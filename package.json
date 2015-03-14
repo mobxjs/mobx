@@ -1,0 +1,19 @@
+{
+  "name": "ts-model",
+  "version": "0.0.0",
+  "description": "",
+  "main": "tsmodel.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mweststrate/ts-model.git"
+  },
+  "author": "Michel Weststrate",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mweststrate/ts-model/issues"
+  },
+  "homepage": "https://github.com/mweststrate/ts-model"
+}
