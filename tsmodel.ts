@@ -3,8 +3,38 @@
 import events = require('events');
 
 module Model {
+	type Primitive = string|boolean|number;
+	type PrimitiveFunction = ()=>Primitive;
 
-	class Property<T> implements IObservable<T> {
+	interface IProperty<T> {
+		():T;
+		(value:T);
+		onChange(callback:(newValue:T, oldValue:T)=>void):IProperty<T>;
+	}
+
+	export function property<T>(value:T|{():T}):IProperty<T> {
+		var prop:Property<any> = null;
+
+		switch(typeof value) {
+			case "function": prop = new ComputedProperty(<()=>T>value);break;
+			case "number": prop = new NumberProperty(<any>value);break; //MWE: WTF cast
+			case "string": prop = new StringProperty(<any>value);break;
+			case "boolean": prop = new BooleanProperty(<any>value);break;
+			default:
+				throw "Unable to determine property type: " + value;
+		}
+
+		var propFunc:IProperty<T> = <any> function(value?) {
+			if (arguments.length > 0)
+				return prop.set(value);
+			return prop.get();
+		}
+		propFunc.onChange = prop.onChange.bind(prop);
+
+		return propFunc;
+	}
+
+	class Property<T> {
 		private events = new events.EventEmitter();
 		protected dependencyState:DNode = new DNode();
 
@@ -14,16 +44,17 @@ module Model {
 
 		set(value:T):Property<T> {
 			if (value !== this._value) {
+				var oldValue = this._value;
 				this.dependencyState.markUnstable();
 				this._value = value;
-				this.events.emit('change', value);
+				this.events.emit('change', value, oldValue);
 				this.dependencyState.markStable();
 			}
 			return this;
 		}
 
 		get():T {
-			DependencyDetector.notifyObserved(this.dependencyState);
+			this.dependencyState.notifyObserved();
 			return this._value;
 		}
 
@@ -33,26 +64,27 @@ module Model {
 		}
 	}
 
-	export class Boolean extends Property<boolean> {
+	class BooleanProperty extends Property<boolean> {
 		constructor(defaultValue=false) {
 			super(defaultValue);
 		}
 	}
 
-	export class Number extends Property<number> {
+	class NumberProperty extends Property<number> {
 		constructor(defaultValue=0) {
 			super(defaultValue);
 		}
 	}
 
-	export class String extends Property<string> {
+	class StringProperty extends Property<string> {
 		constructor(defaultValue="") {
 			super(defaultValue);
 		}
 	}
 
-	export class Computed<U> extends Property<U> {
-		privateSetter:(value:U)=>void = null;
+	class ComputedProperty<U> extends Property<U> {
+		private initialized = false;
+		private privateSetter:(value:U)=>void = null;
 
 		constructor(protected func:()=>U) {
 			super(func ? func() : undefined);
@@ -65,17 +97,19 @@ module Model {
 				return this;
 			}
 
-			this.dependencyState.onDependenciesStable = this.compute.bind(this);
+			this.dependencyState.compute = this.compute.bind(this);
 		}
 
-		compute() {
-			try {
-				DependencyDetector.trackDependencies(this.dependencyState);
-				this.privateSetter.call(this, this.func());
-			}
-			finally {
-				DependencyDetector.bindDependencies(this.dependencyState);
-			}
+		get():U {
+			// first evaluation is lazy
+			if (!this.initialized)
+				this.dependencyState.computeNextValue();
+			return super.get(); // assumption: Compute<> is always synchronous
+		}
+
+		compute(onComplete:()=>void) {
+			this.privateSetter.call(this, this.func());
+			onComplete();
 		}
 	}
 
@@ -100,12 +134,13 @@ module Model {
 	class DNode {
 		state: DNodeState = DNodeState.STABLE;
 
-		observing: DNode[] = [];
-		observers: DNode[] = [];
+		private observing: DNode[] = [];
+		private observers: DNode[] = [];
 
 		addObserver(node:DNode) {
+			/* This check should not be needed, see dependency tracking code
 			var idx = this.observers.indexOf(node);
-			if (idx === -1)
+			if (idx === -1)*/
 				this.observers.push(node);
 		}
 
@@ -136,46 +171,53 @@ module Model {
 				case DNodeState.UNSTABLE:
 					// The observable has become stable, and all others are stable as well, we can compute now!
 					if (observable.state === DNodeState.STABLE && this.observing.filter(o => o.state !== DNodeState.STABLE).length === 0)
-						this.onDependenciesStable();
-					break;
-				case DNodeState.COMPUTING:
-					throw "Circular reference!";
+						// TODO: reschedule if not already in rescheduled mode?
+						this.computeNextValue();
 					break;
 				case DNodeState.STABLE:
+				case DNodeState.COMPUTING:
 					if (observable.state === DNodeState.UNSTABLE)
 						this.markUnstable();
 					break;
 			}
 		}
 
-		onDependenciesStable() {
-			throw "onDependenciesStable not implemented!";
-		}
-
-		clearObserving() {
-			if (this.state !== DNodeState.COMPUTING)
-				throw "Illegal state";
+		private clearObserving() {
 			this.observing.forEach(observing => observing.removeObserver(this));
 			this.observing = [];
 		}
-	}
 
-	class DependencyDetector {
+		computeNextValue() {
+			this.state = DNodeState.COMPUTING;
+			this.trackDependencies();
+			this.compute(() => {
+				this.bindDependencies();
+				this.markStable();
+			});
+		}
+
+		compute(onComplete:()=>void) {
+			onComplete();
+		}
+
+		/*
+			Dependency detection
+		*/
 		private static trackingStack:DNode[][] = []
 
-		static trackDependencies(dnode:DNode) {
-			dnode.clearObserving();
-			DependencyDetector.trackingStack.unshift([]);
+		private trackDependencies() {
+			this.clearObserving();
+			DNode.trackingStack.unshift([]);
 		}
 
-		static bindDependencies(dnode:DNode) {
-			var changedObservables = dnode.observing = DependencyDetector.trackingStack.shift();
-			changedObservables.forEach(observable => observable.addObserver(dnode))
+		private bindDependencies() {
+			var changedObservables = this.observing = DNode.trackingStack.shift();
+			changedObservables.forEach(observable => observable.addObserver(this))
 		}
 
-		static notifyObserved(observable:DNode) {
-			if (DependencyDetector.trackingStack.length)
-				DependencyDetector.trackingStack[0].push(observable);
+		public notifyObserved() {
+			if (DNode.trackingStack.length)
+				DNode.trackingStack[0].push(this);
 		}
 	}
 }
