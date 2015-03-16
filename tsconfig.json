@@ -13,7 +13,7 @@
         "!./node_modules/**/*.ts"
     ],
     "files": [
-        "./node-0.10.d.ts",
+        "./test/properties.ts",
         "./tsmodel.ts",
         "./typings/node-0.10.d.ts"
     ]

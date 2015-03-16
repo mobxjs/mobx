@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/mweststrate/ts-model/issues"
   },
-  "homepage": "https://github.com/mweststrate/ts-model"
+  "homepage": "https://github.com/mweststrate/ts-model",
+  "devDependencies": {
+    "typescript-require": "^0.2.8"
+  }
 }
