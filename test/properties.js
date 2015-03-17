@@ -72,24 +72,58 @@ exports.dynamic2 = function(test) {
 
 exports.readme1 = function(test) {
   try {
-  var b = buffer();
-  var property = model.property;
+    var b = buffer();
+    var property = model.property;
 
-  var vat = property(0.20);
-  var order = {};
-  order.price = property(10);
-    // Prints: New price: 24
-    //in TS, just: property(() => this.price() * (1+vat()))
-  order.priceWithVat = property(function() {
-    return order.price() * (1+vat());
-  });
+    var vat = property(0.20);
+    var order = {};
+    order.price = property(10);
+      // Prints: New price: 24
+      //in TS, just: property(() => this.price() * (1+vat()))
+    order.priceWithVat = property(function() {
+      return order.price() * (1+vat());
+    });
 
-  order.priceWithVat(); // TODO: should not be needed!
-  order.priceWithVat.onChange(b);
+    order.priceWithVat(); // TODO: should not be needed!
+    order.priceWithVat.onChange(b);
 
-  order.price(20);
-  order.price(10);
-  test.deepEqual([24,12],b.toArray());
-  test.done();
-} catch (e) { console.log(e.stack); throw e;}
+    order.price(20);
+    order.price(10);
+    test.deepEqual([24,12],b.toArray());
+    test.done();
+  } catch (e) {
+    console.log(e.stack); throw e;
+  }
+}
+
+exports.cycle1 = function(test) {
+  try {
+    var p = model.property(function() { return p() * 2 }); // thats a cycle!
+    p();
+    test.fail(true);
+  }
+  catch(e) {
+    console.log(e);
+    test.ok(("" + e).indexOf("Cycle detected") !== -1);
+    test.done();
+  }
+}
+
+exports.cycle2 = function(test) {
+  var z = model.property(true);
+  var a = model.property(function() { return z() ? 1 : b() * 2 });
+  var b = model.property(function() { return a() * 2 });
+
+  test.equals(1, a());
+
+  test.equals(2, b());
+  try {
+    z(false); // introduces a cycle!
+    test.fail(true);
+  }
+  catch(e) {
+    console.log(e);
+    test.ok(("" + e).indexOf("Cycle detected") !== -1);
+    test.done();
+  }
 }

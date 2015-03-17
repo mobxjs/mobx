@@ -54,7 +54,8 @@ class Property<T> {
 
 	get():T {
 		if (this.dependencyState.state !== DNodeState.STABLE)
-			throw new Error("Cycle detected");
+			throw new Error("Cycle detected in " + this.toString());
+
 		this.dependencyState.notifyObserved();
 		return this._value;
 	}
@@ -68,6 +69,10 @@ class Property<T> {
 		return () => {
 			this.events.removeListener('change', listener);
 		};
+	}
+
+	toString() {
+		return `Property[${this._value}]`;
 	}
 }
 
@@ -110,6 +115,8 @@ class ComputedProperty<U> extends Property<U> {
 	get():U {
 		// first evaluation is lazy
 		if (!this.initialized) {
+			if (this.dependencyState.state !== DNodeState.STABLE)
+				throw new Error("Cycle detected in " + this.toString());
 			this.dependencyState.computeNextValue();
 		}
 		return super.get(); // assumption: Compute<> is always synchronous
@@ -119,6 +126,10 @@ class ComputedProperty<U> extends Property<U> {
 		this.privateSetter.call(this, this.func());
 		onComplete();
 		this.initialized = true;
+	}
+
+	toString() {
+		return `Property[${this.func.toString()}]`;
 	}
 }
 
