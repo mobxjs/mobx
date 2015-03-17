@@ -46,3 +46,52 @@ exports.dynamic = function(test) {
     console.log(e.stack);
   }
 }
+
+exports.dynamic2 = function(test) {
+  try {
+    var x = model.property(3);
+    var y = model.property(function() {
+      return x() * x();
+    });
+
+    test.equal(9, y());
+    var b = buffer();
+    y.onChange(b);
+
+    x(5);
+    test.equal(25, y());
+
+    //no intermediate value 15!
+    test.deepEqual([25], b.toArray())
+    test.done();
+  }
+  catch(e) {
+    console.log(e.stack);
+  }
+}
+
+exports.readme1 = function(test) {
+  try {
+  var b = buffer();
+  var property = model.property;
+
+  var vat = property(0.20);
+  var order = {
+    price: property(10),
+    // Prints: New price: 24
+    //in TS, just: property(() => this.price() * (1+vat()))
+    priceWithVat: property(function() {
+      // TODO: order -> this
+      return order.price() * (1+vat());
+    }.bind(order))
+  };
+
+  order.priceWithVat(); // TODO: should not be needed!
+  order.priceWithVat.onChange(b);
+
+  order.price(20);
+  order.price(10);
+  test.deepEqual([24,12],b.toArray());
+  test.done();
+} catch (e) { console.log(e.stack); throw e;}
+}

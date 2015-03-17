@@ -105,7 +105,6 @@ class ComputedProperty<U> extends Property<U> {
 	get():U {
 		// first evaluation is lazy
 		if (!this.initialized) {
-			this.initialized = true;
 			this.dependencyState.computeNextValue();
 		}
 		return super.get(); // assumption: Compute<> is always synchronous
@@ -114,6 +113,7 @@ class ComputedProperty<U> extends Property<U> {
 	compute(onComplete:()=>void) {
 		this.privateSetter.call(this, this.func());
 		onComplete();
+		this.initialized = true;
 	}
 }
 
@@ -207,6 +207,7 @@ class DNode {
 	/*
 		Dependency detection
 	*/
+	// TODO: is trackingstack + push/pop still valid if DNode.compute is executed asynchronously?
 	private static trackingStack:DNode[][] = []
 
 	private trackDependencies() {
