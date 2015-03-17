@@ -1,5 +1,4 @@
 /// <reference path="./typings/node-0.10.d.ts" />
-debugger;
 import events = require('events');
 
 type Primitive = string|boolean|number;
@@ -54,6 +53,8 @@ class Property<T> {
 	}
 
 	get():T {
+		if (this.dependencyState.state !== DNodeState.STABLE)
+			throw new Error("Cycle detected");
 		this.dependencyState.notifyObserved();
 		return this._value;
 	}
@@ -64,7 +65,7 @@ class Property<T> {
 			listener(current, undefined);
 
 		this.events.addListener('change', listener);
-		return ()=> {
+		return () => {
 			this.events.removeListener('change', listener);
 		};
 	}
