@@ -32,7 +32,7 @@ exports.dynamic = function(test) {
       return x();
     });
     var b = buffer();
-    y.onChange(b);
+    y.onChange(b, true);
 
     test.equal(3, y()); // First evaluation here..
 
@@ -76,15 +76,13 @@ exports.readme1 = function(test) {
   var property = model.property;
 
   var vat = property(0.20);
-  var order = {
-    price: property(10),
+  var order = {};
+  order.price = property(10);
     // Prints: New price: 24
     //in TS, just: property(() => this.price() * (1+vat()))
-    priceWithVat: property(function() {
-      // TODO: order -> this
-      return order.price() * (1+vat());
-    }.bind(order))
-  };
+  order.priceWithVat = property(function() {
+    return order.price() * (1+vat());
+  });
 
   order.priceWithVat(); // TODO: should not be needed!
   order.priceWithVat.onChange(b);

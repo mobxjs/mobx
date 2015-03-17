@@ -12,10 +12,9 @@ var property = model.property;
 
 var vat = property(0.20);
 
-var order = {
-  price: property(10),
-  priceWithVat: property(() => this.price() * (1+vat()));
-}
+var order = {};
+order.price = property(10),
+order.priceWithVat = property(() => order.price() * (1+vat()));
 
 order.priceWithVat.onChange((price) => console.log("New price: " + price));
 
@@ -37,8 +36,8 @@ Returns the current value of the property
 
 Sets a new value to the property
 
-### Property.onChange(listener)
+### Property.onChange(listener,fireImmediately=false)
 
 Registers a new listener to change events. Listener should be a function, its first argument will be the new value, and second argument the old value.
 
-Returns a function that upon invocation unsubscribes the listener from the property. 
+Returns a function that upon invocation unsubscribes the listener from the property.

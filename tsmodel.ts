@@ -58,10 +58,14 @@ class Property<T> {
 		return this._value;
 	}
 
-	onChange(callback:(newValue:T)=>void):()=>void {
-		this.events.addListener('change', callback);
+	onChange(listener:(newValue:T, oldValue:T)=>void, fireImmediately=false):()=>void {
+		var current = this.get(); // make sure the values are initialized
+		if (fireImmediately)
+			listener(current, undefined);
+
+		this.events.addListener('change', listener);
 		return ()=> {
-			this.events.removeListener('change', callback);
+			this.events.removeListener('change', listener);
 		};
 	}
 }
