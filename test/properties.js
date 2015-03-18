@@ -103,7 +103,15 @@ exports.cycle1 = function(test) {
     test.fail(true);
   }
   catch(e) {
-    console.log(e);
+    test.ok(("" + e).indexOf("Cycle detected") !== -1);
+  }
+  try {
+    var a = model.property(function() { return b() * 2 });
+    var b = model.property(function() { return a() * 2 });
+    b();
+    test.fail(true);
+  }
+  catch(e) {
     test.ok(("" + e).indexOf("Cycle detected") !== -1);
     test.done();
   }
@@ -118,8 +126,11 @@ exports.cycle2 = function(test) {
 
   test.equals(2, b());
   try {
+    debugger;
     z(false); // introduces a cycle!
-    test.fail(true);
+    z(true);
+    test.fail(true, "No exception thrown, found: " + b());
+    test.done();
   }
   catch(e) {
     console.log(e);

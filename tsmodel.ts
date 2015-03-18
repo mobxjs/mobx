@@ -47,9 +47,6 @@ class Property<T> {
 	}
 
 	get():T {
-		if (this.dependencyState.state !== DNodeState.STABLE)
-			throw new Error("Cycle detected in " + this.toString());
-
 		this.dependencyState.notifyObserved();
 		return this._value;
 	}
@@ -91,11 +88,11 @@ class ComputedProperty<U> extends Property<U> {
 	get():U {
 		// first evaluation is lazy
 		if (!this.initialized) {
-			if (this.dependencyState.state !== DNodeState.STABLE)
-				throw new Error("Cycle detected in " + this.toString());
+			this.initialized = true; // prevents endless recursion in cycles (cycles themselves are only detected after finishing the computation)
 			this.dependencyState.computeNextValue();
 		}
-		return super.get(); // assumption: Compute<> is always synchronous
+
+		return super.get(); // assumption: Compute<> is always synchronous for computed properties
 	}
 
 	compute(onComplete:()=>void) {
@@ -131,6 +128,7 @@ class DNode {
 	state: DNodeState = DNodeState.STABLE;
 
 	private observing: DNode[] = [];
+	private prevObserving: DNode[] = [];
 	private observers: DNode[] = [];
 
 	addObserver(node:DNode) {
@@ -143,11 +141,21 @@ class DNode {
 			this.observers.splice(idx, 1);
 	}
 
+	hasObservingChanged() {
+		if (this.observing.length !== this.prevObserving.length)
+			return true;
+		for(var i = 0; i < this.observing.length; i++)
+			if (this.observing[i] !== this.prevObserving[i])
+				return true;
+		return false;
+	}
+
 	markUnstable() {
 		if (this.state === DNodeState.COMPUTING)
 			throw new Error("Illegal state");
 		if (this.state === DNodeState.UNSTABLE)
 			return;
+
 		this.state = DNodeState.UNSTABLE;
 		this.observers.forEach(observer => observer.notifyStateChange(this));
 	}
@@ -168,8 +176,13 @@ class DNode {
 					//Scheduler.schedule(() => this.computeNextValue());
 					this.computeNextValue();
 				break;
-			case DNodeState.STABLE:
 			case DNodeState.COMPUTING:
+				// If computations are asynchronous, new updates might come in during processing,
+				// and it is impossible to determine whether these new values will be taken into consideration
+				// during the async process or not. So to ensure everything is concistent, probably a new computation
+				// should be scheduled immediately after the current one is done..
+				break;
+			case DNodeState.STABLE:
 				if (observable.state === DNodeState.UNSTABLE)
 					this.markUnstable();
 				break;
@@ -196,14 +209,17 @@ class DNode {
 	private static trackingStack:DNode[][] = []
 
 	private trackDependencies() {
-		this.observing.forEach(observing => observing.removeObserver(this));
-		this.observing = null;
+		this.prevObserving = this.observing;
 		DNode.trackingStack.unshift([]);
 	}
 
 	private bindDependencies() {
-		var changedObservables = this.observing = DNode.trackingStack.shift();
-		changedObservables.forEach(observable => observable.addObserver(this))
+		this.observing = DNode.trackingStack.shift();
+		if (this.hasObservingChanged()) {
+			this.prevObserving.forEach(observing => observing.removeObserver(this));
+			this.observing.forEach(observable => observable.addObserver(this))
+			this.findCycle(this);
+		}
 	}
 
 	public notifyObserved() {
@@ -211,6 +227,14 @@ class DNode {
 			throw new Error("Cycle detected");
 		if (DNode.trackingStack.length)
 			DNode.trackingStack[0].push(this);
+	}
+
+	public findCycle(node:DNode) {
+		if (!this.observing)
+			return;
+		if (this.observing.indexOf(node) !== -1)
+			throw new Error("Cycle detected");
+		this.observing.forEach(o => o.findCycle(node));
 	}
 }
 
