@@ -1,9 +1,6 @@
 /// <reference path="./typings/node-0.10.d.ts" />
 import events = require('events');
 
-type Primitive = string|boolean|number;
-type PrimitiveFunction = ()=>Primitive;
-
 interface IProperty<T> {
 	():T;
 	(value:T);
@@ -11,25 +8,22 @@ interface IProperty<T> {
 }
 
 export function property<T>(value:T|{():T}):IProperty<T> {
-	var prop:Property<any> = null;
+	var prop:Property<T> = null;
 
-	switch(typeof value) {
-		case "function": prop = new ComputedProperty(<()=>T>value);break;
-		case "number": prop = new NumberProperty(<any>value);break; //MWE: WTF cast
-		case "string": prop = new StringProperty(<any>value);break;
-		case "boolean": prop = new BooleanProperty(<any>value);break;
-		default:
-			throw new Error("Unable to determine property type: " + value);
-	}
+	if (typeof value === "function")
+		prop = new ComputedProperty(<()=>T>value);
+	else
+		prop = new Property(<T>value);
 
-	var propFunc:IProperty<T> = <any> function(value?) {
+	var propFunc = function(value?:T):T|void {
 		if (arguments.length > 0)
-			return prop.set(value);
-		return prop.get();
-	}
-	propFunc.onChange = prop.onChange.bind(prop);
+			prop.set(value);
+		else
+			return prop.get();
+	};
+	(<any>propFunc).onChange = prop.onChange.bind(prop);
 
-	return propFunc;
+	return <IProperty<T>> propFunc;
 }
 
 class Property<T> {
@@ -73,24 +67,6 @@ class Property<T> {
 
 	toString() {
 		return `Property[${this._value}]`;
-	}
-}
-
-class BooleanProperty extends Property<boolean> {
-	constructor(defaultValue=false) {
-		super(defaultValue);
-	}
-}
-
-class NumberProperty extends Property<number> {
-	constructor(defaultValue=0) {
-		super(defaultValue);
-	}
-}
-
-class StringProperty extends Property<string> {
-	constructor(defaultValue="") {
-		super(defaultValue);
 	}
 }
 
@@ -158,10 +134,7 @@ class DNode {
 	private observers: DNode[] = [];
 
 	addObserver(node:DNode) {
-		/* This check should not be needed, see dependency tracking code
-		var idx = this.observers.indexOf(node);
-		if (idx === -1)*/
-			this.observers.push(node);
+		this.observers.push(node);
 	}
 
 	removeObserver(node:DNode) {
@@ -191,7 +164,8 @@ class DNode {
 			case DNodeState.UNSTABLE:
 				// The observable has become stable, and all others are stable as well, we can compute now!
 				if (observable.state === DNodeState.STABLE && this.observing.filter(o => o.state !== DNodeState.STABLE).length === 0)
-					// TODO: reschedule if not already in rescheduled mode?
+					// TODO:
+					//Scheduler.schedule(() => this.computeNextValue());
 					this.computeNextValue();
 				break;
 			case DNodeState.STABLE:
@@ -200,11 +174,6 @@ class DNode {
 					this.markUnstable();
 				break;
 		}
-	}
-
-	private clearObserving() {
-		this.observing.forEach(observing => observing.removeObserver(this));
-		this.observing = [];
 	}
 
 	computeNextValue() {
@@ -227,7 +196,8 @@ class DNode {
 	private static trackingStack:DNode[][] = []
 
 	private trackDependencies() {
-		this.clearObserving();
+		this.observing.forEach(observing => observing.removeObserver(this));
+		this.observing = null;
 		DNode.trackingStack.unshift([]);
 	}
 
