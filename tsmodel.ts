@@ -207,7 +207,46 @@ class DNode {
 	}
 
 	public notifyObserved() {
+		if (this.state === DNodeState.COMPUTING)
+			throw new Error("Cycle detected");
 		if (DNode.trackingStack.length)
 			DNode.trackingStack[0].push(this);
+	}
+}
+
+class Scheduler {
+	private static tasks:{():void}[] = [];
+	private static isRunScheduled = false;
+	private static isRunning = false;
+
+	public static schedule(func:()=>void) {
+		if (Scheduler.isRunning)
+			func();
+		else if (Scheduler.isRunScheduled)
+			Scheduler.tasks.push(func);
+		else {
+			Scheduler.tasks.push(func);
+			Scheduler.isRunScheduled = true;
+			setImmediate(Scheduler.run); //TODO: or nextTick or setImmediate, or setTimout
+		}
+	}
+
+	private static run() {
+		Scheduler.isRunning = true;
+		Scheduler.isRunScheduled = false;
+		try {
+			while(Scheduler.tasks.length) {
+				try {
+					Scheduler.tasks.shift()();
+				}
+				catch (e) {
+					console && console.error("Failed to run scheduled action: " + e);
+					throw e;
+				}
+			}
+		}
+		finally {
+			Scheduler.isRunning = false;
+		}
 	}
 }
