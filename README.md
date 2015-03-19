@@ -27,11 +27,17 @@ order.price(10);
 
 ### model.property(value)
 
-Constructs a new `Property`, value can either be a string, number, boolean or function that takes no arguments and returns a value. In the body of the function, references to other properties will be tracked, and onChange, the function will be re-evaluated. The returned value is an IProperty function/object.
+Constructs a new `Property`, value can either be a string, number, boolean or function that takes no arguments and returns a value. In the body of the function, references to other properties will be tracked, and onChange, the function will be re-evaluated. The returned value is an `IProperty` function/object.
 
 ### model.batch(workerFunction)
 
-Batch postpones the updates of computed properties until the (synchronous) `workerFunction` has completed. This is useful if you want to apply a bunch of different updates throughout your model before needing the updated computed values, for example while refreshing a value from the database. 
+Batch postpones the updates of computed properties until the (synchronous) `workerFunction` has completed. This is useful if you want to apply a bunch of different updates throughout your model before needing the updated computed values, for example while refreshing a value from the database.
+
+### model.onReady(listener) / model.onceReady(listener)
+
+The listener is invoked each time the complete model has become stable. The listener is always invoked asynchronously, so that even without `batch` the listener is only invoked after a bunch of changes have been applied
+
+`onReady` returns a function with wich the listener can be unsubscribed from future events
 
 ### IProperty()
 

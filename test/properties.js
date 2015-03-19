@@ -142,7 +142,7 @@ exports.cycle2 = function(test) {
   }
 }
 
-exports.testBatch = function(test) {
+exports.testBatchAndReady = function(test) {
     var a = model.property(2);
     var b = model.property(3);
     var c = model.property(function() { return a() * b() });
@@ -155,6 +155,12 @@ exports.testBatch = function(test) {
     // Note, 60 should not happen! (that is d beign computed before c after update of b)
     test.deepEqual([36, 100], buf.toArray());
 
+    model.onceReady(function() {
+        //this is called async, and only after everything has finished, so d should be 54
+        test.deepEqual(54, d()); // only one new value for d
+
+        test.done();
+    });
     model.batch(function() {
         a(2);
         b(3);
@@ -163,5 +169,4 @@ exports.testBatch = function(test) {
     });
 
     test.deepEqual([36, 100, 54], buf.toArray());// only one new value for d
-    test.done();
 }

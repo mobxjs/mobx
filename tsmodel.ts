@@ -30,6 +30,14 @@ export function batch(action:()=>void) {
 	Scheduler.batch(action);
 }
 
+export function onReady(listener:()=>void):()=>void {
+	return Scheduler.onReady(listener);
+}
+
+export function onceReady(listener:()=>void) {
+	Scheduler.onceReady(listener);
+}
+
 class Property<T> {
 	private events = new events.EventEmitter();
 	protected dependencyState:DNode = new DNode();
@@ -169,6 +177,7 @@ class DNode {
 			return;
 		this.state = DNodeState.STABLE;
 		this.observers.forEach(observer => observer.notifyStateChange(this));
+		Scheduler.scheduleReady();
 	}
 
 	notifyStateChange(observable:DNode) {
@@ -245,6 +254,7 @@ class DNode {
 }
 
 class Scheduler {
+	private static events = new events.EventEmitter();
 	private static inBatch = 0;
 	private static tasks:{():void}[] = [];
 
@@ -273,8 +283,33 @@ class Scheduler {
 			action();
 		} finally {
 			Scheduler.inBatch -= 1;
-			if (Scheduler.inBatch === 0)
+			if (Scheduler.inBatch === 0) {
 				Scheduler.run();
+				Scheduler.scheduleReady();
+			}
 		}
+	}
+
+	private static pendingReady = false;
+
+	static scheduleReady() {
+		if (!Scheduler.pendingReady) {
+			Scheduler.pendingReady = true;
+			setTimeout(()=> {
+				Scheduler.pendingReady = false;
+				Scheduler.events.emit('ready');
+			}, 1);
+		}
+	}
+
+	static onReady(listener:()=>void) {
+		Scheduler.events.on('ready', listener);
+		return () => {
+			Scheduler.events.removeListener('ready', listener);
+		}
+	}
+
+	static onceReady(listener:()=>void) {
+		Scheduler.events.once('ready', listener);
 	}
 }
