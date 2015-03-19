@@ -26,6 +26,17 @@ export function property<T>(value:T|{():T}):IProperty<T> {
 	return <IProperty<T>> propFunc;
 }
 
+export function onReady(listener:()=>void) {
+	Scheduler.events.on('ready', listener);
+	return ()=> {
+		Scheduler.events.removeListener('ready', listener);
+	}
+}
+
+export function onNextReady(listener:()=>void) {
+	Scheduler.events.once('ready', listener);
+}
+
 class Property<T> {
 	private events = new events.EventEmitter();
 	protected dependencyState:DNode = new DNode();
@@ -172,9 +183,10 @@ class DNode {
 			case DNodeState.UNSTABLE:
 				// The observable has become stable, and all others are stable as well, we can compute now!
 				if (observable.state === DNodeState.STABLE && this.observing.filter(o => o.state !== DNodeState.STABLE).length === 0)
+					this.state = DNodeState.COMPUTING;
 					// TODO:
-					//Scheduler.schedule(() => this.computeNextValue());
-					this.computeNextValue();
+					Scheduler.schedule(() => this.computeNextValue());
+					//this.computeNextValue();
 				break;
 			case DNodeState.COMPUTING:
 				// If computations are asynchronous, new updates might come in during processing,
@@ -190,7 +202,6 @@ class DNode {
 	}
 
 	computeNextValue() {
-		this.state = DNodeState.COMPUTING;
 		this.trackDependencies();
 		this.compute(() => {
 			this.bindDependencies();
@@ -239,6 +250,8 @@ class DNode {
 }
 
 class Scheduler {
+	static events = new events.EventEmitter();
+
 	private static tasks:{():void}[] = [];
 	private static isRunScheduled = false;
 	private static isRunning = false;
@@ -271,6 +284,7 @@ class Scheduler {
 		}
 		finally {
 			Scheduler.isRunning = false;
+			Scheduler.events.emit('ready');
 		}
 	}
 }

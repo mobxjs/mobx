@@ -37,10 +37,12 @@ exports.dynamic = function(test) {
     test.equal(3, y()); // First evaluation here..
 
     x(5);
-    test.equal(5, y());
+    model.onNextReady(function() {
+        test.equal(5, y());
 
-    test.deepEqual([3, 5], b.toArray())
-    test.done();
+        test.deepEqual([3, 5], b.toArray())
+        test.done();
+    });
   }
   catch(e) {
     console.log(e.stack);
@@ -99,6 +101,7 @@ exports.readme1 = function(test) {
 exports.cycle1 = function(test) {
   try {
     var p = model.property(function() { return p() * 2 }); // thats a cycle!
+    debugger;
     p();
     test.fail(true);
   }
@@ -112,6 +115,7 @@ exports.cycle1 = function(test) {
     test.fail(true);
   }
   catch(e) {
+      console.log(e);
     test.ok(("" + e).indexOf("Cycle detected") !== -1);
     test.done();
   }
