@@ -2,9 +2,10 @@
 
 ts-model is a collection of utilities that helps managing the M of MVC. ts-model provides observable properties and structures, and utilities to create derived data which are updated reactively.
 
-## Property
+# Properties
 
-The `property` method takes a value or function and creates an observable value from this.
+The `model.property` method takes a value or function and creates an observable value from it.
+This way properties that listen that observe each other can be created. A quick example:
 
 ```typescript
 import model = require('ts-model');
@@ -26,17 +27,21 @@ order.price(10);
 
 ### model.property(value)
 
-Constructs a new `Property`, value can either be a string, number, boolean or function that takes no arguments and returns a value. In the body of the function, references to other properties will be tracked, and onChange, the function will be re-evaluated.
+Constructs a new `Property`, value can either be a string, number, boolean or function that takes no arguments and returns a value. In the body of the function, references to other properties will be tracked, and onChange, the function will be re-evaluated. The returned value is an IProperty function/object.
 
-### Property()
+### model.batch(workerFunction)
+
+Batch postpones the updates of computed properties until the (synchronous) `workerFunction` has completed. This is useful if you want to apply a bunch of different updates throughout your model before needing the updated computed values, for example while refreshing a value from the database. 
+
+### IProperty()
 
 Returns the current value of the property
 
-### Property(value)
+### IProperty(value)
 
 Sets a new value to the property
 
-### Property.onChange(listener,fireImmediately=false)
+### IProperty.onChange(listener,fireImmediately=false)
 
 Registers a new listener to change events. Listener should be a function, its first argument will be the new value, and second argument the old value.
 

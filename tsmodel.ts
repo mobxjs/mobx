@@ -26,15 +26,8 @@ export function property<T>(value:T|{():T}):IProperty<T> {
 	return <IProperty<T>> propFunc;
 }
 
-export function onReady(listener:()=>void) {
-	Scheduler.events.on('ready', listener);
-	return ()=> {
-		Scheduler.events.removeListener('ready', listener);
-	}
-}
-
-export function onNextReady(listener:()=>void) {
-	Scheduler.events.once('ready', listener);
+export function batch(action:()=>void) {
+	Scheduler.batch(action);
 }
 
 class Property<T> {
@@ -108,8 +101,8 @@ class ComputedProperty<U> extends Property<U> {
 
 	compute(onComplete:()=>void) {
 		this.privateSetter.call(this, this.func());
-		onComplete();
 		this.initialized = true;
+		onComplete();
 	}
 
 	toString() {
@@ -163,7 +156,7 @@ class DNode {
 
 	markUnstable() {
 		if (this.state === DNodeState.COMPUTING)
-			throw new Error("Illegal state");
+			return; // recalculation still scheduled, we're fine..
 		if (this.state === DNodeState.UNSTABLE)
 			return;
 
@@ -182,18 +175,20 @@ class DNode {
 		switch(this.state) {
 			case DNodeState.UNSTABLE:
 				// The observable has become stable, and all others are stable as well, we can compute now!
-				if (observable.state === DNodeState.STABLE && this.observing.filter(o => o.state !== DNodeState.STABLE).length === 0)
+				if (observable.state === DNodeState.STABLE && this.observing.filter(o => o.state !== DNodeState.STABLE).length === 0) {
 					this.state = DNodeState.COMPUTING;
-					// TODO:
 					Scheduler.schedule(() => this.computeNextValue());
-					//this.computeNextValue();
+				}
 				break;
 			case DNodeState.COMPUTING:
 				// If computations are asynchronous, new updates might come in during processing,
 				// and it is impossible to determine whether these new values will be taken into consideration
 				// during the async process or not. So to ensure everything is concistent, probably a new computation
 				// should be scheduled immediately after the current one is done..
-				break;
+
+				// However, for now the model is that all computations are synchronous, so if computing, a calc is scheduled
+				// and we're fine here
+			//	break;
 			case DNodeState.STABLE:
 				if (observable.state === DNodeState.UNSTABLE)
 					this.markUnstable();
@@ -250,41 +245,36 @@ class DNode {
 }
 
 class Scheduler {
-	static events = new events.EventEmitter();
-
+	private static inBatch = 0;
 	private static tasks:{():void}[] = [];
-	private static isRunScheduled = false;
-	private static isRunning = false;
 
 	public static schedule(func:()=>void) {
-		if (Scheduler.isRunning)
+		if (Scheduler.inBatch < 1)
 			func();
-		else if (Scheduler.isRunScheduled)
+		else
 			Scheduler.tasks.push(func);
-		else {
-			Scheduler.tasks.push(func);
-			Scheduler.isRunScheduled = true;
-			setImmediate(Scheduler.run); //TODO: or nextTick or setImmediate, or setTimout
-		}
 	}
 
 	private static run() {
-		Scheduler.isRunning = true;
-		Scheduler.isRunScheduled = false;
-		try {
-			while(Scheduler.tasks.length) {
-				try {
-					Scheduler.tasks.shift()();
-				}
-				catch (e) {
-					console && console.error("Failed to run scheduled action: " + e);
-					throw e;
-				}
+		while(Scheduler.tasks.length) {
+			try {
+				Scheduler.tasks.shift()();
+			}
+			catch (e) {
+				console && console.error("Failed to run scheduled action: " + e);
+				throw e;
 			}
 		}
-		finally {
-			Scheduler.isRunning = false;
-			Scheduler.events.emit('ready');
+	}
+
+	static batch(action:()=>void) {
+		Scheduler.inBatch += 1;
+		try {
+			action();
+		} finally {
+			Scheduler.inBatch -= 1;
+			if (Scheduler.inBatch === 0)
+				Scheduler.run();
 		}
 	}
 }

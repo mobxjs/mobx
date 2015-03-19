@@ -1,5 +1,6 @@
-require('typescript-require')
-var model = require('../tsmodel.ts')
+//require('typescript-require')
+//var model = require('../tsmodel.ts')
+var model = require('../tsmodel.js')
 
 function buffer() {
   var b = [];
@@ -37,12 +38,10 @@ exports.dynamic = function(test) {
     test.equal(3, y()); // First evaluation here..
 
     x(5);
-    model.onNextReady(function() {
-        test.equal(5, y());
+    test.equal(5, y());
 
-        test.deepEqual([3, 5], b.toArray())
-        test.done();
-    });
+    test.deepEqual([3, 5], b.toArray())
+    test.done();
   }
   catch(e) {
     console.log(e.stack);
@@ -141,4 +140,28 @@ exports.cycle2 = function(test) {
     test.ok(("" + e).indexOf("Cycle detected") !== -1);
     test.done();
   }
+}
+
+exports.testBatch = function(test) {
+    var a = model.property(2);
+    var b = model.property(3);
+    var c = model.property(function() { return a() * b() });
+    var d = model.property(function() { return c() * b() });
+    var buf = buffer();
+    d.onChange(buf);
+
+    a(4);
+    b(5);
+    // Note, 60 should not happen! (that is d beign computed before c after update of b)
+    test.deepEqual([36, 100], buf.toArray());
+
+    model.batch(function() {
+        a(2);
+        b(3);
+        a(6);
+        test.deepEqual(100, d()); // still hunderd
+    });
+
+    test.deepEqual([36, 100, 54], buf.toArray());// only one new value for d
+    test.done();
 }
