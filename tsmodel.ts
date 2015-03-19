@@ -49,11 +49,10 @@ class Property<T> {
 	set(value:T):Property<T> {
 		if (value !== this._value) {
 			var oldValue = this._value;
-			if (this.dependencyState.state !== DNodeState.COMPUTING)
-				this.dependencyState.markUnstable();
+			this.dependencyState.markStale();
 			this._value = value;
+			this.dependencyState.markReady();
 			this.events.emit('change', value, oldValue);
-			this.dependencyState.markStable();
 		}
 		return this;
 	}
@@ -134,10 +133,14 @@ interface IObservable<T> {
 	onChange(callback:(value:T)=>void);
 }
 
-enum DNodeState { UNSTABLE, COMPUTING, STABLE };
+enum DNodeState {
+	STALE, // One or more depencies have changed, current value is stale
+	PENDING, // All dependencies are up to date again, a recalculation of this node is pending, current value is stale
+	READY, // Everything is bright and shiny
+};
 
 class DNode {
-	state: DNodeState = DNodeState.STABLE;
+	state: DNodeState = DNodeState.READY;
 
 	private observing: DNode[] = [];
 	private prevObserving: DNode[] = [];
@@ -162,34 +165,34 @@ class DNode {
 		return false;
 	}
 
-	markUnstable() {
-		if (this.state === DNodeState.COMPUTING)
-			return; // recalculation still scheduled, we're fine..
-		if (this.state === DNodeState.UNSTABLE)
+	markStale() {
+		if (this.state === DNodeState.PENDING)
+			return; // recalculation already scheduled, we're fine..
+		if (this.state === DNodeState.STALE)
 			return;
 
-		this.state = DNodeState.UNSTABLE;
+		this.state = DNodeState.STALE;
 		this.observers.forEach(observer => observer.notifyStateChange(this));
 	}
 
-	markStable() {
-		if (this.state === DNodeState.STABLE)
+	markReady() {
+		if (this.state === DNodeState.READY)
 			return;
-		this.state = DNodeState.STABLE;
+		this.state = DNodeState.READY;
 		this.observers.forEach(observer => observer.notifyStateChange(this));
 		Scheduler.scheduleReady();
 	}
 
 	notifyStateChange(observable:DNode) {
 		switch(this.state) {
-			case DNodeState.UNSTABLE:
+			case DNodeState.STALE:
 				// The observable has become stable, and all others are stable as well, we can compute now!
-				if (observable.state === DNodeState.STABLE && this.observing.filter(o => o.state !== DNodeState.STABLE).length === 0) {
-					this.state = DNodeState.COMPUTING;
+				if (observable.state === DNodeState.READY && this.observing.filter(o => o.state !== DNodeState.READY).length === 0) {
+					this.state = DNodeState.PENDING;
 					Scheduler.schedule(() => this.computeNextValue());
 				}
 				break;
-			case DNodeState.COMPUTING:
+			case DNodeState.PENDING:
 				// If computations are asynchronous, new updates might come in during processing,
 				// and it is impossible to determine whether these new values will be taken into consideration
 				// during the async process or not. So to ensure everything is concistent, probably a new computation
@@ -198,9 +201,9 @@ class DNode {
 				// However, for now the model is that all computations are synchronous, so if computing, a calc is scheduled
 				// and we're fine here
 			//	break;
-			case DNodeState.STABLE:
-				if (observable.state === DNodeState.UNSTABLE)
-					this.markUnstable();
+			case DNodeState.READY:
+				if (observable.state === DNodeState.STALE)
+					this.markStale();
 				break;
 		}
 	}
@@ -209,7 +212,7 @@ class DNode {
 		this.trackDependencies();
 		this.compute(() => {
 			this.bindDependencies();
-			this.markStable();
+			this.markReady();
 		});
 	}
 
@@ -238,7 +241,7 @@ class DNode {
 	}
 
 	public notifyObserved() {
-		if (this.state === DNodeState.COMPUTING)
+		if (this.state === DNodeState.PENDING)
 			throw new Error("Cycle detected");
 		if (DNode.trackingStack.length)
 			DNode.trackingStack[0].push(this);

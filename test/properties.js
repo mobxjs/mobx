@@ -114,7 +114,7 @@ exports.cycle1 = function(test) {
     test.fail(true);
   }
   catch(e) {
-      console.log(e);
+    //  console.log(e);
     test.ok(("" + e).indexOf("Cycle detected") !== -1);
     test.done();
   }
@@ -136,7 +136,7 @@ exports.cycle2 = function(test) {
     test.done();
   }
   catch(e) {
-    console.log(e);
+//    console.log(e);
     test.ok(("" + e).indexOf("Cycle detected") !== -1);
     test.done();
   }
