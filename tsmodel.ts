@@ -1,10 +1,14 @@
 /// <reference path="./typings/node-0.10.d.ts" />
 import events = require('events');
 
+interface Lambda {
+	():void;
+}
+
 interface IProperty<T> {
 	():T;
-	(value:T);
-	onChange(callback:(newValue:T, oldValue:T)=>void):()=>void;
+	(value:T):void;
+	onChange(callback:(newValue:T, oldValue:T)=>void):Lambda;
 }
 
 export function property<T>(value:T|{():T}):IProperty<T> {
@@ -26,15 +30,15 @@ export function property<T>(value:T|{():T}):IProperty<T> {
 	return <IProperty<T>> propFunc;
 }
 
-export function batch(action:()=>void) {
+export function batch(action:Lambda) {
 	Scheduler.batch(action);
 }
 
-export function onReady(listener:()=>void):()=>void {
+export function onReady(listener:Lambda):Lambda {
 	return Scheduler.onReady(listener);
 }
 
-export function onceReady(listener:()=>void) {
+export function onceReady(listener:Lambda) {
 	Scheduler.onceReady(listener);
 }
 
@@ -62,7 +66,7 @@ class Property<T> {
 		return this._value;
 	}
 
-	onChange(listener:(newValue:T, oldValue:T)=>void, fireImmediately=false):()=>void {
+	onChange(listener:(newValue:T, oldValue:T)=>void, fireImmediately=false):Lambda {
 		var current = this.get(); // make sure the values are initialized
 		if (fireImmediately)
 			listener(current, undefined);
@@ -106,7 +110,7 @@ class ComputedProperty<U> extends Property<U> {
 		return super.get(); // assumption: Compute<> is always synchronous for computed properties
 	}
 
-	compute(onComplete:()=>void) {
+	compute(onComplete:Lambda) {
 		this.privateSetter.call(this, this.func());
 		this.initialized = true;
 		onComplete();
@@ -115,22 +119,6 @@ class ComputedProperty<U> extends Property<U> {
 	toString() {
 		return `Property[${this.func.toString()}]`;
 	}
-}
-
-export class Reference<U extends Model> {
-
-}
-
-export class List<U> {
-
-}
-
-export class Model {
-
-}
-
-interface IObservable<T> {
-	onChange(callback:(value:T)=>void);
 }
 
 enum DNodeState {
@@ -216,7 +204,7 @@ class DNode {
 		});
 	}
 
-	compute(onComplete:()=>void) {
+	compute(onComplete:Lambda) {
 		onComplete();
 	}
 
@@ -261,14 +249,14 @@ class Scheduler {
 	private static inBatch = 0;
 	private static tasks:{():void}[] = [];
 
-	public static schedule(func:()=>void) {
+	public static schedule(func:Lambda) {
 		if (Scheduler.inBatch < 1)
 			func();
 		else
 			Scheduler.tasks.push(func);
 	}
 
-	private static run() {
+	private static runPostBatch() {
 		while(Scheduler.tasks.length) {
 			try {
 				Scheduler.tasks.shift()();
@@ -280,14 +268,14 @@ class Scheduler {
 		}
 	}
 
-	static batch(action:()=>void) {
+	static batch(action:Lambda) {
 		Scheduler.inBatch += 1;
 		try {
 			action();
 		} finally {
 			Scheduler.inBatch -= 1;
 			if (Scheduler.inBatch === 0) {
-				Scheduler.run();
+				Scheduler.runPostBatch();
 				Scheduler.scheduleReady();
 			}
 		}
@@ -305,14 +293,14 @@ class Scheduler {
 		}
 	}
 
-	static onReady(listener:()=>void) {
+	static onReady(listener:Lambda) {
 		Scheduler.events.on('ready', listener);
 		return () => {
 			Scheduler.events.removeListener('ready', listener);
 		}
 	}
 
-	static onceReady(listener:()=>void) {
+	static onceReady(listener:Lambda) {
 		Scheduler.events.once('ready', listener);
 	}
 }
