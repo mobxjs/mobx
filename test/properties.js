@@ -1,6 +1,6 @@
-//require('typescript-require')
-//var mobservable = require('../mobservable.ts')
-var mobservable = require('../mobservable.js');
+require('typescript-require')
+var mobservable = require('../mobservable.ts')
+
 var property = mobservable.property;
 
 function buffer() {

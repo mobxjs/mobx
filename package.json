@@ -1,22 +1,24 @@
 {
-  "name": "ts-model",
+  "name": "MOBservable",
   "version": "0.0.0",
-  "description": "",
-  "main": "tsmodel.js",
+  "description": "Changes are coming! Small library for creating observable properties en functions",
+  "main": "mobservable.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node_modules/.bin/nodeunit test/",
+    "prepublish": "node_modules/typescript-require/node_modules/typescript/bin/tsc -m commonjs -t ES5 mobservable.ts"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mweststrate/ts-model.git"
+    "url": "https://github.com/mweststrate/mobservable.git"
   },
   "author": "Michel Weststrate",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mweststrate/ts-model/issues"
+    "url": "https://github.com/mweststrate/mobservable/issues"
   },
-  "homepage": "https://github.com/mweststrate/ts-model",
+  "homepage": "https://github.com/mweststrate/mobservable",
   "devDependencies": {
+    "nodeunit": "^0.9.1",
     "typescript-require": "^0.2.8"
   }
 }
