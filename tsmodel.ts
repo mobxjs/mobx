@@ -5,29 +5,29 @@ interface Lambda {
 	():void;
 }
 
-interface IProperty<T> {
+interface IProperty<T,S> {
 	():T;
-	(value:T):void;
+	(value:T):S;
 	onChange(callback:(newValue:T, oldValue:T)=>void):Lambda;
 }
 
-export function property<T>(value:T|{():T}):IProperty<T> {
-	var prop:Property<T> = null;
+export function property<T,S>(value:T|{():T}, scope:S):IProperty<T,S> {
+	var prop:Property<T,S> = null;
 
 	if (typeof value === "function")
-		prop = new ComputedProperty(<()=>T>value);
+		prop = new ComputedProperty(<()=>T>value, scope);
 	else
-		prop = new Property(<T>value);
+		prop = new Property(<T>value, scope);
 
-	var propFunc = function(value?:T):T|void {
+	var propFunc = function(value?:T):T|S {
 		if (arguments.length > 0)
-			prop.set(value);
+			return <S> prop.set(value);
 		else
-			return prop.get();
+			return <T> prop.get();
 	};
 	(<any>propFunc).onChange = prop.onChange.bind(prop);
 
-	return <IProperty<T>> propFunc;
+	return <IProperty<T,S>> propFunc;
 }
 
 export function batch(action:Lambda) {
@@ -42,15 +42,15 @@ export function onceReady(listener:Lambda) {
 	Scheduler.onceReady(listener);
 }
 
-class Property<T> {
+class Property<T,S> {
 	private events = new events.EventEmitter();
 	protected dependencyState:DNode = new DNode();
 
-	constructor(protected _value:T){
+	constructor(protected _value:T, protected scope?:S){
 
 	}
 
-	set(value:T):Property<T> {
+	set(value:T):S {
 		if (value !== this._value) {
 			var oldValue = this._value;
 			this.dependencyState.markStale();
@@ -58,7 +58,7 @@ class Property<T> {
 			this.dependencyState.markReady();
 			this.events.emit('change', value, oldValue);
 		}
-		return this;
+		return this.scope;
 	}
 
 	get():T {
@@ -82,19 +82,19 @@ class Property<T> {
 	}
 }
 
-class ComputedProperty<U> extends Property<U> {
+class ComputedProperty<U,S> extends Property<U,S> {
 	private initialized = false;
 	private privateSetter:(value:U)=>void = null;
 
-	constructor(protected func:()=>U) {
-		super(undefined);
+	constructor(protected func:()=>U, scope:S) {
+		super(undefined, scope);
 		if (!func)
 			throw new Error("Computed required a function");
 
 		this.privateSetter = this.set;
 		this.set = () => {
 			throw new Error("Computed cannot retrieve a new value!");
-			return this;
+			return this.scope;
 		}
 
 		this.dependencyState.compute = this.compute.bind(this);
@@ -111,7 +111,7 @@ class ComputedProperty<U> extends Property<U> {
 	}
 
 	compute(onComplete:Lambda) {
-		this.privateSetter.call(this, this.func());
+		this.privateSetter.call(this, this.func.call(this.scope));
 		this.initialized = true;
 		onComplete();
 	}

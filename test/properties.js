@@ -1,6 +1,7 @@
 //require('typescript-require')
 //var model = require('../tsmodel.ts')
-var model = require('../tsmodel.js')
+var model = require('../tsmodel.js');
+var property = model.property;
 
 function buffer() {
   var b = [];
@@ -169,4 +170,20 @@ exports.testBatchAndReady = function(test) {
     });
 
     test.deepEqual([36, 100, 54], buf.toArray());// only one new value for d
+}
+
+exports.testScope = function(test) {
+  var vat = property(0.2);
+  var Order = function() {
+    this.price = property(20, this);
+    this.amount = property(2, this);
+    this.total = property(function() {
+      return (1+vat()) * this.price() * this.amount();
+    }, this);
+  };
+
+  var order = new Order();
+  order.price(10).amount(3);
+  test.equals(36, order.total());
+  test.done();
 }
