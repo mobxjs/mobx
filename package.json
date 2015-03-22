@@ -1,5 +1,5 @@
 {
-  "name": "MOBservable",
+  "name": "mobservable",
   "version": "0.0.0",
   "description": "Changes are coming! Small library for creating observable properties en functions",
   "main": "mobservable.js",

@@ -18,7 +18,7 @@ function property(value, scope) {
         else
             return prop.get();
     };
-    propFunc.onChange = prop.onChange.bind(prop);
+    propFunc.subscribe = prop.subscribe.bind(prop);
     return propFunc;
 }
 exports.property = property;
@@ -69,7 +69,7 @@ var Property = (function () {
         this.dependencyState.notifyObserved();
         return this._value;
     };
-    Property.prototype.onChange = function (listener, fireImmediately) {
+    Property.prototype.subscribe = function (listener, fireImmediately) {
         var _this = this;
         if (fireImmediately === void 0) { fireImmediately = false; }
         var current = this.get(); // make sure the values are initialized
