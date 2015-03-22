@@ -31,6 +31,40 @@ Constructs a new `Property`, value can either be a string, number, boolean or fu
 
 Optionally accepts a scope parameter, which will be returned by the setter for chaining, and which will used as scope for calculated properties.
 
+### model.defineProperty(object, name, value)
+
+Defines a property using ES5 getters and setters. This is useful in constructor functions, and allows for direct assignment / reading from observables:
+
+```javascript
+var vat = property(0.2);
+var Order = function() {
+	model.defineProperty(this, 'price', 20);
+	model.defineProperty(this, 'amount', 2);
+	model.defineProperty(this, 'total', function() {
+		return (1+vat()) * this.price * this.amount; // price and amount are now properties!
+	});
+};
+
+var order = new Order();
+order.price = 10;
+order.amount = 3;
+// order.total now equals 36
+```
+
+In typescript, it might be more convenient for the typesystem to directly define getters and setters instead of using `model.defineProperty`:
+
+```typescript
+class Order {
+	_price = new model.property(20, this);
+	get price() {
+		return this._price();
+	}
+	set price(value) {
+		this._price(value);
+	}
+}
+```
+
 ### model.batch(workerFunction)
 
 Batch postpones the updates of computed properties until the (synchronous) `workerFunction` has completed. This is useful if you want to apply a bunch of different updates throughout your model before needing the updated computed values, for example while refreshing a value from the database.

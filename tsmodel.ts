@@ -42,6 +42,20 @@ export function onceReady(listener:Lambda) {
 	Scheduler.onceReady(listener);
 }
 
+export function defineProperty<T>(object:Object, name:string, initialValue:T) {
+	var _property = property(initialValue, object);
+	Object.defineProperty(object, name, {
+		get: function() {
+			return _property();
+		},
+		set: function(value) {
+			_property(value);
+		},
+		enumerable: true,
+		configurable: true
+	});
+}
+
 class Property<T,S> {
 	private events = new events.EventEmitter();
 	protected dependencyState:DNode = new DNode();

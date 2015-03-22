@@ -187,3 +187,20 @@ exports.testScope = function(test) {
   test.equals(36, order.total());
   test.done();
 }
+
+exports.testDefineProperty = function(test) {
+  var vat = property(0.2);
+  var Order = function() {
+    model.defineProperty(this, 'price', 20);
+    model.defineProperty(this, 'amount', 2);
+    model.defineProperty(this, 'total', function() {
+      return (1+vat()) * this.price * this.amount; // price and amount are now properties!
+    });
+  };
+
+  var order = new Order();
+  order.price = 10;
+  order.amount = 3;
+  test.equals(36, order.total);
+  test.done();
+}
