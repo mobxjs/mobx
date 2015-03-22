@@ -8,7 +8,7 @@ interface Lambda {
 interface IProperty<T,S> {
 	():T;
 	(value:T):S;
-	onChange(callback:(newValue:T, oldValue:T)=>void):Lambda;
+	subscribe(callback:(newValue:T, oldValue:T)=>void):Lambda;
 }
 
 export function property<T,S>(value:T|{():T}, scope:S):IProperty<T,S> {
@@ -25,7 +25,7 @@ export function property<T,S>(value:T|{():T}, scope:S):IProperty<T,S> {
 		else
 			return <T> prop.get();
 	};
-	(<any>propFunc).onChange = prop.onChange.bind(prop);
+	(<any>propFunc).subscribe = prop.subscribe.bind(prop);
 
 	return <IProperty<T,S>> propFunc;
 }
@@ -80,7 +80,7 @@ class Property<T,S> {
 		return this._value;
 	}
 
-	onChange(listener:(newValue:T, oldValue:T)=>void, fireImmediately=false):Lambda {
+	subscribe(listener:(newValue:T, oldValue:T)=>void, fireImmediately=false):Lambda {
 		var current = this.get(); // make sure the values are initialized
 		if (fireImmediately)
 			listener(current, undefined);

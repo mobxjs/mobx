@@ -19,7 +19,7 @@ var order = {};
 order.price = property(10),
 order.priceWithVat = property(() => order.price() * (1+vat()));
 
-order.priceWithVat.onChange((price) => console.log("New price: " + price));
+order.priceWithVat.subscribe((price) => console.log("New price: " + price));
 
 order.price(20);
 // Prints: New price: 24
@@ -29,7 +29,7 @@ order.price(10);
 
 ### mobservable.property(value, scope?)
 
-Constructs a new `Property`, value can either be a string, number, boolean or function that takes no arguments and returns a value. In the body of the function, references to other properties will be tracked, and onChange, the function will be re-evaluated. The returned value is an `IProperty` function/object.
+Constructs a new `Property`, value can either be a string, number, boolean or function that takes no arguments and returns a value. In the body of the function, references to other properties will be tracked, and on change, the function will be re-evaluated. The returned value is an `IProperty` function/object.
 
 Optionally accepts a scope parameter, which will be returned by the setter for chaining, and which will used as scope for calculated properties.
 
@@ -85,7 +85,7 @@ Returns the current value of the property
 
 Sets a new value to the property. Returns the scope with which this property was created for chaining.
 
-### IProperty.onChange(listener,fireImmediately=false)
+### IProperty.subscribe(listener,fireImmediately=false)
 
 Registers a new listener to change events. Listener should be a function, its first argument will be the new value, and second argument the old value.
 

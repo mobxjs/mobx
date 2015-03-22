@@ -17,7 +17,7 @@ function buffer() {
 exports.basic = function(test) {
     var x = property(3);
     var b = buffer();
-    x.onChange(b);
+    x.subscribe(b);
     test.equal(3, x());
 
     x(5);
@@ -34,7 +34,7 @@ exports.dynamic = function(test) {
       return x();
     });
     var b = buffer();
-    y.onChange(b, true);
+    y.subscribe(b, true);
 
     test.equal(3, y()); // First evaluation here..
 
@@ -58,7 +58,7 @@ exports.dynamic2 = function(test) {
 
     test.equal(9, y());
     var b = buffer();
-    y.onChange(b);
+    y.subscribe(b);
 
     x(5);
     test.equal(25, y());
@@ -86,7 +86,7 @@ exports.readme1 = function(test) {
     });
 
     order.priceWithVat(); // TODO: should not be needed!
-    order.priceWithVat.onChange(b);
+    order.priceWithVat.subscribe(b);
 
     order.price(20);
     order.price(10);
@@ -148,7 +148,7 @@ exports.testBatchAndReady = function(test) {
     var c = property(function() { return a() * b() });
     var d = property(function() { return c() * b() });
     var buf = buffer();
-    d.onChange(buf);
+    d.subscribe(buf);
 
     a(4);
     b(5);
