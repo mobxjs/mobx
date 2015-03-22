@@ -1,15 +1,17 @@
-# ts-model
+# MOBservable
 
-ts-model is a collection of utilities that helps managing the M of MVC. ts-model provides observable properties and structures, and utilities to create derived data which are updated reactively.
+*Changes are coming!*
+
+MOBservable is simple observable implementation, based on the ideas of observables in bigger frameworks like `knockout`, `ember` etc, but this one does not have 'strings attached'. Furthermore it should fit well in any typescript project.
 
 # Properties
 
-The `model.property` method takes a value or function and creates an observable value from it.
+The `mobservable.property` method takes a value or function and creates an observable value from it.
 This way properties that listen that observe each other can be created. A quick example:
 
 ```typescript
-import model = require('ts-model');
-var property = model.property;
+import mobservable = require('mobservable');
+var property = mobservable.property;
 
 var vat = property(0.20);
 
@@ -25,22 +27,22 @@ order.price(10);
 // Prints: New price: 10
 ```
 
-### model.property(value, scope?)
+### mobservable.property(value, scope?)
 
 Constructs a new `Property`, value can either be a string, number, boolean or function that takes no arguments and returns a value. In the body of the function, references to other properties will be tracked, and onChange, the function will be re-evaluated. The returned value is an `IProperty` function/object.
 
 Optionally accepts a scope parameter, which will be returned by the setter for chaining, and which will used as scope for calculated properties.
 
-### model.defineProperty(object, name, value)
+### mobservable.defineProperty(object, name, value)
 
 Defines a property using ES5 getters and setters. This is useful in constructor functions, and allows for direct assignment / reading from observables:
 
 ```javascript
 var vat = property(0.2);
 var Order = function() {
-	model.defineProperty(this, 'price', 20);
-	model.defineProperty(this, 'amount', 2);
-	model.defineProperty(this, 'total', function() {
+	mobservable.defineProperty(this, 'price', 20);
+	mobservable.defineProperty(this, 'amount', 2);
+	mobservable.defineProperty(this, 'total', function() {
 		return (1+vat()) * this.price * this.amount; // price and amount are now properties!
 	});
 };
@@ -51,11 +53,11 @@ order.amount = 3;
 // order.total now equals 36
 ```
 
-In typescript, it might be more convenient for the typesystem to directly define getters and setters instead of using `model.defineProperty`:
+In typescript, it might be more convenient for the typesystem to directly define getters and setters instead of using `mobservable.defineProperty`:
 
 ```typescript
 class Order {
-	_price = new model.property(20, this);
+	_price = new mobservable.property(20, this);
 	get price() {
 		return this._price();
 	}
@@ -65,11 +67,11 @@ class Order {
 }
 ```
 
-### model.batch(workerFunction)
+### mobservable.batch(workerFunction)
 
 Batch postpones the updates of computed properties until the (synchronous) `workerFunction` has completed. This is useful if you want to apply a bunch of different updates throughout your model before needing the updated computed values, for example while refreshing a value from the database.
 
-### model.onReady(listener) / model.onceReady(listener)
+### mobservable.onReady(listener) / mobservable.onceReady(listener)
 
 The listener is invoked each time the complete model has become stable. The listener is always invoked asynchronously, so that even without `batch` the listener is only invoked after a bunch of changes have been applied
 

@@ -1,7 +1,7 @@
 //require('typescript-require')
-//var model = require('../tsmodel.ts')
-var model = require('../tsmodel.js');
-var property = model.property;
+//var mobservable = require('../mobservable.ts')
+var mobservable = require('../mobservable.js');
+var property = mobservable.property;
 
 function buffer() {
   var b = [];
@@ -15,7 +15,7 @@ function buffer() {
 }
 
 exports.basic = function(test) {
-    var x = model.property(3);
+    var x = property(3);
     var b = buffer();
     x.onChange(b);
     test.equal(3, x());
@@ -29,8 +29,8 @@ exports.basic = function(test) {
 exports.dynamic = function(test) {
   //  debugger;
   try {
-    var x = model.property(3);
-    var y = model.property(function() {
+    var x = property(3);
+    var y = property(function() {
       return x();
     });
     var b = buffer();
@@ -51,8 +51,8 @@ exports.dynamic = function(test) {
 
 exports.dynamic2 = function(test) {
   try {
-    var x = model.property(3);
-    var y = model.property(function() {
+    var x = property(3);
+    var y = property(function() {
       return x() * x();
     });
 
@@ -75,7 +75,6 @@ exports.dynamic2 = function(test) {
 exports.readme1 = function(test) {
   try {
     var b = buffer();
-    var property = model.property;
 
     var vat = property(0.20);
     var order = {};
@@ -100,7 +99,7 @@ exports.readme1 = function(test) {
 
 exports.cycle1 = function(test) {
   try {
-    var p = model.property(function() { return p() * 2 }); // thats a cycle!
+    var p = property(function() { return p() * 2 }); // thats a cycle!
     debugger;
     p();
     test.fail(true);
@@ -109,8 +108,8 @@ exports.cycle1 = function(test) {
     test.ok(("" + e).indexOf("Cycle detected") !== -1);
   }
   try {
-    var a = model.property(function() { return b() * 2 });
-    var b = model.property(function() { return a() * 2 });
+    var a = property(function() { return b() * 2 });
+    var b = property(function() { return a() * 2 });
     b();
     test.fail(true);
   }
@@ -122,9 +121,9 @@ exports.cycle1 = function(test) {
 }
 
 exports.cycle2 = function(test) {
-  var z = model.property(true);
-  var a = model.property(function() { return z() ? 1 : b() * 2 });
-  var b = model.property(function() { return a() * 2 });
+  var z = property(true);
+  var a = property(function() { return z() ? 1 : b() * 2 });
+  var b = property(function() { return a() * 2 });
 
   test.equals(1, a());
 
@@ -144,10 +143,10 @@ exports.cycle2 = function(test) {
 }
 
 exports.testBatchAndReady = function(test) {
-    var a = model.property(2);
-    var b = model.property(3);
-    var c = model.property(function() { return a() * b() });
-    var d = model.property(function() { return c() * b() });
+    var a = property(2);
+    var b = property(3);
+    var c = property(function() { return a() * b() });
+    var d = property(function() { return c() * b() });
     var buf = buffer();
     d.onChange(buf);
 
@@ -156,13 +155,13 @@ exports.testBatchAndReady = function(test) {
     // Note, 60 should not happen! (that is d beign computed before c after update of b)
     test.deepEqual([36, 100], buf.toArray());
 
-    model.onceReady(function() {
+    mobservable.onceReady(function() {
         //this is called async, and only after everything has finished, so d should be 54
         test.deepEqual(54, d()); // only one new value for d
 
         test.done();
     });
-    model.batch(function() {
+    mobservable.batch(function() {
         a(2);
         b(3);
         a(6);
@@ -191,9 +190,9 @@ exports.testScope = function(test) {
 exports.testDefineProperty = function(test) {
   var vat = property(0.2);
   var Order = function() {
-    model.defineProperty(this, 'price', 20);
-    model.defineProperty(this, 'amount', 2);
-    model.defineProperty(this, 'total', function() {
+    mobservable.defineProperty(this, 'price', 20);
+    mobservable.defineProperty(this, 'amount', 2);
+    mobservable.defineProperty(this, 'total', function() {
       return (1+vat()) * this.price * this.amount; // price and amount are now properties!
     });
   };
