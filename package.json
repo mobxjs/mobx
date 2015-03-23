@@ -1,25 +1,25 @@
 {
-  "name": "mobservable",
-  "version": "0.0.1",
-  "description": "Changes are coming! Small library for creating observable properties en functions",
-  "main": "mobservable.js",
-  "scripts": {
-    "test": "node_modules/.bin/nodeunit test/",
-    "prepublish": "node_modules/typescript-require/node_modules/typescript/bin/tsc -m commonjs -t ES5 mobservable.ts"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mweststrate/mobservable.git"
-  },
-  "author": "Michel Weststrate",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/mweststrate/mobservable/issues"
-  },
-  "homepage": "https://github.com/mweststrate/mobservable",
-  "devDependencies": {
-    "nodeunit": "^0.9.1",
-    "nscript": "^0.1.5",
-    "typescript-require": "^0.2.8"
-  }
+    "name": "mobservable",
+    "version": "0.0.2",
+    "description": "Changes are coming! Small library for creating observable properties en functions",
+    "main": "mobservable.js",
+    "scripts": {
+        "test": "node_modules/.bin/nodeunit test/",
+        "prepublish": "node_modules/typescript-require/node_modules/typescript/bin/tsc -m commonjs -t ES5 mobservable.ts"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mweststrate/mobservable.git"
+    },
+    "author": "Michel Weststrate",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/mweststrate/mobservable/issues"
+    },
+    "homepage": "https://github.com/mweststrate/mobservable",
+    "devDependencies": {
+        "nodeunit": "^0.9.1",
+        "nscript": "^0.1.5",
+        "typescript-require": "^0.2.8"
+    }
 }

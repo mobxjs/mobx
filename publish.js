@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /* Publish.js, publish a new version of the npm package as found in the current directory */
 require('nscript')(function(shell, npm, git) {
 	var package = JSON.parse(shell.read('package.json'));
