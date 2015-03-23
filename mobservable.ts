@@ -8,11 +8,11 @@
 
 import events = require('events');
 
-interface Lambda {
+export interface Lambda {
 	():void;
 }
 
-interface IProperty<T,S> {
+export interface IProperty<T,S> {
 	():T;
 	(value:T):S;
 	subscribe(callback:(newValue:T, oldValue:T)=>void):Lambda;
