@@ -18,7 +18,7 @@ interface IProperty<T,S> {
 	subscribe(callback:(newValue:T, oldValue:T)=>void):Lambda;
 }
 
-export function property<T,S>(value:T|{():T}, scope:S):IProperty<T,S> {
+export function property<T,S>(value:T|{():T}, scope?:S):IProperty<T,S> {
 	var prop:Property<T,S> = null;
 
 	if (typeof value === "function")

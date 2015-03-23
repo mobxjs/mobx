@@ -1,10 +1,15 @@
+/// <reference path="./typings/node-0.10.d.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-/// <reference path="./typings/node-0.10.d.ts" />
+/**
+ * MOBservable
+ * (c) 2015 - Michel Weststrate
+ * https://github.com/mweststrate/mobservable
+ */
 var events = require('events');
 function property(value, scope) {
     var prop = null;
@@ -22,6 +27,22 @@ function property(value, scope) {
     return propFunc;
 }
 exports.property = property;
+function guard(func, onInvalidate) {
+    var dnode = new DNode();
+    var retVal;
+    dnode.compute = function (done) {
+        retVal = func();
+        dnode.compute = function (done2) {
+            done2();
+            dnode.dispose();
+            onInvalidate();
+        };
+        done();
+    };
+    dnode.computeNextValue();
+    return [retVal, function () { return dnode.dispose(); }];
+}
+exports.guard = guard;
 function batch(action) {
     Scheduler.batch(action);
 }
@@ -220,6 +241,12 @@ var DNode = (function () {
         if (this.observing.indexOf(node) !== -1)
             throw new Error("Cycle detected");
         this.observing.forEach(function (o) { return o.findCycle(node); });
+    };
+    DNode.prototype.dispose = function () {
+        var _this = this;
+        this.observing.forEach(function (observing) { return observing.removeObserver(_this); });
+        this.observing = [];
+        // Do something with the observers, notify some state like KILLED?
     };
     /*
         Dependency detection
