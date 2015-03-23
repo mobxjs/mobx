@@ -1,0 +1,7 @@
+node_modules/
+test/
+tmp/
+npm-debug.log
+typings/
+tsconfig.json
+publish.js

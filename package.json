@@ -19,6 +19,7 @@
   "homepage": "https://github.com/mweststrate/mobservable",
   "devDependencies": {
     "nodeunit": "^0.9.1",
+    "nscript": "^0.1.5",
     "typescript-require": "^0.2.8"
   }
 }
