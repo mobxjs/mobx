@@ -203,3 +203,50 @@ exports.testDefineProperty = function(test) {
   test.equals(36, order.total);
   test.done();
 }
+
+exports.testGuard = function(test) {
+  var a = property(3);
+  var b = property(2);
+  var changed = 0;
+  var calcs = 0;
+  var res = mobservable.guard(function() {
+    calcs += 1;
+    return a() * b();
+  }, function() {
+    changed += 1;
+  });
+
+  test.equals(2, res.length);
+  test.equals(6, res[0]);
+  test.equals(changed, 0);
+  test.equals(calcs, 1);
+
+  b(4);
+  test.equals(changed, 1);
+  test.equals(calcs, 1); // no more calcs!
+  test.done();
+}
+
+exports.testGuardDisposed = function(test) {
+  var a = property(3);
+  var b = property(2);
+  var changed = 0;
+  var calcs = 0;
+  var res = mobservable.guard(function() {
+    calcs += 1;
+    return a() * b();
+  }, function() {
+    changed += 1;
+  });
+
+  test.equals(2, res.length);
+  test.equals(6, res[0]);
+  test.equals(changed, 0);
+  test.equals(calcs, 1);
+
+  res[1](); //cleanup
+  b(4);
+  test.equals(changed, 0);
+  test.equals(calcs, 1);
+  test.done();
+}

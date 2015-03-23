@@ -30,6 +30,22 @@ export function property<T,S>(value:T|{():T}, scope:S):IProperty<T,S> {
 	return <IProperty<T,S>> propFunc;
 }
 
+export function guard<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
+	var dnode = new DNode();
+	var retVal:T;
+	dnode.compute = function(done) {
+		retVal = func();
+		dnode.compute = function(done2) {
+			done2();
+			dnode.dispose();
+			onInvalidate();
+		}
+		done();
+	}
+	dnode.computeNextValue();
+	return [retVal, () => dnode.dispose()];
+}
+
 export function batch(action:Lambda) {
 	Scheduler.batch(action);
 }
@@ -255,6 +271,12 @@ class DNode {
 		if (this.observing.indexOf(node) !== -1)
 			throw new Error("Cycle detected");
 		this.observing.forEach(o => o.findCycle(node));
+	}
+
+	public dispose() {
+		this.observing.forEach(observing => observing.removeObserver(this));
+		this.observing = [];
+		// Do something with the observers, notify some state like KILLED?
 	}
 }
 

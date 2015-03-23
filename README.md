@@ -67,6 +67,14 @@ class Order {
 }
 ```
 
+### mobservable.guard(func, onInvalidate)
+
+`guard` invokes `func` and returns a tuple consisting of the return value of `func` and an unsubscriber. `guard` will track which observables `func` was observing, but it will *not* recalculate `func` if necessary, instead, it will fire the `onInvalidate` callback to notify that the output of `func` can no longer be trusted.
+
+The `onInvalidate` function will be called only once, after that, the guard has finished. To abort a guard, use the returned unsubscriber.
+
+Guard is useful in functions where you want to have `func` observable, but func is actually invoked as side effect or part of a bigger change flow or where unnecessary recalculations of `func` or either pointless or expensive.
+
 ### mobservable.batch(workerFunction)
 
 Batch postpones the updates of computed properties until the (synchronous) `workerFunction` has completed. This is useful if you want to apply a bunch of different updates throughout your model before needing the updated computed values, for example while refreshing a value from the database.
