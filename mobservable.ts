@@ -1,4 +1,11 @@
 /// <reference path="./typings/node-0.10.d.ts" />
+
+/**
+ * MOBservable
+ * (c) 2015 - Michel Weststrate
+ * https://github.com/mweststrate/mobservable
+ */
+
 import events = require('events');
 
 interface Lambda {
