@@ -44,11 +44,11 @@ export function guard<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
 	dnode.compute = function(done) {
 		retVal = func();
 		dnode.compute = function(done2) {
-			done2();
+			done2(false); // Nobody should observe a guarded function !
 			dnode.dispose();
 			onInvalidate();
 		}
-		done();
+		done(false); // Nobody should observe a guarded function !
 	}
 	dnode.computeNextValue();
 	return [retVal, () => dnode.dispose()];
@@ -81,7 +81,7 @@ export function defineProperty<T>(object:Object, name:string, initialValue:T) {
 }
 
 class Property<T,S> {
-	private events = new events.EventEmitter();
+	protected events = new events.EventEmitter();
 	protected dependencyState:DNode = new DNode();
 
 	constructor(protected _value:T, protected scope?:S){
@@ -96,8 +96,6 @@ class Property<T,S> {
 			this.dependencyState.markReady(true);
 			this.events.emit('change', value, oldValue);
 		}
-		else
-			this.dependencyState.markReady(false);
 
 		return this.scope;
 	}
@@ -125,14 +123,12 @@ class Property<T,S> {
 
 class ComputedProperty<U,S> extends Property<U,S> {
 	private initialized = false;
-	private privateSetter:(value:U)=>void = null;
 
 	constructor(protected func:()=>U, scope:S) {
 		super(undefined, scope);
 		if (!func)
 			throw new Error("Computed required a function");
 
-		this.privateSetter = this.set;
 		this.set = () => {
 			throw new Error("Computed cannot retrieve a new value!");
 			return this.scope;
@@ -151,10 +147,18 @@ class ComputedProperty<U,S> extends Property<U,S> {
 		return super.get(); // assumption: Compute<> is always synchronous for computed properties
 	}
 
-	compute(onComplete:Lambda) {
-		this.privateSetter.call(this, this.func.call(this.scope));
+	compute(onComplete:(changed:boolean)=>void) {
+		var newValue = this.func.call(this.scope);
 		this.initialized = true;
-		onComplete();
+
+		var changed = newValue !== this._value;
+		if (changed) {
+			var oldValue = this._value;
+			this._value = newValue;
+			this.events.emit('change', newValue, oldValue);
+		}
+
+		onComplete(changed);
 	}
 
 	toString() {
@@ -227,7 +231,8 @@ class DNode {
 					this.dependencyChangeCount += 1;
 				// The observable has become stable, and all others are stable as well, we can compute now!
 				if (observable.state === DNodeState.READY && this.observing.filter(o => o.state !== DNodeState.READY).length === 0) {
-					if (this.dependencyChangeCount) {
+					// did any of the observables really change?
+					if (this.dependencyChangeCount > 0) {
 						this.state = DNodeState.PENDING;
 						Scheduler.schedule(() => this.computeNextValue());
 					}
@@ -243,9 +248,9 @@ class DNode {
 				// during the async process or not. So to ensure everything is concistent, probably a new computation
 				// should be scheduled immediately after the current one is done..
 
-				// However, for now the model is that all computations are synchronous, so if computing, a calc is scheduled
-				// and we're fine here
-			//	break;
+				// However, for now the model is that all computations are synchronous, so if computing, a calc is already
+				// scheduled but not running yet, so we're fine here
+				break;
 			case DNodeState.READY:
 				if (observable.state === DNodeState.STALE)
 					this.markStale();
@@ -255,14 +260,14 @@ class DNode {
 
 	computeNextValue() {
 		this.trackDependencies();
-		this.compute(() => {
+		this.compute((changed) => {
 			this.bindDependencies();
-			//this.markReady(true);
+			this.markReady(changed);
 		});
 	}
 
-	compute(onComplete:Lambda) {
-		onComplete();
+	compute(onComplete:(changed:boolean)=>void) {
+		onComplete(false);
 	}
 
 	/*
