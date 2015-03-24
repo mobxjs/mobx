@@ -24,6 +24,7 @@ function property(value, scope) {
             return prop.get();
     };
     propFunc.subscribe = prop.subscribe.bind(prop);
+    propFunc.prop = prop;
     return propFunc;
 }
 exports.property = property;
@@ -172,21 +173,24 @@ var DNode = (function () {
         return false;
     };
     DNode.prototype.markStale = function () {
-        var _this = this;
         if (this.state === 1 /* PENDING */)
             return; // recalculation already scheduled, we're fine..
         if (this.state === 0 /* STALE */)
             return;
         this.state = 0 /* STALE */;
-        this.observers.forEach(function (observer) { return observer.notifyStateChange(_this); });
+        this.notifyObservers();
     };
     DNode.prototype.markReady = function () {
-        var _this = this;
         if (this.state === 2 /* READY */)
             return;
         this.state = 2 /* READY */;
-        this.observers.forEach(function (observer) { return observer.notifyStateChange(_this); });
+        this.notifyObservers();
         Scheduler.scheduleReady();
+    };
+    DNode.prototype.notifyObservers = function () {
+        var os = this.observers;
+        for (var i = os.length - 1; i >= 0; i--)
+            os[i].notifyStateChange(this);
     };
     DNode.prototype.notifyStateChange = function (observable) {
         var _this = this;
