@@ -41,14 +41,16 @@ export function property<T,S>(value:T|{():T}, scope?:S):IProperty<T,S> {
 export function guard<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
 	var dnode = new DNode();
 	var retVal:T;
-	dnode.compute = function(done) {
+	dnode.compute = function() {
 		retVal = func();
-		dnode.compute = function(done2) {
-			done2(false); // Nobody should observe a guarded function !
+		dnode.compute = function() {
+			if (dnode.getObserversCount())
+				throw new Error("A guarded function should not have observers!");
 			dnode.dispose();
 			onInvalidate();
+			return false;
 		}
-		done(false); // Nobody should observe a guarded function !
+		return false; // Note, nobody should observe a guarded funct !
 	}
 	dnode.computeNextValue();
 	return [retVal, () => dnode.dispose()];
@@ -158,7 +160,7 @@ class ComputedProperty<U,S> extends Property<U,S> {
 			this.events.emit('change', newValue, oldValue);
 		}
 
-		onComplete(changed);
+		return changed;
 	}
 
 	toString() {
@@ -178,6 +180,11 @@ class DNode {
 	private observing: DNode[] = [];
 	private prevObserving: DNode[] = [];
 	private observers: DNode[] = [];
+	private dependencyChangeCount = 0;
+
+	getObserversCount() {
+		return this.observers.length;
+	}
 
 	addObserver(node:DNode) {
 		this.observers.push(node);
@@ -260,20 +267,18 @@ class DNode {
 
 	computeNextValue() {
 		this.trackDependencies();
-		this.compute((changed) => {
-			this.bindDependencies();
-			this.markReady(changed);
-		});
+		var valueDidChange = this.compute();
+		this.bindDependencies();
+		this.markReady(valueDidChange);
 	}
 
-	compute(onComplete:(changed:boolean)=>void) {
-		onComplete(false);
+	compute():boolean {
+		return false; // false == unchanged
 	}
 
 	/*
 		Dependency detection
 	*/
-	// TODO: is trackingstack + push/pop still valid if DNode.compute is executed asynchronously?
 	private static trackingStack:DNode[][] = []
 
 	private trackDependencies() {
