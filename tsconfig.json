@@ -13,7 +13,8 @@
         "!./node_modules/**/*.ts"
     ],
     "files": [
-        "./tsmodel.ts",
+        "./mobservable.d.ts",
+        "./mobservable.ts",
         "./typings/node-0.10.d.ts"
     ]
 }

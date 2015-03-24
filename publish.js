@@ -22,9 +22,9 @@ require('nscript')(function(shell, npm, git) {
 		// Finally, commit and publish!
 		git("commit","-am","Bumped to version " + version);
 		git("tag", version);
+		npm("publish");
 		git("push");
 		git("push", { tags: true });
-		npm("publish");
 		console.log("Published!");
 	}
 	else
