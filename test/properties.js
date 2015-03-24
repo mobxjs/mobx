@@ -265,3 +265,31 @@ exports.testGuardDisposed = function(test) {
   test.equals(calcs, 1);
   test.done();
 }
+
+exports.testChangeCountOptimization = function(test) {
+    var bCalcs = 0;
+    var cCalcs = 0;
+    var a = property(3);
+    var b = property(function() {
+        bCalcs += 1;
+        return 4 + a() - a();
+    });
+    var c = property(function() {
+        cCalcs += 1;
+        return b();
+    });
+
+    test.equals(b(), 4);
+    test.equals(c(), 4);
+    test.equals(bCalcs, 1);
+    test.equals(cCalcs, 1);
+
+    a(5);
+
+    test.equals(b(), 4);
+    test.equals(c(), 4);
+    test.equals(bCalcs, 2);
+    test.equals(cCalcs, 1);
+
+    test.done();
+}
