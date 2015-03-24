@@ -129,18 +129,14 @@ class ComputedProperty<U,S> extends Property<U,S> {
 	constructor(protected func:()=>U, scope:S) {
 		super(undefined, scope);
 		if (!func)
-			throw new Error("Computed required a function");
-
-		this.set = () => {
-			throw new Error("Computed cannot retrieve a new value!");
-			return this.scope;
-		}
+			throw new Error("ComputedProperty requires a function");
 
 		this.dependencyState.compute = this.compute.bind(this);
 	}
 
 	get():U {
-		// first evaluation is lazy
+		// the first evaluation of a computed function is lazy, to save lots of calculations when its dependencies are initialized
+		// (and it is cheaper anyways)
 		if (!this.initialized) {
 			this.initialized = true; // prevents endless recursion in cycles (cycles themselves are only detected after finishing the computation)
 			this.dependencyState.computeNextValue();
@@ -149,7 +145,11 @@ class ComputedProperty<U,S> extends Property<U,S> {
 		return super.get(); // assumption: Compute<> is always synchronous for computed properties
 	}
 
-	compute(onComplete:(changed:boolean)=>void) {
+	set(_:U):S {
+		throw new Error("Computed cannot retrieve a new value!");
+	}
+
+	compute() {
 		var newValue = this.func.call(this.scope);
 		this.initialized = true;
 
@@ -164,7 +164,7 @@ class ComputedProperty<U,S> extends Property<U,S> {
 	}
 
 	toString() {
-		return `Property[${this.func.toString()}]`;
+		return `ComputedProperty[${this.func.toString()}]`;
 	}
 }
 
@@ -212,29 +212,27 @@ class DNode {
 			return;
 
 		this.state = DNodeState.STALE;
-		this.notifyObservers(false);
+		this.notifyObservers();
 	}
 
-	markReady(didActuallyChange:boolean) {
+	markReady(didTheValueActuallyChange:boolean) {
 		if (this.state === DNodeState.READY)
 			return;
 		this.state = DNodeState.READY;
-		this.notifyObservers(didActuallyChange);
+		this.notifyObservers(didTheValueActuallyChange);
 		Scheduler.scheduleReady();
 	}
 
-	notifyObservers(didActuallyChange:boolean) {
+	notifyObservers(didTheValueActuallyChange:boolean=false) {
 		var os = this.observers;
 		for(var i = os.length -1; i >= 0; i--)
-			os[i].notifyStateChange(this, didActuallyChange);
+			os[i].notifyStateChange(this, didTheValueActuallyChange);
 	}
 
-	dependencyChangeCount = 0;
-
-	notifyStateChange(observable:DNode, didActuallyChange:boolean) {
+	notifyStateChange(observable:DNode, didTheValueActuallyChange:boolean) {
 		switch(this.state) {
 			case DNodeState.STALE:
-				if (observable.state === DNodeState.READY && didActuallyChange)
+				if (observable.state === DNodeState.READY && didTheValueActuallyChange)
 					this.dependencyChangeCount += 1;
 				// The observable has become stable, and all others are stable as well, we can compute now!
 				if (observable.state === DNodeState.READY && this.observing.filter(o => o.state !== DNodeState.READY).length === 0) {
@@ -244,6 +242,7 @@ class DNode {
 						Scheduler.schedule(() => this.computeNextValue());
 					}
 					else {
+						// we're done, but didn't change, lets make sure verybody knows..
 						this.markReady(false);
 					}
 					this.dependencyChangeCount = 0;
@@ -297,7 +296,7 @@ class DNode {
 
 	public notifyObserved() {
 		if (this.state === DNodeState.PENDING)
-			throw new Error("Cycle detected");
+			throw new Error("Cycle detected"); // we are calculating ATM, *and* somebody is looking at us..
 		if (DNode.trackingStack.length)
 			DNode.trackingStack[0].push(this);
 	}
@@ -306,7 +305,7 @@ class DNode {
 		if (!this.observing)
 			return;
 		if (this.observing.indexOf(node) !== -1)
-			throw new Error("Cycle detected");
+			throw new Error("Cycle detected"); // argh, we are part of our own dependency tree...
 		this.observing.forEach(o => o.findCycle(node));
 	}
 
