@@ -18,7 +18,7 @@ export interface IProperty<T,S> {
 	subscribe(callback:(newValue:T, oldValue:T)=>void):Lambda;
 }
 
-export function property<T,S>(value:T|{():T}, scope?:S):IProperty<T,S> {
+export function property<T,S>(value?:T|{():T}, scope?:S):IProperty<T,S> {
 	var prop:Property<T,S> = null;
 
 	if (typeof value === "function")
@@ -34,6 +34,7 @@ export function property<T,S>(value:T|{():T}, scope?:S):IProperty<T,S> {
 	};
 	(<any>propFunc).subscribe = prop.subscribe.bind(prop);
 	(<any>propFunc).prop = prop;
+	(<any>propFunc).toString = function() { return prop.toString(); };
 
 	return <IProperty<T,S>> propFunc;
 }
@@ -68,7 +69,7 @@ export function onceReady(listener:Lambda) {
 	Scheduler.onceReady(listener);
 }
 
-export function defineProperty<T>(object:Object, name:string, initialValue:T) {
+export function defineProperty<T>(object:Object, name:string, initialValue?:T) {
 	var _property = property(initialValue, object);
 	Object.defineProperty(object, name, {
 		get: function() {
@@ -86,7 +87,7 @@ class Property<T,S> {
 	protected events = new events.EventEmitter();
 	protected dependencyState:DNode = new DNode();
 
-	constructor(protected _value:T, protected scope?:S){
+	constructor(protected _value?:T, protected scope?:S){
 
 	}
 
