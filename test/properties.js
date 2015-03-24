@@ -26,6 +26,21 @@ exports.basic = function(test) {
     test.done();
 }
 
+exports.basic2 = function(test) {
+    var x = property(3);
+    var z = property(function () { return x() * 2});
+    var y = property(function () { return x() * 3});
+
+    test.equal(z(), 6);
+    test.equal(y(), 9);
+
+    x(5);
+    test.equal(z(), 10);
+    test.equal(y(), 15);
+
+    test.done();
+}
+
 exports.dynamic = function(test) {
   //  debugger;
   try {

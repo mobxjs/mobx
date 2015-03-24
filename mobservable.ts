@@ -33,6 +33,7 @@ export function property<T,S>(value:T|{():T}, scope?:S):IProperty<T,S> {
 			return <T> prop.get();
 	};
 	(<any>propFunc).subscribe = prop.subscribe.bind(prop);
+	(<any>propFunc).prop = prop;
 
 	return <IProperty<T,S>> propFunc;
 }
@@ -197,15 +198,21 @@ class DNode {
 			return;
 
 		this.state = DNodeState.STALE;
-		this.observers.forEach(observer => observer.notifyStateChange(this));
+		this.notifyObservers();
 	}
 
 	markReady() {
 		if (this.state === DNodeState.READY)
 			return;
 		this.state = DNodeState.READY;
-		this.observers.forEach(observer => observer.notifyStateChange(this));
+		this.notifyObservers();
 		Scheduler.scheduleReady();
+	}
+
+	notifyObservers() {
+		var os = this.observers;
+		for(var i = os.length -1; i >= 0; i--)
+			os[i].notifyStateChange(this);
 	}
 
 	notifyStateChange(observable:DNode) {
