@@ -93,9 +93,12 @@ class Property<T,S> {
 			var oldValue = this._value;
 			this.dependencyState.markStale();
 			this._value = value;
-			this.dependencyState.markReady();
+			this.dependencyState.markReady(true);
 			this.events.emit('change', value, oldValue);
 		}
+		else
+			this.dependencyState.markReady(false);
+
 		return this.scope;
 	}
 
@@ -198,30 +201,40 @@ class DNode {
 			return;
 
 		this.state = DNodeState.STALE;
-		this.notifyObservers();
+		this.notifyObservers(false);
 	}
 
-	markReady() {
+	markReady(didActuallyChange:boolean) {
 		if (this.state === DNodeState.READY)
 			return;
 		this.state = DNodeState.READY;
-		this.notifyObservers();
+		this.notifyObservers(didActuallyChange);
 		Scheduler.scheduleReady();
 	}
 
-	notifyObservers() {
+	notifyObservers(didActuallyChange:boolean) {
 		var os = this.observers;
 		for(var i = os.length -1; i >= 0; i--)
-			os[i].notifyStateChange(this);
+			os[i].notifyStateChange(this, didActuallyChange);
 	}
 
-	notifyStateChange(observable:DNode) {
+	dependencyChangeCount = 0;
+
+	notifyStateChange(observable:DNode, didActuallyChange:boolean) {
 		switch(this.state) {
 			case DNodeState.STALE:
+				if (observable.state === DNodeState.READY && didActuallyChange)
+					this.dependencyChangeCount += 1;
 				// The observable has become stable, and all others are stable as well, we can compute now!
 				if (observable.state === DNodeState.READY && this.observing.filter(o => o.state !== DNodeState.READY).length === 0) {
-					this.state = DNodeState.PENDING;
-					Scheduler.schedule(() => this.computeNextValue());
+					if (this.dependencyChangeCount) {
+						this.state = DNodeState.PENDING;
+						Scheduler.schedule(() => this.computeNextValue());
+					}
+					else {
+						this.markReady(false);
+					}
+					this.dependencyChangeCount = 0;
 				}
 				break;
 			case DNodeState.PENDING:
@@ -244,7 +257,7 @@ class DNode {
 		this.trackDependencies();
 		this.compute(() => {
 			this.bindDependencies();
-			this.markReady();
+			//this.markReady(true);
 		});
 	}
 
