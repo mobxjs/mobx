@@ -188,6 +188,7 @@ class DNode {
 	}
 
 	addObserver(node:DNode) {
+		// optimization: replace with length, see: https://jsperf.com/array-push-vs-unshift-vs-direct-assignment/2
 		this.observers.push(node);
 	}
 
@@ -201,7 +202,8 @@ class DNode {
 		if (this.observing.length !== this.prevObserving.length)
 			return true;
 		// Optimization; use cached length
-		for(var i = 0; i < this.observing.length; i++)
+		var l = this.observing.length;
+		for(var i = 0; i < l; i++)
 			if (this.observing[i] !== this.prevObserving[i])
 				return true;
 		return false;
@@ -307,8 +309,10 @@ class DNode {
 		this.observing = DNode.trackingStack.shift();
 		if (this.hasObservingChanged()) {
 			// Optimization: replace forEach with for loops https://jsperf.com/for-vs-foreach/32
-			this.prevObserving.forEach(observing => observing.removeObserver(this));
-			this.observing.forEach(observable => observable.addObserver(this))
+			for(var l = this.prevObserving.length, i=0; i<l; i++)
+				this.prevObserving[i].removeObserver(this);
+			for(var l = this.observing.length, i=0; i<l; i++)
+				this.observing[i].addObserver(this);
 			this.findCycle(this);
 		}
 	}
@@ -325,13 +329,15 @@ class DNode {
 			return;
 		if (this.observing.indexOf(node) !== -1)
 			throw new Error("Cycle detected"); // argh, we are part of our own dependency tree...
-		this.observing.forEach(o => o.findCycle(node));
+		for(var l = this.observing.length, i=0; i<l; i++)
+			this.observing[i].findCycle(node);
 	}
 
 	public dispose() {
-		this.observing.forEach(observing => observing.removeObserver(this));
+		for(var l=this.observing.length, i=0; i<l; i++)
+			this.observing[i].removeObserver(this);
 		this.observing = [];
-		// Do something with the observers, notify some state like KILLED?
+		// Do something with the observers, notify some state like KILLED? TODO: => set 'undefined'
 	}
 }
 
@@ -349,7 +355,7 @@ class Scheduler {
 
 	private static runPostBatch() {
 		while(Scheduler.tasks.length) {
-			try {
+			try { // optimization: move try out of while, re-enter after exception (tasks array is preserved after all)
 				Scheduler.tasks.shift()();
 			}
 			catch (e) {

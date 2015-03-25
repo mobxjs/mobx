@@ -4,7 +4,8 @@ var property = mobservable.property;
 
 /*
 	results of this test:
-	300/40000 seconds on netbook
+	300/40000 mseconds on netbook
+	220/37000 after removing forEach
  */
 exports.perf1 = function(test) {
 	var a = property(2);
