@@ -48,3 +48,25 @@ exports.perf1 = function(test) {
 	console.log("Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
 	test.done();
 }
+
+exports.perf2 = function(test) {
+	var observables = [property(1)];
+	for(var i = 0; i < 500; i++) {
+		(function(idx) {
+			observables.push(property(function() { return observables[idx]() + 1 }));
+		})(i);
+	}
+
+	var start = +(new Date);
+
+	var last = observables[observables.length -1];
+	test.equals(501, last());
+	var initial = +(new Date);
+
+	observables[0](2);
+	test.equals(502, last());
+	var end = +(new Date);
+
+	console.log("Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
+	test.done();
+}
