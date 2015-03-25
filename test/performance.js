@@ -6,6 +6,7 @@ var property = mobservable.property;
 	results of this test:
 	300/40000 mseconds on netbook
 	220/37000 after removing forEach
+	140/30000 after not using (un)shift / pop / push
  */
 exports.perf1 = function(test) {
 	var a = property(2);

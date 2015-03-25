@@ -189,7 +189,7 @@ class DNode {
 
 	addObserver(node:DNode) {
 		// optimization: replace with length, see: https://jsperf.com/array-push-vs-unshift-vs-direct-assignment/2
-		this.observers.push(node);
+		this.observers[this.observers.length] = node;
 	}
 
 	removeObserver(node:DNode) {
@@ -302,13 +302,13 @@ class DNode {
 
 	private trackDependencies() {
 		this.prevObserving = this.observing;
-		DNode.trackingStack.unshift([]);
+		DNode.trackingStack[DNode.trackingStack.length] = [];
 	}
 
 	private bindDependencies() {
-		this.observing = DNode.trackingStack.shift();
+		this.observing = DNode.trackingStack.pop();
 		if (this.hasObservingChanged()) {
-			// Optimization: replace forEach with for loops https://jsperf.com/for-vs-foreach/32
+			// optimization, smart compare two lists before removing / deleting / finding cycles
 			for(var l = this.prevObserving.length, i=0; i<l; i++)
 				this.prevObserving[i].removeObserver(this);
 			for(var l = this.observing.length, i=0; i<l; i++)
@@ -320,8 +320,9 @@ class DNode {
 	public notifyObserved() {
 		if (this.state === DNodeState.PENDING)
 			throw new Error("Cycle detected"); // we are calculating ATM, *and* somebody is looking at us..
-		if (DNode.trackingStack.length)
-			DNode.trackingStack[0].push(this);
+		var ts = DNode.trackingStack, l = ts.length;
+		if (l)
+			ts[l-1][ts[l-1].length] = this;
 	}
 
 	public findCycle(node:DNode) {
@@ -350,7 +351,7 @@ class Scheduler {
 		if (Scheduler.inBatch < 1)
 			func();
 		else
-			Scheduler.tasks.push(func);
+			Scheduler.tasks[Scheduler.tasks.length] = func;
 	}
 
 	private static runPostBatch() {
