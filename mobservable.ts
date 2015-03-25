@@ -200,6 +200,7 @@ class DNode {
 	hasObservingChanged() {
 		if (this.observing.length !== this.prevObserving.length)
 			return true;
+		// Optimization; use cached length
 		for(var i = 0; i < this.observing.length; i++)
 			if (this.observing[i] !== this.prevObserving[i])
 				return true;
@@ -213,6 +214,19 @@ class DNode {
 			return;
 
 		this.state = DNodeState.STALE;
+		/*
+			Mark stale recursively marks all observers stale as well, this is nice since it
+			makes all computations consistent, e.g.:
+			a = property(3)
+			b = property(() => a() * 2)
+			c = property(() => b() + a())
+			a(4)
+			// -> c will directly yield 12, and no intermediate 4 or 11 where either 'a' or 'b' wasn't updated in c
+
+			However, if performance becomes an issue, it might be nice to introduce a global 'consistent' flag,
+			that drops de recursive markStale / markReady in favor of a direct set and an (async?) scheduled recomputation
+			of computed properties
+		 */
 		this.notifyObservers();
 	}
 
@@ -226,6 +240,7 @@ class DNode {
 
 	notifyObservers(didTheValueActuallyChange:boolean=false) {
 		var os = this.observers;
+		// change to 'for loop, reverse, pre-decrement', https://jsperf.com/for-vs-foreach/32
 		for(var i = os.length -1; i >= 0; i--)
 			os[i].notifyStateChange(this, didTheValueActuallyChange);
 	}
@@ -266,6 +281,8 @@ class DNode {
 	}
 
 	computeNextValue() {
+		// possible optimization: compute is only needed if there are subscribers or observers (that have subscribers)
+		// otherwise, computation and further (recursive markStale / markReady) could be delayed
 		this.trackDependencies();
 		var valueDidChange = this.compute();
 		this.bindDependencies();
@@ -289,6 +306,7 @@ class DNode {
 	private bindDependencies() {
 		this.observing = DNode.trackingStack.shift();
 		if (this.hasObservingChanged()) {
+			// Optimization: replace forEach with for loops https://jsperf.com/for-vs-foreach/32
 			this.prevObserving.forEach(observing => observing.removeObserver(this));
 			this.observing.forEach(observable => observable.addObserver(this))
 			this.findCycle(this);
