@@ -247,13 +247,21 @@ class DNode {
 			os[i].notifyStateChange(this, didTheValueActuallyChange);
 	}
 
+	areAllDependenciesAreStable() {
+		var obs = this.observing, l = obs.length;
+		for(var i = 0; i < l; i++)
+			if (obs[i].state !== DNodeState.READY)
+				return false;
+		return true;
+	}
+
 	notifyStateChange(observable:DNode, didTheValueActuallyChange:boolean) {
 		switch(this.state) {
 			case DNodeState.STALE:
 				if (observable.state === DNodeState.READY && didTheValueActuallyChange)
 					this.dependencyChangeCount += 1;
 				// The observable has become stable, and all others are stable as well, we can compute now!
-				if (observable.state === DNodeState.READY && this.observing.filter(o => o.state !== DNodeState.READY).length === 0) {
+				if (observable.state === DNodeState.READY && this.areAllDependenciesAreStable()) {
 					// did any of the observables really change?
 					if (this.dependencyChangeCount > 0) {
 						this.state = DNodeState.PENDING;
