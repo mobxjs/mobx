@@ -1,15 +1,9 @@
-/// <reference path="./typings/node-0.10.d.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-/**
- * MOBservable
- * (c) 2015 - Michel Weststrate
- * https://github.com/mweststrate/mobservable
- */
 var events = require('events');
 function property(value, scope) {
     var prop = null;
@@ -82,7 +76,7 @@ var Property = (function () {
             var oldValue = this._value;
             this.dependencyState.markStale();
             this._value = value;
-            this.dependencyState.markReady();
+            this.dependencyState.markReady(true);
             this.events.emit('change', value, oldValue);
         }
         return this.scope;
@@ -94,7 +88,7 @@ var Property = (function () {
     Property.prototype.subscribe = function (listener, fireImmediately) {
         var _this = this;
         if (fireImmediately === void 0) { fireImmediately = false; }
-        var current = this.get(); // make sure the values are initialized
+        var current = this.get();
         if (fireImmediately)
             listener(current, undefined);
         this.events.addListener('change', listener);
@@ -114,10 +108,8 @@ var ComputedProperty = (function (_super) {
         _super.call(this, undefined, scope);
         this.func = func;
         this.initialized = false;
-        this.privateSetter = null;
         if (!func)
             throw new Error("Computed required a function");
-        this.privateSetter = this.set;
         this.set = function () {
             throw new Error("Computed cannot retrieve a new value!");
             return _this.scope;
@@ -125,16 +117,21 @@ var ComputedProperty = (function (_super) {
         this.dependencyState.compute = this.compute.bind(this);
     }
     ComputedProperty.prototype.get = function () {
-        // first evaluation is lazy
         if (!this.initialized) {
-            this.initialized = true; // prevents endless recursion in cycles (cycles themselves are only detected after finishing the computation)
+            this.initialized = true;
             this.dependencyState.computeNextValue();
         }
-        return _super.prototype.get.call(this); // assumption: Compute<> is always synchronous for computed properties
+        return _super.prototype.get.call(this);
     };
     ComputedProperty.prototype.compute = function (onComplete) {
-        this.privateSetter.call(this, this.func.call(this.scope));
+        var newValue = this.func.call(this.scope);
         this.initialized = true;
+        if (newValue !== this._value) {
+            var oldValue = this._value;
+            this._value = newValue;
+            this.dependencyState.markReady(true);
+            this.events.emit('change', value, oldValue);
+        }
         onComplete();
     };
     ComputedProperty.prototype.toString = function () {
@@ -155,6 +152,7 @@ var DNode = (function () {
         this.observing = [];
         this.prevObserving = [];
         this.observers = [];
+        this.dependencyChangeCount = 0;
     }
     DNode.prototype.addObserver = function (node) {
         this.observers.push(node);
@@ -174,32 +172,39 @@ var DNode = (function () {
     };
     DNode.prototype.markStale = function () {
         if (this.state === 1 /* PENDING */)
-            return; // recalculation already scheduled, we're fine..
+            return;
         if (this.state === 0 /* STALE */)
             return;
         this.state = 0 /* STALE */;
-        this.notifyObservers();
+        this.notifyObservers(false);
     };
-    DNode.prototype.markReady = function () {
+    DNode.prototype.markReady = function (didActuallyChange) {
         if (this.state === 2 /* READY */)
             return;
         this.state = 2 /* READY */;
-        this.notifyObservers();
+        this.notifyObservers(didActuallyChange);
         Scheduler.scheduleReady();
     };
-    DNode.prototype.notifyObservers = function () {
+    DNode.prototype.notifyObservers = function (didActuallyChange) {
         var os = this.observers;
         for (var i = os.length - 1; i >= 0; i--)
-            os[i].notifyStateChange(this);
+            os[i].notifyStateChange(this, didActuallyChange);
     };
-    DNode.prototype.notifyStateChange = function (observable) {
+    DNode.prototype.notifyStateChange = function (observable, didActuallyChange) {
         var _this = this;
         switch (this.state) {
             case 0 /* STALE */:
-                // The observable has become stable, and all others are stable as well, we can compute now!
+                if (observable.state === 2 /* READY */ && didActuallyChange)
+                    this.dependencyChangeCount += 1;
                 if (observable.state === 2 /* READY */ && this.observing.filter(function (o) { return o.state !== 2 /* READY */; }).length === 0) {
-                    this.state = 1 /* PENDING */;
-                    Scheduler.schedule(function () { return _this.computeNextValue(); });
+                    if (this.dependencyChangeCount) {
+                        this.state = 1 /* PENDING */;
+                        Scheduler.schedule(function () { return _this.computeNextValue(); });
+                    }
+                    else {
+                        this.markReady(false);
+                    }
+                    this.dependencyChangeCount = 0;
                 }
                 break;
             case 1 /* PENDING */:
@@ -214,7 +219,6 @@ var DNode = (function () {
         this.trackDependencies();
         this.compute(function () {
             _this.bindDependencies();
-            _this.markReady();
         });
     };
     DNode.prototype.compute = function (onComplete) {
@@ -250,12 +254,7 @@ var DNode = (function () {
         var _this = this;
         this.observing.forEach(function (observing) { return observing.removeObserver(_this); });
         this.observing = [];
-        // Do something with the observers, notify some state like KILLED?
     };
-    /*
-        Dependency detection
-    */
-    // TODO: is trackingstack + push/pop still valid if DNode.compute is executed asynchronously?
     DNode.trackingStack = [];
     return DNode;
 })();
