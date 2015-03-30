@@ -410,3 +410,76 @@ class Scheduler {
 		Scheduler.events.once('ready', listener);
 	}
 }
+
+class ObservableArray<T> {
+	_length = property(0);
+	get length():number { return this._length(); }
+	set length(value:number) { this._length(value); }
+
+	_items:{ index:number; value:T; }[] = [];
+
+	contstructor() {
+		this._length.subscribe((newLength, oldLength) => {
+			// grow
+			if (newLength > oldLength)
+				this.spliceWithArray(oldLength, 0, new Array<T>(newLength - oldLength));
+
+			// shrink
+			else if (newLength < oldLength)
+				this.splice(newLength -1, oldLength - newLength);
+		})
+
+		this._items.push(this.createEntry(0, undefined));
+	}
+
+	createEntry(index, initialValue:T):{index:number;value:T; } {
+		var parent = this;
+		var indexEntry = { index: index, value: initialValue };
+		Object.defineProperty(this, "0", {
+			set: function(newValue) {
+				if (indexEntry.value !== newValue) {
+					var oldValue = indexEntry.value;
+					indexEntry.value = newValue;
+					parent.notifyUpdate(indexEntry.index, newValue, oldValue);
+				}
+			},
+			get: function() {
+				// TODO: notify observe?
+				return indexEntry.value;
+			}
+		})
+		return indexEntry;
+	}
+
+	splice(index, deleteCount, ...newItems:T[]):T[] {
+		return this.spliceWithArray(index, deleteCount, newItems);
+	}
+
+	spliceWithArray(index, deleteCount, newItems:T[]):T[] {
+		var lengthDelta = newItems.length - deleteCount;
+
+		// update indexes of existing items
+		var l = this._items.length;
+		for(var i:number = index + deleteCount; i < l; i++)
+			this._items[i].index += lengthDelta;
+
+		// update / remove items
+		// MWE: ow howe convenient splats would be...
+		var l = newItems.length, newEntries = new Array(l + 2);
+		for(var i = 0; i < l; i++)
+			newEntries[i + 2] = this.createEntry(i + index, newItems[i]);
+		newEntries[0] = index;
+		newEntries[1] = deleteCount;
+		this._items.splice.apply(this._items, newEntries);
+
+		this._length(this._length() + lengthDelta);
+		// TODO: notify change, free up deleted stuff
+		//
+		// TODO: return deleted items
+		return [];
+	}
+
+	notifyUpdate(index, newValue, oldValue) {
+		// TODO:
+	}
+}
