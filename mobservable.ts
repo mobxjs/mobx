@@ -411,7 +411,9 @@ class Scheduler {
 	}
 }
 
-class ObservableArray<T> {
+class ObservableArray<T> implements Array<T> {
+    [n: number]: T;
+
 	_length = property(0);
 	get length():number { return this._length(); }
 	set length(value:number) { this._length(value); }
@@ -451,11 +453,12 @@ class ObservableArray<T> {
 		return indexEntry;
 	}
 
-	splice(index, deleteCount, ...newItems:T[]):T[] {
+	splice(index:number, deleteCount?:number, ...newItems:T[]):T[] {
 		return this.spliceWithArray(index, deleteCount, newItems);
 	}
 
-	spliceWithArray(index, deleteCount, newItems:T[]):T[] {
+	spliceWithArray(index:number, deleteCount:number, newItems:T[]):T[] {
+		//TODO: support alias where only index is defined
 		var lengthDelta = newItems.length - deleteCount;
 
 		// update indexes of existing items
@@ -476,10 +479,57 @@ class ObservableArray<T> {
 		// TODO: notify change, free up deleted stuff
 		//
 		// TODO: return deleted items
+		// TODO: guard that when deleting, the last entry is not accidentally deleted!
 		return [];
 	}
 
 	notifyUpdate(index, newValue, oldValue) {
+		// todo: if index == length add new empty entry at the end
 		// TODO:
+	}
+
+	/*
+		functions that do alter the internal structure of the array
+	 */
+    push(...items: T[]): number {
+    	// don't use the property internally
+    	this.spliceWithArray(this._items.length -1, 0, items);
+    	return this._items.length -1;
+    }
+    pop(): T {
+    	return this.splice(this._items.length -1, 1)[0];
+    }
+    shift(): T {
+    	return this.splice(0, 1)[0]
+    }
+    unshift(...items: T[]): number {
+    	this.spliceWithArray(0, 0, items);
+    	return this._items.length -1;
+    }
+
+
+	/*
+		functions that do not alter the array, from lib.es6.d.ts
+	*/
+	toString():string { return this.wrapReadFunction<string>("toString", arguments); }
+	toLocaleString():string { return this.wrapReadFunction<string>("toLocaleString", arguments); }
+    concat<U extends T[]>(...items: U[]): T[] { return this.wrapReadFunction<T[]>("concat", arguments); }
+	join(separator?: string): string { return this.wrapReadFunction<string>("join", arguments); }
+	reverse():T[] { return this.wrapReadFunction<T[]>("reverse", arguments); }
+    slice(start?: number, end?: number): T[] { return this.wrapReadFunction<T[]>("slice", arguments); }
+	sort(compareFn?: (a: T, b: T) => number): T[] { return this.wrapReadFunction<T[]>("sort", arguments); }
+    indexOf(searchElement: T, fromIndex?: number): number { return this.wrapReadFunction<number>("indexOf", arguments); }
+    lastIndexOf(searchElement: T, fromIndex?: number): number { return this.wrapReadFunction<number>("lastIndexOf", arguments); }
+    every(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean { return this.wrapReadFunction<boolean>("every", arguments); }
+    some(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean { return this.wrapReadFunction<boolean>("some", arguments); }
+    forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void { return this.wrapReadFunction<void>("forEach", arguments); }
+    map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[] { return this.wrapReadFunction<U[]>("map", arguments); }
+    filter(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[] { return this.wrapReadFunction<T[]>("filter", arguments); }
+    reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { return this.wrapReadFunction<U>("reduce", arguments); }
+    reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { return this.wrapReadFunction<U>("reduceRight", arguments); }
+
+	wrapReadFunction<U>(funcName:string, ...args:any[]):U {
+		// todo, update this function in the prototype of ObservableArray
+		return null;
 	}
 }
