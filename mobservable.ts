@@ -18,6 +18,9 @@ export interface IProperty<T,S> {
 	subscribe(callback:(newValue:T, oldValue:T)=>void):Lambda;
 }
 
+// TODO: rename to observable, make root export
+// TODO: how to dinstinguish beteween observing refs, and arrays / objects
+// TODO: make observableMap(map) function that makes properties observable, seals the object, introduces observe function?
 export function property<T,S>(value?:T|{():T}, scope?:S):IProperty<T,S> {
 	var prop:Property<T,S> = null;
 
@@ -108,6 +111,7 @@ class Property<T,S> {
 		return this._value;
 	}
 
+	// TODO: subscribe -> observe for consistency?
 	subscribe(listener:(newValue:T, oldValue:T)=>void, fireImmediately=false):Lambda {
 		var current = this.get(); // make sure the values are initialized
 		if (fireImmediately)
@@ -411,10 +415,17 @@ class Scheduler {
 	}
 }
 
+/*
+	TODO: mention clearly that ObservableArray is not sparse, that is,
+	no wild index assignments with index >(!) length are allowed (that is, won't be observed)
+ */
 class ObservableArray<T> implements Array<T> {
     [n: number]: T;
 
 	_length = property(0);
+
+	// TODO: make length and all other props non enumarable, like in a proper array
+	// TODO: make the property at length[x] also non enumerable
 	get length():number { return this._length(); }
 	set length(value:number) { this._length(value); }
 
@@ -434,6 +445,7 @@ class ObservableArray<T> implements Array<T> {
 		this._items.push(this.createEntry(0, undefined));
 	}
 
+	// TODO: fix BS implementation, index does not change, just store values...
 	createEntry(index, initialValue:T):{index:number;value:T; } {
 		var parent = this;
 		var indexEntry = { index: index, value: initialValue };
@@ -446,7 +458,8 @@ class ObservableArray<T> implements Array<T> {
 				}
 			},
 			get: function() {
-				// TODO: notify observe?
+				// TODO: notify observe? only index observers? can you subscribe to a specific index
+				// for changes..?
 				return indexEntry.value;
 			}
 		})
@@ -488,8 +501,19 @@ class ObservableArray<T> implements Array<T> {
 		// TODO:
 	}
 
+	clear(): T[] {
+		return this.splice(0);
+	}
+
 	/*
-		functions that do alter the internal structure of the array
+		ES7 goodies
+	 */
+	// TODO: observe(callaback) https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
+	// https://github.com/arv/ecmascript-object-observe
+	// TODO: unobserve(callback)
+
+	/*
+		functions that do alter the internal structure of the array, from lib.es6.d.ts
 	 */
     push(...items: T[]): number {
     	// don't use the property internally
@@ -506,7 +530,6 @@ class ObservableArray<T> implements Array<T> {
     	this.spliceWithArray(0, 0, items);
     	return this._items.length -1;
     }
-
 
 	/*
 		functions that do not alter the array, from lib.es6.d.ts
