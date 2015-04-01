@@ -429,9 +429,10 @@ class ObservableArray<T> implements Array<T> {
 	get length():number { return this._length(); }
 	set length(value:number) { this._length(value); }
 
+	_values: T[] = [];
 	_items:{ index:number; value:T; }[] = [];
 
-	contstructor() {
+	contstructor(initialValues:T[]) {
 		this._length.subscribe((newLength, oldLength) => {
 			// grow
 			if (newLength > oldLength)
@@ -442,63 +443,80 @@ class ObservableArray<T> implements Array<T> {
 				this.splice(newLength -1, oldLength - newLength);
 		})
 
-		this._items.push(this.createEntry(0, undefined));
+		if (initialValues && initialValues.length)
+			this.spliceWithArray(0, 0, initialValues);
+		else
+			this.createNewEntry(0, false);
 	}
 
-	// TODO: fix BS implementation, index does not change, just store values...
-	createEntry(index, initialValue:T):{index:number;value:T; } {
-		var parent = this;
-		var indexEntry = { index: index, value: initialValue };
-		Object.defineProperty(this, "0", {
-			set: function(newValue) {
-				if (indexEntry.value !== newValue) {
-					var oldValue = indexEntry.value;
-					indexEntry.value = newValue;
-					parent.notifyUpdate(indexEntry.index, newValue, oldValue);
+	private updateLength(oldLength:number, delta:number) {
+		if (delta < 0) {
+			for(var i = oldLength - 1 - delta; i < oldLength; i++)
+				delete this[i];
+		}
+		else if (delta > 0) {
+			for (var i = 0; i < delta; i++)
+				this.createNewEntry(oldLength + i, true);
+		}
+		else
+			return;
+		this. createNewEntry(oldLength + delta, false);
+	}
+
+	private createNewEntry(index: number, enumerable:boolean) {
+		Object.defineProperty(this, "" + index, {
+			enumerable: enumerable,
+			set: (value) => {
+				if (this._values[index] !== value) {
+					this._values[index] = value;
+					this.notifyChildUpdate(index);
 				}
 			},
-			get: function() {
-				// TODO: notify observe? only index observers? can you subscribe to a specific index
-				// for changes..?
-				return indexEntry.value;
+			get: () => {
+				this.notifyChildObserved(index);
+				return this._values[index];
 			}
 		})
-		return indexEntry;
 	}
 
-	splice(index:number, deleteCount?:number, ...newItems:T[]):T[] {
-		return this.spliceWithArray(index, deleteCount, newItems);
-	}
+	spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[] {
+		var length = this._values.length;
 
-	spliceWithArray(index:number, deleteCount:number, newItems:T[]):T[] {
-		//TODO: support alias where only index is defined
+		// yay, splice can deal with strange indexes
+		if (index > length)
+			index = length;
+		else if (index < 0)
+			index = Math.max(0, length - index);
+
+		// too few arguments?
+		if (arguments.length === 0)
+			return;
+		if (arguments.length === 1)
+			deleteCount = length - index;
+
 		var lengthDelta = newItems.length - deleteCount;
+		var res:T[] = Array.prototype.splice.apply(this._values, [<any>index, deleteCount].concat(newItems));
+		this.updateLength(length, lengthDelta); // create or remove new entries
+		this._length(length + lengthDelta); // update length property
 
-		// update indexes of existing items
-		var l = this._items.length;
-		for(var i:number = index + deleteCount; i < l; i++)
-			this._items[i].index += lengthDelta;
-
-		// update / remove items
-		// MWE: ow howe convenient splats would be...
-		var l = newItems.length, newEntries = new Array(l + 2);
-		for(var i = 0; i < l; i++)
-			newEntries[i + 2] = this.createEntry(i + index, newItems[i]);
-		newEntries[0] = index;
-		newEntries[1] = deleteCount;
-		this._items.splice.apply(this._items, newEntries);
-
-		this._length(this._length() + lengthDelta);
-		// TODO: notify change, free up deleted stuff
-		//
-		// TODO: return deleted items
-		// TODO: guard that when deleting, the last entry is not accidentally deleted!
-		return [];
+		this.notifySplice(index, res, newItems);
+		return res;
 	}
 
-	notifyUpdate(index, newValue, oldValue) {
-		// todo: if index == length add new empty entry at the end
-		// TODO:
+	notifyChildUpdate(index:number) {
+
+	}
+
+	notifyChildObserved(index:number) {
+
+	}
+
+	notifySplice(index:number, deleted:T[], added:T[]) {
+
+	}
+
+	notifyObserved() {
+
 	}
 
 	clear(): T[] {
@@ -515,6 +533,10 @@ class ObservableArray<T> implements Array<T> {
 	/*
 		functions that do alter the internal structure of the array, from lib.es6.d.ts
 	 */
+	splice(index:number, deleteCount?:number, ...newItems:T[]):T[] {
+		return this.spliceWithArray(index, deleteCount, newItems);
+	}
+
     push(...items: T[]): number {
     	// don't use the property internally
     	this.spliceWithArray(this._items.length -1, 0, items);
@@ -552,7 +574,11 @@ class ObservableArray<T> implements Array<T> {
     reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { return this.wrapReadFunction<U>("reduceRight", arguments); }
 
 	wrapReadFunction<U>(funcName:string, ...args:any[]):U {
-		// todo, update this function in the prototype of ObservableArray
-		return null;
+		ObservableArray.prototype[funcName] = function() {
+			var res = Array[funcName].apply(this._values, args);
+			this.notifyObserved();
+			return res;
+		}
+		return this[funcName].apply(this, args);
 	}
 }
