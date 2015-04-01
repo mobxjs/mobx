@@ -422,17 +422,18 @@ class Scheduler {
 class ObservableArray<T> implements Array<T> {
     [n: number]: T;
 
-	_length = property(0);
+	private _length = property(0);
+	private  dependencyState:DNode = new DNode();
+	private _values: T[] = [];
+	private events = new events.EventEmitter();
 
 	// TODO: make length and all other props non enumarable, like in a proper array
 	// TODO: make the property at length[x] also non enumerable
 	get length():number { return this._length(); }
 	set length(value:number) { this._length(value); }
 
-	_values: T[] = [];
-	_items:{ index:number; value:T; }[] = [];
 
-	contstructor(initialValues:T[]) {
+	constructor(initialValues:T[]) {
 		this._length.subscribe((newLength, oldLength) => {
 			// grow
 			if (newLength > oldLength)
@@ -504,19 +505,38 @@ class ObservableArray<T> implements Array<T> {
 	}
 
 	notifyChildUpdate(index:number) {
-
+		this.notifyChanged();
+		// TODO: update Array.observe listeners
 	}
 
 	notifyChildObserved(index:number) {
-
+		this.notifyObserved();
 	}
 
 	notifySplice(index:number, deleted:T[], added:T[]) {
+		this.notifyChanged();
+		// TODO: update Array.observe listeners
+	}
 
+	notifyChanged() {
+		this.dependencyState.markStale();
+		this.dependencyState.markReady(true);
+		this.events.emit('change');
 	}
 
 	notifyObserved() {
+		this.dependencyState.notifyObserved();
+	}
 
+	// TODO: subscribe -> observe for consistency?
+	subscribe(listener:()=>void, fireImmediately=false):Lambda {
+		if (fireImmediately)
+			listener();
+
+		this.events.addListener('change', listener);
+		return () => {
+			this.events.removeListener('change', listener);
+		};
 	}
 
 	clear(): T[] {
@@ -539,18 +559,18 @@ class ObservableArray<T> implements Array<T> {
 
     push(...items: T[]): number {
     	// don't use the property internally
-    	this.spliceWithArray(this._items.length -1, 0, items);
-    	return this._items.length -1;
+    	this.spliceWithArray(this._values.length -1, 0, items);
+    	return this._values.length -1;
     }
     pop(): T {
-    	return this.splice(this._items.length -1, 1)[0];
+    	return this.splice(this._values.length -1, 1)[0];
     }
     shift(): T {
     	return this.splice(0, 1)[0]
     }
     unshift(...items: T[]): number {
     	this.spliceWithArray(0, 0, items);
-    	return this._items.length -1;
+    	return this._values.length -1;
     }
 
 	/*
