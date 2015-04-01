@@ -173,6 +173,194 @@ class ComputedProperty<U,S> extends Property<U,S> {
 	}
 }
 
+/*
+	TODO: mention clearly that ObservableArray is not sparse, that is,
+	no wild index assignments with index >(!) length are allowed (that is, won't be observed)
+ */
+class ObservableArray<T> implements Array<T> {
+    [n: number]: T;
+
+	private _length = property(0);
+	private  dependencyState:DNode = new DNode();
+	private _values: T[] = [];
+	private events = new events.EventEmitter();
+
+	// TODO: make length and all other props non enumarable, like in a proper array
+	// TODO: make the property at length[x] also non enumerable
+	get length():number { return this._length(); }
+	set length(value:number) { this._length(value); }
+
+
+	constructor(initialValues:T[]) {
+		this._length.subscribe((newLength, oldLength) => {
+			// grow
+			if (newLength > oldLength)
+				this.spliceWithArray(oldLength, 0, new Array<T>(newLength - oldLength));
+
+			// shrink
+			else if (newLength < oldLength)
+				this.splice(newLength -1, oldLength - newLength);
+		})
+
+		if (initialValues && initialValues.length)
+			this.spliceWithArray(0, 0, initialValues);
+		else
+			this.createNewEntry(0, false);
+	}
+
+	private updateLength(oldLength:number, delta:number) {
+		if (delta < 0) {
+			for(var i = oldLength - 1 - delta; i < oldLength; i++)
+				delete this[i];
+		}
+		else if (delta > 0) {
+			for (var i = 0; i < delta; i++)
+				this.createNewEntry(oldLength + i, true);
+		}
+		else
+			return;
+		this. createNewEntry(oldLength + delta, false);
+	}
+
+	private createNewEntry(index: number, enumerable:boolean) {
+		Object.defineProperty(this, "" + index, {
+			enumerable: enumerable,
+			set: (value) => {
+				if (this._values[index] !== value) {
+					this._values[index] = value;
+					this.notifyChildUpdate(index);
+				}
+			},
+			get: () => {
+				this.notifyChildObserved(index);
+				return this._values[index];
+			}
+		})
+	}
+
+	spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[] {
+		var length = this._values.length;
+
+		// yay, splice can deal with strange indexes
+		if (index > length)
+			index = length;
+		else if (index < 0)
+			index = Math.max(0, length - index);
+
+		// too few arguments?
+		if (arguments.length === 0)
+			return;
+		if (arguments.length === 1)
+			deleteCount = length - index;
+
+		var lengthDelta = newItems.length - deleteCount;
+		var res:T[] = Array.prototype.splice.apply(this._values, [<any>index, deleteCount].concat(newItems));
+		this.updateLength(length, lengthDelta); // create or remove new entries
+		this._length(length + lengthDelta); // update length property
+
+		this.notifySplice(index, res, newItems);
+		return res;
+	}
+
+	notifyChildUpdate(index:number) {
+		this.notifyChanged();
+		// TODO: update Array.observe listeners
+	}
+
+	notifyChildObserved(index:number) {
+		this.notifyObserved();
+	}
+
+	notifySplice(index:number, deleted:T[], added:T[]) {
+		this.notifyChanged();
+		// TODO: update Array.observe listeners
+	}
+
+	notifyChanged() {
+		this.dependencyState.markStale();
+		this.dependencyState.markReady(true);
+		this.events.emit('change');
+	}
+
+	notifyObserved() {
+		this.dependencyState.notifyObserved();
+	}
+
+	// TODO: subscribe -> observe for consistency?
+	subscribe(listener:()=>void, fireImmediately=false):Lambda {
+		if (fireImmediately)
+			listener();
+
+		this.events.addListener('change', listener);
+		return () => {
+			this.events.removeListener('change', listener);
+		};
+	}
+
+	clear(): T[] {
+		return this.splice(0);
+	}
+
+	/*
+		ES7 goodies
+	 */
+	// TODO: observe(callaback) https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
+	// https://github.com/arv/ecmascript-object-observe
+	// TODO: unobserve(callback)
+
+	/*
+		functions that do alter the internal structure of the array, from lib.es6.d.ts
+	 */
+	splice(index:number, deleteCount?:number, ...newItems:T[]):T[] {
+		return this.spliceWithArray(index, deleteCount, newItems);
+	}
+
+    push(...items: T[]): number {
+    	// don't use the property internally
+    	this.spliceWithArray(this._values.length -1, 0, items);
+    	return this._values.length -1;
+    }
+    pop(): T {
+    	return this.splice(this._values.length -1, 1)[0];
+    }
+    shift(): T {
+    	return this.splice(0, 1)[0]
+    }
+    unshift(...items: T[]): number {
+    	this.spliceWithArray(0, 0, items);
+    	return this._values.length -1;
+    }
+
+	/*
+		functions that do not alter the array, from lib.es6.d.ts
+	*/
+	toString():string { return this.wrapReadFunction<string>("toString", arguments); }
+	toLocaleString():string { return this.wrapReadFunction<string>("toLocaleString", arguments); }
+    concat<U extends T[]>(...items: U[]): T[] { return this.wrapReadFunction<T[]>("concat", arguments); }
+	join(separator?: string): string { return this.wrapReadFunction<string>("join", arguments); }
+	reverse():T[] { return this.wrapReadFunction<T[]>("reverse", arguments); }
+    slice(start?: number, end?: number): T[] { return this.wrapReadFunction<T[]>("slice", arguments); }
+	sort(compareFn?: (a: T, b: T) => number): T[] { return this.wrapReadFunction<T[]>("sort", arguments); }
+    indexOf(searchElement: T, fromIndex?: number): number { return this.wrapReadFunction<number>("indexOf", arguments); }
+    lastIndexOf(searchElement: T, fromIndex?: number): number { return this.wrapReadFunction<number>("lastIndexOf", arguments); }
+    every(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean { return this.wrapReadFunction<boolean>("every", arguments); }
+    some(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean { return this.wrapReadFunction<boolean>("some", arguments); }
+    forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void { return this.wrapReadFunction<void>("forEach", arguments); }
+    map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[] { return this.wrapReadFunction<U[]>("map", arguments); }
+    filter(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[] { return this.wrapReadFunction<T[]>("filter", arguments); }
+    reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { return this.wrapReadFunction<U>("reduce", arguments); }
+    reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { return this.wrapReadFunction<U>("reduceRight", arguments); }
+
+	wrapReadFunction<U>(funcName:string, ...args:any[]):U {
+		ObservableArray.prototype[funcName] = function() {
+			var res = Array[funcName].apply(this._values, args);
+			this.notifyObserved();
+			return res;
+		}
+		return this[funcName].apply(this, args);
+	}
+}
+
 enum DNodeState {
 	STALE, // One or more depencies have changed, current value is stale
 	PENDING, // All dependencies are up to date again, a recalculation of this node is pending, current value is stale
@@ -415,190 +603,3 @@ class Scheduler {
 	}
 }
 
-/*
-	TODO: mention clearly that ObservableArray is not sparse, that is,
-	no wild index assignments with index >(!) length are allowed (that is, won't be observed)
- */
-class ObservableArray<T> implements Array<T> {
-    [n: number]: T;
-
-	private _length = property(0);
-	private  dependencyState:DNode = new DNode();
-	private _values: T[] = [];
-	private events = new events.EventEmitter();
-
-	// TODO: make length and all other props non enumarable, like in a proper array
-	// TODO: make the property at length[x] also non enumerable
-	get length():number { return this._length(); }
-	set length(value:number) { this._length(value); }
-
-
-	constructor(initialValues:T[]) {
-		this._length.subscribe((newLength, oldLength) => {
-			// grow
-			if (newLength > oldLength)
-				this.spliceWithArray(oldLength, 0, new Array<T>(newLength - oldLength));
-
-			// shrink
-			else if (newLength < oldLength)
-				this.splice(newLength -1, oldLength - newLength);
-		})
-
-		if (initialValues && initialValues.length)
-			this.spliceWithArray(0, 0, initialValues);
-		else
-			this.createNewEntry(0, false);
-	}
-
-	private updateLength(oldLength:number, delta:number) {
-		if (delta < 0) {
-			for(var i = oldLength - 1 - delta; i < oldLength; i++)
-				delete this[i];
-		}
-		else if (delta > 0) {
-			for (var i = 0; i < delta; i++)
-				this.createNewEntry(oldLength + i, true);
-		}
-		else
-			return;
-		this. createNewEntry(oldLength + delta, false);
-	}
-
-	private createNewEntry(index: number, enumerable:boolean) {
-		Object.defineProperty(this, "" + index, {
-			enumerable: enumerable,
-			set: (value) => {
-				if (this._values[index] !== value) {
-					this._values[index] = value;
-					this.notifyChildUpdate(index);
-				}
-			},
-			get: () => {
-				this.notifyChildObserved(index);
-				return this._values[index];
-			}
-		})
-	}
-
-	spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[] {
-		var length = this._values.length;
-
-		// yay, splice can deal with strange indexes
-		if (index > length)
-			index = length;
-		else if (index < 0)
-			index = Math.max(0, length - index);
-
-		// too few arguments?
-		if (arguments.length === 0)
-			return;
-		if (arguments.length === 1)
-			deleteCount = length - index;
-
-		var lengthDelta = newItems.length - deleteCount;
-		var res:T[] = Array.prototype.splice.apply(this._values, [<any>index, deleteCount].concat(newItems));
-		this.updateLength(length, lengthDelta); // create or remove new entries
-		this._length(length + lengthDelta); // update length property
-
-		this.notifySplice(index, res, newItems);
-		return res;
-	}
-
-	notifyChildUpdate(index:number) {
-		this.notifyChanged();
-		// TODO: update Array.observe listeners
-	}
-
-	notifyChildObserved(index:number) {
-		this.notifyObserved();
-	}
-
-	notifySplice(index:number, deleted:T[], added:T[]) {
-		this.notifyChanged();
-		// TODO: update Array.observe listeners
-	}
-
-	notifyChanged() {
-		this.dependencyState.markStale();
-		this.dependencyState.markReady(true);
-		this.events.emit('change');
-	}
-
-	notifyObserved() {
-		this.dependencyState.notifyObserved();
-	}
-
-	// TODO: subscribe -> observe for consistency?
-	subscribe(listener:()=>void, fireImmediately=false):Lambda {
-		if (fireImmediately)
-			listener();
-
-		this.events.addListener('change', listener);
-		return () => {
-			this.events.removeListener('change', listener);
-		};
-	}
-
-	clear(): T[] {
-		return this.splice(0);
-	}
-
-	/*
-		ES7 goodies
-	 */
-	// TODO: observe(callaback) https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-	// https://github.com/arv/ecmascript-object-observe
-	// TODO: unobserve(callback)
-
-	/*
-		functions that do alter the internal structure of the array, from lib.es6.d.ts
-	 */
-	splice(index:number, deleteCount?:number, ...newItems:T[]):T[] {
-		return this.spliceWithArray(index, deleteCount, newItems);
-	}
-
-    push(...items: T[]): number {
-    	// don't use the property internally
-    	this.spliceWithArray(this._values.length -1, 0, items);
-    	return this._values.length -1;
-    }
-    pop(): T {
-    	return this.splice(this._values.length -1, 1)[0];
-    }
-    shift(): T {
-    	return this.splice(0, 1)[0]
-    }
-    unshift(...items: T[]): number {
-    	this.spliceWithArray(0, 0, items);
-    	return this._values.length -1;
-    }
-
-	/*
-		functions that do not alter the array, from lib.es6.d.ts
-	*/
-	toString():string { return this.wrapReadFunction<string>("toString", arguments); }
-	toLocaleString():string { return this.wrapReadFunction<string>("toLocaleString", arguments); }
-    concat<U extends T[]>(...items: U[]): T[] { return this.wrapReadFunction<T[]>("concat", arguments); }
-	join(separator?: string): string { return this.wrapReadFunction<string>("join", arguments); }
-	reverse():T[] { return this.wrapReadFunction<T[]>("reverse", arguments); }
-    slice(start?: number, end?: number): T[] { return this.wrapReadFunction<T[]>("slice", arguments); }
-	sort(compareFn?: (a: T, b: T) => number): T[] { return this.wrapReadFunction<T[]>("sort", arguments); }
-    indexOf(searchElement: T, fromIndex?: number): number { return this.wrapReadFunction<number>("indexOf", arguments); }
-    lastIndexOf(searchElement: T, fromIndex?: number): number { return this.wrapReadFunction<number>("lastIndexOf", arguments); }
-    every(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean { return this.wrapReadFunction<boolean>("every", arguments); }
-    some(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean { return this.wrapReadFunction<boolean>("some", arguments); }
-    forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void { return this.wrapReadFunction<void>("forEach", arguments); }
-    map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[] { return this.wrapReadFunction<U[]>("map", arguments); }
-    filter(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[] { return this.wrapReadFunction<T[]>("filter", arguments); }
-    reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { return this.wrapReadFunction<U>("reduce", arguments); }
-    reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { return this.wrapReadFunction<U>("reduceRight", arguments); }
-
-	wrapReadFunction<U>(funcName:string, ...args:any[]):U {
-		ObservableArray.prototype[funcName] = function() {
-			var res = Array[funcName].apply(this._values, args);
-			this.notifyObserved();
-			return res;
-		}
-		return this[funcName].apply(this, args);
-	}
-}
