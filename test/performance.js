@@ -70,3 +70,60 @@ exports.five_hunderd_properties_that_observe_their_sibling = function(test) {
 	console.log("Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
 	test.done();
 }
+
+exports.perfArray = function(test) {
+	var ar = mobservable.array([]);
+	var sum = property(function() {
+		return ar.reduce(function(a, b) {
+			return a + b;
+		}, 0);
+	});
+	sum(); // calculate
+
+	var start = +(new Date);
+
+	for(var i = 0; i < 1000; i++)
+		ar.push(i);
+
+	test.equals(499500, sum());
+
+	var initial = +(new Date);
+
+	for(var i = 0; i < 1000; i++)
+		ar[i] = ar[i] * 2;
+	test.equals(999000, sum());
+
+	var end = +(new Date);
+
+	console.log("Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
+	test.done();
+}
+
+exports.perfArray2 = function(test) {
+	var ar = mobservable.array([]);
+	var sum = property(function() {
+		var s = 0;
+		for(var i = 0; i < ar.length; i++)
+			s+=ar[i];
+		return s;
+	});
+	sum(); // calculate
+
+	var start = +(new Date);
+
+	for(var i = 0; i < 1000; i++)
+		ar.push(i);
+
+	test.equals(499500, sum());
+
+	var initial = +(new Date);
+
+	for(var i = 0; i < 1000; i++)
+		ar[i] = ar[i] * 2;
+	test.equals(999000, sum());
+
+	var end = +(new Date);
+
+	console.log("Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
+	test.done();
+}

@@ -551,6 +551,7 @@ class DNode {
 			// optimization, smart compare two lists before removing / deleting / finding cycles
 			for(var l = this.prevObserving.length, i=0; i<l; i++)
 				this.prevObserving[i].removeObserver(this);
+
 			for(var l = this.observing.length, i=0; i<l; i++)
 				this.observing[i].addObserver(this);
 			this.findCycle(this);
@@ -561,8 +562,13 @@ class DNode {
 		if (this.state === DNodeState.PENDING)
 			throw new Error("Cycle detected"); // we are calculating ATM, *and* somebody is looking at us..
 		var ts = DNode.trackingStack, l = ts.length;
-		if (l)
-			ts[l-1][ts[l-1].length] = this;
+		if (l) {
+			var cs = ts[l -1];
+		// TODO: if enabled, array observing becomes a lot faster, observing many different values in a single
+		// function becomse slower, lets check what is the best solution
+		//	if (cs.indexOf(this) === -1)
+				cs[cs.length] = this;
+		}
 	}
 
 	public findCycle(node:DNode) {
