@@ -202,14 +202,18 @@ export class ObservableArray<T> implements Array<T> {
 		Object.defineProperty(this, "_values", { enumerable: false, value: [] });
 		Object.defineProperty(this, "events", { enumerable: false, value: new events.EventEmitter() });
 
-		this._length.subscribe((newLength, oldLength) => {
+		this._length.subscribe((newLength) => {
+			var currentLength = this._values.length;
+			if (newLength != currentLength) // distinguish between internal and external updates
+				return;
+
 			// grow
-			if (newLength > oldLength)
-				this.spliceWithArray(oldLength, 0, new Array<T>(newLength - oldLength));
+			if (newLength > currentLength)
+				this.spliceWithArray(currentLength, 0, new Array<T>(newLength - currentLength));
 
 			// shrink
-			else if (newLength < oldLength)
-				this.splice(newLength -1, oldLength - newLength);
+			else if (newLength < currentLength)
+				this.splice(newLength -1, currentLength - newLength);
 		})
 
 		if (initialValues && initialValues.length)
@@ -218,7 +222,11 @@ export class ObservableArray<T> implements Array<T> {
 			this.createNewStubEntry(0);
 	}
 
+	// updates the length property, and adds / removes the necessary properties
+	// does not alter this._values itself
 	private updateLength(oldLength:number, delta:number) {
+		this._length(oldLength + delta);
+
 		if (delta < 0) {
 			for(var i = oldLength - 1 - delta; i < oldLength; i++)
 				delete this[i];
@@ -276,7 +284,6 @@ export class ObservableArray<T> implements Array<T> {
 		var lengthDelta = newItems.length - deleteCount;
 		var res:T[] = Array.prototype.splice.apply(this._values, [<any>index, deleteCount].concat(newItems));
 		this.updateLength(length, lengthDelta); // create or remove new entries
-		this._length(length + lengthDelta); // update length property
 
 		this.notifySplice(index, res, newItems);
 		return res;
@@ -341,18 +348,18 @@ export class ObservableArray<T> implements Array<T> {
 
     push(...items: T[]): number {
     	// don't use the property internally
-    	this.spliceWithArray(this._values.length -1, 0, items);
-    	return this._values.length -1;
+    	this.spliceWithArray(this._values.length, 0, items);
+    	return this._values.length;
     }
     pop(): T {
-    	return this.splice(this._values.length -1, 1)[0];
+    	return this.splice(this._values.length, 1)[0];
     }
     shift(): T {
     	return this.splice(0, 1)[0]
     }
     unshift(...items: T[]): number {
     	this.spliceWithArray(0, 0, items);
-    	return this._values.length -1;
+    	return this._values.length;
     }
 
 	/*
