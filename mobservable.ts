@@ -552,8 +552,17 @@ class DNode {
 			for(var l = this.prevObserving.length, i=0; i<l; i++)
 				this.prevObserving[i].removeObserver(this);
 
-			for(var l = this.observing.length, i=0; i<l; i++)
-				this.observing[i].addObserver(this);
+			// alreadyAdded is an optimization, that especially helps when observing long arrays
+			// and looping over them, in that case the observes get added multiple times
+			var alreadyAdded = [];
+
+			for(var l = this.observing.length, i=0; i<l; i++) {
+				var observing = this.observing[i];
+				if (alreadyAdded.indexOf(observing) === -1) {
+					alreadyAdded[alreadyAdded.length] = observing;
+					observing.addObserver(this);
+				}
+			}
 			this.findCycle(this);
 		}
 	}
