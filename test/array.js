@@ -19,6 +19,7 @@ function buffer() {
 exports.test1 = function(test) {
   try {
     debugger;
+    var a
     var a = array();
     test.equals(a.length, 0);
     test.deepEqual(Object.keys(a), []);

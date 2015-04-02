@@ -72,8 +72,10 @@ exports.five_hunderd_properties_that_observe_their_sibling = function(test) {
 }
 
 exports.perfArray = function(test) {
+	var aCalc = 0;
 	var ar = mobservable.array([]);
 	var sum = property(function() {
+		aCalc++;
 		return ar.reduce(function(a, b) {
 			return a + b;
 		}, 0);
@@ -86,12 +88,15 @@ exports.perfArray = function(test) {
 		ar.push(i);
 
 	test.equals(499500, sum());
+	test.equals(1001, aCalc);
+	aCalc = 0;
 
 	var initial = +(new Date);
 
 	for(var i = 0; i < 1000; i++)
 		ar[i] = ar[i] * 2;
 	test.equals(999000, sum());
+	test.equals(999, aCalc);
 
 	var end = +(new Date);
 
@@ -101,8 +106,10 @@ exports.perfArray = function(test) {
 
 exports.perfArray2 = function(test) {
 	var ar = mobservable.array([]);
+	var aCalc = 0;
 	var sum = property(function() {
 		var s = 0;
+		aCalc++;
 		for(var i = 0; i < ar.length; i++)
 			s+=ar[i];
 		return s;
@@ -111,16 +118,21 @@ exports.perfArray2 = function(test) {
 
 	var start = +(new Date);
 
+	test.equals(1, aCalc);
+debugger;
 	for(var i = 0; i < 1000; i++)
 		ar.push(i);
 
 	test.equals(499500, sum());
+	test.equals(1001, aCalc);
 
 	var initial = +(new Date);
+	aCalc = 0;
 
 	for(var i = 0; i < 1000; i++)
 		ar[i] = ar[i] * 2;
 	test.equals(999000, sum());
+	test.equals(999, aCalc);
 
 	var end = +(new Date);
 
