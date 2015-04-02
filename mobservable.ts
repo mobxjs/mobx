@@ -60,6 +60,10 @@ export function guard<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
 	return [retVal, () => dnode.dispose()];
 }
 
+export function array<T>(values?:T[]): ObservableArray<T> {
+	return new ObservableArray(values);
+}
+
 export function batch(action:Lambda) {
 	Scheduler.batch(action);
 }
@@ -177,13 +181,13 @@ class ComputedProperty<U,S> extends Property<U,S> {
 	TODO: mention clearly that ObservableArray is not sparse, that is,
 	no wild index assignments with index >(!) length are allowed (that is, won't be observed)
  */
-class ObservableArray<T> implements Array<T> {
+export class ObservableArray<T> implements Array<T> {
     [n: number]: T;
 
-	private _length = property(0);
-	private  dependencyState:DNode = new DNode();
-	private _values: T[] = [];
-	private events = new events.EventEmitter();
+	private _length;
+	private _values: T[];
+	private dependencyState:DNode;
+	private events;
 
 	// TODO: make length and all other props non enumarable, like in a proper array
 	// TODO: make the property at length[x] also non enumerable
@@ -191,7 +195,13 @@ class ObservableArray<T> implements Array<T> {
 	set length(value:number) { this._length(value); }
 
 
-	constructor(initialValues:T[]) {
+	constructor(initialValues?:T[]) {
+		// make for .. in / Object.keys behave like an array:
+		Object.defineProperty(this, "_length", { enumerable: false, value: property(0) });
+		Object.defineProperty(this, "dependencyState", { enumerable: false, value: new DNode() });
+		Object.defineProperty(this, "_values", { enumerable: false, value: [] });
+		Object.defineProperty(this, "events", { enumerable: false, value: new events.EventEmitter() });
+
 		this._length.subscribe((newLength, oldLength) => {
 			// grow
 			if (newLength > oldLength)
@@ -205,7 +215,7 @@ class ObservableArray<T> implements Array<T> {
 		if (initialValues && initialValues.length)
 			this.spliceWithArray(0, 0, initialValues);
 		else
-			this.createNewEntry(0, false);
+			this.createNewStubEntry(0);
 	}
 
 	private updateLength(oldLength:number, delta:number) {
@@ -215,16 +225,17 @@ class ObservableArray<T> implements Array<T> {
 		}
 		else if (delta > 0) {
 			for (var i = 0; i < delta; i++)
-				this.createNewEntry(oldLength + i, true);
+				this.createNewEntry(oldLength + i);
 		}
 		else
 			return;
-		this. createNewEntry(oldLength + delta, false);
+		this.createNewStubEntry(oldLength + delta);
 	}
 
-	private createNewEntry(index: number, enumerable:boolean) {
+	private createNewEntry(index: number) {
 		Object.defineProperty(this, "" + index, {
-			enumerable: enumerable,
+			enumerable: true,
+			configurable: true,
 			set: (value) => {
 				if (this._values[index] !== value) {
 					this._values[index] = value;
@@ -236,6 +247,15 @@ class ObservableArray<T> implements Array<T> {
 				return this._values[index];
 			}
 		})
+	}
+
+	private createNewStubEntry(index: number) {
+		Object.defineProperty(this, "" + index, {
+			enumerable: false,
+			configurable: true,
+			set: (value) => this.push(value),
+			get: () => undefined
+		});
 	}
 
 	spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[] {
@@ -301,6 +321,10 @@ class ObservableArray<T> implements Array<T> {
 		return this.splice(0);
 	}
 
+	values(): T[] {
+		return this.slice(0);
+	}
+
 	/*
 		ES7 goodies
 	 */
@@ -351,15 +375,24 @@ class ObservableArray<T> implements Array<T> {
     reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { return this.wrapReadFunction<U>("reduce", arguments); }
     reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { return this.wrapReadFunction<U>("reduceRight", arguments); }
 
-	wrapReadFunction<U>(funcName:string, ...args:any[]):U {
+	wrapReadFunction<U>(funcName:string, args:IArguments):U {
+		var baseFunc = Array.prototype[funcName];
+		// generate a new function that wraps arround the Array.prototype, and replace our own definition
 		ObservableArray.prototype[funcName] = function() {
-			var res = Array[funcName].apply(this._values, args);
+			var res = baseFunc.apply(this._values, args);
 			this.notifyObserved();
 			return res;
 		}
 		return this[funcName].apply(this, args);
 	}
 }
+
+
+//TODO: trick type system
+//ObservableArray.prototype = []; // makes, observableArray instanceof Array === true, but not typeof or Array.isArray..
+//y.__proto__ = Array.prototype
+//x.prototype.toString = function(){ return "[object Array]" }
+//even monky patch Array.isArray?
 
 enum DNodeState {
 	STALE, // One or more depencies have changed, current value is stale
