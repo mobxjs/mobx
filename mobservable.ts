@@ -420,7 +420,6 @@ class DNode {
 	}
 
 	addObserver(node:DNode) {
-		// optimization: replace with length, see: https://jsperf.com/array-push-vs-unshift-vs-direct-assignment/2
 		this.observers[this.observers.length] = node;
 	}
 
@@ -572,11 +571,11 @@ class DNode {
 			throw new Error("Cycle detected"); // we are calculating ATM, *and* somebody is looking at us..
 		var ts = DNode.trackingStack, l = ts.length;
 		if (l) {
-			var cs = ts[l -1];
-		// TODO: if enabled, array observing becomes a lot faster, observing many different values in a single
+			var cs = ts[l -1], csl = cs.length;
+		// if enabled, array observing becomes a lot faster, observing many different values in a single
 		// function becomse slower, lets check what is the best solution
-		//	if (cs.indexOf(this) === -1)
-				cs[cs.length] = this;
+			if (csl === 0 || cs[csl -1] != this)
+				cs[csl] = this;
 		}
 	}
 
