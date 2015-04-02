@@ -183,38 +183,40 @@ class ComputedProperty<U,S> extends Property<U,S> {
  */
 export class ObservableArray<T> implements Array<T> {
     [n: number]: T;
+	length: number;
 
-	private _length;
+	private _supressLengthNotification: boolean;
 	private _values: T[];
 	private dependencyState:DNode;
 	private events;
 
-	// TODO: make length and all other props non enumarable, like in a proper array
-	// TODO: make the property at length[x] also non enumerable
-	get length():number { return this._length(); }
-	set length(value:number) { this._length(value); }
-
-
 	constructor(initialValues?:T[]) {
 		// make for .. in / Object.keys behave like an array:
-		Object.defineProperty(this, "_length", { enumerable: false, value: property(0) });
+		Object.defineProperty(this, "length", {
+			enumerable: false,
+			get: function() {
+				this.notifyObserved();
+				return this._values.length;
+			},
+			set: function(newLength) {
+				var currentLength = this._values.length;
+				if (this._supressLengthNotification === true || newLength != currentLength) // distinguish between internal and external updates
+					return;
+
+				// grow
+				if (newLength > currentLength)
+					this.spliceWithArray(currentLength, 0, new Array<T>(newLength - currentLength));
+
+				// shrink
+				else if (newLength < currentLength)
+					this.splice(newLength -1, currentLength - newLength);
+
+				this.notifyObserved();
+			}
+		});
 		Object.defineProperty(this, "dependencyState", { enumerable: false, value: new DNode() });
 		Object.defineProperty(this, "_values", { enumerable: false, value: [] });
 		Object.defineProperty(this, "events", { enumerable: false, value: new events.EventEmitter() });
-
-		this._length.subscribe((newLength) => {
-			var currentLength = this._values.length;
-			if (newLength != currentLength) // distinguish between internal and external updates
-				return;
-
-			// grow
-			if (newLength > currentLength)
-				this.spliceWithArray(currentLength, 0, new Array<T>(newLength - currentLength));
-
-			// shrink
-			else if (newLength < currentLength)
-				this.splice(newLength -1, currentLength - newLength);
-		})
 
 		if (initialValues && initialValues.length)
 			this.spliceWithArray(0, 0, initialValues);
@@ -222,11 +224,9 @@ export class ObservableArray<T> implements Array<T> {
 			this.createNewStubEntry(0);
 	}
 
-	// updates the length property, and adds / removes the necessary properties
+	// and adds / removes the necessary numeric properties to this object
 	// does not alter this._values itself
 	private updateLength(oldLength:number, delta:number) {
-		this._length(oldLength + delta);
-
 		if (delta < 0) {
 			for(var i = oldLength - 1 - delta; i < oldLength; i++)
 				delete this[i];
