@@ -74,10 +74,12 @@ exports.five_hunderd_properties_that_observe_their_sibling = function(test) {
 exports.perfArray = function(test) {
 	var aCalc = 0;
 	var ar = mobservable.array([]);
+	var b = property(1);
+
 	var sum = property(function() {
 		aCalc++;
-		return ar.reduce(function(a, b) {
-			return a + b;
+		return ar.reduce(function(a, c) {
+			return a + c * b();
 		}, 0);
 	});
 	sum(); // calculate
@@ -95,8 +97,10 @@ exports.perfArray = function(test) {
 
 	for(var i = 0; i < 1000; i++)
 		ar[i] = ar[i] * 2;
-	test.equals(999000, sum());
-	test.equals(999, aCalc);
+	b(2);
+
+	test.equals(1998000, sum());
+	test.equals(1000, aCalc);
 
 	var end = +(new Date);
 
@@ -107,11 +111,12 @@ exports.perfArray = function(test) {
 exports.perfArray2 = function(test) {
 	var ar = mobservable.array([]);
 	var aCalc = 0;
+	var b = property(1);
 	var sum = property(function() {
 		var s = 0;
 		aCalc++;
 		for(var i = 0; i < ar.length; i++)
-			s+=ar[i];
+			s+=ar[i] * b();
 		return s;
 	});
 	sum(); // calculate
@@ -119,7 +124,6 @@ exports.perfArray2 = function(test) {
 	var start = +(new Date);
 
 	test.equals(1, aCalc);
-debugger;
 	for(var i = 0; i < 1000; i++)
 		ar.push(i);
 
@@ -131,8 +135,49 @@ debugger;
 
 	for(var i = 0; i < 1000; i++)
 		ar[i] = ar[i] * 2;
-	test.equals(999000, sum());
-	test.equals(999, aCalc);
+	b(2);
+
+	test.equals(1998000, sum());
+	test.equals(1000, aCalc);
+
+	var end = +(new Date);
+
+	console.log("Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
+	test.done();
+}
+
+
+exports.perfArray3 = function(test) {
+	var ar = mobservable.array([]);
+	var aCalc = 0;
+	var b = property(1);
+	var sum = property(function() {
+		var s = 0;
+		aCalc++;
+		for(var i = 0; i < ar.length; i++)
+			s+=b() * ar[i];
+		return s;
+	});
+	sum(); // calculate
+
+	var start = +(new Date);
+
+	test.equals(1, aCalc);
+	for(var i = 0; i < 1000; i++)
+		ar.push(i);
+
+	test.equals(499500, sum());
+	test.equals(1001, aCalc);
+
+	var initial = +(new Date);
+	aCalc = 0;
+
+	for(var i = 0; i < 1000; i++)
+		ar[i] = ar[i] * 2;
+	b(2);
+
+	test.equals(1998000, sum());
+	test.equals(1000, aCalc);
 
 	var end = +(new Date);
 

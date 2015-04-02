@@ -557,9 +557,10 @@ class DNode {
 
 			for(var l = this.observing.length, i=0; i<l; i++) {
 				var observing = this.observing[i];
-				if (alreadyAdded.indexOf(observing) === -1) {
-					alreadyAdded[alreadyAdded.length] = observing;
+				if (alreadyAdded.lastIndexOf(observing) === -1)
+				{
 					observing.addObserver(this);
+					alreadyAdded[alreadyAdded.length] = observing;
 				}
 			}
 			this.findCycle(this);
@@ -572,9 +573,10 @@ class DNode {
 		var ts = DNode.trackingStack, l = ts.length;
 		if (l) {
 			var cs = ts[l -1], csl = cs.length;
-		// if enabled, array observing becomes a lot faster, observing many different values in a single
-		// function becomse slower, lets check what is the best solution
-			if (csl === 0 || cs[csl -1] != this)
+			// this last item added check is an optimization especially for array loops,
+			// because an array.length read with subsequent reads from the array
+			// might trigger many observed events, while just checking the last added item is cheap
+			if (cs[csl -1] !== this && cs[csl -2] !== this)
 				cs[csl] = this;
 		}
 	}
