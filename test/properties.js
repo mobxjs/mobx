@@ -293,3 +293,32 @@ exports.testChangeCountOptimization = function(test) {
 
     test.done();
 }
+
+exports.testObservablesRemoved = function(test) {
+    var calcs = 0;
+    var a = property(1);
+    var b = property(2);
+    var c = property(function() {
+      calcs ++;
+      if (a() === 1)
+        return b() * a() * b();
+      return 3;
+    });
+
+    test.equals(calcs, 0);
+    test.equals(c(), 4);
+    test.equals(calcs, 1);
+    a(2);
+    test.equals(c(), 3);
+    test.equals(calcs, 2);
+
+    b(3); // should not retrigger calc
+    test.equals(c(), 3);
+    test.equals(calcs, 2);
+
+    a(1);
+    test.equals(c(), 9);
+    test.equals(calcs, 3);
+
+    test.done();
+}
