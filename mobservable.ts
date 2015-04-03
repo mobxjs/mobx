@@ -386,7 +386,7 @@ export class ObservableArray<T> implements Array<T> {
 		var baseFunc = Array.prototype[funcName];
 		// generate a new function that wraps arround the Array.prototype, and replace our own definition
 		ObservableArray.prototype[funcName] = function() {
-			var res = baseFunc.apply(this._values, args);
+			var res = baseFunc.apply(this._values, arguments);
 			this.notifyObserved();
 			return res;
 		}
