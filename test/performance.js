@@ -11,7 +11,7 @@ var property = mobservable.property;
 
 	// TODO: should upscale this test, since the measurement is now too small....
  */
-exports.perf1 = function(test) {
+exports.one_observes_ten_thousand_that_observe_one = function(test) {
 	var a = property(2);
 
 	// many observers that listen to one..
@@ -49,7 +49,7 @@ exports.perf1 = function(test) {
 	test.done();
 }
 
-exports.perf2 = function(test) {
+exports.five_hunderd_properties_that_observe_their_sibling = function(test) {
 	var observables = [property(1)];
 	for(var i = 0; i < 500; i++) {
 		(function(idx) {
