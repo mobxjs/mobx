@@ -1,6 +1,7 @@
 require('typescript-require')
 var mobservable = require('../mobservable.ts')
 var property = mobservable.property;
+var array = mobservable.array;
 
 /*
 	results of this test:
@@ -45,7 +46,7 @@ exports.one_observes_ten_thousand_that_observe_one = function(test) {
 	test.equals(2, bCalcs);
 	var end = +(new Date);
 
-	console.log("Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
+	console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
 	test.done();
 }
 
@@ -67,11 +68,11 @@ exports.five_hunderd_properties_that_observe_their_sibling = function(test) {
 	test.equals(502, last());
 	var end = +(new Date);
 
-	console.log("Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
+	console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
 	test.done();
 }
 
-exports.perfArray = function(test) {
+exports.array_reduce = function(test) {
 	var aCalc = 0;
 	var ar = mobservable.array([]);
 	var b = property(1);
@@ -104,11 +105,11 @@ exports.perfArray = function(test) {
 
 	var end = +(new Date);
 
-	console.log("Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
+	console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
 	test.done();
 }
 
-exports.perfArray2 = function(test) {
+exports.array_classic_loop = function(test) {
 	var ar = mobservable.array([]);
 	var aCalc = 0;
 	var b = property(1);
@@ -142,45 +143,92 @@ exports.perfArray2 = function(test) {
 
 	var end = +(new Date);
 
-	console.log("Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
+	console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
 	test.done();
 }
 
 
-exports.perfArray3 = function(test) {
-	var ar = mobservable.array([]);
-	var aCalc = 0;
-	var b = property(1);
-	var sum = property(function() {
-		var s = 0;
-		aCalc++;
-		for(var i = 0; i < ar.length; i++)
-			s+=b() * ar[i];
-		return s;
+function order_system_helper(test, usebatch) {
+	var orders = array([]);
+	var vat = property(2);
+
+	var totalAmount = property(function() {
+		var sum = 0, l = orders.length;
+		for(var i = 0; i < l; i++)
+			sum += orders[i].total();
+		return sum;
 	});
-	sum(); // calculate
+
+	function OrderLine(order, price, amount) {
+		this.price = property(price);
+		this.amount = property(amount);
+		this.total = property(function() {
+			return order.vat() * this.price() * this.amount();
+		}, this)
+	}
+
+	function Order(includeVat) {
+		this.includeVat = property(includeVat);
+		this.lines = array();
+
+		this.vat = property(function() {
+			if (this.includeVat())
+				return vat();
+			return 1;
+		}, this)
+
+		this.total = property(function() {
+			return this.lines.reduce(function(acc, order) {
+				return acc + order.total();
+			}, 0);
+		}, this)
+	}
+
+	totalAmount();
 
 	var start = +(new Date);
 
-	test.equals(1, aCalc);
-	for(var i = 0; i < 1000; i++)
-		ar.push(i);
+	function setup() {
+		for(var i = 0; i < 100; i++) {
+			var c = new Order(i % 2 == 0);
+			orders.push(c);
+			for(var j = 0; j < 100; j++)
+				c.lines.unshift(new OrderLine(c, 5, 5))
+		}
+	}
 
-	test.equals(499500, sum());
-	test.equals(1001, aCalc);
+	if (usebatch)
+		mobservable.batch(setup);
+	else
+		setup();
+
+	test.equals(totalAmount(), 375000);
 
 	var initial = +(new Date);
-	aCalc = 0;
 
-	for(var i = 0; i < 1000; i++)
-		ar[i] = ar[i] * 2;
-	b(2);
+	function update() {
+		for(var i = 0; i < 50; i++)
+			orders[i].includeVat(!orders[i].includeVat());
+		vat(3);
+	}
 
-	test.equals(1998000, sum());
-	test.equals(1000, aCalc);
+	if (usebatch)
+		mobservable.batch(update)
+	else
+		update();
+
+	test.equals(totalAmount(), 500000);
 
 	var end = +(new Date);
+	console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
 
-	console.log("Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
 	test.done();
+}
+
+exports.order_system = function(test) {
+	order_system_helper(test, false);
+}
+
+exports.order_system_batched = function(test) {
+	order_system_helper(test, true);
 }
