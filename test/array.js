@@ -62,3 +62,27 @@ exports.test1 = function(test) {
     throw e;
   }
 };
+
+exports.testQuickDiff = function(test) {
+  function t(current, base, added, removed) {
+    var res = mobservable.quickDiff(current, base);
+    test.deepEqual(res[0], added);
+    test.deepEqual(res[1], removed);
+  }
+
+  t([],[],[],[]);
+  t([1],[],[1],[]);
+  t([],[1],[],[1]);
+  t([1],[2],[1],[2]);
+
+  t([1,2,3],[1,3],[2],[]);
+  t([1,2,3],[1,2],[3],[]);
+
+  t([1,2],[0,1,2],[],[0]);
+
+  debugger;
+  t([1,4,6,7,8], [1,2,3,4,5,6], [7,8], [2,3,5]);
+  t([1,2,3,4], [4,3,2,1], [1,2,3], [3,2,1]); // suboptimal, but correct
+
+  test.done();
+}

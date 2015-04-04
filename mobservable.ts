@@ -546,24 +546,17 @@ class DNode {
 
 	private bindDependencies() {
 		this.observing = DNode.trackingStack.pop();
-		if (this.hasObservingChanged()) {
-			// optimization, smart compare two lists before removing / deleting / finding cycles
-			for(var l = this.prevObserving.length, i=0; i<l; i++)
-				this.prevObserving[i].removeObserver(this);
 
-			// alreadyAdded is an optimization, that especially helps when observing long arrays
-			// and looping over them, in that case the observes get added multiple times
-			//var alreadyAdded = [];
+		var changes = quickDiff(this.observing, this.prevObserving);
+		var added = changes[0];
+		var removed = changes[1];
 
-			for(var l = this.observing.length, i=0; i<l; i++) {
-				var observing = this.observing[i];
-			//	if (alreadyAdded.lastIndexOf(observing) === -1)
-				{
-					observing.addObserver(this);
-			//		alreadyAdded[alreadyAdded.length] = observing;
-				}
-			}
-			this.findCycle(this);
+		for(var i = 0, l = removed.length; i < l; i++)
+			removed[i].removeObserver(this);
+
+		for(var i = 0, l = added.length; i < l; i++) {
+			added[i].addObserver(this);
+			added[i].findCycle(this);
 		}
 	}
 
@@ -659,3 +652,73 @@ class Scheduler {
 	}
 }
 
+/**
+ * Given a new and an old list, tries to determine which items are added or removed
+ * in linear time. The algorithm is heuristic and does not give the optimal results in all cases.
+ * (For example, [a,b] -> [b, a] yiels [[b,a],[a,b]])
+ * its basic assumptions is that the difference between base and current are a few splices.
+ *
+ * returns a tuple<addedItems, removedItems>
+ * @type {T[]}
+ */
+export function quickDiff<T>(current:T[], base:T[]):[T[],T[]] {
+	if (!base.length)
+		return [current, []];
+	if (!current.length)
+		return [[], base];
+
+	var added:T[] = [];
+	var removed:T[] = [];
+
+	var	currentIndex = 0,
+		currentSearch = 0,
+		currentLength = current.length,
+		currentExhausted = false,
+		baseIndex = 0,
+		baseSearch = 0,
+		baseLength = base.length,
+		isSearching = false,
+		baseExhausted = false;
+
+	while (!baseExhausted && !currentExhausted) {
+		if (!isSearching) {
+			// within rang and still the same
+			if (currentIndex < currentLength && baseIndex < baseLength && current[currentIndex] === base[baseIndex]) {
+				currentIndex++;
+				baseIndex++;
+				// early exit; ends where equal
+				if (currentIndex === currentLength && baseIndex === baseLength)
+					return [added, removed];
+				continue;
+			}
+			currentSearch = currentIndex;
+			baseSearch = baseIndex;
+			isSearching = true;
+		}
+		baseSearch += 1;
+		currentSearch += 1;
+		if (baseSearch >= baseLength)
+			baseExhausted = true;
+		if (currentSearch >= currentLength)
+			currentExhausted = true;
+
+		if (!currentExhausted && current[currentSearch] === base[baseIndex]) {
+			// items where added
+			added.push.apply(added, current.slice(currentIndex, currentSearch));
+			currentIndex = currentSearch +1;
+			baseIndex ++;
+			isSearching = false;
+		}
+		else if (!baseExhausted && base[baseSearch] === current[currentIndex]) {
+			// items where removed
+			removed.push.apply(removed, base.slice(baseIndex, baseSearch));
+			baseIndex = baseSearch +1;
+			currentIndex ++;
+			isSearching = false;
+		}
+	}
+
+	added.push.apply(added, current.slice(currentIndex));
+	removed.push.apply(removed, base.slice(baseIndex));
+	return [added, removed];
+}
