@@ -277,10 +277,12 @@ export class ObservableArray<T> implements Array<T> {
 			index = Math.max(0, length - index);
 
 		// too few arguments?
-		if (arguments.length === 0)
+		if (index === undefined)
 			return;
-		if (arguments.length === 1)
+		if (deleteCount === undefined)
 			deleteCount = length - index;
+		if (newItems === undefined)
+			newItems = [];
 
 		var lengthDelta = newItems.length - deleteCount;
 		var res:T[] = Array.prototype.splice.apply(this._values, [<any>index, deleteCount].concat(newItems));

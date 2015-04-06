@@ -54,6 +54,21 @@ exports.test1 = function(test) {
     test.deepEqual(a.values(), [1,4,5]);
     test.equals(sum(), 10);
 
+    a.replace([2,4]);
+    test.equals(sum(), 6);
+
+    a.splice(1,1);
+    test.equals(sum(), 2);
+    test.deepEqual(a.values(), [2])
+
+    a.spliceWithArray(0,0,[4,3]);
+    test.equals(sum(), 9);
+    test.deepEqual(a.values(), [4,3,2])
+
+    a.clear();
+    test.equals(sum(), 0);
+    test.deepEqual(a.values(), []);
+
     test.done();
   }
   catch(e) {
