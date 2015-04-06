@@ -1,5 +1,4 @@
-require('typescript-require')
-var mobservable = require('../mobservable.ts')
+var mobservable = require('../mobservable.js')
 var property = mobservable.property;
 var array = mobservable.array;
 
@@ -69,6 +68,30 @@ exports.five_hunderd_properties_that_observe_their_sibling = function(test) {
 	var end = +(new Date);
 
 	console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
+	test.done();
+}
+
+exports.late_depenency_change = function(test) {
+	var values = [];
+	for(var i = 0; i < 100; i++)
+		values.push(property(0))
+
+	var sum = property(function() {
+		var sum = 0;
+		for(var i = 0; i < 100; i++)
+			sum += values[i]();
+		return sum;
+	})
+
+	sum();
+
+	var start = new Date();
+
+	for(var i = 0; i < 10000; i++)
+		values[99](i);
+
+	test.equals(sum(), 9999);
+	console.log("\n  Updated in " + ((new Date) - start) + "ms.");
 	test.done();
 }
 

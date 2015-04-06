@@ -20,10 +20,10 @@ require('nscript')(function(shell, npm, git) {
 		shell.write('package.json', JSON.stringify(package, null, 4));
 
 		// Finally, commit and publish!
-		git("commit","-am","Bumped to version " + version);
-		git("tag", version);
 		npm("publish");
-		git("push");
+		git("commit","-am","Published version " + version);
+		git("tag", version);
+		//git("push");
 		git("push", { tags: true });
 		console.log("Published!");
 	}

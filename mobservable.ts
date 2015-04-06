@@ -101,6 +101,7 @@ class Property<T,S> {
 	set(value:T):S {
 		if (value !== this._value) {
 			var oldValue = this._value;
+			// Optimization: intruce a state that signals ready without an initial dirty, for non-computed values
 			this.dependencyState.markStale();
 			this._value = value;
 			this.dependencyState.markReady(true);
@@ -195,7 +196,7 @@ export class ObservableArray<T> implements Array<T> {
 		Object.defineProperty(this, "length", {
 			enumerable: false,
 			get: function() {
-				this.notifyObserved();
+				this.dependencyState.notifyObserved();
 				return this._values.length;
 			},
 			set: function(newLength) {
@@ -251,7 +252,7 @@ export class ObservableArray<T> implements Array<T> {
 				}
 			},
 			get: () => {
-				this.notifyChildObserved(index);
+				this.dependencyState.notifyObserved();
 				return this._values[index];
 			}
 		})
@@ -289,28 +290,20 @@ export class ObservableArray<T> implements Array<T> {
 		return res;
 	}
 
-	notifyChildUpdate(index:number) {
+	private notifyChildUpdate(index:number) {
 		this.notifyChanged();
 		// TODO: update Array.observe listeners
 	}
 
-	notifyChildObserved(index:number) {
-		this.notifyObserved();
-	}
-
-	notifySplice(index:number, deleted:T[], added:T[]) {
+	private notifySplice(index:number, deleted:T[], added:T[]) {
 		this.notifyChanged();
 		// TODO: update Array.observe listeners
 	}
 
-	notifyChanged() {
+	private notifyChanged() {
 		this.dependencyState.markStale();
 		this.dependencyState.markReady(true);
 		this.events.emit('change');
-	}
-
-	notifyObserved() {
-		this.dependencyState.notifyObserved();
 	}
 
 	// TODO: subscribe -> observe for consistency?
@@ -326,6 +319,10 @@ export class ObservableArray<T> implements Array<T> {
 
 	clear(): T[] {
 		return this.splice(0);
+	}
+
+	replace(newItems:T[]) {
+		return this.spliceWithArray(0, this._values.length, newItems);
 	}
 
 	values(): T[] {
@@ -382,13 +379,12 @@ export class ObservableArray<T> implements Array<T> {
     reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { return this.wrapReadFunction<U>("reduce", arguments); }
     reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { return this.wrapReadFunction<U>("reduceRight", arguments); }
 
-	wrapReadFunction<U>(funcName:string, args:IArguments):U {
+	private wrapReadFunction<U>(funcName:string, args:IArguments):U {
 		var baseFunc = Array.prototype[funcName];
 		// generate a new function that wraps arround the Array.prototype, and replace our own definition
 		ObservableArray.prototype[funcName] = function() {
-			var res = baseFunc.apply(this._values, arguments);
-			this.notifyObserved();
-			return res;
+			this.dependencyState.notifyObserved();
+			return baseFunc.apply(this._values, arguments);
 		}
 		return this[funcName].apply(this, args);
 	}
@@ -478,6 +474,7 @@ class DNode {
 			os[i].notifyStateChange(this, didTheValueActuallyChange);
 	}
 
+	// optimization: replace this check with an 'unstableDependenciesCounter'. 
 	areAllDependenciesAreStable() {
 		var obs = this.observing, l = obs.length;
 		for(var i = 0; i < l; i++)

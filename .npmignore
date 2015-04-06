@@ -1,6 +1,9 @@
 node_modules/
 test/
-tmp/
+coverage/
 npm-debug.log
 tsconfig.json
 publish.js
+/mobservable.js
+.tscache
+*.js.map

@@ -1,5 +1,4 @@
-require('typescript-require')
-var mobservable = require('../mobservable.ts')
+var mobservable = require('../mobservable.js')
 
 var property = mobservable.property;
 var array = mobservable.array;
