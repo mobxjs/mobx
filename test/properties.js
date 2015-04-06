@@ -1,6 +1,6 @@
 var mobservable = require('../mobservable.js')
 
-var property = mobservable.property;
+var value = mobservable.value;
 
 function buffer() {
   var b = [];
@@ -14,9 +14,9 @@ function buffer() {
 }
 
 exports.basic = function(test) {
-    var x = property(3);
+    var x = mobservable(3);
     var b = buffer();
-    x.subscribe(b);
+    x.observe(b);
     test.equal(3, x());
 
     x(5);
@@ -26,9 +26,9 @@ exports.basic = function(test) {
 }
 
 exports.basic2 = function(test) {
-    var x = property(3);
-    var z = property(function () { return x() * 2});
-    var y = property(function () { return x() * 3});
+    var x = value(3);
+    var z = value(function () { return x() * 2});
+    var y = value(function () { return x() * 3});
 
     test.equal(z(), 6);
     test.equal(y(), 9);
@@ -43,12 +43,12 @@ exports.basic2 = function(test) {
 exports.dynamic = function(test) {
   //  debugger;
   try {
-    var x = property(3);
-    var y = property(function() {
+    var x = value(3);
+    var y = value(function() {
       return x();
     });
     var b = buffer();
-    y.subscribe(b, true);
+    y.observe(b, true);
 
     test.equal(3, y()); // First evaluation here..
 
@@ -65,14 +65,14 @@ exports.dynamic = function(test) {
 
 exports.dynamic2 = function(test) {
   try {
-    var x = property(3);
-    var y = property(function() {
+    var x = value(3);
+    var y = value(function() {
       return x() * x();
     });
 
     test.equal(9, y());
     var b = buffer();
-    y.subscribe(b);
+    y.observe(b);
 
     x(5);
     test.equal(25, y());
@@ -90,17 +90,17 @@ exports.readme1 = function(test) {
   try {
     var b = buffer();
 
-    var vat = property(0.20);
+    var vat = value(0.20);
     var order = {};
-    order.price = property(10);
+    order.price = value(10);
       // Prints: New price: 24
-      //in TS, just: property(() => this.price() * (1+vat()))
-    order.priceWithVat = property(function() {
+      //in TS, just: value(() => this.price() * (1+vat()))
+    order.priceWithVat = value(function() {
       return order.price() * (1+vat());
     });
 
     order.priceWithVat(); // TODO: should not be needed!
-    order.priceWithVat.subscribe(b);
+    order.priceWithVat.observe(b);
 
     order.price(20);
     order.price(10);
@@ -113,7 +113,7 @@ exports.readme1 = function(test) {
 
 exports.cycle1 = function(test) {
   try {
-    var p = property(function() { return p() * 2 }); // thats a cycle!
+    var p = value(function() { return p() * 2 }); // thats a cycle!
     debugger;
     p();
     test.fail(true);
@@ -122,8 +122,8 @@ exports.cycle1 = function(test) {
     test.ok(("" + e).indexOf("Cycle detected") !== -1);
   }
   try {
-    var a = property(function() { return b() * 2 });
-    var b = property(function() { return a() * 2 });
+    var a = value(function() { return b() * 2 });
+    var b = value(function() { return a() * 2 });
     b();
     test.fail(true);
   }
@@ -135,9 +135,9 @@ exports.cycle1 = function(test) {
 }
 
 exports.cycle2 = function(test) {
-  var z = property(true);
-  var a = property(function() { return z() ? 1 : b() * 2 });
-  var b = property(function() { return a() * 2 });
+  var z = value(true);
+  var a = value(function() { return z() ? 1 : b() * 2 });
+  var b = value(function() { return a() * 2 });
 
   test.equals(1, a());
 
@@ -157,12 +157,12 @@ exports.cycle2 = function(test) {
 }
 
 exports.testBatchAndReady = function(test) {
-    var a = property(2);
-    var b = property(3);
-    var c = property(function() { return a() * b() });
-    var d = property(function() { return c() * b() });
+    var a = value(2);
+    var b = value(3);
+    var c = value(function() { return a() * b() });
+    var d = value(function() { return c() * b() });
     var buf = buffer();
-    d.subscribe(buf);
+    d.observe(buf);
 
     a(4);
     b(5);
@@ -186,11 +186,11 @@ exports.testBatchAndReady = function(test) {
 }
 
 exports.testScope = function(test) {
-  var vat = property(0.2);
+  var vat = value(0.2);
   var Order = function() {
-    this.price = property(20, this);
-    this.amount = property(2, this);
-    this.total = property(function() {
+    this.price = value(20, this);
+    this.amount = value(2, this);
+    this.total = value(function() {
       return (1+vat()) * this.price() * this.amount();
     }, this);
   };
@@ -202,7 +202,7 @@ exports.testScope = function(test) {
 }
 
 exports.testDefineProperty = function(test) {
-  var vat = property(0.2);
+  var vat = value(0.2);
   var Order = function() {
     mobservable.defineProperty(this, 'price', 20);
     mobservable.defineProperty(this, 'amount', 2);
@@ -218,12 +218,12 @@ exports.testDefineProperty = function(test) {
   test.done();
 }
 
-exports.testGuard = function(test) {
-  var a = property(3);
-  var b = property(2);
+exports.testWatch = function(test) {
+  var a = value(3);
+  var b = value(2);
   var changed = 0;
   var calcs = 0;
-  var res = mobservable.guard(function() {
+  var res = mobservable.watch(function() {
     calcs += 1;
     return a() * b();
   }, function() {
@@ -241,12 +241,12 @@ exports.testGuard = function(test) {
   test.done();
 }
 
-exports.testGuardDisposed = function(test) {
-  var a = property(3);
-  var b = property(2);
+exports.testWatchDisposed = function(test) {
+  var a = value(3);
+  var b = value(2);
   var changed = 0;
   var calcs = 0;
-  var res = mobservable.guard(function() {
+  var res = mobservable.watch(function() {
     calcs += 1;
     return a() * b();
   }, function() {
@@ -268,12 +268,12 @@ exports.testGuardDisposed = function(test) {
 exports.testChangeCountOptimization = function(test) {
     var bCalcs = 0;
     var cCalcs = 0;
-    var a = property(3);
-    var b = property(function() {
+    var a = value(3);
+    var b = value(function() {
         bCalcs += 1;
         return 4 + a() - a();
     });
-    var c = property(function() {
+    var c = value(function() {
         cCalcs += 1;
         return b();
     });
@@ -295,9 +295,9 @@ exports.testChangeCountOptimization = function(test) {
 
 exports.testObservablesRemoved = function(test) {
     var calcs = 0;
-    var a = property(1);
-    var b = property(2);
-    var c = property(function() {
+    var a = value(1);
+    var b = value(2);
+    var c = value(function() {
       calcs ++;
       if (a() === 1)
         return b() * a() * b();

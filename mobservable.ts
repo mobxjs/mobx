@@ -8,26 +8,35 @@
 
 import events = require('events');
 
-export interface Lambda {
+interface Lambda {
 	():void;
 }
 
-export interface IProperty<T,S> {
+interface IObservableValue<T,S> {
 	():T;
 	(value:T):S;
-	subscribe(callback:(newValue:T, oldValue:T)=>void):Lambda;
+	observe(callback:(newValue:T, oldValue:T)=>void):Lambda;
 }
 
-// TODO: rename to observable, make root export
-// TODO: how to dinstinguish beteween observing refs, and arrays / objects
-// TODO: make observableMap(map) function that makes properties observable, seals the object, introduces observe function?
-export function property<T,S>(value?:T|{():T}, scope?:S):IProperty<T,S> {
-	var prop:Property<T,S> = null;
+interface MobservableStatic {
+	<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S>;
+
+	value<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S>;
+	watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda];
+	array<T>(values?:T[]): ObservableArray<T>;
+	batch(action:Lambda);
+	onReady(listener:Lambda):Lambda;
+	onceReady(listener:Lambda);
+	defineProperty<T>(object:Object, name:string, initialValue?:T);
+}
+
+function observableValue<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S> {
+	var prop:ObservableValue<T,S> = null;
 
 	if (typeof value === "function")
-		prop = new ComputedProperty(<()=>T>value, scope);
+		prop = new ComputedObservable(<()=>T>value, scope);
 	else
-		prop = new Property(<T>value, scope);
+		prop = new ObservableValue(<T>value, scope);
 
 	var propFunc = function(value?:T):T|S {
 		if (arguments.length > 0)
@@ -35,14 +44,20 @@ export function property<T,S>(value?:T|{():T}, scope?:S):IProperty<T,S> {
 		else
 			return <T> prop.get();
 	};
-	(<any>propFunc).subscribe = prop.subscribe.bind(prop);
+	(<any>propFunc).observe = prop.observe.bind(prop);
 	(<any>propFunc).prop = prop;
 	(<any>propFunc).toString = function() { return prop.toString(); };
 
-	return <IProperty<T,S>> propFunc;
+	return <IObservableValue<T,S>> propFunc;
 }
 
-export function guard<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
+var mobservableStatic:MobservableStatic = <MobservableStatic> function<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S> {
+	return observableValue(value,scope);
+};
+
+mobservableStatic.value = observableValue;
+
+mobservableStatic.watch = function watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
 	var dnode = new DNode();
 	var retVal:T;
 	dnode.compute = function() {
@@ -60,24 +75,24 @@ export function guard<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
 	return [retVal, () => dnode.dispose()];
 }
 
-export function array<T>(values?:T[]): ObservableArray<T> {
+mobservableStatic.array = function array<T>(values?:T[]): ObservableArray<T> {
 	return new ObservableArray(values);
 }
 
-export function batch(action:Lambda) {
+mobservableStatic.batch = function batch(action:Lambda) {
 	Scheduler.batch(action);
 }
 
-export function onReady(listener:Lambda):Lambda {
+mobservableStatic.onReady = function onReady(listener:Lambda):Lambda {
 	return Scheduler.onReady(listener);
 }
 
-export function onceReady(listener:Lambda) {
+mobservableStatic.onceReady = function onceReady(listener:Lambda) {
 	Scheduler.onceReady(listener);
 }
 
-export function defineProperty<T>(object:Object, name:string, initialValue?:T) {
-	var _property = property(initialValue, object);
+mobservableStatic.defineProperty = function defineProperty<T>(object:Object, name:string, initialValue?:T) {
+	var _property = mobservableStatic.value(initialValue, object);
 	Object.defineProperty(object, name, {
 		get: function() {
 			return _property();
@@ -90,7 +105,7 @@ export function defineProperty<T>(object:Object, name:string, initialValue?:T) {
 	});
 }
 
-class Property<T,S> {
+class ObservableValue<T,S> {
 	protected events = new events.EventEmitter();
 	protected dependencyState:DNode = new DNode();
 
@@ -116,8 +131,7 @@ class Property<T,S> {
 		return this._value;
 	}
 
-	// TODO: subscribe -> observe for consistency?
-	subscribe(listener:(newValue:T, oldValue:T)=>void, fireImmediately=false):Lambda {
+	observe(listener:(newValue:T, oldValue:T)=>void, fireImmediately=false):Lambda {
 		var current = this.get(); // make sure the values are initialized
 		if (fireImmediately)
 			listener(current, undefined);
@@ -129,17 +143,17 @@ class Property<T,S> {
 	}
 
 	toString() {
-		return `Property[${this._value}]`;
+		return `Observable[${this._value}]`;
 	}
 }
 
-class ComputedProperty<U,S> extends Property<U,S> {
+class ComputedObservable<U,S> extends ObservableValue<U,S> {
 	private initialized = false;
 
 	constructor(protected func:()=>U, scope:S) {
 		super(undefined, scope);
 		if (!func)
-			throw new Error("ComputedProperty requires a function");
+			throw new Error("ComputedObservable requires a function");
 
 		this.dependencyState.compute = this.compute.bind(this);
 	}
@@ -156,7 +170,7 @@ class ComputedProperty<U,S> extends Property<U,S> {
 	}
 
 	set(_:U):S {
-		throw new Error("Computed cannot retrieve a new value!");
+		throw new Error("ComputedObservable cannot retrieve a new value!");
 	}
 
 	compute() {
@@ -174,7 +188,7 @@ class ComputedProperty<U,S> extends Property<U,S> {
 	}
 
 	toString() {
-		return `ComputedProperty[${this.func.toString()}]`;
+		return `ComputedObservable[${this.func.toString()}]`;
 	}
 }
 
@@ -182,7 +196,7 @@ class ComputedProperty<U,S> extends Property<U,S> {
 	TODO: mention clearly that ObservableArray is not sparse, that is,
 	no wild index assignments with index >(!) length are allowed (that is, won't be observed)
  */
-export class ObservableArray<T> implements Array<T> {
+class ObservableArray<T> implements Array<T> {
     [n: number]: T;
 	length: number;
 
@@ -308,8 +322,8 @@ export class ObservableArray<T> implements Array<T> {
 		this.events.emit('change');
 	}
 
-	// TODO: subscribe -> observe for consistency?
-	subscribe(listener:()=>void, fireImmediately=false):Lambda {
+	// TODO: eS7 event params
+	observe(listener:()=>void, fireImmediately=false):Lambda {
 		if (fireImmediately)
 			listener();
 
@@ -476,7 +490,7 @@ class DNode {
 			os[i].notifyStateChange(this, didTheValueActuallyChange);
 	}
 
-	// optimization: replace this check with an 'unstableDependenciesCounter'. 
+	// optimization: replace this check with an 'unstableDependenciesCounter'.
 	areAllDependenciesAreStable() {
 		var obs = this.observing, l = obs.length;
 		for(var i = 0; i < l; i++)
@@ -660,7 +674,7 @@ class Scheduler {
  * returns a tuple<addedItems, removedItems>
  * @type {T[]}
  */
-export function quickDiff<T>(current:T[], base:T[]):[T[],T[]] {
+function quickDiff<T>(current:T[], base:T[]):[T[],T[]] {
 	if (!base.length)
 		return [current, []];
 	if (!current.length)
@@ -721,3 +735,6 @@ export function quickDiff<T>(current:T[], base:T[]):[T[],T[]] {
 	removed.push.apply(removed, base.slice(baseIndex));
 	return [added, removed];
 }
+(<any>mobservableStatic).quickDiff = quickDiff; // For testing purposes only
+
+export = mobservableStatic;

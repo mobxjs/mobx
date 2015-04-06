@@ -1,5 +1,5 @@
 var mobservable = require('../mobservable.js')
-var property = mobservable.property;
+var value = mobservable.value;
 var array = mobservable.array;
 
 /*
@@ -12,13 +12,13 @@ var array = mobservable.array;
 	// TODO: should upscale this test, since the measurement is now too small....
  */
 exports.one_observes_ten_thousand_that_observe_one = function(test) {
-	var a = property(2);
+	var a = value(2);
 
 	// many observers that listen to one..
 	var observers = [];
 	for (var i = 0; i < 10000; i++) {
 		(function(idx) {
-			observers.push(property(function() {
+			observers.push(value(function() {
 				return a() * idx;
 			}))
 		})(i);
@@ -26,7 +26,7 @@ exports.one_observes_ten_thousand_that_observe_one = function(test) {
 
 	var bCalcs = 0;
 	// one observers that listens to many..
-	var b = property(function() {
+	var b = value(function() {
 		var res = 0;
 		for(var i = 0; i < observers.length; i++)
 			res += observers[i]();
@@ -50,10 +50,10 @@ exports.one_observes_ten_thousand_that_observe_one = function(test) {
 }
 
 exports.five_hunderd_properties_that_observe_their_sibling = function(test) {
-	var observables = [property(1)];
+	var observables = [value(1)];
 	for(var i = 0; i < 500; i++) {
 		(function(idx) {
-			observables.push(property(function() { return observables[idx]() + 1 }));
+			observables.push(value(function() { return observables[idx]() + 1 }));
 		})(i);
 	}
 
@@ -74,9 +74,9 @@ exports.five_hunderd_properties_that_observe_their_sibling = function(test) {
 exports.late_depenency_change = function(test) {
 	var values = [];
 	for(var i = 0; i < 100; i++)
-		values.push(property(0))
+		values.push(value(0))
 
-	var sum = property(function() {
+	var sum = value(function() {
 		var sum = 0;
 		for(var i = 0; i < 100; i++)
 			sum += values[i]();
@@ -98,9 +98,9 @@ exports.late_depenency_change = function(test) {
 exports.array_reduce = function(test) {
 	var aCalc = 0;
 	var ar = mobservable.array([]);
-	var b = property(1);
+	var b = value(1);
 
-	var sum = property(function() {
+	var sum = value(function() {
 		aCalc++;
 		return ar.reduce(function(a, c) {
 			return a + c * b();
@@ -135,8 +135,8 @@ exports.array_reduce = function(test) {
 exports.array_classic_loop = function(test) {
 	var ar = mobservable.array([]);
 	var aCalc = 0;
-	var b = property(1);
-	var sum = property(function() {
+	var b = value(1);
+	var sum = value(function() {
 		var s = 0;
 		aCalc++;
 		for(var i = 0; i < ar.length; i++)
@@ -173,9 +173,9 @@ exports.array_classic_loop = function(test) {
 
 function order_system_helper(test, usebatch) {
 	var orders = array([]);
-	var vat = property(2);
+	var vat = value(2);
 
-	var totalAmount = property(function() {
+	var totalAmount = value(function() {
 		var sum = 0, l = orders.length;
 		for(var i = 0; i < l; i++)
 			sum += orders[i].total();
@@ -183,24 +183,24 @@ function order_system_helper(test, usebatch) {
 	});
 
 	function OrderLine(order, price, amount) {
-		this.price = property(price);
-		this.amount = property(amount);
-		this.total = property(function() {
+		this.price = value(price);
+		this.amount = value(amount);
+		this.total = value(function() {
 			return order.vat() * this.price() * this.amount();
 		}, this)
 	}
 
 	function Order(includeVat) {
-		this.includeVat = property(includeVat);
+		this.includeVat = value(includeVat);
 		this.lines = array();
 
-		this.vat = property(function() {
+		this.vat = value(function() {
 			if (this.includeVat())
 				return vat();
 			return 1;
 		}, this)
 
-		this.total = property(function() {
+		this.total = value(function() {
 			return this.lines.reduce(function(acc, order) {
 				return acc + order.total();
 			}, 0);

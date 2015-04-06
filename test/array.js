@@ -1,6 +1,6 @@
 var mobservable = require('../mobservable.js')
 
-var property = mobservable.property;
+var value = mobservable.value;
 var array = mobservable.array;
 
 
@@ -34,7 +34,7 @@ exports.test1 = function(test) {
     test.deepEqual(Object.keys(a), ["0", "1"]);
     test.deepEqual(a.values(), [1,2]);
 
-    var sum = property(function() {
+    var sum = value(function() {
       return a.reduce(function(a,b) {
         return a + b;
       }, 0);
