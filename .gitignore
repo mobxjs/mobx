@@ -1,3 +1,6 @@
 node_modules/
-tmp/
 npm-debug.log
+/mobservable.js
+coverage/
+.tscache
+*.js.map
