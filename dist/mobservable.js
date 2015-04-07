@@ -5,27 +5,30 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 var events = require('events');
-function property(value, scope) {
+function observableValue(value, scope) {
     var prop = null;
     if (typeof value === "function")
-        prop = new ComputedProperty(value, scope);
+        prop = new ComputedObservable(value, scope);
     else
-        prop = new Property(value, scope);
+        prop = new ObservableValue(value, scope);
     var propFunc = function (value) {
         if (arguments.length > 0)
             return prop.set(value);
         else
             return prop.get();
     };
-    propFunc.subscribe = prop.subscribe.bind(prop);
+    propFunc.observe = prop.observe.bind(prop);
     propFunc.prop = prop;
     propFunc.toString = function () {
         return prop.toString();
     };
     return propFunc;
 }
-exports.property = property;
-function guard(func, onInvalidate) {
+var mobservableStatic = function (value, scope) {
+    return observableValue(value, scope);
+};
+mobservableStatic.value = observableValue;
+mobservableStatic.watch = function watch(func, onInvalidate) {
     var dnode = new DNode();
     var retVal;
     dnode.compute = function () {
@@ -41,26 +44,21 @@ function guard(func, onInvalidate) {
     };
     dnode.computeNextValue();
     return [retVal, function () { return dnode.dispose(); }];
-}
-exports.guard = guard;
-function array(values) {
+};
+mobservableStatic.array = function array(values) {
     return new ObservableArray(values);
-}
-exports.array = array;
-function batch(action) {
+};
+mobservableStatic.batch = function batch(action) {
     Scheduler.batch(action);
-}
-exports.batch = batch;
-function onReady(listener) {
+};
+mobservableStatic.onReady = function onReady(listener) {
     return Scheduler.onReady(listener);
-}
-exports.onReady = onReady;
-function onceReady(listener) {
+};
+mobservableStatic.onceReady = function onceReady(listener) {
     Scheduler.onceReady(listener);
-}
-exports.onceReady = onceReady;
-function defineProperty(object, name, initialValue) {
-    var _property = property(initialValue, object);
+};
+mobservableStatic.defineProperty = function defineProperty(object, name, initialValue) {
+    var _property = mobservableStatic.value(initialValue, object);
     Object.defineProperty(object, name, {
         get: function () {
             return _property();
@@ -71,16 +69,15 @@ function defineProperty(object, name, initialValue) {
         enumerable: true,
         configurable: true
     });
-}
-exports.defineProperty = defineProperty;
-var Property = (function () {
-    function Property(_value, scope) {
+};
+var ObservableValue = (function () {
+    function ObservableValue(_value, scope) {
         this._value = _value;
         this.scope = scope;
         this.events = new events.EventEmitter();
         this.dependencyState = new DNode();
     }
-    Property.prototype.set = function (value) {
+    ObservableValue.prototype.set = function (value) {
         if (value !== this._value) {
             var oldValue = this._value;
             this.dependencyState.markStale();
@@ -90,11 +87,11 @@ var Property = (function () {
         }
         return this.scope;
     };
-    Property.prototype.get = function () {
+    ObservableValue.prototype.get = function () {
         this.dependencyState.notifyObserved();
         return this._value;
     };
-    Property.prototype.subscribe = function (listener, fireImmediately) {
+    ObservableValue.prototype.observe = function (listener, fireImmediately) {
         var _this = this;
         if (fireImmediately === void 0) { fireImmediately = false; }
         var current = this.get();
@@ -105,32 +102,32 @@ var Property = (function () {
             _this.events.removeListener('change', listener);
         };
     };
-    Property.prototype.toString = function () {
-        return "Property[" + this._value + "]";
+    ObservableValue.prototype.toString = function () {
+        return "Observable[" + this._value + "]";
     };
-    return Property;
+    return ObservableValue;
 })();
-var ComputedProperty = (function (_super) {
-    __extends(ComputedProperty, _super);
-    function ComputedProperty(func, scope) {
+var ComputedObservable = (function (_super) {
+    __extends(ComputedObservable, _super);
+    function ComputedObservable(func, scope) {
         _super.call(this, undefined, scope);
         this.func = func;
         this.initialized = false;
         if (!func)
-            throw new Error("ComputedProperty requires a function");
+            throw new Error("ComputedObservable requires a function");
         this.dependencyState.compute = this.compute.bind(this);
     }
-    ComputedProperty.prototype.get = function () {
+    ComputedObservable.prototype.get = function () {
         if (!this.initialized) {
             this.initialized = true;
             this.dependencyState.computeNextValue();
         }
         return _super.prototype.get.call(this);
     };
-    ComputedProperty.prototype.set = function (_) {
-        throw new Error("Computed cannot retrieve a new value!");
+    ComputedObservable.prototype.set = function (_) {
+        throw new Error("ComputedObservable cannot retrieve a new value!");
     };
-    ComputedProperty.prototype.compute = function () {
+    ComputedObservable.prototype.compute = function () {
         var newValue = this.func.call(this.scope);
         this.initialized = true;
         var changed = newValue !== this._value;
@@ -141,11 +138,11 @@ var ComputedProperty = (function (_super) {
         }
         return changed;
     };
-    ComputedProperty.prototype.toString = function () {
-        return "ComputedProperty[" + this.func.toString() + "]";
+    ComputedObservable.prototype.toString = function () {
+        return "ComputedObservable[" + this.func.toString() + "]";
     };
-    return ComputedProperty;
-})(Property);
+    return ComputedObservable;
+})(ObservableValue);
 var ObservableArray = (function () {
     function ObservableArray(initialValues) {
         Object.defineProperty(this, "length", {
@@ -218,10 +215,12 @@ var ObservableArray = (function () {
             index = length;
         else if (index < 0)
             index = Math.max(0, length - index);
-        if (arguments.length === 0)
+        if (index === undefined)
             return;
-        if (arguments.length === 1)
+        if (deleteCount === undefined)
             deleteCount = length - index;
+        if (newItems === undefined)
+            newItems = [];
         var lengthDelta = newItems.length - deleteCount;
         var res = Array.prototype.splice.apply(this._values, [index, deleteCount].concat(newItems));
         this.updateLength(length, lengthDelta);
@@ -239,7 +238,7 @@ var ObservableArray = (function () {
         this.dependencyState.markReady(true);
         this.events.emit('change');
     };
-    ObservableArray.prototype.subscribe = function (listener, fireImmediately) {
+    ObservableArray.prototype.observe = function (listener, fireImmediately) {
         var _this = this;
         if (fireImmediately === void 0) { fireImmediately = false; }
         if (fireImmediately)
@@ -349,7 +348,6 @@ var ObservableArray = (function () {
     };
     return ObservableArray;
 })();
-exports.ObservableArray = ObservableArray;
 var DNodeState;
 (function (DNodeState) {
     DNodeState[DNodeState["STALE"] = 0] = "STALE";
@@ -590,5 +588,6 @@ function quickDiff(current, base) {
     removed.push.apply(removed, base.slice(baseIndex));
     return [added, removed];
 }
-exports.quickDiff = quickDiff;
+mobservableStatic.quickDiff = quickDiff;
+module.exports = mobservableStatic;
 //# sourceMappingURL=mobservable.js.map
