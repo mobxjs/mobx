@@ -2,43 +2,58 @@
 
 *Changes are coming!*
 
-MOBservable is simple observable implementation, based on the ideas of observables in bigger frameworks like `knockout`, `ember` etc, but this one does not have 'strings attached'. Furthermore it should fit well in any typescript project.
+MOBservable is light-weight stand alone observable implementation, based on the ideas of observables in bigger frameworks like `knockout`, `ember`, but this time without 'strings attached'. Furthermore it should fit well in any typescript project.
 
-# Properties
+# Observable values
 
-The `mobservable.property` method takes a value or function and creates an observable value from it.
-This way properties that listen that observe each other can be created. A quick example:
+The `mobservable.value(valueToObserve)` method (or just its shorthand: `mobservable(valueToObserve)`) takes a value or function and creates an observable value from it. A quick example:
 
 ```typescript
 import mobservable = require('mobservable');
-var property = mobservable.property;
 
-var vat = property(0.20);
+var vat = mobservable(0.20);
 
 var order = {};
-order.price = property(10),
-order.priceWithVat = property(() => order.price() * (1+vat()));
+order.price = mobservable(10),
+order.priceWithVat = mobservable(() => order.price() * (1 + vat()));
 
-order.priceWithVat.subscribe((price) => console.log("New price: " + price));
+order.priceWithVat.observe((price) => console.log("New price: " + price));
 
 order.price(20);
 // Prints: New price: 24
-order.price(10);
-// Prints: New price: 10
+vat(0.10);
+// Prints: New price: 22
 ```
 
-### mobservable.property(value, scope?)
+### mobservable.value(value, scope?)
 
-Constructs a new `Property`, value can either be a string, number, boolean or function that takes no arguments and returns a value. In the body of the function, references to other properties will be tracked, and on change, the function will be re-evaluated. The returned value is an `IProperty` function/object.
+Constructs a new observable value. The value can be everything that is not a function, or a function that takes no arguments and returns a value. In the body of the function, references to other properties will be tracked, and on change, the function will be re-evaluated. The returned value is an `IProperty` function/object. Passing an array or object into the `value` method will only observe the reference, not the contents of the objects itself. To observe the contents of an array, use `mobservable.array`, to observe the contents of an object, just make sure its (relevant) properties are observable values themselves.
 
-Optionally accepts a scope parameter, which will be returned by the setter for chaining, and which will used as scope for calculated properties.
+The method optionally accepts a scope parameter, which will be returned by the setter for chaining, and which will be used as scope for calculated properties, for example:
+
+```javascript
+var value = mobservable.value;
+
+function OrderLine(price, amount) {
+	this.price = value(price);
+	this.amount = value(amount);
+	this.total = value(function() {
+		return this.price() * this.amount();
+	}, this)
+}
+```
+
+### mobservable.array(valueArray?)
+
+TODO
 
 ### mobservable.defineProperty(object, name, value)
 
 Defines a property using ES5 getters and setters. This is useful in constructor functions, and allows for direct assignment / reading from observables:
 
 ```javascript
-var vat = property(0.2);
+var vat = mobservable.value(0.2);
+
 var Order = function() {
 	mobservable.defineProperty(this, 'price', 20);
 	mobservable.defineProperty(this, 'amount', 2);
@@ -67,13 +82,13 @@ class Order {
 }
 ```
 
-### mobservable.guard(func, onInvalidate)
+### mobservable.watch(func, onInvalidate)
 
-`guard` invokes `func` and returns a tuple consisting of the return value of `func` and an unsubscriber. `guard` will track which observables `func` was observing, but it will *not* recalculate `func` if necessary, instead, it will fire the `onInvalidate` callback to notify that the output of `func` can no longer be trusted.
+`watch` invokes `func` and returns a tuple consisting of the return value of `func` and an unsubscriber. `watch` will track which observables `func` was observing, but it will *not* recalculate `func` if necessary, instead, it will fire the `onInvalidate` callback to notify that the output of `func` can no longer be trusted.
 
-The `onInvalidate` function will be called only once, after that, the guard has finished. To abort a guard, use the returned unsubscriber.
+The `onInvalidate` function will be called only once, after that, the watch has finished. To abort a watch, use the returned unsubscriber.
 
-Guard is useful in functions where you want to have `func` observable, but func is actually invoked as side effect or part of a bigger change flow or where unnecessary recalculations of `func` or either pointless or expensive.
+`Watch` is useful in functions where you want to have a function that responds to change, but where the function is actually invoked as side effect or part of a bigger change flow or where unnecessary recalculations of `func` or either pointless or expensive, for example in React component render methods
 
 ### mobservable.batch(workerFunction)
 
