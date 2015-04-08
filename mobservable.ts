@@ -511,15 +511,15 @@ class DNode {
 				// The observable has become stable, and all others are stable as well, we can compute now!
 				if (observable.state === DNodeState.READY && this.areAllDependenciesAreStable()) {
 					// did any of the observables really change?
-					if (this.dependencyChangeCount > 0) {
-						this.state = DNodeState.PENDING;
-						Scheduler.schedule(() => this.computeNextValue());
-					}
-					else {
-						// we're done, but didn't change, lets make sure verybody knows..
-						this.markReady(false);
-					}
-					this.dependencyChangeCount = 0;
+					this.state = DNodeState.PENDING;
+					Scheduler.schedule(() => {
+						if (this.dependencyChangeCount > 0)
+							this.computeNextValue();
+						else
+							// we're done, but didn't change, lets make sure verybody knows..
+							this.markReady(false);
+						this.dependencyChangeCount = 0;
+					});
 				}
 				break;
 			case DNodeState.PENDING:
