@@ -1,3 +1,4 @@
+/// <reference path="./typings/node-0.10.d.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -19,9 +20,7 @@ function observableValue(value, scope) {
     };
     propFunc.observe = prop.observe.bind(prop);
     propFunc.prop = prop;
-    propFunc.toString = function () {
-        return prop.toString();
-    };
+    propFunc.toString = function () { return prop.toString(); };
     return propFunc;
 }
 var mobservableStatic = function (value, scope) {
@@ -286,12 +285,8 @@ var ObservableArray = (function () {
         this.spliceWithArray(0, 0, items);
         return this._values.length;
     };
-    ObservableArray.prototype.toString = function () {
-        return this.wrapReadFunction("toString", arguments);
-    };
-    ObservableArray.prototype.toLocaleString = function () {
-        return this.wrapReadFunction("toLocaleString", arguments);
-    };
+    ObservableArray.prototype.toString = function () { return this.wrapReadFunction("toString", arguments); };
+    ObservableArray.prototype.toLocaleString = function () { return this.wrapReadFunction("toLocaleString", arguments); };
     ObservableArray.prototype.concat = function () {
         var items = [];
         for (var _i = 0; _i < arguments.length; _i++) {
@@ -299,45 +294,19 @@ var ObservableArray = (function () {
         }
         return this.wrapReadFunction("concat", arguments);
     };
-    ObservableArray.prototype.join = function (separator) {
-        return this.wrapReadFunction("join", arguments);
-    };
-    ObservableArray.prototype.reverse = function () {
-        return this.wrapReadFunction("reverse", arguments);
-    };
-    ObservableArray.prototype.slice = function (start, end) {
-        return this.wrapReadFunction("slice", arguments);
-    };
-    ObservableArray.prototype.sort = function (compareFn) {
-        return this.wrapReadFunction("sort", arguments);
-    };
-    ObservableArray.prototype.indexOf = function (searchElement, fromIndex) {
-        return this.wrapReadFunction("indexOf", arguments);
-    };
-    ObservableArray.prototype.lastIndexOf = function (searchElement, fromIndex) {
-        return this.wrapReadFunction("lastIndexOf", arguments);
-    };
-    ObservableArray.prototype.every = function (callbackfn, thisArg) {
-        return this.wrapReadFunction("every", arguments);
-    };
-    ObservableArray.prototype.some = function (callbackfn, thisArg) {
-        return this.wrapReadFunction("some", arguments);
-    };
-    ObservableArray.prototype.forEach = function (callbackfn, thisArg) {
-        return this.wrapReadFunction("forEach", arguments);
-    };
-    ObservableArray.prototype.map = function (callbackfn, thisArg) {
-        return this.wrapReadFunction("map", arguments);
-    };
-    ObservableArray.prototype.filter = function (callbackfn, thisArg) {
-        return this.wrapReadFunction("filter", arguments);
-    };
-    ObservableArray.prototype.reduce = function (callbackfn, initialValue) {
-        return this.wrapReadFunction("reduce", arguments);
-    };
-    ObservableArray.prototype.reduceRight = function (callbackfn, initialValue) {
-        return this.wrapReadFunction("reduceRight", arguments);
-    };
+    ObservableArray.prototype.join = function (separator) { return this.wrapReadFunction("join", arguments); };
+    ObservableArray.prototype.reverse = function () { return this.wrapReadFunction("reverse", arguments); };
+    ObservableArray.prototype.slice = function (start, end) { return this.wrapReadFunction("slice", arguments); };
+    ObservableArray.prototype.sort = function (compareFn) { return this.wrapReadFunction("sort", arguments); };
+    ObservableArray.prototype.indexOf = function (searchElement, fromIndex) { return this.wrapReadFunction("indexOf", arguments); };
+    ObservableArray.prototype.lastIndexOf = function (searchElement, fromIndex) { return this.wrapReadFunction("lastIndexOf", arguments); };
+    ObservableArray.prototype.every = function (callbackfn, thisArg) { return this.wrapReadFunction("every", arguments); };
+    ObservableArray.prototype.some = function (callbackfn, thisArg) { return this.wrapReadFunction("some", arguments); };
+    ObservableArray.prototype.forEach = function (callbackfn, thisArg) { return this.wrapReadFunction("forEach", arguments); };
+    ObservableArray.prototype.map = function (callbackfn, thisArg) { return this.wrapReadFunction("map", arguments); };
+    ObservableArray.prototype.filter = function (callbackfn, thisArg) { return this.wrapReadFunction("filter", arguments); };
+    ObservableArray.prototype.reduce = function (callbackfn, initialValue) { return this.wrapReadFunction("reduce", arguments); };
+    ObservableArray.prototype.reduceRight = function (callbackfn, initialValue) { return this.wrapReadFunction("reduceRight", arguments); };
     ObservableArray.prototype.wrapReadFunction = function (funcName, args) {
         var baseFunc = Array.prototype[funcName];
         ObservableArray.prototype[funcName] = function () {
@@ -357,7 +326,7 @@ var DNodeState;
 ;
 var DNode = (function () {
     function DNode() {
-        this.state = 2 /* READY */;
+        this.state = DNodeState.READY;
         this.observing = [];
         this.prevObserving = [];
         this.observers = [];
@@ -384,17 +353,17 @@ var DNode = (function () {
         return false;
     };
     DNode.prototype.markStale = function () {
-        if (this.state === 1 /* PENDING */)
+        if (this.state === DNodeState.PENDING)
             return;
-        if (this.state === 0 /* STALE */)
+        if (this.state === DNodeState.STALE)
             return;
-        this.state = 0 /* STALE */;
+        this.state = DNodeState.STALE;
         this.notifyObservers();
     };
     DNode.prototype.markReady = function (didTheValueActuallyChange) {
-        if (this.state === 2 /* READY */)
+        if (this.state === DNodeState.READY)
             return;
-        this.state = 2 /* READY */;
+        this.state = DNodeState.READY;
         this.notifyObservers(didTheValueActuallyChange);
         Scheduler.scheduleReady();
     };
@@ -407,19 +376,19 @@ var DNode = (function () {
     DNode.prototype.areAllDependenciesAreStable = function () {
         var obs = this.observing, l = obs.length;
         for (var i = 0; i < l; i++)
-            if (obs[i].state !== 2 /* READY */)
+            if (obs[i].state !== DNodeState.READY)
                 return false;
         return true;
     };
     DNode.prototype.notifyStateChange = function (observable, didTheValueActuallyChange) {
         var _this = this;
         switch (this.state) {
-            case 0 /* STALE */:
-                if (observable.state === 2 /* READY */ && didTheValueActuallyChange)
+            case DNodeState.STALE:
+                if (observable.state === DNodeState.READY && didTheValueActuallyChange)
                     this.dependencyChangeCount += 1;
-                if (observable.state === 2 /* READY */ && this.areAllDependenciesAreStable()) {
+                if (observable.state === DNodeState.READY && this.areAllDependenciesAreStable()) {
                     if (this.dependencyChangeCount > 0) {
-                        this.state = 1 /* PENDING */;
+                        this.state = DNodeState.PENDING;
                         Scheduler.schedule(function () { return _this.computeNextValue(); });
                     }
                     else {
@@ -428,10 +397,10 @@ var DNode = (function () {
                     this.dependencyChangeCount = 0;
                 }
                 break;
-            case 1 /* PENDING */:
+            case DNodeState.PENDING:
                 break;
-            case 2 /* READY */:
-                if (observable.state === 0 /* STALE */)
+            case DNodeState.READY:
+                if (observable.state === DNodeState.STALE)
                     this.markStale();
                 break;
         }
@@ -462,7 +431,7 @@ var DNode = (function () {
         }
     };
     DNode.prototype.notifyObserved = function () {
-        if (this.state === 1 /* PENDING */)
+        if (this.state === DNodeState.PENDING)
             throw new Error("Cycle detected");
         var ts = DNode.trackingStack, l = ts.length;
         if (l) {
