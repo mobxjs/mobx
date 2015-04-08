@@ -69,6 +69,22 @@ exports.test1 = function(test) {
     test.equals(sum(), 0);
     test.deepEqual(a.values(), []);
 
+    a.length = 4;
+    test.equals(isNaN(sum()), true);
+    test.deepEqual(a.length, 4);
+
+    test.deepEqual(a.values(), [undefined, undefined, undefined, undefined]);
+
+    a.replace([1,2, 2,4]);
+    test.equals(sum(), 9);
+    a.length = 4;
+    test.equals(sum(), 9);
+
+
+    a.length = 2;
+    test.equals(sum(), 3);
+    test.deepEqual(a.values(), [1,2]);
+
     test.done();
   }
   catch(e) {

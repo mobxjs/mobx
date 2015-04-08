@@ -204,7 +204,6 @@ class ObservableArray<T> implements Array<T> {
     [n: number]: T;
 	length: number;
 
-	private _supressLengthNotification: boolean;
 	private _values: T[];
 	private dependencyState:DNode;
 	private events;
@@ -217,9 +216,9 @@ class ObservableArray<T> implements Array<T> {
 				this.dependencyState.notifyObserved();
 				return this._values.length;
 			},
-			set: function(newLength) {
+			set: function(newLength:number) {
 				var currentLength = this._values.length;
-				if (this._supressLengthNotification === true || newLength != currentLength) // distinguish between internal and external updates
+				if (newLength === currentLength)
 					return;
 
 				// grow
@@ -228,9 +227,7 @@ class ObservableArray<T> implements Array<T> {
 
 				// shrink
 				else if (newLength < currentLength)
-					this.splice(newLength -1, currentLength - newLength);
-
-				this.notifyObserved();
+					this.splice(newLength, currentLength - newLength);
 			}
 		});
 		Object.defineProperty(this, "dependencyState", { enumerable: false, value: new DNode() });
