@@ -427,6 +427,7 @@ class DNode {
 	private prevObserving: DNode[] = null;
 	private observers: DNode[] = [];
 	private dependencyChangeCount = 0;
+	private isDisposed: boolean = false;
 
 	getObserversCount() {
 		return this.observers.length;
@@ -560,7 +561,8 @@ class DNode {
 
 	private bindDependencies() {
 		this.observing = DNode.trackingStack.pop();
-		if (this.observing.length === 0)
+
+		if (this.observing.length === 0 && !this.isDisposed)
 			warn("You have created a function that doesn't observe any values, did you forget to make its dependencies observable?");
 
 		var changes = quickDiff(this.observing, this.prevObserving);
@@ -606,6 +608,7 @@ class DNode {
 			this.observing[i].removeObserver(this);
 		this.observing = [];
 		this.observers = [];
+		this.isDisposed = true;
 		// Do something with the observers, notify some state like KILLED? TODO: => set 'undefined'
 	}
 }
@@ -617,29 +620,27 @@ class Scheduler {
 
 	public static schedule(func:Lambda) {
 		if (Scheduler.inBatch < 1) {
-			try {
-				func();
-			} catch(e) {
-				console && console.error("Failed to run scheduled action, did some computed value throw an exception? " + e, e);
-			}
+			func(); // func is allowed to throw, it will not affect any internal state
 		}
 		else
 			Scheduler.tasks[Scheduler.tasks.length] = func;
 	}
 
 	private static runPostBatch() {
-		var i = 0, done = false;
-		while (!done) {
-			try { // try is expensive, move it out of the while
-				while(i < Scheduler.tasks.length)
-					Scheduler.tasks[i++]();
-				done = true;
-			}
-			catch (e) {
-				console && console.error("Failed to run scheduled action, did some computed value throw an exception? " + e, e);
-			}
+		var i = 0;
+		try { // try is expensive, move it out of the while
+			for(i = 0; i < Scheduler.tasks.length; i++)
+				Scheduler.tasks[i]();
+			Scheduler.tasks = [];
 		}
-		Scheduler.tasks = [];
+		catch (e) {
+			console && console.error("Failed to run scheduled action, the action has been dropped from the queue: " + e, e);
+			// drop already executed tasks, including the failing one, and retry in the future
+			Scheduler.tasks.splice(0, i + 1);
+			setTimeout(() => Scheduler.runPostBatch(), 1);
+			// rethrow
+			throw e;
+		}
 	}
 
 	static batch(action:Lambda) {
@@ -753,7 +754,7 @@ function quickDiff<T>(current:T[], base:T[]):[T[],T[]] {
 
 function warn(message) {
 	if (console)
-		console.warn("[mobservable] " + message);
+		console.warn("[WARNING:mobservable] " + message);
 }
 
 export = mobservableStatic;

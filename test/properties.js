@@ -41,8 +41,7 @@ exports.basic2 = function(test) {
 }
 
 exports.dynamic = function(test) {
-  //  debugger;
-  try {
+    try {
     var x = value(3);
     var y = value(function() {
       return x();
@@ -114,7 +113,6 @@ exports.readme1 = function(test) {
 exports.cycle1 = function(test) {
   try {
     var p = value(function() { return p() * 2 }); // thats a cycle!
-    debugger;
     p();
     test.fail(true);
   }
@@ -143,7 +141,6 @@ exports.cycle2 = function(test) {
 
   test.equals(2, b());
   try {
-    debugger;
     z(false); // introduces a cycle!
     z(true);
     test.fail(true, "No exception thrown, found: " + b());
