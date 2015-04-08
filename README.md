@@ -43,6 +43,9 @@ function OrderLine(price, amount) {
 }
 ```
 
+**Note: `mobservable.value` versus `mobservable.array`**
+Do *not* confuse `mobservable.value([])` (or `mobservable([])`) with `mobservable.array([])`, the first creates an observable reference to an array, but does not observe its contents. The later observes the contents from the array you pass into it.
+
 ## mobservable.array(initialValues?):ObservableArray
 
 **Note: ES5 environments only**
@@ -62,6 +65,19 @@ numbers.push(5,6);
 // prints 21
 numbers.unshift(10)
 // prints 31
+```
+
+**Note: do not reassign a array variables!**
+
+In general you should never (need to) reassign variables that hold an observable array, instead, use the `replace` method on the array. If you reassign a variable that holds an observable array, the reassignment won't be visible to any of it observers; they will still be observing the original array:
+
+```javascript
+var numbers = mobservable.array([1,2]);
+// .. stuff that depends on numbers
+// bad:
+var numbers = mobservable.array([1,2,3]);
+// good:
+numbers.replace([1,2,3]);
 ```
 
 ## mobservable.defineProperty(object, name, value)

@@ -33,6 +33,9 @@ interface MobservableStatic {
 function observableValue<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S> {
 	var prop:ObservableValue<T,S> = null;
 
+	if (Array.isArray && Array.isArray(value))
+		warn("mobservable.value() was invoked with an array. Probably you want to create an mobservable.array() instead of observing a reference to an array?");
+
 	if (typeof value === "function")
 		prop = new ComputedObservable(<()=>T>value, scope);
 	else
@@ -164,6 +167,7 @@ class ComputedObservable<U,S> extends ObservableValue<U,S> {
 		if (!this.initialized) {
 			this.initialized = true; // prevents endless recursion in cycles (cycles themselves are only detected after finishing the computation)
 			this.dependencyState.computeNextValue();
+			// TODO: go back to initialized/ sleep when all observers have left, remove from dependency tree
 		}
 
 		return super.get(); // assumption: Compute<> is always synchronous for computed properties
@@ -559,6 +563,8 @@ class DNode {
 
 	private bindDependencies() {
 		this.observing = DNode.trackingStack.pop();
+		if (this.observing.length === 0)
+			warn("You have created a function that doesn't observe any values, did you forget to make its dependencies observable?");
 
 		var changes = quickDiff(this.observing, this.prevObserving);
 		var added = changes[0];
@@ -736,5 +742,10 @@ function quickDiff<T>(current:T[], base:T[]):[T[],T[]] {
 	return [added, removed];
 }
 (<any>mobservableStatic).quickDiff = quickDiff; // For testing purposes only
+
+function warn(message) {
+	if (console)
+		console.warn("[mobservable] " + message);
+}
 
 export = mobservableStatic;
