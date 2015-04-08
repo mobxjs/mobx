@@ -1,4 +1,3 @@
-/// <reference path="./typings/node-0.10.d.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -8,6 +7,8 @@ var __extends = this.__extends || function (d, b) {
 var events = require('events');
 function observableValue(value, scope) {
     var prop = null;
+    if (Array.isArray && Array.isArray(value))
+        warn("mobservable.value() was invoked with an array. Probably you want to create an mobservable.array() instead of observing a reference to an array?");
     if (typeof value === "function")
         prop = new ComputedObservable(value, scope);
     else
@@ -20,7 +21,9 @@ function observableValue(value, scope) {
     };
     propFunc.observe = prop.observe.bind(prop);
     propFunc.prop = prop;
-    propFunc.toString = function () { return prop.toString(); };
+    propFunc.toString = function () {
+        return prop.toString();
+    };
     return propFunc;
 }
 var mobservableStatic = function (value, scope) {
@@ -152,13 +155,12 @@ var ObservableArray = (function () {
             },
             set: function (newLength) {
                 var currentLength = this._values.length;
-                if (this._supressLengthNotification === true || newLength != currentLength)
+                if (newLength === currentLength)
                     return;
                 if (newLength > currentLength)
                     this.spliceWithArray(currentLength, 0, new Array(newLength - currentLength));
                 else if (newLength < currentLength)
-                    this.splice(newLength - 1, currentLength - newLength);
-                this.notifyObserved();
+                    this.splice(newLength, currentLength - newLength);
             }
         });
         Object.defineProperty(this, "dependencyState", { enumerable: false, value: new DNode() });
@@ -285,8 +287,12 @@ var ObservableArray = (function () {
         this.spliceWithArray(0, 0, items);
         return this._values.length;
     };
-    ObservableArray.prototype.toString = function () { return this.wrapReadFunction("toString", arguments); };
-    ObservableArray.prototype.toLocaleString = function () { return this.wrapReadFunction("toLocaleString", arguments); };
+    ObservableArray.prototype.toString = function () {
+        return this.wrapReadFunction("toString", arguments);
+    };
+    ObservableArray.prototype.toLocaleString = function () {
+        return this.wrapReadFunction("toLocaleString", arguments);
+    };
     ObservableArray.prototype.concat = function () {
         var items = [];
         for (var _i = 0; _i < arguments.length; _i++) {
@@ -294,19 +300,45 @@ var ObservableArray = (function () {
         }
         return this.wrapReadFunction("concat", arguments);
     };
-    ObservableArray.prototype.join = function (separator) { return this.wrapReadFunction("join", arguments); };
-    ObservableArray.prototype.reverse = function () { return this.wrapReadFunction("reverse", arguments); };
-    ObservableArray.prototype.slice = function (start, end) { return this.wrapReadFunction("slice", arguments); };
-    ObservableArray.prototype.sort = function (compareFn) { return this.wrapReadFunction("sort", arguments); };
-    ObservableArray.prototype.indexOf = function (searchElement, fromIndex) { return this.wrapReadFunction("indexOf", arguments); };
-    ObservableArray.prototype.lastIndexOf = function (searchElement, fromIndex) { return this.wrapReadFunction("lastIndexOf", arguments); };
-    ObservableArray.prototype.every = function (callbackfn, thisArg) { return this.wrapReadFunction("every", arguments); };
-    ObservableArray.prototype.some = function (callbackfn, thisArg) { return this.wrapReadFunction("some", arguments); };
-    ObservableArray.prototype.forEach = function (callbackfn, thisArg) { return this.wrapReadFunction("forEach", arguments); };
-    ObservableArray.prototype.map = function (callbackfn, thisArg) { return this.wrapReadFunction("map", arguments); };
-    ObservableArray.prototype.filter = function (callbackfn, thisArg) { return this.wrapReadFunction("filter", arguments); };
-    ObservableArray.prototype.reduce = function (callbackfn, initialValue) { return this.wrapReadFunction("reduce", arguments); };
-    ObservableArray.prototype.reduceRight = function (callbackfn, initialValue) { return this.wrapReadFunction("reduceRight", arguments); };
+    ObservableArray.prototype.join = function (separator) {
+        return this.wrapReadFunction("join", arguments);
+    };
+    ObservableArray.prototype.reverse = function () {
+        return this.wrapReadFunction("reverse", arguments);
+    };
+    ObservableArray.prototype.slice = function (start, end) {
+        return this.wrapReadFunction("slice", arguments);
+    };
+    ObservableArray.prototype.sort = function (compareFn) {
+        return this.wrapReadFunction("sort", arguments);
+    };
+    ObservableArray.prototype.indexOf = function (searchElement, fromIndex) {
+        return this.wrapReadFunction("indexOf", arguments);
+    };
+    ObservableArray.prototype.lastIndexOf = function (searchElement, fromIndex) {
+        return this.wrapReadFunction("lastIndexOf", arguments);
+    };
+    ObservableArray.prototype.every = function (callbackfn, thisArg) {
+        return this.wrapReadFunction("every", arguments);
+    };
+    ObservableArray.prototype.some = function (callbackfn, thisArg) {
+        return this.wrapReadFunction("some", arguments);
+    };
+    ObservableArray.prototype.forEach = function (callbackfn, thisArg) {
+        return this.wrapReadFunction("forEach", arguments);
+    };
+    ObservableArray.prototype.map = function (callbackfn, thisArg) {
+        return this.wrapReadFunction("map", arguments);
+    };
+    ObservableArray.prototype.filter = function (callbackfn, thisArg) {
+        return this.wrapReadFunction("filter", arguments);
+    };
+    ObservableArray.prototype.reduce = function (callbackfn, initialValue) {
+        return this.wrapReadFunction("reduce", arguments);
+    };
+    ObservableArray.prototype.reduceRight = function (callbackfn, initialValue) {
+        return this.wrapReadFunction("reduceRight", arguments);
+    };
     ObservableArray.prototype.wrapReadFunction = function (funcName, args) {
         var baseFunc = Array.prototype[funcName];
         ObservableArray.prototype[funcName] = function () {
@@ -326,11 +358,12 @@ var DNodeState;
 ;
 var DNode = (function () {
     function DNode() {
-        this.state = DNodeState.READY;
+        this.state = 2 /* READY */;
         this.observing = [];
-        this.prevObserving = [];
+        this.prevObserving = null;
         this.observers = [];
         this.dependencyChangeCount = 0;
+        this.isDisposed = false;
     }
     DNode.prototype.getObserversCount = function () {
         return this.observers.length;
@@ -353,17 +386,17 @@ var DNode = (function () {
         return false;
     };
     DNode.prototype.markStale = function () {
-        if (this.state === DNodeState.PENDING)
+        if (this.state === 1 /* PENDING */)
             return;
-        if (this.state === DNodeState.STALE)
+        if (this.state === 0 /* STALE */)
             return;
-        this.state = DNodeState.STALE;
+        this.state = 0 /* STALE */;
         this.notifyObservers();
     };
     DNode.prototype.markReady = function (didTheValueActuallyChange) {
-        if (this.state === DNodeState.READY)
+        if (this.state === 2 /* READY */)
             return;
-        this.state = DNodeState.READY;
+        this.state = 2 /* READY */;
         this.notifyObservers(didTheValueActuallyChange);
         Scheduler.scheduleReady();
     };
@@ -376,31 +409,31 @@ var DNode = (function () {
     DNode.prototype.areAllDependenciesAreStable = function () {
         var obs = this.observing, l = obs.length;
         for (var i = 0; i < l; i++)
-            if (obs[i].state !== DNodeState.READY)
+            if (obs[i].state !== 2 /* READY */)
                 return false;
         return true;
     };
     DNode.prototype.notifyStateChange = function (observable, didTheValueActuallyChange) {
         var _this = this;
         switch (this.state) {
-            case DNodeState.STALE:
-                if (observable.state === DNodeState.READY && didTheValueActuallyChange)
+            case 0 /* STALE */:
+                if (observable.state === 2 /* READY */ && didTheValueActuallyChange)
                     this.dependencyChangeCount += 1;
-                if (observable.state === DNodeState.READY && this.areAllDependenciesAreStable()) {
-                    if (this.dependencyChangeCount > 0) {
-                        this.state = DNodeState.PENDING;
-                        Scheduler.schedule(function () { return _this.computeNextValue(); });
-                    }
-                    else {
-                        this.markReady(false);
-                    }
-                    this.dependencyChangeCount = 0;
+                if (observable.state === 2 /* READY */ && this.areAllDependenciesAreStable()) {
+                    this.state = 1 /* PENDING */;
+                    Scheduler.schedule(function () {
+                        if (_this.dependencyChangeCount > 0)
+                            _this.computeNextValue();
+                        else
+                            _this.markReady(false);
+                        _this.dependencyChangeCount = 0;
+                    });
                 }
                 break;
-            case DNodeState.PENDING:
+            case 1 /* PENDING */:
                 break;
-            case DNodeState.READY:
-                if (observable.state === DNodeState.STALE)
+            case 2 /* READY */:
+                if (observable.state === 0 /* STALE */)
                     this.markStale();
                 break;
         }
@@ -420,6 +453,8 @@ var DNode = (function () {
     };
     DNode.prototype.bindDependencies = function () {
         this.observing = DNode.trackingStack.pop();
+        if (this.observing.length === 0 && !this.isDisposed)
+            warn("You have created a function that doesn't observe any values, did you forget to make its dependencies observable?");
         var changes = quickDiff(this.observing, this.prevObserving);
         var added = changes[0];
         var removed = changes[1];
@@ -429,9 +464,10 @@ var DNode = (function () {
             added[i].addObserver(this);
             added[i].findCycle(this);
         }
+        this.prevObserving = null;
     };
     DNode.prototype.notifyObserved = function () {
-        if (this.state === DNodeState.PENDING)
+        if (this.state === 1 /* PENDING */)
             throw new Error("Cycle detected");
         var ts = DNode.trackingStack, l = ts.length;
         if (l) {
@@ -452,6 +488,8 @@ var DNode = (function () {
         for (var l = this.observing.length, i = 0; i < l; i++)
             this.observing[i].removeObserver(this);
         this.observing = [];
+        this.observers = [];
+        this.isDisposed = true;
     };
     DNode.trackingStack = [];
     return DNode;
@@ -460,20 +498,24 @@ var Scheduler = (function () {
     function Scheduler() {
     }
     Scheduler.schedule = function (func) {
-        if (Scheduler.inBatch < 1)
+        if (Scheduler.inBatch < 1) {
             func();
+        }
         else
             Scheduler.tasks[Scheduler.tasks.length] = func;
     };
     Scheduler.runPostBatch = function () {
-        while (Scheduler.tasks.length) {
-            try {
-                Scheduler.tasks.shift()();
-            }
-            catch (e) {
-                console && console.error("Failed to run scheduled action: " + e);
-                throw e;
-            }
+        var i = 0;
+        try {
+            for (i = 0; i < Scheduler.tasks.length; i++)
+                Scheduler.tasks[i]();
+            Scheduler.tasks = [];
+        }
+        catch (e) {
+            console && console.error("Failed to run scheduled action, the action has been dropped from the queue: " + e, e);
+            Scheduler.tasks.splice(0, i + 1);
+            setTimeout(function () { return Scheduler.runPostBatch(); }, 1);
+            throw e;
         }
     };
     Scheduler.batch = function (action) {
@@ -558,5 +600,9 @@ function quickDiff(current, base) {
     return [added, removed];
 }
 mobservableStatic.quickDiff = quickDiff;
+function warn(message) {
+    if (console)
+        console.warn("[WARNING:mobservable] " + message);
+}
 module.exports = mobservableStatic;
 //# sourceMappingURL=mobservable.js.map
