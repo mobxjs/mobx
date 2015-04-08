@@ -2,7 +2,7 @@
 
 *Changes are coming!*
 
-MOBservable is light-weight stand alone observable implementation, based on the ideas of observables in bigger frameworks like `knockout`, `ember`, but this time without 'strings attached'. Furthermore it should fit well in any typescript project.
+MOBservable is light-weight stand alone observable implementation, based on the ideas of observables in bigger frameworks like `knockout`, `ember`, but this time without 'strings attached'. MOBservables allows you to observe primitive values, references, functions and arrays both synchronously and asynchronously!
 
 [Typescript typings](https://github.com/mweststrate/MOBservable/blob/master/mobservable.d.ts)
 
@@ -17,7 +17,7 @@ import mobservable = require('mobservable');
 var vat = mobservable.value(0.20);
 
 var order = {};
-order.price = mobservable(10),
+order.price = mobservable.value(10),
 order.priceWithVat = mobservable.value(() => order.price() * (1 + vat()));
 
 order.priceWithVat.observe((price) => console.log("New price: " + price));
