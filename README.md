@@ -4,18 +4,21 @@
 
 MOBservable is light-weight stand alone observable implementation, based on the ideas of observables in bigger frameworks like `knockout`, `ember`, but this time without 'strings attached'. Furthermore it should fit well in any typescript project.
 
+[Typescript typings](https://github.com/mweststrate/MOBservable/blob/master/mobservable.d.ts)
+
 # Observable values
 
 The `mobservable.value(valueToObserve)` method (or just its shorthand: `mobservable(valueToObserve)`) takes a value or function and creates an observable value from it. A quick example:
 
 ```typescript
+/// <reference path='./node_modules/mobservable/mobservable.d.ts'/>
 import mobservable = require('mobservable');
 
-var vat = mobservable(0.20);
+var vat = mobservable.value(0.20);
 
 var order = {};
 order.price = mobservable(10),
-order.priceWithVat = mobservable(() => order.price() * (1 + vat()));
+order.priceWithVat = mobservable.value(() => order.price() * (1 + vat()));
 
 order.priceWithVat.observe((price) => console.log("New price: " + price));
 
@@ -176,3 +179,14 @@ In the near feature this will adhere to the ES7 specs for Array.observe so this 
 ### ObservableArray.values()
 
 Returns all the values of this ObservableArray as native, non-observable, javascript array. The returned array is a shallow copy.
+
+# Using mobservable with Typescript
+
+Use the following import statement to have strongly typed mobservables in typescript:
+
+```typescript
+/// <reference path='./node_modules/mobservable/mobservable.d.ts'/>
+import mobservable = require('mobservable');
+```
+
+Note that the `mobservable(value)` shorthand is not available in typescript, due to limitations in the combination of require statements and .d.ts references. use `mobservable.value(value)` instead.
