@@ -619,22 +619,30 @@ class Scheduler {
 	private static tasks:{():void}[] = [];
 
 	public static schedule(func:Lambda) {
-		if (Scheduler.inBatch < 1)
-			func();
+		if (Scheduler.inBatch < 1) {
+			try {
+				func();
+			} catch(e) {
+				console && console.error("Failed to run scheduled action, did some computed value throw an exception? " + e, e);
+			}
+		}
 		else
 			Scheduler.tasks[Scheduler.tasks.length] = func;
 	}
 
 	private static runPostBatch() {
-		while(Scheduler.tasks.length) {
-			try { // optimization: move try out of while, re-enter after exception (tasks array is preserved after all)
-				Scheduler.tasks.shift()();
+		var i = 0, done = false;
+		while (!done) {
+			try { // try is expensive, move it out of the while
+				while(i < Scheduler.tasks.length)
+					Scheduler.tasks[i++]();
+				done = true;
 			}
 			catch (e) {
-				console && console.error("Failed to run scheduled action: " + e);
-				throw e;
+				console && console.error("Failed to run scheduled action, did some computed value throw an exception? " + e, e);
 			}
 		}
+		Scheduler.tasks = [];
 	}
 
 	static batch(action:Lambda) {
