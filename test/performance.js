@@ -1,6 +1,20 @@
-var mobservable = require('../mobservable.js')
+var mobservable = require('../mobservable.js');
 var value = mobservable.value;
 var array = mobservable.array;
+
+var gc = (function () {
+	var memwatch;
+	try {
+		memwatch = require("memwatch");
+		return function() {
+			memwatch.gc();
+		};
+	}
+	catch (e) {
+		console.warn("Garbage collection not available");
+		return function() {};
+	}
+})();
 
 /*
 	results of this test:
@@ -12,6 +26,7 @@ var array = mobservable.array;
 	// TODO: should upscale this test, since the measurement is now too small....
  */
 exports.one_observes_ten_thousand_that_observe_one = function(test) {
+	gc();
 	var a = value(2);
 
 	// many observers that listen to one..
@@ -50,6 +65,7 @@ exports.one_observes_ten_thousand_that_observe_one = function(test) {
 }
 
 exports.five_hunderd_properties_that_observe_their_sibling = function(test) {
+	gc();
 	var observables = [value(1)];
 	for(var i = 0; i < 500; i++) {
 		(function(idx) {
@@ -72,6 +88,7 @@ exports.five_hunderd_properties_that_observe_their_sibling = function(test) {
 }
 
 exports.late_depenency_change = function(test) {
+	gc();
 	var values = [];
 	for(var i = 0; i < 100; i++)
 		values.push(value(0))
@@ -96,6 +113,7 @@ exports.late_depenency_change = function(test) {
 }
 
 exports.array_reduce = function(test) {
+	gc();
 	var aCalc = 0;
 	var ar = mobservable.array([]);
 	var b = value(1);
@@ -133,6 +151,7 @@ exports.array_reduce = function(test) {
 }
 
 exports.array_classic_loop = function(test) {
+	gc();
 	var ar = mobservable.array([]);
 	var aCalc = 0;
 	var b = value(1);
@@ -172,6 +191,14 @@ exports.array_classic_loop = function(test) {
 
 
 function order_system_helper(test, usebatch) {
+	// Garbage collection is very important here,
+	// Due to the async nature of this test and the large memory consumption,
+	// during tests runs the garbage collector will otherwise kick in at this point
+	// severly slowing down the tests (but after repeating the tests a few times,
+	// they will become fast again, so it is not a memory leak but a gc trigger that
+	// causes the unreliable results)
+	gc();
+
 	var orders = array([]);
 	var vat = value(2);
 

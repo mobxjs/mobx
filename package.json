@@ -1,27 +1,28 @@
 {
-    "name": "mobservable",
-    "version": "0.1.2",
-    "description": "Changes are coming! Small library for creating observable properties en functions",
-    "main": "dist/mobservable.js",
-    "scripts": {
-        "test": "grunt test",
-        "prepublish": "grunt build"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/mweststrate/mobservable.git"
-    },
-    "author": "Michel Weststrate",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/mweststrate/mobservable/issues"
-    },
-    "homepage": "https://github.com/mweststrate/mobservable",
-    "devDependencies": {
-        "grunt": "^0.4.5",
-        "grunt-contrib-nodeunit": "^0.4.1",
-        "grunt-ts": "^4.0.1",
-        "nscript": "^0.1.5",
-        "typescript": "^1.4.1"
-    }
+  "name": "mobservable",
+  "version": "0.1.2",
+  "description": "Changes are coming! Small library for creating observable properties en functions",
+  "main": "dist/mobservable.js",
+  "scripts": {
+    "test": "grunt test",
+    "prepublish": "grunt build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mweststrate/mobservable.git"
+  },
+  "author": "Michel Weststrate",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mweststrate/mobservable/issues"
+  },
+  "homepage": "https://github.com/mweststrate/mobservable",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-nodeunit": "^0.4.1",
+    "grunt-ts": "^4.0.1",
+    "memwatch": "^0.2.2",
+    "nscript": "^0.1.5",
+    "typescript": "^1.4.1"
+  }
 }
