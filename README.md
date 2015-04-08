@@ -110,7 +110,7 @@ In typescript, it might be more convenient for the typesystem to directly define
 
 ```typescript
 class Order {
-	_price = new mobservable.property(20, this);
+	_price = new mobservable.value(20, this);
 	get price() {
 		return this._price();
 	}
