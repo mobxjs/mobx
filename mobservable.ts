@@ -427,7 +427,7 @@ class DNode {
 	state: DNodeState = DNodeState.READY;
 
 	private observing: DNode[] = [];
-	private prevObserving: DNode[] = [];
+	private prevObserving: DNode[] = null;
 	private observers: DNode[] = [];
 	private dependencyChangeCount = 0;
 
@@ -577,6 +577,8 @@ class DNode {
 			added[i].addObserver(this);
 			added[i].findCycle(this);
 		}
+
+		this.prevObserving = null;
 	}
 
 	public notifyObserved() {
@@ -606,6 +608,7 @@ class DNode {
 		for(var l=this.observing.length, i=0; i<l; i++)
 			this.observing[i].removeObserver(this);
 		this.observing = [];
+		this.observers = [];
 		// Do something with the observers, notify some state like KILLED? TODO: => set 'undefined'
 	}
 }
