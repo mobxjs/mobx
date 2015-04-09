@@ -139,8 +139,10 @@ class ObservableValue<T,S> {
 		if (fireImmediately)
 			listener(current, undefined);
 
+		this.dependencyState.setRefCount(+1);
 		this.events.addListener('change', listener);
 		return () => {
+			this.dependencyState.setRefCount(-1);
 			this.events.removeListener('change', listener);
 		};
 	}
@@ -151,8 +153,6 @@ class ObservableValue<T,S> {
 }
 
 class ComputedObservable<U,S> extends ObservableValue<U,S> {
-	private initialized = false;
-
 	constructor(protected func:()=>U, scope:S) {
 		super(undefined, scope);
 		if (!func)
@@ -164,13 +164,12 @@ class ComputedObservable<U,S> extends ObservableValue<U,S> {
 	get():U {
 		// the first evaluation of a computed function is lazy, to save lots of calculations when its dependencies are initialized
 		// (and it is cheaper anyways)
-		if (!this.initialized) {
-			this.initialized = true; // prevents endless recursion in cycles (cycles themselves are only detected after finishing the computation)
-			this.dependencyState.computeNextValue();
-			// TODO: go back to initialized/ sleep when all observers have left, remove from dependency tree
-		}
-
-		return super.get(); // assumption: Compute<> is always synchronous for computed properties
+		this.dependencyState.wakeUp(); //-> wakeup triggers a compute
+		if (DNode.trackingStack.length)
+			this.dependencyState.notifyObserved();
+		else
+			this.dependencyState.tryToSleep(); // this was one time evaluation
+		return this._value;
 	}
 
 	set(_:U):S {
@@ -179,15 +178,12 @@ class ComputedObservable<U,S> extends ObservableValue<U,S> {
 
 	compute() {
 		var newValue = this.func.call(this.scope);
-		this.initialized = true;
-
 		var changed = newValue !== this._value;
 		if (changed) {
 			var oldValue = this._value;
 			this._value = newValue;
 			this.events.emit('change', newValue, oldValue);
 		}
-
 		return changed;
 	}
 
@@ -427,7 +423,21 @@ class DNode {
 	private prevObserving: DNode[] = null;
 	private observers: DNode[] = [];
 	private dependencyChangeCount = 0;
-	private isDisposed: boolean = false;
+	private isDisposed = false;
+	private externalRefenceCount = 0;
+	private isSleeping = true;
+
+	getRefCount():number {
+		return this.observers.length + this.externalRefenceCount;
+	}
+
+	setRefCount(delta:number) {
+		this.externalRefenceCount += delta;
+		if (delta > 0 && this.externalRefenceCount === delta)
+			this.wakeUp();
+		else if (this.externalRefenceCount === 0)
+			this.tryToSleep();
+	}
 
 	getObserversCount() {
 		return this.observers.length;
@@ -439,8 +449,10 @@ class DNode {
 
 	removeObserver(node:DNode) {
 		var idx = this.observers.indexOf(node);
-		if (idx !== -1)
+		if (idx !== -1) {
 			this.observers.splice(idx, 1);
+			this.tryToSleep();
+		}
 	}
 
 	hasObservingChanged() {
@@ -501,6 +513,23 @@ class DNode {
 		return true;
 	}
 
+	tryToSleep() {
+		if (this.getRefCount() === 0 && !this.isSleeping) {
+			for (var i = 0, l = this.observing.length; i < l; i++)
+				this.observing[i].removeObserver(this);
+			this.observing = [];
+			this.isSleeping = true;
+		}
+	}
+
+	wakeUp() {
+		if (this.isSleeping) {
+			this.isSleeping = false;
+			this.state = DNodeState.PENDING;
+			this.computeNextValue();
+		}
+	}
+
 	notifyStateChange(observable:DNode, didTheValueActuallyChange:boolean) {
 		switch(this.state) {
 			case DNodeState.STALE:
@@ -552,7 +581,7 @@ class DNode {
 	/*
 		Dependency detection
 	*/
-	private static trackingStack:DNode[][] = []
+	static trackingStack:DNode[][] = []
 
 	private trackDependencies() {
 		this.prevObserving = this.observing;
