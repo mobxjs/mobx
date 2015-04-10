@@ -153,6 +153,7 @@ class ObservableValue<T,S> {
 }
 
 class ComputedObservable<U,S> extends ObservableValue<U,S> {
+	private isComputing = false;
 	constructor(protected func:()=>U, scope:S) {
 		super(undefined, scope);
 		if (!func)
@@ -164,12 +165,15 @@ class ComputedObservable<U,S> extends ObservableValue<U,S> {
 	get():U {
 		// the first evaluation of a computed function is lazy, to save lots of calculations when its dependencies are initialized
 		// (and it is cheaper anyways)
-		// TODO: dangerous optimization, directly call compute() if this observable is not being observed at all
-		this.dependencyState.wakeUp(); //-> wakeup triggers a compute
-		if (DNode.trackingStack.length)
+		// tricky optimization, directly call compute() if this observable is not being observed at all, note
+		// that in this case the DNode state isn't used at all
+		if (DNode.trackingStack.length) {
+			this.dependencyState.wakeUp(); //-> wakeup triggers a compute
 			this.dependencyState.notifyObserved();
-		else
-			this.dependencyState.tryToSleep(); // this was one time evaluation
+		}
+		else if (this.dependencyState.isSleeping)
+			this.compute(); // <- doesn't detect cycles!
+		//else: we are already up to date, somebody is just inspecting our current value
 		return this._value;
 	}
 
@@ -178,7 +182,11 @@ class ComputedObservable<U,S> extends ObservableValue<U,S> {
 	}
 
 	compute() {
+		if (this.isComputing)
+			throw new Error("Cycle detected");
+		this.isComputing = true;
 		var newValue = this.func.call(this.scope);
+		this.isComputing = false;
 		var changed = newValue !== this._value;
 		if (changed) {
 			var oldValue = this._value;
@@ -419,6 +427,7 @@ enum DNodeState {
 
 class DNode {
 	state: DNodeState = DNodeState.READY;
+	isSleeping = true;
 
 	private observing: DNode[] = [];
 	private prevObserving: DNode[] = null;
@@ -426,7 +435,6 @@ class DNode {
 	private dependencyChangeCount = 0;
 	private isDisposed = false;
 	private externalRefenceCount = 0;
-	private isSleeping = true;
 
 	getRefCount():number {
 		return this.observers.length + this.externalRefenceCount;
