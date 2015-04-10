@@ -135,11 +135,11 @@ class ObservableValue<T,S> {
 	}
 
 	observe(listener:(newValue:T, oldValue:T)=>void, fireImmediately=false):Lambda {
+		this.dependencyState.setRefCount(+1);
 		var current = this.get(); // make sure the values are initialized
 		if (fireImmediately)
 			listener(current, undefined);
 
-		this.dependencyState.setRefCount(+1);
 		this.events.addListener('change', listener);
 		return () => {
 			this.dependencyState.setRefCount(-1);
@@ -164,6 +164,7 @@ class ComputedObservable<U,S> extends ObservableValue<U,S> {
 	get():U {
 		// the first evaluation of a computed function is lazy, to save lots of calculations when its dependencies are initialized
 		// (and it is cheaper anyways)
+		// TODO: dangerous optimization, directly call compute() if this observable is not being observed at all
 		this.dependencyState.wakeUp(); //-> wakeup triggers a compute
 		if (DNode.trackingStack.length)
 			this.dependencyState.notifyObserved();

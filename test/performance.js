@@ -16,6 +16,10 @@ var gc = (function () {
 	}
 })();
 
+function voidObserver() {
+	// nothing, nada, noppes.
+}
+
 /*
 	results of this test:
 	300/40000 mseconds on netbook (AMD c60 processor, same test is on Intel i7 3770 ~10 times faster)
@@ -49,16 +53,16 @@ exports.one_observes_ten_thousand_that_observe_one = function(test) {
 		return res;
 	})
 
-	var start = +(new Date);
+	var start = now();
 
-	b(); // start observers
+	b.observe(voidObserver, true); // start observers
 	test.equals(99990000, b());
-	var initial = +(new Date);
+	var initial = now();
 
 	a(3);
 	test.equals(149985000, b()); // yes, I verified ;-).
 	//test.equals(2, bCalcs);
-	var end = +(new Date);
+	var end = now();
 
 	console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
 	test.done();
@@ -73,15 +77,16 @@ exports.five_hunderd_properties_that_observe_their_sibling = function(test) {
 		})(i);
 	}
 
-	var start = +(new Date);
+	var start = now();
 
 	var last = observables[observables.length -1];
+	last.observe(voidObserver);
 	test.equals(501, last());
-	var initial = +(new Date);
+	var initial = now();
 
 	observables[0](2);
 	test.equals(502, last());
-	var end = +(new Date);
+	var end = now();
 
 	console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
 	test.done();
@@ -100,7 +105,7 @@ exports.late_depenency_change = function(test) {
 		return sum;
 	})
 
-	sum();
+	sum.observe(voidObserver, true);
 
 	var start = new Date();
 
@@ -144,12 +149,12 @@ exports.lots_of_unused_computables = function(test) {
 	// unsubscribe, nobody should listen to a() now!
 	subscription();
 
-	var start = +(new Date);
+	var start = now();
 
 	a(3);
 	test.equals(sum, 49995000); // unchanged!
 
-	var end = +(new Date);
+	var end = now();
 
 	console.log("\n  Updated in " + (end - start) + " ms.");
 	test.done();
@@ -168,27 +173,27 @@ exports.array_reduce = function(test) {
 			return a + c * b();
 		}, 0);
 	});
-	sum(); // calculate
+	sum.observe(voidObserver);
 
-	var start = +(new Date);
+	var start = now();
 
 	for(var i = 0; i < 1000; i++)
 		ar.push(i);
 
 	test.equals(499500, sum());
-//	test.equals(1001, aCalc);
+	test.equals(1001, aCalc);
 	aCalc = 0;
 
-	var initial = +(new Date);
+	var initial = now();
 
 	for(var i = 0; i < 1000; i++)
 		ar[i] = ar[i] * 2;
 	b(2);
 
 	test.equals(1998000, sum());
-//	test.equals(1000, aCalc);
+	test.equals(1000, aCalc);
 
-	var end = +(new Date);
+	var end = now();
 
 	console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
 	test.done();
@@ -199,6 +204,7 @@ exports.array_classic_loop = function(test) {
 	var ar = mobservable.array([]);
 	var aCalc = 0;
 	var b = value(1);
+	debugger;
 	var sum = value(function() {
 		var s = 0;
 		aCalc++;
@@ -206,18 +212,18 @@ exports.array_classic_loop = function(test) {
 			s+=ar[i] * b();
 		return s;
 	});
-	sum(); // calculate
+	sum.observe(voidObserver, true); // calculate
 
-	var start = +(new Date);
+	var start = now();
 
 	test.equals(1, aCalc);
 	for(var i = 0; i < 1000; i++)
 		ar.push(i);
 
 	test.equals(499500, sum());
-//	test.equals(1001, aCalc);
+	test.equals(1001, aCalc);
 
-	var initial = +(new Date);
+	var initial = now();
 	aCalc = 0;
 
 	for(var i = 0; i < 1000; i++)
@@ -225,16 +231,16 @@ exports.array_classic_loop = function(test) {
 	b(2);
 
 	test.equals(1998000, sum());
-//	test.equals(1000, aCalc);
+	test.equals(1000, aCalc);
 
-	var end = +(new Date);
+	var end = now();
 
 	console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
 	test.done();
 }
 
 
-function order_system_helper(test, usebatch) {
+function order_system_helper(test, usebatch, keepObserving) {
 	// Garbage collection is very important here,
 	// Due to the async nature of this test and the large memory consumption,
 	// during tests runs the garbage collector will otherwise kick in at this point
@@ -279,8 +285,10 @@ function order_system_helper(test, usebatch) {
 	}
 
 	totalAmount();
+	if (keepObserving)
+		totalAmount.observe(voidObserver);
 
-	var start = +(new Date);
+	var start = now();
 
 	function setup() {
 		for(var i = 0; i < 100; i++) {
@@ -298,7 +306,7 @@ function order_system_helper(test, usebatch) {
 
 	test.equals(totalAmount(), 375000);
 
-	var initial = +(new Date);
+	var initial = now();
 
 	function update() {
 		for(var i = 0; i < 50; i++)
@@ -313,16 +321,28 @@ function order_system_helper(test, usebatch) {
 
 	test.equals(totalAmount(), 500000);
 
-	var end = +(new Date);
+	var end = now()
 	console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
 
 	test.done();
-}
+};
 
-exports.order_system = function(test) {
-	order_system_helper(test, false);
-}
+exports.order_system_observed = function(test) {
+	order_system_helper(test, false, true);
+};
 
-exports.order_system_batched = function(test) {
-	order_system_helper(test, true);
+exports.order_system_batched_observed = function(test) {
+	order_system_helper(test, true, true);
+};
+
+exports.order_system_lazy = function(test) {
+	order_system_helper(test, false, false);
+};
+
+exports.order_system_batched_lazy = function(test) {
+	order_system_helper(test, true, false);
+};
+
+function now() {
+	return + new Date();
 }
