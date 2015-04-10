@@ -1,6 +1,7 @@
 var mobservable = require('../mobservable.js')
 
 var value = mobservable.value;
+var voidObserver = function(){};
 
 function buffer() {
   var b = [];
@@ -22,6 +23,7 @@ exports.basic = function(test) {
     x(5);
     test.equal(5, x());
     test.deepEqual([5], b.toArray());
+    test.equal(mobservable.stackDepth(), 0);
     test.done();
 }
 
@@ -30,6 +32,8 @@ exports.basic2 = function(test) {
     var z = value(function () { return x() * 2});
     var y = value(function () { return x() * 3});
 
+    z.observe(voidObserver);
+
     test.equal(z(), 6);
     test.equal(y(), 9);
 
@@ -37,6 +41,7 @@ exports.basic2 = function(test) {
     test.equal(z(), 10);
     test.equal(y(), 15);
 
+    test.equal(mobservable.stackDepth(), 0);
     test.done();
 }
 
@@ -54,7 +59,9 @@ exports.dynamic = function(test) {
     x(5);
     test.equal(5, y());
 
-    test.deepEqual([3, 5], b.toArray())
+    test.deepEqual([3, 5], b.toArray());
+    test.equal(mobservable.stackDepth(), 0);
+
     test.done();
   }
   catch(e) {
@@ -77,7 +84,9 @@ exports.dynamic2 = function(test) {
     test.equal(25, y());
 
     //no intermediate value 15!
-    test.deepEqual([25], b.toArray())
+    test.deepEqual([25], b.toArray());
+    test.equal(mobservable.stackDepth(), 0);
+
     test.done();
   }
   catch(e) {
@@ -98,36 +107,42 @@ exports.readme1 = function(test) {
       return order.price() * (1+vat());
     });
 
-    order.priceWithVat(); // TODO: should not be needed!
     order.priceWithVat.observe(b);
 
     order.price(20);
     order.price(10);
     test.deepEqual([24,12],b.toArray());
+    test.equal(mobservable.stackDepth(), 0);
+
     test.done();
   } catch (e) {
     console.log(e.stack); throw e;
   }
 }
 
+// TODO: detect cycles without observers!
 exports.cycle1 = function(test) {
   try {
-    var p = value(function() { return p() * 2 }); // thats a cycle!
-    p();
+    var p = value(function() { return p() * 2; }); // thats a cycle!
+    p.observe(voidObserver, true);
     test.fail(true);
   }
   catch(e) {
     test.ok(("" + e).indexOf("Cycle detected") !== -1);
+    test.equal(mobservable.stackDepth(), 0);
   }
   try {
-    var a = value(function() { return b() * 2 });
-    var b = value(function() { return a() * 2 });
+    var a = value(function() { return b() * 2; });
+    var b = value(function() { return a() * 2; });
+    debugger;
     b();
     test.fail(true);
   }
   catch(e) {
-    //  console.log(e);
+      console.log(e);
     test.ok(("" + e).indexOf("Cycle detected") !== -1);
+    test.equal(mobservable.stackDepth(), 0);
+
     test.done();
   }
 }
@@ -137,6 +152,7 @@ exports.cycle2 = function(test) {
   var a = value(function() { return z() ? 1 : b() * 2 });
   var b = value(function() { return a() * 2 });
 
+  b.observe(voidObserver);
   test.equals(1, a());
 
   test.equals(2, b());
@@ -144,6 +160,8 @@ exports.cycle2 = function(test) {
     z(false); // introduces a cycle!
     z(true);
     test.fail(true, "No exception thrown, found: " + b());
+    test.equal(mobservable.stackDepth(), 0);
+
     test.done();
   }
   catch(e) {
@@ -169,6 +187,7 @@ exports.testBatchAndReady = function(test) {
     mobservable.onceReady(function() {
         //this is called async, and only after everything has finished, so d should be 54
         test.deepEqual(54, d()); // only one new value for d
+        test.equal(mobservable.stackDepth(), 0);
 
         test.done();
     });
@@ -193,8 +212,11 @@ exports.testScope = function(test) {
   };
 
   var order = new Order();
+  order.total.observe(voidObserver);
   order.price(10).amount(3);
   test.equals(36, order.total());
+  test.equal(mobservable.stackDepth(), 0);
+
   test.done();
 }
 
@@ -212,6 +234,8 @@ exports.testDefineProperty = function(test) {
   order.price = 10;
   order.amount = 3;
   test.equals(36, order.total);
+
+  test.equal(mobservable.stackDepth(), 0);
   test.done();
 }
 
@@ -235,6 +259,8 @@ exports.testWatch = function(test) {
   b(4);
   test.equals(changed, 1);
   test.equals(calcs, 1); // no more calcs!
+
+  test.equal(mobservable.stackDepth(), 0);
   test.done();
 }
 
@@ -259,6 +285,8 @@ exports.testWatchDisposed = function(test) {
   b(4);
   test.equals(changed, 0);
   test.equals(calcs, 1);
+
+  test.equal(mobservable.stackDepth(), 0);
   test.done();
 }
 
@@ -275,6 +303,8 @@ exports.testChangeCountOptimization = function(test) {
         return b();
     });
 
+    c.observe(voidObserver);
+
     test.equals(b(), 4);
     test.equals(c(), 4);
     test.equals(bCalcs, 1);
@@ -287,6 +317,7 @@ exports.testChangeCountOptimization = function(test) {
     test.equals(bCalcs, 2);
     test.equals(cCalcs, 1);
 
+    test.equal(mobservable.stackDepth(), 0);
     test.done();
 }
 
@@ -301,7 +332,9 @@ exports.testObservablesRemoved = function(test) {
       return 3;
     });
 
+
     test.equals(calcs, 0);
+    c.observe(voidObserver);
     test.equals(c(), 4);
     test.equals(calcs, 1);
     a(2);

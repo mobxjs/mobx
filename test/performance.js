@@ -7,7 +7,7 @@ var gc = (function () {
 	try {
 		memwatch = require("memwatch");
 		return function() {
-			//memwatch.gc();
+			memwatch.gc();
 		};
 	}
 	catch (e) {
