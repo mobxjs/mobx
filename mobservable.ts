@@ -611,8 +611,11 @@ class DNode {
 	}
 
 	public notifyObserved() {
-		if (this.state === DNodeState.PENDING)
+		if (this.state === DNodeState.PENDING) {
+			debugger;
+			DNode.trackingStack = [];
 			throw new Error("Cycle detected"); // we are calculating ATM, *and* somebody is looking at us..
+		}
 		var ts = DNode.trackingStack, l = ts.length;
 		if (l) {
 			var cs = ts[l -1], csl = cs.length;
@@ -627,8 +630,10 @@ class DNode {
 	public findCycle(node:DNode) {
 		if (!this.observing)
 			return;
-		if (this.observing.indexOf(node) !== -1)
+		if (this.observing.indexOf(node) !== -1) {
+			DNode.trackingStack = [];
 			throw new Error("Cycle detected"); // argh, we are part of our own dependency tree...
+		}
 		for(var l = this.observing.length, i=0; i<l; i++)
 			this.observing[i].findCycle(node);
 	}
@@ -780,7 +785,10 @@ function quickDiff<T>(current:T[], base:T[]):[T[],T[]] {
 	removed.push.apply(removed, base.slice(baseIndex));
 	return [added, removed];
 }
-(<any>mobservableStatic).quickDiff = quickDiff; // For testing purposes only
+
+// For testing purposes only;
+(<any>mobservableStatic).quickDiff = quickDiff;
+(<any>mobservableStatic).stackDepth = () => DNode.trackingStack.length;
 
 function warn(message) {
 	if (console)
