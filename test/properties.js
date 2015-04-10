@@ -134,12 +134,10 @@ exports.cycle1 = function(test) {
   try {
     var a = value(function() { return b() * 2; });
     var b = value(function() { return a() * 2; });
-    debugger;
     b();
     test.fail(true);
   }
   catch(e) {
-      console.log(e);
     test.ok(("" + e).indexOf("Cycle detected") !== -1);
     test.equal(mobservable.stackDepth(), 0);
 
@@ -349,5 +347,81 @@ exports.testObservablesRemoved = function(test) {
     test.equals(c(), 9);
     test.equals(calcs, 3);
 
+    test.equal(mobservable.stackDepth(), 0);
     test.done();
 }
+
+
+exports.testLazyEvaluation = function (test) {
+    debugger;
+    var bCalcs = 0;
+    var cCalcs = 0;
+    var dCalcs = 0;
+    var observerChanges = 0;
+
+    var a = value(1);
+    var b = value(function() {
+        bCalcs += 1;
+        return a() +1;
+    });
+
+    var c = value(function() {
+        cCalcs += 1;
+        return b() +1;
+    });
+
+    test.equal(c(), 3);
+    test.equal(bCalcs,1);
+    test.equal(cCalcs,1);
+
+    test.equal(c(), 3);
+    test.equal(bCalcs,2);
+    test.equal(cCalcs,2);
+
+    a(2);
+    test.equal(bCalcs,2);
+    test.equal(cCalcs,2);
+
+    test.equal(c(), 4);
+    test.equal(bCalcs,3);
+    test.equal(cCalcs,3);
+
+    var d = value(function() {
+        dCalcs += 1;
+        return b() * 2;
+    });
+
+    var handle = d.observe(function() {
+        observerChanges += 1;
+    }, false);
+    test.equal(bCalcs,4);
+    test.equal(cCalcs,3);
+    test.equal(dCalcs,1); // d is evaluated, so that its dependencies are known
+
+    a(3);
+    test.equal(d(), 8);
+    test.equal(bCalcs,5);
+    test.equal(cCalcs,3);
+    test.equal(dCalcs,2);
+
+    test.equal(c(), 5);
+    test.equal(bCalcs,5);
+    test.equal(cCalcs,4);
+    test.equal(dCalcs,2);
+
+    test.equal(b(), 4);
+    test.equal(bCalcs,5);
+    test.equal(cCalcs,4);
+    test.equal(dCalcs,2);
+
+    handle(); // unlisten
+    test.equal(d(), 8);
+    test.equal(bCalcs,6); // gone to sleep
+    test.equal(cCalcs,4);
+    test.equal(dCalcs,3);
+
+    test.equal(observerChanges, 1);
+
+    test.equal(mobservable.stackDepth(), 0);
+    test.done();
+};
