@@ -1,17 +1,24 @@
 
-* lazy tests
+* ~~lazy tests~~
 * fix warning in test
-* fix lazy cycles
+* ~~fix lazy cycles~~
 * error tests
+* rename defineProperty to defineObservableProperty
+* introduce 1.5 decorator. w00t! https://github.com/Microsoft/TypeScript/wiki/What's-new-in-TypeScript#decorators
+* introduce initializeProperties
 * implement and test observe() methods
 * layout elses, rename properties.js -> observables.js
-* coverage tests
-* process remaining optimizations / todo's
-* remove memwatch, make tests smaller?
-* badges for build, coverage, npm
 * OCD on test files
+* coverage tests
+* process remaining optimizations / todo's, document code
+* remove memwatch, make tests smaller?
+* drop event emitter, to make lib smaller and stand alone? https://github.com/joyent/node/blob/master/lib/events.js
+* array.observe conform
+* test browser compatibility?
+* badges for build, coverage, npm
+* use typescript 1.5 spread operator
 * examples
-* properties
+* describe properties in readme:
 	- atomic updates
 	- multiple atomic updates
 	- automatic depency detection
