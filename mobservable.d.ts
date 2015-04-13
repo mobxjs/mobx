@@ -14,7 +14,8 @@ declare module "mobservable" {
 	export function batch(action:Lambda);
 	export function onReady(listener:Lambda):Lambda;
 	export function onceReady(listener:Lambda);
-	export function defineProperty<T>(object:Object, name:string, initialValue?:T);
+	export function defineObservableProperty<T>(object:Object, name:string, initialValue?:T);
+	export function initializeObservableProperties(object:Object);
 
 	interface IObservableArray<T> extends Array<T> {
 		[n: number]: T;
