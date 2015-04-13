@@ -120,55 +120,6 @@ exports.readme1 = function(test) {
   }
 }
 
-// TODO: detect cycles without observers!
-exports.cycle1 = function(test) {
-  try {
-    var p = value(function() { return p() * 2; }); // thats a cycle!
-    p.observe(voidObserver, true);
-    test.fail(true);
-  }
-  catch(e) {
-    test.ok(("" + e).indexOf("Cycle detected") !== -1);
-    test.equal(mobservable.stackDepth(), 0);
-  }
-  try {
-    var a = value(function() { return b() * 2; });
-    var b = value(function() { return a() * 2; });
-    b();
-    test.fail(true);
-  }
-  catch(e) {
-    test.ok(("" + e).indexOf("Cycle detected") !== -1);
-    test.equal(mobservable.stackDepth(), 0);
-
-    test.done();
-  }
-}
-
-exports.cycle2 = function(test) {
-  var z = value(true);
-  var a = value(function() { return z() ? 1 : b() * 2 });
-  var b = value(function() { return a() * 2 });
-
-  b.observe(voidObserver);
-  test.equals(1, a());
-
-  test.equals(2, b());
-  try {
-    z(false); // introduces a cycle!
-    z(true);
-    test.fail(true, "No exception thrown, found: " + b());
-    test.equal(mobservable.stackDepth(), 0);
-
-    test.done();
-  }
-  catch(e) {
-//    console.log(e);
-    test.ok(("" + e).indexOf("Cycle detected") !== -1);
-    test.done();
-  }
-}
-
 exports.testBatchAndReady = function(test) {
     var a = value(2);
     var b = value(3);
@@ -353,7 +304,6 @@ exports.testObservablesRemoved = function(test) {
 
 
 exports.testLazyEvaluation = function (test) {
-    debugger;
     var bCalcs = 0;
     var cCalcs = 0;
     var dCalcs = 0;

@@ -2,7 +2,8 @@
 * ~~lazy tests~~
 * fix warning in test
 * ~~fix lazy cycles~~
-* error tests
+* ~~error tests~~
+* typescript tets
 * rename defineProperty to defineObservableProperty
 * introduce 1.5 decorator. w00t! https://github.com/Microsoft/TypeScript/wiki/What's-new-in-TypeScript#decorators
 * introduce initializeProperties
@@ -25,6 +26,7 @@
 	- minimized amount of computations
 	- lazy computations
 	- synchronous updates (TODO: what about event emitters?)
+	- how errors and cycles in computations are dealt with
 * optimizations
 	- count stale dependencies
 	- collapse stale / ready notifications whenever possible

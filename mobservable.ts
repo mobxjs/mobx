@@ -124,6 +124,8 @@ class ObservableValue<T,S> {
 			this._value = value;
 			this.dependencyState.markReady(true);
 			this.events.emit('change', value, oldValue);
+			// TODO: error checking improvement: check whether we caused no error in one of the observers
+			// if so, throw that exception
 		}
 
 		return this.scope;
@@ -135,7 +137,8 @@ class ObservableValue<T,S> {
 	}
 
 	observe(listener:(newValue:T, oldValue:T)=>void, fireImmediately=false):Lambda {
-		this.dependencyState.setRefCount(+1);
+		this.dependencyState.setRefCount(+1); // awake
+		// TODO: get is not needed here, the setrefcount already awakes the node
 		var current = this.get(); // make sure the values are initialized
 		if (fireImmediately)
 			listener(current, undefined);
@@ -154,6 +157,8 @@ class ObservableValue<T,S> {
 
 class ComputedObservable<U,S> extends ObservableValue<U,S> {
 	private isComputing = false;
+	private hasError = false;
+
 	constructor(protected func:()=>U, scope:S) {
 		super(undefined, scope);
 		if (!func)
@@ -163,6 +168,9 @@ class ComputedObservable<U,S> extends ObservableValue<U,S> {
 	}
 
 	get():U {
+		if (this.isComputing)
+			throw new Error("Cycle detected"); // we are calculating ATM, *and* somebody is looking at us..
+
 		// the first evaluation of a computed function is lazy, to save lots of calculations when its dependencies are initialized
 		// (and it is cheaper anyways)
 		// tricky optimization, directly call compute() if this observable is not being observed at all, note
@@ -170,10 +178,16 @@ class ComputedObservable<U,S> extends ObservableValue<U,S> {
 		if (DNode.trackingStack.length) {
 			this.dependencyState.wakeUp(); //-> wakeup triggers a compute
 			this.dependencyState.notifyObserved();
-		}
-		else if (this.dependencyState.isSleeping)
+		} else if (this.dependencyState.isSleeping) {
 			this.compute(); // <- doesn't detect cycles!
-		//else: we are already up to date, somebody is just inspecting our current value
+		} else {
+			// we are already up to date, somebody is just inspecting our current value
+		}
+
+		if (this.dependencyState.hasCycle)
+			throw new Error("Cycle detected");
+		if (this.hasError)
+			throw this._value; // TODO: log that this is a rethrow
 		return this._value;
 	}
 
@@ -182,10 +196,25 @@ class ComputedObservable<U,S> extends ObservableValue<U,S> {
 	}
 
 	compute() {
-		if (this.isComputing)
-			throw new Error("Cycle detected");
-		this.isComputing = true;
-		var newValue = this.func.call(this.scope);
+		var newValue;
+		try {
+			// this cycle detection mechanism is primarily for lazy computed values, where the
+			// dependency tree is not tracked with DNodes
+			if (this.isComputing)
+				throw new Error("Cycle detected");
+			this.isComputing = true;
+			var newValue = this.func.call(this.scope);
+			this.hasError = false;
+		} catch (e) {
+			this.hasError = true;
+			console && console.error("Caught error during computation: ", e);
+			if (e instanceof Error)
+				newValue = e;
+			else {
+				newValue = new Error("ComputationError");
+				(<any>newValue).cause = e;
+			}
+		}
 		this.isComputing = false;
 		var changed = newValue !== this._value;
 		if (changed) {
@@ -222,6 +251,7 @@ class ObservableArray<T> implements Array<T> {
 				return this._values.length;
 			},
 			set: function(newLength:number) {
+				// TODO: type & range check
 				var currentLength = this._values.length;
 				if (newLength === currentLength)
 					return;
@@ -428,6 +458,7 @@ enum DNodeState {
 class DNode {
 	state: DNodeState = DNodeState.READY;
 	isSleeping = true;
+	hasCycle = false;
 
 	private observing: DNode[] = [];
 	private prevObserving: DNode[] = null;
@@ -448,6 +479,7 @@ class DNode {
 			this.tryToSleep();
 	}
 
+	// TODO: remove?
 	getObserversCount() {
 		return this.observers.length;
 	}
@@ -574,6 +606,7 @@ class DNode {
 		}
 	}
 
+	// TODO: rename to computeNextState
 	computeNextValue() {
 		// possible optimization: compute is only needed if there are subscribers or observers (that have subscribers)
 		// otherwise, computation and further (recursive markStale / markReady) could be delayed
@@ -583,6 +616,7 @@ class DNode {
 		this.markReady(valueDidChange);
 	}
 
+	// TODO: rename to onDependenciesStable
 	compute():boolean {
 		return false; // false == unchanged
 	}
@@ -606,24 +640,25 @@ class DNode {
 		var changes = quickDiff(this.observing, this.prevObserving);
 		var added = changes[0];
 		var removed = changes[1];
+		this.prevObserving = null;
 
 		for(var i = 0, l = removed.length; i < l; i++)
 			removed[i].removeObserver(this);
 
+		this.hasCycle = false;
 		for(var i = 0, l = added.length; i < l; i++) {
-			added[i].addObserver(this);
-			added[i].findCycle(this);
+			if (added[i].findCycle(this)) {
+				this.hasCycle = true;
+				this.observing.splice(this.observing.indexOf(added[i]), 1); // don't observe anything that caused a cycle!
+				// TODO:somehow, we would like to signal 'added[i]' that it is part of a cycle as well?
+			}
+			else
+				added[i].addObserver(this);
 		}
 
-		this.prevObserving = null;
 	}
 
 	public notifyObserved() {
-		if (this.state === DNodeState.PENDING) {
-			debugger;
-			DNode.trackingStack = [];
-			throw new Error("Cycle detected"); // we are calculating ATM, *and* somebody is looking at us..
-		}
 		var ts = DNode.trackingStack, l = ts.length;
 		if (l) {
 			var cs = ts[l -1], csl = cs.length;
@@ -635,15 +670,13 @@ class DNode {
 		}
 	}
 
-	public findCycle(node:DNode) {
-		if (!this.observing)
-			return;
-		if (this.observing.indexOf(node) !== -1) {
-			DNode.trackingStack = [];
-			throw new Error("Cycle detected"); // argh, we are part of our own dependency tree...
-		}
+	private findCycle(node:DNode) {
+		if (this.observing.indexOf(node) !== -1)
+			return true;
 		for(var l = this.observing.length, i=0; i<l; i++)
-			this.observing[i].findCycle(node);
+			if (this.observing[i].findCycle(node))
+				return true;
+		return false;
 	}
 
 	public dispose() {
