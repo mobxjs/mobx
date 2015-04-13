@@ -27,7 +27,8 @@ interface MobservableStatic {
 	batch(action:Lambda);
 	onReady(listener:Lambda):Lambda;
 	onceReady(listener:Lambda);
-	defineProperty<T>(object:Object, name:string, initialValue?:T);
+	defineObservableProperty<T>(object:Object, name:string, initialValue?:T);
+	initializeObservableProperties(object:Object);
 }
 
 function observableValue<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S> {
@@ -94,20 +95,31 @@ mobservableStatic.onceReady = function onceReady(listener:Lambda) {
 	Scheduler.onceReady(listener);
 }
 
-mobservableStatic.defineProperty = function defineProperty<T>(object:Object, name:string, initialValue?:T) {
+mobservableStatic.defineObservableProperty = function defineObservableProperty<T>(object:Object, name:string, initialValue?:T) {
 	var _property = mobservableStatic.value(initialValue, object);
+	definePropertyForObservable(object, name, _property);
+}
+
+mobservableStatic.initializeObservableProperties = function initializeObservableProperties(object:Object) {
+	for(var key in object) if (object.hasOwnProperty(key)) {
+		if (object[key] && object[key].prop && object[key].prop instanceof ObservableValue)
+			definePropertyForObservable(object, key, <IObservableValue<any,any>> object[key])
+	}
+}
+
+function definePropertyForObservable(object:Object, name:string, observable:IObservableValue<any,any>) {
+	// TODO: set is not needed if observable is computed
 	Object.defineProperty(object, name, {
 		get: function() {
-			return _property();
+			return observable();
 		},
 		set: function(value) {
-			_property(value);
+			observable(value);
 		},
 		enumerable: true,
 		configurable: true
 	});
 }
-
 class ObservableValue<T,S> {
 	protected events = new events.EventEmitter();
 	protected dependencyState:DNode = new DNode();

@@ -83,7 +83,13 @@ var numbers = mobservable.array([1,2,3]);
 numbers.replace([1,2,3]);
 ```
 
-## mobservable.defineProperty(object, name, value)
+## mobservable.Observable annotation
+
+**Note: ES5, TypeScript 1.5+ environments only**
+
+TODO
+
+## mobservable.defineObservableProperty(object, name, value)
 
 **Note: ES5 environments only**
 
@@ -93,9 +99,9 @@ Defines a property using ES5 getters and setters. This is useful in constructor 
 var vat = mobservable.value(0.2);
 
 var Order = function() {
-	mobservable.defineProperty(this, 'price', 20);
-	mobservable.defineProperty(this, 'amount', 2);
-	mobservable.defineProperty(this, 'total', function() {
+	mobservable.defineObservableProperty(this, 'price', 20);
+	mobservable.defineObservableProperty(this, 'amount', 2);
+	mobservable.defineObservableProperty(this, 'total', function() {
 		return (1+vat()) * this.price * this.amount; // price and amount are now properties!
 	});
 };
@@ -106,7 +112,7 @@ order.amount = 3;
 // order.total now equals 36
 ```
 
-In typescript, it might be more convenient for the typesystem to directly define getters and setters instead of using `mobservable.defineProperty`:
+In typescript < 1.5, it might be more convenient for the typesystem to directly define getters and setters instead of using `mobservable.defineProperty` (or, use `mobservable.initializeObservableProperties`):
 
 ```typescript
 class Order {
@@ -116,6 +122,38 @@ class Order {
 	}
 	set price(value) {
 		this._price(value);
+	}
+}
+```
+
+## mobservable.initializeObservableProperties(object)
+
+**Note: ES5 environments only**
+
+Converts all observables of the given object into property accessors. For example:
+
+```javascript
+var Order = function() {
+    this.price = value(20);
+    this.amount = value(2);
+    this.nonsense = 3;
+    this.total = value(function() {
+      return (1+vat()) * this.price * this.amount; // price and amount are now properties!
+    }, this);
+    mobservable.initializeObservableProperties(this);
+};
+
+var order = new Order();
+console.log(order.total); // prints 36
+```
+
+Or in typescript pre 1.5, where annotations are not yet supported:
+
+```typescript
+class Order {
+	price:number = <number><any>new mobservable.value(20, this);
+	constructor() {
+		mobservable.initializeObservableProperties(this);
 	}
 }
 ```

@@ -4,9 +4,9 @@
 * ~~fix lazy cycles~~
 * ~~error tests~~
 * typescript tets
-* rename defineProperty to defineObservableProperty
+* ~~rename defineProperty to defineObservableProperty~~
 * introduce 1.5 decorator. w00t! https://github.com/Microsoft/TypeScript/wiki/What's-new-in-TypeScript#decorators
-* introduce initializeProperties
+* ~~introduce initializeProperties~~
 * implement and test observe() methods
 * layout elses, rename properties.js -> observables.js
 * OCD on test files

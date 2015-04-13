@@ -169,12 +169,12 @@ exports.testScope = function(test) {
   test.done();
 }
 
-exports.testDefineProperty = function(test) {
+exports.testdefineObservableProperty = function(test) {
   var vat = value(0.2);
   var Order = function() {
-    mobservable.defineProperty(this, 'price', 20);
-    mobservable.defineProperty(this, 'amount', 2);
-    mobservable.defineProperty(this, 'total', function() {
+    mobservable.defineObservableProperty(this, 'price', 20);
+    mobservable.defineObservableProperty(this, 'amount', 2);
+    mobservable.defineObservableProperty(this, 'total', function() {
       return (1+vat()) * this.price * this.amount; // price and amount are now properties!
     });
   };
@@ -186,7 +186,29 @@ exports.testDefineProperty = function(test) {
 
   test.equal(mobservable.stackDepth(), 0);
   test.done();
-}
+};
+
+exports.testInitializeObservableProperties = function(test) {
+  var vat = value(0.2);
+  var Order = function() {
+    this.price = value(20);
+    this.amount = value(2);
+    this.nonsense = 3;
+    this.total = value(function() {
+      return (1+vat()) * this.price * this.amount; // price and amount are now properties!
+    }, this);
+    mobservable.initializeObservableProperties(this);
+  };
+
+  var order = new Order();
+  order.price = 10;
+  order.amount = 3;
+  test.equals(36, order.total);
+  test.equals(3, order.nonsense);
+
+  test.equal(mobservable.stackDepth(), 0);
+  test.done();
+};
 
 exports.testWatch = function(test) {
   var a = value(3);
