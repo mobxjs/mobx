@@ -1,6 +1,6 @@
 
 * ~~lazy tests~~
-* fix warning in test
+* ~~fix warning in test~~
 * ~~fix lazy cycles~~
 * ~~error tests~~
 * typescript tets

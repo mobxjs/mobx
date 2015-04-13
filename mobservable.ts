@@ -62,7 +62,7 @@ var mobservableStatic:MobservableStatic = <MobservableStatic> function<T,S>(valu
 mobservableStatic.value = observableValue;
 
 mobservableStatic.watch = function watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
-	var dnode = new DNode();
+	var dnode = new DNode(true);
 	var retVal:T;
 	dnode.compute = function() {
 		retVal = func();
@@ -122,7 +122,7 @@ function definePropertyForObservable(object:Object, name:string, observable:IObs
 }
 class ObservableValue<T,S> {
 	protected events = new events.EventEmitter();
-	protected dependencyState:DNode = new DNode();
+	protected dependencyState:DNode = new DNode(false);
 
 	constructor(protected _value?:T, protected scope?:S){
 
@@ -176,6 +176,7 @@ class ComputedObservable<U,S> extends ObservableValue<U,S> {
 		if (!func)
 			throw new Error("ComputedObservable requires a function");
 
+        this.dependencyState.isComputed = true;
 		this.dependencyState.compute = this.compute.bind(this);
 	}
 
@@ -277,7 +278,7 @@ class ObservableArray<T> implements Array<T> {
 					this.splice(newLength, currentLength - newLength);
 			}
 		});
-		Object.defineProperty(this, "dependencyState", { enumerable: false, value: new DNode() });
+		Object.defineProperty(this, "dependencyState", { enumerable: false, value: new DNode(false) });
 		Object.defineProperty(this, "_values", { enumerable: false, value: [] });
 		Object.defineProperty(this, "events", { enumerable: false, value: new events.EventEmitter() });
 
@@ -479,6 +480,9 @@ class DNode {
 	private isDisposed = false;
 	private externalRefenceCount = 0;
 
+    constructor(public isComputed:boolean) {
+    }
+
 	getRefCount():number {
 		return this.observers.length + this.externalRefenceCount;
 	}
@@ -567,7 +571,7 @@ class DNode {
 	}
 
 	tryToSleep() {
-		if (this.getRefCount() === 0 && !this.isSleeping) {
+		if (this.isComputed && this.getRefCount() === 0 && !this.isSleeping) {
 			for (var i = 0, l = this.observing.length; i < l; i++)
 				this.observing[i].removeObserver(this);
 			this.observing = [];
@@ -576,11 +580,11 @@ class DNode {
 	}
 
 	wakeUp() {
-		if (this.isSleeping) {
-			this.isSleeping = false;
-			this.state = DNodeState.PENDING;
-			this.computeNextValue();
-		}
+		if (this.isSleeping && this.isComputed) {
+            this.isSleeping = false;
+            this.state = DNodeState.PENDING;
+            this.computeNextValue();
+        }
 	}
 
 	notifyStateChange(observable:DNode, didTheValueActuallyChange:boolean) {
@@ -646,7 +650,7 @@ class DNode {
 	private bindDependencies() {
 		this.observing = DNode.trackingStack.pop();
 
-		if (this.observing.length === 0 && !this.isDisposed)
+		if (this.isComputed && this.observing.length === 0 && !this.isDisposed)
 			warn("You have created a function that doesn't observe any values, did you forget to make its dependencies observable?");
 
 		var changes = quickDiff(this.observing, this.prevObserving);
@@ -659,7 +663,7 @@ class DNode {
 
 		this.hasCycle = false;
 		for(var i = 0, l = added.length; i < l; i++) {
-			if (added[i].findCycle(this)) {
+			if (this.isComputed && added[i].findCycle(this)) {
 				this.hasCycle = true;
 				this.observing.splice(this.observing.indexOf(added[i]), 1); // don't observe anything that caused a cycle!
 				// TODO:somehow, we would like to signal 'added[i]' that it is part of a cycle as well?
