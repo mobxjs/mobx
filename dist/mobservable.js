@@ -59,19 +59,29 @@ mobservableStatic.onReady = function onReady(listener) {
 mobservableStatic.onceReady = function onceReady(listener) {
     Scheduler.onceReady(listener);
 };
-mobservableStatic.defineProperty = function defineProperty(object, name, initialValue) {
+mobservableStatic.defineObservableProperty = function defineObservableProperty(object, name, initialValue) {
     var _property = mobservableStatic.value(initialValue, object);
+    definePropertyForObservable(object, name, _property);
+};
+mobservableStatic.initializeObservableProperties = function initializeObservableProperties(object) {
+    for (var key in object)
+        if (object.hasOwnProperty(key)) {
+            if (object[key] && object[key].prop && object[key].prop instanceof ObservableValue)
+                definePropertyForObservable(object, key, object[key]);
+        }
+};
+function definePropertyForObservable(object, name, observable) {
     Object.defineProperty(object, name, {
         get: function () {
-            return _property();
+            return observable();
         },
         set: function (value) {
-            _property(value);
+            observable(value);
         },
         enumerable: true,
         configurable: true
     });
-};
+}
 var ObservableValue = (function () {
     function ObservableValue(_value, scope) {
         this._value = _value;
@@ -96,11 +106,13 @@ var ObservableValue = (function () {
     ObservableValue.prototype.observe = function (listener, fireImmediately) {
         var _this = this;
         if (fireImmediately === void 0) { fireImmediately = false; }
+        this.dependencyState.setRefCount(+1);
         var current = this.get();
         if (fireImmediately)
             listener(current, undefined);
         this.events.addListener('change', listener);
         return function () {
+            _this.dependencyState.setRefCount(-1);
             _this.events.removeListener('change', listener);
         };
     };
@@ -114,24 +126,53 @@ var ComputedObservable = (function (_super) {
     function ComputedObservable(func, scope) {
         _super.call(this, undefined, scope);
         this.func = func;
-        this.initialized = false;
+        this.isComputing = false;
+        this.hasError = false;
         if (!func)
             throw new Error("ComputedObservable requires a function");
         this.dependencyState.compute = this.compute.bind(this);
     }
     ComputedObservable.prototype.get = function () {
-        if (!this.initialized) {
-            this.initialized = true;
-            this.dependencyState.computeNextValue();
+        if (this.isComputing)
+            throw new Error("Cycle detected");
+        if (DNode.trackingStack.length) {
+            this.dependencyState.wakeUp();
+            this.dependencyState.notifyObserved();
         }
-        return _super.prototype.get.call(this);
+        else if (this.dependencyState.isSleeping) {
+            this.compute();
+        }
+        else {
+        }
+        if (this.dependencyState.hasCycle)
+            throw new Error("Cycle detected");
+        if (this.hasError)
+            throw this._value;
+        return this._value;
     };
     ComputedObservable.prototype.set = function (_) {
         throw new Error("ComputedObservable cannot retrieve a new value!");
     };
     ComputedObservable.prototype.compute = function () {
-        var newValue = this.func.call(this.scope);
-        this.initialized = true;
+        var newValue;
+        try {
+            if (this.isComputing)
+                throw new Error("Cycle detected");
+            this.isComputing = true;
+            var newValue = this.func.call(this.scope);
+            this.hasError = false;
+        }
+        catch (e) {
+            this.hasError = true;
+            console && console.error("Caught error during computation: ", e);
+            if (e instanceof Error)
+                newValue = e;
+            else {
+                newValue = new Error("ComputationError");
+                newValue.cause = e;
+            }
+        }
+        this.isComputing = false;
         var changed = newValue !== this._value;
         if (changed) {
             var oldValue = this._value;
@@ -359,12 +400,25 @@ var DNodeState;
 var DNode = (function () {
     function DNode() {
         this.state = 2 /* READY */;
+        this.isSleeping = true;
+        this.hasCycle = false;
         this.observing = [];
         this.prevObserving = null;
         this.observers = [];
         this.dependencyChangeCount = 0;
         this.isDisposed = false;
+        this.externalRefenceCount = 0;
     }
+    DNode.prototype.getRefCount = function () {
+        return this.observers.length + this.externalRefenceCount;
+    };
+    DNode.prototype.setRefCount = function (delta) {
+        this.externalRefenceCount += delta;
+        if (delta > 0 && this.externalRefenceCount === delta)
+            this.wakeUp();
+        else if (this.externalRefenceCount === 0)
+            this.tryToSleep();
+    };
     DNode.prototype.getObserversCount = function () {
         return this.observers.length;
     };
@@ -373,8 +427,10 @@ var DNode = (function () {
     };
     DNode.prototype.removeObserver = function (node) {
         var idx = this.observers.indexOf(node);
-        if (idx !== -1)
+        if (idx !== -1) {
             this.observers.splice(idx, 1);
+            this.tryToSleep();
+        }
     };
     DNode.prototype.hasObservingChanged = function () {
         if (this.observing.length !== this.prevObserving.length)
@@ -412,6 +468,21 @@ var DNode = (function () {
             if (obs[i].state !== 2 /* READY */)
                 return false;
         return true;
+    };
+    DNode.prototype.tryToSleep = function () {
+        if (this.getRefCount() === 0 && !this.isSleeping) {
+            for (var i = 0, l = this.observing.length; i < l; i++)
+                this.observing[i].removeObserver(this);
+            this.observing = [];
+            this.isSleeping = true;
+        }
+    };
+    DNode.prototype.wakeUp = function () {
+        if (this.isSleeping) {
+            this.isSleeping = false;
+            this.state = 1 /* PENDING */;
+            this.computeNextValue();
+        }
     };
     DNode.prototype.notifyStateChange = function (observable, didTheValueActuallyChange) {
         var _this = this;
@@ -458,17 +529,20 @@ var DNode = (function () {
         var changes = quickDiff(this.observing, this.prevObserving);
         var added = changes[0];
         var removed = changes[1];
+        this.prevObserving = null;
         for (var i = 0, l = removed.length; i < l; i++)
             removed[i].removeObserver(this);
+        this.hasCycle = false;
         for (var i = 0, l = added.length; i < l; i++) {
-            added[i].addObserver(this);
-            added[i].findCycle(this);
+            if (added[i].findCycle(this)) {
+                this.hasCycle = true;
+                this.observing.splice(this.observing.indexOf(added[i]), 1);
+            }
+            else
+                added[i].addObserver(this);
         }
-        this.prevObserving = null;
     };
     DNode.prototype.notifyObserved = function () {
-        if (this.state === 1 /* PENDING */)
-            throw new Error("Cycle detected");
         var ts = DNode.trackingStack, l = ts.length;
         if (l) {
             var cs = ts[l - 1], csl = cs.length;
@@ -477,12 +551,12 @@ var DNode = (function () {
         }
     };
     DNode.prototype.findCycle = function (node) {
-        if (!this.observing)
-            return;
         if (this.observing.indexOf(node) !== -1)
-            throw new Error("Cycle detected");
+            return true;
         for (var l = this.observing.length, i = 0; i < l; i++)
-            this.observing[i].findCycle(node);
+            if (this.observing[i].findCycle(node))
+                return true;
+        return false;
     };
     DNode.prototype.dispose = function () {
         for (var l = this.observing.length, i = 0; i < l; i++)
@@ -600,6 +674,7 @@ function quickDiff(current, base) {
     return [added, removed];
 }
 mobservableStatic.quickDiff = quickDiff;
+mobservableStatic.stackDepth = function () { return DNode.trackingStack.length; };
 function warn(message) {
     if (console)
         console.warn("[WARNING:mobservable] " + message);
