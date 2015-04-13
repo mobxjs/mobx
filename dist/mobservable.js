@@ -31,7 +31,7 @@ var mobservableStatic = function (value, scope) {
 };
 mobservableStatic.value = observableValue;
 mobservableStatic.watch = function watch(func, onInvalidate) {
-    var dnode = new DNode();
+    var dnode = new DNode(true);
     var retVal;
     dnode.compute = function () {
         retVal = func();
@@ -87,7 +87,7 @@ var ObservableValue = (function () {
         this._value = _value;
         this.scope = scope;
         this.events = new events.EventEmitter();
-        this.dependencyState = new DNode();
+        this.dependencyState = new DNode(false);
     }
     ObservableValue.prototype.set = function (value) {
         if (value !== this._value) {
@@ -130,6 +130,7 @@ var ComputedObservable = (function (_super) {
         this.hasError = false;
         if (!func)
             throw new Error("ComputedObservable requires a function");
+        this.dependencyState.isComputed = true;
         this.dependencyState.compute = this.compute.bind(this);
     }
     ComputedObservable.prototype.get = function () {
@@ -204,7 +205,7 @@ var ObservableArray = (function () {
                     this.splice(newLength, currentLength - newLength);
             }
         });
-        Object.defineProperty(this, "dependencyState", { enumerable: false, value: new DNode() });
+        Object.defineProperty(this, "dependencyState", { enumerable: false, value: new DNode(false) });
         Object.defineProperty(this, "_values", { enumerable: false, value: [] });
         Object.defineProperty(this, "events", { enumerable: false, value: new events.EventEmitter() });
         if (initialValues && initialValues.length)
@@ -398,7 +399,8 @@ var DNodeState;
 })(DNodeState || (DNodeState = {}));
 ;
 var DNode = (function () {
-    function DNode() {
+    function DNode(isComputed) {
+        this.isComputed = isComputed;
         this.state = 2 /* READY */;
         this.isSleeping = true;
         this.hasCycle = false;
@@ -470,7 +472,7 @@ var DNode = (function () {
         return true;
     };
     DNode.prototype.tryToSleep = function () {
-        if (this.getRefCount() === 0 && !this.isSleeping) {
+        if (this.isComputed && this.getRefCount() === 0 && !this.isSleeping) {
             for (var i = 0, l = this.observing.length; i < l; i++)
                 this.observing[i].removeObserver(this);
             this.observing = [];
@@ -478,7 +480,7 @@ var DNode = (function () {
         }
     };
     DNode.prototype.wakeUp = function () {
-        if (this.isSleeping) {
+        if (this.isSleeping && this.isComputed) {
             this.isSleeping = false;
             this.state = 1 /* PENDING */;
             this.computeNextValue();
@@ -524,7 +526,7 @@ var DNode = (function () {
     };
     DNode.prototype.bindDependencies = function () {
         this.observing = DNode.trackingStack.pop();
-        if (this.observing.length === 0 && !this.isDisposed)
+        if (this.isComputed && this.observing.length === 0 && !this.isDisposed)
             warn("You have created a function that doesn't observe any values, did you forget to make its dependencies observable?");
         var changes = quickDiff(this.observing, this.prevObserving);
         var added = changes[0];
@@ -534,7 +536,7 @@ var DNode = (function () {
             removed[i].removeObserver(this);
         this.hasCycle = false;
         for (var i = 0, l = added.length; i < l; i++) {
-            if (added[i].findCycle(this)) {
+            if (this.isComputed && added[i].findCycle(this)) {
                 this.hasCycle = true;
                 this.observing.splice(this.observing.indexOf(added[i]), 1);
             }
