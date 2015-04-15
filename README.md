@@ -173,6 +173,19 @@ class Order {
 }
 ```
 
+## mobservable.observeProperty
+`function observeProperty(object:Object, key:string, listener:Function):Lambda`
+
+Observes the observable property `key` of `object`. This is useful if you want to observe properties created using the `observable` annotation or the `defineObservableProperty` method, since for those properties their own `observe` method is not publicly available.
+
+```typescript
+class Order {
+	@observable total = () => this.price * this.amount;
+}
+var order = new Order();
+
+mobservable.observeProperty(order, 'total', (newPrice) => console.log("New price: " + newPrice));
+
 ## mobservable.watch(func, onInvalidate)
 
 `watch` invokes `func` and returns a tuple consisting of the return value of `func` and an unsubscriber. `watch` will track which observables `func` was observing, but it will *not* recalculate `func` if necessary, instead, it will fire the `onInvalidate` callback to notify that the output of `func` can no longer be trusted.

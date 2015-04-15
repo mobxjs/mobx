@@ -8,9 +8,10 @@ declare module "mobservable" {
 		observe(callback: (newValue: T, oldValue: T) => void, fireImmediately:boolean): Lambda;
 	}
 
+	export function array<T>(values?:T[]): IObservableArray<T>;
 	export function value<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S>;
 	export function watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda];
-	export function array<T>(values?:T[]): IObservableArray<T>;
+    export function observeProperty(object:Object, key:string, listener:Function):Lambda;
 
 	// annotation
     export function observable(target:Object, key:string);

@@ -21,11 +21,13 @@ interface IObservableValue<T,S> {
 interface MobservableStatic {
 	<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S>;
 
+	array<T>(values?:T[]): ObservableArray<T>;
 	value<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S>;
 	watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda];
-	array<T>(values?:T[]): ObservableArray<T>;
+    observeProperty(object:Object, key:string, listener:Function):Lambda;
 
-    observable(target:Object, key:string);
+
+    observable(target:Object, key:string); // annotation
 
 	batch(action:Lambda);
 	onReady(listener:Lambda):Lambda;
@@ -80,6 +82,32 @@ mobservableStatic.watch = function watch<T>(func:()=>T, onInvalidate:Lambda):[T,
 	}
 	dnode.computeNextValue();
 	return [retVal, () => dnode.dispose()];
+}
+
+mobservableStatic.observeProperty = function observeProperty(object:Object, key:string, listener:(...args:any[])=>void):Lambda {
+    if (!object || !key || object[key] === undefined)
+        throw new Error(`Object '${object}' has no key '${key}'.`);
+    if (!listener || typeof listener !== "function")
+        throw new Error("Third argument to mobservable.observeProperty should be a function");
+
+    var currentValue = object[key];
+    // ObservableValue, ComputedObservable or ObservableArray?
+    if (currentValue instanceof ObservableValue || currentValue instanceof ObservableArray)
+        return currentValue.observe(listener, true);
+    // IObservable?
+    else if (currentValue.prop && currentValue.prop instanceof ObservableValue)
+        return currentValue.prop.observe(listener, true);
+
+    var observer = new ComputedObservable(() => object[key], object);
+    var disposer = observer.observe(listener, true);
+
+    if (!(<any>(<any>observer).dependencyState).observing.length)
+        warn(`mobservable.observeProperty: property '${key}' of '${object} doesn't seem to be observable. Did you define it as observable?`);
+
+    return () => {
+        disposer();
+        (<any>observer).dependencyState.dispose(); // clean up
+    };
 }
 
 mobservableStatic.array = function array<T>(values?:T[]): ObservableArray<T> {
@@ -462,7 +490,7 @@ class ObservableArray<T> implements Array<T> {
     	return this._values.length;
     }
     pop(): T {
-    	return this.splice(this._values.length, 1)[0];
+    	return this.splice(this._values.length - 1, 1)[0];
     }
     shift(): T {
     	return this.splice(0, 1)[0]

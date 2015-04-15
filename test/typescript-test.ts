@@ -23,9 +23,7 @@ export function testAnnotations(test) {
 	var order1 = new Order();
 	var order2 = new Order();
 
-	mobservable
-		.value(() => order1.total)
-		.observe(value => order1totals.push(value), true);
+	var disposer = mobservable.observeProperty(order1, 'total', value => order1totals.push(value));
 
 	order2.price = 4;
 	order1.amount = 1;
@@ -38,5 +36,11 @@ export function testAnnotations(test) {
 
 	order1.orders.splice(0,0,'boe', 'hoi');
 	test.deepEqual(order1totals, [6,3,9]);
+
+    disposer();
+    order1.orders.pop();
+    test.equal(order1.total, 6);
+	test.deepEqual(order1totals, [6,3,9]);
+
 	test.done();
 };
