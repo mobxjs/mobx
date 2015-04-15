@@ -5,12 +5,16 @@ declare module "mobservable" {
 	interface IObservableValue<T, S> {
 		(): T;
 		(value: T): S;
-		subscribe(callback: (newValue: T, oldValue: T) => void): Lambda;
+		observe(callback: (newValue: T, oldValue: T) => void, fireImmediately:boolean): Lambda;
 	}
 
 	export function value<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S>;
 	export function watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda];
 	export function array<T>(values?:T[]): IObservableArray<T>;
+
+	// annotation
+    export function observable(target:Object, key:string);
+
 	export function batch(action:Lambda);
 	export function onReady(listener:Lambda):Lambda;
 	export function onceReady(listener:Lambda);
@@ -22,7 +26,7 @@ declare module "mobservable" {
 		length: number;
 
 		spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[];
-		observe(listener:()=>void, fireImmediately:boolean):Lambda;
+		observe(listener:()=>void, fireImmediately?:boolean):Lambda;
 		clear(): T[];
 		replace(newItems:T[]);
 		values(): T[];

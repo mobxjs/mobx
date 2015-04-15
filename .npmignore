@@ -7,3 +7,4 @@ publish.js
 /mobservable.js
 .tscache
 *.js.map
+/test/typescript-test.js*

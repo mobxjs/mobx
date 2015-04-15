@@ -3,9 +3,9 @@
 * ~~fix warning in test~~
 * ~~fix lazy cycles~~
 * ~~error tests~~
-* typescript tets
+* ~~typescript tests~~
 * ~~rename defineProperty to defineObservableProperty~~
-* introduce 1.5 decorator. w00t! https://github.com/Microsoft/TypeScript/wiki/What's-new-in-TypeScript#decorators
+* ~~introduce 1.5 decorator. w00t! https://github.com/Microsoft/TypeScript/wiki/What's-new-in-TypeScript#decorators~~
 * ~~introduce initializeProperties~~
 * implement and test observe() methods
 * layout elses, rename properties.js -> observables.js
@@ -30,4 +30,4 @@
 * optimizations
 	- count stale dependencies
 	- collapse stale / ready notifications whenever possible
-	- heuristic to make computables non-lazy if used frequently
+	- heuristic to make computables non-lazy if used frequently (something like, in computable, if (this.lazyReads > this.computesWithoutObservers) then never-go-to-sleep)

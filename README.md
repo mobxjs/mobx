@@ -87,7 +87,22 @@ numbers.replace([1,2,3]);
 
 **Note: ES5, TypeScript 1.5+ environments only**
 
-TODO
+Marks a property or method as observable. This annotations basically wraps `mobservable.defineObservableProperty`. If the annotations is used in combination with an array property, an observable array will be created.
+
+```typescript
+var observable = require('mobservable').observable;
+
+class Order {
+	@observable price:number = 3;
+	@observable amount:number = 2;
+	@observable orders = [];
+
+	@observable total() {
+		return this.amount * this.price * (1 + orders.length);
+	}
+
+}
+```
 
 ## mobservable.defineObservableProperty(object, name, value)
 

@@ -4,3 +4,4 @@ npm-debug.log
 coverage/
 .tscache
 *.js.map
+/test/typescript-test.js*

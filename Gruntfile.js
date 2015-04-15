@@ -12,9 +12,15 @@ module.exports = function(grunt) {
 			},
 			buildlocal : {
 				src: ["mobservable.ts"]
+			},
+			buildtypescripttest: {
+				options: {
+     				compiler: './node_modules/typescript/bin/tsc'
+    			},
+				src: ["test/typescript-test.ts"]
 			}
 		},
-		 nodeunit: {
+		nodeunit: {
 		 	options: {
 		 		reporter: 'default'
 		 	},
@@ -25,13 +31,13 @@ module.exports = function(grunt) {
 
 	grunt.loadNpmTasks("grunt-ts");
 	grunt.loadNpmTasks('grunt-contrib-nodeunit');
-	
+
 	grunt.registerTask("publish", "Publish to npm", function() {
 		require("./publish.js");
 	});
 	grunt.registerTask("default", ["ts:buildlocal"]);
 	grunt.registerTask("build", ["ts:builddist"]);
-	grunt.registerTask("test", ["ts:buildlocal", "nodeunit:all"]);
+	grunt.registerTask("test", ["ts:buildlocal","ts:buildtypescripttest", "nodeunit:all"]);
 	grunt.registerTask("perf", ["ts:buildlocal", "nodeunit:perf"]);
 
-}
+};

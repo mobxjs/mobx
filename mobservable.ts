@@ -15,7 +15,7 @@ interface Lambda {
 interface IObservableValue<T,S> {
 	():T;
 	(value:T):S;
-	observe(callback:(newValue:T, oldValue:T)=>void):Lambda;
+	observe(callback:(newValue:T, oldValue:T)=>void, fireImmediately?:boolean):Lambda;
 }
 
 interface MobservableStatic {
@@ -24,6 +24,9 @@ interface MobservableStatic {
 	value<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S>;
 	watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda];
 	array<T>(values?:T[]): ObservableArray<T>;
+
+    observable(target:Object, key:string);
+
 	batch(action:Lambda);
 	onReady(listener:Lambda):Lambda;
 	onceReady(listener:Lambda);
@@ -95,6 +98,48 @@ mobservableStatic.onceReady = function onceReady(listener:Lambda) {
 	Scheduler.onceReady(listener);
 }
 
+mobservableStatic.observable = function observable(target:Object, key:string, descriptor?) {
+    var baseValue = descriptor ? descriptor.value : null;
+
+    // observable annotations are invoked on the prototype, not on actual instances,
+    // so upon invocation, determine the 'this' instance, and define a property on the
+    // instance as well (that hides the propotype property)
+
+    if (typeof baseValue === "function") {
+        delete descriptor.value;
+        delete descriptor.writable;
+        descriptor.get = function() {
+            mobservableStatic.defineObservableProperty(this, key, baseValue);
+            return this[key];
+        }
+        descriptor.set = function () {
+            throw  new Error("It is not allowed to reassign observable functions");
+        }
+    }
+    else {
+        Object.defineProperty(target, key, {
+            configurable: true, enumberable:true,
+            get: function() {
+                mobservableStatic.defineObservableProperty(this, key, null);
+                return this[key];
+            },
+            set: function(value) {
+                if (Array.isArray(value)) {
+                    var ar = new ObservableArray(value);
+                    Object.defineProperty(this, key, {
+                        value: ar,
+                        writeable: false,
+                        configurable: false,
+                        enumberable: true
+                    });
+                }
+                else
+                    mobservableStatic.defineObservableProperty(this, key, value);
+            }
+        });
+    }
+}
+
 mobservableStatic.defineObservableProperty = function defineObservableProperty<T>(object:Object, name:string, initialValue?:T) {
 	var _property = mobservableStatic.value(initialValue, object);
 	definePropertyForObservable(object, name, _property);
@@ -120,6 +165,7 @@ function definePropertyForObservable(object:Object, name:string, observable:IObs
 		configurable: true
 	});
 }
+
 class ObservableValue<T,S> {
 	protected events = new events.EventEmitter();
 	protected dependencyState:DNode = new DNode(false);
@@ -192,7 +238,7 @@ class ComputedObservable<U,S> extends ObservableValue<U,S> {
 			this.dependencyState.wakeUp(); //-> wakeup triggers a compute
 			this.dependencyState.notifyObserved();
 		} else if (this.dependencyState.isSleeping) {
-			this.compute(); // <- doesn't detect cycles!
+			this.compute();
 		} else {
 			// we are already up to date, somebody is just inspecting our current value
 		}
@@ -205,6 +251,8 @@ class ComputedObservable<U,S> extends ObservableValue<U,S> {
 	}
 
 	set(_:U):S {
+        // TODO: generic setter exception
+
 		throw new Error("ComputedObservable cannot retrieve a new value!");
 	}
 
@@ -374,7 +422,7 @@ class ObservableArray<T> implements Array<T> {
 	// TODO: eS7 event params
 	observe(listener:()=>void, fireImmediately=false):Lambda {
 		if (fireImmediately)
-			listener();
+			listener(); // TODO: pass in splice data
 
 		this.events.addListener('change', listener);
 		return () => {
@@ -701,7 +749,7 @@ class DNode {
 		this.observing = [];
 		this.observers = [];
 		this.isDisposed = true;
-		// Do something with the observers, notify some state like KILLED? TODO: => set 'undefined'
+		// TODO: if there are observers, throw warning!
 	}
 }
 
