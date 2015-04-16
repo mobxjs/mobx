@@ -1,3 +1,4 @@
+/// <reference path="./typings/node-0.10.d.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -21,9 +22,7 @@ function observableValue(value, scope) {
     };
     propFunc.observe = prop.observe.bind(prop);
     propFunc.prop = prop;
-    propFunc.toString = function () {
-        return prop.toString();
-    };
+    propFunc.toString = function () { return prop.toString(); };
     return propFunc;
 }
 var mobservableStatic = function (value, scope) {
@@ -47,6 +46,25 @@ mobservableStatic.watch = function watch(func, onInvalidate) {
     dnode.computeNextValue();
     return [retVal, function () { return dnode.dispose(); }];
 };
+mobservableStatic.observeProperty = function observeProperty(object, key, listener) {
+    if (!object || !key || object[key] === undefined)
+        throw new Error("Object '" + object + "' has no key '" + key + "'.");
+    if (!listener || typeof listener !== "function")
+        throw new Error("Third argument to mobservable.observeProperty should be a function");
+    var currentValue = object[key];
+    if (currentValue instanceof ObservableValue || currentValue instanceof ObservableArray)
+        return currentValue.observe(listener, true);
+    else if (currentValue.prop && currentValue.prop instanceof ObservableValue)
+        return currentValue.prop.observe(listener, true);
+    var observer = new ComputedObservable(function () { return object[key]; }, object);
+    var disposer = observer.observe(listener, true);
+    if (!observer.dependencyState.observing.length)
+        warn("mobservable.observeProperty: property '" + key + "' of '" + object + " doesn't seem to be observable. Did you define it as observable?");
+    return function () {
+        disposer();
+        observer.dependencyState.dispose();
+    };
+};
 mobservableStatic.array = function array(values) {
     return new ObservableArray(values);
 };
@@ -58,6 +76,42 @@ mobservableStatic.onReady = function onReady(listener) {
 };
 mobservableStatic.onceReady = function onceReady(listener) {
     Scheduler.onceReady(listener);
+};
+mobservableStatic.observable = function observable(target, key, descriptor) {
+    var baseValue = descriptor ? descriptor.value : null;
+    if (typeof baseValue === "function") {
+        delete descriptor.value;
+        delete descriptor.writable;
+        descriptor.get = function () {
+            mobservableStatic.defineObservableProperty(this, key, baseValue);
+            return this[key];
+        };
+        descriptor.set = function () {
+            throw new Error("It is not allowed to reassign observable functions");
+        };
+    }
+    else {
+        Object.defineProperty(target, key, {
+            configurable: true, enumberable: true,
+            get: function () {
+                mobservableStatic.defineObservableProperty(this, key, null);
+                return this[key];
+            },
+            set: function (value) {
+                if (Array.isArray(value)) {
+                    var ar = new ObservableArray(value);
+                    Object.defineProperty(this, key, {
+                        value: ar,
+                        writeable: false,
+                        configurable: false,
+                        enumberable: true
+                    });
+                }
+                else
+                    mobservableStatic.defineObservableProperty(this, key, value);
+            }
+        });
+    }
 };
 mobservableStatic.defineObservableProperty = function defineObservableProperty(object, name, initialValue) {
     var _property = mobservableStatic.value(initialValue, object);
@@ -152,6 +206,7 @@ var ComputedObservable = (function (_super) {
         return this._value;
     };
     ComputedObservable.prototype.set = function (_) {
+        // TODO: generic setter exception
         throw new Error("ComputedObservable cannot retrieve a new value!");
     };
     ComputedObservable.prototype.compute = function () {
@@ -316,7 +371,7 @@ var ObservableArray = (function () {
         return this._values.length;
     };
     ObservableArray.prototype.pop = function () {
-        return this.splice(this._values.length, 1)[0];
+        return this.splice(this._values.length - 1, 1)[0];
     };
     ObservableArray.prototype.shift = function () {
         return this.splice(0, 1)[0];
@@ -329,12 +384,8 @@ var ObservableArray = (function () {
         this.spliceWithArray(0, 0, items);
         return this._values.length;
     };
-    ObservableArray.prototype.toString = function () {
-        return this.wrapReadFunction("toString", arguments);
-    };
-    ObservableArray.prototype.toLocaleString = function () {
-        return this.wrapReadFunction("toLocaleString", arguments);
-    };
+    ObservableArray.prototype.toString = function () { return this.wrapReadFunction("toString", arguments); };
+    ObservableArray.prototype.toLocaleString = function () { return this.wrapReadFunction("toLocaleString", arguments); };
     ObservableArray.prototype.concat = function () {
         var items = [];
         for (var _i = 0; _i < arguments.length; _i++) {
@@ -342,45 +393,19 @@ var ObservableArray = (function () {
         }
         return this.wrapReadFunction("concat", arguments);
     };
-    ObservableArray.prototype.join = function (separator) {
-        return this.wrapReadFunction("join", arguments);
-    };
-    ObservableArray.prototype.reverse = function () {
-        return this.wrapReadFunction("reverse", arguments);
-    };
-    ObservableArray.prototype.slice = function (start, end) {
-        return this.wrapReadFunction("slice", arguments);
-    };
-    ObservableArray.prototype.sort = function (compareFn) {
-        return this.wrapReadFunction("sort", arguments);
-    };
-    ObservableArray.prototype.indexOf = function (searchElement, fromIndex) {
-        return this.wrapReadFunction("indexOf", arguments);
-    };
-    ObservableArray.prototype.lastIndexOf = function (searchElement, fromIndex) {
-        return this.wrapReadFunction("lastIndexOf", arguments);
-    };
-    ObservableArray.prototype.every = function (callbackfn, thisArg) {
-        return this.wrapReadFunction("every", arguments);
-    };
-    ObservableArray.prototype.some = function (callbackfn, thisArg) {
-        return this.wrapReadFunction("some", arguments);
-    };
-    ObservableArray.prototype.forEach = function (callbackfn, thisArg) {
-        return this.wrapReadFunction("forEach", arguments);
-    };
-    ObservableArray.prototype.map = function (callbackfn, thisArg) {
-        return this.wrapReadFunction("map", arguments);
-    };
-    ObservableArray.prototype.filter = function (callbackfn, thisArg) {
-        return this.wrapReadFunction("filter", arguments);
-    };
-    ObservableArray.prototype.reduce = function (callbackfn, initialValue) {
-        return this.wrapReadFunction("reduce", arguments);
-    };
-    ObservableArray.prototype.reduceRight = function (callbackfn, initialValue) {
-        return this.wrapReadFunction("reduceRight", arguments);
-    };
+    ObservableArray.prototype.join = function (separator) { return this.wrapReadFunction("join", arguments); };
+    ObservableArray.prototype.reverse = function () { return this.wrapReadFunction("reverse", arguments); };
+    ObservableArray.prototype.slice = function (start, end) { return this.wrapReadFunction("slice", arguments); };
+    ObservableArray.prototype.sort = function (compareFn) { return this.wrapReadFunction("sort", arguments); };
+    ObservableArray.prototype.indexOf = function (searchElement, fromIndex) { return this.wrapReadFunction("indexOf", arguments); };
+    ObservableArray.prototype.lastIndexOf = function (searchElement, fromIndex) { return this.wrapReadFunction("lastIndexOf", arguments); };
+    ObservableArray.prototype.every = function (callbackfn, thisArg) { return this.wrapReadFunction("every", arguments); };
+    ObservableArray.prototype.some = function (callbackfn, thisArg) { return this.wrapReadFunction("some", arguments); };
+    ObservableArray.prototype.forEach = function (callbackfn, thisArg) { return this.wrapReadFunction("forEach", arguments); };
+    ObservableArray.prototype.map = function (callbackfn, thisArg) { return this.wrapReadFunction("map", arguments); };
+    ObservableArray.prototype.filter = function (callbackfn, thisArg) { return this.wrapReadFunction("filter", arguments); };
+    ObservableArray.prototype.reduce = function (callbackfn, initialValue) { return this.wrapReadFunction("reduce", arguments); };
+    ObservableArray.prototype.reduceRight = function (callbackfn, initialValue) { return this.wrapReadFunction("reduceRight", arguments); };
     ObservableArray.prototype.wrapReadFunction = function (funcName, args) {
         var baseFunc = Array.prototype[funcName];
         ObservableArray.prototype[funcName] = function () {
@@ -401,7 +426,7 @@ var DNodeState;
 var DNode = (function () {
     function DNode(isComputed) {
         this.isComputed = isComputed;
-        this.state = 2 /* READY */;
+        this.state = DNodeState.READY;
         this.isSleeping = true;
         this.hasCycle = false;
         this.observing = [];
@@ -444,17 +469,17 @@ var DNode = (function () {
         return false;
     };
     DNode.prototype.markStale = function () {
-        if (this.state === 1 /* PENDING */)
+        if (this.state === DNodeState.PENDING)
             return;
-        if (this.state === 0 /* STALE */)
+        if (this.state === DNodeState.STALE)
             return;
-        this.state = 0 /* STALE */;
+        this.state = DNodeState.STALE;
         this.notifyObservers();
     };
     DNode.prototype.markReady = function (didTheValueActuallyChange) {
-        if (this.state === 2 /* READY */)
+        if (this.state === DNodeState.READY)
             return;
-        this.state = 2 /* READY */;
+        this.state = DNodeState.READY;
         this.notifyObservers(didTheValueActuallyChange);
         Scheduler.scheduleReady();
     };
@@ -467,7 +492,7 @@ var DNode = (function () {
     DNode.prototype.areAllDependenciesAreStable = function () {
         var obs = this.observing, l = obs.length;
         for (var i = 0; i < l; i++)
-            if (obs[i].state !== 2 /* READY */)
+            if (obs[i].state !== DNodeState.READY)
                 return false;
         return true;
     };
@@ -482,18 +507,18 @@ var DNode = (function () {
     DNode.prototype.wakeUp = function () {
         if (this.isSleeping && this.isComputed) {
             this.isSleeping = false;
-            this.state = 1 /* PENDING */;
+            this.state = DNodeState.PENDING;
             this.computeNextValue();
         }
     };
     DNode.prototype.notifyStateChange = function (observable, didTheValueActuallyChange) {
         var _this = this;
         switch (this.state) {
-            case 0 /* STALE */:
-                if (observable.state === 2 /* READY */ && didTheValueActuallyChange)
+            case DNodeState.STALE:
+                if (observable.state === DNodeState.READY && didTheValueActuallyChange)
                     this.dependencyChangeCount += 1;
-                if (observable.state === 2 /* READY */ && this.areAllDependenciesAreStable()) {
-                    this.state = 1 /* PENDING */;
+                if (observable.state === DNodeState.READY && this.areAllDependenciesAreStable()) {
+                    this.state = DNodeState.PENDING;
                     Scheduler.schedule(function () {
                         if (_this.dependencyChangeCount > 0)
                             _this.computeNextValue();
@@ -503,10 +528,10 @@ var DNode = (function () {
                     });
                 }
                 break;
-            case 1 /* PENDING */:
+            case DNodeState.PENDING:
                 break;
-            case 2 /* READY */:
-                if (observable.state === 0 /* STALE */)
+            case DNodeState.READY:
+                if (observable.state === DNodeState.STALE)
                     this.markStale();
                 break;
         }
