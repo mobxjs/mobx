@@ -240,7 +240,12 @@ Similar to `Array.splice`, but instead of accepting a variable amount of argumen
 
 Register a callback that will be triggered every time the array is altered. A method to unregister the callback is returned.
 
-In the near feature this will adhere to the ES7 specs for Array.observe so this class can be used as ES7 array shim.
+The events that are being fired adhere to the ES7 specs for Array.observe. The event data will be either a `splice` or `update` event, examples:
+
+```javascript
+{ object: <array>, type: "update", index: 2, oldValue: 4 },
+{ object: <array>, type: "splice", index: 1, addedCount: 2, removed: [4,1] },
+```
 
 ### ObservableArray.values()
 

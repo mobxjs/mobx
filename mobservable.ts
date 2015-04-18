@@ -385,9 +385,10 @@ class ObservableArray<T> implements Array<T> {
 			enumerable: true,
 			configurable: true,
 			set: (value) => {
-				if (this._values[index] !== value) {
+				var oldValue = this._values[index];
+				if (oldValue !== value) {
 					this._values[index] = value;
-					this.notifyChildUpdate(index);
+					this.notifyChildUpdate(index, oldValue);
 				}
 			},
 			get: () => {
@@ -408,6 +409,8 @@ class ObservableArray<T> implements Array<T> {
 
 	spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[] {
 		var length = this._values.length;
+		if  ((newItems === undefined || newItems.length === 0) && (deleteCount === 0 || length === 0))
+			return [];
 
 		// yay, splice can deal with strange indexes
 		if (index > length)
@@ -431,26 +434,26 @@ class ObservableArray<T> implements Array<T> {
 		return res;
 	}
 
-	private notifyChildUpdate(index:number) {
+	private notifyChildUpdate(index:number, oldValue:T) {
 		this.notifyChanged();
-		// TODO: update Array.observe listeners
+		// conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
+		this.events.emit('change', { object: this, type: 'update', index: index, oldValue: oldValue});
 	}
 
 	private notifySplice(index:number, deleted:T[], added:T[]) {
 		this.notifyChanged();
-		// TODO: update Array.observe listeners
+		// conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
+		this.events.emit('change', { object: this, type: 'splice', index: index, addedCount: added.length, removed: deleted});
 	}
 
 	private notifyChanged() {
 		this.dependencyState.markStale();
 		this.dependencyState.markReady(true);
-		this.events.emit('change');
 	}
 
-	// TODO: eS7 event params
-	observe(listener:()=>void, fireImmediately=false):Lambda {
+	observe(listener:(data)=>void, fireImmediately=false):Lambda {
 		if (fireImmediately)
-			listener(); // TODO: pass in splice data
+			listener({ object: this, type: 'splice', index: 0, addedCount: this._values.length, removed: []});
 
 		this.events.addListener('change', listener);
 		return () => {
@@ -490,7 +493,7 @@ class ObservableArray<T> implements Array<T> {
     	return this._values.length;
     }
     pop(): T {
-    	return this.splice(this._values.length - 1, 1)[0];
+    	return this.splice(Math.max(this._values.length - 1, 0), 1)[0];
     }
     shift(): T {
     	return this.splice(0, 1)[0]

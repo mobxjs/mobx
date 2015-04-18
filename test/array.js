@@ -17,7 +17,6 @@ function buffer() {
 
 exports.test1 = function(test) {
   try {
-    debugger;
     var a
     var a = array();
     test.equals(a.length, 0);
@@ -110,9 +109,51 @@ exports.testQuickDiff = function(test) {
 
   t([1,2],[0,1,2],[],[0]);
 
-  debugger;
   t([1,4,6,7,8], [1,2,3,4,5,6], [7,8], [2,3,5]);
   t([1,2,3,4], [4,3,2,1], [1,2,3], [3,2,1]); // suboptimal, but correct
 
   test.done();
-}
+};
+
+exports.testObserve = function(test) {
+    var ar = mobservable.array([1,4]);
+    var buf = [];
+    var disposer = ar.observe(function(changes) {
+        buf.push(changes);
+    }, true);
+
+    ar[1] = 3; // 1,3
+    ar[2] = 0; // 1, 3, 0
+    ar.shift(); // 3, 0
+    ar.push(1,2); // 3, 0, 1, 2
+    ar.splice(1,2,3,4); // 3, 3, 4, 2
+    test.deepEqual(ar.values(), [3,3,4,2]);
+    ar.replace(['a']);
+    ar.pop();
+    ar.pop(); // does not fire anything
+
+    // check the object param
+    buf.forEach(function(change) {
+        test.equal(change.object, ar);
+        delete change.object;
+    });
+
+    var result = [
+        { type: "splice", index: 0, addedCount: 2, removed: [] },
+        { type: "update", index: 1, oldValue: 4 },
+        { type: "splice", index: 2, addedCount: 1, removed: [] },
+        { type: "splice", index: 0, addedCount: 0, removed: [1] },
+        { type: "splice", index: 2, addedCount: 2, removed: [] },
+        { type: "splice", index: 1, addedCount: 2, removed: [0,1] },
+        { type: "splice", index: 0, addedCount: 1, removed: [3,3,4,2] },
+        { type: "splice", index: 0, addedCount: 0, removed: ['a'] },
+    ]
+
+    test.deepEqual(buf, result);
+
+    disposer();
+    ar[0] = 5;
+    test.deepEqual(buf, result);
+
+    test.done();
+};
