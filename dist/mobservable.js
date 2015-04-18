@@ -287,9 +287,10 @@ var ObservableArray = (function () {
             enumerable: true,
             configurable: true,
             set: function (value) {
-                if (_this._values[index] !== value) {
+                var oldValue = _this._values[index];
+                if (oldValue !== value) {
                     _this._values[index] = value;
-                    _this.notifyChildUpdate(index);
+                    _this.notifyChildUpdate(index, oldValue);
                 }
             },
             get: function () {
@@ -309,14 +310,20 @@ var ObservableArray = (function () {
     };
     ObservableArray.prototype.spliceWithArray = function (index, deleteCount, newItems) {
         var length = this._values.length;
-        if (index > length)
+        if ((newItems === undefined || newItems.length === 0) && (deleteCount === 0 || length === 0))
+            return [];
+        if (index === undefined)
+            index = 0;
+        else if (index > length)
             index = length;
         else if (index < 0)
-            index = Math.max(0, length - index);
-        if (index === undefined)
-            return;
-        if (deleteCount === undefined)
+            index = Math.max(0, length + index);
+        if (arguments.length === 1)
             deleteCount = length - index;
+        else if (deleteCount === undefined || deleteCount === null)
+            deleteCount = 0;
+        else
+            deleteCount = Math.max(0, Math.min(deleteCount, length - index));
         if (newItems === undefined)
             newItems = [];
         var lengthDelta = newItems.length - deleteCount;
@@ -325,22 +332,25 @@ var ObservableArray = (function () {
         this.notifySplice(index, res, newItems);
         return res;
     };
-    ObservableArray.prototype.notifyChildUpdate = function (index) {
+    ObservableArray.prototype.notifyChildUpdate = function (index, oldValue) {
         this.notifyChanged();
+        this.events.emit('change', { object: this, type: 'update', index: index, oldValue: oldValue });
     };
     ObservableArray.prototype.notifySplice = function (index, deleted, added) {
+        if (deleted.length === 0 && added.length === 0)
+            return;
         this.notifyChanged();
+        this.events.emit('change', { object: this, type: 'splice', index: index, addedCount: added.length, removed: deleted });
     };
     ObservableArray.prototype.notifyChanged = function () {
         this.dependencyState.markStale();
         this.dependencyState.markReady(true);
-        this.events.emit('change');
     };
     ObservableArray.prototype.observe = function (listener, fireImmediately) {
         var _this = this;
         if (fireImmediately === void 0) { fireImmediately = false; }
         if (fireImmediately)
-            listener();
+            listener({ object: this, type: 'splice', index: 0, addedCount: this._values.length, removed: [] });
         this.events.addListener('change', listener);
         return function () {
             _this.events.removeListener('change', listener);
@@ -360,6 +370,14 @@ var ObservableArray = (function () {
         for (var _i = 2; _i < arguments.length; _i++) {
             newItems[_i - 2] = arguments[_i];
         }
+        switch (arguments.length) {
+            case 0:
+                return [];
+            case 1:
+                return this.spliceWithArray(index);
+            case 2:
+                return this.spliceWithArray(index, deleteCount);
+        }
         return this.spliceWithArray(index, deleteCount, newItems);
     };
     ObservableArray.prototype.push = function () {
@@ -371,7 +389,7 @@ var ObservableArray = (function () {
         return this._values.length;
     };
     ObservableArray.prototype.pop = function () {
-        return this.splice(this._values.length - 1, 1)[0];
+        return this.splice(Math.max(this._values.length - 1, 0), 1)[0];
     };
     ObservableArray.prototype.shift = function () {
         return this.splice(0, 1)[0];
