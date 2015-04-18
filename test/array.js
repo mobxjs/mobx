@@ -128,6 +128,8 @@ exports.testObserve = function(test) {
     ar.push(1,2); // 3, 0, 1, 2
     ar.splice(1,2,3,4); // 3, 3, 4, 2
     test.deepEqual(ar.values(), [3,3,4,2]);
+    ar.splice(6);
+    ar.splice(6,2);
     ar.replace(['a']);
     ar.pop();
     ar.pop(); // does not fire anything
@@ -154,6 +156,38 @@ exports.testObserve = function(test) {
     disposer();
     ar[0] = 5;
     test.deepEqual(buf, result);
+
+    test.done();
+};
+
+
+exports.test_array_modification1 = function(test) {
+    var a = mobservable.array([1,2,3]);
+    var r = a.splice(-10, 5, 4,5,6);
+    test.deepEqual(a.values(), [4,5,6]);
+    test.deepEqual(r, [1,2,3]);
+    test.done();
+};
+
+
+exports.test_array_modification2 = function(test) {
+    debugger;
+
+    var a2 = mobservable.array();
+    var inputs = [undefined, -10, -4, -3, -1, 0, 1, 3, 4, 10];
+    var arrays = [[], [1], [1,2,3,4], [1,2,3,4,5,6,7,8,9,10,11],[1,undefined],[undefined]]
+    for (var i = 0; i < inputs.length; i++)
+        for (var j = 0; j< inputs.length; j++)
+            for (var k = 0; k < arrays.length; k++)
+                for (var l = 0; l < arrays.length; l++) {
+                    var msg = ["array mod: [", arrays[k].toString(),"] i: ",inputs[i]," d: ", inputs[j]," [", arrays[l].toString(),"]"].join(' ');
+                    var a1 = arrays[k].slice();
+                    a2.replace(a1.slice()); // TODO: no slice
+                    var res1 = a1.splice.apply(a1, [inputs[i], inputs[j]].concat(arrays[l]));
+                    var res2 = a2.splice.apply(a2, [inputs[i], inputs[j]].concat(arrays[l]));
+                    test.deepEqual(a1.slice(), a2.values(), "values wrong: " + msg); // TODO: or just a2?
+                    test.deepEqual(res1, res2, "results wrong: " + msg);
+                }
 
     test.done();
 };

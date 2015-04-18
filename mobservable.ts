@@ -412,17 +412,20 @@ class ObservableArray<T> implements Array<T> {
 		if  ((newItems === undefined || newItems.length === 0) && (deleteCount === 0 || length === 0))
 			return [];
 
-		// yay, splice can deal with strange indexes
-		if (index > length)
+		if (index === undefined)
+			index = 0;
+		else if (index > length)
 			index = length;
 		else if (index < 0)
-			index = Math.max(0, length - index);
+			index = Math.max(0, length + index);
 
-		// too few arguments?
-		if (index === undefined)
-			return;
-		if (deleteCount === undefined)
+		if (arguments.length === 1)
 			deleteCount = length - index;
+		else if (deleteCount === undefined || deleteCount === null)
+			deleteCount = 0;
+		else
+			deleteCount = Math.max(0, Math.min(deleteCount, length - index));
+
 		if (newItems === undefined)
 			newItems = [];
 
@@ -441,6 +444,8 @@ class ObservableArray<T> implements Array<T> {
 	}
 
 	private notifySplice(index:number, deleted:T[], added:T[]) {
+		if (deleted.length === 0 && added.length === 0)
+			return;
 		this.notifyChanged();
 		// conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
 		this.events.emit('change', { object: this, type: 'splice', index: index, addedCount: added.length, removed: deleted});
@@ -484,6 +489,14 @@ class ObservableArray<T> implements Array<T> {
 		functions that do alter the internal structure of the array, from lib.es6.d.ts
 	 */
 	splice(index:number, deleteCount?:number, ...newItems:T[]):T[] {
+		switch(arguments.length) {
+			case 0:
+				return [];
+			case 1:
+				return this.spliceWithArray(index);
+			case 2:
+				return this.spliceWithArray(index, deleteCount);
+		}
 		return this.spliceWithArray(index, deleteCount, newItems);
 	}
 
