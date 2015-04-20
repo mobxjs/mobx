@@ -17,7 +17,6 @@ function buffer() {
 
 exports.test1 = function(test) {
   try {
-    var a
     var a = array();
     test.equals(a.length, 0);
     test.deepEqual(Object.keys(a), []);
@@ -169,9 +168,56 @@ exports.test_array_modification1 = function(test) {
     test.done();
 };
 
+exports.testSerialize = function(test) {
+    var a = [1,2,3];
+    var m = mobservable.array(a);
+
+    test.equal("" + a, "" + m);
+    test.deepEqual(JSON.stringify(a), JSON.stringify(m));
+    test.deepEqual(a, m);
+
+    a = [4];
+    m.replace(a);
+    test.equal("" + a, "" + m);
+    test.deepEqual(JSON.stringify(a), JSON.stringify(m));
+    test.deepEqual(a, m);
+
+    test.done();
+};
+
+exports.testArrayModificationFunctions = function(test) {
+    var ars = [[], [1,2,3]];
+    var funcs = ["push","pop","shift","unshift"];
+    funcs.forEach(function(f) {
+        ars.forEach(function (ar) {
+            var a = ar.slice();
+            var b = mobservable.array(a);
+            var res1 = a[f](4);
+            var res2 = b[f](4);
+            test.deepEqual(res1, res2);
+            test.deepEqual(a, b);
+        });
+    });
+    test.done();
+};
+
+exports.testArrayWriteFunctions = function(test) {
+    var ars = [[], [1,2,3]];
+    var funcs = ["push","pop","shift","unshift"];
+    funcs.forEach(function(f) {
+        ars.forEach(function (ar) {
+            var a = ar.slice();
+            var b = mobservable.array(a);
+            var res1 = a[f](4);
+            var res2 = b[f](4);
+            test.deepEqual(res1, res2);
+            test.deepEqual(a, b);
+        });
+    });
+    test.done();
+};
 
 exports.test_array_modification2 = function(test) {
-    debugger;
 
     var a2 = mobservable.array();
     var inputs = [undefined, -10, -4, -3, -1, 0, 1, 3, 4, 10];
@@ -182,11 +228,12 @@ exports.test_array_modification2 = function(test) {
                 for (var l = 0; l < arrays.length; l++) {
                     var msg = ["array mod: [", arrays[k].toString(),"] i: ",inputs[i]," d: ", inputs[j]," [", arrays[l].toString(),"]"].join(' ');
                     var a1 = arrays[k].slice();
-                    a2.replace(a1.slice()); // TODO: no slice
+                    a2.replace(a1);
                     var res1 = a1.splice.apply(a1, [inputs[i], inputs[j]].concat(arrays[l]));
                     var res2 = a2.splice.apply(a2, [inputs[i], inputs[j]].concat(arrays[l]));
-                    test.deepEqual(a1.slice(), a2.values(), "values wrong: " + msg); // TODO: or just a2?
+                    test.deepEqual(a1.slice(), a2, "values wrong: " + msg); // TODO: or just a2?
                     test.deepEqual(res1, res2, "results wrong: " + msg);
+                    test.equal(a1.length, a2.length, "length wrong: " + msg);
                 }
 
     test.done();

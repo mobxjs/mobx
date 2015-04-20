@@ -7,7 +7,8 @@
 * ~~rename defineProperty to defineObservableProperty~~
 * ~~introduce 1.5 decorator. w00t! https://github.com/Microsoft/TypeScript/wiki/What's-new-in-TypeScript#decorators~~
 * ~~introduce initializeProperties~~
-* implement and test observe() methods
+* ~~implement and test observe() methods~~
+* ~~toJSON~~
 * layout elses, rename properties.js -> observables.js
 * tabs to spaces everywhere
 * OCD on test files
