@@ -368,7 +368,7 @@ class ObservableArray<T> implements Array<T> {
 	// does not alter this._values itself
 	private updateLength(oldLength:number, delta:number) {
 		if (delta < 0) {
-			for(var i = oldLength - 1 - delta; i < oldLength; i++)
+			for(var i = oldLength + delta + 1; i < oldLength; i++)
 				delete this[i];
 		}
 		else if (delta > 0) {
@@ -475,15 +475,18 @@ class ObservableArray<T> implements Array<T> {
 	}
 
 	values(): T[] {
-		return this.slice(0);
+		return this._values.slice();
+	}
+
+	toJSON(): T[] {
+		return this._values.slice();
 	}
 
 	/*
 		ES7 goodies
 	 */
-	// TODO: observe(callaback) https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
+	// observe(callaback) https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
 	// https://github.com/arv/ecmascript-object-observe
-	// TODO: unobserve(callback)
 
 	/*
 		functions that do alter the internal structure of the array, from lib.es6.d.ts
