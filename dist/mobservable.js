@@ -270,7 +270,7 @@ var ObservableArray = (function () {
     }
     ObservableArray.prototype.updateLength = function (oldLength, delta) {
         if (delta < 0) {
-            for (var i = oldLength - 1 - delta; i < oldLength; i++)
+            for (var i = oldLength + delta + 1; i < oldLength; i++)
                 delete this[i];
         }
         else if (delta > 0) {
@@ -363,7 +363,10 @@ var ObservableArray = (function () {
         return this.spliceWithArray(0, this._values.length, newItems);
     };
     ObservableArray.prototype.values = function () {
-        return this.slice(0);
+        return this._values.slice();
+    };
+    ObservableArray.prototype.toJSON = function () {
+        return this._values.slice();
     };
     ObservableArray.prototype.splice = function (index, deleteCount) {
         var newItems = [];
