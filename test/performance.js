@@ -5,9 +5,9 @@ var array = mobservable.array;
 var gc = (function () {
 	var memwatch;
 	try {
-		memwatch = require("memwatch");
+		// memwatch = require("memwatch");
 		return function() {
-			memwatch.gc();
+			//memwatch.gc();
 		};
 	}
 	catch (e) {
