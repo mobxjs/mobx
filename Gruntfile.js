@@ -33,9 +33,11 @@ module.exports = function(grunt) {
 		coveralls: {
 			options: {
 		      // LCOV coverage file relevant to every target
-		      src: 'coverage/lcov.info',
 		      force: false
-		 	}
+		 	},
+			default: {
+		      src: 'coverage/lcov.info',
+			}
 		 }
 	});
 
@@ -49,7 +51,7 @@ module.exports = function(grunt) {
 	});
 	grunt.registerTask("default", ["ts:buildlocal"]);
 	grunt.registerTask("build", ["ts:builddist"]);
-	grunt.registerTask("cover", ["ts:buildlocal", "exec:cover", "coveralls"]);
+	grunt.registerTask("cover", ["ts:buildlocal", "exec:cover", "coveralls:default"]);
 	grunt.registerTask("test", ["ts:buildlocal","ts:buildtypescripttest", "nodeunit:all"]);
 	grunt.registerTask("perf", ["ts:buildlocal", "nodeunit:perf"]);
 
