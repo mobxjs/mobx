@@ -14,11 +14,11 @@
 * OCD on test files
 * coverage tests
 * process remaining optimizations / todo's, document code
-* remove memwatch, make tests smaller?
+* ~~remove memwatch, make tests smaller?~~
 * drop event emitter, to make lib smaller and stand alone? https://github.com/joyent/node/blob/master/lib/events.js, note: clone listeners before invoking
-* array.observe conform
+* ~~array.observe conform~~
 * test browser compatibility?
-* badges for build, coverage, npm
+* ~~badges for build, coverage, npm~~
 * use typescript 1.5 spread operator
 * use console.trace() in logging where applicable
 * add 'name' as parameter to observable.value, automatically set it when defining properties, use it in warnings / toString
