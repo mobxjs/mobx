@@ -26,17 +26,30 @@ module.exports = function(grunt) {
 		 	},
 		    all: ['test/*.js'],
 			perf: ['test/performance.js']
-		  }
+		},
+		exec: {
+			cover: "istanbul cover nodeunit test/"
+		},
+		coveralls: {
+			options: {
+		      // LCOV coverage file relevant to every target
+		      src: 'coverage/lcov.info',
+		      force: false
+		 	}
+		 }
 	});
 
 	grunt.loadNpmTasks("grunt-ts");
 	grunt.loadNpmTasks('grunt-contrib-nodeunit');
+	grunt.loadNpmTasks('grunt-coveralls');
+	grunt.loadNpmTasks('grunt-exec');
 
 	grunt.registerTask("publish", "Publish to npm", function() {
 		require("./publish.js");
 	});
 	grunt.registerTask("default", ["ts:buildlocal"]);
 	grunt.registerTask("build", ["ts:builddist"]);
+	grunt.registerTask("cover", ["ts:buildlocal", "exec:cover", "coveralls"]);
 	grunt.registerTask("test", ["ts:buildlocal","ts:buildtypescripttest", "nodeunit:all"]);
 	grunt.registerTask("perf", ["ts:buildlocal", "nodeunit:perf"]);
 

@@ -745,8 +745,10 @@ class DNode {
 	private bindDependencies() {
 		this.observing = DNode.trackingStack.pop();
 
+        /* TODO:
 		if (this.isComputed && this.observing.length === 0 && !this.isDisposed)
-			warn("You have created a function that doesn't observe any values, did you forget to make its dependencies observable?");
+			this.log("You have created a function that doesn't observe any values, did you forget to make its dependencies observable?");
+        */
 
 		var changes = quickDiff(this.observing, this.prevObserving);
 		var added = changes[0];
