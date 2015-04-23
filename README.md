@@ -4,8 +4,8 @@
 
 MOBservable is light-weight stand alone observable implementation, based on the ideas of observables in bigger frameworks like `knockout`, `ember`, but this time without 'strings attached'. MOBservables allows you to observe primitive values, references, functions and arrays both synchronously and asynchronously!
 
-|Master|[![Build Status](https://travis-ci.org/mweststrate/MOBservable.svg?branch=master)](https://travis-ci.org/mweststrate/MOBservable)|[![Build Status](https://travis-ci.org/mweststrate/MOBservable.svg?branch=development)](https://travis-ci.org/mweststrate/MOBservable)|
-|Development|[![Coverage Status](https://coveralls.io/repos/mweststrate/MOBservable/badge.svg)](https://coveralls.io/r/mweststrate/MOBservable)|[![Coverage Status](https://coveralls.io/repos/mweststrate/MOBservable/badge.svg?branch=development)](https://coveralls.io/r/mweststrate/MOBservable?branch=development)|
+[![Build Status](https://travis-ci.org/mweststrate/MOBservable.svg?branch=master)](https://travis-ci.org/mweststrate/MOBservable)
+[![Coverage Status](https://coveralls.io/repos/mweststrate/MOBservable/badge.svg?branch=master)](https://coveralls.io/r/mweststrate/MOBservable)
 
 [![NPM](https://nodei.co/npm/mobservable.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/mobservable/)
 

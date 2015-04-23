@@ -507,8 +507,11 @@ var DNode = (function () {
     DNode.prototype.notifyObservers = function (didTheValueActuallyChange) {
         if (didTheValueActuallyChange === void 0) { didTheValueActuallyChange = false; }
         var os = this.observers;
-        for (var i = os.length - 1; i >= 0; i--)
-            os[i].notifyStateChange(this, didTheValueActuallyChange);
+        for (var i = os.length - 1; i >= 0; i--) {
+            var o = os[i];
+            if (o)
+                o.notifyStateChange(this, didTheValueActuallyChange);
+        }
     };
     DNode.prototype.areAllDependenciesAreStable = function () {
         var obs = this.observing, l = obs.length;
@@ -572,8 +575,6 @@ var DNode = (function () {
     };
     DNode.prototype.bindDependencies = function () {
         this.observing = DNode.trackingStack.pop();
-        if (this.isComputed && this.observing.length === 0 && !this.isDisposed)
-            warn("You have created a function that doesn't observe any values, did you forget to make its dependencies observable?");
         var changes = quickDiff(this.observing, this.prevObserving);
         var added = changes[0];
         var removed = changes[1];

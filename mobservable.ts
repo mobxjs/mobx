@@ -38,7 +38,7 @@ interface MobservableStatic {
 
 function observableValue<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S> {
 	var prop:ObservableValue<T,S> = null;
-
+	
 	if (Array.isArray && Array.isArray(value))
 		warn("mobservable.value() was invoked with an array. Probably you want to create an mobservable.array() instead of observing a reference to an array?");
 
@@ -652,8 +652,11 @@ class DNode {
 	notifyObservers(didTheValueActuallyChange:boolean=false) {
 		var os = this.observers;
 		// change to 'for loop, reverse, pre-decrement', https://jsperf.com/for-vs-foreach/32
-		for(var i = os.length -1; i >= 0; i--)
-			os[i].notifyStateChange(this, didTheValueActuallyChange);
+		for(var i = os.length -1; i >= 0; i--) {
+			var o = os[i];
+			if (o)
+				o.notifyStateChange(this, didTheValueActuallyChange);
+		}
 	}
 
 	// optimization: replace this check with an 'unstableDependenciesCounter'.
