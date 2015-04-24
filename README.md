@@ -43,11 +43,11 @@ The method optionally accepts a scope parameter, which will be returned by the s
 var value = mobservable.value;
 
 function OrderLine(price, amount) {
-	this.price = value(price);
-	this.amount = value(amount);
-	this.total = value(function() {
-		return this.price() * this.amount();
-	}, this)
+    this.price = value(price);
+    this.amount = value(amount);
+    this.total = value(function() {
+        return this.price() * this.amount();
+    }, this)
 }
 ```
 
@@ -63,7 +63,7 @@ Constructs an array like, observable structure. An observable array is a thin ab
 ```javascript
 var numbers = mobservable.array([1,2,3]);
 var sum = mobservable.value(function() {
-	return numbers.reduce(function(a, b) { return a + b }, 0);
+    return numbers.reduce(function(a, b) { return a + b }, 0);
 });
 sum.observe(function(s) { console.log(s); });
 
@@ -98,13 +98,13 @@ Marks a property or method as observable. This annotations basically wraps `mobs
 var observable = require('mobservable').observable;
 
 class Order {
-	@observable price:number = 3;
-	@observable amount:number = 2;
-	@observable orders = [];
+    @observable price:number = 3;
+    @observable amount:number = 2;
+    @observable orders = [];
 
-	@observable total() {
-		return this.amount * this.price * (1 + orders.length);
-	}
+    @observable total() {
+        return this.amount * this.price * (1 + orders.length);
+    }
 
 }
 ```
@@ -119,11 +119,11 @@ Defines a property using ES5 getters and setters. This is useful in constructor 
 var vat = mobservable.value(0.2);
 
 var Order = function() {
-	mobservable.defineObservableProperty(this, 'price', 20);
-	mobservable.defineObservableProperty(this, 'amount', 2);
-	mobservable.defineObservableProperty(this, 'total', function() {
-		return (1+vat()) * this.price * this.amount; // price and amount are now properties!
-	});
+    mobservable.defineObservableProperty(this, 'price', 20);
+    mobservable.defineObservableProperty(this, 'amount', 2);
+    mobservable.defineObservableProperty(this, 'total', function() {
+        return (1+vat()) * this.price * this.amount; // price and amount are now properties!
+    });
 };
 
 var order = new Order();
@@ -136,13 +136,13 @@ In typescript < 1.5, it might be more convenient for the typesystem to directly 
 
 ```typescript
 class Order {
-	_price = new mobservable.value(20, this);
-	get price() {
-		return this._price();
-	}
-	set price(value) {
-		this._price(value);
-	}
+    _price = new mobservable.value(20, this);
+    get price() {
+        return this._price();
+    }
+    set price(value) {
+        this._price(value);
+    }
 }
 ```
 
@@ -171,10 +171,10 @@ Or in typescript pre 1.5, where annotations are not yet supported:
 
 ```typescript
 class Order {
-	price:number = <number><any>new mobservable.value(20, this);
-	constructor() {
-		mobservable.initializeObservableProperties(this);
-	}
+    price:number = <number><any>new mobservable.value(20, this);
+    constructor() {
+        mobservable.initializeObservableProperties(this);
+    }
 }
 ```
 
@@ -185,7 +185,7 @@ Observes the observable property `key` of `object`. This is useful if you want t
 
 ```typescript
 class Order {
-	@observable total = () => this.price * this.amount;
+    @observable total = () => this.price * this.amount;
 }
 var order = new Order();
 
