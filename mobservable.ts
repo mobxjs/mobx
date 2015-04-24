@@ -1,12 +1,8 @@
-/// <reference path="./typings/node-0.10.d.ts" />
-
 /**
  * MOBservable
  * (c) 2015 - Michel Weststrate
  * https://github.com/mweststrate/mobservable
  */
-
-import events = require('events');
 
 interface Lambda {
 	():void;
@@ -34,11 +30,13 @@ interface MobservableStatic {
 	onceReady(listener:Lambda);
 	defineObservableProperty<T>(object:Object, name:string, initialValue?:T);
 	initializeObservableProperties(object:Object);
+
+    SimpleEventEmitter: new()=> SimpleEventEmitter;
 }
 
 function observableValue<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S> {
 	var prop:ObservableValue<T,S> = null;
-	
+
 	if (Array.isArray && Array.isArray(value))
 		warn("mobservable.value() was invoked with an array. Probably you want to create an mobservable.array() instead of observing a reference to an array?");
 
@@ -195,7 +193,7 @@ function definePropertyForObservable(object:Object, name:string, observable:IObs
 }
 
 class ObservableValue<T,S> {
-	protected events = new events.EventEmitter();
+	protected changeEvent = new SimpleEventEmitter();
 	protected dependencyState:DNode = new DNode(false);
 
 	constructor(protected _value?:T, protected scope?:S){
@@ -209,7 +207,7 @@ class ObservableValue<T,S> {
 			this.dependencyState.markStale();
 			this._value = value;
 			this.dependencyState.markReady(true);
-			this.events.emit('change', value, oldValue);
+			this.changeEvent.emit(value, oldValue);
 			// TODO: error checking improvement: check whether we caused no error in one of the observers
 			// if so, throw that exception
 		}
@@ -229,10 +227,11 @@ class ObservableValue<T,S> {
 		if (fireImmediately)
 			listener(current, undefined);
 
-		this.events.addListener('change', listener);
+        var disposer = this.changeEvent.on(listener);
 		return () => {
+            // TODO: make sure this happens only once! even if this function is invoked multipel times
 			this.dependencyState.setRefCount(-1);
-			this.events.removeListener('change', listener);
+            disposer();
 		};
 	}
 
@@ -309,7 +308,7 @@ class ComputedObservable<U,S> extends ObservableValue<U,S> {
 		if (changed) {
 			var oldValue = this._value;
 			this._value = newValue;
-			this.events.emit('change', newValue, oldValue);
+			this.changeEvent.emit(newValue, oldValue);
 		}
 		return changed;
 	}
@@ -329,7 +328,7 @@ class ObservableArray<T> implements Array<T> {
 
 	private _values: T[];
 	private dependencyState:DNode;
-	private events;
+	private changeEvent;
 
 	constructor(initialValues?:T[]) {
 		// make for .. in / Object.keys behave like an array:
@@ -356,7 +355,7 @@ class ObservableArray<T> implements Array<T> {
 		});
 		Object.defineProperty(this, "dependencyState", { enumerable: false, value: new DNode(false) });
 		Object.defineProperty(this, "_values", { enumerable: false, value: [] });
-		Object.defineProperty(this, "events", { enumerable: false, value: new events.EventEmitter() });
+		Object.defineProperty(this, "changeEvent", { enumerable: false, value: new SimpleEventEmitter() });
 
 		if (initialValues && initialValues.length)
 			this.spliceWithArray(0, 0, initialValues);
@@ -440,7 +439,7 @@ class ObservableArray<T> implements Array<T> {
 	private notifyChildUpdate(index:number, oldValue:T) {
 		this.notifyChanged();
 		// conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-		this.events.emit('change', { object: this, type: 'update', index: index, oldValue: oldValue});
+		this.changeEvent.emit({ object: this, type: 'update', index: index, oldValue: oldValue});
 	}
 
 	private notifySplice(index:number, deleted:T[], added:T[]) {
@@ -448,7 +447,7 @@ class ObservableArray<T> implements Array<T> {
 			return;
 		this.notifyChanged();
 		// conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-		this.events.emit('change', { object: this, type: 'splice', index: index, addedCount: added.length, removed: deleted});
+		this.changeEvent.emit({ object: this, type: 'splice', index: index, addedCount: added.length, removed: deleted});
 	}
 
 	private notifyChanged() {
@@ -460,10 +459,7 @@ class ObservableArray<T> implements Array<T> {
 		if (fireImmediately)
 			listener({ object: this, type: 'splice', index: 0, addedCount: this._values.length, removed: []});
 
-		this.events.addListener('change', listener);
-		return () => {
-			this.events.removeListener('change', listener);
-		};
+		return this.changeEvent.on(listener);
 	}
 
 	clear(): T[] {
@@ -805,8 +801,55 @@ class DNode {
 	}
 }
 
+
+class SimpleEventEmitter {
+    listeners:{(data?):void}[] = [];
+
+    emit(...data:any[]);
+    emit() {
+        var listeners = this.listeners.slice();
+        var l = listeners.length;
+        switch (arguments.length) {
+            case 0:
+                for(var i = 0; i < l; i++)
+                    listeners[i]();
+                break;
+            case 1:
+                var data = arguments[0];
+                for(var i = 0; i < l; i++)
+                    listeners[i](data);
+                break;
+            default:
+                for(var i = 0; i < l; i++)
+                    listeners[i].apply(undefined, arguments);
+        }
+    }
+
+    on(listener:(...data:any[])=>void):Lambda {
+        var disposed = false;
+        this.listeners.push(listener);
+        return () => {
+            if (disposed)
+                return;
+            disposed = true;
+            var idx = this.listeners.indexOf(listener);
+            if (idx !== -1)
+                this.listeners.splice(idx, 1);
+        }
+    }
+
+    once(listener:(...data:any[])=>void):Lambda {
+        var subscription = this.on(function() {
+            subscription();
+            listener.apply(arguments);
+        });
+        return subscription;
+    }
+}
+mobservableStatic.SimpleEventEmitter = SimpleEventEmitter;
+
 class Scheduler {
-	private static events = new events.EventEmitter();
+	private static readyEvent = new SimpleEventEmitter();
 	private static inBatch = 0;
 	private static tasks:{():void}[] = [];
 
@@ -855,20 +898,17 @@ class Scheduler {
 			Scheduler.pendingReady = true;
 			setTimeout(()=> {
 				Scheduler.pendingReady = false;
-				Scheduler.events.emit('ready');
+				Scheduler.readyEvent.emit();
 			}, 1);
 		}
 	}
 
 	static onReady(listener:Lambda) {
-		Scheduler.events.on('ready', listener);
-		return () => {
-			Scheduler.events.removeListener('ready', listener);
-		}
+		return Scheduler.readyEvent.on(listener);
 	}
 
 	static onceReady(listener:Lambda) {
-		Scheduler.events.once('ready', listener);
+        return Scheduler.readyEvent.once(listener);
 	}
 }
 

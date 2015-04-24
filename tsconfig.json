@@ -15,7 +15,6 @@
     "files": [
         "./mobservable.d.ts",
         "./mobservable.ts",
-        "./test/typescript-test.ts",
-        "./typings/node-0.10.d.ts"
+        "./test/typescript-test.ts"
     ]
 }

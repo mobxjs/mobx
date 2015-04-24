@@ -22,6 +22,8 @@ declare module "mobservable" {
 	export function defineObservableProperty<T>(object:Object, name:string, initialValue?:T);
 	export function initializeObservableProperties(object:Object);
 
+  export var SimpleEventEmitter: new() => ISimpleEventEmitter;
+
 	interface IObservableArray<T> extends Array<T> {
 		[n: number]: T;
 		length: number;
@@ -32,4 +34,11 @@ declare module "mobservable" {
 		replace(newItems:T[]);
 		values(): T[];
 	}
+
+	interface ISimpleEventEmitter {
+	    emit(...data:any[]):void;
+    	on(listener:(...data:any[])=>void):Lambda;
+    	once(listener:(...data:any[])=>void):Lambda;
+	}
+
 }

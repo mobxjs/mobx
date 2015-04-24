@@ -2,7 +2,7 @@
 
 *Changes are coming!*
 
-MOBservable is light-weight stand alone observable implementation, based on the ideas of observables in bigger frameworks like `knockout`, `ember`, but this time without 'strings attached'. MOBservables allows you to observe primitive values, references, functions and arrays both synchronously and asynchronously!
+MOBservable is light-weight stand-alone observable implementation, based on the ideas of observables in bigger frameworks like `knockout`, `ember`, but this time without 'strings attached'. MOBservables allows you to observe primitive values, references, functions and arrays.
 
 [![Build Status](https://travis-ci.org/mweststrate/MOBservable.svg?branch=master)](https://travis-ci.org/mweststrate/MOBservable)
 [![Coverage Status](https://coveralls.io/repos/mweststrate/MOBservable/badge.svg?branch=master)](https://coveralls.io/r/mweststrate/MOBservable)
@@ -190,6 +190,7 @@ class Order {
 var order = new Order();
 
 mobservable.observeProperty(order, 'total', (newPrice) => console.log("New price: " + newPrice));
+```
 
 ## mobservable.watch(func, onInvalidate)
 
@@ -255,6 +256,28 @@ The events that are being fired adhere to the ES7 specs for Array.observe. The e
 ### ObservableArray.values()
 
 Returns all the values of this ObservableArray as native, non-observable, javascript array. The returned array is a shallow copy.
+
+## mobservable.SimpleEventEmitter
+
+Class that implements a simple event system.
+
+### SimpleEventEmitter.emit
+
+`emit(...data:any[]):void;`
+
+Fires the event represented by this SimpleEventEmitter. All arguments passed to `emit` are passed to the listeners.
+
+### SimpleEventEmitter.on
+
+`on(listener:(...data:any[])=>void):Lambda;`
+
+Subscribes a new event listener to this event emitter. The returned function can be used to unsubscribe.
+
+### SimpleEventEmitter.once
+
+`once(listener:(...data:any[])=>void):Lambda;`
+
+Similar to `on`, but the listener is fired only one time and disposed after that.
 
 # Using mobservable with Typescript
 
