@@ -11,7 +11,7 @@ declare module "mobservable" {
     export function array<T>(values?:T[]): IObservableArray<T>;
     export function value<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S>;
     export function watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda];
-    export function observeProperty(object:Object, key:string, listener:Function):Lambda;
+    export function observeProperty(object:Object, key:string, listener:Function, invokeImmediately?:boolean):Lambda;
 
     // annotation
     export function observable(target:Object, key:string);

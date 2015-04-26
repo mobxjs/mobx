@@ -15,29 +15,41 @@ interface IObservableValue<T,S> {
 }
 
 interface MobservableStatic {
+    // shorthand for .value()
     <T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S>;
 
+    // core functinos
     array<T>(values?:T[]): ObservableArray<T>;
     value<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S>;
     watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda];
-    observeProperty(object:Object, key:string, listener:Function):Lambda;
 
-
+    // property definition
     observable(target:Object, key:string); // annotation
+    defineObservableProperty<T>(object:Object, name:string, initialValue?:T);
+    initializeObservableProperties(object:Object);
+    observeProperty(object:Object, key:string, listener:Function, invokeImmediately?:boolean):Lambda;
 
+    // batching
     batch(action:Lambda);
     onReady(listener:Lambda):Lambda;
     onceReady(listener:Lambda);
-    defineObservableProperty<T>(object:Object, name:string, initialValue?:T);
-    initializeObservableProperties(object:Object);
 
+    // Utils
     SimpleEventEmitter: new()=> SimpleEventEmitter;
+
+    debugLevel: number;
 }
 
-function observableValue<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S> {
+/**
+    Creates an observable from either a value or a function.
+    If a scope is provided, the function will be always executed usign the provided scope.
+    Returns a new IObservable, that is, a functon that can be used to set a new value or get the current values
+    (the latter if no arguments are provided)
+*/
+function createObservable<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S> {
     var prop:ObservableValue<T,S> = null;
 
-    if (Array.isArray && Array.isArray(value))
+    if (Array.isArray && Array.isArray(value) && mobservableStatic.debugLevel)
         warn("mobservable.value() was invoked with an array. Probably you want to create an mobservable.array() instead of observing a reference to an array?");
 
     if (typeof value === "function")
@@ -58,54 +70,75 @@ function observableValue<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S> {
     return <IObservableValue<T,S>> propFunc;
 }
 
+/**
+    @see mobservableStatic.value
+*/
 var mobservableStatic:MobservableStatic = <MobservableStatic> function<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S> {
-    return observableValue(value,scope);
+    return createObservable(value,scope);
 };
 
-mobservableStatic.value = observableValue;
+/**
+    @see createObservable
+*/
+mobservableStatic.value = createObservable;
 
+/**
+    DebugLevel: level 0: warnings only, level 1 or higher, prints a lot of messages.
+*/
+mobservableStatic.debugLevel = 0;
+
+/**
+    Evaluates func and return its results. Watch tracks all observables that are used by 'func'
+    and invokes 'onValidate' whenever func *should* update.
+    Returns  a tuplde [return value of func, disposer]. The disposer can be used to abort the watch early.
+*/
 mobservableStatic.watch = function watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
     var dnode = new DNode(true);
     var retVal:T;
     dnode.compute = function() {
         retVal = func();
         dnode.compute = function() {
-            if (dnode.getObserversCount())
-                throw new Error("A guarded function should not have observers!");
             dnode.dispose();
             onInvalidate();
             return false;
         }
-        return false; // Note, nobody should observe a guarded funct !
+        return false;
     }
     dnode.computeNextValue();
     return [retVal, () => dnode.dispose()];
 }
 
-mobservableStatic.observeProperty = function observeProperty(object:Object, key:string, listener:(...args:any[])=>void):Lambda {
+/**
+    Can be used to observe observable properties that are created using the `observable` annotation,
+    `defineObservableProperty` or `initializeObservableProperties`.
+    (Since properties do not expose an .observe method themselves).
+*/
+mobservableStatic.observeProperty = function observeProperty(object:Object, key:string, listener:(...args:any[])=>void, invokeImmediately = false):Lambda {
     if (!object || !key || object[key] === undefined)
         throw new Error(`Object '${object}' has no key '${key}'.`);
     if (!listener || typeof listener !== "function")
         throw new Error("Third argument to mobservable.observeProperty should be a function");
 
     var currentValue = object[key];
-    // ObservableValue, ComputedObservable or ObservableArray?
+
+    // ObservableValue, ComputedObservable or ObservableArray? -> attach observer
     if (currentValue instanceof ObservableValue || currentValue instanceof ObservableArray)
-        return currentValue.observe(listener, true);
-    // IObservable?
+        return currentValue.observe(listener, invokeImmediately);
+    // IObservable? -> attach observer
     else if (currentValue.prop && currentValue.prop instanceof ObservableValue)
-        return currentValue.prop.observe(listener, true);
+        return currentValue.prop.observe(listener, invokeImmediately);
 
-    var observer = new ComputedObservable(() => object[key], object);
-    var disposer = observer.observe(listener, true);
+    // wrap with observable function
+    var observer = new ComputedObservable((() => object[key]), object);
+    var disposer = observer.observe(listener, invokeImmediately);
 
-    if (!(<any>(<any>observer).dependencyState).observing.length)
+    if (mobservableStatic.debugLevel && (<any>observer).dependencyState.observing.length === 0)
         warn(`mobservable.observeProperty: property '${key}' of '${object} doesn't seem to be observable. Did you define it as observable?`);
 
-    return () => {
+    return once(() => {
         disposer();
         (<any>observer).dependencyState.dispose(); // clean up
-    };
+    });
 }
 
 mobservableStatic.array = function array<T>(values?:T[]): ObservableArray<T> {
@@ -139,14 +172,14 @@ mobservableStatic.observable = function observable(target:Object, key:string, de
             return this[key];
         }
         descriptor.set = function () {
-            throw  new Error("It is not allowed to reassign observable functions");
+            console.trace();
+            throw new Error("It is not allowed to reassign observable functions");
         }
-    }
-    else {
+    } else {
         Object.defineProperty(target, key, {
             configurable: true, enumberable:true,
             get: function() {
-                mobservableStatic.defineObservableProperty(this, key, null);
+                mobservableStatic.defineObservableProperty(this, key, undefined);
                 return this[key];
             },
             set: function(value) {
@@ -179,7 +212,6 @@ mobservableStatic.initializeObservableProperties = function initializeObservable
 }
 
 function definePropertyForObservable(object:Object, name:string, observable:IObservableValue<any,any>) {
-    // TODO: set is not needed if observable is computed
     Object.defineProperty(object, name, {
         get: function() {
             return observable();
@@ -197,21 +229,16 @@ class ObservableValue<T,S> {
     protected dependencyState:DNode = new DNode(false);
 
     constructor(protected _value?:T, protected scope?:S){
-
     }
 
     set(value:T):S {
         if (value !== this._value) {
             var oldValue = this._value;
-            // Optimization: intruce a state that signals ready without an initial dirty, for non-computed values
             this.dependencyState.markStale();
             this._value = value;
             this.dependencyState.markReady(true);
             this.changeEvent.emit(value, oldValue);
-            // TODO: error checking improvement: check whether we caused no error in one of the observers
-            // if so, throw that exception
         }
-
         return this.scope;
     }
 
@@ -222,17 +249,13 @@ class ObservableValue<T,S> {
 
     observe(listener:(newValue:T, oldValue:T)=>void, fireImmediately=false):Lambda {
         this.dependencyState.setRefCount(+1); // awake
-        // TODO: get is not needed here, the setrefcount already awakes the node
-        var current = this.get(); // make sure the values are initialized
         if (fireImmediately)
-            listener(current, undefined);
-
+            listener(this.get(), undefined);
         var disposer = this.changeEvent.on(listener);
-        return () => {
-            // TODO: make sure this happens only once! even if this function is invoked multipel times
+        return once(() => {
             this.dependencyState.setRefCount(-1);
             disposer();
-        };
+        });
     }
 
     toString() {
@@ -248,310 +271,77 @@ class ComputedObservable<U,S> extends ObservableValue<U,S> {
         super(undefined, scope);
         if (!func)
             throw new Error("ComputedObservable requires a function");
-
         this.dependencyState.isComputed = true;
         this.dependencyState.compute = this.compute.bind(this);
     }
 
     get():U {
         if (this.isComputing)
-            throw new Error("Cycle detected"); // we are calculating ATM, *and* somebody is looking at us..
-
-        // the first evaluation of a computed function is lazy, to save lots of calculations when its dependencies are initialized
-        // (and it is cheaper anyways)
-        // tricky optimization, directly call compute() if this observable is not being observed at all, note
-        // that in this case the DNode state isn't used at all
-        if (DNode.trackingStack.length) {
-            this.dependencyState.wakeUp(); //-> wakeup triggers a compute
-            this.dependencyState.notifyObserved();
-        } else if (this.dependencyState.isSleeping) {
-            this.compute();
+            throw new Error("Cycle detected");
+    	var state = this.dependencyState;
+        if (state.isSleeping) {
+            if (DNode.trackingStack.length > 0) {
+                // somebody depends on the outcome of this computation
+                state.wakeUp(); // note: wakeup triggers a compute
+                state.notifyObserved();
+            } else {
+                // nobody depends on this computable; so compute a fresh value but do not wake up
+                this.compute();
+            }
         } else {
             // we are already up to date, somebody is just inspecting our current value
+            state.notifyObserved();
         }
 
-        if (this.dependencyState.hasCycle)
+        if (state.hasCycle)
             throw new Error("Cycle detected");
-        if (this.hasError)
-            throw this._value; // TODO: log that this is a rethrow
+        if (this.hasError) {
+            if (mobservableStatic.debugLevel) {
+                console.trace();
+                warn(`${this}: rethrowing caught exception to observer: ${this._value}${(<any>this._value).cause||''}`);
+            }
+            throw this._value;
+        }
         return this._value;
     }
 
     set(_:U):S {
-        // TODO: generic setter exception
-
-        throw new Error("ComputedObservable cannot retrieve a new value!");
+        throw new Error(this.toString() + ": A computed observable does not accept new values!");
     }
 
     compute() {
-        var newValue;
+        var newValue:U;
         try {
-            // this cycle detection mechanism is primarily for lazy computed values, where the
-            // dependency tree is not tracked with DNodes
+            // this cycle detection mechanism is primarily for lazy computed values; other cycles are already detected in the dependency tree
             if (this.isComputing)
                 throw new Error("Cycle detected");
             this.isComputing = true;
-            var newValue = this.func.call(this.scope);
+            newValue = this.func.call(this.scope);
             this.hasError = false;
         } catch (e) {
             this.hasError = true;
-            console && console.error("Caught error during computation: ", e);
+            console.error(this + "Caught error during computation: ", e);
             if (e instanceof Error)
                 newValue = e;
             else {
-                newValue = new Error("ComputationError");
+                newValue = <U><any> new Error("MobservableComputationError");
                 (<any>newValue).cause = e;
             }
         }
         this.isComputing = false;
-        var changed = newValue !== this._value;
-        if (changed) {
+        if (newValue !== this._value) {
             var oldValue = this._value;
             this._value = newValue;
             this.changeEvent.emit(newValue, oldValue);
+            return true;
         }
-        return changed;
+        return false;
     }
 
     toString() {
         return `ComputedObservable[${this.func.toString()}]`;
     }
 }
-
-/*
-    TODO: mention clearly that ObservableArray is not sparse, that is,
-    no wild index assignments with index >(!) length are allowed (that is, won't be observed)
- */
-class ObservableArray<T> implements Array<T> {
-    [n: number]: T;
-    length: number;
-
-    private _values: T[];
-    private dependencyState:DNode;
-    private changeEvent;
-
-    constructor(initialValues?:T[]) {
-        // make for .. in / Object.keys behave like an array:
-        Object.defineProperty(this, "length", {
-            enumerable: false,
-            get: function() {
-                this.dependencyState.notifyObserved();
-                return this._values.length;
-            },
-            set: function(newLength:number) {
-                // TODO: type & range check
-                var currentLength = this._values.length;
-                if (newLength === currentLength)
-                    return;
-
-                // grow
-                if (newLength > currentLength)
-                    this.spliceWithArray(currentLength, 0, new Array<T>(newLength - currentLength));
-
-                // shrink
-                else if (newLength < currentLength)
-                    this.splice(newLength, currentLength - newLength);
-            }
-        });
-        Object.defineProperty(this, "dependencyState", { enumerable: false, value: new DNode(false) });
-        Object.defineProperty(this, "_values", { enumerable: false, value: [] });
-        Object.defineProperty(this, "changeEvent", { enumerable: false, value: new SimpleEventEmitter() });
-
-        if (initialValues && initialValues.length)
-            this.spliceWithArray(0, 0, initialValues);
-        else
-            this.createNewStubEntry(0);
-    }
-
-    // and adds / removes the necessary numeric properties to this object
-    // does not alter this._values itself
-    private updateLength(oldLength:number, delta:number) {
-        if (delta < 0) {
-            for(var i = oldLength + delta + 1; i < oldLength; i++)
-                delete this[i];
-        }
-        else if (delta > 0) {
-            for (var i = 0; i < delta; i++)
-                this.createNewEntry(oldLength + i);
-        }
-        else
-            return;
-        this.createNewStubEntry(oldLength + delta);
-    }
-
-    private createNewEntry(index: number) {
-        Object.defineProperty(this, "" + index, {
-            enumerable: true,
-            configurable: true,
-            set: (value) => {
-                var oldValue = this._values[index];
-                if (oldValue !== value) {
-                    this._values[index] = value;
-                    this.notifyChildUpdate(index, oldValue);
-                }
-            },
-            get: () => {
-                this.dependencyState.notifyObserved();
-                return this._values[index];
-            }
-        })
-    }
-
-    private createNewStubEntry(index: number) {
-        Object.defineProperty(this, "" + index, {
-            enumerable: false,
-            configurable: true,
-            set: (value) => this.push(value),
-            get: () => undefined
-        });
-    }
-
-    spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[] {
-        var length = this._values.length;
-        if  ((newItems === undefined || newItems.length === 0) && (deleteCount === 0 || length === 0))
-            return [];
-
-        if (index === undefined)
-            index = 0;
-        else if (index > length)
-            index = length;
-        else if (index < 0)
-            index = Math.max(0, length + index);
-
-        if (arguments.length === 1)
-            deleteCount = length - index;
-        else if (deleteCount === undefined || deleteCount === null)
-            deleteCount = 0;
-        else
-            deleteCount = Math.max(0, Math.min(deleteCount, length - index));
-
-        if (newItems === undefined)
-            newItems = [];
-
-        var lengthDelta = newItems.length - deleteCount;
-        var res:T[] = Array.prototype.splice.apply(this._values, [<any>index, deleteCount].concat(newItems));
-        this.updateLength(length, lengthDelta); // create or remove new entries
-
-        this.notifySplice(index, res, newItems);
-        return res;
-    }
-
-    private notifyChildUpdate(index:number, oldValue:T) {
-        this.notifyChanged();
-        // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-        this.changeEvent.emit({ object: this, type: 'update', index: index, oldValue: oldValue});
-    }
-
-    private notifySplice(index:number, deleted:T[], added:T[]) {
-        if (deleted.length === 0 && added.length === 0)
-            return;
-        this.notifyChanged();
-        // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-        this.changeEvent.emit({ object: this, type: 'splice', index: index, addedCount: added.length, removed: deleted});
-    }
-
-    private notifyChanged() {
-        this.dependencyState.markStale();
-        this.dependencyState.markReady(true);
-    }
-
-    observe(listener:(data)=>void, fireImmediately=false):Lambda {
-        if (fireImmediately)
-            listener({ object: this, type: 'splice', index: 0, addedCount: this._values.length, removed: []});
-
-        return this.changeEvent.on(listener);
-    }
-
-    clear(): T[] {
-        return this.splice(0);
-    }
-
-    replace(newItems:T[]) {
-        return this.spliceWithArray(0, this._values.length, newItems);
-    }
-
-    values(): T[] {
-        return this._values.slice();
-    }
-
-    toJSON(): T[] {
-        return this._values.slice();
-    }
-
-    /*
-        ES7 goodies
-     */
-    // observe(callaback) https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-    // https://github.com/arv/ecmascript-object-observe
-
-    /*
-        functions that do alter the internal structure of the array, from lib.es6.d.ts
-     */
-    splice(index:number, deleteCount?:number, ...newItems:T[]):T[] {
-        switch(arguments.length) {
-            case 0:
-                return [];
-            case 1:
-                return this.spliceWithArray(index);
-            case 2:
-                return this.spliceWithArray(index, deleteCount);
-        }
-        return this.spliceWithArray(index, deleteCount, newItems);
-    }
-
-    push(...items: T[]): number {
-        // don't use the property internally
-        this.spliceWithArray(this._values.length, 0, items);
-        return this._values.length;
-    }
-    pop(): T {
-        return this.splice(Math.max(this._values.length - 1, 0), 1)[0];
-    }
-    shift(): T {
-        return this.splice(0, 1)[0]
-    }
-    unshift(...items: T[]): number {
-        this.spliceWithArray(0, 0, items);
-        return this._values.length;
-    }
-
-    /*
-        functions that do not alter the array, from lib.es6.d.ts
-    */
-    toString():string { return this.wrapReadFunction<string>("toString", arguments); }
-    toLocaleString():string { return this.wrapReadFunction<string>("toLocaleString", arguments); }
-    concat<U extends T[]>(...items: U[]): T[] { return this.wrapReadFunction<T[]>("concat", arguments); }
-    join(separator?: string): string { return this.wrapReadFunction<string>("join", arguments); }
-    reverse():T[] { return this.wrapReadFunction<T[]>("reverse", arguments); }
-    slice(start?: number, end?: number): T[] { return this.wrapReadFunction<T[]>("slice", arguments); }
-    sort(compareFn?: (a: T, b: T) => number): T[] { return this.wrapReadFunction<T[]>("sort", arguments); }
-    indexOf(searchElement: T, fromIndex?: number): number { return this.wrapReadFunction<number>("indexOf", arguments); }
-    lastIndexOf(searchElement: T, fromIndex?: number): number { return this.wrapReadFunction<number>("lastIndexOf", arguments); }
-    every(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean { return this.wrapReadFunction<boolean>("every", arguments); }
-    some(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean { return this.wrapReadFunction<boolean>("some", arguments); }
-    forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void { return this.wrapReadFunction<void>("forEach", arguments); }
-    map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[] { return this.wrapReadFunction<U[]>("map", arguments); }
-    filter(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[] { return this.wrapReadFunction<T[]>("filter", arguments); }
-    reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { return this.wrapReadFunction<U>("reduce", arguments); }
-    reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { return this.wrapReadFunction<U>("reduceRight", arguments); }
-
-    private wrapReadFunction<U>(funcName:string, args:IArguments):U {
-        var baseFunc = Array.prototype[funcName];
-        // generate a new function that wraps arround the Array.prototype, and replace our own definition
-        ObservableArray.prototype[funcName] = function() {
-            this.dependencyState.notifyObserved();
-            return baseFunc.apply(this._values, arguments);
-        }
-        return this[funcName].apply(this, args);
-    }
-}
-
-
-//TODO: trick type system
-//ObservableArray.prototype = []; // makes, observableArray instanceof Array === true, but not typeof or Array.isArray..
-//y.__proto__ = Array.prototype
-//x.prototype.toString = function(){ return "[object Array]" }
-//even monky patch Array.isArray?
 
 enum DNodeState {
     STALE, // One or more depencies have changed, current value is stale
@@ -801,6 +591,239 @@ class DNode {
     }
 }
 
+//TODO: trick type system
+//ObservableArray.prototype = []; // makes, observableArray instanceof Array === true, but not typeof or Array.isArray..
+//y.__proto__ = Array.prototype
+//x.prototype.toString = function(){ return "[object Array]" }
+//even monky patch Array.isArray?
+
+
+class ObservableArray<T> implements Array<T> {
+    [n: number]: T;
+    length: number;
+
+    private _values: T[];
+    private dependencyState:DNode;
+    private changeEvent: SimpleEventEmitter;
+
+    constructor(initialValues?:T[]) {
+        // make for .. in / Object.keys behave like an array:
+        Object.defineProperty(this, "length", {
+            enumerable: false,
+            get: function() {
+                this.dependencyState.notifyObserved();
+                return this._values.length;
+            },
+            set: function(newLength:number) {
+                // TODO: type & range check
+                var currentLength = this._values.length;
+                if (newLength === currentLength)
+                    return;
+
+                // grow
+                if (newLength > currentLength)
+                    this.spliceWithArray(currentLength, 0, new Array<T>(newLength - currentLength));
+
+                // shrink
+                else if (newLength < currentLength)
+                    this.splice(newLength, currentLength - newLength);
+            }
+        });
+        Object.defineProperty(this, "dependencyState", { enumerable: false, value: new DNode(false) });
+        Object.defineProperty(this, "_values", { enumerable: false, value: [] });
+        Object.defineProperty(this, "changeEvent", { enumerable: false, value: new SimpleEventEmitter() });
+
+        if (initialValues && initialValues.length)
+            this.spliceWithArray(0, 0, initialValues);
+        else
+            this.createNewStubEntry(0);
+    }
+
+    // and adds / removes the necessary numeric properties to this object
+    // does not alter this._values itself
+    private updateLength(oldLength:number, delta:number) {
+        if (delta < 0) {
+            for(var i = oldLength + delta + 1; i < oldLength; i++)
+                delete this[i];
+        }
+        else if (delta > 0) {
+            for (var i = 0; i < delta; i++)
+                this.createNewEntry(oldLength + i);
+        }
+        else
+            return;
+        this.createNewStubEntry(oldLength + delta);
+    }
+
+    private createNewEntry(index: number) {
+        Object.defineProperty(this, "" + index, {
+            enumerable: true,
+            configurable: true,
+            set: (value) => {
+                var oldValue = this._values[index];
+                if (oldValue !== value) {
+                    this._values[index] = value;
+                    this.notifyChildUpdate(index, oldValue);
+                }
+            },
+            get: () => {
+                this.dependencyState.notifyObserved();
+                return this._values[index];
+            }
+        })
+    }
+
+    private createNewStubEntry(index: number) {
+        Object.defineProperty(this, "" + index, {
+            enumerable: false,
+            configurable: true,
+            set: (value) => this.push(value),
+            get: () => undefined
+        });
+    }
+
+    spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[] {
+        var length = this._values.length;
+        if  ((newItems === undefined || newItems.length === 0) && (deleteCount === 0 || length === 0))
+            return [];
+
+        if (index === undefined)
+            index = 0;
+        else if (index > length)
+            index = length;
+        else if (index < 0)
+            index = Math.max(0, length + index);
+
+        if (arguments.length === 1)
+            deleteCount = length - index;
+        else if (deleteCount === undefined || deleteCount === null)
+            deleteCount = 0;
+        else
+            deleteCount = Math.max(0, Math.min(deleteCount, length - index));
+
+        if (newItems === undefined)
+            newItems = [];
+
+        var lengthDelta = newItems.length - deleteCount;
+        var res:T[] = Array.prototype.splice.apply(this._values, [<any>index, deleteCount].concat(newItems));
+        this.updateLength(length, lengthDelta); // create or remove new entries
+
+        this.notifySplice(index, res, newItems);
+        return res;
+    }
+
+    private notifyChildUpdate(index:number, oldValue:T) {
+        this.notifyChanged();
+        // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
+        this.changeEvent.emit({ object: this, type: 'update', index: index, oldValue: oldValue});
+    }
+
+    private notifySplice(index:number, deleted:T[], added:T[]) {
+        if (deleted.length === 0 && added.length === 0)
+            return;
+        this.notifyChanged();
+        // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
+        this.changeEvent.emit({ object: this, type: 'splice', index: index, addedCount: added.length, removed: deleted});
+    }
+
+    private notifyChanged() {
+        this.dependencyState.markStale();
+        this.dependencyState.markReady(true);
+    }
+
+    observe(listener:(data)=>void, fireImmediately=false):Lambda {
+        if (fireImmediately)
+            listener({ object: this, type: 'splice', index: 0, addedCount: this._values.length, removed: []});
+
+        return this.changeEvent.on(listener);
+    }
+
+    clear(): T[] {
+        return this.splice(0);
+    }
+
+    replace(newItems:T[]) {
+        return this.spliceWithArray(0, this._values.length, newItems);
+    }
+
+    values(): T[] {
+        return this._values.slice();
+    }
+
+    toJSON(): T[] {
+        return this._values.slice();
+    }
+
+    /*
+        ES7 goodies
+     */
+    // observe(callaback) https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
+    // https://github.com/arv/ecmascript-object-observe
+
+    /*
+        functions that do alter the internal structure of the array, from lib.es6.d.ts
+     */
+    splice(index:number, deleteCount?:number, ...newItems:T[]):T[] {
+        switch(arguments.length) {
+            case 0:
+                return [];
+            case 1:
+                return this.spliceWithArray(index);
+            case 2:
+                return this.spliceWithArray(index, deleteCount);
+        }
+        return this.spliceWithArray(index, deleteCount, newItems);
+    }
+
+    push(...items: T[]): number {
+        // don't use the property internally
+        this.spliceWithArray(this._values.length, 0, items);
+        return this._values.length;
+    }
+    pop(): T {
+        return this.splice(Math.max(this._values.length - 1, 0), 1)[0];
+    }
+    shift(): T {
+        return this.splice(0, 1)[0]
+    }
+    unshift(...items: T[]): number {
+        this.spliceWithArray(0, 0, items);
+        return this._values.length;
+    }
+
+    /*
+        functions that do not alter the array, from lib.es6.d.ts
+    */
+    toString():string { return this.wrapReadFunction<string>("toString", arguments); }
+    toLocaleString():string { return this.wrapReadFunction<string>("toLocaleString", arguments); }
+    concat<U extends T[]>(...items: U[]): T[] { return this.wrapReadFunction<T[]>("concat", arguments); }
+    join(separator?: string): string { return this.wrapReadFunction<string>("join", arguments); }
+    reverse():T[] { return this.wrapReadFunction<T[]>("reverse", arguments); }
+    slice(start?: number, end?: number): T[] { return this.wrapReadFunction<T[]>("slice", arguments); }
+    sort(compareFn?: (a: T, b: T) => number): T[] { return this.wrapReadFunction<T[]>("sort", arguments); }
+    indexOf(searchElement: T, fromIndex?: number): number { return this.wrapReadFunction<number>("indexOf", arguments); }
+    lastIndexOf(searchElement: T, fromIndex?: number): number { return this.wrapReadFunction<number>("lastIndexOf", arguments); }
+    every(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean { return this.wrapReadFunction<boolean>("every", arguments); }
+    some(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean { return this.wrapReadFunction<boolean>("some", arguments); }
+    forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void { return this.wrapReadFunction<void>("forEach", arguments); }
+    map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[] { return this.wrapReadFunction<U[]>("map", arguments); }
+    filter(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[] { return this.wrapReadFunction<T[]>("filter", arguments); }
+    reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { return this.wrapReadFunction<U>("reduce", arguments); }
+    reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { return this.wrapReadFunction<U>("reduceRight", arguments); }
+
+    private wrapReadFunction<U>(funcName:string, args:IArguments):U {
+        var baseFunc = Array.prototype[funcName];
+        // generate a new function that wraps arround the Array.prototype, and replace our own definition
+        ObservableArray.prototype[funcName] = function() {
+            this.dependencyState.notifyObserved();
+            return baseFunc.apply(this._values, arguments);
+        }
+        return this[funcName].apply(this, args);
+    }
+}
+
+
+
 
 class SimpleEventEmitter {
     listeners:{(data?):void}[] = [];
@@ -990,6 +1013,19 @@ function quickDiff<T>(current:T[], base:T[]):[T[],T[]] {
 function warn(message) {
     if (console)
         console.warn("[WARNING:mobservable] " + message);
+}
+
+/**
+    Makes sure that the provided function is invoked at most once.
+*/
+function once(func: Lambda):Lambda {
+    var invoked = false;
+    return function() {
+        if (invoked)
+            return;
+        invoked = true;
+        return func.apply(this, arguments);
+    }
 }
 
 export = mobservableStatic;

@@ -23,7 +23,7 @@ export function testAnnotations(test) {
     var order1 = new Order();
     var order2 = new Order();
 
-    var disposer = mobservable.observeProperty(order1, 'total', value => order1totals.push(value));
+    var disposer = mobservable.observeProperty(order1, 'total', value => order1totals.push(value), true);
 
     order2.price = 4;
     order1.amount = 1;

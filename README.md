@@ -179,7 +179,7 @@ class Order {
 ```
 
 ## mobservable.observeProperty
-`function observeProperty(object:Object, key:string, listener:Function):Lambda`
+`function observeProperty(object:Object, key:string, listener:Function, fireImmediately=false):Lambda`
 
 Observes the observable property `key` of `object`. This is useful if you want to observe properties created using the `observable` annotation or the `defineObservableProperty` method, since for those properties their own `observe` method is not publicly available.
 
