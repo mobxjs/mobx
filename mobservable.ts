@@ -365,6 +365,7 @@ class DNode {
     private prevObserving: DNode[] = null; // nodes we were looking at before. Used to determine changes in the dependency tree
     private observers: DNode[] = [];       // nodes that are dependent on this node. Will be notified when our state change
     private dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
+    private dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
     private isDisposed = false;            // ready to be garbage collected. Nobody is observing or ever will observe us
     private externalRefenceCount = 0;      // nr of 'things' that depend on us, excluding other DNode's. If > 0, this node will not go to sleep
 
@@ -415,14 +416,6 @@ class DNode {
             os[i].notifyStateChange(this, stateDidActuallyChange);
     }
 
-    areAllDependenciesAreStable() {
-        var obs = this.observing, l = obs.length;
-        for(var i = 0; i < l; i++)
-            if (obs[i].state !== DNodeState.READY)
-                return false;
-        return true;
-    }
-
     tryToSleep() {
         if (this.isComputed && this.observers.length === 0 && this.externalRefenceCount === 0 && !this.isSleeping) {
             for (var i = 0, l = this.observing.length; i < l; i++)
@@ -441,33 +434,24 @@ class DNode {
     }
 
     notifyStateChange(observable:DNode, stateDidActuallyChange:boolean) {
-        switch(this.state) {
-            case DNodeState.STALE:
-                if (observable.state === DNodeState.READY) {
-                    if (stateDidActuallyChange)
-                        this.dependencyChangeCount += 1;
-                    // The observable has become stable, and all others are stable as well, we can compute now!
-                    if (this.areAllDependenciesAreStable()) {
-                        this.state = DNodeState.PENDING;
-                        Scheduler.schedule(() => {
-                            // did any of the observables really change?
-                            if (this.dependencyChangeCount > 0)
-                                this.computeNextState();
-                            else
-                                // we're done, but didn't change, lets make sure verybody knows..
-                                this.markReady(false);
-                            this.dependencyChangeCount = 0;
-                        });
-                    }
-                }
-                return;
-            case DNodeState.READY:
-                if (observable.state === DNodeState.STALE)
-                    this.markStale();
-                return;
-            case DNodeState.PENDING:
-                // computation is already scheduled, we are ATM not interested in others..
-                return;
+        if (observable.state === DNodeState.STALE) {
+            if (++this.dependencyStaleCount === 1)
+                this.markStale();
+        } else { // ready
+            if (stateDidActuallyChange)
+                this.dependencyChangeCount += 1;
+            if (--this.dependencyStaleCount === 0) {
+                this.state = DNodeState.PENDING;
+                Scheduler.schedule(() => {
+                    // did any of the observables really change?
+                    if (this.dependencyChangeCount > 0)
+                        this.computeNextState();
+                    else
+                        // we're done, but didn't change, lets make sure verybody knows..
+                        this.markReady(false);
+                    this.dependencyChangeCount = 0;
+                });
+            }
         }
     }
 

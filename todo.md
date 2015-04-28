@@ -39,9 +39,9 @@
     - pass compute function into DNode in computed observable
     - computable's without observers should stay 'awake' after a computation (e.g. being inspected by .get),
         but then go to sleep if one of its dependencies has changed, so that subsequent reads on a computable are cheap even if there are no observers
-    - node.addObserver check if new observer doesn't equal the prevous one
+    - ~~node.addObserver check if new observer doesn't equal the prevous one~~
     - check if somewhere an array is filled that could be preallocate
-    - count stale dependencies, instead of looping each time whether all dependencies are ready again.
+    - ~~count stale dependencies, instead of looping each time whether all dependencies are ready again.~~
     - collapse stale / ready notifications whenever possible
     - heuristic to make computables non-lazy if used frequently (something like, in computable, if (this.lazyReads > this.computesWithoutObservers) then never-go-to-sleep)
 * make sure array properties are read only
