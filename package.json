@@ -4,7 +4,7 @@
     "description": "Changes are coming! Small library for creating observable properties en functions",
     "main": "dist/mobservable.js",
     "scripts": {
-        "test": "grunt test",
+        "test": "grunt cover",
         "prepublish": "grunt build"
     },
     "repository": {
