@@ -28,7 +28,7 @@ module.exports = function(grunt) {
             perf: ['test/performance.js']
         },
         exec: {
-            cover: "istanbul cover nodeunit test/"
+            cover: "mkdir -p dist/test && cp -rf test/* dist/test && istanbul cover nodeunit dist/test/"
         },
         coveralls: {
             options: {
@@ -36,7 +36,7 @@ module.exports = function(grunt) {
                 force: false
             },
             default: {
-                src: 'coverage/lcov.info',
+                src: 'dist/coverage/lcov.info',
             }
          }
     });

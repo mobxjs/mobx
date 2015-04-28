@@ -8,3 +8,4 @@ publish.js
 .tscache
 *.js.map
 /test/typescript-test.js*
+/dist/test
