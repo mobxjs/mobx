@@ -36,7 +36,7 @@ module.exports = function(grunt) {
                 force: false
             },
             default: {
-                src: 'dist/coverage/lcov.info',
+                src: 'coverage/lcov.info',
             }
          }
     });
