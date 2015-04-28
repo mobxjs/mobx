@@ -495,9 +495,7 @@ class DNode {
             warn("You have created a function that doesn't observe any values, did you forget to make its dependencies observable?");
         }
 
-        var changes = quickDiff(this.observing, this.prevObserving);
-        var added = changes[0];
-        var removed = changes[1];
+        var [added, removed] = quickDiff(this.observing, this.prevObserving);
         this.prevObserving = null;
 
         for(var i = 0, l = removed.length; i < l; i++)
@@ -649,7 +647,7 @@ class ObservableArray<T> implements Array<T> {
             newItems = [];
 
         var lengthDelta = newItems.length - deleteCount;
-        var res:T[] = Array.prototype.splice.apply(this._values, [<any>index, deleteCount].concat(newItems));
+        var res:T[] = this._values.splice(index, deleteCount, ...newItems);
         this.updateLength(length, lengthDelta); // create or remove new entries
 
         this.notifySplice(index, res, newItems);
@@ -780,7 +778,7 @@ class SimpleEventEmitter {
                 break;
             default:
                 for(var i = 0; i < l; i++)
-                    listeners[i].apply(undefined, arguments);
+                    listeners[i].apply(null, arguments);
         }
     }
 
@@ -796,7 +794,7 @@ class SimpleEventEmitter {
     once(listener:(...data:any[])=>void):Lambda {
         var subscription = this.on(function() {
             subscription();
-            listener.apply(arguments);
+            listener.apply(this, arguments);
         });
         return subscription;
     }
@@ -915,22 +913,22 @@ function quickDiff<T>(current:T[], base:T[]):[T[],T[]] {
 
         if (!currentExhausted && current[currentSearch] === base[baseIndex]) {
             // items where added
-            added.push.apply(added, current.slice(currentIndex, currentSearch));
+            added.push(...current.slice(currentIndex, currentSearch));
             currentIndex = currentSearch +1;
             baseIndex ++;
             isSearching = false;
         }
         else if (!baseExhausted && base[baseSearch] === current[currentIndex]) {
             // items where removed
-            removed.push.apply(removed, base.slice(baseIndex, baseSearch));
+            removed.push(...base.slice(baseIndex, baseSearch));
             baseIndex = baseSearch +1;
             currentIndex ++;
             isSearching = false;
         }
     }
 
-    added.push.apply(added, current.slice(currentIndex));
-    removed.push.apply(removed, base.slice(baseIndex));
+    added.push(...current.slice(currentIndex));
+    removed.push(...base.slice(baseIndex));
     return [added, removed];
 }
 

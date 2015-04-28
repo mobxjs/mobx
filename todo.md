@@ -15,17 +15,17 @@
 * ~~drop event emitter, to make lib smaller and stand alone? https://github.com/joyent/node/blob/master/lib/events.js, note: clone listeners before invoking, note: document~~
 * ~~array.observe conform~~
 * ~~badges for build, coverage, npm~~
-* process remaining optimizations / todo's, document code
+* ~~process remaining optimizations / todo's, document code~~
 * test browser compatibility?
 * coverage tests
 * minified version
-* use typescript 1.5 spread operator
-* use console.trace() in logging where applicable
+* ~~use typescript 1.5 spread operator~~
+* ~~use console.trace() in logging where applicable~~
 * add 'name' as parameter to observable.value, automatically set it when defining properties, use it in warnings / toString
 * IReactiveValue interface
 * IObservable interface
 * browser support test https://ci.testling.com/
-* use destructurings (for example quickdiff)
+* ~~use destructurings (for example quickdiff)~~
 * examples
 * describe properties in readme:
     - synchronous updates
