@@ -25,6 +25,7 @@
 * IReactiveValue interface
 * IObservable interface
 * browser support test https://ci.testling.com/
+* use destructurings (for example quickdiff)
 * examples
 * describe properties in readme:
     - synchronous updates

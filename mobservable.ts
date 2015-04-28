@@ -95,16 +95,16 @@ mobservableStatic.debugLevel = 0;
 mobservableStatic.watch = function watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
     var dnode = new DNode(true);
     var retVal:T;
-    dnode.compute = function() {
+    dnode.nextState = function() {
         retVal = func();
-        dnode.compute = function() {
+        dnode.nextState = function() {
             dnode.dispose();
             onInvalidate();
             return false;
         }
         return false;
     }
-    dnode.computeNextValue();
+    dnode.computeNextState();
     return [retVal, () => dnode.dispose()];
 }
 
@@ -272,7 +272,7 @@ class ComputedObservable<U,S> extends ObservableValue<U,S> {
         if (!func)
             throw new Error("ComputedObservable requires a function");
         this.dependencyState.isComputed = true;
-        this.dependencyState.compute = this.compute.bind(this);
+        this.dependencyState.nextState = this.compute.bind(this);
     }
 
     get():U {
@@ -344,41 +344,40 @@ class ComputedObservable<U,S> extends ObservableValue<U,S> {
 }
 
 enum DNodeState {
-    STALE, // One or more depencies have changed, current value is stale
-    PENDING, // All dependencies are up to date again, a recalculation of this node is pending, current value is stale
-    READY, // Everything is bright and shiny
+    STALE,     // One or more depencies have changed but their values are not yet known, current value is stale
+    PENDING,   // All dependencies are up to date again, a recalculation of this node is ongoing or pending, current value is stale
+    READY,     // Everything is bright and shiny
 };
 
+/**
+ * A Node in the dependency graph of a (computed)observable.
+ *
+ * observing: nodes that are needed for this DNode to operate
+ * observers: nodes that need this node to operate
+ */
 class DNode {
-    state: DNodeState = DNodeState.READY;
-    isSleeping = true;
-    hasCycle = false;
+    static trackingStack: DNode[][] = [];  // stack of: list of DNode's being observed by the currently ongoing computation
 
-    private observing: DNode[] = [];
-    private prevObserving: DNode[] = null;
-    private observers: DNode[] = [];
-    private dependencyChangeCount = 0;
-    private isDisposed = false;
-    private externalRefenceCount = 0;
+    state: DNodeState = DNodeState.READY;
+    isSleeping = true; // isSleeping: nobody is observing this dependency node, so don't bother tracking DNode's this DNode depends on
+    hasCycle = false;  // this node is part of a cycle, which is an error
+    private observing: DNode[] = [];       // nodes we are looking at. Our value depends on these nodes
+    private prevObserving: DNode[] = null; // nodes we were looking at before. Used to determine changes in the dependency tree
+    private observers: DNode[] = [];       // nodes that are dependent on this node. Will be notified when our state change
+    private dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
+    private isDisposed = false;            // ready to be garbage collected. Nobody is observing or ever will observe us
+    private externalRefenceCount = 0;      // nr of 'things' that depend on us, excluding other DNode's. If > 0, this node will not go to sleep
 
     constructor(public isComputed:boolean) {
-    }
-
-    getRefCount():number {
-        return this.observers.length + this.externalRefenceCount;
+        // isComputed indicates that this node can depend on others.
     }
 
     setRefCount(delta:number) {
-        this.externalRefenceCount += delta;
-        if (delta > 0 && this.externalRefenceCount === delta)
-            this.wakeUp();
-        else if (this.externalRefenceCount === 0)
+        var rc = this.externalRefenceCount += delta;
+        if (rc === 0)
             this.tryToSleep();
-    }
-
-    // TODO: remove?
-    getObserversCount() {
-        return this.observers.length;
+        else if (rc === delta)
+            this.wakeUp();
     }
 
     addObserver(node:DNode) {
@@ -386,66 +385,36 @@ class DNode {
     }
 
     removeObserver(node:DNode) {
-        var idx = this.observers.indexOf(node);
+        var obs = this.observers, idx = obs.indexOf(node);
         if (idx !== -1) {
-            this.observers.splice(idx, 1);
-            this.tryToSleep();
+            obs.splice(idx, 1);
+            if (obs.length === 0)
+                this.tryToSleep();
         }
-    }
-
-    hasObservingChanged() {
-        if (this.observing.length !== this.prevObserving.length)
-            return true;
-        // Optimization; use cached length
-        var l = this.observing.length;
-        for(var i = 0; i < l; i++)
-            if (this.observing[i] !== this.prevObserving[i])
-                return true;
-        return false;
     }
 
     markStale() {
-        if (this.state === DNodeState.PENDING)
-            return; // recalculation already scheduled, we're fine..
-        if (this.state === DNodeState.STALE)
-            return;
-
+        if (this.state !== DNodeState.READY)
+            return; // stale or pending; recalculation already scheduled, we're fine..
         this.state = DNodeState.STALE;
-        /*
-            Mark stale recursively marks all observers stale as well, this is nice since it
-            makes all computations consistent, e.g.:
-            a = property(3)
-            b = property(() => a() * 2)
-            c = property(() => b() + a())
-            a(4)
-            // -> c will directly yield 12, and no intermediate 4 or 11 where either 'a' or 'b' wasn't updated in c
-
-            However, if performance becomes an issue, it might be nice to introduce a global 'consistent' flag,
-            that drops de recursive markStale / markReady in favor of a direct set and an (async?) scheduled recomputation
-            of computed properties
-         */
         this.notifyObservers();
     }
 
-    markReady(didTheValueActuallyChange:boolean) {
+    markReady(stateDidActuallyChange:boolean) {
         if (this.state === DNodeState.READY)
             return;
         this.state = DNodeState.READY;
-        this.notifyObservers(didTheValueActuallyChange);
-        Scheduler.scheduleReady();
+        this.notifyObservers(stateDidActuallyChange);
+        if (this.observers.length === 0) // otherwise, let one of the observers do that :)
+            Scheduler.scheduleReady();
     }
 
-    notifyObservers(didTheValueActuallyChange:boolean=false) {
-        var os = this.observers;
-        // change to 'for loop, reverse, pre-decrement', https://jsperf.com/for-vs-foreach/32
-        for(var i = os.length -1; i >= 0; i--) {
-            var o = os[i];
-            if (o)
-                o.notifyStateChange(this, didTheValueActuallyChange);
-        }
+    notifyObservers(stateDidActuallyChange:boolean=false) {
+        var os = this.observers.slice();
+        for(var l = os.length, i = 0; i < l; i++)
+            os[i].notifyStateChange(this, stateDidActuallyChange);
     }
 
-    // optimization: replace this check with an 'unstableDependenciesCounter'.
     areAllDependenciesAreStable() {
         var obs = this.observing, l = obs.length;
         for(var i = 0; i < l; i++)
@@ -455,7 +424,7 @@ class DNode {
     }
 
     tryToSleep() {
-        if (this.isComputed && this.getRefCount() === 0 && !this.isSleeping) {
+        if (this.isComputed && this.observers.length === 0 && this.externalRefenceCount === 0 && !this.isSleeping) {
             for (var i = 0, l = this.observing.length; i < l; i++)
                 this.observing[i].removeObserver(this);
             this.observing = [];
@@ -467,64 +436,51 @@ class DNode {
         if (this.isSleeping && this.isComputed) {
             this.isSleeping = false;
             this.state = DNodeState.PENDING;
-            this.computeNextValue();
+            this.computeNextState();
         }
     }
 
-    notifyStateChange(observable:DNode, didTheValueActuallyChange:boolean) {
+    notifyStateChange(observable:DNode, stateDidActuallyChange:boolean) {
         switch(this.state) {
             case DNodeState.STALE:
-                if (observable.state === DNodeState.READY && didTheValueActuallyChange)
-                    this.dependencyChangeCount += 1;
-                // The observable has become stable, and all others are stable as well, we can compute now!
-                if (observable.state === DNodeState.READY && this.areAllDependenciesAreStable()) {
-                    // did any of the observables really change?
-                    this.state = DNodeState.PENDING;
-                    Scheduler.schedule(() => {
-                        if (this.dependencyChangeCount > 0)
-                            this.computeNextValue();
-                        else
-                            // we're done, but didn't change, lets make sure verybody knows..
-                            this.markReady(false);
-                        this.dependencyChangeCount = 0;
-                    });
+                if (observable.state === DNodeState.READY) {
+                    if (stateDidActuallyChange)
+                        this.dependencyChangeCount += 1;
+                    // The observable has become stable, and all others are stable as well, we can compute now!
+                    if (this.areAllDependenciesAreStable()) {
+                        this.state = DNodeState.PENDING;
+                        Scheduler.schedule(() => {
+                            // did any of the observables really change?
+                            if (this.dependencyChangeCount > 0)
+                                this.computeNextState();
+                            else
+                                // we're done, but didn't change, lets make sure verybody knows..
+                                this.markReady(false);
+                            this.dependencyChangeCount = 0;
+                        });
+                    }
                 }
-                break;
-            case DNodeState.PENDING:
-                // If computations are asynchronous, new updates might come in during processing,
-                // and it is impossible to determine whether these new values will be taken into consideration
-                // during the async process or not. So to ensure everything is concistent, probably a new computation
-                // should be scheduled immediately after the current one is done..
-
-                // However, for now the model is that all computations are synchronous, so if computing, a calc is already
-                // scheduled but not running yet, so we're fine here
-                break;
+                return;
             case DNodeState.READY:
                 if (observable.state === DNodeState.STALE)
                     this.markStale();
-                break;
+                return;
+            case DNodeState.PENDING:
+                // computation is already scheduled, we are ATM not interested in others..
+                return;
         }
     }
 
-    // TODO: rename to computeNextState
-    computeNextValue() {
-        // possible optimization: compute is only needed if there are subscribers or observers (that have subscribers)
-        // otherwise, computation and further (recursive markStale / markReady) could be delayed
+    computeNextState() {
         this.trackDependencies();
-        var valueDidChange = this.compute();
+        var stateDidChange = this.nextState();
         this.bindDependencies();
-        this.markReady(valueDidChange);
+        this.markReady(stateDidChange);
     }
 
-    // TODO: rename to onDependenciesStable
-    compute():boolean {
+    nextState():boolean {
         return false; // false == unchanged
     }
-
-    /*
-        Dependency detection
-    */
-    static trackingStack:DNode[][] = []
 
     private trackDependencies() {
         this.prevObserving = this.observing;
@@ -534,10 +490,10 @@ class DNode {
     private bindDependencies() {
         this.observing = DNode.trackingStack.pop();
 
-        /* TODO:
-        if (this.isComputed && this.observing.length === 0 && !this.isDisposed)
-            this.log("You have created a function that doesn't observe any values, did you forget to make its dependencies observable?");
-        */
+        if (this.isComputed && this.observing.length === 0 && mobservableStatic.debugLevel > 1 && !this.isDisposed) {
+            console.trace();
+            warn("You have created a function that doesn't observe any values, did you forget to make its dependencies observable?");
+        }
 
         var changes = quickDiff(this.observing, this.prevObserving);
         var added = changes[0];
@@ -551,19 +507,19 @@ class DNode {
         for(var i = 0, l = added.length; i < l; i++) {
             if (this.isComputed && added[i].findCycle(this)) {
                 this.hasCycle = true;
-                this.observing.splice(this.observing.indexOf(added[i]), 1); // don't observe anything that caused a cycle!
-                // TODO:somehow, we would like to signal 'added[i]' that it is part of a cycle as well?
-            }
-            else
+                // don't observe anything that caused a cycle, or we are stuck forever!
+                this.observing.splice(this.observing.indexOf(added[i]), 1);
+                added[i].hasCycle = true; // for completeness sake..
+            } else {
                 added[i].addObserver(this);
+            }
         }
-
     }
 
     public notifyObserved() {
         var ts = DNode.trackingStack, l = ts.length;
-        if (l) {
-            var cs = ts[l -1], csl = cs.length;
+        if (l > 0) {
+            var cs = ts[l - 1], csl = cs.length;
             // this last item added check is an optimization especially for array loops,
             // because an array.length read with subsequent reads from the array
             // might trigger many observed events, while just checking the last added item is cheap
@@ -573,30 +529,24 @@ class DNode {
     }
 
     private findCycle(node:DNode) {
-        if (this.observing.indexOf(node) !== -1)
+        var obs = this.observing;
+        if (obs.indexOf(node) !== -1)
             return true;
-        for(var l = this.observing.length, i=0; i<l; i++)
-            if (this.observing[i].findCycle(node))
+        for(var l = obs.length, i = 0; i < l; i++)
+            if (obs[i].findCycle(node))
                 return true;
         return false;
     }
 
     public dispose() {
+        if (this.observers.length)
+            throw new Error("Cannot dispose DNode; it is still being observed");
         for(var l=this.observing.length, i=0; i<l; i++)
             this.observing[i].removeObserver(this);
         this.observing = [];
-        this.observers = [];
         this.isDisposed = true;
-        // TODO: if there are observers, throw warning!
     }
 }
-
-//TODO: trick type system
-//ObservableArray.prototype = []; // makes, observableArray instanceof Array === true, but not typeof or Array.isArray..
-//y.__proto__ = Array.prototype
-//x.prototype.toString = function(){ return "[object Array]" }
-//even monky patch Array.isArray?
-
 
 class ObservableArray<T> implements Array<T> {
     [n: number]: T;
@@ -607,7 +557,10 @@ class ObservableArray<T> implements Array<T> {
     private changeEvent: SimpleEventEmitter;
 
     constructor(initialValues?:T[]) {
-        // make for .. in / Object.keys behave like an array:
+        // make for .. in / Object.keys behave like an array, so hide the other properties
+        Object.defineProperty(this, "dependencyState", { enumerable: false, value: new DNode(false) });
+        Object.defineProperty(this, "_values", { enumerable: false, value: [] });
+        Object.defineProperty(this, "changeEvent", { enumerable: false, value: new SimpleEventEmitter() });
         Object.defineProperty(this, "length", {
             enumerable: false,
             get: function() {
@@ -615,62 +568,53 @@ class ObservableArray<T> implements Array<T> {
                 return this._values.length;
             },
             set: function(newLength:number) {
-                // TODO: type & range check
+                if (typeof newLength !== "number" || newLength < 0)
+                    throw new Error("Out of range: " + newLength);
                 var currentLength = this._values.length;
                 if (newLength === currentLength)
                     return;
-
-                // grow
                 if (newLength > currentLength)
                     this.spliceWithArray(currentLength, 0, new Array<T>(newLength - currentLength));
-
-                // shrink
                 else if (newLength < currentLength)
-                    this.splice(newLength, currentLength - newLength);
+                    this.spliceWithArray(newLength, currentLength - newLength);
             }
         });
-        Object.defineProperty(this, "dependencyState", { enumerable: false, value: new DNode(false) });
-        Object.defineProperty(this, "_values", { enumerable: false, value: [] });
-        Object.defineProperty(this, "changeEvent", { enumerable: false, value: new SimpleEventEmitter() });
-
         if (initialValues && initialValues.length)
             this.spliceWithArray(0, 0, initialValues);
         else
             this.createNewStubEntry(0);
     }
 
-    // and adds / removes the necessary numeric properties to this object
-    // does not alter this._values itself
+    // adds / removes the necessary numeric properties to this object
     private updateLength(oldLength:number, delta:number) {
-        if (delta < 0) {
+        if (delta < 0)
             for(var i = oldLength + delta + 1; i < oldLength; i++)
                 delete this[i];
-        }
-        else if (delta > 0) {
+        else if (delta > 0)
             for (var i = 0; i < delta; i++)
                 this.createNewEntry(oldLength + i);
-        }
         else
             return;
         this.createNewStubEntry(oldLength + delta);
     }
 
+    // create an entry that makes sure `array[array.length] = x` assignments work as expected
     private createNewEntry(index: number) {
         Object.defineProperty(this, "" + index, {
             enumerable: true,
             configurable: true,
-            set: (value) => {
+            set: function(value) {
                 var oldValue = this._values[index];
                 if (oldValue !== value) {
                     this._values[index] = value;
                     this.notifyChildUpdate(index, oldValue);
                 }
             },
-            get: () => {
+            get: function() {
                 this.dependencyState.notifyObserved();
                 return this._values[index];
             }
-        })
+        });
     }
 
     private createNewStubEntry(index: number) {
@@ -734,7 +678,6 @@ class ObservableArray<T> implements Array<T> {
     observe(listener:(data)=>void, fireImmediately=false):Lambda {
         if (fireImmediately)
             listener({ object: this, type: 'splice', index: 0, addedCount: this._values.length, removed: []});
-
         return this.changeEvent.on(listener);
     }
 
@@ -755,12 +698,6 @@ class ObservableArray<T> implements Array<T> {
     }
 
     /*
-        ES7 goodies
-     */
-    // observe(callaback) https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-    // https://github.com/arv/ecmascript-object-observe
-
-    /*
         functions that do alter the internal structure of the array, from lib.es6.d.ts
      */
     splice(index:number, deleteCount?:number, ...newItems:T[]):T[] {
@@ -776,16 +713,18 @@ class ObservableArray<T> implements Array<T> {
     }
 
     push(...items: T[]): number {
-        // don't use the property internally
         this.spliceWithArray(this._values.length, 0, items);
         return this._values.length;
     }
+
     pop(): T {
         return this.splice(Math.max(this._values.length - 1, 0), 1)[0];
     }
+
     shift(): T {
         return this.splice(0, 1)[0]
     }
+
     unshift(...items: T[]): number {
         this.spliceWithArray(0, 0, items);
         return this._values.length;
@@ -822,9 +761,6 @@ class ObservableArray<T> implements Array<T> {
     }
 }
 
-
-
-
 class SimpleEventEmitter {
     listeners:{(data?):void}[] = [];
 
@@ -849,16 +785,12 @@ class SimpleEventEmitter {
     }
 
     on(listener:(...data:any[])=>void):Lambda {
-        var disposed = false;
         this.listeners.push(listener);
-        return () => {
-            if (disposed)
-                return;
-            disposed = true;
+        return once(() => {
             var idx = this.listeners.indexOf(listener);
             if (idx !== -1)
                 this.listeners.splice(idx, 1);
-        }
+        });
     }
 
     once(listener:(...data:any[])=>void):Lambda {
@@ -872,32 +804,30 @@ class SimpleEventEmitter {
 mobservableStatic.SimpleEventEmitter = SimpleEventEmitter;
 
 class Scheduler {
+    private static pendingReady = false;
     private static readyEvent = new SimpleEventEmitter();
     private static inBatch = 0;
     private static tasks:{():void}[] = [];
 
     public static schedule(func:Lambda) {
-        if (Scheduler.inBatch < 1) {
-            func(); // func is allowed to throw, it will not affect any internal state
-        }
+        if (Scheduler.inBatch < 1)
+            func();
         else
             Scheduler.tasks[Scheduler.tasks.length] = func;
     }
 
-    private static runPostBatch() {
+    private static runPostBatchActions() {
         var i = 0;
-        try { // try is expensive, move it out of the while
-            for(i = 0; i < Scheduler.tasks.length; i++)
+        try {
+            for(; i < Scheduler.tasks.length; i++)
                 Scheduler.tasks[i]();
             Scheduler.tasks = [];
-        }
-        catch (e) {
-            console && console.error("Failed to run scheduled action, the action has been dropped from the queue: " + e, e);
+        } catch (e) {
+            console.error("Failed to run scheduled action, the action has been dropped from the queue: " + e, e);
             // drop already executed tasks, including the failing one, and retry in the future
             Scheduler.tasks.splice(0, i + 1);
-            setTimeout(() => Scheduler.runPostBatch(), 1);
-            // rethrow
-            throw e;
+            setTimeout(Scheduler.runPostBatchActions, 1);
+            throw e; // rethrow
         }
     }
 
@@ -906,20 +836,18 @@ class Scheduler {
         try {
             action();
         } finally {
-            Scheduler.inBatch -= 1;
-            if (Scheduler.inBatch === 0) {
-                Scheduler.runPostBatch();
+            //Scheduler.inBatch -= 1;
+            if (--Scheduler.inBatch === 0) {
+                Scheduler.runPostBatchActions();
                 Scheduler.scheduleReady();
             }
         }
     }
 
-    private static pendingReady = false;
-
     static scheduleReady() {
         if (!Scheduler.pendingReady) {
             Scheduler.pendingReady = true;
-            setTimeout(()=> {
+            setTimeout(() => {
                 Scheduler.pendingReady = false;
                 Scheduler.readyEvent.emit();
             }, 1);
@@ -953,7 +881,7 @@ function quickDiff<T>(current:T[], base:T[]):[T[],T[]] {
     var added:T[] = [];
     var removed:T[] = [];
 
-    var    currentIndex = 0,
+    var currentIndex = 0,
         currentSearch = 0,
         currentLength = current.length,
         currentExhausted = false,
