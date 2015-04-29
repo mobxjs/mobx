@@ -717,7 +717,8 @@ class ObservableArray<T> implements Array<T> {
     */
     toString():string { return this.wrapReadFunction<string>("toString", arguments); }
     toLocaleString():string { return this.wrapReadFunction<string>("toLocaleString", arguments); }
-    concat<U extends T[]>(...items: U[]): T[] { return this.wrapReadFunction<T[]>("concat", arguments); }
+    concat<U extends T[]>(...items: U[]): T[];
+    concat<U extends T[]>(): T[] { return this.wrapReadFunction<T[]>("concat", arguments); }
     join(separator?: string): string { return this.wrapReadFunction<string>("join", arguments); }
     reverse():T[] { return this.wrapReadFunction<T[]>("reverse", arguments); }
     slice(start?: number, end?: number): T[] { return this.wrapReadFunction<T[]>("slice", arguments); }

@@ -184,6 +184,15 @@ exports.testdefineObservableProperty = function(test) {
     order.amount = 3;
     test.equals(36, order.total);
 
+    var totals = [];
+    var sub = mobservable.observeProperty(order, 'total', function(value) {
+        totals.push(value);
+    }, true);
+    order.amount = 4;
+    sub();
+    order.amount = 5;
+    test.deepEqual(totals, [36,48]);
+
     test.equal(mobservable.stackDepth(), 0);
     test.done();
 };

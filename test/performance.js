@@ -343,6 +343,16 @@ exports.order_system_batched_lazy = function(test) {
     order_system_helper(test, true, false);
 };
 
+exports.array_creation = function(test) {
+    var a = [];
+    var b = [1];
+    var start = now();
+    for(var i = 0; i < 10000; i++)
+        mobservable.array(i % 2 === 0 ? a : b);
+    console.log('\n  Created in ' + (now() - start) + 'ms.');
+    test.done();
+};
+
 function now() {
     return + new Date();
 }
