@@ -42,6 +42,7 @@
     - ~~node.addObserver check if new observer doesn't equal the prevous one~~
     - check if somewhere an array is filled that could be preallocate
     - array: recycle properties (or not)
+    - look into defineProperties / making property creating faster (especially arrays)
     - ~~count stale dependencies, instead of looping each time whether all dependencies are ready again.~~
     - collapse stale / ready notifications whenever possible
     - heuristic to make computables non-lazy if used frequently (something like, in computable, if (this.lazyReads > this.computesWithoutObservers) then never-go-to-sleep)

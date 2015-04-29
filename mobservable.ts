@@ -530,6 +530,32 @@ class DNode {
     }
 }
 
+ var arrayStubProperty = {
+    enumerable: false,
+    configurable: true,
+    set: function(value) { this.push(value) },
+    get: function() { return undefined; }
+};
+
+var arrayLengthProperty = {
+    enumerable: false,
+    get: function() {
+        this.dependencyState.notifyObserved();
+        return this._values.length;
+    },
+    set: function(newLength:number) {
+        if (typeof newLength !== "number" || newLength < 0)
+            throw new Error("Out of range: " + newLength);
+        var currentLength = this._values.length;
+        if (newLength === currentLength)
+            return;
+        if (newLength > currentLength)
+            this.spliceWithArray(currentLength, 0, new Array(newLength - currentLength));
+        else if (newLength < currentLength)
+            this.spliceWithArray(newLength, currentLength - newLength);
+    }
+};
+
 class ObservableArray<T> implements Array<T> {
     [n: number]: T;
     length: number;
@@ -540,26 +566,11 @@ class ObservableArray<T> implements Array<T> {
 
     constructor(initialValues?:T[]) {
         // make for .. in / Object.keys behave like an array, so hide the other properties
-        Object.defineProperty(this, "dependencyState", { enumerable: false, value: new DNode(false) });
-        Object.defineProperty(this, "_values", { enumerable: false, value: [] });
-        Object.defineProperty(this, "changeEvent", { enumerable: false, value: new SimpleEventEmitter() });
-        Object.defineProperty(this, "length", {
-            enumerable: false,
-            get: function() {
-                this.dependencyState.notifyObserved();
-                return this._values.length;
-            },
-            set: function(newLength:number) {
-                if (typeof newLength !== "number" || newLength < 0)
-                    throw new Error("Out of range: " + newLength);
-                var currentLength = this._values.length;
-                if (newLength === currentLength)
-                    return;
-                if (newLength > currentLength)
-                    this.spliceWithArray(currentLength, 0, new Array<T>(newLength - currentLength));
-                else if (newLength < currentLength)
-                    this.spliceWithArray(newLength, currentLength - newLength);
-            }
+        Object.defineProperties(this, {
+            "dependencyState" : { enumerable: false, value: new DNode(false) },
+            "_values" : { enumerable: false, value: [] },
+            "changeEvent" : { enumerable: false, value: new SimpleEventEmitter() },
+            "length" : arrayLengthProperty
         });
         if (initialValues && initialValues.length)
             this.spliceWithArray(0, 0, initialValues);
@@ -582,7 +593,7 @@ class ObservableArray<T> implements Array<T> {
 
     // create an entry that makes sure `array[array.length] = x` assignments work as expected
     private createNewEntry(index: number) {
-        Object.defineProperty(this, "" + index, {
+        Object.defineProperty(this, <string><any>index, {
             enumerable: true,
             configurable: true,
             set: function(value) {
@@ -600,12 +611,7 @@ class ObservableArray<T> implements Array<T> {
     }
 
     private createNewStubEntry(index: number) {
-        Object.defineProperty(this, "" + index, {
-            enumerable: false,
-            configurable: true,
-            set: (value) => this.push(value),
-            get: () => undefined
-        });
+        Object.defineProperty(this, <string><any>index, arrayStubProperty);
     }
 
     spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[] {

@@ -27,7 +27,6 @@ results of this test:
 140/30000 after not using (un)shift / pop / push
 186/113 after remove filter/length call to detect whether depencies are stable. 300 times faster. w00t.
 
-// TODO: should upscale this test, since the measurement is now too small....
 */
 exports.one_observes_ten_thousand_that_observe_one = function(test) {
     gc();
@@ -343,15 +342,29 @@ exports.order_system_batched_lazy = function(test) {
     order_system_helper(test, true, false);
 };
 
-exports.array_creation = function(test) {
+test_array_creation = function(test, amount, size) {
     var a = [];
-    var b = [1];
+    for(var i = 0; i < size; i++)
+        a.push(i);
     var start = now();
-    for(var i = 0; i < 10000; i++)
-        mobservable.array(i % 2 === 0 ? a : b);
+    for(var i = 0; i < amount; i++)
+        mobservable.array(a);
     console.log('\n  Created in ' + (now() - start) + 'ms.');
     test.done();
 };
+
+exports.test_array_0 = function(test) {
+    test_array_creation(test, 1000);
+};
+
+exports.test_array_100 = function(test) {
+    test_array_creation(test, 1000);
+};
+
+exports.test_array_10000 = function(test) {
+    test_array_creation(test, 1000);
+};
+
 
 function now() {
     return + new Date();

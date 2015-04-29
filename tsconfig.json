@@ -13,6 +13,7 @@
         "!./node_modules/**/*.ts"
     ],
     "files": [
+        "./dist/test/typescript-test.ts",
         "./mobservable.d.ts",
         "./mobservable.ts",
         "./test/typescript-test.ts"
