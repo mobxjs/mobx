@@ -1,0 +1,33 @@
+{
+	"version": "0.1.0",
+	// List of configurations. Add new configurations or edit existing ones.  
+	// ONLY "node" and "mono" are supported, change "type" to switch.
+	"configurations": [
+		{
+			// Name of configuration; appears in the launch configuration drop down menu.
+			"name": "Launch app.js",
+			// Type of configuration. Possible values: "node", "mono".
+			"type": "node",
+			// Workspace relative or absolute path to the program.
+			"program": "node_modules/nodeunit/bin/nodeunit",
+			// Automatically stop program after launch.
+			"stopOnEntry": true,
+			// Command line arguments passed to the program.
+			"args": ["test/"],
+			// Workspace relative or absolute path to the working directory of the program being debugged. Default is the current workspace.
+			"cwd": ".",
+			// Workspace relative or absolute path to the runtime executable to be used. Default is the runtime executable on the PATH.
+			"runtimeExecutable": null,
+			// Environment variables passed to the program.
+			"env": { }
+		}, 
+		{
+			"name": "Attach",
+			"type": "node",
+			// TCP/IP address. Default is "localhost".
+			"address": "localhost",
+			// Port to attach to.
+			"port": 5858
+		}
+	]
+}
