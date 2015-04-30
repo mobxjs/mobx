@@ -413,68 +413,43 @@ var DNode = (function () {
 })();
 var ObservableArray = (function () {
     function ObservableArray(initialValues) {
-        Object.defineProperty(this, "dependencyState", { enumerable: false, value: new DNode(false) });
-        Object.defineProperty(this, "_values", { enumerable: false, value: [] });
-        Object.defineProperty(this, "changeEvent", { enumerable: false, value: new SimpleEventEmitter() });
-        Object.defineProperty(this, "length", {
-            enumerable: false,
-            get: function () {
-                this.dependencyState.notifyObserved();
-                return this._values.length;
-            },
-            set: function (newLength) {
-                if (typeof newLength !== "number" || newLength < 0)
-                    throw new Error("Out of range: " + newLength);
-                var currentLength = this._values.length;
-                if (newLength === currentLength)
-                    return;
-                if (newLength > currentLength)
-                    this.spliceWithArray(currentLength, 0, new Array(newLength - currentLength));
-                else if (newLength < currentLength)
-                    this.spliceWithArray(newLength, currentLength - newLength);
-            }
+        Object.defineProperties(this, {
+            "dependencyState": { enumerable: false, value: new DNode(false) },
+            "_values": { enumerable: false, value: initialValues ? initialValues.slice() : [] },
+            "changeEvent": { enumerable: false, value: new SimpleEventEmitter() },
         });
         if (initialValues && initialValues.length)
-            this.spliceWithArray(0, 0, initialValues);
-        else
-            this.createNewStubEntry(0);
+            this.updateLength(0, initialValues.length);
     }
+    Object.defineProperty(ObservableArray.prototype, "length", {
+        get: function () {
+            this.dependencyState.notifyObserved();
+            return this._values.length;
+        },
+        set: function (newLength) {
+            if (typeof newLength !== "number" || newLength < 0)
+                throw new Error("Out of range: " + newLength);
+            var currentLength = this._values.length;
+            if (newLength === currentLength)
+                return;
+            else if (newLength > currentLength)
+                this.spliceWithArray(currentLength, 0, new Array(newLength - currentLength));
+            else
+                this.spliceWithArray(newLength, currentLength - newLength);
+        },
+        enumerable: true,
+        configurable: true
+    });
     ObservableArray.prototype.updateLength = function (oldLength, delta) {
         if (delta < 0)
-            for (var i = oldLength + delta + 1; i < oldLength; i++)
+            for (var i = oldLength + delta; i < oldLength; i++)
                 delete this[i];
-        else if (delta > 0)
-            for (var i = 0; i < delta; i++)
-                this.createNewEntry(oldLength + i);
-        else
-            return;
-        this.createNewStubEntry(oldLength + delta);
-    };
-    ObservableArray.prototype.createNewEntry = function (index) {
-        Object.defineProperty(this, "" + index, {
-            enumerable: true,
-            configurable: true,
-            set: function (value) {
-                var oldValue = this._values[index];
-                if (oldValue !== value) {
-                    this._values[index] = value;
-                    this.notifyChildUpdate(index, oldValue);
-                }
-            },
-            get: function () {
-                this.dependencyState.notifyObserved();
-                return this._values[index];
-            }
-        });
-    };
-    ObservableArray.prototype.createNewStubEntry = function (index) {
-        var _this = this;
-        Object.defineProperty(this, "" + index, {
-            enumerable: false,
-            configurable: true,
-            set: function (value) { return _this.push(value); },
-            get: function () { return undefined; }
-        });
+        else if (delta > 0) {
+            if (oldLength + delta > ObservableArray.OBSERVABLE_ARRAY_BUFFER_SIZE)
+                ObservableArray.reserveArrayBuffer(oldLength + delta);
+            for (var i = oldLength, end = oldLength + delta; i < end; i++)
+                Object.defineProperty(this, "" + i, ObservableArray.ENUMERABLE_PROPS[i]);
+        }
     };
     ObservableArray.prototype.spliceWithArray = function (index, deleteCount, newItems) {
         var length = this._values.length;
@@ -572,13 +547,7 @@ var ObservableArray = (function () {
     };
     ObservableArray.prototype.toString = function () { return this.wrapReadFunction("toString", arguments); };
     ObservableArray.prototype.toLocaleString = function () { return this.wrapReadFunction("toLocaleString", arguments); };
-    ObservableArray.prototype.concat = function () {
-        var items = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            items[_i - 0] = arguments[_i];
-        }
-        return this.wrapReadFunction("concat", arguments);
-    };
+    ObservableArray.prototype.concat = function () { return this.wrapReadFunction("concat", arguments); };
     ObservableArray.prototype.join = function (separator) { return this.wrapReadFunction("join", arguments); };
     ObservableArray.prototype.reverse = function () { return this.wrapReadFunction("reverse", arguments); };
     ObservableArray.prototype.slice = function (start, end) { return this.wrapReadFunction("slice", arguments); };
@@ -592,16 +561,52 @@ var ObservableArray = (function () {
     ObservableArray.prototype.filter = function (callbackfn, thisArg) { return this.wrapReadFunction("filter", arguments); };
     ObservableArray.prototype.reduce = function (callbackfn, initialValue) { return this.wrapReadFunction("reduce", arguments); };
     ObservableArray.prototype.reduceRight = function (callbackfn, initialValue) { return this.wrapReadFunction("reduceRight", arguments); };
-    ObservableArray.prototype.wrapReadFunction = function (funcName, args) {
+    ObservableArray.prototype.wrapReadFunction = function (funcName, initialArgs) {
         var baseFunc = Array.prototype[funcName];
-        ObservableArray.prototype[funcName] = function () {
+        return (ObservableArray.prototype[funcName] = function () {
             this.dependencyState.notifyObserved();
             return baseFunc.apply(this._values, arguments);
-        };
-        return this[funcName].apply(this, args);
+        }).apply(this, initialArgs);
     };
+    ObservableArray.createArrayBufferItem = function (index) {
+        var prop = {
+            enumerable: false,
+            configurable: true,
+            set: function (value) {
+                if (index < this._values.length) {
+                    var oldValue = this._values[index];
+                    if (oldValue !== value) {
+                        this._values[index] = value;
+                        this.notifyChildUpdate(index, oldValue);
+                    }
+                }
+                else if (index === this._values.length)
+                    this.push(value);
+                else
+                    throw new Error("ObservableArray: Index out of bounds, " + index + " is larger than " + this.values.length);
+            },
+            get: function () {
+                if (index < this._values.length) {
+                    this.dependencyState.notifyObserved();
+                    return this._values[index];
+                }
+                return undefined;
+            }
+        };
+        Object.defineProperty(ObservableArray.prototype, "" + index, prop);
+        prop.enumerable = true;
+        ObservableArray.ENUMERABLE_PROPS[index] = prop;
+    };
+    ObservableArray.reserveArrayBuffer = function (max) {
+        for (var index = ObservableArray.OBSERVABLE_ARRAY_BUFFER_SIZE; index <= max; index++)
+            ObservableArray.createArrayBufferItem(index);
+        ObservableArray.OBSERVABLE_ARRAY_BUFFER_SIZE = max;
+    };
+    ObservableArray.OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
+    ObservableArray.ENUMERABLE_PROPS = [];
     return ObservableArray;
 })();
+ObservableArray.reserveArrayBuffer(1000);
 var SimpleEventEmitter = (function () {
     function SimpleEventEmitter() {
         this.listeners = [];
