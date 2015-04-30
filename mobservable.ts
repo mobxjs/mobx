@@ -530,14 +530,6 @@ class DNode {
     }
 }
 
-var enumerableProp = {
-    enumerable: true
-};
-
-var notEnumerableProp = {
-    enumerable: false
-};
-
 class ObservableArray<T> implements Array<T> {
     [n: number]: T;
     length: number;
@@ -562,19 +554,19 @@ class ObservableArray<T> implements Array<T> {
     private updateLength(oldLength:number, delta:number) {       
         if (delta < 0)
             for(var i = oldLength + delta; i < oldLength; i++)
-                Object.defineProperty(this, <string><any> i, notEnumerableProp);
+                delete this[i]; // bit faster but mem inefficient: Object.defineProperty(this, <string><any> i, notEnumerableProp);
         else if (delta > 0) {
             if (oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
                 reserveArrayBuffer(oldLength + delta);
             for (var i = oldLength, end = oldLength + delta; i < end; i++)
-                Object.defineProperty(this, <string><any> i, enumerableProp);
+                Object.defineProperty(this, <string><any> i, ENUMERABLE_PROPS[i]);
         }
     }
 
     spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[] {
         var length = this._values.length;
         if  ((newItems === undefined || newItems.length === 0) && (deleteCount === 0 || length === 0))
-            return [];
+            return []; // TODO make var
 
         if (index === undefined)
             index = 0;
@@ -591,7 +583,7 @@ class ObservableArray<T> implements Array<T> {
             deleteCount = Math.max(0, Math.min(deleteCount, length - index));
 
         if (newItems === undefined)
-            newItems = [];
+            newItems = []; // TODO: make var
 
         var lengthDelta = newItems.length - deleteCount;
         var res:T[] = this._values.splice(index, deleteCount, ...newItems);
@@ -721,18 +713,19 @@ Object.defineProperty(ObservableArray.prototype, 'length', {
         var currentLength = this._values.length;
         if (newLength === currentLength)
             return;
-        if (newLength > currentLength)
+        else if (newLength > currentLength)
             this.spliceWithArray(currentLength, 0, new Array(newLength - currentLength));
-        else if (newLength < currentLength)
+        else
             this.spliceWithArray(newLength, currentLength - newLength);
     }
 });
 
 // TODO: make these static?
 var OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
+var ENUMERABLE_PROPS = [];
 
 function createArrayBufferItem(index:number) {
-    Object.defineProperty(ObservableArray.prototype, <string><any>index, {
+    var prop = {
         enumerable: false,
         configurable: true,
         set: function(value) {
@@ -755,7 +748,10 @@ function createArrayBufferItem(index:number) {
             }
             return undefined;
         }
-    });
+    };
+    Object.defineProperty(ObservableArray.prototype, "" + index, prop);
+    prop.enumerable = true;
+    ENUMERABLE_PROPS[index] = prop;
 }
 
 function reserveArrayBuffer(max:number) {

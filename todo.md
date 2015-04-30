@@ -45,6 +45,7 @@
     - look into defineProperties / making property creating faster (especially arrays)
     - ~~count stale dependencies, instead of looping each time whether all dependencies are ready again.~~
     - collapse stale / ready notifications whenever possible
+    - find unmodifyable empty lists / objects and put in var
     - heuristic to make computables non-lazy if used frequently (something like, in computable, if (this.lazyReads > this.computesWithoutObservers) then never-go-to-sleep)
 * make sure array properties are read only
 * License
