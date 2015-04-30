@@ -532,15 +532,13 @@ class DNode {
 
 class ObservableArray<T> implements Array<T> {
     [n: number]: T;
-    length: number;
-
+    
     private _values: T[];
     private dependencyState:DNode;
     private changeEvent: SimpleEventEmitter;
 
     constructor(initialValues?:T[]) {
         // make for .. in / Object.keys behave like an array, so hide the other properties
-        // TODO: define on prototype
         Object.defineProperties(this, {
             "dependencyState" : { enumerable: false, value: new DNode(false) },
             "_values" : { enumerable: false, value: [] },
@@ -549,6 +547,23 @@ class ObservableArray<T> implements Array<T> {
         if (initialValues && initialValues.length)
             this.spliceWithArray(0, 0, initialValues);
     }
+    
+    get length():number {
+        this.dependencyState.notifyObserved();
+        return this._values.length;
+    }
+    
+    set length(newLength:number) {
+        if (typeof newLength !== "number" || newLength < 0)
+            throw new Error("Out of range: " + newLength);
+        var currentLength = this._values.length;
+        if (newLength === currentLength)
+            return;
+        else if (newLength > currentLength)
+            this.spliceWithArray(currentLength, 0, new Array(newLength - currentLength));
+        else
+            this.spliceWithArray(newLength, currentLength - newLength);
+    }
 
     // adds / removes the necessary numeric properties to this object
     private updateLength(oldLength:number, delta:number) {       
@@ -556,17 +571,17 @@ class ObservableArray<T> implements Array<T> {
             for(var i = oldLength + delta; i < oldLength; i++)
                 delete this[i]; // bit faster but mem inefficient: Object.defineProperty(this, <string><any> i, notEnumerableProp);
         else if (delta > 0) {
-            if (oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
-                reserveArrayBuffer(oldLength + delta);
+            if (oldLength + delta > ObservableArray.OBSERVABLE_ARRAY_BUFFER_SIZE)
+                ObservableArray.reserveArrayBuffer(oldLength + delta);
             for (var i = oldLength, end = oldLength + delta; i < end; i++)
-                Object.defineProperty(this, <string><any> i, ENUMERABLE_PROPS[i]);
+                Object.defineProperty(this, <string><any> i, ObservableArray.ENUMERABLE_PROPS[i]);
         }
     }
 
     spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[] {
         var length = this._values.length;
         if  ((newItems === undefined || newItems.length === 0) && (deleteCount === 0 || length === 0))
-            return []; // TODO make var
+            return [];
 
         if (index === undefined)
             index = 0;
@@ -583,7 +598,7 @@ class ObservableArray<T> implements Array<T> {
             deleteCount = Math.max(0, Math.min(deleteCount, length - index));
 
         if (newItems === undefined)
-            newItems = []; // TODO: make var
+            newItems = [];
 
         var lengthDelta = newItems.length - deleteCount;
         var res:T[] = this._values.splice(index, deleteCount, ...newItems);
@@ -688,78 +703,55 @@ class ObservableArray<T> implements Array<T> {
     reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { return this.wrapReadFunction<U>("reduce", arguments); }
     reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { return this.wrapReadFunction<U>("reduceRight", arguments); }
 
-    private wrapReadFunction<U>(funcName:string, args:IArguments):U {
+    private wrapReadFunction<U>(funcName:string, initialArgs:IArguments):U {
         var baseFunc = Array.prototype[funcName];
         // generate a new function that wraps arround the Array.prototype, and replace our own definition
-        ObservableArray.prototype[funcName] = function() {
+        return (ObservableArray.prototype[funcName] = function() {
             this.dependencyState.notifyObserved();
             return baseFunc.apply(this._values, arguments);
-        }
-        return this[funcName].apply(this, args);
+        }).apply(this, initialArgs);
     }
-}
 
-// Observable array enrichments
-// TODO: move back into class?
-Object.defineProperty(ObservableArray.prototype, 'length', {
-    enumerable: false,
-    get: function() {
-        this.dependencyState.notifyObserved();
-        return this._values.length;
-    },
-    set: function(newLength:number) {
-        if (typeof newLength !== "number" || newLength < 0)
-            throw new Error("Out of range: " + newLength);
-        var currentLength = this._values.length;
-        if (newLength === currentLength)
-            return;
-        else if (newLength > currentLength)
-            this.spliceWithArray(currentLength, 0, new Array(newLength - currentLength));
-        else
-            this.spliceWithArray(newLength, currentLength - newLength);
-    }
-});
-
-// TODO: make these static?
-var OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
-var ENUMERABLE_PROPS = [];
-
-function createArrayBufferItem(index:number) {
-    var prop = {
-        enumerable: false,
-        configurable: true,
-        set: function(value) {
-            if (index < this._values.length) {
-                var oldValue = this._values[index];
-                if (oldValue !== value) {
-                    this._values[index] = value;
-                    this.notifyChildUpdate(index, oldValue);
+    static OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
+    static ENUMERABLE_PROPS = [];
+    
+    static createArrayBufferItem(index:number) {
+        var prop = {
+            enumerable: false,
+            configurable: true,
+            set: function(value) {
+                if (index < this._values.length) {
+                    var oldValue = this._values[index];
+                    if (oldValue !== value) {
+                        this._values[index] = value;
+                        this.notifyChildUpdate(index, oldValue);
+                    }
                 }
+                else if (index === this._values.length)
+                    this.push(value);
+                else
+                    throw new Error(`ObservableArray: Index out of bounds, ${index} is larger than ${this.values.length}`);
+            },
+            get: function() {
+                if (index < this._values.length) {
+                    this.dependencyState.notifyObserved();
+                    return this._values[index];
+                }
+                return undefined;
             }
-            else if (index === this._values.length)
-                this.push(value);
-            else
-                throw new Error(`ObservableArray: Index out of bounds, ${index} is larger than ${this.values.length}`);
-        },
-        get: function() {
-            if (index < this._values.length) {
-                this.dependencyState.notifyObserved();
-                return this._values[index];
-            }
-            return undefined;
-        }
-    };
-    Object.defineProperty(ObservableArray.prototype, "" + index, prop);
-    prop.enumerable = true;
-    ENUMERABLE_PROPS[index] = prop;
+        };
+        Object.defineProperty(ObservableArray.prototype, "" + index, prop);
+        prop.enumerable = true;
+        ObservableArray.ENUMERABLE_PROPS[index] = prop;
+    }
+    
+    static reserveArrayBuffer(max:number) {
+        for (var index = ObservableArray.OBSERVABLE_ARRAY_BUFFER_SIZE; index <= max; index++)
+            ObservableArray.createArrayBufferItem(index);    
+        ObservableArray.OBSERVABLE_ARRAY_BUFFER_SIZE = max;
+    }
 }
-
-function reserveArrayBuffer(max:number) {
-    for (var index = OBSERVABLE_ARRAY_BUFFER_SIZE; index <= max; index++)
-        createArrayBufferItem(index);    
-    OBSERVABLE_ARRAY_BUFFER_SIZE = max;
-}
-reserveArrayBuffer(1000);
+ObservableArray.reserveArrayBuffer(1000);
 
 class SimpleEventEmitter {
     listeners:{(data?):void}[] = [];

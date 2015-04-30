@@ -32,10 +32,11 @@ exports.test1 = function(test) {
         test.deepEqual(Object.keys(a), ["0", "1"]);
         test.deepEqual(a.values(), [1,2]);
 
+        debugger;
         var sum = value(function() {
-            return a.reduce(function(a,b) {
+            return -1 + a.reduce(function(a,b) {
                 return a + b;
-            }, 0);
+            }, 1);
         });
 
         test.equals(sum(), 3);
