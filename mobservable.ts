@@ -541,11 +541,11 @@ class ObservableArray<T> implements Array<T> {
         // make for .. in / Object.keys behave like an array, so hide the other properties
         Object.defineProperties(this, {
             "dependencyState" : { enumerable: false, value: new DNode(false) },
-            "_values" : { enumerable: false, value: [] },
+            "_values" : { enumerable: false, value: initialValues ? initialValues.slice() : [] },
             "changeEvent" : { enumerable: false, value: new SimpleEventEmitter() },
         });
         if (initialValues && initialValues.length)
-            this.spliceWithArray(0, 0, initialValues);
+            this.updateLength(0, initialValues.length);
     }
     
     get length():number {
@@ -573,8 +573,9 @@ class ObservableArray<T> implements Array<T> {
         else if (delta > 0) {
             if (oldLength + delta > ObservableArray.OBSERVABLE_ARRAY_BUFFER_SIZE)
                 ObservableArray.reserveArrayBuffer(oldLength + delta);
+            // funny enough, this is faster than slicing ENUMERABLE_PROPS into defineProperties, and faster as a temporarily map
             for (var i = oldLength, end = oldLength + delta; i < end; i++)
-                Object.defineProperty(this, <string><any> i, ObservableArray.ENUMERABLE_PROPS[i]);
+                Object.defineProperty(this, "" + i, ObservableArray.ENUMERABLE_PROPS[i])
         }
     }
 

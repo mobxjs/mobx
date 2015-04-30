@@ -354,15 +354,15 @@ test_array_creation = function(test, amount, size) {
 };
 
 exports.test_array_0 = function(test) {
-    test_array_creation(test, 1000);
+    test_array_creation(test, 10000);
 };
 
 exports.test_array_100 = function(test) {
-    test_array_creation(test, 1000);
+    test_array_creation(test, 10000);
 };
 
 exports.test_array_10000 = function(test) {
-    test_array_creation(test, 1000);
+    test_array_creation(test, 10000);
 };
 
 
