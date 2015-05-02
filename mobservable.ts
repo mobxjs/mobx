@@ -32,8 +32,6 @@ interface MobservableStatic {
     
     // batching
     batch(action:Lambda);
-    onReady(listener:Lambda):Lambda;
-    onceReady(listener:Lambda);
 
     // Utils
     SimpleEventEmitter: new()=> SimpleEventEmitter;
@@ -148,14 +146,6 @@ mobservableStatic.array = function array<T>(values?:T[]): ObservableArray<T> {
 
 mobservableStatic.batch = function batch(action:Lambda) {
     Scheduler.batch(action);
-}
-
-mobservableStatic.onReady = function onReady(listener:Lambda):Lambda {
-    return Scheduler.onReady(listener);
-}
-
-mobservableStatic.onceReady = function onceReady(listener:Lambda) {
-    Scheduler.onceReady(listener);
 }
 
 /**
@@ -417,8 +407,6 @@ class DNode {
             return;
         this.state = DNodeState.READY;
         this.notifyObservers(stateDidActuallyChange);
-        if (this.observers.length === 0) // otherwise, let one of the observers do that :)
-            Scheduler.scheduleReady();
     }
 
     notifyObservers(stateDidActuallyChange:boolean=false) {
@@ -820,8 +808,6 @@ class SimpleEventEmitter {
 mobservableStatic.SimpleEventEmitter = SimpleEventEmitter;
 
 class Scheduler {
-    private static pendingReady = false;
-    private static readyEvent = new SimpleEventEmitter();
     private static inBatch = 0;
     private static tasks:{():void}[] = [];
 
@@ -834,16 +820,16 @@ class Scheduler {
 
     private static runPostBatchActions() {
         var i = 0;
-        try {
-            for(; i < Scheduler.tasks.length; i++)
-                Scheduler.tasks[i]();
-            Scheduler.tasks = [];
-        } catch (e) {
-            console.error("Failed to run scheduled action, the action has been dropped from the queue: " + e, e);
-            // drop already executed tasks, including the failing one, and retry in the future
-            Scheduler.tasks.splice(0, i + 1);
-            setTimeout(Scheduler.runPostBatchActions, 1);
-            throw e; // rethrow
+        while(Scheduler.tasks.length) {
+            try { // try outside loop; much cheaper
+                for(; i < Scheduler.tasks.length; i++)
+                    Scheduler.tasks[i]();
+                Scheduler.tasks = [];
+            } catch (e) {
+                console.error("Failed to run scheduled action, the action has been dropped from the queue: " + e, e);
+                // drop already executed tasks, including the failing one, and continue with other actions, to keep state as stable as possible
+                Scheduler.tasks.splice(0, i + 1);
+            }
         }
     }
 
@@ -853,29 +839,9 @@ class Scheduler {
             action();
         } finally {
             //Scheduler.inBatch -= 1;
-            if (--Scheduler.inBatch === 0) {
+            if (--Scheduler.inBatch === 0)
                 Scheduler.runPostBatchActions();
-                Scheduler.scheduleReady();
-            }
         }
-    }
-
-    static scheduleReady() {
-        if (!Scheduler.pendingReady) {
-            Scheduler.pendingReady = true;
-            setTimeout(() => {
-                Scheduler.pendingReady = false;
-                Scheduler.readyEvent.emit();
-            }, 1);
-        }
-    }
-
-    static onReady(listener:Lambda) {
-        return Scheduler.readyEvent.on(listener);
-    }
-
-    static onceReady(listener:Lambda) {
-        return Scheduler.readyEvent.once(listener);
     }
 }
 

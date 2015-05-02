@@ -10,19 +10,26 @@ declare module "mobservable" {
 
     export function array<T>(values?:T[]): IObservableArray<T>;
     export function value<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S>;
+
     export function watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda];
     export function observeProperty(object:Object, key:string, listener:Function, invokeImmediately?:boolean):Lambda;
 
     // annotation
     export function observable(target:Object, key:string);
 
-    export function batch(action:Lambda);
-    export function onReady(listener:Lambda):Lambda;
-    export function onceReady(listener:Lambda);
-    export function defineObservableProperty<T>(object:Object, name:string, initialValue?:T);
-    export function initializeObservableProperties(object:Object);
+    // property definition
+    export function props(object:Object, name:string, initalValue: any);
+    export function props(object:Object, props:Object);
+    export function props(object:Object);
 
-  export var SimpleEventEmitter: new() => ISimpleEventEmitter;
+    export function batch(action:Lambda);
+
+    // Utils
+    SimpleEventEmitter: new()=> SimpleEventEmitter;
+
+    debugLevel: number;
+
+    export var SimpleEventEmitter: new() => ISimpleEventEmitter;
 
     interface IObservableArray<T> extends Array<T> {
         [n: number]: T;

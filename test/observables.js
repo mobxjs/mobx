@@ -120,7 +120,7 @@ exports.readme1 = function(test) {
     }
 }
 
-exports.testBatchAndReady = function(test) {
+exports.testBatch = function(test) {
     var a = value(2);
     var b = value(3);
     var c = value(function() { return a() * b() });
@@ -133,13 +133,6 @@ exports.testBatchAndReady = function(test) {
     // Note, 60 should not happen! (that is d beign computed before c after update of b)
     test.deepEqual([36, 100], buf.toArray());
 
-    mobservable.onceReady(function() {
-        //this is called async, and only after everything has finished, so d should be 54
-        test.deepEqual(54, d()); // only one new value for d
-        test.equal(mobservable.stackDepth(), 0);
-
-        test.done();
-    });
     mobservable.batch(function() {
         a(2);
         b(3);
@@ -148,6 +141,7 @@ exports.testBatchAndReady = function(test) {
     });
 
     test.deepEqual([36, 100, 54], buf.toArray());// only one new value for d
+    test.done();
 }
 
 exports.testScope = function(test) {
