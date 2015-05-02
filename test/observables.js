@@ -169,17 +169,18 @@ exports.testScope = function(test) {
     test.done();
 }
 
-exports.testdefineObservableProperty = function(test) {
+exports.testProps1 = function(test) {
     var vat = value(0.2);
     var Order = function() {
-        mobservable.defineObservableProperty(this, 'price', 20);
-        mobservable.defineObservableProperty(this, 'amount', 2);
-        mobservable.defineObservableProperty(this, 'total', function() {
+        mobservable.props(this, 'price', 20);
+        mobservable.props(this, 'amount', 2);
+        mobservable.props(this, 'total', function() {
             return (1+vat()) * this.price * this.amount; // price and amount are now properties!
         });
     };
 
     var order = new Order();
+    test.equals(48, order.total);
     order.price = 10;
     order.amount = 3;
     test.equals(36, order.total);
@@ -197,27 +198,46 @@ exports.testdefineObservableProperty = function(test) {
     test.done();
 };
 
-exports.testInitializeObservableProperties = function(test) {
+exports.testProps2 = function(test) {
     var vat = value(0.2);
     var Order = function() {
-        this.price = value(20);
-        this.amount = value(2);
-        this.nonsense = 3;
-        this.total = value(function() {
-            return (1+vat()) * this.price * this.amount; // price and amount are now properties!
-        }, this);
-        mobservable.initializeObservableProperties(this);
+        mobservable.props(this, {
+            price: 20,
+            amount: 2,
+            total: function() {
+                return (1+vat()) * this.price * this.amount; // price and amount are now properties!
+            }
+        });
     };
 
     var order = new Order();
+    test.equals(48, order.total);
     order.price = 10;
     order.amount = 3;
     test.equals(36, order.total);
-    test.equals(3, order.nonsense);
-
-    test.equal(mobservable.stackDepth(), 0);
     test.done();
 };
+
+exports.testProps3 = function(test) {
+    var vat = value(0.2);
+    var Order = function() {
+        this.price = 20;
+        this.amount = 2;
+        this.total = function() { 
+            return (1+vat()) * this.price * this.amount; // price and amount are now properties!
+        };
+        mobservable.props(this);
+    };
+
+    var order = new Order();
+    test.equals(48, order.total);
+    order.price = 10;
+    order.amount = 3;
+    test.equals(36, order.total);
+    test.done();
+};
+
+
 
 exports.testWatch = function(test) {
     var a = value(3);

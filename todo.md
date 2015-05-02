@@ -60,6 +60,7 @@
 * drop initializeObservableProperty/ies
 * introduce .props(target, prop, value), .props(props), .props(target, ...props)
 * use disposable like RxJs?
+* update apidocs
 
 0.5
 * Introduce mobservable.object(data) that creates observable properties and an observe method.

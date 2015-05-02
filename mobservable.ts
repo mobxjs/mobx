@@ -25,10 +25,11 @@ interface MobservableStatic {
 
     // property definition
     observable(target:Object, key:string); // annotation
-    defineObservableProperty<T>(object:Object, name:string, initialValue?:T);
-    initializeObservableProperties(object:Object);
     observeProperty(object:Object, key:string, listener:Function, invokeImmediately?:boolean):Lambda;
-
+    props(object:Object, name:string, initalValue: any);
+    props(object:Object, props:Object);
+    props(object:Object);
+    
     // batching
     batch(action:Lambda);
     onReady(listener:Lambda):Lambda;
@@ -157,6 +158,16 @@ mobservableStatic.onceReady = function onceReady(listener:Lambda) {
     Scheduler.onceReady(listener);
 }
 
+/**
+ * Use this annotation to wrap properties of an object in an observable, for example:
+ * class OrderLine {
+ *   @observable amount = 3;
+ *   @observable price = 2;
+ *   @observable total() { 
+ *      return this.amount * this.price;
+ *   }
+ * }
+ */
 mobservableStatic.observable = function observable(target:Object, key:string, descriptor?) {
     var baseValue = descriptor ? descriptor.value : null;
 
@@ -168,7 +179,7 @@ mobservableStatic.observable = function observable(target:Object, key:string, de
         delete descriptor.value;
         delete descriptor.writable;
         descriptor.get = function() {
-            mobservableStatic.defineObservableProperty(this, key, baseValue);
+            mobservableStatic.props(this, key, baseValue);
             return this[key];
         }
         descriptor.set = function () {
@@ -179,7 +190,7 @@ mobservableStatic.observable = function observable(target:Object, key:string, de
         Object.defineProperty(target, key, {
             configurable: true, enumberable:true,
             get: function() {
-                mobservableStatic.defineObservableProperty(this, key, undefined);
+                mobservableStatic.props(this, key, undefined);
                 return this[key];
             },
             set: function(value) {
@@ -193,35 +204,35 @@ mobservableStatic.observable = function observable(target:Object, key:string, de
                     });
                 }
                 else
-                    mobservableStatic.defineObservableProperty(this, key, value);
+                    mobservableStatic.props(this, key, value);
             }
         });
     }
 }
 
-mobservableStatic.defineObservableProperty = function defineObservableProperty<T>(object:Object, name:string, initialValue?:T) {
-    var _property = mobservableStatic.value(initialValue, object);
-    definePropertyForObservable(object, name, _property);
-}
-
-mobservableStatic.initializeObservableProperties = function initializeObservableProperties(object:Object) {
-    for(var key in object) if (object.hasOwnProperty(key)) {
-        if (object[key] && object[key].prop && object[key].prop instanceof ObservableValue)
-            definePropertyForObservable(object, key, <IObservableValue<any,any>> object[key])
+mobservableStatic.props = function props(target, props?, value?) {
+    switch(arguments.length) {
+        case 1:
+            return mobservableStatic.props(target, target); // mix target roperties into itself
+        case 2:
+            for(var key in props)
+                mobservableStatic.props(target, key, props[key]);
+            break;
+        case 3:
+            var observable = mobservableStatic.value(value, target);
+            Object.defineProperty(target, props, {
+                get: function() {
+                    return observable();
+                },
+                set: function(value) {
+                    observable(value);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            break;
     }
-}
-
-function definePropertyForObservable(object:Object, name:string, observable:IObservableValue<any,any>) {
-    Object.defineProperty(object, name, {
-        get: function() {
-            return observable();
-        },
-        set: function(value) {
-            observable(value);
-        },
-        enumerable: true,
-        configurable: true
-    });
+    return target;
 }
 
 class ObservableValue<T,S> {
