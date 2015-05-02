@@ -532,7 +532,7 @@ class DNode {
 
 class ObservableArray<T> implements Array<T> {
     [n: number]: T;
-    
+
     private _values: T[];
     private dependencyState:DNode;
     private changeEvent: SimpleEventEmitter;
@@ -547,12 +547,12 @@ class ObservableArray<T> implements Array<T> {
         if (initialValues && initialValues.length)
             this.updateLength(0, initialValues.length);
     }
-    
+
     get length():number {
         this.dependencyState.notifyObserved();
         return this._values.length;
     }
-    
+
     set length(newLength:number) {
         if (typeof newLength !== "number" || newLength < 0)
             throw new Error("Out of range: " + newLength);
@@ -566,7 +566,7 @@ class ObservableArray<T> implements Array<T> {
     }
 
     // adds / removes the necessary numeric properties to this object
-    private updateLength(oldLength:number, delta:number) {       
+    private updateLength(oldLength:number, delta:number) {
         if (delta < 0)
             for(var i = oldLength + delta; i < oldLength; i++)
                 delete this[i]; // bit faster but mem inefficient: Object.defineProperty(this, <string><any> i, notEnumerableProp);
@@ -643,11 +643,18 @@ class ObservableArray<T> implements Array<T> {
     }
 
     values(): T[] {
+        this.dependencyState.notifyObserved();
         return this._values.slice();
     }
 
     toJSON(): T[] {
+        this.dependencyState.notifyObserved();
         return this._values.slice();
+    }
+
+    clone(): ObservableArray<T> {
+        this.dependencyState.notifyObserved();
+        return new ObservableArray<T>(this._values);
     }
 
     /*
@@ -683,6 +690,13 @@ class ObservableArray<T> implements Array<T> {
         return this._values.length;
     }
 
+    reverse():T[] {
+        return this.replace(this._values.reverse());
+    }
+
+    sort(compareFn?: (a: T, b: T) => number): T[] {
+        return this.replace(this._values.sort.apply(this._values, arguments));
+    }
     /*
         functions that do not alter the array, from lib.es6.d.ts
     */
@@ -691,9 +705,7 @@ class ObservableArray<T> implements Array<T> {
     concat<U extends T[]>(...items: U[]): T[];
     concat<U extends T[]>(): T[] { return this.wrapReadFunction<T[]>("concat", arguments); }
     join(separator?: string): string { return this.wrapReadFunction<string>("join", arguments); }
-    reverse():T[] { return this.wrapReadFunction<T[]>("reverse", arguments); }
     slice(start?: number, end?: number): T[] { return this.wrapReadFunction<T[]>("slice", arguments); }
-    sort(compareFn?: (a: T, b: T) => number): T[] { return this.wrapReadFunction<T[]>("sort", arguments); }
     indexOf(searchElement: T, fromIndex?: number): number { return this.wrapReadFunction<number>("indexOf", arguments); }
     lastIndexOf(searchElement: T, fromIndex?: number): number { return this.wrapReadFunction<number>("lastIndexOf", arguments); }
     every(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean { return this.wrapReadFunction<boolean>("every", arguments); }
@@ -715,7 +727,7 @@ class ObservableArray<T> implements Array<T> {
 
     static OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
     static ENUMERABLE_PROPS = [];
-    
+
     static createArrayBufferItem(index:number) {
         var prop = {
             enumerable: false,
@@ -745,10 +757,10 @@ class ObservableArray<T> implements Array<T> {
         prop.enumerable = true;
         ObservableArray.ENUMERABLE_PROPS[index] = prop;
     }
-    
+
     static reserveArrayBuffer(max:number) {
         for (var index = ObservableArray.OBSERVABLE_ARRAY_BUFFER_SIZE; index <= max; index++)
-            ObservableArray.createArrayBufferItem(index);    
+            ObservableArray.createArrayBufferItem(index);
         ObservableArray.OBSERVABLE_ARRAY_BUFFER_SIZE = max;
     }
 }

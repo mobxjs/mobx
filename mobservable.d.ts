@@ -33,6 +33,7 @@ declare module "mobservable" {
         clear(): T[];
         replace(newItems:T[]);
         values(): T[];
+        clone(): IObservableArray<T>;
     }
 
     interface ISimpleEventEmitter {

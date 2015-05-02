@@ -24,7 +24,8 @@ require('nscript')(function(shell, npm, git) {
         git("commit","-am","Published version " + version);
         git("tag", version);
 
-        git("push", { followTags: true });
+        git("push");
+        git("push","--tags");
         console.log("Published!");
     }
     else

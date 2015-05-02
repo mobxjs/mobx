@@ -62,7 +62,7 @@ exports.test1 = function(test) {
 
         a.spliceWithArray(0,0,[4,3]);
         test.equals(sum(), 9);
-        test.deepEqual(a.values(), [4,3,2])
+        test.deepEqual(a.values(), [4,3,2]);
 
         a.clear();
         test.equals(sum(), 0);
@@ -82,6 +82,14 @@ exports.test1 = function(test) {
 
         a.length = 2;
         test.equals(sum(), 3);
+        test.deepEqual(a.values(), [1,2]);
+        var b = a.clone();
+
+        test.deepEqual(a.reverse(), [2,1]);
+        test.deepEqual(a.values(), [2,1]);
+        test.deepEqual(b.values(), [1,2]);
+
+        test.deepEqual(a.sort(), [1,2]);
         test.deepEqual(a.values(), [1,2]);
 
         test.done();
