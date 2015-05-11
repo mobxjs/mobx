@@ -22,18 +22,33 @@ declare module "mobservable" {
     export function defineObservableProperty<T>(object:Object, name:string, initialValue?:T);
     export function initializeObservableProperties(object:Object);
 
-  export var SimpleEventEmitter: new() => ISimpleEventEmitter;
+    export var SimpleEventEmitter: new() => ISimpleEventEmitter;
 
     interface IObservableArray<T> extends Array<T> {
         [n: number]: T;
         length: number;
 
         spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[];
-        observe(listener:()=>void, fireImmediately?:boolean):Lambda;
+        observe(listener:(changeData:IArrayChange<T>|IArraySplice<T>)=>void, fireImmediately?:boolean):Lambda;
         clear(): T[];
         replace(newItems:T[]);
         values(): T[];
         clone(): IObservableArray<T>;
+    }
+    
+    interface IArrayChange<T> {
+        type: string; // Always: 'update' 
+        object: IObservableArray<T>;
+        index: number;
+        oldValue: T;
+    }
+    
+    interface IArraySplice<T> {
+        type: string; // Always: 'splice'
+        object: IObservableArray<T>;
+        index: number;
+        removed: T[];
+        addedCount: number;
     }
 
     interface ISimpleEventEmitter {
