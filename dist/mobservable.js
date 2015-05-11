@@ -503,10 +503,16 @@ var ObservableArray = (function () {
         return this.spliceWithArray(0, this._values.length, newItems);
     };
     ObservableArray.prototype.values = function () {
+        this.dependencyState.notifyObserved();
         return this._values.slice();
     };
     ObservableArray.prototype.toJSON = function () {
+        this.dependencyState.notifyObserved();
         return this._values.slice();
+    };
+    ObservableArray.prototype.clone = function () {
+        this.dependencyState.notifyObserved();
+        return new ObservableArray(this._values);
     };
     ObservableArray.prototype.splice = function (index, deleteCount) {
         var newItems = [];
@@ -545,13 +551,17 @@ var ObservableArray = (function () {
         this.spliceWithArray(0, 0, items);
         return this._values.length;
     };
+    ObservableArray.prototype.reverse = function () {
+        return this.replace(this._values.reverse());
+    };
+    ObservableArray.prototype.sort = function (compareFn) {
+        return this.replace(this._values.sort.apply(this._values, arguments));
+    };
     ObservableArray.prototype.toString = function () { return this.wrapReadFunction("toString", arguments); };
     ObservableArray.prototype.toLocaleString = function () { return this.wrapReadFunction("toLocaleString", arguments); };
     ObservableArray.prototype.concat = function () { return this.wrapReadFunction("concat", arguments); };
     ObservableArray.prototype.join = function (separator) { return this.wrapReadFunction("join", arguments); };
-    ObservableArray.prototype.reverse = function () { return this.wrapReadFunction("reverse", arguments); };
     ObservableArray.prototype.slice = function (start, end) { return this.wrapReadFunction("slice", arguments); };
-    ObservableArray.prototype.sort = function (compareFn) { return this.wrapReadFunction("sort", arguments); };
     ObservableArray.prototype.indexOf = function (searchElement, fromIndex) { return this.wrapReadFunction("indexOf", arguments); };
     ObservableArray.prototype.lastIndexOf = function (searchElement, fromIndex) { return this.wrapReadFunction("lastIndexOf", arguments); };
     ObservableArray.prototype.every = function (callbackfn, thisArg) { return this.wrapReadFunction("every", arguments); };

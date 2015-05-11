@@ -1,6 +1,6 @@
 {
     "name": "mobservable",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "description": "Changes are coming! Small library for creating observable properties en functions",
     "main": "dist/mobservable.js",
     "scripts": {
