@@ -30,7 +30,7 @@ interface MobservableStatic {
     observeProperty(object:Object, key:string, listener:Function, invokeImmediately?:boolean):Lambda;
 
     // batching
-    batch(action:Lambda);
+    batch<T>(action:()=>T):T;
     onReady(listener:Lambda):Lambda;
     onceReady(listener:Lambda);
 
@@ -145,8 +145,8 @@ mobservableStatic.array = function array<T>(values?:T[]): ObservableArray<T> {
     return new ObservableArray(values);
 }
 
-mobservableStatic.batch = function batch(action:Lambda) {
-    Scheduler.batch(action);
+mobservableStatic.batch = function batch<T>(action:()=>T):T {
+    return Scheduler.batch(action);
 }
 
 mobservableStatic.onReady = function onReady(listener:Lambda):Lambda {
@@ -836,10 +836,10 @@ class Scheduler {
         }
     }
 
-    static batch(action:Lambda) {
+    static batch<T>(action:()=>T):T {
         Scheduler.inBatch += 1;
         try {
-            action();
+            return action();
         } finally {
             //Scheduler.inBatch -= 1;
             if (--Scheduler.inBatch === 0) {

@@ -16,7 +16,7 @@ declare module "mobservable" {
     // annotation
     export function observable(target:Object, key:string);
 
-    export function batch(action:Lambda);
+	export function batch<T>(action:()=>T):T;
     export function onReady(listener:Lambda):Lambda;
     export function onceReady(listener:Lambda);
     export function defineObservableProperty<T>(object:Object, name:string, initialValue?:T);
