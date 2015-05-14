@@ -100,6 +100,28 @@ exports.test1 = function(test) {
     }
 };
 
+exports.testFind = function(test) {
+    var a = mobservable.array([10,20,20]);
+    var idx = -1;
+    function predicate(item, index) {
+        if (item === 20) {
+            idx = index;
+            return true;
+        }
+        return false;
+    }
+
+    test.equal(a.find(predicate), 20);
+    test.equal(idx, 1);
+    test.equal(a.find(predicate, 1), 20);
+    test.equal(idx, 1);
+    test.equal(a.find(predicate, 2), 20);
+    test.equal(idx, 2);
+    test.equal(a.find(predicate, 3), null);
+
+    test.done();
+}
+
 exports.testQuickDiff = function(test) {
     function t(current, base, added, removed) {
         var res = mobservable.quickDiff(current, base);

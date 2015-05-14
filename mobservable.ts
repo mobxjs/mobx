@@ -29,7 +29,7 @@ interface MobservableStatic {
     props(object:Object, name:string, initalValue: any);
     props(object:Object, props:Object);
     props(object:Object);
-    
+
     // batching
     batch(action:Lambda);
 
@@ -153,7 +153,7 @@ mobservableStatic.batch = function batch(action:Lambda) {
  * class OrderLine {
  *   @observable amount = 3;
  *   @observable price = 2;
- *   @observable total() { 
+ *   @observable total() {
  *      return this.amount * this.price;
  *   }
  * }
@@ -279,7 +279,7 @@ class ComputedObservable<U,S> extends ObservableValue<U,S> {
     get():U {
         if (this.isComputing)
             throw new Error("Cycle detected");
-    	var state = this.dependencyState;
+        var state = this.dependencyState;
         if (state.isSleeping) {
             if (DNode.trackingStack.length > 0) {
                 // somebody depends on the outcome of this computation
@@ -654,6 +654,15 @@ class ObservableArray<T> implements Array<T> {
     clone(): ObservableArray<T> {
         this.dependencyState.notifyObserved();
         return new ObservableArray<T>(this._values);
+    }
+
+    find(predicate:(item:T,index:number)=>boolean, fromIndex=0,thisArg?):T {
+        this.dependencyState.notifyObserved();
+        var items = this._values, l = items.length;
+        for(var i = fromIndex; i < l; i++)
+            if(predicate.call(thisArg,items[i],i))
+                return items[i];
+        return null;
     }
 
     /*

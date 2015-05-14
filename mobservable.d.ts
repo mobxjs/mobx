@@ -34,6 +34,7 @@ declare module "mobservable" {
         replace(newItems:T[]);
         values(): T[];
         clone(): IObservableArray<T>;
+        find(predicate:(item:T,index:number)=>boolean,fromIndex?:number,thisArg?):T;
     }
 
     interface ISimpleEventEmitter {
@@ -41,7 +42,7 @@ declare module "mobservable" {
         on(listener:(...data:any[])=>void):Lambda;
         once(listener:(...data:any[])=>void):Lambda;
     }
-    
+
     interface Lambda {
         (): void;
     }
