@@ -667,9 +667,13 @@ class ObservableArray<T> implements Array<T> {
     }
 
     /*
-        functions that do alter the internal structure of the array, from lib.es6.d.ts
+        functions that do alter the internal structure of the array, (based on lib.es6.d.ts)
+        since these functions alter the inner structure of the array, the have side effects.
+        Because the have side effects, they should not be used in computed function,
+        and for that reason the do not call dependencyState.notifyObserved
      */
     splice(index:number, deleteCount?:number, ...newItems:T[]):T[] {
+        this.sideEffectWarning("splice");
         switch(arguments.length) {
             case 0:
                 return [];
@@ -682,28 +686,34 @@ class ObservableArray<T> implements Array<T> {
     }
 
     push(...items: T[]): number {
+        this.sideEffectWarning("push");
         this.spliceWithArray(this._values.length, 0, items);
         return this._values.length;
     }
 
     pop(): T {
+        this.sideEffectWarning("pop");
         return this.splice(Math.max(this._values.length - 1, 0), 1)[0];
     }
 
     shift(): T {
+        this.sideEffectWarning("shift");
         return this.splice(0, 1)[0]
     }
 
     unshift(...items: T[]): number {
+        this.sideEffectWarning("unshift");
         this.spliceWithArray(0, 0, items);
         return this._values.length;
     }
 
     reverse():T[] {
+        this.sideEffectWarning("reverse");
         return this.replace(this._values.reverse());
     }
 
     sort(compareFn?: (a: T, b: T) => number): T[] {
+        this.sideEffectWarning("sort");
         return this.replace(this._values.sort.apply(this._values, arguments));
     }
     /*
@@ -733,6 +743,12 @@ class ObservableArray<T> implements Array<T> {
             return baseFunc.apply(this._values, arguments);
         }).apply(this, initialArgs);
     }
+
+    private sideEffectWarning(funcName:string) {
+        if (DNode.trackingStack.length > 0)
+            warn(`[Mobservable.Array] The method array.${funcName} should not be used inside observable functions since it has side-effects`);
+    }
+
 
     static OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
     static ENUMERABLE_PROPS = [];
