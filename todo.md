@@ -23,12 +23,12 @@
 
 0.4
 * License
-* implement array.sort & reverse properly, they do change the array
-* drop mobservable.onReady / onceReady?
-* clean up / clarify properties / annotations code
-* drop initializeObservableProperty/ies
-* introduce .props(target, prop, value), .props(props), .props(target, ...props)
-* use disposable like RxJs?
+* ~~implement array.sort & reverse properly, they do change the array~~
+* ~~drop mobservable.onReady / onceReady?~~
+* ~~clean up / clarify properties / annotations code~~
+* ~~drop initializeObservableProperties -> turnObservablesIntoProperties ~~
+* ~~introduce .props(target, prop, value), .props(props), .props(target, ...props)~~
+* ~~use disposable like RxJs?~~
 * update apidocs
 
 0.5

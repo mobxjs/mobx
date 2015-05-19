@@ -13,11 +13,12 @@ declare module "mobservable" {
     export function props(object:Object, name:string, initalValue: any);
     export function props(object:Object, props:Object);
     export function props(object:Object);
-
+    export function turnObservablesIntoProperties(object:Object);
+    
     // Utils
-    export var debugLevel: number;
     export var SimpleEventEmitter: new() => ISimpleEventEmitter;
-
+    export var debugLevel: number;
+    
     interface IObservableValue<T, S> {
         (): T;
         (value: T): S;

@@ -231,7 +231,27 @@ exports.testProps3 = function(test) {
     test.done();
 };
 
+exports.testTurnObservablesIntoProperties = function(test) {
+    var vat = value(0.2);
+    var Order = function() {
+        this.price = value(20);
+        this.amount = value(2);
+        this.nonsense = 3;
+        this.total = value(function() {
+            return (1+vat()) * this.price * this.amount; // price and amount are now properties!
+        }, this);
+        mobservable.turnObservablesIntoProperties(this);
+    };
 
+    var order = new Order();
+    order.price = 10;
+    order.amount = 3;
+    test.equals(36, order.total);
+    test.equals(3, order.nonsense);
+
+    test.equal(mobservable.stackDepth(), 0);
+    test.done();
+};
 
 exports.testWatch = function(test) {
     var a = value(3);
