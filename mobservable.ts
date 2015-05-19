@@ -656,11 +656,12 @@ class ObservableArray<T> implements Array<T> {
         return new ObservableArray<T>(this._values);
     }
 
-    find(predicate:(item:T,index:number)=>boolean, fromIndex=0,thisArg?):T {
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
+    find(predicate:(item:T,index:number,array:ObservableArray<T>)=>boolean, thisArg?, fromIndex=0):T {
         this.dependencyState.notifyObserved();
         var items = this._values, l = items.length;
         for(var i = fromIndex; i < l; i++)
-            if(predicate.call(thisArg,items[i],i))
+            if(predicate.call(thisArg, items[i], i, this))
                 return items[i];
         return null;
     }
