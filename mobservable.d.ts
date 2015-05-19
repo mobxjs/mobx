@@ -34,7 +34,8 @@ declare module "mobservable" {
         replace(newItems:T[]);
         values(): T[];
         clone(): IObservableArray<T>;
-        find(predicate:(item:T,index:number)=>boolean,fromIndex?:number,thisArg?):T;
+        find(predicate:(item:T,index:number,array:IObservableArray<T>)=>boolean,thisArg?,fromIndex?:number):T;
+        remove(value:T):boolean;
     }
 
     interface ISimpleEventEmitter {

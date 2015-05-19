@@ -100,7 +100,7 @@ exports.test1 = function(test) {
     }
 };
 
-exports.testFind = function(test) {
+exports.testFindAndRemove = function(test) {
     var a = mobservable.array([10,20,20]);
     var idx = -1;
     function predicate(item, index) {
@@ -113,11 +113,23 @@ exports.testFind = function(test) {
 
     test.equal(a.find(predicate), 20);
     test.equal(idx, 1);
-    test.equal(a.find(predicate, 1), 20);
+    test.equal(a.find(predicate, null, 1), 20);
     test.equal(idx, 1);
-    test.equal(a.find(predicate, 2), 20);
+    test.equal(a.find(predicate, null, 2), 20);
     test.equal(idx, 2);
-    test.equal(a.find(predicate, 3), null);
+    idx = -1;
+    test.equal(a.find(predicate, null, 3), null);
+    test.equal(idx, -1);
+
+    test.equal(a.remove(20), true);
+    test.equal(a.find(predicate), 20);
+    test.equal(idx, 1);
+    idx = -1;
+    test.equal(a.remove(20), true);
+    test.equal(a.find(predicate), null);
+    test.equal(idx, -1);
+
+    test.equal(a.remove(20), false);
 
     test.done();
 }

@@ -716,6 +716,17 @@ class ObservableArray<T> implements Array<T> {
         this.sideEffectWarning("sort");
         return this.replace(this._values.sort.apply(this._values, arguments));
     }
+
+    remove(value:T):boolean {
+        this.sideEffectWarning("remove");
+        var idx = this._values.indexOf(value);
+        if (idx > -1) {
+            this.splice(idx, 1);
+            return true;
+        }
+        return false;            
+    }
+
     /*
         functions that do not alter the array, from lib.es6.d.ts
     */
