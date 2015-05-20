@@ -1,4 +1,4 @@
-var mobservable = require('../mobservable.js');
+var mobservable = require('mobservable');
 
 var value = mobservable.value;
 var voidObserver = function(){};

@@ -1,5 +1,5 @@
-/// <reference path="../mobservable.d.ts"/>
-import mobservable = require('../mobservable');
+/// <reference path="./node_modules/mobservable/mobservable.d.ts"/>
+import mobservable = require('mobservable');
 
 var observable = mobservable.observable;
 
@@ -16,6 +16,13 @@ class Order {
     @observable total() {
         return this.amount * this.price * (1 + this.orders.length);
     }
+}
+
+export function testObservable(test) {
+    var a = mobservable(3);
+    var b = mobservable(() => a * 2);
+    test.equal(b(), 6);
+    test.done();
 }
 
 export function testAnnotations(test) {

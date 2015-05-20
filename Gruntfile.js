@@ -28,7 +28,10 @@ module.exports = function(grunt) {
             perf: ['test/performance.js']
         },
         exec: {
-            cover: "mkdir -p dist/test && cp -rf test/* dist/test && istanbul cover nodeunit dist/test/"
+            cover: "istanbul cover nodeunit test/",
+            testsetup: "mkdir -p test/node_modules/mobservable " + 
+                    "&& cp mobservable.js test/node_modules/mobservable/index.js" +
+                    "&& cp mobservable.d.ts test/node_modules/mobservable"
         },
         coveralls: {
             options: {
@@ -52,6 +55,6 @@ module.exports = function(grunt) {
     grunt.registerTask("default", ["ts:buildlocal"]);
     grunt.registerTask("build", ["ts:builddist"]);
     grunt.registerTask("cover", ["ts:buildlocal", "exec:cover", "coveralls:default"]);
-    grunt.registerTask("test", ["ts:buildlocal","ts:buildtypescripttest", "nodeunit:all"]);
+    grunt.registerTask("test", ["ts:buildlocal","exec:testsetup", "ts:buildtypescripttest", "nodeunit:all"]);
     grunt.registerTask("perf", ["ts:buildlocal", "nodeunit:perf"]);
 };
