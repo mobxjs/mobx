@@ -42,7 +42,7 @@ interface IMObservableStatic {
     
     watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda];
     observeProperty(object:Object, key:string, listener:Function, invokeImmediately?:boolean):Lambda;
-    batch(action:Lambda);
+    batch<T>(action:()=>T):T;
     
     // property definition
     observable(target:Object, key:string); // annotation

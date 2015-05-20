@@ -133,13 +133,15 @@ exports.testBatch = function(test) {
     // Note, 60 should not happen! (that is d beign computed before c after update of b)
     test.deepEqual([36, 100], buf.toArray());
 
-    mobservable.batch(function() {
+    var x = mobservable.batch(function() {
         a(2);
         b(3);
         a(6);
         test.deepEqual(100, d()); // still hunderd
+        return 2;
     });
 
+    test.equal(x, 2); // test return value
     test.deepEqual([36, 100, 54], buf.toArray());// only one new value for d
     test.done();
 }
