@@ -22,7 +22,7 @@
     - verify that multiple computations schedulings during batch result in single computation
 
 0.4
-* License
+* ~~License~~
 * ~~implement array.sort & reverse properly, they do change the array~~
 * ~~drop mobservable.onReady / onceReady?~~
 * ~~clean up / clarify properties / annotations code~~
