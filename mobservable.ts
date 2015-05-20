@@ -57,6 +57,8 @@ interface IMObservableStatic {
     debugLevel: number;
 }
 
+/* END OF DECLARATION */
+
 /**
     Creates an observable from either a value or a function.
     If a scope is provided, the function will be always executed usign the provided scope.

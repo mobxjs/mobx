@@ -1,9 +1,8 @@
-declare module "mobservable" {
-    var m : IMObservableStatic;
-    export = m;
-}
-
-/* Copied verbatim from mobservable.ts */
+/**
+ * MOBservable
+ * (c) 2015 - Michel Weststrate
+ * https://github.com/mweststrate/mobservable
+ */
 interface Lambda {
     ():void;
 }
@@ -58,5 +57,9 @@ interface IMObservableStatic {
     debugLevel: number;
 }
 
-/* END Copied verbatim from mobservable.ts */
 
+
+declare module "mobservable" {
+	var m : IMObservableStatic;
+	export = m;
+}
