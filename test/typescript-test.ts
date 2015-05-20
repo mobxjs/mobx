@@ -20,7 +20,7 @@ class Order {
 
 export function testObservable(test) {
     var a = mobservable(3);
-    var b = mobservable(() => a * 2);
+    var b = mobservable(() => a() * 2);
     test.equal(b(), 6);
     test.done();
 }

@@ -3,7 +3,6 @@
  * (c) 2015 - Michel Weststrate
  * https://github.com/mweststrate/mobservable
  */
-
 interface Lambda {
     ():void;
 }
@@ -14,11 +13,31 @@ interface IObservableValue<T,S> {
     observe(callback:(newValue:T, oldValue:T)=>void, fireImmediately?:boolean):Lambda;
 }
 
-interface MobservableStatic {
+interface IObservableArray<T> extends Array<T> {
+    [n: number]: T;
+    length: number;
+
+    spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[];
+    observe(listener:()=>void, fireImmediately?:boolean):Lambda;
+    clear(): T[];
+    replace(newItems:T[]);
+    values(): T[];
+    clone(): IObservableArray<T>;
+    find(predicate:(item:T,index:number,array:IObservableArray<T>)=>boolean,thisArg?,fromIndex?:number):T;
+    remove(value:T):boolean;
+}
+
+interface ISimpleEventEmitter {
+    emit(...data:any[]):void;
+    on(listener:(...data:any[])=>void):Lambda;
+    once(listener:(...data:any[])=>void):Lambda;
+}
+
+interface IMObservableStatic {
     // shorthand for .value()
     <T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S>;
 
-    array<T>(values?:T[]): ObservableArray<T>;
+    array<T>(values?:T[]): IObservableArray<T>;
     value<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S>;
     
     watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda];
@@ -34,7 +53,7 @@ interface MobservableStatic {
     turnObservablesIntoProperties(object:Object);
 
     // Utils
-    SimpleEventEmitter: new()=> SimpleEventEmitter;
+    SimpleEventEmitter: new()=> ISimpleEventEmitter;
     debugLevel: number;
 }
 
@@ -71,7 +90,7 @@ function createObservable<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S> 
 /**
     @see mobservableStatic.value
 */
-var mobservableStatic:MobservableStatic = <MobservableStatic> function<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S> {
+var mobservableStatic:IMObservableStatic = <IMObservableStatic> function<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S> {
     return createObservable(value,scope);
 };
 
@@ -544,7 +563,7 @@ class DNode {
     }
 }
 
-class ObservableArray<T> implements Array<T> {
+class ObservableArray<T> implements IObservableArray<T> {
     [n: number]: T;
 
     private _values: T[];
@@ -817,7 +836,7 @@ class ObservableArray<T> implements Array<T> {
 }
 ObservableArray.reserveArrayBuffer(1000);
 
-class SimpleEventEmitter {
+class SimpleEventEmitter implements ISimpleEventEmitter {
     listeners:{(data?):void}[] = [];
 
     emit(...data:any[]);
