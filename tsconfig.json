@@ -16,6 +16,7 @@
         "./dist/test/typescript-test.ts",
         "./mobservable.d.ts",
         "./mobservable.ts",
+        "./test/node_modules/mobservable/mobservable.d.ts",
         "./test/typescript-test.ts"
     ]
 }

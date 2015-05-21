@@ -27,17 +27,17 @@ module.exports = function(grunt) {
                 reporter: 'default'
             },
             all: ['test/*.js'],
-            perf: ['test/performance.js']
+            perf: ['test/perf/*.js']
         },
         exec: {
-            cover: "istanbul cover nodeunit test/",
-            testsetup: "mkdir -p test/node_modules/mobservable " + 
-                    "&& cp mobservable.js test/node_modules/mobservable/index.js" +
-                    "&& cp mobservable.d.ts test/node_modules/mobservable"
+            cover: "istanbul cover nodeunit test/*.js",
+            testsetup: "mkdir -p test/node_modules/mobservable " +
+                    "&& ln -sf ../../../mobservable.js test/node_modules/mobservable/index.js" +
+                    "&& ln -sf ../../../mobservable.d.ts test/node_modules/mobservable"
         },
         coveralls: {
             options: {
-		        // LCOV coverage file relevant to every target
+                // LCOV coverage file relevant to every target
                 force: false
             },
             default: {
@@ -52,12 +52,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-exec');
 
     grunt.registerTask("buildDts", "Build .d.ts file", function() {
-        var header = '\n\ndeclare module "mobservable" {\n\tvar m : IMObservableStatic;\n\texport = m;\n}';
+        var moduleDeclaration = '\n\ndeclare module "mobservable" {\n\tvar m : IMObservableStatic;\n\texport = m;\n}';
         var ts = fs.readFileSync('mobservable.ts','utf8');
         var headerEndIndex = ts.indexOf("/* END OF DECLARATION */");
         if (headerEndIndex === -1)
             throw "Failed to find end of declaration in mobservable.ts";
-        fs.writeFileSync('mobservable.d.ts', ts.substr(0, headerEndIndex) + header, 'utf8');
+        fs.writeFileSync('mobservable.d.ts', "/** GENERATED FILE */\n" + ts.substr(0, headerEndIndex) + moduleDeclaration, 'utf8');
     });
     grunt.registerTask("publish", "Publish to npm", function() {
         require("./publish.js");
