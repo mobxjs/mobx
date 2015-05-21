@@ -64,8 +64,8 @@ module.exports = function(grunt) {
     });
     grunt.registerTask("default", ["buildlocal"]);
     grunt.registerTask("build", ["ts:builddist","buildDts"]);
-    grunt.registerTask("buildlocal", ["ts:buildlocal", "buildDts"]);
+    grunt.registerTask("buildlocal", ["ts:buildlocal", "exec:testsetup", "buildDts"]);
     grunt.registerTask("cover", ["buildlocal", "exec:cover", "coveralls:default"]);
-    grunt.registerTask("test", ["buildlocal","exec:testsetup", "ts:buildtypescripttest", "nodeunit:all"]);
+    grunt.registerTask("test", ["buildlocal", "ts:buildtypescripttest", "nodeunit:all"]);
     grunt.registerTask("perf", ["buildlocal", "nodeunit:perf"]);
 };
