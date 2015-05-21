@@ -22,7 +22,9 @@ interface MobservableStatic {
     array<T>(values?:T[]): ObservableArray<T>;
     value<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S>;
     watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda];
-
+	
+	toJSON<T>(any:T):T;
+    
     // property definition
     observable(target:Object, key:string); // annotation
     defineObservableProperty<T>(object:Object, name:string, initialValue?:T);
@@ -143,6 +145,13 @@ mobservableStatic.observeProperty = function observeProperty(object:Object, key:
 
 mobservableStatic.array = function array<T>(values?:T[]): ObservableArray<T> {
     return new ObservableArray(values);
+}
+
+mobservableStatic.toJSON = function toJSON<T>(value:T):T {
+    if (value instanceof ObservableArray)
+        return (<any>value).values();
+    // later on, more cases like objects and such
+    return value;
 }
 
 mobservableStatic.batch = function batch<T>(action:()=>T):T {

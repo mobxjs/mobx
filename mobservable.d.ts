@@ -13,6 +13,8 @@ declare module "mobservable" {
     export function watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda];
     export function observeProperty(object:Object, key:string, listener:Function, invokeImmediately?:boolean):Lambda;
 
+	export function toJSON<T>(any:T):T;
+	
     // annotation
     export function observable(target:Object, key:string);
 
