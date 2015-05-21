@@ -71,8 +71,13 @@ mobservableStatic.observeProperty = function observeProperty(object, key, listen
 mobservableStatic.array = function array(values) {
     return new ObservableArray(values);
 };
+mobservableStatic.toJSON = function toJSON(value) {
+    if (value instanceof ObservableArray)
+        return value.values();
+    return value;
+};
 mobservableStatic.batch = function batch(action) {
-    Scheduler.batch(action);
+    return Scheduler.batch(action);
 };
 mobservableStatic.onReady = function onReady(listener) {
     return Scheduler.onReady(listener);
@@ -684,7 +689,7 @@ var Scheduler = (function () {
     Scheduler.batch = function (action) {
         Scheduler.inBatch += 1;
         try {
-            action();
+            return action();
         }
         finally {
             if (--Scheduler.inBatch === 0) {
