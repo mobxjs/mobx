@@ -59,6 +59,8 @@ interface IMObservableStatic {
 
 /* END OF DECLARATION */
 
+module mobservable { // wrap in module for UMD export, see end of the file
+
 /**
     Creates an observable from either a value or a function.
     If a scope is provided, the function will be always executed usign the provided scope.
@@ -92,7 +94,7 @@ function createObservable<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S> 
 /**
     @see mobservableStatic.value
 */
-var mobservableStatic:IMObservableStatic = <IMObservableStatic> function<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S> {
+export var mobservableStatic:IMObservableStatic = <IMObservableStatic> function<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S> {
     return createObservable(value,scope);
 };
 
@@ -1011,4 +1013,26 @@ function once(func: Lambda):Lambda {
     }
 }
 
-export = mobservableStatic;
+} // end of module
+
+/* typescript does not support UMD modules yet, lets do it ourselves... */
+declare var define;
+declare var exports;
+declare var module;
+
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD.
+        define('mobservable', [], function () {
+            return (factory());
+        });
+    } else if (typeof exports === 'object') {
+        // CommonJS like
+        module.exports = factory();
+    } else {
+        // register global
+        root['mobservable'] = factory();
+    }
+}(this, function () {
+    return mobservable.mobservableStatic;
+}));
