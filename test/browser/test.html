@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<body>
+	<script src="../../node_modules/nodeunit/examples/browser/nodeunit.js"></script>
+	<script>
+		/* lots of ugly to avoid using browserify :-P. */
+		var module = { exports: {} };		
+	</script>
+	<script src="../../mobservable.js"></script>
+	<script>
+		var mobservable = module.exports;
+		function require(module) {
+			return window[module];
+		}
+		var  exports = {};
+	</script>
+	<script src="../observables.js"></script>
+	<script>
+		var observablesTests = exports;
+		var exports = {};
+	</script>
+	<script src="../array.js"></script>
+	<script>
+		var arrayTests = exports;
+		delete exports;
+		nodeunit.run({
+			'observables': observablesTests,
+			'arrays': arrayTests
+		});
+	</script>
+
+</body>
