@@ -1,39 +1,21 @@
 var fs = require('fs');
+var mkdirp = require('mkdirp');
 
 module.exports = function(grunt) {
+    var tsc = "./node_modules/typescript/bin/tsc";
     grunt.initConfig({
-        ts: {
-            options: {
-                module: 'commonjs',
-                target: 'es5'
-            },
-            builddist : {
-                src: ["mobservable.ts"],
-                outDir: "dist/",
-                comments: false,
-            },
-            buildlocal : {
-                src: ["mobservable.ts"]
-            },
-            buildtypescripttest: {
-                options: {
-                     compiler: './node_modules/typescript/bin/tsc'
-                },
-                src: ["test/typescript-test.ts"]
-            }
-        },
         nodeunit: {
-            options: {
-                reporter: 'default'
-            },
             all: ['test/*.js'],
             perf: ['test/perf/*.js']
         },
         exec: {
-            cover: "istanbul cover nodeunit test/*.js",
-            testsetup: "mkdir -p test/node_modules/mobservable " +
-                    "&& ln -sf ../../../mobservable.js test/node_modules/mobservable/index.js" +
-                    "&& ln -sf ../../../mobservable.d.ts test/node_modules/mobservable"
+            cover: "istanbul cover nodeunit test/",
+            buildtypescripttest: {
+                cmd: "." + tsc + " typescript-test.ts -m commonjs -t es5",
+                cwd: "test/"
+            },
+            buildlocal: tsc + " mobservable.ts -t es5 --sourceMap",
+            builddist: tsc + " mobservable.ts -t es5 --removeComments -out dist/mobservable.js"
         },
         coveralls: {
             options: {
@@ -43,10 +25,9 @@ module.exports = function(grunt) {
             default: {
                 src: 'coverage/lcov.info',
             }
-         }
+        }
     });
 
-    grunt.loadNpmTasks("grunt-ts");
     grunt.loadNpmTasks('grunt-contrib-nodeunit');
     grunt.loadNpmTasks('grunt-coveralls');
     grunt.loadNpmTasks('grunt-exec');
@@ -59,13 +40,20 @@ module.exports = function(grunt) {
             throw "Failed to find end of declaration in mobservable.ts";
         fs.writeFileSync('mobservable.d.ts', "/** GENERATED FILE */\n" + ts.substr(0, headerEndIndex) + moduleDeclaration, 'utf8');
     });
+
+    grunt.registerTask("preparetest", "Create node module in test folder", function(sourceDir) {
+        mkdirp.sync("test/node_modules/mobservable");
+        fs.writeFileSync("test/node_modules/mobservable/mobservable.d.ts", fs.readFileSync("mobservable.d.ts","utf8"),"utf8");
+        fs.writeFileSync("test/node_modules/mobservable/index.js", "module.exports=require('../../../" + sourceDir + "/mobservable.js');","utf8");
+    });
+
     grunt.registerTask("publish", "Publish to npm", function() {
         require("./publish.js");
     });
     grunt.registerTask("default", ["buildlocal"]);
-    grunt.registerTask("build", ["ts:builddist","buildDts"]);
-    grunt.registerTask("buildlocal", ["ts:buildlocal", "exec:testsetup", "buildDts"]);
-    grunt.registerTask("cover", ["buildlocal", "exec:cover", "coveralls:default"]);
-    grunt.registerTask("test", ["buildlocal", "ts:buildtypescripttest", "nodeunit:all"]);
-    grunt.registerTask("perf", ["buildlocal", "nodeunit:perf"]);
+    grunt.registerTask("builddist", ["exec:builddist","buildDts"]);
+    grunt.registerTask("buildlocal", ["exec:buildlocal", "buildDts"]);
+    grunt.registerTask("cover", ["builddist", "preparetest:dist", "exec:cover", "coveralls:default"]);
+    grunt.registerTask("test", ["buildlocal", "preparetest:", "exec:buildtypescripttest", "nodeunit:all"]);
+    grunt.registerTask("perf", ["buildlocal", "preparetest:", "nodeunit:perf"]);
 };

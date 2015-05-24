@@ -22,10 +22,10 @@
     "grunt-contrib-nodeunit": "^0.4.1",
     "grunt-coveralls": "^1.0.0",
     "grunt-exec": "^0.4.6",
-    "grunt-ts": "^4.0.1",
+    "mkdirp": "^0.5.1",
     "nodeunit-browser-tap": "^0.1.0",
     "nscript": "^0.1.5",
-    "typescript": "^1.5.0-alpha"
+    "typescript": "^1.5.0-beta"
   },
   "testling": {
     "files": "test/browser/test.js",
