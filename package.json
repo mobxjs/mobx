@@ -5,7 +5,7 @@
   "main": "dist/mobservable.js",
   "scripts": {
     "test": "grunt cover",
-    "prepublish": "grunt build"
+    "prepublish": "grunt builddist"
   },
   "repository": {
     "type": "git",
