@@ -1,3 +1,4 @@
+/** GENERATED FILE */
 /**
  * MOBservable
  * (c) 2015 - Michel Weststrate
@@ -14,9 +15,6 @@ interface IObservableValue<T,S> {
 }
 
 interface IObservableArray<T> extends Array<T> {
-    [n: number]: T;
-    length: number;
-
     spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[];
     observe(listener:()=>void, fireImmediately?:boolean):Lambda;
     clear(): T[];
@@ -39,22 +37,24 @@ interface IMObservableStatic {
 
     array<T>(values?:T[]): IObservableArray<T>;
     value<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S>;
-    
+
+    toPlainValue<T>(any:T):T;
+
     watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda];
     observeProperty(object:Object, key:string, listener:Function, invokeImmediately?:boolean):Lambda;
     batch<T>(action:()=>T):T;
-    
+
     // property definition
     observable(target:Object, key:string); // annotation
-    
+
     props(object:Object, name:string, initalValue: any);
     props(object:Object, props:Object);
     props(object:Object);
     turnObservablesIntoProperties(object:Object);
 
     // Utils
-    SimpleEventEmitter: new()=> ISimpleEventEmitter;
     debugLevel: number;
+    SimpleEventEmitter: new()=> ISimpleEventEmitter;
 }
 
 
