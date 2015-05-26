@@ -2,7 +2,7 @@ var fs = require('fs');
 var mkdirp = require('mkdirp');
 
 module.exports = function(grunt) {
-    var tsc = "node_modules/typescript/bin/tsc";
+    var tsc = __dirname + "/node_modules/typescript/bin/tsc";
     grunt.initConfig({
         nodeunit: {
             all: ['test/*.js'],
@@ -11,7 +11,7 @@ module.exports = function(grunt) {
         exec: {
             cover: "istanbul cover nodeunit test/",
             buildtypescripttest: {
-                cmd: "." + tsc + " typescript-test.ts -m commonjs -t es5",
+                cmd: tsc + " typescript-test.ts -m commonjs -t es5",
                 cwd: "test/"
             },
             buildlocal: tsc + " mobservable.ts -t es5 --sourceMap",
