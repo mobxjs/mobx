@@ -32,7 +32,6 @@ exports.test1 = function(test) {
         test.deepEqual(Object.keys(a), ["0", "1"]);
         test.deepEqual(a.values(), [1,2]);
 
-        debugger;
         var sum = value(function() {
             return -1 + a.reduce(function(a,b) {
                 return a + b;
@@ -281,3 +280,13 @@ exports.test_array_modification2 = function(test) {
 
     test.done();
 };
+
+exports.test_is_array = function(test) {
+    var x = mobservable.array();
+    test.equal(x instanceof Array, true);
+
+    // would be cool if these two would return true...
+    test.equal(typeof x === "array", false);
+    test.equal(Array.isArray(x), false);
+    test.done();
+}

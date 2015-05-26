@@ -593,7 +593,12 @@ class DNode {
     }
 }
 
-class ObservableArray<T> implements IObservableArray<T> {
+// Workaround to make sure ObservableArray extends Array
+class StubArray {
+}
+StubArray.prototype = [];
+
+class ObservableArray<T> extends StubArray implements IObservableArray<T> {
     [n: number]: T;
 
     private _values: T[];
@@ -601,6 +606,7 @@ class ObservableArray<T> implements IObservableArray<T> {
     private changeEvent: SimpleEventEmitter;
 
     constructor(initialValues?:T[]) {
+        super();
         // make for .. in / Object.keys behave like an array, so hide the other properties
         Object.defineProperties(this, {
             "dependencyState" : { enumerable: false, value: new DNode(false) },
