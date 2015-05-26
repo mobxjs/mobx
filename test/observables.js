@@ -233,6 +233,25 @@ exports.testProps3 = function(test) {
     test.done();
 };
 
+exports.testProps4 = function(test) {
+    function Bzz() {
+        mobservable.props(this, {
+            fluff: [1,2],
+            sum: function() {
+                return this.fluff.reduce(function(a,b) { 
+                    return a + b;
+                }, 0);
+            }
+        });
+    }
+    
+    var x = new Bzz();
+    test.equal(x.sum, 3);
+    x.fluff.push(3);
+    test.equal(x.sum, 6);    
+    test.done();
+}
+
 exports.testTurnObservablesIntoProperties = function(test) {
     var vat = value(0.2);
     var Order = function() {
