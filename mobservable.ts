@@ -14,9 +14,6 @@ interface IObservableValue<T,S> {
 }
 
 interface IObservableArray<T> extends Array<T> {
-    [n: number]: T;
-    length: number;
-
     spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[];
     observe(listener:()=>void, fireImmediately?:boolean):Lambda;
     clear(): T[];
@@ -39,22 +36,24 @@ interface IMObservableStatic {
 
     array<T>(values?:T[]): IObservableArray<T>;
     value<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S>;
-    
+
+    toPlainValue<T>(any:T):T;
+
     watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda];
     observeProperty(object:Object, key:string, listener:Function, invokeImmediately?:boolean):Lambda;
     batch<T>(action:()=>T):T;
-    
+
     // property definition
     observable(target:Object, key:string); // annotation
-    
+
     props(object:Object, name:string, initalValue: any);
     props(object:Object, props:Object);
     props(object:Object);
     turnObservablesIntoProperties(object:Object);
 
     // Utils
-    SimpleEventEmitter: new()=> ISimpleEventEmitter;
     debugLevel: number;
+    SimpleEventEmitter: new()=> ISimpleEventEmitter;
 }
 
 /* END OF DECLARATION */
@@ -164,6 +163,33 @@ mobservableStatic.observeProperty = function observeProperty(object:Object, key:
 
 mobservableStatic.array = function array<T>(values?:T[]): ObservableArray<T> {
     return new ObservableArray(values);
+}
+
+/**
+ * Inverse function of `props` and `array`, given an (observable) array, returns a plain,
+ * non observable version. (non recursive), or given an object with observable properties, returns a clone
+ * object with plain properties.
+ *
+ * Any other value will be returned as is.
+ */
+mobservableStatic.toPlainValue = function toPlainValue(value:any):any {
+    if (value) {
+        if (value instanceof ObservableArray) // TODO: instanceof Array and slice
+            return (<any>value).values();
+        if (Array.isArray(value))
+            return value.slice();
+        if (value instanceof ObservableValue)
+            return value.get();
+        if (typeof value === "function" && value.prop && value.prop instanceof ObservableValue)
+            return value()
+        if (typeof value === "object") {
+            var res = {};
+            for (var key in value)
+                res[key] = toPlainValue(value[key]);
+            return res;
+        }
+    }
+    return value;
 }
 
 mobservableStatic.batch = function batch<T>(action:()=>T):T {
@@ -579,7 +605,7 @@ class ObservableArray<T> implements IObservableArray<T> {
         Object.defineProperties(this, {
             "dependencyState" : { enumerable: false, value: new DNode(false) },
             "_values" : { enumerable: false, value: initialValues ? initialValues.slice() : [] },
-            "changeEvent" : { enumerable: false, value: new SimpleEventEmitter() },
+            "changeEvent" : { enumerable: false, value: new SimpleEventEmitter() }
         });
         if (initialValues && initialValues.length)
             this.updateLength(0, initialValues.length);
@@ -762,7 +788,7 @@ class ObservableArray<T> implements IObservableArray<T> {
             this.splice(idx, 1);
             return true;
         }
-        return false;            
+        return false;
     }
 
     /*

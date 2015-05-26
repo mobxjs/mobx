@@ -219,7 +219,7 @@ exports.testProps3 = function(test) {
     var Order = function() {
         this.price = 20;
         this.amount = 2;
-        this.total = function() { 
+        this.total = function() {
             return (1+vat()) * this.price * this.amount; // price and amount are now properties!
         };
         mobservable.props(this);
@@ -440,5 +440,41 @@ exports.testLazyEvaluation = function (test) {
     test.equal(observerChanges, 1);
 
     test.equal(mobservable.stackDepth(), 0);
+    test.done();
+};
+
+exports.testToPlainValue = function(test) {
+    var n = null;
+    var a = 3;
+    var b = mobservable(3);
+    var c = mobservable.array([1,2,3]);
+    var d = mobservable.props({
+        a: 1
+    });
+    var e = [4,5,6];
+    var p = mobservable.toPlainValue;
+
+    test.equal(p(n), null);
+    test.equal(p(a), 3);
+    test.equal(p(b), 3);
+    test.deepEqual(p(c), [1,2,3]);
+    test.deepEqual(p(d), { a: 1 });
+    test.deepEqual(p(e), [4,5,6]);
+
+    var pb = p(b);
+    var pc = p(c);
+    var pd = p(d);
+    var pe = p(e);
+
+    b(2);
+    c[0] = 4;
+    d.a = 2;
+    e.shift();
+
+    test.equal(pb, 3);
+    test.deepEqual(pc, [1,2,3]);
+    test.deepEqual(pd, {a:1});
+    test.deepEqual(pe, [4,5,6]);
+
     test.done();
 };
