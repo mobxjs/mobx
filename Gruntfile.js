@@ -2,7 +2,7 @@ var fs = require('fs');
 var mkdirp = require('mkdirp');
 
 module.exports = function(grunt) {
-    var tsc = "./node_modules/typescript/bin/tsc";
+    var tsc = "node_modules/typescript/bin/tsc";
     grunt.initConfig({
         nodeunit: {
             all: ['test/*.js'],
@@ -25,10 +25,18 @@ module.exports = function(grunt) {
             default: {
                 src: 'coverage/lcov.info',
             }
+        },
+        uglify: {
+            dist: {
+                files: {
+                    'dist/mobservable.min.js': ['dist/mobservable.js']
+                }
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-nodeunit');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-coveralls');
     grunt.loadNpmTasks('grunt-exec');
 
@@ -51,7 +59,7 @@ module.exports = function(grunt) {
         require("./publish.js");
     });
     grunt.registerTask("default", ["buildlocal"]);
-    grunt.registerTask("builddist", ["exec:builddist","buildDts"]);
+    grunt.registerTask("builddist", ["exec:builddist","buildDts","uglify:dist"]);
     grunt.registerTask("buildlocal", ["exec:buildlocal", "buildDts"]);
     grunt.registerTask("cover", ["builddist", "preparetest:dist", "exec:cover", "coveralls:default"]);
     grunt.registerTask("test", ["buildlocal", "preparetest:", "exec:buildtypescripttest", "nodeunit:all"]);

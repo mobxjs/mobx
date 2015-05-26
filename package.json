@@ -22,6 +22,7 @@
     "grunt-contrib-nodeunit": "^0.4.1",
     "grunt-coveralls": "^1.0.0",
     "grunt-exec": "^0.4.6",
+    "grunt-contrib-uglify": "^0.9.1",
     "mkdirp": "^0.5.1",
     "nodeunit-browser-tap": "^0.1.0",
     "nscript": "^0.1.5",
