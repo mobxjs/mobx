@@ -1,10 +1,13 @@
 var fs = require('fs');
 var mkdirp = require('mkdirp');
+var path = require('path');
 
 module.exports = function(grunt) {
-    var tsc = __dirname + "/node_modules/typescript/bin/tsc";
+    var tsc = "node " + __dirname + "/node_modules/typescript/bin/tsc.js".replace(/\//g, path.sep);
+    console.log("Compiling with: " + tsc);
     grunt.initConfig({
         nodeunit: {
+            options: { reporter: 'default' },
             all: ['test/*.js'],
             perf: ['test/perf/*.js']
         },
