@@ -1,13 +1,9 @@
 <!DOCTYPE HTML>
 <body>
 	<script src="../../node_modules/nodeunit/examples/browser/nodeunit.js"></script>
-	<script>
-		/* lots of ugly to avoid using browserify :-P. */
-		var module = { exports: {} };		
-	</script>
 	<script src="../../mobservable.js"></script>
 	<script>
-		var mobservable = module.exports;
+		// Weird way to require the tests :-P.
 		function require(module) {
 			return window[module];
 		}
