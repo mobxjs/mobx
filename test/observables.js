@@ -158,7 +158,8 @@ exports.testScope = function(test) {
 
     var order = new Order();
     order.total.observe(voidObserver);
-    order.price(10).amount(3);
+    order.price(10);
+    order.amount(3);
     test.equals(36, order.total());
     test.equal(mobservable.stackDepth(), 0);
 
@@ -238,17 +239,17 @@ exports.testProps4 = function(test) {
         mobservable.props(this, {
             fluff: [1,2],
             sum: function() {
-                return this.fluff.reduce(function(a,b) { 
+                return this.fluff.reduce(function(a,b) {
                     return a + b;
                 }, 0);
             }
         });
     }
-    
+
     var x = new Bzz();
     test.equal(x.sum, 3);
     x.fluff.push(3);
-    test.equal(x.sum, 6);    
+    test.equal(x.sum, 6);
     test.done();
 }
 

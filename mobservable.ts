@@ -7,15 +7,34 @@ interface Lambda {
     ():void;
 }
 
-interface IObservableValue<T,S> {
+interface IObservable {
+    observe(callback:(...args:any[])=>void, fireImmediately?:boolean):Lambda;
+}
+
+interface IObservableValue<T> extends IObservable {
     ():T;
-    (value:T):S;
+    (value:T);
     observe(callback:(newValue:T, oldValue:T)=>void, fireImmediately?:boolean):Lambda;
 }
 
-interface IObservableArray<T> extends Array<T> {
+interface IArrayChange<T> {
+    type: string; // Always: 'update'
+    object: IObservableArray<T>;
+    index: number;
+    oldValue: T;
+}
+
+interface IArraySplice<T> {
+    type: string; // Always: 'splice'
+    object: IObservableArray<T>;
+    index: number;
+    removed: T[];
+    addedCount: number;
+}
+
+interface IObservableArray<T> extends Array<T>, IObservable {
     spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[];
-    observe(listener:()=>void, fireImmediately?:boolean):Lambda;
+    observe(listener:(changeData:IArrayChange<T>|IArraySplice<T>)=>void, fireImmediately?:boolean):Lambda;
     clear(): T[];
     replace(newItems:T[]);
     values(): T[];
@@ -32,10 +51,10 @@ interface ISimpleEventEmitter {
 
 interface IMObservableStatic {
     // shorthand for .value()
-    <T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S>;
+    <T>(value?:T|{():T}, scope?:Object):IObservableValue<T>;
 
     array<T>(values?:T[]): IObservableArray<T>;
-    value<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S>;
+    value<T>(value?:T|{():T}, scope?:Object):IObservableValue<T>;
 
     toPlainValue<T>(any:T):T;
 
@@ -66,8 +85,8 @@ module mobservable { // wrap in module for UMD export, see end of the file
     Returns a new IObservable, that is, a functon that can be used to set a new value or get the current values
     (the latter if no arguments are provided)
 */
-function createObservable<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S> {
-    var prop:ObservableValue<T,S> = null;
+function createObservable<T>(value?:T|{():T}, scope?:Object):IObservableValue<T> {
+    var prop:ObservableValue<T> = null;
 
     if (Array.isArray && Array.isArray(value) && mobservableStatic.debugLevel)
         warn("mobservable.value() was invoked with an array. Probably you want to create an mobservable.array() instead of observing a reference to an array?");
@@ -77,9 +96,11 @@ function createObservable<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S> 
     else
         prop = new ObservableValue(<T>value, scope);
 
-    var propFunc = function(value?:T):T|S {
-        if (arguments.length > 0)
-            return <S> prop.set(value);
+    var propFunc = function(value?:T):T {
+        if (arguments.length > 0) {
+            prop.set(value);
+            return undefined;
+        }
         else
             return <T> prop.get();
     };
@@ -87,13 +108,13 @@ function createObservable<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S> 
     (<any>propFunc).prop = prop;
     (<any>propFunc).toString = function() { return prop.toString(); };
 
-    return <IObservableValue<T,S>> propFunc;
+    return <IObservableValue<T>> propFunc;
 }
 
 /**
     @see mobservableStatic.value
 */
-export var mobservableStatic:IMObservableStatic = <IMObservableStatic> function<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S> {
+export var mobservableStatic:IMObservableStatic = <IMObservableStatic> function<T>(value?:T|{():T}, scope?:Object):IObservableValue<T> {
     return createObservable(value,scope);
 };
 
@@ -278,7 +299,7 @@ mobservableStatic.props = function props(target, props?, value?) {
 mobservableStatic.turnObservablesIntoProperties = function turnObservablesIntoProperties(object:Object) {
     for(var key in object) if (object.hasOwnProperty(key)) {
         if (object[key] && object[key].prop && object[key].prop instanceof ObservableValue) {
-            var observable = <ObservableValue<any,any>> object[key].prop;
+            var observable = <ObservableValue<any>> object[key].prop;
             Object.defineProperty(object, key, {
                 get: observable.get.bind(observable),
                 set: observable.set.bind(observable),
@@ -289,14 +310,14 @@ mobservableStatic.turnObservablesIntoProperties = function turnObservablesIntoPr
     }
 }
 
-class ObservableValue<T,S> {
+class ObservableValue<T> {
     protected changeEvent = new SimpleEventEmitter();
     protected dependencyState:DNode = new DNode(false);
 
-    constructor(protected _value?:T, protected scope?:S){
+    constructor(protected _value?:T, protected scope?:Object){
     }
 
-    set(value:T):S {
+    set(value:T) {
         if (value !== this._value) {
             var oldValue = this._value;
             this.dependencyState.markStale();
@@ -304,7 +325,6 @@ class ObservableValue<T,S> {
             this.dependencyState.markReady(true);
             this.changeEvent.emit(value, oldValue);
         }
-        return this.scope;
     }
 
     get():T {
@@ -328,11 +348,11 @@ class ObservableValue<T,S> {
     }
 }
 
-class ComputedObservable<U,S> extends ObservableValue<U,S> {
+class ComputedObservable<U> extends ObservableValue<U> {
     private isComputing = false;
     private hasError = false;
 
-    constructor(protected func:()=>U, scope:S) {
+    constructor(protected func:()=>U, scope?:Object) {
         super(undefined, scope);
         if (!func)
             throw new Error("ComputedObservable requires a function");
@@ -370,7 +390,7 @@ class ComputedObservable<U,S> extends ObservableValue<U,S> {
         return this._value;
     }
 
-    set(_:U):S {
+    set(_:U) {
         throw new Error(this.toString() + ": A computed observable does not accept new values!");
     }
 
@@ -681,7 +701,7 @@ class ObservableArray<T> extends StubArray implements IObservableArray<T> {
     private notifyChildUpdate(index:number, oldValue:T) {
         this.notifyChanged();
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-        this.changeEvent.emit({ object: this, type: 'update', index: index, oldValue: oldValue});
+        this.changeEvent.emit(<IArrayChange<T>>{ object: this, type: 'update', index: index, oldValue: oldValue});
     }
 
     private notifySplice(index:number, deleted:T[], added:T[]) {
@@ -689,7 +709,7 @@ class ObservableArray<T> extends StubArray implements IObservableArray<T> {
             return;
         this.notifyChanged();
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-        this.changeEvent.emit({ object: this, type: 'splice', index: index, addedCount: added.length, removed: deleted});
+        this.changeEvent.emit(<IArraySplice<T>>{ object: this, type: 'splice', index: index, addedCount: added.length, removed: deleted});
     }
 
     private notifyChanged() {
@@ -697,9 +717,9 @@ class ObservableArray<T> extends StubArray implements IObservableArray<T> {
         this.dependencyState.markReady(true);
     }
 
-    observe(listener:(data)=>void, fireImmediately=false):Lambda {
+    observe(listener:(changeData:IArrayChange<T>|IArraySplice<T>)=>void, fireImmediately=false):Lambda {
         if (fireImmediately)
-            listener({ object: this, type: 'splice', index: 0, addedCount: this._values.length, removed: []});
+            listener(<IArraySplice<T>>{ object: this, type: 'splice', index: 0, addedCount: this._values.length, removed: []});
         return this.changeEvent.on(listener);
     }
 

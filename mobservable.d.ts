@@ -8,15 +8,34 @@ interface Lambda {
     ():void;
 }
 
-interface IObservableValue<T,S> {
+interface IObservable {
+    observe(callback:(...args:any[])=>void, fireImmediately?:boolean):Lambda;
+}
+
+interface IObservableValue<T> extends IObservable {
     ():T;
-    (value:T):S;
+    (value:T);
     observe(callback:(newValue:T, oldValue:T)=>void, fireImmediately?:boolean):Lambda;
 }
 
-interface IObservableArray<T> extends Array<T> {
+interface IArrayChange<T> {
+    type: string; // Always: 'update'
+    object: IObservableArray<T>;
+    index: number;
+    oldValue: T;
+}
+
+interface IArraySplice<T> {
+    type: string; // Always: 'splice'
+    object: IObservableArray<T>;
+    index: number;
+    removed: T[];
+    addedCount: number;
+}
+
+interface IObservableArray<T> extends Array<T>, IObservable {
     spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[];
-    observe(listener:()=>void, fireImmediately?:boolean):Lambda;
+    observe(listener:(changeData:IArrayChange<T>|IArraySplice<T>)=>void, fireImmediately?:boolean):Lambda;
     clear(): T[];
     replace(newItems:T[]);
     values(): T[];
@@ -33,10 +52,10 @@ interface ISimpleEventEmitter {
 
 interface IMObservableStatic {
     // shorthand for .value()
-    <T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S>;
+    <T>(value?:T|{():T}, scope?:Object):IObservableValue<T>;
 
     array<T>(values?:T[]): IObservableArray<T>;
-    value<T,S>(value?:T|{():T}, scope?:S):IObservableValue<T,S>;
+    value<T>(value?:T|{():T}, scope?:Object):IObservableValue<T>;
 
     toPlainValue<T>(any:T):T;
 
