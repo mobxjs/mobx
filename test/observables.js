@@ -247,9 +247,15 @@ exports.testProps4 = function(test) {
     }
 
     var x = new Bzz();
+    var ar = x.fluff;
     test.equal(x.sum, 3);
     x.fluff.push(3);
     test.equal(x.sum, 6);
+    x.fluff = [5,6];
+    test.equal(x.sum, 11);
+    test.equal(ar === x.fluff, true);
+    ar.push(2);
+    test.equal(x.sum, 13);
     test.done();
 }
 
@@ -469,7 +475,9 @@ exports.testToPlainValue = function(test) {
     var b = mobservable(3);
     var c = mobservable.array([1,2,3]);
     var d = mobservable.props({
-        a: 1
+        a: 1,
+        b: [1,2,3],
+        c: function() { return this.a * 2; }
     });
     var e = [4,5,6];
     var p = mobservable.toPlainValue;
@@ -478,7 +486,7 @@ exports.testToPlainValue = function(test) {
     test.equal(p(a), 3);
     test.equal(p(b), 3);
     test.deepEqual(p(c), [1,2,3]);
-    test.deepEqual(p(d), { a: 1 });
+    test.deepEqual(p(d), { a: 1, b:[1,2,3],c:2 });
     test.deepEqual(p(e), [4,5,6]);
 
     var pb = p(b);
@@ -486,15 +494,30 @@ exports.testToPlainValue = function(test) {
     var pd = p(d);
     var pe = p(e);
 
+    // changes should not become visible in clones
     b(2);
     c[0] = 4;
     d.a = 2;
+    d.b.push(4);
     e.shift();
 
+    test.equal(b(), 2);
     test.equal(pb, 3);
+    test.deepEqual(c, [4,2,3]);
     test.deepEqual(pc, [1,2,3]);
-    test.deepEqual(pd, {a:1});
+    test.deepEqual(d, {a:2, b:[1,2,3,4],c:4});
+    test.deepEqual(pd, {a:1, b:[1,2,3],c:2});
+    test.deepEqual(e, [5,6]);
     test.deepEqual(pe, [4,5,6]);
+
+    // And vice versa
+    pd.a = 3;
+    pe.push(7); 
+    test.deepEqual(d, {a:2, b:[1,2,3,4],c:4});
+    test.deepEqual(pd, {a:3, b:[1,2,3],c:2});
+
+    test.deepEqual(e, [5,6]);
+    test.deepEqual(pe, [4,5,6,7]);
 
     test.done();
 };
