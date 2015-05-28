@@ -7,13 +7,13 @@ interface Lambda {
     ():void;
 }
 
-interface IObservable {
+interface IObservable<T> {
+    ():T;
+    (value:T);
     observe(callback:(...args:any[])=>void, fireImmediately?:boolean):Lambda;
 }
 
-interface IObservableValue<T> extends IObservable {
-    ():T;
-    (value:T);
+interface IObservableValue<T> extends IObservable<T> {
     observe(callback:(newValue:T, oldValue:T)=>void, fireImmediately?:boolean):Lambda;
 }
 
@@ -32,7 +32,7 @@ interface IArraySplice<T> {
     addedCount: number;
 }
 
-interface IObservableArray<T> extends Array<T>, IObservable {
+interface IObservableArray<T> extends Array<T> {
     spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[];
     observe(listener:(changeData:IArrayChange<T>|IArraySplice<T>)=>void, fireImmediately?:boolean):Lambda;
     clear(): T[];
@@ -43,6 +43,10 @@ interface IObservableArray<T> extends Array<T>, IObservable {
     remove(value:T):boolean;
 }
 
+interface IWrappedObservableArray<T> extends IObservable<IObservableArray<T>> {
+    observe(listener:(changeData:IArrayChange<T>|IArraySplice<T>)=>void, fireImmediately?:boolean):Lambda;
+}
+
 interface ISimpleEventEmitter {
     emit(...data:any[]):void;
     on(listener:(...data:any[])=>void):Lambda;
@@ -51,10 +55,12 @@ interface ISimpleEventEmitter {
 
 interface IMObservableStatic {
     // shorthand for .value()
+    <T>(value?:T[], scope?:Object):IWrappedObservableArray<T>;
     <T>(value?:T|{():T}, scope?:Object):IObservableValue<T>;
-
-    array<T>(values?:T[]): IObservableArray<T>;
+    
+    value<T>(value?:T[], scope?:Object):IWrappedObservableArray<T>;
     value<T>(value?:T|{():T}, scope?:Object):IObservableValue<T>;
+    array<T>(values?:T[]): IObservableArray<T>;
 
     toPlainValue<T>(any:T):T;
 
@@ -114,7 +120,7 @@ function createObservable<T>(value?:T|{():T}, scope?:Object):IObservableValue<T>
 /**
     @see mobservableStatic.value
 */
-export var mobservableStatic:IMObservableStatic = <IMObservableStatic> function<T>(value?:T|{():T}, scope?:Object):IObservableValue<T> {
+export var mobservableStatic:IMObservableStatic = <IMObservableStatic> function(value, scope?) {
     return createObservable(value,scope);
 };
 
