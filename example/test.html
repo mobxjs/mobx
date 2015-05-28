@@ -1,0 +1,190 @@
+<!DOCTYPE HTML>
+<body>
+    <div id="container">
+        <h1>Mobservale shopping cart demo</h1>
+        <table>
+            <tr>
+                <td>
+                    <h2>Availale items</h2>
+                    <button id="new-article">New article</button>
+                    <ul id="articles">
+
+                    </ul>
+                </td>
+                <td>
+                    <h2>Your shopping cart</h2>
+                    <div>Total: <span id="total"></span></div>
+                    <ul id="cart">
+
+                    </ul>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <script src="../mobservable.js"></script>
+    <script src="jquery-2.1.4.min.js"></script>
+    <script>
+        /**
+         * Data model
+         */
+        function Article(name, price) {
+            mobservable.props(this, {
+                name: name,
+                price: price
+            });
+        }
+
+        function ShoppingCartEntry(article) {
+            mobservable.props(this, {
+                article: article,
+                amount: 1,
+                price: function() {
+                    return this.article ? this.article.price * this.amount : 0;
+                }
+            });
+        }
+
+        function ShoppingCart() {
+            mobservable.props(this, {
+                entries: [],
+                total: function() {
+                    return this.entries.reduce(function(sum, entry) {
+                        return sum + entry.price;
+                    }, 0);
+                }
+            });
+        }
+
+        // Some available articles
+        var articles = mobservable.array([
+            ["Funny Bunnies", 17.63],
+            ["Awesome React", 23.95],
+            ["Second hand netook", 50.00]
+        ].map(function(e) {
+            return new Article(e[0], e[1]);
+        }));
+
+        // Our shopping cart
+        var shoppingCart = new ShoppingCart();
+        // With a demo item inside
+        shoppingCart.entries.push(new ShoppingCartEntry(articles[0]));
+
+
+        /**
+         * from http://stackoverflow.com/a/12903503/1983583
+         */
+        $.fn.insertAt = function(index, $parent) {
+            return this.each(function() {
+                if (index === 0) {
+                    $parent.prepend(this);
+                } else {
+                    $parent.children().eq(index - 1).after(this);
+                }
+            });
+        };
+
+        /**
+         * UI logic
+         */
+        var $articles = $("#articles");
+
+        /**
+         * Make the articles list follow the array
+         */
+        articles.observe(function(change) {
+            // items where added or removed
+            if (change.type === "splice") {
+                $articles.children().slice(change.index, change.index + change.removed.length).remove();
+                for(var i = 0; i < change.addedCount; i++) {
+                    renderArticle(articles[change.index + i])
+                        .insertAt(change.index + i, $articles);
+                }
+            }
+         }, true); // true makes sure the observe function is invoked immediately
+
+         /**
+          * Render an article in the articles overview, and watch or changes
+          */
+         function renderArticle(article) {
+             var $name = $("<span>").text(article.name);
+             var $price = $("<span>").text(article.price);
+             mobservable.observeProperty(article, "name", function(name) {
+                 $name.text(name);
+             });
+             mobservable.observeProperty(article, "price", function(price) {
+                 $price.text(price);
+             });
+             return $("<li>").append($name, $price,
+                $("<button>").text("edit").addClass("edit-article"),
+                $("<button>").text("add").addClass("add-article"));
+
+         }
+
+         /**
+          * ShoppingCart ui
+         */
+        var $cart = $("#cart");
+        var $total = $("#total");
+
+        mobservable.observeProperty(shoppingCart, "total", function(newValue) {
+            $total.text(newValue);
+        }, true);
+
+        shoppingCart.entries.observe(function(change) {
+            // items where added or removed
+            if (change.type === "splice") {
+                $cart.children().slice(change.index, change.index + change.removed.length).remove();
+                for(var i = 0; i < change.addedCount; i++) {
+                    renderCartEntry(shoppingCart.entries[change.index + i])
+                        .insertAt(change.index + i, $cart);
+                }
+            }
+        }, true);
+
+        function renderCartEntry(entry) {
+             var $name = $("<span>").text(entry.article.name);
+             var $amount = $("<span>").text(entry.amount);
+             mobservable.observeProperty(entry.article, "name", function(name) {
+                 $name.text(name);
+             });
+             mobservable.observeProperty(entry, "amount", function(amount) {
+                 $amount.text(amount);
+             });
+             return $("<li>").append(
+                $("<button>").text("remove").addClass("remove-article"),
+                $name,
+                $amount);
+         }
+
+
+         /**
+          * Events
+          */
+         $("#new-article").on("click", function() {
+            articles.push(new Article(prompt("Article name"), prompt("Price")));
+         });
+
+         $(document).on("click", ".edit-article", function(event) {
+             var idx = $(event.target).parent().index();
+             articles[idx].name = prompt("New name");
+             articles[idx].price = prompt("New price");
+         });
+
+         $(document).on("click", ".add-article", function(event) {
+             var article = articles[$(event.target).parent().index()];
+             var existingEntry = shoppingCart.entries.find(function(entry) {
+                 return entry.article === article;
+             });
+             if (existingEntry)
+                 existingEntry.amount += 1;
+             else
+                 shoppingCart.entries.unshift(new ShoppingCartEntry(article));
+         });
+
+         $(document).on("click", ".remove-article", function(event) {
+             var entryIndex = $(event.target).parent().index();
+             if ((shoppingCart.entries[entryIndex].amount -= 1) < 1)
+                shoppingCart.entries.splice(entryIndex,1);
+         });
+    </script>
+</body>
