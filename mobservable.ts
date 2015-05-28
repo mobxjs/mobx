@@ -91,30 +91,38 @@ module mobservable { // wrap in module for UMD export, see end of the file
     Returns a new IObservable, that is, a functon that can be used to set a new value or get the current values
     (the latter if no arguments are provided)
 */
-function createObservable<T>(value?:T|{():T}, scope?:Object):IObservableValue<T> {
-    var prop:ObservableValue<T> = null;
-
-    if (Array.isArray && Array.isArray(value) && mobservableStatic.debugLevel)
-        warn("mobservable.value() was invoked with an array. Probably you want to create an mobservable.array() instead of observing a reference to an array?");
-
-    if (typeof value === "function")
-        prop = new ComputedObservable(<()=>T>value, scope);
-    else
-        prop = new ObservableValue(<T>value, scope);
-
-    var propFunc = function(value?:T):T {
-        if (arguments.length > 0) {
-            prop.set(value);
-            return undefined;
+function createObservable<T>(value?:T[], scope?:Object):IObservableValue<IObservableArray<T>>;
+function createObservable<T>(value?:T|{():T}, scope?:Object):IObservableValue<T>;
+function createObservable(value?, scope?:Object) {
+    var prop = null;
+    var propFunc;
+    
+    if (Array.isArray(value) || value instanceof ObservableArray) {
+        prop = value instanceof ObservableArray ? value : new ObservableArray(value);
+        propFunc = function(value?) {
+            if (arguments.length > 0)
+                prop.replace(value);
+            else
+                return prop; // return the mutable structure
         }
+    }
+    else {
+        if (value instanceof ObservableValue)
+            prop = value;
         else
-            return <T> prop.get();
-    };
+            prop = new (typeof value === "function" ? ComputedObservable : ObservableValue) (value, scope);
+        propFunc = function(value?) {
+            if (arguments.length > 0)
+                prop.set(value);
+            else
+                return prop.get();
+        };
+    }
     (<any>propFunc).observe = prop.observe.bind(prop);
     (<any>propFunc).prop = prop;
     (<any>propFunc).toString = function() { return prop.toString(); };
 
-    return <IObservableValue<T>> propFunc;
+    return propFunc;
 }
 
 /**
@@ -172,7 +180,7 @@ mobservableStatic.observeProperty = function observeProperty(object:Object, key:
     if (currentValue instanceof ObservableValue || currentValue instanceof ObservableArray)
         return currentValue.observe(listener, invokeImmediately);
     // IObservable? -> attach observer
-    else if (currentValue.prop && currentValue.prop instanceof ObservableValue)
+    else if (currentValue.prop && (currentValue.prop instanceof ObservableValue || currentValue instanceof ObservableArray))
         return currentValue.prop.observe(listener, invokeImmediately);
 
     // wrap with observable function
@@ -201,15 +209,17 @@ mobservableStatic.array = function array<T>(values?:T[]): ObservableArray<T> {
  */
 mobservableStatic.toPlainValue = function toPlainValue(value:any):any {
     if (value) {
-        if (value instanceof ObservableArray) // TODO: instanceof Array and slice
-            return (<any>value).values();
-        if (Array.isArray(value))
+        if (value instanceof Array)
             return value.slice();
-        if (value instanceof ObservableValue)
+        else if (value instanceof ObservableValue)
             return value.get();
-        if (typeof value === "function" && value.prop && value.prop instanceof ObservableValue)
-            return value()
-        if (typeof value === "object") {
+        else if (typeof value === "function" && value.prop) {
+            if (value.prop instanceof ObservableValue)
+                return value()
+            else if (value.prop instanceof ObservableArray)
+                return value().slice();
+        }            
+        else if (typeof value === "object") {
             var res = {};
             for (var key in value)
                 res[key] = toPlainValue(value[key]);
@@ -239,7 +249,6 @@ mobservableStatic.observable = function observable(target:Object, key:string, de
     // observable annotations are invoked on the prototype, not on actual instances,
     // so upon invocation, determine the 'this' instance, and define a property on the
     // instance as well (that hides the propotype property)
-
     if (typeof baseValue === "function") {
         delete descriptor.value;
         delete descriptor.writable;
@@ -259,17 +268,7 @@ mobservableStatic.observable = function observable(target:Object, key:string, de
                 return this[key];
             },
             set: function(value) {
-                if (Array.isArray(value)) {
-                    var ar = new ObservableArray(value);
-                    Object.defineProperty(this, key, {
-                        value: ar,
-                        writeable: false,
-                        configurable: false,
-                        enumberable: true
-                    });
-                }
-                else
-                    mobservableStatic.props(this, key, value);
+                mobservableStatic.props(this, key, value);
             }
         });
     }
@@ -288,12 +287,8 @@ mobservableStatic.props = function props(target, props?, value?) {
         case 3:
             var observable = mobservableStatic.value(value, target);
             Object.defineProperty(target, props, {
-                get: function() {
-                    return observable();
-                },
-                set: function(value) {
-                    observable(value);
-                },
+                get: observable,
+                set: observable,
                 enumerable: true,
                 configurable: true
             });
@@ -304,14 +299,14 @@ mobservableStatic.props = function props(target, props?, value?) {
 
 mobservableStatic.turnObservablesIntoProperties = function turnObservablesIntoProperties(object:Object) {
     for(var key in object) if (object.hasOwnProperty(key)) {
-        if (object[key] && object[key].prop && object[key].prop instanceof ObservableValue) {
-            var observable = <ObservableValue<any>> object[key].prop;
+        if (object[key] && object[key].prop && (object[key].prop instanceof ObservableValue || object[key].prop instanceof ObservableArray)) {
+            var observable = <IObservable<any>> object[key];
             Object.defineProperty(object, key, {
-                get: observable.get.bind(observable),
-                set: observable.set.bind(observable),
+                get: observable,
+                set: observable,
                 enumerable: true,
                 configurable: true
-            });
+            });        
         }
     }
 }
