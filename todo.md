@@ -1,9 +1,4 @@
 
-* coverage tests
-* minified version
-* add 'name' as parameter to observable.value, automatically set it when defining properties, use it in warnings / toString
-* browser support test https://ci.testling.com/
-* examples
 * describe properties in readme:
     - synchronous updates
     - atomic updates
@@ -28,14 +23,40 @@
 * ~~clean up / clarify properties / annotations code~~
 * ~~drop initializeObservableProperties -> turnObservablesIntoProperties ~~
 * ~~introduce .props(target, prop, value), .props(props), .props(target, ...props)~~
-* ~~use disposable like RxJs?~~
+* ~~use disposable like RxJs? -> NO ~~
+* props should create real observable array
+* value for array, + set -> replace
+* .prop. -> .impl.
+* replace instanceof observableValue checks with isObservable, isWrappedObservable
+* introduce createGetterSetter on all implementations
+* make properties non-configurable
+* helpers .variable, computed, array
+* introduce IGetter / ISetter interfaces
+* fiddle demo
 * update apidocs
+* perf tests
+* test .value etc
+* removed .bind, it is slow!
+
 
 0.5
+* ~~browser based tests~~
+* ~~fix instanceof array~~
+* ~~implement + test toPlainValue~~
+* ~~make browser / amd / umd build https://github.com/bebraw/grunt-umd https://github.com/umdjs/umd~~
+* ~~minify~~
+* react mixin, https://medium.com/@dan_abramov/mixins-are-dead-long-live-higher-order-components-94a0d2f9e750
+* react fiddle demo
+* bind is slow!!!
+
+Later
+
+* coverage tests
+* minified version
+* add 'tap' function (that doesn't register as new observer)
+* add 'name' as parameter to observable.value, automatically set it when defining properties, use it in warnings / toString
+* browser support test https://ci.testling.com/
 * Introduce mobservable.object(data) that creates observable properties and an observe method.
 * react components
 * should arrays trigger a notify observed for methods like reverse, sort, values, json etc? -> they change the internal structure, so that seems to be weird
-
-0.5
-
 * nested watcher test

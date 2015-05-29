@@ -17,10 +17,16 @@
 	<script src="../array.js"></script>
 	<script>
 		var arrayTests = exports;
+		var exports = {};
+	</script>
+	<script src="../perf/performance.js"></script>
+	<script>
+		var perfTests = exports;
 		delete exports;
 		nodeunit.run({
 			'observables': observablesTests,
-			'arrays': arrayTests
+			'arrays': arrayTests,
+			'performance': perfTests
 		});
 	</script>
 
