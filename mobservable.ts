@@ -296,7 +296,7 @@ mobservableStatic.debugLevel = 0;
 
 class ObservableValue<T> {
     protected changeEvent = new SimpleEventEmitter();
-    protected dependencyState:DNode = new DNode(false);
+    protected dependencyState:DNode = new DNode(this);
 
     constructor(protected _value?:T){
     }
@@ -352,10 +352,8 @@ class ComputedObservable<U> extends ObservableValue<U> {
 
     constructor(protected func:()=>U, private scope?:Object) {
         super(undefined);
-        if (!func)
+        if (typeof func !== "function")
             throw new Error("ComputedObservable requires a function");
-        this.dependencyState.isComputed = true;
-        this.dependencyState.nextState = this.compute.bind(this);
     }
 
     get():U {
@@ -451,9 +449,10 @@ class DNode {
     private dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
     private isDisposed = false;            // ready to be garbage collected. Nobody is observing or ever will observe us
     private externalRefenceCount = 0;      // nr of 'things' that depend on us, excluding other DNode's. If > 0, this node will not go to sleep
+    public isComputed:boolean;;    // isComputed indicates that this node can depend on others, and should update when dependencies change
 
-    constructor(public isComputed:boolean) {
-        // isComputed indicates that this node can depend on others.
+    constructor(private owner:{compute?:()=>boolean}) {
+        this.isComputed = owner.compute !== undefined;
     }
 
     setRefCount(delta:number) {
@@ -538,13 +537,9 @@ class DNode {
 
     computeNextState() {
         this.trackDependencies();
-        var stateDidChange = this.nextState();
+        var stateDidChange = this.owner.compute();
         this.bindDependencies();
         this.markReady(stateDidChange);
-    }
-
-    nextState():boolean {
-        return false; // false == unchanged
     }
 
     private trackDependencies() {
@@ -627,7 +622,7 @@ class ObservableArray<T> extends StubArray implements IObservableArray<T> {
         super();
         // make for .. in / Object.keys behave like an array, so hide the other properties
         Object.defineProperties(this, {
-            "dependencyState" : { enumerable: false, value: new DNode(false) },
+            "dependencyState" : { enumerable: false, value: new DNode(this) },
             "_values" : { enumerable: false, value: initialValues ? initialValues.slice() : [] },
             "changeEvent" : { enumerable: false, value: new SimpleEventEmitter() }
         });
