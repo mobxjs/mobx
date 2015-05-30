@@ -297,10 +297,14 @@ exports.testWatch = function(test) {
     test.equals(6, res[0]);
     test.equals(changed, 0);
     test.equals(calcs, 1);
-
+    test.equals(a.prop.dependencyState.observers.length, 1);
+    test.equals(b.prop.dependencyState.observers.length, 1);
+    
     b(4);
     test.equals(changed, 1);
     test.equals(calcs, 1); // no more calcs!
+    test.equals(a.prop.dependencyState.observers.length, 0);
+    test.equals(b.prop.dependencyState.observers.length, 0);
 
     test.equal(mobservable.stackDepth(), 0);
     test.done();

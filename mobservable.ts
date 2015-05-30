@@ -270,19 +270,22 @@ mobservableStatic.observeProperty = function observeProperty(object:Object, key:
     Returns  a tuplde [return value of func, disposer]. The disposer can be used to abort the watch early.
 */
 mobservableStatic.watch = function watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
-    var dnode = new DNode(true);
-    var retVal:T;
-    dnode.nextState = function() {
-        retVal = func();
-        dnode.nextState = function() {
-            dnode.dispose();
-            onInvalidate();
-            return false;
+    var state = 0;
+    var computed:any = new ComputedObservable<T>(() => {
+        switch(state++) {
+            case 0:
+                return func();
+            case 1:
+                disposer();
+                onInvalidate();
         }
-        return false;
-    }
-    dnode.computeNextState();
-    return [retVal, () => dnode.dispose()];
+    });
+    var disposer = () => {
+        computed.dependencyState.setRefCount(-1);
+        computed.dependencyState.dispose();
+    };
+    computed.dependencyState.setRefCount(+1);
+    return [computed.get(), disposer];
 }
 
 mobservableStatic.batch = function batch<T>(action:()=>T):T {
