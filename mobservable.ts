@@ -280,10 +280,10 @@ mobservableStatic.watch = function watch<T>(func:()=>T, onInvalidate:Lambda):[T,
                 onInvalidate();
         }
     });
-    var disposer = () => {
+    var disposer = once(() => {
         computed.dependencyState.setRefCount(-1);
         computed.dependencyState.dispose();
-    };
+    });
     computed.dependencyState.setRefCount(+1);
     return [computed.get(), disposer];
 }
@@ -497,7 +497,7 @@ class DNode {
     }
 
     tryToSleep() {
-        if (this.isComputed && this.observers.length === 0 && this.externalRefenceCount === 0 && !this.isSleeping) {
+        if (!this.isSleeping && this.isComputed && this.observers.length === 0 && this.externalRefenceCount === 0) {
             for (var i = 0, l = this.observing.length; i < l; i++)
                 this.observing[i].removeObserver(this);
             this.observing = [];
@@ -513,14 +513,15 @@ class DNode {
         }
     }
 
+    // the state of something we are observing has changed..
     notifyStateChange(observable:DNode, stateDidActuallyChange:boolean) {
         if (observable.state === DNodeState.STALE) {
             if (++this.dependencyStaleCount === 1)
                 this.markStale();
-        } else { // ready
+        } else { // not stale, thus ready since pending states are not propagated
             if (stateDidActuallyChange)
                 this.dependencyChangeCount += 1;
-            if (--this.dependencyStaleCount === 0) {
+            if (--this.dependencyStaleCount === 0) { // all dependencies are ready
                 this.state = DNodeState.PENDING;
                 Scheduler.schedule(() => {
                     // did any of the observables really change?
@@ -842,8 +843,7 @@ class ObservableArray<T> extends StubArray implements IObservableArray<T> {
         if (DNode.trackingStack.length > 0)
             warn(`[Mobservable.Array] The method array.${funcName} should not be used inside observable functions since it has side-effects`);
     }
-
-
+    
     static OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
     static ENUMERABLE_PROPS = [];
 
