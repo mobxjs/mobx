@@ -159,6 +159,25 @@ exports.lots_of_unused_computables = function(test) {
     test.done();
 }
 
+exports.test_many_unreferenced_observables = function(test) {
+    var a = value(3);
+    var b = value(6);
+    var c = value(7);
+    var d = value(function() { return a() * b() * c() });
+    test.equal(d(), 126);
+    test.equal(d.prop.dependencyState.isSleeping, true);
+    var start = now();
+    for(var i = 0; i < 10000; i++) {
+        c(i);
+        d();
+    }
+    var end = now();
+
+    console.log("\n  Updated in " + (end - start) + " ms.");
+    
+    test.done();
+    
+}
 
 exports.array_reduce = function(test) {
     gc();

@@ -47,8 +47,8 @@ exports.basic2 = function(test) {
 
 exports.dynamic = function(test) {
     try {
-        var x = value(3);
-        var y = value(function() {
+        var x = mobservable.primitive(3);
+        var y = mobservable.computed(function() {
             return x();
         });
         var b = buffer();

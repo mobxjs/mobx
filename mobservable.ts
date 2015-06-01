@@ -974,8 +974,12 @@ class Scheduler {
             return action();
         } finally {
             //Scheduler.inBatch -= 1;
-            if (--Scheduler.inBatch === 0)
+            if (--Scheduler.inBatch === 0) {
+                // make sure follow up actions are processed in batch after the current queue
+                Scheduler.inBatch += 1;
                 Scheduler.runPostBatchActions();
+                Scheduler.inBatch -= 1;
+            }
         }
     }
 }

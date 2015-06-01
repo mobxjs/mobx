@@ -15,6 +15,7 @@
     - combine multiple adds to array during batch into single splice
     - verify that combine multiple assignments to property during batch are combined into singleupdate
     - verify that multiple computations schedulings during batch result in single computation
+    - go to sleep if there are no observers and a 'stale' notification comes in 
     - notifyStateChange: avoid or remove scheduler.schedule, or strip closure by passing the DNode in 
     
 0.4
@@ -27,8 +28,8 @@
 * ~~use disposable like RxJs? -> NO ~~
 * ~~props should create real observable array~~
 * ~~value for array, + set -> replace~~
-* check nested watches! inner watch should not reevaluate outer watch, introduce DNode.unobserved that swaps out trackingstack?
-* .prop. -> .impl.
+* ~~check nested watches! inner watch should not reevaluate outer watch, introduce DNode.unobserved that swaps out trackingstack?~~
+* rename .prop. -> .impl.
 * ~~replace instanceof observableValue checks with isObservable, isWrappedObservable~~
 * ~~introduce createGetterSetter on all implementations~~
 * make properties non-configurable
@@ -37,12 +38,13 @@
 * fiddle demo
 * update apidocs
 * ~~perf tests~~
-* test .value etc
+* ~~test .value etc~~
 * removed .bind, it is slow!
-* watchClass
-* move out scheduler check stuff..
-* check batching
-* check closure usages for scheduler.schedule
+* ~~watchClass~~
+* ~~move out scheduler check stuff..~~
+* ~~check batching~~
+* ~~check closure usages for scheduler.schedule~~
+* ~~no source map for dist!~~
 
 0.5
 * ~~browser based tests~~
