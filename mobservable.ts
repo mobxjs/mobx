@@ -270,51 +270,8 @@ mobservableStatic.observeProperty = function observeProperty(object:Object, key:
     Returns  a tuplde [return value of func, disposer]. The disposer can be used to abort the watch early.
 */
 mobservableStatic.watch = function watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
-   /* var c = {
-        compute: function() {
-            retVal = func();
-            c.compute = function() {
-                dnode.dispose();
-                onInvalidate();
-                return false;
-            }
-            return false;
-        }
-    };
-    var dnode = new DNode(c);
-    var retVal:T;
-    dnode.computeNextState();
-    return [retVal, () => dnode.dispose()];
-    */
-    var state = 0;
-    var result;
-    var computed:any = new ComputedObservable<T>(() => {
-        switch(state++) {
-            case 0:
-                return func();
-            case 1:
-                disposer();
-                onInvalidate();
-        }
-        return result;
-    });
-    var disposer = once(() => {
-        computed.dependencyState.setRefCount(-1);
-        computed.dependencyState.dispose();
-    });
-    untracked(() => {
-    computed.dependencyState.setRefCount(+1);
-    result = computed.get();
-    });
-    return [result, disposer];
-    
-}
-
-function untracked(f) {
-    DNode.trackingStack.push([]);
-    return f();
-    DNode.trackingStack.pop();
-    
+    var watch = new WatchedExpression(func, onInvalidate);
+    return [watch.value, () => watch.dispose()];
 }
 
 mobservableStatic.batch = function batch<T>(action:()=>T):T {
@@ -450,6 +407,35 @@ class ComputedObservable<U> extends ObservableValue<U> {
 
     toString() {
         return `ComputedObservable[${this.func.toString()}]`;
+    }
+}
+
+/**
+ * given an expression, evaluate it once and track its dependencies. 
+ * Whenever the expression *should* re-evaluate, the onInvalidate event should fire
+ */
+class WatchedExpression<T> {
+    private dependencyState = new DNode(this);
+    private didEvaluate = false;
+    public value:T;
+    
+    constructor(private expr:()=>T, private onInvalidate:()=>void){
+        this.dependencyState.computeNextState();
+    }
+    
+    compute() {
+        if (!this.didEvaluate) {
+            this.didEvaluate = true;
+            this.value = this.expr();
+        } else {
+            this.dispose();
+            this.onInvalidate();
+        }
+        return false;
+    }
+    
+    dispose() {
+        this.dependencyState.dispose();
     }
 }
 

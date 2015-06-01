@@ -329,7 +329,7 @@ exports.testWatchDisposed = function(test) {
 
     res[1](); //cleanup
     b(4);
-    test.equals(changed, 0);
+    test.equals(changed, 0); // onInvalidate should not trigger during explicit cleanup
     test.equals(calcs, 1);
 
     test.equal(mobservable.stackDepth(), 0);
