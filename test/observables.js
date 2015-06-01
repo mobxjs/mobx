@@ -336,6 +336,41 @@ exports.testWatchDisposed = function(test) {
     test.done();
 }
 
+exports.testWatchNested = function(test) {
+    var bCalcs = 0, cCalcs = 0, dCalcs = 0;
+    var a = value(3);
+    var b, c;
+    value(function() {
+        bCalcs += 1;
+        c = mobservable.watch(function() {
+            debugger;
+            cCalcs += 1;
+            return a();
+        }, function() {
+            dCalcs += 1;
+        });
+        return c[0];
+        
+    }).observe(function(newValue) {
+        b = newValue;  
+    }, true);
+
+    test.equal(b, 3);
+    test.equal(c[0], 3);
+    test.equal(cCalcs, 1);
+    test.equal(dCalcs, 0);
+    test.equal(bCalcs, 1);
+
+    a(4); // doesn't affect anything outside the watch!
+    test.equal(c[0], 3);
+    test.equal(b, 3);
+    test.equal(cCalcs, 1);
+    test.equal(dCalcs, 1);
+    test.equal(bCalcs, 1);
+
+    test.done();
+};
+
 exports.testChangeCountOptimization = function(test) {
     var bCalcs = 0;
     var cCalcs = 0;

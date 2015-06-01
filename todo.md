@@ -15,7 +15,8 @@
     - combine multiple adds to array during batch into single splice
     - verify that combine multiple assignments to property during batch are combined into singleupdate
     - verify that multiple computations schedulings during batch result in single computation
-
+    - notifyStateChange: avoid or remove scheduler.schedule, or strip closure by passing the DNode in 
+    
 0.4
 * ~~License~~
 * ~~implement array.sort & reverse properly, they do change the array~~
@@ -24,20 +25,24 @@
 * ~~drop initializeObservableProperties -> turnObservablesIntoProperties ~~
 * ~~introduce .props(target, prop, value), .props(props), .props(target, ...props)~~
 * ~~use disposable like RxJs? -> NO ~~
-* props should create real observable array
-* value for array, + set -> replace
+* ~~props should create real observable array~~
+* ~~value for array, + set -> replace~~
+* check nested watches! inner watch should not reevaluate outer watch, introduce DNode.unobserved that swaps out trackingstack?
 * .prop. -> .impl.
-* replace instanceof observableValue checks with isObservable, isWrappedObservable
-* introduce createGetterSetter on all implementations
+* ~~replace instanceof observableValue checks with isObservable, isWrappedObservable~~
+* ~~introduce createGetterSetter on all implementations~~
 * make properties non-configurable
-* helpers .variable, computed, array
-* introduce IGetter / ISetter interfaces
+* ~~helpers .variable, computed, array~~
+* ~~introduce IGetter / ISetter interfaces, or create getter setter for array~~
 * fiddle demo
 * update apidocs
-* perf tests
+* ~~perf tests~~
 * test .value etc
 * removed .bind, it is slow!
-
+* watchClass
+* move out scheduler check stuff..
+* check batching
+* check closure usages for scheduler.schedule
 
 0.5
 * ~~browser based tests~~

@@ -270,51 +270,19 @@ mobservableStatic.observeProperty = function observeProperty(object:Object, key:
     Returns  a tuplde [return value of func, disposer]. The disposer can be used to abort the watch early.
 */
 mobservableStatic.watch = function watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
-   /* var c = {
-        compute: function() {
-            retVal = func();
-            c.compute = function() {
-                dnode.dispose();
-                onInvalidate();
-                return false;
-            }
+    var dnode = new DNode(null, true);
+    var retVal:T;
+    dnode.nextState = function() {
+        retVal = func();
+        dnode.nextState = function() {
+            dnode.dispose();
+            onInvalidate();
             return false;
         }
-    };
-    var dnode = new DNode(c);
-    var retVal:T;
+        return false;
+    }
     dnode.computeNextState();
     return [retVal, () => dnode.dispose()];
-    */
-    var state = 0;
-    var result;
-    var computed:any = new ComputedObservable<T>(() => {
-        switch(state++) {
-            case 0:
-                return func();
-            case 1:
-                disposer();
-                onInvalidate();
-        }
-        return result;
-    });
-    var disposer = once(() => {
-        computed.dependencyState.setRefCount(-1);
-        computed.dependencyState.dispose();
-    });
-    untracked(() => {
-    computed.dependencyState.setRefCount(+1);
-    result = computed.get();
-    });
-    return [result, disposer];
-    
-}
-
-function untracked(f) {
-    DNode.trackingStack.push([]);
-    return f();
-    DNode.trackingStack.pop();
-    
 }
 
 mobservableStatic.batch = function batch<T>(action:()=>T):T {
@@ -325,9 +293,10 @@ mobservableStatic.debugLevel = 0;
 
 class ObservableValue<T> {
     protected changeEvent = new SimpleEventEmitter();
-    protected dependencyState:DNode = new DNode(this);
+    protected dependencyState:DNode;
 
-    constructor(protected _value?:T){
+    constructor(protected _value?:T, isComputed=false){
+        this.dependencyState = new DNode(this, isComputed);
     }
 
     set(value:T) {
@@ -380,9 +349,10 @@ class ComputedObservable<U> extends ObservableValue<U> {
     private hasError = false;
 
     constructor(protected func:()=>U, private scope?:Object) {
-        super(undefined);
-        if (typeof func !== "function")
+        super(undefined, true);
+        if (!func)
             throw new Error("ComputedObservable requires a function");
+        //this.dependencyState.nextState = this.compute.bind(this);
     }
 
     get():U {
@@ -478,10 +448,10 @@ class DNode {
     private dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
     private isDisposed = false;            // ready to be garbage collected. Nobody is observing or ever will observe us
     private externalRefenceCount = 0;      // nr of 'things' that depend on us, excluding other DNode's. If > 0, this node will not go to sleep
-    public isComputed:boolean;;    // isComputed indicates that this node can depend on others, and should update when dependencies change
+    
 
-    constructor(private owner:{compute?:()=>boolean}) {
-        this.isComputed = owner.compute !== undefined;
+    constructor(private owner:any, private isComputed:boolean) {
+        // isComputed indicates that this node can depend on others.
     }
 
     setRefCount(delta:number) {
@@ -526,7 +496,7 @@ class DNode {
     }
 
     tryToSleep() {
-        if (!this.isSleeping && this.isComputed && this.observers.length === 0 && this.externalRefenceCount === 0) {
+        if (this.isComputed && this.observers.length === 0 && this.externalRefenceCount === 0 && !this.isSleeping) {
             for (var i = 0, l = this.observing.length; i < l; i++)
                 this.observing[i].removeObserver(this);
             this.observing = [];
@@ -542,15 +512,14 @@ class DNode {
         }
     }
 
-    // the state of something we are observing has changed..
     notifyStateChange(observable:DNode, stateDidActuallyChange:boolean) {
         if (observable.state === DNodeState.STALE) {
             if (++this.dependencyStaleCount === 1)
                 this.markStale();
-        } else { // not stale, thus ready since pending states are not propagated
+        } else { // ready
             if (stateDidActuallyChange)
                 this.dependencyChangeCount += 1;
-            if (--this.dependencyStaleCount === 0) { // all dependencies are ready
+            if (--this.dependencyStaleCount === 0) {
                 this.state = DNodeState.PENDING;
                 Scheduler.schedule(() => {
                     // did any of the observables really change?
@@ -570,6 +539,10 @@ class DNode {
         var stateDidChange = this.owner.compute();
         this.bindDependencies();
         this.markReady(stateDidChange);
+    }
+
+    nextState():boolean {
+        return false; // false == unchanged
     }
 
     private trackDependencies() {
@@ -652,7 +625,7 @@ class ObservableArray<T> extends StubArray implements IObservableArray<T> {
         super();
         // make for .. in / Object.keys behave like an array, so hide the other properties
         Object.defineProperties(this, {
-            "dependencyState" : { enumerable: false, value: new DNode(this) },
+            "dependencyState" : { enumerable: false, value: new DNode(this, false) },
             "_values" : { enumerable: false, value: initialValues ? initialValues.slice() : [] },
             "changeEvent" : { enumerable: false, value: new SimpleEventEmitter() }
         });
@@ -872,7 +845,8 @@ class ObservableArray<T> extends StubArray implements IObservableArray<T> {
         if (DNode.trackingStack.length > 0)
             warn(`[Mobservable.Array] The method array.${funcName} should not be used inside observable functions since it has side-effects`);
     }
-    
+
+
     static OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
     static ENUMERABLE_PROPS = [];
 

@@ -3,64 +3,18 @@
  * (c) 2015 - Michel Weststrate
  * https://github.com/mweststrate/mobservable
  */
-interface IMObservableStatic {
-    // ways of creating observables. 
-    <T>(value?:T[]):IObservableArray<T>;
-    <T>(value?:T|{():T}, scope?:Object):IObservableValue<T>;
-    
-    value<T>(value?:T[]):IObservableArray<T>;
-    value<T>(value?:T|{():T}, scope?:Object):IObservableValue<T>;
-    
-    array<T>(values?:T[]):IObservableArray<T>;
-    primitive<T>(value?:T):IObservableValue<T>;
-    reference<T>(value?:T):IObservableValue<T>;
-    computed<T>(value:()=>T,scope?):IObservableValue<T>;
-
-    // create observable properties
-    props(object:Object, name:string, initalValue: any);
-    props(object:Object, props:Object);
-    props(object:Object);
-    observable(target:Object, key:string); // annotation
-    turnObservablesIntoProperties(object:Object);
-
-    // observables to not observables
-    toPlainValue<T>(any:T):T;
-
-    // observe observables
-    observeProperty(object:Object, key:string, listener:Function, invokeImmediately?:boolean):Lambda;
-    watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda];
-    
-    // change a lot of observables at once
-    batch<T>(action:()=>T):T;
-
-    // Utils
-    debugLevel: number;
-    SimpleEventEmitter: new()=> ISimpleEventEmitter;
-}
-
 interface Lambda {
     ():void;
 }
 
-interface IObservable {
+interface IObservable<T> {
+    ():T;
+    (value:T);
     observe(callback:(...args:any[])=>void, fireImmediately?:boolean):Lambda;
 }
 
-interface IObservableValue<T> extends IObservable {
-    ():T;
-    (value:T);
+interface IObservableValue<T> extends IObservable<T> {
     observe(callback:(newValue:T, oldValue:T)=>void, fireImmediately?:boolean):Lambda;
-}
-
-interface IObservableArray<T> extends IObservable, Array<T> {
-    spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[];
-    observe(listener:(changeData:IArrayChange<T>|IArraySplice<T>)=>void, fireImmediately?:boolean):Lambda;
-    clear(): T[];
-    replace(newItems:T[]);
-    values(): T[];
-    clone(): IObservableArray<T>;
-    find(predicate:(item:T,index:number,array:IObservableArray<T>)=>boolean,thisArg?,fromIndex?:number):T;
-    remove(value:T):boolean;
 }
 
 interface IArrayChange<T> {
@@ -78,128 +32,172 @@ interface IArraySplice<T> {
     addedCount: number;
 }
 
+interface IObservableArray<T> extends Array<T> {
+    spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[];
+    observe(listener:(changeData:IArrayChange<T>|IArraySplice<T>)=>void, fireImmediately?:boolean):Lambda;
+    clear(): T[];
+    replace(newItems:T[]);
+    values(): T[];
+    clone(): IObservableArray<T>;
+    find(predicate:(item:T,index:number,array:IObservableArray<T>)=>boolean,thisArg?,fromIndex?:number):T;
+    remove(value:T):boolean;
+}
+
+interface IWrappedObservableArray<T> extends IObservable<IObservableArray<T>> {
+    observe(listener:(changeData:IArrayChange<T>|IArraySplice<T>)=>void, fireImmediately?:boolean):Lambda;
+}
+
 interface ISimpleEventEmitter {
     emit(...data:any[]):void;
     on(listener:(...data:any[])=>void):Lambda;
     once(listener:(...data:any[])=>void):Lambda;
 }
 
+interface IMObservableStatic {
+    // shorthand for .value()
+    <T>(value?:T[], scope?:Object):IWrappedObservableArray<T>;
+    <T>(value?:T|{():T}, scope?:Object):IObservableValue<T>;
+    
+    value<T>(value?:T[], scope?:Object):IWrappedObservableArray<T>;
+    value<T>(value?:T|{():T}, scope?:Object):IObservableValue<T>;
+    array<T>(values?:T[]): IObservableArray<T>;
+
+    toPlainValue<T>(any:T):T;
+
+    watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda];
+    observeProperty(object:Object, key:string, listener:Function, invokeImmediately?:boolean):Lambda;
+    batch<T>(action:()=>T):T;
+
+    // property definition
+    observable(target:Object, key:string); // annotation
+
+    props(object:Object, name:string, initalValue: any);
+    props(object:Object, props:Object);
+    props(object:Object);
+    turnObservablesIntoProperties(object:Object);
+
+    // Utils
+    debugLevel: number;
+    SimpleEventEmitter: new()=> ISimpleEventEmitter;
+}
+
 /* END OF DECLARATION */
 
 module mobservable { // wrap in module for UMD export, see end of the file
 
-function createObservable<T>(value:T[]):IObservableArray<T>;
+/**
+    Creates an observable from either a value or a function.
+    If a scope is provided, the function will be always executed usign the provided scope.
+    Returns a new IObservable, that is, a functon that can be used to set a new value or get the current values
+    (the latter if no arguments are provided)
+*/
+function createObservable<T>(value?:T[], scope?:Object):IObservableValue<IObservableArray<T>>;
 function createObservable<T>(value?:T|{():T}, scope?:Object):IObservableValue<T>;
-function createObservable(value?, scope?:Object):any {
-    if (Array.isArray(value))
-        return new ObservableArray(value);
-    if (typeof value === "function")
-        return mobservableStatic.computed(value, scope);
-    return mobservableStatic.primitive(value);
+function createObservable(value?, scope?:Object) {
+    var prop = null;
+    var propFunc;
+    
+    if (Array.isArray(value) || value instanceof ObservableArray) {
+        prop = value instanceof ObservableArray ? value : new ObservableArray(value);
+        propFunc = function(value?) {
+            if (arguments.length > 0)
+                prop.replace(value);
+            else
+                return prop; // return the mutable structure
+        }
+    }
+    else {
+        if (value instanceof ObservableValue)
+            prop = value;
+        else
+            prop = new (typeof value === "function" ? ComputedObservable : ObservableValue) (value, scope);
+        propFunc = function(value?) {
+            if (arguments.length > 0)
+                prop.set(value);
+            else
+                return prop.get();
+        };
+    }
+    (<any>propFunc).observe = prop.observe.bind(prop);
+    (<any>propFunc).prop = prop;
+    (<any>propFunc).toString = function() { return prop.toString(); };
+
+    return propFunc;
 }
 
+/**
+    @see mobservableStatic.value
+*/
 export var mobservableStatic:IMObservableStatic = <IMObservableStatic> function(value, scope?) {
     return createObservable(value,scope);
 };
 
+/**
+    @see createObservable
+*/
 mobservableStatic.value = createObservable;
 
-mobservableStatic.primitive = mobservableStatic.reference = function(value?) {
-    return new ObservableValue(value).createGetterSetter();
+/**
+    DebugLevel: level 0: warnings only, level 1 or higher, prints a lot of messages.
+*/
+mobservableStatic.debugLevel = 0;
+
+/**
+    Evaluates func and return its results. Watch tracks all observables that are used by 'func'
+    and invokes 'onValidate' whenever func *should* update.
+    Returns  a tuplde [return value of func, disposer]. The disposer can be used to abort the watch early.
+*/
+mobservableStatic.watch = function watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
+    var dnode = new DNode(true);
+    var retVal:T;
+    dnode.nextState = function() {
+        retVal = func();
+        dnode.nextState = function() {
+            dnode.dispose();
+            onInvalidate();
+            return false;
+        }
+        return false;
+    }
+    dnode.computeNextState();
+    return [retVal, () => dnode.dispose()];
 }
 
-mobservableStatic.computed = function<T>(func:()=>void, scope?) {
-    return new ComputedObservable(func, scope).createGetterSetter();
+/**
+    Can be used to observe observable properties that are created using the `observable` annotation,
+    `defineObservableProperty` or `initializeObservableProperties`.
+    (Since properties do not expose an .observe method themselves).
+*/
+mobservableStatic.observeProperty = function observeProperty(object:Object, key:string, listener:(...args:any[])=>void, invokeImmediately = false):Lambda {
+    if (!object || !key || object[key] === undefined)
+        throw new Error(`Object '${object}' has no key '${key}'.`);
+    if (!listener || typeof listener !== "function")
+        throw new Error("Third argument to mobservable.observeProperty should be a function");
+
+    var currentValue = object[key];
+
+    // ObservableValue, ComputedObservable or ObservableArray? -> attach observer
+    if (currentValue instanceof ObservableValue || currentValue instanceof ObservableArray)
+        return currentValue.observe(listener, invokeImmediately);
+    // IObservable? -> attach observer
+    else if (currentValue.prop && (currentValue.prop instanceof ObservableValue || currentValue instanceof ObservableArray))
+        return currentValue.prop.observe(listener, invokeImmediately);
+
+    // wrap with observable function
+    var observer = new ComputedObservable((() => object[key]), object);
+    var disposer = observer.observe(listener, invokeImmediately);
+
+    if (mobservableStatic.debugLevel && (<any>observer).dependencyState.observing.length === 0)
+        warn(`mobservable.observeProperty: property '${key}' of '${object} doesn't seem to be observable. Did you define it as observable?`);
+
+    return once(() => {
+        disposer();
+        (<any>observer).dependencyState.dispose(); // clean up
+    });
 }
 
 mobservableStatic.array = function array<T>(values?:T[]): ObservableArray<T> {
     return new ObservableArray(values);
-}
-
-mobservableStatic.props = function props(target, props?, value?) {
-    switch(arguments.length) {
-        case 0:
-            throw new Error("Not enough arguments");
-        case 1:
-            return mobservableStatic.props(target, target); // mix target properties into itself
-        case 2:
-            for(var key in props)
-                mobservableStatic.props(target, key, props[key]);
-            break;
-        case 3:
-            var isArray = Array.isArray(value);
-            var observable = mobservableStatic.value(value, target);
-            Object.defineProperty(target, props, {
-                get: isArray ? function() { return observable; } : observable,
-                set: isArray ? (<any>observable).replace.bind(observable) : observable,
-                enumerable: true,
-                configurable: true
-            });
-            break;
-    }
-    return target;
-}
-
-/**
- * Use this annotation to wrap properties of an object in an observable, for example:
- * class OrderLine {
- *   @observable amount = 3;
- *   @observable price = 2;
- *   @observable total() {
- *      return this.amount * this.price;
- *   }
- * }
- */
-mobservableStatic.observable = function observable(target:Object, key:string, descriptor?) {
-    var baseValue = descriptor ? descriptor.value : null;
-    // observable annotations are invoked on the prototype, not on actual instances,
-    // so upon invocation, determine the 'this' instance, and define a property on the
-    // instance as well (that hides the propotype property)
-    if (typeof baseValue === "function") {
-        delete descriptor.value;
-        delete descriptor.writable;
-        descriptor.get = function() {
-            mobservableStatic.props(this, key, baseValue);
-            return this[key];
-        }
-        descriptor.set = function () {
-            console.trace();
-            throw new Error("It is not allowed to reassign observable functions");
-        }
-    } else {
-        Object.defineProperty(target, key, {
-            configurable: true, enumberable:true,
-            get: function() {
-                mobservableStatic.props(this, key, undefined);
-                return this[key];
-            },
-            set: function(value) {
-                mobservableStatic.props(this, key, value);
-            }
-        });
-    }
-}
-
-mobservableStatic.turnObservablesIntoProperties = function turnObservablesIntoProperties(object:Object) {
-    for(var key in object) if (object.hasOwnProperty(key)) {
-        var value = object[key], 
-            getter:()=>any = null,
-            setter:(v)=>void = null;
-        if (value instanceof ObservableArray) {
-            getter = function() { return value; };
-            setter = (<ObservableArray<any>>value).replace.bind(value);
-        } else if (value && value.prop && (value.prop instanceof ObservableValue)) {
-            getter = setter = <IObservableValue<any>> object[key];
-        }
-        if (getter) {
-            Object.defineProperty(object, key, {
-                get: getter,
-                set: setter,
-                enumerable: true,
-                configurable: true
-            });        
-        }
-    }
 }
 
 /**
@@ -231,103 +229,93 @@ mobservableStatic.toPlainValue = function toPlainValue(value:any):any {
     return value;
 }
 
-/**
-    Can be used to observe observable properties that are created using the `observable` annotation,
-    `defineObservableProperty` or `initializeObservableProperties`.
-    (Since properties do not expose an .observe method themselves).
-*/ 
-mobservableStatic.observeProperty = function observeProperty(object:Object, key:string, listener:(...args:any[])=>void, invokeImmediately = false):Lambda {
-    if (!object || !key || object[key] === undefined)
-        throw new Error(`Object '${object}' has no key '${key}'.`);
-    if (!listener || typeof listener !== "function")
-        throw new Error("Third argument to mobservable.observeProperty should be a function");
-
-    var currentValue = object[key];
-
-    // ObservableValue, ComputedObservable or ObservableArray? -> attach observer
-    if (currentValue instanceof ObservableValue || currentValue instanceof ObservableArray)
-        return currentValue.observe(listener, invokeImmediately);
-    // IObservable? -> attach observer
-    else if (currentValue.prop && (currentValue.prop instanceof ObservableValue || currentValue instanceof ObservableArray))
-        return currentValue.prop.observe(listener, invokeImmediately);
-
-    // wrap with observable function
-    var observer = new ComputedObservable((() => object[key]), object);
-    var disposer = observer.observe(listener, invokeImmediately);
-
-    if (mobservableStatic.debugLevel && (<any>observer).dependencyState.observing.length === 0)
-        warn(`mobservable.observeProperty: property '${key}' of '${object} doesn't seem to be observable. Did you define it as observable?`);
-
-    return once(() => {
-        disposer();
-        (<any>observer).dependencyState.dispose(); // clean up
-    });
-}
-
-/**
-    Evaluates func and return its results. Watch tracks all observables that are used by 'func'
-    and invokes 'onValidate' whenever func *should* update.
-    Returns  a tuplde [return value of func, disposer]. The disposer can be used to abort the watch early.
-*/
-mobservableStatic.watch = function watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
-   /* var c = {
-        compute: function() {
-            retVal = func();
-            c.compute = function() {
-                dnode.dispose();
-                onInvalidate();
-                return false;
-            }
-            return false;
-        }
-    };
-    var dnode = new DNode(c);
-    var retVal:T;
-    dnode.computeNextState();
-    return [retVal, () => dnode.dispose()];
-    */
-    var state = 0;
-    var result;
-    var computed:any = new ComputedObservable<T>(() => {
-        switch(state++) {
-            case 0:
-                return func();
-            case 1:
-                disposer();
-                onInvalidate();
-        }
-        return result;
-    });
-    var disposer = once(() => {
-        computed.dependencyState.setRefCount(-1);
-        computed.dependencyState.dispose();
-    });
-    untracked(() => {
-    computed.dependencyState.setRefCount(+1);
-    result = computed.get();
-    });
-    return [result, disposer];
-    
-}
-
-function untracked(f) {
-    DNode.trackingStack.push([]);
-    return f();
-    DNode.trackingStack.pop();
-    
-}
-
 mobservableStatic.batch = function batch<T>(action:()=>T):T {
     return Scheduler.batch(action);
 }
 
-mobservableStatic.debugLevel = 0;
+/**
+ * Use this annotation to wrap properties of an object in an observable, for example:
+ * class OrderLine {
+ *   @observable amount = 3;
+ *   @observable price = 2;
+ *   @observable total() {
+ *      return this.amount * this.price;
+ *   }
+ * }
+ */
+mobservableStatic.observable = function observable(target:Object, key:string, descriptor?) {
+    var baseValue = descriptor ? descriptor.value : null;
+
+    // observable annotations are invoked on the prototype, not on actual instances,
+    // so upon invocation, determine the 'this' instance, and define a property on the
+    // instance as well (that hides the propotype property)
+    if (typeof baseValue === "function") {
+        delete descriptor.value;
+        delete descriptor.writable;
+        descriptor.get = function() {
+            mobservableStatic.props(this, key, baseValue);
+            return this[key];
+        }
+        descriptor.set = function () {
+            console.trace();
+            throw new Error("It is not allowed to reassign observable functions");
+        }
+    } else {
+        Object.defineProperty(target, key, {
+            configurable: true, enumberable:true,
+            get: function() {
+                mobservableStatic.props(this, key, undefined);
+                return this[key];
+            },
+            set: function(value) {
+                mobservableStatic.props(this, key, value);
+            }
+        });
+    }
+}
+
+mobservableStatic.props = function props(target, props?, value?) {
+    switch(arguments.length) {
+        case 0:
+            throw new Error("Not enough arguments");
+        case 1:
+            return mobservableStatic.props(target, target); // mix target properties into itself
+        case 2:
+            for(var key in props)
+                mobservableStatic.props(target, key, props[key]);
+            break;
+        case 3:
+            var observable = mobservableStatic.value(value, target);
+            Object.defineProperty(target, props, {
+                get: observable,
+                set: observable,
+                enumerable: true,
+                configurable: true
+            });
+            break;
+    }
+    return target;
+}
+
+mobservableStatic.turnObservablesIntoProperties = function turnObservablesIntoProperties(object:Object) {
+    for(var key in object) if (object.hasOwnProperty(key)) {
+        if (object[key] && object[key].prop && (object[key].prop instanceof ObservableValue || object[key].prop instanceof ObservableArray)) {
+            var observable = <IObservable<any>> object[key];
+            Object.defineProperty(object, key, {
+                get: observable,
+                set: observable,
+                enumerable: true,
+                configurable: true
+            });        
+        }
+    }
+}
 
 class ObservableValue<T> {
     protected changeEvent = new SimpleEventEmitter();
-    protected dependencyState:DNode = new DNode(this);
+    protected dependencyState:DNode = new DNode(false);
 
-    constructor(protected _value?:T){
+    constructor(protected _value?:T, protected scope?:Object){
     }
 
     set(value:T) {
@@ -355,20 +343,6 @@ class ObservableValue<T> {
             disposer();
         });
     }
-    
-    createGetterSetter():IObservableValue<T> {
-        var self = this;
-        var f:any = function(value?) {
-            if (arguments.length > 0)
-                self.set(value);
-            else
-                return self.get();
-        };
-        f.observe = (listener, fire) => this.observe(listener, fire);
-        f.prop = this;
-        f.toString = () => this.toString();
-        return f;
-    }
 
     toString() {
         return `Observable[${this._value}]`;
@@ -379,10 +353,12 @@ class ComputedObservable<U> extends ObservableValue<U> {
     private isComputing = false;
     private hasError = false;
 
-    constructor(protected func:()=>U, private scope?:Object) {
-        super(undefined);
-        if (typeof func !== "function")
+    constructor(protected func:()=>U, scope?:Object) {
+        super(undefined, scope);
+        if (!func)
             throw new Error("ComputedObservable requires a function");
+        this.dependencyState.isComputed = true;
+        this.dependencyState.nextState = this.compute.bind(this);
     }
 
     get():U {
@@ -478,10 +454,9 @@ class DNode {
     private dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
     private isDisposed = false;            // ready to be garbage collected. Nobody is observing or ever will observe us
     private externalRefenceCount = 0;      // nr of 'things' that depend on us, excluding other DNode's. If > 0, this node will not go to sleep
-    public isComputed:boolean;;    // isComputed indicates that this node can depend on others, and should update when dependencies change
 
-    constructor(private owner:{compute?:()=>boolean}) {
-        this.isComputed = owner.compute !== undefined;
+    constructor(public isComputed:boolean) {
+        // isComputed indicates that this node can depend on others.
     }
 
     setRefCount(delta:number) {
@@ -526,7 +501,7 @@ class DNode {
     }
 
     tryToSleep() {
-        if (!this.isSleeping && this.isComputed && this.observers.length === 0 && this.externalRefenceCount === 0) {
+        if (this.isComputed && this.observers.length === 0 && this.externalRefenceCount === 0 && !this.isSleeping) {
             for (var i = 0, l = this.observing.length; i < l; i++)
                 this.observing[i].removeObserver(this);
             this.observing = [];
@@ -542,15 +517,14 @@ class DNode {
         }
     }
 
-    // the state of something we are observing has changed..
     notifyStateChange(observable:DNode, stateDidActuallyChange:boolean) {
         if (observable.state === DNodeState.STALE) {
             if (++this.dependencyStaleCount === 1)
                 this.markStale();
-        } else { // not stale, thus ready since pending states are not propagated
+        } else { // ready
             if (stateDidActuallyChange)
                 this.dependencyChangeCount += 1;
-            if (--this.dependencyStaleCount === 0) { // all dependencies are ready
+            if (--this.dependencyStaleCount === 0) {
                 this.state = DNodeState.PENDING;
                 Scheduler.schedule(() => {
                     // did any of the observables really change?
@@ -567,9 +541,13 @@ class DNode {
 
     computeNextState() {
         this.trackDependencies();
-        var stateDidChange = this.owner.compute();
+        var stateDidChange = this.nextState();
         this.bindDependencies();
         this.markReady(stateDidChange);
+    }
+
+    nextState():boolean {
+        return false; // false == unchanged
     }
 
     private trackDependencies() {
@@ -652,7 +630,7 @@ class ObservableArray<T> extends StubArray implements IObservableArray<T> {
         super();
         // make for .. in / Object.keys behave like an array, so hide the other properties
         Object.defineProperties(this, {
-            "dependencyState" : { enumerable: false, value: new DNode(this) },
+            "dependencyState" : { enumerable: false, value: new DNode(false) },
             "_values" : { enumerable: false, value: initialValues ? initialValues.slice() : [] },
             "changeEvent" : { enumerable: false, value: new SimpleEventEmitter() }
         });
@@ -872,7 +850,8 @@ class ObservableArray<T> extends StubArray implements IObservableArray<T> {
         if (DNode.trackingStack.length > 0)
             warn(`[Mobservable.Array] The method array.${funcName} should not be used inside observable functions since it has side-effects`);
     }
-    
+
+
     static OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
     static ENUMERABLE_PROPS = [];
 
