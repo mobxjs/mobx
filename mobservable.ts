@@ -132,7 +132,7 @@ mobservableStatic.props = function props(target, props?, value?) {
                 get: isArray ? function() { return observable; } : observable,
                 set: isArray ? (<any>observable).replace.bind(observable) : observable,
                 enumerable: true,
-                configurable: true
+                configurable: false
             });
             break;
     }
@@ -167,7 +167,7 @@ mobservableStatic.observable = function observable(target:Object, key:string, de
         }
     } else {
         Object.defineProperty(target, key, {
-            configurable: true, enumberable:true,
+            configurable: false, enumberable:true,
             get: function() {
                 mobservableStatic.props(this, key, undefined);
                 return this[key];
@@ -842,7 +842,7 @@ class ObservableArray<T> extends StubArray implements IObservableArray<T> {
     static createArrayBufferItem(index:number) {
         var prop = {
             enumerable: false,
-            configurable: true,
+            configurable: false,
             set: function(value) {
                 if (index < this._values.length) {
                     var oldValue = this._values[index];
@@ -866,6 +866,7 @@ class ObservableArray<T> extends StubArray implements IObservableArray<T> {
         };
         Object.defineProperty(ObservableArray.prototype, "" + index, prop);
         prop.enumerable = true;
+        prop.configurable = true;
         ObservableArray.ENUMERABLE_PROPS[index] = prop;
     }
 
