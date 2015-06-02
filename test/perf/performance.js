@@ -165,7 +165,7 @@ exports.test_many_unreferenced_observables = function(test) {
     var c = value(7);
     var d = value(function() { return a() * b() * c() });
     test.equal(d(), 126);
-    test.equal(d.prop.dependencyState.isSleeping, true);
+    test.equal(d.impl.dependencyState.isSleeping, true);
     var start = now();
     for(var i = 0; i < 10000; i++) {
         c(i);

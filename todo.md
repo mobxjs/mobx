@@ -29,22 +29,22 @@
 * ~~props should create real observable array~~
 * ~~value for array, + set -> replace~~
 * ~~check nested watches! inner watch should not reevaluate outer watch, introduce DNode.unobserved that swaps out trackingstack?~~
-* rename .prop. -> .impl.
+* ~~rename .prop. -> .impl.~~
 * ~~replace instanceof observableValue checks with isObservable, isWrappedObservable~~
 * ~~introduce createGetterSetter on all implementations~~
-* make properties non-configurable
+* ~~make properties non-configurable~~
 * ~~helpers .variable, computed, array~~
 * ~~introduce IGetter / ISetter interfaces, or create getter setter for array~~
-* fiddle demo
-* update apidocs
 * ~~perf tests~~
 * ~~test .value etc~~
-* removed .bind, it is slow!
+* ~~removed .bind, it is slow!~~
 * ~~watchClass~~
 * ~~move out scheduler check stuff..~~
 * ~~check batching~~
 * ~~check closure usages for scheduler.schedule~~
 * ~~no source map for dist!~~
+* fiddle demo
+* update apidocs
 
 0.5
 * ~~browser based tests~~

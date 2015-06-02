@@ -196,10 +196,10 @@ mobservableStatic.toPlainValue = function toPlainValue(value:any):any {
             return value.slice();
         else if (value instanceof ObservableValue)
             return value.get();
-        else if (typeof value === "function" && value.prop) {
-            if (value.prop instanceof ObservableValue)
+        else if (typeof value === "function" && value.impl) {
+            if (value.impl instanceof ObservableValue)
                 return value()
-            else if (value.prop instanceof ObservableArray)
+            else if (value.impl instanceof ObservableArray)
                 return value().slice();
         }            
         else if (typeof value === "object") {
@@ -229,8 +229,8 @@ mobservableStatic.observeProperty = function observeProperty(object:Object, key:
     if (currentValue instanceof ObservableValue || currentValue instanceof ObservableArray)
         return currentValue.observe(listener, invokeImmediately);
     // IObservable? -> attach observer
-    else if (currentValue.prop && (currentValue.prop instanceof ObservableValue || currentValue instanceof ObservableArray))
-        return currentValue.prop.observe(listener, invokeImmediately);
+    else if (currentValue.impl && (currentValue.impl instanceof ObservableValue || currentValue instanceof ObservableArray))
+        return currentValue.impl.observe(listener, invokeImmediately);
 
     // wrap with observable function
     var observer = new ComputedObservable((() => object[key]), object);
@@ -303,7 +303,7 @@ class ObservableValue<T> {
                 return self.get();
         };
         f.observe = (listener, fire) => this.observe(listener, fire);
-        f.prop = this;
+        f.impl = this;
         f.toString = () => this.toString();
         return f;
     }
