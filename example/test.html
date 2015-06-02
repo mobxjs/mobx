@@ -1,22 +1,28 @@
 <!DOCTYPE HTML>
+<head>
+	<link type="text/css" rel="stylesheet" href="test.css" />
+</head>
 <body>
     <div id="container">
-        <h1>Mobservale shopping cart demo</h1>
+        <div id="header">
+            <h1>MOBervale shopping cart demo</h1>
+            <a href="https://github.com/mweststrate/mobservable">Github repo</a>
+        </div>
         <table>
             <tr>
                 <td>
-                    <h2>Availale items</h2>
-                    <button id="new-article">New article</button>
+                    <h2>Availale items<button id="new-article">New article</button></h2>
                     <ul id="articles">
 
                     </ul>
+                    
                 </td>
                 <td>
                     <h2>Your shopping cart</h2>
-                    <div>Total: <span id="total"></span></div>
                     <ul id="cart">
 
                     </ul>
+                    <div><b>Total: <span id="total"></span></b></div>
                 </td>
             </tr>
         </table>
@@ -107,17 +113,17 @@
           */
          function renderArticle(article) {
              var $name = $("<span>").text(article.name);
-             var $price = $("<span>").text(article.price);
+             var $price = $("<span>").addClass("price").text(article.price);
              mobservable.observeProperty(article, "name", function(name) {
                  $name.text(name);
              });
              mobservable.observeProperty(article, "price", function(price) {
                  $price.text(price);
              });
-             return $("<li>").append($name, $price,
+             return $("<li>").append($name, 
+                $("<button>").text("add").addClass("add-article"),
                 $("<button>").text("edit").addClass("edit-article"),
-                $("<button>").text("add").addClass("add-article"));
-
+                $price);
          }
 
          /**
@@ -143,7 +149,7 @@
 
         function renderCartEntry(entry) {
              var $name = $("<span>").text(entry.article.name);
-             var $amount = $("<span>").text(entry.amount);
+             var $amount = $("<span>").addClass("price").text(entry.amount);
              mobservable.observeProperty(entry.article, "name", function(name) {
                  $name.text(name);
              });

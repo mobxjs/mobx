@@ -1,0 +1,61 @@
+body {
+	font-family: 'Georgia';
+	background: url('bg.jpg') no-repeat 50% 50% fixed; 
+    background-size: cover;
+}
+
+h1 {
+	font-family: 'Arial Black';
+}
+
+h2 {
+	font-family: 'Arial Black';
+	font-size: 12pt;	
+}
+
+#header {
+	text-align: center;
+}
+
+#container {
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 40px;
+	width: 800px;
+	padding: 40px;
+	border-radius: 20px;
+	background:rgba(255,255,255,1);
+	box-shadow: 3px 3px 5px 0px rgba(50, 50, 50, 0.7);
+}
+
+#container table {
+	width: 100%;
+}
+
+#container table td {
+	width: 50%;
+	vertical-align: top;
+	padding: 20px;
+}
+
+ul {
+	list-style: none;
+    padding-left: 0px;
+}
+
+li {
+	display: inline-block;
+	width: 100%;
+	border-bottom: 1px solid #e2e2e2;
+	padding: 10px 0;
+}
+
+button {
+	float: right;
+}
+
+.price {
+	float: right;
+	font-style: italic;
+	margin-right: 10px;
+}
