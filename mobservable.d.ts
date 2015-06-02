@@ -22,7 +22,6 @@ interface IMObservableStatic {
     props(object:Object, props:Object);
     props(object:Object);
     observable(target:Object, key:string); // annotation
-    turnObservablesIntoProperties(object:Object);
 
     // observables to not observables
     toPlainValue<T>(any:T):T;

@@ -21,7 +21,6 @@ interface IMObservableStatic {
     props(object:Object, props:Object);
     props(object:Object);
     observable(target:Object, key:string); // annotation
-    turnObservablesIntoProperties(object:Object);
 
     // observables to not observables
     toPlainValue<T>(any:T):T;
@@ -177,28 +176,6 @@ mobservableStatic.observable = function observable(target:Object, key:string, de
                 mobservableStatic.props(this, key, value);
             }
         });
-    }
-}
-
-mobservableStatic.turnObservablesIntoProperties = function turnObservablesIntoProperties(object:Object) {
-    for(var key in object) if (object.hasOwnProperty(key)) {
-        var value = object[key], 
-            getter:()=>any = null,
-            setter:(v)=>void = null;
-        if (value instanceof ObservableArray) {
-            getter = function() { return value; };
-            setter = (<ObservableArray<any>>value).replace.bind(value);
-        } else if (value && value.prop && (value.prop instanceof ObservableValue)) {
-            getter = setter = <IObservableValue<any>> object[key];
-        }
-        if (getter) {
-            Object.defineProperty(object, key, {
-                get: getter,
-                set: setter,
-                enumerable: true,
-                configurable: true
-            });        
-        }
     }
 }
 
