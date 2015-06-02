@@ -129,8 +129,12 @@ mobservableStatic.props = function props(target, props?, value?) {
             var isArray = Array.isArray(value);
             var observable = mobservableStatic.value(value, target);
             Object.defineProperty(target, props, {
-                get: isArray ? function() { return observable; } : observable,
-                set: isArray ? (<any>observable).replace.bind(observable) : observable,
+                get: isArray 
+                    ? function() { return observable; } 
+                    : observable,
+                set: isArray 
+                    ? function(newValue) { (<IObservableArray<any>><any>observable).replace(newValue) } 
+                    : observable,
                 enumerable: true,
                 configurable: false
             });
