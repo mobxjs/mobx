@@ -1,15 +1,142 @@
 # MOBservable
 
-*Changes are coming!*
-
-MOBservable is light-weight stand-alone observable implementation, based on the ideas of observables in bigger frameworks like `knockout`, `ember`, but this time without 'strings attached'. MOBservables allows you to observe primitive values, references, functions and arrays.
-
 [![Build Status](https://travis-ci.org/mweststrate/MOBservable.svg?branch=master)](https://travis-ci.org/mweststrate/MOBservable)
 [![Coverage Status](https://coveralls.io/repos/mweststrate/MOBservable/badge.svg?branch=master)](https://coveralls.io/r/mweststrate/MOBservable)
 
 [![NPM](https://nodei.co/npm/mobservable.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/mobservable/)
 
+Installation: `npm install mobservable --save`
+
+MOBservable is light-weight stand-alone observable implementation, that helps you to create reactive data structures, based on the ideas of observables in bigger frameworks like `knockout`, `ember`, but this time without 'strings attached'. 
+MOBservables allows you to observe primitive values, references, functions and arrays and makes sure that all changes in your data are propagated automatically, atomically and synchronously.
+
+TODO: blog post
+
+# Examples
+
+[Fiddle demo: MOBservable + JQuery](http://jsfiddle.net/mweststrate/vxn7qgdw)
+https://jsfiddle.net/mweststrate/vxn7qgdw/1/embedded/result/
+
+TODO: react fiddle
+
+## Example: Observable values and functions
+
+```javascript
+var mobservable = require('mobservable');
+
+var nrOfCatz = mobservable(3);
+var nrOfDogs = mobservable(8);
+
+// Create a function that automatically observes values:
+var nrOfAnimals = mobservable(function() {
+    // calling an mobservable without arguments acts as getter
+    return nrOfCatz() * nrOfDogs();
+});
+
+// Print a message whenever the observable changes:
+nrOfAnimals.observe(function(amount) {
+    console.log("Total: " + amount);
+}, true);
+// -> Prints: "Total: 11"
+
+// calling an mobservable with a value acts as setter, 
+// ...and automatically updates all computations in which it was used
+nrOfCatz(34);
+// -> Prints: "Total: 42"
+```
+
+## Example: Observable objects & properties
+
+```javascript
+var mobservable = require('mobservable');
+
+var Person = function(firstName, lastName) {
+    // define the observable properties firstName, lastName and fullName on 'this'.
+    mobservable.props(this, {
+        firstName: firstName,
+        lastName: lastName,
+        fullName: function() {
+            return this.firsName + " " + this.lastName;
+        }
+    });
+}
+
+var jane = new Person("Jane","Dôh");
+
+// (computed) properties can be accessed like any other property:
+console.log(jan.fullName);
+// prints: "Jan Dôh"
+
+// properties can be observed as well:
+mobsevable.observeProperty(jane, "fullName", console.log);
+
+// values can be assigned directly to observable properties
+jane.lastName = "Do";
+// prints: "Jane Do"
+```
+
+## Example: Arrays
+
+```javascript
+import mobservable = require('mobservable');
+
+// create an array, that works by all means as a normal array, except that they are observable!
+var someNumbers = mobservable.value([1,2,3]);
+var sum = mobservable.value(function() {
+    for(var s = 0, i = 0; i < someNumbers.length; i++)
+        s += someNumbers[i];
+});
+sum.observe(console.log);
+
+someNumbers.push(4);
+// Prints: 10
+someNumbers[2] = 0;
+// Prints: 7
+someNumbers[someNumbers.length] = 5;
+// Prints: 12
+```
+
+## Example: TypeScript classes and annotations
+
+```typescript
+/// <reference path="./node_modules/mobservable/mobservable.d.ts"/>
+import mobservable = require('mobservable');
+var observable = mobservable.observable;
+
+class Order {
+    @observable orderLines: OrderLine[] = [];
+    @observable total() {
+        return this.orderLines.reduce((sum, orderLine) => sum + orderLine.total, 0)
+    }
+}
+
+class OrderLine {
+    @observable price:number = 0;
+    @observable amount:number = 1;
+
+    constructor(price) {
+        this.price = price;
+    }
+
+    @observable total() {
+        return "Total: " + this.price * this.amount;
+    }
+}
+
+var order1 = new Order();
+order1.total.observe(console.log);
+
+order1.orderLines.push(new OrderLine(7));
+// Prints: Total: 7
+order1.orderLines.push(new OrderLine(12));
+// Prints: Total: 12
+order1.orderLines[0].amount = 3;
+// Prints: Total: 33
+```
+
+# API 
 [Typescript typings](https://github.com/mweststrate/MOBservable/blob/master/mobservable.d.ts)
+
 
 # Observable values
 
@@ -33,32 +160,109 @@ vat(0.10);
 // Prints: New price: 22
 ```
 
-## mobservable.value(value, scope?):IObservableValue
+# Processing observables
 
-Constructs a new observable value. The value can be everything that is not a function, or a function that takes no arguments and returns a value. In the body of the function, references to other properties will be tracked, and on change, the function will be re-evaluated. The returned value is an `IProperty` function/object. Passing an array or object into the `value` method will only observe the reference, not the contents of the objects itself. To observe the contents of an array, use `mobservable.array`, to observe the contents of an object, just make sure its (relevant) properties are observable values themselves.
+Observable values, arrays and functions created by `mobservable` possess the following characteristics:
 
-The method optionally accepts a scope parameter, which will be returned by the setter for chaining, and which will be used as scope for calculated properties, for example:
+* _synchronous_. All updates are processed synchronously, that is, the pseudo expressions `a = 3; b -> a * 2; a = 4; print(b); ` will always print `4`; `b` will never yield a stale value (unless `batch` is used).
+* _atomic_. All computed values will postpone updates until all inputs are settled, to make sure no intermediate values are visible. That is, the expression `a = 3; b -> a * 2; c -> a * b; a = 4; print(c)` will always print `36` and no intermediate values like `24`.
+* _real time dependency detection_. Computed values only depend on values actually used in the last computation, for example in this `a -> b > 5 ? c : b` the variable `c` will only cause a re-evaluation of a if `b` > 5. 
+* _lazy_. Computed values will only be evaluated if they are actually being observed. So make sure computed functions are pure and side effect free; the library might not evaluate the expression as often as you thought it would.   
+* _cycle detection_. Cycles in computes, like in `a -> 2 * b; b -> 2 * a;` will be deteced automatically.  
+* _error handling_. Exceptions that are raised during computations are propagated to consumers.
 
-```javascript
-var value = mobservable.value;
+#### .props or .value?
 
-function OrderLine(price, amount) {
-    this.price = value(price);
-    this.amount = value(amount);
-    this.total = value(function() {
-        return this.price() * this.amount();
-    }, this)
-}
+MOVE
+
+| .value | .props |
+| ---- | ---|
+| ES3 complient | requires ES 5 |
+| explicit getter/setter functions: `obj.amount(2)`  | object properties with implicit getter/setter: `obj.amount = 2 ` |
+| easy to make mistakes; e.g. `obj.amount = 3` instead of `obj.amount(3)`, or `7 * obj.amount` instead of `7 * obj.amount()` wilt both not achieve the intended behavior | Use property reads / assignments |
+| easy to observe: `obj.amount.observe(listener)` | `mobservable.observeProperty(obj,'amount',listener)`  |
+
+# API
+
+## mobservable
+
+Shorthand for `mobservable.value`
+
+## mobservable.value
+
+`mobservable.value<T>(value? : T[], scope? : Object) : IObservableArray<T>`
+
+`mobservable.value<T>(value? : T|()=>T, scope? : Object) : IObservableValue<T>`
+
+Function that creates an observable given a `value`. 
+Depending on the type of the function, this function invokes `mobservable.array`, `mobservable.computed` or `mobservable.primitive`.
+See the examples above for usage patterns. The `scope` is only meaningful if a function is passed into this method.
+
+## mobservable.primitive
+
+`mobservable.primitive<T>(value? : T) : IObservableValue<T>`
+
+Creates a new observable, initialzed with the given `value` that can change over time. 
+The returned observable is a function, that without arguments acts as getter, and with arguments as setter.
+Furthermore its value can be observed using the `.observe` method, see `IObservableValue.observe`.  
+
+Example:
+```
+var vat = mobservable.primitive(3);
+console.log(vat()); // prints '3'
+vat.observe(console.log); // register an observer
+vat(4); // updates value, also notifies all observers, thus prints '4'
 ```
 
-**Note: `mobservable.value` versus `mobservable.array`**
-Do *not* confuse `mobservable.value([])` (or `mobservable([])`) with `mobservable.array([])`, the first creates an observable reference to an array, but does not observe its contents. The later observes the contents from the array you pass into it.
 
-## mobservable.array(initialValues?):ObservableArray
+## mobservable.reference
 
+`mobservable.reference<T>(value? : T) : IObservableValue<T>`
+Synonym for `mobservable.primitive`, since the equality of primitives is determined in the same way as references, namely by strict equality.
+(TODO: future work) See `mobservable.struct` if values need to be compared structuraly (by using deep equality).
+
+## mobservable.computed
+
+`mobservable.computed<T>(expr : () => T, scope?) : IObservableValue<T>`
+
+`computed` turns a function into an observable value. 
+The provided `expr` should not have any arguments, but instead really on other observables that are in scope to determine its value.
+The latest value returned by `expr` determines the value of the observable. When one of the observables used in `expr` changes, `computed` will make sure that the function gets re-evaluated, and all updates are propogated to the children.
+
+```javascript
+    var amount = mobservable(3);
+    var price = mobservable(2);
+    var total = mobservable.computed(function() {
+        return amount() * price();
+    });
+    console.log(total()); // gets the current value, prints '6'
+    total.observe(console.log); // attach listener
+    amount(4); // update amount, total gets re-evaluated automatically and will print '8'
+    amount(4); // update amount, but total will not be re-evaluated since the value didn't change
+```
+
+The optional `scope` parameter defines `this` context during the evaluation of `expr`. 
+
+`computed` will try to reduce the amount of re-evaluates of `expr` as much as possible. For that reason the function *should* be pure, that is:
+* The result of `expr` should only be defined in terms of other observables, and not depend on any other state.
+* Your code shouldn't rely on any side-effects, triggered by `expr`; `expr` should be side-effect free.
+* The result of `expr` should always be the same if none of the observed observables did change.
+
+It is not allowed for `expr` to have an (implicit) dependency on its own value.
+
+It is allowed to throw exceptions in an observed function. The thrown exceptions might only be detected late. 
+The exception will be rethrown if somebody inspects the current value, and will be passed as first callback argument
+to all the listeners. 
+
+## mobservable.array
+
+`mobservable.array<T>(values? : T[]) : IObservableArray<T>`
 **Note: ES5 environments only**
 
-Constructs an array like, observable structure. An observable array is a thin abstraction over native arrays that adds observable properties. The only noticable difference between built-in arrays is that these arrays cannot be sparse, that is, values assigned to an index larger than `length` are not oberved (nor any other property that is assigned to a non-numeric index). In practice, this should harldy be an issue. Example:
+Constructs an array like, observable structure. An observable array is a thin abstraction over native arrays that adds observable properties. 
+The most notable difference between built-in arrays is that these arrays cannot be sparse, that is, values assigned to an index larger than `length` are considered out-of-bounds and not oberved (nor any other property that is assigned to a non-numeric index). 
+
+Furthermore, `Array.isArray(observableArray)` and `typeof observableArray === "array"` will yield `false` for observable arrays, but `observableArray instanceof Array` will return `true`. 
 
 ```javascript
 var numbers = mobservable.array([1,2,3]);
@@ -75,217 +279,54 @@ numbers.unshift(10)
 // prints 31
 ```
 
-**Note: do not reassign a array variables!**
-
-In general you should never (need to) reassign variables that hold an observable array, instead, use the `replace` method on the array. If you reassign a variable that holds an observable array, the reassignment won't be visible to any of it observers; they will still be observing the original array:
-
-```javascript
-var numbers = mobservable.array([1,2]);
-// .. stuff that depends on numbers
-// bad:
-var numbers = mobservable.array([1,2,3]);
-// good:
-numbers.replace([1,2,3]);
-```
-
-## mobservable.Observable annotation
-
-**Note: ES5, TypeScript 1.5+ environments only**
-
-Marks a property or method as observable. This annotations basically wraps `mobservable.defineObservableProperty`. If the annotations is used in combination with an array property, an observable array will be created.
+## mobservable.props
 
 ```typescript
-var observable = require('mobservable').observable;
-
-class Order {
-    @observable price:number = 3;
-    @observable amount:number = 2;
-    @observable orders = [];
-
-    @observable total() {
-        return this.amount * this.price * (1 + orders.length);
-    }
-
-}
-```
-
-## mobservable.defineObservableProperty(object, name, value)
-
+props(target:Object, name:string, initialValue: any):Object;
+props(target:Object, props:Object):Object;
+props(target:Object):Object;
+``` 
 **Note: ES5 environments only**
 
-Defines a property using ES5 getters and setters. This is useful in constructor functions, and allows for direct assignment / reading from observables:
+Creates observable properties on the given `target` object. This function uses `mobservable.value` internally to create observables.
+Creating properties has as advantage that they are more convenient to use. See also [props or variables](TODO).
+The original `target`, with the added properties, is returned by this function. Functions used to created computed observables will automatically
+be bound to the correct `this`.
 
 ```javascript
-var vat = mobservable.value(0.2);
-
-var Order = function() {
-    mobservable.defineObservableProperty(this, 'price', 20);
-    mobservable.defineObservableProperty(this, 'amount', 2);
-    mobservable.defineObservableProperty(this, 'total', function() {
-        return (1+vat()) * this.price * this.amount; // price and amount are now properties!
-    });
-};
-
-var order = new Order();
-order.price = 10;
-order.amount = 3;
-// order.total now equals 36
+var order = {};
+mobservable.props(order, {
+    amount: 3,
+    price: 5,
+    total: function() {
+        return this.amount * this.price; // note that no setters are needed
+    }
+});
+order.amount = 4;
+console.log(order.total); // Prints '20'
 ```
 
-In typescript < 1.5, it might be more convenient for the typesystem to directly define getters and setters instead of using `mobservable.defineProperty` (or, use `mobservable.initializeObservableProperties`):
+Note that observables created by `mobservable.props` don't have an `.observe` method, to observe properties, see [`mobservable.observeProperty`](TODO)
 
-```typescript
-class Order {
-    _price = new mobservable.value(20, this);
-    get price() {
-        return this._price();
-    }
-    set price(value) {
-        this._price(value);
-    }
-}
-```
-
-## mobservable.initializeObservableProperties(object)
-
-**Note: ES5 environments only**
-
-Converts all observables of the given object into property accessors. For example:
-
+Other forms in which this function can be called:
 ```javascript
-var Order = function() {
-    this.price = value(20);
-    this.amount = value(2);
-    this.nonsense = 3;
-    this.total = value(function() {
-      return (1+vat()) * this.price * this.amount; // price and amount are now properties!
-    }, this);
-    mobservable.initializeObservableProperties(this);
-};
-
-var order = new Order();
-console.log(order.total); // prints 36
+mobservable.props(order, "price", 3); // equivalent to mobservable.props(order, { price: 3 });
+var order = mobservable.props({ price: 3}); // uses the original object as target, that is, all values in it are replaced by their observable counterparts
 ```
 
-Or in typescript pre 1.5, where annotations are not yet supported:
 
-```typescript
-class Order {
-    price:number = <number><any>new mobservable.value(20, this);
-    constructor() {
-        mobservable.initializeObservableProperties(this);
-    }
-}
-```
+observable(target:Object, key:string); // annotation
 
-## mobservable.observeProperty
-`function observeProperty(object:Object, key:string, listener:Function, fireImmediately=false):Lambda`
+// observables to not observables
+toPlainValue<T>(any:T):T;
 
-Observes the observable property `key` of `object`. This is useful if you want to observe properties created using the `observable` annotation or the `defineObservableProperty` method, since for those properties their own `observe` method is not publicly available.
+// observe observables
+observeProperty(object:Object, key:string, listener:Function, invokeImmediately?:boolean):Lambda;
+watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda];
 
-```typescript
-class Order {
-    @observable total = () => this.price * this.amount;
-}
-var order = new Order();
+// change a lot of observables at once
+batch<T>(action:()=>T):T;
 
-mobservable.observeProperty(order, 'total', (newPrice) => console.log("New price: " + newPrice));
-```
-
-## mobservable.watch(func, onInvalidate)
-
-`watch` invokes `func` and returns a tuple consisting of the return value of `func` and an unsubscriber. `watch` will track which observables `func` was observing, but it will *not* recalculate `func` if necessary, instead, it will fire the `onInvalidate` callback to notify that the output of `func` can no longer be trusted.
-
-The `onInvalidate` function will be called only once, after that, the watch has finished. To abort a watch, use the returned unsubscriber.
-
-`Watch` is useful in functions where you want to have a function that responds to change, but where the function is actually invoked as side effect or part of a bigger change flow or where unnecessary recalculations of `func` or either pointless or expensive, for example in React component render methods
-
-## mobservable.batch(workerFunction)
-
-Batch postpones the updates of computed properties until the (synchronous) `workerFunction` has completed. This is useful if you want to apply a bunch of different updates throughout your model before needing the updated computed values, for example while refreshing a value from the database.
-
-## mobservable.onReady(listener) / mobservable.onceReady(listener)
-
-The listener is invoked each time the complete model has become stable. The listener is always invoked asynchronously, so that even without `batch` the listener is only invoked after a bunch of changes have been applied
-
-`onReady` returns a function with wich the listener can be unsubscribed from future events
-
-## `IObservableValue` objects
-
-### IObservableValue()
-
-If an IObservableValue object is called without arguments, the current value of the observer is returned
-
-### IObservableValue(newValue)
-
-If an IObservable object is called with arguments, the current value is updated. All current observers will be updated as well.
-
-### IObservableValue.observe(listener,fireImmediately=false)
-
-Registers a new listener to change events. Listener should be a function, its first argument will be the new value, and second argument the old value.
-
-Returns a function that upon invocation unsubscribes the listener from the property.
-
-## `ObservableArray`
-
-An `ObservableArray` is an array-like structure with all the typical behavior of arrays, so you can freely assign new values to (non-sparse) indexes, alter the length, call array functions like `map`, `filter`, `shift` etc. etc. All the ES5 features are in there. Additionally available methods:
-
-### ObservableArray.clear()
-
-Removes all elements from the array and returns the removed elements. Shorthand for `ObservableArray.splice(0)`
-
-### ObservableArray.replace(newItemsArray)
-
-Replaces all the items in the array with `newItemsArray`, and returns the old items.
-
-### ObservableArray.spliceWithArray(index, deleteCount, newItemsArray)
-
-Similar to `Array.splice`, but instead of accepting a variable amount of arguments, the third argument should be an array containing the new arguments.
-
-### ObservableArray.observe(callback)
-
-Register a callback that will be triggered every time the array is altered. A method to unregister the callback is returned.
-
-The events that are being fired adhere to the ES7 specs for Array.observe. The event data will be either a `splice` or `update` event, examples:
-
-```javascript
-{ object: <array>, type: "update", index: 2, oldValue: 4 },
-{ object: <array>, type: "splice", index: 1, addedCount: 2, removed: [4,1] },
-```
-
-### ObservableArray.values()
-
-Returns all the values of this ObservableArray as native, non-observable, javascript array. The returned array is a shallow copy.
-
-## mobservable.SimpleEventEmitter
-
-Class that implements a simple event system.
-
-### SimpleEventEmitter.emit
-
-`emit(...data:any[]):void;`
-
-Fires the event represented by this SimpleEventEmitter. All arguments passed to `emit` are passed to the listeners.
-
-### SimpleEventEmitter.on
-
-`on(listener:(...data:any[])=>void):Lambda;`
-
-Subscribes a new event listener to this event emitter. The returned function can be used to unsubscribe.
-
-### SimpleEventEmitter.once
-
-`once(listener:(...data:any[])=>void):Lambda;`
-
-Similar to `on`, but the listener is fired only one time and disposed after that.
-
-# Using mobservable with Typescript
-
-Use the following import statement to have strongly typed mobservables in typescript:
-
-```typescript
-/// <reference path='./node_modules/mobservable/mobservable.d.ts'/>
-import mobservable = require('mobservable');
-```
-
-Note that the `mobservable(value)` shorthand is not available in typescript, due to limitations in the combination of require statements and .d.ts references. use `mobservable.value(value)` instead.
+// Utils
+debugLevel: number;
+SimpleEventEmitter: new()=> ISimpleEventEmitter;

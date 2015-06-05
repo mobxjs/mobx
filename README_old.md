@@ -1,140 +1,15 @@
 # MOBservable
 
+*Changes are coming!*
+
+MOBservable is light-weight stand-alone observable implementation, based on the ideas of observables in bigger frameworks like `knockout`, `ember`, but this time without 'strings attached'. MOBservables allows you to observe primitive values, references, functions and arrays.
+
 [![Build Status](https://travis-ci.org/mweststrate/MOBservable.svg?branch=master)](https://travis-ci.org/mweststrate/MOBservable)
 [![Coverage Status](https://coveralls.io/repos/mweststrate/MOBservable/badge.svg?branch=master)](https://coveralls.io/r/mweststrate/MOBservable)
 
 [![NPM](https://nodei.co/npm/mobservable.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/mobservable/)
 
-Installation: `npm install mobservable --save`
-
-MOBservable is light-weight stand-alone observable implementation, that helps you to create reactive data structures, based on the ideas of observables in bigger frameworks like `knockout`, `ember`, but this time without 'strings attached'. 
-MOBservables allows you to observe primitive values, references, functions and arrays and makes sure that all changes in your data are propagated automatically, atomically and synchronously.
-
-TODO: blog post
-
-# Examples
-
-TODO: html fiddle
-TODO: react fiddle
-
-## Example: Observable values and functions
-
-```javascript
-var mobservable = require('mobservable');
-
-var nrOfCatz = mobservable(3);
-var nrOfDogs = mobservable(8);
-
-// Create a function that automatically observes values:
-var nrOfAnimals = mobservable(function() {
-    // calling an mobservable without arguments acts as getter
-    return nrOfCatz() * nrOfDogs();
-});
-
-// Print a message whenever the observable changes:
-nrOfAnimals.observe(function(amount) {
-    console.log("Total: " + amount);
-}, true);
-// -> Prints: "Total: 11"
-
-// calling an mobservable with a value acts as setter, 
-// ...and automatically updates all computations in which it was used
-nrOfCatz(34);
-// -> Prints: "Total: 42"
-```
-
-## Example: Observable objects & properties
-
-```javascript
-var mobservable = require('mobservable');
-
-var Person = function(firstName, lastName) {
-    // define the observable properties firstName, lastName and fullName on 'this'.
-    mobservable.props(this, {
-        firstName: firstName,
-        lastName: lastName,
-        fullName: function() {
-            return this.firsName + " " + this.lastName;
-        }
-    });
-}
-
-var jane = new Person("Jane","Dôh");
-
-// (computed) properties can be accessed like any other property:
-console.log(jan.fullName);
-// prints: "Jan Dôh"
-
-// properties can be observed as well:
-mobsevable.observeProperty(jane, "fullName", console.log);
-
-// values can be assigned directly to observable properties
-jane.lastName = "Do";
-// prints: "Jane Do"
-```
-
-## Example: Arrays
-
-```javascript
-import mobservable = require('mobservable');
-
-// create an array, that works by all means as a normal array, except that they are observable!
-var someNumbers = mobservable.value([1,2,3]);
-var sum = mobservable.value(function() {
-    for(var s = 0, i = 0; i < someNumbers.length; i++)
-        s += someNumbers[i];
-});
-sum.observe(console.log);
-
-someNumbers.push(4);
-// Prints: 10
-someNumbers[2] = 0;
-// Prints: 7
-someNumbers[someNumbers.length] = 5;
-// Prints: 12
-```
-
-## Example: TypeScript classes and annotations
-
-```typescript
-/// <reference path="./node_modules/mobservable/mobservable.d.ts"/>
-import mobservable = require('mobservable');
-var observable = mobservable.observable;
-
-class Order {
-    @observable orderLines: OrderLine[] = [];
-    @observable total() {
-        return this.orderLines.reduce((sum, orderLine) => sum + orderLine.total, 0)
-    }
-}
-
-class OrderLine {
-    @observable price:number = 0;
-    @observable amount:number = 1;
-
-    constructor(price) {
-        this.price = price;
-    }
-
-    @observable total() {
-        return "Total: " + this.price * this.amount;
-    }
-}
-
-var order1 = new Order();
-order1.total.observe(console.log);
-
-order1.orderLines.push(new OrderLine(7));
-// Prints: Total: 7
-order1.orderLines.push(new OrderLine(12));
-// Prints: Total: 12
-order1.orderLines[0].amount = 3;
-// Prints: Total: 33
-```
-
-# API 
 [Typescript typings](https://github.com/mweststrate/MOBservable/blob/master/mobservable.d.ts)
-
 
 # Observable values
 
@@ -414,3 +289,29 @@ import mobservable = require('mobservable');
 ```
 
 Note that the `mobservable(value)` shorthand is not available in typescript, due to limitations in the combination of require statements and .d.ts references. use `mobservable.value(value)` instead.
+
+
+# Best practices
+
+Reuse observables in computed functions
+
+**Note: do not reassign a array variables!**
+
+In general you should never (need to) reassign variables that hold an observable (array), instead, use the `replace` method on the array. If you reassign a variable that holds an observable array, the reassignment won't be visible to any of it observers; they will still be observing the original).
+Using `mobservable.props` will automatically protect any properties that hold observable arrays against reassignments.
+
+```javascript
+var numbers = mobservable.array([4,5]);
+// .. stuff that depends on numbers
+// bad:
+var numbers = mobservable.array([1,2,3]);
+// good:
+numbers.replace([1,2,3]);
+// good:
+var x = {};
+mobservable.props(x, { items: [4,5] });
+x.items = [1,2,3]; // will internally call .replace
+```
+
+**Note: `mobservable.primitive` versus `mobservable.array`**
+Do *not* confuse `mobservable.primitive([])` (or `mobservable([])`) with `mobservable.array([])`, the first creates an observable reference to an array, but does not observe its contents. The later observes the contents from the array you pass into it.

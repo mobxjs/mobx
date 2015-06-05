@@ -16,7 +16,9 @@
     - verify that combine multiple assignments to property during batch are combined into singleupdate
     - verify that multiple computations schedulings during batch result in single computation
     - go to sleep if there are no observers and a 'stale' notification comes in 
-    - notifyStateChange: avoid or remove scheduler.schedule, or strip closure by passing the DNode in 
+    - notifyStateChange: avoid or remove scheduler.schedule, or strip closure by passing the DNode in
+    - do not wrap around .value in .props, to use save some closures 
+    - create dnode.observers / observing lazy, to save memory?
     
 0.4
 * ~~License~~
@@ -54,7 +56,8 @@
 * ~~minify~~
 * react mixin, https://medium.com/@dan_abramov/mixins-are-dead-long-live-higher-order-components-94a0d2f9e750
 * react fiddle demo
-* bind is slow!!!
+* mobservable.struct (ALWAYS compare deep equal, use defensive copy so that changes in object are detected)
+* mobservable.computedStruct
 
 Later
 
