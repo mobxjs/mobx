@@ -293,7 +293,7 @@ Note that the `mobservable(value)` shorthand is not available in typescript, due
 
 # Best practices
 
-Reuse observables in computed functions
+use local variables in computed functions
 
 **Note: do not reassign a array variables!**
 
@@ -315,3 +315,14 @@ x.items = [1,2,3]; // will internally call .replace
 
 **Note: `mobservable.primitive` versus `mobservable.array`**
 Do *not* confuse `mobservable.primitive([])` (or `mobservable([])`) with `mobservable.array([])`, the first creates an observable reference to an array, but does not observe its contents. The later observes the contents from the array you pass into it.
+
+#### .props or .value?
+
+MOVE
+
+| .value | .props |
+| ---- | ---|
+| ES3 complient | requires ES 5 |
+| explicit getter/setter functions: `obj.amount(2)`  | object properties with implicit getter/setter: `obj.amount = 2 ` |
+| easy to make mistakes; e.g. `obj.amount = 3` instead of `obj.amount(3)`, or `7 * obj.amount` instead of `7 * obj.amount()` wilt both not achieve the intended behavior | Use property reads / assignments |
+| easy to observe: `obj.amount.observe(listener)` | `mobservable.observeProperty(obj,'amount',listener)`  |

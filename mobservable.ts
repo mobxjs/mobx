@@ -219,7 +219,7 @@ mobservableStatic.toPlainValue = function toPlainValue(value:any):any {
 */ 
 mobservableStatic.observeProperty = function observeProperty(object:Object, key:string, listener:(...args:any[])=>void, invokeImmediately = false):Lambda {
     if (!object || !key || object[key] === undefined)
-        throw new Error(`Object '${object}' has no key '${key}'.`);
+        throw new Error(`Object '${object}' has no property '${key}'.`);
     if (!listener || typeof listener !== "function")
         throw new Error("Third argument to mobservable.observeProperty should be a function");
 

@@ -23,8 +23,6 @@ interface IMObservableStatic {
     props(object:Object);
     observable(target:Object, key:string); // annotation
 
-    // observables to not observables
-    toPlainValue<T>(any:T):T;
 
     // observe observables
     observeProperty(object:Object, key:string, listener:Function, invokeImmediately?:boolean):Lambda;
@@ -34,6 +32,7 @@ interface IMObservableStatic {
     batch<T>(action:()=>T):T;
 
     // Utils
+    toPlainValue<T>(any:T):T; // convert observables to non-observables
     debugLevel: number;
     SimpleEventEmitter: new()=> ISimpleEventEmitter;
 }
