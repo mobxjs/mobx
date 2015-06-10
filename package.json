@@ -1,44 +1,44 @@
 {
-  "name": "mobservable",
-  "version": "0.3.3",
-  "description": "Changes are coming! Small library for creating observable properties, arrays and functions",
-  "main": "dist/mobservable.js",
-  "scripts": {
-    "test": "grunt cover",
-    "prepublish": "grunt builddist"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mweststrate/mobservable.git"
-  },
-  "author": "Michel Weststrate",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/mweststrate/mobservable/issues"
-  },
-  "homepage": "https://github.com/mweststrate/mobservable",
-  "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-nodeunit": "^0.4.1",
-    "grunt-coveralls": "^1.0.0",
-    "grunt-exec": "^0.4.6",
-    "grunt-contrib-uglify": "^0.9.1",
-    "mkdirp": "^0.5.1",
-    "nodeunit-browser-tap": "^0.1.0",
-    "nscript": "^0.1.5",
-    "typescript": "^1.5.0-beta"
-  },
-  "testling": {
-    "files": "test/browser/test.js",
-    "browsers": [
-      "ie/6..latest",
-      "chrome/22..latest",
-      "firefox/16..latest",
-      "safari/latest",
-      "opera/11.0..latest",
-      "iphone/6",
-      "ipad/6",
-      "android-browser/latest"
-    ]
-  }
+    "name": "mobservable",
+    "version": "0.4.0",
+    "description": "Changes are coming! Small library for creating observable properties, arrays and functions",
+    "main": "dist/mobservable.js",
+    "scripts": {
+        "test": "grunt cover",
+        "prepublish": "grunt builddist"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mweststrate/mobservable.git"
+    },
+    "author": "Michel Weststrate",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/mweststrate/mobservable/issues"
+    },
+    "homepage": "https://github.com/mweststrate/mobservable",
+    "devDependencies": {
+        "grunt": "^0.4.5",
+        "grunt-contrib-nodeunit": "^0.4.1",
+        "grunt-coveralls": "^1.0.0",
+        "grunt-exec": "^0.4.6",
+        "grunt-contrib-uglify": "^0.9.1",
+        "mkdirp": "^0.5.1",
+        "nodeunit-browser-tap": "^0.1.0",
+        "nscript": "^0.1.5",
+        "typescript": "^1.5.0-beta"
+    },
+    "testling": {
+        "files": "test/browser/test.js",
+        "browsers": [
+            "ie/6..latest",
+            "chrome/22..latest",
+            "firefox/16..latest",
+            "safari/latest",
+            "opera/11.0..latest",
+            "iphone/6",
+            "ipad/6",
+            "android-browser/latest"
+        ]
+    }
 }

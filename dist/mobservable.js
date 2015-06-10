@@ -104,7 +104,7 @@ var mobservable;
     mobservable.mobservableStatic.observeProperty = function observeProperty(object, key, listener, invokeImmediately) {
         if (invokeImmediately === void 0) { invokeImmediately = false; }
         if (!object || !key || object[key] === undefined)
-            throw new Error("Object '" + object + "' has no key '" + key + "'.");
+            throw new Error("Object '" + object + "' has no property '" + key + "'.");
         if (!listener || typeof listener !== "function")
             throw new Error("Third argument to mobservable.observeProperty should be a function");
         var currentValue = object[key];
