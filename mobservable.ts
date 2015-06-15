@@ -35,6 +35,11 @@ interface IMObservableStatic {
     // Utils
     debugLevel: number;
     SimpleEventEmitter: new()=> ISimpleEventEmitter;
+    
+    ReactObservingMixin: {
+        componentWillMount();
+        componentWillUnmount();
+    }
 }
 
 interface Lambda {
@@ -963,6 +968,26 @@ class Scheduler {
                 Scheduler.inBatch -= 1;
             }
         }
+    }
+}
+
+mobservableStatic.ReactObservingMixin = {
+    componentWillMount: function() {
+        var baseRender = this.render;
+        this.render = function() {
+            if (this._watchDisposer)
+                this._watchDisposer();
+            var[rendering, disposer] = mobservableStatic.watch(() => baseRender.call(this), () => {
+                this.forceUpdate();
+            });
+            this._watchDisposer = disposer;
+            return rendering;
+        }
+    },
+    
+    componentWillUnmount: function() {
+        if (this._watchDisposer)
+            this._watchDisposer();
     }
 }
 

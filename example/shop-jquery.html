@@ -5,7 +5,7 @@
 <body>
     <div id="container">
         <div id="header">
-            <h1>MOBservale shopping cart demo</h1>
+            <h1>MOBservable + jQuery shopping cart demo</h1>
             <a href="https://github.com/mweststrate/mobservable">Github repo</a>
         </div>
         <table>
@@ -75,8 +75,10 @@
         // With a demo item inside
         shoppingCart.entries.push(new ShoppingCartEntry(articles[0]));
 
-
-        /**
+    </script>
+    <script>
+        /** 
+         * Utility to insert child at a certain position in the dom
          * from http://stackoverflow.com/a/12903503/1983583
          */
         $.fn.insertAt = function(index, $parent) {
@@ -167,7 +169,7 @@
           * Events
           */
          $("#new-article").on("click", function() {
-            articles.push(new Article(prompt("Article name"), prompt("Price")));
+            articles.push(new Article(prompt("Article name"), prompt("Price (please fill in a number)")));
          });
 
          $(document).on("click", ".edit-article", function(event) {
@@ -189,7 +191,7 @@
 
          $(document).on("click", ".remove-article", function(event) {
              var entryIndex = $(event.target).parent().index();
-             if ((shoppingCart.entries[entryIndex].amount -= 1) < 1)
+             if (--shoppingCart.entries[entryIndex].amount < 1)
                 shoppingCart.entries.splice(entryIndex,1);
          });
     </script>

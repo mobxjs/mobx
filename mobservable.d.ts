@@ -36,6 +36,11 @@ interface IMObservableStatic {
     // Utils
     debugLevel: number;
     SimpleEventEmitter: new()=> ISimpleEventEmitter;
+    
+    ReactObservingMixin: {
+        componentWillMount();
+        componentWillUnmount();
+    }
 }
 
 interface Lambda {

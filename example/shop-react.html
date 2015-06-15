@@ -1,0 +1,165 @@
+<!DOCTYPE HTML>
+<head>
+	<link type="text/css" rel="stylesheet" href="test.css" />
+</head>
+<body>
+    <div id="container">
+        <div id="header">
+            <h1>MOBservable + React shopping cart demo</h1>
+            <a href="https://github.com/mweststrate/mobservable">Github repo</a>
+        </div>
+        <div id="mount" />
+    </div>
+    <script src="../mobservable.js"></script>
+    <script src="react/react.min.js"></script>
+    <script src="react/JSXTransformer.js"></script>
+    <script>
+        /**
+         * Data model
+         */
+        function Article(name, price) {
+            mobservable.props(this, {
+                name: name,
+                price: price
+            });
+        }
+
+        function ShoppingCartEntry(article) {
+            mobservable.props(this, {
+                article: article,
+                amount: 1,
+                price: function() {
+                    return this.article ? this.article.price * this.amount : 0;
+                }
+            });
+        }
+
+        function ShoppingCart() {
+            mobservable.props(this, {
+                entries: [],
+                total: function() {
+                    return this.entries.reduce(function(sum, entry) {
+                        return sum + entry.price;
+                    }, 0);
+                }
+            });
+        }
+
+        // Some available articles
+        var articles = mobservable.array([
+            ["Funny Bunnies", 17.63],
+            ["Awesome React", 23.95],
+            ["Second hand Netbook", 50.00]
+        ].map(function(e) {
+            return new Article(e[0], e[1]);
+        }));
+
+        // Our shopping cart
+        var shoppingCart = new ShoppingCart();
+        // With a demo item inside
+        shoppingCart.entries.push(new ShoppingCartEntry(articles[0]));
+        
+    </script>
+    <script type="text/jsx">
+        /**
+         * UI logic
+         */
+        var ShopDemoView = React.createClass({
+            mixins: [mobservable.ReactObservingMixin],
+            
+            render: function() {
+                return (<table>
+                        <tr>
+                            <td>
+                                <h2>Availale items</h2>
+                                <ArticlesView articles={this.props.articles} />
+                            </td>
+                            <td>
+                                <h2>Your shopping cart</h2>
+                                <CartView cart={this.props.cart} />
+                            </td>
+                        </tr>
+                    </table>)
+            }            
+        }); 
+         
+        var ArticlesView = React.createClass({
+            mixins: [mobservable.ReactObservingMixin],
+            
+            render: function() {
+                function renderArticle(article) {
+                    return (<ArticleView article={article} />);
+                }
+                return (<div>
+                        <button id="new-article" onClick={this.newArticleClick}>New article</button>
+                        <ul id="articles">{this.props.articles.map(renderArticle)}</ul>
+                    </div>)
+            },
+            
+            newArticleClick: function() {
+                this.props.articles.push(new Article(prompt("Article name"), prompt("Price (please fill in a number)")));
+            }
+        });
+        
+        var ArticleView = React.createClass({
+            mixins: [mobservable.ReactObservingMixin],
+            
+            render: function() {
+                return (<li>
+                    <span>{this.props.article.name}</span>
+                    <button onClick={this.onAddArticle}>add</button>
+                    <button onClick={this.onEditArticle}>edit</button>
+                    <span className="price">{this.props.article.price}</span>
+                </li>);
+            },
+            
+            onAddArticle: function() {
+                var existingEntry = shoppingCart.entries.find(function(entry) {
+                    return entry.article === this.props.article;
+                }, this);
+                if (existingEntry)
+                    existingEntry.amount += 1;
+                else
+                    shoppingCart.entries.unshift(new ShoppingCartEntry(this.props.article));
+            },
+            
+            onEditArticle: function() {
+                this.props.article.name = prompt("New name");
+                this.props.article.price = prompt("New price");
+            }
+        });
+        
+        var CartView = React.createClass({
+            mixins: [mobservable.ReactObservingMixin],
+            
+            render: function() {
+                function renderEntry(entry) {
+                    return (<CartEntryView entry={entry} />);
+                }
+                return (<div>
+                    <ul id="cart">{this.props.cart.entries.map(renderEntry)}</ul>
+                    <div><b>Total: <span id="total">{this.props.cart.total}</span></b></div>
+                </div>)
+            } 
+        });
+
+        var CartEntryView = React.createClass({
+            mixins: [mobservable.ReactObservingMixin],
+            
+            render: function() {
+                return (<li>
+                    <button onClick={this.removeArticle}>remove</button>
+                    <span>{this.props.entry.article.name}</span>
+                    <span className="price">{this.props.entry.amount}</span>
+                </li>);
+            },
+            
+            removeArticle: function() {
+                if (--this.props.entry.amount < 1)
+                    shoppingCart.entries.splice(shoppingCart.entries.indexOf(this.props.entry), 1);      
+            }
+        });
+        
+         React.render(<ShopDemoView articles={articles} cart={shoppingCart} />, document.getElementById("mount"));
+    </script>
+</body>
