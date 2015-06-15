@@ -13,6 +13,7 @@ MOBservables allows you to observe primitive values, references, functions and a
 # Examples
 
 [Fiddle demo: MOBservable + JQuery](http://jsfiddle.net/mweststrate/vxn7qgdw)
+[Fiddle demo: MOBservable + React](https://jsfiddle.net/mweststrate/46vL0phw)
 
 ## Example: Observable values and functions
 
@@ -140,6 +141,36 @@ order1.orderLines.push(new OrderLine(12));
 // Prints: Total: 12
 order1.orderLines[0].amount = 3;
 // Prints: Total: 33
+```
+
+## Example: ObserverMixin for react components
+
+MOBservable ships with a mixin that can be used to subscribe React components to observables automatically, so that model changes are processed transparently. 
+The full JSX example can be found in this [fjsiddle]()
+
+```javascript
+        function Article(name, price) {
+            mobservable.props(this, {
+                name: name,
+                price: price
+            });
+        }
+
+        var ArticleView = React.createClass({
+            mixins: [mobservable.ObserverMixin],
+            
+            render: function() {
+                return (<li>
+                    <span>{this.props.article.name}</span>
+                    <span className="price">{this.props.article.price}</span>
+                </li>);
+            }
+        });
+        
+        var book = new Article("Orthodoxy, G.K. Chesterton", 19.95);
+        React.render(<ArticleView article={book} />, document.body);
+        
+        book.price = 15.95; // Triggers automatically a re-render of the ArticleView
 ```
 
 # Processing observables
@@ -390,6 +421,16 @@ mobservable.batch(function() {
 
 Converts a (possibly) observable value into a non-observablue value. 
 For non-primitive values, this function will always return a shallow copy.
+
+### mobservable.ObserverMixin
+
+The observer mixin can be used in [React](https://facebook.github.io/react/index.html) components. 
+This mixin basically turns the `.render` function of the component into an observable function, and makes sure that the component itself becomes an observer of that function, 
+so that the component is re-rendered each time an observable has changed. 
+In general, this mixin combines very well with the [React PureRender mixin](https://facebook.github.io/react/docs/pure-render-mixin.html) if observable objects or arrays are passed into the component.
+This allows for React apps that perform well in apps with large amount of complex data, while avoiding the need to manage a lot of subscriptions.
+
+See the [above example](#example_observermixin_for_react_components) or the [JSFiddle demo: MOBservable + React](https://jsfiddle.net/mweststrate/46vL0phw)
 
 ### mobservable.debugLevel
 
