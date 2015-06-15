@@ -9,7 +9,7 @@
     - how errors and cycles in computations are dealt with
 * optimizations
     - computable's without observers should stay 'awake' after a computation (e.g. being inspected by .get),
-        but then go to sleep if one of its dependencies has changed, so that subsequent reads on a computable are cheap even if there are no observers
+        but then go to sleep if one of its dependencies has changed, so that subsequent reads on a computable are cheap even if there are no observers -> But, what about GC? this creates pending references until invalidation
     - check if somewhere an array is filled that could be preallocate
     - collapse stale / ready notifications whenever possible
     - combine multiple adds to array during batch into single splice
@@ -45,8 +45,12 @@
 * ~~check batching~~
 * ~~check closure usages for scheduler.schedule~~
 * ~~no source map for dist!~~
-* fiddle demo
-* update apidocs
+* ~~fiddle demo~~
+* ~~update apidocs~~
+* react mixin, https://medium.com/@dan_abramov/mixins-are-dead-long-live-higher-order-components-94a0d2f9e750
+* react fiddle demo
+* ~~test with webmodeler~~
+* blog posts
 
 0.5
 * ~~browser based tests~~
@@ -54,10 +58,14 @@
 * ~~implement + test toPlainValue~~
 * ~~make browser / amd / umd build https://github.com/bebraw/grunt-umd https://github.com/umdjs/umd~~
 * ~~minify~~
-* react mixin, https://medium.com/@dan_abramov/mixins-are-dead-long-live-higher-order-components-94a0d2f9e750
-* react fiddle demo
-* mobservable.struct (ALWAYS compare deep equal, use defensive copy so that changes in object are detected)
+* mobservable.struct (ALWAYS compare deep equal, use defensive copy so that changes in object are detected). Wrap in Struct() object?
 * mobservable.computedStruct
+* observable annotation on methods should define a method instead of a property (e.g. order.total() instead of order.total)
+* update fiddle to master
+
+0.6
+* implement .liveFilter, .liveMap, .liveSlice, .liveSort
+* add `thisArg` to all methods that accept a function
 
 Later
 
