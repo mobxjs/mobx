@@ -37,7 +37,7 @@ interface IMObservableStatic {
     debugLevel: number;
     SimpleEventEmitter: new()=> ISimpleEventEmitter;
     
-    ReactObservingMixin: {
+    ObserverMixin: {
         componentWillMount();
         componentWillUnmount();
     }

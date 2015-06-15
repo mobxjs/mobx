@@ -36,7 +36,7 @@ interface IMObservableStatic {
     debugLevel: number;
     SimpleEventEmitter: new()=> ISimpleEventEmitter;
     
-    ReactObservingMixin: {
+    ObserverMixin: {
         componentWillMount();
         componentWillUnmount();
     }
@@ -971,7 +971,7 @@ class Scheduler {
     }
 }
 
-mobservableStatic.ReactObservingMixin = {
+mobservableStatic.ObserverMixin = {
     componentWillMount: function() {
         var baseRender = this.render;
         this.render = function() {

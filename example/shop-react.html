@@ -65,7 +65,7 @@
          * UI logic
          */
         var ShopDemoView = React.createClass({
-            mixins: [mobservable.ReactObservingMixin],
+            mixins: [mobservable.ObserverMixin],
             
             render: function() {
                 return (<table>
@@ -84,7 +84,7 @@
         }); 
          
         var ArticlesView = React.createClass({
-            mixins: [mobservable.ReactObservingMixin],
+            mixins: [mobservable.ObserverMixin],
             
             render: function() {
                 function renderArticle(article) {
@@ -102,7 +102,7 @@
         });
         
         var ArticleView = React.createClass({
-            mixins: [mobservable.ReactObservingMixin],
+            mixins: [mobservable.ObserverMixin],
             
             render: function() {
                 return (<li>
@@ -130,7 +130,7 @@
         });
         
         var CartView = React.createClass({
-            mixins: [mobservable.ReactObservingMixin],
+            mixins: [mobservable.ObserverMixin],
             
             render: function() {
                 function renderEntry(entry) {
@@ -144,7 +144,7 @@
         });
 
         var CartEntryView = React.createClass({
-            mixins: [mobservable.ReactObservingMixin],
+            mixins: [mobservable.ObserverMixin],
             
             render: function() {
                 return (<li>

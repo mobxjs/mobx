@@ -757,6 +757,25 @@ var mobservable;
         Scheduler.tasks = [];
         return Scheduler;
     })();
+    mobservable.mobservableStatic.ObserverMixin = {
+        componentWillMount: function () {
+            var baseRender = this.render;
+            this.render = function () {
+                var _this = this;
+                if (this._watchDisposer)
+                    this._watchDisposer();
+                var _a = mobservable.mobservableStatic.watch(function () { return baseRender.call(_this); }, function () {
+                    _this.forceUpdate();
+                }), rendering = _a[0], disposer = _a[1];
+                this._watchDisposer = disposer;
+                return rendering;
+            };
+        },
+        componentWillUnmount: function () {
+            if (this._watchDisposer)
+                this._watchDisposer();
+        }
+    };
     function quickDiff(current, base) {
         if (!base.length)
             return [current, []];
