@@ -51,11 +51,22 @@ li {
 }
 
 button {
-	float: right;
+	margin: 0px 5px;
+}
+
+td:first-child button {
+	float:right;
 }
 
 .price {
 	float: right;
 	font-style: italic;
 	margin-right: 10px;
+}
+
+.logview {
+	background-color: #e2e2e2;
+	font-size: 10pt;
+	color: black;
+	padding: 10px 40px;
 }

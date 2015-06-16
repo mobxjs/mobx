@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <head>
-	<link type="text/css" rel="stylesheet" href="test.css" />
+	<link type="text/css" rel="stylesheet" href="style/test.css" />
 </head>
 <body>
     <div id="container">
@@ -8,16 +8,20 @@
             <h1>MOBservable + React shopping cart demo</h1>
             <a href="https://github.com/mweststrate/mobservable">Github repo</a>
         </div>
-        <div id="mount" />
+        <div id="mount"></div>
+        <div class="logview" id="logview">Rendering history:<br/></div>
+        <button onClick="document.getElementById('logview').innerHTML = '';" style="float:right">clear</button>
     </div>
     <script src="../dist/mobservable.js"></script>
-    <script src="react/react.min.js"></script>
-    <script src="react/JSXTransformer.js"></script>
+    <script src="lib/react-with-addons.js"></script>
+    <script src="lib/JSXTransformer.js"></script>
     <script>
+        var autoNumber = 0;
         /**
          * Data model
          */
         function Article(name, price) {
+            this.id = ++autoNumber; // UUID for this article
             mobservable.props(this, {
                 name: name,
                 price: price
@@ -25,6 +29,7 @@
         }
 
         function ShoppingCartEntry(article) {
+            this.id = ++autoNumber; // UUID for this entry
             mobservable.props(this, {
                 article: article,
                 amount: 1,
@@ -65,9 +70,10 @@
          * UI logic
          */
         var ShopDemoView = React.createClass({
-            mixins: [mobservable.ObserverMixin],
+            mixins: [mobservable.ObserverMixin, React.addons.PureRenderMixin],
             
             render: function() {
+                log("Rendering ShopDemoView");
                 return (<table>
                         <tr>
                             <td>
@@ -84,14 +90,15 @@
         }); 
          
         var ArticlesView = React.createClass({
-            mixins: [mobservable.ObserverMixin],
+            mixins: [mobservable.ObserverMixin, React.addons.PureRenderMixin],
             
             render: function() {
+                log("Rendering ArticlesView");
                 function renderArticle(article) {
-                    return (<ArticleView article={article} />);
+                    return (<ArticleView article={article} key={article.id} />);
                 }
                 return (<div>
-                        <button id="new-article" onClick={this.newArticleClick}>New article</button>
+                        <button id="new-article" onClick={this.newArticleClick}>new article</button>
                         <ul id="articles">{this.props.articles.map(renderArticle)}</ul>
                     </div>)
             },
@@ -102,12 +109,13 @@
         });
         
         var ArticleView = React.createClass({
-            mixins: [mobservable.ObserverMixin],
+            mixins: [mobservable.ObserverMixin, React.addons.PureRenderMixin],
             
             render: function() {
+                log("Rendering ArticleView " + this.props.article.id);
                 return (<li>
                     <span>{this.props.article.name}</span>
-                    <button onClick={this.onAddArticle}>add</button>
+                    <button onClick={this.onAddArticle}>&raquo;</button>
                     <button onClick={this.onEditArticle}>edit</button>
                     <span className="price">{this.props.article.price}</span>
                 </li>);
@@ -130,11 +138,12 @@
         });
         
         var CartView = React.createClass({
-            mixins: [mobservable.ObserverMixin],
+            mixins: [mobservable.ObserverMixin, React.addons.PureRenderMixin],
             
             render: function() {
+                log("Rendering CartView");
                 function renderEntry(entry) {
-                    return (<CartEntryView entry={entry} />);
+                    return (<CartEntryView entry={entry} key={entry.id} />);
                 }
                 return (<div>
                     <ul id="cart">{this.props.cart.entries.map(renderEntry)}</ul>
@@ -144,11 +153,12 @@
         });
 
         var CartEntryView = React.createClass({
-            mixins: [mobservable.ObserverMixin],
+            mixins: [mobservable.ObserverMixin, React.addons.PureRenderMixin],
             
             render: function() {
+                log("Rendering CartEntryView " + this.props.entry.id);
                 return (<li>
-                    <button onClick={this.removeArticle}>remove</button>
+                    <button onClick={this.removeArticle}>&laquo;</button>
                     <span>{this.props.entry.article.name}</span>
                     <span className="price">{this.props.entry.amount}</span>
                 </li>);
@@ -161,5 +171,9 @@
         });
         
          React.render(<ShopDemoView articles={articles} cart={shoppingCart} />, document.getElementById("mount"));
+         
+         function log(line) {
+            document.getElementById('logview').innerHTML += line + '<br/>';
+         }
     </script>
 </body>
