@@ -603,7 +603,7 @@ class DNode {
             throw new Error("Cannot dispose DNode; it is still being observed");
         for(var l=this.observing.length, i=0; i<l; i++)
             this.observing[i].removeObserver(this);
-        this.observing = [];
+        this.observing = null;
         this.isDisposed = true;
     }
 }
@@ -841,8 +841,8 @@ class ObservableArray<T> extends StubArray implements IObservableArray<T> {
     }
 
     private sideEffectWarning(funcName:string) {
-        if (DNode.trackingStack.length > 0)
-            warn(`[Mobservable.Array] The method array.${funcName} should not be used inside observable functions since it has side-effects`);
+        if (mobservableStatic.debugLevel > 0 && DNode.trackingStack.length > 0)
+            warn(`[Mobservable.Array] The method array.${funcName} should probably not be used inside observable functions since it has side-effects`);
     }
     
     static OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
@@ -880,7 +880,7 @@ class ObservableArray<T> extends StubArray implements IObservableArray<T> {
     }
 
     static reserveArrayBuffer(max:number) {
-        for (var index = ObservableArray.OBSERVABLE_ARRAY_BUFFER_SIZE; index <= max; index++)
+        for (var index = ObservableArray.OBSERVABLE_ARRAY_BUFFER_SIZE; index < max; index++)
             ObservableArray.createArrayBufferItem(index);
         ObservableArray.OBSERVABLE_ARRAY_BUFFER_SIZE = max;
     }
