@@ -6,59 +6,51 @@
 <body>
     <div id="container">
         <div id="header">
-            <h1>MOBservable + React shopping cart demo</h1>
+            <h1>React shopping cart demo without observables</h1>
             <a href="https://github.com/mweststrate/mobservable">Github repo</a>
         </div>
         <div id="mount"></div>
-        <div class="logview" id="logview">Rendering history:<br/></div>
-        <button onClick="document.getElementById('logview').innerHTML = '';" style="float:right">clear</button>
     </div>
-    <script src="../dist/mobservable.js"></script>
     <script src="lib/react-with-addons.js"></script>
     <script src="lib/JSXTransformer.js"></script>
     <script>
         var autoNumber = 0;
+        
         /**
          * Data model
          */
         function Article(name, price) {
             this.id = ++autoNumber; // UUID for this article
-            mobservable.props(this, {
-                name: name,
-                price: price
-            });
+            this.name = name;
+            this.price = price;
         }
 
         function ShoppingCartEntry(article) {
             this.id = ++autoNumber; // UUID for this entry
-            mobservable.props(this, {
-                article: article,
-                amount: 1,
-                price: function() {
-                    return this.article ? this.article.price * this.amount : 0;
-                }
-            });
+            this.article = article;
+            this.amount = 1;
         }
+        ShoppingCartEntry.prototype.price = function() {
+            return this.article ? this.article.price * this.amount : 0;
+        };
 
         function ShoppingCart() {
-            mobservable.props(this, {
-                entries: [],
-                total: function() {
-                    return this.entries.reduce(function(sum, entry) {
-                        return sum + entry.price;
-                    }, 0);
-                }
-            });
+            this.entries = [];
         }
+        ShoppingCart.prototype.total = function() {
+            return this.entries.reduce(function(sum, entry) {
+                return sum + entry.price();
+            }, 0);
+        };
 
         // Some available articles
-        var articles = mobservable.array([
+        var articles = [
             ["Funny Bunnies", 17.63],
             ["Awesome React", 23.95],
             ["Second hand Netbook", 50.00]
         ].map(function(e) {
             return new Article(e[0], e[1]);
-        }));
+        });
 
         // Our shopping cart
         var shoppingCart = new ShoppingCart();
@@ -70,11 +62,19 @@
         /**
          * UI logic
          */
+         
+        var onRefresh;
+        // helper function to repaint the whole UI
+        function updateUI() {
+            onRefresh();
+        }
+        
         var ShopDemoView = React.createClass({
-            mixins: [mobservable.ObserverMixin, React.addons.PureRenderMixin],
+            componentDidMount: function() {
+                onRefresh = this.forceUpdate.bind(this);
+            },
             
             render: function() {
-                log("Rendering ShopDemoView");
                 return (<table>
                         <tr>
                             <td>
@@ -91,10 +91,7 @@
         }); 
          
         var ArticlesView = React.createClass({
-            mixins: [mobservable.ObserverMixin, React.addons.PureRenderMixin],
-            
             render: function() {
-                log("Rendering ArticlesView");
                 function renderArticle(article) {
                     return (<ArticleView article={article} key={article.id} />);
                 }
@@ -106,14 +103,12 @@
             
             newArticleClick: function() {
                 this.props.articles.push(new Article(prompt("Article name"), prompt("Price (please fill in a number)")));
+                updateUI();
             }
         });
         
         var ArticleView = React.createClass({
-            mixins: [mobservable.ObserverMixin, React.addons.PureRenderMixin],
-            
             render: function() {
-                log("Rendering ArticleView " + this.props.article.id);
                 return (<li>
                     <span>{this.props.article.name}</span>
                     <button onClick={this.onAddArticle}>&raquo;</button>
@@ -123,41 +118,40 @@
             },
             
             onAddArticle: function() {
-                var existingEntry = shoppingCart.entries.find(function(entry) {
-                    return entry.article === this.props.article;
-                }, this);
+                var existingEntry;
+                for (var i = 0; i < shoppingCart.entries.length; i++)
+                    if (shoppingCart.entries[i].article === this.props.article) {
+                        existingEntry = shoppingCart.entries[i];
+                        break;
+                    }
                 if (existingEntry)
                     existingEntry.amount += 1;
                 else
                     shoppingCart.entries.unshift(new ShoppingCartEntry(this.props.article));
+                updateUI();
             },
             
             onEditArticle: function() {
                 this.props.article.name = prompt("New name", this.props.article.name);
                 this.props.article.price = parseInt(prompt("New price", this.props.article.price), 10);
+                updateUI();
             }
         });
         
         var CartView = React.createClass({
-            mixins: [mobservable.ObserverMixin, React.addons.PureRenderMixin],
-            
             render: function() {
-                log("Rendering CartView");
                 function renderEntry(entry) {
                     return (<CartEntryView entry={entry} key={entry.id} />);
                 }
                 return (<div>
                     <ul id="cart">{this.props.cart.entries.map(renderEntry)}</ul>
-                    <div><b>Total: <span id="total">{("€ " + this.props.cart.total).replace(/(\.\d\d)\d*/,"$1")}</span></b></div>
+                    <div><b>Total: <span id="total">{("€ " + this.props.cart.total()).replace(/(\.\d\d)\d*/,"$1")}</span></b></div>
                 </div>)
             } 
         });
 
         var CartEntryView = React.createClass({
-            mixins: [mobservable.ObserverMixin, React.addons.PureRenderMixin],
-            
             render: function() {
-                log("Rendering CartEntryView " + this.props.entry.id);
                 return (<li>
                     <button onClick={this.removeArticle}>&laquo;</button>
                     <span>{this.props.entry.article.name}</span>
@@ -167,14 +161,11 @@
             
             removeArticle: function() {
                 if (--this.props.entry.amount < 1)
-                    shoppingCart.entries.splice(shoppingCart.entries.indexOf(this.props.entry), 1);      
+                    shoppingCart.entries.splice(shoppingCart.entries.indexOf(this.props.entry), 1);
+                updateUI();      
             }
         });
         
          React.render(<ShopDemoView articles={articles} cart={shoppingCart} />, document.getElementById("mount"));
-         
-         function log(line) {
-            document.getElementById('logview').innerHTML += line + '<br/>';
-         }
     </script>
 </body>
