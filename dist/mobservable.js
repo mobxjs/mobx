@@ -426,7 +426,7 @@ var mobservable;
                 throw new Error("Cannot dispose DNode; it is still being observed");
             for (var l = this.observing.length, i = 0; i < l; i++)
                 this.observing[i].removeObserver(this);
-            this.observing = [];
+            this.observing = null;
             this.isDisposed = true;
         };
         DNode.trackingStack = [];
@@ -633,8 +633,8 @@ var mobservable;
             }).apply(this, initialArgs);
         };
         ObservableArray.prototype.sideEffectWarning = function (funcName) {
-            if (DNode.trackingStack.length > 0)
-                warn("[Mobservable.Array] The method array." + funcName + " should not be used inside observable functions since it has side-effects");
+            if (mobservable.mobservableStatic.debugLevel > 0 && DNode.trackingStack.length > 0)
+                warn("[Mobservable.Array] The method array." + funcName + " should probably not be used inside observable functions since it has side-effects");
         };
         ObservableArray.createArrayBufferItem = function (index) {
             var prop = {
@@ -667,7 +667,7 @@ var mobservable;
             ObservableArray.ENUMERABLE_PROPS[index] = prop;
         };
         ObservableArray.reserveArrayBuffer = function (max) {
-            for (var index = ObservableArray.OBSERVABLE_ARRAY_BUFFER_SIZE; index <= max; index++)
+            for (var index = ObservableArray.OBSERVABLE_ARRAY_BUFFER_SIZE; index < max; index++)
                 ObservableArray.createArrayBufferItem(index);
             ObservableArray.OBSERVABLE_ARRAY_BUFFER_SIZE = max;
         };

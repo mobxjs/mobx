@@ -13,9 +13,9 @@
         <div class="logview" id="logview">Rendering history:<br/></div>
         <button onClick="document.getElementById('logview').innerHTML = '';" style="float:right">clear</button>
     </div>
-    <script src="../dist/mobservable.js"></script>
     <script src="lib/react-with-addons.js"></script>
     <script src="lib/JSXTransformer.js"></script>
+    <script src="../dist/mobservable.js"></script>
     <script>
         var autoNumber = 0;
         /**
@@ -66,7 +66,7 @@
         shoppingCart.entries.push(new ShoppingCartEntry(articles[0]));
         
     </script>
-    <script type="text/jsx">
+    <script type="text/jsx">        
         /**
          * UI logic
          */
@@ -76,6 +76,12 @@
             render: function() {
                 log("Rendering ShopDemoView");
                 return (<table>
+                        <tr>
+                            <td colSpan="2">
+                                <button onClick={this.update}>update some items</button>
+                                <button onClick={this.generate}>create a lot of items</button>
+                            </td>
+                        </tr>
                         <tr>
                             <td>
                                 <h2>Availale items</h2>
@@ -87,7 +93,26 @@
                             </td>
                         </tr>
                     </table>)
-            }            
+            },
+            
+            generate: function() {
+                var amount = parseInt(prompt("How many articles and entries should be created?", 1000));
+                measure();
+                for(var i = 0; i < amount; i++) {
+                    var art = new Article("Generated item " + articles.length, articles.length);
+                    articles.push(art);
+                    shoppingCart.entries.push(new ShoppingCartEntry(art));
+                }
+            },
+            
+            update: function() {
+                measure();
+                for(var i = 0; i < 10; i++) {
+                    var article = articles[Math.floor(Math.random() * articles.length)];
+                    article.name += "x";
+                    article.price += 1;
+                }
+            }
         }); 
          
         var ArticlesView = React.createClass({
@@ -148,9 +173,17 @@
                 }
                 return (<div>
                     <ul id="cart">{this.props.cart.entries.map(renderEntry)}</ul>
-                    <div><b>Total: <span id="total">{("€ " + this.props.cart.total).replace(/(\.\d\d)\d*/,"$1")}</span></b></div>
+                    <CartTotalView cart={this.props.cart} />
                 </div>)
             } 
+        });
+        
+        var CartTotalView = React.createClass({
+            mixins: [mobservable.ObserverMixin, React.addons.PureRenderMixin],
+            
+            render: function() {
+                return (<div><b>Total: <span id="total">{("€ " + this.props.cart.total).replace(/(\.\d\d)\d*/,"$1")}</span></b></div>);
+            }
         });
 
         var CartEntryView = React.createClass({
@@ -171,10 +204,30 @@
             }
         });
         
-         React.render(<ShopDemoView articles={articles} cart={shoppingCart} />, document.getElementById("mount"));
+        React.render(<ShopDemoView articles={articles} cart={shoppingCart} />, document.getElementById("mount"));
+
+        /*
+         * Demo / Test utilities
+         */         
+        var Perf = React.addons.Perf;
+        var logEnabled = true;
+
+        function log(line) {
+            if (logEnabled)
+                document.getElementById('logview').innerHTML += line + '<br/>';
+        }
          
-         function log(line) {
-            document.getElementById('logview').innerHTML += line + '<br/>';
-         }
+        function measure() {
+            log("Running performance test, results will be printed in the developers console after 10 second. (F12)");
+            logEnabled = false;
+            Perf.start();
+            setTimeout(function() {
+                Perf.stop();
+                Perf.printInclusive();
+                Perf.printWasted();               
+                logEnabled = true;
+                log("Results has been printed to the console");
+            });
+        }
     </script>
 </body>

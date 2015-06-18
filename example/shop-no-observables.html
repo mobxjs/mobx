@@ -77,6 +77,12 @@
             render: function() {
                 return (<table>
                         <tr>
+                            <td colSpan="2">
+                                <button onClick={this.update}>update some items</button>
+                                <button onClick={this.generate}>create a lot of items</button>
+                            </td>
+                        </tr>
+                        <tr>
                             <td>
                                 <h2>Availale items</h2>
                                 <ArticlesView articles={this.props.articles} />
@@ -87,9 +93,31 @@
                             </td>
                         </tr>
                     </table>)
-            }            
+            },
+            
+            generate: function() {
+                var amount = parseInt(prompt("How many articles and entries should be created?", 1000));
+                measure();
+                for(var i = 0; i < amount; i++) {
+                    var art = new Article("Generated item " + articles.length, articles.length);
+                    articles.push(art);
+                    shoppingCart.entries.push(new ShoppingCartEntry(art));
+                }
+                updateUI();
+            },
+            
+            update: function() {
+                measure();
+                var start = +new Date;
+                for(var i = 0; i < 10; i++) {
+                    var article = articles[Math.floor(Math.random() * articles.length)];
+                    article.name += "x";
+                    article.price += 1;
+                }
+                updateUI();
+            }
         }); 
-         
+
         var ArticlesView = React.createClass({
             render: function() {
                 function renderArticle(article) {
@@ -167,5 +195,20 @@
         });
         
          React.render(<ShopDemoView articles={articles} cart={shoppingCart} />, document.getElementById("mount"));
+         
+        /*
+         * Demo / Test utilities
+         */         
+        var Perf = React.addons.Perf;
+
+        function measure() {
+            alert("Running performance test, results will be printed in the developers console after 10 second. (F12)");
+            Perf.start();
+            setTimeout(function() {
+                Perf.stop();
+                Perf.printInclusive();
+                Perf.printWasted();               
+            },10000);
+        }
     </script>
 </body>
