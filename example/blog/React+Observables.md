@@ -136,7 +136,7 @@ Well, that is pretty straight forward. Just add mixin `mobservable.ObserverMixin
 
 ```javascript
 var CartEntryView = React.createClass({
-    mixins: [mobservable.ObserverMixin, React.addons.Pure-RenderMixin],
+    mixins: [mobservable.ObserverMixin, React.addons.PureRenderMixin],
     render: function() {
         return (<li>
             // etc...
@@ -156,7 +156,7 @@ Just play around in the example app, and while doing that, keep an eye on the lo
 * ... etc. You will notice that with each action, the minimum amount of components will be re-rendered.
 
 Finally, since each component tracks its own dependencies, there is usually no need to explicitly re-render the children of a component. 
-For example, if the total of the shopping cart is re-rendered, there is no need to re-render the entries as well. React's own *Pure-RenderMixin* makes sure that that doesn't happen.
+For example, if the total of the shopping cart is re-rendered, there is no need to re-render the entries as well. React's own *PureRenderMixin* makes sure that that doesn't happen.
 
 ## The numbers
 
@@ -185,28 +185,38 @@ For comparison, here is the same image with observables:
 That is a big difference! Instead of re-rendering 20006 components, only 31 components are re-rendered. And more importantly, there is no waste reported!
 That means that each and every re-rendered component actually changed something in the DOM. That is exactly what we intended to achieve by using observables!
 
+From the report, it becomes clear that most remaining rendering time, 243 of the total 267 milliseconds, is spend in rendering the CartView, 
+which is re-rendered just to refresh the total costs of the cart. 
+However re-rendering the CartView also implies that all ten thousand entries are revisited to see if any of the arguments to the CartEntryViews did change.
+So by simple putting the total of the CartView in its own component, CartTotalView, the whole rendering of the CartView can be skipped if just the total costs changes.
+This drops our rendering time even further to about 60 milliseconds (see the 'optimized' series in the chart above).
+Thats roughly 40 times faster than the same update in our vanilla React app! 
+
 ## Conclusion
 
 By using observables we built an application that is an order of magnitude faster than the same app that naively re-renders all components.
-And as important (for you as a programmer), we did this without compromising the maintainability of the code. 
+And, as important (for you as a programmer), we did this without compromising the maintainability of the code. 
 Just take a look at the source code of the two JSFiddles linked above, the two listings are very similar and are both equally convenient to work with.
 
 Could we have achieved the same with other techniques? Probably. 
 For instance there is ImmutableJS which also makes the React rendering very fast by only updating that receive changed data.
 However, you have to do much larger concession on your data model. 
-After all, imho, mutable classes are in the end a tat more convenient to work with than their immutable counterparts.
-(But I strongly advise to still use controllers that alter data, even with observables, to keep the separation of concerns clear).
+After all, imho, mutable classes are in the end a tad more convenient to work with than their immutable counterparts.
+Besides, the immutable data structures do not help you to keep your calculated values up to date.
+This means for example that when using immutable data, changing the name of an article would really fast rerender the ArticleView, 
+but still not invalidate any existing CartEntryViews that refers to the same article. 
+I do however strongly advise to still use controllers (or stores) that maintain and alter your data model, even with observables, to keep the separation of concerns clear.
 
-You can also create events for each possible mutation, and register listeners (and unsubscribe those again!) at the proper moments and in the proper components.
+Another technique one can apply to optimize a React app is to create events for each possible mutation in the data and (un)register listeners for those events at the proper moments in time and in the proper components.
 But this results in tons of boiler-plate code which is error-prone to maintain.
 Besides, I tend to think I'm just too lazy to do such things.
 
-So for me, I'll gonna leave the hard work to React and Observables, and focus on the interesting parts of coding :).
+So for me, I'll gonna leave the hard work of figuring out when and how to update the UI as fast as possible to React and Observables, and focus on the interesting parts of coding :).
 
 ## Resources
 
-[MOBservable library](https://github.com/mweststrate/mobservable)
-[React performance guide](https://facebook.github.io/react/docs/advanced-performance.html)
-[Shopping cart demo, React with Observables](https://jsfiddle.net/mweststrate/vxn7qgdw/)
-[Shopping cart demo, React without Observables](https://jsfiddle.net/mweststrate/46vL0phw/)
-[Shopping cart demo, JQuery with Observables](https://jsfiddle.net/mweststrate/wr2hcdwL)
+* [MOBservable library](https://github.com/mweststrate/mobservable)
+* [React performance guide](https://facebook.github.io/react/docs/advanced-performance.html)
+* [Shopping cart demo, React with Observables](https://jsfiddle.net/mweststrate/46vL0phw/)
+* [Shopping cart demo, React without Observables](https://jsfiddle.net/mweststrate/wr2hcdwL)
+* [Shopping cart demo, JQuery with Observables](https://jsfiddle.net/mweststrate/vxn7qgdw/)
