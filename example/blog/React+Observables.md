@@ -1,6 +1,6 @@
-# A Reactive React for building high performance, easy maintainable projects
+# Making React reactive; the pursuit of high performing and easy maintainable projects
 
-How to build blazing fast react apps?
+How to build blazing fast web apps?
 Since recently, we started using React in one of our large scale projects and React has helped us big time thanks to its structured way of building components and its fast virtual DOM that saves tons of UI updates.
 The beauty of this project is that it has quite some nice challenges; it needs to draw thousands of objects in the browser and these objects are highly coupled to each other. 
 Values of one object might be used in an arbitrarily amount of other objects so a small changes might require updates in many unrelated parts of the UI.
@@ -17,7 +17,7 @@ We figured out that if all our model objects become *Observables* and all our Re
 we don't need to apply any further magic to make sure the relevant part, and only the relevant part, of our UI gets updated.
 Read on to see all the awesomeness unrevealed. There are even numbers near the end!
 
-Lets start with a contrived example to make this all a lot less theoretically (or fussy if you prefer). 
+Lets start with a contrived example to make this all a lot less theoretically (or less fussy if you prefer). 
 Imagine a react app that represents a small shop. There are some articles, and there is a shopping cart in which you can put some of these articles.
 Something like this:
 
@@ -30,8 +30,7 @@ Poof, [there](https://jsfiddle.net/mweststrate/46vL0phw/embedded/result/) it is 
 For starters, lets define the data model. There are articles with a name and price and there is a shopping cart with a total cost, which is based on the sum of its entries. 
 Each entry refers to an article, stores an amount and has a derived price. 
 The relations within our data model are visualized below. 
-Open bullets represent derived date, that should be updated if some other data changes and so should its representation in the UI.
-So even in this simple model a lot of data is flowing around, and that a lot of UI updates are required when stuff changes.
+Open bullets represent derived data, that should be updated if related data changes and as a result the corresponding UI parts should be updated as well.
 
 ![data model](model.png) 
 
@@ -160,7 +159,7 @@ For example, if the total of the shopping cart is re-rendered, there is no need 
 
 ## The numbers
 
-So what did we achieve? For comparison purposes, [here](https://jsfiddle.net/mweststrate/46vL0phw/) you can find the exact same app but without observables and a naive 're-render-all-the-things' approach.
+So what did we achieve? For comparison purposes, [here](https://jsfiddle.net/mweststrate/wr2hcdwL/) you can find the exact same app but without observables and a naive 're-render-all-the-things' approach.
 With only a few articles you won't notice any difference, but once the number of articles is ramped up, the difference in performance becomes really significant.
 
 ![Creating & rendering articles](creating_articles.png)
@@ -171,25 +170,25 @@ But once data is changed, the observables really start to shine.
 Updating 10 articles in a collection of 10.000 items is approximately ten times faster! 2.5 seconds dropped to 250 milliseconds. 
 That is the difference between a lagging and a non-lagging experience.
 Where does this difference come from? 
-Lets first take a look at the React render rapports after running the updates in the 'update 10 articles in a list of 1000' scenarios without observables:
+Lets first take a look at the React render reports after running the updates in the 'update 10 articles in a list of 10000' scenario without observables:
 
 ![React report without observables](update_10000_p.png)
 
-As you can see, all twenty thousand ArticleViews and CartEntryViews are re-rendered. However, according to react 2145 of the total of 2433 milliseconds of rendering where wasted.
+As you can see, all twenty thousand ArticleViews and CartEntryViews are re-rendered. However, according to react 2145 of the total of 2433 milliseconds of rendering time were wasted.
 Wasted means: time that was spent on executing render functions that did not actually result in an update of the real DOM.
 This strongly suggests that naively re-rendering everything is a big waste of CPU time if there are many components. 
-For comparison, here is the same image with observables:
+For comparison, here is the report of the same scenario when observables are used:
 
 ![React report with observables](update_10000_m.png)
 
 That is a big difference! Instead of re-rendering 20006 components, only 31 components are re-rendered. And more importantly, there is no waste reported!
 That means that each and every re-rendered component actually changed something in the DOM. That is exactly what we intended to achieve by using observables!
 
-From the report, it becomes clear that most remaining rendering time, 243 of the total 267 milliseconds, is spend in rendering the CartView, 
+From the report, it becomes clear that most remaining of the rendering time, 243 of the total 267 milliseconds, is spend in rendering the CartView, 
 which is re-rendered just to refresh the total costs of the cart. 
 However re-rendering the CartView also implies that all ten thousand entries are revisited to see if any of the arguments to the CartEntryViews did change.
 So by simple putting the total of the CartView in its own component, CartTotalView, the whole rendering of the CartView can be skipped if just the total costs changes.
-This drops our rendering time even further to about 60 milliseconds (see the 'optimized' series in the chart above).
+This drops our rendering time even further to roughly 60 milliseconds (see the 'optimized' series in the chart above).
 Thats roughly 40 times faster than the same update in our vanilla React app! 
 
 ## Conclusion
@@ -198,20 +197,21 @@ By using observables we built an application that is an order of magnitude faste
 And, as important (for you as a programmer), we did this without compromising the maintainability of the code. 
 Just take a look at the source code of the two JSFiddles linked above, the two listings are very similar and are both equally convenient to work with.
 
-Could we have achieved the same with other techniques? Probably. 
-For instance there is ImmutableJS which also makes the React rendering very fast by only updating that receive changed data.
+Could we have achieved the same with other techniques? Maybe. 
+For instance there is ImmutableJS which also makes the React rendering very fast by only updating components that receive changed data.
 However, you have to do much larger concession on your data model. 
 After all, imho, mutable classes are in the end a tad more convenient to work with than their immutable counterparts.
 Besides, the immutable data structures do not help you to keep your calculated values up to date.
-This means for example that when using immutable data, changing the name of an article would really fast rerender the ArticleView, 
+So with immutable data, changing the name of an article would really fast re-render the ArticleView, 
 but still not invalidate any existing CartEntryViews that refers to the same article. 
-I do however strongly advise to still use controllers (or stores) that maintain and alter your data model, even with observables, to keep the separation of concerns clear.
 
 Another technique one can apply to optimize a React app is to create events for each possible mutation in the data and (un)register listeners for those events at the proper moments in time and in the proper components.
 But this results in tons of boiler-plate code which is error-prone to maintain.
 Besides, I tend to think I'm just too lazy to do such things.
 
-So for me, I'll gonna leave the hard work of figuring out when and how to update the UI as fast as possible to React and Observables, and focus on the interesting parts of coding :).
+By the way, I do strongly advise to use controllers or action dispatchers as an abstraction around updating your model data to keep the separation of concerns clear in your project.
+
+To conclude, in large projects combining React with Observables worked so well that sometimes I saw data mutations correctly updating the UI in corner cases I did not even think of yet, without hitting any performance issues. So for me, I'll gonna leave the hard work of figuring out when and how to update the UI as fast as possible to React and Observables, and focus on the interesting parts of coding :).
 
 ## Resources
 
