@@ -20,38 +20,6 @@
     - do not wrap around .value in .props, to use save some closures 
     - create dnode.observers / observing lazy, to save memory?
     
-0.4
-* ~~License~~
-* ~~implement array.sort & reverse properly, they do change the array~~
-* ~~drop mobservable.onReady / onceReady?~~
-* ~~clean up / clarify properties / annotations code~~
-* ~~drop initializeObservableProperties -> turnObservablesIntoProperties ~~
-* ~~introduce .props(target, prop, value), .props(props), .props(target, ...props)~~
-* ~~use disposable like RxJs? -> NO ~~
-* ~~props should create real observable array~~
-* ~~value for array, + set -> replace~~
-* ~~check nested watches! inner watch should not reevaluate outer watch, introduce DNode.unobserved that swaps out trackingstack?~~
-* ~~rename .prop. -> .impl.~~
-* ~~replace instanceof observableValue checks with isObservable, isWrappedObservable~~
-* ~~introduce createGetterSetter on all implementations~~
-* ~~make properties non-configurable~~
-* ~~helpers .variable, computed, array~~
-* ~~introduce IGetter / ISetter interfaces, or create getter setter for array~~
-* ~~perf tests~~
-* ~~test .value etc~~
-* ~~removed .bind, it is slow!~~
-* ~~watchClass~~
-* ~~move out scheduler check stuff..~~
-* ~~check batching~~
-* ~~check closure usages for scheduler.schedule~~
-* ~~no source map for dist!~~
-* ~~fiddle demo~~
-* ~~update apidocs~~
-* react mixin, https://medium.com/@dan_abramov/mixins-are-dead-long-live-higher-order-components-94a0d2f9e750
-* react fiddle demo
-* ~~test with webmodeler~~
-* blog posts
-
 0.5
 * ~~browser based tests~~
 * ~~fix instanceof array~~
@@ -60,8 +28,8 @@
 * ~~minify~~
 * mobservable.struct (ALWAYS compare deep equal, use defensive copy so that changes in object are detected). Wrap in Struct() object?
 * mobservable.computedStruct
-* observable annotation on methods should define a method instead of a property (e.g. order.total() instead of order.total)
-* update fiddle to master
+* observable annotation on methods should define a method instead of a property (e.g. order.total() instead of order.total) for type soudness with its original?
+* ~~update fiddle to master~~
 
 0.6
 * implement .liveFilter, .liveMap, .liveSlice, .liveSort
