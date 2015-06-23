@@ -51,3 +51,19 @@ export function testAnnotations(test) {
 
     test.done();
 };
+
+export function testTyping(test) {
+    var ar:Mobservable.IObservableArray<number> = mobservable.array([1,2]);
+    ar.observe((d:Mobservable.IArrayChange<number>|Mobservable.IArraySplice<number>) => {
+        console.log(d.type);
+    });
+    
+    var ar2:Mobservable.IObservableArray<number> = mobservable([1,2]);
+    ar2.observe((d:Mobservable.IArrayChange<number>|Mobservable.IArraySplice<number>) => {
+        console.log(d.type);
+    });
+    
+    var x:Mobservable.IObservableValue<number> = mobservable(3);
+    
+    test.done();
+}

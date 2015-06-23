@@ -3,18 +3,19 @@
  * (c) 2015 - Michel Weststrate
  * https://github.com/mweststrate/mobservable
  */
+
 interface IMObservableStatic {
     // ways of creating observables. 
-    <T>(value?:T[]):IObservableArray<T>;
-    <T>(value?:T|{():T}, scope?:Object):IObservableValue<T>;
+    <T>(value?:T[]):Mobservable.IObservableArray<T>;
+    <T>(value?:T|{():T}, scope?:Object):Mobservable.IObservableValue<T>;
     
-    value<T>(value?:T[]):IObservableArray<T>;
-    value<T>(value?:T|{():T}, scope?:Object):IObservableValue<T>;
+    value<T>(value?:T[]):Mobservable.IObservableArray<T>;
+    value<T>(value?:T|{():T}, scope?:Object):Mobservable.IObservableValue<T>;
     
-    array<T>(values?:T[]):IObservableArray<T>;
-    primitive<T>(value?:T):IObservableValue<T>;
-    reference<T>(value?:T):IObservableValue<T>;
-    computed<T>(value:()=>T,scope?):IObservableValue<T>;
+    array<T>(values?:T[]):Mobservable.IObservableArray<T>;
+    primitive<T>(value?:T):Mobservable.IObservableValue<T>;
+    reference<T>(value?:T):Mobservable.IObservableValue<T>;
+    computed<T>(value:()=>T,scope?):Mobservable.IObservableValue<T>;
 
     // create observable properties
     props(object:Object, name:string, initalValue: any);
@@ -26,15 +27,15 @@ interface IMObservableStatic {
     toPlainValue<T>(any:T):T;
 
     // observe observables
-    observeProperty(object:Object, key:string, listener:Function, invokeImmediately?:boolean):Lambda;
-    watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda];
+    observeProperty(object:Object, key:string, listener:Function, invokeImmediately?:boolean):Mobservable.Lambda;
+    watch<T>(func:()=>T, onInvalidate:Mobservable.Lambda):[T,Mobservable.Lambda];
     
     // change a lot of observables at once
     batch<T>(action:()=>T):T;
 
     // Utils
     debugLevel: number;
-    SimpleEventEmitter: new()=> ISimpleEventEmitter;
+    SimpleEventEmitter: new()=> Mobservable.ISimpleEventEmitter;
     
     ObserverMixin: {
         componentWillMount();
@@ -42,58 +43,63 @@ interface IMObservableStatic {
     }
 }
 
-interface Lambda {
-    ():void;
-}
-
-interface IObservable {
-    observe(callback:(...args:any[])=>void, fireImmediately?:boolean):Lambda;
-}
-
-interface IObservableValue<T> extends IObservable {
-    ():T;
-    (value:T);
-    observe(callback:(newValue:T, oldValue:T)=>void, fireImmediately?:boolean):Lambda;
-}
-
-interface IObservableArray<T> extends IObservable, Array<T> {
-    spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[];
-    observe(listener:(changeData:IArrayChange<T>|IArraySplice<T>)=>void, fireImmediately?:boolean):Lambda;
-    clear(): T[];
-    replace(newItems:T[]);
-    values(): T[];
-    clone(): IObservableArray<T>;
-    find(predicate:(item:T,index:number,array:IObservableArray<T>)=>boolean,thisArg?,fromIndex?:number):T;
-    remove(value:T):boolean;
-}
-
-interface IArrayChange<T> {
-    type: string; // Always: 'update'
-    object: IObservableArray<T>;
-    index: number;
-    oldValue: T;
-}
-
-interface IArraySplice<T> {
-    type: string; // Always: 'splice'
-    object: IObservableArray<T>;
-    index: number;
-    removed: T[];
-    addedCount: number;
-}
-
-interface ISimpleEventEmitter {
-    emit(...data:any[]):void;
-    on(listener:(...data:any[])=>void):Lambda;
-    once(listener:(...data:any[])=>void):Lambda;
+declare module Mobservable {
+    
+    interface Lambda {
+        ():void;
+    }
+    
+    interface IObservable {
+        observe(callback:(...args:any[])=>void, fireImmediately?:boolean):Lambda;
+    }
+    
+    interface IObservableValue<T> extends IObservable {
+        ():T;
+        (value:T);
+        observe(callback:(newValue:T, oldValue:T)=>void, fireImmediately?:boolean):Lambda;
+    }
+    
+    interface IObservableArray<T> extends IObservable, Array<T> {
+        spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[];
+        observe(listener:(changeData:IArrayChange<T>|IArraySplice<T>)=>void, fireImmediately?:boolean):Lambda;
+        clear(): T[];
+        replace(newItems:T[]);
+        values(): T[];
+        clone(): IObservableArray<T>;
+        find(predicate:(item:T,index:number,array:IObservableArray<T>)=>boolean,thisArg?,fromIndex?:number):T;
+        remove(value:T):boolean;
+    }
+    
+    interface IArrayChange<T> {
+        type: string; // Always: 'update'
+        object: IObservableArray<T>;
+        index: number;
+        oldValue: T;
+    }
+    
+    interface IArraySplice<T> {
+        type: string; // Always: 'splice'
+        object: IObservableArray<T>;
+        index: number;
+        removed: T[];
+        addedCount: number;
+    }
+    
+    interface ISimpleEventEmitter {
+        emit(...data:any[]):void;
+        on(listener:(...data:any[])=>void):Lambda;
+        once(listener:(...data:any[])=>void):Lambda;
+    }
 }
 
 /* END OF DECLARATION */
 
+type Lambda = Mobservable.Lambda;
+
 module mobservable { // wrap in module for UMD export, see end of the file
 
-function createObservable<T>(value:T[]):IObservableArray<T>;
-function createObservable<T>(value?:T|{():T}, scope?:Object):IObservableValue<T>;
+function createObservable<T>(value:T[]):Mobservable.IObservableArray<T>;
+function createObservable<T>(value?:T|{():T}, scope?:Object):Mobservable.IObservableValue<T>;
 function createObservable(value?, scope?:Object):any {
     if (Array.isArray(value))
         return new ObservableArray(value);
@@ -138,7 +144,7 @@ mobservableStatic.props = function props(target, props?, value?) {
                     ? function() { return observable; } 
                     : observable,
                 set: isArray 
-                    ? function(newValue) { (<IObservableArray<any>><any>observable).replace(newValue) } 
+                    ? function(newValue) { (<Mobservable.IObservableArray<any>><any>observable).replace(newValue) } 
                     : observable,
                 enumerable: true,
                 configurable: false
@@ -299,7 +305,7 @@ class ObservableValue<T> {
         });
     }
     
-    createGetterSetter():IObservableValue<T> {
+    createGetterSetter():Mobservable.IObservableValue<T> {
         var self = this;
         var f:any = function(value?) {
             if (arguments.length > 0)
@@ -613,7 +619,7 @@ class StubArray {
 }
 StubArray.prototype = [];
 
-class ObservableArray<T> extends StubArray implements IObservableArray<T> {
+class ObservableArray<T> extends StubArray implements Mobservable.IObservableArray<T> {
     [n: number]: T;
 
     private _values: T[];
@@ -696,7 +702,7 @@ class ObservableArray<T> extends StubArray implements IObservableArray<T> {
     private notifyChildUpdate(index:number, oldValue:T) {
         this.notifyChanged();
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-        this.changeEvent.emit(<IArrayChange<T>>{ object: this, type: 'update', index: index, oldValue: oldValue});
+        this.changeEvent.emit(<Mobservable.IArrayChange<T>>{ object: this, type: 'update', index: index, oldValue: oldValue});
     }
 
     private notifySplice(index:number, deleted:T[], added:T[]) {
@@ -704,7 +710,7 @@ class ObservableArray<T> extends StubArray implements IObservableArray<T> {
             return;
         this.notifyChanged();
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-        this.changeEvent.emit(<IArraySplice<T>>{ object: this, type: 'splice', index: index, addedCount: added.length, removed: deleted});
+        this.changeEvent.emit(<Mobservable.IArraySplice<T>>{ object: this, type: 'splice', index: index, addedCount: added.length, removed: deleted});
     }
 
     private notifyChanged() {
@@ -712,9 +718,9 @@ class ObservableArray<T> extends StubArray implements IObservableArray<T> {
         this.dependencyState.markReady(true);
     }
 
-    observe(listener:(changeData:IArrayChange<T>|IArraySplice<T>)=>void, fireImmediately=false):Lambda {
+    observe(listener:(changeData:Mobservable.IArrayChange<T>|Mobservable.IArraySplice<T>)=>void, fireImmediately=false):Lambda {
         if (fireImmediately)
-            listener(<IArraySplice<T>>{ object: this, type: 'splice', index: 0, addedCount: this._values.length, removed: []});
+            listener(<Mobservable.IArraySplice<T>>{ object: this, type: 'splice', index: 0, addedCount: this._values.length, removed: []});
         return this.changeEvent.on(listener);
     }
 
@@ -887,7 +893,7 @@ class ObservableArray<T> extends StubArray implements IObservableArray<T> {
 }
 ObservableArray.reserveArrayBuffer(1000);
 
-class SimpleEventEmitter implements ISimpleEventEmitter {
+class SimpleEventEmitter implements Mobservable.ISimpleEventEmitter {
     listeners:{(data?):void}[] = [];
 
     emit(...data:any[]);
