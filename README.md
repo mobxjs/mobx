@@ -3,8 +3,6 @@
 [![Build Status](https://travis-ci.org/mweststrate/MOBservable.svg?branch=master)](https://travis-ci.org/mweststrate/MOBservable)
 [![Coverage Status](https://coveralls.io/repos/mweststrate/MOBservable/badge.svg?branch=master)](https://coveralls.io/r/mweststrate/MOBservable)
 
-[![NPM](https://nodei.co/npm/mobservable.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/mobservable/)
-
 Installation: `npm install mobservable --save`
 
 MOBservable is light-weight stand-alone observable implementation, that helps you to create reactive data structures, based on the ideas of observables in bigger frameworks like `knockout`, `ember`, but this time without 'strings attached'. 
