@@ -8,7 +8,7 @@ Installation: `npm install mobservable --save`
 MOBservable is light-weight stand-alone observable implementation, that helps you to create reactive data structures, based on the ideas of observables in bigger frameworks like `knockout`, `ember`, but this time without 'strings attached'. 
 MOBservables allows you to observe primitive values, references, functions and arrays and makes sure that all changes in your data are propagated automatically, atomically and synchronously.
 
-[Blog post: combing React with MOBservable](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) 
+[Blog post: combining React with MOBservable](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) 
 
 # Examples
 
