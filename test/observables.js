@@ -538,3 +538,77 @@ exports.testToPlainValue = function(test) {
 
     test.done();
 };
+
+exports.test_nested_observable = function(test) {
+    var factor = mobservable(50);
+    
+    var price = mobservable(100);
+    
+    var total = mobservable(function() {
+       return price() * mobservable(function() {
+           return 1 + (factor() / 100);
+       })();
+    });
+    
+    test.equal(total(), 150);
+    price(200);
+    test.equal(total(), 300);
+    factor(100);
+    test.equal(total(), 400);
+    test.equal(factor.impl.dependencyState.observers.length, 0);
+    test.equal(total.impl.dependencyState.observing.length, 0);
+    
+    var b = [];
+    var sub = total.observe(function(v) {
+        b.push(v);
+    });
+    price(100);
+    factor(50);
+    price(200);
+    factor(100);
+    
+    test.deepEqual(b, [200, 150, 300, 400]);
+    // changes over time didn't increase number of observers
+    test.equal(factor.impl.dependencyState.observers.length, 1);
+    test.equal(price.impl.dependencyState.observers.length, 1);
+    test.equal(total.impl.dependencyState.observing.length, 2);
+    
+    sub();
+    // and everything is cleaned up properly
+    test.equal(factor.impl.dependencyState.observers.length, 0);
+    test.equal(price.impl.dependencyState.observers.length, 0);
+    test.equal(total.impl.dependencyState.observing.length, 0);
+    
+    test.done();
+};
+
+exports.test_nested_observable2 = function(test) {
+    var factor = mobservable(0);
+    var price = mobservable(100);
+    var totalCalcs = 0;
+    var innerCalcs = 0;
+    
+    var total = mobservable(function() {
+        totalCalcs += 1; // outer observable shouldn't recalc if inner observable didn't publish a real change
+        return price() * mobservable(function() {
+            innerCalcs += 1;
+            return factor() % 2 === 0 ? 1 : 3;
+        })();
+    });
+    
+    var b = [];
+    var sub = total.observe(function(x) { b.push(x); }, true);
+    
+    price(150);
+    factor(7); // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
+    factor(5); // doesn't trigger outer calc
+    factor(3); // doesn't trigger outer calc
+    factor(4); // triggers innerCalc twice
+    price(20);
+    
+    test.deepEqual(b, [100,150,450,150,20]);
+    test.equal(innerCalcs, 9);
+    test.equal(totalCalcs, 5);    
+    
+    test.done();
+}; 
