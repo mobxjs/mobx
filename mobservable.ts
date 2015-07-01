@@ -984,7 +984,10 @@ mobservableStatic.ObserverMixin = {
             if (this._watchDisposer)
                 this._watchDisposer();
             var[rendering, disposer] = mobservableStatic.watch(() => baseRender.call(this), () => {
-                this.forceUpdate();
+                if (this.isMounted())
+                    this.forceUpdate();
+                else if (mobservableStatic.debugLevel)
+                    warn("Rendering was triggered for unmounted component. Please check the lifecycle of the components");
             });
             this._watchDisposer = disposer;
             return rendering;
