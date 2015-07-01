@@ -182,6 +182,7 @@
             mixins: [mobservable.ObserverMixin, React.addons.PureRenderMixin],
             
             render: function() {
+                log("Rendering CartTotalView");
                 return (<div><b>Total: <span id="total">{("€ " + this.props.cart.total).replace(/(\.\d\d)\d*/,"$1")}</span></b></div>);
             }
         });
