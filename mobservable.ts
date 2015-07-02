@@ -16,6 +16,7 @@ interface IMObservableStatic {
     primitive<T>(value?:T):Mobservable.IObservableValue<T>;
     reference<T>(value?:T):Mobservable.IObservableValue<T>;
     computed<T>(value:()=>T,scope?):Mobservable.IObservableValue<T>;
+    expr<T>(expr:()=>T,scope?):T;
 
     // create observable properties
     props(object:Object, name:string, initalValue: any);
@@ -120,6 +121,12 @@ mobservableStatic.primitive = mobservableStatic.reference = function(value?) {
 
 mobservableStatic.computed = function<T>(func:()=>void, scope?) {
     return new ComputedObservable(func, scope).createGetterSetter();
+}
+
+mobservableStatic.expr = function<T>(expr:()=>void, scope?) {
+    if (DNode.trackingStack.length === 0)
+        throw new Error("mobservable.expr can only be used inside a computed observable. Probably mobservable.computed should be used instead of .expr");
+    return new ComputedObservable(expr, scope).get();
 }
 
 mobservableStatic.array = function array<T>(values?:T[]): ObservableArray<T> {
@@ -466,7 +473,7 @@ class DNode {
         var rc = this.externalRefenceCount += delta;
         if (rc === 0)
             this.tryToSleep();
-        else if (rc === delta)
+        else if (rc === delta) // a.k.a. rc was zero.
             this.wakeUp();
     }
 
