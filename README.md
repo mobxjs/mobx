@@ -260,6 +260,14 @@ It is allowed to throw exceptions in an observed function. The thrown exceptions
 The exception will be rethrown if somebody inspects the current value, and will be passed as first callback argument
 to all the listeners. 
 
+### mobservable.expr
+
+`mobservable.expr<T>(expr:()=>T,scope?):T;`
+
+This function is simply sugar for `mobservable.computed(expr, scope)();`. 
+`expr` can be used to split up and improve the performance of expensive computations,
+as described in this [section](#use-nested-observables-in-expensive-computations).
+
 ### mobservable.array
 
 `mobservable.array<T>(values? : T[]) : IObservableArray<T>`
@@ -445,7 +453,7 @@ Utility class for managing an event. Its methods are:
 * `on(listener:(...data : any[]) => void) : () => void`. Registers a new callback that will be invoked on each `emit`. Returns a method that can be used to unsubscribe the listener.
 * `once(listener:(...data : any[]) => void) : () => void`. Similar to `.on`, but automatically removes the listener after one invocation.
 
-# Tips & tricks
+# Advanced Tips & Tricks
 
 ## Use local variables in computations
 
@@ -473,6 +481,53 @@ var fullName = mobservable(function() {
     return last;
 }
 ```
+
+## Use nested observables in expensive computations
+
+It is perfectly fine to create computed observables inside computed observables.
+This is a useful pattern if you have an expensive computation that depends on a condition check that is fired often, but not changed often.
+For example when your computation contains a cheap treshold check, or when your UI renderig depends on the some selection of the user.
+For example:
+
+```javascript
+var person; // ...
+var total = mobservable(function() {
+    if (person.age === 42)
+        doSomeExpensiveComputation();
+    else
+        doSomeOtherExpensiveComputation();
+});
+```
+
+In the example above, every single time the person's `age` changes, `total` is computed by invoking some expensive computations. 
+However, if the expression `page.age === 42` was put in a separate observable, 
+computing the `total` itself could be avoided in many cases because a recomputation would only occur if the value of the complete expression changes.
+Yet, you might not want to create separate stand-alone observables for these expressions, 
+because you don't have a nice place to put them or because it would make the readability of the code worse.
+In such cases you can also create an inline observable.   
+In the following example, the total is only recalculated if the age changes to, or from, 42. Which means that for most other ages,
+recomputing the expensive computations can be avoided.
+
+```javascript
+var person; // ...
+var total = mobservable(function() {
+    var ageEquals42 = mobservable(function() { return person.age === 42 })(); // create observable and invoke getter
+    if (ageEquals42)
+        doSomeExpensiveComputation();
+    else
+        doSomeOtherExpensiveComputation();
+});
+```
+
+Note that the dangling `()` after the expression is meant to invoke the getter of the just created observable to obtain its value.
+For convenience the same statement can also be rewritten using the [expr](#mobservable-expr) function:
+
+
+```javascript
+// ...
+var ageEquals42 = mobservable.expr(function() { return person.age === 42 });
+// ...
+```        
 
 ## Use native array methods
 
@@ -523,4 +578,3 @@ Here is a small comparison list between the two approaches.
 Do *not* confuse `mobservable.primitive([])` (or `mobservable([])`) with `mobservable.array([])`, 
 the first creates an observable reference to an array, but does not observe its contents. 
 The later observes the contents from the array you pass into it.
-

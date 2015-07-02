@@ -1,13 +1,14 @@
 
 0.5
-* test and explain nested observables
+* ~~test and explain nested observables~~
+* observable annotation on methods should define a method instead of a property (e.g. order.total() instead of order.total) for type soudness with its original?
 * mobservable.struct (ALWAYS compare deep equal, use defensive copy so that changes in object are detected). Wrap in Struct() object?
 * mobservable.computedStruct
-* observable annotation on methods should define a method instead of a property (e.g. order.total() instead of order.total) for type soudness with its original?
 
 0.6
-* implement .liveFilter, .liveMap, , liveFlatten, .liveConcat (.liveSlice, .liveSort)
-* add `thisArg` to all methods that accept a function
+* (de)serialize complete data structure from json
+* implement .liveFilter, .liveMap, , liveFlatten, .liveConcat (.liveSlice, .liveSort .get(=slice(x,1)), sum,min,max,avg,numericCount
+* add `thisArg` to all methods that accept a function?
 
 Later
 

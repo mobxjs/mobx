@@ -17,6 +17,7 @@ interface IMObservableStatic {
     primitive<T>(value?:T):Mobservable.IObservableValue<T>;
     reference<T>(value?:T):Mobservable.IObservableValue<T>;
     computed<T>(value:()=>T,scope?):Mobservable.IObservableValue<T>;
+    expr<T>(expr:()=>T,scope?):T;
 
     // create observable properties
     props(object:Object, name:string, initalValue: any);
