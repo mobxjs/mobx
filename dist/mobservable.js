@@ -429,8 +429,9 @@ var mobservable;
         DNode.prototype.dispose = function () {
             if (this.observers.length)
                 throw new Error("Cannot dispose DNode; it is still being observed");
-            for (var l = this.observing.length, i = 0; i < l; i++)
-                this.observing[i].removeObserver(this);
+            if (this.observing)
+                for (var l = this.observing.length, i = 0; i < l; i++)
+                    this.observing[i].removeObserver(this);
             this.observing = null;
             this.isDisposed = true;
         };

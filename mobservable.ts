@@ -607,7 +607,7 @@ class DNode {
     public dispose() {
         if (this.observers.length)
             throw new Error("Cannot dispose DNode; it is still being observed");
-        for(var l=this.observing.length, i=0; i<l; i++)
+        if (this.observing) for(var l=this.observing.length, i=0; i<l; i++)
             this.observing[i].removeObserver(this);
         this.observing = null;
         this.isDisposed = true;
