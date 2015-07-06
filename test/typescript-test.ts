@@ -36,19 +36,18 @@ export function testAnnotations(test) {
     order1.amount = 1;
 
     test.equal(order1.price, 3);
-    test.equal(order1.total, 3);
-    test.equal(order2.total, 8);
+    test.equal(order1.total(), 3);
+    test.equal(order2.total(), 8);
     order2.orders.push('bla');
-    test.equal(order2.total, 16);
+    test.equal(order2.total(), 16);
 
     order1.orders.splice(0,0,'boe', 'hoi');
     test.deepEqual(order1totals, [6,3,9]);
 
     disposer();
     order1.orders.pop();
-    test.equal(order1.total, 6);
+    test.equal(order1.total(), 6);
     test.deepEqual(order1totals, [6,3,9]);
-
     test.done();
 };
 

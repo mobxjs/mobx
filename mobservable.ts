@@ -15,7 +15,7 @@ interface IMObservableStatic {
     array<T>(values?:T[]):Mobservable.IObservableArray<T>;
     primitive<T>(value?:T):Mobservable.IObservableValue<T>;
     reference<T>(value?:T):Mobservable.IObservableValue<T>;
-    computed<T>(value:()=>T,scope?):Mobservable.IObservableValue<T>;
+    computed<T>(func:()=>T,scope?):Mobservable.IObservableValue<T>;
     expr<T>(expr:()=>T,scope?):T;
 
     // create observable properties
@@ -180,13 +180,13 @@ mobservableStatic.observable = function observable(target:Object, key:string, de
         delete descriptor.value;
         delete descriptor.writable;
         descriptor.get = function() {
-            mobservableStatic.props(this, key, baseValue);
-            return this[key];
-        }
+            var observable = this.key = mobservableStatic.computed(baseValue, this);
+            return observable;
+        };
         descriptor.set = function () {
             console.trace();
             throw new Error("It is not allowed to reassign observable functions");
-        }
+        };
     } else {
         Object.defineProperty(target, key, {
             configurable: false, enumberable:true,
