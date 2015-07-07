@@ -5,15 +5,26 @@
 
 Installation: `npm install mobservable --save`
 
-MOBservable is light-weight stand-alone observable implementation, that helps you to create reactive data structures, based on the ideas of observables in bigger frameworks like `knockout`, `ember`, but this time without 'strings attached'. 
-MOBservables allows you to observe primitive values, references, functions and arrays and makes sure that all changes in your data are propagated automatically, atomically and synchronously.
+MOBservable is light-weight stand-alone library to create reactive primitives, functions, arrays and objects.
 
-[Blog post: combining React with MOBservable](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) 
+Its goal is to make developers happy and productive, by removing boilerplate work such as invalidating derived data or managing event listeners. 
+It makes sure data changes are automatically, atomically and synchronously propagated through your app without being obtrusive.
+MOBservable runs in any ES5 environment but features also some React addons.
+It is higly efficient and shines when managing large amounts of complex, cyclic, nested or computed data.
+
+* [Blog post: combining React with MOBservable](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) 
+* [Examples](#examples)
+* [Design principles](#design-principles)
+* [API documentation](#api-documentation)
+* [Advanced Tips & Tricks](#advanced-types-tricks)
 
 # Examples
 
-[Fiddle demo: MOBservable + JQuery](http://jsfiddle.net/mweststrate/vxn7qgdw)
-[Fiddle demo: MOBservable + React](https://jsfiddle.net/mweststrate/46vL0phw)
+* [Fiddle demo: MOBservable + React: simple timer](https://jsfiddle.net/mweststrate/wgbe4guu/)
+* [Fiddle demo: MOBservable + React: shop](https://jsfiddle.net/mweststrate/46vL0phw)
+* [Fiddle demo: MOBservable + JQuery: shop](http://jsfiddle.net/mweststrate/vxn7qgdw)
+
+The source of all demo's can also be found in the [example](/mweststrate/mobservable/tree/master/example) folder.
 
 ## Example: Observable values and functions
 
@@ -65,7 +76,7 @@ var Person = function(firstName, lastName) {
 var jane = new Person("Jane","Dôh");
 
 // (computed) properties can be accessed like any other property:
-console.log(jan.fullName);
+console.log(jane.fullName);
 // prints: "Jan Dôh"
 
 // properties can be observed as well:
@@ -78,7 +89,7 @@ jane.lastName = "Do";
 
 ## Example: Observable arrays
 
-`mobservable` provides an observable array implementation, which is fully ES5 compliant, 
+`mobservable` provides an observable array implementation (as ES7 polyfill), which is fully ES5 compliant, 
 but which will notify dependent computations upon each change.
 
 ```javascript
@@ -146,34 +157,72 @@ order1.orderLines[0].amount = 3;
 ## Example: ObserverMixin for react components
 
 MOBservable ships with a mixin that can be used to subscribe React components to observables automatically, so that model changes are processed transparently. 
-The full JSX example can be found in this [fjsiddle]()
+The full JSX example can be found in this [fjsiddle](https://jsfiddle.net/mweststrate/wgbe4guu/)
 
 ```javascript
-        function Article(name, price) {
-            mobservable.props(this, {
-                name: name,
-                price: price
-            });
+        var store = {};
+        // add observable properties to the store
+        mobservable.props(store, {
+            timer: 0
+        });
+        
+        // of course, this could be put flux-style in dispatchable actions, but this is just to demo Model -> View
+        function resetTimer() {
+            store.timer = 0;
         }
-
-        var ArticleView = React.createClass({
+        
+        setInterval(function() {
+            store.timer += 1;
+        }, 1000);
+                
+        var TimerView = React.createClass({
+            // This component is actually an observer of all store properties that are accessed during the last rendering
+            // so there is no need to declare any data use, nor is there (seemingly) any state in this component
+            // the combination of mobservable.props and ObserverMixin does all the magic for us.
+            // UI updates are nowhere forced, but all views (un)subscribe to their data automatically
             mixins: [mobservable.ObserverMixin],
             
             render: function() {
-                return (<li>
-                    <span>{this.props.article.name}</span>
-                    <span className="price">{this.props.article.price}</span>
-                </li>);
+                return (<span>Seconds passed: {this.props.store.timer}</span>);
             }
         });
         
-        var book = new Article("Orthodoxy, G.K. Chesterton", 19.95);
-        React.render(<ArticleView article={book} />, document.body);
+        var TimerApp = React.createClass({
+            render: function() {
+                var now = new Date(); // just to demonstrate that TimerView updates independently of TimerApp
+                return (<div>
+                    <div>Started rendering at: {now.toString()}</div>
+                    <TimerView {...this.props} />
+                    <br/><button onClick={resetTimer}>Reset timer</button>
+                </div>);
+            }
+        });
         
-        book.price = 15.95; // Triggers automatically a re-render of the ArticleView
+        // pass in the store to the component tree (you could also access it directly through global vars, whatever suits your style)
+        React.render(<TimerApp store={store} />, document.body);
 ```
 
-# Processing observables
+# Design principles
+
+
+## Principles
+
+MOBservable is designed with the following principles in mind.
+
+- The Model, View (and Contorller) of an app should be separated.
+Views should be loosely coupled to UI, so that UI refactorings do not require changes of the data model.
+It should be possible to describe views on the data model as naturally as possible, as-if data does not change over time.
+- Derived data should be re-calculated automatically and efficiently.
+It is the responsibility of MOBservable to prevent that views ever become stale.
+- MOBservable is unobtrusive and doesnt place any constraints on how you build or work with data structures.
+You want to use inheritance, classes, cyclic data structures, or instance methods? You are not restricted in any way.
+- Data should be mutable as this is the natural mental model of most kinds of data.
+<small>(despite some nice properties of immutable data, mutable data is easier to inspect, read, grok and especially more natural to program against.
+`markRead(email) { email.isRead = true; }` is more convenient to write than `markRead(email) { return { ...email, isRead : true }; }` or `markRead(email) { model.set('email', 'isRead', true`); }`)</small>
+- Subscriptions should be a breeze to manage, and managed automatically wherever possible.
+- MOBservable is only about the model data, not about querying, back-end communication etc (although observers are really useful there as well).
+
+## Behavior
 
 Observable values, arrays and functions created by `mobservable` possess the following characteristics:
 
@@ -184,7 +233,7 @@ Observable values, arrays and functions created by `mobservable` possess the fol
 * _cycle detection_. Cycles in computes, like in `a -> 2 * b; b -> 2 * a;` will be deteced automatically.  
 * _error handling_. Exceptions that are raised during computations are propagated to consumers.
 
-# API
+# API Documentation
 
 [Typescript typings](https://github.com/mweststrate/MOBservable/blob/master/mobservable.d.ts)
 
@@ -219,7 +268,6 @@ console.log(vat()); // prints '3'
 vat.observe(console.log); // register an observer
 vat(4); // updates value, also notifies all observers, thus prints '4'
 ```
-
 
 ### mobservable.reference
 
@@ -435,12 +483,26 @@ For non-primitive values, this function will always return a shallow copy.
 The observer mixin can be used in [React](https://facebook.github.io/react/index.html) components. 
 This mixin basically turns the `.render` function of the component into an observable function, and makes sure that the component itself becomes an observer of that function, 
 so that the component is re-rendered each time an observable has changed. 
-In general, this mixin combines very well with the [React PureRender mixin](https://facebook.github.io/react/docs/pure-render-mixin.html) if observable objects or arrays are passed into the component.
+This mixin also prevents re-renderings when the *props* of the component have only shallowly changed 
+(Similar to [React PureRender mixin](https://facebook.github.io/react/docs/pure-render-mixin.html), except that *state* changes are still always processed). 
 This allows for React apps that perform well in apps with large amount of complex data, while avoiding the need to manage a lot of subscriptions.
 
 See the [above example](#example_observermixin_for_react_components) or the [JSFiddle demo: MOBservable + React](https://jsfiddle.net/mweststrate/46vL0phw)
 
 For an extensive explanation, read [combing React with MOBservable](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) 
+
+### mobservable.ObservingComponent
+`mobservable.ObservingComponent(clazz:ReactComponentClass):ReactComponentClass`
+
+If you want to create a React component based on ES6 where mixins are not supported,
+you can use the `ObservingComponent` function to wrap around your React `createClass` call (instead of using the mixin `ObserverMixin`):
+
+```javascript
+// TODO: change to class
+var myComponent = mobservable.ObservingComponent(React.createClass({
+    // widget specification without mixins
+});
+```
 
 ### mobservable.debugLevel
 
@@ -454,6 +516,10 @@ Utility class for managing an event. Its methods are:
 * `once(listener:(...data : any[]) => void) : () => void`. Similar to `.on`, but automatically removes the listener after one invocation.
 
 # Advanced Tips & Tricks
+
+## How to create lazy values?
+
+All computed values are lazy and only evaluated upon first observation (or when their value is explicitly getted)
 
 ## Use local variables in computations
 
@@ -554,7 +620,7 @@ var sum2 = mobservable(function() {
     return s;    
 });
 
-// Also fast:
+// Faster:
 var sum2 = mobservable(function() {
     return numbers.reduce(function(a, b) { // single observable read
         return a + b;
@@ -563,18 +629,24 @@ var sum2 = mobservable(function() {
 ``` 
 ## `.value` versus `.props`
 
-Using `mobservable.value` or `mobservable.props` to create observables inside objects might be a matter of taste.
+The difference between `obj.amount = mobservable.value(3)` and `mobservable.props(obj, { value: 3 })` 
+to create observable values inside an object might seem to be a matter of taste.
 Here is a small comparison list between the two approaches.
 
-| .value | .props |
-| ---- | ---|
-| ES3 complient | requires ES 5 |
-| explicit getter/setter functions: `obj.amount(2)`  | object properties with implicit getter/setter: `obj.amount = 2 ` |
-| easy to make mistakes; e.g. `obj.amount = 3` instead of `obj.amount(3)`, or `7 * obj.amount` instead of `7 * obj.amount()` wilt both not achieve the intended behavior | Use property reads / assignments |
-| easy to observe: `obj.amount.observe(listener)` | `mobservable.observeProperty(obj,'amount',listener)`  |
+**.value**
+* ES3 compliant
+* explicit getter/setter functions: `obj.amount(2)`
+* easy to make mistakes in assignments; e.g. `obj.amount = 3` instead of `obj.amount(3)`, or `7 * obj.amount` instead of `7 * obj.amount()` 
+* easy to manually observe: `obj.amount.observe(listener)`
+
+**.props**
+* Requires ES5
+* object properties with implicit getter/setter: `obj.amount = 2`
+* more natural to write / read values, syntactically you won't notice they are observable
+* harder to manually observe: `mobservable.observeProperty(obj,'amount',listener)`
 
 ## `.reference` versus `.array`
 
-Do *not* confuse `mobservable.primitive([])` (or `mobservable([])`) with `mobservable.array([])`, 
+Do *not* confuse `mobservable.primitive([])` with `mobservable([])`/`mobservable.array([])`, 
 the first creates an observable reference to an array, but does not observe its contents. 
 The later observes the contents from the array you pass into it.
