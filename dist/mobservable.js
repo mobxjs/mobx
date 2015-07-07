@@ -28,6 +28,11 @@ var mobservable;
     mobservable.mobservableStatic.computed = function (func, scope) {
         return new ComputedObservable(func, scope).createGetterSetter();
     };
+    mobservable.mobservableStatic.expr = function (expr, scope) {
+        if (DNode.trackingStack.length === 0)
+            throw new Error("mobservable.expr can only be used inside a computed observable. Probably mobservable.computed should be used instead of .expr");
+        return new ComputedObservable(expr, scope).get();
+    };
     mobservable.mobservableStatic.array = function array(values) {
         return new ObservableArray(values);
     };
@@ -64,8 +69,8 @@ var mobservable;
             delete descriptor.value;
             delete descriptor.writable;
             descriptor.get = function () {
-                mobservable.mobservableStatic.props(this, key, baseValue);
-                return this[key];
+                var observable = this.key = mobservable.mobservableStatic.computed(baseValue, this);
+                return observable;
             };
             descriptor.set = function () {
                 console.trace();
@@ -771,7 +776,10 @@ var mobservable;
                 if (this._watchDisposer)
                     this._watchDisposer();
                 var _a = mobservable.mobservableStatic.watch(function () { return baseRender.call(_this); }, function () {
-                    _this.forceUpdate();
+                    if (_this.isMounted())
+                        _this.forceUpdate();
+                    else if (mobservable.mobservableStatic.debugLevel)
+                        warn("Rendering was triggered for unmounted component. Please check the lifecycle of the components");
                 }), rendering = _a[0], disposer = _a[1];
                 this._watchDisposer = disposer;
                 return rendering;
@@ -780,7 +788,33 @@ var mobservable;
         componentWillUnmount: function () {
             if (this._watchDisposer)
                 this._watchDisposer();
+        },
+        shouldComponentUpdate: function (nextProps, nextState) {
+            if (this.state !== nextState)
+                return true;
+            var keys = Object.keys(this.props);
+            var key;
+            if (keys.length !== Object.keys(nextProps).length)
+                return true;
+            for (var i = keys.length - 1; i >= 0, key = keys[i]; i--)
+                if (nextProps[key] !== this.props[key])
+                    return true;
+            return false;
         }
+    };
+    mobservable.mobservableStatic.ObservingComponent = function (componentClass) {
+        var baseMount = componentClass.componentWillMount;
+        var baseUnmount = componentClass.componentWillUnmount;
+        componentClass.prototype.componentWillMount = function () {
+            mobservable.mobservableStatic.ObserverMixin.componentWillMount.apply(this, arguments);
+            return baseMount && baseMount.apply(this, arguments);
+        };
+        componentClass.prototype.componentWillUnmount = function () {
+            mobservable.mobservableStatic.ObserverMixin.componentWillUnmount.apply(this, arguments);
+            return baseUnmount && baseUnmount.apply(this, arguments);
+        };
+        componentClass.prototype.shouldComponentUpdate = mobservable.mobservableStatic.ObserverMixin.shouldComponentUpdate;
+        return componentClass;
     };
     function quickDiff(current, base) {
         if (!base.length)

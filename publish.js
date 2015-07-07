@@ -4,9 +4,9 @@ module.exports = function(shell, npm, git) {
     var pkg = JSON.parse(shell.read('package.json'));
 
     // Bump version number
-    var nrs = package.version.split(".");
+    var nrs = pkg.version.split(".");
     nrs[2] = 1 + parseInt(nrs[2], 10);
-    var version = package.version = shell.prompt("Please specify the new package version of '" + pkg.name + "' (Ctrl^C to abort)", nrs.join("."));
+    var version = pkg.version = shell.prompt("Please specify the new package version of '" + pkg.name + "' (Ctrl^C to abort)", nrs.join("."));
     if (!version.match(/^\d+\.\d+\.\d+$/))
         shell.exit(1, "Invalid semantic version: " + version);
 
