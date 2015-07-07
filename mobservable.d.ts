@@ -42,7 +42,9 @@ interface IMObservableStatic {
     ObserverMixin: {
         componentWillMount();
         componentWillUnmount();
-    }
+        shouldComponentUpdate(nextProps, nextState);
+    };
+    ObservingComponent<T>(componentClass:T):T;
 }
 
 declare module Mobservable {

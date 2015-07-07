@@ -70,9 +70,7 @@
         /**
          * UI logic
          */
-        var ShopDemoView = React.createClass({
-            mixins: [mobservable.ObserverMixin, React.addons.PureRenderMixin],
-            
+        var ShopDemoView = mobservable.ObservingComponent(React.createClass({
             render: function() {
                 log("Rendering ShopDemoView");
                 return (<table>
@@ -113,11 +111,9 @@
                     article.price += 1;
                 }
             }
-        }); 
+        })); 
          
-        var ArticlesView = React.createClass({
-            mixins: [mobservable.ObserverMixin, React.addons.PureRenderMixin],
-            
+        var ArticlesView = mobservable.ObservingComponent(React.createClass({
             render: function() {
                 log("Rendering ArticlesView");
                 function renderArticle(article) {
@@ -132,11 +128,9 @@
             newArticleClick: function() {
                 this.props.articles.push(new Article(prompt("Article name"), prompt("Price (please fill in a number)")));
             }
-        });
+        }));
         
-        var ArticleView = React.createClass({
-            mixins: [mobservable.ObserverMixin, React.addons.PureRenderMixin],
-            
+        var ArticleView = mobservable.ObservingComponent(React.createClass({
             render: function() {
                 log("Rendering ArticleView " + this.props.article.id);
                 return (<li>
@@ -161,11 +155,9 @@
                 this.props.article.name = prompt("New name", this.props.article.name);
                 this.props.article.price = parseInt(prompt("New price", this.props.article.price), 10);
             }
-        });
+        }));
         
-        var CartView = React.createClass({
-            mixins: [mobservable.ObserverMixin, React.addons.PureRenderMixin],
-            
+        var CartView = mobservable.ObservingComponent(React.createClass({
             render: function() {
                 log("Rendering CartView");
                 function renderEntry(entry) {
@@ -176,20 +168,16 @@
                     <CartTotalView cart={this.props.cart} />
                 </div>)
             } 
-        });
+        }));
         
-        var CartTotalView = React.createClass({
-            mixins: [mobservable.ObserverMixin, React.addons.PureRenderMixin],
-            
+        var CartTotalView = mobservable.ObservingComponent(React.createClass({
             render: function() {
                 log("Rendering CartTotalView");
                 return (<div><b>Total: <span id="total">{("€ " + this.props.cart.total).replace(/(\.\d\d)\d*/,"$1")}</span></b></div>);
             }
-        });
+        }));
 
-        var CartEntryView = React.createClass({
-            mixins: [mobservable.ObserverMixin, React.addons.PureRenderMixin],
-            
+        var CartEntryView = mobservable.ObservingComponent(React.createClass({
             render: function() {
                 log("Rendering CartEntryView " + this.props.entry.id);
                 return (<li>
@@ -203,7 +191,7 @@
                 if (--this.props.entry.amount < 1)
                     shoppingCart.entries.splice(shoppingCart.entries.indexOf(this.props.entry), 1);      
             }
-        });
+        }));
         
         React.render(<ShopDemoView articles={articles} cart={shoppingCart} />, document.getElementById("mount"));
 
