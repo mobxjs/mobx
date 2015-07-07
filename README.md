@@ -16,7 +16,7 @@ It is higly efficient and shines when managing large amounts of complex, cyclic,
 * [Examples](#examples)
 * [Design principles](#design-principles)
 * [API documentation](#api-documentation)
-* [Advanced Tips & Tricks](#advanced-types-tricks)
+* [Advanced Tips & Tricks](#advanced-tips--tricks)
 
 # Examples
 
@@ -24,7 +24,7 @@ It is higly efficient and shines when managing large amounts of complex, cyclic,
 * [Fiddle demo: MOBservable + React: shop](https://jsfiddle.net/mweststrate/46vL0phw)
 * [Fiddle demo: MOBservable + JQuery: shop](http://jsfiddle.net/mweststrate/vxn7qgdw)
 
-The source of all demo's can also be found in the [example](/mweststrate/mobservable/tree/master/example) folder.
+The source of all demo's can also be found in the [example](/example) folder.
 
 ## Example: Observable values and functions
 
@@ -154,16 +154,16 @@ order1.orderLines[0].amount = 3;
 // Prints: Total: 33
 ```
 
-## Example: ObserverMixin for react components
+## Example: ObservingComponent for react components
 
-MOBservable ships with a mixin that can be used to subscribe React components to observables automatically, so that model changes are processed transparently. 
+MOBservable ships with a mixin and class decorator that can be used to subscribe React components to observables automatically.
 The full JSX example can be found in this [fjsiddle](https://jsfiddle.net/mweststrate/wgbe4guu/)
 
 ```javascript
         var store = {};
         // add observable properties to the store
         mobservable.props(store, {
-            timer: 0
+            timer: 0 // this could be an array, object, function as well..
         });
         
         // of course, this could be put flux-style in dispatchable actions, but this is just to demo Model -> View
@@ -175,17 +175,15 @@ The full JSX example can be found in this [fjsiddle](https://jsfiddle.net/mwests
             store.timer += 1;
         }, 1000);
                 
-        var TimerView = React.createClass({
-            // This component is actually an observer of all store properties that are accessed during the last rendering
-            // so there is no need to declare any data use, nor is there (seemingly) any state in this component
-            // the combination of mobservable.props and ObserverMixin does all the magic for us.
-            // UI updates are nowhere forced, but all views (un)subscribe to their data automatically
-            mixins: [mobservable.ObserverMixin],
-            
+        // This component is actually an observer of all store properties that are accessed during the last rendering
+        // so there is no need to declare any data use, nor is there (seemingly) any state in this component
+        // the combination of mobservable.props and ObservingComponent does all the magic for us.
+        // UI updates are nowhere forced, but all views (un)subscribe to their data automatically
+        var TimerView = mobservable.ObservingComponent(React.createClass({
             render: function() {
                 return (<span>Seconds passed: {this.props.store.timer}</span>);
             }
-        });
+        }));
         
         var TimerApp = React.createClass({
             render: function() {
@@ -210,15 +208,16 @@ The full JSX example can be found in this [fjsiddle](https://jsfiddle.net/mwests
 MOBservable is designed with the following principles in mind.
 
 - The Model, View (and Contorller) of an app should be separated.
-Views should be loosely coupled to UI, so that UI refactorings do not require changes of the data model.
+Views should be loosely coupled to the UI, so that UI refactorings do not require changes of the data model.
 It should be possible to describe views on the data model as naturally as possible, as-if data does not change over time.
 - Derived data should be re-calculated automatically and efficiently.
 It is the responsibility of MOBservable to prevent that views ever become stale.
 - MOBservable is unobtrusive and doesnt place any constraints on how you build or work with data structures.
-You want to use inheritance, classes, cyclic data structures, or instance methods? You are not restricted in any way.
-- Data should be mutable as this is the natural mental model of most kinds of data.
+Inheritance, classes, cyclic data structures, or instance methods...? The library does not pose any restrictions on your data.
+- Data should be mutable as this is close to the natural mental model of most kinds of data.
 <small>(despite some nice properties of immutable data, mutable data is easier to inspect, read, grok and especially more natural to program against.
-`markRead(email) { email.isRead = true; }` is more convenient to write than `markRead(email) { return { ...email, isRead : true }; }` or `markRead(email) { model.set('email', 'isRead', true`); }`)</small>
+`markRead(email) { email.isRead = true; }` is more convenient to write than `markRead(email) { return { ...email, isRead : true }; }` or `markRead(email) { model.set('email', 'isRead', true); }`.
+Especially when email is somewhere deep in your model tree)</small>
 - Subscriptions should be a breeze to manage, and managed automatically wherever possible.
 - MOBservable is only about the model data, not about querying, back-end communication etc (although observers are really useful there as well).
 
@@ -229,7 +228,7 @@ Observable values, arrays and functions created by `mobservable` possess the fol
 * _synchronous_. All updates are processed synchronously, that is, the pseudo expressions `a = 3; b -> a * 2; a = 4; print(b); ` will always print `4`; `b` will never yield a stale value (unless `batch` is used).
 * _atomic_. All computed values will postpone updates until all inputs are settled, to make sure no intermediate values are visible. That is, the expression `a = 3; b -> a * 2; c -> a * b; a = 4; print(c)` will always print `36` and no intermediate values like `24`.
 * _real time dependency detection_. Computed values only depend on values actually used in the last computation, for example in this `a -> b > 5 ? c : b` the variable `c` will only cause a re-evaluation of a if `b` > 5. 
-* _lazy_. Computed values will only be evaluated if they are actually being observed. So make sure computed functions are pure and side effect free; the library might not evaluate the expression as often as you thought it would.   
+* _lazy_. Computed values will only be evaluated if they are actually being observed. So make sure computed functions are pure and side effect free; the library might not evaluate expressions as often as you thought it would.   
 * _cycle detection_. Cycles in computes, like in `a -> 2 * b; b -> 2 * a;` will be deteced automatically.  
 * _error handling_. Exceptions that are raised during computations are propagated to consumers.
 
@@ -319,12 +318,16 @@ as described in this [section](#use-nested-observables-in-expensive-computations
 ### mobservable.array
 
 `mobservable.array<T>(values? : T[]) : IObservableArray<T>`
+
 **Note: ES5 environments only**
 
-Constructs an array like, observable structure. An observable array is a thin abstraction over native arrays that adds observable properties. 
-The most notable difference between built-in arrays is that these arrays cannot be sparse, that is, values assigned to an index larger than `length` are considered out-of-bounds and not oberved (nor any other property that is assigned to a non-numeric index). 
+Constructs an array like, observable structure. An observable array is a thin abstraction over native arrays and adds observable properties. 
+The most notable difference between built-in arrays is that these arrays cannot be sparse, that is,
+values assigned to an index larger than `length` are considered out-of-bounds and not oberved
+(nor any other property that is assigned to a non-numeric pr negative index). 
 
-Furthermore, `Array.isArray(observableArray)` and `typeof observableArray === "array"` will yield `false` for observable arrays, but `observableArray instanceof Array` will return `true`. 
+Furthermore, `Array.isArray(observableArray)` and `typeof observableArray === "array"` will yield `false` for observable arrays,
+but `observableArray instanceof Array` will return `true`. 
 
 ```javascript
 var numbers = mobservable.array([1,2,3]);
@@ -346,7 +349,7 @@ Observable arrays implement all the ES5 array methods. Besides those, the follow
 * `observe(listener:(changeData:IArrayChange<T>|IArraySplice<T>)=>void, fireImmediately?:boolean):Lambda` Listen to changes in this array. The callback will receive arguments that express an array splice or array change, conform the [ES7 proposal](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe)
 * `clear(): T[]` Remove all current entries from the array 
 * `replace(newItems:T[])` Replaces all existing entries in the array with new ones.
-* `values(): T[]` Returns a shallow clone of the array, similar to `.slice`
+* `values(): T[]` Returns a shallow, non-observable clone of the array, similar to `.slice`
 * `clone(): IObservableArray<T>` Create a new observable array containing the same values
 * `find(predicate:(item:T,index:number,array:IObservableArray<T>)=>boolean,thisArg?,fromIndex?:number):T` Find implementation, basically the same as the ES7 Array.find proposal, but with added `fromIndex` parameter. 
 * `remove(value:T):boolean` Remove a single item by value from the array. Returns true if the item was found and removed. 
@@ -361,7 +364,7 @@ props(target:Object):Object;
 **Note: ES5 environments only**
 
 Creates observable properties on the given `target` object. This function uses `mobservable.value` internally to create observables.
-Creating properties has as advantage that they are more convenient to use. See also [props or variables](#value_versus_props).
+Creating properties has as advantage that they are more convenient to use. See also [value versus props](#value-versus-props).
 The original `target`, with the added properties, is returned by this function. Functions used to created computed observables will automatically
 be bound to the correct `this`.
 
@@ -378,7 +381,8 @@ order.amount = 4;
 console.log(order.total); // Prints '20'
 ```
 
-Note that observables created by `mobservable.props` do not expose an `.observe` method, to observe properties, see [`mobservable.observeProperty`](#mobservable_observeproperty)
+Note that observables created by `mobservable.props` do not expose an `.observe` method,
+to observe properties, see [`mobservable.observeProperty`](#mobservableobserveproperty)
 
 Other forms in which this function can be called:
 ```javascript
@@ -448,7 +452,7 @@ for example in the `render` method of a React component.
 
 Batch postpones the updates of computed properties until the (synchronous) `workerFunction` has completed. 
 This is useful if you want to apply a bunch of different updates throughout your model before needing the updated computed values, 
-for example while refreshing a data from the database.
+for example while refreshing a data from the database. In practice, you wil probably never need `.batch`, since observables usually update wickedly fast.
 
 ```javascript
 var amount = mobservable(3);
@@ -487,7 +491,7 @@ This mixin also prevents re-renderings when the *props* of the component have on
 (Similar to [React PureRender mixin](https://facebook.github.io/react/docs/pure-render-mixin.html), except that *state* changes are still always processed). 
 This allows for React apps that perform well in apps with large amount of complex data, while avoiding the need to manage a lot of subscriptions.
 
-See the [above example](#example_observermixin_for_react_components) or the [JSFiddle demo: MOBservable + React](https://jsfiddle.net/mweststrate/46vL0phw)
+See the [above example](#example_observingcomponent_for_react_components) or the [JSFiddle demo: MOBservable + React](https://jsfiddle.net/mweststrate/46vL0phw)
 
 For an extensive explanation, read [combing React with MOBservable](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) 
 
@@ -509,8 +513,9 @@ var myComponent = mobservable.ObservingComponent(React.createClass({
 Numeric property, setting this to value to '1' or higher will cause additional debug information to be printed.
 
 ### mobservable.SimpleEventEmitter
-Utility class for managing an event. Its methods are:
+Utility class for managing an event. Its instance methods are:
 
+* `new mobservable.SimpleEventEmitter()`. Creates a new `SimpleEventEmitter`
 * `emit(...data : any[])`. Invokes all registered listeners with the given arguments
 * `on(listener:(...data : any[]) => void) : () => void`. Registers a new callback that will be invoked on each `emit`. Returns a method that can be used to unsubscribe the listener.
 * `once(listener:(...data : any[]) => void) : () => void`. Similar to `.on`, but automatically removes the listener after one invocation.
@@ -586,7 +591,7 @@ var total = mobservable(function() {
 ```
 
 Note that the dangling `()` after the expression is meant to invoke the getter of the just created observable to obtain its value.
-For convenience the same statement can also be rewritten using the [expr](#mobservable-expr) function:
+For convenience the same statement can also be rewritten using the [expr](#mobservableexpr) function:
 
 
 ```javascript
@@ -647,6 +652,6 @@ Here is a small comparison list between the two approaches.
 
 ## `.reference` versus `.array`
 
-Do *not* confuse `mobservable.primitive([])` with `mobservable([])`/`mobservable.array([])`, 
-the first creates an observable reference to an array, but does not observe its contents. 
-The later observes the contents from the array you pass into it.
+Do *not* confuse `mobservable.reference([])` / `mobservable.primitive([])` with `mobservable([])` / `mobservable.array([])`, 
+the first two create a observable reference to an array, but does not observe its contents. 
+The later two observe the content of the array you passed into it, which is probably what you inteded.
