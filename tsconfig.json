@@ -6,7 +6,8 @@
         "declaration": false,
         "noImplicitAny": false,
         "removeComments": true,
-        "noLib": false
+        "noLib": false,
+        "experimentalDecorators": true
     },
     "filesGlob": [
         "./**/*.ts",

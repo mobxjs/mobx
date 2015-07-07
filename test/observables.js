@@ -430,6 +430,8 @@ exports.testLazyEvaluation = function (test) {
         return b() +1;
     });
 
+    test.equal(bCalcs, 0);
+    test.equal(cCalcs, 0);
     test.equal(c(), 3);
     test.equal(bCalcs,1);
     test.equal(cCalcs,1);
