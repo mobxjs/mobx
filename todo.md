@@ -12,6 +12,8 @@ https://discuss.reactjs.org/
 * implement .liveFilter, .liveMap, , liveFlatten, .liveConcat (.liveSlice, .liveSort .get(=slice(x,1)), sum,min,max,avg,numericCount
 * add `thisArg` to all methods that accept a function?
 
+* website
+* logo
 * normalize observables ({ onNext: handleNext } => handleNext)
 * think of a way to go back and forth in state? global observer?
 * try to improve debugger rendering of observables

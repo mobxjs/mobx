@@ -1,6 +1,6 @@
 {
     "name": "mobservable",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "description": "Changes are coming! Small library for creating observable properties, arrays and functions",
     "main": "dist/mobservable.js",
     "scripts": {
@@ -40,13 +40,13 @@
             "android-browser/latest"
         ]
     },
-	"keywords": [
-		"mobservable",
-		"observable",
-		"react-component",
-		"react",
+    "keywords": [
+        "mobservable",
+        "observable",
+        "react-component",
+        "react",
         "reactive",
-		"frp",
-		"function-reactive-programming"
-	]
+        "frp",
+        "function-reactive-programming"
+    ]
 }
