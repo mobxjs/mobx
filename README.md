@@ -225,11 +225,11 @@ Especially when email is somewhere deep in your model tree)</small>
 
 Observable values, arrays and functions created by `mobservable` possess the following characteristics:
 
-* _synchronous_. All updates are processed synchronously, that is, the pseudo expressions `a = 3; b -> a * 2; a = 4; print(b); ` will always print `4`; `b` will never yield a stale value (unless `batch` is used).
-* _atomic_. All computed values will postpone updates until all inputs are settled, to make sure no intermediate values are visible. That is, the expression `a = 3; b -> a * 2; c -> a * b; a = 4; print(c)` will always print `36` and no intermediate values like `24`.
-* _real time dependency detection_. Computed values only depend on values actually used in the last computation, for example in this `a -> b > 5 ? c : b` the variable `c` will only cause a re-evaluation of a if `b` > 5. 
+* _synchronous_. Updates are processed synchronously, that is, the pseudo expressions `a = 3; b -> a * 2; a = 4; print(b); ` will always print `8`; `b` will never yield a stale value.
+* _atomic_. Computed values will postpone updates until all inputs are settled, to make sure no intermediate values are visible. That is, the expression `a = 3; b -> a * 2; c -> a * b; a = 4; print(c)` will always print `32` and no intermediate values like `24`.
+* _real time dependency detection_. Computed values only depend on values actually used in the last computation, for example, given: `a -> b > 5 ? c : b` the variable `c` will only cause a re-evaluation of `a` if `b > 5`. 
 * _lazy_. Computed values will only be evaluated if they are actually being observed. So make sure computed functions are pure and side effect free; the library might not evaluate expressions as often as you thought it would.   
-* _cycle detection_. Cycles in computes, like in `a -> 2 * b; b -> 2 * a;` will be deteced automatically.  
+* _cycle detection_. Cycles in computations, like in `a -> 2 * b; b -> 2 * a;` will be deteced.  
 * _error handling_. Exceptions that are raised during computations are propagated to consumers.
 
 # API Documentation
