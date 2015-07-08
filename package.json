@@ -39,5 +39,14 @@
             "ipad/6",
             "android-browser/latest"
         ]
-    }
+    },
+	"keywords": [
+		"mobservable",
+		"observable",
+		"react-component",
+		"react",
+        "reactive",
+		"frp",
+		"function-reactive-programming"
+	]
 }
