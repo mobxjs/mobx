@@ -17,6 +17,7 @@ interface IMObservableStatic {
     reference<T>(value?:T):Mobservable.IObservableValue<T>;
     computed<T>(func:()=>T,scope?):Mobservable.IObservableValue<T>;
     expr<T>(expr:()=>T,scope?):T;
+    sideEffect(func:Mobservable.Lambda,scope?):Mobservable.Lambda;
 
     // create observable properties
     props(object:Object, name:string, initalValue: any);
@@ -129,6 +130,10 @@ mobservableStatic.expr = function<T>(expr:()=>void, scope?) {
     if (DNode.trackingStack.length === 0)
         throw new Error("mobservable.expr can only be used inside a computed observable. Probably mobservable.computed should be used instead of .expr");
     return new ComputedObservable(expr, scope).get();
+}
+
+mobservableStatic.sideEffect = function(func:Lambda, scope?):Lambda {
+    return mobservableStatic.computed(func, scope).observe(noop);
 }
 
 mobservableStatic.array = function array<T>(values?:T[]): ObservableArray<T> {
@@ -1131,6 +1136,8 @@ function once(func: Lambda):Lambda {
         return func.apply(this, arguments);
     }
 }
+
+function noop(){};
 
 } // end of module
 

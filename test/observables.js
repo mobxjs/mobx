@@ -649,3 +649,22 @@ exports.test_expr = function(test) {
     
     test.done();
 }; 
+
+exports.test_sideeffect = function(test) {
+    var x = mobservable(3);
+    var x2 = mobservable(function() { return x() * 2; });
+    var b = [];
+    
+    var cancel = mobservable.sideEffect(function() { 
+        b.push(x2()); 
+    });
+    
+    x(4);
+    x(5);
+    test.deepEqual(b, [6, 8, 10]);
+    cancel();
+    x(7);
+    test.deepEqual(b, [6, 8, 10]);
+    
+    test.done();
+};

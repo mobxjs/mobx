@@ -12,6 +12,7 @@ It makes sure data changes are automatically, atomically and synchronously propa
 MOBservable runs in any ES5 environment but features also some React addons.
 It is higly efficient and shines when managing large amounts of complex, cyclic, nested or computed data.
 
+* [Slack group](https://mobservable.slack.com)
 * [Blog post: combining React with MOBservable](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) 
 * [Examples](#examples)
 * [Design principles](#design-principles)
@@ -309,11 +310,33 @@ to all the listeners.
 
 ### mobservable.expr
 
-`mobservable.expr<T>(expr:()=>T,scope?):T;`
+`mobservable.expr<T>(expr : ()=>T, scope?) : T`
 
 This function is simply sugar for `mobservable.computed(expr, scope)();`. 
 `expr` can be used to split up and improve the performance of expensive computations,
 as described in this [section](#use-nested-observables-in-expensive-computations).
+
+### mobservable.sideEffect
+`mobservable.sideEffect(func:() => void, scope?): ()=>void`
+
+Use this function if you have a function which should produce side effects, even if it is not observed itself.
+This is useful for logging, storage backend interaction etc.
+Use it whenever you need to transfer observable data to things that don't know how to observe. 
+`sideEffect` returns a function that can be used to prevent the sideEffect from being triggered in the future.
+
+```javascript
+var x = mobservable(3);
+var x2 = mobservable(function() {
+    return x() * 2;
+});
+
+mobservable.sideEffect(function() {
+    storeInDatabase(x2());
+    console.log(x2());
+});
+x(7);
+// prints 14
+```
 
 ### mobservable.array
 
