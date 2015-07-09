@@ -13,6 +13,7 @@ Gruntfile.js
 npm-debug.log
 publish.js
 todo.md
+notes.md
 tsconfig.json
 
 *.js.map

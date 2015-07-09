@@ -6,3 +6,4 @@ coverage/
 *.js.map
 /test/typescript-test.js*
 /dist/test
+notes.md
