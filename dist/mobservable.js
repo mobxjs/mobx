@@ -33,6 +33,9 @@ var mobservable;
             throw new Error("mobservable.expr can only be used inside a computed observable. Probably mobservable.computed should be used instead of .expr");
         return new ComputedObservable(expr, scope).get();
     };
+    mobservable.mobservableStatic.sideEffect = function (func, scope) {
+        return mobservable.mobservableStatic.computed(func, scope).observe(noop);
+    };
     mobservable.mobservableStatic.array = function array(values) {
         return new ObservableArray(values);
     };
@@ -875,6 +878,8 @@ var mobservable;
             return func.apply(this, arguments);
         };
     }
+    function noop() { }
+    ;
 })(mobservable || (mobservable = {}));
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
