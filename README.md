@@ -13,7 +13,7 @@ MOBservable runs in any ES5 environment but features also some React addons.
 It is higly efficient and shines when managing large amounts of complex, cyclic, nested or computed data.
 
 * [Slack group](https://mobservable.slack.com)
-* [Blog post: combining React with MOBservable](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) 
+* [Blog post: combining React with MOBservable to create high performing easily maintainable apps](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) 
 * [Examples](#examples)
 * [Design principles](#design-principles)
 * [API documentation](#api-documentation)
@@ -21,6 +21,7 @@ It is higly efficient and shines when managing large amounts of complex, cyclic,
 
 # Examples
 
+* [TodoMVC in Mobservable + React](https://rawgit.com/mweststrate/todomvc/immutable-to-observable/examples/react-mobservable/index.html#/), ... and the [diff](https://github.com/mweststrate/todomvc/commit/2e30caeb8c690c914f92081ac01d12097a068a1e) of using observables with react instead of immutables.
 * [Fiddle demo: MOBservable + React: simple timer](https://jsfiddle.net/mweststrate/wgbe4guu/)
 * [Fiddle demo: MOBservable + React: shop](https://jsfiddle.net/mweststrate/46vL0phw)
 * [Fiddle demo: MOBservable + JQuery: shop](http://jsfiddle.net/mweststrate/vxn7qgdw)
@@ -434,6 +435,10 @@ class Order {
     }
 }
 ```
+
+Please note that adding the `@observable` annotations to a function does not result in an observable property (as would be the case when using `props`) but in an observable function,
+to make sure the compile time type matches the runtime type of the function.
+
 ## Observing changes
 
 ### mobservable.observeProperty
