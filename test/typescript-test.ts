@@ -1,7 +1,6 @@
 /// <reference path="./node_modules/mobservable/mobservable.d.ts"/>
 import mobservable = require('mobservable');
-
-var observable = mobservable.observable;
+import {observable} from "mobservable";
 
 var v = mobservable(3);
 v.observe(() => {});
@@ -14,6 +13,10 @@ class Order {
     @observable orders = [];
 
     @observable total() {
+        return this.amount * this.price * (1 + this.orders.length);
+    }
+
+    @observable get total2() {
         return this.amount * this.price * (1 + this.orders.length);
     }
 }
@@ -37,6 +40,7 @@ export function testAnnotations(test) {
 
     test.equal(order1.price, 3);
     test.equal(order1.total(), 3);
+    test.equal(order1.total2, 3);
     test.equal(order2.total(), 8);
     order2.orders.push('bla');
     test.equal(order2.total(), 16);
@@ -47,6 +51,7 @@ export function testAnnotations(test) {
     disposer();
     order1.orders.pop();
     test.equal(order1.total(), 6);
+    test.equal(order1.total2, 6);
     test.deepEqual(order1totals, [6,3,9]);
     test.done();
 };

@@ -37,8 +37,6 @@ The core of `MOBservable` consists of observable values, i.e. functions that aut
 and the possibility to listen to changing values and updated computations.
 
 ```javascript
-var mobservable = require('mobservable');
-
 var nrOfCatz = mobservable(3);
 var nrOfDogs = mobservable(8);
 
@@ -65,8 +63,6 @@ nrOfCatz(34);
 By using `.props`, it is possible to create observable values and functions that can be assigned or read as normal properties. 
 
 ```javascript
-var mobservable = require('mobservable');
-
 var Person = function(firstName, lastName) {
     // Define the observable properties firstName, lastName and fullName on 'this':
     mobservable.props(this, {
@@ -97,8 +93,6 @@ jane.lastName = "Do";
 `mobservable` provides an observable array implementation (as ES7 polyfill) which is fully ES5 compliant but which will notify dependent computations upon each change.
 
 ```javascript
-import mobservable = require('mobservable');
-
 // Create an array, that works by all means as a normal array, except that it is observable!
 var someNumbers = mobservable.value([1,2,3]);
 
@@ -124,12 +118,11 @@ For TypeScript users, `mobservable` ships with module typings and an `@observabl
 
 ```typescript
 /// <reference path="./node_modules/mobservable/mobservable.d.ts"/>
-import mobservable = require('mobservable');
-var observable = mobservable.observable;
+import {observable, sideEffect} from "mobservable";
 
 class Order {
     @observable orderLines: OrderLine[] = [];
-    @observable total() {
+    @observable get total() {
         return this.orderLines.reduce((sum, orderLine) => sum + orderLine.total, 0)
     }
 }
@@ -142,13 +135,13 @@ class OrderLine {
         this.price = price;
     }
 
-    @observable total() {
+    @observable get total() {
         return "Total: " + this.price * this.amount;
     }
 }
 
 var order1 = new Order();
-order1.total.observe(console.log);
+sideEffect(() => console.log("Total: " + order1.total));
 
 order1.orderLines.push(new OrderLine(7));
 // Prints: Total: 7
@@ -431,14 +424,14 @@ This annotations basically wraps `mobservable.props`. Example:
 
 ```typescript
 /// <reference path='./node_modules/mobservable/mobservable.d.ts'/>
-var observable = require('mobservable').observable;
+import {observable} from 'mobservable';
 
 class Order {
     @observable price:number = 3;
     @observable amount:number = 2;
     @observable orders = [];
 
-    @observable total() {
+    @observable get total() {
         return this.amount * this.price * (1 + orders.length);
     }
 }
@@ -446,6 +439,7 @@ class Order {
 
 Please note that adding the `@observable` annotations to a function does not result in an observable property (as would be the case when using `props`) but in an observable function,
 to make sure the compile time type matches the runtime type of the function.
+In most cases you probably want to annotate a getter instead.
 
 ## Observing changes
 
