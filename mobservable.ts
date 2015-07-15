@@ -1055,9 +1055,9 @@ mobservableStatic.ObservingComponent = function(componentClass) {
  * @type {T[]}
  */
 function quickDiff<T>(current:T[], base:T[]):[T[],T[]] {
-    if (!base.length)
+    if (!base || !base.length)
         return [current, []];
-    if (!current.length)
+    if (!current || !current.length)
         return [[], base];
 
     var added:T[] = [];
