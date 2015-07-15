@@ -5,7 +5,7 @@
 
 Installation: `npm install mobservable --save`
 
-MOBservable is light-weight standalone library to create Reactive primitives, functions, arrays and objects.
+MOBservable is light-weight standalone transparent reactive programming library to create Reactive primitives, functions, arrays and objects.
 
 Its goal is to make developers happy and productive by removing boilerplate work such as invalidating derived data or managing event listeners. 
 It makes sure data changes are automatically, atomically and synchronously propagated through your app without being obtrusive.
@@ -15,7 +15,7 @@ It is highly efficient and shines when managing large amounts of complex, cyclic
 Some links that may be interesting:
 
 * [Slack group](https://mobservable.slack.com)
-* [Blog post: combining React with MOBservable to create high performing easily maintainable apps](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) 
+* [Blog post: combining React with MOBservable to create high performing and easily maintainable apps](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) 
 * [Examples](#examples)
 * [Design principles](#design-principles)
 * [API documentation](#api-documentation)
