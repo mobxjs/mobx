@@ -71,6 +71,7 @@ var mobservable;
         if (typeof baseValue === "function") {
             delete descriptor.value;
             delete descriptor.writable;
+            descriptor.configurable = true;
             descriptor.get = function () {
                 var observable = this.key = mobservable.mobservableStatic.computed(baseValue, this);
                 return observable;
@@ -82,7 +83,7 @@ var mobservable;
         }
         else {
             Object.defineProperty(target, key, {
-                configurable: false, enumberable: true,
+                configurable: true, enumberable: true,
                 get: function () {
                     mobservable.mobservableStatic.props(this, key, undefined);
                     return this[key];
