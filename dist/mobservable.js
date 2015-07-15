@@ -821,9 +821,9 @@ var mobservable;
         return componentClass;
     };
     function quickDiff(current, base) {
-        if (!base.length)
+        if (!base || !base.length)
             return [current, []];
-        if (!current.length)
+        if (!current || !current.length)
             return [[], base];
         var added = [];
         var removed = [];
