@@ -30,10 +30,12 @@ export function testObservable(test) {
 
 export function testAnnotations(test) {
     var order1totals = [];
+    var order2totals = [];
     var order1 = new Order();
     var order2 = new Order();
 
-    var disposer = mobservable.observeProperty(order1, 'total', value => order1totals.push(value), true);
+    var disposer = order1.total['observe'](value => order1totals.push(value), true); // MWE: mweh, how to make this type technically sound?
+    var disposer2 = mobservable.observeProperty(order1, 'total2', value => order2totals.push(value), true);
 
     order2.price = 4;
     order1.amount = 1;
@@ -49,10 +51,12 @@ export function testAnnotations(test) {
     test.deepEqual(order1totals, [6,3,9]);
 
     disposer();
+    disposer2();
     order1.orders.pop();
     test.equal(order1.total(), 6);
     test.equal(order1.total2, 6);
     test.deepEqual(order1totals, [6,3,9]);
+    test.deepEqual(order2totals, [6,3,9]);
     test.done();
 };
 

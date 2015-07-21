@@ -259,6 +259,50 @@ exports.testProps4 = function(test) {
     test.done();
 }
 
+
+exports.testObserveProperty = function(test) {
+    var sb = [];
+    var mb = [];
+    
+    var Wrapper = function (chocolateBar) {
+        mobservable.props(this, {
+            chocolateBar: chocolateBar,
+            calories: function () {
+                return this.chocolateBar.calories;
+            }
+        });
+    };
+
+    var snickers = mobservable.props({
+        calories: null
+    });
+    var mars = mobservable.props({
+        calories: undefined
+    });
+
+    var wrappedSnickers = new Wrapper(snickers);
+    var wrappedMars = new Wrapper(mars);
+
+    var disposeSnickers = mobservable.observeProperty(wrappedSnickers, 'calories', function (calories) {
+        sb.push(calories);
+    }, true);
+    var disposeMars = mobservable.observeProperty(wrappedMars, 'calories', function (calories) {
+        mb.push(calories);
+    }, true);
+    snickers.calories = 10;
+    mars.calories = 15;
+
+    disposeSnickers();
+    disposeMars();
+    snickers.calories = 5;
+    mars.calories = 7;
+
+    test.deepEqual(sb, [null, 10]);
+    test.deepEqual(mb, [undefined, 15]);
+
+    test.done();
+}
+
 exports.testWatch = function(test) {
     var a = value(3);
     var b = value(2);
@@ -321,7 +365,6 @@ exports.testWatchNested = function(test) {
     value(function() {
         bCalcs += 1;
         c = mobservable.watch(function() {
-            debugger;
             cCalcs += 1;
             return a();
         }, function() {
