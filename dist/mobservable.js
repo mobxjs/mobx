@@ -117,19 +117,16 @@ var mobservable;
     };
     mobservable.mobservableStatic.observeProperty = function observeProperty(object, key, listener, invokeImmediately) {
         if (invokeImmediately === void 0) { invokeImmediately = false; }
-        if (!object || !key || object[key] === undefined)
+        if (!object)
+            throw new Error("Cannot observe property of '" + object + "'");
+        if (!(key in object))
             throw new Error("Object '" + object + "' has no property '" + key + "'.");
         if (!listener || typeof listener !== "function")
             throw new Error("Third argument to mobservable.observeProperty should be a function");
-        var currentValue = object[key];
-        if (currentValue instanceof ObservableValue || currentValue instanceof ObservableArray)
-            return currentValue.observe(listener, invokeImmediately);
-        else if (currentValue.impl && (currentValue.impl instanceof ObservableValue || currentValue instanceof ObservableArray))
-            return currentValue.impl.observe(listener, invokeImmediately);
         var observer = new ComputedObservable((function () { return object[key]; }), object);
         var disposer = observer.observe(listener, invokeImmediately);
-        if (mobservable.mobservableStatic.debugLevel && observer.dependencyState.observing.length === 0)
-            warn("mobservable.observeProperty: property '" + key + "' of '" + object + " doesn't seem to be observable. Did you define it as observable?");
+        if (observer.dependencyState.observing.length === 0)
+            throw new Error("mobservable.observeProperty: property '" + key + "' of '" + object + " doesn't seem to be observable. Did you define it as observable using @observable or mobservable.props? You might try to use the .observe() method instead.");
         return once(function () {
             disposer();
             observer.dependencyState.dispose();
