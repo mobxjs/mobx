@@ -244,26 +244,19 @@ mobservableStatic.toPlainValue = function toPlainValue(value:any):any {
     (Since properties do not expose an .observe method themselves).
 */ 
 mobservableStatic.observeProperty = function observeProperty(object:Object, key:string, listener:(...args:any[])=>void, invokeImmediately = false):Lambda {
-    if (!object || !key || object[key] === undefined)
+    if (!object)
+        throw new Error(`Cannot observe property of '${object}'`);
+    if (!(key in object))
         throw new Error(`Object '${object}' has no property '${key}'.`);
     if (!listener || typeof listener !== "function")
         throw new Error("Third argument to mobservable.observeProperty should be a function");
-
-    var currentValue = object[key];
-
-    // ObservableValue, ComputedObservable or ObservableArray? -> attach observer
-    if (currentValue instanceof ObservableValue || currentValue instanceof ObservableArray)
-        return currentValue.observe(listener, invokeImmediately);
-    // IObservable? -> attach observer
-    else if (currentValue && currentValue.impl && (currentValue.impl instanceof ObservableValue || currentValue instanceof ObservableArray))
-        return currentValue.impl.observe(listener, invokeImmediately);
 
     // wrap with observable function
     var observer = new ComputedObservable((() => object[key]), object);
     var disposer = observer.observe(listener, invokeImmediately);
 
-    if (mobservableStatic.debugLevel && (<any>observer).dependencyState.observing.length === 0)
-        warn(`mobservable.observeProperty: property '${key}' of '${object} doesn't seem to be observable. Did you define it as observable?`);
+    if ((<any>observer).dependencyState.observing.length === 0)
+        throw new Error(`mobservable.observeProperty: property '${key}' of '${object} doesn't seem to be observable. Did you define it as observable using @observable or mobservable.props? You might try to use the .observe() method instead.`);
 
     return once(() => {
         disposer();

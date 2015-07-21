@@ -14,7 +14,7 @@ It is highly efficient and shines when managing large amounts of complex, cyclic
 
 Some links that may be interesting:
 
-* [Slack group](https://mobservable.slack.com)
+* [Slack channel on reactiflux](https://reactiflux.slack.com/messages/mobservable/)
 * [Blog post: combining React with MOBservable to create high performing and easily maintainable apps](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) 
 * [Examples](#examples)
 * [Design principles](#design-principles)
@@ -447,7 +447,7 @@ In most cases you probably want to annotate a getter instead.
 `mobservable.observeProperty(object : Object, key : string, listener : Function, invokeImmediately : boolean = false) : Function`
 
 Observes the observable property `key` of `object`.
-This is useful if you want to observe properties created using the `observable` annotation or the `props` method,  since for those properties their own `observe` method is not publicly available.
+This is useful if you want to observe *properties* created using the `observable` annotation or the `props` method,  since for those properties their own `observe` method is not publicly available.
 
 ```javascript
 function OrderLine(price) {
