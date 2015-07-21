@@ -255,7 +255,7 @@ mobservableStatic.observeProperty = function observeProperty(object:Object, key:
     if (currentValue instanceof ObservableValue || currentValue instanceof ObservableArray)
         return currentValue.observe(listener, invokeImmediately);
     // IObservable? -> attach observer
-    else if (currentValue.impl && (currentValue.impl instanceof ObservableValue || currentValue instanceof ObservableArray))
+    else if (currentValue && currentValue.impl && (currentValue.impl instanceof ObservableValue || currentValue instanceof ObservableArray))
         return currentValue.impl.observe(listener, invokeImmediately);
 
     // wrap with observable function
