@@ -23,11 +23,13 @@ interface IMObservableStatic {
     props(object:Object, name:string, initalValue: any);
     props(object:Object, props:Object);
     props(object:Object);
+    fromJson<T>(value:T):T;
     observable(target:Object, key:string); // annotation
 
-    // observables to not observables
+    // convert observables to not observables
+    toJson<T>(value:T):T;
     toPlainValue<T>(any:T):T;
-
+    
     // observe observables
     observeProperty(object:Object, key:string, listener:Function, invokeImmediately?:boolean):Mobservable.Lambda;
     watch<T>(func:()=>T, onInvalidate:Mobservable.Lambda):[T,Mobservable.Lambda];
@@ -166,6 +168,42 @@ mobservableStatic.props = function props(target, props?, value?) {
             break;
     }
     return target;
+}
+
+mobservableStatic.fromJson = function fromJson(source) {
+    function convertValue(value) {
+        if (!value)
+            return value;
+        if (typeof value === "object") // array or object
+            return fromJson(value);
+        return value;
+    }
+
+    if (source) {
+        if (Array.isArray(source))
+            return mobservableStatic.array(source.map(convertValue));
+        if (typeof source === "object") {
+            var props = {};
+            for(var key in source) if (source.hasOwnProperty(key))
+                props[key] = convertValue(source[key]);
+            return mobservableStatic.props(props);
+        }
+    }
+    throw new Error(`mobservable.fromJson expects object or array, got: '${source}'`);
+}
+
+mobservableStatic.toJson = function toJson(source) {
+    if (!source)
+        return source;
+    if (Array.isArray(source) || source instanceof ObservableArray)
+        return source.map(toJson);
+    if (typeof source === "object") {
+        var res = {};
+        for (var key in source) if (source.hasOwnProperty(key))
+            res[key] = toJson(source[key]);
+        return res;
+    }
+    return source;
 }
 
 /**

@@ -24,10 +24,14 @@ interface IMObservableStatic {
     props(object:Object, name:string, initalValue: any);
     props(object:Object, props:Object);
     props(object:Object);
+    fromJson<T>(value:T):T;
     observable(target:Object, key:string); // annotation
 
-    // observables to not observables
+    // convert observables to not observables
+    toJson<T>(value:T):T;
     toPlainValue<T>(any:T):T;
+    
+    
 
     // observe observables
     observeProperty(object:Object, key:string, listener:Function, invokeImmediately?:boolean):Mobservable.Lambda;

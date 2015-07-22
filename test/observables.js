@@ -711,3 +711,216 @@ exports.test_sideeffect = function(test) {
     
     test.done();
 };
+
+exports.test_json1 = function(test) {
+    var todos = mobservable.fromJson([
+        {
+            title: "write blog"
+        },
+        {
+            title: "improve coverge"
+        }    
+    ]);
+    
+    var output;
+    mobservable.sideEffect(function() {
+        output = todos.map(function(todo) { return todo.title; }).join(", ");
+    });
+    
+    todos[1].title = "improve coverage"; // prints: write blog, improve coverage
+    test.equal(output, "write blog, improve coverage");
+    todos.push({ title: "take a nap" }); // prints: write blog, improve coverage, take a nap
+    test.equal(output, "write blog, improve coverage, take a nap");
+    
+    test.done();
+}
+
+exports.test_json2 = function(test) {
+    var source = {
+        todos: [
+            {
+                title: "write blog",
+                tags: ["react","frp"],
+                details: {
+                    url: "somewhere"
+                }
+            },
+            {
+                title: "do the dishes",
+                tags: ["mweh"],
+                details: {
+                    url: "here"
+                }
+            }
+        ]
+    };
+    
+    var o = mobservable.fromJson(source);
+    
+    //console.log(JSON.stringify(source,null,4));
+    test.deepEqual(mobservable.toJson(o), source);
+    test.deepEqual(source, o);
+        
+    var analyze = mobservable(function() {
+        return [
+            o.todos.length,
+            o.todos[1].details.url
+        ]
+    });
+    
+    var alltags = mobservable(function() {
+        return o.todos.map(function(todo) {
+            return todo.tags.join(",");
+        }).join(",");
+    });
+    
+    var ab = [];
+    var tb = [];
+    
+    analyze.observe(function(d) { ab.push(d); }, true);
+    alltags.observe(function(d) { tb.push(d); }, true);
+    
+    o.todos[0].details.url = "boe";
+    o.todos[1].details.url = "ba";
+    o.todos[0].tags[0] = "reactjs";
+    o.todos[1].tags.push("pff");
+    
+    test.deepEqual(mobservable.toJson(o), {
+        "todos": [
+            {
+                "title": "write blog",
+                "tags": [
+                    "reactjs",
+                    "frp"
+                ],
+                "details": {
+                    "url": "boe"
+                }
+            },
+            {
+                "title": "do the dishes",
+                "tags": [
+                    "mweh", "pff"
+                ],
+                "details": {
+                    "url": "ba"
+                }
+            }
+        ]
+    });
+    test.deepEqual(ab, [ [ 2, 'here' ], [ 2, 'ba' ] ]);
+    test.deepEqual(tb,  [ 'react,frp,mweh', 'reactjs,frp,mweh', 'reactjs,frp,mweh,pff' ]);
+    ab = [];
+    tb = [];
+    
+    o.todos.push(mobservable.fromJson({
+        title: "test",
+        tags: ["x"]
+    }));
+    
+    test.deepEqual(o, {
+        "todos": [
+            {
+                "title": "write blog",
+                "tags": [
+                    "reactjs",
+                    "frp"
+                ],
+                "details": {
+                    "url": "boe"
+                }
+            },
+            {
+                "title": "do the dishes",
+                "tags": [
+                    "mweh", "pff"
+                ],
+                "details": {
+                    "url": "ba"
+                }
+            },
+            {
+                title: "test",
+                tags: ["x"]
+            }
+        ]
+    });
+    test.deepEqual(ab, [[3, "ba"]]);
+    test.deepEqual(tb, ["reactjs,frp,mweh,pff,x"]);
+    ab = [];
+    tb = [];
+
+    o.todos[1] = mobservable.fromJson({
+        title: "clean the attic",
+        tags: ["needs sabbatical"],
+        details: {
+            url: "booking.com"
+        }
+    });
+    test.deepEqual(o, {
+        "todos": [
+            {
+                "title": "write blog",
+                "tags": [
+                    "reactjs",
+                    "frp"
+                ],
+                "details": {
+                    "url": "boe"
+                }
+            },
+            {
+                "title": "clean the attic",
+                "tags": [
+                    "needs sabbatical"
+                ],
+                "details": {
+                    "url": "booking.com"
+                }
+            },
+            {
+                title: "test",
+                tags: ["x"]
+            }
+        ]
+    });
+    test.deepEqual(ab, [[3, "booking.com"]]);
+    test.deepEqual(tb, ["reactjs,frp,needs sabbatical,x"]);
+    ab = [];
+    tb = [];
+    
+    o.todos[1].details = mobservable.fromJson({ url: "google" });
+    o.todos[1].tags = ["foo", "bar"];
+    test.deepEqual(mobservable.toJson(o), {
+         "todos": [
+            {
+                "title": "write blog",
+                "tags": [
+                    "reactjs",
+                    "frp"
+                ],
+                "details": {
+                    "url": "boe"
+                }
+            },
+            {
+                "title": "clean the attic",
+                "tags": [
+                    "foo", "bar"
+                ],
+                "details": {
+                    "url": "google"
+                }
+            },
+            {
+                title: "test",
+                tags: ["x"]
+            }
+        ]
+    });
+    test.deepEqual(o, mobservable.toJson(o));
+    test.deepEqual(ab, [[3, "google"]]);
+    test.deepEqual(tb, ["reactjs,frp,foo,bar,x"]);
+    
+    test.done();
+}

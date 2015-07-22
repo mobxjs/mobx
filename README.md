@@ -414,6 +414,31 @@ mobservable.props(order, "price", 3); // equivalent to mobservable.props(order, 
 var order = mobservable.props({ price: 3}); // uses the original object as target, that is, all values in it are replaced by their observable counterparts
 ```
 
+### mobservable.fromJson
+`fromJson<T>(value:T):T;`
+ 
+Converts a JSON object tree into an observable tree that is structurally the same, but completely observable, by combining `.props` and `.array`.
+
+Example:
+
+```javascript
+var todos = mobservable.fromJson([
+    {
+        title: "write blog"
+    },
+    {
+        title: "improve coverge"
+    }    
+]);
+
+mobservable.sideEffect(function() {
+    console.log(todos.map(todo => todo.title).join(", "));
+});
+
+todos[1].title = "improve coverage"; // prints: write blog, improve coverage
+todos.push({ title: "take a nap" }); // prints: write blog, improve coverage, take a nap
+```
+
 ### mobservable.observable annotation
 
 **Note: ES5, TypeScript 1.5+ environments only**
@@ -504,11 +529,17 @@ mobservable.batch(function() {
 
 ## Utilities
 
+### mobservable.toJson
+`toJson<T>(value:T):T;`
+
+Converts a non-cyclic tree of observable objects into a JSON structure that is not observable. It is the inverse of `mobservable.fromJson`
+
 ### mobservable.toPlainValue
 `mobservable.toPlainValue<T>(any:T):T;` 
 
 Converts a (possibly) observable value into a non-observablue value.
 For non-primitive values, this function will always return a shallow copy.
+Similar to `.toJson`, but doesn't recurse deeper into the structures
 
 ### mobservable.ObserverMixin
 
