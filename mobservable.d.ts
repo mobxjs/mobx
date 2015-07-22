@@ -31,8 +31,6 @@ interface IMObservableStatic {
     toJson<T>(value:T):T;
     toPlainValue<T>(any:T):T;
     
-    
-
     // observe observables
     observeProperty(object:Object, key:string, listener:Function, invokeImmediately?:boolean):Mobservable.Lambda;
     watch<T>(func:()=>T, onInvalidate:Mobservable.Lambda):[T,Mobservable.Lambda];

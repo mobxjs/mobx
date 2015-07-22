@@ -66,6 +66,41 @@ var mobservable;
         }
         return target;
     };
+    mobservable.mobservableStatic.fromJson = function fromJson(source) {
+        function convertValue(value) {
+            if (!value)
+                return value;
+            if (typeof value === "object")
+                return fromJson(value);
+            return value;
+        }
+        if (source) {
+            if (Array.isArray(source))
+                return mobservable.mobservableStatic.array(source.map(convertValue));
+            if (typeof source === "object") {
+                var props = {};
+                for (var key in source)
+                    if (source.hasOwnProperty(key))
+                        props[key] = convertValue(source[key]);
+                return mobservable.mobservableStatic.props(props);
+            }
+        }
+        throw new Error("mobservable.fromJson expects object or array, got: '" + source + "'");
+    };
+    mobservable.mobservableStatic.toJson = function toJson(source) {
+        if (!source)
+            return source;
+        if (Array.isArray(source) || source instanceof ObservableArray)
+            return source.map(toJson);
+        if (typeof source === "object") {
+            var res = {};
+            for (var key in source)
+                if (source.hasOwnProperty(key))
+                    res[key] = toJson(source[key]);
+            return res;
+        }
+        return source;
+    };
     mobservable.mobservableStatic.observable = function observable(target, key, descriptor) {
         var baseValue = descriptor ? descriptor.value : null;
         if (typeof baseValue === "function") {
