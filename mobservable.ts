@@ -110,51 +110,51 @@ function createObservable(value?, scope?:Object):any {
     if (Array.isArray(value))
         return new ObservableArray(value);
     if (typeof value === "function")
-        return mobservableStatic.computed(value, scope);
-    return mobservableStatic.primitive(value);
+        return m.computed(value, scope);
+    return m.primitive(value);
 }
 
-export var mobservableStatic:IMObservableStatic = <IMObservableStatic> function(value, scope?) {
+export var m:IMObservableStatic = <IMObservableStatic> function(value, scope?) {
     return createObservable(value,scope);
 };
 
-mobservableStatic.value = createObservable;
+m.value = createObservable;
 
-mobservableStatic.primitive = mobservableStatic.reference = function(value?) {
+m.primitive = m.reference = function(value?) {
     return new ObservableValue(value).createGetterSetter();
 }
 
-mobservableStatic.computed = function<T>(func:()=>void, scope?) {
+m.computed = function<T>(func:()=>void, scope?) {
     return new ComputedObservable(func, scope).createGetterSetter();
 }
 
-mobservableStatic.expr = function<T>(expr:()=>void, scope?) {
+m.expr = function<T>(expr:()=>void, scope?) {
     if (DNode.trackingStack.length === 0)
         throw new Error("mobservable.expr can only be used inside a computed observable. Probably mobservable.computed should be used instead of .expr");
     return new ComputedObservable(expr, scope).get();
 }
 
-mobservableStatic.sideEffect = function(func:Lambda, scope?):Lambda {
-    return mobservableStatic.computed(func, scope).observe(noop);
+m.sideEffect = function(func:Lambda, scope?):Lambda {
+    return m.computed(func, scope).observe(noop);
 }
 
-mobservableStatic.array = function array<T>(values?:T[]): ObservableArray<T> {
+m.array = function array<T>(values?:T[]): ObservableArray<T> {
     return new ObservableArray(values);
 }
 
-mobservableStatic.props = function props(target, props?, value?) {
+m.props = function props(target, props?, value?) {
     switch(arguments.length) {
         case 0:
             throw new Error("Not enough arguments");
         case 1:
-            return mobservableStatic.props(target, target); // mix target properties into itself
+            return m.props(target, target); // mix target properties into itself
         case 2:
             for(var key in props)
-                mobservableStatic.props(target, key, props[key]);
+                m.props(target, key, props[key]);
             break;
         case 3:
             var isArray = Array.isArray(value);
-            var observable = mobservableStatic.value(value, target);
+            var observable = m.value(value, target);
             Object.defineProperty(target, props, {
                 get: isArray 
                     ? function() { return observable; } 
@@ -170,7 +170,7 @@ mobservableStatic.props = function props(target, props?, value?) {
     return target;
 }
 
-mobservableStatic.fromJson = function fromJson(source) {
+m.fromJson = function fromJson(source) {
     function convertValue(value) {
         if (!value)
             return value;
@@ -181,18 +181,18 @@ mobservableStatic.fromJson = function fromJson(source) {
 
     if (source) {
         if (Array.isArray(source))
-            return mobservableStatic.array(source.map(convertValue));
+            return m.array(source.map(convertValue));
         if (typeof source === "object") {
             var props = {};
             for(var key in source) if (source.hasOwnProperty(key))
                 props[key] = convertValue(source[key]);
-            return mobservableStatic.props(props);
+            return m.props(props);
         }
     }
     throw new Error(`mobservable.fromJson expects object or array, got: '${source}'`);
 }
 
-mobservableStatic.toJson = function toJson(source) {
+m.toJson = function toJson(source) {
     if (!source)
         return source;
     if (Array.isArray(source) || source instanceof ObservableArray)
@@ -216,7 +216,7 @@ mobservableStatic.toJson = function toJson(source) {
  *   }
  * }
  */
-mobservableStatic.observable = function observable(target:Object, key:string, descriptor?) {
+m.observable = function observable(target:Object, key:string, descriptor?) {
     var baseValue = descriptor ? descriptor.value : null;
     // observable annotations are invoked on the prototype, not on actual instances,
     // so upon invocation, determine the 'this' instance, and define a property on the
@@ -226,7 +226,7 @@ mobservableStatic.observable = function observable(target:Object, key:string, de
         delete descriptor.writable;
         descriptor.configurable = true;
         descriptor.get = function() {
-            var observable = this.key = mobservableStatic.computed(baseValue, this);
+            var observable = this.key = m.computed(baseValue, this);
             return observable;
         };
         descriptor.set = function () {
@@ -237,11 +237,11 @@ mobservableStatic.observable = function observable(target:Object, key:string, de
         Object.defineProperty(target, key, {
             configurable: true, enumberable:true,
             get: function() {
-                mobservableStatic.props(this, key, undefined);
+                m.props(this, key, undefined);
                 return this[key];
             },
             set: function(value) {
-                mobservableStatic.props(this, key, value);
+                m.props(this, key, value);
             }
         });
     }
@@ -254,7 +254,7 @@ mobservableStatic.observable = function observable(target:Object, key:string, de
  *
  * Any other value will be returned as is.
  */
-mobservableStatic.toPlainValue = function toPlainValue(value:any):any {
+m.toPlainValue = function toPlainValue(value:any):any {
     if (value) {
         if (value instanceof Array)
             return value.slice();
@@ -281,7 +281,7 @@ mobservableStatic.toPlainValue = function toPlainValue(value:any):any {
     `defineObservableProperty` or `initializeObservableProperties`.
     (Since properties do not expose an .observe method themselves).
 */ 
-mobservableStatic.observeProperty = function observeProperty(object:Object, key:string, listener:(...args:any[])=>void, invokeImmediately = false):Lambda {
+m.observeProperty = function observeProperty(object:Object, key:string, listener:(...args:any[])=>void, invokeImmediately = false):Lambda {
     if (!object)
         throw new Error(`Cannot observe property of '${object}'`);
     if (!(key in object))
@@ -307,16 +307,16 @@ mobservableStatic.observeProperty = function observeProperty(object:Object, key:
     and invokes 'onValidate' whenever func *should* update.
     Returns  a tuplde [return value of func, disposer]. The disposer can be used to abort the watch early.
 */
-mobservableStatic.watch = function watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
+m.watch = function watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
     var watch = new WatchedExpression(func, onInvalidate);
     return [watch.value, () => watch.dispose()];
 }
 
-mobservableStatic.batch = function batch<T>(action:()=>T):T {
+m.batch = function batch<T>(action:()=>T):T {
     return Scheduler.batch(action);
 }
 
-mobservableStatic.debugLevel = 0;
+m.debugLevel = 0;
 
 class ObservableValue<T> {
     protected changeEvent = new SimpleEventEmitter();
@@ -401,7 +401,7 @@ class ComputedObservable<U> extends ObservableValue<U> {
         if (state.hasCycle)
             throw new Error("Cycle detected");
         if (this.hasError) {
-            if (mobservableStatic.debugLevel) {
+            if (m.debugLevel) {
                 console.trace();
                 warn(`${this}: rethrowing caught exception to observer: ${this._value}${(<any>this._value).cause||''}`);
             }
@@ -604,7 +604,7 @@ class DNode {
     private bindDependencies() {
         this.observing = DNode.trackingStack.pop();
 
-        if (this.isComputed && this.observing.length === 0 && mobservableStatic.debugLevel > 1 && !this.isDisposed) {
+        if (this.isComputed && this.observing.length === 0 && m.debugLevel > 1 && !this.isDisposed) {
             console.trace();
             warn("You have created a function that doesn't observe any values, did you forget to make its dependencies observable?");
         }
@@ -893,7 +893,7 @@ class ObservableArray<T> extends StubArray implements Mobservable.IObservableArr
     }
 
     private sideEffectWarning(funcName:string) {
-        if (mobservableStatic.debugLevel > 0 && DNode.trackingStack.length > 0)
+        if (m.debugLevel > 0 && DNode.trackingStack.length > 0)
             warn(`[Mobservable.Array] The method array.${funcName} should probably not be used inside observable functions since it has side-effects`);
     }
     
@@ -979,7 +979,7 @@ class SimpleEventEmitter implements Mobservable.ISimpleEventEmitter {
         return subscription;
     }
 }
-mobservableStatic.SimpleEventEmitter = SimpleEventEmitter;
+m.SimpleEventEmitter = SimpleEventEmitter;
 
 class Scheduler {
     private static inBatch = 0;
@@ -1023,16 +1023,16 @@ class Scheduler {
     }
 }
 
-mobservableStatic.ObserverMixin = {
+m.ObserverMixin = {
     componentWillMount: function() {
         var baseRender = this.render;
         this.render = function() {
             if (this._watchDisposer)
                 this._watchDisposer();
-            var[rendering, disposer] = mobservableStatic.watch(() => baseRender.call(this), () => {
+            var[rendering, disposer] = m.watch(() => baseRender.call(this), () => {
                 if (this.isMounted())
                     this.forceUpdate();
-                else if (mobservableStatic.debugLevel)
+                else if (m.debugLevel)
                     warn("Rendering was triggered for unmounted component. Please check the lifecycle of the components");
             });
             this._watchDisposer = disposer;
@@ -1061,18 +1061,18 @@ mobservableStatic.ObserverMixin = {
     }
 }
 
-mobservableStatic.ObservingComponent = function(componentClass) {
+m.ObservingComponent = function(componentClass) {
     var baseMount = componentClass.componentWillMount;
     var baseUnmount = componentClass.componentWillUnmount;
     componentClass.prototype.componentWillMount = function() {
-        mobservableStatic.ObserverMixin.componentWillMount.apply(this, arguments);
+        m.ObserverMixin.componentWillMount.apply(this, arguments);
         return baseMount && baseMount.apply(this, arguments);
     };
     componentClass.prototype.componentWillUnmount = function() {
-        mobservableStatic.ObserverMixin.componentWillUnmount.apply(this, arguments);
+        m.ObserverMixin.componentWillUnmount.apply(this, arguments);
         return baseUnmount && baseUnmount.apply(this, arguments);
     };
-    componentClass.prototype.shouldComponentUpdate = mobservableStatic.ObserverMixin.shouldComponentUpdate;
+    componentClass.prototype.shouldComponentUpdate = m.ObserverMixin.shouldComponentUpdate;
     return componentClass;
 };
 
@@ -1148,8 +1148,8 @@ function quickDiff<T>(current:T[], base:T[]):[T[],T[]] {
 }
 
 // For testing purposes only;
-(<any>mobservableStatic).quickDiff = quickDiff;
-(<any>mobservableStatic).stackDepth = () => DNode.trackingStack.length;
+(<any>m).quickDiff = quickDiff;
+(<any>m).stackDepth = () => DNode.trackingStack.length;
 
 function warn(message) {
     if (console)
@@ -1192,5 +1192,5 @@ declare var module;
         root['mobservable'] = factory();
     }
 }(this, function () {
-    return mobservable.mobservableStatic;
+    return mobservable.m;
 }));
