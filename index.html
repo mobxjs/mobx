@@ -21,9 +21,6 @@
           <h1 id="project_title">mobservable</h1>
           <h2 id="project_tagline">Write applications as if data doesn&#39;t change</h2>
 
-          <a class="github-button" href="https://github.com/mweststrate/mobservable" data-icon="octicon-star" data-style="mega" data-count-href="/mweststrate/mobservable/stargazers" data-count-api="/repos/mweststrate/mobservable#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star mweststrate/mobservable on GitHub">Star</a>
-          <a href="https://twitter.com/share" class="twitter-share-button" data-via="mweststrate" data-hashtags="mobservable">Tweet</a>
-
             <section id="downloads">
               <a class="zip_download_link" href="https://github.com/mweststrate/mobservable/zipball/master">Download this project as a .zip file</a>
               <a class="tar_download_link" href="https://github.com/mweststrate/mobservable/tarball/master">Download this project as a tar.gz file</a>
@@ -71,54 +68,52 @@ addTodo(<span class="pl-s"><span class="pl-pds">"</span>Find a clean mug<span cl
 addTodo(<span class="pl-s"><span class="pl-pds">"</span>Make coffee<span class="pl-pds">"</span></span>);
 <span class="pl-c">// Prints: 'Completed 0 of 2 todo items'</span>
 todos[<span class="pl-c1">0</span>].completed <span class="pl-k">=</span> <span class="pl-c1">true</span>;
-<span class="pl-c">// Prints: 'Completed 1 of 2 todo items'</span>
-</pre></div>
+<span class="pl-c">// Prints: 'Completed 1 of 2 todo items'</span></pre></div>
 
 <h3>
 <a id="observing-reactjs-components" class="anchor" href="#observing-reactjs-components" aria-hidden="true"><span class="octicon octicon-link"></span></a>Observing Reactjs components</h3>
 
 <p>The following components re-render automatically, but <em>only</em> if some data that is <em>actually used</em> inside the component has changed</p>
 
-<pre><code>import React, { Component } from 'react';
-import { todos, addTodo } from './store';
-import { ObservingComponent } from 'mobservable'
+<div class="highlight highlight-javascript"><pre><span class="pl-k">import</span> React, { Component } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { todos, addTodo } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./store<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { ObservingComponent } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>mobservable<span class="pl-pds">'</span></span>
 
-// React component that responds to changes in 'todos'
-@ObservingComponent export class TodoList extends Component {
-  render() {
-    const todos = this.props.todos;
-    return (&lt;div&gt;
-      &lt;ul&gt;
-        {this.props.todos.map(todo =&gt; (&lt;TodoItem todo={todo} key={todo.title} /&gt;))}
-      &lt;/ul&gt;
-      &lt;hr/&gt;
-      Completed {todos.filter(todo =&gt; todo.completed).length} of {todos.length} items.
-      &lt;button onClick={this.onNewTodo.bind(this)}&gt;New Todo&lt;/button&gt;
-    &lt;/div&gt;);
+<span class="pl-c">// React component that responds to changes in 'todos'</span>
+@ObservingComponent <span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">TodoList</span> <span class="pl-k">extends</span> <span class="pl-en">Component</span> {
+  <span class="pl-en">render</span>() {
+    <span class="pl-k">const</span> <span class="pl-c1">todos</span> <span class="pl-k">=</span> <span class="pl-v">this</span>.props.todos;
+    <span class="pl-k">return</span> (<span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
+      <span class="pl-k">&lt;</span>ul<span class="pl-k">&gt;</span>
+        {<span class="pl-v">this</span>.props.todos.map(todo <span class="pl-k">=&gt;</span> (<span class="pl-k">&lt;</span>TodoItem todo<span class="pl-k">=</span>{todo} key<span class="pl-k">=</span>{todo.<span class="pl-c1">title</span>} /<span class="pl-k">&gt;</span>))}
+      <span class="pl-k">&lt;</span>/ul<span class="pl-k">&gt;</span>
+      <span class="pl-k">&lt;</span>hr/<span class="pl-k">&gt;</span>
+      Completed {todos.filter(todo <span class="pl-k">=&gt;</span> todo.completed).<span class="pl-c1">length</span>} <span class="pl-k">of</span> {todos.<span class="pl-c1">length</span>} items.
+      <span class="pl-k">&lt;</span>button onClick<span class="pl-k">=</span>{<span class="pl-v">this</span>.onNewTodo.bind(<span class="pl-v">this</span>)}<span class="pl-k">&gt;</span>New Todo<span class="pl-k">&lt;</span>/button<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>/div<span class="pl-k">&gt;</span>);
   }
 
-  onNewTodo() {
-    addTodo(prompt("Enter a new todo:", "Try mobservable at home!"))
-  }
-}
-
-// React component that responds to changes in its 'todo'
-@ObservingComponent class TodoItem extends Component {
-  render() {
-    const todo = this.props.todo;
-    return (&lt;li&gt;
-      &lt;input type="checkbox" checked={todo.completed} onChange={this.onToggleCompleted.bind(this)} /&gt;
-      {todo.title}
-    &lt;/li&gt;);
-  }
-
-  onToggleCompleted() {
-    this.props.todo.completed = !this.props.todo.completed;
+  <span class="pl-en">onNewTodo</span>() {
+    addTodo(<span class="pl-c1">prompt</span>(<span class="pl-s"><span class="pl-pds">"</span>Enter a new todo:<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Try mobservable at home!<span class="pl-pds">"</span></span>))
   }
 }
 
-React.render(&lt;TodoList todos={todos} /&gt;, document.body);
-</code></pre>
+<span class="pl-c">// React component that responds to changes in its 'todo'</span>
+@ObservingComponent <span class="pl-k">class</span> <span class="pl-en">TodoItem</span> <span class="pl-k">extends</span> <span class="pl-en">Component</span> {
+  <span class="pl-en">render</span>() {
+    <span class="pl-k">const</span> <span class="pl-c1">todo</span> <span class="pl-k">=</span> <span class="pl-v">this</span>.props.todo;
+    <span class="pl-k">return</span> (<span class="pl-k">&lt;</span>li<span class="pl-k">&gt;</span>
+      <span class="pl-k">&lt;</span>input type<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>checkbox<span class="pl-pds">"</span></span> checked<span class="pl-k">=</span>{todo.completed} <span class="pl-c1">onChange</span><span class="pl-k">=</span>{<span class="pl-v">this</span>.onToggleCompleted.bind(<span class="pl-v">this</span>)} /<span class="pl-k">&gt;</span>
+      {todo.<span class="pl-c1">title</span>}
+    <span class="pl-k">&lt;</span>/li<span class="pl-k">&gt;</span>);
+  }
+
+  <span class="pl-en">onToggleCompleted</span>() {
+    <span class="pl-v">this</span>.props.todo.completed <span class="pl-k">=</span> <span class="pl-k">!</span><span class="pl-v">this</span>.props.todo.completed;
+  }
+}
+
+React.render(<span class="pl-k">&lt;</span>TodoList todos<span class="pl-k">=</span>{todos} /<span class="pl-k">&gt;</span>, <span class="pl-c1">document</span>.<span class="pl-c1">body</span>);</pre></div>
 
 <h3>
 <a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h3>
@@ -145,7 +140,7 @@ write functions as if there is no time</p>
       </footer>
     </div>
 
-          <script type="text/javascript">
+              <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
@@ -156,8 +151,6 @@ write functions as if there is no time</p>
             } catch(err) {}
           </script>
 
-          <script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
-          <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
 
   </body>
 </html>
