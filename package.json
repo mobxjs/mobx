@@ -1,7 +1,7 @@
 {
     "name": "mobservable",
     "version": "0.5.6",
-    "description": "Changes are coming! Small library for creating observable properties, arrays and functions",
+    "description": "MOBservable is light-weight stand-alone transparent reactive programming library to create reactive primitives, functions, arrays and objects. Its goal is to make developers happy and productive. It loves React.",
     "main": "dist/mobservable.js",
     "scripts": {
         "test": "grunt cover",
@@ -45,8 +45,9 @@
         "observable",
         "react-component",
         "react",
+        "reactjs",
         "reactive",
         "frp",
-        "function-reactive-programming"
+        "functional-reactive-programming"
     ]
 }

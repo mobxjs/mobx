@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/mweststrate/MOBservable.svg?branch=master)](https://travis-ci.org/mweststrate/MOBservable)
 [![Coverage Status](https://coveralls.io/repos/mweststrate/MOBservable/badge.svg?branch=master)](https://coveralls.io/r/mweststrate/MOBservable)
+[![mobservable channel on slack](https://img.shields.io/badge/slack-mobservable-blue.svg)](http://www.reactiflux.com)
 
 Installation: `npm install mobservable --save`
 
@@ -69,7 +70,7 @@ var Person = function(firstName, lastName) {
         firstName: firstName,
         lastName: lastName,
         fullName: function() {
-            return this.firsName + " " + this.lastName;
+            return this.firstName + " " + this.lastName;
         }
     });
 }
