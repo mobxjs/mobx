@@ -15,43 +15,43 @@ var mobservable;
         if (Array.isArray(value))
             return new ObservableArray(value);
         if (typeof value === "function")
-            return mobservable.mobservableStatic.computed(value, scope);
-        return mobservable.mobservableStatic.primitive(value);
+            return mobservable.m.computed(value, scope);
+        return mobservable.m.primitive(value);
     }
-    mobservable.mobservableStatic = function (value, scope) {
+    mobservable.m = function (value, scope) {
         return createObservable(value, scope);
     };
-    mobservable.mobservableStatic.value = createObservable;
-    mobservable.mobservableStatic.primitive = mobservable.mobservableStatic.reference = function (value) {
+    mobservable.m.value = createObservable;
+    mobservable.m.primitive = mobservable.m.reference = function (value) {
         return new ObservableValue(value).createGetterSetter();
     };
-    mobservable.mobservableStatic.computed = function (func, scope) {
+    mobservable.m.computed = function (func, scope) {
         return new ComputedObservable(func, scope).createGetterSetter();
     };
-    mobservable.mobservableStatic.expr = function (expr, scope) {
+    mobservable.m.expr = function (expr, scope) {
         if (DNode.trackingStack.length === 0)
             throw new Error("mobservable.expr can only be used inside a computed observable. Probably mobservable.computed should be used instead of .expr");
         return new ComputedObservable(expr, scope).get();
     };
-    mobservable.mobservableStatic.sideEffect = function (func, scope) {
-        return mobservable.mobservableStatic.computed(func, scope).observe(noop);
+    mobservable.m.sideEffect = function (func, scope) {
+        return mobservable.m.computed(func, scope).observe(noop);
     };
-    mobservable.mobservableStatic.array = function array(values) {
+    mobservable.m.array = function array(values) {
         return new ObservableArray(values);
     };
-    mobservable.mobservableStatic.props = function props(target, props, value) {
+    mobservable.m.props = function props(target, props, value) {
         switch (arguments.length) {
             case 0:
                 throw new Error("Not enough arguments");
             case 1:
-                return mobservable.mobservableStatic.props(target, target);
+                return mobservable.m.props(target, target);
             case 2:
                 for (var key in props)
-                    mobservable.mobservableStatic.props(target, key, props[key]);
+                    mobservable.m.props(target, key, props[key]);
                 break;
             case 3:
                 var isArray = Array.isArray(value);
-                var observable = mobservable.mobservableStatic.value(value, target);
+                var observable = mobservable.m.value(value, target);
                 Object.defineProperty(target, props, {
                     get: isArray
                         ? function () { return observable; }
@@ -66,7 +66,7 @@ var mobservable;
         }
         return target;
     };
-    mobservable.mobservableStatic.fromJson = function fromJson(source) {
+    mobservable.m.fromJson = function fromJson(source) {
         function convertValue(value) {
             if (!value)
                 return value;
@@ -76,18 +76,18 @@ var mobservable;
         }
         if (source) {
             if (Array.isArray(source))
-                return mobservable.mobservableStatic.array(source.map(convertValue));
+                return mobservable.m.array(source.map(convertValue));
             if (typeof source === "object") {
                 var props = {};
                 for (var key in source)
                     if (source.hasOwnProperty(key))
                         props[key] = convertValue(source[key]);
-                return mobservable.mobservableStatic.props(props);
+                return mobservable.m.props(props);
             }
         }
         throw new Error("mobservable.fromJson expects object or array, got: '" + source + "'");
     };
-    mobservable.mobservableStatic.toJson = function toJson(source) {
+    mobservable.m.toJson = function toJson(source) {
         if (!source)
             return source;
         if (Array.isArray(source) || source instanceof ObservableArray)
@@ -101,14 +101,14 @@ var mobservable;
         }
         return source;
     };
-    mobservable.mobservableStatic.observable = function observable(target, key, descriptor) {
+    mobservable.m.observable = function observable(target, key, descriptor) {
         var baseValue = descriptor ? descriptor.value : null;
         if (typeof baseValue === "function") {
             delete descriptor.value;
             delete descriptor.writable;
             descriptor.configurable = true;
             descriptor.get = function () {
-                var observable = this.key = mobservable.mobservableStatic.computed(baseValue, this);
+                var observable = this.key = mobservable.m.computed(baseValue, this);
                 return observable;
             };
             descriptor.set = function () {
@@ -120,16 +120,16 @@ var mobservable;
             Object.defineProperty(target, key, {
                 configurable: true, enumberable: true,
                 get: function () {
-                    mobservable.mobservableStatic.props(this, key, undefined);
+                    mobservable.m.props(this, key, undefined);
                     return this[key];
                 },
                 set: function (value) {
-                    mobservable.mobservableStatic.props(this, key, value);
+                    mobservable.m.props(this, key, value);
                 }
             });
         }
     };
-    mobservable.mobservableStatic.toPlainValue = function toPlainValue(value) {
+    mobservable.m.toPlainValue = function toPlainValue(value) {
         if (value) {
             if (value instanceof Array)
                 return value.slice();
@@ -150,7 +150,7 @@ var mobservable;
         }
         return value;
     };
-    mobservable.mobservableStatic.observeProperty = function observeProperty(object, key, listener, invokeImmediately) {
+    mobservable.m.observeProperty = function observeProperty(object, key, listener, invokeImmediately) {
         if (invokeImmediately === void 0) { invokeImmediately = false; }
         if (!object)
             throw new Error("Cannot observe property of '" + object + "'");
@@ -167,14 +167,14 @@ var mobservable;
             observer.dependencyState.dispose();
         });
     };
-    mobservable.mobservableStatic.watch = function watch(func, onInvalidate) {
+    mobservable.m.watch = function watch(func, onInvalidate) {
         var watch = new WatchedExpression(func, onInvalidate);
         return [watch.value, function () { return watch.dispose(); }];
     };
-    mobservable.mobservableStatic.batch = function batch(action) {
+    mobservable.m.batch = function batch(action) {
         return Scheduler.batch(action);
     };
-    mobservable.mobservableStatic.debugLevel = 0;
+    mobservable.m.debugLevel = 0;
     var ObservableValue = (function () {
         function ObservableValue(_value) {
             this._value = _value;
@@ -207,7 +207,6 @@ var mobservable;
             });
         };
         ObservableValue.prototype.createGetterSetter = function () {
-            var _this = this;
             var self = this;
             var f = function (value) {
                 if (arguments.length > 0)
@@ -215,9 +214,13 @@ var mobservable;
                 else
                     return self.get();
             };
-            f.observe = function (listener, fire) { return _this.observe(listener, fire); };
             f.impl = this;
-            f.toString = function () { return _this.toString(); };
+            f.observe = function (listener, fire) {
+                return self.observe(listener, fire);
+            };
+            f.toString = function () {
+                return self.toString();
+            };
             return f;
         };
         ObservableValue.prototype.toString = function () {
@@ -255,7 +258,7 @@ var mobservable;
             if (state.hasCycle)
                 throw new Error("Cycle detected");
             if (this.hasError) {
-                if (mobservable.mobservableStatic.debugLevel) {
+                if (mobservable.m.debugLevel) {
                     console.trace();
                     warn(this + ": rethrowing caught exception to observer: " + this._value + (this._value.cause || ''));
                 }
@@ -430,7 +433,7 @@ var mobservable;
         };
         DNode.prototype.bindDependencies = function () {
             this.observing = DNode.trackingStack.pop();
-            if (this.isComputed && this.observing.length === 0 && mobservable.mobservableStatic.debugLevel > 1 && !this.isDisposed) {
+            if (this.isComputed && this.observing.length === 0 && mobservable.m.debugLevel > 1 && !this.isDisposed) {
                 console.trace();
                 warn("You have created a function that doesn't observe any values, did you forget to make its dependencies observable?");
             }
@@ -680,7 +683,7 @@ var mobservable;
             }).apply(this, initialArgs);
         };
         ObservableArray.prototype.sideEffectWarning = function (funcName) {
-            if (mobservable.mobservableStatic.debugLevel > 0 && DNode.trackingStack.length > 0)
+            if (mobservable.m.debugLevel > 0 && DNode.trackingStack.length > 0)
                 warn("[Mobservable.Array] The method array." + funcName + " should probably not be used inside observable functions since it has side-effects");
         };
         ObservableArray.createArrayBufferItem = function (index) {
@@ -763,7 +766,7 @@ var mobservable;
         };
         return SimpleEventEmitter;
     })();
-    mobservable.mobservableStatic.SimpleEventEmitter = SimpleEventEmitter;
+    mobservable.m.SimpleEventEmitter = SimpleEventEmitter;
     var Scheduler = (function () {
         function Scheduler() {
         }
@@ -804,18 +807,15 @@ var mobservable;
         Scheduler.tasks = [];
         return Scheduler;
     })();
-    mobservable.mobservableStatic.ObserverMixin = {
+    mobservable.m.ObserverMixin = {
         componentWillMount: function () {
             var baseRender = this.render;
             this.render = function () {
                 var _this = this;
                 if (this._watchDisposer)
                     this._watchDisposer();
-                var _a = mobservable.mobservableStatic.watch(function () { return baseRender.call(_this); }, function () {
-                    if (_this.isMounted())
-                        _this.forceUpdate();
-                    else if (mobservable.mobservableStatic.debugLevel)
-                        warn("Rendering was triggered for unmounted component. Please check the lifecycle of the components");
+                var _a = mobservable.m.watch(function () { return baseRender.call(_this); }, function () {
+                    _this.forceUpdate();
                 }), rendering = _a[0], disposer = _a[1];
                 this._watchDisposer = disposer;
                 return rendering;
@@ -838,18 +838,18 @@ var mobservable;
             return false;
         }
     };
-    mobservable.mobservableStatic.ObservingComponent = function (componentClass) {
+    mobservable.m.ObservingComponent = function (componentClass) {
         var baseMount = componentClass.componentWillMount;
         var baseUnmount = componentClass.componentWillUnmount;
         componentClass.prototype.componentWillMount = function () {
-            mobservable.mobservableStatic.ObserverMixin.componentWillMount.apply(this, arguments);
+            mobservable.m.ObserverMixin.componentWillMount.apply(this, arguments);
             return baseMount && baseMount.apply(this, arguments);
         };
         componentClass.prototype.componentWillUnmount = function () {
-            mobservable.mobservableStatic.ObserverMixin.componentWillUnmount.apply(this, arguments);
+            mobservable.m.ObserverMixin.componentWillUnmount.apply(this, arguments);
             return baseUnmount && baseUnmount.apply(this, arguments);
         };
-        componentClass.prototype.shouldComponentUpdate = mobservable.mobservableStatic.ObserverMixin.shouldComponentUpdate;
+        componentClass.prototype.shouldComponentUpdate = mobservable.m.ObserverMixin.shouldComponentUpdate;
         return componentClass;
     };
     function quickDiff(current, base) {
@@ -896,8 +896,8 @@ var mobservable;
         removed.push.apply(removed, base.slice(baseIndex));
         return [added, removed];
     }
-    mobservable.mobservableStatic.quickDiff = quickDiff;
-    mobservable.mobservableStatic.stackDepth = function () { return DNode.trackingStack.length; };
+    mobservable.m.quickDiff = quickDiff;
+    mobservable.m.stackDepth = function () { return DNode.trackingStack.length; };
     function warn(message) {
         if (console)
             console.warn("[WARNING:mobservable] " + message);
@@ -927,5 +927,5 @@ var mobservable;
         root['mobservable'] = factory();
     }
 }(this, function () {
-    return mobservable.mobservableStatic;
+    return mobservable.m;
 }));
