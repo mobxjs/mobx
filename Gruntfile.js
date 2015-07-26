@@ -23,7 +23,7 @@ module.exports = function(grunt) {
         coveralls: {
             options: {
                 // LCOV coverage file relevant to every target
-                force: false
+                force: true
             },
             default: {
                 src: 'coverage/lcov.info',
