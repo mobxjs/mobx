@@ -9,6 +9,17 @@
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
     <title>mobservable</title>
+    <style>
+      #usps {
+        border-style: none;
+      }
+      #usps td {
+        border-style: none;
+        vertical-align: top;
+        text-align: center;
+        width: 33%;
+      }
+    </style>
   </head>
 
   <body>
@@ -21,33 +32,23 @@
           <h1 id="project_title">mobservable</h1>
           <h2 id="project_tagline">Write applications as if data doesn&#39;t change</h2>
 
-          <a class="github-button" href="https://github.com/mweststrate/mobservable" data-icon="octicon-star" data-style="mega" data-count-href="/mweststrate/mobservable/stargazers" data-count-api="/repos/mweststrate/mobservable#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star mweststrate/mobservable on GitHub">Star</a>
-          <a href="https://twitter.com/share" class="twitter-share-button" data-via="mweststrate" data-hashtags="mobservable">Tweet</a>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/mweststrate/mobservable/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/mweststrate/mobservable/tarball/master">Download this project as a tar.gz file</a>
-            </section>
         </header>
     </div>
 
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <p>mobservable </p>
-
-<p>MOBservable is light-weight stand-alone transparent reactive programming library to create reactive primitives, functions, arrays and objects. Its goal is to make developers happy and productive. It loves React.</p>
-
-<p>Write applications as if data doesn't change</p>
-
-<p>Mobservable helps you to process and propagate changes through your program automatically.
-By applying transparent functional reactive programming you get rid of possible stale values and views in your application without needing to manage data subscriptions.
-Instead of that, dependencies between data and functions are tracked automatically.</p>
-
-<p>| <strong>Self updating functions</strong> prevents the existence of stale values and avoids the need for subscriptions | <strong>The Reactjs decorator</strong> turns reactjs components in to observers that automatically sideways load data for ((bleeding edge performance)[mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/] | <strong>Functional Reactive Programming</strong> was never easier to learn and apply. No new concepts, just turn good old javascript structures into observable ones. |</p>
+<table id="usps"><tr>
+  <td><h5>self updating<br/>functions</h5>Prevent stale values and avoid the need for subscriptions in your application by creating functions that track their dependencies automatically.</td>
+  <td><h5>functional reactive<br/>programming</h5>Was never easier to grok and apply. Work with observables as if they are plain javascript structures.</td>
+  <td><h5>reactjs<br/>decorator</h5>Turn reactjs components into observers that automatically sideways load data for
+    <a href="http://mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/" target="_blank">bleeding edge performance</a>.</td>
+</tr></table>
 
 <h3>
 <a id="observable-data-structures" class="anchor" href="#observable-data-structures" aria-hidden="true"><span class="octicon octicon-link"></span></a>Observable data structures</h3>
+
+<p>Use mobservable to make primitives, arrays, objects, classes or functions reactive. Reactive functions re-evaluate automatically if data used by it changes</p>
 
 <div class="highlight highlight-javascript"><pre><span class="pl-k">import</span> mobservable <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>mobservable<span class="pl-pds">'</span></span>;
 
@@ -61,7 +62,7 @@ Instead of that, dependencies between data and functions are tracked automatical
   }));
 }
 
-<span class="pl-c">// The following function will automatically be executed whenever 'todos' changes</span>
+<span class="pl-c">// The following function will automatically re-evaluate whenever the 'todos' array changes</span>
 mobservable.sideEffect(()<span class="pl-k"> =&gt;</span> {
   <span class="pl-en">console</span><span class="pl-c1">.log</span>(<span class="pl-s"><span class="pl-pds">"</span>Completed %d of %d todo items<span class="pl-pds">"</span></span>, todos.filter(todo <span class="pl-k">=&gt;</span> todo.completed).<span class="pl-c1">length</span>, todos.<span class="pl-c1">length</span>)
 });
@@ -74,9 +75,10 @@ todos[<span class="pl-c1">0</span>].completed <span class="pl-k">=</span> <span 
 <span class="pl-c">// Prints: 'Completed 1 of 2 todo items'</span></pre></div>
 
 <h3>
-<a id="observing-reactjs-components" class="anchor" href="#observing-reactjs-components" aria-hidden="true"><span class="octicon octicon-link"></span></a>Observing Reactjs components</h3>
+<a id="observing-reactjs-components" class="anchor" href="#observing-reactjs-components" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reactjs components that automatically observe their data</h3>
 
-<p>The following components re-render automatically, but <em>only</em> if some data that is <em>actually used</em> inside the component has changed</p>
+<p>The following components re-render automatically, but <em>only</em> if some data that is <em>actually used</em> inside the component has changed.
+This doesn't require subscriptions nor a full page re-render; so components can stay really dumb.</p>
 
 <div class="highlight highlight-javascript"><pre><span class="pl-k">import</span> React, { Component } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
 <span class="pl-k">import</span> { todos, addTodo } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./store<span class="pl-pds">'</span></span>;
@@ -131,13 +133,15 @@ write functions as if there is no time</p>
 
 <p>runtime properties</p>
 
-<p>read more</p>
+<a class="github-button" href="https://github.com/mweststrate/mobservable" data-icon="octicon-star" data-style="mega" data-count-href="/mweststrate/mobservable/stargazers" data-count-api="/repos/mweststrate/mobservable#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star mweststrate/mobservable on GitHub">Star</a>
+<a href="https://twitter.com/share" class="twitter-share-button" data-via="mweststrate" data-hashtags="mobservable">Tweet</a>
       </section>
     </div>
 
     <!-- FOOTER  -->
     <div id="footer_wrap" class="outer">
       <footer class="inner">
+
         <p class="copyright">mobservable maintained by <a href="https://github.com/mweststrate">mweststrate</a></p>
         <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
       </footer>
