@@ -359,9 +359,13 @@ class ObservableValue<T> {
             else
                 return self.get();
         };
-        f.observe = (listener, fire) => this.observe(listener, fire);
         f.impl = this;
-        f.toString = () => this.toString();
+        f.observe = function(listener, fire) {
+            return self.observe(listener, fire);
+        }
+        f.toString = function() {
+            return self.toString();
+        }
         return f;
     }
 
@@ -1030,10 +1034,7 @@ m.ObserverMixin = {
             if (this._watchDisposer)
                 this._watchDisposer();
             var[rendering, disposer] = m.watch(() => baseRender.call(this), () => {
-                if (this.isMounted())
-                    this.forceUpdate();
-                else if (m.debugLevel)
-                    warn("Rendering was triggered for unmounted component. Please check the lifecycle of the components");
+                this.forceUpdate();
             });
             this._watchDisposer = disposer;
             return rendering;
