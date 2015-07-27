@@ -1,70 +1,80 @@
 <!DOCTYPE html>
 <html>
 
-  <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="mobservable : Write applications as if data doesn&#39;t change">
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="description" content="mobservable : Write applications as if data doesn&#39;t change">
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+  <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
-    <title>mobservable</title>
-    <style>
-      #usps {
-        border-style: none;
-      }
-      #usps td {
-        border-style: none;
-        vertical-align: top;
-        text-align: center;
-        width: 33%;
-      }
-    </style>
-  </head>
+  <title>mobservable</title>
+  <style>
+  #usps {
+    border-style: none;
+  }
+  #usps td {
+    border-style: none;
+    vertical-align: top;
+    text-align: center;
+    width: 50%;
+  }
+  #usps h4 {
+    text-transform: uppercase;
+  }
+  #approot {
+    padding: 20px;
+    background-color: white;
+    border: 3px solid orange;
 
-  <body>
+  }
+  </style>
+</head>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/mweststrate/mobservable">View on GitHub</a>
+<body>
 
-          <h1 id="project_title">mobservable</h1>
-          <h2 id="project_tagline">Write applications as if data doesn&#39;t change</h2>
+  <!-- HEADER -->
+  <div id="header_wrap" class="outer">
+    <header class="inner">
+      <a id="forkme_banner" href="https://github.com/mweststrate/mobservable">View on GitHub</a>
 
-        </header>
-    </div>
+      <h1 id="project_title">mobservable</h1>
+      <p style="font-style:italic; color:white">Library to create reactive data structures and functions. Tracks and updates inter-data dependencies automatically, so that you can:</p>
+      <h2 id="project_tagline">write applications as-if data doesn&#39;t change</h2>
+    </header>
+  </div>
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-<table id="usps"><tr>
-  <td><h5>self updating<br/>functions</h5>Prevent stale values and avoid the need for subscriptions in your application by creating functions that track their dependencies automatically.</td>
-  <td><h5>functional reactive<br/>programming</h5>Was never easier to grok and apply. Work with observables as if they are plain javascript structures.</td>
-  <td><h5>reactjs<br/>decorator</h5>Turn reactjs components into observers that automatically sideways load data for
-    <a href="http://mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/" target="_blank">bleeding edge performance</a>.</td>
-</tr></table>
+  <!-- MAIN CONTENT -->
+  <div id="main_content_wrap" class="outer">
+    <section id="main_content" class="inner">
 
-<h3>
-<a id="observable-data-structures" class="anchor" href="#observable-data-structures" aria-hidden="true"><span class="octicon octicon-link"></span></a>Observable data structures</h3>
+      <div style="text-align:center;">
+        <a class="github-button" href="https://github.com/mweststrate/mobservable" data-icon="octicon-star" data-style="small" data-count-href="/mweststrate/mobservable/stargazers" data-count-api="/repos/mweststrate/mobservable#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star mweststrate/mobservable on GitHub">Star</a>
+        <a href="https://twitter.com/share" class="twitter-share-button" data-via="mweststrate" data-hashtags="mobservable">Tweet</a>
+      </div>
 
-<p>Use mobservable to make primitives, arrays, objects, classes or functions reactive. Reactive functions re-evaluate automatically if data used by it changes</p>
+      <table id="usps"><tr>
+        <td><h4>self updating functions</h4>Prevent stale values and avoid the need for subscriptions in your application by creating functions that track their dependencies automatically.</td>
+        <td><h4>functional reactive programming</h4>Was never easier to grok and apply. Work with observables as if they are plain javascript structures.</td>
+      </tr><tr>
+        <td><h4>reactjs decorator</h4>Turn reactjs components into observers that automatically sideways load data for
+          <a href="http://mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/" target="_blank">bleeding edge performance</a>.</td>
+        <td><h4>shines in large apps </h4>The library is battle tested and shines in large enterprise scale apps. Works transparently in combination with classes, deeply nested and cyclic data structures.</td>
+      </tr></table>
 
-<div class="highlight highlight-javascript"><pre><span class="pl-k">import</span> mobservable <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>mobservable<span class="pl-pds">'</span></span>;
+        <h3><a id="observable-data-structures" class="anchor" href="#observable-data-structures" aria-hidden="true"><span class="octicon octicon-link"></span></a>Observable data structures</h3>
+
+        <p>Use mobservable to create reactive primitives, arrays, objects and functions. Reactive functions re-evaluate automatically whenever relevant data changes.</p>
+
+<!-- BEGIN CODE BLOCK 1 -->
+        <div class="highlight highlight-javascript"><pre><span class="pl-k">import</span> mobservable <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>mobservable<span class="pl-pds">'</span></span>;
 
 <span class="pl-c">// Create a reactive data structure</span>
 <span class="pl-k">export</span> <span class="pl-k">var</span> todos <span class="pl-k">=</span> mobservable.fromJson([]);
 
-<span class="pl-k">export</span> <span class="pl-k">function</span> <span class="pl-en">addTodo</span>(<span class="pl-smi">title</span>) {
-  todos.<span class="pl-c1">push</span>(mobservable.fromJson({
-    title<span class="pl-k">:</span> title,
-    completed<span class="pl-k">:</span> <span class="pl-c1">false</span>
-  }));
-}
-
-<span class="pl-c">// The following function will automatically re-evaluate whenever the 'todos' array changes</span>
+<span class="pl-c">// The following function will automatically be executed whenever 'todos' changes</span>
 mobservable.sideEffect(()<span class="pl-k"> =&gt;</span> {
-  <span class="pl-en">console</span><span class="pl-c1">.log</span>(<span class="pl-s"><span class="pl-pds">"</span>Completed %d of %d todo items<span class="pl-pds">"</span></span>, todos.filter(todo <span class="pl-k">=&gt;</span> todo.completed).<span class="pl-c1">length</span>, todos.<span class="pl-c1">length</span>)
+    <span class="pl-en">console</span><span class="pl-c1">.log</span>(<span class="pl-s"><span class="pl-pds">"</span>Completed %d of %d todo items<span class="pl-pds">"</span></span>, todos.filter(todo <span class="pl-k">=&gt;</span> todo.completed).<span class="pl-c1">length</span>, todos.<span class="pl-c1">length</span>)
 });
 
 addTodo(<span class="pl-s"><span class="pl-pds">"</span>Find a clean mug<span class="pl-pds">"</span></span>);
@@ -72,94 +82,133 @@ addTodo(<span class="pl-s"><span class="pl-pds">"</span>Find a clean mug<span cl
 addTodo(<span class="pl-s"><span class="pl-pds">"</span>Make coffee<span class="pl-pds">"</span></span>);
 <span class="pl-c">// Prints: 'Completed 0 of 2 todo items'</span>
 todos[<span class="pl-c1">0</span>].completed <span class="pl-k">=</span> <span class="pl-c1">true</span>;
-<span class="pl-c">// Prints: 'Completed 1 of 2 todo items'</span></pre></div>
+<span class="pl-c">// Prints: 'Completed 1 of 2 todo items'</span>
 
-<h3>
-<a id="observing-reactjs-components" class="anchor" href="#observing-reactjs-components" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reactjs components that automatically observe their data</h3>
+<span class="pl-k">export</span> <span class="pl-k">function</span> <span class="pl-en">addTodo</span>(<span class="pl-smi">title</span>) {
+    todos.<span class="pl-c1">push</span>(mobservable.fromJson({
+        title<span class="pl-k">:</span> title,
+        completed<span class="pl-k">:</span> <span class="pl-c1">false</span>
+    }));
+}
 
-<p>The following components re-render automatically, but <em>only</em> if some data that is <em>actually used</em> inside the component has changed.
-This doesn't require subscriptions nor a full page re-render; so components can stay really dumb.</p>
+<span class="pl-k">export</span> <span class="pl-k">function</span> <span class="pl-en">removeTodo</span>(<span class="pl-smi">todo</span>) {
+    todos.<span class="pl-c1">splice</span>(todos.<span class="pl-c1">indexOf</span>(todo), <span class="pl-c1">1</span>);
+}</pre></div>
 
+<!-- END CODE BLOCK 1 -->
+
+        <h3><a id="observing-reactjs-components" class="anchor" href="#observing-reactjs-components" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reactjs components that automatically observe their data</h3>
+
+        <p>The following components re-render automatically, but <em>only</em> if some data that is <em>actually used</em> inside the component has changed.
+          This doesn't require subscriptions nor a full page re-render; so components can stay really dumb.
+          The actions are purely defined in terms of the data. They do not state anything about how the UI should be updated. </p>
+
+<!-- Code block 2 -->
 <div class="highlight highlight-javascript"><pre><span class="pl-k">import</span> React, { Component } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
-<span class="pl-k">import</span> { todos, addTodo } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./store<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { addTodo, removeTodo } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./todos<span class="pl-pds">'</span></span>;
 <span class="pl-k">import</span> { ObservingComponent } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>mobservable<span class="pl-pds">'</span></span>
 
 <span class="pl-c">// React component that responds to changes in 'todos'</span>
 @ObservingComponent <span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">TodoList</span> <span class="pl-k">extends</span> <span class="pl-en">Component</span> {
-  <span class="pl-en">render</span>() {
-    <span class="pl-k">const</span> <span class="pl-c1">todos</span> <span class="pl-k">=</span> <span class="pl-v">this</span>.props.todos;
-    <span class="pl-k">return</span> (<span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
-      <span class="pl-k">&lt;</span>ul<span class="pl-k">&gt;</span>
-        {<span class="pl-v">this</span>.props.todos.map(todo <span class="pl-k">=&gt;</span> (<span class="pl-k">&lt;</span>TodoItem todo<span class="pl-k">=</span>{todo} key<span class="pl-k">=</span>{todo.<span class="pl-c1">title</span>} /<span class="pl-k">&gt;</span>))}
-      <span class="pl-k">&lt;</span>/ul<span class="pl-k">&gt;</span>
-      <span class="pl-k">&lt;</span>hr/<span class="pl-k">&gt;</span>
-      Completed {todos.filter(todo <span class="pl-k">=&gt;</span> todo.completed).<span class="pl-c1">length</span>} <span class="pl-k">of</span> {todos.<span class="pl-c1">length</span>} items.
-      <span class="pl-k">&lt;</span>button onClick<span class="pl-k">=</span>{<span class="pl-v">this</span>.onNewTodo.bind(<span class="pl-v">this</span>)}<span class="pl-k">&gt;</span>New Todo<span class="pl-k">&lt;</span>/button<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>/div<span class="pl-k">&gt;</span>);
-  }
+    <span class="pl-en">render</span>() {
+        <span class="pl-k">const</span> <span class="pl-c1">todos</span> <span class="pl-k">=</span> <span class="pl-v">this</span>.props.todos;
+        <span class="pl-k">return</span> (<span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
+            <span class="pl-k">&lt;</span>ul<span class="pl-k">&gt;</span>
+                 {<span class="pl-v">this</span>.props.todos.map((<span class="pl-smi">todo</span>,<span class="pl-smi">idx</span>)<span class="pl-k"> =&gt;</span> (<span class="pl-k">&lt;</span>TodoView todo<span class="pl-k">=</span>{todo} key<span class="pl-k">=</span>{idx} /<span class="pl-k">&gt;</span>))}
+            <span class="pl-k">&lt;</span>/ul<span class="pl-k">&gt;</span>
+            <span class="pl-k">&lt;</span>hr/<span class="pl-k">&gt;</span>
+            Completed {todos.filter(todo <span class="pl-k">=&gt;</span> todo.completed).<span class="pl-c1">length</span>} <span class="pl-k">of</span> {todos.<span class="pl-c1">length</span>} items.
+            <span class="pl-k">&lt;</span>br/<span class="pl-k">&gt;&lt;</span>button onClick<span class="pl-k">=</span>{<span class="pl-v">this</span>.onNewTodo.bind(<span class="pl-v">this</span>)}<span class="pl-k">&gt;</span>New Todo<span class="pl-k">&lt;</span>/button<span class="pl-k">&gt;</span>
+        <span class="pl-k">&lt;</span>/div<span class="pl-k">&gt;</span>);
+    }
 
-  <span class="pl-en">onNewTodo</span>() {
-    addTodo(<span class="pl-c1">prompt</span>(<span class="pl-s"><span class="pl-pds">"</span>Enter a new todo:<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Try mobservable at home!<span class="pl-pds">"</span></span>))
-  }
+    <span class="pl-en">onNewTodo</span>() {
+        addTodo(<span class="pl-c1">prompt</span>(<span class="pl-s"><span class="pl-pds">"</span>Enter a new todo:<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Try mobservable at home!<span class="pl-pds">"</span></span>))
+    }
 }
 
 <span class="pl-c">// React component that responds to changes in its 'todo'</span>
-@ObservingComponent <span class="pl-k">class</span> <span class="pl-en">TodoItem</span> <span class="pl-k">extends</span> <span class="pl-en">Component</span> {
-  <span class="pl-en">render</span>() {
-    <span class="pl-k">const</span> <span class="pl-c1">todo</span> <span class="pl-k">=</span> <span class="pl-v">this</span>.props.todo;
-    <span class="pl-k">return</span> (<span class="pl-k">&lt;</span>li<span class="pl-k">&gt;</span>
-      <span class="pl-k">&lt;</span>input type<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>checkbox<span class="pl-pds">"</span></span> checked<span class="pl-k">=</span>{todo.completed} <span class="pl-c1">onChange</span><span class="pl-k">=</span>{<span class="pl-v">this</span>.onToggleCompleted.bind(<span class="pl-v">this</span>)} /<span class="pl-k">&gt;</span>
-      {todo.<span class="pl-c1">title</span>}
-    <span class="pl-k">&lt;</span>/li<span class="pl-k">&gt;</span>);
-  }
+@ObservingComponent <span class="pl-k">class</span> <span class="pl-en">TodoView</span> <span class="pl-k">extends</span> <span class="pl-en">Component</span> {
+    <span class="pl-en">render</span>() {
+        <span class="pl-k">const</span> <span class="pl-c1">todo</span> <span class="pl-k">=</span> <span class="pl-v">this</span>.props.todo;
+        <span class="pl-k">return</span> (<span class="pl-k">&lt;</span>li<span class="pl-k">&gt;</span>
+            <span class="pl-k">&lt;</span>input type<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>checkbox<span class="pl-pds">"</span></span> checked<span class="pl-k">=</span>{todo.completed} <span class="pl-c1">onChange</span><span class="pl-k">=</span>{<span class="pl-v">this</span>.onToggleCompleted.bind(<span class="pl-v">this</span>)} /<span class="pl-k">&gt;</span>
+            {todo.<span class="pl-c1">title</span>}{<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span>}
+            <span class="pl-k">&lt;</span>a href<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>#<span class="pl-pds">"</span></span> onClick<span class="pl-k">=</span>{<span class="pl-v">this</span>.onEdit.bind(<span class="pl-v">this</span>)}<span class="pl-k">&gt;</span>[edit]<span class="pl-k">&lt;</span>/a<span class="pl-k">&gt;</span>
+            <span class="pl-k">&lt;</span>a href<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>#<span class="pl-pds">"</span></span> onClick<span class="pl-k">=</span>{<span class="pl-v">this</span>.onRemove.bind(<span class="pl-v">this</span>)}<span class="pl-k">&gt;</span>[remove]<span class="pl-k">&lt;</span>/a<span class="pl-k">&gt;</span>
+        <span class="pl-k">&lt;</span>/li<span class="pl-k">&gt;</span>);
+    }
 
-  <span class="pl-en">onToggleCompleted</span>() {
-    <span class="pl-v">this</span>.props.todo.completed <span class="pl-k">=</span> <span class="pl-k">!</span><span class="pl-v">this</span>.props.todo.completed;
-  }
-}
+    <span class="pl-en">onToggleCompleted</span>() {
+        <span class="pl-v">this</span>.props.todo.completed <span class="pl-k">=</span> <span class="pl-k">!</span><span class="pl-v">this</span>.props.todo.completed;
+    }
 
-React.render(<span class="pl-k">&lt;</span>TodoList todos<span class="pl-k">=</span>{todos} /<span class="pl-k">&gt;</span>, <span class="pl-c1">document</span>.<span class="pl-c1">body</span>);</pre></div>
+    <span class="pl-en">onEdit</span>() {
+        <span class="pl-v">this</span>.props.todo.<span class="pl-c1">title</span> <span class="pl-k">=</span> <span class="pl-c1">prompt</span>(<span class="pl-s"><span class="pl-pds">'</span>Todo:<span class="pl-pds">'</span></span>, <span class="pl-v">this</span>.props.todo.<span class="pl-c1">title</span>);
+    }
 
-<h3>
-<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h3>
+    <span class="pl-en">onRemove</span>() {
+        removeTodo(<span class="pl-v">this</span>.props.todo);
+    }
+}</pre></div>
+<!-- Code block 2 END -->
+          <h4><a id="demo" class="anchor" href="#demo" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running demo</h4>
+          <pre id="approot" class=""></pre>
 
-<p>Install using <code>npm install mobservable --save</code> or <a href="https://raw.githubusercontent.com/mweststrate/mobservable/master/dist/mobservable.js">download</a> the stand-alone library. </p>
+          <p>The full project source of the todo demo can be found in the <a target="_blank" href="https://github.com/mweststrate/react-mobservable-boilerplate">react-mobservable-boilerplate</a> repository.</p>
 
-<h3>
-<a id="philosophy" class="anchor" href="#philosophy" aria-hidden="true"><span class="octicon octicon-link"></span></a>Philosophy</h3>
+          <h3><a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h3>
 
-<p>Observable values and observing functions - move the responsibility of re-evaluating values from the code that causes data to change to the code that uses the changed data
-write functions as if there is no time</p>
+          <p>Install using <code>npm install mobservable --save</code> or <a href="https://raw.githubusercontent.com/mweststrate/mobservable/master/dist/mobservable.js">download</a> the stand-alone library. </p>
 
-<p>runtime properties</p>
+          <h3><a id="runtimebehavior" class="anchor" href="#runtimebehavior" aria-hidden="true"><span class="octicon octicon-link"></span></a>Runtime behavior</h3>
 
-<a class="github-button" href="https://github.com/mweststrate/mobservable" data-icon="octicon-star" data-style="mega" data-count-href="/mweststrate/mobservable/stargazers" data-count-api="/repos/mweststrate/mobservable#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star mweststrate/mobservable on GitHub">Star</a>
-<a href="https://twitter.com/share" class="twitter-share-button" data-via="mweststrate" data-hashtags="mobservable">Tweet</a>
-      </section>
-    </div>
+            <p>Reactive values created using mobservable have the following characteristics:</p>
+            <ul>
+              <li>Synchronous: Updates are processed synchronously; after each update everything is still fresh.</li>
+              <li>Atomic updates: All updates are processed atomically so that you can never observe a stale value, even when updates cascade.</li>
+              <li>Real time dependency detection: Computed values only depend on values actually used in the last computation.</li>
+              <li>Lazy: Computed values will only be evaluated if they are actually being observed.</li>
+            </ul>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
 
-        <p class="copyright">mobservable maintained by <a href="https://github.com/mweststrate">mweststrate</a></p>
-        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
+          <h3><a id="more" class="anchor" href="#more" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dive deeper...</h3>
+            <ul>
+              <li>The <a target="_blank" href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/">design &amp; performance </a> of mobservable</li>
+              <li>The <a target="_blank" href="https://medium.com/@mweststrate/pure-rendering-in-the-light-of-time-and-state-4b537d8d40b1">philosophy</a> behind mobservable</li>
+              <li>The <a target="_blank" href="https://github.com/mweststrate/mobservable/blob/master/README.md">full documentation</a></li>
+              <li>Get started with a <a target="_blank" href="https://jsfiddle.net/mweststrate/wgbe4guu/">small JSFiddle</a></li>
+              <li>Get started by cloning the <a target="_blank" href="https://github.com/mweststrate/react-mobservable-boilerplate">react mobservable boilerplate project</a></li>
+              <li>Review a more <a target="_blank" href="https://jsfiddle.net/mweststrate/46vL0phw">sophisticated example</a></li>
+              <li>Discuss mobservable in the <a target="_blank" href="https://reactiflux.slack.com/messages/mobservable/">Reactiflux #mobservable</a> slack channel (<a target="_blank" href="http://www.reactiflux.com/">Sign up</a>)</li>
+            </ul>
 
-          <script type="text/javascript">
-            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-          </script>
-          <script type="text/javascript">
-            try {
-              var pageTracker = _gat._getTracker("UA-65632006-1");
-            pageTracker._trackPageview();
-            } catch(err) {}
-          </script>
+          </section>
+        </div>
 
-          <script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
-          <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+        <!-- FOOTER  -->
+        <div id="footer_wrap" class="outer">
+          <footer class="inner">
 
-  </body>
-</html>
+            <p class="copyright">mobservable maintained by <a href="https://github.com/mweststrate">mweststrate</a></p>
+            <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+          </footer>
+        </div>
+        <!-- webpack bundle of react-mobservable-boilerplate -->
+        <script src="javascripts/bundle.js"></script>
+        <script type="text/javascript">
+        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+        </script>
+        <script type="text/javascript">
+        try {
+          var pageTracker = _gat._getTracker("UA-65632006-1");
+          pageTracker._trackPageview();
+        } catch(err) {}
+        </script>
+
+        <script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
+        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+      </body>
+      </html>
