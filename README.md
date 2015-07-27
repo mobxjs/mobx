@@ -1,22 +1,22 @@
-# MOBservable
+# mobservable
 
-[![Build Status](https://travis-ci.org/mweststrate/MOBservable.svg?branch=master)](https://travis-ci.org/mweststrate/MOBservable)
-[![Coverage Status](https://coveralls.io/repos/mweststrate/MOBservable/badge.svg?branch=master)](https://coveralls.io/r/mweststrate/MOBservable)
+[![Build Status](https://travis-ci.org/mweststrate/mobservable.svg?branch=master)](https://travis-ci.org/mweststrate/mobservable)
+[![Coverage Status](https://coveralls.io/repos/mweststrate/mobservable/badge.svg?branch=master)](https://coveralls.io/r/mweststrate/mobservable)
 [![mobservable channel on slack](https://img.shields.io/badge/slack-mobservable-blue.svg)](http://www.reactiflux.com)
 
 Installation: `npm install mobservable --save`
 
-MOBservable is light-weight standalone transparent reactive programming library to create Reactive primitives, functions, arrays and objects.
+Mobservable is light-weight standalone transparent reactive programming library to create Reactive primitives, functions, arrays and objects.
 
 Its goal is to make developers happy and productive by removing boilerplate work such as invalidating derived data or managing event listeners. 
 It makes sure data changes are automatically, atomically and synchronously propagated through your app without being obtrusive.
-MOBservable runs in any ES5 environment but features also some React add-ons.
+Mobservable runs in any ES5 environment but features also some React add-ons.
 It is highly efficient and shines when managing large amounts of complex, cyclic, nested or computed data.
 
 Some links that may be interesting:
 
 * [Slack channel on reactiflux](https://reactiflux.slack.com/messages/mobservable/)
-* [Blog post: combining React with MOBservable to create high performing and easily maintainable apps](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) 
+* [Blog post: combining React with Mobservable to create high performing and easily maintainable apps](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) 
 * [Examples](#examples)
 * [Design principles](#design-principles)
 * [API documentation](#api-documentation)
@@ -25,16 +25,16 @@ Some links that may be interesting:
 
 # Examples
 
-* [TodoMVC in Mobservable + React](https://rawgit.com/mweststrate/todomvc/immutable-to-observable/examples/react-mobservable/index.html#/), ... and the [diff](https://github.com/mweststrate/todomvc/commit/2e30caeb8c690c914f92081ac01d12097a068a1e) of using observables with react instead of immutables.
-* [Fiddle demo: MOBservable + React: simple timer](https://jsfiddle.net/mweststrate/wgbe4guu/)
-* [Fiddle demo: MOBservable + React: shop](https://jsfiddle.net/mweststrate/46vL0phw)
-* [Fiddle demo: MOBservable + JQuery: shop](http://jsfiddle.net/mweststrate/vxn7qgdw)
+* [TodoMVC in obobservable + React](https://rawgit.com/mweststrate/todomvc/immutable-to-observable/examples/react-mobservable/index.html#/), ... and the [diff](https://github.com/mweststrate/todomvc/commit/2e30caeb8c690c914f92081ac01d12097a068a1e) of using observables with react instead of immutables.
+* [Fiddle demo: Mobservable + React: simple timer](https://jsfiddle.net/mweststrate/wgbe4guu/)
+* [Fiddle demo: Mobservable + React: shop](https://jsfiddle.net/mweststrate/46vL0phw)
+* [Fiddle demo: Mobservable + JQuery: shop](http://jsfiddle.net/mweststrate/vxn7qgdw)
 
 The source of all demos can also be found in the [example](/example) folder.
 
 ## Example: Observable values and functions
 
-The core of `MOBservable` consists of observable values, i.e. functions that automatically recompute when an observed value changes, 
+The core of `mobservable` consists of observable values, i.e. functions that automatically recompute when an observed value changes, 
 and the possibility to listen to changing values and updated computations.
 
 ```javascript
@@ -154,7 +154,7 @@ order1.orderLines[0].amount = 3;
 
 ## Example: ObservingComponent for React components
 
-MOBservable ships with a mixin and class decorator that can be used to subscribe React components to observables automatically.
+Mobservable ships with a mixin and class decorator that can be used to subscribe React components to observables automatically.
 The full JSX example can be found in this [fjsiddle](https://jsfiddle.net/mweststrate/wgbe4guu/)
 
 ```javascript
@@ -204,21 +204,21 @@ The full JSX example can be found in this [fjsiddle](https://jsfiddle.net/mwests
 
 ## Principles
 
-MOBservable is designed with the following principles in mind.
+Mobservable is designed with the following principles in mind.
 
 - The Model, View (and Controller) of an app should be separated.
 Views should be loosely coupled to the UI, so that UI refactorings do not require changes of the data model.
 It should be possible to describe views on the data model as naturally as possible, as if data does not change over time, or in other words: as a pure function of state.
 - Derived data should be re-calculated automatically and efficiently.
-It is the responsibility of MOBservable to prevent that views ever become stale.
-- MOBservable is unobtrusive and doesnt place any constraints on how you build or work with data structures.
+It is the responsibility of mobservable to prevent that views ever become stale.
+- Mobservable is unobtrusive and doesnt place any constraints on how you build or work with data structures.
 Inheritance, classes, cyclic data structures, or instance methods...? The library does not pose any restrictions on your data.
 - Data should be mutable as this is close to the natural mental model of most kinds of data.
 <small>Despite some nice properties of immutable data, mutable data is easier to inspect, read, grok and especially more natural to program _explicitly_ against.
 `markRead(email) { email.isRead = true; }` is more convenient to write than `markRead(email) { return { ...email, isRead : true }; }` or `markRead(email) { model.set('email', 'isRead', true); }`.
 Especially when email is somewhere deep in your model tree.</small>
 - Subscriptions should be a breeze to manage, and managed automatically wherever possible.
-- MOBservable is only about the model data, not about querying, back-end communication etc. (although observers are really useful there as well).
+- Mobservable is only about the model data, not about querying, back-end communication etc. (although observers are really useful there as well).
 
 ## Behavior
 
@@ -234,7 +234,7 @@ Observable values, arrays and functions created by `mobservable` possess the fol
 
 # API Documentation
 
-The [Typescript typings](https://github.com/mweststrate/MOBservable/blob/master/mobservable.d.ts) serve as offline API documentation.
+The [Typescript typings](https://github.com/mweststrate/mobservable/blob/master/mobservable.d.ts) serve as offline API documentation.
 
 ## Creating observables
 
@@ -550,9 +550,9 @@ This mixin also prevents re-renderings when the *props* of the component have on
 (This is similar to [React PureRender mixin](https://facebook.github.io/react/docs/pure-render-mixin.html), except that *state* changes are still always processed). 
 This allows for React apps that perform well in apps with large amount of complex data, while avoiding the need to manage a lot of subscriptions.
 
-See the [above example](#example_observingcomponent_for_react_components) or the [JSFiddle demo: MOBservable + React](https://jsfiddle.net/mweststrate/46vL0phw)
+See the [above example](#example_observingcomponent_for_react_components) or the [JSFiddle demo: Mobservable + React](https://jsfiddle.net/mweststrate/46vL0phw)
 
-For an extensive explanation, read [combing React with MOBservable](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/)
+For an extensive explanation, read [combing React with Mobservable](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/)
 
 ### mobservable.ObservingComponent
 `mobservable.ObservingComponent(clazz:ReactComponentClass):ReactComponentClass`

@@ -1,7 +1,7 @@
 {
     "name": "mobservable",
     "version": "0.5.7",
-    "description": "MOBservable is light-weight stand-alone transparent reactive programming library to create reactive primitives, functions, arrays and objects. Its goal is to make developers happy and productive. It loves React.",
+    "description": "Library to create reactive data structures and functions. Tracks and updates inter-data dependencies automatically.",
     "main": "dist/mobservable.js",
     "scripts": {
         "test": "grunt cover",
