@@ -16,7 +16,7 @@
     "bugs": {
         "url": "https://github.com/mweststrate/mobservable/issues"
     },
-    "homepage": "https://github.com/mweststrate/mobservable",
+    "homepage": "https://mweststrate.github.io/mobservable",
     "devDependencies": {
         "grunt": "^0.4.5",
         "grunt-contrib-nodeunit": "^0.4.1",
