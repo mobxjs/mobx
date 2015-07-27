@@ -1,8 +1,10 @@
 # mobservable
 
 [![Build Status](https://travis-ci.org/mweststrate/mobservable.svg?branch=master)](https://travis-ci.org/mweststrate/mobservable)
-[![Coverage Status](https://coveralls.io/repos/mweststrate/mobservable/badge.svg?branch=master)](https://coveralls.io/r/mweststrate/mobservable)
+[![Coverage Status](https://coveralls.io/repos/mweststrate/mobservable/badge.svg?branch=master&service=github)](https://coveralls.io/github/mweststrate/mobservable?branch=master)
 [![mobservable channel on slack](https://img.shields.io/badge/slack-mobservable-blue.svg)](http://www.reactiflux.com)
+
+[Official homepage](http://mweststrate.github.io/mobservable/)
 
 Installation: `npm install mobservable --save`
 
