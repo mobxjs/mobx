@@ -39,8 +39,8 @@
       <a id="forkme_banner" href="https://github.com/mweststrate/mobservable">View on GitHub</a>
 
       <h1 id="project_title">mobservable</h1>
-      <p style="font-style:italic; color:white">Library to create reactive data structures and functions. Tracks and updates inter-data dependencies automatically, so that you can:</p>
-      <h2 id="project_tagline">write applications as-if data doesn&#39;t change</h2>
+      <p style="font-style:italic; color:white">Library to create reactive data structures and functions. Tracks and updates inter-data dependencies automatically, so that one can</p>
+      <h2 id="project_tagline">cleanly separate view, actions and model</h2>
     </header>
   </div>
 
@@ -55,12 +55,16 @@
 
       <table id="usps"><tr>
         <td><h4>self updating functions</h4>Prevent stale values and avoid the need for subscriptions in your application by creating functions that track their dependencies automatically.</td>
-        <td><h4>functional reactive programming</h4>Was never easier to grok and apply. Work with observables as if they are plain javascript structures.</td>
+        <td><h4>reactive programming</h4>Was never easier to grok and apply. Work with observables as if they are plain javascript structures. Deal with asynchronous functions with ease.</td>
       </tr><tr>
         <td><h4>reactjs decorator</h4>Turn reactjs components into observers that automatically sideways load data for
           <a href="http://mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/" target="_blank">bleeding edge performance</a>.</td>
         <td><h4>shines in large apps </h4>The library is battle tested and shines in large enterprise scale apps. Works transparently in combination with classes, deeply nested and cyclic data structures.</td>
       </tr></table>
+
+      <h3><a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h3>
+
+      <p>Install using <code>npm install mobservable --save</code> or <a href="https://raw.githubusercontent.com/mweststrate/mobservable/master/dist/mobservable.js">download</a> the stand-alone library. </p>
 
         <h3><a id="observable-data-structures" class="anchor" href="#observable-data-structures" aria-hidden="true"><span class="octicon octicon-link"></span></a>Observable data structures</h3>
 
@@ -157,9 +161,34 @@ todos[<span class="pl-c1">0</span>].completed <span class="pl-k">=</span> <span 
 
           <p>The full project source of the todo demo can be found in the <a target="_blank" href="https://github.com/mweststrate/react-mobservable-boilerplate">react-mobservable-boilerplate</a> repository.</p>
 
-          <h3><a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h3>
+          <h3><a id="async" class="anchor" href="#async" aria-hidden="true"><span class="octicon octicon-link"></span></a>Working with async stuff</h3>
 
-          <p>Install using <code>npm install mobservable --save</code> or <a href="https://raw.githubusercontent.com/mweststrate/mobservable/master/dist/mobservable.js">download</a> the stand-alone library. </p>
+          <p>Asynchronous stuff is easy to deal with in reactive programming.
+            Just prepare observable values and update them whenever the async function completes or fails.
+            In the mean time make sure to present a friendly UI to your users!
+            For example with the following adaptions to the snippets above the "Load more..." button was implemented:
+          </p>
+          <p>Changes to the store:</p>
+
+<div class="highlight highlight-javascript"><pre>mobservable.props(todos, { isLoading<span class="pl-k">:</span> <span class="pl-c1">false</span> });
+<span class="pl-k">export</span> <span class="pl-k">function</span> <span class="pl-en">loadTodosAsync</span>() {
+    todos.isLoading <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+    <span class="pl-c">// mimic something asynchronous</span>
+    <span class="pl-c1">setTimeout</span>(<span class="pl-k">function</span>() {
+        addTodo(<span class="pl-s"><span class="pl-pds">"</span>Asynchronously created todo<span class="pl-pds">"</span></span>);
+        addTodo(<span class="pl-s"><span class="pl-pds">"</span>Another asynchronously created todo<span class="pl-pds">"</span></span>);
+        todos.isLoading <span class="pl-k">=</span> <span class="pl-c1">false</span>;
+    }, <span class="pl-c1">2000</span>);
+}</pre></div>
+
+          <p>Changes to the render function of the TodoList component:
+
+<div class="highlight highlight-javascript"><pre><span class="pl-k">&lt;</span>ul<span class="pl-k">&gt;</span>
+     {<span class="pl-v">this</span>.props.todos.map(<span class="pl-c">/* omitted */</span>)}
+     {todos.isLoading <span class="pl-k">?</span> (<span class="pl-k">&lt;</span>li<span class="pl-k">&gt;</span>Loading more items...<span class="pl-k">&lt;</span>/li<span class="pl-k">&gt;</span>) <span class="pl-k">:</span> <span class="pl-c1">null</span> }
+<span class="pl-k">&lt;</span>/ul<span class="pl-k">&gt;</span>
+<span class="pl-c">// omitted</span>
+<span class="pl-k">&lt;</span>button onClick<span class="pl-k">=</span>{loadTodosAsync}<span class="pl-k">&gt;</span>Load more...<span class="pl-k">&lt;</span>/button<span class="pl-k">&gt;</span></pre></div>
 
           <h3><a id="runtimebehavior" class="anchor" href="#runtimebehavior" aria-hidden="true"><span class="octicon octicon-link"></span></a>Runtime behavior</h3>
 
@@ -179,6 +208,7 @@ todos[<span class="pl-c1">0</span>].completed <span class="pl-k">=</span> <span 
               <li>The <a target="_blank" href="https://github.com/mweststrate/mobservable/blob/master/README.md">full documentation</a></li>
               <li>Get started with a <a target="_blank" href="https://jsfiddle.net/mweststrate/wgbe4guu/">small JSFiddle</a></li>
               <li>Get started by cloning the <a target="_blank" href="https://github.com/mweststrate/react-mobservable-boilerplate">react mobservable boilerplate project</a></li>
+              <li><a target="_blank" href="https://github.com/mweststrate/todomvc/tree/master/examples/react-mobservable">TodoMVC using mobservable</a></li>
               <li>Review a more <a target="_blank" href="https://jsfiddle.net/mweststrate/46vL0phw">sophisticated example</a></li>
               <li>Discuss mobservable in the <a target="_blank" href="https://reactiflux.slack.com/messages/mobservable/">Reactiflux #mobservable</a> slack channel (<a target="_blank" href="http://www.reactiflux.com/">Sign up</a>)</li>
             </ul>
@@ -194,6 +224,26 @@ todos[<span class="pl-c1">0</span>].completed <span class="pl-k">=</span> <span 
             <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
           </footer>
         </div>
+
+        <script>
+          (function() {
+            var tagLines = [
+              "cleanly separate view, actions and model",
+              "stop reasoning about which views need an update",
+              "stop changing the UI in event handlers",
+              "write applications as-if data doesn't change",
+//              "“express a lot of events just with observables... it's really funny.”",
+//              "use stuff that is “pretty clever! Actually, the whole thing is really cool.”",
+//              "easily build spreadsheets.",
+              "elegantly deal with asynchronous data fetching",
+              "create views without explicitly stating data dependencies",
+              "automatically compute derived data"
+            ];
+            setInterval(function() {
+              document.getElementById("project_tagline").innerHTML = tagLines[Math.round(Math.random() * (tagLines.length -1))];
+            }, 5000);
+          })();
+        </script>
         <!-- webpack bundle of react-mobservable-boilerplate -->
         <script src="javascripts/bundle.js"></script>
         <script type="text/javascript">
