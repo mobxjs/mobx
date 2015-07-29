@@ -109,7 +109,7 @@ todos[<span class="pl-c1">0</span>].completed <span class="pl-k">=</span> <span 
 
 <!-- Code block 2 -->
 <div class="highlight highlight-javascript"><pre><span class="pl-k">import</span> React, { Component } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
-<span class="pl-k">import</span> { addTodo, removeTodo } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./todos<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { addTodo, removeTodo, loadTodosAsync } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./todos<span class="pl-pds">'</span></span>;
 <span class="pl-k">import</span> { ObservingComponent } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>mobservable<span class="pl-pds">'</span></span>
 
 <span class="pl-c">// React component that responds to changes in 'todos'</span>
@@ -170,14 +170,14 @@ todos[<span class="pl-c1">0</span>].completed <span class="pl-k">=</span> <span 
           </p>
           <p>Changes to the store:</p>
 
-<div class="highlight highlight-javascript"><pre>mobservable.props(todos, { isLoading<span class="pl-k">:</span> <span class="pl-c1">false</span> });
+<div class="highlight highlight-javascript"><pre>mobservable.props(todos, { isLoading<span class="pl-k">:</span> <span class="pl-c1">0</span> });
 <span class="pl-k">export</span> <span class="pl-k">function</span> <span class="pl-en">loadTodosAsync</span>() {
-    todos.isLoading <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+    todos.isLoading<span class="pl-k">++</span>;
     <span class="pl-c">// mimic something asynchronous</span>
     <span class="pl-c1">setTimeout</span>(<span class="pl-k">function</span>() {
         addTodo(<span class="pl-s"><span class="pl-pds">"</span>Asynchronously created todo<span class="pl-pds">"</span></span>);
         addTodo(<span class="pl-s"><span class="pl-pds">"</span>Another asynchronously created todo<span class="pl-pds">"</span></span>);
-        todos.isLoading <span class="pl-k">=</span> <span class="pl-c1">false</span>;
+        todos.isLoading<span class="pl-k">--</span>;
     }, <span class="pl-c1">2000</span>);
 }</pre></div>
 
@@ -231,7 +231,7 @@ todos[<span class="pl-c1">0</span>].completed <span class="pl-k">=</span> <span 
               "cleanly separate view, actions and model",
               "stop reasoning about which views need an update",
               "stop changing the UI in event handlers",
-              "write applications as-if data doesn't change",
+              "write views as-if data doesn't change",
 //              "“express a lot of events just with observables... it's really funny.”",
 //              "use stuff that is “pretty clever! Actually, the whole thing is really cool.”",
 //              "easily build spreadsheets.",
