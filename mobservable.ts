@@ -1063,8 +1063,8 @@ m.ObserverMixin = {
 }
 
 m.ObservingComponent = function(componentClass) {
-    var baseMount = componentClass.componentWillMount;
-    var baseUnmount = componentClass.componentWillUnmount;
+    var baseMount = componentClass.prototype.componentWillMount;
+    var baseUnmount = componentClass.prototype.componentWillUnmount;
     componentClass.prototype.componentWillMount = function() {
         m.ObserverMixin.componentWillMount.apply(this, arguments);
         return baseMount && baseMount.apply(this, arguments);
