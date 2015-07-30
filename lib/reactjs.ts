@@ -36,17 +36,18 @@ namespace mobservable {
     }
 
     export function ObservingComponent(componentClass) {
-        var baseMount = componentClass.componentWillMount;
-        var baseUnmount = componentClass.componentWillUnmount;
+        var baseMount = componentClass.prototype.componentWillMount;
+        var baseUnmount = componentClass.prototype.componentWillUnmount;
         componentClass.prototype.componentWillMount = function() {
             ObserverMixin.componentWillMount.apply(this, arguments);
-            return baseMount && baseMount.apply(this, arguments);
+            baseMount && baseMount.apply(this, arguments);
         };
         componentClass.prototype.componentWillUnmount = function() {
             ObserverMixin.componentWillUnmount.apply(this, arguments);
-            return baseUnmount && baseUnmount.apply(this, arguments);
+            baseUnmount && baseUnmount.apply(this, arguments);
         };
-        componentClass.prototype.shouldComponentUpdate = ObserverMixin.shouldComponentUpdate;
+        if (!componentClass.prototype.shouldComponentUpdate)
+            componentClass.prototype.shouldComponentUpdate = ObserverMixin.shouldComponentUpdate;
         return componentClass;
     };
 }
