@@ -14,7 +14,7 @@ module.exports = function(grunt) {
         exec: {
             cover: "istanbul cover nodeunit test/",
             buildtypescripttest: {
-                cmd: tsc + " typescript-test.ts -m commonjs -t es5",
+                cmd: tsc + " typescript-test.ts -m commonjs -t es5 --experimentalDecorators",
                 cwd: "test/"
             },
             buildlocal: tsc + " mobservable.ts -t es5 --sourceMap",
