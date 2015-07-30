@@ -17,8 +17,8 @@ module.exports = function(grunt) {
                 cmd: tsc + " typescript-test.ts -m commonjs -t es5 --experimentalDecorators",
                 cwd: "test/"
             },
-            buildlocal: tsc + " lib/index.ts -t es5 --sourceMap --out mobservable.js",
-            builddist: tsc + " lib/index.ts -t es5 --removeComments -out dist/mobservable.js"
+            buildlocal: tsc + " lib/*.ts -t es5 --sourceMap --out mobservable.js",
+            builddist: tsc + " lib/*.ts -t es5 --removeComments -out dist/mobservable.js"
         },
         coveralls: {
             options: {
