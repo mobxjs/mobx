@@ -4,14 +4,14 @@
  * https://github.com/mweststrate/mobservable
  */
  
-/// <refererence path="./scheduler.ts" />
-/// <refererence path="./utils.ts" />
-/// <refererence path="./simpleeventemitter.ts" />
-/// <refererence path="./dnode.ts" />
-/// <refererence path="./observablevalue.ts" />
-/// <refererence path="./observablearray.ts" />
-/// <refererence path="./computedobservable.ts" />
-/// <refererence path="./reactjs.ts" />
+/// <refererence path="./scheduler" />
+/// <refererence path="./utils" />
+/// <refererence path="./simpleeventemitter" />
+/// <refererence path="./dnode" />
+/// <refererence path="./observablevalue" />
+/// <refererence path="./observablearray" />
+/// <refererence path="./computedobservable" />
+/// <refererence path="./reactjs" />
 
 namespace mobservable {
     

@@ -1,3 +1,5 @@
+/// <reference path="./observablevalue" />
+
 namespace mobservable {
     export class ComputedObservable<U> extends ObservableValue<U> {
         private isComputing = false;
