@@ -14,11 +14,11 @@ module.exports = function(grunt) {
         exec: {
             cover: "istanbul cover nodeunit test/",
             buildtypescripttest: {
-                cmd: tsc + " typescript-test.ts -m commonjs -t es5",
+                cmd: tsc + " typescript-test.ts -m commonjs -t es5 --experimentalDecorators",
                 cwd: "test/"
             },
-            buildlocal: tsc + " mobservable.ts -t es5 --sourceMap",
-            builddist: tsc + " mobservable.ts -t es5 --removeComments -out dist/mobservable.js"
+            buildlocal: tsc + " lib/index.ts -t es5 --sourceMap --out mobservable.js",
+            builddist: tsc + " lib/index.ts -t es5 --removeComments -out dist/mobservable.js"
         },
         coveralls: {
             options: {
@@ -45,7 +45,7 @@ module.exports = function(grunt) {
 
     grunt.registerTask("buildDts", "Build .d.ts file", function() {
         var moduleDeclaration = '\n\ndeclare module "mobservable" {\n\tvar m : IMObservableStatic;\n\texport = m;\n}';
-        var ts = fs.readFileSync('mobservable.ts','utf8');
+        var ts = fs.readFileSync('lib/index.ts','utf8');
         var headerEndIndex = ts.indexOf("/* END OF DECLARATION */");
         if (headerEndIndex === -1)
             throw "Failed to find end of declaration in mobservable.ts";
