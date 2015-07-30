@@ -24,6 +24,9 @@
         // the combination of mobservable.props and ObservingComponent does all the magic for us.
         // UI updates are nowhere forced, but all views (un)subscribe to their data automatically
         var TimerView = mobservable.ObservingComponent(React.createClass({
+            componentDidMount: function() {
+                store.timer = 1000;
+            }, 
             render: function() {
                 return (<span>Seconds passed: {this.props.store.timer}</span>);
             }

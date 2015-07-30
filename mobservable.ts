@@ -1067,13 +1067,14 @@ m.ObservingComponent = function(componentClass) {
     var baseUnmount = componentClass.prototype.componentWillUnmount;
     componentClass.prototype.componentWillMount = function() {
         m.ObserverMixin.componentWillMount.apply(this, arguments);
-        return baseMount && baseMount.apply(this, arguments);
+        baseMount && baseMount.apply(this, arguments);
     };
     componentClass.prototype.componentWillUnmount = function() {
         m.ObserverMixin.componentWillUnmount.apply(this, arguments);
-        return baseUnmount && baseUnmount.apply(this, arguments);
+        baseUnmount && baseUnmount.apply(this, arguments);
     };
-    componentClass.prototype.shouldComponentUpdate = m.ObserverMixin.shouldComponentUpdate;
+    if (!componentClass.prototype.shouldComponentUpdate)
+        componentClass.prototype.shouldComponentUpdate = m.ObserverMixin.shouldComponentUpdate;
     return componentClass;
 };
 
