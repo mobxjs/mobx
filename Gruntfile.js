@@ -49,12 +49,12 @@ module.exports = function(grunt) {
         var headerEndIndex = ts.indexOf("/* END OF DECLARATION */");
         if (headerEndIndex === -1)
             throw "Failed to find end of declaration in mobservable.ts";
-        fs.writeFileSync('mobservable.d.ts', "/** GENERATED FILE */\n" + ts.substr(0, headerEndIndex) + moduleDeclaration, 'utf8');
+        fs.writeFileSync('dist/mobservable.d.ts', "/** GENERATED FILE */\n" + ts.substr(0, headerEndIndex) + moduleDeclaration, 'utf8');
     });
 
     grunt.registerTask("preparetest", "Create node module in test folder", function(sourceDir) {
-        mkdirp.sync("test/node_modules/mobservable");
-        fs.writeFileSync("test/node_modules/mobservable/mobservable.d.ts", fs.readFileSync("mobservable.d.ts","utf8"),"utf8");
+        mkdirp.sync("test/node_modules/mobservable/dist/");
+        fs.writeFileSync("test/node_modules/mobservable/dist/mobservable.d.ts", fs.readFileSync("dist/mobservable.d.ts","utf8"),"utf8");
         fs.writeFileSync("test/node_modules/mobservable/index.js", "module.exports=require('../../../" + sourceDir + "/mobservable.js');","utf8");
     });
 

@@ -1,4 +1,4 @@
-/// <reference path="./node_modules/mobservable/mobservable.d.ts"/>
+/// <reference path="./node_modules/mobservable/dist/mobservable.d.ts"/>
 import mobservable = require('mobservable');
 import {observable} from "mobservable";
 
