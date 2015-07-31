@@ -8,3 +8,4 @@ coverage/
 /test/typescript-test.js*
 /dist/test
 notes.md
+.settings
