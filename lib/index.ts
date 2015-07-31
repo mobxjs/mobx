@@ -4,14 +4,15 @@
  * https://github.com/mweststrate/mobservable
  */
  
-/// <refererence path="./scheduler" />
-/// <refererence path="./utils" />
-/// <refererence path="./simpleeventemitter" />
-/// <refererence path="./dnode" />
-/// <refererence path="./observablevalue" />
-/// <refererence path="./observablearray" />
-/// <refererence path="./computedobservable" />
-/// <refererence path="./reactjs" />
+/// <refererence path="./scheduler.ts" />
+/// <refererence path="./utils.ts" />
+/// <refererence path="./simpleeventemitter.ts" />
+/// <refererence path="./dnode.ts" />
+/// <refererence path="./observablevalue.ts" />
+/// <refererence path="./observablearray.ts" />
+/// <refererence path="./computedobservable.ts" />
+/// <refererence path="./reactjs.ts" />
+/// <refererence path="./umd.ts" />
 
 namespace mobservable {
     
@@ -51,20 +52,20 @@ namespace mobservable {
         return new ObservableArray(values);
     }
     
-    export function props(target, props?, value?) {
+    export function props(target, properties?, initialValue?) {
         switch(arguments.length) {
             case 0:
                 throw new Error("Not enough arguments");
             case 1:
                 return props(target, target); // mix target properties into itself
             case 2:
-                for(var key in props)
-                    props(target, key, props[key]);
+                for(var key in properties)
+                    props(target, key, properties[key]);
                 break;
             case 3:
-                var isArray = Array.isArray(value);
-                var observable = value(value, target);
-                Object.defineProperty(target, props, {
+                var isArray = Array.isArray(initialValue);
+                var observable = value(initialValue, target);
+                Object.defineProperty(target, properties, {
                     get: isArray
                         ? function() { return observable; }
                         : observable,
@@ -228,38 +229,3 @@ namespace mobservable {
     export var debugLevel = 0;
     
 }
-
-/*    export var m:IMObservableStatic = <IMObservableStatic> function(value, scope?) {
-        return createObservable(value,scope);
-    };
-*/
-
-/*
-    // For testing purposes only;
-    (<any>m).quickDiff = quickDiff;
-    (<any>m).stackDepth = () => DNode.trackingStack.length;
-
-*/
-
-/* typescript does not support UMD modules yet, lets do it ourselves... */
-/*(declare var define;
-declare var exports;
-declare var module;
-
-(function (root, factory) {
-    if (typeof define === 'function' && define.amd) {
-        // AMD.
-        define('mobservable', [], function () {
-            return (factory());
-        });
-    } else if (typeof exports === 'object') {
-        // CommonJS like
-        module.exports = factory();
-    } else {
-        // register global
-        root['mobservable'] = factory();
-    }
-}(this, function () {
-    return mobservable.m;
-}));
-*/

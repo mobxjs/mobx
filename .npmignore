@@ -20,3 +20,4 @@ tsconfig.json
 
 /dist/test
 /test/typescript-test.js*
+/lib

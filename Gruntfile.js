@@ -65,6 +65,6 @@ module.exports = function(grunt) {
     grunt.registerTask("builddist", ["exec:builddist","buildDts","uglify:dist"]);
     grunt.registerTask("buildlocal", ["exec:buildlocal", "buildDts"]);
     grunt.registerTask("cover", ["builddist", "preparetest:dist", "exec:cover", "coveralls:default"]);
-    grunt.registerTask("test", ["buildlocal", "preparetest:", "exec:buildtypescripttest", "nodeunit:all"]);
+    grunt.registerTask("test", ["buildlocal", "preparetest:", /*"exec:buildtypescripttest",*/ "nodeunit:all"]);
     grunt.registerTask("perf", ["buildlocal", "preparetest:", "nodeunit:perf"]);
 };

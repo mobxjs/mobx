@@ -182,4 +182,8 @@ namespace mobservable {
             this.isDisposed = true;
         }
     }
+    
+    export function stackDepth () {
+        return DNode.trackingStack.length;
+    }
 }
