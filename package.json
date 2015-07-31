@@ -1,7 +1,7 @@
 {
     "name": "mobservable",
     "version": "0.5.9",
-    "description": "Library to create reactive data structures and functions. Tracks and updates inter-data dependencies automatically.",
+    "description": "Library to create reactive data structures and functions. Tracks and updates inter-data dependencies automatically to be able to create self-updating views.",
     "main": "dist/mobservable.js",
     "scripts": {
         "test": "grunt cover",
@@ -26,19 +26,6 @@
         "mkdirp": "^0.5.1",
         "nodeunit-browser-tap": "^0.1.0",
         "typescript": "^1.5.0-beta"
-    },
-    "testling": {
-        "files": "test/browser/test.js",
-        "browsers": [
-            "ie/6..latest",
-            "chrome/22..latest",
-            "firefox/16..latest",
-            "safari/latest",
-            "opera/11.0..latest",
-            "iphone/6",
-            "ipad/6",
-            "android-browser/latest"
-        ]
     },
     "keywords": [
         "mobservable",

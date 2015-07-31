@@ -135,7 +135,7 @@ exports.testFindAndRemove = function(test) {
 
 exports.testQuickDiff = function(test) {
     function t(current, base, added, removed) {
-        var res = mobservable.quickDiff(current, base);
+        var res = mobservable._.quickDiff(current, base);
         test.deepEqual(res[0], added);
         test.deepEqual(res[1], removed);
     }

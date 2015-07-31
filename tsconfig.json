@@ -1,23 +1,11 @@
 {
-    "version": "1.5.0-alpha",
+    "version": "1.5.3",
     "compilerOptions": {
         "target": "es5",
-        "module": "commonjs",
-        "declaration": false,
-        "noImplicitAny": false,
-        "removeComments": true,
-        "noLib": false,
         "experimentalDecorators": true
     },
     "filesGlob": [
         "./**/*.ts",
         "!./node_modules/**/*.ts"
-    ],
-    "files": [
-        "./dist/test/typescript-test.ts",
-        "./mobservable.d.ts",
-        "./mobservable.ts",
-        "./test/node_modules/mobservable/mobservable.d.ts",
-        "./test/typescript-test.ts"
     ]
 }

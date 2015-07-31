@@ -1,18 +1,22 @@
-/** GENERATED FILE */
 /**
  * mobservable
  * (c) 2015 - Michel Weststrate
- * https://github.com/mweststrate/mobservable
+ * https://mweststrate.github.io/mobservable
  */
 
-interface IMObservableStatic {
-    // ways of creating observables. 
+interface IMobservableStatic extends _IMobservableStatic {
+
+    // value is the default exported function of the module
     <T>(value?:T[]):Mobservable.IObservableArray<T>;
     <T>(value?:T|{():T}, scope?:Object):Mobservable.IObservableValue<T>;
-    
+ }
+
+interface _IMobservableStatic {
+
+    // ways of creating observables.
     value<T>(value?:T[]):Mobservable.IObservableArray<T>;
     value<T>(value?:T|{():T}, scope?:Object):Mobservable.IObservableValue<T>;
-    
+
     array<T>(values?:T[]):Mobservable.IObservableArray<T>;
     primitive<T>(value?:T):Mobservable.IObservableValue<T>;
     reference<T>(value?:T):Mobservable.IObservableValue<T>;
@@ -30,28 +34,23 @@ interface IMObservableStatic {
     // convert observables to not observables
     toJson<T>(value:T):T;
     toPlainValue<T>(any:T):T;
-    
+
     // observe observables
     observeProperty(object:Object, key:string, listener:Function, invokeImmediately?:boolean):Mobservable.Lambda;
     watch<T>(func:()=>T, onInvalidate:Mobservable.Lambda):[T,Mobservable.Lambda];
-    
+
     // change a lot of observables at once
     batch<T>(action:()=>T):T;
 
     // Utils
     debugLevel: number;
-    SimpleEventEmitter: new()=> Mobservable.ISimpleEventEmitter;
-    
-    ObserverMixin: {
-        componentWillMount();
-        componentWillUnmount();
-        shouldComponentUpdate(nextProps, nextState);
-    };
+
+    // ReactJS
+    ObserverMixin;
     ObservingComponent<T>(componentClass:T):T;
 }
 
 declare module Mobservable {
-    
     interface Lambda {
         ():void;
     }
@@ -91,17 +90,4 @@ declare module Mobservable {
         removed: T[];
         addedCount: number;
     }
-    
-    interface ISimpleEventEmitter {
-        emit(...data:any[]):void;
-        on(listener:(...data:any[])=>void):Lambda;
-        once(listener:(...data:any[])=>void):Lambda;
-    }
-}
-
-
-
-declare module "mobservable" {
-	var m : IMObservableStatic;
-	export = m;
 }

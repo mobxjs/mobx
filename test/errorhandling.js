@@ -22,7 +22,7 @@ function testException(test, observable, exception) {
     catch (e) {
         test.equal(e.message === exception || e.cause === exception, true);
     }
-    test.equal(mobservable.stackDepth(), 0);
+    test.equal(mobservable._.stackDepth(), 0);
 }
 
 exports.testException1  = function(test) {
@@ -30,7 +30,7 @@ exports.testException1  = function(test) {
         throw "hoi";
     });
     testException(test, a, "hoi");
-    test.equal(mobservable.stackDepth(), 0);
+    test.equal(mobservable._.stackDepth(), 0);
     test.done();
 };
 
@@ -62,7 +62,7 @@ exports.testException2 = function(test) {
     test.equal(cbuffer.toArray().length, 2);
     test.equal(cbuffer.toArray()[0].cause, "Some error!");
     test.equal(cbuffer.toArray()[1], 1);
-    test.equal(mobservable.stackDepth(), 0);
+    test.equal(mobservable._.stackDepth(), 0);
 
     test.done();
 };
@@ -75,7 +75,7 @@ exports.cycle1 = function(test) {
     }
     catch(e) {
         test.ok(("" + e).indexOf("Cycle detected") !== -1);
-        test.equal(mobservable.stackDepth(), 0);
+        test.equal(mobservable._.stackDepth(), 0);
     }
 
     var a = value(function() { return b() * 2; });
@@ -106,6 +106,6 @@ exports.cycle3 = function(test) {
     test.equals(1, a());
     test.equals(2, b());
 
-    test.equal(mobservable.stackDepth(), 0);
+    test.equal(mobservable._.stackDepth(), 0);
     test.done();
 };

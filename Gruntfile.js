@@ -17,8 +17,8 @@ module.exports = function(grunt) {
                 cmd: tsc + " typescript-test.ts -m commonjs -t es5 --experimentalDecorators",
                 cwd: "test/"
             },
-            buildlocal: tsc + " mobservable.ts -t es5 --sourceMap",
-            builddist: tsc + " mobservable.ts -t es5 --removeComments -out dist/mobservable.js"
+            buildlocal: tsc + " lib/*.ts -t es5 --sourceMap --out .build/mobservable.js",
+            builddist: tsc + " lib/*.ts -t es5 --removeComments -out dist/mobservable.js"
         },
         coveralls: {
             options: {
@@ -43,18 +43,14 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-coveralls');
     grunt.loadNpmTasks('grunt-exec');
 
-    grunt.registerTask("buildDts", "Build .d.ts file", function() {
-        var moduleDeclaration = '\n\ndeclare module "mobservable" {\n\tvar m : IMObservableStatic;\n\texport = m;\n}';
-        var ts = fs.readFileSync('mobservable.ts','utf8');
-        var headerEndIndex = ts.indexOf("/* END OF DECLARATION */");
-        if (headerEndIndex === -1)
-            throw "Failed to find end of declaration in mobservable.ts";
-        fs.writeFileSync('mobservable.d.ts', "/** GENERATED FILE */\n" + ts.substr(0, headerEndIndex) + moduleDeclaration, 'utf8');
+    grunt.registerTask("builddts", "Build .d.ts file", function() {
+        var moduleDeclaration = '\n\ndeclare module "mobservable" {\n\tvar m : IMobservableStatic;\n\texport = m;\n}';
+        fs.writeFileSync('dist/mobservable.d.ts', fs.readFileSync('lib/api.ts','utf8') + moduleDeclaration, 'utf8');
     });
 
     grunt.registerTask("preparetest", "Create node module in test folder", function(sourceDir) {
-        mkdirp.sync("test/node_modules/mobservable");
-        fs.writeFileSync("test/node_modules/mobservable/mobservable.d.ts", fs.readFileSync("mobservable.d.ts","utf8"),"utf8");
+        mkdirp.sync("test/node_modules/mobservable/dist/");
+        fs.writeFileSync("test/node_modules/mobservable/dist/mobservable.d.ts", fs.readFileSync("dist/mobservable.d.ts","utf8"),"utf8");
         fs.writeFileSync("test/node_modules/mobservable/index.js", "module.exports=require('../../../" + sourceDir + "/mobservable.js');","utf8");
     });
 
@@ -62,9 +58,9 @@ module.exports = function(grunt) {
         require("./publish.js");
     });
     grunt.registerTask("default", ["buildlocal"]);
-    grunt.registerTask("builddist", ["exec:builddist","buildDts","uglify:dist"]);
-    grunt.registerTask("buildlocal", ["exec:buildlocal", "buildDts"]);
+    grunt.registerTask("builddist", ["buildlocal", "exec:builddist","builddts","uglify:dist"]);
+    grunt.registerTask("buildlocal", ["exec:buildlocal", "builddts"]);
     grunt.registerTask("cover", ["builddist", "preparetest:dist", "exec:cover", "coveralls:default"]);
-    grunt.registerTask("test", ["buildlocal", "preparetest:", "exec:buildtypescripttest", "nodeunit:all"]);
-    grunt.registerTask("perf", ["buildlocal", "preparetest:", "nodeunit:perf"]);
+    grunt.registerTask("test", ["buildlocal", "preparetest:.build", "exec:buildtypescripttest", "nodeunit:all"]);
+    grunt.registerTask("perf", ["buildlocal", "preparetest:.build", "nodeunit:perf"]);
 };

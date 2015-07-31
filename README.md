@@ -120,7 +120,7 @@ someNumbers[someNumbers.length] = 5;
 For TypeScript users, `mobservable` ships with module typings and an `@observable` annotation with which class members can be marked as observable.
 
 ```typescript
-/// <reference path="./node_modules/mobservable/mobservable.d.ts"/>
+/// <reference path="./node_modules/mobservable/dist/mobservable.d.ts"/>
 import {observable, sideEffect} from "mobservable";
 
 class Order {
@@ -236,7 +236,7 @@ Observable values, arrays and functions created by `mobservable` possess the fol
 
 # API Documentation
 
-The [Typescript typings](https://github.com/mweststrate/mobservable/blob/master/mobservable.d.ts) serve as offline API documentation.
+The [Typescript typings](https://github.com/mweststrate/mobservable/blob/master/dist/mobservable.d.ts) serve as offline API documentation.
 
 ## Creating observables
 
@@ -451,7 +451,7 @@ The `mobservable.observable` annotation can be used to mark class properties and
 This annotations basically wraps `mobservable.props`. Example:
 
 ```typescript
-/// <reference path='./node_modules/mobservable/mobservable.d.ts'/>
+/// <reference path='./node_modules/mobservable/dist/mobservable.d.ts'/>
 import {observable} from 'mobservable';
 
 class Order {
