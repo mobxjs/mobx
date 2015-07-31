@@ -2,6 +2,7 @@
 .git/
 .settings/
 .tscache/
+.build
 coverage/
 example/
 node_modules/
@@ -9,7 +10,6 @@ test/
 
 .travis.yml
 Gruntfile.js
-/mobservable.js
 npm-debug.log
 publish.js
 todo.md

@@ -17,7 +17,7 @@ module.exports = function(grunt) {
                 cmd: tsc + " typescript-test.ts -m commonjs -t es5 --experimentalDecorators",
                 cwd: "test/"
             },
-            buildlocal: tsc + " lib/*.ts -t es5 --sourceMap --out mobservable.js",
+            buildlocal: tsc + " lib/*.ts -t es5 --sourceMap --out .build/mobservable.js",
             builddist: tsc + " lib/*.ts -t es5 --removeComments -out dist/mobservable.js"
         },
         coveralls: {
@@ -61,6 +61,6 @@ module.exports = function(grunt) {
     grunt.registerTask("builddist", ["buildlocal", "exec:builddist","builddts","uglify:dist"]);
     grunt.registerTask("buildlocal", ["exec:buildlocal", "builddts"]);
     grunt.registerTask("cover", ["builddist", "preparetest:dist", "exec:cover", "coveralls:default"]);
-    grunt.registerTask("test", ["buildlocal", "preparetest:", "exec:buildtypescripttest", "nodeunit:all"]);
+    grunt.registerTask("test", ["buildlocal", "preparetest:.build", "exec:buildtypescripttest", "nodeunit:all"]);
     grunt.registerTask("perf", ["buildlocal", "preparetest:", "nodeunit:perf"]);
 };
