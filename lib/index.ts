@@ -10,6 +10,7 @@
 /// <refererence path="./dnode.ts" />
 /// <refererence path="./observablevalue.ts" />
 /// <refererence path="./observablearray.ts" />
+/// <refererence path="./watch.ts" />
 /// <refererence path="./computedobservable.ts" />
 /// <refererence path="./reactjs.ts" />
 /// <refererence path="./umd.ts" />
@@ -19,40 +20,14 @@ namespace mobservable {
 
     export type Lambda = Mobservable.Lambda;
 
-    export function createObservable<T>(value:T[]): Mobservable.IObservableArray<T>;
-    export function createObservable<T>(value?:T|{():T}, scope?:Object): Mobservable.IObservableValue<T>;
-    export function createObservable(value?, scope?:Object):any {
+    export function value<T>(value:T[]): Mobservable.IObservableArray<T>;
+    export function value<T>(value?:T|{():T}, scope?:Object): Mobservable.IObservableValue<T>;
+    export function value(value?, scope?:Object):any {
         if (Array.isArray(value))
-            return new ObservableArray(value);
+            return array(value);
         if (typeof value === "function")
             return computed(value, scope);
-        return primitive(value);
-    }
-
-
-    export var value = createObservable;
-
-    export function reference(value?) {
-        return new ObservableValue(value).createGetterSetter();
-    }
-    export var primitive = reference;
-
-    export function computed<T>(func:()=>void, scope?) {
-        return new ComputedObservable(func, scope).createGetterSetter();
-    }
-
-    export function expr<T>(expr:()=>void, scope?) {
-        if (DNode.trackingStack.length === 0)
-            throw new Error("mobservable.expr can only be used inside a computed observable. Probably mobservable.computed should be used instead of .expr");
-        return new ComputedObservable(expr, scope).get();
-    }
-
-    export function sideEffect(func:Lambda, scope?):Lambda {
-        return computed(func, scope).observe(noop);
-    }
-
-    export function array<T>(values?:T[]): ObservableArray<T> {
-        return new ObservableArray(values);
+        return reference(value);
     }
 
     export function props(target, properties?, initialValue?) {
@@ -108,7 +83,7 @@ namespace mobservable {
     export function toJson(source) {
         if (!source)
             return source;
-        if (Array.isArray(source) || source instanceof ObservableArray)
+        if (Array.isArray(source) || source instanceof _.ObservableArray)
             return source.map(toJson);
         if (typeof source === "object") {
             var res = {};
@@ -171,12 +146,12 @@ namespace mobservable {
         if (value) {
             if (value instanceof Array)
                 return value.slice();
-            else if (value instanceof ObservableValue)
+            else if (value instanceof _.ObservableValue)
                 return value.get();
             else if (typeof value === "function" && value.impl) {
-                if (value.impl instanceof ObservableValue)
+                if (value.impl instanceof _.ObservableValue)
                     return value()
-                else if (value.impl instanceof ObservableArray)
+                else if (value.impl instanceof _.ObservableArray)
                     return value().slice();
             }
             else if (typeof value === "object") {
@@ -203,30 +178,16 @@ namespace mobservable {
             throw new Error("Third argument to mobservable.observeProperty should be a function");
 
         // wrap with observable function
-        var observer = new ComputedObservable((() => object[key]), object);
+        var observer = new _.ComputedObservable((() => object[key]), object);
         var disposer = observer.observe(listener, invokeImmediately);
 
         if ((<any>observer).dependencyState.observing.length === 0)
             throw new Error(`mobservable.observeProperty: property '${key}' of '${object} doesn't seem to be observable. Did you define it as observable using @observable or mobservable.props? You might try to use the .observe() method instead.`);
 
-        return once(() => {
+        return _.once(() => {
             disposer();
             (<any>observer).dependencyState.dispose(); // clean up
         });
-    }
-
-    /**
-        Evaluates func and return its results. Watch tracks all observables that are used by 'func'
-        and invokes 'onValidate' whenever func *should* update.
-        Returns  a tuplde [return value of func, disposer]. The disposer can be used to abort the watch early.
-    */
-    export function watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
-        var watch = new WatchedExpression(func, onInvalidate);
-        return [watch.value, () => watch.dispose()];
-    }
-
-    export function batch<T>(action:()=>T):T {
-        return Scheduler.batch(action);
     }
 
     export var debugLevel = 0;

@@ -23,7 +23,7 @@ exports.basic = function(test) {
     x(5);
     test.equal(5, x());
     test.deepEqual([5], b.toArray());
-    test.equal(mobservable.stackDepth(), 0);
+    test.equal(mobservable._.stackDepth(), 0);
     test.done();
 }
 
@@ -41,7 +41,7 @@ exports.basic2 = function(test) {
     test.equal(z(), 10);
     test.equal(y(), 15);
 
-    test.equal(mobservable.stackDepth(), 0);
+    test.equal(mobservable._.stackDepth(), 0);
     test.done();
 }
 
@@ -60,7 +60,7 @@ exports.dynamic = function(test) {
         test.equal(5, y());
 
         test.deepEqual([3, 5], b.toArray());
-        test.equal(mobservable.stackDepth(), 0);
+        test.equal(mobservable._.stackDepth(), 0);
 
         test.done();
     }
@@ -85,7 +85,7 @@ exports.dynamic2 = function(test) {
 
         //no intermediate value 15!
         test.deepEqual([25], b.toArray());
-        test.equal(mobservable.stackDepth(), 0);
+        test.equal(mobservable._.stackDepth(), 0);
 
         test.done();
     }
@@ -112,7 +112,7 @@ exports.readme1 = function(test) {
         order.price(20);
         order.price(10);
         test.deepEqual([24,12],b.toArray());
-        test.equal(mobservable.stackDepth(), 0);
+        test.equal(mobservable._.stackDepth(), 0);
 
         test.done();
     } catch (e) {
@@ -161,7 +161,7 @@ exports.testScope = function(test) {
     order.price(10);
     order.amount(3);
     test.equals(36, order.total());
-    test.equal(mobservable.stackDepth(), 0);
+    test.equal(mobservable._.stackDepth(), 0);
 
     test.done();
 }
@@ -191,7 +191,7 @@ exports.testProps1 = function(test) {
     order.amount = 5;
     test.deepEqual(totals, [36,48]);
 
-    test.equal(mobservable.stackDepth(), 0);
+    test.equal(mobservable._.stackDepth(), 0);
     test.done();
 };
 
@@ -328,7 +328,7 @@ exports.testWatch = function(test) {
     test.equals(a.impl.dependencyState.observers.length, 0);
     test.equals(b.impl.dependencyState.observers.length, 0);
 
-    test.equal(mobservable.stackDepth(), 0);
+    test.equal(mobservable._.stackDepth(), 0);
     test.done();
 }
 
@@ -354,7 +354,7 @@ exports.testWatchDisposed = function(test) {
     test.equals(changed, 0); // onInvalidate should not trigger during explicit cleanup
     test.equals(calcs, 1);
 
-    test.equal(mobservable.stackDepth(), 0);
+    test.equal(mobservable._.stackDepth(), 0);
     test.done();
 }
 
@@ -419,7 +419,7 @@ exports.testChangeCountOptimization = function(test) {
     test.equals(bCalcs, 2);
     test.equals(cCalcs, 1);
 
-    test.equal(mobservable.stackDepth(), 0);
+    test.equal(mobservable._.stackDepth(), 0);
     test.done();
 }
 
@@ -451,7 +451,7 @@ exports.testObservablesRemoved = function(test) {
     test.equals(c(), 9);
     test.equals(calcs, 3);
 
-    test.equal(mobservable.stackDepth(), 0);
+    test.equal(mobservable._.stackDepth(), 0);
     test.done();
 }
 
@@ -527,7 +527,7 @@ exports.testLazyEvaluation = function (test) {
 
     test.equal(observerChanges, 1);
 
-    test.equal(mobservable.stackDepth(), 0);
+    test.equal(mobservable._.stackDepth(), 0);
     test.done();
 };
 

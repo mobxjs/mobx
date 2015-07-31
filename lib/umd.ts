@@ -7,6 +7,7 @@
 /// <reference path="./utils.ts" />
 /// <reference path="./index.ts" />
 /// <reference path="./api.ts" />
+/// <reference path="./watch.ts" />
 
 /**
  * This complete file is a fight against the system since typescript cannot decently generate 
