@@ -1,14 +1,6 @@
 namespace mobservable {
 
-    export interface IObservable {
-        observe(callback:(...args:any[])=>void, fireImmediately?:boolean):Lambda;
-    }
 
-    export interface IObservableValue<T> extends IObservable {
-        ():T;
-        (value:T);
-        observe(callback:(newValue:T, oldValue:T)=>void, fireImmediately?:boolean):Lambda;
-    }
 
     export class ObservableValue<T> {
         protected changeEvent = new SimpleEventEmitter();
@@ -43,7 +35,7 @@ namespace mobservable {
             });
         }
 
-        createGetterSetter():IObservableValue<T> {
+        createGetterSetter():Mobservable.IObservableValue<T> {
             var self = this;
             var f:any = function(value?) {
                 if (arguments.length > 0)

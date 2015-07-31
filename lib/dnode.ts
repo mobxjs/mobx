@@ -1,6 +1,6 @@
 namespace mobservable {
 
-    enum DNodeState {
+    export enum DNodeState {
         STALE,     // One or more depencies have changed but their values are not yet known, current value is stale
         PENDING,   // All dependencies are up to date again, a recalculation of this node is ongoing or pending, current value is stale
         READY,     // Everything is bright and shiny

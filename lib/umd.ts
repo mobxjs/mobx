@@ -6,6 +6,15 @@
  
 /// <reference path="./utils.ts" />
 /// <reference path="./index.ts" />
+/// <reference path="./api.ts" />
+
+/**
+ * This complete file is a fight against the system since typescript cannot decently generate 
+ * ambient declarations from internal modules, merge default exports etc. etc. 
+ */
+
+// Let the compiler figure out whether we are still compatible with the api..
+var forCompilerVerificationOnly = <_IMobservableStatic> mobservable;
 
 declare var define;
 declare var exports;

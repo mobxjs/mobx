@@ -1,7 +1,5 @@
 namespace mobservable {
-    export interface Lambda {
-        ():void;
-    }
+
 
     export function warn(message) {
         if (console)

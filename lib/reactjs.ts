@@ -50,4 +50,4 @@ namespace mobservable {
             componentClass.prototype.shouldComponentUpdate = ObserverMixin.shouldComponentUpdate;
         return componentClass;
     };
-}
+}   

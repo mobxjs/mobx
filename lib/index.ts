@@ -3,7 +3,7 @@
  * (c) 2015 - Michel Weststrate
  * https://github.com/mweststrate/mobservable
  */
- 
+
 /// <refererence path="./scheduler.ts" />
 /// <refererence path="./utils.ts" />
 /// <refererence path="./simpleeventemitter.ts" />
@@ -13,11 +13,14 @@
 /// <refererence path="./computedobservable.ts" />
 /// <refererence path="./reactjs.ts" />
 /// <refererence path="./umd.ts" />
+/// <refererence path="./api.ts" />
 
 namespace mobservable {
-    
-    export function createObservable<T>(value:T[]): IObservableArray<T>;
-    export function createObservable<T>(value?:T|{():T}, scope?:Object): IObservableValue<T>;
+
+    export type Lambda = Mobservable.Lambda;
+
+    export function createObservable<T>(value:T[]): Mobservable.IObservableArray<T>;
+    export function createObservable<T>(value?:T|{():T}, scope?:Object): Mobservable.IObservableValue<T>;
     export function createObservable(value?, scope?:Object):any {
         if (Array.isArray(value))
             return new ObservableArray(value);
@@ -25,33 +28,33 @@ namespace mobservable {
             return computed(value, scope);
         return primitive(value);
     }
-    
-    
+
+
     export var value = createObservable;
-    
+
     export function reference(value?) {
         return new ObservableValue(value).createGetterSetter();
     }
     export var primitive = reference;
-    
+
     export function computed<T>(func:()=>void, scope?) {
         return new ComputedObservable(func, scope).createGetterSetter();
     }
-    
+
     export function expr<T>(expr:()=>void, scope?) {
         if (DNode.trackingStack.length === 0)
             throw new Error("mobservable.expr can only be used inside a computed observable. Probably mobservable.computed should be used instead of .expr");
         return new ComputedObservable(expr, scope).get();
     }
-    
+
     export function sideEffect(func:Lambda, scope?):Lambda {
         return computed(func, scope).observe(noop);
     }
-    
+
     export function array<T>(values?:T[]): ObservableArray<T> {
         return new ObservableArray(values);
     }
-    
+
     export function props(target, properties?, initialValue?) {
         switch(arguments.length) {
             case 0:
@@ -70,7 +73,7 @@ namespace mobservable {
                         ? function() { return observable; }
                         : observable,
                     set: isArray
-                        ? function(newValue) { (<IObservableArray<any>><any>observable).replace(newValue) }
+                        ? function(newValue) { (<Mobservable.IObservableArray<any>><any>observable).replace(newValue) }
                         : observable,
                     enumerable: true,
                     configurable: false
@@ -79,7 +82,7 @@ namespace mobservable {
         }
         return target;
     }
-    
+
     export function fromJson(source) {
         function convertValue(value) {
             if (!value)
@@ -88,7 +91,7 @@ namespace mobservable {
                 return fromJson(value);
             return value;
         }
-    
+
         if (source) {
             if (Array.isArray(source))
                 return array(source.map(convertValue));
@@ -101,7 +104,7 @@ namespace mobservable {
         }
         throw new Error(`mobservable.fromJson expects object or array, got: '${source}'`);
     }
-    
+
     export function toJson(source) {
         if (!source)
             return source;
@@ -115,7 +118,7 @@ namespace mobservable {
         }
         return source;
     }
-    
+
     /**
      * Use this annotation to wrap properties of an object in an observable, for example:
      * class OrderLine {
@@ -156,7 +159,7 @@ namespace mobservable {
             });
         }
     }
-    
+
     /**
      * Inverse function of `props` and `array`, given an (observable) array, returns a plain,
      * non observable version. (non recursive), or given an object with observable properties, returns a clone
@@ -185,7 +188,7 @@ namespace mobservable {
         }
         return value;
     }
-    
+
     /**
         Can be used to observe observable properties that are created using the `observable` annotation,
         `defineObservableProperty` or `initializeObservableProperties`.
@@ -198,20 +201,20 @@ namespace mobservable {
             throw new Error(`Object '${object}' has no property '${key}'.`);
         if (!listener || typeof listener !== "function")
             throw new Error("Third argument to mobservable.observeProperty should be a function");
-    
+
         // wrap with observable function
         var observer = new ComputedObservable((() => object[key]), object);
         var disposer = observer.observe(listener, invokeImmediately);
-    
+
         if ((<any>observer).dependencyState.observing.length === 0)
             throw new Error(`mobservable.observeProperty: property '${key}' of '${object} doesn't seem to be observable. Did you define it as observable using @observable or mobservable.props? You might try to use the .observe() method instead.`);
-    
+
         return once(() => {
             disposer();
             (<any>observer).dependencyState.dispose(); // clean up
         });
     }
-    
+
     /**
         Evaluates func and return its results. Watch tracks all observables that are used by 'func'
         and invokes 'onValidate' whenever func *should* update.
@@ -221,11 +224,11 @@ namespace mobservable {
         var watch = new WatchedExpression(func, onInvalidate);
         return [watch.value, () => watch.dispose()];
     }
-    
+
     export function batch<T>(action:()=>T):T {
         return Scheduler.batch(action);
     }
-    
+
     export var debugLevel = 0;
-    
+
 }

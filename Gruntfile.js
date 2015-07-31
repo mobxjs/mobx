@@ -43,13 +43,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-coveralls');
     grunt.loadNpmTasks('grunt-exec');
 
-    grunt.registerTask("buildDts", "Build .d.ts file", function() {
-        var moduleDeclaration = '\n\ndeclare module "mobservable" {\n\tvar m : IMObservableStatic;\n\texport = m;\n}';
-        var ts = fs.readFileSync('lib/index.ts','utf8');
-        var headerEndIndex = ts.indexOf("/* END OF DECLARATION */");
-        if (headerEndIndex === -1)
-            throw "Failed to find end of declaration in mobservable.ts";
-        fs.writeFileSync('dist/mobservable.d.ts', "/** GENERATED FILE */\n" + ts.substr(0, headerEndIndex) + moduleDeclaration, 'utf8');
+    grunt.registerTask("builddts", "Build .d.ts file", function() {
+        var moduleDeclaration = '\n\ndeclare module "mobservable" {\n\tvar m : IMobservableStatic;\n\texport = m;\n}';
+        fs.writeFileSync('dist/mobservable.d.ts', fs.readFileSync('lib/api.ts','utf8') + moduleDeclaration, 'utf8');
     });
 
     grunt.registerTask("preparetest", "Create node module in test folder", function(sourceDir) {
@@ -62,9 +58,9 @@ module.exports = function(grunt) {
         require("./publish.js");
     });
     grunt.registerTask("default", ["buildlocal"]);
-    grunt.registerTask("builddist", ["exec:builddist","buildDts","uglify:dist"]);
-    grunt.registerTask("buildlocal", ["exec:buildlocal", "buildDts"]);
+    grunt.registerTask("builddist", ["buildlocal", "exec:builddist","builddts","uglify:dist"]);
+    grunt.registerTask("buildlocal", ["exec:buildlocal", "builddts"]);
     grunt.registerTask("cover", ["builddist", "preparetest:dist", "exec:cover", "coveralls:default"]);
-    grunt.registerTask("test", ["buildlocal", "preparetest:", /*"exec:buildtypescripttest",*/ "nodeunit:all"]);
+    grunt.registerTask("test", ["buildlocal", "preparetest:", "exec:buildtypescripttest", "nodeunit:all"]);
     grunt.registerTask("perf", ["buildlocal", "preparetest:", "nodeunit:perf"]);
 };

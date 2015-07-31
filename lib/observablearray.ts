@@ -1,37 +1,12 @@
 namespace mobservable {
 
-    export interface IObservableArray<T> extends IObservable, Array<T> {
-        spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[];
-        observe(listener:(changeData:IArrayChange<T>|IArraySplice<T>)=>void, fireImmediately?:boolean):Lambda;
-        clear(): T[];
-        replace(newItems:T[]);
-        values(): T[];
-        clone(): IObservableArray<T>;
-        find(predicate:(item:T,index:number,array:IObservableArray<T>)=>boolean,thisArg?,fromIndex?:number):T;
-        remove(value:T):boolean;
-    }
-
-    export interface IArrayChange<T> {
-        type: string; // Always: 'update'
-        object: IObservableArray<T>;
-        index: number;
-        oldValue: T;
-    }
-
-    export interface IArraySplice<T> {
-        type: string; // Always: 'splice'
-        object: IObservableArray<T>;
-        index: number;
-        removed: T[];
-        addedCount: number;
-    }
 
     // Workaround to make sure ObservableArray extends Array
-    class StubArray {
+    export class StubArray {
     }
     StubArray.prototype = [];
 
-    export class ObservableArray<T> extends StubArray implements IObservableArray<T> {
+    export class ObservableArray<T> extends StubArray implements Mobservable.IObservableArray<T> {
         [n: number]: T;
 
         private _values: T[];
@@ -114,7 +89,7 @@ namespace mobservable {
         private notifyChildUpdate(index:number, oldValue:T) {
             this.notifyChanged();
             // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-            this.changeEvent.emit(<IArrayChange<T>>{ object: this, type: 'update', index: index, oldValue: oldValue});
+            this.changeEvent.emit(<Mobservable.IArrayChange<T>>{ object: this, type: 'update', index: index, oldValue: oldValue});
         }
 
         private notifySplice(index:number, deleted:T[], added:T[]) {
@@ -122,7 +97,7 @@ namespace mobservable {
                 return;
             this.notifyChanged();
             // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-            this.changeEvent.emit(<IArraySplice<T>>{ object: this, type: 'splice', index: index, addedCount: added.length, removed: deleted});
+            this.changeEvent.emit(<Mobservable.IArraySplice<T>>{ object: this, type: 'splice', index: index, addedCount: added.length, removed: deleted});
         }
 
         private notifyChanged() {
@@ -130,9 +105,9 @@ namespace mobservable {
             this.dependencyState.markReady(true);
         }
 
-        observe(listener:(changeData:IArrayChange<T>|IArraySplice<T>)=>void, fireImmediately=false):Lambda {
+        observe(listener:(changeData:Mobservable.IArrayChange<T>|Mobservable.IArraySplice<T>)=>void, fireImmediately=false):Lambda {
             if (fireImmediately)
-                listener(<IArraySplice<T>>{ object: this, type: 'splice', index: 0, addedCount: this._values.length, removed: []});
+                listener(<Mobservable.IArraySplice<T>>{ object: this, type: 'splice', index: 0, addedCount: this._values.length, removed: []});
             return this.changeEvent.on(listener);
         }
 
