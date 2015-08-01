@@ -4,31 +4,12 @@
 <head>
   <meta charset='utf-8'>
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
-  <meta name="description" content="mobservable : Write applications as if data doesn&#39;t change">
+  <meta name="description" content="mobservable : unobtrusive library to create reactive data structures and self-updating view functions">
 
   <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+  <link rel="shortcut icon" type="image/png" href="images/favicon.png"/>
 
   <title>mobservable</title>
-  <style>
-  #usps {
-    border-style: none;
-  }
-  #usps td {
-    border-style: none;
-    vertical-align: top;
-    text-align: center;
-    width: 50%;
-  }
-  #usps h4 {
-    text-transform: uppercase;
-  }
-  #approot {
-    padding: 20px;
-    background-color: white;
-    border: 3px solid orange;
-
-  }
-  </style>
 </head>
 
 <body>
@@ -38,35 +19,39 @@
     <header class="inner">
       <a id="forkme_banner" href="https://github.com/mweststrate/mobservable">View on GitHub</a>
 
+      <img src="images/mobservable.png" id="logo" />
       <h1 id="project_title">mobservable</h1>
-      <p style="font-style:italic; color:white">Library to create reactive data structures and functions. Tracks and updates inter-data dependencies automatically, so that one can</p>
-      <h2 id="project_tagline">cleanly separate view, actions and model</h2>
+      <h2 id="project_tagline">unobtrusive library to create reactive data structures and self-updating view functions</h2>
     </header>
+  </div>
+
+  <div id="overview_content" class="outer">
+    <div class="inner">
+      <img src="images/overview_nologo.png" id="overview_img" class="overview_step1"/>
+      <p style="color:#916f6f;font-size:0.8em;margin:-10px 0 0 0;padding-bottom:10px">(scroll down for a running demo)</p>
+    </div>
   </div>
 
   <!-- MAIN CONTENT -->
   <div id="main_content_wrap" class="outer">
     <section id="main_content" class="inner">
 
-      <div style="text-align:center;">
-        <a class="github-button" href="https://github.com/mweststrate/mobservable" data-icon="octicon-star" data-style="small" data-count-href="/mweststrate/mobservable/stargazers" data-count-api="/repos/mweststrate/mobservable#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star mweststrate/mobservable on GitHub">Star</a>
-        <a href="https://twitter.com/share" class="twitter-share-button" data-via="mweststrate" data-hashtags="mobservable">Tweet</a>
-      </div>
-
       <table id="usps"><tr>
-        <td><h4>self updating functions</h4>Prevent stale values and avoid the need for subscriptions in your application by creating functions that track their dependencies automatically.</td>
-        <td><h4>reactive programming</h4>Was never easier to grok and apply. Work with observables as if they are plain javascript structures. Deal with asynchronous functions with ease.</td>
+        <td><h4>self updating view functions</h4>Declaratively define the relationships between your data and UI. Mobservable figures out when and where the UI should be updated.
+          </td>
+        <td><h4>reactive<br/>yet unobtrusive</h4>Work with reactive objects, classes and arrays as if they are plain javascript structures. Even if deeply nested or cyclic.</td>
       </tr><tr>
         <td><h4>reactjs decorator</h4>Turn reactjs components into observers that automatically sideways load data for
           <a href="http://mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/" target="_blank">bleeding edge performance</a>.</td>
-        <td><h4>shines in large apps </h4>The library is battle tested and shines in large enterprise scale apps. Works transparently in combination with classes, deeply nested and cyclic data structures.</td>
+        <td><h4>shines in large apps </h4>The library is battle tested and shines in large enterprise scale apps.</td>
       </tr></table>
 
+      <hr/>
       <h3><a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h3>
 
       <p>Install using <code>npm install mobservable --save</code> or <a href="https://raw.githubusercontent.com/mweststrate/mobservable/master/dist/mobservable.js">download</a> the stand-alone library. </p>
 
-        <h3><a id="observable-data-structures" class="anchor" href="#observable-data-structures" aria-hidden="true"><span class="octicon octicon-link"></span></a>Observable data structures</h3>
+        <h3><a id="observable-data-structures" class="anchor" href="#observable-data-structures" aria-hidden="true"><span class="octicon octicon-link"></span></a>Create reactive data structures</h3>
 
         <p>Use mobservable to create reactive primitives, arrays, objects and functions. Reactive functions re-evaluate automatically whenever relevant data changes.</p>
 
@@ -75,11 +60,6 @@
 
 <span class="pl-c">// Create a reactive data structure</span>
 <span class="pl-k">export</span> <span class="pl-k">var</span> todos <span class="pl-k">=</span> mobservable.fromJson([]);
-
-<span class="pl-c">// The following function will automatically be executed whenever 'todos' changes</span>
-mobservable.sideEffect(()<span class="pl-k"> =&gt;</span> {
-    <span class="pl-en">console</span><span class="pl-c1">.log</span>(<span class="pl-s"><span class="pl-pds">"</span>Completed %d of %d todo items<span class="pl-pds">"</span></span>, todos.filter(todo <span class="pl-k">=&gt;</span> todo.completed).<span class="pl-c1">length</span>, todos.<span class="pl-c1">length</span>)
-});
 
 addTodo(<span class="pl-s"><span class="pl-pds">"</span>Find a clean mug<span class="pl-pds">"</span></span>);
 <span class="pl-c">// Prints: 'Completed 0 of 1 todo items'</span>
@@ -97,13 +77,19 @@ todos[<span class="pl-c1">0</span>].completed <span class="pl-k">=</span> <span 
 
 <span class="pl-k">export</span> <span class="pl-k">function</span> <span class="pl-en">removeTodo</span>(<span class="pl-smi">todo</span>) {
     todos.<span class="pl-c1">splice</span>(todos.<span class="pl-c1">indexOf</span>(todo), <span class="pl-c1">1</span>);
-}</pre></div>
+}
+
+<span class="pl-c">// The following function will automatically execute whenever 'todos' changes</span>
+mobservable.sideEffect(()<span class="pl-k"> =&gt;</span> {
+    <span class="pl-en">console</span><span class="pl-c1">.log</span>(<span class="pl-s"><span class="pl-pds">"</span>Completed %d of %d todo items<span class="pl-pds">"</span></span>, todos.filter(todo <span class="pl-k">=&gt;</span> todo.completed).<span class="pl-c1">length</span>, todos.<span class="pl-c1">length</span>)
+});
+</pre></div>
 
 <!-- END CODE BLOCK 1 -->
 
-        <h3><a id="observing-reactjs-components" class="anchor" href="#observing-reactjs-components" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reactjs components that automatically observe their data</h3>
+        <h3><a id="observing-reactjs-components" class="anchor" href="#observing-reactjs-components" aria-hidden="true"><span class="octicon octicon-link"></span></a>Create Reactjs components that automatically update</h3>
 
-        <p>The following components re-render automatically, but <em>only</em> if some data that is <em>actually used</em> inside the component has changed.
+        <p>The following components re-render automatically, but <em>only</em> if some data that is <em>actually used</em> inside that specific component has changed.
           This doesn't require subscriptions nor a full page re-render; so components can stay really dumb.
           The actions are purely defined in terms of the data. They do not state anything about how the UI should be updated. </p>
 
@@ -192,13 +178,22 @@ todos[<span class="pl-c1">0</span>].completed <span class="pl-k">=</span> <span 
 
           <h3><a id="runtimebehavior" class="anchor" href="#runtimebehavior" aria-hidden="true"><span class="octicon octicon-link"></span></a>Runtime behavior</h3>
 
-            <p>Reactive values created using mobservable have the following characteristics:</p>
-            <ul>
-              <li>Synchronous: Updates are processed synchronously; after each update everything is still fresh.</li>
-              <li>Atomic updates: All updates are processed atomically so that you can never observe a stale value, even when updates cascade.</li>
-              <li>Real time dependency detection: Computed values only depend on values actually used in the last computation.</li>
-              <li>Lazy: Computed values will only be evaluated if they are actually being observed.</li>
-            </ul>
+          <p>Reactive values created using mobservable have the following characteristics:</p>
+          <ul>
+            <li>Synchronous: Updates are processed synchronously; after each update everything is still fresh.</li>
+            <li>Atomic updates: All updates are processed atomically so that you can never observe a stale value, even when updates cascade.</li>
+            <li>Real time dependency detection: Computed values only depend on values actually used in the last computation.</li>
+            <li>Lazy: Computed values will only be evaluated if they are actually being observed.</li>
+          </ul>
+
+          <hr/>
+          <h4 id="shout"></h4>
+
+          <div style="text-align:center;">
+            <a class="github-button" href="https://github.com/mweststrate/mobservable" data-icon="octicon-star" data-style="small" data-count-href="/mweststrate/mobservable/stargazers" data-count-api="/repos/mweststrate/mobservable#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star mweststrate/mobservable on GitHub">Star</a>
+            <a href="https://twitter.com/share" class="twitter-share-button" data-via="mweststrate" data-hashtags="mobservable">Tweet</a>
+          </div>
+          <hr/>
 
 
           <h3><a id="more" class="anchor" href="#more" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dive deeper...</h3>
@@ -228,20 +223,22 @@ todos[<span class="pl-c1">0</span>].completed <span class="pl-k">=</span> <span 
         <script>
           (function() {
             var tagLines = [
-              "cleanly separate view, actions and model",
+              "cleanly separate views, actions and model data",
               "stop reasoning about which views need an update",
               "stop changing the UI in event handlers",
-              "write views as-if data doesn't change",
+              "eliminate data subscriptions from your code",
+              "write views as-if data will not change in the future",
 //              "“express a lot of events just with observables... it's really funny.”",
 //              "use stuff that is “pretty clever! Actually, the whole thing is really cool.”",
-//              "easily build spreadsheets.",
               "elegantly deal with asynchronous data fetching",
               "create views without explicitly stating data dependencies",
-              "automatically compute derived data"
+              "automatically and synchronously compute derived data"
             ];
-            setInterval(function() {
-              document.getElementById("project_tagline").innerHTML = tagLines[Math.round(Math.random() * (tagLines.length -1))];
-            }, 5000);
+            function shout() {
+              document.getElementById("shout").innerHTML = "&ldquo;" + tagLines[Math.round(Math.random() * (tagLines.length -1))] + "&rdquo;";
+            }
+            setInterval(shout, 5000);
+            shout();
           })();
         </script>
         <!-- webpack bundle of react-mobservable-boilerplate -->
