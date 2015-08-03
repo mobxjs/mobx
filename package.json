@@ -1,7 +1,7 @@
 {
     "name": "mobservable",
     "version": "0.5.9",
-    "description": "unobtrusive library to create reactive data structures and self-updating view functions",
+    "description": "unobtrusive library to make data structures reactive and create seamlessly self-updating view functions",
     "main": "dist/mobservable.js",
     "scripts": {
         "test": "grunt cover",

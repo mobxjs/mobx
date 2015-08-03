@@ -1,21 +1,6 @@
 /// <reference path="./observablevalue" />
 
 namespace mobservable {
-
-    export function computed<T>(func:()=>void, scope?) {
-        return new _.ComputedObservable(func, scope).createGetterSetter();
-    }
-
-    export function expr<T>(expr:()=>void, scope?) {
-        if (_.DNode.trackingStack.length === 0)
-            throw new Error("mobservable.expr can only be used inside a computed observable. Probably mobservable.computed should be used instead of .expr");
-        return new _.ComputedObservable(expr, scope).get();
-    }
-
-    export function sideEffect(func:Lambda, scope?):Lambda {
-        return computed(func, scope).observe(_.noop);
-    }
-
     export namespace _ {
         export class ComputedObservable<U> extends ObservableValue<U> {
             private isComputing = false;

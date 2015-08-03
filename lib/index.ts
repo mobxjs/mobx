@@ -30,6 +30,30 @@ namespace mobservable {
         return reference(value);
     }
 
+
+    export function reference(value?) {
+        return new _.ObservableValue(value).createGetterSetter();
+    }
+    export var primitive = reference;
+
+    export function computed<T>(func:()=>void, scope?) {
+        return new _.ComputedObservable(func, scope).createGetterSetter();
+    }
+
+    export function expr<T>(expr:()=>void, scope?) {
+        if (_.DNode.trackingStack.length === 0)
+            throw new Error("mobservable.expr can only be used inside a computed observable. Probably mobservable.computed should be used instead of .expr");
+        return new _.ComputedObservable(expr, scope).get();
+    }
+
+    export function sideEffect(func:Lambda, scope?):Lambda {
+        return computed(func, scope).observe(_.noop);
+    }
+
+    export function array<T>(values?:T[]): _.ObservableArray<T> {
+        return new _.ObservableArray(values);
+    }
+
     export function props(target, properties?, initialValue?) {
         switch(arguments.length) {
             case 0:
@@ -190,6 +214,19 @@ namespace mobservable {
         });
     }
 
-    export var debugLevel = 0;
+    export function batch<T>(action:()=>T):T {
+        return _.Scheduler.batch(action);
+    }
 
+    /**
+        Evaluates func and return its results. Watch tracks all observables that are used by 'func'
+        and invokes 'onValidate' whenever func *should* update.
+        Returns  a tuplde [return value of func, disposer]. The disposer can be used to abort the watch early.
+    */
+    export function watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
+        var watch = new _.WatchedExpression(func, onInvalidate);
+        return [watch.value, () => watch.dispose()];
+    }
+
+    export var debugLevel = 0;
 }

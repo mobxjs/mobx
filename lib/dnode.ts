@@ -1,5 +1,4 @@
 namespace mobservable {
-
     export namespace _ {
         export enum DNodeState {
             STALE,     // One or more depencies have changed but their values are not yet known, current value is stale

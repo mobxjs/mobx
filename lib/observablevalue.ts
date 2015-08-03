@@ -1,10 +1,4 @@
 namespace mobservable {
-
-    export function reference(value?) {
-        return new _.ObservableValue(value).createGetterSetter();
-    }
-    export var primitive = reference;
-
     export namespace _ {
         export class ObservableValue<T> {
             protected changeEvent = new SimpleEventEmitter();

@@ -1,17 +1,6 @@
 /// <reference path="./observablevalue" />
 
 namespace mobservable {
-
-    /**
-        Evaluates func and return its results. Watch tracks all observables that are used by 'func'
-        and invokes 'onValidate' whenever func *should* update.
-        Returns  a tuplde [return value of func, disposer]. The disposer can be used to abort the watch early.
-    */
-    export function watch<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
-        var watch = new _.WatchedExpression(func, onInvalidate);
-        return [watch.value, () => watch.dispose()];
-    }
-
     export namespace _ {
         /**
          * given an expression, evaluate it once and track its dependencies.

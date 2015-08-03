@@ -1,9 +1,4 @@
 namespace mobservable {
-
-    export function batch<T>(action:()=>T):T {
-        return _.Scheduler.batch(action);
-    }
-
     export namespace _ {
         export class Scheduler {
             private static inBatch = 0;

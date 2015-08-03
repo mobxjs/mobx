@@ -1,9 +1,4 @@
 namespace mobservable {
-
-    export function array<T>(values?:T[]): _.ObservableArray<T> {
-        return new _.ObservableArray(values);
-    }
-
     export namespace _ {
         // Workaround to make sure ObservableArray extends Array
         class StubArray {
