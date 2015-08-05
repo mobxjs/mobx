@@ -1,6 +1,6 @@
 {
     "name": "mobservable",
-    "version": "0.5.9",
+    "version": "0.5.10",
     "description": "unobtrusive library to make data structures reactive and create seamlessly self-updating view functions",
     "main": "dist/mobservable.js",
     "scripts": {
