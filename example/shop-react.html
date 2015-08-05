@@ -23,7 +23,7 @@
          */
         function Article(name, price) {
             this.id = ++autoNumber; // UUID for this article
-            mobservable.props(this, {
+            mobservable.defineReactiveProperties(this, {
                 name: name,
                 price: price
             });
@@ -31,7 +31,7 @@
 
         function ShoppingCartEntry(article) {
             this.id = ++autoNumber; // UUID for this entry
-            mobservable.props(this, {
+            mobservable.defineReactiveProperties(this, {
                 article: article,
                 amount: 1,
                 price: function() {
@@ -41,7 +41,7 @@
         }
 
         function ShoppingCart() {
-            mobservable.props(this, {
+            mobservable.defineReactiveProperties(this, {
                 entries: [],
                 total: function() {
                     return this.entries.reduce(function(sum, entry) {
@@ -52,7 +52,7 @@
         }
 
         // Some available articles
-        var articles = mobservable.array([
+        var articles = mobservable.makeReactive([
             ["Funny Bunnies", 17.63],
             ["Awesome React", 23.95],
             ["Second hand Netbook", 50.00]
@@ -70,7 +70,7 @@
         /**
          * UI logic
          */
-        var ShopDemoView = mobservable.ObservingComponent(React.createClass({
+        var ShopDemoView = mobservable.reactiveComponent(React.createClass({
             render: function() {
                 log("Rendering ShopDemoView");
                 return (<table>
@@ -113,7 +113,7 @@
             }
         })); 
          
-        var ArticlesView = mobservable.ObservingComponent(React.createClass({
+        var ArticlesView = mobservable.reactiveComponent(React.createClass({
             render: function() {
                 log("Rendering ArticlesView");
                 function renderArticle(article) {
@@ -130,7 +130,7 @@
             }
         }));
         
-        var ArticleView = mobservable.ObservingComponent(React.createClass({
+        var ArticleView = mobservable.reactiveComponent(React.createClass({
             render: function() {
                 log("Rendering ArticleView " + this.props.article.id);
                 return (<li>
@@ -157,7 +157,7 @@
             }
         }));
         
-        var CartView = mobservable.ObservingComponent(React.createClass({
+        var CartView = mobservable.reactiveComponent(React.createClass({
             render: function() {
                 log("Rendering CartView");
                 function renderEntry(entry) {
@@ -170,14 +170,14 @@
             } 
         }));
         
-        var CartTotalView = mobservable.ObservingComponent(React.createClass({
+        var CartTotalView = mobservable.reactiveComponent(React.createClass({
             render: function() {
                 log("Rendering CartTotalView");
                 return (<div><b>Total: <span id="total">{("€ " + this.props.cart.total).replace(/(\.\d\d)\d*/,"$1")}</span></b></div>);
             }
         }));
 
-        var CartEntryView = mobservable.ObservingComponent(React.createClass({
+        var CartEntryView = mobservable.reactiveComponent(React.createClass({
             render: function() {
                 log("Rendering CartEntryView " + this.props.entry.id);
                 return (<li>

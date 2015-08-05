@@ -1,9 +1,8 @@
 namespace mobservable {
     export namespace _ {
-
         export function warn(message) {
             if (console)
-                console.warn("[WARNING:mobservable] " + message);
+                console.warn("[mobservable:warning] " + message);
         }
     
         /**
@@ -21,7 +20,11 @@ namespace mobservable {
     
         export function noop(){
             // NOOP
-        };
+        }
+        
+        export function isPlainObject(value) {
+            return value !== null && typeof value == 'object' && Object.getPrototypeOf(value) === Object.prototype;
+        }
     
         /**
          * Given a new and an old list, tries to determine which items are added or removed

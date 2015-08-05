@@ -35,7 +35,7 @@ declare var module;
         root['mobservable'] = factory();
     }
 }(this, function () {
-    var m = mobservable.value; // the default export
+    var m = mobservable.makeReactive; // The default export
     for (var key in mobservable)
         m[key] = mobservable[key]; // the non-default exports
     return m;

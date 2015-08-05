@@ -223,7 +223,7 @@ exports.testProps3 = function(test) {
         this.total = function() {
             return (1+vat()) * this.price * this.amount; // price and amount are now properties!
         };
-        mobservable.props(this);
+        mobservable.props(this, this);
     };
 
     var order = new Order();
@@ -253,8 +253,7 @@ exports.testProps4 = function(test) {
     test.equal(x.sum, 6);
     x.fluff = [5,6];
     test.equal(x.sum, 11);
-    test.equal(ar === x.fluff, true);
-    ar.push(2);
+    x.fluff.push(2);
     test.equal(x.sum, 13);
     test.done();
 }

@@ -18,7 +18,7 @@ namespace mobservable {
             state: DNodeState = DNodeState.READY;
             isSleeping = true; // isSleeping: nobody is observing this dependency node, so don't bother tracking DNode's this DNode depends on
             hasCycle = false;  // this node is part of a cycle, which is an error
-            private observing: DNode[] = [];       // nodes we are looking at. Our value depends on these nodes
+            observing: DNode[] = [];       // nodes we are looking at. Our value depends on these nodes
             private prevObserving: DNode[] = null; // nodes we were looking at before. Used to determine changes in the dependency tree
             private observers: DNode[] = [];       // nodes that are dependent on this node. Will be notified when our state change
             private dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute

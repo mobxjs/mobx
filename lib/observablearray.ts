@@ -11,13 +11,22 @@ namespace mobservable {
             private _values: T[];
             private dependencyState:DNode;
             private changeEvent: SimpleEventEmitter;
+            private recurse: boolean;  // whether everything put in this array will be com reactive as well
     
-            constructor(initialValues?:T[]) {
+            constructor(initialValues:T[], recurse: boolean) {
                 super();
+                _.markReactive(this);
                 // make for .. in / Object.keys behave like an array, so hide the other properties
                 Object.defineProperties(this, {
+                    "recurse": { enumerable: false, value: recurse },
                     "dependencyState" : { enumerable: false, value: new DNode(this) },
-                    "_values" : { enumerable: false, value: initialValues ? initialValues.slice() : [] },
+                    "_values" : { 
+                        enumerable: false, 
+                        value: initialValues 
+                            ? (recurse 
+                                ? initialValues.map(_.makeReactiveArrayItem) 
+                                : initialValues.slice()) 
+                            : [] },
                     "changeEvent" : { enumerable: false, value: new SimpleEventEmitter() }
                 });
                 if (initialValues && initialValues.length)
@@ -76,6 +85,8 @@ namespace mobservable {
     
                 if (newItems === undefined)
                     newItems = [];
+                else if (this.recurse)
+                    newItems = newItems.map(_.makeReactiveArrayItem);
     
                 var lengthDelta = newItems.length - deleteCount;
                 var res:T[] = this._values.splice(index, deleteCount, ...newItems);
@@ -130,7 +141,7 @@ namespace mobservable {
     
             clone(): ObservableArray<T> {
                 this.dependencyState.notifyObserved();
-                return new ObservableArray<T>(this._values);
+                return new ObservableArray<T>(this._values, this.recurse);
             }
     
             // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find

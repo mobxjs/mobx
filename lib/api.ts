@@ -13,6 +13,30 @@ interface IMobservableStatic extends _IMobservableStatic {
 
 interface _IMobservableStatic {
 
+    makeReactive<T>(value:T[], opts?:Mobservable.IMakeReactiveOptions):Mobservable.IObservableArray<T>;
+    makeReactive<T>(value:()=>T, opts?:Mobservable.IMakeReactiveOptions):Mobservable.IObservableValue<T>;
+    makeReactive<T extends Object>(value:T, opts?:Mobservable.IMakeReactiveOptions):T;
+    makeReactive<T>(value:T, opts?:Mobservable.IMakeReactiveOptions):Mobservable.IObservableValue<T>;
+
+    asReference(value); 
+    isReactive(value:any):boolean;
+
+    sideEffect(func:Mobservable.Lambda,scope?):Mobservable.Lambda;
+    defineReactiveProperties(target:Object, properties:Object);
+
+    reactiveMixin;
+    reactiveComponent<T>(componentClass:T):T;
+
+    observable(target:Object, key:string); // annotation
+    toJson<T>(value:T):T;
+    observeUntilInvalid<T>(func:()=>T, onInvalidate:Mobservable.Lambda):[T,Mobservable.Lambda];
+
+    // change a lot of observables at once
+    transaction<T>(action:()=>T):T;
+    
+    /** old api TODO: remove */
+      
+     
     // ways of creating observables.
     value<T>(value?:T[]):Mobservable.IObservableArray<T>;
     value<T>(value?:T|{():T}, scope?:Object):Mobservable.IObservableValue<T>;
@@ -29,10 +53,8 @@ interface _IMobservableStatic {
     props(object:Object, props:Object);
     props(object:Object);
     fromJson<T>(value:T):T;
-    observable(target:Object, key:string); // annotation
 
     // convert observables to not observables
-    toJson<T>(value:T):T;
     toPlainValue<T>(any:T):T;
 
     // observe observables
@@ -51,6 +73,13 @@ interface _IMobservableStatic {
 }
 
 declare module Mobservable {
+    interface IMakeReactiveOptions {
+        as?: string /* "auto" | "reference" | TODO: see #8 "structure" */
+        scope?: Object,
+        recurse?: boolean;
+        // protected: boolean TODO: see #9
+    }
+    
     interface Lambda {
         ():void;
     }

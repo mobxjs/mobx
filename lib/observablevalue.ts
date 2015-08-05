@@ -1,19 +1,28 @@
 namespace mobservable {
     export namespace _ {
+        
         export class ObservableValue<T> {
             protected changeEvent = new SimpleEventEmitter();
-            protected dependencyState:DNode = new DNode(this);
+            protected _value: T;
+            dependencyState:DNode = new DNode(this);
     
-            constructor(protected _value?:T){
+            constructor(protected value:T, protected recurse:boolean){
+                this._value = this.makeReferenceValueReactive(value);
+            }
+
+            private makeReferenceValueReactive(value) {
+                if (this.recurse && (Array.isArray(value) || isPlainObject(value)))
+                    return makeReactive(value);
+                return value;
             }
     
             set(value:T) {
                 if (value !== this._value) {
                     var oldValue = this._value;
                     this.dependencyState.markStale();
-                    this._value = value;
+                    this._value = this.makeReferenceValueReactive(value);
                     this.dependencyState.markReady(true);
-                    this.changeEvent.emit(value, oldValue);
+                    this.changeEvent.emit(this._value, oldValue);
                 }
             }
     
@@ -48,6 +57,7 @@ namespace mobservable {
                 f.toString = function() {
                     return self.toString();
                 }
+                _.markReactive(f);
                 return f;
             }
     

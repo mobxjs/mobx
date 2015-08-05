@@ -7,7 +7,7 @@ namespace mobservable {
             private hasError = false;
     
             constructor(protected func:()=>U, private scope?:Object) {
-                super(undefined);
+                super(undefined, false);
                 if (typeof func !== "function")
                     throw new Error("ComputedObservable requires a function");
             }

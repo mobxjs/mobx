@@ -34,14 +34,14 @@
          * Data model
          */
         function Article(name, price) {
-            mobservable.props(this, {
+            mobservable.defineReactiveProperties(this, {
                 name: name,
                 price: price
             });
         }
 
         function ShoppingCartEntry(article) {
-            mobservable.props(this, {
+            mobservable.defineReactiveProperties(this, {
                 article: article,
                 amount: 1,
                 price: function() {
@@ -51,7 +51,7 @@
         }
 
         function ShoppingCart() {
-            mobservable.props(this, {
+            mobservable.defineReactiveProperties(this, {
                 entries: [],
                 total: function() {
                     return this.entries.reduce(function(sum, entry) {
@@ -62,7 +62,7 @@
         }
 
         // Some available articles
-        var articles = mobservable.array([
+        var articles = mobservable.makeReactive([
             ["Funny Bunnies", 17.63],
             ["Awesome React", 23.95],
             ["Second hand Netbook", 50.00]
@@ -116,11 +116,11 @@
          function renderArticle(article) {
              var $name = $("<span>").text(article.name);
              var $price = $("<span>").addClass("price").text(article.price);
-             mobservable.observeProperty(article, "name", function(name) {
-                 $name.text(name);
+             mobservable.sideEffect(function() {
+                 $name.text(article.name);
              });
-             mobservable.observeProperty(article, "price", function(price) {
-                 $price.text(price);
+             mobservable.sideEffect(function() {
+                 $price.text(article.price);
              });
              return $("<li>").append($name, 
                 $("<button>").text("add").addClass("add-article"),
@@ -134,8 +134,8 @@
         var $cart = $("#cart");
         var $total = $("#total");
 
-        mobservable.observeProperty(shoppingCart, "total", function(newValue) {
-            $total.text(newValue);
+        mobservable.sideEffect(function() {
+            $total.text(shoppingCart.total);
         }, true);
 
         shoppingCart.entries.observe(function(change) {
@@ -152,11 +152,11 @@
         function renderCartEntry(entry) {
              var $name = $("<span>").text(entry.article.name);
              var $amount = $("<span>").addClass("price").text(entry.amount);
-             mobservable.observeProperty(entry.article, "name", function(name) {
-                 $name.text(name);
+             mobservable.sideEffect(function() {
+                 $name.text(entry.article.name);
              });
-             mobservable.observeProperty(entry, "amount", function(amount) {
-                 $amount.text(amount);
+             mobservable.sideEffect(function() {
+                 $amount.text(entry.amount);
              });
              return $("<li>").append(
                 $("<button>").text("remove").addClass("remove-article"),

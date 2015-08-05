@@ -1,12 +1,12 @@
 namespace mobservable {
 
-    export var ObserverMixin = {
+    export var reactiveMixin = {
         componentWillMount: function() {
             var baseRender = this.render;
             this.render = function() {
                 if (this._watchDisposer)
                     this._watchDisposer();
-                var[rendering, disposer] = watch(() => baseRender.call(this), () => {
+                var[rendering, disposer] = observeUntilInvalid(() => baseRender.call(this), () => {
                     this.forceUpdate();
                 });
                 this._watchDisposer = disposer;
@@ -34,8 +34,9 @@ namespace mobservable {
             return false;
         }
     }
+    export var ObserverMixin = reactiveMixin; // TODO: remove in 0.7
 
-    export function ObservingComponent(componentClass) {
+    export function reactiveComponent(componentClass) {
         var baseMount = componentClass.prototype.componentWillMount;
         var baseUnmount = componentClass.prototype.componentWillUnmount;
         componentClass.prototype.componentWillMount = function() {
@@ -50,4 +51,5 @@ namespace mobservable {
             componentClass.prototype.shouldComponentUpdate = ObserverMixin.shouldComponentUpdate;
         return componentClass;
     };
+    export var ObservingComponent = _.wrapDeprecated("ObservingComponent", reactiveComponent);
 }   

@@ -4,9 +4,8 @@
     <script src="lib/JSXTransformer.js"></script>
     <script src="../dist/mobservable.js"></script>
     <script type="text/jsx">
-        var store = {};
-        // add observable properties to the store
-        mobservable.props(store, {
+        // add create a reactive store
+        var store = mobservable.makeReactive({
             timer: 0
         });
         
@@ -21,12 +20,9 @@
                 
         // This component is actually an observer of all store properties that are accessed during the last rendering
         // so there is no need to declare any data use, nor is there (seemingly) any state in this component
-        // the combination of mobservable.props and ObservingComponent does all the magic for us.
+        // the combination of mobservable.makeReactive and reactiveComponent does all the magic for us.
         // UI updates are nowhere forced, but all views (un)subscribe to their data automatically
-        var TimerView = mobservable.ObservingComponent(React.createClass({
-            componentDidMount: function() {
-                store.timer = 1000;
-            }, 
+        var TimerView = mobservable.reactiveComponent(React.createClass({
             render: function() {
                 return (<span>Seconds passed: {this.props.store.timer}</span>);
             }
