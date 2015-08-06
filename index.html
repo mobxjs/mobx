@@ -54,9 +54,9 @@
 
         <h3><a id="observable-data-structures" class="anchor" href="#observable-data-structures" aria-hidden="true"><span class="octicon octicon-link"></span></a>Create reactive data structures</h3>
 
-        <p>Use mobservable.makeReactive to create reactive primitives, arrays, objects and functions.
+        <p>Use <em>mobservable.makeReactive</em> to create reactive primitives, arrays, objects and functions.
           Reactive functions re-evaluate automatically whenever relevant data changes, but only if they are used somewhere.
-          Controller functions can still treat the data as if it were still plain JavaScript objects.</p>
+          Controller functions can still treat the data as if it are plain JavaScript objects.</p>
 
 <!-- BEGIN CODE BLOCK 1 -->
 <div class="highlight highlight-javascript"><pre><span class="pl-k">import</span> {makeReactive} <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>mobservable<span class="pl-pds">'</span></span>;
@@ -95,7 +95,7 @@
 
         <h3><a id="observing-reactjs-components" class="anchor" href="#observing-reactjs-components" aria-hidden="true"><span class="octicon octicon-link"></span></a>Create Reactjs components that automatically update</h3>
 
-        <p>Use mobservable.reactiveComponent to create components that update themselves whenever reactive data they use changes.
+        <p>Use <em>mobservable.reactiveComponent</em> to create components that update themselves whenever reactive data they use changes.
           This process is highly efficient and only update that components that actually need a re-render.
           Since components update automatically, most of them can be stateless. You don't even need to state which its data dependencies are!
         </p>
@@ -173,7 +173,7 @@ React.render(<span class="pl-k">&lt;</span>TodoList store<span class="pl-k">=</s
           <h3><a id="async" class="anchor" href="#async" aria-hidden="true"><span class="octicon octicon-link"></span></a>Working with async stuff</h3>
 
           <p>Asynchronous stuff is easy to deal with in reactive programming.
-            Just prepare observable values and update them whenever the async function completes or fails.
+            Just prepare reactive values and update them whenever the async function completes or fails.
             In the mean time make sure to present a friendly UI to your users!
             For example with the following adaptions to the snippets above the "Load more..." button was implemented:
           </p>
@@ -190,7 +190,7 @@ React.render(<span class="pl-k">&lt;</span>TodoList store<span class="pl-k">=</s
 
           <p>Changes to the TodoList component:
 
-<div class="highlight highlight-javascript"><pre><span class="pl-c">// In TodoList:</span>
+<div class="highlight highlight-javascript"><pre>
 <span class="pl-en">render</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
     <span class="pl-k">var</span> store <span class="pl-k">=</span> <span class="pl-v">this</span>.props.store;
     <span class="pl-k">return</span> (<span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
