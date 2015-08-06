@@ -54,97 +54,117 @@
 
         <h3><a id="observable-data-structures" class="anchor" href="#observable-data-structures" aria-hidden="true"><span class="octicon octicon-link"></span></a>Create reactive data structures</h3>
 
-        <p>Use mobservable to create reactive primitives, arrays, objects and functions. Reactive functions re-evaluate automatically whenever relevant data changes.</p>
+        <p>Use mobservable.makeReactive to create reactive primitives, arrays, objects and functions.
+          Reactive functions re-evaluate automatically whenever relevant data changes, but only if they are used somewhere.
+          Controller functions can still treat the data as if it were still plain JavaScript objects.</p>
 
 <!-- BEGIN CODE BLOCK 1 -->
-        <div class="highlight highlight-javascript"><pre><span class="pl-k">import</span> mobservable <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>mobservable<span class="pl-pds">'</span></span>;
+<div class="highlight highlight-javascript"><pre><span class="pl-k">import</span> {makeReactive} <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>mobservable<span class="pl-pds">'</span></span>;
 
 <span class="pl-c">// Create a reactive data structure</span>
-<span class="pl-k">export</span> <span class="pl-k">var</span> todos <span class="pl-k">=</span> mobservable.fromJson([]);
+<span class="pl-k">var</span> todoStore <span class="pl-k">=</span> <span style="color:red; font-weight:bold">makeReactive</span>({
+    todos<span class="pl-k">:</span> [
+        {
+            title<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>Find a clean mug<span class="pl-pds">'</span></span>,
+            completed<span class="pl-k">:</span> <span class="pl-c1">true</span>
+        },
+        {
+            title<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>Make coffee<span class="pl-pds">'</span></span>,
+            completed<span class="pl-k">:</span> <span class="pl-c1">false</span>
+        }
+    ],
+    <span class="pl-en">completedCount</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
+        <span class="pl-k">return</span> <span class="pl-v">this</span>.todos.filter((<span class="pl-smi">todo</span>)<span class="pl-k"> =&gt;</span> todo.completed).<span class="pl-c1">length</span>;
+    },
+    pending<span class="pl-k">:</span> <span class="pl-c1">0</span>
+});
 
-addTodo(<span class="pl-s"><span class="pl-pds">"</span>Find a clean mug<span class="pl-pds">"</span></span>);
-<span class="pl-c">// Prints: 'Completed 0 of 1 todo items'</span>
-addTodo(<span class="pl-s"><span class="pl-pds">"</span>Make coffee<span class="pl-pds">"</span></span>);
-<span class="pl-c">// Prints: 'Completed 0 of 2 todo items'</span>
-todos[<span class="pl-c1">0</span>].completed <span class="pl-k">=</span> <span class="pl-c1">true</span>;
-<span class="pl-c">// Prints: 'Completed 1 of 2 todo items'</span>
-
-<span class="pl-k">export</span> <span class="pl-k">function</span> <span class="pl-en">addTodo</span>(<span class="pl-smi">title</span>) {
-    todos.<span class="pl-c1">push</span>(mobservable.fromJson({
+<span class="pl-c1">todoStore</span>.<span class="pl-en">addTodo</span> <span class="pl-k">=</span> <span class="pl-k">function</span>(<span class="pl-smi">title</span>) {
+    <span class="pl-v">this</span>.todos.<span class="pl-c1">push</span>({
         title<span class="pl-k">:</span> title,
         completed<span class="pl-k">:</span> <span class="pl-c1">false</span>
-    }));
-}
+    });
+};
 
-<span class="pl-k">export</span> <span class="pl-k">function</span> <span class="pl-en">removeTodo</span>(<span class="pl-smi">todo</span>) {
-    todos.<span class="pl-c1">splice</span>(todos.<span class="pl-c1">indexOf</span>(todo), <span class="pl-c1">1</span>);
-}
+<span class="pl-c1">todoStore</span>.<span class="pl-en">removeTodo</span> <span class="pl-k">=</span> <span class="pl-k">function</span>(<span class="pl-smi">todo</span>) {
+    <span class="pl-v">this</span>.todos.<span class="pl-c1">splice</span>(<span class="pl-v">this</span>.todos.<span class="pl-c1">indexOf</span>(todo), <span class="pl-c1">1</span>);
+};
 
-<span class="pl-c">// The following function will automatically execute whenever 'todos' changes</span>
-mobservable.sideEffect(()<span class="pl-k"> =&gt;</span> {
-    <span class="pl-en">console</span><span class="pl-c1">.log</span>(<span class="pl-s"><span class="pl-pds">"</span>Completed %d of %d todo items<span class="pl-pds">"</span></span>, todos.filter(todo <span class="pl-k">=&gt;</span> todo.completed).<span class="pl-c1">length</span>, todos.<span class="pl-c1">length</span>)
-});
-</pre></div>
-
+<span class="pl-k">export</span> <span class="pl-k">default</span> todoStore;</pre></div>
 <!-- END CODE BLOCK 1 -->
 
         <h3><a id="observing-reactjs-components" class="anchor" href="#observing-reactjs-components" aria-hidden="true"><span class="octicon octicon-link"></span></a>Create Reactjs components that automatically update</h3>
 
-        <p>The following components re-render automatically, but <em>only</em> if some data that is <em>actually used</em> inside that specific component has changed.
-          This doesn't require subscriptions nor a full page re-render; so components can stay really dumb.
-          The actions are purely defined in terms of the data. They do not state anything about how the UI should be updated. </p>
+        <p>Use mobservable.reactiveComponent to create components that update themselves whenever reactive data they use changes.
+          This process is highly efficient and only update that components that actually need a re-render.
+          Since components update automatically, most of them can be stateless. You don't even need to state which its data dependencies are!
+        </p>
 
 <!-- Code block 2 -->
-<div class="highlight highlight-javascript"><pre><span class="pl-k">import</span> React, { Component } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
-<span class="pl-k">import</span> { addTodo, removeTodo, loadTodosAsync } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./todos<span class="pl-pds">'</span></span>;
-<span class="pl-k">import</span> { ObservingComponent } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>mobservable<span class="pl-pds">'</span></span>
+<div class="highlight highlight-javascript"><pre><span class="pl-k">import</span> React <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> todoStore <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./todostore<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> {reactiveComponent} <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>mobservable<span class="pl-pds">'</span></span>;
 
 <span class="pl-c">// React component that responds to changes in 'todos'</span>
-@ObservingComponent <span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">TodoList</span> <span class="pl-k">extends</span> <span class="pl-en">Component</span> {
-    <span class="pl-en">render</span>() {
-        <span class="pl-k">const</span> <span class="pl-c1">todos</span> <span class="pl-k">=</span> <span class="pl-v">this</span>.props.todos;
+<span class="pl-k">var</span> TodoList <span class="pl-k">=</span> <span style="color:red; font-weight:bold">reactiveComponent</span>(React.createClass({
+    displayName<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>TodoList<span class="pl-pds">'</span></span>,
+
+    <span class="pl-en">render</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
+        <span class="pl-k">var</span> store <span class="pl-k">=</span> <span class="pl-v">this</span>.props.store;
         <span class="pl-k">return</span> (<span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
             <span class="pl-k">&lt;</span>ul<span class="pl-k">&gt;</span>
-                 {<span class="pl-v">this</span>.props.todos.map((<span class="pl-smi">todo</span>,<span class="pl-smi">idx</span>)<span class="pl-k"> =&gt;</span> (<span class="pl-k">&lt;</span>TodoView todo<span class="pl-k">=</span>{todo} key<span class="pl-k">=</span>{idx} /<span class="pl-k">&gt;</span>))}
+                { store.todos.map((<span class="pl-smi">todo</span>, <span class="pl-smi">idx</span>)<span class="pl-k"> =&gt;</span>
+                    (<span class="pl-k">&lt;</span>TodoView store<span class="pl-k">=</span>{ store } todo<span class="pl-k">=</span>{ todo } key<span class="pl-k">=</span>{ idx } /<span class="pl-k">&gt;</span>)
+                ) }
             <span class="pl-k">&lt;</span>/ul<span class="pl-k">&gt;</span>
             <span class="pl-k">&lt;</span>hr/<span class="pl-k">&gt;</span>
-            Completed {todos.filter(todo <span class="pl-k">=&gt;</span> todo.completed).<span class="pl-c1">length</span>} <span class="pl-k">of</span> {todos.<span class="pl-c1">length</span>} items.
-            <span class="pl-k">&lt;</span>br/<span class="pl-k">&gt;&lt;</span>button onClick<span class="pl-k">=</span>{<span class="pl-v">this</span>.onNewTodo.bind(<span class="pl-v">this</span>)}<span class="pl-k">&gt;</span>New Todo<span class="pl-k">&lt;</span>/button<span class="pl-k">&gt;</span>
+            Completed { store.completedCount } <span class="pl-k">of</span> { store.todos.<span class="pl-c1">length</span> } items.<span class="pl-k">&lt;</span>br/<span class="pl-k">&gt;</span>
+            <span class="pl-k">&lt;</span>button onClick<span class="pl-k">=</span>{ <span class="pl-v">this</span>.onNewTodo }<span class="pl-k">&gt;</span>New Todo<span class="pl-k">&lt;</span>/button<span class="pl-k">&gt;</span>
         <span class="pl-k">&lt;</span>/div<span class="pl-k">&gt;</span>);
-    }
+    },
 
-    <span class="pl-en">onNewTodo</span>() {
-        addTodo(<span class="pl-c1">prompt</span>(<span class="pl-s"><span class="pl-pds">"</span>Enter a new todo:<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Try mobservable at home!<span class="pl-pds">"</span></span>))
+    <span class="pl-en">onNewTodo</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
+        <span class="pl-v">this</span>.props.store.addTodo(<span class="pl-c1">prompt</span>(<span class="pl-s"><span class="pl-pds">'</span>Enter a new todo:<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>Try mobservable at home!<span class="pl-pds">'</span></span>));
+    },
+
+    <span class="pl-en">loadMore</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
+        <span class="pl-v">this</span>.props.store.loadTodosAsync();
     }
-}
+}));
 
 <span class="pl-c">// React component that responds to changes in its 'todo'</span>
-@ObservingComponent <span class="pl-k">class</span> <span class="pl-en">TodoView</span> <span class="pl-k">extends</span> <span class="pl-en">Component</span> {
-    <span class="pl-en">render</span>() {
-        <span class="pl-k">const</span> <span class="pl-c1">todo</span> <span class="pl-k">=</span> <span class="pl-v">this</span>.props.todo;
+<span class="pl-k">var</span> TodoView <span class="pl-k">=</span> <span style="color:red; font-weight:bold">reactiveComponent</span>(React.createClass({
+    displayName<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>TodoView<span class="pl-pds">'</span></span>,
+
+    <span class="pl-en">render</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
+        <span class="pl-k">var</span> todo <span class="pl-k">=</span> <span class="pl-v">this</span>.props.todo;
         <span class="pl-k">return</span> (<span class="pl-k">&lt;</span>li<span class="pl-k">&gt;</span>
-            <span class="pl-k">&lt;</span>input type<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>checkbox<span class="pl-pds">"</span></span> checked<span class="pl-k">=</span>{todo.completed} <span class="pl-c1">onChange</span><span class="pl-k">=</span>{<span class="pl-v">this</span>.onToggleCompleted.bind(<span class="pl-v">this</span>)} /<span class="pl-k">&gt;</span>
-            {todo.<span class="pl-c1">title</span>}{<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span>}
-            <span class="pl-k">&lt;</span>a href<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>#<span class="pl-pds">"</span></span> onClick<span class="pl-k">=</span>{<span class="pl-v">this</span>.onEdit.bind(<span class="pl-v">this</span>)}<span class="pl-k">&gt;</span>[edit]<span class="pl-k">&lt;</span>/a<span class="pl-k">&gt;</span>
-            <span class="pl-k">&lt;</span>a href<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>#<span class="pl-pds">"</span></span> onClick<span class="pl-k">=</span>{<span class="pl-v">this</span>.onRemove.bind(<span class="pl-v">this</span>)}<span class="pl-k">&gt;</span>[remove]<span class="pl-k">&lt;</span>/a<span class="pl-k">&gt;</span>
+            <span class="pl-k">&lt;</span>input type<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">'</span>checkbox<span class="pl-pds">'</span></span> checked<span class="pl-k">=</span>{ todo.completed } <span class="pl-c1">onChange</span><span class="pl-k">=</span>{ <span class="pl-v">this</span>.onToggleCompleted } /<span class="pl-k">&gt;</span>
+            {todo.<span class="pl-c1">title</span>}{<span class="pl-s"><span class="pl-pds">'</span> <span class="pl-pds">'</span></span>}
+            <span class="pl-k">&lt;</span>a href<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">'</span>#<span class="pl-pds">'</span></span> onClick<span class="pl-k">=</span>{ <span class="pl-v">this</span>.onEdit }<span class="pl-k">&gt;</span>[edit]<span class="pl-k">&lt;</span>/a<span class="pl-k">&gt;</span>
+            <span class="pl-k">&lt;</span>a href<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">'</span>#<span class="pl-pds">'</span></span> onClick<span class="pl-k">=</span>{ <span class="pl-v">this</span>.onRemove }<span class="pl-k">&gt;</span>[remove]<span class="pl-k">&lt;</span>/a<span class="pl-k">&gt;</span>
         <span class="pl-k">&lt;</span>/li<span class="pl-k">&gt;</span>);
-    }
+    },
 
-    <span class="pl-en">onToggleCompleted</span>() {
+    <span class="pl-en">onToggleCompleted</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
         <span class="pl-v">this</span>.props.todo.completed <span class="pl-k">=</span> <span class="pl-k">!</span><span class="pl-v">this</span>.props.todo.completed;
-    }
+    },
 
-    <span class="pl-en">onEdit</span>(e) {
+    <span class="pl-en">onEdit</span><span class="pl-k">:</span> <span class="pl-k">function</span>(<span class="pl-smi">e</span>) {
         e.preventDefault();
         <span class="pl-v">this</span>.props.todo.<span class="pl-c1">title</span> <span class="pl-k">=</span> <span class="pl-c1">prompt</span>(<span class="pl-s"><span class="pl-pds">'</span>Todo:<span class="pl-pds">'</span></span>, <span class="pl-v">this</span>.props.todo.<span class="pl-c1">title</span>);
-    }
+    },
 
-    <span class="pl-en">onRemove</span>(e) {
+    <span class="pl-en">onRemove</span><span class="pl-k">:</span> <span class="pl-k">function</span>(<span class="pl-smi">e</span>) {
         e.preventDefault();
-        removeTodo(<span class="pl-v">this</span>.props.todo);
+        <span class="pl-v">this</span>.props.store.removeTodo(<span class="pl-v">this</span>.props.todo);
     }
-}</pre></div>
+}));
+
+React.render(<span class="pl-k">&lt;</span>TodoList store<span class="pl-k">=</span>{todoStore} /<span class="pl-k">&gt;</span>, <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>approot<span class="pl-pds">'</span></span>));
+</pre></div>
 <!-- Code block 2 END -->
+
           <h4><a id="demo" class="anchor" href="#demo" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running demo</h4>
           <pre id="approot" class=""></pre>
 
@@ -159,25 +179,33 @@ mobservable.sideEffect(()<span class="pl-k"> =&gt;</span> {
           </p>
           <p>Changes to the store:</p>
 
-<div class="highlight highlight-javascript"><pre>mobservable.props(todos, { isLoading<span class="pl-k">:</span> <span class="pl-c1">0</span> });
-<span class="pl-k">export</span> <span class="pl-k">function</span> <span class="pl-en">loadTodosAsync</span>() {
-    todos.isLoading<span class="pl-k">++</span>;
+<div class="highlight highlight-javascript"><pre><span class="pl-c1">todoStore</span>.<span class="pl-en">loadTodosAsync</span> <span class="pl-k">=</span> <span class="pl-k">function</span>() {
+    <span class="pl-v">this</span>.pending<span class="pl-k">++</span>;
     <span class="pl-c">// mimic something asynchronous</span>
     <span class="pl-c1">setTimeout</span>(<span class="pl-k">function</span>() {
-        addTodo(<span class="pl-s"><span class="pl-pds">"</span>Asynchronously created todo<span class="pl-pds">"</span></span>);
-        addTodo(<span class="pl-s"><span class="pl-pds">"</span>Another asynchronously created todo<span class="pl-pds">"</span></span>);
-        todos.isLoading<span class="pl-k">--</span>;
-    }, <span class="pl-c1">2000</span>);
+        <span class="pl-v">this</span>.addTodo(<span class="pl-s"><span class="pl-pds">'</span>Asynchronously created todo<span class="pl-pds">'</span></span>);
+        <span class="pl-v">this</span>.pending<span class="pl-k">--</span>;
+    }.bind(<span class="pl-v">this</span>), <span class="pl-c1">2000</span>);
+};</pre></div>
+
+          <p>Changes to the TodoList component:
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">// In TodoList:</span>
+<span class="pl-en">render</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
+    <span class="pl-k">var</span> store <span class="pl-k">=</span> <span class="pl-v">this</span>.props.store;
+    <span class="pl-k">return</span> (<span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
+        <span class="pl-k">&lt;</span>ul<span class="pl-k">&gt;</span>
+            { <span class="pl-c">/** Omitted */</span> }
+            { store.pending <span class="pl-k">?</span> (<span class="pl-k">&lt;</span>li<span class="pl-k">&gt;</span>Loading more items...<span class="pl-k">&lt;</span>/li<span class="pl-k">&gt;</span>) <span class="pl-k">:</span> <span class="pl-c1">null</span> }
+        <span class="pl-k">&lt;</span>/ul<span class="pl-k">&gt;</span>
+        { <span class="pl-c">/** Omitted */</span> }
+        <span class="pl-k">&lt;</span>button onClick<span class="pl-k">=</span>{ <span class="pl-v">this</span>.loadMore }<span class="pl-k">&gt;</span>Load more...<span class="pl-k">&lt;</span>/button<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>/div<span class="pl-k">&gt;</span>);
+},
+
+<span class="pl-en">loadMore</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
+    <span class="pl-v">this</span>.props.store.loadTodosAsync();
 }</pre></div>
-
-          <p>Changes to the render function of the TodoList component:
-
-<div class="highlight highlight-javascript"><pre><span class="pl-k">&lt;</span>ul<span class="pl-k">&gt;</span>
-     {<span class="pl-v">this</span>.props.todos.map(<span class="pl-c">/* omitted */</span>)}
-     {todos.isLoading <span class="pl-k">?</span> (<span class="pl-k">&lt;</span>li<span class="pl-k">&gt;</span>Loading more items...<span class="pl-k">&lt;</span>/li<span class="pl-k">&gt;</span>) <span class="pl-k">:</span> <span class="pl-c1">null</span> }
-<span class="pl-k">&lt;</span>/ul<span class="pl-k">&gt;</span>
-<span class="pl-c">// omitted</span>
-<span class="pl-k">&lt;</span>button onClick<span class="pl-k">=</span>{loadTodosAsync}<span class="pl-k">&gt;</span>Load more...<span class="pl-k">&lt;</span>/button<span class="pl-k">&gt;</span></pre></div>
 
           <h3><a id="runtimebehavior" class="anchor" href="#runtimebehavior" aria-hidden="true"><span class="octicon octicon-link"></span></a>Runtime behavior</h3>
 
