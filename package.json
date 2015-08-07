@@ -1,7 +1,7 @@
 {
     "name": "mobservable",
     "version": "0.5.10",
-    "description": "unobtrusive library to make data structures reactive and create seamlessly self-updating view functions",
+    "description": "Unobtrusive reactive library that keeps views automatically in sync with data.",
     "main": "dist/mobservable.js",
     "scripts": {
         "test": "grunt cover",
@@ -34,6 +34,7 @@
         "react",
         "reactjs",
         "reactive",
+        "model",
         "frp",
         "functional-reactive-programming"
     ]
