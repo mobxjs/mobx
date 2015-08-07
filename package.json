@@ -1,6 +1,6 @@
 {
     "name": "mobservable",
-    "version": "0.5.10",
+    "version": "0.6.0",
     "description": "Unobtrusive reactive library that keeps views automatically in sync with data.",
     "main": "dist/mobservable.js",
     "scripts": {
