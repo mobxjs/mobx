@@ -1,7 +1,5 @@
 var mobservable = require('mobservable')
-
-var value = mobservable.value;
-var array = mobservable.array;
+var makeReactive = mobservable.makeReactive;
 
 
 function buffer() {
@@ -17,7 +15,7 @@ function buffer() {
 
 exports.test1 = function(test) {
     try {
-        var a = array();
+        var a = makeReactive([]);
         test.equals(a.length, 0);
         test.deepEqual(Object.keys(a), []);
         test.deepEqual(a.values(), []);
@@ -32,7 +30,7 @@ exports.test1 = function(test) {
         test.deepEqual(Object.keys(a), ["0", "1"]);
         test.deepEqual(a.values(), [1,2]);
 
-        var sum = value(function() {
+        var sum = makeReactive(function() {
             return -1 + a.reduce(function(a,b) {
                 return a + b;
             }, 1);
@@ -100,7 +98,7 @@ exports.test1 = function(test) {
 };
 
 exports.testFindAndRemove = function(test) {
-    var a = mobservable.array([10,20,20]);
+    var a = mobservable.makeReactive([10,20,20]);
     var idx = -1;
     function predicate(item, index) {
         if (item === 20) {
@@ -157,7 +155,7 @@ exports.testQuickDiff = function(test) {
 };
 
 exports.testObserve = function(test) {
-    var ar = mobservable.array([1,4]);
+    var ar = mobservable.makeReactive([1,4]);
     var buf = [];
     var disposer = ar.observe(function(changes) {
         buf.push(changes);
@@ -203,7 +201,7 @@ exports.testObserve = function(test) {
 
 
 exports.test_array_modification1 = function(test) {
-    var a = mobservable.array([1,2,3]);
+    var a = mobservable.makeReactive([1,2,3]);
     var r = a.splice(-10, 5, 4,5,6);
     test.deepEqual(a.values(), [4,5,6]);
     test.deepEqual(r, [1,2,3]);
@@ -212,7 +210,7 @@ exports.test_array_modification1 = function(test) {
 
 exports.testSerialize = function(test) {
     var a = [1,2,3];
-    var m = mobservable.array(a);
+    var m = mobservable.makeReactive(a);
 
     test.equal("" + a, "" + m);
     test.deepEqual(JSON.stringify(a), JSON.stringify(m));
@@ -233,7 +231,7 @@ exports.testArrayModificationFunctions = function(test) {
     funcs.forEach(function(f) {
         ars.forEach(function (ar) {
             var a = ar.slice();
-            var b = mobservable.array(a);
+            var b = mobservable.makeReactive(a);
             var res1 = a[f](4);
             var res2 = b[f](4);
             test.deepEqual(res1, res2);
@@ -249,7 +247,7 @@ exports.testArrayWriteFunctions = function(test) {
     funcs.forEach(function(f) {
         ars.forEach(function (ar) {
             var a = ar.slice();
-            var b = mobservable.array(a);
+            var b = mobservable.makeReactive(a);
             var res1 = a[f](4);
             var res2 = b[f](4);
             test.deepEqual(res1, res2);
@@ -261,7 +259,7 @@ exports.testArrayWriteFunctions = function(test) {
 
 exports.test_array_modification2 = function(test) {
 
-    var a2 = mobservable.array();
+    var a2 = mobservable.makeReactive([]);
     var inputs = [undefined, -10, -4, -3, -1, 0, 1, 3, 4, 10];
     var arrays = [[], [1], [1,2,3,4], [1,2,3,4,5,6,7,8,9,10,11],[1,undefined],[undefined]]
     for (var i = 0; i < inputs.length; i++)
@@ -282,7 +280,7 @@ exports.test_array_modification2 = function(test) {
 };
 
 exports.test_is_array = function(test) {
-    var x = mobservable.array();
+    var x = mobservable.makeReactive([]);
     test.equal(x instanceof Array, true);
 
     // would be cool if these two would return true...
