@@ -4,37 +4,41 @@
  * https: //mweststrate.github.io/mobservable
  */
 
-interface IMobservableStatic extends _IMobservableStatic {
+interface _IMobservableStatic {
+
+    makeReactive : IMakeReactive;
+
+    reactiveComponent<T>(componentClass: T): T;
+
+    sideEffect(func: Mobservable.Lambda,scope?): Mobservable.Lambda;
+
+    defineReactiveProperties(target: Object, properties: Object);
+
+    isReactive(value: any): boolean;
+
+    asReference(value); 
+
+    observable(target: Object, key: string); // annotation
+
+    transaction<T>(action: ()=>T): T;
+
+    toJson<T>(value: T): T;
+
+    observeUntilInvalid<T>(func: ()=>T, onInvalidate: Mobservable.Lambda): [T,Mobservable.Lambda];
+    
+    reactiveMixin;
+
+    debugLevel:  number;
+}
+
+interface IMakeReactive {
     <T>(value: T[], opts?: Mobservable.IMakeReactiveOptions): Mobservable.IObservableArray<T>;
     <T>(value: ()=>T, opts?: Mobservable.IMakeReactiveOptions): Mobservable.IObservableValue<T>;
     <T extends string|number|boolean|Date|RegExp|Function|void>(value: T, opts?: Mobservable.IMakeReactiveOptions): Mobservable.IObservableValue<T>;
     <T extends Object>(value: Object, opts?: Mobservable.IMakeReactiveOptions): T;
- }
+}
 
-interface _IMobservableStatic {
-
-    makeReactive<T>(value: T[], opts?: Mobservable.IMakeReactiveOptions): Mobservable.IObservableArray<T>;
-    makeReactive<T>(value: ()=>T, opts?: Mobservable.IMakeReactiveOptions): Mobservable.IObservableValue<T>;
-    makeReactive<T extends string|number|boolean|Date|RegExp|Function|void>(value: T, opts?: Mobservable.IMakeReactiveOptions): Mobservable.IObservableValue<T>;
-    makeReactive<T extends Object>(value: Object, opts?: Mobservable.IMakeReactiveOptions): T;
-
-    asReference(value); 
-    isReactive(value: any): boolean;
-
-    sideEffect(func: Mobservable.Lambda,scope?): Mobservable.Lambda;
-    defineReactiveProperties(target: Object, properties: Object);
-
-    reactiveMixin;
-    reactiveComponent<T>(componentClass: T): T;
-
-    observable(target: Object, key: string); // annotation
-    toJson<T>(value: T): T;
-    observeUntilInvalid<T>(func: ()=>T, onInvalidate: Mobservable.Lambda): [T,Mobservable.Lambda];
-
-    // change a lot of observables at once
-    transaction<T>(action: ()=>T): T;
-    
-    debugLevel:  number;
+interface IMobservableStatic extends _IMobservableStatic, IMakeReactive {
 }
 
 declare module Mobservable {
