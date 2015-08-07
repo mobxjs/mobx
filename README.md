@@ -73,7 +73,8 @@ var Timer = mobservable.reactiveComponent(React.createClass{
 }));
 ```
 
-Thats all folks! Its as simple as that. And it does not just work plain objects, but also for arrays, functions, classes, deeply nested structures. The actual interesting thing about these changes are the things that are *not* in the code:
+Thats all folks! Its as simple as that. The `Timer` will now automatically update each time `timerData.secondsPassed` is altered. 
+The actual interesting thing about these changes are the things that are *not* in the code:
 
 * The `setInterval` method didn't alter. It still threads `timerData` as a plain JS object.
 * There is no state. Timer is still a dump component.
@@ -84,6 +85,7 @@ Thats all folks! Its as simple as that. And it does not just work plain objects,
 * If the `Timer` component would be somewhere deep in our app; only the `Timer` would be re-rendered. Nothing else.
 
 All this missing code... it will scale well into large code-bases!
+It does not only work for plain objects, but also for arrays, functions, classes, deeply nested structures. 
 
 <div align="center">
     <img src="https://mweststrate.github.io/mobservable/images/overview.png" height="300"/>
@@ -92,10 +94,10 @@ All this missing code... it will scale well into large code-bases!
 ## A Todo application
 
 The following simple todo application can be found up & running on https://mweststrate.github.io/mobservable. A full TodoMVC implementation can be found [here](https://github.com/mweststrate/todomvc/tree/master/examples/react-mobservable)
-Note how the array, function and primitive of `todoStore` will all become reactive.
+Note how the array, function and primitive of `todoStore` will all become reactive. There are just three calls to `mobservable` and all the components are kept in sync with the `todoStore`.
 
 ```javascript
-var todoStore = makeReactive({
+var todoStore = mobservable.makeReactive({
     todos: [
         {
             title: 'Find a clean mug',
@@ -131,7 +133,7 @@ todoStore.loadTodosAsync = function() {
     }.bind(this), 2000);
 };
 
-var TodoList = reactiveComponent(React.createClass({
+var TodoList = mobservable.reactiveComponent(React.createClass({
     render: function() {
         var store = this.props.store;
         return (<div>
@@ -157,7 +159,7 @@ var TodoList = reactiveComponent(React.createClass({
     }
 }));
 
-var TodoView = reactiveComponent(React.createClass({
+var TodoView = mobservable.reactiveComponent(React.createClass({
     render: function() {
         var todo = this.props.todo;
         return (<li>
@@ -233,4 +235,4 @@ So other programming paradigms like classic MVC are now can be easily applied in
 Probably. 
 Mobservable is framework agnostic and can be applied in any JS environment.
 It just ships with a small function to transform Reactjs components into reactive view functions for convenience.
-Mobservable works just as well server side, and is already combined with JQuery (see this [Fiddle](http://jsfiddle.net/mweststrate/vxn7qgdw)) and [Deku](https://gist.github.com/mattmccray/d8740ea97013c7505a9b) 
+Mobservable works just as well server side, and is already combined with JQuery (see this [Fiddle](http://jsfiddle.net/mweststrate/vxn7qgdw)) and [Deku](https://gist.github.com/mattmccray/d8740ea97013c7505a9b). 

@@ -169,7 +169,7 @@ exports.testScope = function(test) {
 exports.testProps1 = function(test) {
     var vat = makeReactive(0.2);
     var Order = function() {
-        mobservable.defineReactiveProperties(this, {
+        mobservable.extendReactive(this, {
             'price' : 20, 
             'amount' : 2, 
             'total': function() {
@@ -200,7 +200,7 @@ exports.testProps1 = function(test) {
 exports.testProps2 = function(test) {
     var vat = makeReactive(0.2);
     var Order = function() {
-        mobservable.defineReactiveProperties(this, {
+        mobservable.extendReactive(this, {
             price: 20,
             amount: 2,
             total: function() {
@@ -225,7 +225,7 @@ exports.testProps3 = function(test) {
         this.total = function() {
             return (1+vat()) * this.price * this.amount; // price and amount are now properties!
         };
-        mobservable.defineReactiveProperties(this, this);
+        mobservable.extendReactive(this, this);
     };
 
     var order = new Order();
@@ -238,7 +238,7 @@ exports.testProps3 = function(test) {
 
 exports.testProps4 = function(test) {
     function Bzz() {
-        mobservable.defineReactiveProperties(this, {
+        mobservable.extendReactive(this, {
             fluff: [1,2],
             sum: function() {
                 return this.fluff.reduce(function(a,b) {
@@ -266,7 +266,7 @@ exports.testObserveProperty = function(test) {
     var mb = [];
     
     var Wrapper = function (chocolateBar) {
-        mobservable.defineReactiveProperties(this, {
+        mobservable.extendReactive(this, {
             chocolateBar: chocolateBar,
             calories: function () {
                 return this.chocolateBar.calories;

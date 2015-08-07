@@ -363,7 +363,7 @@ var mobservable;
             case ValueType.Array:
                 return new _.ObservableArray(value, recurse);
             case ValueType.PlainObject:
-                return _.makeReactiveObject({}, value, recurse);
+                return _.extendReactive({}, value, recurse);
         }
         throw "Illegal State";
     }
@@ -403,10 +403,10 @@ var mobservable;
         return disposer;
     }
     mobservable.sideEffect = sideEffect;
-    function defineReactiveProperties(target, properties) {
-        _.makeReactiveObject(target, properties, true);
+    function extendReactive(target, properties) {
+        _.extendReactive(target, properties, true);
     }
-    mobservable.defineReactiveProperties = defineReactiveProperties;
+    mobservable.extendReactive = extendReactive;
     function observable(target, key, descriptor) {
         var baseValue = descriptor ? descriptor.value : null;
         if (typeof baseValue === "function") {
@@ -426,11 +426,11 @@ var mobservable;
             Object.defineProperty(target, key, {
                 configurable: true, enumberable: true,
                 get: function () {
-                    _.makeReactiveObjectProperty(this, key, undefined, true);
+                    _.defineReactiveProperty(this, key, undefined, true);
                     return this[key];
                 },
                 set: function (value) {
-                    _.makeReactiveObjectProperty(this, key, value, true);
+                    _.defineReactiveProperty(this, key, value, true);
                 }
             });
         }
@@ -463,14 +463,14 @@ var mobservable;
     mobservable.debugLevel = 0;
     var _;
     (function (_) {
-        function makeReactiveObject(target, properties, recurse) {
+        function extendReactive(target, properties, recurse) {
             markReactive(target);
             for (var key in properties)
-                makeReactiveObjectProperty(target, key, properties[key], recurse);
+                defineReactiveProperty(target, key, properties[key], recurse);
             return target;
         }
-        _.makeReactiveObject = makeReactiveObject;
-        function makeReactiveObjectProperty(target, name, value, recurse) {
+        _.extendReactive = extendReactive;
+        function defineReactiveProperty(target, name, value, recurse) {
             var type;
             if (value instanceof AsReference) {
                 value = value.value;
@@ -505,7 +505,7 @@ var mobservable;
             });
             return target;
         }
-        _.makeReactiveObjectProperty = makeReactiveObjectProperty;
+        _.defineReactiveProperty = defineReactiveProperty;
         function makeReactiveArrayItem(value) {
             if (isReactive(value))
                 return value;
@@ -522,7 +522,7 @@ var mobservable;
                 case ValueType.Array:
                     return new _.ObservableArray(value, true);
                 case ValueType.PlainObject:
-                    return _.makeReactiveObject({}, value, true);
+                    return _.extendReactive({}, value, true);
             }
             throw "Illegal State";
         }

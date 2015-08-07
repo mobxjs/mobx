@@ -22,10 +22,6 @@ namespace mobservable {
 
     enum ValueType { Reference, PlainObject, ComplexObject, Array, ViewFunction, ComplexFunction }
 
-    export function makeReactive<T>(value:T[], opts?:Mobservable.IMakeReactiveOptions):Mobservable.IObservableArray<T>;
-    export function makeReactive<T>(value:()=>T, opts?:Mobservable.IMakeReactiveOptions):Mobservable.IObservableValue<T>;
-    export function makeReactive<T extends Object>(value:T, opts?:Mobservable.IMakeReactiveOptions):T;
-    export function makeReactive<T>(value:T, opts?:Mobservable.IMakeReactiveOptions):Mobservable.IObservableValue<T>;
     export function makeReactive(value:any, opts?:Mobservable.IMakeReactiveOptions) {
         if (isReactive(value))
             return value;
@@ -49,7 +45,7 @@ namespace mobservable {
             case ValueType.Array:
                 return new _.ObservableArray(<[]>value, recurse);
             case ValueType.PlainObject:
-                return _.makeReactiveObject({}, value, recurse);
+                return _.extendReactive({}, value, recurse);
         }
         throw "Illegal State";
     }
@@ -90,8 +86,8 @@ namespace mobservable {
         return disposer;
     }
 
-    export function defineReactiveProperties(target:Object, properties:Object) {
-        _.makeReactiveObject(target, properties, true);
+    export function extendReactive(target:Object, properties:Object) {
+        _.extendReactive(target, properties, true);
     }
  
     /**
@@ -125,11 +121,11 @@ namespace mobservable {
             Object.defineProperty(target, key, {
                 configurable: true, enumberable:true,
                 get: function() {
-                    _.makeReactiveObjectProperty(this, key, undefined, true);
+                    _.defineReactiveProperty(this, key, undefined, true);
                     return this[key];
                 },
                 set: function(value) {
-                    _.makeReactiveObjectProperty(this, key, value, true);
+                    _.defineReactiveProperty(this, key, value, true);
                 }
             });
         }
@@ -170,14 +166,14 @@ namespace mobservable {
     export var debugLevel = 0;
     
     export namespace _ {
-        export function makeReactiveObject(target, properties, recurse: boolean) {
+        export function extendReactive(target, properties, recurse: boolean) {
             markReactive(target);
             for(var key in properties)
-                makeReactiveObjectProperty(target, key, properties[key], recurse);
+                defineReactiveProperty(target, key, properties[key], recurse);
             return target;
         }
         
-        export function makeReactiveObjectProperty(target, name, value, recurse) {
+        export function defineReactiveProperty(target, name, value, recurse) {
             let type;
             if (value instanceof AsReference) {
                 value = value.value;
@@ -231,7 +227,7 @@ namespace mobservable {
                 case ValueType.Array:
                     return new _.ObservableArray(<[]>value, true);
                 case ValueType.PlainObject:
-                    return _.makeReactiveObject({}, value, true);
+                    return _.extendReactive({}, value, true);
             }
             throw "Illegal State";
         }
