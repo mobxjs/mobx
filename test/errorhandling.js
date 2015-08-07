@@ -1,6 +1,6 @@
 var mobservable = require('mobservable');
 
-var value = mobservable.value;
+var makeReactive = mobservable.makeReactive;
 var voidObserver = function(){};
 
 function buffer() {
@@ -26,7 +26,7 @@ function testException(test, observable, exception) {
 }
 
 exports.testException1  = function(test) {
-    var a = value(function() {
+    var a = makeReactive(function() {
         throw "hoi";
     });
     testException(test, a, "hoi");
@@ -36,16 +36,16 @@ exports.testException1  = function(test) {
 
 exports.testException2 = function(test) {
     var cbuffer = buffer();
-    var z = value(true);
-    var a = value(function() {
+    var z = makeReactive(true);
+    var a = makeReactive(function() {
         if (z())
         return 1;
         throw "Some error!";
     });
-    var b = value(function() {
+    var b = makeReactive(function() {
         return a();
     });
-    var c = value(function() {
+    var c = makeReactive(function() {
         return a();
     });
     c.observe(cbuffer);
@@ -69,7 +69,7 @@ exports.testException2 = function(test) {
 
 exports.cycle1 = function(test) {
     try {
-        var p = value(function() { return p() * 2; }); // thats a cycle!
+        var p = makeReactive(function() { return p() * 2; }); // thats a cycle!
         p.observe(voidObserver, true);
         test.fail("expected exception");
     }
@@ -78,22 +78,22 @@ exports.cycle1 = function(test) {
         test.equal(mobservable._.stackDepth(), 0);
     }
 
-    var a = value(function() { return b() * 2; });
-    var b = value(function() { return a() * 2; });
+    var a = makeReactive(function() { return b() * 2; });
+    var b = makeReactive(function() { return a() * 2; });
     testException(test, b, "Cycle detected");
     test.done();
 };
 
 exports.cycle2 = function(test) {
-    var p = value(function() { return p() * 2; });
+    var p = makeReactive(function() { return p() * 2; });
     testException(test, p, "Cycle detected");
     test.done();
 };
 
 exports.cycle3 = function(test) {
-    var z = value(true);
-    var a = value(function() { return z() ? 1 : b() * 2; });
-    var b = value(function() { return a() * 2; });
+    var z = makeReactive(true);
+    var a = makeReactive(function() { return z() ? 1 : b() * 2; });
+    var b = makeReactive(function() { return a() * 2; });
 
     b.observe(voidObserver);
     test.equals(1, a());

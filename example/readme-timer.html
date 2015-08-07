@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<body>
+    <script src="lib/react-with-addons.js"></script>
+    <script src="lib/JSXTransformer.js"></script>
+    <script src="../dist/mobservable.js"></script>
+    <script type="text/jsx">
+var timerData = mobservable.makeReactive({
+  secondsPassed: 0
+});
+
+setInterval(function() {
+  this.timerData.secondsPassed++;
+}, 1000);
+
+var Timer = mobservable.reactiveComponent(React.createClass({
+  render: function() {
+    return (<span>Seconds passed: { this.props.timerData.secondsPassed } </span> )
+  }
+}));
+
+React.render(<Timer timerData={timerData} />, document.body);
+    </script>
+</body>

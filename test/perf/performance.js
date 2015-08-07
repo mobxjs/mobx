@@ -221,7 +221,6 @@ exports.array_classic_loop = function(test) {
     var ar = makeReactive([]);
     var aCalc = 0;
     var b = makeReactive(1);
-    debugger;
     var sum = makeReactive(function() {
         var s = 0;
         aCalc++;

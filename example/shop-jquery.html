@@ -34,14 +34,14 @@
          * Data model
          */
         function Article(name, price) {
-            mobservable.defineReactiveProperties(this, {
+            mobservable.extendReactive(this, {
                 name: name,
                 price: price
             });
         }
 
         function ShoppingCartEntry(article) {
-            mobservable.defineReactiveProperties(this, {
+            mobservable.extendReactive(this, {
                 article: article,
                 amount: 1,
                 price: function() {
@@ -51,7 +51,7 @@
         }
 
         function ShoppingCart() {
-            mobservable.defineReactiveProperties(this, {
+            mobservable.extendReactive(this, {
                 entries: [],
                 total: function() {
                     return this.entries.reduce(function(sum, entry) {

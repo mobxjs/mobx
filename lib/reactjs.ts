@@ -34,22 +34,20 @@ namespace mobservable {
             return false;
         }
     }
-    export var ObserverMixin = reactiveMixin; // TODO: remove in 0.7
 
     export function reactiveComponent(componentClass) {
         var baseMount = componentClass.prototype.componentWillMount;
         var baseUnmount = componentClass.prototype.componentWillUnmount;
         componentClass.prototype.componentWillMount = function() {
-            ObserverMixin.componentWillMount.apply(this, arguments);
+            reactiveMixin.componentWillMount.apply(this, arguments);
             baseMount && baseMount.apply(this, arguments);
         };
         componentClass.prototype.componentWillUnmount = function() {
-            ObserverMixin.componentWillUnmount.apply(this, arguments);
+            reactiveMixin.componentWillUnmount.apply(this, arguments);
             baseUnmount && baseUnmount.apply(this, arguments);
         };
         if (!componentClass.prototype.shouldComponentUpdate)
-            componentClass.prototype.shouldComponentUpdate = ObserverMixin.shouldComponentUpdate;
+            componentClass.prototype.shouldComponentUpdate = reactiveMixin.shouldComponentUpdate;
         return componentClass;
     };
-    export var ObservingComponent = _.wrapDeprecated("ObservingComponent", reactiveComponent);
 }   
