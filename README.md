@@ -55,7 +55,7 @@ But that is the kind of dependency we want to avoid in our code. So let's apply 
 
 ### mobservable.makeReactive
 
-The first function is `makeReactive`. It is the swiss knife of mobservable and  turns any data structure and function into its reactive counterpart. Objects, arrays, functions; they can all be made reactive. Reactiveness is infectious; new data that is put in reactive data will become reactive as well. To make our timer reactive, just change the first three lines of the code:
+The first function is `makeReactive`. It is the swiss knife of mobservable and  turns any data structure and function into its reactive counterpart. Objects, arrays, functions; they can all be made reactive. Reactiveness is contagious; new data that is put in reactive data will become reactive as well. To make our timer reactive, just change the first three lines of the code:
 
 ```javascript
 var timerData = mobservable.makeReactive({
@@ -73,7 +73,7 @@ var Timer = mobservable.reactiveComponent(React.createClass{
 }));
 ```
 
-Thats all folks! Its as simple as that. The `Timer` will now automatically update each time `timerData.secondsPassed` is altered. 
+Thats all folks! Its as simple as that. The `Timer` will now automatically update each time `timerData.secondsPassed` is altered.
 The actual interesting thing about these changes are the things that are *not* in the code:
 
 * The `setInterval` method didn't alter. It still threads `timerData` as a plain JS object.
@@ -85,7 +85,7 @@ The actual interesting thing about these changes are the things that are *not* i
 * If the `Timer` component would be somewhere deep in our app; only the `Timer` would be re-rendered. Nothing else.
 
 All this missing code... it will scale well into large code-bases!
-It does not only work for plain objects, but also for arrays, functions, classes, deeply nested structures. 
+It does not only work for plain objects, but also for arrays, functions, classes, deeply nested structures.
 
 <div align="center">
     <img src="https://mweststrate.github.io/mobservable/images/overview.png" height="300"/>
@@ -191,7 +191,7 @@ React.render(<TodoList store={todoStore} />, document.getElementById('approot'))
 ## Getting started
 
 Either:
-* `npm install mobservable --save` 
+* `npm install mobservable --save`
 * clone the boilerplate repository containing the above example from: https://github.com/mweststrate/react-mobservable-boilerplate
 * or fork this [JSFiddle](https://jsfiddle.net/mweststrate/wgbe4guu/)
 
@@ -214,7 +214,7 @@ Either:
 * Reactive views always update atomically, intermediate values will never be visible.
 * Reactive functions evaluate lazily and are not processed if they aren't observed.
 * Dependency detection is based on actual values to real-time minify the amount of dependencies.
-* Cycles are detected automatically. 
+* Cycles are detected automatically.
 * Exceptions during computations are propagated to consumers.
 
 ## FAQ
@@ -226,13 +226,13 @@ Mobservabe is *not* a framework. It does not tell you how to structure your code
 **Can I combine flux with mobservable?**
 
 Flux implementations that do not work on the assumption that the data in their stores is immutable should work well with mobservable.
-However, the need for flux is less when using mobservable. 
+However, the need for flux is less when using mobservable.
 Mobservable already optimizes rendering and since it works with most kinds of data, including cycles and classes.
 So other programming paradigms like classic MVC are now can be easily applied in applications that combine ReactJS with mobservable.
 
 **Can I use mobservable together with framework X?**
 
-Probably. 
+Probably.
 Mobservable is framework agnostic and can be applied in any JS environment.
 It just ships with a small function to transform Reactjs components into reactive view functions for convenience.
-Mobservable works just as well server side, and is already combined with JQuery (see this [Fiddle](http://jsfiddle.net/mweststrate/vxn7qgdw)) and [Deku](https://gist.github.com/mattmccray/d8740ea97013c7505a9b). 
+Mobservable works just as well server side, and is already combined with JQuery (see this [Fiddle](http://jsfiddle.net/mweststrate/vxn7qgdw)) and [Deku](https://gist.github.com/mattmccray/d8740ea97013c7505a9b).
