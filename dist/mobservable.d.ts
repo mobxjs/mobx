@@ -6,9 +6,11 @@
 
 interface IMobservableStatic extends _IMobservableStatic {
 
-    // value is the default exported function of the module
-    <T>(value?:T[]):Mobservable.IObservableArray<T>;
-    <T>(value?:T|{():T}, scope?:Object):Mobservable.IObservableValue<T>;
+    // makeReactive is the default exported function of the module
+    <T>(value:T[], opts?:Mobservable.IMakeReactiveOptions):Mobservable.IObservableArray<T>;
+    <T>(value:()=>T, opts?:Mobservable.IMakeReactiveOptions):Mobservable.IObservableValue<T>;
+    <T extends Object>(value:T, opts?:Mobservable.IMakeReactiveOptions):T;
+    <T>(value:T, opts?:Mobservable.IMakeReactiveOptions):Mobservable.IObservableValue<T>;
  }
 
 interface _IMobservableStatic {
