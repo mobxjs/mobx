@@ -1,7 +1,7 @@
 /**
  * mobservable
  * (c) 2015 - Michel Weststrate
- * https://mweststrate.github.io/mobservable
+ * https: //mweststrate.github.io/mobservable
  */
 var mobservable;
 (function (mobservable) {
@@ -383,24 +383,86 @@ var mobservable;
         return new _.AsReference(value);
     }
     mobservable.asReference = asReference;
-    var _;
-    (function (_) {
-        var deprecations = [];
-        function deprecated(name) {
-            if (deprecations.indexOf(name) === -1) {
-                deprecations.push(name);
-                console.warn("The method '" + name + "' has been deprecated, for any questions or suggestions, see: https://github.com/mweststrate/mobservable/issues/11");
-                console.trace();
-            }
+    function isReactive(value) {
+        if (value === null || value === undefined)
+            return false;
+        switch (typeof value) {
+            case "array":
+            case "object":
+            case "function":
+                return value.__isReactive === true;
         }
-        _.deprecated = deprecated;
-        function wrapDeprecated(name, func) {
-            return function () {
-                deprecated(name);
-                return func.apply(null, arguments);
+        return false;
+    }
+    mobservable.isReactive = isReactive;
+    function sideEffect(func, scope) {
+        var observable = new _.ComputedObservable(func, scope);
+        var disposer = observable.observe(_.noop);
+        if (observable.dependencyState.observing.length === 0)
+            _.warn("mobservable.sideEffect: not a single observable was used inside the side-effect function. Side-effect would be a no-op.");
+        return disposer;
+    }
+    mobservable.sideEffect = sideEffect;
+    function defineReactiveProperties(target, properties) {
+        _.makeReactiveObject(target, properties, true);
+    }
+    mobservable.defineReactiveProperties = defineReactiveProperties;
+    function observable(target, key, descriptor) {
+        var baseValue = descriptor ? descriptor.value : null;
+        if (typeof baseValue === "function") {
+            delete descriptor.value;
+            delete descriptor.writable;
+            descriptor.configurable = true;
+            descriptor.get = function () {
+                var observable = this.key = new _.ComputedObservable(baseValue, this).createGetterSetter();
+                return observable;
+            };
+            descriptor.set = function () {
+                console.trace();
+                throw new Error("It is not allowed to reassign observable functions");
             };
         }
-        _.wrapDeprecated = wrapDeprecated;
+        else {
+            Object.defineProperty(target, key, {
+                configurable: true, enumberable: true,
+                get: function () {
+                    _.makeReactiveObjectProperty(this, key, undefined, true);
+                    return this[key];
+                },
+                set: function (value) {
+                    _.makeReactiveObjectProperty(this, key, value, true);
+                }
+            });
+        }
+    }
+    mobservable.observable = observable;
+    function toJson(source) {
+        if (!source)
+            return source;
+        if (Array.isArray(source) || source instanceof _.ObservableArray)
+            return source.map(toJson);
+        if (typeof source === "object") {
+            var res = {};
+            for (var key in source)
+                if (source.hasOwnProperty(key))
+                    res[key] = toJson(source[key]);
+            return res;
+        }
+        return source;
+    }
+    mobservable.toJson = toJson;
+    function transaction(action) {
+        return _.Scheduler.batch(action);
+    }
+    mobservable.transaction = transaction;
+    function observeUntilInvalid(func, onInvalidate) {
+        var watch = new _.WatchedExpression(func, onInvalidate);
+        return [watch.value, function () { return watch.dispose(); }];
+    }
+    mobservable.observeUntilInvalid = observeUntilInvalid;
+    mobservable.debugLevel = 0;
+    var _;
+    (function (_) {
         function makeReactiveObject(target, properties, recurse) {
             markReactive(target);
             for (var key in properties)
@@ -484,175 +546,6 @@ var mobservable;
         })();
         _.AsReference = AsReference;
     })(_ = mobservable._ || (mobservable._ = {}));
-    function isReactive(value) {
-        if (value === null || value === undefined)
-            return false;
-        switch (typeof value) {
-            case "array":
-            case "object":
-            case "function":
-                return value.__isReactive === true;
-        }
-        return false;
-    }
-    mobservable.isReactive = isReactive;
-    function sideEffect(func, scope) {
-        var observable = new _.ComputedObservable(func, scope);
-        var disposer = observable.observe(_.noop);
-        if (observable.dependencyState.observing.length === 0)
-            _.warn("mobservable.sideEffect: not a single observable was used inside the side-effect function. Side-effect would be a no-op.");
-        return disposer;
-    }
-    mobservable.sideEffect = sideEffect;
-    function defineReactiveProperties(target, properties) {
-        _.makeReactiveObject(target, properties, true);
-    }
-    mobservable.defineReactiveProperties = defineReactiveProperties;
-    function observable(target, key, descriptor) {
-        var baseValue = descriptor ? descriptor.value : null;
-        if (typeof baseValue === "function") {
-            delete descriptor.value;
-            delete descriptor.writable;
-            descriptor.configurable = true;
-            descriptor.get = function () {
-                var observable = this.key = new _.ComputedObservable(baseValue, this).createGetterSetter();
-                return observable;
-            };
-            descriptor.set = function () {
-                console.trace();
-                throw new Error("It is not allowed to reassign observable functions");
-            };
-        }
-        else {
-            Object.defineProperty(target, key, {
-                configurable: true, enumberable: true,
-                get: function () {
-                    _.makeReactiveObjectProperty(this, key, undefined, true);
-                    return this[key];
-                },
-                set: function (value) {
-                    _.makeReactiveObjectProperty(this, key, value, true);
-                }
-            });
-        }
-    }
-    mobservable.observable = observable;
-    function toJson(source) {
-        if (!source)
-            return source;
-        if (Array.isArray(source) || source instanceof _.ObservableArray)
-            return source.map(toJson);
-        if (typeof source === "object") {
-            var res = {};
-            for (var key in source)
-                if (source.hasOwnProperty(key))
-                    res[key] = toJson(source[key]);
-            return res;
-        }
-        return source;
-    }
-    mobservable.toJson = toJson;
-    function transaction(action) {
-        return _.Scheduler.batch(action);
-    }
-    mobservable.transaction = transaction;
-    function observeUntilInvalid(func, onInvalidate) {
-        var watch = new _.WatchedExpression(func, onInvalidate);
-        return [watch.value, function () { return watch.dispose(); }];
-    }
-    mobservable.observeUntilInvalid = observeUntilInvalid;
-    mobservable.watch = _.wrapDeprecated("watch", observeUntilInvalid);
-    mobservable.batch = _.wrapDeprecated("batch", transaction);
-    function value(value, scope) {
-        _.deprecated("value");
-        return makeReactive(value, { scope: scope });
-    }
-    mobservable.value = value;
-    function reference(value) {
-        _.deprecated("reference");
-        return makeReactive(value, { as: "reference" });
-    }
-    mobservable.reference = reference;
-    mobservable.primitive = _.wrapDeprecated("primitive", reference);
-    function computed(func, scope) {
-        _.deprecated("computed");
-        return makeReactive(func, { scope: scope });
-    }
-    mobservable.computed = computed;
-    function expr(expr, scope) {
-        _.deprecated("expr");
-        if (_.DNode.trackingStack.length === 0)
-            throw new Error("mobservable.expr can only be used inside a computed observable. Probably mobservable.computed should be used instead of .expr");
-        return new _.ComputedObservable(expr, scope).get();
-    }
-    mobservable.expr = expr;
-    function array(values) {
-        _.deprecated("array");
-        return new _.ObservableArray(values, false);
-    }
-    mobservable.array = array;
-    function props(target, properties, initialValue) {
-        _.deprecated("props");
-        switch (arguments.length) {
-            case 1: return _.makeReactiveObject(target, target, false);
-            case 2: return _.makeReactiveObject(target, properties, false);
-            case 3: return _.makeReactiveObject(target, (_a = {}, _a[properties] = initialValue, _a), false);
-        }
-        throw "Illegal invocation";
-        var _a;
-    }
-    mobservable.props = props;
-    function fromJson(source) {
-        _.deprecated("fromJson");
-        return makeReactive(source);
-    }
-    mobservable.fromJson = fromJson;
-    function toPlainValue(value) {
-        _.deprecated("toPlainValue");
-        if (value) {
-            if (value instanceof Array)
-                return value.slice();
-            else if (value instanceof _.ObservableValue)
-                return value.get();
-            else if (typeof value === "function" && value.impl) {
-                if (value.impl instanceof _.ObservableValue)
-                    return value();
-                else if (value.impl instanceof _.ObservableArray)
-                    return value().slice();
-            }
-            else if (typeof value === "object") {
-                var res = {};
-                for (var key in value)
-                    res[key] = toPlainValue(value[key]);
-                return res;
-            }
-        }
-        return value;
-    }
-    mobservable.toPlainValue = toPlainValue;
-    function observeProperty(object, key, listener, invokeImmediately) {
-        if (invokeImmediately === void 0) { invokeImmediately = false; }
-        _.deprecated("observeProperty");
-        if (!object)
-            throw new Error("Cannot observe property of '" + object + "'");
-        if (!(key in object))
-            throw new Error("Object '" + object + "' has no property '" + key + "'.");
-        if (!listener || typeof listener !== "function")
-            throw new Error("Third argument to mobservable.observeProperty should be a function");
-        return sideEffect(function () {
-            listener(object[key]);
-        });
-        var observer = new _.ComputedObservable((function () { return object[key]; }), object);
-        var disposer = observer.observe(listener, invokeImmediately);
-        if (observer.dependencyState.observing.length === 0)
-            throw new Error("mobservable.observeProperty: property '" + key + "' of '" + object + " doesn't seem to be observable. Did you define it as observable using @observable or mobservable.props? You might try to use the .observe() method instead.");
-        return _.once(function () {
-            disposer();
-            observer.dependencyState.dispose();
-        });
-    }
-    mobservable.observeProperty = observeProperty;
-    mobservable.debugLevel = 0;
 })(mobservable || (mobservable = {}));
 var mobservable;
 (function (mobservable) {
@@ -948,25 +841,23 @@ var mobservable;
             return false;
         }
     };
-    mobservable.ObserverMixin = mobservable.reactiveMixin;
     function reactiveComponent(componentClass) {
         var baseMount = componentClass.prototype.componentWillMount;
         var baseUnmount = componentClass.prototype.componentWillUnmount;
         componentClass.prototype.componentWillMount = function () {
-            mobservable.ObserverMixin.componentWillMount.apply(this, arguments);
+            mobservable.reactiveMixin.componentWillMount.apply(this, arguments);
             baseMount && baseMount.apply(this, arguments);
         };
         componentClass.prototype.componentWillUnmount = function () {
-            mobservable.ObserverMixin.componentWillUnmount.apply(this, arguments);
+            mobservable.reactiveMixin.componentWillUnmount.apply(this, arguments);
             baseUnmount && baseUnmount.apply(this, arguments);
         };
         if (!componentClass.prototype.shouldComponentUpdate)
-            componentClass.prototype.shouldComponentUpdate = mobservable.ObserverMixin.shouldComponentUpdate;
+            componentClass.prototype.shouldComponentUpdate = mobservable.reactiveMixin.shouldComponentUpdate;
         return componentClass;
     }
     mobservable.reactiveComponent = reactiveComponent;
     ;
-    mobservable.ObservingComponent = mobservable._.wrapDeprecated("ObservingComponent", reactiveComponent);
 })(mobservable || (mobservable = {}));
 var mobservable;
 (function (mobservable) {
