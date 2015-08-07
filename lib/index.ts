@@ -70,23 +70,106 @@ namespace mobservable {
         return new _.AsReference(value);
     }
     
-    export namespace _ {
-        var deprecations = [];
-        export function deprecated(name) {
-            if (deprecations.indexOf(name) === -1) {
-                deprecations.push(name);
-                console.warn(`The method '${name}' has been deprecated, for any questions or suggestions, see: https://github.com/mweststrate/mobservable/issues/11`);
+    export function isReactive(value):boolean {
+        if (value === null || value === undefined)
+            return false;
+        switch(typeof value) {
+            case "array":
+            case "object":
+            case "function":
+                return value.__isReactive === true;
+        }
+        return false;
+    }
+    
+    export function sideEffect(func:Lambda, scope?):Lambda {
+        const observable = new _.ComputedObservable(func, scope);
+        const disposer = observable.observe(_.noop);
+        if (observable.dependencyState.observing.length === 0)
+            _.warn(`mobservable.sideEffect: not a single observable was used inside the side-effect function. Side-effect would be a no-op.`);
+        return disposer;
+    }
+
+    export function defineReactiveProperties(target:Object, properties:Object) {
+        _.makeReactiveObject(target, properties, true);
+    }
+ 
+    /**
+     * Use this annotation to wrap properties of an object in an observable, for example:
+     * class OrderLine {
+     *   @observable amount = 3;
+     *   @observable price = 2;
+     *   @observable total() {
+     *      return this.amount * this.price;
+     *   }
+     * }
+     */
+    export function observable(target:Object, key:string, descriptor?) {
+        var baseValue = descriptor ? descriptor.value : null;
+        // observable annotations are invoked on the prototype, not on actual instances,
+        // so upon invocation, determine the 'this' instance, and define a property on the
+        // instance as well (that hides the propotype property)
+        if (typeof baseValue === "function") {
+            delete descriptor.value;
+            delete descriptor.writable;
+            descriptor.configurable = true;
+            descriptor.get = function() {
+                var observable = this.key = new _.ComputedObservable(baseValue, this).createGetterSetter();
+                return observable;
+            };
+            descriptor.set = function () {
                 console.trace();
-            }
+                throw new Error("It is not allowed to reassign observable functions");
+            };
+        } else {
+            Object.defineProperty(target, key, {
+                configurable: true, enumberable:true,
+                get: function() {
+                    _.makeReactiveObjectProperty(this, key, undefined, true);
+                    return this[key];
+                },
+                set: function(value) {
+                    _.makeReactiveObjectProperty(this, key, value, true);
+                }
+            });
         }
-        
-        export function wrapDeprecated<T extends Function>(name:string, func:T):T {
-            return <T><any>function() {
-                deprecated(name);
-                return func.apply(null, arguments);
-            }
+    }
+
+    /**
+     * Basically, a deep clone, so that no reactive property will exist anymore
+     */
+    export function toJson(source) {
+        if (!source)
+            return source;
+        if (Array.isArray(source) || source instanceof _.ObservableArray)
+            return source.map(toJson);
+        if (typeof source === "object") {
+            // TODO: only for plain objects, otherwise return reference?
+            var res = {};
+            for (var key in source) if (source.hasOwnProperty(key))
+                res[key] = toJson(source[key]);
+            return res;
         }
-        
+        return source;
+    }
+
+    export function transaction<T>(action:()=>T):T {
+        return _.Scheduler.batch(action);
+    }
+
+    /**
+        Evaluates func and return its results. Watch tracks all observables that are used by 'func'
+        and invokes 'onValidate' whenever func *should* update.
+        Returns  a tuplde [return value of func, disposer]. The disposer can be used to abort the watch early.
+    */
+    export function observeUntilInvalid<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
+        var watch = new _.WatchedExpression(func, onInvalidate);
+        return [watch.value, () => watch.dispose()];
+    }
+
+    export var debugLevel = 0;
+    
+    export namespace _ {
         export function makeReactiveObject(target, properties, recurse: boolean) {
             markReactive(target);
             for(var key in properties)
@@ -171,215 +254,4 @@ namespace mobservable {
             }
         }
     }
-    
-    export function isReactive(value):boolean {
-        if (value === null || value === undefined)
-            return false;
-        switch(typeof value) {
-            case "array":
-            case "object":
-            case "function":
-                return value.__isReactive === true;
-        }
-        return false;
-    }
-    
-    export function sideEffect(func:Lambda, scope?):Lambda {
-        const observable = new _.ComputedObservable(func, scope);
-        const disposer = observable.observe(_.noop);
-        if (observable.dependencyState.observing.length === 0)
-            _.warn(`mobservable.sideEffect: not a single observable was used inside the side-effect function. Side-effect would be a no-op.`);
-        return disposer;
-    }
-
-    export function defineReactiveProperties(target:Object, properties:Object) {
-        _.makeReactiveObject(target, properties, true);
-    }
- 
-    /**
-     * Use this annotation to wrap properties of an object in an observable, for example:
-     * class OrderLine {
-     *   @observable amount = 3;
-     *   @observable price = 2;
-     *   @observable total() {
-     *      return this.amount * this.price;
-     *   }
-     * }
-     */
-    export function observable(target:Object, key:string, descriptor?) {
-        var baseValue = descriptor ? descriptor.value : null;
-        // observable annotations are invoked on the prototype, not on actual instances,
-        // so upon invocation, determine the 'this' instance, and define a property on the
-        // instance as well (that hides the propotype property)
-        if (typeof baseValue === "function") {
-            delete descriptor.value;
-            delete descriptor.writable;
-            descriptor.configurable = true;
-            descriptor.get = function() {
-                var observable = this.key = new _.ComputedObservable(baseValue, this).createGetterSetter();
-                return observable;
-            };
-            descriptor.set = function () {
-                console.trace();
-                throw new Error("It is not allowed to reassign observable functions");
-            };
-        } else {
-            Object.defineProperty(target, key, {
-                configurable: true, enumberable:true,
-                get: function() {
-                    _.makeReactiveObjectProperty(this, key, undefined, true);
-                    return this[key];
-                },
-                set: function(value) {
-                    _.makeReactiveObjectProperty(this, key, value, true);
-                }
-            });
-        }
-    }
-
-
-    /**
-     * Basically, a deep clone, so that no reactive property will exist anymore
-     */
-    export function toJson(source) {
-        if (!source)
-            return source;
-        if (Array.isArray(source) || source instanceof _.ObservableArray)
-            return source.map(toJson);
-        if (typeof source === "object") {
-            // TODO: only for plain objects, otherwise return reference?
-            var res = {};
-            for (var key in source) if (source.hasOwnProperty(key))
-                res[key] = toJson(source[key]);
-            return res;
-        }
-        return source;
-    }
-
-    export function transaction<T>(action:()=>T):T {
-        return _.Scheduler.batch(action);
-    }
-
-    /**
-        Evaluates func and return its results. Watch tracks all observables that are used by 'func'
-        and invokes 'onValidate' whenever func *should* update.
-        Returns  a tuplde [return value of func, disposer]. The disposer can be used to abort the watch early.
-    */
-    export function observeUntilInvalid<T>(func:()=>T, onInvalidate:Lambda):[T,Lambda] {
-        var watch = new _.WatchedExpression(func, onInvalidate);
-        return [watch.value, () => watch.dispose()];
-    }
-
-    /** Old api */
-
-    export var watch = _.wrapDeprecated("watch", observeUntilInvalid);
-    export var batch = _.wrapDeprecated("batch", transaction);
-
-    export function value<T>(value:T[]): Mobservable.IObservableArray<T>;
-    export function value<T>(value?:T|{():T}, scope?:Object): Mobservable.IObservableValue<T>;
-    export function value(value?, scope?:Object):any {
-        _.deprecated("value");
-        return makeReactive(value, { scope: scope });
-    }
-
-
-    export function reference(value?) {
-        _.deprecated("reference");
-        return makeReactive(value, { as: "reference" });
-    }
-    export var primitive = _.wrapDeprecated("primitive", reference);
-
-    export function computed<T>(func:()=>void, scope?) {
-        _.deprecated("computed");
-        return makeReactive(func, { scope: scope });
-    }
-
-    export function expr<T>(expr:()=>void, scope?) {
-        _.deprecated("expr");
-        if (_.DNode.trackingStack.length === 0)
-            throw new Error("mobservable.expr can only be used inside a computed observable. Probably mobservable.computed should be used instead of .expr");
-        return new _.ComputedObservable(expr, scope).get();
-    }
-
-    export function array<T>(values?:T[]): _.ObservableArray<T> {
-        _.deprecated("array");
-        return new _.ObservableArray(values, false);
-    }
-
-    export function props(target, properties?, initialValue?) {
-        _.deprecated("props");
-        switch(arguments.length) {
-            case 1: return _.makeReactiveObject(target, target, false);
-            case 2: return _.makeReactiveObject(target, properties, false);
-            case 3: return _.makeReactiveObject(target, { [properties]: initialValue }, false);
-        }
-        throw "Illegal invocation";
-    }
-
-    export function fromJson(source) {
-        _.deprecated("fromJson");
-        return makeReactive(source);
-    }
-
-    /**
-     * Inverse function of `props` and `array`, given an (observable) array, returns a plain,
-     * non observable version. (non recursive), or given an object with observable properties, returns a clone
-     * object with plain properties.
-     *
-     * Any other value will be returned as is.
-     */
-    export function toPlainValue(value:any):any {
-        _.deprecated("toPlainValue");
-        if (value) {
-            if (value instanceof Array)
-                return value.slice();
-            else if (value instanceof _.ObservableValue)
-                return value.get();
-            else if (typeof value === "function" && value.impl) {
-                if (value.impl instanceof _.ObservableValue)
-                    return value()
-                else if (value.impl instanceof _.ObservableArray)
-                    return value().slice();
-            }
-            else if (typeof value === "object") {
-                var res = {};
-                for (var key in value)
-                    res[key] = toPlainValue(value[key]);
-                return res;
-            }
-        }
-        return value;
-    }
-
-    /**
-        Can be used to observe observable properties that are created using the `observable` annotation,
-        `defineObservableProperty` or `initializeObservableProperties`.
-        (Since properties do not expose an .observe method themselves).
-    */
-    export function observeProperty(object:Object, key:string, listener:(...args:any[])=>void, invokeImmediately = false):Lambda {
-        _.deprecated("observeProperty");
-        if (!object)
-            throw new Error(`Cannot observe property of '${object}'`);
-        if (!(key in object))
-            throw new Error(`Object '${object}' has no property '${key}'.`);
-        if (!listener || typeof listener !== "function")
-            throw new Error("Third argument to mobservable.observeProperty should be a function");
-
-        // wrap with observable function
-        return sideEffect(() => {
-            listener(object[key]);
-        })
-        var observer = new _.ComputedObservable((() => object[key]), object);
-        var disposer = observer.observe(listener, invokeImmediately);
-
-        if ((<any>observer).dependencyState.observing.length === 0)
-            throw new Error(`mobservable.observeProperty: property '${key}' of '${object} doesn't seem to be observable. Did you define it as observable using @observable or mobservable.props? You might try to use the .observe() method instead.`);
-
-        return _.once(() => {
-            disposer();
-            (<any>observer).dependencyState.dispose(); // clean up
-        });
-    }
-
-    export var debugLevel = 0;
 }
