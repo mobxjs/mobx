@@ -16,7 +16,10 @@ The following types are distinguished:
 
 If `data` is a primitive value, _complex_ object or function, a _[reactive getter/setter](#reactive-getter-setter)_ will be returned.
 
-For plain objects, a plain object with reactive properties will be returned. View functions inside the object will become reactive properties of the object. Their `this` will be bound to the object.
+For plain objects, a plain object with reactive properties will be returned.
+View functions inside the object will become reactive properties of the object. Their `this` will be bound to the object.
+New values assigned to one of its properties will by default be made reactive as well.
+But new properties that are added to the object won't be reactive. To add reactive properties later, use `extendReactive`.
 
 For arrays an [reactive array](#reactive-array) will be returned.
 
@@ -61,13 +64,13 @@ This is especially useful inside constructor functions or to extend existing (po
 
 ### isReactive(value)
 
-Returns true if the given value was created or extended by mobservable.
+Returns true if the given value was created or extended by mobservable. Note that this function does not work on object properties themselves (which after all, would return their value to `isReactive`)
 
 ### asReference(value)
 
 See `makeReactive`, the given value will not be converted to a reactive structure if its added to another reactive structure. The reference to it will be observable nonetheless.
 
-### observable
+### @observable
 
 Decorator (or annotation) that can be used on ES6 or TypeScript properties to make them reactive.
 It can be used on functions as well for reactive derived data, but for consistency it is recommended to assign it to a getter in that case.
@@ -160,7 +163,7 @@ mobservable.transaction(function() {
 
 Converts a non-cyclic tree of observable objects into a JSON structure that is not observable. It is kind of the inverse of `mobservable.makeReactive`
 
-### reactiveComponent(component)
+### reactiveComponent(reactJsComponent)
 
 Turns a reactiveComponent into a reactive one. Supports both components that are contructed using `React.createClass` or using ES6 classes that extend `React.Component`.
 See `reactiveMixin`.

@@ -20,13 +20,15 @@ The goal of mobservable is simple:
 2. Write simple controllers and stores. Change data without thinking about how this should be reflected in views.
 3. Allow flexible model design, be able to use objects, arrays, classes, real references, and cyclic data structures in your app.
 4. Performance: find the absolute minimum amount of changes that are needed to update views.
-5. Views should be updated atomically and sychronously without showing stale or intermediate values.
+5. Views* should be updated atomically and sychronously without showing stale or intermediate values.
 
 Mobservable is born as part of an enterprise scale visual editor,
 which needs high performance rendering and covers over 400 different domain concepts.
 So the best performance and the simplest possible controller and view code are both of the utmost importance.
 See [this blog](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) for more details about that journey.
 Mobservable applies reactive programming behind the scenes and is inspired by MVVM frameworks like knockout and ember, yet less obtrusive to use.
+
+* 'Views' should be interpreted in the broadest sense: User interface, derived data, backend storage; anything that can be derived from your data in a pure manner is a view of the data. 
 
 ## The essentials
 
@@ -216,6 +218,24 @@ Either:
 * Dependency detection is based on actual values to real-time minify the amount of dependencies.
 * Cycles are detected automatically.
 * Exceptions during computations are propagated to consumers.
+
+## Top level api
+
+For the full api, see the [API documentation](https://github.com/mweststrate/mobservable/blob/master/docs/api.md).
+This is an overview of most important functions available in the `mobservable` namespace:
+
+**makeReactive(value, options?)**
+Turns a value into a reactive array, object, function, value or a reactive reference to a value.
+
+**reactiveComponent(reactJsComponent)**
+Turns a ReactJS component into a reactive one, that automatically re-renders if any reactive data that it uses is changed.
+
+**extendReactive(target, properties)**
+Extends an existing object with reactive properties.
+
+**sideEffect(function)**
+Similar to `makeReactive(function)`. Exception the created reactive function will not be lazy, so that it is executed even when it has no observers on its own.
+Useful to bridge reactive code to imperative code.
 
 ## FAQ
 
