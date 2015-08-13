@@ -16,10 +16,7 @@ The following types are distinguished:
 
 If `data` is a primitive value, _complex_ object or function, a _[reactive getter/setter](#reactive-getter-setter)_ will be returned.
 
-For plain objects, a plain object with reactive properties will be returned.
-View functions inside the object will become reactive properties of the object. Their `this` will be bound to the object.
-New values assigned to one of its properties will by default be made reactive as well.
-But new properties that are added to the object won't be reactive. To add reactive properties later, use `extendReactive`.
+For plain objects, a plain object with reactive properties will be returned. View functions inside the object will become reactive properties of the object. Their `this` will be bound to the object.
 
 For arrays an [reactive array](#reactive-array) will be returned.
 
@@ -64,13 +61,13 @@ This is especially useful inside constructor functions or to extend existing (po
 
 ### isReactive(value)
 
-Returns true if the given value was created or extended by mobservable. Note that this function does not work on object properties themselves (which after all, would return their value to `isReactive`)
+Returns true if the given value was created or extended by mobservable.
 
 ### asReference(value)
 
 See `makeReactive`, the given value will not be converted to a reactive structure if its added to another reactive structure. The reference to it will be observable nonetheless.
 
-### @observable
+### observable
 
 Decorator (or annotation) that can be used on ES6 or TypeScript properties to make them reactive.
 It can be used on functions as well for reactive derived data, but for consistency it is recommended to assign it to a getter in that case.
@@ -163,18 +160,22 @@ mobservable.transaction(function() {
 
 Converts a non-cyclic tree of observable objects into a JSON structure that is not observable. It is kind of the inverse of `mobservable.makeReactive`
 
-### reactiveComponent(reactJsComponent)
+### reactiveComponent(component)
 
-Turns a reactiveComponent into a reactive one. Supports both components that are contructed using `React.createClass` or using ES6 classes that extend `React.Component`.
-See `reactiveMixin`.
+Turns a React component into a reactive one.
+Making a component reactive means that it will automatically observe any reactive data it uses.
+Ut is quite similar to `@connect` as found in several flux libraries, yet there are two important differences.
+With `@reactiveComponent` you don't need to specify which store / data should be observed in order to re-render at the appropriate time.
+Secondly, reactive components provide far more fine grained update semantics: Reactive components won't be observing a complete store or data tree, but only that data that is actually used during the rendering of the component. This might be a complete list, but also a single object or even a single property.
+The consequence of this is that components won't re-render unless some data that is actually used in the rendering has changed. Large applications really benefit from this in terms of performance.
 
-### reactiveMixin
+Rule of thumb is to use `reactiveComponent` on every component in your application that is specific for your application. Its overhead is neglectable and it makes sure that whenever you start using reactive data the component will respond to it. One exception are general purposes components that are not specific for your app. As these probably don't depend on the actual state of your application. For that reason it doesn't make sense to add `reactiveComponent` to them (unless their own state is expressed using reactive data structures as well).
 
-The observer mixin can be used in ReactJS components.
-This mixin basically turns the `.render` function of the component into an observable function, and makes sure that the component itself becomes an observer of that function,  that the component is re-rendered each time an observable has changed.
-This mixin also prevents re-renderings when the *props* of the component have only shallowly changed.
-(This is similar to [React PureRender mixin](https://facebook.github.io/react/docs/pure-render-mixin.html), except that *state* changes are still always processed).
-This allows for React apps that perform well in apps with large amount of complex data, while avoiding the need to manage a lot of subscriptions.
+The `reactiveComponent` function / decorator supports both components that are constructed using `React.createClass` or using ES6 classes that extend `React.Component`. `reactiveComponent` is also available as mixin: `mobservable.reactiveMixin`.
+
+`reactiveComponent` also prevents re-renderings when the *props* of the component have only shallowly changed, which makes a lot of sense if the data passed into the component is reactive.
+This behavior is similar to [React PureRender mixin](https://facebook.github.io/react/docs/pure-render-mixin.html), except that *state* changes are still always processed.
+If a component provides its own `shouldComponentUpdate`, that one takes precedence.
 
 ## reactive array
 

@@ -18,7 +18,7 @@ The goal of mobservable is simple:
 
 1. Write simple views. Views should be subscription free.
 2. Write simple controllers and stores. Change data without thinking about how this should be reflected in views.
-3. Allow flexible model design, be able to use objects, arrays, classes, real references, and cyclic data structures in your app.
+3. Allow flexible model design, be able to use mutable objects, arrays, classes, real references, and cyclic data structures in your app.
 4. Performance: find the absolute minimum amount of changes that are needed to update views.
 5. Views* should be updated atomically and sychronously without showing stale or intermediate values.
 
@@ -28,7 +28,7 @@ So the best performance and the simplest possible controller and view code are b
 See [this blog](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) for more details about that journey.
 Mobservable applies reactive programming behind the scenes and is inspired by MVVM frameworks like knockout and ember, yet less obtrusive to use.
 
-* 'Views' should be interpreted in the broadest sense: User interface, derived data, backend storage; anything that can be derived from your data in a pure manner is a view of the data. 
+\* 'Views' should be interpreted in the broadest sense: User interface, derived data, backend storage; anything that can be derived from your data in a pure manner is a view of the data. 
 
 ## The essentials
 
