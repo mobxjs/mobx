@@ -11,23 +11,109 @@
 
   <title>mobservable</title>
   <style>
-      pre.prettyprint {
+      textarea {
           width: 600px;
-          border-color: #fff !important;
+          border-style: none;
+          white-space: pre;
+          overflow: auto;
+          padding: 20px;
+          box-shadow: #ccc 2px 2px 2px;
+          font-family: courier new;
+          color: #333;
+          font-size: 14px;
+          text-shadow: #fff 1px 1px;
+          margin-top: 10px;
       }
       #preview {
-          width: 400px;
+          position: fixed;
+          left: 60%;
+          right: 0px;
+          top: 0px;
+          height: 100%;
+          border-left: 4px solid #ff9955;
+          padding: 40px 20% 40px 20px;
+          background: #f2f2f2;
+      }
+      .outer {
+          width: 60%;
+          overflow: hidden;
       }
       .inner {
-          max-width: 1024px;
+          margin-right:20px;
       }
       #main_layout td, #main_layout {
           border-style: none;
+      }
+      code {
+            padding: 0;
+            margin: 0;
+            box-shadow: none;
+            color: #007edf;
+            font-family: courier new;
+            background: none;
+            font-weight: bold;
+      }
+      p, li {
+        font-size: 19px;
+        line-height: 1.3;
+        margin-bottom: 0;
+        font-family: "freight-text-pro",Georgia,Cambria,"Times New Roman",Times,serif;
+        letter-spacing: .01rem;
+        font-weight: 400;
+        font-style: normal;
+      }
+      #clear-btn {
+          font-size: 8pt;
+          border: 2px solid #ccc;
+          color: #333;
+          padding: 4px 10px;
+          float:right;
+          cursor: pointer;
+          margin-top: 18px;
+      }
+      .btn-run {
+          border: 2px solid #007edf;
+          background-color: #007edf;
+          color: white;
+          float:right;
+          margin: -6px -1px 10px;
+          padding: 4px 10px;
+          font-size: 18px;
+          cursor: pointer;
+      }
+      #reactjs-app {
+          margin-left: -20px;
+          border-bottom: 4px solid #ff9955;
+          padding: 20px;
+          width: 100%;
+      }
+      #consoleout div {
+          border-bottom: 1px solid #ccc;
+          padding: 4px 0;
+          font-family: courier new;
+          font-size: 10pt;
+      }
+      .demo {
+          color: #000;
+          transition-property: color;
+          transition-duration: 0.3s;
+          transition-timing-function: ease-out;
+      }
+      .demo-anim {
+          color: #007edf;
       }
   </style>
 </head>
 
 <body>
+
+    <div id="preview">
+        <h3>ReactJS preview</h3>
+        <div id="reactjs-app">ReactJS app</div>
+        <button onclick="clearConsole();" id="clear-btn">clear</button>
+        <h3>Console log</h3>
+        <div id="consoleout"></div>
+    </div>
 
   <!-- HEADER -->
   <div id="header_wrap" class="outer">
@@ -36,32 +122,26 @@
 
       <img src="images/mobservable.png" id="logo" />
       <h1 id="project_title">mobservable</h1>
-      <h2 id="project_tagline">Unobtrusive reactive library that keeps views automatically in sync with data.</h2>
+      <h2 id="project_tagline">Five minute introduction to mobservable</h2>
     </header>
   </div>
 
   <!-- MAIN CONTENT -->
   <div id="main_content_wrap" class="outer">
     <section id="main_content" class="inner">
-        <table id="main_layout">
-            <tr>
-                <td>
-                    <h1 id="getting-started">Getting started</h1>
+                    <h2 id="getting-started">Introduction</h1>
                     <p>Mobservable is a library to create reactive state and views.
-                    The advantage of reactive state and views is that it achieves <a href="https://en.wikipedia.org/wiki/Inversion_of_control">inversion of control</a> in your code.
-                    This has major benefits in terms of performance and maintainability of your code; views that are based on your state will be updated automatically.
-                    This means that whenever your state changes all views are updated automatically without you needing to do this programmatically:</p>
-                    <ul>
-                    <li>No code that refreshes views like: <code>redrawTodoList</code> or <code>recalculateOrderTotal</code>.</li>
-                    <li>No subscriptions, lenses or cursors to subscribe your views to your data.</li>
-                    <li>No <code>setState</code> to refresh your ReactJS components.</li>
-                    <li>No unnecessary updates because views <em>might</em> have become stale.</li>
-                    </ul>
-                    <h1 id="going-from-imperative-to-reactive-code">Going from imperative to reactive code</h1>
-                    <p>Instead reactive views automatically are notified by reactive data structures upon each change.
-                    Let&#39;s try this in a small example. Suppose you have the following simple data model
+                    The advantage of reactive state and views is that it achieves <a target="-_blank" href="https://en.wikipedia.org/wiki/Inversion_of_control"><code>inversion of control</code></a> in your code.
+                    This has major benefits in terms of simplicity, maintainability and performance of your code;
+                    anything that depends on the state of your application will be updated automatically whenever needed.
+                    This removes boilerplate code like refreshing interface parts, maintaining data subscriptions or defining cursors on the state.</p>
+                    <h2 id="going-from-imperative-to-reactive-code">Going from imperative to reactive</h2>
+                    <p>Sounds promising right? Let's start with a simple example to see how reactiveness might benefit us.
+                        All code blocks below are <code>editable</code> and can be run using the <code>run</code> button, in which case their result will be shown on the right.
+                        For originalities sake let's start with a simple todo model:
+                    </p>
 
-<pre class="prettyprint" id="code1">
+<textarea spellcheck="false" class="prettyprint" id="code1" rows="25">
 function TodoStore() {
     this.todos = [];
 }
@@ -80,111 +160,142 @@ TodoStore.prototype.completedTodosCount = function() {
 }
 
 TodoStore.prototype.report = function() {
-    var firstTodo = this.todos.length ? this.todos[0].task : "<none>";
-    console.log("First todo: '" + firstTodo + "'. Progress: " + this.completedTodosCount() + "/" + this.todos.length);
+    if (this.todos.length === 0)
+        return "<none>";
+    return "First todo: '" + this.todos[0].task
+        + "'. Progress: "
+        + this.completedTodosCount() + "/" + this.todos.length;
 }
 
 var todoStore = new TodoStore();
-</pre>
+</textarea>
 
-<p>We have just created a <code>todoStore</code> with a <code>todos</code> collection that can contain <code>Todo</code> objects.
-We now can start filling this todoStore with objects. But after each change we have to carefully invoke <code>todoStore.report</code>,
-because with each change the report might have changed! For example:</p>
+<p>We have just created a <code>todoStore</code> with a <code>todos</code> collection that can contain todo objects.
+Time to fill the <code>todoStore</code> with some objects.
+And to see the effect of our changes we carefully invoke <code>todoStore.report</code> after each change:
+</p>
 
-<pre class="prettyprint" id="code2">
+<textarea spellcheck="false" class="prettyprint" id="code2" rows="15">
 todoStore.addTodo("write getting started");
-todoStore.report(); // Prints: First todo: 'write getting started'. Progress: 0/1
+console.log(todoStore.report());
 
 todoStore.addTodo("present at meekup");
-todoStore.report(); // Prints: First todo: 'write getting started'. Progress: 0/2
+console.log(todoStore.report());
 
 todoStore.todos[0].completed = true;
-todoStore.report(); // Prints: First todo: 'write getting started'. Progress: 1/2
+console.log(todoStore.report());
 
 todoStore.todos[1].task = "present at meetup";
-todoStore.report(); // Superfluous message: First todo: 'write getting started'. Progress: 1/2
+console.log(todoStore.report());
 
 todoStore.todos[0].task = "finish getting started";
-todoStore.report(); // Prints: First todo: 'finish getting started'. Progress: 1/2
-</pre>
+console.log(todoStore.report());
+</textarea>
 <button onClick="runCode(['#code1', '#code2'])" class="btn-run">Run</button>
 
 
-<p>But what if we didn&#39;t have to call report explicitly?
-What if the data used by the <code>report</code> would make sure our report is updated?
-Then we would have achieved inversion of control. That is exactly what mobservable can do for you!</p>
-<p>This is what the <code>TodoStore</code> constructor function looks like when using mobservable:</p>
+<p>But what if we didn&#39;t have to call <code>report</code> explicitly?
+What if the data used by the report would make sure our report is printed automatically?
+Then we would have achieved inversion of control!
+That is exactly what mobservable can do for you. Execute code that solely depends on state automatically.</p>
+<p>To achieve that, our <code>TodoStore</code> has to be reactive. Let's alter the constructor function just enough to achieve that:</p>
 
 
-<pre class="prettyprint" id="code3">
-var mobservable = require('mobservable');
-
+<textarea spellcheck="false" class="prettyprint" id="code3" rows="8">
 function TodoStore() {
     this.todos = mobservable.makeReactive([]);
     mobservable.sideEffect(function() {
-        this.report();
+        console.log(this.report());
     }, this);
 }
 
-/** addTodo, completedTodosCount and report remain as is */
-</pre>
+/** addTodo, completedTodosCount and report remain untouched */
+
+
+TodoStore.prototype.addTodo = function(task) {
+    this.todos.push({
+        task: task,
+        completed: false
+    });
+}
+
+TodoStore.prototype.completedTodosCount = function() {
+    return this.todos.filter(function(todo) {
+        return todo.completed === true;
+    }).length;
+}
+
+TodoStore.prototype.report = function() {
+    if (this.todos.length === 0)
+        return "<none>";
+    return "First todo: '" + this.todos[0].task
+        + "'. Progress: "
+        + this.completedTodosCount() + "/" + this.todos.length;
+}
+
+var todoStore = new TodoStore();
+</textarea>
 
 <p>We just changed two things. First, we converted <code>todos</code> from a plain array into an reactive array.
-Secondly, we created a function that is invoked automatically whenever any data used by it has changed.
-Seems to be too simple to be true right? Let&#39;s try it:</p>
+Secondly, we created a function that prints our report and is invoked automatically whenever any data used by it has changed.
+Seems to be too simple to be true right? Let's try altering the data again, but without explicitly invoking the <code>report</code> function:</p>
 
-<pre class="prettyprint" id="code4">
-todoStore.addTodo("write getting started");         // Prints: First todo: 'write getting started'. Progress: 0/1
-todoStore.addTodo("present at meekup");             // Prints: First todo: 'write getting started'. Progress: 0/2
-todoStore.todos[0].completed = true;                // Prints: First todo: 'write getting started'. Progress: 1/2
-todoStore.todos[1].task = "present at meetup";      // (prints nothing)
-todoStore.todos[0].task = "finish getting started"; // Prints: First todo: 'finish getting started'. Progress: 1/2
-</pre>
+<textarea spellcheck="false" class="prettyprint" id="code4" rows="6">
+todoStore.addTodo("write getting started");
+todoStore.addTodo("present at meekup");
+todoStore.todos[0].completed = true;
+todoStore.todos[1].task = "present at meetup";
+todoStore.todos[0].task = "finish getting started";
+</textarea>
+<button onClick="runCode(['#code3', '#code4'])" class="btn-run">Run</button>
 
 <p>Pretty amazing right? <code>report</code> did not only update automatically, it also did this synchronously and without leaking intermediate values.
-It also only updated the report when data <em>actually</em> used in the report was changed.</p>
-<p>Next: build a cool user interface around this principle!</p>
+It also only updated the report when data <em>actually</em> used in the report was changed.
+If you investigate the log carefully, you will see that the fourth line didn't result in a new report being logged.
+Next question: can we build complex user interfaces around this principle?</p>
 <h2 id="reactive-reactjs-components">Reactive ReactJS components</h2>
 <p>ReactJS components are (despite their name) not reactive out of the box.
 They will not re-render automatically so usually you need either either to call <code>setState</code> or maintain some store/data subscriptions to update your components.</p>
-<p>Mobservable provides the <code>reactiveComponent</code> function / decorator that will turn the <code>render</code> method of any method into a reactive function.
+<p>Mobservable provides the <code>reactiveComponent</code> function / decorator that will turn the <code>render</code> method of any component into a reactive function.
 From there on, you never have to worry about when to update your component! Similar to what happened to the <code>report</code> function.
-This process is <a href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/">extremely efficient</a>, as Mobservable will determine the minimum amount of components that need an update.</p>
-<p>So a basic, self updating user interface using ReactJS can be achieved by writing just the following dump components:</p>
+This process is <a target="_blank" href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/">extremely efficient</a>, as Mobservable will determine the minimum amount of components that need an update.</p>
+<p>So a basic, self updating user interface using ReactJS can be achieved by writing just the following dumb components:</p>
 
-<pre class="" id="react1">
-var reactiveComponent = require('mobservable').reactiveComponent;
-var React = require('react');
-
-var TodoList = reactiveComponent(React.createClass({
+<textarea spellcheck="false" class="" id="react1" rows="44">
+var TodoList = mobservable.reactiveComponent(React.createClass({
     displayName: 'TodoList',
 
     render: function() {
         var store = this.props.store;
-        return (<div>
+        return (<div className='demo'>
+            { store.report() }
             <ul>
-                { store.todos.map(function(todo, idx)
-                    return (<TodoView store={ store } todo={ todo } key={ idx } />)
+                { store.todos.map(function(todo, idx) {
+                    return (<TodoView
+                        store={ store }
+                        todo={ todo }
+                        key={ idx }
+                    />)
                 }) }
             </ul>
-            { store.report() }
             <button onClick={ this.onNewTodo }>New Todo</button>
         </div>);
     },
 
     onNewTodo: function() {
-        this.props.store.addTodo(prompt('Enter a new todo:', 'Try mobservable at home!'));
+        this.props.store.addTodo(prompt('Enter a new todo:'));
     }
 }));
 
-var TodoView = reactiveComponent(React.createClass({
+var TodoView = mobservable.reactiveComponent(React.createClass({
     displayName: 'TodoView',
 
     render: function() {
         var todo = this.props.todo;
-        return (<li>
-            <input type='checkbox' checked={ todo.completed } onChange={ this.onToggleCompleted } />
-            {todo.title}
+        return (<li className='demo'>
+            <input type='checkbox' checked={ todo.completed }
+                onChange={ this.onToggleCompleted } />
+            {todo.task}
         </li>);
     },
 
@@ -193,11 +304,20 @@ var TodoView = reactiveComponent(React.createClass({
     }
 }));
 
-React.render(<TodoList store={todoStore} />, document.getElementById('approot'));
-</pre>
+React.render(<TodoList store={todoStore} />,
+    document.getElementById('reactjs-app'));
+</textarea>
+<button onClick="runCode(['#code3', '#code4', '#react1'])" class="btn-run">Run</button>
 
-<p><a href="listings/getting-started2.html">That&#39;s it</a>! Simple, stateless components that updates themselves in a smart way.
-You are now ready to start applying reactiveness to your own applications.</p>
+<p>That&#39;s it! Simple, stateless components that updates themselves in a smart way.
+You are now ready to start applying reactiveness to your own applications. Or just play some more by editing the components above or the following state changing statements:</p>
+<textarea spellcheck="false" class="" id="play1" rows="8">
+todoStore.todos[todoStore.todos.length] = { task: "Find a fine cheese", completed: true };
+todoStore.todos[0].completed = !todoStore.todos[0].completed;
+// etc etc.. type your own statements here:
+</textarea>
+<button onClick="runCode(['#play1'])" class="btn-run">Run</button>
+
 <h2 id="learn-more">Learn more</h2>
 <p>Some links</p>
 <h2 id="notes">Notes</h2>
@@ -205,16 +325,6 @@ You are now ready to start applying reactiveness to your own applications.</p>
 Best practice is to make any function that is defined in terms of the state reactive, so that mobservable can find the minimum amount of calculations needed to update the data. For example, if the name of the first todo was changed, the <code>completedTodosCount</code> function would not be evaluated during updating the <code>report</code>, because the name of the first todo could not have affected the outcome of <code>completedTodosCount</code>.</p>
 
  </div>
-
-    </td><td>
-      <div id="preview" style="width:400px">
-          <h3>ReactJS preview</h3>
-          <div id="approot">ReactJS app root</div>
-          <h3>Console log</h3>
-          <button onclick="$('#consoleout').text('')">clear</button>
-          <div id="consoleout"></div>
-      </div>
-  </td></tr></table>
     </section>
 
 </div>
@@ -230,6 +340,7 @@ Best practice is to make any function that is defined in terms of the state reac
         <script src="javascripts/jquery-2.1.4.min.js"></script>
         <script src="javascripts/react-with-addons.js"></script>
         <script src="javascripts/JSXTransformer.js"></script>
+        <script src="javascripts/mobservable.js"></script>
 
         <script type="text/javascript">
         var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
@@ -244,14 +355,17 @@ Best practice is to make any function that is defined in terms of the state reac
 
         <script>
             // Save the original source before pretty printer is fired
-            $(".prettyprint").each(function(i, elem) {
-                $(elem).data('source', $(elem).text());
-            });
             function runCode(ids) {
                 $(ids.join(",")).each(function(i, elem) {
-                    var code = $(elem).data('source');
+                    clearConsole();
+                    var code = $(elem).val();
                     var globalEval = eval; // global scope trick, See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval
-                    globalEval(transformReact(code));
+                    code = JSXTransformer.transform(code).code;
+                    try {
+                        globalEval(code);
+                    } catch (e) {
+                        console.error(e);
+                    }
                 });
             };
 
@@ -259,13 +373,16 @@ Best practice is to make any function that is defined in terms of the state reac
             var baseLog = console.log, baseError = console.error;
             console.log = function(arg) {
                 baseLog.apply(console, arguments);
-                $console.html($console.html() + escapeHtml(arg).replace('\n','<br/>\n') + "<br/>");
+                $console.html($console.html() + "<div>" + escapeHtml(arg).replace('\n','<br/>\n') + "</div>");
             };
             console.error = function(arg) {
                 baseError.apply(console, arguments);
-                $console.html($console.html() + "<span style='color:red'>" + escapeHtml(arg).replace(/\n/,'<br/>') + "</span><br/>\n");
+                $console.html($console.html() + "<div style='color:red'>" + escapeHtml(arg).replace(/\n/,'<br/>') + "</div>\n");
             };
 
+            function clearConsole() {
+                $('#consoleout').text('')
+            }
 
             var entityMap = {
                 "&": "&amp;",
@@ -282,14 +399,17 @@ Best practice is to make any function that is defined in terms of the state reac
                 });
             }
 
-            $(document).ready(function() {
-                var offset = $("#preview").offset();
-                $("#preview").css({
-                    position:"fixed",
-                    left: offset.left,
-                    top: offset.top
-                })
+            setInterval(function() {
+                $(".demo").addClass("demo-anim");
+            }, 500);
+
+            document.body.addEventListener("transitionend", function(e) {
+                $(e.target).removeClass('demo').removeClass('demo');
             });
+
+            //runCode(['#code3', '#code4', '#react1']);
+            //clearConsole();
+
         </script>
         <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
       </body>
