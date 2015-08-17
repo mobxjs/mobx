@@ -40,7 +40,7 @@ var timerData = {
 };
 
 setInterval(function() {
-  this.timerData.secondsPassed++;
+  timerData.secondsPassed++;
 }, 1000);
 
 var Timer = React.createClass({
@@ -78,8 +78,8 @@ var Timer = mobservable.reactiveComponent(React.createClass{
 Thats all folks! Its as simple as that. The `Timer` will now automatically update each time `timerData.secondsPassed` is altered.
 The actual interesting thing about these changes are the things that are *not* in the code:
 
-* The `setInterval` method didn't alter. It still threads `timerData` as a plain JS object.
-* There is no state. Timer is still a dump component.
+* The `setInterval` method didn't alter. It still treats `timerData` as a plain JS object.
+* There is no state. Timer is still a dumb component.
 * There is no magic context being passed through components.
 * There are no subscriptions of any kind that need to be managed.
 * There is no higher order component that needs configuration; no scopes, lenses or cursors.
@@ -95,7 +95,7 @@ It does not only work for plain objects, but also for arrays, functions, classes
 
 ## A Todo application
 
-The following simple todo application can be found up & running on https://mweststrate.github.io/mobservable. A full TodoMVC implementation can be found [here](https://github.com/mweststrate/todomvc/tree/master/examples/react-mobservable)
+The following simple todo application can be found up & running on https://mweststrate.github.io/mobservable. A full TodoMVC implementation can be found [here](https://github.com/mweststrate/todomvc/tree/master/examples/react-mobservable).
 Note how the array, function and primitive of `todoStore` will all become reactive. There are just three calls to `mobservable` and all the components are kept in sync with the `todoStore`.
 
 ```javascript
