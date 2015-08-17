@@ -21,7 +21,7 @@
 
       <img src="images/mobservable.png" id="logo" />
       <h1 id="project_title">mobservable</h1>
-      <h2 id="project_tagline">unobtrusive library to make data structures reactive and create seamlessly self-updating view functions</h2>
+      <h2 id="project_tagline">Unobtrusive reactive library that keeps views automatically in sync with data.</h2>
     </header>
   </div>
 
@@ -97,7 +97,7 @@
 
         <p>Use <em>mobservable.reactiveComponent</em> to create components that update themselves whenever reactive data they use changes.
           This process is highly efficient and only update that components that actually need a re-render.
-          Since components update automatically, most of them can be stateless. You don't even need to state which its data dependencies are!
+          Since components update automatically, most of them can be stateless. You don't even need to state which data dependencies it has!
         </p>
 
 <!-- Code block 2 -->
@@ -125,10 +125,6 @@
 
     <span class="pl-en">onNewTodo</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
         <span class="pl-v">this</span>.props.store.addTodo(<span class="pl-c1">prompt</span>(<span class="pl-s"><span class="pl-pds">'</span>Enter a new todo:<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>Try mobservable at home!<span class="pl-pds">'</span></span>));
-    },
-
-    <span class="pl-en">loadMore</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
-        <span class="pl-v">this</span>.props.store.loadTodosAsync();
     }
 }));
 

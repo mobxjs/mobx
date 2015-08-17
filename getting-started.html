@@ -11,7 +11,7 @@
 
   <title>mobservable</title>
   <style>
-      textarea {
+       textarea {
           width: 600px;
           border-style: none;
           white-space: pre;
@@ -20,9 +20,17 @@
           box-shadow: #ccc 2px 2px 2px;
           font-family: courier new;
           color: #333;
-          font-size: 14px;
+          font-size: 10pt;
           text-shadow: #fff 1px 1px;
           margin: 30px 0 20px;
+      }
+      body .CodeMirror {
+        height: auto;
+        font-size: 10pt;
+        box-shadow: #ccc 2px 2px 2px;
+        font-family: courier new;
+        margin-top: 30px;
+        margin-bottom: 30px;
       }
       #preview {
           position: fixed;
@@ -54,8 +62,8 @@
             font-weight: bold;
       }
       p, li {
-        font-size: 19px;
-        line-height: 1.3;
+        font-size: 14pt;
+        line-height: 1.5;
         margin-bottom: 0;
         font-family: "freight-text-pro",Georgia,Cambria,"Times New Roman",Times,serif;
         letter-spacing: .01rem;
@@ -80,7 +88,8 @@
           padding: 4px 10px;
           font-size: 18px;
           cursor: pointer;
-          top: -26px;
+          top: -29px;
+          left: 1px;
       }
       #reactjs-app {
           margin-left: -20px;
@@ -98,7 +107,7 @@
           position: relative;
           float: right;
           border-radius: 8px;
-          background: #ddd;
+          background-color: #dddddd;
           font-family: arial;
           font-size: 8pt;
           font-weight: bold;
@@ -108,21 +117,27 @@
           color: white;
           top: 2px;
       }
-      @keyframes blink {
-          0% { background : #ddd};
-          50% { background : #ff9955};
-          100% { background : #ddd};
+      @keyframes blink1 {
+          0% { background-color : #dddddd}
+          50% { background-color : #ff9955}
+          100% { background-color : #dddddd}
       }
       @keyframes blink2 {
-          0% { background : #ddd};
-          50% { background : #ff9955};
-          100% { background : #ddd};
+          0% { background-color : #dddddd}
+          50% { background-color : #ff9955}
+          100% { background-color : #dddddd}
       }
       .render-counter.odd {
-          animation: blink 1s ease-in-out;
+          animation: blink1 1s ease;
       }
       .render-counter.even {
-          animation: blink2 1s ease-in-out;
+          animation: blink2 1s ease;
+      }
+      pre {
+          box-shadow: none;
+      }
+      h3 {
+          margin-top: 30px;
       }
   </style>
 </head>
@@ -151,15 +166,18 @@
   <!-- MAIN CONTENT -->
   <div id="main_content_wrap" class="outer">
     <section id="main_content" class="inner">
-                    <h2 id="getting-started">Introduction</h1>
+                    <h3 id="getting-started">Introduction</h3>
                     <p>Mobservable is a library to create reactive state and views.
                         The advantage of reactive state and views is that it achieves <a target="-_blank" href="https://en.wikipedia.org/wiki/Inversion_of_control"><code>inversion of control</code></a> in your code.
                         This has major benefits for the simplicity, maintainability and performance of your code.
-                        Anything that depends on the state of your application will update automatically whenever needed. This removes boilerplate code from your app.
+                        Anything that depends on the state of your application will update automatically whenever needed.
+                        This removes boilerplate code from your app.
                         You can drop all the interface refreshes, state subscriptions and data cursors!
                     </p>
-                    <h2 id="going-from-imperative-to-reactive-code">Going from imperative to reactive</h2>
-                    <p>Sounds promising right? Let's start with a simple example to see how reactive programming might benefit us. Note: All code blocks below are editable, use the 'run' button to execute them. For originality's sake let's start with a simple ToDo model:
+                    <h3 id="going-from-imperative-to-reactive-code">Going from imperative to reactive</h3>
+                    <p>Sounds promising right? Let's start with a simple example to see how reactive programming might benefit us.
+                        All the code blocks below are editable, use the <em>run</em> button to execute them.
+                        For originality's sake let's start with a simple ToDo model:
                     </p>
 
 <textarea spellcheck="false" class="prettyprint" id="code1" rows="25">
@@ -215,7 +233,8 @@ console.log(todoStore.report());
 <button onClick="runCode(['#code1', '#code2'])" class="btn-run">Run</button>
 
 
-<p>But what if we didn't have to call <code>report</code> explicitly?
+<p>So far, there is nothing special about this code.
+But what if we didn't have to call <code>report</code> explicitly?
 What if the data used in the report would make sure our report prints automatically upon each change?
 Then we would have achieved inversion of control!
 That is exactly what mobservable can do for you.
@@ -224,64 +243,46 @@ To achieve that, the <code>TodoStore</code> has to become reactive.
 Let's alter the constructor function just enough to achieve that:</p>
 
 <textarea spellcheck="false" class="prettyprint" id="code3" rows="8">
-function TodoStore() {
+function ReactiveTodoStore() {
     this.todos = mobservable.makeReactive([]);
     mobservable.sideEffect(function() {
         console.log(this.report());
     }, this);
 }
 
-/** addTodo, completedTodosCount and report remain untouched */
+/** addTodo, completedTodosCount and report remain untouched,
+    let's just inherit them... */
+ReactiveTodoStore.prototype = new TodoStore();
 
-
-TodoStore.prototype.addTodo = function(task) {
-    this.todos.push({
-        task: task,
-        completed: false
-    });
-}
-
-TodoStore.prototype.completedTodosCount = function() {
-    return this.todos.filter(function(todo) {
-        return todo.completed === true;
-    }).length;
-}
-
-TodoStore.prototype.report = function() {
-    if (this.todos.length === 0)
-        return "<none>";
-    return "First todo: '" + this.todos[0].task
-        + "'. Progress: "
-        + this.completedTodosCount() + "/" + this.todos.length;
-}
-
-var todoStore = new TodoStore();
+var reactiveTodoStore = new ReactiveTodoStore();
 </textarea>
 
 <p>We just changed two things. First, we converted <code>todos</code> to a reactive array.
-Next, we register a function that prints the report as a <code>sideEffect</code> of changes in the <code>report</code>.
-As a result, our report will print itself wheenver needed.
+Next, a function that prints the report as a <code>sideEffect</code> of changes in the <code>report</code> was registered.
+As a result, our report will print itself whenever needed.
 Seems to be too simple to be true right? Let's try altering the data again,
 but this time without explicitly logging the <code>report</code>:</p>
 
 <textarea spellcheck="false" class="prettyprint" id="code4" rows="6">
-todoStore.addTodo("write getting started");
-todoStore.addTodo("present at meekup");
-todoStore.todos[0].completed = true;
-todoStore.todos[1].task = "present at meetup";
-todoStore.todos[0].task = "finish getting started";
+reactiveTodoStore.addTodo("write getting started");
+reactiveTodoStore.addTodo("present at meekup");
+reactiveTodoStore.todos[0].completed = true;
+reactiveTodoStore.todos[1].task = "present at meetup";
+reactiveTodoStore.todos[0].task = "finish getting started";
 </textarea>
-<button onClick="runCode(['#code3', '#code4'])" class="btn-run">Run</button>
+<button onClick="runCode(['#code1', '#code3', '#code4'])" class="btn-run">Run</button>
 
 <p>Fascinating isn't it? The <code>report</code> did print automatically, synchronously and without leaking intermediate values.
-If you investigate the log carefully, you will see that the fourth line didn't result in a new report being logged.
-Because the report did not actually <em>actually</em> change, although the backing data did.
-Now we have achieved this, we can also build complex user interfaces based on this principle.
-Efficiently updating user interfaces are just a small next step.</p>
+If you investigate the log carefully, you will see that the fourth line didn't result in a new log-line.
+Because the report did not <em>actually</em> change as a result of the rename, although the backing data did.
+</p>
+<p>Now that we can establish reactive relationships between <em>state</em> and <em>views</em>,
+    we can also build complex user interfaces that relate to their data automatically.
+</p>
 
-<h2 id="reactive-reactjs-components">Reactive ReactJS components</h2>
+<h3 id="reactive-reactjs-components">Reactive ReactJS components</h3>
 <p>ReactJS components are (despite their name) not reactive out of the box.
-They will not re-render automatically when they underlying data changes.
+They will not re-render automatically when their underlying data changes.
 So you need to either call <code>setState</code> or you need to maintain data subscriptions or cursors to update your components.</p>
 
 <p>That avoid such boilerplate, Mobservable provides the <code>reactiveComponent</code> function to make components reactive.
@@ -289,12 +290,11 @@ From there on, you never have to worry about when to update your component!  Jus
 Mobservable will determine the smallest amount of components that need an update.
 So reactive components render <a target="_blank" href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/">extremely efficient</a>.
 </p>
-<p>A basic, self updating user interface for our TodoStore is now just a matter of writing the following dumb, yet reactive, components:</p>
+<p>A basic, self updating user interface for our <code>ReactiveTodoStore</code> is now just a matter of writing the following dumb, yet reactive, components:</p>
 
 <textarea spellcheck="false" class="" id="react1" rows="44">
 function renderTodoApp() {
-    React.render(<TodoList store={todoStore} />,
-        document.getElementById('reactjs-app'));
+    React.render(<TodoList store={reactiveTodoStore} />, document.getElementById('reactjs-app'));
 }
 
 var TodoList = mobservable.reactiveComponent(React.createClass({
@@ -306,11 +306,7 @@ var TodoList = mobservable.reactiveComponent(React.createClass({
             { store.report() }
             <ul>
                 { store.todos.map(function(todo, idx) {
-                    return (<TodoView
-                        store={ store }
-                        todo={ todo }
-                        key={ idx }
-                    />)
+                    return (<TodoView todo={ todo } key={ idx } />)
                 }) }
             </ul>
             <button onClick={ this.onNewTodo }>New Todo</button>
@@ -339,21 +335,12 @@ var TodoView = mobservable.reactiveComponent(React.createClass({
     }
 }));
 
-// For demo purposes only, widget to show how many times a component was rendered
-var RenderCounter = React.createClass({
-    _rendering: 0,
-    render: function() {
-        this._rendering++;
-        return (<div
-            className={ "render-counter " + (this._rendering % 2 ? 'odd' : 'even') }>
-            { this._rendering }
-        </div>);
-    }
-});
+/* For demo purposes only, component to track the amount of renderings */
+var RenderCounter=React.createClass({_cnt:0,render:function(){this._cnt++;return(<div className={"render-counter "+(this._cnt%2?'odd':'even')}>{this._cnt}</div>);}});
 
 renderTodoApp();
 </textarea>
-<button onClick="runCode(['#code3', '#code4', '#react1'])" class="btn-run">Run</button>
+<button onClick="runCode(['#code1', '#code3', '#code4', '#react1'])" class="btn-run">Run</button>
 
 <p>That's it! No boilerplate! Just some simple, declarative components that form our complete UI.
     You are now ready to start applying reactiveness to your own applications.
@@ -362,17 +349,26 @@ renderTodoApp();
     Note how the counters on the right show how many times each part of the UI is re-rendered.
 </p>
 <textarea spellcheck="false" class="" id="play1" rows="8">
-todoStore.todos[todoStore.todos.length] = { task: "Find a fine cheese", completed: true };
-todoStore.todos[0].completed = !todoStore.todos[0].completed;
+reactiveTodoStore.todos[reactiveTodoStore.todos.length] = { task: "Find a fine cheese", completed: true };
+reactiveTodoStore.todos[0].completed = !reactiveTodoStore.todos[0].completed
+reactiveTodoStore.todos[1].task = "Random todo " + Math.random();
 // etc etc.. type your own statements here:
 </textarea>
-<button onClick="runCode(['#play1'])" class="btn-run">Run</button>
+<button onClick="if (typeof reactiveTodoStore === 'undefined') { runCode(['#code1', '#code3', '#code4', '#react1']) } runCode(['#play1'])" class="btn-run">Run</button>
 
-<h2 id="learn-more">Learn more</h2>
-<p>Some links</p>
-<h2 id="notes">Notes</h2>
-<p>For the simplicity of getting started we didn&#39;t make the functions <code>report</code> and <code>completedTodosCount</code> of the <code>TodoStore</code> reactive themselves.
-Best practice is to make any function that is defined in terms of the state reactive, so that mobservable can find the minimum amount of calculations needed to update the data. For example, if the name of the first todo was changed, the <code>completedTodosCount</code> function would not be evaluated during updating the <code>report</code>, because the name of the first todo could not have affected the outcome of <code>completedTodosCount</code>.</p>
+<h3 id="learn-more">Learn more</32>
+<p>Intrigued? Here are some useful resources:</p>
+<ul>
+    <li>Join the #mobservable discussion on the reactiflux <a href="https://reactiflux.slack.com/messages/mobservable/" target="_blank">slack channel</a>
+    <li>The <a href="https://github.com/mweststrate/mobservable" target="_blank">git repository</a>.</li>
+    <li>A <a href="https://github.com/mweststrate/react-mobservable-boilerplate" target="_blank">ReactJS mobservable boilerplate</a></li>
+    <li>The original <a href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/" target="_blank">blog post</a> introducing reactive react</li>
+    <li>A full CRUD webshop on <a href="https://jsfiddle.net/mweststrate/46vL0phw" target="_blank">JSFiddle</a></li>
+</ul>
+<div style="text-align:center;">
+  <a class="github-button" href="https://github.com/mweststrate/mobservable" data-icon="octicon-star" data-style="small" data-count-href="/mweststrate/mobservable/stargazers" data-count-api="/repos/mweststrate/mobservable#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star mweststrate/mobservable on GitHub">Star</a>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-via="mweststrate" data-hashtags="mobservable">Tweet</a>
+</div>
 
  </div>
     </section>
@@ -388,6 +384,10 @@ Best practice is to make any function that is defined in terms of the state reac
         </div>
 
         <script src="javascripts/jquery-2.1.4.min.js"></script>
+        <script src="javascripts/codemirror/lib/codemirror.js"></script>
+        <link rel="stylesheet" href="javascripts/codemirror/lib/codemirror.css">
+        <link rel="stylesheet" href="javascripts/codemirror/theme/xq-light.css">
+        <script src="javascripts/codemirror/javascript/javascript.js"></script>
         <script src="javascripts/react-with-addons.js"></script>
         <script src="javascripts/JSXTransformer.js"></script>
         <script src="javascripts/mobservable.js"></script>
@@ -402,6 +402,8 @@ Best practice is to make any function that is defined in terms of the state reac
           pageTracker._trackPageview();
         } catch(err) {}
         </script>
+        <script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
+        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
 
         <script>
             // Save the original source before pretty printer is fired
@@ -449,10 +451,18 @@ Best practice is to make any function that is defined in terms of the state reac
                 });
             }
 
+            $(function() {
+                $("textarea").each(function(i, t) {
+                     CodeMirror.fromTextArea(t, {
+                         lineNumbers: true,
+                         mode: "javascript",
+                         theme: 'xq-light'
+                     });
+                });
+            });
             //runCode(['#code3', '#code4', '#react1']);
             //clearConsole();
 
         </script>
-        <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
       </body>
       </html>
