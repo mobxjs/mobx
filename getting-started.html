@@ -91,6 +91,10 @@
           top: -29px;
           left: 1px;
       }
+      .btn-run:hover {
+          background-color: #ff9955;
+          border-color: #ff9955;
+      }
       #reactjs-app {
           margin-left: -20px;
           border-bottom: 4px solid #ddd;
@@ -146,7 +150,7 @@
 
     <div id="preview">
         <h3>ReactJS preview</h3>
-        <div id="reactjs-app">ReactJS app</div>
+        <div id="reactjs-app">Use the <em>run</em> buttons to run one of the listings..</div>
         <button onclick="clearConsole();" id="clear-btn">clear</button>
         <h3>Console log</h3>
         <div id="consoleout"></div>
@@ -159,7 +163,7 @@
 
       <img src="images/mobservable.png" id="logo" />
       <h1 id="project_title">mobservable</h1>
-      <h2 id="project_tagline">Five minute introduction to mobservable</h2>
+      <h2 id="project_tagline">Five minute introduction to Mobservable + ReactJS</h2>
     </header>
   </div>
 
@@ -167,12 +171,20 @@
   <div id="main_content_wrap" class="outer">
     <section id="main_content" class="inner">
                     <h3 id="getting-started">Introduction</h3>
-                    <p>Mobservable is a library to create reactive state and views.
+                    <p><code>Mobservable</code> is a library to create reactive state and views.
                         The advantage of reactive state and views is that it achieves <a target="-_blank" href="https://en.wikipedia.org/wiki/Inversion_of_control"><code>inversion of control</code></a> in your code.
-                        This has major benefits for the simplicity, maintainability and performance of your code.
                         Anything that depends on the state of your application will update automatically whenever needed.
-                        This removes boilerplate code from your app.
-                        You can drop all the interface refreshes, state subscriptions and data cursors!
+                        This has major benefits for the simplicity, maintainability and performance of your code.
+                        This is <em>the promise of Mobservable</em>:
+                        <!--This removes boilerplate code from your app.
+                        You can drop all the interface refreshes, state subscriptions and data cursors!-->
+                        <p/>
+                        <ul>
+                        <li>Write complex applications which unmatched simple code.</li>
+                        <li>Unobtrusive state management: be free to use mutable objects, cyclic references, classes, real references...</li>
+                        <li>Write declarative views that determine their own dependencies. No subscriptions, cursors or other redundant declarations to manage.</li>
+                        <li>Build high performing ReactJS applications without Flux or Immutable data structures.</li>
+                        </ul>
                     </p>
                     <h3 id="going-from-imperative-to-reactive-code">Going from imperative to reactive</h3>
                     <p>Sounds promising right? Let's start with a simple example to see how reactive programming might benefit us.
@@ -230,7 +242,7 @@ console.log(todoStore.report());
 todoStore.todos[0].task = "finish getting started";
 console.log(todoStore.report());
 </textarea>
-<button onClick="runCode(['#code1', '#code2'])" class="btn-run">Run</button>
+<button onClick="runCode(['#code1', '#code2'])" class="btn-run">Run code</button>
 
 
 <p>So far, there is nothing special about this code.
@@ -270,7 +282,7 @@ reactiveTodoStore.todos[0].completed = true;
 reactiveTodoStore.todos[1].task = "present at meetup";
 reactiveTodoStore.todos[0].task = "finish getting started";
 </textarea>
-<button onClick="runCode(['#code1', '#code3', '#code4'])" class="btn-run">Run</button>
+<button onClick="runCode(['#code1', '#code3', '#code4'])" class="btn-run">Run code</button>
 
 <p>Fascinating isn't it? The <code>report</code> did print automatically, synchronously and without leaking intermediate values.
 If you investigate the log carefully, you will see that the fourth line didn't result in a new log-line.
@@ -340,13 +352,13 @@ var RenderCounter=React.createClass({_cnt:0,render:function(){this._cnt++;return
 
 renderTodoApp();
 </textarea>
-<button onClick="runCode(['#code1', '#code3', '#code4', '#react1'])" class="btn-run">Run</button>
+<button onClick="runCode(['#code1', '#code3', '#code4', '#react1'])" class="btn-run">Run code</button>
 
 <p>That's it! No boilerplate! Just some simple, declarative components that form our complete UI.
-    You are now ready to start applying reactiveness to your own applications.
+    You are now ready to start using <code>mobservable</code> in your own applications.
     Feel free to fiddle around by adjusting the  above components.
     Or alter the data using the listing below.
-    Note how the counters on the right show how many times each part of the UI is re-rendered.
+    The counters on the right show how many times each part of the UI is re-rendered.
 </p>
 <textarea spellcheck="false" class="" id="play1" rows="8">
 reactiveTodoStore.todos[reactiveTodoStore.todos.length] = { task: "Find a fine cheese", completed: true };
@@ -354,7 +366,14 @@ reactiveTodoStore.todos[0].completed = !reactiveTodoStore.todos[0].completed
 reactiveTodoStore.todos[1].task = "Random todo " + Math.random();
 // etc etc.. type your own statements here:
 </textarea>
-<button onClick="if (typeof reactiveTodoStore === 'undefined') { runCode(['#code1', '#code3', '#code4', '#react1']) } runCode(['#play1'])" class="btn-run">Run</button>
+<button onClick="if (typeof reactiveTodoStore === 'undefined') { runCode(['#code1', '#code3', '#code4', '#react1']) } runCode(['#play1'])" class="btn-run">Run code</button>
+
+<h3 id="quotes">What others are saying...</h3>
+<ul>
+    <p><em>&ldquo;Great job with mobservable! Really gives current conventions and libraries a run for their money.&rdquo;</em></p>
+    <p><em>&ldquo;I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated.&rdquo;</em></p>
+    <p><em>&ldquo;We ported to mobservable (...). Compared to the original I was definitely positively surprised.&rdquo;</em></p>
+</ul>
 
 <h3 id="learn-more">Learn more</32>
 <p>Intrigued? Here are some useful resources:</p>
