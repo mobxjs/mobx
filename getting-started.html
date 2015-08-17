@@ -84,7 +84,7 @@
       }
       #reactjs-app {
           margin-left: -20px;
-          border-bottom: 4px solid #ff9955;
+          border-bottom: 4px solid #ddd;
           padding: 20px;
           width: 100%;
       }
@@ -153,14 +153,13 @@
     <section id="main_content" class="inner">
                     <h2 id="getting-started">Introduction</h1>
                     <p>Mobservable is a library to create reactive state and views.
-                    The advantage of reactive state and views is that it achieves <a target="-_blank" href="https://en.wikipedia.org/wiki/Inversion_of_control"><code>inversion of control</code></a> in your code.
-                    This has major benefits in terms of simplicity, maintainability and performance of your code;
-                    anything that depends on the state of your application will be updated automatically whenever needed.
-                    This removes boilerplate code like refreshing interface parts, maintaining data subscriptions or defining cursors on the state.</p>
+                        The advantage of reactive state and views is that it achieves <a target="-_blank" href="https://en.wikipedia.org/wiki/Inversion_of_control"><code>inversion of control</code></a> in your code.
+                        This has major benefits for the simplicity, maintainability and performance of your code.
+                        Anything that depends on the state of your application will update automatically whenever needed. This removes boilerplate code from your app.
+                        You can drop all the interface refreshes, state subscriptions and data cursors!
+                    </p>
                     <h2 id="going-from-imperative-to-reactive-code">Going from imperative to reactive</h2>
-                    <p>Sounds promising right? Let's start with a simple example to see how reactiveness might benefit us.
-                        All code blocks below are <code>editable</code> and can be run using the <code>run</code> button, in which case their result will be shown on the right.
-                        For originalities sake let's start with a simple todo model:
+                    <p>Sounds promising right? Let's start with a simple example to see how reactive programming might benefit us. Note: All code blocks below are editable, use the 'run' button to execute them. For originality's sake let's start with a simple ToDo model:
                     </p>
 
 <textarea spellcheck="false" class="prettyprint" id="code1" rows="25">
@@ -194,7 +193,7 @@ var todoStore = new TodoStore();
 
 <p>We have just created a <code>todoStore</code> with a <code>todos</code> collection that can contain todo objects.
 Time to fill the <code>todoStore</code> with some objects.
-And to see the effect of our changes we carefully invoke <code>todoStore.report</code> after each change:
+To make sure we see effects of our changes we invoke <code>todoStore.report</code> after each change and log it:
 </p>
 
 <textarea spellcheck="false" class="prettyprint" id="code2" rows="15">
@@ -216,12 +215,13 @@ console.log(todoStore.report());
 <button onClick="runCode(['#code1', '#code2'])" class="btn-run">Run</button>
 
 
-<p>But what if we didn&#39;t have to call <code>report</code> explicitly?
-What if the data used by the report would make sure our report is printed automatically?
+<p>But what if we didn't have to call <code>report</code> explicitly?
+What if the data used in the report would make sure our report prints automatically upon each change?
 Then we would have achieved inversion of control!
-That is exactly what mobservable can do for you. Execute code that solely depends on state automatically.</p>
-<p>To achieve that, our <code>TodoStore</code> has to be reactive. Let's alter the constructor function just enough to achieve that:</p>
-
+That is exactly what mobservable can do for you.
+Automatically execute code that solely depends on state.
+To achieve that, the <code>TodoStore</code> has to become reactive.
+Let's alter the constructor function just enough to achieve that:</p>
 
 <textarea spellcheck="false" class="prettyprint" id="code3" rows="8">
 function TodoStore() {
@@ -258,9 +258,11 @@ TodoStore.prototype.report = function() {
 var todoStore = new TodoStore();
 </textarea>
 
-<p>We just changed two things. First, we converted <code>todos</code> from a plain array into an reactive array.
-Secondly, we created a function that prints our report and is invoked automatically whenever any data used by it has changed.
-Seems to be too simple to be true right? Let's try altering the data again, but without explicitly invoking the <code>report</code> function:</p>
+<p>We just changed two things. First, we converted <code>todos</code> to a reactive array.
+Next, we register a function that prints the report as a <code>sideEffect</code> of changes in the <code>report</code>.
+As a result, our report will print itself wheenver needed.
+Seems to be too simple to be true right? Let's try altering the data again,
+but this time without explicitly logging the <code>report</code>:</p>
 
 <textarea spellcheck="false" class="prettyprint" id="code4" rows="6">
 todoStore.addTodo("write getting started");
@@ -271,19 +273,30 @@ todoStore.todos[0].task = "finish getting started";
 </textarea>
 <button onClick="runCode(['#code3', '#code4'])" class="btn-run">Run</button>
 
-<p>Pretty amazing right? <code>report</code> did not only update automatically, it also did this synchronously and without leaking intermediate values.
-It also only updated the report when data <em>actually</em> used in the report was changed.
+<p>Fascinating isn't it? The <code>report</code> did print automatically, synchronously and without leaking intermediate values.
 If you investigate the log carefully, you will see that the fourth line didn't result in a new report being logged.
-Next question: can we build complex user interfaces around this principle?</p>
+Because the report did not actually <em>actually</em> change, although the backing data did.
+Now we have achieved this, we can also build complex user interfaces based on this principle.
+Efficiently updating user interfaces are just a small next step.</p>
+
 <h2 id="reactive-reactjs-components">Reactive ReactJS components</h2>
 <p>ReactJS components are (despite their name) not reactive out of the box.
-They will not re-render automatically so usually you need either either to call <code>setState</code> or maintain some store/data subscriptions to update your components.</p>
-<p>Mobservable provides the <code>reactiveComponent</code> function / decorator that will turn the <code>render</code> method of any component into a reactive function.
-From there on, you never have to worry about when to update your component! Similar to what happened to the <code>report</code> function.
-This process is <a target="_blank" href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/">extremely efficient</a>, as Mobservable will determine the minimum amount of components that need an update.</p>
-<p>So a basic, self updating user interface using ReactJS can be achieved by writing just the following dumb components:</p>
+They will not re-render automatically when they underlying data changes.
+So you need to either call <code>setState</code> or you need to maintain data subscriptions or cursors to update your components.</p>
+
+<p>That avoid such boilerplate, Mobservable provides the <code>reactiveComponent</code> function to make components reactive.
+From there on, you never have to worry about when to update your component!  Just like what we did with the <code>report</code> function.
+Mobservable will determine the smallest amount of components that need an update.
+So reactive components render <a target="_blank" href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/">extremely efficient</a>.
+</p>
+<p>A basic, self updating user interface for our TodoStore is now just a matter of writing the following dumb, yet reactive, components:</p>
 
 <textarea spellcheck="false" class="" id="react1" rows="44">
+function renderTodoApp() {
+    React.render(<TodoList store={todoStore} />,
+        document.getElementById('reactjs-app'));
+}
+
 var TodoList = mobservable.reactiveComponent(React.createClass({
     displayName: 'TodoList',
 
@@ -338,14 +351,16 @@ var RenderCounter = React.createClass({
     }
 });
 
-React.render(<TodoList store={todoStore} />,
-    document.getElementById('reactjs-app'));
-
+renderTodoApp();
 </textarea>
 <button onClick="runCode(['#code3', '#code4', '#react1'])" class="btn-run">Run</button>
 
-<p>That&#39;s it! Simple, stateless components that updates themselves in a smart way.
-You are now ready to start applying reactiveness to your own applications. Or just play some more by editing the components above or the following state changing statements:</p>
+<p>That's it! No boilerplate! Just some simple, declarative components that form our complete UI.
+    You are now ready to start applying reactiveness to your own applications.
+    Feel free to fiddle around by adjusting the  above components.
+    Or alter the data using the listing below.
+    Note how the counters on the right show how many times each part of the UI is re-rendered.
+</p>
 <textarea spellcheck="false" class="" id="play1" rows="8">
 todoStore.todos[todoStore.todos.length] = { task: "Find a fine cheese", completed: true };
 todoStore.todos[0].completed = !todoStore.todos[0].completed;
