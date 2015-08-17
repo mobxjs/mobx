@@ -22,7 +22,7 @@
           color: #333;
           font-size: 14px;
           text-shadow: #fff 1px 1px;
-          margin-top: 10px;
+          margin: 30px 0 20px;
       }
       #preview {
           position: fixed;
@@ -30,7 +30,7 @@
           right: 0px;
           top: 0px;
           height: 100%;
-          border-left: 4px solid #ff9955;
+          border-left: 4px solid #ddd;
           padding: 40px 20% 40px 20px;
           background: #f2f2f2;
       }
@@ -75,11 +75,12 @@
           border: 2px solid #007edf;
           background-color: #007edf;
           color: white;
-          float:right;
-          margin: -6px -1px 10px;
+          float: right;
+          position: relative;
           padding: 4px 10px;
           font-size: 18px;
           cursor: pointer;
+          top: -26px;
       }
       #reactjs-app {
           margin-left: -20px;
@@ -93,14 +94,35 @@
           font-family: courier new;
           font-size: 10pt;
       }
-      .demo {
-          color: #000;
-          transition-property: color;
-          transition-duration: 0.3s;
-          transition-timing-function: ease-out;
+      .render-counter {
+          position: relative;
+          float: right;
+          border-radius: 8px;
+          background: #ddd;
+          font-family: arial;
+          font-size: 8pt;
+          font-weight: bold;
+          text-align: center;
+          display: inline-block;
+          padding: 1px 5px;
+          color: white;
+          top: 2px;
       }
-      .demo-anim {
-          color: #007edf;
+      @keyframes blink {
+          0% { background : #ddd};
+          50% { background : #ff9955};
+          100% { background : #ddd};
+      }
+      @keyframes blink2 {
+          0% { background : #ddd};
+          50% { background : #ff9955};
+          100% { background : #ddd};
+      }
+      .render-counter.odd {
+          animation: blink 1s ease-in-out;
+      }
+      .render-counter.even {
+          animation: blink2 1s ease-in-out;
       }
   </style>
 </head>
@@ -267,7 +289,7 @@ var TodoList = mobservable.reactiveComponent(React.createClass({
 
     render: function() {
         var store = this.props.store;
-        return (<div className='demo'>
+        return (<div><RenderCounter />
             { store.report() }
             <ul>
                 { store.todos.map(function(todo, idx) {
@@ -292,7 +314,7 @@ var TodoView = mobservable.reactiveComponent(React.createClass({
 
     render: function() {
         var todo = this.props.todo;
-        return (<li className='demo'>
+        return (<li><RenderCounter />
             <input type='checkbox' checked={ todo.completed }
                 onChange={ this.onToggleCompleted } />
             {todo.task}
@@ -304,8 +326,21 @@ var TodoView = mobservable.reactiveComponent(React.createClass({
     }
 }));
 
+// For demo purposes only, widget to show how many times a component was rendered
+var RenderCounter = React.createClass({
+    _rendering: 0,
+    render: function() {
+        this._rendering++;
+        return (<div
+            className={ "render-counter " + (this._rendering % 2 ? 'odd' : 'even') }>
+            { this._rendering }
+        </div>);
+    }
+});
+
 React.render(<TodoList store={todoStore} />,
     document.getElementById('reactjs-app'));
+
 </textarea>
 <button onClick="runCode(['#code3', '#code4', '#react1'])" class="btn-run">Run</button>
 
@@ -398,14 +433,6 @@ Best practice is to make any function that is defined in terms of the state reac
                     return entityMap[s];
                 });
             }
-
-            setInterval(function() {
-                $(".demo").addClass("demo-anim");
-            }, 500);
-
-            document.body.addEventListener("transitionend", function(e) {
-                $(e.target).removeClass('demo').removeClass('demo');
-            });
 
             //runCode(['#code3', '#code4', '#react1']);
             //clearConsole();
