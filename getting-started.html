@@ -38,26 +38,23 @@
           right: 0px;
           top: 0px;
           height: 100%;
+          padding: 40px 20% 40px 40px;
+          background: #ddd;
           border-left: 4px solid #ddd;
-          padding: 40px 20% 40px 20px;
-          background: #f2f2f2;
-          background: url(images/dust.png);
       }
       #header_wrap {
-          background: #4c4c4c; /* Old browsers */
-background: -moz-linear-gradient(-45deg, #4c4c4c 0%, #4c4c4c 25%, #2c2c2c 50%, #000000 100%, #131313 100%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,#4c4c4c), color-stop(25%,#4c4c4c), color-stop(50%,#2c2c2c), color-stop(100%,#000000), color-stop(100%,#131313)); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(-45deg, #4c4c4c 0%,#4c4c4c 25%,#2c2c2c 50%,#000000 100%,#131313 100%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(-45deg, #4c4c4c 0%,#4c4c4c 25%,#2c2c2c 50%,#000000 100%,#131313 100%); /* Opera 11.10+ */
-background: -ms-linear-gradient(-45deg, #4c4c4c 0%,#4c4c4c 25%,#2c2c2c 50%,#000000 100%,#131313 100%); /* IE10+ */
-background: linear-gradient(135deg, #4c4c4c 0%,#4c4c4c 25%,#2c2c2c 50%,#000000 100%,#131313 100%); /* W3C */
+        background: #f2f2f2;
+      }
+      #project_title, #project_tagline {
+          color: #333;
+          text-shadow: #fff 0px 0px 10px
       }
       .outer {
           width: 60%;
           overflow: hidden;
       }
       .inner {
-          margin-right:20px;
+          margin-right:40px;
       }
       #main_layout td, #main_layout {
           border-style: none;
@@ -87,11 +84,11 @@ background: linear-gradient(135deg, #4c4c4c 0%,#4c4c4c 25%,#2c2c2c 50%,#000000 1
           padding: 4px 10px;
           float:right;
           cursor: pointer;
-          margin-top: 18px;
       }
       .btn-run {
           border: 2px solid #007edf;
           background-color: #007edf;
+          margin-left: 8px;
           color: white;
           float: right;
           position: relative;
@@ -100,6 +97,8 @@ background: linear-gradient(135deg, #4c4c4c 0%,#4c4c4c 25%,#2c2c2c 50%,#000000 1
           cursor: pointer;
           top: -29px;
           left: 1px;
+          box-shadow: #ccc 2px 2px 2px;
+
       }
       .btn-run:hover {
           background-color: #ff9955;
@@ -107,7 +106,6 @@ background: linear-gradient(135deg, #4c4c4c 0%,#4c4c4c 25%,#2c2c2c 50%,#000000 1
       }
       #reactjs-app {
           margin-left: -20px;
-          border-bottom: 4px solid #ddd;
           padding: 20px;
           width: 100%;
       }
@@ -121,7 +119,7 @@ background: linear-gradient(135deg, #4c4c4c 0%,#4c4c4c 25%,#2c2c2c 50%,#000000 1
           position: relative;
           float: right;
           border-radius: 8px;
-          background-color: #dddddd;
+          background-color: #bbb;
           font-family: arial;
           font-size: 8pt;
           font-weight: bold;
@@ -132,14 +130,14 @@ background: linear-gradient(135deg, #4c4c4c 0%,#4c4c4c 25%,#2c2c2c 50%,#000000 1
           top: 2px;
       }
       @keyframes blink1 {
-          0% { background-color : #dddddd}
+          0% { background-color : #bbb}
           50% { background-color : #ff9955}
-          100% { background-color : #dddddd}
+          100% { background-color : #bbb}
       }
       @keyframes blink2 {
-          0% { background-color : #dddddd}
+          0% { background-color : #bbb}
           50% { background-color : #ff9955}
-          100% { background-color : #dddddd}
+          100% { background-color : #bbb}
       }
       .render-counter.odd {
           animation: blink1 1s ease;
@@ -153,27 +151,35 @@ background: linear-gradient(135deg, #4c4c4c 0%,#4c4c4c 25%,#2c2c2c 50%,#000000 1
       h3 {
           margin-top: 30px;
       }
+      small {
+          color: #aaa;
+          font-size: 10pt;
+          font-style: italic;
+      }
   </style>
 </head>
 
 <body>
 
     <div id="preview">
+        <a id="forkme_banner" href="https://github.com/mweststrate/mobservable">View on GitHub</a>
         <h3>React preview</h3>
-        <div id="reactjs-app">Use the <em>run</em> buttons to run one of the listings..</div>
-        <button onclick="clearConsole();" id="clear-btn">clear</button>
-        <h3>Console log</h3>
+        <div id="reactjs-app"><small>Just press one of the <em>run</em> buttons below the listings.</small></div>
+        <hr/>
+        <h4>Console log
+            <button onclick="clearConsole();" id="clear-btn">clear</button>
+        </h4>
         <div id="consoleout"></div>
     </div>
 
   <!-- HEADER -->
   <div id="header_wrap" class="outer">
     <header class="inner">
-      <a id="forkme_banner" href="https://github.com/mweststrate/mobservable">View on GitHub</a>
 
       <img src="images/mobservable.png" id="logo" />
       <h1 id="project_title">mobservable</h1>
       <h2 id="project_tagline">Five minute introduction to Mobservable + React</h2>
+      <hr/>
     </header>
   </div>
 
@@ -195,6 +201,7 @@ background: linear-gradient(135deg, #4c4c4c 0%,#4c4c4c 25%,#2c2c2c 50%,#000000 1
                         <li>Write declarative views that determine their own dependencies. No subscriptions, cursors or other redundant declarations to manage.</li>
                         <li>Build high performing React applications without Flux or Immutable data structures.</li>
                         </ul>
+                    <p><a href="#demo" onclick="runCodePerLine();">Demo link</a> for impatient people.
                     </p>
                     <h3 id="going-from-imperative-to-reactive-code">Going from imperative to reactive</h3>
                     <p>Sounds promising right? Let's start with a simple example to see how reactive programming might benefit us.
@@ -230,14 +237,15 @@ TodoStore.prototype.report = function() {
 
 var todoStore = new TodoStore();
 </textarea>
+<center style="margin-top:-20px"><small>(This store is editable, use the 'run' button on the next listing to test it)</small></center>
 
 <p>We have just created a <code>todoStore</code> with a <code>todos</code> collection that can contain todo objects.
-Time to fill the <code>todoStore</code> with some objects.
+Time to fill the todoStore with some objects.
 To make sure we see effects of our changes we invoke <code>todoStore.report</code> after each change and log it:
 </p>
 
 <textarea spellcheck="false" class="prettyprint" id="code2" rows="15">
-todoStore.addTodo("write getting started");
+todoStore.addTodo("write intro");
 console.log(todoStore.report());
 
 todoStore.addTodo("present at meekup");
@@ -249,7 +257,7 @@ console.log(todoStore.report());
 todoStore.todos[1].task = "present at meetup";
 console.log(todoStore.report());
 
-todoStore.todos[0].task = "finish getting started";
+todoStore.todos[0].task = "finish intro";
 console.log(todoStore.report());
 </textarea>
 <button onClick="runCode(['#code1', '#code2'])" class="btn-run">Run code</button>
@@ -275,24 +283,27 @@ function ReactiveTodoStore() {
 }
 
 /** addTodo, completedTodosCount and report remain untouched,
-    let's just inherit them... */
-ReactiveTodoStore.prototype = new TodoStore();
+    let's just copy them... */
+ReactiveTodoStore.prototype.addTodo = TodoStore.prototype.addTodo;
+ReactiveTodoStore.prototype.completedTodosCount = TodoStore.prototype.completedTodosCount;
+ReactiveTodoStore.prototype.report = TodoStore.prototype.report;
 
 var reactiveTodoStore = new ReactiveTodoStore();
 </textarea>
+<center style="margin-top:-20px"><small>(This store is editable, use the 'run' button on the next listing to test it)</small></center>
 
 <p>We just changed two things. First, we converted <code>todos</code> to a reactive array.
 Next, a function that prints the report as a <code>sideEffect</code> of changes in the <code>report</code> was registered.
 As a result, our report will print itself whenever needed.
-Seems to be too simple to be true right? Let's try altering the data again,
+Looks too simple to be true right? Let's try altering the data again,
 but this time without explicitly logging the <code>report</code>:</p>
 
 <textarea spellcheck="false" class="prettyprint" id="code4" rows="6">
-reactiveTodoStore.addTodo("write getting started");
+reactiveTodoStore.addTodo("write intro");
 reactiveTodoStore.addTodo("present at meekup");
 reactiveTodoStore.todos[0].completed = true;
 reactiveTodoStore.todos[1].task = "present at meetup";
-reactiveTodoStore.todos[0].task = "finish getting started";
+reactiveTodoStore.todos[0].task = "finish intro";
 </textarea>
 <button onClick="runCode(['#code1', '#code3', '#code4'])" class="btn-run">Run code</button>
 
@@ -314,6 +325,8 @@ From there on, you never have to worry about when to update your component!  Jus
 Mobservable will determine the smallest amount of components that need an update.
 So reactive components render <a target="_blank" href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/">extremely efficient</a>.
 </p>
+
+<a name="demo"></a><h3 id="demo">Editable demo</h3>
 <p>A basic, self updating user interface for our <code>ReactiveTodoStore</code> is now just a matter of writing the following dumb, yet reactive, components:</p>
 
 <textarea spellcheck="false" class="" id="react1" rows="44">
@@ -329,17 +342,18 @@ var TodoList = mobservable.reactiveComponent(React.createClass({
         var store = this.props.store;
         return (<div><RenderCounter />
             { store.report() }
-            <ul>
+            <ul><hr/>
                 { store.todos.map(function(todo, idx) {
                     return (<TodoView todo={ todo } key={ idx } />)
                 }) }
-            </ul>
+            <hr/></ul>
             <button onClick={ this.onNewTodo }>New Todo</button>
+            <small> (double-click a todo to edit)</small>
         </div>);
     },
 
     onNewTodo: function() {
-        this.props.store.addTodo(prompt('Enter a new todo:'));
+        this.props.store.addTodo(prompt('Enter a new todo:','coffee plz'));
     }
 }));
 
@@ -348,20 +362,24 @@ var TodoView = mobservable.reactiveComponent(React.createClass({
 
     render: function() {
         var todo = this.props.todo;
-        return (<li><RenderCounter />
+        return (<li onDoubleClick={ this.onRename }>
+            <RenderCounter />
             <input type='checkbox' checked={ todo.completed }
                 onChange={ this.onToggleCompleted } />
-            {todo.task}
+            <code>{todo.task}</code>
         </li>);
     },
 
     onToggleCompleted: function() {
-        this.props.todo.completed = !this.props.todo.completed;
+        var todo = this.props.todo;
+        todo.completed = !todo.completed;
+    },
+
+    onRename: function() {
+        var todo = this.props.todo;
+        todo.task = prompt('Task name', todo.task) || "";
     }
 }));
-
-/* For demo purposes only, component to track the amount of renderings */
-var RenderCounter=React.createClass({_cnt:0,render:function(){this._cnt++;return(<div className={"render-counter "+(this._cnt%2?'odd':'even')}>{this._cnt}</div>);}});
 
 renderTodoApp();
 </textarea>
@@ -381,29 +399,29 @@ reactiveTodoStore.todos[reactiveTodoStore.todos.length] = { task: "Find a fine c
 // etc etc.. type your own statements here:
 </textarea>
 <button onClick="if (typeof reactiveTodoStore === 'undefined') { runCode(['#code1', '#code3', '#code4', '#react1']) } runCode(['#play1'])" class="btn-run">Run code</button>
-<button onClick="if (typeof reactiveTodoStore === 'undefined') { runCode(['#code1', '#code3', '#code4', '#react1']) } runCodePerLine('#play1')" class="btn-run">Run line-by-line</button>
-
+<button id="runline-btn" onClick="runCodePerLine()" class="btn-run">Run line-by-line</button>
+<p>&nbsp;</p>
 <h3 id="quotes">What others are saying...</h3>
 <ul>
     <p><em>&ldquo;Elegant! I love it!&rdquo;</em>
         <div style="text-align:right">&dash; Johan den Haan, CTO Mendix</div></p>
     <p><em>&ldquo;We ported the book Notes and Kanban examples to mobservable. Check out <a href="https://github.com/survivejs/mobservable-demo" target="_blank">the source</a> to see how this worked out. Compared to the original I was definitely positively surprised. Mobservable seems like a good fit for these problems.&rdquo;
         </em>
-        <div style="text-align:right">&dash; Juho Vepsäläinen, <br/>author of SurviveJS "Webpack and React", jster.net curator</div></p>
+        <div style="text-align:right">&dash; Juho Vepsäläinen, <br/>author of "SurviveJS - Webpack and React" and jster.net curator</div></p>
     <p><em>&ldquo;Great job with mobservable! Really gives current conventions and libraries a run for their money.&rdquo;</em>
         <div style="text-align:right">&dash; Daniel Dunderfelt</div></p>
     <p><em>&ldquo;I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated.&rdquo;</em>
-        <div style="text-align:right">&dash; David Schalk</div></p>
+        <div style="text-align:right">&dash; Anonymous programmer</div></p>
 </ul>
 
 <h3 id="learn-more">Learn more</32>
 <p>Intrigued? Here are some useful resources:</p>
 <ul>
-    <li>Join the #mobservable discussion on the reactiflux <a href="https://reactiflux.slack.com/messages/mobservable/" target="_blank">slack channel</a>
+    <li>Join the #mobservable discussion on the reactiflux <a href="https://reactiflux.slack.com/messages/mobservable/" target="_blank">slack channel</a>.
     <li>The <a href="https://github.com/mweststrate/mobservable" target="_blank">git repository</a>.</li>
-    <li>A <a href="https://github.com/mweststrate/react-mobservable-boilerplate" target="_blank">React mobservable boilerplate</a></li>
-    <li>The original <a href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/" target="_blank">blog post</a> introducing reactive react</li>
-    <li>A full CRUD webshop on <a href="https://jsfiddle.net/mweststrate/46vL0phw" target="_blank">JSFiddle</a></li>
+    <li>A <a href="https://github.com/mweststrate/react-mobservable-boilerplate" target="_blank">React mobservable boilerplate</a> project.</li>
+    <li>The original <a href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/" target="_blank">blog post</a> introducing reactive react.</li>
+    <li>A full CRUD webshop on <a href="https://jsfiddle.net/mweststrate/46vL0phw" target="_blank">JSFiddle</a>.</li>
 </ul>
 <div style="text-align:center;">
   <a class="github-button" href="https://github.com/mweststrate/mobservable" data-icon="octicon-star" data-style="small" data-count-href="/mweststrate/mobservable/stargazers" data-count-api="/repos/mweststrate/mobservable#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star mweststrate/mobservable on GitHub">Star</a>
@@ -446,6 +464,10 @@ reactiveTodoStore.todos[reactiveTodoStore.todos.length] = { task: "Find a fine c
         <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
 
         <script>
+            /* For demo purposes only, component to track its own (and parents) amount of renderings */
+            var RenderCounter=React.createClass({_c:0,render:function(){return React.createElement("div", {className:"render-counter "+(++this._c%2?'odd':'even')}, this._c)}});
+
+
             // Save the original source before pretty printer is fired
             function getCodeFromTA(elem) {
                 var cm = $(elem).data('cm');
@@ -476,24 +498,37 @@ reactiveTodoStore.todos[reactiveTodoStore.todos.length] = { task: "Find a fine c
             };
 
             var runLineHandle = null;
-            function runCodePerLine(id) {
-                if (runLineHandle)
-                    clearInterval(runLineHandle);
+            var runLineIndex = 0;
+            var lineMarker;
 
-                var code = getCodeFromTA($(id));
-                var cm = $(id).data('cm');
-                var lines = code.split("\n");
-                var idx = 0;
+            function runCodePerLine() {
+                if (typeof reactiveTodoStore === 'undefined') {
+                    runCode(['#code1', '#code3', '#code4', '#react1'])
+                }
 
                 function runNext() {
+                    var cm = $("#play1").data('cm');
+                    var code = cm.getDoc().getValue();
+                    var lines = code.split("\n");
+                    var idx = runLineIndex % lines.length;
                     var line = lines[idx];
-                    cm.getDoc().setSelection({ line: idx, ch: 0}, { line: idx, ch: line.length }, { scroll: false });
+                    if (lineMarker)
+                        lineMarker.clear();
+                    lineMarker = cm.getDoc().markText({ line: idx, ch: 0}, { line: idx, ch: line.length }, { css: 'background-color:#ff9955;' });
                     runCodeHelper(line);
-                    idx++;
-                    if (idx < lines.length)
-                        runLineHandle = setTimeout(runNext, 2000);
+                    runLineIndex++;
                 };
-                runNext();
+
+                if (!runLineHandle) {
+                    $("#runline-btn").text("Pause");
+                    runNext();
+                    runLineHandle = setInterval(runNext, 2000);
+                }
+                else {
+                    clearInterval(runLineHandle);
+                    runLineHandle = null;
+                    $("#runline-btn").text("Continue");
+                }
             }
 
             $console = $('#consoleout');
