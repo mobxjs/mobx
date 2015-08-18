@@ -7,6 +7,7 @@
   <meta name="description" content="mobservable : unobtrusive library to create reactive data structures and self-updating view functions">
 
   <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.1.1/gh-fork-ribbon.min.css" />
   <link rel="shortcut icon" type="image/png" href="images/favicon.png"/>
 
   <title>mobservable</title>
@@ -160,11 +161,18 @@
 </head>
 
 <body>
+    <!-- TOP RIGHT RIBBON: START COPYING HERE -->
+<div class="github-fork-ribbon-wrapper right">
+    <div class="github-fork-ribbon">
+        <a href="https://github.com/mweststrate/mobservable">Fork me on GitHub</a>
+    </div>
+</div>
+<!-- TOP RIGHT RIBBON: END COPYING HERE -->
+
 
     <div id="preview">
-        <a id="forkme_banner" href="https://github.com/mweststrate/mobservable">View on GitHub</a>
         <h3>React preview</h3>
-        <div id="reactjs-app"><small>Just press one of the <em>run</em> buttons below the listings.</small></div>
+        <div id="reactjs-app"><small>Read on and press any <em>run</em> buttons you encounter!</small></div>
         <hr/>
         <h4>Console log
             <button onclick="clearConsole();" id="clear-btn">clear</button>
@@ -283,9 +291,10 @@ function ReactiveTodoStore() {
 }
 
 /** addTodo, completedTodosCount and report remain untouched,
-    let's just copy them... */
+    so, let's just copy them... */
 ReactiveTodoStore.prototype.addTodo = TodoStore.prototype.addTodo;
-ReactiveTodoStore.prototype.completedTodosCount = TodoStore.prototype.completedTodosCount;
+ReactiveTodoStore.prototype.completedTodosCount =
+    TodoStore.prototype.completedTodosCount;
 ReactiveTodoStore.prototype.report = TodoStore.prototype.report;
 
 var reactiveTodoStore = new ReactiveTodoStore();
@@ -404,14 +413,14 @@ reactiveTodoStore.todos[reactiveTodoStore.todos.length] = { task: "Find a fine c
 <h3 id="quotes">What others are saying...</h3>
 <ul>
     <p><em>&ldquo;Elegant! I love it!&rdquo;</em>
-        <div style="text-align:right">&dash; Johan den Haan, CTO Mendix</div></p>
+        <div style="text-align:right">&dash; Johan den Haan, CTO Mendix</div><br/></p>
     <p><em>&ldquo;We ported the book Notes and Kanban examples to mobservable. Check out <a href="https://github.com/survivejs/mobservable-demo" target="_blank">the source</a> to see how this worked out. Compared to the original I was definitely positively surprised. Mobservable seems like a good fit for these problems.&rdquo;
         </em>
-        <div style="text-align:right">&dash; Juho Vepsäläinen, <br/>author of "SurviveJS - Webpack and React" and jster.net curator</div></p>
+        <div style="text-align:right">&dash; Juho Vepsäläinen, <br/>author of "SurviveJS - Webpack and React" and jster.net curator</div><br/></p>
     <p><em>&ldquo;Great job with mobservable! Really gives current conventions and libraries a run for their money.&rdquo;</em>
-        <div style="text-align:right">&dash; Daniel Dunderfelt</div></p>
+        <div style="text-align:right">&dash; Daniel Dunderfelt</div><br/></p>
     <p><em>&ldquo;I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated.&rdquo;</em>
-        <div style="text-align:right">&dash; Anonymous programmer</div></p>
+        <div style="text-align:right">&dash; Anonymous programmer</div><br/></p>
 </ul>
 
 <h3 id="learn-more">Learn more</32>
