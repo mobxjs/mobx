@@ -41,6 +41,16 @@
           border-left: 4px solid #ddd;
           padding: 40px 20% 40px 20px;
           background: #f2f2f2;
+          background: url(images/dust.png);
+      }
+      #header_wrap {
+          background: #4c4c4c; /* Old browsers */
+background: -moz-linear-gradient(-45deg, #4c4c4c 0%, #4c4c4c 25%, #2c2c2c 50%, #000000 100%, #131313 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,#4c4c4c), color-stop(25%,#4c4c4c), color-stop(50%,#2c2c2c), color-stop(100%,#000000), color-stop(100%,#131313)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(-45deg, #4c4c4c 0%,#4c4c4c 25%,#2c2c2c 50%,#000000 100%,#131313 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(-45deg, #4c4c4c 0%,#4c4c4c 25%,#2c2c2c 50%,#000000 100%,#131313 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(-45deg, #4c4c4c 0%,#4c4c4c 25%,#2c2c2c 50%,#000000 100%,#131313 100%); /* IE10+ */
+background: linear-gradient(135deg, #4c4c4c 0%,#4c4c4c 25%,#2c2c2c 50%,#000000 100%,#131313 100%); /* W3C */
       }
       .outer {
           width: 60%;
@@ -149,7 +159,7 @@
 <body>
 
     <div id="preview">
-        <h3>ReactJS preview</h3>
+        <h3>React preview</h3>
         <div id="reactjs-app">Use the <em>run</em> buttons to run one of the listings..</div>
         <button onclick="clearConsole();" id="clear-btn">clear</button>
         <h3>Console log</h3>
@@ -163,7 +173,7 @@
 
       <img src="images/mobservable.png" id="logo" />
       <h1 id="project_title">mobservable</h1>
-      <h2 id="project_tagline">Five minute introduction to Mobservable + ReactJS</h2>
+      <h2 id="project_tagline">Five minute introduction to Mobservable + React</h2>
     </header>
   </div>
 
@@ -172,7 +182,7 @@
     <section id="main_content" class="inner">
                     <h3 id="getting-started">Introduction</h3>
                     <p><code>Mobservable</code> is a library to create reactive state and views.
-                        The advantage of reactive state and views is that it achieves <a target="-_blank" href="https://en.wikipedia.org/wiki/Inversion_of_control"><code>inversion of control</code></a> in your code.
+                        The advantage of this is that it achieves <a target="-_blank" href="https://en.wikipedia.org/wiki/Inversion_of_control"><code>inversion of control</code></a> in your code.
                         Anything that depends on the state of your application will update automatically whenever needed.
                         This has major benefits for the simplicity, maintainability and performance of your code.
                         This is <em>the promise of Mobservable</em>:
@@ -183,7 +193,7 @@
                         <li>Write complex applications which unmatched simple code.</li>
                         <li>Unobtrusive state management: be free to use mutable objects, cyclic references, classes, real references...</li>
                         <li>Write declarative views that determine their own dependencies. No subscriptions, cursors or other redundant declarations to manage.</li>
-                        <li>Build high performing ReactJS applications without Flux or Immutable data structures.</li>
+                        <li>Build high performing React applications without Flux or Immutable data structures.</li>
                         </ul>
                     </p>
                     <h3 id="going-from-imperative-to-reactive-code">Going from imperative to reactive</h3>
@@ -249,6 +259,8 @@ console.log(todoStore.report());
 But what if we didn't have to call <code>report</code> explicitly?
 What if the data used in the report would make sure our report prints automatically upon each change?
 Then we would have achieved inversion of control!
+</p>
+<p>
 That is exactly what mobservable can do for you.
 Automatically execute code that solely depends on state.
 To achieve that, the <code>TodoStore</code> has to become reactive.
@@ -292,8 +304,8 @@ Because the report did not <em>actually</em> change as a result of the rename, a
     we can also build complex user interfaces that relate to their data automatically.
 </p>
 
-<h3 id="reactive-reactjs-components">Reactive ReactJS components</h3>
-<p>ReactJS components are (despite their name) not reactive out of the box.
+<h3 id="reactive-reactjs-components">Reactive React components</h3>
+<p>React components are (despite their name) not reactive out of the box.
 They will not re-render automatically when their underlying data changes.
 So you need to either call <code>setState</code> or you need to maintain data subscriptions or cursors to update your components.</p>
 
@@ -306,7 +318,8 @@ So reactive components render <a target="_blank" href="https://www.mendix.com/te
 
 <textarea spellcheck="false" class="" id="react1" rows="44">
 function renderTodoApp() {
-    React.render(<TodoList store={reactiveTodoStore} />, document.getElementById('reactjs-app'));
+    React.render(<TodoList store={reactiveTodoStore} />,
+        document.getElementById('reactjs-app'));
 }
 
 var TodoList = mobservable.reactiveComponent(React.createClass({
@@ -361,18 +374,26 @@ renderTodoApp();
     The counters on the right show how many times each part of the UI is re-rendered.
 </p>
 <textarea spellcheck="false" class="" id="play1" rows="8">
-reactiveTodoStore.todos[reactiveTodoStore.todos.length] = { task: "Find a fine cheese", completed: true };
 reactiveTodoStore.todos[0].completed = !reactiveTodoStore.todos[0].completed
 reactiveTodoStore.todos[1].task = "Random todo " + Math.random();
+reactiveTodoStore.todos[reactiveTodoStore.todos.length] = { task: "Find a fine cheese", completed: true };
+
 // etc etc.. type your own statements here:
 </textarea>
 <button onClick="if (typeof reactiveTodoStore === 'undefined') { runCode(['#code1', '#code3', '#code4', '#react1']) } runCode(['#play1'])" class="btn-run">Run code</button>
+<button onClick="if (typeof reactiveTodoStore === 'undefined') { runCode(['#code1', '#code3', '#code4', '#react1']) } runCodePerLine('#play1')" class="btn-run">Run line-by-line</button>
 
 <h3 id="quotes">What others are saying...</h3>
 <ul>
-    <p><em>&ldquo;Great job with mobservable! Really gives current conventions and libraries a run for their money.&rdquo;</em></p>
-    <p><em>&ldquo;I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated.&rdquo;</em></p>
-    <p><em>&ldquo;We ported to mobservable (...). Compared to the original I was definitely positively surprised.&rdquo;</em></p>
+    <p><em>&ldquo;Elegant! I love it!&rdquo;</em>
+        <div style="text-align:right">&dash; Johan den Haan, CTO Mendix</div></p>
+    <p><em>&ldquo;We ported the book Notes and Kanban examples to mobservable. Check out <a href="https://github.com/survivejs/mobservable-demo" target="_blank">the source</a> to see how this worked out. Compared to the original I was definitely positively surprised. Mobservable seems like a good fit for these problems.&rdquo;
+        </em>
+        <div style="text-align:right">&dash; Juho Vepsäläinen, <br/>author of SurviveJS "Webpack and React", jster.net curator</div></p>
+    <p><em>&ldquo;Great job with mobservable! Really gives current conventions and libraries a run for their money.&rdquo;</em>
+        <div style="text-align:right">&dash; Daniel Dunderfelt</div></p>
+    <p><em>&ldquo;I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated.&rdquo;</em>
+        <div style="text-align:right">&dash; David Schalk</div></p>
 </ul>
 
 <h3 id="learn-more">Learn more</32>
@@ -380,7 +401,7 @@ reactiveTodoStore.todos[1].task = "Random todo " + Math.random();
 <ul>
     <li>Join the #mobservable discussion on the reactiflux <a href="https://reactiflux.slack.com/messages/mobservable/" target="_blank">slack channel</a>
     <li>The <a href="https://github.com/mweststrate/mobservable" target="_blank">git repository</a>.</li>
-    <li>A <a href="https://github.com/mweststrate/react-mobservable-boilerplate" target="_blank">ReactJS mobservable boilerplate</a></li>
+    <li>A <a href="https://github.com/mweststrate/react-mobservable-boilerplate" target="_blank">React mobservable boilerplate</a></li>
     <li>The original <a href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/" target="_blank">blog post</a> introducing reactive react</li>
     <li>A full CRUD webshop on <a href="https://jsfiddle.net/mweststrate/46vL0phw" target="_blank">JSFiddle</a></li>
 </ul>
@@ -426,19 +447,54 @@ reactiveTodoStore.todos[1].task = "Random todo " + Math.random();
 
         <script>
             // Save the original source before pretty printer is fired
+            function getCodeFromTA(elem) {
+                var cm = $(elem).data('cm');
+                if (!cm) {
+                    console.log("Code editors not yet loaded");
+                    return "";
+                }
+                var code = cm.getDoc().getValue();
+                return code;
+            }
+
+            function runCodeHelper(code) {
+                var globalEval = eval; // global scope trick, See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval
+                code = JSXTransformer.transform(code).code;
+                try {
+                    globalEval(code);
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
             function runCode(ids) {
                 $(ids.join(",")).each(function(i, elem) {
                     clearConsole();
-                    var code = $(elem).val();
-                    var globalEval = eval; // global scope trick, See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval
-                    code = JSXTransformer.transform(code).code;
-                    try {
-                        globalEval(code);
-                    } catch (e) {
-                        console.error(e);
-                    }
+                    var code = getCodeFromTA(elem);
+                    runCodeHelper(code);
                 });
             };
+
+            var runLineHandle = null;
+            function runCodePerLine(id) {
+                if (runLineHandle)
+                    clearInterval(runLineHandle);
+
+                var code = getCodeFromTA($(id));
+                var cm = $(id).data('cm');
+                var lines = code.split("\n");
+                var idx = 0;
+
+                function runNext() {
+                    var line = lines[idx];
+                    cm.getDoc().setSelection({ line: idx, ch: 0}, { line: idx, ch: line.length }, { scroll: false });
+                    runCodeHelper(line);
+                    idx++;
+                    if (idx < lines.length)
+                        runLineHandle = setTimeout(runNext, 2000);
+                };
+                runNext();
+            }
 
             $console = $('#consoleout');
             var baseLog = console.log, baseError = console.error;
@@ -472,15 +528,14 @@ reactiveTodoStore.todos[1].task = "Random todo " + Math.random();
 
             $(function() {
                 $("textarea").each(function(i, t) {
-                     CodeMirror.fromTextArea(t, {
+                     var cm = CodeMirror.fromTextArea(t, {
                          lineNumbers: true,
                          mode: "javascript",
                          theme: 'xq-light'
                      });
+                     $(t).data('cm', cm);
                 });
             });
-            //runCode(['#code3', '#code4', '#react1']);
-            //clearConsole();
 
         </script>
       </body>
