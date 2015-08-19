@@ -196,8 +196,8 @@
     <section id="main_content" class="inner">
                     <h3 id="getting-started">Introduction</h3>
                     <p><code>Mobservable</code> is a library to create reactive state and views.
-                        The advantage of this is that it achieves <a target="-_blank" href="https://en.wikipedia.org/wiki/Inversion_of_control"><code>inversion of control</code></a> in your code.
-                        Anything that depends on the state of your application will update automatically whenever needed.
+                        Mobservable updates views automatically when the state changes,
+                        and thereby achieves <a target="-_blank" href="https://en.wikipedia.org/wiki/Inversion_of_control">inversion of control</a>.
                         This has major benefits for the simplicity, maintainability and performance of your code.
                         This is <em>the promise of Mobservable</em>:
                         <!--This removes boilerplate code from your app.
@@ -205,9 +205,10 @@
                         <p/>
                         <ul>
                         <li>Write complex applications which unmatched simple code.</li>
-                        <li>Unobtrusive state management: be free to use mutable objects, cyclic references, classes, real references...</li>
-                        <li>Write declarative views that determine their own dependencies. No subscriptions, cursors or other redundant declarations to manage.</li>
+                        <li>Enable unobtrusive state management: be free to use mutable objects, cyclic references, classes, real references...</li>
+                        <li>Write declarative views that track their own dependencies. No subscriptions, cursors or other redundant declarations to manage.</li>
                         <li>Build high performing React applications without Flux or Immutable data structures.</li>
+                        <li>Predictable behavior: all views are updated synchronously and atomically.</li>
                         </ul>
                     <p><a href="#demo" onclick="runCodePerLine();">Demo link</a> for impatient people.
                     </p>
