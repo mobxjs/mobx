@@ -55,12 +55,12 @@ namespace mobservable {
                     return self.observe(listener, fire);
                 }
                 f.toString = function() {
-                    return self.toString();
+                    return "" + self.value;
                 }
                 _.markReactive(f);
                 return f;
             }
-    
+
             toString() {
                 return `Observable[${this._value}]`;
             }

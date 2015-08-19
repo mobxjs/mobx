@@ -5,6 +5,7 @@ npm-debug.log
 coverage/
 .tscache
 *.js.map
+lib/*.js.map
 /test/typescript-test.js*
 /dist/test
 notes.md

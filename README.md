@@ -3,36 +3,30 @@
 <img src="https://mweststrate.github.io/mobservable/images/mobservable.png" align="right" width="120px" />
 
 
-##### _Unobtrusive reactive library that keeps views automatically in sync with data._
+##### _Keeps views automatically in sync with state. Unobtrusively._
 
 [![Build Status](https://travis-ci.org/mweststrate/mobservable.svg?branch=master)](https://travis-ci.org/mweststrate/mobservable)
 [![Coverage Status](https://coveralls.io/repos/mweststrate/mobservable/badge.svg?branch=master&service=github)](https://coveralls.io/github/mweststrate/mobservable?branch=master)
 [![mobservable channel on slack](https://img.shields.io/badge/slack-mobservable-blue.svg)](https://reactiflux.slack.com/messages/mobservable/)
 
-[API documentation](https://github.com/mweststrate/mobservable/blob/master/docs/api.md) - [Typings](https://github.com/mweststrate/mobservable/blob/master/dist/mobservable.d.ts)
 
-## Philosophy
+##### <center>A [Five minute, interactive introduction](https://mweststrate.github.io/mobservable/getting-started.html) to Mobservable and React</center>
 
-Mobservable is light-weight standalone library to create reactive primitives, functions, arrays and objects.
-The goal of mobservable is simple:
 
-1. Write simple views. Views should be subscription free.
-2. Write simple controllers and stores. Change data without thinking about how this should be reflected in views.
-3. Allow flexible model design, be able to use mutable objects, arrays, classes, real references, and cyclic data structures in your app.
-4. Performance: find the absolute minimum amount of changes that are needed to update views.
-5. Views* should be updated atomically and sychronously without showing stale or intermediate values.
+[API documentation](https://github.com/mweststrate/mobservable/blob/master/docs/api.md) - [Tips & Tricks](https://github.com/mweststrate/mobservable/blob/master/docs/syntax.md) - [ES5, ES6, TypeScript syntax examples](https://github.com/mweststrate/mobservable/blob/master/docs/api.md) - [TypeScript Typings](https://github.com/mweststrate/mobservable/blob/master/dist/mobservable.d.ts)
 
-Mobservable is born as part of an enterprise scale visual editor,
-which needs high performance rendering and covers over 400 different domain concepts.
-So the best performance and the simplest possible controller and view code are both of the utmost importance.
-See [this blog](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) for more details about that journey.
-Mobservable applies reactive programming behind the scenes and is inspired by MVVM frameworks like knockout and ember, yet less obtrusive to use.
+## Introduction
 
-\* 'Views' should be interpreted in the broadest sense: User interface, derived data, backend storage; anything that can be derived from your data in a pure manner is a view of the data. 
+Mobservable is a library to create reactive state and views. Mobservable updates views automatically when the state changes, and thereby achieves [inversion of control](https://en.wikipedia.org/wiki/Inversion_of_control). This has major benefits for the simplicity, maintainability and performance of your code. This is the promise of Mobservable:
+* Write complex applications which unmatched simple code.
+* Enable unobtrusive state management: be free to use mutable objects, cyclic references, classes and real references to store state.
+* Write declarative views that track their own dependencies. No subscriptions, cursors or other redundant declarations to manage.
+* Build [high performing](mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) React applications without Flux or Immutable data structures.
+* Predictable behavior: all views are updated synchronously and atomically.
 
 ## The essentials
 
-Mobservable can be summarized in two functions that will fundamentally simplify the way you write Reactjs applications. Lets take a look at this really really simple timer application:
+Mobservable can be summarized in two functions that will fundamentally simplify the way you write React applications. Lets take a look at this really really simple timer application:
 
 ```javascript
 var timerData = {
@@ -52,8 +46,10 @@ var Timer = React.createClass({
 React.render(<Timer timerData={timerData} />, document.body);
 ```
 
-So what will this app do? It does nothing! The timer increases every second, but the UI never responds to that. After the interval updates the timer we should force the UI to update.
-But that is the kind of dependency we want to avoid in our code. So let's apply two simple functions of mobservable instead to fix this issue:
+So what will this app do? It does nothing! The timer increases every second, but the will UI never update. To fix that, we should force the UI to refresh somehow upon each interval.
+But that is the kind of dependency we should avoid in our code. We shouldn't have to _pull_ data from our state to update the UI. Instead, the data structures should be in control and call the UI when it needs an update. The state should be _pushed_ throughout our application. This is called inversion of control.
+
+We can apply two simple functions of Mobservable to achieve this.
 
 ### mobservable.makeReactive
 
@@ -75,7 +71,7 @@ var Timer = mobservable.reactiveComponent(React.createClass{
 }));
 ```
 
-Thats all folks! Its as simple as that. The `Timer` will now automatically update each time `timerData.secondsPassed` is altered.
+Its as simple as that. The `Timer` will now automatically update each time `timerData.secondsPassed` is altered.
 The actual interesting thing about these changes are the things that are *not* in the code:
 
 * The `setInterval` method didn't alter. It still treats `timerData` as a plain JS object.
@@ -93,118 +89,24 @@ It does not only work for plain objects, but also for arrays, functions, classes
     <img src="https://mweststrate.github.io/mobservable/images/overview.png" height="300"/>
 </div>
 
-## A Todo application
-
-The following simple todo application can be found up & running on https://mweststrate.github.io/mobservable. A full TodoMVC implementation can be found [here](https://github.com/mweststrate/todomvc/tree/master/examples/react-mobservable).
-Note how the array, function and primitive of `todoStore` will all become reactive. There are just three calls to `mobservable` and all the components are kept in sync with the `todoStore`.
-
-```javascript
-var todoStore = mobservable.makeReactive({
-    todos: [
-        {
-            title: 'Find a clean mug',
-            completed: true
-        },
-        {
-            title: 'Make coffee',
-            completed: false
-        }
-    ],
-    completedCount: function() {
-        return this.todos.filter((todo) => todo.completed).length;
-    },
-    pending: 0
-});
-
-todoStore.addTodo = function(title) {
-    this.todos.push({
-        title: title,
-        completed: false
-    });
-};
-
-todoStore.removeTodo = function(todo) {
-    this.todos.splice(this.todos.indexOf(todo), 1);
-};
-
-todoStore.loadTodosAsync = function() {
-    this.pending++;
-    setTimeout(function() {
-        this.addTodo('Asynchronously created todo');
-        this.pending--;
-    }.bind(this), 2000);
-};
-
-var TodoList = mobservable.reactiveComponent(React.createClass({
-    render: function() {
-        var store = this.props.store;
-        return (<div>
-            <ul>
-                { store.todos.map((todo, idx) =>
-                    (<TodoView store={ store } todo={ todo } key={ idx } />)
-                ) }
-                { store.pending ? (<li>Loading more items...</li>) : null }
-            </ul>
-            <hr/>
-            Completed { store.completedCount } of { store.todos.length } items.<br/>
-            <button onClick={ this.onNewTodo }>New Todo</button>
-            <button onClick={ this.loadMore }>Load more...</button>
-        </div>);
-    },
-
-    onNewTodo: function() {
-        this.props.store.addTodo(prompt('Enter a new todo:', 'Try mobservable at home!'));
-    },
-
-    loadMore: function() {
-        this.props.store.loadTodosAsync();
-    }
-}));
-
-var TodoView = mobservable.reactiveComponent(React.createClass({
-    render: function() {
-        var todo = this.props.todo;
-        return (<li>
-            <input type='checkbox' checked={ todo.completed } onChange={ this.onToggleCompleted } />
-            {todo.title}{' '}
-            <a href='#' onClick={ this.onEdit }>[edit]</a>
-            <a href='#' onClick={ this.onRemove }>[remove]</a>
-        </li>);
-    },
-
-    onToggleCompleted: function() {
-        this.props.todo.completed = !this.props.todo.completed;
-    },
-
-    onEdit: function(e) {
-        e.preventDefault();
-        this.props.todo.title = prompt('Todo:', this.props.todo.title);
-    },
-
-    onRemove: function(e) {
-        e.preventDefault();
-        this.props.store.removeTodo(this.props.todo);
-    }
-}));
-
-React.render(<TodoList store={todoStore} />, document.getElementById('approot'));
-```
-
 ## Getting started
 
 Either:
+* [Edit](https://mweststrate.github.io/mobservable/getting-started.html#demo) a simple ToDo application online.
 * `npm install mobservable --save`
-* clone the boilerplate repository containing the above example from: https://github.com/mweststrate/react-mobservable-boilerplate
-* or fork this [JSFiddle](https://jsfiddle.net/mweststrate/wgbe4guu/)
+* Clone the boilerplate repository containing the above example from: https://github.com/mweststrate/react-mobservable-boilerplate.
+* Or fork this [JSFiddle](https://jsfiddle.net/mweststrate/wgbe4guu/).
 
 ## Examples
 
+* The [ports of the _Notes_ and _Kanban_ examples](https://github.com/survivejs/mobservable-demo) from the book "SurviveJS - Webpack and React" to mobservable.
 * A simple webshop using [React + mobservable](https://jsfiddle.net/mweststrate/46vL0phw) or [JQuery + mobservable](http://jsfiddle.net/mweststrate/vxn7qgdw).
-* [Simple timer](https://jsfiddle.net/mweststrate/wgbe4guu/)
+* [Simple timer](https://jsfiddle.net/mweststrate/wgbe4guu/) application in JSFiddle.
 * [TodoMVC](https://rawgit.com/mweststrate/todomvc/immutable-to-observable/examples/react-mobservable/index.html#/), based on the ReactJS TodoMVC.
 
 ## Read more
 
+* [Five minute interactive introducton](https://mweststrate.github.io/mobservable/getting-started.html) to Mobservable and React
 * [Making React reactive: the pursuit of high performing, easily maintainable React apps](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/)
 * [Pure rendering in the light of time and state](https://medium.com/@mweststrate/pure-rendering-in-the-light-of-time-and-state-4b537d8d40b1)
 * [Official homepage](http://mweststrate.github.io/mobservable/)
@@ -239,20 +141,28 @@ Useful to bridge reactive code to imperative code.
 
 ## FAQ
 
-**Is mobservable a framework?**
+##### Is mobservable a framework?
 
 Mobservabe is *not* a framework. It does not tell you how to structure your code, where to store state or how to process events. Yet it might free you from frameworks that poses all kinds of restrictions on your code in the name of performance.
 
-**Can I combine flux with mobservable?**
+##### Can I combine flux with mobservable?
 
 Flux implementations that do not work on the assumption that the data in their stores is immutable should work well with mobservable.
 However, the need for flux is less when using mobservable.
 Mobservable already optimizes rendering and since it works with most kinds of data, including cycles and classes.
 So other programming paradigms like classic MVC are now can be easily applied in applications that combine ReactJS with mobservable.
 
-**Can I use mobservable together with framework X?**
+##### Can I use mobservable together with framework X?
 
 Probably.
 Mobservable is framework agnostic and can be applied in any JS environment.
 It just ships with a small function to transform Reactjs components into reactive view functions for convenience.
 Mobservable works just as well server side, and is already combined with JQuery (see this [Fiddle](http://jsfiddle.net/mweststrate/vxn7qgdw)) and [Deku](https://gist.github.com/mattmccray/d8740ea97013c7505a9b).
+
+##### Can I record states and re-hydrate them?
+
+Yes, some examples are coming shortly!
+
+##### Can you tell me how it works?
+
+Sure, join the reactiflux channel our checkout [dnode.ts](dnode.ts). Or, submit an issue to motivate me to make some nice drawings :).

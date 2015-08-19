@@ -1,7 +1,7 @@
 {
     "name": "mobservable",
     "version": "0.6.0",
-    "description": "Unobtrusive reactive library that keeps views automatically in sync with data.",
+    "description": "Keeps views automatically in sync with state. Unobtrusively.",
     "main": "dist/mobservable.js",
     "scripts": {
         "test": "grunt cover",

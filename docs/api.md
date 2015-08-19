@@ -1,76 +1,191 @@
 # API Documentation
 
-## mobservable top level api
+Mobservable divides your application into three different concepts:
+
+1. State
+2. Views on your state
+3. State management
+
+_State_ is is all the factual information that lives inside your application.
+This might be the profile of the user that is logged in, the tasks he needs to manage, or the fact that the sidebar currently collapsed.
+With Mobservable you can make your state reactive. This means that all derived views based on your state are updated automatically.
+The first section of this api documentation describes how to [make data reactive](#making-state-reactive).
+
+_Views_ are all pieces of information that can be derived from the _State_ or its mutations.
+For example; the amount of unfinished tasks, the user interface and the data mutations that need to be synced with the server.
+Those are all forms of views.
+The second section describes how to [react to data changes](#reacting-to-state-changes).
+
+Finally your application has actions that _change state_.
+Mobservable does not dictate how to change your state.
+Instead of that, Mobservable tries to be as unobtrusive as possible.
+You can use mutable objects and arrays, real references, classes and cyclic data structures to store your state.
+With Mobservable you are free to mutate that state in any way you think is the best.
+
+Different examples of storing state in ES5, ES6, or TypeScript, using plain objects, constructor functions or classes can be found in the [syntax documentation](syntax.md).
+
+The third section describes some [utility functions](#utility-functions) that might come in convenient.
+
+## Making state reactive
 
 ### makeReactive(data, options)
 
-`makeReactive` is the swiss knife of `mobservable`. It converts `data` to something similar, but reactive, based on the type of `data`.
-The following types are distinguished:
+`makeReactive` is the swiss knife of `mobservable`. It converts `data` to something reactive.
+The following types are distinguished, details are described below.
 
-* `Primitive`: boolean, string, number, null, undefined, date
-* `PlainObject`: raw javascript objects that was not created using a constructor function
-* `ComplexObject`: raw javascript object that was created using a constructor function
-* `Array`
-* `ViewFuncion`: function that takes no arguments but produces a value
-* `ComplexFunction`: function that takes one or more arguments and might produce a value
+* `Primitive`: Any boolean, string, number, null, undefined, date, or regex.
+* `PlainObject`: Any raw javascript object that wasn't created using a constructor function
+* `ComplexObject`: A javascript object that was created by a constructor function (using the `new` keyword, with the sole exception of `new Object`).
+* `Array`: A javascript array; anything which `Array.isArray` yields true.
+* `ViewFuncion`: A function that takes no arguments but produces a value based on its scope / closure.
+* `ComplexFunction`: A function that takes one or more arguments and might produce a value
 
-If `data` is a primitive value, _complex_ object or function, a _[reactive getter/setter](#reactive-getter-setter)_ will be returned.
+#### Primitive values
+If `data` is a primitive value, _complex_ object or function, a getter/setter function is returned:
+a function that returns its current value if invoked without arguments, or updates its current value if invoked with exactly one argument.
+If updated, it will notify all its _observers_.
 
-For plain objects, a plain object with reactive properties will be returned. View functions inside the object will become reactive properties of the object. Their `this` will be bound to the object.
+New observers can be registered by invoking the _.observe(callback, invokeImmediately=false)_ method.
+If the second parameter passed to `.observe` is true, the callback will be invoked with the current value immediately.
+Otherwise the callback will be invoked on the first change.
+Note that you might never use `.observe` yourself; as creating new [reactive functions or side-effects](#reacting-to-state-changes) is a more high-level approach to observe one or more values.
 
-For arrays an [reactive array](#reactive-array) will be returned.
+In practice you will hardly use `makeReactive` for primitives, as most primitive values will belong to some object.
 
-Reactiveness is an contagious thing; all values that are part of `data`, or will be in same future time,
-will be made reactive as well.
-Except for non-plain objects, multi-argument functions or any value that is wrapped in `asReference`.
+```javascript
+var temperature = makeReactive(25);
+temperature.observe(function(newTemperature, oldTemperature) {
+  console.log('Temperature changed from ', oldTemperature, ' to ', newTemperature);
+});
+temperature(30);
+// prints: 'Temperature changed from 25 to 30'
+console.log(temperature());
+// prints: '30'.
+```
+
+#### Plain objects
+
+If `makeReactive` is invoked on a plain objects, a new plain object with reactive properties based on the original properties will be returned.
+`makeReactive` will recurse into all property values of the original object.
+Any values that will be assigned to these properties in the future, will be made reactive as well if needed.
+
+View functions inside the object will become reactive properties of the object (see the next section for more info about reactive functions).
+Their `this` will be bound to the object automatically.
+
+Properties that will be added to the reactive object later on won't become reactive automatically.
+This makes it easy to extend objects with, for example, functions that are not reactive themselves but instead mutate the object.
+If you want to add a new reactive property to an existing object, just use `extendReactive`.
+
+Example:
+```javascript
+var orderLine = makeReactive({
+  price: 10,
+  amount: 1,
+  total: function() {
+    return this.price * this.amount;
+  }
+});
+
+// sideEffect is explained below,
+mobservable.sideEffect(function() {
+  console.log(orderline.total);
+});
+// prints: 10
+
+orderLine.amount = 3;
+// prints: 30
+```
+
+The recommended way to create reactive objects is to create a constructor function and use `extendReactive(this, properties)` inside the constructor;
+this keeps the responsibility of making an object inside the object and makes it impossible to accidentally use a non-reactive version of the object.
+However, some prefer to not use constructor functions at all in javascript applications.
+So Mobservable will work just as fine when using `makeReactive(plainObject)`.
+
+#### Complex objects
+
+Passing non-plain objects to `makeReactive` will result in a reactive reference to the object, similar to creating reactive primitive values.
+The constructor of such objects is considered responsible for creating reactive properties if needed.
+
+#### Arrays
+
+For arrays a new, reactive array will be returned.
+Like with plain objects, reactiveness is a contagious thing; all values of the array,
+now or in the future, will be made reactive as well if needed.
+
+Arrays created using `makeReactive` provide a thin abstraction over native arrays.
+The most notable difference between built-in arrays is that reactive arrays cannot be sparse;
+values assigned to an index larger than `length` are considered to be out-of-bounds and will not become reactive.
+
+Furthermore, `Array.isArray(reactiveArray)` and `typeof reactiveArray === "array"` will yield `false` for reactive arrays,
+but `reactiveArray instanceof Array` will return `true`.
+
+This has consequences when passing arrays to external methods or built-in functions, like `array.concat`, as they might not handle reactive arrays correctly.
+(This might improve in the future).
+
+***To avoid issues with other libraries, just make defensive copies before passing reactive arrays to external libraries using `array.slice()`.***
+
+Reactive arrays support all available ES5 array methods. Besides those, the following methods are available as well:
+
+* `observe(listener, fireImmediately? = false)` Listen to changes in this array. The callback will receive arguments that express an array splice or array change, conforming to [ES7 proposal](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe). It returns a disposer function to stop the listener.
+* `clear()` Remove all current entries from the array.
+* `replace(newItems)` Replaces all existing entries in the array with new ones.
+* `clone()` Create a new observable array containing the same values.
+* `find(predicate: (item, index, array) => boolean, thisArg?, fromIndex?)` Find implementation, basically the same as the ES7 Array.find proposal, but with added `fromIndex` parameter.
+* `remove(value)` Remove a single item by value from the array. Returns true if the item was found and removed.
+
+#### Functions
+
+Those are explained in the next [section](#reacting-to-state-changes).
+
+#### Further notes on `makeReactive`.
+
+`makeReactive` will not recurse into non-plain objects, multi-argument functions and any value that is wrapped in `asReference`.
 
 `makeReactive` will not recurse into objects that already have been processed by `makeReactive` or `extendReactive`.
 
-
-The `options` object is optional but can define the following flags:
+The second `options` parameter object is optional but can define using following flags:
 
 * `as` specifies what kind of reactive object should be made. Defaults to `"auto"`. Other valid values are `"reference"`, `"struct"` (in a later version see #8).
 * `scope` defined the `this` of reactive functions. Will be set automatically in most cases
 * `recurse` defaults `true`. If `false`, `makeActive` will not recurse into any child values.
 
-`makeReactive` is the default export of the `mobservable` module, so `mobservable(value) === mobservable.makeReactive(value)`.
+More flags will be made available in the feature.
 
-```javascript
-var todoStore = mobservable.makeReactive({
-    todos: [
-        {
-            title: 'Find a clean mug',
-            completed: true
-        },
-        {
-            title: 'Make coffee',
-            completed: false
-        }
-    ],
-    completedCount: function() {
-        return this.todos.filter((todo) => todo.completed).length;
-    },
-    pending: 0
-});
-```
+`makeReactive` is the default export of the `mobservable` module, so you can use `mobservable(data, opts)` as a shorthand.
 
 ### extendReactive(target, properties)
 
-Creates reactive `properties` on the given `target` object. Works similar to `makeReactive`, but extends existing objects.
+`extendReactive` works similarly to `makeReactive`, but it extends an existing object instead of creating a new one. Similar to `Object.assign` or `jQuery.extend`.
 This is especially useful inside constructor functions or to extend existing (possibly already reactive) objects.
 
-### isReactive(value)
-
-Returns true if the given value was created or extended by mobservable.
+In general, it is better to use `extendReactive(target, { property : value })` than `target.property = makeReactive(value)`.
+The difference is that in the later only creates a reactive value, while `extendReactive` will make the property itself reactive as well,
+so that you can safely assign new values to it later on.
 
 ### asReference(value)
 
-See `makeReactive`, the given value will not be converted to a reactive structure if its added to another reactive structure. The reference to it will be observable nonetheless.
+See `makeReactive`, the given value will not be converted to a reactive structure if it is added to another reactive structure.
+The reference to it will be observable nonetheless.
+
+In the following example the properties of the dimensions object itself won't be reactive, but assigning a new object value to the `image.dimension` will be picked up:
+
+```javascript
+var image = makeReactive({
+  src: "/some/path",
+  dimension: asReference({
+    width: 100,
+    height: 200
+  })
+});
+```
 
 ### observable
 
 Decorator (or annotation) that can be used on ES6 or TypeScript properties to make them reactive.
-It can be used on functions as well for reactive derived data, but for consistency it is recommended to assign it to a getter in that case.
+It can be used on functions as well if they should be reactive, but for type consistency it is recommended to use a getter function in such cases.
+
+Note that in ES6 the annotation can only be used on getter functions, as ES6 doesn't support property initializers in class declarations.
+See also the [syntax section](syntax.md) to see how `@observable` can be combined with different flavors of javascript code.
 
 ```javascript
 /// <reference path="./node_modules/mobservable/dist/mobservable.d.ts"/>
@@ -97,13 +212,60 @@ class OrderLine {
 }
 ```
 
+## Reacting to state changes
+
+### makeReactive(function, options)
+
+Responding to changes in your state is simply the matter of passing a `function` that takes no parameters to `makeReactive`.
+Mobservable will track which reactive objects, array and other reactive functions are used by the provided function.
+Mobservable will call `function` again when any of those values have changed.
+
+This will happen in such a way one can never observe a stale output of `function`; updates are pushed synchronously.
+Invocations of `function` will only happen when none of its dependencies is stale, so that updates are atomic.
+This is a major difference with many other reactive frameworks.
+This sounds complicated and expensive but in practice you won't notice any performance overhead in any reasonable scenario.
+Reactive functions evaluate lazily; if nobody is observing the reactive function it will never evaluate.
+For non-lazy reactive functions see `sideEffect`.
+
+Invoking `makeReactive` directly on a function will result in a _getter function_, similar to invoking `makeReactive` on primitive values.
+If `makeReactive` encounters a function inside an object passed through it,
+it will introduce a new property on that object, that uses the function as getter function for that property.
+
+The optional `options` parameter is an object.
+The `scope` property of that object can be set to define the `this` value that will be used inside the reactive function.
+
+```javascript
+var greeter = makeReactive({
+  who: "world",
+  greeting: function() {
+    return "Hello, " + this.who + "!!!";
+  }
+});
+
+var upperCaseGreeter = makeReactive(function() {
+  return greeter.greeting; // greeting has become an reactive property
+});
+
+var disposer = upperCaseGreeter.observe(function(newGreeting) {
+  console.log(newGreeting)
+});
+
+greeter.who = "Universe";
+// Prints: 'HELLO, UNIVERSE!!!'
+
+disposer(); // stop observing
+console.log(greeter.greeting); // prints the latest version of the reactive, derived property
+console.log(upperCaseGreeter()); // prints the latest version of the reactive function
+```
+
 ### sideEffect(function)
 
-Makes `function` reactive. The difference with `makeReactive(function)` is that in cases where `sideEffect` is used, `function` will always be
-triggered when one of its dependencies changes, whereas `makeReactive(function)` creates reactive functions that only re-evaluate if it has
-observers on its own. `sideEffect` return a functions that cancels its effect.
-
-`sideEffect` is very useful if you need to bridge from reactive to imperative code, for example:
+`sideEffect` can be used in those cases where you want to create a reactive function that will never have observers itself.
+This is usually the case when you need to bridge from reactive to imperative code, for example for logging, persistence or UI-updating code.
+When `sideEffect` is used, `function` will always be
+triggered when one of its dependencies changes.
+(In contrast, `makeReactive(function)` creates functions that only re-evaluate if it has
+observers on its own, otherwise its value is considered to be irrelevant).
 
 ```javascript
 var numbers = makeReactive([1,2,3]);
@@ -117,8 +279,57 @@ numbers.push(4);
 loggerDisposer();
 numbers.push(5);
 // won't print anything, nor is `sum` re-evaluated
-
 ```
+
+Fun fact: `sideEffect(func)` is actually an alias for `makeReactive(func).observe(function() { /* noop */ });`.
+
+### reactiveComponent(component)
+
+It turns a ReactJS component into a reactive one.
+Making a component reactive means that it will automatically observe any reactive data it uses.
+
+It is quite similar to `@connect` as found in several flux libraries, yet there are two important differences.
+With `@reactiveComponent` you don't need to specify which store / data should be observed in order to re-render at the appropriate time.
+Secondly, reactive components provide far more fine grained update semantics: Reactive components won't be observing a complete store or data tree, but only that data that is actually used during the rendering of the component. This might be a complete list, but also a single object or even a single property.
+The consequence of this is that components won't re-render unless some data that is actually used in the rendering has changed. Large applications really benefit from this in terms of performance.
+
+Rule of thumb is to use `reactiveComponent` on every component in your application that is specific for your application.
+Its overhead is neglectable and it makes sure that whenever you start using reactive data the component will respond to it.
+One exception are general purposes components that are not specific for your app. As these probably don't depend on the actual state of your application.
+For that reason it doesn't make sense to add `reactiveComponent` to them (unless their own state is expressed using reactive data structures as well).
+
+The `reactiveComponent` function / decorator supports both components that are constructed using `React.createClass` or using ES6 classes that extend `React.Component`. `reactiveComponent` is also available as mixin: `mobservable.reactiveMixin`.
+
+`reactiveComponent` also prevents re-renderings when the *props* of the component have only shallowly changed, which makes a lot of sense if the data passed into the component is reactive.
+This behavior is similar to [React PureRender mixin](https://facebook.github.io/react/docs/pure-render-mixin.html), except that *state* changes are still always processed.
+If a component provides its own `shouldComponentUpdate`, that one takes precedence.
+
+_Note: when `reactiveComponent` needs to be combined with other decorators or higher-order-components, make sure that `reactiveComponent` is the most inner (first applied) decorator;
+otherwise it might do nothing at all._
+
+**ES6 class + decorator**
+```javascript
+@reactiveComponent class MyCompoment extends React.Component {
+  /* .. */
+}
+```
+
+**ES6 class + function call**
+```javascript
+reactiveComponent(class MyCompoment extends React.Component {
+  /* .. */
+});
+```
+
+**ES5 + React.createClass**
+```javascript
+reactiveComponent(React.createClass({
+  /* .. */
+}))
+```
+
+Note: `reactiveComponent` is actually the only ReactJS specific thing in mobservable and should be easily portable to other frameworks.
+`reactiveComponent` might move to its own package in the future.
 
 ### observeUntilInvalid(functionToObserve, onInvalidate)
 
@@ -128,13 +339,24 @@ So `functionToObserve` will be evaluated only once, and as soon as its value has
 `observeUntilInvalid` returns a tuple consisting of the initial return value of `func` and an `unsubscriber` to be able to abort the observeUntilInvalid.
 The `onInvalidate` function will be called only once, after that, the observeUntilInvalid has finished.
 
-`observeUntilInvalid` is useful in functions where you want to have a function that responds to change, but where the function is actually invoked as side effect or as part of a bigger change flow or where unnecessary recalculations of `func` or either pointless or expensive, e.g. in the `render` method of a React component.
+`observeUntilInvalid` is useful in functions where you want to have a function that responds to change, but where the function is actually invoked as side effect or as part of a bigger change flow or where unnecessary recalculations of `func` or either pointless or expensive.
+It is for example used to implement `reactiveCompoenent`, which, in pseudo-code, does just: `component.render = () => observeUntilInvalid(originalRender, this.forceUpdate)[0]`;
+
+## Utility functions
+
+### isReactive(value)
+
+Returns true if the given value was created or extended by mobservable. Note: this function cannot be used to tell whether a property is reactive; it will determine the reactiveness of its actual value.
+
+### toJson(value)
+
+Converts a non-cyclic tree of observable objects into a JSON structure that is not observable. It is kind of the inverse of `mobservable.makeReactive`
 
 ### transaction(workerFunction)
 
 Transaction postpones the updates of computed properties until the (synchronous) `workerFunction` has completed.
-This is useful if you want to apply a bunch of different updates throughout your model before needing the updated computed values, e.g. while refreshing data from the backend.
-In practice, you wil probably never need `.transaction`, since observables typically update wickedly fast.
+This is useful if you want to apply a bunch of different updates throughout your model before needing the updated computed values, e.g. while refreshing data from the back-end.
+In practice, you will probably never need `.transaction`, since observables typically update wickedly fast.
 
 ```javascript
 var amount = mobservable(3);
@@ -154,58 +376,4 @@ mobservable.transaction(function() {
     price(4);
 });
 // Prints 12, after completing the transaction
-```
-
-### toJson(value)
-
-Converts a non-cyclic tree of observable objects into a JSON structure that is not observable. It is kind of the inverse of `mobservable.makeReactive`
-
-### reactiveComponent(component)
-
-Turns a React component into a reactive one.
-Making a component reactive means that it will automatically observe any reactive data it uses.
-Ut is quite similar to `@connect` as found in several flux libraries, yet there are two important differences.
-With `@reactiveComponent` you don't need to specify which store / data should be observed in order to re-render at the appropriate time.
-Secondly, reactive components provide far more fine grained update semantics: Reactive components won't be observing a complete store or data tree, but only that data that is actually used during the rendering of the component. This might be a complete list, but also a single object or even a single property.
-The consequence of this is that components won't re-render unless some data that is actually used in the rendering has changed. Large applications really benefit from this in terms of performance.
-
-Rule of thumb is to use `reactiveComponent` on every component in your application that is specific for your application. Its overhead is neglectable and it makes sure that whenever you start using reactive data the component will respond to it. One exception are general purposes components that are not specific for your app. As these probably don't depend on the actual state of your application. For that reason it doesn't make sense to add `reactiveComponent` to them (unless their own state is expressed using reactive data structures as well).
-
-The `reactiveComponent` function / decorator supports both components that are constructed using `React.createClass` or using ES6 classes that extend `React.Component`. `reactiveComponent` is also available as mixin: `mobservable.reactiveMixin`.
-
-`reactiveComponent` also prevents re-renderings when the *props* of the component have only shallowly changed, which makes a lot of sense if the data passed into the component is reactive.
-This behavior is similar to [React PureRender mixin](https://facebook.github.io/react/docs/pure-render-mixin.html), except that *state* changes are still always processed.
-If a component provides its own `shouldComponentUpdate`, that one takes precedence.
-
-## reactive array
-
-The arrays created using `makeReactive` provide thin abstraction over native arrays and to add reactive entries in the array.
-The most notable difference between built-in arrays is that reactive arrays cannot be sparse, i.e. values assigned to an index larger than `length` are considered out-of-bounds and not observed.
-
-Furthermore, `Array.isArray(reactiveArray)` and `typeof reactiveArray === "array"` will yield `false` for reactive arrays, but `reactiveArray instanceof Array` will return `true`.
-
-Reactive arrays implement all the ES5 array methods. Besides those, the following methods are available as well:
-
-* `observe(listener:(changeData:IArrayChange<T>|IArraySplice<T>)=>void, fireImmediately?:boolean):Lambda` Listen to changes in this array. The callback will receive arguments that express an array splice or array change, conforming to [ES7 proposal](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe)
-* `clear(): T[]` Remove all current entries from the array.
-* `replace(newItems:T[])` Replaces all existing entries in the array with new ones.
-* `values(): T[]` Returns a shallow, non-observable clone of the array, similar to `.slice`.
-* `clone(): IObservableArray<T>` Create a new observable array containing the same values.
-* `find(predicate:(item:T,index:number,array:IObservableArray<T>)=>boolean,thisArg?,fromIndex?:number):T` Find implementation, basically the same as the ES7 Array.find proposal, but with added `fromIndex` parameter.
-* `remove(value:T):boolean` Remove a single item by value from the array. Returns true if the item was found and removed.
-
-## reactive getter/setter
-
-A reactive getter/setter is a function that wraps a primitive reactive value. If it is invoked without arguments, it returns the current value.
-If it is invoked with a value, the current value will be updated with that value.
-Futher it exposes an `observe` function which can be used to attach a listener to the getter/setter function to be notified of any future updates.
-
-It's full interface is:
-
-```typescript
-interface IObservableValue<T> {
-    (): T;
-    (value: T);
-    observe(callback: (newValue: T, oldValue: T)=>void, fireImmediately?: boolean): () => void /* disposer */;
-}
 ```
