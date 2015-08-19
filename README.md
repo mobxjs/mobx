@@ -2,18 +2,14 @@
 
 <img src="https://mweststrate.github.io/mobservable/images/mobservable.png" align="right" width="120px" />
 
-
 ##### _Keeps views automatically in sync with state. Unobtrusively._
 
 [![Build Status](https://travis-ci.org/mweststrate/mobservable.svg?branch=master)](https://travis-ci.org/mweststrate/mobservable)
 [![Coverage Status](https://coveralls.io/repos/mweststrate/mobservable/badge.svg?branch=master&service=github)](https://coveralls.io/github/mweststrate/mobservable?branch=master)
 [![mobservable channel on slack](https://img.shields.io/badge/slack-mobservable-blue.svg)](https://reactiflux.slack.com/messages/mobservable/)
 
-
-##### <center>A [Five minute, interactive introduction](https://mweststrate.github.io/mobservable/getting-started.html) to Mobservable and React</center>
-
-
-[API documentation](https://github.com/mweststrate/mobservable/blob/master/docs/api.md) - [Tips & Tricks](https://github.com/mweststrate/mobservable/blob/master/docs/syntax.md) - [ES5, ES6, TypeScript syntax examples](https://github.com/mweststrate/mobservable/blob/master/docs/api.md) - [TypeScript Typings](https://github.com/mweststrate/mobservable/blob/master/dist/mobservable.d.ts)
+<br/>
+### New to Mobservable? Take the [five minute, interactive introduction](https://mweststrate.github.io/mobservable/getting-started.html)
 
 ## Introduction
 
@@ -23,6 +19,20 @@ Mobservable is a library to create reactive state and views. Mobservable updates
 * Write declarative views that track their own dependencies. No subscriptions, cursors or other redundant declarations to manage.
 * Build [high performing](mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) React applications without Flux or Immutable data structures.
 * Predictable behavior: all views are updated synchronously and atomically.
+
+## What others are saying...
+
+> _Elegant! I love it!_  
+> &dash; Johan den Haan, CTO of Mendix
+
+> _We ported the book Notes and Kanban examples to Mobservable. Check out [the source](https://github.com/survivejs/mobservable-demo) to see how this worked out. Compared to the original I was definitely positively surprised. Mobservable seems like a good fit for these problems._  
+> &dash; Juho Vepsäläinen, author of "SurviveJS - Webpack and React" and jster.net curator
+
+> _Great job with Mobservable! Really gives current conventions and libraries a run for their money._  
+> &dash; Daniel Dunderfelt
+
+> _I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated._  
+>&dash;Anonymous programmer
 
 ## The essentials
 
@@ -85,41 +95,36 @@ The actual interesting thing about these changes are the things that are *not* i
 All this missing code... it will scale well into large code-bases!
 It does not only work for plain objects, but also for arrays, functions, classes, deeply nested structures.
 
-<div align="center">
-    <img src="https://mweststrate.github.io/mobservable/images/overview.png" height="300"/>
-</div>
-
 ## Getting started
 
 Either:
-* [Edit](https://mweststrate.github.io/mobservable/getting-started.html#demo) a simple ToDo application online.
 * `npm install mobservable --save`
+* [Edit](https://mweststrate.github.io/mobservable/getting-started.html#demo) a simple ToDo application online.
 * Clone the boilerplate repository containing the above example from: https://github.com/mweststrate/react-mobservable-boilerplate.
 * Or fork this [JSFiddle](https://jsfiddle.net/mweststrate/wgbe4guu/).
 
-## Examples
+## Resources
+
+* [Five minute interactive introducton to Mobservable and React](https://mweststrate.github.io/mobservable/getting-started.html)
+* [API documentation](https://github.com/mweststrate/mobservable/blob/master/docs/api.md)
+* [Tips & Tricks](https://github.com/mweststrate/mobservable/blob/master/docs/syntax.md)
+* [ES5, ES6, TypeScript syntax examples](https://github.com/mweststrate/mobservable/blob/master/docs/api.md)
+* [TypeScript Typings](https://github.com/mweststrate/mobservable/blob/master/dist/mobservable.d.ts)
+
+## More examples
 
 * The [ports of the _Notes_ and _Kanban_ examples](https://github.com/survivejs/mobservable-demo) from the book "SurviveJS - Webpack and React" to mobservable.
 * A simple webshop using [React + mobservable](https://jsfiddle.net/mweststrate/46vL0phw) or [JQuery + mobservable](http://jsfiddle.net/mweststrate/vxn7qgdw).
 * [Simple timer](https://jsfiddle.net/mweststrate/wgbe4guu/) application in JSFiddle.
 * [TodoMVC](https://rawgit.com/mweststrate/todomvc/immutable-to-observable/examples/react-mobservable/index.html#/), based on the ReactJS TodoMVC.
 
-## Read more
+## Philosophy
 
-* [Five minute interactive introducton](https://mweststrate.github.io/mobservable/getting-started.html) to Mobservable and React
 * [Making React reactive: the pursuit of high performing, easily maintainable React apps](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/)
+* [SurviveJS interview on Mobservable, React and Flux](http://survivejs.com/blog/mobservable-interview/)
 * [Pure rendering in the light of time and state](https://medium.com/@mweststrate/pure-rendering-in-the-light-of-time-and-state-4b537d8d40b1)
 * [Official homepage](http://mweststrate.github.io/mobservable/)
-* Advanced [tips & tricks](https://github.com/mweststrate/mobservable/blob/master/docs/tips.md)
 
-## Runtime behavior
-
-* Reactive views always update synchronously (unless `transaction is used`)
-* Reactive views always update atomically, intermediate values will never be visible.
-* Reactive functions evaluate lazily and are not processed if they aren't observed.
-* Dependency detection is based on actual values to real-time minify the amount of dependencies.
-* Cycles are detected automatically.
-* Exceptions during computations are propagated to consumers.
 
 ## Top level api
 
@@ -138,6 +143,15 @@ Extends an existing object with reactive properties.
 **sideEffect(function)**
 Similar to `makeReactive(function)`. Exception the created reactive function will not be lazy, so that it is executed even when it has no observers on its own.
 Useful to bridge reactive code to imperative code.
+
+## Runtime behavior
+
+* Reactive views always update synchronously (unless `transaction is used`)
+* Reactive views always update atomically, intermediate values will never be visible.
+* Reactive functions evaluate lazily and are not processed if they aren't observed.
+* Dependency detection is based on actual values to real-time minify the amount of dependencies.
+* Cycles are detected automatically.
+* Exceptions during computations are propagated to consumers.
 
 ## FAQ
 
