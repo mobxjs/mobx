@@ -179,4 +179,4 @@ Yes, some examples are coming shortly!
 
 ##### Can you tell me how it works?
 
-Sure, join the reactiflux channel our checkout [dnode.ts](dnode.ts). Or, submit an issue to motivate me to make some nice drawings :).
+Sure, join the reactiflux channel our checkout [dnode.ts](lib/dnode.ts). Or, submit an issue to motivate me to make some nice drawings :).
