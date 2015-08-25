@@ -4,7 +4,7 @@ namespace mobservable {
             if (console)
                 console.warn("[mobservable:warning] " + message);
         }
-    
+
         /**
             Makes sure that the provided function is invoked at most once.
         */
@@ -17,15 +17,24 @@ namespace mobservable {
                 return func.apply(this, arguments);
             }
         }
-    
+
         export function noop(){
             // NOOP
         }
-        
+
+        export function unique<T>(list:T[]):T[] {
+            var res = [];
+            list.forEach(item => {
+                if (res.indexOf(item) === -1)
+                    res.push(item);
+            });
+            return res;
+        }
+
         export function isPlainObject(value) {
             return value !== null && typeof value == 'object' && Object.getPrototypeOf(value) === Object.prototype;
         }
-    
+
         /**
          * Given a new and an old list, tries to determine which items are added or removed
          * in linear time. The algorithm is heuristic and does not give the optimal results in all cases.
@@ -40,10 +49,10 @@ namespace mobservable {
                 return [current, []];
             if (!current || !current.length)
                 return [[], base];
-    
+
             var added:T[] = [];
             var removed:T[] = [];
-    
+
             var currentIndex = 0,
                 currentSearch = 0,
                 currentLength = current.length,
@@ -53,7 +62,7 @@ namespace mobservable {
                 baseLength = base.length,
                 isSearching = false,
                 baseExhausted = false;
-    
+
             while (!baseExhausted && !currentExhausted) {
                 if (!isSearching) {
                     // within rang and still the same
@@ -75,7 +84,7 @@ namespace mobservable {
                     baseExhausted = true;
                 if (currentSearch >= currentLength)
                     currentExhausted = true;
-    
+
                 if (!currentExhausted && current[currentSearch] === base[baseIndex]) {
                     // items where added
                     added.push(...current.slice(currentIndex, currentSearch));
@@ -91,7 +100,7 @@ namespace mobservable {
                     isSearching = false;
                 }
             }
-    
+
             added.push(...current.slice(currentIndex));
             removed.push(...base.slice(baseIndex));
             return [added, removed];

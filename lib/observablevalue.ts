@@ -1,68 +1,57 @@
+/// <reference path="./dnode.ts" />
 namespace mobservable {
     export namespace _ {
-        
-        export class ObservableValue<T> {
+
+        export class ObservableValue<T> extends RootDNode {
             protected changeEvent = new SimpleEventEmitter();
             protected _value: T;
-            dependencyState:DNode = new DNode(this);
-    
-            constructor(protected value:T, protected recurse:boolean){
+
+            constructor(protected value:T, protected recurse:boolean, context:Mobservable.IContextInfoStruct){
+                super(context);
                 this._value = this.makeReferenceValueReactive(value);
             }
 
             private makeReferenceValueReactive(value) {
                 if (this.recurse && (Array.isArray(value) || isPlainObject(value)))
-                    return makeReactive(value);
+                    return makeReactive(value, {
+                        context: this.context.object,
+                        name: this.context.name
+                    });
                 return value;
             }
-    
+
             set(value:T) {
                 if (value !== this._value) {
                     var oldValue = this._value;
-                    this.dependencyState.markStale();
+                    this.markStale();
                     this._value = this.makeReferenceValueReactive(value);
-                    this.dependencyState.markReady(true);
+                    this.markReady(true);
                     this.changeEvent.emit(this._value, oldValue);
                 }
             }
-    
+
             get():T {
-                this.dependencyState.notifyObserved();
+                this.notifyObserved();
                 return this._value;
             }
-    
+
             observe(listener:(newValue:T, oldValue:T)=>void, fireImmediately=false):Lambda {
-                this.dependencyState.setRefCount(+1); // awake
                 if (fireImmediately)
                     listener(this.get(), undefined);
-                var disposer = this.changeEvent.on(listener);
-                return once(() => {
-                    this.dependencyState.setRefCount(-1);
-                    disposer();
-                });
+                return this.changeEvent.on(listener);
             }
-    
-            createGetterSetter():Mobservable.IObservableValue<T> {
-                var self = this;
-                var f:any = function(value?) {
-                    if (arguments.length > 0)
-                        self.set(value);
-                    else
-                        return self.get();
-                };
-                f.impl = this;
-                f.observe = function(listener, fire) {
-                    return self.observe(listener, fire);
+
+            asPropertyDescriptor(): PropertyDescriptor {
+                return {
+                    configurable: false,
+                    enumerable: true,
+                    get: () => this.get(),
+                    set: (value) => this.set(value)
                 }
-                f.toString = function() {
-                    return "" + self.value;
-                }
-                _.markReactive(f);
-                return f;
             }
 
             toString() {
-                return `Observable[${this._value}]`;
+                return `Observable[${this.context.name}:${this._value}]`;
             }
         }
     }

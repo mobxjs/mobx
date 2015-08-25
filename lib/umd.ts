@@ -3,15 +3,15 @@
  * 1. not being able to generate an external (UMD) module from multiple files (thats why we have internal module)
  * 2. not being able to merge a default export declaration with non-default export declarations
  */
- 
+
 /// <reference path="./utils.ts" />
 /// <reference path="./index.ts" />
 /// <reference path="./api.ts" />
 /// <reference path="./watch.ts" />
 
 /**
- * This complete file is a fight against the system since typescript cannot decently generate 
- * ambient declarations from internal modules, merge default exports etc. etc. 
+ * This complete file is a fight against the system since typescript cannot decently generate
+ * ambient declarations from internal modules, merge default exports etc. etc.
  */
 
 // Let the compiler figure out whether we are still compatible with the api..
@@ -36,7 +36,8 @@ declare var module;
     }
 }(this, function () {
     var m = mobservable.makeReactive; // The default export
-    for (var key in mobservable)
+    m['default'] = mobservable.makeReactive;
+    for (var key in mobservable) if (mobservable.hasOwnProperty(key))
         m[key] = mobservable[key]; // the non-default exports
     return m;
 }));

@@ -96,6 +96,7 @@ exports.dynamic2 = function(test) {
 
 exports.readme1 = function(test) {
     try {
+        debugger;
         var b = buffer();
 
         var vat = makeReactive(0.20);
@@ -170,8 +171,8 @@ exports.testProps1 = function(test) {
     var vat = makeReactive(0.2);
     var Order = function() {
         mobservable.extendReactive(this, {
-            'price' : 20, 
-            'amount' : 2, 
+            'price' : 20,
+            'amount' : 2,
             'total': function() {
                 return (1+vat()) * this.price * this.amount; // price and amount are now properties!
             }
@@ -264,7 +265,7 @@ exports.testProps4 = function(test) {
 exports.testObserveProperty = function(test) {
     var sb = [];
     var mb = [];
-    
+
     var Wrapper = function (chocolateBar) {
         mobservable.extendReactive(this, {
             chocolateBar: chocolateBar,
@@ -316,18 +317,18 @@ exports.testWatch = function(test) {
         changed += 1;
     });
 
-    test.equals(2, res.length);
+    test.equals(3, res.length);
     test.equals(6, res[0]);
     test.equals(changed, 0);
     test.equals(calcs, 1);
-    test.equals(a.impl.dependencyState.observers.length, 1);
-    test.equals(b.impl.dependencyState.observers.length, 1);
-    
+    test.equals(a.$mobservable.observers.length, 1);
+    test.equals(b.$mobservable.observers.length, 1);
+
     b(4);
     test.equals(changed, 1);
     test.equals(calcs, 1); // no more calcs!
-    test.equals(a.impl.dependencyState.observers.length, 0);
-    test.equals(b.impl.dependencyState.observers.length, 0);
+    test.equals(a.$mobservable.observers.length, 0);
+    test.equals(b.$mobservable.observers.length, 0);
 
     test.equal(mobservable._.stackDepth(), 0);
     test.done();
@@ -345,7 +346,7 @@ exports.testWatchDisposed = function(test) {
         changed += 1;
     });
 
-    test.equals(2, res.length);
+    test.equals(3, res.length);
     test.equals(6, res[0]);
     test.equals(changed, 0);
     test.equals(calcs, 1);
@@ -372,9 +373,9 @@ exports.testWatchNested = function(test) {
             dCalcs += 1;
         });
         return c[0];
-        
+
     }).observe(function(newValue) {
-        b = newValue;  
+        b = newValue;
     }, true);
 
     test.equal(b, 3);
@@ -537,7 +538,7 @@ exports.test_nested_observable2 = function(test) {
     var price = mobservable(100);
     var totalCalcs = 0;
     var innerCalcs = 0;
-    
+
     var total = mobservable(function() {
         totalCalcs += 1; // outer observable shouldn't recalc if inner observable didn't publish a real change
         return price() * mobservable(function() {
@@ -545,30 +546,30 @@ exports.test_nested_observable2 = function(test) {
             return factor() % 2 === 0 ? 1 : 3;
         })();
     });
-    
+
     var b = [];
     var sub = total.observe(function(x) { b.push(x); }, true);
-    
+
     price(150);
     factor(7); // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
     factor(5); // doesn't trigger outer calc
     factor(3); // doesn't trigger outer calc
     factor(4); // triggers innerCalc twice
     price(20);
-    
+
     test.deepEqual(b, [100,150,450,150,20]);
     test.equal(innerCalcs, 9);
-    test.equal(totalCalcs, 5);    
-    
+    test.equal(totalCalcs, 5);
+
     test.done();
-}; 
+};
 
 exports.test_expr = function(test) {
     var factor = mobservable(0);
     var price = mobservable(100);
     var totalCalcs = 0;
     var innerCalcs = 0;
-    
+
     var total = mobservable(function() {
         totalCalcs += 1; // outer observable shouldn't recalc if inner observable didn't publish a real change
         return price() * mobservable(function() {
@@ -576,40 +577,40 @@ exports.test_expr = function(test) {
             return factor() % 2 === 0 ? 1 : 3;
         })();
     });
-    
+
     var b = [];
     var sub = total.observe(function(x) { b.push(x); }, true);
-    
+
     price(150);
     factor(7); // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
     factor(5); // doesn't trigger outer calc
     factor(3); // doesn't trigger outer calc
     factor(4); // triggers innerCalc twice
     price(20);
-    
+
     test.deepEqual(b, [100,150,450,150,20]);
     test.equal(innerCalcs, 9);
-    test.equal(totalCalcs, 5);    
-    
+    test.equal(totalCalcs, 5);
+
     test.done();
-}; 
+};
 
 exports.test_sideeffect = function(test) {
     var x = mobservable(3);
     var x2 = mobservable(function() { return x() * 2; });
     var b = [];
-    
-    var cancel = mobservable.sideEffect(function() { 
-        b.push(x2()); 
+
+    var cancel = mobservable.sideEffect(function() {
+        b.push(x2());
     });
-    
+
     x(4);
     x(5);
     test.deepEqual(b, [6, 8, 10]);
     cancel();
     x(7);
     test.deepEqual(b, [6, 8, 10]);
-    
+
     test.done();
 };
 
@@ -620,19 +621,19 @@ exports.test_json1 = function(test) {
         },
         {
             title: "improve coverge"
-        }    
+        }
     ]);
-    
+
     var output;
     mobservable.sideEffect(function() {
         output = todos.map(function(todo) { return todo.title; }).join(", ");
     });
-    
+
     todos[1].title = "improve coverage"; // prints: write blog, improve coverage
     test.equal(output, "write blog, improve coverage");
     todos.push({ title: "take a nap" }); // prints: write blog, improve coverage, take a nap
     test.equal(output, "write blog, improve coverage, take a nap");
-    
+
     test.done();
 }
 
@@ -655,37 +656,37 @@ exports.test_json2 = function(test) {
             }
         ]
     };
-    
+
     var o = mobservable.makeReactive(source);
-    
+
     //console.log(JSON.stringify(source,null,4));
     test.deepEqual(mobservable.toJson(o), source);
     test.deepEqual(source, o);
-        
+
     var analyze = mobservable(function() {
         return [
             o.todos.length,
             o.todos[1].details.url
         ]
     });
-    
+
     var alltags = mobservable(function() {
         return o.todos.map(function(todo) {
             return todo.tags.join(",");
         }).join(",");
     });
-    
+
     var ab = [];
     var tb = [];
-    
+
     analyze.observe(function(d) { ab.push(d); }, true);
     alltags.observe(function(d) { tb.push(d); }, true);
-    
+
     o.todos[0].details.url = "boe";
     o.todos[1].details.url = "ba";
     o.todos[0].tags[0] = "reactjs";
     o.todos[1].tags.push("pff");
-    
+
     test.deepEqual(mobservable.toJson(o), {
         "todos": [
             {
@@ -713,12 +714,12 @@ exports.test_json2 = function(test) {
     test.deepEqual(tb,  [ 'react,frp,mweh', 'reactjs,frp,mweh', 'reactjs,frp,mweh,pff' ]);
     ab = [];
     tb = [];
-    
+
     o.todos.push(mobservable.makeReactive({
         title: "test",
         tags: ["x"]
     }));
-    
+
     test.deepEqual(o, {
         "todos": [
             {
@@ -789,7 +790,7 @@ exports.test_json2 = function(test) {
     test.deepEqual(tb, ["reactjs,frp,needs sabbatical,x"]);
     ab = [];
     tb = [];
-    
+
     o.todos[1].details = mobservable.makeReactive({ url: "google" });
     o.todos[1].tags = ["foo", "bar"];
     test.deepEqual(mobservable.toJson(o), {
@@ -822,6 +823,6 @@ exports.test_json2 = function(test) {
     test.deepEqual(o, mobservable.toJson(o));
     test.deepEqual(ab, [[3, "google"]]);
     test.deepEqual(tb, ["reactjs,frp,foo,bar,x"]);
-    
+
     test.done();
 }

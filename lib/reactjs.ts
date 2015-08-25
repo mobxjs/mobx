@@ -1,14 +1,25 @@
+/// <reference path="./index.ts" />
 namespace mobservable {
+
+    var reactComponentId = 1;
 
     export var reactiveMixin = {
         componentWillMount: function() {
+            var name = (this.displayName || this.constructor.name || "ReactiveComponent") + reactComponentId++;
             var baseRender = this.render;
+
             this.render = function() {
                 if (this._watchDisposer)
                     this._watchDisposer();
-                var[rendering, disposer] = observeUntilInvalid(() => baseRender.call(this), () => {
-                    this.forceUpdate();
-                });
+                var[rendering, disposer, watch] = observeUntilInvalid(
+                    () => baseRender.call(this),
+                    () => {
+                        this.forceUpdate();
+                    }, {
+                        object: this,
+                        name
+                    });
+                this.$mobservable = watch;
                 this._watchDisposer = disposer;
                 return rendering;
             }
@@ -17,6 +28,7 @@ namespace mobservable {
         componentWillUnmount: function() {
             if (this._watchDisposer)
                 this._watchDisposer();
+            delete this._mobservableDNode;
         },
 
         shouldComponentUpdate: function(nextProps, nextState) {
@@ -36,18 +48,19 @@ namespace mobservable {
     }
 
     export function reactiveComponent(componentClass) {
-        var baseMount = componentClass.prototype.componentWillMount;
-        var baseUnmount = componentClass.prototype.componentWillUnmount;
-        componentClass.prototype.componentWillMount = function() {
+        var target = componentClass.prototype || componentClass; // For React 0.14
+        var baseMount = target.componentWillMount;
+        var baseUnmount = target.componentWillUnmount;
+        target.componentWillMount = function() {
             reactiveMixin.componentWillMount.apply(this, arguments);
             baseMount && baseMount.apply(this, arguments);
         };
-        componentClass.prototype.componentWillUnmount = function() {
+        target.componentWillUnmount = function() {
             reactiveMixin.componentWillUnmount.apply(this, arguments);
             baseUnmount && baseUnmount.apply(this, arguments);
         };
-        if (!componentClass.prototype.shouldComponentUpdate)
-            componentClass.prototype.shouldComponentUpdate = reactiveMixin.shouldComponentUpdate;
+        if (!target.shouldComponentUpdate)
+            target.shouldComponentUpdate = reactiveMixin.shouldComponentUpdate;
         return componentClass;
     };
-}   
+}

@@ -15,9 +15,9 @@ interface _IMobservableStatic {
 
     observable(target: Object, key: string); // decorator / annotation
 
-    sideEffect(func: Mobservable.Lambda,scope?): Mobservable.Lambda;
+    sideEffect(func: Mobservable.Lambda, options?: Mobservable.IMakeReactiveOptions): Mobservable.Lambda;
 
-    observeUntilInvalid<T>(func: ()=>T, onInvalidate: Mobservable.Lambda): [T,Mobservable.Lambda];
+    observeUntilInvalid<T>(func: ()=>T, onInvalidate: Mobservable.Lambda, context?: Mobservable.IContextInfo): [T,Mobservable.Lambda];
 
     transaction<T>(action: ()=>T): T;
 
@@ -29,6 +29,14 @@ interface _IMobservableStatic {
     reactiveMixin: Object;
 
     debugLevel:  number;
+
+    extras: {
+        getDependencyTree(thing:any, property?:string): Mobservable.IDependencyTree;
+
+        getObserverTree(thing:any, property?:string): Mobservable.IObserverTree;
+
+        trackTransitions(extensive?:boolean, onReport?:(lines:Mobservable.ITransitionEvent) => void) : Mobservable.Lambda;
+    }
 }
 
 interface IMakeReactive {
@@ -45,12 +53,22 @@ declare module Mobservable {
     interface IMakeReactiveOptions {
         as?:  string /* "auto" | "reference" | TODO:  see #8 "structure" */
         scope?:  Object,
+        context?: Object,
         recurse?:  boolean;
+        name?: string;
         // protected:  boolean TODO:  see #9
     }
 
+    export interface IContextInfoStruct {
+        object: Object;
+        name: string;
+    }
+
+    export type IContextInfo = IContextInfoStruct | string;
+
     interface Lambda {
         (): void;
+        name?: string;
     }
 
     interface IObservable {
@@ -87,5 +105,29 @@ declare module Mobservable {
         index:  number;
         removed:  T[];
         addedCount:  number;
+    }
+
+    interface IDependencyTree {
+        id: number;
+        name: string;
+        context: any;
+        dependencies?: IDependencyTree[];
+    }
+
+    interface IObserverTree {
+        id: number;
+        name: string;
+        context: any;
+        observers?: IObserverTree[];
+        listeners?: number; // amount of functions manually attached using an .observe method
+    }
+
+    interface ITransitionEvent {
+        id: number;
+        name: string;
+        context: Object;
+        state: string;
+        changed: boolean;
+        newValue: string;
     }
 }

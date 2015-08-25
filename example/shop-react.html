@@ -173,7 +173,12 @@
         var CartTotalView = mobservable.reactiveComponent(React.createClass({
             render: function() {
                 log("Rendering CartTotalView");
-                return (<div><b>Total: <span id="total">{("€ " + this.props.cart.total).replace(/(\.\d\d)\d*/,"$1")}</span></b></div>);
+                return (<div onClick={ this.showDepTree }><b>Total: <span id="total">{("€ " + this.props.cart.total).replace(/(\.\d\d)\d*/,"$1")}</span></b></div>);
+            },
+            
+            showDepTree: function() {
+                // clicking the total will show the dependency tree of total in the console!
+                console.dir(mobservable.extra.getDependencyTree(this));
             }
         }));
 

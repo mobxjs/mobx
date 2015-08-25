@@ -2,35 +2,34 @@
 
 namespace mobservable {
     export namespace _ {
-        export class ComputedObservable<U> extends ObservableValue<U> {
+        export class ObservableView<T> extends ObservingDNode {
             private isComputing = false;
             private hasError = false;
-    
-            constructor(protected func:()=>U, private scope?:Object) {
-                super(undefined, false);
-                if (typeof func !== "function")
-                    throw new Error("ComputedObservable requires a function");
+            protected _value: T;
+            protected changeEvent = new SimpleEventEmitter();
+
+            constructor(protected func:()=>T, private scope: Object, context:Mobservable.IContextInfoStruct) {
+                super(context);
             }
-    
-            get():U {
+
+            get():T {
                 if (this.isComputing)
                     throw new Error("Cycle detected");
-                var state = this.dependencyState;
-                if (state.isSleeping) {
-                    if (DNode.trackingStack.length > 0) {
+                if (this.isSleeping) {
+                    if (RootDNode.trackingStack.length > 0) {
                         // somebody depends on the outcome of this computation
-                        state.wakeUp(); // note: wakeup triggers a compute
-                        state.notifyObserved();
+                        this.wakeUp(); // note: wakeup triggers a compute
+                        this.notifyObserved();
                     } else {
                         // nobody depends on this computable; so compute a fresh value but do not wake up
                         this.compute();
                     }
                 } else {
                     // we are already up to date, somebody is just inspecting our current value
-                    state.notifyObserved();
+                    this.notifyObserved();
                 }
-    
-                if (state.hasCycle)
+
+                if (this.hasCycle)
                     throw new Error("Cycle detected");
                 if (this.hasError) {
                     if (debugLevel) {
@@ -41,13 +40,13 @@ namespace mobservable {
                 }
                 return this._value;
             }
-    
-            set(_:U) {
-                throw new Error(this.toString() + ": A computed observable does not accept new values!");
+
+            set() {
+                throwingSetter();
             }
-    
+
             compute() {
-                var newValue:U;
+                var newValue:T;
                 try {
                     // this cycle detection mechanism is primarily for lazy computed values; other cycles are already detected in the dependency tree
                     if (this.isComputing)
@@ -61,7 +60,7 @@ namespace mobservable {
                     if (e instanceof Error)
                         newValue = e;
                     else {
-                        newValue = <U><any> new Error("MobservableComputationError");
+                        newValue = <T><any> new Error("MobservableComputationError");
                         (<any>newValue).cause = e;
                     }
                 }
@@ -74,10 +73,34 @@ namespace mobservable {
                 }
                 return false;
             }
-    
-            toString() {
-                return `ComputedObservable[${this.func.toString()}]`;
+
+            observe(listener:(newValue:T, oldValue:T)=>void, fireImmediately=false):Lambda {
+                this.setRefCount(+1); // awake
+                if (fireImmediately)
+                    listener(this.get(), undefined);
+                var disposer = this.changeEvent.on(listener);
+                return once(() => {
+                    this.setRefCount(-1);
+                    disposer();
+                });
             }
+
+            asPropertyDescriptor(): PropertyDescriptor {
+                return {
+                    configurable: false,
+                    enumerable: false,
+                    get: () => this.get(),
+                    set: throwingSetter
+                }
+            }
+
+            toString() {
+                return `ComputedObservable[${this.context.name}:${this._value}]`;
+            }
+        }
+
+        function throwingSetter() {
+            throw new Error("View functions do not accept new values");
         }
     }
 }
