@@ -22,17 +22,17 @@ Mobservable is a library to create reactive state and views. Mobservable updates
 
 ## What others are saying...
 
-> _Elegant! I love it!_  
+> _Elegant! I love it!_
 > &dash; Johan den Haan, CTO of Mendix
 
-> _We ported the book Notes and Kanban examples to Mobservable. Check out [the source](https://github.com/survivejs/mobservable-demo) to see how this worked out. Compared to the original I was definitely positively surprised. Mobservable seems like a good fit for these problems._  
+> _We ported the book Notes and Kanban examples to Mobservable. Check out [the source](https://github.com/survivejs/mobservable-demo) to see how this worked out. Compared to the original I was definitely positively surprised. Mobservable seems like a good fit for these problems._
 > &dash; Juho Vepsäläinen, author of "SurviveJS - Webpack and React" and jster.net curator
 
-> _Great job with Mobservable! Really gives current conventions and libraries a run for their money._  
+> _Great job with Mobservable! Really gives current conventions and libraries a run for their money._
 > &dash; Daniel Dunderfelt
 
-> _I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated._  
->&dash;David Schalk
+> _I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated._
+>&dash;David Schalk, fpcomplete.com
 
 ## The essentials
 
