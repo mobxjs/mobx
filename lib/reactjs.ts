@@ -48,6 +48,8 @@ namespace mobservable {
     }
 
     export function reactiveComponent(componentClass) {
+        console.warn("The use of mobservable.reactiveComponent and mobservable.reactiveMixin is deprecated, please use reactiveComponent from the mobservable-react package");
+
         var target = componentClass.prototype || componentClass; // For React 0.14
         var baseMount = target.componentWillMount;
         var baseUnmount = target.componentWillUnmount;
