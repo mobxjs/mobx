@@ -1,9 +1,19 @@
 /// <reference path="./api.ts" />
 
+declare var __mobservableTrackingStack;
+
 namespace mobservable {
+
+    var global = (function() { return this; })()
+
+    // DNode[][], stack of: list of DNode's being observed by the currently ongoing computation
+    global.__mobservableTrackingStack = [];
+
     export namespace _ {
 
         var mobservableId = 0;
+
+
 
         export enum DNodeState {
             STALE,     // One or more depencies have changed but their values are not yet known, current value is stale
@@ -16,7 +26,6 @@ namespace mobservable {
          * Represents the state of some State.
          */
         export class RootDNode {
-            static trackingStack: RootDNode[][] = [];  // stack of: list of DNode's being observed by the currently ongoing computation
 
             id = ++mobservableId;
             state: DNodeState = DNodeState.READY;
@@ -68,7 +77,7 @@ namespace mobservable {
             }
 
             public notifyObserved() {
-                var ts = RootDNode.trackingStack, l = ts.length;
+                var ts = __mobservableTrackingStack, l = ts.length;
                 if (l > 0) {
                     var cs = ts[l - 1], csl = cs.length;
                     // this last item added check is an optimization especially for array loops,
@@ -170,11 +179,11 @@ namespace mobservable {
 
             private trackDependencies() {
                 this.prevObserving = this.observing;
-                RootDNode.trackingStack[RootDNode.trackingStack.length] = [];
+                __mobservableTrackingStack[__mobservableTrackingStack.length] = [];
             }
 
             private bindDependencies() {
-                this.observing = RootDNode.trackingStack.pop();
+                this.observing = __mobservableTrackingStack.pop();
 
                 if (this.observing.length === 0 && debugLevel > 1 && !this.isDisposed) {
                     console.trace();
@@ -220,7 +229,7 @@ namespace mobservable {
         }
 
         export function stackDepth () {
-            return RootDNode.trackingStack.length;
+            return __mobservableTrackingStack.length;
         }
     }
 }

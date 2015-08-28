@@ -264,7 +264,7 @@ namespace mobservable {
             }
 
             private sideEffectWarning(funcName:string) {
-                if (debugLevel > 0 && RootDNode.trackingStack.length > 0)
+                if (debugLevel > 0 && __mobservableTrackingStack.length > 0)
                     warn(`[Mobservable.Array] The method array.${funcName} should probably not be used inside observable functions since it has side-effects`);
             }
         }

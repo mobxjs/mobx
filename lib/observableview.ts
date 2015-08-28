@@ -16,7 +16,7 @@ namespace mobservable {
                 if (this.isComputing)
                     throw new Error("Cycle detected");
                 if (this.isSleeping) {
-                    if (RootDNode.trackingStack.length > 0) {
+                    if (__mobservableTrackingStack.length > 0) {
                         // somebody depends on the outcome of this computation
                         this.wakeUp(); // note: wakeup triggers a compute
                         this.notifyObserved();
