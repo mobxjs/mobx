@@ -153,6 +153,13 @@ Useful to bridge reactive code to imperative code.
 * Cycles are detected automatically.
 * Exceptions during computations are propagated to consumers.
 
+## Roadmap
+
+* Split into two packages; `mobservable` and `mobservable-react`
+* Write blog about inner workings
+* Write documentation, including how to organize projects
+* Introduce options for asynchronous views and structurally compare view results
+
 ## FAQ
 
 ##### Which browsers are supported?
