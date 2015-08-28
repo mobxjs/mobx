@@ -12,6 +12,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var mobservable;
 (function (mobservable) {
+    var global = (function () { return this; })();
+    global.__mobservableTrackingStack = [];
     var _;
     (function (_) {
         var mobservableId = 0;
@@ -67,7 +69,7 @@ var mobservable;
                     os[i].notifyStateChange(this, stateDidActuallyChange);
             };
             RootDNode.prototype.notifyObserved = function () {
-                var ts = RootDNode.trackingStack, l = ts.length;
+                var ts = __mobservableTrackingStack, l = ts.length;
                 if (l > 0) {
                     var cs = ts[l - 1], csl = cs.length;
                     if (cs[csl - 1] !== this && cs[csl - 2] !== this)
@@ -82,7 +84,6 @@ var mobservable;
             RootDNode.prototype.toString = function () {
                 return "DNode[" + this.context.name + ", state: " + this.state + ", observers: " + this.observers.length + "]";
             };
-            RootDNode.trackingStack = [];
             return RootDNode;
         })();
         _.RootDNode = RootDNode;
@@ -157,10 +158,10 @@ var mobservable;
             };
             ObservingDNode.prototype.trackDependencies = function () {
                 this.prevObserving = this.observing;
-                RootDNode.trackingStack[RootDNode.trackingStack.length] = [];
+                __mobservableTrackingStack[__mobservableTrackingStack.length] = [];
             };
             ObservingDNode.prototype.bindDependencies = function () {
-                this.observing = RootDNode.trackingStack.pop();
+                this.observing = __mobservableTrackingStack.pop();
                 if (this.observing.length === 0 && mobservable.debugLevel > 1 && !this.isDisposed) {
                     console.trace();
                     _.warn("You have created a function that doesn't observe any values, did you forget to make its dependencies observable?");
@@ -202,7 +203,7 @@ var mobservable;
         })(RootDNode);
         _.ObservingDNode = ObservingDNode;
         function stackDepth() {
-            return RootDNode.trackingStack.length;
+            return __mobservableTrackingStack.length;
         }
         _.stackDepth = stackDepth;
     })(_ = mobservable._ || (mobservable._ = {}));
@@ -695,7 +696,7 @@ var mobservable;
                 }).apply(this, initialArgs);
             };
             ObservableArray.prototype.sideEffectWarning = function (funcName) {
-                if (mobservable.debugLevel > 0 && _.RootDNode.trackingStack.length > 0)
+                if (mobservable.debugLevel > 0 && __mobservableTrackingStack.length > 0)
                     _.warn("[Mobservable.Array] The method array." + funcName + " should probably not be used inside observable functions since it has side-effects");
             };
             return ObservableArray;
@@ -754,9 +755,9 @@ var mobservable;
             if (!mobservable.isReactive(thing))
                 throw new Error("[mobservable.getDNode] " + thing + " doesn't seem to be reactive");
             if (property !== undefined) {
-                _.RootDNode.trackingStack.push([]);
+                __mobservableTrackingStack.push([]);
                 thing[property];
-                var dnode = _.RootDNode.trackingStack.pop()[0];
+                var dnode = __mobservableTrackingStack.pop()[0];
                 if (!dnode)
                     throw new Error("[mobservable.getDNode] property '" + property + "' of '" + thing + "' doesn't seem to be a reactive property");
                 return dnode;
@@ -929,7 +930,7 @@ var mobservable;
                 if (this.isComputing)
                     throw new Error("Cycle detected");
                 if (this.isSleeping) {
-                    if (_.RootDNode.trackingStack.length > 0) {
+                    if (__mobservableTrackingStack.length > 0) {
                         this.wakeUp();
                         this.notifyObserved();
                     }
@@ -1122,6 +1123,7 @@ var mobservable;
         }
     };
     function reactiveComponent(componentClass) {
+        console.warn("The use of mobservable.reactiveComponent and mobservable.reactiveMixin is deprecated, please use reactiveComponent from the mobservable-react package");
         var target = componentClass.prototype || componentClass;
         var baseMount = target.componentWillMount;
         var baseUnmount = target.componentWillUnmount;
