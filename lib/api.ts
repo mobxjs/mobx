@@ -15,7 +15,7 @@ interface _IMobservableStatic {
 
     observable(target: Object, key: string); // decorator / annotation
 
-    sideEffect(func: Mobservable.Lambda, options?: Mobservable.IMakeReactiveOptions): Mobservable.Lambda;
+    sideEffect(func: Mobservable.Lambda, scope?: any): Mobservable.Lambda;
 
     observeUntilInvalid<T>(func: ()=>T, onInvalidate: Mobservable.Lambda, context?: Mobservable.IContextInfo): [T,Mobservable.Lambda];
 

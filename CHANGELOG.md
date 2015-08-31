@@ -1,3 +1,7 @@
+# 0.6.4: 
+
+* 2nd argument of sideEffect is now the scope, instead of an options object which hadn't any useful properties
+
 # 0.6.3
 
 * Deprecated: reactiveComponent, reactiveComponent from the separate package mobservable-react should be used instead

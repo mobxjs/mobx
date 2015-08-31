@@ -66,11 +66,10 @@ namespace mobservable {
         return !!value.$mobservable;
     }
 
-    export function sideEffect(func:Lambda, opts?:Mobservable.IMakeReactiveOptions):Lambda {
-        opts = opts || {};
-        const observable = new _.ObservableView(func, opts.scope || opts.context, {
-            object: opts.context || opts.scope,
-            name: opts.name || func.name
+    export function sideEffect(func:Lambda, scope?:any):Lambda {
+        const observable = new _.ObservableView(func, scope, {
+            object: scope,
+            name: func.name
         });
         const disposer = observable.observe(_.noop);
         if (observable.observing.length === 0)

@@ -201,9 +201,6 @@ exports.testNames = function(test) {
     test.equal(name(m.sideEffect(function namedFunction() {
     })), "namedFunction");
 
-    test.equal(name(m.sideEffect(function namedFunction() {
-    },  { name : "overridenName" })), "overridenName");
-
     test.ok(name(m(function() {
     })));
 
