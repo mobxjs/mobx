@@ -257,11 +257,10 @@ var mobservable;
         return !!value.$mobservable;
     }
     mobservable.isReactive = isReactive;
-    function sideEffect(func, opts) {
-        opts = opts || {};
-        var observable = new _.ObservableView(func, opts.scope || opts.context, {
-            object: opts.context || opts.scope,
-            name: opts.name || func.name
+    function sideEffect(func, scope) {
+        var observable = new _.ObservableView(func, scope, {
+            object: scope,
+            name: func.name
         });
         var disposer = observable.observe(_.noop);
         if (observable.observing.length === 0)
