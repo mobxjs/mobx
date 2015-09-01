@@ -104,10 +104,12 @@
           Since components update automatically, most of them can be stateless. You don't even need to state which data dependencies it has!
         </p>
 
+        <p>Install the Mobservable - React bindings using <code>npm install mobservable-react --save</code></p>
+
 <!-- Code block 2 -->
 <div class="highlight highlight-javascript"><pre><span class="pl-k">import</span> React <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
 <span class="pl-k">import</span> todoStore <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./todostore<span class="pl-pds">'</span></span>;
-<span class="pl-k">import</span> {reactiveComponent} <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>mobservable<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> {reactiveComponent} <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>mobservable-react<span class="pl-pds">'</span></span>;
 
 <span class="pl-c">// React component that responds to changes in 'todos'</span>
 <span class="pl-k">var</span> TodoList <span class="pl-k">=</span> <span style="color:red; font-weight:bold">reactiveComponent</span>(React.createClass({
@@ -234,7 +236,7 @@ React.render(<span class="pl-k">&lt;</span>TodoList store<span class="pl-k">=</s
               <li>The <a target="_blank" href="https://github.com/mweststrate/mobservable/blob/master/README.md">full documentation</a></li>
               <li>Get started with a <a target="_blank" href="https://jsfiddle.net/mweststrate/wgbe4guu/">small JSFiddle</a></li>
               <li>Get started by cloning the <a target="_blank" href="https://github.com/mweststrate/react-mobservable-boilerplate">react mobservable boilerplate project</a></li>
-              <li><a target="_blank" href="https://github.com/mweststrate/todomvc/tree/master/examples/react-mobservable">TodoMVC using mobservable</a></li>
+              <li><a target="_blank" href="https://github.com/mweststrate/mobservable-react-todomvc">TodoMVC using mobservable</a></li>
               <li>Review a more <a target="_blank" href="https://jsfiddle.net/mweststrate/46vL0phw">sophisticated example</a></li>
               <li>Discuss mobservable in the <a target="_blank" href="https://reactiflux.slack.com/messages/mobservable/">Reactiflux #mobservable</a> slack channel (<a target="_blank" href="http://www.reactiflux.com/">Sign up</a>)</li>
             </ul>
