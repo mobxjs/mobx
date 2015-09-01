@@ -71,12 +71,12 @@ var timerData = mobservable.makeReactive({
 });
 ```
 
-### mobservable.reactiveComponent
+### mobservableReact.reactiveComponent
 
-The second important function is `reactiveComponent`. It turns a Reactjs component into a reactive one, that responds automatically to changes in data that is used by its render method. It can be used to wrap any react component, either created by using ES6 classes or `createClass`. So to fix the example, just update the timer definition to:
+The second important function is `reactiveComponent` from the `mobservable-react` package. It turns a Reactjs component into a reactive one, that responds automatically to changes in data that is used by its render method. It can be used to wrap any react component, either created by using ES6 classes or `createClass`. So to fix the example, just update the timer definition to:
 
 ```javascript
-var Timer = mobservable.reactiveComponent(React.createClass{
+var Timer = mobservableReact.reactiveComponent(React.createClass{
   /** Omitted */
 }));
 ```
@@ -97,26 +97,25 @@ It does not only work for plain objects, but also for arrays, functions, classes
 
 ## Getting started
 
-Either:
-* `npm install mobservable --save`
-* [Edit](https://mweststrate.github.io/mobservable/getting-started.html#demo) a simple ToDo application online.
-* Clone the boilerplate repository containing the above example from: https://github.com/mweststrate/react-mobservable-boilerplate.
-* Or fork this [JSFiddle](https://jsfiddle.net/mweststrate/wgbe4guu/).
+* `npm install mobservable --save`.
+* For React apps `npm install mobservable-react --save` as well. You might also be interested in the [dev tools for React and Mobservable](https://github.com/mweststrate/mobservable-react-devtools).
 
 ## Resources
 
+Fresh step-by-step documentation is [coming soon](https://github.com/mweststrate/mobservable/issues/7)!
+
 * [Five minute interactive introducton to Mobservable and React](https://mweststrate.github.io/mobservable/getting-started.html)
 * [API documentation](https://github.com/mweststrate/mobservable/blob/master/docs/api.md)
-* [Tips & Tricks](https://github.com/mweststrate/mobservable/blob/master/docs/syntax.md)
 * [ES5, ES6, TypeScript syntax examples](https://github.com/mweststrate/mobservable/blob/master/docs/api.md)
 * [TypeScript Typings](https://github.com/mweststrate/mobservable/blob/master/dist/mobservable.d.ts)
 
-## More examples
+## Examples
 
-* The [ports of the _Notes_ and _Kanban_ examples](https://github.com/survivejs/mobservable-demo) from the book "SurviveJS - Webpack and React" to mobservable.
-* A simple webshop using [React + mobservable](https://jsfiddle.net/mweststrate/46vL0phw) or [JQuery + mobservable](http://jsfiddle.net/mweststrate/vxn7qgdw).
-* [Simple timer](https://jsfiddle.net/mweststrate/wgbe4guu/) application in JSFiddle.
-* [TodoMVC](https://rawgit.com/mweststrate/todomvc/immutable-to-observable/examples/react-mobservable/index.html#/), based on the ReactJS TodoMVC.
+* Online: Live edit the Todo example from the [introduction](https://mweststrate.github.io/mobservable/getting-started.html#demo).
+* Online: Simple timer example on [JSFiddle](https://jsfiddle.net/mweststrate/wgbe4guu/).
+* Repo: [Minimal boilerplate repostory](https://github.com/mweststrate/mobservable-react-boilerplate).
+* Repo: [Full TodoMVC implementation](https://github.com/mweststrate/mobservable-react-todomvc).
+* External example: The ports of the _Notes_ and _Kanban_ [examples of the "SurviveJS - Webpack and React"](https://github.com/survivejs/mobservable-demo).
 
 ## Philosophy
 
@@ -124,7 +123,6 @@ Either:
 * [SurviveJS interview on Mobservable, React and Flux](http://survivejs.com/blog/mobservable-interview/)
 * [Pure rendering in the light of time and state](https://medium.com/@mweststrate/pure-rendering-in-the-light-of-time-and-state-4b537d8d40b1)
 * [Official homepage](http://mweststrate.github.io/mobservable/)
-
 
 ## Top level api
 
@@ -135,7 +133,7 @@ This is an overview of most important functions available in the `mobservable` n
 Turns a value into a reactive array, object, function, value or a reactive reference to a value.
 
 **reactiveComponent(reactJsComponent)**
-Turns a ReactJS component into a reactive one, that automatically re-renders if any reactive data that it uses is changed.
+Provided by the `mobservable-react` packaege, turns a ReactJS component into a reactive one, that automatically re-renders if any reactive data that it uses is changed.
 
 **extendReactive(target, properties)**
 Extends an existing object with reactive properties.

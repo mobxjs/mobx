@@ -286,7 +286,7 @@ Fun fact: `sideEffect(func)` is actually an alias for `makeReactive(func).observ
 
 ### reactiveComponent(component)
 
-It turns a ReactJS component into a reactive one.
+`reactiveComponent` turns a ReactJS component into a reactive one and is provided through the separate (and minimal) `mobservable-react` package.
 Making a component reactive means that it will automatically observe any reactive data it uses.
 
 It is quite similar to `@connect` as found in several flux libraries, yet there are two important differences.
@@ -330,9 +330,6 @@ reactiveComponent(React.createClass({
   /* .. */
 }))
 ```
-
-Note: `reactiveComponent` is actually the only ReactJS specific thing in mobservable and should be easily portable to other frameworks.
-`reactiveComponent` might move to its own package in the future.
 
 ### observeUntilInvalid(functionToObserve, onInvalidate)
 
