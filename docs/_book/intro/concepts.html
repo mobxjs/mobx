@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>Why Mobservable? | Introduction</title>
+        <title>Concepts &amp; Principles | Introduction</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.2.0">
@@ -15,20 +15,20 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black">
-        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
-        <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+        <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
         
-    <link rel="stylesheet" href="gitbook/style.css">
+    <link rel="stylesheet" href="../gitbook/style.css">
     
     
 
         
     
     
-    <link rel="next" href="./intro/overview.html" />
+    <link rel="next" href="../core/reactive-state.html" />
     
     
-    <link rel="prev" href="./index.html" />
+    <link rel="prev" href="../intro/overview.html" />
     
 
         
@@ -36,7 +36,7 @@
     <body>
         
         
-    <div class="book" data-level="1.1" data-basepath="." data-revision="Thu Sep 03 2015 20:15:09 GMT+0200 (CEST)">
+    <div class="book" data-level="1.3" data-basepath=".." data-revision="Thu Sep 03 2015 20:15:09 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -53,10 +53,10 @@
 
         
     
-        <li class="chapter active" data-level="0" data-path="index.html">
+        <li class="chapter " data-level="0" data-path="index.html">
             
                 
-                    <a href="./index.html">
+                    <a href="../index.html">
                 
                         <i class="fa fa-check"></i>
                         
@@ -74,10 +74,10 @@
             <ul class="articles">
                 
     
-        <li class="chapter active" data-level="1.1" data-path="index.html">
+        <li class="chapter " data-level="1.1" data-path="index.html">
             
                 
-                    <a href="./index.html">
+                    <a href="../index.html">
                 
                         <i class="fa fa-check"></i>
                         
@@ -92,7 +92,7 @@
         <li class="chapter " data-level="1.2" data-path="intro/overview.html">
             
                 
-                    <a href="./intro/overview.html">
+                    <a href="../intro/overview.html">
                 
                         <i class="fa fa-check"></i>
                         
@@ -104,10 +104,10 @@
             
         </li>
     
-        <li class="chapter " data-level="1.3" data-path="intro/concepts.html">
+        <li class="chapter active" data-level="1.3" data-path="intro/concepts.html">
             
                 
-                    <a href="./intro/concepts.html">
+                    <a href="../intro/concepts.html">
                 
                         <i class="fa fa-check"></i>
                         
@@ -135,7 +135,7 @@
         <li class="chapter " data-level="2.1" data-path="core/reactive-state.html">
             
                 
-                    <a href="./core/reactive-state.html">
+                    <a href="../core/reactive-state.html">
                 
                         <i class="fa fa-check"></i>
                         
@@ -398,7 +398,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href="./" >Introduction</a>
+        <a href="../" >Introduction</a>
     </h1>
 </div>
 
@@ -408,42 +408,70 @@
                 
                     <section class="normal" id="section-">
                     
-                        <h1 id="introduction">Introduction</h1>
-<p><strong>Mobservable is a library to create <em>views</em> that react to <em>state</em> changes automatically.</strong></p>
-<h2 id="philosophy">Philosophy</h2>
-<p>Mobservable isn&apos;t a library that helps you to write fancy code.
-It helps you to remove fancy code, so that just boring, simple code remains.
-Because simple code<sup>1</sup> is the secret recipe to building enterprise scale software that is easy to change or maintain.
-Simple code allows you to focus on the essential complexity<sup>2</sup> of your application.</p>
-<p>These are some examples of fancy code that you no longer need when using Mobservable:</p>
+                        <h1 id="concepts-principles">Concepts &amp; Principles</h1>
+<h2 id="concepts">Concepts</h2>
+<p>Mobservable destinguishes the following concepts in your application. You saw them in the previous gist, but let&apos;s dive into them in a bit more detail.</p>
+<h3 id="1-state">1. State</h3>
+<p><em>State</em> is the data that drives your application. 
+Usually there is <em>domain specific state</em> like a list of todo items and there is <em>view state</em> such as the currently selected element.</p>
+<h3 id="2-views">2. Views</h3>
+<p><em>Views</em> are all forms of data that can be derived from the <em>state</em> without any further interaction. 
+Views exist in many forms:</p>
 <ul>
-<li>Verbose, boilerplated actions that alter state using unwieldy database query like constructions.</li>
-<li>Clever constructions that allows you to &apos;mutate&apos; immutable data.</li>
-<li>Data subscriptions, cursors, lensens or higher order components; constructions require you to configure how your views should be kept in sync with the applicaiton state.</li>
+<li>The <em>user interface</em>.</li>
+<li><em>Derived data</em>, such as the amount of todos left.</li>
+<li><em>Backend integrations</em> like sending changes to the server.</li>
 </ul>
-<p>Instead Mobservable offers an alternative:</p>
-<p><strong>With Mobservable you can write views like there is only one state ever.</strong></p>
-<p>So what happens when you alter the state? No worries, Mobservable makes sure that any view you have is kept in sync with the state efficiently<sup>3</sup>.
-The only thing that is left for you is to write boring views and straightforward actions.
-Intrigued? Read on and take a dive in the boring world of Mobservable. </p>
-<h2 id="testimonials">Testimonials</h2>
-<blockquote>
-<p><em>We ported the book Notes and Kanban examples to Mobservable. Check out <a href="https://github.com/survivejs/mobservable-demo" target="_blank">the source</a> to see how this worked out. Compared to the original I was definitely positively surprised. Mobservable seems like a good fit for these problems.</em>
-&#x2010; Juho Veps&#xE4;l&#xE4;inen, author of &quot;SurviveJS - Webpack and React&quot; and jster.net curator</p>
-<p><em>I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can&apos;t think of any reason not to do things the simple, elegant way you have demonstrated.</em>
-&#x2010;David Schalk, fpcomplete.com</p>
-<p><em>Elegant! I love it!</em>
-&#x2010; Johan den Haan, CTO of Mendix</p>
-<p><em>Great job with Mobservable! Really gives current conventions and libraries a run for their money.</em>
-&#x2010; Daniel Dunderfelt</p>
-</blockquote>
-<hr>
-<ol>
-<li><a href="http://blog.codinghorror.com/the-best-code-is-no-code-at-all/" target="_blank">The best code is no code at all</a></li>
-<li><a href="https://en.wikipedia.org/wiki/No_Silver_Bullet" target="_blank">No Silver Bullet &#x2014; Essence and Accidents of Software Engineering</a></li>
-<li><a href="https://medium.com/@mweststrate/pure-rendering-in-the-light-of-time-and-state-4b537d8d40b1" target="_blank">Pure Rendering in the light of State and Time</a></li>
-<li><a href="mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps">Making React reactive: the pursuit of high performing, easily maintainable React apps</a></li>
-</ol>
+<p>Views are characterized by the fact that they never change the <em>state</em>.</p>
+<h3 id="3-actions">3. Actions</h3>
+<p>An <em>action</em> is any piece of code that changes the <em>state</em>. User events, backend data pushes, scheduled events etc.</p>
+<h2 id="principles">Principles</h2>
+<p>Mobservable supports an uni-directional dataflow where <em>actions</em> changes the <em>state</em>, which in turn updates all affected <em>views</em>.</p>
+<p><img src="../images/action-state-view.png" alt="Action, State, View"></p>
+<p><em>Views</em> are updated atomically when the <em>state</em> changes. As a result it is not possible to ever observe intermediate values.</p>
+<p><em>Views</em> are updated synchonously by default. This means that for example <em>actions</em> can safely inspect a <em>view</em> directly after altering the <em>state</em>.</p>
+<p><em>Views</em> are updated lazily. A View that is not actively in use will not be updated.
+This largely avoids the need to dispose views.
+If a view is no longer in use it will be garbage collected automatically.</p>
+<p><em>Side effects</em> are special views which are not lazy.
+Use <em>side effects</em> if you have <em>view</em> that should always be updated, even if it is not in use by other views.
+<em>Side effects</em> are useful in any place where you need to kick off some imperative code automatically if the <em>state</em> changed.
+This is useful to achieve effects like logging to the console or sending changes to the server.</p>
+<p>All <em>views</em> must be pure. They are not allowed to change <em>state</em>. 
+This applies even to <em>side effects</em>.
+This might sound a bit contradictionary, but it means that you can rely  as it sounds; it means that you can rely on <em>side effects</em> to happen, 
+Enforcing that <em>views</em> must be pure is strictly speaking not a technically requirement of Mobservable.
+It is a designed contraint to protect your sanity :).</p>
+<h2 id="illustration">Illustration</h2>
+<p>The following listing illustrates the above concepts and principles:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {makeReactive, sideEffect} <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;mobservable&apos;</span>;
+
+<span class="hljs-keyword">var</span> todoStore = makeReactive({
+    <span class="hljs-comment">/* some reactive state */</span>
+    todos: [],
+
+    <span class="hljs-comment">/* a reactive view */</span>
+    completedCount: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.todos.filter(() =&gt; todo.completed).length;
+    }
+});
+
+<span class="hljs-comment">/* a sideEffect */</span>
+sideEffect(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Completed %d of %d items&quot;</span>, todoStore.completedCount, todoStore.todos.length);
+});
+
+<span class="hljs-comment">/* ..and some actions that modify the state */</span>
+todoStore.todos[<span class="hljs-number">0</span>] = {
+    title: <span class="hljs-string">&quot;Take a walk&quot;</span>,
+    completed: <span class="hljs-literal">false</span>
+};
+<span class="hljs-comment">// -&gt; synchronously prints &apos;Completed 0 of 1 items&apos;</span>
+
+todoStore.todos[<span class="hljs-number">0</span>].completed = <span class="hljs-literal">true</span>;
+<span class="hljs-comment">// -&gt; synchronously prints &apos;Completed 1 of 1 items&apos;</span>
+</code></pre>
+<p>In the <a href="mweststrate.github.io/mobservable/getting-started.html">5 minute introduction to Mobservable and React</a> you can dive deeper into this example and build an user interface using <a href="https://facebook.github.io/react/" target="_blank">React</a> around it.</p>
 
                     
                     </section>
@@ -454,19 +482,19 @@ Intrigued? Read on and take a dive in the boring world of Mobservable. </p>
         </div>
 
         
-        <a href="./index.html" class="navigation navigation-prev " aria-label="Previous page: Introduction"><i class="fa fa-angle-left"></i></a>
+        <a href="../intro/overview.html" class="navigation navigation-prev " aria-label="Previous page: The Gist of Mobservable"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="./intro/overview.html" class="navigation navigation-next " aria-label="Next page: The Gist of Mobservable"><i class="fa fa-angle-right"></i></a>
+        <a href="../core/reactive-state.html" class="navigation navigation-next " aria-label="Next page: Reactive Data Structures"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>
 
         
-<script src="gitbook/app.js"></script>
+<script src="../gitbook/app.js"></script>
 
     
-    <script src="gitbook/plugins/gitbook-plugin-livereload/plugin.js"></script>
+    <script src="../gitbook/plugins/gitbook-plugin-livereload/plugin.js"></script>
     
 
 <script>

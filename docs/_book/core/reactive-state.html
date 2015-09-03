@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>Why Mobservable? | Introduction</title>
+        <title>Reactive Data Structures | Introduction</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.2.0">
@@ -15,20 +15,18 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black">
-        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
-        <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+        <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
         
-    <link rel="stylesheet" href="gitbook/style.css">
+    <link rel="stylesheet" href="../gitbook/style.css">
     
     
 
         
     
     
-    <link rel="next" href="./intro/overview.html" />
     
-    
-    <link rel="prev" href="./index.html" />
+    <link rel="prev" href="../intro/concepts.html" />
     
 
         
@@ -36,7 +34,7 @@
     <body>
         
         
-    <div class="book" data-level="1.1" data-basepath="." data-revision="Thu Sep 03 2015 20:15:09 GMT+0200 (CEST)">
+    <div class="book" data-level="2.1" data-basepath=".." data-revision="Thu Sep 03 2015 20:15:09 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -53,10 +51,10 @@
 
         
     
-        <li class="chapter active" data-level="0" data-path="index.html">
+        <li class="chapter " data-level="0" data-path="index.html">
             
                 
-                    <a href="./index.html">
+                    <a href="../index.html">
                 
                         <i class="fa fa-check"></i>
                         
@@ -74,10 +72,10 @@
             <ul class="articles">
                 
     
-        <li class="chapter active" data-level="1.1" data-path="index.html">
+        <li class="chapter " data-level="1.1" data-path="index.html">
             
                 
-                    <a href="./index.html">
+                    <a href="../index.html">
                 
                         <i class="fa fa-check"></i>
                         
@@ -92,7 +90,7 @@
         <li class="chapter " data-level="1.2" data-path="intro/overview.html">
             
                 
-                    <a href="./intro/overview.html">
+                    <a href="../intro/overview.html">
                 
                         <i class="fa fa-check"></i>
                         
@@ -107,7 +105,7 @@
         <li class="chapter " data-level="1.3" data-path="intro/concepts.html">
             
                 
-                    <a href="./intro/concepts.html">
+                    <a href="../intro/concepts.html">
                 
                         <i class="fa fa-check"></i>
                         
@@ -132,10 +130,10 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="2.1" data-path="core/reactive-state.html">
+        <li class="chapter active" data-level="2.1" data-path="core/reactive-state.html">
             
                 
-                    <a href="./core/reactive-state.html">
+                    <a href="../core/reactive-state.html">
                 
                         <i class="fa fa-check"></i>
                         
@@ -398,7 +396,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href="./" >Introduction</a>
+        <a href="../" >Introduction</a>
     </h1>
 </div>
 
@@ -408,42 +406,41 @@
                 
                     <section class="normal" id="section-">
                     
-                        <h1 id="introduction">Introduction</h1>
-<p><strong>Mobservable is a library to create <em>views</em> that react to <em>state</em> changes automatically.</strong></p>
-<h2 id="philosophy">Philosophy</h2>
-<p>Mobservable isn&apos;t a library that helps you to write fancy code.
-It helps you to remove fancy code, so that just boring, simple code remains.
-Because simple code<sup>1</sup> is the secret recipe to building enterprise scale software that is easy to change or maintain.
-Simple code allows you to focus on the essential complexity<sup>2</sup> of your application.</p>
-<p>These are some examples of fancy code that you no longer need when using Mobservable:</p>
-<ul>
-<li>Verbose, boilerplated actions that alter state using unwieldy database query like constructions.</li>
-<li>Clever constructions that allows you to &apos;mutate&apos; immutable data.</li>
-<li>Data subscriptions, cursors, lensens or higher order components; constructions require you to configure how your views should be kept in sync with the applicaiton state.</li>
-</ul>
-<p>Instead Mobservable offers an alternative:</p>
-<p><strong>With Mobservable you can write views like there is only one state ever.</strong></p>
-<p>So what happens when you alter the state? No worries, Mobservable makes sure that any view you have is kept in sync with the state efficiently<sup>3</sup>.
-The only thing that is left for you is to write boring views and straightforward actions.
-Intrigued? Read on and take a dive in the boring world of Mobservable. </p>
-<h2 id="testimonials">Testimonials</h2>
-<blockquote>
-<p><em>We ported the book Notes and Kanban examples to Mobservable. Check out <a href="https://github.com/survivejs/mobservable-demo" target="_blank">the source</a> to see how this worked out. Compared to the original I was definitely positively surprised. Mobservable seems like a good fit for these problems.</em>
-&#x2010; Juho Veps&#xE4;l&#xE4;inen, author of &quot;SurviveJS - Webpack and React&quot; and jster.net curator</p>
-<p><em>I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can&apos;t think of any reason not to do things the simple, elegant way you have demonstrated.</em>
-&#x2010;David Schalk, fpcomplete.com</p>
-<p><em>Elegant! I love it!</em>
-&#x2010; Johan den Haan, CTO of Mendix</p>
-<p><em>Great job with Mobservable! Really gives current conventions and libraries a run for their money.</em>
-&#x2010; Daniel Dunderfelt</p>
-</blockquote>
-<hr>
-<ol>
-<li><a href="http://blog.codinghorror.com/the-best-code-is-no-code-at-all/" target="_blank">The best code is no code at all</a></li>
-<li><a href="https://en.wikipedia.org/wiki/No_Silver_Bullet" target="_blank">No Silver Bullet &#x2014; Essence and Accidents of Software Engineering</a></li>
-<li><a href="https://medium.com/@mweststrate/pure-rendering-in-the-light-of-time-and-state-4b537d8d40b1" target="_blank">Pure Rendering in the light of State and Time</a></li>
-<li><a href="mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps">Making React reactive: the pursuit of high performing, easily maintainable React apps</a></li>
-</ol>
+                        <h1 id="reactive-data-structures">Reactive Data Structures</h1>
+<h2 id="reactive-objects">Reactive Objects</h2>
+<p><code>makeReactive</code> is the swiss knife of mobservable. It makes all properties of an object reactive. Or all values in an array.
+So you can simply create an object with some observable properties:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> lolCatz = makeReactive({
+    doILikeLolCatz : <span class="hljs-literal">false</span>,
+    favoriteLolCat: <span class="hljs-literal">null</span>
+});
+</code></pre>
+<p>For demo purposes, we also create a <a href="TODO">side effect</a> that prints a message based on <code>lolCatz</code>.  </p>
+<pre><code class="lang-javascript">sideEffect(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">if</span> (lolCatz.doILikeLolCatz === <span class="hljs-literal">false</span>)
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Never mind..&quot;</span>);
+    <span class="hljs-keyword">else</span>
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Check this! &quot;</span> + lolCatz.favoriteLolCat.url);    
+});
+
+<span class="hljs-comment">// prints &apos;Never mind...&apos;</span>
+</code></pre>
+<p>So you can just pass an object into <code>makeReactive</code> and you get back the same object, but this time with properties that will be tracked by Mobservable.
+Let&apos;s do something funny, and add our favorite lolCat to the now reactive object <code>lolCatz</code>:</p>
+<pre><code class="lang-javascript">lolCatz.favoriteLolCat = {
+    url: <span class="hljs-string">&quot;http://www.oddee.com/item_97873.aspx&quot;</span>    
+};
+<span class="hljs-comment">// doesn&apos;t print</span>
+
+lolCatz.doILikeLolCatz = <span class="hljs-literal">true</span>;
+<span class="hljs-comment">// prints: &apos;Check this! http://www.oddee.com/item_97873.aspx&apos;</span>
+
+lolCatz.favoriteLolCat.url = <span class="hljs-string">&quot;http://cheezburger.com/4518829056&quot;</span>;
+<span class="hljs-comment">// prints: &apos;Check this! http://cheezburger.com/4518829056&apos;</span>
+</code></pre>
+<p>runner ups</p>
+<p>lolcatz pointer</p>
+<p>```</p>
 
                     
                     </section>
@@ -454,19 +451,17 @@ Intrigued? Read on and take a dive in the boring world of Mobservable. </p>
         </div>
 
         
-        <a href="./index.html" class="navigation navigation-prev " aria-label="Previous page: Introduction"><i class="fa fa-angle-left"></i></a>
+        <a href="../intro/concepts.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page: Concepts &amp; Principles"><i class="fa fa-angle-left"></i></a>
         
-        
-        <a href="./intro/overview.html" class="navigation navigation-next " aria-label="Next page: The Gist of Mobservable"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>
 
         
-<script src="gitbook/app.js"></script>
+<script src="../gitbook/app.js"></script>
 
     
-    <script src="gitbook/plugins/gitbook-plugin-livereload/plugin.js"></script>
+    <script src="../gitbook/plugins/gitbook-plugin-livereload/plugin.js"></script>
     
 
 <script>

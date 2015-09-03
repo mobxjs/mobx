@@ -1,11 +1,12 @@
 # Mobservable
 
-* Introduction
-  * [Why Mobservable?](intro/why.md)
-  * The gist
-  * The concepts 
+* Introduction to Mobservable
+  * [Why Mobservable?](README.md)
+  * [The Gist of Mobservable](intro/overview.md)
+  * [Concepts & Principles](intro/concepts.md)
 * The Basics: Making stuff reactive
-  * Objects
+  * [Reactive Data Structures](core/reactive-state.md)
+  * Reactive Views
   * Arrays
   * Functions
   * Side-effects
