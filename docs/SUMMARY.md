@@ -25,4 +25,11 @@
   * Performance considerations
   * Classes or objects
   * Tracking state
+* Reference Guide
+  * isReactive
+  * makeReactive
+  * extendReactive
+  * sideEffect
+  * reactiveComponent
+  
 * (Resources)[LINKS.md]

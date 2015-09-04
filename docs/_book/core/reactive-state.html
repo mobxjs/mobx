@@ -34,7 +34,7 @@
     <body>
         
         
-    <div class="book" data-level="2.1" data-basepath=".." data-revision="Fri Sep 04 2015 12:09:23 GMT+0200 (CEST)">
+    <div class="book" data-level="2.1" data-basepath=".." data-revision="Fri Sep 04 2015 14:32:50 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -296,7 +296,55 @@
     
         <li class="chapter " data-level="7" >
             
-            <span><b>7.</b> (Resources)[LINKS.md]</span>
+            <span><b>7.</b> Reference Guide</span>
+            
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="7.1" >
+            
+            <span><b>7.1.</b> isReactive</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="7.2" >
+            
+            <span><b>7.2.</b> makeReactive</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="7.3" >
+            
+            <span><b>7.3.</b> extendReactive</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="7.4" >
+            
+            <span><b>7.4.</b> sideEffect</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="7.5" >
+            
+            <span><b>7.5.</b> reactiveComponent</span>
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="8" >
+            
+            <span><b>8.</b> (Resources)[LINKS.md]</span>
             
             
         </li>
@@ -408,25 +456,27 @@
                     
                         <h1 id="reactive-data-structures">Reactive Data Structures</h1>
 <h2 id="reactive-objects">Reactive Objects</h2>
-<p><code>makeReactive</code> is the swiss knife of mobservable. It makes all properties of an object reactive. Or all values in an array.
-So you can simply create an object with some observable properties:</p>
+<p><code>makeReactive</code> is the swiss knife of Mobservable. It makes all properties of an object reactive. Or all values in an array.
+(and even functions as will be explained in the next chapter).
+You can simply create an object with some observable properties as follows:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> lolCatz = makeReactive({
     doILikeLolCatz : <span class="hljs-literal">false</span>,
     favoriteLolCat: <span class="hljs-literal">null</span>
 });
 </code></pre>
-<p>For demo purposes, we also create a <a href="TODO">side effect</a> that prints a message based on <code>lolCatz</code>.  </p>
+<p>For demo purposes, we also create a side effect that prints a message based on <code>lolCatz</code>. (side effects will be explained in the next chapter).  </p>
 <pre><code class="lang-javascript">sideEffect(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
     <span class="hljs-keyword">if</span> (lolCatz.doILikeLolCatz === <span class="hljs-literal">false</span>)
-        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Never mind..&quot;</span>);
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Never mind...&quot;</span>);
     <span class="hljs-keyword">else</span>
-        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Check this! &quot;</span> + lolCatz.favoriteLolCat.url);    
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Check this! &quot;</span>, lolCatz.favoriteLolCat.url);    
 });
 
 <span class="hljs-comment">// prints &apos;Never mind...&apos;</span>
 </code></pre>
-<p>So you can just pass an object into <code>makeReactive</code> and you get back the same object, but this time with properties that will be tracked by Mobservable.
-Let&apos;s do something funny, and add our favorite lolCat to the now reactive object <code>lolCatz</code>:</p>
+<p>So you can just pass an object into <code>makeReactive</code> and you get back a new object holding the same properties. 
+But this time the properties will be tracked by Mobservable.
+So let&apos;s do something funny and add our favorite lolCat to the now reactive object <code>lolCatz</code>:</p>
 <pre><code class="lang-javascript">lolCatz.favoriteLolCat = {
     url: <span class="hljs-string">&quot;http://www.oddee.com/item_97873.aspx&quot;</span>    
 };
@@ -438,9 +488,15 @@ lolCatz.doILikeLolCatz = <span class="hljs-literal">true</span>;
 lolCatz.favoriteLolCat.url = <span class="hljs-string">&quot;http://cheezburger.com/4518829056&quot;</span>;
 <span class="hljs-comment">// prints: &apos;Check this! http://cheezburger.com/4518829056&apos;</span>
 </code></pre>
-<p>runner ups</p>
-<p>lolcatz pointer</p>
-<p>```</p>
+<p>Reactive data structures can be altered similar to normal data structures.
+New structures that are assigned to already reactive data structures will automatically become reactive as well,
+Mobservable will apply <code>makeReactive</code> to those values automatically.
+So even changes deep inside objects, like the <code>url</code> in <code>favoriteLolCat</code> will be detected.</p>
+<p>So if you have a state tree consisting off plain objects and arrays passing the root object through <code>makeReactive</code> once is enough for Mobservable to do its job.
+Mobservable will only properties reactive that existed on the object when it was passed through <code>makeReactive</code>.
+This way, reactive and non-reactive values can live side by side inside the same object.
+This allows you for example to define <em>actions</em> on objects that have reactive members. 
+But you can read all about that in the Best Practices section. </p>
 
                     
                     </section>
