@@ -18,11 +18,10 @@ var appState = mobservable.makeReactive({
 
 We didn't make our `appState` reactive just for nothing;
 you can now create views that automatically update whenever relevant data in the `appState` changes.
-To achieve this reactive programming principles are applied.
-What this means is that the data relations<sup>3</sup> between `views` and `state` are detected automatically so that Mobservable can find the minimal way to update your views.
-This single fact saves you ton's of boilerplate and is wickedly efficient<sup>4</sup>.
+Mobservable will find the minimal way to update your views.
+This single fact saves you ton's of boilerplate and is [wickedly efficient](mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/).
 
-Generally speaking any function can become a reactive view.
+Generally speaking any function can become a reactive view, and Mobservable can be applied in any ES5 conformant JavaScript environment.
 But here is an example of a view in the form of a React component.
 
 ```javascript
@@ -41,7 +40,7 @@ var TimerView = mobservable.reactiveComponent(React.createClass({
 React.render(<TimerView appState={appState} />, document.body);
 ```
 
-Note that the implementation of `resetTimer` is provided in the next code block.
+(For the implementation of `resetTimer` function see the next section)
 
 ## 3. Modify the State
 
@@ -53,7 +52,7 @@ But remember, the key thing here is: Mobservable helps you to keep things simple
 The following code will alter your data every second, and the UI will update automatically when needed.
 No explicit relations are defined in either in the controller functions that _change_ the state or in the views that should _update_.
 Decorating your _state_ and _views_ with `makeReactive` is enough for Mobservable to detect all relationships.
-Here are two examples of state that was changed:
+Here are two examples of changing the state:
 
 ```javascript
 appState.resetTimer = function() {

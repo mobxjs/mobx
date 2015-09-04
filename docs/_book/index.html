@@ -36,7 +36,7 @@
     <body>
         
         
-    <div class="book" data-level="1.1" data-basepath="." data-revision="Thu Sep 03 2015 20:15:09 GMT+0200 (CEST)">
+    <div class="book" data-level="1.1" data-basepath="." data-revision="Fri Sep 04 2015 12:09:23 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -409,23 +409,28 @@
                     <section class="normal" id="section-">
                     
                         <h1 id="introduction">Introduction</h1>
-<p><strong>Mobservable is a library to create <em>views</em> that react to <em>state</em> changes automatically.</strong></p>
+<p>Mobservable is a library to create <em>views</em> that react to <em>state</em> changes automatically.</p>
+<p><img src="images/concept.png" alt="Mobservable + React"></p>
 <h2 id="philosophy">Philosophy</h2>
 <p>Mobservable isn&apos;t a library that helps you to write fancy code.
 It helps you to remove fancy code, so that just boring, simple code remains.
-Because simple code<sup>1</sup> is the secret recipe to building enterprise scale software that is easy to change or maintain.
-Simple code allows you to focus on the essential complexity<sup>2</sup> of your application.</p>
-<p>These are some examples of fancy code that you no longer need when using Mobservable:</p>
-<ul>
-<li>Verbose, boilerplated actions that alter state using unwieldy database query like constructions.</li>
-<li>Clever constructions that allows you to &apos;mutate&apos; immutable data.</li>
-<li>Data subscriptions, cursors, lensens or higher order components; constructions require you to configure how your views should be kept in sync with the applicaiton state.</li>
-</ul>
-<p>Instead Mobservable offers an alternative:</p>
+Because simple code<sup>1</sup> is the secret recipe to building enterprise scale software that is easy to change and maintain.
+Simple code allows you to quickly change the essential parts<sup>2</sup> of your application.</p>
 <p><strong>With Mobservable you can write views like there is only one state ever.</strong></p>
 <p>So what happens when you alter the state? No worries, Mobservable makes sure that any view you have is kept in sync with the state efficiently<sup>3</sup>.
 The only thing that is left for you is to write boring views and straightforward actions.
-Intrigued? Read on and take a dive in the boring world of Mobservable. </p>
+These are some examples of fancy code that you <em>no longer need</em> when using Mobservable:</p>
+<ul>
+<li>Verbose, boilerplated actions that alter state using unwieldy database query like constructions.</li>
+<li>Clever constructions that allows you to &apos;mutate&apos; immutable data.</li>
+<li>Data subscriptions, cursors, lensens or higher order components; in short any construction to configure how views should be kept in sync with the applicaiton state.</li>
+</ul>
+<h2 id="how-does-it-work">How does it work?</h2>
+<p>Mobservable applies <em>Transparent Reactive Functional Programming</em> to determine when views needs an update.
+This is an old technique that is used by spreadsheet applications.
+In spreadsheets the cells that hold a value are the <em>state</em>, and each cell that holds a formula is a <em>view</em>.
+While spreadsheets just work with simple values, Mobservable does the same job for all common JavaScript structures; primitives, plain objects, arrays, classes, references etc.</p>
+<p>Intrigued? Read on and take a dive in the world of Mobservable. </p>
 <h2 id="testimonials">Testimonials</h2>
 <blockquote>
 <p><em>We ported the book Notes and Kanban examples to Mobservable. Check out <a href="https://github.com/survivejs/mobservable-demo" target="_blank">the source</a> to see how this worked out. Compared to the original I was definitely positively surprised. Mobservable seems like a good fit for these problems.</em>

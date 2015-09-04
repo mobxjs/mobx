@@ -1,27 +1,34 @@
 # Introduction
 
-**Mobservable is a library to create _views_ that react to _state_ changes automatically.**
+Mobservable is a library to create _views_ that react to _state_ changes automatically.
+
+![Mobservable + React](images/concept.png)
 
 ## Philosophy
 
 Mobservable isn't a library that helps you to write fancy code.
 It helps you to remove fancy code, so that just boring, simple code remains.
-Because simple code<sup>1</sup> is the secret recipe to building enterprise scale software that is easy to change or maintain.
-Simple code allows you to focus on the essential complexity<sup>2</sup> of your application.
-
-These are some examples of fancy code that you no longer need when using Mobservable:
-
-* Verbose, boilerplated actions that alter state using unwieldy database query like constructions.
-* Clever constructions that allows you to 'mutate' immutable data.
-* Data subscriptions, cursors, lensens or higher order components; constructions require you to configure how your views should be kept in sync with the applicaiton state.
-
-Instead Mobservable offers an alternative:
+Because simple code<sup>1</sup> is the secret recipe to building enterprise scale software that is easy to change and maintain.
+Simple code allows you to quickly change the essential parts<sup>2</sup> of your application.
 
 **With Mobservable you can write views like there is only one state ever.**
 
 So what happens when you alter the state? No worries, Mobservable makes sure that any view you have is kept in sync with the state efficiently<sup>3</sup>.
 The only thing that is left for you is to write boring views and straightforward actions.
-Intrigued? Read on and take a dive in the boring world of Mobservable. 
+These are some examples of fancy code that you _no longer need_ when using Mobservable:
+
+* Verbose, boilerplated actions that alter state using unwieldy database query like constructions.
+* Clever constructions that allows you to 'mutate' immutable data.
+* Data subscriptions, cursors, lensens or higher order components; in short any construction to configure how views should be kept in sync with the applicaiton state.
+
+## How does it work?
+
+Mobservable applies _Transparent Reactive Functional Programming_ to determine when views needs an update.
+This is an old technique that is used by spreadsheet applications.
+In spreadsheets the cells that hold a value are the _state_, and each cell that holds a formula is a _view_.
+While spreadsheets just work with simple values, Mobservable does the same job for all common JavaScript structures; primitives, plain objects, arrays, classes, references etc.
+
+Intrigued? Read on and take a dive in the world of Mobservable. 
 
 ## Testimonials
 
