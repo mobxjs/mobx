@@ -6,11 +6,8 @@
   * [Concepts & Principles](intro/concepts.md)
 * The Basics: Making stuff reactive
   * [Reactive Data Structures](core/reactive-state.md)
-  * Reactive Views
-  * Arrays
-  * Functions
-  * Side-effects
-  * React components
+  * [Reactive Views](core/reactive-views.md)
+  * [Reactive Components](core/reactive-component.md)
 * Fancy stuff
   * Transactions
   * Async views

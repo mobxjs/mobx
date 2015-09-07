@@ -1,0 +1,11 @@
+{
+	"plugins":["ungrey", "ga", "disqus"],
+	"pluginsConfig": {
+        "ga": {
+            "token": "UA-65632006-1"
+        },
+        "disqus": {
+            "shortName": "mobservable"
+        }
+    }
+}

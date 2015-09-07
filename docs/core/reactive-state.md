@@ -1,26 +1,27 @@
 # Reactive Data Structures
 
-## Reactive Objects
+## The Basics
 
 `makeReactive` is the swiss knife of Mobservable. It makes all properties of an object reactive. Or all values in an array.
 (and even functions as will be explained in the next chapter).
-You can simply create an object with some observable properties as follows:
+You can simply create an object with some reactive properties as follows:
 
 ```javascript
 var lolCatz = makeReactive({
-	doILikeLolCatz : false,
-	favoriteLolCat: null
+	doILikeLolcatz : false,
+	favoriteLolcat: null,
+	lolcatz: []
 });
 ```
 
-For demo purposes, we also create a side effect that prints a message based on `lolCatz`. (side effects will be explained in the next chapter).  
+For demo purposes, we also create a side effect that prints a message based on `lolCatz`. (side effects will be explained in the next paragraphs).  
 
 ```javascript 
 sideEffect(function() {
-	if (lolCatz.doILikeLolCatz === false)
+	if (lolCatz.doILikeLolcatz === false)
 		console.log("Never mind...");
 	else
-		console.log("Check this! ", lolCatz.favoriteLolCat.url);	
+		console.log("Check this! ", lolCatz.favoriteLolcat.url);	
 });
 
 // prints 'Never mind...'
@@ -28,28 +29,52 @@ sideEffect(function() {
 
 So you can just pass an object into `makeReactive` and you get back a new object holding the same properties. 
 But this time the properties will be tracked by Mobservable.
-So let's do something funny and add our favorite lolCat to the now reactive object `lolCatz`:
+So let's do something funny and add our favorite lolcat to the now reactive object `lolCatz`:
 
 ```javascript
-lolCatz.favoriteLolCat = {
-	url: "http://www.oddee.com/item_97873.aspx"	
+lolCatz.favoriteLolcat = {
+	url: "http://tinyurl.com/3vwvkga"	
 };
 // doesn't print
 
-lolCatz.doILikeLolCatz = true;
-// prints: 'Check this! http://www.oddee.com/item_97873.aspx'
+lolCatz.doILikeLolcatz = true;
+// prints: 'Check this! http://tinyurl.com/3vwvkga'
 
-lolCatz.favoriteLolCat.url = "http://cheezburger.com/4518829056";
-// prints: 'Check this! http://cheezburger.com/4518829056'
+lolCatz.favoriteLolcat.url = "http://tinyurl.com/nc7p2ft";
+// prints: 'Check this! http://tinyurl.com/nc7p2ft'
 ```
 
 Reactive data structures can be altered similar to normal data structures.
-New structures that are assigned to already reactive data structures will automatically become reactive as well,
-Mobservable will apply `makeReactive` to those values automatically.
-So even changes deep inside objects, like the `url` in `favoriteLolCat` will be detected.
+New structures that are assigned to already reactive data structures will become reactive as well,
+Mobservable will apply `makeReactive` to those structures automatically.
+So even changes deep inside new objects, like the `url` in `favoriteLolcat`, will be detected.
 
-So if you have a state tree consisting off plain objects and arrays passing the root object through `makeReactive` once is enough for Mobservable to do its job.
-Mobservable will only properties reactive that existed on the object when it was passed through `makeReactive`.
-This way, reactive and non-reactive values can live side by side inside the same object.
-This allows you for example to define _actions_ on objects that have reactive members. 
-But you can read all about that in the Best Practices section. 
+## Arrays and References
+
+With Mobservable, you can freely work with arrays and references.
+So instead of picking only one favorite lolcat, let's add two of them to the `lolcatz` array and use the `favoriteLolcat` property as a reference:
+
+```javascript
+lolCatz.lolcatz.push(
+	{ url: "ttp://tinyurl.com/3vwvkga" },
+	{ url: "http://tinyurl.com/nc7p2ft" }
+);
+
+lolCatz.favoriteLolcat = lolCatz.lolcatz[0];
+// prints: 'Check this! ttp://tinyurl.com/3vwvkga'
+// oops, typo...
+
+lolCatz.lolcatz[0].url = "http://tinyurl.com/3vwvkga"
+// prints: 'Check this! http://tinyurl.com/3vwvkga'
+```
+
+So, you can freely mix and match objects, references, arrays when using Mobservable.
+Just pick the most natural data structure.
+Mobservable is unopiniated about your the data structures that store the _state_.
+This enables you to write _actions_ as natural as possible.
+
+## Summary
+
+If you have a state tree consisting of plain objects and arrays, passing the root object through `makeReactive` once is enough for Mobservable to do its job.
+More details about `makeReactive` can be found in the [reference guide](../refguide/make-reactive.md).
+First, let's dive into reactive views.
