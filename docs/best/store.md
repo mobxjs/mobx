@@ -139,7 +139,7 @@ Especially in large applications this is important.
 
 class OrderStore {
     constructor(transportLayer, productStore) {
-        
+        // TODO:
     }   
 }
 

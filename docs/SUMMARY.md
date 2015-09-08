@@ -15,18 +15,18 @@
   * Working with async actions
   * Routing
   * Universal applications
+* [Reference Guide](refguide/api.md)
+<!--  * isReactive
+  * makeReactive
+  * extendReactive
+  * sideEffect
+  * reactiveComponent -->
+* How does Mobservable work?
 * Tips & Tricks
   * [DevTools](best/devtools.md)
   * [ES6 & TypeScript goodies](best/syntax.md)
   * Tracking state changes
   * Predicates
   * Performance considerations
-* [Reference Guide](refguide/api.md)
-  * isReactive
-  * makeReactive
-  * extendReactive
-  * sideEffect
-  * reactiveComponent
-* How does Mobservable work
 * [Resources](LINKS.md)
 * [Frequently Asked Questions](faq/faq.md)

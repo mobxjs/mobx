@@ -1,6 +1,6 @@
-This document is work in progress. Some items might be deprecated.
+Disclaimer: this document is work in progress but reflects the latest 0.6 release.
 
-# API Documentation
+# Reference Guide
 
 Mobservable divides your application into three different concepts:
 
