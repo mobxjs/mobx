@@ -4,6 +4,9 @@ Mobservable is a library to create _views_ that react to _state_ changes automat
 
 ![Mobservable + React](images/concept.png)
 
+* [Mobservable on Github](https://github.com/mweststrate/mobservable)
+* For the impatient: [Five minute interactive introduction to Mobservable](http://mweststrate.github.io/mobservable/getting-started.html)
+
 ## Philosophy
 
 Mobservable isn't a library that helps you to write fancy code.

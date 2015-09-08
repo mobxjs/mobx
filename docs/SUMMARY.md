@@ -9,11 +9,12 @@
   * [Reactive Views](core/reactive-views.md)
   * [Reactive Components](core/reactive-component.md)
 * Best Practices
-  * Organizing data stores
+  * [Organizing data stores](best/store.md)
   * Organizing components
   * Organizing actions
   * Working with async actions
   * Routing
+  * Universal applications
 * Tips & Tricks
   * [DevTools](best/devtools.md)
   * [ES6 & TypeScript goodies](best/syntax.md)
@@ -30,3 +31,4 @@
   * reactiveComponent
 * How does Mobservable work
 * [Resources](LINKS.md)
+* [Frequently Asked Questions](faq/faq.md)
