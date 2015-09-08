@@ -1,294 +1,574 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE HTML>
+<html lang="en" >
+    
+    <head>
+        
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <title>Why Mobservable? | Introduction</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 2.2.0">
+        
+        
+        <meta name="HandheldFriendly" content="true"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+        <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+        
+    <link rel="stylesheet" href="gitbook/style.css">
+    
+    
 
-<head>
-  <meta charset='utf-8'>
-  <meta http-equiv="X-UA-Compatible" content="chrome=1">
-  <meta name="description" content="mobservable : unobtrusive library to create reactive data structures and self-updating view functions">
+        
+    
+    
+    <link rel="next" href="./intro/overview.html" />
+    
+    
+    <link rel="prev" href="./index.html" />
+    
 
-  <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-  <link rel="shortcut icon" type="image/png" href="images/favicon.png"/>
+        
+    </head>
+    <body>
+        
+        
+    <div class="book" data-level="1.1" data-basepath="." data-revision="Tue Sep 08 2015 17:01:46 GMT+0200 (CEST)">
+    
 
-  <title>mobservable</title>
-</head>
-
-<body>
-
-  <!-- HEADER -->
-  <div id="header_wrap" class="outer">
-    <header class="inner">
-      <a id="forkme_banner" href="https://github.com/mweststrate/mobservable">View on GitHub</a>
-
-      <img src="images/mobservable.png" id="logo" />
-      <h1 id="project_title">mobservable</h1>
-      <h2 id="project_tagline">Keeps views automatically in sync with state. Unobtrusively.</h2>
-    </header>
-  </div>
-
-  <div id="overview_content" class="outer">
-    <div class="inner">
-      <img src="images/overview.png" id="overview_img" class="overview_step1"/>
-      <p style="color:#916f6f;font-size:0.8em;margin:-10px 0 0 0;padding-bottom:10px">(scroll down for a running demo)</p>
+<div class="book-summary">
+    <div class="book-search">
+        <input type="text" placeholder="Type to search" class="form-control" />
     </div>
-  </div>
+    <ul class="summary">
+        
+        
+        
+        
 
-  <!-- MAIN CONTENT -->
-  <div id="main_content_wrap" class="outer">
-    <section id="main_content" class="inner">
+        
 
-      <table id="usps"><tr>
-        <td><h4>seamlessly updating views</h4>
-          Create view functions that update automatically, synchronously, atomically and efficiently. No stale or intermediate values will ever be visible.
-          </td>
-        <td><h4>reactive and unobtrusive data structures</h4>Work with reactive objects, classes and arrays as if they are plain javascript structures. Even if deeply nested or cyclic.</td>
-      </tr><tr>
-        <td><h4>reactjs decorator</h4>Turn reactjs components into reactive ones that automatically sideways load data for
-          <a href="http://mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/" target="_blank">bleeding edge performance</a>.</td>
-        <td><h4>shines in large apps</h4>Battle tested library that shines in large enterprise scale apps with complex data models.</td>
-      </tr></table>
+        
+    
+        <li class="chapter active" data-level="0" data-path="index.html">
+            
+                
+                    <a href="./index.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                        Introduction
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="1" >
+            
+            <span><b>1.</b> Introduction to Mobservable</span>
+            
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter active" data-level="1.1" data-path="index.html">
+            
+                
+                    <a href="./index.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>1.1.</b>
+                        
+                        Why Mobservable?
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="intro/overview.html">
+            
+                
+                    <a href="./intro/overview.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>1.2.</b>
+                        
+                        The Gist of Mobservable
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="intro/concepts.html">
+            
+                
+                    <a href="./intro/concepts.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>1.3.</b>
+                        
+                        Concepts &amp; Principles
+                    </a>
+            
+            
+        </li>
+    
 
-      <hr/>
-      <h3><a id="start" class="anchor" href="#start" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting started</h3>
-
-      <p>Take the <a href="getting-started.html">five minute, interactive introduction</a> to Mobservable and React.
-
-      <h3><a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h3>
-
-      <p>Install using <code>npm install mobservable --save</code> or <a href="https://raw.githubusercontent.com/mweststrate/mobservable/master/dist/mobservable.js">download</a> the stand-alone library. </p>
-
-        <h3><a id="observable-data-structures" class="anchor" href="#observable-data-structures" aria-hidden="true"><span class="octicon octicon-link"></span></a>Create reactive data structures</h3>
-
-        <p>Use <em>mobservable.makeReactive</em> to create reactive primitives, arrays, objects and functions.
-          Reactive functions re-evaluate automatically whenever relevant data changes, but only if they are used somewhere.
-          Controller functions can still treat the data as if it are plain JavaScript objects.</p>
-
-<!-- BEGIN CODE BLOCK 1 -->
-<div class="highlight highlight-javascript"><pre><span class="pl-k">import</span> {makeReactive} <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>mobservable<span class="pl-pds">'</span></span>;
-
-<span class="pl-c">// Create a reactive data structure</span>
-<span class="pl-k">var</span> todoStore <span class="pl-k">=</span> <span style="color:red; font-weight:bold">makeReactive</span>({
-    todos<span class="pl-k">:</span> [
-        {
-            title<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>Find a clean mug<span class="pl-pds">'</span></span>,
-            completed<span class="pl-k">:</span> <span class="pl-c1">true</span>
-        },
-        {
-            title<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>Make coffee<span class="pl-pds">'</span></span>,
-            completed<span class="pl-k">:</span> <span class="pl-c1">false</span>
-        }
-    ],
-    <span class="pl-en">completedCount</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
-        <span class="pl-k">return</span> <span class="pl-v">this</span>.todos.filter((<span class="pl-smi">todo</span>)<span class="pl-k"> =&gt;</span> todo.completed).<span class="pl-c1">length</span>;
-    },
-    pending<span class="pl-k">:</span> <span class="pl-c1">0</span>
-});
-
-<span class="pl-c1">todoStore</span>.<span class="pl-en">addTodo</span> <span class="pl-k">=</span> <span class="pl-k">function</span>(<span class="pl-smi">title</span>) {
-    <span class="pl-v">this</span>.todos.<span class="pl-c1">push</span>({
-        title<span class="pl-k">:</span> title,
-        completed<span class="pl-k">:</span> <span class="pl-c1">false</span>
-    });
-};
-
-<span class="pl-c1">todoStore</span>.<span class="pl-en">removeTodo</span> <span class="pl-k">=</span> <span class="pl-k">function</span>(<span class="pl-smi">todo</span>) {
-    <span class="pl-v">this</span>.todos.<span class="pl-c1">splice</span>(<span class="pl-v">this</span>.todos.<span class="pl-c1">indexOf</span>(todo), <span class="pl-c1">1</span>);
-};
-
-<span class="pl-k">export</span> <span class="pl-k">default</span> todoStore;</pre></div>
-<!-- END CODE BLOCK 1 -->
-
-        <h3><a id="observing-reactjs-components" class="anchor" href="#observing-reactjs-components" aria-hidden="true"><span class="octicon octicon-link"></span></a>Create Reactjs components that automatically update</h3>
-
-        <p>Use <em>mobservable.reactiveComponent</em> to create components that update themselves whenever reactive data they use changes.
-          This process is highly efficient and only update that components that actually need a re-render.
-          Since components update automatically, most of them can be stateless. You don't even need to state which data dependencies it has!
-        </p>
-
-        <p>Install the Mobservable - React bindings using <code>npm install mobservable-react --save</code></p>
-
-<!-- Code block 2 -->
-<div class="highlight highlight-javascript"><pre><span class="pl-k">import</span> React <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
-<span class="pl-k">import</span> todoStore <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./todostore<span class="pl-pds">'</span></span>;
-<span class="pl-k">import</span> {reactiveComponent} <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>mobservable-react<span class="pl-pds">'</span></span>;
-
-<span class="pl-c">// React component that responds to changes in 'todos'</span>
-<span class="pl-k">var</span> TodoList <span class="pl-k">=</span> <span style="color:red; font-weight:bold">reactiveComponent</span>(React.createClass({
-    displayName<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>TodoList<span class="pl-pds">'</span></span>,
-
-    <span class="pl-en">render</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
-        <span class="pl-k">var</span> store <span class="pl-k">=</span> <span class="pl-v">this</span>.props.store;
-        <span class="pl-k">return</span> (<span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
-            <span class="pl-k">&lt;</span>ul<span class="pl-k">&gt;</span>
-                { store.todos.map((<span class="pl-smi">todo</span>, <span class="pl-smi">idx</span>)<span class="pl-k"> =&gt;</span>
-                    (<span class="pl-k">&lt;</span>TodoView store<span class="pl-k">=</span>{ store } todo<span class="pl-k">=</span>{ todo } key<span class="pl-k">=</span>{ idx } /<span class="pl-k">&gt;</span>)
-                ) }
-            <span class="pl-k">&lt;</span>/ul<span class="pl-k">&gt;</span>
-            <span class="pl-k">&lt;</span>hr/<span class="pl-k">&gt;</span>
-            Completed { store.completedCount } <span class="pl-k">of</span> { store.todos.<span class="pl-c1">length</span> } items.<span class="pl-k">&lt;</span>br/<span class="pl-k">&gt;</span>
-            <span class="pl-k">&lt;</span>button onClick<span class="pl-k">=</span>{ <span class="pl-v">this</span>.onNewTodo }<span class="pl-k">&gt;</span>New Todo<span class="pl-k">&lt;</span>/button<span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>/div<span class="pl-k">&gt;</span>);
-    },
-
-    <span class="pl-en">onNewTodo</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
-        <span class="pl-v">this</span>.props.store.addTodo(<span class="pl-c1">prompt</span>(<span class="pl-s"><span class="pl-pds">'</span>Enter a new todo:<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>Try mobservable at home!<span class="pl-pds">'</span></span>));
-    }
-}));
-
-<span class="pl-c">// React component that responds to changes in its 'todo'</span>
-<span class="pl-k">var</span> TodoView <span class="pl-k">=</span> <span style="color:red; font-weight:bold">reactiveComponent</span>(React.createClass({
-    displayName<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>TodoView<span class="pl-pds">'</span></span>,
-
-    <span class="pl-en">render</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
-        <span class="pl-k">var</span> todo <span class="pl-k">=</span> <span class="pl-v">this</span>.props.todo;
-        <span class="pl-k">return</span> (<span class="pl-k">&lt;</span>li<span class="pl-k">&gt;</span>
-            <span class="pl-k">&lt;</span>input type<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">'</span>checkbox<span class="pl-pds">'</span></span> checked<span class="pl-k">=</span>{ todo.completed } <span class="pl-c1">onChange</span><span class="pl-k">=</span>{ <span class="pl-v">this</span>.onToggleCompleted } /<span class="pl-k">&gt;</span>
-            {todo.<span class="pl-c1">title</span>}{<span class="pl-s"><span class="pl-pds">'</span> <span class="pl-pds">'</span></span>}
-            <span class="pl-k">&lt;</span>a href<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">'</span>#<span class="pl-pds">'</span></span> onClick<span class="pl-k">=</span>{ <span class="pl-v">this</span>.onEdit }<span class="pl-k">&gt;</span>[edit]<span class="pl-k">&lt;</span>/a<span class="pl-k">&gt;</span>
-            <span class="pl-k">&lt;</span>a href<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">'</span>#<span class="pl-pds">'</span></span> onClick<span class="pl-k">=</span>{ <span class="pl-v">this</span>.onRemove }<span class="pl-k">&gt;</span>[remove]<span class="pl-k">&lt;</span>/a<span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>/li<span class="pl-k">&gt;</span>);
-    },
-
-    <span class="pl-en">onToggleCompleted</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
-        <span class="pl-v">this</span>.props.todo.completed <span class="pl-k">=</span> <span class="pl-k">!</span><span class="pl-v">this</span>.props.todo.completed;
-    },
-
-    <span class="pl-en">onEdit</span><span class="pl-k">:</span> <span class="pl-k">function</span>(<span class="pl-smi">e</span>) {
-        e.preventDefault();
-        <span class="pl-v">this</span>.props.todo.<span class="pl-c1">title</span> <span class="pl-k">=</span> <span class="pl-c1">prompt</span>(<span class="pl-s"><span class="pl-pds">'</span>Todo:<span class="pl-pds">'</span></span>, <span class="pl-v">this</span>.props.todo.<span class="pl-c1">title</span>);
-    },
-
-    <span class="pl-en">onRemove</span><span class="pl-k">:</span> <span class="pl-k">function</span>(<span class="pl-smi">e</span>) {
-        e.preventDefault();
-        <span class="pl-v">this</span>.props.store.removeTodo(<span class="pl-v">this</span>.props.todo);
-    }
-}));
-
-React.render(<span class="pl-k">&lt;</span>TodoList store<span class="pl-k">=</span>{todoStore} /<span class="pl-k">&gt;</span>, <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>approot<span class="pl-pds">'</span></span>));
-</pre></div>
-<!-- Code block 2 END -->
-
-          <h4><a id="demo" class="anchor" href="#demo" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running demo</h4>
-          <pre id="approot" class=""></pre>
-
-          <p>The full project source of the todo demo can be found in the <a target="_blank" href="https://github.com/mweststrate/react-mobservable-boilerplate">react-mobservable-boilerplate</a> repository.</p>
-
-          <h3><a id="async" class="anchor" href="#async" aria-hidden="true"><span class="octicon octicon-link"></span></a>Working with async stuff</h3>
-
-          <p>Asynchronous stuff is easy to deal with in reactive programming.
-            Just prepare reactive values and update them whenever the async function completes or fails.
-            In the mean time make sure to present a friendly UI to your users!
-            For example with the following adaptions to the snippets above the "Load more..." button was implemented:
-          </p>
-          <p>Changes to the store:</p>
-
-<div class="highlight highlight-javascript"><pre><span class="pl-c1">todoStore</span>.<span class="pl-en">loadTodosAsync</span> <span class="pl-k">=</span> <span class="pl-k">function</span>() {
-    <span class="pl-v">this</span>.pending<span class="pl-k">++</span>;
-    <span class="pl-c">// mimic something asynchronous</span>
-    <span class="pl-c1">setTimeout</span>(<span class="pl-k">function</span>() {
-        <span class="pl-v">this</span>.addTodo(<span class="pl-s"><span class="pl-pds">'</span>Asynchronously created todo<span class="pl-pds">'</span></span>);
-        <span class="pl-v">this</span>.pending<span class="pl-k">--</span>;
-    }.bind(<span class="pl-v">this</span>), <span class="pl-c1">2000</span>);
-};</pre></div>
-
-          <p>Changes to the TodoList component:
-
-<div class="highlight highlight-javascript"><pre>
-<span class="pl-en">render</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
-    <span class="pl-k">var</span> store <span class="pl-k">=</span> <span class="pl-v">this</span>.props.store;
-    <span class="pl-k">return</span> (<span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>ul<span class="pl-k">&gt;</span>
-            { <span class="pl-c">/** Omitted */</span> }
-            { store.pending <span class="pl-k">?</span> (<span class="pl-k">&lt;</span>li<span class="pl-k">&gt;</span>Loading more items...<span class="pl-k">&lt;</span>/li<span class="pl-k">&gt;</span>) <span class="pl-k">:</span> <span class="pl-c1">null</span> }
-        <span class="pl-k">&lt;</span>/ul<span class="pl-k">&gt;</span>
-        { <span class="pl-c">/** Omitted */</span> }
-        <span class="pl-k">&lt;</span>button onClick<span class="pl-k">=</span>{ <span class="pl-v">this</span>.loadMore }<span class="pl-k">&gt;</span>Load more...<span class="pl-k">&lt;</span>/button<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>/div<span class="pl-k">&gt;</span>);
-},
-
-<span class="pl-en">loadMore</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
-    <span class="pl-v">this</span>.props.store.loadTodosAsync();
-}</pre></div>
-
-          <h3><a id="runtimebehavior" class="anchor" href="#runtimebehavior" aria-hidden="true"><span class="octicon octicon-link"></span></a>Runtime behavior</h3>
-
-          <p>Reactive values created using mobservable have the following characteristics:</p>
-          <ul>
-            <li>Synchronous: Updates are processed synchronously; after each update everything is still fresh.</li>
-            <li>Atomic updates: All updates are processed atomically so that you can never observe a stale value, even when updates cascade.</li>
-            <li>Real time dependency detection: Computed values only depend on values actually used in the last computation.</li>
-            <li>Lazy: Computed values will only be evaluated if they are actually being observed.</li>
-          </ul>
-
-          <hr/>
-          <h4 id="shout"></h4>
-
-          <div style="text-align:center;">
-            <a class="github-button" href="https://github.com/mweststrate/mobservable" data-icon="octicon-star" data-style="small" data-count-href="/mweststrate/mobservable/stargazers" data-count-api="/repos/mweststrate/mobservable#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star mweststrate/mobservable on GitHub">Star</a>
-            <a href="https://twitter.com/share" class="twitter-share-button" data-via="mweststrate" data-hashtags="mobservable">Tweet</a>
-          </div>
-          <hr/>
-
-
-          <h3><a id="more" class="anchor" href="#more" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dive deeper...</h3>
-            <ul>
-              <li>The <a target="_blank" href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/">design &amp; performance </a> of mobservable</li>
-              <li>The <a target="_blank" href="https://medium.com/@mweststrate/pure-rendering-in-the-light-of-time-and-state-4b537d8d40b1">philosophy</a> behind mobservable</li>
-              <li>The <a target="_blank" href="https://github.com/mweststrate/mobservable/blob/master/README.md">full documentation</a></li>
-              <li>Get started with a <a target="_blank" href="https://jsfiddle.net/mweststrate/wgbe4guu/">small JSFiddle</a></li>
-              <li>Get started by cloning the <a target="_blank" href="https://github.com/mweststrate/react-mobservable-boilerplate">react mobservable boilerplate project</a></li>
-              <li><a target="_blank" href="https://github.com/mweststrate/mobservable-react-todomvc">TodoMVC using mobservable</a></li>
-              <li>Review a more <a target="_blank" href="https://jsfiddle.net/mweststrate/46vL0phw">sophisticated example</a></li>
-              <li>Discuss mobservable in the <a target="_blank" href="https://reactiflux.slack.com/messages/mobservable/">Reactiflux #mobservable</a> slack channel (<a target="_blank" href="http://www.reactiflux.com/">Sign up</a>)</li>
             </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="2" >
+            
+            <span><b>2.</b> The Basics: Making stuff reactive</span>
+            
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="2.1" data-path="core/reactive-state.html">
+            
+                
+                    <a href="./core/reactive-state.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.1.</b>
+                        
+                        Reactive Data Structures
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="2.2" data-path="core/reactive-views.html">
+            
+                
+                    <a href="./core/reactive-views.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.2.</b>
+                        
+                        Reactive Views
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="2.3" data-path="core/reactive-component.html">
+            
+                
+                    <a href="./core/reactive-component.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.3.</b>
+                        
+                        Reactive Components
+                    </a>
+            
+            
+        </li>
+    
 
-          </section>
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="3" >
+            
+            <span><b>3.</b> Best Practices</span>
+            
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="3.1" >
+            
+            <span><b>3.1.</b> Organizing data stores</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="3.2" >
+            
+            <span><b>3.2.</b> Organizing components</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="3.3" >
+            
+            <span><b>3.3.</b> Organizing actions</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="3.4" >
+            
+            <span><b>3.4.</b> Working with async actions</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="3.5" >
+            
+            <span><b>3.5.</b> Routing</span>
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="4" >
+            
+            <span><b>4.</b> Tips &amp; Tricks</span>
+            
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="4.1" data-path="best/devtools.html">
+            
+                
+                    <a href="./best/devtools.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>4.1.</b>
+                        
+                        DevTools
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="4.2" data-path="best/syntax.html">
+            
+                
+                    <a href="./best/syntax.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>4.2.</b>
+                        
+                        ES6 &amp; TypeScript goodies
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="4.3" >
+            
+            <span><b>4.3.</b> Classes or objects</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="4.4" >
+            
+            <span><b>4.4.</b> State history</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="4.5" >
+            
+            <span><b>4.5.</b> Structural equality</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="4.6" >
+            
+            <span><b>4.6.</b> Predicates</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="4.7" >
+            
+            <span><b>4.7.</b> Performance considerations</span>
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="5" data-path="refguide/api.html">
+            
+                
+                    <a href="./refguide/api.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.</b>
+                        
+                        Reference Guide
+                    </a>
+            
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="5.1" >
+            
+            <span><b>5.1.</b> isReactive</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="5.2" >
+            
+            <span><b>5.2.</b> makeReactive</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="5.3" >
+            
+            <span><b>5.3.</b> extendReactive</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="5.4" >
+            
+            <span><b>5.4.</b> sideEffect</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="5.5" >
+            
+            <span><b>5.5.</b> reactiveComponent</span>
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="6" >
+            
+            <span><b>6.</b> How does Mobservable work</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="7" data-path="LINKS.html">
+            
+                
+                    <a href="./LINKS.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.</b>
+                        
+                        Resources
+                    </a>
+            
+            
+        </li>
+    
+
+
+        
+        <li class="divider"></li>
+        <li>
+            <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+                Published with GitBook
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+    <div class="book-body">
+        <div class="body-inner">
+            <div class="book-header">
+    <!-- Actions Left -->
+    <a href="#" class="btn pull-left toggle-summary" aria-label="Table of Contents"><i class="fa fa-align-justify"></i></a>
+    <a href="#" class="btn pull-left toggle-search" aria-label="Search"><i class="fa fa-search"></i></a>
+    
+    <div id="font-settings-wrapper" class="dropdown pull-left">
+        <a href="#" class="btn toggle-dropdown" aria-label="Font Settings"><i class="fa fa-font"></i>
+        </a>
+        <div class="dropdown-menu font-settings">
+    <div class="dropdown-caret">
+        <span class="caret-outer"></span>
+        <span class="caret-inner"></span>
+    </div>
+
+    <div class="buttons">
+        <button type="button" id="reduce-font-size" class="button size-2">A</button>
+        <button type="button" id="enlarge-font-size" class="button size-2">A</button>
+    </div>
+
+    <div class="buttons font-family-list">
+        <button type="button" data-font="0" class="button">Serif</button>
+        <button type="button" data-font="1" class="button">Sans</button>
+    </div>
+
+    <div class="buttons color-theme-list">
+        <button type="button" id="color-theme-preview-0" class="button size-3" data-theme="0">White</button>
+        <button type="button" id="color-theme-preview-1" class="button size-3" data-theme="1">Sepia</button>
+        <button type="button" id="color-theme-preview-2" class="button size-3" data-theme="2">Night</button>
+    </div>
+</div>
+
+    </div>
+
+    <!-- Actions Right -->
+    
+    <div class="dropdown pull-right">
+        <a href="#" class="btn toggle-dropdown" aria-label="Share"><i class="fa fa-share-alt"></i>
+        </a>
+        <div class="dropdown-menu font-settings dropdown-left">
+            <div class="dropdown-caret">
+                <span class="caret-outer"></span>
+                <span class="caret-inner"></span>
+            </div>
+            <div class="buttons">
+                <button type="button" data-sharing="twitter" class="button">
+                    Share on Twitter
+                </button>
+                <button type="button" data-sharing="google-plus" class="button">
+                    Share on Google
+                </button>
+                <button type="button" data-sharing="facebook" class="button">
+                    Share on Facebook
+                </button>
+                <button type="button" data-sharing="weibo" class="button">
+                    Share on Weibo
+                </button>
+                <button type="button" data-sharing="instapaper" class="button">
+                    Share on Instapaper
+                </button>
+            </div>
+        </div>
+    </div>
+    
+
+    
+    <a href="#" target="_blank" class="btn pull-right google-plus-sharing-link sharing-link" data-sharing="google-plus" aria-label="Google"><i class="fa fa-google-plus"></i></a>
+    
+    
+    <a href="#" target="_blank" class="btn pull-right facebook-sharing-link sharing-link" data-sharing="facebook" aria-label="Facebook"><i class="fa fa-facebook"></i></a>
+    
+    
+    <a href="#" target="_blank" class="btn pull-right twitter-sharing-link sharing-link" data-sharing="twitter" aria-label="Twitter"><i class="fa fa-twitter"></i></a>
+    
+    
+    
+
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="./" >Introduction</a>
+    </h1>
+</div>
+
+            <div class="page-wrapper" tabindex="-1">
+                <div class="page-inner">
+                
+                
+                    <section class="normal" id="section-">
+                    
+                        <h1 id="introduction">Introduction</h1>
+<p>Mobservable is a library to create <em>views</em> that react to <em>state</em> changes automatically.</p>
+<p><img src="images/concept.png" alt="Mobservable + React"></p>
+<h2 id="philosophy">Philosophy</h2>
+<p>Mobservable isn&apos;t a library that helps you to write fancy code.
+It helps you to remove fancy code, so that just boring, simple code remains.
+Because simple code<sup>1</sup> is the secret recipe to building enterprise scale software that is easy to change and maintain.
+Simple code allows you to quickly change the essential parts<sup>2</sup> of your application.</p>
+<p><strong>With Mobservable you can write views like there is only one state ever.</strong></p>
+<p>So what happens when you alter the state? No worries, Mobservable makes sure that any view you have is kept in sync with the state efficiently<sup>3</sup>.
+The only thing that is left for you is to write boring views and straightforward actions.
+These are some examples of fancy code that you <em>no longer need</em> when using Mobservable:</p>
+<ul>
+<li>Verbose, boilerplated actions that alter state using unwieldy database query like constructions.</li>
+<li>Clever constructions that allows you to &apos;mutate&apos; immutable data.</li>
+<li>Data subscriptions, cursors, lenses or higher order components; in short any construction to configure how views should be kept in sync with the application state.</li>
+</ul>
+<h2 id="how-does-it-work">How does it work?</h2>
+<p>Mobservable applies <em>Transparent Reactive Functional Programming</em> to determine when views needs an update.
+This is an old technique that is used by spreadsheet applications.
+In spreadsheets the cells that hold a value are the <em>state</em>, and each cell that holds a formula is a <em>view</em>.
+While spreadsheets just work with simple values, Mobservable does the same job for all common JavaScript structures; primitives, plain objects, arrays, classes, references etc.</p>
+<p>Intrigued? Read on and take a dive in the world of Mobservable.</p>
+<h2 id="testimonials">Testimonials</h2>
+<blockquote>
+<p><em>We ported the book Notes and Kanban examples to Mobservable. Check out <a href="https://github.com/survivejs/mobservable-demo" target="_blank">the source</a> to see how this worked out. Compared to the original I was definitely positively surprised. Mobservable seems like a good fit for these problems.</em>
+&#x2010; Juho Veps&#xE4;l&#xE4;inen, author of &quot;SurviveJS - Webpack and React&quot; and jster.net curator</p>
+<p><em>I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can&apos;t think of any reason not to do things the simple, elegant way you have demonstrated.</em>
+&#x2010;David Schalk, fpcomplete.com</p>
+<p><em>Elegant! I love it!</em>
+&#x2010; Johan den Haan, CTO Mendix</p>
+<p><em>Great job with Mobservable! Really gives current conventions and libraries a run for their money.</em>
+&#x2010; Daniel Dunderfelt</p>
+</blockquote>
+<hr>
+<ol>
+<li><a href="http://blog.codinghorror.com/the-best-code-is-no-code-at-all/" target="_blank">The best code is no code at all</a></li>
+<li><a href="https://en.wikipedia.org/wiki/No_Silver_Bullet" target="_blank">No Silver Bullet &#x2014; Essence and Accidents of Software Engineering</a></li>
+<li><a href="https://medium.com/@mweststrate/pure-rendering-in-the-light-of-time-and-state-4b537d8d40b1" target="_blank">Pure Rendering in the light of State and Time</a></li>
+<li><a href="mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps">Making React reactive: the pursuit of high performing, easily maintainable React apps</a></li>
+</ol>
+
+                    
+                    </section>
+                
+                
+                </div>
+            </div>
         </div>
 
-        <!-- FOOTER  -->
-        <div id="footer_wrap" class="outer">
-          <footer class="inner">
+        
+        <a href="./index.html" class="navigation navigation-prev " aria-label="Previous page: Introduction"><i class="fa fa-angle-left"></i></a>
+        
+        
+        <a href="./intro/overview.html" class="navigation navigation-next " aria-label="Next page: The Gist of Mobservable"><i class="fa fa-angle-right"></i></a>
+        
+    </div>
+</div>
 
-            <p class="copyright">mobservable maintained by <a href="https://github.com/mweststrate">mweststrate</a></p>
-            <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
-          </footer>
-        </div>
+        
+<script src="gitbook/app.js"></script>
 
-        <script>
-          (function() {
-            var tagLines = [
-              "cleanly separate views, actions and model data",
-              "stop reasoning about which views need an update",
-              "stop changing the UI in event handlers",
-              "eliminate data subscriptions from your code",
-              "write views as-if data will not change in the future",
-//              "“express a lot of events just with observables... it's really funny.”",
-//              "use stuff that is “pretty clever! Actually, the whole thing is really cool.”",
-              "elegantly deal with asynchronous data fetching",
-              "create views without explicitly stating data dependencies",
-              "automatically and synchronously compute derived data"
-            ];
-            function shout() {
-              document.getElementById("shout").innerHTML = "&ldquo;" + tagLines[Math.round(Math.random() * (tagLines.length -1))] + "&rdquo;";
-            }
-            setInterval(shout, 5000);
-            shout();
-          })();
-        </script>
-        <!-- webpack bundle of react-mobservable-boilerplate -->
-        <script src="javascripts/bundle.js"></script>
-        <script type="text/javascript">
-        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-        </script>
-        <script type="text/javascript">
-        try {
-          var pageTracker = _gat._getTracker("UA-65632006-1");
-          pageTracker._trackPageview();
-        } catch(err) {}
-        </script>
+    
+    <script src="gitbook/plugins/gitbook-plugin-ga/plugin.js"></script>
+    
 
-        <script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
-        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+    
+    <script src="gitbook/plugins/gitbook-plugin-disqus/plugin.js"></script>
+    
 
-      </body>
-      </html>
+<script>
+require(["gitbook"], function(gitbook) {
+    var config = {"fontSettings":{"theme":null,"family":"sans","size":2},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"}};
+    gitbook.start(config);
+});
+</script>
+
+        <script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'UA-65632006-1', 'auto');ga('send', 'pageview');</script>
+    </body>
+    
+</html>

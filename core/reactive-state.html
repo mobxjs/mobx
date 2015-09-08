@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>Reactive Components | Introduction</title>
+        <title>Reactive Data Structures | Introduction</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.2.0">
@@ -25,10 +25,10 @@
         
     
     
-    <link rel="next" href="../best/devtools.html" />
+    <link rel="next" href="../core/reactive-views.html" />
     
     
-    <link rel="prev" href="../core/reactive-views.html" />
+    <link rel="prev" href="../intro/concepts.html" />
     
 
         
@@ -36,7 +36,7 @@
     <body>
         
         
-    <div class="book" data-level="2.3" data-basepath=".." data-revision="Tue Sep 08 2015 08:10:46 GMT+0200 (CEST)">
+    <div class="book" data-level="2.1" data-basepath=".." data-revision="Tue Sep 08 2015 17:01:46 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -132,7 +132,7 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="2.1" data-path="core/reactive-state.html">
+        <li class="chapter active" data-level="2.1" data-path="core/reactive-state.html">
             
                 
                     <a href="../core/reactive-state.html">
@@ -162,7 +162,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="2.3" data-path="core/reactive-component.html">
+        <li class="chapter " data-level="2.3" data-path="core/reactive-component.html">
             
                 
                     <a href="../core/reactive-component.html">
@@ -491,71 +491,68 @@
                 
                     <section class="normal" id="section-">
                     
-                        <h1 id="reactive-react-components">Reactive React Components</h1>
-<p>What if the <code>render</code> function of a <a href="https://facebook.github.io/react" target="_blank">React</a> component was just a reactive view to update the DOM?
-Then we would have a system that keeps the user interface actively in sync with the state, without ever <a href="https://facebook.github.io/react/docs/perf.html#perf.printwastedmeasurements" target="_blank">wasting</a> a rendering.
-And without explicitly declaring dependencies.</p>
-<p>That is exactly what the <code>reactiveComponent</code> function (and decorator) from the <code>mobservable-react</code> package does.
-Given a react component class, it turns the <code>render</code> function into a <code>sideEffect</code> while respecting the life-cycle system of React.
-Let&apos;s rebuild our lolcatz user interface by using some reactive React components:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> reactiveComponent = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;mobservable-react&apos;</span>).reactiveComponent;
-<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;react&apos;</span>);
-
-<span class="hljs-keyword">var</span> LolCatzOverview = reactiveComponent(React.createClass({
-    render: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-        <span class="hljs-keyword">var</span> lolCatz = <span class="hljs-keyword">this</span>.props.lolCatz;
-        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>
-            { isLolCatzFanatic() ? <span class="hljs-tag">&lt;<span class="hljs-title">marquee</span>&gt;</span>Lolcatz!<span class="hljs-tag">&lt;/<span class="hljs-title">marquee</span>&gt;</span> : null }
-            <span class="hljs-tag">&lt;<span class="hljs-title">h1</span>&gt;</span>Favorite:<span class="hljs-tag">&lt;/<span class="hljs-title">h1</span>&gt;</span>
-            <span class="hljs-tag">&lt;<span class="hljs-title">img</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">{</span> <span class="hljs-attribute">lolCatz.favoriteLolcat.url</span> } /&gt;</span>
-            <span class="hljs-tag">&lt;<span class="hljs-title">h2</span>&gt;</span>Runner ups:<span class="hljs-tag">&lt;/<span class="hljs-title">h2</span>&gt;</span>
-            <span class="hljs-tag">&lt;<span class="hljs-title">ul</span>&gt;</span>
-            { lolCatz.lolcatz.map(function(lolcat, index) {
-                return <span class="hljs-tag">&lt;<span class="hljs-title">li</span> <span class="hljs-attribute">key</span>=<span class="hljs-value">{</span> <span class="hljs-attribute">index</span> }&gt;</span>
-                    <span class="hljs-tag">&lt;<span class="hljs-title">LolCat</span> <span class="hljs-attribute">cat</span>=<span class="hljs-value">{</span> <span class="hljs-attribute">lolcat</span> } /&gt;</span>
-                <span class="hljs-tag">&lt;/<span class="hljs-title">li</span>&gt;</span>
-            }) }
-            <span class="hljs-tag">&lt;/<span class="hljs-title">ul</span>&gt;</span>
-        <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>;</span>
-    }
-}));
-
-<span class="hljs-keyword">var</span> LolCat = reactiveComponent(React.createClass({
-    render: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">img</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">{</span> <span class="hljs-attribute">this.props.cat.url</span> } /&gt;</span>;</span>
-    }
-}));
-
-React.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">LolCatzOverview</span> <span class="hljs-attribute">lolCatz</span>=<span class="hljs-value">{</span> <span class="hljs-attribute">lolCatz</span> } /&gt;</span>, document.body);
-</span></code></pre>
-<p>So there we are, simple, straightforward reactive components that will render whenever needed.
-These components have some interesting characteristics:</p>
-<ul>
-<li>Usually reactive components have <em>no state</em>. But you are still free to use state.</li>
-<li><code>reactiveComponent</code> doesn&apos;t require you to define which data you want to use, yet it offers more fine grained subscriptions compared to many higher order components as found in other frameworks.</li>
-<li>Reactive components only subscribe to the data structures that where actively used during the last render.
-This means that you cannot under-subscribe or over-subscribe.
-You can even use data in your rendering that will only be available at later moment in time.
-This is ideal for asynchronously loading data.  </li>
-<li>The <code>render</code> method will react to any reactive data structures, regardless whether data is passed in as <code>props</code> (recommended), is part of the <code>state</code>, is in instance properties or is accessed through the closure of the component.</li>
-<li>Reactive components implement <code>shouldComponentUpdate</code> so that children are not re-rendered unnecessary.</li>
-<li>Reactive components sideways load data; parent components won&apos;t re-render even when child components will.</li>
-<li><code>reactiveComponent</code> does not depend on React&apos;s <em>context</em> system which has its own quirks.</li>
-</ul>
-<h2 id="es6">ES6</h2>
-<p>For ES6 users, components can also be declared using classes:</p>
-<pre><code class="lang-javascript">@reactiveComponent <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyComponent</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
-  <span class="hljs-comment">/* .. */</span>
-}
+                        <h1 id="reactive-data-structures">Reactive Data Structures</h1>
+<h2 id="the-basics">The Basics</h2>
+<p><code>makeReactive</code> is the swiss knife of Mobservable. It makes all properties of an object reactive. Or all values in an array.
+(and even functions as will be explained in the next chapter).
+You can simply create an object with some reactive properties as follows:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> lolCatz = makeReactive({
+    doILikeLolcatz : <span class="hljs-literal">false</span>,
+    favoriteLolcat: <span class="hljs-literal">null</span>,
+    lolcatz: []
+});
 </code></pre>
+<p>For demo purposes, we also create a side effect that prints a message based on <code>lolCatz</code>. (side effects will be explained in the next paragraphs).  </p>
+<pre><code class="lang-javascript">sideEffect(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">if</span> (lolCatz.doILikeLolcatz === <span class="hljs-literal">false</span>)
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Never mind...&quot;</span>);
+    <span class="hljs-keyword">else</span>
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Check this! &quot;</span>, lolCatz.favoriteLolcat.url);
+});
+
+<span class="hljs-comment">// prints &apos;Never mind...&apos;</span>
+</code></pre>
+<p>So you can just pass an object into <code>makeReactive</code> and you get back a new object holding the same properties.
+But this time the properties will be tracked by Mobservable.
+So let&apos;s do something funny and add our favorite lolcat to the now reactive object <code>lolCatz</code>:</p>
+<pre><code class="lang-javascript">lolCatz.favoriteLolcat = {
+    url: <span class="hljs-string">&quot;http://tinyurl.com/3vwvkga&quot;</span>
+};
+<span class="hljs-comment">// doesn&apos;t print</span>
+
+lolCatz.doILikeLolcatz = <span class="hljs-literal">true</span>;
+<span class="hljs-comment">// prints: &apos;Check this! http://tinyurl.com/3vwvkga&apos;</span>
+
+lolCatz.favoriteLolcat.url = <span class="hljs-string">&quot;http://tinyurl.com/nc7p2ft&quot;</span>;
+<span class="hljs-comment">// prints: &apos;Check this! http://tinyurl.com/nc7p2ft&apos;</span>
+</code></pre>
+<p>Reactive data structures can be altered similar to normal data structures.
+New structures that are assigned to already reactive data structures will become reactive as well,
+Mobservable will apply <code>makeReactive</code> to those structures automatically.
+So even changes deep inside new objects, like the <code>url</code> in <code>favoriteLolcat</code>, will be detected.</p>
+<h2 id="arrays-and-references">Arrays and References</h2>
+<p>With Mobservable, you can freely work with arrays and references.
+So instead of picking only one favorite lolcat, let&apos;s add two of them to the <code>lolcatz</code> array and use the <code>favoriteLolcat</code> property as a reference:</p>
+<pre><code class="lang-javascript">lolCatz.lolcatz.push(
+    { url: <span class="hljs-string">&quot;ttp://tinyurl.com/3vwvkga&quot;</span> },
+    { url: <span class="hljs-string">&quot;http://tinyurl.com/nc7p2ft&quot;</span> }
+);
+
+lolCatz.favoriteLolcat = lolCatz.lolcatz[<span class="hljs-number">0</span>];
+<span class="hljs-comment">// prints: &apos;Check this! ttp://tinyurl.com/3vwvkga&apos;</span>
+<span class="hljs-comment">// oops, typo...</span>
+
+lolCatz.lolcatz[<span class="hljs-number">0</span>].url = <span class="hljs-string">&quot;http://tinyurl.com/3vwvkga&quot;</span>
+<span class="hljs-comment">// prints: &apos;Check this! http://tinyurl.com/3vwvkga&apos;</span>
+</code></pre>
+<p>So, you can freely mix and match objects, references, arrays when using Mobservable.
+Just pick the most natural data structure.
+Mobservable is not opinionated about your the data structures that store the <em>state</em>.
+This enables you to write <em>actions</em> as natural as possible.</p>
 <h2 id="summary">Summary</h2>
-<p>Use <code>reactiveComponent</code> to turn React components into reactive components.
-You can play with the above example and the examples from the previous paragraph in this <a href="http://jsbin.com/zayere/edit?js,console,output" target="_blank">JSBin</a>.
-This concludes the introduction to the core concepts of Mobservable.
-Just try it out!
-Or read on for best practices on how to structure large scale applications.</p>
-<p>Oh, did I mention the <a href="https://github.com/mweststrate/mobservable-react-devtools" target="_blank">Mobservable-React-DevTools</a> yet?
-It shows exactly when your components are rerendered and you can inspect the data dependencies of your components.</p>
+<p>If you have a state tree consisting of plain objects and arrays, passing the root object through <code>makeReactive</code> once is enough for Mobservable to do its job.
+More details about <code>makeReactive</code> can be found in the <a href="../refguide/make-reactive.md">reference guide</a>.
+First, let&apos;s dive into reactive views.</p>
 
                     
                     </section>
@@ -566,10 +563,10 @@ It shows exactly when your components are rerendered and you can inspect the dat
         </div>
 
         
-        <a href="../core/reactive-views.html" class="navigation navigation-prev " aria-label="Previous page: Reactive Views"><i class="fa fa-angle-left"></i></a>
+        <a href="../intro/concepts.html" class="navigation navigation-prev " aria-label="Previous page: Concepts &amp; Principles"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../best/devtools.html" class="navigation navigation-next " aria-label="Next page: DevTools"><i class="fa fa-angle-right"></i></a>
+        <a href="../core/reactive-views.html" class="navigation navigation-next " aria-label="Next page: Reactive Views"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>
@@ -583,10 +580,6 @@ It shows exactly when your components are rerendered and you can inspect the dat
 
     
     <script src="../gitbook/plugins/gitbook-plugin-disqus/plugin.js"></script>
-    
-
-    
-    <script src="../gitbook/plugins/gitbook-plugin-livereload/plugin.js"></script>
     
 
 <script>
