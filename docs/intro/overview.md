@@ -31,7 +31,7 @@ var TimerView = mobservable.reactiveComponent(React.createClass({
                 Seconds passed: {this.props.appState.timer}
             </button>);
     },
-    
+
     onReset: function() {
         this.props.appState.resetTimer();
     }
@@ -47,7 +47,7 @@ React.render(<TimerView appState={appState} />, document.body);
 The third relevant thing to do is modifying the state.
 That is what your app is about after all.
 Now, unlike many other frameworks, Mobservable doesn't dictate you how to do this (but there are best practices).
-But remember, the key thing here is: Mobservable helps you to keep things simple.
+But remember, the key thing here is: Mobservable helps you to do things in a simple straightforward way.
 
 The following code will alter your data every second, and the UI will update automatically when needed.
 No explicit relations are defined in either in the controller functions that _change_ the state or in the views that should _update_.

@@ -1,12 +1,12 @@
 # Reactive React Components
 
-We just saw how `sideEffect` can be used to create a view the automatically observes all reactive data structures it uses to trigger side effects eagerly.
-What if the `render` methods of [React](https://facebook.github.io/react) components where side effects?
-Then you would have a system that keeps the user interface actively in sync with the state, without ever [wasting](https://facebook.github.io/react/docs/perf.html#perf.printwastedmeasurements) a rendering.
+What if the `render` function of a [React](https://facebook.github.io/react) component was just a reactive view to update the DOM?
+Then we would have a system that keeps the user interface actively in sync with the state, without ever [wasting](https://facebook.github.io/react/docs/perf.html#perf.printwastedmeasurements) a rendering.
+And without explicitly declaring dependencies.
 
 That is exactly what the `reactiveComponent` function (and decorator) from the `mobservable-react` package does.
-Given a react component class, it turns the `render` function into a `sideEffect` while respecting the lifecycle system of React.
-Let's rebuild our lolcatz user interface using some React components:
+Given a react component class, it turns the `render` function into a `sideEffect` while respecting the life-cycle system of React.
+Let's rebuild our lolcatz user interface by using some reactive React components:
 
 ```javascript
 var reactiveComponent = require('mobservable-react').reactiveComponent;
@@ -27,30 +27,49 @@ var LolCatzOverview = reactiveComponent(React.createClass({
 				</li>
 			}) }
 			</ul>
-		</div>;	
-	}	
+		</div>;
+	}
 }));
 
 var LolCat = reactiveComponent(React.createClass({
 	render: function() {
-		return <img src={ this.props.cat.url } />;	
+		return <img src={ this.props.cat.url } />;
 	}
 }));
 
 React.render(<LolCatzOverview lolCatz={ lolCatz } />, document.body);
 ```
 
+So there we are, simple, straightforward reactive components that will render whenever needed.
+These components have some interesting characteristics:
 
-* No state
-* No context
-* No configuration
-* Won't unecessary render children
-* Won't unecessary render parents
+* Usually reactive components have _no state_. But you are still free to use state.
+* `reactiveComponent` doesn't require you to define which data you want to use, yet it offers more fine grained subscriptions compared to many higher order components as found in other frameworks.
+* Reactive components only subscribe to the data structures that where actively used during the last render.
+This means that you cannot under-subscribe or over-subscribe.
+You can even use data in your rendering that will only be available at later moment in time.
+This is ideal for asynchronously loading data.  
+* The `render` method will react to any reactive data structures, regardless whether data is passed in as `props` (recommended), is part of the `state`, is in instance properties or is accessed through the closure of the component.
+* Reactive components implement `shouldComponentUpdate` so that children are not re-rendered unnecessary.
+* Reactive components sideways load data; parent components won't re-render even when child components will.
+* `reactiveComponent` does not depend on React's _context_ system which has its own quirks.
 
-JSBin: http://jsbin.com/zayere/edit?js,console,output
+## ES6
 
-plugins: ungrey, http://plugins.gitbook.com/plugin/jsfiddle http://plugins.gitbook.com/plugin/ga http://plugins.gitbook.com/plugin/jsbin http://plugins.gitbook.com/plugin/disqus
+For ES6 users, components can also be declared using classes:
+```javascript
+@reactiveComponent class MyComponent extends React.Component {
+  /* .. */
+}
+```
 
+## Summary
 
-The `mobservable-react` package provides a simple function, `makeReactive` that accepts a React component and basically wraps `sideEffect` around it.
-From there on, Mobservable will ensure that React components are updated automatically if any value that it uses is changed.
+Use `reactiveComponent` to turn React components into reactive components.
+You can play with the above example and the examples from the previous paragraph in this [JSBin](http://jsbin.com/zayere/edit?js,console,output).
+This concludes the introduction to the core concepts of Mobservable.
+Just try it out!
+Or read on for best practices on how to structure large scale applications.
+
+Oh, did I mention the [Mobservable-React-DevTools](https://github.com/mweststrate/mobservable-react-devtools) yet?
+It shows exactly when your components are rerendered and you can inspect the data dependencies of your components.

@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>Reactive Views | Introduction</title>
+        <title>DevTools | Introduction</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.2.0">
@@ -25,10 +25,10 @@
         
     
     
-    <link rel="next" href="../core/reactive-component.html" />
+    <link rel="next" href="../best/syntax.html" />
     
     
-    <link rel="prev" href="../core/reactive-state.html" />
+    <link rel="prev" href="../core/reactive-component.html" />
     
 
         
@@ -36,7 +36,7 @@
     <body>
         
         
-    <div class="book" data-level="2.2" data-basepath=".." data-revision="Tue Sep 08 2015 08:10:46 GMT+0200 (CEST)">
+    <div class="book" data-level="4.1" data-basepath=".." data-revision="Tue Sep 08 2015 08:10:46 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -147,7 +147,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="2.2" data-path="core/reactive-views.html">
+        <li class="chapter " data-level="2.2" data-path="core/reactive-views.html">
             
                 
                     <a href="../core/reactive-views.html">
@@ -238,7 +238,7 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="4.1" data-path="best/devtools.html">
+        <li class="chapter active" data-level="4.1" data-path="best/devtools.html">
             
                 
                     <a href="../best/devtools.html">
@@ -491,62 +491,15 @@
                 
                     <section class="normal" id="section-">
                     
-                        <h1 id="reactive-views">Reactive Views</h1>
-<h2 id="creating-views-using-makereactive">Creating views using <code>makeReactive</code></h2>
-<p>Reactive views are the things that make Mobservable really lovable.
-They are just functions that use some reactive data.
-But those view function won&apos;t just inspect the value once, they will keep tracking what happens to those values and re-evaluate when necessary.
-View functions can be created by passing a function (without arguments) to <code>makeReactive</code>.
-Remember the <code>lolCatz</code> data structure from previous paragraph?
-Here is a view:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> isLolCatzFanatic = makeReactive(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-    <span class="hljs-keyword">return</span> lolCatz.doILikeLolcatz &amp;&amp; lolCatz.lolcatz.length &gt;= <span class="hljs-number">42</span>;
-});
-</code></pre>
-<p>That looks a lot like a spreadsheet formula doesn&apos;t it?
-This view will automatically observe the property <code>lolCatz.doILikeLolcatz</code>.
-And, as long as <code>lolCatz.doILikeLolcatz</code> yields <code>true</code>, the view will also observe the reference <code>lolCatz.lolcatz</code> and the property <code>length</code> of <code>lolCatz.lolcatz</code>.
-The fact that the system determines itself which values should be observed, distinguishes Transparent FRP libraries from normal FRP libraries like RxJs and Bacon.</p>
-<p>Anyway, this view will always yield <code>false</code> unless you find another 40 lolcatz, so lets build another view.
-<code>makeReactive(function)</code> will return a function with which you can inspect the current value, so let&apos;s use the previous view in yet another view.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> lolCatzHtml = makeReactive(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-    <span class="hljs-keyword">return</span> (
-        (isLolCatzFanatic() ? <span class="hljs-string">&quot;&lt;marquee&gt;Lolcatz!&lt;/marquee&gt;&quot;</span> : <span class="hljs-string">&quot;&quot;</span>) +
-        <span class="hljs-string">&quot;&lt;h1&gt;Favorite:&lt;/h1&gt;&quot;</span> +
-        <span class="hljs-string">&quot;&lt;img src=&apos;&quot;</span> + lolCatz.favoriteLolcat.url + <span class="hljs-string">&quot;&apos;/&gt;&quot;</span> +
-        <span class="hljs-string">&quot;&lt;h2&gt;Runner ups:&lt;/h2&gt;&quot;</span> +
-        <span class="hljs-string">&quot;&lt;ul&gt;&quot;</span> +
-        lolCatz.lolcatz.map(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">lolcat</span>) </span>{
-            <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;&lt;li&gt;&lt;img src=&apos;&quot;</span> + lolcat.url + <span class="hljs-string">&quot;&apos;/&gt;&lt;/li&gt;&quot;</span>;
-        }).join(<span class="hljs-string">&quot;&quot;</span>) +
-        <span class="hljs-string">&quot;&lt;/ul&gt;&quot;</span>
-    );
-});
-</code></pre>
-<p>From now on, <code>lolCatzHtml()</code> will yield us the latest rendering.
-But we can also ask <code>lolCatzHtml</code> to pro-actively inform us when there is a new rendering by using the <code>.observe</code> method which is available on all views.
-You might already be familiar with this concept from other FRP libraries.</p>
-<pre><code class="lang-javascript">lolCatzHtml.observe(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">rendering</span>) </span>{
-    <span class="hljs-built_in">document</span>.body.innerHTML = rendering;
-});
-</code></pre>
-<p>In practice you hardly will use &apos;.observe&apos; since there is a more powerful alternative: <code>mobservable.sideEffect</code>.</p>
-<h2 id="creating-views-with-effects-using-sideeffect">Creating views with effects using <code>sideEffect</code></h2>
-<p>Views are derived purely from the state. And observers in turn only react to view updates.
-So observers are in fact view functions as well.
-Except that they do not produce a new value, so they must produce side effects to be useful.
-So instead of registering observes, we can just create more views using the <code>sideEffect</code> function.
-The big difference is that observers can ultimately observe only one value or stream, while <code>sideEffect</code> can observe many values at the same time.
-So we can rewrite the above observer to a <code>sideEffect</code>:</p>
-<pre><code class="lang-javascript">sideEffect(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-    <span class="hljs-built_in">document</span>.body.innerHTML = lolCatzHtml();
-});
-</code></pre>
-<p>And there it is! A rendering system that renders the <code>lolCatz</code> structure automatically to the DOM whenever a relevant value inside <code>lolCatz</code> changes.
-Surely, dumping a bunch of HTML into the DOM isn&apos;t a very scalable architecture.
-Frameworks like React are way smarter in manipulating the DOM.
-Can we add those to the mix...?</p>
-<p>(N.B. both <code>sideEffect</code> and <code>.observe</code> return a function that, if invoked, cancels the effect from being called in the future).</p>
+                        <h1 id="mobservable-react-devtools">Mobservable + React DevTools</h1>
+<p>Mobservable ships with DevTools that can be used to track the rendering behavior and data depenencies of your app.</p>
+<p><img src="../images/devtools.gif" alt="devtools"></p>
+<h2 id="usage">Usage:</h2>
+<p>Install:</p>
+<p><code>npm install mobservable-react-devtools</code></p>
+<p>To enable devtools, require the devtools somewhere in your code-base.</p>
+<p><code>require(&apos;mobservable-react-devtools&apos;)</code></p>
+<p>For more details check the <a href="https://github.com/mweststrate/mobservable-react-devtools" target="_blank">mobservable-react-devtools</a> repository.</p>
 
                     
                     </section>
@@ -557,10 +510,10 @@ Can we add those to the mix...?</p>
         </div>
 
         
-        <a href="../core/reactive-state.html" class="navigation navigation-prev " aria-label="Previous page: Reactive Data Structures"><i class="fa fa-angle-left"></i></a>
+        <a href="../core/reactive-component.html" class="navigation navigation-prev " aria-label="Previous page: Reactive Components"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../core/reactive-component.html" class="navigation navigation-next " aria-label="Next page: Reactive Components"><i class="fa fa-angle-right"></i></a>
+        <a href="../best/syntax.html" class="navigation navigation-next " aria-label="Next page: ES6 &amp; TypeScript goodies"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

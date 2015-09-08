@@ -19,7 +19,7 @@ These are some examples of fancy code that you _no longer need_ when using Mobse
 
 * Verbose, boilerplated actions that alter state using unwieldy database query like constructions.
 * Clever constructions that allows you to 'mutate' immutable data.
-* Data subscriptions, cursors, lensens or higher order components; in short any construction to configure how views should be kept in sync with the applicaiton state.
+* Data subscriptions, cursors, lenses or higher order components; in short any construction to configure how views should be kept in sync with the application state.
 
 ## How does it work?
 
@@ -28,7 +28,7 @@ This is an old technique that is used by spreadsheet applications.
 In spreadsheets the cells that hold a value are the _state_, and each cell that holds a formula is a _view_.
 While spreadsheets just work with simple values, Mobservable does the same job for all common JavaScript structures; primitives, plain objects, arrays, classes, references etc.
 
-Intrigued? Read on and take a dive in the world of Mobservable. 
+Intrigued? Read on and take a dive in the world of Mobservable.
 
 ## Testimonials
 
@@ -36,10 +36,10 @@ Intrigued? Read on and take a dive in the world of Mobservable.
 > &dash; Juho Vepsäläinen, author of "SurviveJS - Webpack and React" and jster.net curator
 
 > _I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated._
->&dash;David Schalk, fpcomplete.com
+> &dash;David Schalk, fpcomplete.com
 
 > _Elegant! I love it!_
-> &dash; Johan den Haan, CTO of Mendix
+> &dash; Johan den Haan, CTO Mendix
 
 > _Great job with Mobservable! Really gives current conventions and libraries a run for their money._
 > &dash; Daniel Dunderfelt
@@ -51,4 +51,3 @@ Intrigued? Read on and take a dive in the world of Mobservable.
 2. [No Silver Bullet — Essence and Accidents of Software Engineering](https://en.wikipedia.org/wiki/No_Silver_Bullet)
 3. [Pure Rendering in the light of State and Time](https://medium.com/@mweststrate/pure-rendering-in-the-light-of-time-and-state-4b537d8d40b1)
 4. [Making React reactive: the pursuit of high performing, easily maintainable React apps](mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/)
-

@@ -2,17 +2,17 @@
 
 ## Concepts
 
-Mobservable destinguishes the following concepts in your application. You saw them in the previous gist, but let's dive into them in a bit more detail.
+Mobservable distinguishes the following concepts in your application. You saw them in the previous gist, but let's dive into them in a bit more detail.
 
 ### 1. State
 
-_State_ is the data that drives your application. 
+_State_ is the data that drives your application.
 Usually there is _domain specific state_ like a list of todo items and there is _view state_ such as the currently selected element.
 Remember, state is like spreadsheets cells that hold a value.
 
 ### 2. Views
 
-_Views_ are all forms of data that can be derived from the _state_ without any further interaction. 
+_Views_ are all forms of data that can be derived from the _state_ without any further interaction.
 Views exist in many forms:
 
 * The _user interface_.
@@ -29,7 +29,7 @@ An action is like a user that enters a new value in a spreadsheet cell.
 
 ## Principles
 
-Mobservable supports an uni-directional dataflow where _actions_ changes the _state_, which in turn updates all affected _views_.
+Mobservable supports an uni-directional data flow where _actions_ changes the _state_, which in turn updates all affected _views_.
 
 ![Action, State, View](../images/action-state-view.png)
 
@@ -46,11 +46,11 @@ Use _side effects_ if you have _view_ that should always be updated, even if it 
 _Side effects_ are useful in any place where you need to kick off some imperative code automatically if the _state_ changed.
 This is useful **to achieve effects** like logging to the console or sending changes to the server.
 
-All _views_ must be **pure**. They are not allowed to change _state_. 
+All _views_ must be **pure**. They are not allowed to change _state_.
 This applies even to _side effects_.
-This might sound a bit contradictionary, but it means that you are allowed to do anything in side effects, except for changing the state.
+This might sound like a contradiction, but it means that you are allowed to do anything in side effects, except for changing the state.
 This is strictly speaking not a technically requirement of Mobservable,
-it is a designed contraint to protect your sanity :).
+it is a designed constraint to protect your sanity :).
 
 
 ## Illustration
@@ -63,7 +63,7 @@ import {makeReactive, sideEffect} from 'mobservable';
 var todoStore = makeReactive({
 	/* some reactive state */
 	todos: [],
-	
+
 	/* a reactive view */
 	completedCount: function() {
 		return this.todos.filter(() => todo.completed).length;
@@ -73,7 +73,7 @@ var todoStore = makeReactive({
 /* a sideEffect */
 sideEffect(function() {
 	console.log("Completed %d of %d items",
-		todoStore.completedCount, 
+		todoStore.completedCount,
 		todoStore.todos.length
 	);
 });

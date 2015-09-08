@@ -16,24 +16,24 @@ var lolCatz = makeReactive({
 
 For demo purposes, we also create a side effect that prints a message based on `lolCatz`. (side effects will be explained in the next paragraphs).  
 
-```javascript 
+```javascript
 sideEffect(function() {
 	if (lolCatz.doILikeLolcatz === false)
 		console.log("Never mind...");
 	else
-		console.log("Check this! ", lolCatz.favoriteLolcat.url);	
+		console.log("Check this! ", lolCatz.favoriteLolcat.url);
 });
 
 // prints 'Never mind...'
 ```
 
-So you can just pass an object into `makeReactive` and you get back a new object holding the same properties. 
+So you can just pass an object into `makeReactive` and you get back a new object holding the same properties.
 But this time the properties will be tracked by Mobservable.
 So let's do something funny and add our favorite lolcat to the now reactive object `lolCatz`:
 
 ```javascript
 lolCatz.favoriteLolcat = {
-	url: "http://tinyurl.com/3vwvkga"	
+	url: "http://tinyurl.com/3vwvkga"
 };
 // doesn't print
 
@@ -70,7 +70,7 @@ lolCatz.lolcatz[0].url = "http://tinyurl.com/3vwvkga"
 
 So, you can freely mix and match objects, references, arrays when using Mobservable.
 Just pick the most natural data structure.
-Mobservable is unopiniated about your the data structures that store the _state_.
+Mobservable is not opinionated about your the data structures that store the _state_.
 This enables you to write _actions_ as natural as possible.
 
 ## Summary

@@ -8,25 +8,25 @@
   * [Reactive Data Structures](core/reactive-state.md)
   * [Reactive Views](core/reactive-views.md)
   * [Reactive Components](core/reactive-component.md)
-* Fancy stuff
-  * Transactions
-  * Async views
-  * Structural equality
-
-* How does Mobservable work
-* Organizing (React) projects
-  * Domain state
-  * View state
-  * Components
-* Best practices
-  * Performance considerations
+* Best Practices
+  * Organizing data stores
+  * Organizing components
+  * Organizing actions
+  * Working with async actions
+  * Routing
+* Tips & Tricks
+  * [DevTools](best/devtools.md)
+  * [ES6 & TypeScript goodies](best/syntax.md)
   * Classes or objects
-  * Tracking state
-* Reference Guide
+  * State history
+  * Structural equality
+  * Predicates
+  * Performance considerations
+* [Reference Guide](refguide/api.md)
   * isReactive
   * makeReactive
   * extendReactive
   * sideEffect
   * reactiveComponent
-  
-* (Resources)[LINKS.md]
+* How does Mobservable work
+* [Resources](LINKS.md)

@@ -8,7 +8,6 @@
 ## Resources
 
 * [Five minute interactive introducton to Mobservable and React](https://mweststrate.github.io/mobservable/getting-started.html)
-* [API documentation](https://github.com/mweststrate/mobservable/blob/master/docs/api.md)
 * [Tips & Tricks](https://github.com/mweststrate/mobservable/blob/master/docs/syntax.md)
 * [ES5, ES6, TypeScript syntax examples](https://github.com/mweststrate/mobservable/blob/master/docs/api.md)
 * [TypeScript Typings](https://github.com/mweststrate/mobservable/blob/master/dist/mobservable.d.ts)
