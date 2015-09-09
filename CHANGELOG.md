@@ -1,3 +1,8 @@
+# 0.6.5:
+
+* It is no longer possible to create impure views; views that alter other reactive values.
+* Update links to the new documentation.
+
 # 0.6.4: 
 
 * 2nd argument of sideEffect is now the scope, instead of an options object which hadn't any useful properties

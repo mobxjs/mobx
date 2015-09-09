@@ -206,6 +206,10 @@ var mobservable;
             return __mobservableTrackingStack.length;
         }
         _.stackDepth = stackDepth;
+        function isComputingView() {
+            return __mobservableTrackingStack.length > 0;
+        }
+        _.isComputingView = isComputingView;
     })(_ = mobservable._ || (mobservable._ = {}));
 })(mobservable || (mobservable = {}));
 /**
@@ -497,6 +501,7 @@ var mobservable;
                     return this.$mobservable.values.length;
                 },
                 set: function (newLength) {
+                    this.assertNotComputing("spliceWithArray");
                     if (typeof newLength !== "number" || newLength < 0)
                         throw new Error("Out of range: " + newLength);
                     var currentLength = this.$mobservable.values.length;
@@ -523,6 +528,7 @@ var mobservable;
             };
             ObservableArray.prototype.spliceWithArray = function (index, deleteCount, newItems) {
                 var _this = this;
+                this.assertNotComputing("spliceWithArray");
                 var length = this.$mobservable.values.length;
                 if ((newItems === undefined || newItems.length === 0) && (deleteCount === 0 || length === 0))
                     return [];
@@ -619,7 +625,7 @@ var mobservable;
                 for (var _i = 2; _i < arguments.length; _i++) {
                     newItems[_i - 2] = arguments[_i];
                 }
-                this.sideEffectWarning("splice");
+                this.assertNotComputing("splice");
                 switch (arguments.length) {
                     case 0:
                         return [];
@@ -635,16 +641,16 @@ var mobservable;
                 for (var _i = 0; _i < arguments.length; _i++) {
                     items[_i - 0] = arguments[_i];
                 }
-                this.sideEffectWarning("push");
+                this.assertNotComputing("push");
                 this.spliceWithArray(this.$mobservable.values.length, 0, items);
                 return this.$mobservable.values.length;
             };
             ObservableArray.prototype.pop = function () {
-                this.sideEffectWarning("pop");
+                this.assertNotComputing("pop");
                 return this.splice(Math.max(this.$mobservable.values.length - 1, 0), 1)[0];
             };
             ObservableArray.prototype.shift = function () {
-                this.sideEffectWarning("shift");
+                this.assertNotComputing("shift");
                 return this.splice(0, 1)[0];
             };
             ObservableArray.prototype.unshift = function () {
@@ -652,20 +658,20 @@ var mobservable;
                 for (var _i = 0; _i < arguments.length; _i++) {
                     items[_i - 0] = arguments[_i];
                 }
-                this.sideEffectWarning("unshift");
+                this.assertNotComputing("unshift");
                 this.spliceWithArray(0, 0, items);
                 return this.$mobservable.values.length;
             };
             ObservableArray.prototype.reverse = function () {
-                this.sideEffectWarning("reverse");
+                this.assertNotComputing("reverse");
                 return this.replace(this.$mobservable.values.reverse());
             };
             ObservableArray.prototype.sort = function (compareFn) {
-                this.sideEffectWarning("sort");
+                this.assertNotComputing("sort");
                 return this.replace(this.$mobservable.values.sort.apply(this.$mobservable.values, arguments));
             };
             ObservableArray.prototype.remove = function (value) {
-                this.sideEffectWarning("remove");
+                this.assertNotComputing("remove");
                 var idx = this.$mobservable.values.indexOf(value);
                 if (idx > -1) {
                     this.splice(idx, 1);
@@ -694,9 +700,13 @@ var mobservable;
                     return baseFunc.apply(this.$mobservable.values, arguments);
                 }).apply(this, initialArgs);
             };
-            ObservableArray.prototype.sideEffectWarning = function (funcName) {
-                if (mobservable.debugLevel > 0 && __mobservableTrackingStack.length > 0)
-                    _.warn("[Mobservable.Array] The method array." + funcName + " should probably not be used inside observable functions since it has side-effects");
+            ObservableArray.prototype.assertNotComputing = function (funcName) {
+                if (_.isComputingView()) {
+                    var e = "[Mobservable.Array] The method array." + funcName + " is not allowed to be used inside reactive views since it alters the state.";
+                    console.error(e);
+                    console.trace();
+                    throw new Error();
+                }
             };
             return ObservableArray;
         })(StubArray);
@@ -857,6 +867,7 @@ var mobservable;
 (function (mobservable) {
     var _;
     (function (_) {
+        _.NON_PURE_VIEW_ERROR = "[Mobservable] It is not allowed to change the state during the computation of a reactive view.";
         var ObservableValue = (function (_super) {
             __extends(ObservableValue, _super);
             function ObservableValue(value, recurse, context) {
@@ -875,6 +886,11 @@ var mobservable;
                 return value;
             };
             ObservableValue.prototype.set = function (value) {
+                if (_.isComputingView()) {
+                    console.error(_.NON_PURE_VIEW_ERROR);
+                    console.trace();
+                    throw new Error(_.NON_PURE_VIEW_ERROR);
+                }
                 if (value !== this._value) {
                     var oldValue = this._value;
                     this.markStale();
@@ -929,12 +945,13 @@ var mobservable;
                 if (this.isComputing)
                     throw new Error("Cycle detected");
                 if (this.isSleeping) {
-                    if (__mobservableTrackingStack.length > 0) {
+                    if (_.isComputingView()) {
                         this.wakeUp();
                         this.notifyObserved();
                     }
                     else {
-                        this.compute();
+                        this.wakeUp();
+                        this.tryToSleep();
                     }
                 }
                 else {
