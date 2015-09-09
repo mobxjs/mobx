@@ -124,7 +124,7 @@ namespace mobservable {
                 this.tryToSleep();
             }
 
-            private tryToSleep() {
+            tryToSleep() {
                 if (!this.isSleeping && this.observers.length === 0 && this.externalRefenceCount === 0) {
                     for (var i = 0, l = this.observing.length; i < l; i++)
                         this.observing[i].removeObserver(this);
@@ -230,6 +230,10 @@ namespace mobservable {
 
         export function stackDepth () {
             return __mobservableTrackingStack.length;
+        }
+        
+        export function isComputingView() {
+            return __mobservableTrackingStack.length > 0;
         }
     }
 }

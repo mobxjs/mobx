@@ -1,6 +1,7 @@
 /// <reference path="./dnode.ts" />
 namespace mobservable {
     export namespace _ {
+        export var NON_PURE_VIEW_ERROR = `[Mobservable] It is not allowed to change the state during the computation of a reactive view.`;
 
         export class ObservableValue<T> extends RootDNode {
             protected changeEvent = new SimpleEventEmitter();
@@ -21,6 +22,11 @@ namespace mobservable {
             }
 
             set(value:T) {
+                if (_.isComputingView()) {
+                    console.error(NON_PURE_VIEW_ERROR);
+                    console.trace();
+                    throw new Error(NON_PURE_VIEW_ERROR);
+                }
                 if (value !== this._value) {
                     var oldValue = this._value;
                     this.markStale();

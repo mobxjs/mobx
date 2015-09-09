@@ -16,13 +16,15 @@ namespace mobservable {
                 if (this.isComputing)
                     throw new Error("Cycle detected");
                 if (this.isSleeping) {
-                    if (__mobservableTrackingStack.length > 0) {
+                    if (_.isComputingView()) {
                         // somebody depends on the outcome of this computation
                         this.wakeUp(); // note: wakeup triggers a compute
                         this.notifyObserved();
                     } else {
-                        // nobody depends on this computable; so compute a fresh value but do not wake up
-                        this.compute();
+                        // nobody depends on this computable;
+                        // so just compute fresh value and continue to sleep
+                        this.wakeUp();
+                        this.tryToSleep();
                     }
                 } else {
                     // we are already up to date, somebody is just inspecting our current value

@@ -67,6 +67,67 @@ exports.testException2 = function(test) {
     test.done();
 };
 
+
+exports.deny_state_changes = function(test) {
+    try {
+        var x = makeReactive(3);
+        var z = makeReactive(5);
+        var y = makeReactive(function() {
+            z(6);
+            return x() * x();
+        });
+
+        test.throws(function() {
+            test.equal(9, y());
+        }, null, mobservable._.NON_PURE_VIEW_ERROR);
+    
+        var b = buffer();
+        y.observe(b, false);
+    
+        test.throws(function() {
+            y.observe(b, true);
+        }, null, mobservable._.NON_PURE_VIEW_ERROR);
+        
+        test.deepEqual([], b.toArray());
+        test.equal(mobservable._.stackDepth(), 0);
+
+        test.done();
+    }
+    catch(e) {
+        console.log(e.stack);
+    }
+}
+
+exports.deny_array_change = function(test) {
+    try {
+        var x = makeReactive(3);
+        var z = makeReactive([]);
+        var y = makeReactive(function() {
+            z.push(3);
+            return x() * x();
+        });
+
+        test.throws(function() {
+            test.equal(9, y());
+        }, null, "alters state");
+    
+        var b = buffer();
+        y.observe(b, false);
+    
+        test.throws(function() {
+            y.observe(b, true);
+        }, null, "alters state");
+        
+        test.deepEqual([], b.toArray());
+        test.equal(mobservable._.stackDepth(), 0);
+
+        test.done();
+    }
+    catch(e) {
+        console.log(e.stack);
+    }
+}
+
 exports.cycle1 = function(test) {
     try {
         var p = makeReactive(function() { return p() * 2; }); // thats a cycle!
