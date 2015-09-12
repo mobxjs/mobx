@@ -91,7 +91,35 @@ exports.deny_state_changes = function(test) {
         test.deepEqual([], b.toArray());
         test.equal(mobservable._.stackDepth(), 0);
 
-        test.done();
+        debugger;
+        // these should not throw:
+        var z = makeReactive({ 
+            a: null,
+            b: function() {
+                throw "oeps";
+                return this.a + "hio";
+            } 
+        });
+        
+        mobservable.sideEffect(function() {
+            console.log("test");
+             if (z.a > 42 || z.b === 17) // nonsense
+                 console.log('hi');  
+        });
+        
+        z.a = 2;
+        
+        setImmediate(function() {
+            z.a = 3;
+            if (typeof process !== "undefined") {
+                process.nextTick(function() {
+                    z.a = 4;
+                    test.done(); 
+                });
+            } else { 
+                test.done();
+            }
+        });
     }
     catch(e) {
         console.log(e.stack);
