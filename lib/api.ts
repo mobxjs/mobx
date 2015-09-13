@@ -17,8 +17,6 @@ interface _IMobservableStatic {
 
     sideEffect(func: Mobservable.Lambda, scope?: any): Mobservable.Lambda;
 
-    observeUntilInvalid<T>(func: ()=>T, onInvalidate: Mobservable.Lambda, context?: Mobservable.IContextInfo): [T,Mobservable.Lambda];
-
     transaction<T>(action: ()=>T): T;
 
     toJson<T>(value: T): T;

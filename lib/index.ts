@@ -141,8 +141,18 @@ namespace mobservable {
         Returns  a tuplde [return value of func, disposer]. The disposer can be used to abort the watch early.
     */
     export function observeUntilInvalid<T>(func:()=>T, onInvalidate:Lambda, context?:Mobservable.IContextInfo):[T,Lambda, any] {
-        var watch = new _.WatchedExpression(func, onInvalidate, context || (<any>func).name);
-        return [watch.value, () => watch.dispose(), watch];
+        console.warn("Mobservable.observeUntilInvalid is deprecated and will be removed in 0.7");
+        var hasRun = false;
+        var result;
+        var disposer = sideEffect(() => {
+            if (!hasRun) {
+                hasRun = true;
+                result = func();
+            } else {
+                onInvalidate();
+            }
+        });
+        return [result, disposer, disposer['$mobservable']];
     }
 
     export var debugLevel = 0;

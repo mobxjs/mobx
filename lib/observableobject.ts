@@ -17,8 +17,8 @@ namespace mobservable {
 					this.context = {
 						object: target,
 						name: ""
-					}
-				} else if  (!context.object) {
+					};
+				} else if (!context.object) {
 					context.object = target;
 				}
 

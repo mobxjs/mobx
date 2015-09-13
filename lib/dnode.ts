@@ -4,10 +4,10 @@ declare var __mobservableTrackingStack;
 
 namespace mobservable {
 
-    var global = (function() { return this; })()
+    var globalScope = (function() { return this; })()
 
     // DNode[][], stack of: list of DNode's being observed by the currently ongoing computation
-    global.__mobservableTrackingStack = [];
+    globalScope.__mobservableTrackingStack = [];
 
     export namespace _ {
 

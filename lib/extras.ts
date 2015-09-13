@@ -11,11 +11,14 @@ namespace mobservable {
 				throw new Error(`[mobservable.getDNode] ${thing} doesn't seem to be reactive`);
 			if (property !== undefined) {
 				__mobservableTrackingStack.push([]);
-				thing[property];
-				let dnode = __mobservableTrackingStack.pop()[0];
-				if (!dnode)
-					throw new Error(`[mobservable.getDNode] property '${property}' of '${thing}' doesn't seem to be a reactive property`);
-				return dnode;
+				try {
+					thing[property];
+				} finally {
+					let dnode = __mobservableTrackingStack.pop()[0];
+					if (!dnode)
+						throw new Error(`[mobservable.getDNode] property '${property}' of '${thing}' doesn't seem to be a reactive property`);
+					return dnode;
+				}
 			}
 			if (thing.$mobservable) {
 				if (thing.$mobservable instanceof ObservableObject)
