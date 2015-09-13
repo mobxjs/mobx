@@ -86,8 +86,6 @@ declare module Mobservable {
         observe(listener: (changeData: IArrayChange<T>|IArraySplice<T>)=>void, fireImmediately?: boolean): Lambda;
         clear():  T[];
         replace(newItems: T[]);
-        values():  T[];
-        clone():  IObservableArray<T>;
         find(predicate: (item: T,index: number,array: IObservableArray<T>)=>boolean,thisArg?,fromIndex?: number): T;
         remove(value: T): boolean;
     }

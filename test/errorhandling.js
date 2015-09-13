@@ -91,7 +91,6 @@ exports.deny_state_changes = function(test) {
         test.deepEqual([], b.toArray());
         test.equal(mobservable._.stackDepth(), 0);
 
-        debugger;
         // these should not throw:
         var z = makeReactive({ 
             a: null,

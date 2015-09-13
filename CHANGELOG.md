@@ -1,3 +1,8 @@
+
+# 0.6.6:
+
+* Deprecated observable array `.values()` and `.clone()`
+
 # 0.6.5:
 
 * It is no longer possible to create impure views; views that alter other reactive values.

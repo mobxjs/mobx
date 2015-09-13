@@ -3,8 +3,8 @@ namespace mobservable {
         // Workaround to make sure ObservableArray extends Array
         class StubArray {
         }
-        StubArray.prototype = [];
-
+        StubArray.prototype = [];        
+        
         export class ObservableArrayAdministration<T> extends RootDNode {
             values: T[] = [];
             changeEvent: SimpleEventEmitter = new SimpleEventEmitter();
@@ -149,6 +149,7 @@ namespace mobservable {
             }
 
             values(): T[] {
+                console.warn("ObservableArray.values is deprecated and will be removed in 0.7, use slice() instead");
                 this.$mobservable.notifyObserved();
                 return this.$mobservable.values.slice();
             }
@@ -159,6 +160,7 @@ namespace mobservable {
             }
 
             clone(): ObservableArray<T> {
+                console.warn("ObservableArray.clone is deprecated and will be removed in 0.7");
                 this.$mobservable.notifyObserved();
                 return new ObservableArray<T>(this.$mobservable.values, this.$mobservable.recurse, {
                     object: null,
@@ -237,33 +239,30 @@ namespace mobservable {
                 return false;
             }
 
+            toString():string { 
+                return "[mobservable array] " + Array.prototype.toString.apply(this.$mobservable.values, arguments);
+            }
+
+            toLocaleString():string { 
+                return "[mobservable array] " + Array.prototype.toLocaleString.apply(this.$mobservable.values, arguments);
+            }
+
             /*
                 functions that do not alter the array, from lib.es6.d.ts
             */
-            toString():string { return this.wrapReadFunction<string>("toString", arguments); }
-            toLocaleString():string { return this.wrapReadFunction<string>("toLocaleString", arguments); }
             concat<U extends T[]>(...items: U[]): T[];
-            concat<U extends T[]>(): T[] { return this.wrapReadFunction<T[]>("concat", arguments); }
-            join(separator?: string): string { return this.wrapReadFunction<string>("join", arguments); }
-            slice(start?: number, end?: number): T[] { return this.wrapReadFunction<T[]>("slice", arguments); }
-            indexOf(searchElement: T, fromIndex?: number): number { return this.wrapReadFunction<number>("indexOf", arguments); }
-            lastIndexOf(searchElement: T, fromIndex?: number): number { return this.wrapReadFunction<number>("lastIndexOf", arguments); }
-            every(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean { return this.wrapReadFunction<boolean>("every", arguments); }
-            some(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean { return this.wrapReadFunction<boolean>("some", arguments); }
-            forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void { return this.wrapReadFunction<void>("forEach", arguments); }
-            map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[] { return this.wrapReadFunction<U[]>("map", arguments); }
-            filter(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[] { return this.wrapReadFunction<T[]>("filter", arguments); }
-            reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { return this.wrapReadFunction<U>("reduce", arguments); }
-            reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { return this.wrapReadFunction<U>("reduceRight", arguments); }
-
-            private wrapReadFunction<U>(funcName:string, initialArgs:IArguments):U {
-                var baseFunc = Array.prototype[funcName];
-                // generate a new function that wraps arround the Array.prototype, and replace our own definition
-                return (ObservableArray.prototype[funcName] = function() {
-                    this.$mobservable.notifyObserved();
-                    return baseFunc.apply(this.$mobservable.values, arguments);
-                }).apply(this, initialArgs);
-            }
+            concat<U extends T[]>(): T[] { throw "Illegal state"; }
+            join(separator?: string): string { throw "Illegal state"; }
+            slice(start?: number, end?: number): T[] { throw "Illegal state"; }
+            indexOf(searchElement: T, fromIndex?: number): number { throw "Illegal state"; }
+            lastIndexOf(searchElement: T, fromIndex?: number): number { throw "Illegal state"; }
+            every(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean { throw "Illegal state"; }
+            some(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean { throw "Illegal state"; }
+            forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void { throw "Illegal state"; }
+            map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[] { throw "Illegal state"; }
+            filter(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[] { throw "Illegal state"; }
+            reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { throw "Illegal state"; }
+            reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { throw "Illegal state"; }
 
             private assertNotComputing(funcName:string) {
                 if (_.isComputingView()) {
@@ -275,6 +274,35 @@ namespace mobservable {
             }
         }
 
+        /**
+         * Wrap function from prototype
+         */
+        [
+            "concat",
+            "join",
+            "slice",
+            "indexOf",
+            "lastIndexOf",
+            "every",
+            "some",
+            "forEach",
+            "map",
+            "filter",
+            "reduce",
+            "reduceRight",
+        ].forEach(funcName => {
+            var baseFunc = Array.prototype[funcName];
+            ObservableArray.prototype[funcName] = function() {
+                this.$mobservable.notifyObserved();
+                return baseFunc.apply(this.$mobservable.values, arguments);
+            }
+        });
+
+        /**
+         * This array buffer contains two lists of properties, so that all arrays
+         * can recycle their property definitions, which significantly improves performance of creating
+         * properties on the fly.
+         */
         var OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
         var ENUMERABLE_PROPS = [];
 

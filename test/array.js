@@ -18,17 +18,17 @@ exports.test1 = function(test) {
         var a = makeReactive([]);
         test.equals(a.length, 0);
         test.deepEqual(Object.keys(a), []);
-        test.deepEqual(a.values(), []);
+        test.deepEqual(a.slice(), []);
 
         a.push(1);
         test.equals(a.length, 1);
         test.deepEqual(Object.keys(a), ["0"]);
-        test.deepEqual(a.values(), [1]);
+        test.deepEqual(a.slice(), [1]);
 
         a[1] = 2;
         test.equals(a.length, 2);
         test.deepEqual(Object.keys(a), ["0", "1"]);
-        test.deepEqual(a.values(), [1,2]);
+        test.deepEqual(a.slice(), [1,2]);
 
         var sum = makeReactive(function() {
             return -1 + a.reduce(function(a,b) {
@@ -41,13 +41,13 @@ exports.test1 = function(test) {
         a[1] = 3;
         test.equals(a.length, 2);
         test.deepEqual(Object.keys(a), ["0", "1"]);
-        test.deepEqual(a.values(), [1,3]);
+        test.deepEqual(a.slice(), [1,3]);
         test.equals(sum(), 4);
 
         a.splice(1,1,4,5);
         test.equals(a.length, 3);
         test.deepEqual(Object.keys(a), ["0", "1", "2"]);
-        test.deepEqual(a.values(), [1,4,5]);
+        test.deepEqual(a.slice(), [1,4,5]);
         test.equals(sum(), 10);
 
         a.replace([2,4]);
@@ -55,21 +55,21 @@ exports.test1 = function(test) {
 
         a.splice(1,1);
         test.equals(sum(), 2);
-        test.deepEqual(a.values(), [2])
+        test.deepEqual(a.slice(), [2])
 
         a.spliceWithArray(0,0,[4,3]);
         test.equals(sum(), 9);
-        test.deepEqual(a.values(), [4,3,2]);
+        test.deepEqual(a.slice(), [4,3,2]);
 
         a.clear();
         test.equals(sum(), 0);
-        test.deepEqual(a.values(), []);
+        test.deepEqual(a.slice(), []);
 
         a.length = 4;
         test.equals(isNaN(sum()), true);
         test.deepEqual(a.length, 4);
 
-        test.deepEqual(a.values(), [undefined, undefined, undefined, undefined]);
+        test.deepEqual(a.slice(), [undefined, undefined, undefined, undefined]);
 
         a.replace([1,2, 2,4]);
         test.equals(sum(), 9);
@@ -79,15 +79,15 @@ exports.test1 = function(test) {
 
         a.length = 2;
         test.equals(sum(), 3);
-        test.deepEqual(a.values(), [1,2]);
+        test.deepEqual(a.slice(), [1,2]);
         var b = a.clone();
 
         test.deepEqual(a.reverse(), [2,1]);
-        test.deepEqual(a.values(), [2,1]);
-        test.deepEqual(b.values(), [1,2]);
+        test.deepEqual(a.slice(), [2,1]);
+        test.deepEqual(b.slice(), [1,2]);
 
         test.deepEqual(a.sort(), [1,2]);
-        test.deepEqual(a.values(), [1,2]);
+        test.deepEqual(a.slice(), [1,2]);
 
         test.done();
     }
@@ -166,7 +166,7 @@ exports.testObserve = function(test) {
     ar.shift(); // 3, 0
     ar.push(1,2); // 3, 0, 1, 2
     ar.splice(1,2,3,4); // 3, 3, 4, 2
-    test.deepEqual(ar.values(), [3,3,4,2]);
+    test.deepEqual(ar.slice(), [3,3,4,2]);
     ar.splice(6);
     ar.splice(6,2);
     ar.replace(['a']);
@@ -203,7 +203,7 @@ exports.testObserve = function(test) {
 exports.test_array_modification1 = function(test) {
     var a = mobservable.makeReactive([1,2,3]);
     var r = a.splice(-10, 5, 4,5,6);
-    test.deepEqual(a.values(), [4,5,6]);
+    test.deepEqual(a.slice(), [4,5,6]);
     test.deepEqual(r, [1,2,3]);
     test.done();
 };
@@ -212,13 +212,11 @@ exports.testSerialize = function(test) {
     var a = [1,2,3];
     var m = mobservable.makeReactive(a);
 
-    test.equal("" + a, "" + m);
     test.deepEqual(JSON.stringify(a), JSON.stringify(m));
     test.deepEqual(a, m);
 
     a = [4];
     m.replace(a);
-    test.equal("" + a, "" + m);
     test.deepEqual(JSON.stringify(a), JSON.stringify(m));
     test.deepEqual(a, m);
 
