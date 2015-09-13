@@ -25,7 +25,7 @@
         "grunt-contrib-uglify": "^0.9.1",
         "mkdirp": "^0.5.1",
         "nodeunit-browser-tap": "^0.1.0",
-        "typescript": "^1.5.0-beta"
+        "typescript": "1.5.3"
     },
     "keywords": [
         "mobservable",
