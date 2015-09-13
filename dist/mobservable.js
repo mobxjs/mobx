@@ -12,8 +12,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var mobservable;
 (function (mobservable) {
-    var global = (function () { return this; })();
-    global.__mobservableTrackingStack = [];
+    var globalScope = (function () { return this; })();
+    globalScope.__mobservableTrackingStack = [];
     var _;
     (function (_) {
         var mobservableId = 0;
@@ -162,9 +162,8 @@ var mobservable;
             };
             ObservingDNode.prototype.bindDependencies = function () {
                 this.observing = __mobservableTrackingStack.pop();
-                if (this.observing.length === 0 && mobservable.debugLevel > 1 && !this.isDisposed) {
-                    console.trace();
-                    _.warn("You have created a function that doesn't observe any values, did you forget to make its dependencies observable?");
+                if (this.observing.length === 0 && mobservable.logLevel > 1 && !this.isDisposed) {
+                    console.error("[mobservable] You have created a view function that doesn't observe any values, did you forget to make its dependencies observable?");
                 }
                 var _a = _.quickDiff(this.observing, this.prevObserving), added = _a[0], removed = _a[1];
                 this.prevObserving = null;
@@ -266,15 +265,18 @@ var mobservable;
             object: scope,
             name: func.name
         });
-        var disposer = observable.observe(_.noop);
-        if (observable.observing.length === 0)
-            _.warn("mobservable.sideEffect: not a single observable was used inside the side-effect function. Side-effect would be a no-op.");
+        observable.setRefCount(+1);
+        var disposer = _.once(function () {
+            observable.setRefCount(-1);
+        });
+        if (mobservable.logLevel >= 2 && observable.observing.length === 0)
+            console.warn("[mobservable.sideEffect] not a single observable was used inside the side-effect function. Side-effect would be a no-op.");
         disposer.$mobservable = observable;
         return disposer;
     }
     mobservable.sideEffect = sideEffect;
     function extendReactive(target, properties, context) {
-        _.extendReactive(target, properties, true, context);
+        return _.extendReactive(target, properties, true, context);
     }
     mobservable.extendReactive = extendReactive;
     function observable(target, key, descriptor) {
@@ -295,19 +297,24 @@ var mobservable;
         });
     }
     mobservable.observable = observable;
-    function toJson(source) {
+    function toJSON(source) {
         if (!source)
             return source;
         if (Array.isArray(source) || source instanceof _.ObservableArray)
-            return source.map(toJson);
-        if (typeof source === "object") {
+            return source.map(toJSON);
+        if (typeof source === "object" && _.isPlainObject(source)) {
             var res = {};
             for (var key in source)
                 if (source.hasOwnProperty(key))
-                    res[key] = toJson(source[key]);
+                    res[key] = toJSON(source[key]);
             return res;
         }
         return source;
+    }
+    mobservable.toJSON = toJSON;
+    function toJson(source) {
+        console.warn("mobservable.toJson is deprecated, use mobservable.toJSON instead");
+        return toJSON(source);
     }
     mobservable.toJson = toJson;
     function transaction(action) {
@@ -315,11 +322,26 @@ var mobservable;
     }
     mobservable.transaction = transaction;
     function observeUntilInvalid(func, onInvalidate, context) {
-        var watch = new _.WatchedExpression(func, onInvalidate, context || func.name);
-        return [watch.value, function () { return watch.dispose(); }, watch];
+        console.warn("mobservable.observeUntilInvalid is deprecated and will be removed in 0.7");
+        var hasRun = false;
+        var result;
+        var disposer = sideEffect(function () {
+            if (!hasRun) {
+                hasRun = true;
+                result = func();
+            }
+            else {
+                onInvalidate();
+            }
+        });
+        return [result, disposer, disposer['$mobservable']];
     }
     mobservable.observeUntilInvalid = observeUntilInvalid;
-    mobservable.debugLevel = 0;
+    mobservable.logLevel = 1;
+    setTimeout(function () {
+        if (mobservable.logLevel > 0)
+            console.info("Welcome to mobservable. Current logLevel = " + mobservable.logLevel + ". Change mobservable.logLevel according to your needs: 0 = production, 1 = development, 2 = debugging");
+    }, 1);
     var _;
     (function (_) {
         (function (ValueType) {
@@ -381,11 +403,6 @@ var mobservable;
 (function (mobservable) {
     var _;
     (function (_) {
-        function warn(message) {
-            if (console)
-                console.warn("[mobservable:warning] " + message);
-        }
-        _.warn = warn;
         function once(func) {
             var invoked = false;
             return function () {
@@ -597,6 +614,7 @@ var mobservable;
                 return this.spliceWithArray(0, this.$mobservable.values.length, newItems);
             };
             ObservableArray.prototype.values = function () {
+                console.warn("mobservable.array.values is deprecated and will be removed in 0.7, use slice() instead");
                 this.$mobservable.notifyObserved();
                 return this.$mobservable.values.slice();
             };
@@ -605,6 +623,7 @@ var mobservable;
                 return this.$mobservable.values.slice();
             };
             ObservableArray.prototype.clone = function () {
+                console.warn("mobservable.array.clone is deprecated and will be removed in 0.7");
                 this.$mobservable.notifyObserved();
                 return new ObservableArray(this.$mobservable.values, this.$mobservable.recurse, {
                     object: null,
@@ -679,38 +698,52 @@ var mobservable;
                 }
                 return false;
             };
-            ObservableArray.prototype.toString = function () { return this.wrapReadFunction("toString", arguments); };
-            ObservableArray.prototype.toLocaleString = function () { return this.wrapReadFunction("toLocaleString", arguments); };
-            ObservableArray.prototype.concat = function () { return this.wrapReadFunction("concat", arguments); };
-            ObservableArray.prototype.join = function (separator) { return this.wrapReadFunction("join", arguments); };
-            ObservableArray.prototype.slice = function (start, end) { return this.wrapReadFunction("slice", arguments); };
-            ObservableArray.prototype.indexOf = function (searchElement, fromIndex) { return this.wrapReadFunction("indexOf", arguments); };
-            ObservableArray.prototype.lastIndexOf = function (searchElement, fromIndex) { return this.wrapReadFunction("lastIndexOf", arguments); };
-            ObservableArray.prototype.every = function (callbackfn, thisArg) { return this.wrapReadFunction("every", arguments); };
-            ObservableArray.prototype.some = function (callbackfn, thisArg) { return this.wrapReadFunction("some", arguments); };
-            ObservableArray.prototype.forEach = function (callbackfn, thisArg) { return this.wrapReadFunction("forEach", arguments); };
-            ObservableArray.prototype.map = function (callbackfn, thisArg) { return this.wrapReadFunction("map", arguments); };
-            ObservableArray.prototype.filter = function (callbackfn, thisArg) { return this.wrapReadFunction("filter", arguments); };
-            ObservableArray.prototype.reduce = function (callbackfn, initialValue) { return this.wrapReadFunction("reduce", arguments); };
-            ObservableArray.prototype.reduceRight = function (callbackfn, initialValue) { return this.wrapReadFunction("reduceRight", arguments); };
-            ObservableArray.prototype.wrapReadFunction = function (funcName, initialArgs) {
-                var baseFunc = Array.prototype[funcName];
-                return (ObservableArray.prototype[funcName] = function () {
-                    this.$mobservable.notifyObserved();
-                    return baseFunc.apply(this.$mobservable.values, arguments);
-                }).apply(this, initialArgs);
+            ObservableArray.prototype.toString = function () {
+                return "[mobservable.array] " + Array.prototype.toString.apply(this.$mobservable.values, arguments);
             };
+            ObservableArray.prototype.toLocaleString = function () {
+                return "[mobservable.array] " + Array.prototype.toLocaleString.apply(this.$mobservable.values, arguments);
+            };
+            ObservableArray.prototype.concat = function () { throw "Illegal state"; };
+            ObservableArray.prototype.join = function (separator) { throw "Illegal state"; };
+            ObservableArray.prototype.slice = function (start, end) { throw "Illegal state"; };
+            ObservableArray.prototype.indexOf = function (searchElement, fromIndex) { throw "Illegal state"; };
+            ObservableArray.prototype.lastIndexOf = function (searchElement, fromIndex) { throw "Illegal state"; };
+            ObservableArray.prototype.every = function (callbackfn, thisArg) { throw "Illegal state"; };
+            ObservableArray.prototype.some = function (callbackfn, thisArg) { throw "Illegal state"; };
+            ObservableArray.prototype.forEach = function (callbackfn, thisArg) { throw "Illegal state"; };
+            ObservableArray.prototype.map = function (callbackfn, thisArg) { throw "Illegal state"; };
+            ObservableArray.prototype.filter = function (callbackfn, thisArg) { throw "Illegal state"; };
+            ObservableArray.prototype.reduce = function (callbackfn, initialValue) { throw "Illegal state"; };
+            ObservableArray.prototype.reduceRight = function (callbackfn, initialValue) { throw "Illegal state"; };
             ObservableArray.prototype.assertNotComputing = function (funcName) {
                 if (_.isComputingView()) {
-                    var e = "[Mobservable.Array] The method array." + funcName + " is not allowed to be used inside reactive views since it alters the state.";
-                    console.error(e);
-                    console.trace();
-                    throw new Error();
+                    console.error("mobservable.array: The method array." + funcName + " is not allowed to be used inside reactive views since it alters the state.");
                 }
             };
             return ObservableArray;
         })(StubArray);
         _.ObservableArray = ObservableArray;
+        [
+            "concat",
+            "join",
+            "slice",
+            "indexOf",
+            "lastIndexOf",
+            "every",
+            "some",
+            "forEach",
+            "map",
+            "filter",
+            "reduce",
+            "reduceRight",
+        ].forEach(function (funcName) {
+            var baseFunc = Array.prototype[funcName];
+            ObservableArray.prototype[funcName] = function () {
+                this.$mobservable.notifyObserved();
+                return baseFunc.apply(this.$mobservable.values, arguments);
+            };
+        });
         var OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
         var ENUMERABLE_PROPS = [];
         function createArrayBufferItem(index) {
@@ -765,11 +798,15 @@ var mobservable;
                 throw new Error("[mobservable.getDNode] " + thing + " doesn't seem to be reactive");
             if (property !== undefined) {
                 __mobservableTrackingStack.push([]);
-                thing[property];
-                var dnode = __mobservableTrackingStack.pop()[0];
-                if (!dnode)
-                    throw new Error("[mobservable.getDNode] property '" + property + "' of '" + thing + "' doesn't seem to be a reactive property");
-                return dnode;
+                try {
+                    thing[property];
+                }
+                finally {
+                    var dnode = __mobservableTrackingStack.pop()[0];
+                    if (!dnode)
+                        throw new Error("[mobservable.getDNode] property '" + property + "' of '" + thing + "' doesn't seem to be a reactive property");
+                    return dnode;
+                }
             }
             if (thing.$mobservable) {
                 if (thing.$mobservable instanceof _.ObservableObject)
@@ -867,7 +904,7 @@ var mobservable;
 (function (mobservable) {
     var _;
     (function (_) {
-        _.NON_PURE_VIEW_ERROR = "[Mobservable] It is not allowed to change the state during the computation of a reactive view.";
+        _.NON_PURE_VIEW_ERROR = "[mobservable] It is not allowed to change the state during the computation of a reactive view.";
         var ObservableValue = (function (_super) {
             __extends(ObservableValue, _super);
             function ObservableValue(value, recurse, context) {
@@ -887,9 +924,7 @@ var mobservable;
             };
             ObservableValue.prototype.set = function (value) {
                 if (_.isComputingView()) {
-                    console.error(_.NON_PURE_VIEW_ERROR);
-                    console.trace();
-                    throw new Error(_.NON_PURE_VIEW_ERROR);
+                    console.error(_.NON_PURE_VIEW_ERROR + (" (stack size is " + __mobservableTrackingStack.length + ")"));
                 }
                 if (value !== this._value) {
                     var oldValue = this._value;
@@ -960,10 +995,8 @@ var mobservable;
                 if (this.hasCycle)
                     throw new Error("Cycle detected");
                 if (this.hasError) {
-                    if (mobservable.debugLevel) {
-                        console.trace();
-                        _.warn(this + ": rethrowing caught exception to observer: " + this._value + (this._value.cause || ''));
-                    }
+                    if (mobservable.logLevel > 0)
+                        console.error(this + ": rethrowing caught exception to observer: " + this._value + (this._value.cause || ''));
                     throw this._value;
                 }
                 return this._value;
@@ -975,14 +1008,14 @@ var mobservable;
                 var newValue;
                 try {
                     if (this.isComputing)
-                        throw new Error("Cycle detected");
+                        throw new Error("[mobservable] Cycle detected");
                     this.isComputing = true;
                     newValue = this.func.call(this.scope);
                     this.hasError = false;
                 }
                 catch (e) {
                     this.hasError = true;
-                    console.error(this + "Caught error during computation: ", e);
+                    console.error("[mobservable] Caught error during computation: ", e);
                     if (e instanceof Error)
                         newValue = e;
                     else {
@@ -1252,36 +1285,6 @@ var mobservable;
         _.SimpleEventEmitter = SimpleEventEmitter;
     })(_ = mobservable._ || (mobservable._ = {}));
 })(mobservable || (mobservable = {}));
-/// <reference path="./observablevalue" />
-var mobservable;
-(function (mobservable) {
-    var _;
-    (function (_) {
-        var WatchedExpression = (function (_super) {
-            __extends(WatchedExpression, _super);
-            function WatchedExpression(expr, onInvalidate, context) {
-                _super.call(this, context);
-                this.expr = expr;
-                this.onInvalidate = onInvalidate;
-                this.didEvaluate = false;
-                this.computeNextState();
-            }
-            WatchedExpression.prototype.compute = function () {
-                if (!this.didEvaluate) {
-                    this.didEvaluate = true;
-                    this.value = this.expr();
-                }
-                else {
-                    this.dispose();
-                    this.onInvalidate();
-                }
-                return false;
-            };
-            return WatchedExpression;
-        })(_.ObservingDNode);
-        _.WatchedExpression = WatchedExpression;
-    })(_ = mobservable._ || (mobservable._ = {}));
-})(mobservable || (mobservable = {}));
 /**
  * This file basically works around all the typescript limitations that exist atm:
  * 1. not being able to generate an external (UMD) module from multiple files (thats why we have internal module)
@@ -1290,7 +1293,6 @@ var mobservable;
 /// <reference path="./utils.ts" />
 /// <reference path="./index.ts" />
 /// <reference path="./api.ts" />
-/// <reference path="./watch.ts" />
 var forCompilerVerificationOnly = mobservable;
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {

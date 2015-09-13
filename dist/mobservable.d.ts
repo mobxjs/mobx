@@ -5,9 +5,9 @@
  */
 
 interface _IMobservableStatic {
-    makeReactive : IMakeReactive;
+    makeReactive: IMakeReactive;
 
-    extendReactive(target: Object, properties: Object);
+    extendReactive(target: Object, properties: Object):Object;
 
     isReactive(value: any): boolean;
 
@@ -19,7 +19,7 @@ interface _IMobservableStatic {
 
     transaction<T>(action: ()=>T): T;
 
-    toJson<T>(value: T): T;
+    toJSON<T>(value: T): T;
 
     // decorator
     reactiveComponent<T>(componentClass: T): T;

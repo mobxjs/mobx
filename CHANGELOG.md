@@ -2,6 +2,8 @@
 # 0.6.6:
 
 * Deprecated observable array `.values()` and `.clone()`
+* Deprecated observeUntilInvalid; use sideEffect instead
+* Renamed mobservable.toJson to mobservable.toJSON
 
 # 0.6.5:
 

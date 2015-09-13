@@ -71,15 +71,18 @@ namespace mobservable {
             object: scope,
             name: func.name
         });
-        const disposer = observable.observe(_.noop);
+        observable.setRefCount(+1);
+        const disposer = _.once(() => {
+            observable.setRefCount(-1);
+        });
         if (logLevel >= 2 && observable.observing.length === 0)
             console.warn(`[mobservable.sideEffect] not a single observable was used inside the side-effect function. Side-effect would be a no-op.`);
         (<any>disposer).$mobservable = observable;
         return disposer;
     }
 
-    export function extendReactive(target:Object, properties:Object, context?:Mobservable.IContextInfoStruct) {
-        _.extendReactive(target, properties, true, context);
+    export function extendReactive(target:Object, properties:Object, context?:Mobservable.IContextInfoStruct):Object {
+        return _.extendReactive(target, properties, true, context);
     }
 
     /**
@@ -114,21 +117,26 @@ namespace mobservable {
     }
 
     /**
-     * Basically, a deep clone, so that no reactive property will exist anymore
+     * Basically, a deep clone, so that no reactive property will exist anymore.
+     * Doesn't follow references.
      */
-    export function toJson(source) {
+    export function toJSON(source) {
         if (!source)
             return source;
         if (Array.isArray(source) || source instanceof _.ObservableArray)
-            return source.map(toJson);
-        if (typeof source === "object") {
-            // TODO: only for plain objects, otherwise return reference?
+            return source.map(toJSON);
+        if (typeof source === "object" && _.isPlainObject(source)) {
             var res = {};
             for (var key in source) if (source.hasOwnProperty(key))
-                res[key] = toJson(source[key]);
+                res[key] = toJSON(source[key]);
             return res;
         }
         return source;
+    }
+    
+    export function toJson(source) {
+        console.warn("mobservable.toJson is deprecated, use mobservable.toJSON instead");
+        return toJSON(source);
     }
 
     export function transaction<T>(action:()=>T):T {
@@ -156,6 +164,11 @@ namespace mobservable {
     }
 
     export var logLevel = 1; // 0 = production, 1 = development, 2 = debugging
+    
+    setTimeout(function() {
+        if (logLevel > 0)
+            console.info(`Welcome to mobservable. Current logLevel = ${logLevel}. Change mobservable.logLevel according to your needs: 0 = production, 1 = development, 2 = debugging`);
+    }, 1);
 
     export namespace _ {
         export enum ValueType { Reference, PlainObject, ComplexObject, Array, ViewFunction, ComplexFunction }
@@ -172,7 +185,7 @@ namespace mobservable {
             return ValueType.Reference; // safe default, only refer by reference..
         }
 
-        export function extendReactive(target, properties, recurse: boolean, context: Mobservable.IContextInfoStruct) {
+        export function extendReactive(target, properties, recurse: boolean, context: Mobservable.IContextInfoStruct):Object {
             var meta = _.ObservableObject.asReactive(target, context);
             for(var key in properties) if (properties.hasOwnProperty(key))
                 meta.set(key, properties[key], recurse);
