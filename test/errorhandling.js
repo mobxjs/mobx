@@ -67,6 +67,7 @@ exports.testException2 = function(test) {
     test.done();
 };
 
+/* TODO: enable in 0.7 if state changes are completely denied?
 
 exports.deny_state_changes = function(test) {
     try {
@@ -154,6 +155,7 @@ exports.deny_array_change = function(test) {
         console.log(e.stack);
     }
 }
+*/
 
 exports.cycle1 = function(test) {
     try {

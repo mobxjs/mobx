@@ -26,7 +26,7 @@ interface _IMobservableStatic {
 
     reactiveMixin: Object;
 
-    debugLevel:  number;
+    logLevel:  number;  // 0 = production, 1 = development, 2 = debugging
 
     extras: {
         getDependencyTree(thing:any, property?:string): Mobservable.IDependencyTree;

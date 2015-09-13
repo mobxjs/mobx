@@ -149,7 +149,7 @@ namespace mobservable {
             }
 
             values(): T[] {
-                console.warn("ObservableArray.values is deprecated and will be removed in 0.7, use slice() instead");
+                console.warn("mobservable.array.values is deprecated and will be removed in 0.7, use slice() instead");
                 this.$mobservable.notifyObserved();
                 return this.$mobservable.values.slice();
             }
@@ -160,7 +160,7 @@ namespace mobservable {
             }
 
             clone(): ObservableArray<T> {
-                console.warn("ObservableArray.clone is deprecated and will be removed in 0.7");
+                console.warn("mobservable.array.clone is deprecated and will be removed in 0.7");
                 this.$mobservable.notifyObserved();
                 return new ObservableArray<T>(this.$mobservable.values, this.$mobservable.recurse, {
                     object: null,
@@ -240,11 +240,11 @@ namespace mobservable {
             }
 
             toString():string { 
-                return "[mobservable array] " + Array.prototype.toString.apply(this.$mobservable.values, arguments);
+                return "[mobservable.array] " + Array.prototype.toString.apply(this.$mobservable.values, arguments);
             }
 
             toLocaleString():string { 
-                return "[mobservable array] " + Array.prototype.toLocaleString.apply(this.$mobservable.values, arguments);
+                return "[mobservable.array] " + Array.prototype.toLocaleString.apply(this.$mobservable.values, arguments);
             }
 
             /*
@@ -266,10 +266,7 @@ namespace mobservable {
 
             private assertNotComputing(funcName:string) {
                 if (_.isComputingView()) {
-                    var e = `[Mobservable.Array] The method array.${funcName} is not allowed to be used inside reactive views since it alters the state.`;
-                    console.error(e);
-                    console.trace();
-                    throw new Error();
+                    console.error(`mobservable.array: The method array.${funcName} is not allowed to be used inside reactive views since it alters the state.`);
                 }
             }
         }

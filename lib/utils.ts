@@ -1,10 +1,5 @@
 namespace mobservable {
     export namespace _ {
-        export function warn(message) {
-            if (console)
-                console.warn("[mobservable:warning] " + message);
-        }
-
         /**
             Makes sure that the provided function is invoked at most once.
         */

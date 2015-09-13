@@ -72,8 +72,8 @@ namespace mobservable {
             name: func.name
         });
         const disposer = observable.observe(_.noop);
-        if (observable.observing.length === 0)
-            _.warn(`mobservable.sideEffect: not a single observable was used inside the side-effect function. Side-effect would be a no-op.`);
+        if (logLevel >= 2 && observable.observing.length === 0)
+            console.warn(`[mobservable.sideEffect] not a single observable was used inside the side-effect function. Side-effect would be a no-op.`);
         (<any>disposer).$mobservable = observable;
         return disposer;
     }
@@ -141,7 +141,7 @@ namespace mobservable {
         Returns  a tuplde [return value of func, disposer]. The disposer can be used to abort the watch early.
     */
     export function observeUntilInvalid<T>(func:()=>T, onInvalidate:Lambda, context?:Mobservable.IContextInfo):[T,Lambda, any] {
-        console.warn("Mobservable.observeUntilInvalid is deprecated and will be removed in 0.7");
+        console.warn("mobservable.observeUntilInvalid is deprecated and will be removed in 0.7");
         var hasRun = false;
         var result;
         var disposer = sideEffect(() => {
@@ -155,7 +155,7 @@ namespace mobservable {
         return [result, disposer, disposer['$mobservable']];
     }
 
-    export var debugLevel = 0;
+    export var logLevel = 1; // 0 = production, 1 = development, 2 = debugging
 
     export namespace _ {
         export enum ValueType { Reference, PlainObject, ComplexObject, Array, ViewFunction, ComplexFunction }

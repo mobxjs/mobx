@@ -185,9 +185,8 @@ namespace mobservable {
             private bindDependencies() {
                 this.observing = __mobservableTrackingStack.pop();
 
-                if (this.observing.length === 0 && debugLevel > 1 && !this.isDisposed) {
-                    console.trace();
-                    warn("You have created a function that doesn't observe any values, did you forget to make its dependencies observable?");
+                if (this.observing.length === 0 && logLevel > 1 && !this.isDisposed) {
+                    console.error("[mobservable] You have created a view function that doesn't observe any values, did you forget to make its dependencies observable?");
                 }
 
                 var [added, removed] = quickDiff(this.observing, this.prevObserving);
