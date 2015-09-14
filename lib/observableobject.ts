@@ -8,7 +8,7 @@ namespace mobservable {
 	export namespace _ {
 		// responsible for the administration of objects that have become reactive
 		export class ObservableObject {
-			private keys:_.ObservableArray<string>;
+			values:{[key:string]:RootDNode} = {};
 
 			constructor(private target, private context:Mobservable.IContextInfoStruct) {
 				if (target.$mobservable)
@@ -22,10 +22,6 @@ namespace mobservable {
 					context.object = target;
 				}
 
-				this.keys = new ObservableArray([], false, {
-					object: target,
-					name: this.context.name + "[keys]"
-				});
 				Object.defineProperty(target, "$mobservable", {
 					enumerable: false,
 					configurable: false,
@@ -40,10 +36,10 @@ namespace mobservable {
 			}
 
 			set(propName, value, recurse) {
-				if (this.keys.indexOf(propName) === -1)
-					this.defineReactiveProperty(propName, value, recurse);
-				else
+				if (this.values[propName])
 					this.target[propName] = value; // the property setter will make 'value' reactive if needed.
+				else
+					this.defineReactiveProperty(propName, value, recurse);
 			}
 
 			private defineReactiveProperty(propName, value, recurse) {
@@ -52,18 +48,19 @@ namespace mobservable {
 					recurse = false;
 				}
 
+				let observable: ObservableView<any>|ObservableValue<any>;
 				let context = {
 					object: this.context.object,
 					name: `${this.context.name || ""}.${propName}`
 				};
-				let descriptor: PropertyDescriptor;
 
 				if (typeof value === "function" && value.length === 0 && recurse)
-					descriptor = new ObservableView(value, this.target, context).asPropertyDescriptor();
+					observable = new ObservableView(value, this.target, context);
 				else
-					descriptor = new ObservableValue(value, recurse, context).asPropertyDescriptor();
+					observable = new ObservableValue(value, recurse, context);
 
-				Object.defineProperty(this.target, propName, descriptor);
+				this.values[propName] = observable;
+				Object.defineProperty(this.target, propName, observable.asPropertyDescriptor());
 			}
 		}
 	}
