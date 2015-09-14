@@ -25,6 +25,7 @@ namespace mobservable {
                 if (_.isComputingView()) {
                     var ts = __mobservableViewStack;
                     console.error(NON_PURE_VIEW_ERROR + ` (stack size is ${ts.length}, active view: "${ts[ts.length -1].toString()}")`);
+                    console.trace();
                 }
                 if (value !== this._value) {
                     var oldValue = this._value;

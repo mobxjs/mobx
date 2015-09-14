@@ -57,6 +57,8 @@ namespace mobservable {
                 } catch (e) {
                     this.hasError = true;
                     console.error("[mobservable] Caught error during computation: ", e);
+                    console.trace();
+                    
                     if (e instanceof Error)
                         newValue = e;
                     else {
