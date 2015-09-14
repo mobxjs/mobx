@@ -3,7 +3,7 @@ namespace mobservable {
     export namespace _ {
         export var NON_PURE_VIEW_ERROR = `[mobservable] It is not allowed to change the state during the computation of a reactive view.`;
 
-        export class ObservableValue<T> extends RootDNode {
+        export class ObservableValue<T> extends DataNode {
             protected changeEvent = new SimpleEventEmitter();
             protected _value: T;
 

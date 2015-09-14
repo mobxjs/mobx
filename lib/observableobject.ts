@@ -8,7 +8,7 @@ namespace mobservable {
 	export namespace _ {
 		// responsible for the administration of objects that have become reactive
 		export class ObservableObject {
-			values:{[key:string]:RootDNode} = {};
+			values:{[key:string]:DataNode} = {};
 
 			constructor(private target, private context:Mobservable.IContextInfoStruct) {
 				if (target.$mobservable)

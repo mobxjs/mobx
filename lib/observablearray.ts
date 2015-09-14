@@ -5,7 +5,7 @@ namespace mobservable {
         }
         StubArray.prototype = [];        
         
-        export class ObservableArrayAdministration<T> extends RootDNode {
+        export class ObservableArrayAdministration<T> extends DataNode {
             values: T[] = [];
             changeEvent: SimpleEventEmitter = new SimpleEventEmitter();
 

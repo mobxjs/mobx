@@ -1,6 +1,6 @@
 /// <reference path="./api.ts" />
 
-declare var __mobservableViewStack:mobservable._.ObservingDNode[];
+declare var __mobservableViewStack:mobservable._.ViewNode[];
 
 namespace mobservable {
 
@@ -15,9 +15,10 @@ namespace mobservable {
 
         var mobservableId = 0;
 
-
-
-        export enum DNodeState {
+        /**
+         * The state of some node in the dependency tree that is created for all views.
+         */
+        export enum NodeState {
             STALE,     // One or more depencies have changed but their values are not yet known, current value is stale
             PENDING,   // All dependencies are up to date again, a recalculation of this node is ongoing or pending, current value is stale
             READY,     // Everything is bright and shiny
@@ -25,13 +26,13 @@ namespace mobservable {
 
         /**
          * A root node in the dependency graph. This node can be observed by others, but doesn't observe anything itself.
-         * Represents the state of some State.
+         * These nodes are used to store 'state'.
          */
-        export class RootDNode {
+        export class DataNode {
 
             id = ++mobservableId;
-            state: DNodeState = DNodeState.READY;
-            observers: ObservingDNode[] = [];       // nodes that are dependent on this node. Will be notified when our state change
+            state: NodeState = NodeState.READY;
+            observers: ViewNode[] = [];       // nodes that are dependent on this node. Will be notified when our state change
             protected isDisposed = false;            // ready to be garbage collected. Nobody is observing or ever will observe us
             externalRefenceCount = 0;      // nr of 'things' that depend on us, excluding other DNode's. If > 0, this node will not go to sleep
 
@@ -44,29 +45,29 @@ namespace mobservable {
                 this.externalRefenceCount += delta;
             }
 
-            addObserver(node:ObservingDNode) {
+            addObserver(node:ViewNode) {
                 this.observers[this.observers.length] = node;
             }
 
-            removeObserver(node:ObservingDNode) {
+            removeObserver(node:ViewNode) {
                 var obs = this.observers, idx = obs.indexOf(node);
                 if (idx !== -1)
                     obs.splice(idx, 1);
             }
 
             markStale() {
-                if (this.state !== DNodeState.READY)
+                if (this.state !== NodeState.READY)
                     return; // stale or pending; recalculation already scheduled, we're fine..
-                this.state = DNodeState.STALE;
+                this.state = NodeState.STALE;
                 if (_.transitionTracker)
                     _.reportTransition(this, "STALE");
                 this.notifyObservers();
             }
 
             markReady(stateDidActuallyChange:boolean) {
-                if (this.state === DNodeState.READY)
+                if (this.state === NodeState.READY)
                     return;
-                this.state = DNodeState.READY;
+                this.state = NodeState.READY;
                 if (_.transitionTracker)
                     _.reportTransition(this, "READY", true, this["_value"]);
                 this.notifyObservers(stateDidActuallyChange);
@@ -106,11 +107,11 @@ namespace mobservable {
          * A node in the state dependency root that observes other nodes, and can be observed itself.
          * Represents the state of a View.
          */
-        export class ObservingDNode extends RootDNode {
+        export class ViewNode extends DataNode {
             isSleeping = true; // isSleeping: nobody is observing this dependency node, so don't bother tracking DNode's this DNode depends on
             hasCycle = false;  // this node is part of a cycle, which is an error
-            observing: RootDNode[] = [];       // nodes we are looking at. Our value depends on these nodes
-            private prevObserving: _.RootDNode[] = null; // nodes we were looking at before. Used to determine changes in the dependency tree
+            observing: DataNode[] = [];       // nodes we are looking at. Our value depends on these nodes
+            private prevObserving: _.DataNode[] = null; // nodes we were looking at before. Used to determine changes in the dependency tree
             private dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
             private dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 
@@ -122,7 +123,7 @@ namespace mobservable {
                     this.wakeUp();
             }
 
-            removeObserver(node:ObservingDNode) {
+            removeObserver(node:ViewNode) {
                 super.removeObserver(node);
                 this.tryToSleep();
             }
@@ -139,21 +140,21 @@ namespace mobservable {
             wakeUp() {
                 if (this.isSleeping) {
                     this.isSleeping = false;
-                    this.state = DNodeState.PENDING;
+                    this.state = NodeState.PENDING;
                     this.computeNextState();
                 }
             }
 
             // the state of something we are observing has changed..
-            notifyStateChange(observable:RootDNode, stateDidActuallyChange:boolean) {
-                if (observable.state === DNodeState.STALE) {
+            notifyStateChange(observable:DataNode, stateDidActuallyChange:boolean) {
+                if (observable.state === NodeState.STALE) {
                     if (++this.dependencyStaleCount === 1)
                         this.markStale();
                 } else { // not stale, thus ready since pending states are not propagated
                     if (stateDidActuallyChange)
                         this.dependencyChangeCount += 1;
                     if (--this.dependencyStaleCount === 0) { // all dependencies are ready
-                        this.state = DNodeState.PENDING;
+                        this.state = NodeState.PENDING;
                         Scheduler.schedule(() => {
                             // did any of the observables really change?
                             if (this.dependencyChangeCount > 0)
@@ -202,7 +203,7 @@ namespace mobservable {
                 this.hasCycle = false;
                 for(var i = 0, l = added.length; i < l; i++) {
                     var dependency = added[i];
-                    if (dependency instanceof ObservingDNode && dependency.findCycle(this)) {
+                    if (dependency instanceof ViewNode && dependency.findCycle(this)) {
                         this.hasCycle = true;
                         // don't observe anything that caused a cycle, or we are stuck forever!
                         this.observing.splice(this.observing.indexOf(added[i]), 1);
@@ -213,12 +214,12 @@ namespace mobservable {
                 }
             }
 
-            private findCycle(node:RootDNode) {
+            private findCycle(node:DataNode) {
                 var obs = this.observing;
                 if (obs.indexOf(node) !== -1)
                     return true;
                 for(var l = obs.length, i = 0; i < l; i++)
-                    if (obs[i] instanceof ObservingDNode && (<ObservingDNode>obs[i]).findCycle(node))
+                    if (obs[i] instanceof ViewNode && (<ViewNode>obs[i]).findCycle(node))
                         return true;
                 return false;
             }

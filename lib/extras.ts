@@ -6,7 +6,7 @@
 
 namespace mobservable {
 	export namespace _ {
-		export function getDNode(thing:any, property?:string):RootDNode {
+		export function getDNode(thing:any, property?:string):DataNode {
 			if (!isReactive(thing))
 				throw new Error(`[mobservable.getDNode] ${thing} doesn't seem to be reactive`);
 			if (property !== undefined) {
@@ -24,7 +24,7 @@ namespace mobservable {
 			throw new Error(`[mobservable.getDNode] ${thing} doesn't seem to be reactive`);
 		}
 
-		export function reportTransition(node:RootDNode, state:string, changed:boolean = false, newValue = null) {
+		export function reportTransition(node:DataNode, state:string, changed:boolean = false, newValue = null) {
 			transitionTracker.emit({
 				id: node.id,
 				name: node.context.name,
@@ -43,13 +43,13 @@ namespace mobservable {
 			return nodeToDependencyTree(_.getDNode(thing, property));
 		}
 
-		function nodeToDependencyTree(node:_.RootDNode): Mobservable.IDependencyTree {
+		function nodeToDependencyTree(node:_.DataNode): Mobservable.IDependencyTree {
 			var result:Mobservable.IDependencyTree = {
 				id: node.id,
 				name: node.context.name,
 				context: node.context.object || null
 			};
-			if (node instanceof _.ObservingDNode && node.observing.length)
+			if (node instanceof _.ViewNode && node.observing.length)
 				result.dependencies = _.unique(node.observing).map(nodeToDependencyTree);
 			return result;
 		}
@@ -58,7 +58,7 @@ namespace mobservable {
 			return nodeToObserverTree(_.getDNode(thing, property));
 		}
 
-		function nodeToObserverTree(node:_.RootDNode): Mobservable.IObserverTree {
+		function nodeToObserverTree(node:_.DataNode): Mobservable.IObserverTree {
 			var result:Mobservable.IObserverTree = {
 				id: node.id,
 				name: node.context.name,

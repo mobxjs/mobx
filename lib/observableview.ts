@@ -2,7 +2,7 @@
 
 namespace mobservable {
     export namespace _ {
-        export class ObservableView<T> extends ObservingDNode {
+        export class ObservableView<T> extends ViewNode {
             private isComputing = false;
             private hasError = false;
             protected _value: T;
