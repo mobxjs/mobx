@@ -43,7 +43,7 @@ namespace mobservable {
             case _.ValueType.ComplexObject:
                 return _.toGetterSetterFunction(new _.ObservableValue(value, false, context));
             case _.ValueType.ComplexFunction:
-                throw new Error("[mobservable:error] Creating reactive functions from functions with multiple arguments is currently not supported, see https://github.com/mweststrate/mobservable/issues/12");
+                throw new Error("[mobservable.makeReactive] Creating reactive functions from functions with multiple arguments is currently not supported, see https://github.com/mweststrate/mobservable/issues/12");
             case _.ValueType.ViewFunction:
                 if (!context.name)
                     context.name = value.name;

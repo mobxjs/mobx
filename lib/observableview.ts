@@ -14,7 +14,7 @@ namespace mobservable {
 
             get():T {
                 if (this.isComputing)
-                    throw new Error("Cycle detected");
+                    throw new Error(`[mobservable.view '${this.context.name}'] Cycle detected`);
                 if (this.isSleeping) {
                     if (_.isComputingView()) {
                         // somebody depends on the outcome of this computation
@@ -32,10 +32,10 @@ namespace mobservable {
                 }
 
                 if (this.hasCycle)
-                    throw new Error("Cycle detected");
+                    throw new Error(`[mobservable.view '${this.context.name}'] Cycle detected`);
                 if (this.hasError) {
                     if (logLevel > 0)
-                        console.error(`${this}: rethrowing caught exception to observer: ${this._value}${(<any>this._value).cause||''}`);
+                        console.error(`[mobservable.view '${this.context.name}'] Rethrowing caught exception to observer: ${this._value}${(<any>this._value).cause||''}`);
                     throw this._value;
                 }
                 return this._value;
@@ -50,19 +50,19 @@ namespace mobservable {
                 try {
                     // this cycle detection mechanism is primarily for lazy computed values; other cycles are already detected in the dependency tree
                     if (this.isComputing)
-                        throw new Error("[mobservable] Cycle detected");
+                        throw new Error(`[mobservable.view '${this.context.name}'] Cycle detected`);
                     this.isComputing = true;
                     newValue = this.func.call(this.scope);
                     this.hasError = false;
                 } catch (e) {
                     this.hasError = true;
-                    console.error("[mobservable] Caught error during computation: ", e);
+                    console.error(`[mobservable.view '${this.context.name}'] Caught error during computation: `, e, "View function:", this.func.toString());
                     console.trace();
                     
                     if (e instanceof Error)
                         newValue = e;
                     else {
-                        newValue = <T><any> new Error("MobservableComputationError");
+                        newValue = <T><any> new Error(`[mobservable.view '${this.context.name}'] Error during computation (see error.cause) in ` + this.func.toString());
                         (<any>newValue).cause = e;
                     }
                 }
@@ -102,7 +102,7 @@ namespace mobservable {
         }
 
         function throwingSetter() {
-            throw new Error("View functions do not accept new values");
+            throw new Error(`[mobservablei.view '${this.context.name}'] View functions do not accept new values`);
         }
     }
 }

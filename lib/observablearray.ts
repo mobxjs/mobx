@@ -41,7 +41,7 @@ namespace mobservable {
             set length(newLength:number) {
                 this.assertNotComputing("spliceWithArray");
                 if (typeof newLength !== "number" || newLength < 0)
-                    throw new Error("Out of range: " + newLength);
+                    throw new Error("[mobservable.array] Out of range: " + newLength);
                 var currentLength = this.$mobservable.values.length;
                 if (newLength === currentLength)
                     return;
@@ -266,7 +266,7 @@ namespace mobservable {
 
             private assertNotComputing(funcName:string) {
                 if (_.isComputingView()) {
-                    console.error(`mobservable.array: The method array.${funcName} is not allowed to be used inside reactive views since it alters the state.`);
+                    console.error(`[mobservable.array] The method array.${funcName} is not allowed to be used inside reactive views since it alters the state.`);
                 }
             }
         }
@@ -318,7 +318,7 @@ namespace mobservable {
                     else if (index === this.$mobservable.values.length)
                         this.push(value);
                     else
-                        throw new Error(`ObservableArray: Index out of bounds, ${index} is larger than ${this.values.length}`);
+                        throw new Error(`[mobservable.array] Index out of bounds, ${index} is larger than ${this.values.length}`);
                 },
                 get: function() {
                     if (index < this.$mobservable.values.length) {

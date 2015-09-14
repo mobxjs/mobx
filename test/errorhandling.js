@@ -20,7 +20,7 @@ function testException(test, observable, exception) {
         test.fail("Expected exception: " + exception + ", got: " + value);
     }
     catch (e) {
-        test.equal(e.message === exception || e.cause === exception, true);
+        test.equal(e.message === exception || e.cause === exception || e.message.indexOf(exception) !== -1, true, "Expected exception '" + exception + "', got: " + e);
     }
     test.equal(mobservable._.stackDepth(), 0);
 }

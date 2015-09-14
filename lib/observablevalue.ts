@@ -1,8 +1,6 @@
 /// <reference path="./dnode.ts" />
 namespace mobservable {
     export namespace _ {
-        export var NON_PURE_VIEW_ERROR = `[mobservable] It is not allowed to change the state during the computation of a reactive view.`;
-
         export class ObservableValue<T> extends DataNode {
             protected changeEvent = new SimpleEventEmitter();
             protected _value: T;
@@ -24,7 +22,7 @@ namespace mobservable {
             set(value:T) {
                 if (_.isComputingView()) {
                     var ts = __mobservableViewStack;
-                    console.error(NON_PURE_VIEW_ERROR + ` (stack size is ${ts.length}, active view: "${ts[ts.length -1].toString()}")`);
+                    console.error(`[mobservable.value '${this.context.name}'] It is not allowed to change the state during the computation of a reactive view. (stack size is ${ts.length}, active view: "${ts[ts.length -1].toString()}")`);
                     console.trace();
                 }
                 if (value !== this._value) {

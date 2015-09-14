@@ -8,7 +8,7 @@ namespace mobservable {
 
     // DNode[][], stack of: list of DNode's being observed by the currently ongoing computation
     if (globalScope.__mobservableTrackingStack)
-        throw new Error("An incompatible version of mobservable is already loaded.");
+        throw new Error("[mobservable] An incompatible version of mobservable is already loaded.");
     globalScope.__mobservableViewStack = [];
 
     export namespace _ {
@@ -94,7 +94,7 @@ namespace mobservable {
 
             public dispose() {
                 if (this.observers.length)
-                    throw new Error("Cannot dispose DNode; it is still being observed");
+                    throw new Error("[mobservable] Cannot dispose DNode; it is still being observed");
                 this.isDisposed = true;
             }
 
