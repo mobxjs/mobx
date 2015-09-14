@@ -13,83 +13,85 @@ var __extends = (this && this.__extends) || function (d, b) {
 var mobservable;
 (function (mobservable) {
     var globalScope = (function () { return this; })();
-    globalScope.__mobservableTrackingStack = [];
+    if (globalScope.__mobservableTrackingStack)
+        throw new Error("[mobservable] An incompatible version of mobservable is already loaded.");
+    globalScope.__mobservableViewStack = [];
     var _;
     (function (_) {
         var mobservableId = 0;
-        (function (DNodeState) {
-            DNodeState[DNodeState["STALE"] = 0] = "STALE";
-            DNodeState[DNodeState["PENDING"] = 1] = "PENDING";
-            DNodeState[DNodeState["READY"] = 2] = "READY";
-        })(_.DNodeState || (_.DNodeState = {}));
-        var DNodeState = _.DNodeState;
+        (function (NodeState) {
+            NodeState[NodeState["STALE"] = 0] = "STALE";
+            NodeState[NodeState["PENDING"] = 1] = "PENDING";
+            NodeState[NodeState["READY"] = 2] = "READY";
+        })(_.NodeState || (_.NodeState = {}));
+        var NodeState = _.NodeState;
         ;
-        var RootDNode = (function () {
-            function RootDNode(context) {
+        var DataNode = (function () {
+            function DataNode(context) {
                 this.context = context;
                 this.id = ++mobservableId;
-                this.state = DNodeState.READY;
+                this.state = NodeState.READY;
                 this.observers = [];
                 this.isDisposed = false;
                 this.externalRefenceCount = 0;
                 if (!context.name)
                     context.name = "[m#" + this.id + "]";
             }
-            RootDNode.prototype.setRefCount = function (delta) {
+            DataNode.prototype.setRefCount = function (delta) {
                 this.externalRefenceCount += delta;
             };
-            RootDNode.prototype.addObserver = function (node) {
+            DataNode.prototype.addObserver = function (node) {
                 this.observers[this.observers.length] = node;
             };
-            RootDNode.prototype.removeObserver = function (node) {
+            DataNode.prototype.removeObserver = function (node) {
                 var obs = this.observers, idx = obs.indexOf(node);
                 if (idx !== -1)
                     obs.splice(idx, 1);
             };
-            RootDNode.prototype.markStale = function () {
-                if (this.state !== DNodeState.READY)
+            DataNode.prototype.markStale = function () {
+                if (this.state !== NodeState.READY)
                     return;
-                this.state = DNodeState.STALE;
+                this.state = NodeState.STALE;
                 if (_.transitionTracker)
                     _.reportTransition(this, "STALE");
                 this.notifyObservers();
             };
-            RootDNode.prototype.markReady = function (stateDidActuallyChange) {
-                if (this.state === DNodeState.READY)
+            DataNode.prototype.markReady = function (stateDidActuallyChange) {
+                if (this.state === NodeState.READY)
                     return;
-                this.state = DNodeState.READY;
+                this.state = NodeState.READY;
                 if (_.transitionTracker)
                     _.reportTransition(this, "READY", true, this["_value"]);
                 this.notifyObservers(stateDidActuallyChange);
             };
-            RootDNode.prototype.notifyObservers = function (stateDidActuallyChange) {
+            DataNode.prototype.notifyObservers = function (stateDidActuallyChange) {
                 if (stateDidActuallyChange === void 0) { stateDidActuallyChange = false; }
                 var os = this.observers.slice();
                 for (var l = os.length, i = 0; i < l; i++)
                     os[i].notifyStateChange(this, stateDidActuallyChange);
             };
-            RootDNode.prototype.notifyObserved = function () {
-                var ts = __mobservableTrackingStack, l = ts.length;
+            DataNode.prototype.notifyObserved = function () {
+                var ts = __mobservableViewStack, l = ts.length;
                 if (l > 0) {
-                    var cs = ts[l - 1], csl = cs.length;
-                    if (cs[csl - 1] !== this && cs[csl - 2] !== this)
-                        cs[csl] = this;
+                    var deps = ts[l - 1].observing, depslength = deps.length;
+                    if (deps[depslength - 1] !== this && deps[depslength - 2] !== this)
+                        deps[depslength] = this;
                 }
             };
-            RootDNode.prototype.dispose = function () {
+            DataNode.prototype.dispose = function () {
                 if (this.observers.length)
-                    throw new Error("Cannot dispose DNode; it is still being observed");
+                    throw new Error("[mobservable] Cannot dispose DNode; it is still being observed");
                 this.isDisposed = true;
             };
-            RootDNode.prototype.toString = function () {
+            DataNode.prototype.toString = function () {
                 return "DNode[" + this.context.name + ", state: " + this.state + ", observers: " + this.observers.length + "]";
             };
-            return RootDNode;
+            return DataNode;
         })();
-        _.RootDNode = RootDNode;
-        var ObservingDNode = (function (_super) {
-            __extends(ObservingDNode, _super);
-            function ObservingDNode() {
+        _.DataNode = DataNode;
+        var ViewNode = (function (_super) {
+            __extends(ViewNode, _super);
+            function ViewNode() {
                 _super.apply(this, arguments);
                 this.isSleeping = true;
                 this.hasCycle = false;
@@ -98,18 +100,18 @@ var mobservable;
                 this.dependencyChangeCount = 0;
                 this.dependencyStaleCount = 0;
             }
-            ObservingDNode.prototype.setRefCount = function (delta) {
+            ViewNode.prototype.setRefCount = function (delta) {
                 var rc = this.externalRefenceCount += delta;
                 if (rc === 0)
                     this.tryToSleep();
                 else if (rc === delta)
                     this.wakeUp();
             };
-            ObservingDNode.prototype.removeObserver = function (node) {
+            ViewNode.prototype.removeObserver = function (node) {
                 _super.prototype.removeObserver.call(this, node);
                 this.tryToSleep();
             };
-            ObservingDNode.prototype.tryToSleep = function () {
+            ViewNode.prototype.tryToSleep = function () {
                 if (!this.isSleeping && this.observers.length === 0 && this.externalRefenceCount === 0) {
                     for (var i = 0, l = this.observing.length; i < l; i++)
                         this.observing[i].removeObserver(this);
@@ -117,16 +119,16 @@ var mobservable;
                     this.isSleeping = true;
                 }
             };
-            ObservingDNode.prototype.wakeUp = function () {
+            ViewNode.prototype.wakeUp = function () {
                 if (this.isSleeping) {
                     this.isSleeping = false;
-                    this.state = DNodeState.PENDING;
+                    this.state = NodeState.PENDING;
                     this.computeNextState();
                 }
             };
-            ObservingDNode.prototype.notifyStateChange = function (observable, stateDidActuallyChange) {
+            ViewNode.prototype.notifyStateChange = function (observable, stateDidActuallyChange) {
                 var _this = this;
-                if (observable.state === DNodeState.STALE) {
+                if (observable.state === NodeState.STALE) {
                     if (++this.dependencyStaleCount === 1)
                         this.markStale();
                 }
@@ -134,7 +136,7 @@ var mobservable;
                     if (stateDidActuallyChange)
                         this.dependencyChangeCount += 1;
                     if (--this.dependencyStaleCount === 0) {
-                        this.state = DNodeState.PENDING;
+                        this.state = NodeState.PENDING;
                         _.Scheduler.schedule(function () {
                             if (_this.dependencyChangeCount > 0)
                                 _this.computeNextState();
@@ -145,7 +147,7 @@ var mobservable;
                     }
                 }
             };
-            ObservingDNode.prototype.computeNextState = function () {
+            ViewNode.prototype.computeNextState = function () {
                 this.trackDependencies();
                 if (_.transitionTracker)
                     _.reportTransition(this, "PENDING");
@@ -153,15 +155,16 @@ var mobservable;
                 this.bindDependencies();
                 this.markReady(stateDidChange);
             };
-            ObservingDNode.prototype.compute = function () {
+            ViewNode.prototype.compute = function () {
                 throw "Abstract!";
             };
-            ObservingDNode.prototype.trackDependencies = function () {
+            ViewNode.prototype.trackDependencies = function () {
                 this.prevObserving = this.observing;
-                __mobservableTrackingStack[__mobservableTrackingStack.length] = [];
+                this.observing = [];
+                __mobservableViewStack[__mobservableViewStack.length] = this;
             };
-            ObservingDNode.prototype.bindDependencies = function () {
-                this.observing = __mobservableTrackingStack.pop();
+            ViewNode.prototype.bindDependencies = function () {
+                __mobservableViewStack.length -= 1;
                 if (this.observing.length === 0 && mobservable.logLevel > 1 && !this.isDisposed) {
                     console.error("[mobservable] You have created a view function that doesn't observe any values, did you forget to make its dependencies observable?");
                 }
@@ -172,7 +175,7 @@ var mobservable;
                 this.hasCycle = false;
                 for (var i = 0, l = added.length; i < l; i++) {
                     var dependency = added[i];
-                    if (dependency instanceof ObservingDNode && dependency.findCycle(this)) {
+                    if (dependency instanceof ViewNode && dependency.findCycle(this)) {
                         this.hasCycle = true;
                         this.observing.splice(this.observing.indexOf(added[i]), 1);
                         dependency.hasCycle = true;
@@ -182,31 +185,31 @@ var mobservable;
                     }
                 }
             };
-            ObservingDNode.prototype.findCycle = function (node) {
+            ViewNode.prototype.findCycle = function (node) {
                 var obs = this.observing;
                 if (obs.indexOf(node) !== -1)
                     return true;
                 for (var l = obs.length, i = 0; i < l; i++)
-                    if (obs[i] instanceof ObservingDNode && obs[i].findCycle(node))
+                    if (obs[i] instanceof ViewNode && obs[i].findCycle(node))
                         return true;
                 return false;
             };
-            ObservingDNode.prototype.dispose = function () {
+            ViewNode.prototype.dispose = function () {
                 if (this.observing)
                     for (var l = this.observing.length, i = 0; i < l; i++)
                         this.observing[i].removeObserver(this);
                 this.observing = null;
                 _super.prototype.dispose.call(this);
             };
-            return ObservingDNode;
-        })(RootDNode);
-        _.ObservingDNode = ObservingDNode;
+            return ViewNode;
+        })(DataNode);
+        _.ViewNode = ViewNode;
         function stackDepth() {
-            return __mobservableTrackingStack.length;
+            return __mobservableViewStack.length;
         }
         _.stackDepth = stackDepth;
         function isComputingView() {
-            return __mobservableTrackingStack.length > 0;
+            return __mobservableViewStack.length > 0;
         }
         _.isComputingView = isComputingView;
     })(_ = mobservable._ || (mobservable._ = {}));
@@ -237,7 +240,7 @@ var mobservable;
             case _.ValueType.ComplexObject:
                 return _.toGetterSetterFunction(new _.ObservableValue(value, false, context));
             case _.ValueType.ComplexFunction:
-                throw new Error("[mobservable:error] Creating reactive functions from functions with multiple arguments is currently not supported, see https://github.com/mweststrate/mobservable/issues/12");
+                throw new Error("[mobservable.makeReactive] Creating reactive functions from functions with multiple arguments is currently not supported, see https://github.com/mweststrate/mobservable/issues/12");
             case _.ValueType.ViewFunction:
                 if (!context.name)
                     context.name = value.name;
@@ -498,7 +501,7 @@ var mobservable;
                     context.object = array;
             }
             return ObservableArrayAdministration;
-        })(_.RootDNode);
+        })(_.DataNode);
         _.ObservableArrayAdministration = ObservableArrayAdministration;
         var ObservableArray = (function (_super) {
             __extends(ObservableArray, _super);
@@ -520,7 +523,7 @@ var mobservable;
                 set: function (newLength) {
                     this.assertNotComputing("spliceWithArray");
                     if (typeof newLength !== "number" || newLength < 0)
-                        throw new Error("Out of range: " + newLength);
+                        throw new Error("[mobservable.array] Out of range: " + newLength);
                     var currentLength = this.$mobservable.values.length;
                     if (newLength === currentLength)
                         return;
@@ -718,7 +721,7 @@ var mobservable;
             ObservableArray.prototype.reduceRight = function (callbackfn, initialValue) { throw "Illegal state"; };
             ObservableArray.prototype.assertNotComputing = function (funcName) {
                 if (_.isComputingView()) {
-                    console.error("mobservable.array: The method array." + funcName + " is not allowed to be used inside reactive views since it alters the state.");
+                    console.error("[mobservable.array] The method array." + funcName + " is not allowed to be used inside reactive views since it alters the state.");
                 }
             };
             return ObservableArray;
@@ -761,7 +764,7 @@ var mobservable;
                     else if (index === this.$mobservable.values.length)
                         this.push(value);
                     else
-                        throw new Error("ObservableArray: Index out of bounds, " + index + " is larger than " + this.values.length);
+                        throw new Error("[mobservable.array] Index out of bounds, " + index + " is larger than " + this.values.length);
                 },
                 get: function () {
                     if (index < this.$mobservable.values.length) {
@@ -797,16 +800,11 @@ var mobservable;
             if (!mobservable.isReactive(thing))
                 throw new Error("[mobservable.getDNode] " + thing + " doesn't seem to be reactive");
             if (property !== undefined) {
-                __mobservableTrackingStack.push([]);
-                try {
-                    thing[property];
-                }
-                finally {
-                    var dnode = __mobservableTrackingStack.pop()[0];
-                    if (!dnode)
-                        throw new Error("[mobservable.getDNode] property '" + property + "' of '" + thing + "' doesn't seem to be a reactive property");
-                    return dnode;
-                }
+                var o = thing.$mobservable;
+                var dnode = o.values && o.values[property];
+                if (!dnode)
+                    throw new Error("[mobservable.getDNode] property '" + property + "' of '" + thing + "' doesn't seem to be a reactive property");
+                return dnode;
             }
             if (thing.$mobservable) {
                 if (thing.$mobservable instanceof _.ObservableObject)
@@ -843,7 +841,7 @@ var mobservable;
                 name: node.context.name,
                 context: node.context.object || null
             };
-            if (node instanceof _.ObservingDNode && node.observing.length)
+            if (node instanceof _.ViewNode && node.observing.length)
                 result.dependencies = _.unique(node.observing).map(nodeToDependencyTree);
             return result;
         }
@@ -904,7 +902,6 @@ var mobservable;
 (function (mobservable) {
     var _;
     (function (_) {
-        _.NON_PURE_VIEW_ERROR = "[mobservable] It is not allowed to change the state during the computation of a reactive view.";
         var ObservableValue = (function (_super) {
             __extends(ObservableValue, _super);
             function ObservableValue(value, recurse, context) {
@@ -924,7 +921,9 @@ var mobservable;
             };
             ObservableValue.prototype.set = function (value) {
                 if (_.isComputingView()) {
-                    console.error(_.NON_PURE_VIEW_ERROR + (" (stack size is " + __mobservableTrackingStack.length + ")"));
+                    var ts = __mobservableViewStack;
+                    console.error("[mobservable.value '" + this.context.name + "'] It is not allowed to change the state during the computation of a reactive view. (stack size is " + ts.length + ", active view: \"" + ts[ts.length - 1].toString() + "\")");
+                    console.trace();
                 }
                 if (value !== this._value) {
                     var oldValue = this._value;
@@ -957,7 +956,7 @@ var mobservable;
                 return "Observable[" + this.context.name + ":" + this._value + "]";
             };
             return ObservableValue;
-        })(_.RootDNode);
+        })(_.DataNode);
         _.ObservableValue = ObservableValue;
     })(_ = mobservable._ || (mobservable._ = {}));
 })(mobservable || (mobservable = {}));
@@ -978,7 +977,7 @@ var mobservable;
             }
             ObservableView.prototype.get = function () {
                 if (this.isComputing)
-                    throw new Error("Cycle detected");
+                    throw new Error("[mobservable.view '" + this.context.name + "'] Cycle detected");
                 if (this.isSleeping) {
                     if (_.isComputingView()) {
                         this.wakeUp();
@@ -993,10 +992,10 @@ var mobservable;
                     this.notifyObserved();
                 }
                 if (this.hasCycle)
-                    throw new Error("Cycle detected");
+                    throw new Error("[mobservable.view '" + this.context.name + "'] Cycle detected");
                 if (this.hasError) {
                     if (mobservable.logLevel > 0)
-                        console.error(this + ": rethrowing caught exception to observer: " + this._value + (this._value.cause || ''));
+                        console.error("[mobservable.view '" + this.context.name + "'] Rethrowing caught exception to observer: " + this._value + (this._value.cause || ''));
                     throw this._value;
                 }
                 return this._value;
@@ -1008,18 +1007,19 @@ var mobservable;
                 var newValue;
                 try {
                     if (this.isComputing)
-                        throw new Error("[mobservable] Cycle detected");
+                        throw new Error("[mobservable.view '" + this.context.name + "'] Cycle detected");
                     this.isComputing = true;
                     newValue = this.func.call(this.scope);
                     this.hasError = false;
                 }
                 catch (e) {
                     this.hasError = true;
-                    console.error("[mobservable] Caught error during computation: ", e);
+                    console.error("[mobservable.view '" + this.context.name + "'] Caught error during computation: ", e, "View function:", this.func.toString());
+                    console.trace();
                     if (e instanceof Error)
                         newValue = e;
                     else {
-                        newValue = new Error("MobservableComputationError");
+                        newValue = new Error(("[mobservable.view '" + this.context.name + "'] Error during computation (see error.cause) in ") + this.func.toString());
                         newValue.cause = e;
                     }
                 }
@@ -1054,13 +1054,13 @@ var mobservable;
                 };
             };
             ObservableView.prototype.toString = function () {
-                return "ComputedObservable[" + this.context.name + ":" + this._value + "]";
+                return "ComputedObservable[" + this.context.name + ":" + this._value + "] " + this.func.toString();
             };
             return ObservableView;
-        })(_.ObservingDNode);
+        })(_.ViewNode);
         _.ObservableView = ObservableView;
         function throwingSetter() {
-            throw new Error("View functions do not accept new values");
+            throw new Error("[mobservablei.view '" + this.context.name + "'] View functions do not accept new values");
         }
     })(_ = mobservable._ || (mobservable._ = {}));
 })(mobservable || (mobservable = {}));
@@ -1077,6 +1077,7 @@ var mobservable;
             function ObservableObject(target, context) {
                 this.target = target;
                 this.context = context;
+                this.values = {};
                 if (target.$mobservable)
                     throw new Error("Illegal state: already an reactive object");
                 if (!context) {
@@ -1088,10 +1089,6 @@ var mobservable;
                 else if (!context.object) {
                     context.object = target;
                 }
-                this.keys = new _.ObservableArray([], false, {
-                    object: target,
-                    name: this.context.name + "[keys]"
-                });
                 Object.defineProperty(target, "$mobservable", {
                     enumerable: false,
                     configurable: false,
@@ -1104,26 +1101,27 @@ var mobservable;
                 return new ObservableObject(target, context);
             };
             ObservableObject.prototype.set = function (propName, value, recurse) {
-                if (this.keys.indexOf(propName) === -1)
-                    this.defineReactiveProperty(propName, value, recurse);
-                else
+                if (this.values[propName])
                     this.target[propName] = value;
+                else
+                    this.defineReactiveProperty(propName, value, recurse);
             };
             ObservableObject.prototype.defineReactiveProperty = function (propName, value, recurse) {
                 if (value instanceof _.AsReference) {
                     value = value.value;
                     recurse = false;
                 }
+                var observable;
                 var context = {
                     object: this.context.object,
                     name: (this.context.name || "") + "." + propName
                 };
-                var descriptor;
                 if (typeof value === "function" && value.length === 0 && recurse)
-                    descriptor = new _.ObservableView(value, this.target, context).asPropertyDescriptor();
+                    observable = new _.ObservableView(value, this.target, context);
                 else
-                    descriptor = new _.ObservableValue(value, recurse, context).asPropertyDescriptor();
-                Object.defineProperty(this.target, propName, descriptor);
+                    observable = new _.ObservableValue(value, recurse, context);
+                this.values[propName] = observable;
+                Object.defineProperty(this.target, propName, observable.asPropertyDescriptor());
             };
             return ObservableObject;
         })();
