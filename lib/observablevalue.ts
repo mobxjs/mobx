@@ -23,7 +23,8 @@ namespace mobservable {
 
             set(value:T) {
                 if (_.isComputingView()) {
-                    console.error(NON_PURE_VIEW_ERROR + ` (stack size is ${__mobservableTrackingStack.length})`);
+                    var ts = __mobservableViewStack;
+                    console.error(NON_PURE_VIEW_ERROR + ` (stack size is ${ts.length}, active view: "${ts[ts.length -1].toString()}")`);
                 }
                 if (value !== this._value) {
                     var oldValue = this._value;

@@ -1,13 +1,15 @@
 /// <reference path="./api.ts" />
 
-declare var __mobservableTrackingStack;
+declare var __mobservableViewStack:mobservable._.ObservingDNode[];
 
 namespace mobservable {
 
     var globalScope = (function() { return this; })()
 
     // DNode[][], stack of: list of DNode's being observed by the currently ongoing computation
-    globalScope.__mobservableTrackingStack = [];
+    if (globalScope.__mobservableTrackingStack)
+        throw new Error("An incompatible version of mobservable is already loaded.");
+    globalScope.__mobservableViewStack = [];
 
     export namespace _ {
 
@@ -77,14 +79,15 @@ namespace mobservable {
             }
 
             public notifyObserved() {
-                var ts = __mobservableTrackingStack, l = ts.length;
+                var ts = __mobservableViewStack, l = ts.length;
                 if (l > 0) {
-                    var cs = ts[l - 1], csl = cs.length;
+                    var deps = ts[l-1].observing, depslength = deps.length;
                     // this last item added check is an optimization especially for array loops,
                     // because an array.length read with subsequent reads from the array
-                    // might trigger many observed events, while just checking the last added item is cheap
-                    if (cs[csl -1] !== this && cs[csl -2] !== this)
-                        cs[csl] = this;
+                    // might trigger many observed events, while just checking the latest added items is cheap
+                    // (n.b.: this code is inlined and not in observable view for performance reasons)
+                    if (deps[depslength -1] !== this && deps[depslength -2] !== this)
+                        deps[depslength] = this;
                 }
             }
 
@@ -179,11 +182,12 @@ namespace mobservable {
 
             private trackDependencies() {
                 this.prevObserving = this.observing;
-                __mobservableTrackingStack[__mobservableTrackingStack.length] = [];
+                this.observing = [];
+                __mobservableViewStack[__mobservableViewStack.length] = this;
             }
 
             private bindDependencies() {
-                this.observing = __mobservableTrackingStack.pop();
+                 __mobservableViewStack.length -= 1;
 
                 if (this.observing.length === 0 && logLevel > 1 && !this.isDisposed) {
                     console.error("[mobservable] You have created a view function that doesn't observe any values, did you forget to make its dependencies observable?");
@@ -228,11 +232,11 @@ namespace mobservable {
         }
 
         export function stackDepth () {
-            return __mobservableTrackingStack.length;
+            return __mobservableViewStack.length;
         }
         
         export function isComputingView() {
-            return __mobservableTrackingStack.length > 0;
+            return __mobservableViewStack.length > 0;
         }
     }
 }

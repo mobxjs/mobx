@@ -95,7 +95,7 @@ namespace mobservable {
             }
 
             toString() {
-                return `ComputedObservable[${this.context.name}:${this._value}]`;
+                return `ComputedObservable[${this.context.name}:${this._value}] ${this.func.toString()}`;
             }
         }
 
