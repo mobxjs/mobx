@@ -136,11 +136,144 @@ Especially in large applications this is important.
 ### Example domain store
 
 ```javascript
+import {observable, sideEffect} from 'mobservable';
+import uuid from 'node-uuid';
 
-class OrderStore {
-    constructor(transportLayer, productStore) {
-        // TODO:
-    }   
+export class TodoStore {
+    @observable todos = [];
+    @observable isLoading = true;
+    
+    constructor(transportLayer, authorStore) {
+        this.authorStore = authorStore; // Store that can resolve authors for us
+        this.transportLayer = transportLayer; // Thing that can make server requests for us
+        this.transportLayer.onReceiveTodoUpdate(updatedTodo => this.updateTodoFromServer(updatedTodo));
+        this.loadTodos();
+    }
+    
+    /**
+     * Fetches all todo's from the server
+     */
+    loadTodos() {      
+        this.isLoading = true;
+        this.transportLayer.fetchTodos().then(fetchedTodos => {
+            todos.forEach(json => this.updateTodoFromServer(json));
+            this.isLoading = false;
+        });
+    }
+    
+    /**
+     * Update a todo with information from the server. Guarantees a todo 
+     * only exists once. Might either construct a new todo, update an existing one,
+     * or remove an todo if it has been deleted on the server.
+     */
+    updateTodoFromServer(json) {
+        var todo = this.todos.find(todo => todo.id === json.id);
+        if (!todo) {
+            todo = new Todo(this, json.id);
+            this.todos.push(todo);
+        }
+        if (json.isDeleted) {
+            this.removeTodo(todo);
+        } else {        
+            todo.updateFromJson(json);
+        }        
+    }
+
+    /**
+     * Creates a fresh todo on the client and server
+     */
+    createTodo() {
+        var todo = new Todo(this);
+        this.todos.push(todo);
+        return todo;   
+    }
+    
+    /**
+     * A todo was somehow deleted, clean it from the client memory
+     */
+    removeTodo(todo) {
+        this.todos.splice(this.todos.indexOf(todo), 1);
+        todo.dispose();
+    }
 }
+
+export class Todo {
+    
+    /**
+     * unique id of this todo, immutable.
+     */
+    id = null;
+    
+    @observable completed = false;
+    @observable task = "";
+    
+    /**
+     * reference to an Author object (from the authorStore)
+     */
+    @observable author = null;
+    
+    store = null;
+    
+    /**
+     * Indicates whether changes in this object
+     * should be submitted to the server
+     */
+    autoSave = true;
+    
+    /**
+     * Disposer for the side effect that automatically
+     * stores this Todo, see @dispose.
+     */
+    saveHandler = null;
+
+    constructor(store, id=uuid.v4()) {
+        this.store = store;
+        this.id = id;
+        
+        this.saveHandler = sideEffect(() => {
+            // observe everything that is used in the JSON:
+            var json = this.toJson();
+            // if autoSave is on, send json to server
+            if (this.autoSave) {
+                this.store.transportLayer.saveTodo(todoJson);
+            }
+        });
+    }
+    
+    /**
+     * Remove this todo from the client and server
+     */
+    delete() {
+        this.store.transportLayer.deleteTodo(this.id);
+        this.store.removeTodo(this);
+    }
+
+    toJson() {
+        return {
+            id: this.id,
+            completed: this.completed,
+            task: this.task,
+            authorId: this.author ? this.author.id : null
+        };
+    }
+    
+    /**
+     * Update this todo with information from the server
+     */
+    updateFromJson(json) {
+        // make sure our changes aren't send back to the server
+        this.autoSave = false;
+        todo.completed = json.completed;
+        todo.task = json.task;
+        this.author = this.store.authorStore.resolveAuthor(json.authorId);
+        this.autoSave = true;
+    }
+
+    dispose() {
+        // clean up the sideEffect
+        this.saveHandler();
+    }
+}
+
 
 ```

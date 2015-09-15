@@ -131,7 +131,6 @@ Reactive arrays support all available ES5 array methods. Besides those, the foll
 * `observe(listener, fireImmediately? = false)` Listen to changes in this array. The callback will receive arguments that express an array splice or array change, conforming to [ES7 proposal](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe). It returns a disposer function to stop the listener.
 * `clear()` Remove all current entries from the array.
 * `replace(newItems)` Replaces all existing entries in the array with new ones.
-* `clone()` Create a new observable array containing the same values.
 * `find(predicate: (item, index, array) => boolean, thisArg?, fromIndex?)` Find implementation, basically the same as the ES7 Array.find proposal, but with added `fromIndex` parameter.
 * `remove(value)` Remove a single item by value from the array. Returns true if the item was found and removed.
 
@@ -332,17 +331,6 @@ reactiveComponent(React.createClass({
   /* .. */
 }))
 ```
-
-### observeUntilInvalid(functionToObserve, onInvalidate)
-
-`observeUntilInvalid` is quite similar to `sideEffect`, but instead of re-evaluating `functionToObserve` when one of its dependencies has changed,
-the `onInvalidate` function is triggered instead.
-So `functionToObserve` will be evaluated only once, and as soon as its value has become stale, the `onInvalidate` callback is triggered.
-`observeUntilInvalid` returns a tuple consisting of the initial return value of `func` and an `unsubscriber` to be able to abort the observeUntilInvalid.
-The `onInvalidate` function will be called only once, after that, the observeUntilInvalid has finished.
-
-`observeUntilInvalid` is useful in functions where you want to have a function that responds to change, but where the function is actually invoked as side effect or as part of a bigger change flow or where unnecessary recalculations of `func` or either pointless or expensive.
-It is for example used to implement `reactiveCompoenent`, which, in pseudo-code, does just: `component.render = () => observeUntilInvalid(originalRender, this.forceUpdate)[0]`;
 
 ## Utility functions
 

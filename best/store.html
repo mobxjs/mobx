@@ -36,7 +36,7 @@
     <body>
         
         
-    <div class="book" data-level="3.1" data-basepath=".." data-revision="Tue Sep 08 2015 22:26:51 GMT+0200 (CEST)">
+    <div class="book" data-level="3.1" data-basepath=".." data-revision="Tue Sep 15 2015 04:20:12 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -593,11 +593,143 @@ Especially in large applications this is important.</li>
 <li>They are easily recognizable and can strictly be type-checked.</li>
 </ul>
 <h3 id="example-domain-store">Example domain store</h3>
-<pre><code class="lang-javascript">
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OrderStore</span> </span>{
-    constructor(transportLayer, productStore) {
-        <span class="hljs-comment">// <span class="hljs-doctag"><span class="hljs-keyword">TODO</span></span>:</span>
-    }   
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, sideEffect} <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;mobservable&apos;</span>;
+<span class="hljs-keyword">import</span> uuid <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;node-uuid&apos;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoStore</span> </span>{
+    @observable todos = [];
+    @observable isLoading = <span class="hljs-literal">true</span>;
+
+    constructor(transportLayer, authorStore) {
+        <span class="hljs-keyword">this</span>.authorStore = authorStore; <span class="hljs-comment">// Store that can resolve authors for us</span>
+        <span class="hljs-keyword">this</span>.transportLayer = transportLayer; <span class="hljs-comment">// Thing that can make server requests for us</span>
+        <span class="hljs-keyword">this</span>.transportLayer.onReceiveTodoUpdate(updatedTodo =&gt; <span class="hljs-keyword">this</span>.updateTodoFromServer(updatedTodo));
+        <span class="hljs-keyword">this</span>.loadTodos();
+    }
+
+    <span class="hljs-comment">/**
+     * Fetches all todo&apos;s from the server
+     */</span>
+    loadTodos() {      
+        <span class="hljs-keyword">this</span>.isLoading = <span class="hljs-literal">true</span>;
+        <span class="hljs-keyword">this</span>.transportLayer.fetchTodos().then(fetchedTodos =&gt; {
+            todos.forEach(json =&gt; <span class="hljs-keyword">this</span>.updateTodoFromServer(json));
+            <span class="hljs-keyword">this</span>.isLoading = <span class="hljs-literal">false</span>;
+        });
+    }
+
+    <span class="hljs-comment">/**
+     * Update a todo with information from the server. Guarantees a todo 
+     * only exists once. Might either construct a new todo, update an existing one,
+     * or remove an todo if it has been deleted on the server.
+     */</span>
+    updateTodoFromServer(json) {
+        <span class="hljs-keyword">var</span> todo = <span class="hljs-keyword">this</span>.todos.find(todo =&gt; todo.id === json.id);
+        <span class="hljs-keyword">if</span> (!todo) {
+            todo = <span class="hljs-keyword">new</span> Todo(<span class="hljs-keyword">this</span>, json.id);
+            <span class="hljs-keyword">this</span>.todos.push(todo);
+        }
+        <span class="hljs-keyword">if</span> (json.isDeleted) {
+            <span class="hljs-keyword">this</span>.removeTodo(todo);
+        } <span class="hljs-keyword">else</span> {        
+            todo.updateFromJson(json);
+        }        
+    }
+
+    <span class="hljs-comment">/**
+     * Creates a fresh todo on the client and server
+     */</span>
+    createTodo() {
+        <span class="hljs-keyword">var</span> todo = <span class="hljs-keyword">new</span> Todo(<span class="hljs-keyword">this</span>);
+        <span class="hljs-keyword">this</span>.todos.push(todo);
+        <span class="hljs-keyword">return</span> todo;   
+    }
+
+    <span class="hljs-comment">/**
+     * A todo was somehow deleted, clean it from the client memory
+     */</span>
+    removeTodo(todo) {
+        <span class="hljs-keyword">this</span>.todos.splice(<span class="hljs-keyword">this</span>.todos.indexOf(todo), <span class="hljs-number">1</span>);
+        todo.dispose();
+    }
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span> </span>{
+
+    <span class="hljs-comment">/**
+     * unique id of this todo, immutable.
+     */</span>
+    id = <span class="hljs-literal">null</span>;
+
+    @observable completed = <span class="hljs-literal">false</span>;
+    @observable task = <span class="hljs-string">&quot;&quot;</span>;
+
+    <span class="hljs-comment">/**
+     * reference to an Author object (from the authorStore)
+     */</span>
+    @observable author = <span class="hljs-literal">null</span>;
+
+    store = <span class="hljs-literal">null</span>;
+
+    <span class="hljs-comment">/**
+     * Indicates whether changes in this object
+     * should be submitted to the server
+     */</span>
+    autoSave = <span class="hljs-literal">true</span>;
+
+    <span class="hljs-comment">/**
+     * Disposer for the side effect that automatically
+     * stores this Todo, see @dispose.
+     */</span>
+    saveHandler = <span class="hljs-literal">null</span>;
+
+    constructor(store, id=uuid.v4()) {
+        <span class="hljs-keyword">this</span>.store = store;
+        <span class="hljs-keyword">this</span>.id = id;
+
+        <span class="hljs-keyword">this</span>.saveHandler = sideEffect(() =&gt; {
+            <span class="hljs-comment">// observe everything that is used in the JSON:</span>
+            <span class="hljs-keyword">var</span> json = <span class="hljs-keyword">this</span>.toJson();
+            <span class="hljs-comment">// if autoSave is on, send json to server</span>
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.autoSave) {
+                <span class="hljs-keyword">this</span>.store.transportLayer.saveTodo(todoJson);
+            }
+        });
+    }
+
+    <span class="hljs-comment">/**
+     * Remove this todo from the client and server
+     */</span>
+    <span class="hljs-keyword">delete</span>() {
+        <span class="hljs-keyword">this</span>.store.transportLayer.deleteTodo(<span class="hljs-keyword">this</span>.id);
+        <span class="hljs-keyword">this</span>.store.removeTodo(<span class="hljs-keyword">this</span>);
+    }
+
+    toJson() {
+        <span class="hljs-keyword">return</span> {
+            id: <span class="hljs-keyword">this</span>.id,
+            completed: <span class="hljs-keyword">this</span>.completed,
+            task: <span class="hljs-keyword">this</span>.task,
+            authorId: <span class="hljs-keyword">this</span>.author ? <span class="hljs-keyword">this</span>.author.id : <span class="hljs-literal">null</span>
+        };
+    }
+
+    <span class="hljs-comment">/**
+     * Update this todo with information from the server
+     */</span>
+    updateFromJson(json) {
+        <span class="hljs-comment">// make sure our changes aren&apos;t send back to the server</span>
+        <span class="hljs-keyword">this</span>.autoSave = <span class="hljs-literal">false</span>;
+        todo.completed = json.completed;
+        todo.task = json.task;
+        <span class="hljs-keyword">this</span>.author = <span class="hljs-keyword">this</span>.store.authorStore.resolveAuthor(json.authorId);
+        <span class="hljs-keyword">this</span>.autoSave = <span class="hljs-literal">true</span>;
+    }
+
+    dispose() {
+        <span class="hljs-comment">// clean up the sideEffect</span>
+        <span class="hljs-keyword">this</span>.saveHandler();
+    }
 }
 </code></pre>
 

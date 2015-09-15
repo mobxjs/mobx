@@ -36,7 +36,7 @@
     <body>
         
         
-    <div class="book" data-level="4" data-basepath=".." data-revision="Tue Sep 08 2015 22:26:51 GMT+0200 (CEST)">
+    <div class="book" data-level="4" data-basepath=".." data-revision="Tue Sep 15 2015 04:20:12 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -570,7 +570,6 @@ but <code>reactiveArray instanceof Array</code> will return <code>true</code>.</
 <li><code>observe(listener, fireImmediately? = false)</code> Listen to changes in this array. The callback will receive arguments that express an array splice or array change, conforming to <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe" target="_blank">ES7 proposal</a>. It returns a disposer function to stop the listener.</li>
 <li><code>clear()</code> Remove all current entries from the array.</li>
 <li><code>replace(newItems)</code> Replaces all existing entries in the array with new ones.</li>
-<li><code>clone()</code> Create a new observable array containing the same values.</li>
 <li><code>find(predicate: (item, index, array) =&gt; boolean, thisArg?, fromIndex?)</code> Find implementation, basically the same as the ES7 Array.find proposal, but with added <code>fromIndex</code> parameter.</li>
 <li><code>remove(value)</code> Remove a single item by value from the array. Returns true if the item was found and removed.</li>
 </ul>
@@ -725,14 +724,6 @@ otherwise it might do nothing at all.</em></p>
   <span class="hljs-comment">/* .. */</span>
 }))
 </code></pre>
-<h3 id="observeuntilinvalid-functiontoobserve-oninvalidate">observeUntilInvalid(functionToObserve, onInvalidate)</h3>
-<p><code>observeUntilInvalid</code> is quite similar to <code>sideEffect</code>, but instead of re-evaluating <code>functionToObserve</code> when one of its dependencies has changed,
-the <code>onInvalidate</code> function is triggered instead.
-So <code>functionToObserve</code> will be evaluated only once, and as soon as its value has become stale, the <code>onInvalidate</code> callback is triggered.
-<code>observeUntilInvalid</code> returns a tuple consisting of the initial return value of <code>func</code> and an <code>unsubscriber</code> to be able to abort the observeUntilInvalid.
-The <code>onInvalidate</code> function will be called only once, after that, the observeUntilInvalid has finished.</p>
-<p><code>observeUntilInvalid</code> is useful in functions where you want to have a function that responds to change, but where the function is actually invoked as side effect or as part of a bigger change flow or where unnecessary recalculations of <code>func</code> or either pointless or expensive.
-It is for example used to implement <code>reactiveCompoenent</code>, which, in pseudo-code, does just: <code>component.render = () =&gt; observeUntilInvalid(originalRender, this.forceUpdate)[0]</code>;</p>
 <h2 id="utility-functions">Utility functions</h2>
 <h3 id="isreactive-value">isReactive(value)</h3>
 <p>Returns true if the given value was created or extended by mobservable. Note: this function cannot be used to tell whether a property is reactive; it will determine the reactiveness of its actual value.</p>
