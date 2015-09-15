@@ -9,12 +9,11 @@
   * [Reactive Views](core/reactive-views.md)
   * [Reactive Components](core/reactive-component.md)
 * Best Practices For Large Apps
-  * [Organizing data stores](best/store.md)
-  * Organizing components
-  * Organizing actions
-  * Working with async actions
-  * Routing
-  * Universal applications
+  * [Definging data stores](best/store.md)
+  * [Writing (async) actions](best/actions.md)
+  * [Organizing React components](best/components.md)
+<!--  * Routing
+  * Universal applications -->
 * [Reference Guide](refguide/api.md)
 <!--  * isReactive
   * makeReactive

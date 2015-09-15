@@ -307,13 +307,16 @@ This behavior is similar to [React PureRender mixin](https://facebook.github.io/
 If a component provides its own `shouldComponentUpdate`, that one takes precedence.
 
 Since in practice you will see that most reactive components become stateless, they can easily be hot-reloaded.
+You will discover that many small components will consist of just a render function.
+In such cases, you can also directly pass the render function to `reactiveComponent`, without building a component.
+The props will then be available as first argument of the function.
 
 _Note: when `reactiveComponent` needs to be combined with other decorators or higher-order-components, make sure that `reactiveComponent` is the most inner (first applied) decorator;
 otherwise it might do nothing at all._
 
 **ES6 class + decorator**
 ```javascript
-@reactiveComponent class MyCompoment extends React.Component {
+@reactiveComponent class MyComponent extends React.Component {
   /* .. */
 }
 ```
@@ -327,9 +330,16 @@ reactiveComponent(class MyCompoment extends React.Component {
 
 **ES5 + React.createClass**
 ```javascript
-reactiveComponent(React.createClass({
+var MyComponent = reactiveComponent(React.createClass({
   /* .. */
 }))
+```
+
+**ES5/6 + render function**
+```javascript
+var MyComponent = reactiveComponent(function (props) {
+    return <rendering />;
+});
 ```
 
 ## Utility functions

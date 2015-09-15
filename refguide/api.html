@@ -28,7 +28,7 @@
     <link rel="next" href="../best/devtools.html" />
     
     
-    <link rel="prev" href="../best/store.html" />
+    <link rel="prev" href="../best/components.html" />
     
 
         
@@ -36,7 +36,7 @@
     <body>
         
         
-    <div class="book" data-level="4" data-basepath=".." data-revision="Tue Sep 15 2015 04:20:12 GMT+0200 (CEST)">
+    <div class="book" data-level="4" data-basepath=".." data-revision="Tue Sep 15 2015 20:03:23 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -199,43 +199,45 @@
                         
                             <b>3.1.</b>
                         
-                        Organizing data stores
+                        Definging data stores
                     </a>
             
             
         </li>
     
-        <li class="chapter " data-level="3.2" >
+        <li class="chapter " data-level="3.2" data-path="best/actions.html">
             
-            <span><b>3.2.</b> Organizing components</span>
+                
+                    <a href="../best/actions.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.2.</b>
+                        
+                        Writing (async) actions
+                    </a>
             
             
         </li>
     
-        <li class="chapter " data-level="3.3" >
+        <li class="chapter " data-level="3.3" data-path="best/components.html">
             
-            <span><b>3.3.</b> Organizing actions</span>
+                
+                    <a href="../best/components.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.3.</b>
+                        
+                        Organizing React components
+                    </a>
             
             
         </li>
     
         <li class="chapter " data-level="3.4" >
             
-            <span><b>3.4.</b> Working with async actions</span>
-            
-            
-        </li>
-    
-        <li class="chapter " data-level="3.5" >
-            
-            <span><b>3.5.</b> Routing</span>
-            
-            
-        </li>
-    
-        <li class="chapter " data-level="3.6" >
-            
-            <span><b>3.6.</b> Universal applications</span>
+            <span><b>3.4.</b> Universal applications --&gt;</span>
             
             
         </li>
@@ -706,11 +708,14 @@ For that reason it doesn&apos;t make sense to add <code>reactiveComponent</code>
 <p><code>reactiveComponent</code> also prevents re-renderings when the <em>props</em> of the component have only shallowly changed, which makes a lot of sense if the data passed into the component is reactive.
 This behavior is similar to <a href="https://facebook.github.io/react/docs/pure-render-mixin.html" target="_blank">React PureRender mixin</a>, except that <em>state</em> changes are still always processed.
 If a component provides its own <code>shouldComponentUpdate</code>, that one takes precedence.</p>
-<p>Since in practice you will see that most reactive components become stateless, they can easily be hot-reloaded.</p>
+<p>Since in practice you will see that most reactive components become stateless, they can easily be hot-reloaded.
+You will discover that many small components will consist of just a render function.
+In such cases, you can also directly pass the render function to <code>reactiveComponent</code>, without building a component.
+The props will then be available as first argument of the function.</p>
 <p><em>Note: when <code>reactiveComponent</code> needs to be combined with other decorators or higher-order-components, make sure that <code>reactiveComponent</code> is the most inner (first applied) decorator;
 otherwise it might do nothing at all.</em></p>
 <p><strong>ES6 class + decorator</strong></p>
-<pre><code class="lang-javascript">@reactiveComponent <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyCompoment</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
+<pre><code class="lang-javascript">@reactiveComponent <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyComponent</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
   <span class="hljs-comment">/* .. */</span>
 }
 </code></pre>
@@ -720,9 +725,14 @@ otherwise it might do nothing at all.</em></p>
 });
 </code></pre>
 <p><strong>ES5 + React.createClass</strong></p>
-<pre><code class="lang-javascript">reactiveComponent(React.createClass({
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> MyComponent = reactiveComponent(React.createClass({
   <span class="hljs-comment">/* .. */</span>
 }))
+</code></pre>
+<p><strong>ES5/6 + render function</strong></p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> MyComponent = reactiveComponent(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">props</span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">rendering</span> /&gt;</span>;</span>
+});
 </code></pre>
 <h2 id="utility-functions">Utility functions</h2>
 <h3 id="isreactive-value">isReactive(value)</h3>
@@ -800,7 +810,7 @@ The <code>onReport</code> function is a callback that will be invoked for each t
         </div>
 
         
-        <a href="../best/store.html" class="navigation navigation-prev " aria-label="Previous page: Organizing data stores"><i class="fa fa-angle-left"></i></a>
+        <a href="../best/components.html" class="navigation navigation-prev " aria-label="Previous page: Organizing React components"><i class="fa fa-angle-left"></i></a>
         
         
         <a href="../best/devtools.html" class="navigation navigation-next " aria-label="Next page: DevTools"><i class="fa fa-angle-right"></i></a>
