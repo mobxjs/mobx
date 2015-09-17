@@ -29,7 +29,7 @@ export function testAnnotations(test) {
     var order1 = new Order();
     var order2 = new Order();
 
-    var disposer = mobservable.sideEffect(() => {
+    var disposer = mobservable.observe(() => {
         order1totals.push(order1.total)
     });
 

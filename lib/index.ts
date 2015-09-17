@@ -67,6 +67,11 @@ namespace mobservable {
     }
 
     export function sideEffect(func:Lambda, scope?:any):Lambda {
+        // TODO: add deprecation warning
+        return observe(func, scope);
+    }
+
+    export function observe(func:Lambda, scope?:any):Lambda {
         const observable = new _.ObservableView(func, scope, {
             object: scope,
             name: func.name
@@ -78,6 +83,16 @@ namespace mobservable {
         if (logLevel >= 2 && observable.observing.length === 0)
             console.warn(`[mobservable.sideEffect] not a single observable was used inside the side-effect function. Side-effect would be a no-op.`);
         (<any>disposer).$mobservable = observable;
+        return disposer;
+    }
+
+    export function when(predicate: ()=>boolean, effect: Mobservable.Lambda, scope?: any): Mobservable.Lambda {
+        const disposer = observe(() => {
+            if (predicate.call(scope)) {
+                disposer();
+                effect.call(scope);
+            }
+        });
         return disposer;
     }
 

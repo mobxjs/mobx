@@ -595,12 +595,12 @@ exports.test_expr = function(test) {
     test.done();
 };
 
-exports.test_sideeffect = function(test) {
+exports.test_observe = function(test) {
     var x = mobservable(3);
     var x2 = mobservable(function() { return x() * 2; });
     var b = [];
 
-    var cancel = mobservable.sideEffect(function() {
+    var cancel = mobservable.observe(function() {
         b.push(x2());
     });
 
@@ -611,6 +611,28 @@ exports.test_sideeffect = function(test) {
     x(7);
     test.deepEqual(b, [6, 8, 10]);
 
+    test.done();
+};
+
+exports.test_when = function(test) {
+    var x = mobservable(3);
+
+    var called = 0;
+    mobservable.when(function() {
+        return (x() === 4);
+    }, function() {
+        called += 1;
+    });
+
+    x(5);
+    test.equal(called, 0);
+    x(4);
+    test.equal(called, 1);
+    x(3);
+    test.equal(called, 1);
+    x(4);
+    test.equal(called, 1);
+    
     test.done();
 };
 

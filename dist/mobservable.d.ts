@@ -15,7 +15,11 @@ interface _IMobservableStatic {
 
     observable(target: Object, key: string); // decorator / annotation
 
+    observe(func: Mobservable.Lambda, scope?: any): Mobservable.Lambda;
+    // old alias for observe:
     sideEffect(func: Mobservable.Lambda, scope?: any): Mobservable.Lambda;
+
+    when(predicate: ()=>boolean, effect: Mobservable.Lambda, scope?: any): Mobservable.Lambda;
 
     transaction<T>(action: ()=>T): T;
 

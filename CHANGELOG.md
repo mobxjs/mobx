@@ -1,4 +1,13 @@
 
+# 0.6.8
+
+* Introduced `when`, which, given a reactive predicate, observes it until it returns true.
+* Renamed `sideEffect -> observe`
+
+# 0.6.7:
+
+* Improved logging
+
 # 0.6.6:
 
 * Deprecated observable array `.values()` and `.clone()`
