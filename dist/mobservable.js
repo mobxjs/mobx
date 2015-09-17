@@ -264,6 +264,10 @@ var mobservable;
     }
     mobservable.isReactive = isReactive;
     function sideEffect(func, scope) {
+        return observe(func, scope);
+    }
+    mobservable.sideEffect = sideEffect;
+    function observe(func, scope) {
         var observable = new _.ObservableView(func, scope, {
             object: scope,
             name: func.name
@@ -277,7 +281,17 @@ var mobservable;
         disposer.$mobservable = observable;
         return disposer;
     }
-    mobservable.sideEffect = sideEffect;
+    mobservable.observe = observe;
+    function when(predicate, effect, scope) {
+        var disposer = observe(function () {
+            if (predicate.call(scope)) {
+                disposer();
+                effect.call(scope);
+            }
+        });
+        return disposer;
+    }
+    mobservable.when = when;
     function extendReactive(target, properties, context) {
         return _.extendReactive(target, properties, true, context);
     }
