@@ -43,9 +43,13 @@ namespace mobservable {
 			}
 
 			private defineReactiveProperty(propName, value, recurse) {
+				var async = false;
 				if (value instanceof AsReference) {
 					value = value.value;
 					recurse = false;
+				} else if (value instanceof Async) {
+					value = value.value;
+					async = true;
 				}
 
 				let observable: ObservableView<any>|ObservableValue<any>;
@@ -55,7 +59,7 @@ namespace mobservable {
 				};
 
 				if (typeof value === "function" && value.length === 0 && recurse)
-					observable = new ObservableView(value, this.target, context);
+					observable = new ObservableView(value, this.target, context, async);
 				else
 					observable = new ObservableValue(value, recurse, context);
 

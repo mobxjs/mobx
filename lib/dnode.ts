@@ -1,4 +1,5 @@
 /// <reference path="./api.ts" />
+/// <reference path="./scheduler.ts" />
 
 declare var __mobservableViewStack:mobservable._.ViewNode[];
 
@@ -110,6 +111,7 @@ namespace mobservable {
         export class ViewNode extends DataNode {
             isSleeping = true; // isSleeping: nobody is observing this dependency node, so don't bother tracking DNode's this DNode depends on
             hasCycle = false;  // this node is part of a cycle, which is an error
+            async = false;     // this view will be run asynchronous
             observing: DataNode[] = [];       // nodes we are looking at. Our value depends on these nodes
             private prevObserving: _.DataNode[] = null; // nodes we were looking at before. Used to determine changes in the dependency tree
             private dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
@@ -163,7 +165,7 @@ namespace mobservable {
                                 // we're done, but didn't change, lets make sure verybody knows..
                                 this.markReady(false);
                             this.dependencyChangeCount = 0;
-                        });
+                        }, this.async);
                     }
                 }
             }

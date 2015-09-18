@@ -57,6 +57,7 @@ declare module Mobservable {
         scope?:  Object,
         context?: Object,
         recurse?:  boolean;
+        async?: boolean;
         name?: string;
         // protected:  boolean TODO:  see #9
     }

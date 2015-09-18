@@ -27,10 +27,16 @@ namespace mobservable {
             return value;
 
         opts = opts || {};
+        // TODO: use unwrap function
         if (value instanceof _.AsReference) {
             value = value.value;
             opts.as = "reference";
         }
+        if (value instanceof _.Async) {
+            value = value.value;
+            opts.async = true;
+        }
+
         const recurse = opts.recurse !== false;
         const sourceType = opts.as === "reference" ? _.ValueType.Reference : _.getTypeOfValue(value);
         const context = {
@@ -47,7 +53,7 @@ namespace mobservable {
             case _.ValueType.ViewFunction:
                 if (!context.name)
                     context.name = value.name;
-                return _.toGetterSetterFunction(new _.ObservableView(value, opts.scope || opts.context, context));
+                return _.toGetterSetterFunction(new _.ObservableView(value, opts.scope || opts.context, context, opts.async));
             case _.ValueType.Array:
                 return new _.ObservableArray(<[]>value, recurse, context);
             case _.ValueType.PlainObject:
@@ -58,6 +64,10 @@ namespace mobservable {
 
     export function asReference(value) {
         return new _.AsReference(value);
+    }
+
+    export function async(func: Mobservable.Lambda) {
+        return new _.Async(func);
     }
 
     export function isReactive(value):boolean {
@@ -71,11 +81,20 @@ namespace mobservable {
         return observe(func, scope);
     }
 
-    export function observe(func:Lambda, scope?:any):Lambda {
+    export function observe(f:Lambda|_.Async, scope?:any):Lambda {
+        var async = false;
+        var func: Lambda;
+        if (f instanceof _.Async) {
+            func = (<_.Async> f).value;
+            async = true;
+        } else {
+            func = <Lambda> f;
+        }
+        
         const observable = new _.ObservableView(func, scope, {
             object: scope,
-            name: func.name
-        });
+            name: func.name,
+        }, async);
         observable.setRefCount(+1);
         const disposer = _.once(() => {
             observable.setRefCount(-1);
@@ -120,7 +139,8 @@ namespace mobservable {
         if (descriptor && descriptor.set)
             throw new Error("@observable properties cannot have a setter.");
         Object.defineProperty(target, key, {
-            configurable: true, enumberable:true,
+            configurable: true,
+            enumerable:true,
             get: function() {
                 _.ObservableObject.asReactive(this, null).set(key, undefined, true);
                 return this[key];
@@ -226,6 +246,12 @@ namespace mobservable {
 
         export class AsReference {
             constructor(public value:any) {
+
+            }
+        }
+
+        export class Async {
+            constructor(public value:Mobservable.Lambda) {
 
             }
         }

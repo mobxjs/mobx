@@ -1,4 +1,5 @@
 var mobservable = require('mobservable');
+var m = mobservable;
 
 var makeReactive = mobservable.makeReactive;
 var voidObserver = function(){};
@@ -96,7 +97,6 @@ exports.dynamic2 = function(test) {
 
 exports.readme1 = function(test) {
     try {
-        debugger;
         var b = buffer();
 
         var vat = makeReactive(0.20);
@@ -634,6 +634,92 @@ exports.test_when = function(test) {
     test.equal(called, 1);
     
     test.done();
+};
+
+exports.test_async = function(test) {
+    debugger;
+    var called = 0;
+    var x = mobservable(3);
+    var value;
+    var viewsUpdated = 0;
+    
+    mobservable.sideEffect(mobservable.async(function() {
+        called += 1;
+        value = x();
+    }));
+    
+    x(4);
+    x(5);
+    
+    var disposer = mobservable._.Scheduler.awaitViews(function() {
+        viewsUpdated++;
+        test.equal(called, 1);
+        test.equal(value, 5);
+    });
+    
+    setTimeout(function() {
+        test.equal(called, 1);
+        test.equal(viewsUpdated, 1);
+        test.equal(value, 5);
+        
+        x(6);
+        mobservable._.Scheduler.awaitViews(function() {
+            viewsUpdated++;
+            test.equal(called, 2);
+            test.equal(value, 6);
+        });
+        
+        setTimeout(function() {
+            test.equal(viewsUpdated, 2);
+            test.equal(called, 2);
+            test.equal(value, 6);
+            
+            x(7);
+            disposer();
+            // after calling disposer, sideEffect should not update anymore! even if its scheduled
+            
+            mobservable._.Scheduler.awaitViews(function() {
+                viewsUpdated++;
+                test.equal(called, 2);
+                test.equal(value, 6);
+            });
+            
+            setTimeout(function() {
+                test.equal(viewsUpdated, 3);
+                test.equal(called, 2);
+                test.equal(value, 6);
+            }, 10);
+        }, 10);
+    }, 10);
+};
+
+exports.test_async2 = function(test) {
+    var a = m(1);
+    var b = m(function() { a() * 2 });
+    var c = m(m.async(function() {
+        return a();
+    }))
+    var d = m(function() {
+        return b() + c();
+    });
+    
+    var states = [];
+    var disposer = m.observe(function() {
+        states.push(d());
+    });
+    
+    test.deepEqual(states, [undefined]);
+    mobservable._.Scheduler.awaitViews(function() {
+        test.deepEqual(states, [undefined, 3]);
+        
+        a(2);
+        test.deepEqual(states, [undefined, 3]);
+        mobservable._.Scheduler.awaitViews(function() {
+            test.deepEqual(states, [undefined, 3, 6]);
+            test.done();
+        });
+    });
+    
 };
 
 exports.test_json1 = function(test) {

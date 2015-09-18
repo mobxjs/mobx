@@ -8,8 +8,9 @@ namespace mobservable {
             protected _value: T;
             protected changeEvent = new SimpleEventEmitter();
 
-            constructor(protected func:()=>T, private scope: Object, context:Mobservable.IContextInfoStruct) {
+            constructor(protected func:()=>T, private scope: Object, context:Mobservable.IContextInfoStruct, async: boolean) {
                 super(context);
+                this.async = async;
             }
 
             get():T {

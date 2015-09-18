@@ -1,14 +1,44 @@
+/// <reference path="./simpleeventemitter" />
+
 namespace mobservable {
     export namespace _ {
+        // TODO: rewrite to closures instead of this weird static class..
+        // TODO: type alias Lambda plz..
+
         export class Scheduler {
             private static inBatch = 0;
             private static tasks:{():void}[] = [];
-    
-            public static schedule(func:Lambda) {
-                if (Scheduler.inBatch < 1)
+            private static asyncTasks:{():void}[] = [];
+            private static isAsyncScheduled = false;
+            private static asyncViewsReady = new _.SimpleEventEmitter();
+
+            public static schedule(func:Lambda, async:boolean) {
+                if (async) {
+                    Scheduler.asyncTasks.push(func);
+                    if (!Scheduler.isAsyncScheduled) {
+                        setTimeout(function() {
+                            Scheduler.processAsyncViews();
+                        }, 1);
+                    }
+                } else if (Scheduler.inBatch < 1) {
                     func();
-                else
+                } else {
                     Scheduler.tasks[Scheduler.tasks.length] = func;
+                }
+            }
+            
+            private static processAsyncViews() {
+                var f:Mobservable.Lambda, i = -1;
+                while(f = Scheduler.asyncTasks[++i]) {
+                    f();
+                }
+                Scheduler.asyncTasks = [];
+                Scheduler.isAsyncScheduled = false;
+                Scheduler.asyncViewsReady.emit();
+            }
+            
+            public static awaitViews(f:Mobservable.Lambda):Mobservable.Lambda {
+                return Scheduler.asyncViewsReady.once(f);
             }
     
             private static runPostBatchActions() {
