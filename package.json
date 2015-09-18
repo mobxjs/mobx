@@ -1,41 +1,41 @@
 {
-    "name": "mobservable",
-    "version": "0.6.8",
-    "description": "Keeps views automatically in sync with state. Unobtrusively.",
-    "main": "dist/mobservable.js",
-    "scripts": {
-        "test": "grunt cover",
-        "prepublish": "grunt builddist"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/mweststrate/mobservable.git"
-    },
-    "author": "Michel Weststrate",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/mweststrate/mobservable/issues"
-    },
-    "homepage": "https://mweststrate.github.io/mobservable",
-    "devDependencies": {
-        "grunt": "^0.4.5",
-        "grunt-contrib-nodeunit": "^0.4.1",
-        "grunt-coveralls": "^1.0.0",
-        "grunt-exec": "^0.4.6",
-        "grunt-contrib-uglify": "^0.9.1",
-        "mkdirp": "^0.5.1",
-        "nodeunit-browser-tap": "^0.1.0",
-        "typescript": "1.5.3"
-    },
-    "keywords": [
-        "mobservable",
-        "observable",
-        "react-component",
-        "react",
-        "reactjs",
-        "reactive",
-        "model",
-        "frp",
-        "functional-reactive-programming"
-    ]
+  "name": "mobservable",
+  "version": "0.6.8",
+  "description": "Keeps views automatically in sync with state. Unobtrusively.",
+  "main": "dist/mobservable.js",
+  "scripts": {
+    "test": "grunt cover",
+    "prepublish": "grunt builddist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mweststrate/mobservable.git"
+  },
+  "author": "Michel Weststrate",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mweststrate/mobservable/issues"
+  },
+  "homepage": "https://mweststrate.github.io/mobservable",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-nodeunit": "^0.4.1",
+    "grunt-coveralls": "^1.0.0",
+    "grunt-exec": "^0.4.6",
+    "grunt-contrib-uglify": "^0.9.1",
+    "mkdirp": "^0.5.1",
+    "nodeunit-browser-tap": "^0.1.0",
+    "typescript": "^1.6.2"
+  },
+  "keywords": [
+    "mobservable",
+    "observable",
+    "react-component",
+    "react",
+    "reactjs",
+    "reactive",
+    "model",
+    "frp",
+    "functional-reactive-programming"
+  ]
 }

@@ -3,7 +3,7 @@ var mkdirp = require('mkdirp');
 var path = require('path');
 
 module.exports = function(grunt) {
-    var tsc = "node " + __dirname + "/node_modules/typescript/bin/tsc.js".replace(/\//g, path.sep);
+    var tsc = "node " + __dirname + "/node_modules/typescript/bin/tsc".replace(/\//g, path.sep);
     console.log("Compiling with: " + tsc);
     grunt.initConfig({
         nodeunit: {
