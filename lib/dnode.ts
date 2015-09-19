@@ -197,9 +197,6 @@ namespace mobservable {
                 var [added, removed] = quickDiff(this.observing, this.prevObserving);
                 this.prevObserving = null;
 
-                for(var i = 0, l = removed.length; i < l; i++)
-                    removed[i].removeObserver(this);
-
                 this.hasCycle = false;
                 for(var i = 0, l = added.length; i < l; i++) {
                     var dependency = added[i];
@@ -212,6 +209,10 @@ namespace mobservable {
                         added[i].addObserver(this);
                     }
                 }
+                
+                // remove observers after adding them, so that they don't go in lazy mode to early
+                for(var i = 0, l = removed.length; i < l; i++)
+                    removed[i].removeObserver(this);
             }
 
             private findCycle(node:DataNode) {

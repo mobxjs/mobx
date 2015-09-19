@@ -1,4 +1,5 @@
 var mobservable = require('mobservable');
+var m = mobservable;
 
 var makeReactive = mobservable.makeReactive;
 var voidObserver = function(){};
@@ -96,7 +97,6 @@ exports.dynamic2 = function(test) {
 
 exports.readme1 = function(test) {
     try {
-        debugger;
         var b = buffer();
 
         var vat = makeReactive(0.20);
@@ -532,6 +532,55 @@ exports.testLazyEvaluation = function (test) {
     test.equal(mobservable._.stackDepth(), 0);
     test.done();
 };
+
+exports.test_multiple_view_dependencies = function(test) {
+    var bCalcs = 0;
+    var dCalcs = 0;
+    var a = m(1);
+    var b = m(function() {
+        bCalcs++;
+        return 2 * a();
+    });
+    var c = m(2);
+    var d = m(function() {
+        dCalcs++;
+        return 3 * c();
+    })
+
+    var zwitch = true;
+    var buffer = [];
+    var fCalcs = 0;
+    var dis = m.observe(function() {
+        debugger;
+        fCalcs++;
+        if (zwitch)
+            buffer.push(b() + d());
+        else
+            buffer.push(d() + b());
+    });
+
+    zwitch = false;
+    c(3);
+    test.equals(bCalcs, 1);
+    test.equals(dCalcs, 2);
+    test.equals(fCalcs, 2);
+    test.deepEqual(buffer, [8, 11]);
+
+    c(4);
+    test.equals(bCalcs, 1);
+    test.equals(dCalcs, 3);
+    test.equals(fCalcs, 3);
+    test.deepEqual(buffer, [8, 11, 14]);
+
+    dis();
+    c(5);
+    test.equals(bCalcs, 1);
+    test.equals(dCalcs, 3);
+    test.equals(fCalcs, 3);
+    test.deepEqual(buffer, [8, 11, 14]);
+    
+    test.done();
+}
 
 exports.test_nested_observable2 = function(test) {
     var factor = mobservable(0);
