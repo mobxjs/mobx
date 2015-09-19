@@ -1,4 +1,8 @@
 
+# 0.6.9
+
+* Fixed bug where views where sometimes not triggered again if the dependency tree changed to much.
+
 # 0.6.8
 
 * Introduced `when`, which, given a reactive predicate, observes it until it returns true.

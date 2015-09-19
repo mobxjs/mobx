@@ -170,8 +170,6 @@ var mobservable;
                 }
                 var _a = _.quickDiff(this.observing, this.prevObserving), added = _a[0], removed = _a[1];
                 this.prevObserving = null;
-                for (var i = 0, l = removed.length; i < l; i++)
-                    removed[i].removeObserver(this);
                 this.hasCycle = false;
                 for (var i = 0, l = added.length; i < l; i++) {
                     var dependency = added[i];
@@ -184,6 +182,8 @@ var mobservable;
                         added[i].addObserver(this);
                     }
                 }
+                for (var i = 0, l = removed.length; i < l; i++)
+                    removed[i].removeObserver(this);
             };
             ViewNode.prototype.findCycle = function (node) {
                 var obs = this.observing;
