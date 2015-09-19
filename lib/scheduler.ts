@@ -12,21 +12,23 @@ namespace mobservable {
             private static isAsyncScheduled = false;
             private static asyncViewsReady = new _.SimpleEventEmitter();
 
-            public static schedule(func:Lambda, async:boolean) {
-                if (async) {
-                    Scheduler.asyncTasks.push(func);
-                    if (!Scheduler.isAsyncScheduled) {
-                        setTimeout(function() {
-                            Scheduler.processAsyncViews();
-                        }, 1);
-                    }
-                } else if (Scheduler.inBatch < 1) {
+            public static schedule(func:Lambda) {
+                if (Scheduler.inBatch < 1) {
                     func();
                 } else {
                     Scheduler.tasks[Scheduler.tasks.length] = func;
                 }
             }
-            
+
+            public static scheduleAsync(func:Lambda) {
+                Scheduler.asyncTasks.push(func);
+                if (!Scheduler.isAsyncScheduled) {
+                    setTimeout(function() {
+                        Scheduler.processAsyncViews();
+                    }, 1);
+                }
+            }
+
             private static processAsyncViews() {
                 var f:Mobservable.Lambda, i = -1;
                 while(f = Scheduler.asyncTasks[++i]) {

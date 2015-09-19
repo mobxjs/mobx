@@ -108,6 +108,7 @@ namespace mobservable {
          * A node in the state dependency root that observes other nodes, and can be observed itself.
          * Represents the state of a View.
          */
+        // TODO: split to separate file
         export class ViewNode extends DataNode {
             isSleeping = true; // isSleeping: nobody is observing this dependency node, so don't bother tracking DNode's this DNode depends on
             hasCycle = false;  // this node is part of a cycle, which is an error
@@ -143,7 +144,7 @@ namespace mobservable {
                 if (this.isSleeping) {
                     this.isSleeping = false;
                     this.state = NodeState.PENDING;
-                    this.computeNextState();
+                    this.scheduleComputeNextState();
                 }
             }
 
@@ -155,22 +156,33 @@ namespace mobservable {
                 } else { // not stale, thus ready since pending states are not propagated
                     if (stateDidActuallyChange)
                         this.dependencyChangeCount += 1;
-                    if (--this.dependencyStaleCount === 0) { // all dependencies are ready
+                    if (--this.dependencyStaleCount === 0 && this.state === NodeState.STALE) { 
+                        // all dependencies are ready, no re-calculation was scheduled yet
                         this.state = NodeState.PENDING;
                         Scheduler.schedule(() => {
                             // did any of the observables really change?
                             if (this.dependencyChangeCount > 0)
-                                this.computeNextState();
+                                this.scheduleComputeNextState();
                             else
                                 // we're done, but didn't change, lets make sure verybody knows..
                                 this.markReady(false);
                             this.dependencyChangeCount = 0;
-                        }, this.async);
+                        });
                     }
                 }
             }
 
-            computeNextState() {
+            private scheduleComputeNextState() {
+                if (this.async)
+                    Scheduler.scheduleAsync(() => this.computeNextState());
+                else
+                    this.computeNextState();
+            }
+            
+            private computeNextState() {
+                if (this.isDisposed)
+                    return;
+
                 this.trackDependencies();
                 if (_.transitionTracker)
                     _.reportTransition(this, "PENDING");
