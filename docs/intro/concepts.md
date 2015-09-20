@@ -90,4 +90,4 @@ todoStore.todos[0].completed = true;
 
 ```
 
-In the [5 minute introduction to Mobservable and React](mweststrate.github.io/mobservable/getting-started.html) you can dive deeper into this example and build an user interface using [React](https://facebook.github.io/react/) around it.
+In the [5 minute introduction to Mobservable and React](https://mweststrate.github.io/mobservable/getting-started.html) you can dive deeper into this example and build an user interface using [React](https://facebook.github.io/react/) around it.
