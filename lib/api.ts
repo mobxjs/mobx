@@ -19,7 +19,7 @@ interface _IMobservableStatic {
     // old alias for observe:
     sideEffect(func: Mobservable.Lambda, scope?: any): Mobservable.Lambda;
 
-    when(predicate: ()=>boolean, effect: Mobservable.Lambda, scope?: any): Mobservable.Lambda;
+    observeUntil(predicate: ()=>boolean, effect: Mobservable.Lambda, scope?: any): Mobservable.Lambda;
 
     transaction<T>(action: ()=>T): T;
 

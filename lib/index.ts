@@ -73,7 +73,7 @@ namespace mobservable {
         return disposer;
     }
 
-    export function when(predicate: ()=>boolean, effect: Mobservable.Lambda, scope?: any): Mobservable.Lambda {
+    export function observeUntil(predicate: ()=>boolean, effect: Mobservable.Lambda, scope?: any): Mobservable.Lambda {
         const disposer = observe(() => {
             if (predicate.call(scope)) {
                 disposer();
@@ -81,6 +81,11 @@ namespace mobservable {
             }
         });
         return disposer;
+    }
+    
+    export function when(predicate: ()=>boolean, effect: Mobservable.Lambda, scope?: any): Mobservable.Lambda {
+        console.error("[mobservable.when] deprecated, please use 'mobservable.observeUntil'");
+        return observeUntil(predicate, effect, scope);
     }
 
     export function extendReactive(target:Object, properties:Object, context?:Mobservable.IContextInfoStruct):Object {
