@@ -684,6 +684,51 @@ exports.test_when = function(test) {
     test.done();
 };
 
+exports.test_async = function(test) {
+    var called = 0;
+    var x = mobservable(3);
+    var y = mobservable(1);
+   
+    var value;
+    
+    var disposer = mobservable.observeAsync(
+        function() {
+            return x() * y();
+        }, function(newValue) {
+            called += 1;
+            value = newValue;
+        }
+    );
+    
+    x(4);
+    x(5);
+    y(2);
+    
+    setTimeout(function() {
+        test.equal(called, 1);
+        test.equal(value, 10);
+
+        x(4);
+        x(6);
+        y(1);
+        
+        setTimeout(function() {
+            test.equal(called, 2);
+            test.equal(value, 6);
+            
+            x(7);
+            disposer();
+            // after calling disposer, observeAsync should not update anymore! even if its scheduled
+            
+            setTimeout(function() {
+                test.equal(called, 2);
+                test.equal(value, 6);
+                test.done();
+            }, 10);
+        }, 10);
+    }, 10);
+};
+
 exports.test_json1 = function(test) {
     var todos = mobservable([
         {

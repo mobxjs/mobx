@@ -6,6 +6,8 @@
 
 namespace mobservable {
     export namespace _ {
+        // TODO: rewrite to closures instead of this weird static class..
+        // TODO: type alias Lambda plz..
         export class Scheduler {
             private static inBatch = 0;
             private static tasks:{():void}[] = [];

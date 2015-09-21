@@ -57,10 +57,10 @@ namespace mobservable {
         return observe(func, scope);
     }
 
-    export function observe(func:Lambda, scope?:any):Lambda {
-        const observable = new _.ObservableView(func, scope, {
+    export function observe(view:Lambda, scope?:any):Lambda {
+        const observable = new _.ObservableView(view, scope, {
             object: scope,
-            name: func.name
+            name: view.name
         });
         observable.setRefCount(+1);
         const disposer = _.once(() => {
@@ -82,7 +82,28 @@ namespace mobservable {
         });
         return disposer;
     }
-    
+
+    export function observeAsync<T>(view: () => T, effect: (latestValue : T ) => void, delay:number = 1, scope?: any): Lambda {
+        var latestValue: T = undefined;
+        var timeoutHandle;
+
+        const disposer = observe(() => {
+            latestValue = view.call(scope);
+            if (!timeoutHandle) {
+                timeoutHandle = setTimeout(() => {
+                    effect.call(scope, latestValue);
+                    timeoutHandle = null;
+                }, delay);
+            }
+        });
+
+        return _.once(() => {
+            disposer();
+            if (timeoutHandle)
+                clearTimeout(timeoutHandle);
+        });
+    }
+
     export function when(predicate: ()=>boolean, effect: Mobservable.Lambda, scope?: any): Mobservable.Lambda {
         console.error("[mobservable.when] deprecated, please use 'mobservable.observeUntil'");
         return observeUntil(predicate, effect, scope);
@@ -141,7 +162,7 @@ namespace mobservable {
         }
         return source;
     }
-    
+
     export function toJson(source) {
         console.warn("mobservable.toJson is deprecated, use mobservable.toJSON instead");
         return toJSON(source);
@@ -172,7 +193,7 @@ namespace mobservable {
     }
 
     export var logLevel = 1; // 0 = production, 1 = development, 2 = debugging
-    
+
     setTimeout(function() {
         if (logLevel > 0)
             console.info(`Welcome to mobservable. Current logLevel = ${logLevel}. Change mobservable.logLevel according to your needs: 0 = production, 1 = development, 2 = debugging`);

@@ -1,4 +1,9 @@
 
+# 0.6.10
+
+* Improved typings (will be distributed through DefinitelyTyped in the near future)
+* Introduced `observeAsync`.
+
 # 0.6.9
 
 * Fixed bug where views where sometimes not triggered again if the dependency tree changed to much.

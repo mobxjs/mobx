@@ -43,16 +43,16 @@ interface _IMobservableStatic {
     /**
      * Creates a reactive view and keeps it alive, so that the view is always
      * updated if one of the dependencies changes, even when the view is not further used by something else.
-     * @param func The reactive view
+     * @param view The reactive view
      * @param scope (optional)
      * @returns disposer function, which can be used to stop the view from being updated in the future.
      */
-    observe(func: Mobservable.Lambda, scope?: any): Mobservable.Lambda;
+    observe(view: Mobservable.Lambda, scope?: any): Mobservable.Lambda;
     
     /**
      * Deprecated, use mobservable.observe instead.
      */
-    sideEffect(func: Mobservable.Lambda, scope?: any): Mobservable.Lambda;
+    sideEffect(view: Mobservable.Lambda, scope?: any): Mobservable.Lambda;
 
     /**
      * Similar to 'observer', observes the given predicate until it returns true.
@@ -64,6 +64,19 @@ interface _IMobservableStatic {
      */
     observeUntil(predicate: ()=>boolean, effect: Mobservable.Lambda, scope?: any): Mobservable.Lambda;
 
+    /**
+     * Once the view triggers, effect will be scheduled in the background.
+     * If observer triggers multiple times, effect will still be triggered only once, so it achieves a similar effect as transaction.
+     * This might be useful for stuff that is expensive and doesn't need to happen synchronously; such as server communication.
+     * Afther the effect has been fired, it can be scheduled again if the view is triggered in the future.
+     * 
+     * @param view to observe. If it returns a value, the latest returned value will be passed into the scheduled effect.
+     * @param the effect that will be executed, a fixed amount of time after the first trigger of 'view'.
+     * @param delay, optional. After how many milleseconds the effect should fire.
+     * @param scope, optional, the 'this' value of 'view' and 'effect'.
+     */
+    observeAsync<T>(view: () => T, effect: (latestValue : T ) => void, delay?:number, scope?: any): Mobservable.Lambda;
+        
     /**
      * During a transaction no views are updated until the end of the transaction.
      * The transaction will be run synchronously nonetheless.

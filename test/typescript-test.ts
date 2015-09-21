@@ -65,5 +65,15 @@ export function testTyping(test) {
 
     var x:Mobservable.IObservableValue<number> = mobservable(3);
 
+    var d1 = mobservable.observeAsync(() => 3, (num:number) => {
+        // noop
+    });
+    
+    var d2 = mobservable.observeAsync(function() {
+        
+    }, function() {
+        // noop
+    });
+
     test.done();
 }
