@@ -1,8 +1,8 @@
-/// <reference path="./observablearray.ts" />
-/// <reference path="./observableview.ts" />
-/// <reference path="./index.ts" />
-/// <reference path="./api.ts" />
-/// <reference path="./utils.ts" />
+/**
+ * mobservable
+ * (c) 2015 - Michel Weststrate
+ * https://github.com/mweststrate/mobservable
+ */
 
 namespace mobservable {
 	export namespace _ {

@@ -662,7 +662,6 @@ exports.test_observe = function(test) {
 
     test.done();
 };
-
 exports.test_when = function(test) {
     var x = mobservable(3);
 

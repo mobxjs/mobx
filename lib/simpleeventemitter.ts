@@ -1,3 +1,9 @@
+/**
+ * mobservable
+ * (c) 2015 - Michel Weststrate
+ * https://github.com/mweststrate/mobservable
+ */
+
 namespace mobservable {
     export namespace _ {
 

@@ -1,8 +1,8 @@
-/// <reference path="./index.ts" />
-/// <reference path="./utils.ts" />
-/// <reference path="./dnode.ts" />
-/// <reference path="./observablearray.ts" />
-/// <reference path="./api.ts" />
+/**
+ * mobservable
+ * (c) 2015 - Michel Weststrate
+ * https://github.com/mweststrate/mobservable
+ */
 
 namespace mobservable {
 	export namespace _ {

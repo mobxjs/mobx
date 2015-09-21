@@ -4,20 +4,6 @@
  * https://github.com/mweststrate/mobservable
  */
 
-/// <refererence path="./utils.ts" />
-/// <refererence path="./scheduler.ts" />
-/// <refererence path="./simpleeventemitter.ts" />
-/// <refererence path="./dnode.ts" />
-/// <refererence path="./observablevalue.ts" />
-/// <refererence path="./observablearray.ts" />
-/// <refererence path="./observableobject.ts" />
-/// <refererence path="./watch.ts" />
-/// <refererence path="./observableview.ts" />
-/// <refererence path="./reactjs.ts" />
-/// <refererence path="./umd.ts" />
-/// <refererence path="./api.ts" />
-/// <refererence path="./extras.ts" />
-
 namespace mobservable {
 
     export type Lambda = Mobservable.Lambda;

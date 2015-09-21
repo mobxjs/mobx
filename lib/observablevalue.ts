@@ -1,4 +1,9 @@
-/// <reference path="./dnode.ts" />
+/**
+ * mobservable
+ * (c) 2015 - Michel Weststrate
+ * https://github.com/mweststrate/mobservable
+ */
+
 namespace mobservable {
     export namespace _ {
         export class ObservableValue<T> extends DataNode {

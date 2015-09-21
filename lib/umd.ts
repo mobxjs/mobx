@@ -1,12 +1,14 @@
 /**
+ * mobservable
+ * (c) 2015 - Michel Weststrate
+ * https://github.com/mweststrate/mobservable
+ */
+
+/**
  * This file basically works around all the typescript limitations that exist atm:
  * 1. not being able to generate an external (UMD) module from multiple files (thats why we have internal module)
  * 2. not being able to merge a default export declaration with non-default export declarations
  */
-
-/// <reference path="./utils.ts" />
-/// <reference path="./index.ts" />
-/// <reference path="./api.ts" />
 
 /**
  * This complete file is a fight against the system since typescript cannot decently generate

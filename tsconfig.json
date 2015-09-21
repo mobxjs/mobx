@@ -2,10 +2,26 @@
     "version": "1.5.3",
     "compilerOptions": {
         "target": "es5",
-        "experimentalDecorators": true
+        "out": "./.build/mobservable.js",
+        "sourceMap": true
     },
+    "files": [
+        "./lib/utils.ts",
+        "./lib/scheduler.ts",
+        "./lib/simpleeventemitter.ts", 
+        "./lib/dnode.ts",
+        "./lib/observablevalue.ts", 
+        "./lib/observablearray.ts", 
+        "./lib/observableobject.ts",
+        "./lib/observableview.ts",
+        "./lib/reactjs.ts", 
+        "./lib/api.ts",
+        "./lib/extras.ts", 
+        "./lib/index.ts",
+        "./lib/umd.ts"
+    ],
     "filesGlob": [
-        "./**/*.ts",
+        "./lib/*.ts",
         "!./node_modules/**/*.ts",
         "!./dist/*.d.ts"
     ]

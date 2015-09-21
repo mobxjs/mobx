@@ -3,7 +3,7 @@ var mkdirp = require('mkdirp');
 var path = require('path');
 
 module.exports = function(grunt) {
-    var tsc = "node " + __dirname + "/node_modules/typescript/bin/tsc.js".replace(/\//g, path.sep);
+    var tsc = "node " + __dirname + "/node_modules/typescript/bin/tsc".replace(/\//g, path.sep);
     console.log("Compiling with: " + tsc);
     grunt.initConfig({
         nodeunit: {
@@ -17,8 +17,8 @@ module.exports = function(grunt) {
                 cmd: tsc + " typescript-test.ts -m commonjs -t es5 --experimentalDecorators",
                 cwd: "test/"
             },
-            buildlocal: tsc + " lib/*.ts -t es5 --sourceMap --out .build/mobservable.js",
-            builddist: tsc + " lib/*.ts -t es5 --removeComments -out dist/mobservable.js"
+            buildlocal: tsc,
+            builddist: tsc + " -out dist/mobservable.js"
         },
         coveralls: {
             options: {
