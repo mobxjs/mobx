@@ -65,6 +65,7 @@ namespace mobservable {
         observable.setRefCount(+1);
         const disposer = _.once(() => {
             observable.setRefCount(-1);
+            // TODO: observable.dispose?
         });
         if (logLevel >= 2 && observable.observing.length === 0)
             console.warn(`[mobservable.sideEffect] not a single observable was used inside the side-effect function. Side-effect would be a no-op.`);
@@ -106,7 +107,8 @@ namespace mobservable {
         if (descriptor && descriptor.set)
             throw new Error("@observable properties cannot have a setter.");
         Object.defineProperty(target, key, {
-            configurable: true, enumberable:true,
+            configurable: true,
+            enumerable:true,
             get: function() {
                 _.ObservableObject.asReactive(this, null).set(key, undefined, true);
                 return this[key];
