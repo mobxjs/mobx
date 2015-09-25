@@ -1,4 +1,5 @@
 var mobservable = require('mobservable');
+var m = mobservable;
 
 var makeReactive = mobservable.makeReactive;
 var voidObserver = function(){};
@@ -66,8 +67,6 @@ exports.testException2 = function(test) {
 
     test.done();
 };
-
-/* TODO: enable in 0.7 if state changes are completely denied?
 
 exports.deny_state_changes = function(test) {
     try {
@@ -154,8 +153,25 @@ exports.deny_array_change = function(test) {
     catch(e) {
         console.log(e.stack);
     }
-}
-*/
+};
+
+exports.enable_change_state_if_non_strict_mode = function(test) {
+    try {
+        debugger;
+        m.strict = false;
+        var x = makeReactive(3);
+        var y = makeReactive(1);
+        var dis = m.observe(function() {
+            y();
+            x(4);
+        });
+        test.equal(x(), 4);
+        dis();
+        test.done();
+    } finally {
+        m.strict = true;
+    }
+};
 
 exports.cycle1 = function(test) {
     try {

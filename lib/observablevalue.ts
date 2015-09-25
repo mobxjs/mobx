@@ -25,11 +25,7 @@ namespace mobservable {
             }
 
             set(value:T) {
-                if (_.isComputingView()) {
-                    var ts = __mobservableViewStack;
-                    console.error(`[mobservable.value '${this.context.name}'] It is not allowed to change the state during the computation of a reactive view. (stack size is ${ts.length}, active view: "${ts[ts.length -1].toString()}")`);
-                    console.trace();
-                }
+                checkIfStateIsBeingModifiedDuringView(this.context);
                 if (value !== this._value) {
                     var oldValue = this._value;
                     this.markStale();

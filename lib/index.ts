@@ -194,9 +194,11 @@ namespace mobservable {
 
     export var logLevel = 1; // 0 = production, 1 = development, 2 = debugging
 
+    export var strict = true;
+
     setTimeout(function() {
         if (logLevel > 0)
-            console.info(`Welcome to mobservable. Current logLevel = ${logLevel}. Change mobservable.logLevel according to your needs: 0 = production, 1 = development, 2 = debugging`);
+            console.info(`Welcome to mobservable. Current logLevel = ${logLevel}. Change mobservable.logLevel according to your needs: 0 = production, 1 = development, 2 = debugging. Strict mode is ${strict ? 'enabled' : 'disabled'}.`);
     }, 1);
 
     export namespace _ {

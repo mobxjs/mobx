@@ -16,8 +16,20 @@ namespace mobservable {
     globalScope.__mobservableViewStack = [];
 
     export namespace _ {
-
         var mobservableId = 0;
+
+        export function checkIfStateIsBeingModifiedDuringView(context:Mobservable.IContextInfoStruct) {
+            if (isComputingView() && mobservable.strict === true) {
+                // TODO: add url with detailed error subscription / best practice here:
+                const ts = __mobservableViewStack;
+                throw new Error(
+`[mobservable] It is not allowed to change the state during the computation of a reactive view if 'mobservable.strict' mode is enabled:
+ Should the data you are trying to modify actually be a view?
+ View name: ${context.name}.
+ Current stack size is ${ts.length}, active view: "${ts[ts.length -1].toString()}".`
+                );
+            }
+        }
 
         /**
          * The state of some node in the dependency tree that is created for all views.

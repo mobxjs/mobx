@@ -45,7 +45,6 @@ namespace mobservable {
             }
 
             set length(newLength:number) {
-                this.assertNotComputing("spliceWithArray");
                 if (typeof newLength !== "number" || newLength < 0)
                     throw new Error("[mobservable.array] Out of range: " + newLength);
                 var currentLength = this.$mobservable.values.length;
@@ -72,7 +71,6 @@ namespace mobservable {
             }
 
             spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[] {
-                this.assertNotComputing("spliceWithArray");
                 var length = this.$mobservable.values.length;
                 if  ((newItems === undefined || newItems.length === 0) && (deleteCount === 0 || length === 0))
                     return [];
@@ -136,6 +134,7 @@ namespace mobservable {
             }
 
             private notifyChanged() {
+                checkIfStateIsBeingModifiedDuringView(this.$mobservable.context); 
                 this.$mobservable.markStale();
                 this.$mobservable.markReady(true);
             }
@@ -191,7 +190,6 @@ namespace mobservable {
                 and for that reason the do not call dependencyState.notifyObserved
              */
             splice(index:number, deleteCount?:number, ...newItems:T[]):T[] {
-                this.assertNotComputing("splice");
                 switch(arguments.length) {
                     case 0:
                         return [];
@@ -204,39 +202,32 @@ namespace mobservable {
             }
 
             push(...items: T[]): number {
-                this.assertNotComputing("push");
                 this.spliceWithArray(this.$mobservable.values.length, 0, items);
                 return this.$mobservable.values.length;
             }
 
             pop(): T {
-                this.assertNotComputing("pop");
                 return this.splice(Math.max(this.$mobservable.values.length - 1, 0), 1)[0];
             }
 
             shift(): T {
-                this.assertNotComputing("shift");
                 return this.splice(0, 1)[0]
             }
 
             unshift(...items: T[]): number {
-                this.assertNotComputing("unshift");
                 this.spliceWithArray(0, 0, items);
                 return this.$mobservable.values.length;
             }
 
             reverse():T[] {
-                this.assertNotComputing("reverse");
                 return this.replace(this.$mobservable.values.reverse());
             }
 
             sort(compareFn?: (a: T, b: T) => number): T[] {
-                this.assertNotComputing("sort");
                 return this.replace(this.$mobservable.values.sort.apply(this.$mobservable.values, arguments));
             }
 
             remove(value:T):boolean {
-                this.assertNotComputing("remove");
                 var idx = this.$mobservable.values.indexOf(value);
                 if (idx > -1) {
                     this.splice(idx, 1);
@@ -270,11 +261,6 @@ namespace mobservable {
             reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { throw "Illegal state"; }
             reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U { throw "Illegal state"; }
 
-            private assertNotComputing(funcName:string) {
-                if (_.isComputingView()) {
-                    console.error(`[mobservable.array] The method array.${funcName} is not allowed to be used inside reactive views since it alters the state.`);
-                }
-            }
         }
 
         /**
