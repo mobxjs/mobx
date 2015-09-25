@@ -53,7 +53,7 @@ namespace mobservable {
     }
 
     export function sideEffect(func:Lambda, scope?:any):Lambda {
-        // TODO: add deprecation warning
+        console.warn(`[mobservable.sideEffect] 'sideEffect' has been renamed to 'observe' and will be removed in a later version.`);
         return observe(func, scope);
     }
 
@@ -68,7 +68,7 @@ namespace mobservable {
             // TODO: observable.dispose?
         });
         if (logLevel >= 2 && observable.observing.length === 0)
-            console.warn(`[mobservable.sideEffect] not a single observable was used inside the side-effect function. Side-effect would be a no-op.`);
+            console.warn(`[mobservable.observe] not a single observable was used inside the side-effect function. This observer is now a no-op.`);
         (<any>disposer).$mobservable = observable;
         return disposer;
     }
