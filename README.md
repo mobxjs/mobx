@@ -1,5 +1,7 @@
 # mobservable
 
+[![Join the chat at https://gitter.im/mweststrate/mobservable](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mweststrate/mobservable?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 <img src="https://mweststrate.github.io/mobservable/images/mobservable.png" align="right" width="120px" />
 
 ##### _Keeps views automatically in sync with state. Unobtrusively._
