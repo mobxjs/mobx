@@ -38,7 +38,23 @@ declare var module;
 }(this, function () {
     var m = mobservable.makeReactive; // The default export
     m['default'] = mobservable.makeReactive;
-    for (var key in mobservable) if (mobservable.hasOwnProperty(key))
-        m[key] = mobservable[key]; // the non-default exports
+    for (var key in mobservable) 
+        if (mobservable.hasOwnProperty(key))
+            m[key] = mobservable[key]; // the non-default exports
+
+    // Turn by-value-exports into properties  :-/
+    Object.defineProperties(m, {
+        logLevel: {
+            get: () => mobservable.logLevel,
+            set: (value) => mobservable.logLevel = value,
+            enumerable: true
+        },
+        strict: {
+            get: () => mobservable.strict,
+            set: (value) => mobservable.strict = value,
+            enumerable: true
+        }
+    });
+
     return m;
 }));
