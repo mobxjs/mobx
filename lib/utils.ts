@@ -37,6 +37,41 @@ namespace mobservable {
         }
 
         /**
+         * Naive deepEqual. Doesn't check for prototype, non-enumerable or out-of-range properties on arrays.
+         * If you have such a case, you probably should use this function but something fancier :).
+         */
+        export function deepEquals(a, b) {
+            if (a === null && b === null)
+                return true;
+            if (a === undefined && b === undefined)
+                return true;
+            const aIsArray = Array.isArray(a) || a instanceof ObservableArray;
+            if (aIsArray !== (Array.isArray(b) || b instanceof ObservableArray)) {
+                return false;
+            } else if (aIsArray) {
+                if (a.length !== b.length)
+                    return false;
+                for (var i = a.length; i >= 0; i--)
+                    if (!deepEquals(a[i], b[i]))
+                        return false;
+                return true;
+            } else if (typeof a === "object" && typeof b === "object") {
+                if (a === null || b === null)
+                    return false;
+                if (Object.keys(a).length !== Object.keys(b).length)
+                    return false;
+                for(var prop in a) {
+                    if (!b.hasOwnProperty(prop))
+                        return false;
+                    if (!deepEquals(a[prop], b[prop]))
+                        return false;
+                }
+                return true;
+            }
+            return a === b;
+        }
+
+        /**
          * Given a new and an old list, tries to determine which items are added or removed
          * in linear time. The algorithm is heuristic and does not give the optimal results in all cases.
          * (For example, [a,b] -> [b, a] yiels [[b,a],[a,b]])

@@ -188,7 +188,6 @@ exports.makeReactive4 = function(test) {
 
 exports.makeReactive5 = function(test) {
 
-
     var x = m(function() { });
     test.throws(function() {
         x(7); // set not allowed
@@ -203,8 +202,9 @@ exports.makeReactive5 = function(test) {
     test.equal(x3(), f);
     x3(null); // allowed
 
-    var f = function() { return this.price };
+    f = function() { return this.price };
 
+    debugger;
     var x = m({
         price : 17,
         reactive: f,
@@ -217,7 +217,167 @@ exports.makeReactive5 = function(test) {
     });
 
     x.price = 18;
-    test.deepEqual(b.toArray(), [[17, f, 17], [18, f, 18]]);
+    var three = function() { return 3; }
+    x.nonReactive = three;
+    test.deepEqual(b.toArray(), [[17, f, 17], [18, f, 18], [18, three, 3]]);
 
+    test.done();
+};
+
+
+exports.test_as_structure = function(test) {
+    
+    var x = m.makeReactive({
+        x: m.asStructure(null)
+    });
+    
+    var changed = 0;
+    var dis = m.observe(function() {
+        changed++;
+        JSON.stringify(x);
+    });
+    
+    function c() {
+        test.equal(changed, 1, "expected a change");
+        changed = 0;
+    }
+
+    function nc() {
+        test.equal(changed, 0, "expected no change");
+        changed = 0;
+    }
+    
+    // nc = no change, c = changed.
+    c();
+    x.x = null;
+    nc();
+    x.x = undefined;
+    c();
+    x.x = 3;
+    c();
+    x.x = 1* x.x;
+    nc();
+    x.x = "3";
+    c();
+
+    x.x = {
+        y: 3
+    };
+    c();
+    x.x.y = 3;
+    nc();
+    x.x = {
+        y: 3
+    };
+    nc();
+    x.x = {
+        y: 4
+    };
+    c();
+    x.x = {
+        y: 3
+    };
+    c();
+    x.x = {
+        y: {
+            y: 3
+        }
+    };
+    c();
+    x.x.y.y = 3;
+    nc();
+    x.x.y = { y: 3 };
+    nc();
+    x.x = { y: { y: 3 }};
+    nc();
+    x.x = { y: { y: 4 }};
+    c();
+    x.x = {};
+    c();
+    x.x = {};
+    nc();
+
+    x.x = [];
+    c();
+    x.x = [];
+    nc();
+    x.x = [3,2,1];
+    c();
+    x.x.sort();
+    c();
+    x.x.sort();
+    c(); // But.., Ideally, no change here ..! nc();
+    x.x[1] = 2;
+    nc();
+    x.x[0] = 0;
+    c();
+    x.x[1] = {
+        a: [1,2]
+    };
+    c();
+    x.x[1].a = [1,2];
+    nc();
+    x.x[1].a[1] = 3;
+    c();
+    x.x[1].a[2] = 3;
+    c();
+    x.x = {
+        a : [ {
+            b : 3
+        }]
+    };
+    c();
+    x.x = {
+        a : [ {
+            b : 3
+        }]
+    };
+    nc();
+    x.x.a = [{ b : 3 }]
+    nc();
+    x.x.a[0] = { b: 3 };
+    nc();
+    x.x.a[0].b = 3;
+    nc();
+    
+    dis();
+    test.done();
+};
+
+exports.test_as_structure_view = function(test) {
+    var x = m.makeReactive({
+        a: 1,
+        aa: 1,
+        b: function() {
+            this.a;
+            return { a: this.aa };
+        },
+        c: m.asStructure(function() {
+            this.b
+            return { a : this.aa };
+        })
+    });
+
+    var bc = 0;
+    var bo = m.observe(function() {
+        x.b;
+        bc++;
+    });
+    test.equal(bc, 1);
+    
+    var cc = 0;
+    var co = m.observe(function() {
+        x.c;
+        cc++;
+    });
+    test.equal(cc, 1);
+
+    x.a = 2;
+    x.a = 3;
+    test.equal(bc, 3);
+    test.equal(cc, 1);
+    x.aa = 3;
+    test.equal(bc, 4);
+    test.equal(cc, 2);
     test.done();
 };

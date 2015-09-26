@@ -551,7 +551,6 @@ exports.test_multiple_view_dependencies = function(test) {
     var buffer = [];
     var fCalcs = 0;
     var dis = m.observe(function() {
-        debugger;
         fCalcs++;
         if (zwitch)
             buffer.push(b() + d());

@@ -10,26 +10,29 @@ namespace mobservable {
             protected changeEvent = new SimpleEventEmitter();
             protected _value: T;
 
-            constructor(protected value:T, protected recurse:boolean, context:Mobservable.IContextInfoStruct){
+            constructor(protected value:T, protected mode:ValueMode, context:Mobservable.IContextInfoStruct){
                 super(context);
-                this._value = this.makeReferenceValueReactive(value);
+                const [childmode, unwrappedValue] = getValueModeFromValue(value, ValueMode.Recursive);
+                // If the value mode is recursive, modifiers like 'structure', 'reference', or 'flat' could apply
+                if (this.mode === ValueMode.Recursive)
+                    this.mode = childmode;
+                this._value = this.makeReferenceValueReactive(unwrappedValue);
             }
 
             private makeReferenceValueReactive(value) {
-                if (this.recurse && (Array.isArray(value) || isPlainObject(value)))
-                    return makeReactive(value, {
-                        context: this.context.object,
-                        name: this.context.name
-                    });
-                return value;
+                return makeChildReactive(value, this.mode, this.context);
             }
 
-            set(value:T) {
+            set(newValue:T) {
                 checkIfStateIsBeingModifiedDuringView(this.context);
-                if (value !== this._value) {
+                const changed = this.mode === ValueMode.Structure ? !deepEquals(newValue, this._value) : newValue !== this._value;
+                // Possible improvement; even if changed and structural, apply the minium amount of updates to alter the object,
+                // To minimize the amount of observers triggered.
+                // Complex. Is that a useful case?
+                if (changed) {
                     var oldValue = this._value;
                     this.markStale();
-                    this._value = this.makeReferenceValueReactive(value);
+                    this._value = this.makeReferenceValueReactive(newValue);
                     this.markReady(true);
                     this.changeEvent.emit(this._value, oldValue);
                 }

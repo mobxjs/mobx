@@ -36,6 +36,18 @@ interface _IMobservableStatic {
     asReference<T>(value: any):{value:T};
 
     /**
+     * Can be used in combination with makeReactive / extendReactive.
+     * Enforces that values that are deeply equalled identical to the previous are considered to unchanged.
+     * (the default equality used by mobservable is reference equality).
+     * Values that are still reference equal, but not deep equal, are considered to be changed.
+     * asStructure can only be used incombinations with arrays or objects.
+     * It does not support cyclic structures.
+     * Future assignments to the same property will inherit this behavior.
+     * @param value initial value of the reactive property that is being defined.
+     */
+    asStructure<T>(value: any):{value:T};
+
+    /**
      * ES6 / Typescript decorator which can to make class properties and getter functions reactive.
      */
     observable(target: Object, key: string):any; // decorator / annotation
