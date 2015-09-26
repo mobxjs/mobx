@@ -296,22 +296,33 @@ var mobservable;
         return _.extendReactive(target, properties, true, context);
     }
     mobservable.extendReactive = extendReactive;
-    function observable(target, key, descriptor) {
-        var baseValue = descriptor ? descriptor.value : null;
-        if (typeof baseValue === "function")
-            throw new Error("@observable functions are deprecated. Use @observable (getter) properties instead");
-        if (descriptor && descriptor.set)
-            throw new Error("@observable properties cannot have a setter.");
-        Object.defineProperty(target, key, {
-            configurable: true, enumberable: true,
-            get: function () {
-                _.ObservableObject.asReactive(this, null).set(key, undefined, true);
-                return this[key];
-            },
-            set: function (value) {
-                _.ObservableObject.asReactive(this, null).set(key, value, true);
-            }
-        });
+    function observable(target, key, baseDescriptor) {
+        var isDecoratingProperty = baseDescriptor && !baseDescriptor.hasOwnProperty("value");
+        var descriptor = baseDescriptor || {};
+        var baseValue = isDecoratingProperty ? descriptor.get : descriptor.value;
+        if (!isDecoratingProperty && typeof baseValue === "function")
+            throw new Error("@observable functions are deprecated. Use @observable on a getter function if you want to create a view, or wrap the value in 'asReference' if you want to store a value (found on member " + key + ").");
+        if (isDecoratingProperty) {
+            if (typeof baseValue !== "function")
+                throw new Error("@observable expects a getter function if used on a property (found on member " + key + ").");
+            if (descriptor.set)
+                throw new Error("@observable properties cannot have a setter (found on member " + key + ").");
+            if (baseValue.length !== 0)
+                throw new Error("@observable getter functions should not take arguments (found on member " + key + ").");
+        }
+        descriptor.configurable = true;
+        descriptor.enumerable = true;
+        delete descriptor.value;
+        descriptor.get = function () {
+            _.ObservableObject.asReactive(this, null).set(key, baseValue, true);
+            return this[key];
+        };
+        descriptor.set = isDecoratingProperty
+            ? _.throwingViewSetter
+            : function (value) { _.ObservableObject.asReactive(this, null).set(key, value, true); };
+        if (!isDecoratingProperty) {
+            Object.defineProperty(target, key, descriptor);
+        }
     }
     mobservable.observable = observable;
     function toJSON(source) {
@@ -979,6 +990,10 @@ var mobservable;
 (function (mobservable) {
     var _;
     (function (_) {
+        function throwingViewSetter() {
+            throw new Error("[mobservable.view '" + this.context.name + "'] View functions do not accept new values");
+        }
+        _.throwingViewSetter = throwingViewSetter;
         var ObservableView = (function (_super) {
             __extends(ObservableView, _super);
             function ObservableView(func, scope, context) {
@@ -1015,7 +1030,7 @@ var mobservable;
                 return this._value;
             };
             ObservableView.prototype.set = function () {
-                throwingSetter();
+                throwingViewSetter.call(this);
             };
             ObservableView.prototype.compute = function () {
                 var newValue;
@@ -1064,7 +1079,7 @@ var mobservable;
                     configurable: false,
                     enumerable: false,
                     get: function () { return _this.get(); },
-                    set: throwingSetter
+                    set: throwingViewSetter
                 };
             };
             ObservableView.prototype.toString = function () {
@@ -1073,9 +1088,6 @@ var mobservable;
             return ObservableView;
         })(_.ViewNode);
         _.ObservableView = ObservableView;
-        function throwingSetter() {
-            throw new Error("[mobservablei.view '" + this.context.name + "'] View functions do not accept new values");
-        }
     })(_ = mobservable._ || (mobservable._ = {}));
 })(mobservable || (mobservable = {}));
 /// <reference path="./observablearray.ts" />
