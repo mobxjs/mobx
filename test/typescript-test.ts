@@ -67,3 +67,40 @@ export function testTyping(test) {
 
     test.done();
 }
+
+const state:any = mobservable.makeReactive({
+    authToken: null
+});
+
+class LoginStoreTest {
+    loggedIn2;
+    constructor() {
+        mobservable.extendReactive(this, {
+            loggedIn2: () => !!state.authToken
+        });
+    }
+
+    @observable get loggedIn() {
+        return !!state.authToken;
+    }
+}
+
+export function testIssue8(test){
+    var fired = 0;
+
+    const store = new LoginStoreTest();
+    
+    mobservable.observe(() => {
+        fired++;
+        console.log(store.loggedIn);
+    });
+    
+    console.log("1");
+    test.equal(fired, 1);
+    state.authToken = 'a';
+    state.authToken = 'b';
+    console.log("2");
+    
+    test.equal(fired, 2);
+    test.done();
+}

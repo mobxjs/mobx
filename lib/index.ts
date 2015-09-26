@@ -110,25 +110,40 @@ namespace mobservable {
      *   }
      * }
      */
-    export function observable(target:Object, key:string, descriptor?) {
+    export function observable(target:Object, key:string, baseDescriptor?) {
         // observable annotations are invoked on the prototype, not on actual instances,
         // so upon invocation, determine the 'this' instance, and define a property on the
         // instance as well (that hides the propotype property)
-        var baseValue = descriptor ? descriptor.value : null;
-        if (typeof baseValue === "function")
-            throw new Error("@observable functions are deprecated. Use @observable (getter) properties instead");
-        if (descriptor && descriptor.set)
-            throw new Error("@observable properties cannot have a setter.");
-        Object.defineProperty(target, key, {
-            configurable: true, enumberable:true,
-            get: function() {
-                _.ObservableObject.asReactive(this, null).set(key, undefined, true);
-                return this[key];
-            },
-            set: function(value) {
-                _.ObservableObject.asReactive(this, null).set(key, value, true);
-            }
-        });
+        const isDecoratingProperty = baseDescriptor && !baseDescriptor.hasOwnProperty("value");
+        const descriptor:PropertyDescriptor = baseDescriptor || {};
+        const baseValue = isDecoratingProperty ? descriptor.get : descriptor.value; 
+
+        if (!isDecoratingProperty && typeof baseValue === "function")
+            throw new Error(`@observable functions are deprecated. Use @observable on a getter function if you want to create a view, or wrap the value in 'asReference' if you want to store a value (found on member ${key}).`);
+        if (isDecoratingProperty) {
+            if (typeof baseValue !== "function")
+                throw new Error(`@observable expects a getter function if used on a property (found on member ${key}).`);
+            if (descriptor.set)
+                throw new Error(`@observable properties cannot have a setter (found on member ${key}).`);
+            if (baseValue.length !== 0)
+                throw new Error(`@observable getter functions should not take arguments (found on member ${key}).`);
+        }
+
+        descriptor.configurable = true;
+        descriptor.enumerable = true;
+        delete descriptor.value;
+        descriptor.get = function() {
+            _.ObservableObject.asReactive(this, null).set(key, baseValue, true);
+            return this[key];
+        };
+        descriptor.set = isDecoratingProperty 
+            ? _.throwingViewSetter
+            : function(value) { _.ObservableObject.asReactive(this, null).set(key, value, true); }
+        ;
+
+        if (!isDecoratingProperty) {
+            Object.defineProperty(target, key, descriptor);
+        }
     }
 
     /**
