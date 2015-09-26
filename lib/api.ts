@@ -48,6 +48,13 @@ interface _IMobservableStatic {
     asStructure<T>(value: any):{value:T};
 
     /**
+     * Can be used in combination with makeReactive / extendReactive.
+     * The value will be made reactive, but, if the value is an object or array,
+     * children will not automatically be made reactive as well.
+     */
+    asFlat<T>(value: any):{value:T};
+
+    /**
      * ES6 / Typescript decorator which can to make class properties and getter functions reactive.
      */
     observable(target: Object, key: string):any; // decorator / annotation

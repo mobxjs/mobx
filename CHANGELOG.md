@@ -1,11 +1,20 @@
-# 0.6.10
 
-* Fixed issue where @observable did not properly create a stand-alone view
+# 0.7.0
 
-# 0.6.10
-
-* Improved typings (will be distributed through DefinitelyTyped in the near future)
+* Introduced `strict` mode (see issues #30, #31)
+* Renamed `sideEffect` to `observe`
+* Renamed `when` to `observeUntil`
 * Introduced `observeAsync`.
+* Fixed issue where changing the `logLevel` was not picked up.
+* Improved typings (will be distributed through DefinitelyTyped in the near future)
+* Introduces `asStructure` (see #8) and `asFlat`. 
+
+TODO:
+* Deprecated the options object that could be passed to `makeReactive`.
+
+
+# 0.6.10
+* Fixed issue where @observable did not properly create a stand-alone view
 
 # 0.6.9
 

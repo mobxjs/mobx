@@ -16,10 +16,13 @@ namespace mobservable {
         let [mode, value] = _.getValueModeFromValue(v, _.ValueMode.Recursive);
 
         // TODO: deprecate these options
-        if (opts.recurse === false)
+        if (opts.recurse === false) {
+            console.warn("[mobservable.makeReactive] option 'recurse: false' is deprecated, use 'mobservable.asFlat' instead");
             mode = _.ValueMode.Flat;
-        else if (opts.as === "reference")
+        } else if (opts.as === "reference") {
+            console.warn("[mobservable.makeReactive] option 'as: \"reference\"' is deprecated, use 'mobservable.asReference' instead");
             mode = _.ValueMode.Reference;
+        }
 
         const sourceType = mode === _.ValueMode.Reference ? _.ValueType.Reference : _.getTypeOfValue(value);
         const context = {
@@ -38,9 +41,8 @@ namespace mobservable {
                     context.name = value.name;
                 return _.toGetterSetterFunction(new _.ObservableView(value, opts.scope || opts.context, context, mode === _.ValueMode.Structure));
             case _.ValueType.Array:
-                return new _.ObservableArray(<[]>value, mode, context);
             case _.ValueType.PlainObject:
-                return _.extendReactive({}, value, mode, context);
+                return _.makeChildReactive(value, mode, context);
         }
         throw "Illegal State";
     }
@@ -51,6 +53,10 @@ namespace mobservable {
 
     export function asStructure(value) {
         return new _.AsStructure(value);
+    }
+
+    export function asFlat(value) {
+        return new _.AsFlat(value);
     }
 
     export function isReactive(value):boolean {
@@ -156,12 +162,12 @@ namespace mobservable {
         delete descriptor.value;
         delete descriptor.writable;
         descriptor.get = function() {
-            _.ObservableObject.asReactive(this, null, ValueMode.Recursive).set(key, baseValue);
+            _.ObservableObject.asReactive(this, null, _.ValueMode.Recursive).set(key, baseValue);
             return this[key];
         };
         descriptor.set = isDecoratingProperty 
             ? _.throwingViewSetter
-            : function(value) { _.ObservableObject.asReactive(this, null, ValueMode.Recursive).set(key, value); }
+            : function(value) { _.ObservableObject.asReactive(this, null, _.ValueMode.Recursive).set(key, value); }
         ;
 
         if (!isDecoratingProperty) {
@@ -275,6 +281,7 @@ namespace mobservable {
 
         export class AsReference {
             constructor(public value:any) {
+                // TODO: change to: assertUnwrapped
                  if (value instanceof _.AsStructure)
                     throw new Error("[mobservable.asReference] asStructure and asReference cannot be mixed");
             }
@@ -282,8 +289,15 @@ namespace mobservable {
 
         export class AsStructure {
             constructor(public value:any) {
+                // TODO: change to: assertUnwrapped
                  if (value instanceof _.AsReference)
                     throw new Error("[mobservable.asStructure] asStructure and asReference cannot be mixed");
+            }
+        }
+
+        export class AsFlat {
+            constructor(public value:any) {
+                // TODO: change to: assertUnwrapped
             }
         }
 
@@ -292,17 +306,23 @@ namespace mobservable {
                 return [ValueMode.Reference, value.value];
             if (value instanceof AsStructure)
                 return [ValueMode.Structure, value.value];
+            if (value instanceof AsFlat)
+                return [ValueMode.Flat, value.value];
             return [defaultMode, value];
         }
 
         export function makeChildReactive(value, parentMode:ValueMode, context) {
             let childMode: ValueMode;
+            if (isReactive(value))
+                return value;
 
             switch (parentMode) {
                 case ValueMode.Reference:
+                    return value;
                 case ValueMode.Flat:
                     // TODO: check not wrapped
-                    return value;
+                    childMode = ValueMode.Reference;
+                    break;
                 case ValueMode.Structure:
                     // TODO: check not wrapped
                     childMode = ValueMode.Structure;
@@ -314,14 +334,10 @@ namespace mobservable {
                     throw "Illegal State";
             }
 
-            if (childMode !== ValueMode.Reference) {
-                if (isReactive(value))
-                    return value;
-                else if (Array.isArray(value))
-                    return new _.ObservableArray(<[]> value.slice(), childMode, context);
-                else if (isPlainObject(value))
-                    return _.extendReactive({}, value, childMode, context);
-            }
+            if (Array.isArray(value))
+                return new _.ObservableArray(<[]> value.slice(), childMode, context);
+            if (isPlainObject(value))
+                return _.extendReactive({}, value, childMode, context);
             return value;
         }
     }

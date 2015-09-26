@@ -204,7 +204,6 @@ exports.makeReactive5 = function(test) {
 
     f = function() { return this.price };
 
-    debugger;
     var x = m({
         price : 17,
         reactive: f,
@@ -223,6 +222,72 @@ exports.makeReactive5 = function(test) {
 
     test.done();
 };
+
+exports.test_flat_array = function(test) {
+    var x = m.makeReactive({
+        x: m.asFlat([{
+            a: 1
+        }])
+    });
+    
+    var result;
+    var updates = 0;
+    var dis = m.observe(function() {
+        updates++;
+        result = mobservable.toJSON(x);
+    });
+    
+    test.deepEqual(result, { x: [{ a: 1 }]});
+    test.equal(updates, 1);
+    
+    x.x[0].a = 2; // not picked up; object is not made reactive
+    test.deepEqual(result, { x: [{ a: 1 }]});
+    test.equal(updates, 1);
+    
+    x.x.push({ a: 3 }); // picked up, array is reactive
+    test.deepEqual(result, { x: [{ a: 2}, { a: 3 }]});
+    test.equal(updates, 2);
+    
+    x.x[0] = { a: 4 }; // picked up, array is reactive
+    test.deepEqual(result, { x: [{ a: 4 }, { a: 3 }]});
+    test.equal(updates, 3);
+
+    x.x[1].a = 6; // not picked up    
+    test.deepEqual(result, { x: [{ a: 4 }, { a: 3 }]});
+    test.equal(updates, 3);
+    
+    test.done();
+}
+
+exports.test_flat_object = function(test) {
+    var y = m.makeReactive(m.asFlat({
+        x : { z: 3 }
+    }));
+    
+    var result;
+    var updates = 0;
+    var dis = m.observe(function() {
+        updates++;
+        result = mobservable.toJSON(y);
+    });
+
+    test.deepEqual(result, { x: { z: 3 }});
+    test.equal(updates, 1);
+    
+    y.x.z = 4; // not picked up
+    test.deepEqual(result, { x: { z: 3 }});
+    test.equal(updates, 1);
+    
+    y.x = { z: 5 };
+    test.deepEqual(result, { x: { z: 5 }});
+    test.equal(updates, 2);
+
+    y.x.z = 6; // not picked up
+    test.deepEqual(result, { x: { z: 5 }});
+    test.equal(updates, 2);
+    
+    test.done();
+}
 
 
 exports.test_as_structure = function(test) {
