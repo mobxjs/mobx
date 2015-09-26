@@ -132,19 +132,20 @@ namespace mobservable {
         const baseValue = isDecoratingProperty ? descriptor.get : descriptor.value; 
 
         if (!isDecoratingProperty && typeof baseValue === "function")
-            throw new Error(`@observable functions are deprecated. Use @observable on a getter function if you want to create a view, or wrap the value in 'asReference' if you want to store a value (found on member ${key}).`);
+            throw new Error(`@observable functions are deprecated. Use @observable on a getter function if you want to create a view, or wrap the value in 'asReference' if you want to store a value (found on member '${key}').`);
         if (isDecoratingProperty) {
             if (typeof baseValue !== "function")
-                throw new Error(`@observable expects a getter function if used on a property (found on member ${key}).`);
+                throw new Error(`@observable expects a getter function if used on a property (found on member '${key}').`);
             if (descriptor.set)
-                throw new Error(`@observable properties cannot have a setter (found on member ${key}).`);
+                throw new Error(`@observable properties cannot have a setter (found on member '${key}').`);
             if (baseValue.length !== 0)
-                throw new Error(`@observable getter functions should not take arguments (found on member ${key}).`);
+                throw new Error(`@observable getter functions should not take arguments (found on member '${key}').`);
         }
 
         descriptor.configurable = true;
         descriptor.enumerable = true;
         delete descriptor.value;
+        delete descriptor.writable;
         descriptor.get = function() {
             _.ObservableObject.asReactive(this, null).set(key, baseValue, true);
             return this[key];

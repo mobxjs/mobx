@@ -7,14 +7,21 @@ v.observe(() => {});
 
 var a = mobservable([1,2,3]);
 
+var testFunction = function(a) {};
+
 class Order {
     @observable price:number = 3;
     @observable amount:number = 2;
     @observable orders = [];
+    @observable aFunction = testFunction;
 
     @observable get total() {
         return this.amount * this.price * (1 + this.orders.length);
     }
+    
+    // Typescript classes cannot be defined inside functions,
+    // but if the next line is enabled it should throw...
+    // @observable hoepie() { return 3; }
 }
 
 export function testObservable(test) {
@@ -49,6 +56,11 @@ export function testAnnotations(test) {
     order1.orders.pop();
     test.equal(order1.total, 6);
     test.deepEqual(order1totals, [6,3,9]);
+    
+    test.equal(order1.aFunction, testFunction);
+    var x = function() { return 3; };
+    order1.aFunction = x;
+    test.equal(order1.aFunction, x);
     test.done();
 };
 
@@ -102,7 +114,7 @@ export function testIssue8(test){
     
     mobservable.observe(() => {
         fired++;
-        console.log(store.loggedIn);
+        store.loggedIn;
     });
     
     test.equal(fired, 1);
