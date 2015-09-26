@@ -157,7 +157,6 @@ exports.deny_array_change = function(test) {
 
 exports.enable_change_state_if_non_strict_mode = function(test) {
     try {
-        debugger;
         m.strict = false;
         var x = makeReactive(3);
         var y = makeReactive(1);
@@ -172,6 +171,30 @@ exports.enable_change_state_if_non_strict_mode = function(test) {
         m.strict = true;
     }
 };
+
+/*
+// currently, this test logs the cycle error but doesn't actually throw,
+// which will change as soon as esceptions are thrown instead of stored
+// TODO: 
+exports.throw_error_if_modification_loop = function(test) {
+    try {
+        m.strict = false;
+        var x = makeReactive(3);
+        try {
+            var dis = m.observe(function() {
+                x(x() + 1);
+            });
+            x(5);
+            test.equal(false, true, "expected exception");
+        } catch(e) {
+            test.ok((""+e).indexOf("Cycle detected") !== -1, "[mobservable] loop detected while updating a value");
+        }
+        test.done();
+    } finally {
+        m.strict = true;
+    }
+};
+*/
 
 exports.cycle1 = function(test) {
     try {

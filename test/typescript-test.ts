@@ -105,11 +105,9 @@ export function testIssue8(test){
         console.log(store.loggedIn);
     });
     
-    console.log("1");
     test.equal(fired, 1);
     state.authToken = 'a';
     state.authToken = 'b';
-    console.log("2");
     
     test.equal(fired, 2);
     test.done();
