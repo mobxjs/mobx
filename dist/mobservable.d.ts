@@ -94,7 +94,13 @@ interface _IMobservableStatic {
     /**
      * Sets the reporting level Defaults to 1. Use 0 for production or 2 for increased verbosity.
      */
-    logLevel:  number;  // 0 = production, 1 = development, 2 = debugging
+    logLevel:  number;
+
+    /**
+     * If strict is enabled, views are not allowed to modify the state.
+     * This is a recommended practice, as it makes reasoning about your application simpler.
+     */
+    strict: boolean;
 
     extras: {
         getDependencyTree(thing:any, property?:string): Mobservable.IDependencyTree;

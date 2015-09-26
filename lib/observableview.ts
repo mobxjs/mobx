@@ -6,6 +6,10 @@
 
 namespace mobservable {
     export namespace _ {
+        export function throwingViewSetter() {
+            throw new Error(`[mobservable.view '${this.context.name}'] View functions do not accept new values`);
+        }
+
         export class ObservableView<T> extends ViewNode {
             private isComputing = false;
             private hasError = false;
@@ -46,7 +50,7 @@ namespace mobservable {
             }
 
             set() {
-                throwingSetter();
+                throwingViewSetter.call(this);
             }
 
             compute() {
@@ -96,17 +100,13 @@ namespace mobservable {
                     configurable: false,
                     enumerable: false,
                     get: () => this.get(),
-                    set: throwingSetter
+                    set: throwingViewSetter
                 }
             }
 
             toString() {
                 return `ComputedObservable[${this.context.name}:${this._value}] ${this.func.toString()}`;
             }
-        }
-
-        function throwingSetter() {
-            throw new Error(`[mobservablei.view '${this.context.name}'] View functions do not accept new values`);
         }
     }
 }

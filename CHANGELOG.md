@@ -1,3 +1,6 @@
+# 0.6.10
+
+* Fixed issue where @observable did not properly create a stand-alone view
 
 # 0.6.10
 
