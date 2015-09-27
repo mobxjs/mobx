@@ -168,7 +168,18 @@ exports.testNames = function(test) {
     test.equal(contextObj(rstruct.ar[3]), rstruct);
 
     var STUB = {};
-    var rstruct2 = m(struct, { name: 'hoi', context: STUB });
+    var rstruct2 = m({
+        x: 3,
+        y: {
+            z: 7
+        },
+        ar : [
+            4,
+            {
+                w: 5
+            }
+        ]
+    }, { name: 'hoi', context: STUB });
     m.extendReactive(rstruct2.y, { a:  { b : 2}});
     rstruct2.ar.push({ b : 2});
     rstruct2.ar.push([]);

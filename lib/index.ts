@@ -337,7 +337,7 @@ namespace mobservable {
             if (Array.isArray(value))
                 return new _.ObservableArray(<[]> value.slice(), childMode, context);
             if (isPlainObject(value))
-                return _.extendReactive({}, value, childMode, context);
+                return _.extendReactive(value, value, childMode, context);
             return value;
         }
     }
