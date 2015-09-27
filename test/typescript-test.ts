@@ -1,6 +1,6 @@
 /// <reference path="./node_modules/mobservable/dist/mobservable.d.ts"/>
 import mobservable = require('mobservable');
-import {observable} from "mobservable";
+import {observable, asStructure} from "mobservable";
 
 var v = mobservable(3);
 v.observe(() => {});
@@ -14,6 +14,7 @@ class Order {
     @observable amount:number = 2;
     @observable orders = [];
     @observable aFunction = testFunction;
+    @observable someStruct = asStructure({ x: 1, y: 2});
 
     @observable get total() {
         return this.amount * this.price * (1 + this.orders.length);
@@ -61,6 +62,29 @@ export function testAnnotations(test) {
     var x = function() { return 3; };
     order1.aFunction = x;
     test.equal(order1.aFunction, x);
+    
+    var coords = null;
+    var coordsCalcs = 0;
+    var disposer2 = mobservable.observe(() => {
+        coordsCalcs++;
+        coords = { x : order1.someStruct.x, y: order1.someStruct.y };
+    });
+    test.equal(coordsCalcs, 1);
+    test.deepEqual(coords, { x: 1, y: 2});
+    
+    order1.someStruct.x = 1;
+    order1.someStruct = { x: 1, y: 2};
+    test.equal(coordsCalcs, 1);
+    test.deepEqual(coords, { x: 1, y: 2});
+
+    order1.someStruct.x = 2;
+    test.deepEqual(coords, { x: 2, y: 2 });
+    test.equal(coordsCalcs, 2);
+    
+    order1.someStruct = { x: 3, y: 3 };
+    test.equal(coordsCalcs, 3);
+    test.deepEqual(coords, { x: 3, y: 3 });
+    
     test.done();
 };
 

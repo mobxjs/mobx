@@ -173,7 +173,9 @@ namespace mobservable {
         };
         descriptor.set = isDecoratingProperty 
             ? _.throwingViewSetter
-            : function(value) { _.ObservableObject.asReactive(this, null, _.ValueMode.Recursive).set(key, value); }
+            : function(value) { 
+                _.ObservableObject.asReactive(this, null, _.ValueMode.Recursive).set(key, value); 
+            }
         ;
 
         if (!isDecoratingProperty) {

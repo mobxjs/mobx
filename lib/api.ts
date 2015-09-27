@@ -33,7 +33,7 @@ interface _IMobservableStatic {
      * Future assignments to the same property will inherit this behavior.
      * @param value initial value of the reactive property that is being defined.
      */
-    asReference<T>(value: any):{value:T};
+    asReference<T>(value: T): T;
 
     /**
      * Can be used in combination with makeReactive / extendReactive.
@@ -45,14 +45,14 @@ interface _IMobservableStatic {
      * Future assignments to the same property will inherit this behavior.
      * @param value initial value of the reactive property that is being defined.
      */
-    asStructure<T>(value: any):{value:T};
+    asStructure<T>(value: T): T;
 
     /**
      * Can be used in combination with makeReactive / extendReactive.
      * The value will be made reactive, but, if the value is an object or array,
      * children will not automatically be made reactive as well.
      */
-    asFlat<T>(value: any):{value:T};
+    asFlat<T>(value: T): T;
 
     /**
      * ES6 / Typescript decorator which can to make class properties and getter functions reactive.
