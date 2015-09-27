@@ -8,7 +8,8 @@
 * Fixed issue where changing the `logLevel` was not picked up.
 * Improved typings (will be distributed through DefinitelyTyped in the near future)
 * Introduces `asStructure` (see #8) and `asFlat`. 
-* Assigning a plain object to a reactive structure no longer clones the object, instead, the original object is decorated. (Arrays are still cloned due to Javascript limitations to extend arrays)
+* Assigning a plain object to a reactive structure no longer clones the object, instead, the original object is decorated. (Arrays are still cloned due to Javascript limitations to extend arrays).
+* Reintroduced `expr(func)` as shorthand for `makeReactive(func)()`, which is useful to create temporarily views inside views
 
 TODO:
 * Deprecated the options object that could be passed to `makeReactive`.

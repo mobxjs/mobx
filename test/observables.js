@@ -728,6 +728,41 @@ exports.test_async = function(test) {
     }, 10);
 };
 
+exports.test_expr = function(test) {
+    var factor = mobservable(0);
+    var price = mobservable(100);
+    var totalCalcs = 0;
+    var innerCalcs = 0;
+    
+    var total = mobservable(function() {
+        totalCalcs += 1; // outer observable shouldn't recalc if inner observable didn't publish a real change
+        return price() * mobservable.expr(function() {
+            innerCalcs += 1;
+            return factor() % 2 === 0 ? 1 : 3;
+        });
+    });
+    
+    var b = [];
+    var sub = total.observe(function(x) { b.push(x); }, true);
+    
+    price(150);
+    factor(7); // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
+    factor(5); // doesn't trigger outer calc
+    factor(3); // doesn't trigger outer calc
+    factor(4); // triggers innerCalc twice
+    price(20);
+    
+    test.deepEqual(b, [100,150,450,150,20]);
+    test.equal(innerCalcs, 9);
+    test.equal(totalCalcs, 5);    
+    
+    test.throws(function() {
+        mobservable.expr(function() { return 1; });
+    }, "mobservable.expr can only be used inside a computed observable");
+    
+    test.done();
+}; 
+
 exports.test_json1 = function(test) {
     var todos = mobservable([
         {

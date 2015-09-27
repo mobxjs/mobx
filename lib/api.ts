@@ -95,7 +95,24 @@ interface _IMobservableStatic {
      * @param scope, optional, the 'this' value of 'view' and 'effect'.
      */
     observeAsync<T>(view: () => T, effect: (latestValue : T ) => void, delay?:number, scope?: any): Mobservable.Lambda;
-        
+
+
+    /**
+     * expr can be used to create temporarily views inside views.
+     * This can be improved to improve performance if a value changes often, but usually doesn't affect the outcome of an expression.
+     * 
+     * In the following example the expression prevents that a component is rerender _each time_ the selection changes;
+     * instead it will only rerenders when the current todo is (de)selected.
+     * 
+     * reactiveComponent((props) => {
+     *     const todo = props.todo;
+     *     const isSelected = mobservable.expr(() => props.viewState.selection === todo);
+     *     return <div className={isSelected ? "todo todo-selected" : "todo"}>{todo.title}</div>
+     * });
+     * 
+     */
+    expr<T>(expr:()=>T, scope?) : T;
+
     /**
      * During a transaction no views are updated until the end of the transaction.
      * The transaction will be run synchronously nonetheless.

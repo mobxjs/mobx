@@ -124,6 +124,12 @@ namespace mobservable {
         return observeUntil(predicate, effect, scope);
     }
 
+    export function expr<T>(expr: () => void, scope?):T {
+        if (!_.isComputingView())
+            throw new Error("[mobservable.expr] 'expr' can only be used inside a computed value.");
+        return makeReactive(expr, { scope : scope }) ();
+    }
+
     export function extendReactive(target:Object, properties:Object, context?:Mobservable.IContextInfoStruct):Object {
         return _.extendReactive(target, properties, _.ValueMode.Recursive, context); // No other mode makes sense..?
     }
