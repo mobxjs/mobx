@@ -8,14 +8,13 @@ namespace mobservable {
 
     export type Lambda = Mobservable.Lambda;
 
-    export function makeReactive(v:any, opts?:Mobservable.IMakeReactiveOptions) {
+    export function makeReactive(v:any, scopeOrName?:string | any, name?: string) {
         if (isReactive(v))
             return v;
 
-        opts = opts || {};
+        const opts = _.isPlainObject(scopeOrName) ? scopeOrName : {};
         let [mode, value] = _.getValueModeFromValue(v, _.ValueMode.Recursive);
 
-        // TODO: deprecate these options
         if (opts.recurse === false) {
             console.warn("[mobservable.makeReactive] option 'recurse: false' is deprecated, use 'mobservable.asFlat' instead");
             mode = _.ValueMode.Flat;
@@ -25,8 +24,9 @@ namespace mobservable {
         }
 
         const sourceType = mode === _.ValueMode.Reference ? _.ValueType.Reference : _.getTypeOfValue(value);
+        const scope = opts.scope || (scopeOrName && typeof scopeOrName === "object" ? scopeOrName : null);
         const context = {
-            name: opts.name,
+            name: name || opts.name,
             object: opts.context || opts.scope
         };
 
@@ -66,7 +66,7 @@ namespace mobservable {
     }
 
     export function sideEffect(func:Lambda, scope?:any):Lambda {
-        // TODO: once docs are updated console.warn(`[mobservable.sideEffect] 'sideEffect' has been renamed to 'observe' and will be removed in a later version.`);
+        console.warn(`[mobservable.sideEffect] 'sideEffect' has been renamed to 'observe' and will be removed in a later version.`);
         return observe(func, scope);
     }
 
@@ -80,7 +80,6 @@ namespace mobservable {
 
         const disposer = _.once(() => {
             observable.setRefCount(-1);
-            // TODO: observable.dispose?
         });
         if (logLevel >= 2 && observable.observing.length === 0)
             console.warn(`[mobservable.observe] not a single observable was used inside the observing function. This observer is now a no-op.`);

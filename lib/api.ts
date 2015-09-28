@@ -17,7 +17,7 @@ interface _IMobservableStatic {
      * @param properties the properties that should be added and made reactive
      * @returns targer
      */
-    extendReactive(target: Object, properties: Object):Object;
+    extendReactive<A extends Object, B extends Object>(target: A, properties: B): A & B;
 
     /**
      * Returns true if the provided value is reactive.
@@ -148,10 +148,10 @@ interface _IMobservableStatic {
 }
 
 interface IMakeReactive {
-    <T>(value: T[], opts?: Mobservable.IMakeReactiveOptions): Mobservable.IObservableArray<T>;
-    <T>(value: ()=>T, opts?: Mobservable.IMakeReactiveOptions): Mobservable.IObservableValue<T>;
-    <T extends string|number|boolean|Date|RegExp|Function|void>(value: T, opts?: Mobservable.IMakeReactiveOptions): Mobservable.IObservableValue<T>;
-    <T extends Object>(value: Object, opts?: Mobservable.IMakeReactiveOptions): T;
+    <T>(value: T[], name?:string): Mobservable.IObservableArray<T>;
+    <T>(value: ()=>T, nameOrScope?: string | Object, name?: string): Mobservable.IObservableValue<T>;
+    <T extends string|number|boolean|Date|RegExp|Function|void>(value: T, name?:string): Mobservable.IObservableValue<T>;
+    <T extends Object>(value: T, name?: string): T;
 }
 
 interface IMobservableStatic extends _IMobservableStatic, IMakeReactive {
