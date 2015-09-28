@@ -24,6 +24,7 @@ namespace mobservable {
             }
 
             set(newValue:T) {
+                assertUnwrapped(newValue, "Modifiers cannot be used on non-initial values.");
                 checkIfStateIsBeingModifiedDuringView(this.context);
                 const changed = this.mode === ValueMode.Structure ? !deepEquals(newValue, this._value) : newValue !== this._value;
                 // Possible improvement; even if changed and structural, apply the minium amount of updates to alter the object,

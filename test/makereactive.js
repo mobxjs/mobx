@@ -446,3 +446,37 @@ exports.test_as_structure_view = function(test) {
     test.equal(cc, 2);
     test.done();
 };
+
+exports.test_exceptions = function(test) {
+    test.throws(function() {
+        m.asReference(m.asFlat(3));
+    }, "nested");
+
+    var x = m.makeReactive({
+        y: m.asReference(null)
+    });
+    
+    test.throws(function() {
+        x.y = m.asStructure(3)
+    });
+
+    test.throws(function() {
+        x.y = m.asReference(3)
+    });
+
+    var ar = m.makeReactive([2]);
+
+    test.throws(function() {
+        ar[0] = m.asReference(3)
+    });
+
+    test.throws(function() {
+        ar[1] = m.asReference(3)
+    });
+    
+    test.throws(function() {
+        ar = m.makeReactive([m.asStructure(3)]);
+    });
+
+    return test.done();
+}

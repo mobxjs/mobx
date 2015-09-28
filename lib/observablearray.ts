@@ -103,6 +103,7 @@ namespace mobservable {
             }
 
             makeReactiveArrayItem(value) {
+                assertUnwrapped(value, "Array values cannot have modifiers");
                 return makeChildReactive(value, this.$mobservable.mode, {
                     object: this.$mobservable.context.object,
                     name: this.$mobservable.context.name + "[x]"
@@ -290,6 +291,7 @@ namespace mobservable {
                 enumerable: false,
                 configurable: false,
                 set: function(value) {
+                    assertUnwrapped(value, "Modifiers cannot be used on array values. For non-reactive array values use makeReactive(asFlat(array)).");
                     if (index < this.$mobservable.values.length) {
                         var oldValue = this.$mobservable.values[index];
                         var changed = this.$mobservable.mode === ValueMode.Structure ? !deepEquals(oldValue, value) : oldValue !== value; 

@@ -288,23 +288,19 @@ namespace mobservable {
 
         export class AsReference {
             constructor(public value:any) {
-                // TODO: change to: assertUnwrapped
-                 if (value instanceof _.AsStructure)
-                    throw new Error("[mobservable.asReference] asStructure and asReference cannot be mixed");
+                assertUnwrapped(value, "Modifiers are not allowed to be nested");
             }
         }
 
         export class AsStructure {
             constructor(public value:any) {
-                // TODO: change to: assertUnwrapped
-                 if (value instanceof _.AsReference)
-                    throw new Error("[mobservable.asStructure] asStructure and asReference cannot be mixed");
+                assertUnwrapped(value, "Modifiers are not allowed to be nested");
             }
         }
 
         export class AsFlat {
             constructor(public value:any) {
-                // TODO: change to: assertUnwrapped
+                assertUnwrapped(value, "Modifiers are not allowed to be nested");
             }
         }
 
@@ -327,11 +323,11 @@ namespace mobservable {
                 case ValueMode.Reference:
                     return value;
                 case ValueMode.Flat:
-                    // TODO: check not wrapped
+                    assertUnwrapped(value, "Items inside 'asFlat' canont have modifiers");
                     childMode = ValueMode.Reference;
                     break;
                 case ValueMode.Structure:
-                    // TODO: check not wrapped
+                    assertUnwrapped(value, "Items inside 'asStructure' canont have modifiers");
                     childMode = ValueMode.Structure;
                     break;
                 case ValueMode.Recursive:
@@ -346,6 +342,11 @@ namespace mobservable {
             if (isPlainObject(value))
                 return _.extendReactive(value, value, childMode, context);
             return value;
+        }
+
+        export function assertUnwrapped(value, message) {
+            if (value instanceof AsReference || value instanceof AsStructure || value instanceof AsFlat)
+                throw new Error(`[mobservable] asStructure / asReference / asFlat cannot be used here. ${message}`);
         }
     }
 }
