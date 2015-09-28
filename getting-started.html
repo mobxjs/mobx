@@ -330,7 +330,7 @@ Because the report did not <em>actually</em> change as a result of the rename, a
 They will not re-render automatically when their underlying data changes.
 So you need to either call <code>setState</code> or you need to maintain data subscriptions or cursors to update your components.</p>
 
-<p>That avoid such boilerplate, the <code>mobservable-react</code> package provides the <code>reactiveComponent</code> function to make components reactive.
+<p>To avoid such boilerplate, the <code>mobservable-react</code> package provides the <code>reactiveComponent</code> function to make components reactive.
 From there on, you never have to worry about when to update your component!  Just like what we did with the <code>report</code> function.
 As shown below, Mobservable will determine the smallest amount of components that need an update.
 So reactive components render <a target="_blank" href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/">extremely efficient</a>.
