@@ -8,7 +8,11 @@ Mobservable runs on any ES5 environment. That means that all browsers except IE8
 
 Mobservabe is *not* a framework. It does not tell you how to structure your code, where to store state or how to process events. Yet it might free you from frameworks that poses all kinds of restrictions on your code in the name of performance.
 
-##### Can I combine flux with mobservable?
+##### Does mobservable and mobservable-react work on react native?
+
+Yes.
+
+##### Can I combine mobservable with flux?
 
 Flux implementations that do not work on the assumption that the data in their stores is immutable should work well with mobservable.
 However, the need for flux is less when using mobservable.

@@ -14,10 +14,10 @@ var lolCatz = makeReactive({
 });
 ```
 
-For demo purposes, we also create a side effect that prints a message based on `lolCatz`. (side effects will be explained in the next paragraphs).  
+For demo purposes, we also create an observer that prints a message based on `lolCatz`. (the `observe` function will be explained in the next paragraphs).  
 
 ```javascript
-sideEffect(function() {
+observe(function() {
 	if (lolCatz.doILikeLolcatz === false)
 		console.log("Never mind...");
 	else

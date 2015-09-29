@@ -41,16 +41,17 @@ _Views_ are updated **lazily**. A View that is not actively in use will not be u
 This largely avoids the need to dispose views.
 If a view is no longer in use it will be garbage collected automatically.
 
-_Side effects_ are special views which are not lazy.
-Use _side effects_ if you have _view_ that should always be updated, even if it is not in use by other views.
-_Side effects_ are useful in any place where you need to kick off some imperative code automatically if the _state_ changed.
-This is useful **to achieve effects** like logging to the console or sending changes to the server.
+_observers_ are special kind views. They evaluate eagerly instead of lazily. But without producing a value.
+Create _observer_ functions if you have _views_ that should always be updated, even if it they are not in use by any other view.
+_Observers_ are useful to achieve **effects**; code to kick off some imperative code automatically if the _state_ changed.
+Stuff like logging to the console, updating the UI or sending changes to the server.
 
 All _views_ must be **pure**. They are not allowed to change _state_.
-This applies even to _side effects_.
+This applies even to _observers_.
 This might sound like a contradiction, but it means that you are allowed to do anything in side effects, except for changing the state.
 This is strictly speaking not a technically requirement of Mobservable,
 it is a designed constraint to protect your sanity :).
+This constraint can be turned off by running Mobservable in [non strict](../refguide/strict.md) mode.
 
 
 ## Illustration
@@ -58,7 +59,7 @@ it is a designed constraint to protect your sanity :).
 The following listing illustrates the above concepts and principles:
 
 ```javascript
-import {makeReactive, sideEffect} from 'mobservable';
+import {makeReactive, observe} from 'mobservable';
 
 var todoStore = makeReactive({
 	/* some reactive state */
@@ -70,8 +71,8 @@ var todoStore = makeReactive({
 	}
 });
 
-/* a sideEffect */
-sideEffect(function() {
+/* a observer */
+observe(function() {
 	console.log("Completed %d of %d items",
 		todoStore.completedCount,
 		todoStore.todos.length

@@ -1,6 +1,10 @@
 {
-	"plugins":["ga", "disqus"],
-	"pluginsConfig": {
+    "plugins":["ga", "disqus", "edit-link"],
+    "pluginsConfig": {
+        "edit-link": {
+            "base": "https://github.com/mweststrate/mobservable/tree/gh-pages/docs",
+            "label": "Edit This Page"
+        },
         "ga": {
             "token": "UA-65632006-1"
         },

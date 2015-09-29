@@ -49,26 +49,30 @@ lolCatzHtml.observe(function(rendering) {
 });
 ```
 
-In practice you hardly will use '.observe' since there is a more powerful alternative: `mobservable.sideEffect`.
+In practice you hardly will use 'value.observe' since there is a more powerful alternative: `mobservable.observe`.
 
-## Creating views with effects using `sideEffect`
+## Creating observers `mobservable.observe`
 
-Views are derived purely from the state. And observers in turn only react to view updates.
-So observers are in fact view functions as well.
-Except that they do not produce a new value, so they must produce side effects to be useful.
-So instead of registering observes, we can just create more views using the `sideEffect` function.
-The big difference is that observers can ultimately observe only one value or stream, while `sideEffect` can observe many values at the same time.
-So we can rewrite the above observer to a `sideEffect`:
+Observers are functions that react to changes in other reactive data structures and views.
+Actually observers are a special kind of views.
+They work just like views, except that they evualate eagerly and do not produce values.
+Observers can be used to achieve effects; things that need to happen regardless whether some else is observing the observer.
+These effects are typical stuff that needs to be done imperatively; sending requests to the server, logging output, updating the UI.
+In a well designed app you will hardly need them.
+
+The big difference between using `value.observe` and `mobservable.observe` is that observers created using the latter method can observe many values at the same time.
+So we can rewrite the above observer to as:
 
 ```javascript
-sideEffect(function() {
+mobservable.observe(function() {
 	document.body.innerHTML = lolCatzHtml();
 });
 ```
 
 And there it is! A rendering system that renders the `lolCatz` structure automatically to the DOM whenever a relevant value inside `lolCatz` changes.
+Note that just like views, observers are not required to state their dependencies explicitly.
 Surely, dumping a bunch of HTML into the DOM isn't a very scalable architecture.
 Frameworks like React are way smarter in manipulating the DOM.
 Can we add those to the mix...?
 
-(N.B. both `sideEffect` and `.observe` return a function that, if invoked, cancels the effect from being called in the future).
+(N.B. both `.observe` returns a function that, if invoked, cancels the effect from being called in the future).

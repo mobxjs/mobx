@@ -5,7 +5,7 @@ Then we would have a system that keeps the user interface actively in sync with 
 And without explicitly declaring dependencies.
 
 That is exactly what the `reactiveComponent` function (and decorator) from the `mobservable-react` package does.
-Given a react component class, it turns the `render` function into a `sideEffect` while respecting the life-cycle system of React.
+Given a react component class, it turns the `render` function into an observer while respecting the life-cycle system of React.
 Let's rebuild our lolcatz user interface by using some reactive React components:
 
 ```javascript
