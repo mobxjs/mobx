@@ -138,7 +138,7 @@ Provided by the `mobservable-react` packaege, turns a ReactJS component into a r
 **extendReactive(target, properties)**
 Extends an existing object with reactive properties.
 
-**sideEffect(function)**
+**observe(function)**
 Similar to `makeReactive(function)`. Exception the created reactive function will not be lazy, so that it is executed even when it has no observers on its own.
 Useful to bridge reactive code to imperative code.
 

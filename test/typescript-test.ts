@@ -88,6 +88,33 @@ export function testAnnotations(test) {
     test.done();
 };
 
+export function testScope(test) {
+    var x = mobservable.makeReactive({
+        y: 3,
+        // this wo't work here.
+        z: () => 2 * x.y
+    });
+    
+    test.equal(x.z, 6);
+    x.y = 4;
+    test.equal(x.z, 8);
+
+    var x2 = function() {
+        mobservable.extendReactive(this, {
+            y: 3,
+            // this will work here
+            z: () => 2 * this.y
+        });
+    }
+
+    var x3= new x2();
+    test.equal(x3.z, 6);
+    x3.y = 4;
+    test.equal(x3.z, 8);
+
+    test.done();
+}
+
 export function testTyping(test) {
     var ar:Mobservable.IObservableArray<number> = mobservable.makeReactive([1,2]);
     ar.observe((d:Mobservable.IArrayChange<number>|Mobservable.IArraySplice<number>) => {
