@@ -10,13 +10,14 @@
   * [Reactive Components](core/reactive-component.md)
 * Core API
   * [makeReactive](refguide/make-reactive.md)
-  * [@observable](refguide/observable.md)
   * [observe](refguide/observe.md)
-  * [reactiveComponent](refguide/reactive-component.md)
+  * [@observable](refguide/observable.md)
+  * [@reactiveComponent](refguide/reactive-component.md)
 * Advanced API
   * [isReactive](refguide/is-reactive.md)
   * [extendReactive](refguide/extend-reactive.md)
   * [modifiers](refguide/modifiers.md)
+  * [transactions](refguide/transactions.md)
   * [observeAsync](refguide/observe-async.md)
   * [observeUntil](refguide/observe-until.md)
   * [expr](refguide/expr.md)

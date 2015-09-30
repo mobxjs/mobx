@@ -286,7 +286,7 @@ Let's alter the constructor function just enough to achieve that:</p>
 <textarea spellcheck="false" class="prettyprint" id="code3" rows="8">
 function ReactiveTodoStore() {
     this.todos = mobservable.makeReactive([]);
-    mobservable.sideEffect(function() {
+    mobservable.observe(function() {
         console.log(this.report());
     }, this);
 }
@@ -303,8 +303,7 @@ var reactiveTodoStore = new ReactiveTodoStore();
 <center style="margin-top:-20px"><small>(This store is editable, use the 'run' button on the next listing to test it)</small></center>
 
 <p>We just changed two things. First, we converted <code>todos</code> to a reactive array.
-Next, a function that prints the report as a <code>sideEffect</code> of changes in the <code>report</code> was registered.
-As a result, our report will print itself whenever needed.
+Next, we created a function <code>observe</code>s the <code>report</code> and prints it whenever it has changes.
 Looks too simple to be true right? Let's try altering the data again,
 but this time without explicitly logging the <code>report</code>:</p>
 
