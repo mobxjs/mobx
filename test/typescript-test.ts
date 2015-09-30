@@ -1,9 +1,10 @@
 import {
     observable, asStructure, makeReactive, observe, observeAsync, extendReactive, 
-    IObservableArray, IArrayChange, IArraySplice, IObservableValue
+    IObservableArray, IArrayChange, IArraySplice, IObservableValue,
+    default as mobservable
 } from "mobservable";
 
-var v = makeReactive(3);
+var v = mobservable(3);
 v.observe(() => {});
 
 var a = makeReactive([1,2,3]);

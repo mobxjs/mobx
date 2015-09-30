@@ -1,7 +1,9 @@
 import './dnode';
 
-export * from './interfaces';
+import {makeReactive} from './core';
+export default makeReactive;
 
+export * from './interfaces';
 export {
 	isReactive,
 	makeReactive,
