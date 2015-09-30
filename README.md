@@ -20,23 +20,10 @@ Mobservable is a library to create reactive state and views. Mobservable updates
 * Build [high performing](mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) React applications without Flux or Immutable data structures.
 * Predictable behavior: all views are updated synchronously and atomically.
 
-## What others are saying...
-
-> _Elegant! I love it!_
-> &dash; Johan den Haan, CTO of Mendix
-
-> _We ported the book Notes and Kanban examples to Mobservable. Check out [the source](https://github.com/survivejs/mobservable-demo) to see how this worked out. Compared to the original I was definitely positively surprised. Mobservable seems like a good fit for these problems._
-> &dash; Juho Vepsäläinen, author of "SurviveJS - Webpack and React" and jster.net curator
-
-> _Great job with Mobservable! Really gives current conventions and libraries a run for their money._
-> &dash; Daniel Dunderfelt
-
-> _I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated._
-> &dash;David Schalk, fpcomplete.com
-
 ## The essentials
 
-Mobservable can be summarized in two functions that will fundamentally simplify the way you write React applications. Lets take a look at this really really simple timer application:
+Mobservable can be summarized in two functions that will fundamentally simplify the way you write React applications.
+Let's start by building a really really simple timer application:
 
 ```javascript
 var timerData = {
@@ -100,14 +87,27 @@ It does not only work for plain objects, but also for arrays, functions, classes
 * `npm install mobservable --save`.
 * For React apps `npm install mobservable-react --save` as well. You might also be interested in the [dev tools for React and Mobservable](https://github.com/mweststrate/mobservable-react-devtools).
 
+* [Five minute interactive introducton to Mobservable and React](https://mweststrate.github.io/mobservable/getting-started.html)
+
+## What others are saying...
+
+> _Elegant! I love it!_
+> &dash; Johan den Haan, CTO of Mendix
+
+> _We ported the book Notes and Kanban examples to Mobservable. Check out [the source](https://github.com/survivejs/mobservable-demo) to see how this worked out. Compared to the original I was definitely positively surprised. Mobservable seems like a good fit for these problems._
+> &dash; Juho Vepsäläinen, author of "SurviveJS - Webpack and React" and jster.net curator
+
+> _Great job with Mobservable! Really gives current conventions and libraries a run for their money._
+> &dash; Daniel Dunderfelt
+
+> _I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated._
+> &dash;David Schalk, fpcomplete.com
+
 ## Resources
 
-Fresh step-by-step documentation is [coming soon](https://github.com/mweststrate/mobservable/issues/7)!
-
-* [Five minute interactive introducton to Mobservable and React](https://mweststrate.github.io/mobservable/getting-started.html)
-* [API documentation](https://mweststrate.github.io/mobservable/refguide/api.html)
+* [API documentation](https://mweststrate.github.io/mobservable/)
 * [ES5, ES6, TypeScript syntax examples](https://github.com/mweststrate/mobservable/blob/master/docs/api.md)
-* [TypeScript Typings](https://github.com/mweststrate/mobservable/blob/master/dist/mobservable.d.ts)
+* [TypeScript Typings](https://github.com/mweststrate/mobservable/blob/master/dist/mobservable.d.ts), also available through `tsd install mobservable --save`.
 
 ## Examples
 
