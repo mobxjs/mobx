@@ -1,12 +1,16 @@
 {
-    "version": "1.5.3",
+    "version": "1.6.2",
     "compilerOptions": {
         "target": "es5",
-        "out": "./.build/mobservable.js",
-        "sourceMap": true
+        "outDir": ".build",
+        "sourceMap": true,
+        "declaration": true,
+        "module": "commonjs"
     },
     "files": [
+        "./lib/index.ts",
         "./lib/utils.ts",
+        "./lib/core",
         "./lib/scheduler.ts",
         "./lib/simpleeventemitter.ts", 
         "./lib/dnode.ts",
@@ -14,11 +18,7 @@
         "./lib/observablearray.ts", 
         "./lib/observableobject.ts",
         "./lib/observableview.ts",
-        "./lib/reactjs.ts", 
-        "./lib/api.ts",
-        "./lib/extras.ts", 
-        "./lib/index.ts",
-        "./lib/umd.ts"
+        "./lib/extras.ts" 
     ],
     "filesGlob": [
         "./lib/*.ts",
