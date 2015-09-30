@@ -17,7 +17,7 @@ interface _IMobservableStatic {
      * @param properties the properties that should be added and made reactive
      * @returns targer
      */
-    extendReactive(target: Object, properties: Object):Object;
+    extendReactive<A extends Object, B extends Object>(target: A, properties: B): A & B;
 
     /**
      * Returns true if the provided value is reactive.
@@ -33,7 +33,26 @@ interface _IMobservableStatic {
      * Future assignments to the same property will inherit this behavior.
      * @param value initial value of the reactive property that is being defined.
      */
-    asReference<T>(value: any):{value:T};
+    asReference<T>(value: T): T;
+
+    /**
+     * Can be used in combination with makeReactive / extendReactive.
+     * Enforces that values that are deeply equalled identical to the previous are considered to unchanged.
+     * (the default equality used by mobservable is reference equality).
+     * Values that are still reference equal, but not deep equal, are considered to be changed.
+     * asStructure can only be used incombinations with arrays or objects.
+     * It does not support cyclic structures.
+     * Future assignments to the same property will inherit this behavior.
+     * @param value initial value of the reactive property that is being defined.
+     */
+    asStructure<T>(value: T): T;
+
+    /**
+     * Can be used in combination with makeReactive / extendReactive.
+     * The value will be made reactive, but, if the value is an object or array,
+     * children will not automatically be made reactive as well.
+     */
+    asFlat<T>(value: T): T;
 
     /**
      * ES6 / Typescript decorator which can to make class properties and getter functions reactive.
@@ -129,10 +148,10 @@ interface _IMobservableStatic {
 }
 
 interface IMakeReactive {
-    <T>(value: T[], opts?: Mobservable.IMakeReactiveOptions): Mobservable.IObservableArray<T>;
-    <T>(value: ()=>T, opts?: Mobservable.IMakeReactiveOptions): Mobservable.IObservableValue<T>;
-    <T extends string|number|boolean|Date|RegExp|Function|void>(value: T, opts?: Mobservable.IMakeReactiveOptions): Mobservable.IObservableValue<T>;
-    <T extends Object>(value: Object, opts?: Mobservable.IMakeReactiveOptions): T;
+    <T>(value: T[], name?:string): Mobservable.IObservableArray<T>;
+    <T>(value: ()=>T, nameOrScope?: string | Object, name?: string): Mobservable.IObservableValue<T>;
+    <T extends string|number|boolean|Date|RegExp|Function|void>(value: T, name?:string): Mobservable.IObservableValue<T>;
+    <T extends Object>(value: T, name?: string): T;
 }
 
 interface IMobservableStatic extends _IMobservableStatic, IMakeReactive {
