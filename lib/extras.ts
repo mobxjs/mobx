@@ -3,11 +3,11 @@
  * (c) 2015 - Michel Weststrate
  * https://github.com/mweststrate/mobservable
  */
-import {isReactive} from './index';
 import {DataNode, ViewNode} from './dnode';
 import {ObservableObject} from './observableobject';
 import SimpleEventEmitter from './simpleeventemitter';
 import {once, unique} from './utils';
+import {isReactive} from './core';
 import {IDependencyTree, ITransitionEvent, IObserverTree, Lambda} from './interfaces';
 
 export function getDNode(thing:any, property?:string):DataNode {

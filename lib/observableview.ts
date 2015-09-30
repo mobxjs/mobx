@@ -6,7 +6,7 @@
 
 import {ViewNode, isComputingView} from './dnode';
 import SimpleEventEmitter from './simpleeventemitter';
-import {logLevel} from './index';
+import {logLevel} from './core';
 import {IContextInfoStruct, Lambda} from './interfaces';
 import {deepEquals, once} from './utils';
 

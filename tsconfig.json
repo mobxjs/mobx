@@ -8,17 +8,17 @@
         "module": "commonjs"
     },
     "files": [
-        "./lib/index.ts",
+        "./lib/dnode.ts",
         "./lib/utils.ts",
-        "./lib/core",
         "./lib/scheduler.ts",
         "./lib/simpleeventemitter.ts", 
-        "./lib/dnode.ts",
         "./lib/observablevalue.ts", 
+        "./lib/observableview.ts",
         "./lib/observablearray.ts", 
         "./lib/observableobject.ts",
-        "./lib/observableview.ts",
-        "./lib/extras.ts" 
+        "./lib/extras.ts", 
+        "./lib/core",
+        "./lib/index.ts"
     ],
     "filesGlob": [
         "./lib/*.ts",

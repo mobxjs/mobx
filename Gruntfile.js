@@ -17,8 +17,9 @@ module.exports = function(grunt) {
                 cmd: tsc + " typescript-test.ts -m commonjs -t es5 --experimentalDecorators",
                 cwd: "test/"
             },
-            buildlocal: tsc,
-            builddist: tsc + " -out dist/mobservable.js"
+            buildtsc: tsc,
+            webpack: "NODE_ENV=production ./node_modules/webpack/bin/webpack.js",
+            copytypings: "cp -rf .build/*.d.ts test/node_modules/mobservable" // TODO: dir might not exist
         },
         coveralls: {
             options: {
@@ -48,19 +49,19 @@ module.exports = function(grunt) {
         fs.writeFileSync('dist/mobservable.d.ts', fs.readFileSync('lib/api.ts','utf8') + moduleDeclaration, 'utf8');
     });
 
-    grunt.registerTask("preparetest", "Create node module in test folder", function(sourceDir) {
+    grunt.registerTask("preparetest", "Create node module in test folder", function() {
         mkdirp.sync("test/node_modules/mobservable/dist/");
-        fs.writeFileSync("test/node_modules/mobservable/dist/mobservable.d.ts", fs.readFileSync("dist/mobservable.d.ts","utf8"),"utf8");
-        fs.writeFileSync("test/node_modules/mobservable/index.js", "module.exports=require('../../../" + sourceDir + "/mobservable.js');","utf8");
+        //fs.writeFileSync("test/node_modules/mobservable/index.d.ts", fs.readFileSync("dist/mobservable.d.ts","utf8"),"utf8");
+        fs.writeFileSync("test/node_modules/mobservable/index.js", "module.exports=require('../../../dist/mobservable.js');","utf8");
     });
 
     grunt.registerTask("publish", "Publish to npm", function() {
         require("./publish.js");
     });
     grunt.registerTask("default", ["buildlocal"]);
-    grunt.registerTask("builddist", ["buildlocal", "exec:builddist","builddts","uglify:dist"]);
-    grunt.registerTask("buildlocal", ["exec:buildlocal", "builddts"]);
+    grunt.registerTask("builddist", ["exec:buildtsc", "webpack"]);// "exec:builddist","builddts","uglify:dist"]);
+    grunt.registerTask("buildlocal", ["exec:buildtsc", "exec:webpack"]);
     grunt.registerTask("cover", ["builddist", "preparetest:dist", "exec:cover", "coveralls:default"]);
-    grunt.registerTask("test", ["buildlocal", "preparetest:.build", "exec:buildtypescripttest", "nodeunit:all"]);
+    grunt.registerTask("test", ["buildlocal", "exec:copytypings", "preparetest", "exec:buildtypescripttest", "nodeunit:all"]);
     grunt.registerTask("perf", ["buildlocal", "preparetest:.build", "nodeunit:perf"]);
 };

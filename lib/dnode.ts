@@ -4,11 +4,12 @@
  * https://github.com/mweststrate/mobservable
  */
 
-import {strict, logLevel} from './index';
-import {transitionTracker, reportTransition} from './extras';
-import {quickDiff} from './utils';
-import {schedule} from './scheduler';
-import {IContextInfoStruct} from './interfaces';
+//import {strict, logLevel} from './core';
+//var strict = true;
+//var logLevel = 1;
+// import {transitionTracker, reportTransition} from './extras';
+//var transitionTracker = {};
+//function reportTransition() {};
 
 declare var __mobservableViewStack:ViewNode[];
 
@@ -260,3 +261,9 @@ export function stackDepth () {
 export function isComputingView() {
     return __mobservableViewStack.length > 0;
 }
+
+import {strict, logLevel} from './core';
+import {transitionTracker, reportTransition} from './extras';
+import {quickDiff} from './utils';
+import {schedule} from './scheduler';
+import {IContextInfoStruct} from './interfaces';

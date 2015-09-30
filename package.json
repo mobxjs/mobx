@@ -26,7 +26,8 @@
     "grunt-exec": "^0.4.6",
     "mkdirp": "^0.5.1",
     "nodeunit-browser-tap": "^0.1.0",
-    "typescript": "^1.6.2"
+    "typescript": "^1.6.2",
+    "webpack": "^1.12.2"
   },
   "keywords": [
     "mobservable",

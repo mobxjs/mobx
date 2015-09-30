@@ -4,8 +4,8 @@
  * https://github.com/mweststrate/mobservable
  */
 
-import SimpleEventEmitter from './simpleeventemitter';
 import {DataNode, checkIfStateIsBeingModifiedDuringView} from './dnode';
+import SimpleEventEmitter from './simpleeventemitter';
 import {ValueMode, assertUnwrapped, makeChildReactive} from './core';
 import {IArrayChange, IArraySplice, IObservableArray, Lambda, IContextInfoStruct} from './interfaces';
 import {deepEquals} from './utils';

@@ -1,0 +1,9 @@
+{
+  "name": "mobservable-tests",
+  "version": "0.0.0",
+  "description": "",
+  "main": "",
+  "dependencies": {
+    "mobservable" : "latest"
+  }
+}
