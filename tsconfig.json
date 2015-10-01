@@ -5,7 +5,8 @@
         "outDir": ".build",
         "sourceMap": true,
         "declaration": true,
-        "module": "commonjs"
+        "module": "commonjs",
+        "removeComments": true
     },
     "files": [
         "./lib/dnode.ts",
@@ -23,6 +24,7 @@
     "filesGlob": [
         "./lib/*.ts",
         "!./node_modules/**/*.ts",
-        "!./dist/*.d.ts"
+        "!./dist/*.d.ts",
+        "!./test/*.ts"
     ]
 }

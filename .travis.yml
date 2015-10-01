@@ -2,4 +2,4 @@ language: node_js
 node_js:
   - "0.12"
   - "0.10"
-before_install: npm install -g grunt-cli istanbul nodeunit
+  - "4.0.0"

@@ -156,3 +156,8 @@ Useful to bridge reactive code to imperative code.
 * Write documentation, including how to organize projects
 * Write blog about inner workings
 * Introduce options for asynchronous views and structurally compare view results
+
+## Contributing
+
+* Feel free to send pr requests.
+* Use `npm start` to run the basic test suite, `npm test` for the test suite with coverage and `npm run perf` for the performance tests.

@@ -79,6 +79,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.expr = core_1.expr;
 	exports.transaction = core_1.transaction;
 	exports.toJSON = core_1.toJSON;
+	exports.logLevel = core_1.logLevel;
+	exports.strict = core_1.strict;
 	Object.defineProperties(module.exports, {
 	    strict: {
 	        enumerable: true,
@@ -91,9 +93,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        set: function (v) { return core.logLevel = v; }
 	    }
 	});
-	/**
-	 * 'Private' elements that are exposed for testing and debugging utilities
-	 */
 	exports._ = {
 	    isComputingView: dnode_1.isComputingView,
 	    quickDiff: utils_1.quickDiff,
@@ -158,68 +157,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    throw "Illegal State";
 	}
 	exports.makeReactive = makeReactive;
-	/**
-	    * Can be used in combination with makeReactive / extendReactive.
-	    * Enforces that a reference to 'value' is stored as property,
-	    * but that 'value' itself is not turned into something reactive.
-	    * Future assignments to the same property will inherit this behavior.
-	    * @param value initial value of the reactive property that is being defined.
-	    */
 	function asReference(value) {
-	    // unsound typecast, but in combination with makeReactive, the end result should be of the correct type this way
-	    // e.g: makeReactive({ x : asReference(number)}) -> { x : number }
 	    return new AsReference(value);
 	}
 	exports.asReference = asReference;
-	/**
-	    * Can be used in combination with makeReactive / extendReactive.
-	    * Enforces that values that are deeply equalled identical to the previous are considered to unchanged.
-	    * (the default equality used by mobservable is reference equality).
-	    * Values that are still reference equal, but not deep equal, are considered to be changed.
-	    * asStructure can only be used incombinations with arrays or objects.
-	    * It does not support cyclic structures.
-	    * Future assignments to the same property will inherit this behavior.
-	    * @param value initial value of the reactive property that is being defined.
-	    */
 	function asStructure(value) {
 	    return new AsStructure(value);
 	}
 	exports.asStructure = asStructure;
-	/**
-	    * Can be used in combination with makeReactive / extendReactive.
-	    * The value will be made reactive, but, if the value is an object or array,
-	    * children will not automatically be made reactive as well.
-	    */
 	function asFlat(value) {
 	    return new AsFlat(value);
 	}
 	exports.asFlat = asFlat;
-	/**
-	    * Returns true if the provided value is reactive.
-	    * @param value object, function or array
-	    * @param propertyName if propertyName is specified, checkes whether value.propertyName is reactive.
-	    */
 	function isReactive(value) {
 	    if (value === null || value === undefined)
 	        return false;
 	    return !!value.$mobservable;
 	}
 	exports.isReactive = isReactive;
-	/**
-	    * Deprecated, use mobservable.observe instead.
-	    */
 	function sideEffect(func, scope) {
 	    console.warn("[mobservable.sideEffect] 'sideEffect' has been renamed to 'observe' and will be removed in a later version.");
 	    return observe(func, scope);
 	}
 	exports.sideEffect = sideEffect;
-	/**
-	    * Creates a reactive view and keeps it alive, so that the view is always
-	    * updated if one of the dependencies changes, even when the view is not further used by something else.
-	    * @param view The reactive view
-	    * @param scope (optional)
-	    * @returns disposer function, which can be used to stop the view from being updated in the future.
-	    */
 	function observe(view, scope) {
 	    var _a = getValueModeFromValue(view, ValueMode.Recursive), mode = _a[0], unwrappedView = _a[1];
 	    var observable = new observableview_1.ObservableView(unwrappedView, scope, {
@@ -236,14 +196,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return disposer;
 	}
 	exports.observe = observe;
-	/**
-	    * Similar to 'observer', observes the given predicate until it returns true.
-	    * Once it returns true, the 'effect' function is invoked an the observation is cancelled.
-	    * @param predicate
-	    * @param effect
-	    * @param scope (optional)
-	    * @returns disposer function to prematurely end the observer.
-	    */
 	function observeUntil(predicate, effect, scope) {
 	    var disposer = observe(function () {
 	        if (predicate.call(scope)) {
@@ -254,17 +206,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return disposer;
 	}
 	exports.observeUntil = observeUntil;
-	/**
-	    * Once the view triggers, effect will be scheduled in the background.
-	    * If observer triggers multiple times, effect will still be triggered only once, so it achieves a similar effect as transaction.
-	    * This might be useful for stuff that is expensive and doesn't need to happen synchronously; such as server communication.
-	    * Afther the effect has been fired, it can be scheduled again if the view is triggered in the future.
-	    *
-	    * @param view to observe. If it returns a value, the latest returned value will be passed into the scheduled effect.
-	    * @param the effect that will be executed, a fixed amount of time after the first trigger of 'view'.
-	    * @param delay, optional. After how many milleseconds the effect should fire.
-	    * @param scope, optional, the 'this' value of 'view' and 'effect'.
-	    */
 	function observeAsync(view, effect, delay, scope) {
 	    if (delay === void 0) { delay = 1; }
 	    var latestValue = undefined;
@@ -290,51 +231,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return observeUntil(predicate, effect, scope);
 	}
 	exports.when = when;
-	/**
-	    * expr can be used to create temporarily views inside views.
-	    * This can be improved to improve performance if a value changes often, but usually doesn't affect the outcome of an expression.
-	    *
-	    * In the following example the expression prevents that a component is rerender _each time_ the selection changes;
-	    * instead it will only rerenders when the current todo is (de)selected.
-	    *
-	    * reactiveComponent((props) => {
-	    *     const todo = props.todo;
-	    *     const isSelected = mobservable.expr(() => props.viewState.selection === todo);
-	    *     return <div className={isSelected ? "todo todo-selected" : "todo"}>{todo.title}</div>
-	    * });
-	    *
-	    */
 	function expr(expr, scope) {
 	    if (!dnode_1.isComputingView())
 	        throw new Error("[mobservable.expr] 'expr' can only be used inside a computed value.");
 	    return makeReactive(expr, scope)();
 	}
 	exports.expr = expr;
-	/**
-	    * Extends an object with reactive capabilities.
-	    * @param target the object to which reactive properties should be added
-	    * @param properties the properties that should be added and made reactive
-	    * @returns targer
-	    */
 	function extendReactive(target, properties, context) {
-	    return extendReactiveHelper(target, properties, ValueMode.Recursive, context); // No other mode makes sense..?
+	    return extendReactiveHelper(target, properties, ValueMode.Recursive, context);
 	}
 	exports.extendReactive = extendReactive;
-	/**
-	    * ES6 / Typescript decorator which can to make class properties and getter functions reactive.
-	    * Use this annotation to wrap properties of an object in an observable, for example:
-	    * class OrderLine {
-	    *   @observable amount = 3;
-	    *   @observable price = 2;
-	    *   @observable total() {
-	    *      return this.amount * this.price;
-	    *   }
-	    * }
-	    */
 	function observable(target, key, baseDescriptor) {
-	    // observable annotations are invoked on the prototype, not on actual instances,
-	    // so upon invocation, determine the 'this' instance, and define a property on the
-	    // instance as well (that hides the propotype property)
 	    var isDecoratingProperty = baseDescriptor && !baseDescriptor.hasOwnProperty("value");
 	    var descriptor = baseDescriptor || {};
 	    var baseValue = isDecoratingProperty ? descriptor.get : descriptor.value;
@@ -366,10 +273,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	exports.observable = observable;
-	/**
-	    * Basically, a deep clone, so that no reactive property will exist anymore.
-	    * Doesn't follow references.
-	    */
 	function toJSON(source) {
 	    if (!source)
 	        return source;
@@ -385,30 +288,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return source;
 	}
 	exports.toJSON = toJSON;
-	/**
-	    * Converts a reactive structure into a non-reactive structure.
-	    * Basically a deep-clone.
-	    */
 	function toJson(source) {
 	    console.warn("mobservable.toJson is deprecated, use mobservable.toJSON instead");
 	    return toJSON(source);
 	}
 	exports.toJson = toJson;
-	/**
-	    * During a transaction no views are updated until the end of the transaction.
-	    * The transaction will be run synchronously nonetheless.
-	    * @param action a function that updates some reactive state
-	    * @returns any value that was returned by the 'action' parameter.
-	    */
 	function transaction(action) {
 	    return scheduler_1.batch(action);
 	}
 	exports.transaction = transaction;
-	/**
-	    Evaluates func and return its results. Watch tracks all observables that are used by 'func'
-	    and invokes 'onValidate' whenever func *should* update.
-	    Returns  a tuplde [return value of func, disposer]. The disposer can be used to abort the watch early.
-	*/
 	function observeUntilInvalid(func, onInvalidate, context) {
 	    console.warn("mobservable.observeUntilInvalid is deprecated and will be removed in 0.7");
 	    var hasRun = false;
@@ -425,22 +313,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return [result, disposer, disposer['$mobservable']];
 	}
 	exports.observeUntilInvalid = observeUntilInvalid;
-	/**
-	    * Sets the reporting level Defaults to 1. Use 0 for production or 2 for increased verbosity.
-	    */
-	exports.logLevel = 1; // 0 = production, 1 = development, 2 = debugging
-	/**
-	    * If strict is enabled, views are not allowed to modify the state.
-	    * This is a recommended practice, as it makes reasoning about your application simpler.
-	    */
+	exports.logLevel = 1;
 	exports.strict = true;
 	setTimeout(function () {
 	    if (exports.logLevel > 0)
 	        console.info("Welcome to mobservable. Current logLevel = " + exports.logLevel + ". Change mobservable.logLevel according to your needs: 0 = production, 1 = development, 2 = debugging. Strict mode is " + (exports.strict ? 'enabled' : 'disabled') + ".");
 	}, 1);
-	/**
-	 * Internal methods
-	 */
 	(function (ValueType) {
 	    ValueType[ValueType["Reference"] = 0] = "Reference";
 	    ValueType[ValueType["PlainObject"] = 1] = "PlainObject";
@@ -454,8 +332,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ValueMode[ValueMode["Recursive"] = 0] = "Recursive";
 	    ValueMode[ValueMode["Reference"] = 1] = "Reference";
 	    ValueMode[ValueMode["Structure"] = 2] = "Structure";
-	    // No observers will be triggered if a new value is assigned (to a part of the tree) that deeply equals the old value.
-	    ValueMode[ValueMode["Flat"] = 3] = "Flat"; // If the value is an plain object, it will be made reactive, and so will all its future children.
+	    ValueMode[ValueMode["Flat"] = 3] = "Flat";
 	})(exports.ValueMode || (exports.ValueMode = {}));
 	var ValueMode = exports.ValueMode;
 	function getTypeOfValue(value) {
@@ -467,7 +344,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return ValueType.Array;
 	    if (typeof value == 'object')
 	        return utils_1.isPlainObject(value) ? ValueType.PlainObject : ValueType.ComplexObject;
-	    return ValueType.Reference; // safe default, only refer by reference..
+	    return ValueType.Reference;
 	}
 	exports.getTypeOfValue = getTypeOfValue;
 	function extendReactiveHelper(target, properties, mode, context) {
@@ -581,22 +458,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var globalScope = (function () { return this; })();
-	// DNode[][], stack of: list of DNode's being observed by the currently ongoing computation
 	if (globalScope.__mobservableTrackingStack)
 	    throw new Error("[mobservable] An incompatible version of mobservable is already loaded.");
 	globalScope.__mobservableViewStack = [];
 	var mobservableId = 0;
 	function checkIfStateIsBeingModifiedDuringView(context) {
 	    if (isComputingView() && core_1.strict === true) {
-	        // TODO: add url with detailed error subscription / best practice here:
 	        var ts = __mobservableViewStack;
 	        throw new Error("[mobservable] It is not allowed to change the state during the computation of a reactive view if 'mobservable.strict' mode is enabled:\nShould the data you are trying to modify actually be a view?\nView name: " + context.name + ".\nCurrent stack size is " + ts.length + ", active view: \"" + ts[ts.length - 1].toString() + "\".");
 	    }
 	}
 	exports.checkIfStateIsBeingModifiedDuringView = checkIfStateIsBeingModifiedDuringView;
-	/**
-	    * The state of some node in the dependency tree that is created for all views.
-	    */
 	(function (NodeState) {
 	    NodeState[NodeState["STALE"] = 0] = "STALE";
 	    NodeState[NodeState["PENDING"] = 1] = "PENDING";
@@ -604,18 +476,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	})(exports.NodeState || (exports.NodeState = {}));
 	var NodeState = exports.NodeState;
 	;
-	/**
-	    * A root node in the dependency graph. This node can be observed by others, but doesn't observe anything itself.
-	    * These nodes are used to store 'state'.
-	    */
 	var DataNode = (function () {
 	    function DataNode(context) {
 	        this.context = context;
 	        this.id = ++mobservableId;
 	        this.state = NodeState.READY;
-	        this.observers = []; // nodes that are dependent on this node. Will be notified when our state change
-	        this.isDisposed = false; // ready to be garbage collected. Nobody is observing or ever will observe us
-	        this.externalRefenceCount = 0; // nr of 'things' that depend on us, excluding other DNode's. If > 0, this node will not go to sleep
+	        this.observers = [];
+	        this.isDisposed = false;
+	        this.externalRefenceCount = 0;
 	        if (!context.name)
 	            context.name = "[m#" + this.id + "]";
 	    }
@@ -632,7 +500,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    DataNode.prototype.markStale = function () {
 	        if (this.state !== NodeState.READY)
-	            return; // stale or pending; recalculation already scheduled, we're fine..
+	            return;
 	        this.state = NodeState.STALE;
 	        if (extras_1.transitionTracker)
 	            extras_1.reportTransition(this, "STALE");
@@ -656,10 +524,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var ts = __mobservableViewStack, l = ts.length;
 	        if (l > 0) {
 	            var deps = ts[l - 1].observing, depslength = deps.length;
-	            // this last item added check is an optimization especially for array loops,
-	            // because an array.length read with subsequent reads from the array
-	            // might trigger many observed events, while just checking the latest added items is cheap
-	            // (n.b.: this code is inlined and not in observable view for performance reasons)
 	            if (deps[depslength - 1] !== this && deps[depslength - 2] !== this)
 	                deps[depslength] = this;
 	        }
@@ -675,20 +539,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return DataNode;
 	})();
 	exports.DataNode = DataNode;
-	/**
-	    * A node in the state dependency root that observes other nodes, and can be observed itself.
-	    * Represents the state of a View.
-	    */
 	var ViewNode = (function (_super) {
 	    __extends(ViewNode, _super);
 	    function ViewNode() {
 	        _super.apply(this, arguments);
-	        this.isSleeping = true; // isSleeping: nobody is observing this dependency node, so don't bother tracking DNode's this DNode depends on
-	        this.hasCycle = false; // this node is part of a cycle, which is an error
-	        this.observing = []; // nodes we are looking at. Our value depends on these nodes
-	        this.prevObserving = null; // nodes we were looking at before. Used to determine changes in the dependency tree
-	        this.dependencyChangeCount = 0; // nr of nodes being observed that have received a new value. If > 0, we should recompute
-	        this.dependencyStaleCount = 0; // nr of nodes being observed that are currently not ready
+	        this.isSleeping = true;
+	        this.hasCycle = false;
+	        this.observing = [];
+	        this.prevObserving = null;
+	        this.dependencyChangeCount = 0;
+	        this.dependencyStaleCount = 0;
 	    }
 	    ViewNode.prototype.setRefCount = function (delta) {
 	        var rc = this.externalRefenceCount += delta;
@@ -716,7 +576,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.computeNextState();
 	        }
 	    };
-	    // the state of something we are observing has changed..
 	    ViewNode.prototype.notifyStateChange = function (observable, stateDidActuallyChange) {
 	        var _this = this;
 	        if (observable.state === NodeState.STALE) {
@@ -729,11 +588,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (--this.dependencyStaleCount === 0) {
 	                this.state = NodeState.PENDING;
 	                scheduler_1.schedule(function () {
-	                    // did any of the observables really change?
 	                    if (_this.dependencyChangeCount > 0)
 	                        _this.computeNextState();
 	                    else
-	                        // we're done, but didn't change, lets make sure verybody knows..
 	                        _this.markReady(false);
 	                    _this.dependencyChangeCount = 0;
 	                });
@@ -768,15 +625,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var dependency = added[i];
 	            if (dependency instanceof ViewNode && dependency.findCycle(this)) {
 	                this.hasCycle = true;
-	                // don't observe anything that caused a cycle, or we are stuck forever!
 	                this.observing.splice(this.observing.indexOf(added[i]), 1);
-	                dependency.hasCycle = true; // for completeness sake..
+	                dependency.hasCycle = true;
 	            }
 	            else {
 	                added[i].addObserver(this);
 	            }
 	        }
-	        // remove observers after adding them, so that they don't go in lazy mode to early
 	        for (var i = 0, l = removed.length; i < l; i++)
 	            removed[i].removeObserver(this);
 	    };
@@ -817,11 +672,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * mobservable
-	 * (c) 2015 - Michel Weststrate
-	 * https://github.com/mweststrate/mobservable
-	 */
 	var dnode_1 = __webpack_require__(2);
 	var observableobject_1 = __webpack_require__(4);
 	var simpleeventemitter_1 = __webpack_require__(6);
@@ -932,7 +782,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var core_1 = __webpack_require__(1);
 	var observableview_1 = __webpack_require__(5);
 	var observablevalue_1 = __webpack_require__(9);
-	// responsible for the administration of objects that have become reactive
 	var ObservableObject = (function () {
 	    function ObservableObject(target, context, mode) {
 	        this.target = target;
@@ -963,7 +812,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    ObservableObject.prototype.set = function (propName, value) {
 	        if (this.values[propName])
-	            this.target[propName] = value; // the property setter will make 'value' reactive if needed.
+	            this.target[propName] = value;
 	        else
 	            this.defineReactiveProperty(propName, value);
 	    };
@@ -1025,19 +874,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            throw new Error("[mobservable.view '" + this.context.name + "'] Cycle detected");
 	        if (this.isSleeping) {
 	            if (dnode_1.isComputingView()) {
-	                // somebody depends on the outcome of this computation
-	                this.wakeUp(); // note: wakeup triggers a compute
+	                this.wakeUp();
 	                this.notifyObserved();
 	            }
 	            else {
-	                // nobody depends on this computable;
-	                // so just compute fresh value and continue to sleep
 	                this.wakeUp();
 	                this.tryToSleep();
 	            }
 	        }
 	        else {
-	            // we are already up to date, somebody is just inspecting our current value
 	            this.notifyObserved();
 	        }
 	        if (this.hasCycle)
@@ -1055,7 +900,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ObservableView.prototype.compute = function () {
 	        var newValue;
 	        try {
-	            // this cycle detection mechanism is primarily for lazy computed values; other cycles are already detected in the dependency tree
 	            if (this.isComputing)
 	                throw new Error("[mobservable.view '" + this.context.name + "'] Cycle detected");
 	            this.isComputing = true;
@@ -1086,7 +930,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ObservableView.prototype.observe = function (listener, fireImmediately) {
 	        var _this = this;
 	        if (fireImmediately === void 0) { fireImmediately = false; }
-	        this.setRefCount(+1); // awake
+	        this.setRefCount(+1);
 	        if (fireImmediately)
 	            listener(this.get(), undefined);
 	        var disposer = this.changeEvent.on(listener);
@@ -1171,9 +1015,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * https://github.com/mweststrate/mobservable
 	 */
 	var observablearray_1 = __webpack_require__(8);
-	/**
-	    Makes sure that the provided function is invoked at most once.
-	*/
 	function once(func) {
 	    var invoked = false;
 	    return function () {
@@ -1185,7 +1026,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.once = once;
 	function noop() {
-	    // NOOP
 	}
 	exports.noop = noop;
 	function unique(list) {
@@ -1201,10 +1041,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return value !== null && typeof value == 'object' && Object.getPrototypeOf(value) === Object.prototype;
 	}
 	exports.isPlainObject = isPlainObject;
-	/**
-	    * Naive deepEqual. Doesn't check for prototype, non-enumerable or out-of-range properties on arrays.
-	    * If you have such a case, you probably should use this function but something fancier :).
-	    */
 	function deepEquals(a, b) {
 	    if (a === null && b === null)
 	        return true;
@@ -1238,15 +1074,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return a === b;
 	}
 	exports.deepEquals = deepEquals;
-	/**
-	    * Given a new and an old list, tries to determine which items are added or removed
-	    * in linear time. The algorithm is heuristic and does not give the optimal results in all cases.
-	    * (For example, [a,b] -> [b, a] yiels [[b,a],[a,b]])
-	    * its basic assumptions is that the difference between base and current are a few splices.
-	    *
-	    * returns a tuple<addedItems, removedItems>
-	    * @type {T[]}
-	    */
 	function quickDiff(current, base) {
 	    if (!base || !base.length)
 	        return [current, []];
@@ -1257,11 +1084,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var currentIndex = 0, currentSearch = 0, currentLength = current.length, currentExhausted = false, baseIndex = 0, baseSearch = 0, baseLength = base.length, isSearching = false, baseExhausted = false;
 	    while (!baseExhausted && !currentExhausted) {
 	        if (!isSearching) {
-	            // within rang and still the same
 	            if (currentIndex < currentLength && baseIndex < baseLength && current[currentIndex] === base[baseIndex]) {
 	                currentIndex++;
 	                baseIndex++;
-	                // early exit; ends where equal
 	                if (currentIndex === currentLength && baseIndex === baseLength)
 	                    return [added, removed];
 	                continue;
@@ -1277,14 +1102,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (currentSearch >= currentLength)
 	            currentExhausted = true;
 	        if (!currentExhausted && current[currentSearch] === base[baseIndex]) {
-	            // items where added
 	            added.push.apply(added, current.slice(currentIndex, currentSearch));
 	            currentIndex = currentSearch + 1;
 	            baseIndex++;
 	            isSearching = false;
 	        }
 	        else if (!baseExhausted && base[baseSearch] === current[currentIndex]) {
-	            // items where removed
 	            removed.push.apply(removed, base.slice(baseIndex, baseSearch));
 	            baseIndex = baseSearch + 1;
 	            currentIndex++;
@@ -1316,7 +1139,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var simpleeventemitter_1 = __webpack_require__(6);
 	var core_1 = __webpack_require__(1);
 	var utils_1 = __webpack_require__(7);
-	// Workaround to make sure ObservableArray extends Array
 	var StubArray = (function () {
 	    function StubArray() {
 	    }
@@ -1369,15 +1191,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        enumerable: true,
 	        configurable: true
 	    });
-	    // adds / removes the necessary numeric properties to this object
 	    ObservableArray.prototype.updateLength = function (oldLength, delta) {
 	        if (delta < 0)
 	            for (var i = oldLength + delta; i < oldLength; i++)
-	                delete this[i]; // bit faster but mem inefficient: Object.defineProperty(this, <string><any> i, notEnumerableProp);
+	                delete this[i];
 	        else if (delta > 0) {
 	            if (oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
 	                reserveArrayBuffer(oldLength + delta);
-	            // funny enough, this is faster than slicing ENUMERABLE_PROPS into defineProperties, and faster as a temporarily map
 	            for (var i = oldLength, end = oldLength + delta; i < end; i++)
 	                Object.defineProperty(this, "" + i, ENUMERABLE_PROPS[i]);
 	        }
@@ -1405,7 +1225,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            newItems = newItems.map(function (value) { return _this.makeReactiveArrayItem(value); });
 	        var lengthDelta = newItems.length - deleteCount;
 	        var res = (_a = this.$mobservable.values).splice.apply(_a, [index, deleteCount].concat(newItems));
-	        this.updateLength(length, lengthDelta); // create or remove new entries
+	        this.updateLength(length, lengthDelta);
 	        this.notifySplice(index, res, newItems);
 	        return res;
 	        var _a;
@@ -1419,14 +1239,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    ObservableArray.prototype.notifyChildUpdate = function (index, oldValue) {
 	        this.notifyChanged();
-	        // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
 	        this.$mobservable.changeEvent.emit({ object: this, type: 'update', index: index, oldValue: oldValue });
 	    };
 	    ObservableArray.prototype.notifySplice = function (index, deleted, added) {
 	        if (deleted.length === 0 && added.length === 0)
 	            return;
 	        this.notifyChanged();
-	        // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
 	        this.$mobservable.changeEvent.emit({ object: this, type: 'splice', index: index, addedCount: added.length, removed: deleted });
 	    };
 	    ObservableArray.prototype.notifyChanged = function () {
@@ -1463,7 +1281,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            name: this.$mobservable.context.name + "[clone]"
 	        });
 	    };
-	    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
 	    ObservableArray.prototype.find = function (predicate, thisArg, fromIndex) {
 	        if (fromIndex === void 0) { fromIndex = 0; }
 	        this.$mobservable.notifyObserved();
@@ -1473,12 +1290,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return items[i];
 	        return null;
 	    };
-	    /*
-	        functions that do alter the internal structure of the array, (based on lib.es6.d.ts)
-	        since these functions alter the inner structure of the array, the have side effects.
-	        Because the have side effects, they should not be used in computed function,
-	        and for that reason the do not call dependencyState.notifyObserved
-	        */
 	    ObservableArray.prototype.splice = function (index, deleteCount) {
 	        var newItems = [];
 	        for (var _i = 2; _i < arguments.length; _i++) {
@@ -1551,9 +1362,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ObservableArray;
 	})(StubArray);
 	exports.ObservableArray = ObservableArray;
-	/**
-	    * Wrap function from prototype
-	    */
 	[
 	    "concat",
 	    "join",
@@ -1574,11 +1382,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return baseFunc.apply(this.$mobservable.values, arguments);
 	    };
 	});
-	/**
-	    * This array buffer contains two lists of properties, so that all arrays
-	    * can recycle their property definitions, which significantly improves performance of creating
-	    * properties on the fly.
-	    */
 	var OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
 	var ENUMERABLE_PROPS = [];
 	function createArrayBufferItem(index) {
@@ -1630,11 +1433,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	/**
-	 * mobservable
-	 * (c) 2015 - Michel Weststrate
-	 * https://github.com/mweststrate/mobservable
-	 */
 	var dnode_1 = __webpack_require__(2);
 	var simpleeventemitter_1 = __webpack_require__(6);
 	var core_1 = __webpack_require__(1);
@@ -1647,7 +1445,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.mode = mode;
 	        this.changeEvent = new simpleeventemitter_1.default();
 	        var _a = core_1.getValueModeFromValue(value, core_1.ValueMode.Recursive), childmode = _a[0], unwrappedValue = _a[1];
-	        // If the value mode is recursive, modifiers like 'structure', 'reference', or 'flat' could apply
 	        if (this.mode === core_1.ValueMode.Recursive)
 	            this.mode = childmode;
 	        this._value = this.makeReferenceValueReactive(unwrappedValue);
@@ -1659,9 +1456,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        core_1.assertUnwrapped(newValue, "Modifiers cannot be used on non-initial values.");
 	        dnode_1.checkIfStateIsBeingModifiedDuringView(this.context);
 	        var changed = this.mode === core_1.ValueMode.Structure ? !utils_1.deepEquals(newValue, this._value) : newValue !== this._value;
-	        // Possible improvement; even if changed and structural, apply the minium amount of updates to alter the object,
-	        // To minimize the amount of observers triggered.
-	        // Complex. Is that a useful case?
 	        if (changed) {
 	            var oldValue = this._value;
 	            this.markStale();
@@ -1720,7 +1514,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        catch (e) {
 	            console.error("Failed to run scheduled action, the action has been dropped from the queue: " + e, e);
-	            // drop already executed tasks, including the failing one, and continue with other actions, to keep state as stable as possible
 	            tasks.splice(0, i + 1);
 	        }
 	    }
@@ -1732,7 +1525,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    finally {
 	        if (--inBatch === 0) {
-	            // make sure follow up actions are processed in batch after the current queue
 	            inBatch += 1;
 	            runPostBatchActions();
 	            inBatch -= 1;

@@ -5,8 +5,12 @@
   "main": "dist/mobservable.js",
   "typings": "dist/typings/index",
   "scripts": {
-    "test": "grunt cover",
-    "prepublish": "grunt"
+    "test": "npm run build && npm run buildtest && ./node_modules/istanbul/lib/cli.js cover nodeunit test/*.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js ",
+    "start": "npm run build && npm run buildtest && ./node_modules/nodeunit/bin/nodeunit test/*.js",
+    "prepublish": "npm run build",
+    "build": "rm -rf dist && mkdir -p dist/typings && ./node_modules/typescript/bin/tsc && NODE_ENV=production ./node_modules/webpack/bin/webpack.js && cp -r .build/*.d.ts dist/typings",
+    "buildtest": "cd test && ../node_modules/typescript/bin/tsc && cd ..",
+    "perf": "npm run build && ./node_modules/nodeunit/bin/nodeunit test/perf/*.js"
   },
   "repository": {
     "type": "git",
@@ -19,12 +23,9 @@
   },
   "homepage": "https://mweststrate.github.io/mobservable",
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-nodeunit": "^0.4.1",
-    "grunt-contrib-uglify": "^0.9.1",
-    "grunt-coveralls": "^1.0.0",
-    "grunt-exec": "^0.4.6",
-    "mkdirp": "^0.5.1",
+    "coveralls": "^2.11.4",
+    "istanbul": "^0.3.21",
+    "nodeunit": "^0.9.1",
     "nodeunit-browser-tap": "^0.1.0",
     "typescript": "^1.6.2",
     "webpack": "^1.12.2"

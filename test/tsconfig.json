@@ -1,0 +1,15 @@
+{
+    "version": "1.6.2",
+    "compilerOptions": {
+        "target": "es5",
+        "sourceMap": false,
+        "module": "commonjs",
+        "experimentalDecorators": true
+    },
+    "files": [
+        "./typescript-test.ts"
+    ],
+    "filesGlob": [
+        "!./node_modules/**/*.ts"
+    ]
+}
