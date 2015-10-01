@@ -1,6 +1,9 @@
 import {
     observable, asStructure, makeReactive, observe, observeAsync, extendReactive, 
     IObservableArray, IArrayChange, IArraySplice, IObservableValue,
+    extras,
+    logLevel,
+    strict,
     default as mobservable
 } from "mobservable";
 
@@ -30,6 +33,7 @@ class Order {
 export function testObservable(test) {
     var a = makeReactive(3);
     var b = makeReactive(() => a() * 2);
+    test.ok(extras.getDNode(a));
     test.equal(b(), 6);
     test.done();
 }

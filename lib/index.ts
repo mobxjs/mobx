@@ -23,6 +23,8 @@ export {
 	expr,
 	transaction,
 	toJSON,
+	logLevel,
+	strict
 } from './core';
 
 /* Make configurable module properties writable */

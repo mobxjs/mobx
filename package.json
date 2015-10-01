@@ -3,10 +3,10 @@
   "version": "0.6.11",
   "description": "Keeps views automatically in sync with state. Unobtrusively.",
   "main": "dist/mobservable.js",
-  "typings": "dist/mobservable",
+  "typings": "dist/typings/index",
   "scripts": {
     "test": "grunt cover",
-    "prepublish": "grunt builddist"
+    "prepublish": "grunt"
   },
   "repository": {
     "type": "git",

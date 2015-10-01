@@ -19,7 +19,8 @@ module.exports = function(grunt) {
             },
             buildtsc: tsc,
             webpack: "NODE_ENV=production ./node_modules/webpack/bin/webpack.js",
-            copytypings: "cp -rf .build/*.d.ts test/node_modules/mobservable" // TODO: dir might not exist
+            copytypingsdist: "rm -rf dist/typings && mkdir -p dist/typings && cp -rf .build/*.d.ts dist/typings",
+            copytypingstest: "cp -rf .build/*.d.ts test/node_modules/mobservable" // TODO: dir might not exist
         },
         coveralls: {
             options: {
@@ -60,8 +61,8 @@ module.exports = function(grunt) {
     });
     grunt.registerTask("default", ["buildlocal"]);
     grunt.registerTask("builddist", ["exec:buildtsc", "webpack"]);// "exec:builddist","builddts","uglify:dist"]);
-    grunt.registerTask("buildlocal", ["exec:buildtsc", "exec:webpack"]);
+    grunt.registerTask("buildlocal", ["exec:buildtsc", "exec:webpack", "exec:copytypingsdist"]);
     grunt.registerTask("cover", ["builddist", "preparetest:dist", "exec:cover", "coveralls:default"]);
-    grunt.registerTask("test", ["buildlocal", "exec:copytypings", "preparetest", "exec:buildtypescripttest", "nodeunit:all"]);
+    grunt.registerTask("test", ["buildlocal", "exec:copytypingstest", "preparetest", "exec:buildtypescripttest", "nodeunit:all"]);
     grunt.registerTask("perf", ["buildlocal", "preparetest:.build", "nodeunit:perf"]);
 };
