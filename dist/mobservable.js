@@ -57,9 +57,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	function __export(m) {
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
-	__webpack_require__(1);
+	var core = __webpack_require__(1);
+	var dnode_1 = __webpack_require__(2);
+	var utils_1 = __webpack_require__(7);
+	var extras_1 = __webpack_require__(3);
 	__export(__webpack_require__(11));
-	var core_1 = __webpack_require__(2);
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = core.makeReactive;
+	var core_1 = __webpack_require__(1);
 	exports.isReactive = core_1.isReactive;
 	exports.makeReactive = core_1.makeReactive;
 	exports.extendReactive = core_1.extendReactive;
@@ -74,8 +79,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.expr = core_1.expr;
 	exports.transaction = core_1.transaction;
 	exports.toJSON = core_1.toJSON;
-	exports.logLevel = core_1.logLevel;
-	exports.strict = core_1.strict;
+	Object.defineProperties(module.exports, {
+	    strict: {
+	        enumerable: true,
+	        get: function () { return core.strict; },
+	        set: function (v) { return core.strict = v; }
+	    },
+	    logLevel: {
+	        enumerable: true,
+	        get: function () { return core.logLevel; },
+	        set: function (v) { return core.logLevel = v; }
+	    }
+	});
+	/**
+	 * 'Private' elements that are exposed for testing and debugging utilities
+	 */
+	exports._ = {
+	    isComputingView: dnode_1.isComputingView,
+	    quickDiff: utils_1.quickDiff,
+	};
+	exports.extras = {
+	    getDNode: extras_1.getDNode,
+	    getDependencyTree: extras_1.getDependencyTree,
+	    getObserverTree: extras_1.getObserverTree,
+	    trackTransitions: extras_1.trackTransitions
+	};
 	//# sourceMappingURL=index.js.map
 
 /***/ },
@@ -87,260 +115,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * (c) 2015 - Michel Weststrate
 	 * https://github.com/mweststrate/mobservable
 	 */
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var globalScope = (function () { return this; })();
-	// DNode[][], stack of: list of DNode's being observed by the currently ongoing computation
-	if (globalScope.__mobservableTrackingStack)
-	    throw new Error("[mobservable] An incompatible version of mobservable is already loaded.");
-	globalScope.__mobservableViewStack = [];
-	var mobservableId = 0;
-	function checkIfStateIsBeingModifiedDuringView(context) {
-	    if (isComputingView() && core_1.strict === true) {
-	        // TODO: add url with detailed error subscription / best practice here:
-	        var ts = __mobservableViewStack;
-	        throw new Error("[mobservable] It is not allowed to change the state during the computation of a reactive view if 'mobservable.strict' mode is enabled:\nShould the data you are trying to modify actually be a view?\nView name: " + context.name + ".\nCurrent stack size is " + ts.length + ", active view: \"" + ts[ts.length - 1].toString() + "\".");
-	    }
-	}
-	exports.checkIfStateIsBeingModifiedDuringView = checkIfStateIsBeingModifiedDuringView;
-	/**
-	    * The state of some node in the dependency tree that is created for all views.
-	    */
-	(function (NodeState) {
-	    NodeState[NodeState["STALE"] = 0] = "STALE";
-	    NodeState[NodeState["PENDING"] = 1] = "PENDING";
-	    NodeState[NodeState["READY"] = 2] = "READY";
-	})(exports.NodeState || (exports.NodeState = {}));
-	var NodeState = exports.NodeState;
-	;
-	/**
-	    * A root node in the dependency graph. This node can be observed by others, but doesn't observe anything itself.
-	    * These nodes are used to store 'state'.
-	    */
-	var DataNode = (function () {
-	    function DataNode(context) {
-	        this.context = context;
-	        this.id = ++mobservableId;
-	        this.state = NodeState.READY;
-	        this.observers = []; // nodes that are dependent on this node. Will be notified when our state change
-	        this.isDisposed = false; // ready to be garbage collected. Nobody is observing or ever will observe us
-	        this.externalRefenceCount = 0; // nr of 'things' that depend on us, excluding other DNode's. If > 0, this node will not go to sleep
-	        if (!context.name)
-	            context.name = "[m#" + this.id + "]";
-	    }
-	    DataNode.prototype.setRefCount = function (delta) {
-	        this.externalRefenceCount += delta;
-	    };
-	    DataNode.prototype.addObserver = function (node) {
-	        this.observers[this.observers.length] = node;
-	    };
-	    DataNode.prototype.removeObserver = function (node) {
-	        var obs = this.observers, idx = obs.indexOf(node);
-	        if (idx !== -1)
-	            obs.splice(idx, 1);
-	    };
-	    DataNode.prototype.markStale = function () {
-	        if (this.state !== NodeState.READY)
-	            return; // stale or pending; recalculation already scheduled, we're fine..
-	        this.state = NodeState.STALE;
-	        if (extras_1.transitionTracker)
-	            extras_1.reportTransition(this, "STALE");
-	        this.notifyObservers();
-	    };
-	    DataNode.prototype.markReady = function (stateDidActuallyChange) {
-	        if (this.state === NodeState.READY)
-	            return;
-	        this.state = NodeState.READY;
-	        if (extras_1.transitionTracker)
-	            extras_1.reportTransition(this, "READY", true, this["_value"]);
-	        this.notifyObservers(stateDidActuallyChange);
-	    };
-	    DataNode.prototype.notifyObservers = function (stateDidActuallyChange) {
-	        if (stateDidActuallyChange === void 0) { stateDidActuallyChange = false; }
-	        var os = this.observers.slice();
-	        for (var l = os.length, i = 0; i < l; i++)
-	            os[i].notifyStateChange(this, stateDidActuallyChange);
-	    };
-	    DataNode.prototype.notifyObserved = function () {
-	        var ts = __mobservableViewStack, l = ts.length;
-	        if (l > 0) {
-	            var deps = ts[l - 1].observing, depslength = deps.length;
-	            // this last item added check is an optimization especially for array loops,
-	            // because an array.length read with subsequent reads from the array
-	            // might trigger many observed events, while just checking the latest added items is cheap
-	            // (n.b.: this code is inlined and not in observable view for performance reasons)
-	            if (deps[depslength - 1] !== this && deps[depslength - 2] !== this)
-	                deps[depslength] = this;
-	        }
-	    };
-	    DataNode.prototype.dispose = function () {
-	        if (this.observers.length)
-	            throw new Error("[mobservable] Cannot dispose DNode; it is still being observed");
-	        this.isDisposed = true;
-	    };
-	    DataNode.prototype.toString = function () {
-	        return "DNode[" + this.context.name + ", state: " + this.state + ", observers: " + this.observers.length + "]";
-	    };
-	    return DataNode;
-	})();
-	exports.DataNode = DataNode;
-	/**
-	    * A node in the state dependency root that observes other nodes, and can be observed itself.
-	    * Represents the state of a View.
-	    */
-	var ViewNode = (function (_super) {
-	    __extends(ViewNode, _super);
-	    function ViewNode() {
-	        _super.apply(this, arguments);
-	        this.isSleeping = true; // isSleeping: nobody is observing this dependency node, so don't bother tracking DNode's this DNode depends on
-	        this.hasCycle = false; // this node is part of a cycle, which is an error
-	        this.observing = []; // nodes we are looking at. Our value depends on these nodes
-	        this.prevObserving = null; // nodes we were looking at before. Used to determine changes in the dependency tree
-	        this.dependencyChangeCount = 0; // nr of nodes being observed that have received a new value. If > 0, we should recompute
-	        this.dependencyStaleCount = 0; // nr of nodes being observed that are currently not ready
-	    }
-	    ViewNode.prototype.setRefCount = function (delta) {
-	        var rc = this.externalRefenceCount += delta;
-	        if (rc === 0)
-	            this.tryToSleep();
-	        else if (rc === delta)
-	            this.wakeUp();
-	    };
-	    ViewNode.prototype.removeObserver = function (node) {
-	        _super.prototype.removeObserver.call(this, node);
-	        this.tryToSleep();
-	    };
-	    ViewNode.prototype.tryToSleep = function () {
-	        if (!this.isSleeping && this.observers.length === 0 && this.externalRefenceCount === 0) {
-	            for (var i = 0, l = this.observing.length; i < l; i++)
-	                this.observing[i].removeObserver(this);
-	            this.observing = [];
-	            this.isSleeping = true;
-	        }
-	    };
-	    ViewNode.prototype.wakeUp = function () {
-	        if (this.isSleeping) {
-	            this.isSleeping = false;
-	            this.state = NodeState.PENDING;
-	            this.computeNextState();
-	        }
-	    };
-	    // the state of something we are observing has changed..
-	    ViewNode.prototype.notifyStateChange = function (observable, stateDidActuallyChange) {
-	        var _this = this;
-	        if (observable.state === NodeState.STALE) {
-	            if (++this.dependencyStaleCount === 1)
-	                this.markStale();
-	        }
-	        else {
-	            if (stateDidActuallyChange)
-	                this.dependencyChangeCount += 1;
-	            if (--this.dependencyStaleCount === 0) {
-	                this.state = NodeState.PENDING;
-	                scheduler_1.schedule(function () {
-	                    // did any of the observables really change?
-	                    if (_this.dependencyChangeCount > 0)
-	                        _this.computeNextState();
-	                    else
-	                        // we're done, but didn't change, lets make sure verybody knows..
-	                        _this.markReady(false);
-	                    _this.dependencyChangeCount = 0;
-	                });
-	            }
-	        }
-	    };
-	    ViewNode.prototype.computeNextState = function () {
-	        this.trackDependencies();
-	        if (extras_1.transitionTracker)
-	            extras_1.reportTransition(this, "PENDING");
-	        var stateDidChange = this.compute();
-	        this.bindDependencies();
-	        this.markReady(stateDidChange);
-	    };
-	    ViewNode.prototype.compute = function () {
-	        throw "Abstract!";
-	    };
-	    ViewNode.prototype.trackDependencies = function () {
-	        this.prevObserving = this.observing;
-	        this.observing = [];
-	        __mobservableViewStack[__mobservableViewStack.length] = this;
-	    };
-	    ViewNode.prototype.bindDependencies = function () {
-	        __mobservableViewStack.length -= 1;
-	        if (this.observing.length === 0 && core_1.logLevel > 1 && !this.isDisposed) {
-	            console.error("[mobservable] You have created a view function that doesn't observe any values, did you forget to make its dependencies observable?");
-	        }
-	        var _a = utils_1.quickDiff(this.observing, this.prevObserving), added = _a[0], removed = _a[1];
-	        this.prevObserving = null;
-	        this.hasCycle = false;
-	        for (var i = 0, l = added.length; i < l; i++) {
-	            var dependency = added[i];
-	            if (dependency instanceof ViewNode && dependency.findCycle(this)) {
-	                this.hasCycle = true;
-	                // don't observe anything that caused a cycle, or we are stuck forever!
-	                this.observing.splice(this.observing.indexOf(added[i]), 1);
-	                dependency.hasCycle = true; // for completeness sake..
-	            }
-	            else {
-	                added[i].addObserver(this);
-	            }
-	        }
-	        // remove observers after adding them, so that they don't go in lazy mode to early
-	        for (var i = 0, l = removed.length; i < l; i++)
-	            removed[i].removeObserver(this);
-	    };
-	    ViewNode.prototype.findCycle = function (node) {
-	        var obs = this.observing;
-	        if (obs.indexOf(node) !== -1)
-	            return true;
-	        for (var l = obs.length, i = 0; i < l; i++)
-	            if (obs[i] instanceof ViewNode && obs[i].findCycle(node))
-	                return true;
-	        return false;
-	    };
-	    ViewNode.prototype.dispose = function () {
-	        if (this.observing)
-	            for (var l = this.observing.length, i = 0; i < l; i++)
-	                this.observing[i].removeObserver(this);
-	        this.observing = null;
-	        _super.prototype.dispose.call(this);
-	    };
-	    return ViewNode;
-	})(DataNode);
-	exports.ViewNode = ViewNode;
-	function stackDepth() {
-	    return __mobservableViewStack.length;
-	}
-	exports.stackDepth = stackDepth;
-	function isComputingView() {
-	    return __mobservableViewStack.length > 0;
-	}
-	exports.isComputingView = isComputingView;
-	var core_1 = __webpack_require__(2);
-	var extras_1 = __webpack_require__(10);
-	var utils_1 = __webpack_require__(3);
-	var scheduler_1 = __webpack_require__(9);
-	//# sourceMappingURL=dnode.js.map
-
-/***/ },
-/* 2 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * mobservable
-	 * (c) 2015 - Michel Weststrate
-	 * https://github.com/mweststrate/mobservable
-	 */
-	var dnode_1 = __webpack_require__(1);
-	var utils_1 = __webpack_require__(3);
-	var observablevalue_1 = __webpack_require__(6);
-	var observableview_1 = __webpack_require__(7);
-	var observablearray_1 = __webpack_require__(4);
-	var observableobject_1 = __webpack_require__(8);
-	var scheduler_1 = __webpack_require__(9);
+	var dnode_1 = __webpack_require__(2);
+	var utils_1 = __webpack_require__(7);
+	var observablevalue_1 = __webpack_require__(9);
+	var observableview_1 = __webpack_require__(5);
+	var observablearray_1 = __webpack_require__(8);
+	var observableobject_1 = __webpack_require__(4);
+	var scheduler_1 = __webpack_require__(10);
 	function makeReactive(v, scopeOrName, name) {
 	    if (isReactive(v))
 	        return v;
@@ -786,6 +567,253 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=core.js.map
 
 /***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * mobservable
+	 * (c) 2015 - Michel Weststrate
+	 * https://github.com/mweststrate/mobservable
+	 */
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var globalScope = (function () { return this; })();
+	// DNode[][], stack of: list of DNode's being observed by the currently ongoing computation
+	if (globalScope.__mobservableTrackingStack)
+	    throw new Error("[mobservable] An incompatible version of mobservable is already loaded.");
+	globalScope.__mobservableViewStack = [];
+	var mobservableId = 0;
+	function checkIfStateIsBeingModifiedDuringView(context) {
+	    if (isComputingView() && core_1.strict === true) {
+	        // TODO: add url with detailed error subscription / best practice here:
+	        var ts = __mobservableViewStack;
+	        throw new Error("[mobservable] It is not allowed to change the state during the computation of a reactive view if 'mobservable.strict' mode is enabled:\nShould the data you are trying to modify actually be a view?\nView name: " + context.name + ".\nCurrent stack size is " + ts.length + ", active view: \"" + ts[ts.length - 1].toString() + "\".");
+	    }
+	}
+	exports.checkIfStateIsBeingModifiedDuringView = checkIfStateIsBeingModifiedDuringView;
+	/**
+	    * The state of some node in the dependency tree that is created for all views.
+	    */
+	(function (NodeState) {
+	    NodeState[NodeState["STALE"] = 0] = "STALE";
+	    NodeState[NodeState["PENDING"] = 1] = "PENDING";
+	    NodeState[NodeState["READY"] = 2] = "READY";
+	})(exports.NodeState || (exports.NodeState = {}));
+	var NodeState = exports.NodeState;
+	;
+	/**
+	    * A root node in the dependency graph. This node can be observed by others, but doesn't observe anything itself.
+	    * These nodes are used to store 'state'.
+	    */
+	var DataNode = (function () {
+	    function DataNode(context) {
+	        this.context = context;
+	        this.id = ++mobservableId;
+	        this.state = NodeState.READY;
+	        this.observers = []; // nodes that are dependent on this node. Will be notified when our state change
+	        this.isDisposed = false; // ready to be garbage collected. Nobody is observing or ever will observe us
+	        this.externalRefenceCount = 0; // nr of 'things' that depend on us, excluding other DNode's. If > 0, this node will not go to sleep
+	        if (!context.name)
+	            context.name = "[m#" + this.id + "]";
+	    }
+	    DataNode.prototype.setRefCount = function (delta) {
+	        this.externalRefenceCount += delta;
+	    };
+	    DataNode.prototype.addObserver = function (node) {
+	        this.observers[this.observers.length] = node;
+	    };
+	    DataNode.prototype.removeObserver = function (node) {
+	        var obs = this.observers, idx = obs.indexOf(node);
+	        if (idx !== -1)
+	            obs.splice(idx, 1);
+	    };
+	    DataNode.prototype.markStale = function () {
+	        if (this.state !== NodeState.READY)
+	            return; // stale or pending; recalculation already scheduled, we're fine..
+	        this.state = NodeState.STALE;
+	        if (extras_1.transitionTracker)
+	            extras_1.reportTransition(this, "STALE");
+	        this.notifyObservers();
+	    };
+	    DataNode.prototype.markReady = function (stateDidActuallyChange) {
+	        if (this.state === NodeState.READY)
+	            return;
+	        this.state = NodeState.READY;
+	        if (extras_1.transitionTracker)
+	            extras_1.reportTransition(this, "READY", true, this["_value"]);
+	        this.notifyObservers(stateDidActuallyChange);
+	    };
+	    DataNode.prototype.notifyObservers = function (stateDidActuallyChange) {
+	        if (stateDidActuallyChange === void 0) { stateDidActuallyChange = false; }
+	        var os = this.observers.slice();
+	        for (var l = os.length, i = 0; i < l; i++)
+	            os[i].notifyStateChange(this, stateDidActuallyChange);
+	    };
+	    DataNode.prototype.notifyObserved = function () {
+	        var ts = __mobservableViewStack, l = ts.length;
+	        if (l > 0) {
+	            var deps = ts[l - 1].observing, depslength = deps.length;
+	            // this last item added check is an optimization especially for array loops,
+	            // because an array.length read with subsequent reads from the array
+	            // might trigger many observed events, while just checking the latest added items is cheap
+	            // (n.b.: this code is inlined and not in observable view for performance reasons)
+	            if (deps[depslength - 1] !== this && deps[depslength - 2] !== this)
+	                deps[depslength] = this;
+	        }
+	    };
+	    DataNode.prototype.dispose = function () {
+	        if (this.observers.length)
+	            throw new Error("[mobservable] Cannot dispose DNode; it is still being observed");
+	        this.isDisposed = true;
+	    };
+	    DataNode.prototype.toString = function () {
+	        return "DNode[" + this.context.name + ", state: " + this.state + ", observers: " + this.observers.length + "]";
+	    };
+	    return DataNode;
+	})();
+	exports.DataNode = DataNode;
+	/**
+	    * A node in the state dependency root that observes other nodes, and can be observed itself.
+	    * Represents the state of a View.
+	    */
+	var ViewNode = (function (_super) {
+	    __extends(ViewNode, _super);
+	    function ViewNode() {
+	        _super.apply(this, arguments);
+	        this.isSleeping = true; // isSleeping: nobody is observing this dependency node, so don't bother tracking DNode's this DNode depends on
+	        this.hasCycle = false; // this node is part of a cycle, which is an error
+	        this.observing = []; // nodes we are looking at. Our value depends on these nodes
+	        this.prevObserving = null; // nodes we were looking at before. Used to determine changes in the dependency tree
+	        this.dependencyChangeCount = 0; // nr of nodes being observed that have received a new value. If > 0, we should recompute
+	        this.dependencyStaleCount = 0; // nr of nodes being observed that are currently not ready
+	    }
+	    ViewNode.prototype.setRefCount = function (delta) {
+	        var rc = this.externalRefenceCount += delta;
+	        if (rc === 0)
+	            this.tryToSleep();
+	        else if (rc === delta)
+	            this.wakeUp();
+	    };
+	    ViewNode.prototype.removeObserver = function (node) {
+	        _super.prototype.removeObserver.call(this, node);
+	        this.tryToSleep();
+	    };
+	    ViewNode.prototype.tryToSleep = function () {
+	        if (!this.isSleeping && this.observers.length === 0 && this.externalRefenceCount === 0) {
+	            for (var i = 0, l = this.observing.length; i < l; i++)
+	                this.observing[i].removeObserver(this);
+	            this.observing = [];
+	            this.isSleeping = true;
+	        }
+	    };
+	    ViewNode.prototype.wakeUp = function () {
+	        if (this.isSleeping) {
+	            this.isSleeping = false;
+	            this.state = NodeState.PENDING;
+	            this.computeNextState();
+	        }
+	    };
+	    // the state of something we are observing has changed..
+	    ViewNode.prototype.notifyStateChange = function (observable, stateDidActuallyChange) {
+	        var _this = this;
+	        if (observable.state === NodeState.STALE) {
+	            if (++this.dependencyStaleCount === 1)
+	                this.markStale();
+	        }
+	        else {
+	            if (stateDidActuallyChange)
+	                this.dependencyChangeCount += 1;
+	            if (--this.dependencyStaleCount === 0) {
+	                this.state = NodeState.PENDING;
+	                scheduler_1.schedule(function () {
+	                    // did any of the observables really change?
+	                    if (_this.dependencyChangeCount > 0)
+	                        _this.computeNextState();
+	                    else
+	                        // we're done, but didn't change, lets make sure verybody knows..
+	                        _this.markReady(false);
+	                    _this.dependencyChangeCount = 0;
+	                });
+	            }
+	        }
+	    };
+	    ViewNode.prototype.computeNextState = function () {
+	        this.trackDependencies();
+	        if (extras_1.transitionTracker)
+	            extras_1.reportTransition(this, "PENDING");
+	        var stateDidChange = this.compute();
+	        this.bindDependencies();
+	        this.markReady(stateDidChange);
+	    };
+	    ViewNode.prototype.compute = function () {
+	        throw "Abstract!";
+	    };
+	    ViewNode.prototype.trackDependencies = function () {
+	        this.prevObserving = this.observing;
+	        this.observing = [];
+	        __mobservableViewStack[__mobservableViewStack.length] = this;
+	    };
+	    ViewNode.prototype.bindDependencies = function () {
+	        __mobservableViewStack.length -= 1;
+	        if (this.observing.length === 0 && core_1.logLevel > 1 && !this.isDisposed) {
+	            console.error("[mobservable] You have created a view function that doesn't observe any values, did you forget to make its dependencies observable?");
+	        }
+	        var _a = utils_1.quickDiff(this.observing, this.prevObserving), added = _a[0], removed = _a[1];
+	        this.prevObserving = null;
+	        this.hasCycle = false;
+	        for (var i = 0, l = added.length; i < l; i++) {
+	            var dependency = added[i];
+	            if (dependency instanceof ViewNode && dependency.findCycle(this)) {
+	                this.hasCycle = true;
+	                // don't observe anything that caused a cycle, or we are stuck forever!
+	                this.observing.splice(this.observing.indexOf(added[i]), 1);
+	                dependency.hasCycle = true; // for completeness sake..
+	            }
+	            else {
+	                added[i].addObserver(this);
+	            }
+	        }
+	        // remove observers after adding them, so that they don't go in lazy mode to early
+	        for (var i = 0, l = removed.length; i < l; i++)
+	            removed[i].removeObserver(this);
+	    };
+	    ViewNode.prototype.findCycle = function (node) {
+	        var obs = this.observing;
+	        if (obs.indexOf(node) !== -1)
+	            return true;
+	        for (var l = obs.length, i = 0; i < l; i++)
+	            if (obs[i] instanceof ViewNode && obs[i].findCycle(node))
+	                return true;
+	        return false;
+	    };
+	    ViewNode.prototype.dispose = function () {
+	        if (this.observing)
+	            for (var l = this.observing.length, i = 0; i < l; i++)
+	                this.observing[i].removeObserver(this);
+	        this.observing = null;
+	        _super.prototype.dispose.call(this);
+	    };
+	    return ViewNode;
+	})(DataNode);
+	exports.ViewNode = ViewNode;
+	function stackDepth() {
+	    return __mobservableViewStack.length;
+	}
+	exports.stackDepth = stackDepth;
+	function isComputingView() {
+	    return __mobservableViewStack.length > 0;
+	}
+	exports.isComputingView = isComputingView;
+	var core_1 = __webpack_require__(1);
+	var extras_1 = __webpack_require__(3);
+	var utils_1 = __webpack_require__(7);
+	var scheduler_1 = __webpack_require__(10);
+	//# sourceMappingURL=dnode.js.map
+
+/***/ },
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -794,7 +822,355 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * (c) 2015 - Michel Weststrate
 	 * https://github.com/mweststrate/mobservable
 	 */
-	var observablearray_1 = __webpack_require__(4);
+	var dnode_1 = __webpack_require__(2);
+	var observableobject_1 = __webpack_require__(4);
+	var simpleeventemitter_1 = __webpack_require__(6);
+	var utils_1 = __webpack_require__(7);
+	var core_1 = __webpack_require__(1);
+	function getDNode(thing, property) {
+	    if (!core_1.isReactive(thing))
+	        throw new Error("[mobservable.getDNode] " + thing + " doesn't seem to be reactive");
+	    if (property !== undefined) {
+	        var o = thing.$mobservable;
+	        var dnode = o.values && o.values[property];
+	        if (!dnode)
+	            throw new Error("[mobservable.getDNode] property '" + property + "' of '" + thing + "' doesn't seem to be a reactive property");
+	        return dnode;
+	    }
+	    if (thing.$mobservable) {
+	        if (thing.$mobservable instanceof observableobject_1.ObservableObject)
+	            throw new Error("[mobservable.getDNode] missing properties parameter. Please specify a property of '" + thing + "'.");
+	        return thing.$mobservable;
+	    }
+	    throw new Error("[mobservable.getDNode] " + thing + " doesn't seem to be reactive");
+	}
+	exports.getDNode = getDNode;
+	function reportTransition(node, state, changed, newValue) {
+	    if (changed === void 0) { changed = false; }
+	    if (newValue === void 0) { newValue = null; }
+	    exports.transitionTracker.emit({
+	        id: node.id,
+	        name: node.context.name,
+	        context: node.context.object,
+	        state: state,
+	        changed: changed,
+	        newValue: newValue
+	    });
+	}
+	exports.reportTransition = reportTransition;
+	exports.transitionTracker = null;
+	function getDependencyTree(thing, property) {
+	    return nodeToDependencyTree(getDNode(thing, property));
+	}
+	exports.getDependencyTree = getDependencyTree;
+	function nodeToDependencyTree(node) {
+	    var result = {
+	        id: node.id,
+	        name: node.context.name,
+	        context: node.context.object || null
+	    };
+	    if (node instanceof dnode_1.ViewNode && node.observing.length)
+	        result.dependencies = utils_1.unique(node.observing).map(nodeToDependencyTree);
+	    return result;
+	}
+	function getObserverTree(thing, property) {
+	    return nodeToObserverTree(getDNode(thing, property));
+	}
+	exports.getObserverTree = getObserverTree;
+	function nodeToObserverTree(node) {
+	    var result = {
+	        id: node.id,
+	        name: node.context.name,
+	        context: node.context.object || null
+	    };
+	    if (node.observers.length)
+	        result.observers = utils_1.unique(node.observers).map(nodeToObserverTree);
+	    if (node.externalRefenceCount > 0)
+	        result.listeners = node.externalRefenceCount;
+	    return result;
+	}
+	function createConsoleReporter(extensive) {
+	    var lines = [];
+	    var scheduled = false;
+	    return function (line) {
+	        if (extensive || line.changed)
+	            lines.push(line);
+	        if (!scheduled) {
+	            scheduled = true;
+	            setTimeout(function () {
+	                console[console["table"] ? "table" : "dir"](lines);
+	                lines = [];
+	                scheduled = false;
+	            }, 1);
+	        }
+	    };
+	}
+	function trackTransitions(extensive, onReport) {
+	    if (extensive === void 0) { extensive = false; }
+	    if (!exports.transitionTracker)
+	        exports.transitionTracker = new simpleeventemitter_1.default();
+	    var reporter = onReport
+	        ? function (line) {
+	            if (extensive || line.changed)
+	                onReport(line);
+	        }
+	        : createConsoleReporter(extensive);
+	    var disposer = exports.transitionTracker.on(reporter);
+	    return utils_1.once(function () {
+	        disposer();
+	        if (exports.transitionTracker.listeners.length === 0)
+	            exports.transitionTracker = null;
+	    });
+	}
+	exports.trackTransitions = trackTransitions;
+	//# sourceMappingURL=extras.js.map
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var core_1 = __webpack_require__(1);
+	var observableview_1 = __webpack_require__(5);
+	var observablevalue_1 = __webpack_require__(9);
+	// responsible for the administration of objects that have become reactive
+	var ObservableObject = (function () {
+	    function ObservableObject(target, context, mode) {
+	        this.target = target;
+	        this.context = context;
+	        this.mode = mode;
+	        this.values = {};
+	        if (target.$mobservable)
+	            throw new Error("Illegal state: already an reactive object");
+	        if (!context) {
+	            this.context = {
+	                object: target,
+	                name: ""
+	            };
+	        }
+	        else if (!context.object) {
+	            context.object = target;
+	        }
+	        Object.defineProperty(target, "$mobservable", {
+	            enumerable: false,
+	            configurable: false,
+	            value: this
+	        });
+	    }
+	    ObservableObject.asReactive = function (target, context, mode) {
+	        if (target.$mobservable)
+	            return target.$mobservable;
+	        return new ObservableObject(target, context, mode);
+	    };
+	    ObservableObject.prototype.set = function (propName, value) {
+	        if (this.values[propName])
+	            this.target[propName] = value; // the property setter will make 'value' reactive if needed.
+	        else
+	            this.defineReactiveProperty(propName, value);
+	    };
+	    ObservableObject.prototype.defineReactiveProperty = function (propName, value) {
+	        var observable;
+	        var context = {
+	            object: this.context.object,
+	            name: (this.context.name || "") + "." + propName
+	        };
+	        if (typeof value === "function" && value.length === 0)
+	            observable = new observableview_1.ObservableView(value, this.target, context, false);
+	        else if (value instanceof core_1.AsStructure && typeof value.value === "function" && value.value.length === 0)
+	            observable = new observableview_1.ObservableView(value.value, this.target, context, true);
+	        else
+	            observable = new observablevalue_1.ObservableValue(value, this.mode, context);
+	        this.values[propName] = observable;
+	        Object.defineProperty(this.target, propName, observable.asPropertyDescriptor());
+	    };
+	    return ObservableObject;
+	})();
+	exports.ObservableObject = ObservableObject;
+	//# sourceMappingURL=observableobject.js.map
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * mobservable
+	 * (c) 2015 - Michel Weststrate
+	 * https://github.com/mweststrate/mobservable
+	 */
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var dnode_1 = __webpack_require__(2);
+	var simpleeventemitter_1 = __webpack_require__(6);
+	var core_1 = __webpack_require__(1);
+	var utils_1 = __webpack_require__(7);
+	function throwingViewSetter() {
+	    throw new Error("[mobservable.view '" + this.context.name + "'] View functions do not accept new values");
+	}
+	exports.throwingViewSetter = throwingViewSetter;
+	var ObservableView = (function (_super) {
+	    __extends(ObservableView, _super);
+	    function ObservableView(func, scope, context, compareStructural) {
+	        _super.call(this, context);
+	        this.func = func;
+	        this.scope = scope;
+	        this.compareStructural = compareStructural;
+	        this.isComputing = false;
+	        this.hasError = false;
+	        this.changeEvent = new simpleeventemitter_1.default();
+	    }
+	    ObservableView.prototype.get = function () {
+	        if (this.isComputing)
+	            throw new Error("[mobservable.view '" + this.context.name + "'] Cycle detected");
+	        if (this.isSleeping) {
+	            if (dnode_1.isComputingView()) {
+	                // somebody depends on the outcome of this computation
+	                this.wakeUp(); // note: wakeup triggers a compute
+	                this.notifyObserved();
+	            }
+	            else {
+	                // nobody depends on this computable;
+	                // so just compute fresh value and continue to sleep
+	                this.wakeUp();
+	                this.tryToSleep();
+	            }
+	        }
+	        else {
+	            // we are already up to date, somebody is just inspecting our current value
+	            this.notifyObserved();
+	        }
+	        if (this.hasCycle)
+	            throw new Error("[mobservable.view '" + this.context.name + "'] Cycle detected");
+	        if (this.hasError) {
+	            if (core_1.logLevel > 0)
+	                console.error("[mobservable.view '" + this.context.name + "'] Rethrowing caught exception to observer: " + this._value + (this._value.cause || ''));
+	            throw this._value;
+	        }
+	        return this._value;
+	    };
+	    ObservableView.prototype.set = function () {
+	        throwingViewSetter.call(this);
+	    };
+	    ObservableView.prototype.compute = function () {
+	        var newValue;
+	        try {
+	            // this cycle detection mechanism is primarily for lazy computed values; other cycles are already detected in the dependency tree
+	            if (this.isComputing)
+	                throw new Error("[mobservable.view '" + this.context.name + "'] Cycle detected");
+	            this.isComputing = true;
+	            newValue = this.func.call(this.scope);
+	            this.hasError = false;
+	        }
+	        catch (e) {
+	            this.hasError = true;
+	            console.error("[mobservable.view '" + this.context.name + "'] Caught error during computation: ", e, "View function:", this.func.toString());
+	            console.trace();
+	            if (e instanceof Error)
+	                newValue = e;
+	            else {
+	                newValue = new Error(("[mobservable.view '" + this.context.name + "'] Error during computation (see error.cause) in ") + this.func.toString());
+	                newValue.cause = e;
+	            }
+	        }
+	        this.isComputing = false;
+	        var changed = this.compareStructural ? !utils_1.deepEquals(newValue, this._value) : newValue !== this._value;
+	        if (changed) {
+	            var oldValue = this._value;
+	            this._value = newValue;
+	            this.changeEvent.emit(newValue, oldValue);
+	            return true;
+	        }
+	        return false;
+	    };
+	    ObservableView.prototype.observe = function (listener, fireImmediately) {
+	        var _this = this;
+	        if (fireImmediately === void 0) { fireImmediately = false; }
+	        this.setRefCount(+1); // awake
+	        if (fireImmediately)
+	            listener(this.get(), undefined);
+	        var disposer = this.changeEvent.on(listener);
+	        return utils_1.once(function () {
+	            _this.setRefCount(-1);
+	            disposer();
+	        });
+	    };
+	    ObservableView.prototype.asPropertyDescriptor = function () {
+	        var _this = this;
+	        return {
+	            configurable: false,
+	            enumerable: false,
+	            get: function () { return _this.get(); },
+	            set: throwingViewSetter
+	        };
+	    };
+	    ObservableView.prototype.toString = function () {
+	        return "ComputedObservable[" + this.context.name + ":" + this._value + "] " + this.func.toString();
+	    };
+	    return ObservableView;
+	})(dnode_1.ViewNode);
+	exports.ObservableView = ObservableView;
+	//# sourceMappingURL=observableview.js.map
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var utils_1 = __webpack_require__(7);
+	var SimpleEventEmitter = (function () {
+	    function SimpleEventEmitter() {
+	        this.listeners = [];
+	    }
+	    SimpleEventEmitter.prototype.emit = function () {
+	        var listeners = this.listeners.slice();
+	        var l = listeners.length;
+	        switch (arguments.length) {
+	            case 0:
+	                for (var i = 0; i < l; i++)
+	                    listeners[i]();
+	                break;
+	            case 1:
+	                var data = arguments[0];
+	                for (var i = 0; i < l; i++)
+	                    listeners[i](data);
+	                break;
+	            default:
+	                for (var i = 0; i < l; i++)
+	                    listeners[i].apply(null, arguments);
+	        }
+	    };
+	    SimpleEventEmitter.prototype.on = function (listener) {
+	        var _this = this;
+	        this.listeners.push(listener);
+	        return utils_1.once(function () {
+	            var idx = _this.listeners.indexOf(listener);
+	            if (idx !== -1)
+	                _this.listeners.splice(idx, 1);
+	        });
+	    };
+	    SimpleEventEmitter.prototype.once = function (listener) {
+	        var subscription = this.on(function () {
+	            subscription();
+	            listener.apply(this, arguments);
+	        });
+	        return subscription;
+	    };
+	    return SimpleEventEmitter;
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = SimpleEventEmitter;
+	//# sourceMappingURL=simpleeventemitter.js.map
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * mobservable
+	 * (c) 2015 - Michel Weststrate
+	 * https://github.com/mweststrate/mobservable
+	 */
+	var observablearray_1 = __webpack_require__(8);
 	/**
 	    Makes sure that the provided function is invoked at most once.
 	*/
@@ -923,7 +1299,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=utils.js.map
 
 /***/ },
-/* 4 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -936,10 +1312,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var dnode_1 = __webpack_require__(1);
-	var simpleeventemitter_1 = __webpack_require__(5);
-	var core_1 = __webpack_require__(2);
-	var utils_1 = __webpack_require__(3);
+	var dnode_1 = __webpack_require__(2);
+	var simpleeventemitter_1 = __webpack_require__(6);
+	var core_1 = __webpack_require__(1);
+	var utils_1 = __webpack_require__(7);
 	// Workaround to make sure ObservableArray extends Array
 	var StubArray = (function () {
 	    function StubArray() {
@@ -1246,56 +1622,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=observablearray.js.map
 
 /***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var utils_1 = __webpack_require__(3);
-	var SimpleEventEmitter = (function () {
-	    function SimpleEventEmitter() {
-	        this.listeners = [];
-	    }
-	    SimpleEventEmitter.prototype.emit = function () {
-	        var listeners = this.listeners.slice();
-	        var l = listeners.length;
-	        switch (arguments.length) {
-	            case 0:
-	                for (var i = 0; i < l; i++)
-	                    listeners[i]();
-	                break;
-	            case 1:
-	                var data = arguments[0];
-	                for (var i = 0; i < l; i++)
-	                    listeners[i](data);
-	                break;
-	            default:
-	                for (var i = 0; i < l; i++)
-	                    listeners[i].apply(null, arguments);
-	        }
-	    };
-	    SimpleEventEmitter.prototype.on = function (listener) {
-	        var _this = this;
-	        this.listeners.push(listener);
-	        return utils_1.once(function () {
-	            var idx = _this.listeners.indexOf(listener);
-	            if (idx !== -1)
-	                _this.listeners.splice(idx, 1);
-	        });
-	    };
-	    SimpleEventEmitter.prototype.once = function (listener) {
-	        var subscription = this.on(function () {
-	            subscription();
-	            listener.apply(this, arguments);
-	        });
-	        return subscription;
-	    };
-	    return SimpleEventEmitter;
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = SimpleEventEmitter;
-	//# sourceMappingURL=simpleeventemitter.js.map
-
-/***/ },
-/* 6 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __extends = (this && this.__extends) || function (d, b) {
@@ -1308,10 +1635,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * (c) 2015 - Michel Weststrate
 	 * https://github.com/mweststrate/mobservable
 	 */
-	var dnode_1 = __webpack_require__(1);
-	var simpleeventemitter_1 = __webpack_require__(5);
-	var core_1 = __webpack_require__(2);
-	var utils_1 = __webpack_require__(3);
+	var dnode_1 = __webpack_require__(2);
+	var simpleeventemitter_1 = __webpack_require__(6);
+	var core_1 = __webpack_require__(1);
+	var utils_1 = __webpack_require__(7);
 	var ObservableValue = (function (_super) {
 	    __extends(ObservableValue, _super);
 	    function ObservableValue(value, mode, context) {
@@ -1371,194 +1698,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=observablevalue.js.map
 
 /***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * mobservable
-	 * (c) 2015 - Michel Weststrate
-	 * https://github.com/mweststrate/mobservable
-	 */
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var dnode_1 = __webpack_require__(1);
-	var simpleeventemitter_1 = __webpack_require__(5);
-	var core_1 = __webpack_require__(2);
-	var utils_1 = __webpack_require__(3);
-	function throwingViewSetter() {
-	    throw new Error("[mobservable.view '" + this.context.name + "'] View functions do not accept new values");
-	}
-	exports.throwingViewSetter = throwingViewSetter;
-	var ObservableView = (function (_super) {
-	    __extends(ObservableView, _super);
-	    function ObservableView(func, scope, context, compareStructural) {
-	        _super.call(this, context);
-	        this.func = func;
-	        this.scope = scope;
-	        this.compareStructural = compareStructural;
-	        this.isComputing = false;
-	        this.hasError = false;
-	        this.changeEvent = new simpleeventemitter_1.default();
-	    }
-	    ObservableView.prototype.get = function () {
-	        if (this.isComputing)
-	            throw new Error("[mobservable.view '" + this.context.name + "'] Cycle detected");
-	        if (this.isSleeping) {
-	            if (dnode_1.isComputingView()) {
-	                // somebody depends on the outcome of this computation
-	                this.wakeUp(); // note: wakeup triggers a compute
-	                this.notifyObserved();
-	            }
-	            else {
-	                // nobody depends on this computable;
-	                // so just compute fresh value and continue to sleep
-	                this.wakeUp();
-	                this.tryToSleep();
-	            }
-	        }
-	        else {
-	            // we are already up to date, somebody is just inspecting our current value
-	            this.notifyObserved();
-	        }
-	        if (this.hasCycle)
-	            throw new Error("[mobservable.view '" + this.context.name + "'] Cycle detected");
-	        if (this.hasError) {
-	            if (core_1.logLevel > 0)
-	                console.error("[mobservable.view '" + this.context.name + "'] Rethrowing caught exception to observer: " + this._value + (this._value.cause || ''));
-	            throw this._value;
-	        }
-	        return this._value;
-	    };
-	    ObservableView.prototype.set = function () {
-	        throwingViewSetter.call(this);
-	    };
-	    ObservableView.prototype.compute = function () {
-	        var newValue;
-	        try {
-	            // this cycle detection mechanism is primarily for lazy computed values; other cycles are already detected in the dependency tree
-	            if (this.isComputing)
-	                throw new Error("[mobservable.view '" + this.context.name + "'] Cycle detected");
-	            this.isComputing = true;
-	            newValue = this.func.call(this.scope);
-	            this.hasError = false;
-	        }
-	        catch (e) {
-	            this.hasError = true;
-	            console.error("[mobservable.view '" + this.context.name + "'] Caught error during computation: ", e, "View function:", this.func.toString());
-	            console.trace();
-	            if (e instanceof Error)
-	                newValue = e;
-	            else {
-	                newValue = new Error(("[mobservable.view '" + this.context.name + "'] Error during computation (see error.cause) in ") + this.func.toString());
-	                newValue.cause = e;
-	            }
-	        }
-	        this.isComputing = false;
-	        var changed = this.compareStructural ? !utils_1.deepEquals(newValue, this._value) : newValue !== this._value;
-	        if (changed) {
-	            var oldValue = this._value;
-	            this._value = newValue;
-	            this.changeEvent.emit(newValue, oldValue);
-	            return true;
-	        }
-	        return false;
-	    };
-	    ObservableView.prototype.observe = function (listener, fireImmediately) {
-	        var _this = this;
-	        if (fireImmediately === void 0) { fireImmediately = false; }
-	        this.setRefCount(+1); // awake
-	        if (fireImmediately)
-	            listener(this.get(), undefined);
-	        var disposer = this.changeEvent.on(listener);
-	        return utils_1.once(function () {
-	            _this.setRefCount(-1);
-	            disposer();
-	        });
-	    };
-	    ObservableView.prototype.asPropertyDescriptor = function () {
-	        var _this = this;
-	        return {
-	            configurable: false,
-	            enumerable: false,
-	            get: function () { return _this.get(); },
-	            set: throwingViewSetter
-	        };
-	    };
-	    ObservableView.prototype.toString = function () {
-	        return "ComputedObservable[" + this.context.name + ":" + this._value + "] " + this.func.toString();
-	    };
-	    return ObservableView;
-	})(dnode_1.ViewNode);
-	exports.ObservableView = ObservableView;
-	//# sourceMappingURL=observableview.js.map
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var core_1 = __webpack_require__(2);
-	var observableview_1 = __webpack_require__(7);
-	var observablevalue_1 = __webpack_require__(6);
-	// responsible for the administration of objects that have become reactive
-	var ObservableObject = (function () {
-	    function ObservableObject(target, context, mode) {
-	        this.target = target;
-	        this.context = context;
-	        this.mode = mode;
-	        this.values = {};
-	        if (target.$mobservable)
-	            throw new Error("Illegal state: already an reactive object");
-	        if (!context) {
-	            this.context = {
-	                object: target,
-	                name: ""
-	            };
-	        }
-	        else if (!context.object) {
-	            context.object = target;
-	        }
-	        Object.defineProperty(target, "$mobservable", {
-	            enumerable: false,
-	            configurable: false,
-	            value: this
-	        });
-	    }
-	    ObservableObject.asReactive = function (target, context, mode) {
-	        if (target.$mobservable)
-	            return target.$mobservable;
-	        return new ObservableObject(target, context, mode);
-	    };
-	    ObservableObject.prototype.set = function (propName, value) {
-	        if (this.values[propName])
-	            this.target[propName] = value; // the property setter will make 'value' reactive if needed.
-	        else
-	            this.defineReactiveProperty(propName, value);
-	    };
-	    ObservableObject.prototype.defineReactiveProperty = function (propName, value) {
-	        var observable;
-	        var context = {
-	            object: this.context.object,
-	            name: (this.context.name || "") + "." + propName
-	        };
-	        if (typeof value === "function" && value.length === 0)
-	            observable = new observableview_1.ObservableView(value, this.target, context, false);
-	        else if (value instanceof core_1.AsStructure && typeof value.value === "function" && value.value.length === 0)
-	            observable = new observableview_1.ObservableView(value.value, this.target, context, true);
-	        else
-	            observable = new observablevalue_1.ObservableValue(value, this.mode, context);
-	        this.values[propName] = observable;
-	        Object.defineProperty(this.target, propName, observable.asPropertyDescriptor());
-	    };
-	    return ObservableObject;
-	})();
-	exports.ObservableObject = ObservableObject;
-	//# sourceMappingURL=observableobject.js.map
-
-/***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports) {
 
 	var inBatch = 0;
@@ -1601,118 +1741,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.batch = batch;
 	//# sourceMappingURL=scheduler.js.map
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * mobservable
-	 * (c) 2015 - Michel Weststrate
-	 * https://github.com/mweststrate/mobservable
-	 */
-	var dnode_1 = __webpack_require__(1);
-	var observableobject_1 = __webpack_require__(8);
-	var simpleeventemitter_1 = __webpack_require__(5);
-	var utils_1 = __webpack_require__(3);
-	var core_1 = __webpack_require__(2);
-	function getDNode(thing, property) {
-	    if (!core_1.isReactive(thing))
-	        throw new Error("[mobservable.getDNode] " + thing + " doesn't seem to be reactive");
-	    if (property !== undefined) {
-	        var o = thing.$mobservable;
-	        var dnode = o.values && o.values[property];
-	        if (!dnode)
-	            throw new Error("[mobservable.getDNode] property '" + property + "' of '" + thing + "' doesn't seem to be a reactive property");
-	        return dnode;
-	    }
-	    if (thing.$mobservable) {
-	        if (thing.$mobservable instanceof observableobject_1.ObservableObject)
-	            throw new Error("[mobservable.getDNode] missing properties parameter. Please specify a property of '" + thing + "'.");
-	        return thing.$mobservable;
-	    }
-	    throw new Error("[mobservable.getDNode] " + thing + " doesn't seem to be reactive");
-	}
-	exports.getDNode = getDNode;
-	function reportTransition(node, state, changed, newValue) {
-	    if (changed === void 0) { changed = false; }
-	    if (newValue === void 0) { newValue = null; }
-	    exports.transitionTracker.emit({
-	        id: node.id,
-	        name: node.context.name,
-	        context: node.context.object,
-	        state: state,
-	        changed: changed,
-	        newValue: newValue
-	    });
-	}
-	exports.reportTransition = reportTransition;
-	exports.transitionTracker = null;
-	function getDependencyTree(thing, property) {
-	    return nodeToDependencyTree(getDNode(thing, property));
-	}
-	exports.getDependencyTree = getDependencyTree;
-	function nodeToDependencyTree(node) {
-	    var result = {
-	        id: node.id,
-	        name: node.context.name,
-	        context: node.context.object || null
-	    };
-	    if (node instanceof dnode_1.ViewNode && node.observing.length)
-	        result.dependencies = utils_1.unique(node.observing).map(nodeToDependencyTree);
-	    return result;
-	}
-	function getObserverTree(thing, property) {
-	    return nodeToObserverTree(getDNode(thing, property));
-	}
-	exports.getObserverTree = getObserverTree;
-	function nodeToObserverTree(node) {
-	    var result = {
-	        id: node.id,
-	        name: node.context.name,
-	        context: node.context.object || null
-	    };
-	    if (node.observers.length)
-	        result.observers = utils_1.unique(node.observers).map(nodeToObserverTree);
-	    if (node.externalRefenceCount > 0)
-	        result.listeners = node.externalRefenceCount;
-	    return result;
-	}
-	function createConsoleReporter(extensive) {
-	    var lines = [];
-	    var scheduled = false;
-	    return function (line) {
-	        if (extensive || line.changed)
-	            lines.push(line);
-	        if (!scheduled) {
-	            scheduled = true;
-	            setTimeout(function () {
-	                console[console["table"] ? "table" : "dir"](lines);
-	                lines = [];
-	                scheduled = false;
-	            }, 1);
-	        }
-	    };
-	}
-	function trackTransitions(extensive, onReport) {
-	    if (extensive === void 0) { extensive = false; }
-	    if (!exports.transitionTracker)
-	        exports.transitionTracker = new simpleeventemitter_1.default();
-	    var reporter = onReport
-	        ? function (line) {
-	            if (extensive || line.changed)
-	                onReport(line);
-	        }
-	        : createConsoleReporter(extensive);
-	    var disposer = exports.transitionTracker.on(reporter);
-	    return utils_1.once(function () {
-	        disposer();
-	        if (exports.transitionTracker.listeners.length === 0)
-	            exports.transitionTracker = null;
-	    });
-	}
-	exports.trackTransitions = trackTransitions;
-	//# sourceMappingURL=extras.js.map
 
 /***/ },
 /* 11 */

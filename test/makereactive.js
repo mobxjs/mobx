@@ -29,47 +29,37 @@ exports.testIsReactive = function(test) {
     test.equal(m.isReactive(null), false);
     test.equal(m.isReactive(null), false);
 
-    test.equal(m.isReactive(m([])), true);
-    test.equal(m.isReactive(m({})), true);
-    test.equal(m.isReactive(m(function() {})), true);
+    test.equal(m.isReactive(m.makeReactive([])), true);
+    test.equal(m.isReactive(m.makeReactive({})), true);
+    test.equal(m.isReactive(m.makeReactive(function() {})), true);
 
     test.equal(m.isReactive([]), false);
     test.equal(m.isReactive({}), false);
     test.equal(m.isReactive(function() {}), false);
 
     test.equal(m.isReactive(new Order()), false);
-    test.equal(m.isReactive(m(new Order())), true);
+    test.equal(m.isReactive(m.makeReactive(new Order())), true);
 
     test.equal(m.isReactive(new ReactiveOrder), true);
-    test.equal(m.isReactive(m(3)), true);
+    test.equal(m.isReactive(m.makeReactive(3)), true);
 
     var obj = {};
     test.equal(m.isReactive(obj), false);
 
-    test.equal(m.isReactive(m(function(){})), true);
+    test.equal(m.isReactive(m.makeReactive(function(){})), true);
     test.equal(m.isReactive(m.sideEffect(function(){})), true);
 
     test.done();
 
 }
 
-exports.testIsComponentReactive = function(test) {
-    var component = mobservable.reactiveComponent({ render: function() {}});
-    test.equal(m.isReactive(component), false); // dependencies not known yet
-    component.componentWillMount();
-    component.render();
-    test.ok(m.isReactive(component), true);
-
-    test.done();
-}
-
 exports.makeReactive1 = function(test) {
     test.throws(function() {
-        m(function(a,b) {});
+        m.makeReactive(function(a,b) {});
     });
 
     // recursive structure
-    var x = m({
+    var x = m.makeReactive({
         a: {
             b: {
                 c: 3
@@ -86,7 +76,7 @@ exports.makeReactive1 = function(test) {
 
     // recursive structure, but asReference passed in
     test.equal(m.isReactive(x.a.b), true);
-    var x2 = m({
+    var x2 = m.makeReactive({
         a: m.asReference({
             b: {
                 c: 3
@@ -107,7 +97,7 @@ exports.makeReactive1 = function(test) {
     test.deepEqual(b2.toArray(), [3, 4]);
 
     // non recursive structure
-    var x3 = m({
+    var x3 = m.makeReactive({
         a: {
             b: {
                 c: 3
@@ -130,7 +120,7 @@ exports.makeReactive3 = function(test) {
         this.price = price;
     }
 
-    var x = m({
+    var x = m.makeReactive({
         orders: [new Order(1), new Order(2)]
     });
 
@@ -151,13 +141,13 @@ exports.makeReactive3 = function(test) {
 }
 
 exports.makeReactive4 = function(test) {
-    var x = m([
+    var x = m.makeReactive([
         { x : 1 },
         { x : 2 }
     ]);
 
     var b = buffer();
-    m(function() {
+    m.makeReactive(function() {
         return x.map(function(d) { return d.x });
     }).observe(b, true);
 
@@ -167,13 +157,13 @@ exports.makeReactive4 = function(test) {
     test.deepEqual(b.toArray(), [[1,2], [3,2], [2], [2, 5]]);
 
     // non recursive
-    var x2 = m([
+    var x2 = m.makeReactive([
         { x : 1 },
         { x : 2 }
     ], { recurse: false });
 
     var b2 = buffer();
-    m(function() {
+    m.makeReactive(function() {
         return x2.map(function(d) { return d.x });
     }).observe(b2, true);
 
@@ -188,23 +178,23 @@ exports.makeReactive4 = function(test) {
 
 exports.makeReactive5 = function(test) {
 
-    var x = m(function() { });
+    var x = m.makeReactive(function() { });
     test.throws(function() {
         x(7); // set not allowed
     });
 
     var f = function() {};
-    var x2 = m(f, { as: 'reference' });
+    var x2 = m.makeReactive(f, { as: 'reference' });
     test.equal(x2(), f);
     x2(null); // allowed
 
-    var x3 = m(m.asReference(f));
+    var x3 = m.makeReactive(m.asReference(f));
     test.equal(x3(), f);
     x3(null); // allowed
 
     f = function() { return this.price };
 
-    var x = m({
+    var x = m.makeReactive({
         price : 17,
         reactive: f,
         nonReactive: m.asReference(f)

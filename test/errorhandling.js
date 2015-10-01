@@ -23,7 +23,7 @@ function testException(test, observable, exception) {
     catch (e) {
         test.equal(e.message === exception || e.cause === exception || e.message.indexOf(exception) !== -1, true, "Expected exception '" + exception + "', got: " + e);
     }
-    test.equal(mobservable._.stackDepth(), 0);
+    test.equal(mobservable._.isComputingView(), false);
 }
 
 exports.testException1  = function(test) {
@@ -31,7 +31,7 @@ exports.testException1  = function(test) {
         throw "hoi";
     });
     testException(test, a, "hoi");
-    test.equal(mobservable._.stackDepth(), 0);
+    test.equal(mobservable._.isComputingView(), false);
     test.done();
 };
 
@@ -63,7 +63,7 @@ exports.testException2 = function(test) {
     test.equal(cbuffer.toArray().length, 2);
     test.equal(cbuffer.toArray()[0].cause, "Some error!");
     test.equal(cbuffer.toArray()[1], 1);
-    test.equal(mobservable._.stackDepth(), 0);
+    test.equal(mobservable._.isComputingView(), false);
 
     test.done();
 };
@@ -89,7 +89,7 @@ exports.deny_state_changes = function(test) {
         }, null, mobservable._.NON_PURE_VIEW_ERROR);
         
         test.deepEqual([], b.toArray());
-        test.equal(mobservable._.stackDepth(), 0);
+        test.equal(mobservable._.isComputingView(), false);
 
         // these should not throw:
         var z = makeReactive({ 
@@ -146,7 +146,7 @@ exports.deny_array_change = function(test) {
         }, null, "alters state");
         
         test.deepEqual([], b.toArray());
-        test.equal(mobservable._.stackDepth(), 0);
+        test.equal(mobservable._.isComputingView(), false);
 
         test.done();
     }
@@ -204,7 +204,7 @@ exports.cycle1 = function(test) {
     }
     catch(e) {
         test.ok(("" + e).indexOf("Cycle detected") !== -1);
-        test.equal(mobservable._.stackDepth(), 0);
+        test.equal(mobservable._.isComputingView(), false);
     }
 
     var a = makeReactive(function() { return b() * 2; });
@@ -235,6 +235,6 @@ exports.cycle3 = function(test) {
     test.equals(1, a());
     test.equals(2, b());
 
-    test.equal(mobservable._.stackDepth(), 0);
+    test.equal(mobservable._.isComputingView(), false);
     test.done();
 };
