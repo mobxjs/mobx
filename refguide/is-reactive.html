@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="4.1" data-basepath=".." data-revision="Wed Sep 30 2015 20:19:53 GMT+0200 (CEST)">
+    <div class="book" data-level="4.1" data-basepath=".." data-revision="Thu Oct 01 2015 21:51:50 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -685,7 +685,22 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/is-reactive.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a>
+                        <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/is-reactive.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="isreactive">isReactive</h1>
+<p>Returns true if the given value was created or extended by mobservable.
+Optionally accepts a second string parameter to see whether a specific property is observable.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> person = makeReactive({
+    firstName: <span class="hljs-string">&quot;Sherlock&quot;</span>,
+    lastName: <span class="hljs-string">&quot;Holmes&quot;</span>
+});
+
+person.age = <span class="hljs-number">3</span>;
+
+isReactive(person); <span class="hljs-comment">// true</span>
+isReactive(person, <span class="hljs-string">&quot;firstName&quot;</span>); <span class="hljs-comment">// true</span>
+isReactive(person.firstName); <span class="hljs-comment">// false (just a string)</span>
+isReactive(person, <span class="hljs-string">&quot;age&quot;</span>); <span class="hljs-comment">// false</span>
+</code></pre>
+
                     
                     </section>
                 

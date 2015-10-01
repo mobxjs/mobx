@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="4.3" data-basepath=".." data-revision="Wed Sep 30 2015 20:19:53 GMT+0200 (CEST)">
+    <div class="book" data-level="4.3" data-basepath=".." data-revision="Thu Oct 01 2015 21:51:50 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -685,7 +685,67 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/modifiers.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a>
+                        <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/modifiers.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="modifiers-for-makereactive">modifiers for makeReactive</h1>
+<p>By default, <code>makeReactive</code> recursively makes all the values of plain objects and arrays recursively reactive.
+Besides that it automatically converts functions without arguments into reactive views or derived properties.
+For all other types of values just a reference is stored.
+In general, this should just do what you need, but if you want you can override the default behavior using <em>modifiers</em>.
+Note that modifiers are &apos;sticky&apos;, they are interpreted as being annotations.
+They do not only apply to the current value, but also to all values that are assigned in the future to the same attribute.</p>
+<h2 id="asreference">asReference</h2>
+<p>The most common modifier is <code>asReference</code>.
+If this modifier is used, <code>makeReactive</code> will not attempt to make the value reactive.
+Use this for example if you want to store a reference to a function, instead of creating a view based on that function. 
+Or use it if you want to prevent that objects or arrays are made reactive (ok, not sure whether thats a use-case, but alas).</p>
+<pre><code class="lang-javascript">
+<span class="hljs-keyword">var</span> test = makeReactive({
+    x : <span class="hljs-number">3</span>,
+    doubler: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.x;
+    },
+    someFunc: asReference(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.x;
+    })
+});
+
+test.doubler; <span class="hljs-comment">// === 6</span>
+test.someFunc; <span class="hljs-comment">// still a function</span>
+</code></pre>
+<h2 id="asstructure">asStructure</h2>
+<p>Can be used on non-cyclic, plain javascript values.
+Instead of comparing old values with new values based on whether the reference has changed, values are compared using deep equality before notifying any observers.
+This is useful if you are working with &apos;struct&apos; like objects like colors or coordinates.
+<code>asStructure</code> can be used on reactive functions, plain objects and arrays.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> vector1 = makeReactive({ x: <span class="hljs-number">10</span>, y : <span class="hljs-number">10</span> });
+<span class="hljs-keyword">var</span> vector2 = makeReactive({ x: <span class="hljs-number">0</span>, y: <span class="hljs-number">20</span> });
+
+<span class="hljs-keyword">var</span> boundingVector = makeReactive(asStructure(() =&gt; {
+    <span class="hljs-keyword">return</span> {
+        x: <span class="hljs-built_in">Math</span>.max(vector1.x, vector2.x),
+        y: <span class="hljs-built_in">Math</span>.max(vector1.y, vector2.y)
+    }
+});
+
+boundingVector.observe((vector) =&gt; <span class="hljs-built_in">console</span>.log(vector.x, vector.y));
+
+vector1.x = <span class="hljs-number">30</span>;
+<span class="hljs-comment">// prints &apos;30 20&apos;</span>
+
+vector2.x = <span class="hljs-number">10</span>;
+<span class="hljs-comment">// doesn&apos;t print, but without &apos;asStructure&apos; it would print because &apos;boundingVector&apos; always returns a new object.</span>
+</code></pre>
+<h2 id="asflat">asFlat</h2>
+<p>Similar to <code>asReference</code>, except that <code>asFlat</code> does not prevent its value to become reactive, but only the children of the value.
+Can be used for example to create an reactive array or object that should not automatically make its children reactive.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> todos = makeReactive(asFlat([{
+    title: <span class="hljs-string">&quot;make coffee&quot;</span>,
+    completed: <span class="hljs-literal">false</span>
+}]));
+
+isReactive(todos); <span class="hljs-comment">// true</span>
+isReactive(todos[<span class="hljs-number">0</span>]); <span class="hljs-comment">// false</span>
+</code></pre>
+
                     
                     </section>
                 
