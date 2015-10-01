@@ -10,3 +10,6 @@ lib/*.js.map
 /dist/test
 notes.md
 .settings
+dist/typings
+dist/mobservable.min.js
+dist/mobservable.js.map
