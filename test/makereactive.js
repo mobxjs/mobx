@@ -16,7 +16,7 @@ function buffer() {
 }
 
 
-exports.testIsReactive = function(test) {
+exports.testIsObservable = function(test) {
     function Order(price) {
 
     }
@@ -26,28 +26,28 @@ exports.testIsReactive = function(test) {
             price: price
         });
     }
-    test.equal(m.isReactive(null), false);
-    test.equal(m.isReactive(null), false);
+    test.equal(m.isObservable(null), false);
+    test.equal(m.isObservable(null), false);
 
-    test.equal(m.isReactive(m.observable([])), true);
-    test.equal(m.isReactive(m.observable({})), true);
-    test.equal(m.isReactive(m.observable(function() {})), true);
+    test.equal(m.isObservable(m.observable([])), true);
+    test.equal(m.isObservable(m.observable({})), true);
+    test.equal(m.isObservable(m.observable(function() {})), true);
 
-    test.equal(m.isReactive([]), false);
-    test.equal(m.isReactive({}), false);
-    test.equal(m.isReactive(function() {}), false);
+    test.equal(m.isObservable([]), false);
+    test.equal(m.isObservable({}), false);
+    test.equal(m.isObservable(function() {}), false);
 
-    test.equal(m.isReactive(new Order()), false);
-    test.equal(m.isReactive(m.observable(new Order())), true);
+    test.equal(m.isObservable(new Order()), false);
+    test.equal(m.isObservable(m.observable(new Order())), true);
 
-    test.equal(m.isReactive(new ReactiveOrder), true);
-    test.equal(m.isReactive(m.observable(3)), true);
+    test.equal(m.isObservable(new ReactiveOrder), true);
+    test.equal(m.isObservable(m.observable(3)), true);
 
     var obj = {};
-    test.equal(m.isReactive(obj), false);
+    test.equal(m.isObservable(obj), false);
 
-    test.equal(m.isReactive(m.observable(function(){})), true);
-    test.equal(m.isReactive(m.observe(function(){})), true);
+    test.equal(m.isObservable(m.observable(function(){})), true);
+    test.equal(m.isObservable(m.observe(function(){})), true);
 
     test.done();
 
@@ -75,7 +75,7 @@ exports.observable1 = function(test) {
     test.deepEqual(b.toArray(), [3, 4, 5]);
 
     // recursive structure, but asReference passed in
-    test.equal(m.isReactive(x.a.b), true);
+    test.equal(m.isObservable(x.a.b), true);
     var x2 = m.observable({
         a: m.asReference({
             b: {
@@ -84,9 +84,9 @@ exports.observable1 = function(test) {
         })
     });
 
-    test.equal(m.isReactive(x2), true);
-    test.equal(m.isReactive(x2.a), false);
-    test.equal(m.isReactive(x2.a.b), false);
+    test.equal(m.isObservable(x2), true);
+    test.equal(m.isObservable(x2.a), false);
+    test.equal(m.isObservable(x2.a.b), false);
 
     var b2 = buffer();
     m.observe(function() {
@@ -129,11 +129,11 @@ exports.observable3 = function(test) {
         b(x.orders.length);
     });
 
-    test.equal(m.isReactive(x.orders), true);
-    test.equal(m.isReactive(x.orders[0]), false);
+    test.equal(m.isObservable(x.orders), true);
+    test.equal(m.isObservable(x.orders[0]), false);
     x.orders[2] = new Order(3);
     x.orders = [];
-    test.equal(m.isReactive(x.orders), true);
+    test.equal(m.isObservable(x.orders), true);
     x.orders[0] = new Order(2);
     test.deepEqual(b.toArray(), [2, 3, 0, 1]);
 

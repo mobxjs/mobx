@@ -7,11 +7,11 @@ import {DataNode, ViewNode} from './dnode';
 import {ObservableObject} from './observableobject';
 import SimpleEventEmitter from './simpleeventemitter';
 import {once, unique} from './utils';
-import {isReactive} from './core';
+import {isObservable} from './core';
 import {IDependencyTree, ITransitionEvent, IObserverTree, Lambda} from './interfaces';
 
 export function getDNode(thing:any, property?:string):DataNode {
-	if (!isReactive(thing))
+	if (!isObservable(thing))
 		throw new Error(`[mobservable.getDNode] ${thing} doesn't seem to be reactive`);
 	if (property !== undefined) {
 		var o = <ObservableObject> thing.$mobservable;

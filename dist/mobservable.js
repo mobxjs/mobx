@@ -65,7 +65,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = core.observable;
 	var core_1 = __webpack_require__(1);
-	exports.isReactive = core_1.isReactive;
+	exports.isObservable = core_1.isObservable;
 	exports.observable = core_1.observable;
 	exports.extendObservable = core_1.extendObservable;
 	exports.asReference = core_1.asReference;
@@ -122,7 +122,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function observable(v, keyOrScope) {
 	    if (typeof arguments[1] === "string")
 	        return observableDecorator.apply(null, arguments);
-	    if (isReactive(v))
+	    if (isObservable(v))
 	        return v;
 	    var _a = getValueModeFromValue(v, ValueMode.Recursive), mode = _a[0], value = _a[1];
 	    var sourceType = mode === ValueMode.Reference ? ValueType.Reference : getTypeOfValue(value);
@@ -158,12 +158,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return new AsFlat(value);
 	}
 	exports.asFlat = asFlat;
-	function isReactive(value) {
+	function isObservable(value) {
 	    if (value === null || value === undefined)
 	        return false;
 	    return !!value.$mobservable;
 	}
-	exports.isReactive = isReactive;
+	exports.isObservable = isObservable;
 	function observe(view, scope) {
 	    var _a = getValueModeFromValue(view, ValueMode.Recursive), mode = _a[0], unwrappedView = _a[1];
 	    var observable = new observableview_1.ObservableView(unwrappedView, scope, {
@@ -368,7 +368,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.getValueModeFromValue = getValueModeFromValue;
 	function makeChildObservable(value, parentMode, context) {
 	    var childMode;
-	    if (isReactive(value))
+	    if (isObservable(value))
 	        return value;
 	    switch (parentMode) {
 	        case ValueMode.Reference:
@@ -639,7 +639,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var utils_1 = __webpack_require__(7);
 	var core_1 = __webpack_require__(1);
 	function getDNode(thing, property) {
-	    if (!core_1.isReactive(thing))
+	    if (!core_1.isObservable(thing))
 	        throw new Error("[mobservable.getDNode] " + thing + " doesn't seem to be reactive");
 	    if (property !== undefined) {
 	        var o = thing.$mobservable;

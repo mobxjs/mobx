@@ -9,7 +9,7 @@ export * from './interfaces';
 
 export default core.observable;
 export {
-	isReactive,
+	isObservable,
 	observable,
 	extendObservable,
 	asReference,

@@ -26,7 +26,7 @@ export function observable(v:any, keyOrScope?:string | any) {
     if (typeof arguments[1] === "string")
         return observableDecorator.apply(null, arguments);
 
-    if (isReactive(v))
+    if (isObservable(v))
         return v;
 
     let [mode, value] = getValueModeFromValue(v, ValueMode.Recursive);
@@ -93,7 +93,7 @@ export function asFlat<T>(value:T):T {
     * @param value object, function or array
     * @param propertyName if propertyName is specified, checkes whether value.propertyName is reactive.
     */
-export function isReactive(value):boolean {
+export function isObservable(value):boolean {
     if (value === null || value === undefined)
         return false;
     return !!value.$mobservable;
@@ -380,7 +380,7 @@ export function getValueModeFromValue(value:any, defaultMode:ValueMode): [ValueM
 
 export function makeChildObservable(value, parentMode:ValueMode, context) {
 	let childMode: ValueMode;
-	if (isReactive(value))
+	if (isObservable(value))
 		return value;
 
 	switch (parentMode) {

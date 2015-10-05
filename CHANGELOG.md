@@ -1,4 +1,5 @@
 
+
 # 0.7.0
 
 * Introduced `strict` mode (see issues #30, #31)
@@ -10,8 +11,6 @@
 * Introduces `asStructure` (see #8) and `asFlat`. 
 * Assigning a plain object to a reactive structure no longer clones the object, instead, the original object is decorated. (Arrays are still cloned due to Javascript limitations to extend arrays).
 * Reintroduced `expr(func)` as shorthand for `makeReactive(func)()`, which is useful to create temporarily views inside views
-
-TODO:
 * Deprecated the options object that could be passed to `makeReactive`.
 
 
