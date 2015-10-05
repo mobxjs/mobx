@@ -17,7 +17,6 @@ export {
 	asStructure,
 	observable,
 	observe,
-	sideEffect,
 	observeUntil,
 	observeAsync,
 	expr,

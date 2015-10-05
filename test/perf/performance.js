@@ -280,7 +280,7 @@ function order_system_helper(test, usebatch, keepObserving) {
         this.amount = makeReactive(amount);
         this.total = makeReactive(function() {
             return order.vat() * this.price() * this.amount();
-        }, { scope: this })
+        }, this);
     }
 
     function Order(includeVat) {
@@ -291,13 +291,13 @@ function order_system_helper(test, usebatch, keepObserving) {
             if (this.includeVat())
             return vat();
             return 1;
-        }, { scope: this });
+        }, this);
 
         this.total = makeReactive(function() {
             return this.lines.reduce(function(acc, order) {
                 return acc + order.total();
             }, 0);
-        }, { scope: this });
+        }, this);
     }
 
     totalAmount();

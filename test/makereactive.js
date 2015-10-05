@@ -47,7 +47,7 @@ exports.testIsReactive = function(test) {
     test.equal(m.isReactive(obj), false);
 
     test.equal(m.isReactive(m.makeReactive(function(){})), true);
-    test.equal(m.isReactive(m.sideEffect(function(){})), true);
+    test.equal(m.isReactive(m.observe(function(){})), true);
 
     test.done();
 
@@ -67,7 +67,7 @@ exports.makeReactive1 = function(test) {
         }
     });
     var b = buffer();
-    m.sideEffect(function() {
+    m.observe(function() {
         b(x.a.b.c)
     });
     x.a = { b : { c : 4 }};
@@ -89,7 +89,7 @@ exports.makeReactive1 = function(test) {
     test.equal(m.isReactive(x2.a.b), false);
 
     var b2 = buffer();
-    m.sideEffect(function() {
+    m.observe(function() {
         b2(x2.a.b.c)
     });
     x2.a = { b : { c : 4 }};
@@ -97,15 +97,15 @@ exports.makeReactive1 = function(test) {
     test.deepEqual(b2.toArray(), [3, 4]);
 
     // non recursive structure
-    var x3 = m.makeReactive({
+    var x3 = m.makeReactive(m.asFlat({
         a: {
             b: {
                 c: 3
             }
         }
-    }, { recurse: false });
+    }));
     var b3 = buffer();
-    m.sideEffect(function() {
+    m.observe(function() {
         b3(x3.a.b.c)
     });
     x3.a = { b : { c : 4 }};
@@ -125,7 +125,7 @@ exports.makeReactive3 = function(test) {
     });
 
     var b = buffer();
-    m.sideEffect(function() {
+    m.observe(function() {
         b(x.orders.length);
     });
 
@@ -157,10 +157,10 @@ exports.makeReactive4 = function(test) {
     test.deepEqual(b.toArray(), [[1,2], [3,2], [2], [2, 5]]);
 
     // non recursive
-    var x2 = m.makeReactive([
+    var x2 = m.makeReactive(m.asFlat([
         { x : 1 },
         { x : 2 }
-    ], { recurse: false });
+    ]));
 
     var b2 = buffer();
     m.makeReactive(function() {
@@ -184,13 +184,9 @@ exports.makeReactive5 = function(test) {
     });
 
     var f = function() {};
-    var x2 = m.makeReactive(f, { as: 'reference' });
+    var x2 = m.makeReactive(m.asReference(f));
     test.equal(x2(), f);
     x2(null); // allowed
-
-    var x3 = m.makeReactive(m.asReference(f));
-    test.equal(x3(), f);
-    x3(null); // allowed
 
     f = function() { return this.price };
 
@@ -201,7 +197,7 @@ exports.makeReactive5 = function(test) {
     });
 
     var b = buffer();
-    m.sideEffect(function() {
+    m.observe(function() {
         b([x.reactive, x.nonReactive, x.nonReactive()]);
     });
 

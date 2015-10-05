@@ -31,7 +31,7 @@ exports.testGetDNode = function(test) {
     test.ok(getD(m.makeReactive(3)));
     test.ok(getD(m.makeReactive({x:function() { return 3 }}), "x"));
     test.ok(getD(m.makeReactive(function() {})));
-    test.ok(getD(mobservable.sideEffect(function() {})));
+    test.ok(getD(mobservable.observe(function() {})));
 
     var a;
     a = m.makeReactive({x:{}});
@@ -53,37 +53,39 @@ exports.testTreeD = function(test) {
 
     var dtree = m.extras.getDependencyTree;
     test.deepEqual(dtree(a), {
-       context:null,
+       context:3,
        name: aName,
        id: a.$mobservable.id
     });
 
 
-    var b = m.makeReactive(function () {
+    var bFunc =function () {
         return a() * a();
-    });
+    };
+    var b = m.makeReactive(bFunc);
     var bName = b.$mobservable.context.name
     test.deepEqual(dtree(b), {
-        context:null,
+        context:bFunc,
         name: bName,
         id: b.$mobservable.id,
         // no dependencies yet, since it isn't observed yet
     });
 
-    var c = m.sideEffect(function() {
+    var cFunc =function() {
         return b();
-    });
+    };
+    var c = m.observe(cFunc);
     var cName = c.$mobservable.context.name;
     test.deepEqual(dtree(c), {
-        context: null,
+        context: cFunc,
         name: cName,
         id: c.$mobservable.id,
         dependencies: [{
-            context: null,
+            context: bFunc,
             name: bName,
             id: b.$mobservable.id,
             dependencies: [{
-                context: null,
+                context: 3,
                 name: aName,
                 id: a.$mobservable.id
             }]
@@ -94,15 +96,15 @@ exports.testTreeD = function(test) {
     test.ok(bName !== cName);
 
     test.deepEqual(m.extras.getObserverTree(a), {
-        context: null,
+        context: 3,
         name: aName,
         id: a.$mobservable.id,
         observers: [{
-            context: null,
+            context: bFunc,
             name: bName,
             id: b.$mobservable.id,
             observers: [{
-                context: null,
+                context: cFunc,
                 name: cName,
                 id: c.$mobservable.id,
                 listeners: 1
@@ -122,7 +124,7 @@ exports.testNames = function(test) {
         return m.extras.getDNode(thing, prop).context.object;
     }
 
-    test.equal(name(m.makeReactive(3, { name: 'hoi' })), "hoi");
+    test.equal(name(m.makeReactive(3, 'hoi')), 'hoi');
 
     var struct = {
         x: 3,
@@ -174,7 +176,7 @@ exports.testNames = function(test) {
                 w: 5
             }
         ]
-    }, { name: 'hoi', context: STUB });
+    }, 'hoi');
     m.extendReactive(rstruct2.y, { a:  { b : 2}});
     rstruct2.ar.push({ b : 2});
     rstruct2.ar.push([]);
@@ -189,22 +191,11 @@ exports.testNames = function(test) {
     test.equal(name(rstruct2.ar[2], "b"), "hoi.ar[x].b");
     test.equal(name(rstruct2.ar[3]), "hoi.ar[x]");
 
-    test.equal(contextObj(rstruct2,"x"), STUB);
-    test.equal(contextObj(rstruct2, "y"), STUB);
-    test.equal(contextObj(rstruct2.y,"z"), STUB);
-    test.equal(contextObj(rstruct2, "ar"), STUB);
-    test.equal(contextObj(rstruct2.ar), STUB);
-    test.equal(contextObj(rstruct2.ar), STUB);
-    test.equal(contextObj(rstruct2.ar[1],"w"), STUB);
-    test.equal(contextObj(rstruct2.y.a,"b"), STUB);
-    test.equal(contextObj(rstruct2.ar[2], "b"), STUB);
-    test.equal(contextObj(rstruct2.ar[3]), STUB);
-
-    var d = m.sideEffect(function() {
+    var d = m.observe(function() {
     });
     test.ok(name(d));
 
-    test.equal(name(m.sideEffect(function namedFunction() {
+    test.equal(name(m.observe(function namedFunction() {
     })), "namedFunction");
 
     test.ok(name(m.makeReactive(function() {
@@ -214,28 +205,32 @@ exports.testNames = function(test) {
     })), "namedFunction");
 
     test.equal(name(m.makeReactive(function namedFunction() {
-    },  { name : "overridenName" })), "overridenName");
+    },  "overridenName")), "overridenName");
 
     test.done();
+}
+
+function stripTrackerOutput(output) {
+    return output.map(function (i) {
+        if (Array.isArray(i))
+            return stripTrackerOutput(i);
+        delete i.context;
+        delete i.name;
+        return i;
+    });
 }
 
 var trackerOutput1 = function(a, b,c) {
     return [
     { id: a.$mobservable.id,
-        name: a.$mobservable.context.name,
-        context: undefined,
         changed: true,
         state: 'READY',
         newValue: 4 },
     { id: b.$mobservable.id,
-        name: b.$mobservable.context.name,
-        context: undefined,
         changed: true,
         state: 'READY',
         newValue: 8 },
     { id: c.$mobservable.id,
-        name: c.$mobservable.context.name,
-        context: undefined,
         changed: true,
         state: 'READY',
         newValue: null } ];
@@ -243,50 +238,34 @@ var trackerOutput1 = function(a, b,c) {
 
 var trackerOutput2 = function(a, b, c) {
     return [ { id: a.$mobservable.id,
-    name: a.$mobservable.context.name,
-    context: undefined,
     state: 'STALE',
     changed: false,
     newValue: null },
   { id: b.$mobservable.id,
-    name: b.$mobservable.context.name,
-    context: undefined,
     state: 'STALE',
     changed: false,
     newValue: null },
   { id: c.$mobservable.id,
-    name: c.$mobservable.context.name,
-    context: undefined,
     state: 'STALE',
     changed: false,
     newValue: null },
   { id: a.$mobservable.id,
-    name: a.$mobservable.context.name,
-    context: undefined,
     state: 'READY',
     changed: true,
     newValue: 4 },
   { id: b.$mobservable.id,
-    name: b.$mobservable.context.name,
-    context: undefined,
     state: 'PENDING',
     changed: false,
     newValue: null },
   { id: b.$mobservable.id,
-    name: b.$mobservable.context.name,
-    context: undefined,
     state: 'READY',
     changed: true,
     newValue: 8 },
   { id: c.$mobservable.id,
-    name: c.$mobservable.context.name,
-    context: undefined,
     state: 'PENDING',
     changed: false,
     newValue: null },
   { id: c.$mobservable.id,
-    name: c.$mobservable.context.name,
-    context: undefined,
     state: 'READY',
     changed: true,
     newValue: null }
@@ -298,7 +277,7 @@ exports.testTransitionTracker1 = function(test) {
 
     var a = m.makeReactive(3);
     var b = m.makeReactive(function() { return a() * 2 });
-    var c = m.sideEffect(function() { b(); });
+    var c = m.observe(function() { b(); });
     var stop = m.extras.trackTransitions(false, function(line) {
         lines.push(line);
     });
@@ -306,7 +285,7 @@ exports.testTransitionTracker1 = function(test) {
     a(4);
     stop();
     a(5);
-    test.deepEqual(lines, trackerOutput1(a,b,c));
+    test.deepEqual(stripTrackerOutput(lines), trackerOutput1(a,b,c));
 
     test.done();
 }
@@ -316,7 +295,7 @@ exports.testTransitionTracker2 = function(test) {
 
     var a = m.makeReactive(3);
     var b = m.makeReactive(function() { return a() * 2 });
-    var c = m.sideEffect(function() { b(); });
+    var c = m.observe(function() { b(); });
     var stop = m.extras.trackTransitions(true, function(line) {
         lines.push(line);
     });
@@ -324,7 +303,7 @@ exports.testTransitionTracker2 = function(test) {
     a(4);
     stop();
     a(5);
-    test.deepEqual(lines, trackerOutput2(a,b,c));
+    test.deepEqual(stripTrackerOutput(lines), trackerOutput2(a,b,c));
 
     test.done();
 }
@@ -333,13 +312,12 @@ exports.testTransitionTracker3 = function(test) {
     var base = console.table;
     var lines = [];
     console.table = function(d) {
-        debugger;
         lines.push(d);
     }
 
     var a = m.makeReactive(3);
     var b = m.makeReactive(function() { return a() * 2 });
-    var c = m.sideEffect(function() { b(); });
+    var c = m.observe(function() { b(); });
     var d = m.makeReactive(4);
 
     var stop = m.extras.trackTransitions(false)
@@ -351,11 +329,8 @@ exports.testTransitionTracker3 = function(test) {
     a(5);
 
     setTimeout(function() {
-
-        test.deepEqual(lines, [trackerOutput1(a,b,c).concat([{
+        test.deepEqual(stripTrackerOutput(lines), [trackerOutput1(a,b,c).concat([{
             id: d.$mobservable.id,
-            name: d.$mobservable.context.name,
-            context: d.$mobservable.context.object,
             state: "READY",
             newValue: 6,
             changed: true
@@ -375,14 +350,14 @@ exports.testTransitionTracker4 = function(test) {
 
     var a = m.makeReactive(3);
     var b = m.makeReactive(function() { return a() * 2 });
-    var c = m.sideEffect(function() { b(); });
+    var c = m.observe(function() { b(); });
     var stop = m.extras.trackTransitions(true);
 
     a(4);
     stop();
     a(5);
     setTimeout(function() {
-        test.deepEqual(lines, [trackerOutput2(a,b,c)]);
+        test.deepEqual(stripTrackerOutput(lines), [trackerOutput2(a,b,c)]);
 
         console.dir = base;
         test.done();

@@ -20,10 +20,6 @@ export function once(func: Lambda):Lambda {
     }
 }
 
-export function noop(){
-    // NOOP
-}
-
 export function unique<T>(list:T[]):T[] {
     var res = [];
     list.forEach(item => {

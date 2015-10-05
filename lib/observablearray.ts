@@ -148,24 +148,9 @@ export class ObservableArray<T> extends StubArray implements IObservableArray<T>
         return this.spliceWithArray(0, this.$mobservable.values.length, newItems);
     }
 
-    values(): T[] {
-        console.warn("mobservable.array.values is deprecated and will be removed in 0.7, use slice() instead");
-        this.$mobservable.notifyObserved();
-        return this.$mobservable.values.slice();
-    }
-
     toJSON(): T[] {
         this.$mobservable.notifyObserved();
         return this.$mobservable.values.slice();
-    }
-
-    clone(): ObservableArray<T> {
-        console.warn("mobservable.array.clone is deprecated and will be removed in 0.7");
-        this.$mobservable.notifyObserved();
-        return new ObservableArray<T>(this.$mobservable.values, this.$mobservable.mode, {
-            object: null,
-            name: this.$mobservable.context.name + "[clone]"
-        });
     }
 
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find

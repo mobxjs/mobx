@@ -154,7 +154,7 @@ exports.testScope = function(test) {
         this.amount = makeReactive(2, this);
         this.total = makeReactive(function() {
             return (1+vat()) * this.price() * this.amount();
-        }, { scope: this });
+        }, this);
     };
 
     var order = new Order();
@@ -186,7 +186,7 @@ exports.testProps1 = function(test) {
     test.equals(36, order.total);
 
     var totals = [];
-    var sub = mobservable.sideEffect(function() {
+    var sub = mobservable.observe(function() {
         totals.push(order.total);
     });
     order.amount = 4;
@@ -285,10 +285,10 @@ exports.testObserveProperty = function(test) {
     var wrappedSnickers = new Wrapper(snickers);
     var wrappedMars = new Wrapper(mars);
 
-    var disposeSnickers = mobservable.sideEffect(function () {
+    var disposeSnickers = mobservable.observe(function () {
         sb.push(wrappedSnickers.calories);
     });
-    var disposeMars = mobservable.sideEffect(function () {
+    var disposeMars = mobservable.observe(function () {
         mb.push(wrappedMars.calories);
     });
     snickers.calories = 10;
@@ -686,7 +686,7 @@ exports.test_json1 = function(test) {
     ]);
 
     var output;
-    mobservable.sideEffect(function() {
+    mobservable.observe(function() {
         output = todos.map(function(todo) { return todo.title; }).join(", ");
     });
 

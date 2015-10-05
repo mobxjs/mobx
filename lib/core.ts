@@ -25,22 +25,13 @@ export function makeReactive(v:any, scopeOrName?:string | any, name?: string) {
     if (isReactive(v))
         return v;
 
-    const opts = isPlainObject(scopeOrName) ? scopeOrName : {};
-    let [mode, value] =getValueModeFromValue(v,ValueMode.Recursive);
+    let [mode, value] = getValueModeFromValue(v, ValueMode.Recursive);
 
-    if (opts.recurse === false) {
-        console.warn("[mobservable.makeReactive] option 'recurse: false' is deprecated, use 'mobservable.asFlat' instead");
-        mode =ValueMode.Flat;
-    } else if (opts.as === "reference") {
-        console.warn("[mobservable.makeReactive] option 'as: \"reference\"' is deprecated, use 'mobservable.asReference' instead");
-        mode =ValueMode.Reference;
-    }
-
-    const sourceType = mode ===ValueMode.Reference ?ValueType.Reference :getTypeOfValue(value);
-    const scope = opts.scope || (scopeOrName && typeof scopeOrName === "object" ? scopeOrName : null);
+    const sourceType = mode === ValueMode.Reference ? ValueType.Reference : getTypeOfValue(value);
+    const scope = typeof scopeOrName === "object" ? scopeOrName : null;
     const context = {
-        name: name || opts.name,
-        object: opts.context || opts.scope
+        name: scope ? name : scopeOrName,
+        object: value
     };
 
     switch(sourceType) {
@@ -52,7 +43,7 @@ export function makeReactive(v:any, scopeOrName?:string | any, name?: string) {
         case ValueType.ViewFunction:
             if (!context.name)
                 context.name = value.name;
-            return toGetterSetterFunction(new ObservableView(value, opts.scope || opts.context, context, mode ===ValueMode.Structure));
+            return toGetterSetterFunction(new ObservableView(value, scope, context, mode === ValueMode.Structure));
         case ValueType.Array:
         case ValueType.PlainObject:
             return makeChildReactive(value, mode, context);
@@ -108,14 +99,6 @@ export function isReactive(value):boolean {
 }
 
 /**
-    * Deprecated, use mobservable.observe instead.
-    */
-export function sideEffect(func:Lambda, scope?:any):Lambda {
-    console.warn(`[mobservable.sideEffect] 'sideEffect' has been renamed to 'observe' and will be removed in a later version.`);
-    return observe(func, scope);
-}
-
-/**
     * Creates a reactive view and keeps it alive, so that the view is always
     * updated if one of the dependencies changes, even when the view is not further used by something else.
     * @param view The reactive view
@@ -123,11 +106,11 @@ export function sideEffect(func:Lambda, scope?:any):Lambda {
     * @returns disposer function, which can be used to stop the view from being updated in the future.
     */
 export function observe(view:Lambda, scope?:any):Lambda {
-    var [mode, unwrappedView] =getValueModeFromValue(view,ValueMode.Recursive);
+    var [mode, unwrappedView] = getValueModeFromValue(view,ValueMode.Recursive);
     const observable = new ObservableView(unwrappedView, scope, {
-        object: scope,
+        object: scope || view,
         name: view.name
-    }, mode ===ValueMode.Structure);
+    }, mode === ValueMode.Structure);
     observable.setRefCount(+1);
 
     const disposer = once(() => {
@@ -189,11 +172,6 @@ export function observeAsync<T>(view: () => T, effect: (latestValue : T ) => voi
     });
 }
 
-export function when(predicate: ()=>boolean, effect: Lambda, scope?: any): Lambda {
-    console.error("[mobservable.when] deprecated, please use 'mobservable.observeUntil'");
-    return observeUntil(predicate, effect, scope);
-}
-
 /**
     * expr can be used to create temporarily views inside views.
     * This can be improved to improve performance if a value changes often, but usually doesn't affect the outcome of an expression.
@@ -244,7 +222,7 @@ export function observable(target:Object, key:string, baseDescriptor?) {
     const baseValue = isDecoratingProperty ? descriptor.get : descriptor.value; 
 
     if (!isDecoratingProperty && typeof baseValue === "function")
-        throw new Error(`@observable functions are deprecated. Use @observable on a getter function if you want to create a view, or wrap the value in 'asReference' if you want to store a value (found on member '${key}').`);
+        throw new Error(`@observable functions are not supported. Use @observable on a getter function if you want to create a view, or wrap the value in 'asReference' if you want to store a value (found on member '${key}').`);
     if (isDecoratingProperty) {
         if (typeof baseValue !== "function")
             throw new Error(`@observable expects a getter function if used on a property (found on member '${key}').`);
@@ -293,15 +271,6 @@ export function toJSON(source) {
 }
 
 /**
-    * Converts a reactive structure into a non-reactive structure.
-    * Basically a deep-clone.
-    */
-export function toJson(source) {
-    console.warn("mobservable.toJson is deprecated, use mobservable.toJSON instead");
-    return toJSON(source);
-}
-
-/**
     * During a transaction no views are updated until the end of the transaction.
     * The transaction will be run synchronously nonetheless.
     * @param action a function that updates some reactive state
@@ -309,26 +278,6 @@ export function toJson(source) {
     */
 export function transaction<T>(action:()=>T):T {
     return batch(action);
-}
-
-/**
-    Evaluates func and return its results. Watch tracks all observables that are used by 'func'
-    and invokes 'onValidate' whenever func *should* update.
-    Returns  a tuplde [return value of func, disposer]. The disposer can be used to abort the watch early.
-*/
-export function observeUntilInvalid<T>(func:()=>T, onInvalidate:Lambda, context?: IContextInfo):[T,Lambda, any] {
-    console.warn("mobservable.observeUntilInvalid is deprecated and will be removed in 0.7");
-    var hasRun = false;
-    var result;
-    var disposer = observe(() => {
-        if (!hasRun) {
-            hasRun = true;
-            result = func();
-        } else {
-            onInvalidate();
-        }
-    });
-    return [result, disposer, disposer['$mobservable']];
 }
 
 /**

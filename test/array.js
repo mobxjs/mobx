@@ -80,11 +80,9 @@ exports.test1 = function(test) {
         a.length = 2;
         test.equals(sum(), 3);
         test.deepEqual(a.slice(), [1,2]);
-        var b = a.clone();
 
         test.deepEqual(a.reverse(), [2,1]);
         test.deepEqual(a.slice(), [2,1]);
-        test.deepEqual(b.slice(), [1,2]);
 
         test.deepEqual(a.sort(), [1,2]);
         test.deepEqual(a.slice(), [1,2]);

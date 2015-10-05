@@ -100,7 +100,7 @@ exports.deny_state_changes = function(test) {
             } 
         });
         
-        mobservable.sideEffect(function() {
+        mobservable.observe(function() {
             console.log("test");
              if (z.a > 42 || z.b === 17) // nonsense
                  console.log('hi');  
