@@ -1,5 +1,5 @@
 import {
-    observable, asStructure, makeReactive, observe, observeAsync, extendReactive, 
+    observable, observablex, asStructure, observe, observeAsync, extendReactive, 
     IObservableArray, IArrayChange, IArraySplice, IObservableValue,
     extras,
     logLevel,
@@ -10,29 +10,29 @@ import {
 var v = mobservable(3);
 v.observe(() => {});
 
-var a = makeReactive([1,2,3]);
+var a = observable([1,2,3]);
 
 var testFunction = function(a) {};
 
 class Order {
-    @observable price:number = 3;
-    @observable amount:number = 2;
-    @observable orders = [];
-    @observable aFunction = testFunction;
-    @observable someStruct = asStructure({ x: 1, y: 2});
+    @observablex price:number = 3;
+    @observablex amount:number = 2;
+    @observablex orders = [];
+    @observablex aFunction = testFunction;
+    @observablex someStruct = asStructure({ x: 1, y: 2});
 
-    @observable get total() {
+    @observablex get total() {
         return this.amount * this.price * (1 + this.orders.length);
     }
     
     // Typescript classes cannot be defined inside functions,
     // but if the next line is enabled it should throw...
-    // @observable hoepie() { return 3; }
+    // @observablex hoepie() { return 3; }
 }
 
 export function testObservable(test) {
-    var a = makeReactive(3);
-    var b = makeReactive(() => a() * 2);
+    var a = observable(3);
+    var b = observable(() => a() * 2);
     test.ok(extras.getDNode(a));
     test.equal(b(), 6);
     test.done();
@@ -95,7 +95,7 @@ export function testAnnotations(test) {
 };
 
 export function testScope(test) {
-    var x = makeReactive({
+    var x = observable({
         y: 3,
         // this wo't work here.
         z: () => 2 * x.y
@@ -122,17 +122,17 @@ export function testScope(test) {
 }
 
 export function testTyping(test) {
-    var ar:IObservableArray<number> = makeReactive([1,2]);
+    var ar:IObservableArray<number> = observable([1,2]);
     ar.observe((d:IArrayChange<number>|IArraySplice<number>) => {
         console.log(d.type);
     });
 
-    var ar2:IObservableArray<number> = makeReactive([1,2]);
+    var ar2:IObservableArray<number> = observable([1,2]);
     ar2.observe((d:IArrayChange<number>|IArraySplice<number>) => {
         console.log(d.type);
     });
 
-    var x:IObservableValue<number> = makeReactive(3);
+    var x:IObservableValue<number> = observable(3);
 
     var d1 = observeAsync(() => 3, (num:number) => {
         // noop
@@ -147,7 +147,7 @@ export function testTyping(test) {
     test.done();
 }
 
-const state:any = makeReactive({
+const state:any = observable({
     authToken: null
 });
 
@@ -159,7 +159,7 @@ class LoginStoreTest {
         });
     }
 
-    @observable get loggedIn() {
+    @observablex get loggedIn() {
         return !!state.authToken;
     }
 }

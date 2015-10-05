@@ -1,7 +1,7 @@
 var mobservable = require('mobservable');
 var m = mobservable.default;
 
-var makeReactive = mobservable.makeReactive;
+var observable = mobservable.observable;
 var voidObserver = function(){};
 
 function buffer() {
@@ -29,9 +29,9 @@ exports.basic = function(test) {
 }
 
 exports.basic2 = function(test) {
-    var x = makeReactive(3);
-    var z = makeReactive(function () { return x() * 2});
-    var y = makeReactive(function () { return x() * 3});
+    var x = observable(3);
+    var z = observable(function () { return x() * 2});
+    var y = observable(function () { return x() * 3});
 
     z.observe(voidObserver);
 
@@ -72,8 +72,8 @@ exports.dynamic = function(test) {
 
 exports.dynamic2 = function(test) {
     try {
-        var x = makeReactive(3);
-        var y = makeReactive(function() {
+        var x = observable(3);
+        var y = observable(function() {
             return x() * x();
         });
 
@@ -99,12 +99,12 @@ exports.readme1 = function(test) {
     try {
         var b = buffer();
 
-        var vat = makeReactive(0.20);
+        var vat = observable(0.20);
         var order = {};
-        order.price = makeReactive(10);
+        order.price = observable(10);
         // Prints: New price: 24
         //in TS, just: value(() => this.price() * (1+vat()))
-        order.priceWithVat = makeReactive(function() {
+        order.priceWithVat = observable(function() {
             return order.price() * (1+vat());
         });
 
@@ -122,10 +122,10 @@ exports.readme1 = function(test) {
 }
 
 exports.testBatch = function(test) {
-    var a = makeReactive(2);
-    var b = makeReactive(3);
-    var c = makeReactive(function() { return a() * b() });
-    var d = makeReactive(function() { return c() * b() });
+    var a = observable(2);
+    var b = observable(3);
+    var c = observable(function() { return a() * b() });
+    var d = observable(function() { return c() * b() });
     var buf = buffer();
     d.observe(buf);
 
@@ -148,11 +148,11 @@ exports.testBatch = function(test) {
 }
 
 exports.testScope = function(test) {
-    var vat = makeReactive(0.2);
+    var vat = observable(0.2);
     var Order = function() {
-        this.price = makeReactive(20, this);
-        this.amount = makeReactive(2, this);
-        this.total = makeReactive(function() {
+        this.price = observable(20, this);
+        this.amount = observable(2, this);
+        this.total = observable(function() {
             return (1+vat()) * this.price() * this.amount();
         }, this);
     };
@@ -168,7 +168,7 @@ exports.testScope = function(test) {
 }
 
 exports.testProps1 = function(test) {
-    var vat = makeReactive(0.2);
+    var vat = observable(0.2);
     var Order = function() {
         mobservable.extendReactive(this, {
             'price' : 20,
@@ -199,7 +199,7 @@ exports.testProps1 = function(test) {
 };
 
 exports.testProps2 = function(test) {
-    var vat = makeReactive(0.2);
+    var vat = observable(0.2);
     var Order = function() {
         mobservable.extendReactive(this, {
             price: 20,
@@ -219,7 +219,7 @@ exports.testProps2 = function(test) {
 };
 
 exports.testProps3 = function(test) {
-    var vat = makeReactive(0.2);
+    var vat = observable(0.2);
     var Order = function() {
         this.price = 20;
         this.amount = 2;
@@ -275,10 +275,10 @@ exports.testObserveProperty = function(test) {
         });
     };
 
-    var snickers = mobservable.makeReactive({
+    var snickers = mobservable.observable({
         calories: null
     });
-    var mars = mobservable.makeReactive({
+    var mars = mobservable.observable({
         calories: undefined
     });
 
@@ -309,12 +309,12 @@ exports.testObserveProperty = function(test) {
 exports.testChangeCountOptimization = function(test) {
     var bCalcs = 0;
     var cCalcs = 0;
-    var a = makeReactive(3);
-    var b = makeReactive(function() {
+    var a = observable(3);
+    var b = observable(function() {
         bCalcs += 1;
         return 4 + a() - a();
     });
-    var c = makeReactive(function() {
+    var c = observable(function() {
         cCalcs += 1;
         return b();
     });
@@ -339,9 +339,9 @@ exports.testChangeCountOptimization = function(test) {
 
 exports.testObservablesRemoved = function(test) {
     var calcs = 0;
-    var a = makeReactive(1);
-    var b = makeReactive(2);
-    var c = makeReactive(function() {
+    var a = observable(1);
+    var b = observable(2);
+    var c = observable(function() {
         calcs ++;
         if (a() === 1)
         return b() * a() * b();
@@ -376,13 +376,13 @@ exports.testLazyEvaluation = function (test) {
     var dCalcs = 0;
     var observerChanges = 0;
 
-    var a = makeReactive(1);
-    var b = makeReactive(function() {
+    var a = observable(1);
+    var b = observable(function() {
         bCalcs += 1;
         return a() +1;
     });
 
-    var c = makeReactive(function() {
+    var c = observable(function() {
         cCalcs += 1;
         return b() +1;
     });
@@ -405,7 +405,7 @@ exports.testLazyEvaluation = function (test) {
     test.equal(bCalcs,3);
     test.equal(cCalcs,3);
 
-    var d = makeReactive(function() {
+    var d = observable(function() {
         dCalcs += 1;
         return b() * 2;
     });
@@ -718,7 +718,7 @@ exports.test_json2 = function(test) {
         ]
     };
 
-    var o = mobservable.makeReactive(source);
+    var o = mobservable.observable(source);
 
     //console.log(JSON.stringify(source,null,4));
     test.deepEqual(mobservable.toJSON(o), source);
@@ -776,7 +776,7 @@ exports.test_json2 = function(test) {
     ab = [];
     tb = [];
 
-    o.todos.push(mobservable.makeReactive({
+    o.todos.push(mobservable.observable({
         title: "test",
         tags: ["x"]
     }));
@@ -813,7 +813,7 @@ exports.test_json2 = function(test) {
     ab = [];
     tb = [];
 
-    o.todos[1] = mobservable.makeReactive({
+    o.todos[1] = mobservable.observable({
         title: "clean the attic",
         tags: ["needs sabbatical"],
         details: {
@@ -852,7 +852,7 @@ exports.test_json2 = function(test) {
     ab = [];
     tb = [];
 
-    o.todos[1].details = mobservable.makeReactive({ url: "google" });
+    o.todos[1].details = mobservable.observable({ url: "google" });
     o.todos[1].tags = ["foo", "bar"];
     test.deepEqual(mobservable.toJSON(o), {
          "todos": [

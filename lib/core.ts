@@ -17,11 +17,11 @@ import {batch} from './scheduler';
     * Turns an object, array or function into a reactive structure.
     * @param value the value which should become observable.
     */
-export function makeReactive<T>(value: T[], name?:string): IObservableArray<T>;
-export function makeReactive<T>(value: ()=>T, nameOrScope?: string | Object, name?: string): IObservableValue<T>;
-export function makeReactive<T extends string|number|boolean|Date|RegExp|Function|void>(value: T, name?:string): IObservableValue<T>;
-export function makeReactive<T extends Object>(value: T, name?: string): T;
-export function makeReactive(v:any, scopeOrName?:string | any, name?: string) {
+export function observable<T>(value: T[], name?:string): IObservableArray<T>;
+export function observable<T>(value: ()=>T, nameOrScope?: string | Object, name?: string): IObservableValue<T>;
+export function observable<T extends string|number|boolean|Date|RegExp|Function|void>(value: T, name?:string): IObservableValue<T>;
+export function observable<T extends Object>(value: T, name?: string): T;
+export function observable(v:any, scopeOrName?:string | any, name?: string) {
     if (isReactive(v))
         return v;
 
@@ -192,7 +192,7 @@ export function observeAsync<T>(view: () => T, effect: (latestValue : T ) => voi
 export function expr<T>(expr: () => T, scope?):T {
     if (!isComputingView())
         throw new Error("[mobservable.expr] 'expr' can only be used inside a computed value.");
-    return makeReactive(expr, scope) ();
+    return observable(expr, scope) ();
 }
 
 /**
@@ -216,7 +216,7 @@ export function extendReactive<A extends Object, B extends Object>(target: A, pr
     *   }
     * }
     */
-export function observable(target:Object, key:string, baseDescriptor?) {
+export function observablex(target:Object, key:string, baseDescriptor?) {
     // observable annotations are invoked on the prototype, not on actual instances,
     // so upon invocation, determine the 'this' instance, and define a property on the
     // instance as well (that hides the propotype property)

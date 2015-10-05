@@ -1,7 +1,7 @@
 var mobservable = require('mobservable');
 var m = mobservable;
 
-var makeReactive = mobservable.makeReactive;
+var observable = mobservable.observable;
 var voidObserver = function(){};
 
 function buffer() {
@@ -27,7 +27,7 @@ function testException(test, observable, exception) {
 }
 
 exports.testException1  = function(test) {
-    var a = makeReactive(function() {
+    var a = observable(function() {
         throw "hoi";
     });
     testException(test, a, "hoi");
@@ -37,16 +37,16 @@ exports.testException1  = function(test) {
 
 exports.testException2 = function(test) {
     var cbuffer = buffer();
-    var z = makeReactive(true);
-    var a = makeReactive(function() {
+    var z = observable(true);
+    var a = observable(function() {
         if (z())
         return 1;
         throw "Some error!";
     });
-    var b = makeReactive(function() {
+    var b = observable(function() {
         return a();
     });
-    var c = makeReactive(function() {
+    var c = observable(function() {
         return a();
     });
     c.observe(cbuffer);
@@ -70,9 +70,9 @@ exports.testException2 = function(test) {
 
 exports.deny_state_changes = function(test) {
     try {
-        var x = makeReactive(3);
-        var z = makeReactive(5);
-        var y = makeReactive(function() {
+        var x = observable(3);
+        var z = observable(5);
+        var y = observable(function() {
             z(6);
             return x() * x();
         });
@@ -92,7 +92,7 @@ exports.deny_state_changes = function(test) {
         test.equal(mobservable._.isComputingView(), false);
 
         // these should not throw:
-        var z = makeReactive({ 
+        var z = observable({ 
             a: null,
             b: function() {
                 throw "oeps";
@@ -127,9 +127,9 @@ exports.deny_state_changes = function(test) {
 
 exports.deny_array_change = function(test) {
     try {
-        var x = makeReactive(3);
-        var z = makeReactive([]);
-        var y = makeReactive(function() {
+        var x = observable(3);
+        var z = observable([]);
+        var y = observable(function() {
             z.push(3);
             return x() * x();
         });
@@ -158,8 +158,8 @@ exports.deny_array_change = function(test) {
 exports.enable_change_state_if_non_strict_mode = function(test) {
     try {
         m.strict = false;
-        var x = makeReactive(3);
-        var y = makeReactive(1);
+        var x = observable(3);
+        var y = observable(1);
         var dis = m.observe(function() {
             y();
             x(4);
@@ -179,7 +179,7 @@ exports.enable_change_state_if_non_strict_mode = function(test) {
 exports.throw_error_if_modification_loop = function(test) {
     try {
         m.strict = false;
-        var x = makeReactive(3);
+        var x = observable(3);
         try {
             var dis = m.observe(function() {
                 x(x() + 1);
@@ -198,7 +198,7 @@ exports.throw_error_if_modification_loop = function(test) {
 
 exports.cycle1 = function(test) {
     try {
-        var p = makeReactive(function() { return p() * 2; }); // thats a cycle!
+        var p = observable(function() { return p() * 2; }); // thats a cycle!
         p.observe(voidObserver, true);
         test.fail("expected exception");
     }
@@ -207,22 +207,22 @@ exports.cycle1 = function(test) {
         test.equal(mobservable._.isComputingView(), false);
     }
 
-    var a = makeReactive(function() { return b() * 2; });
-    var b = makeReactive(function() { return a() * 2; });
+    var a = observable(function() { return b() * 2; });
+    var b = observable(function() { return a() * 2; });
     testException(test, b, "Cycle detected");
     test.done();
 };
 
 exports.cycle2 = function(test) {
-    var p = makeReactive(function() { return p() * 2; });
+    var p = observable(function() { return p() * 2; });
     testException(test, p, "Cycle detected");
     test.done();
 };
 
 exports.cycle3 = function(test) {
-    var z = makeReactive(true);
-    var a = makeReactive(function() { return z() ? 1 : b() * 2; });
-    var b = makeReactive(function() { return a() * 2; });
+    var z = observable(true);
+    var a = observable(function() { return z() ? 1 : b() * 2; });
+    var b = observable(function() { return a() * 2; });
 
     b.observe(voidObserver);
     test.equals(1, a());

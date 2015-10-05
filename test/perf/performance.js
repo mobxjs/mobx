@@ -1,5 +1,5 @@
 var mobservable = require('mobservable');
-var makeReactive = mobservable.makeReactive;
+var observable = mobservable.observable;
 
 var gc = (function () {
     var memwatch;
@@ -29,13 +29,13 @@ results of this test:
 */
 exports.one_observes_ten_thousand_that_observe_one = function(test) {
     gc();
-    var a = makeReactive(2);
+    var a = observable(2);
 
     // many observers that listen to one..
     var observers = [];
     for (var i = 0; i < 10000; i++) {
         (function(idx) {
-            observers.push(makeReactive(function() {
+            observers.push(observable(function() {
                 return a() * idx;
             }))
         })(i);
@@ -43,7 +43,7 @@ exports.one_observes_ten_thousand_that_observe_one = function(test) {
 
     var bCalcs = 0;
     // one observers that listens to many..
-    var b = makeReactive(function() {
+    var b = observable(function() {
         var res = 0;
         for(var i = 0; i < observers.length; i++)
         res += observers[i]();
@@ -68,10 +68,10 @@ exports.one_observes_ten_thousand_that_observe_one = function(test) {
 
 exports.five_hunderd_properties_that_observe_their_sibling = function(test) {
     gc();
-    var observables = [makeReactive(1)];
+    var observables = [observable(1)];
     for(var i = 0; i < 500; i++) {
         (function(idx) {
-            observables.push(makeReactive(function() { return observables[idx]() + 1 }));
+            observables.push(observable(function() { return observables[idx]() + 1 }));
         })(i);
     }
 
@@ -94,9 +94,9 @@ exports.late_depenency_change = function(test) {
     gc();
     var values = [];
     for(var i = 0; i < 100; i++)
-    values.push(makeReactive(0))
+    values.push(observable(0))
 
-    var sum = makeReactive(function() {
+    var sum = observable(function() {
         var sum = 0;
         for(var i = 0; i < 100; i++)
         sum += values[i]();
@@ -117,20 +117,20 @@ exports.late_depenency_change = function(test) {
 
 exports.lots_of_unused_computables = function(test) {
     gc();
-    var a = makeReactive(1);
+    var a = observable(1);
 
     // many observers that listen to one..
     var observers = [];
     for (var i = 0; i < 10000; i++) {
         (function(idx) {
-            observers.push(makeReactive(function() {
+            observers.push(observable(function() {
                 return a() * idx;
             }))
         })(i);
     }
 
     // one observers that listens to many..
-    var b = makeReactive(function() {
+    var b = observable(function() {
         var res = 0;
         for(var i = 0; i < observers.length; i++)
         res += observers[i]();
@@ -159,10 +159,10 @@ exports.lots_of_unused_computables = function(test) {
 }
 
 exports.test_many_unreferenced_observables = function(test) {
-    var a = makeReactive(3);
-    var b = makeReactive(6);
-    var c = makeReactive(7);
-    var d = makeReactive(function() { return a() * b() * c() });
+    var a = observable(3);
+    var b = observable(6);
+    var c = observable(7);
+    var d = observable(function() { return a() * b() * c() });
     test.equal(d(), 126);
     test.equal(d.$mobservable.isSleeping, true);
     var start = now();
@@ -181,10 +181,10 @@ exports.test_many_unreferenced_observables = function(test) {
 exports.array_reduce = function(test) {
     gc();
     var aCalc = 0;
-    var ar = makeReactive([]);
-    var b = makeReactive(1);
+    var ar = observable([]);
+    var b = observable(1);
 
-    var sum = makeReactive(function() {
+    var sum = observable(function() {
         aCalc++;
         return ar.reduce(function(a, c) {
             return a + c * b();
@@ -218,10 +218,10 @@ exports.array_reduce = function(test) {
 
 exports.array_classic_loop = function(test) {
     gc();
-    var ar = makeReactive([]);
+    var ar = observable([]);
     var aCalc = 0;
-    var b = makeReactive(1);
-    var sum = makeReactive(function() {
+    var b = observable(1);
+    var sum = observable(function() {
         var s = 0;
         aCalc++;
         for(var i = 0; i < ar.length; i++)
@@ -265,10 +265,10 @@ function order_system_helper(test, usebatch, keepObserving) {
     // causes the unreliable results)
     gc();
 
-    var orders = makeReactive([]);
-    var vat = makeReactive(2);
+    var orders = observable([]);
+    var vat = observable(2);
 
-    var totalAmount = makeReactive(function() {
+    var totalAmount = observable(function() {
         var sum = 0, l = orders.length;
         for(var i = 0; i < l; i++)
         sum += orders[i].total();
@@ -276,24 +276,24 @@ function order_system_helper(test, usebatch, keepObserving) {
     });
 
     function OrderLine(order, price, amount) {
-        this.price = makeReactive(price);
-        this.amount = makeReactive(amount);
-        this.total = makeReactive(function() {
+        this.price = observable(price);
+        this.amount = observable(amount);
+        this.total = observable(function() {
             return order.vat() * this.price() * this.amount();
         }, this);
     }
 
     function Order(includeVat) {
-        this.includeVat = makeReactive(includeVat);
-        this.lines = makeReactive([]);
+        this.includeVat = observable(includeVat);
+        this.lines = observable([]);
 
-        this.vat = makeReactive(function() {
+        this.vat = observable(function() {
             if (this.includeVat())
             return vat();
             return 1;
         }, this);
 
-        this.total = makeReactive(function() {
+        this.total = observable(function() {
             return this.lines.reduce(function(acc, order) {
                 return acc + order.total();
             }, 0);
@@ -365,7 +365,7 @@ test_array_creation = function(test, amount, size) {
         a.push(i);
     var start = now();
     for(var i = 0; i < amount; i++)
-        makeReactive(a);
+        observable(a);
     console.log('\n  Created in ' + (now() - start) + 'ms.');
     test.done();
 };

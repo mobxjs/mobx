@@ -7,15 +7,15 @@ import {getDependencyTree, getDNode, getObserverTree, trackTransitions} from './
 
 export * from './interfaces';
 
-export default core.makeReactive;
+export default core.observable;
 export {
 	isReactive,
-	makeReactive,
+	observable,
+	observablex,
 	extendReactive,
 	asReference,
 	asFlat,
 	asStructure,
-	observable,
 	observe,
 	observeUntil,
 	observeAsync,

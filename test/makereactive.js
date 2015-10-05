@@ -29,37 +29,37 @@ exports.testIsReactive = function(test) {
     test.equal(m.isReactive(null), false);
     test.equal(m.isReactive(null), false);
 
-    test.equal(m.isReactive(m.makeReactive([])), true);
-    test.equal(m.isReactive(m.makeReactive({})), true);
-    test.equal(m.isReactive(m.makeReactive(function() {})), true);
+    test.equal(m.isReactive(m.observable([])), true);
+    test.equal(m.isReactive(m.observable({})), true);
+    test.equal(m.isReactive(m.observable(function() {})), true);
 
     test.equal(m.isReactive([]), false);
     test.equal(m.isReactive({}), false);
     test.equal(m.isReactive(function() {}), false);
 
     test.equal(m.isReactive(new Order()), false);
-    test.equal(m.isReactive(m.makeReactive(new Order())), true);
+    test.equal(m.isReactive(m.observable(new Order())), true);
 
     test.equal(m.isReactive(new ReactiveOrder), true);
-    test.equal(m.isReactive(m.makeReactive(3)), true);
+    test.equal(m.isReactive(m.observable(3)), true);
 
     var obj = {};
     test.equal(m.isReactive(obj), false);
 
-    test.equal(m.isReactive(m.makeReactive(function(){})), true);
+    test.equal(m.isReactive(m.observable(function(){})), true);
     test.equal(m.isReactive(m.observe(function(){})), true);
 
     test.done();
 
 }
 
-exports.makeReactive1 = function(test) {
+exports.observable1 = function(test) {
     test.throws(function() {
-        m.makeReactive(function(a,b) {});
+        m.observable(function(a,b) {});
     });
 
     // recursive structure
-    var x = m.makeReactive({
+    var x = m.observable({
         a: {
             b: {
                 c: 3
@@ -76,7 +76,7 @@ exports.makeReactive1 = function(test) {
 
     // recursive structure, but asReference passed in
     test.equal(m.isReactive(x.a.b), true);
-    var x2 = m.makeReactive({
+    var x2 = m.observable({
         a: m.asReference({
             b: {
                 c: 3
@@ -97,7 +97,7 @@ exports.makeReactive1 = function(test) {
     test.deepEqual(b2.toArray(), [3, 4]);
 
     // non recursive structure
-    var x3 = m.makeReactive(m.asFlat({
+    var x3 = m.observable(m.asFlat({
         a: {
             b: {
                 c: 3
@@ -115,12 +115,12 @@ exports.makeReactive1 = function(test) {
     test.done();
 }
 
-exports.makeReactive3 = function(test) {
+exports.observable3 = function(test) {
     function Order(price) {
         this.price = price;
     }
 
-    var x = m.makeReactive({
+    var x = m.observable({
         orders: [new Order(1), new Order(2)]
     });
 
@@ -140,14 +140,14 @@ exports.makeReactive3 = function(test) {
     test.done();
 }
 
-exports.makeReactive4 = function(test) {
-    var x = m.makeReactive([
+exports.observable4 = function(test) {
+    var x = m.observable([
         { x : 1 },
         { x : 2 }
     ]);
 
     var b = buffer();
-    m.makeReactive(function() {
+    m.observable(function() {
         return x.map(function(d) { return d.x });
     }).observe(b, true);
 
@@ -157,13 +157,13 @@ exports.makeReactive4 = function(test) {
     test.deepEqual(b.toArray(), [[1,2], [3,2], [2], [2, 5]]);
 
     // non recursive
-    var x2 = m.makeReactive(m.asFlat([
+    var x2 = m.observable(m.asFlat([
         { x : 1 },
         { x : 2 }
     ]));
 
     var b2 = buffer();
-    m.makeReactive(function() {
+    m.observable(function() {
         return x2.map(function(d) { return d.x });
     }).observe(b2, true);
 
@@ -176,21 +176,21 @@ exports.makeReactive4 = function(test) {
 }
 
 
-exports.makeReactive5 = function(test) {
+exports.observable5 = function(test) {
 
-    var x = m.makeReactive(function() { });
+    var x = m.observable(function() { });
     test.throws(function() {
         x(7); // set not allowed
     });
 
     var f = function() {};
-    var x2 = m.makeReactive(m.asReference(f));
+    var x2 = m.observable(m.asReference(f));
     test.equal(x2(), f);
     x2(null); // allowed
 
     f = function() { return this.price };
 
-    var x = m.makeReactive({
+    var x = m.observable({
         price : 17,
         reactive: f,
         nonReactive: m.asReference(f)
@@ -210,7 +210,7 @@ exports.makeReactive5 = function(test) {
 };
 
 exports.test_flat_array = function(test) {
-    var x = m.makeReactive({
+    var x = m.observable({
         x: m.asFlat([{
             a: 1
         }])
@@ -246,7 +246,7 @@ exports.test_flat_array = function(test) {
 }
 
 exports.test_flat_object = function(test) {
-    var y = m.makeReactive(m.asFlat({
+    var y = m.observable(m.asFlat({
         x : { z: 3 }
     }));
     
@@ -278,7 +278,7 @@ exports.test_flat_object = function(test) {
 
 exports.test_as_structure = function(test) {
     
-    var x = m.makeReactive({
+    var x = m.observable({
         x: m.asStructure(null)
     });
     
@@ -396,7 +396,7 @@ exports.test_as_structure = function(test) {
 };
 
 exports.test_as_structure_view = function(test) {
-    var x = m.makeReactive({
+    var x = m.observable({
         a: 1,
         aa: 1,
         b: function() {
@@ -438,7 +438,7 @@ exports.test_exceptions = function(test) {
         m.asReference(m.asFlat(3));
     }, "nested");
 
-    var x = m.makeReactive({
+    var x = m.observable({
         y: m.asReference(null)
     });
     
@@ -450,7 +450,7 @@ exports.test_exceptions = function(test) {
         x.y = m.asReference(3)
     });
 
-    var ar = m.makeReactive([2]);
+    var ar = m.observable([2]);
 
     test.throws(function() {
         ar[0] = m.asReference(3)
@@ -461,7 +461,7 @@ exports.test_exceptions = function(test) {
     });
     
     test.throws(function() {
-        ar = m.makeReactive([m.asStructure(3)]);
+        ar = m.observable([m.asStructure(3)]);
     });
 
     return test.done();

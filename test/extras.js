@@ -17,29 +17,29 @@ exports.testGetDNode = function(test) {
         getD({ x: 3}, "x");
     });
     test.throws(function() {
-        getD(m.makeReactive({ x: 3}));
+        getD(m.observable({ x: 3}));
     });
     test.throws(function() {
         getD(function() {});
     });
     test.throws(function() {
-        getD(Object.assign(m.makeReactive({ x: 3}), { y:2}), "y");
+        getD(Object.assign(m.observable({ x: 3}), { y:2}), "y");
     });
 
-    test.ok(getD(m.makeReactive([])));
-    test.ok(getD(m.makeReactive({x:3}), "x"));
-    test.ok(getD(m.makeReactive(3)));
-    test.ok(getD(m.makeReactive({x:function() { return 3 }}), "x"));
-    test.ok(getD(m.makeReactive(function() {})));
+    test.ok(getD(m.observable([])));
+    test.ok(getD(m.observable({x:3}), "x"));
+    test.ok(getD(m.observable(3)));
+    test.ok(getD(m.observable({x:function() { return 3 }}), "x"));
+    test.ok(getD(m.observable(function() {})));
     test.ok(getD(mobservable.observe(function() {})));
 
     var a;
-    a = m.makeReactive({x:{}});
+    a = m.observable({x:{}});
     test.ok(getD(a,"x"));
-    a = m.makeReactive({x:[]});
+    a = m.observable({x:[]});
     test.ok(getD(a,"x"));
     test.ok(getD(a.x));
-    a = m.makeReactive({x:[[]]});
+    a = m.observable({x:[[]]});
     test.ok(getD(a,"x"));
     test.ok(getD(a.x));
     test.ok(getD(a.x[0]));
@@ -48,7 +48,7 @@ exports.testGetDNode = function(test) {
 }
 
 exports.testTreeD = function(test) {
-    var a = m.makeReactive(3);
+    var a = m.observable(3);
     var aName = a.$mobservable.context.name;
 
     var dtree = m.extras.getDependencyTree;
@@ -62,7 +62,7 @@ exports.testTreeD = function(test) {
     var bFunc =function () {
         return a() * a();
     };
-    var b = m.makeReactive(bFunc);
+    var b = m.observable(bFunc);
     var bName = b.$mobservable.context.name
     test.deepEqual(dtree(b), {
         context:bFunc,
@@ -124,7 +124,7 @@ exports.testNames = function(test) {
         return m.extras.getDNode(thing, prop).context.object;
     }
 
-    test.equal(name(m.makeReactive(3, 'hoi')), 'hoi');
+    test.equal(name(m.observable(3, 'hoi')), 'hoi');
 
     var struct = {
         x: 3,
@@ -139,7 +139,7 @@ exports.testNames = function(test) {
         ]
     };
 
-    var rstruct = m.makeReactive(struct);
+    var rstruct = m.observable(struct);
     m.extendReactive(rstruct.y, { a:  { b : 2}});
     rstruct.ar.push({ b : 2});
     rstruct.ar.push([]);
@@ -165,7 +165,7 @@ exports.testNames = function(test) {
     test.equal(contextObj(rstruct.ar[3]), rstruct);
 
     var STUB = {};
-    var rstruct2 = m.makeReactive({
+    var rstruct2 = m.observable({
         x: 3,
         y: {
             z: 7
@@ -198,13 +198,13 @@ exports.testNames = function(test) {
     test.equal(name(m.observe(function namedFunction() {
     })), "namedFunction");
 
-    test.ok(name(m.makeReactive(function() {
+    test.ok(name(m.observable(function() {
     })));
 
-    test.equal(name(m.makeReactive(function namedFunction() {
+    test.equal(name(m.observable(function namedFunction() {
     })), "namedFunction");
 
-    test.equal(name(m.makeReactive(function namedFunction() {
+    test.equal(name(m.observable(function namedFunction() {
     },  "overridenName")), "overridenName");
 
     test.done();
@@ -275,8 +275,8 @@ var trackerOutput2 = function(a, b, c) {
 exports.testTransitionTracker1 = function(test) {
     var lines = [];
 
-    var a = m.makeReactive(3);
-    var b = m.makeReactive(function() { return a() * 2 });
+    var a = m.observable(3);
+    var b = m.observable(function() { return a() * 2 });
     var c = m.observe(function() { b(); });
     var stop = m.extras.trackTransitions(false, function(line) {
         lines.push(line);
@@ -293,8 +293,8 @@ exports.testTransitionTracker1 = function(test) {
 exports.testTransitionTracker2 = function(test) {
     var lines = [];
 
-    var a = m.makeReactive(3);
-    var b = m.makeReactive(function() { return a() * 2 });
+    var a = m.observable(3);
+    var b = m.observable(function() { return a() * 2 });
     var c = m.observe(function() { b(); });
     var stop = m.extras.trackTransitions(true, function(line) {
         lines.push(line);
@@ -315,10 +315,10 @@ exports.testTransitionTracker3 = function(test) {
         lines.push(d);
     }
 
-    var a = m.makeReactive(3);
-    var b = m.makeReactive(function() { return a() * 2 });
+    var a = m.observable(3);
+    var b = m.observable(function() { return a() * 2 });
     var c = m.observe(function() { b(); });
-    var d = m.makeReactive(4);
+    var d = m.observable(4);
 
     var stop = m.extras.trackTransitions(false)
 
@@ -348,8 +348,8 @@ exports.testTransitionTracker4 = function(test) {
         lines.push(d);
     }
 
-    var a = m.makeReactive(3);
-    var b = m.makeReactive(function() { return a() * 2 });
+    var a = m.observable(3);
+    var b = m.observable(function() { return a() * 2 });
     var c = m.observe(function() { b(); });
     var stop = m.extras.trackTransitions(true);
 

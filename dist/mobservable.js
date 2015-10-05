@@ -63,15 +63,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	var extras_1 = __webpack_require__(3);
 	__export(__webpack_require__(11));
 	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = core.makeReactive;
+	exports.default = core.observable;
 	var core_1 = __webpack_require__(1);
 	exports.isReactive = core_1.isReactive;
-	exports.makeReactive = core_1.makeReactive;
+	exports.observable = core_1.observable;
+	exports.observablex = core_1.observablex;
 	exports.extendReactive = core_1.extendReactive;
 	exports.asReference = core_1.asReference;
 	exports.asFlat = core_1.asFlat;
 	exports.asStructure = core_1.asStructure;
-	exports.observable = core_1.observable;
 	exports.observe = core_1.observe;
 	exports.observeUntil = core_1.observeUntil;
 	exports.observeAsync = core_1.observeAsync;
@@ -120,7 +120,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var observablearray_1 = __webpack_require__(8);
 	var observableobject_1 = __webpack_require__(4);
 	var scheduler_1 = __webpack_require__(10);
-	function makeReactive(v, scopeOrName, name) {
+	function observable(v, scopeOrName, name) {
 	    if (isReactive(v))
 	        return v;
 	    var _a = getValueModeFromValue(v, ValueMode.Recursive), mode = _a[0], value = _a[1];
@@ -149,7 +149,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    throw "Illegal State";
 	}
-	exports.makeReactive = makeReactive;
+	exports.observable = observable;
 	function asReference(value) {
 	    return new AsReference(value);
 	}
@@ -217,14 +217,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	function expr(expr, scope) {
 	    if (!dnode_1.isComputingView())
 	        throw new Error("[mobservable.expr] 'expr' can only be used inside a computed value.");
-	    return makeReactive(expr, scope)();
+	    return observable(expr, scope)();
 	}
 	exports.expr = expr;
 	function extendReactive(target, properties, context) {
 	    return extendReactiveHelper(target, properties, ValueMode.Recursive, context);
 	}
 	exports.extendReactive = extendReactive;
-	function observable(target, key, baseDescriptor) {
+	function observablex(target, key, baseDescriptor) {
 	    var isDecoratingProperty = baseDescriptor && !baseDescriptor.hasOwnProperty("value");
 	    var descriptor = baseDescriptor || {};
 	    var baseValue = isDecoratingProperty ? descriptor.get : descriptor.value;
@@ -255,7 +255,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        Object.defineProperty(target, key, descriptor);
 	    }
 	}
-	exports.observable = observable;
+	exports.observablex = observablex;
 	function toJSON(source) {
 	    if (!source)
 	        return source;
