@@ -1,5 +1,5 @@
 import {
-    observable, observablex, asStructure, observe, observeAsync, extendReactive, 
+    observable, asStructure, observe, observeAsync, extendReactive, 
     IObservableArray, IArrayChange, IArraySplice, IObservableValue,
     extras,
     logLevel,
@@ -15,19 +15,19 @@ var a = observable([1,2,3]);
 var testFunction = function(a) {};
 
 class Order {
-    @observablex price:number = 3;
-    @observablex amount:number = 2;
-    @observablex orders = [];
-    @observablex aFunction = testFunction;
-    @observablex someStruct = asStructure({ x: 1, y: 2});
+    @observable price:number = 3;
+    @observable amount:number = 2;
+    @observable orders = [];
+    @observable aFunction = testFunction;
+    @observable someStruct = asStructure({ x: 1, y: 2});
 
-    @observablex get total() {
+    @observable get total() {
         return this.amount * this.price * (1 + this.orders.length);
     }
     
     // Typescript classes cannot be defined inside functions,
     // but if the next line is enabled it should throw...
-    // @observablex hoepie() { return 3; }
+    // @observable hoepie() { return 3; }
 }
 
 export function testObservable(test) {
@@ -159,7 +159,7 @@ class LoginStoreTest {
         });
     }
 
-    @observablex get loggedIn() {
+    @observable get loggedIn() {
         return !!state.authToken;
     }
 }

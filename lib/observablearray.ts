@@ -20,9 +20,9 @@ export class ObservableArrayAdministration<T> extends DataNode {
     changeEvent: SimpleEventEmitter = new SimpleEventEmitter();
 
     constructor(private array: ObservableArray<T>, public mode:ValueMode, context: IContextInfoStruct) {
-        super(context);
-        if (!context.object)
-            context.object = array;
+        super(context ? context : { name: undefined, object: undefined });
+        if (!this.context.object)
+            this.context.object = array;
     }
 }
 

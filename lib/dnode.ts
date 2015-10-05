@@ -56,10 +56,14 @@ export class DataNode {
     observers: ViewNode[] = [];       // nodes that are dependent on this node. Will be notified when our state change
     protected isDisposed = false;            // ready to be garbage collected. Nobody is observing or ever will observe us
     externalRefenceCount = 0;      // nr of 'things' that depend on us, excluding other DNode's. If > 0, this node will not go to sleep
+    context: IContextInfoStruct;
 
-    constructor(public context:IContextInfoStruct) {
+    constructor(context:IContextInfoStruct) {
+        if (!context)
+            context = { name: undefined, object: undefined } 
         if (!context.name)
             context.name = "[m#" + this.id + "]";
+        this.context = context;
     }
 
     setRefCount(delta:number) {

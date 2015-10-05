@@ -124,8 +124,6 @@ exports.testNames = function(test) {
         return m.extras.getDNode(thing, prop).context.object;
     }
 
-    test.equal(name(m.observable(3, 'hoi')), 'hoi');
-
     var struct = {
         x: 3,
         y: {
@@ -164,33 +162,6 @@ exports.testNames = function(test) {
     test.equal(contextObj(rstruct.ar[2], "b"), rstruct);
     test.equal(contextObj(rstruct.ar[3]), rstruct);
 
-    var STUB = {};
-    var rstruct2 = m.observable({
-        x: 3,
-        y: {
-            z: 7
-        },
-        ar : [
-            4,
-            {
-                w: 5
-            }
-        ]
-    }, 'hoi');
-    m.extendReactive(rstruct2.y, { a:  { b : 2}});
-    rstruct2.ar.push({ b : 2});
-    rstruct2.ar.push([]);
-
-    test.equal(name(rstruct2,"x"), "hoi.x");
-    test.equal(name(rstruct2, "y"), "hoi.y");
-    test.equal(name(rstruct2.y,"z"), "hoi.y.z");
-    test.equal(name(rstruct2, "ar"), "hoi.ar");
-    test.equal(name(rstruct2.ar), "hoi.ar");
-    test.equal(name(rstruct2.ar[1],"w"), "hoi.ar[x].w");
-    test.equal(name(rstruct2.y.a,"b"), "hoi.y.a.b");
-    test.equal(name(rstruct2.ar[2], "b"), "hoi.ar[x].b");
-    test.equal(name(rstruct2.ar[3]), "hoi.ar[x]");
-
     var d = m.observe(function() {
     });
     test.ok(name(d));
@@ -203,9 +174,6 @@ exports.testNames = function(test) {
 
     test.equal(name(m.observable(function namedFunction() {
     })), "namedFunction");
-
-    test.equal(name(m.observable(function namedFunction() {
-    },  "overridenName")), "overridenName");
 
     test.done();
 }

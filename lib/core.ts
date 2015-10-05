@@ -17,39 +17,37 @@ import {batch} from './scheduler';
     * Turns an object, array or function into a reactive structure.
     * @param value the value which should become observable.
     */
-export function observable<T>(value: T[], name?:string): IObservableArray<T>;
-export function observable<T>(value: ()=>T, nameOrScope?: string | Object, name?: string): IObservableValue<T>;
-export function observable<T extends string|number|boolean|Date|RegExp|Function|void>(value: T, name?:string): IObservableValue<T>;
-export function observable<T extends Object>(value: T, name?: string): T;
-export function observable(v:any, scopeOrName?:string | any, name?: string) {
+export function observable(target:Object, key:string, baseDescriptor?:PropertyDescriptor):any;
+export function observable<T>(value: T[]): IObservableArray<T>;
+export function observable<T, S extends Object>(value: ()=>T, thisArg: S): IObservableValue<T>;
+export function observable<T extends string|number|boolean|Date|RegExp|Function|void>(value: T): IObservableValue<T>;
+export function observable<T extends Object>(value: T): T;
+export function observable(v:any, keyOrScope?:string | any) {
+    if (typeof arguments[1] === "string")
+        return observableDecorator.apply(null, arguments);
+
     if (isReactive(v))
         return v;
 
     let [mode, value] = getValueModeFromValue(v, ValueMode.Recursive);
-
     const sourceType = mode === ValueMode.Reference ? ValueType.Reference : getTypeOfValue(value);
-    const scope = typeof scopeOrName === "object" ? scopeOrName : null;
-    const context = {
-        name: scope ? name : scopeOrName,
-        object: null
-    };
 
     switch(sourceType) {
         case ValueType.Reference:
         case ValueType.ComplexObject:
-            return toGetterSetterFunction(new ObservableValue(value, mode, context));
+            return toGetterSetterFunction(new ObservableValue(value, mode, null));
         case ValueType.ComplexFunction:
             throw new Error("[mobservable.makeReactive] Creating reactive functions from functions with multiple arguments is currently not supported, see https://github.com/mweststrate/mobservable/issues/12");
-        case ValueType.ViewFunction:
-            if (!context.name)
-                context.name = value.name;
-            context.object = value;
-            return toGetterSetterFunction(new ObservableView(value, scope, context, mode === ValueMode.Structure));
+        case ValueType.ViewFunction: {
+            const context = {
+                name: value.name,
+                object: value
+            };
+            return toGetterSetterFunction(new ObservableView(value, keyOrScope, context, mode === ValueMode.Structure));
+        }
         case ValueType.Array:
         case ValueType.PlainObject:
-            const res = makeChildReactive(value, mode, context);
-            context.object = res;
-            return res;
+            return makeChildReactive(value, mode, null);
     }
     throw "Illegal State";
 }
@@ -216,7 +214,7 @@ export function extendReactive<A extends Object, B extends Object>(target: A, pr
     *   }
     * }
     */
-export function observablex(target:Object, key:string, baseDescriptor?) {
+export function observableDecorator(target:Object, key:string, baseDescriptor:PropertyDescriptor) {
     // observable annotations are invoked on the prototype, not on actual instances,
     // so upon invocation, determine the 'this' instance, and define a property on the
     // instance as well (that hides the propotype property)

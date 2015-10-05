@@ -67,7 +67,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var core_1 = __webpack_require__(1);
 	exports.isReactive = core_1.isReactive;
 	exports.observable = core_1.observable;
-	exports.observablex = core_1.observablex;
 	exports.extendReactive = core_1.extendReactive;
 	exports.asReference = core_1.asReference;
 	exports.asFlat = core_1.asFlat;
@@ -120,32 +119,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	var observablearray_1 = __webpack_require__(8);
 	var observableobject_1 = __webpack_require__(4);
 	var scheduler_1 = __webpack_require__(10);
-	function observable(v, scopeOrName, name) {
+	function observable(v, keyOrScope) {
+	    if (typeof arguments[1] === "string")
+	        return observableDecorator.apply(null, arguments);
 	    if (isReactive(v))
 	        return v;
 	    var _a = getValueModeFromValue(v, ValueMode.Recursive), mode = _a[0], value = _a[1];
 	    var sourceType = mode === ValueMode.Reference ? ValueType.Reference : getTypeOfValue(value);
-	    var scope = typeof scopeOrName === "object" ? scopeOrName : null;
-	    var context = {
-	        name: scope ? name : scopeOrName,
-	        object: null
-	    };
 	    switch (sourceType) {
 	        case ValueType.Reference:
 	        case ValueType.ComplexObject:
-	            return toGetterSetterFunction(new observablevalue_1.ObservableValue(value, mode, context));
+	            return toGetterSetterFunction(new observablevalue_1.ObservableValue(value, mode, null));
 	        case ValueType.ComplexFunction:
 	            throw new Error("[mobservable.makeReactive] Creating reactive functions from functions with multiple arguments is currently not supported, see https://github.com/mweststrate/mobservable/issues/12");
-	        case ValueType.ViewFunction:
-	            if (!context.name)
-	                context.name = value.name;
-	            context.object = value;
-	            return toGetterSetterFunction(new observableview_1.ObservableView(value, scope, context, mode === ValueMode.Structure));
+	        case ValueType.ViewFunction: {
+	            var context = {
+	                name: value.name,
+	                object: value
+	            };
+	            return toGetterSetterFunction(new observableview_1.ObservableView(value, keyOrScope, context, mode === ValueMode.Structure));
+	        }
 	        case ValueType.Array:
 	        case ValueType.PlainObject:
-	            var res = makeChildReactive(value, mode, context);
-	            context.object = res;
-	            return res;
+	            return makeChildReactive(value, mode, null);
 	    }
 	    throw "Illegal State";
 	}
@@ -224,7 +220,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return extendReactiveHelper(target, properties, ValueMode.Recursive, context);
 	}
 	exports.extendReactive = extendReactive;
-	function observablex(target, key, baseDescriptor) {
+	function observableDecorator(target, key, baseDescriptor) {
 	    var isDecoratingProperty = baseDescriptor && !baseDescriptor.hasOwnProperty("value");
 	    var descriptor = baseDescriptor || {};
 	    var baseValue = isDecoratingProperty ? descriptor.get : descriptor.value;
@@ -255,7 +251,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        Object.defineProperty(target, key, descriptor);
 	    }
 	}
-	exports.observablex = observablex;
+	exports.observableDecorator = observableDecorator;
 	function toJSON(source) {
 	    if (!source)
 	        return source;
@@ -440,14 +436,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	;
 	var DataNode = (function () {
 	    function DataNode(context) {
-	        this.context = context;
 	        this.id = ++mobservableId;
 	        this.state = NodeState.READY;
 	        this.observers = [];
 	        this.isDisposed = false;
 	        this.externalRefenceCount = 0;
+	        if (!context)
+	            context = { name: undefined, object: undefined };
 	        if (!context.name)
 	            context.name = "[m#" + this.id + "]";
+	        this.context = context;
 	    }
 	    DataNode.prototype.setRefCount = function (delta) {
 	        this.externalRefenceCount += delta;
@@ -1108,13 +1106,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	var ObservableArrayAdministration = (function (_super) {
 	    __extends(ObservableArrayAdministration, _super);
 	    function ObservableArrayAdministration(array, mode, context) {
-	        _super.call(this, context);
+	        _super.call(this, context ? context : { name: undefined, object: undefined });
 	        this.array = array;
 	        this.mode = mode;
 	        this.values = [];
 	        this.changeEvent = new simpleeventemitter_1.default();
-	        if (!context.object)
-	            context.object = array;
+	        if (!this.context.object)
+	            this.context.object = array;
 	    }
 	    return ObservableArrayAdministration;
 	})(dnode_1.DataNode);
