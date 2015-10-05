@@ -31,7 +31,7 @@ export function makeReactive(v:any, scopeOrName?:string | any, name?: string) {
     const scope = typeof scopeOrName === "object" ? scopeOrName : null;
     const context = {
         name: scope ? name : scopeOrName,
-        object: value
+        object: null
     };
 
     switch(sourceType) {
@@ -43,10 +43,13 @@ export function makeReactive(v:any, scopeOrName?:string | any, name?: string) {
         case ValueType.ViewFunction:
             if (!context.name)
                 context.name = value.name;
+            context.object = value;
             return toGetterSetterFunction(new ObservableView(value, scope, context, mode === ValueMode.Structure));
         case ValueType.Array:
         case ValueType.PlainObject:
-            return makeChildReactive(value, mode, context);
+            const res = makeChildReactive(value, mode, context);
+            context.object = res;
+            return res;
     }
     throw "Illegal State";
 }

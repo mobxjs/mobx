@@ -73,7 +73,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.asStructure = core_1.asStructure;
 	exports.observable = core_1.observable;
 	exports.observe = core_1.observe;
-	exports.sideEffect = core_1.sideEffect;
 	exports.observeUntil = core_1.observeUntil;
 	exports.observeAsync = core_1.observeAsync;
 	exports.expr = core_1.expr;
@@ -124,21 +123,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	function makeReactive(v, scopeOrName, name) {
 	    if (isReactive(v))
 	        return v;
-	    var opts = utils_1.isPlainObject(scopeOrName) ? scopeOrName : {};
 	    var _a = getValueModeFromValue(v, ValueMode.Recursive), mode = _a[0], value = _a[1];
-	    if (opts.recurse === false) {
-	        console.warn("[mobservable.makeReactive] option 'recurse: false' is deprecated, use 'mobservable.asFlat' instead");
-	        mode = ValueMode.Flat;
-	    }
-	    else if (opts.as === "reference") {
-	        console.warn("[mobservable.makeReactive] option 'as: \"reference\"' is deprecated, use 'mobservable.asReference' instead");
-	        mode = ValueMode.Reference;
-	    }
 	    var sourceType = mode === ValueMode.Reference ? ValueType.Reference : getTypeOfValue(value);
-	    var scope = opts.scope || (scopeOrName && typeof scopeOrName === "object" ? scopeOrName : null);
+	    var scope = typeof scopeOrName === "object" ? scopeOrName : null;
 	    var context = {
-	        name: name || opts.name,
-	        object: opts.context || opts.scope
+	        name: scope ? name : scopeOrName,
+	        object: null
 	    };
 	    switch (sourceType) {
 	        case ValueType.Reference:
@@ -149,10 +139,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        case ValueType.ViewFunction:
 	            if (!context.name)
 	                context.name = value.name;
-	            return toGetterSetterFunction(new observableview_1.ObservableView(value, opts.scope || opts.context, context, mode === ValueMode.Structure));
+	            context.object = value;
+	            return toGetterSetterFunction(new observableview_1.ObservableView(value, scope, context, mode === ValueMode.Structure));
 	        case ValueType.Array:
 	        case ValueType.PlainObject:
-	            return makeChildReactive(value, mode, context);
+	            var res = makeChildReactive(value, mode, context);
+	            context.object = res;
+	            return res;
 	    }
 	    throw "Illegal State";
 	}
@@ -175,15 +168,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return !!value.$mobservable;
 	}
 	exports.isReactive = isReactive;
-	function sideEffect(func, scope) {
-	    console.warn("[mobservable.sideEffect] 'sideEffect' has been renamed to 'observe' and will be removed in a later version.");
-	    return observe(func, scope);
-	}
-	exports.sideEffect = sideEffect;
 	function observe(view, scope) {
 	    var _a = getValueModeFromValue(view, ValueMode.Recursive), mode = _a[0], unwrappedView = _a[1];
 	    var observable = new observableview_1.ObservableView(unwrappedView, scope, {
-	        object: scope,
+	        object: scope || view,
 	        name: view.name
 	    }, mode === ValueMode.Structure);
 	    observable.setRefCount(+1);
@@ -226,11 +214,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	}
 	exports.observeAsync = observeAsync;
-	function when(predicate, effect, scope) {
-	    console.error("[mobservable.when] deprecated, please use 'mobservable.observeUntil'");
-	    return observeUntil(predicate, effect, scope);
-	}
-	exports.when = when;
 	function expr(expr, scope) {
 	    if (!dnode_1.isComputingView())
 	        throw new Error("[mobservable.expr] 'expr' can only be used inside a computed value.");
@@ -246,7 +229,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var descriptor = baseDescriptor || {};
 	    var baseValue = isDecoratingProperty ? descriptor.get : descriptor.value;
 	    if (!isDecoratingProperty && typeof baseValue === "function")
-	        throw new Error("@observable functions are deprecated. Use @observable on a getter function if you want to create a view, or wrap the value in 'asReference' if you want to store a value (found on member '" + key + "').");
+	        throw new Error("@observable functions are not supported. Use @observable on a getter function if you want to create a view, or wrap the value in 'asReference' if you want to store a value (found on member '" + key + "').");
 	    if (isDecoratingProperty) {
 	        if (typeof baseValue !== "function")
 	            throw new Error("@observable expects a getter function if used on a property (found on member '" + key + "').");
@@ -288,31 +271,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return source;
 	}
 	exports.toJSON = toJSON;
-	function toJson(source) {
-	    console.warn("mobservable.toJson is deprecated, use mobservable.toJSON instead");
-	    return toJSON(source);
-	}
-	exports.toJson = toJson;
 	function transaction(action) {
 	    return scheduler_1.batch(action);
 	}
 	exports.transaction = transaction;
-	function observeUntilInvalid(func, onInvalidate, context) {
-	    console.warn("mobservable.observeUntilInvalid is deprecated and will be removed in 0.7");
-	    var hasRun = false;
-	    var result;
-	    var disposer = observe(function () {
-	        if (!hasRun) {
-	            hasRun = true;
-	            result = func();
-	        }
-	        else {
-	            onInvalidate();
-	        }
-	    });
-	    return [result, disposer, disposer['$mobservable']];
-	}
-	exports.observeUntilInvalid = observeUntilInvalid;
 	exports.logLevel = 1;
 	exports.strict = true;
 	setTimeout(function () {
@@ -1025,9 +987,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	}
 	exports.once = once;
-	function noop() {
-	}
-	exports.noop = noop;
 	function unique(list) {
 	    var res = [];
 	    list.forEach(function (item) {
@@ -1264,22 +1223,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ObservableArray.prototype.replace = function (newItems) {
 	        return this.spliceWithArray(0, this.$mobservable.values.length, newItems);
 	    };
-	    ObservableArray.prototype.values = function () {
-	        console.warn("mobservable.array.values is deprecated and will be removed in 0.7, use slice() instead");
-	        this.$mobservable.notifyObserved();
-	        return this.$mobservable.values.slice();
-	    };
 	    ObservableArray.prototype.toJSON = function () {
 	        this.$mobservable.notifyObserved();
 	        return this.$mobservable.values.slice();
-	    };
-	    ObservableArray.prototype.clone = function () {
-	        console.warn("mobservable.array.clone is deprecated and will be removed in 0.7");
-	        this.$mobservable.notifyObserved();
-	        return new ObservableArray(this.$mobservable.values, this.$mobservable.mode, {
-	            object: null,
-	            name: this.$mobservable.context.name + "[clone]"
-	        });
 	    };
 	    ObservableArray.prototype.find = function (predicate, thisArg, fromIndex) {
 	        if (fromIndex === void 0) { fromIndex = 0; }

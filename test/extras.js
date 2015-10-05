@@ -53,7 +53,7 @@ exports.testTreeD = function(test) {
 
     var dtree = m.extras.getDependencyTree;
     test.deepEqual(dtree(a), {
-       context:3,
+       context:null,
        name: aName,
        id: a.$mobservable.id
     });
@@ -85,7 +85,7 @@ exports.testTreeD = function(test) {
             name: bName,
             id: b.$mobservable.id,
             dependencies: [{
-                context: 3,
+                context: null,
                 name: aName,
                 id: a.$mobservable.id
             }]
@@ -96,7 +96,7 @@ exports.testTreeD = function(test) {
     test.ok(bName !== cName);
 
     test.deepEqual(m.extras.getObserverTree(a), {
-        context: 3,
+        context: null,
         name: aName,
         id: a.$mobservable.id,
         observers: [{
