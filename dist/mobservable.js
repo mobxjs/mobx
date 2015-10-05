@@ -67,7 +67,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var core_1 = __webpack_require__(1);
 	exports.isReactive = core_1.isReactive;
 	exports.observable = core_1.observable;
-	exports.extendReactive = core_1.extendReactive;
+	exports.extendObservable = core_1.extendObservable;
 	exports.asReference = core_1.asReference;
 	exports.asFlat = core_1.asFlat;
 	exports.asStructure = core_1.asStructure;
@@ -141,7 +141,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        case ValueType.Array:
 	        case ValueType.PlainObject:
-	            return makeChildReactive(value, mode, null);
+	            return makeChildObservable(value, mode, null);
 	    }
 	    throw "Illegal State";
 	}
@@ -216,14 +216,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return observable(expr, scope)();
 	}
 	exports.expr = expr;
-	function extendReactive(target, properties, context) {
-	    return extendReactiveHelper(target, properties, ValueMode.Recursive, context);
+	function extendObservable(target, properties, context) {
+	    return extendObservableHelper(target, properties, ValueMode.Recursive, context);
 	}
-	exports.extendReactive = extendReactive;
+	exports.extendObservable = extendObservable;
 	function observableDecorator(target, key, baseDescriptor) {
 	    var isDecoratingProperty = baseDescriptor && !baseDescriptor.hasOwnProperty("value");
 	    var descriptor = baseDescriptor || {};
 	    var baseValue = isDecoratingProperty ? descriptor.get : descriptor.value;
+	    if (!target || typeof target !== "object")
+	        throw new Error("The @observable decorator can only be used on objects");
 	    if (!isDecoratingProperty && typeof baseValue === "function")
 	        throw new Error("@observable functions are not supported. Use @observable on a getter function if you want to create a view, or wrap the value in 'asReference' if you want to store a value (found on member '" + key + "').");
 	    if (isDecoratingProperty) {
@@ -251,7 +253,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        Object.defineProperty(target, key, descriptor);
 	    }
 	}
-	exports.observableDecorator = observableDecorator;
 	function toJSON(source) {
 	    if (!source)
 	        return source;
@@ -268,7 +269,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.toJSON = toJSON;
 	function transaction(action) {
-	    return scheduler_1.batch(action);
+	    return scheduler_1.transaction(action);
 	}
 	exports.transaction = transaction;
 	exports.logLevel = 1;
@@ -305,7 +306,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ValueType.Reference;
 	}
 	exports.getTypeOfValue = getTypeOfValue;
-	function extendReactiveHelper(target, properties, mode, context) {
+	function extendObservableHelper(target, properties, mode, context) {
 	    var meta = observableobject_1.ObservableObject.asReactive(target, context, mode);
 	    for (var key in properties)
 	        if (properties.hasOwnProperty(key)) {
@@ -313,7 +314,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    return target;
 	}
-	exports.extendReactiveHelper = extendReactiveHelper;
+	exports.extendObservableHelper = extendObservableHelper;
 	function toGetterSetterFunction(observable) {
 	    var f = function (value) {
 	        if (arguments.length > 0)
@@ -365,7 +366,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return [defaultMode, value];
 	}
 	exports.getValueModeFromValue = getValueModeFromValue;
-	function makeChildReactive(value, parentMode, context) {
+	function makeChildObservable(value, parentMode, context) {
 	    var childMode;
 	    if (isReactive(value))
 	        return value;
@@ -389,11 +390,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (Array.isArray(value))
 	        return new observablearray_1.ObservableArray(value.slice(), childMode, context);
 	    if (utils_1.isPlainObject(value))
-	        return extendReactiveHelper(value, value, childMode, context);
+	        return extendObservableHelper(value, value, childMode, context);
 	    return value;
 	    var _a;
 	}
-	exports.makeChildReactive = makeChildReactive;
+	exports.makeChildObservable = makeChildObservable;
 	function assertUnwrapped(value, message) {
 	    if (value instanceof AsReference || value instanceof AsStructure || value instanceof AsFlat)
 	        throw new Error("[mobservable] asStructure / asReference / asFlat cannot be used here. " + message);
@@ -1189,7 +1190,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    ObservableArray.prototype.makeReactiveArrayItem = function (value) {
 	        core_1.assertUnwrapped(value, "Array values cannot have modifiers");
-	        return core_1.makeChildReactive(value, this.$mobservable.mode, {
+	        return core_1.makeChildObservable(value, this.$mobservable.mode, {
 	            object: this.$mobservable.context.object,
 	            name: this.$mobservable.context.name + "[x]"
 	        });
@@ -1394,7 +1395,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._value = this.makeReferenceValueReactive(unwrappedValue);
 	    }
 	    ObservableValue.prototype.makeReferenceValueReactive = function (value) {
-	        return core_1.makeChildReactive(value, this.mode, this.context);
+	        return core_1.makeChildObservable(value, this.mode, this.context);
 	    };
 	    ObservableValue.prototype.set = function (newValue) {
 	        core_1.assertUnwrapped(newValue, "Modifiers cannot be used on non-initial values.");
@@ -1462,7 +1463,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }
 	}
-	function batch(action) {
+	function transaction(action) {
 	    inBatch += 1;
 	    try {
 	        return action();
@@ -1475,7 +1476,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }
 	}
-	exports.batch = batch;
+	exports.transaction = transaction;
 	//# sourceMappingURL=scheduler.js.map
 
 /***/ },

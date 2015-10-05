@@ -30,7 +30,7 @@ function runPostBatchActions() {
     }
 }
 
-export function batch<T>(action:()=>T):T {
+export function transaction<T>(action:()=>T):T {
     inBatch += 1;
     try {
         return action();

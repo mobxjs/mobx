@@ -11,7 +11,7 @@ import {ObservableValue} from './observablevalue';
 import {ObservableView, throwingViewSetter} from './observableview';
 import {ObservableArray} from './observablearray';
 import {ObservableObject} from './observableobject';
-import {batch} from './scheduler';
+import {transaction} from './scheduler';
 
 /**
     * Turns an object, array or function into a reactive structure.
@@ -47,7 +47,7 @@ export function observable(v:any, keyOrScope?:string | any) {
         }
         case ValueType.Array:
         case ValueType.PlainObject:
-            return makeChildReactive(value, mode, null);
+            return makeChildObservable(value, mode, null);
     }
     throw "Illegal State";
 }
@@ -199,8 +199,8 @@ export function expr<T>(expr: () => T, scope?):T {
     * @param properties the properties that should be added and made reactive
     * @returns targer
     */
-export function extendReactive<A extends Object, B extends Object>(target: A, properties: B, context?: IContextInfoStruct): A & B {
-    return <A & B> extendReactiveHelper(target, properties,ValueMode.Recursive, context); // No other mode makes sense..?
+export function extendObservable<A extends Object, B extends Object>(target: A, properties: B, context?: IContextInfoStruct): A & B {
+    return <A & B> extendObservableHelper(target, properties,ValueMode.Recursive, context) 
 }
 
 /**
@@ -214,7 +214,7 @@ export function extendReactive<A extends Object, B extends Object>(target: A, pr
     *   }
     * }
     */
-export function observableDecorator(target:Object, key:string, baseDescriptor:PropertyDescriptor) {
+function observableDecorator(target:Object, key:string, baseDescriptor:PropertyDescriptor) {
     // observable annotations are invoked on the prototype, not on actual instances,
     // so upon invocation, determine the 'this' instance, and define a property on the
     // instance as well (that hides the propotype property)
@@ -222,6 +222,8 @@ export function observableDecorator(target:Object, key:string, baseDescriptor:Pr
     const descriptor:PropertyDescriptor = baseDescriptor || {};
     const baseValue = isDecoratingProperty ? descriptor.get : descriptor.value; 
 
+    if (!target || typeof target !== "object")
+        throw new Error(`The @observable decorator can only be used on objects`);
     if (!isDecoratingProperty && typeof baseValue === "function")
         throw new Error(`@observable functions are not supported. Use @observable on a getter function if you want to create a view, or wrap the value in 'asReference' if you want to store a value (found on member '${key}').`);
     if (isDecoratingProperty) {
@@ -278,7 +280,7 @@ export function toJSON(source) {
     * @returns any value that was returned by the 'action' parameter.
     */
 export function transaction<T>(action:()=>T):T {
-    return batch(action);
+    return transaction(action);
 }
 
 /**
@@ -323,7 +325,7 @@ export function getTypeOfValue(value): ValueType {
 	return ValueType.Reference; // safe default, only refer by reference..
 }
 
-export function extendReactiveHelper(target, properties, mode: ValueMode, context: IContextInfoStruct):Object {
+export function extendObservableHelper(target, properties, mode: ValueMode, context: IContextInfoStruct):Object {
 	var meta = ObservableObject.asReactive(target, context, mode);
 	for(var key in properties) if (properties.hasOwnProperty(key)) {
 		meta.set(key, properties[key]);
@@ -376,7 +378,7 @@ export function getValueModeFromValue(value:any, defaultMode:ValueMode): [ValueM
 	return [defaultMode, value];
 }
 
-export function makeChildReactive(value, parentMode:ValueMode, context) {
+export function makeChildObservable(value, parentMode:ValueMode, context) {
 	let childMode: ValueMode;
 	if (isReactive(value))
 		return value;
@@ -402,7 +404,7 @@ export function makeChildReactive(value, parentMode:ValueMode, context) {
 	if (Array.isArray(value))
 		return new ObservableArray(<[]> value.slice(), childMode, context);
 	if (isPlainObject(value))
-		return extendReactiveHelper(value, value, childMode, context);
+		return extendObservableHelper(value, value, childMode, context);
 	return value;
 }
 

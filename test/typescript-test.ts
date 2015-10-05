@@ -1,5 +1,5 @@
 import {
-    observable, asStructure, observe, observeAsync, extendReactive, 
+    observable, asStructure, observe, observeAsync, extendObservable, 
     IObservableArray, IArrayChange, IArraySplice, IObservableValue,
     extras,
     logLevel,
@@ -106,7 +106,7 @@ export function testScope(test) {
     test.equal(x.z, 8);
 
     var x2 = function() {
-        extendReactive(this, {
+        extendObservable(this, {
             y: 3,
             // this will work here
             z: () => 2 * this.y
@@ -154,7 +154,7 @@ const state:any = observable({
 class LoginStoreTest {
     loggedIn2;
     constructor() {
-        extendReactive(this, {
+        extendObservable(this, {
             loggedIn2: () => !!state.authToken
         });
     }

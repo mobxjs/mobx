@@ -22,7 +22,7 @@ exports.testIsReactive = function(test) {
     }
 
     function ReactiveOrder(price) {
-        m.extendReactive(this, {
+        m.extendObservable(this, {
             price: price
         });
     }

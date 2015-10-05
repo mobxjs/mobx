@@ -48,22 +48,22 @@ But that is the kind of dependency we should avoid in our code. We shouldn't hav
 
 We can apply two simple functions of Mobservable to achieve this.
 
-### mobservable.makeReactive
+### mobservable.observable
 
-The first function is `makeReactive`. It is the swiss knife of mobservable and  turns any data structure and function into its reactive counterpart. Objects, arrays, functions; they can all be made reactive. Reactiveness is contagious; new data that is put in reactive data will become reactive as well. To make our timer reactive, just change the first three lines of the code:
+The first function is `observable`. It is the swiss knife of mobservable and  turns any data structure and function into its reactive counterpart. Objects, arrays, functions; they can all be made reactive. Reactiveness is contagious; new data that is put in reactive data will become reactive as well. To make our timer reactive, just change the first three lines of the code:
 
 ```javascript
-var timerData = mobservable.makeReactive({
+var timerData = mobservable.observable({
   secondsPassed: 0
 });
 ```
 
-### mobservableReact.reactiveComponent
+### mobservableReact.observer
 
-The second important function is `reactiveComponent` from the `mobservable-react` package. It turns a Reactjs component into a reactive one, that responds automatically to changes in data that is used by its render method. It can be used to wrap any react component, either created by using ES6 classes or `createClass`. So to fix the example, just update the timer definition to:
+The second important function is `observer` from the `mobservable-react` package. It turns a Reactjs component into a reactive one, that responds automatically to changes in data that is used by its render method. It can be used to wrap any react component, either created by using ES6 classes or `createClass`. So to fix the example, just update the timer definition to:
 
 ```javascript
-var Timer = mobservableReact.reactiveComponent(React.createClass{
+var Timer = mobservableReact.observer(React.createClass{
   /** Omitted */
 }));
 ```
@@ -129,17 +129,17 @@ It does not only work for plain objects, but also for arrays, functions, classes
 For the full api, see the [API documentation](https://mweststrate.github.io/mobservable/refguide/api.html).
 This is an overview of most important functions available in the `mobservable` namespace:
 
-**makeReactive(value, options?)**
+**observable(value, options?)**
 Turns a value into a reactive array, object, function, value or a reactive reference to a value.
 
-**reactiveComponent(reactJsComponent)**
+**observer(reactJsComponent)**
 Provided by the `mobservable-react` packaege, turns a ReactJS component into a reactive one, that automatically re-renders if any reactive data that it uses is changed.
 
-**extendReactive(target, properties)**
+**extendObservable(target, properties)**
 Extends an existing object with reactive properties.
 
 **observe(function)**
-Similar to `makeReactive(function)`. Exception the created reactive function will not be lazy, so that it is executed even when it has no observers on its own.
+Similar to `observable(function)`. Exception the created reactive function will not be lazy, so that it is executed even when it has no observers on its own.
 Useful to bridge reactive code to imperative code.
 
 ## Runtime behavior

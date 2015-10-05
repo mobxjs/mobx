@@ -6,7 +6,7 @@
 
 import {DataNode, checkIfStateIsBeingModifiedDuringView} from './dnode';
 import SimpleEventEmitter from './simpleeventemitter';
-import {ValueMode, assertUnwrapped, makeChildReactive} from './core';
+import {ValueMode, assertUnwrapped, makeChildObservable} from './core';
 import {IArrayChange, IArraySplice, IObservableArray, Lambda, IContextInfoStruct} from './interfaces';
 import {deepEquals} from './utils';
 
@@ -108,7 +108,7 @@ export class ObservableArray<T> extends StubArray implements IObservableArray<T>
 
     makeReactiveArrayItem(value) {
         assertUnwrapped(value, "Array values cannot have modifiers");
-        return makeChildReactive(value, this.$mobservable.mode, {
+        return makeChildObservable(value, this.$mobservable.mode, {
             object: this.$mobservable.context.object,
             name: this.$mobservable.context.name + "[x]"
         });

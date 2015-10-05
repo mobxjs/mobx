@@ -11,7 +11,7 @@ export default core.observable;
 export {
 	isReactive,
 	observable,
-	extendReactive,
+	extendObservable,
 	asReference,
 	asFlat,
 	asStructure,

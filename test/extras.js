@@ -138,7 +138,7 @@ exports.testNames = function(test) {
     };
 
     var rstruct = m.observable(struct);
-    m.extendReactive(rstruct.y, { a:  { b : 2}});
+    m.extendObservable(rstruct.y, { a:  { b : 2}});
     rstruct.ar.push({ b : 2});
     rstruct.ar.push([]);
     test.equal(name(rstruct,"x"), ".x");

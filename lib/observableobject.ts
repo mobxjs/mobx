@@ -4,7 +4,7 @@
  * https://github.com/mweststrate/mobservable
  */
 import {DataNode} from './dnode';
-import {ValueMode, makeChildReactive, AsStructure} from './core';
+import {ValueMode, makeChildObservable, AsStructure} from './core';
 import {IContextInfoStruct} from './interfaces';
 import {ObservableView} from './observableview';
 import {ObservableValue} from './observablevalue';

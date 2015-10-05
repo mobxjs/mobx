@@ -5,7 +5,7 @@
  */
 import {DataNode, checkIfStateIsBeingModifiedDuringView} from './dnode';
 import SimpleEventEmitter from './simpleeventemitter';
-import {ValueMode, getValueModeFromValue, makeChildReactive, assertUnwrapped} from './core';
+import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} from './core';
 import {deepEquals} from './utils';
 import {IContextInfoStruct, Lambda} from './interfaces';
 
@@ -23,7 +23,7 @@ export class ObservableValue<T> extends DataNode {
     }
 
     private makeReferenceValueReactive(value) {
-        return makeChildReactive(value, this.mode, this.context);
+        return makeChildObservable(value, this.mode, this.context);
     }
 
     set(newValue:T) {
