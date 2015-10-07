@@ -3,7 +3,7 @@ import {isComputingView} from './dnode';
 import {quickDiff} from './utils';
 import {IDependencyTree, IObserverTree, ITransitionEvent, Lambda} from './interfaces';
 import {getDependencyTree, getDNode, getObserverTree, trackTransitions} from './extras';
-
+import SimpleEventEmitter from './simpleeventemitter';
 
 export * from './interfaces';
 
@@ -46,6 +46,7 @@ Object.defineProperties(module.exports, {
 export const _ = {
 	isComputingView,
 	quickDiff,
+	SimpleEventEmitter
 }
 
 

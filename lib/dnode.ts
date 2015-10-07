@@ -4,13 +4,6 @@
  * https://github.com/mweststrate/mobservable
  */
 
-//import {strict, logLevel} from './core';
-//var strict = true;
-//var logLevel = 1;
-// import {transitionTracker, reportTransition} from './extras';
-//var transitionTracker = {};
-//function reportTransition() {};
-
 declare var __mobservableViewStack:ViewNode[];
 
 var globalScope = (function() { return this; })()

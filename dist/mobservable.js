@@ -61,6 +61,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var dnode_1 = __webpack_require__(2);
 	var utils_1 = __webpack_require__(7);
 	var extras_1 = __webpack_require__(3);
+	var simpleeventemitter_1 = __webpack_require__(6);
 	__export(__webpack_require__(11));
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = core.observable;
@@ -94,6 +95,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports._ = {
 	    isComputingView: dnode_1.isComputingView,
 	    quickDiff: utils_1.quickDiff,
+	    SimpleEventEmitter: simpleeventemitter_1.default
 	};
 	exports.extras = {
 	    getDNode: extras_1.getDNode,
