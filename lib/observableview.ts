@@ -10,8 +10,10 @@ import {logLevel} from './core';
 import {IContextInfoStruct, Lambda} from './interfaces';
 import {deepEquals, once} from './utils';
 
-export function throwingViewSetter() {
-    throw new Error(`[mobservable.view '${this.context.name}'] View functions do not accept new values`);
+export function throwingViewSetter(name):Lambda {
+    return () => {
+        throw new Error(`[mobservable.view '${name}'] View functions do not accept new values`);
+    }
 }
 
 export class ObservableView<T> extends ViewNode {
@@ -54,7 +56,7 @@ export class ObservableView<T> extends ViewNode {
     }
 
     set() {
-        throwingViewSetter.call(this);
+        throwingViewSetter(this.context.name)();
     }
 
     compute() {
@@ -105,7 +107,7 @@ export class ObservableView<T> extends ViewNode {
             configurable: false,
             enumerable: false,
             get: () => this.get(),
-            set: throwingViewSetter
+            set: throwingViewSetter(this.context.name)
         }
     }
 

@@ -8,11 +8,12 @@ import {
 } from "mobservable";
 
 class Box {
+    @observable uninitialized;
     @observable height = 20;
     @observable sizes = [2];
     @observable someFunc = function () { return 2; }
     @observable get width() {
-        return this.height * this.sizes.length * this.someFunc();
+        return this.height * this.sizes.length * this.someFunc() * (this.uninitialized ? 2 : 1);
     }
 }
 
@@ -32,6 +33,8 @@ export function test_babel(test) {
     test.deepEqual(ar.slice(), [40, 20, 60]);
     box.someFunc = () => 7;
     test.deepEqual(ar.slice(), [40, 20, 60, 210]);
+    box.uninitialized = true;
+    test.deepEqual(ar.slice(), [40, 20, 60, 210, 420]);
 
     test.done();
 };

@@ -223,6 +223,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.extendObservable = extendObservable;
 	function observableDecorator(target, key, baseDescriptor) {
+	    // - In typescript, observable annotations are invoked on the prototype, not on actual instances,
+	    // so upon invocation, determine the 'this' instance, and define a property on the
+	    // instance as well (that hides the propotype property)
+	    // - In typescript, the baseDescriptor is empty for attributes without initial value
+	    // - In babel, the initial value is passed as the closure baseDiscriptor.initializer' 
 	    var isDecoratingGetter = baseDescriptor && baseDescriptor.hasOwnProperty("get");
 	    var descriptor = {};
 	    var baseValue = undefined;
@@ -231,7 +236,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            baseValue = baseDescriptor.get;
 	        else if (baseDescriptor.hasOwnProperty('value'))
 	            baseValue = baseDescriptor.value;
-	        else if (baseDescriptor.hasOwnProperty('initializer')) {
+	        else if (baseDescriptor.initializer) {
 	            baseValue = baseDescriptor.initializer();
 	            if (typeof baseValue === "function")
 	                baseValue = asReference(baseValue);
@@ -250,15 +255,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    descriptor.configurable = true;
 	    descriptor.enumerable = true;
 	    descriptor.get = function () {
+	        var baseStrict = exports.strict;
 	        exports.strict = false;
 	        observableobject_1.ObservableObject.asReactive(this, null, ValueMode.Recursive).set(key, baseValue);
-	        exports.strict = true;
+	        exports.strict = baseStrict;
 	        return this[key];
 	    };
 	    descriptor.set = isDecoratingGetter
-	        ? observableview_1.throwingViewSetter
+	        ? observableview_1.throwingViewSetter(key)
 	        : function (value) {
-	            observableobject_1.ObservableObject.asReactive(this, null, ValueMode.Recursive).set(key, value);
+	            observableobject_1.ObservableObject.asReactive(this, null, ValueMode.Recursive).set(key, typeof value === "function" ? asReference(value) : value);
 	        };
 	    if (!baseDescriptor) {
 	        Object.defineProperty(target, key, descriptor);
@@ -829,8 +835,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var simpleeventemitter_1 = __webpack_require__(6);
 	var core_1 = __webpack_require__(1);
 	var utils_1 = __webpack_require__(7);
-	function throwingViewSetter() {
-	    throw new Error("[mobservable.view '" + this.context.name + "'] View functions do not accept new values");
+	function throwingViewSetter(name) {
+	    return function () {
+	        throw new Error("[mobservable.view '" + name + "'] View functions do not accept new values");
+	    };
 	}
 	exports.throwingViewSetter = throwingViewSetter;
 	var ObservableView = (function (_super) {
@@ -870,7 +878,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this._value;
 	    };
 	    ObservableView.prototype.set = function () {
-	        throwingViewSetter.call(this);
+	        throwingViewSetter(this.context.name)();
 	    };
 	    ObservableView.prototype.compute = function () {
 	        var newValue;
@@ -920,7 +928,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            configurable: false,
 	            enumerable: false,
 	            get: function () { return _this.get(); },
-	            set: throwingViewSetter
+	            set: throwingViewSetter(this.context.name)
 	        };
 	    };
 	    ObservableView.prototype.toString = function () {

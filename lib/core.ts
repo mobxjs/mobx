@@ -215,9 +215,12 @@ export function extendObservable<A extends Object, B extends Object>(target: A, 
     * }
     */
 function observableDecorator(target:Object, key:string, baseDescriptor:PropertyDescriptor) {
-    // observable annotations are invoked on the prototype, not on actual instances,
+    // - In typescript, observable annotations are invoked on the prototype, not on actual instances,
     // so upon invocation, determine the 'this' instance, and define a property on the
     // instance as well (that hides the propotype property)
+    // - In typescript, the baseDescriptor is empty for attributes without initial value
+    // - In babel, the initial value is passed as the closure baseDiscriptor.initializer' 
+    
     const isDecoratingGetter = baseDescriptor && baseDescriptor.hasOwnProperty("get");
     const descriptor:PropertyDescriptor = {};
     let baseValue = undefined;
@@ -226,7 +229,7 @@ function observableDecorator(target:Object, key:string, baseDescriptor:PropertyD
             baseValue = baseDescriptor.get;
         else if (baseDescriptor.hasOwnProperty('value'))
             baseValue = baseDescriptor.value;
-        else if (baseDescriptor.hasOwnProperty('initializer')) { // For babel
+        else if ((<any>baseDescriptor).initializer) { // For babel
             baseValue = (<any>baseDescriptor).initializer();
             if (typeof baseValue === "function")
                 baseValue = asReference(baseValue);
@@ -247,15 +250,17 @@ function observableDecorator(target:Object, key:string, baseDescriptor:PropertyD
     descriptor.configurable = true;
     descriptor.enumerable = true;
     descriptor.get = function() {
+        // the getter creates a reactive property lazily, so this might even happen during a view.
+        const baseStrict = strict;
         strict = false;
         ObservableObject.asReactive(this, null,ValueMode.Recursive).set(key, baseValue);
-        strict = true;
+        strict = baseStrict;
         return this[key];
     };
     descriptor.set = isDecoratingGetter 
-        ? throwingViewSetter
+        ? throwingViewSetter(key)
         : function(value) { 
-            ObservableObject.asReactive(this, null,ValueMode.Recursive).set(key, value); 
+            ObservableObject.asReactive(this, null,ValueMode.Recursive).set(key, typeof value === "function" ? asReference(value) : value); 
         }
     ;
     if (!baseDescriptor) {
