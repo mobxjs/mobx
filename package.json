@@ -9,7 +9,9 @@
     "start": "npm run build && npm run buildtest && ./node_modules/nodeunit/bin/nodeunit test/*.js",
     "prepublish": "npm run build",
     "build": "rm -rf dist && mkdir -p dist/typings && ./node_modules/typescript/bin/tsc && NODE_ENV=production ./node_modules/webpack/bin/webpack.js && cp -r .build/*.d.ts dist/typings",
-    "buildtest": "cd test && ../node_modules/typescript/bin/tsc && cd ..",
+    "buildtest": "npm run build-typescript-tests && npm run build-babel-tests",
+    "build-typescript-tests": "./node_modules/typescript/bin/tsc -m commonjs -t es5 --experimentalDecorators --outDir test test/typescript/typescript-test.ts",
+    "build-babel-tests": "./node_modules/babel/bin/babel.js --stage 0 test/babel/babel-test.js -o test/babel-test.js",
     "perf": "npm run build && ./node_modules/nodeunit/bin/nodeunit test/perf/*.js"
   },
   "repository": {
@@ -23,6 +25,7 @@
   },
   "homepage": "https://mweststrate.github.io/mobservable",
   "devDependencies": {
+    "babel": "^5.8.23",
     "coveralls": "^2.11.4",
     "istanbul": "^0.3.21",
     "nodeunit": "^0.9.1",

@@ -103,7 +103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    trackTransitions: extras_1.trackTransitions,
 	    SimpleEventEmitter: simpleeventemitter_1.default
 	};
-	//# sourceMappingURL=index.js.map
+
 
 /***/ },
 /* 1 */
@@ -223,36 +223,48 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.extendObservable = extendObservable;
 	function observableDecorator(target, key, baseDescriptor) {
-	    var isDecoratingProperty = baseDescriptor && !baseDescriptor.hasOwnProperty("value");
-	    var descriptor = baseDescriptor || {};
-	    var baseValue = isDecoratingProperty ? descriptor.get : descriptor.value;
+	    var isDecoratingGetter = baseDescriptor && baseDescriptor.hasOwnProperty("get");
+	    var descriptor = {};
+	    var baseValue = undefined;
+	    if (baseDescriptor) {
+	        if (baseDescriptor.hasOwnProperty('get'))
+	            baseValue = baseDescriptor.get;
+	        else if (baseDescriptor.hasOwnProperty('value'))
+	            baseValue = baseDescriptor.value;
+	        else if (baseDescriptor.hasOwnProperty('initializer')) {
+	            baseValue = baseDescriptor.initializer();
+	            if (typeof baseValue === "function")
+	                baseValue = asReference(baseValue);
+	        }
+	    }
 	    if (!target || typeof target !== "object")
 	        throw new Error("The @observable decorator can only be used on objects");
-	    if (!isDecoratingProperty && typeof baseValue === "function")
-	        throw new Error("@observable functions are not supported. Use @observable on a getter function if you want to create a view, or wrap the value in 'asReference' if you want to store a value (found on member '" + key + "').");
-	    if (isDecoratingProperty) {
+	    if (isDecoratingGetter) {
 	        if (typeof baseValue !== "function")
-	            throw new Error("@observable expects a getter function if used on a property (found on member '" + key + "').");
+	            throw new Error("@observable expects a getter function if used on a property (in member: '" + key + "').");
 	        if (descriptor.set)
-	            throw new Error("@observable properties cannot have a setter (found on member '" + key + "').");
+	            throw new Error("@observable properties cannot have a setter (in member: '" + key + "').");
 	        if (baseValue.length !== 0)
-	            throw new Error("@observable getter functions should not take arguments (found on member '" + key + "').");
+	            throw new Error("@observable getter functions should not take arguments (in member: '" + key + "').");
 	    }
 	    descriptor.configurable = true;
 	    descriptor.enumerable = true;
-	    delete descriptor.value;
-	    delete descriptor.writable;
 	    descriptor.get = function () {
+	        exports.strict = false;
 	        observableobject_1.ObservableObject.asReactive(this, null, ValueMode.Recursive).set(key, baseValue);
+	        exports.strict = true;
 	        return this[key];
 	    };
-	    descriptor.set = isDecoratingProperty
+	    descriptor.set = isDecoratingGetter
 	        ? observableview_1.throwingViewSetter
 	        : function (value) {
 	            observableobject_1.ObservableObject.asReactive(this, null, ValueMode.Recursive).set(key, value);
 	        };
-	    if (!isDecoratingProperty) {
+	    if (!baseDescriptor) {
 	        Object.defineProperty(target, key, descriptor);
+	    }
+	    else {
+	        return descriptor;
 	    }
 	}
 	function toJSON(source) {
@@ -402,7 +414,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        throw new Error("[mobservable] asStructure / asReference / asFlat cannot be used here. " + message);
 	}
 	exports.assertUnwrapped = assertUnwrapped;
-	//# sourceMappingURL=core.js.map
+
 
 /***/ },
 /* 2 */
@@ -629,7 +641,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var extras_1 = __webpack_require__(3);
 	var utils_1 = __webpack_require__(7);
 	var scheduler_1 = __webpack_require__(10);
-	//# sourceMappingURL=dnode.js.map
+
 
 /***/ },
 /* 3 */
@@ -736,7 +748,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	}
 	exports.trackTransitions = trackTransitions;
-	//# sourceMappingURL=extras.js.map
+
 
 /***/ },
 /* 4 */
@@ -797,7 +809,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ObservableObject;
 	})();
 	exports.ObservableObject = ObservableObject;
-	//# sourceMappingURL=observableobject.js.map
+
 
 /***/ },
 /* 5 */
@@ -917,7 +929,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ObservableView;
 	})(dnode_1.ViewNode);
 	exports.ObservableView = ObservableView;
-	//# sourceMappingURL=observableview.js.map
+
 
 /***/ },
 /* 6 */
@@ -966,7 +978,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = SimpleEventEmitter;
-	//# sourceMappingURL=simpleeventemitter.js.map
+
 
 /***/ },
 /* 7 */
@@ -1079,7 +1091,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return [added, removed];
 	}
 	exports.quickDiff = quickDiff;
-	//# sourceMappingURL=utils.js.map
+
 
 /***/ },
 /* 8 */
@@ -1369,7 +1381,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    OBSERVABLE_ARRAY_BUFFER_SIZE = max;
 	}
 	reserveArrayBuffer(1000);
-	//# sourceMappingURL=observablearray.js.map
+
 
 /***/ },
 /* 9 */
@@ -1436,7 +1448,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ObservableValue;
 	})(dnode_1.DataNode);
 	exports.ObservableValue = ObservableValue;
-	//# sourceMappingURL=observablevalue.js.map
+
 
 /***/ },
 /* 10 */
@@ -1479,13 +1491,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	exports.transaction = transaction;
-	//# sourceMappingURL=scheduler.js.map
+
 
 /***/ },
 /* 11 */
 /***/ function(module, exports) {
 
-	//# sourceMappingURL=interfaces.js.map
+	
 
 /***/ }
 /******/ ])
