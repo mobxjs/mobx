@@ -1,6 +1,6 @@
 {
   "name": "mobservable",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.4",
   "description": "Observable data. Observing views.",
   "main": "dist/mobservable.js",
   "typings": "dist/typings/index",

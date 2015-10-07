@@ -45,8 +45,7 @@ Object.defineProperties(module.exports, {
  */
 export const _ = {
 	isComputingView,
-	quickDiff,
-	SimpleEventEmitter
+	quickDiff
 }
 
 
@@ -54,5 +53,6 @@ export const extras = {
 	getDNode: <(thing:any)=>any> getDNode,
 	getDependencyTree,
 	getObserverTree,
-	trackTransitions
+	trackTransitions,
+	SimpleEventEmitter
 } 

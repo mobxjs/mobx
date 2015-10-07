@@ -94,14 +94,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports._ = {
 	    isComputingView: dnode_1.isComputingView,
-	    quickDiff: utils_1.quickDiff,
-	    SimpleEventEmitter: simpleeventemitter_1.default
+	    quickDiff: utils_1.quickDiff
 	};
 	exports.extras = {
 	    getDNode: extras_1.getDNode,
 	    getDependencyTree: extras_1.getDependencyTree,
 	    getObserverTree: extras_1.getObserverTree,
-	    trackTransitions: extras_1.trackTransitions
+	    trackTransitions: extras_1.trackTransitions,
+	    SimpleEventEmitter: simpleeventemitter_1.default
 	};
 	//# sourceMappingURL=index.js.map
 
