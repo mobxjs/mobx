@@ -1,3 +1,7 @@
+# 0.7.1
+
+* Backported Babel support for the @observable decorator from the 1.0 branch. The decorator should now behave the same when compiled with either Typescript or Babeljs. 
+
 # 0.7.0
 
 * Introduced `strict` mode (see issues [#30](), [#31]())
