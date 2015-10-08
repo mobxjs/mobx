@@ -1,6 +1,6 @@
 {
     "name": "mobservable",
-    "version": "0.7.0",
+    "version": "0.7.1",
     "description": "Keeps views automatically in sync with state. Unobtrusively.",
     "main": "dist/mobservable.js",
     "typings": "dist/mobservable",
