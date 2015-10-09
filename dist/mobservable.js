@@ -416,6 +416,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.makeChildObservable = makeChildObservable;
 	function assertUnwrapped(value, message) {
+	    if (exports.logLevel === 0)
+	        return;
 	    if (value instanceof AsReference || value instanceof AsStructure || value instanceof AsFlat)
 	        throw new Error("[mobservable] asStructure / asReference / asFlat cannot be used here. " + message);
 	}
@@ -442,7 +444,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	globalScope.__mobservableViewStack = [];
 	var mobservableId = 0;
 	function checkIfStateIsBeingModifiedDuringView(context) {
-	    if (isComputingView() && core_1.strict === true) {
+	    if (core_1.logLevel > 0 && isComputingView() && core_1.strict === true) {
 	        var ts = __mobservableViewStack;
 	        throw new Error("[mobservable] It is not allowed to change the state during the computation of a reactive view if 'mobservable.strict' mode is enabled:\nShould the data you are trying to modify actually be a view?\nView name: " + context.name + ".\nCurrent stack size is " + ts.length + ", active view: \"" + ts[ts.length - 1].toString() + "\".");
 	    }
@@ -582,9 +584,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.trackDependencies();
 	        if (extras_1.transitionTracker)
 	            extras_1.reportTransition(this, "PENDING");
-	        var stateDidChange = this.compute();
-	        this.bindDependencies();
-	        this.markReady(stateDidChange);
+	        var hasError = true;
+	        try {
+	            var stateDidChange = this.compute();
+	            hasError = false;
+	        }
+	        finally {
+	            if (hasError)
+	                console.error("[mobservable.view '" + this.context.name + "'] There was an uncaught error during the computation of " + this.toString());
+	            this.isComputing = false;
+	            this.bindDependencies();
+	            this.markReady(stateDidChange);
+	        }
 	    };
 	    ViewNode.prototype.compute = function () {
 	        throw "Abstract!";
@@ -604,7 +615,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.hasCycle = false;
 	        for (var i = 0, l = added.length; i < l; i++) {
 	            var dependency = added[i];
-	            if (dependency instanceof ViewNode && dependency.findCycle(this)) {
+	            if (core_1.logLevel > 0 && dependency instanceof ViewNode && dependency.findCycle(this)) {
 	                this.hasCycle = true;
 	                this.observing.splice(this.observing.indexOf(added[i]), 1);
 	                dependency.hasCycle = true;
@@ -617,6 +628,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            removed[i].removeObserver(this);
 	    };
 	    ViewNode.prototype.findCycle = function (node) {
+	        console.log("find cycle");
 	        var obs = this.observing;
 	        if (obs.indexOf(node) !== -1)
 	            return true;
@@ -833,7 +845,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	var dnode_1 = __webpack_require__(2);
 	var simpleeventemitter_1 = __webpack_require__(6);
-	var core_1 = __webpack_require__(1);
 	var utils_1 = __webpack_require__(7);
 	function throwingViewSetter(name) {
 	    return function () {
@@ -849,7 +860,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.scope = scope;
 	        this.compareStructural = compareStructural;
 	        this.isComputing = false;
-	        this.hasError = false;
 	        this.changeEvent = new simpleeventemitter_1.default();
 	    }
 	    ObservableView.prototype.get = function () {
@@ -870,36 +880,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        if (this.hasCycle)
 	            throw new Error("[mobservable.view '" + this.context.name + "'] Cycle detected");
-	        if (this.hasError) {
-	            if (core_1.logLevel > 0)
-	                console.error("[mobservable.view '" + this.context.name + "'] Rethrowing caught exception to observer: " + this._value + (this._value.cause || ''));
-	            throw this._value;
-	        }
 	        return this._value;
 	    };
 	    ObservableView.prototype.set = function () {
 	        throwingViewSetter(this.context.name)();
 	    };
 	    ObservableView.prototype.compute = function () {
-	        var newValue;
-	        try {
-	            if (this.isComputing)
-	                throw new Error("[mobservable.view '" + this.context.name + "'] Cycle detected");
-	            this.isComputing = true;
-	            newValue = this.func.call(this.scope);
-	            this.hasError = false;
-	        }
-	        catch (e) {
-	            this.hasError = true;
-	            console.error("[mobservable.view '" + this.context.name + "'] Caught error during computation: ", e, "View function:", this.func.toString());
-	            console.trace();
-	            if (e instanceof Error)
-	                newValue = e;
-	            else {
-	                newValue = new Error(("[mobservable.view '" + this.context.name + "'] Error during computation (see error.cause) in ") + this.func.toString());
-	                newValue.cause = e;
-	            }
-	        }
+	        if (this.isComputing)
+	            throw new Error("[mobservable.view '" + this.context.name + "'] Cycle detected");
+	        this.isComputing = true;
+	        var newValue = this.func.call(this.scope);
 	        this.isComputing = false;
 	        var changed = this.compareStructural ? !utils_1.deepEquals(newValue, this._value) : newValue !== this._value;
 	        if (changed) {
@@ -1172,10 +1162,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        configurable: true
 	    });
 	    ObservableArray.prototype.updateLength = function (oldLength, delta) {
-	        if (delta < 0)
+	        if (delta < 0) {
+	            dnode_1.checkIfStateIsBeingModifiedDuringView(this.$mobservable.context);
 	            for (var i = oldLength + delta; i < oldLength; i++)
 	                delete this[i];
+	        }
 	        else if (delta > 0) {
+	            dnode_1.checkIfStateIsBeingModifiedDuringView(this.$mobservable.context);
 	            if (oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
 	                reserveArrayBuffer(oldLength + delta);
 	            for (var i = oldLength, end = oldLength + delta; i < end; i++)
@@ -1204,8 +1197,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        else
 	            newItems = newItems.map(function (value) { return _this.makeReactiveArrayItem(value); });
 	        var lengthDelta = newItems.length - deleteCount;
-	        var res = (_a = this.$mobservable.values).splice.apply(_a, [index, deleteCount].concat(newItems));
 	        this.updateLength(length, lengthDelta);
+	        var res = (_a = this.$mobservable.values).splice.apply(_a, [index, deleteCount].concat(newItems));
 	        this.notifySplice(index, res, newItems);
 	        return res;
 	        var _a;
@@ -1228,7 +1221,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.$mobservable.changeEvent.emit({ object: this, type: 'splice', index: index, addedCount: added.length, removed: deleted });
 	    };
 	    ObservableArray.prototype.notifyChanged = function () {
-	        dnode_1.checkIfStateIsBeingModifiedDuringView(this.$mobservable.context);
 	        this.$mobservable.markStale();
 	        this.$mobservable.markReady(true);
 	    };
@@ -1358,6 +1350,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        set: function (value) {
 	            core_1.assertUnwrapped(value, "Modifiers cannot be used on array values. For non-reactive array values use makeReactive(asFlat(array)).");
 	            if (index < this.$mobservable.values.length) {
+	                dnode_1.checkIfStateIsBeingModifiedDuringView(this.$mobservable.context);
 	                var oldValue = this.$mobservable.values[index];
 	                var changed = this.$mobservable.mode === core_1.ValueMode.Structure ? !utils_1.deepEquals(oldValue, value) : oldValue !== value;
 	                if (changed) {
