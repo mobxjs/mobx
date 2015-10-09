@@ -17,7 +17,7 @@ globalScope.__mobservableViewStack = [];
 var mobservableId = 0;
 
 export function checkIfStateIsBeingModifiedDuringView(context: IContextInfoStruct) {
-    if (isComputingView() && strict === true) {
+    if (logLevel > 0 && isComputingView() && strict === true) {
         // TODO: add url with detailed error subscription / best practice here:
         const ts = __mobservableViewStack;
         throw new Error(
@@ -228,7 +228,7 @@ export class ViewNode extends DataNode {
         this.hasCycle = false;
         for(var i = 0, l = added.length; i < l; i++) {
             var dependency = added[i];
-            if (dependency instanceof ViewNode && dependency.findCycle(this)) {
+            if (logLevel > 0 && dependency instanceof ViewNode && dependency.findCycle(this)) {
                 this.hasCycle = true;
                 // don't observe anything that caused a cycle, or we are stuck forever!
                 this.observing.splice(this.observing.indexOf(added[i]), 1);
@@ -244,6 +244,7 @@ export class ViewNode extends DataNode {
     }
 
     private findCycle(node:DataNode) {
+        console.log("find cycle");
         var obs = this.observing;
         if (obs.indexOf(node) !== -1)
             return true;

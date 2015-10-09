@@ -19,6 +19,16 @@ function voidObserver() {
     // nothing, nada, noppes.
 }
 
+exports.setUp = function (callback) {
+    mobservable.logLevel = 0;
+    callback();
+}
+
+exports.tearDown = function (callback) {
+    mobservable.logLevel = 1;
+    callback();
+};
+
 /*
 results of this test:
 300/40000 mseconds on netbook (AMD c60 processor, same test is on Intel i7 3770 ~10 times faster)
@@ -359,7 +369,7 @@ exports.order_system_batched_lazy = function(test) {
     order_system_helper(test, true, false);
 };
 
-test_array_creation = function(test, amount, size) {
+function test_array_creation(test, amount, size) {
     var a = [];
     for(var i = 0; i < size; i++)
         a.push(i);

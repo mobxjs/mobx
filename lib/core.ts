@@ -424,6 +424,8 @@ export function makeChildObservable(value, parentMode:ValueMode, context) {
 }
 
 export function assertUnwrapped(value, message) {
+	if (logLevel === 0)
+		return;
 	if (value instanceof AsReference || value instanceof AsStructure || value instanceof AsFlat)
 		throw new Error(`[mobservable] asStructure / asReference / asFlat cannot be used here. ${message}`);
 }
