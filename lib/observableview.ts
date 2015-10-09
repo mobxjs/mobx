@@ -18,7 +18,6 @@ export function throwingViewSetter(name):Lambda {
 
 export class ObservableView<T> extends ViewNode {
     private isComputing = false;
-    private hasError = false;
     protected _value: T;
     protected changeEvent = new SimpleEventEmitter();
 
@@ -47,11 +46,6 @@ export class ObservableView<T> extends ViewNode {
 
         if (this.hasCycle)
             throw new Error(`[mobservable.view '${this.context.name}'] Cycle detected`);
-        if (this.hasError) {
-            if (logLevel > 0)
-                console.error(`[mobservable.view '${this.context.name}'] Rethrowing caught exception to observer: ${this._value}${(<any>this._value).cause||''}`);
-            throw this._value;
-        }
         return this._value;
     }
 
@@ -60,30 +54,15 @@ export class ObservableView<T> extends ViewNode {
     }
 
     compute() {
-        var newValue:T;
-        try {
-            // this cycle detection mechanism is primarily for lazy computed values; other cycles are already detected in the dependency tree
-            if (this.isComputing)
-                throw new Error(`[mobservable.view '${this.context.name}'] Cycle detected`);
-            this.isComputing = true;
-            newValue = this.func.call(this.scope);
-            this.hasError = false;
-        } catch (e) {
-            this.hasError = true;
-            console.error(`[mobservable.view '${this.context.name}'] Caught error during computation: `, e, "View function:", this.func.toString());
-            console.trace();
-            
-            if (e instanceof Error)
-                newValue = e;
-            else {
-                newValue = <T><any> new Error(`[mobservable.view '${this.context.name}'] Error during computation (see error.cause) in ` + this.func.toString());
-                (<any>newValue).cause = e;
-            }
-        }
+        // this cycle detection mechanism is primarily for lazy computed values; other cycles are already detected in the dependency tree
+        if (this.isComputing)
+            throw new Error(`[mobservable.view '${this.context.name}'] Cycle detected`);
+        this.isComputing = true;
+        const newValue = this.func.call(this.scope);
         this.isComputing = false;
         const changed = this.compareStructural ? !deepEquals(newValue, this._value) : newValue !== this._value;
         if (changed) {
-            var oldValue = this._value;
+            const oldValue = this._value;
             this._value = newValue;
             this.changeEvent.emit(newValue, oldValue);
             return true;

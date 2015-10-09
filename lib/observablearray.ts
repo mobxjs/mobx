@@ -62,10 +62,12 @@ export class ObservableArray<T> extends StubArray implements IObservableArray<T>
 
     // adds / removes the necessary numeric properties to this object
     private updateLength(oldLength:number, delta:number) {
-        if (delta < 0)
+        if (delta < 0) {
+            checkIfStateIsBeingModifiedDuringView(this.$mobservable.context); 
             for(var i = oldLength + delta; i < oldLength; i++)
                 delete this[i]; // bit faster but mem inefficient: Object.defineProperty(this, <string><any> i, notEnumerableProp);
-        else if (delta > 0) {
+        } else if (delta > 0) {
+            checkIfStateIsBeingModifiedDuringView(this.$mobservable.context); 
             if (oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
                 reserveArrayBuffer(oldLength + delta);
             // funny enough, this is faster than slicing ENUMERABLE_PROPS into defineProperties, and faster as a temporarily map
@@ -99,8 +101,8 @@ export class ObservableArray<T> extends StubArray implements IObservableArray<T>
             newItems = <T[]> newItems.map((value) => this.makeReactiveArrayItem(value));
 
         var lengthDelta = newItems.length - deleteCount;
-        var res:T[] = this.$mobservable.values.splice(index, deleteCount, ...newItems);
         this.updateLength(length, lengthDelta); // create or remove new entries
+        var res:T[] = this.$mobservable.values.splice(index, deleteCount, ...newItems);
 
         this.notifySplice(index, res, newItems);
         return res;
@@ -129,7 +131,6 @@ export class ObservableArray<T> extends StubArray implements IObservableArray<T>
     }
 
     private notifyChanged() {
-        checkIfStateIsBeingModifiedDuringView(this.$mobservable.context); 
         this.$mobservable.markStale();
         this.$mobservable.markReady(true);
     }
@@ -282,6 +283,7 @@ function createArrayBufferItem(index:number) {
         set: function(value) {
             assertUnwrapped(value, "Modifiers cannot be used on array values. For non-reactive array values use makeReactive(asFlat(array)).");
             if (index < this.$mobservable.values.length) {
+                checkIfStateIsBeingModifiedDuringView(this.$mobservable.context); 
                 var oldValue = this.$mobservable.values[index];
                 var changed = this.$mobservable.mode === ValueMode.Structure ? !deepEquals(oldValue, value) : oldValue !== value; 
                 if (changed) {

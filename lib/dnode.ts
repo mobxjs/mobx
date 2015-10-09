@@ -53,7 +53,7 @@ export class DataNode {
 
     constructor(context:IContextInfoStruct) {
         if (!context)
-            context = { name: undefined, object: undefined } 
+            context = { name: undefined, object: undefined }
         if (!context.name)
             context.name = "[m#" + this.id + "]";
         this.context = context;
@@ -190,9 +190,19 @@ export class ViewNode extends DataNode {
         this.trackDependencies();
         if (transitionTracker)
             reportTransition(this, "PENDING");
-        var stateDidChange = this.compute();
-        this.bindDependencies();
-        this.markReady(stateDidChange);
+        var hasError = true;
+        try {
+            var stateDidChange = this.compute();
+            hasError = false;
+        } finally {
+            if (hasError)
+                // TODO: merge with computable view, use this.func.toString
+                console.error(`[mobservable.view '${this.context.name}'] There was an uncaught error during the computation of ${this.toString()}`);
+            // TODO: merge with computable view, so this is correct:
+            (<any>this).isComputing = false
+            this.bindDependencies();
+            this.markReady(stateDidChange);
+        }
     }
 
     compute():boolean {
@@ -227,7 +237,7 @@ export class ViewNode extends DataNode {
                 added[i].addObserver(this);
             }
         }
-        
+
         // remove observers after adding them, so that they don't go in lazy mode to early
         for(var i = 0, l = removed.length; i < l; i++)
             removed[i].removeObserver(this);

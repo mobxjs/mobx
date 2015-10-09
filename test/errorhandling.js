@@ -21,7 +21,8 @@ function testException(test, observable, exception) {
         test.fail("Expected exception: " + exception + ", got: " + value);
     }
     catch (e) {
-        test.equal(e.message === exception || e.cause === exception || e.message.indexOf(exception) !== -1, true, "Expected exception '" + exception + "', got: " + e);
+        var message = "" + e;
+        test.equal(message === exception || e.cause === exception || message.indexOf(exception) !== -1, true, "Expected exception '" + exception + "', got: " + e);
     }
     test.equal(mobservable._.isComputingView(), false);
 }
@@ -38,9 +39,10 @@ exports.testException1  = function(test) {
 exports.testException2 = function(test) {
     var cbuffer = buffer();
     var z = observable(true);
+    var x = observable(1);
     var a = observable(function() {
         if (z())
-        return 1;
+            return x();
         throw "Some error!";
     });
     var b = observable(function() {
@@ -49,26 +51,30 @@ exports.testException2 = function(test) {
     var c = observable(function() {
         return a();
     });
-    c.observe(cbuffer);
+    c.observe(cbuffer, true);
 
     test.equal(a(), 1);
-    z(false);
+    test.throws(function() {
+        z(false);
+    });
 
-    testException(test, b, "Some error!");
-    testException(test, a, "Some error!");
-
-    z(true);
+    test.equal(z(), false);
     test.equal(a(), 1);
     test.equal(b(), 1);
+
+    x(2);
+    z(true);
+    test.equal(a(), 2);
+    test.equal(b(), 2);
     test.equal(cbuffer.toArray().length, 2);
-    test.equal(cbuffer.toArray()[0].cause, "Some error!");
-    test.equal(cbuffer.toArray()[1], 1);
+    test.deepEqual(cbuffer.toArray(), [1,2]);
     test.equal(mobservable._.isComputingView(), false);
 
     test.done();
 };
 
 exports.deny_state_changes = function(test) {
+    debugger;
     try {
         var x = observable(3);
         var z = observable(5);
@@ -77,48 +83,17 @@ exports.deny_state_changes = function(test) {
             return x() * x();
         });
 
-        test.throws(function() {
+        try {
             test.equal(9, y());
-        }, null, mobservable._.NON_PURE_VIEW_ERROR);
+            test.fail("no exception");
+        } catch(e) {
+            test.ok(("" + e).indexOf('It is not allowed to change the state during the computation of a reactive view') > 0, "Invalid exception: " + e);
+        }
     
-        var b = buffer();
-        y.observe(b, false);
-    
-        test.throws(function() {
-            y.observe(b, true);
-        }, null, mobservable._.NON_PURE_VIEW_ERROR);
-        
-        test.deepEqual([], b.toArray());
-        test.equal(mobservable._.isComputingView(), false);
+        // y is broken now...
+        test.equal(y(), undefined); 
 
-        // these should not throw:
-        var z = observable({ 
-            a: null,
-            b: function() {
-                throw "oeps";
-                return this.a + "hio";
-            } 
-        });
-        
-        mobservable.observe(function() {
-            console.log("test");
-             if (z.a > 42 || z.b === 17) // nonsense
-                 console.log('hi');  
-        });
-        
-        z.a = 2;
-        
-        setImmediate(function() {
-            z.a = 3;
-            if (typeof process !== "undefined") {
-                process.nextTick(function() {
-                    z.a = 4;
-                    test.done(); 
-                });
-            } else { 
-                test.done();
-            }
-        });
+        test.done();
     }
     catch(e) {
         console.log(e.stack);
@@ -134,18 +109,14 @@ exports.deny_array_change = function(test) {
             return x() * x();
         });
 
-        test.throws(function() {
+        try {
             test.equal(9, y());
-        }, null, "alters state");
-    
-        var b = buffer();
-        y.observe(b, false);
-    
-        test.throws(function() {
-            y.observe(b, true);
-        }, null, "alters state");
+            test.fail("no exception");
+        } catch(e) {
+            test.ok(("" + e).indexOf('It is not allowed to change the state during the computation of a reactive view') > 0, "Invalid exception: " + e);
+        }
         
-        test.deepEqual([], b.toArray());
+        test.deepEqual(z.slice(), []);
         test.equal(mobservable._.isComputingView(), false);
 
         test.done();
@@ -172,10 +143,6 @@ exports.enable_change_state_if_non_strict_mode = function(test) {
     }
 };
 
-/*
-// currently, this test logs the cycle error but doesn't actually throw,
-// which will change as soon as esceptions are thrown instead of stored
-// TODO: 
 exports.throw_error_if_modification_loop = function(test) {
     try {
         m.strict = false;
@@ -194,7 +161,6 @@ exports.throw_error_if_modification_loop = function(test) {
         m.strict = true;
     }
 };
-*/
 
 exports.cycle1 = function(test) {
     try {
@@ -220,6 +186,7 @@ exports.cycle2 = function(test) {
 };
 
 exports.cycle3 = function(test) {
+    debugger;
     var z = observable(true);
     var a = observable(function() { return z() ? 1 : b() * 2; });
     var b = observable(function() { return a() * 2; });
@@ -227,8 +194,13 @@ exports.cycle3 = function(test) {
     b.observe(voidObserver);
     test.equals(1, a());
 
-    z(false); // introduces a cycle!
-    testException(test, b, "Cycle detected");
+    try {
+        z(false); // introduces a cycle!
+        test.fail("expected exception");
+    } catch(e) {
+        test.ok(("" + e).indexOf("Cycle detected") > -1);
+    }
+    test.equal(b(), 2);
     testException(test, a, "Cycle detected");
 
     z(true); // cycle is gone, restore stable state
