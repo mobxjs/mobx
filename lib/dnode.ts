@@ -244,7 +244,6 @@ export class ViewNode extends DataNode {
     }
 
     private findCycle(node:DataNode) {
-        console.log("find cycle");
         var obs = this.observing;
         if (obs.indexOf(node) !== -1)
             return true;
