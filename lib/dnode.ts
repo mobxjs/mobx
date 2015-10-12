@@ -22,7 +22,7 @@ export function checkIfStateIsBeingModifiedDuringView(context: IContextInfoStruc
         const ts = __mobservableViewStack;
         throw new Error(
 `[mobservable] It is not allowed to change the state during the computation of a reactive view if 'mobservable.strict' mode is enabled:
-Should the data you are trying to modify actually be a view?
+Should the data you are trying to modify actually be a view? Use 'transaction(block, false)' or 'setStrict(false)' to allow changes to be made inside views.
 View name: ${context.name}.
 Current stack size is ${ts.length}, active view: "${ts[ts.length -1].toString()}".`
         );

@@ -1,8 +1,16 @@
 # 1.0
 
-* Introduces a second `strictMode` parameter to transaction.
+* Introduces a second `strictMode` parameter to `transaction`.
 * dropped the default export of observable
 * Fixes issue where non-`strict` mode and `logLevel` where not always honored.
+* replaced `strict` and `logLevel` with functions: `setStrict / getStrict / setLogLevel / getLogLevel`
+* renames:
+  * isReactive -> isObservable
+  * makeReactive -> observable
+  * extendReactive -> extendObservable
+  * observe > autorun
+  * observeUntil -> autorunUntil
+  * observeAsync -> autorunAsync 
 
 # 0.7.0
 
