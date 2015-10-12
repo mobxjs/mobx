@@ -106,7 +106,7 @@ export function isObservable(value):boolean {
     * @param scope (optional)
     * @returns disposer function, which can be used to stop the view from being updated in the future.
     */
-export function observe(view:Lambda, scope?:any):Lambda {
+export function autorun(view:Lambda, scope?:any):Lambda {
     var [mode, unwrappedView] = getValueModeFromValue(view,ValueMode.Recursive);
     const observable = new ObservableView(unwrappedView, scope, {
         object: scope || view,
@@ -131,8 +131,8 @@ export function observe(view:Lambda, scope?:any):Lambda {
     * @param scope (optional)
     * @returns disposer function to prematurely end the observer.
     */
-export function observeUntil(predicate: ()=>boolean, effect: Lambda, scope?: any): Lambda {
-    const disposer = observe(() => {
+export function autorunUntil(predicate: ()=>boolean, effect: Lambda, scope?: any): Lambda {
+    const disposer = autorun(() => {
         if (predicate.call(scope)) {
             disposer();
             effect.call(scope);
@@ -152,11 +152,11 @@ export function observeUntil(predicate: ()=>boolean, effect: Lambda, scope?: any
     * @param delay, optional. After how many milleseconds the effect should fire.
     * @param scope, optional, the 'this' value of 'view' and 'effect'.
     */
-export function observeAsync<T>(view: () => T, effect: (latestValue : T ) => void, delay:number = 1, scope?: any): Lambda {
+export function autorunAsync<T>(view: () => T, effect: (latestValue : T ) => void, delay:number = 1, scope?: any): Lambda {
     var latestValue: T = undefined;
     var timeoutHandle;
 
-    const disposer = observe(() => {
+    const disposer = autorun(() => {
         latestValue = view.call(scope);
         if (!timeoutHandle) {
             timeoutHandle = setTimeout(() => {

@@ -47,7 +47,7 @@ exports.testIsObservable = function(test) {
     test.equal(m.isObservable(obj), false);
 
     test.equal(m.isObservable(m.observable(function(){})), true);
-    test.equal(m.isObservable(m.observe(function(){})), true);
+    test.equal(m.isObservable(m.autorun(function(){})), true);
 
     test.done();
 
@@ -67,7 +67,7 @@ exports.observable1 = function(test) {
         }
     });
     var b = buffer();
-    m.observe(function() {
+    m.autorun(function() {
         b(x.a.b.c)
     });
     x.a = { b : { c : 4 }};
@@ -89,7 +89,7 @@ exports.observable1 = function(test) {
     test.equal(m.isObservable(x2.a.b), false);
 
     var b2 = buffer();
-    m.observe(function() {
+    m.autorun(function() {
         b2(x2.a.b.c)
     });
     x2.a = { b : { c : 4 }};
@@ -105,7 +105,7 @@ exports.observable1 = function(test) {
         }
     }));
     var b3 = buffer();
-    m.observe(function() {
+    m.autorun(function() {
         b3(x3.a.b.c)
     });
     x3.a = { b : { c : 4 }};
@@ -125,7 +125,7 @@ exports.observable3 = function(test) {
     });
 
     var b = buffer();
-    m.observe(function() {
+    m.autorun(function() {
         b(x.orders.length);
     });
 
@@ -197,7 +197,7 @@ exports.observable5 = function(test) {
     });
 
     var b = buffer();
-    m.observe(function() {
+    m.autorun(function() {
         b([x.reactive, x.nonReactive, x.nonReactive()]);
     });
 
@@ -218,7 +218,7 @@ exports.test_flat_array = function(test) {
     
     var result;
     var updates = 0;
-    var dis = m.observe(function() {
+    var dis = m.autorun(function() {
         updates++;
         result = mobservable.toJSON(x);
     });
@@ -252,7 +252,7 @@ exports.test_flat_object = function(test) {
     
     var result;
     var updates = 0;
-    var dis = m.observe(function() {
+    var dis = m.autorun(function() {
         updates++;
         result = mobservable.toJSON(y);
     });
@@ -283,7 +283,7 @@ exports.test_as_structure = function(test) {
     });
     
     var changed = 0;
-    var dis = m.observe(function() {
+    var dis = m.autorun(function() {
         changed++;
         JSON.stringify(x);
     });
@@ -410,14 +410,14 @@ exports.test_as_structure_view = function(test) {
     });
 
     var bc = 0;
-    var bo = m.observe(function() {
+    var bo = m.autorun(function() {
         x.b;
         bc++;
     });
     test.equal(bc, 1);
     
     var cc = 0;
-    var co = m.observe(function() {
+    var co = m.autorun(function() {
         x.c;
         cc++;
     });

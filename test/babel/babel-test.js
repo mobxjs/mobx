@@ -1,5 +1,5 @@
 import {
-    observable, asStructure, observe, observeAsync, extendObservable, 
+    observable, asStructure, autorun, extendObservable, 
     IObservableArray, IArrayChange, IArraySplice, IObservableValue,
     extras,
     logLevel,
@@ -22,7 +22,7 @@ export function test_babel(test) {
     
     var ar = []
     
-    observe(() => {
+    autorun(() => {
         ar.push(box.width);
     });
 

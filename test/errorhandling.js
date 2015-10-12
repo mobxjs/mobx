@@ -103,7 +103,7 @@ exports.allow_state_changes_in_transaction = function(test) {
     var x = observable(3);
     var z = observable(3);
     
-    m.observe(function() {
+    m.autorun(function() {
         if (x() !== z())
             z(x());
     });
@@ -161,7 +161,7 @@ exports.enable_change_state_if_non_strict_mode = function(test) {
         m.strict = false;
         var x = observable(3);
         var y = observable(1);
-        var dis = m.observe(function() {
+        var dis = m.autorun(function() {
             y();
             x(4);
         });
@@ -178,7 +178,7 @@ exports.throw_error_if_modification_loop = function(test) {
         m.strict = false;
         var x = observable(3);
         try {
-            var dis = m.observe(function() {
+            var dis = m.autorun(function() {
                 x(x() + 1);
             });
             x(5);
@@ -216,7 +216,6 @@ exports.cycle2 = function(test) {
 };
 
 exports.cycle3 = function(test) {
-    debugger;
     var z = observable(true);
     var a = observable(function() { return z() ? 1 : b() * 2; });
     var b = observable(function() { return a() * 2; });

@@ -31,7 +31,7 @@ exports.testGetDNode = function(test) {
     test.ok(getD(m.observable(3)));
     test.ok(getD(m.observable({x:function() { return 3 }}), "x"));
     test.ok(getD(m.observable(function() {})));
-    test.ok(getD(mobservable.observe(function() {})));
+    test.ok(getD(mobservable.autorun(function() {})));
 
     var a;
     a = m.observable({x:{}});
@@ -74,7 +74,7 @@ exports.testTreeD = function(test) {
     var cFunc =function() {
         return b();
     };
-    var c = m.observe(cFunc);
+    var c = m.autorun(cFunc);
     var cName = c.$mobservable.context.name;
     test.deepEqual(dtree(c), {
         context: cFunc,
@@ -162,11 +162,11 @@ exports.testNames = function(test) {
     test.equal(contextObj(rstruct.ar[2], "b"), rstruct);
     test.equal(contextObj(rstruct.ar[3]), rstruct);
 
-    var d = m.observe(function() {
+    var d = m.autorun(function() {
     });
     test.ok(name(d));
 
-    test.equal(name(m.observe(function namedFunction() {
+    test.equal(name(m.autorun(function namedFunction() {
     })), "namedFunction");
 
     test.ok(name(m.observable(function() {
@@ -245,7 +245,7 @@ exports.testTransitionTracker1 = function(test) {
 
     var a = m.observable(3);
     var b = m.observable(function() { return a() * 2 });
-    var c = m.observe(function() { b(); });
+    var c = m.autorun(function() { b(); });
     var stop = m.extras.trackTransitions(false, function(line) {
         lines.push(line);
     });
@@ -263,7 +263,7 @@ exports.testTransitionTracker2 = function(test) {
 
     var a = m.observable(3);
     var b = m.observable(function() { return a() * 2 });
-    var c = m.observe(function() { b(); });
+    var c = m.autorun(function() { b(); });
     var stop = m.extras.trackTransitions(true, function(line) {
         lines.push(line);
     });
@@ -285,7 +285,7 @@ exports.testTransitionTracker3 = function(test) {
 
     var a = m.observable(3);
     var b = m.observable(function() { return a() * 2 });
-    var c = m.observe(function() { b(); });
+    var c = m.autorun(function() { b(); });
     var d = m.observable(4);
 
     var stop = m.extras.trackTransitions(false)
@@ -318,7 +318,7 @@ exports.testTransitionTracker4 = function(test) {
 
     var a = m.observable(3);
     var b = m.observable(function() { return a() * 2 });
-    var c = m.observe(function() { b(); });
+    var c = m.autorun(function() { b(); });
     var stop = m.extras.trackTransitions(true);
 
     a(4);

@@ -1,5 +1,5 @@
 import {
-    observable, asStructure, observe, observeAsync, extendObservable, 
+    observable, asStructure, autorun, autorunAsync, extendObservable, 
     IObservableArray, IArrayChange, IArraySplice, IObservableValue,
     extras,
     logLevel,
@@ -42,7 +42,7 @@ export function testAnnotations(test) {
     var order1 = new Order();
     var order2 = new Order();
 
-    var disposer = observe(() => {
+    var disposer = autorun(() => {
         order1totals.push(order1.total)
     });
 
@@ -70,7 +70,7 @@ export function testAnnotations(test) {
     
     var coords = null;
     var coordsCalcs = 0;
-    var disposer2 = observe(() => {
+    var disposer2 = autorun(() => {
         coordsCalcs++;
         coords = { x : order1.someStruct.x, y: order1.someStruct.y };
     });
@@ -133,11 +133,11 @@ export function testTyping(test) {
 
     var x:IObservableValue<number> = observable(3);
 
-    var d1 = observeAsync(() => 3, (num:number) => {
+    var d1 = autorunAsync(() => 3, (num:number) => {
         // noop
     });
     
-    var d2 = observeAsync(function() {
+    var d2 = autorunAsync(function() {
         
     }, function() {
         // noop
@@ -168,7 +168,7 @@ export function testIssue8(test){
 
     const store = new LoginStoreTest();
     
-    observe(() => {
+    autorun(() => {
         fired++;
         store.loggedIn;
     });
@@ -196,7 +196,7 @@ export function test_box(test) {
     
     var ar = []
     
-    observe(() => {
+    autorun(() => {
         ar.push(box.width);
     });
 

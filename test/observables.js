@@ -186,7 +186,7 @@ exports.testProps1 = function(test) {
     test.equals(36, order.total);
 
     var totals = [];
-    var sub = mobservable.observe(function() {
+    var sub = mobservable.autorun(function() {
         totals.push(order.total);
     });
     order.amount = 4;
@@ -285,10 +285,10 @@ exports.testObserveProperty = function(test) {
     var wrappedSnickers = new Wrapper(snickers);
     var wrappedMars = new Wrapper(mars);
 
-    var disposeSnickers = mobservable.observe(function () {
+    var disposeSnickers = mobservable.autorun(function () {
         sb.push(wrappedSnickers.calories);
     });
-    var disposeMars = mobservable.observe(function () {
+    var disposeMars = mobservable.autorun(function () {
         mb.push(wrappedMars.calories);
     });
     snickers.calories = 10;
@@ -462,7 +462,7 @@ exports.test_multiple_view_dependencies = function(test) {
     var zwitch = true;
     var buffer = [];
     var fCalcs = 0;
-    var dis = mobservable.observe(function() {
+    var dis = mobservable.autorun(function() {
         fCalcs++;
         if (zwitch)
             buffer.push(b() + d());
@@ -560,7 +560,7 @@ exports.test_observe = function(test) {
     var x2 = m(function() { return x() * 2; });
     var b = [];
 
-    var cancel = mobservable.observe(function() {
+    var cancel = mobservable.autorun(function() {
         b.push(x2());
     });
 
@@ -577,7 +577,7 @@ exports.test_when = function(test) {
     var x = m(3);
 
     var called = 0;
-    mobservable.observeUntil(function() {
+    mobservable.autorunUntil(function() {
         return (x() === 4);
     }, function() {
         called += 1;
@@ -602,7 +602,7 @@ exports.test_async = function(test) {
    
     var value;
     
-    var disposer = mobservable.observeAsync(
+    var disposer = mobservable.autorunAsync(
         function() {
             return x() * y();
         }, function(newValue) {
@@ -629,7 +629,7 @@ exports.test_async = function(test) {
             
             x(7);
             disposer();
-            // after calling disposer, observeAsync should not update anymore! even if its scheduled
+            // after calling disposer, autorunAsync should not update anymore! even if its scheduled
             
             setTimeout(function() {
                 test.equal(called, 2);
@@ -686,7 +686,7 @@ exports.test_json1 = function(test) {
     ]);
 
     var output;
-    mobservable.observe(function() {
+    mobservable.autorun(function() {
         output = todos.map(function(todo) { return todo.title; }).join(", ");
     });
 
