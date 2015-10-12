@@ -294,8 +294,8 @@ export function toJSON(source) {
     * @param action a function that updates some reactive state
     * @returns any value that was returned by the 'action' parameter.
     */
-export function transaction<T>(action:()=>T):T {
-    return transaction(action);
+export function transaction<T>(action:()=>T, strict?:boolean):T {
+    return transaction(action, strict);
 }
 
 /**

@@ -4,6 +4,7 @@
  * https://github.com/mweststrate/mobservable
  */
 import {Lambda} from './interfaces';
+import * as core from './core';
 
 var inBatch = 0;
 var tasks:{():void}[] = [];
@@ -30,8 +31,11 @@ function runPostBatchActions() {
     }
 }
 
-export function transaction<T>(action:()=>T):T {
+export function transaction<T>(action:()=>T, strict?:boolean):T {
+    var preStrict = core.getStrict();
     inBatch += 1;
+    if (strict !== undefined)
+        core.setStrict(strict);
     try {
         return action();
     } finally {
@@ -41,5 +45,6 @@ export function transaction<T>(action:()=>T):T {
             runPostBatchActions();
             inBatch -= 1;
         }
+        core.setStrict(preStrict);
     }
 }

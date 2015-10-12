@@ -74,7 +74,6 @@ exports.testException2 = function(test) {
 };
 
 exports.deny_state_changes = function(test) {
-    debugger;
     try {
         var x = observable(3);
         var z = observable(5);
@@ -98,6 +97,37 @@ exports.deny_state_changes = function(test) {
     catch(e) {
         console.log(e.stack);
     }
+}
+
+exports.allow_state_changes_in_transaction = function(test) {
+    var x = observable(3);
+    var z = observable(3);
+    
+    m.observe(function() {
+        if (x() !== z())
+            z(x());
+    });
+    
+    test.equal(x(), 3);
+    test.equal(z(), 3);
+    
+    try {
+        x(4);
+        test.fail("no exception");
+    } catch(e) {
+        test.ok(("" + e).indexOf('It is not allowed to change the state during the computation of a reactive view') > 0, "Invalid exception: " + e);
+    }
+
+    test.equal(x(), 4); // assignment went ok, observer failed
+    test.equal(z(), 3);
+
+    m.transaction(function() {
+        x(5);
+    }, false);
+    test.equal(x(), 5);
+    test.equal(z(), 5);
+
+    test.done();
 }
 
 exports.deny_array_change = function(test) {

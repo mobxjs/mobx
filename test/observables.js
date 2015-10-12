@@ -1,7 +1,7 @@
 var mobservable = require('mobservable');
-var m = mobservable.default;
-
+var m = mobservable.observable;
 var observable = mobservable.observable;
+
 var voidObserver = function(){};
 
 function buffer() {
