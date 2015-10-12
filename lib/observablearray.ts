@@ -274,12 +274,12 @@ export class ObservableArray<T> extends StubArray implements IObservableArray<T>
     * properties on the fly.
     */
 var OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
-var ENUMERABLE_PROPS = [];
+var ENUMERABLE_PROPS : PropertyDescriptor[] = [];
 
 function createArrayBufferItem(index:number) {
-    var prop = {
-        enumerable: false,
-        configurable: false,
+    var prop = ENUMERABLE_PROPS[index] = {
+        enumerable: true,
+        configurable: true,
         set: function(value) {
             assertUnwrapped(value, "Modifiers cannot be used on array values. For non-reactive array values use makeReactive(asFlat(array)).");
             if (index < this.$mobservable.values.length) {
@@ -304,10 +304,12 @@ function createArrayBufferItem(index:number) {
             return undefined;
         }
     };
-    Object.defineProperty(ObservableArray.prototype, "" + index, prop);
-    prop.enumerable = true;
-    prop.configurable = true;
-    ENUMERABLE_PROPS[index] = prop;
+    Object.defineProperty(ObservableArray.prototype, "" + index, {
+        enumerable: false,
+        configurable: true,
+        get: prop.get,
+        set: prop.set
+    });
 }
 
 function reserveArrayBuffer(max:number) {
