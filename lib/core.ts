@@ -9,7 +9,7 @@ import {Lambda, IObservableArray, IObservableValue, IContextInfoStruct, IContext
 import {isPlainObject, once} from './utils';
 import {ObservableValue} from './observablevalue';
 import {ObservableView, throwingViewSetter} from './observableview';
-import {ObservableArray} from './observablearray';
+import {createObservableArray, ObservableArray} from './observablearray';
 import {ObservableObject} from './observableobject';
 import {transaction} from './scheduler';
 
@@ -435,7 +435,7 @@ export function makeChildObservable(value, parentMode:ValueMode, context) {
 	}
 
 	if (Array.isArray(value))
-		return new ObservableArray(<[]> value.slice(), childMode, context);
+		return createObservableArray(<[]> value.slice(), childMode, context);
 	if (isPlainObject(value))
 		return extendObservableHelper(value, value, childMode, context);
 	return value;

@@ -261,6 +261,21 @@ exports.testProps4 = function(test) {
     test.done();
 }
 
+exports.test_object_enumerable_props = function(test) {
+    var x = mobservable.observable({
+        a: 3,
+        b: function() {
+            return 2 * this.a;
+        }
+    });
+    mobservable.extendObservable(x, { c: 4 });
+    var ar = [];
+    for(var key in x)
+        ar.push(key);
+    test.deepEqual(ar, ['a', 'c']); // or should 'b' be in here as well?
+    test.done();    
+}
+
 
 exports.testObserveProperty = function(test) {
     var sb = [];

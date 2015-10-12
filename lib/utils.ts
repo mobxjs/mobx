@@ -4,9 +4,6 @@
  * https://github.com/mweststrate/mobservable
  */
 
-import {Lambda} from './interfaces';
-import {ObservableArray} from './observablearray';
-
 /**
     Makes sure that the provided function is invoked at most once.
 */
@@ -31,6 +28,17 @@ export function unique<T>(list:T[]):T[] {
 
 export function isPlainObject(value) {
     return value !== null && typeof value == 'object' && Object.getPrototypeOf(value) === Object.prototype;
+}
+
+export function makeNonEnumerable(object:any, props:string[]) {
+    for(var i = 0; i < props.length; i++) {
+        Object.defineProperty(object, props[i], {
+            configurable: true,
+            writable: true,
+            enumerable: false,
+            value: object[props[i]]
+        });
+    }
 }
 
 /**
@@ -138,3 +146,6 @@ export function quickDiff<T>(current:T[], base:T[]):[T[],T[]] {
     removed.push(...base.slice(baseIndex));
     return [added, removed];
 }
+
+import {Lambda} from './interfaces';
+import {ObservableArray} from './observablearray';

@@ -57,7 +57,7 @@ exports.test1 = function(test) {
         test.equals(sum(), 2);
         test.deepEqual(a.slice(), [2])
 
-        a.spliceWithArray(0,0,[4,3]);
+        a.splice(0,0,4,3);
         test.equals(sum(), 9);
         test.deepEqual(a.slice(), [4,3,2]);
 
@@ -93,6 +93,28 @@ exports.test1 = function(test) {
         console.error(e);
         throw e;
     }
+};
+
+exports.testEnumerable = function(test) {
+    function getKeys(ar) {
+        var res = [];
+        for(var key in ar)
+            res.push(key);
+        return res;
+    }
+
+    var ar = mobservable.observable([1,2,3]);
+    test.deepEqual(getKeys(ar), ['0','1','2']);
+    
+    ar.push(5,6);
+    test.deepEqual(getKeys(ar), ['0','1','2','3','4']);
+
+    ar.pop();
+    test.deepEqual(getKeys(ar), ['0','1','2','3']);
+    
+    ar.shift();
+    test.deepEqual(getKeys(ar), ['0','1','2']);
+    test.done();
 };
 
 exports.testFindAndRemove = function(test) {
