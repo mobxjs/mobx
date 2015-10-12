@@ -31,11 +31,8 @@ function runPostBatchActions() {
     }
 }
 
-export function transaction<T>(action:()=>T, strict?:boolean):T {
-    var preStrict = core.getStrict();
+export function transaction<T>(action:()=>T):T {
     inBatch += 1;
-    if (strict !== undefined)
-        core.setStrict(strict);
     try {
         return action();
     } finally {
@@ -45,6 +42,5 @@ export function transaction<T>(action:()=>T, strict?:boolean):T {
             runPostBatchActions();
             inBatch -= 1;
         }
-        core.setStrict(preStrict);
     }
 }

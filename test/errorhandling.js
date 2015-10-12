@@ -73,7 +73,7 @@ exports.testException2 = function(test) {
     test.done();
 };
 
-exports.deny_state_changes = function(test) {
+exports.deny_state_changes_in_views = function(test) {
     try {
         var x = observable(3);
         var z = observable(5);
@@ -92,45 +92,81 @@ exports.deny_state_changes = function(test) {
         // y is broken now...
         test.equal(y(), undefined); 
 
+        test.equal(mobservable._.isComputingView(), false);
         test.done();
     }
     catch(e) {
         console.log(e.stack);
     }
-}
+};
 
-exports.allow_state_changes_in_transaction = function(test) {
+exports.allow_state_changes_in_non_strict_views = function(test) {
+    var x = observable(3);
+    var z = observable(5);
+    var y = observable(function() {
+        m.extras.withStrict(false, function() { 
+            z(6);
+        });
+        return x() * x();
+    });
+
+    test.equal(9, y());
+    test.equal(z(), 6);
+
+    test.equal(mobservable._.isComputingView(), false);
+    test.done();
+};
+
+exports.allow_state_changes_in_autorun = function(test) {
     var x = observable(3);
     var z = observable(3);
     
     m.autorun(function() {
-        if (x() !== z())
+        if (x() !== 3)
             z(x());
     });
     
     test.equal(x(), 3);
     test.equal(z(), 3);
+
+    x(5); // autorunneres are allowed to change state
+
+    test.equal(x(), 5);
+    test.equal(z(), 5);
+
+    test.equal(mobservable._.isComputingView(), false);
+    test.done();
+};
+
+exports.deny_state_changes_in_autorun_if_strict = function(test) {
+    var x = observable(3);
+    var z = observable(3);
     
+    m.autorun(function() {
+        m.extras.withStrict(true, function() {
+            if (x() !== 3)
+                z(x());
+        });
+    });
+    
+    test.equal(x(), 3);
+    test.equal(z(), 3);
+
     try {
-        x(4);
+        x(5);
         test.fail("no exception");
     } catch(e) {
         test.ok(("" + e).indexOf('It is not allowed to change the state during the computation of a reactive view') > 0, "Invalid exception: " + e);
     }
 
-    test.equal(x(), 4); // assignment went ok, observer failed
+    test.equal(x(), 5);
     test.equal(z(), 3);
 
-    m.transaction(function() {
-        x(5);
-    }, false);
-    test.equal(x(), 5);
-    test.equal(z(), 5);
-
+    test.equal(mobservable._.isComputingView(), false);
     test.done();
-}
+};
 
-exports.deny_array_change = function(test) {
+exports.deny_array_change_in_view = function(test) {
     try {
         var x = observable(3);
         var z = observable([]);
@@ -156,40 +192,37 @@ exports.deny_array_change = function(test) {
     }
 };
 
-exports.enable_change_state_if_non_strict_mode = function(test) {
-    try {
-        m.setStrict(false);
-        var x = observable(3);
-        var y = observable(1);
-        var dis = m.autorun(function() {
-            y();
-            x(4);
-        });
-        test.equal(x(), 4);
-        dis();
-        test.done();
-    } finally {
-        m.setStrict(true);
-    }
+exports.allow_array_change_in_autorun = function(test) {
+    var x = observable(3);
+    var z = observable([]);
+    var y = m.autorun(function() {
+        if (x() > 4)
+            z.push(x());
+    });
+    
+    x(5);
+    x(6);
+    test.deepEqual(z.slice(), [5, 6])
+    x(2);
+    test.deepEqual(z.slice(), [5, 6])
+
+    test.equal(mobservable._.isComputingView(), false);
+
+    test.done();
 };
 
 exports.throw_error_if_modification_loop = function(test) {
+    var x = observable(3);
     try {
-        m.setStrict(false);
-        var x = observable(3);
-        try {
-            var dis = m.autorun(function() {
-                x(x() + 1);
-            });
-            x(5);
-            test.equal(false, true, "expected exception");
-        } catch(e) {
-            test.ok((""+e).indexOf("Cycle detected") !== -1, "[mobservable] loop detected while updating a value");
-        }
-        test.done();
-    } finally {
-        m.setStrict(true);
+        var dis = m.autorun(function() {
+            x(x() + 1);
+        });
+        x(5);
+        test.equal(false, true, "expected exception");
+    } catch(e) {
+        test.ok((""+e).indexOf("Cycle detected") !== -1, "[mobservable] loop detected while updating a value");
     }
+    test.done();
 };
 
 exports.cycle1 = function(test) {

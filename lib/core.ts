@@ -250,11 +250,10 @@ function observableDecorator(target:Object, key:string, baseDescriptor:PropertyD
     descriptor.configurable = true;
     descriptor.enumerable = true;
     descriptor.get = function() {
-        // the getter creates a reactive property lazily, so this might even happen during a view.
-        const baseStrict = strict;
-        strict = false;
-        ObservableObject.asReactive(this, null,ValueMode.Recursive).set(key, baseValue);
-        strict = baseStrict;
+        // the getter might create a reactive property lazily, so this might even happen during a view.
+        withStrict(false, () => {
+            ObservableObject.asReactive(this, null,ValueMode.Recursive).set(key, baseValue);
+        });
         return this[key];
     };
     descriptor.set = isDecoratingGetter 
@@ -294,8 +293,8 @@ export function toJSON(source) {
     * @param action a function that updates some reactive state
     * @returns any value that was returned by the 'action' parameter.
     */
-export function transaction<T>(action:()=>T, strict?:boolean):T {
-    return transaction(action, strict);
+export function transaction<T>(action:()=>T):T {
+    return transaction(action);
 }
 
 /**
@@ -313,12 +312,19 @@ export function setLogLevel(newLogLevel) {
     * If strict is enabled, views are not allowed to modify the state.
     * This is a recommended practice, as it makes reasoning about your application simpler.
     */
-var strict = true;
+var strict = false;
 export function getStrict() {
     return strict;
 }
-export function setStrict(newStrict) {
+
+export function withStrict(newStrict:boolean, func:Lambda) {
+    const baseStrict = strict;
     strict = newStrict;
+    try {
+        func();
+    } finally {
+        strict = baseStrict;
+    }
 }
 
 setTimeout(function() {

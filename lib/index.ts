@@ -20,8 +20,6 @@ export {
 	expr,
 	transaction,
 	toJSON,
-	setStrict,
-	getStrict,
 	setLogLevel,
 	getLogLevel,
 	// deprecated, add warning?
@@ -47,5 +45,6 @@ export const extras = {
 	getDependencyTree,
 	getObserverTree,
 	trackTransitions,
-	SimpleEventEmitter
+	SimpleEventEmitter,
+	withStrict: core.withStrict
 } 

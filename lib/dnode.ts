@@ -17,12 +17,12 @@ globalScope.__mobservableViewStack = [];
 var mobservableId = 0;
 
 export function checkIfStateIsBeingModifiedDuringView(context: IContextInfoStruct) {
-    if (getLogLevel() > 0 && isComputingView() && getStrict() === true) {
+    if (getStrict() === true && isComputingView()) {
         // TODO: add url with detailed error subscription / best practice here:
         const ts = __mobservableViewStack;
         throw new Error(
-`[mobservable] It is not allowed to change the state during the computation of a reactive view if 'mobservable.strict' mode is enabled:
-Should the data you are trying to modify actually be a view? Use 'transaction(block, false)' or 'setStrict(false)' to allow changes to be made inside views.
+`[mobservable] It is not allowed to change the state during the computation of a reactive view. Should the data you are trying to modify actually be a view? 
+Use 'mobservable.extras.withStrict(false, block)' to allow changes to be made inside views (unrecommended).
 View name: ${context.name}.
 Current stack size is ${ts.length}, active view: "${ts[ts.length -1].toString()}".`
         );
@@ -192,7 +192,10 @@ export class ViewNode extends DataNode {
             reportTransition(this, "PENDING");
         var hasError = true;
         try {
-            var stateDidChange = this.compute();
+            var stateDidChange;
+            withStrict(this.externalRefenceCount === 0, () => {
+                stateDidChange = this.compute();
+            });
             hasError = false;
         } finally {
             if (hasError)
@@ -269,7 +272,7 @@ export function isComputingView() {
     return __mobservableViewStack.length > 0;
 }
 
-import {getStrict, getLogLevel} from './core';
+import {getStrict, getLogLevel, withStrict} from './core';
 import {transitionTracker, reportTransition} from './extras';
 import {quickDiff} from './utils';
 import {schedule} from './scheduler';
