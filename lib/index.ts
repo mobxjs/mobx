@@ -31,7 +31,7 @@ export {
 
 /* Make configurable module properties writable */
 export var strict: boolean;
-export var logLevel: string;
+export var logLevel: number;
 declare var module;
 Object.defineProperties(module.exports, {
 	strict: {

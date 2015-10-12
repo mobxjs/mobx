@@ -1,6 +1,6 @@
 {
   "name": "mobservable",
-  "version": "1.0.0-alpha.4",
+  "version": "1.0.0-alpha.6",
   "description": "Observable data. Reactive functions. No staleness.",
   "main": "dist/mobservable.js",
   "typings": "dist/typings/index",

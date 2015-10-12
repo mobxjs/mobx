@@ -70,12 +70,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.asReference = core_1.asReference;
 	exports.asFlat = core_1.asFlat;
 	exports.asStructure = core_1.asStructure;
-	exports.observe = core_1.observe;
-	exports.observeUntil = core_1.observeUntil;
-	exports.observeAsync = core_1.observeAsync;
+	exports.autorun = core_1.autorun;
+	exports.autorunUntil = core_1.autorunUntil;
+	exports.autorunAsync = core_1.autorunAsync;
 	exports.expr = core_1.expr;
 	exports.transaction = core_1.transaction;
 	exports.toJSON = core_1.toJSON;
+	exports.isReactive = core_1.isObservable;
+	exports.makeReactive = core_1.observable;
+	exports.extendReactive = core_1.extendObservable;
+	exports.observe = core_1.autorun;
+	exports.observeUntil = core_1.autorunUntil;
+	exports.observeAsync = core_1.autorunAsync;
 	Object.defineProperties(module.exports, {
 	    strict: {
 	        enumerable: true,
@@ -162,7 +168,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return !!value.$mobservable;
 	}
 	exports.isObservable = isObservable;
-	function observe(view, scope) {
+	function autorun(view, scope) {
 	    var _a = getValueModeFromValue(view, ValueMode.Recursive), mode = _a[0], unwrappedView = _a[1];
 	    var observable = new observableview_1.ObservableView(unwrappedView, scope, {
 	        object: scope || view,
@@ -177,9 +183,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    disposer.$mobservable = observable;
 	    return disposer;
 	}
-	exports.observe = observe;
-	function observeUntil(predicate, effect, scope) {
-	    var disposer = observe(function () {
+	exports.autorun = autorun;
+	function autorunUntil(predicate, effect, scope) {
+	    var disposer = autorun(function () {
 	        if (predicate.call(scope)) {
 	            disposer();
 	            effect.call(scope);
@@ -187,12 +193,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	    return disposer;
 	}
-	exports.observeUntil = observeUntil;
-	function observeAsync(view, effect, delay, scope) {
+	exports.autorunUntil = autorunUntil;
+	function autorunAsync(view, effect, delay, scope) {
 	    if (delay === void 0) { delay = 1; }
 	    var latestValue = undefined;
 	    var timeoutHandle;
-	    var disposer = observe(function () {
+	    var disposer = autorun(function () {
 	        latestValue = view.call(scope);
 	        if (!timeoutHandle) {
 	            timeoutHandle = setTimeout(function () {
@@ -207,7 +213,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            clearTimeout(timeoutHandle);
 	    });
 	}
-	exports.observeAsync = observeAsync;
+	exports.autorunAsync = autorunAsync;
 	function expr(expr, scope) {
 	    if (!dnode_1.isComputingView())
 	        throw new Error("[mobservable.expr] 'expr' can only be used inside a computed value.");
@@ -284,8 +290,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return source;
 	}
 	exports.toJSON = toJSON;
-	function transaction(action) {
-	    return scheduler_1.transaction(action);
+	function transaction(action, strict) {
+	    return scheduler_1.transaction(action, strict);
 	}
 	exports.transaction = transaction;
 	var logLevel = 1;
@@ -1355,9 +1361,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
 	var ENUMERABLE_PROPS = [];
 	function createArrayBufferItem(index) {
-	    var prop = {
-	        enumerable: false,
-	        configurable: false,
+	    var prop = ENUMERABLE_PROPS[index] = {
+	        enumerable: true,
+	        configurable: true,
 	        set: function (value) {
 	            core_1.assertUnwrapped(value, "Modifiers cannot be used on array values. For non-reactive array values use makeReactive(asFlat(array)).");
 	            if (index < this.$mobservable.values.length) {
@@ -1372,20 +1378,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	            else if (index === this.$mobservable.values.length)
 	                this.push(this.makeReactiveArrayItem(value));
 	            else
-	                throw new Error("[mobservable.array] Index out of bounds, " + index + " is larger than " + this.values.length);
+	                throw new Error("[mobservable.array] Index out of bounds, " + index + " is larger than " + this.$mobservable.values.length);
 	        },
 	        get: function () {
-	            if (index < this.$mobservable.values.length) {
+	            if (this.$mobservable && index < this.$mobservable.values.length) {
 	                this.$mobservable.notifyObserved();
 	                return this.$mobservable.values[index];
 	            }
 	            return undefined;
 	        }
 	    };
-	    Object.defineProperty(ObservableArray.prototype, "" + index, prop);
-	    prop.enumerable = true;
-	    prop.configurable = true;
-	    ENUMERABLE_PROPS[index] = prop;
+	    Object.defineProperty(ObservableArray.prototype, "" + index, {
+	        enumerable: false,
+	        configurable: true,
+	        get: prop.get,
+	        set: prop.set
+	    });
 	}
 	function reserveArrayBuffer(max) {
 	    for (var index = OBSERVABLE_ARRAY_BUFFER_SIZE; index < max; index++)
@@ -1464,8 +1472,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 10 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
+	var core = __webpack_require__(1);
 	var inBatch = 0;
 	var tasks = [];
 	function schedule(func) {
@@ -1489,8 +1498,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }
 	}
-	function transaction(action) {
+	function transaction(action, strict) {
+	    var preStrict = core.getStrict();
 	    inBatch += 1;
+	    if (strict !== undefined)
+	        core.setStrict(strict);
 	    try {
 	        return action();
 	    }
@@ -1500,6 +1512,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            runPostBatchActions();
 	            inBatch -= 1;
 	        }
+	        core.setStrict(preStrict);
 	    }
 	}
 	exports.transaction = transaction;
