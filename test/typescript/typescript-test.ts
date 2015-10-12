@@ -1,9 +1,7 @@
 import {
     observable, asStructure, autorun, autorunAsync, extendObservable, 
     IObservableArray, IArrayChange, IArraySplice, IObservableValue,
-    extras,
-    logLevel,
-    strict
+    extras
 } from "mobservable";
 
 var v = observable(3);

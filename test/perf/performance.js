@@ -20,12 +20,12 @@ function voidObserver() {
 }
 
 exports.setUp = function (callback) {
-    mobservable.logLevel = 0;
+    mobservable.setLogLevel(0);
     callback();
 }
 
 exports.tearDown = function (callback) {
-    mobservable.logLevel = 1;
+    mobservable.setLogLevel(1);
     callback();
 };
 

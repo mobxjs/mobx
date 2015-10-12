@@ -20,6 +20,10 @@ export {
 	expr,
 	transaction,
 	toJSON,
+	setStrict,
+	getStrict,
+	setLogLevel,
+	getLogLevel,
 	// deprecated, add warning?
 	isObservable as isReactive,
 	observable as makeReactive,
@@ -28,23 +32,6 @@ export {
 	autorunUntil as observeUntil,
 	autorunAsync as observeAsync
 } from './core';
-
-/* Make configurable module properties writable */
-export var strict: boolean;
-export var logLevel: number;
-declare var module;
-Object.defineProperties(module.exports, {
-	strict: {
-		enumerable: true,
-		get: core.getStrict,
-		set: core.setStrict
-	},
-	logLevel: {
-		enumerable: true,
-		get: core.getLogLevel,
-		set: core.setLogLevel
-	}
-});
 
 /**
  * 'Private' elements that are exposed for testing and debugging utilities

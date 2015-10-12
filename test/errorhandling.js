@@ -158,7 +158,7 @@ exports.deny_array_change = function(test) {
 
 exports.enable_change_state_if_non_strict_mode = function(test) {
     try {
-        m.strict = false;
+        m.setStrict(false);
         var x = observable(3);
         var y = observable(1);
         var dis = m.autorun(function() {
@@ -169,13 +169,13 @@ exports.enable_change_state_if_non_strict_mode = function(test) {
         dis();
         test.done();
     } finally {
-        m.strict = true;
+        m.setStrict(true);
     }
 };
 
 exports.throw_error_if_modification_loop = function(test) {
     try {
-        m.strict = false;
+        m.setStrict(false);
         var x = observable(3);
         try {
             var dis = m.autorun(function() {
@@ -188,7 +188,7 @@ exports.throw_error_if_modification_loop = function(test) {
         }
         test.done();
     } finally {
-        m.strict = true;
+        m.setStrict(true);
     }
 };
 
