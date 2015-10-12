@@ -15,7 +15,7 @@ export function getDNode(thing:any, property?:string):DataNode {
 		throw new Error(`[mobservable.getDNode] ${thing} doesn't seem to be reactive`);
 	if (property !== undefined) {
 		var o = <ObservableObject> thing.$mobservable;
-		var dnode = o.values && o.values[property]
+		var dnode = o.values && o.values[property];
 		if (!dnode)
 			throw new Error(`[mobservable.getDNode] property '${property}' of '${thing}' doesn't seem to be a reactive property`);
 		return dnode;

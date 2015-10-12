@@ -294,10 +294,10 @@ function createArrayBufferItem(index:number) {
             else if (index === this.$mobservable.values.length)
                 this.push(this.makeReactiveArrayItem(value));
             else
-                throw new Error(`[mobservable.array] Index out of bounds, ${index} is larger than ${this.values.length}`);
+                throw new Error(`[mobservable.array] Index out of bounds, ${index} is larger than ${this.$mobservable.values.length}`);
         },
         get: function() {
-            if (index < this.$mobservable.values.length) {
+            if (this.$mobservable && index < this.$mobservable.values.length) {
                 this.$mobservable.notifyObserved();
                 return this.$mobservable.values[index];
             }
