@@ -1,7 +1,7 @@
 {
   "name": "mobservable",
   "version": "1.0.0-alpha.4",
-  "description": "Observable data. Observing views.",
+  "description": "Observable data. Reactive functions. No staleness.",
   "main": "dist/mobservable.js",
   "typings": "dist/typings/index",
   "scripts": {

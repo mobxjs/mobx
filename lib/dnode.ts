@@ -17,7 +17,7 @@ globalScope.__mobservableViewStack = [];
 var mobservableId = 0;
 
 export function checkIfStateIsBeingModifiedDuringView(context: IContextInfoStruct) {
-    if (logLevel > 0 && isComputingView() && strict === true) {
+    if (getLogLevel() > 0 && isComputingView() && getStrict() === true) {
         // TODO: add url with detailed error subscription / best practice here:
         const ts = __mobservableViewStack;
         throw new Error(
@@ -218,7 +218,7 @@ export class ViewNode extends DataNode {
     private bindDependencies() {
             __mobservableViewStack.length -= 1;
 
-        if (this.observing.length === 0 && logLevel > 1 && !this.isDisposed) {
+        if (this.observing.length === 0 && getLogLevel() > 1 && !this.isDisposed) {
             console.error("[mobservable] You have created a view function that doesn't observe any values, did you forget to make its dependencies observable?");
         }
 
@@ -228,7 +228,7 @@ export class ViewNode extends DataNode {
         this.hasCycle = false;
         for(var i = 0, l = added.length; i < l; i++) {
             var dependency = added[i];
-            if (logLevel > 0 && dependency instanceof ViewNode && dependency.findCycle(this)) {
+            if (getLogLevel() > 0 && dependency instanceof ViewNode && dependency.findCycle(this)) {
                 this.hasCycle = true;
                 // don't observe anything that caused a cycle, or we are stuck forever!
                 this.observing.splice(this.observing.indexOf(added[i]), 1);
@@ -269,7 +269,7 @@ export function isComputingView() {
     return __mobservableViewStack.length > 0;
 }
 
-import {strict, logLevel} from './core';
+import {getStrict, getLogLevel} from './core';
 import {transitionTracker, reportTransition} from './extras';
 import {quickDiff} from './utils';
 import {schedule} from './scheduler';

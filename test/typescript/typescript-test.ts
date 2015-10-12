@@ -3,11 +3,10 @@ import {
     IObservableArray, IArrayChange, IArraySplice, IObservableValue,
     extras,
     logLevel,
-    strict,
-    default as mobservable
+    strict
 } from "mobservable";
 
-var v = mobservable(3);
+var v = observable(3);
 v.observe(() => {});
 
 var a = observable([1,2,3]);

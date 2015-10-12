@@ -301,13 +301,25 @@ export function transaction<T>(action:()=>T):T {
 /**
     * Sets the reporting level Defaults to 1. Use 0 for production or 2 for increased verbosity.
     */
-export var logLevel = 1; // 0 = production, 1 = development, 2 = debugging
+var logLevel = 1; // 0 = production, 1 = development, 2 = debugging
+export function getLogLevel() {
+    return logLevel;
+}
+export function setLogLevel(newLogLevel) {
+    logLevel = newLogLevel;
+}
 
 /**
     * If strict is enabled, views are not allowed to modify the state.
     * This is a recommended practice, as it makes reasoning about your application simpler.
     */
-export var strict = true;
+var strict = true;
+export function getStrict() {
+    return strict;
+}
+export function setStrict(newStrict) {
+    strict = newStrict;
+}
 
 setTimeout(function() {
     if (logLevel > 0)

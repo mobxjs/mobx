@@ -63,8 +63,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var extras_1 = __webpack_require__(3);
 	var simpleeventemitter_1 = __webpack_require__(6);
 	__export(__webpack_require__(11));
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = core.observable;
 	var core_1 = __webpack_require__(1);
 	exports.isObservable = core_1.isObservable;
 	exports.observable = core_1.observable;
@@ -78,18 +76,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.expr = core_1.expr;
 	exports.transaction = core_1.transaction;
 	exports.toJSON = core_1.toJSON;
-	exports.logLevel = core_1.logLevel;
-	exports.strict = core_1.strict;
 	Object.defineProperties(module.exports, {
 	    strict: {
 	        enumerable: true,
-	        get: function () { return core.strict; },
-	        set: function (v) { return core.strict = v; }
+	        get: core.getStrict,
+	        set: core.setStrict
 	    },
 	    logLevel: {
 	        enumerable: true,
-	        get: function () { return core.logLevel; },
-	        set: function (v) { return core.logLevel = v; }
+	        get: core.getLogLevel,
+	        set: core.setLogLevel
 	    }
 	});
 	exports._ = {
@@ -176,7 +172,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var disposer = utils_1.once(function () {
 	        observable.setRefCount(-1);
 	    });
-	    if (exports.logLevel >= 2 && observable.observing.length === 0)
+	    if (logLevel >= 2 && observable.observing.length === 0)
 	        console.warn("[mobservable.observe] not a single observable was used inside the observing function. This observer is now a no-op.");
 	    disposer.$mobservable = observable;
 	    return disposer;
@@ -255,10 +251,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    descriptor.configurable = true;
 	    descriptor.enumerable = true;
 	    descriptor.get = function () {
-	        var baseStrict = exports.strict;
-	        exports.strict = false;
+	        var baseStrict = strict;
+	        strict = false;
 	        observableobject_1.ObservableObject.asReactive(this, null, ValueMode.Recursive).set(key, baseValue);
-	        exports.strict = baseStrict;
+	        strict = baseStrict;
 	        return this[key];
 	    };
 	    descriptor.set = isDecoratingGetter
@@ -292,11 +288,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return scheduler_1.transaction(action);
 	}
 	exports.transaction = transaction;
-	exports.logLevel = 1;
-	exports.strict = true;
+	var logLevel = 1;
+	function getLogLevel() {
+	    return logLevel;
+	}
+	exports.getLogLevel = getLogLevel;
+	function setLogLevel(newLogLevel) {
+	    logLevel = newLogLevel;
+	}
+	exports.setLogLevel = setLogLevel;
+	var strict = true;
+	function getStrict() {
+	    return strict;
+	}
+	exports.getStrict = getStrict;
+	function setStrict(newStrict) {
+	    strict = newStrict;
+	}
+	exports.setStrict = setStrict;
 	setTimeout(function () {
-	    if (exports.logLevel > 0)
-	        console.info("Welcome to mobservable. Current logLevel = " + exports.logLevel + ". Change mobservable.logLevel according to your needs: 0 = production, 1 = development, 2 = debugging. Strict mode is " + (exports.strict ? 'enabled' : 'disabled') + ".");
+	    if (logLevel > 0)
+	        console.info("Welcome to mobservable. Current logLevel = " + logLevel + ". Change mobservable.logLevel according to your needs: 0 = production, 1 = development, 2 = debugging. Strict mode is " + (strict ? 'enabled' : 'disabled') + ".");
 	}, 1);
 	(function (ValueType) {
 	    ValueType[ValueType["Reference"] = 0] = "Reference";
@@ -416,7 +428,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.makeChildObservable = makeChildObservable;
 	function assertUnwrapped(value, message) {
-	    if (exports.logLevel === 0)
+	    if (logLevel === 0)
 	        return;
 	    if (value instanceof AsReference || value instanceof AsStructure || value instanceof AsFlat)
 	        throw new Error("[mobservable] asStructure / asReference / asFlat cannot be used here. " + message);
@@ -444,7 +456,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	globalScope.__mobservableViewStack = [];
 	var mobservableId = 0;
 	function checkIfStateIsBeingModifiedDuringView(context) {
-	    if (core_1.logLevel > 0 && isComputingView() && core_1.strict === true) {
+	    if (core_1.getLogLevel() > 0 && isComputingView() && core_1.getStrict() === true) {
 	        var ts = __mobservableViewStack;
 	        throw new Error("[mobservable] It is not allowed to change the state during the computation of a reactive view if 'mobservable.strict' mode is enabled:\nShould the data you are trying to modify actually be a view?\nView name: " + context.name + ".\nCurrent stack size is " + ts.length + ", active view: \"" + ts[ts.length - 1].toString() + "\".");
 	    }
@@ -607,7 +619,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    ViewNode.prototype.bindDependencies = function () {
 	        __mobservableViewStack.length -= 1;
-	        if (this.observing.length === 0 && core_1.logLevel > 1 && !this.isDisposed) {
+	        if (this.observing.length === 0 && core_1.getLogLevel() > 1 && !this.isDisposed) {
 	            console.error("[mobservable] You have created a view function that doesn't observe any values, did you forget to make its dependencies observable?");
 	        }
 	        var _a = utils_1.quickDiff(this.observing, this.prevObserving), added = _a[0], removed = _a[1];
@@ -615,7 +627,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.hasCycle = false;
 	        for (var i = 0, l = added.length; i < l; i++) {
 	            var dependency = added[i];
-	            if (core_1.logLevel > 0 && dependency instanceof ViewNode && dependency.findCycle(this)) {
+	            if (core_1.getLogLevel() > 0 && dependency instanceof ViewNode && dependency.findCycle(this)) {
 	                this.hasCycle = true;
 	                this.observing.splice(this.observing.indexOf(added[i]), 1);
 	                dependency.hasCycle = true;
@@ -628,7 +640,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            removed[i].removeObserver(this);
 	    };
 	    ViewNode.prototype.findCycle = function (node) {
-	        console.log("find cycle");
 	        var obs = this.observing;
 	        if (obs.indexOf(node) !== -1)
 	            return true;

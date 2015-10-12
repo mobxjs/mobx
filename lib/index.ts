@@ -7,7 +7,6 @@ import SimpleEventEmitter from './simpleeventemitter';
 
 export * from './interfaces';
 
-export default core.observable;
 export {
 	isObservable,
 	observable,
@@ -21,22 +20,22 @@ export {
 	expr,
 	transaction,
 	toJSON,
-	logLevel,
-	strict
 } from './core';
 
 /* Make configurable module properties writable */
+export var strict: boolean;
+export var logLevel: string;
 declare var module;
 Object.defineProperties(module.exports, {
 	strict: {
 		enumerable: true,
-		get: () => core.strict,
-		set: (v) => core.strict = v
+		get: core.getStrict,
+		set: core.setStrict
 	},
 	logLevel: {
 		enumerable: true,
-		get: () => core.logLevel,
-		set: (v) => core.logLevel = v
+		get: core.getLogLevel,
+		set: core.setLogLevel
 	}
 });
 

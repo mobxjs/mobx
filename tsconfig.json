@@ -9,17 +9,18 @@
         "removeComments": true
     },
     "files": [
+        "./lib/core.ts",
         "./lib/dnode.ts",
-        "./lib/utils.ts",
-        "./lib/scheduler.ts",
-        "./lib/simpleeventemitter.ts", 
-        "./lib/observablevalue.ts", 
-        "./lib/observableview.ts",
-        "./lib/observablearray.ts", 
+        "./lib/extras.ts",
+        "./lib/index.ts",
+        "./lib/interfaces.ts",
+        "./lib/observablearray.ts",
         "./lib/observableobject.ts",
-        "./lib/extras.ts", 
-        "./lib/core",
-        "./lib/index.ts"
+        "./lib/observablevalue.ts",
+        "./lib/observableview.ts",
+        "./lib/scheduler.ts",
+        "./lib/simpleeventemitter.ts",
+        "./lib/utils.ts"
     ],
     "filesGlob": [
         "./lib/*.ts",

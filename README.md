@@ -2,18 +2,19 @@
 
 <img src="https://mweststrate.github.io/mobservable/images/mobservable.png" align="right" width="120px" />
 
-##### _Keeps views automatically in sync with state. Unobtrusively._
+##### _Makes data observable. And functions reactive. Whut? Like Excel._
 
 [![Build Status](https://travis-ci.org/mweststrate/mobservable.svg?branch=master)](https://travis-ci.org/mweststrate/mobservable)
 [![Coverage Status](https://coveralls.io/repos/mweststrate/mobservable/badge.svg?branch=master&service=github)](https://coveralls.io/github/mweststrate/mobservable?branch=master)
 [![mobservable channel on slack](https://img.shields.io/badge/slack-mobservable-blue.svg)](https://reactiflux.slack.com/messages/mobservable/)
 
 <br/>
-### New to Mobservable? Take the [five minute, interactive introduction](https://mweststrate.github.io/mobservable/getting-started.html)
+New to Mobservable? Take the [five minute, interactive introduction](https://mweststrate.github.io/mobservable/getting-started.html)
 
 ## Introduction
 
-Mobservable is a library to create reactive state and views. Mobservable updates views automatically when the state changes, and thereby achieves [inversion of control](https://en.wikipedia.org/wiki/Inversion_of_control). This has major benefits for the simplicity, maintainability and performance of your code. This is the promise of Mobservable:
+Mobservable enables your data structures to become observable.
+Next to that it can make your functions reactive, so that they re-evaluate whenever relevant data is altered. This has major benefits for the simplicity, maintainability and performance of your code. This is the promise of Mobservable:
 * Write complex applications which unmatched simple code.
 * Enable unobtrusive state management: be free to use mutable objects, cyclic references, classes and real references to store state.
 * Write declarative views that track their own dependencies. No subscriptions, cursors or other redundant declarations to manage.
@@ -26,19 +27,19 @@ Mobservable can be summarized in two functions that will fundamentally simplify 
 Let's start by building a really really simple timer application:
 
 ```javascript
-var timerData = {
+var timerData = mobservable.observable({
   secondsPassed: 0
-};
+});
 
 setInterval(function() {
   timerData.secondsPassed++;
 }, 1000);
 
-var Timer = React.createClass({
+var Timer = mobservable.observer(React.createClass({
   render: function() {
     return (<span>Seconds passed: { this.props.timerData.secondsPassed } </span> )
   }
-});
+}));
 
 React.render(<Timer timerData={timerData} />, document.body);
 ```
@@ -89,20 +90,6 @@ It does not only work for plain objects, but also for arrays, functions, classes
 
 * [Five minute interactive introducton to Mobservable and React](https://mweststrate.github.io/mobservable/getting-started.html)
 
-## What others are saying...
-
-> _Elegant! I love it!_
-> &dash; Johan den Haan, CTO of Mendix
-
-> _We ported the book Notes and Kanban examples to Mobservable. Check out [the source](https://github.com/survivejs/mobservable-demo) to see how this worked out. Compared to the original I was definitely positively surprised. Mobservable seems like a good fit for these problems._
-> &dash; Juho Vepsäläinen, author of "SurviveJS - Webpack and React" and jster.net curator
-
-> _Great job with Mobservable! Really gives current conventions and libraries a run for their money._
-> &dash; Daniel Dunderfelt
-
-> _I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated._
-> &dash;David Schalk, fpcomplete.com
-
 ## Resources
 
 * [API documentation](https://mweststrate.github.io/mobservable/)
@@ -124,9 +111,11 @@ It does not only work for plain objects, but also for arrays, functions, classes
 * [SurviveJS interview on Mobservable, React and Flux](http://survivejs.com/blog/mobservable-interview/)
 * [Pure rendering in the light of time and state](https://medium.com/@mweststrate/pure-rendering-in-the-light-of-time-and-state-4b537d8d40b1)
 
+Mobservable is inspired by Microsoft Excel and existing TFRP implementations like MeteorJS tracker, knockout and Vue.js.
+
 ## Top level api
 
-For the full api, see the [API documentation](https://mweststrate.github.io/mobservable/refguide/api.html).
+For the full api, see the [API documentation](https://mweststrate.github.io/mobservable/refguide/observable.html).
 This is an overview of most important functions available in the `mobservable` namespace:
 
 **observable(value, options?)**
@@ -142,20 +131,21 @@ Extends an existing object with reactive properties.
 Similar to `observable(function)`. Exception the created reactive function will not be lazy, so that it is executed even when it has no observers on its own.
 Useful to bridge reactive code to imperative code.
 
-## Runtime behavior
 
-* Reactive views always update synchronously (unless `transaction is used`)
-* Reactive views always update atomically, intermediate values will never be visible.
-* Reactive functions evaluate lazily and are not processed if they aren't observed.
-* Dependency detection is based on actual values to real-time minify the amount of dependencies.
-* Cycles are detected automatically.
-* Exceptions during computations are propagated to consumers.
 
-## Roadmap
+## What others are saying...
 
-* Write documentation, including how to organize projects
-* Write blog about inner workings
-* Introduce options for asynchronous views and structurally compare view results
+> _Elegant! I love it!_
+> &dash; Johan den Haan, CTO of Mendix
+
+> _We ported the book Notes and Kanban examples to Mobservable. Check out [the source](https://github.com/survivejs/mobservable-demo) to see how this worked out. Compared to the original I was definitely positively surprised. Mobservable seems like a good fit for these problems._
+> &dash; Juho Vepsäläinen, author of "SurviveJS - Webpack and React" and jster.net curator
+
+> _Great job with Mobservable! Really gives current conventions and libraries a run for their money._
+> &dash; Daniel Dunderfelt
+
+> _I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated._
+> &dash;David Schalk, fpcomplete.com
 
 ## Contributing
 

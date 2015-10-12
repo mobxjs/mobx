@@ -1,4 +1,8 @@
+# 1.0
 
+* Introduces a second `strictMode` parameter to transaction.
+* dropped the default export of observable
+* Fixes issue where non-`strict` mode and `logLevel` where not always honored.
 
 # 0.7.0
 
