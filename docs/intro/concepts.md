@@ -59,10 +59,10 @@ This constraint can be turned off by running Mobservable in [non strict](../refg
 The following listing illustrates the above concepts and principles:
 
 ```javascript
-import {makeReactive, observe} from 'mobservable';
+import {observable, observe} from 'mobservable';
 
-var todoStore = makeReactive({
-	/* some reactive state */
+var todoStore = observable({
+	/* some observable state */
 	todos: [],
 
 	/* a reactive view */
@@ -71,7 +71,7 @@ var todoStore = makeReactive({
 	}
 });
 
-/* a observer */
+/* a function that observes the state */
 observe(function() {
 	console.log("Completed %d of %d items",
 		todoStore.completedCount,

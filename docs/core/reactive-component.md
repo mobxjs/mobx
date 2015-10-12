@@ -4,15 +4,15 @@ What if the `render` function of a [React](https://facebook.github.io/react) com
 Then we would have a system that keeps the user interface actively in sync with the state, without ever [wasting](https://facebook.github.io/react/docs/perf.html#perf.printwastedmeasurements) a rendering.
 And without explicitly declaring dependencies.
 
-That is exactly what the `reactiveComponent` function (and decorator) from the `mobservable-react` package does.
+That is exactly what the `observer` function (and decorator) from the `mobservable-react` package does.
 Given a react component class, it turns the `render` function into an observer while respecting the life-cycle system of React.
 Let's rebuild our lolcatz user interface by using some reactive React components:
 
 ```javascript
-var reactiveComponent = require('mobservable-react').reactiveComponent;
+var observer = require('mobservable-react').observer;
 var React = require('react');
 
-var LolCatzOverview = reactiveComponent(React.createClass({
+var LolCatzOverview = observer(React.createClass({
 	render: function() {
 		var lolCatz = this.props.lolCatz;
 		return <div>
@@ -31,7 +31,7 @@ var LolCatzOverview = reactiveComponent(React.createClass({
 	}
 }));
 
-var LolCat = reactiveComponent(React.createClass({
+var LolCat = observer(React.createClass({
 	render: function() {
 		return <img src={ this.props.cat.url } />;
 	}
@@ -44,28 +44,28 @@ So there we are, simple, straightforward reactive components that will render wh
 These components have some interesting characteristics:
 
 * Usually reactive components have _no state_. But you are still free to use state.
-* `reactiveComponent` doesn't require you to define which data you want to use, yet it offers more fine grained subscriptions compared to many higher order components as found in other frameworks.
+* `observer` doesn't require you to define which data you want to use, yet it offers more fine grained subscriptions compared to many higher order components as found in other frameworks.
 * Reactive components only subscribe to the data structures that where actively used during the last render.
 This means that you cannot under-subscribe or over-subscribe.
 You can even use data in your rendering that will only be available at later moment in time.
 This is ideal for asynchronously loading data.  
-* The `render` method will react to any reactive data structures, regardless whether data is passed in as `props` (recommended), is part of the `state`, is in instance properties or is accessed through the closure of the component.
+* The `render` method will react to any observable data structures, regardless whether data is passed in as `props` (recommended), is part of the `state`, is in instance properties or is accessed through the closure of the component.
 * Reactive components implement `shouldComponentUpdate` so that children are not re-rendered unnecessary.
 * Reactive components sideways load data; parent components won't re-render even when child components will.
-* `reactiveComponent` does not depend on React's _context_ system which has its own quirks.
+* `observer` does not depend on React's _context_ system which has its own quirks.
 
 ## ES6
 
 For ES6 users, components can also be declared using classes:
 ```javascript
-@reactiveComponent class MyComponent extends React.Component {
+@observer class MyComponent extends React.Component {
   /* .. */
 }
 ```
 
 ## Summary
 
-Use `reactiveComponent` to turn React components into reactive components.
+Use `observer` to turn React components into reactive components.
 You can play with the above example and the examples from the previous paragraph in this [JSBin](http://jsbin.com/zayere/edit?js,console,output).
 This concludes the introduction to the core concepts of Mobservable.
 Just try it out!

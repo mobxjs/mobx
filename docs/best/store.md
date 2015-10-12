@@ -29,7 +29,7 @@ Things you will typically find in ui stores:
   * Window dimensions
   * Accessibility information
   * Current language
-  * Currently active theme 
+  * Currently active theme
 * User interface state as soon as it effects multiple, further unrelated components:
   * Current selection
   * Visibility of toolbars, etc..
@@ -45,39 +45,39 @@ For isomorphic applications you might also want to provide a stub implementation
 You might distribute the _ui-state-store_ through your application by passing it as property through your component tree.
 You can also pass this store by using context or make it globally available as a module.
 For testing purposes, I recommend to just pass it through the component tree.
-  
+
 Example of a store (using ES6 syntax):
 
 ```javascript
-import {extendReactive} from 'mobservable';
+import {extendObservable} from 'mobservable';
 import jquery from 'jquery';
 
 class UiState {
 	constructor() {
         const $window = jquery(window);
-        extendReactive(this, {
-            // make window dimensions available as reactive information
+        extendObservable(this, {
+            // make window dimensions available as observable information
             windowDimensions: this.getWindowDimensions(),
-            
+
             // active translation
             language: "en_US",
-            
+
             // info about pending requests, used for the component that shows the current sync state
             pendingRequestCount: 0,
             appIsInSync: function() {
                 return this.pendingRequestCount === 0
             }
         });
-        
+
         jquery.resize(() => {
             this.windowDimensions = getWindowDimensions();
         });
     }
-    
+
     getWindowDimensions() {
-        return { 
+        return {
             width: $(window).width(),
-            height: $(window).height()     
+            height: $(window).height()
         };
     }
 }
@@ -129,7 +129,7 @@ Just pass objects around.
 You don't have to pass stores around, or have to figure out which actions can be applied to an object if they are just available as instance methods.
 Especially in large applications this is important.
 * They offer fine grained control over the visibility of attributes and methods.
-* Objects created a using a constructor function can freely mix reactive properties and functions, and non-reactive properties and methods.
+* Objects created a using a constructor function can freely mix observable properties and functions, and non-observable properties and methods.
 * They are easily recognizable and can strictly be type-checked.
 
 
@@ -142,27 +142,27 @@ import uuid from 'node-uuid';
 export class TodoStore {
     @observable todos = [];
     @observable isLoading = true;
-    
+
     constructor(transportLayer, authorStore) {
         this.authorStore = authorStore; // Store that can resolve authors for us
         this.transportLayer = transportLayer; // Thing that can make server requests for us
         this.transportLayer.onReceiveTodoUpdate(updatedTodo => this.updateTodoFromServer(updatedTodo));
         this.loadTodos();
     }
-    
+
     /**
      * Fetches all todo's from the server
      */
-    loadTodos() {      
+    loadTodos() {
         this.isLoading = true;
         this.transportLayer.fetchTodos().then(fetchedTodos => {
             todos.forEach(json => this.updateTodoFromServer(json));
             this.isLoading = false;
         });
     }
-    
+
     /**
-     * Update a todo with information from the server. Guarantees a todo 
+     * Update a todo with information from the server. Guarantees a todo
      * only exists once. Might either construct a new todo, update an existing one,
      * or remove an todo if it has been deleted on the server.
      */
@@ -174,9 +174,9 @@ export class TodoStore {
         }
         if (json.isDeleted) {
             this.removeTodo(todo);
-        } else {        
+        } else {
             todo.updateFromJson(json);
-        }        
+        }
     }
 
     /**
@@ -185,9 +185,9 @@ export class TodoStore {
     createTodo() {
         var todo = new Todo(this);
         this.todos.push(todo);
-        return todo;   
+        return todo;
     }
-    
+
     /**
      * A todo was somehow deleted, clean it from the client memory
      */
@@ -198,28 +198,28 @@ export class TodoStore {
 }
 
 export class Todo {
-    
+
     /**
      * unique id of this todo, immutable.
      */
     id = null;
-    
+
     @observable completed = false;
     @observable task = "";
-    
+
     /**
      * reference to an Author object (from the authorStore)
      */
     @observable author = null;
-    
+
     store = null;
-    
+
     /**
      * Indicates whether changes in this object
      * should be submitted to the server
      */
     autoSave = true;
-    
+
     /**
      * Disposer for the side effect that automatically
      * stores this Todo, see @dispose.
@@ -229,7 +229,7 @@ export class Todo {
     constructor(store, id=uuid.v4()) {
         this.store = store;
         this.id = id;
-        
+
         this.saveHandler = observe(() => {
             // observe everything that is used in the JSON:
             var json = this.toJson();
@@ -239,7 +239,7 @@ export class Todo {
             }
         });
     }
-    
+
     /**
      * Remove this todo from the client and server
      */
@@ -256,7 +256,7 @@ export class Todo {
             authorId: this.author ? this.author.id : null
         };
     }
-    
+
     /**
      * Update this todo with information from the server
      */

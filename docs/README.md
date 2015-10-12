@@ -1,6 +1,6 @@
 # Introduction
 
-Mobservable is a library to create _views_ that react to _state_ changes automatically.
+Mobservable makes data _observable_, so that _views_ update reactively.
 
 ![Mobservable + React](images/concept.png)
 

@@ -1,4 +1,4 @@
 
 # mobservable.logLevel
 
-3 debug functions
+# mobservable.strict

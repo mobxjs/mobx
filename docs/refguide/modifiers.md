@@ -1,6 +1,6 @@
-# modifiers for makeReactive
+# modifiers for observable
 
-By default, `makeReactive` recursively makes all the values of plain objects and arrays recursively reactive.
+By default, `observable` recursively makes all the values of plain objects and arrays recursively observable.
 Besides that it automatically converts functions without arguments into reactive views or derived properties.
 For all other types of values just a reference is stored.
 In general, this should just do what you need, but if you want you can override the default behavior using _modifiers_.
@@ -10,13 +10,13 @@ They do not only apply to the current value, but also to all values that are ass
 ## asReference
 
 The most common modifier is `asReference`.
-If this modifier is used, `makeReactive` will not attempt to make the value reactive.
-Use this for example if you want to store a reference to a function, instead of creating a view based on that function. 
-Or use it if you want to prevent that objects or arrays are made reactive (ok, not sure whether thats a use-case, but alas).
+If this modifier is used, `observable` will not attempt to make the value observable.
+Use this for example if you want to store a reference to a function, instead of creating a view based on that function.
+You can also use it to prevent that plain objects or arrays are made observable automatically.
 
 ```javascript
 
-var test = makeReactive({
+var test = observable({
 	x : 3,
 	doubler: function() {
 		return this.x;
@@ -38,10 +38,10 @@ This is useful if you are working with 'struct' like objects like colors or coor
 `asStructure` can be used on reactive functions, plain objects and arrays.
 
 ```javascript
-var vector1 = makeReactive({ x: 10, y : 10 });
-var vector2 = makeReactive({ x: 0, y: 20 });
+var vector1 = observable({ x: 10, y : 10 });
+var vector2 = observable({ x: 0, y: 20 });
 
-var boundingVector = makeReactive(asStructure(() => {
+var boundingVector = observable(asStructure(() => {
 	return {
 		x: Math.max(vector1.x, vector2.x),
 		y: Math.max(vector1.y, vector2.y)
@@ -59,15 +59,16 @@ vector2.x = 10;
 
 ## asFlat
 
-Similar to `asReference`, except that `asFlat` does not prevent its value to become reactive, but only the children of the value.
-Can be used for example to create an reactive array or object that should not automatically make its children reactive.
+Similar to `asReference`, except that `asFlat` does not prevent its value to become observable, but only the children of the value.
+It can be used for example to create an observable array or object that should not automatically make its children observable.
 
 ```javascript
-var todos = makeReactive(asFlat([{
+var todos = observable(asFlat([{
 	title: "make coffee",
 	completed: false
 }]));
 
-isReactive(todos); // true
-isReactive(todos[0]); // false
+isObservable(todos); // true
+isObservable(todos[0]); // false
+isObservable(todos[0], "title"); // false
 ```

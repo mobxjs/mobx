@@ -1,12 +1,12 @@
 # ES5 / ES6 / TypeScript flavored examples
 
-Here are some examples show you how you can make the state of a simple todo application reactive,
+Here are some examples show you how you can make the state of a simple todo application observable,
 using different flavors.
 
 #### ES5 with plain objects
 
 ```javascript
-var todoStore = mobservable.makeReactive({
+var todoStore = mobservable.observable({
     todos: [{
           title: 'Find a clean mug',
           completed: true
@@ -23,7 +23,7 @@ var todoStore = mobservable.makeReactive({
 
 ```javascript
 function TodoStore() {
-    mobservable.extendReactive(this, {
+    mobservable.extendObservable(this, {
         todos: [{
             title: 'Find a clean mug',
             completed: true
@@ -37,14 +37,14 @@ function TodoStore() {
 }
 ```
 
-Note that the constructor could also be written like: `this.todos = mobservable.makeReactive([{ ... }])`. The advantage of using `extendReactive` is that it makes the `this.todos` reference itself observable as well, so that you can safely assign a new array to it later on (although it is best practice to never do such thing).
+Note that the constructor could also be written like: `this.todos = mobservable.observable([{ ... }])`. The advantage of using `extendObservable` is that it makes the `this.todos` reference itself observable as well, so that you can safely assign a new array to it later on (although it is best practice to never do such thing).
 
 #### ES6 classes
 
 ```javascript
 class TodoStore {
     constructor() {
-        mobservable.extendReactive(this, {
+        mobservable.extendObservable(this, {
             todos: [{
                 title: 'Find a clean mug',
                 completed: true
@@ -76,9 +76,9 @@ class TodoStore {
 ## Components in ES6 / TypeScript
 
 For ES6+ users, components can also be declared using classes.
-`reactiveComponent` can be used in that case as a decorator.
+`observer` can be used in that case as a decorator.
 ```javascript
-@reactiveComponent class MyComponent extends React.Component {
+@observer class MyComponent extends React.Component {
   /* .. */
 }
 ```

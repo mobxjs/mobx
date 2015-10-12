@@ -5,17 +5,17 @@
   * [The Gist of Mobservable](intro/overview.md)
   * [Concepts & Principles](intro/concepts.md)
 * The Basics: Making stuff Reactive
-  * [Reactive Data Structures](core/reactive-state.md)
+  * [Observable Data Structures](core/observable-state.md)
   * [Reactive Views](core/reactive-views.md)
-  * [Reactive Components](core/reactive-component.md)
+  * [Observing Components](core/reactive-component.md)
 * Core API
-  * [makeReactive](refguide/make-reactive.md)
+  * [observable](refguide/observable.md)
   * [observe](refguide/observe.md)
-  * [@observable](refguide/observable.md)
-  * [@reactiveComponent](refguide/reactive-component.md)
+  * [@observable](refguide/observable-decorator.md)
+  * [@observer](refguide/observer-component.md)
 * Advanced API
-  * [isReactive](refguide/is-reactive.md)
-  * [extendReactive](refguide/extend-reactive.md)
+  * [isObservable](refguide/is-observable.md)
+  * [extendObservable](refguide/extend-observable.md)
   * [modifiers](refguide/modifiers.md)
   * [transactions](refguide/transactions.md)
   * [observeAsync](refguide/observe-async.md)
@@ -35,7 +35,6 @@
   * [DevTools](best/devtools.md)
   * [ES6 & TypeScript goodies](best/syntax.md)
   * Tracking state changes
-  * Predicates
   * Performance considerations
 * [Resources](LINKS.md)
 * [Frequently Asked Questions](faq/faq.md)

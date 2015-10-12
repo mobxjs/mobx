@@ -14,7 +14,7 @@ That is enough create a todo, submit it to the server and update our user interf
 ## Asynchronous actions
 
 Writing asynchronous actions is pretty simple as well.
-You can use reactive data structures as a promise.
+You can use observable data structures as a promise.
 This is what happens with the `isLoading` property in the `todoStore` for example:
 
 ```javascript
@@ -31,9 +31,9 @@ After completing the asynchronous action, just update your data and your views w
 The render function of a React component could be come as simple as:
 
 ```javascript
-import {reactiveComponent} from "mobservable-react";
+import {observer} from "mobservable-react";
 
-var TodoOverview = reactiveComponent(function(props) {
+var TodoOverview = observer(function(props) {
 	var todoStore = props.todoStore;
 	if (todoStore.isLoading) {
 		return <div>Loading...</div>;
@@ -47,4 +47,4 @@ var TodoOverview = reactiveComponent(function(props) {
 
 The above `TodoOverview` component will now update whenever `isLoading` changes, or when `isLoading` is true and the `todos` list changes.
 Note that we could have expressed `todoStore.isLoading` as `todoStore.todos.length` as well.
-The result would be exactly the same. 
+The result would be exactly the same.

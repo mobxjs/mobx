@@ -1,16 +1,16 @@
 # Reactive Views
 
-## Creating views using `makeReactive`
+## Creating views using `observable`
 
 Reactive views are the things that make Mobservable really lovable.
-They are just functions that use some reactive data.
+They are just functions that use some observable data.
 But those view function won't just inspect the value once, they will keep tracking what happens to those values and re-evaluate when necessary.
-View functions can be created by passing a function (without arguments) to `makeReactive`.
+View functions can be created by passing a function (without arguments) to `observable`.
 Remember the `lolCatz` data structure from previous paragraph?
 Here is a view:
 
 ```javascript
-var isLolCatzFanatic = makeReactive(function() {
+var isLolCatzFanatic = observable(function() {
 	return lolCatz.doILikeLolcatz && lolCatz.lolcatz.length >= 42;
 });
 ```
@@ -21,10 +21,10 @@ And, as long as `lolCatz.doILikeLolcatz` yields `true`, the view will also obser
 The fact that the system determines itself which values should be observed, distinguishes Transparent FRP libraries from normal FRP libraries like RxJs and Bacon.
 
 Anyway, this view will always yield `false` unless you find another 40 lolcatz, so lets build another view.
-`makeReactive(function)` will return a function with which you can inspect the current value, so let's use the previous view in yet another view.
+`observable(function)` will return a function with which you can inspect the current value, so let's use the previous view in yet another view.
 
 ```javascript
-var lolCatzHtml = makeReactive(function() {
+var lolCatzHtml = observable(function() {
 	return (
 		(isLolCatzFanatic() ? "<marquee>Lolcatz!</marquee>" : "") +
 		"<h1>Favorite:</h1>" +
@@ -53,7 +53,7 @@ In practice you hardly will use 'value.observe' since there is a more powerful a
 
 ## Creating observers `mobservable.observe`
 
-Observers are functions that react to changes in other reactive data structures and views.
+Observers are functions that react to changes in other observable data structures and views.
 Actually observers are a special kind of views.
 They work just like views, except that they evualate eagerly and do not produce values.
 Observers can be used to achieve effects; things that need to happen regardless whether some else is observing the observer.

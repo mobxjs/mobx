@@ -284,8 +284,8 @@ To achieve that, the <code>TodoStore</code> has to become reactive.
 Let's alter the constructor function just enough to achieve that:</p>
 
 <textarea spellcheck="false" class="prettyprint" id="code3" rows="8">
-function ReactiveTodoStore() {
-    this.todos = mobservable.makeReactive([]);
+function ObservableTodoStore() {
+    this.todos = mobservable.observable([]);
     mobservable.observe(function() {
         console.log(this.report());
     }, this);
@@ -293,26 +293,26 @@ function ReactiveTodoStore() {
 
 /** addTodo, completedTodosCount and report remain untouched,
     so, let's just copy them... */
-ReactiveTodoStore.prototype.addTodo = TodoStore.prototype.addTodo;
-ReactiveTodoStore.prototype.completedTodosCount =
+ObservableTodoStore.prototype.addTodo = TodoStore.prototype.addTodo;
+ObservableTodoStore.prototype.completedTodosCount =
     TodoStore.prototype.completedTodosCount;
-ReactiveTodoStore.prototype.report = TodoStore.prototype.report;
+ObservableTodoStore.prototype.report = TodoStore.prototype.report;
 
-var reactiveTodoStore = new ReactiveTodoStore();
+var observableTodoStore = new ObservableTodoStore();
 </textarea>
 <center style="margin-top:-20px"><small>(This store is editable, use the 'run' button on the next listing to test it)</small></center>
 
-<p>We just changed two things. First, we converted <code>todos</code> to a reactive array.
-Next, we created a function <code>observe</code>s the <code>report</code> and prints it whenever it has changes.
-Looks too simple to be true right? Let's try altering the data again,
+<p>We just changed two things. First, we defined <code>todos</code> as an observable array.
+Next, we created a function that <code>observe</code>s the <code>report</code> and prints it whenever it has changes.
+That's too simple to be true right? Let's try altering the data again,
 but this time without explicitly logging the <code>report</code>:</p>
 
 <textarea spellcheck="false" class="prettyprint" id="code4" rows="6">
-reactiveTodoStore.addTodo("write intro");
-reactiveTodoStore.addTodo("present at meekup");
-reactiveTodoStore.todos[0].completed = true;
-reactiveTodoStore.todos[1].task = "present at meetup";
-reactiveTodoStore.todos[0].task = "finish intro";
+observableTodoStore.addTodo("write intro");
+observableTodoStore.addTodo("present at meekup");
+observableTodoStore.todos[0].completed = true;
+observableTodoStore.todos[1].task = "present at meetup";
+observableTodoStore.todos[0].task = "finish intro";
 </textarea>
 <button onClick="runCode(['#code1', '#code3', '#code4'])" class="btn-run">Run code</button>
 
@@ -329,22 +329,22 @@ Because the report did not <em>actually</em> change as a result of the rename, a
 They will not re-render automatically when their underlying data changes.
 So you need to either call <code>setState</code> or you need to maintain data subscriptions or cursors to update your components.</p>
 
-<p>To avoid such boilerplate, the <code>mobservable-react</code> package provides the <code>reactiveComponent</code> function to make components reactive.
+<p>To avoid such boilerplate, the <code>mobservable-react</code> package provides the <code>observer</code> decorator that turns any component into an observer.
 From there on, you never have to worry about when to update your component!  Just like what we did with the <code>report</code> function.
 As shown below, Mobservable will determine the smallest amount of components that need an update.
 So reactive components render <a target="_blank" href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/">extremely efficient</a>.
 </p>
 
 <a name="demo"></a><h3 id="demo">Editable demo</h3>
-<p>A basic, self updating user interface for our <code>ReactiveTodoStore</code> is now just a matter of writing the following dumb, yet reactive, components:</p>
+<p>A basic, self updating user interface for our <code>ObservableTodoStore</code> is now just a matter of writing the following dumb, yet reactive, components:</p>
 
 <textarea spellcheck="false" class="" id="react1" rows="44">
 function renderTodoApp() {
-    React.render(<TodoList store={reactiveTodoStore} />,
+    React.render(<TodoList store={observableTodoStore} />,
         document.getElementById('reactjs-app'));
 }
 
-var TodoList = mobservableReact.reactiveComponent(React.createClass({
+var TodoList = mobservableReact.observer(React.createClass({
     displayName: 'TodoList',
 
     render: function() {
@@ -366,7 +366,7 @@ var TodoList = mobservableReact.reactiveComponent(React.createClass({
     }
 }));
 
-var TodoView = mobservableReact.reactiveComponent(React.createClass({
+var TodoView = mobservableReact.observer(React.createClass({
     displayName: 'TodoView',
 
     render: function() {
@@ -401,12 +401,12 @@ renderTodoApp();
     The counters on the right show how many times each part of the UI is re-rendered.
 </p>
 <textarea spellcheck="false" class="" id="play1" rows="8">
-reactiveTodoStore.todos[0].completed = !reactiveTodoStore.todos[0].completed
-reactiveTodoStore.todos[1].task = "Random todo " + Math.random();
-reactiveTodoStore.todos[reactiveTodoStore.todos.length] = { task: "Find a fine cheese", completed: true };
+observableTodoStore.todos[0].completed = !observableTodoStore.todos[0].completed
+observableTodoStore.todos[1].task = "Random todo " + Math.random();
+observableTodoStore.todos[observableTodoStore.todos.length] = { task: "Find a fine cheese", completed: true };
 // etc etc.. type your own statements here:
 </textarea>
-<button onClick="if (typeof reactiveTodoStore === 'undefined') { runCode(['#code1', '#code3', '#code4', '#react1']) } runCode(['#play1'])" class="btn-run">Run code</button>
+<button onClick="if (typeof observableTodoStore === 'undefined') { runCode(['#code1', '#code3', '#code4', '#react1']) } runCode(['#play1'])" class="btn-run">Run code</button>
 <button id="runline-btn" onClick="runCodePerLine()" class="btn-run">Run line-by-line</button>
 <p>&nbsp;</p>
 <h3 id="learn-more">Learn more</32>
@@ -513,7 +513,7 @@ reactiveTodoStore.todos[reactiveTodoStore.todos.length] = { task: "Find a fine c
             var lineMarker;
 
             function runCodePerLine() {
-                if (typeof reactiveTodoStore === 'undefined') {
+                if (typeof observableTodoStore === 'undefined') {
                     runCode(['#code1', '#code3', '#code4', '#react1'])
                 }
 

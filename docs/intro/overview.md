@@ -2,40 +2,45 @@
 
 So far it all might sound a bit fancy, but making an app reactive using Mobservable boils down to just these three steps:
 
-## 1. Define State and make it Reactive
+## 1. Define your state and make it observable
 
 Store state in any data structure you like; objects, array, classes.
 Cyclic data structures, references, it doesn't matter.
-Just make sure that all properties that you want to change over time are marked by `mobservable` to make them reactive.
+Just make sure that all properties that you want to change over time are marked by `mobservable` to make them observable.
 
 ```javascript
-var appState = mobservable.makeReactive({
+import {observable} from 'mobservable';
+
+var appState = observable({
     timer: 0
 });
 ```
 
 ## 2. Create a View that responds to changes in the State
 
-We didn't make our `appState` reactive just for nothing;
+We didn't make our `appState` observable just for nothing;
 you can now create views that automatically update whenever relevant data in the `appState` changes.
 Mobservable will find the minimal way to update your views.
 This single fact saves you ton's of boilerplate and is [wickedly efficient](mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/).
 
-Generally speaking any function can become a reactive view, and Mobservable can be applied in any ES5 conformant JavaScript environment.
-But here is an example of a view in the form of a React component.
+Generally speaking any function can become a reactive view that observes it data, and Mobservable can be applied in any ES5 conformant JavaScript environment.
+But here is an (ES6) example of a view in the form of a React component.
 
 ```javascript
-var TimerView = mobservable.reactiveComponent(React.createClass({
-    render: function() {
+import {observer} from 'mobservable-react';
+
+@observer
+class TimerView extend React.Component {
+    render() {
         return (<button onClick={this.onReset}>
                 Seconds passed: {this.props.appState.timer}
             </button>);
-    },
+    }
 
-    onReset: function() {
+    onReset = () => {
         this.props.appState.resetTimer();
     }
-}));
+};
 
 React.render(<TimerView appState={appState} />, document.body);
 ```
@@ -51,7 +56,7 @@ But remember, the key thing here is: Mobservable helps you to do things in a sim
 
 The following code will alter your data every second, and the UI will update automatically when needed.
 No explicit relations are defined in either in the controller functions that _change_ the state or in the views that should _update_.
-Decorating your _state_ and _views_ with `makeReactive` is enough for Mobservable to detect all relationships.
+Decorating your _state_ and _views_ with `observable` is enough for Mobservable to detect all relationships.
 Here are two examples of changing the state:
 
 ```javascript
