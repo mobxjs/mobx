@@ -88,7 +88,7 @@ exports.five_hunderd_properties_that_observe_their_sibling = function(test) {
     var start = now();
 
     var last = observables[observables.length -1];
-    last.autorun(voidObserver);
+    last.observe(voidObserver);
     test.equals(501, last());
     var initial = now();
 
@@ -113,7 +113,7 @@ exports.late_depenency_change = function(test) {
         return sum;
     })
 
-    sum.autorun(voidObserver, true);
+    sum.observe(voidObserver, true);
 
     var start = new Date();
 
@@ -148,7 +148,7 @@ exports.lots_of_unused_computables = function(test) {
     });
 
     var sum = 0;
-    var subscription = b.autorun(function(newValue) {
+    var subscription = b.observe(function(newValue) {
         sum = newValue;
     }, true);
 
@@ -200,7 +200,7 @@ exports.array_reduce = function(test) {
             return a + c * b();
         }, 0);
     });
-    sum.autorun(voidObserver);
+    sum.observe(voidObserver);
 
     var start = now();
 
@@ -238,7 +238,7 @@ exports.array_classic_loop = function(test) {
             s+=ar[i] * b();
         return s;
     });
-    sum.autorun(voidObserver, true); // calculate
+    sum.observe(voidObserver, true); // calculate
 
     var start = now();
 
@@ -312,7 +312,7 @@ function order_system_helper(test, usebatch, keepObserving) {
 
     totalAmount();
     if (keepObserving)
-    totalAmount.autorun(voidObserver);
+        totalAmount.observe(voidObserver);
 
     var start = now();
 
