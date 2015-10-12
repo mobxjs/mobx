@@ -20,8 +20,6 @@ export {
 	expr,
 	transaction,
 	toJSON,
-	setLogLevel,
-	getLogLevel,
 	// deprecated, add warning?
 	isObservable as isReactive,
 	observable as makeReactive,

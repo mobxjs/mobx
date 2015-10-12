@@ -1,9 +1,5 @@
 import {
     observable, asStructure, autorun, extendObservable, 
-    IObservableArray, IArrayChange, IArraySplice, IObservableValue,
-    extras,
-    logLevel,
-    strict,
     default as mobservable
 } from "mobservable";
 

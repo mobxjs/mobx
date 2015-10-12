@@ -221,17 +221,13 @@ export class ViewNode extends DataNode {
     private bindDependencies() {
             __mobservableViewStack.length -= 1;
 
-        if (this.observing.length === 0 && getLogLevel() > 1 && !this.isDisposed) {
-            console.error("[mobservable] You have created a view function that doesn't observe any values, did you forget to make its dependencies observable?");
-        }
-
         var [added, removed] = quickDiff(this.observing, this.prevObserving);
         this.prevObserving = null;
 
         this.hasCycle = false;
         for(var i = 0, l = added.length; i < l; i++) {
             var dependency = added[i];
-            if (getLogLevel() > 0 && dependency instanceof ViewNode && dependency.findCycle(this)) {
+            if (dependency instanceof ViewNode && dependency.findCycle(this)) {
                 this.hasCycle = true;
                 // don't observe anything that caused a cycle, or we are stuck forever!
                 this.observing.splice(this.observing.indexOf(added[i]), 1);
@@ -272,7 +268,7 @@ export function isComputingView() {
     return __mobservableViewStack.length > 0;
 }
 
-import {getStrict, getLogLevel, withStrict} from './core';
+import {getStrict, withStrict} from './core';
 import {transitionTracker, reportTransition} from './extras';
 import {quickDiff} from './utils';
 import {schedule} from './scheduler';

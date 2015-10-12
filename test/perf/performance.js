@@ -19,16 +19,6 @@ function voidObserver() {
     // nothing, nada, noppes.
 }
 
-exports.setUp = function (callback) {
-    mobservable.setLogLevel(0);
-    callback();
-}
-
-exports.tearDown = function (callback) {
-    mobservable.setLogLevel(1);
-    callback();
-};
-
 /*
 results of this test:
 300/40000 mseconds on netbook (AMD c60 processor, same test is on Intel i7 3770 ~10 times faster)

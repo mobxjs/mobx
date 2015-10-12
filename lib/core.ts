@@ -117,8 +117,6 @@ export function autorun(view:Lambda, scope?:any):Lambda {
     const disposer = once(() => {
         observable.setRefCount(-1);
     });
-    if (logLevel >= 2 && observable.observing.length === 0)
-        console.warn(`[mobservable.observe] not a single observable was used inside the observing function. This observer is now a no-op.`);
     (<any>disposer).$mobservable = observable;
     return disposer;
 }
@@ -298,17 +296,6 @@ export function transaction<T>(action:()=>T):T {
 }
 
 /**
-    * Sets the reporting level Defaults to 1. Use 0 for production or 2 for increased verbosity.
-    */
-var logLevel = 1; // 0 = production, 1 = development, 2 = debugging
-export function getLogLevel() {
-    return logLevel;
-}
-export function setLogLevel(newLogLevel) {
-    logLevel = newLogLevel;
-}
-
-/**
     * If strict is enabled, views are not allowed to modify the state.
     * This is a recommended practice, as it makes reasoning about your application simpler.
     */
@@ -326,11 +313,6 @@ export function withStrict(newStrict:boolean, func:Lambda) {
         strict = baseStrict;
     }
 }
-
-setTimeout(function() {
-    if (logLevel > 0)
-        console.info(`Welcome to mobservable. Current logLevel is ${logLevel}. Change mobservable.setLogLevel according to your needs: 0 = production, 1 = development, 2 = debugging. Strict mode is ${strict ? 'enabled' : 'disabled'}.`);
-}, 1);
 
 /**
  * Internal methods
@@ -442,8 +424,6 @@ export function makeChildObservable(value, parentMode:ValueMode, context) {
 }
 
 export function assertUnwrapped(value, message) {
-	if (logLevel === 0)
-		return;
 	if (value instanceof AsReference || value instanceof AsStructure || value instanceof AsFlat)
 		throw new Error(`[mobservable] asStructure / asReference / asFlat cannot be used here. ${message}`);
 }
