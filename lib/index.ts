@@ -20,6 +20,13 @@ export {
 	expr,
 	transaction,
 	toJSON,
+	// deprecated, add warning?
+	isObservable as isReactive,
+	observable as makeReactive,
+	extendObservable as extendReactive,
+	autorun as observe,
+	autorunUntil as observeUntil,
+	autorunAsync as observeAsync
 } from './core';
 
 /* Make configurable module properties writable */
