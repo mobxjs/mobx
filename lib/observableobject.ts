@@ -59,6 +59,15 @@ export class ObservableObject {
 			observable = new ObservableValue(value, this.mode, context);
 
 		this.values[propName] = observable;
-		Object.defineProperty(this.target, propName, observable.asPropertyDescriptor());
+		Object.defineProperty(this.target, propName, {
+			configurable: true,
+			enumerable: true,
+			get: function() {
+				return this.$mobservable ? this.$mobservable.values[propName].get() : undefined;
+			},
+			set: function(newValue) {
+				this.$mobservable.values[propName].set(newValue);
+			}
+		});
 	}
 }

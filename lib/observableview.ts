@@ -80,15 +80,6 @@ export class ObservableView<T> extends ViewNode {
         });
     }
 
-    asPropertyDescriptor(): PropertyDescriptor {
-        return {
-            configurable: false,
-            enumerable: false,
-            get: () => this.get(),
-            set: throwingViewSetter(this.context.name)
-        }
-    }
-
     toString() {
         return `ComputedObservable[${this.context.name}:${this._value}] ${this.func.toString()}`;
     }

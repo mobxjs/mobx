@@ -53,15 +53,6 @@ export class ObservableValue<T> extends DataNode {
         return this.changeEvent.on(listener);
     }
 
-    asPropertyDescriptor(): PropertyDescriptor {
-        return {
-            configurable: false,
-            enumerable: true,
-            get: () => this.get(),
-            set: (value) => this.set(value)
-        }
-    }
-
     toString() {
         return `Observable[${this.context.name}:${this._value}]`;
     }
