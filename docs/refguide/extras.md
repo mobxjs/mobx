@@ -1,4 +1,0 @@
-
-# mobservable.logLevel
-
-# mobservable.strict

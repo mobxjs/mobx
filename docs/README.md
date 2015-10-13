@@ -1,56 +1,71 @@
 # Introduction
 
-Mobservable makes data _observable_, so that _views_ update reactively.
+_Observable data. Reactive functions. Simple code._
 
 ![Mobservable + React](images/concept.png)
 
 * [Mobservable on Github](https://github.com/mweststrate/mobservable)
 * For the impatient: [Five minute interactive introduction to Mobservable](http://mweststrate.github.io/mobservable/getting-started.html)
 
-## Philosophy
+## Introduction
 
-Mobservable isn't a library that helps you to write fancy code.
-It helps you to remove fancy code, so that just boring, simple code remains.
-Because simple code<sup>1</sup> is the secret recipe to building enterprise scale software that is easy to change and maintain.
-Simple code allows you to quickly change the essential parts<sup>2</sup> of your application.
+Mobservable enables your data structures to become observable.
+Next to that it can make your functions (or [React components](https://github.com/mweststrate/mobservable-react)) reactive, so that they re-evaluate whenever relevant data is altered.
+It's like Excel for JavaScript: any data structure can be turned into a 'data cell', and every function or user interface component can be turned into a 'formula' that updates automatically.
+Mobservable is unopiniated about which data structures to use;
+it can work with mutable objects, arrays, (cyclic) references, classes etc.
+So that your actions, stores and user interface can remain KISS.
+Besides that, it is [fast](mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/).
 
-**With Mobservable you can write views like there is only one state ever.**
+## The essentials
 
-So what happens when you alter the state? No worries, Mobservable makes sure that any view you have is kept in sync with the state efficiently<sup>3</sup>.
-The only thing that is left for you is to write boring views and straightforward actions.
-These are some examples of fancy code that you _no longer need_ when using Mobservable:
+Mobservable can be summarized in two functions that will fundamentally simplify the way you write React applications.
+Let's start by building a really really simple timer application:
 
-* Verbose, boilerplated actions that alter state using unwieldy database query like constructions.
-* Clever constructions that allows you to 'mutate' immutable data.
-* Data subscriptions, cursors, lenses or higher order components; in short any construction to configure how views should be kept in sync with the application state.
+```javascript
+var timerData = mobservable.observable({
+  secondsPassed: 0
+});
 
-## How does it work?
+setInterval(function() {
+  timerData.secondsPassed++;
+}, 1000);
 
-Mobservable applies _Transparent Reactive Functional Programming_ to determine when views needs an update.
-This is an old technique that is used by spreadsheet applications.
-In spreadsheets the cells that hold a value are the _state_, and each cell that holds a formula is a _view_.
-While spreadsheets just work with simple values, Mobservable does the same job for all common JavaScript structures; primitives, plain objects, arrays, classes, references etc.
+var Timer = mobservable.observer(React.createClass({
+  render: function() {
+    return (<span>Seconds passed: { this.props.timerData.secondsPassed } </span> )
+  }
+}));
 
-Intrigued? Read on and take a dive in the world of Mobservable.
+React.render(<Timer timerData={timerData} />, document.body);
+```
 
-## Testimonials
+In the example above the `timerData` data structure is made observable and the `Timer` component is turned into an `observer`.
+Mobservable will automatically track all relations between _observable data_ and _observing functions (or components)_ so that the minimum amount of observers is updated to keep all observers fresh.
+
+Its as simple as that. In the example above the `Timer` will automatically update each time the property `timerData.secondsPassed` is altered.
+The actual interesting thing about this approach are the things that are *not* in the code:
+
+* The `setInterval` method didn't alter. It still treats `timerData` as a plain JS object.
+* If the `Timer` component would be somewhere deep in our app; only the `Timer` would be re-rendered. Nothing else (sideways data loading).
+* There are no subscriptions of any kind that need to be managed.
+* There is no forced UI update in our 'controller'.
+* There is no state in the component. Timer is a dumb component.
+* This approach is unobtrusive; you are not forced to apply certain techniques like keeping all data denormalized and immutable.
+* There is no higher order component that needs configuration; no scopes, lenses or cursors.
+* There is no magic context being passed through components.
+
+
+## What others are saying...
+
+> _Elegant! I love it!_
+> &dash; Johan den Haan, CTO of Mendix
 
 > _We ported the book Notes and Kanban examples to Mobservable. Check out [the source](https://github.com/survivejs/mobservable-demo) to see how this worked out. Compared to the original I was definitely positively surprised. Mobservable seems like a good fit for these problems._
 > &dash; Juho Vepsäläinen, author of "SurviveJS - Webpack and React" and jster.net curator
 
-> _I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated._
-> &dash;David Schalk, fpcomplete.com
-
-> _Elegant! I love it!_
-> &dash; Johan den Haan, CTO Mendix
-
 > _Great job with Mobservable! Really gives current conventions and libraries a run for their money._
 > &dash; Daniel Dunderfelt
 
-
-----
-
-1. [The best code is no code at all](http://blog.codinghorror.com/the-best-code-is-no-code-at-all/)
-2. [No Silver Bullet — Essence and Accidents of Software Engineering](https://en.wikipedia.org/wiki/No_Silver_Bullet)
-3. [Pure Rendering in the light of State and Time](https://medium.com/@mweststrate/pure-rendering-in-the-light-of-time-and-state-4b537d8d40b1)
-4. [Making React reactive: the pursuit of high performing, easily maintainable React apps](mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/)
+> _I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated._
+> &dash;David Schalk, fpcomplete.com

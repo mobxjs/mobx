@@ -41,11 +41,6 @@ _Views_ are updated **lazily**. A View that is not actively in use will not be u
 This largely avoids the need to dispose views.
 If a view is no longer in use it will be garbage collected automatically.
 
-_autorun_ creates a special kind of views. They evaluate eagerly instead of lazily. But without producing a value.
-_autorun_ functions if you have _views_ that should always be updated, even if it they are not in use by any other view.
-This is useful to achieve **effects**; code that kicks off some imperative code if the _state_ changed.
-Stuff like logging to the console, updating the UI or sending changes to the server.
-
 All _views_ should be **pure**. They are not supposed to change _state_.
 
 ## Illustration

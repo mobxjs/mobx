@@ -24,6 +24,27 @@ setInterval(function() {
 React.render(<Timer timerData={timerData} />, document.body);
 ```
 
+_Note: when `observer` needs to be combined with other decorators or higher-order-components, make sure that `observer` is the most inner (first applied) decorator;
+otherwise it might do nothing at all._
+
+### Characterstics of reactive components
+
+So here we are, simple, straightforward reactive components that will render whenever needed. These components have some interesting characteristics:
+
+* They only subscribe to the data structures that where actively used during the last render. This means that you cannot under-subscribe or over-subscribe. You can even use data in your rendering that will only be available at later moment in time. This is ideal for asynchronously loading data.
+* You are not required to declare what data a component will use. Instead, dependencies are determined at runtime and tracked in a very fine-grained manner.
+* Usually reactive components have no state. But you are still free to use state.
+* `@observer` implements `shouldComponentUpdate` so that children are not re-rendered unnecessary.
+* Reactive components sideways load data; parent components won't re-render unnecessarily even when child components will.
+* `@observer` does not depend on React's context system.
+
+
+### Mobservable-React-DevTools
+
+In combination with `@observer` you can use the Mobservable-React-DevTools, it shows exactly when your components are rerendered and you can inspect the data dependencies of your components.
+
+### Alternative syntaxes
+
 In ES5 environments, reactive components can be simple declared using `observer(React.createClass({ ... `.
 
 When using `@observer`, a lot of components will become stateless.
@@ -34,5 +55,3 @@ const Timer = @observer( ({timerData}) =>
 	(<span>Seconds passed: { timerData.secondsPassed } </span> )
 );
 ```
-_Note: when `observer` needs to be combined with other decorators or higher-order-components, make sure that `observer` is the most inner (first applied) decorator;
-otherwise it might do nothing at all._

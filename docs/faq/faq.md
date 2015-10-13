@@ -4,6 +4,15 @@
 
 Mobservable runs on any ES5 environment. That means that all browsers except IE8, Node.js and Rhine are supported. See [caniuse.com](http://caniuse.com/#feat=es5)
 
+##### Is React Native supported?
+
+Yes, `mobservable` and `mobservable-react` will work on React Native. The latter through importing `"mobservable-react/native"`.
+The devtools don't support React Native.
+
+##### How does Mobservable compare to other Reactive frameworks?
+
+See this [issue](https://github.com/mweststrate/mobservable/issues/18) for some considerations.
+
 ##### Is mobservable a framework?
 
 Mobservabe is *not* a framework. It does not tell you how to structure your code, where to store state or how to process events. Yet it might free you from frameworks that poses all kinds of restrictions on your code in the name of performance.
