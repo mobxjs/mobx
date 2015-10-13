@@ -61,7 +61,7 @@ export class ObservableObject {
 		this.values[propName] = observable;
 		Object.defineProperty(this.target, propName, {
 			configurable: true,
-			enumerable: true,
+			enumerable: observable instanceof ObservableValue,
 			get: function() {
 				return this.$mobservable ? this.$mobservable.values[propName].get() : undefined;
 			},
