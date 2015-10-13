@@ -28,21 +28,29 @@ Use `extras.withStrict(boolean, block)` if you want to deviate from the default 
 * Simplified error handling, mobservable will no longer catch errors in views, which makes the stack traces easier to debug. 
 * Removed the initial 'welcom to mobservable' logline that was printed during start-up.
 
+# 0.7.1
+
+* Backported Babel support for the @observable decorator from the 1.0 branch. The decorator should now behave the same when compiled with either Typescript or Babeljs. 
+
 # 0.7.0
 
-* Introduced `strict` mode (see issues #30, #31)
+* Introduced `strict` mode (see issues [#30](), [#31]())
 * Renamed `sideEffect` to `observe`
 * Renamed `when` to `observeUntil`
 * Introduced `observeAsync`.
 * Fixed issue where changing the `logLevel` was not picked up.
-* Improved typings (will be distributed through DefinitelyTyped in the near future)
-* Introduces `asStructure` (see #8) and `asFlat`. 
+* Improved typings.
+* Introduces `asStructure` (see [#8]()) and `asFlat`. 
 * Assigning a plain object to a reactive structure no longer clones the object, instead, the original object is decorated. (Arrays are still cloned due to Javascript limitations to extend arrays).
 * Reintroduced `expr(func)` as shorthand for `makeReactive(func)()`, which is useful to create temporarily views inside views
 * Deprecated the options object that could be passed to `makeReactive`.
-
+* Deprecated the options object that could be passed to `makeReactive`:
+  * A `thisArg` can be passed as second param.
+  * A name (for debugging) can be passed as second or third param
+  * The `as` modifier is no longer needed, use `asReference` (instead of `as:'reference'`) or `asFlat` (instead of `recurse:false`). 
 
 # 0.6.10
+
 * Fixed issue where @observable did not properly create a stand-alone view
 
 # 0.6.9
