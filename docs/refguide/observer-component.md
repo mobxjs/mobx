@@ -1,7 +1,7 @@
 # @observer
 
 The `observer` function / decorator can be used to turn ReactJS components into reactive components.
-It wraps the component's render function in `mobservable.observe` to make sure that any data that is used during the rendering of a component forces a rerendering upon change.
+It wraps the component's render function in `mobservable.autorun` to make sure that any data that is used during the rendering of a component forces a rerendering upon change.
 It is available through the separate `mobservable-react` package.
 
 ```javascript

@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>Definging data stores | Introduction</title>
+        <title>@observer | Introduction</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.2.0">
@@ -29,10 +29,10 @@
         
     
     
-    <link rel="next" href="../best/actions.html" />
+    <link rel="next" href="../refguide/is-observable.html" />
     
     
-    <link rel="prev" href="../refguide/extras.html" />
+    <link rel="prev" href="../refguide/observable-decorator.html" />
     
 
         
@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="5.1" data-basepath=".." data-revision="Tue Oct 13 2015 07:44:13 GMT+0200 (CEST)">
+    <div class="book" data-level="3.4" data-basepath=".." data-revision="Tue Oct 13 2015 07:44:13 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -239,7 +239,7 @@
             
         </li>
     
-        <li class="chapter " data-level="3.4" data-path="refguide/observer-component.html">
+        <li class="chapter active" data-level="3.4" data-path="refguide/observer-component.html">
             
                 
                     <a href="../refguide/observer-component.html">
@@ -414,7 +414,7 @@
             <ul class="articles">
                 
     
-        <li class="chapter active" data-level="5.1" data-path="best/store.html">
+        <li class="chapter " data-level="5.1" data-path="best/store.html">
             
                 
                     <a href="../best/store.html">
@@ -670,272 +670,37 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/best/store.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="best-practices-for-building-large-scale-maintainable-projects">Best Practices for building large scale maintainable projects</h1>
-<p>This section contains some best practices we discovered at Mendix while working with Mobservable.
-This section is opiniated and you are in no way forced to apply this practices.
-There are many ways of working with Mobservable and React, and this is just one of them.</p>
-<h1 id="stores">Stores</h1>
-<p>Let&apos;s start with <em>stores</em>.
-In the next sections we will discuss <em>actions</em> and React <em>components</em> as well.
-Stores are can be found in any flux architecture and can be compared a bit with controllers in the MVC pattern.
-The main responsibility of stores is to move <em>logic</em> and <em>state</em> out of your components into a standalone testable unit that can be used in both frontend and backend javascript.</p>
-<h2 id="stores-for-the-user-interface-state">Stores for the user interface state</h2>
-<p>Most applications benefit from having at least two stores.
-One for the <em>ui state</em> and one or more for the <em>domain state</em>.
-The advantage of separating those two is you can reuse and test <em>domain state</em> universally, and you might very well reuse it in other applications.
-The <em>ui-state-store</em> however is often very specific for your application.
-But usually very simple as well.
-This store typically doesn&apos;t have much logic in it, but will store a plethorea of loosely coupled pieces of information about the ui.
-This is ideal as most applications will change the ui state often during the development process.</p>
-<p>Things you will typically find in ui stores:</p>
-<ul>
-<li>Session information</li>
-<li>Information about how far you applications has loaded</li>
-<li>Information that will not be stored in the backend</li>
-<li>Information that affects the UI globally<ul>
-<li>Window dimensions</li>
-<li>Accessibility information</li>
-<li>Current language</li>
-<li>Currently active theme</li>
-</ul>
-</li>
-<li>User interface state as soon as it effects multiple, further unrelated components:<ul>
-<li>Current selection</li>
-<li>Visibility of toolbars, etc..</li>
-<li>State of a wizard</li>
-<li>State of a global overlay</li>
-</ul>
-</li>
-</ul>
-<p>It might very well be that these pieces of information start as internal state of a specific component (for example the visibility of a toolbar).
-But after a while you discover that you need this information somewhere else in your application.
-Instead of pushing state in such a case upwards in the component tree, like you would do in plain react apps, you just move that state to the <em>ui-state-store</em>.</p>
-<p>Make sure this state is a singleton.
-For isomorphic applications you might also want to provide a stub implementation of this store with sane defaults so that all components render as expected.
-You might distribute the <em>ui-state-store</em> through your application by passing it as property through your component tree.
-You can also pass this store by using context or make it globally available as a module.
-For testing purposes, I recommend to just pass it through the component tree.</p>
-<p>Example of a store (using ES6 syntax):</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {extendObservable} <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;mobservable&apos;</span>;
-<span class="hljs-keyword">import</span> jquery <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;jquery&apos;</span>;
+                        <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/observer-component.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="-observer">@observer</h1>
+<p>The <code>observer</code> function / decorator can be used to turn ReactJS components into reactive components.
+It wraps the component&apos;s render function in <code>mobservable.autorun</code> to make sure that any data that is used during the rendering of a component forces a rerendering upon change.
+It is available through the separate <code>mobservable-react</code> package.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobservable-react&quot;</span>;
 
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UiState</span> </span>{
-    constructor() {
-        <span class="hljs-keyword">const</span> $<span class="hljs-built_in">window</span> = jquery(<span class="hljs-built_in">window</span>);
-        extendObservable(<span class="hljs-keyword">this</span>, {
-            <span class="hljs-comment">// make window dimensions available as observable information</span>
-            windowDimensions: <span class="hljs-keyword">this</span>.getWindowDimensions(),
+<span class="hljs-keyword">var</span> timerData = {
+    secondsPassed: <span class="hljs-number">0</span>
+};
 
-            <span class="hljs-comment">// active translation</span>
-            language: <span class="hljs-string">&quot;en_US&quot;</span>,
+setInterval(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    timerData.secondsPassed++;
+}, <span class="hljs-number">1000</span>);
 
-            <span class="hljs-comment">// info about pending requests, used for the component that shows the current sync state</span>
-            pendingRequestCount: <span class="hljs-number">0</span>,
-            appIsInSync: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-                <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.pendingRequestCount === <span class="hljs-number">0</span>
-            }
-        });
-
-        jquery.resize(() =&gt; {
-            <span class="hljs-keyword">this</span>.windowDimensions = getWindowDimensions();
-        });
+@observer <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Timer</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
+    render() {
+        <span class="hljs-keyword">return</span> (<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">span</span>&gt;</span>Seconds passed: { this.props.timerData.secondsPassed } <span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span> )</span>
     }
+});
 
-    getWindowDimensions() {
-        <span class="hljs-keyword">return</span> {
-            width: $(<span class="hljs-built_in">window</span>).width(),
-            height: $(<span class="hljs-built_in">window</span>).height()
-        };
-    }
-}
-
-singleton = <span class="hljs-keyword">new</span> UiState();
-<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> singleton;
+React.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">Timer</span> <span class="hljs-attribute">timerData</span>=<span class="hljs-value">{timerData}</span> /&gt;</span>, document.body);
+</span></code></pre>
+<p>In ES5 environments, reactive components can be simple declared using <code>observer(React.createClass({ ...</code>.</p>
+<p>When using <code>@observer</code>, a lot of components will become stateless.
+In such cases you can also write reactive function components using <code>@observer</code> (this works also on ES5 and with React 0.13):</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> Timer = @observer( ({timerData}) =&gt;
+    (<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">span</span>&gt;</span>Seconds passed: { timerData.secondsPassed } <span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span> )</span>
+);
 </code></pre>
-<h2 id="domain-stores">Domain Stores</h2>
-<p>Your application will contain one or multiple <em>domain</em> stores.
-These stores store the data your application is all about.
-Todo items, users, books, movies, orders, you name it.
-Your application will most probably have at least one domain store.</p>
-<p>A single domain store should be responsible for a single concept in your application.
-However a single concept might take the form of multiple subtypes and it often a (cyclic) tree structure.
-For example: one domain store for your products, and one for our orders and orderlines.
-As a rule of thumb: if the nature of the relationship between two items is containment, they should typically be in the same store.
-So a store just manages <em>domain objects</em>.</p>
-<p>These are the responsibility of a store:</p>
-<ul>
-<li>Instantiate domain objects. Make sure domain objects know the store they belong to.</li>
-<li>Make sure there is only one instance of each of your domain objects.
-The same user, order or todo should not be twice in your memory.
-This way you can safely use refences and also be sure you are looking at the latest instance, without ever having to resolve a references.
-This is fast, straight forward and convenient when debugging.</li>
-<li>Provide backend integration. Store data when needed.</li>
-<li>Update existing instances if updates are received from the backend.</li>
-<li>Provide a stand-alone, universal, testable component of your application.</li>
-<li>To make sure your store is testable and can be run server-side, you probably will move doing actual websocket / http requests to a separate object so that you can abstract over your communication layer.</li>
-<li>There should be only one instance of a store.</li>
-</ul>
-<h3 id="domain-objects">Domain objects</h3>
-<p>Each domain object should be expressed using its own class (or constructor function).
-It is recommended to store your data in <em>denormalized</em> form.
-There is no need to treat your client-side application state as some kind of database.
-Real references, cyclic data structures and instance methods are powerful concepts in javascript.
-Domain objects are allowed to refer directly to domain objects from other stores.
-Remember; we want to keep our actions and views as simple as possible and needing to manage references and doing garbage collection yourself might be a step backward.
-Unlike many flux architectures, with <code>mobservable</code> there is no need to denormalize your data, and this makes it a lot simpler to build the <em>essentially</em> complex parts of your application:
-Your business rules, actions and user interface.</p>
-<p>Domain objects can delegate all their logic to the store they belong to if that suits your application well.
-It is possible to express your domain objects as plain objects, but classes have some important advantages over plain objects:</p>
-<ul>
-<li>They can have methods.
-This makes your domain concepts easier to use stand-alone and reduces the amount of contextual awareness that is needed in your application.
-Just pass objects around.
-You don&apos;t have to pass stores around, or have to figure out which actions can be applied to an object if they are just available as instance methods.
-Especially in large applications this is important.</li>
-<li>They offer fine grained control over the visibility of attributes and methods.</li>
-<li>Objects created a using a constructor function can freely mix observable properties and functions, and non-observable properties and methods.</li>
-<li>They are easily recognizable and can strictly be type-checked.</li>
-</ul>
-<h3 id="example-domain-store">Example domain store</h3>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, autorun} <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;mobservable&apos;</span>;
-<span class="hljs-keyword">import</span> uuid <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;node-uuid&apos;</span>;
-
-<span class="hljs-keyword">export</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoStore</span> </span>{
-    @observable todos = [];
-    @observable isLoading = <span class="hljs-literal">true</span>;
-
-    constructor(transportLayer, authorStore) {
-        <span class="hljs-keyword">this</span>.authorStore = authorStore; <span class="hljs-comment">// Store that can resolve authors for us</span>
-        <span class="hljs-keyword">this</span>.transportLayer = transportLayer; <span class="hljs-comment">// Thing that can make server requests for us</span>
-        <span class="hljs-keyword">this</span>.transportLayer.onReceiveTodoUpdate(updatedTodo =&gt; <span class="hljs-keyword">this</span>.updateTodoFromServer(updatedTodo));
-        <span class="hljs-keyword">this</span>.loadTodos();
-    }
-
-    <span class="hljs-comment">/**
-     * Fetches all todo&apos;s from the server
-     */</span>
-    loadTodos() {
-        <span class="hljs-keyword">this</span>.isLoading = <span class="hljs-literal">true</span>;
-        <span class="hljs-keyword">this</span>.transportLayer.fetchTodos().then(fetchedTodos =&gt; {
-            todos.forEach(json =&gt; <span class="hljs-keyword">this</span>.updateTodoFromServer(json));
-            <span class="hljs-keyword">this</span>.isLoading = <span class="hljs-literal">false</span>;
-        });
-    }
-
-    <span class="hljs-comment">/**
-     * Update a todo with information from the server. Guarantees a todo
-     * only exists once. Might either construct a new todo, update an existing one,
-     * or remove an todo if it has been deleted on the server.
-     */</span>
-    updateTodoFromServer(json) {
-        <span class="hljs-keyword">var</span> todo = <span class="hljs-keyword">this</span>.todos.find(todo =&gt; todo.id === json.id);
-        <span class="hljs-keyword">if</span> (!todo) {
-            todo = <span class="hljs-keyword">new</span> Todo(<span class="hljs-keyword">this</span>, json.id);
-            <span class="hljs-keyword">this</span>.todos.push(todo);
-        }
-        <span class="hljs-keyword">if</span> (json.isDeleted) {
-            <span class="hljs-keyword">this</span>.removeTodo(todo);
-        } <span class="hljs-keyword">else</span> {
-            todo.updateFromJson(json);
-        }
-    }
-
-    <span class="hljs-comment">/**
-     * Creates a fresh todo on the client and server
-     */</span>
-    createTodo() {
-        <span class="hljs-keyword">var</span> todo = <span class="hljs-keyword">new</span> Todo(<span class="hljs-keyword">this</span>);
-        <span class="hljs-keyword">this</span>.todos.push(todo);
-        <span class="hljs-keyword">return</span> todo;
-    }
-
-    <span class="hljs-comment">/**
-     * A todo was somehow deleted, clean it from the client memory
-     */</span>
-    removeTodo(todo) {
-        <span class="hljs-keyword">this</span>.todos.splice(<span class="hljs-keyword">this</span>.todos.indexOf(todo), <span class="hljs-number">1</span>);
-        todo.dispose();
-    }
-}
-
-<span class="hljs-keyword">export</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span> </span>{
-
-    <span class="hljs-comment">/**
-     * unique id of this todo, immutable.
-     */</span>
-    id = <span class="hljs-literal">null</span>;
-
-    @observable completed = <span class="hljs-literal">false</span>;
-    @observable task = <span class="hljs-string">&quot;&quot;</span>;
-
-    <span class="hljs-comment">/**
-     * reference to an Author object (from the authorStore)
-     */</span>
-    @observable author = <span class="hljs-literal">null</span>;
-
-    store = <span class="hljs-literal">null</span>;
-
-    <span class="hljs-comment">/**
-     * Indicates whether changes in this object
-     * should be submitted to the server
-     */</span>
-    autoSave = <span class="hljs-literal">true</span>;
-
-    <span class="hljs-comment">/**
-     * Disposer for the side effect that automatically
-     * stores this Todo, see @dispose.
-     */</span>
-    saveHandler = <span class="hljs-literal">null</span>;
-
-    constructor(store, id=uuid.v4()) {
-        <span class="hljs-keyword">this</span>.store = store;
-        <span class="hljs-keyword">this</span>.id = id;
-
-        <span class="hljs-keyword">this</span>.saveHandler = autorun(() =&gt; {
-            <span class="hljs-comment">// observe everything that is used in the JSON:</span>
-            <span class="hljs-keyword">var</span> json = <span class="hljs-keyword">this</span>.toJson();
-            <span class="hljs-comment">// if autoSave is on, send json to server</span>
-            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.autoSave) {
-                <span class="hljs-keyword">this</span>.store.transportLayer.saveTodo(todoJson);
-            }
-        });
-    }
-
-    <span class="hljs-comment">/**
-     * Remove this todo from the client and server
-     */</span>
-    <span class="hljs-keyword">delete</span>() {
-        <span class="hljs-keyword">this</span>.store.transportLayer.deleteTodo(<span class="hljs-keyword">this</span>.id);
-        <span class="hljs-keyword">this</span>.store.removeTodo(<span class="hljs-keyword">this</span>);
-    }
-
-    toJson() {
-        <span class="hljs-keyword">return</span> {
-            id: <span class="hljs-keyword">this</span>.id,
-            completed: <span class="hljs-keyword">this</span>.completed,
-            task: <span class="hljs-keyword">this</span>.task,
-            authorId: <span class="hljs-keyword">this</span>.author ? <span class="hljs-keyword">this</span>.author.id : <span class="hljs-literal">null</span>
-        };
-    }
-
-    <span class="hljs-comment">/**
-     * Update this todo with information from the server
-     */</span>
-    updateFromJson(json) {
-        <span class="hljs-comment">// make sure our changes aren&apos;t send back to the server</span>
-        <span class="hljs-keyword">this</span>.autoSave = <span class="hljs-literal">false</span>;
-        todo.completed = json.completed;
-        todo.task = json.task;
-        <span class="hljs-keyword">this</span>.author = <span class="hljs-keyword">this</span>.store.authorStore.resolveAuthor(json.authorId);
-        <span class="hljs-keyword">this</span>.autoSave = <span class="hljs-literal">true</span>;
-    }
-
-    dispose() {
-        <span class="hljs-comment">// clean up the observer</span>
-        <span class="hljs-keyword">this</span>.saveHandler();
-    }
-}
-</code></pre>
+<p><em>Note: when <code>observer</code> needs to be combined with other decorators or higher-order-components, make sure that <code>observer</code> is the most inner (first applied) decorator;
+otherwise it might do nothing at all.</em></p>
 
                     
                     </section>
@@ -946,10 +711,10 @@ Especially in large applications this is important.</li>
         </div>
 
         
-        <a href="../refguide/extras.html" class="navigation navigation-prev " aria-label="Previous page: debug utilities"><i class="fa fa-angle-left"></i></a>
+        <a href="../refguide/observable-decorator.html" class="navigation navigation-prev " aria-label="Previous page: @observable"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../best/actions.html" class="navigation navigation-next " aria-label="Next page: Writing (async) actions"><i class="fa fa-angle-right"></i></a>
+        <a href="../refguide/is-observable.html" class="navigation navigation-next " aria-label="Next page: isObservable"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

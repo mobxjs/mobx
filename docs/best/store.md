@@ -136,7 +136,7 @@ Especially in large applications this is important.
 ### Example domain store
 
 ```javascript
-import {observable, observe} from 'mobservable';
+import {observable, autorun} from 'mobservable';
 import uuid from 'node-uuid';
 
 export class TodoStore {
@@ -230,7 +230,7 @@ export class Todo {
         this.store = store;
         this.id = id;
 
-        this.saveHandler = observe(() => {
+        this.saveHandler = autorun(() => {
             // observe everything that is used in the JSON:
             var json = this.toJson();
             // if autoSave is on, send json to server

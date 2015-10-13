@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>Reactive Components | Introduction</title>
+        <title>Reactive React Components | Introduction</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.2.0">
@@ -29,7 +29,7 @@
         
     
     
-    <link rel="next" href="../refguide/make-reactive.html" />
+    <link rel="next" href="../refguide/observable.html" />
     
     
     <link rel="prev" href="../core/reactive-views.html" />
@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="2.3" data-basepath=".." data-revision="Thu Oct 01 2015 21:51:50 GMT+0200 (CEST)">
+    <div class="book" data-level="2.3" data-basepath=".." data-revision="Tue Oct 13 2015 07:44:13 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -136,16 +136,16 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="2.1" data-path="core/reactive-state.html">
+        <li class="chapter " data-level="2.1" data-path="core/observable-state.html">
             
                 
-                    <a href="../core/reactive-state.html">
+                    <a href="../core/observable-state.html">
                 
                         <i class="fa fa-check"></i>
                         
                             <b>2.1.</b>
                         
-                        Reactive Data Structures
+                        Observable Data Structures
                     </a>
             
             
@@ -175,7 +175,7 @@
                         
                             <b>2.3.</b>
                         
-                        Reactive Components
+                        Reactive React Components
                     </a>
             
             
@@ -194,40 +194,40 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="3.1" data-path="refguide/make-reactive.html">
+        <li class="chapter " data-level="3.1" data-path="refguide/observable.html">
             
                 
-                    <a href="../refguide/make-reactive.html">
+                    <a href="../refguide/observable.html">
                 
                         <i class="fa fa-check"></i>
                         
                             <b>3.1.</b>
                         
-                        makeReactive
+                        observable
                     </a>
             
             
         </li>
     
-        <li class="chapter " data-level="3.2" data-path="refguide/observe.html">
+        <li class="chapter " data-level="3.2" data-path="refguide/autorun.html">
             
                 
-                    <a href="../refguide/observe.html">
+                    <a href="../refguide/autorun.html">
                 
                         <i class="fa fa-check"></i>
                         
                             <b>3.2.</b>
                         
-                        observe
+                        autorun
                     </a>
             
             
         </li>
     
-        <li class="chapter " data-level="3.3" data-path="refguide/observable.html">
+        <li class="chapter " data-level="3.3" data-path="refguide/observable-decorator.html">
             
                 
-                    <a href="../refguide/observable.html">
+                    <a href="../refguide/observable-decorator.html">
                 
                         <i class="fa fa-check"></i>
                         
@@ -239,16 +239,16 @@
             
         </li>
     
-        <li class="chapter " data-level="3.4" data-path="refguide/reactive-component.html">
+        <li class="chapter " data-level="3.4" data-path="refguide/observer-component.html">
             
                 
-                    <a href="../refguide/reactive-component.html">
+                    <a href="../refguide/observer-component.html">
                 
                         <i class="fa fa-check"></i>
                         
                             <b>3.4.</b>
                         
-                        @reactiveComponent
+                        @observer
                     </a>
             
             
@@ -267,31 +267,31 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="4.1" data-path="refguide/is-reactive.html">
+        <li class="chapter " data-level="4.1" data-path="refguide/is-observable.html">
             
                 
-                    <a href="../refguide/is-reactive.html">
+                    <a href="../refguide/is-observable.html">
                 
                         <i class="fa fa-check"></i>
                         
                             <b>4.1.</b>
                         
-                        isReactive
+                        isObservable
                     </a>
             
             
         </li>
     
-        <li class="chapter " data-level="4.2" data-path="refguide/extend-reactive.html">
+        <li class="chapter " data-level="4.2" data-path="refguide/extend-observable.html">
             
                 
-                    <a href="../refguide/extend-reactive.html">
+                    <a href="../refguide/extend-observable.html">
                 
                         <i class="fa fa-check"></i>
                         
                             <b>4.2.</b>
                         
-                        extendReactive
+                        extendObservable
                     </a>
             
             
@@ -319,31 +319,31 @@
             
         </li>
     
-        <li class="chapter " data-level="4.5" data-path="refguide/observe-async.html">
+        <li class="chapter " data-level="4.5" data-path="refguide/autorun-async.html">
             
                 
-                    <a href="../refguide/observe-async.html">
+                    <a href="../refguide/autorun-async.html">
                 
                         <i class="fa fa-check"></i>
                         
                             <b>4.5.</b>
                         
-                        observeAsync
+                        autorunAsync
                     </a>
             
             
         </li>
     
-        <li class="chapter " data-level="4.6" data-path="refguide/observe-until.html">
+        <li class="chapter " data-level="4.6" data-path="refguide/autorun-until.html">
             
                 
-                    <a href="../refguide/observe-until.html">
+                    <a href="../refguide/autorun-until.html">
                 
                         <i class="fa fa-check"></i>
                         
                             <b>4.6.</b>
                         
-                        observeUntil
+                        autorunUntil
                     </a>
             
             
@@ -366,15 +366,7 @@
     
         <li class="chapter " data-level="4.8" data-path="refguide/strict.html">
             
-                
-                    <a href="../refguide/strict.html">
-                
-                        <i class="fa fa-check"></i>
-                        
-                            <b>4.8.</b>
-                        
-                        strict
-                    </a>
+            <span><b>4.8.</b> strict</span>
             
             
         </li>
@@ -533,14 +525,7 @@
     
         <li class="chapter " data-level="7.4" >
             
-            <span><b>7.4.</b> Predicates</span>
-            
-            
-        </li>
-    
-        <li class="chapter " data-level="7.5" >
-            
-            <span><b>7.5.</b> Performance considerations</span>
+            <span><b>7.4.</b> Performance considerations</span>
             
             
         </li>
@@ -689,13 +674,13 @@
 <p>What if the <code>render</code> function of a <a href="https://facebook.github.io/react" target="_blank">React</a> component was just a reactive view to update the DOM?
 Then we would have a system that keeps the user interface actively in sync with the state, without ever <a href="https://facebook.github.io/react/docs/perf.html#perf.printwastedmeasurements" target="_blank">wasting</a> a rendering.
 And without explicitly declaring dependencies.</p>
-<p>That is exactly what the <code>reactiveComponent</code> function (and decorator) from the <code>mobservable-react</code> package does.
+<p>That is exactly what the <code>observer</code> function (and decorator) from the <code>mobservable-react</code> package does.
 Given a react component class, it turns the <code>render</code> function into an observer while respecting the life-cycle system of React.
 Let&apos;s rebuild our lolcatz user interface by using some reactive React components:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> reactiveComponent = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;mobservable-react&apos;</span>).reactiveComponent;
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> observer = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;mobservable-react&apos;</span>).observer;
 <span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;react&apos;</span>);
 
-<span class="hljs-keyword">var</span> LolCatzOverview = reactiveComponent(React.createClass({
+<span class="hljs-keyword">var</span> LolCatzOverview = observer(React.createClass({
     render: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
         <span class="hljs-keyword">var</span> lolCatz = <span class="hljs-keyword">this</span>.props.lolCatz;
         <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>
@@ -714,7 +699,7 @@ Let&apos;s rebuild our lolcatz user interface by using some reactive React compo
     }
 }));
 
-<span class="hljs-keyword">var</span> LolCat = reactiveComponent(React.createClass({
+<span class="hljs-keyword">var</span> LolCat = observer(React.createClass({
     render: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
         <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">img</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">{</span> <span class="hljs-attribute">this.props.cat.url</span> } /&gt;</span>;</span>
     }
@@ -726,24 +711,24 @@ React.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-titl
 These components have some interesting characteristics:</p>
 <ul>
 <li>Usually reactive components have <em>no state</em>. But you are still free to use state.</li>
-<li><code>reactiveComponent</code> doesn&apos;t require you to define which data you want to use, yet it offers more fine grained subscriptions compared to many higher order components as found in other frameworks.</li>
+<li><code>observer</code> doesn&apos;t require you to define which data you want to use, yet it offers more fine grained subscriptions compared to many higher order components as found in other frameworks.</li>
 <li>Reactive components only subscribe to the data structures that where actively used during the last render.
 This means that you cannot under-subscribe or over-subscribe.
 You can even use data in your rendering that will only be available at later moment in time.
 This is ideal for asynchronously loading data.  </li>
-<li>The <code>render</code> method will react to any reactive data structures, regardless whether data is passed in as <code>props</code> (recommended), is part of the <code>state</code>, is in instance properties or is accessed through the closure of the component.</li>
+<li>The <code>render</code> method will react to any observable data structures, regardless whether data is passed in as <code>props</code> (recommended), is part of the <code>state</code>, is in instance properties or is accessed through the closure of the component.</li>
 <li>Reactive components implement <code>shouldComponentUpdate</code> so that children are not re-rendered unnecessary.</li>
 <li>Reactive components sideways load data; parent components won&apos;t re-render even when child components will.</li>
-<li><code>reactiveComponent</code> does not depend on React&apos;s <em>context</em> system which has its own quirks.</li>
+<li><code>observer</code> does not depend on React&apos;s <em>context</em> system which has its own quirks.</li>
 </ul>
 <h2 id="es6">ES6</h2>
 <p>For ES6 users, components can also be declared using classes:</p>
-<pre><code class="lang-javascript">@reactiveComponent <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyComponent</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
+<pre><code class="lang-javascript">@observer <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyComponent</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
   <span class="hljs-comment">/* .. */</span>
 }
 </code></pre>
 <h2 id="summary">Summary</h2>
-<p>Use <code>reactiveComponent</code> to turn React components into reactive components.
+<p>Use <code>observer</code> to turn React components into reactive components.
 You can play with the above example and the examples from the previous paragraph in this <a href="http://jsbin.com/zayere/edit?js,console,output" target="_blank">JSBin</a>.
 This concludes the introduction to the core concepts of Mobservable.
 Just try it out!
@@ -763,7 +748,7 @@ It shows exactly when your components are rerendered and you can inspect the dat
         <a href="../core/reactive-views.html" class="navigation navigation-prev " aria-label="Previous page: Reactive Views"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../refguide/make-reactive.html" class="navigation navigation-next " aria-label="Next page: makeReactive"><i class="fa fa-angle-right"></i></a>
+        <a href="../refguide/observable.html" class="navigation navigation-next " aria-label="Next page: observable"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

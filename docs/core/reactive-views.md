@@ -49,19 +49,17 @@ lolCatzHtml.observe(function(rendering) {
 });
 ```
 
-In practice you hardly will use 'value.observe' since there is a more powerful alternative: `mobservable.observe`.
+In practice you hardly will use 'value.observe' since there is a more powerful alternative: `mobservable.autorun`.
 
-## Creating observers `mobservable.observe`
+## Creating observers using `mobservable.autorun`
 
-Observers are functions that react to changes in other observable data structures and views.
-Actually observers are a special kind of views.
-They work just like views, except that they evualate eagerly and do not produce values.
-Observers can be used to achieve effects; things that need to happen regardless whether some else is observing the observer.
+Similary to `observable`, `autorun` can be used to create functions that update automatically.
+The difference is that views created by `autorun` will evaluate eagerly (and do not produce values).
+Autorun can be used to achieve effects; things that need to happen any time that the observed data changes.
 These effects are typical stuff that needs to be done imperatively; sending requests to the server, logging output, updating the UI.
-In a well designed app you will hardly need them.
+In a well designed app you will hardly need `autorun`.
 
-The big difference between using `value.observe` and `mobservable.observe` is that observers created using the latter method can observe many values at the same time.
-So we can rewrite the above observer to as:
+Using `autorun`, we can rewrite the above observer to as:
 
 ```javascript
 mobservable.observe(function() {
@@ -75,4 +73,4 @@ Surely, dumping a bunch of HTML into the DOM isn't a very scalable architecture.
 Frameworks like React are way smarter in manipulating the DOM.
 Can we add those to the mix...?
 
-(N.B. both `.observe` returns a function that, if invoked, cancels the effect from being called in the future).
+(N.B. both `.observe` and `autorun` return a function that, if invoked, will stop executing the observer function in the future).

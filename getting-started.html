@@ -286,7 +286,7 @@ Let's alter the constructor function just enough to achieve that:</p>
 <textarea spellcheck="false" class="prettyprint" id="code3" rows="8">
 function ObservableTodoStore() {
     this.todos = mobservable.observable([]);
-    mobservable.observe(function() {
+    mobservable.autorun(function() {
         console.log(this.report());
     }, this);
 }
@@ -303,7 +303,7 @@ var observableTodoStore = new ObservableTodoStore();
 <center style="margin-top:-20px"><small>(This store is editable, use the 'run' button on the next listing to test it)</small></center>
 
 <p>We just changed two things. First, we defined <code>todos</code> as an observable array.
-Next, we created a function that <code>observe</code>s the <code>report</code> and prints it whenever it has changes.
+Next, we created a function that <code>autorun</code>s the <code>report</code> and prints it whenever it has changes.
 That's too simple to be true right? Let's try altering the data again,
 but this time without explicitly logging the <code>report</code>:</p>
 

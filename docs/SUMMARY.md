@@ -7,10 +7,10 @@
 * The Basics: Making stuff Reactive
   * [Observable Data Structures](core/observable-state.md)
   * [Reactive Views](core/reactive-views.md)
-  * [Observing Components](core/reactive-component.md)
+  * [Reactive React Components](core/reactive-component.md)
 * Core API
   * [observable](refguide/observable.md)
-  * [observe](refguide/observe.md)
+  * [autorun](refguide/autorun.md)
   * [@observable](refguide/observable-decorator.md)
   * [@observer](refguide/observer-component.md)
 * Advanced API
@@ -18,8 +18,8 @@
   * [extendObservable](refguide/extend-observable.md)
   * [modifiers](refguide/modifiers.md)
   * [transactions](refguide/transactions.md)
-  * [observeAsync](refguide/observe-async.md)
-  * [observeUntil](refguide/observe-until.md)
+  * [autorunAsync](refguide/autorun-async.md)
+  * [autorunUntil](refguide/autorun-until.md)
   * [expr](refguide/expr.md)
   * [strict](refguide/strict.md)
   * [toJSON](refguide/tojson.md)

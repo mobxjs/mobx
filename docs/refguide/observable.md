@@ -1,4 +1,4 @@
-# observable(value, scope?, name?)
+# observable
 
 `observable` is to Mobservable as `$` is to jQuery.
 Making data observable starts with this function.

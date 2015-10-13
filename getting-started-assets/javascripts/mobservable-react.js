@@ -1,1 +1,200 @@
-!function(e,t){"object"==typeof exports&&"object"==typeof module?module.exports=t(require("mobservable"),require("react")):"function"==typeof define&&define.amd?define(["mobservable","react"],t):"object"==typeof exports?exports.mobservableReact=t(require("mobservable"),require("react")):e.mobservableReact=t(e.mobservable,e.react)}(this,function(e,t){return function(e){function t(o){if(n[o])return n[o].exports;var r=n[o]={exports:{},id:o,loaded:!1};return e[o].call(r.exports,r,r.exports,t),r.loaded=!0,r.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){var o,r,i;!function(){function s(e,t){function n(e){var n=t.findDOMNode(e);c.set(n,e),u.emit({event:"render",renderTime:e.__renderEnd-e.__renderStart,totalTime:Date.now()-e.__renderStart,component:e,node:n})}function o(e,t){var n=e[t],o=d[t];e[t]=function(){n&&n.apply(this,arguments),o.apply(this,arguments)}}function r(e){if(!e)throw new Error("Please pass a valid component to 'reactiveComponent'");var t=e.prototype||e;return["componentWillMount","componentWillUnmount","componentDidMount","componentDidUpdate"].forEach(function(e){o(t,e)}),t.shouldComponentUpdate||(t.shouldComponentUpdate=d.shouldComponentUpdate),e}function i(){if("undefined"==typeof WeakMap)throw new Error("tracking components is not supported in this browser");a||(a=!0)}var s=1,a=!1,p=e.observeUntilInvalid,c="undefined"!=typeof WeakMap?new WeakMap:void 0,u=new e._.SimpleEventEmitter,d={componentWillMount:function(){var e=(this.displayName||this.constructor.name||"ReactiveComponent")+s++,t=this.render;this.render=function(){var n=this;a&&(this.__renderStart=Date.now()),this.__watchDisposer&&this.__watchDisposer();var o=p(function(){return t.call(n)},function(){n.forceUpdate()},{object:this,name:e});return this.__watchDisposer=o[1],this.$mobservable=o[2],a&&(this.__renderEnd=Date.now()),o[0]}},componentWillUnmount:function(){if(this.__watchDisposer&&this.__watchDisposer(),delete this.$mobservable,a){var e=t.findDOMNode(this);e&&(c.delete(e),u.emit({event:"destroy",component:this,node:e}))}},componentDidMount:function(){a&&n(this)},componentDidUpdate:function(){a&&n(this)},shouldComponentUpdate:function(e,t){if(this.state!==t)return!0;var n,o=Object.keys(this.props);if(o.length!==Object.keys(e).length)return!0;for(var r=o.length-1;n=o[r];r--)if(e[n]!==this.props[n])return!0;return!1}};return{reactiveComponent:r,renderReporter:u,componentByNodeRegistery:c,trackComponents:i}}r=[n(1),n(2)],o=s,i="function"==typeof o?o.apply(t,r):o,!(void 0!==i&&(e.exports=i))}()},function(t,n){t.exports=e},function(e,n){e.exports=t}])});
+(function() {
+    function mrFactory(mobservable, React) {
+        if (!mobservable)
+            throw new Error("mobservable-react requires the Mobservable package.")
+        if (!React)
+            throw new Error("mobservable-react requires React to be available, or mobservable-react/native requires ReactNative to be available");
+
+        var isTracking = false;
+
+        // WeakMap<Node, Object>;
+        var componentByNodeRegistery = typeof WeakMap !== "undefined" ? new WeakMap() : undefined;
+        var renderReporter = new mobservable.extras.SimpleEventEmitter();
+
+        function reportRendering(component) {
+            // TODO: Fix in 0.14: React.findDOMNode is deprecated. Please use ReactDOM.findDOMNode from require('react-dom') instead.
+            var node = React.findDOMNode(component);
+            if (node)
+                componentByNodeRegistery.set(node, component);
+
+            renderReporter.emit({
+                event: 'render',
+                renderTime: component.__$mobRenderEnd - component.__$mobRenderStart,
+                totalTime: Date.now() - component.__$mobRenderStart,
+                component: component,
+                node: node
+            });
+        }
+
+        var reactiveMixin = {
+            componentWillMount: function() {
+                var baseRender = this.render;
+                this.__$mobDependencies = [];
+
+                this.render = function() {
+                    if (isTracking)
+                        this.__$mobRenderStart = Date.now();
+
+                    // invoke the old render function and in the mean time track all dependencies using
+                    // 'autorun'.
+                    // when the dependencies change, the function is triggered, but we don't want to 
+                    // rerender because that would ignore the normal React lifecycle, 
+                    // so instead we dispose the current observer and trigger a force update.
+                    var hasRendered = false;
+                    var self = this;
+                    var rendering;
+                    this.__$mobDisposer = mobservable.autorun(function reactiveRender() {
+                        if (!hasRendered) {
+                            hasRendered = true;
+                            mobservable.extras.withStrict(true, function() {
+                                rendering = baseRender.call(self);
+                            });
+                        } else {
+                            self.__$mobDisposer();
+                            React.Component.prototype.forceUpdate.call(self);
+                        }
+                    });
+
+                    // make sure views are not disposed between the clean-up of the observer and the next render
+                    // (invoked through force update)
+                    this.$mobservable = this.__$mobDisposer.$mobservable;
+                    var newDependencies = this.$mobservable.observing.map(function(dep) {
+                        dep.setRefCount(+1);
+                        return dep;
+                    });
+                    this.__$mobDependencies.forEach(function(dep) {
+                        dep.setRefCount(-1);
+                    });
+                    this.__$mobDependencies = newDependencies;
+                    
+                    if (isTracking)
+                        this.__$mobRenderEnd = Date.now();
+                    return rendering;
+                }
+            },
+
+            componentWillUnmount: function() {
+                this.__$mobDisposer && this.__$mobDisposer();
+                this.__$mobDependencies.forEach(function(dep) {
+                    dep.setRefCount(-1);
+                });
+                delete this.$mobservable;
+                if (isTracking) {
+                    // TODO: Fix in 0.14: React.findDOMNode is deprecated. Please use ReactDOM.findDOMNode from require('react-dom') instead.
+                    var node = React.findDOMNode(this);
+                    if (node) {
+                        componentByNodeRegistery.delete(node);
+                        renderReporter.emit({
+                            event: 'destroy',
+                            component: this,
+                            node: node
+                        });
+                    }
+                }
+            },
+
+            componentDidMount: function() {
+                if (isTracking)
+                    reportRendering(this);
+            },
+
+            componentDidUpdate: function() {
+                if (isTracking)
+                    reportRendering(this);
+            },
+
+            shouldComponentUpdate: function(nextProps, nextState) {
+                // update on any state changes (as is the default)
+                if (this.state !== nextState)
+                    return true;
+                // update if props are shallowly not equal, inspired by PureRenderMixin
+                var keys = Object.keys(this.props);
+                var key;
+                if (keys.length !== Object.keys(nextProps).length)
+                    return true;
+                for(var i = keys.length -1; i >= 0, key = keys[i]; i--) {
+                    var newValue = nextProps[key];
+                    if (newValue !== this.props[key]) {
+                        return true;
+                    } else if (newValue && typeof newValue === "object" && !mobservable.isObservable(newValue)) {
+                        /**
+                         * If the newValue is still the same object, but that object is not observable,
+                         * fallback to the default React behavior: update, because the object *might* have changed.
+                         * If you need the non default behavior, just use the React pure render mixin, as that one 
+                         * will work fine with mobservable as well, instead of the default implementation of 
+                         * observer.
+                         */
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        function patch(target, funcName) {
+            var base = target[funcName];
+            var mixinFunc = reactiveMixin[funcName];
+            target[funcName] = function() {
+                base && base.apply(this, arguments);
+                mixinFunc.apply(this, arguments);
+            }
+        }
+
+        function observer(componentClass) {
+            // If it is function but doesn't seem to be a react class constructor,
+            // wrap it to a react class automatically
+            if (typeof componentClass === "function" && !componentClass.prototype.render && !componentClass.isReactClass && !React.Component.isPrototypeOf(componentClass)) {
+                return observer(React.createClass({
+                    displayName: componentClass.name,
+                    render: function() {
+                        return componentClass.call(this, this.props);
+                    }
+                }));
+            }
+            
+            if (!componentClass)
+                throw new Error("Please pass a valid component to 'observer'");
+            var target = componentClass.prototype || componentClass;
+
+            [
+                "componentWillMount",
+                "componentWillUnmount",
+                "componentDidMount",
+                "componentDidUpdate"
+            ].forEach(function(funcName) {
+                patch(target, funcName)
+            });
+
+            if (!target.shouldComponentUpdate)
+                target.shouldComponentUpdate = reactiveMixin.shouldComponentUpdate;
+            return componentClass;
+        }
+
+        function trackComponents() {
+            if (typeof WeakMap === "undefined")
+                throw new Error("tracking components is not supported in this browser");
+            if (!isTracking)
+                isTracking = true;
+        }
+
+        return ({
+            observer: observer,
+            reactiveComponent: function() {
+                console.warn("[mobservable-react] `reactiveComponent` has been renamed to `observer` and will be removed in 1.1.");
+                return observer.apply(null, arguments);                
+            },
+            renderReporter: renderReporter,
+            componentByNodeRegistery: componentByNodeRegistery,
+            trackComponents: trackComponents
+        });
+    }
+
+    // UMD
+    if (typeof define === 'function' && define.amd) {
+        define('mobservable-react', ['mobservable', 'react'/* or native */], mrFactory);
+    } else if (typeof exports === 'object') {
+        module.exports = mrFactory(require('mobservable'), require('react'/* or native */));
+    } else {
+        this.mobservableReact = mrFactory(this['mobservable'], this['ReactNative'] || this['React']);
+    }
+})();
