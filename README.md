@@ -2,19 +2,23 @@
 
 <img src="https://mweststrate.github.io/mobservable/images/mobservable.png" align="right" width="120px" />
 
-##### _Makes data observable. And functions reactive. Whut? Like Excel._
+##### _Observable data. Reactive functions. Simple code._
 
 [![Build Status](https://travis-ci.org/mweststrate/mobservable.svg?branch=master)](https://travis-ci.org/mweststrate/mobservable)
 [![Coverage Status](https://coveralls.io/repos/mweststrate/mobservable/badge.svg?branch=master&service=github)](https://coveralls.io/github/mweststrate/mobservable?branch=master)
 [![mobservable channel on slack](https://img.shields.io/badge/slack-mobservable-blue.svg)](https://reactiflux.slack.com/messages/mobservable/)
 
 <br/>
-New to Mobservable? Take the [five minute, interactive introduction](https://mweststrate.github.io/mobservable/getting-started.html)
+* New to Mobservable? Take the [five minute, interactive introduction](https://mweststrate.github.io/mobservable/getting-started.html)
+* [Official documentation](https://mweststrate.github.io/mobservable/)
 
 ## Introduction
 
 Mobservable enables your data structures to become observable.
-Next to that it can make your functions (or [React components](https://github.com/mweststrate/mobservable-react)) reactive, so that they re-evaluate whenever relevant data is altered. This has major benefits for the simplicity, maintainability and performance of your code. This is the promise of Mobservable:
+Next to that it can make your functions (or [React components](https://github.com/mweststrate/mobservable-react)) reactive, so that they re-evaluate whenever relevant data is altered. 
+It's like Excel for JavaScript: any data structure can be turned into a 'data cell', any function into a 'formula' that updates automatically.
+
+This has major benefits for the simplicity, maintainability and performance of your code:
 * Write complex applications which unmatched simple code.
 * Enable unopiniated state management: be free to use mutable objects, cyclic references, classes and real references to store state.
 * Write declarative views that track their own dependencies. No subscriptions, cursors or other redundant declarations to manage.
@@ -44,36 +48,23 @@ var Timer = mobservable.observer(React.createClass({
 React.render(<Timer timerData={timerData} />, document.body);
 ```
 
-So what will this app do? It does nothing! The timer increases every second, but the will UI never update. To fix that, we should force the UI to refresh somehow upon each interval.
-But that is the kind of dependency we should avoid in our code. We shouldn't have to _pull_ data from our state to update the UI. Instead, the data structures should be in control and call the UI when it needs an update. The state should be _pushed_ throughout our application. This is called inversion of control.
+Without Mobservable, this app would do nothing beyond the initial render.
+The timer would increase every second, but the would UI never update. 
+To fix that, your code should trigger the UI to update each time the `timerData` changes.
+But there is a better way.
+We shouldn't have to _pull_ data from our state to update the UI.
+Instead, the data structures should be in control and call the UI whenever it becomes stale.
+The state should be _pushed_ throughout our application. 
 
-We can apply two simple functions of Mobservable to achieve this.
+In the example above this is achieved by making the `timerDate` observable and by turning the `Timer` component into an `observer`.
+Mobservable will automatically track all relations between _observable data_ and _observing functions (or components)_ so that the minum amount of observers is updated to keep all observers fresh. 
 
-### mobservable.observable
 
-The first function is `observable`. It is the swiss knife of mobservable and  turns any data structure and function into its reactive counterpart. Objects, arrays, functions; they can all be made reactive. Reactiveness is contagious; new data that is put in reactive data will become reactive as well. To make our timer reactive, just change the first three lines of the code:
-
-```javascript
-var timerData = mobservable.observable({
-  secondsPassed: 0
-});
-```
-
-### mobservableReact.observer
-
-The second important function is `observer` from the `mobservable-react` package. It turns a Reactjs component into a reactive one, that responds automatically to changes in data that is used by its render method. It can be used to wrap any react component, either created by using ES6 classes or `createClass`. So to fix the example, just update the timer definition to:
-
-```javascript
-var Timer = mobservableReact.observer(React.createClass{
-  /** Omitted */
-}));
-```
-
-Its as simple as that. The `Timer` will now automatically update each time `timerData.secondsPassed` is altered.
-The actual interesting thing about these changes are the things that are *not* in the code:
+Its as simple as that. In the example above the `Timer` will automatically update each time the property `timerData.secondsPassed` is altered.
+The actual interesting thing about this approach are the things that are *not* in the code:
 
 * The `setInterval` method didn't alter. It still treats `timerData` as a plain JS object.
-* There is no state. Timer is still a dumb component.
+* There is no state. Timer is a dumb component.
 * There is no magic context being passed through components.
 * There are no subscriptions of any kind that need to be managed.
 * There is no higher order component that needs configuration; no scopes, lenses or cursors.
@@ -86,15 +77,8 @@ It does not only work for plain objects, but also for arrays, functions, classes
 ## Getting started
 
 * `npm install mobservable --save`.
-* For React apps `npm install mobservable-react --save` as well. You might also be interested in the [dev tools for React and Mobservable](https://github.com/mweststrate/mobservable-react-devtools).
-
+* For (Native) React apps `npm install mobservable-react --save` as well. You might also be interested in the [dev tools for React and Mobservable](https://github.com/mweststrate/mobservable-react-devtools).
 * [Five minute interactive introducton to Mobservable and React](https://mweststrate.github.io/mobservable/getting-started.html)
-
-## Resources
-
-* [API documentation](https://mweststrate.github.io/mobservable/)
-* [ES5, ES6, TypeScript syntax examples](https://github.com/mweststrate/mobservable/blob/master/docs/api.md)
-* [TypeScript Typings](https://github.com/mweststrate/mobservable/blob/master/dist/mobservable.d.ts), also available through `tsd install mobservable --save`.
 
 ## Examples
 
@@ -119,19 +103,14 @@ For the full api, see the [API documentation](https://mweststrate.github.io/mobs
 This is an overview of most important functions available in the `mobservable` namespace:
 
 **observable(value, options?)**
-Turns a value into a reactive array, object, function, value or a reactive reference to a value.
+The `observable` function is the swiss knife of mobservable and enriches any data structure or function with observable capabilities. 
+
+**autorun(function)**
+Turns a function into an observer so that it will automatically be re-evaluated if any data values it uses changes.
 
 **observer(reactJsComponent)**
-Provided by the `mobservable-react` packaege, turns a ReactJS component into a reactive one, that automatically re-renders if any reactive data that it uses is changed.
-
-**extendObservable(target, properties)**
-Extends an existing object with reactive properties.
-
-**observe(function)**
-Similar to `observable(function)`. Exception the created reactive function will not be lazy, so that it is executed even when it has no observers on its own.
-Useful to bridge reactive code to imperative code.
-
-
+The `observer` function (and ES6 decorator) from the `mobservable-react` turns any Reactjs component into a reactive one.
+From there on it will responds automatically to any relevant change in _observable_ data that was used by its render method.
 
 ## What others are saying...
 
