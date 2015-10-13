@@ -819,7 +819,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        else
 	            observable = new observablevalue_1.ObservableValue(value, this.mode, context);
 	        this.values[propName] = observable;
-	        Object.defineProperty(this.target, propName, observable.asPropertyDescriptor());
+	        Object.defineProperty(this.target, propName, {
+	            configurable: true,
+	            enumerable: observable instanceof observablevalue_1.ObservableValue,
+	            get: function () {
+	                return this.$mobservable ? this.$mobservable.values[propName].get() : undefined;
+	            },
+	            set: function (newValue) {
+	                this.$mobservable.values[propName].set(newValue);
+	            }
+	        });
 	    };
 	    return ObservableObject;
 	})();
@@ -908,15 +917,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _this.setRefCount(-1);
 	            disposer();
 	        });
-	    };
-	    ObservableView.prototype.asPropertyDescriptor = function () {
-	        var _this = this;
-	        return {
-	            configurable: false,
-	            enumerable: false,
-	            get: function () { return _this.get(); },
-	            set: throwingViewSetter(this.context.name)
-	        };
 	    };
 	    ObservableView.prototype.toString = function () {
 	        return "ComputedObservable[" + this.context.name + ":" + this._value + "] " + this.func.toString();
@@ -1468,15 +1468,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (fireImmediately)
 	            listener(this.get(), undefined);
 	        return this.changeEvent.on(listener);
-	    };
-	    ObservableValue.prototype.asPropertyDescriptor = function () {
-	        var _this = this;
-	        return {
-	            configurable: false,
-	            enumerable: true,
-	            get: function () { return _this.get(); },
-	            set: function (value) { return _this.set(value); }
-	        };
 	    };
 	    ObservableValue.prototype.toString = function () {
 	        return "Observable[" + this.context.name + ":" + this._value + "]";

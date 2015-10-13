@@ -1,47 +1,47 @@
 {
-  "name": "mobservable",
-  "version": "1.0.0",
-  "description": "Observable data. Reactive functions. Simple code.",
-  "main": "dist/mobservable.js",
-  "typings": "dist/typings/index",
-  "scripts": {
-    "test": "npm run build && npm run buildtest && ./node_modules/istanbul/lib/cli.js cover nodeunit test/*.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js ",
-    "start": "npm run build && npm run buildtest && ./node_modules/nodeunit/bin/nodeunit test/*.js",
-    "prepublish": "npm run build",
-    "build": "rm -rf dist && mkdir -p dist/typings && ./node_modules/typescript/bin/tsc && NODE_ENV=production ./node_modules/webpack/bin/webpack.js && cp -r .build/*.d.ts dist/typings",
-    "buildtest": "npm run build-typescript-tests && npm run build-babel-tests",
-    "build-typescript-tests": "./node_modules/typescript/bin/tsc -m commonjs -t es5 --experimentalDecorators --outDir test test/typescript/typescript-test.ts",
-    "build-babel-tests": "./node_modules/babel/bin/babel.js --stage 0 test/babel/babel-test.js -o test/babel-test.js",
-    "perf": "npm run build && ./node_modules/nodeunit/bin/nodeunit test/perf/*.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mweststrate/mobservable.git"
-  },
-  "author": "Michel Weststrate",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/mweststrate/mobservable/issues"
-  },
-  "homepage": "https://mweststrate.github.io/mobservable",
-  "devDependencies": {
-    "babel": "^5.8.23",
-    "coveralls": "^2.11.4",
-    "istanbul": "^0.3.21",
-    "nodeunit": "^0.9.1",
-    "nodeunit-browser-tap": "^0.1.0",
-    "typescript": "^1.6.2",
-    "webpack": "^1.12.2"
-  },
-  "keywords": [
-    "mobservable",
-    "observable",
-    "react-component",
-    "react",
-    "reactjs",
-    "reactive",
-    "model",
-    "frp",
-    "functional-reactive-programming"
-  ]
+    "name": "mobservable",
+    "version": "1.0.0",
+    "description": "Observable data. Reactive functions. Simple code.",
+    "main": "dist/mobservable.js",
+    "typings": "dist/typings/index",
+    "scripts": {
+        "test": "npm run build && npm run buildtest && ./node_modules/istanbul/lib/cli.js cover nodeunit test/*.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js ",
+        "start": "npm run build && npm run buildtest && ./node_modules/nodeunit/bin/nodeunit test/*.js",
+        "prepublish": "npm run build",
+        "build": "rm -rf dist && mkdir -p dist/typings && ./node_modules/typescript/bin/tsc && NODE_ENV=production ./node_modules/webpack/bin/webpack.js && cp -r .build/*.d.ts dist/typings",
+        "buildtest": "npm run build-typescript-tests && npm run build-babel-tests",
+        "build-typescript-tests": "./node_modules/typescript/bin/tsc -m commonjs -t es5 --experimentalDecorators --outDir test test/typescript/typescript-test.ts",
+        "build-babel-tests": "./node_modules/babel/bin/babel.js --stage 0 test/babel/babel-test.js -o test/babel-test.js",
+        "perf": "npm run build && ./node_modules/nodeunit/bin/nodeunit test/perf/*.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mweststrate/mobservable.git"
+    },
+    "author": "Michel Weststrate",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/mweststrate/mobservable/issues"
+    },
+    "homepage": "https://mweststrate.github.io/mobservable",
+    "devDependencies": {
+        "babel": "^5.8.23",
+        "coveralls": "^2.11.4",
+        "istanbul": "^0.3.21",
+        "nodeunit": "^0.9.1",
+        "nodeunit-browser-tap": "^0.1.0",
+        "typescript": "^1.6.2",
+        "webpack": "^1.12.2"
+    },
+    "keywords": [
+        "mobservable",
+        "observable",
+        "react-component",
+        "react",
+        "reactjs",
+        "reactive",
+        "model",
+        "frp",
+        "functional-reactive-programming"
+    ]
 }
