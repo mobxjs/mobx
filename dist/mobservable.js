@@ -82,18 +82,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.observe = core_1.autorun;
 	exports.observeUntil = core_1.autorunUntil;
 	exports.observeAsync = core_1.autorunAsync;
-	Object.defineProperties(module.exports, {
-	    strict: {
-	        enumerable: true,
-	        get: core.getStrict,
-	        set: core.setStrict
-	    },
-	    logLevel: {
-	        enumerable: true,
-	        get: core.getLogLevel,
-	        set: core.setLogLevel
-	    }
-	});
 	exports._ = {
 	    isComputingView: dnode_1.isComputingView,
 	    quickDiff: utils_1.quickDiff
@@ -103,7 +91,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    getDependencyTree: extras_1.getDependencyTree,
 	    getObserverTree: extras_1.getObserverTree,
 	    trackTransitions: extras_1.trackTransitions,
-	    SimpleEventEmitter: simpleeventemitter_1.default
+	    SimpleEventEmitter: simpleeventemitter_1.default,
+	    withStrict: core.withStrict
 	};
 
 
@@ -178,8 +167,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var disposer = utils_1.once(function () {
 	        observable.setRefCount(-1);
 	    });
-	    if (logLevel >= 2 && observable.observing.length === 0)
-	        console.warn("[mobservable.observe] not a single observable was used inside the observing function. This observer is now a no-op.");
 	    disposer.$mobservable = observable;
 	    return disposer;
 	}
@@ -257,10 +244,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    descriptor.configurable = true;
 	    descriptor.enumerable = true;
 	    descriptor.get = function () {
-	        var baseStrict = strict;
-	        strict = false;
-	        observableobject_1.ObservableObject.asReactive(this, null, ValueMode.Recursive).set(key, baseValue);
-	        strict = baseStrict;
+	        var _this = this;
+	        withStrict(false, function () {
+	            observableobject_1.ObservableObject.asReactive(_this, null, ValueMode.Recursive).set(key, baseValue);
+	        });
 	        return this[key];
 	    };
 	    descriptor.set = isDecoratingGetter
@@ -290,32 +277,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return source;
 	}
 	exports.toJSON = toJSON;
-	function transaction(action, strict) {
-	    return scheduler_1.transaction(action, strict);
+	function transaction(action) {
+	    return scheduler_1.transaction(action);
 	}
 	exports.transaction = transaction;
-	var logLevel = 1;
-	function getLogLevel() {
-	    return logLevel;
-	}
-	exports.getLogLevel = getLogLevel;
-	function setLogLevel(newLogLevel) {
-	    logLevel = newLogLevel;
-	}
-	exports.setLogLevel = setLogLevel;
-	var strict = true;
+	var strict = false;
 	function getStrict() {
 	    return strict;
 	}
 	exports.getStrict = getStrict;
-	function setStrict(newStrict) {
+	function withStrict(newStrict, func) {
+	    var baseStrict = strict;
 	    strict = newStrict;
+	    try {
+	        func();
+	    }
+	    finally {
+	        strict = baseStrict;
+	    }
 	}
-	exports.setStrict = setStrict;
-	setTimeout(function () {
-	    if (logLevel > 0)
-	        console.info("Welcome to mobservable. Current logLevel = " + logLevel + ". Change mobservable.logLevel according to your needs: 0 = production, 1 = development, 2 = debugging. Strict mode is " + (strict ? 'enabled' : 'disabled') + ".");
-	}, 1);
+	exports.withStrict = withStrict;
 	(function (ValueType) {
 	    ValueType[ValueType["Reference"] = 0] = "Reference";
 	    ValueType[ValueType["PlainObject"] = 1] = "PlainObject";
@@ -426,7 +407,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            throw "Illegal State";
 	    }
 	    if (Array.isArray(value))
-	        return new observablearray_1.ObservableArray(value.slice(), childMode, context);
+	        return observablearray_1.createObservableArray(value.slice(), childMode, context);
 	    if (utils_1.isPlainObject(value))
 	        return extendObservableHelper(value, value, childMode, context);
 	    return value;
@@ -434,8 +415,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.makeChildObservable = makeChildObservable;
 	function assertUnwrapped(value, message) {
-	    if (logLevel === 0)
-	        return;
 	    if (value instanceof AsReference || value instanceof AsStructure || value instanceof AsFlat)
 	        throw new Error("[mobservable] asStructure / asReference / asFlat cannot be used here. " + message);
 	}
@@ -462,9 +441,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	globalScope.__mobservableViewStack = [];
 	var mobservableId = 0;
 	function checkIfStateIsBeingModifiedDuringView(context) {
-	    if (core_1.getLogLevel() > 0 && isComputingView() && core_1.getStrict() === true) {
+	    if (core_1.getStrict() === true && isComputingView()) {
 	        var ts = __mobservableViewStack;
-	        throw new Error("[mobservable] It is not allowed to change the state during the computation of a reactive view if 'mobservable.strict' mode is enabled:\nShould the data you are trying to modify actually be a view?\nView name: " + context.name + ".\nCurrent stack size is " + ts.length + ", active view: \"" + ts[ts.length - 1].toString() + "\".");
+	        throw new Error("[mobservable] It is not allowed to change the state during the computation of a reactive view. Should the data you are trying to modify actually be a view? \nUse 'mobservable.extras.withStrict(false, block)' to allow changes to be made inside views (unrecommended).\nView name: " + context.name + ".\nCurrent stack size is " + ts.length + ", active view: \"" + ts[ts.length - 1].toString() + "\".");
 	    }
 	}
 	exports.checkIfStateIsBeingModifiedDuringView = checkIfStateIsBeingModifiedDuringView;
@@ -599,12 +578,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    ViewNode.prototype.computeNextState = function () {
+	        var _this = this;
 	        this.trackDependencies();
 	        if (extras_1.transitionTracker)
 	            extras_1.reportTransition(this, "PENDING");
 	        var hasError = true;
 	        try {
-	            var stateDidChange = this.compute();
+	            var stateDidChange;
+	            core_1.withStrict(this.externalRefenceCount === 0, function () {
+	                stateDidChange = _this.compute();
+	            });
 	            hasError = false;
 	        }
 	        finally {
@@ -625,15 +608,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    ViewNode.prototype.bindDependencies = function () {
 	        __mobservableViewStack.length -= 1;
-	        if (this.observing.length === 0 && core_1.getLogLevel() > 1 && !this.isDisposed) {
-	            console.error("[mobservable] You have created a view function that doesn't observe any values, did you forget to make its dependencies observable?");
-	        }
 	        var _a = utils_1.quickDiff(this.observing, this.prevObserving), added = _a[0], removed = _a[1];
 	        this.prevObserving = null;
 	        this.hasCycle = false;
 	        for (var i = 0, l = added.length; i < l; i++) {
 	            var dependency = added[i];
-	            if (core_1.getLogLevel() > 0 && dependency instanceof ViewNode && dependency.findCycle(this)) {
+	            if (dependency instanceof ViewNode && dependency.findCycle(this)) {
 	                this.hasCycle = true;
 	                this.observing.splice(this.observing.indexOf(added[i]), 1);
 	                dependency.hasCycle = true;
@@ -1004,7 +984,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * (c) 2015 - Michel Weststrate
 	 * https://github.com/mweststrate/mobservable
 	 */
-	var observablearray_1 = __webpack_require__(8);
 	function once(func) {
 	    var invoked = false;
 	    return function () {
@@ -1028,6 +1007,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return value !== null && typeof value == 'object' && Object.getPrototypeOf(value) === Object.prototype;
 	}
 	exports.isPlainObject = isPlainObject;
+	function makeNonEnumerable(object, props) {
+	    for (var i = 0; i < props.length; i++) {
+	        Object.defineProperty(object, props[i], {
+	            configurable: true,
+	            writable: true,
+	            enumerable: false,
+	            value: object[props[i]]
+	        });
+	    }
+	}
+	exports.makeNonEnumerable = makeNonEnumerable;
 	function deepEquals(a, b) {
 	    if (a === null && b === null)
 	        return true;
@@ -1106,6 +1096,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return [added, removed];
 	}
 	exports.quickDiff = quickDiff;
+	var observablearray_1 = __webpack_require__(8);
 
 
 /***/ },
@@ -1122,10 +1113,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
+	var utils_1 = __webpack_require__(7);
 	var dnode_1 = __webpack_require__(2);
 	var simpleeventemitter_1 = __webpack_require__(6);
 	var core_1 = __webpack_require__(1);
-	var utils_1 = __webpack_require__(7);
 	var StubArray = (function () {
 	    function StubArray() {
 	    }
@@ -1144,57 +1135,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (!this.context.object)
 	            this.context.object = array;
 	    }
-	    return ObservableArrayAdministration;
-	})(dnode_1.DataNode);
-	exports.ObservableArrayAdministration = ObservableArrayAdministration;
-	var ObservableArray = (function (_super) {
-	    __extends(ObservableArray, _super);
-	    function ObservableArray(initialValues, mode, context) {
-	        _super.call(this);
-	        Object.defineProperty(this, "$mobservable", {
-	            enumerable: false,
-	            configurable: false,
-	            value: new ObservableArrayAdministration(this, mode, context)
-	        });
-	        if (initialValues && initialValues.length)
-	            this.replace(initialValues);
-	    }
-	    Object.defineProperty(ObservableArray.prototype, "length", {
-	        get: function () {
-	            this.$mobservable.notifyObserved();
-	            return this.$mobservable.values.length;
-	        },
-	        set: function (newLength) {
-	            if (typeof newLength !== "number" || newLength < 0)
-	                throw new Error("[mobservable.array] Out of range: " + newLength);
-	            var currentLength = this.$mobservable.values.length;
-	            if (newLength === currentLength)
-	                return;
-	            else if (newLength > currentLength)
-	                this.spliceWithArray(currentLength, 0, new Array(newLength - currentLength));
-	            else
-	                this.spliceWithArray(newLength, currentLength - newLength);
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    ObservableArray.prototype.updateLength = function (oldLength, delta) {
+	    ObservableArrayAdministration.prototype.getLength = function () {
+	        this.notifyObserved();
+	        return this.values.length;
+	    };
+	    ObservableArrayAdministration.prototype.setLength = function (newLength) {
+	        if (typeof newLength !== "number" || newLength < 0)
+	            throw new Error("[mobservable.array] Out of range: " + newLength);
+	        var currentLength = this.values.length;
+	        if (newLength === currentLength)
+	            return;
+	        else if (newLength > currentLength)
+	            this.spliceWithArray(currentLength, 0, new Array(newLength - currentLength));
+	        else
+	            this.spliceWithArray(newLength, currentLength - newLength);
+	    };
+	    ObservableArrayAdministration.prototype.updateLength = function (oldLength, delta) {
 	        if (delta < 0) {
-	            dnode_1.checkIfStateIsBeingModifiedDuringView(this.$mobservable.context);
+	            dnode_1.checkIfStateIsBeingModifiedDuringView(this.context);
 	            for (var i = oldLength + delta; i < oldLength; i++)
-	                delete this[i];
+	                delete this.array[i];
 	        }
 	        else if (delta > 0) {
-	            dnode_1.checkIfStateIsBeingModifiedDuringView(this.$mobservable.context);
+	            dnode_1.checkIfStateIsBeingModifiedDuringView(this.context);
 	            if (oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
 	                reserveArrayBuffer(oldLength + delta);
 	            for (var i = oldLength, end = oldLength + delta; i < end; i++)
-	                Object.defineProperty(this, "" + i, ENUMERABLE_PROPS[i]);
+	                Object.defineProperty(this.array, i, ENUMERABLE_PROPS[i]);
 	        }
 	    };
-	    ObservableArray.prototype.spliceWithArray = function (index, deleteCount, newItems) {
+	    ObservableArrayAdministration.prototype.spliceWithArray = function (index, deleteCount, newItems) {
 	        var _this = this;
-	        var length = this.$mobservable.values.length;
+	        var length = this.values.length;
 	        if ((newItems === undefined || newItems.length === 0) && (deleteCount === 0 || length === 0))
 	            return [];
 	        if (index === undefined)
@@ -1215,32 +1187,51 @@ return /******/ (function(modules) { // webpackBootstrap
 	            newItems = newItems.map(function (value) { return _this.makeReactiveArrayItem(value); });
 	        var lengthDelta = newItems.length - deleteCount;
 	        this.updateLength(length, lengthDelta);
-	        var res = (_a = this.$mobservable.values).splice.apply(_a, [index, deleteCount].concat(newItems));
+	        var res = (_a = this.values).splice.apply(_a, [index, deleteCount].concat(newItems));
 	        this.notifySplice(index, res, newItems);
 	        return res;
 	        var _a;
 	    };
-	    ObservableArray.prototype.makeReactiveArrayItem = function (value) {
+	    ObservableArrayAdministration.prototype.makeReactiveArrayItem = function (value) {
 	        core_1.assertUnwrapped(value, "Array values cannot have modifiers");
-	        return core_1.makeChildObservable(value, this.$mobservable.mode, {
-	            object: this.$mobservable.context.object,
-	            name: this.$mobservable.context.name + "[x]"
+	        return core_1.makeChildObservable(value, this.mode, {
+	            object: this.context.object,
+	            name: this.context.name + "[x]"
 	        });
 	    };
-	    ObservableArray.prototype.notifyChildUpdate = function (index, oldValue) {
+	    ObservableArrayAdministration.prototype.notifyChildUpdate = function (index, oldValue) {
 	        this.notifyChanged();
-	        this.$mobservable.changeEvent.emit({ object: this, type: 'update', index: index, oldValue: oldValue });
+	        this.changeEvent.emit({ object: this.array, type: 'update', index: index, oldValue: oldValue });
 	    };
-	    ObservableArray.prototype.notifySplice = function (index, deleted, added) {
+	    ObservableArrayAdministration.prototype.notifySplice = function (index, deleted, added) {
 	        if (deleted.length === 0 && added.length === 0)
 	            return;
 	        this.notifyChanged();
-	        this.$mobservable.changeEvent.emit({ object: this, type: 'splice', index: index, addedCount: added.length, removed: deleted });
+	        this.changeEvent.emit({ object: this.array, type: 'splice', index: index, addedCount: added.length, removed: deleted });
 	    };
-	    ObservableArray.prototype.notifyChanged = function () {
-	        this.$mobservable.markStale();
-	        this.$mobservable.markReady(true);
+	    ObservableArrayAdministration.prototype.notifyChanged = function () {
+	        this.markStale();
+	        this.markReady(true);
 	    };
+	    return ObservableArrayAdministration;
+	})(dnode_1.DataNode);
+	exports.ObservableArrayAdministration = ObservableArrayAdministration;
+	function createObservableArray(initialValues, mode, context) {
+	    return new ObservableArray(initialValues, mode, context);
+	}
+	exports.createObservableArray = createObservableArray;
+	var ObservableArray = (function (_super) {
+	    __extends(ObservableArray, _super);
+	    function ObservableArray(initialValues, mode, context) {
+	        _super.call(this);
+	        Object.defineProperty(this, "$mobservable", {
+	            enumerable: false,
+	            configurable: false,
+	            value: new ObservableArrayAdministration(this, mode, context)
+	        });
+	        if (initialValues && initialValues.length)
+	            this.replace(initialValues);
+	    }
 	    ObservableArray.prototype.observe = function (listener, fireImmediately) {
 	        if (fireImmediately === void 0) { fireImmediately = false; }
 	        if (fireImmediately)
@@ -1251,7 +1242,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.splice(0);
 	    };
 	    ObservableArray.prototype.replace = function (newItems) {
-	        return this.spliceWithArray(0, this.$mobservable.values.length, newItems);
+	        return this.$mobservable.spliceWithArray(0, this.$mobservable.values.length, newItems);
 	    };
 	    ObservableArray.prototype.toJSON = function () {
 	        this.$mobservable.notifyObserved();
@@ -1275,18 +1266,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	            case 0:
 	                return [];
 	            case 1:
-	                return this.spliceWithArray(index);
+	                return this.$mobservable.spliceWithArray(index);
 	            case 2:
-	                return this.spliceWithArray(index, deleteCount);
+	                return this.$mobservable.spliceWithArray(index, deleteCount);
 	        }
-	        return this.spliceWithArray(index, deleteCount, newItems);
+	        return this.$mobservable.spliceWithArray(index, deleteCount, newItems);
 	    };
 	    ObservableArray.prototype.push = function () {
 	        var items = [];
 	        for (var _i = 0; _i < arguments.length; _i++) {
 	            items[_i - 0] = arguments[_i];
 	        }
-	        this.spliceWithArray(this.$mobservable.values.length, 0, items);
+	        this.$mobservable.spliceWithArray(this.$mobservable.values.length, 0, items);
 	        return this.$mobservable.values.length;
 	    };
 	    ObservableArray.prototype.pop = function () {
@@ -1300,7 +1291,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        for (var _i = 0; _i < arguments.length; _i++) {
 	            items[_i - 0] = arguments[_i];
 	        }
-	        this.spliceWithArray(0, 0, items);
+	        this.$mobservable.spliceWithArray(0, 0, items);
 	        return this.$mobservable.values.length;
 	    };
 	    ObservableArray.prototype.reverse = function () {
@@ -1323,40 +1314,62 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ObservableArray.prototype.toLocaleString = function () {
 	        return "[mobservable.array] " + Array.prototype.toLocaleString.apply(this.$mobservable.values, arguments);
 	    };
-	    ObservableArray.prototype.concat = function () { throw "Illegal state"; };
-	    ObservableArray.prototype.join = function (separator) { throw "Illegal state"; };
-	    ObservableArray.prototype.slice = function (start, end) { throw "Illegal state"; };
-	    ObservableArray.prototype.indexOf = function (searchElement, fromIndex) { throw "Illegal state"; };
-	    ObservableArray.prototype.lastIndexOf = function (searchElement, fromIndex) { throw "Illegal state"; };
-	    ObservableArray.prototype.every = function (callbackfn, thisArg) { throw "Illegal state"; };
-	    ObservableArray.prototype.some = function (callbackfn, thisArg) { throw "Illegal state"; };
-	    ObservableArray.prototype.forEach = function (callbackfn, thisArg) { throw "Illegal state"; };
-	    ObservableArray.prototype.map = function (callbackfn, thisArg) { throw "Illegal state"; };
-	    ObservableArray.prototype.filter = function (callbackfn, thisArg) { throw "Illegal state"; };
-	    ObservableArray.prototype.reduce = function (callbackfn, initialValue) { throw "Illegal state"; };
-	    ObservableArray.prototype.reduceRight = function (callbackfn, initialValue) { throw "Illegal state"; };
 	    return ObservableArray;
 	})(StubArray);
 	exports.ObservableArray = ObservableArray;
+	utils_1.makeNonEnumerable(ObservableArray.prototype, [
+	    "constructor",
+	    "clear",
+	    "find",
+	    "observe",
+	    "pop",
+	    "push",
+	    "remove",
+	    "replace",
+	    "reverse",
+	    "shift",
+	    "sort",
+	    "splice",
+	    "split",
+	    "toJSON",
+	    "toLocaleString",
+	    "toString",
+	    "unshift"
+	]);
+	Object.defineProperty(ObservableArray.prototype, "length", {
+	    enumerable: false,
+	    configurable: true,
+	    get: function () {
+	        return this.$mobservable.getLength();
+	    },
+	    set: function (newLength) {
+	        this.$mobservable.setLength(newLength);
+	    }
+	});
 	[
 	    "concat",
-	    "join",
-	    "slice",
-	    "indexOf",
-	    "lastIndexOf",
 	    "every",
-	    "some",
-	    "forEach",
-	    "map",
 	    "filter",
+	    "forEach",
+	    "indexOf",
+	    "join",
+	    "lastIndexOf",
+	    "map",
 	    "reduce",
 	    "reduceRight",
+	    "slice",
+	    "some",
 	].forEach(function (funcName) {
 	    var baseFunc = Array.prototype[funcName];
-	    ObservableArray.prototype[funcName] = function () {
-	        this.$mobservable.notifyObserved();
-	        return baseFunc.apply(this.$mobservable.values, arguments);
-	    };
+	    Object.defineProperty(ObservableArray.prototype, funcName, {
+	        configurable: false,
+	        writable: true,
+	        enumerable: false,
+	        value: function () {
+	            this.$mobservable.notifyObserved();
+	            return baseFunc.apply(this.$mobservable.values, arguments);
+	        }
+	    });
 	});
 	var OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
 	var ENUMERABLE_PROPS = [];
@@ -1365,25 +1378,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	        enumerable: true,
 	        configurable: true,
 	        set: function (value) {
+	            var impl = this.$mobservable;
+	            var values = impl.values;
 	            core_1.assertUnwrapped(value, "Modifiers cannot be used on array values. For non-reactive array values use makeReactive(asFlat(array)).");
-	            if (index < this.$mobservable.values.length) {
-	                dnode_1.checkIfStateIsBeingModifiedDuringView(this.$mobservable.context);
-	                var oldValue = this.$mobservable.values[index];
-	                var changed = this.$mobservable.mode === core_1.ValueMode.Structure ? !utils_1.deepEquals(oldValue, value) : oldValue !== value;
+	            if (index < values.length) {
+	                dnode_1.checkIfStateIsBeingModifiedDuringView(impl.context);
+	                var oldValue = values[index];
+	                var changed = impl.mode === core_1.ValueMode.Structure ? !utils_1.deepEquals(oldValue, value) : oldValue !== value;
 	                if (changed) {
-	                    this.$mobservable.values[index] = this.makeReactiveArrayItem(value);
-	                    this.notifyChildUpdate(index, oldValue);
+	                    values[index] = impl.makeReactiveArrayItem(value);
+	                    impl.notifyChildUpdate(index, oldValue);
 	                }
 	            }
-	            else if (index === this.$mobservable.values.length)
-	                this.push(this.makeReactiveArrayItem(value));
+	            else if (index === values.length)
+	                this.push(impl.makeReactiveArrayItem(value));
 	            else
-	                throw new Error("[mobservable.array] Index out of bounds, " + index + " is larger than " + this.$mobservable.values.length);
+	                throw new Error("[mobservable.array] Index out of bounds, " + index + " is larger than " + values.length);
 	        },
 	        get: function () {
-	            if (this.$mobservable && index < this.$mobservable.values.length) {
-	                this.$mobservable.notifyObserved();
-	                return this.$mobservable.values[index];
+	            var impl = this.$mobservable;
+	            if (impl && index < impl.values.length) {
+	                impl.notifyObserved();
+	                return impl.values[index];
 	            }
 	            return undefined;
 	        }
@@ -1472,9 +1488,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 10 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	var core = __webpack_require__(1);
 	var inBatch = 0;
 	var tasks = [];
 	function schedule(func) {
@@ -1498,11 +1513,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }
 	}
-	function transaction(action, strict) {
-	    var preStrict = core.getStrict();
+	function transaction(action) {
 	    inBatch += 1;
-	    if (strict !== undefined)
-	        core.setStrict(strict);
 	    try {
 	        return action();
 	    }
@@ -1512,7 +1524,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            runPostBatchActions();
 	            inBatch -= 1;
 	        }
-	        core.setStrict(preStrict);
 	    }
 	}
 	exports.transaction = transaction;

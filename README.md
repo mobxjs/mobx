@@ -14,9 +14,9 @@ New to Mobservable? Take the [five minute, interactive introduction](https://mwe
 ## Introduction
 
 Mobservable enables your data structures to become observable.
-Next to that it can make your functions reactive, so that they re-evaluate whenever relevant data is altered. This has major benefits for the simplicity, maintainability and performance of your code. This is the promise of Mobservable:
+Next to that it can make your functions (or [React components](https://github.com/mweststrate/mobservable-react)) reactive, so that they re-evaluate whenever relevant data is altered. This has major benefits for the simplicity, maintainability and performance of your code. This is the promise of Mobservable:
 * Write complex applications which unmatched simple code.
-* Enable unobtrusive state management: be free to use mutable objects, cyclic references, classes and real references to store state.
+* Enable unopiniated state management: be free to use mutable objects, cyclic references, classes and real references to store state.
 * Write declarative views that track their own dependencies. No subscriptions, cursors or other redundant declarations to manage.
 * Build [high performing](mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) React applications without Flux or Immutable data structures.
 * Predictable behavior: all views are updated synchronously and atomically.
