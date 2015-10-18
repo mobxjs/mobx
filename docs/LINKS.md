@@ -5,13 +5,6 @@
 * Clone the boilerplate repository containing the above example from: https://github.com/mweststrate/react-mobservable-boilerplate.
 * Or fork this [JSFiddle](https://jsfiddle.net/mweststrate/wgbe4guu/).
 
-## Resources
-
-* [Five minute interactive introducton to Mobservable and React](https://mweststrate.github.io/mobservable/getting-started.html)
-* [Tips & Tricks](https://github.com/mweststrate/mobservable/blob/master/docs/syntax.md)
-* [ES5, ES6, TypeScript syntax examples](https://github.com/mweststrate/mobservable/blob/master/docs/api.md)
-* [TypeScript Typings](https://github.com/mweststrate/mobservable/blob/master/dist/mobservable.d.ts)
-
 ## More examples
 
 * [TodoMVC using Mobservable and React](https://github.com/mweststrate/mobservable-react-todomvc)
