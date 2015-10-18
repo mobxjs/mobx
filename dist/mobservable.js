@@ -115,6 +115,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	function observable(v, keyOrScope) {
 	    if (typeof arguments[1] === "string")
 	        return observableDecorator.apply(null, arguments);
+	    switch (arguments.length) {
+	        case 0:
+	            throw new Error("[mobservable.observable] Please provide at least one argument.");
+	        case 1:
+	            break;
+	        case 2:
+	            if (typeof v === "function")
+	                break;
+	            throw new Error("[mobservable.observable] Only one argument expected.");
+	        default:
+	            throw new Error("[mobservable.observable] Too many arguments. Please provide exactly one argument, or a function and a scope.");
+	    }
 	    if (isObservable(v))
 	        return v;
 	    var _a = getValueModeFromValue(v, ValueMode.Recursive), mode = _a[0], value = _a[1];
@@ -159,6 +171,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.isObservable = isObservable;
 	function autorun(view, scope) {
 	    var _a = getValueModeFromValue(view, ValueMode.Recursive), mode = _a[0], unwrappedView = _a[1];
+	    if (typeof unwrappedView !== "function")
+	        throw new Error("[mobservable.autorun] expects a function");
+	    if (unwrappedView.length !== 0)
+	        throw new Error("[mobservable.autorun] expects a function without arguments");
 	    var observable = new observableview_1.ObservableView(unwrappedView, scope, {
 	        object: scope || view,
 	        name: view.name
@@ -203,7 +219,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.autorunAsync = autorunAsync;
 	function expr(expr, scope) {
 	    if (!dnode_1.isComputingView())
-	        throw new Error("[mobservable.expr] 'expr' can only be used inside a computed value.");
+	        console.warn("[mobservable.expr] 'expr' should only be used inside other reactive functions.");
 	    return observable(expr, scope)();
 	}
 	exports.expr = expr;
@@ -212,11 +228,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.extendObservable = extendObservable;
 	function observableDecorator(target, key, baseDescriptor) {
-	    // - In typescript, observable annotations are invoked on the prototype, not on actual instances,
-	    // so upon invocation, determine the 'this' instance, and define a property on the
-	    // instance as well (that hides the propotype property)
-	    // - In typescript, the baseDescriptor is empty for attributes without initial value
-	    // - In babel, the initial value is passed as the closure baseDiscriptor.initializer' 
+	    if (arguments.length < 2 || arguments.length > 3)
+	        throw new Error("[mobservable.@observable] A decorator expects 2 or 3 arguments, got: " + arguments.length);
 	    var isDecoratingGetter = baseDescriptor && baseDescriptor.hasOwnProperty("get");
 	    var descriptor = {};
 	    var baseValue = undefined;

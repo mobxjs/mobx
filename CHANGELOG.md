@@ -1,3 +1,7 @@
+# 1.0.1
+
+* Stricter argument checking for several api's.
+
 # 1.0
 
 ## Renames

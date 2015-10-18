@@ -1,6 +1,6 @@
 {
     "name": "mobservable",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Observable data. Reactive functions. Simple code.",
     "main": "dist/mobservable.js",
     "typings": "dist/typings/index",
