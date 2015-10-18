@@ -25,6 +25,18 @@ export function observable<T extends Object>(value: T): T;
 export function observable(v:any, keyOrScope?:string | any) {
     if (typeof arguments[1] === "string")
         return observableDecorator.apply(null, arguments);
+    switch (arguments.length) {
+        case 0:
+            throw new Error("[mobservable.observable] Please provide at least one argument.");
+        case 1:
+            break;
+        case 2:
+            if (typeof v === "function")
+                break;
+            throw new Error("[mobservable.observable] Only one argument expected.");
+        default:
+            throw new Error("[mobservable.observable] Too many arguments. Please provide exactly one argument, or a function and a scope.");
+    }
 
     if (isObservable(v))
         return v;
@@ -217,6 +229,8 @@ export function extendObservable<A extends Object, B extends Object>(target: A, 
     * }
     */
 function observableDecorator(target:Object, key:string, baseDescriptor:PropertyDescriptor) {
+    if (arguments.length < 2 || arguments.length > 3)
+        throw new Error("[mobservable.@observable] A decorator expects 2 or 3 arguments, got: " + arguments.length);
     // - In typescript, observable annotations are invoked on the prototype, not on actual instances,
     // so upon invocation, determine the 'this' instance, and define a property on the
     // instance as well (that hides the propotype property)

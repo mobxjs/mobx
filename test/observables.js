@@ -150,8 +150,8 @@ exports.testBatch = function(test) {
 exports.testScope = function(test) {
     var vat = observable(0.2);
     var Order = function() {
-        this.price = observable(20, this);
-        this.amount = observable(2, this);
+        this.price = observable(20);
+        this.amount = observable(2);
         this.total = observable(function() {
             return (1+vat()) * this.price() * this.amount();
         }, this);
