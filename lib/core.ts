@@ -108,6 +108,10 @@ export function isObservable(value):boolean {
     */
 export function autorun(view:Lambda, scope?:any):Lambda {
     var [mode, unwrappedView] = getValueModeFromValue(view,ValueMode.Recursive);
+    if (typeof unwrappedView !== "function")
+        throw new Error("[mobservable.autorun] expects a function");
+    if (unwrappedView.length !== 0)
+        throw new Error("[mobservable.autorun] expects a function without arguments");
     const observable = new ObservableView(unwrappedView, scope, {
         object: scope || view,
         name: view.name
@@ -187,7 +191,7 @@ export function autorunAsync<T>(view: () => T, effect: (latestValue : T ) => voi
     */
 export function expr<T>(expr: () => T, scope?):T {
     if (!isComputingView())
-        throw new Error("[mobservable.expr] 'expr' can only be used inside a computed value.");
+        console.warn("[mobservable.expr] 'expr' should only be used inside other reactive functions.");
     return observable(expr, scope) ();
 }
 

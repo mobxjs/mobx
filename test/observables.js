@@ -683,10 +683,6 @@ exports.test_expr = function(test) {
     test.equal(innerCalcs, 9);
     test.equal(totalCalcs, 5);    
     
-    test.throws(function() {
-        mobservable.expr(function() { return 1; });
-    }, "mobservable.expr can only be used inside a computed observable");
-    
     test.done();
 }; 
 
