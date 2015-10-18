@@ -16,14 +16,11 @@
 
 Mobservable enables your data structures to become observable.
 Next to that it can make your functions (or [React components](https://github.com/mweststrate/mobservable-react)) reactive, so that they re-evaluate whenever relevant data is altered. 
-It's like Excel for JavaScript: any data structure can be turned into a 'data cell', any function into a 'formula' that updates automatically.
-
-This has major benefits for the simplicity, maintainability and performance of your code:
-* Write complex applications which unmatched simple code.
-* Enable unopiniated state management: be free to use mutable objects, cyclic references, classes and real references to store state.
-* Write declarative views that track their own dependencies. No subscriptions, cursors or other redundant declarations to manage.
-* Build [high performing](mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/) React applications without Flux or Immutable data structures.
-* Predictable behavior: all views are updated synchronously and atomically.
+It's like Excel for JavaScript: any data structure can be turned into a 'data cell', and every function or user interface component can be turned into a 'formula' that updates automatically.
+Mobservable is unopiniated about which data structures to use;
+it can work with mutable objects, arrays, (cyclic) references, classes etc.
+So that your actions, stores and user interface can remain KISS.
+Besides that, it is [fast](mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/).
 
 ## The essentials
 
@@ -48,37 +45,41 @@ var Timer = mobservable.observer(React.createClass({
 React.render(<Timer timerData={timerData} />, document.body);
 ```
 
-Without Mobservable, this app would do nothing beyond the initial render.
-The timer would increase every second, but the would UI never update. 
-To fix that, your code should trigger the UI to update each time the `timerData` changes.
-But there is a better way.
-We shouldn't have to _pull_ data from our state to update the UI.
-Instead, the data structures should be in control and call the UI whenever it becomes stale.
-The state should be _pushed_ throughout our application. 
-
-In the example above this is achieved by making the `timerDate` observable and by turning the `Timer` component into an `observer`.
-Mobservable will automatically track all relations between _observable data_ and _observing functions (or components)_ so that the minum amount of observers is updated to keep all observers fresh. 
-
+In the example above the `timerData` data structure is made observable and the `Timer` component is turned into an `observer`.
+Mobservable will automatically track all relations between _observable data_ and _observing functions (or components)_ so that the minimum amount of observers is updated to keep all observers fresh. 
 
 Its as simple as that. In the example above the `Timer` will automatically update each time the property `timerData.secondsPassed` is altered.
 The actual interesting thing about this approach are the things that are *not* in the code:
 
 * The `setInterval` method didn't alter. It still treats `timerData` as a plain JS object.
-* There is no state. Timer is a dumb component.
-* There is no magic context being passed through components.
+* If the `Timer` component would be somewhere deep in our app; only the `Timer` would be re-rendered. Nothing else (sideways data loading).
 * There are no subscriptions of any kind that need to be managed.
-* There is no higher order component that needs configuration; no scopes, lenses or cursors.
 * There is no forced UI update in our 'controller'.
-* If the `Timer` component would be somewhere deep in our app; only the `Timer` would be re-rendered. Nothing else.
-
-All this missing code... it will scale well into large code-bases!
-It does not only work for plain objects, but also for arrays, functions, classes, deeply nested structures.
+* There is no state in the component. Timer is a dumb component.
+* This approach is unobtrusive; you are not forced to apply certain techniques like keeping all data denormalized and immutable.
+* There is no higher order component that needs configuration; no scopes, lenses or cursors.
+* There is no magic context being passed through components.
 
 ## Getting started
 
 * `npm install mobservable --save`.
 * For (Native) React apps `npm install mobservable-react --save` as well. You might also be interested in the [dev tools for React and Mobservable](https://github.com/mweststrate/mobservable-react-devtools).
 * [Five minute interactive introducton to Mobservable and React](https://mweststrate.github.io/mobservable/getting-started.html)
+
+## Top level api
+
+For the full api, see the [API documentation](https://mweststrate.github.io/mobservable/refguide/observable.html).
+This is an overview of most important functions available in the `mobservable` namespace:
+
+**observable(value, options?)**
+The `observable` function is the swiss knife of mobservable and enriches any data structure or function with observable capabilities. 
+
+**autorun(function)**
+Turns a function into an observer so that it will automatically be re-evaluated if any data values it uses changes.
+
+**observer(reactJsComponent)**
+The `observer` function (and ES6 decorator) from the `mobservable-react` turns any Reactjs component into a reactive one.
+From there on it will responds automatically to any relevant change in _observable_ data that was used by its render method.
 
 ## Examples
 
@@ -96,21 +97,6 @@ It does not only work for plain objects, but also for arrays, functions, classes
 * [Pure rendering in the light of time and state](https://medium.com/@mweststrate/pure-rendering-in-the-light-of-time-and-state-4b537d8d40b1)
 
 Mobservable is inspired by Microsoft Excel and existing TFRP implementations like MeteorJS tracker, knockout and Vue.js.
-
-## Top level api
-
-For the full api, see the [API documentation](https://mweststrate.github.io/mobservable/refguide/observable.html).
-This is an overview of most important functions available in the `mobservable` namespace:
-
-**observable(value, options?)**
-The `observable` function is the swiss knife of mobservable and enriches any data structure or function with observable capabilities. 
-
-**autorun(function)**
-Turns a function into an observer so that it will automatically be re-evaluated if any data values it uses changes.
-
-**observer(reactJsComponent)**
-The `observer` function (and ES6 decorator) from the `mobservable-react` turns any Reactjs component into a reactive one.
-From there on it will responds automatically to any relevant change in _observable_ data that was used by its render method.
 
 ## What others are saying...
 
