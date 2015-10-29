@@ -22,6 +22,7 @@ export {
 	toJSON,
 	// deprecated, add warning?
 	isObservable as isReactive,
+	map,
 	observable as makeReactive,
 	extendObservable as extendReactive,
 	autorun as observe,

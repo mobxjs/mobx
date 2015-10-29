@@ -11,6 +11,7 @@ import {ObservableValue} from './observablevalue';
 import {ObservableView, throwingViewSetter} from './observableview';
 import {createObservableArray, ObservableArray} from './observablearray';
 import {ObservableObject} from './observableobject';
+import {ObservableMap, KeyValueMap} from './observablemap';
 import {transaction} from './scheduler';
 
 /**
@@ -49,7 +50,7 @@ export function observable(v:any, keyOrScope?:string | any) {
         case ValueType.ComplexObject:
             return toGetterSetterFunction(new ObservableValue(value, mode, null));
         case ValueType.ComplexFunction:
-            throw new Error("[mobservable.makeReactive] Creating reactive functions from functions with multiple arguments is currently not supported, see https://github.com/mweststrate/mobservable/issues/12");
+            throw new Error("[mobservable.observable] To be able to make a function reactive it shoul dnot have arguments. If you need an observable reference to a function, use `observable(asReference(f))`");
         case ValueType.ViewFunction: {
             const context = {
                 name: value.name,
@@ -62,6 +63,10 @@ export function observable(v:any, keyOrScope?:string | any) {
             return makeChildObservable(value, mode, null);
     }
     throw "Illegal State";
+}
+
+export function map<V>(initialValues?: KeyValueMap<V>): ObservableMap<V> {
+    return new ObservableMap(initialValues);
 }
 
 /**
