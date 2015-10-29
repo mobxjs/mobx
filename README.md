@@ -6,7 +6,7 @@
 
 [![Build Status](https://travis-ci.org/mweststrate/mobservable.svg?branch=master)](https://travis-ci.org/mweststrate/mobservable)
 [![Coverage Status](https://coveralls.io/repos/mweststrate/mobservable/badge.svg?branch=master&service=github)](https://coveralls.io/github/mweststrate/mobservable?branch=master)
-[![mobservable channel on slack](https://img.shields.io/badge/slack-mobservable-blue.svg)](https://reactiflux.slack.com/messages/mobservable/)
+[![#mobservable channel on reactiflux discord](https://img.shields.io/badge/discord-%23mobservable%20%40reactiflux-blue.svg)](https://discord.gg/0ZcbPKXt5bYAa2J1)
 
 <br/>
 * New to Mobservable? Take the [five minute, interactive introduction](https://mweststrate.github.io/mobservable/getting-started.html)
