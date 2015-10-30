@@ -40,6 +40,7 @@ export class ObservableValue<T> extends DataNode {
             this.markReady(true);
             this.changeEvent.emit(this._value, oldValue);
         }
+        return changed;
     }
 
     get():T {

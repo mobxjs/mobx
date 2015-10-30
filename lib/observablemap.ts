@@ -1,6 +1,7 @@
 import {ObservableValue} from './observablevalue';
-import {ValueMode, observable, transaction, assertUnwrapped, asReference, asStructure, asFlat} from './core';
-import {IObservableArray} from './interfaces';
+import {ValueMode, observable, transaction, assertUnwrapped, getValueModeFromModifierFunc} from './core';
+import {IObservableArray, Lambda} from './interfaces';
+import SimpleEventEmitter from './simpleeventemitter';
 
 export interface KeyValueMap<V> {
 	[key:string]: V
@@ -12,16 +13,10 @@ export class ObservableMap<V> {
 	private _hasMap: { [key:string]: ObservableValue<boolean> } = {};
 	private _keys: IObservableArray<string> = observable([]);
 	private _valueMode: ValueMode;
+	private _events = new SimpleEventEmitter();
 
 	constructor(initialData?: KeyValueMap<V>, valueModeFunc?: Function) {
-		if (valueModeFunc === asReference)
-			this._valueMode = ValueMode.Reference;
-		else if (valueModeFunc === asStructure)
-			this._valueMode = ValueMode.Structure;
-		else if (valueModeFunc === asFlat)
-			this._valueMode = ValueMode.Flat;
-		else if (valueModeFunc !== undefined)
-			throw new Error("[mobservable.map] Second argument should be either undefined, mobservable.asReference, mobservable.asStructure or mobservable.asFlat");
+		this._valueMode = getValueModeFromModifierFunc(valueModeFunc);
 		if (initialData)
 			this.merge(initialData);
 	}
@@ -32,14 +27,26 @@ export class ObservableMap<V> {
 	
 	has(key: string): boolean {
 		this.assertValidKey(key);
+		if (this._hasMap[key])
+			return this._hasMap[key].get();
 		return this._updateHasMapEntry(key, false).get();
 	}
 
 	set(key: string, value: V) {
 		this.assertValidKey(key);
 		assertUnwrapped(value, `[mobservable.map.set] Expected unwrapped value to be inserted to key '${key}'. If you need to use modifiers pass them as second argument to the constructor`);
-		if (this._has(key))
-			this._data[key].set(value);
+		if (this._has(key)) {
+			const oldValue = (<any>this._data[key])._value;
+			const changed = this._data[key].set(value);
+			if (changed) {
+				this._events.emit(<IObjectChange<V>>{ 
+					type: "update",
+					object: this,
+					name: key,
+					oldValue
+				});
+			}
+		}
 		else {
 			transaction(() => {
 				this._data[key] = new ObservableValue(value, this._valueMode, {
@@ -48,6 +55,11 @@ export class ObservableMap<V> {
 				});
 				this._updateHasMapEntry(key, true);
 				this._keys.push(key);
+			});
+			this._events.emit(<IObjectChange<V>>{ 
+				type: "add",
+				object: this,
+				name: key,
 			}); 
 		}
 	}
@@ -55,14 +67,19 @@ export class ObservableMap<V> {
 	delete(key: string) {
 		this.assertValidKey(key);
 		if (this._has(key)) {
+			const oldValue = (<any>this._data[key])._value;
 			transaction(() => {
 				this._keys.remove(key);
 				this._updateHasMapEntry(key, false);
 				const observable = this._data[key];
 				observable.set(undefined);
-				if (observable.observers.length > 0 || observable.externalRefenceCount > 0)
-					console.warn(`[mobservable.map.delete] Removed '${key}' from map, but its value is still being observed`);
 				this._data[key] = undefined;
+			});
+			this._events.emit(<IObjectChange<V>>{ 
+				type: "delete",
+				object: this,
+				name: key,
+				oldValue
 			});
 		}
 	}
@@ -72,7 +89,7 @@ export class ObservableMap<V> {
 		if (entry) {
 			entry.set(value);
 		} else {
-			entry = new ObservableValue(value, ValueMode.Reference, {
+			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, {
 				name: ".(has)" + key,
 				object: this
 			});
@@ -95,11 +112,23 @@ export class ObservableMap<V> {
 		return this.keys().map(this.get, this);
 	}
 
-	merge(other:ObservableMap<V> | KeyValueMap<V>) {
-		if (other instanceof ObservableMap)
-			other.keys().forEach(key => this.set(key, other.get(key)));
-		else
-			Object.keys(other).forEach(key => this.set(key, other[key]));
+	entries(): [string, V][] {
+		return this.keys().map(key => <[string, V]>[key, this.get(key)]);
+	}
+
+	forEach(callback:(value:V, key:string, object:KeyValueMap<V>)=> void, thisArg?) {
+		
+	}
+
+	/** Merge another object into this object, returns this. */
+	merge(other:ObservableMap<V> | KeyValueMap<V>):ObservableMap<V> {
+		transaction(() => {
+			if (other instanceof ObservableMap)
+				other.keys().forEach(key => this.set(key, other.get(key)));
+			else
+				Object.keys(other).forEach(key => this.set(key, other[key]));
+		});
+		return this;
 	}
 
 	clear() {
@@ -126,6 +155,22 @@ export class ObservableMap<V> {
 	}
 
 	toString(): string {
-		return "[mobservable.map {" + this.keys().map(key => `${key}: ${"" + this.get(key)}`).join(",") + "}]";
+		return "[mobservable.map { " + this.keys().map(key => `${key}: ${"" + this.get(key)}`).join(", ") + " }]";
 	}
+	
+	/**
+	 * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
+	 * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe 
+	 * for callback details
+	 */
+	observe(callback: (changes:IObjectChange<V>) => void): Lambda {
+		return this._events.on(callback);
+	}
+}
+
+export interface IObjectChange<T> {
+	name: string;
+	object: ObservableMap<T>,
+	type: string;
+	oldValue?: T;
 }

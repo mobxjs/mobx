@@ -65,8 +65,12 @@ export function observable(v:any, keyOrScope?:string | any) {
     throw "Illegal State";
 }
 
-export function map<V>(initialValues?: KeyValueMap<V>): ObservableMap<V> {
-    return new ObservableMap(initialValues);
+/**
+ * Creates a map, similar to ES6 maps (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map),
+ * yet observable.
+ */
+export function map<V>(initialValues?: KeyValueMap<V>, valueModifier?: Function): ObservableMap<V> {
+    return new ObservableMap(initialValues, valueModifier);
 }
 
 /**
@@ -414,6 +418,18 @@ export function getValueModeFromValue(value:any, defaultMode:ValueMode): [ValueM
 	if (value instanceof AsFlat)
 		return [ValueMode.Flat, value.value];
 	return [defaultMode, value];
+}
+
+export function getValueModeFromModifierFunc(func?: Function): ValueMode {
+	if (func === asReference)
+		return ValueMode.Reference;
+	else if (func === asStructure)
+		return ValueMode.Structure;
+	else if (func === asFlat)
+		return ValueMode.Flat;
+	else if (func !== undefined)
+		throw new Error("[mobservable] Cannot determine value mode from function. Please pass in one of these: mobservable.asReference, mobservable.asStructure or mobservable.asFlat, got: " + func);
+	return ValueMode.Recursive;
 }
 
 export function makeChildObservable(value, parentMode:ValueMode, context) {

@@ -48,7 +48,7 @@ export class ObservableView<T> extends ViewNode {
         return this._value;
     }
 
-    set() {
+    set(x) {
         throwingViewSetter(this.context.name)();
     }
 
