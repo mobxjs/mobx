@@ -1,3 +1,7 @@
+# 1.0.2
+
+* added `mobservable.map()`, which creates a new map similarly to ES6 maps, yet observable. Until properly documentation, see the [MDN docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map).
+
 # 1.0.1
 
 * Stricter argument checking for several api's.

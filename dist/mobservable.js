@@ -62,7 +62,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var utils_1 = __webpack_require__(7);
 	var extras_1 = __webpack_require__(3);
 	var simpleeventemitter_1 = __webpack_require__(6);
-	__export(__webpack_require__(11));
+	__export(__webpack_require__(12));
 	var core_1 = __webpack_require__(1);
 	exports.isObservable = core_1.isObservable;
 	exports.observable = core_1.observable;
@@ -77,6 +77,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.transaction = core_1.transaction;
 	exports.toJSON = core_1.toJSON;
 	exports.isReactive = core_1.isObservable;
+	exports.map = core_1.map;
 	exports.makeReactive = core_1.observable;
 	exports.extendReactive = core_1.extendObservable;
 	exports.observe = core_1.autorun;
@@ -111,7 +112,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var observableview_1 = __webpack_require__(5);
 	var observablearray_1 = __webpack_require__(8);
 	var observableobject_1 = __webpack_require__(4);
-	var scheduler_1 = __webpack_require__(10);
+	var observablemap_1 = __webpack_require__(10);
+	var scheduler_1 = __webpack_require__(11);
+	var dnode_2 = __webpack_require__(2);
 	function observable(v, keyOrScope) {
 	    if (typeof arguments[1] === "string")
 	        return observableDecorator.apply(null, arguments);
@@ -136,7 +139,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        case ValueType.ComplexObject:
 	            return toGetterSetterFunction(new observablevalue_1.ObservableValue(value, mode, null));
 	        case ValueType.ComplexFunction:
-	            throw new Error("[mobservable.makeReactive] Creating reactive functions from functions with multiple arguments is currently not supported, see https://github.com/mweststrate/mobservable/issues/12");
+	            throw new Error("[mobservable.observable] To be able to make a function reactive it shoul dnot have arguments. If you need an observable reference to a function, use `observable(asReference(f))`");
 	        case ValueType.ViewFunction: {
 	            var context = {
 	                name: value.name,
@@ -151,6 +154,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    throw "Illegal State";
 	}
 	exports.observable = observable;
+	function map(initialValues, valueModifier) {
+	    return new observablemap_1.ObservableMap(initialValues, valueModifier);
+	}
+	exports.map = map;
 	function asReference(value) {
 	    return new AsReference(value);
 	}
@@ -166,7 +173,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function isObservable(value) {
 	    if (value === null || value === undefined)
 	        return false;
-	    return !!value.$mobservable;
+	    return !!value.$mobservable || value instanceof dnode_2.DataNode;
 	}
 	exports.isObservable = isObservable;
 	function autorun(view, scope) {
@@ -224,6 +231,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.expr = expr;
 	function extendObservable(target, properties, context) {
+	    if (target instanceof observablemap_1.ObservableMap || properties instanceof observablemap_1.ObservableMap)
+	        throw new Error("[mobservable.extendObservable] 'extendObservable' should not be used on maps, use map.merge instead");
 	    return extendObservableHelper(target, properties, ValueMode.Recursive, context);
 	}
 	exports.extendObservable = extendObservable;
@@ -280,6 +289,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return source;
 	    if (Array.isArray(source) || source instanceof observablearray_1.ObservableArray)
 	        return source.map(toJSON);
+	    if (source instanceof observablemap_1.ObservableMap) {
+	        var res_1 = {};
+	        source.forEach(function (value, key) { return res_1[key] = value; });
+	        return res_1;
+	    }
 	    if (typeof source === "object" && utils_1.isPlainObject(source)) {
 	        var res = {};
 	        for (var key in source)
@@ -398,6 +412,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return [defaultMode, value];
 	}
 	exports.getValueModeFromValue = getValueModeFromValue;
+	function getValueModeFromModifierFunc(func) {
+	    if (func === asReference)
+	        return ValueMode.Reference;
+	    else if (func === asStructure)
+	        return ValueMode.Structure;
+	    else if (func === asFlat)
+	        return ValueMode.Flat;
+	    else if (func !== undefined)
+	        throw new Error("[mobservable] Cannot determine value mode from function. Please pass in one of these: mobservable.asReference, mobservable.asStructure or mobservable.asFlat, got: " + func);
+	    return ValueMode.Recursive;
+	}
+	exports.getValueModeFromModifierFunc = getValueModeFromModifierFunc;
 	function makeChildObservable(value, parentMode, context) {
 	    var childMode;
 	    if (isObservable(value))
@@ -668,7 +694,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var core_1 = __webpack_require__(1);
 	var extras_1 = __webpack_require__(3);
 	var utils_1 = __webpack_require__(7);
-	var scheduler_1 = __webpack_require__(10);
+	var scheduler_1 = __webpack_require__(11);
 
 
 /***/ },
@@ -677,6 +703,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var dnode_1 = __webpack_require__(2);
 	var observableobject_1 = __webpack_require__(4);
+	var observablemap_1 = __webpack_require__(10);
 	var simpleeventemitter_1 = __webpack_require__(6);
 	var utils_1 = __webpack_require__(7);
 	var core_1 = __webpack_require__(1);
@@ -684,14 +711,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (!core_1.isObservable(thing))
 	        throw new Error("[mobservable.getDNode] " + thing + " doesn't seem to be reactive");
 	    if (property !== undefined) {
-	        var o = thing.$mobservable;
-	        var dnode = o.values && o.values[property];
+	        var dnode;
+	        if (thing instanceof observablemap_1.ObservableMap)
+	            dnode = thing._data[property];
+	        else if (thing.$mobservable instanceof observableobject_1.ObservableObject) {
+	            var o = thing.$mobservable;
+	            dnode = o.values && o.values[property];
+	        }
 	        if (!dnode)
 	            throw new Error("[mobservable.getDNode] property '" + property + "' of '" + thing + "' doesn't seem to be a reactive property");
 	        return dnode;
 	    }
+	    if (thing instanceof dnode_1.DataNode)
+	        return thing;
 	    if (thing.$mobservable) {
-	        if (thing.$mobservable instanceof observableobject_1.ObservableObject)
+	        if (thing.$mobservable instanceof observableobject_1.ObservableObject || thing instanceof observablemap_1.ObservableMap)
 	            throw new Error("[mobservable.getDNode] missing properties parameter. Please specify a property of '" + thing + "'.");
 	        return thing.$mobservable;
 	    }
@@ -901,7 +935,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            throw new Error("[mobservable.view '" + this.context.name + "'] Cycle detected");
 	        return this._value;
 	    };
-	    ObservableView.prototype.set = function () {
+	    ObservableView.prototype.set = function (x) {
 	        throwingViewSetter(this.context.name)();
 	    };
 	    ObservableView.prototype.compute = function () {
@@ -1471,6 +1505,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.markReady(true);
 	            this.changeEvent.emit(this._value, oldValue);
 	        }
+	        return changed;
 	    };
 	    ObservableValue.prototype.get = function () {
 	        this.notifyObserved();
@@ -1492,6 +1527,165 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var observablevalue_1 = __webpack_require__(9);
+	var core_1 = __webpack_require__(1);
+	var simpleeventemitter_1 = __webpack_require__(6);
+	var observablearray_1 = __webpack_require__(8);
+	var ObservableMap = (function () {
+	    function ObservableMap(initialData, valueModeFunc) {
+	        this.$mobservable = true;
+	        this._data = {};
+	        this._hasMap = {};
+	        this._keys = new observablearray_1.ObservableArray(null, core_1.ValueMode.Reference, {
+	            name: ".keys()",
+	            object: this
+	        });
+	        this._events = new simpleeventemitter_1.default();
+	        this._valueMode = core_1.getValueModeFromModifierFunc(valueModeFunc);
+	        if (initialData)
+	            this.merge(initialData);
+	    }
+	    ObservableMap.prototype._has = function (key) {
+	        return typeof this._data[key] !== 'undefined';
+	    };
+	    ObservableMap.prototype.has = function (key) {
+	        this.assertValidKey(key);
+	        if (this._hasMap[key])
+	            return this._hasMap[key].get();
+	        return this._updateHasMapEntry(key, false).get();
+	    };
+	    ObservableMap.prototype.set = function (key, value) {
+	        var _this = this;
+	        this.assertValidKey(key);
+	        core_1.assertUnwrapped(value, "[mobservable.map.set] Expected unwrapped value to be inserted to key '" + key + "'. If you need to use modifiers pass them as second argument to the constructor");
+	        if (this._has(key)) {
+	            var oldValue = this._data[key]._value;
+	            var changed = this._data[key].set(value);
+	            if (changed) {
+	                this._events.emit({
+	                    type: "update",
+	                    object: this,
+	                    name: key,
+	                    oldValue: oldValue
+	                });
+	            }
+	        }
+	        else {
+	            core_1.transaction(function () {
+	                _this._data[key] = new observablevalue_1.ObservableValue(value, _this._valueMode, {
+	                    name: "." + key,
+	                    object: _this
+	                });
+	                _this._updateHasMapEntry(key, true);
+	                _this._keys.push(key);
+	            });
+	            this._events.emit({
+	                type: "add",
+	                object: this,
+	                name: key,
+	            });
+	        }
+	    };
+	    ObservableMap.prototype.delete = function (key) {
+	        var _this = this;
+	        this.assertValidKey(key);
+	        if (this._has(key)) {
+	            var oldValue = this._data[key]._value;
+	            core_1.transaction(function () {
+	                _this._keys.remove(key);
+	                _this._updateHasMapEntry(key, false);
+	                var observable = _this._data[key];
+	                observable.set(undefined);
+	                _this._data[key] = undefined;
+	            });
+	            this._events.emit({
+	                type: "delete",
+	                object: this,
+	                name: key,
+	                oldValue: oldValue
+	            });
+	        }
+	    };
+	    ObservableMap.prototype._updateHasMapEntry = function (key, value) {
+	        var entry = this._hasMap[key];
+	        if (entry) {
+	            entry.set(value);
+	        }
+	        else {
+	            entry = this._hasMap[key] = new observablevalue_1.ObservableValue(value, core_1.ValueMode.Reference, {
+	                name: ".(has)" + key,
+	                object: this
+	            });
+	        }
+	        return entry;
+	    };
+	    ObservableMap.prototype.get = function (key) {
+	        this.assertValidKey(key);
+	        if (this.has(key))
+	            return this._data[key].get();
+	        return undefined;
+	    };
+	    ObservableMap.prototype.keys = function () {
+	        return this._keys.slice();
+	    };
+	    ObservableMap.prototype.values = function () {
+	        return this.keys().map(this.get, this);
+	    };
+	    ObservableMap.prototype.entries = function () {
+	        var _this = this;
+	        return this.keys().map(function (key) { return [key, _this.get(key)]; });
+	    };
+	    ObservableMap.prototype.forEach = function (callback, thisArg) {
+	        var _this = this;
+	        this.keys().forEach(function (key) { return callback.call(thisArg, _this.get(key), key); });
+	    };
+	    ObservableMap.prototype.merge = function (other) {
+	        var _this = this;
+	        core_1.transaction(function () {
+	            if (other instanceof ObservableMap)
+	                other.keys().forEach(function (key) { return _this.set(key, other.get(key)); });
+	            else
+	                Object.keys(other).forEach(function (key) { return _this.set(key, other[key]); });
+	        });
+	        return this;
+	    };
+	    ObservableMap.prototype.clear = function () {
+	        var _this = this;
+	        core_1.transaction(function () {
+	            _this.keys().forEach(_this.delete, _this);
+	        });
+	    };
+	    ObservableMap.prototype.size = function () {
+	        return this._keys.length;
+	    };
+	    ObservableMap.prototype.toJs = function () {
+	        var _this = this;
+	        var res = {};
+	        this.keys().forEach(function (key) { return res[key] = _this.get(key); });
+	        return res;
+	    };
+	    ObservableMap.prototype.assertValidKey = function (key) {
+	        if (key === null || key === undefined)
+	            throw new Error("[mobservable.map] Invalid key: '" + key + "'");
+	        if (typeof key !== "string" && typeof key !== "number")
+	            throw new Error("[mobservable.map] Invalid key: '" + key + "'");
+	    };
+	    ObservableMap.prototype.toString = function () {
+	        var _this = this;
+	        return "[mobservable.map { " + this.keys().map(function (key) { return (key + ": " + ("" + _this.get(key))); }).join(", ") + " }]";
+	    };
+	    ObservableMap.prototype.observe = function (callback) {
+	        return this._events.on(callback);
+	    };
+	    return ObservableMap;
+	})();
+	exports.ObservableMap = ObservableMap;
+
+
+/***/ },
+/* 11 */
 /***/ function(module, exports) {
 
 	var inBatch = 0;
@@ -1534,7 +1728,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports) {
 
 	
