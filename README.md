@@ -1,11 +1,13 @@
 # mobservable
 
+
 <img src="https://mweststrate.github.io/mobservable/images/mobservable.png" align="right" width="120px" />
 
 ##### _Observable data. Reactive functions. Simple code._
 
 [![Build Status](https://travis-ci.org/mweststrate/mobservable.svg?branch=master)](https://travis-ci.org/mweststrate/mobservable)
 [![Coverage Status](https://coveralls.io/repos/mweststrate/mobservable/badge.svg?branch=master&service=github)](https://coveralls.io/github/mweststrate/mobservable?branch=master)
+[![Join the chat at https://gitter.im/mweststrate/mobservable](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mweststrate/mobservable?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![#mobservable channel on reactiflux discord](https://img.shields.io/badge/discord-%23mobservable%20%40reactiflux-blue.svg)](https://discord.gg/0ZcbPKXt5bYAa2J1)
 
 <br/>
