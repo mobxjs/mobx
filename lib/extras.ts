@@ -5,6 +5,7 @@
  */
 import {DataNode, ViewNode} from './dnode';
 import {ObservableObject} from './observableobject';
+import {ObservableMap} from './observablemap';
 import SimpleEventEmitter from './simpleeventemitter';
 import {once, unique} from './utils';
 import {isObservable} from './core';
@@ -14,14 +15,21 @@ export function getDNode(thing:any, property?:string):DataNode {
 	if (!isObservable(thing))
 		throw new Error(`[mobservable.getDNode] ${thing} doesn't seem to be reactive`);
 	if (property !== undefined) {
-		var o = <ObservableObject> thing.$mobservable;
-		var dnode = o.values && o.values[property];
+		var dnode;
+		if (thing instanceof ObservableMap)
+			dnode = thing._data[property];
+		else if (thing.$mobservable instanceof ObservableObject) {
+			const o = <ObservableObject> thing.$mobservable;
+			dnode = o.values && o.values[property];
+		}
 		if (!dnode)
 			throw new Error(`[mobservable.getDNode] property '${property}' of '${thing}' doesn't seem to be a reactive property`);
 		return dnode;
 	}
+	if (thing instanceof DataNode)
+		return thing;
 	if (thing.$mobservable) {
-		if (thing.$mobservable instanceof ObservableObject)
+		if (thing.$mobservable instanceof ObservableObject || thing instanceof ObservableMap)
 			throw new Error(`[mobservable.getDNode] missing properties parameter. Please specify a property of '${thing}'.`);
 		return thing.$mobservable;
 	}

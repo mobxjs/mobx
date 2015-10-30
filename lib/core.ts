@@ -13,6 +13,7 @@ import {createObservableArray, ObservableArray} from './observablearray';
 import {ObservableObject} from './observableobject';
 import {ObservableMap, KeyValueMap} from './observablemap';
 import {transaction} from './scheduler';
+import {DataNode} from './dnode';
 
 /**
     * Turns an object, array or function into a reactive structure.
@@ -117,7 +118,7 @@ export function asFlat<T>(value:T):T {
 export function isObservable(value):boolean {
     if (value === null || value === undefined)
         return false;
-    return !!value.$mobservable;
+    return !!value.$mobservable || value instanceof DataNode;
 }
 
 /**
@@ -223,6 +224,8 @@ export function expr<T>(expr: () => T, scope?):T {
     * @returns targer
     */
 export function extendObservable<A extends Object, B extends Object>(target: A, properties: B, context?: IContextInfoStruct): A & B {
+    if (target instanceof ObservableMap || properties instanceof ObservableMap)
+        throw new Error("[mobservable.extendObservable] 'extendObservable' should not be used on maps, use map.merge instead");
     return <A & B> extendObservableHelper(target, properties,ValueMode.Recursive, context) 
 }
 
@@ -303,6 +306,11 @@ export function toJSON(source) {
         return source;
     if (Array.isArray(source) || source instanceof ObservableArray)
         return source.map(toJSON);
+    if (source instanceof ObservableMap) {
+        const res = {};
+        source.forEach((value, key) => res[key] = value);
+        return res;
+    }
     if (typeof source === "object" && isPlainObject(source)) {
         var res = {};
         for (var key in source) if (source.hasOwnProperty(key))

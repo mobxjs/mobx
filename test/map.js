@@ -41,8 +41,8 @@ exports.mapCrud = function(test) {
 	test.equal(m.has("b"), false);
 	test.equal(m.get("a"), undefined);
 	test.equal(m.get("b"), undefined);
-	
-	test.deepEqual(events, 
+
+	test.deepEqual(events,
 		[ { type: 'update',
 			object: m,
 			name: 'a',
@@ -121,7 +121,7 @@ exports.testObserveValue = function(test) {
 exports.testObserveCollections = function(test) {
 	var x = map();
 	var keys, values, entries;
-	
+
 	autorun(function() {
 		keys = x.keys();
 	});
@@ -131,7 +131,7 @@ exports.testObserveCollections = function(test) {
 	autorun(function() {
 		entries = x.entries();
 	});
-	
+
 	x.set("a", 1);
 	test.deepEqual(keys, ["a"]);
 	test.deepEqual(values, [1]);
@@ -145,16 +145,16 @@ exports.testObserveCollections = function(test) {
 	test.deepEqual(keys, null);
 	test.deepEqual(values, null);
 	test.deepEqual(entries, null);
-	
+
 	x.set("a", 2);
 	test.deepEqual(values, [2]);
 	test.deepEqual(entries, [["a", 2]]);
-	
+
 	x.set("b", 3);
 	test.deepEqual(keys, ["a","b"]);
 	test.deepEqual(values, [2, 3]);
 	test.deepEqual(entries, [["a", 2], ["b", 3]]);
-	
+
 	x.has("c");
 	test.deepEqual(keys, ["a","b"]);
 	test.deepEqual(values, [2, 3]);
@@ -164,7 +164,7 @@ exports.testObserveCollections = function(test) {
 	test.deepEqual(keys, ["b"]);
 	test.deepEqual(values, [3]);
 	test.deepEqual(entries, [["b", 3]]);
-			
+
 	test.done();
 }
 
@@ -172,23 +172,23 @@ exports.testAsStructure = function(test) {
 	var x = map({}, mobservable.asStructure);
 	var triggerCount = 0;
 	var value = null;
-	
+
 	x.set("a", { b : { c: 1 } } );
 	autorun(function() {
 		triggerCount += 1;
 		value = x.get("a").b.c;
 	});
-	
-	test.equal(triggerCount, 1);
-	test.equal(value, 1);
-	
-	x.get("a").b.c = 1;
-	x.get("a").b = { c: 1 };
-	x.set("a", { b: { c: 1 } });	
 
 	test.equal(triggerCount, 1);
 	test.equal(value, 1);
-	
+
+	x.get("a").b.c = 1;
+	x.get("a").b = { c: 1 };
+	x.set("a", { b: { c: 1 } });
+
+	test.equal(triggerCount, 1);
+	test.equal(value, 1);
+
 	x.get("a").b.c = 2;
 	test.equal(triggerCount, 2);
 	test.equal(value, 2);
@@ -198,34 +198,64 @@ exports.testAsStructure = function(test) {
 
 exports.testCleanup = function(test) {
 	var x = map({a: 1});
-	
+
 	var aValue;
 	var disposer = autorun(function() {
 		aValue = x.get("a");
 	});
-	
+
 	var observable = x._data.a;
 
 	test.equal(aValue, 1);
 	test.equal(observable.observers.length, 1);
 	test.equal(x._hasMap.a.observers.length, 1);
-	
+
 	x.delete("a");
 
 	test.equal(aValue, undefined);
 	test.equal(observable.observers.length, 0);
 	test.equal(x._hasMap.a.observers.length, 1);
-	
+
 	x.set("a", 2);
 	observable = x._data.a;
-	
+
 	test.equal(aValue, 2);
 	test.equal(observable.observers.length, 1);
 	test.equal(x._hasMap.a.observers.length, 1);
-	
+
 	disposer();
 	test.equal(aValue, 2);
 	test.equal(observable.observers.length, 0);
 	test.equal(x._hasMap.a.observers.length, 0);
+	test.done();
+}
+
+exports.testExtras = function(test) {
+	var m = map({a : 1});
+	test.equal(mobservable.isObservable(m), true);
+
+	test.deepEqual(mobservable.toJSON(m), m.toJs());
+
+	test.ok(mobservable.extras.getDNode(m._data.a));
+	test.equal(mobservable.extras.getDNode(m, "a"),  mobservable.extras.getDNode(m._data.a));
+
+	function name(thing, prop) {
+		return mobservable.extras.getDNode(thing, prop).context.name;
+	}
+
+	test.equal(name(m, "a"), ".a");
+	test.equal(name(m._data.a), ".a");
+	test.equal(name(m._hasMap.a), ".(has)a");
+	test.equal(name(m._keys), ".keys()");
+	test.done();
+}
+
+exports.testStrict = function(test) {
+	var x = map();
+	autorun(function() {
+		mobservable.extras.withStrict(true, function() {
+			x.get("y"); // should not throw
+		});
+	});
 	test.done();
 }

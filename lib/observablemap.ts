@@ -2,16 +2,21 @@ import {ObservableValue} from './observablevalue';
 import {ValueMode, observable, transaction, assertUnwrapped, getValueModeFromModifierFunc} from './core';
 import {IObservableArray, Lambda} from './interfaces';
 import SimpleEventEmitter from './simpleeventemitter';
+import {isComputingView} from './dnode';
+import {ObservableArray} from './observablearray';
 
 export interface KeyValueMap<V> {
 	[key:string]: V
 }
 
 export class ObservableMap<V> {
-	// TODO: get id, pass to keyset and new members
+	$mobservable = true;
 	private _data: { [key:string]: ObservableValue<V> } = {};
-	private _hasMap: { [key:string]: ObservableValue<boolean> } = {};
-	private _keys: IObservableArray<string> = observable([]);
+	private _hasMap: { [key:string]: ObservableValue<boolean> } = {}; // hasMap, not hashMap >-).
+	private _keys: IObservableArray<string> = <any> new ObservableArray(null, ValueMode.Reference, {
+		name: ".keys()", 
+		object: this
+	});
 	private _valueMode: ValueMode;
 	private _events = new SimpleEventEmitter();
 
@@ -22,7 +27,7 @@ export class ObservableMap<V> {
 	}
 
 	_has(key: string): boolean {
-		return typeof this._data[key] !== 'undefined'; // https://jsperf.com/hasownproperty-vs-in-vs-undefined/12
+		return typeof this._data[key] !== 'undefined';
 	}
 	
 	has(key: string): boolean {
@@ -89,6 +94,8 @@ export class ObservableMap<V> {
 		if (entry) {
 			entry.set(value);
 		} else {
+			//if (value === false && !isComputingView())
+			//	return; // optimization; don't fill the hasMap if we are not observing
 			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, {
 				name: ".(has)" + key,
 				object: this
@@ -117,7 +124,7 @@ export class ObservableMap<V> {
 	}
 
 	forEach(callback:(value:V, key:string, object:KeyValueMap<V>)=> void, thisArg?) {
-		
+		this.keys().forEach(key => callback.call(thisArg, this.get(key), key));
 	}
 
 	/** Merge another object into this object, returns this. */
@@ -141,6 +148,10 @@ export class ObservableMap<V> {
 		return this._keys.length;
 	}
 
+	/**
+	 * Returns a shallow non observable object clone of this map. 
+	 * Note that the values migth still be observable. For a deep clone use mobservable.toJSON.
+	 */
 	toJs(): KeyValueMap<V> {
 		const res:KeyValueMap<V> = {};
 		this.keys().forEach(key => res[key] = this.get(key));
