@@ -30,8 +30,7 @@
     "coveralls": "^2.11.4",
     "exorcist": "^0.4.0",
     "istanbul": "^0.3.21",
-    "nodeunit": "^0.9.1",
-    "nodeunit-browser-tap": "^0.1.0",
+    "tape": "^4.2.2",
     "tsify": "^0.12.2",
     "typescript": "^1.6.2",
     "uglifyify": "^3.0.1"

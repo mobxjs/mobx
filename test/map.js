@@ -1,48 +1,49 @@
-var mobservable = require('..')
+var test = require('tape');
+var mobservable = require('..');
 var map = mobservable.map;
 var autorun = mobservable.autorun;
 
-exports.mapCrud = function(test) {
+test('map crud', function(t) {
 	var events = [];
 	var m = map({ a: 1});
 	m.observe(function(changes) {
 		events.push(changes);
 	});
 
-	test.equal(m.has("a"), true);
-	test.equal(m.has("b"), false);
-	test.equal(m.get("a"), 1);
-	test.equal(m.get("b"), undefined);
-	test.equal(m.size(), 1);
+	t.equal(m.has("a"), true);
+	t.equal(m.has("b"), false);
+	t.equal(m.get("a"), 1);
+	t.equal(m.get("b"), undefined);
+	t.equal(m.size(), 1);
 
 	m.set("a", 2);
-	test.equal(m.has("a"), true);
-	test.equal(m.get("a"), 2);
+	t.equal(m.has("a"), true);
+	t.equal(m.get("a"), 2);
 
 	m.set("b", 3);
-	test.equal(m.has("b"), true);
-	test.equal(m.get("b"), 3);
+	t.equal(m.has("b"), true);
+	t.equal(m.get("b"), 3);
 
-	test.deepEqual(m.keys(), ["a", "b"]);
-	test.deepEqual(m.values(), [2, 3]);
-	test.deepEqual(m.entries(), [["a", 2], ["b", 3]]);
-	test.deepEqual(m.toJs(), { a: 2, b: 3});
-	test.deepEqual(m.toString(), "[mobservable.map { a: 2, b: 3 }]");
-	test.equal(m.size(), 2);
+	t.deepEqual(m.keys(), ["a", "b"]);
+	t.deepEqual(m.values(), [2, 3]);
+	t.deepEqual(m.entries(), [["a", 2], ["b", 3]]);
+	t.deepEqual(m.toJs(), { a: 2, b: 3});
+	t.deepEqual(m.toString(), "[mobservable.map { a: 2, b: 3 }]");
+	t.equal(m.size(), 2);
 
 	m.clear();
-	test.deepEqual(m.keys(), []);
-	test.deepEqual(m.values(), []);
-	test.deepEqual(m.toJs(), { });
-	test.deepEqual(m.toString(), "[mobservable.map {  }]");
-	test.equal(m.size(), 0);
+	t.deepEqual(m.keys(), []);
+	t.deepEqual(m.values(), []);
+	t.deepEqual(m.toJs(), { });
+	t.deepEqual(m.toString(), "[mobservable.map {  }]");
+	t.equal(m.size(), 0);
 
-	test.equal(m.has("a"), false);
-	test.equal(m.has("b"), false);
-	test.equal(m.get("a"), undefined);
-	test.equal(m.get("b"), undefined);
+	t.equal(m.has("a"), false);
+	t.equal(m.has("b"), false);
+	t.equal(m.get("a"), undefined);
+	t.equal(m.get("b"), undefined);
 
-	test.deepEqual(events,
+	t.deepEqual(events,
 		[ { type: 'update',
 			object: m,
 			name: 'a',
@@ -60,19 +61,19 @@ exports.mapCrud = function(test) {
 			oldValue: 3 }
 		]
 	);
-	test.done();
-}
+	t.end();
+})
 
-exports.mapMerge = function(test) {
+test('map merge', function(t) {
 	var a = map({a: 1, b: 2, c: 2});
 	var b = map({c: 3, d: 4});
 	a.merge(b);
-	test.deepEqual(a.toJs(), { a: 1, b: 2, c: 3, d: 4 });
+	t.deepEqual(a.toJs(), { a: 1, b: 2, c: 3, d: 4 });
 
-	test.done();
-}
+	t.end();
+})
 
-exports.testObserveValue = function(test) {
+test('observe value', function(t) {
 	var a = map();
 	var hasX = false;
 	var valueX = undefined;
@@ -90,35 +91,35 @@ exports.testObserveValue = function(test) {
 		valueY = a.get("y");
 	});
 
-	test.equal(hasX, false);
-	test.equal(valueX, undefined);
+	t.equal(hasX, false);
+	t.equal(valueX, undefined);
 
 	a.set("x", 3);
-	test.equal(hasX, true);
-	test.equal(valueX, 3);
+	t.equal(hasX, true);
+	t.equal(valueX, 3);
 
 	a.set("x", 4);
-	test.equal(hasX, true);
-	test.equal(valueX, 4);
+	t.equal(hasX, true);
+	t.equal(valueX, 4);
 
 	a.delete("x");
-	test.equal(hasX, false);
-	test.equal(valueX, undefined);
+	t.equal(hasX, false);
+	t.equal(valueX, undefined);
 
 	a.set("x", 5);
-	test.equal(hasX, true);
-	test.equal(valueX, 5);
+	t.equal(hasX, true);
+	t.equal(valueX, 5);
 
-	test.equal(valueY, undefined);
+	t.equal(valueY, undefined);
 	a.merge({y : 'hi'});
-	test.equal(valueY, 'hi');
+	t.equal(valueY, 'hi');
 	a.merge({y: 'hello'});
-	test.equal(valueY, 'hello');
+	t.equal(valueY, 'hello');
 
-	test.done();
-}
+	t.end();
+})
 
-exports.testObserveCollections = function(test) {
+test('observe collections', function(t) {
 	var x = map();
 	var keys, values, entries;
 
@@ -133,42 +134,42 @@ exports.testObserveCollections = function(test) {
 	});
 
 	x.set("a", 1);
-	test.deepEqual(keys, ["a"]);
-	test.deepEqual(values, [1]);
-	test.deepEqual(entries, [["a", 1]]);
+	t.deepEqual(keys, ["a"]);
+	t.deepEqual(values, [1]);
+	t.deepEqual(entries, [["a", 1]]);
 
 	// should not retrigger:
 	keys = null;
 	values = null;
 	entries = null;
 	x.set("a", 1);
-	test.deepEqual(keys, null);
-	test.deepEqual(values, null);
-	test.deepEqual(entries, null);
+	t.deepEqual(keys, null);
+	t.deepEqual(values, null);
+	t.deepEqual(entries, null);
 
 	x.set("a", 2);
-	test.deepEqual(values, [2]);
-	test.deepEqual(entries, [["a", 2]]);
+	t.deepEqual(values, [2]);
+	t.deepEqual(entries, [["a", 2]]);
 
 	x.set("b", 3);
-	test.deepEqual(keys, ["a","b"]);
-	test.deepEqual(values, [2, 3]);
-	test.deepEqual(entries, [["a", 2], ["b", 3]]);
+	t.deepEqual(keys, ["a","b"]);
+	t.deepEqual(values, [2, 3]);
+	t.deepEqual(entries, [["a", 2], ["b", 3]]);
 
 	x.has("c");
-	test.deepEqual(keys, ["a","b"]);
-	test.deepEqual(values, [2, 3]);
-	test.deepEqual(entries, [["a", 2], ["b", 3]]);
+	t.deepEqual(keys, ["a","b"]);
+	t.deepEqual(values, [2, 3]);
+	t.deepEqual(entries, [["a", 2], ["b", 3]]);
 
 	x.delete("a");
-	test.deepEqual(keys, ["b"]);
-	test.deepEqual(values, [3]);
-	test.deepEqual(entries, [["b", 3]]);
+	t.deepEqual(keys, ["b"]);
+	t.deepEqual(values, [3]);
+	t.deepEqual(entries, [["b", 3]]);
 
-	test.done();
-}
+	t.end();
+})
 
-exports.testAsStructure = function(test) {
+test('asStructure', function(t) {
 	var x = map({}, mobservable.asStructure);
 	var triggerCount = 0;
 	var value = null;
@@ -179,24 +180,24 @@ exports.testAsStructure = function(test) {
 		value = x.get("a").b.c;
 	});
 
-	test.equal(triggerCount, 1);
-	test.equal(value, 1);
+	t.equal(triggerCount, 1);
+	t.equal(value, 1);
 
 	x.get("a").b.c = 1;
 	x.get("a").b = { c: 1 };
 	x.set("a", { b: { c: 1 } });
 
-	test.equal(triggerCount, 1);
-	test.equal(value, 1);
+	t.equal(triggerCount, 1);
+	t.equal(value, 1);
 
 	x.get("a").b.c = 2;
-	test.equal(triggerCount, 2);
-	test.equal(value, 2);
+	t.equal(triggerCount, 2);
+	t.equal(value, 2);
 
-	test.done();
-}
+	t.end();
+})
 
-exports.testCleanup = function(test) {
+test('cleanup', function(t) {
 	var x = map({a: 1});
 
 	var aValue;
@@ -206,56 +207,56 @@ exports.testCleanup = function(test) {
 
 	var observable = x._data.a;
 
-	test.equal(aValue, 1);
-	test.equal(observable.observers.length, 1);
-	test.equal(x._hasMap.a.observers.length, 1);
+	t.equal(aValue, 1);
+	t.equal(observable.observers.length, 1);
+	t.equal(x._hasMap.a.observers.length, 1);
 
 	x.delete("a");
 
-	test.equal(aValue, undefined);
-	test.equal(observable.observers.length, 0);
-	test.equal(x._hasMap.a.observers.length, 1);
+	t.equal(aValue, undefined);
+	t.equal(observable.observers.length, 0);
+	t.equal(x._hasMap.a.observers.length, 1);
 
 	x.set("a", 2);
 	observable = x._data.a;
 
-	test.equal(aValue, 2);
-	test.equal(observable.observers.length, 1);
-	test.equal(x._hasMap.a.observers.length, 1);
+	t.equal(aValue, 2);
+	t.equal(observable.observers.length, 1);
+	t.equal(x._hasMap.a.observers.length, 1);
 
 	disposer();
-	test.equal(aValue, 2);
-	test.equal(observable.observers.length, 0);
-	test.equal(x._hasMap.a.observers.length, 0);
-	test.done();
-}
+	t.equal(aValue, 2);
+	t.equal(observable.observers.length, 0);
+	t.equal(x._hasMap.a.observers.length, 0);
+	t.end();
+})
 
-exports.testExtras = function(test) {
+test('extras', function(t) {
 	var m = map({a : 1});
-	test.equal(mobservable.isObservable(m), true);
+	t.equal(mobservable.isObservable(m), true);
 
-	test.deepEqual(mobservable.toJSON(m), m.toJs());
+	t.deepEqual(mobservable.toJSON(m), m.toJs());
 
-	test.ok(mobservable.extras.getDNode(m._data.a));
-	test.equal(mobservable.extras.getDNode(m, "a"),  mobservable.extras.getDNode(m._data.a));
+	t.ok(mobservable.extras.getDNode(m._data.a));
+	t.equal(mobservable.extras.getDNode(m, "a"),  mobservable.extras.getDNode(m._data.a));
 
 	function name(thing, prop) {
 		return mobservable.extras.getDNode(thing, prop).context.name;
 	}
 
-	test.equal(name(m, "a"), ".a");
-	test.equal(name(m._data.a), ".a");
-	test.equal(name(m._hasMap.a), ".(has)a");
-	test.equal(name(m._keys), ".keys()");
-	test.done();
-}
+	t.equal(name(m, "a"), ".a");
+	t.equal(name(m._data.a), ".a");
+	t.equal(name(m._hasMap.a), ".(has)a");
+	t.equal(name(m._keys), ".keys()");
+	t.end();
+})
 
-exports.testStrict = function(test) {
+test('strict', function(t) {
 	var x = map();
 	autorun(function() {
 		mobservable.extras.withStrict(true, function() {
 			x.get("y"); // should not throw
 		});
 	});
-	test.done();
-}
+	t.end();
+})

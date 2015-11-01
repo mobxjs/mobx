@@ -1,3 +1,4 @@
+var test = require('tape');
 var mobservable = require('..');
 var m = mobservable;
 
@@ -16,7 +17,7 @@ function buffer() {
 }
 
 
-exports.testIsObservable = function(test) {
+test('isObservable', function(t) {
     function Order(price) {
 
     }
@@ -26,35 +27,35 @@ exports.testIsObservable = function(test) {
             price: price
         });
     }
-    test.equal(m.isObservable(null), false);
-    test.equal(m.isObservable(null), false);
+    t.equal(m.isObservable(null), false);
+    t.equal(m.isObservable(null), false);
 
-    test.equal(m.isObservable(m.observable([])), true);
-    test.equal(m.isObservable(m.observable({})), true);
-    test.equal(m.isObservable(m.observable(function() {})), true);
+    t.equal(m.isObservable(m.observable([])), true);
+    t.equal(m.isObservable(m.observable({})), true);
+    t.equal(m.isObservable(m.observable(function() {})), true);
 
-    test.equal(m.isObservable([]), false);
-    test.equal(m.isObservable({}), false);
-    test.equal(m.isObservable(function() {}), false);
+    t.equal(m.isObservable([]), false);
+    t.equal(m.isObservable({}), false);
+    t.equal(m.isObservable(function() {}), false);
 
-    test.equal(m.isObservable(new Order()), false);
-    test.equal(m.isObservable(m.observable(new Order())), true);
+    t.equal(m.isObservable(new Order()), false);
+    t.equal(m.isObservable(m.observable(new Order())), true);
 
-    test.equal(m.isObservable(new ReactiveOrder), true);
-    test.equal(m.isObservable(m.observable(3)), true);
+    t.equal(m.isObservable(new ReactiveOrder), true);
+    t.equal(m.isObservable(m.observable(3)), true);
 
     var obj = {};
-    test.equal(m.isObservable(obj), false);
+    t.equal(m.isObservable(obj), false);
 
-    test.equal(m.isObservable(m.observable(function(){})), true);
-    test.equal(m.isObservable(m.autorun(function(){})), true);
+    t.equal(m.isObservable(m.observable(function(){})), true);
+    t.equal(m.isObservable(m.autorun(function(){})), true);
 
-    test.done();
+    t.end();
 
-}
+})
 
-exports.observable1 = function(test) {
-    test.throws(function() {
+test('observable1', function(t) {
+    t.throws(function() {
         m.observable(function(a,b) {});
     });
 
@@ -72,10 +73,10 @@ exports.observable1 = function(test) {
     });
     x.a = { b : { c : 4 }};
     x.a.b.c = 5; // new structure was reactive as well
-    test.deepEqual(b.toArray(), [3, 4, 5]);
+    t.deepEqual(b.toArray(), [3, 4, 5]);
 
     // recursive structure, but asReference passed in
-    test.equal(m.isObservable(x.a.b), true);
+    t.equal(m.isObservable(x.a.b), true);
     var x2 = m.observable({
         a: m.asReference({
             b: {
@@ -84,9 +85,9 @@ exports.observable1 = function(test) {
         })
     });
 
-    test.equal(m.isObservable(x2), true);
-    test.equal(m.isObservable(x2.a), false);
-    test.equal(m.isObservable(x2.a.b), false);
+    t.equal(m.isObservable(x2), true);
+    t.equal(m.isObservable(x2.a), false);
+    t.equal(m.isObservable(x2.a.b), false);
 
     var b2 = buffer();
     m.autorun(function() {
@@ -94,7 +95,7 @@ exports.observable1 = function(test) {
     });
     x2.a = { b : { c : 4 }};
     x2.a.b.c = 5; // not picked up, not reactive, since passed as reference
-    test.deepEqual(b2.toArray(), [3, 4]);
+    t.deepEqual(b2.toArray(), [3, 4]);
 
     // non recursive structure
     var x3 = m.observable(m.asFlat({
@@ -110,12 +111,12 @@ exports.observable1 = function(test) {
     });
     x3.a = { b : { c : 4 }};
     x3.a.b.c = 5; // sub structure not reactive
-    test.deepEqual(b3.toArray(), [3, 4]);
+    t.deepEqual(b3.toArray(), [3, 4]);
 
-    test.done();
-}
+    t.end();
+})
 
-exports.observable3 = function(test) {
+test('observable3', function(t) {
     function Order(price) {
         this.price = price;
     }
@@ -129,18 +130,18 @@ exports.observable3 = function(test) {
         b(x.orders.length);
     });
 
-    test.equal(m.isObservable(x.orders), true);
-    test.equal(m.isObservable(x.orders[0]), false);
+    t.equal(m.isObservable(x.orders), true);
+    t.equal(m.isObservable(x.orders[0]), false);
     x.orders[2] = new Order(3);
     x.orders = [];
-    test.equal(m.isObservable(x.orders), true);
+    t.equal(m.isObservable(x.orders), true);
     x.orders[0] = new Order(2);
-    test.deepEqual(b.toArray(), [2, 3, 0, 1]);
+    t.deepEqual(b.toArray(), [2, 3, 0, 1]);
 
-    test.done();
-}
+    t.end();
+})
 
-exports.observable4 = function(test) {
+test('observable4', function(t) {
     var x = m.observable([
         { x : 1 },
         { x : 2 }
@@ -154,7 +155,7 @@ exports.observable4 = function(test) {
     x[0].x = 3;
     x.shift();
     x.push({ x : 5 });
-    test.deepEqual(b.toArray(), [[1,2], [3,2], [2], [2, 5]]);
+    t.deepEqual(b.toArray(), [[1,2], [3,2], [2], [2, 5]]);
 
     // non recursive
     var x2 = m.observable(m.asFlat([
@@ -170,22 +171,21 @@ exports.observable4 = function(test) {
     x2[0].x = 3;
     x2.shift();
     x2.push({ x : 5 });
-    test.deepEqual(b2.toArray(), [[1,2], [2], [2, 5]]);
+    t.deepEqual(b2.toArray(), [[1,2], [2], [2, 5]]);
 
-    test.done();
-}
+    t.end();
+})
 
-
-exports.observable5 = function(test) {
+test('observable5', function(t) {
 
     var x = m.observable(function() { });
-    test.throws(function() {
+    t.throws(function() {
         x(7); // set not allowed
     });
 
     var f = function() {};
     var x2 = m.observable(m.asReference(f));
-    test.equal(x2(), f);
+    t.equal(x2(), f);
     x2(null); // allowed
 
     f = function() { return this.price };
@@ -204,12 +204,12 @@ exports.observable5 = function(test) {
     x.price = 18;
     var three = function() { return 3; }
     x.nonReactive = three;
-    test.deepEqual(b.toArray(), [[17, f, 17], [18, f, 18], [18, three, 3]]);
+    t.deepEqual(b.toArray(), [[17, f, 17], [18, f, 18], [18, three, 3]]);
 
-    test.done();
-};
+    t.end();
+})
 
-exports.test_flat_array = function(test) {
+test('flat array', function(t) {
     var x = m.observable({
         x: m.asFlat([{
             a: 1
@@ -223,29 +223,29 @@ exports.test_flat_array = function(test) {
         result = mobservable.toJSON(x);
     });
     
-    test.deepEqual(result, { x: [{ a: 1 }]});
-    test.equal(updates, 1);
+    t.deepEqual(result, { x: [{ a: 1 }]});
+    t.equal(updates, 1);
     
     x.x[0].a = 2; // not picked up; object is not made reactive
-    test.deepEqual(result, { x: [{ a: 1 }]});
-    test.equal(updates, 1);
+    t.deepEqual(result, { x: [{ a: 1 }]});
+    t.equal(updates, 1);
     
     x.x.push({ a: 3 }); // picked up, array is reactive
-    test.deepEqual(result, { x: [{ a: 2}, { a: 3 }]});
-    test.equal(updates, 2);
+    t.deepEqual(result, { x: [{ a: 2}, { a: 3 }]});
+    t.equal(updates, 2);
     
     x.x[0] = { a: 4 }; // picked up, array is reactive
-    test.deepEqual(result, { x: [{ a: 4 }, { a: 3 }]});
-    test.equal(updates, 3);
+    t.deepEqual(result, { x: [{ a: 4 }, { a: 3 }]});
+    t.equal(updates, 3);
 
     x.x[1].a = 6; // not picked up    
-    test.deepEqual(result, { x: [{ a: 4 }, { a: 3 }]});
-    test.equal(updates, 3);
+    t.deepEqual(result, { x: [{ a: 4 }, { a: 3 }]});
+    t.equal(updates, 3);
     
-    test.done();
-}
+    t.end();
+})
 
-exports.test_flat_object = function(test) {
+test('flat object', function(t) {
     var y = m.observable(m.asFlat({
         x : { z: 3 }
     }));
@@ -257,26 +257,25 @@ exports.test_flat_object = function(test) {
         result = mobservable.toJSON(y);
     });
 
-    test.deepEqual(result, { x: { z: 3 }});
-    test.equal(updates, 1);
+    t.deepEqual(result, { x: { z: 3 }});
+    t.equal(updates, 1);
     
     y.x.z = 4; // not picked up
-    test.deepEqual(result, { x: { z: 3 }});
-    test.equal(updates, 1);
+    t.deepEqual(result, { x: { z: 3 }});
+    t.equal(updates, 1);
     
     y.x = { z: 5 };
-    test.deepEqual(result, { x: { z: 5 }});
-    test.equal(updates, 2);
+    t.deepEqual(result, { x: { z: 5 }});
+    t.equal(updates, 2);
 
     y.x.z = 6; // not picked up
-    test.deepEqual(result, { x: { z: 5 }});
-    test.equal(updates, 2);
+    t.deepEqual(result, { x: { z: 5 }});
+    t.equal(updates, 2);
     
-    test.done();
-}
+    t.end();
+})
 
-
-exports.test_as_structure = function(test) {
+test('as structure', function(t) {
     
     var x = m.observable({
         x: m.asStructure(null)
@@ -289,12 +288,12 @@ exports.test_as_structure = function(test) {
     });
     
     function c() {
-        test.equal(changed, 1, "expected a change");
+        t.equal(changed, 1, "expected a change");
         changed = 0;
     }
 
     function nc() {
-        test.equal(changed, 0, "expected no change");
+        t.equal(changed, 0, "expected no change");
         changed = 0;
     }
     
@@ -392,10 +391,10 @@ exports.test_as_structure = function(test) {
     nc();
     
     dis();
-    test.done();
-};
+    t.end();
+})
 
-exports.test_as_structure_view = function(test) {
+test('as structure view', function(t) {
     var x = m.observable({
         a: 1,
         aa: 1,
@@ -414,27 +413,27 @@ exports.test_as_structure_view = function(test) {
         x.b;
         bc++;
     });
-    test.equal(bc, 1);
+    t.equal(bc, 1);
     
     var cc = 0;
     var co = m.autorun(function() {
         x.c;
         cc++;
     });
-    test.equal(cc, 1);
+    t.equal(cc, 1);
 
     x.a = 2;
     x.a = 3;
-    test.equal(bc, 3);
-    test.equal(cc, 1);
+    t.equal(bc, 3);
+    t.equal(cc, 1);
     x.aa = 3;
-    test.equal(bc, 4);
-    test.equal(cc, 2);
-    test.done();
-};
+    t.equal(bc, 4);
+    t.equal(cc, 2);
+    t.end();
+})
 
-exports.test_exceptions = function(test) {
-    test.throws(function() {
+test('exceptions', function(t) {
+    t.throws(function() {
         m.asReference(m.asFlat(3));
     }, "nested");
 
@@ -442,27 +441,27 @@ exports.test_exceptions = function(test) {
         y: m.asReference(null)
     });
     
-    test.throws(function() {
+    t.throws(function() {
         x.y = m.asStructure(3)
     });
 
-    test.throws(function() {
+    t.throws(function() {
         x.y = m.asReference(3)
     });
 
     var ar = m.observable([2]);
 
-    test.throws(function() {
+    t.throws(function() {
         ar[0] = m.asReference(3)
     });
 
-    test.throws(function() {
+    t.throws(function() {
         ar[1] = m.asReference(3)
     });
     
-    test.throws(function() {
+    t.throws(function() {
         ar = m.observable([m.asStructure(3)]);
     });
 
-    return test.done();
-}
+    return t.end();
+})

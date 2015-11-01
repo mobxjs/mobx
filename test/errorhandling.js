@@ -1,3 +1,4 @@
+var test = require('tape');
 var mobservable = require('..');
 var m = mobservable;
 
@@ -15,28 +16,28 @@ function buffer() {
     return res;
 }
 
-function testException(test, observable, exception) {
+function testException(t, observable, exception) {
     try {
         var value = observable();
-        test.fail("Expected exception: " + exception + ", got: " + value);
+        t.fail("Expected exception: " + exception + ", got: " + value);
     }
     catch (e) {
         var message = "" + e;
-        test.equal(message === exception || e.cause === exception || message.indexOf(exception) !== -1, true, "Expected exception '" + exception + "', got: " + e);
+        t.equal(message === exception || e.cause === exception || message.indexOf(exception) !== -1, true, "Expected exception '" + exception + "', got: " + e);
     }
-    test.equal(mobservable._.isComputingView(), false);
+    t.equal(mobservable._.isComputingView(), false);
 }
 
-exports.testException1  = function(test) {
+test('exception1', function(t) {
     var a = observable(function() {
         throw "hoi";
     });
-    testException(test, a, "hoi");
-    test.equal(mobservable._.isComputingView(), false);
-    test.done();
-};
+    testException(t, a, "hoi");
+    t.equal(mobservable._.isComputingView(), false);
+    t.end();
+})
 
-exports.testException2 = function(test) {
+test('exception2', function(t) {
     var cbuffer = buffer();
     var z = observable(true);
     var x = observable(1);
@@ -53,27 +54,27 @@ exports.testException2 = function(test) {
     });
     c.observe(cbuffer, true);
 
-    test.equal(a(), 1);
-    test.throws(function() {
+    t.equal(a(), 1);
+    t.throws(function() {
         z(false);
     });
 
-    test.equal(z(), false);
-    test.equal(a(), 1);
-    test.equal(b(), 1);
+    t.equal(z(), false);
+    t.equal(a(), 1);
+    t.equal(b(), 1);
 
     x(2);
     z(true);
-    test.equal(a(), 2);
-    test.equal(b(), 2);
-    test.equal(cbuffer.toArray().length, 2);
-    test.deepEqual(cbuffer.toArray(), [1,2]);
-    test.equal(mobservable._.isComputingView(), false);
+    t.equal(a(), 2);
+    t.equal(b(), 2);
+    t.equal(cbuffer.toArray().length, 2);
+    t.deepEqual(cbuffer.toArray(), [1,2]);
+    t.equal(mobservable._.isComputingView(), false);
 
-    test.done();
-};
+    t.end();
+})
 
-exports.deny_state_changes_in_views = function(test) {
+test('deny state changes in views', function(t) {
     try {
         var x = observable(3);
         var z = observable(5);
@@ -83,24 +84,24 @@ exports.deny_state_changes_in_views = function(test) {
         });
 
         try {
-            test.equal(9, y());
-            test.fail("no exception");
+            t.equal(9, y());
+            t.fail("no exception");
         } catch(e) {
-            test.ok(("" + e).indexOf('It is not allowed to change the state during the computation of a reactive view') > 0, "Invalid exception: " + e);
+            t.ok(("" + e).indexOf('It is not allowed to change the state during the computation of a reactive view') > 0, "Invalid exception: " + e);
         }
     
         // y is broken now...
-        test.equal(y(), undefined); 
+        t.equal(y(), undefined); 
 
-        test.equal(mobservable._.isComputingView(), false);
-        test.done();
+        t.equal(mobservable._.isComputingView(), false);
+        t.end();
     }
     catch(e) {
         console.log(e.stack);
     }
-};
+})
 
-exports.allow_state_changes_in_non_strict_views = function(test) {
+test('allow state changes in non strict views', function(t) {
     var x = observable(3);
     var z = observable(5);
     var y = observable(function() {
@@ -110,14 +111,14 @@ exports.allow_state_changes_in_non_strict_views = function(test) {
         return x() * x();
     });
 
-    test.equal(9, y());
-    test.equal(z(), 6);
+    t.equal(9, y());
+    t.equal(z(), 6);
 
-    test.equal(mobservable._.isComputingView(), false);
-    test.done();
-};
+    t.equal(mobservable._.isComputingView(), false);
+    t.end();
+})
 
-exports.allow_state_changes_in_autorun = function(test) {
+test('allow state changes in autorun', function(t) {
     var x = observable(3);
     var z = observable(3);
     
@@ -126,19 +127,19 @@ exports.allow_state_changes_in_autorun = function(test) {
             z(x());
     });
     
-    test.equal(x(), 3);
-    test.equal(z(), 3);
+    t.equal(x(), 3);
+    t.equal(z(), 3);
 
     x(5); // autorunneres are allowed to change state
 
-    test.equal(x(), 5);
-    test.equal(z(), 5);
+    t.equal(x(), 5);
+    t.equal(z(), 5);
 
-    test.equal(mobservable._.isComputingView(), false);
-    test.done();
-};
+    t.equal(mobservable._.isComputingView(), false);
+    t.end();
+})
 
-exports.deny_state_changes_in_autorun_if_strict = function(test) {
+test('deny state changes in autorun if strict', function(t) {
     var x = observable(3);
     var z = observable(3);
     
@@ -149,24 +150,24 @@ exports.deny_state_changes_in_autorun_if_strict = function(test) {
         });
     });
     
-    test.equal(x(), 3);
-    test.equal(z(), 3);
+    t.equal(x(), 3);
+    t.equal(z(), 3);
 
     try {
         x(5);
-        test.fail("no exception");
+        t.fail("no exception");
     } catch(e) {
-        test.ok(("" + e).indexOf('It is not allowed to change the state during the computation of a reactive view') > 0, "Invalid exception: " + e);
+        t.ok(("" + e).indexOf('It is not allowed to change the state during the computation of a reactive view') > 0, "Invalid exception: " + e);
     }
 
-    test.equal(x(), 5);
-    test.equal(z(), 3);
+    t.equal(x(), 5);
+    t.equal(z(), 3);
 
-    test.equal(mobservable._.isComputingView(), false);
-    test.done();
-};
+    t.equal(mobservable._.isComputingView(), false);
+    t.end();
+})
 
-exports.deny_array_change_in_view = function(test) {
+test('deny array change in view', function(t) {
     try {
         var x = observable(3);
         var z = observable([]);
@@ -176,23 +177,23 @@ exports.deny_array_change_in_view = function(test) {
         });
 
         try {
-            test.equal(9, y());
-            test.fail("no exception");
+            t.equal(9, y());
+            t.fail("no exception");
         } catch(e) {
-            test.ok(("" + e).indexOf('It is not allowed to change the state during the computation of a reactive view') > 0, "Invalid exception: " + e);
+            t.ok(("" + e).indexOf('It is not allowed to change the state during the computation of a reactive view') > 0, "Invalid exception: " + e);
         }
         
-        test.deepEqual(z.slice(), []);
-        test.equal(mobservable._.isComputingView(), false);
+        t.deepEqual(z.slice(), []);
+        t.equal(mobservable._.isComputingView(), false);
 
-        test.done();
+        t.end();
     }
     catch(e) {
         console.log(e.stack);
     }
-};
+})
 
-exports.allow_array_change_in_autorun = function(test) {
+test('allow array change in autorun', function(t) {
     var x = observable(3);
     var z = observable([]);
     var y = m.autorun(function() {
@@ -202,73 +203,73 @@ exports.allow_array_change_in_autorun = function(test) {
     
     x(5);
     x(6);
-    test.deepEqual(z.slice(), [5, 6])
+    t.deepEqual(z.slice(), [5, 6])
     x(2);
-    test.deepEqual(z.slice(), [5, 6])
+    t.deepEqual(z.slice(), [5, 6])
 
-    test.equal(mobservable._.isComputingView(), false);
+    t.equal(mobservable._.isComputingView(), false);
 
-    test.done();
-};
+    t.end();
+})
 
-exports.throw_error_if_modification_loop = function(test) {
+test('throw error if modification loop', function(t) {
     var x = observable(3);
     try {
         var dis = m.autorun(function() {
             x(x() + 1);
         });
         x(5);
-        test.equal(false, true, "expected exception");
+        t.equal(false, true, "expected exception");
     } catch(e) {
-        test.ok((""+e).indexOf("Cycle detected") !== -1, "[mobservable] loop detected while updating a value");
+        t.ok((""+e).indexOf("Cycle detected") !== -1, "[mobservable] loop detected while updating a value");
     }
-    test.done();
-};
+    t.end();
+})
 
-exports.cycle1 = function(test) {
+test('cycle1', function(t) {
     try {
         var p = observable(function() { return p() * 2; }); // thats a cycle!
         p.observe(voidObserver, true);
-        test.fail("expected exception");
+        t.fail("expected exception");
     }
     catch(e) {
-        test.ok(("" + e).indexOf("Cycle detected") !== -1);
-        test.equal(mobservable._.isComputingView(), false);
+        t.ok(("" + e).indexOf("Cycle detected") !== -1);
+        t.equal(mobservable._.isComputingView(), false);
     }
 
     var a = observable(function() { return b() * 2; });
     var b = observable(function() { return a() * 2; });
-    testException(test, b, "Cycle detected");
-    test.done();
-};
+    testException(t, b, "Cycle detected");
+    t.end();
+})
 
-exports.cycle2 = function(test) {
+test('cycle2', function(t) {
     var p = observable(function() { return p() * 2; });
-    testException(test, p, "Cycle detected");
-    test.done();
-};
+    testException(t, p, "Cycle detected");
+    t.end();
+})
 
-exports.cycle3 = function(test) {
+test('cycle3', function(t) {
     var z = observable(true);
     var a = observable(function() { return z() ? 1 : b() * 2; });
     var b = observable(function() { return a() * 2; });
 
     b.observe(voidObserver);
-    test.equals(1, a());
+    t.equal(1, a());
 
     try {
         z(false); // introduces a cycle!
-        test.fail("expected exception");
+        t.fail("expected exception");
     } catch(e) {
-        test.ok(("" + e).indexOf("Cycle detected") > -1);
+        t.ok(("" + e).indexOf("Cycle detected") > -1);
     }
-    test.equal(b(), 2);
-    testException(test, a, "Cycle detected");
+    t.equal(b(), 2);
+    testException(t, a, "Cycle detected");
 
     z(true); // cycle is gone, restore stable state
-    test.equals(1, a());
-    test.equals(2, b());
+    t.equal(1, a());
+    t.equal(2, b());
 
-    test.equal(mobservable._.isComputingView(), false);
-    test.done();
-};
+    t.equal(mobservable._.isComputingView(), false);
+    t.end();
+})

@@ -1,3 +1,4 @@
+var test = require('tape');
 var mobservable = require('..');
 var m = mobservable.observable;
 var observable = mobservable.observable;
@@ -15,38 +16,38 @@ function buffer() {
     return res;
 }
 
-exports.basic = function(test) {
+test('basic', function(t) {
     var x = m(3);
     var b = buffer();
     x.observe(b);
-    test.equal(3, x());
+    t.equal(3, x());
 
     x(5);
-    test.equal(5, x());
-    test.deepEqual([5], b.toArray());
-    test.equal(mobservable._.isComputingView(), false);
-    test.done();
-}
+    t.equal(5, x());
+    t.deepEqual([5], b.toArray());
+    t.equal(mobservable._.isComputingView(), false);
+    t.end();
+})
 
-exports.basic2 = function(test) {
+test('basic2', function(t) {
     var x = observable(3);
     var z = observable(function () { return x() * 2});
     var y = observable(function () { return x() * 3});
 
     z.observe(voidObserver);
 
-    test.equal(z(), 6);
-    test.equal(y(), 9);
+    t.equal(z(), 6);
+    t.equal(y(), 9);
 
     x(5);
-    test.equal(z(), 10);
-    test.equal(y(), 15);
+    t.equal(z(), 10);
+    t.equal(y(), 15);
 
-    test.equal(mobservable._.isComputingView(), false);
-    test.done();
-}
+    t.equal(mobservable._.isComputingView(), false);
+    t.end();
+})
 
-exports.dynamic = function(test) {
+test('dynamic', function(t) {
     try {
         var x = m(3);
         var y = m(function() {
@@ -55,47 +56,47 @@ exports.dynamic = function(test) {
         var b = buffer();
         y.observe(b, true);
 
-        test.equal(3, y()); // First evaluation here..
+        t.equal(3, y()); // First evaluation here..
 
         x(5);
-        test.equal(5, y());
+        t.equal(5, y());
 
-        test.deepEqual([3, 5], b.toArray());
-        test.equal(mobservable._.isComputingView(), false);
+        t.deepEqual([3, 5], b.toArray());
+        t.equal(mobservable._.isComputingView(), false);
 
-        test.done();
+        t.end();
     }
     catch(e) {
         console.log(e.stack);
     }
-}
+})
 
-exports.dynamic2 = function(test) {
+test('dynamic2', function(t) {
     try {
         var x = observable(3);
         var y = observable(function() {
             return x() * x();
         });
 
-        test.equal(9, y());
+        t.equal(9, y());
         var b = buffer();
         y.observe(b);
 
         x(5);
-        test.equal(25, y());
+        t.equal(25, y());
 
         //no intermediate value 15!
-        test.deepEqual([25], b.toArray());
-        test.equal(mobservable._.isComputingView(), false);
+        t.deepEqual([25], b.toArray());
+        t.equal(mobservable._.isComputingView(), false);
 
-        test.done();
+        t.end();
     }
     catch(e) {
         console.log(e.stack);
     }
-}
+})
 
-exports.readme1 = function(test) {
+test('readme1', function(t) {
     try {
         var b = buffer();
 
@@ -112,16 +113,16 @@ exports.readme1 = function(test) {
 
         order.price(20);
         order.price(10);
-        test.deepEqual([24,12],b.toArray());
-        test.equal(mobservable._.isComputingView(), false);
+        t.deepEqual([24,12],b.toArray());
+        t.equal(mobservable._.isComputingView(), false);
 
-        test.done();
+        t.end();
     } catch (e) {
         console.log(e.stack); throw e;
     }
-}
+})
 
-exports.testBatch = function(test) {
+test('batch', function(t) {
     var a = observable(2);
     var b = observable(3);
     var c = observable(function() { return a() * b() });
@@ -132,22 +133,22 @@ exports.testBatch = function(test) {
     a(4);
     b(5);
     // Note, 60 should not happen! (that is d beign computed before c after update of b)
-    test.deepEqual([36, 100], buf.toArray());
+    t.deepEqual([36, 100], buf.toArray());
 
     var x = mobservable.transaction(function() {
         a(2);
         b(3);
         a(6);
-        test.deepEqual(100, d()); // still hunderd
+        t.deepEqual(100, d()); // still hunderd
         return 2;
     });
 
-    test.equal(x, 2); // test return value
-    test.deepEqual([36, 100, 54], buf.toArray());// only one new value for d
-    test.done();
-}
+    t.equal(x, 2); // test return value
+    t.deepEqual([36, 100, 54], buf.toArray());// only one new value for d
+    t.end();
+})
 
-exports.testScope = function(test) {
+test('scope', function(t) {
     var vat = observable(0.2);
     var Order = function() {
         this.price = observable(20);
@@ -161,13 +162,13 @@ exports.testScope = function(test) {
     order.total.observe(voidObserver);
     order.price(10);
     order.amount(3);
-    test.equals(36, order.total());
-    test.equal(mobservable._.isComputingView(), false);
+    t.equal(36, order.total());
+    t.equal(mobservable._.isComputingView(), false);
 
-    test.done();
-}
+    t.end();
+})
 
-exports.testProps1 = function(test) {
+test('props1', function(t) {
     var vat = observable(0.2);
     var Order = function() {
         mobservable.extendObservable(this, {
@@ -180,10 +181,10 @@ exports.testProps1 = function(test) {
     };
 
     var order = new Order();
-    test.equals(48, order.total);
+    t.equal(48, order.total);
     order.price = 10;
     order.amount = 3;
-    test.equals(36, order.total);
+    t.equal(36, order.total);
 
     var totals = [];
     var sub = mobservable.autorun(function() {
@@ -192,13 +193,13 @@ exports.testProps1 = function(test) {
     order.amount = 4;
     sub();
     order.amount = 5;
-    test.deepEqual(totals, [36,48]);
+    t.deepEqual(totals, [36,48]);
 
-    test.equal(mobservable._.isComputingView(), false);
-    test.done();
-};
+    t.equal(mobservable._.isComputingView(), false);
+    t.end();
+})
 
-exports.testProps2 = function(test) {
+test('props2', function(t) {
     var vat = observable(0.2);
     var Order = function() {
         mobservable.extendObservable(this, {
@@ -211,14 +212,14 @@ exports.testProps2 = function(test) {
     };
 
     var order = new Order();
-    test.equals(48, order.total);
+    t.equal(48, order.total);
     order.price = 10;
     order.amount = 3;
-    test.equals(36, order.total);
-    test.done();
-};
+    t.equal(36, order.total);
+    t.end();
+})
 
-exports.testProps3 = function(test) {
+test('props3', function(t) {
     var vat = observable(0.2);
     var Order = function() {
         this.price = 20;
@@ -230,14 +231,14 @@ exports.testProps3 = function(test) {
     };
 
     var order = new Order();
-    test.equals(48, order.total);
+    t.equal(48, order.total);
     order.price = 10;
     order.amount = 3;
-    test.equals(36, order.total);
-    test.done();
-};
+    t.equal(36, order.total);
+    t.end();
+})
 
-exports.testProps4 = function(test) {
+test('props4', function(t) {
     function Bzz() {
         mobservable.extendObservable(this, {
             fluff: [1,2],
@@ -251,17 +252,17 @@ exports.testProps4 = function(test) {
 
     var x = new Bzz();
     var ar = x.fluff;
-    test.equal(x.sum, 3);
+    t.equal(x.sum, 3);
     x.fluff.push(3);
-    test.equal(x.sum, 6);
+    t.equal(x.sum, 6);
     x.fluff = [5,6];
-    test.equal(x.sum, 11);
+    t.equal(x.sum, 11);
     x.fluff.push(2);
-    test.equal(x.sum, 13);
-    test.done();
-}
+    t.equal(x.sum, 13);
+    t.end();
+})
 
-exports.test_object_enumerable_props = function(test) {
+test('object enumerable props', function(t) {
     var x = mobservable.observable({
         a: 3,
         b: function() {
@@ -272,12 +273,11 @@ exports.test_object_enumerable_props = function(test) {
     var ar = [];
     for(var key in x)
         ar.push(key);
-    test.deepEqual(ar, ['a', 'c']); // or should 'b' be in here as well?
-    test.done();    
-}
+    t.deepEqual(ar, ['a', 'c']); // or should 'b' be in here as well?
+    t.end();    
+})
 
-
-exports.testObserveProperty = function(test) {
+test('observe property', function(t) {
     var sb = [];
     var mb = [];
 
@@ -314,14 +314,13 @@ exports.testObserveProperty = function(test) {
     snickers.calories = 5;
     mars.calories = 7;
 
-    test.deepEqual(sb, [null, 10]);
-    test.deepEqual(mb, [undefined, 15]);
+    t.deepEqual(sb, [null, 10]);
+    t.deepEqual(mb, [undefined, 15]);
 
-    test.done();
-}
+    t.end();
+})
 
-
-exports.testChangeCountOptimization = function(test) {
+test('change count optimization', function(t) {
     var bCalcs = 0;
     var cCalcs = 0;
     var a = observable(3);
@@ -336,23 +335,23 @@ exports.testChangeCountOptimization = function(test) {
 
     c.observe(voidObserver);
 
-    test.equals(b(), 4);
-    test.equals(c(), 4);
-    test.equals(bCalcs, 1);
-    test.equals(cCalcs, 1);
+    t.equal(b(), 4);
+    t.equal(c(), 4);
+    t.equal(bCalcs, 1);
+    t.equal(cCalcs, 1);
 
     a(5);
 
-    test.equals(b(), 4);
-    test.equals(c(), 4);
-    test.equals(bCalcs, 2);
-    test.equals(cCalcs, 1);
+    t.equal(b(), 4);
+    t.equal(c(), 4);
+    t.equal(bCalcs, 2);
+    t.equal(cCalcs, 1);
 
-    test.equal(mobservable._.isComputingView(), false);
-    test.done();
-}
+    t.equal(mobservable._.isComputingView(), false);
+    t.end();
+})
 
-exports.testObservablesRemoved = function(test) {
+test('observables removed', function(t) {
     var calcs = 0;
     var a = observable(1);
     var b = observable(2);
@@ -364,28 +363,27 @@ exports.testObservablesRemoved = function(test) {
     });
 
 
-    test.equals(calcs, 0);
+    t.equal(calcs, 0);
     c.observe(voidObserver);
-    test.equals(c(), 4);
-    test.equals(calcs, 1);
+    t.equal(c(), 4);
+    t.equal(calcs, 1);
     a(2);
-    test.equals(c(), 3);
-    test.equals(calcs, 2);
+    t.equal(c(), 3);
+    t.equal(calcs, 2);
 
     b(3); // should not retrigger calc
-    test.equals(c(), 3);
-    test.equals(calcs, 2);
+    t.equal(c(), 3);
+    t.equal(calcs, 2);
 
     a(1);
-    test.equals(c(), 9);
-    test.equals(calcs, 3);
+    t.equal(c(), 9);
+    t.equal(calcs, 3);
 
-    test.equal(mobservable._.isComputingView(), false);
-    test.done();
-}
+    t.equal(mobservable._.isComputingView(), false);
+    t.end();
+})
 
-
-exports.testLazyEvaluation = function (test) {
+test('lazy evaluation', function (t) {
     var bCalcs = 0;
     var cCalcs = 0;
     var dCalcs = 0;
@@ -402,23 +400,23 @@ exports.testLazyEvaluation = function (test) {
         return b() +1;
     });
 
-    test.equal(bCalcs, 0);
-    test.equal(cCalcs, 0);
-    test.equal(c(), 3);
-    test.equal(bCalcs,1);
-    test.equal(cCalcs,1);
+    t.equal(bCalcs, 0);
+    t.equal(cCalcs, 0);
+    t.equal(c(), 3);
+    t.equal(bCalcs,1);
+    t.equal(cCalcs,1);
 
-    test.equal(c(), 3);
-    test.equal(bCalcs,2);
-    test.equal(cCalcs,2);
+    t.equal(c(), 3);
+    t.equal(bCalcs,2);
+    t.equal(cCalcs,2);
 
     a(2);
-    test.equal(bCalcs,2);
-    test.equal(cCalcs,2);
+    t.equal(bCalcs,2);
+    t.equal(cCalcs,2);
 
-    test.equal(c(), 4);
-    test.equal(bCalcs,3);
-    test.equal(cCalcs,3);
+    t.equal(c(), 4);
+    t.equal(bCalcs,3);
+    t.equal(cCalcs,3);
 
     var d = observable(function() {
         dCalcs += 1;
@@ -428,39 +426,39 @@ exports.testLazyEvaluation = function (test) {
     var handle = d.observe(function() {
         observerChanges += 1;
     }, false);
-    test.equal(bCalcs,4);
-    test.equal(cCalcs,3);
-    test.equal(dCalcs,1); // d is evaluated, so that its dependencies are known
+    t.equal(bCalcs,4);
+    t.equal(cCalcs,3);
+    t.equal(dCalcs,1); // d is evaluated, so that its dependencies are known
 
     a(3);
-    test.equal(d(), 8);
-    test.equal(bCalcs,5);
-    test.equal(cCalcs,3);
-    test.equal(dCalcs,2);
+    t.equal(d(), 8);
+    t.equal(bCalcs,5);
+    t.equal(cCalcs,3);
+    t.equal(dCalcs,2);
 
-    test.equal(c(), 5);
-    test.equal(bCalcs,5);
-    test.equal(cCalcs,4);
-    test.equal(dCalcs,2);
+    t.equal(c(), 5);
+    t.equal(bCalcs,5);
+    t.equal(cCalcs,4);
+    t.equal(dCalcs,2);
 
-    test.equal(b(), 4);
-    test.equal(bCalcs,5);
-    test.equal(cCalcs,4);
-    test.equal(dCalcs,2);
+    t.equal(b(), 4);
+    t.equal(bCalcs,5);
+    t.equal(cCalcs,4);
+    t.equal(dCalcs,2);
 
     handle(); // unlisten
-    test.equal(d(), 8);
-    test.equal(bCalcs,6); // gone to sleep
-    test.equal(cCalcs,4);
-    test.equal(dCalcs,3);
+    t.equal(d(), 8);
+    t.equal(bCalcs,6); // gone to sleep
+    t.equal(cCalcs,4);
+    t.equal(dCalcs,3);
 
-    test.equal(observerChanges, 1);
+    t.equal(observerChanges, 1);
 
-    test.equal(mobservable._.isComputingView(), false);
-    test.done();
-};
+    t.equal(mobservable._.isComputingView(), false);
+    t.end();
+})
 
-exports.test_multiple_view_dependencies = function(test) {
+test('multiple view dependencies', function(t) {
     var bCalcs = 0;
     var dCalcs = 0;
     var a = m(1);
@@ -487,28 +485,28 @@ exports.test_multiple_view_dependencies = function(test) {
 
     zwitch = false;
     c(3);
-    test.equals(bCalcs, 1);
-    test.equals(dCalcs, 2);
-    test.equals(fCalcs, 2);
-    test.deepEqual(buffer, [8, 11]);
+    t.equal(bCalcs, 1);
+    t.equal(dCalcs, 2);
+    t.equal(fCalcs, 2);
+    t.deepEqual(buffer, [8, 11]);
 
     c(4);
-    test.equals(bCalcs, 1);
-    test.equals(dCalcs, 3);
-    test.equals(fCalcs, 3);
-    test.deepEqual(buffer, [8, 11, 14]);
+    t.equal(bCalcs, 1);
+    t.equal(dCalcs, 3);
+    t.equal(fCalcs, 3);
+    t.deepEqual(buffer, [8, 11, 14]);
 
     dis();
     c(5);
-    test.equals(bCalcs, 1);
-    test.equals(dCalcs, 3);
-    test.equals(fCalcs, 3);
-    test.deepEqual(buffer, [8, 11, 14]);
+    t.equal(bCalcs, 1);
+    t.equal(dCalcs, 3);
+    t.equal(fCalcs, 3);
+    t.deepEqual(buffer, [8, 11, 14]);
     
-    test.done();
-}
+    t.end();
+})
 
-exports.test_nested_observable2 = function(test) {
+test('nested observable2', function(t) {
     var factor = m(0);
     var price = m(100);
     var totalCalcs = 0;
@@ -532,14 +530,14 @@ exports.test_nested_observable2 = function(test) {
     factor(4); // triggers innerCalc twice
     price(20);
 
-    test.deepEqual(b, [100,150,450,150,20]);
-    test.equal(innerCalcs, 9);
-    test.equal(totalCalcs, 5);
+    t.deepEqual(b, [100,150,450,150,20]);
+    t.equal(innerCalcs, 9);
+    t.equal(totalCalcs, 5);
 
-    test.done();
-};
+    t.end();
+})
 
-exports.test_expr = function(test) {
+test('expr', function(t) {
     var factor = m(0);
     var price = m(100);
     var totalCalcs = 0;
@@ -563,14 +561,14 @@ exports.test_expr = function(test) {
     factor(4); // triggers innerCalc twice
     price(20);
 
-    test.deepEqual(b, [100,150,450,150,20]);
-    test.equal(innerCalcs, 9);
-    test.equal(totalCalcs, 5);
+    t.deepEqual(b, [100,150,450,150,20]);
+    t.equal(innerCalcs, 9);
+    t.equal(totalCalcs, 5);
 
-    test.done();
-};
+    t.end();
+})
 
-exports.test_observe = function(test) {
+test('observe', function(t) {
     var x = m(3);
     var x2 = m(function() { return x() * 2; });
     var b = [];
@@ -581,14 +579,15 @@ exports.test_observe = function(test) {
 
     x(4);
     x(5);
-    test.deepEqual(b, [6, 8, 10]);
+    t.deepEqual(b, [6, 8, 10]);
     cancel();
     x(7);
-    test.deepEqual(b, [6, 8, 10]);
+    t.deepEqual(b, [6, 8, 10]);
 
-    test.done();
-};
-exports.test_when = function(test) {
+    t.end();
+})
+
+test('when', function(t) {
     var x = m(3);
 
     var called = 0;
@@ -599,18 +598,18 @@ exports.test_when = function(test) {
     });
 
     x(5);
-    test.equal(called, 0);
+    t.equal(called, 0);
     x(4);
-    test.equal(called, 1);
+    t.equal(called, 1);
     x(3);
-    test.equal(called, 1);
+    t.equal(called, 1);
     x(4);
-    test.equal(called, 1);
+    t.equal(called, 1);
     
-    test.done();
-};
+    t.end();
+})
 
-exports.test_async = function(test) {
+test('async', function(t) {
     var called = 0;
     var x = m(3);
     var y = m(1);
@@ -631,31 +630,31 @@ exports.test_async = function(test) {
     y(2);
     
     setTimeout(function() {
-        test.equal(called, 1);
-        test.equal(value, 10);
+        t.equal(called, 1);
+        t.equal(value, 10);
 
         x(4);
         x(6);
         y(1);
         
         setTimeout(function() {
-            test.equal(called, 2);
-            test.equal(value, 6);
+            t.equal(called, 2);
+            t.equal(value, 6);
             
             x(7);
             disposer();
             // after calling disposer, autorunAsync should not update anymore! even if its scheduled
             
             setTimeout(function() {
-                test.equal(called, 2);
-                test.equal(value, 6);
-                test.done();
+                t.equal(called, 2);
+                t.equal(value, 6);
+                t.end();
             }, 10);
         }, 10);
     }, 10);
-};
+})
 
-exports.test_expr = function(test) {
+test('expr2', function(t) {
     var factor = m(0);
     var price = m(100);
     var totalCalcs = 0;
@@ -679,14 +678,14 @@ exports.test_expr = function(test) {
     factor(4); // triggers innerCalc twice
     price(20);
     
-    test.deepEqual(b, [100,150,450,150,20]);
-    test.equal(innerCalcs, 9);
-    test.equal(totalCalcs, 5);    
+    t.deepEqual(b, [100,150,450,150,20]);
+    t.equal(innerCalcs, 9);
+    t.equal(totalCalcs, 5);    
     
-    test.done();
-}; 
+    t.end();
+})
 
-exports.test_json1 = function(test) {
+test('json1', function(t) {
     var todos = m([
         {
             title: "write blog"
@@ -702,14 +701,14 @@ exports.test_json1 = function(test) {
     });
 
     todos[1].title = "improve coverage"; // prints: write blog, improve coverage
-    test.equal(output, "write blog, improve coverage");
+    t.equal(output, "write blog, improve coverage");
     todos.push({ title: "take a nap" }); // prints: write blog, improve coverage, take a nap
-    test.equal(output, "write blog, improve coverage, take a nap");
+    t.equal(output, "write blog, improve coverage, take a nap");
 
-    test.done();
-}
+    t.end();
+})
 
-exports.test_json2 = function(test) {
+test('json2', function(t) {
     var source = {
         todos: [
             {
@@ -732,8 +731,8 @@ exports.test_json2 = function(test) {
     var o = mobservable.observable(source);
 
     //console.log(JSON.stringify(source,null,4));
-    test.deepEqual(mobservable.toJSON(o), source);
-    test.deepEqual(source, o);
+    t.deepEqual(mobservable.toJSON(o), source);
+    t.deepEqual(source, o);
 
     var analyze = m(function() {
         return [
@@ -759,7 +758,7 @@ exports.test_json2 = function(test) {
     o.todos[0].tags[0] = "reactjs";
     o.todos[1].tags.push("pff");
 
-    test.deepEqual(mobservable.toJSON(o), {
+    t.deepEqual(mobservable.toJSON(o), {
         "todos": [
             {
                 "title": "write blog",
@@ -782,8 +781,8 @@ exports.test_json2 = function(test) {
             }
         ]
     });
-    test.deepEqual(ab, [ [ 2, 'here' ], [ 2, 'ba' ] ]);
-    test.deepEqual(tb,  [ 'react,frp,mweh', 'reactjs,frp,mweh', 'reactjs,frp,mweh,pff' ]);
+    t.deepEqual(ab, [ [ 2, 'here' ], [ 2, 'ba' ] ]);
+    t.deepEqual(tb,  [ 'react,frp,mweh', 'reactjs,frp,mweh', 'reactjs,frp,mweh,pff' ]);
     ab = [];
     tb = [];
 
@@ -792,7 +791,7 @@ exports.test_json2 = function(test) {
         tags: ["x"]
     }));
 
-    test.deepEqual(o, {
+    t.deepEqual(o, {
         "todos": [
             {
                 "title": "write blog",
@@ -819,8 +818,8 @@ exports.test_json2 = function(test) {
             }
         ]
     });
-    test.deepEqual(ab, [[3, "ba"]]);
-    test.deepEqual(tb, ["reactjs,frp,mweh,pff,x"]);
+    t.deepEqual(ab, [[3, "ba"]]);
+    t.deepEqual(tb, ["reactjs,frp,mweh,pff,x"]);
     ab = [];
     tb = [];
 
@@ -831,7 +830,7 @@ exports.test_json2 = function(test) {
             url: "booking.com"
         }
     });
-    test.deepEqual(o, {
+    t.deepEqual(o, {
         "todos": [
             {
                 "title": "write blog",
@@ -858,14 +857,14 @@ exports.test_json2 = function(test) {
             }
         ]
     });
-    test.deepEqual(ab, [[3, "booking.com"]]);
-    test.deepEqual(tb, ["reactjs,frp,needs sabbatical,x"]);
+    t.deepEqual(ab, [[3, "booking.com"]]);
+    t.deepEqual(tb, ["reactjs,frp,needs sabbatical,x"]);
     ab = [];
     tb = [];
 
     o.todos[1].details = mobservable.observable({ url: "google" });
     o.todos[1].tags = ["foo", "bar"];
-    test.deepEqual(mobservable.toJSON(o), {
+    t.deepEqual(mobservable.toJSON(o), {
          "todos": [
             {
                 "title": "write blog",
@@ -892,9 +891,9 @@ exports.test_json2 = function(test) {
             }
         ]
     });
-    test.deepEqual(o, mobservable.toJSON(o));
-    test.deepEqual(ab, [[3, "google"]]);
-    test.deepEqual(tb, ["reactjs,frp,foo,bar,x"]);
+    t.deepEqual(o, mobservable.toJSON(o));
+    t.deepEqual(ab, [[3, "google"]]);
+    t.deepEqual(tb, ["reactjs,frp,foo,bar,x"]);
 
-    test.done();
-}
+    t.end();
+})
