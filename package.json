@@ -2,8 +2,8 @@
     "name": "mobservable",
     "version": "1.0.2",
     "description": "Observable data. Reactive functions. Simple code.",
-    "main": "dist/mobservable.js",
-    "typings": "dist/typings/index",
+    "main": "index.js",
+    "typings": "lib/index.d.ts",
     "scripts": {
         "test": "npm run build && npm run buildtest && istanbul cover nodeunit test/*.js && cat ./coverage/lcov.info | coveralls ",
         "start": "npm run build && npm run buildtest && nodeunit test/*.js",
