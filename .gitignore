@@ -1,12 +1,7 @@
-/node_modules/
-npm-debug.log
-.dist
-.build
-coverage/
 .tscache
-/test/typescript-test.js*
-/test/babel-test.js
-/dist/test
-notes.md
 .settings
-dist/typings
+node_modules
+npm-debug.log
+coverage
+notes.md
+lib
