@@ -52,6 +52,6 @@ export declare class ViewNode extends DataNode {
     private findCycle(node);
     dispose(): void;
 }
-export declare function stackDepth(): number;
+export declare function stackDepth(): any;
 export declare function isComputingView(): boolean;
 import { IContextInfoStruct } from './interfaces';

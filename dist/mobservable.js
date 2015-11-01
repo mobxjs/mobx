@@ -472,6 +472,7 @@ function assertUnwrapped(value, message) {
 exports.assertUnwrapped = assertUnwrapped;
 
 },{"./dnode":2,"./observablearray":6,"./observablemap":7,"./observableobject":8,"./observablevalue":9,"./observableview":10,"./scheduler":11,"./utils":13}],2:[function(require,module,exports){
+(function (global){
 /**
  * mobservable
  * (c) 2015 - Michel Weststrate
@@ -482,16 +483,15 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var globalScope = (function () { return this; })();
 // DNode[][], stack of: list of DNode's being observed by the currently ongoing computation
-if (globalScope.__mobservableTrackingStack)
+if (global.__mobservableTrackingStack)
     throw new Error("[mobservable] An incompatible version of mobservable is already loaded.");
-globalScope.__mobservableViewStack = [];
+global.__mobservableViewStack = [];
 var mobservableId = 0;
 function checkIfStateIsBeingModifiedDuringView(context) {
     if (core_1.getStrict() === true && isComputingView()) {
         // TODO: add url with detailed error subscription / best practice here:
-        var ts = __mobservableViewStack;
+        var ts = global.__mobservableViewStack;
         throw new Error("[mobservable] It is not allowed to change the state during the computation of a reactive view. Should the data you are trying to modify actually be a view? \nUse 'mobservable.extras.withStrict(false, block)' to allow changes to be made inside views (unrecommended).\nView name: " + context.name + ".\nCurrent stack size is " + ts.length + ", active view: \"" + ts[ts.length - 1].toString() + "\".");
     }
 }
@@ -557,7 +557,7 @@ var DataNode = (function () {
             os[i].notifyStateChange(this, stateDidActuallyChange);
     };
     DataNode.prototype.notifyObserved = function () {
-        var ts = __mobservableViewStack, l = ts.length;
+        var ts = global.__mobservableViewStack, l = ts.length;
         if (l > 0) {
             var deps = ts[l - 1].observing, depslength = deps.length;
             // this last item added check is an optimization especially for array loops,
@@ -673,10 +673,10 @@ var ViewNode = (function (_super) {
     ViewNode.prototype.trackDependencies = function () {
         this.prevObserving = this.observing;
         this.observing = [];
-        __mobservableViewStack[__mobservableViewStack.length] = this;
+        global.__mobservableViewStack[global.__mobservableViewStack.length] = this;
     };
     ViewNode.prototype.bindDependencies = function () {
-        __mobservableViewStack.length -= 1;
+        global.__mobservableViewStack.length -= 1;
         var _a = utils_1.quickDiff(this.observing, this.prevObserving), added = _a[0], removed = _a[1];
         this.prevObserving = null;
         this.hasCycle = false;
@@ -716,17 +716,19 @@ var ViewNode = (function (_super) {
 })(DataNode);
 exports.ViewNode = ViewNode;
 function stackDepth() {
-    return __mobservableViewStack.length;
+    return global.__mobservableViewStack.length;
 }
 exports.stackDepth = stackDepth;
 function isComputingView() {
-    return __mobservableViewStack.length > 0;
+    return global.__mobservableViewStack.length > 0;
 }
 exports.isComputingView = isComputingView;
 var core_1 = require('./core');
 var extras_1 = require('./extras');
 var utils_1 = require('./utils');
 var scheduler_1 = require('./scheduler');
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
 },{"./core":1,"./extras":3,"./scheduler":11,"./utils":13}],3:[function(require,module,exports){
 /**
