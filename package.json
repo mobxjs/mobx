@@ -8,7 +8,6 @@
     "test": "tape test/*.js",
     "test-browser": "make test-browser",
     "coverage": "istanbul cover tape test/*.js && cat ./coverage/lcov.info|coveralls",
-    "coverage-browser": "istanbul cover make test-browser && cat ./coverage/lcov.info|coveralls",
     "prepublish": "npm run build",
     "build": "make build"
   },
