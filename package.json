@@ -28,6 +28,7 @@
     "babel": "^5.8.23",
     "browserify": "^12.0.1",
     "coveralls": "^2.11.4",
+    "exorcist": "^0.4.0",
     "istanbul": "^0.3.21",
     "nodeunit": "^0.9.1",
     "nodeunit-browser-tap": "^0.1.0",

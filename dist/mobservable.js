@@ -1849,3 +1849,4 @@ var observablearray_1 = require('./observablearray');
 
 },{"./observablearray":6}]},{},[4])(4)
 });
+//# sourceMappingURL=mobservable.js.map

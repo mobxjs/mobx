@@ -15,8 +15,9 @@ dist: cleandist
 	@mkdir -p dist
 	@$(BIN)browserify src/index.ts \
 		-p tsify \
+		--debug \
 		--standalone mobservable \
-		> dist/mobservable.js
+		|$(BIN)exorcist dist/mobservable.js.map > dist/mobservable.js
 
 clean: cleandist
 	@rm -fr lib
