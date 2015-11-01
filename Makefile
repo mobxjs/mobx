@@ -1,7 +1,12 @@
 BIN=./node_modules/.bin/
 SRC=$(shell find src -name "*.ts")
+BROWSER_TESTS=$(shell find test -name "*.js" \
+! -path "test/babel*" ! -path "test/typescript*")
 
 build: lib dist
+
+test-browser:
+	@$(BIN)browserify $(BROWSER_TESTS)|$(BIN)tape-run
 
 lib: clean
 	@$(BIN)tsc \
