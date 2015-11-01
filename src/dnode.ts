@@ -4,22 +4,20 @@
  * https://github.com/mweststrate/mobservable
  */
 
-declare var __mobservableViewStack:ViewNode[];
-
-var globalScope = (function() { return this; })()
+declare var global:any;
 
 // DNode[][], stack of: list of DNode's being observed by the currently ongoing computation
-if (globalScope.__mobservableTrackingStack)
+if (global.__mobservableTrackingStack)
     throw new Error("[mobservable] An incompatible version of mobservable is already loaded.");
-globalScope.__mobservableViewStack = [];
 
+global.__mobservableViewStack = [];
 
 var mobservableId = 0;
 
 export function checkIfStateIsBeingModifiedDuringView(context: IContextInfoStruct) {
     if (getStrict() === true && isComputingView()) {
         // TODO: add url with detailed error subscription / best practice here:
-        const ts = __mobservableViewStack;
+        const ts = global.__mobservableViewStack;
         throw new Error(
 `[mobservable] It is not allowed to change the state during the computation of a reactive view. Should the data you are trying to modify actually be a view? 
 Use 'mobservable.extras.withStrict(false, block)' to allow changes to be made inside views (unrecommended).
@@ -98,7 +96,7 @@ export class DataNode {
     }
 
     public notifyObserved() {
-        var ts = __mobservableViewStack, l = ts.length;
+        var ts = global.__mobservableViewStack, l = ts.length;
         if (l > 0) {
             var deps = ts[l-1].observing, depslength = deps.length;
             // this last item added check is an optimization especially for array loops,
@@ -215,11 +213,11 @@ export class ViewNode extends DataNode {
     private trackDependencies() {
         this.prevObserving = this.observing;
         this.observing = [];
-        __mobservableViewStack[__mobservableViewStack.length] = this;
+        global.__mobservableViewStack[global.__mobservableViewStack.length] = this;
     }
 
     private bindDependencies() {
-            __mobservableViewStack.length -= 1;
+            global.__mobservableViewStack.length -= 1;
 
         var [added, removed] = quickDiff(this.observing, this.prevObserving);
         this.prevObserving = null;
@@ -261,11 +259,11 @@ export class ViewNode extends DataNode {
 }
 
 export function stackDepth () {
-    return __mobservableViewStack.length;
+    return global.__mobservableViewStack.length;
 }
 
 export function isComputingView() {
-    return __mobservableViewStack.length > 0;
+    return global.__mobservableViewStack.length > 0;
 }
 
 import {getStrict, withStrict} from './core';
