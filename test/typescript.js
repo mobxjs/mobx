@@ -9,6 +9,8 @@ var tmpdir = path.join((os.tmpdir || os.tmpDir)(), 'mobservable-' + Math.random
 test('typescript', function (t) {
   t.plan(2)
 
+  process.chdir(__dirname)
+
   var ps = spawn(path.resolve(__dirname, '../node_modules/.bin/tsc'),[
     '-m', 'commonjs', '--experimentalDecorators', '--outDir', tmpdir, '-t', 'es5',
     'typescript/x.ts'])
