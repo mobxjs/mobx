@@ -1,4 +1,4 @@
-var mobservable = require('mobservable');
+var mobservable = require('..');
 var m = mobservable.observable;
 var observable = mobservable.observable;
 
