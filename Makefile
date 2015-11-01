@@ -1,7 +1,7 @@
 BIN=./node_modules/.bin/
 SRC=$(shell find src -name "*.ts")
 
-build: lib
+build: lib dist
 
 lib: clean
 	@$(BIN)tsc \
@@ -11,5 +11,15 @@ lib: clean
 		--outDir lib\
 		$(SRC)
 
-clean:
+dist: cleandist
+	@mkdir -p dist
+	@$(BIN)browserify src/index.ts \
+		-p tsify \
+		--standalone mobservable \
+		> dist/mobservable.js
+
+clean: cleandist
 	@rm -fr lib
+
+cleandist:
+	@rm -fr dist
