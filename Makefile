@@ -18,6 +18,12 @@ dist: cleandist
 		--debug \
 		--standalone mobservable \
 		|$(BIN)exorcist dist/mobservable.js.map > dist/mobservable.js
+	@$(BIN)browserify src/index.ts \
+		-t uglifyify \
+		-p tsify \
+		--debug \
+		--standalone mobservable \
+		|$(BIN)exorcist dist/mobservable.min.js.map > dist/mobservable.min.js
 
 clean: cleandist
 	@rm -fr lib

@@ -4,13 +4,9 @@ npm-debug.log
 .build
 coverage/
 .tscache
-*.js.map
-lib/*.js.map
 /test/typescript-test.js*
 /test/babel-test.js
 /dist/test
 notes.md
 .settings
 dist/typings
-dist/mobservable.min.js
-dist/mobservable.js.map

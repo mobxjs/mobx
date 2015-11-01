@@ -33,7 +33,8 @@
     "nodeunit": "^0.9.1",
     "nodeunit-browser-tap": "^0.1.0",
     "tsify": "^0.12.2",
-    "typescript": "^1.6.2"
+    "typescript": "^1.6.2",
+    "uglifyify": "^3.0.1"
   },
   "keywords": [
     "mobservable",
