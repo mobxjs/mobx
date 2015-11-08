@@ -223,10 +223,17 @@ export function expr<T>(expr: () => T, scope?):T {
     * @param properties the properties that should be added and made reactive
     * @returns targer
     */
-export function extendObservable<A extends Object, B extends Object>(target: A, properties: B, context?: IContextInfoStruct): A & B {
+export function extendObservable<A extends Object, B extends Object>(target: A, ...properties: B[]): A & B {
+    if (arguments.length < 2)
+        throw new Error("[mobservable.extendObservable] expected 2 or more arguments");
     if (target instanceof ObservableMap || properties instanceof ObservableMap)
         throw new Error("[mobservable.extendObservable] 'extendObservable' should not be used on maps, use map.merge instead");
-    return <A & B> extendObservableHelper(target, properties,ValueMode.Recursive, context) 
+    properties.forEach(propSet => {
+        if (!propSet || typeof target !== "object")
+            throw new Error("[mobservable.extendObservable] 'extendObservable' expects one or more objects with properties to define");
+        extendObservableHelper(target, propSet, ValueMode.Recursive, null);
+    }); 
+    return <A & B> target;
 }
 
 /**
