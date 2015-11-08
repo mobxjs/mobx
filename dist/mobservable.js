@@ -230,10 +230,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return observable(expr, scope)();
 	}
 	exports.expr = expr;
-	function extendObservable(target, properties, context) {
+	function extendObservable(target) {
+	    var properties = [];
+	    for (var _i = 1; _i < arguments.length; _i++) {
+	        properties[_i - 1] = arguments[_i];
+	    }
+	    if (arguments.length < 2)
+	        throw new Error("[mobservable.extendObservable] expected 2 or more arguments");
 	    if (target instanceof observablemap_1.ObservableMap || properties instanceof observablemap_1.ObservableMap)
 	        throw new Error("[mobservable.extendObservable] 'extendObservable' should not be used on maps, use map.merge instead");
-	    return extendObservableHelper(target, properties, ValueMode.Recursive, context);
+	    properties.forEach(function (propSet) {
+	        if (!propSet || typeof target !== "object")
+	            throw new Error("[mobservable.extendObservable] 'extendObservable' expects one or more objects with properties to define");
+	        extendObservableHelper(target, propSet, ValueMode.Recursive, null);
+	    });
+	    return target;
 	}
 	exports.extendObservable = extendObservable;
 	function observableDecorator(target, key, baseDescriptor) {
