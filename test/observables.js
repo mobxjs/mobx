@@ -147,6 +147,65 @@ exports.testBatch = function(test) {
     test.done();
 }
 
+exports.testTransactionWithIntermediateEvaluation = function(test) {
+    var a = observable(2);
+    var calcs = 0;
+    var b = observable(function() {
+        calcs++;
+        return a() * 2;
+    });
+
+    // if not inspected during transaction, postpone value to end
+    mobservable.transaction(function() {
+        a(3);
+        test.equal(b(), 6);
+        test.equal(calcs, 1);
+    });
+    test.equal(b(), 6);
+    test.equal(calcs, 2);
+
+    // if inspected, evaluate eagerly
+    mobservable.transaction(function() {
+        a(4);
+        test.equal(b(), 8);
+        test.equal(calcs, 1);
+    });
+    test.equal(b(), 8);
+    test.equal(calcs, 2);
+
+    test.done();
+}
+
+exports.testTransactionWithIntermediateEvaluation = function(test) {
+    var a = observable(2);
+    var calcs = 0;
+    var b;
+    mobservable.autorun(function() {
+        calcs++;
+        b = a() * 2;
+    });
+
+    // if not inspected during transaction, postpone value to end
+    mobservable.transaction(function() {
+        a(3);
+        test.equal(b, 4);
+        test.equal(calcs, 1);
+    });
+    test.equal(b, 6);
+    test.equal(calcs, 2);
+
+    // if inspected, evaluate eagerly
+    mobservable.transaction(function() {
+        a(4);
+        test.equal(b, 6);
+        test.equal(calcs, 2);
+    });
+    test.equal(b, 8);
+    test.equal(calcs, 3);
+
+    test.done();
+}
+
 exports.testScope = function(test) {
     var vat = observable(0.2);
     var Order = function() {
