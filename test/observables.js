@@ -262,6 +262,29 @@ test('props4', function(t) {
     t.end();
 })
 
+test('extend observable multiple prop maps', function(t) {
+    var x = { a: 1 };
+    mobservable.extendObservable(x, {
+        b: 2,
+        c: 2
+    }, {
+        c: 3,
+        d: 4
+    }, {
+        a: 5
+    });
+    
+    var sum = 0;
+    var disposer = mobservable.autorun(function() {
+        sum = x.a + x.b + x.c + x.d;
+    });
+    t.equal(sum, 14);
+    x.a = 1;
+    t.equal(sum, 10);
+    
+    t.done();
+})
+
 test('object enumerable props', function(t) {
     var x = mobservable.observable({
         a: 3,
