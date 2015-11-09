@@ -1,58 +1,59 @@
-var mobservable = require('mobservable');
+var test = require('tape');
+var mobservable = require('..');
 var m = mobservable;
 
-exports.testGetDNode = function(test) {
+test('getDNode', function(t) {
     var getD = mobservable.extras.getDNode;
 
-    test.throws(function() {
+    t.throws(function() {
         getD({});
     });
-    test.throws(function() {
+    t.throws(function() {
         getD([]);
     });
-    test.throws(function() {
+    t.throws(function() {
         getD(null);
     });
-    test.throws(function() {
+    t.throws(function() {
         getD({ x: 3}, "x");
     });
-    test.throws(function() {
+    t.throws(function() {
         getD(m.observable({ x: 3}));
     });
-    test.throws(function() {
+    t.throws(function() {
         getD(function() {});
     });
-    test.throws(function() {
+    t.throws(function() {
         getD(Object.assign(m.observable({ x: 3}), { y:2}), "y");
     });
 
-    test.ok(getD(m.observable([])));
-    test.ok(getD(m.observable({x:3}), "x"));
-    test.ok(getD(m.observable(3)));
-    test.ok(getD(m.observable({x:function() { return 3 }}), "x"));
-    test.ok(getD(m.observable(function() {})));
-    test.ok(getD(mobservable.autorun(function() {})));
+    t.ok(getD(m.observable([])));
+    t.ok(getD(m.observable({x:3}), "x"));
+    t.ok(getD(m.observable(3)));
+    t.ok(getD(m.observable({x:function() { return 3 }}), "x"));
+    t.ok(getD(m.observable(function() {})));
+    t.ok(getD(mobservable.autorun(function() {})));
 
     var a;
     a = m.observable({x:{}});
-    test.ok(getD(a,"x"));
+    t.ok(getD(a,"x"));
     a = m.observable({x:[]});
-    test.ok(getD(a,"x"));
-    test.ok(getD(a.x));
+    t.ok(getD(a,"x"));
+    t.ok(getD(a.x));
     a = m.observable({x:[[]]});
-    test.ok(getD(a,"x"));
-    test.ok(getD(a.x));
-    test.ok(getD(a.x[0]));
+    t.ok(getD(a,"x"));
+    t.ok(getD(a.x));
+    t.ok(getD(a.x[0]));
 
-    test.done();
-}
+    t.end();
+})
 
-exports.testTreeD = function(test) {
+test('treeD', function(t) {
     var a = m.observable(3);
     var aName = a.$mobservable.context.name;
 
     var dtree = m.extras.getDependencyTree;
-    test.deepEqual(dtree(a), {
+    t.deepEqual(dtree(a), {
        context:null,
        name: aName,
        id: a.$mobservable.id
@@ -64,7 +65,7 @@ exports.testTreeD = function(test) {
     };
     var b = m.observable(bFunc);
     var bName = b.$mobservable.context.name
-    test.deepEqual(dtree(b), {
+    t.deepEqual(dtree(b), {
         context:bFunc,
         name: bName,
         id: b.$mobservable.id,
@@ -76,7 +77,7 @@ exports.testTreeD = function(test) {
     };
     var c = m.autorun(cFunc);
     var cName = c.$mobservable.context.name;
-    test.deepEqual(dtree(c), {
+    t.deepEqual(dtree(c), {
         context: cFunc,
         name: cName,
         id: c.$mobservable.id,
@@ -92,10 +93,10 @@ exports.testTreeD = function(test) {
         }]
     });
 
-    test.ok(aName !== bName);
-    test.ok(bName !== cName);
+    t.ok(aName !== bName);
+    t.ok(bName !== cName);
 
-    test.deepEqual(m.extras.getObserverTree(a), {
+    t.deepEqual(m.extras.getObserverTree(a), {
         context: null,
         name: aName,
         id: a.$mobservable.id,
@@ -112,10 +113,10 @@ exports.testTreeD = function(test) {
         }]
     });
 
-    test.done();
-}
+    t.end();
+})
 
-exports.testNames = function(test) {
+test('names', function(t) {
     function name(thing, prop) {
         return m.extras.getDNode(thing, prop).context.name;
     }
@@ -141,42 +142,42 @@ exports.testNames = function(test) {
     m.extendObservable(rstruct.y, { a:  { b : 2}});
     rstruct.ar.push({ b : 2});
     rstruct.ar.push([]);
-    test.equal(name(rstruct,"x"), ".x");
-    test.equal(name(rstruct, "y"), ".y");
-    test.equal(name(rstruct.y,"z"), ".y.z");
-    test.equal(name(rstruct, "ar"), ".ar");
-    test.equal(name(rstruct.ar), ".ar");
-    test.equal(name(rstruct.ar[1],"w"), ".ar[x].w");
-    test.equal(name(rstruct.y.a,"b"), ".y.a.b");
-    test.equal(name(rstruct.ar[2], "b"), ".ar[x].b");
-    test.equal(name(rstruct.ar[3]), ".ar[x]");
+    t.equal(name(rstruct,"x"), ".x");
+    t.equal(name(rstruct, "y"), ".y");
+    t.equal(name(rstruct.y,"z"), ".y.z");
+    t.equal(name(rstruct, "ar"), ".ar");
+    t.equal(name(rstruct.ar), ".ar");
+    t.equal(name(rstruct.ar[1],"w"), ".ar[x].w");
+    t.equal(name(rstruct.y.a,"b"), ".y.a.b");
+    t.equal(name(rstruct.ar[2], "b"), ".ar[x].b");
+    t.equal(name(rstruct.ar[3]), ".ar[x]");
 
-    test.equal(contextObj(rstruct,"x"), rstruct);
-    test.equal(contextObj(rstruct, "y"), rstruct);
-    test.equal(contextObj(rstruct.y,"z"), rstruct);
-    test.equal(contextObj(rstruct, "ar"), rstruct);
-    test.equal(contextObj(rstruct.ar), rstruct);
-    test.equal(contextObj(rstruct.ar), rstruct);
-    test.equal(contextObj(rstruct.ar[1],"w"), rstruct);
-    test.equal(contextObj(rstruct.y.a,"b"), rstruct);
-    test.equal(contextObj(rstruct.ar[2], "b"), rstruct);
-    test.equal(contextObj(rstruct.ar[3]), rstruct);
+    t.equal(contextObj(rstruct,"x"), rstruct);
+    t.equal(contextObj(rstruct, "y"), rstruct);
+    t.equal(contextObj(rstruct.y,"z"), rstruct);
+    t.equal(contextObj(rstruct, "ar"), rstruct);
+    t.equal(contextObj(rstruct.ar), rstruct);
+    t.equal(contextObj(rstruct.ar), rstruct);
+    t.equal(contextObj(rstruct.ar[1],"w"), rstruct);
+    t.equal(contextObj(rstruct.y.a,"b"), rstruct);
+    t.equal(contextObj(rstruct.ar[2], "b"), rstruct);
+    t.equal(contextObj(rstruct.ar[3]), rstruct);
 
     var d = m.autorun(function() {
     });
-    test.ok(name(d));
+    t.ok(name(d));
 
-    test.equal(name(m.autorun(function namedFunction() {
+    t.equal(name(m.autorun(function namedFunction() {
     })), "namedFunction");
 
-    test.ok(name(m.observable(function() {
+    t.ok(name(m.observable(function() {
     })));
 
-    test.equal(name(m.observable(function namedFunction() {
+    t.equal(name(m.observable(function namedFunction() {
     })), "namedFunction");
 
-    test.done();
-}
+    t.end();
+})
 
 function stripTrackerOutput(output) {
     return output.map(function (i) {
@@ -240,7 +241,7 @@ var trackerOutput2 = function(a, b, c) {
   ];
 }
 
-exports.testTransitionTracker1 = function(test) {
+test('transition tracker 1', function(t) {
     var lines = [];
 
     var a = m.observable(3);
@@ -253,12 +254,12 @@ exports.testTransitionTracker1 = function(test) {
     a(4);
     stop();
     a(5);
-    test.deepEqual(stripTrackerOutput(lines), trackerOutput1(a,b,c));
+    t.deepEqual(stripTrackerOutput(lines), trackerOutput1(a,b,c));
 
-    test.done();
-}
+    t.end();
+})
 
-exports.testTransitionTracker2 = function(test) {
+test('transition tracker 2', function(t) {
     var lines = [];
 
     var a = m.observable(3);
@@ -271,12 +272,12 @@ exports.testTransitionTracker2 = function(test) {
     a(4);
     stop();
     a(5);
-    test.deepEqual(stripTrackerOutput(lines), trackerOutput2(a,b,c));
+    t.deepEqual(stripTrackerOutput(lines), trackerOutput2(a,b,c));
 
-    test.done();
-}
+    t.end();
+})
 
-exports.testTransitionTracker3 = function(test) {
+test('transition tracker 3', function(t) {
     var base = console.table;
     var lines = [];
     console.table = function(d) {
@@ -297,7 +298,7 @@ exports.testTransitionTracker3 = function(test) {
     a(5);
 
     setTimeout(function() {
-        test.deepEqual(stripTrackerOutput(lines), [trackerOutput1(a,b,c).concat([{
+        t.deepEqual(stripTrackerOutput(lines), [trackerOutput1(a,b,c).concat([{
             id: d.$mobservable.id,
             state: "READY",
             newValue: 6,
@@ -305,11 +306,11 @@ exports.testTransitionTracker3 = function(test) {
         }])]);
 
         console.table = base;
-        test.done();
+        t.end();
     }, 100);
-}
+})
 
-exports.testTransitionTracker4 = function(test) {
+test('transition tracker 4', function(t) {
     var base = console.dir;
     var lines = [];
     console.dir = function(d) {
@@ -325,9 +326,9 @@ exports.testTransitionTracker4 = function(test) {
     stop();
     a(5);
     setTimeout(function() {
-        test.deepEqual(stripTrackerOutput(lines), [trackerOutput2(a,b,c)]);
+        t.deepEqual(stripTrackerOutput(lines), [trackerOutput2(a,b,c)]);
 
         console.dir = base;
-        test.done();
+        t.end();
     }, 100);
-}
+})

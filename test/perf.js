@@ -1,4 +1,5 @@
-var mobservable = require('mobservable');
+var test = require('tape');
+var mobservable = require('..');
 var observable = mobservable.observable;
 
 var gc = (function () {
@@ -27,7 +28,7 @@ results of this test:
 186/113 after remove filter/length call to detect whether depencies are stable. 300 times faster. w00t.
 
 */
-exports.one_observes_ten_thousand_that_observe_one = function(test) {
+test('one observes ten thousand that observe one', function (t) {
     gc();
     var a = observable(2);
 
@@ -54,19 +55,19 @@ exports.one_observes_ten_thousand_that_observe_one = function(test) {
     var start = now();
 
     b.observe(voidObserver, true); // start observers
-    test.equals(99990000, b());
+    t.equal(99990000, b());
     var initial = now();
 
     a(3);
-    test.equals(149985000, b()); // yes, I verified ;-).
-    //test.equals(2, bCalcs);
+    t.equal(149985000, b()); // yes, I verified ;-).
+    //t.equal(2, bCalcs);
     var end = now();
 
     console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
-    test.done();
-}
+    t.end();
+})
 
-exports.five_hunderd_properties_that_observe_their_sibling = function(test) {
+test('five hundrend properties that observe their sibling', function (t) {
     gc();
     var observables = [observable(1)];
     for(var i = 0; i < 500; i++) {
@@ -79,18 +80,18 @@ exports.five_hunderd_properties_that_observe_their_sibling = function(test) {
 
     var last = observables[observables.length -1];
     last.observe(voidObserver);
-    test.equals(501, last());
+    t.equal(501, last());
     var initial = now();
 
     observables[0](2);
-    test.equals(502, last());
+    t.equal(502, last());
     var end = now();
 
     console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
-    test.done();
-}
+    t.end();
+})
 
-exports.late_depenency_change = function(test) {
+test('late dependency change', function(t) {
     gc();
     var values = [];
     for(var i = 0; i < 100; i++)
@@ -110,12 +111,12 @@ exports.late_depenency_change = function(test) {
     for(var i = 0; i < 10000; i++)
     values[99](i);
 
-    test.equals(sum(), 9999);
+    t.equal(sum(), 9999);
     console.log("\n  Updated in " + ((new Date) - start) + "ms.");
-    test.done();
-}
+    t.end();
+})
 
-exports.lots_of_unused_computables = function(test) {
+test('lots of unused computables', function(t) {
     gc();
     var a = observable(1);
 
@@ -142,7 +143,7 @@ exports.lots_of_unused_computables = function(test) {
         sum = newValue;
     }, true);
 
-    test.equals(sum, 49995000);
+    t.equal(sum, 49995000);
 
     // unsubscribe, nobody should listen to a() now!
     subscription();
@@ -150,21 +151,21 @@ exports.lots_of_unused_computables = function(test) {
     var start = now();
 
     a(3);
-    test.equals(sum, 49995000); // unchanged!
+    t.equal(sum, 49995000); // unchanged!
 
     var end = now();
 
     console.log("\n  Updated in " + (end - start) + " ms.");
-    test.done();
-}
+    t.end();
+})
 
-exports.test_many_unreferenced_observables = function(test) {
+test('many unreferenced observables', function(t) {
     var a = observable(3);
     var b = observable(6);
     var c = observable(7);
     var d = observable(function() { return a() * b() * c() });
-    test.equal(d(), 126);
-    test.equal(d.$mobservable.isSleeping, true);
+    t.equal(d(), 126);
+    t.equal(d.$mobservable.isSleeping, true);
     var start = now();
     for(var i = 0; i < 10000; i++) {
         c(i);
@@ -174,11 +175,10 @@ exports.test_many_unreferenced_observables = function(test) {
 
     console.log("\n  Updated in " + (end - start) + " ms.");
 
-    test.done();
+    t.end();
+})
 
-}
-
-exports.array_reduce = function(test) {
+test('array reduce', function(t) {
     gc();
     var aCalc = 0;
     var ar = observable([]);
@@ -197,8 +197,8 @@ exports.array_reduce = function(test) {
     for(var i = 0; i < 1000; i++)
     ar.push(i);
 
-    test.equals(499500, sum());
-    test.equals(1001, aCalc);
+    t.equal(499500, sum());
+    t.equal(1001, aCalc);
     aCalc = 0;
 
     var initial = now();
@@ -207,16 +207,16 @@ exports.array_reduce = function(test) {
     ar[i] = ar[i] * 2;
     b(2);
 
-    test.equals(1998000, sum());
-    test.equals(1000, aCalc);
+    t.equal(1998000, sum());
+    t.equal(1000, aCalc);
 
     var end = now();
 
     console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
-    test.done();
-}
+    t.end();
+})
 
-exports.array_classic_loop = function(test) {
+test('array classic loop', function(t) {
     gc();
     var ar = observable([]);
     var aCalc = 0;
@@ -232,12 +232,12 @@ exports.array_classic_loop = function(test) {
 
     var start = now();
 
-    test.equals(1, aCalc);
+    t.equal(1, aCalc);
     for(var i = 0; i < 1000; i++)
     ar.push(i);
 
-    test.equals(499500, sum());
-    test.equals(1001, aCalc);
+    t.equal(499500, sum());
+    t.equal(1001, aCalc);
 
     var initial = now();
     aCalc = 0;
@@ -246,17 +246,16 @@ exports.array_classic_loop = function(test) {
     ar[i] = ar[i] * 2;
     b(2);
 
-    test.equals(1998000, sum());
-    test.equals(1000, aCalc);
+    t.equal(1998000, sum());
+    t.equal(1000, aCalc);
 
     var end = now();
 
     console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
-    test.done();
-}
+    t.end();
+})
 
-
-function order_system_helper(test, usebatch, keepObserving) {
+function order_system_helper(t, usebatch, keepObserving) {
     // Garbage collection is very important here,
     // Due to the async nature of this test and the large memory consumption,
     // during tests runs the garbage collector will otherwise kick in at this point
@@ -320,7 +319,7 @@ function order_system_helper(test, usebatch, keepObserving) {
     else
         setup();
 
-    test.equals(totalAmount(), 375000);
+    t.equal(totalAmount(), 375000);
 
     var initial = now();
 
@@ -335,31 +334,31 @@ function order_system_helper(test, usebatch, keepObserving) {
     else
         update();
 
-    test.equals(totalAmount(), 500000);
+    t.equal(totalAmount(), 500000);
 
     var end = now()
     console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
 
-    test.done();
+    t.end();
 };
 
-exports.order_system_observed = function(test) {
-    order_system_helper(test, false, true);
-};
+test('order system observed', function(t) {
+    order_system_helper(t, false, true);
+})
 
-exports.order_system_batched_observed = function(test) {
-    order_system_helper(test, true, true);
-};
+test('order system batched observed', function(t) {
+    order_system_helper(t, true, true);
+})
 
-exports.order_system_lazy = function(test) {
-    order_system_helper(test, false, false);
-};
+test('order system lazy', function(t) {
+    order_system_helper(t, false, false);
+})
 
-exports.order_system_batched_lazy = function(test) {
-    order_system_helper(test, true, false);
-};
+test('order system batched lazy', function(t) {
+    order_system_helper(t, true, false);
+})
 
-function test_array_creation(test, amount, size) {
+function test_array_creation(t, amount, size) {
     var a = [];
     for(var i = 0; i < size; i++)
         a.push(i);
@@ -367,21 +366,20 @@ function test_array_creation(test, amount, size) {
     for(var i = 0; i < amount; i++)
         observable(a);
     console.log('\n  Created in ' + (now() - start) + 'ms.');
-    test.done();
+    t.end();
 };
 
-exports.test_array_0 = function(test) {
-    test_array_creation(test, 10000);
-};
+test('array 0', function(t) {
+    test_array_creation(t, 10000);
+})
 
-exports.test_array_100 = function(test) {
-    test_array_creation(test, 10000);
-};
+test('array 100', function(t) {
+    test_array_creation(t, 10000);
+})
 
-exports.test_array_10000 = function(test) {
-    test_array_creation(test, 10000);
-};
-
+test('array 10000', function(t) {
+    test_array_creation(t, 10000);
+})
 
 function now() {
     return + new Date();

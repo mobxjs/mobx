@@ -1,8 +1,10 @@
+/// <reference path='require.d.ts' />
 import {
     observable, asStructure, autorun, autorunAsync, extendObservable, 
     IObservableArray, IArrayChange, IArraySplice, IObservableValue,
     extras
-} from "mobservable";
+} from "../../src";
+var test = require('tape')
 
 var v = observable(3);
 v.observe(() => {});
@@ -27,15 +29,15 @@ class Order {
     // @observable hoepie() { return 3; }
 }
 
-export function testObservable(test) {
+test('observable', function(t) {
     var a = observable(3);
     var b = observable(() => a() * 2);
-    test.ok(extras.getDNode(a));
-    test.equal(b(), 6);
-    test.done();
-}
+    t.ok(extras.getDNode(a));
+    t.equal(b(), 6);
+    t.end();
+})
 
-export function testAnnotations(test) {
+test('annotations', function(t) {
     var order1totals = [];
     var order1 = new Order();
     var order2 = new Order();
@@ -47,24 +49,24 @@ export function testAnnotations(test) {
     order2.price = 4;
     order1.amount = 1;
 
-    test.equal(order1.price, 3);
-    test.equal(order1.total, 3);
-    test.equal(order2.total, 8);
+    t.equal(order1.price, 3);
+    t.equal(order1.total, 3);
+    t.equal(order2.total, 8);
     order2.orders.push('bla');
-    test.equal(order2.total, 16);
+    t.equal(order2.total, 16);
 
     order1.orders.splice(0,0,'boe', 'hoi');
-    test.deepEqual(order1totals, [6,3,9]);
+    t.deepEqual(order1totals, [6,3,9]);
 
     disposer();
     order1.orders.pop();
-    test.equal(order1.total, 6);
-    test.deepEqual(order1totals, [6,3,9]);
+    t.equal(order1.total, 6);
+    t.deepEqual(order1totals, [6,3,9]);
     
-    test.equal(order1.aFunction, testFunction);
+    t.equal(order1.aFunction, testFunction);
     var x = function() { return 3; };
     order1.aFunction = x;
-    test.equal(order1.aFunction, x);
+    t.equal(order1.aFunction, x);
     
     var coords = null;
     var coordsCalcs = 0;
@@ -72,35 +74,35 @@ export function testAnnotations(test) {
         coordsCalcs++;
         coords = { x : order1.someStruct.x, y: order1.someStruct.y };
     });
-    test.equal(coordsCalcs, 1);
-    test.deepEqual(coords, { x: 1, y: 2});
+    t.equal(coordsCalcs, 1);
+    t.deepEqual(coords, { x: 1, y: 2});
     
     order1.someStruct.x = 1;
     order1.someStruct = { x: 1, y: 2};
-    test.equal(coordsCalcs, 1);
-    test.deepEqual(coords, { x: 1, y: 2});
+    t.equal(coordsCalcs, 1);
+    t.deepEqual(coords, { x: 1, y: 2});
 
     order1.someStruct.x = 2;
-    test.deepEqual(coords, { x: 2, y: 2 });
-    test.equal(coordsCalcs, 2);
+    t.deepEqual(coords, { x: 2, y: 2 });
+    t.equal(coordsCalcs, 2);
     
     order1.someStruct = { x: 3, y: 3 };
-    test.equal(coordsCalcs, 3);
-    test.deepEqual(coords, { x: 3, y: 3 });
+    t.equal(coordsCalcs, 3);
+    t.deepEqual(coords, { x: 3, y: 3 });
     
-    test.done();
-};
+    t.end();
+})
 
-export function testScope(test) {
+test('scope', function(t) {
     var x = observable({
         y: 3,
         // this wo't work here.
         z: () => 2 * x.y
     });
     
-    test.equal(x.z, 6);
+    t.equal(x.z, 6);
     x.y = 4;
-    test.equal(x.z, 8);
+    t.equal(x.z, 8);
 
     var x2 = function() {
         extendObservable(this, {
@@ -111,14 +113,14 @@ export function testScope(test) {
     }
 
     var x3= new x2();
-    test.equal(x3.z, 6);
+    t.equal(x3.z, 6);
     x3.y = 4;
-    test.equal(x3.z, 8);
+    t.equal(x3.z, 8);
 
-    test.done();
-}
+    t.end();
+})
 
-export function testTyping(test) {
+test('typing', function(t) {
     var ar:IObservableArray<number> = observable([1,2]);
     ar.observe((d:IArrayChange<number>|IArraySplice<number>) => {
         console.log(d.type);
@@ -141,8 +143,8 @@ export function testTyping(test) {
         // noop
     });
 
-    test.done();
-}
+    t.end();
+})
 
 const state:any = observable({
     authToken: null
@@ -161,7 +163,7 @@ class LoginStoreTest {
     }
 }
 
-export function testIssue8(test){
+test('issue8', function(t){
     var fired = 0;
 
     const store = new LoginStoreTest();
@@ -171,13 +173,13 @@ export function testIssue8(test){
         store.loggedIn;
     });
     
-    test.equal(fired, 1);
+    t.equal(fired, 1);
     state.authToken = 'a';
     state.authToken = 'b';
     
-    test.equal(fired, 2);
-    test.done();
-}
+    t.equal(fired, 2);
+    t.end();
+})
 
 class Box {
     @observable uninitialized;
@@ -189,7 +191,7 @@ class Box {
     }
 }
 
-export function test_box(test) {
+test('box', function(t) {
     var box = new Box();
     
     var ar = []
@@ -198,15 +200,15 @@ export function test_box(test) {
         ar.push(box.width);
     });
 
-    test.deepEqual(ar.slice(), [40]);
+    t.deepEqual(ar.slice(), [40]);
     box.height = 10;
-    test.deepEqual(ar.slice(), [40, 20]);
+    t.deepEqual(ar.slice(), [40, 20]);
     box.sizes.push(3, 4);
-    test.deepEqual(ar.slice(), [40, 20, 60]);
+    t.deepEqual(ar.slice(), [40, 20, 60]);
     box.someFunc = () => 7;
-    test.deepEqual(ar.slice(), [40, 20, 60, 210]);
+    t.deepEqual(ar.slice(), [40, 20, 60, 210]);
     box.uninitialized = true;
-    test.deepEqual(ar.slice(), [40, 20, 60, 210, 420]);
+    t.deepEqual(ar.slice(), [40, 20, 60, 210, 420]);
 
-    test.done();
-};
+    t.end();
+})
