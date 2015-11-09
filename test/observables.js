@@ -282,7 +282,7 @@ test('extend observable multiple prop maps', function(t) {
     x.a = 1;
     t.equal(sum, 10);
     
-    t.done();
+    t.end();
 })
 
 test('object enumerable props', function(t) {
