@@ -2,28 +2,27 @@
     "version": "1.6.2",
     "compilerOptions": {
         "target": "es5",
-        "outDir": ".build",
-        "sourceMap": false,
+        "outDir": "lib",
+        "sourceMap": true,
         "declaration": true,
         "module": "commonjs",
         "removeComments": true
     },
     "files": [
-        "./lib/core.ts",
-        "./lib/dnode.ts",
-        "./lib/extras.ts",
-        "./lib/index.ts",
-        "./lib/interfaces.ts",
-        "./lib/observablearray.ts",
-        "./lib/observableobject.ts",
-        "./lib/observablevalue.ts",
-        "./lib/observableview.ts",
-        "./lib/scheduler.ts",
-        "./lib/simpleeventemitter.ts",
-        "./lib/utils.ts"
+        "./src/core.ts",
+        "./src/dnode.ts",
+        "./src/extras.ts",
+        "./src/index.ts",
+        "./src/interfaces.ts",
+        "./src/observablearray.ts",
+        "./src/observableobject.ts",
+        "./src/observablevalue.ts",
+        "./src/observableview.ts",
+        "./src/scheduler.ts",
+        "./src/simpleeventemitter.ts",
+        "./src/utils.ts"
     ],
     "filesGlob": [
-        "./lib/*.ts",
         "!./node_modules/**/*.ts",
         "!./dist/*.d.ts",
         "!./test/*.ts"

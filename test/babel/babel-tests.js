@@ -1,7 +1,7 @@
 import {
     observable, asStructure, autorun, extendObservable, 
     default as mobservable
-} from "../..";
+} from "../";
 
 class Box {
     @observable uninitialized;

@@ -3,8 +3,8 @@ import {
     observable, asStructure, autorun, autorunAsync, extendObservable, 
     IObservableArray, IArrayChange, IArraySplice, IObservableValue,
     extras
-} from "../../src";
-var test = require('tape')
+} from "../lib/index";
+const test = require('tape')
 
 var v = observable(3);
 v.observe(() => {});

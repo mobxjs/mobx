@@ -1,20 +1,6 @@
 var test = require('tape');
-var mobservable = require('..');
+var mobservable = require('../..');
 var observable = mobservable.observable;
-
-var gc = (function () {
-    var memwatch;
-    try {
-        // memwatch = require("memwatch");
-        return function() {
-            //memwatch.gc();
-        };
-    }
-    catch (e) {
-        console.warn("Garbage collection not available");
-        return function() {};
-    }
-})();
 
 function voidObserver() {
     // nothing, nada, noppes.
@@ -29,7 +15,6 @@ results of this test:
 
 */
 test('one observes ten thousand that observe one', function (t) {
-    gc();
     var a = observable(2);
 
     // many observers that listen to one..
@@ -68,7 +53,6 @@ test('one observes ten thousand that observe one', function (t) {
 })
 
 test('five hundrend properties that observe their sibling', function (t) {
-    gc();
     var observables = [observable(1)];
     for(var i = 0; i < 500; i++) {
         (function(idx) {
@@ -92,7 +76,6 @@ test('five hundrend properties that observe their sibling', function (t) {
 })
 
 test('late dependency change', function(t) {
-    gc();
     var values = [];
     for(var i = 0; i < 100; i++)
     values.push(observable(0))
@@ -117,7 +100,6 @@ test('late dependency change', function(t) {
 })
 
 test('lots of unused computables', function(t) {
-    gc();
     var a = observable(1);
 
     // many observers that listen to one..
@@ -179,7 +161,6 @@ test('many unreferenced observables', function(t) {
 })
 
 test('array reduce', function(t) {
-    gc();
     var aCalc = 0;
     var ar = observable([]);
     var b = observable(1);
@@ -217,7 +198,6 @@ test('array reduce', function(t) {
 })
 
 test('array classic loop', function(t) {
-    gc();
     var ar = observable([]);
     var aCalc = 0;
     var b = observable(1);
@@ -256,14 +236,6 @@ test('array classic loop', function(t) {
 })
 
 function order_system_helper(t, usebatch, keepObserving) {
-    // Garbage collection is very important here,
-    // Due to the async nature of this test and the large memory consumption,
-    // during tests runs the garbage collector will otherwise kick in at this point
-    // severly slowing down the tests (but after repeating the tests a few times,
-    // they will become fast again, so it is not a memory leak but a gc trigger that
-    // causes the unreliable results)
-    gc();
-
     var orders = observable([]);
     var vat = observable(2);
 

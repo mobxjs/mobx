@@ -4,5 +4,8 @@
 coverage
 dist
 publish.js
-todo.md
 notes.md
+src/
+test/
+webpack.*.js
+tsconfig.json
