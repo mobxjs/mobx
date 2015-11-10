@@ -313,7 +313,8 @@ test('transition tracker 3', function(t) {
 test('transition tracker 4', function(t) {
     var base = console.dir;
     var lines = [];
-    console.dir = function(d) {
+    var method = console.table ? "table" : "dir";
+    console[method] = function(d) {
         lines.push(d);
     }
 
@@ -328,7 +329,7 @@ test('transition tracker 4', function(t) {
     setTimeout(function() {
         t.deepEqual(stripTrackerOutput(lines), [trackerOutput2(a,b,c)]);
 
-        console.dir = base;
+        console[method] = base;
         t.end();
     }, 100);
 })
