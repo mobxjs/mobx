@@ -1,7 +1,7 @@
 # extendObservable
 
-Quite similar to `Object.assign`, `extendObservable` takes two arguments, a `target` object and a `properties` map, and addes all key-value pairs from the properties to the `target` as observable properties.
-This is very useful in constructor functions or to extend already observable objects.
+Quite similar to `Object.assign`, `extendObservable` takes two or more arguments, a `target` object and one or more `properties` maps.
+It adds all key-value pairs from the properties to the `target` as observable properties.
 
 ```javascript
 var Person = function(firstName, lastName) {

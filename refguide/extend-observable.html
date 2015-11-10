@@ -29,10 +29,10 @@
         
     
     
-    <link rel="next" href="../refguide/modifiers.html" />
+    <link rel="next" href="../refguide/transaction.html" />
     
     
-    <link rel="prev" href="../refguide/is-observable.html" />
+    <link rel="prev" href="../refguide/map.html" />
     
 
         
@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="3.2" data-basepath=".." data-revision="Tue Oct 13 2015 22:21:34 GMT+0200 (CEST)">
+    <div class="book" data-level="3.2" data-basepath=".." data-revision="Tue Nov 10 2015 21:41:54 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -217,16 +217,16 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="3.1" data-path="refguide/is-observable.html">
+        <li class="chapter " data-level="3.1" data-path="refguide/map.html">
             
                 
-                    <a href="../refguide/is-observable.html">
+                    <a href="../refguide/map.html">
                 
                         <i class="fa fa-check"></i>
                         
                             <b>3.1.</b>
                         
-                        isObservable
+                        map
                     </a>
             
             
@@ -247,14 +247,44 @@
             
         </li>
     
-        <li class="chapter " data-level="3.3" data-path="refguide/modifiers.html">
+        <li class="chapter " data-level="3.3" data-path="refguide/transaction.html">
+            
+                
+                    <a href="../refguide/transaction.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.3.</b>
+                        
+                        transaction
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="3.4" data-path="refguide/is-observable.html">
+            
+                
+                    <a href="../refguide/is-observable.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.4.</b>
+                        
+                        isObservable(..)
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="3.5" data-path="refguide/modifiers.html">
             
                 
                     <a href="../refguide/modifiers.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>3.3.</b>
+                            <b>3.5.</b>
                         
                         modifiers
                     </a>
@@ -262,23 +292,46 @@
             
         </li>
     
-        <li class="chapter " data-level="3.4" >
+        <li class="chapter " data-level="3.6" data-path="refguide/expr.html">
             
-            <span><b>3.4.</b> transactions</span>
+                
+                    <a href="../refguide/expr.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.6.</b>
+                        
+                        expr
+                    </a>
             
             
         </li>
     
-        <li class="chapter " data-level="3.5" >
+        <li class="chapter " data-level="3.7" data-path="refguide/observe.html">
             
-            <span><b>3.5.</b> autorunAsync / autorunUntil</span>
+                
+                    <a href="../refguide/observe.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.7.</b>
+                        
+                        observe
+                    </a>
             
             
         </li>
     
-        <li class="chapter " data-level="3.6" >
+        <li class="chapter " data-level="3.8" >
             
-            <span><b>3.6.</b> extras</span>
+            <span><b>3.8.</b> autorunAsync / autorunUntil</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="3.9" >
+            
+            <span><b>3.9.</b> extras</span>
             
             
         </li>
@@ -546,8 +599,8 @@
                     <section class="normal" id="section-">
                     
                         <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/extend-observable.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="extendobservable">extendObservable</h1>
-<p>Quite similar to <code>Object.assign</code>, <code>extendObservable</code> takes two arguments, a <code>target</code> object and a <code>properties</code> map, and addes all key-value pairs from the properties to the <code>target</code> as observable properties.
-This is very useful in constructor functions or to extend already observable objects.</p>
+<p>Quite similar to <code>Object.assign</code>, <code>extendObservable</code> takes two or more arguments, a <code>target</code> object and one or more <code>properties</code> maps.
+It adds all key-value pairs from the properties to the <code>target</code> as observable properties.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> Person = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">firstName, lastName</span>) </span>{
     <span class="hljs-comment">// initialize observable properties on a new instance</span>
     extendObservable(<span class="hljs-keyword">this</span>, {
@@ -574,10 +627,10 @@ extendObservable(matthew, {
         </div>
 
         
-        <a href="../refguide/is-observable.html" class="navigation navigation-prev " aria-label="Previous page: isObservable"><i class="fa fa-angle-left"></i></a>
+        <a href="../refguide/map.html" class="navigation navigation-prev " aria-label="Previous page: map"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../refguide/modifiers.html" class="navigation navigation-next " aria-label="Next page: modifiers"><i class="fa fa-angle-right"></i></a>
+        <a href="../refguide/transaction.html" class="navigation navigation-next " aria-label="Next page: transaction"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

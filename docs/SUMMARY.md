@@ -10,10 +10,13 @@
   * [@observer](refguide/observer-component.md)
   * [@observable](refguide/observable-decorator.md)
 * Advanced API
-  * [isObservable](refguide/is-observable.md)
+  * [map](refguide/map.md)
   * [extendObservable](refguide/extend-observable.md)
+  * [transaction](refguide/transaction.md)
+  * [isObservable(..)](refguide/is-observable.md)
   * [modifiers](refguide/modifiers.md)
-  * transactions
+  * [expr](refguide/expr.md)
+  * [observe](refguide/observe.md)
   * autorunAsync / autorunUntil
   * extras
 * Best Practices For Large Apps

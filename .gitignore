@@ -1,2 +1,3 @@
 docs/_book
 docs/node_modules
+refguide/*.md

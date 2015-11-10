@@ -16,3 +16,15 @@ isObservable(person, "firstName"); // true
 isObservable(person.firstName); // false (just a string)
 isObservable(person, "age"); // false
 ```
+
+# isObservableMap
+
+Returns true if the given object is created using `mobservable.map`
+
+# isObservableArray
+
+Returns true if the given obect is an array that was made observable using `mobservable.observable(array)`
+
+# isObservableObject
+
+Returns true if the given object is an object that was made observable using `mobservable.observable(object)`
