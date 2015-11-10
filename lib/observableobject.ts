@@ -5,13 +5,15 @@
  */
 import {DataNode} from './dnode';
 import {ValueMode, makeChildObservable, AsStructure} from './core';
-import {IContextInfoStruct} from './interfaces';
+import {IContextInfoStruct, IObjectChange, Lambda} from './interfaces';
 import {ObservableView} from './observableview';
 import {ObservableValue} from './observablevalue';
+import SimpleEventEmitter from './simpleeventemitter';
 
 // responsible for the administration of objects that have become reactive
 export class ObservableObject {
 	values:{[key:string]:DataNode} = {};
+	private _events = new SimpleEventEmitter();
 
 	constructor(private target, private context:IContextInfoStruct, private mode: ValueMode) {
 		if (target.$mobservable)
@@ -66,8 +68,30 @@ export class ObservableObject {
 				return this.$mobservable ? this.$mobservable.values[propName].get() : undefined;
 			},
 			set: function(newValue) {
+				const oldValue = this.$mobservable.values[propName].get();
 				this.$mobservable.values[propName].set(newValue);
+				this.$mobservable._events.emit(<IObjectChange<any, any>>{ 
+					type: "update",
+					object: this,
+					name: propName,
+					oldValue
+				});
 			}
 		});
+
+		this._events.emit(<IObjectChange<any, any>>{ 
+			type: "add",
+			object: this.target,
+			name: propName
+		});
+	}
+
+	/**
+	 * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
+	 * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe 
+	 * for callback details
+	 */
+	observe(callback: (changes:IObjectChange<any, any>) => void): Lambda {
+		return this._events.on(callback);
 	}
 }

@@ -402,6 +402,101 @@ exports.testObserveProperty = function(test) {
     test.done();
 }
 
+exports.testObserveObject = function(test) {
+    var events = [];
+    var a = observable({
+        a: 1,
+        da: function() { return this.a * 2 }
+    });
+    var stop = a.$mobservable.observe(function(change) {
+        events.push(change);
+    });
+    
+    a.a = 2;
+    mobservable.extendObservable(a, {
+        a: 3, b: 3
+    });
+    a.a = 4;
+    a.b = 5;
+    test.deepEqual(events, [
+        { type: 'update',
+            object: a,
+            name: 'a',
+            oldValue: 1 },
+        { type: 'update',
+            object: a,
+            name: 'a',
+            oldValue: 2 },
+        { type: 'add',
+            object: a,
+            name: 'b' },
+        { type: 'update',
+            object: a,
+            name: 'a',
+            oldValue: 3 },
+        { type: 'update',
+            object: a,
+            name: 'b',
+            oldValue: 3 } 
+    ]);
+
+    stop();
+    events = [];
+    a.a = 6;
+    test.equals(events.length, 0);
+    
+    test.done();
+}
+
+exports.testObserve = function(test) {
+    var events = [];
+    var po = { a: 1 };
+    var o = observable({ b: 2 });
+    var ar = observable([ 3 ]);
+    var map = mobservable.map({ });
+    
+    var push = function(event) { events.push(event); };
+    
+    var stop1 = mobservable.observe(po, push);
+    var stop2 = mobservable.observe(o, push);
+    var stop3 = mobservable.observe(ar, push);
+    var stop4 = mobservable.observe(map, push);
+    
+    po.a = 4;
+    o.b = 5;
+    ar[0] = 6;
+    map.set("d", 7);
+    
+    stop1();
+    stop2();
+    stop3();
+    stop4();
+    
+    po.a = 8;
+    o.b = 9;
+    ar[0] = 10;
+    map.set("d", 11);
+    
+    test.deepEqual(events, [ 
+        { type: 'update',
+            object: po,
+            name: 'a',
+            oldValue: 1 },
+        { type: 'update',
+            object: o,
+            name: 'b',
+            oldValue: 2 },
+        { object: ar,
+            type: 'update',
+            index: 0,
+            oldValue: 3 },
+        { type: 'add',
+            object: map,
+            name: 'd' } 
+    ]);
+    
+    test.done();
+}
 
 exports.testChangeCountOptimization = function(test) {
     var bCalcs = 0;

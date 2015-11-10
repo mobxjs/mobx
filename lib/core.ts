@@ -5,7 +5,7 @@
  */
 
 import {isComputingView} from './dnode';
-import {Lambda, IObservableArray, IObservableValue, IContextInfoStruct, IContextInfo} from './interfaces';
+import {Lambda, IObservableArray, IObservableValue, IContextInfoStruct, IContextInfo, IArrayChange, IArraySplice, IObjectChange} from './interfaces';
 import {isPlainObject, once} from './utils';
 import {ObservableValue} from './observablevalue';
 import {ObservableView, throwingViewSetter} from './observableview';
@@ -480,4 +480,33 @@ export function makeChildObservable(value, parentMode:ValueMode, context) {
 export function assertUnwrapped(value, message) {
 	if (value instanceof AsReference || value instanceof AsStructure || value instanceof AsFlat)
 		throw new Error(`[mobservable] asStructure / asReference / asFlat cannot be used here. ${message}`);
+}
+
+export function isObservableObject(thing):boolean {
+    return thing && typeof thing === "object" && thing.$mobservable instanceof ObservableObject;
+}
+
+export function isObservableArray(thing):boolean {
+    return thing instanceof ObservableArray;
+}
+
+export function isObservableMap(thing):boolean {
+    return thing instanceof ObservableMap;
+}
+
+export function observe<T>(observableArray:IObservableArray<T>, listener:(change:IArrayChange<T>|IArraySplice<T>) => void): Lambda;
+export function observe<T>(observableMap:ObservableMap<T>, listener:(change:IObjectChange<T, ObservableMap<T>>) => void): Lambda;
+export function observe<T extends Object>(object:T, listener:(change:IObjectChange<any, T>) => void): Lambda;
+export function observe(thing, listener):Lambda {
+    if (typeof thing === "function")
+        throw new Error("[mobservable.observe] is deprecated in combination with a function, use 'mobservable.autorun' instead");
+    if (typeof listener !== "function")
+        throw new Error("[mobservable.observe] expected second argument to be a function");
+    if (isObservableArray(thing) || isObservableMap(thing))
+        return thing.observe(listener);
+    if (isObservableObject(thing))
+        return thing.$mobservable.observe(listener);
+    if (isPlainObject(thing))
+        return (<any>observable(thing)).$mobservable.observe(listener);
+    throw new Error("[mobservable.observe] first argument should be an observable array, observable map, observable object or plain object.");
 }
