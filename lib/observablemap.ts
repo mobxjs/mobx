@@ -4,10 +4,13 @@ import {IObservableArray, Lambda, IObjectChange} from './interfaces';
 import SimpleEventEmitter from './simpleeventemitter';
 import {isComputingView} from './dnode';
 import {ObservableArray} from './observablearray';
+import {isPlainObject} from './utils';
 
 export interface KeyValueMap<V> {
 	[key:string]: V
 }
+
+export type Entries<V> = [string, V][]
 
 export type IObservableMapChange<T> = IObjectChange<T, ObservableMap<T>>;
 
@@ -22,10 +25,12 @@ export class ObservableMap<V> {
 	private _valueMode: ValueMode;
 	private _events = new SimpleEventEmitter();
 
-	constructor(initialData?: KeyValueMap<V>, valueModeFunc?: Function) {
+	constructor(initialData?: Entries<V> | KeyValueMap<V>, valueModeFunc?: Function) {
 		this._valueMode = getValueModeFromModifierFunc(valueModeFunc);
-		if (initialData)
-			this.merge(initialData);
+		if (isPlainObject(initialData))
+			this.merge(<KeyValueMap<V>> initialData);
+		else if (Array.isArray(initialData))
+			initialData.forEach(([key, value]) => this.set(key, value));
 	}
 
 	_has(key: string): boolean {
@@ -120,7 +125,7 @@ export class ObservableMap<V> {
 		return this.keys().map(this.get, this);
 	}
 
-	entries(): [string, V][] {
+	entries(): Entries<V> {
 		return this.keys().map(key => <[string, V]>[key, this.get(key)]);
 	}
 
@@ -145,7 +150,7 @@ export class ObservableMap<V> {
 		});
 	}
 
-	size(): number {
+	get size(): number {
 		return this._keys.length;
 	}
 

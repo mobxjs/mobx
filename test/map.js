@@ -13,7 +13,7 @@ exports.mapCrud = function(test) {
 	test.equal(m.has("b"), false);
 	test.equal(m.get("a"), 1);
 	test.equal(m.get("b"), undefined);
-	test.equal(m.size(), 1);
+	test.equal(m.size, 1);
 
 	m.set("a", 2);
 	test.equal(m.has("a"), true);
@@ -28,14 +28,14 @@ exports.mapCrud = function(test) {
 	test.deepEqual(m.entries(), [["a", 2], ["b", 3]]);
 	test.deepEqual(m.toJs(), { a: 2, b: 3});
 	test.deepEqual(m.toString(), "[mobservable.map { a: 2, b: 3 }]");
-	test.equal(m.size(), 2);
+	test.equal(m.size, 2);
 
 	m.clear();
 	test.deepEqual(m.keys(), []);
 	test.deepEqual(m.values(), []);
 	test.deepEqual(m.toJs(), { });
 	test.deepEqual(m.toString(), "[mobservable.map {  }]");
-	test.equal(m.size(), 0);
+	test.equal(m.size, 0);
 
 	test.equal(m.has("a"), false);
 	test.equal(m.has("b"), false);
@@ -69,6 +69,12 @@ exports.mapMerge = function(test) {
 	a.merge(b);
 	test.deepEqual(a.toJs(), { a: 1, b: 2, c: 3, d: 4 });
 
+	test.done();
+}
+
+exports.testInitialArray = function(test) {
+	var a = map([["a", 1], ["b", 2]]);
+	test.deepEqual(a.toJs(), { a: 1, b: 2});
 	test.done();
 }
 
