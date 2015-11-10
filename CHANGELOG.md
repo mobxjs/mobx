@@ -1,3 +1,10 @@
+# 1.0.4
+
+* `map.size` is now a property instead of a function
+* `map()` now accepts an array as entries to construct the new map
+* introduced `isObservableObject`, `isObservableArray` and `isObservableMap`
+* introduced `observe`, to observe observable arrays, objects and maps, similarly to Object.observe and Array.observe
+
 # 1.0.3
 
 * `extendObservable` now supports passing in multiple object properties
