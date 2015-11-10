@@ -29,7 +29,6 @@
         "coveralls": "^2.11.4",
         "istanbul": "^0.3.21",
         "nodeunit": "^0.9.1",
-        "nodeunit-browser-tap": "^0.1.0",
         "typescript": "^1.6.2",
         "webpack": "^1.12.2"
     },
