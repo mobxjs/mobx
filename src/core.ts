@@ -496,8 +496,9 @@ export function isObservableMap(thing):boolean {
 
 export function observe<T>(observableArray:IObservableArray<T>, listener:(change:IArrayChange<T>|IArraySplice<T>) => void): Lambda;
 export function observe<T>(observableMap:ObservableMap<T>, listener:(change:IObjectChange<T, ObservableMap<T>>) => void): Lambda;
+export function observe(func:()=>void): Lambda;
 export function observe<T extends Object>(object:T, listener:(change:IObjectChange<any, T>) => void): Lambda;
-export function observe(thing, listener):Lambda {
+export function observe(thing, listener?):Lambda {
     if (typeof thing === "function") {
         console.error("[mobservable.observe] is deprecated in combination with a function, use 'mobservable.autorun' instead");
         return autorun(thing);
