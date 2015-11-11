@@ -8,7 +8,7 @@
         "test": "npm run buildtest && tape test/*.js",
         "test-browser": "npm run buildtest && ( browserify test/*.js | tape-run )",
         "coverage": "npm run buildtest && istanbul cover tape test/*.js && cat ./coverage/lcov.info|coveralls",
-        "perf": "npm run build && time nodeunit test/perf/*.js",
+        "perf": "npm run build && time tape test/perf/*.js",
         "prepublish": "npm run clean && npm run build-dist",
         "clean": "rm -rf lib/ dist/",
         "build": "tsc",
