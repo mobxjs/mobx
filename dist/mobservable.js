@@ -71,11 +71,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	__export(__webpack_require__(13));
 	var core_1 = __webpack_require__(2);
 	exports.isObservable = core_1.isObservable;
+	exports.isObservableObject = core_1.isObservableObject;
+	exports.isObservableArray = core_1.isObservableArray;
+	exports.isObservableMap = core_1.isObservableMap;
 	exports.observable = core_1.observable;
 	exports.extendObservable = core_1.extendObservable;
 	exports.asReference = core_1.asReference;
 	exports.asFlat = core_1.asFlat;
 	exports.asStructure = core_1.asStructure;
+	exports.observe = core_1.observe;
 	exports.autorun = core_1.autorun;
 	exports.autorunUntil = core_1.autorunUntil;
 	exports.autorunAsync = core_1.autorunAsync;
@@ -86,7 +90,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.map = core_1.map;
 	exports.makeReactive = core_1.observable;
 	exports.extendReactive = core_1.extendObservable;
-	exports.observe = core_1.autorun;
 	exports.observeUntil = core_1.autorunUntil;
 	exports.observeAsync = core_1.autorunAsync;
 	exports._ = {
@@ -236,10 +239,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return observable(expr, scope)();
 	}
 	exports.expr = expr;
-	function extendObservable(target, properties, context) {
+	function extendObservable(target) {
+	    var properties = [];
+	    for (var _i = 1; _i < arguments.length; _i++) {
+	        properties[_i - 1] = arguments[_i];
+	    }
+	    if (arguments.length < 2)
+	        throw new Error("[mobservable.extendObservable] expected 2 or more arguments");
 	    if (target instanceof observablemap_1.ObservableMap || properties instanceof observablemap_1.ObservableMap)
 	        throw new Error("[mobservable.extendObservable] 'extendObservable' should not be used on maps, use map.merge instead");
-	    return extendObservableHelper(target, properties, ValueMode.Recursive, context);
+	    properties.forEach(function (propSet) {
+	        if (!propSet || typeof target !== "object")
+	            throw new Error("[mobservable.extendObservable] 'extendObservable' expects one or more objects with properties to define");
+	        extendObservableHelper(target, propSet, ValueMode.Recursive, null);
+	    });
+	    return target;
 	}
 	exports.extendObservable = extendObservable;
 	function observableDecorator(target, key, baseDescriptor) {
@@ -464,6 +478,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	        throw new Error("[mobservable] asStructure / asReference / asFlat cannot be used here. " + message);
 	}
 	exports.assertUnwrapped = assertUnwrapped;
+	function isObservableObject(thing) {
+	    return thing && typeof thing === "object" && thing.$mobservable instanceof observableobject_1.ObservableObject;
+	}
+	exports.isObservableObject = isObservableObject;
+	function isObservableArray(thing) {
+	    return thing instanceof observablearray_1.ObservableArray;
+	}
+	exports.isObservableArray = isObservableArray;
+	function isObservableMap(thing) {
+	    return thing instanceof observablemap_1.ObservableMap;
+	}
+	exports.isObservableMap = isObservableMap;
+	function observe(thing, listener) {
+	    if (typeof thing === "function") {
+	        console.error("[mobservable.observe] is deprecated in combination with a function, use 'mobservable.autorun' instead");
+	        return autorun(thing);
+	    }
+	    if (typeof listener !== "function")
+	        throw new Error("[mobservable.observe] expected second argument to be a function");
+	    if (isObservableArray(thing) || isObservableMap(thing))
+	        return thing.observe(listener);
+	    if (isObservableObject(thing))
+	        return thing.$mobservable.observe(listener);
+	    if (utils_1.isPlainObject(thing))
+	        return observable(thing).$mobservable.observe(listener);
+	    throw new Error("[mobservable.observe] first argument should be an observable array, observable map, observable object or plain object.");
+	}
+	exports.observe = observe;
 	//# sourceMappingURL=core.js.map
 
 /***/ },
@@ -825,12 +867,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	var core_1 = __webpack_require__(2);
 	var observableview_1 = __webpack_require__(6);
 	var observablevalue_1 = __webpack_require__(10);
+	var simpleeventemitter_1 = __webpack_require__(7);
 	var ObservableObject = (function () {
 	    function ObservableObject(target, context, mode) {
 	        this.target = target;
 	        this.context = context;
 	        this.mode = mode;
 	        this.values = {};
+	        this._events = new simpleeventemitter_1.default();
 	        if (target.$mobservable)
 	            throw new Error("Illegal state: already an reactive object");
 	        if (!context) {
@@ -879,9 +923,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return this.$mobservable ? this.$mobservable.values[propName].get() : undefined;
 	            },
 	            set: function (newValue) {
+	                var oldValue = this.$mobservable.values[propName].get();
 	                this.$mobservable.values[propName].set(newValue);
+	                this.$mobservable._events.emit({
+	                    type: "update",
+	                    object: this,
+	                    name: propName,
+	                    oldValue: oldValue
+	                });
 	            }
 	        });
+	        this._events.emit({
+	            type: "add",
+	            object: this.target,
+	            name: propName
+	        });
+	    };
+	    ObservableObject.prototype.observe = function (callback) {
+	        return this._events.on(callback);
 	    };
 	    return ObservableObject;
 	})();
@@ -1539,8 +1598,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var core_1 = __webpack_require__(2);
 	var simpleeventemitter_1 = __webpack_require__(7);
 	var observablearray_1 = __webpack_require__(9);
+	var utils_1 = __webpack_require__(8);
 	var ObservableMap = (function () {
 	    function ObservableMap(initialData, valueModeFunc) {
+	        var _this = this;
 	        this.$mobservable = true;
 	        this._data = {};
 	        this._hasMap = {};
@@ -1550,8 +1611,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	        this._events = new simpleeventemitter_1.default();
 	        this._valueMode = core_1.getValueModeFromModifierFunc(valueModeFunc);
-	        if (initialData)
+	        if (utils_1.isPlainObject(initialData))
 	            this.merge(initialData);
+	        else if (Array.isArray(initialData))
+	            initialData.forEach(function (_a) {
+	                var key = _a[0], value = _a[1];
+	                return _this.set(key, value);
+	            });
 	    }
 	    ObservableMap.prototype._has = function (key) {
 	        return typeof this._data[key] !== 'undefined';
@@ -1590,7 +1656,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this._events.emit({
 	                type: "add",
 	                object: this,
-	                name: key,
+	                name: key
 	            });
 	        }
 	    };
@@ -1663,9 +1729,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _this.keys().forEach(_this.delete, _this);
 	        });
 	    };
-	    ObservableMap.prototype.size = function () {
-	        return this._keys.length;
-	    };
+	    Object.defineProperty(ObservableMap.prototype, "size", {
+	        get: function () {
+	            return this._keys.length;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
 	    ObservableMap.prototype.toJs = function () {
 	        var _this = this;
 	        var res = {};
