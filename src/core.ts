@@ -51,7 +51,7 @@ export function observable(v:any, keyOrScope?:string | any) {
         case ValueType.ComplexObject:
             return toGetterSetterFunction(new ObservableValue(value, mode, null));
         case ValueType.ComplexFunction:
-            throw new Error("[mobservable.observable] To be able to make a function reactive it shoul dnot have arguments. If you need an observable reference to a function, use `observable(asReference(f))`");
+            throw new Error("[mobservable.observable] To be able to make a function reactive it should not have arguments. If you need an observable reference to a function, use `observable(asReference(f))`");
         case ValueType.ViewFunction: {
             const context = {
                 name: value.name,
