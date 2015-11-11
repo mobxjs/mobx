@@ -1,5 +1,5 @@
 language: node_js
-script: npm run coverage
+script: npm run test-travis
 node_js:
   - "0.12"
   - "0.10"
