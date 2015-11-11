@@ -9,11 +9,15 @@ export * from './interfaces';
 
 export {
 	isObservable,
+	isObservableObject,
+	isObservableArray,
+	isObservableMap,
 	observable,
 	extendObservable,
 	asReference,
 	asFlat,
 	asStructure,
+	observe,
 	autorun,
 	autorunUntil,
 	autorunAsync,
@@ -25,7 +29,6 @@ export {
 	map,
 	observable as makeReactive,
 	extendObservable as extendReactive,
-	autorun as observe,
 	autorunUntil as observeUntil,
 	autorunAsync as observeAsync
 } from './core';

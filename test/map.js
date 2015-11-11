@@ -14,7 +14,7 @@ test('map crud', function(t) {
 	t.equal(m.has("b"), false);
 	t.equal(m.get("a"), 1);
 	t.equal(m.get("b"), undefined);
-	t.equal(m.size(), 1);
+	t.equal(m.size, 1);
 
 	m.set("a", 2);
 	t.equal(m.has("a"), true);
@@ -29,14 +29,14 @@ test('map crud', function(t) {
 	t.deepEqual(m.entries(), [["a", 2], ["b", 3]]);
 	t.deepEqual(m.toJs(), { a: 2, b: 3});
 	t.deepEqual(m.toString(), "[mobservable.map { a: 2, b: 3 }]");
-	t.equal(m.size(), 2);
+	t.equal(m.size, 2);
 
 	m.clear();
 	t.deepEqual(m.keys(), []);
 	t.deepEqual(m.values(), []);
 	t.deepEqual(m.toJs(), { });
 	t.deepEqual(m.toString(), "[mobservable.map {  }]");
-	t.equal(m.size(), 0);
+	t.equal(m.size, 0);
 
 	t.equal(m.has("a"), false);
 	t.equal(m.has("b"), false);
@@ -116,6 +116,12 @@ test('observe value', function(t) {
 	a.merge({y: 'hello'});
 	t.equal(valueY, 'hello');
 
+	t.end();
+})
+
+test('initialize with entries', function(t) {
+	var a = map([["a", 1], ["b", 2]]);
+	t.deepEqual(a.toJs(), { a: 1, b: 2});
 	t.end();
 })
 

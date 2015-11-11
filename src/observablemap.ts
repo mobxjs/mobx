@@ -1,13 +1,18 @@
 import {ObservableValue} from './observablevalue';
 import {ValueMode, observable, transaction, assertUnwrapped, getValueModeFromModifierFunc} from './core';
-import {IObservableArray, Lambda} from './interfaces';
+import {IObservableArray, Lambda, IObjectChange} from './interfaces';
 import SimpleEventEmitter from './simpleeventemitter';
 import {isComputingView} from './dnode';
 import {ObservableArray} from './observablearray';
+import {isPlainObject} from './utils';
 
 export interface KeyValueMap<V> {
 	[key:string]: V
 }
+
+export type Entries<V> = [string, V][]
+
+export type IObservableMapChange<T> = IObjectChange<T, ObservableMap<T>>;
 
 export class ObservableMap<V> {
 	$mobservable = true;
@@ -20,10 +25,12 @@ export class ObservableMap<V> {
 	private _valueMode: ValueMode;
 	private _events = new SimpleEventEmitter();
 
-	constructor(initialData?: KeyValueMap<V>, valueModeFunc?: Function) {
+	constructor(initialData?: Entries<V> | KeyValueMap<V>, valueModeFunc?: Function) {
 		this._valueMode = getValueModeFromModifierFunc(valueModeFunc);
-		if (initialData)
-			this.merge(initialData);
+		if (isPlainObject(initialData))
+			this.merge(<KeyValueMap<V>> initialData);
+		else if (Array.isArray(initialData))
+			initialData.forEach(([key, value]) => this.set(key, value));
 	}
 
 	_has(key: string): boolean {
@@ -44,7 +51,7 @@ export class ObservableMap<V> {
 			const oldValue = (<any>this._data[key])._value;
 			const changed = this._data[key].set(value);
 			if (changed) {
-				this._events.emit(<IObjectChange<V>>{ 
+				this._events.emit(<IObservableMapChange<V>>{ 
 					type: "update",
 					object: this,
 					name: key,
@@ -61,10 +68,10 @@ export class ObservableMap<V> {
 				this._updateHasMapEntry(key, true);
 				this._keys.push(key);
 			});
-			this._events.emit(<IObjectChange<V>>{ 
+			this._events.emit(<IObservableMapChange<V>>{ 
 				type: "add",
 				object: this,
-				name: key,
+				name: key
 			}); 
 		}
 	}
@@ -80,7 +87,7 @@ export class ObservableMap<V> {
 				observable.set(undefined);
 				this._data[key] = undefined;
 			});
-			this._events.emit(<IObjectChange<V>>{ 
+			this._events.emit(<IObservableMapChange<V>>{ 
 				type: "delete",
 				object: this,
 				name: key,
@@ -90,12 +97,11 @@ export class ObservableMap<V> {
 	}
 
 	_updateHasMapEntry(key: string, value: boolean): ObservableValue<boolean> {
+		// optimization; don't fill the hasMap if we are not observing, or remove entry if there are no observers anymore 
 		let entry = this._hasMap[key];
 		if (entry) {
 			entry.set(value);
 		} else {
-			//if (value === false && !isComputingView())
-			//	return; // optimization; don't fill the hasMap if we are not observing
 			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, {
 				name: ".(has)" + key,
 				object: this
@@ -119,7 +125,7 @@ export class ObservableMap<V> {
 		return this.keys().map(this.get, this);
 	}
 
-	entries(): [string, V][] {
+	entries(): Entries<V> {
 		return this.keys().map(key => <[string, V]>[key, this.get(key)]);
 	}
 
@@ -144,7 +150,7 @@ export class ObservableMap<V> {
 		});
 	}
 
-	size(): number {
+	get size(): number {
 		return this._keys.length;
 	}
 
@@ -174,14 +180,7 @@ export class ObservableMap<V> {
 	 * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe 
 	 * for callback details
 	 */
-	observe(callback: (changes:IObjectChange<V>) => void): Lambda {
+	observe(callback: (changes:IObservableMapChange<V>) => void): Lambda {
 		return this._events.on(callback);
 	}
-}
-
-export interface IObjectChange<T> {
-	name: string;
-	object: ObservableMap<T>,
-	type: string;
-	oldValue?: T;
 }

@@ -44,6 +44,13 @@ export interface IArraySplice<T> {
     addedCount:  number;
 }
 
+export interface IObjectChange<T, R> {
+	name: string;
+	object: R;
+	type: string;
+	oldValue?: T;
+}
+
 export interface IDependencyTree {
     id: number;
     name: string;
