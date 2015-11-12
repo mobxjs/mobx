@@ -21,12 +21,22 @@ autorun(() => {
     ar.push(box.width);
 });
 
-console.log(ar.slice(), [40]);
-box.height = 10;
-console.log(ar.slice(), [40, 20]);
-box.sizes.push(3, 4);
-console.log(ar.slice(), [40, 20, 60]);
-box.someFunc = () => 7;
-console.log(ar.slice(), [40, 20, 60, 210]);
-box.uninitialized = true;
-console.log(ar.slice(), [40, 20, 60, 210, 420]);
+var test = require('tape')
+
+test('babel', function (t) {
+  var s = ar.slice()
+  t.deepEqual(s, [40])
+  box.height = 10
+  s = ar.slice()
+  t.deepEqual(s, [40, 20])
+  box.sizes.push(3, 4)
+  s = ar.slice()
+  t.deepEqual(s, [40, 20, 60])
+  box.someFunc = () => 7
+  s = ar.slice()
+  t.deepEqual(s, [40, 20, 60, 210])
+  box.uninitialized = true
+  s = ar.slice()
+  t.deepEqual(s, [40, 20, 60, 210, 420])
+  t.end()
+})
