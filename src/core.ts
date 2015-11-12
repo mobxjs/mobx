@@ -324,6 +324,8 @@ export function toJSON(source) {
             res[key] = toJSON(source[key]);
         return res;
     }
+    if (isObservable(source) && source.$mobservable instanceof ObservableValue)
+        return source();
     return source;
 }
 
