@@ -341,16 +341,8 @@ function test_array_creation(t, amount, size) {
     t.end();
 };
 
-test('array 0', function(t) {
-    test_array_creation(t, 10000);
-})
-
-test('array 100', function(t) {
-    test_array_creation(t, 10000);
-})
-
-test('array 10000', function(t) {
-    test_array_creation(t, 10000);
+test('create array', function(t) {
+    test_array_creation(t, 1000, 1000);
 })
 
 function now() {

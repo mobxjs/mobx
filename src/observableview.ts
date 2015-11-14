@@ -81,6 +81,6 @@ export class ObservableView<T> extends ViewNode {
     }
 
     toString() {
-        return `ComputedObservable[${this.context.name}:${this._value}] ${this.func.toString()}`;
+        return `ComputedObservable[${this.context.name} (current value:'${this._value}')] ${this.func.toString()}`;
     }
 }
