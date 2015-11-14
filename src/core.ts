@@ -7,12 +7,11 @@
 import {isComputingView} from './dnode';
 import {Lambda, IObservableArray, IObservableValue, IContextInfoStruct, IContextInfo, IArrayChange, IArraySplice, IObjectChange} from './interfaces';
 import {isPlainObject, once} from './utils';
-import {ObservableValue} from './observablevalue';
+import {ObservableValue, transaction} from './observablevalue';
 import {ObservableView, throwingViewSetter} from './observableview';
 import {createObservableArray, ObservableArray} from './observablearray';
 import {ObservableObject} from './observableobject';
 import {ObservableMap, KeyValueMap} from './observablemap';
-import {transaction} from './scheduler';
 import {DataNode} from './dnode';
 
 /**

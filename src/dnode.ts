@@ -171,15 +171,13 @@ export class ViewNode extends DataNode {
                 this.dependencyChangeCount += 1;
             if (--this.dependencyStaleCount === 0) { // all dependencies are ready
                 this.state = NodeState.PENDING;
-                schedule(() => {
-                    // did any of the observables really change?
-                    if (this.dependencyChangeCount > 0)
-                        this.computeNextState();
-                    else
-                        // we're done, but didn't change, lets make sure verybody knows..
-                        this.markReady(false);
-                    this.dependencyChangeCount = 0;
-                });
+                // did any of the observables really change?
+                if (this.dependencyChangeCount > 0)
+                    this.computeNextState();
+                else
+                    // we're done, but didn't change, lets make sure verybody knows..
+                    this.markReady(false);
+                this.dependencyChangeCount = 0;
             }
         }
     }
@@ -269,5 +267,4 @@ export function isComputingView() {
 import {getStrict, withStrict} from './core';
 import {transitionTracker, reportTransition} from './extras';
 import {quickDiff} from './utils';
-import {schedule} from './scheduler';
 import {IContextInfoStruct} from './interfaces';

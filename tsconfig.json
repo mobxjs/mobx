@@ -18,7 +18,6 @@
         "./src/observableobject.ts",
         "./src/observablevalue.ts",
         "./src/observableview.ts",
-        "./src/scheduler.ts",
         "./src/simpleeventemitter.ts",
         "./src/utils.ts"
     ],

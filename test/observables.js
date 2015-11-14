@@ -1075,3 +1075,113 @@ test('json2', function(t) {
 
     t.end();
 })
+
+
+test('issue 50', function(t) {
+    var x = observable({
+        a: true,
+        b: false,
+        c: function() {
+            events.push("calc c");
+            return this.b;
+        }
+    });
+    
+    var result
+    var events = [];
+    var disposer1 = mobservable.autorun(function ar() {
+        events.push("auto");
+        result = [x.a, x.b, x.c].join(",");
+    });
+    
+    var disposer2 = mobservable.extras.trackTransitions(true, function(info) {
+        events.push([info.state, info.name]);
+    });
+    
+    setTimeout(function() {
+        mobservable.transaction(function() {
+            events.push("transstart");
+            x.a = !x.a;
+            x.b = !x.b;
+            events.push("transpreend");
+        });
+        events.push("transpostend");
+        t.equal(result, "false,true,true");
+        t.equal(x.c, x.b);
+  
+        t.deepEqual(events, [
+             'auto', 
+             'calc c', 
+             'transstart', 
+             [ 'STALE', '.a' ], 
+             [ 'STALE', 'ar' ],
+             [ 'STALE', '.b' ], 
+             [ 'STALE', '.c' ], 
+             'transpreend', 
+             [ 'READY', '.a' ], 
+             [ 'READY', '.b' ], 
+             [ 'PENDING', '.c' ], 
+             'calc c', 
+             [ 'READY', '.c' ], 
+             [ 'PENDING', 'ar' ], 
+             'auto', 
+             [ 'READY', 'ar' ], 
+             'transpostend' 
+        ]);
+        
+        disposer1();
+        disposer2();
+        t.end();
+    }, 500);
+    
+});
+
+test('verify transaction events', function(t) {
+    var x = observable({
+        b: 1,
+        c: function() {
+            events.push("calc c");
+            return this.b;
+        }
+    });
+    
+    var events = [];
+    var disposer1 = mobservable.autorun(function ar() {
+        events.push("auto");
+        x.c;
+    });
+    
+    var disposer2 = mobservable.extras.trackTransitions(true, function(info) {
+        events.push([info.state, info.name]);
+    });
+    
+    mobservable.transaction(function() {
+        events.push("transstart");
+        x.b = 1;
+        x.b = 2;
+        events.push("transpreend");
+    });
+    events.push("transpostend");
+
+    t.deepEqual(events, [
+            'auto', 
+            'calc c', 
+            'transstart', 
+            [ 'STALE', '.b' ], 
+            [ 'STALE', '.c' ],
+            [ 'STALE', 'ar' ],
+            'transpreend', 
+            [ 'READY', '.b' ], 
+            [ 'PENDING', '.c' ], 
+            'calc c', 
+            [ 'READY', '.c' ], 
+            [ 'PENDING', 'ar' ], 
+            'auto', 
+            [ 'READY', 'ar' ], 
+            'transpostend' 
+    ]);
+    
+    disposer1();
+    disposer2();
+    t.end();
+});
