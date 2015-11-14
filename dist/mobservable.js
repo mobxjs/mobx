@@ -62,7 +62,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var utils_1 = __webpack_require__(7);
 	var extras_1 = __webpack_require__(3);
 	var simpleeventemitter_1 = __webpack_require__(6);
-	__export(__webpack_require__(12));
+	__export(__webpack_require__(11));
 	var core_1 = __webpack_require__(1);
 	exports.isObservable = core_1.isObservable;
 	exports.isObservableObject = core_1.isObservableObject;
@@ -116,7 +116,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var observablearray_1 = __webpack_require__(8);
 	var observableobject_1 = __webpack_require__(4);
 	var observablemap_1 = __webpack_require__(10);
-	var scheduler_1 = __webpack_require__(11);
 	var dnode_2 = __webpack_require__(2);
 	function observable(v, keyOrScope) {
 	    if (typeof arguments[1] === "string")
@@ -321,7 +320,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.toJSON = toJSON;
 	function transaction(action) {
-	    return scheduler_1.transaction(action);
+	    return observablevalue_1.transaction(action);
 	}
 	exports.transaction = transaction;
 	var strict = false;
@@ -639,7 +638,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    ViewNode.prototype.notifyStateChange = function (observable, stateDidActuallyChange) {
-	        var _this = this;
 	        if (observable.state === NodeState.STALE) {
 	            if (++this.dependencyStaleCount === 1)
 	                this.markStale();
@@ -649,13 +647,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.dependencyChangeCount += 1;
 	            if (--this.dependencyStaleCount === 0) {
 	                this.state = NodeState.PENDING;
-	                scheduler_1.schedule(function () {
-	                    if (_this.dependencyChangeCount > 0)
-	                        _this.computeNextState();
-	                    else
-	                        _this.markReady(false);
-	                    _this.dependencyChangeCount = 0;
-	                });
+	                if (this.dependencyChangeCount > 0)
+	                    this.computeNextState();
+	                else
+	                    this.markReady(false);
+	                this.dependencyChangeCount = 0;
 	            }
 	        }
 	    };
@@ -737,7 +733,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var core_1 = __webpack_require__(1);
 	var extras_1 = __webpack_require__(3);
 	var utils_1 = __webpack_require__(7);
-	var scheduler_1 = __webpack_require__(11);
 	//# sourceMappingURL=dnode.js.map
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
@@ -1027,7 +1022,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	    };
 	    ObservableView.prototype.toString = function () {
-	        return "ComputedObservable[" + this.context.name + ":" + this._value + "] " + this.func.toString();
+	        return "ComputedObservable[" + this.context.name + " (current value:'" + this._value + "')] " + this.func.toString();
 	    };
 	    return ObservableView;
 	})(dnode_1.ViewNode);
@@ -1540,6 +1535,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var simpleeventemitter_1 = __webpack_require__(6);
 	var core_1 = __webpack_require__(1);
 	var utils_1 = __webpack_require__(7);
+	var inTransaction = 0;
+	var changedValues = [];
 	var ObservableValue = (function (_super) {
 	    __extends(ObservableValue, _super);
 	    function ObservableValue(value, mode, context) {
@@ -1563,8 +1560,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var oldValue = this._value;
 	            this.markStale();
 	            this._value = this.makeReferenceValueReactive(newValue);
-	            this.markReady(true);
 	            this.changeEvent.emit(this._value, oldValue);
+	            if (inTransaction === 0)
+	                this.markReady(true);
+	            else
+	                changedValues[changedValues.length] = this;
 	        }
 	        return changed;
 	    };
@@ -1584,6 +1584,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ObservableValue;
 	})(dnode_1.DataNode);
 	exports.ObservableValue = ObservableValue;
+	function transaction(action) {
+	    inTransaction += 1;
+	    try {
+	        return action();
+	    }
+	    finally {
+	        if (--inTransaction === 0) {
+	            for (var i = 0, l = changedValues.length; i < l; i++)
+	                changedValues[i].markReady(true);
+	            changedValues.splice(0, l);
+	            if (changedValues.length)
+	                throw new Error("Illegal State");
+	        }
+	    }
+	}
+	exports.transaction = transaction;
 	//# sourceMappingURL=observablevalue.js.map
 
 /***/ },
@@ -1758,49 +1774,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 11 */
-/***/ function(module, exports) {
-
-	var inBatch = 0;
-	var tasks = [];
-	function schedule(func) {
-	    if (inBatch < 1)
-	        func();
-	    else
-	        tasks[tasks.length] = func;
-	}
-	exports.schedule = schedule;
-	function runPostBatchActions() {
-	    var i = 0;
-	    while (tasks.length) {
-	        try {
-	            for (; i < tasks.length; i++)
-	                tasks[i]();
-	            tasks = [];
-	        }
-	        catch (e) {
-	            console.error("Failed to run scheduled action, the action has been dropped from the queue: " + e, e);
-	            tasks.splice(0, i + 1);
-	        }
-	    }
-	}
-	function transaction(action) {
-	    inBatch += 1;
-	    try {
-	        return action();
-	    }
-	    finally {
-	        if (--inBatch === 0) {
-	            inBatch += 1;
-	            runPostBatchActions();
-	            inBatch -= 1;
-	        }
-	    }
-	}
-	exports.transaction = transaction;
-	//# sourceMappingURL=scheduler.js.map
-
-/***/ },
-/* 12 */
 /***/ function(module, exports) {
 
 	//# sourceMappingURL=interfaces.js.map

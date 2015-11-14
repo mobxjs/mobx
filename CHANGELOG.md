@@ -1,6 +1,10 @@
+# 1.0.7
+
+Fixed inconsistency when using `transaction` and `@observer`, which sometimes caused stale values to be displayed.
+
 # 1.0.6
 
-Fix incompatibility issue with systemjs bundler
+Fix incompatibility issue with systemjs bundler (see PR 52)
 
 # 1.0.4/5
 
