@@ -2,7 +2,7 @@
     "name": "mobservable",
     "version": "1.0.5",
     "description": "Observable data. Reactive functions. Simple code.",
-    "main": "index.js",
+    "main": "lib/index.js",
     "typings": "lib/index.d.ts",
     "scripts": {
         "test": "npm run buildtest && tape test/*.js",
