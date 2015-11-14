@@ -1,4 +1,8 @@
-# 1.0.4
+# 1.0.6
+
+Fix incompatibility issue with systemjs bundler
+
+# 1.0.4/5
 
 * `map.size` is now a property instead of a function
 * `map()` now accepts an array as entries to construct the new map

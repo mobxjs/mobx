@@ -54,22 +54,16 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(1)
-
-/***/ },
-/* 1 */
-/***/ function(module, exports, __webpack_require__) {
-
 	function __export(m) {
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
-	var core = __webpack_require__(2);
-	var dnode_1 = __webpack_require__(3);
-	var utils_1 = __webpack_require__(8);
-	var extras_1 = __webpack_require__(4);
-	var simpleeventemitter_1 = __webpack_require__(7);
-	__export(__webpack_require__(13));
-	var core_1 = __webpack_require__(2);
+	var core = __webpack_require__(1);
+	var dnode_1 = __webpack_require__(2);
+	var utils_1 = __webpack_require__(7);
+	var extras_1 = __webpack_require__(3);
+	var simpleeventemitter_1 = __webpack_require__(6);
+	__export(__webpack_require__(12));
+	var core_1 = __webpack_require__(1);
 	exports.isObservable = core_1.isObservable;
 	exports.isObservableObject = core_1.isObservableObject;
 	exports.isObservableArray = core_1.isObservableArray;
@@ -107,7 +101,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=index.js.map
 
 /***/ },
-/* 2 */
+/* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -115,15 +109,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * (c) 2015 - Michel Weststrate
 	 * https://github.com/mweststrate/mobservable
 	 */
-	var dnode_1 = __webpack_require__(3);
-	var utils_1 = __webpack_require__(8);
-	var observablevalue_1 = __webpack_require__(10);
-	var observableview_1 = __webpack_require__(6);
-	var observablearray_1 = __webpack_require__(9);
-	var observableobject_1 = __webpack_require__(5);
-	var observablemap_1 = __webpack_require__(11);
-	var scheduler_1 = __webpack_require__(12);
-	var dnode_2 = __webpack_require__(3);
+	var dnode_1 = __webpack_require__(2);
+	var utils_1 = __webpack_require__(7);
+	var observablevalue_1 = __webpack_require__(9);
+	var observableview_1 = __webpack_require__(5);
+	var observablearray_1 = __webpack_require__(8);
+	var observableobject_1 = __webpack_require__(4);
+	var observablemap_1 = __webpack_require__(10);
+	var scheduler_1 = __webpack_require__(11);
+	var dnode_2 = __webpack_require__(2);
 	function observable(v, keyOrScope) {
 	    if (typeof arguments[1] === "string")
 	        return observableDecorator.apply(null, arguments);
@@ -148,7 +142,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        case ValueType.ComplexObject:
 	            return toGetterSetterFunction(new observablevalue_1.ObservableValue(value, mode, null));
 	        case ValueType.ComplexFunction:
-	            throw new Error("[mobservable.observable] To be able to make a function reactive it shoul dnot have arguments. If you need an observable reference to a function, use `observable(asReference(f))`");
+	            throw new Error("[mobservable.observable] To be able to make a function reactive it should not have arguments. If you need an observable reference to a function, use `observable(asReference(f))`");
 	        case ValueType.ViewFunction: {
 	            var context = {
 	                name: value.name,
@@ -321,6 +315,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                res[key] = toJSON(source[key]);
 	        return res;
 	    }
+	    if (isObservable(source) && source.$mobservable instanceof observablevalue_1.ObservableValue)
+	        return source();
 	    return source;
 	}
 	exports.toJSON = toJSON;
@@ -509,7 +505,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=core.js.map
 
 /***/ },
-/* 3 */
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -738,23 +734,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return global.__mobservableViewStack.length > 0;
 	}
 	exports.isComputingView = isComputingView;
-	var core_1 = __webpack_require__(2);
-	var extras_1 = __webpack_require__(4);
-	var utils_1 = __webpack_require__(8);
-	var scheduler_1 = __webpack_require__(12);
+	var core_1 = __webpack_require__(1);
+	var extras_1 = __webpack_require__(3);
+	var utils_1 = __webpack_require__(7);
+	var scheduler_1 = __webpack_require__(11);
 	//# sourceMappingURL=dnode.js.map
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 4 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var dnode_1 = __webpack_require__(3);
-	var observableobject_1 = __webpack_require__(5);
-	var observablemap_1 = __webpack_require__(11);
-	var simpleeventemitter_1 = __webpack_require__(7);
-	var utils_1 = __webpack_require__(8);
-	var core_1 = __webpack_require__(2);
+	var dnode_1 = __webpack_require__(2);
+	var observableobject_1 = __webpack_require__(4);
+	var observablemap_1 = __webpack_require__(10);
+	var simpleeventemitter_1 = __webpack_require__(6);
+	var utils_1 = __webpack_require__(7);
+	var core_1 = __webpack_require__(1);
 	function getDNode(thing, property) {
 	    if (!core_1.isObservable(thing))
 	        throw new Error("[mobservable.getDNode] " + thing + " doesn't seem to be reactive");
@@ -861,13 +857,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=extras.js.map
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var core_1 = __webpack_require__(2);
-	var observableview_1 = __webpack_require__(6);
-	var observablevalue_1 = __webpack_require__(10);
-	var simpleeventemitter_1 = __webpack_require__(7);
+	var core_1 = __webpack_require__(1);
+	var observableview_1 = __webpack_require__(5);
+	var observablevalue_1 = __webpack_require__(9);
+	var simpleeventemitter_1 = __webpack_require__(6);
 	var ObservableObject = (function () {
 	    function ObservableObject(target, context, mode) {
 	        this.target = target;
@@ -948,7 +944,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=observableobject.js.map
 
 /***/ },
-/* 6 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -961,9 +957,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var dnode_1 = __webpack_require__(3);
-	var simpleeventemitter_1 = __webpack_require__(7);
-	var utils_1 = __webpack_require__(8);
+	var dnode_1 = __webpack_require__(2);
+	var simpleeventemitter_1 = __webpack_require__(6);
+	var utils_1 = __webpack_require__(7);
 	function throwingViewSetter(name) {
 	    return function () {
 	        throw new Error("[mobservable.view '" + name + "'] View functions do not accept new values");
@@ -1039,10 +1035,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=observableview.js.map
 
 /***/ },
-/* 7 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var utils_1 = __webpack_require__(8);
+	var utils_1 = __webpack_require__(7);
 	var SimpleEventEmitter = (function () {
 	    function SimpleEventEmitter() {
 	        this.listeners = [];
@@ -1088,7 +1084,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=simpleeventemitter.js.map
 
 /***/ },
-/* 8 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -1208,11 +1204,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return [added, removed];
 	}
 	exports.quickDiff = quickDiff;
-	var observablearray_1 = __webpack_require__(9);
+	var observablearray_1 = __webpack_require__(8);
 	//# sourceMappingURL=utils.js.map
 
 /***/ },
-/* 9 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -1225,10 +1221,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var utils_1 = __webpack_require__(8);
-	var dnode_1 = __webpack_require__(3);
-	var simpleeventemitter_1 = __webpack_require__(7);
-	var core_1 = __webpack_require__(2);
+	var utils_1 = __webpack_require__(7);
+	var dnode_1 = __webpack_require__(2);
+	var simpleeventemitter_1 = __webpack_require__(6);
+	var core_1 = __webpack_require__(1);
 	var StubArray = (function () {
 	    function StubArray() {
 	    }
@@ -1532,7 +1528,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=observablearray.js.map
 
 /***/ },
-/* 10 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __extends = (this && this.__extends) || function (d, b) {
@@ -1540,10 +1536,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var dnode_1 = __webpack_require__(3);
-	var simpleeventemitter_1 = __webpack_require__(7);
-	var core_1 = __webpack_require__(2);
-	var utils_1 = __webpack_require__(8);
+	var dnode_1 = __webpack_require__(2);
+	var simpleeventemitter_1 = __webpack_require__(6);
+	var core_1 = __webpack_require__(1);
+	var utils_1 = __webpack_require__(7);
 	var ObservableValue = (function (_super) {
 	    __extends(ObservableValue, _super);
 	    function ObservableValue(value, mode, context) {
@@ -1591,14 +1587,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=observablevalue.js.map
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var observablevalue_1 = __webpack_require__(10);
-	var core_1 = __webpack_require__(2);
-	var simpleeventemitter_1 = __webpack_require__(7);
-	var observablearray_1 = __webpack_require__(9);
-	var utils_1 = __webpack_require__(8);
+	var observablevalue_1 = __webpack_require__(9);
+	var core_1 = __webpack_require__(1);
+	var simpleeventemitter_1 = __webpack_require__(6);
+	var observablearray_1 = __webpack_require__(8);
+	var utils_1 = __webpack_require__(7);
 	var ObservableMap = (function () {
 	    function ObservableMap(initialData, valueModeFunc) {
 	        var _this = this;
@@ -1761,7 +1757,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=observablemap.js.map
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports) {
 
 	var inBatch = 0;
@@ -1804,7 +1800,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=scheduler.js.map
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports) {
 
 	//# sourceMappingURL=interfaces.js.map

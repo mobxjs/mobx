@@ -6,4 +6,4 @@ coverage
 notes.md
 lib
 test/babel-tests.js
-test/typescript-tests.js
+test/typescript-tests.js*

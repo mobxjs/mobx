@@ -1,7 +1,7 @@
 var webpack = require('webpack');
 
 module.exports = {
-    entry: './index.js',
+    entry: './lib/index.js',
     devtool: 'source-map',
     output: {
         libraryTarget: 'umd',
