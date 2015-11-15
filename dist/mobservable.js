@@ -320,7 +320,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.toJSON = toJSON;
 	function transaction(action) {
-	    return observablevalue_1.transaction(action);
+	    return dnode_1.transaction(action);
 	}
 	exports.transaction = transaction;
 	var strict = false;
@@ -520,6 +520,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	if (global.__mobservableTrackingStack)
 	    throw new Error("[mobservable] An incompatible version of mobservable is already loaded.");
 	global.__mobservableViewStack = [];
+	var inTransaction = 0;
+	var changedValues = [];
 	var mobservableId = 0;
 	function checkIfStateIsBeingModifiedDuringView(context) {
 	    if (core_1.getStrict() === true && isComputingView()) {
@@ -528,6 +530,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	exports.checkIfStateIsBeingModifiedDuringView = checkIfStateIsBeingModifiedDuringView;
+	function transaction(action) {
+	    inTransaction += 1;
+	    try {
+	        return action();
+	    }
+	    finally {
+	        if (--inTransaction === 0) {
+	            console.log("TRANSEND");
+	            var length_1 = changedValues.length;
+	            for (var i = 0; i < length_1; i++)
+	                changedValues[i].markReady(true);
+	            changedValues.splice(0, length_1);
+	            if (changedValues.length)
+	                throw new Error("[mobservable] Illegal State, please file a bug report");
+	        }
+	    }
+	}
+	exports.transaction = transaction;
 	(function (NodeState) {
 	    NodeState[NodeState["STALE"] = 0] = "STALE";
 	    NodeState[NodeState["PENDING"] = 1] = "PENDING";
@@ -560,16 +580,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	            obs.splice(idx, 1);
 	    };
 	    DataNode.prototype.markStale = function () {
-	        if (this.state !== NodeState.READY)
-	            return;
 	        this.state = NodeState.STALE;
 	        if (extras_1.transitionTracker)
 	            extras_1.reportTransition(this, "STALE");
 	        this.notifyObservers();
 	    };
 	    DataNode.prototype.markReady = function (stateDidActuallyChange) {
-	        if (this.state === NodeState.READY)
+	        if (inTransaction > 0) {
+	            changedValues.push(this);
+	            if (!stateDidActuallyChange)
+	                throw new Error("[mobservable] Illegal state; only data values can be readied while in transaction. Please file a bug with stacktrace.");
 	            return;
+	        }
 	        this.state = NodeState.READY;
 	        if (extras_1.transitionTracker)
 	            extras_1.reportTransition(this, "READY", true, this["_value"]);
@@ -1535,8 +1557,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var simpleeventemitter_1 = __webpack_require__(6);
 	var core_1 = __webpack_require__(1);
 	var utils_1 = __webpack_require__(7);
-	var inTransaction = 0;
-	var changedValues = [];
 	var ObservableValue = (function (_super) {
 	    __extends(ObservableValue, _super);
 	    function ObservableValue(value, mode, context) {
@@ -1561,10 +1581,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.markStale();
 	            this._value = this.makeReferenceValueReactive(newValue);
 	            this.changeEvent.emit(this._value, oldValue);
-	            if (inTransaction === 0)
-	                this.markReady(true);
-	            else
-	                changedValues[changedValues.length] = this;
+	            this.markReady(true);
 	        }
 	        return changed;
 	    };
@@ -1584,22 +1601,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ObservableValue;
 	})(dnode_1.DataNode);
 	exports.ObservableValue = ObservableValue;
-	function transaction(action) {
-	    inTransaction += 1;
-	    try {
-	        return action();
-	    }
-	    finally {
-	        if (--inTransaction === 0) {
-	            for (var i = 0, l = changedValues.length; i < l; i++)
-	                changedValues[i].markReady(true);
-	            changedValues.splice(0, l);
-	            if (changedValues.length)
-	                throw new Error("Illegal State");
-	        }
-	    }
-	}
-	exports.transaction = transaction;
 	//# sourceMappingURL=observablevalue.js.map
 
 /***/ },
