@@ -297,7 +297,7 @@ function order_system_helper(t, usebatch, keepObserving) {
 
     function update() {
         for(var i = 0; i < 50; i++)
-        orders[i].includeVat(!orders[i].includeVat());
+            orders[i].includeVat(!orders[i].includeVat());
         vat(3);
     }
 

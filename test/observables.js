@@ -1185,3 +1185,26 @@ test('verify transaction events', function(t) {
     disposer2();
     t.end();
 });
+
+test("verify array in transaction", function(t) {
+    var ar = m([]);
+    var aCount= 0;
+    var aValue;
+    
+    mobservable.autorun(function() {
+        aCount++;
+        aValue = 0;
+        for(var i = 0; i < ar.length; i++)
+            aValue += ar[i];
+    });
+    
+    mobservable.transaction(function() {
+        ar.push(2);
+        ar.push(3);
+        ar.push(4);
+        ar.unshift(1);
+    });
+    t.equal(aValue, 10);
+    t.equal(aCount, 2);
+    t.end();
+})

@@ -12,6 +12,9 @@ if (global.__mobservableTrackingStack)
 
 global.__mobservableViewStack = [];
 
+let inTransaction = 0;
+const changedValues : DataNode[] = [];
+
 var mobservableId = 0;
 
 export function checkIfStateIsBeingModifiedDuringView(context: IContextInfoStruct) {
@@ -24,6 +27,23 @@ Use 'mobservable.extras.withStrict(false, block)' to allow changes to be made in
 View name: ${context.name}.
 Current stack size is ${ts.length}, active view: "${ts[ts.length -1].toString()}".`
         );
+    }
+}
+
+export function transaction<T>(action:()=>T):T {
+    inTransaction += 1;
+    try {
+        return action();
+    } finally {
+        if (--inTransaction === 0) {
+            console.log("TRANSEND");
+            const length = changedValues.length;
+            for (var i = 0; i < length; i++)
+                changedValues[i].markReady(true);
+            changedValues.splice(0, length);
+            if (changedValues.length)
+                throw new Error("[mobservable] Illegal State, please file a bug report");
+        }
     }
 }
 
@@ -72,8 +92,6 @@ export class DataNode {
     }
 
     markStale() {
-        if (this.state !== NodeState.READY)
-            return; // stale or pending; recalculation already scheduled, we're fine..
         this.state = NodeState.STALE;
         if (transitionTracker)
             reportTransition(this, "STALE");
@@ -81,8 +99,12 @@ export class DataNode {
     }
 
     markReady(stateDidActuallyChange:boolean) {
-        if (this.state === NodeState.READY)
+       if (inTransaction > 0) {
+            changedValues.push(this);
+            if (!stateDidActuallyChange)
+                throw new Error("[mobservable] Illegal state; only data values can be readied while in transaction. Please file a bug with stacktrace.");
             return;
+        }
         this.state = NodeState.READY;
         if (transitionTracker)
             reportTransition(this, "READY", true, this["_value"]);

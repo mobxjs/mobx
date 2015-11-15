@@ -9,9 +9,6 @@ import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} 
 import {deepEquals} from './utils';
 import {IContextInfoStruct, Lambda} from './interfaces';
 
-let inTransaction = 0;
-const changedValues : ObservableValue<any>[] = [];
-
 export class ObservableValue<T> extends DataNode {
     protected changeEvent = new SimpleEventEmitter();
     protected _value: T;
@@ -41,10 +38,7 @@ export class ObservableValue<T> extends DataNode {
             this.markStale();
             this._value = this.makeReferenceValueReactive(newValue);
             this.changeEvent.emit(this._value, oldValue);
-            if (inTransaction === 0)
-                this.markReady(true);
-            else
-                changedValues[changedValues.length] = this;
+            this.markReady(true);
         }
         return changed;
     }
@@ -62,22 +56,5 @@ export class ObservableValue<T> extends DataNode {
 
     toString() {
         return `Observable[${this.context.name}:${this._value}]`;
-    }
-}
-
-
-
-export function transaction<T>(action:()=>T):T {
-    inTransaction += 1;
-    try {
-        return action();
-    } finally {
-        if (--inTransaction === 0) {
-            for (var i = 0, l = changedValues.length; i < l; i++)
-                changedValues[i].markReady(true);
-            changedValues.splice(0, l);
-            if (changedValues.length)
-                throw new Error("Illegal State");
-        }
     }
 }

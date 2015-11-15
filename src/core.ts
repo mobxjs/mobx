@@ -4,10 +4,10 @@
  * https://github.com/mweststrate/mobservable
  */
 
-import {isComputingView} from './dnode';
+import {isComputingView, transaction} from './dnode';
 import {Lambda, IObservableArray, IObservableValue, IContextInfoStruct, IContextInfo, IArrayChange, IArraySplice, IObjectChange} from './interfaces';
 import {isPlainObject, once} from './utils';
-import {ObservableValue, transaction} from './observablevalue';
+import {ObservableValue} from './observablevalue';
 import {ObservableView, throwingViewSetter} from './observableview';
 import {createObservableArray, ObservableArray} from './observablearray';
 import {ObservableObject} from './observableobject';
