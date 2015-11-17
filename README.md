@@ -50,7 +50,7 @@ React.render(<Timer timerData={timerData} />, document.body);
 In the example above the `timerData` data structure is made observable and the `Timer` component is turned into an `observer`.
 Mobservable will automatically track all relations between _observable data_ and _observing functions (or components)_ so that the minimum amount of observers is updated to keep all observers fresh. 
 
-Its as simple as that. In the example above the `Timer` will automatically update each time the property `timerData.secondsPassed` is altered.
+Its as simple as that. In the example above the `Timer` will automatically update each time the property `timerData.secondsPassed` is altered. This is because setter notifies the Timer observer.
 The actual interesting thing about this approach are the things that are *not* in the code:
 
 * The `setInterval` method didn't alter. It still treats `timerData` as a plain JS object.
@@ -61,6 +61,10 @@ The actual interesting thing about this approach are the things that are *not* i
 * This approach is unobtrusive; you are not forced to apply certain techniques like keeping all data denormalized and immutable.
 * There is no higher order component that needs configuration; no scopes, lenses or cursors.
 * There is no magic context being passed through components.
+
+### Notice
+Unlike Object.observe, you cannot track added properties. So remeber to initialize any property you want to observe. Null values work if you don't have any value yet. 
+Observing added properties is impossible to achieve without native Proxy support or dirty checking.
 
 ## Getting started
 
