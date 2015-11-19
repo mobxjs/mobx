@@ -537,7 +537,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    finally {
 	        if (--inTransaction === 0) {
-	            console.log("TRANSEND");
 	            var length_1 = changedValues.length;
 	            for (var i = 0; i < length_1; i++)
 	                changedValues[i].markReady(true);

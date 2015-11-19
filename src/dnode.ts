@@ -36,7 +36,6 @@ export function transaction<T>(action:()=>T):T {
         return action();
     } finally {
         if (--inTransaction === 0) {
-            console.log("TRANSEND");
             const length = changedValues.length;
             for (var i = 0; i < length; i++)
                 changedValues[i].markReady(true);
