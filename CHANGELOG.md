@@ -1,3 +1,7 @@
+# 1.0.9
+
+Removed accidental log message
+
 # 1.0.7 / 1.0.8
 
 Fixed inconsistency when using `transaction` and `@observer`, which sometimes caused stale values to be displayed.
