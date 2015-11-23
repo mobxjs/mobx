@@ -1,8 +1,8 @@
 import {ObservableValue} from './observablevalue';
-import {ValueMode, observable, transaction, assertUnwrapped, getValueModeFromModifierFunc} from './core';
+import {ValueMode, observable, assertUnwrapped, getValueModeFromModifierFunc} from './core';
 import {IObservableArray, Lambda, IObjectChange} from './interfaces';
 import SimpleEventEmitter from './simpleeventemitter';
-import {isComputingView} from './dnode';
+import {isComputingView, transaction} from './dnode';
 import {ObservableArray} from './observablearray';
 import {isPlainObject} from './utils';
 

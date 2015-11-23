@@ -1,5 +1,5 @@
 import * as core from './core';
-import {isComputingView} from './dnode';
+import {isComputingView, untracked} from './dnode';
 import {quickDiff} from './utils';
 import {IDependencyTree, IObserverTree, ITransitionEvent, Lambda} from './interfaces';
 import {getDependencyTree, getDNode, getObserverTree, trackTransitions} from './extras';
@@ -22,7 +22,6 @@ export {
 	autorunUntil,
 	autorunAsync,
 	expr,
-	transaction,
 	toJSON,
 	// deprecated, add warning?
 	isObservable as isReactive,
@@ -32,6 +31,11 @@ export {
 	autorunUntil as observeUntil,
 	autorunAsync as observeAsync
 } from './core';
+
+export {
+	untracked,
+	transaction
+} from './dnode';
 
 /**
  * 'Private' elements that are exposed for testing and debugging utilities

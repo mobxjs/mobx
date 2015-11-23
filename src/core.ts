@@ -383,16 +383,6 @@ export function toJSON(source) {
 }
 
 /**
-    * During a transaction no views are updated until the end of the transaction.
-    * The transaction will be run synchronously nonetheless.
-    * @param action a function that updates some reactive state
-    * @returns any value that was returned by the 'action' parameter.
-    */
-export function transaction<T>(action:()=>T):T {
-    return transaction(action);
-}
-
-/**
     * If strict is enabled, views are not allowed to modify the state.
     * This is a recommended practice, as it makes reasoning about your application simpler.
     */

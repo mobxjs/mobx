@@ -30,6 +30,13 @@ Current stack size is ${ts.length}, active view: "${ts[ts.length -1].toString()}
     }
 }
 
+
+/**
+    * During a transaction no views are updated until the end of the transaction.
+    * The transaction will be run synchronously nonetheless.
+    * @param action a function that updates some reactive state
+    * @returns any value that was returned by the 'action' parameter.
+    */
 export function transaction<T>(action:()=>T):T {
     inTransaction += 1;
     try {
@@ -43,6 +50,16 @@ export function transaction<T>(action:()=>T):T {
             if (changedValues.length)
                 throw new Error("[mobservable] Illegal State, please file a bug report");
         }
+    }
+}
+
+export function untracked<T>(action:()=>T):T {
+    try {
+        var dnode = new ViewNode({ object: null, name: "untracked" });
+        global.__mobservableViewStack.push(dnode);
+        return action();
+    } finally {
+        global.__mobservableViewStack.pop();
     }
 }
 
