@@ -1,5 +1,5 @@
 var test = require('tape');
-var m = require('mobservable');
+var m = require('..');
 
 test('autorun 1', function(t) {
 		debugger;
