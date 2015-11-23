@@ -175,7 +175,7 @@ export function autorunUntil(predicate: ()=>boolean, effect: Lambda, scope?: any
     * @param delay, optional. After how many milleseconds the effect should fire.
     * @param scope, optional, the 'this' value of 'view' and 'effect'.
     */
-export function autorunAsync<T>(view: () => T, effect: (latestValue : T ) => void, delay:number = 1, scope?: any): Lambda {
+export function autorunAsyncDeprecated<T>(view: () => T, effect: (latestValue : T ) => void, delay:number = 1, scope?: any): Lambda {
     var latestValue: T = undefined;
     var timeoutHandle;
 
@@ -196,6 +196,59 @@ export function autorunAsync<T>(view: () => T, effect: (latestValue : T ) => voi
     });
 }
 
+// Deprecate:
+export function autorunAsync<T>(view: () => T, effect: (latestValue : T ) => void, delay?:number, scope?: any): Lambda;
+export function autorunAsync(func: Lambda, delay?:number, scope?: any): Lambda;
+// Deprecate weird overload:
+export function autorunAsync<T>(func: Lambda | {():T}, delay:number | {(x:T):void} = 1, scope?: any): Lambda {
+    if (typeof delay === "function") {
+        console.warn("[mobservable] autorun(func, func) is deprecated and will removed in 2.0");
+        return autorunAsyncDeprecated.apply(null, arguments);
+    }
+    let shouldRun = false;
+    let tickScheduled = false;
+    let tick = observable(0);
+    let observedValues: DataNode[] = [];
+    let disposer: Lambda;
+    let isDisposed = false;
+    
+    function schedule(f: Lambda) {
+        setTimeout(f, delay);
+    }
+    
+    function doTick() {
+        tickScheduled = false;
+        shouldRun = true;
+        tick(tick() + 1);
+    }
+    
+    disposer = autorun(() => {
+        if (isDisposed)
+            return;
+        tick(); // observe so that autorun fires on next tick
+        if (shouldRun) {
+            func.call(scope);
+            observedValues = (<any>disposer).$mobservable.observing;
+            shouldRun = false;
+        } else {
+            // keep observed values eager, probably cheaper then forgetting 
+            // about the value and later re-evaluating lazily, 
+            // probably cheaper when computations are expensive 
+            observedValues.forEach(o => o.notifyObserved()); 
+            if (!tickScheduled) {
+                tickScheduled = true;
+                schedule(doTick);
+            }
+        }
+    });
+
+    return once(() => {
+        isDisposed = true; // short-circuit any pending calculation
+        if (disposer)
+            disposer();
+    });
+}
+
 /**
     * expr can be used to create temporarily views inside views.
     * This can be improved to improve performance if a value changes often, but usually doesn't affect the outcome of an expression.
@@ -213,6 +266,7 @@ export function autorunAsync<T>(view: () => T, effect: (latestValue : T ) => voi
 export function expr<T>(expr: () => T, scope?):T {
     if (!isComputingView())
         console.warn("[mobservable.expr] 'expr' should only be used inside other reactive functions.");
+    // optimization: would be more efficient if the expr itself wouldn't be evaluated first on the next change, but just a 'changed' signal would be fired
     return observable(expr, scope) ();
 }
 
