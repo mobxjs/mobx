@@ -1042,7 +1042,7 @@ test('json2', function(t) {
 
     o.todos[1].details = mobservable.observable({ url: "google" });
     o.todos[1].tags = ["foo", "bar"];
-    t.deepEqual(mobservable.toJSON(o), {
+    t.deepEqual(mobservable.toJSON(o, false), {
          "todos": [
             {
                 "title": "write blog",
@@ -1076,6 +1076,35 @@ test('json2', function(t) {
     t.end();
 })
 
+test('json cycles', function(t) {
+    var a = observable({
+        b: 1,
+        c: [2],
+        d: mobservable.map(),
+        e: a
+    });
+    
+    a.e = a;
+    a.c.push(a, a.d);
+    a.d.set("f", a);
+    a.d.set("d", a.d);
+    a.d.set("c", a.c);
+
+    var cloneA = mobservable.toJSON(a, true);
+    var cloneC = cloneA.c;
+    var cloneD = cloneA.d;
+    
+    t.equal(cloneA.b, 1);
+    t.equal(cloneA.c[0], 2);
+    t.equal(cloneA.c[1], cloneA);
+    t.equal(cloneA.c[2], cloneD);
+    t.equal(cloneD.f, cloneA);
+    t.equal(cloneD.d, cloneD);
+    t.equal(cloneD.c, cloneC);
+    t.equal(cloneA.e, cloneA);
+    
+    t.end();
+})
 
 test('issue 50', function(t) {
     var x = observable({
