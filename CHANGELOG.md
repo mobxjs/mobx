@@ -1,3 +1,7 @@
+# 1.1.1
+
+* `toJSON` now serializes object trees with cycles as well. If you know the object tree is acyclic, pass in `false` as second parameter for a performance gain. 
+
 # 1.1.0
 
 * Exposed `ObservableMap` type

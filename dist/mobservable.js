@@ -345,25 +345,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return descriptor;
 	    }
 	}
-	function toJSON(source) {
+	function toJSON(source, detectCycles, __alreadySeen) {
+	    if (detectCycles === void 0) { detectCycles = true; }
+	    if (__alreadySeen === void 0) { __alreadySeen = null; }
+	    function cache(value) {
+	        if (detectCycles)
+	            __alreadySeen.push([source, value]);
+	        return value;
+	    }
+	    if (detectCycles && __alreadySeen === null)
+	        __alreadySeen = [];
+	    if (detectCycles && source !== null && typeof source === "object") {
+	        for (var i = 0, l = __alreadySeen.length; i < l; i++)
+	            if (__alreadySeen[i][0] === source)
+	                return __alreadySeen[i][1];
+	    }
 	    if (!source)
 	        return source;
-	    if (Array.isArray(source) || source instanceof observablearray_1.ObservableArray)
-	        return source.map(toJSON);
+	    if (Array.isArray(source) || source instanceof observablearray_1.ObservableArray) {
+	        var res = cache([]);
+	        res.push.apply(res, source.map(function (value) { return toJSON(value, detectCycles, __alreadySeen); }));
+	        return res;
+	    }
 	    if (source instanceof observablemap_1.ObservableMap) {
-	        var res_1 = {};
-	        source.forEach(function (value, key) { return res_1[key] = value; });
-	        return res_1;
+	        var res = cache({});
+	        source.forEach(function (value, key) { return res[key] = toJSON(value, detectCycles, __alreadySeen); });
+	        return res;
 	    }
 	    if (typeof source === "object" && utils_1.isPlainObject(source)) {
-	        var res = {};
+	        var res = cache({});
 	        for (var key in source)
 	            if (source.hasOwnProperty(key))
-	                res[key] = toJSON(source[key]);
+	                res[key] = toJSON(source[key], detectCycles, __alreadySeen);
 	        return res;
 	    }
 	    if (isObservable(source) && source.$mobservable instanceof observablevalue_1.ObservableValue)
-	        return source();
+	        return toJSON(source(), detectCycles, __alreadySeen);
 	    return source;
 	}
 	exports.toJSON = toJSON;
