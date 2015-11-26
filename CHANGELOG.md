@@ -1,3 +1,9 @@
+# 1.1.0
+
+* Exposed `ObservableMap` type
+* Introduced `mobservable.untracked(block)`
+* Introduced `mobservable.autorunAsync(block, delay)`
+
 # 1.0.9
 
 Removed accidental log message

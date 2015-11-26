@@ -78,7 +78,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.autorunUntil = core_1.autorunUntil;
 	exports.autorunAsync = core_1.autorunAsync;
 	exports.expr = core_1.expr;
-	exports.transaction = core_1.transaction;
 	exports.toJSON = core_1.toJSON;
 	exports.isReactive = core_1.isObservable;
 	exports.map = core_1.map;
@@ -86,6 +85,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.extendReactive = core_1.extendObservable;
 	exports.observeUntil = core_1.autorunUntil;
 	exports.observeAsync = core_1.autorunAsync;
+	var dnode_2 = __webpack_require__(2);
+	exports.untracked = dnode_2.untracked;
+	exports.transaction = dnode_2.transaction;
+	var observablemap_1 = __webpack_require__(10);
+	exports.ObservableMap = observablemap_1.ObservableMap;
 	exports._ = {
 	    isComputingView: dnode_1.isComputingView,
 	    quickDiff: utils_1.quickDiff
@@ -206,7 +210,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return disposer;
 	}
 	exports.autorunUntil = autorunUntil;
-	function autorunAsync(view, effect, delay, scope) {
+	function autorunAsyncDeprecated(view, effect, delay, scope) {
 	    if (delay === void 0) { delay = 1; }
 	    var latestValue = undefined;
 	    var timeoutHandle;
@@ -223,6 +227,50 @@ return /******/ (function(modules) { // webpackBootstrap
 	        disposer();
 	        if (timeoutHandle)
 	            clearTimeout(timeoutHandle);
+	    });
+	}
+	exports.autorunAsyncDeprecated = autorunAsyncDeprecated;
+	function autorunAsync(func, delay, scope) {
+	    if (delay === void 0) { delay = 1; }
+	    if (typeof delay === "function") {
+	        console.warn("[mobservable] autorun(func, func) is deprecated and will removed in 2.0");
+	        return autorunAsyncDeprecated.apply(null, arguments);
+	    }
+	    var shouldRun = false;
+	    var tickScheduled = false;
+	    var tick = observable(0);
+	    var observedValues = [];
+	    var disposer;
+	    var isDisposed = false;
+	    function schedule(f) {
+	        setTimeout(f, delay);
+	    }
+	    function doTick() {
+	        tickScheduled = false;
+	        shouldRun = true;
+	        tick(tick() + 1);
+	    }
+	    disposer = autorun(function () {
+	        if (isDisposed)
+	            return;
+	        tick();
+	        if (shouldRun) {
+	            func.call(scope);
+	            observedValues = disposer.$mobservable.observing;
+	            shouldRun = false;
+	        }
+	        else {
+	            observedValues.forEach(function (o) { return o.notifyObserved(); });
+	            if (!tickScheduled) {
+	                tickScheduled = true;
+	                schedule(doTick);
+	            }
+	        }
+	    });
+	    return utils_1.once(function () {
+	        isDisposed = true;
+	        if (disposer)
+	            disposer();
 	    });
 	}
 	exports.autorunAsync = autorunAsync;
@@ -319,10 +367,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return source;
 	}
 	exports.toJSON = toJSON;
-	function transaction(action) {
-	    return dnode_1.transaction(action);
-	}
-	exports.transaction = transaction;
 	var strict = false;
 	function getStrict() {
 	    return strict;
@@ -547,6 +591,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	exports.transaction = transaction;
+	function untracked(action) {
+	    try {
+	        var dnode = new ViewNode({ object: null, name: "untracked" });
+	        global.__mobservableViewStack.push(dnode);
+	        return action();
+	    }
+	    finally {
+	        global.__mobservableViewStack.pop();
+	    }
+	}
+	exports.untracked = untracked;
 	(function (NodeState) {
 	    NodeState[NodeState["STALE"] = 0] = "STALE";
 	    NodeState[NodeState["PENDING"] = 1] = "PENDING";
@@ -1609,6 +1664,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var observablevalue_1 = __webpack_require__(9);
 	var core_1 = __webpack_require__(1);
 	var simpleeventemitter_1 = __webpack_require__(6);
+	var dnode_1 = __webpack_require__(2);
 	var observablearray_1 = __webpack_require__(8);
 	var utils_1 = __webpack_require__(7);
 	var ObservableMap = (function () {
@@ -1657,7 +1713,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	        else {
-	            core_1.transaction(function () {
+	            dnode_1.transaction(function () {
 	                _this._data[key] = new observablevalue_1.ObservableValue(value, _this._valueMode, {
 	                    name: "." + key,
 	                    object: _this
@@ -1677,7 +1733,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.assertValidKey(key);
 	        if (this._has(key)) {
 	            var oldValue = this._data[key]._value;
-	            core_1.transaction(function () {
+	            dnode_1.transaction(function () {
 	                _this._keys.remove(key);
 	                _this._updateHasMapEntry(key, false);
 	                var observable = _this._data[key];
@@ -1727,7 +1783,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    ObservableMap.prototype.merge = function (other) {
 	        var _this = this;
-	        core_1.transaction(function () {
+	        dnode_1.transaction(function () {
 	            if (other instanceof ObservableMap)
 	                other.keys().forEach(function (key) { return _this.set(key, other.get(key)); });
 	            else
@@ -1737,7 +1793,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    ObservableMap.prototype.clear = function () {
 	        var _this = this;
-	        core_1.transaction(function () {
+	        dnode_1.transaction(function () {
 	            _this.keys().forEach(_this.delete, _this);
 	        });
 	    };

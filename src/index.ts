@@ -37,6 +37,10 @@ export {
 	transaction
 } from './dnode';
 
+export {
+	ObservableMap
+} from './observablemap';
+
 /**
  * 'Private' elements that are exposed for testing and debugging utilities
  */
