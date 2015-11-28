@@ -155,12 +155,18 @@ export function autorun(view:Lambda, scope?:any):Lambda {
     * @returns disposer function to prematurely end the observer.
     */
 export function autorunUntil(predicate: ()=>boolean, effect: Lambda, scope?: any): Lambda {
+    let disposeImmediately = false;
     const disposer = autorun(() => {
         if (predicate.call(scope)) {
-            disposer();
+            if (disposer)
+                disposer();
+            else
+                disposeImmediately = true;
             effect.call(scope);
         }
     });
+    if (disposeImmediately)
+        disposer();
     return disposer;
 }
 
@@ -175,7 +181,7 @@ export function autorunUntil(predicate: ()=>boolean, effect: Lambda, scope?: any
     * @param delay, optional. After how many milleseconds the effect should fire.
     * @param scope, optional, the 'this' value of 'view' and 'effect'.
     */
-export function autorunAsyncDeprecated<T>(view: () => T, effect: (latestValue : T ) => void, delay:number = 1, scope?: any): Lambda {
+function autorunAsyncDeprecated<T>(view: () => T, effect: (latestValue : T ) => void, delay:number = 1, scope?: any): Lambda {
     var latestValue: T = undefined;
     var timeoutHandle;
 
@@ -362,6 +368,7 @@ function observableDecorator(target:Object, key:string, baseDescriptor:PropertyD
     * Doesn't follow references.
     */
 export function toJSON(source, detectCycles: boolean = true, __alreadySeen:[any,any][] = null) {
+    // optimization: using ES6 map would be more efficient!
     function cache(value) {
         if (detectCycles)
             __alreadySeen.push([source, value]);

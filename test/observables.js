@@ -787,6 +787,25 @@ test('when', function(t) {
     t.end();
 })
 
+test('when 2', function(t) {
+    var x = m(3);
+
+    var called = 0;
+    mobservable.autorunUntil(function() {
+        return (x() === 3);
+    }, function() {
+        called += 1;
+    });
+
+    t.equal(called, 1);
+    t.equal(x.$mobservable.observers.length, 0)
+    x(5);
+    x(3);
+    t.equal(called, 1);
+    
+    t.end();
+})
+
 test('async', function(t) {
     var called = 0;
     var x = m(3);
