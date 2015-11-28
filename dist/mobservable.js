@@ -201,12 +201,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.autorun = autorun;
 	function autorunUntil(predicate, effect, scope) {
+	    var disposeImmediately = false;
 	    var disposer = autorun(function () {
 	        if (predicate.call(scope)) {
-	            disposer();
+	            if (disposer)
+	                disposer();
+	            else
+	                disposeImmediately = true;
 	            effect.call(scope);
 	        }
 	    });
+	    if (disposeImmediately)
+	        disposer();
 	    return disposer;
 	}
 	exports.autorunUntil = autorunUntil;
@@ -229,7 +235,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            clearTimeout(timeoutHandle);
 	    });
 	}
-	exports.autorunAsyncDeprecated = autorunAsyncDeprecated;
 	function autorunAsync(func, delay, scope) {
 	    if (delay === void 0) { delay = 1; }
 	    if (typeof delay === "function") {

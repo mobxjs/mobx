@@ -1,3 +1,7 @@
+# 1.1.2
+
+* Fixed exception when autorunUntil finished immediately
+
 # 1.1.1
 
 * `toJSON` now serializes object trees with cycles as well. If you know the object tree is acyclic, pass in `false` as second parameter for a performance gain. 
