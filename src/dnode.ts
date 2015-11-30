@@ -14,6 +14,7 @@ global.__mobservableViewStack = [];
 
 let inTransaction = 0;
 const changedValues : DataNode[] = [];
+const afterTransactionItems: {():void}[] = [];
 
 var mobservableId = 0;
 
@@ -49,8 +50,19 @@ export function transaction<T>(action:()=>T):T {
             changedValues.splice(0, length);
             if (changedValues.length)
                 throw new Error("[mobservable] Illegal State, please file a bug report");
+            
+            const actions = afterTransactionItems.splice(0, afterTransactionItems.length);
+            for (var i = 0, l = actions.length; i < l; i++)
+                actions[i]();
         }
     }
+}
+
+export function runAfterTransaction(action: () => void) {
+    if (inTransaction === 0)
+        action();
+    else
+        afterTransactionItems.push(action);
 }
 
 export function untracked<T>(action:()=>T):T {

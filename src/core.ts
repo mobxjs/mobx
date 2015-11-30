@@ -12,7 +12,7 @@ import {ObservableView, throwingViewSetter} from './observableview';
 import {createObservableArray, ObservableArray} from './observablearray';
 import {ObservableObject} from './observableobject';
 import {ObservableMap, KeyValueMap} from './observablemap';
-import {DataNode} from './dnode';
+import {DataNode, runAfterTransaction} from './dnode';
 
 /**
     * Turns an object, array or function into a reactive structure.
@@ -133,14 +133,27 @@ export function autorun(view:Lambda, scope?:any):Lambda {
         throw new Error("[mobservable.autorun] expects a function");
     if (unwrappedView.length !== 0)
         throw new Error("[mobservable.autorun] expects a function without arguments");
+
     const observable = new ObservableView(unwrappedView, scope, {
         object: scope || view,
         name: view.name
     }, mode === ValueMode.Structure);
-    observable.setRefCount(+1);
+
+    let disposedPrematurely = false;
+    let started = false;
+
+    runAfterTransaction(() => {
+        if (!disposedPrematurely) {
+            observable.setRefCount(+1);
+            started = true;
+        }
+    });
 
     const disposer = once(() => {
-        observable.setRefCount(-1);
+        if (started)
+            observable.setRefCount(-1);
+        else
+            disposedPrematurely = true;
     });
     (<any>disposer).$mobservable = observable;
     return disposer;

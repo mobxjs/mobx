@@ -1256,3 +1256,112 @@ test("verify array in transaction", function(t) {
     t.equal(aCount, 2);
     t.end();
 })
+
+test('delay autorun until end of transaction', function(t) {
+    var events = [];
+    var x = observable({
+        a: 2,
+        b: function() {
+            events.push("calc y");
+            return this.a;
+        }
+    });
+    var disposer1; 
+    var disposer2 = mobservable.extras.trackTransitions(true, function(info) {
+        events.push([info.state, info.name]);
+    });
+
+    mobservable.transaction(function() {
+        mobservable.transaction(function() {
+            
+            disposer1 = mobservable.autorun(function test() {
+                events.push("auto");
+                x.b;
+            });
+            
+            x.a = 3;
+            x.a = 4;
+            
+            events.push("end1");
+        });
+        x.a = 5;
+        events.push("end2");
+    });
+    events.push("post trans1");
+    x.a = 6;
+    events.push("post trans2");
+    disposer1();
+    x.a = 3;
+    events.push("post trans3");
+
+    t.deepEqual(events, [
+            [ 'STALE', '.a' ], 
+            [ 'STALE', '.a' ],
+            "end1",
+            [ 'STALE', '.a' ],
+            "end2",
+            [ 'READY', '.a'],
+            [ 'READY', '.a'],
+            [ 'READY', '.a'],
+            [ 'PENDING', 'test'],
+            'auto',
+            [ 'PENDING', '.b'],
+            'calc y',
+            [ 'READY', '.b'],
+            [ 'READY', 'test'],
+            "post trans1",
+            [ 'STALE', '.a'],
+            [ 'STALE', '.b'],
+            [ 'STALE', 'test' ],
+            [ 'READY', '.a'],
+            [ 'PENDING', '.b'],
+            'calc y',
+            [ 'READY', '.b'],
+            [ 'PENDING', 'test'],
+            "auto",
+            [ 'READY', 'test'],
+            'post trans2',
+            [ 'STALE', '.a'],
+            [ 'READY', '.a'],
+            'post trans3'
+    ]);
+    
+    disposer2();
+    t.end();
+});
+
+test('prematurely end autorun', function(t) {
+    var x = observable(2);
+    var dis1, dis2;
+    mobservable.transaction(function() {
+        dis1 =  mobservable.autorun(function() {
+            x();
+        });
+        dis2 =  mobservable.autorun(function() {
+            x();
+        });
+
+        t.equal(x.$mobservable.observers.length, 0);
+        t.equal(x.$mobservable.externalRefenceCount, 0);
+        t.equal(dis1.$mobservable.observing.length, 0);
+        t.equal(dis2.$mobservable.observing.length, 0);
+        
+        dis1();
+
+    });
+    t.equal(x.$mobservable.observers.length, 1);
+    t.equal(dis1.$mobservable.externalRefenceCount, 0);
+    t.equal(dis2.$mobservable.externalRefenceCount, 1);
+    t.equal(dis1.$mobservable.observing.length, 0);
+    t.equal(dis2.$mobservable.observing.length, 1);
+    
+    dis2();
+
+    t.equal(x.$mobservable.observers.length, 0);
+    t.equal(dis1.$mobservable.externalRefenceCount, 0);
+    t.equal(dis2.$mobservable.externalRefenceCount, 0);
+    t.equal(dis1.$mobservable.observing.length, 0);
+    t.equal(dis2.$mobservable.observing.length, 0);
+    
+    t.end();
+});
