@@ -192,9 +192,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        object: scope || view,
 	        name: view.name
 	    }, mode === ValueMode.Structure);
-	    observable.setRefCount(+1);
+	    var disposedPrematurely = false;
+	    var started = false;
+	    dnode_2.runAfterTransaction(function () {
+	        if (!disposedPrematurely) {
+	            observable.setRefCount(+1);
+	            started = true;
+	        }
+	    });
 	    var disposer = utils_1.once(function () {
-	        observable.setRefCount(-1);
+	        if (started)
+	            observable.setRefCount(-1);
+	        else
+	            disposedPrematurely = true;
 	    });
 	    disposer.$mobservable = observable;
 	    return disposer;
@@ -588,6 +598,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	global.__mobservableViewStack = [];
 	var inTransaction = 0;
 	var changedValues = [];
+	var afterTransactionItems = [];
 	var mobservableId = 0;
 	function checkIfStateIsBeingModifiedDuringView(context) {
 	    if (core_1.getStrict() === true && isComputingView()) {
@@ -609,10 +620,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	            changedValues.splice(0, length_1);
 	            if (changedValues.length)
 	                throw new Error("[mobservable] Illegal State, please file a bug report");
+	            var actions = afterTransactionItems.splice(0, afterTransactionItems.length);
+	            for (var i = 0, l = actions.length; i < l; i++)
+	                actions[i]();
 	        }
 	    }
 	}
 	exports.transaction = transaction;
+	function runAfterTransaction(action) {
+	    if (inTransaction === 0)
+	        action();
+	    else
+	        afterTransactionItems.push(action);
+	}
+	exports.runAfterTransaction = runAfterTransaction;
 	function untracked(action) {
 	    try {
 	        var dnode = new ViewNode({ object: null, name: "untracked" });
