@@ -19,6 +19,7 @@
         "./src/observablevalue.ts",
         "./src/observableview.ts",
         "./src/simpleeventemitter.ts",
+        "./src/transform.ts",
         "./src/utils.ts"
     ],
     "filesGlob": [

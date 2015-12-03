@@ -20,7 +20,7 @@ export class ObservableView<T> extends ViewNode {
     protected _value: T;
     protected changeEvent = new SimpleEventEmitter();
 
-    constructor(protected func:()=>T, private scope: Object, context:IContextInfoStruct, private compareStructural) {
+    constructor(protected func:()=>T, private scope: Object, context:IContextInfoStruct, private compareStructural: boolean) {
         super(context);
     }
 

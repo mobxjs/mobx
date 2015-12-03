@@ -33,6 +33,10 @@ export {
 } from './core';
 
 export {
+	transform
+} from './transform';
+
+export {
 	untracked,
 	transaction
 } from './dnode';
