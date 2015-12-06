@@ -85,6 +85,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.extendReactive = core_1.extendObservable;
 	exports.observeUntil = core_1.autorunUntil;
 	exports.observeAsync = core_1.autorunAsync;
+	var transform_1 = __webpack_require__(12);
+	exports.transform = transform_1.transform;
 	var dnode_2 = __webpack_require__(2);
 	exports.untracked = dnode_2.untracked;
 	exports.transaction = dnode_2.transaction;
@@ -108,11 +110,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * mobservable
-	 * (c) 2015 - Michel Weststrate
-	 * https://github.com/mweststrate/mobservable
-	 */
 	var dnode_1 = __webpack_require__(2);
 	var utils_1 = __webpack_require__(7);
 	var observablevalue_1 = __webpack_require__(9);
@@ -583,12 +580,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {/**
-	 * mobservable
-	 * (c) 2015 - Michel Weststrate
-	 * https://github.com/mweststrate/mobservable
-	 */
-	var __extends = (this && this.__extends) || function (d, b) {
+	/* WEBPACK VAR INJECTION */(function(global) {var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -1061,11 +1053,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * mobservable
-	 * (c) 2015 - Michel Weststrate
-	 * https://github.com/mweststrate/mobservable
-	 */
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
@@ -1201,11 +1188,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * mobservable
-	 * (c) 2015 - Michel Weststrate
-	 * https://github.com/mweststrate/mobservable
-	 */
 	function once(func) {
 	    var invoked = false;
 	    return function () {
@@ -1325,11 +1307,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * mobservable
-	 * (c) 2015 - Michel Weststrate
-	 * https://github.com/mweststrate/mobservable
-	 */
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
@@ -1876,6 +1853,81 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	//# sourceMappingURL=interfaces.js.map
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var observableview_1 = __webpack_require__(5);
+	var core_1 = __webpack_require__(1);
+	function transform(object, transformer) {
+	    var objectCache = {};
+	    var transformStack = [];
+	    var TransformationNode = (function () {
+	        function TransformationNode(id, source) {
+	            var _this = this;
+	            this.id = id;
+	            this.source = source;
+	            this.uses = [];
+	            this._refCount = 0;
+	            this._disposed = false;
+	            this.value = new observableview_1.ObservableView(function () {
+	                try {
+	                    transformStack.unshift([]);
+	                    return transformer(_this.source, recurseTransform);
+	                }
+	                finally {
+	                    var used = transformStack.shift();
+	                    for (var i = 0, l = used.length; i < l; i++)
+	                        used[i].refCount(+1);
+	                    for (var i = _this.uses.length - 1; i >= 0; i--)
+	                        _this.uses[i].refCount(-1);
+	                    _this.uses = used;
+	                }
+	            }, this, null, false);
+	        }
+	        TransformationNode.prototype.refCount = function (delta) {
+	            if ((this._refCount += delta) === 0) {
+	                this.dispose();
+	            }
+	        };
+	        TransformationNode.prototype.dispose = function () {
+	            if (this._disposed)
+	                return;
+	            this._disposed = true;
+	            for (var i = this.uses.length - 1; i >= 0; i--)
+	                this.uses[i].refCount(-1);
+	            this.uses = null;
+	            delete objectCache[this.id];
+	        };
+	        return TransformationNode;
+	    })();
+	    function recurseTransform(object) {
+	        if (object === null || object === undefined)
+	            return object;
+	        var identifier = getId(object);
+	        if (objectCache[identifier]) {
+	            var n_1 = objectCache[identifier];
+	            transformStack[0].push(n_1);
+	            return n_1.value.get();
+	        }
+	        var n = new TransformationNode(identifier, object);
+	        objectCache[identifier] = n;
+	        return n.value.get();
+	    }
+	    return new TransformationNode(getId(object), object);
+	}
+	exports.transform = transform;
+	var transformId = 0;
+	function getId(object) {
+	    if (!core_1.isObservable(object))
+	        throw new Error("[mobservable] transform expected some observable object, got: " + object);
+	    var tid = object.$mobservable.transformId;
+	    if (tid === undefined)
+	        return object.$mobservable.transformId = ++transformId;
+	    return tid;
+	}
+	//# sourceMappingURL=transform.js.map
 
 /***/ }
 /******/ ])
