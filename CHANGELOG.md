@@ -1,3 +1,7 @@
+# 1.1.4
+
+* Fixed #65; illegal state exception when using a transaction inside a reactive function. Credits: @kmalakoff
+
 # 1.1.3
 
 * Fixed #61; if autorun was created during a transaction, postpone execution until the end of the transaction
