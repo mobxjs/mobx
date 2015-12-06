@@ -8,11 +8,14 @@ export type ITransformationFunction = (object: any, recurse:(object:any) => any)
 
 // TODO: cleanup callback
 // TODO: what is the effect of not returning reactive objects?
+// TODO: compose different transform functions?
+// TODO: how does this relate to map-reduce?
 
 export function transform(object: any, transformer: ITransformationFunction):any /*TODO typed */ {
 	const objectCache : {[id:number]: TransformationNode} = {};
-	const transformStack : TransformationNode[][] = [];
+	const transformStack : TransformationNode[][] = []; // TODO: stack needed? just save info on transformationNode? or make it global?
 	
+	// TODO: recycle DNode? it's so similar
 	class TransformationNode {
 		uses: TransformationNode[] = [];
 		_refCount = 0;
@@ -26,11 +29,12 @@ export function transform(object: any, transformer: ITransformationFunction):any
 				return transformer(this.source, recurseTransform);
 			} finally {
 				const used = transformStack.shift();
+				const previous = this.uses;
+				this.uses = used;
 				for(let i = 0, l = used.length; i < l; i++)
 					used[i].refCount(+1);
-				for(let i = this.uses.length - 1; i >= 0; i--)
-					this.uses[i].refCount(-1);
-				this.uses = used;
+				for(let i = previous.length - 1; i >= 0; i--)
+					previous[i].refCount(-1);
 			}
 		}, this, null, false);
 		
@@ -41,6 +45,7 @@ export function transform(object: any, transformer: ITransformationFunction):any
 		}
 		
 		dispose() {
+			// TODO: use dispose (or onReferencesDropToZero) of DNode to do this?
 			if (this._disposed)
 				return;
 			this._disposed = true;
@@ -49,6 +54,9 @@ export function transform(object: any, transformer: ITransformationFunction):any
 			this.uses = null;
 			delete objectCache[this.id];
 		}
+
+		// TODO: function to transformation always make eager?
+		// this.value.setRefCount(delta);
 	}
 
 	function recurseTransform(object: any): any {
@@ -74,6 +82,8 @@ export function transform(object: any, transformer: ITransformationFunction):any
 		rootNode.dispose();
 	});*/
 	//return rootNode;
+
+	// TODO: if in other transform, just return recurseTransform instead of the transformationNode?
 	return new TransformationNode(getId(object), object);
 }
 
