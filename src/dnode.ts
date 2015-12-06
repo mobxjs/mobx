@@ -44,10 +44,9 @@ export function transaction<T>(action:()=>T):T {
         return action();
     } finally {
         if (--inTransaction === 0) {
-            const length = changedValues.length;
-            for (var i = 0; i < length; i++)
-                changedValues[i].markReady(true);
-            changedValues.splice(0, length);
+            const values = changedValues.splice(0);
+            for (var i = 0, l = values.length; i < l; i++)
+                values[i].markReady(true);
             if (changedValues.length)
                 throw new Error("[mobservable] Illegal State, please file a bug report");
             
