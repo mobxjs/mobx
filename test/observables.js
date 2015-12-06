@@ -1365,3 +1365,26 @@ test('prematurely end autorun', function(t) {
     
     t.end();
 });
+
+test('issue 65; transaction causing transaction', function(t) {
+    var x = mobservable.observable({
+        a: 3,
+        b: function() {
+            return mobservable.transaction(function() {
+                return this.a * 2;
+            }, this);
+        }
+    });
+    
+    var res;
+    mobservable.autorun(function() {
+        res = x.a + x.b;
+    });
+    
+    mobservable.transaction(function() {
+        x.a = 2;
+        x.a = 5;
+    });
+    t.equal(res, 15);
+    t.end();
+});
