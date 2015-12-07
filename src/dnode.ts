@@ -179,6 +179,7 @@ export class ViewNode extends DataNode {
     private prevObserving: DataNode[] = null; // nodes we were looking at before. Used to determine changes in the dependency tree
     private dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
     private dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
+    private onSleepEmitter: SimpleEventEmitter = null;
 
     setRefCount(delta:number) {
         var rc = this.externalRefenceCount += delta;
@@ -199,6 +200,8 @@ export class ViewNode extends DataNode {
                 this.observing[i].removeObserver(this);
             this.observing = [];
             this.isSleeping = true;
+            if (this.onSleepEmitter !== null)
+                this.onSleepEmitter.emit((<any>this)._value); // mwe: XXX: fix when flatten
         }
     }
 
@@ -297,6 +300,12 @@ export class ViewNode extends DataNode {
         return false;
     }
 
+    public onceSleep(onSleep: (lastValue) => void) {
+        if (this.onSleepEmitter === null)
+            this.onSleepEmitter = new SimpleEventEmitter();
+        this.onSleepEmitter.once(onSleep);
+    }
+
     public dispose() {
         if (this.observing) for(var l=this.observing.length, i=0; i<l; i++)
             this.observing[i].removeObserver(this);
@@ -317,3 +326,4 @@ import {getStrict, withStrict} from './core';
 import {transitionTracker, reportTransition} from './extras';
 import {quickDiff} from './utils';
 import {IContextInfoStruct} from './interfaces';
+import SimpleEventEmitter from './simpleeventemitter';

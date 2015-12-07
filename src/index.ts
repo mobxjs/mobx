@@ -33,7 +33,7 @@ export {
 } from './core';
 
 export {
-	transform
+	createTransformer
 } from './transform';
 
 export {

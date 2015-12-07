@@ -1,93 +1,85 @@
-import {Lambda} from './interfaces';
 import {ObservableView} from './observableview';
 import {getDNode} from './extras';
 import {once} from './utils';
-import {isObservable} from './core';
+import {isObservable, autorun} from './core';
 
-export type ITransformationFunction = (object: any, recurse:(object:any) => any) => void;
+export interface ITransformer<A, B> {
+	(object: A): B;
+	root(object: A): ITransformController<B>;
+};
 
-// TODO: cleanup callback
-// TODO: what is the effect of not returning reactive objects?
-// TODO: compose different transform functions?
-// TODO: how does this relate to map-reduce?
+export interface ITransformController<B> {
+	value: B;
+	dispose();
+}
 
-export function transform(object: any, transformer: ITransformationFunction):any /*TODO typed */ {
-	const objectCache : {[id:number]: TransformationNode} = {};
-	const transformStack : TransformationNode[][] = []; // TODO: stack needed? just save info on transformationNode? or make it global?
-	
-	// TODO: recycle DNode? it's so similar
-	class TransformationNode {
-		uses: TransformationNode[] = [];
-		_refCount = 0;
-		_disposed = false;
-		
-		constructor(public id: number, public source: any) { }
-		
-		value = new ObservableView<any>(() => {
-			try {
-				transformStack.unshift([]);
-				return transformer(this.source, recurseTransform);
-			} finally {
-				const used = transformStack.shift();
-				const previous = this.uses;
-				this.uses = used;
-				for(let i = 0, l = used.length; i < l; i++)
-					used[i].refCount(+1);
-				for(let i = previous.length - 1; i >= 0; i--)
-					previous[i].refCount(-1);
-			}
-		}, this, null, false);
-		
-		refCount(delta) {
-			if ((this._refCount += delta) === 0) {
-				this.dispose();
-			}
-		}
-		
-		dispose() {
-			// TODO: use dispose (or onReferencesDropToZero) of DNode to do this?
-			if (this._disposed)
-				return;
-			this._disposed = true;
-			for(let i = this.uses.length - 1; i >= 0; i--)
-				this.uses[i].refCount(-1);
-			this.uses = null;
-			delete objectCache[this.id];
-		}
+export function createTransformer<A, B>(transformer: (object: A) => B, onCleanup?: (object: A, result?: B) => void): ITransformer<A, B> {
+	if (typeof transformer !== "function" || transformer.length !== 1)
+		throw new Error("[mobservable] transformer parameter should be a function that accepts one argument");
 
-		// TODO: function to transformation always make eager?
-		// this.value.setRefCount(delta);
-	}
+	// Memoizes: object id -> reactive view that applies transformer to the object
+	const objectCache : {[id:number]: ObservableView<B>} = {};
 
-	function recurseTransform(object: any): any {
-		if (object === null || object === undefined)
-			return object;
+	const result = (object: A) => {
 		const identifier = getId(object);
-		if (objectCache[identifier]) {
-			const n = objectCache[identifier];
-			transformStack[0].push(n);
-			return n.value.get();
+		let reactiveTransformer = objectCache[identifier];
+		if (reactiveTransformer)
+			return reactiveTransformer.get();
+
+		// Not in cache; create a reactive view
+		reactiveTransformer = objectCache[identifier] = new ObservableView<any>(() => {
+			return transformer(object);
+		}, this, {
+			object: object,
+			name: `transformer-${(<any>transformer).name}-${identifier}`
+		}, false);
+
+		// remove the view from the cache as soon as the object isn't part of the graph anymore
+		reactiveTransformer.onceSleep((lastValue) => {
+			delete objectCache[identifier];
+			if (onCleanup)
+				onCleanup(object, lastValue);
+		});
+		
+		return reactiveTransformer.get();
+	};
+	
+	// transformer.root(object); transforms object and keeps it 'hot'.
+	// will never fallback to lazy behavior when there are no observers
+	(<any>result).root = (object: A) => new RootTransformer(object); 
+	
+	class RootTransformer {
+		disposed = false;
+		rootView: ObservableView<B>;
+		
+		constructor(private source:A) {
+			const identifier = getId(source);
+			// use autorun to keep the transformation alive until we found the view function
+			const tempDisposer = autorun(() => {
+				result(this.source);
+			});
+			this.rootView = objectCache[identifier];
+			this.rootView.setRefCount(+1);
+			tempDisposer();
 		}
 		
-		const n = new TransformationNode(identifier, object);
-		objectCache[identifier] = n;
-		return n.value.get();
+		get value():B {
+			if (this.disposed)
+				throw new Error("[mobservable] transformer.root: The root transformer is already disposed");
+			return this.rootView.get();
+		}
+		
+		dispose = once(() => {
+			this.rootView.setRefCount(-1);
+			this.disposed = true;
+		});
 	}
 	
-	//recurseTransform(object);
-	//const rootNode = objectCache[getId(object)];
-	/*rootNode.refCount(+1); 
-	return once(() => {
-		rootNode.refCount(-1);
-		rootNode.dispose();
-	});*/
-	//return rootNode;
-
-	// TODO: if in other transform, just return recurseTransform instead of the transformationNode?
-	return new TransformationNode(getId(object), object);
+	return <ITransformer<A,B>> result;
 }
 
 let transformId = 0;
+
 function getId(object) {
 	if (!isObservable(object))
 		throw new Error("[mobservable] transform expected some observable object, got: " + object);
