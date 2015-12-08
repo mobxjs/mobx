@@ -147,6 +147,24 @@ test('transform using root-1 transformer', function(t) {
 
 // testing: https://github.com/mweststrate/mobservable/issues/67
 test('transform tree', function(t) {
+	var state = m.observable({root: null});
+	state.renderedNodes = m.observable(m.asStructure([]));
+
+	var nodeCalc = 0;
+	var displayNodeCalc = 0;
+	var renderCalc = 0;
+	var renderNodeCalc = 0;
+	var node, children;
+
+	function pluckFn(key) {
+		return function(obj) {
+			var keys = key.split('.'), value = obj;
+			for (var i = 0, l = keys.length; i < l; i++) { if (!value) return; value = value[keys[i]]; }
+			return value;
+		}
+	}
+	function identity(value) { return value; }
+
 	var TreeNode = function(name) {
 		this.children = m.observable([]); // tree
 		this.icon = m.observable('folder'); // render-only observable
@@ -164,7 +182,7 @@ test('transform tree', function(t) {
 
 	TreeNode.prototype.map = function(iter, memo) {
 		memo = memo || [];
-		memo.push(iter(this)); // TODO: why does transform require an observable-wrapped tree node
+		memo.push(iter(this)); // KM: why does transform require an observable-wrapped tree node
 		this.children.map(function(child) { child.map(iter, memo); });
 		return memo;
 	}
@@ -180,6 +198,8 @@ test('transform tree', function(t) {
 	}
 
 	var DisplayNode = function(node) {
+		displayNodeCalc++;
+
 		this.node = node;
 		this.canExpand = m.observable(false);
 		this.isExpanded = m.observable(true);
@@ -187,31 +207,14 @@ test('transform tree', function(t) {
 		var _this = this;
 		m.autorun(function() { _this.canExpand = !!_this.node.children.length });
 	}
+	DisplayNode.prototype.destroy = function() { displayNodeCalc--; }
 	DisplayNode.prototype.toggleExpanded = function() { if (this.canExpand) { this.isExpanded = !this.isExpanded; } }
-
-	var state = m.observable({root: null});
-	state.renderedNodes = m.observable(m.asStructure([]));
-
-	var nodeCalc = 0;
-	var renderCalc = 0;
-	var renderNodeCalc = 0;
-	var unloaded = [];
-
-	function pluckFn(key) {
-		return function(obj) {
-			var keys = key.split('.'), value = obj;
-			for (var i = 0, l = keys.length; i < l; i++) { if (!value) return; value = value[keys[i]]; }
-			return value;
-		}
-	}
-	function identity(value) { return value; }
-	var node, children;
 
 	var transformNode = m.createTransformer(function(node) {
 		nodeCalc++;
-		return new DisplayNode(node);;
-	}, function cleanup(displayNode) {
-		unloaded.push(displayNode);
+		return new DisplayNode(node);
+	}, function cleanup(node, displayNode) { // KM: maybe the transformed node should be the first argument?
+		displayNode.destroy();
 	});
 
 	// transform nodes to renderedNodes
@@ -226,9 +229,10 @@ test('transform tree', function(t) {
 		renderNodeCalc += state.renderedNodes.length;
 	});
 
-	t.equal(nodeCalc, 			0);
-	t.equal(renderCalc, 1);
-	t.equal(renderNodeCalc, 0);
+	t.equal(nodeCalc, 				0);
+	t.equal(displayNodeCalc,	0);
+	t.equal(renderCalc, 			1);
+	t.equal(renderNodeCalc, 	0);
 	t.deepEqual(state.renderedNodes.length, 0);
 
 	////////////////////////////////////
@@ -237,27 +241,30 @@ test('transform tree', function(t) {
 
 	// initialize root-1
 	state.root = new TreeNode('root-1');
-	t.equal(nodeCalc, 			1);
-	t.equal(renderCalc, 2);
-	t.equal(renderNodeCalc, 1);
+	t.equal(nodeCalc, 				1);
+	t.equal(displayNodeCalc,	1);
+	t.equal(renderCalc, 			2);
+	t.equal(renderNodeCalc, 	1);
 	t.deepEqual(state.renderedNodes.length, 1);
 	t.deepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
 	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1']);
 
 	// add first child
 	state.root.addChild(new TreeNode('root-1-child-1'));
-	t.equal(nodeCalc, 			1 + 1);
-	t.equal(renderCalc, 3);
-	t.equal(renderNodeCalc, 1 + 2);
+	t.equal(nodeCalc, 				1 + 1);
+	t.equal(displayNodeCalc,	1 + 1);
+	t.equal(renderCalc, 			2 + 1);
+	t.equal(renderNodeCalc, 	1 + 2);
 	t.deepEqual(state.renderedNodes.length, 2);
 	t.deepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
 	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1', 'root-1-child-1']);
 
 	// add second child
 	state.root.addChild(new TreeNode('root-1-child-2'));
-	t.equal(nodeCalc, 			1 + 1 + 1);
-	t.equal(renderCalc, 4);
-	t.equal(renderNodeCalc, 1 + 2 + 3);
+	t.equal(nodeCalc, 				1 + 1 + 1);
+	t.equal(displayNodeCalc,	1 + 1 + 1);
+	t.equal(renderCalc, 			2 + 1 + 1);
+	t.equal(renderNodeCalc, 	1 + 2 + 3);
 	t.deepEqual(state.renderedNodes.length, 3);
 	t.deepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
 	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1', 'root-1-child-1', 'root-1-child-2']);
@@ -265,9 +272,10 @@ test('transform tree', function(t) {
 	// add first child to second child
 	node = state.root.find(function(node) { return node.name === 'root-1-child-2'; });
 	node.addChild(new TreeNode('root-1-child-2-child-1'));
-	t.equal(nodeCalc, 			1 + 1 + 1 + 1);
-	t.equal(renderCalc, 5);
-	t.equal(renderNodeCalc, 1 + 2 + 3 + 4);
+	t.equal(nodeCalc, 				1 + 1 + 1 + 1);
+	t.equal(displayNodeCalc,	1 + 1 + 1 + 1);
+	t.equal(renderCalc, 			2 + 1 + 1 + 1);
+	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4);
 	t.deepEqual(state.renderedNodes.length, 4);
 	t.deepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
 	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1', 'root-1-child-1', 'root-1-child-2', 'root-1-child-2-child-1']);
@@ -275,9 +283,10 @@ test('transform tree', function(t) {
 	// add first child to first child
 	node = state.root.find(function(node) { return node.name === 'root-1-child-1'; });
 	node.addChild(new TreeNode('root-1-child-1-child-1'));
-	t.equal(nodeCalc, 			1 + 1 + 1 + 1 + 1);
-	t.equal(renderCalc, 6);
-	t.equal(renderNodeCalc, 1 + 2 + 3 + 4 + 5);
+	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1);
+	t.equal(displayNodeCalc, 	1 + 1 + 1 + 1 + 1);
+	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1);
+	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5);
 	t.deepEqual(state.renderedNodes.length, 5);
 	t.deepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
 	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1', 'root-1-child-1', 'root-1-child-1-child-1', 'root-1-child-2', 'root-1-child-2-child-1']);
@@ -285,9 +294,10 @@ test('transform tree', function(t) {
 	// remove children from first child
 	node = state.root.find(function(node) { return node.name === 'root-1-child-1'; });
 	node.children.splice(0);
-	t.equal(nodeCalc, 			1 + 1 + 1 + 1 + 1 + 0);
-	t.equal(renderCalc, 7);
-	t.equal(renderNodeCalc, 1 + 2 + 3 + 4 + 5 + 4);
+	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0);
+	t.equal(displayNodeCalc, 	1 + 1 + 1 + 1 + 1 - 1);
+	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1);
+	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4);
 	t.deepEqual(state.renderedNodes.length, 4);
 	t.deepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
 	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1', 'root-1-child-1', 'root-1-child-2', 'root-1-child-2-child-1']);
@@ -295,18 +305,20 @@ test('transform tree', function(t) {
 	// remove children from first child with no children should be a noop
 	node = state.root.find(function(node) { return node.name === 'root-1-child-1'; });
 	node.children.splice(0);
-	t.equal(nodeCalc, 			1 + 1 + 1 + 1 + 1 + 0 + 0);
-	t.equal(renderCalc, 7);
-	t.equal(renderNodeCalc, 1 + 2 + 3 + 4 + 5 + 4 + 0);
+	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0);
+	t.equal(displayNodeCalc, 	1 + 1 + 1 + 1 + 1 - 1 + 0);
+	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0);
+	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0);
 	t.deepEqual(state.renderedNodes.length, 4);
 	t.deepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
 	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1', 'root-1-child-1', 'root-1-child-2', 'root-1-child-2-child-1']);
 
 	// remove children from root-1
 	state.root.children.splice(0);
-	t.equal(nodeCalc, 			1 + 1 + 1 + 1 + 1 + 0 + 0 + 0);
-	t.equal(renderCalc, 8);
-	t.equal(renderNodeCalc, 1 + 2 + 3 + 4 + 5 + 4 + 0 + 1);
+	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0 + 0);
+	t.equal(displayNodeCalc, 	1 + 1 + 1 + 1 + 1 - 1 + 0 - 3);
+	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1);
+	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1);
 	t.deepEqual(state.renderedNodes.length, 1);
 	t.deepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
 	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1']);
@@ -322,18 +334,20 @@ test('transform tree', function(t) {
 	children.push(new TreeNode('root-1-child-2b'));
 	children[1].addChild(new TreeNode('root-1-child-2b-child-1'))
 	state.root.addChildren(children);
-	t.equal(nodeCalc, 			1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4);
-	t.equal(renderCalc, 9);
-	t.equal(renderNodeCalc, 1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5);
+	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4);
+	t.equal(displayNodeCalc, 	1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4);
+	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1 + 1);
+	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5);
 	t.deepEqual(state.renderedNodes.length, 5);
 	t.deepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
 	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1', 'root-1-child-1b', 'root-1-child-1b-child-1', 'root-1-child-2b', 'root-1-child-2b-child-1']);
 
 	// remove root-1
 	state.root = null;
-	t.equal(nodeCalc, 			1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4 + 0);
-	t.equal(renderCalc, 10);
-	t.equal(renderNodeCalc, 1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5 + 0);
+	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4 + 0);
+	t.equal(displayNodeCalc, 	1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4 - 5);
+	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1 + 1 + 1);
+	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5 + 0);
 	t.deepEqual(state.renderedNodes.length, 0);
 
 	////////////////////////////////////
@@ -347,9 +361,10 @@ test('transform tree', function(t) {
 	node.addChild(new TreeNode('root-1b-child-2'));
 	node.children[1].addChild(new TreeNode('root-1b-child-2-child-1'))
 	state.root = node;
-	t.equal(nodeCalc, 			1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4 + 0 + 5);
-	t.equal(renderCalc, 11);
-	t.equal(renderNodeCalc, 1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5 + 0 + 5);
+	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4 + 0 + 5);
+	t.equal(displayNodeCalc, 	1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4 - 5 + 5);
+	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1 + 1 + 1 + 1);
+	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5 + 0 + 5);
 	t.deepEqual(state.renderedNodes.length, 5);
 	t.deepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
 	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1b', 'root-1b-child-1', 'root-1b-child-1-child-1', 'root-1b-child-2', 'root-1b-child-2-child-1']);
