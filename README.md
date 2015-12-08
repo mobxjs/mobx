@@ -13,6 +13,8 @@
 <br/>
 * New to Mobservable? Take the [five minute, interactive introduction](https://mweststrate.github.io/mobservable/getting-started.html)
 * [Official documentation](https://mweststrate.github.io/mobservable/)
+* Mobservable talk on [Reactive2015](https://www.youtube.com/watch?v=FEwLwiizlk0)
+
 
 ## Introduction
 
