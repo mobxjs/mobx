@@ -304,7 +304,7 @@ test('transform tree (modifying tree incrementally)', function(t) {
 	var transformNode = m.createTransformer(function(node) {
 		nodeCreateCount++;
 		return new DisplayNode(node);
-	}, function cleanup(node, displayNode) { displayNode.destroy(); }); // KM: maybe the transformed node should be the first argument?
+	}, function cleanup(node, displayNode) { displayNode.destroy(); });
 
 	// transform nodes to renderedNodes
 	m.autorun(function() {
