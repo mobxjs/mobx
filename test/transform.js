@@ -147,11 +147,14 @@ test('transform using root-1 transformer', function(t) {
 
 // testing: https://github.com/mweststrate/mobservable/issues/67
 test('transform tree', function(t) {
-	var state = m.observable({root: null});
-	state.renderedNodes = m.observable(m.asStructure([]));
+	var state = m.observable({
+		root: null,
+		renderedNodes: m.asStructure([]),
+		collapsed: new m.map() // KM: ideally, I would like to use a set
+	});
 
 	var nodeCalc = 0;
-	var displayNodeCalc = 0;
+	var displayNodeCount = 0;
 	var renderCalc = 0;
 	var renderNodeCalc = 0;
 	var node, children;
@@ -180,12 +183,22 @@ test('transform tree', function(t) {
 		this.children.splice.apply(this.children, [this.children.length, 0].concat(nodes));
 	}
 
+	TreeNode.prototype.path = function() {
+		var node = this, parts = [];
+		while (node) {
+			parts.push(node.name);
+			node = node.parent;
+		}
+		return parts.join('/');
+	}
+
 	TreeNode.prototype.map = function(iter, memo) {
 		memo = memo || [];
-		memo.push(iter(this)); // KM: why does transform require an observable-wrapped tree node
-		this.children.map(function(child) { child.map(iter, memo); });
+		memo.push(iter(this));
+		this.children.forEach(function(child) { child.map(iter, memo); });
 		return memo;
 	}
+
 	TreeNode.prototype.find = function(iter) {
 		if (iter(this)) return this;
 
@@ -197,18 +210,26 @@ test('transform tree', function(t) {
 		return null;
 	}
 
-	var DisplayNode = function(node) {
-		displayNodeCalc++;
+	// transform insted of map to control tree traversal early outs
+	TreeNode.prototype.transform = function(iter, memo) {
+		if (this.parent && state.collapsed.has(this.parent.path())) return memo || []; // not visible
 
-		this.node = node;
-		this.canExpand = m.observable(false);
-		this.isExpanded = m.observable(true);
-
-		var _this = this;
-		m.autorun(function() { _this.canExpand = !!_this.node.children.length });
+		memo = memo || [];
+		memo.push(iter(this));
+		this.children.forEach(function(child) { child.transform(iter, memo); });
+		return memo;
 	}
-	DisplayNode.prototype.destroy = function() { displayNodeCalc--; }
-	DisplayNode.prototype.toggleExpanded = function() { if (this.canExpand) { this.isExpanded = !this.isExpanded; } }
+
+	var DisplayNode = function(node) {
+		displayNodeCount++;
+		this.node = node;
+	}
+	DisplayNode.prototype.destroy = function() { displayNodeCount--; }
+
+	DisplayNode.prototype.toggleCollapsed = function() {
+		var path = this.node.path();
+		state.collapsed.has(path) ? state.collapsed.delete(path) : state.collapsed.set(path, true); // KM: ideally, I would like to use a set
+	}
 
 	var transformNode = m.createTransformer(function(node) {
 		nodeCalc++;
@@ -219,8 +240,13 @@ test('transform tree', function(t) {
 
 	// transform nodes to renderedNodes
 	m.autorun(function() {
-		var result = state.root ? state.root.map(transformNode).filter(function(node) { return !!node; }) : []
-		m.untracked(function() { state.renderedNodes.replace(result); });
+		// KM: ideally, I would like to do an assignment here, but it creates a cycle and would need to preserve ms.asStructure:
+		//
+		// state.renderedNodes = state.root ? state.root.transform(transformNode) : [];
+		//
+
+		var renderedNodes = state.root ? state.root.transform(transformNode) : [];
+		state.renderedNodes.replace(renderedNodes);
 	});
 
 	// render
@@ -230,7 +256,7 @@ test('transform tree', function(t) {
 	});
 
 	t.equal(nodeCalc, 				0);
-	t.equal(displayNodeCalc,	0);
+	t.equal(displayNodeCount,	0);
 	t.equal(renderCalc, 			1);
 	t.equal(renderNodeCalc, 	0);
 	t.deepEqual(state.renderedNodes.length, 0);
@@ -242,7 +268,7 @@ test('transform tree', function(t) {
 	// initialize root-1
 	state.root = new TreeNode('root-1');
 	t.equal(nodeCalc, 				1);
-	t.equal(displayNodeCalc,	1);
+	t.equal(displayNodeCount,	1);
 	t.equal(renderCalc, 			2);
 	t.equal(renderNodeCalc, 	1);
 	t.deepEqual(state.renderedNodes.length, 1);
@@ -252,7 +278,7 @@ test('transform tree', function(t) {
 	// add first child
 	state.root.addChild(new TreeNode('root-1-child-1'));
 	t.equal(nodeCalc, 				1 + 1);
-	t.equal(displayNodeCalc,	1 + 1);
+	t.equal(displayNodeCount,	1 + 1);
 	t.equal(renderCalc, 			2 + 1);
 	t.equal(renderNodeCalc, 	1 + 2);
 	t.deepEqual(state.renderedNodes.length, 2);
@@ -262,7 +288,7 @@ test('transform tree', function(t) {
 	// add second child
 	state.root.addChild(new TreeNode('root-1-child-2'));
 	t.equal(nodeCalc, 				1 + 1 + 1);
-	t.equal(displayNodeCalc,	1 + 1 + 1);
+	t.equal(displayNodeCount,	1 + 1 + 1);
 	t.equal(renderCalc, 			2 + 1 + 1);
 	t.equal(renderNodeCalc, 	1 + 2 + 3);
 	t.deepEqual(state.renderedNodes.length, 3);
@@ -273,7 +299,7 @@ test('transform tree', function(t) {
 	node = state.root.find(function(node) { return node.name === 'root-1-child-2'; });
 	node.addChild(new TreeNode('root-1-child-2-child-1'));
 	t.equal(nodeCalc, 				1 + 1 + 1 + 1);
-	t.equal(displayNodeCalc,	1 + 1 + 1 + 1);
+	t.equal(displayNodeCount,	1 + 1 + 1 + 1);
 	t.equal(renderCalc, 			2 + 1 + 1 + 1);
 	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4);
 	t.deepEqual(state.renderedNodes.length, 4);
@@ -284,7 +310,7 @@ test('transform tree', function(t) {
 	node = state.root.find(function(node) { return node.name === 'root-1-child-1'; });
 	node.addChild(new TreeNode('root-1-child-1-child-1'));
 	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1);
-	t.equal(displayNodeCalc, 	1 + 1 + 1 + 1 + 1);
+	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1);
 	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1);
 	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5);
 	t.deepEqual(state.renderedNodes.length, 5);
@@ -295,18 +321,18 @@ test('transform tree', function(t) {
 	node = state.root.find(function(node) { return node.name === 'root-1-child-1'; });
 	node.children.splice(0);
 	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0);
-	t.equal(displayNodeCalc, 	1 + 1 + 1 + 1 + 1 - 1);
+	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1 - 1);
 	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1);
 	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4);
 	t.deepEqual(state.renderedNodes.length, 4);
 	t.deepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
 	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1', 'root-1-child-1', 'root-1-child-2', 'root-1-child-2-child-1']);
 
-	// remove children from first child with no children should be a noop
+	// remove children from first child with no children should be a no-op
 	node = state.root.find(function(node) { return node.name === 'root-1-child-1'; });
 	node.children.splice(0);
 	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0);
-	t.equal(displayNodeCalc, 	1 + 1 + 1 + 1 + 1 - 1 + 0);
+	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1 - 1 + 0);
 	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0);
 	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0);
 	t.deepEqual(state.renderedNodes.length, 4);
@@ -316,7 +342,7 @@ test('transform tree', function(t) {
 	// remove children from root-1
 	state.root.children.splice(0);
 	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0 + 0);
-	t.equal(displayNodeCalc, 	1 + 1 + 1 + 1 + 1 - 1 + 0 - 3);
+	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1 - 1 + 0 - 3);
 	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1);
 	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1);
 	t.deepEqual(state.renderedNodes.length, 1);
@@ -335,7 +361,7 @@ test('transform tree', function(t) {
 	children[1].addChild(new TreeNode('root-1-child-2b-child-1'))
 	state.root.addChildren(children);
 	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4);
-	t.equal(displayNodeCalc, 	1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4);
+	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4);
 	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1 + 1);
 	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5);
 	t.deepEqual(state.renderedNodes.length, 5);
@@ -345,7 +371,7 @@ test('transform tree', function(t) {
 	// remove root-1
 	state.root = null;
 	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4 + 0);
-	t.equal(displayNodeCalc, 	1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4 - 5);
+	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4 - 5);
 	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1 + 1 + 1);
 	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5 + 0);
 	t.deepEqual(state.renderedNodes.length, 0);
@@ -362,7 +388,7 @@ test('transform tree', function(t) {
 	node.children[1].addChild(new TreeNode('root-1b-child-2-child-1'))
 	state.root = node;
 	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4 + 0 + 5);
-	t.equal(displayNodeCalc, 	1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4 - 5 + 5);
+	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4 - 5 + 5);
 	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1 + 1 + 1 + 1);
 	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5 + 0 + 5);
 	t.deepEqual(state.renderedNodes.length, 5);
@@ -370,17 +396,48 @@ test('transform tree', function(t) {
 	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1b', 'root-1b-child-1', 'root-1b-child-1-child-1', 'root-1b-child-2', 'root-1b-child-2-child-1']);
 
 	////////////////////////////////////
-	// Expanded - UNTESTED
+	// Expanded
 	////////////////////////////////////
 
 	// toggle root to collapsed
-	// state.renderedNodes[0].toggleExpanded();
-	// t.equal(nodeCalc, 			1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4 + 0 + 5 + 0);
-	// t.equal(renderCalc, 12);
-	// t.equal(renderNodeCalc, 1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5 + 0 + 5 + 1);
-	// t.deepEqual(state.renderedNodes.length, 5);
-	// t.deepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
-	// t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1b']);
+	state.renderedNodes[0].toggleCollapsed();
+	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4 + 0 + 5 + 0);
+	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4 - 5 + 5 - 4);
+	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1 + 1 + 1 + 1 + 1);
+	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5 + 0 + 5 + 1);
+	t.deepEqual(state.renderedNodes.length, 1);
+	t.notDeepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity)); // not a direct map of the tree nodes
+	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1b']);
+
+	// toggle root to expanded
+	state.renderedNodes[0].toggleCollapsed();
+	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4 + 0 + 5 + 0 + 4);
+	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4 - 5 + 5 - 4 + 4);
+	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1 + 1 + 1 + 1 + 1 + 1);
+	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5 + 0 + 5 + 1 + 5);
+	t.deepEqual(state.renderedNodes.length, 5);
+	t.deepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
+	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1b', 'root-1b-child-1', 'root-1b-child-1-child-1', 'root-1b-child-2', 'root-1b-child-2-child-1']);
+
+	// toggle child-1 collapsed
+	state.renderedNodes[1].toggleCollapsed();
+	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4 + 0 + 5 + 0 + 4 + 0);
+	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4 - 5 + 5 - 4 + 4 - 1);
+	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1 + 1 + 1 + 1 + 1 + 1 + 1);
+	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5 + 0 + 5 + 1 + 5 + 4);
+	t.deepEqual(state.renderedNodes.length, 4);
+	t.notDeepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity)); // not a direct map of the tree nodes
+	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1b', 'root-1b-child-1', 'root-1b-child-2', 'root-1b-child-2-child-1']);
+
+	// toggle child-2-child-1 collapsed should be a no-op
+	state.renderedNodes[state.renderedNodes.length-1].toggleCollapsed();
+	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4 + 0 + 5 + 0 + 4 + 0 + 0);
+	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4 - 5 + 5 - 4 + 4 - 1 + 0);
+	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 0);
+	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5 + 0 + 5 + 1 + 5 + 4 + 0);
+	t.deepEqual(state.renderedNodes.length, 4);
+	t.notDeepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity)); // not a direct map of the tree nodes
+	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1b', 'root-1b-child-1', 'root-1b-child-2', 'root-1b-child-2-child-1']);
 
 	t.end();
 });
