@@ -23,12 +23,11 @@ module.exports.testSet = function() {
   }
 
   var TreeNode = testSet.TreeNode = function(name) {
-    this.children = m.observable([]); // tree
-    this.icon = m.observable('folder'); // render-only observable
+    this.children = m.observable(m.asStructure([])); // tree
+    this.icon = m.observable('folder');
 
     this.parent = null; // not observed
     this.name = name; // not observed
-    this.tags = []; // not observed
   }
   TreeNode.prototype.addChild = function(node) { node.parent = this; this.children.push(node); }
   TreeNode.prototype.addChildren = function(nodes) {
