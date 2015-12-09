@@ -1,5 +1,6 @@
 var m = require('../');
 var test = require('tape');
+var TransformUtils = require('./utils/transform');
 
 test('transform1', function(t) {
 	var todoCalc = 0;
@@ -146,97 +147,24 @@ test('transform using root-1 transformer', function(t) {
 });
 
 // testing: https://github.com/mweststrate/mobservable/issues/67
-test('transform tree', function(t) {
-	var state = m.observable({
-		root: null,
-		renderedNodes: m.asStructure([]),
-		collapsed: new m.map() // KM: ideally, I would like to use a set
-	});
+test('transform tree (modifying tree)', function(t) {
+  var pluckFn = TransformUtils.pluckFn;
+  var identity = TransformUtils.identity;
+	var testSet = TransformUtils.testSet();
+	var state = testSet.state;
+	var stats = testSet.stats;
+  var TreeNode = testSet.TreeNode;
+  var DisplayNode = testSet.DisplayNode;
 
-	var nodeCalc = 0;
-	var displayNodeCount = 0;
-	var renderCalc = 0;
-	var renderNodeCalc = 0;
-	var node, children;
-
-	function pluckFn(key) {
-		return function(obj) {
-			var keys = key.split('.'), value = obj;
-			for (var i = 0, l = keys.length; i < l; i++) { if (!value) return; value = value[keys[i]]; }
-			return value;
-		}
-	}
-	function identity(value) { return value; }
-
-	var TreeNode = function(name) {
-		this.children = m.observable([]); // tree
-		this.icon = m.observable('folder'); // render-only observable
-
-		this.parent = null; // not observed
-		this.name = name; // not observed
-		this.tags = []; // not observed
-	}
-	TreeNode.prototype.addChild = function(node) { node.parent = this; this.children.push(node); }
-	TreeNode.prototype.addChildren = function(nodes) {
-		var _this = this;
-		nodes.map(function(node) { node.parent = _this; });
-		this.children.splice.apply(this.children, [this.children.length, 0].concat(nodes));
-	}
-
-	TreeNode.prototype.path = function() {
-		var node = this, parts = [];
-		while (node) {
-			parts.push(node.name);
-			node = node.parent;
-		}
-		return parts.join('/');
-	}
-
-	TreeNode.prototype.map = function(iter, memo) {
-		memo = memo || [];
-		memo.push(iter(this));
-		this.children.forEach(function(child) { child.map(iter, memo); });
-		return memo;
-	}
-
-	TreeNode.prototype.find = function(iter) {
-		if (iter(this)) return this;
-
-		var result;
-		for (var i = 0, l = this.children.length; i < l; i++) {
-			result = this.children[i].find(iter);
-			if (result) return result;
-		}
-		return null;
-	}
-
-	// transform insted of map to control tree traversal early outs
-	TreeNode.prototype.transform = function(iter, memo) {
-		if (this.parent && state.collapsed.has(this.parent.path())) return memo || []; // not visible
-
-		memo = memo || [];
-		memo.push(iter(this));
-		this.children.forEach(function(child) { child.transform(iter, memo); });
-		return memo;
-	}
-
-	var DisplayNode = function(node) {
-		displayNodeCount++;
-		this.node = node;
-	}
-	DisplayNode.prototype.destroy = function() { displayNodeCount--; }
-
-	DisplayNode.prototype.toggleCollapsed = function() {
-		var path = this.node.path();
-		state.collapsed.has(path) ? state.collapsed.delete(path) : state.collapsed.set(path, true); // KM: ideally, I would like to use a set
-	}
+  var nodeCalc = 0;
+  var renderCalc = 0;
+  var renderNodeCalc = 0;
+  var node, children;
 
 	var transformNode = m.createTransformer(function(node) {
 		nodeCalc++;
 		return new DisplayNode(node);
-	}, function cleanup(node, displayNode) { // KM: maybe the transformed node should be the first argument?
-		displayNode.destroy();
-	});
+	}, function cleanup(node, displayNode) { displayNode.destroy(); }); // KM: maybe the transformed node should be the first argument?
 
 	// transform nodes to renderedNodes
 	m.autorun(function() {
@@ -255,10 +183,10 @@ test('transform tree', function(t) {
 		renderNodeCalc += state.renderedNodes.length;
 	});
 
-	t.equal(nodeCalc, 				0);
-	t.equal(displayNodeCount,	0);
-	t.equal(renderCalc, 			1);
-	t.equal(renderNodeCalc, 	0);
+	t.equal(nodeCalc, 			0);
+	t.equal(stats.nodeCount,	0);
+	t.equal(renderCalc, 		1);
+	t.equal(renderNodeCalc, 0);
 	t.deepEqual(state.renderedNodes.length, 0);
 
 	////////////////////////////////////
@@ -268,7 +196,7 @@ test('transform tree', function(t) {
 	// initialize root-1
 	state.root = new TreeNode('root-1');
 	t.equal(nodeCalc, 				1);
-	t.equal(displayNodeCount,	1);
+	t.equal(stats.nodeCount,	1);
 	t.equal(renderCalc, 			2);
 	t.equal(renderNodeCalc, 	1);
 	t.deepEqual(state.renderedNodes.length, 1);
@@ -278,7 +206,7 @@ test('transform tree', function(t) {
 	// add first child
 	state.root.addChild(new TreeNode('root-1-child-1'));
 	t.equal(nodeCalc, 				1 + 1);
-	t.equal(displayNodeCount,	1 + 1);
+	t.equal(stats.nodeCount,	1 + 1);
 	t.equal(renderCalc, 			2 + 1);
 	t.equal(renderNodeCalc, 	1 + 2);
 	t.deepEqual(state.renderedNodes.length, 2);
@@ -288,7 +216,7 @@ test('transform tree', function(t) {
 	// add second child
 	state.root.addChild(new TreeNode('root-1-child-2'));
 	t.equal(nodeCalc, 				1 + 1 + 1);
-	t.equal(displayNodeCount,	1 + 1 + 1);
+	t.equal(stats.nodeCount,	1 + 1 + 1);
 	t.equal(renderCalc, 			2 + 1 + 1);
 	t.equal(renderNodeCalc, 	1 + 2 + 3);
 	t.deepEqual(state.renderedNodes.length, 3);
@@ -299,7 +227,7 @@ test('transform tree', function(t) {
 	node = state.root.find(function(node) { return node.name === 'root-1-child-2'; });
 	node.addChild(new TreeNode('root-1-child-2-child-1'));
 	t.equal(nodeCalc, 				1 + 1 + 1 + 1);
-	t.equal(displayNodeCount,	1 + 1 + 1 + 1);
+	t.equal(stats.nodeCount,	1 + 1 + 1 + 1);
 	t.equal(renderCalc, 			2 + 1 + 1 + 1);
 	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4);
 	t.deepEqual(state.renderedNodes.length, 4);
@@ -310,7 +238,7 @@ test('transform tree', function(t) {
 	node = state.root.find(function(node) { return node.name === 'root-1-child-1'; });
 	node.addChild(new TreeNode('root-1-child-1-child-1'));
 	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1);
-	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1);
+	t.equal(stats.nodeCount, 	1 + 1 + 1 + 1 + 1);
 	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1);
 	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5);
 	t.deepEqual(state.renderedNodes.length, 5);
@@ -321,7 +249,7 @@ test('transform tree', function(t) {
 	node = state.root.find(function(node) { return node.name === 'root-1-child-1'; });
 	node.children.splice(0);
 	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0);
-	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1 - 1);
+	t.equal(stats.nodeCount, 	1 + 1 + 1 + 1 + 1 - 1);
 	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1);
 	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4);
 	t.deepEqual(state.renderedNodes.length, 4);
@@ -332,7 +260,7 @@ test('transform tree', function(t) {
 	node = state.root.find(function(node) { return node.name === 'root-1-child-1'; });
 	node.children.splice(0);
 	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0);
-	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1 - 1 + 0);
+	t.equal(stats.nodeCount, 	1 + 1 + 1 + 1 + 1 - 1 + 0);
 	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0);
 	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0);
 	t.deepEqual(state.renderedNodes.length, 4);
@@ -342,7 +270,7 @@ test('transform tree', function(t) {
 	// remove children from root-1
 	state.root.children.splice(0);
 	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0 + 0);
-	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1 - 1 + 0 - 3);
+	t.equal(stats.nodeCount, 	1 + 1 + 1 + 1 + 1 - 1 + 0 - 3);
 	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1);
 	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1);
 	t.deepEqual(state.renderedNodes.length, 1);
@@ -361,7 +289,7 @@ test('transform tree', function(t) {
 	children[1].addChild(new TreeNode('root-1-child-2b-child-1'))
 	state.root.addChildren(children);
 	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4);
-	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4);
+	t.equal(stats.nodeCount, 	1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4);
 	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1 + 1);
 	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5);
 	t.deepEqual(state.renderedNodes.length, 5);
@@ -371,7 +299,7 @@ test('transform tree', function(t) {
 	// remove root-1
 	state.root = null;
 	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4 + 0);
-	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4 - 5);
+	t.equal(stats.nodeCount, 	1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4 - 5);
 	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1 + 1 + 1);
 	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5 + 0);
 	t.deepEqual(state.renderedNodes.length, 0);
@@ -388,53 +316,100 @@ test('transform tree', function(t) {
 	node.children[1].addChild(new TreeNode('root-1b-child-2-child-1'))
 	state.root = node;
 	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4 + 0 + 5);
-	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4 - 5 + 5);
+	t.equal(stats.nodeCount, 	1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4 - 5 + 5);
 	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1 + 1 + 1 + 1);
 	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5 + 0 + 5);
 	t.deepEqual(state.renderedNodes.length, 5);
 	t.deepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
 	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1b', 'root-1b-child-1', 'root-1b-child-1-child-1', 'root-1b-child-2', 'root-1b-child-2-child-1']);
 
+	t.end();
+});
+
+test('transform tree (modifying expanded)', function(t) {
+  var pluckFn = TransformUtils.pluckFn;
+  var identity = TransformUtils.identity;
+	var testSet = TransformUtils.testSet();
+	var state = testSet.state;
+	var stats = testSet.stats;
+  var TreeNode = testSet.TreeNode;
+  var DisplayNode = testSet.DisplayNode;
+
+  var nodeCalc = 0;
+  var renderCalc = 0;
+  var renderNodeCalc = 0;
+  var node, children;
+
+	var transformNode = m.createTransformer(function(node) {
+		nodeCalc++;
+		return new DisplayNode(node);
+	}, function cleanup(node, displayNode) { displayNode.destroy(); });
+
+	// transform nodes to renderedNodes
+	m.autorun(function() {
+		var renderedNodes = state.root ? state.root.transform(transformNode) : [];
+		state.renderedNodes.replace(renderedNodes);
+	});
+
+	// render
+	m.autorun(function() {
+		renderCalc++;
+		renderNodeCalc += state.renderedNodes.length;
+	});
+
+	t.equal(nodeCalc, 			0);
+	t.equal(stats.nodeCount,	0);
+	t.equal(renderCalc, 		1);
+	t.equal(renderNodeCalc, 0);
+	t.deepEqual(state.renderedNodes.length, 0);
+
 	////////////////////////////////////
 	// Expanded
 	////////////////////////////////////
 
+	node = new TreeNode('root-1b')
+	node.addChild(new TreeNode('root-1b-child-1'));
+	node.children[0].addChild(new TreeNode('root-1b-child-1-child-1'))
+	node.addChild(new TreeNode('root-1b-child-2'));
+	node.children[1].addChild(new TreeNode('root-1b-child-2-child-1'))
+	state.root = node;
+
 	// toggle root to collapsed
 	state.renderedNodes[0].toggleCollapsed();
-	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4 + 0 + 5 + 0);
-	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4 - 5 + 5 - 4);
-	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1 + 1 + 1 + 1 + 1);
-	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5 + 0 + 5 + 1);
+	t.equal(nodeCalc, 				5 + 0);
+	t.equal(stats.nodeCount, 	5 - 4);
+	t.equal(renderCalc, 			2 + 1);
+	t.equal(renderNodeCalc, 	5 + 1);
 	t.deepEqual(state.renderedNodes.length, 1);
 	t.notDeepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity)); // not a direct map of the tree nodes
 	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1b']);
 
 	// toggle root to expanded
 	state.renderedNodes[0].toggleCollapsed();
-	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4 + 0 + 5 + 0 + 4);
-	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4 - 5 + 5 - 4 + 4);
-	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1 + 1 + 1 + 1 + 1 + 1);
-	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5 + 0 + 5 + 1 + 5);
+	t.equal(nodeCalc, 				5 + 0 + 4);
+	t.equal(stats.nodeCount, 	5 - 4 + 4);
+	t.equal(renderCalc, 			2 + 1 + 1);
+	t.equal(renderNodeCalc, 	5 + 1 + 5);
 	t.deepEqual(state.renderedNodes.length, 5);
 	t.deepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
 	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1b', 'root-1b-child-1', 'root-1b-child-1-child-1', 'root-1b-child-2', 'root-1b-child-2-child-1']);
 
 	// toggle child-1 collapsed
 	state.renderedNodes[1].toggleCollapsed();
-	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4 + 0 + 5 + 0 + 4 + 0);
-	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4 - 5 + 5 - 4 + 4 - 1);
-	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1 + 1 + 1 + 1 + 1 + 1 + 1);
-	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5 + 0 + 5 + 1 + 5 + 4);
+	t.equal(nodeCalc, 				5 + 0 + 4 + 0);
+	t.equal(stats.nodeCount, 	5 - 4 + 4 - 1);
+	t.equal(renderCalc, 			2 + 1 + 1 + 1);
+	t.equal(renderNodeCalc, 	5 + 1 + 5 + 4);
 	t.deepEqual(state.renderedNodes.length, 4);
 	t.notDeepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity)); // not a direct map of the tree nodes
 	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1b', 'root-1b-child-1', 'root-1b-child-2', 'root-1b-child-2-child-1']);
 
 	// toggle child-2-child-1 collapsed should be a no-op
 	state.renderedNodes[state.renderedNodes.length-1].toggleCollapsed();
-	t.equal(nodeCalc, 				1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 4 + 0 + 5 + 0 + 4 + 0 + 0);
-	t.equal(displayNodeCount, 1 + 1 + 1 + 1 + 1 - 1 + 0 - 3 + 4 - 5 + 5 - 4 + 4 - 1 + 0);
-	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 0);
-	t.equal(renderNodeCalc, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 5 + 0 + 5 + 1 + 5 + 4 + 0);
+	t.equal(nodeCalc, 				5 + 0 + 4 + 0 + 0);
+	t.equal(stats.nodeCount, 	5 - 4 + 4 - 1 + 0);
+	t.equal(renderCalc, 			2 + 1 + 1 + 1 + 0);
+	t.equal(renderNodeCalc, 	5 + 1 + 5 + 4 + 0);
 	t.deepEqual(state.renderedNodes.length, 4);
 	t.notDeepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity)); // not a direct map of the tree nodes
 	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-1b', 'root-1b-child-1', 'root-1b-child-2', 'root-1b-child-2-child-1']);
