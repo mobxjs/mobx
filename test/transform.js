@@ -148,17 +148,17 @@ test('transform using root transformer', function(t) {
 
 // testing: https://github.com/mweststrate/mobservable/issues/67
 test('transform tree (modifying tree incrementally)', function(t) {
-  var pluckFn = TransformUtils.pluckFn;
-  var identity = TransformUtils.identity;
+	var pluckFn = TransformUtils.pluckFn;
+	var identity = TransformUtils.identity;
 	var testSet = TransformUtils.testSet();
 	var state = testSet.state;
 	var stats = testSet.stats;
-  var TreeNode = testSet.TreeNode;
-  var DisplayNode = testSet.DisplayNode;
+	var TreeNode = testSet.TreeNode;
+	var DisplayNode = testSet.DisplayNode;
 
-  var nodeCreateCount = 0;
-  var renderCount = 0;
-  var renderNodeCount = 0;
+	var nodeCreateCount = 0;
+	var renderCount = 0;
+	var renderNodeCount = 0;
 
 	var transformNode = m.createTransformer(function(node) {
 		nodeCreateCount++;
@@ -169,10 +169,10 @@ test('transform tree (modifying tree incrementally)', function(t) {
 	m.autorun(function() {
 		// KM: ideally, I would like to do an assignment here, but it creates a cycle and would need to preserve ms.asStructure:
 		//
-		// state.renderedNodes = state.root ? state.root.transform(transformNode) : [];
+		// state.renderedNodes = state.root ? state.root.map(transformNode) : [];
 		//
 
-		var renderedNodes = state.root ? state.root.transform(transformNode) : [];
+		var renderedNodes = state.root ? state.root.map(transformNode) : [];
 		state.renderedNodes.replace(renderedNodes);
 	});
 
@@ -183,7 +183,7 @@ test('transform tree (modifying tree incrementally)', function(t) {
 	});
 
 	t.equal(nodeCreateCount,	0);
-	t.equal(stats.nodeCount,	0);
+	t.equal(stats.refCount,	0);
 	t.equal(renderCount, 			1);
 	t.equal(renderNodeCount, 	0);
 	t.deepEqual(state.renderedNodes.length, 0);
@@ -196,7 +196,7 @@ test('transform tree (modifying tree incrementally)', function(t) {
 	var node = new TreeNode('root');
 	state.root = node;
 	t.equal(nodeCreateCount,	1);
-	t.equal(stats.nodeCount,	1);
+	t.equal(stats.refCount,	1);
 	t.equal(renderCount, 			2);
 	t.equal(renderNodeCount, 	1);
 	t.deepEqual(state.renderedNodes.length, 1);
@@ -206,7 +206,7 @@ test('transform tree (modifying tree incrementally)', function(t) {
 	// add first child
 	state.root.addChild(new TreeNode('root-child-1'));
 	t.equal(nodeCreateCount,	1 + 1);
-	t.equal(stats.nodeCount,	1 + 1);
+	t.equal(stats.refCount,	1 + 1);
 	t.equal(renderCount, 			2 + 1);
 	t.equal(renderNodeCount, 	1 + 2);
 	t.deepEqual(state.renderedNodes.length, 2);
@@ -216,7 +216,7 @@ test('transform tree (modifying tree incrementally)', function(t) {
 	// add second child
 	state.root.addChild(new TreeNode('root-child-2'));
 	t.equal(nodeCreateCount,	1 + 1 + 1);
-	t.equal(stats.nodeCount,	1 + 1 + 1);
+	t.equal(stats.refCount,	1 + 1 + 1);
 	t.equal(renderCount, 			2 + 1 + 1);
 	t.equal(renderNodeCount, 	1 + 2 + 3);
 	t.deepEqual(state.renderedNodes.length, 3);
@@ -227,7 +227,7 @@ test('transform tree (modifying tree incrementally)', function(t) {
 	node = state.root.find(function(node) { return node.name === 'root-child-2'; });
 	node.addChild(new TreeNode('root-child-2-child-1'));
 	t.equal(nodeCreateCount,	1 + 1 + 1 + 1);
-	t.equal(stats.nodeCount,	1 + 1 + 1 + 1);
+	t.equal(stats.refCount,	1 + 1 + 1 + 1);
 	t.equal(renderCount, 			2 + 1 + 1 + 1);
 	t.equal(renderNodeCount, 	1 + 2 + 3 + 4);
 	t.deepEqual(state.renderedNodes.length, 4);
@@ -238,7 +238,7 @@ test('transform tree (modifying tree incrementally)', function(t) {
 	node = state.root.find(function(node) { return node.name === 'root-child-1'; });
 	node.addChild(new TreeNode('root-child-1-child-1'));
 	t.equal(nodeCreateCount,	1 + 1 + 1 + 1 + 1);
-	t.equal(stats.nodeCount, 	1 + 1 + 1 + 1 + 1);
+	t.equal(stats.refCount, 	1 + 1 + 1 + 1 + 1);
 	t.equal(renderCount, 			2 + 1 + 1 + 1 + 1);
 	t.equal(renderNodeCount, 	1 + 2 + 3 + 4 + 5);
 	t.deepEqual(state.renderedNodes.length, 5);
@@ -249,7 +249,7 @@ test('transform tree (modifying tree incrementally)', function(t) {
 	node = state.root.find(function(node) { return node.name === 'root-child-1'; });
 	node.children.splice(0);
 	t.equal(nodeCreateCount,	1 + 1 + 1 + 1 + 1 + 0);
-	t.equal(stats.nodeCount, 	1 + 1 + 1 + 1 + 1 - 1);
+	t.equal(stats.refCount, 	1 + 1 + 1 + 1 + 1 - 1);
 	t.equal(renderCount, 			2 + 1 + 1 + 1 + 1 + 1);
 	t.equal(renderNodeCount, 	1 + 2 + 3 + 4 + 5 + 4);
 	t.deepEqual(state.renderedNodes.length, 4);
@@ -260,7 +260,7 @@ test('transform tree (modifying tree incrementally)', function(t) {
 	node = state.root.find(function(node) { return node.name === 'root-child-1'; });
 	node.children.splice(0);
 	t.equal(nodeCreateCount,	1 + 1 + 1 + 1 + 1 + 0 + 0);
-	t.equal(stats.nodeCount, 	1 + 1 + 1 + 1 + 1 - 1 + 0);
+	t.equal(stats.refCount, 	1 + 1 + 1 + 1 + 1 - 1 + 0);
 	t.equal(renderCount, 			2 + 1 + 1 + 1 + 1 + 1 + 0);
 	t.equal(renderNodeCount, 	1 + 2 + 3 + 4 + 5 + 4 + 0);
 	t.deepEqual(state.renderedNodes.length, 4);
@@ -270,7 +270,7 @@ test('transform tree (modifying tree incrementally)', function(t) {
 	// remove children from root
 	state.root.children.splice(0);
 	t.equal(nodeCreateCount,	1 + 1 + 1 + 1 + 1 + 0 + 0 + 0);
-	t.equal(stats.nodeCount, 	1 + 1 + 1 + 1 + 1 - 1 + 0 - 3);
+	t.equal(stats.refCount, 	1 + 1 + 1 + 1 + 1 - 1 + 0 - 3);
 	t.equal(renderCount, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1);
 	t.equal(renderNodeCount, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1);
 	t.deepEqual(state.renderedNodes.length, 1);
@@ -280,7 +280,7 @@ test('transform tree (modifying tree incrementally)', function(t) {
 	// teardown
 	state.root = null;
 	t.equal(nodeCreateCount,	1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 0);
-	t.equal(stats.nodeCount, 	0);
+	t.equal(stats.refCount, 	0);
 	t.equal(renderCount, 			2 + 1 + 1 + 1 + 1 + 1 + 0 + 1 + 1);
 	t.equal(renderNodeCount, 	1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 0);
 	t.deepEqual(state.renderedNodes.length, 0);
@@ -289,17 +289,17 @@ test('transform tree (modifying tree incrementally)', function(t) {
 });
 
 test('transform tree (modifying tree incrementally)', function(t) {
-  var pluckFn = TransformUtils.pluckFn;
-  var identity = TransformUtils.identity;
+	var pluckFn = TransformUtils.pluckFn;
+	var identity = TransformUtils.identity;
 	var testSet = TransformUtils.testSet();
 	var state = testSet.state;
 	var stats = testSet.stats;
-  var TreeNode = testSet.TreeNode;
-  var DisplayNode = testSet.DisplayNode;
+	var TreeNode = testSet.TreeNode;
+	var DisplayNode = testSet.DisplayNode;
 
-  var nodeCreateCount = 0;
-  var renderCount = 0;
-  var renderNodeCount = 0;
+	var nodeCreateCount = 0;
+	var renderCount = 0;
+	var renderNodeCount = 0;
 
 	var transformNode = m.createTransformer(function(node) {
 		nodeCreateCount++;
@@ -308,7 +308,7 @@ test('transform tree (modifying tree incrementally)', function(t) {
 
 	// transform nodes to renderedNodes
 	m.autorun(function() {
-		var renderedNodes = state.root ? state.root.transform(transformNode) : [];
+		var renderedNodes = state.root ? state.root.map(transformNode) : [];
 		state.renderedNodes.replace(renderedNodes);
 	});
 
@@ -322,7 +322,7 @@ test('transform tree (modifying tree incrementally)', function(t) {
 	var node = new TreeNode('root-1');
 	state.root = node;
 	t.equal(nodeCreateCount,	1);
-	t.equal(stats.nodeCount, 	1);
+	t.equal(stats.refCount, 	1);
 	t.equal(renderCount, 			2);
 	t.equal(renderNodeCount, 	1);
 	t.deepEqual(state.renderedNodes.length, 1);
@@ -341,7 +341,7 @@ test('transform tree (modifying tree incrementally)', function(t) {
 	children[1].addChild(new TreeNode('root-1-child-2b-child-1'))
 	state.root.addChildren(children);
 	t.equal(nodeCreateCount,	1 + 4);
-	t.equal(stats.nodeCount, 	1 + 4);
+	t.equal(stats.refCount, 	1 + 4);
 	t.equal(renderCount, 			2 + 1);
 	t.equal(renderNodeCount, 	1 + 5);
 	t.deepEqual(state.renderedNodes.length, 5);
@@ -351,7 +351,7 @@ test('transform tree (modifying tree incrementally)', function(t) {
 	// remove root-1
 	state.root = null;
 	t.equal(nodeCreateCount,	1 + 4 + 0);
-	t.equal(stats.nodeCount, 	1 + 4 - 5);
+	t.equal(stats.refCount, 	1 + 4 - 5);
 	t.equal(renderCount, 			2 + 1 + 1);
 	t.equal(renderNodeCount, 	1 + 5 + 0);
 	t.deepEqual(state.renderedNodes.length, 0);
@@ -368,7 +368,7 @@ test('transform tree (modifying tree incrementally)', function(t) {
 	node.children[1].addChild(new TreeNode('root-2-child-2-child-1'))
 	state.root = node;
 	t.equal(nodeCreateCount,	1 + 4 + 0 + 5);
-	t.equal(stats.nodeCount, 	1 + 4 - 5 + 5);
+	t.equal(stats.refCount, 	1 + 4 - 5 + 5);
 	t.equal(renderCount, 			2 + 1 + 1 + 1);
 	t.equal(renderNodeCount, 	1 + 5 + 0 + 5);
 	t.deepEqual(state.renderedNodes.length, 5);
@@ -378,7 +378,7 @@ test('transform tree (modifying tree incrementally)', function(t) {
 	// teardown
 	state.root = null;
 	t.equal(nodeCreateCount,	1 + 4 + 0 + 5 + 0);
-	t.equal(stats.nodeCount, 	0);
+	t.equal(stats.refCount, 	0);
 	t.equal(renderCount, 			2 + 1 + 1 + 1 + 1);
 	t.equal(renderNodeCount, 	1 + 5 + 0 + 5 + 0);
 	t.deepEqual(state.renderedNodes.length, 0);
@@ -387,17 +387,17 @@ test('transform tree (modifying tree incrementally)', function(t) {
 });
 
 test('transform tree (modifying expanded)', function(t) {
-  var pluckFn = TransformUtils.pluckFn;
-  var identity = TransformUtils.identity;
+	var pluckFn = TransformUtils.pluckFn;
+	var identity = TransformUtils.identity;
 	var testSet = TransformUtils.testSet();
 	var state = testSet.state;
 	var stats = testSet.stats;
-  var TreeNode = testSet.TreeNode;
-  var DisplayNode = testSet.DisplayNode;
+	var TreeNode = testSet.TreeNode;
+	var DisplayNode = testSet.DisplayNode;
 
-  var nodeCreateCount = 0;
-  var renderCount = 0;
-  var renderNodeCount = 0;
+	var nodeCreateCount = 0;
+	var renderCount = 0;
+	var renderNodeCount = 0;
 
 	var transformNode = m.createTransformer(function(node) {
 		nodeCreateCount++;
@@ -416,6 +416,16 @@ test('transform tree (modifying expanded)', function(t) {
 		renderNodeCount += state.renderedNodes.length;
 	});
 
+	// patch for collapsed
+	TreeNode.prototype.transform = function(iter, memo) {
+		if (this.parent && state.collapsed.has(this.parent.path())) return memo || []; // not visible
+
+		memo = memo || [];
+		memo.push(iter(this));
+		this.children.forEach(function(child) { child.transform(iter, memo); });
+		return memo;
+	}
+
 	// setup
 	var node = new TreeNode('root')
 	node.addChild(new TreeNode('root-child-1'));
@@ -424,7 +434,7 @@ test('transform tree (modifying expanded)', function(t) {
 	node.children[1].addChild(new TreeNode('root-child-2-child-1'))
 	state.root = node;
 	t.equal(nodeCreateCount,	5);
-	t.equal(stats.nodeCount, 	5);
+	t.equal(stats.refCount, 	5);
 	t.equal(renderCount, 			2);
 	t.equal(renderNodeCount, 	5);
 	t.deepEqual(state.renderedNodes.length, 5);
@@ -438,7 +448,7 @@ test('transform tree (modifying expanded)', function(t) {
 	// toggle root to collapsed
 	state.renderedNodes[0].toggleCollapsed();
 	t.equal(nodeCreateCount,	5 + 0);
-	t.equal(stats.nodeCount, 	5 - 4);
+	t.equal(stats.refCount, 	5 - 4);
 	t.equal(renderCount, 			2 + 1);
 	t.equal(renderNodeCount, 	5 + 1);
 	t.deepEqual(state.renderedNodes.length, 1);
@@ -448,7 +458,7 @@ test('transform tree (modifying expanded)', function(t) {
 	// toggle root to expanded
 	state.renderedNodes[0].toggleCollapsed();
 	t.equal(nodeCreateCount,	5 + 0 + 4);
-	t.equal(stats.nodeCount, 	5 - 4 + 4);
+	t.equal(stats.refCount, 	5 - 4 + 4);
 	t.equal(renderCount, 			2 + 1 + 1);
 	t.equal(renderNodeCount, 	5 + 1 + 5);
 	t.deepEqual(state.renderedNodes.length, 5);
@@ -458,7 +468,7 @@ test('transform tree (modifying expanded)', function(t) {
 	// toggle child-1 collapsed
 	state.renderedNodes[1].toggleCollapsed();
 	t.equal(nodeCreateCount,	5 + 0 + 4 + 0);
-	t.equal(stats.nodeCount, 	5 - 4 + 4 - 1);
+	t.equal(stats.refCount, 	5 - 4 + 4 - 1);
 	t.equal(renderCount, 			2 + 1 + 1 + 1);
 	t.equal(renderNodeCount, 	5 + 1 + 5 + 4);
 	t.deepEqual(state.renderedNodes.length, 4);
@@ -468,7 +478,7 @@ test('transform tree (modifying expanded)', function(t) {
 	// toggle child-2-child-1 collapsed should be a no-op
 	state.renderedNodes[state.renderedNodes.length-1].toggleCollapsed();
 	t.equal(nodeCreateCount,	5 + 0 + 4 + 0 + 0);
-	t.equal(stats.nodeCount, 	5 - 4 + 4 - 1 + 0);
+	t.equal(stats.refCount, 	5 - 4 + 4 - 1 + 0);
 	t.equal(renderCount, 			2 + 1 + 1 + 1 + 0);
 	t.equal(renderNodeCount, 	5 + 1 + 5 + 4 + 0);
 	t.deepEqual(state.renderedNodes.length, 4);
@@ -478,7 +488,7 @@ test('transform tree (modifying expanded)', function(t) {
 	// teardown
 	state.root = null;
 	t.equal(nodeCreateCount,	5 + 0 + 4 + 0 + 0 + 0);
-	t.equal(stats.nodeCount, 	0);
+	t.equal(stats.refCount, 	0);
 	t.equal(renderCount, 			2 + 1 + 1 + 1 + 0 + 1);
 	t.equal(renderNodeCount, 	5 + 1 + 5 + 4 + 0 + 0);
 	t.deepEqual(state.renderedNodes.length, 0);
@@ -487,22 +497,21 @@ test('transform tree (modifying expanded)', function(t) {
 });
 
 test('transform tree (modifying render observable)', function(t) {
-  var pluckFn = TransformUtils.pluckFn;
-  var identity = TransformUtils.identity;
+	var pluckFn = TransformUtils.pluckFn;
+	var identity = TransformUtils.identity;
 	var testSet = TransformUtils.testSet();
 	var state = testSet.state;
 	var stats = testSet.stats;
-  var TreeNode = testSet.TreeNode;
-  var DisplayNode = testSet.DisplayNode;
+	var TreeNode = testSet.TreeNode;
+	var DisplayNode = testSet.DisplayNode;
 
-  var nodeCreateCount = 0;
-  var renderCount = 0;
-  var renderNodeCount = 0;
-  var renderIconCalc = 0;
+	var nodeCreateCount = 0;
+	var renderCount = 0;
+	var renderNodeCount = 0;
+	var renderIconCalc = 0;
 
 	var transformNode = m.createTransformer(function(node) {
 		nodeCreateCount++;
-		node.icon();  // icon dependency
 		return new DisplayNode(node);
 	}, function cleanup(node, displayNode) { displayNode.destroy(); });
 
@@ -518,6 +527,16 @@ test('transform tree (modifying render observable)', function(t) {
 		renderNodeCount += state.renderedNodes.length;
 	});
 
+	// custom transform
+	TreeNode.prototype.transform = function(iter, memo) {
+		node.icon();  // icon dependency
+
+		memo = memo || [];
+		memo.push(iter(this));
+		this.children.forEach(function(child) { child.transform(iter, memo); });
+		return memo;
+	}
+
 	// setup
 	var node = new TreeNode('root')
 	node.addChild(new TreeNode('root-child-1'));
@@ -526,7 +545,7 @@ test('transform tree (modifying render observable)', function(t) {
 	node.children[1].addChild(new TreeNode('root-child-2-child-1'))
 	state.root = node;
 	t.equal(nodeCreateCount,	5);
-	t.equal(stats.nodeCount, 	5);
+	t.equal(stats.refCount, 	5);
 	t.equal(renderCount, 			2);
 	t.equal(renderNodeCount, 	5);
 	t.deepEqual(state.renderedNodes.length, 5);
@@ -539,8 +558,8 @@ test('transform tree (modifying render observable)', function(t) {
 
 	// update root icon
 	state.root.icon('file');
-	t.equal(nodeCreateCount,	5 + 1);
-	t.equal(stats.nodeCount, 	5 + 0); // KM: bug, the replaced node is not destroyed
+	t.equal(nodeCreateCount,	5 + 0);
+	t.equal(stats.refCount, 	5 + 0);
 	t.equal(renderCount, 			2 + 1);
 	t.equal(renderNodeCount, 	5 + 5);
 	t.deepEqual(state.renderedNodes.length, 5);
@@ -549,8 +568,8 @@ test('transform tree (modifying render observable)', function(t) {
 
 	// teardown
 	state.root = null;
-	t.equal(nodeCreateCount,	5 + 1 + 0);
-	t.equal(stats.nodeCount, 	0); // KM: bug, the replaced node is not destroyed
+	t.equal(nodeCreateCount,	5 + 0 + 0);
+	t.equal(stats.refCount, 	0);
 	t.equal(renderCount, 			2 + 1 + 1);
 	t.equal(renderNodeCount, 	5 + 5 + 0);
 	t.deepEqual(state.renderedNodes.length, 0);
@@ -559,18 +578,18 @@ test('transform tree (modifying render observable)', function(t) {
 });
 
 test('transform tree (modifying render-only observable)', function(t) {
-  var pluckFn = TransformUtils.pluckFn;
-  var identity = TransformUtils.identity;
+	var pluckFn = TransformUtils.pluckFn;
+	var identity = TransformUtils.identity;
 	var testSet = TransformUtils.testSet();
 	var state = testSet.state;
 	var stats = testSet.stats;
-  var TreeNode = testSet.TreeNode;
-  var DisplayNode = testSet.DisplayNode;
+	var TreeNode = testSet.TreeNode;
+	var DisplayNode = testSet.DisplayNode;
 
-  var nodeCreateCount = 0;
-  var renderCount = 0;
-  var renderNodeCount = 0;
-  var renderIconCalc = 0;
+	var nodeCreateCount = 0;
+	var renderCount = 0;
+	var renderNodeCount = 0;
+	var renderIconCalc = 0;
 
 	var transformNode = m.createTransformer(function(node) {
 		nodeCreateCount++;
@@ -579,7 +598,7 @@ test('transform tree (modifying render-only observable)', function(t) {
 
 	// transform nodes to renderedNodes
 	m.autorun(function() {
-		var renderedNodes = state.root ? state.root.transform(transformNode) : [];
+		var renderedNodes = state.root ? state.root.map(transformNode) : [];
 		state.renderedNodes.replace(renderedNodes);
 	});
 
@@ -604,7 +623,7 @@ test('transform tree (modifying render-only observable)', function(t) {
 	node.children[1].addChild(new TreeNode('root-child-2-child-1'))
 	state.root = node;
 	t.equal(nodeCreateCount,	5);
-	t.equal(stats.nodeCount, 	5);
+	t.equal(stats.refCount, 	5);
 	t.equal(renderCount, 			2);
 	t.equal(renderNodeCount, 	5);
 	t.equal(renderIconCalc, 	5);
@@ -619,7 +638,7 @@ test('transform tree (modifying render-only observable)', function(t) {
 	// update root icon
 	state.root.icon('file');
 	t.equal(nodeCreateCount,	5 + 0);
-	t.equal(stats.nodeCount, 	5 + 0);
+	t.equal(stats.refCount, 	5 + 0);
 	t.equal(renderCount, 			2 + 0);
 	t.equal(renderNodeCount, 	5 + 0);
 	t.equal(renderIconCalc, 	5 + 1);
@@ -630,10 +649,229 @@ test('transform tree (modifying render-only observable)', function(t) {
 	// teardown
 	state.root = null;
 	t.equal(nodeCreateCount,	5 + 0 + 0);
-	t.equal(stats.nodeCount, 	0);
+	t.equal(stats.refCount, 	0);
 	t.equal(renderCount, 			2 + 0 + 1);
 	t.equal(renderNodeCount, 	5 + 0 + 0);
 	t.equal(renderIconCalc, 	5 + 1 + 0);
+	t.deepEqual(state.renderedNodes.length, 0);
+
+	t.end();
+});
+
+test('transform tree (static tags / global filter only)', function(t) {
+	var intersection = TransformUtils.intersection;
+	var pluckFn = TransformUtils.pluckFn;
+	var identity = TransformUtils.identity;
+	var testSet = TransformUtils.testSet();
+	var state = testSet.state;
+	var stats = testSet.stats;
+	var TreeNode = testSet.TreeNode;
+	var DisplayNode = testSet.DisplayNode;
+
+	var nodeCreateCount = 0;
+	var renderCount = 0;
+	var renderNodeCount = 0;
+
+	var transformNode = m.createTransformer(function(node) {
+		nodeCreateCount++;
+		return new DisplayNode(node);
+	}, function cleanup(node, displayNode) { displayNode.destroy(); });
+
+	// transform nodes to renderedNodes
+	m.autorun(function() {
+		var renderedNodes = state.root ? state.root.transform(transformNode) : [];
+		state.renderedNodes.replace(renderedNodes);
+	});
+
+	// render
+	m.autorun(function() {
+		renderCount++;
+		renderNodeCount += state.renderedNodes.length;
+	});
+
+	// no tags
+	state.tags = m.observable(m.asStructure([]));
+
+	// custom transform
+	TreeNode.prototype.transform = function(iter, memo) {
+		memo = memo || [];
+		if (!state.tags.length || intersection(state.tags, this.tags).length) memo.push(iter(this));
+		this.children.forEach(function(child) { child.transform(iter, memo); });
+		return memo;
+	}
+
+	// setup
+	var node = new TreeNode('root', {tags: [1]});
+	node.addChild(new TreeNode('root-child-1', {tags: [2]}));
+	node.children[0].addChild(new TreeNode('root-child-1-child-1', {tags: [3]}));
+	node.addChild(new TreeNode('root-child-2', {tags: [2]}));
+	node.children[1].addChild(new TreeNode('root-child-2-child-1', {tags: [3]}));
+	state.root = node;
+	t.equal(nodeCreateCount,	5);
+	t.equal(stats.refCount, 	5);
+	t.equal(renderCount, 			2);
+	t.equal(renderNodeCount, 	5);
+	t.deepEqual(state.renderedNodes.length, 5);
+	t.deepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
+	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root', 'root-child-1', 'root-child-1-child-1', 'root-child-2', 'root-child-2-child-1']);
+
+	////////////////////////////////////
+	// Tags
+	////////////////////////////////////
+
+	// add search tag
+	state.tags.push(2);
+	t.equal(nodeCreateCount,	5 + 0);
+	t.equal(stats.refCount, 	5 - 3);
+	t.equal(renderCount, 			2 + 1);
+	t.equal(renderNodeCount, 	5 + 2);
+	t.deepEqual(state.renderedNodes.length, 2);
+	t.notDeepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
+	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-child-1', 'root-child-2']);
+
+	// add search tag
+	state.tags.push(3);
+	t.equal(nodeCreateCount,	5 + 0 + 2);
+	t.equal(stats.refCount, 	5 - 3 + 2);
+	t.equal(renderCount, 			2 + 1 + 1);
+	t.equal(renderNodeCount, 	5 + 2 + 4);
+	t.deepEqual(state.renderedNodes.length, 4);
+	t.notDeepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
+	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-child-1', 'root-child-1-child-1', 'root-child-2', 'root-child-2-child-1']);
+
+	// add search tag
+	state.tags.push(1);
+	t.equal(nodeCreateCount,	5 + 0 + 2 + 1);
+	t.equal(stats.refCount, 	5 - 3 + 2 + 1);
+	t.equal(renderCount, 			2 + 1 + 1 + 1);
+	t.equal(renderNodeCount, 	5 + 2 + 4 + 5);
+	t.deepEqual(state.renderedNodes.length, 5);
+	t.deepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
+	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root', 'root-child-1', 'root-child-1-child-1', 'root-child-2', 'root-child-2-child-1']);
+
+	// remove search tags
+	state.tags.splice(0, 2);
+	t.equal(nodeCreateCount,	5 + 0 + 2 + 1 + 0);
+	t.equal(stats.refCount, 	5 - 3 + 2 + 1 - 4);
+	t.equal(renderCount, 			2 + 1 + 1 + 1 + 1);
+	t.equal(renderNodeCount, 	5 + 2 + 4 + 5 + 1);
+	t.deepEqual(state.renderedNodes.length, 1);
+	t.notDeepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
+	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root']);
+
+	// teardown
+	state.root = null;
+	t.equal(nodeCreateCount,	5 + 0 + 2 + 1 + 0 + 0);
+	t.equal(stats.refCount, 	0);
+	t.equal(renderCount, 			2 + 1 + 1 + 1 + 1 + 1);
+	t.equal(renderNodeCount, 	5 + 2 + 4 + 5 + 1 + 0);
+	t.deepEqual(state.renderedNodes.length, 0);
+
+	t.end();
+});
+
+test('transform tree (dynamic tags - peek / rebuild)', function(t) {
+	var intersection = TransformUtils.intersection;
+	var pluckFn = TransformUtils.pluckFn;
+	var identity = TransformUtils.identity;
+	var testSet = TransformUtils.testSet();
+	var state = testSet.state;
+	var stats = testSet.stats;
+	var TreeNode = testSet.TreeNode;
+	var DisplayNode = testSet.DisplayNode;
+
+	var nodeCreateCount = 0;
+	var renderCount = 0;
+	var renderNodeCount = 0;
+
+	var transformNode = m.createTransformer(function(node) {
+		nodeCreateCount++;
+		return new DisplayNode(node);
+	}, function cleanup(node, displayNode) { displayNode.destroy(); });
+
+	// transform nodes to renderedNodes
+	m.autorun(function() {
+		var renderedNodes = state.root ? state.root.transform(transformNode) : [];
+		state.renderedNodes.replace(renderedNodes);
+	});
+
+	// render
+	m.autorun(function() {
+		renderCount++;
+		renderNodeCount += state.renderedNodes.length;
+	});
+
+	// no tags
+	state.tags = m.observable(m.asStructure([]));
+
+	// custom transform
+	TreeNode.prototype.transform = function(iter, memo) {
+		memo = memo || [];
+		if (!state.tags.length || intersection(state.tags, this.tags).length) memo.push(iter(this));
+		this.children.forEach(function(child) { child.transform(iter, memo); });
+		return memo;
+	}
+
+	// setup
+	var node = new TreeNode('root', {tags: m.observable(m.asStructure([1]))});
+	node.addChild(new TreeNode('root-child-1', {tags: m.observable(m.asStructure([2]))}));
+	node.children[0].addChild(new TreeNode('root-child-1-child-1', {tags: m.observable(m.asStructure([3]))}));
+	node.addChild(new TreeNode('root-child-2', {tags: m.observable(m.asStructure([2]))}));
+	node.children[1].addChild(new TreeNode('root-child-2-child-1', {tags: m.observable(m.asStructure([3]))}));
+	state.root = node;
+	t.equal(nodeCreateCount,	5);
+	t.equal(stats.refCount, 	5);
+	t.equal(renderCount, 			2);
+	t.equal(renderNodeCount, 	5);
+	t.deepEqual(state.renderedNodes.length, 5);
+	t.deepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
+	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root', 'root-child-1', 'root-child-1-child-1', 'root-child-2', 'root-child-2-child-1']);
+
+	////////////////////////////////////
+	// Tags
+	////////////////////////////////////
+
+	// add search tag
+	state.tags.push(2);
+	t.equal(nodeCreateCount,	5 + 0);
+	t.equal(stats.refCount, 	5 - 3);
+	t.equal(renderCount, 			2 + 1);
+	t.equal(renderNodeCount, 	5 + 2);
+	t.deepEqual(state.renderedNodes.length, 2);
+	t.notDeepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
+	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root-child-1', 'root-child-2']);
+
+	// modify search tag
+	state.root.tags.push(2);
+	t.equal(nodeCreateCount,	5 + 0 + 1);
+	t.equal(stats.refCount, 	5 - 3 + 1);
+	t.equal(renderCount, 			2 + 1 + 1);
+	t.equal(renderNodeCount, 	5 + 2 + 3);
+	t.deepEqual(state.renderedNodes.length, 3);
+	t.notDeepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
+	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root', 'root-child-1', 'root-child-2']);
+
+	// perform multiple search tag operations
+	m.transaction(function() {
+		state.root.tags.shift(); // no-op
+		state.root.find(function(node) { return node.name === 'root-child-1'; }).tags.splice(0);
+		state.root.find(function(node) { return node.name === 'root-child-1-child-1'; }).tags.push(2);
+		state.root.find(function(node) { return node.name === 'root-child-2-child-1'; }).tags.push(2);
+	});
+	t.equal(nodeCreateCount,	5 + 0 + 1 + 2);
+	t.equal(stats.refCount, 	5 - 3 + 1 + 1);
+	t.equal(renderCount, 			2 + 1 + 1 + 1);
+	t.equal(renderNodeCount, 	5 + 2 + 3 + 4);
+	t.deepEqual(state.renderedNodes.length, 4);
+	t.notDeepEqual(state.renderedNodes.map(pluckFn('node')), state.root.map(identity));
+	t.deepEqual(state.renderedNodes.map(pluckFn('node.name')), ['root', 'root-child-1-child-1', 'root-child-2', 'root-child-2-child-1']);
+
+	// teardown
+	state.root = null;
+	t.equal(nodeCreateCount,	5 + 0 + 1 + 2 + 0);
+	t.equal(stats.refCount, 	0);
+	t.equal(renderCount, 			2 + 1 + 1 + 1 + 1);
+	t.equal(renderNodeCount, 	5 + 2 + 3 + 4 + 0);
 	t.deepEqual(state.renderedNodes.length, 0);
 
 	t.end();

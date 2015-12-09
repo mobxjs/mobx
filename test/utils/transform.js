@@ -1,5 +1,8 @@
 var m = require('../../');
 
+// TODO: should this development depdendency be removed? (it's for tag tests)
+module.exports.intersection = require('lodash.intersection');
+
 module.exports.pluckFn = function(key) {
   return function(obj) {
     var keys = key.split('.'), value = obj;
@@ -19,15 +22,18 @@ module.exports.testSet = function() {
   });
 
   var stats = testSet.stats = {
-    nodeCount: 0
+    refCount: 0
   }
 
-  var TreeNode = testSet.TreeNode = function(name) {
-    this.children = m.observable(m.asStructure([])); // tree
+  var TreeNode = testSet.TreeNode = function(name, extensions) {
+    this.children = m.observable(m.asStructure([]));
     this.icon = m.observable('folder');
 
     this.parent = null; // not observed
     this.name = name; // not observed
+
+    // optional extensions
+    if (extensions) { for (var key in extensions) { this[key] = extensions[key]; } }
   }
   TreeNode.prototype.addChild = function(node) { node.parent = this; this.children.push(node); }
   TreeNode.prototype.addChildren = function(nodes) {
@@ -63,21 +69,11 @@ module.exports.testSet = function() {
     return null;
   }
 
-  // transform insted of map to control tree traversal early outs
-  TreeNode.prototype.transform = function(iter, memo) {
-    if (this.parent && state.collapsed.has(this.parent.path())) return memo || []; // not visible
-
-    memo = memo || [];
-    memo.push(iter(this));
-    this.children.forEach(function(child) { child.transform(iter, memo); });
-    return memo;
-  }
-
   var DisplayNode = testSet.DisplayNode = function(node) {
-    stats.nodeCount++;
+    stats.refCount++;
     this.node = node;
   }
-  DisplayNode.prototype.destroy = function() { stats.nodeCount--; }
+  DisplayNode.prototype.destroy = function() { stats.refCount--; }
 
   DisplayNode.prototype.toggleCollapsed = function() {
     var path = this.node.path();
