@@ -51,19 +51,19 @@ module.exports.testSet = function() {
     return parts.join('/');
   }
 
-  TreeNode.prototype.map = function(iter, memo) {
-    memo = memo || [];
-    memo.push(iter(this));
-    this.children.forEach(function(child) { child.map(iter, memo); });
-    return memo;
+  TreeNode.prototype.map = function(iteratee, results) {
+    results = results || [];
+    results.push(iteratee(this));
+    this.children.forEach(function(child) { child.map(iteratee, results); });
+    return results;
   }
 
-  TreeNode.prototype.find = function(iter) {
-    if (iter(this)) return this;
+  TreeNode.prototype.find = function(predicate) {
+    if (predicate(this)) return this;
 
     var result;
     for (var i = 0, l = this.children.length; i < l; i++) {
-      result = this.children[i].find(iter);
+      result = this.children[i].find(predicate);
       if (result) return result;
     }
     return null;

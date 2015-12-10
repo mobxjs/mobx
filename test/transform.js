@@ -417,13 +417,13 @@ test('transform tree (modifying expanded)', function(t) {
 	});
 
 	// patch for collapsed
-	TreeNode.prototype.transform = function(iter, memo) {
-		if (this.parent && state.collapsed.has(this.parent.path())) return memo || []; // not visible
+	TreeNode.prototype.transform = function(iteratee, results) {
+		if (this.parent && state.collapsed.has(this.parent.path())) return results || []; // not visible
 
-		memo = memo || [];
-		memo.push(iter(this));
-		this.children.forEach(function(child) { child.transform(iter, memo); });
-		return memo;
+		results = results || [];
+		results.push(iteratee(this));
+		this.children.forEach(function(child) { child.transform(iteratee, results); });
+		return results;
 	}
 
 	// setup
@@ -528,13 +528,13 @@ test('transform tree (modifying render observable)', function(t) {
 	});
 
 	// custom transform
-	TreeNode.prototype.transform = function(iter, memo) {
+	TreeNode.prototype.transform = function(iteratee, results) {
 		node.icon();  // icon dependency
 
-		memo = memo || [];
-		memo.push(iter(this));
-		this.children.forEach(function(child) { child.transform(iter, memo); });
-		return memo;
+		results = results || [];
+		results.push(iteratee(this));
+		this.children.forEach(function(child) { child.transform(iteratee, results); });
+		return results;
 	}
 
 	// setup
@@ -693,11 +693,11 @@ test('transform tree (static tags / global filter only)', function(t) {
 	state.tags = m.observable(m.asStructure([]));
 
 	// custom transform
-	TreeNode.prototype.transform = function(iter, memo) {
-		memo = memo || [];
-		if (!state.tags.length || intersection(state.tags, this.tags).length) memo.push(iter(this));
-		this.children.forEach(function(child) { child.transform(iter, memo); });
-		return memo;
+	TreeNode.prototype.transform = function(iteratee, results) {
+		results = results || [];
+		if (!state.tags.length || intersection(state.tags, this.tags).length) results.push(iteratee(this));
+		this.children.forEach(function(child) { child.transform(iteratee, results); });
+		return results;
 	}
 
 	// setup
@@ -805,11 +805,11 @@ test('transform tree (dynamic tags - peek / rebuild)', function(t) {
 	state.tags = m.observable(m.asStructure([]));
 
 	// custom transform
-	TreeNode.prototype.transform = function(iter, memo) {
-		memo = memo || [];
-		if (!state.tags.length || intersection(state.tags, this.tags).length) memo.push(iter(this));
-		this.children.forEach(function(child) { child.transform(iter, memo); });
-		return memo;
+	TreeNode.prototype.transform = function(iteratee, results) {
+		results = results || [];
+		if (!state.tags.length || intersection(state.tags, this.tags).length) results.push(iteratee(this));
+		this.children.forEach(function(child) { child.transform(iteratee, results); });
+		return results;
 	}
 
 	// setup
