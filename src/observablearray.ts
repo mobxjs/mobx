@@ -46,17 +46,17 @@ export class ObservableArrayAdministration<T> extends DataNode {
     // adds / removes the necessary numeric properties to this object
     updateLength(oldLength:number, delta:number) {
         if (delta < 0) {
-            checkIfStateIsBeingModifiedDuringView(this.context); 
-            for(var i = oldLength + delta; i < oldLength; i++)
-                delete this.array[i]; // bit faster but mem inefficient: 
+            //checkIfStateIsBeingModifiedDuringView(this.context); 
+            //for(var i = oldLength + delta; i < oldLength; i++)
+            //    delete this.array[i]; // bit faster but mem inefficient: 
                 //Object.defineProperty(this, <string><any> i, notEnumerableProp);
         } else if (delta > 0) {
-            checkIfStateIsBeingModifiedDuringView(this.context); 
+            //checkIfStateIsBeingModifiedDuringView(this.context); 
             if (oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
                 reserveArrayBuffer(oldLength + delta);
             // funny enough, this is faster than slicing ENUMERABLE_PROPS into defineProperties, and faster as a temporarily map
-            for (var i = oldLength, end = oldLength + delta; i < end; i++)
-                Object.defineProperty(this.array, <string><any> i, ENUMERABLE_PROPS[i])
+            //for (var i = oldLength, end = oldLength + delta; i < end; i++)
+            //    Object.defineProperty(this.array, <string><any> i, ENUMERABLE_PROPS[i])
         }
     }
 

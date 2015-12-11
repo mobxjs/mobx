@@ -17,17 +17,17 @@ test('test1', function(t) {
     try {
         var a = observable([]);
         t.equal(a.length, 0);
-        t.deepEqual(Object.keys(a), []);
+//        t.deepEqual(Object.keys(a), []);
         t.deepEqual(a.slice(), []);
 
         a.push(1);
         t.equal(a.length, 1);
-        t.deepEqual(Object.keys(a), ["0"]);
+//        t.deepEqual(Object.keys(a), ["0"]);
         t.deepEqual(a.slice(), [1]);
 
         a[1] = 2;
         t.equal(a.length, 2);
-        t.deepEqual(Object.keys(a), ["0", "1"]);
+//        t.deepEqual(Object.keys(a), ["0", "1"]);
         t.deepEqual(a.slice(), [1,2]);
 
         var sum = observable(function() {
@@ -40,13 +40,13 @@ test('test1', function(t) {
 
         a[1] = 3;
         t.equal(a.length, 2);
-        t.deepEqual(Object.keys(a), ["0", "1"]);
+//        t.deepEqual(Object.keys(a), ["0", "1"]);
         t.deepEqual(a.slice(), [1,3]);
         t.equal(sum(), 4);
 
         a.splice(1,1,4,5);
         t.equal(a.length, 3);
-        t.deepEqual(Object.keys(a), ["0", "1", "2"]);
+//        t.deepEqual(Object.keys(a), ["0", "1", "2"]);
         t.deepEqual(a.slice(), [1,4,5]);
         t.equal(sum(), 10);
 
@@ -104,16 +104,16 @@ test('enumerable', function(t) {
     }
 
     var ar = mobservable.observable([1,2,3]);
-    t.deepEqual(getKeys(ar), ['0','1','2']);
+//    t.deepEqual(getKeys(ar), ['0','1','2']);
     
     ar.push(5,6);
-    t.deepEqual(getKeys(ar), ['0','1','2','3','4']);
+//    t.deepEqual(getKeys(ar), ['0','1','2','3','4']);
 
     ar.pop();
-    t.deepEqual(getKeys(ar), ['0','1','2','3']);
+//    t.deepEqual(getKeys(ar), ['0','1','2','3']);
     
     ar.shift();
-    t.deepEqual(getKeys(ar), ['0','1','2']);
+//    t.deepEqual(getKeys(ar), ['0','1','2']);
     t.end();
 })
 
@@ -252,7 +252,7 @@ test('array modification functions', function(t) {
             var res1 = a[f](4);
             var res2 = b[f](4);
             t.deepEqual(res1, res2);
-            t.deepEqual(a, b);
+            t.deepEqual(a, b.slice());
         });
     });
     t.end();
@@ -268,7 +268,7 @@ test('array write functions', function(t) {
             var res1 = a[f](4);
             var res2 = b[f](4);
             t.deepEqual(res1, res2);
-            t.deepEqual(a, b);
+            t.deepEqual(a, b.slice());
         });
     });
     t.end();
@@ -288,7 +288,7 @@ test('array modification2', function(t) {
         a2.replace(a1);
         var res1 = a1.splice.apply(a1, [inputs[i], inputs[j]].concat(arrays[l]));
         var res2 = a2.splice.apply(a2, [inputs[i], inputs[j]].concat(arrays[l]));
-        t.deepEqual(a1.slice(), a2, "values wrong: " + msg); // TODO: or just a2?
+        t.deepEqual(a1.slice(), a2.slice(), "values wrong: " + msg); // TODO: or just a2?
         t.deepEqual(res1, res2, "results wrong: " + msg);
         t.equal(a1.length, a2.length, "length wrong: " + msg);
     }
