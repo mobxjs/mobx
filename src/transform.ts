@@ -40,8 +40,8 @@ export function createTransformer<A, B>(transformer: (object: A) => B, onCleanup
 let transformId = 0;
 
 function getId(object) {
-//	if (!isObservable(object))
-//		throw new Error("[mobservable] transform expected some observable object, got: " + object);
+	if (object === null  || typeof object !== "object")
+		throw new Error("[mobservable] transform expected some kind of object, got: " + object);
 	var tid = object.$transformId;
 	if (tid === undefined)
 		return object.$transformId = ++transformId;
