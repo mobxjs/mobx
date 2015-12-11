@@ -16,8 +16,8 @@ export class StubArray {
 StubArray.prototype = [];
 
 export class ObservableArrayAdministration<T> extends DataNode {
-    values: T[] = [];
-    changeEvent: SimpleEventEmitter = new SimpleEventEmitter();
+    values: T[];
+    changeEvent: SimpleEventEmitter;
 
     constructor(private array: ObservableArray<T>, public mode:ValueMode, context: IContextInfoStruct) {
         super(context ? context : { name: undefined, object: undefined });
@@ -44,7 +44,7 @@ export class ObservableArrayAdministration<T> extends DataNode {
     
     
     // adds / removes the necessary numeric properties to this object
-    private updateLength(oldLength:number, delta:number) {
+    updateLength(oldLength:number, delta:number) {
         if (delta < 0) {
             checkIfStateIsBeingModifiedDuringView(this.context); 
             for(var i = oldLength + delta; i < oldLength; i++)
@@ -94,16 +94,17 @@ export class ObservableArrayAdministration<T> extends DataNode {
 
     makeReactiveArrayItem(value) {
         assertUnwrapped(value, "Array values cannot have modifiers");
-        return makeChildObservable(value, this.mode, {
+        return makeChildObservable(value, this.mode, null /* TODO: enable again: {
             object: this.context.object,
             name: this.context.name + "[x]"
-        });
+        }*/);
     }
 
     private notifyChildUpdate(index:number, oldValue:T) {
         this.notifyChanged();
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-        this.changeEvent.emit(<IArrayChange<T>>{ object: <IObservableArray<T>><any> this.array, type: 'update', index: index, oldValue: oldValue});
+        if (this.changeEvent)
+            this.changeEvent.emit(<IArrayChange<T>>{ object: <IObservableArray<T>><any> this.array, type: 'update', index: index, oldValue: oldValue});
     }
 
     private notifySplice(index:number, deleted:T[], added:T[]) {
@@ -111,7 +112,8 @@ export class ObservableArrayAdministration<T> extends DataNode {
             return;
         this.notifyChanged();
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-        this.changeEvent.emit(<IArraySplice<T>>{ object: <IObservableArray<T>><any> this.array, type: 'splice', index: index, addedCount: added.length, removed: deleted});
+        if (this.changeEvent)
+            this.changeEvent.emit(<IArraySplice<T>>{ object: <IObservableArray<T>><any> this.array, type: 'splice', index: index, addedCount: added.length, removed: deleted});
     }
 
     private notifyChanged() {
@@ -130,17 +132,23 @@ export class ObservableArray<T> extends StubArray {
 
     constructor(initialValues:T[], mode:ValueMode, context: IContextInfoStruct) {
         super();
+        let adm = new ObservableArrayAdministration(this, mode, context);
         Object.defineProperty(this, "$mobservable", {
             enumerable: false,
             configurable: false,
-            value : new ObservableArrayAdministration(this, mode, context)
+            value : adm
         });
 
-        if (initialValues && initialValues.length)
-            this.replace(initialValues);
+        if (initialValues && initialValues.length) {
+            adm.updateLength(0, initialValues.length);
+            adm.values = initialValues.map(v => adm.makeReactiveArrayItem(v));
+        } else
+            adm.values = [];
     }
 
     observe(listener:(changeData:IArrayChange<T>|IArraySplice<T>)=>void, fireImmediately=false):Lambda {
+        if (this.$mobservable.changeEvent === undefined)
+            this.$mobservable.changeEvent = new SimpleEventEmitter();
         if (fireImmediately)
             listener(<IArraySplice<T>>{ object: <IObservableArray<T>><any> this, type: 'splice', index: 0, addedCount: this.$mobservable.values.length, removed: []});
         return this.$mobservable.changeEvent.on(listener);
