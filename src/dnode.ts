@@ -216,7 +216,7 @@ export class ViewNode extends DataNode {
         } else { // not stale, thus ready since pending states are not propagated
             if (stateDidActuallyChange)
                 this.dependencyChangeCount += 1;
-            if (--this.dependencyStaleCount === 0) { // all dependencies are ready
+            if (this.dependencyStaleCount > 0 && --this.dependencyStaleCount === 0) { // all dependencies are ready
                 this.state = NodeState.PENDING;
                 // did any of the observables really change?
                 if (this.dependencyChangeCount > 0)

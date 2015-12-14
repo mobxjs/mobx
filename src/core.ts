@@ -4,7 +4,7 @@
  * https://github.com/mweststrate/mobservable
  */
 
-import {isComputingView, transaction} from './dnode';
+import {isComputingView, transaction, untracked} from './dnode';
 import {Lambda, IObservableArray, IObservableValue, IContextInfoStruct, IContextInfo, IArrayChange, IArraySplice, IObjectChange} from './interfaces';
 import {isPlainObject, once} from './utils';
 import {ObservableValue} from './observablevalue';
@@ -175,7 +175,8 @@ export function autorunUntil(predicate: ()=>boolean, effect: Lambda, scope?: any
                 disposer();
             else
                 disposeImmediately = true;
-            effect.call(scope);
+            untracked(() => effect.call(scope));
+            //effect.call(scope);            
         }
     });
     if (disposeImmediately)
