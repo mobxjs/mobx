@@ -288,7 +288,29 @@ test('array modification2', function(t) {
         a2.replace(a1);
         var res1 = a1.splice.apply(a1, [inputs[i], inputs[j]].concat(arrays[l]));
         var res2 = a2.splice.apply(a2, [inputs[i], inputs[j]].concat(arrays[l]));
-        t.deepEqual(a1.slice(), a2, "values wrong: " + msg); // TODO: or just a2?
+        t.deepEqual(a1.slice(), a2, "values wrong: " + msg);
+        t.deepEqual(res1, res2, "results wrong: " + msg);
+        t.equal(a1.length, a2.length, "length wrong: " + msg);
+    }
+
+    t.end();
+})
+
+test('fastArray modifications', function(t) {
+
+    var a2 = mobservable.fastArray([]);
+    var inputs = [undefined, -10, -4, -3, -1, 0, 1, 3, 4, 10];
+    var arrays = [[], [1], [1,2,3,4], [1,2,3,4,5,6,7,8,9,10,11],[1,undefined],[undefined]]
+    for (var i = 0; i < inputs.length; i++)
+    for (var j = 0; j< inputs.length; j++)
+    for (var k = 0; k < arrays.length; k++)
+    for (var l = 0; l < arrays.length; l++) {
+        var msg = ["array mod: [", arrays[k].toString(),"] i: ",inputs[i]," d: ", inputs[j]," [", arrays[l].toString(),"]"].join(' ');
+        var a1 = arrays[k].slice();
+        a2.replace(a1);
+        var res1 = a1.splice.apply(a1, [inputs[i], inputs[j]].concat(arrays[l]));
+        var res2 = a2.splice.apply(a2, [inputs[i], inputs[j]].concat(arrays[l]));
+        t.deepEqual(a1.slice(), a2.slice(), "values wrong: " + msg); // TODO: or just a2?
         t.deepEqual(res1, res2, "results wrong: " + msg);
         t.equal(a1.length, a2.length, "length wrong: " + msg);
     }
@@ -303,5 +325,17 @@ test('is array', function(t) {
     // would be cool if these two would return true...
     t.equal(typeof x === "array", false);
     t.equal(Array.isArray(x), false);
+    t.end();
+})
+
+test('peek', function(t) {
+    var x = mobservable.observable([1, 2, 3]);
+    t.deepEqual(x.peek(), [1, 2, 3]);
+    t.equal(x.$mobservable.values, x.peek());
+    
+    x.peek().push(4); //noooo!
+    t.throws(function() {
+        x.push(5); // detect alien change
+    }, "modification exception");
     t.end();
 })

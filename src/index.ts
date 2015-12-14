@@ -26,6 +26,7 @@ export {
 	// deprecated, add warning?
 	isObservable as isReactive,
 	map,
+	fastArray,
 	observable as makeReactive,
 	extendObservable as extendReactive,
 	autorunUntil as observeUntil,

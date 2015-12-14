@@ -73,6 +73,10 @@ export function map<V>(initialValues?: KeyValueMap<V>, valueModifier?: Function)
     return new ObservableMap(initialValues, valueModifier);
 }
 
+export function fastArray<V>(initialValues?: V[]): IObservableArray<V> {
+    return createObservableArray(initialValues, ValueMode.Flat, false, null);
+}
+
 /**
     * Can be used in combination with makeReactive / extendReactive.
     * Enforces that a reference to 'value' is stored as property,
@@ -554,7 +558,7 @@ export function makeChildObservable(value, parentMode:ValueMode, context) {
 	}
 
 	if (Array.isArray(value))
-		return createObservableArray(<[]> value.slice(), childMode, context);
+		return createObservableArray(<[]> value, childMode, true, context);
 	if (isPlainObject(value))
 		return extendObservableHelper(value, value, childMode, context);
 	return value;
