@@ -176,7 +176,6 @@ export function autorunUntil(predicate: ()=>boolean, effect: Lambda, scope?: any
             else
                 disposeImmediately = true;
             untracked(() => effect.call(scope));
-            //effect.call(scope);            
         }
     });
     if (disposeImmediately)
