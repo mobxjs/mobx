@@ -18,8 +18,9 @@ StubArray.prototype = [];
 export class ObservableArrayAdministration<T> extends DataNode {
     values: T[];
     changeEvent: SimpleEventEmitter;
+    lastKnownLength = 0;
 
-    constructor(private array: ObservableArray<T>, public mode:ValueMode, context: IContextInfoStruct) {
+    constructor(public array: ObservableArray<T>, public mode:ValueMode, public supportEnumerable:boolean, context: IContextInfoStruct) {
         super(context ? context : { name: undefined, object: undefined });
         if (!this.context.object)
             this.context.object = array;
@@ -45,18 +46,22 @@ export class ObservableArrayAdministration<T> extends DataNode {
     
     // adds / removes the necessary numeric properties to this object
     updateLength(oldLength:number, delta:number) {
+        if (oldLength !== this.lastKnownLength)
+            throw new Error("[mobservable] Modification exception: the internal structure of an observable array was changed. Did you use peek() to change it?");
+        this.lastKnownLength += delta;
         if (delta < 0) {
-            //checkIfStateIsBeingModifiedDuringView(this.context); 
-            //for(var i = oldLength + delta; i < oldLength; i++)
-            //    delete this.array[i]; // bit faster but mem inefficient: 
-                //Object.defineProperty(this, <string><any> i, notEnumerableProp);
+            checkIfStateIsBeingModifiedDuringView(this.context);
+            if (this.supportEnumerable)
+                for(var i = oldLength + delta; i < oldLength; i++)
+                    delete this.array[i]; // bit faster but mem inefficient: 
         } else if (delta > 0) {
-            //checkIfStateIsBeingModifiedDuringView(this.context); 
+            checkIfStateIsBeingModifiedDuringView(this.context);
             if (oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
                 reserveArrayBuffer(oldLength + delta);
             // funny enough, this is faster than slicing ENUMERABLE_PROPS into defineProperties, and faster as a temporarily map
-            //for (var i = oldLength, end = oldLength + delta; i < end; i++)
-            //    Object.defineProperty(this.array, <string><any> i, ENUMERABLE_PROPS[i])
+            if (this.supportEnumerable)
+                for (var i = oldLength, end = oldLength + delta; i < end; i++)
+                    Object.defineProperty(this.array, <string><any> i, ENUMERABLE_PROPS[i])
         }
     }
 
@@ -94,10 +99,10 @@ export class ObservableArrayAdministration<T> extends DataNode {
 
     makeReactiveArrayItem(value) {
         assertUnwrapped(value, "Array values cannot have modifiers");
-        return makeChildObservable(value, this.mode, null /* TODO: enable again: {
+        return makeChildObservable(value, this.mode, {
             object: this.context.object,
             name: this.context.name + "[x]"
-        }*/);
+        });
     }
 
     private notifyChildUpdate(index:number, oldValue:T) {
@@ -122,17 +127,16 @@ export class ObservableArrayAdministration<T> extends DataNode {
     }
 }
 
-export function createObservableArray<T>(initialValues:T[], mode:ValueMode, context: IContextInfoStruct): IObservableArray<T> {
-    return <IObservableArray<T>><any> new ObservableArray(initialValues, mode, context);
+export function createObservableArray<T>(initialValues:T[], mode:ValueMode, supportEnumerable:boolean, context: IContextInfoStruct): IObservableArray<T> {
+    return <IObservableArray<T>><any> new ObservableArray(initialValues, mode, supportEnumerable, context);
 }
 
 export class ObservableArray<T> extends StubArray {
     $mobservable:ObservableArrayAdministration<T>;
 
-
-    constructor(initialValues:T[], mode:ValueMode, context: IContextInfoStruct) {
+    constructor(initialValues:T[], mode:ValueMode, supportEnumerable:boolean, context: IContextInfoStruct) {
         super();
-        let adm = new ObservableArrayAdministration(this, mode, context);
+        let adm = new ObservableArrayAdministration(this, mode, supportEnumerable, context);
         Object.defineProperty(this, "$mobservable", {
             enumerable: false,
             configurable: false,
@@ -165,6 +169,11 @@ export class ObservableArray<T> extends StubArray {
     toJSON(): T[] {
         this.$mobservable.notifyObserved();
         return this.$mobservable.values.slice();
+    }
+
+    peek(): T[] {
+        this.$mobservable.notifyObserved();
+        return this.$mobservable.values;
     }
 
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
@@ -248,6 +257,7 @@ makeNonEnumerable(ObservableArray.prototype, [
     "find",
     "observe",
     "pop",
+    "peek",
     "push",
     "remove",
     "replace",

@@ -17,17 +17,17 @@ test('test1', function(t) {
     try {
         var a = observable([]);
         t.equal(a.length, 0);
-//        t.deepEqual(Object.keys(a), []);
+        t.deepEqual(Object.keys(a), []);
         t.deepEqual(a.slice(), []);
 
         a.push(1);
         t.equal(a.length, 1);
-//        t.deepEqual(Object.keys(a), ["0"]);
+        t.deepEqual(Object.keys(a), ["0"]);
         t.deepEqual(a.slice(), [1]);
 
         a[1] = 2;
         t.equal(a.length, 2);
-//        t.deepEqual(Object.keys(a), ["0", "1"]);
+        t.deepEqual(Object.keys(a), ["0", "1"]);
         t.deepEqual(a.slice(), [1,2]);
 
         var sum = observable(function() {
@@ -40,13 +40,13 @@ test('test1', function(t) {
 
         a[1] = 3;
         t.equal(a.length, 2);
-//        t.deepEqual(Object.keys(a), ["0", "1"]);
+        t.deepEqual(Object.keys(a), ["0", "1"]);
         t.deepEqual(a.slice(), [1,3]);
         t.equal(sum(), 4);
 
         a.splice(1,1,4,5);
         t.equal(a.length, 3);
-//        t.deepEqual(Object.keys(a), ["0", "1", "2"]);
+        t.deepEqual(Object.keys(a), ["0", "1", "2"]);
         t.deepEqual(a.slice(), [1,4,5]);
         t.equal(sum(), 10);
 
@@ -104,16 +104,16 @@ test('enumerable', function(t) {
     }
 
     var ar = mobservable.observable([1,2,3]);
-//    t.deepEqual(getKeys(ar), ['0','1','2']);
+    t.deepEqual(getKeys(ar), ['0','1','2']);
     
     ar.push(5,6);
-//    t.deepEqual(getKeys(ar), ['0','1','2','3','4']);
+    t.deepEqual(getKeys(ar), ['0','1','2','3','4']);
 
     ar.pop();
-//    t.deepEqual(getKeys(ar), ['0','1','2','3']);
+    t.deepEqual(getKeys(ar), ['0','1','2','3']);
     
     ar.shift();
-//    t.deepEqual(getKeys(ar), ['0','1','2']);
+    t.deepEqual(getKeys(ar), ['0','1','2']);
     t.end();
 })
 
@@ -252,7 +252,7 @@ test('array modification functions', function(t) {
             var res1 = a[f](4);
             var res2 = b[f](4);
             t.deepEqual(res1, res2);
-            t.deepEqual(a, b.slice());
+            t.deepEqual(a, b);
         });
     });
     t.end();
@@ -268,7 +268,7 @@ test('array write functions', function(t) {
             var res1 = a[f](4);
             var res2 = b[f](4);
             t.deepEqual(res1, res2);
-            t.deepEqual(a, b.slice());
+            t.deepEqual(a, b);
         });
     });
     t.end();
@@ -277,6 +277,28 @@ test('array write functions', function(t) {
 test('array modification2', function(t) {
 
     var a2 = mobservable.observable([]);
+    var inputs = [undefined, -10, -4, -3, -1, 0, 1, 3, 4, 10];
+    var arrays = [[], [1], [1,2,3,4], [1,2,3,4,5,6,7,8,9,10,11],[1,undefined],[undefined]]
+    for (var i = 0; i < inputs.length; i++)
+    for (var j = 0; j< inputs.length; j++)
+    for (var k = 0; k < arrays.length; k++)
+    for (var l = 0; l < arrays.length; l++) {
+        var msg = ["array mod: [", arrays[k].toString(),"] i: ",inputs[i]," d: ", inputs[j]," [", arrays[l].toString(),"]"].join(' ');
+        var a1 = arrays[k].slice();
+        a2.replace(a1);
+        var res1 = a1.splice.apply(a1, [inputs[i], inputs[j]].concat(arrays[l]));
+        var res2 = a2.splice.apply(a2, [inputs[i], inputs[j]].concat(arrays[l]));
+        t.deepEqual(a1.slice(), a2, "values wrong: " + msg);
+        t.deepEqual(res1, res2, "results wrong: " + msg);
+        t.equal(a1.length, a2.length, "length wrong: " + msg);
+    }
+
+    t.end();
+})
+
+test('fastArray modifications', function(t) {
+
+    var a2 = mobservable.fastArray([]);
     var inputs = [undefined, -10, -4, -3, -1, 0, 1, 3, 4, 10];
     var arrays = [[], [1], [1,2,3,4], [1,2,3,4,5,6,7,8,9,10,11],[1,undefined],[undefined]]
     for (var i = 0; i < inputs.length; i++)
@@ -303,5 +325,17 @@ test('is array', function(t) {
     // would be cool if these two would return true...
     t.equal(typeof x === "array", false);
     t.equal(Array.isArray(x), false);
+    t.end();
+})
+
+test('peek', function(t) {
+    var x = mobservable.observable([1, 2, 3]);
+    t.deepEqual(x.peek(), [1, 2, 3]);
+    t.equal(x.$mobservable.values, x.peek());
+    
+    x.peek().push(4); //noooo!
+    t.throws(function() {
+        x.push(5); // detect alien change
+    }, "modification exception");
     t.end();
 })

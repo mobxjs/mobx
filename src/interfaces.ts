@@ -24,6 +24,7 @@ export interface IObservableArray<T> extends IObservable, Array<T> {
     spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[];
     observe(listener: (changeData: IArrayChange<T>|IArraySplice<T>)=>void, fireImmediately?: boolean): Lambda;
     clear(): T[];
+    peek(): T[];
     replace(newItems: T[]): T[];
     find(predicate: (item: T,index: number,array: IObservableArray<T>)=>boolean,thisArg?: any,fromIndex?: number): T;
     remove(value: T): boolean;
