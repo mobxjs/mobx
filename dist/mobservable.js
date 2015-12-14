@@ -218,7 +218,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                disposer();
 	            else
 	                disposeImmediately = true;
-	            effect.call(scope);
+	            dnode_1.untracked(function () { return effect.call(scope); });
 	        }
 	    });
 	    if (disposeImmediately)
@@ -761,7 +761,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        else {
 	            if (stateDidActuallyChange)
 	                this.dependencyChangeCount += 1;
-	            if (--this.dependencyStaleCount === 0) {
+	            if (this.dependencyStaleCount > 0 && --this.dependencyStaleCount === 0) {
 	                this.state = NodeState.PENDING;
 	                if (this.dependencyChangeCount > 0)
 	                    this.computeNextState();
