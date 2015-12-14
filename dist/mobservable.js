@@ -81,6 +81,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.toJSON = core_1.toJSON;
 	exports.isReactive = core_1.isObservable;
 	exports.map = core_1.map;
+	exports.fastArray = core_1.fastArray;
 	exports.makeReactive = core_1.observable;
 	exports.extendReactive = core_1.extendObservable;
 	exports.observeUntil = core_1.autorunUntil;
@@ -164,6 +165,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return new observablemap_1.ObservableMap(initialValues, valueModifier);
 	}
 	exports.map = map;
+	function fastArray(initialValues) {
+	    return observablearray_1.createObservableArray(initialValues, ValueMode.Flat, false, null);
+	}
+	exports.fastArray = fastArray;
 	function asReference(value) {
 	    return new AsReference(value);
 	}
@@ -537,7 +542,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            throw "Illegal State";
 	    }
 	    if (Array.isArray(value))
-	        return observablearray_1.createObservableArray(value.slice(), childMode, context);
+	        return observablearray_1.createObservableArray(value, childMode, true, context);
 	    if (utils_1.isPlainObject(value))
 	        return extendObservableHelper(value, value, childMode, context);
 	    return value;
@@ -1345,12 +1350,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	StubArray.prototype = [];
 	var ObservableArrayAdministration = (function (_super) {
 	    __extends(ObservableArrayAdministration, _super);
-	    function ObservableArrayAdministration(array, mode, context) {
+	    function ObservableArrayAdministration(array, mode, supportEnumerable, context) {
 	        _super.call(this, context ? context : { name: undefined, object: undefined });
 	        this.array = array;
 	        this.mode = mode;
-	        this.values = [];
-	        this.changeEvent = new simpleeventemitter_1.default();
+	        this.supportEnumerable = supportEnumerable;
+	        this.lastKnownLength = 0;
 	        if (!this.context.object)
 	            this.context.object = array;
 	    }
@@ -1370,17 +1375,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.spliceWithArray(newLength, currentLength - newLength);
 	    };
 	    ObservableArrayAdministration.prototype.updateLength = function (oldLength, delta) {
+	        if (oldLength !== this.lastKnownLength)
+	            throw new Error("[mobservable] Modification exception: the internal structure of an observable array was changed. Did you use peek() to change it?");
+	        this.lastKnownLength += delta;
 	        if (delta < 0) {
 	            dnode_1.checkIfStateIsBeingModifiedDuringView(this.context);
-	            for (var i = oldLength + delta; i < oldLength; i++)
-	                delete this.array[i];
+	            if (this.supportEnumerable)
+	                for (var i = oldLength + delta; i < oldLength; i++)
+	                    delete this.array[i];
 	        }
 	        else if (delta > 0) {
 	            dnode_1.checkIfStateIsBeingModifiedDuringView(this.context);
 	            if (oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
 	                reserveArrayBuffer(oldLength + delta);
-	            for (var i = oldLength, end = oldLength + delta; i < end; i++)
-	                Object.defineProperty(this.array, i, ENUMERABLE_PROPS[i]);
+	            if (this.supportEnumerable)
+	                for (var i = oldLength, end = oldLength + delta; i < end; i++)
+	                    Object.defineProperty(this.array, i, ENUMERABLE_PROPS[i]);
 	        }
 	    };
 	    ObservableArrayAdministration.prototype.spliceWithArray = function (index, deleteCount, newItems) {
@@ -1420,13 +1430,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    ObservableArrayAdministration.prototype.notifyChildUpdate = function (index, oldValue) {
 	        this.notifyChanged();
-	        this.changeEvent.emit({ object: this.array, type: 'update', index: index, oldValue: oldValue });
+	        if (this.changeEvent)
+	            this.changeEvent.emit({ object: this.array, type: 'update', index: index, oldValue: oldValue });
 	    };
 	    ObservableArrayAdministration.prototype.notifySplice = function (index, deleted, added) {
 	        if (deleted.length === 0 && added.length === 0)
 	            return;
 	        this.notifyChanged();
-	        this.changeEvent.emit({ object: this.array, type: 'splice', index: index, addedCount: added.length, removed: deleted });
+	        if (this.changeEvent)
+	            this.changeEvent.emit({ object: this.array, type: 'splice', index: index, addedCount: added.length, removed: deleted });
 	    };
 	    ObservableArrayAdministration.prototype.notifyChanged = function () {
 	        this.markStale();
@@ -1435,24 +1447,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ObservableArrayAdministration;
 	})(dnode_1.DataNode);
 	exports.ObservableArrayAdministration = ObservableArrayAdministration;
-	function createObservableArray(initialValues, mode, context) {
-	    return new ObservableArray(initialValues, mode, context);
+	function createObservableArray(initialValues, mode, supportEnumerable, context) {
+	    return new ObservableArray(initialValues, mode, supportEnumerable, context);
 	}
 	exports.createObservableArray = createObservableArray;
 	var ObservableArray = (function (_super) {
 	    __extends(ObservableArray, _super);
-	    function ObservableArray(initialValues, mode, context) {
+	    function ObservableArray(initialValues, mode, supportEnumerable, context) {
 	        _super.call(this);
+	        var adm = new ObservableArrayAdministration(this, mode, supportEnumerable, context);
 	        Object.defineProperty(this, "$mobservable", {
 	            enumerable: false,
 	            configurable: false,
-	            value: new ObservableArrayAdministration(this, mode, context)
+	            value: adm
 	        });
-	        if (initialValues && initialValues.length)
-	            this.replace(initialValues);
+	        if (initialValues && initialValues.length) {
+	            adm.updateLength(0, initialValues.length);
+	            adm.values = initialValues.map(function (v) { return adm.makeReactiveArrayItem(v); });
+	        }
+	        else
+	            adm.values = [];
 	    }
 	    ObservableArray.prototype.observe = function (listener, fireImmediately) {
 	        if (fireImmediately === void 0) { fireImmediately = false; }
+	        if (this.$mobservable.changeEvent === undefined)
+	            this.$mobservable.changeEvent = new simpleeventemitter_1.default();
 	        if (fireImmediately)
 	            listener({ object: this, type: 'splice', index: 0, addedCount: this.$mobservable.values.length, removed: [] });
 	        return this.$mobservable.changeEvent.on(listener);
@@ -1466,6 +1485,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ObservableArray.prototype.toJSON = function () {
 	        this.$mobservable.notifyObserved();
 	        return this.$mobservable.values.slice();
+	    };
+	    ObservableArray.prototype.peek = function () {
+	        this.$mobservable.notifyObserved();
+	        return this.$mobservable.values;
 	    };
 	    ObservableArray.prototype.find = function (predicate, thisArg, fromIndex) {
 	        if (fromIndex === void 0) { fromIndex = 0; }
@@ -1542,6 +1565,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    "find",
 	    "observe",
 	    "pop",
+	    "peek",
 	    "push",
 	    "remove",
 	    "replace",
@@ -1713,7 +1737,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.$mobservable = true;
 	        this._data = {};
 	        this._hasMap = {};
-	        this._keys = new observablearray_1.ObservableArray(null, core_1.ValueMode.Reference, {
+	        this._keys = new observablearray_1.ObservableArray(null, core_1.ValueMode.Reference, false, {
 	            name: ".keys()",
 	            object: this
 	        });

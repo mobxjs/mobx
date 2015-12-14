@@ -1,3 +1,12 @@
+# 1.1.6
+
+* Introduced `mobservable.fastArray(array)`, in addition to `mobservable.observable(array)`. Which is much faster when adding items but doesn't support enumerability (`for (var idx in ar) ..` loops).
+* Introduced `observableArray.peek()`, for fast access to the array values. Should be used read-only.
+
+# 1.1.5
+
+* Fixed 71: transactions should not influence running computations
+
 # 1.1.4
 
 * Fixed #65; illegal state exception when using a transaction inside a reactive function. Credits: @kmalakoff

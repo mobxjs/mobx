@@ -1,6 +1,6 @@
 {
     "name": "mobservable",
-    "version": "1.1.5",
+    "version": "1.1.6",
     "description": "Observable data. Reactive functions. Simple code.",
     "main": "lib/index.js",
     "typings": "lib/index.d.ts",
