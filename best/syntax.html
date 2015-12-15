@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>ES6 &amp; TypeScript goodies | Introduction</title>
+        <title>ES5 / ES6 / TypeScript syntax | Introduction</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.2.0">
@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="6.2" data-basepath=".." data-revision="Tue Nov 10 2015 21:41:54 GMT+0100 (CET)">
+    <div class="book" data-level="6.2" data-basepath=".." data-revision="Tue Dec 15 2015 21:06:25 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -217,16 +217,16 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="3.1" data-path="refguide/map.html">
+        <li class="chapter " data-level="3.1" data-path="refguide/transaction.html">
             
                 
-                    <a href="../refguide/map.html">
+                    <a href="../refguide/transaction.html">
                 
                         <i class="fa fa-check"></i>
                         
                             <b>3.1.</b>
                         
-                        map
+                        transaction
                     </a>
             
             
@@ -247,29 +247,44 @@
             
         </li>
     
-        <li class="chapter " data-level="3.3" data-path="refguide/transaction.html">
+        <li class="chapter " data-level="3.3" data-path="refguide/map.html">
             
                 
-                    <a href="../refguide/transaction.html">
+                    <a href="../refguide/map.html">
                 
                         <i class="fa fa-check"></i>
                         
                             <b>3.3.</b>
                         
-                        transaction
+                        map
                     </a>
             
             
         </li>
     
-        <li class="chapter " data-level="3.4" data-path="refguide/is-observable.html">
+        <li class="chapter " data-level="3.4" data-path="refguide/observe.html">
+            
+                
+                    <a href="../refguide/observe.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.4.</b>
+                        
+                        observe
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="3.5" data-path="refguide/is-observable.html">
             
                 
                     <a href="../refguide/is-observable.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>3.4.</b>
+                            <b>3.5.</b>
                         
                         isObservable(..)
                     </a>
@@ -277,14 +292,14 @@
             
         </li>
     
-        <li class="chapter " data-level="3.5" data-path="refguide/modifiers.html">
+        <li class="chapter " data-level="3.6" data-path="refguide/modifiers.html">
             
                 
                     <a href="../refguide/modifiers.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>3.5.</b>
+                            <b>3.6.</b>
                         
                         modifiers
                     </a>
@@ -292,31 +307,16 @@
             
         </li>
     
-        <li class="chapter " data-level="3.6" data-path="refguide/expr.html">
+        <li class="chapter " data-level="3.7" data-path="refguide/expr.html">
             
                 
                     <a href="../refguide/expr.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>3.6.</b>
-                        
-                        expr
-                    </a>
-            
-            
-        </li>
-    
-        <li class="chapter " data-level="3.7" data-path="refguide/observe.html">
-            
-                
-                    <a href="../refguide/observe.html">
-                
-                        <i class="fa fa-check"></i>
-                        
                             <b>3.7.</b>
                         
-                        observe
+                        expr
                     </a>
             
             
@@ -438,7 +438,7 @@
                         
                             <b>6.2.</b>
                         
-                        ES6 &amp; TypeScript goodies
+                        ES5 / ES6 / TypeScript syntax
                     </a>
             
             
@@ -600,8 +600,24 @@
                     
                         <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/best/syntax.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="es5-es6-typescript-flavored-examples">ES5 / ES6 / TypeScript flavored examples</h1>
 <p>Here are some examples show you how you can make the state of a simple todo application observable,
-using different flavors.</p>
-<h4 id="es5-with-plain-objects">ES5 with plain objects</h4>
+using either plain objects or classes.
+Mobservable ships with TypeScript typings in the package (supported in TypeScript 1.6 and higher).
+So <code>import * as mobservable from &quot;mobservable&quot;</code> gives access to the strongly typed api without further imports.</p>
+<h2 id="exposed-typescript-types">Exposed TypeScript types</h2>
+<p>The following types can be imported from the <code>&quot;mobservable&quot;</code> package to assist you with using strong types (the types will still be infered if needed, even if you don&apos;t import them).
+The full definitions can be found <a href="https://github.com/mweststrate/mobservable/blob/master/src/interfaces.ts" target="_blank">here</a></p>
+<ul>
+<li>ObservableMap</li>
+<li>Lambda (<code>() =&gt; void</code>).</li>
+<li>IObservable</li>
+<li>IObservableValue</li>
+<li>IObservableArray</li>
+<li>IArrayChange</li>
+<li>IArraySplice</li>
+<li>IObjectChange</li>
+</ul>
+<h2 id="creating-objects">Creating objects</h2>
+<h3 id="es5-es6-ts-making-plain-objects-observable">ES5 / ES6 / TS: Making plain objects observable</h3>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> todoStore = mobservable.observable({
     todos: [{
           title: <span class="hljs-string">&apos;Find a clean mug&apos;</span>,
@@ -614,7 +630,9 @@ using different flavors.</p>
     }
 });
 </code></pre>
-<h4 id="es5-with-constructor-function">ES5 with constructor function</h4>
+<h3 id="es5-constructor-functions">ES5 constructor functions</h3>
+<p>If <code>TodoStore</code> is a constructor function that is typically invoked using the <code>new</code> keyword,
+<code>extendObservable</code> can be used to add observable properties to the object during creation:</p>
 <pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">TodoStore</span>(<span class="hljs-params"></span>) </span>{
     mobservable.extendObservable(<span class="hljs-keyword">this</span>, {
         todos: [{
@@ -629,42 +647,61 @@ using different flavors.</p>
     });
 }
 </code></pre>
-<p>Note that the constructor could also be written like: <code>this.todos = mobservable.observable([{ ... }])</code>. The advantage of using <code>extendObservable</code> is that it makes the <code>this.todos</code> reference itself observable as well, so that you can safely assign a new array to it later on (although it is best practice to never do such thing).</p>
-<h4 id="es6-classes">ES6 classes</h4>
+<h3 id="es6-typescript-classes">ES6 / TypeScript classes</h3>
+<p>When using ES6 or TypeScript it is recommended to use the <code>@observable</code> decorator to make observable properties or derivations.
+Note that getters should be used to define observable functions on a class.This is to keep the type of a derived value consistent between ES5 / ES6 and TypeScript:
+Use <code>store.completedCount</code> to obtain a derived value; not <code>store.completedCount()</code>.
+In contrast, <code>@observable someFunction() {}</code> will just create an observable reference to <code>someFunction</code>, but <code>someFunction</code> itself won&apos;t become reactive.</p>
 <pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoStore</span> </span>{
-    constructor() {
-        mobservable.extendObservable(<span class="hljs-keyword">this</span>, {
-            todos: [{
-                title: <span class="hljs-string">&apos;Find a clean mug&apos;</span>,
-                completed: <span class="hljs-literal">true</span>
-            }]
-        });
-    },
-    @observable get completedCount() {
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.todos.filter((todo) =&gt; todo.completed).length;
-    }
-}
-</code></pre>
-<h4 id="typescript">TypeScript</h4>
-<pre><code class="lang-javascript"><span class="hljs-comment">/// &lt;reference path=&quot;./node_modules/mobservable/dist/mobservable.d.ts&quot;/&gt;</span>
-
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoStore</span> </span>{
-    @observable todos = [{
+    @observable todos = todos: [{
         title: <span class="hljs-string">&apos;Find a clean mug&apos;</span>,
         completed: <span class="hljs-literal">true</span>
-    }];
+    }]
+
     @observable get completedCount() {
         <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.todos.filter((todo) =&gt; todo.completed).length;
     }
 }
 </code></pre>
+<h2 id="react-components">React components</h2>
+<p>In combination with <code>@observer</code> decorator from the <code>mobservable-react</code> package:</p>
+<h2 id="components-in-es5">Components in ES5</h2>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> MyComponent = observer(React.createClass({
+    render: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{this.onButtonClick}</span>&gt;</span>Hi<span class="hljs-tag">&lt;/<span class="hljs-title">button</span>&gt;</span>
+    },
+    onButtonClick: function(e) {
+        // bound function
+    }
+});
+</span></code></pre>
+<p>If stateless component functions are used:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> MyOtherComponent = observer(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">props</span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>{props.user.name{/div};
+});
+</span></code></pre>
 <h2 id="components-in-es6-typescript">Components in ES6 / TypeScript</h2>
-<p>For ES6+ users, components can also be declared using classes.
-<code>observer</code> can be used in that case as a decorator.</p>
 <pre><code class="lang-javascript">@observer <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyComponent</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
-  <span class="hljs-comment">/* .. */</span>
+    render() {
+        <span class="hljs-comment">// Warning: don&apos;t use {this.onButtonClick.bind(this)} or {() =&gt; this.onButtonClick} !</span>
+        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{this.onButtonClick}</span>&gt;</span>Hi<span class="hljs-tag">&lt;/<span class="hljs-title">button</span>&gt;</span>
+    }
+
+    onButtonClick = (e) =&gt; {
+        // bound function
+    }
 }
+</span></code></pre>
+<p>If stateless component functions are used:</p>
+<pre><code class="lang-javascript">const MyOtherComponent = observer(props =&gt; // ..or with destructuring: ({user}) =&gt; ..
+    &lt;div&gt;{props.user.name{/div}
+);
 </code></pre>
+<p>Please note that <code>onButtonClick</code> is not just a class method, but an instance field which get a bound function.
+This is the most convenient and the fastest way to create bound event handlers.
+If <code>{this.onButtonClick.bind(this)}</code> or <code>{(e) =&gt; this.onButtonClick(e)}</code> was used instead in the rendering, each render invocation would create a new closures.
+That is not only slightly slower in itself, 
+but it will also cause the <code>button</code> (or any other component) to be always re-rendered because you are effectively passing a new event handler to the button each time <code>MyComponent</code> is rendered.  </p>
 
                     
                     </section>
