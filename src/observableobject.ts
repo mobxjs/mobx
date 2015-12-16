@@ -3,29 +3,19 @@
  * (c) 2015 - Michel Weststrate
  * https://github.com/mweststrate/mobservable
  */
-import {DataNode} from './dnode';
+import {ObservableValue, DerivedValue} from './dnode';
 import {ValueMode, makeChildObservable, AsStructure} from './core';
-import {IContextInfoStruct, IObjectChange, Lambda} from './interfaces';
-import {ObservableView} from './observableview';
-import {ObservableValue} from './observablevalue';
+import {IObjectChange, Lambda} from './interfaces';
 import SimpleEventEmitter from './simpleeventemitter';
 
 // responsible for the administration of objects that have become reactive
-export class ObservableObject {
-	values:{[key:string]:DataNode} = {};
+export class ObservableObject { // TODO: implement IObservable
+	values:{[key:string]:ObservableValue<any>|DerivedValue<any>} = {};
 	private _events = new SimpleEventEmitter();
 
-	constructor(private target, private context:IContextInfoStruct, private mode: ValueMode) {
+	constructor(private target, private name:string, private mode: ValueMode) {
 		if (target.$mobservable)
 			throw new Error("Illegal state: already an reactive object");
-		if (!context) {
-			this.context = {
-				object: target,
-				name: ""
-			};
-		} else if (!context.object) {
-			context.object = target;
-		}
 
 		Object.defineProperty(target, "$mobservable", {
 			enumerable: false,
@@ -33,10 +23,10 @@ export class ObservableObject {
 			value: this
 		});
 	}
-	static asReactive(target, context:IContextInfoStruct, mode:ValueMode):ObservableObject {
+	static asReactive(target, name: string, mode:ValueMode):ObservableObject {
 		if (target.$mobservable)
 			return target.$mobservable;
-		return new ObservableObject(target, context, mode);
+		return new ObservableObject(target, name, mode);
 	}
 
 	set(propName, value) {
@@ -47,18 +37,15 @@ export class ObservableObject {
 	}
 
 	private defineReactiveProperty(propName, value) {
-		let observable: ObservableView<any>|ObservableValue<any>;
-		let context = {
-			object: this.context.object,
-			name: `${this.context.name || ""}.${propName}`
-		};
+		let observable: DerivedValue<any>|ObservableValue<any>;
+		let name = `${this.name || ""}.${propName}`;
 
 		if (typeof value === "function" && value.length === 0)
-			observable = new ObservableView(value, this.target, context, false);
+			observable = new DerivedValue(value, this.target, name, false);
 		else if (value instanceof AsStructure && typeof value.value === "function" && value.value.length === 0)
-			observable = new ObservableView(value.value, this.target, context, true);
+			observable = new DerivedValue(value.value, this.target, name, true);
 		else
-			observable = new ObservableValue(value, this.mode, context);
+			observable = new ObservableValue(value, this.mode, name);
 
 		this.values[propName] = observable;
 		Object.defineProperty(this.target, propName, {

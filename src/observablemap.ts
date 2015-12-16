@@ -1,4 +1,4 @@
-import {ObservableValue} from './observablevalue';
+import {ObservableValue} from './dnode';
 import {ValueMode, observable, assertUnwrapped, getValueModeFromModifierFunc} from './core';
 import {IObservableArray, Lambda, IObjectChange} from './interfaces';
 import SimpleEventEmitter from './simpleeventemitter';
@@ -18,10 +18,7 @@ export class ObservableMap<V> {
 	$mobservable = true;
 	private _data: { [key:string]: ObservableValue<V> } = {};
 	private _hasMap: { [key:string]: ObservableValue<boolean> } = {}; // hasMap, not hashMap >-).
-	private _keys: IObservableArray<string> = <any> new ObservableArray(null, ValueMode.Reference, {
-		name: ".keys()", 
-		object: this
-	});
+	private _keys: IObservableArray<string> = <any> new ObservableArray(null, ValueMode.Reference, ".keys()");
 	private _valueMode: ValueMode;
 	private _events = new SimpleEventEmitter();
 
@@ -61,10 +58,7 @@ export class ObservableMap<V> {
 		}
 		else {
 			transaction(() => {
-				this._data[key] = new ObservableValue(value, this._valueMode, {
-					name: "." + key,
-					object: this
-				});
+				this._data[key] = new ObservableValue(value, this._valueMode, "." + key);
 				this._updateHasMapEntry(key, true);
 				this._keys.push(key);
 			});
@@ -102,10 +96,7 @@ export class ObservableMap<V> {
 		if (entry) {
 			entry.set(value);
 		} else {
-			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, {
-				name: ".(has)" + key,
-				object: this
-			});
+			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, ".(has)" + key);
 		} 
 		return entry;
 	}

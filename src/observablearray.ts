@@ -5,24 +5,22 @@
  */
 
 import {deepEquals, makeNonEnumerable} from './utils';
-import {DataNode, checkIfStateIsBeingModifiedDuringView} from './dnode';
+import {ObservableValue, checkIfStateIsBeingModifiedDuringView} from './dnode';
 import SimpleEventEmitter from './simpleeventemitter';
 import {ValueMode, assertUnwrapped, makeChildObservable} from './core';
-import {IArrayChange, IArraySplice, IObservableArray, Lambda, IContextInfoStruct} from './interfaces';
+import {IArrayChange, IArraySplice, IObservableArray, Lambda} from './interfaces';
 
 // Workaround to make sure ObservableArray extends Array
 export class StubArray {
 }
 StubArray.prototype = [];
 
-export class ObservableArrayAdministration<T> extends DataNode {
+export class ObservableArrayAdministration<T> extends ObservableValue<any> {
     values: T[] = [];
     changeEvent: SimpleEventEmitter = new SimpleEventEmitter();
 
-    constructor(private array: ObservableArray<T>, public mode:ValueMode, context: IContextInfoStruct) {
-        super(context ? context : { name: undefined, object: undefined });
-        if (!this.context.object)
-            this.context.object = array;
+    constructor(private array: ObservableArray<T>, public mode:ValueMode, name: string) {
+        super(null, mode, undefined); // TODO blegh, don't inherit here! become IObservable
     }
     
     getLength(): number {
@@ -46,12 +44,12 @@ export class ObservableArrayAdministration<T> extends DataNode {
     // adds / removes the necessary numeric properties to this object
     private updateLength(oldLength:number, delta:number) {
         if (delta < 0) {
-            checkIfStateIsBeingModifiedDuringView(this.context); 
+            checkIfStateIsBeingModifiedDuringView(this.name); 
             for(var i = oldLength + delta; i < oldLength; i++)
                 delete this.array[i]; // bit faster but mem inefficient: 
                 //Object.defineProperty(this, <string><any> i, notEnumerableProp);
         } else if (delta > 0) {
-            checkIfStateIsBeingModifiedDuringView(this.context); 
+            checkIfStateIsBeingModifiedDuringView(this.name); 
             if (oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
                 reserveArrayBuffer(oldLength + delta);
             // funny enough, this is faster than slicing ENUMERABLE_PROPS into defineProperties, and faster as a temporarily map
@@ -94,10 +92,7 @@ export class ObservableArrayAdministration<T> extends DataNode {
 
     makeReactiveArrayItem(value) {
         assertUnwrapped(value, "Array values cannot have modifiers");
-        return makeChildObservable(value, this.mode, {
-            object: this.context.object,
-            name: this.context.name + "[x]"
-        });
+        return makeChildObservable(value, this.mode, this.name + "[x]");
     }
 
     private notifyChildUpdate(index:number, oldValue:T) {
@@ -120,20 +115,20 @@ export class ObservableArrayAdministration<T> extends DataNode {
     }
 }
 
-export function createObservableArray<T>(initialValues:T[], mode:ValueMode, context: IContextInfoStruct): IObservableArray<T> {
-    return <IObservableArray<T>><any> new ObservableArray(initialValues, mode, context);
+export function createObservableArray<T>(initialValues:T[], mode:ValueMode, name: string): IObservableArray<T> {
+    return <IObservableArray<T>><any> new ObservableArray(initialValues, mode, name);
 }
 
 export class ObservableArray<T> extends StubArray {
     $mobservable:ObservableArrayAdministration<T>;
 
 
-    constructor(initialValues:T[], mode:ValueMode, context: IContextInfoStruct) {
+    constructor(initialValues:T[], mode:ValueMode, name: string) {
         super();
         Object.defineProperty(this, "$mobservable", {
             enumerable: false,
             configurable: false,
-            value : new ObservableArrayAdministration(this, mode, context)
+            value : new ObservableArrayAdministration(this, mode, name)
         });
 
         if (initialValues && initialValues.length)

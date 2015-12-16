@@ -1,10 +1,3 @@
-export interface IContextInfoStruct {
-    object: Object;
-    name: string;
-}
-
-export type IContextInfo = IContextInfoStruct | string;
-
 export interface Lambda {
     (): void;
     name?: string;
@@ -45,23 +38,21 @@ export interface IArraySplice<T> {
 }
 
 export interface IObjectChange<T, R> {
-	name: string;
-	object: R;
-	type: string;
-	oldValue?: T;
+    name: string;
+    object: R;
+    type: string;
+    oldValue?: T;
 }
 
 export interface IDependencyTree {
     id: number;
     name: string;
-    context: any;
     dependencies?: IDependencyTree[];
 }
 
 export interface IObserverTree {
     id: number;
     name: string;
-    context: any;
     observers?: IObserverTree[];
     listeners?: number; // amount of functions manually attached using an .observe method
 }
@@ -69,7 +60,6 @@ export interface IObserverTree {
 export interface ITransitionEvent {
     id: number;
     name: string;
-    context: Object;
     state: string;
     changed: boolean;
     newValue: string;

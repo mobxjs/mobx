@@ -4,15 +4,13 @@
  * https://github.com/mweststrate/mobservable
  */
 
-import {isComputingView, transaction} from './dnode';
-import {Lambda, IObservableArray, IObservableValue, IContextInfoStruct, IContextInfo, IArrayChange, IArraySplice, IObjectChange} from './interfaces';
-import {isPlainObject, once} from './utils';
-import {ObservableValue} from './observablevalue';
-import {ObservableView, throwingViewSetter} from './observableview';
+import {isComputingView, transaction, runAfterTransaction, IObservable} from './dnode';
+import {Lambda, IObservableArray, IObservableValue, IArrayChange, IArraySplice, IObjectChange} from './interfaces';
+import {isPlainObject, once, deepEquals} from './utils';
+import {DerivedValue, ObservableValue} from './dnode';
 import {createObservableArray, ObservableArray} from './observablearray';
 import {ObservableObject} from './observableobject';
 import {ObservableMap, KeyValueMap} from './observablemap';
-import {DataNode, runAfterTransaction} from './dnode';
 
 /**
     * Turns an object, array or function into a reactive structure.
@@ -52,11 +50,7 @@ export function observable(v:any, keyOrScope?:string | any) {
         case ValueType.ComplexFunction:
             throw new Error("[mobservable.observable] To be able to make a function reactive it should not have arguments. If you need an observable reference to a function, use `observable(asReference(f))`");
         case ValueType.ViewFunction: {
-            const context = {
-                name: value.name,
-                object: value
-            };
-            return toGetterSetterFunction(new ObservableView(value, keyOrScope, context, mode === ValueMode.Structure));
+            return toGetterSetterFunction(new DerivedValue(value, keyOrScope, value.name, mode === ValueMode.Structure));
         }
         case ValueType.Array:
         case ValueType.PlainObject:
@@ -117,7 +111,7 @@ export function asFlat<T>(value:T):T {
 export function isObservable(value):boolean {
     if (value === null || value === undefined)
         return false;
-    return !!value.$mobservable || value instanceof DataNode;
+    return !!value.$mobservable || value instanceof ObservableValue || value instanceof DerivedValue;
 }
 
 /**
@@ -134,10 +128,8 @@ export function autorun(view:Lambda, scope?:any):Lambda {
     if (unwrappedView.length !== 0)
         throw new Error("[mobservable.autorun] expects a function without arguments");
 
-    const observable = new ObservableView(unwrappedView, scope, {
-        object: scope || view,
-        name: view.name
-    }, mode === ValueMode.Structure);
+    // TODO: always run untracked
+    const observable = new DerivedValue(unwrappedView, scope, view.name, mode === ValueMode.Structure);
 
     let disposedPrematurely = false;
     let started = false;
@@ -227,7 +219,7 @@ export function autorunAsync<T>(func: Lambda | {():T}, delay:number | {(x:T):voi
     let shouldRun = false;
     let tickScheduled = false;
     let tick = observable(0);
-    let observedValues: DataNode[] = [];
+    let observedValues: IObservable[] = [];
     let disposer: Lambda;
     let isDisposed = false;
     
@@ -364,7 +356,7 @@ function observableDecorator(target:Object, key:string, baseDescriptor:PropertyD
         return this[key];
     };
     descriptor.set = isDecoratingGetter 
-        ? throwingViewSetter(key)
+        ? () => {throw new Error(`[DerivedValue '${key}'] View functions do not accept new values`); }
         : function(value) { 
             ObservableObject.asReactive(this, null,ValueMode.Recursive).set(key, typeof value === "function" ? asReference(value) : value); 
         }
@@ -465,15 +457,15 @@ export function getTypeOfValue(value): ValueType {
 	return ValueType.Reference; // safe default, only refer by reference..
 }
 
-export function extendObservableHelper(target, properties, mode: ValueMode, context: IContextInfoStruct):Object {
-	var meta = ObservableObject.asReactive(target, context, mode);
+export function extendObservableHelper(target, properties, mode: ValueMode, name: string):Object {
+	var meta = ObservableObject.asReactive(target, name, mode);
 	for(var key in properties) if (properties.hasOwnProperty(key)) {
 		meta.set(key, properties[key]);
 	}
 	return target;
 }
 
-export function toGetterSetterFunction<T>(observable: ObservableValue<T> | ObservableView<T>):IObservableValue<T> {
+export function toGetterSetterFunction<T>(observable: ObservableValue<T> | DerivedValue<T>):IObservableValue<T> {
 	var f:any = function(value?) {
 		if (arguments.length > 0)
 			observable.set(value);
@@ -594,4 +586,10 @@ export function observe(thing, listener?):Lambda {
     if (isPlainObject(thing))
         return (<any>observable(thing)).$mobservable.observe(listener);
     throw new Error("[mobservable.observe] first argument should be an observable array, observable map, observable object or plain object.");
+}
+
+export function valueDidChange(compareStructural: boolean, oldValue, newValue):boolean {
+    return compareStructural
+        ? !deepEquals(oldValue, newValue)
+        : oldValue !== newValue
 }

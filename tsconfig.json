@@ -16,8 +16,6 @@
         "./src/interfaces.ts",
         "./src/observablearray.ts",
         "./src/observableobject.ts",
-        "./src/observablevalue.ts",
-        "./src/observableview.ts",
         "./src/simpleeventemitter.ts",
         "./src/utils.ts"
     ],

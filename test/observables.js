@@ -61,7 +61,7 @@ test('dynamic', function(t) {
         x(5);
         t.equal(5, y());
 
-        t.deepEqual([3, 5], b.toArray());
+        t.deepEqual(b.toArray(), [3, 5]);
         t.equal(mobservable._.isComputingView(), false);
 
         t.end();
@@ -129,11 +129,11 @@ test('batch', function(t) {
     var d = observable(function() { return c() * b() });
     var buf = buffer();
     d.observe(buf);
-
+    debugger;
     a(4);
     b(5);
     // Note, 60 should not happen! (that is d beign computed before c after update of b)
-    t.deepEqual([36, 100], buf.toArray());
+    t.deepEqual(buf.toArray(), [36, 100]);
 
     var x = mobservable.transaction(function() {
         a(2);
@@ -144,7 +144,7 @@ test('batch', function(t) {
     });
 
     t.equal(x, 2); // test return value
-    t.deepEqual([36, 100, 54], buf.toArray());// only one new value for d
+    t.deepEqual(buf.toArray(), [36, 100, 54]);// only one new value for d
     t.end();
 })
 
@@ -1363,6 +1363,28 @@ test('prematurely end autorun', function(t) {
     t.equal(dis1.$mobservable.observing.length, 0);
     t.equal(dis2.$mobservable.observing.length, 0);
     
+    t.end();
+});
+
+test('isComputing', function(t) {
+    mobservable.autorun(function() {
+        t.equal(mobservable.extras.isComputingView(), true);
+        mobservable.expr(function() {
+            t.equal(mobservable.extras.isComputingView(), true);
+        });
+        mobservable.untracked(function() {
+            t.equal(mobservable.extras.isComputingView(), false);
+            mobservable.observable(function() {
+                t.equal(mobservable.extras.isComputingView(), false);
+            })();
+            mobservable.autorun(function() {
+                t.equal(mobservable.extras.isComputingView(), true);
+                mobservable.untracked(function() {
+                    t.equal(mobservable.extras.isComputingView(), false);
+                });
+            });
+        });
+    });
     t.end();
 });
 
