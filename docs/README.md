@@ -6,6 +6,7 @@ _Observable data. Reactive functions. Simple code._
 
 * [Mobservable on Github](https://github.com/mweststrate/mobservable)
 * For the impatient: [Five minute interactive introduction to Mobservable](http://mweststrate.github.io/mobservable/getting-started.html)
+* [Mobservable talk on Reactive2015](https://www.youtube.com/watch?v=FEwLwiizlk0)
 
 ## Introduction
 

@@ -5,6 +5,8 @@ Only string values are accepted as keys.
 
 The following methods are exposed according to the [ES6 Map spec](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map):
 
+It is not needed to use the `new` keyword, `map` will always return a newly created `ObservableMap`.
+
 * `has(key)` Returns whether this map has the provided key. Note that the presence of a key is an observable fact in itself.
 * `set(key, value)`. Sets the given `key` to `value`. The provided key will be added to the map if it didn't exist yet.
 * `delete(key)`. Deletes the given key and its value from the map.

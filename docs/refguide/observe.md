@@ -34,3 +34,7 @@ person.firstName =  "Martin";
 disposer();
 // Ignore any future updates
 ```
+
+Note: `transaction` does not affect the working of the `observe` method(s).
+
+Related blog: [Object.observe is dead. Long live Mobservable.observe](https://medium.com/@mweststrate/object-observe-is-dead-long-live-mobservable-observe-ad96930140c5)

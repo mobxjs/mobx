@@ -9,16 +9,20 @@
   * [autorun](refguide/autorun.md)
   * [@observer](refguide/observer-component.md)
   * [@observable](refguide/observable-decorator.md)
+  * [createTransformer](refguide/create-transformer.md)
 * Advanced API
-  * [map](refguide/map.md)
-  * [extendObservable](refguide/extend-observable.md)
-  * [transaction](refguide/transaction.md)
-  * [isObservable(..)](refguide/is-observable.md)
-  * [modifiers](refguide/modifiers.md)
+  * [autorunAsync](refguide/autorun-async.md)
+  * [autorunUntil](refguide/autorun-until.md)
   * [expr](refguide/expr.md)
+  * [extendObservable](refguide/extend-observable.md)
+  * [extras](refguide/extras.md)
+  * [fastArray](refguide/fast-array.md)
+  * [isObservable(..)](refguide/is-observable.md)
+  * [map](refguide/map.md)
+  * [modifiers](refguide/modifiers.md)
   * [observe](refguide/observe.md)
-  * autorunAsync / autorunUntil
-  * extras
+  * [tojson](refguide/tojson.md)
+  * [transaction](refguide/transaction.md)
 * Best Practices For Large Apps
   * [Definging data stores](best/store.md)
   * [Writing (async) actions](best/actions.md)
@@ -27,7 +31,7 @@
 * How does Mobservable work?
 * Tips & Tricks
   * [DevTools](best/devtools.md)
-  * [ES6 & TypeScript goodies](best/syntax.md)
+  * [ES5 / ES6 / TypeScript syntax](best/syntax.md)
   * Tracking state changes
   * Performance considerations
 * [Resources](LINKS.md)

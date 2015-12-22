@@ -45,7 +45,7 @@ In combination with `@observer` you can use the Mobservable-React-DevTools, it s
 
 ### Alternative syntaxes
 
-In ES5 environments, reactive components can be simple declared using `observer(React.createClass({ ... `.
+In ES5 environments, reactive components can be simple declared using `observer(React.createClass({ ... `. See also the [syntax guide](../best/syntax)
 
 When using `@observer`, a lot of components will become stateless.
 In such cases you can also write reactive function components using `@observer` (this works also on ES5 and with React 0.13):

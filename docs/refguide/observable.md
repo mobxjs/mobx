@@ -169,7 +169,8 @@ Due to limitations of native arrays in ES5 (`array.observe` is only available in
 In practice, these arrays work just as fine as native arrays and all native methods are supported, including index assignments, up-to and including the length of the array.
 
 Bear in mind that `Array.isArray(observable([]))` will yield `false`, so whenever you need to pass an observable array to an external library,
-it is a good idea to _create a shallow copy before passing it to other libraries or built-in functions_ (which is good practice anyway). So `Array.isArray(observable([]).slice())` will yield `true`.
+it is a good idea to _create a shallow copy before passing it to other libraries or built-in functions_ (which is good practice anyway) by using `array.slice()` or `array.peek()`.
+So `Array.isArray(observable([]).slice())` will yield `true`.
 
 Besides all built-in functions, the following goodies are available as well on observable arrays:
 
@@ -178,3 +179,6 @@ Besides all built-in functions, the following goodies are available as well on o
 * `replace(newItems)` Replaces all existing entries in the array with new ones.
 * `find(predicate: (item, index, array) => boolean, thisArg?, fromIndex?)` Basically the same as the ES7 `Array.find` proposal, except for the additional `fromIndex` parameter.
 * `remove(value)` Remove a single item by value from the array. Returns `true` if the item was found and removed.
+* `peek()` Returns an array with all the values which can safely be passed to other libraries, similar to `slice()`.  
+In contrast to `slice`, `peek` peek doesn't create a defensive copy. Use this in performance critical applications if you know for sure that you use the array in a read-only manner.  
+In performance cricital sections it is recommend to use [fastArray](../refguide/fast-array.md) as well.
