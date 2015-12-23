@@ -382,7 +382,6 @@ function observableDecorator(target:Object, key:string, baseDescriptor:PropertyD
 
 /**
     * Basically, a deep clone, so that no reactive property will exist anymore.
-    * Doesn't follow references.
     */
 export function toJSON(source, detectCycles: boolean = true, __alreadySeen:[any,any][] = null) {
     // optimization: using ES6 map would be more efficient!

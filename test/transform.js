@@ -891,3 +891,14 @@ test('transform tree (dynamic tags - peek / rebuild)', function(t) {
 
 	t.end();
 });
+
+test('doc example 1 - substitute vars', function(t) {
+	
+	const appState = m.observable({
+		config: "Hi $USER,\n\nWelcome to the world of $WORLD",
+		lines: function() {
+			
+		}
+	})
+	
+});
