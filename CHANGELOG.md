@@ -1,3 +1,7 @@
+# 1.1.7
+
+* Fixed #77: package consumers with --noImplicitAny should be able to build
+
 # 1.1.6
 
 * Introduced `mobservable.fastArray(array)`, in addition to `mobservable.observable(array)`. Which is much faster when adding items but doesn't support enumerability (`for (var idx in ar) ..` loops).
