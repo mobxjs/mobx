@@ -1,22 +1,23 @@
 /// <reference path='require.d.ts' />
+/// <reference path='tape.d.ts' />
 import {
     observable, asStructure, autorun, autorunAsync, extendObservable, 
     IObservableArray, IArrayChange, IArraySplice, IObservableValue,
     extras
 } from "../lib/index";
-const test = require('tape')
+import * as test from 'tape';
 
 var v = observable(3);
 v.observe(() => {});
 
 var a = observable([1,2,3]);
 
-var testFunction = function(a) {};
+var testFunction = function(a:any) {};
 
 class Order {
     @observable price:number = 3;
     @observable amount:number = 2;
-    @observable orders = [];
+    @observable orders:string[] = [];
     @observable aFunction = testFunction;
     @observable someStruct = asStructure({ x: 1, y: 2});
 
@@ -38,7 +39,7 @@ test('observable', function(t) {
 })
 
 test('annotations', function(t) {
-    var order1totals = [];
+    var order1totals:number[] = [];
     var order1 = new Order();
     var order2 = new Order();
 
@@ -68,7 +69,7 @@ test('annotations', function(t) {
     order1.aFunction = x;
     t.equal(order1.aFunction, x);
     
-    var coords = null;
+    var coords:{x:number, y:number} = null;
     var coordsCalcs = 0;
     var disposer2 = autorun(() => {
         coordsCalcs++;
@@ -103,8 +104,13 @@ test('scope', function(t) {
     t.equal(x.z, 6);
     x.y = 4;
     t.equal(x.z, 8);
+    
+    interface IThing {
+        z: number;
+        y: number;
+    }
 
-    var x2 = function() {
+    const Thing = function() {
         extendObservable(this, {
             y: 3,
             // this will work here
@@ -112,7 +118,7 @@ test('scope', function(t) {
         });
     }
 
-    var x3= new x2();
+    var x3: IThing = new (<any>Thing)();
     t.equal(x3.z, 6);
     x3.y = 4;
     t.equal(x3.z, 8);
@@ -151,7 +157,7 @@ const state:any = observable({
 });
 
 class LoginStoreTest {
-    loggedIn2;
+    loggedIn2: boolean;
     constructor() {
         extendObservable(this, {
             loggedIn2: () => !!state.authToken
@@ -182,7 +188,7 @@ test('issue8', function(t){
 })
 
 class Box {
-    @observable uninitialized;
+    @observable uninitialized:any;
     @observable height = 20;
     @observable sizes = [2];
     @observable someFunc = function () { return 2; }
@@ -194,7 +200,7 @@ class Box {
 test('box', function(t) {
     var box = new Box();
     
-    var ar = []
+    var ar:number[] = []
     
     autorun(() => {
         ar.push(box.width);
