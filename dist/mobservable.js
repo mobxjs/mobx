@@ -181,9 +181,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return new AsFlat(value);
 	}
 	exports.asFlat = asFlat;
-	function isObservable(value) {
+	function isObservable(value, property) {
 	    if (value === null || value === undefined)
 	        return false;
+	    if (property !== undefined) {
+	        if (value instanceof observablemap_1.ObservableMap || value instanceof observablearray_1.ObservableArray)
+	            throw new Error("[mobservable.isObservable] isObservable(object, propertyName) is not supported for arrays and maps. Use map.has or array.length instead.");
+	        else if (value.$mobservable instanceof observableobject_1.ObservableObject) {
+	            var o = value.$mobservable;
+	            return o.values && !!o.values[property];
+	        }
+	        return false;
+	    }
 	    return !!value.$mobservable || value instanceof dnode_2.DataNode;
 	}
 	exports.isObservable = isObservable;
@@ -566,17 +575,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return thing instanceof observablemap_1.ObservableMap;
 	}
 	exports.isObservableMap = isObservableMap;
-	function observe(thing, listener) {
+	function observe(thing, property, listener) {
+	    if (arguments.length === 2) {
+	        listener = property;
+	        property = undefined;
+	    }
 	    if (typeof thing === "function") {
 	        console.error("[mobservable.observe] is deprecated in combination with a function, use 'mobservable.autorun' instead");
 	        return autorun(thing);
 	    }
 	    if (typeof listener !== "function")
 	        throw new Error("[mobservable.observe] expected second argument to be a function");
-	    if (isObservableArray(thing) || isObservableMap(thing))
+	    if (isObservableArray(thing))
 	        return thing.observe(listener);
-	    if (isObservableObject(thing))
+	    if (isObservableMap(thing)) {
+	        if (property) {
+	            if (!thing._has(property))
+	                throw new Error("[mobservable.observe] the provided observable map has no key with name: " + property);
+	            return thing._data[property].observe(listener);
+	        }
+	        else {
+	            return thing.observe(listener);
+	        }
+	    }
+	    if (isObservableObject(thing)) {
+	        if (property) {
+	            if (!isObservable(thing, property))
+	                throw new Error("[mobservable.observe] the provided object has no observable property with name: " + property);
+	            return thing.$mobservable.values[property].observe(listener);
+	        }
 	        return thing.$mobservable.observe(listener);
+	    }
 	    if (utils_1.isPlainObject(thing))
 	        return observable(thing).$mobservable.observe(listener);
 	    throw new Error("[mobservable.observe] first argument should be an observable array, observable map, observable object or plain object.");
@@ -868,19 +897,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	var utils_1 = __webpack_require__(7);
 	var core_1 = __webpack_require__(1);
 	function getDNode(thing, property) {
-	    if (!core_1.isObservable(thing))
-	        throw new Error("[mobservable.getDNode] " + thing + " doesn't seem to be reactive");
-	    if (property !== undefined) {
-	        var dnode;
-	        if (thing instanceof observablemap_1.ObservableMap)
-	            dnode = thing._data[property];
-	        else if (thing.$mobservable instanceof observableobject_1.ObservableObject) {
-	            var o = thing.$mobservable;
-	            dnode = o.values && o.values[property];
-	        }
+	    var propError = "[mobservable.getDNode] property '" + property + "' of '" + thing + "' doesn't seem to be a reactive property";
+	    if (thing instanceof observablemap_1.ObservableMap && property) {
+	        var dnode = thing._data[property];
 	        if (!dnode)
-	            throw new Error("[mobservable.getDNode] property '" + property + "' of '" + thing + "' doesn't seem to be a reactive property");
+	            throw new Error(propError);
 	        return dnode;
+	    }
+	    if (!core_1.isObservable(thing, property)) {
+	        if (property)
+	            throw new Error(propError);
+	        throw new Error("[mobservable.getDNode] " + thing + " doesn't seem to be reactive");
+	    }
+	    if (property !== undefined) {
+	        if (thing.$mobservable instanceof observableobject_1.ObservableObject)
+	            return thing.$mobservable.values[property];
+	        throw new Error(propError);
 	    }
 	    if (thing instanceof dnode_1.DataNode)
 	        return thing;

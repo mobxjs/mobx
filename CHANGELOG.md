@@ -1,3 +1,7 @@
+# 1.1.8
+
+* Implemented #59, `isObservable` and `observe` now support a property name as second param to observe individual values on maps and objects.
+
 # 1.1.7
 
 * Fixed #77: package consumers with --noImplicitAny should be able to build
