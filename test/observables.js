@@ -34,6 +34,7 @@ test('basic2', function(t) {
     var z = observable(function () { return x() * 2});
     var y = observable(function () { return x() * 3});
 
+    debugger;
     z.observe(voidObserver);
 
     t.equal(z(), 6);

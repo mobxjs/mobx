@@ -163,8 +163,8 @@ export class ObservableValue<T> implements IObservable {
 		if (changed) {
 			this.markStale();
 			this.value = makeChildObservable(newValue, this.mode, this.name);
-			this.changeEvent.emit(this.value, oldValue);
 			this.markReady(true);
+			this.changeEvent.emit(this.value, oldValue);
 		}
 	}
 	
@@ -209,6 +209,7 @@ export class DerivedValue<T> implements IObservable, IObserver {
 	protected changeEvent = new SimpleEventEmitter(); // TODO: initialize lazily
 	protected value: T;
 
+	// TODO: bind derivation immediately, don't store scope
 	constructor(protected derivation:()=>T, private scope: Object, public name:string, private compareStructural: boolean) {
 		if (!this.name)
 			this.name = "DerivedValue#" + this.id;
@@ -248,29 +249,27 @@ export class DerivedValue<T> implements IObservable, IObserver {
 	}
 
 	get(): T {
+		// TODO: support in-transaction lazy inspection of the value
 		if (this.isComputing)
 			throw new Error(`[DerivedValue '${this.name}'] Cycle detected`);
-		let result;
 		if (this.isLazy) {
 			if (isComputingView()) {
 				// somebody depends on the outcome of this computation
 				this.wakeUp(); // note: wakeup triggers a compute if needed
 				markObservableAsObserved(this);
-				result = this.value;
 			} else {
 				// nobody depends on this computable;
 				// so just compute fresh value and continue to sleep
-				result = this.compute(false, false);
+				this.compute(false, false);
 			}
 		} else {
 			// we are already up to date, somebody is just inspecting our current value
 			markObservableAsObserved(this);
-			result = this.value;
 		}
 	
 		if (this.hasCycle) // TODO: is this check needed? and for which branches? otherwise this function can be simpler
 			throw new Error(`[DerivedValue '${this.name}'] Cycle detected`);
-		return result;
+		return this.value;
 	}
 	
 	set(x) {
@@ -290,7 +289,7 @@ export class DerivedValue<T> implements IObservable, IObserver {
 	wakeUp() {
 		if (this.isLazy) {
 			this.isLazy = false;
-			this.value = this.compute(true, false);
+			this.compute(true, false);
 		}
 	}
 
@@ -305,42 +304,41 @@ export class DerivedValue<T> implements IObservable, IObserver {
 				this.dependencyChangeCount += 1;
 			if (--this.dependencyStaleCount === 0) { // all dependencies are ready
 				// did any of the observables really change?
-				if (this.dependencyChangeCount > 0)
-					this.value = this.compute(true, true);
-				else
+				if (this.dependencyChangeCount > 0) {
+					this.dependencyChangeCount = 0;
+					this.compute(true, true);
+				} else
 					// we're done, but didn't change, lets make sure verybody knows..
 					this.markReady(false);
-				this.dependencyChangeCount = 0;
 			}
 		}
 	}
 
-	compute(track:boolean, markReady:boolean): T {
-		this.trackDependencies();
+	compute(track:boolean, markReady:boolean) {
+		if (track)
+			this.trackDependencies();
 		if (transitionTracker)
 			reportTransition(this, "PENDING");
 		var hasError = true;
-		var stateDidChange;
 		var oldValue = this.value;
-		var result : T;
 		try {
 			this.isComputing = true;
-			withStrict(this.externalRefenceCount === 0, () => { // TODO: always with strict once autorun has own derivable
-				result = this.derivation.call(this.scope);
-			});
+			// TODO: strict check withStrict(this.externalRefenceCount === 0, () => { // TODO: always with strict once autorun has own derivable
+			this.value = this.derivation.call(this.scope);
+			// });
 			hasError = false;
-			return result;
 		} finally {
 			if (hasError)
 				// TODO: merge with computable view, use this.func.toString
 				console.error(`[DerivedValue '${this.name}'] There was an uncaught error during the computation of a derived value. Please check the next exception.`);
 			this.isComputing = false
-			this.bindDependencies();
-			const changed = valueDidChange(this.compareStructural, this.value, result)
+			if (track)
+				this.bindDependencies();
+			const changed = valueDidChange(this.compareStructural, this.value, oldValue)
 			if (markReady)
 				this.markReady(changed);
 			if (changed)
-				this.changeEvent.emit(result, oldValue);
+				this.changeEvent.emit(this.value, oldValue);
 		}
 	}
 
