@@ -9,3 +9,4 @@ src/
 test/
 webpack.*.js
 tsconfig.json
+.vscode
