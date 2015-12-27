@@ -7,9 +7,9 @@ It is available through the separate `mobservable-react` package.
 ```javascript
 import {observer} from "mobservable-react";
 
-var timerData = {
+var timerData = observable({
 	secondsPassed: 0
-};
+});
 
 setInterval(function() {
 	timerData.secondsPassed++;
