@@ -19,15 +19,15 @@ You can also use it to prevent that plain objects or arrays are made observable 
 var test = observable({
 	x : 3,
 	doubler: function() {
-		return this.x;
+		return this.x*2;
 	},
 	someFunc: asReference(function() {
 		return this.x;
 	})
 });
 
-test.doubler; // === 6
-test.someFunc; // still a function
+console.log(test.doubler); // === 6
+console.log(test.someFunc); // still a function
 ```
 
 ## asStructure
