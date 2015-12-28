@@ -5,7 +5,8 @@ import {isObservable, autorun} from './core';
 
 export type ITransformer<A, B> = (object: A) => B;
 
-export function createTransformer<A, B>(transformer: (object: A) => B, onCleanup?: (object: A, result?: B) => void): ITransformer<A, B> {
+// TODO: swap A & B
+export function createTransformer<A, B>(transformer: ITransformer<A,B>, onCleanup?: (object: A, result?: B) => void): ITransformer<A, B> {
 	if (typeof transformer !== "function" || transformer.length !== 1)
 		throw new Error("[mobservable] transformer parameter should be a function that accepts one argument");
 
@@ -13,7 +14,7 @@ export function createTransformer<A, B>(transformer: (object: A) => B, onCleanup
 	const objectCache : {[id:number]: ObservableView<B>} = {};
 
 	return (object: A) => {
-		const identifier = getId(object);
+		const identifier = getMemoizationId(object);
 		let reactiveTransformer = objectCache[identifier];
 		if (reactiveTransformer)
 			return reactiveTransformer.get();
@@ -32,14 +33,14 @@ export function createTransformer<A, B>(transformer: (object: A) => B, onCleanup
 			if (onCleanup)
 				onCleanup(object, lastValue);
 		});
-		
+
 		return reactiveTransformer.get();
 	};
 }
 
 let transformId = 0;
 
-function getId(object) {
+function getMemoizationId(object) {
 	if (object === null  || typeof object !== "object")
 		throw new Error("[mobservable] transform expected some kind of object, got: " + object);
 	var tid = object.$transformId;
