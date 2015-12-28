@@ -1,55 +1,55 @@
 {
-  "name": "mobservable",
-  "version": "1.1.3",
-  "description": "Observable data. Reactive functions. Simple code.",
-  "main": "lib/index.js",
-  "typings": "lib/index.d.ts",
-  "scripts": {
-    "test": "npm run buildtest && tape test/*.js",
-    "test-browser": "npm run buildtest && ( browserify test/*.js | tape-run )",
-    "test-travis": "npm run clean && npm run test-browser && istanbul cover tape test/*.js",
-    "coverage": "npm run buildtest && istanbul cover tape test/*.js && cat ./coverage/lcov.info|coveralls",
-    "perf": "npm run build && time tape test/perf/*.js",
-    "prepublish": "npm run clean && npm run build-dist",
-    "clean": "rm -rf lib/ dist/",
-    "build": "tsc",
-    "clean-build": "npm run clean && npm run build",
-    "build-dist": "npm run build && webpack && uglifyjs --in-source-map dist/mobservable.js.map -s dist/mobservable.js --source-map dist/mobservable.min.js.map -o dist/mobservable.min.js",
-    "buildtest": "npm run build && npm run build-typescript-tests && npm run build-babel-tests",
-    "build-typescript-tests": "tsc -m commonjs -t es5 --experimentalDecorators --outDir test test/typescript-tests.ts",
-    "build-babel-tests": "babel --stage 0 test/babel/babel-tests.js -o test/babel-tests.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mweststrate/mobservable.git"
-  },
-  "author": "Michel Weststrate",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/mweststrate/mobservable/issues"
-  },
-  "homepage": "https://mweststrate.github.io/mobservable",
-  "devDependencies": {
-    "babel": "^5.8.23",
-    "browserify": "^12.0.1",
-    "coveralls": "^2.11.4",
-    "istanbul": "^0.3.21",
-    "lodash.intersection": "^3.2.0",
-    "tape": "^4.2.2",
-    "tape-run": "^2.1.0",
-    "typescript": "^1.6.2",
-    "uglify-js": "^2.5.0",
-    "webpack": "^1.12.2"
-  },
-  "keywords": [
-    "mobservable",
-    "observable",
-    "react-component",
-    "react",
-    "reactjs",
-    "reactive",
-    "model",
-    "frp",
-    "functional-reactive-programming"
-  ]
+    "name": "mobservable",
+    "version": "1.1.8",
+    "description": "Observable data. Reactive functions. Simple code.",
+    "main": "lib/index.js",
+    "typings": "lib/index.d.ts",
+    "scripts": {
+        "test": "npm run buildtest && tape test/*.js",
+        "test-browser": "npm run buildtest && ( browserify test/*.js | tape-run )",
+        "test-travis": "npm run clean && npm run test-browser && istanbul cover tape test/*.js",
+        "coverage": "npm run buildtest && istanbul cover tape test/*.js && cat ./coverage/lcov.info|coveralls",
+        "perf": "npm run build && time tape test/perf/*.js",
+        "prepublish": "npm run clean && npm run build-dist",
+        "clean": "rm -rf lib/ dist/",
+        "build": "tsc",
+        "clean-build": "npm run clean && npm run build",
+        "build-dist": "npm run build && webpack && uglifyjs --in-source-map dist/mobservable.js.map -s dist/mobservable.js --source-map dist/mobservable.min.js.map -o dist/mobservable.min.js",
+        "buildtest": "npm run build && npm run build-typescript-tests && npm run build-babel-tests",
+        "build-typescript-tests": "tsc -m commonjs -t es5 --experimentalDecorators --noImplicitAny --outDir test test/typescript-tests.ts",
+        "build-babel-tests": "babel --stage 0 test/babel/babel-tests.js -o test/babel-tests.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mweststrate/mobservable.git"
+    },
+    "author": "Michel Weststrate",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/mweststrate/mobservable/issues"
+    },
+    "homepage": "https://mweststrate.github.io/mobservable",
+    "devDependencies": {
+        "babel": "^5.8.23",
+        "browserify": "^12.0.1",
+        "coveralls": "^2.11.4",
+        "istanbul": "^0.3.21",
+        "lodash.intersection": "^3.2.0",
+        "tape": "^4.2.2",
+        "tape-run": "^2.1.0",
+        "typescript": "^1.6.2",
+        "uglify-js": "^2.5.0",
+        "webpack": "^1.12.2"
+    },
+    "keywords": [
+        "mobservable",
+        "observable",
+        "react-component",
+        "react",
+        "reactjs",
+        "reactive",
+        "model",
+        "frp",
+        "functional-reactive-programming"
+    ]
 }

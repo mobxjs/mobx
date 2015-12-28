@@ -13,6 +13,8 @@
 <br/>
 * New to Mobservable? Take the [five minute, interactive introduction](https://mweststrate.github.io/mobservable/getting-started.html)
 * [Official documentation](https://mweststrate.github.io/mobservable/)
+* Mobservable talk on [Reactive2015](https://www.youtube.com/watch?v=FEwLwiizlk0)
+
 
 ## Introduction
 
@@ -22,7 +24,7 @@ It's like Excel for JavaScript: any data structure can be turned into a 'data ce
 Mobservable is unopiniated about which data structures to use;
 it can work with mutable objects, arrays, (cyclic) references, classes etc.
 So that your actions, stores and user interface can remain KISS.
-Besides that, it is [fast](mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/).
+Besides that, it is [fast](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/).
 
 ## The essentials
 

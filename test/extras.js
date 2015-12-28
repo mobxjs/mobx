@@ -26,6 +26,12 @@ test('getDNode', function(t) {
     t.throws(function() {
         getD(Object.assign(m.observable({ x: 3}), { y:2}), "y");
     });
+    t.throws(function() {
+        getD(m.map());
+    });
+    t.throws(function() {
+        getD(m.map({}), "a");
+    });
 
     t.ok(getD(m.observable([])));
     t.ok(getD(m.observable({x:3}), "x"));
@@ -33,6 +39,7 @@ test('getDNode', function(t) {
     t.ok(getD(m.observable({x:function() { return 3 }}), "x"));
     t.ok(getD(m.observable(function() {})));
     t.ok(getD(mobservable.autorun(function() {})));
+    t.ok(getD(m.map({a: 1}), "a"));
 
     var a;
     a = m.observable({x:{}});

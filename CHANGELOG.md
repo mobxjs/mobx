@@ -1,3 +1,24 @@
+# 1.1.8
+
+* Implemented #59, `isObservable` and `observe` now support a property name as second param to observe individual values on maps and objects.
+
+# 1.1.7
+
+* Fixed #77: package consumers with --noImplicitAny should be able to build
+
+# 1.1.6
+
+* Introduced `mobservable.fastArray(array)`, in addition to `mobservable.observable(array)`. Which is much faster when adding items but doesn't support enumerability (`for (var idx in ar) ..` loops).
+* Introduced `observableArray.peek()`, for fast access to the array values. Should be used read-only.
+
+# 1.1.5
+
+* Fixed 71: transactions should not influence running computations
+
+# 1.1.4
+
+* Fixed #65; illegal state exception when using a transaction inside a reactive function. Credits: @kmalakoff
+
 # 1.1.3
 
 * Fixed #61; if autorun was created during a transaction, postpone execution until the end of the transaction
