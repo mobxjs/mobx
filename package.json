@@ -1,6 +1,6 @@
 {
     "name": "mobservable",
-    "version": "1.1.4",
+    "version": "1.2.0",
     "description": "Observable data. Reactive functions. Simple code.",
     "main": "lib/index.js",
     "typings": "lib/index.d.ts",
@@ -16,7 +16,7 @@
         "clean-build": "npm run clean && npm run build",
         "build-dist": "npm run build && webpack && uglifyjs --in-source-map dist/mobservable.js.map -s dist/mobservable.js --source-map dist/mobservable.min.js.map -o dist/mobservable.min.js",
         "buildtest": "npm run build && npm run build-typescript-tests && npm run build-babel-tests",
-        "build-typescript-tests": "tsc -m commonjs -t es5 --experimentalDecorators --outDir test test/typescript-tests.ts",
+        "build-typescript-tests": "tsc -m commonjs -t es5 --experimentalDecorators --noImplicitAny --outDir test test/typescript-tests.ts",
         "build-babel-tests": "babel --stage 0 test/babel/babel-tests.js -o test/babel-tests.js"
     },
     "repository": {
@@ -34,6 +34,7 @@
         "browserify": "^12.0.1",
         "coveralls": "^2.11.4",
         "istanbul": "^0.3.21",
+        "lodash.intersection": "^3.2.0",
         "tape": "^4.2.2",
         "tape-run": "^2.1.0",
         "typescript": "^1.6.2",

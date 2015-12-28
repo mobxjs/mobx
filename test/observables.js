@@ -1411,3 +1411,54 @@ test('issue 65; transaction causing transaction', function(t) {
     t.equal(res, 15);
     t.end();
 });
+
+test('issue 71, transacting running transformation', function(t) {
+    var state = mobservable.observable({
+        things: []
+    });
+    
+    function Thing(value) {
+        mobservable.extendObservable(this, {
+            value: value,
+            pos: function() {
+                return state.things.indexOf(this);
+            },
+            isVisible: function() {
+                return this.pos !== -1;
+            }
+        });
+
+        mobservable.observeUntil(function() {
+            return this.isVisible;
+        }, function() {
+            if (this.pos < 4)
+                state.things.push(new Thing(value + 1));
+        }, this);
+    }
+    
+    var copy;
+    var vSum;
+    mobservable.autorun(function() {
+        copy = state.things.map(function(thing) { return thing.value });
+        vSum = state.things.reduce(function(a, thing) {
+            return a  + thing.value
+        }, 0);
+    });
+    
+    t.deepEqual(copy, []);
+    
+    mobservable.transaction(function() {
+        state.things.push(new Thing(1));
+    });
+    
+    t.deepEqual(copy, [1,2,3,4,5]);
+    t.equal(vSum, 15);
+    
+    state.things.splice(0,2);
+    state.things.push(new Thing(6));
+
+    t.deepEqual(copy, [3,4,5,6,7]);
+    t.equal(vSum, 25);
+    
+    t.end();
+});

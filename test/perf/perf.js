@@ -176,7 +176,7 @@ test('array reduce', function(t) {
     var start = now();
 
     for(var i = 0; i < 1000; i++)
-    ar.push(i);
+        ar.push(i);
 
     t.equal(499500, sum());
     t.equal(1001, aCalc);
@@ -330,19 +330,26 @@ test('order system batched lazy', function(t) {
     order_system_helper(t, true, false);
 })
 
-function test_array_creation(t, amount, size) {
+test('create array', function(t) {
     var a = [];
-    for(var i = 0; i < size; i++)
+    for(var i = 0; i < 1000; i++)
         a.push(i);
     var start = now();
-    for(var i = 0; i < amount; i++)
+    for(var i = 0; i < 1000; i++)
         observable(a);
     console.log('\n  Created in ' + (now() - start) + 'ms.');
     t.end();
-};
+})
 
-test('create array', function(t) {
-    test_array_creation(t, 1000, 1000);
+test('create array (fast)', function(t) {
+    var a = [];
+    for(var i = 0; i < 1000; i++)
+        a.push(i);
+    var start = now();
+    for(var i = 0; i < 1000; i++)
+        mobservable.fastArray(a);
+    console.log('\n  Created in ' + (now() - start) + 'ms.');
+    t.end();
 })
 
 function now() {

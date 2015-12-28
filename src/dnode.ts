@@ -208,6 +208,7 @@ export class DerivedValue<T> implements IObservable, IObserver {
 	externalRefenceCount = 0;      // nr of 'things' that depend on us, excluding other DNode's. If > 0, this node will not go to sleep
 	protected changeEvent = new SimpleEventEmitter(); // TODO: initialize lazily
 	protected value: T;
+	onSleepEmitter: SimpleEventEmitter;
 
 	// TODO: bind derivation immediately, don't store scope
 	constructor(protected derivation:()=>T, private scope: Object, public name:string, private compareStructural: boolean) {
@@ -282,9 +283,17 @@ export class DerivedValue<T> implements IObservable, IObserver {
 				this.observing[i].removeObserver(this);
 			this.observing = [];
 			this.isLazy = true;
+			if (this.onSleepEmitter)
+				this.onSleepEmitter.emit(this.value);
 			this.value = undefined;
 		}
 	}
+
+    public onceSleep(onSleep: (lastValue:any) => void) {
+        if (this.onSleepEmitter === null)
+            this.onSleepEmitter = new SimpleEventEmitter();
+        this.onSleepEmitter.once(onSleep);
+    }
 
 	wakeUp() {
 		if (this.isLazy) {

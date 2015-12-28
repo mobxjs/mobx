@@ -4,7 +4,7 @@
  * https://github.com/mweststrate/mobservable
  */
 
-import {isComputingView, transaction, runAfterTransaction, IObservable} from './dnode';
+import {isComputingView, transaction, runAfterTransaction, IObservable, untracked} from './dnode';
 import {Lambda, IObservableArray, IObservableValue, IArrayChange, IArraySplice, IObjectChange} from './interfaces';
 import {isPlainObject, once, deepEquals} from './utils';
 import {DerivedValue, ObservableValue} from './dnode';
@@ -67,6 +67,10 @@ export function map<V>(initialValues?: KeyValueMap<V>, valueModifier?: Function)
     return new ObservableMap(initialValues, valueModifier);
 }
 
+export function fastArray<V>(initialValues?: V[]): IObservableArray<V> {
+    return createObservableArray(initialValues, ValueMode.Flat, false, null);
+}
+
 /**
     * Can be used in combination with makeReactive / extendReactive.
     * Enforces that a reference to 'value' is stored as property,
@@ -108,9 +112,18 @@ export function asFlat<T>(value:T):T {
     * @param value object, function or array
     * @param propertyName if propertyName is specified, checkes whether value.propertyName is reactive.
     */
-export function isObservable(value):boolean {
+export function isObservable(value, property?:string):boolean {
     if (value === null || value === undefined)
         return false;
+    if (property !== undefined) {
+        if (value instanceof ObservableMap || value instanceof ObservableArray)
+            throw new Error("[mobservable.isObservable] isObservable(object, propertyName) is not supported for arrays and maps. Use map.has or array.length instead.");
+        else if (value.$mobservable instanceof ObservableObject) {
+            const o = <ObservableObject>value.$mobservable;
+            return o.values && !!o.values[property];
+        }
+        return false;
+    }
     return !!value.$mobservable || value instanceof ObservableValue || value instanceof DerivedValue;
 }
 
@@ -167,7 +180,7 @@ export function autorunUntil(predicate: ()=>boolean, effect: Lambda, scope?: any
                 disposer();
             else
                 disposeImmediately = true;
-            effect.call(scope);
+            untracked(() => effect.call(scope));
         }
     });
     if (disposeImmediately)
@@ -370,7 +383,6 @@ function observableDecorator(target:Object, key:string, baseDescriptor:PropertyD
 
 /**
     * Basically, a deep clone, so that no reactive property will exist anymore.
-    * Doesn't follow references.
     */
 export function toJSON(source, detectCycles: boolean = true, __alreadySeen:[any,any][] = null) {
     // optimization: using ES6 map would be more efficient!
@@ -546,7 +558,7 @@ export function makeChildObservable(value, parentMode:ValueMode, context) {
 	}
 
 	if (Array.isArray(value))
-		return createObservableArray(<[]> value.slice(), childMode, context);
+		return createObservableArray(<[]> value, childMode, true, context);
 	if (isPlainObject(value))
 		return extendObservableHelper(value, value, childMode, context);
 	return value;
@@ -573,16 +585,37 @@ export function observe<T>(observableArray:IObservableArray<T>, listener:(change
 export function observe<T>(observableMap:ObservableMap<T>, listener:(change:IObjectChange<T, ObservableMap<T>>) => void): Lambda;
 export function observe(func:()=>void): Lambda;
 export function observe<T extends Object>(object:T, listener:(change:IObjectChange<any, T>) => void): Lambda;
-export function observe(thing, listener?):Lambda {
+export function observe<T extends Object,Y>(object:T, prop: string, listener:(newValue:Y, oldValue?: Y) => void): Lambda;
+export function observe(thing, property?, listener?):Lambda {
+    if (arguments.length === 2) {
+        listener = property;
+        property = undefined;
+    }
     if (typeof thing === "function") {
         console.error("[mobservable.observe] is deprecated in combination with a function, use 'mobservable.autorun' instead");
         return autorun(thing);
-    } if (typeof listener !== "function")
+    }
+    if (typeof listener !== "function")
         throw new Error("[mobservable.observe] expected second argument to be a function");
-    if (isObservableArray(thing) || isObservableMap(thing))
+    if (isObservableArray(thing))
         return thing.observe(listener);
-    if (isObservableObject(thing))
+    if (isObservableMap(thing)) {
+        if (property) {
+            if (!thing._has(property))
+                throw new Error("[mobservable.observe] the provided observable map has no key with name: " + property);
+            return thing._data[property].observe(listener);
+        } else {
+            return thing.observe(listener);
+        }
+    }
+    if (isObservableObject(thing)) {
+        if (property) {
+            if (!isObservable(thing, property))
+                throw new Error("[mobservable.observe] the provided object has no observable property with name: " + property);
+            return thing.$mobservable.values[property].observe(listener);
+        }
         return thing.$mobservable.observe(listener);
+    }
     if (isPlainObject(thing))
         return (<any>observable(thing)).$mobservable.observe(listener);
     throw new Error("[mobservable.observe] first argument should be an observable array, observable map, observable object or plain object.");

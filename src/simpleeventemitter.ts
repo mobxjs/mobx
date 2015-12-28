@@ -7,7 +7,7 @@ import {Lambda} from './interfaces';
 import {once} from './utils';
 
 export default class SimpleEventEmitter {
-    listeners:{(data?):void}[] = [];
+    listeners:{(...data: any[]):void}[] = [];
 
     emit(...data:any[]);
     emit() {

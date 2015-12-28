@@ -50,6 +50,11 @@ test('isObservable', function(t) {
     t.equal(m.isObservable(m.observable(function(){})), true);
     t.equal(m.isObservable(m.autorun(function(){})), true);
 
+    t.equal(m.isObservable(m.observable({ a: 1}), "a"), true);
+    t.equal(m.isObservable(m.observable({ a: 1}), "b"), false);
+
+    t.equal(m.isObservable(m.map()), true);
+
     t.end();
 
 })

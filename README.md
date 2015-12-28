@@ -24,7 +24,7 @@ It's like Excel for JavaScript: any data structure can be turned into a 'data ce
 Mobservable is unopiniated about which data structures to use;
 it can work with mutable objects, arrays, (cyclic) references, classes etc.
 So that your actions, stores and user interface can remain KISS.
-Besides that, it is [fast](mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/).
+Besides that, it is [fast](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/).
 
 ## The essentials
 

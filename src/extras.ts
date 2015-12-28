@@ -11,20 +11,24 @@ import {once, unique} from './utils';
 import {isObservable} from './core';
 import {IDependencyTree, ITransitionEvent, IObserverTree, Lambda} from './interfaces';
 
-export function getDNode(thing:any, property?:string): IObservable {
-	if (!isObservable(thing))
-		throw new Error(`[mobservable.getDNode] ${thing} doesn't seem to be reactive`);
-	if (property !== undefined) {
-		var dnode;
-		if (thing instanceof ObservableMap)
-			dnode = thing._data[property];
-		else if (thing.$mobservable instanceof ObservableObject) {
-			const o = <ObservableObject> thing.$mobservable;
-			dnode = o.values && o.values[property];
-		}
+export function getDNode(thing:any, property?:string):IObservable {
+	const propError = `[mobservable.getDNode] property '${property}' of '${thing}' doesn't seem to be a reactive property`;
+
+	if (thing instanceof ObservableMap && property) {
+		const dnode = thing._data[property];
 		if (!dnode)
-			throw new Error(`[mobservable.getDNode] property '${property}' of '${thing}' doesn't seem to be a reactive property`);
+			throw new Error(propError);
 		return dnode;
+	}
+	if (!isObservable(thing, property)) {
+		if (property)
+			throw new Error(propError);
+		throw new Error(`[mobservable.getDNode] ${thing} doesn't seem to be reactive`);
+	}
+	if (property !== undefined) {
+		if (thing.$mobservable instanceof ObservableObject)
+			return thing.$mobservable.values[property];
+		throw new Error(propError);
 	}
 	if (thing instanceof ObservableValue || thing instanceof DerivedValue)
 		return thing;
