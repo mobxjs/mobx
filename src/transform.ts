@@ -5,8 +5,7 @@ import {isObservable, autorun} from './core';
 
 export type ITransformer<A, B> = (object: A) => B;
 
-// TODO: swap A & B
-export function createTransformer<A, B>(transformer: ITransformer<A,B>, onCleanup?: (object: A, result?: B) => void): ITransformer<A, B> {
+export function createTransformer<A, B>(transformer: ITransformer<A,B>, onCleanup?: (resultObject: B, sourceObject?: A) => void): ITransformer<A, B> {
 	if (typeof transformer !== "function" || transformer.length !== 1)
 		throw new Error("[mobservable] transformer parameter should be a function that accepts one argument");
 
@@ -31,7 +30,7 @@ export function createTransformer<A, B>(transformer: ITransformer<A,B>, onCleanu
 		reactiveTransformer.onceSleep((lastValue) => {
 			delete objectCache[identifier];
 			if (onCleanup)
-				onCleanup(object, lastValue);
+				onCleanup(lastValue, object);
 		});
 
 		return reactiveTransformer.get();

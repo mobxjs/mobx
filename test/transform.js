@@ -23,7 +23,7 @@ test('transform1', function(t) {
 	var transformTodo = m.createTransformer(function(todo) {
 		todoCalc++;
 		return todo.title.toUpperCase();
-	}, function cleanup(todo, text) {
+	}, function cleanup(text, todo) {
 		unloaded.push([todo, text]);
 	});
 
@@ -178,7 +178,7 @@ test('transform tree (modifying tree incrementally)', function(t) {
 	var transformNode = m.createTransformer(function(node) {
 		nodeCreateCount++;
 		return new DisplayNode(node);
-	}, function cleanup(node, displayNode) { displayNode.destroy(); }); // KM: maybe the transformed node should be the first argument?
+	}, function cleanup(displayNode, node) { displayNode.destroy(); });
 
 	// transform nodes to renderedNodes
 	m.autorun(function() {
@@ -319,7 +319,7 @@ test('transform tree (modifying tree incrementally)', function(t) {
 	var transformNode = m.createTransformer(function(node) {
 		nodeCreateCount++;
 		return new DisplayNode(node);
-	}, function cleanup(node, displayNode) { displayNode.destroy(); });
+	}, function cleanup(displayNode, node) { displayNode.destroy(); });
 
 	// transform nodes to renderedNodes
 	m.autorun(function() {
@@ -417,7 +417,7 @@ test('transform tree (modifying expanded)', function(t) {
 	var transformNode = m.createTransformer(function(node) {
 		nodeCreateCount++;
 		return new DisplayNode(node);
-	}, function cleanup(node, displayNode) { displayNode.destroy(); });
+	}, function cleanup(displayNode, node) { displayNode.destroy(); });
 
 	// transform nodes to renderedNodes
 	m.autorun(function() {
@@ -528,7 +528,7 @@ test('transform tree (modifying render observable)', function(t) {
 	var transformNode = m.createTransformer(function(node) {
 		nodeCreateCount++;
 		return new DisplayNode(node);
-	}, function cleanup(node, displayNode) { displayNode.destroy(); });
+	}, function cleanup(displayNode, node) { displayNode.destroy(); });
 
 	// transform nodes to renderedNodes
 	m.autorun(function() {
@@ -609,7 +609,7 @@ test('transform tree (modifying render-only observable)', function(t) {
 	var transformNode = m.createTransformer(function(node) {
 		nodeCreateCount++;
 		return new DisplayNode(node);
-	}, function cleanup(node, displayNode) { displayNode.destroy(); });
+	}, function cleanup(displayNode, node) { displayNode.destroy(); });
 
 	// transform nodes to renderedNodes
 	m.autorun(function() {
@@ -690,7 +690,7 @@ test('transform tree (static tags / global filter only)', function(t) {
 	var transformNode = m.createTransformer(function(node) {
 		nodeCreateCount++;
 		return new DisplayNode(node);
-	}, function cleanup(node, displayNode) { displayNode.destroy(); });
+	}, function cleanup(displayNode, node) { displayNode.destroy(); });
 
 	// transform nodes to renderedNodes
 	m.autorun(function() {
@@ -802,7 +802,7 @@ test('transform tree (dynamic tags - peek / rebuild)', function(t) {
 	var transformNode = m.createTransformer(function(node) {
 		nodeCreateCount++;
 		return new DisplayNode(node);
-	}, function cleanup(node, displayNode) { displayNode.destroy(); });
+	}, function cleanup(displayNode, node) { displayNode.destroy(); });
 
 	// transform nodes to renderedNodes
 	m.autorun(function() {
@@ -890,15 +890,4 @@ test('transform tree (dynamic tags - peek / rebuild)', function(t) {
 	t.deepEqual(state.renderedNodes.length, 0);
 
 	t.end();
-});
-
-test('doc example 1 - substitute vars', function(t) {
-	
-	const appState = m.observable({
-		config: "Hi $USER,\n\nWelcome to the world of $WORLD",
-		lines: function() {
-			
-		}
-	})
-	
 });

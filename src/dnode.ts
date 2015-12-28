@@ -298,7 +298,7 @@ export class ViewNode extends DataNode {
         return false;
     }
 
-    public onceSleep(onSleep: (lastValue) => void) {
+    public onceSleep(onSleep: (lastValue:any) => void) {
         if (this.onSleepEmitter === null)
             this.onSleepEmitter = new SimpleEventEmitter();
         this.onSleepEmitter.once(onSleep);

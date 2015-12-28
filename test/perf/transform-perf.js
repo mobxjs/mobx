@@ -186,7 +186,8 @@ test('reactive folder tree', function(t) {
 	
 	var state = m.observable({
 		root: new Folder(null, "root"),
-		filter: null
+		filter: null,
+		displayRoot: null
 	});
 	
 	var transformFolder = m.createTransformer(function (folder) {
