@@ -11,6 +11,7 @@ Accepted objects are:
 * Observable arrays (created using `mobservable.observable(array)`). Possibly emitted event types are `"update"` and `"splice"`.
 * Plain objects will be passed through `mobservable.observable` first. See 'Observable objects' for further details. 
 * Plain arrays are _not_ accepted by `observe`. Pass them through `mobservable.observable` first.
+* Observable object / map + property name (string) can be used to observe a single property.
 
 The function returns a `disposer` function that can be used to cancel the observer.
 
@@ -33,6 +34,11 @@ person.firstName =  "Martin";
 
 disposer();
 // Ignore any future updates
+
+// observe a single field
+const disposer2 = observe(person, "lastName", (newValue, oldValue) => {
+	console.log("LastName changed to ", newValue);
+});
 ```
 
 Note: `transaction` does not affect the working of the `observe` method(s).

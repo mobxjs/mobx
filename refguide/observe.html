@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="3.10" data-basepath=".." data-revision="Tue Dec 22 2015 21:00:55 GMT+0100 (CET)">
+    <div class="book" data-level="3.10" data-basepath=".." data-revision="Mon Dec 28 2015 02:12:55 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -206,7 +206,15 @@
     
         <li class="chapter " data-level="2.5" data-path="refguide/create-transformer.html">
             
-            <span><b>2.5.</b> createTransformer</span>
+                
+                    <a href="../refguide/create-transformer.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.5.</b>
+                        
+                        createTransformer
+                    </a>
             
             
         </li>
@@ -678,6 +686,7 @@ and <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/G
 <li>Observable arrays (created using <code>mobservable.observable(array)</code>). Possibly emitted event types are <code>&quot;update&quot;</code> and <code>&quot;splice&quot;</code>.</li>
 <li>Plain objects will be passed through <code>mobservable.observable</code> first. See &apos;Observable objects&apos; for further details. </li>
 <li>Plain arrays are <em>not</em> accepted by <code>observe</code>. Pass them through <code>mobservable.observable</code> first.</li>
+<li>Observable object / map + property name (string) can be used to observe a single property.</li>
 </ul>
 <p>The function returns a <code>disposer</code> function that can be used to cancel the observer.</p>
 <p>Example:</p>
@@ -697,6 +706,11 @@ person.firstName =  <span class="hljs-string">&quot;Martin&quot;</span>;
 
 disposer();
 <span class="hljs-comment">// Ignore any future updates</span>
+
+<span class="hljs-comment">// observe a single field</span>
+<span class="hljs-keyword">const</span> disposer2 = observe(person, <span class="hljs-string">&quot;lastName&quot;</span>, (newValue, oldValue) =&gt; {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;LastName changed to &quot;</span>, newValue);
+});
 </code></pre>
 <p>Note: <code>transaction</code> does not affect the working of the <code>observe</code> method(s).</p>
 <p>Related blog: <a href="https://medium.com/@mweststrate/object-observe-is-dead-long-live-mobservable-observe-ad96930140c5" target="_blank">Object.observe is dead. Long live Mobservable.observe</a></p>

@@ -26,6 +26,8 @@ So the signature of the return value of `observable` is:
 Example:
 
 ```javascript
+import {observable} from "mobservable";
+
 const cityName = observable("Vienna");
 
 console.log(cityName());
@@ -49,6 +51,7 @@ A new function is returned which has the same signature as the function returned
 
 Example:
 ```javascript
+import {observable} from "mobservable";
 var name = observable("John");
 var age = observable(42);
 var showAge = observable(false);
@@ -103,6 +106,8 @@ This way the complete object (tree) is in-place instrumented to make it observab
 So we can rewrite the previous example as:
 
 ```javascript
+import {observable, autorun} from "mobservable";
+
 var person = observable({
 	name: "John",
 	age: 42,
@@ -113,8 +118,8 @@ var person = observable({
 };
 
 // object properties don't expose an 'observe' method,
-// but don't worry, 'mobservable.observe' is even more powerful
-mobservable.observe(() => console.log(person.labelText));
+// but don't worry, 'mobservable.autorun' is even more powerful
+autorun(() => console.log(person.labelText));
 
 person.name = "Dave";
 // prints: 'Dave'
@@ -140,12 +145,14 @@ Similar to objects, arrays can be made observable using `observable`.
 This works recursively as well, so all (future) values of the array will be observable as well.
 
 ```javascript
+import {observable, autorun} from "mobservable";
+
 var todos = observable([
 	{ title: "Spoil tea", completed: true },
 	{ title: "Make coffee", completed: false }
 ]);
 
-mobservable.observe(() => {
+autorun(() => {
 	console.log("Remaining:", todos
 		.filter(todo => !todo.completed)
 		.map(todo => todo.title)

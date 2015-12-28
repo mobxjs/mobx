@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="2.1" data-basepath=".." data-revision="Tue Dec 22 2015 21:00:55 GMT+0100 (CET)">
+    <div class="book" data-level="2.1" data-basepath=".." data-revision="Mon Dec 28 2015 02:05:52 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -206,7 +206,15 @@
     
         <li class="chapter " data-level="2.5" data-path="refguide/create-transformer.html">
             
-            <span><b>2.5.</b> createTransformer</span>
+                
+                    <a href="../refguide/create-transformer.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.5.</b>
+                        
+                        createTransformer
+                    </a>
             
             
         </li>
@@ -687,7 +695,9 @@ But usually it is more convenient to use <a href="observe.html"><code>mobservabl
 <li><code>func.observe(callback: (newValue, previousValue) =&gt; void, fireImmediately = false): disposerFunction</code>. Registers an observer function that will fire each time the stored value is replaced. Returns a function to cancel the observer.</li>
 </ul>
 <p>Example:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> cityName = observable(<span class="hljs-string">&quot;Vienna&quot;</span>);
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobservable&quot;</span>;
+
+<span class="hljs-keyword">const</span> cityName = observable(<span class="hljs-string">&quot;Vienna&quot;</span>);
 
 <span class="hljs-built_in">console</span>.log(cityName());
 <span class="hljs-comment">// prints &apos;Vienna&apos;</span>
@@ -704,7 +714,8 @@ cityName(<span class="hljs-string">&quot;Amsterdam&quot;</span>);
 Mobservable will make sure that that function is run each time that any of the values used by the function is changed.
 A new function is returned which has the same signature as the function returned for primitives, except that it is not allowed to assign a new value manually.</p>
 <p>Example:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> name = observable(<span class="hljs-string">&quot;John&quot;</span>);
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobservable&quot;</span>;
+<span class="hljs-keyword">var</span> name = observable(<span class="hljs-string">&quot;John&quot;</span>);
 <span class="hljs-keyword">var</span> age = observable(<span class="hljs-number">42</span>);
 <span class="hljs-keyword">var</span> showAge = observable(<span class="hljs-literal">false</span>);
 
@@ -749,7 +760,9 @@ Nonetheless, you will rarely use these forms; using objects is just a tat more c
 Mobservable will recursively pass all its values through <code>observable</code>.
 This way the complete object (tree) is in-place instrumented to make it observable.</p>
 <p>So we can rewrite the previous example as:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> person = observable({
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, autorun} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobservable&quot;</span>;
+
+<span class="hljs-keyword">var</span> person = observable({
     name: <span class="hljs-string">&quot;John&quot;</span>,
     age: <span class="hljs-number">42</span>,
     showAge: <span class="hljs-literal">false</span>,
@@ -759,8 +772,8 @@ This way the complete object (tree) is in-place instrumented to make it observab
 };
 
 <span class="hljs-comment">// object properties don&apos;t expose an &apos;observe&apos; method,</span>
-<span class="hljs-comment">// but don&apos;t worry, &apos;mobservable.observe&apos; is even more powerful</span>
-mobservable.observe(() =&gt; <span class="hljs-built_in">console</span>.log(person.labelText));
+<span class="hljs-comment">// but don&apos;t worry, &apos;mobservable.autorun&apos; is even more powerful</span>
+autorun(() =&gt; <span class="hljs-built_in">console</span>.log(person.labelText));
 
 person.name = <span class="hljs-string">&quot;Dave&quot;</span>;
 <span class="hljs-comment">// prints: &apos;Dave&apos;</span>
@@ -782,12 +795,14 @@ However, if a function expression (ES6 / typescript) is used, <code>this</code> 
 <h2 id="arrays">Arrays</h2>
 <p>Similar to objects, arrays can be made observable using <code>observable</code>.
 This works recursively as well, so all (future) values of the array will be observable as well.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> todos = observable([
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, autorun} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobservable&quot;</span>;
+
+<span class="hljs-keyword">var</span> todos = observable([
     { title: <span class="hljs-string">&quot;Spoil tea&quot;</span>, completed: <span class="hljs-literal">true</span> },
     { title: <span class="hljs-string">&quot;Make coffee&quot;</span>, completed: <span class="hljs-literal">false</span> }
 ]);
 
-mobservable.observe(() =&gt; {
+autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Remaining:&quot;</span>, todos
         .filter(todo =&gt; !todo.completed)
         .map(todo =&gt; todo.title)

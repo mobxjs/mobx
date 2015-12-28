@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="2.3" data-basepath=".." data-revision="Tue Dec 22 2015 21:00:55 GMT+0100 (CET)">
+    <div class="book" data-level="2.3" data-basepath=".." data-revision="Mon Dec 28 2015 02:12:55 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -206,7 +206,15 @@
     
         <li class="chapter " data-level="2.5" data-path="refguide/create-transformer.html">
             
-            <span><b>2.5.</b> createTransformer</span>
+                
+                    <a href="../refguide/create-transformer.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.5.</b>
+                        
+                        createTransformer
+                    </a>
             
             
         </li>
@@ -672,9 +680,9 @@ It wraps the component&apos;s render function in <code>mobservable.autorun</code
 It is available through the separate <code>mobservable-react</code> package.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobservable-react&quot;</span>;
 
-<span class="hljs-keyword">var</span> timerData = {
+<span class="hljs-keyword">var</span> timerData = observable({
     secondsPassed: <span class="hljs-number">0</span>
-};
+});
 
 setInterval(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
     timerData.secondsPassed++;

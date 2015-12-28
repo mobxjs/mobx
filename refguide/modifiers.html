@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="3.9" data-basepath=".." data-revision="Tue Dec 22 2015 21:00:55 GMT+0100 (CET)">
+    <div class="book" data-level="3.9" data-basepath=".." data-revision="Mon Dec 28 2015 02:05:52 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -206,7 +206,15 @@
     
         <li class="chapter " data-level="2.5" data-path="refguide/create-transformer.html">
             
-            <span><b>2.5.</b> createTransformer</span>
+                
+                    <a href="../refguide/create-transformer.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.5.</b>
+                        
+                        createTransformer
+                    </a>
             
             
         </li>
@@ -682,15 +690,15 @@ You can also use it to prevent that plain objects or arrays are made observable 
 <span class="hljs-keyword">var</span> test = observable({
     x : <span class="hljs-number">3</span>,
     doubler: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.x;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.x*<span class="hljs-number">2</span>;
     },
     someFunc: asReference(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
         <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.x;
     })
 });
 
-test.doubler; <span class="hljs-comment">// === 6</span>
-test.someFunc; <span class="hljs-comment">// still a function</span>
+<span class="hljs-built_in">console</span>.log(test.doubler); <span class="hljs-comment">// === 6</span>
+<span class="hljs-built_in">console</span>.log(test.someFunc); <span class="hljs-comment">// still a function</span>
 </code></pre>
 <h2 id="asstructure">asStructure</h2>
 <p>Can be used on non-cyclic, plain javascript values.
