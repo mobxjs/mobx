@@ -1,3 +1,7 @@
+# 1.2.0
+
+* Implemented #67: Reactive graph transformations. See: http://mweststrate.github.io/mobservable/refguide/create-transformer.html
+
 # 1.1.8
 
 * Implemented #59, `isObservable` and `observe` now support a property name as second param to observe individual values on maps and objects.

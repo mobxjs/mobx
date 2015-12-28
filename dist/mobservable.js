@@ -86,6 +86,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.extendReactive = core_1.extendObservable;
 	exports.observeUntil = core_1.autorunUntil;
 	exports.observeAsync = core_1.autorunAsync;
+	var transform_1 = __webpack_require__(12);
+	exports.createTransformer = transform_1.createTransformer;
 	var dnode_2 = __webpack_require__(2);
 	exports.untracked = dnode_2.untracked;
 	exports.transaction = dnode_2.transaction;
@@ -760,6 +762,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.prevObserving = null;
 	        this.dependencyChangeCount = 0;
 	        this.dependencyStaleCount = 0;
+	        this.onSleepEmitter = null;
 	    }
 	    ViewNode.prototype.setRefCount = function (delta) {
 	        var rc = this.externalRefenceCount += delta;
@@ -778,6 +781,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.observing[i].removeObserver(this);
 	            this.observing = [];
 	            this.isSleeping = true;
+	            if (this.onSleepEmitter !== null)
+	                this.onSleepEmitter.emit(this._value);
 	        }
 	    };
 	    ViewNode.prototype.wakeUp = function () {
@@ -862,6 +867,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return true;
 	        return false;
 	    };
+	    ViewNode.prototype.onceSleep = function (onSleep) {
+	        if (this.onSleepEmitter === null)
+	            this.onSleepEmitter = new simpleeventemitter_1.default();
+	        this.onSleepEmitter.once(onSleep);
+	    };
 	    ViewNode.prototype.dispose = function () {
 	        if (this.observing)
 	            for (var l = this.observing.length, i = 0; i < l; i++)
@@ -883,6 +893,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var core_1 = __webpack_require__(1);
 	var extras_1 = __webpack_require__(3);
 	var utils_1 = __webpack_require__(7);
+	var simpleeventemitter_1 = __webpack_require__(6);
 	//# sourceMappingURL=dnode.js.map
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
@@ -1766,7 +1777,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var ObservableMap = (function () {
 	    function ObservableMap(initialData, valueModeFunc) {
 	        var _this = this;
-	        this.$mobservable = true;
+	        this.$mobservable = {};
 	        this._data = {};
 	        this._hasMap = {};
 	        this._keys = new observablearray_1.ObservableArray(null, core_1.ValueMode.Reference, false, {
@@ -1929,6 +1940,47 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	//# sourceMappingURL=interfaces.js.map
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var observableview_1 = __webpack_require__(5);
+	function createTransformer(transformer, onCleanup) {
+	    var _this = this;
+	    if (typeof transformer !== "function" || transformer.length !== 1)
+	        throw new Error("[mobservable] transformer parameter should be a function that accepts one argument");
+	    var objectCache = {};
+	    return function (object) {
+	        var identifier = getMemoizationId(object);
+	        var reactiveTransformer = objectCache[identifier];
+	        if (reactiveTransformer)
+	            return reactiveTransformer.get();
+	        reactiveTransformer = objectCache[identifier] = new observableview_1.ObservableView(function () {
+	            return transformer(object);
+	        }, _this, {
+	            object: object,
+	            name: "transformer-" + transformer.name + "-" + identifier
+	        }, false);
+	        reactiveTransformer.onceSleep(function (lastValue) {
+	            delete objectCache[identifier];
+	            if (onCleanup)
+	                onCleanup(lastValue, object);
+	        });
+	        return reactiveTransformer.get();
+	    };
+	}
+	exports.createTransformer = createTransformer;
+	var transformId = 0;
+	function getMemoizationId(object) {
+	    if (object === null || typeof object !== "object")
+	        throw new Error("[mobservable] transform expected some kind of object, got: " + object);
+	    var tid = object.$transformId;
+	    if (tid === undefined)
+	        return object.$transformId = ++transformId;
+	    return tid;
+	}
+	//# sourceMappingURL=transform.js.map
 
 /***/ }
 /******/ ])
