@@ -258,3 +258,57 @@ test('reactive folder tree', function(t) {
 	
 	t.end(); 
 });
+
+var BOX_COUNT = 10000;
+var BOX_MUTATIONS = 100;
+
+test('non-reactive state serialization', function(t) {
+	serializationTester(t, x => x);
+});
+
+test('reactive state serialization', function(t) {
+	serializationTester(t, m.createTransformer);
+});
+
+function serializationTester(t, transformerFactory) {	
+	function Box(x, y) {
+		m.extendObservable(this, {
+			x: x,
+			y: y
+		});
+	}
+	
+	var boxes = m.fastArray();
+	var states = [];
+	
+	var serializeBox = transformerFactory(box => {
+		return { x: box.x, y: box.y };
+	});
+	
+	var serializeBoxes = transformerFactory(boxes => {
+		// NB. would be a lot faster if partitioning or liveMap would be applied..!
+		return boxes.map(serializeBox);
+	})
+	
+	measure("total", () => {
+		measure("create boxes", () => {
+			for(var i = 0; i < BOX_COUNT; i++)
+				boxes.push(new Box(i, i));
+		});
+		
+		m.autorun(() => {
+			states.push(serializeBoxes(boxes));
+		});
+		
+		measure("mutations", () => {
+			for(var i = 0; i < BOX_MUTATIONS; i++)
+				boxes[boxes.length -1 - BOX_MUTATIONS][i % 2 === 0 ? "x" : "y"] = i * 3;
+		});
+		
+		t.equal(boxes.length, BOX_COUNT);
+		t.equal(states.length, BOX_MUTATIONS + 1);
+		t.equal(states[states.length -1].length, BOX_COUNT);	
+	});	
+	
+	t.end();
+}
