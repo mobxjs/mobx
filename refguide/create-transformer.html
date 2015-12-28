@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>extendObservable | Introduction</title>
+        <title>createTransformer | Introduction</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.2.0">
@@ -29,10 +29,10 @@
         
     
     
-    <link rel="next" href="../refguide/extras.html" />
+    <link rel="next" href="../refguide/autorun-async.html" />
     
     
-    <link rel="prev" href="../refguide/expr.html" />
+    <link rel="prev" href="../refguide/observable-decorator.html" />
     
 
         
@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="3.4" data-basepath=".." data-revision="Mon Dec 28 2015 11:38:05 GMT+0100 (CET)">
+    <div class="book" data-level="2.5" data-basepath=".." data-revision="Mon Dec 28 2015 11:38:05 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -204,7 +204,7 @@
             
         </li>
     
-        <li class="chapter " data-level="2.5" data-path="refguide/create-transformer.html">
+        <li class="chapter active" data-level="2.5" data-path="refguide/create-transformer.html">
             
                 
                     <a href="../refguide/create-transformer.html">
@@ -277,7 +277,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="3.4" data-path="refguide/extend-observable.html">
+        <li class="chapter " data-level="3.4" data-path="refguide/extend-observable.html">
             
                 
                     <a href="../refguide/extend-observable.html">
@@ -674,25 +674,139 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/extend-observable.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="extendobservable">extendObservable</h1>
-<p>Quite similar to <code>Object.assign</code>, <code>extendObservable</code> takes two or more arguments, a <code>target</code> object and one or more <code>properties</code> maps.
-It adds all key-value pairs from the properties to the <code>target</code> as observable properties.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> Person = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">firstName, lastName</span>) </span>{
-    <span class="hljs-comment">// initialize observable properties on a new instance</span>
-    extendObservable(<span class="hljs-keyword">this</span>, {
-        firstName: firstName,
-        lastName: lastName
+                        <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/create-transformer.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="createtransformer">createTransformer</h1>
+<p><code>createTransformer&lt;A, B&gt;(transformation: (value: A) =&gt; B, onCleanup?: (result: B, value?: A) =&gt; void): (value: A) =&gt; B</code></p>
+<p><code>createTransformer</code> turns a function (that should transforms one value into another value) into a reactive and memoizing function.
+In other words, if the <code>transformation</code> functions computes B given a specific A, the same B will be returned for all other future invocations of the transformation with the same A.
+However, if A changes, the transformation will be re-applied so that B is updated accordingly.
+And last but not least, if nobody is using the transformation of a specific A anymore, it&apos;s entry will be removed from the memoization table.</p>
+<p>With <code>createTransformer</code> it is very easy to transform a complete data graph into another data graph.
+Transformation functions can be composed so that you can build a tree using lots of small transformations.
+The resulting data graph will never be stale, it will be kept in sync with the source by applying small patches to the result graph.
+This makes it very easy to achieve powerful patterns similar to like sideways data loading, map-reduce, tracking state history using immutable data structures etc...</p>
+<p>The optional <code>onCleanup</code> function can be used to get a notification when a transformation of an object is no longer needed.
+This can be used to dispose resources attached to the result object if needed. </p>
+<p>Always use transformations inside a reaction like <code>@observer</code> or <code>autorun</code>.
+Transformations will, like any other computed value, fall back to lazy evaluation if not observed by something, which sort of defeats their purpose.</p>
+<p>This all might still be a bit vague, so here are two examples that explain this whole idea of transforming one data structure into another by using small, reactive functions:</p>
+<h2 id="tracking-mutable-state-using-immutable-shared-data-structures">Tracking mutable state using immutable, shared data structures.</h2>
+<p>This example is taken from the <a href="https://github.com/mweststrate/mobservable-reactive2015-demo" target="_blank">Reactive2015 conference demo</a>:</p>
+<pre><code class="lang-javascript"><span class="hljs-comment">/*
+    The store that holds our domain: boxes and arrows
+*/</span>
+<span class="hljs-keyword">const</span> store = observable({
+    boxes: [],
+    arrows: [],
+    selection: <span class="hljs-literal">null</span>
+});
+
+<span class="hljs-comment">/**
+    Serialize store to json upon each change and push it onto the states list
+*/</span>
+<span class="hljs-keyword">const</span> states = [];
+
+autorun(() =&gt; {
+    states.push(serializeState(store));
+});
+
+<span class="hljs-keyword">const</span> serializeState = createTransformer(store =&gt; ({
+    boxes: store.boxes.map(serializeBox),
+    arrows: store.arrows.map(serializeArrow),
+    selection: store.selection ? store.selection.id : <span class="hljs-literal">null</span>
+}));
+
+<span class="hljs-keyword">const</span> serializeBox = createTransformer(box =&gt; ({...box}));
+
+<span class="hljs-keyword">const</span> serializeArrow = createTransformer(arrow =&gt; ({
+    id: arrow.id,
+    to: arrow.to.id,
+    from: arrow.from.id
+}));
+</code></pre>
+<p>In this example the state is serialized by composing three different transformation functions.
+The autorunner triggers the serialization of the <code>store</code> object, which in turn serializes all boxes and arrows.
+Let&apos;s take closer look at the life of an imaginary example box#3.</p>
+<ol>
+<li>The first time box#3 is passed by <code>map</code> to <code>serializeBox</code>,
+the serializeBox transformation is executed and an entry containing box#3 and it&apos;s serialized representation is added to the internal memoization table of <code>serializeBox</code>.</li>
+<li>Imagine that another box is added to the <code>store.boxes</code> list.
+This would cause the <code>serializeState</code> function to re-compute, resulting in a complete remapping of all the boxes.
+However, all the invocations of <code>serializeBox</code> will now return their old values from the memoization tables since their transformation functions didn&apos;t (need to) run again.</li>
+<li>Secondly, if somebody changes a property of box#3 this will cause the application of the <code>serializeBox</code> to box#3 to re-compute, just like any other reactive function in Mobservable.
+Since the transformation will now produce a new json object based on box#3, all observers of that specific transformation will be forced to run again as well.
+The <code>serializeState</code> transformation in this case.
+<code>serializeState</code> will now produce a new value in turn and map all the boxes again. But except for box#3, all other boxes will be returned from the memoization table.</li>
+<li>Finally, if box#3 is removed from <code>store.boxes</code>, <code>serializeState</code> will compute again.
+But since it will no longer be using the application of <code>serializeBox</code> to box#3,
+that reactive function will go back to non-reactive mode.
+This signals the memoization table that the entry can be removed so that it is ready for GC.</li>
+</ol>
+<p>So effectively we have achieved state tracking using immutable, shared datas structures here.
+All boxes and arrows are mapped and reduced into single state tree.
+Each change will result in a new entry in the <code>states</code> array, but the different entries will share almost all of their box and arrow representations. </p>
+<h2 id="transforming-a-datagraph-into-another-reactive-data-graph">Transforming a datagraph into another reactive data graph</h2>
+<p>Instead of returning plain values from a transformation function, it is also possible to return observable objects.
+This can be used to transform an observable data graph into a another observable data graph, which can be used to transform... you get the idea.</p>
+<p>Here is small example that encodes a reactive file explorer that will update it&apos;s representation upon each change. 
+Data graphs that are built this way will in general react a lot faster and will consist of much more straight-forward code,
+in comparison to derived data graph that are updated using your own code. See the <a href="https://github.com/mweststrate/mobservable/blob/3ea1f4af20a51a1cb30be3e4a55ec8f964a8c495/test/perf/transform-perf.js#L4" target="_blank">performance tests</a> for some examples.</p>
+<p>Unlike the previous example, the <code>transformFolder</code> will only run once as long as a folder remains visible;
+the <code>DisplayFolder</code> objects track the associated <code>Folder</code> objects themselves.</p>
+<p>In the following example all mutations to the <code>state</code> graph will be processed automatically.
+Some examples:</p>
+<ol>
+<li>Changing the name of a folder will update it&apos;s own <code>path</code> property and the <code>path</code> property of all its descendants.</li>
+<li>Collapsing a folder will remove all descendant DisplayFolders from the tree.</li>
+<li>Expanding a folder will restore them again.</li>
+<li>Setting a search filter will remove all nodes that do not match the filter, unless they have a descendant that matches the filter.  </li>
+<li>Etc...</li>
+</ol>
+<pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Folder</span>(<span class="hljs-params">parent, name</span>) </span>{
+    <span class="hljs-keyword">this</span>.parent = parent;
+    m.extendObservable(<span class="hljs-keyword">this</span>, {
+        name: name,
+        children: m.fastArray(),
     });
 }
 
-<span class="hljs-keyword">var</span> matthew = <span class="hljs-keyword">new</span> Person(<span class="hljs-string">&quot;Matthew&quot;</span>, <span class="hljs-string">&quot;Henry&quot;</span>);
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">DisplayFolder</span>(<span class="hljs-params">folder, state</span>) </span>{
+    <span class="hljs-keyword">this</span>.state = state;
+    <span class="hljs-keyword">this</span>.folder = folder;
+    m.extendObservable(<span class="hljs-keyword">this</span>, {
+        collapsed: <span class="hljs-literal">false</span>,
+        name: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.folder.name;
+        },
+        isVisible: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+            <span class="hljs-keyword">return</span> !<span class="hljs-keyword">this</span>.state.filter || <span class="hljs-keyword">this</span>.name.indexOf(<span class="hljs-keyword">this</span>.state.filter) !== -<span class="hljs-number">1</span> || <span class="hljs-keyword">this</span>.children.some(child =&gt; child.isVisible);
+        },
+        children: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.collapsed)
+                <span class="hljs-keyword">return</span> [];
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.folder.children.map(transformFolder).filter(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">child</span>) </span>{
+                <span class="hljs-keyword">return</span> child.isVisible;
+            })
+        },
+        path: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.folder.parent === <span class="hljs-literal">null</span> ? <span class="hljs-keyword">this</span>.name : transformFolder(<span class="hljs-keyword">this</span>.folder.parent).path + <span class="hljs-string">&quot;/&quot;</span> + <span class="hljs-keyword">this</span>.name;
+        }
+    });
+}
 
-<span class="hljs-comment">// add a observable property to an already observable object</span>
-extendObservable(matthew, {
-    age: <span class="hljs-number">353</span>
+<span class="hljs-keyword">var</span> state = m.observable({
+    root: <span class="hljs-keyword">new</span> Folder(<span class="hljs-literal">null</span>, <span class="hljs-string">&quot;root&quot;</span>),
+    filter: <span class="hljs-literal">null</span>,
+    displayRoot: <span class="hljs-literal">null</span>
+});
+
+<span class="hljs-keyword">var</span> transformFolder = m.createTransformer(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">folder</span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> DisplayFolder(folder, state);
+});
+
+m.autorun(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    state.displayRoot = transformFolder(state.root);
 });
 </code></pre>
-<p>(N.b:  <code>observable(object)</code> is actually an alias for <code>extendObservable(object, object)</code>)</p>
 
                     
                     </section>
@@ -703,10 +817,10 @@ extendObservable(matthew, {
         </div>
 
         
-        <a href="../refguide/expr.html" class="navigation navigation-prev " aria-label="Previous page: expr"><i class="fa fa-angle-left"></i></a>
+        <a href="../refguide/observable-decorator.html" class="navigation navigation-prev " aria-label="Previous page: @observable"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../refguide/extras.html" class="navigation navigation-next " aria-label="Next page: extras"><i class="fa fa-angle-right"></i></a>
+        <a href="../refguide/autorun-async.html" class="navigation navigation-next " aria-label="Next page: autorunAsync"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>
