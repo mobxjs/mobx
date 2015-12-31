@@ -62,6 +62,10 @@ export function runAfterTransaction(action: () => void) {
         afterTransactionItems.push(action);
 }
 
+export function isInTransaction() {
+    return inTransaction > 0;
+}
+
 export function untracked<T>(action:()=>T):T {
     try {
         var dnode = new ViewNode({ object: null, name: "untracked" });

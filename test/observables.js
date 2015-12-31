@@ -139,7 +139,7 @@ test('batch', function(t) {
         a(2);
         b(3);
         a(6);
-        t.deepEqual(100, d()); // still hunderd
+        t.deepEqual(100, mobservable.extras.getDNode(d)._value); // still hunderd
         return 2;
     });
 
@@ -1439,3 +1439,37 @@ test('issue 71, transacting running transformation', function(t) {
     
     t.end();
 });
+
+test('eval in transaction', function(t) {
+    var bCalcs = 0;
+    var x = mobservable.observable({
+        a: 1,
+        b: function() {
+            bCalcs++;
+            return this.a * 2;
+        }
+    });
+    var c;
+    
+    mobservable.autorun(function() {
+       c = x.b; 
+    });
+    
+    t.equal(bCalcs, 1);
+    t.equal(c, 2);
+    
+    mobservable.transaction(function() {
+        x.a = 3;
+        t.equal(x.b, 6);
+        t.equal(bCalcs, 2);
+        t.equal(c, 2);
+
+        x.a = 4;
+        t.equal(x.b, 8);
+        t.equal(bCalcs, 3);
+        t.equal(c, 2);
+    });
+    t.equal(bCalcs, 4); // 2 or 3 would be fine as well 
+    t.equal(c, 8);
+    t.end();
+})

@@ -4,7 +4,7 @@
  * https://github.com/mweststrate/mobservable
  */
 
-import {ViewNode, isComputingView} from './dnode';
+import {ViewNode, isComputingView, NodeState, isInTransaction} from './dnode';
 import SimpleEventEmitter from './simpleeventemitter';
 import {IContextInfoStruct, Lambda} from './interfaces';
 import {deepEquals, once} from './utils';
@@ -27,6 +27,9 @@ export class ObservableView<T> extends ViewNode {
     get():T {
         if (this.isComputing)
             throw new Error(`[mobservable.view '${this.context.name}'] Cycle detected`);
+        if (this.state === NodeState.STALE && isInTransaction()) {
+            return this.func.call(this.scope);
+        }
         if (this.isSleeping) {
             if (isComputingView()) {
                 // somebody depends on the outcome of this computation
