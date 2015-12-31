@@ -61,5 +61,6 @@ export const extras = {
 	getObserverTree,
 	trackTransitions,
 	SimpleEventEmitter,
-	withStrict: core.withStrict
+	withStrict: core.withStrict,
+	isComputingView
 } 

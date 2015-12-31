@@ -250,9 +250,12 @@ export class DerivedValue<T> implements IObservable, IObserver {
 	}
 
 	get(): T {
-		// TODO: support in-transaction lazy inspection of the value
 		if (this.isComputing)
 			throw new Error(`[DerivedValue '${this.name}'] Cycle detected`);
+		if (!this.isReady && inTransaction > 0) {
+			// in-transaction lazy inspection of the value, derive on the fly..
+			return this.derivation.call(this.scope);
+		}
 		if (this.isLazy) {
 			if (isComputingView()) {
 				// somebody depends on the outcome of this computation
