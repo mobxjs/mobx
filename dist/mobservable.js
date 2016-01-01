@@ -667,6 +667,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        afterTransactionItems.push(action);
 	}
 	exports.runAfterTransaction = runAfterTransaction;
+	function isInTransaction() {
+	    return inTransaction > 0;
+	}
+	exports.isInTransaction = isInTransaction;
 	function untracked(action) {
 	    try {
 	        var dnode = new ViewNode({ object: null, name: "untracked" });
@@ -1138,6 +1142,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ObservableView.prototype.get = function () {
 	        if (this.isComputing)
 	            throw new Error("[mobservable.view '" + this.context.name + "'] Cycle detected");
+	        if (this.state === dnode_1.NodeState.STALE && dnode_1.isInTransaction()) {
+	            return this.func.call(this.scope);
+	        }
 	        if (this.isSleeping) {
 	            if (dnode_1.isComputingView()) {
 	                this.wakeUp();

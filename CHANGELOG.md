@@ -1,3 +1,7 @@
+# 1.2.1
+
+* Computed value now yields consistent results when being inspected while in transaction
+
 # 1.2.0
 
 * Implemented #67: Reactive graph transformations. See: http://mweststrate.github.io/mobservable/refguide/create-transformer.html
