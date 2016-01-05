@@ -1,5 +1,8 @@
+import {registerGlobals} from "./core/global";
+registerGlobals();
+
 import * as core from './core';
-import {isComputingView, untracked} from './dnode';
+import {isComputingDerivation} from './core/global';
 import {quickDiff} from './utils';
 import {IDependencyTree, IObserverTree, ITransitionEvent, Lambda} from './interfaces';
 import {getDependencyTree, getDNode, getObserverTree, trackTransitions} from './extras';
@@ -37,11 +40,12 @@ export {
 	createTransformer
 } from './transform';
 
-export {
-	untracked,
-	transaction
+/*export {
+	// TODO:untracked,
 } from './dnode';
+*/
 
+export {transaction} from "./core/transaction";
 export {
 	ObservableMap
 } from './observablemap';
@@ -50,7 +54,6 @@ export {
  * 'Private' elements that are exposed for testing and debugging utilities
  */
 export const _ = {
-	isComputingView,
 	quickDiff
 }
 
@@ -62,5 +65,5 @@ export const extras = {
 	trackTransitions,
 	SimpleEventEmitter,
 	withStrict: core.withStrict,
-	isComputingView
+	isComputingDerivation
 } 

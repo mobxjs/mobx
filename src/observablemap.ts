@@ -1,9 +1,10 @@
-import {ObservableValue} from './dnode';
 import {ValueMode, observable, assertUnwrapped, getValueModeFromModifierFunc} from './core';
 import {IObservableArray, Lambda, IObjectChange} from './interfaces';
 import SimpleEventEmitter from './simpleeventemitter';
-import {isComputingView, transaction} from './dnode';
+import {transaction} from "./core/transaction";
+import {isComputingDerivation} from "./core/global";
 import {ObservableArray} from './observablearray';
+import ObservableValue from "./types/observablevalue";
 import {isPlainObject} from './utils';
 
 export interface KeyValueMap<V> {

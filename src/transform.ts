@@ -1,4 +1,4 @@
-import {DerivedValue} from './dnode';
+import ComputedValue from './core/computedvalue';
 import {getDNode} from './extras';
 import {once} from './utils';
 import {isObservable, autorun} from './core';
@@ -10,7 +10,7 @@ export function createTransformer<A, B>(transformer: ITransformer<A,B>, onCleanu
 		throw new Error("[mobservable] transformer parameter should be a function that accepts one argument");
 
 	// Memoizes: object id -> reactive view that applies transformer to the object
-	const objectCache : {[id:number]: DerivedValue<B>} = {};
+	const objectCache : {[id:number]: ComputedValue<B>} = {};
 
 	return (object: A) => {
 		const identifier = getMemoizationId(object);
@@ -19,7 +19,7 @@ export function createTransformer<A, B>(transformer: ITransformer<A,B>, onCleanu
 			return reactiveTransformer.get();
 
 		// Not in cache; create a reactive view
-		reactiveTransformer = objectCache[identifier] = new DerivedValue<any>(() => {
+		reactiveTransformer = objectCache[identifier] = new ComputedValue<any>(() => {
 			return transformer(object);
 		}, this, `transformer-${(<any>transformer).name}-${identifier}`, false);
 

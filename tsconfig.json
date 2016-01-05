@@ -8,20 +8,9 @@
         "module": "commonjs",
         "removeComments": true
     },
-    "files": [
-        "./src/core.ts",
-        "./src/dnode.ts",
-        "./src/extras.ts",
-        "./src/index.ts",
-        "./src/interfaces.ts",
-        "./src/observablearray.ts",
-        "./src/observableobject.ts",
-        "./src/simpleeventemitter.ts",
-        "./src/utils.ts"
-    ],
-    "filesGlob": [
-        "!./node_modules/**/*.ts",
-        "!./dist/*.d.ts",
-        "!./test/*.ts"
+    "exclude": [
+        "node_modules",
+        "test",
+        "lib"
     ]
 }

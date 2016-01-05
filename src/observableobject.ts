@@ -3,14 +3,15 @@
  * (c) 2015 - Michel Weststrate
  * https://github.com/mweststrate/mobservable
  */
-import {ObservableValue, DerivedValue} from './dnode';
+import ObservableValue from "./types/observablevalue";
+import ComputedValue from "./core/computedvalue";
 import {ValueMode, makeChildObservable, AsStructure} from './core';
 import {IObjectChange, Lambda} from './interfaces';
 import SimpleEventEmitter from './simpleeventemitter';
 
 // responsible for the administration of objects that have become reactive
 export class ObservableObject { // TODO: implement IObservable
-	values:{[key:string]:ObservableValue<any>|DerivedValue<any>} = {};
+	values:{[key:string]:ObservableValue<any>|ComputedValue<any>} = {};
 	private _events = new SimpleEventEmitter();
 
 	constructor(private target, private name:string, private mode: ValueMode) {
@@ -37,13 +38,13 @@ export class ObservableObject { // TODO: implement IObservable
 	}
 
 	private defineReactiveProperty(propName, value) {
-		let observable: DerivedValue<any>|ObservableValue<any>;
+		let observable: ComputedValue<any>|ObservableValue<any>;
 		let name = `${this.name || ""}.${propName}`;
 
 		if (typeof value === "function" && value.length === 0)
-			observable = new DerivedValue(value, this.target, name, false);
+			observable = new ComputedValue(value, this.target, name, false);
 		else if (value instanceof AsStructure && typeof value.value === "function" && value.value.length === 0)
-			observable = new DerivedValue(value.value, this.target, name, true);
+			observable = new ComputedValue(value.value, this.target, name, true);
 		else
 			observable = new ObservableValue(value, this.mode, name);
 

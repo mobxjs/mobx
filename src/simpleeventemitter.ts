@@ -6,6 +6,7 @@
 import {Lambda} from './interfaces';
 import {once} from './utils';
 
+// TODO: make generic
 export default class SimpleEventEmitter {
     listeners:{(...data: any[]):void}[] = [];
 

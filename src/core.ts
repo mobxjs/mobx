@@ -4,10 +4,15 @@
  * https://github.com/mweststrate/mobservable
  */
 
-import {isComputingView, transaction, runAfterTransaction, IObservable, untracked} from './dnode';
+import {transaction, runAfterTransaction} from './core/transaction';
+import {IObservable, reportObserved} from "./core/observable";
+import {isComputingDerivation} from "./core/global";
+import {IDerivation} from "./core/derivation";
 import {Lambda, IObservableArray, IObservableValue, IArrayChange, IArraySplice, IObjectChange} from './interfaces';
 import {isPlainObject, once, deepEquals} from './utils';
-import {DerivedValue, ObservableValue} from './dnode';
+import ComputedValue from "./core/computedvalue";
+import Reaction from "./core/reaction";
+import ObservableValue from "./types/observablevalue";
 import {createObservableArray, ObservableArray} from './observablearray';
 import {ObservableObject} from './observableobject';
 import {ObservableMap, KeyValueMap} from './observablemap';
@@ -50,7 +55,7 @@ export function observable(v:any, keyOrScope?:string | any) {
         case ValueType.ComplexFunction:
             throw new Error("[mobservable.observable] To be able to make a function reactive it should not have arguments. If you need an observable reference to a function, use `observable(asReference(f))`");
         case ValueType.ViewFunction: {
-            return toGetterSetterFunction(new DerivedValue(value, keyOrScope, value.name, mode === ValueMode.Structure));
+            return toGetterSetterFunction(new ComputedValue(value, keyOrScope, value.name, mode === ValueMode.Structure));
         }
         case ValueType.Array:
         case ValueType.PlainObject:
@@ -124,7 +129,7 @@ export function isObservable(value, property?:string):boolean {
         }
         return false;
     }
-    return !!value.$mobservable || value instanceof ObservableValue || value instanceof DerivedValue;
+    return !!value.$mobservable || value instanceof ObservableValue || value instanceof ComputedValue || value instanceof Reaction;
 }
 
 /**
@@ -135,6 +140,7 @@ export function isObservable(value, property?:string):boolean {
     * @returns disposer function, which can be used to stop the view from being updated in the future.
     */
 export function autorun(view:Lambda, scope?:any):Lambda {
+    // TODO: don't unwrap and such
     var [mode, unwrappedView] = getValueModeFromValue(view,ValueMode.Recursive);
     if (typeof unwrappedView !== "function")
         throw new Error("[mobservable.autorun] expects a function");
@@ -142,22 +148,22 @@ export function autorun(view:Lambda, scope?:any):Lambda {
         throw new Error("[mobservable.autorun] expects a function without arguments");
 
     // TODO: always run untracked
-    const observable = new DerivedValue(unwrappedView, scope, view.name, mode === ValueMode.Structure);
+    const observable = new Reaction(unwrappedView, scope, view.name);
 
     let disposedPrematurely = false;
     let started = false;
 
     runAfterTransaction(() => {
         if (!disposedPrematurely) {
-            observable.setRefCount(+1);
+            // TODO: restore observable.setRefCount(+1);
             started = true;
         }
     });
 
     const disposer = once(() => {
-        if (started)
-            observable.setRefCount(-1);
-        else
+        if (started) {
+            // TODO: restore  observable.setRefCount(-1);
+        }else
             disposedPrematurely = true;
     });
     (<any>disposer).$mobservable = observable;
@@ -180,7 +186,7 @@ export function autorunUntil(predicate: ()=>boolean, effect: Lambda, scope?: any
                 disposer();
             else
                 disposeImmediately = true;
-            untracked(() => effect.call(scope));
+            /* TODO:untracked*/(() => effect.call(scope));
         }
     });
     if (disposeImmediately)
@@ -258,7 +264,7 @@ export function autorunAsync<T>(func: Lambda | {():T}, delay:number | {(x:T):voi
             // keep observed values eager, probably cheaper then forgetting 
             // about the value and later re-evaluating lazily, 
             // probably cheaper when computations are expensive 
-            observedValues.forEach(o => o.notifyObserved()); 
+            observedValues.forEach(o => reportObserved(o)); 
             if (!tickScheduled) {
                 tickScheduled = true;
                 schedule(doTick);
@@ -288,7 +294,7 @@ export function autorunAsync<T>(func: Lambda | {():T}, delay:number | {(x:T):voi
     * 
     */
 export function expr<T>(expr: () => T, scope?):T {
-    if (!isComputingView())
+    if (!isComputingDerivation())
         console.warn("[mobservable.expr] 'expr' should only be used inside other reactive functions.");
     // optimization: would be more efficient if the expr itself wouldn't be evaluated first on the next change, but just a 'changed' signal would be fired
     return observable(expr, scope) ();
@@ -424,10 +430,12 @@ export function toJSON(source, detectCycles: boolean = true, __alreadySeen:[any,
         return toJSON(source(), detectCycles, __alreadySeen);
     return source;
 }
+
 /**
     * If strict is enabled, views are not allowed to modify the state.
     * This is a recommended practice, as it makes reasoning about your application simpler.
     */
+// TODO: remove getStrict / withStrict
 var strict = false;
 export function getStrict() {
     return strict;
@@ -477,7 +485,7 @@ export function extendObservableHelper(target, properties, mode: ValueMode, name
 	return target;
 }
 
-export function toGetterSetterFunction<T>(observable: ObservableValue<T> | DerivedValue<T>):IObservableValue<T> {
+export function toGetterSetterFunction<T>(observable: ObservableValue<T> | ComputedValue<T>):IObservableValue<T> {
 	var f:any = function(value?) {
 		if (arguments.length > 0)
 			observable.set(value);
@@ -485,9 +493,6 @@ export function toGetterSetterFunction<T>(observable: ObservableValue<T> | Deriv
 			return observable.get();
 	};
 	f.$mobservable = observable;
-	f.observe = function(listener, fire) {
-		return observable.observe(listener, fire);
-	}
 	f.toString = function() {
 		return observable.toString();
 	}

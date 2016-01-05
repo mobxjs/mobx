@@ -3,7 +3,10 @@
  * (c) 2015 - Michel Weststrate
  * https://github.com/mweststrate/mobservable
  */
-import {ObservableValue, DerivedValue, IObservable, IObserver} from './dnode';
+import ObservableValue from "./types/observablevalue";
+import ComputedValue from "./core/computedvalue";
+import Reaction from "./core/reaction";
+import {IDepTreeNode} from "./core/observable";
 import {ObservableObject} from './observableobject';
 import {ObservableMap} from './observablemap';
 import SimpleEventEmitter from './simpleeventemitter';
@@ -11,7 +14,7 @@ import {once, unique} from './utils';
 import {isObservable} from './core';
 import {IDependencyTree, ITransitionEvent, IObserverTree, Lambda} from './interfaces';
 
-export function getDNode(thing:any, property?:string):IObservable {
+export function getDNode(thing:any, property?:string):IDepTreeNode {
 	const propError = `[mobservable.getDNode] property '${property}' of '${thing}' doesn't seem to be a reactive property`;
 
 	if (thing instanceof ObservableMap && property) {
@@ -30,7 +33,7 @@ export function getDNode(thing:any, property?:string):IObservable {
 			return thing.$mobservable.values[property];
 		throw new Error(propError);
 	}
-	if (thing instanceof ObservableValue || thing instanceof DerivedValue)
+	if (thing instanceof ObservableValue || thing instanceof ComputedValue || thing instanceof Reaction)
 		return thing;
 	if (thing.$mobservable) {
 		if (thing.$mobservable instanceof ObservableObject || thing instanceof ObservableMap)
@@ -40,28 +43,28 @@ export function getDNode(thing:any, property?:string):IObservable {
 	throw new Error(`[mobservable.getDNode] ${thing} doesn't seem to be reactive`);
 }
 
-export function reportTransition(node:IObservable, state:string, changed:boolean = false, newValue = null) {
-	transitionTracker.emit({
+export function reportTransition(node:IDepTreeNode, state:string, changed:boolean = false) {
+	transitionTracker && transitionTracker.emit({
 		id: node.id,
 		name: node.name,
 		state: state,
-		changed: changed,
-		newValue: newValue
+		changed: changed
 	});
 }
 
+// TODO: export needed?
 export var transitionTracker:SimpleEventEmitter = null;
 
 export function getDependencyTree(thing:any, property?:string): IDependencyTree {
 	return nodeToDependencyTree(getDNode(thing, property));
 }
 
-function nodeToDependencyTree(node:IObservable): IDependencyTree {
+function nodeToDependencyTree(node:IDepTreeNode): IDependencyTree {
 	var result:IDependencyTree = {
 		id: node.id,
 		name: node.name
 	};
-	if (node instanceof DerivedValue && node.observing.length)
+	if (node instanceof ComputedValue && node.observing.length)
 		result.dependencies = unique(node.observing).map(nodeToDependencyTree);
 	return result;
 }
@@ -70,15 +73,13 @@ export function getObserverTree(thing:any, property?:string): IObserverTree {
 	return nodeToObserverTree(getDNode(thing, property));
 }
 
-function nodeToObserverTree(node:IObservable): IObserverTree {
+function nodeToObserverTree(node:IDepTreeNode): IObserverTree {
 	var result:IObserverTree = {
 		id: node.id,
 		name: node.name,
 	};
 	if (node.observers && node.observers.length)
 		result.observers = <any>unique(node.observers).map(<any>nodeToObserverTree);
-	if (node.externalRefenceCount > 0)
-		result.listeners =  node.externalRefenceCount;
 	return result;
 }
 

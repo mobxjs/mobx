@@ -5,28 +5,39 @@
  */
 
 import {deepEquals, makeNonEnumerable} from './utils';
-import {ObservableValue, checkIfStateIsBeingModifiedDuringView} from './dnode';
+import {IAtom, reportAtomChanged} from "./core/atom";
+import {reportObserved} from "./core/observable";
 import SimpleEventEmitter from './simpleeventemitter';
 import {ValueMode, assertUnwrapped, makeChildObservable} from './core';
 import {IArrayChange, IArraySplice, IObservableArray, Lambda} from './interfaces';
+import ObservableValue from "./types/observablevalue";
+import {getNextId, checkIfStateIsBeingModifiedDuringDerivation} from "./core/global";
+import {IDerivation} from "./core/derivation";
+
 
 // Workaround to make sure ObservableArray extends Array
 export class StubArray {
 }
 StubArray.prototype = [];
 
-export class ObservableArrayAdministration<T> extends ObservableValue<any> {
+export class ObservableArrayAdministration<T> implements IAtom {
     values: T[];
     changeEvent: SimpleEventEmitter;
     lastKnownLength = 0;
-
+    id = getNextId();
+    isDirty = false;
+    observers:IDerivation[] = []; // TODO: initialize lazy
+    
     // TODO: remove supportEnumerable
-    constructor(private array: ObservableArray<T>, public mode:ValueMode, public supportEnumerable:boolean, name: string) {
-        super(null, mode, undefined); // TODO blegh, don't inherit here! become IObservable
+    constructor(private array: ObservableArray<T>, public mode:ValueMode, public supportEnumerable:boolean, public name: string) {
+    }
+    
+    onBecomeUnobserved() {
+        // noop
     }
     
     getLength(): number {
-        this.notifyObserved();
+        reportObserved(this);
         return this.values.length;
     }
     
@@ -49,12 +60,12 @@ export class ObservableArrayAdministration<T> extends ObservableValue<any> {
             throw new Error("[mobservable] Modification exception: the internal structure of an observable array was changed. Did you use peek() to change it?");
         this.lastKnownLength += delta;
         if (delta < 0) {
-            checkIfStateIsBeingModifiedDuringView(this.name);
+            checkIfStateIsBeingModifiedDuringDerivation(this.name);
             if (this.supportEnumerable)
                 for(var i = oldLength + delta; i < oldLength; i++)
                     delete this.array[i]; // bit faster but mem inefficient: 
         } else if (delta > 0) {
-            checkIfStateIsBeingModifiedDuringView(this.name);
+            checkIfStateIsBeingModifiedDuringDerivation(this.name);
             if (oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
                 reserveArrayBuffer(oldLength + delta);
             // funny enough, this is faster than slicing ENUMERABLE_PROPS into defineProperties, and faster as a temporarily map
@@ -102,7 +113,7 @@ export class ObservableArrayAdministration<T> extends ObservableValue<any> {
     }
 
     private notifyChildUpdate(index:number, oldValue:T) {
-        this.notifyChanged();
+        reportAtomChanged(this);
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
         if (this.changeEvent)
             this.changeEvent.emit(<IArrayChange<T>>{ object: <IObservableArray<T>><any> this.array, type: 'update', index: index, oldValue: oldValue});
@@ -111,15 +122,10 @@ export class ObservableArrayAdministration<T> extends ObservableValue<any> {
     private notifySplice(index:number, deleted:T[], added:T[]) {
         if (deleted.length === 0 && added.length === 0)
             return;
-        this.notifyChanged();
+        reportAtomChanged(this);
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
         if (this.changeEvent)
             this.changeEvent.emit(<IArraySplice<T>>{ object: <IObservableArray<T>><any> this.array, type: 'splice', index: index, addedCount: added.length, removed: deleted});
-    }
-
-    private notifyChanged() {
-        this.markStale();
-        this.markReady(true);
     }
 }
 
@@ -163,18 +169,18 @@ export class ObservableArray<T> extends StubArray {
     }
 
     toJSON(): T[] {
-        this.$mobservable.notifyObserved();
+        reportAtomChanged(this.$mobservable);
         return this.$mobservable.values.slice();
     }
 
     peek(): T[] {
-        this.$mobservable.notifyObserved();
+        reportAtomChanged(this.$mobservable);
         return this.$mobservable.values;
     }
 
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
     find(predicate:(item:T,index:number,array:ObservableArray<T>)=>boolean, thisArg?, fromIndex=0):T {
-        this.$mobservable.notifyObserved();
+        reportAtomChanged(this.$mobservable);
         var items = this.$mobservable.values, l = items.length;
         for(var i = fromIndex; i < l; i++)
             if(predicate.call(thisArg, items[i], i, this))
@@ -325,7 +331,7 @@ function createArrayBufferItem(index:number) {
             const values = impl.values;
             assertUnwrapped(value, "Modifiers cannot be used on array values. For non-reactive array values use makeReactive(asFlat(array)).");
             if (index < values.length) {
-                checkIfStateIsBeingModifiedDuringView(impl.context); 
+                checkIfStateIsBeingModifiedDuringDerivation(impl.context); 
                 var oldValue = values[index];
                 var changed = impl.mode === ValueMode.Structure ? !deepEquals(oldValue, value) : oldValue !== value; 
                 if (changed) {
