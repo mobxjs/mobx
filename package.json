@@ -9,7 +9,7 @@
     "test-browser": "npm run buildtest && ( browserify test/*.js | tape-run )",
     "test-travis": "npm run clean && npm run test-browser && istanbul cover tape test/*.js",
     "coverage": "npm run buildtest && istanbul cover tape test/*.js && cat ./coverage/lcov.info|coveralls",
-    "perf": "npm run build && time tape test/perf/*.js",
+    "perf": "npm run build && time node --expose-gc test/perf/index.js",
     "prepublish": "npm run clean && npm run build-dist",
     "clean": "rm -rf lib/ dist/",
     "build": "tsc",
