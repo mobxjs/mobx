@@ -3,6 +3,7 @@ import {IDerivation, trackDerivedFunction} from "./derivation";
 import state, {getNextId, isComputingDerivation} from "./global";
 import SimpleEventEmitter from "../simpleeventemitter";
 import {invariant} from "../utils";
+import {reportTransition} from "../extras";
 
 export interface IReaction extends IDerivation {
 	runReaction();	
@@ -21,7 +22,10 @@ export default class Reaction implements IReaction {
 		if (!this.name)
 			this.name = "Reaction#" + this.id;
 		this.derivation = () => derivation.call(scope); // TODO: use bind?
-		this.runReaction(); // TODO: schedule if currently deriving view? 
+		if (isComputingDerivation() || state.inTransaction > 0)
+			state.pendingReactions.push(this);
+		else
+			this.runReaction(); 
 	}
 	
 	onBecomeUnobserved() {
@@ -34,8 +38,10 @@ export default class Reaction implements IReaction {
 	}
 
 	runReaction() {
-		invariant(!this.disposed);
-		trackDerivedFunction(this, this.derivation);
+		if (!this.disposed) {
+			trackDerivedFunction(this, this.derivation);
+			reportTransition(this, "READY", false);
+		}
 	}
 	
 	dispose() {

@@ -27,8 +27,8 @@ export function notifyDependencyReady(derivation: IDerivation, dependencyDidChan
         if (derivation.dependencyChangeCount > 0) {
             // did any of the observables really change?
             derivation.dependencyChangeCount = 0;
+            reportTransition(derivation, "PENDING");
             const changed = derivation.onDependenciesReady();
-            reportTransition(derivation, "READY", changed);
             propagateReadiness(derivation, changed);
         } else {
             // we're done, but didn't change, lets make sure verybody knows..

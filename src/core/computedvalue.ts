@@ -5,6 +5,7 @@ import SimpleEventEmitter from "../simpleeventemitter";
 import {autorun, ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped, valueDidChange} from '../core';
 import {Lambda} from "../interfaces";
 import {invariant} from "../utils";
+import {reportTransition} from "../extras";
 
 /**
  * A node in the state dependency root that observes other nodes, and can be observed itself.
@@ -20,17 +21,16 @@ export default class ComputedValue<T> implements IObservable, IDerivation {
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 	protected value: T;
 	onSleepEmitter: SimpleEventEmitter;
-	derivation:()=>T
+	boundDerivation:()=>T
 	
 	// TODO: bind derivation immediately, don't store scope
-	constructor(derivation:()=>T, private scope: Object, public name:string, private compareStructural: boolean) {
+	constructor(public derivation:()=>T, private scope: Object, public name:string, private compareStructural: boolean) {
 		if (!this.name)
 			this.name = "DerivedValue#" + this.id;
-		this.derivation = () => derivation.call(scope); // TODO: use bind? 
+		this.boundDerivation = () => derivation.call(scope); // TODO: use bind? 
 	}
 	
 	onBecomeUnobserved() {
-		invariant(!this.isLazy);
 		for (var i = 0, l = this.observing.length; i < l; i++)
 			removeObserver(this.observing[i], this);
 		this.observing = [];
@@ -41,15 +41,16 @@ export default class ComputedValue<T> implements IObservable, IDerivation {
 	}
 
 	onDependenciesReady(): boolean {
-		return this.compute(true)
+		const changed = this.compute(true)
+		reportTransition(this, "READY", changed);
+		return changed;
 	}
 
 	get(): T {
 		if (this.isComputing)
 			throw new Error(`[DerivedValue '${this.name}'] Cycle detected`);
 		if (this.dependencyStaleCount > 0 && state.inTransaction > 0) {
-			// in-transaction lazy inspection of the value, derive on the fly..
-			return this.derivation.call(this.scope);
+			return this.boundDerivation();
 		}
 		if (this.isLazy) {
 			if (isComputingDerivation()) {
@@ -87,9 +88,9 @@ export default class ComputedValue<T> implements IObservable, IDerivation {
 		var oldValue = this.value;
 		this.isComputing = true;
 		if (!track)
-			this.value = this.derivation();
+			this.value = this.boundDerivation();
 		else 			
-			this.value = trackDerivedFunction(this, this.derivation);
+			this.value = trackDerivedFunction(this, this.boundDerivation);
 		this.isComputing = false
 		return valueDidChange(this.compareStructural, this.value, oldValue)
 	}

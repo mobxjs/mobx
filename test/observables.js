@@ -770,7 +770,6 @@ test('when', function(t) {
     var x = m(3);
 
     var called = 0;
-    debugger;
     mobservable.autorunUntil(function() {
         return (x() === 4);
     }, function() {
@@ -1169,11 +1168,13 @@ test('issue 50', function(t) {
              [ 'STALE', '.c' ], 
              'transpreend', 
              [ 'READY', '.a' ], 
-             [ 'READY', '.b' ], 
+             [ 'READY', '.b' ],
+             [ 'PENDING', '.c' ],  
              'calc c', 
              [ 'READY', '.c' ], 
-             [ 'READY', 'ar' ], 
+             [ 'PENDING', 'ar' ],
              'auto', 
+             [ 'READY', 'ar' ], 
              'transpostend' 
         ]);
         
@@ -1219,11 +1220,13 @@ test('verify transaction events', function(t) {
             [ 'STALE', '.c' ],
             [ 'STALE', 'ar' ],
             'transpreend', 
-            [ 'READY', '.b' ], 
+            [ 'READY', '.b' ],
+            [ 'PENDING', '.c' ], 
             'calc c', 
             [ 'READY', '.c' ], 
-            [ 'READY', 'ar' ], 
+            [ 'PENDING', 'ar' ],
             'auto', 
+            [ 'READY', 'ar' ], 
             'transpostend' 
     ]);
     
@@ -1268,23 +1271,30 @@ test('delay autorun until end of transaction', function(t) {
     var disposer2 = mobservable.extras.trackTransitions(true, function(info) {
         events.push([info.state, info.name]);
     });
+    var didRun = false;
 
     mobservable.transaction(function() {
         mobservable.transaction(function() {
             
             disposer1 = mobservable.autorun(function test() {
+                didRun = true;
                 events.push("auto");
                 x.b;
             });
+            
+            t.equal(didRun, false, "autorun should not have run yet");
             
             x.a = 3;
             x.a = 4;
             
             events.push("end1");
         });
+        t.equal(didRun, false, "autorun should not have run yet");
         x.a = 5;
         events.push("end2");
     });
+
+    t.equal(didRun, true, "autorun should not have run yet");
     events.push("post trans1");
     x.a = 6;
     events.push("post trans2");
@@ -1294,18 +1304,11 @@ test('delay autorun until end of transaction', function(t) {
 
     t.deepEqual(events, [
             [ 'STALE', '.a' ], 
-            [ 'STALE', '.a' ],
             "end1",
-            [ 'STALE', '.a' ],
             "end2",
             [ 'READY', '.a'],
-            [ 'READY', '.a'],
-            [ 'READY', '.a'],
-            [ 'PENDING', 'test'],
             'auto',
-            [ 'PENDING', '.b'],
             'calc y',
-            [ 'READY', '.b'],
             [ 'READY', 'test'],
             "post trans1",
             [ 'STALE', '.a'],
@@ -1340,7 +1343,6 @@ test('prematurely end autorun', function(t) {
         });
 
         t.equal(x.$mobservable.observers.length, 0);
-        t.equal(x.$mobservable.externalRefenceCount, 0);
         t.equal(dis1.$mobservable.observing.length, 0);
         t.equal(dis2.$mobservable.observing.length, 0);
         
@@ -1348,41 +1350,15 @@ test('prematurely end autorun', function(t) {
 
     });
     t.equal(x.$mobservable.observers.length, 1);
-    t.equal(dis1.$mobservable.externalRefenceCount, 0);
-    t.equal(dis2.$mobservable.externalRefenceCount, 1);
     t.equal(dis1.$mobservable.observing.length, 0);
     t.equal(dis2.$mobservable.observing.length, 1);
     
     dis2();
 
     t.equal(x.$mobservable.observers.length, 0);
-    t.equal(dis1.$mobservable.externalRefenceCount, 0);
-    t.equal(dis2.$mobservable.externalRefenceCount, 0);
     t.equal(dis1.$mobservable.observing.length, 0);
     t.equal(dis2.$mobservable.observing.length, 0);
     
-    t.end();
-});
-
-test('isComputing', function(t) {
-    mobservable.autorun(function() {
-        t.equal(mobservable.extras.isComputingDerivation(), true);
-        mobservable.expr(function() {
-            t.equal(mobservable.extras.isComputingDerivation(), true);
-        });
-        mobservable.untracked(function() {
-            t.equal(mobservable.extras.isComputingDerivation(), false);
-            mobservable.observable(function() {
-                t.equal(mobservable.extras.isComputingDerivation(), false);
-            })();
-            mobservable.autorun(function() {
-                t.equal(mobservable.extras.isComputingDerivation(), true);
-                mobservable.untracked(function() {
-                    t.equal(mobservable.extras.isComputingDerivation(), false);
-                });
-            });
-        });
-    });
     t.end();
 });
 

@@ -41,9 +41,9 @@ export function stackDepth () {
 }
 
 export function checkIfStateIsBeingModifiedDuringDerivation(name: string) {
-    if (isComputingDerivation()) {
+    if (isComputingDerivation() && !globals.isRunningReactions) {
         // TODO: add url with detailed error subscription / best practice here:
-        const ts = global.__mobservableViewStack;
+        const ts = globals.derivationStack;
         throw new Error(
 `[mobservable] It is not allowed to change the state during the computation of a reactive view. Should the data you are trying to modify actually be a view? 
 Use 'mobservable.extras.withStrict(false, block)' to allow changes to be made inside views (unrecommended).
