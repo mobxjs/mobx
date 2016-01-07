@@ -6,7 +6,7 @@
 
 export function invariant(check: boolean) {
     if (!check)
-        throw new Error("[mobservable] Invariant failed, please report this as a big including the stacktrace of this error");
+        throw new Error("[mobservable] Invariant failed, please report this as a bug. Be sure to including the stacktrace of this error.");
 }
 
 /**

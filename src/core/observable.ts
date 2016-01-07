@@ -28,6 +28,8 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 }
 
 export function reportObserved(observable: IObservable) {
+	if (globalState.inUntracked > 0)
+		return;
 	const l = derivationStack.length;
 	if (l > 0) {
 		const deps = derivationStack[l - 1].observing, depslength = deps.length;

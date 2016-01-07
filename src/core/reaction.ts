@@ -1,4 +1,4 @@
-import {IObservable} from "./observable";
+import {IObservable, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction} from "./derivation";
 import state, {getNextId, isComputingDerivation} from "./global";
 import SimpleEventEmitter from "../simpleeventemitter";
@@ -14,12 +14,14 @@ export default class Reaction implements IReaction {
 	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 	derivation:()=>void;
+	disposed = false;
 	
 	// TODO: bind derivation immediately, don't store scope
 	constructor(derivation:()=>void, private scope: Object, public name:string) {
 		if (!this.name)
 			this.name = "Reaction#" + this.id;
-		this.derivation = () => derivation.call(scope); // TODO: use bind? 
+		this.derivation = () => derivation.call(scope); // TODO: use bind?
+		this.runReaction(); // TODO: schedule if currently deriving view? 
 	}
 	
 	onBecomeUnobserved() {
@@ -32,7 +34,17 @@ export default class Reaction implements IReaction {
 	}
 
 	runReaction() {
+		invariant(!this.disposed);
 		trackDerivedFunction(this, this.derivation);
+	}
+	
+	dispose() {
+		if (!this.disposed) {
+			this.disposed = true;
+			const deps = this.observing.splice(0);
+			for(var i = 0, l = deps.length; i < l; i++)
+				removeObserver(deps[i], this);
+		}
 	}
 
 	toString() {

@@ -5,6 +5,7 @@ export class MobservableGlobals {
 	derivationStack: IDerivation[] = [];
 	mobservableObjectId = 0;
 	inTransaction = 0;
+    inUntracked = 0;
     isRunningReactions = false;
 	changedAtoms: IAtom[] = [];
 	pendingReactions: IReaction[] = [];
@@ -52,19 +53,14 @@ Current stack size is ${ts.length}, active view: "${ts[ts.length -1].toString()}
     }
 }
 
-/* TODO: implement
 export function untracked<T>(action:()=>T):T {
-    try {
-		// TODO: blegh!
-        var dnode = new DerivedValue<boolean>(() => true, null, "untracked", false);
-        (<any>dnode).$UNTRACKED_MARKER = true;
-        global.__mobservableViewStack.push(dnode);
+    try { // TODO: remove try finally
+        globals.inUntracked++;
         return action();
     } finally {
-        global.__mobservableViewStack.pop();
+        globals.inUntracked--;
     }
 }
-*/
 
 export function registerGlobals() {
 	// no-op to make explicit why this file is loaded

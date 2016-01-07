@@ -28,7 +28,7 @@ export function notifyDependencyReady(derivation: IDerivation, dependencyDidChan
             // did any of the observables really change?
             derivation.dependencyChangeCount = 0;
             const changed = derivation.onDependenciesReady();
-            reportTransition(derivation, "STALE", changed);
+            reportTransition(derivation, "READY", changed);
             propagateReadiness(derivation, changed);
         } else {
             // we're done, but didn't change, lets make sure verybody knows..
@@ -87,5 +87,5 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
 
     // remove observers after adding them, so that they don't go in lazy mode to early
     for (var i = 0, l = removed.length; i < l; i++)
-        removeObserver(added[i], derivation);
+        removeObserver(removed[i], derivation);
 }

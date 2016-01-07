@@ -148,8 +148,8 @@ export function autorun(view:Lambda, scope?:any):Lambda {
         throw new Error("[mobservable.autorun] expects a function without arguments");
 
     // TODO: always run untracked
-    const observable = new Reaction(unwrappedView, scope, view.name);
-
+    const reaction = new Reaction(unwrappedView, scope, view.name);
+/*
     let disposedPrematurely = false;
     let started = false;
 
@@ -167,6 +167,10 @@ export function autorun(view:Lambda, scope?:any):Lambda {
             disposedPrematurely = true;
     });
     (<any>disposer).$mobservable = observable;
+    return disposer;
+*/
+    const disposer = () => reaction.dispose();
+    (<any>disposer).$mobservable = reaction;
     return disposer;
 }
 
@@ -186,7 +190,9 @@ export function autorunUntil(predicate: ()=>boolean, effect: Lambda, scope?: any
                 disposer();
             else
                 disposeImmediately = true;
-            /* TODO:untracked*/(() => effect.call(scope));
+            // TODO:untracked(() => 
+                effect.call(scope)
+            //);
         }
     });
     if (disposeImmediately)
@@ -493,9 +499,13 @@ export function toGetterSetterFunction<T>(observable: ObservableValue<T> | Compu
 			return observable.get();
 	};
 	f.$mobservable = observable;
+    // TODO: remove observe
+    f.observe = function() {
+        return observable.observe.apply(observable, arguments);
+    };
 	f.toString = function() {
 		return observable.toString();
-	}
+	};
 	return f;
 }
 

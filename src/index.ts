@@ -40,10 +40,9 @@ export {
 	createTransformer
 } from './transform';
 
-/*export {
-	// TODO:untracked,
-} from './dnode';
-*/
+export {
+	untracked
+} from './core/global';
 
 export {transaction} from "./core/transaction";
 export {

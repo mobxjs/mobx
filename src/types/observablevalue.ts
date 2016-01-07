@@ -4,6 +4,7 @@ import {getNextId, checkIfStateIsBeingModifiedDuringDerivation} from "../core/gl
 import {IDerivation} from "../core/derivation";
 import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped, valueDidChange} from '../core';
 import {Lambda} from "../interfaces";
+import {autorun} from "../core";
 
 export default class ObservableValue<T> implements IAtom {
 	id = getNextId();
@@ -46,5 +47,19 @@ export default class ObservableValue<T> implements IAtom {
 	
 	toString() {
 		return `ObservableValue[${this.name}:${this.value}]`;
-	}    
+	}
+	
+	// TODO: remove
+	observe(listener:(newValue:T, oldValue:T)=>void, fireImmediately=false):Lambda {
+		let firstTime = true;
+		let prevValue = undefined;
+		return autorun(() => {
+			var newValue = this.get();
+			if (!firstTime || fireImmediately) {
+				listener(newValue, prevValue);
+			}
+			firstTime = false;
+			prevValue = newValue;
+		});
+	}
 }

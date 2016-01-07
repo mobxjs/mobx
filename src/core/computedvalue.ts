@@ -2,7 +2,7 @@ import {IObservable, reportObserved, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction} from "./derivation";
 import state, {getNextId, isComputingDerivation} from "./global";
 import SimpleEventEmitter from "../simpleeventemitter";
-import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped, valueDidChange} from '../core';
+import {autorun, ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped, valueDidChange} from '../core';
 import {Lambda} from "../interfaces";
 import {invariant} from "../utils";
 
@@ -108,5 +108,19 @@ export default class ComputedValue<T> implements IObservable, IDerivation {
 */
 	toString() {
 		return `ComputedValue[${this.name}:${this.value}]`;
+	}
+	
+		// TODO: remove
+	observe(listener:(newValue:T, oldValue:T)=>void, fireImmediately=false):Lambda {
+		let firstTime = true;
+		let prevValue = undefined;
+		return autorun(() => {
+			var newValue = this.get();
+			if (!firstTime || fireImmediately) {
+				listener(newValue, prevValue);
+			}
+			firstTime = false;
+			prevValue = newValue;
+		});
 	}
 }

@@ -25,7 +25,7 @@ test('basic', function(t) {
     x(5);
     t.equal(5, x());
     t.deepEqual([5], b.toArray());
-    t.equal(mobservable._.isComputingView(), false);
+    t.equal(mobservable.extras.isComputingDerivation(), false);
     t.end();
 })
 
@@ -34,7 +34,6 @@ test('basic2', function(t) {
     var z = observable(function () { return x() * 2});
     var y = observable(function () { return x() * 3});
 
-    debugger;
     z.observe(voidObserver);
 
     t.equal(z(), 6);
@@ -44,7 +43,7 @@ test('basic2', function(t) {
     t.equal(z(), 10);
     t.equal(y(), 15);
 
-    t.equal(mobservable._.isComputingView(), false);
+    t.equal(mobservable.extras.isComputingDerivation(), false);
     t.end();
 })
 
@@ -63,7 +62,7 @@ test('dynamic', function(t) {
         t.equal(5, y());
 
         t.deepEqual(b.toArray(), [3, 5]);
-        t.equal(mobservable._.isComputingView(), false);
+        t.equal(mobservable.extras.isComputingDerivation(), false);
 
         t.end();
     }
@@ -88,7 +87,7 @@ test('dynamic2', function(t) {
 
         //no intermediate value 15!
         t.deepEqual([25], b.toArray());
-        t.equal(mobservable._.isComputingView(), false);
+        t.equal(mobservable.extras.isComputingDerivation(), false);
 
         t.end();
     }
@@ -115,7 +114,7 @@ test('readme1', function(t) {
         order.price(20);
         order.price(10);
         t.deepEqual([24,12],b.toArray());
-        t.equal(mobservable._.isComputingView(), false);
+        t.equal(mobservable.extras.isComputingDerivation(), false);
 
         t.end();
     } catch (e) {
@@ -130,7 +129,7 @@ test('batch', function(t) {
     var d = observable(function() { return c() * b() });
     var buf = buffer();
     d.observe(buf);
-    debugger;
+
     a(4);
     b(5);
     // Note, 60 should not happen! (that is d beign computed before c after update of b)
@@ -140,7 +139,8 @@ test('batch', function(t) {
         a(2);
         b(3);
         a(6);
-        t.deepEqual(100, d()); // still hunderd
+        t.equal(d.$mobservable.value, 100); // not updated; in transaction
+        t.equal(d(), 54); // consistent due to inspection
         return 2;
     });
 
@@ -223,7 +223,7 @@ test('scope', function(t) {
     order.price(10);
     order.amount(3);
     t.equal(36, order.total());
-    t.equal(mobservable._.isComputingView(), false);
+    t.equal(mobservable.extras.isComputingDerivation(), false);
 
     t.end();
 })
@@ -255,7 +255,7 @@ test('props1', function(t) {
     order.amount = 5;
     t.deepEqual(totals, [36,48]);
 
-    t.equal(mobservable._.isComputingView(), false);
+    t.equal(mobservable.extras.isComputingDerivation(), false);
     t.end();
 })
 
@@ -526,7 +526,7 @@ test('change count optimization', function(t) {
     t.equal(bCalcs, 2);
     t.equal(cCalcs, 1);
 
-    t.equal(mobservable._.isComputingView(), false);
+    t.equal(mobservable.extras.isComputingDerivation(), false);
     t.end();
 })
 
@@ -558,7 +558,7 @@ test('observables removed', function(t) {
     t.equal(c(), 9);
     t.equal(calcs, 3);
 
-    t.equal(mobservable._.isComputingView(), false);
+    t.equal(mobservable.extras.isComputingDerivation(), false);
     t.end();
 })
 
@@ -633,7 +633,7 @@ test('lazy evaluation', function (t) {
 
     t.equal(observerChanges, 1);
 
-    t.equal(mobservable._.isComputingView(), false);
+    t.equal(mobservable.extras.isComputingDerivation(), false);
     t.end();
 })
 
@@ -770,6 +770,7 @@ test('when', function(t) {
     var x = m(3);
 
     var called = 0;
+    debugger;
     mobservable.autorunUntil(function() {
         return (x() === 4);
     }, function() {
@@ -1169,12 +1170,10 @@ test('issue 50', function(t) {
              'transpreend', 
              [ 'READY', '.a' ], 
              [ 'READY', '.b' ], 
-             [ 'PENDING', '.c' ], 
              'calc c', 
              [ 'READY', '.c' ], 
-             [ 'PENDING', 'ar' ], 
-             'auto', 
              [ 'READY', 'ar' ], 
+             'auto', 
              'transpostend' 
         ]);
         
@@ -1221,12 +1220,10 @@ test('verify transaction events', function(t) {
             [ 'STALE', 'ar' ],
             'transpreend', 
             [ 'READY', '.b' ], 
-            [ 'PENDING', '.c' ], 
             'calc c', 
             [ 'READY', '.c' ], 
-            [ 'PENDING', 'ar' ], 
-            'auto', 
             [ 'READY', 'ar' ], 
+            'auto', 
             'transpostend' 
     ]);
     
@@ -1369,19 +1366,19 @@ test('prematurely end autorun', function(t) {
 
 test('isComputing', function(t) {
     mobservable.autorun(function() {
-        t.equal(mobservable.extras.isComputingView(), true);
+        t.equal(mobservable.extras.isComputingDerivation(), true);
         mobservable.expr(function() {
-            t.equal(mobservable.extras.isComputingView(), true);
+            t.equal(mobservable.extras.isComputingDerivation(), true);
         });
         mobservable.untracked(function() {
-            t.equal(mobservable.extras.isComputingView(), false);
+            t.equal(mobservable.extras.isComputingDerivation(), false);
             mobservable.observable(function() {
-                t.equal(mobservable.extras.isComputingView(), false);
+                t.equal(mobservable.extras.isComputingDerivation(), false);
             })();
             mobservable.autorun(function() {
-                t.equal(mobservable.extras.isComputingView(), true);
+                t.equal(mobservable.extras.isComputingDerivation(), true);
                 mobservable.untracked(function() {
-                    t.equal(mobservable.extras.isComputingView(), false);
+                    t.equal(mobservable.extras.isComputingDerivation(), false);
                 });
             });
         });

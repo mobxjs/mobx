@@ -308,7 +308,7 @@ Object.defineProperty(ObservableArray.prototype, "length", {
         writable: true,
         enumerable: false,
         value: function() {
-            this.$mobservable.notifyObserved();
+            reportObserved(this.$mobservable);
             return baseFunc.apply(this.$mobservable.values, arguments);
         }
     });
@@ -347,7 +347,7 @@ function createArrayBufferItem(index:number) {
         get: function() {
             const impl = this.$mobservable;
             if (impl && index < impl.values.length) {
-                impl.notifyObserved();
+                reportObserved(impl);
                 return impl.values[index];
             }
             return undefined;
