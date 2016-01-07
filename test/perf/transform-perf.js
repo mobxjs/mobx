@@ -25,7 +25,7 @@ function flatten() {
 }
 
 test('non-reactive folder tree', function(t) {
-
+	global.gc();
 	function Folder(parent, name) {
 		this.parent = parent;
 		this.name = "" + name;
@@ -151,7 +151,7 @@ test('non-reactive folder tree', function(t) {
 });
 
 test('reactive folder tree', function(t) {
-
+	global.gc();
 	function Folder(parent, name) {
 		this.parent = parent;
 		m.extendObservable(this, {
@@ -264,10 +264,12 @@ var BOX_COUNT = 10000;
 var BOX_MUTATIONS = 100;
 
 test('non-reactive state serialization', function(t) {
+	global.gc();
 	serializationTester(t, x => x);
 });
 
 test('reactive state serialization', function(t) {
+	global.gc();
 	serializationTester(t, m.createTransformer);
 });
 

@@ -15,6 +15,7 @@ results of this test:
 
 */
 test('one observes ten thousand that observe one', function (t) {
+    global.gc();
     var a = observable(2);
 
     // many observers that listen to one..
@@ -53,6 +54,7 @@ test('one observes ten thousand that observe one', function (t) {
 })
 
 test('five hundrend properties that observe their sibling', function (t) {
+    global.gc();
     var observables = [observable(1)];
     for(var i = 0; i < 500; i++) {
         (function(idx) {
@@ -76,6 +78,7 @@ test('five hundrend properties that observe their sibling', function (t) {
 })
 
 test('late dependency change', function(t) {
+    global.gc();
     var values = [];
     for(var i = 0; i < 100; i++)
     values.push(observable(0))
@@ -100,6 +103,7 @@ test('late dependency change', function(t) {
 })
 
 test('lots of unused computables', function(t) {
+    global.gc();
     var a = observable(1);
 
     // many observers that listen to one..
@@ -142,6 +146,7 @@ test('lots of unused computables', function(t) {
 })
 
 test('many unreferenced observables', function(t) {
+    global.gc();
     var a = observable(3);
     var b = observable(6);
     var c = observable(7);
@@ -161,6 +166,7 @@ test('many unreferenced observables', function(t) {
 })
 
 test('array reduce', function(t) {
+    global.gc();
     var aCalc = 0;
     var ar = observable([]);
     var b = observable(1);
@@ -198,6 +204,7 @@ test('array reduce', function(t) {
 })
 
 test('array classic loop', function(t) {
+    global.gc();
     var ar = observable([]);
     var aCalc = 0;
     var b = observable(1);
@@ -236,6 +243,8 @@ test('array classic loop', function(t) {
 })
 
 function order_system_helper(t, usebatch, keepObserving) {
+    global.gc();
+    t.equal(mobservable._.isComputingView(), false);
     var orders = observable([]);
     var vat = observable(2);
 
@@ -271,9 +280,9 @@ function order_system_helper(t, usebatch, keepObserving) {
         }, this);
     }
 
-    totalAmount();
+    var disp;
     if (keepObserving)
-        totalAmount.observe(voidObserver);
+        disp = totalAmount.observe(voidObserver);
 
     var start = now();
 
@@ -308,6 +317,9 @@ function order_system_helper(t, usebatch, keepObserving) {
 
     t.equal(totalAmount(), 500000);
 
+    if (keepObserving)
+        disp();
+
     var end = now()
     console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
 
@@ -331,6 +343,7 @@ test('order system batched lazy', function(t) {
 })
 
 test('create array', function(t) {
+    global.gc();
     var a = [];
     for(var i = 0; i < 1000; i++)
         a.push(i);
@@ -342,6 +355,7 @@ test('create array', function(t) {
 })
 
 test('create array (fast)', function(t) {
+    global.gc();
     var a = [];
     for(var i = 0; i < 1000; i++)
         a.push(i);
