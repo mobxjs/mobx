@@ -51,7 +51,7 @@ When using `@observer`, a lot of components will become stateless.
 In such cases you can also write reactive function components using `@observer` (this works also on ES5 and with React 0.13):
 
 ```javascript
-const Timer = @observer( ({timerData}) =>
+const Timer = observer( ({timerData}) =>
 	(<span>Seconds passed: { timerData.secondsPassed } </span> )
 );
 ```
