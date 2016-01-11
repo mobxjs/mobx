@@ -1,6 +1,11 @@
 var m = require('../../');
 var test = require('tape');
 
+function gc() {
+    if (typeof global.gc === "function")
+        global.gc();
+}
+
 /**
  * This file compares creating a project tree view using a reactive graph transformation 
  * against the same in a plain js implementation (the baseline).
@@ -25,7 +30,7 @@ function flatten() {
 }
 
 test('non-reactive folder tree', function(t) {
-	global.gc();
+	gc();
 	function Folder(parent, name) {
 		this.parent = parent;
 		this.name = "" + name;
@@ -151,7 +156,7 @@ test('non-reactive folder tree', function(t) {
 });
 
 test('reactive folder tree', function(t) {
-	global.gc();
+	gc();
 	function Folder(parent, name) {
 		this.parent = parent;
 		m.extendObservable(this, {
@@ -264,12 +269,12 @@ var BOX_COUNT = 10000;
 var BOX_MUTATIONS = 100;
 
 test('non-reactive state serialization', function(t) {
-	global.gc();
+	gc();
 	serializationTester(t, x => x);
 });
 
 test('reactive state serialization', function(t) {
-	global.gc();
+	gc();
 	serializationTester(t, m.createTransformer);
 });
 
