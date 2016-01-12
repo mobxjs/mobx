@@ -28,7 +28,7 @@ export default class ObservableValue<T> implements IAtom {
 		// noop
 	}
 
-	set(newValue:T) {
+	set(newValue:T):boolean {
 		assertUnwrapped(newValue, "Modifiers cannot be used on non-initial values.");
 		// TODO: check if derived value is running (not reactor)
 		checkIfStateIsBeingModifiedDuringDerivation(this.name);
@@ -38,6 +38,7 @@ export default class ObservableValue<T> implements IAtom {
 			this.value = makeChildObservable(newValue, this.mode, this.name);
             reportAtomChanged(this);
 		}
+		return changed;
 	}
 	
 	get():T {

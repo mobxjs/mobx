@@ -46,7 +46,7 @@ export class ObservableMap<V> {
 		this.assertValidKey(key);
 		assertUnwrapped(value, `[mobservable.map.set] Expected unwrapped value to be inserted to key '${key}'. If you need to use modifiers pass them as second argument to the constructor`);
 		if (this._has(key)) {
-			const oldValue = (<any>this._data[key])._value;
+			const oldValue = (<any>this._data[key]).value;
 			const changed = this._data[key].set(value);
 			if (changed) {
 				this._events.emit(<IObservableMapChange<V>>{ 
@@ -74,7 +74,7 @@ export class ObservableMap<V> {
 	delete(key: string) {
 		this.assertValidKey(key);
 		if (this._has(key)) {
-			const oldValue = (<any>this._data[key])._value;
+			const oldValue = (<any>this._data[key]).value;
 			transaction(() => {
 				this._keys.remove(key);
 				this._updateHasMapEntry(key, false);

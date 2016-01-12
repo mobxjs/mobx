@@ -169,18 +169,18 @@ export class ObservableArray<T> extends StubArray {
     }
 
     toJSON(): T[] {
-        reportAtomChanged(this.$mobservable);
+        reportObserved(this.$mobservable);
         return this.$mobservable.values.slice();
     }
 
     peek(): T[] {
-        reportAtomChanged(this.$mobservable);
+        reportObserved(this.$mobservable);
         return this.$mobservable.values;
     }
 
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
     find(predicate:(item:T,index:number,array:ObservableArray<T>)=>boolean, thisArg?, fromIndex=0):T {
-        reportAtomChanged(this.$mobservable);
+        reportObserved(this.$mobservable);
         var items = this.$mobservable.values, l = items.length;
         for(var i = fromIndex; i < l; i++)
             if(predicate.call(thisArg, items[i], i, this))

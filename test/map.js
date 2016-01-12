@@ -43,20 +43,20 @@ test('map crud', function(t) {
 	t.equal(m.get("a"), undefined);
 	t.equal(m.get("b"), undefined);
 
-	t.deepEqual(events,
+	function removeObjectProp(item) {
+		delete item.object;
+		return item;
+	};
+	t.deepEqual(events.map(removeObjectProp),
 		[ { type: 'update',
-			object: m,
 			name: 'a',
 			oldValue: 1 },
 		{ type: 'add',
-			object:  m,
 			name: 'b' },
 		{ type: 'delete',
-			object:  m,
 			name: 'a',
 			oldValue: 2 },
 		{ type: 'delete',
-			object: m,
 			name: 'b',
 			oldValue: 3 }
 		]
@@ -247,7 +247,7 @@ test('extras', function(t) {
 	t.equal(mobservable.extras.getDNode(m, "a"),  mobservable.extras.getDNode(m._data.a));
 
 	function name(thing, prop) {
-		return mobservable.extras.getDNode(thing, prop).context.name;
+		return mobservable.extras.getDNode(thing, prop).name;
 	}
 
 	t.equal(name(m, "a"), ".a");
