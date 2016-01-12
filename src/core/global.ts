@@ -7,7 +7,7 @@ export class MobservableGlobals {
 	inTransaction = 0;
     inUntracked = 0;
     isRunningReactions = false;
-	changedAtoms: IAtom[] = [];
+	changedAtoms: { atom: IAtom, observersToNotify: IDerivation[] }[] = [];
 	pendingReactions: IReaction[] = [];
     afterTransactionItems: Lambda[] = []; // TODO: is this needed?
 }

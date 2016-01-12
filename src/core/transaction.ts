@@ -14,8 +14,11 @@ export function transaction<T>(action: () => T, thisArg?): T {
 		return action.call(thisArg);
 	} finally {
 		if (--globalState.inTransaction === 0) {
-            // TODO: faster with for loop?
-			const values = globalState.changedAtoms.splice(0).forEach(reportAtomReady);
+            // TODO: splice needed?
+			// TODO: while needed?
+			const values = globalState.changedAtoms.splice(0);
+			for(var i = 0, l = values.length; i < l; i++)
+				reportAtomReady(values[i].atom, values[i].observersToNotify);
 
 			runReactions();
 
