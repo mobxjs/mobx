@@ -54,12 +54,10 @@ Current stack size is ${ts.length}, active view: "${ts[ts.length -1].toString()}
 }
 
 export function untracked<T>(action:()=>T):T {
-    try { // TODO: remove try finally
-        globals.inUntracked++;
-        return action();
-    } finally {
-        globals.inUntracked--;
-    }
+    globals.inUntracked++;
+    const res = action();
+    globals.inUntracked--;
+    return res;
 }
 
 export function registerGlobals() {

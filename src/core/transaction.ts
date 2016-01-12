@@ -9,25 +9,22 @@ import {reportAtomReady} from "./atom";
 */
 export function transaction<T>(action: () => T, thisArg?): T {
 	globalState.inTransaction += 1;
-    // TODO: no try/ finally?
-	try {
-		return action.call(thisArg);
-	} finally {
-		if (--globalState.inTransaction === 0) {
-            // TODO: splice needed?
-			// TODO: while needed?
-			const values = globalState.changedAtoms.splice(0);
-			for(var i = 0, l = values.length; i < l; i++)
-				reportAtomReady(values[i].atom, values[i].observersToNotify);
+	const res = action.call(thisArg);
+	if (--globalState.inTransaction === 0) {
+		// TODO: splice needed?
+		// TODO: while needed?
+		const values = globalState.changedAtoms.splice(0);
+		for(var i = 0, l = values.length; i < l; i++)
+			reportAtomReady(values[i].atom, values[i].observersToNotify);
 
-			runReactions();
+		runReactions();
 
-            // TODO: needed?
-			const actions = globalState.afterTransactionItems.splice(0);
-			for (var i = 0, l = actions.length; i < l; i++)
-				actions[i]();
-		}
+		// TODO: needed?
+		const actions = globalState.afterTransactionItems.splice(0);
+		for (var i = 0, l = actions.length; i < l; i++)
+			actions[i]();
 	}
+	return res;
 }
 
 // TODO: what is this good for?

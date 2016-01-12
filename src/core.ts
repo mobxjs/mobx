@@ -450,11 +450,8 @@ export function getStrict() {
 export function withStrict(newStrict:boolean, func:Lambda) {
     const baseStrict = strict;
     strict = newStrict;
-    try {
-        func();
-    } finally {
-        strict = baseStrict;
-    }
+    func();
+    strict = baseStrict;
 }
 
 /**

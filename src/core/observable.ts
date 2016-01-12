@@ -17,6 +17,7 @@ export interface IObservable extends IDepTreeNode {
 
 export function addObserver(observable: IObservable, node: IDerivation) {
     observable.observers[observable.observers.length] = node;
+	// TODO: if (obs.length === 1 observable.onBecomeObserved)
 }
 
 export function removeObserver(observable: IObservable, node: IDerivation) {
@@ -50,11 +51,10 @@ export function propagateStaleness(observable:IObservable|IDerivation) {
         notifyDependencyStale(os[i]);
 }
 
-export function propagateReadiness(observable:IObservable|IDerivation, valueDidActuallyChange:boolean) {
-	var os = observable.observers;
-    if (!os)
+export function propagateReadiness(observable:IObservable|IDerivation, valueDidActuallyChange:boolean, observersToNotify:IDerivation[] = observable.observers) {
+    if (!observersToNotify)
         return;
-    os = os.slice(); // TODO: slice needed?
-	for(var l = os.length, i = 0; i < l; i++)
-        notifyDependencyReady(os[i], valueDidActuallyChange);
+	//    observers = observers.slice(); // TODO: slice needed?
+	for(var l = observersToNotify.length, i = 0; i < l; i++)
+        notifyDependencyReady(observersToNotify[i], valueDidActuallyChange);
 }

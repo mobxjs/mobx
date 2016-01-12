@@ -19,8 +19,8 @@ export default class ComputedValue<T> implements IObservable, IDerivation {
 	observing: IObservable[] = [];       // nodes we are looking at. Our value depends on these nodes
 	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
-	protected value: T;
-	onSleepEmitter: SimpleEventEmitter;
+	protected value: T = undefined;
+	onSleepEmitter: SimpleEventEmitter =  null;;
 	boundDerivation:()=>T
 	
 	// TODO: bind derivation immediately, don't store scope

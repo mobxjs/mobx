@@ -42,18 +42,10 @@ export function trackDerivedFunction<T>(derivation:IDerivation, f: () => T) {
     const prevObserving = trackDependencies(derivation);
     let hasError = true;
     let result:T;
-    // TODO: no try catch
-    try {
-        // TODO: strict check withStrict(this.externalRefenceCount === 0, () => { // TODO: always with strict once autorun has own derivable
-        result = f();
-        // });
-        hasError = false;
-    } finally {
-        if (hasError)
-            // TODO: merge with computable view, use this.func.toString
-            console.error(`[DerivedValue '${this.name}'] There was an uncaught error during the computation of a derived value. Please check the next exception.`);
-        bindDependencies(derivation, prevObserving);
-    }
+    // TODO: strict check withStrict(this.externalRefenceCount === 0, () => { // TODO: always with strict once autorun has own derivable
+    result = f();
+    // });
+    bindDependencies(derivation, prevObserving);
     return result;
 }
 

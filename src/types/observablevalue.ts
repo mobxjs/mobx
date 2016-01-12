@@ -12,7 +12,7 @@ export default class ObservableValue<T> implements IAtom {
 	observers: IDerivation[] = []; // TODO: initialize with null       // nodes that are dependent on this node. Will be notified when our state change
 	hasUnreportedChange = false;
 
-	protected value: T;
+	protected value: T = undefined;
 	
 	constructor(value:T, protected mode:ValueMode, public name?: string){
 		if (!name)

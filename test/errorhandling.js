@@ -273,3 +273,38 @@ test('cycle3', function(t) {
     t.equal(mobservable._.isComputingView(), false);
     t.end();
 })
+
+test('issue 86, converging cycles', function(t) {
+    const deleteThisId = mobservable.observable(1);
+    const state = mobservable.observable({ someArray: [] });
+    var calcs = 0;
+
+    state.someArray.push({ id: 1, text: 'I am 1' });
+    state.someArray.push({ id: 2, text: 'I am 2' });
+    
+    // should delete item 1 in first run, which works fine
+    mobservable.autorun(() => {
+        calcs++;
+        const i = _.findIndex(state.someArray, item => item.id === deleteThisId());
+        state.someArray.remove(state.someArray[i]);
+    });
+    
+    t.equal(state.someArray.length, 1); // should be 1, which prints fine
+    t.equal(calcs, 1);
+    deleteThisId(2); // should delete item 2, but it errors on cycle
+    
+    t.equal(console.log(state.someArray.length, 0)); // should be 0, which never prints
+    t.equal(calcs, 3);
+    
+    t.end(); 
+});
+
+test('non converging cycle', function(t) {
+    t.fail();
+    t.end();
+});
+
+test('slow converging cycle', function(t) {
+    t.fail();
+    t.end();
+});
