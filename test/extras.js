@@ -57,11 +57,10 @@ test('getDNode', function(t) {
 
 test('treeD', function(t) {
     var a = m.observable(3);
-    var aName = a.$mobservable.context.name;
+    var aName = a.$mobservable.name;
 
     var dtree = m.extras.getDependencyTree;
     t.deepEqual(dtree(a), {
-       context:null,
        name: aName,
        id: a.$mobservable.id
     });
@@ -71,9 +70,8 @@ test('treeD', function(t) {
         return a() * a();
     };
     var b = m.observable(bFunc);
-    var bName = b.$mobservable.context.name
+    var bName = b.$mobservable.name
     t.deepEqual(dtree(b), {
-        context:bFunc,
         name: bName,
         id: b.$mobservable.id,
         // no dependencies yet, since it isn't observed yet
@@ -83,17 +81,14 @@ test('treeD', function(t) {
         return b();
     };
     var c = m.autorun(cFunc);
-    var cName = c.$mobservable.context.name;
+    var cName = c.$mobservable.name;
     t.deepEqual(dtree(c), {
-        context: cFunc,
         name: cName,
         id: c.$mobservable.id,
         dependencies: [{
-            context: bFunc,
             name: bName,
             id: b.$mobservable.id,
             dependencies: [{
-                context: null,
                 name: aName,
                 id: a.$mobservable.id
             }]
@@ -104,18 +99,14 @@ test('treeD', function(t) {
     t.ok(bName !== cName);
 
     t.deepEqual(m.extras.getObserverTree(a), {
-        context: null,
         name: aName,
         id: a.$mobservable.id,
         observers: [{
-            context: bFunc,
             name: bName,
             id: b.$mobservable.id,
             observers: [{
-                context: cFunc,
                 name: cName,
-                id: c.$mobservable.id,
-                listeners: 1
+                id: c.$mobservable.id
             }]
         }]
     });
@@ -125,11 +116,7 @@ test('treeD', function(t) {
 
 test('names', function(t) {
     function name(thing, prop) {
-        return m.extras.getDNode(thing, prop).context.name;
-    }
-
-    function contextObj(thing, prop) {
-        return m.extras.getDNode(thing, prop).context.object;
+        return m.extras.getDNode(thing, prop).name;
     }
 
     var struct = {
@@ -159,17 +146,6 @@ test('names', function(t) {
     t.equal(name(rstruct.ar[2], "b"), ".ar[x].b");
     t.equal(name(rstruct.ar[3]), ".ar[x]");
 
-    t.equal(contextObj(rstruct,"x"), rstruct);
-    t.equal(contextObj(rstruct, "y"), rstruct);
-    t.equal(contextObj(rstruct.y,"z"), rstruct);
-    t.equal(contextObj(rstruct, "ar"), rstruct);
-    t.equal(contextObj(rstruct.ar), rstruct);
-    t.equal(contextObj(rstruct.ar), rstruct);
-    t.equal(contextObj(rstruct.ar[1],"w"), rstruct);
-    t.equal(contextObj(rstruct.y.a,"b"), rstruct);
-    t.equal(contextObj(rstruct.ar[2], "b"), rstruct);
-    t.equal(contextObj(rstruct.ar[3]), rstruct);
-
     var d = m.autorun(function() {
     });
     t.ok(name(d));
@@ -190,7 +166,7 @@ function stripTrackerOutput(output) {
     return output.map(function (i) {
         if (Array.isArray(i))
             return stripTrackerOutput(i);
-        delete i.context;
+        delete i.node;
         delete i.name;
         return i;
     });
@@ -200,52 +176,49 @@ var trackerOutput1 = function(a, b,c) {
     return [
     { id: a.$mobservable.id,
         changed: true,
-        state: 'READY',
-        newValue: 4 },
+        state: 'READY' },
     { id: b.$mobservable.id,
         changed: true,
-        state: 'READY',
-        newValue: 8 },
+        state: 'READY' },
     { id: c.$mobservable.id,
         changed: true,
-        state: 'READY',
-        newValue: null } ];
+        state: 'READY' } 
+    ];
 }
 
 var trackerOutput2 = function(a, b, c) {
     return [ { id: a.$mobservable.id,
     state: 'STALE',
     changed: false,
-    newValue: null },
+    }, 
   { id: b.$mobservable.id,
     state: 'STALE',
     changed: false,
-    newValue: null },
+  }, 
   { id: c.$mobservable.id,
     state: 'STALE',
     changed: false,
-    newValue: null },
+  }, 
   { id: a.$mobservable.id,
     state: 'READY',
     changed: true,
-    newValue: 4 },
+  }, 
   { id: b.$mobservable.id,
     state: 'PENDING',
     changed: false,
-    newValue: null },
+  }, 
   { id: b.$mobservable.id,
     state: 'READY',
     changed: true,
-    newValue: 8 },
+  }, 
   { id: c.$mobservable.id,
     state: 'PENDING',
     changed: false,
-    newValue: null },
+  }, 
   { id: c.$mobservable.id,
     state: 'READY',
     changed: true,
-    newValue: null }
-  ];
+  }];
 }
 
 test('transition tracker 1', function(t) {
@@ -308,7 +281,6 @@ test('transition tracker 3', function(t) {
         t.deepEqual(stripTrackerOutput(lines), [trackerOutput1(a,b,c).concat([{
             id: d.$mobservable.id,
             state: "READY",
-            newValue: 6,
             changed: true
         }])]);
 

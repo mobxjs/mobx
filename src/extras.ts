@@ -47,8 +47,7 @@ export function reportTransition(node:IDepTreeNode, state:string, changed:boolea
 	transitionTracker && transitionTracker.emit({
 		id: node.id,
 		name: node.name,
-		state: state,
-		changed: changed
+		node, state, changed
 	});
 }
 
@@ -64,7 +63,7 @@ function nodeToDependencyTree(node:IDepTreeNode): IDependencyTree {
 		id: node.id,
 		name: node.name
 	};
-	if (node instanceof ComputedValue && node.observing.length)
+	if (node.observing && node.observing.length)
 		result.dependencies = unique(node.observing).map(nodeToDependencyTree);
 	return result;
 }

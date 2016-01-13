@@ -40,7 +40,7 @@ export default class Reaction implements IReaction {
 	runReaction() {
 		if (!this.disposed) {
 			trackDerivedFunction(this, this.derivation);
-			reportTransition(this, "READY", false);
+			reportTransition(this, "READY", true); // a reaction has always 'changed'.
 		}
 	}
 	

@@ -3,14 +3,15 @@ export interface Lambda {
     name?: string;
 }
 
-// TODO: clean up
 export interface IObservable {
+    observe(callback: (...args: any[])=>void, fireImmediately?: boolean): Lambda;
 }
 
-// TODO: clean up
 export interface IObservableValue<T> extends IObservable {
     (): T;
     (value: T):void;
+    // TODO: remove observe:
+    observe(callback: (newValue: T, oldValue: T)=>void, fireImmediately?: boolean): Lambda;
 }
 
 export interface IObservableArray<T> extends IObservable, Array<T> {
@@ -63,5 +64,5 @@ export interface ITransitionEvent {
     name: string;
     state: string;
     changed: boolean;
-    newValue: string;
+    node: any; // TODO: IAtom;
 }

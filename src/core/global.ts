@@ -10,6 +10,7 @@ export class MobservableGlobals {
 	changedAtoms: { atom: IAtom, observersToNotify: IDerivation[] }[] = [];
 	pendingReactions: IReaction[] = [];
     afterTransactionItems: Lambda[] = []; // TODO: is this needed?
+    nonStrictMode = 0;
 }
 
 
@@ -32,16 +33,19 @@ export function getNextId() {
     return ++globals.mobservableObjectId;
 }
 
+// TODO: move to derivation
 export function isComputingDerivation() {
 	return globals.derivationStack.length > 0;
 }
 
+// TODO: move to derivation
 export function stackDepth () {
 	return globals.derivationStack.length;
 }
 
+// TODO: move to derivation
 export function checkIfStateIsBeingModifiedDuringDerivation(name: string) {
-    if (isComputingDerivation() && !globals.isRunningReactions) {
+    if (isComputingDerivation() && !globals.isRunningReactions && globals.nonStrictMode === 0) {
         // TODO: add url with detailed error subscription / best practice here:
         const ts = globals.derivationStack;
         throw new Error(
@@ -53,6 +57,7 @@ Current stack size is ${ts.length}, active view: "${ts[ts.length -1].toString()}
     }
 }
 
+// TODO: move to observable
 export function untracked<T>(action:()=>T):T {
     globals.inUntracked++;
     const res = action();
@@ -62,6 +67,14 @@ export function untracked<T>(action:()=>T):T {
 
 export function registerGlobals() {
 	// no-op to make explicit why this file is loaded
+}
+
+/**
+ * For testing purposes only; this will break the internal state of existing observables,
+ * but can be used to get back at a stable state after throwing errors
+ */
+export function resetGlobalState() {
+    global.__mobservableGlobal = globals = new MobservableGlobals();
 }
 
 import {IAtom} from "./atom";

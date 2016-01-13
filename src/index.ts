@@ -2,7 +2,7 @@ import {registerGlobals} from "./core/global";
 registerGlobals();
 
 import * as core from './core';
-import {isComputingDerivation} from './core/global';
+import {isComputingDerivation, resetGlobalState} from './core/global';
 import {quickDiff} from './utils';
 import {IDependencyTree, IObserverTree, ITransitionEvent, Lambda} from './interfaces';
 import {getDependencyTree, getDNode, getObserverTree, trackTransitions} from './extras';
@@ -53,7 +53,8 @@ export {
  * 'Private' elements that are exposed for testing and debugging utilities
  */
 export const _ = {
-	quickDiff
+	quickDiff,
+	resetGlobalState
 }
 
 
@@ -63,6 +64,5 @@ export const extras = {
 	getObserverTree,
 	trackTransitions,
 	SimpleEventEmitter,
-	withStrict: core.withStrict,
 	isComputingDerivation
 } 

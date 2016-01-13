@@ -6,7 +6,7 @@
 
 import {transaction, runAfterTransaction} from './core/transaction';
 import {IObservable, reportObserved} from "./core/observable";
-import {isComputingDerivation} from "./core/global";
+import globalState, {isComputingDerivation} from "./core/global";
 import {IDerivation} from "./core/derivation";
 import {Lambda, IObservableArray, IObservableValue, IArrayChange, IArraySplice, IObjectChange} from './interfaces';
 import {isPlainObject, once, deepEquals} from './utils';
@@ -375,7 +375,7 @@ function observableDecorator(target:Object, key:string, baseDescriptor:PropertyD
     descriptor.enumerable = true;
     descriptor.get = function() {
         // the getter might create a reactive property lazily, so this might even happen during a view.
-        withStrict(false, () => {
+        nonStrict(() => {
             ObservableObject.asReactive(this, null,ValueMode.Recursive).set(key, baseValue);
         });
         return this[key];
@@ -441,17 +441,11 @@ export function toJSON(source, detectCycles: boolean = true, __alreadySeen:[any,
     * If strict is enabled, views are not allowed to modify the state.
     * This is a recommended practice, as it makes reasoning about your application simpler.
     */
-// TODO: remove getStrict / withStrict
-var strict = false;
-export function getStrict() {
-    return strict;
-}
-
-export function withStrict(newStrict:boolean, func:Lambda) {
-    const baseStrict = strict;
-    strict = newStrict;
+// TODO: move to derivation?
+export function nonStrict(func:Lambda) {
+    globalState.nonStrictMode++;
     func();
-    strict = baseStrict;
+    globalState.nonStrictMode--;
 }
 
 /**
