@@ -1,3 +1,7 @@
+# 1.2.2
+
+* Add bower support
+
 # 1.2.1
 
 * Computed value now yields consistent results when being inspected while in transaction

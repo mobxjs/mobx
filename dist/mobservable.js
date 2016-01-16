@@ -111,11 +111,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * mobservable
-	 * (c) 2015 - Michel Weststrate
-	 * https://github.com/mweststrate/mobservable
-	 */
 	var dnode_1 = __webpack_require__(2);
 	var utils_1 = __webpack_require__(7);
 	var observablevalue_1 = __webpack_require__(9);
@@ -619,12 +614,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {/**
-	 * mobservable
-	 * (c) 2015 - Michel Weststrate
-	 * https://github.com/mweststrate/mobservable
-	 */
-	var __extends = (this && this.__extends) || function (d, b) {
+	/* WEBPACK VAR INJECTION */(function(global) {var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -1110,11 +1100,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * mobservable
-	 * (c) 2015 - Michel Weststrate
-	 * https://github.com/mweststrate/mobservable
-	 */
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
@@ -1253,11 +1238,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * mobservable
-	 * (c) 2015 - Michel Weststrate
-	 * https://github.com/mweststrate/mobservable
-	 */
 	function once(func) {
 	    var invoked = false;
 	    return function () {
@@ -1377,11 +1357,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * mobservable
-	 * (c) 2015 - Michel Weststrate
-	 * https://github.com/mweststrate/mobservable
-	 */
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
