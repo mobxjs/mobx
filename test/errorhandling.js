@@ -1,9 +1,19 @@
-var test = require('tape');
+var testBase = require('tape');
 var mobservable = require('..');
 var m = mobservable;
 
 var observable = mobservable.observable;
 var voidObserver = function(){};
+
+function test(name, func) {
+    testBase(name, function(t) {
+        try {
+            func(t);    
+        } finally {
+            mobservable._.resetGlobalState();
+        }
+    });
+}
 
 function buffer() {
     var b = [];
@@ -16,105 +26,27 @@ function buffer() {
     return res;
 }
 
-function testException(t, observable, exception) {
-    try {
-        var value = observable();
-        t.fail("Expected exception: " + exception + ", got: " + value);
-    }
-    catch (e) {
-        var message = "" + e;
-        t.equal(message === exception || e.cause === exception || message.indexOf(exception) !== -1, true, "Expected exception '" + exception + "', got: " + e);
-    }
-    t.equal(mobservable._.isComputingView(), false);
-}
-
 test('exception1', function(t) {
     var a = observable(function() {
         throw "hoi";
     });
-    testException(t, a, "hoi");
-    t.equal(mobservable._.isComputingView(), false);
-    t.end();
-})
-
-test('exception2', function(t) {
-    var cbuffer = buffer();
-    var z = observable(true);
-    var x = observable(1);
-    var a = observable(function() {
-        if (z())
-            return x();
-        throw "Some error!";
-    });
-    var b = observable(function() {
-        return a();
-    });
-    var c = observable(function() {
-        return a();
-    });
-    c.observe(cbuffer, true);
-
-    t.equal(a(), 1);
-    t.throws(function() {
-        z(false);
-    });
-
-    t.equal(z(), false);
-    t.equal(a(), 1);
-    t.equal(b(), 1);
-
-    x(2);
-    z(true);
-    t.equal(a(), 2);
-    t.equal(b(), 2);
-    t.equal(cbuffer.toArray().length, 2);
-    t.deepEqual(cbuffer.toArray(), [1,2]);
-    t.equal(mobservable._.isComputingView(), false);
-
+    t.throws(() => a(), "hoi");
     t.end();
 })
 
 test('deny state changes in views', function(t) {
-    try {
-        var x = observable(3);
-        var z = observable(5);
-        var y = observable(function() {
-            z(6);
-            return x() * x();
-        });
-
-        try {
-            t.equal(9, y());
-            t.fail("no exception");
-        } catch(e) {
-            t.ok(("" + e).indexOf('It is not allowed to change the state during the computation of a reactive view') > 0, "Invalid exception: " + e);
-        }
-    
-        // y is broken now...
-        t.equal(y(), undefined); 
-
-        t.equal(mobservable._.isComputingView(), false);
-        t.end();
-    }
-    catch(e) {
-        console.log(e.stack);
-    }
-})
-
-test('allow state changes in non strict views', function(t) {
     var x = observable(3);
     var z = observable(5);
     var y = observable(function() {
-        m.extras.withStrict(false, function() { 
-            z(6);
-        });
+        z(6);
         return x() * x();
     });
 
-    t.equal(9, y());
-    t.equal(z(), 6);
+    
+    t.throws(() => {
+        y()
+    }, 'It is not allowed to change the state during the computation of a reactive view');
 
-    t.equal(mobservable._.isComputingView(), false);
     t.end();
 })
 
@@ -135,35 +67,7 @@ test('allow state changes in autorun', function(t) {
     t.equal(x(), 5);
     t.equal(z(), 5);
 
-    t.equal(mobservable._.isComputingView(), false);
-    t.end();
-})
-
-test('deny state changes in autorun if strict', function(t) {
-    var x = observable(3);
-    var z = observable(3);
-    
-    m.autorun(function() {
-        m.extras.withStrict(true, function() {
-            if (x() !== 3)
-                z(x());
-        });
-    });
-    
-    t.equal(x(), 3);
-    t.equal(z(), 3);
-
-    try {
-        x(5);
-        t.fail("no exception");
-    } catch(e) {
-        t.ok(("" + e).indexOf('It is not allowed to change the state during the computation of a reactive view') > 0, "Invalid exception: " + e);
-    }
-
-    t.equal(x(), 5);
-    t.equal(z(), 3);
-
-    t.equal(mobservable._.isComputingView(), false);
+    t.equal(mobservable.extras.isComputingDerivation(), false);
     t.end();
 })
 
@@ -184,7 +88,7 @@ test('deny array change in view', function(t) {
         }
         
         t.deepEqual(z.slice(), []);
-        t.equal(mobservable._.isComputingView(), false);
+        t.equal(mobservable.extras.isComputingDerivation(), false);
 
         t.end();
     }
@@ -207,45 +111,43 @@ test('allow array change in autorun', function(t) {
     x(2);
     t.deepEqual(z.slice(), [5, 6])
 
-    t.equal(mobservable._.isComputingView(), false);
-
+    t.equal(mobservable.extras.isComputingDerivation(), false);
     t.end();
 })
 
 test('throw error if modification loop', function(t) {
     var x = observable(3);
-    try {
-        var dis = m.autorun(function() {
-            x(x() + 1);
-        });
+    var dis = m.autorun(function() {
+        x(x() + 1); // is allowed to throw, but doesn't as the observables aren't bound yet during first execution
+    });
+    t.throws(() => {
         x(5);
-        t.equal(false, true, "expected exception");
-    } catch(e) {
-        t.ok((""+e).indexOf("Cycle detected") !== -1, "[mobservable] loop detected while updating a value");
-    }
+    }, "Reaction doesn't converge to a stable state")
     t.end();
 })
 
 test('cycle1', function(t) {
-    try {
+    t.throws(() => {
         var p = observable(function() { return p() * 2; }); // thats a cycle!
         p.observe(voidObserver, true);
-        t.fail("expected exception");
-    }
-    catch(e) {
-        t.ok(("" + e).indexOf("Cycle detected") !== -1);
-        t.equal(mobservable._.isComputingView(), false);
-    }
-
-    var a = observable(function() { return b() * 2; });
-    var b = observable(function() { return a() * 2; });
-    testException(t, b, "Cycle detected");
+    }, "Found cyclic dependency");
     t.end();
 })
 
 test('cycle2', function(t) {
+    var a = observable(function() { return b() * 2; });
+    var b = observable(function() { return a() * 2; });
+    t.throws(() => {
+        b()
+    }, "Found cyclic dependency");
+    t.end();
+})
+
+test('cycle3', function(t) {
     var p = observable(function() { return p() * 2; });
-    testException(t, p, "Cycle detected");
+    t.throws(() => {
+        p();
+    }, "Found cyclic dependency");
     t.end();
 })
 
@@ -257,24 +159,20 @@ test('cycle3', function(t) {
     b.observe(voidObserver);
     t.equal(1, a());
 
-    try {
+    t.throws(() => {
         z(false); // introduces a cycle!
-        t.fail("expected exception");
-    } catch(e) {
-        t.ok(("" + e).indexOf("Cycle detected") > -1);
-    }
-    t.equal(b(), 2);
-    testException(t, a, "Cycle detected");
-
-    z(true); // cycle is gone, restore stable state
-    t.equal(1, a());
-    t.equal(2, b());
-
-    t.equal(mobservable._.isComputingView(), false);
+    }, "Found cyclic dependency");
     t.end();
-})
+});
 
 test('issue 86, converging cycles', function(t) {
+    function findIndex(arr, predicate) {
+        for (var i = 0, l = arr.length; i < l; i++)
+            if (predicate(arr[i]) === true)
+                return i;
+        return -1;
+    }
+    
     const deleteThisId = mobservable.observable(1);
     const state = mobservable.observable({ someArray: [] });
     var calcs = 0;
@@ -285,7 +183,7 @@ test('issue 86, converging cycles', function(t) {
     // should delete item 1 in first run, which works fine
     mobservable.autorun(() => {
         calcs++;
-        const i = _.findIndex(state.someArray, item => item.id === deleteThisId());
+        const i = findIndex(state.someArray, item => item.id === deleteThisId());
         state.someArray.remove(state.someArray[i]);
     });
     
@@ -299,12 +197,27 @@ test('issue 86, converging cycles', function(t) {
     t.end(); 
 });
 
-test('non converging cycle', function(t) {
-    t.fail();
-    t.end();
-});
-
 test('slow converging cycle', function(t) {
-    t.fail();
+    var x = mobservable.observable(1);
+    var res = -1;
+    mobservable.autorun(() => {
+        if (x() === 100)
+            res = x();
+        else
+            x(x() + 1);
+    });
+    
+    // ideally the outcome should be 100 / 100.
+    // autorun is only an observer of x *after* the first run, hence the initial outcome is not as expected..
+    // is there a practical use case where such a pattern would be expected?
+    // maybe we need to immediately register observers on the observable? but that would be slow....
+    // or detect cycles and re-run the autorun in that case once?
+    t.equal(x(), 2)
+    t.equal(res, -1);
+    
+    x(7);
+    t.equal(x(), 100)
+    t.equal(res, 100);
+    
     t.end();
 });

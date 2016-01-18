@@ -2,7 +2,6 @@ import {ValueMode, observable, assertUnwrapped, getValueModeFromModifierFunc} fr
 import {IObservableArray, Lambda, IObjectChange} from './interfaces';
 import SimpleEventEmitter from './simpleeventemitter';
 import {transaction} from "./core/transaction";
-import {isComputingDerivation} from "./core/global";
 import {ObservableArray} from './observablearray';
 import ObservableValue from "./types/observablevalue";
 import {isPlainObject} from './utils';

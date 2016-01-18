@@ -1,6 +1,6 @@
 import {IObservable, reportObserved, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction} from "./derivation";
-import state, {getNextId, isComputingDerivation} from "./global";
+import globalState, {getNextId, isComputingDerivation} from "./global";
 import SimpleEventEmitter from "../simpleeventemitter";
 import {autorun, ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped, valueDidChange} from '../core';
 import {Lambda} from "../interfaces";
@@ -41,7 +41,7 @@ export default class ComputedValue<T> implements IObservable, IDerivation {
 	}
 
 	onDependenciesReady(): boolean {
-		const changed = this.compute(true)
+		const changed = this.trackAndCompute()
 		reportTransition(this, "READY", changed);
 		return changed;
 	}
@@ -49,19 +49,21 @@ export default class ComputedValue<T> implements IObservable, IDerivation {
 	get(): T {
 		if (this.isComputing)
 			throw new Error(`[DerivedValue '${this.name}'] Cycle detected`);
-		if (this.dependencyStaleCount > 0 && state.inTransaction > 0) {
-			return this.boundDerivation();
+		if (this.dependencyStaleCount > 0 && globalState.inTransaction > 0) {
+			// somebody is inspecting this computed value while being stale (because it is in a transaction)
+			// so peek into the value
+			return this.peek();
 		}
 		if (this.isLazy) {
 			if (isComputingDerivation()) {
 				// somebody depends on the outcome of this computation
 				this.isLazy = false;
-				this.compute(true);
+				this.trackAndCompute();
 				reportObserved(this);
 			} else {
 				// nobody depends on this computable;
 				// so just compute fresh value and continue to sleep
-				this.compute(false);
+				return this.peek();
 				// TODO: this.value should be cleaned up again!
 			}
 		} else {
@@ -84,34 +86,40 @@ export default class ComputedValue<T> implements IObservable, IDerivation {
         this.onSleepEmitter.once(onSleep);
     }
 
-	compute(track:boolean) {
-		var oldValue = this.value;
+	peek():T {
 		this.isComputing = true;
-		if (!track)
-			this.value = this.boundDerivation();
-		else 			
-			this.value = trackDerivedFunction(this, this.boundDerivation);
+		globalState.isComputingComputedValue++;
+		const res = this.boundDerivation(); 
+		globalState.isComputingComputedValue--;
 		this.isComputing = false
-		return valueDidChange(this.compareStructural, this.value, oldValue)
+		return res;
 	}
 
+	trackAndCompute(): boolean {
+		var oldValue = this.value;
+		// TODO: move isComputing to boundDerivation
+		this.value = trackDerivedFunction(this, this.boundDerivation);
+		const res = valueDidChange(this.compareStructural, this.value, oldValue)
+		if (this.findCycle(this))
+			throw new Error(`${this.toString()}: Found cyclic dependency in computed value '${this.derivation.toString()}'`);
+		return res;
+	}
 
-/* TODO: enable 
-	private findCycle(node: DerivedValue<any>):boolean {
-		var obs = this.observing;
+	protected findCycle(node: ComputedValue<any>):boolean {
+		const obs = this.observing;
 		if (obs.indexOf(node) !== -1)
 			return true;
-		for(var l = obs.length, i = 0; i < l; i++)
-			if (obs[i] instanceof DerivedValue && (<DerivedValue<any>> obs[i]).findCycle(node))
+		for(let l = obs.length, i = 0; i < l; i++)
+			if (obs[i] instanceof ComputedValue && (<ComputedValue<any>> obs[i]).findCycle(node))
 				return true;
 		return false;
 	}
-*/
+
 	toString() {
-		return `ComputedValue[${this.name}:${this.value}]`;
+		return `ComputedValue[${this.name}]`;
 	}
 	
-		// TODO: remove
+		// TODO: refactor to mobservable.observe
 	observe(listener:(newValue:T, oldValue:T)=>void, fireImmediately=false):Lambda {
 		let firstTime = true;
 		let prevValue = undefined;

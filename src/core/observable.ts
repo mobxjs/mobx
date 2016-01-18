@@ -1,7 +1,6 @@
 import {IDerivation, notifyDependencyReady, notifyDependencyStale} from "./derivation";
 import {invariant} from "../utils";
 import globalState from "./global";
-const derivationStack = globalState.derivationStack;
 
 export interface IDepTreeNode {
 	id: number;
@@ -31,6 +30,7 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 export function reportObserved(observable: IObservable) {
 	if (globalState.inUntracked > 0)
 		return;
+	const {derivationStack} = globalState;
 	const l = derivationStack.length;
 	if (l > 0) {
 		const deps = derivationStack[l - 1].observing, depslength = deps.length;

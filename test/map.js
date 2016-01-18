@@ -260,9 +260,7 @@ test('extras', function(t) {
 test('strict', function(t) {
 	var x = map();
 	autorun(function() {
-		mobservable.extras.withStrict(true, function() {
-			x.get("y"); // should not throw
-		});
+		x.get("y"); // should not throw
 	});
 	t.end();
 })
