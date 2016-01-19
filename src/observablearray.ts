@@ -227,7 +227,11 @@ export class ObservableArray<T> extends StubArray {
     }
 
     sort(compareFn?: (a: T, b: T) => number): T[] {
-        return this.replace(this.$mobservable.values.sort.apply(this.$mobservable.values, arguments));
+        this.$mobservable.notifyObserved();
+        // sort by default mutates in place before returning the result
+        // which goes against all good practices. Let's not change the array in place!
+        const clone = (<any>this).slice();
+        return clone.sort.apply(clone, arguments);
     }
 
     remove(value:T):boolean {
