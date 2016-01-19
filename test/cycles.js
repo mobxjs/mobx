@@ -86,3 +86,48 @@ test('cascading active state (form 2)', function(t) {
 
   t.end();
 });
+
+test('emulate rendering', function(t) {
+  var renderCount = 0;
+
+  var Component = function(props) {
+    var _this = this;
+    this.props = props;
+  }
+  Component.prototype.destroy = function() {
+    if (this.handler) { this.handler(); this.handler = null; }
+  }
+
+  Component.prototype.render = function() {
+    var _this = this;
+
+    if (this.handler) { this.handler(); this.handler = null; }
+    this.handler = m.autorun(function() {
+      if (!_this.props.data.title) _this.props.data.title = 'HELLO';
+      renderCount++;
+    });
+  }
+
+  var data = {};
+  m.extendObservable(data, {title: null});
+  var component = new Component({data: data});
+  t.equal(renderCount, 0);
+
+  component.render();
+  t.equal(renderCount, 1);
+
+  data.title = 'WORLD';
+  t.equal(renderCount, 2);
+
+  data.title = null;
+  t.equal(renderCount, 4);
+
+  data.title = 'WORLD';
+  t.equal(renderCount, 5);
+
+  component.destroy();
+  data.title = 'HELLO';
+  t.equal(renderCount, 5);
+
+  t.end();
+});
