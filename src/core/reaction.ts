@@ -22,6 +22,8 @@ export default class Reaction implements IReaction {
 		if (!this.name)
 			this.name = "Reaction#" + this.id;
 		this.derivation = () => derivation.call(scope); // TODO: use bind?
+		// TODO: don't bother whether we are in a transaction; see latest mobservable-react issue
+		// but how would that impact the performance of createTransformer?
 		if (isComputingDerivation() || state.inTransaction > 0)
 			state.pendingReactions.push(this);
 		else

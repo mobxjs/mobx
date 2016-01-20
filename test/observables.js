@@ -1469,3 +1469,39 @@ test('eval in transaction', function(t) {
     t.equal(c, 8);
     t.end();
 })
+
+test('autorun in transaction should run', function(t) {
+    /**
+     * This test is a difficulat test. For optimization purposes we would like to postpone running new reactions until
+     * the end of a transaction. 
+     * 
+     * Yet on the otherhand, even within a transaction (transactions are globally so can be caused by anyone)
+     * people might depend on the synchronous nature of autorun; namely assigning a variable like res in the example below.
+     * 
+     * So for now we prefer the complete synchronous behavior over the side effect.
+     * Note that the autorun won't re-run until the end of the transaction. So only in the initial run the transaction is ignored. 
+     */
+    
+    var a = observable(2);
+    var b = observable(function() { return a() * 2 });
+    var autorunCalcs = 0;
+    var res;
+    
+    mobservable.transaction(function() {
+        a(3);
+        mobservable.autorun(function() {
+            res = b();
+        })
+        t.equal(autorunCalcs, 1);
+        t.equal(res, 6); // consistent value despite transactoin
+        
+        a(4);
+        t.equal(autorunCalcs, 1); // no re-runs
+        t.equal(res, 6);
+    });
+    
+    // re-run
+    t.equal(autorunCalcs, 2);
+    t.equal(res, 6);
+    t.end();
+})
