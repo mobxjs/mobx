@@ -61,23 +61,27 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
 
     var [added, removed] = quickDiff(derivation.observing, prevObserving);
 
-    // TODO: re-enable cycle detection
-    //derivation.hasCycle = false;
     for (var i = 0, l = added.length; i < l; i++) {
-    /*    var dependency = added[i];
-        if (dependency instanceof DerivedValue){
-            if (dependency.findCycle(this)) {
-                derivation.hasCycle = true;
-                // don't observe anything that caused a cycle, or we are stuck forever!
-                derivation.observing.splice(derivation.observing.indexOf(added[i]), 1);
-                dependency.hasCycle = true; // for completeness sake..
-                continue;
-            }
-        }
-    */    addObserver(added[i], derivation);
+        var dependency = added[i];
+        // only check for cycles on new dependencies, existing dependencies cannot cause a cycle..
+        if (findCycle(derivation, dependency))
+			throw new Error(`${this.toString()}: Found cyclic dependency in computed value '${this.derivation.toString()}'`);
+        addObserver(added[i], derivation);
     }
 
     // remove observers after adding them, so that they don't go in lazy mode to early
     for (var i = 0, l = removed.length; i < l; i++)
         removeObserver(removed[i], derivation);
+}
+
+function findCycle(needle:IDerivation, node:IObservable):boolean {
+    const obs = node.observing;
+    if (!obs)
+        return false;
+    if (obs.indexOf(node) !== -1)
+        return true;
+    for(let l = obs.length, i = 0; i < l; i++)
+        if (findCycle(needle, obs[i]))
+            return true;
+    return false;
 }

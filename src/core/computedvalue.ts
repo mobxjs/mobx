@@ -99,20 +99,7 @@ export default class ComputedValue<T> implements IObservable, IDerivation {
 		var oldValue = this.value;
 		// TODO: move isComputing to boundDerivation
 		this.value = trackDerivedFunction(this, this.boundDerivation);
-		const res = valueDidChange(this.compareStructural, this.value, oldValue)
-		if (this.findCycle(this))
-			throw new Error(`${this.toString()}: Found cyclic dependency in computed value '${this.derivation.toString()}'`);
-		return res;
-	}
-
-	protected findCycle(node: ComputedValue<any>):boolean {
-		const obs = this.observing;
-		if (obs.indexOf(node) !== -1)
-			return true;
-		for(let l = obs.length, i = 0; i < l; i++)
-			if (obs[i] instanceof ComputedValue && (<ComputedValue<any>> obs[i]).findCycle(node))
-				return true;
-		return false;
+		return valueDidChange(this.compareStructural, this.value, oldValue)
 	}
 
 	toString() {
