@@ -72,7 +72,7 @@ Observing added properties is impossible to achieve without native Proxy support
 
 * `npm install mobservable --save`.
 * For (Native) React apps `npm install mobservable-react --save` as well. You might also be interested in the [dev tools for React and Mobservable](https://github.com/mweststrate/mobservable-react-devtools).
-* [Five minute interactive introducton to Mobservable and React](https://mweststrate.github.io/mobservable/getting-started.html)
+* [Five minute interactive introduction to Mobservable and React](https://mweststrate.github.io/mobservable/getting-started.html)
 
 ## Top level api
 
