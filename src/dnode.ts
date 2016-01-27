@@ -130,8 +130,6 @@ export class DataNode {
     markReady(stateDidActuallyChange:boolean) {
        if (inTransaction > 0) {
             changedValues.push(this);
-            if (!stateDidActuallyChange)
-                throw new Error("[mobservable] Illegal state; only data values can be readied while in transaction. Please file a bug with stacktrace.");
             return;
         }
         this.state = NodeState.READY;
