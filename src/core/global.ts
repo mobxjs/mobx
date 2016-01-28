@@ -9,7 +9,7 @@ export class MobservableGlobals {
     isRunningReactions = false;
     isComputingComputedValue = 0;
 	changedAtoms: { atom: IAtom, observersToNotify: IDerivation[] }[] = [];
-	pendingReactions: IReaction[] = [];
+	pendingReactions: Reaction[] = [];
     afterTransactionItems: Lambda[] = []; // TODO: is this needed?
     nonStrictMode = 0;
 }
@@ -77,6 +77,6 @@ export function resetGlobalState() {
 }
 
 import {IAtom} from "./atom";
-import {IReaction} from "./reaction";
+import Reaction from "./reaction";
 import {Lambda} from "../interfaces";
 import {IDerivation} from "./derivation";

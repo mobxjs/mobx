@@ -49,7 +49,8 @@ export {
 	ObservableMap
 } from './observablemap';
 
-export {atom, Atom} from "./core/atom";
+export {Atom} from "./core/atom";
+export {default as Reaction} from "./core/reaction";
 
 /**
  * 'Private' elements that are exposed for testing and debugging utilities

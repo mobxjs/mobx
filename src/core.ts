@@ -146,9 +146,16 @@ export function autorun(view:Lambda, scope?:any):Lambda {
         throw new Error("[mobservable.autorun] expects a function");
     if (unwrappedView.length !== 0)
         throw new Error("[mobservable.autorun] expects a function without arguments");
-
-    // TODO: always run untracked
-    const reaction = new Reaction(unwrappedView, scope, view.name);
+	if (scope)
+		unwrappedView = unwrappedView.bind(scope);
+	
+	const reaction = new Reaction(view.name, () => {
+		reaction.track(unwrappedView);
+	});
+	if (isComputingDerivation() || globalState.inTransaction > 0)
+		globalState.pendingReactions.push(reaction);
+	else
+		reaction.runReaction();
 /*
     let disposedPrematurely = false;
     let started = false;

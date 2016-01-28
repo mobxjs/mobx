@@ -22,7 +22,7 @@ export class Atom implements IAtom {
     isDirty = false;
     observers = []; // TODO: initialize lazily
     
-    constructor(name: string, public onBecomeObserved: () => void = noop, public onBecomeUnobserved = noop) {
+    constructor(name?: string, public onBecomeObserved: () => void = noop, public onBecomeUnobserved = noop) {
         this.name = name || ("Atom#" + this.id);
     }
     
