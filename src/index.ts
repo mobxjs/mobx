@@ -49,6 +49,8 @@ export {
 	ObservableMap
 } from './observablemap';
 
+export {atom, Atom} from "./core/atom";
+
 /**
  * 'Private' elements that are exposed for testing and debugging utilities
  */
