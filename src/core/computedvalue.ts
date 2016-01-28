@@ -23,11 +23,14 @@ export default class ComputedValue<T> implements IObservable, IDerivation {
 	onSleepEmitter: SimpleEventEmitter =  null;;
 	boundDerivation:()=>T
 	
-	// TODO: bind derivation immediately, don't store scope
 	constructor(public derivation:()=>T, private scope: Object, public name:string, private compareStructural: boolean) {
 		if (!this.name)
 			this.name = "DerivedValue#" + this.id;
 		this.boundDerivation = () => derivation.call(scope); // TODO: use bind? 
+	}
+
+	onBecomeObserved() {
+		// noop, handled by .get()
 	}
 	
 	onBecomeUnobserved() {

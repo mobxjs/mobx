@@ -1,31 +1,23 @@
-import {IAtom, reportAtomChanged} from "../core/atom";
-import {reportObserved} from "../core/observable";
-import {getNextId, checkIfStateIsBeingModifiedDuringDerivation} from "../core/global";
+import {Atom, atom} from "../core/atom";
+import {checkIfStateIsBeingModifiedDuringDerivation} from "../core/global";
 import {IDerivation} from "../core/derivation";
 import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped, valueDidChange} from '../core';
 import {Lambda} from "../interfaces";
 import {autorun} from "../core";
 
-export default class ObservableValue<T> implements IAtom {
-	id = getNextId();
-	isDirty = false;
-	observers: IDerivation[] = []; // TODO: initialize with null       // nodes that are dependent on this node. Will be notified when our state change
+export default class ObservableValue<T> {
+	atom: Atom;
 	hasUnreportedChange = false;
 
 	protected value: T = undefined;
 	
 	constructor(value:T, protected mode:ValueMode, public name?: string){
-		if (!name)
-			this.name = "ObservableValue#" + this.id;
+		this.atom = atom(name);
 		const [childmode, unwrappedValue] = getValueModeFromValue(value, ValueMode.Recursive);
 		// If the value mode is recursive, modifiers like 'structure', 'reference', or 'flat' could apply
 		if (this.mode === ValueMode.Recursive)
 			this.mode = childmode;
 		this.value = makeChildObservable(unwrappedValue, this.mode, this.name);
-	}
-	
-	onBecomeUnobserved() {
-		// noop
 	}
 
 	set(newValue:T):boolean {
@@ -36,13 +28,13 @@ export default class ObservableValue<T> implements IAtom {
 		const changed = valueDidChange(this.mode === ValueMode.Structure, oldValue, newValue);
 		if (changed) {
 			this.value = makeChildObservable(newValue, this.mode, this.name);
-            reportAtomChanged(this);
+            this.atom.reportChanged();
 		}
 		return changed;
 	}
 	
 	get():T {
-		reportObserved(this);
+		this.atom.reportObserved();
 		return this.value;
 	}
 	

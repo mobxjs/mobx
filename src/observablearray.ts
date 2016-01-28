@@ -5,13 +5,12 @@
  */
 
 import {deepEquals, makeNonEnumerable} from './utils';
-import {IAtom, reportAtomChanged} from "./core/atom";
-import {reportObserved} from "./core/observable";
+import {Atom, atom} from "./core/atom";
 import SimpleEventEmitter from './simpleeventemitter';
 import {ValueMode, assertUnwrapped, makeChildObservable} from './core';
 import {IArrayChange, IArraySplice, IObservableArray, Lambda} from './interfaces';
 import ObservableValue from "./types/observablevalue";
-import {getNextId, checkIfStateIsBeingModifiedDuringDerivation} from "./core/global";
+import {checkIfStateIsBeingModifiedDuringDerivation} from "./core/global";
 import {IDerivation} from "./core/derivation";
 
 
@@ -20,24 +19,19 @@ export class StubArray {
 }
 StubArray.prototype = [];
 
-export class ObservableArrayAdministration<T> implements IAtom {
+export class ObservableArrayAdministration<T> {
+    atom: Atom;
     values: T[];
     changeEvent: SimpleEventEmitter;
     lastKnownLength = 0;
-    id = getNextId();
-    isDirty = false;
-    observers:IDerivation[] = []; // TODO: initialize lazy
     
     // TODO: remove supportEnumerable
     constructor(private array: ObservableArray<T>, public mode:ValueMode, public supportEnumerable:boolean, public name: string) {
+         this.atom = atom(name || "ObservableArray");
     }
-    
-    onBecomeUnobserved() {
-        // noop
-    }
-    
+
     getLength(): number {
-        reportObserved(this);
+        this.atom.reportObserved();
         return this.values.length;
     }
     
@@ -52,7 +46,6 @@ export class ObservableArrayAdministration<T> implements IAtom {
         else
             this.spliceWithArray(newLength, currentLength - newLength);
     }
-    
     
     // adds / removes the necessary numeric properties to this object
     updateLength(oldLength:number, delta:number) {
@@ -113,7 +106,7 @@ export class ObservableArrayAdministration<T> implements IAtom {
     }
 
     private notifyChildUpdate(index:number, oldValue:T) {
-        reportAtomChanged(this);
+        this.atom.reportChanged();
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
         if (this.changeEvent)
             this.changeEvent.emit(<IArrayChange<T>>{ object: <IObservableArray<T>><any> this.array, type: 'update', index: index, oldValue: oldValue});
@@ -122,7 +115,7 @@ export class ObservableArrayAdministration<T> implements IAtom {
     private notifySplice(index:number, deleted:T[], added:T[]) {
         if (deleted.length === 0 && added.length === 0)
             return;
-        reportAtomChanged(this);
+       this.atom.reportChanged();
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
         if (this.changeEvent)
             this.changeEvent.emit(<IArraySplice<T>>{ object: <IObservableArray<T>><any> this.array, type: 'splice', index: index, addedCount: added.length, removed: deleted});
@@ -169,18 +162,18 @@ export class ObservableArray<T> extends StubArray {
     }
 
     toJSON(): T[] {
-        reportObserved(this.$mobservable);
+        this.$mobservable.atom.reportObserved();
         return this.$mobservable.values.slice();
     }
 
     peek(): T[] {
-        reportObserved(this.$mobservable);
+        this.$mobservable.atom.reportObserved();
         return this.$mobservable.values;
     }
 
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
     find(predicate:(item:T,index:number,array:ObservableArray<T>)=>boolean, thisArg?, fromIndex=0):T {
-        reportObserved(this.$mobservable);
+        this.$mobservable.atom.reportObserved();
         var items = this.$mobservable.values, l = items.length;
         for(var i = fromIndex; i < l; i++)
             if(predicate.call(thisArg, items[i], i, this))
@@ -225,6 +218,7 @@ export class ObservableArray<T> extends StubArray {
     }
 
     reverse():T[] {
+        // TODO: like sort, return a copy, see #90
         return this.replace(this.$mobservable.values.reverse());
     }
 
@@ -308,7 +302,7 @@ Object.defineProperty(ObservableArray.prototype, "length", {
         writable: true,
         enumerable: false,
         value: function() {
-            reportObserved(this.$mobservable);
+            this.$mobservable.atom.reportObserved();
             return baseFunc.apply(this.$mobservable.values, arguments);
         }
     });
@@ -331,7 +325,7 @@ function createArrayBufferItem(index:number) {
             const values = impl.values;
             assertUnwrapped(value, "Modifiers cannot be used on array values. For non-reactive array values use makeReactive(asFlat(array)).");
             if (index < values.length) {
-                checkIfStateIsBeingModifiedDuringDerivation(impl.context); 
+                checkIfStateIsBeingModifiedDuringDerivation(impl.atom.name); 
                 var oldValue = values[index];
                 var changed = impl.mode === ValueMode.Structure ? !deepEquals(oldValue, value) : oldValue !== value; 
                 if (changed) {
@@ -347,7 +341,7 @@ function createArrayBufferItem(index:number) {
         get: function() {
             const impl = this.$mobservable;
             if (impl && index < impl.values.length) {
-                reportObserved(impl);
+                impl.atom.reportObserved();
                 return impl.values[index];
             }
             return undefined;

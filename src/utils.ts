@@ -22,6 +22,8 @@ export function once(func: Lambda):Lambda {
     }
 }
 
+export const noop = () => {};
+
 export function unique<T>(list:T[]):T[] {
     var res = [];
     list.forEach(item => {

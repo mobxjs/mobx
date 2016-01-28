@@ -11,12 +11,15 @@ export interface IDepTreeNode {
 
 export interface IObservable extends IDepTreeNode {
 	observers: IDerivation[];
+	onBecomeObserved();
 	onBecomeUnobserved();
 }
 
 export function addObserver(observable: IObservable, node: IDerivation) {
-    observable.observers[observable.observers.length] = node;
-	// TODO: if (obs.length === 1 observable.onBecomeObserved)
+	const obs = observable.observers, l = obs.length;
+    obs[l] = node;
+	if (l === 0)
+		observable.onBecomeObserved();
 }
 
 export function removeObserver(observable: IObservable, node: IDerivation) {

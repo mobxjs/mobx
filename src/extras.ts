@@ -18,10 +18,10 @@ export function getDNode(thing:any, property?:string):IDepTreeNode {
 	const propError = `[mobservable.getDNode] property '${property}' of '${thing}' doesn't seem to be a reactive property`;
 
 	if (thing instanceof ObservableMap && property) {
-		const dnode = thing._data[property];
-		if (!dnode)
+		const value = thing._data[property];
+		if (!value)
 			throw new Error(propError);
-		return dnode;
+		return getDNode(value);
 	}
 	if (!isObservable(thing, property)) {
 		if (property)
@@ -30,14 +30,18 @@ export function getDNode(thing:any, property?:string):IDepTreeNode {
 	}
 	if (property !== undefined) {
 		if (thing.$mobservable instanceof ObservableObject)
-			return thing.$mobservable.values[property];
+			return getDNode(thing.$mobservable.values[property]);
 		throw new Error(propError);
 	}
-	if (thing instanceof ObservableValue || thing instanceof ComputedValue || thing instanceof Reaction)
+	if (thing instanceof ObservableValue)
+		return thing.atom;
+	if (thing instanceof ComputedValue || thing instanceof Reaction)
 		return thing;
 	if (thing.$mobservable) {
 		if (thing.$mobservable instanceof ObservableObject || thing instanceof ObservableMap)
 			throw new Error(`[mobservable.getDNode] missing properties parameter. Please specify a property of '${thing}'.`);
+		if (thing.$mobservable instanceof ObservableValue)
+			return thing. $mobservable.atom;
 		return thing.$mobservable;
 	}
 	throw new Error(`[mobservable.getDNode] ${thing} doesn't seem to be reactive`);

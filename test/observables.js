@@ -799,7 +799,7 @@ test('when 2', function(t) {
     });
 
     t.equal(called, 1);
-    t.equal(x.$mobservable.observers.length, 0)
+    t.equal(x.$mobservable.atom.observers.length, 0)
     x(5);
     x(3);
     t.equal(called, 1);
@@ -1342,20 +1342,19 @@ test('prematurely end autorun', function(t) {
             x();
         });
 
-        t.equal(x.$mobservable.observers.length, 0);
+        t.equal(x.$mobservable.atom.observers.length, 0);
         t.equal(dis1.$mobservable.observing.length, 0);
         t.equal(dis2.$mobservable.observing.length, 0);
         
         dis1();
-
     });
-    t.equal(x.$mobservable.observers.length, 1);
+    t.equal(x.$mobservable.atom.observers.length, 1);
     t.equal(dis1.$mobservable.observing.length, 0);
     t.equal(dis2.$mobservable.observing.length, 1);
     
     dis2();
 
-    t.equal(x.$mobservable.observers.length, 0);
+    t.equal(x.$mobservable.atom.observers.length, 0);
     t.equal(dis1.$mobservable.observing.length, 0);
     t.equal(dis2.$mobservable.observing.length, 0);
     
@@ -1470,6 +1469,7 @@ test('eval in transaction', function(t) {
     t.end();
 })
 
+/*
 test('autorun in transaction should run', function(t) {
     /**
      * This test is a difficulat test. For optimization purposes we would like to postpone running new reactions until
@@ -1481,7 +1481,7 @@ test('autorun in transaction should run', function(t) {
      * So for now we prefer the complete synchronous behavior over the side effect.
      * Note that the autorun won't re-run until the end of the transaction. So only in the initial run the transaction is ignored. 
      */
-    
+ /*  
     var a = observable(2);
     var b = observable(function() { return a() * 2 });
     var autorunCalcs = 0;
@@ -1490,6 +1490,7 @@ test('autorun in transaction should run', function(t) {
     mobservable.transaction(function() {
         a(3);
         mobservable.autorun(function() {
+            autorunCalcs++;
             res = b();
         })
         t.equal(autorunCalcs, 1);
@@ -1505,3 +1506,4 @@ test('autorun in transaction should run', function(t) {
     t.equal(res, 6);
     t.end();
 })
+*/

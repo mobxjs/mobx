@@ -57,12 +57,12 @@ test('getDNode', function(t) {
 
 test('treeD', function(t) {
     var a = m.observable(3);
-    var aName = a.$mobservable.name;
+    var aName = a.$mobservable.atom.name;
 
     var dtree = m.extras.getDependencyTree;
     t.deepEqual(dtree(a), {
        name: aName,
-       id: a.$mobservable.id
+       id: a.$mobservable.atom.id
     });
 
 
@@ -90,7 +90,7 @@ test('treeD', function(t) {
             id: b.$mobservable.id,
             dependencies: [{
                 name: aName,
-                id: a.$mobservable.id
+                id: a.$mobservable.atom.id
             }]
         }]
     });
@@ -100,7 +100,7 @@ test('treeD', function(t) {
 
     t.deepEqual(m.extras.getObserverTree(a), {
         name: aName,
-        id: a.$mobservable.id,
+        id: a.$mobservable.atom.id,
         observers: [{
             name: bName,
             id: b.$mobservable.id,
@@ -174,7 +174,7 @@ function stripTrackerOutput(output) {
 
 var trackerOutput1 = function(a, b,c) {
     return [
-    { id: a.$mobservable.id,
+    { id: a.$mobservable.atom.id,
         changed: true,
         state: 'READY' },
     { id: b.$mobservable.id,
@@ -187,7 +187,7 @@ var trackerOutput1 = function(a, b,c) {
 }
 
 var trackerOutput2 = function(a, b, c) {
-    return [ { id: a.$mobservable.id,
+    return [ { id: a.$mobservable.atom.id,
     state: 'STALE',
     changed: false,
     }, 
@@ -199,7 +199,7 @@ var trackerOutput2 = function(a, b, c) {
     state: 'STALE',
     changed: false,
   }, 
-  { id: a.$mobservable.id,
+  { id: a.$mobservable.atom.id,
     state: 'READY',
     changed: true,
   }, 
@@ -279,7 +279,7 @@ test('transition tracker 3', function(t) {
 
     setTimeout(function() {
         t.deepEqual(stripTrackerOutput(lines), [trackerOutput1(a,b,c).concat([{
-            id: d.$mobservable.id,
+            id: d.$mobservable.atom.id,
             state: "READY",
             changed: true
         }])]);

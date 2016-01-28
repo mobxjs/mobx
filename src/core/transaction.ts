@@ -1,5 +1,5 @@
 import globalState from "./global";
-import {reportAtomReady} from "./atom";
+import {propagateAtomReady} from "./atom";
 
 /**
  * Magic number alert!
@@ -22,7 +22,7 @@ export function transaction<T>(action: () => T, thisArg?): T {
 		// TODO: while needed?
 		const values = globalState.changedAtoms.splice(0);
 		for(var i = 0, l = values.length; i < l; i++)
-			reportAtomReady(values[i].atom, values[i].observersToNotify);
+			propagateAtomReady(values[i].atom, values[i].observersToNotify);
 
 		runReactions();
 

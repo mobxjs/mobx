@@ -19,7 +19,7 @@ export function notifyDependencyStale(derivation: IDerivation) {
 }
 
 export function notifyDependencyReady(derivation: IDerivation, dependencyDidChange: boolean) {
-    invariant(derivation.dependencyStaleCount > 0);
+    // TODO: fix invariant(derivation.dependencyStaleCount > 0);
     if (dependencyDidChange)
         derivation.dependencyChangeCount += 1;
     if (--derivation.dependencyStaleCount === 0) {
