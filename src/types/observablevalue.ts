@@ -1,5 +1,5 @@
 import {Atom, atom} from "../core/atom";
-import {checkIfStateIsBeingModifiedDuringDerivation} from "../core/global";
+import {checkIfStateModificationsAreAllowed} from "../core/global";
 import {IDerivation} from "../core/derivation";
 import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped, valueDidChange} from '../core';
 import {Lambda} from "../interfaces";
@@ -23,7 +23,7 @@ export default class ObservableValue<T> {
 	set(newValue:T):boolean {
 		assertUnwrapped(newValue, "Modifiers cannot be used on non-initial values.");
 		// TODO: check if derived value is running (not reactor)
-		checkIfStateIsBeingModifiedDuringDerivation(this.name);
+		checkIfStateModificationsAreAllowed();
 		var oldValue = this.value;
 		const changed = valueDidChange(this.mode === ValueMode.Structure, oldValue, newValue);
 		if (changed) {

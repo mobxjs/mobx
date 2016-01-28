@@ -382,7 +382,8 @@ function observableDecorator(target:Object, key:string, baseDescriptor:PropertyD
     descriptor.enumerable = true;
     descriptor.get = function() {
         // the getter might create a reactive property lazily, so this might even happen during a view.
-        nonStrict(() => {
+        // TODO: eliminate non-strict; creating observables during views is allowed, just don't use set.
+        allowStateChanges(true, () => {
             ObservableObject.asReactive(this, null,ValueMode.Recursive).set(key, baseValue);
         });
         return this[key];
@@ -448,11 +449,12 @@ export function toJSON(source, detectCycles: boolean = true, __alreadySeen:[any,
     * If strict is enabled, views are not allowed to modify the state.
     * This is a recommended practice, as it makes reasoning about your application simpler.
     */
-// TODO: move to derivation?
-export function nonStrict(func:Lambda) {
-    globalState.nonStrictMode++;
-    func();
-    globalState.nonStrictMode--;
+export function allowStateChanges<T>(allowStateChanges: boolean, func:() => T):T {
+    const prev = globalState.allowStateChanges;
+    globalState.allowStateChanges = allowStateChanges;
+    const res = func();
+    globalState.allowStateChanges = prev;
+    return res;   
 }
 
 /**

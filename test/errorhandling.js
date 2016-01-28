@@ -80,12 +80,9 @@ test('deny array change in view', function(t) {
             return x() * x();
         });
 
-        try {
+        t.throws(function() {
             t.equal(9, y());
-            t.fail("no exception");
-        } catch(e) {
-            t.ok(("" + e).indexOf('It is not allowed to change the state during the computation of a reactive view') > 0, "Invalid exception: " + e);
-        }
+        }, 'It is not allowed to change the state during the computation of a reactive derivation');
         
         t.deepEqual(z.slice(), []);
         t.equal(mobservable.extras.isComputingDerivation(), false);

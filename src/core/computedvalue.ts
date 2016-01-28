@@ -21,12 +21,24 @@ export default class ComputedValue<T> implements IObservable, IDerivation {
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 	protected value: T = undefined;
 	onSleepEmitter: SimpleEventEmitter =  null;;
-	boundDerivation:()=>T
+	peek:()=>T;
 	
 	constructor(public derivation:()=>T, private scope: Object, public name:string, private compareStructural: boolean) {
 		if (!this.name)
 			this.name = "DerivedValue#" + this.id;
-		this.boundDerivation = () => derivation.call(scope); // TODO: use bind? 
+		this.peek = () => {
+			this.isComputing = true;
+			globalState.isComputingComputedValue++;
+			const prevAllowStateChanges = globalState.allowStateChanges;
+			globalState.allowStateChanges = false;
+			
+			const res = derivation.call(scope);
+			
+			globalState.allowStateChanges = prevAllowStateChanges;
+			globalState.isComputingComputedValue--;
+			this.isComputing = false
+			return res;
+		} 
 	}
 
 	onBecomeObserved() {
@@ -89,19 +101,9 @@ export default class ComputedValue<T> implements IObservable, IDerivation {
         this.onSleepEmitter.once(onSleep);
     }
 
-	peek():T {
-		this.isComputing = true;
-		globalState.isComputingComputedValue++;
-		const res = this.boundDerivation(); 
-		globalState.isComputingComputedValue--;
-		this.isComputing = false
-		return res;
-	}
-
 	trackAndCompute(): boolean {
 		var oldValue = this.value;
-		// TODO: move isComputing to boundDerivation
-		this.value = trackDerivedFunction(this, this.boundDerivation);
+		this.value = trackDerivedFunction(this, this.peek);
 		return valueDidChange(this.compareStructural, this.value, oldValue)
 	}
 

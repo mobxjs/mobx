@@ -40,11 +40,7 @@ export function notifyDependencyReady(derivation: IDerivation, dependencyDidChan
 
 export function trackDerivedFunction<T>(derivation:IDerivation, f: () => T) {
     const prevObserving = trackDependencies(derivation);
-    let hasError = true;
-    let result:T;
-    // TODO: strict check withStrict(this.externalRefenceCount === 0, () => { // TODO: always with strict once autorun has own derivable
-    result = f();
-    // });
+    const result = f();
     bindDependencies(derivation, prevObserving);
     return result;
 }

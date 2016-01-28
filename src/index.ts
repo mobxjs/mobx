@@ -67,5 +67,6 @@ export const extras = {
 	getObserverTree,
 	trackTransitions,
 	SimpleEventEmitter,
-	isComputingDerivation
+	isComputingDerivation,
+	allowStateChanges: core.allowStateChanges
 } 

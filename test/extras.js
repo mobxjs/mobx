@@ -312,3 +312,23 @@ test('transition tracker 4', function(t) {
         t.end();
     }, 100);
 })
+
+test('strict mode checks', function(t) {
+    var x = mobservable.observable(3);
+    
+    mobservable.extras.allowStateChanges(false, function() {
+        x();        
+    });
+
+    mobservable.extras.allowStateChanges(true, function() {
+        x(7);        
+    });
+        
+    t.throws(function() {
+        mobservable.extras.allowStateChanges(false, function() {
+            x(4);        
+        });
+    });
+    
+    t.end();
+});

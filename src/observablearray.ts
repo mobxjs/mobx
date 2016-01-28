@@ -10,7 +10,7 @@ import SimpleEventEmitter from './simpleeventemitter';
 import {ValueMode, assertUnwrapped, makeChildObservable} from './core';
 import {IArrayChange, IArraySplice, IObservableArray, Lambda} from './interfaces';
 import ObservableValue from "./types/observablevalue";
-import {checkIfStateIsBeingModifiedDuringDerivation} from "./core/global";
+import {checkIfStateModificationsAreAllowed} from "./core/global";
 import {IDerivation} from "./core/derivation";
 
 
@@ -53,12 +53,12 @@ export class ObservableArrayAdministration<T> {
             throw new Error("[mobservable] Modification exception: the internal structure of an observable array was changed. Did you use peek() to change it?");
         this.lastKnownLength += delta;
         if (delta < 0) {
-            checkIfStateIsBeingModifiedDuringDerivation(this.name);
+            checkIfStateModificationsAreAllowed();
             if (this.supportEnumerable)
                 for(var i = oldLength + delta; i < oldLength; i++)
                     delete this.array[i]; // bit faster but mem inefficient: 
         } else if (delta > 0) {
-            checkIfStateIsBeingModifiedDuringDerivation(this.name);
+            checkIfStateModificationsAreAllowed();
             if (oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
                 reserveArrayBuffer(oldLength + delta);
             // funny enough, this is faster than slicing ENUMERABLE_PROPS into defineProperties, and faster as a temporarily map
@@ -325,7 +325,7 @@ function createArrayBufferItem(index:number) {
             const values = impl.values;
             assertUnwrapped(value, "Modifiers cannot be used on array values. For non-reactive array values use makeReactive(asFlat(array)).");
             if (index < values.length) {
-                checkIfStateIsBeingModifiedDuringDerivation(impl.atom.name); 
+                checkIfStateModificationsAreAllowed(); 
                 var oldValue = values[index];
                 var changed = impl.mode === ValueMode.Structure ? !deepEquals(oldValue, value) : oldValue !== value; 
                 if (changed) {

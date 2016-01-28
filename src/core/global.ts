@@ -11,26 +11,26 @@ export class MobservableGlobals {
 	changedAtoms: { atom: IAtom, observersToNotify: IDerivation[] }[] = [];
 	pendingReactions: Reaction[] = [];
     afterTransactionItems: Lambda[] = []; // TODO: is this needed?
-    nonStrictMode = 0;
+    allowStateChanges = true;
 }
 
 
-const globals = (() => {
+const globalState = (() => {
     const res = new MobservableGlobals();
     /**
     * Backward compatibility check
     */
-    if (global.__mobservableTrackingStack || global.__mobservableViewStack || (global.__mobservableGlobal && global.__mobservableGlobal.version !== globals.version))
+    if (global.__mobservableTrackingStack || global.__mobservableViewStack || (global.__mobservableGlobal && global.__mobservableGlobal.version !== globalState.version))
 	   throw new Error("[mobservable] An incompatible version of mobservable is already loaded.");
     if (global.__mobservableGlobal)
         return global.__mobservableGlobal;
     return global.__mobservableGlobal = res;    
 })();
 
-export default globals;
+export default globalState;
 
 export function getNextId() {
-    return ++globals.mobservableObjectId;
+    return ++globalState.mobservableObjectId;
 }
 
 // TODO: move to derivation
@@ -40,25 +40,25 @@ export function isComputingDerivation() {
 
 // TODO: move to derivation
 export function stackDepth () {
-	return globals.derivationStack.length;
+	return globalState.derivationStack.length;
 }
 
 // TODO: move to derivation
-export function checkIfStateIsBeingModifiedDuringDerivation(name: string) {
+export function checkIfStateModificationsAreAllowed() {
 // TODO: kill nonStrictMode check? how does that relate to ES6 props?
-    if (globals.isComputingComputedValue > 0 && globals.nonStrictMode === 0) {
+// TODO: use invariant
+    if (!globalState.allowStateChanges) {
         // TODO: add url with detailed error subscription / best practice here:
-        const ts = globals.derivationStack;
         throw new Error(
-`[mobservable] It is not allowed to change the state during the computation of a reactive view.`);
+`[mobservable] It is not allowed to change the state during the computation of a reactive derivation.`);
     }
 }
 
 // TODO: move to observable
 export function untracked<T>(action:()=>T):T {
-    globals.inUntracked++;
+    globalState.inUntracked++;
     const res = action();
-    globals.inUntracked--;
+    globalState.inUntracked--;
     return res;
 }
 
@@ -73,7 +73,7 @@ export function registerGlobals() {
 export function resetGlobalState() {
     const defaultGlobals = new MobservableGlobals();
     for (var key in defaultGlobals)
-        globals[key] = defaultGlobals[key];
+        globalState[key] = defaultGlobals[key];
 }
 
 import {IAtom} from "./atom";
