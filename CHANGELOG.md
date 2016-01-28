@@ -1,3 +1,11 @@
+# 2.0.0
+
+* Improved the scheduling of reactions. Reactions are now allowed to loop as long as the converge to a stable state.  
+This means that it is allowed in an to change the state in such a way that the same reaction is triggered again.
+* Changed error handling: Mobservable will always fail fast now. This means that a reactive computation should never allow an exception to escape as Mobservable will no longer try to recover from it
+* `.fastArray` has been deprecated and has become the default when creating arrays.
+* Mobservable is now extensible! Use the exposed `Atom` or `Reaction` classes to define your own custom state values and reactive actions.
+
 # 1.2.0
 
 * Implemented #67: Reactive graph transformations. See: http://mweststrate.github.io/mobservable/refguide/create-transformer.html
