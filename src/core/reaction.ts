@@ -1,8 +1,7 @@
 import {IObservable, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction} from "./derivation";
 import globalState, {getNextId, isComputingDerivation} from "./global";
-import SimpleEventEmitter from "../simpleeventemitter";
-import {invariant} from "../utils";
+import {invariant} from "../utils/utils";
 import {reportTransition} from "../extras";
 import {runReactions} from "./transaction";
 

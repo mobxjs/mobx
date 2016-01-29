@@ -7,10 +7,10 @@ import ObservableValue from "./types/observablevalue";
 import ComputedValue from "./core/computedvalue";
 import Reaction from "./core/reaction";
 import {IDepTreeNode} from "./core/observable";
-import {ObservableObject} from './observableobject';
-import {ObservableMap} from './observablemap';
-import SimpleEventEmitter from './simpleeventemitter';
-import {once, unique} from './utils';
+import {ObservableObject} from './types/observableobject';
+import {ObservableMap} from './types/observablemap';
+import SimpleEventEmitter from './utils/simpleeventemitter';
+import {once, unique} from './utils/utils';
 import {isObservable} from './core';
 import {IDependencyTree, ITransitionEvent, IObserverTree, Lambda} from './interfaces';
 

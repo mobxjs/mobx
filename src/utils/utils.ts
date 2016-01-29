@@ -154,5 +154,5 @@ export function quickDiff<T>(current:T[], base:T[]):[T[],T[]] {
     return [added, removed];
 }
 
-import {Lambda} from './interfaces';
-import {ObservableArray} from './observablearray';
+import {Lambda} from '../interfaces';
+import {ObservableArray} from '../types/observablearray';

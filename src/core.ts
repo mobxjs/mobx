@@ -9,13 +9,13 @@ import {IObservable, reportObserved} from "./core/observable";
 import globalState, {isComputingDerivation} from "./core/global";
 import {IDerivation} from "./core/derivation";
 import {Lambda, IObservableArray, IObservableValue, IArrayChange, IArraySplice, IObjectChange} from './interfaces';
-import {isPlainObject, once, deepEquals} from './utils';
+import {isPlainObject, once, deepEquals} from './utils/utils';
 import ComputedValue from "./core/computedvalue";
 import Reaction from "./core/reaction";
 import ObservableValue from "./types/observablevalue";
-import {createObservableArray, ObservableArray} from './observablearray';
-import {ObservableObject} from './observableobject';
-import {ObservableMap, KeyValueMap} from './observablemap';
+import {createObservableArray, ObservableArray} from './types/observablearray';
+import {ObservableObject} from './types/observableobject';
+import {ObservableMap, KeyValueMap} from './types/observablemap';
 
 /**
     * Turns an object, array or function into a reactive structure.

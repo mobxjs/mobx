@@ -1,6 +1,6 @@
 import ComputedValue from './core/computedvalue';
 import {getDNode} from './extras';
-import {once} from './utils';
+import {once} from './utils/utils';
 import {isObservable, autorun} from './core';
 
 export type ITransformer<A, B> = (object: A) => B;

@@ -1,8 +1,12 @@
 import {IObservable, IDepTreeNode, propagateReadiness, propagateStaleness, addObserver, removeObserver} from "./observable";
-import {invariant, quickDiff} from "../utils";
+import {invariant, quickDiff} from "../utils/utils";
 import {reportTransition} from "../extras";
 import globalState from "./global";
 
+/**
+ * A derivation is everything that can be derived from the state (all the atoms) in a pure manner.
+ * See https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.xvbh6qd74
+ */
 export interface IDerivation extends IDepTreeNode {
     observing: IObservable[];
     observers?: IDerivation[];
@@ -11,6 +15,9 @@ export interface IDerivation extends IDepTreeNode {
     onDependenciesReady():boolean;
 }
 
+/**
+ * Notify a derivation that one of the values it is observing has become stale
+ */
 export function notifyDependencyStale(derivation: IDerivation) {
     if (++derivation.dependencyStaleCount === 1) {
         reportTransition(derivation, "STALE");
@@ -18,6 +25,11 @@ export function notifyDependencyStale(derivation: IDerivation) {
     }
 }
 
+/**
+ * Notify a derivation that one of the values it is observing has become stable again.
+ * If all observed values are stable and at least one of them has changed, the derivation
+ * will be scheduled for re-evaluation.
+ */
 export function notifyDependencyReady(derivation: IDerivation, dependencyDidChange: boolean) {
     // TODO: fix invariant(derivation.dependencyStaleCount > 0);
     if (dependencyDidChange)
@@ -38,18 +50,18 @@ export function notifyDependencyReady(derivation: IDerivation, dependencyDidChan
     }
 }
 
+/**
+ * Executes the provided function `f` and tracks which observables are being accessed.
+ * The tracking information is stored on the `derivation` object and the derivation is registered
+ * as observer of any of the accessed observables.
+ */
 export function trackDerivedFunction<T>(derivation:IDerivation, f: () => T) {
-    const prevObserving = trackDependencies(derivation);
-    const result = f();
-    bindDependencies(derivation, prevObserving);
-    return result;
-}
-
-function trackDependencies(derivation: IDerivation):IObservable[] {
     const prevObserving = derivation.observing;
     derivation.observing = [];
     globalState.derivationStack.push(derivation);
-    return prevObserving;
+    const result = f();
+    bindDependencies(derivation, prevObserving);
+    return result;
 }
 
 function bindDependencies(derivation: IDerivation, prevObserving: IObservable[]) {
@@ -70,6 +82,10 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
         removeObserver(removed[i], derivation);
 }
 
+/**
+ * Find out whether the dependency tree of this derivation contains a cycle, as would be the case in a 
+ * computation like `a = a * 2`
+ */
 function findCycle(needle:IDerivation, node:IObservable):boolean {
     const obs = node.observing;
     if (!obs)

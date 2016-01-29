@@ -1,10 +1,9 @@
 import {IObservable, reportObserved, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction} from "./derivation";
 import globalState, {getNextId, isComputingDerivation} from "./global";
-import SimpleEventEmitter from "../simpleeventemitter";
 import {autorun, ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped, valueDidChange} from '../core';
 import {Lambda} from "../interfaces";
-import {invariant} from "../utils";
+import {invariant} from "../utils/utils";
 import {reportTransition} from "../extras";
 
 /**

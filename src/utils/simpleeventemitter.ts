@@ -3,7 +3,7 @@
  * (c) 2015 - Michel Weststrate
  * https://github.com/mweststrate/mobservable
  */
-import {Lambda} from './interfaces';
+import {Lambda} from '../interfaces';
 import {once} from './utils';
 
 // TODO: make generic

@@ -1,5 +1,5 @@
 import {IDerivation, notifyDependencyReady, notifyDependencyStale} from "./derivation";
-import {invariant} from "../utils";
+import {invariant} from "../utils/utils";
 import globalState from "./global";
 
 export interface IDepTreeNode {

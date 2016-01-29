@@ -1,5 +1,5 @@
 import {IObservable, propagateReadiness, propagateStaleness, reportObserved} from "./observable";
-import {invariant, noop} from "../utils";
+import {invariant, noop} from "../utils/utils";
 import globalState, {getNextId} from "./global";
 import {reportTransition} from "../extras";
 import {runReactions} from "./transaction";

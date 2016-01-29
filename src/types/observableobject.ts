@@ -3,11 +3,11 @@
  * (c) 2015 - Michel Weststrate
  * https://github.com/mweststrate/mobservable
  */
-import ObservableValue from "./types/observablevalue";
-import ComputedValue from "./core/computedvalue";
-import {ValueMode, makeChildObservable, AsStructure} from './core';
-import {IObjectChange, Lambda} from './interfaces';
-import SimpleEventEmitter from './simpleeventemitter';
+import ObservableValue from "./observablevalue";
+import ComputedValue from "../core/computedvalue";
+import {ValueMode, makeChildObservable, AsStructure} from '../core';
+import {IObjectChange, Lambda} from '../interfaces';
+import SimpleEventEmitter from '../utils/simpleeventemitter';
 
 // responsible for the administration of objects that have become reactive
 export class ObservableObject { // TODO: implement IObservable

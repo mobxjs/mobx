@@ -1,10 +1,10 @@
-import {ValueMode, observable, assertUnwrapped, getValueModeFromModifierFunc} from './core';
-import {IObservableArray, Lambda, IObjectChange} from './interfaces';
-import SimpleEventEmitter from './simpleeventemitter';
-import {transaction} from "./core/transaction";
+import {ValueMode, observable, assertUnwrapped, getValueModeFromModifierFunc} from '../core';
+import {IObservableArray, Lambda, IObjectChange} from '../interfaces';
+import SimpleEventEmitter from '../utils/simpleeventemitter';
+import {transaction} from "../core/transaction";
 import {ObservableArray} from './observablearray';
-import ObservableValue from "./types/observablevalue";
-import {isPlainObject} from './utils';
+import ObservableValue from "./observablevalue";
+import {isPlainObject} from '../utils/utils';
 
 export interface KeyValueMap<V> {
 	[key:string]: V

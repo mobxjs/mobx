@@ -61,9 +61,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	global_1.registerGlobals();
 	var core = __webpack_require__(2);
 	var global_2 = __webpack_require__(1);
-	var utils_1 = __webpack_require__(7);
-	var extras_1 = __webpack_require__(10);
-	var simpleeventemitter_1 = __webpack_require__(9);
+	var utils_1 = __webpack_require__(5);
+	var extras_1 = __webpack_require__(8);
+	var simpleeventemitter_1 = __webpack_require__(11);
 	__export(__webpack_require__(16));
 	var core_1 = __webpack_require__(2);
 	exports.isObservable = core_1.isObservable;
@@ -90,12 +90,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.observeAsync = core_1.autorunAsync;
 	var transform_1 = __webpack_require__(17);
 	exports.createTransformer = transform_1.createTransformer;
-	var transaction_1 = __webpack_require__(3);
+	var global_3 = __webpack_require__(1);
+	exports.untracked = global_3.untracked;
+	var transaction_1 = __webpack_require__(15);
 	exports.transaction = transaction_1.transaction;
-	var observablemap_1 = __webpack_require__(15);
+	var observablemap_1 = __webpack_require__(14);
 	exports.ObservableMap = observablemap_1.ObservableMap;
+	var atom_1 = __webpack_require__(7);
+	exports.Atom = atom_1.default;
+	var reaction_1 = __webpack_require__(12);
+	exports.Reaction = reaction_1.default;
 	exports._ = {
-	    quickDiff: utils_1.quickDiff
+	    quickDiff: utils_1.quickDiff,
+	    resetGlobalState: global_2.resetGlobalState
 	};
 	exports.extras = {
 	    getDNode: extras_1.getDNode,
@@ -103,8 +110,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    getObserverTree: extras_1.getObserverTree,
 	    trackTransitions: extras_1.trackTransitions,
 	    SimpleEventEmitter: simpleeventemitter_1.default,
-	    withStrict: core.withStrict,
-	    isComputingDerivation: global_2.isComputingDerivation
+	    isComputingDerivation: global_2.isComputingDerivation,
+	    allowStateChanges: core.allowStateChanges
 	};
 	//# sourceMappingURL=index.js.map
 
@@ -118,45 +125,61 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.derivationStack = [];
 	        this.mobservableObjectId = 0;
 	        this.inTransaction = 0;
+	        this.inUntracked = 0;
 	        this.isRunningReactions = false;
+	        this.isComputingComputedValue = 0;
 	        this.changedAtoms = [];
 	        this.pendingReactions = [];
 	        this.afterTransactionItems = [];
+	        this.allowStateChanges = true;
 	    }
 	    return MobservableGlobals;
 	})();
 	exports.MobservableGlobals = MobservableGlobals;
-	var globals = new MobservableGlobals();
-	if (global.__mobservableTrackingStack || global.__mobservableViewStack || (global.__mobservableGlobal && global.__mobservableGlobal.version !== globals.version))
-	    throw new Error("[mobservable] An incompatible version of mobservable is already loaded.");
-	if (global.__mobservableGlobal)
-	    globals = global.__mobservableGlobal;
-	else
-	    global.__mobservableGlobal = globals;
+	var globalState = (function () {
+	    var res = new MobservableGlobals();
+	    if (global.__mobservableTrackingStack || global.__mobservableViewStack || (global.__mobservableGlobal && global.__mobservableGlobal.version !== globalState.version))
+	        throw new Error("[mobservable] An incompatible version of mobservable is already loaded.");
+	    if (global.__mobservableGlobal)
+	        return global.__mobservableGlobal;
+	    return global.__mobservableGlobal = res;
+	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = globals;
+	exports.default = globalState;
 	function getNextId() {
-	    return ++globals.mobservableObjectId;
+	    return ++globalState.mobservableObjectId;
 	}
 	exports.getNextId = getNextId;
 	function isComputingDerivation() {
-	    return globals.derivationStack.length > 0;
+	    return stackDepth() > 0;
 	}
 	exports.isComputingDerivation = isComputingDerivation;
 	function stackDepth() {
-	    return globals.derivationStack.length;
+	    return globalState.derivationStack.length;
 	}
 	exports.stackDepth = stackDepth;
-	function checkIfStateIsBeingModifiedDuringDerivation(name) {
-	    if (isComputingDerivation()) {
-	        var ts = global.__mobservableViewStack;
-	        throw new Error("[mobservable] It is not allowed to change the state during the computation of a reactive view. Should the data you are trying to modify actually be a view? \nUse 'mobservable.extras.withStrict(false, block)' to allow changes to be made inside views (unrecommended).\nView name: " + name + ".\nCurrent stack size is " + ts.length + ", active view: \"" + ts[ts.length - 1].toString() + "\".");
+	function checkIfStateModificationsAreAllowed() {
+	    if (!globalState.allowStateChanges) {
+	        throw new Error("[mobservable] It is not allowed to change the state during the computation of a reactive derivation.");
 	    }
 	}
-	exports.checkIfStateIsBeingModifiedDuringDerivation = checkIfStateIsBeingModifiedDuringDerivation;
+	exports.checkIfStateModificationsAreAllowed = checkIfStateModificationsAreAllowed;
+	function untracked(action) {
+	    globalState.inUntracked++;
+	    var res = action();
+	    globalState.inUntracked--;
+	    return res;
+	}
+	exports.untracked = untracked;
 	function registerGlobals() {
 	}
 	exports.registerGlobals = registerGlobals;
+	function resetGlobalState() {
+	    var defaultGlobals = new MobservableGlobals();
+	    for (var key in defaultGlobals)
+	        globalState[key] = defaultGlobals[key];
+	}
+	exports.resetGlobalState = resetGlobalState;
 	//# sourceMappingURL=global.js.map
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
@@ -164,16 +187,15 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var transaction_1 = __webpack_require__(3);
-	var observable_1 = __webpack_require__(5);
+	var observable_1 = __webpack_require__(3);
 	var global_1 = __webpack_require__(1);
-	var utils_1 = __webpack_require__(7);
-	var computedvalue_1 = __webpack_require__(12);
-	var reaction_1 = __webpack_require__(13);
-	var observablevalue_1 = __webpack_require__(11);
-	var observablearray_1 = __webpack_require__(8);
-	var observableobject_1 = __webpack_require__(14);
-	var observablemap_1 = __webpack_require__(15);
+	var utils_1 = __webpack_require__(5);
+	var computedvalue_1 = __webpack_require__(10);
+	var reaction_1 = __webpack_require__(12);
+	var observablevalue_1 = __webpack_require__(9);
+	var observablearray_1 = __webpack_require__(6);
+	var observableobject_1 = __webpack_require__(13);
+	var observablemap_1 = __webpack_require__(14);
 	function observable(v, keyOrScope) {
 	    if (typeof arguments[1] === "string")
 	        return observableDecorator.apply(null, arguments);
@@ -250,21 +272,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        throw new Error("[mobservable.autorun] expects a function");
 	    if (unwrappedView.length !== 0)
 	        throw new Error("[mobservable.autorun] expects a function without arguments");
-	    var observable = new reaction_1.default(unwrappedView, scope, view.name);
-	    var disposedPrematurely = false;
-	    var started = false;
-	    transaction_1.runAfterTransaction(function () {
-	        if (!disposedPrematurely) {
-	            started = true;
-	        }
+	    if (scope)
+	        unwrappedView = unwrappedView.bind(scope);
+	    var reaction = new reaction_1.default(view.name, function () {
+	        this.track(unwrappedView);
 	    });
-	    var disposer = utils_1.once(function () {
-	        if (started) {
-	        }
-	        else
-	            disposedPrematurely = true;
-	    });
-	    disposer.$mobservable = observable;
+	    if (global_1.isComputingDerivation() || global_1.default.inTransaction > 0)
+	        global_1.default.pendingReactions.push(reaction);
+	    else
+	        reaction.runReaction();
+	    var disposer = function () { return reaction.dispose(); };
+	    disposer.$mobservable = reaction;
 	    return disposer;
 	}
 	exports.autorun = autorun;
@@ -276,7 +294,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                disposer();
 	            else
 	                disposeImmediately = true;
-	            (function () { return effect.call(scope); });
+	            effect.call(scope);
 	        }
 	    });
 	    if (disposeImmediately)
@@ -401,7 +419,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    descriptor.enumerable = true;
 	    descriptor.get = function () {
 	        var _this = this;
-	        withStrict(false, function () {
+	        allowStateChanges(true, function () {
 	            observableobject_1.ObservableObject.asReactive(_this, null, ValueMode.Recursive).set(key, baseValue);
 	        });
 	        return this[key];
@@ -457,22 +475,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return source;
 	}
 	exports.toJSON = toJSON;
-	var strict = false;
-	function getStrict() {
-	    return strict;
+	function allowStateChanges(allowStateChanges, func) {
+	    var prev = global_1.default.allowStateChanges;
+	    global_1.default.allowStateChanges = allowStateChanges;
+	    var res = func();
+	    global_1.default.allowStateChanges = prev;
+	    return res;
 	}
-	exports.getStrict = getStrict;
-	function withStrict(newStrict, func) {
-	    var baseStrict = strict;
-	    strict = newStrict;
-	    try {
-	        func();
-	    }
-	    finally {
-	        strict = baseStrict;
-	    }
-	}
-	exports.withStrict = withStrict;
+	exports.allowStateChanges = allowStateChanges;
 	(function (ValueType) {
 	    ValueType[ValueType["Reference"] = 0] = "Reference";
 	    ValueType[ValueType["PlainObject"] = 1] = "PlainObject";
@@ -518,6 +528,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return observable.get();
 	    };
 	    f.$mobservable = observable;
+	    f.observe = function () {
+	        return observable.observe.apply(observable, arguments);
+	    };
 	    f.toString = function () {
 	        return observable.toString();
 	    };
@@ -664,87 +677,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var derivation_1 = __webpack_require__(4);
 	var global_1 = __webpack_require__(1);
-	var atom_1 = __webpack_require__(4);
-	function transaction(action, thisArg) {
-	    global_1.default.inTransaction += 1;
-	    try {
-	        return action.call(thisArg);
-	    }
-	    finally {
-	        if (--global_1.default.inTransaction === 0) {
-	            var values = global_1.default.changedAtoms.splice(0).forEach(atom_1.reportAtomReady);
-	            runReactions();
-	            var actions = global_1.default.afterTransactionItems.splice(0);
-	            for (var i = 0, l = actions.length; i < l; i++)
-	                actions[i]();
-	        }
-	    }
-	}
-	exports.transaction = transaction;
-	function runAfterTransaction(action) {
-	    if (global_1.default.inTransaction === 0)
-	        action();
-	    else
-	        global_1.default.afterTransactionItems.push(action);
-	}
-	exports.runAfterTransaction = runAfterTransaction;
-	function runReactions() {
-	    if (global_1.default.isRunningReactions)
-	        return;
-	    global_1.default.isRunningReactions = true;
-	    var pr = global_1.default.pendingReactions;
-	    while (pr.length) {
-	        var rs = pr.splice(0);
-	        for (var i = 0, l = rs.length; i < l; i++)
-	            rs[i].runReaction();
-	    }
-	    global_1.default.isRunningReactions = false;
-	}
-	exports.runReactions = runReactions;
-	//# sourceMappingURL=transaction.js.map
-
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var observable_1 = __webpack_require__(5);
-	var utils_1 = __webpack_require__(7);
-	var global_1 = __webpack_require__(1);
-	var extras_1 = __webpack_require__(10);
-	var transaction_1 = __webpack_require__(3);
-	function reportAtomChanged(atom) {
-	    if (!atom.isDirty) {
-	        atom.isDirty = true;
-	        extras_1.reportTransition(atom, "STALE");
-	        observable_1.propagateStaleness(atom);
-	        if (global_1.default.inTransaction > 0)
-	            global_1.default.changedAtoms.push(atom);
-	        else {
-	            reportAtomReady(atom);
-	            transaction_1.runReactions();
-	        }
-	    }
-	}
-	exports.reportAtomChanged = reportAtomChanged;
-	function reportAtomReady(atom) {
-	    utils_1.invariant(atom.isDirty);
-	    atom.isDirty = false;
-	    extras_1.reportTransition(atom, "READY", true);
-	    observable_1.propagateReadiness(atom, true);
-	}
-	exports.reportAtomReady = reportAtomReady;
-	//# sourceMappingURL=atom.js.map
-
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var derivation_1 = __webpack_require__(6);
-	var global_1 = __webpack_require__(1);
-	var derivationStack = global_1.default.derivationStack;
 	function addObserver(observable, node) {
-	    observable.observers[observable.observers.length] = node;
+	    var obs = observable.observers, l = obs.length;
+	    obs[l] = node;
+	    if (l === 0)
+	        observable.onBecomeObserved();
 	}
 	exports.addObserver = addObserver;
 	function removeObserver(observable, node) {
@@ -756,6 +695,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.removeObserver = removeObserver;
 	function reportObserved(observable) {
+	    if (global_1.default.inUntracked > 0)
+	        return;
+	    var derivationStack = global_1.default.derivationStack;
 	    var l = derivationStack.length;
 	    if (l > 0) {
 	        var deps = derivationStack[l - 1].observing, depslength = deps.length;
@@ -773,24 +715,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	        derivation_1.notifyDependencyStale(os[i]);
 	}
 	exports.propagateStaleness = propagateStaleness;
-	function propagateReadiness(observable, valueDidActuallyChange) {
-	    var os = observable.observers;
-	    if (!os)
+	function propagateReadiness(observable, valueDidActuallyChange, observersToNotify) {
+	    if (observersToNotify === void 0) { observersToNotify = observable.observers; }
+	    if (!observersToNotify)
 	        return;
-	    os = os.slice();
-	    for (var l = os.length, i = 0; i < l; i++)
-	        derivation_1.notifyDependencyReady(os[i], valueDidActuallyChange);
+	    for (var l = observersToNotify.length, i = 0; i < l; i++)
+	        derivation_1.notifyDependencyReady(observersToNotify[i], valueDidActuallyChange);
 	}
 	exports.propagateReadiness = propagateReadiness;
 	//# sourceMappingURL=observable.js.map
 
 /***/ },
-/* 6 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var observable_1 = __webpack_require__(5);
-	var utils_1 = __webpack_require__(7);
-	var extras_1 = __webpack_require__(10);
+	var observable_1 = __webpack_require__(3);
+	var utils_1 = __webpack_require__(5);
+	var extras_1 = __webpack_require__(8);
 	var global_1 = __webpack_require__(1);
 	function notifyDependencyStale(derivation) {
 	    if (++derivation.dependencyStaleCount === 1) {
@@ -800,14 +741,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.notifyDependencyStale = notifyDependencyStale;
 	function notifyDependencyReady(derivation, dependencyDidChange) {
-	    utils_1.invariant(derivation.dependencyStaleCount > 0);
 	    if (dependencyDidChange)
 	        derivation.dependencyChangeCount += 1;
 	    if (--derivation.dependencyStaleCount === 0) {
 	        if (derivation.dependencyChangeCount > 0) {
 	            derivation.dependencyChangeCount = 0;
+	            extras_1.reportTransition(derivation, "PENDING");
 	            var changed = derivation.onDependenciesReady();
-	            extras_1.reportTransition(derivation, "STALE", changed);
 	            observable_1.propagateReadiness(derivation, changed);
 	        }
 	        else {
@@ -819,17 +759,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.notifyDependencyReady = notifyDependencyReady;
 	function trackDerivedFunction(derivation, f) {
 	    var prevObserving = trackDependencies(derivation);
-	    var hasError = true;
-	    var result;
-	    try {
-	        result = f();
-	        hasError = false;
-	    }
-	    finally {
-	        if (hasError)
-	            console.error("[DerivedValue '" + this.name + "'] There was an uncaught error during the computation of a derived value. Please check the next exception.");
-	        bindDependencies(derivation, prevObserving);
-	    }
+	    var result = f();
+	    bindDependencies(derivation, prevObserving);
 	    return result;
 	}
 	exports.trackDerivedFunction = trackDerivedFunction;
@@ -843,20 +774,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	    global_1.default.derivationStack.length -= 1;
 	    var _a = utils_1.quickDiff(derivation.observing, prevObserving), added = _a[0], removed = _a[1];
 	    for (var i = 0, l = added.length; i < l; i++) {
+	        var dependency = added[i];
+	        if (findCycle(derivation, dependency))
+	            throw new Error(this.toString() + ": Found cyclic dependency in computed value '" + this.derivation.toString() + "'");
 	        observable_1.addObserver(added[i], derivation);
 	    }
 	    for (var i = 0, l = removed.length; i < l; i++)
-	        observable_1.removeObserver(added[i], derivation);
+	        observable_1.removeObserver(removed[i], derivation);
+	}
+	function findCycle(needle, node) {
+	    var obs = node.observing;
+	    if (!obs)
+	        return false;
+	    if (obs.indexOf(node) !== -1)
+	        return true;
+	    for (var l = obs.length, i = 0; i < l; i++)
+	        if (findCycle(needle, obs[i]))
+	            return true;
+	    return false;
 	}
 	//# sourceMappingURL=derivation.js.map
 
 /***/ },
-/* 7 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	function invariant(check) {
 	    if (!check)
-	        throw new Error("[mobservable] Invariant failed, please report this as a big including the stacktrace of this error");
+	        throw new Error("[mobservable] Invariant failed, please report this as a bug. Be sure to including the stacktrace of this error.");
 	}
 	exports.invariant = invariant;
 	function once(func) {
@@ -869,6 +814,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	}
 	exports.once = once;
+	exports.noop = function () { };
 	function unique(list) {
 	    var res = [];
 	    list.forEach(function (item) {
@@ -971,11 +917,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return [added, removed];
 	}
 	exports.quickDiff = quickDiff;
-	var observablearray_1 = __webpack_require__(8);
+	var observablearray_1 = __webpack_require__(6);
 	//# sourceMappingURL=utils.js.map
 
 /***/ },
-/* 8 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __extends = (this && this.__extends) || function (d, b) {
@@ -983,10 +929,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var utils_1 = __webpack_require__(7);
-	var atom_1 = __webpack_require__(4);
-	var observable_1 = __webpack_require__(5);
-	var simpleeventemitter_1 = __webpack_require__(9);
+	var utils_1 = __webpack_require__(5);
+	var atom_1 = __webpack_require__(7);
+	var simpleeventemitter_1 = __webpack_require__(11);
 	var core_1 = __webpack_require__(2);
 	var global_1 = __webpack_require__(1);
 	var StubArray = (function () {
@@ -1003,14 +948,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.supportEnumerable = supportEnumerable;
 	        this.name = name;
 	        this.lastKnownLength = 0;
-	        this.id = global_1.getNextId();
-	        this.isDirty = false;
-	        this.observers = [];
+	        this.atom = new atom_1.default(name || "ObservableArray");
 	    }
-	    ObservableArrayAdministration.prototype.onBecomeUnobserved = function () {
-	    };
 	    ObservableArrayAdministration.prototype.getLength = function () {
-	        observable_1.reportObserved(this);
+	        this.atom.reportObserved();
 	        return this.values.length;
 	    };
 	    ObservableArrayAdministration.prototype.setLength = function (newLength) {
@@ -1029,13 +970,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            throw new Error("[mobservable] Modification exception: the internal structure of an observable array was changed. Did you use peek() to change it?");
 	        this.lastKnownLength += delta;
 	        if (delta < 0) {
-	            global_1.checkIfStateIsBeingModifiedDuringDerivation(this.name);
+	            global_1.checkIfStateModificationsAreAllowed();
 	            if (this.supportEnumerable)
 	                for (var i = oldLength + delta; i < oldLength; i++)
 	                    delete this.array[i];
 	        }
 	        else if (delta > 0) {
-	            global_1.checkIfStateIsBeingModifiedDuringDerivation(this.name);
+	            global_1.checkIfStateModificationsAreAllowed();
 	            if (oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
 	                reserveArrayBuffer(oldLength + delta);
 	            if (this.supportEnumerable)
@@ -1076,14 +1017,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return core_1.makeChildObservable(value, this.mode, this.name + "[x]");
 	    };
 	    ObservableArrayAdministration.prototype.notifyChildUpdate = function (index, oldValue) {
-	        atom_1.reportAtomChanged(this);
+	        this.atom.reportChanged();
 	        if (this.changeEvent)
 	            this.changeEvent.emit({ object: this.array, type: 'update', index: index, oldValue: oldValue });
 	    };
 	    ObservableArrayAdministration.prototype.notifySplice = function (index, deleted, added) {
 	        if (deleted.length === 0 && added.length === 0)
 	            return;
-	        atom_1.reportAtomChanged(this);
+	        this.atom.reportChanged();
 	        if (this.changeEvent)
 	            this.changeEvent.emit({ object: this.array, type: 'splice', index: index, addedCount: added.length, removed: deleted });
 	    };
@@ -1126,16 +1067,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.$mobservable.spliceWithArray(0, this.$mobservable.values.length, newItems);
 	    };
 	    ObservableArray.prototype.toJSON = function () {
-	        atom_1.reportAtomChanged(this.$mobservable);
+	        this.$mobservable.atom.reportObserved();
 	        return this.$mobservable.values.slice();
 	    };
 	    ObservableArray.prototype.peek = function () {
-	        atom_1.reportAtomChanged(this.$mobservable);
+	        this.$mobservable.atom.reportObserved();
 	        return this.$mobservable.values;
 	    };
 	    ObservableArray.prototype.find = function (predicate, thisArg, fromIndex) {
 	        if (fromIndex === void 0) { fromIndex = 0; }
-	        atom_1.reportAtomChanged(this.$mobservable);
+	        this.$mobservable.atom.reportObserved();
 	        var items = this.$mobservable.values, l = items.length;
 	        for (var i = fromIndex; i < l; i++)
 	            if (predicate.call(thisArg, items[i], i, this))
@@ -1252,7 +1193,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        writable: true,
 	        enumerable: false,
 	        value: function () {
-	            this.$mobservable.notifyObserved();
+	            this.$mobservable.atom.reportObserved();
 	            return baseFunc.apply(this.$mobservable.values, arguments);
 	        }
 	    });
@@ -1268,7 +1209,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var values = impl.values;
 	            core_1.assertUnwrapped(value, "Modifiers cannot be used on array values. For non-reactive array values use makeReactive(asFlat(array)).");
 	            if (index < values.length) {
-	                global_1.checkIfStateIsBeingModifiedDuringDerivation(impl.context);
+	                global_1.checkIfStateModificationsAreAllowed();
 	                var oldValue = values[index];
 	                var changed = impl.mode === core_1.ValueMode.Structure ? !utils_1.deepEquals(oldValue, value) : oldValue !== value;
 	                if (changed) {
@@ -1284,7 +1225,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        get: function () {
 	            var impl = this.$mobservable;
 	            if (impl && index < impl.values.length) {
-	                impl.notifyObserved();
+	                impl.atom.reportObserved();
 	                return impl.values[index];
 	            }
 	            return undefined;
@@ -1306,73 +1247,86 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=observablearray.js.map
 
 /***/ },
-/* 9 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var utils_1 = __webpack_require__(7);
-	var SimpleEventEmitter = (function () {
-	    function SimpleEventEmitter() {
-	        this.listeners = [];
+	var observable_1 = __webpack_require__(3);
+	var utils_1 = __webpack_require__(5);
+	var global_1 = __webpack_require__(1);
+	var extras_1 = __webpack_require__(8);
+	var transaction_1 = __webpack_require__(15);
+	function propagateAtomReady(atom, observersToNotify) {
+	    if (observersToNotify === void 0) { observersToNotify = atom.observers; }
+	    utils_1.invariant(atom.isDirty);
+	    atom.isDirty = false;
+	    extras_1.reportTransition(atom, "READY", true);
+	    observable_1.propagateReadiness(atom, true, observersToNotify);
+	}
+	exports.propagateAtomReady = propagateAtomReady;
+	var Atom = (function () {
+	    function Atom(name, onBecomeObserved, onBecomeUnobserved) {
+	        if (onBecomeObserved === void 0) { onBecomeObserved = utils_1.noop; }
+	        if (onBecomeUnobserved === void 0) { onBecomeUnobserved = utils_1.noop; }
+	        this.onBecomeObserved = onBecomeObserved;
+	        this.onBecomeUnobserved = onBecomeUnobserved;
+	        this.id = global_1.getNextId();
+	        this.isDirty = false;
+	        this.observers = [];
+	        this.name = name || ("Atom#" + this.id);
 	    }
-	    SimpleEventEmitter.prototype.emit = function () {
-	        var listeners = this.listeners.slice();
-	        var l = listeners.length;
-	        switch (arguments.length) {
-	            case 0:
-	                for (var i = 0; i < l; i++)
-	                    listeners[i]();
-	                break;
-	            case 1:
-	                var data = arguments[0];
-	                for (var i = 0; i < l; i++)
-	                    listeners[i](data);
-	                break;
-	            default:
-	                for (var i = 0; i < l; i++)
-	                    listeners[i].apply(null, arguments);
+	    Atom.prototype.reportObserved = function () {
+	        observable_1.reportObserved(this);
+	    };
+	    Atom.prototype.reportChanged = function () {
+	        if (!this.isDirty) {
+	            this.reportStale();
+	            this.reportReady();
 	        }
 	    };
-	    SimpleEventEmitter.prototype.on = function (listener) {
-	        var _this = this;
-	        this.listeners.push(listener);
-	        return utils_1.once(function () {
-	            var idx = _this.listeners.indexOf(listener);
-	            if (idx !== -1)
-	                _this.listeners.splice(idx, 1);
-	        });
+	    Atom.prototype.reportStale = function () {
+	        if (!this.isDirty) {
+	            this.isDirty = true;
+	            extras_1.reportTransition(this, "STALE");
+	            observable_1.propagateStaleness(this);
+	        }
 	    };
-	    SimpleEventEmitter.prototype.once = function (listener) {
-	        var subscription = this.on(function () {
-	            subscription();
-	            listener.apply(this, arguments);
-	        });
-	        return subscription;
+	    Atom.prototype.reportReady = function (changed) {
+	        if (changed === void 0) { changed = true; }
+	        if (global_1.default.inTransaction > 0)
+	            global_1.default.changedAtoms.push({ atom: this, observersToNotify: this.observers.slice() });
+	        else {
+	            propagateAtomReady(this);
+	            transaction_1.runReactions();
+	        }
 	    };
-	    return SimpleEventEmitter;
+	    Atom.prototype.toString = function () {
+	        return "" + this.name;
+	    };
+	    return Atom;
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = SimpleEventEmitter;
-	//# sourceMappingURL=simpleeventemitter.js.map
+	exports.default = Atom;
+	//# sourceMappingURL=atom.js.map
 
 /***/ },
-/* 10 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var observablevalue_1 = __webpack_require__(11);
-	var computedvalue_1 = __webpack_require__(12);
-	var reaction_1 = __webpack_require__(13);
-	var observableobject_1 = __webpack_require__(14);
-	var observablemap_1 = __webpack_require__(15);
-	var simpleeventemitter_1 = __webpack_require__(9);
-	var utils_1 = __webpack_require__(7);
+	var observablevalue_1 = __webpack_require__(9);
+	var computedvalue_1 = __webpack_require__(10);
+	var reaction_1 = __webpack_require__(12);
+	var observableobject_1 = __webpack_require__(13);
+	var observablemap_1 = __webpack_require__(14);
+	var simpleeventemitter_1 = __webpack_require__(11);
+	var utils_1 = __webpack_require__(5);
 	var core_1 = __webpack_require__(2);
 	function getDNode(thing, property) {
 	    var propError = "[mobservable.getDNode] property '" + property + "' of '" + thing + "' doesn't seem to be a reactive property";
 	    if (thing instanceof observablemap_1.ObservableMap && property) {
-	        var dnode = thing._data[property];
-	        if (!dnode)
+	        var value = thing._data[property];
+	        if (!value)
 	            throw new Error(propError);
-	        return dnode;
+	        return getDNode(value);
 	    }
 	    if (!core_1.isObservable(thing, property)) {
 	        if (property)
@@ -1381,14 +1335,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    if (property !== undefined) {
 	        if (thing.$mobservable instanceof observableobject_1.ObservableObject)
-	            return thing.$mobservable.values[property];
+	            return getDNode(thing.$mobservable.values[property]);
 	        throw new Error(propError);
 	    }
-	    if (thing instanceof observablevalue_1.default || thing instanceof computedvalue_1.default || thing instanceof reaction_1.default)
+	    if (thing instanceof observablevalue_1.default)
+	        return thing.atom;
+	    if (thing instanceof computedvalue_1.default || thing instanceof reaction_1.default)
 	        return thing;
 	    if (thing.$mobservable) {
 	        if (thing.$mobservable instanceof observableobject_1.ObservableObject || thing instanceof observablemap_1.ObservableMap)
 	            throw new Error("[mobservable.getDNode] missing properties parameter. Please specify a property of '" + thing + "'.");
+	        if (thing.$mobservable instanceof observablevalue_1.default)
+	            return thing.$mobservable.atom;
 	        return thing.$mobservable;
 	    }
 	    throw new Error("[mobservable.getDNode] " + thing + " doesn't seem to be reactive");
@@ -1399,8 +1357,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.transitionTracker && exports.transitionTracker.emit({
 	        id: node.id,
 	        name: node.name,
-	        state: state,
-	        changed: changed
+	        node: node, state: state, changed: changed
 	    });
 	}
 	exports.reportTransition = reportTransition;
@@ -1414,7 +1371,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        id: node.id,
 	        name: node.name
 	    };
-	    if (node instanceof computedvalue_1.default && node.observing.length)
+	    if (node.observing && node.observing.length)
 	        result.dependencies = utils_1.unique(node.observing).map(nodeToDependencyTree);
 	    return result;
 	}
@@ -1468,46 +1425,56 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=extras.js.map
 
 /***/ },
-/* 11 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var atom_1 = __webpack_require__(4);
-	var observable_1 = __webpack_require__(5);
+	var atom_1 = __webpack_require__(7);
 	var global_1 = __webpack_require__(1);
 	var core_1 = __webpack_require__(2);
+	var core_2 = __webpack_require__(2);
 	var ObservableValue = (function () {
 	    function ObservableValue(value, mode, name) {
 	        this.mode = mode;
 	        this.name = name;
-	        this.id = global_1.getNextId();
-	        this.isDirty = false;
-	        this.observers = [];
 	        this.hasUnreportedChange = false;
-	        if (!name)
-	            this.name = "ObservableValue#" + this.id;
+	        this.value = undefined;
+	        this.atom = new atom_1.default(name);
 	        var _a = core_1.getValueModeFromValue(value, core_1.ValueMode.Recursive), childmode = _a[0], unwrappedValue = _a[1];
 	        if (this.mode === core_1.ValueMode.Recursive)
 	            this.mode = childmode;
 	        this.value = core_1.makeChildObservable(unwrappedValue, this.mode, this.name);
 	    }
-	    ObservableValue.prototype.onBecomeUnobserved = function () {
-	    };
 	    ObservableValue.prototype.set = function (newValue) {
 	        core_1.assertUnwrapped(newValue, "Modifiers cannot be used on non-initial values.");
-	        global_1.checkIfStateIsBeingModifiedDuringDerivation(this.name);
+	        global_1.checkIfStateModificationsAreAllowed();
 	        var oldValue = this.value;
 	        var changed = core_1.valueDidChange(this.mode === core_1.ValueMode.Structure, oldValue, newValue);
 	        if (changed) {
 	            this.value = core_1.makeChildObservable(newValue, this.mode, this.name);
-	            atom_1.reportAtomChanged(this);
+	            this.atom.reportChanged();
 	        }
+	        return changed;
 	    };
 	    ObservableValue.prototype.get = function () {
-	        observable_1.reportObserved(this);
+	        this.atom.reportObserved();
 	        return this.value;
 	    };
 	    ObservableValue.prototype.toString = function () {
 	        return "ObservableValue[" + this.name + ":" + this.value + "]";
+	    };
+	    ObservableValue.prototype.observe = function (listener, fireImmediately) {
+	        var _this = this;
+	        if (fireImmediately === void 0) { fireImmediately = false; }
+	        var firstTime = true;
+	        var prevValue = undefined;
+	        return core_2.autorun(function () {
+	            var newValue = _this.get();
+	            if (!firstTime || fireImmediately) {
+	                listener(newValue, prevValue);
+	            }
+	            firstTime = false;
+	            prevValue = newValue;
+	        });
 	    };
 	    return ObservableValue;
 	})();
@@ -1516,17 +1483,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=observablevalue.js.map
 
 /***/ },
-/* 12 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var observable_1 = __webpack_require__(5);
-	var derivation_1 = __webpack_require__(6);
+	var observable_1 = __webpack_require__(3);
+	var derivation_1 = __webpack_require__(4);
 	var global_1 = __webpack_require__(1);
-	var simpleeventemitter_1 = __webpack_require__(9);
+	var simpleeventemitter_1 = __webpack_require__(11);
 	var core_1 = __webpack_require__(2);
-	var utils_1 = __webpack_require__(7);
+	var extras_1 = __webpack_require__(8);
 	var ComputedValue = (function () {
 	    function ComputedValue(derivation, scope, name, compareStructural) {
+	        var _this = this;
+	        this.derivation = derivation;
 	        this.scope = scope;
 	        this.name = name;
 	        this.compareStructural = compareStructural;
@@ -1538,12 +1507,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.observing = [];
 	        this.dependencyChangeCount = 0;
 	        this.dependencyStaleCount = 0;
+	        this.value = undefined;
+	        this.onSleepEmitter = null;
 	        if (!this.name)
 	            this.name = "DerivedValue#" + this.id;
-	        this.derivation = function () { return derivation.call(scope); };
+	        this.peek = function () {
+	            _this.isComputing = true;
+	            global_1.default.isComputingComputedValue++;
+	            var prevAllowStateChanges = global_1.default.allowStateChanges;
+	            global_1.default.allowStateChanges = false;
+	            var res = derivation.call(scope);
+	            global_1.default.allowStateChanges = prevAllowStateChanges;
+	            global_1.default.isComputingComputedValue--;
+	            _this.isComputing = false;
+	            return res;
+	        };
 	    }
+	    ;
+	    ComputedValue.prototype.onBecomeObserved = function () {
+	    };
 	    ComputedValue.prototype.onBecomeUnobserved = function () {
-	        utils_1.invariant(!this.isLazy);
 	        for (var i = 0, l = this.observing.length; i < l; i++)
 	            observable_1.removeObserver(this.observing[i], this);
 	        this.observing = [];
@@ -1553,22 +1536,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.value = undefined;
 	    };
 	    ComputedValue.prototype.onDependenciesReady = function () {
-	        return this.compute(true);
+	        var changed = this.trackAndCompute();
+	        extras_1.reportTransition(this, "READY", changed);
+	        return changed;
 	    };
 	    ComputedValue.prototype.get = function () {
 	        if (this.isComputing)
 	            throw new Error("[DerivedValue '" + this.name + "'] Cycle detected");
 	        if (this.dependencyStaleCount > 0 && global_1.default.inTransaction > 0) {
-	            return this.derivation.call(this.scope);
+	            return this.peek();
 	        }
 	        if (this.isLazy) {
 	            if (global_1.isComputingDerivation()) {
 	                this.isLazy = false;
-	                this.compute(true);
+	                this.trackAndCompute();
 	                observable_1.reportObserved(this);
 	            }
 	            else {
-	                this.compute(false);
+	                return this.peek();
 	            }
 	        }
 	        else {
@@ -1586,18 +1571,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.onSleepEmitter = new simpleeventemitter_1.default();
 	        this.onSleepEmitter.once(onSleep);
 	    };
-	    ComputedValue.prototype.compute = function (track) {
+	    ComputedValue.prototype.trackAndCompute = function () {
 	        var oldValue = this.value;
-	        this.isComputing = true;
-	        if (!track)
-	            this.value = this.derivation();
-	        else
-	            this.value = derivation_1.trackDerivedFunction(this, this.derivation);
-	        this.isComputing = false;
+	        this.value = derivation_1.trackDerivedFunction(this, this.peek);
 	        return core_1.valueDidChange(this.compareStructural, this.value, oldValue);
 	    };
 	    ComputedValue.prototype.toString = function () {
-	        return "ComputedValue[" + this.name + ":" + this.value + "]";
+	        return "ComputedValue[" + this.name + "]";
+	    };
+	    ComputedValue.prototype.observe = function (listener, fireImmediately) {
+	        var _this = this;
+	        if (fireImmediately === void 0) { fireImmediately = false; }
+	        var firstTime = true;
+	        var prevValue = undefined;
+	        return core_1.autorun(function () {
+	            var newValue = _this.get();
+	            if (!firstTime || fireImmediately) {
+	                listener(newValue, prevValue);
+	            }
+	            firstTime = false;
+	            prevValue = newValue;
+	        });
 	    };
 	    return ComputedValue;
 	})();
@@ -1606,31 +1600,105 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=computedvalue.js.map
 
 /***/ },
-/* 13 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var derivation_1 = __webpack_require__(6);
+	var utils_1 = __webpack_require__(5);
+	var SimpleEventEmitter = (function () {
+	    function SimpleEventEmitter() {
+	        this.listeners = [];
+	    }
+	    SimpleEventEmitter.prototype.emit = function () {
+	        var listeners = this.listeners.slice();
+	        var l = listeners.length;
+	        switch (arguments.length) {
+	            case 0:
+	                for (var i = 0; i < l; i++)
+	                    listeners[i]();
+	                break;
+	            case 1:
+	                var data = arguments[0];
+	                for (var i = 0; i < l; i++)
+	                    listeners[i](data);
+	                break;
+	            default:
+	                for (var i = 0; i < l; i++)
+	                    listeners[i].apply(null, arguments);
+	        }
+	    };
+	    SimpleEventEmitter.prototype.on = function (listener) {
+	        var _this = this;
+	        this.listeners.push(listener);
+	        return utils_1.once(function () {
+	            var idx = _this.listeners.indexOf(listener);
+	            if (idx !== -1)
+	                _this.listeners.splice(idx, 1);
+	        });
+	    };
+	    SimpleEventEmitter.prototype.once = function (listener) {
+	        var subscription = this.on(function () {
+	            subscription();
+	            listener.apply(this, arguments);
+	        });
+	        return subscription;
+	    };
+	    return SimpleEventEmitter;
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = SimpleEventEmitter;
+	//# sourceMappingURL=simpleeventemitter.js.map
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var observable_1 = __webpack_require__(3);
+	var derivation_1 = __webpack_require__(4);
 	var global_1 = __webpack_require__(1);
+	var extras_1 = __webpack_require__(8);
 	var Reaction = (function () {
-	    function Reaction(derivation, scope, name) {
-	        this.scope = scope;
-	        this.name = name;
+	    function Reaction(name, onInvalidate) {
+	        if (name === void 0) { name = ""; }
+	        this.onInvalidate = onInvalidate;
 	        this.id = global_1.getNextId();
 	        this.observing = [];
 	        this.dependencyChangeCount = 0;
 	        this.dependencyStaleCount = 0;
-	        if (!this.name)
-	            this.name = "Reaction#" + this.id;
-	        this.derivation = function () { return derivation.call(scope); };
+	        this.disposed = false;
+	        this.scheduled = false;
+	        this.name = name || ("Reaction#" + this.id);
 	    }
+	    Reaction.prototype.onBecomeObserved = function () {
+	    };
 	    Reaction.prototype.onBecomeUnobserved = function () {
 	    };
 	    Reaction.prototype.onDependenciesReady = function () {
-	        global_1.default.pendingReactions.push(this);
+	        if (!this.scheduled) {
+	            this.scheduled = true;
+	            global_1.default.pendingReactions.push(this);
+	        }
 	        return false;
 	    };
+	    Reaction.prototype.isScheduled = function () {
+	        return this.dependencyStaleCount > 0 || this.scheduled;
+	    };
 	    Reaction.prototype.runReaction = function () {
-	        derivation_1.trackDerivedFunction(this, this.derivation);
+	        if (!this.disposed) {
+	            this.scheduled = false;
+	            this.onInvalidate();
+	            extras_1.reportTransition(this, "READY", true);
+	        }
+	    };
+	    Reaction.prototype.track = function (fn) {
+	        derivation_1.trackDerivedFunction(this, fn);
+	    };
+	    Reaction.prototype.dispose = function () {
+	        if (!this.disposed) {
+	            this.disposed = true;
+	            var deps = this.observing.splice(0);
+	            for (var i = 0, l = deps.length; i < l; i++)
+	                observable_1.removeObserver(deps[i], this);
+	        }
 	    };
 	    Reaction.prototype.toString = function () {
 	        return "Reaction[" + this.name + "]";
@@ -1642,13 +1710,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=reaction.js.map
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var observablevalue_1 = __webpack_require__(11);
-	var computedvalue_1 = __webpack_require__(12);
+	var observablevalue_1 = __webpack_require__(9);
+	var computedvalue_1 = __webpack_require__(10);
 	var core_1 = __webpack_require__(2);
-	var simpleeventemitter_1 = __webpack_require__(9);
+	var simpleeventemitter_1 = __webpack_require__(11);
 	var ObservableObject = (function () {
 	    function ObservableObject(target, name, mode) {
 	        this.target = target;
@@ -1717,15 +1785,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=observableobject.js.map
 
 /***/ },
-/* 15 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var core_1 = __webpack_require__(2);
-	var simpleeventemitter_1 = __webpack_require__(9);
-	var transaction_1 = __webpack_require__(3);
-	var observablearray_1 = __webpack_require__(8);
-	var observablevalue_1 = __webpack_require__(11);
-	var utils_1 = __webpack_require__(7);
+	var simpleeventemitter_1 = __webpack_require__(11);
+	var transaction_1 = __webpack_require__(15);
+	var observablearray_1 = __webpack_require__(6);
+	var observablevalue_1 = __webpack_require__(9);
+	var utils_1 = __webpack_require__(5);
 	var ObservableMap = (function () {
 	    function ObservableMap(initialData, valueModeFunc) {
 	        var _this = this;
@@ -1757,7 +1825,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.assertValidKey(key);
 	        core_1.assertUnwrapped(value, "[mobservable.map.set] Expected unwrapped value to be inserted to key '" + key + "'. If you need to use modifiers pass them as second argument to the constructor");
 	        if (this._has(key)) {
-	            var oldValue = this._data[key]._value;
+	            var oldValue = this._data[key].value;
 	            var changed = this._data[key].set(value);
 	            if (changed) {
 	                this._events.emit({
@@ -1785,7 +1853,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var _this = this;
 	        this.assertValidKey(key);
 	        if (this._has(key)) {
-	            var oldValue = this._data[key]._value;
+	            var oldValue = this._data[key].value;
 	            transaction_1.transaction(function () {
 	                _this._keys.remove(key);
 	                _this._updateHasMapEntry(key, false);
@@ -1879,6 +1947,53 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=observablemap.js.map
 
 /***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var global_1 = __webpack_require__(1);
+	var atom_1 = __webpack_require__(7);
+	var MAX_REACTION_ITERATIONS = 100;
+	function transaction(action, thisArg) {
+	    global_1.default.inTransaction += 1;
+	    var res = action.call(thisArg);
+	    if (--global_1.default.inTransaction === 0) {
+	        var values = global_1.default.changedAtoms.splice(0);
+	        for (var i = 0, l = values.length; i < l; i++)
+	            atom_1.propagateAtomReady(values[i].atom, values[i].observersToNotify);
+	        runReactions();
+	        var actions = global_1.default.afterTransactionItems.splice(0);
+	        for (var i = 0, l = actions.length; i < l; i++)
+	            actions[i]();
+	    }
+	    return res;
+	}
+	exports.transaction = transaction;
+	function runAfterTransaction(action) {
+	    if (global_1.default.inTransaction === 0)
+	        action();
+	    else
+	        global_1.default.afterTransactionItems.push(action);
+	}
+	exports.runAfterTransaction = runAfterTransaction;
+	function runReactions() {
+	    if (global_1.default.isRunningReactions)
+	        return;
+	    global_1.default.isRunningReactions = true;
+	    var pr = global_1.default.pendingReactions;
+	    var iterations = 0;
+	    while (pr.length) {
+	        if (++iterations === MAX_REACTION_ITERATIONS)
+	            throw new Error("Reaction doesn't converge to a stable state. Probably there is a cycle in your computations: " + pr[0].toString());
+	        var rs = pr.splice(0);
+	        for (var i = 0, l = rs.length; i < l; i++)
+	            rs[i].runReaction();
+	    }
+	    global_1.default.isRunningReactions = false;
+	}
+	exports.runReactions = runReactions;
+	//# sourceMappingURL=transaction.js.map
+
+/***/ },
 /* 16 */
 /***/ function(module, exports) {
 
@@ -1888,7 +2003,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var computedvalue_1 = __webpack_require__(12);
+	var computedvalue_1 = __webpack_require__(10);
 	function createTransformer(transformer, onCleanup) {
 	    var _this = this;
 	    if (typeof transformer !== "function" || transformer.length !== 1)

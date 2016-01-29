@@ -8,10 +8,10 @@ registerGlobals();
 
 import * as core from './core';
 import {isComputingDerivation, resetGlobalState} from './core/global';
-import {quickDiff} from './utils';
+import {quickDiff} from './utils/utils';
 import {IDependencyTree, IObserverTree, ITransitionEvent, Lambda} from './interfaces';
 import {getDependencyTree, getDNode, getObserverTree, trackTransitions} from './extras';
-import SimpleEventEmitter from './simpleeventemitter';
+import SimpleEventEmitter from './utils/simpleeventemitter';
 
 export * from './interfaces';
 
@@ -52,7 +52,7 @@ export {
 export {transaction} from "./core/transaction";
 export {
 	ObservableMap
-} from './observablemap';
+} from './types/observablemap';
 
 export {default as Atom} from "./core/atom";
 export {default as Reaction} from "./core/reaction";

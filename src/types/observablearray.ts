@@ -4,15 +4,14 @@
  * https://github.com/mweststrate/mobservable
  */
 
-import {deepEquals, makeNonEnumerable} from './utils';
-import Atom from "./core/atom";
-import SimpleEventEmitter from './simpleeventemitter';
-import {ValueMode, assertUnwrapped, makeChildObservable} from './core';
-import {IArrayChange, IArraySplice, IObservableArray, Lambda} from './interfaces';
-import ObservableValue from "./types/observablevalue";
-import {checkIfStateModificationsAreAllowed} from "./core/global";
-import {IDerivation} from "./core/derivation";
-
+import {deepEquals, makeNonEnumerable} from '../utils/utils';
+import Atom from "../core/atom";
+import SimpleEventEmitter from '../utils/simpleeventemitter';
+import {ValueMode, assertUnwrapped, makeChildObservable} from '../core';
+import {IArrayChange, IArraySplice, IObservableArray, Lambda} from '../interfaces';
+import ObservableValue from "./observablevalue";
+import {checkIfStateModificationsAreAllowed} from "../core/global";
+import {IDerivation} from "../core/derivation";
 
 // Workaround to make sure ObservableArray extends Array
 export class StubArray {
