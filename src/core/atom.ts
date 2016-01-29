@@ -16,7 +16,7 @@ export function propagateAtomReady(atom: IAtom, observersToNotify:IDerivation[]=
     propagateReadiness(atom, true, observersToNotify);
 }
 
-export class Atom implements IAtom {
+export default class Atom implements IAtom {
     id = getNextId();
     name: string;
     isDirty = false;
@@ -58,8 +58,4 @@ export class Atom implements IAtom {
     toString() {
         return `${this.name}`;
     }
-}
-
-export function atom(prefix: string, onBecomeObserved: () => void = noop, onBecomeUnobserved = noop) {
-    return new Atom(prefix, onBecomeObserved, onBecomeUnobserved);
 }

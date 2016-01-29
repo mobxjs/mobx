@@ -49,7 +49,7 @@ export {
 	ObservableMap
 } from './observablemap';
 
-export {Atom} from "./core/atom";
+export {default as Atom} from "./core/atom";
 export {default as Reaction} from "./core/reaction";
 
 /**

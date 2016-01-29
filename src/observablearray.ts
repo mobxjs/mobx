@@ -5,7 +5,7 @@
  */
 
 import {deepEquals, makeNonEnumerable} from './utils';
-import {Atom, atom} from "./core/atom";
+import Atom from "./core/atom";
 import SimpleEventEmitter from './simpleeventemitter';
 import {ValueMode, assertUnwrapped, makeChildObservable} from './core';
 import {IArrayChange, IArraySplice, IObservableArray, Lambda} from './interfaces';
@@ -27,7 +27,7 @@ export class ObservableArrayAdministration<T> {
     
     // TODO: remove supportEnumerable
     constructor(private array: ObservableArray<T>, public mode:ValueMode, public supportEnumerable:boolean, public name: string) {
-         this.atom = atom(name || "ObservableArray");
+         this.atom = new Atom(name || "ObservableArray");
     }
 
     getLength(): number {

@@ -1,4 +1,4 @@
-import {Atom, atom} from "../core/atom";
+import Atom from "../core/atom";
 import {checkIfStateModificationsAreAllowed} from "../core/global";
 import {IDerivation} from "../core/derivation";
 import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped, valueDidChange} from '../core';
@@ -12,7 +12,7 @@ export default class ObservableValue<T> {
 	protected value: T = undefined;
 	
 	constructor(value:T, protected mode:ValueMode, public name?: string){
-		this.atom = atom(name);
+		this.atom = new Atom(name);
 		const [childmode, unwrappedValue] = getValueModeFromValue(value, ValueMode.Recursive);
 		// If the value mode is recursive, modifiers like 'structure', 'reference', or 'flat' could apply
 		if (this.mode === ValueMode.Recursive)
