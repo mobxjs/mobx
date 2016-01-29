@@ -42,6 +42,7 @@ export function runAfterTransaction(action: () => void) {
 		globalState.afterTransactionItems.push(action);
 }
 
+// TODO: move to reaction
 export function runReactions() {
 	if (globalState.isRunningReactions)
 		return;

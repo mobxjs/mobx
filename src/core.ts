@@ -149,13 +149,13 @@ export function autorun(view:Lambda, scope?:any):Lambda {
 	if (scope)
 		unwrappedView = unwrappedView.bind(scope);
 	
-	const reaction = new Reaction(view.name, () => {
-		reaction.track(unwrappedView);
+	const reaction = new Reaction(view.name, function () {
+		this.track(unwrappedView);
 	});
 	if (isComputingDerivation() || globalState.inTransaction > 0)
 		globalState.pendingReactions.push(reaction);
 	else
-		reaction.runReaction();
+		reaction.runReaction();    
 /*
     let disposedPrematurely = false;
     let started = false;
@@ -190,6 +190,8 @@ export function autorun(view:Lambda, scope?:any):Lambda {
     * @returns disposer function to prematurely end the observer.
     */
 export function autorunUntil(predicate: ()=>boolean, effect: Lambda, scope?: any): Lambda {
+    // TODO: rename to when
+    // TODO: use Reaction class
     let disposeImmediately = false;
     const disposer = autorun(() => {
         if (predicate.call(scope)) {

@@ -120,6 +120,9 @@ test('emulate rendering', function(t) {
   t.equal(renderCount, 2);
 
   data.title = null;
+  // Note that this causes two invalidations
+  // however, the real mobservable-react binding optimizes this as well
+  // see mobservable-react #12, so maybe this ain't the best test
   t.equal(renderCount, 4);
 
   data.title = 'WORLD';

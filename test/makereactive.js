@@ -63,6 +63,7 @@ test('observable1', function(t) {
     t.throws(function() {
         m.observable(function(a,b) {});
     });
+    m._.resetGlobalState();
 
     // recursive structure
     var x = m.observable({
