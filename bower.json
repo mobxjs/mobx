@@ -1,0 +1,33 @@
+{
+  "name": "mobservable",
+  "description": "Observable data. Reactive functions. Simple code.",
+  "main": "dist/mobservable.js",
+  "authors": [
+    "Michel Weststrate"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "mobservable",
+    "observable",
+    "react-component",
+    "react",
+    "reactjs",
+    "reactive",
+    "model",
+    "frp",
+    "functional-reactive-programming"
+  ],
+  "homepage": "https://mweststrate.github.io/mobservable",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

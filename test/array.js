@@ -85,7 +85,7 @@ test('test1', function(t) {
         t.deepEqual(a.slice(), [2,1]);
 
         t.deepEqual(a.sort(), [1,2]);
-        t.deepEqual(a.slice(), [1,2]);
+        t.deepEqual(a.slice(), [2,1]);
 
         t.end();
     }
@@ -337,5 +337,28 @@ test('peek', function(t) {
     t.throws(function() {
         x.push(5); // detect alien change
     }, "modification exception");
+    t.end();
+})
+
+test('react to sort changes', function(t) {
+    var x = mobservable.observable([4, 2, 3]);
+    var sortedX = mobservable.observable(function() {
+        debugger;
+        return x.sort();
+    });
+    var sorted;
+    
+    mobservable.autorun(function() {
+        sorted = sortedX();
+    });
+    
+    t.deepEqual(x.slice(), [4,2,3]);
+    t.deepEqual(sorted, [2,3,4]);
+    x.push(1);
+    t.deepEqual(x.slice(), [4,2,3,1]);
+    t.deepEqual(sorted, [1,2,3,4]);
+    x.shift();
+    t.deepEqual(x.slice(), [2,3,1]);
+    t.deepEqual(sorted, [1,2,3]);
     t.end();
 })

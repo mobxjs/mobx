@@ -264,3 +264,13 @@ test('strict', function(t) {
 	});
 	t.end();
 })
+
+test('issue 100', function(t) {
+	var that = {};
+	mobservable.extendObservable(that, {
+		myMap: map()
+	})
+	t.equal(mobservable.isObservableMap(that.myMap), true);
+	t.equal(typeof that.myMap.observe, "function");
+	t.end();
+});

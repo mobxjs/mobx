@@ -360,9 +360,9 @@ test('as structure', function(t) {
     x.x = [3,2,1];
     c();
     x.x.sort();
-    c();
+    nc();
     x.x.sort();
-    c(); // But.., Ideally, no change here ..! nc();
+    nc();
     x.x[1] = 2;
     nc();
     x.x[0] = 0;
