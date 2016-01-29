@@ -1,3 +1,8 @@
+/**
+ * Welcome to the mobservable sources! To get an global overview of how Mobservable works,
+ * this is a good place to start: 
+ * https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.xvbh6qd74
+ */
 import {registerGlobals} from "./core/global";
 registerGlobals();
 

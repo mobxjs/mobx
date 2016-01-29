@@ -9,24 +9,42 @@ import {reportTransition} from "../extras";
 
 /**
  * A node in the state dependency root that observes other nodes, and can be observed itself.
+ * 
+ * Computed values will update automatically if any observed value changes and if they are observed themselves.
+ * If a computed value isn't actively used by another observer, but is inspect, it will compute lazily to return at least a consistent value.
  */
 export default class ComputedValue<T> implements IObservable, IDerivation {
 	id = getNextId();
 	isLazy = true; // nobody is observing this derived value, so don't bother tracking upstream values
 	isComputing = false;
 	hasCycle = false;  // this node is part of a cycle, which is an error
-	observers: IDerivation[] = [];       // nodes that are dependent on this node. Will be notified when our state change
+	observers: IDerivation[] = [];      // nodes that are dependent on this node. Will be notified when our state change
 	observing: IObservable[] = [];       // nodes we are looking at. Our value depends on these nodes
 	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 	protected value: T = undefined;
-	onSleepEmitter: SimpleEventEmitter =  null;;
+
+	/**
+	 * Peek into the current value of this computedObservable. Re-evaluate if needed but don't bind the current
+	 * exeuction context as an observer.
+	 */
 	peek:()=>T;
 	
+	/**
+	 * Create a new computed value based on a function expression.
+	 * 
+	 * The `name` property is for debug purposes only.
+	 *
+	 * The `compareStructural` property indicates whether the return values should be compared structurally.
+	 * Normally, a computed value will not notify an upstream observer if a newly produced value is strictly equal to the previously produced value.
+	 * However, enabling compareStructural can be convienent if you always produce an new aggregated object and don't want to notify observers if it is structurally the same.
+	 * This is useful for working with vectors, mouse coordinates etc. 
+	 */
 	constructor(public derivation:()=>T, private scope: Object, public name:string, private compareStructural: boolean) {
 		if (!this.name)
 			this.name = "DerivedValue#" + this.id;
 		this.peek = () => {
+			// MWE: hmm.. to many state vars here...
 			this.isComputing = true;
 			globalState.isComputingComputedValue++;
 			const prevAllowStateChanges = globalState.allowStateChanges;
@@ -50,8 +68,6 @@ export default class ComputedValue<T> implements IObservable, IDerivation {
 			removeObserver(this.observing[i], this);
 		this.observing = [];
 		this.isLazy = true;
-		if (this.onSleepEmitter)
-			this.onSleepEmitter.emit(this.value);
 		this.value = undefined;
 	}
 
@@ -61,6 +77,10 @@ export default class ComputedValue<T> implements IObservable, IDerivation {
 		return changed;
 	}
 
+	/**
+	 * Returns the current value of this computed value.
+	 * Will evaluate it's computation first if needed.
+	 */
 	get(): T {
 		if (this.isComputing)
 			throw new Error(`[DerivedValue '${this.name}'] Cycle detected`);
@@ -94,12 +114,6 @@ export default class ComputedValue<T> implements IObservable, IDerivation {
 	set(_) {
 		throw new Error(`[DerivedValue '${name}'] View functions do not accept new values`);
 	}
-
-    public onceSleep(onSleep: (lastValue:any) => void) {
-        if (this.onSleepEmitter === null)
-            this.onSleepEmitter = new SimpleEventEmitter();
-        this.onSleepEmitter.once(onSleep);
-    }
 
 	trackAndCompute(): boolean {
 		var oldValue = this.value;

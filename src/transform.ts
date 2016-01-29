@@ -12,24 +12,27 @@ export function createTransformer<A, B>(transformer: ITransformer<A,B>, onCleanu
 	// Memoizes: object id -> reactive view that applies transformer to the object
 	const objectCache : {[id:number]: ComputedValue<B>} = {};
 
+	// Local transformer class specifically for this transformer
+	class Transformer extends ComputedValue<B> {
+		constructor(private sourceIdentifier: string, private sourceObject: A) {
+			super(() => transformer(sourceObject), null, `transformer-${(<any>transformer).name}-${sourceIdentifier}`, false);
+		}
+		onBecomeUnobserved() {
+			const lastValue = this.value;
+			super.onBecomeUnobserved();
+			delete objectCache[this.sourceIdentifier];
+			if (onCleanup)
+				onCleanup(lastValue, this.sourceObject);
+		}
+	}
+
 	return (object: A) => {
 		const identifier = getMemoizationId(object);
 		let reactiveTransformer = objectCache[identifier];
 		if (reactiveTransformer)
 			return reactiveTransformer.get();
-
 		// Not in cache; create a reactive view
-		reactiveTransformer = objectCache[identifier] = new ComputedValue<any>(() => {
-			return transformer(object);
-		}, this, `transformer-${(<any>transformer).name}-${identifier}`, false);
-
-		// remove the view from the cache as soon as the object isn't part of the graph anymore
-		reactiveTransformer.onceSleep((lastValue) => {
-			delete objectCache[identifier];
-			if (onCleanup)
-				onCleanup(lastValue, object);
-		});
-
+		reactiveTransformer = objectCache[identifier] = new Transformer(identifier, object);
 		return reactiveTransformer.get();
 	};
 }
