@@ -318,6 +318,21 @@ test('fastArray modifications', function(t) {
     t.end();
 })
 
+test('new fast array values won\'t be observable', function(t) {
+   // See: https://mweststrate.github.io/mobservable/refguide/fast-array.html#comment-2486090381
+    var booksA = mobservable.fastArray([]);
+    // mobservable.observe(booksA, (change) => {
+    //     console.log(change);
+    // })
+    var rowling = { name: 'J.K.Rowling', birth: 1965 };
+    debugger;
+    booksA.push(rowling)
+    t.equal(mobservable.isObservable(booksA[0], "name"), false);
+    var removed = booksA.splice(0, 1);
+    t.equal(mobservable.isObservable(removed[0], "name"), false);
+    t.end(); 
+});
+
 test('is array', function(t) {
     var x = mobservable.observable([]);
     t.equal(x instanceof Array, true);

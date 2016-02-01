@@ -1,3 +1,7 @@
+# 1.2.4
+
+* Fixed: observable arrays didn't properly apply modifiers if created using `asFlat([])` or `fastArray([])`
+
 # 1.2.3
 
 * observableArray.sort no longer mutates the array being sorted but returns a sorted clone instead (#90)

@@ -99,6 +99,8 @@ export class ObservableArrayAdministration<T> extends DataNode {
 
     makeReactiveArrayItem(value) {
         assertUnwrapped(value, "Array values cannot have modifiers");
+        if (this.mode === ValueMode.Flat || this.mode === ValueMode.Reference)
+            return value;
         return makeChildObservable(value, this.mode, {
             object: this.context.object,
             name: this.context.name + "[x]"
