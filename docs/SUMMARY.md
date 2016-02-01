@@ -6,13 +6,13 @@
   * [Concepts & Principles](intro/concepts.md)
 * [Core API](refguide/api.md)
   * [observable](refguide/observable.md)
+  * [@observable](refguide/observable-decorator.md)
   * [autorun](refguide/autorun.md)
   * [@observer](refguide/observer-component.md)
-  * [@observable](refguide/observable-decorator.md)
-  * [createTransformer](refguide/create-transformer.md)
 * Advanced API
   * [autorunAsync](refguide/autorun-async.md)
   * [autorunUntil](refguide/autorun-until.md)
+  * [createTransformer](refguide/create-transformer.md)
   * [expr](refguide/expr.md)
   * [extendObservable](refguide/extend-observable.md)
   * [extras](refguide/extras.md)
@@ -29,6 +29,7 @@
   * [Organizing React components](best/components.md)
 <!--  * Routing Universal applications -->
 * How does Mobservable work?
+  * [In depth explanation of Mobservable](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.gh651s1ta)
 * Tips & Tricks
   * [DevTools](best/devtools.md)
   * [ES5 / ES6 / TypeScript syntax](best/syntax.md)

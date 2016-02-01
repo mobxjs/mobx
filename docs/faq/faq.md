@@ -4,6 +4,14 @@
 
 Mobservable runs on any ES5 environment. That means that all browsers except IE8, Node.js and Rhine are supported. See [caniuse.com](http://caniuse.com/#feat=es5)
 
+##### Can Mobservable be combined with RxJS?
+Yes, see the [rx-mobservable](https://www.npmjs.com/package/rx-mobservable) interoperability package.
+
+##### When to use RxJS instead of Mobservable?
+For anything that involves explictly working with the concept of time such,
+or when you need to combine reason about the historical values / events of an observable (and not just th elatest) RxJs is recommended as it provides the more low level primitives.
+Whenever you want react to _state_ instead of _events_, Mobservable offers an easier and more high level approach.
+
 ##### Is React Native supported?
 
 Yes, `mobservable` and `mobservable-react` will work on React Native. The latter through importing `"mobservable-react/native"`.
@@ -41,7 +49,7 @@ See: https://github.com/mweststrate/mobservable/issues/18
 
 ##### Can I record states and re-hydrate them?
 
-Yes, some examples are coming shortly!
+Yes, see [createTransformer](http://mweststrate.github.io/mobservable/refguide/create-transformer.html) for some examples.
 
 ##### Can you tell me how it works?
 

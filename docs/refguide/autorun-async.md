@@ -12,7 +12,7 @@ This might be useful for stuff that is expensive and doesn't need to happen sync
 Returns a disposer to cancel the autorun.
 
 ```javascript
-autorun(() => {
+autorunAsync(() => {
 	// assuming that profile.asJson returns an observable json representation of profile,
 	// send it to the server each time it is changed, but await at least 300mseconds before sending it
 	// when send, the latest value of profile.asJson will be used.

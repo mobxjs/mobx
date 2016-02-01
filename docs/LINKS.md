@@ -1,7 +1,7 @@
 # Resources
 
 * [Five minute interactive introduction to Mobservable and React](https://mweststrate.github.io/mobservable/getting-started.html#demo)
-
+* How Mobservable works: [In depth explanation of Mobservable](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.wnlo6bw8y)
 * Clone the boilerplate repository containing the above example from: https://github.com/mweststrate/react-mobservable-boilerplate.
 * Or fork this [JSFiddle](https://jsfiddle.net/mweststrate/wgbe4guu/).
 

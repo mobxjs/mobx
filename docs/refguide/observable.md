@@ -179,6 +179,8 @@ Bear in mind that `Array.isArray(observable([]))` will yield `false`, so wheneve
 it is a good idea to _create a shallow copy before passing it to other libraries or built-in functions_ (which is good practice anyway) by using `array.slice()` or `array.peek()`.
 So `Array.isArray(observable([]).slice())` will yield `true`.
 
+Unlike the built-in implementation of the functions `sort` and `reverse`, observableArray.sort and reverse  will not change the array in-place, but only will return a sorted / reversed copy. 
+
 Besides all built-in functions, the following goodies are available as well on observable arrays:
 
 * `observe(listener, fireImmediately? = false)` Listen to changes in this array. The callback will receive arguments that express an array splice or array change, conforming to [ES7 proposal](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe). It returns a disposer function to stop the listener.

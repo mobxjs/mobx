@@ -132,3 +132,11 @@ This is the most convenient and the fastest way to create bound event handlers.
 If `{this.onButtonClick.bind(this)}` or `{(e) => this.onButtonClick(e)}` was used instead in the rendering, each render invocation would create a new closures.
 That is not only slightly slower in itself, 
 but it will also cause the `button` (or any other component) to be always re-rendered because you are effectively passing a new event handler to the button each time `MyComponent` is rendered.  
+
+
+## Enabling decorators in your transpiler
+
+Decorators are not supported by default when using TypeScript or Babel pending a definitive definition in the ES standard.
+* For _typescript_, enable the `--experimentalDecorators` compiler flag or set the compiler option `experimentalDecorators` to `true` in `tsconfig.json` (Recommended)
+* For _babel5_, make sure `--stage 0` is passed to the babel CLI
+* For _babel6_, see the example configuration as suggested in this [issue](https://github.com/mweststrate/mobservable/issues/105)
