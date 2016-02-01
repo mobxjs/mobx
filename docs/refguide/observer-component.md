@@ -27,7 +27,7 @@ React.render(<Timer timerData={timerData} />, document.body);
 _Note: when `observer` needs to be combined with other decorators or higher-order-components, make sure that `observer` is the most inner (first applied) decorator;
 otherwise it might do nothing at all._
 
-### Characterstics of reactive components
+### Characteristics of reactive components
 
 So here we are, simple, straightforward reactive components that will render whenever needed. These components have some interesting characteristics:
 
