@@ -547,9 +547,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        default:
 	            throw "Illegal State";
 	    }
-	    if (Array.isArray(value))
+	    if (Array.isArray(value) && Object.isExtensible(value))
 	        return observablearray_1.createObservableArray(value, childMode, true, context);
-	    if (utils_1.isPlainObject(value))
+	    if (utils_1.isPlainObject(value) && Object.isExtensible(value))
 	        return extendObservableHelper(value, value, childMode, context);
 	    return value;
 	    var _a;
@@ -1446,6 +1446,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    ObservableArrayAdministration.prototype.makeReactiveArrayItem = function (value) {
 	        core_1.assertUnwrapped(value, "Array values cannot have modifiers");
+	        if (this.mode === core_1.ValueMode.Flat || this.mode === core_1.ValueMode.Reference)
+	            return value;
 	        return core_1.makeChildObservable(value, this.mode, {
 	            object: this.context.object,
 	            name: this.context.name + "[x]"
@@ -1560,7 +1562,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.$mobservable.values.length;
 	    };
 	    ObservableArray.prototype.reverse = function () {
-	        return this.replace(this.$mobservable.values.reverse());
+	        this.$mobservable.notifyObserved();
+	        var clone = this.slice();
+	        return clone.reverse.apply(clone, arguments);
 	    };
 	    ObservableArray.prototype.sort = function (compareFn) {
 	        this.$mobservable.notifyObserved();

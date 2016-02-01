@@ -1,6 +1,9 @@
 # 1.2.4
 
 * Fixed: observable arrays didn't properly apply modifiers if created using `asFlat([])` or `fastArray([])`
+* Don't try to make frozen objects observable (by @andykog)
+* `observableArray.reverse` no longer mutates the arry but just returns a sorted copy
+* Updated tests to use babel6
 
 # 1.2.3
 
