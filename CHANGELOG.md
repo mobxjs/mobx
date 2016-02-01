@@ -6,6 +6,13 @@ This means that it is allowed in an to change the state in such a way that the s
 * `.fastArray` has been deprecated and has become the default when creating arrays.
 * Mobservable is now extensible! Use the exposed `Atom` or `Reaction` classes to define your own custom state values and reactive actions.
 
+# 1.2.4
+
+* Fixed: observable arrays didn't properly apply modifiers if created using `asFlat([])` or `fastArray([])`
+* Don't try to make frozen objects observable (by @andykog)
+* `observableArray.reverse` no longer mutates the arry but just returns a sorted copy
+* Updated tests to use babel6
+
 # 1.2.3
 
 * observableArray.sort no longer mutates the array being sorted but returns a sorted clone instead (#90)

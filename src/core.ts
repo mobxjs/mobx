@@ -574,9 +574,9 @@ export function makeChildObservable(value, parentMode:ValueMode, context) {
 			throw "Illegal State";
 	}
 
-	if (Array.isArray(value))
+	if (Array.isArray(value) && Object.isExtensible(value))
 		return createObservableArray(<[]> value, childMode, true, context);
-	if (isPlainObject(value))
+	if (isPlainObject(value) && Object.isExtensible(value))
 		return extendObservableHelper(value, value, childMode, context);
 	return value;
 }

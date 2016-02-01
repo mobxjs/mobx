@@ -32,6 +32,7 @@ test('isObservable', function(t) {
 
     t.equal(m.isObservable(m.observable([])), true);
     t.equal(m.isObservable(m.observable({})), true);
+    t.equal(m.isObservable(m.observable(Object.freeze({}))), false);
     t.equal(m.isObservable(m.observable(function() {})), true);
 
     t.equal(m.isObservable([]), false);

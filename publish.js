@@ -18,7 +18,7 @@ module.exports = function(shell, npm, git) {
         if (publishedPackageInfo.versions == version || publishedPackageInfo.versions.indexOf(version) != -1)
             shell.exit(2, "Version " + pkg.version + " is already published to npm");
 
-        shell.write('package.json', JSON.stringify(pkg, null, 4));
+        shell.write('package.json', JSON.stringify(pkg, null, 2));
 
         // Finally, commit and publish!
         npm("publish");

@@ -101,6 +101,8 @@ export class ObservableArrayAdministration<T> {
 
     makeReactiveArrayItem(value) {
         assertUnwrapped(value, "Array values cannot have modifiers");
+        if (this.mode === ValueMode.Flat || this.mode === ValueMode.Reference)
+            return value;
         return makeChildObservable(value, this.mode, this.name + "[x]");
     }
 
@@ -217,8 +219,12 @@ export class ObservableArray<T> extends StubArray {
     }
 
     reverse():T[] {
-        // TODO: like sort, return a copy, see #90
-        return this.replace(this.$mobservable.values.reverse());
+        this.$mobservable.atom.reportObserved();
+        // reverse by default mutates in place before returning the result
+        // which makes it both a 'derivation' and a 'mutation'. 
+        // so we deviate from the default and just make it an dervitation
+        const clone = (<any>this).slice();
+        return clone.reverse.apply(clone, arguments);        
     }
 
     sort(compareFn?: (a: T, b: T) => number): T[] {
