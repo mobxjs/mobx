@@ -225,7 +225,12 @@ export class ObservableArray<T> extends StubArray {
     }
 
     reverse():T[] {
-        return this.replace(this.$mobservable.values.reverse());
+        this.$mobservable.notifyObserved();
+        // reverse by default mutates in place before returning the result
+        // which makes it both a 'derivation' and a 'mutation'. 
+        // so we deviate from the default and just make it an dervitation
+        const clone = (<any>this).slice();
+        return clone.reverse.apply(clone, arguments);        
     }
 
     sort(compareFn?: (a: T, b: T) => number): T[] {

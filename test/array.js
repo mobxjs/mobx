@@ -82,10 +82,11 @@ test('test1', function(t) {
         t.deepEqual(a.slice(), [1,2]);
 
         t.deepEqual(a.reverse(), [2,1]);
-        t.deepEqual(a.slice(), [2,1]);
+        t.deepEqual(a.slice(), [1,2]);
 
-        t.deepEqual(a.sort(), [1,2]);
-        t.deepEqual(a.slice(), [2,1]);
+        a.unshift(3);
+        t.deepEqual(a.sort(), [1,2,3]);
+        t.deepEqual(a.slice(), [3,1,2]);
 
         t.end();
     }
