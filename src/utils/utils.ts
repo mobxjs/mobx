@@ -9,6 +9,14 @@ export function invariant(check: boolean) {
         throw new Error("[mobservable] Invariant failed, please report this as a bug. Be sure to including the stacktrace of this error.");
 }
 
+const deprecatedMessages = [];
+export function deprecated(msg: string) {
+    if (deprecatedMessages.indexOf(msg) !== -1)
+        return;
+    deprecatedMessages.push(msg);
+    console.error("[mobservable] Deprecated: " + msg);
+}
+
 /**
     Makes sure that the provided function is invoked at most once.
 */

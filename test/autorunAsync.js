@@ -2,7 +2,6 @@ var test = require('tape');
 var m = require('..');
 
 test('autorun 1', function(t) {
-		debugger;
 	var _fired = 0;
 	var _result = null;
 	var _cCalcs = 0;

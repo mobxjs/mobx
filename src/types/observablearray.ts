@@ -24,8 +24,7 @@ export class ObservableArrayAdministration<T> {
     changeEvent: SimpleEventEmitter;
     lastKnownLength = 0;
     
-    // TODO: remove supportEnumerable
-    constructor(private array: ObservableArray<T>, public mode:ValueMode, public supportEnumerable:boolean, public name: string) {
+    constructor(private array: ObservableArray<T>, public mode:ValueMode, public name: string) {
          this.atom = new Atom(name || "ObservableArray");
     }
 
@@ -50,21 +49,10 @@ export class ObservableArrayAdministration<T> {
     updateLength(oldLength:number, delta:number) {
         if (oldLength !== this.lastKnownLength)
             throw new Error("[mobservable] Modification exception: the internal structure of an observable array was changed. Did you use peek() to change it?");
+        checkIfStateModificationsAreAllowed();
         this.lastKnownLength += delta;
-        if (delta < 0) {
-            checkIfStateModificationsAreAllowed();
-            if (this.supportEnumerable)
-                for(var i = oldLength + delta; i < oldLength; i++)
-                    delete this.array[i]; // bit faster but mem inefficient: 
-        } else if (delta > 0) {
-            checkIfStateModificationsAreAllowed();
-            if (oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
-                reserveArrayBuffer(oldLength + delta);
-            // funny enough, this is faster than slicing ENUMERABLE_PROPS into defineProperties, and faster as a temporarily map
-            if (this.supportEnumerable)
-                for (var i = oldLength, end = oldLength + delta; i < end; i++)
-                    Object.defineProperty(this.array, <string><any> i, ENUMERABLE_PROPS[i])
-        }
+        if (delta > 0 && oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
+            reserveArrayBuffer(oldLength + delta);
     }
 
     spliceWithArray(index:number, deleteCount?:number, newItems?:T[]):T[] {
@@ -123,16 +111,16 @@ export class ObservableArrayAdministration<T> {
     }
 }
 
-export function createObservableArray<T>(initialValues:T[], mode:ValueMode, supportEnumerable:boolean, name:string): IObservableArray<T> {
-    return <IObservableArray<T>><any> new ObservableArray(initialValues, mode, supportEnumerable, name);
+export function createObservableArray<T>(initialValues:T[], mode:ValueMode, name:string): IObservableArray<T> {
+    return <IObservableArray<T>><any> new ObservableArray(initialValues, mode, name);
 }
 
 export class ObservableArray<T> extends StubArray {
     $mobservable:ObservableArrayAdministration<T>;
 
-    constructor(initialValues:T[], mode:ValueMode, supportEnumerable:boolean, name: string) {
+    constructor(initialValues:T[], mode:ValueMode, name: string) {
         super();
-        let adm = new ObservableArrayAdministration(this, mode, supportEnumerable, name);
+        let adm = new ObservableArrayAdministration(this, mode, name);
         Object.defineProperty(this, "$mobservable", {
             enumerable: false,
             configurable: false,
@@ -326,9 +314,9 @@ var OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
 var ENUMERABLE_PROPS : PropertyDescriptor[] = [];
 
 function createArrayBufferItem(index:number) {
-    var prop = ENUMERABLE_PROPS[index] = {
-        enumerable: true,
-        configurable: true,
+    Object.defineProperty(ObservableArray.prototype, "" + index, {
+        enumerable: false,
+        configurable: false,
         set: function(value) {
             const impl = this.$mobservable;
             const values = impl.values;
@@ -343,7 +331,7 @@ function createArrayBufferItem(index:number) {
                 }
             }
             else if (index === values.length)
-                this.push(impl.makeReactiveArrayItem(value));
+                impl.spliceWithArray(index, 0, [impl.makeReactiveArrayItem(value)]);
             else
                 throw new Error(`[mobservable.array] Index out of bounds, ${index} is larger than ${values.length}`);
         },
@@ -355,12 +343,6 @@ function createArrayBufferItem(index:number) {
             }
             return undefined;
         }
-    };
-    Object.defineProperty(ObservableArray.prototype, "" + index, {
-        enumerable: false,
-        configurable: true,
-        get: prop.get,
-        set: prop.set
     });
 }
 

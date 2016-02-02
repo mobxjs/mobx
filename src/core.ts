@@ -9,7 +9,7 @@ import {IObservable, reportObserved} from "./core/observable";
 import globalState, {isComputingDerivation} from "./core/global";
 import {IDerivation} from "./core/derivation";
 import {Lambda, IObservableArray, IObservableValue, IArrayChange, IArraySplice, IObjectChange} from './interfaces';
-import {isPlainObject, once, deepEquals} from './utils/utils';
+import {isPlainObject, once, deepEquals, deprecated} from './utils/utils';
 import ComputedValue from "./core/computedvalue";
 import Reaction from "./core/reaction";
 import ObservableValue from "./types/observablevalue";
@@ -73,7 +73,8 @@ export function map<V>(initialValues?: KeyValueMap<V>, valueModifier?: Function)
 }
 
 export function fastArray<V>(initialValues?: V[]): IObservableArray<V> {
-    return createObservableArray(initialValues, ValueMode.Flat, false, null);
+    deprecated("fastArray is deprecated. Please use `observable(asFlat([]))`");
+    return createObservableArray(initialValues, ValueMode.Flat, null);
 }
 
 /**
@@ -575,7 +576,7 @@ export function makeChildObservable(value, parentMode:ValueMode, context) {
 	}
 
 	if (Array.isArray(value) && Object.isExtensible(value))
-		return createObservableArray(<[]> value, childMode, true, context);
+		return createObservableArray(<[]> value, childMode, context);
 	if (isPlainObject(value) && Object.isExtensible(value))
 		return extendObservableHelper(value, value, childMode, context);
 	return value;

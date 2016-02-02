@@ -927,11 +927,9 @@ test('json2', function(t) {
         ]
     };
 
-    var o = mobservable.observable(source);
+    var o = mobservable.observable(JSON.parse(JSON.stringify(source)));
 
-    //console.log(JSON.stringify(source,null,4));
     t.deepEqual(mobservable.toJSON(o), source);
-    t.deepEqual(source, o);
 
     var analyze = m(function() {
         return [
@@ -990,7 +988,7 @@ test('json2', function(t) {
         tags: ["x"]
     }));
 
-    t.deepEqual(o, {
+    t.deepEqual(mobservable.toJSON(o), {
         "todos": [
             {
                 "title": "write blog",
@@ -1029,7 +1027,7 @@ test('json2', function(t) {
             url: "booking.com"
         }
     });
-    t.deepEqual(o, {
+    t.deepEqual(JSON.parse(JSON.stringify(o)), {
         "todos": [
             {
                 "title": "write blog",
@@ -1090,7 +1088,7 @@ test('json2', function(t) {
             }
         ]
     });
-    t.deepEqual(o, mobservable.toJSON(o));
+    t.deepEqual(mobservable.toJSON(o, true), mobservable.toJSON(o, false));
     t.deepEqual(ab, [[3, "google"]]);
     t.deepEqual(tb, ["reactjs,frp,foo,bar,x"]);
 
