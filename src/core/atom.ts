@@ -1,7 +1,7 @@
 import {IObservable, propagateReadiness, propagateStaleness, reportObserved} from "./observable";
 import {invariant, noop} from "../utils/utils";
-import globalState, {getNextId} from "./global";
-import {reportTransition} from "../extras";
+import globalState, {getNextId} from "./globalstate";
+import {reportTransition} from "../api/extras";
 import {runReactions} from "./transaction";
 import {IDerivation} from "./derivation";
 
@@ -12,7 +12,7 @@ export interface IAtom extends IObservable {
 /**
  * Used by the transaction manager to signal observers that an atom is ready as soon as the transaction has ended.
  */
-export function propagateAtomReady(atom: IAtom, observersToNotify:IDerivation[]=atom.observers) {
+export function propagateAtomReady(atom: IAtom, observersToNotify: IDerivation[] = atom.observers) {
     invariant(atom.isDirty);
     atom.isDirty = false;
     reportTransition(atom, "READY", true);
@@ -30,7 +30,7 @@ export default class Atom implements IAtom {
     name: string;
     isDirty = false;
     observers = [];
-    
+
     /**
      * Create a new atom. For debugging purposes it is recommended to give it a name.
      * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
@@ -38,7 +38,7 @@ export default class Atom implements IAtom {
     constructor(name?: string, public onBecomeObserved: () => void = noop, public onBecomeUnobserved = noop) {
         this.name = name || ("Atom#" + this.id);
     }
-    
+
     /**
      * Invoke this method to notify mobservable that your atom has been used somehow. 
      */
@@ -55,7 +55,7 @@ export default class Atom implements IAtom {
             this.reportReady();
         }
     }
-    
+
     private reportStale() {
         if (!this.isDirty) {
             this.isDirty = true;
@@ -63,7 +63,7 @@ export default class Atom implements IAtom {
             propagateStaleness(this);
         }
     }
-    
+
     private reportReady(changed: boolean = true) {
         invariant(this.isDirty);
         if (globalState.inTransaction > 0)
@@ -73,7 +73,7 @@ export default class Atom implements IAtom {
             runReactions();
         }
     }
-    
+
     toString() {
         return `${this.name}`;
     }

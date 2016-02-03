@@ -1,7 +1,9 @@
-import ComputedValue from './core/computedvalue';
-import {getDNode} from './extras';
-import {once} from './utils/utils';
-import {isObservable, autorun} from './core';
+import ComputedValue from '../core/computedvalue';
+import {getDNode} from '../api/extras';
+import {once} from '../utils/utils';
+// TODO move isObservable to own file
+import {isObservable} from './observable';
+import {autorun} from './autorun';
 
 export type ITransformer<A, B> = (object: A) => B;
 

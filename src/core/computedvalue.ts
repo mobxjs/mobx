@@ -1,10 +1,10 @@
 import {IObservable, reportObserved, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction} from "./derivation";
-import globalState, {getNextId, isComputingDerivation} from "./global";
-import {autorun, ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped, valueDidChange} from '../core';
-import {Lambda} from "../interfaces";
-import {invariant} from "../utils/utils";
-import {reportTransition} from "../extras";
+import globalState, {getNextId, isComputingDerivation} from "./globalstate";
+import {autorun} from "../api/autorun";
+import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} from '../types/modifiers';
+import {invariant, valueDidChange, Lambda} from "../utils/utils";
+import {reportTransition} from "../api/extras";
 
 /**
  * A node in the state dependency root that observes other nodes, and can be observed itself.
@@ -13,6 +13,7 @@ import {reportTransition} from "../extras";
  * If a computed value isn't actively used by another observer, but is inspect, it will compute lazily to return at least a consistent value.
  */
 export default class ComputedValue<T> implements IObservable, IDerivation {
+	// TODO: use atom for simplification?
 	id = getNextId();
 	isLazy = true; // nobody is observing this derived value, so don't bother tracking upstream values
 	isComputing = false;

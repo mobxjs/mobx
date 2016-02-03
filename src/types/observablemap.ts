@@ -1,10 +1,10 @@
-import {ValueMode, observable, assertUnwrapped, getValueModeFromModifierFunc} from '../core';
-import {IObservableArray, Lambda, IObjectChange} from '../interfaces';
+import {ValueMode, assertUnwrapped, getValueModeFromModifierFunc} from './modifiers';
+import {IObjectChange} from './observableobject';
 import SimpleEventEmitter from '../utils/simpleeventemitter';
 import {transaction} from "../core/transaction";
-import {ObservableArray} from './observablearray';
+import {ObservableArray, IObservableArray} from './observablearray';
 import ObservableValue from "./observablevalue";
-import {isPlainObject} from '../utils/utils';
+import {isPlainObject, Lambda} from '../utils/utils';
 
 export interface KeyValueMap<V> {
 	[key:string]: V
@@ -174,4 +174,17 @@ export class ObservableMap<V> {
 	observe(callback: (changes:IObservableMapChange<V>) => void): Lambda {
 		return this._events.on(callback);
 	}
+}
+
+
+/**
+ * Creates a map, similar to ES6 maps (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map),
+ * yet observable.
+ */
+export function map<V>(initialValues?: KeyValueMap<V>, valueModifier?: Function): ObservableMap<V> {
+    return new ObservableMap(initialValues, valueModifier);
+}
+
+export function isObservableMap(thing):boolean {
+    return thing instanceof ObservableMap;
 }

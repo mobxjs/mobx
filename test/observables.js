@@ -1399,7 +1399,7 @@ test('issue 71, transacting running transformation', function(t) {
             }
         });
 
-        mobservable.observeUntil(function() {
+        mobservable.autorunUntil(function() {
             return this.isVisible;
         }, function() {
             if (this.pos < 4)

@@ -3,6 +3,12 @@
  * (c) 2015 - Michel Weststrate
  * https://github.com/mweststrate/mobservable
  */
+import {isObservableArray} from "../types/observablearray";
+
+export interface Lambda {
+    (): void;
+    name?: string;
+}
 
 export function invariant(check: boolean) {
     if (!check)
@@ -45,6 +51,12 @@ export function isPlainObject(value) {
     return value !== null && typeof value == 'object' && Object.getPrototypeOf(value) === Object.prototype;
 }
 
+export function valueDidChange(compareStructural: boolean, oldValue, newValue):boolean {
+    return compareStructural
+        ? !deepEquals(oldValue, newValue)
+        : oldValue !== newValue
+}
+
 export function makeNonEnumerable(object:any, props:string[]) {
     for(var i = 0; i < props.length; i++) {
         Object.defineProperty(object, props[i], {
@@ -65,8 +77,8 @@ export function deepEquals(a, b) {
         return true;
     if (a === undefined && b === undefined)
         return true;
-    const aIsArray = Array.isArray(a) || a instanceof ObservableArray;
-    if (aIsArray !== (Array.isArray(b) || b instanceof ObservableArray)) {
+    const aIsArray = Array.isArray(a) || isObservableArray(a);
+    if (aIsArray !== (Array.isArray(b) || isObservableArray(b))) {
         return false;
     } else if (aIsArray) {
         if (a.length !== b.length)
@@ -161,6 +173,3 @@ export function quickDiff<T>(current:T[], base:T[]):[T[],T[]] {
     removed.push(...base.slice(baseIndex));
     return [added, removed];
 }
-
-import {Lambda} from '../interfaces';
-import {ObservableArray} from '../types/observablearray';

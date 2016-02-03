@@ -54,6 +54,7 @@ export function checkIfStateModificationsAreAllowed() {
     }
 }
 
+
 // TODO: move to observable
 export function untracked<T>(action:()=>T):T {
     globalState.inUntracked++;
@@ -78,5 +79,5 @@ export function resetGlobalState() {
 
 import {IAtom} from "./atom";
 import Reaction from "./reaction";
-import {Lambda} from "../interfaces";
+import {Lambda} from "../utils/utils";
 import {IDerivation} from "./derivation";

@@ -3,8 +3,7 @@
  * (c) 2015 - Michel Weststrate
  * https://github.com/mweststrate/mobservable
  */
-import {Lambda} from '../interfaces';
-import {once} from './utils';
+import {once, Lambda} from './utils';
 
 // TODO: make generic
 export default class SimpleEventEmitter {

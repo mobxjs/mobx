@@ -1,9 +1,10 @@
 import Atom from "../core/atom";
-import {checkIfStateModificationsAreAllowed} from "../core/global";
+import {checkIfStateModificationsAreAllowed} from "../core/globalstate";
 import {IDerivation} from "../core/derivation";
-import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped, valueDidChange} from '../core';
-import {Lambda} from "../interfaces";
-import {autorun} from "../core";
+import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} from './modifiers';
+import {valueDidChange, Lambda} from "../utils/utils";
+import {autorun} from "../api/autorun";
+import ComputedValue from "../core/computedvalue";
 
 export default class ObservableValue<T> {
 	atom: Atom;
@@ -55,4 +56,29 @@ export default class ObservableValue<T> {
 			prevValue = newValue;
 		});
 	}
+}
+
+export interface IObservableValue<T> {
+    (): T;
+    (value: T):void;
+    // TODO: remove observe:
+    observe(callback: (newValue: T, oldValue: T)=>void, fireImmediately?: boolean): Lambda;
+}
+
+export function toGetterSetterFunction<T>(observable: ObservableValue<T> | ComputedValue<T>):IObservableValue<T> {
+	var f:any = function(value?) {
+		if (arguments.length > 0)
+			observable.set(value);
+		else
+			return observable.get();
+	};
+	f.$mobservable = observable;
+    // TODO: remove observe
+    f.observe = function() {
+        return observable.observe.apply(observable, arguments);
+    };
+	f.toString = function() {
+		return observable.toString();
+	};
+	return f;
 }

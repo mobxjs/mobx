@@ -4,16 +4,40 @@
  * https://github.com/mweststrate/mobservable
  */
 
-import {deepEquals, makeNonEnumerable} from '../utils/utils';
+import {deepEquals, makeNonEnumerable, Lambda, deprecated} from '../utils/utils';
 import Atom from "../core/atom";
 import SimpleEventEmitter from '../utils/simpleeventemitter';
-import {ValueMode, assertUnwrapped, makeChildObservable} from '../core';
-import {IArrayChange, IArraySplice, IObservableArray, Lambda} from '../interfaces';
+import {ValueMode, assertUnwrapped, makeChildObservable} from './modifiers';
 import ObservableValue from "./observablevalue";
-import {checkIfStateModificationsAreAllowed} from "../core/global";
+import {checkIfStateModificationsAreAllowed} from "../core/globalstate";
 import {IDerivation} from "../core/derivation";
 
-// Workaround to make sure ObservableArray extends Array
+export interface IObservableArray<T> extends Array<T> {
+    spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[];
+    observe(listener: (changeData: IArrayChange<T>|IArraySplice<T>)=>void, fireImmediately?: boolean): Lambda;
+    clear(): T[];
+    peek(): T[];
+    replace(newItems: T[]): T[];
+    find(predicate: (item: T,index: number,array: IObservableArray<T>)=>boolean,thisArg?: any,fromIndex?: number): T;
+    remove(value: T): boolean;
+}
+
+export interface IArrayChange<T> {
+    type:  string; // Always:  'update'
+    object:  IObservableArray<T>;
+    index:  number;
+    oldValue:  T;
+}
+
+export interface IArraySplice<T> {
+    type:  string; // Always:  'splice'
+    object:  IObservableArray<T>;
+    index:  number;
+    removed:  T[];
+    addedCount:  number;
+}
+
+// Typescript workaround to make sure ObservableArray extends Array
 export class StubArray {
 }
 StubArray.prototype = [];
@@ -109,10 +133,6 @@ export class ObservableArrayAdministration<T> {
         if (this.changeEvent)
             this.changeEvent.emit(<IArraySplice<T>>{ object: <IObservableArray<T>><any> this.array, type: 'splice', index: index, addedCount: added.length, removed: deleted});
     }
-}
-
-export function createObservableArray<T>(initialValues:T[], mode:ValueMode, name:string): IObservableArray<T> {
-    return <IObservableArray<T>><any> new ObservableArray(initialValues, mode, name);
 }
 
 export class ObservableArray<T> extends StubArray {
@@ -353,3 +373,16 @@ function reserveArrayBuffer(max:number) {
 }
 
 reserveArrayBuffer(1000);
+
+export function createObservableArray<T>(initialValues:T[], mode:ValueMode, name:string): IObservableArray<T> {
+    return <IObservableArray<T>><any> new ObservableArray(initialValues, mode, name);
+}
+
+export function fastArray<V>(initialValues?: V[]): IObservableArray<V> {
+    deprecated("fastArray is deprecated. Please use `observable(asFlat([]))`");
+    return createObservableArray(initialValues, ValueMode.Flat, null);
+}
+
+export function isObservableArray(thing):boolean {
+    return thing instanceof ObservableArray;
+}

@@ -1,4 +1,4 @@
-import globalState from "./global";
+import globalState from "./globalstate";
 import {propagateAtomReady} from "./atom";
 
 /**

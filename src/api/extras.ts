@@ -3,16 +3,51 @@
  * (c) 2015 - Michel Weststrate
  * https://github.com/mweststrate/mobservable
  */
-import ObservableValue from "./types/observablevalue";
-import ComputedValue from "./core/computedvalue";
-import Reaction from "./core/reaction";
-import {IDepTreeNode} from "./core/observable";
-import {ObservableObject} from './types/observableobject';
-import {ObservableMap} from './types/observablemap';
-import SimpleEventEmitter from './utils/simpleeventemitter';
-import {once, unique} from './utils/utils';
-import {isObservable} from './core';
-import {IDependencyTree, ITransitionEvent, IObserverTree, Lambda} from './interfaces';
+import ObservableValue from "../types/observablevalue";
+import ComputedValue from "../core/computedvalue";
+import Reaction from "../core/reaction";
+import {IDepTreeNode} from "../core/observable";
+import {ObservableObject} from '../types/observableobject';
+import {ObservableMap} from '../types/observablemap';
+import SimpleEventEmitter from '../utils/simpleeventemitter';
+import {once, unique, Lambda} from '../utils/utils';
+import {isObservable} from '../api/observable';
+import globalState from "../core/globalstate";
+
+export interface IDependencyTree {
+    id: number;
+    name: string;
+    dependencies?: IDependencyTree[];
+}
+
+export interface IObserverTree {
+    id: number;
+    name: string;
+    observers?: IObserverTree[];
+    listeners?: number; // amount of functions manually attached using an .observe method
+}
+
+export interface ITransitionEvent {
+    id: number;
+    name: string;
+    state: string;
+    changed: boolean;
+    node: any; // TODO: IAtom;
+}
+
+/**
+    * If strict is enabled, views are not allowed to modify the state.
+    * This is a recommended practice, as it makes reasoning about your application simpler.
+    */
+export function allowStateChanges<T>(allowStateChanges: boolean, func:() => T):T {
+    const prev = globalState.allowStateChanges;
+    globalState.allowStateChanges = allowStateChanges;
+    const res = func();
+    globalState.allowStateChanges = prev;
+    return res;   
+}
+
+
 
 export function getDNode(thing:any, property?:string):IDepTreeNode {
 	const propError = `[mobservable.getDNode] property '${property}' of '${thing}' doesn't seem to be a reactive property`;
