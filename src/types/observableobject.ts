@@ -11,10 +11,10 @@ import SimpleEventEmitter from '../utils/simpleeventemitter';
 
 
 export interface IObjectChange<T, R> {
-    name: string;
-    object: R;
-    type: string;
-    oldValue?: T;
+	name: string;
+	object: R;
+	type: string;
+	oldValue?: T;
 }
 
 // responsible for the administration of objects that have become reactive
@@ -93,5 +93,5 @@ export class ObservableObject { // TODO: implement IObservable
 }
 
 export function isObservableObject(thing):boolean {
-    return thing && typeof thing === "object" && thing.$mobservable instanceof ObservableObject;
+	return thing && typeof thing === "object" && thing.$mobservable instanceof ObservableObject;
 }

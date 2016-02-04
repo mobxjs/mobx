@@ -30,7 +30,7 @@ export {    asReference, asFlat, asStructure                     } from "./types
 export {    IObservableValue                                     } from "./types/observablevalue";
 export {    isObservableObject                                   } from "./types/observableobject";
 export {    isObservableArray, fastArray,
-            IObservableArray, IArrayChange, IArraySplice         } from "./types/observablearray";
+			IObservableArray, IArrayChange, IArraySplice         } from "./types/observablearray";
 export {    isObservableMap, map, ObservableMap                  } from "./types/observablemap"
 
 export {    untracked                                            } from './core/globalstate';

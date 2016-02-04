@@ -12,39 +12,39 @@ export enum ValueMode {
 
 
 /**
-    * Can be used in combination with makeReactive / extendReactive.
-    * Enforces that a reference to 'value' is stored as property,
-    * but that 'value' itself is not turned into something reactive.
-    * Future assignments to the same property will inherit this behavior.
-    * @param value initial value of the reactive property that is being defined.
-    */
+	* Can be used in combination with makeReactive / extendReactive.
+	* Enforces that a reference to 'value' is stored as property,
+	* but that 'value' itself is not turned into something reactive.
+	* Future assignments to the same property will inherit this behavior.
+	* @param value initial value of the reactive property that is being defined.
+	*/
 export function asReference<T>(value:T):T {
-    // unsound typecast, but in combination with makeReactive, the end result should be of the correct type this way
-    // e.g: makeReactive({ x : asReference(number)}) -> { x : number }
-    return <T><any> new AsReference(value);
+	// unsound typecast, but in combination with makeReactive, the end result should be of the correct type this way
+	// e.g: makeReactive({ x : asReference(number)}) -> { x : number }
+	return <T><any> new AsReference(value);
 }
 
 /**
-    * Can be used in combination with makeReactive / extendReactive.
-    * Enforces that values that are deeply equalled identical to the previous are considered to unchanged.
-    * (the default equality used by mobservable is reference equality).
-    * Values that are still reference equal, but not deep equal, are considered to be changed.
-    * asStructure can only be used incombinations with arrays or objects.
-    * It does not support cyclic structures.
-    * Future assignments to the same property will inherit this behavior.
-    * @param value initial value of the reactive property that is being defined.
-    */
+	* Can be used in combination with makeReactive / extendReactive.
+	* Enforces that values that are deeply equalled identical to the previous are considered to unchanged.
+	* (the default equality used by mobservable is reference equality).
+	* Values that are still reference equal, but not deep equal, are considered to be changed.
+	* asStructure can only be used incombinations with arrays or objects.
+	* It does not support cyclic structures.
+	* Future assignments to the same property will inherit this behavior.
+	* @param value initial value of the reactive property that is being defined.
+	*/
 export function asStructure<T>(value:T):T {
-    return <T><any>new AsStructure(value);
+	return <T><any>new AsStructure(value);
 }
 
 /**
-    * Can be used in combination with makeReactive / extendReactive.
-    * The value will be made reactive, but, if the value is an object or array,
-    * children will not automatically be made reactive as well.
-    */
+	* Can be used in combination with makeReactive / extendReactive.
+	* The value will be made reactive, but, if the value is an object or array,
+	* children will not automatically be made reactive as well.
+	*/
 export function asFlat<T>(value:T):T {
-    return <T><any> new AsFlat(value);
+	return <T><any> new AsFlat(value);
 }
 
 export class AsReference {

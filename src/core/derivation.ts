@@ -8,21 +8,21 @@ import globalState from "./globalstate";
  * See https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.xvbh6qd74
  */
 export interface IDerivation extends IDepTreeNode {
-    observing: IObservable[];
-    observers?: IDerivation[];
-    dependencyStaleCount: number;
-    dependencyChangeCount: number;
-    onDependenciesReady():boolean;
+	observing: IObservable[];
+	observers?: IDerivation[];
+	dependencyStaleCount: number;
+	dependencyChangeCount: number;
+	onDependenciesReady():boolean;
 }
 
 /**
  * Notify a derivation that one of the values it is observing has become stale
  */
 export function notifyDependencyStale(derivation: IDerivation) {
-    if (++derivation.dependencyStaleCount === 1) {
-        reportTransition(derivation, "STALE");
-        propagateStaleness(derivation);
-    }
+	if (++derivation.dependencyStaleCount === 1) {
+		reportTransition(derivation, "STALE");
+		propagateStaleness(derivation);
+	}
 }
 
 /**
@@ -31,23 +31,23 @@ export function notifyDependencyStale(derivation: IDerivation) {
  * will be scheduled for re-evaluation.
  */
 export function notifyDependencyReady(derivation: IDerivation, dependencyDidChange: boolean) {
-    // TODO: fix invariant(derivation.dependencyStaleCount > 0);
-    if (dependencyDidChange)
-        derivation.dependencyChangeCount += 1;
-    if (--derivation.dependencyStaleCount === 0) {
-        // all dependencies are ready
-        if (derivation.dependencyChangeCount > 0) {
-            // did any of the observables really change?
-            derivation.dependencyChangeCount = 0;
-            reportTransition(derivation, "PENDING");
-            const changed = derivation.onDependenciesReady();
-            propagateReadiness(derivation, changed);
-        } else {
-            // we're done, but didn't change, lets make sure verybody knows..
-            reportTransition(derivation, "READY", false);
-            propagateReadiness(derivation, false);
-        }
-    }
+	// TODO: fix invariant(derivation.dependencyStaleCount > 0);
+	if (dependencyDidChange)
+		derivation.dependencyChangeCount += 1;
+	if (--derivation.dependencyStaleCount === 0) {
+		// all dependencies are ready
+		if (derivation.dependencyChangeCount > 0) {
+			// did any of the observables really change?
+			derivation.dependencyChangeCount = 0;
+			reportTransition(derivation, "PENDING");
+			const changed = derivation.onDependenciesReady();
+			propagateReadiness(derivation, changed);
+		} else {
+			// we're done, but didn't change, lets make sure verybody knows..
+			reportTransition(derivation, "READY", false);
+			propagateReadiness(derivation, false);
+		}
+	}
 }
 
 /**
@@ -56,30 +56,30 @@ export function notifyDependencyReady(derivation: IDerivation, dependencyDidChan
  * as observer of any of the accessed observables.
  */
 export function trackDerivedFunction<T>(derivation:IDerivation, f: () => T) {
-    const prevObserving = derivation.observing;
-    derivation.observing = [];
-    globalState.derivationStack.push(derivation);
-    const result = f();
-    bindDependencies(derivation, prevObserving);
-    return result;
+	const prevObserving = derivation.observing;
+	derivation.observing = [];
+	globalState.derivationStack.push(derivation);
+	const result = f();
+	bindDependencies(derivation, prevObserving);
+	return result;
 }
 
 function bindDependencies(derivation: IDerivation, prevObserving: IObservable[]) {
-    globalState.derivationStack.length -= 1;
+	globalState.derivationStack.length -= 1;
 
-    var [added, removed] = quickDiff(derivation.observing, prevObserving);
+	var [added, removed] = quickDiff(derivation.observing, prevObserving);
 
-    for (var i = 0, l = added.length; i < l; i++) {
-        var dependency = added[i];
-        // only check for cycles on new dependencies, existing dependencies cannot cause a cycle..
-        if (findCycle(derivation, dependency))
+	for (var i = 0, l = added.length; i < l; i++) {
+		var dependency = added[i];
+		// only check for cycles on new dependencies, existing dependencies cannot cause a cycle..
+		if (findCycle(derivation, dependency))
 			throw new Error(`${this.toString()}: Found cyclic dependency in computed value '${this.derivation.toString()}'`);
-        addObserver(added[i], derivation);
-    }
+		addObserver(added[i], derivation);
+	}
 
-    // remove observers after adding them, so that they don't go in lazy mode to early
-    for (var i = 0, l = removed.length; i < l; i++)
-        removeObserver(removed[i], derivation);
+	// remove observers after adding them, so that they don't go in lazy mode to early
+	for (var i = 0, l = removed.length; i < l; i++)
+		removeObserver(removed[i], derivation);
 }
 
 /**
@@ -87,13 +87,13 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
  * computation like `a = a * 2`
  */
 function findCycle(needle:IDerivation, node:IObservable):boolean {
-    const obs = node.observing;
-    if (!obs)
-        return false;
-    if (obs.indexOf(node) !== -1)
-        return true;
-    for(let l = obs.length, i = 0; i < l; i++)
-        if (findCycle(needle, obs[i]))
-            return true;
-    return false;
+	const obs = node.observing;
+	if (!obs)
+		return false;
+	if (obs.indexOf(node) !== -1)
+		return true;
+	for(let l = obs.length, i = 0; i < l; i++)
+		if (findCycle(needle, obs[i]))
+			return true;
+	return false;
 }

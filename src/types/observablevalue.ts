@@ -29,7 +29,7 @@ export default class ObservableValue<T> {
 		const changed = valueDidChange(this.mode === ValueMode.Structure, oldValue, newValue);
 		if (changed) {
 			this.value = makeChildObservable(newValue, this.mode, this.name);
-            this.atom.reportChanged();
+			this.atom.reportChanged();
 		}
 		return changed;
 	}
@@ -59,10 +59,10 @@ export default class ObservableValue<T> {
 }
 
 export interface IObservableValue<T> {
-    (): T;
-    (value: T):void;
-    // TODO: remove observe:
-    observe(callback: (newValue: T, oldValue: T)=>void, fireImmediately?: boolean): Lambda;
+	(): T;
+	(value: T):void;
+	// TODO: remove observe:
+	observe(callback: (newValue: T, oldValue: T)=>void, fireImmediately?: boolean): Lambda;
 }
 
 export function toGetterSetterFunction<T>(observable: ObservableValue<T> | ComputedValue<T>):IObservableValue<T> {
@@ -73,10 +73,10 @@ export function toGetterSetterFunction<T>(observable: ObservableValue<T> | Compu
 			return observable.get();
 	};
 	f.$mobservable = observable;
-    // TODO: remove observe
-    f.observe = function() {
-        return observable.observe.apply(observable, arguments);
-    };
+	// TODO: remove observe
+	f.observe = function() {
+		return observable.observe.apply(observable, arguments);
+	};
 	f.toString = function() {
 		return observable.toString();
 	};

@@ -182,9 +182,9 @@ export class ObservableMap<V> {
  * yet observable.
  */
 export function map<V>(initialValues?: KeyValueMap<V>, valueModifier?: Function): ObservableMap<V> {
-    return new ObservableMap(initialValues, valueModifier);
+	return new ObservableMap(initialValues, valueModifier);
 }
 
 export function isObservableMap(thing):boolean {
-    return thing instanceof ObservableMap;
+	return thing instanceof ObservableMap;
 }

@@ -15,36 +15,36 @@ import {isObservable} from '../api/observable';
 import globalState from "../core/globalstate";
 
 export interface IDependencyTree {
-    id: number;
-    name: string;
-    dependencies?: IDependencyTree[];
+	id: number;
+	name: string;
+	dependencies?: IDependencyTree[];
 }
 
 export interface IObserverTree {
-    id: number;
-    name: string;
-    observers?: IObserverTree[];
-    listeners?: number; // amount of functions manually attached using an .observe method
+	id: number;
+	name: string;
+	observers?: IObserverTree[];
+	listeners?: number; // amount of functions manually attached using an .observe method
 }
 
 export interface ITransitionEvent {
-    id: number;
-    name: string;
-    state: string;
-    changed: boolean;
-    node: any; // TODO: IAtom;
+	id: number;
+	name: string;
+	state: string;
+	changed: boolean;
+	node: any; // TODO: IAtom;
 }
 
 /**
-    * If strict is enabled, views are not allowed to modify the state.
-    * This is a recommended practice, as it makes reasoning about your application simpler.
-    */
+	* If strict is enabled, views are not allowed to modify the state.
+	* This is a recommended practice, as it makes reasoning about your application simpler.
+	*/
 export function allowStateChanges<T>(allowStateChanges: boolean, func:() => T):T {
-    const prev = globalState.allowStateChanges;
-    globalState.allowStateChanges = allowStateChanges;
-    const res = func();
-    globalState.allowStateChanges = prev;
-    return res;   
+	const prev = globalState.allowStateChanges;
+	globalState.allowStateChanges = allowStateChanges;
+	const res = func();
+	globalState.allowStateChanges = prev;
+	return res;   
 }
 
 

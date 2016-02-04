@@ -6,17 +6,17 @@ import {runReactions} from "./transaction";
 import {IDerivation} from "./derivation";
 
 export interface IAtom extends IObservable {
-    isDirty: boolean;
+	isDirty: boolean;
 }
 
 /**
  * Used by the transaction manager to signal observers that an atom is ready as soon as the transaction has ended.
  */
 export function propagateAtomReady(atom: IAtom, observersToNotify: IDerivation[] = atom.observers) {
-    invariant(atom.isDirty);
-    atom.isDirty = false;
-    reportTransition(atom, "READY", true);
-    propagateReadiness(atom, true, observersToNotify);
+	invariant(atom.isDirty);
+	atom.isDirty = false;
+	reportTransition(atom, "READY", true);
+	propagateReadiness(atom, true, observersToNotify);
 }
 
 /**
@@ -26,55 +26,55 @@ export function propagateAtomReady(atom: IAtom, observersToNotify: IDerivation[]
  * 2) they should notify mobservable whenever they have _changed_. This way mobservable can re-run any functions (derivations) that are using this atom. 
  */
 export default class Atom implements IAtom {
-    id = getNextId();
-    name: string;
-    isDirty = false;
-    observers = [];
+	id = getNextId();
+	name: string;
+	isDirty = false;
+	observers = [];
 
-    /**
-     * Create a new atom. For debugging purposes it is recommended to give it a name.
-     * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
-     */
-    constructor(name?: string, public onBecomeObserved: () => void = noop, public onBecomeUnobserved = noop) {
-        this.name = name || ("Atom#" + this.id);
-    }
+	/**
+	 * Create a new atom. For debugging purposes it is recommended to give it a name.
+	 * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
+	 */
+	constructor(name?: string, public onBecomeObserved: () => void = noop, public onBecomeUnobserved = noop) {
+		this.name = name || ("Atom#" + this.id);
+	}
 
-    /**
-     * Invoke this method to notify mobservable that your atom has been used somehow. 
-     */
-    reportObserved() {
-        reportObserved(this);
-    }
+	/**
+	 * Invoke this method to notify mobservable that your atom has been used somehow. 
+	 */
+	reportObserved() {
+		reportObserved(this);
+	}
 
-    /**
-     * Invoke this method _after_ this method has changed to signal mobservable that all its observers should invalidate.
-     */
-    reportChanged() {
-        if (!this.isDirty) {
-            this.reportStale();
-            this.reportReady();
-        }
-    }
+	/**
+	 * Invoke this method _after_ this method has changed to signal mobservable that all its observers should invalidate.
+	 */
+	reportChanged() {
+		if (!this.isDirty) {
+			this.reportStale();
+			this.reportReady();
+		}
+	}
 
-    private reportStale() {
-        if (!this.isDirty) {
-            this.isDirty = true;
-            reportTransition(this, "STALE");
-            propagateStaleness(this);
-        }
-    }
+	private reportStale() {
+		if (!this.isDirty) {
+			this.isDirty = true;
+			reportTransition(this, "STALE");
+			propagateStaleness(this);
+		}
+	}
 
-    private reportReady(changed: boolean = true) {
-        invariant(this.isDirty);
-        if (globalState.inTransaction > 0)
-            globalState.changedAtoms.push({atom: this, observersToNotify: this.observers.slice()});
-        else {
-            propagateAtomReady(this);
-            runReactions();
-        }
-    }
+	private reportReady(changed: boolean = true) {
+		invariant(this.isDirty);
+		if (globalState.inTransaction > 0)
+			globalState.changedAtoms.push({atom: this, observersToNotify: this.observers.slice()});
+		else {
+			propagateAtomReady(this);
+			runReactions();
+		}
+	}
 
-    toString() {
-        return `${this.name}`;
-    }
+	toString() {
+		return `${this.name}`;
+	}
 }
