@@ -3,7 +3,6 @@
  * (c) 2015 - Michel Weststrate
  * https://github.com/mweststrate/mobservable
  */
-import {isObservableArray} from "../types/observablearray";
 
 export interface Lambda {
 	(): void;
@@ -173,3 +172,5 @@ export function quickDiff<T>(current: T[], base: T[]): [T[], T[]] {
 	removed.push(...base.slice(baseIndex));
 	return [added, removed];
 }
+
+import {isObservableArray} from "../types/observablearray";

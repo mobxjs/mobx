@@ -1,6 +1,4 @@
 import {IAtom} from "./atom";
-import Reaction from "./reaction";
-import {Lambda} from "../utils/utils";
 import {IDerivation} from "./derivation";
 
 declare const global: any;
@@ -20,7 +18,7 @@ export class MobservableGlobals {
 }
 
 
-const globalState = (() => {
+export const globalState = (() => {
 	const res = new MobservableGlobals();
 	/**
 	 * Backward compatibility check
@@ -31,8 +29,6 @@ const globalState = (() => {
 		return global.__mobservableGlobal;
 	return global.__mobservableGlobal = res;
 })();
-
-export default globalState;
 
 export function getNextId() {
 	return ++globalState.mobservableObjectId;
@@ -81,3 +77,6 @@ export function resetGlobalState() {
 	for (let key in defaultGlobals)
 		globalState[key] = defaultGlobals[key];
 }
+
+import {Reaction} from "./reaction";
+import {Lambda} from "../utils/utils";

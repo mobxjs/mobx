@@ -1,6 +1,6 @@
 import {IObservable, reportObserved, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction} from "./derivation";
-import globalState, {getNextId, isComputingDerivation} from "./globalstate";
+import {globalState, getNextId, isComputingDerivation} from "./globalstate";
 import {autorun} from "../api/autorun";
 import {valueDidChange, Lambda} from "../utils/utils";
 import {reportTransition} from "../api/extras";
@@ -11,7 +11,7 @@ import {reportTransition} from "../api/extras";
  * Computed values will update automatically if any observed value changes and if they are observed themselves.
  * If a computed value isn't actively used by another observer, but is inspect, it will compute lazily to return at least a consistent value.
  */
-export default class ComputedValue<T> implements IObservable, IDerivation {
+export class ComputedValue<T> implements IObservable, IDerivation {
 	// TODO: use atom for simplification?
 	id = getNextId();
 	isLazy = true; // nobody is observing this derived value, so don't bother tracking upstream values

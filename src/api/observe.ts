@@ -1,9 +1,10 @@
 import {IObservableArray, IArrayChange, IArraySplice, isObservableArray} from "../types/observablearray";
 import {ObservableMap, IObservableMapChange, isObservableMap} from "../types/observablemap";
 import {IObjectChange, isObservableObject} from "../types/observableobject";
-import {isObservable, observable} from "./observable";
+import {observable} from "./observable";
 import {Lambda, isPlainObject} from "../utils/utils";
 import {autorun} from "../api/autorun";
+import {isObservable} from "./isobservable";
 
 export function observe<T>(observableArray: IObservableArray<T>, listener: (change: IArrayChange<T> | IArraySplice<T>) => void): Lambda;
 export function observe<T>(observableMap: ObservableMap<T>, listener: (change: IObservableMapChange<T>) => void): Lambda;

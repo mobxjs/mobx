@@ -3,16 +3,16 @@
  * (c) 2015 - Michel Weststrate
  * https://github.com/mweststrate/mobservable
  */
-import ObservableValue from "../types/observablevalue";
-import ComputedValue from "../core/computedvalue";
-import Reaction from "../core/reaction";
+import {ObservableValue} from "../types/observablevalue";
+import {ComputedValue} from "../core/computedvalue";
+import {Reaction} from "../core/reaction";
 import {IDepTreeNode} from "../core/observable";
 import {ObservableObject} from "../types/observableobject";
 import {ObservableMap} from "../types/observablemap";
-import SimpleEventEmitter from "../utils/simpleeventemitter";
+import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {once, unique, Lambda} from "../utils/utils";
-import {isObservable} from "../api/observable";
-import globalState from "../core/globalstate";
+import {isObservable} from "../api/isobservable";
+import {globalState} from "../core/globalstate";
 
 export interface IDependencyTree {
 	id: number;
@@ -32,7 +32,7 @@ export interface ITransitionEvent {
 	name: string;
 	state: string;
 	changed: boolean;
-	node: any; // TODO: IAtom;
+	node: IDepTreeNode;
 }
 
 /**
@@ -82,8 +82,7 @@ export function getDNode(thing: any, property?: string): IDepTreeNode {
 	throw new Error(`[mobservable.getDNode] ${thing} doesn't seem to be reactive`);
 }
 
-// TODO: export needed?
-export let transitionTracker: SimpleEventEmitter = null;
+let transitionTracker: SimpleEventEmitter = null;
 
 export function reportTransition(node: IDepTreeNode, state: string, changed: boolean = false) {
 	if (transitionTracker) transitionTracker.emit({

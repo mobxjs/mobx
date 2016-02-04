@@ -1,9 +1,9 @@
 import {ValueMode, assertUnwrapped, getValueModeFromModifierFunc} from "./modifiers";
 import {IObjectChange} from "./observableobject";
-import SimpleEventEmitter from "../utils/simpleeventemitter";
+import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {transaction} from "../core/transaction";
 import {ObservableArray, IObservableArray} from "./observablearray";
-import ObservableValue from "./observablevalue";
+import {ObservableValue} from "./observablevalue";
 import {isPlainObject, Lambda} from "../utils/utils";
 
 export interface IKeyValueMap<V> {

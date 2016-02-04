@@ -5,8 +5,7 @@
  */
 import {once, Lambda} from "./utils";
 
-// TODO: make generic
-export default class SimpleEventEmitter {
+export class SimpleEventEmitter {
 	listeners:{(...data: any[]): void}[] = [];
 
 	emit(...data: any[]);

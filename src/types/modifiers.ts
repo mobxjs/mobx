@@ -1,5 +1,6 @@
 import {isPlainObject} from "../utils/utils";
-import {isObservable, extendObservableHelper} from "../api/observable";
+import {isObservable} from "../api/isobservable";
+import {extendObservableHelper} from "../api/extendobservable";
 import {createObservableArray} from "../types/observablearray";
 
 export enum ValueMode {

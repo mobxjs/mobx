@@ -1,5 +1,4 @@
-import ComputedValue from "../core/computedvalue";
-// TODO move isObservable to own file
+import {ComputedValue} from "../core/computedvalue";
 
 export type ITransformer<A, B> = (object: A) => B;
 

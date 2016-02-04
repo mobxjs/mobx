@@ -1,7 +1,7 @@
-import {Lambda, once} from "../utils/utils";
+import {Lambda, once, deprecated} from "../utils/utils";
 import {assertUnwrapped} from "../types/modifiers";
-import Reaction from "../core/reaction";
-import globalState, {isComputingDerivation} from "../core/globalstate";
+import {Reaction} from "../core/reaction";
+import {globalState, isComputingDerivation} from "../core/globalstate";
 import {observable} from "../api/observable";
 import {IObservable, reportObserved} from "../core/observable";
 
@@ -24,30 +24,13 @@ export function autorun(view: Lambda, scope?: any): Lambda {
 	const reaction = new Reaction(view.name, function () {
 		this.track(view);
 	});
+
+	// Start or schedule the just created reaction
 	if (isComputingDerivation() || globalState.inTransaction > 0)
 		globalState.pendingReactions.push(reaction);
 	else
 		reaction.runReaction();
-/*
-	let disposedPrematurely = false;
-	let started = false;
 
-	runAfterTransaction(() => {
-		if (!disposedPrematurely) {
-			// TODO: restore observable.setRefCount(+1);
-			started = true;
-		}
-	});
-
-	const disposer = once(() => {
-		if (started) {
-			// TODO: restore  observable.setRefCount(-1);
-		}else
-			disposedPrematurely = true;
-	});
-	(<any>disposer).$mobservable = observable;
-	return disposer;
-*/
 	const disposer = () => reaction.dispose();
 	(<any>disposer).$mobservable = reaction;
 	return disposer;
@@ -61,9 +44,7 @@ export function autorun(view: Lambda, scope?: any): Lambda {
  * @param scope (optional)
  * @returns disposer function to prematurely end the observer.
  */
-export function autorunUntil(predicate: () => boolean, effect: Lambda, scope?: any): Lambda {
-	// TODO: rename to when
-	// TODO: use Reaction class
+export function when(predicate: () => boolean, effect: Lambda, scope?: any): Lambda {
 	let disposeImmediately = false;
 	const disposer = autorun(() => {
 		if (predicate.call(scope)) {
@@ -77,6 +58,11 @@ export function autorunUntil(predicate: () => boolean, effect: Lambda, scope?: a
 	if (disposeImmediately)
 		disposer();
 	return disposer;
+}
+
+export function autorunUntil(predicate: () => boolean, effect: Lambda, scope?: any): Lambda {
+	deprecated("`autorunUntil` is deprecated, please use `when`.");
+	return when.apply(null, arguments);
 }
 
 export function autorunAsync(func: Lambda, delay: number = 1, scope?: any): Lambda {

@@ -1,6 +1,6 @@
 import {IObservable, propagateReadiness, propagateStaleness, reportObserved} from "./observable";
 import {invariant, noop} from "../utils/utils";
-import globalState, {getNextId} from "./globalstate";
+import {globalState, getNextId} from "./globalstate";
 import {reportTransition} from "../api/extras";
 import {runReactions} from "./transaction";
 import {IDerivation} from "./derivation";
@@ -25,7 +25,7 @@ export function propagateAtomReady(atom: IAtom, observersToNotify: IDerivation[]
  * 1) detect when they are being _used_ and report this (using reportObserved). This allows mobservable to make the connection between running functions and the data they used
  * 2) they should notify mobservable whenever they have _changed_. This way mobservable can re-run any functions (derivations) that are using this atom. 
  */
-export default class Atom implements IAtom {
+export class Atom implements IAtom {
 	id = getNextId();
 	name: string;
 	isDirty = false;

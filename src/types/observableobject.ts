@@ -3,11 +3,11 @@
  * (c) 2015 - Michel Weststrate
  * https://github.com/mweststrate/mobservable
  */
-import ObservableValue from "./observablevalue";
-import ComputedValue from "../core/computedvalue";
+import {ObservableValue} from "./observablevalue";
+import {ComputedValue} from "../core/computedvalue";
 import {ValueMode, AsStructure} from "./modifiers";
 import {Lambda} from "../utils/utils";
-import SimpleEventEmitter from "../utils/simpleeventemitter";
+import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 
 export interface IObjectChange<T, R> {
 	name: string;

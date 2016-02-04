@@ -1,8 +1,7 @@
 import {ObservableArray} from "../types/observablearray";
 import {ObservableMap} from "../types/observablemap";
-// TODO: remove all default exports
-import ObservableValue from "../types/observablevalue";
-import {isObservable} from "../api/observable";
+import {ObservableValue} from "../types/observablevalue";
+import {isObservable} from "../api/isobservable";
 import {isPlainObject} from "../utils/utils";
 
 /**

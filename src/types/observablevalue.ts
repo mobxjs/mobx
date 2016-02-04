@@ -1,11 +1,11 @@
-import Atom from "../core/atom";
+import {Atom} from "../core/atom";
 import {checkIfStateModificationsAreAllowed} from "../core/globalstate";
 import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} from "./modifiers";
 import {valueDidChange, Lambda} from "../utils/utils";
 import {autorun} from "../api/autorun";
-import ComputedValue from "../core/computedvalue";
+import {ComputedValue} from "../core/computedvalue";
 
-export default class ObservableValue<T> {
+export class ObservableValue<T> {
 	atom: Atom;
 	hasUnreportedChange = false;
 

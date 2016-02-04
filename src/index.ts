@@ -19,9 +19,11 @@
 import {registerGlobals} from "./core/globalstate";
 registerGlobals();
 
-export {    isObservable, observable, extendObservable           } from "./api/observable";
+export {    observable                                           } from "./api/observable";
+export {    isObservable                                         } from "./api/isobservable";
+export {    extendObservable                                     } from "./api/extendobservable";
 export {    observe                                              } from "./api/observe";
-export {    autorun, autorunAsync, autorunUntil                  } from "./api/autorun";
+export {    autorun, autorunAsync, autorunUntil, when            } from "./api/autorun";
 export {    expr                                                 } from "./api/expr";
 export {    toJSON                                               } from "./api/tojson";
 export {    createTransformer                                    } from "./api/createtransformer";
@@ -35,15 +37,15 @@ export {    isObservableMap, map, ObservableMap                  } from "./types
 
 export {    untracked                                            } from "./core/globalstate";
 export {    transaction                                          } from "./core/transaction";
-export {    default as Atom                                      } from "./core/atom";
-export {    default as Reaction                                  } from "./core/reaction";
+export {    Atom                                                 } from "./core/atom";
+export {    Reaction                                             } from "./core/reaction";
 
 /**
  * 'Private' elements that are exposed for testing and debugging utilities
  */
 
 import {quickDiff} from "./utils/utils";
-import SimpleEventEmitter from "./utils/simpleeventemitter";
+import {SimpleEventEmitter} from "./utils/simpleeventemitter";
 import {isComputingDerivation, resetGlobalState,  } from "./core/globalstate";
 
 export const _ = {

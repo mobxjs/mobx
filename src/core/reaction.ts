@@ -1,6 +1,6 @@
 import {IObservable, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction} from "./derivation";
-import globalState, {getNextId} from "./globalstate";
+import {globalState, getNextId} from "./globalstate";
 import {reportTransition} from "../api/extras";
 
 /**
@@ -21,7 +21,7 @@ import {reportTransition} from "../api/extras";
  * 5) `onInvalidate` will be called, and we are back at step 1.
  *
  */
-export default class Reaction implements IDerivation {
+export class Reaction implements IDerivation {
 	id = getNextId();
 	name; string;
 	observing: IObservable[] = []; // nodes we are looking at. Our value depends on these nodes

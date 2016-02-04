@@ -5,8 +5,8 @@
  */
 
 import {deepEquals, makeNonEnumerable, Lambda, deprecated} from "../utils/utils";
-import Atom from "../core/atom";
-import SimpleEventEmitter from "../utils/simpleeventemitter";
+import {Atom} from "../core/atom";
+import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {ValueMode, assertUnwrapped, makeChildObservable} from "./modifiers";
 import {checkIfStateModificationsAreAllowed} from "../core/globalstate";
 

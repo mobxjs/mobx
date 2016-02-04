@@ -1,7 +1,7 @@
 import {IObservable, IDepTreeNode, propagateReadiness, propagateStaleness, addObserver, removeObserver} from "./observable";
 import {quickDiff} from "../utils/utils";
 import {reportTransition} from "../api/extras";
-import globalState from "./globalstate";
+import {globalState} from "./globalstate";
 
 /**
  * A derivation is everything that can be derived from the state (all the atoms) in a pure manner.
