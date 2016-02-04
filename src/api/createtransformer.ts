@@ -1,18 +1,14 @@
-import ComputedValue from '../core/computedvalue';
-import {getDNode} from '../api/extras';
-import {once} from '../utils/utils';
+import ComputedValue from "../core/computedvalue";
 // TODO move isObservable to own file
-import {isObservable} from './observable';
-import {autorun} from './autorun';
 
 export type ITransformer<A, B> = (object: A) => B;
 
-export function createTransformer<A, B>(transformer: ITransformer<A,B>, onCleanup?: (resultObject: B, sourceObject?: A) => void): ITransformer<A, B> {
+export function createTransformer<A, B>(transformer: ITransformer<A, B>, onCleanup?: (resultObject: B, sourceObject?: A) => void): ITransformer<A, B> {
 	if (typeof transformer !== "function" || transformer.length !== 1)
 		throw new Error("[mobservable] transformer parameter should be a function that accepts one argument");
 
 	// Memoizes: object id -> reactive view that applies transformer to the object
-	const objectCache : {[id:number]: ComputedValue<B>} = {};
+	const objectCache: {[id: number]: ComputedValue<B>} = {};
 
 	// Local transformer class specifically for this transformer
 	class Transformer extends ComputedValue<B> {
@@ -44,7 +40,7 @@ let transformId = 0;
 function getMemoizationId(object) {
 	if (object === null  || typeof object !== "object")
 		throw new Error("[mobservable] transform expected some kind of object, got: " + object);
-	var tid = object.$transformId;
+	const tid = object.$transformId;
 	if (tid === undefined)
 		return object.$transformId = ++transformId;
 	return tid;

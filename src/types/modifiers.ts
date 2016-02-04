@@ -18,7 +18,7 @@ export enum ValueMode {
 	* Future assignments to the same property will inherit this behavior.
 	* @param value initial value of the reactive property that is being defined.
 	*/
-export function asReference<T>(value:T):T {
+export function asReference<T>(value: T): T {
 	// unsound typecast, but in combination with makeReactive, the end result should be of the correct type this way
 	// e.g: makeReactive({ x : asReference(number)}) -> { x : number }
 	return <T><any> new AsReference(value);
@@ -34,7 +34,7 @@ export function asReference<T>(value:T):T {
 	* Future assignments to the same property will inherit this behavior.
 	* @param value initial value of the reactive property that is being defined.
 	*/
-export function asStructure<T>(value:T):T {
+export function asStructure<T>(value: T): T {
 	return <T><any>new AsStructure(value);
 }
 
@@ -43,29 +43,29 @@ export function asStructure<T>(value:T):T {
 	* The value will be made reactive, but, if the value is an object or array,
 	* children will not automatically be made reactive as well.
 	*/
-export function asFlat<T>(value:T):T {
+export function asFlat<T>(value: T): T {
 	return <T><any> new AsFlat(value);
 }
 
 export class AsReference {
-	constructor(public value:any) {
+	constructor(public value: any) {
 		assertUnwrapped(value, "Modifiers are not allowed to be nested");
 	}
 }
 
 export class AsStructure {
-	constructor(public value:any) {
+	constructor(public value: any) {
 		assertUnwrapped(value, "Modifiers are not allowed to be nested");
 	}
 }
 
 export class AsFlat {
-	constructor(public value:any) {
+	constructor(public value: any) {
 		assertUnwrapped(value, "Modifiers are not allowed to be nested");
 	}
 }
 
-export function getValueModeFromValue(value:any, defaultMode:ValueMode): [ValueMode, any] {
+export function getValueModeFromValue(value: any, defaultMode: ValueMode): [ValueMode, any] {
 	if (value instanceof AsReference)
 		return [ValueMode.Reference, value.value];
 	if (value instanceof AsStructure)
@@ -88,7 +88,7 @@ export function getValueModeFromModifierFunc(func?: Function): ValueMode {
 }
 
 
-export function makeChildObservable(value, parentMode:ValueMode, context) {
+export function makeChildObservable(value, parentMode: ValueMode, context) {
 	let childMode: ValueMode;
 	if (isObservable(value))
 		return value;

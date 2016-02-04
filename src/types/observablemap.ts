@@ -1,13 +1,13 @@
-import {ValueMode, assertUnwrapped, getValueModeFromModifierFunc} from './modifiers';
-import {IObjectChange} from './observableobject';
-import SimpleEventEmitter from '../utils/simpleeventemitter';
+import {ValueMode, assertUnwrapped, getValueModeFromModifierFunc} from "./modifiers";
+import {IObjectChange} from "./observableobject";
+import SimpleEventEmitter from "../utils/simpleeventemitter";
 import {transaction} from "../core/transaction";
-import {ObservableArray, IObservableArray} from './observablearray';
+import {ObservableArray, IObservableArray} from "./observablearray";
 import ObservableValue from "./observablevalue";
-import {isPlainObject, Lambda} from '../utils/utils';
+import {isPlainObject, Lambda} from "../utils/utils";
 
-export interface KeyValueMap<V> {
-	[key:string]: V
+export interface IKeyValueMap<V> {
+	[key: string]: V;
 }
 
 export type Entries<V> = [string, V][]
@@ -16,24 +16,24 @@ export type IObservableMapChange<T> = IObjectChange<T, ObservableMap<T>>;
 
 export class ObservableMap<V> {
 	$mobservable = {};
-	private _data: { [key:string]: ObservableValue<V> } = {};
-	private _hasMap: { [key:string]: ObservableValue<boolean> } = {}; // hasMap, not hashMap >-).
+	private _data: { [key: string]: ObservableValue<V> } = {};
+	private _hasMap: { [key: string]: ObservableValue<boolean> } = {}; // hasMap, not hashMap >-).
 	private _keys: IObservableArray<string> = <any> new ObservableArray(null, ValueMode.Reference, ".keys()");
 	private _valueMode: ValueMode;
 	private _events = new SimpleEventEmitter();
 
-	constructor(initialData?: Entries<V> | KeyValueMap<V>, valueModeFunc?: Function) {
+	constructor(initialData?: Entries<V> | IKeyValueMap<V>, valueModeFunc?: Function) {
 		this._valueMode = getValueModeFromModifierFunc(valueModeFunc);
 		if (isPlainObject(initialData))
-			this.merge(<KeyValueMap<V>> initialData);
+			this.merge(<IKeyValueMap<V>> initialData);
 		else if (Array.isArray(initialData))
 			initialData.forEach(([key, value]) => this.set(key, value));
 	}
 
 	_has(key: string): boolean {
-		return typeof this._data[key] !== 'undefined';
+		return typeof this._data[key] !== "undefined";
 	}
-	
+
 	has(key: string): boolean {
 		this.assertValidKey(key);
 		if (this._hasMap[key])
@@ -48,7 +48,7 @@ export class ObservableMap<V> {
 			const oldValue = (<any>this._data[key]).value;
 			const changed = this._data[key].set(value);
 			if (changed) {
-				this._events.emit(<IObservableMapChange<V>>{ 
+				this._events.emit(<IObservableMapChange<V>>{
 					type: "update",
 					object: this,
 					name: key,
@@ -62,11 +62,11 @@ export class ObservableMap<V> {
 				this._updateHasMapEntry(key, true);
 				this._keys.push(key);
 			});
-			this._events.emit(<IObservableMapChange<V>>{ 
+			this._events.emit(<IObservableMapChange<V>>{
 				type: "add",
 				object: this,
 				name: key
-			}); 
+			});
 		}
 	}
 
@@ -81,7 +81,7 @@ export class ObservableMap<V> {
 				observable.set(undefined);
 				this._data[key] = undefined;
 			});
-			this._events.emit(<IObservableMapChange<V>>{ 
+			this._events.emit(<IObservableMapChange<V>>{
 				type: "delete",
 				object: this,
 				name: key,
@@ -91,13 +91,13 @@ export class ObservableMap<V> {
 	}
 
 	_updateHasMapEntry(key: string, value: boolean): ObservableValue<boolean> {
-		// optimization; don't fill the hasMap if we are not observing, or remove entry if there are no observers anymore 
+		// optimization; don't fill the hasMap if we are not observing, or remove entry if there are no observers anymore
 		let entry = this._hasMap[key];
 		if (entry) {
 			entry.set(value);
 		} else {
 			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, ".(has)" + key);
-		} 
+		}
 		return entry;
 	}
 
@@ -120,12 +120,12 @@ export class ObservableMap<V> {
 		return this.keys().map(key => <[string, V]>[key, this.get(key)]);
 	}
 
-	forEach(callback:(value:V, key:string, object:KeyValueMap<V>)=> void, thisArg?) {
+	forEach(callback: (value: V, key: string, object: IKeyValueMap<V>) => void, thisArg?) {
 		this.keys().forEach(key => callback.call(thisArg, this.get(key), key));
 	}
 
 	/** Merge another object into this object, returns this. */
-	merge(other:ObservableMap<V> | KeyValueMap<V>):ObservableMap<V> {
+	merge(other: ObservableMap<V> | IKeyValueMap<V>): ObservableMap<V> {
 		transaction(() => {
 			if (other instanceof ObservableMap)
 				other.keys().forEach(key => this.set(key, other.get(key)));
@@ -146,11 +146,11 @@ export class ObservableMap<V> {
 	}
 
 	/**
-	 * Returns a shallow non observable object clone of this map. 
+	 * Returns a shallow non observable object clone of this map.
 	 * Note that the values migth still be observable. For a deep clone use mobservable.toJSON.
 	 */
-	toJs(): KeyValueMap<V> {
-		const res:KeyValueMap<V> = {};
+	toJs(): IKeyValueMap<V> {
+		const res: IKeyValueMap<V> = {};
 		this.keys().forEach(key => res[key] = this.get(key));
 		return res;
 	}
@@ -165,13 +165,13 @@ export class ObservableMap<V> {
 	toString(): string {
 		return "[mobservable.map { " + this.keys().map(key => `${key}: ${"" + this.get(key)}`).join(", ") + " }]";
 	}
-	
+
 	/**
 	 * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
-	 * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe 
+	 * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
 	 * for callback details
 	 */
-	observe(callback: (changes:IObservableMapChange<V>) => void): Lambda {
+	observe(callback: (changes: IObservableMapChange<V>) => void): Lambda {
 		return this._events.on(callback);
 	}
 }
@@ -181,10 +181,10 @@ export class ObservableMap<V> {
  * Creates a map, similar to ES6 maps (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map),
  * yet observable.
  */
-export function map<V>(initialValues?: KeyValueMap<V>, valueModifier?: Function): ObservableMap<V> {
+export function map<V>(initialValues?: IKeyValueMap<V>, valueModifier?: Function): ObservableMap<V> {
 	return new ObservableMap(initialValues, valueModifier);
 }
 
-export function isObservableMap(thing):boolean {
+export function isObservableMap(thing): boolean {
 	return thing instanceof ObservableMap;
 }

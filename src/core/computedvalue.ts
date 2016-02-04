@@ -2,13 +2,12 @@ import {IObservable, reportObserved, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction} from "./derivation";
 import globalState, {getNextId, isComputingDerivation} from "./globalstate";
 import {autorun} from "../api/autorun";
-import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} from '../types/modifiers';
-import {invariant, valueDidChange, Lambda} from "../utils/utils";
+import {valueDidChange, Lambda} from "../utils/utils";
 import {reportTransition} from "../api/extras";
 
 /**
  * A node in the state dependency root that observes other nodes, and can be observed itself.
- * 
+ *
  * Computed values will update automatically if any observed value changes and if they are observed themselves.
  * If a computed value isn't actively used by another observer, but is inspect, it will compute lazily to return at least a consistent value.
  */
@@ -28,19 +27,19 @@ export default class ComputedValue<T> implements IObservable, IDerivation {
 	 * Peek into the current value of this computedObservable. Re-evaluate if needed but don't bind the current
 	 * exeuction context as an observer.
 	 */
-	peek:()=>T;
-	
+	peek: () => T;
+
 	/**
 	 * Create a new computed value based on a function expression.
-	 * 
+	 *
 	 * The `name` property is for debug purposes only.
 	 *
 	 * The `compareStructural` property indicates whether the return values should be compared structurally.
 	 * Normally, a computed value will not notify an upstream observer if a newly produced value is strictly equal to the previously produced value.
 	 * However, enabling compareStructural can be convienent if you always produce an new aggregated object and don't want to notify observers if it is structurally the same.
-	 * This is useful for working with vectors, mouse coordinates etc. 
+	 * This is useful for working with vectors, mouse coordinates etc.
 	 */
-	constructor(public derivation:()=>T, private scope: Object, public name:string, private compareStructural: boolean) {
+	constructor(public derivation: () => T, private scope: Object, public name: string, private compareStructural: boolean) {
 		if (!this.name)
 			this.name = "DerivedValue#" + this.id;
 		this.peek = () => {
@@ -49,22 +48,22 @@ export default class ComputedValue<T> implements IObservable, IDerivation {
 			globalState.isComputingComputedValue++;
 			const prevAllowStateChanges = globalState.allowStateChanges;
 			globalState.allowStateChanges = false;
-			
+
 			const res = derivation.call(scope);
-			
+
 			globalState.allowStateChanges = prevAllowStateChanges;
 			globalState.isComputingComputedValue--;
 			this.isComputing = false
 			return res;
-		} 
+		}
 	}
 
 	onBecomeObserved() {
 		// noop, handled by .get()
 	}
-	
+
 	onBecomeUnobserved() {
-		for (var i = 0, l = this.observing.length; i < l; i++)
+		for (let i = 0, l = this.observing.length; i < l; i++)
 			removeObserver(this.observing[i], this);
 		this.observing = [];
 		this.isLazy = true;
@@ -72,7 +71,7 @@ export default class ComputedValue<T> implements IObservable, IDerivation {
 	}
 
 	onDependenciesReady(): boolean {
-		const changed = this.trackAndCompute()
+		const changed = this.trackAndCompute();
 		reportTransition(this, "READY", changed);
 		return changed;
 	}
@@ -105,32 +104,32 @@ export default class ComputedValue<T> implements IObservable, IDerivation {
 			// we are already up to date, somebody is just inspecting our current value
 			reportObserved(this);
 		}
-	
+
 		if (this.hasCycle) // TODO: is this check needed? and for which branches? otherwise this function can be simpler
 			throw new Error(`[DerivedValue '${this.name}'] Cycle detected`);
 		return this.value;
 	}
-	
-	set(_) {
+
+	set(_: T) {
 		throw new Error(`[DerivedValue '${name}'] View functions do not accept new values`);
 	}
 
 	trackAndCompute(): boolean {
-		var oldValue = this.value;
+		let oldValue = this.value;
 		this.value = trackDerivedFunction(this, this.peek);
-		return valueDidChange(this.compareStructural, this.value, oldValue)
+		return valueDidChange(this.compareStructural, this.value, oldValue);
 	}
 
 	toString() {
 		return `ComputedValue[${this.name}]`;
 	}
-	
+
 		// TODO: refactor to mobservable.observe
-	observe(listener:(newValue:T, oldValue:T)=>void, fireImmediately=false):Lambda {
+	observe(listener: (newValue: T, oldValue: T) => void, fireImmediately = false): Lambda {
 		let firstTime = true;
 		let prevValue = undefined;
 		return autorun(() => {
-			var newValue = this.get();
+			let newValue = this.get();
 			if (!firstTime || fireImmediately) {
 				listener(newValue, prevValue);
 			}

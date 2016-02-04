@@ -24,7 +24,7 @@ export {    observe                                              } from "./api/o
 export {    autorun, autorunAsync, autorunUntil                  } from "./api/autorun";
 export {    expr                                                 } from "./api/expr";
 export {    toJSON                                               } from "./api/tojson";
-export {    createTransformer                                    } from './api/createtransformer';
+export {    createTransformer                                    } from "./api/createtransformer";
 
 export {    asReference, asFlat, asStructure                     } from "./types/modifiers";
 export {    IObservableValue                                     } from "./types/observablevalue";
@@ -33,7 +33,7 @@ export {    isObservableArray, fastArray,
 			IObservableArray, IArrayChange, IArraySplice         } from "./types/observablearray";
 export {    isObservableMap, map, ObservableMap                  } from "./types/observablemap"
 
-export {    untracked                                            } from './core/globalstate';
+export {    untracked                                            } from "./core/globalstate";
 export {    transaction                                          } from "./core/transaction";
 export {    default as Atom                                      } from "./core/atom";
 export {    default as Reaction                                  } from "./core/reaction";
@@ -52,17 +52,17 @@ export const _ = {
 }
 
 import {
-	getDNode, getDependencyTree, getObserverTree, trackTransitions, allowStateChanges, 
+	getDNode, getDependencyTree, getObserverTree, trackTransitions, allowStateChanges,
 	ITransitionEvent, IObserverTree, IDependencyTree
 } from "./api/extras";
 import {Lambda} from "./utils/utils";
 
 export const extras = {
-	getDNode: <(thing:any)=>any> getDNode,
+	getDNode: <(thing:any) => any> getDNode,
 	getDependencyTree,
 	getObserverTree,
 	trackTransitions,
 	SimpleEventEmitter,
 	isComputingDerivation,
-	allowStateChanges: allowStateChanges
-} 
+	allowStateChanges
+};

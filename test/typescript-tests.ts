@@ -139,14 +139,8 @@ test('typing', function(t) {
 
     var x:IObservableValue<number> = observable(3);
 
-    var d1 = autorunAsync(() => 3, (num:number) => {
-        // noop
-    });
-    
     var d2 = autorunAsync(function() {
         
-    }, function() {
-        // noop
     });
 
     t.end();

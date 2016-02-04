@@ -7,11 +7,11 @@ import ObservableValue from "../types/observablevalue";
 import ComputedValue from "../core/computedvalue";
 import Reaction from "../core/reaction";
 import {IDepTreeNode} from "../core/observable";
-import {ObservableObject} from '../types/observableobject';
-import {ObservableMap} from '../types/observablemap';
-import SimpleEventEmitter from '../utils/simpleeventemitter';
-import {once, unique, Lambda} from '../utils/utils';
-import {isObservable} from '../api/observable';
+import {ObservableObject} from "../types/observableobject";
+import {ObservableMap} from "../types/observablemap";
+import SimpleEventEmitter from "../utils/simpleeventemitter";
+import {once, unique, Lambda} from "../utils/utils";
+import {isObservable} from "../api/observable";
 import globalState from "../core/globalstate";
 
 export interface IDependencyTree {
@@ -39,17 +39,17 @@ export interface ITransitionEvent {
 	* If strict is enabled, views are not allowed to modify the state.
 	* This is a recommended practice, as it makes reasoning about your application simpler.
 	*/
-export function allowStateChanges<T>(allowStateChanges: boolean, func:() => T):T {
+export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T): T {
 	const prev = globalState.allowStateChanges;
 	globalState.allowStateChanges = allowStateChanges;
 	const res = func();
 	globalState.allowStateChanges = prev;
-	return res;   
+	return res;
 }
 
 
 
-export function getDNode(thing:any, property?:string):IDepTreeNode {
+export function getDNode(thing: any, property?: string): IDepTreeNode {
 	const propError = `[mobservable.getDNode] property '${property}' of '${thing}' doesn't seem to be a reactive property`;
 
 	if (thing instanceof ObservableMap && property) {
@@ -82,23 +82,23 @@ export function getDNode(thing:any, property?:string):IDepTreeNode {
 	throw new Error(`[mobservable.getDNode] ${thing} doesn't seem to be reactive`);
 }
 
-export function reportTransition(node:IDepTreeNode, state:string, changed:boolean = false) {
-	transitionTracker && transitionTracker.emit({
+// TODO: export needed?
+export let transitionTracker: SimpleEventEmitter = null;
+
+export function reportTransition(node: IDepTreeNode, state: string, changed: boolean = false) {
+	if (transitionTracker) transitionTracker.emit({
 		id: node.id,
 		name: node.name,
 		node, state, changed
 	});
 }
 
-// TODO: export needed?
-export var transitionTracker:SimpleEventEmitter = null;
-
-export function getDependencyTree(thing:any, property?:string): IDependencyTree {
+export function getDependencyTree(thing: any, property?: string): IDependencyTree {
 	return nodeToDependencyTree(getDNode(thing, property));
 }
 
-function nodeToDependencyTree(node:IDepTreeNode): IDependencyTree {
-	var result:IDependencyTree = {
+function nodeToDependencyTree(node: IDepTreeNode): IDependencyTree {
+	const result: IDependencyTree = {
 		id: node.id,
 		name: node.name
 	};
@@ -107,25 +107,25 @@ function nodeToDependencyTree(node:IDepTreeNode): IDependencyTree {
 	return result;
 }
 
-export function getObserverTree(thing:any, property?:string): IObserverTree {
+export function getObserverTree(thing: any, property?: string): IObserverTree {
 	return nodeToObserverTree(getDNode(thing, property));
 }
 
-function nodeToObserverTree(node:IDepTreeNode): IObserverTree {
-	var result:IObserverTree = {
+function nodeToObserverTree(node: IDepTreeNode): IObserverTree {
+	const result: IObserverTree = {
 		id: node.id,
-		name: node.name,
+		name: node.name
 	};
 	if (node.observers && node.observers.length)
 		result.observers = <any>unique(node.observers).map(<any>nodeToObserverTree);
 	return result;
 }
 
-function createConsoleReporter(extensive:boolean) {
-	var lines:ITransitionEvent[] = [];
-	var scheduled = false;
+function createConsoleReporter(extensive: boolean) {
+	let lines: ITransitionEvent[] = [];
+	let scheduled = false;
 
-	return (line:ITransitionEvent) => {
+	return (line: ITransitionEvent) => {
 		if (extensive || line.changed)
 			lines.push(line);
 		if (!scheduled) {
@@ -136,10 +136,10 @@ function createConsoleReporter(extensive:boolean) {
 				scheduled = false;
 			}, 1);
 		}
-	}
+	};
 }
 
-export function trackTransitions(extensive=false, onReport?:(lines:ITransitionEvent) => void) : Lambda {
+export function trackTransitions(extensive = false, onReport?: (lines: ITransitionEvent) => void): Lambda {
 	if (!transitionTracker)
 		transitionTracker = new SimpleEventEmitter();
 

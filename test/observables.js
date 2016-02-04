@@ -808,51 +808,6 @@ test('when 2', function(t) {
     t.end();
 })
 
-test('async', function(t) {
-    var called = 0;
-    var x = m(3);
-    var y = m(1);
-   
-    var value;
-    
-    var disposer = mobservable.autorunAsync(
-        function() {
-            return x() * y();
-        }, function(newValue) {
-            called += 1;
-            value = newValue;
-        }
-    );
-    
-    x(4);
-    x(5);
-    y(2);
-    
-    setTimeout(function() {
-        t.equal(called, 1);
-        t.equal(value, 10);
-
-        x(4);
-        x(6);
-        y(1);
-        
-        setTimeout(function() {
-            t.equal(called, 2);
-            t.equal(value, 6);
-            
-            x(7);
-            disposer();
-            // after calling disposer, autorunAsync should not update anymore! even if its scheduled
-            
-            setTimeout(function() {
-                t.equal(called, 2);
-                t.equal(value, 6);
-                t.end();
-            }, 10);
-        }, 10);
-    }, 10);
-})
-
 test('expr2', function(t) {
     var factor = m(0);
     var price = m(100);

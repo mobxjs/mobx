@@ -24,22 +24,22 @@ export function deprecated(msg: string) {
 }
 
 /**
-	Makes sure that the provided function is invoked at most once.
-*/
-export function once(func: Lambda):Lambda {
-	var invoked = false;
+ * Makes sure that the provided function is invoked at most once.
+ */
+export function once(func: Lambda): Lambda {
+	let invoked = false;
 	return function() {
 		if (invoked)
 			return;
 		invoked = true;
 		return func.apply(this, arguments);
-	}
+	};
 }
 
 export const noop = () => {};
 
-export function unique<T>(list:T[]):T[] {
-	var res = [];
+export function unique<T>(list: T[]): T[] {
+	const res = [];
 	list.forEach(item => {
 		if (res.indexOf(item) === -1)
 			res.push(item);
@@ -48,17 +48,17 @@ export function unique<T>(list:T[]):T[] {
 }
 
 export function isPlainObject(value) {
-	return value !== null && typeof value == 'object' && Object.getPrototypeOf(value) === Object.prototype;
+	return value !== null && typeof value === "object" && Object.getPrototypeOf(value) === Object.prototype;
 }
 
-export function valueDidChange(compareStructural: boolean, oldValue, newValue):boolean {
+export function valueDidChange(compareStructural: boolean, oldValue, newValue): boolean {
 	return compareStructural
 		? !deepEquals(oldValue, newValue)
-		: oldValue !== newValue
+		: oldValue !== newValue;
 }
 
-export function makeNonEnumerable(object:any, props:string[]) {
-	for(var i = 0; i < props.length; i++) {
+export function makeNonEnumerable(object: any, props: string[]) {
+	for(let i = 0; i < props.length; i++) {
 		Object.defineProperty(object, props[i], {
 			configurable: true,
 			writable: true,
@@ -69,9 +69,9 @@ export function makeNonEnumerable(object:any, props:string[]) {
 }
 
 /**
-	* Naive deepEqual. Doesn't check for prototype, non-enumerable or out-of-range properties on arrays.
-	* If you have such a case, you probably should use this function but something fancier :).
-	*/
+ * Naive deepEqual. Doesn't check for prototype, non-enumerable or out-of-range properties on arrays.
+ * If you have such a case, you probably should use this function but something fancier :).
+ */
 export function deepEquals(a, b) {
 	if (a === null && b === null)
 		return true;
@@ -83,7 +83,7 @@ export function deepEquals(a, b) {
 	} else if (aIsArray) {
 		if (a.length !== b.length)
 			return false;
-		for (var i = a.length; i >= 0; i--)
+		for (let i = a.length; i >= 0; i--)
 			if (!deepEquals(a[i], b[i]))
 				return false;
 		return true;
@@ -92,7 +92,7 @@ export function deepEquals(a, b) {
 			return false;
 		if (Object.keys(a).length !== Object.keys(b).length)
 			return false;
-		for(var prop in a) {
+		for (let prop in a) {
 			if (!b.hasOwnProperty(prop))
 				return false;
 			if (!deepEquals(a[prop], b[prop]))
@@ -104,24 +104,24 @@ export function deepEquals(a, b) {
 }
 
 /**
-	* Given a new and an old list, tries to determine which items are added or removed
-	* in linear time. The algorithm is heuristic and does not give the optimal results in all cases.
-	* (For example, [a,b] -> [b, a] yiels [[b,a],[a,b]])
-	* its basic assumptions is that the difference between base and current are a few splices.
-	*
-	* returns a tuple<addedItems, removedItems>
-	* @type {T[]}
-	*/
-export function quickDiff<T>(current:T[], base:T[]):[T[],T[]] {
+ * Given a new and an old list, tries to determine which items are added or removed
+ * in linear time. The algorithm is heuristic and does not give the optimal results in all cases.
+ * (For example, [a,b] -> [b, a] yiels [[b,a],[a,b]])
+ * its basic assumptions is that the difference between base and current are a few splices.
+ *
+ * returns a tuple<addedItems, removedItems>
+ * @type {T[]}
+ */
+export function quickDiff<T>(current: T[], base: T[]): [T[], T[]] {
 	if (!base || !base.length)
 		return [current, []];
 	if (!current || !current.length)
 		return [[], base];
 
-	var added:T[] = [];
-	var removed:T[] = [];
+	const added: T[] = [];
+	const removed: T[] = [];
 
-	var currentIndex = 0,
+	let currentIndex = 0,
 		currentSearch = 0,
 		currentLength = current.length,
 		currentExhausted = false,
@@ -156,14 +156,14 @@ export function quickDiff<T>(current:T[], base:T[]):[T[],T[]] {
 		if (!currentExhausted && current[currentSearch] === base[baseIndex]) {
 			// items where added
 			added.push(...current.slice(currentIndex, currentSearch));
-			currentIndex = currentSearch +1;
+			currentIndex = currentSearch + 1;
 			baseIndex ++;
 			isSearching = false;
 		}
 		else if (!baseExhausted && base[baseSearch] === current[currentIndex]) {
 			// items where removed
 			removed.push(...base.slice(baseIndex, baseSearch));
-			baseIndex = baseSearch +1;
+			baseIndex = baseSearch + 1;
 			currentIndex ++;
 			isSearching = false;
 		}

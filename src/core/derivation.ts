@@ -1,5 +1,5 @@
 import {IObservable, IDepTreeNode, propagateReadiness, propagateStaleness, addObserver, removeObserver} from "./observable";
-import {invariant, quickDiff} from "../utils/utils";
+import {quickDiff} from "../utils/utils";
 import {reportTransition} from "../api/extras";
 import globalState from "./globalstate";
 
@@ -12,7 +12,7 @@ export interface IDerivation extends IDepTreeNode {
 	observers?: IDerivation[];
 	dependencyStaleCount: number;
 	dependencyChangeCount: number;
-	onDependenciesReady():boolean;
+	onDependenciesReady(): boolean;
 }
 
 /**
@@ -55,7 +55,7 @@ export function notifyDependencyReady(derivation: IDerivation, dependencyDidChan
  * The tracking information is stored on the `derivation` object and the derivation is registered
  * as observer of any of the accessed observables.
  */
-export function trackDerivedFunction<T>(derivation:IDerivation, f: () => T) {
+export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	const prevObserving = derivation.observing;
 	derivation.observing = [];
 	globalState.derivationStack.push(derivation);
@@ -67,10 +67,10 @@ export function trackDerivedFunction<T>(derivation:IDerivation, f: () => T) {
 function bindDependencies(derivation: IDerivation, prevObserving: IObservable[]) {
 	globalState.derivationStack.length -= 1;
 
-	var [added, removed] = quickDiff(derivation.observing, prevObserving);
+	let [added, removed] = quickDiff(derivation.observing, prevObserving);
 
-	for (var i = 0, l = added.length; i < l; i++) {
-		var dependency = added[i];
+	for (let i = 0, l = added.length; i < l; i++) {
+		let dependency = added[i];
 		// only check for cycles on new dependencies, existing dependencies cannot cause a cycle..
 		if (findCycle(derivation, dependency))
 			throw new Error(`${this.toString()}: Found cyclic dependency in computed value '${this.derivation.toString()}'`);
@@ -78,7 +78,7 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
 	}
 
 	// remove observers after adding them, so that they don't go in lazy mode to early
-	for (var i = 0, l = removed.length; i < l; i++)
+	for (let i = 0, l = removed.length; i < l; i++)
 		removeObserver(removed[i], derivation);
 }
 
@@ -86,13 +86,13 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
  * Find out whether the dependency tree of this derivation contains a cycle, as would be the case in a 
  * computation like `a = a * 2`
  */
-function findCycle(needle:IDerivation, node:IObservable):boolean {
+function findCycle(needle: IDerivation, node: IObservable): boolean {
 	const obs = node.observing;
 	if (!obs)
 		return false;
 	if (obs.indexOf(node) !== -1)
 		return true;
-	for(let l = obs.length, i = 0; i < l; i++)
+	for (let l = obs.length, i = 0; i < l; i++)
 		if (findCycle(needle, obs[i]))
 			return true;
 	return false;

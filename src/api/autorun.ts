@@ -12,7 +12,7 @@ import {IObservable, reportObserved} from "../core/observable";
  * @param scope (optional)
  * @returns disposer function, which can be used to stop the view from being updated in the future.
  */
-export function autorun(view:Lambda, scope?:any):Lambda {
+export function autorun(view: Lambda, scope?: any): Lambda {
 	assertUnwrapped(view, "autorun methods cannot have modifiers");
 	if (typeof view !== "function")
 		throw new Error("[mobservable.autorun] expects a function");
@@ -61,7 +61,7 @@ export function autorun(view:Lambda, scope?:any):Lambda {
  * @param scope (optional)
  * @returns disposer function to prematurely end the observer.
  */
-export function autorunUntil(predicate: ()=>boolean, effect: Lambda, scope?: any): Lambda {
+export function autorunUntil(predicate: () => boolean, effect: Lambda, scope?: any): Lambda {
 	// TODO: rename to when
 	// TODO: use Reaction class
 	let disposeImmediately = false;
@@ -71,7 +71,7 @@ export function autorunUntil(predicate: ()=>boolean, effect: Lambda, scope?: any
 				disposer();
 			else
 				disposeImmediately = true;
-			effect.call(scope)
+			effect.call(scope);
 		}
 	});
 	if (disposeImmediately)
@@ -79,48 +79,7 @@ export function autorunUntil(predicate: ()=>boolean, effect: Lambda, scope?: any
 	return disposer;
 }
 
-/**
- * Once the view triggers, effect will be scheduled in the background.
- * If observer triggers multiple times, effect will still be triggered only once, so it achieves a similar effect as transaction.
- * This might be useful for stuff that is expensive and doesn't need to happen synchronously; such as server communication.
- * Afther the effect has been fired, it can be scheduled again if the view is triggered in the future.
- *
- * @param view to observe. If it returns a value, the latest returned value will be passed into the scheduled effect.
- * @param the effect that will be executed, a fixed amount of time after the first trigger of 'view'.
- * @param delay, optional. After how many milleseconds the effect should fire.
- * @param scope, optional, the 'this' value of 'view' and 'effect'.
- */
-// TODO: remove this one
-function autorunAsyncDeprecated<T>(view: () => T, effect: (latestValue : T ) => void, delay:number = 1, scope?: any): Lambda {
-	let latestValue: T = undefined;
-	let timeoutHandle;
-
-	const disposer = autorun(() => {
-		latestValue = view.call(scope);
-		if (!timeoutHandle) {
-			timeoutHandle = setTimeout(() => {
-				effect.call(scope, latestValue);
-				timeoutHandle = null;
-			}, delay);
-		}
-	});
-
-	return once(() => {
-		disposer();
-		if (timeoutHandle)
-			clearTimeout(timeoutHandle);
-	});
-}
-
-// Deprecate:
-export function autorunAsync<T>(view: () => T, effect: (latestValue : T ) => void, delay?:number, scope?: any): Lambda;
-export function autorunAsync(func: Lambda, delay?:number, scope?: any): Lambda;
-// Deprecate weird overload:
-export function autorunAsync<T>(func: Lambda | {():T}, delay:number | {(x:T):void} = 1, scope?: any): Lambda {
-	if (typeof delay === "function") {
-		console.warn("[mobservable] autorun(func, func) is deprecated and will removed in 2.0");
-		return autorunAsyncDeprecated.apply(null, arguments);
-	}
+export function autorunAsync(func: Lambda, delay: number = 1, scope?: any): Lambda {
 	let shouldRun = false;
 	let tickScheduled = false;
 	let tick = observable(0);

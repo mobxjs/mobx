@@ -5,10 +5,9 @@
  */
 import ObservableValue from "./observablevalue";
 import ComputedValue from "../core/computedvalue";
-import {ValueMode, makeChildObservable, AsStructure} from './modifiers';
-import {Lambda} from '../utils/utils';
-import SimpleEventEmitter from '../utils/simpleeventemitter';
-
+import {ValueMode, AsStructure} from "./modifiers";
+import {Lambda} from "../utils/utils";
+import SimpleEventEmitter from "../utils/simpleeventemitter";
 
 export interface IObjectChange<T, R> {
 	name: string;
@@ -19,10 +18,10 @@ export interface IObjectChange<T, R> {
 
 // responsible for the administration of objects that have become reactive
 export class ObservableObject { // TODO: implement IObservable
-	values:{[key:string]:ObservableValue<any>|ComputedValue<any>} = {};
+	values: {[key: string]: ObservableValue<any>|ComputedValue<any>} = {};
 	private _events = new SimpleEventEmitter();
 
-	constructor(private target, private name:string, private mode: ValueMode) {
+	constructor(private target, private name: string, private mode: ValueMode) {
 		if (target.$mobservable)
 			throw new Error("Illegal state: already an reactive object");
 
@@ -32,7 +31,7 @@ export class ObservableObject { // TODO: implement IObservable
 			value: this
 		});
 	}
-	static asReactive(target, name: string, mode:ValueMode):ObservableObject {
+	static asReactive(target, name: string, mode: ValueMode):ObservableObject {
 		if (target.$mobservable)
 			return target.$mobservable;
 		return new ObservableObject(target, name, mode);
@@ -66,7 +65,7 @@ export class ObservableObject { // TODO: implement IObservable
 			set: function(newValue) {
 				const oldValue = this.$mobservable.values[propName].get();
 				this.$mobservable.values[propName].set(newValue);
-				this.$mobservable._events.emit(<IObjectChange<any, any>>{ 
+				this.$mobservable._events.emit(<IObjectChange<any, any>> {
 					type: "update",
 					object: this,
 					name: propName,
@@ -75,7 +74,7 @@ export class ObservableObject { // TODO: implement IObservable
 			}
 		});
 
-		this._events.emit(<IObjectChange<any, any>>{ 
+		this._events.emit(<IObjectChange<any, any>> {
 			type: "add",
 			object: this.target,
 			name: propName
@@ -87,11 +86,11 @@ export class ObservableObject { // TODO: implement IObservable
 	 * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe 
 	 * for callback details
 	 */
-	observe(callback: (changes:IObjectChange<any, any>) => void): Lambda {
+	observe(callback: (changes: IObjectChange<any, any>) => void): Lambda {
 		return this._events.on(callback);
 	}
 }
 
-export function isObservableObject(thing):boolean {
+export function isObservableObject(thing): boolean {
 	return thing && typeof thing === "object" && thing.$mobservable instanceof ObservableObject;
 }

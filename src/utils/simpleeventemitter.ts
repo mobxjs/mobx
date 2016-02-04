@@ -3,44 +3,44 @@
  * (c) 2015 - Michel Weststrate
  * https://github.com/mweststrate/mobservable
  */
-import {once, Lambda} from './utils';
+import {once, Lambda} from "./utils";
 
 // TODO: make generic
 export default class SimpleEventEmitter {
-	listeners:{(...data: any[]):void}[] = [];
+	listeners:{(...data: any[]): void}[] = [];
 
-	emit(...data:any[]);
+	emit(...data: any[]);
 	emit() {
-		var listeners = this.listeners.slice();
-		var l = listeners.length;
+		const listeners = this.listeners.slice();
+		const l = listeners.length;
 		// TODO: remove switch optimization?
 		switch (arguments.length) {
 			case 0:
-				for(var i = 0; i < l; i++)
+				for (let i = 0; i < l; i++)
 					listeners[i]();
 				break;
 			case 1:
-				var data = arguments[0];
-				for(var i = 0; i < l; i++)
+				const data = arguments[0];
+				for (let i = 0; i < l; i++)
 					listeners[i](data);
 				break;
 			default:
-				for(var i = 0; i < l; i++)
+				for (let i = 0; i < l; i++)
 					listeners[i].apply(null, arguments);
 		}
 	}
 
-	on(listener:(...data:any[])=>void):Lambda {
+	on(listener: (...data: any[]) => void): Lambda {
 		this.listeners.push(listener);
 		return once(() => {
-			var idx = this.listeners.indexOf(listener);
+			const idx = this.listeners.indexOf(listener);
 			if (idx !== -1)
 				this.listeners.splice(idx, 1);
 		});
 	}
 
-	once(listener:(...data:any[])=>void):Lambda {
-		var subscription = this.on(function() {
+	once(listener: (...data: any[]) => void): Lambda {
+		const subscription = this.on(function() {
 			subscription();
 			listener.apply(this, arguments);
 		});

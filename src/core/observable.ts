@@ -1,12 +1,11 @@
 import {IDerivation, notifyDependencyReady, notifyDependencyStale} from "./derivation";
-import {invariant} from "../utils/utils";
 import globalState from "./globalstate";
 
 export interface IDepTreeNode {
 	id: number;
 	name: string;
-	observers?:IDerivation[];
-	observing?:IObservable[];
+	observers?: IDerivation[];
+	observing?: IObservable[];
 }
 
 export interface IObservable extends IDepTreeNode {
@@ -23,7 +22,7 @@ export function addObserver(observable: IObservable, node: IDerivation) {
 }
 
 export function removeObserver(observable: IObservable, node: IDerivation) {
-	var obs = observable.observers, idx = obs.indexOf(node);
+	let obs = observable.observers, idx = obs.indexOf(node);
 	if (idx !== -1)
 		obs.splice(idx, 1);
 	if (obs.length === 0)
@@ -45,19 +44,19 @@ export function reportObserved(observable: IObservable) {
 	}
 }
 
-export function propagateStaleness(observable:IObservable|IDerivation) {
-	var os = observable.observers;
+export function propagateStaleness(observable: IObservable|IDerivation) {
+	let os = observable.observers;
 	if (!os)
 		return;
 	os = os.slice(); // TODO: slice needed?
-	for(var l = os.length, i = 0; i < l; i++)
+	for (let l = os.length, i = 0; i < l; i++)
 		notifyDependencyStale(os[i]);
 }
 
-export function propagateReadiness(observable:IObservable|IDerivation, valueDidActuallyChange:boolean, observersToNotify:IDerivation[] = observable.observers) {
+export function propagateReadiness(observable: IObservable|IDerivation, valueDidActuallyChange: boolean, observersToNotify: IDerivation[] = observable.observers) {
 	if (!observersToNotify)
 		return;
 	//    observers = observers.slice(); // TODO: slice needed?
-	for(var l = observersToNotify.length, i = 0; i < l; i++)
+	for (let l = observersToNotify.length, i = 0; i < l; i++)
 		notifyDependencyReady(observersToNotify[i], valueDidActuallyChange);
 }

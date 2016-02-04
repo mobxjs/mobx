@@ -9,11 +9,11 @@ import {propagateAtomReady} from "./atom";
 const MAX_REACTION_ITERATIONS = 100;
 
 /**
-* During a transaction no views are updated until the end of the transaction.
-* The transaction will be run synchronously nonetheless.
-* @param action a function that updates some reactive state
-* @returns any value that was returned by the 'action' parameter.
-*/
+ * During a transaction no views are updated until the end of the transaction.
+ * The transaction will be run synchronously nonetheless.
+ * @param action a function that updates some reactive state
+ * @returns any value that was returned by the 'action' parameter.
+ */
 export function transaction<T>(action: () => T, thisArg?): T {
 	globalState.inTransaction += 1;
 	const res = action.call(thisArg);
@@ -21,14 +21,14 @@ export function transaction<T>(action: () => T, thisArg?): T {
 		// TODO: splice needed?
 		// TODO: while needed?
 		const values = globalState.changedAtoms.splice(0);
-		for(var i = 0, l = values.length; i < l; i++)
+		for (let i = 0, l = values.length; i < l; i++)
 			propagateAtomReady(values[i].atom, values[i].observersToNotify);
 
 		runReactions();
 
 		// TODO: needed?
 		const actions = globalState.afterTransactionItems.splice(0);
-		for (var i = 0, l = actions.length; i < l; i++)
+		for (let i = 0, l = actions.length; i < l; i++)
 			actions[i]();
 	}
 	return res;
@@ -52,8 +52,8 @@ export function runReactions() {
 	while (pr.length) {
 		if (++iterations === MAX_REACTION_ITERATIONS)
 			throw new Error("Reaction doesn't converge to a stable state. Probably there is a cycle in your computations: " + pr[0].toString());
-		var rs = pr.splice(0);
-		for(var i = 0, l = rs.length; i < l; i++)
+		let rs = pr.splice(0);
+		for (let i = 0, l = rs.length; i < l; i++)
 			rs[i].runReaction();
 	}
 	globalState.isRunningReactions = false;

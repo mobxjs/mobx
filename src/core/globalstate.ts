@@ -1,7 +1,12 @@
+import {IAtom} from "./atom";
+import Reaction from "./reaction";
+import {Lambda} from "../utils/utils";
+import {IDerivation} from "./derivation";
+
 declare const global: any;
 
 export class MobservableGlobals {
-	version = 1; // 
+	version = 1; //
 	derivationStack: IDerivation[] = [];
 	mobservableObjectId = 0;
 	inTransaction = 0;
@@ -18,13 +23,13 @@ export class MobservableGlobals {
 const globalState = (() => {
 	const res = new MobservableGlobals();
 	/**
-	* Backward compatibility check
-	*/
+	 * Backward compatibility check
+	 */
 	if (global.__mobservableTrackingStack || global.__mobservableViewStack || (global.__mobservableGlobal && global.__mobservableGlobal.version !== globalState.version))
-	   throw new Error("[mobservable] An incompatible version of mobservable is already loaded.");
+		throw new Error("[mobservable] An incompatible version of mobservable is already loaded.");
 	if (global.__mobservableGlobal)
 		return global.__mobservableGlobal;
-	return global.__mobservableGlobal = res;    
+	return global.__mobservableGlobal = res;
 })();
 
 export default globalState;
@@ -50,13 +55,13 @@ export function checkIfStateModificationsAreAllowed() {
 	if (!globalState.allowStateChanges) {
 		// TODO: add url with detailed error subscription / best practice here:
 		throw new Error(
-`[mobservable] It is not allowed to change the state during the computation of a reactive derivation.`);
+			`[mobservable] It is not allowed to change the state during the computation of a reactive derivation.`);
 	}
 }
 
 
 // TODO: move to observable
-export function untracked<T>(action:()=>T):T {
+export function untracked<T>(action: () => T): T {
 	globalState.inUntracked++;
 	const res = action();
 	globalState.inUntracked--;
@@ -73,11 +78,6 @@ export function registerGlobals() {
  */
 export function resetGlobalState() {
 	const defaultGlobals = new MobservableGlobals();
-	for (var key in defaultGlobals)
+	for (let key in defaultGlobals)
 		globalState[key] = defaultGlobals[key];
 }
-
-import {IAtom} from "./atom";
-import Reaction from "./reaction";
-import {Lambda} from "../utils/utils";
-import {IDerivation} from "./derivation";

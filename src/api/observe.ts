@@ -5,12 +5,12 @@ import {isObservable, observable} from "./observable";
 import {Lambda, isPlainObject} from "../utils/utils";
 import {autorun} from "../api/autorun";
 
-export function observe<T>(observableArray:IObservableArray<T>, listener:(change:IArrayChange<T>|IArraySplice<T>) => void): Lambda;
-export function observe<T>(observableMap:ObservableMap<T>, listener:(change:IObservableMapChange<T>) => void): Lambda;
-export function observe(func:()=>void): Lambda;
-export function observe<T extends Object>(object:T, listener:(change:IObjectChange<any, T>) => void): Lambda;
-export function observe<T extends Object,Y>(object:T, prop: string, listener:(newValue:Y, oldValue?: Y) => void): Lambda;
-export function observe(thing, property?, listener?):Lambda {
+export function observe<T>(observableArray: IObservableArray<T>, listener: (change: IArrayChange<T> | IArraySplice<T>) => void): Lambda;
+export function observe<T>(observableMap: ObservableMap<T>, listener: (change: IObservableMapChange<T>) => void): Lambda;
+export function observe(func: () => void): Lambda;
+export function observe<T extends Object>(object: T, listener: (change: IObjectChange<any, T>) => void): Lambda;
+export function observe<T extends Object, Y>(object: T, prop: string, listener: (newValue: Y, oldValue?: Y) => void): Lambda;
+export function observe(thing, property?, listener?): Lambda {
 	if (arguments.length === 2) {
 		listener = property;
 		property = undefined;

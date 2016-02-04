@@ -8,7 +8,7 @@ import {isPlainObject} from "../utils/utils";
 /**
 	* Basically, a deep clone, so that no reactive property will exist anymore.
 	*/
-export function toJSON(source, detectCycles: boolean = true, __alreadySeen:[any,any][] = null) {
+export function toJSON(source, detectCycles: boolean = true, __alreadySeen: [any, any][] = null) {
 	// optimization: using ES6 map would be more efficient!
 	function cache(value) {
 		if (detectCycles)
@@ -40,7 +40,7 @@ export function toJSON(source, detectCycles: boolean = true, __alreadySeen:[any,
 	}
 	if (typeof source === "object" && isPlainObject(source)) {
 		const res = cache({});
-		for (var key in source) if (source.hasOwnProperty(key))
+		for (let key in source) if (source.hasOwnProperty(key))
 			res[key] = toJSON(source[key], detectCycles, __alreadySeen);
 		return res;
 	}
