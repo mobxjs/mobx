@@ -174,7 +174,7 @@ test('reactive folder tree', function(t) {
 				return this.folder.name;
 			},
 			isVisible: function() {
-				return !this.state.filter || this.name.indexOf(this.state.filter) !== -1 || this.children.some(child => child.isVisible);
+				return !this.state.filter || this.name.indexOf(this.state.filter) !== -1 || this.folder.children.some(child => child.isVisible);
 			},
 			children: function() {
 				if (this.collapsed)

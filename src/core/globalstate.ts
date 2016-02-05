@@ -51,7 +51,7 @@ export function checkIfStateModificationsAreAllowed() {
 	if (!globalState.allowStateChanges) {
 		// TODO: add url with detailed error subscription / best practice here:
 		throw new Error(
-			`[mobservable] It is not allowed to change the state during the computation of a reactive derivation.`);
+			`[mobservable] It is not allowed to change the state when a derivation is being computed. Are you sure that the value you are trying to change shouldn't be derived instead? Use 'extras.allowStateChanges(true, block)' to supress this message.`);
 	}
 }
 

@@ -51,8 +51,9 @@ export class Atom implements IAtom {
 	 */
 	reportChanged() {
 		if (!this.isDirty) {
+			const {observers} = this;
 			this.reportStale();
-			this.reportReady();
+			this.reportReady(true, observers.slice());
 		}
 	}
 
@@ -64,10 +65,10 @@ export class Atom implements IAtom {
 		}
 	}
 
-	private reportReady(changed: boolean = true) {
+	private reportReady(changed: boolean = true, observersToNotify = this.observers.slice()) {
 		invariant(this.isDirty);
 		if (globalState.inTransaction > 0)
-			globalState.changedAtoms.push({atom: this, observersToNotify: this.observers.slice()});
+			globalState.changedAtoms.push({atom: this, observersToNotify: observersToNotify});
 		else {
 			propagateAtomReady(this);
 			runReactions();

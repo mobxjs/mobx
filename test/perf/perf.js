@@ -46,11 +46,11 @@ test('one observes ten thousand that observe one', function (t) {
     var start = now();
 
     b.observe(voidObserver, true); // start observers
-    t.equal(99990000, b());
+    t.equal(b(), 99990000);
     var initial = now();
 
     a(3);
-    t.equal(149985000, b()); // yes, I verified ;-).
+    t.equal(b(), 149985000); // yes, I verified ;-).
     //t.equal(2, bCalcs);
     var end = now();
 

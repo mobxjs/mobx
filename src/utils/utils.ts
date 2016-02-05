@@ -10,8 +10,10 @@ export interface Lambda {
 }
 
 export function invariant(check: boolean) {
-	if (!check)
+	if (!check) {
+		debugger;
 		throw new Error("[mobservable] Invariant failed, please report this as a bug. Be sure to including the stacktrace of this error.");
+	}
 }
 
 const deprecatedMessages = [];

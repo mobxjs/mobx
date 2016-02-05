@@ -1,5 +1,6 @@
 import {IDerivation, notifyDependencyReady, notifyDependencyStale} from "./derivation";
 import {globalState} from "./globalstate";
+import {invariant} from "../utils/utils";
 
 export interface IDepTreeNode {
 	id: number;
@@ -15,6 +16,7 @@ export interface IObservable extends IDepTreeNode {
 }
 
 export function addObserver(observable: IObservable, node: IDerivation) {
+	invariant(observable['isComputing'] !== true);
 	const obs = observable.observers, l = obs.length;
 	obs[l] = node;
 	if (l === 0)
@@ -53,10 +55,11 @@ export function propagateStaleness(observable: IObservable|IDerivation) {
 		notifyDependencyStale(os[i]);
 }
 
-export function propagateReadiness(observable: IObservable|IDerivation, valueDidActuallyChange: boolean, observersToNotify: IDerivation[] = observable.observers) {
-	if (!observersToNotify)
-		return;
-	//    observers = observers.slice(); // TODO: slice needed?
-	for (let l = observersToNotify.length, i = 0; i < l; i++)
-		notifyDependencyReady(observersToNotify[i], valueDidActuallyChange);
+export function propagateReadiness(observable: IObservable|IDerivation, valueDidActuallyChange: boolean, observersToNotify: IDerivation[]) {
+//	if (!observersToNotify)
+//		return;
+	//observersToNotify = observersToNotify.slice(); // TODO: slice needed?
+	//for (let l = observersToNotify.length, i = 0; i < l; i++)
+	for (let i = observersToNotify.length - 1; i > 0; i--)
+		notifyDependencyReady(observersToNotify[i], valueDidActuallyChange, observable);
 }

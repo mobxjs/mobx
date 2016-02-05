@@ -1,5 +1,5 @@
 import {IObservable, IDepTreeNode, propagateReadiness, propagateStaleness, addObserver, removeObserver} from "./observable";
-import {quickDiff} from "../utils/utils";
+import {quickDiff, invariant} from "../utils/utils";
 import {reportTransition} from "../api/extras";
 import {globalState} from "./globalstate";
 
@@ -30,8 +30,14 @@ export function notifyDependencyStale(derivation: IDerivation) {
  * If all observed values are stable and at least one of them has changed, the derivation
  * will be scheduled for re-evaluation.
  */
-export function notifyDependencyReady(derivation: IDerivation, dependencyDidChange: boolean) {
-	// TODO: fix invariant(derivation.dependencyStaleCount > 0);
+export function notifyDependencyReady(derivation: IDerivation, dependencyDidChange: boolean, who) {
+	invariant(!!derivation);
+	invariant(derivation.observing.indexOf(who) !== -1)
+	invariant(derivation.dependencyStaleCount > 0);
+	// if (this.dependencyStaleCount === 0) {
+	// 	invariant(!dependencyDidChange);
+	// 	return;
+	// }
 	if (dependencyDidChange)
 		derivation.dependencyChangeCount += 1;
 	if (--derivation.dependencyStaleCount === 0) {
@@ -41,11 +47,13 @@ export function notifyDependencyReady(derivation: IDerivation, dependencyDidChan
 			derivation.dependencyChangeCount = 0;
 			reportTransition(derivation, "PENDING");
 			const changed = derivation.onDependenciesReady();
-			propagateReadiness(derivation, changed);
+			if (derivation.observers)
+				propagateReadiness(derivation, changed, derivation.observers.slice()); // TODO: slices needed?
 		} else {
 			// we're done, but didn't change, lets make sure verybody knows..
 			reportTransition(derivation, "READY", false);
-			propagateReadiness(derivation, false);
+			if (derivation.observers)
+				propagateReadiness(derivation, false, derivation.observers.slice());
 		}
 	}
 }

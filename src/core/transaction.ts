@@ -15,6 +15,8 @@ const MAX_REACTION_ITERATIONS = 100;
  * @returns any value that was returned by the 'action' parameter.
  */
 export function transaction<T>(action: () => T, thisArg?): T {
+	return action.call(thisArg);
+	
 	globalState.inTransaction += 1;
 	const res = action.call(thisArg);
 	if (--globalState.inTransaction === 0) {
