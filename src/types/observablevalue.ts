@@ -2,8 +2,8 @@ import {Atom} from "../core/atom";
 import {checkIfStateModificationsAreAllowed} from "../core/globalstate";
 import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} from "./modifiers";
 import {valueDidChange, Lambda} from "../utils/utils";
-import {autorun} from "../api/autorun";
 import {ComputedValue} from "../core/computedvalue";
+import {observe} from "../api/observe";
 
 export class ObservableValue<T> {
 	atom: Atom;
@@ -41,20 +41,6 @@ export class ObservableValue<T> {
 	toString() {
 		return `ObservableValue[${this.name}:${this.value}]`;
 	}
-
-	// TODO: remove
-	observe(listener: (newValue: T, oldValue: T) => void, fireImmediately = false): Lambda {
-		let firstTime = true;
-		let prevValue = undefined;
-		return autorun(() => {
-			const newValue = this.get();
-			if (!firstTime || fireImmediately) {
-				listener(newValue, prevValue);
-			}
-			firstTime = false;
-			prevValue = newValue;
-		});
-	}
 }
 
 export interface IObservableValue<T> {
@@ -72,10 +58,7 @@ export function toGetterSetterFunction<T>(observable: ObservableValue<T> | Compu
 			return observable.get();
 	};
 	f.$mobservable = observable;
-	// TODO: remove observe
-	f.observe = function() {
-		return observable.observe.apply(observable, arguments);
-	};
+	f.observe = observe.bind(null, observable); // TODO: remove observe?
 	f.toString = function() {
 		return observable.toString();
 	};

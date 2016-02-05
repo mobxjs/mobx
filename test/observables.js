@@ -55,6 +55,7 @@ test('dynamic', function(t) {
             return x();
         });
         var b = buffer();
+		debugger;
         y.observe(b, true);
 
         t.equal(3, y()); // First evaluation here..

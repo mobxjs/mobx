@@ -6,6 +6,7 @@ This means that it is allowed in an to change the state in such a way that the s
 * `.fastArray` has been deprecated and has become the default when creating arrays.
 * Mobservable is now extensible! Use the exposed `Atom` or `Reaction` classes to define your own custom state values and reactive actions.
 * Removed deprecated methods: `isReactive`, `makeReactive`, `observeUntil`, `observeAsync`
+* (TODO) observableValue.observe(listener, fireImmediately) -> observe(observableValue, listener, fireImmediately?)
 
 # 1.2.4
 

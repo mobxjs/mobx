@@ -118,18 +118,4 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 	toString() {
 		return `ComputedValue[${this.name}]`;
 	}
-
-		// TODO: refactor to mobservable.observe
-	observe(listener: (newValue: T, oldValue: T) => void, fireImmediately = false): Lambda {
-		let firstTime = true;
-		let prevValue = undefined;
-		return autorun(() => {
-			let newValue = this.get();
-			if (!firstTime || fireImmediately) {
-				listener(newValue, prevValue);
-			}
-			firstTime = false;
-			prevValue = newValue;
-		});
-	}
 }

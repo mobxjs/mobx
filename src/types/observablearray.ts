@@ -177,9 +177,9 @@ export class ObservableArray<T> extends StubArray {
 		return this.$mobservable.spliceWithArray(0, this.$mobservable.values.length, newItems);
 	}
 
-	// TODO: FIX! and for Map as well.
 	toJSON(): T[] {
 		this.$mobservable.atom.reportObserved();
+		// JSON.stringify recurses on returned objects, so this will work fine
 		return this.$mobservable.values.slice();
 	}
 

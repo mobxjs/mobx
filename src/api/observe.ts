@@ -2,6 +2,8 @@ import {IObservableArray, IArrayChange, IArraySplice, isObservableArray} from ".
 import {ObservableMap, IObservableMapChange, isObservableMap} from "../types/observablemap";
 import {IObjectChange, isObservableObject} from "../types/observableobject";
 import {observable} from "./observable";
+import {ComputedValue} from "../core/computedvalue";
+import {ObservableValue} from "../types/observablevalue";
 import {Lambda, isPlainObject} from "../utils/utils";
 import {autorun} from "../api/autorun";
 import {isObservable} from "./isobservable";
@@ -11,8 +13,10 @@ export function observe<T>(observableMap: ObservableMap<T>, listener: (change: I
 export function observe(func: () => void): Lambda;
 export function observe<T extends Object>(object: T, listener: (change: IObjectChange<any, T>) => void): Lambda;
 export function observe<T extends Object, Y>(object: T, prop: string, listener: (newValue: Y, oldValue?: Y) => void): Lambda;
+export function observe<T>(value: ObservableValue<T>|ComputedValue<T>, listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
 export function observe(thing, property?, listener?): Lambda {
-	if (arguments.length === 2) {
+	const fireImmediately = arguments[2] === true;
+	if (typeof property === "function") {
 		listener = property;
 		property = undefined;
 	}
@@ -20,15 +24,13 @@ export function observe(thing, property?, listener?): Lambda {
 		console.error("[mobservable.observe] is deprecated in combination with a function, use 'mobservable.autorun' instead");
 		return autorun(thing);
 	}
-	if (typeof listener !== "function")
-		throw new Error("[mobservable.observe] expected second argument to be a function");
 	if (isObservableArray(thing))
 		return thing.observe(listener);
 	if (isObservableMap(thing)) {
 		if (property) {
 			if (!thing._has(property))
 				throw new Error("[mobservable.observe] the provided observable map has no key with name: " + property);
-			return thing._data[property].observe(listener);
+			return observe(thing._data[property], listener);
 		} else {
 			return thing.observe(listener);
 		}
@@ -37,11 +39,23 @@ export function observe(thing, property?, listener?): Lambda {
 		if (property) {
 			if (!isObservable(thing, property))
 				throw new Error("[mobservable.observe] the provided object has no observable property with name: " + property);
-			return thing.$mobservable.values[property].observe(listener);
+			return observe(thing.$mobservable.values[property], listener);
 		}
 		return thing.$mobservable.observe(listener);
 	}
+	if (thing instanceof ObservableValue || thing instanceof ComputedValue) {
+		let firstTime = true;
+		let prevValue = undefined;
+		return autorun(() => {
+			let newValue = thing.get();
+			if (!firstTime || fireImmediately) {
+				listener(newValue, prevValue);
+			}
+			firstTime = false;
+			prevValue = newValue;
+		});
+	}
 	if (isPlainObject(thing))
 		return (<any>observable(thing)).$mobservable.observe(listener);
-	throw new Error("[mobservable.observe] first argument should be an observable array, observable map, observable object or plain object.");
+	throw new Error("[mobservable.observe] first argument should be an observable array, observable map, observable object, observable value, computed value or plain object.");
 }
