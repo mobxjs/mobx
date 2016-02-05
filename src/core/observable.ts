@@ -47,13 +47,12 @@ export function reportObserved(observable: IObservable) {
 
 export function propagateStaleness(observable: IObservable|IDerivation) {
 	const os = observable.observers.slice();
-	for (let l = os.length, i = 0; i < l; i++)
-		notifyDependencyStale(os[i]); // TODO: could check if it wasn't already stale and filter those out!
-	observable.staleObservers = observable.staleObservers.concat(os); // probably inefficient!
+	os.forEach(notifyDependencyStale);
+	observable.staleObservers = observable.staleObservers.concat(os);
 }
 
 export function propagateReadiness(observable: IObservable|IDerivation, valueDidActuallyChange: boolean) {
-	const os = observable.staleObservers.splice(0);
-	for (let l = os.length, i = 0; i < l; i++)
-		notifyDependencyReady(os[i], valueDidActuallyChange);
+	observable.staleObservers.splice(0).forEach(
+		o => notifyDependencyReady(o, valueDidActuallyChange)
+	);
 }
