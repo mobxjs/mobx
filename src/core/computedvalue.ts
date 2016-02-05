@@ -12,11 +12,9 @@ import {reportTransition} from "../api/extras";
  * If a computed value isn't actively used by another observer, but is inspect, it will compute lazily to return at least a consistent value.
  */
 export class ComputedValue<T> implements IObservable, IDerivation {
-	// TODO: use atom for simplification?
 	id = getNextId();
 	isLazy = true; // nobody is observing this derived value, so don't bother tracking upstream values
 	isComputing = false;
-	hasCycle = false;  // this node is part of a cycle, which is an error
 	staleObservers: IDerivation[] = [];
 	observers: IDerivation[] = [];      // nodes that are dependent on this node. Will be notified when our state change
 	observing: IObservable[] = [];       // nodes we are looking at. Our value depends on these nodes
@@ -99,15 +97,11 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 				// nobody depends on this computable;
 				// so just compute fresh value and continue to sleep
 				return this.peek();
-				// TODO: this.value should be cleaned up again!
 			}
 		} else {
 			// we are already up to date, somebody is just inspecting our current value
 			reportObserved(this);
 		}
-
-		if (this.hasCycle) // TODO: is this check needed? and for which branches? otherwise this function can be simpler
-			throw new Error(`[DerivedValue '${this.name}'] Cycle detected`);
 		return this.value;
 	}
 

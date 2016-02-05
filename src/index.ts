@@ -19,6 +19,8 @@
 import {registerGlobals} from "./core/globalstate";
 registerGlobals();
 
+// TODO: all exports in sync with docs?
+// TODO: optimize packaging?
 export {    observable                                           } from "./api/observable";
 export {    isObservable                                         } from "./api/isobservable";
 export {    extendObservable                                     } from "./api/extendobservable";

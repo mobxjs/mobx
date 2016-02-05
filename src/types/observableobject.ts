@@ -17,7 +17,7 @@ export interface IObjectChange<T, R> {
 }
 
 // responsible for the administration of objects that have become reactive
-export class ObservableObject { // TODO: implement IObservable
+export class ObservableObject {
 	values: {[key: string]: ObservableValue<any>|ComputedValue<any>} = {};
 	private _events = new SimpleEventEmitter();
 

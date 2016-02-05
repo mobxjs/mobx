@@ -11,22 +11,8 @@ export class SimpleEventEmitter {
 	emit(...data: any[]);
 	emit() {
 		const listeners = this.listeners.slice();
-		const l = listeners.length;
-		// TODO: remove switch optimization?
-		switch (arguments.length) {
-			case 0:
-				for (let i = 0; i < l; i++)
-					listeners[i]();
-				break;
-			case 1:
-				const data = arguments[0];
-				for (let i = 0; i < l; i++)
-					listeners[i](data);
-				break;
-			default:
-				for (let i = 0; i < l; i++)
-					listeners[i].apply(null, arguments);
-		}
+		for (let i = 0, l = listeners.length; i < l; i++)
+			listeners[i].apply(null, arguments);
 	}
 
 	on(listener: (...data: any[]) => void): Lambda {

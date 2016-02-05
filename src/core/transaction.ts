@@ -18,28 +18,13 @@ export function transaction<T>(action: () => T, thisArg?): T {
 	globalState.inTransaction += 1;
 	const res = action.call(thisArg);
 	if (--globalState.inTransaction === 0) {
-		// TODO: splice needed?
-		// TODO: while needed?
 		const values = globalState.changedAtoms.splice(0);
 		for (let i = 0, l = values.length; i < l; i++)
 			propagateAtomReady(values[i]);
 
 		runReactions();
-
-		// TODO: needed?
-		const actions = globalState.afterTransactionItems.splice(0);
-		for (let i = 0, l = actions.length; i < l; i++)
-			actions[i]();
 	}
 	return res;
-}
-
-// TODO: what is this good for?
-export function runAfterTransaction(action: () => void) {
-	if (globalState.inTransaction === 0)
-		action();
-	else
-		globalState.afterTransactionItems.push(action);
 }
 
 // TODO: move to reaction
