@@ -22,7 +22,7 @@ export function transaction<T>(action: () => T, thisArg?): T {
 		// TODO: while needed?
 		const values = globalState.changedAtoms.splice(0);
 		for (let i = 0, l = values.length; i < l; i++)
-			propagateAtomReady(values[i].atom, values[i].observersToNotify);
+			propagateAtomReady(values[i]);
 
 		runReactions();
 

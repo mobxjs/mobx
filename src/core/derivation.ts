@@ -1,5 +1,5 @@
 import {IObservable, IDepTreeNode, propagateReadiness, propagateStaleness, addObserver, removeObserver} from "./observable";
-import {quickDiff} from "../utils/utils";
+import {quickDiff, invariant} from "../utils/utils";
 import {reportTransition} from "../api/extras";
 import {globalState} from "./globalstate";
 
@@ -7,9 +7,10 @@ import {globalState} from "./globalstate";
  * A derivation is everything that can be derived from the state (all the atoms) in a pure manner.
  * See https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.xvbh6qd74
  */
-export interface IDerivation extends IDepTreeNode {
+export interface IDerivation extends IDepTreeNode, IObservable {
 	observing: IObservable[];
-	observers?: IDerivation[];
+	staleObservers: IDerivation[];
+	observers: IDerivation[];
 	dependencyStaleCount: number;
 	dependencyChangeCount: number;
 	onDependenciesReady(): boolean;
@@ -31,7 +32,7 @@ export function notifyDependencyStale(derivation: IDerivation) {
  * will be scheduled for re-evaluation.
  */
 export function notifyDependencyReady(derivation: IDerivation, dependencyDidChange: boolean) {
-	// TODO: fix invariant(derivation.dependencyStaleCount > 0);
+	invariant(derivation.dependencyStaleCount > 0);
 	if (dependencyDidChange)
 		derivation.dependencyChangeCount += 1;
 	if (--derivation.dependencyStaleCount === 0) {

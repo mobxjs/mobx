@@ -2,6 +2,7 @@ import {IObservable, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction} from "./derivation";
 import {globalState, getNextId} from "./globalstate";
 import {reportTransition} from "../api/extras";
+import {EMPTY_ARRAY} from "../utils/utils";
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations
@@ -24,6 +25,8 @@ import {reportTransition} from "../api/extras";
 export class Reaction implements IDerivation {
 	id = getNextId();
 	name; string;
+	staleObservers:  IDerivation[] = EMPTY_ARRAY; // Won't change
+	observers: IDerivation[] = EMPTY_ARRAY;       // Won't change
 	observing: IObservable[] = []; // nodes we are looking at. Our value depends on these nodes
 	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready

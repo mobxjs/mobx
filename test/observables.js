@@ -113,6 +113,7 @@ test('readme1', function(t) {
         order.priceWithVat.observe(b);
 
         order.price(20);
+        t.deepEqual([24],b.toArray());
         order.price(10);
         t.deepEqual([24,12],b.toArray());
         t.equal(mobservable.extras.isComputingDerivation(), false);

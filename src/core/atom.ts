@@ -3,7 +3,6 @@ import {invariant, noop} from "../utils/utils";
 import {globalState, getNextId} from "./globalstate";
 import {reportTransition} from "../api/extras";
 import {runReactions} from "./transaction";
-import {IDerivation} from "./derivation";
 
 export interface IAtom extends IObservable {
 	isDirty: boolean;
@@ -12,11 +11,11 @@ export interface IAtom extends IObservable {
 /**
  * Used by the transaction manager to signal observers that an atom is ready as soon as the transaction has ended.
  */
-export function propagateAtomReady(atom: IAtom, observersToNotify: IDerivation[] = atom.observers) {
+export function propagateAtomReady(atom: IAtom) {
 	invariant(atom.isDirty);
 	atom.isDirty = false;
 	reportTransition(atom, "READY", true);
-	propagateReadiness(atom, true, observersToNotify);
+	propagateReadiness(atom, true);
 }
 
 /**
@@ -29,6 +28,7 @@ export class Atom implements IAtom {
 	id = getNextId();
 	name: string;
 	isDirty = false;
+	staleObservers = [];
 	observers = [];
 
 	/**
@@ -52,7 +52,7 @@ export class Atom implements IAtom {
 	reportChanged() {
 		if (!this.isDirty) {
 			this.reportStale();
-			this.reportReady();
+			this.reportReady(true);
 		}
 	}
 
@@ -64,10 +64,10 @@ export class Atom implements IAtom {
 		}
 	}
 
-	private reportReady(changed: boolean = true) {
+	private reportReady(changed: boolean) {
 		invariant(this.isDirty);
 		if (globalState.inTransaction > 0)
-			globalState.changedAtoms.push({atom: this, observersToNotify: this.observers.slice()});
+			globalState.changedAtoms.push(this);
 		else {
 			propagateAtomReady(this);
 			runReactions();

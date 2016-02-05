@@ -85,13 +85,13 @@ test('five hundrend properties that observe their sibling', function (t) {
 test('late dependency change', function(t) {
     gc();
     var values = [];
-    for(var i = 0; i < 100; i++)
-    values.push(observable(0))
+	for(var i = 0; i < 100; i++)
+		values.push(observable(0))
 
     var sum = observable(function() {
         var sum = 0;
         for(var i = 0; i < 100; i++)
-        sum += values[i]();
+    	    sum += values[i]();
         return sum;
     })
 
@@ -100,7 +100,7 @@ test('late dependency change', function(t) {
     var start = new Date();
 
     for(var i = 0; i < 10000; i++)
-    values[99](i);
+	    values[99](i);
 
     t.equal(sum(), 9999);
     console.log("\n  Updated in " + ((new Date) - start) + "ms.");

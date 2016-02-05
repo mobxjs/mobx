@@ -17,6 +17,7 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 	isLazy = true; // nobody is observing this derived value, so don't bother tracking upstream values
 	isComputing = false;
 	hasCycle = false;  // this node is part of a cycle, which is an error
+	staleObservers: IDerivation[] = [];
 	observers: IDerivation[] = [];      // nodes that are dependent on this node. Will be notified when our state change
 	observing: IObservable[] = [];       // nodes we are looking at. Our value depends on these nodes
 	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute

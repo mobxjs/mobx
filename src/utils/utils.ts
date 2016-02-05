@@ -4,6 +4,9 @@
  * https://github.com/mweststrate/mobservable
  */
 
+export const EMPTY_ARRAY = [];
+Object.freeze(EMPTY_ARRAY);
+
 export interface Lambda {
 	(): void;
 	name?: string;

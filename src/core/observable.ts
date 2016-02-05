@@ -9,6 +9,7 @@ export interface IDepTreeNode {
 }
 
 export interface IObservable extends IDepTreeNode {
+	staleObservers: IDerivation[];
 	observers: IDerivation[];
 	onBecomeObserved();
 	onBecomeUnobserved();
@@ -45,18 +46,14 @@ export function reportObserved(observable: IObservable) {
 }
 
 export function propagateStaleness(observable: IObservable|IDerivation) {
-	let os = observable.observers;
-	if (!os)
-		return;
-	os = os.slice(); // TODO: slice needed?
+	const os = observable.observers.slice();
 	for (let l = os.length, i = 0; i < l; i++)
-		notifyDependencyStale(os[i]);
+		notifyDependencyStale(os[i]); // TODO: could check if it wasn't already stale and filter those out!
+	observable.staleObservers = observable.staleObservers.concat(os); // probably inefficient!
 }
 
-export function propagateReadiness(observable: IObservable|IDerivation, valueDidActuallyChange: boolean, observersToNotify: IDerivation[] = observable.observers) {
-	if (!observersToNotify)
-		return;
-	//    observers = observers.slice(); // TODO: slice needed?
-	for (let l = observersToNotify.length, i = 0; i < l; i++)
-		notifyDependencyReady(observersToNotify[i], valueDidActuallyChange);
+export function propagateReadiness(observable: IObservable|IDerivation, valueDidActuallyChange: boolean) {
+	const os = observable.staleObservers.splice(0);
+	for (let l = os.length, i = 0; i < l; i++)
+		notifyDependencyReady(os[i], valueDidActuallyChange);
 }
