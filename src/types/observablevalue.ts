@@ -43,13 +43,13 @@ export class ObservableValue<T> {
 	}
 }
 
+// TODO: deprecate?
 export interface IObservableValue<T> {
 	(): T;
 	(value: T): void;
-	// TODO: remove observe:
-	observe(callback: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
 }
 
+// TODO: deprecate?
 export function toGetterSetterFunction<T>(observable: ObservableValue<T> | ComputedValue<T>): IObservableValue<T> {
 	const f: any = function(value?) {
 		if (arguments.length > 0)
@@ -58,7 +58,6 @@ export function toGetterSetterFunction<T>(observable: ObservableValue<T> | Compu
 			return observable.get();
 	};
 	f.$mobservable = observable;
-	f.observe = observe.bind(null, observable); // TODO: remove observe?
 	f.toString = function() {
 		return observable.toString();
 	};

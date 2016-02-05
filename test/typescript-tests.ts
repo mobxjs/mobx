@@ -1,14 +1,14 @@
 /// <reference path='require.d.ts' />
 /// <reference path='tape.d.ts' />
 import {
-    observable, asStructure, autorun, autorunAsync, extendObservable, 
+    observe, observable, asStructure, autorun, autorunAsync, extendObservable, 
     IObservableArray, IArrayChange, IArraySplice, IObservableValue,
     extras
 } from "../lib/index";
 import * as test from 'tape';
 
 var v = observable(3);
-v.observe(() => {});
+observe(v, () => {});
 
 var a = observable([1,2,3]);
 

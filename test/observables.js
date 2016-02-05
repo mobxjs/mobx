@@ -1,6 +1,6 @@
 var test = require('tape');
 var mobservable = require('..');
-var m = mobservable.observable;
+var m = mobservable;
 var observable = mobservable.observable;
 var transaction = mobservable.transaction;
 
@@ -18,9 +18,9 @@ function buffer() {
 }
 
 test('basic', function(t) {
-    var x = m(3);
+    var x = observable(3);
     var b = buffer();
-    x.observe(b);
+    m.observe(x, b);
     t.equal(3, x());
 
     x(5);
@@ -35,7 +35,7 @@ test('basic2', function(t) {
     var z = observable(function () { return x() * 2});
     var y = observable(function () { return x() * 3});
 
-    z.observe(voidObserver);
+    m.observe(z, voidObserver);
 
     t.equal(z(), 6);
     t.equal(y(), 9);
@@ -50,13 +50,12 @@ test('basic2', function(t) {
 
 test('dynamic', function(t) {
     try {
-        var x = m(3);
-        var y = m(function() {
+        var x = observable(3);
+        var y = observable(function() {
             return x();
         });
         var b = buffer();
-		debugger;
-        y.observe(b, true);
+        m.observe(y, b, true);
 
         t.equal(3, y()); // First evaluation here..
 
@@ -82,7 +81,7 @@ test('dynamic2', function(t) {
 
         t.equal(9, y());
         var b = buffer();
-        y.observe(b);
+        m.observe(y, b);
 
         x(5);
         t.equal(25, y());
@@ -111,7 +110,7 @@ test('readme1', function(t) {
             return order.price() * (1+vat());
         });
 
-        order.priceWithVat.observe(b);
+        m.observe(order.priceWithVat, b);
 
         order.price(20);
         t.deepEqual([24],b.toArray());
@@ -131,7 +130,7 @@ test('batch', function(t) {
     var c = observable(function() { return a() * b() });
     var d = observable(function() { return c() * b() });
     var buf = buffer();
-    d.observe(buf);
+    m.observe(d, buf);
 
     a(4);
     b(5);
@@ -222,7 +221,7 @@ test('scope', function(t) {
     };
 
     var order = new Order();
-    order.total.observe(voidObserver);
+    m.observe(order.total, voidObserver);
     order.price(10);
     order.amount(3);
     t.equal(36, order.total());
@@ -412,7 +411,7 @@ test('observe object', function(t) {
         a: 1,
         da: function() { return this.a * 2 }
     });
-    var stop = a.$mobservable.observe(function(change) {
+    var stop = m.observe(a, function(change) {
         events.push(change);
     });
     
@@ -515,7 +514,7 @@ test('change count optimization', function(t) {
         return b();
     });
 
-    c.observe(voidObserver);
+    m.observe(c, voidObserver);
 
     t.equal(b(), 4);
     t.equal(c(), 4);
@@ -546,7 +545,7 @@ test('observables removed', function(t) {
 
 
     t.equal(calcs, 0);
-    c.observe(voidObserver);
+    m.observe(c, voidObserver);
     t.equal(c(), 4);
     t.equal(calcs, 1);
     a(2);
@@ -605,7 +604,7 @@ test('lazy evaluation', function (t) {
         return b() * 2;
     });
 
-    var handle = d.observe(function() {
+    var handle = m.observe(d, function() {
         observerChanges += 1;
     }, false);
     t.equal(bCalcs,4);
@@ -643,13 +642,13 @@ test('lazy evaluation', function (t) {
 test('multiple view dependencies', function(t) {
     var bCalcs = 0;
     var dCalcs = 0;
-    var a = m(1);
-    var b = m(function() {
+    var a = observable(1);
+    var b = observable(function() {
         bCalcs++;
         return 2 * a();
     });
-    var c = m(2);
-    var d = m(function() {
+    var c = observable(2);
+    var d = observable(function() {
         dCalcs++;
         return 3 * c();
     })
@@ -689,21 +688,21 @@ test('multiple view dependencies', function(t) {
 })
 
 test('nested observable2', function(t) {
-    var factor = m(0);
-    var price = m(100);
+    var factor = observable(0);
+    var price = observable(100);
     var totalCalcs = 0;
     var innerCalcs = 0;
 
-    var total = m(function() {
+    var total = observable(function() {
         totalCalcs += 1; // outer observable shouldn't recalc if inner observable didn't publish a real change
-        return price() * m(function() {
+        return price() * observable(function() {
             innerCalcs += 1;
             return factor() % 2 === 0 ? 1 : 3;
         })();
     });
 
     var b = [];
-    var sub = total.observe(function(x) { b.push(x); }, true);
+    var sub = m.observe(total, function(x) { b.push(x); }, true);
 
     price(150);
     factor(7); // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
@@ -720,21 +719,21 @@ test('nested observable2', function(t) {
 })
 
 test('expr', function(t) {
-    var factor = m(0);
-    var price = m(100);
+    var factor = observable(0);
+    var price = observable(100);
     var totalCalcs = 0;
     var innerCalcs = 0;
 
-    var total = m(function() {
+    var total = observable(function() {
         totalCalcs += 1; // outer observable shouldn't recalc if inner observable didn't publish a real change
-        return price() * m(function() {
+        return price() * observable(function() {
             innerCalcs += 1;
             return factor() % 2 === 0 ? 1 : 3;
         })();
     });
 
     var b = [];
-    var sub = total.observe(function(x) { b.push(x); }, true);
+    var sub = m.observe(total, function(x) { b.push(x); }, true);
 
     price(150);
     factor(7); // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
@@ -751,8 +750,8 @@ test('expr', function(t) {
 })
 
 test('observe', function(t) {
-    var x = m(3);
-    var x2 = m(function() { return x() * 2; });
+    var x = observable(3);
+    var x2 = observable(function() { return x() * 2; });
     var b = [];
 
     var cancel = mobservable.autorun(function() {
@@ -770,7 +769,7 @@ test('observe', function(t) {
 })
 
 test('when', function(t) {
-    var x = m(3);
+    var x = observable(3);
 
     var called = 0;
     mobservable.autorunUntil(function() {
@@ -792,7 +791,7 @@ test('when', function(t) {
 })
 
 test('when 2', function(t) {
-    var x = m(3);
+    var x = observable(3);
 
     var called = 0;
     mobservable.autorunUntil(function() {
@@ -811,12 +810,12 @@ test('when 2', function(t) {
 })
 
 test('expr2', function(t) {
-    var factor = m(0);
-    var price = m(100);
+    var factor = observable(0);
+    var price = observable(100);
     var totalCalcs = 0;
     var innerCalcs = 0;
     
-    var total = m(function() {
+    var total = observable(function() {
         totalCalcs += 1; // outer observable shouldn't recalc if inner observable didn't publish a real change
         return price() * mobservable.expr(function() {
             innerCalcs += 1;
@@ -825,7 +824,7 @@ test('expr2', function(t) {
     });
     
     var b = [];
-    var sub = total.observe(function(x) { b.push(x); }, true);
+    var sub = m.observe(total, function(x) { b.push(x); }, true);
     
     price(150);
     factor(7); // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
@@ -842,7 +841,7 @@ test('expr2', function(t) {
 })
 
 test('json1', function(t) {
-    var todos = m([
+    var todos = observable([
         {
             title: "write blog"
         },
@@ -888,14 +887,14 @@ test('json2', function(t) {
 
     t.deepEqual(mobservable.toJSON(o), source);
 
-    var analyze = m(function() {
+    var analyze = observable(function() {
         return [
             o.todos.length,
             o.todos[1].details.url
         ]
     });
 
-    var alltags = m(function() {
+    var alltags = observable(function() {
         return o.todos.map(function(todo) {
             return todo.tags.join(",");
         }).join(",");
@@ -904,8 +903,8 @@ test('json2', function(t) {
     var ab = [];
     var tb = [];
 
-    analyze.observe(function(d) { ab.push(d); }, true);
-    alltags.observe(function(d) { tb.push(d); }, true);
+    m.observe(analyze, function(d) { ab.push(d); }, true);
+    m.observe(alltags, function(d) { tb.push(d); }, true);
 
     o.todos[0].details.url = "boe";
     o.todos[1].details.url = "ba";
@@ -1192,7 +1191,7 @@ test('verify transaction events', function(t) {
 });
 
 test("verify array in transaction", function(t) {
-    var ar = m([]);
+    var ar = observable([]);
     var aCount= 0;
     var aValue;
     

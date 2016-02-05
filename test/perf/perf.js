@@ -45,7 +45,7 @@ test('one observes ten thousand that observe one', function (t) {
 
     var start = now();
 
-    b.observe(voidObserver, true); // start observers
+    mobservable.observe(b, voidObserver, true); // start observers
     t.equal(99990000, b());
     var initial = now();
 
@@ -70,7 +70,7 @@ test('five hundrend properties that observe their sibling', function (t) {
     var start = now();
 
     var last = observables[observables.length -1];
-    last.observe(voidObserver);
+    mobservable.observe(last, voidObserver);
     t.equal(501, last());
     var initial = now();
 
@@ -95,7 +95,7 @@ test('late dependency change', function(t) {
         return sum;
     })
 
-    sum.observe(voidObserver, true);
+    mobservable.observe(sum, voidObserver, true);
 
     var start = new Date();
 
@@ -130,7 +130,7 @@ test('lots of unused computables', function(t) {
     });
 
     var sum = 0;
-    var subscription = b.observe(function(newValue) {
+    var subscription = mobservable.observe(b, function(newValue) {
         sum = newValue;
     }, true);
 
@@ -182,7 +182,7 @@ test('array reduce', function(t) {
             return a + c * b();
         }, 0);
     });
-    sum.observe(voidObserver);
+    mobservable.observe(sum, voidObserver);
 
     var start = now();
 
@@ -220,7 +220,7 @@ test('array classic loop', function(t) {
             s+=ar[i] * b();
         return s;
     });
-    sum.observe(voidObserver, true); // calculate
+    mobservable.observe(sum, voidObserver, true); // calculate
 
     var start = now();
 
@@ -287,7 +287,7 @@ function order_system_helper(t, usebatch, keepObserving) {
 
     var disp;
     if (keepObserving)
-        disp = totalAmount.observe(voidObserver);
+        disp = mobservable.observe(totalAmount, voidObserver);
 
     var start = now();
 

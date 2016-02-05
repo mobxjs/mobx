@@ -13,7 +13,7 @@ test('untracked 1', function(t) {
 	});
 	var result;
 	
-	var d = m.observe(function() {
+	var d = m.autorun(function() {
 		dCalcs++;
 		result = c();
 	});

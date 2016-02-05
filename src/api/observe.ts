@@ -20,10 +20,6 @@ export function observe(thing, property?, listener?): Lambda {
 		listener = property;
 		property = undefined;
 	}
-	if (typeof thing === "function") {
-		console.error("[mobservable.observe] is deprecated in combination with a function, use 'mobservable.autorun' instead");
-		return autorun(thing);
-	}
 	if (isObservableArray(thing))
 		return thing.observe(listener);
 	if (isObservableMap(thing)) {
@@ -43,19 +39,24 @@ export function observe(thing, property?, listener?): Lambda {
 		}
 		return thing.$mobservable.observe(listener);
 	}
-	if (thing instanceof ObservableValue || thing instanceof ComputedValue) {
-		let firstTime = true;
-		let prevValue = undefined;
-		return autorun(() => {
-			let newValue = thing.get();
-			if (!firstTime || fireImmediately) {
-				listener(newValue, prevValue);
-			}
-			firstTime = false;
-			prevValue = newValue;
-		});
-	}
+	if (thing instanceof ObservableValue || thing instanceof ComputedValue)
+		return observeObservableValue(thing, listener, fireImmediately);
+	if (thing.$mobservable instanceof ObservableValue || thing.$mobservable instanceof ComputedValue)
+		return observeObservableValue(thing.$mobservable, listener, fireImmediately);
 	if (isPlainObject(thing))
 		return (<any>observable(thing)).$mobservable.observe(listener);
 	throw new Error("[mobservable.observe] first argument should be an observable array, observable map, observable object, observable value, computed value or plain object.");
+}
+
+function observeObservableValue<T>(observable: ObservableValue<T>|ComputedValue<T>, listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda {
+	let firstTime = true;
+	let prevValue = undefined;
+	return autorun(() => {
+		let newValue = observable.get();
+		if (!firstTime || fireImmediately) {
+			listener(newValue, prevValue);
+		}
+		firstTime = false;
+		prevValue = newValue;
+	});
 }

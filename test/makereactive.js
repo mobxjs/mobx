@@ -155,9 +155,9 @@ test('observable4', function(t) {
     ]);
 
     var b = buffer();
-    m.observable(function() {
+    m.observe(m.observable(function() {
         return x.map(function(d) { return d.x });
-    }).observe(b, true);
+    }), b, true);
 
     x[0].x = 3;
     x.shift();
@@ -171,9 +171,9 @@ test('observable4', function(t) {
     ]));
 
     var b2 = buffer();
-    m.observable(function() {
+    m.observe(m.observable(function() {
         return x2.map(function(d) { return d.x });
-    }).observe(b2, true);
+    }), b2, true);
 
     x2[0].x = 3;
     x2.shift();

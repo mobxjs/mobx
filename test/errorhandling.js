@@ -153,7 +153,7 @@ test('cycle3', function(t) {
     var a = observable(function() { return z() ? 1 : b() * 2; });
     var b = observable(function() { return a() * 2; });
 
-    b.observe(voidObserver);
+    m.observe(b, voidObserver);
     t.equal(1, a());
 
     t.throws(() => {
