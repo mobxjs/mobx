@@ -19,5 +19,5 @@ export function expr<T>(expr: () => T, scope?): T {
 	if (!isComputingDerivation())
 		console.warn("[mobservable.expr] 'expr' should only be used inside other reactive functions.");
 	// optimization: would be more efficient if the expr itself wouldn't be evaluated first on the next change, but just a 'changed' signal would be fired
-	return observable(expr, scope) ();
+	return observable(expr, scope).get();
 }

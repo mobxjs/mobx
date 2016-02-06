@@ -21,10 +21,10 @@ test('basic', function(t) {
     var x = observable(3);
     var b = buffer();
     m.observe(x, b);
-    t.equal(3, x());
+    t.equal(3, x.get());
 
-    x(5);
-    t.equal(5, x());
+    x.set(5);
+    t.equal(5, x.get());
     t.deepEqual([5], b.toArray());
     t.equal(mobservable.extras.isComputingDerivation(), false);
     t.end();
@@ -32,17 +32,17 @@ test('basic', function(t) {
 
 test('basic2', function(t) {
     var x = observable(3);
-    var z = observable(function () { return x() * 2});
-    var y = observable(function () { return x() * 3});
+    var z = observable(function () { return x.get() * 2});
+    var y = observable(function () { return x.get() * 3});
 
     m.observe(z, voidObserver);
 
-    t.equal(z(), 6);
-    t.equal(y(), 9);
+    t.equal(z.get(), 6);
+    t.equal(y.get(), 9);
 
-    x(5);
-    t.equal(z(), 10);
-    t.equal(y(), 15);
+    x.set(5);
+    t.equal(z.get(), 10);
+    t.equal(y.get(), 15);
 
     t.equal(mobservable.extras.isComputingDerivation(), false);
     t.end();
@@ -52,15 +52,15 @@ test('dynamic', function(t) {
     try {
         var x = observable(3);
         var y = observable(function() {
-            return x();
+            return x.get();
         });
         var b = buffer();
         m.observe(y, b, true);
 
-        t.equal(3, y()); // First evaluation here..
+        t.equal(3, y.get()); // First evaluation here..
 
-        x(5);
-        t.equal(5, y());
+        x.set(5);
+        t.equal(5, y.get());
 
         t.deepEqual(b.toArray(), [3, 5]);
         t.equal(mobservable.extras.isComputingDerivation(), false);
@@ -76,15 +76,15 @@ test('dynamic2', function(t) {
     try {
         var x = observable(3);
         var y = observable(function() {
-            return x() * x();
+            return x.get() * x.get();
         });
 
-        t.equal(9, y());
+        t.equal(9, y.get());
         var b = buffer();
         m.observe(y, b);
 
-        x(5);
-        t.equal(25, y());
+        x.set(5);
+        t.equal(25, y.get());
 
         //no intermediate value 15!
         t.deepEqual([25], b.toArray());
@@ -107,14 +107,14 @@ test('readme1', function(t) {
         // Prints: New price: 24
         //in TS, just: value(() => this.price() * (1+vat()))
         order.priceWithVat = observable(function() {
-            return order.price() * (1+vat());
+            return order.price.get() * (1 + vat.get());
         });
 
         m.observe(order.priceWithVat, b);
 
-        order.price(20);
+        order.price.set(20);
         t.deepEqual([24],b.toArray());
-        order.price(10);
+        order.price.set(10);
         t.deepEqual([24,12],b.toArray());
         t.equal(mobservable.extras.isComputingDerivation(), false);
 
@@ -127,22 +127,22 @@ test('readme1', function(t) {
 test('batch', function(t) {
     var a = observable(2);
     var b = observable(3);
-    var c = observable(function() { return a() * b() });
-    var d = observable(function() { return c() * b() });
+    var c = observable(function() { return a.get() * b.get() });
+    var d = observable(function() { return c.get() * b.get() });
     var buf = buffer();
     m.observe(d, buf);
 
-    a(4);
-    b(5);
+    a.set(4);
+    b.set(5);
     // Note, 60 should not happen! (that is d beign computed before c after update of b)
     t.deepEqual(buf.toArray(), [36, 100]);
 
     var x = mobservable.transaction(function() {
-        a(2);
-        b(3);
-        a(6);
-        t.equal(d.$mobservable.value, 100); // not updated; in transaction
-        t.equal(d(), 54); // consistent due to inspection
+        a.set(2);
+        b.set(3);
+        a.set(6);
+        t.equal(d.value, 100); // not updated; in transaction
+        t.equal(d.get(), 54); // consistent due to inspection
         return 2;
     });
 
@@ -156,25 +156,25 @@ test('transaction with inspection', function(t) {
     var calcs = 0;
     var b = observable(function() {
         calcs++;
-        return a() * 2;
+        return a.get() * 2;
     });
 
     // if not inspected during transaction, postpone value to end
     mobservable.transaction(function() {
-        a(3);
-        t.equal(b(), 6);
+        a.set(3);
+        t.equal(b.get(), 6);
         t.equal(calcs, 1);
     });
-    t.equal(b(), 6);
+    t.equal(b.get(), 6);
     t.equal(calcs, 2);
 
     // if inspected, evaluate eagerly
     mobservable.transaction(function() {
-        a(4);
-        t.equal(b(), 8);
+        a.set(4);
+        t.equal(b.get(), 8);
         t.equal(calcs, 3);
     });
-    t.equal(b(), 8);
+    t.equal(b.get(), 8);
     t.equal(calcs, 4);
 
     t.end();
@@ -186,12 +186,12 @@ test('transaction with inspection 2', function(t) {
     var b;
     mobservable.autorun(function() {
         calcs++;
-        b = a() * 2;
+        b = a.get() * 2;
     });
 
     // if not inspected during transaction, postpone value to end
     mobservable.transaction(function() {
-        a(3);
+        a.set(3);
         t.equal(b, 4);
         t.equal(calcs, 1);
     });
@@ -200,7 +200,7 @@ test('transaction with inspection 2', function(t) {
 
     // if inspected, evaluate eagerly
     mobservable.transaction(function() {
-        a(4);
+        a.set(4);
         t.equal(b, 6);
         t.equal(calcs, 2);
     });
@@ -216,15 +216,15 @@ test('scope', function(t) {
         this.price = observable(20);
         this.amount = observable(2);
         this.total = observable(function() {
-            return (1+vat()) * this.price() * this.amount();
+            return (1+vat.get()) * this.price.get() * this.amount.get();
         }, this);
     };
 
     var order = new Order();
     m.observe(order.total, voidObserver);
-    order.price(10);
-    order.amount(3);
-    t.equal(36, order.total());
+    order.price.set(10);
+    order.amount.set(3);
+    t.equal(36, order.total.get());
     t.equal(mobservable.extras.isComputingDerivation(), false);
 
     t.end();
@@ -237,7 +237,7 @@ test('props1', function(t) {
             'price' : 20,
             'amount' : 2,
             'total': function() {
-                return (1+vat()) * this.price * this.amount; // price and amount are now properties!
+                return (1+vat.get()) * this.price * this.amount; // price and amount are now properties!
             }
         });
     };
@@ -268,7 +268,7 @@ test('props2', function(t) {
             price: 20,
             amount: 2,
             total: function() {
-                return (1+vat()) * this.price * this.amount; // price and amount are now properties!
+                return (1+vat.get()) * this.price * this.amount; // price and amount are now properties!
             }
         });
     };
@@ -287,7 +287,7 @@ test('props3', function(t) {
         this.price = 20;
         this.amount = 2;
         this.total = function() {
-            return (1+vat()) * this.price * this.amount; // price and amount are now properties!
+            return (1+vat.get()) * this.price * this.amount; // price and amount are now properties!
         };
         mobservable.extendObservable(this, this);
     };
@@ -507,24 +507,24 @@ test('change count optimization', function(t) {
     var a = observable(3);
     var b = observable(function() {
         bCalcs += 1;
-        return 4 + a() - a();
+        return 4 + a.get() - a.get();
     });
     var c = observable(function() {
         cCalcs += 1;
-        return b();
+        return b.get();
     });
 
     m.observe(c, voidObserver);
 
-    t.equal(b(), 4);
-    t.equal(c(), 4);
+    t.equal(b.get(), 4);
+    t.equal(c.get(), 4);
     t.equal(bCalcs, 1);
     t.equal(cCalcs, 1);
 
-    a(5);
+    a.set(5);
 
-    t.equal(b(), 4);
-    t.equal(c(), 4);
+    t.equal(b.get(), 4);
+    t.equal(c.get(), 4);
     t.equal(bCalcs, 2);
     t.equal(cCalcs, 1);
 
@@ -538,26 +538,26 @@ test('observables removed', function(t) {
     var b = observable(2);
     var c = observable(function() {
         calcs ++;
-        if (a() === 1)
-        return b() * a() * b();
+        if (a.get() === 1)
+        return b.get() * a.get() * b.get();
         return 3;
     });
 
 
     t.equal(calcs, 0);
     m.observe(c, voidObserver);
-    t.equal(c(), 4);
+    t.equal(c.get(), 4);
     t.equal(calcs, 1);
-    a(2);
-    t.equal(c(), 3);
+    a.set(2);
+    t.equal(c.get(), 3);
     t.equal(calcs, 2);
 
-    b(3); // should not retrigger calc
-    t.equal(c(), 3);
+    b.set(3); // should not retrigger calc
+    t.equal(c.get(), 3);
     t.equal(calcs, 2);
 
-    a(1);
-    t.equal(c(), 9);
+    a.set(1);
+    t.equal(c.get(), 9);
     t.equal(calcs, 3);
 
     t.equal(mobservable.extras.isComputingDerivation(), false);
@@ -573,35 +573,35 @@ test('lazy evaluation', function (t) {
     var a = observable(1);
     var b = observable(function() {
         bCalcs += 1;
-        return a() +1;
+        return a.get() +1;
     });
 
     var c = observable(function() {
         cCalcs += 1;
-        return b() +1;
+        return b.get() +1;
     });
 
     t.equal(bCalcs, 0);
     t.equal(cCalcs, 0);
-    t.equal(c(), 3);
+    t.equal(c.get(), 3);
     t.equal(bCalcs,1);
     t.equal(cCalcs,1);
 
-    t.equal(c(), 3);
+    t.equal(c.get(), 3);
     t.equal(bCalcs,2);
     t.equal(cCalcs,2);
 
-    a(2);
+    a.set(2);
     t.equal(bCalcs,2);
     t.equal(cCalcs,2);
 
-    t.equal(c(), 4);
+    t.equal(c.get(), 4);
     t.equal(bCalcs,3);
     t.equal(cCalcs,3);
 
     var d = observable(function() {
         dCalcs += 1;
-        return b() * 2;
+        return b.get() * 2;
     });
 
     var handle = m.observe(d, function() {
@@ -611,24 +611,24 @@ test('lazy evaluation', function (t) {
     t.equal(cCalcs,3);
     t.equal(dCalcs,1); // d is evaluated, so that its dependencies are known
 
-    a(3);
-    t.equal(d(), 8);
+    a.set(3);
+    t.equal(d.get(), 8);
     t.equal(bCalcs,5);
     t.equal(cCalcs,3);
     t.equal(dCalcs,2);
 
-    t.equal(c(), 5);
+    t.equal(c.get(), 5);
     t.equal(bCalcs,5);
     t.equal(cCalcs,4);
     t.equal(dCalcs,2);
 
-    t.equal(b(), 4);
+    t.equal(b.get(), 4);
     t.equal(bCalcs,5);
     t.equal(cCalcs,4);
     t.equal(dCalcs,2);
 
     handle(); // unlisten
-    t.equal(d(), 8);
+    t.equal(d.get(), 8);
     t.equal(bCalcs,6); // gone to sleep
     t.equal(cCalcs,4);
     t.equal(dCalcs,3);
@@ -645,13 +645,13 @@ test('multiple view dependencies', function(t) {
     var a = observable(1);
     var b = observable(function() {
         bCalcs++;
-        return 2 * a();
+        return 2 * a.get();
     });
     var c = observable(2);
     var d = observable(function() {
         dCalcs++;
-        return 3 * c();
-    })
+        return 3 * c.get();
+    });
 
     var zwitch = true;
     var buffer = [];
@@ -659,26 +659,26 @@ test('multiple view dependencies', function(t) {
     var dis = mobservable.autorun(function() {
         fCalcs++;
         if (zwitch)
-            buffer.push(b() + d());
+            buffer.push(b.get() + d.get());
         else
-            buffer.push(d() + b());
+            buffer.push(d.get() + b.get());
     });
 
     zwitch = false;
-    c(3);
+    c.set(3);
     t.equal(bCalcs, 1);
     t.equal(dCalcs, 2);
     t.equal(fCalcs, 2);
     t.deepEqual(buffer, [8, 11]);
 
-    c(4);
+    c.set(4);
     t.equal(bCalcs, 1);
     t.equal(dCalcs, 3);
     t.equal(fCalcs, 3);
     t.deepEqual(buffer, [8, 11, 14]);
 
     dis();
-    c(5);
+    c.set(5);
     t.equal(bCalcs, 1);
     t.equal(dCalcs, 3);
     t.equal(fCalcs, 3);
@@ -695,21 +695,21 @@ test('nested observable2', function(t) {
 
     var total = observable(function() {
         totalCalcs += 1; // outer observable shouldn't recalc if inner observable didn't publish a real change
-        return price() * observable(function() {
+        return price.get() * observable(function() {
             innerCalcs += 1;
-            return factor() % 2 === 0 ? 1 : 3;
-        })();
+            return factor.get() % 2 === 0 ? 1 : 3;
+        }).get();
     });
 
     var b = [];
     var sub = m.observe(total, function(x) { b.push(x); }, true);
 
-    price(150);
-    factor(7); // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
-    factor(5); // doesn't trigger outer calc
-    factor(3); // doesn't trigger outer calc
-    factor(4); // triggers innerCalc twice
-    price(20);
+    price.set(150);
+    factor.set(7); // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
+    factor.set(5); // doesn't trigger outer calc
+    factor.set(3); // doesn't trigger outer calc
+    factor.set(4); // triggers innerCalc twice
+    price.set(20);
 
     t.deepEqual(b, [100,150,450,150,20]);
     t.equal(innerCalcs, 9);
@@ -726,21 +726,21 @@ test('expr', function(t) {
 
     var total = observable(function() {
         totalCalcs += 1; // outer observable shouldn't recalc if inner observable didn't publish a real change
-        return price() * observable(function() {
+        return price.get() * mobservable.expr(function() {
             innerCalcs += 1;
-            return factor() % 2 === 0 ? 1 : 3;
-        })();
+            return factor.get() % 2 === 0 ? 1 : 3;
+        });
     });
 
     var b = [];
     var sub = m.observe(total, function(x) { b.push(x); }, true);
 
-    price(150);
-    factor(7); // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
-    factor(5); // doesn't trigger outer calc
-    factor(3); // doesn't trigger outer calc
-    factor(4); // triggers innerCalc twice
-    price(20);
+    price.set(150);
+    factor.set(7); // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
+    factor.set(5); // doesn't trigger outer calc
+    factor.set(3); // doesn't trigger outer calc
+    factor.set(4); // triggers innerCalc twice
+    price.set(20);
 
     t.deepEqual(b, [100,150,450,150,20]);
     t.equal(innerCalcs, 9);
@@ -751,18 +751,18 @@ test('expr', function(t) {
 
 test('observe', function(t) {
     var x = observable(3);
-    var x2 = observable(function() { return x() * 2; });
+    var x2 = observable(function() { return x.get() * 2; });
     var b = [];
 
     var cancel = mobservable.autorun(function() {
-        b.push(x2());
+        b.push(x2.get());
     });
 
-    x(4);
-    x(5);
+    x.set(4);
+    x.set(5);
     t.deepEqual(b, [6, 8, 10]);
     cancel();
-    x(7);
+    x.set(7);
     t.deepEqual(b, [6, 8, 10]);
 
     t.end();
@@ -773,18 +773,18 @@ test('when', function(t) {
 
     var called = 0;
     mobservable.autorunUntil(function() {
-        return (x() === 4);
+        return (x.get() === 4);
     }, function() {
         called += 1;
     });
 
-    x(5);
+    x.set(5);
     t.equal(called, 0);
-    x(4);
+    x.set(4);
     t.equal(called, 1);
-    x(3);
+    x.set(3);
     t.equal(called, 1);
-    x(4);
+    x.set(4);
     t.equal(called, 1);
     
     t.end();
@@ -795,15 +795,15 @@ test('when 2', function(t) {
 
     var called = 0;
     mobservable.autorunUntil(function() {
-        return (x() === 3);
+        return (x.get() === 3);
     }, function() {
         called += 1;
     });
 
     t.equal(called, 1);
-    t.equal(x.$mobservable.atom.observers.length, 0)
-    x(5);
-    x(3);
+    t.equal(x.atom.observers.length, 0)
+    x.set(5);
+    x.set(3);
     t.equal(called, 1);
     
     t.end();
@@ -817,21 +817,21 @@ test('expr2', function(t) {
     
     var total = observable(function() {
         totalCalcs += 1; // outer observable shouldn't recalc if inner observable didn't publish a real change
-        return price() * mobservable.expr(function() {
+        return price.get() * mobservable.expr(function() {
             innerCalcs += 1;
-            return factor() % 2 === 0 ? 1 : 3;
+            return factor.get() % 2 === 0 ? 1 : 3;
         });
     });
     
     var b = [];
     var sub = m.observe(total, function(x) { b.push(x); }, true);
     
-    price(150);
-    factor(7); // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
-    factor(5); // doesn't trigger outer calc
-    factor(3); // doesn't trigger outer calc
-    factor(4); // triggers innerCalc twice
-    price(20);
+    price.set(150);
+    factor.set(7); // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
+    factor.set(5); // doesn't trigger outer calc
+    factor.set(3); // doesn't trigger outer calc
+    factor.set(4); // triggers innerCalc twice
+    price.set(20);
     
     t.deepEqual(b, [100,150,450,150,20]);
     t.equal(innerCalcs, 9);
@@ -1291,25 +1291,25 @@ test('prematurely end autorun', function(t) {
     var dis1, dis2;
     mobservable.transaction(function() {
         dis1 =  mobservable.autorun(function() {
-            x();
+            x.get();
         });
         dis2 =  mobservable.autorun(function() {
-            x();
+            x.get();
         });
 
-        t.equal(x.$mobservable.atom.observers.length, 0);
+        t.equal(x.atom.observers.length, 0);
         t.equal(dis1.$mobservable.observing.length, 0);
         t.equal(dis2.$mobservable.observing.length, 0);
         
         dis1();
     });
-    t.equal(x.$mobservable.atom.observers.length, 1);
+    t.equal(x.atom.observers.length, 1);
     t.equal(dis1.$mobservable.observing.length, 0);
     t.equal(dis2.$mobservable.observing.length, 1);
     
     dis2();
 
-    t.equal(x.$mobservable.atom.observers.length, 0);
+    t.equal(x.atom.observers.length, 0);
     t.equal(dis1.$mobservable.observing.length, 0);
     t.equal(dis2.$mobservable.observing.length, 0);
     
@@ -1430,7 +1430,7 @@ test('forcefully tracked reaction should still yield valid results', function(t)
     var runCount = 0;
     var identity = function() {
         runCount++;
-        z = x();
+        z = x.get();
     };
     var a = new mobservable.Reaction("test", function() {
         this.track(identity);
@@ -1441,7 +1441,7 @@ test('forcefully tracked reaction should still yield valid results', function(t)
     t.equal(runCount, 1);
     
     transaction(function() {
-        x(4);
+        x.set(4);
         a.track(identity);
         t.equal(a.isScheduled(), true);
         t.equal(z, 4);
@@ -1452,14 +1452,14 @@ test('forcefully tracked reaction should still yield valid results', function(t)
     t.equal(runCount, 3);
 
     transaction(function() {
-        x(5);
+        x.set(5);
         t.equal(a.isScheduled(), true);
         a.track(identity);
         t.equal(z, 5);
         t.equal(runCount, 4);
         t.equal(a.isScheduled(), true);
         
-        x(6);
+        x.set(6);
         t.equal(z, 5);
         t.equal(runCount, 4);
     });

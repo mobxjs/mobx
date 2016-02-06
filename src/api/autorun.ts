@@ -80,13 +80,13 @@ export function autorunAsync(func: Lambda, delay: number = 1, scope?: any): Lamb
 	function doTick() {
 		tickScheduled = false;
 		shouldRun = true;
-		tick(tick() + 1);
+		tick.set(tick.get() + 1);
 	}
 
 	disposer = autorun(() => {
 		if (isDisposed)
 			return;
-		tick(); // observe so that autorun fires on next tick
+		tick.get(); // observe so that autorun fires on next tick
 		if (shouldRun) {
 			func.call(scope);
 			observedValues = (<any>disposer).$mobservable.observing;

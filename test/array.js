@@ -34,47 +34,47 @@ test('test1', function(t) {
             }, 1);
         });
 
-        t.equal(sum(), 3);
+        t.equal(sum.get(), 3);
 
         a[1] = 3;
         t.equal(a.length, 2);
         t.deepEqual(a.slice(), [1,3]);
-        t.equal(sum(), 4);
+        t.equal(sum.get(), 4);
 
         a.splice(1,1,4,5);
         t.equal(a.length, 3);
         t.deepEqual(a.slice(), [1,4,5]);
-        t.equal(sum(), 10);
+        t.equal(sum.get(), 10);
 
         a.replace([2,4]);
-        t.equal(sum(), 6);
+        t.equal(sum.get(), 6);
 
         a.splice(1,1);
-        t.equal(sum(), 2);
+        t.equal(sum.get(), 2);
         t.deepEqual(a.slice(), [2])
 
         a.splice(0,0,4,3);
-        t.equal(sum(), 9);
+        t.equal(sum.get(), 9);
         t.deepEqual(a.slice(), [4,3,2]);
 
         a.clear();
-        t.equal(sum(), 0);
+        t.equal(sum.get(), 0);
         t.deepEqual(a.slice(), []);
 
         a.length = 4;
-        t.equal(isNaN(sum()), true);
+        t.equal(isNaN(sum.get()), true);
         t.deepEqual(a.length, 4);
 
         t.deepEqual(a.slice(), [undefined, undefined, undefined, undefined]);
 
         a.replace([1,2, 2,4]);
-        t.equal(sum(), 9);
+        t.equal(sum.get(), 9);
         a.length = 4;
-        t.equal(sum(), 9);
+        t.equal(sum.get(), 9);
 
 
         a.length = 2;
-        t.equal(sum(), 3);
+        t.equal(sum.get(), 3);
         t.deepEqual(a.slice(), [1,2]);
 
         t.deepEqual(a.reverse(), [2,1]);
@@ -296,7 +296,7 @@ test('react to sort changes', function(t) {
     var sorted;
     
     mobservable.autorun(function() {
-        sorted = sortedX();
+        sorted = sortedX.get();
     });
     
     t.deepEqual(x.slice(), [4,2,3]);

@@ -43,14 +43,14 @@ export class ObservableValue<T> {
 	}
 }
 
-// TODO: deprecate?
+// TODO: deprecate / use on computed value / observable value!
 export interface IObservableValue<T> {
-	(): T;
-	(value: T): void;
+	get(): T;
+	set(value: T): void;
 }
 
 // TODO: deprecate?
-export function toGetterSetterFunction<T>(observable: ObservableValue<T> | ComputedValue<T>): IObservableValue<T> {
+export function XXXtoGetterSetterFunction<T>(observable: ObservableValue<T> | ComputedValue<T>): IObservableValue<T> {
 	const f: any = function(value?) {
 		if (arguments.length > 0)
 			observable.set(value);

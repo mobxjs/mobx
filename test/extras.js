@@ -57,28 +57,28 @@ test('getDNode', function(t) {
 
 test('treeD', function(t) {
     var a = m.observable(3);
-    var aName = a.$mobservable.atom.name;
+    var aName = a.atom.name;
 
     var dtree = m.extras.getDependencyTree;
     t.deepEqual(dtree(a), {
        name: aName,
-       id: a.$mobservable.atom.id
+       id: a.atom.id
     });
 
 
     var bFunc =function () {
-        return a() * a();
+        return a.get() * a.get();
     };
     var b = m.observable(bFunc);
-    var bName = b.$mobservable.name
+    var bName = b.name;
     t.deepEqual(dtree(b), {
         name: bName,
-        id: b.$mobservable.id,
+        id: b.id,
         // no dependencies yet, since it isn't observed yet
     });
 
     var cFunc =function() {
-        return b();
+        return b.get();
     };
     var c = m.autorun(cFunc);
     var cName = c.$mobservable.name;
@@ -87,10 +87,10 @@ test('treeD', function(t) {
         id: c.$mobservable.id,
         dependencies: [{
             name: bName,
-            id: b.$mobservable.id,
+            id: b.id,
             dependencies: [{
                 name: aName,
-                id: a.$mobservable.atom.id
+                id: a.atom.id
             }]
         }]
     });
@@ -100,10 +100,10 @@ test('treeD', function(t) {
 
     t.deepEqual(m.extras.getObserverTree(a), {
         name: aName,
-        id: a.$mobservable.atom.id,
+        id: a.atom.id,
         observers: [{
             name: bName,
-            id: b.$mobservable.id,
+            id: b.id,
             observers: [{
                 name: cName,
                 id: c.$mobservable.id
@@ -174,10 +174,10 @@ function stripTrackerOutput(output) {
 
 var trackerOutput1 = function(a, b,c) {
     return [
-    { id: a.$mobservable.atom.id,
+    { id: a.atom.id,
         changed: true,
         state: 'READY' },
-    { id: b.$mobservable.id,
+    { id: b.id,
         changed: true,
         state: 'READY' },
     { id: c.$mobservable.id,
@@ -187,11 +187,11 @@ var trackerOutput1 = function(a, b,c) {
 }
 
 var trackerOutput2 = function(a, b, c) {
-    return [ { id: a.$mobservable.atom.id,
+    return [ { id: a.atom.id,
     state: 'STALE',
     changed: false,
     }, 
-  { id: b.$mobservable.id,
+  { id: b.id,
     state: 'STALE',
     changed: false,
   }, 
@@ -199,15 +199,15 @@ var trackerOutput2 = function(a, b, c) {
     state: 'STALE',
     changed: false,
   }, 
-  { id: a.$mobservable.atom.id,
+  { id: a.atom.id,
     state: 'READY',
     changed: true,
   }, 
-  { id: b.$mobservable.id,
+  { id: b.id,
     state: 'PENDING',
     changed: false,
   }, 
-  { id: b.$mobservable.id,
+  { id: b.id,
     state: 'READY',
     changed: true,
   }, 
@@ -225,15 +225,15 @@ test('transition tracker 1', function(t) {
     var lines = [];
 
     var a = m.observable(3);
-    var b = m.observable(function() { return a() * 2 });
-    var c = m.autorun(function() { b(); });
+    var b = m.observable(function() { return a.get() * 2 });
+    var c = m.autorun(function() { b.get(); });
     var stop = m.extras.trackTransitions(false, function(line) {
         lines.push(line);
     });
 
-    a(4);
+    a.set(4);
     stop();
-    a(5);
+    a.set(5);
     t.deepEqual(stripTrackerOutput(lines), trackerOutput1(a,b,c));
 
     t.end();
@@ -243,15 +243,15 @@ test('transition tracker 2', function(t) {
     var lines = [];
 
     var a = m.observable(3);
-    var b = m.observable(function() { return a() * 2 });
-    var c = m.autorun(function() { b(); });
+    var b = m.observable(function() { return a.get() * 2 });
+    var c = m.autorun(function() { b.get(); });
     var stop = m.extras.trackTransitions(true, function(line) {
         lines.push(line);
     });
 
-    a(4);
+    a.set(4);
     stop();
-    a(5);
+    a.set(5);
     t.deepEqual(stripTrackerOutput(lines), trackerOutput2(a,b,c));
 
     t.end();
@@ -265,21 +265,21 @@ test('transition tracker 3', function(t) {
     }
 
     var a = m.observable(3);
-    var b = m.observable(function() { return a() * 2 });
-    var c = m.autorun(function() { b(); });
+    var b = m.observable(function() { return a.get() * 2 });
+    var c = m.autorun(function() { b.get(); });
     var d = m.observable(4);
 
     var stop = m.extras.trackTransitions(false)
 
 
-    a(4);
-    d(6);
+    a.set(4);
+    d.set(6);
     stop();
-    a(5);
+    a.set(5);
 
     setTimeout(function() {
         t.deepEqual(stripTrackerOutput(lines), [trackerOutput1(a,b,c).concat([{
-            id: d.$mobservable.atom.id,
+            id: d.atom.id,
             state: "READY",
             changed: true
         }])]);
@@ -298,13 +298,13 @@ test('transition tracker 4', function(t) {
     }
 
     var a = m.observable(3);
-    var b = m.observable(function() { return a() * 2 });
-    var c = m.autorun(function() { b(); });
+    var b = m.observable(function() { return a.get() * 2 });
+    var c = m.autorun(function() { b.get(); });
     var stop = m.extras.trackTransitions(true);
 
-    a(4);
+    a.set(4);
     stop();
-    a(5);
+    a.set(5);
     setTimeout(function() {
         t.deepEqual(stripTrackerOutput(lines), [trackerOutput2(a,b,c)]);
 
@@ -317,16 +317,16 @@ test('strict mode checks', function(t) {
     var x = mobservable.observable(3);
     
     mobservable.extras.allowStateChanges(false, function() {
-        x();        
+        x.get();        
     });
 
     mobservable.extras.allowStateChanges(true, function() {
-        x(7);        
+        x.set(7);        
     });
         
     t.throws(function() {
         mobservable.extras.allowStateChanges(false, function() {
-            x(4);        
+            x.set(4);        
         });
     });
     

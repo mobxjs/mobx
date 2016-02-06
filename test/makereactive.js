@@ -187,13 +187,13 @@ test('observable5', function(t) {
 
     var x = m.observable(function() { });
     t.throws(function() {
-        x(7); // set not allowed
+        x.set(7); // set not allowed
     });
 
     var f = function() {};
     var x2 = m.observable(m.asReference(f));
-    t.equal(x2(), f);
-    x2(null); // allowed
+    t.equal(x2.get(), f);
+    x2.set(null); // allowed
 
     f = function() { return this.price };
 

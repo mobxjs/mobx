@@ -1,4 +1,4 @@
-import {ObservableValue, IObservableValue, toGetterSetterFunction} from "../types/observablevalue";
+import {ObservableValue, IObservableValue} from "../types/observablevalue";
 import {ValueMode, getValueModeFromValue, makeChildObservable} from "../types/modifiers";
 import {ComputedValue} from "../core/computedvalue";
 import {isPlainObject} from "../utils/utils";
@@ -12,8 +12,8 @@ import {IObservableArray, ObservableArray} from "../types/observablearray";
 	*/
 export function observable(target: Object, key: string, baseDescriptor?: PropertyDescriptor): any;
 export function observable<T>(value: T[]): IObservableArray<T>;
-export function observable<T, S extends Object>(value: () => T, thisArg?: S): IObservableValue<T>;
-export function observable<T extends string|number|boolean|Date|RegExp|Function|void>(value: T): IObservableValue<T>;
+export function observable<T, S extends Object>(value: () => T, thisArg?: S): ComputedValue<T>;
+export function observable<T extends string|number|boolean|Date|RegExp|Function|void>(value: T): ObservableValue<T>;
 export function observable<T extends Object>(value: T): T;
 export function observable(v: any, keyOrScope?: string | any) {
 	if (typeof arguments[1] === "string")
@@ -40,11 +40,11 @@ export function observable(v: any, keyOrScope?: string | any) {
 	switch (sourceType) {
 		case ValueType.Reference:
 		case ValueType.ComplexObject:
-			return toGetterSetterFunction(new ObservableValue(value, mode, null));
+			return new ObservableValue(value, mode, null);
 		case ValueType.ComplexFunction:
 			throw new Error("[mobservable.observable] To be able to make a function reactive it should not have arguments. If you need an observable reference to a function, use `observable(asReference(f))`");
 		case ValueType.ViewFunction:
-			return toGetterSetterFunction(new ComputedValue(value, keyOrScope, value.name, mode === ValueMode.Structure));
+			return new ComputedValue(value, keyOrScope, value.name, mode === ValueMode.Structure);
 		case ValueType.Array:
 		case ValueType.PlainObject:
 			return makeChildObservable(value, mode, null);

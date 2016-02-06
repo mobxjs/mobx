@@ -544,7 +544,7 @@ test('transform tree (modifying render observable)', function(t) {
 
 	// custom transform
 	TreeNode.prototype.transform = function(iteratee, results) {
-		node.icon();  // icon dependency
+		node.icon.get();  // icon dependency
 
 		results = results || [];
 		results.push(iteratee(this));
@@ -572,7 +572,7 @@ test('transform tree (modifying render observable)', function(t) {
 	////////////////////////////////////
 
 	// update root icon
-	state.root.icon('file');
+	state.root.icon.set('file');
 	t.equal(nodeCreateCount,	5 + 0);
 	t.equal(stats.refCount, 	5 + 0);
 	t.equal(renderCount, 			2 + 1);
@@ -625,7 +625,7 @@ test('transform tree (modifying render-only observable)', function(t) {
 		state.renderedNodes.forEach(function(renderedNode) {
 			m.autorun(function() {
 				renderIconCalc++;
-				renderedNode.node.icon();  // icon dependency
+				renderedNode.node.icon.get();  // icon dependency
 			});
 		});
 	});
@@ -651,7 +651,7 @@ test('transform tree (modifying render-only observable)', function(t) {
 	////////////////////////////////////
 
 	// update root icon
-	state.root.icon('file');
+	state.root.icon.set('file');
 	t.equal(nodeCreateCount,	5 + 0);
 	t.equal(stats.refCount, 	5 + 0);
 	t.equal(renderCount, 			2 + 0);

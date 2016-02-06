@@ -20,12 +20,12 @@ test('autorun 1', function(t) {
 	var b = m.observable(3);
 	var c = m.observable(function() {
 		_cCalcs++;
-		return a() * b();
+		return a.get() * b.get();
 	});
 	var d = m.observable(1);
 	var autorun = function() {
 		_fired++;
-		_result = d() > 0 ? a() * c() : d();
+		_result = d.get() > 0 ? a.get() * c.get() : d.get();
 		
 	};
 	var disp = m.autorunAsync(autorun, 20);
@@ -38,36 +38,36 @@ test('autorun 1', function(t) {
 		
 		to(function() {
 			expect(1, 1, 12);
-			a(4);
-			b(5);
-			a(6);
+			a.set(4);
+			b.set(5);
+			a.set(6);
 			expect(0, 3, null);
 			to(function() {
 				expect(1, 0, 180); // c() is cached, not refired since previous expect
-				d(2);
+				d.set(2);
 				
 				to(function() {
 					expect(1, 0, 180);
 					
-					d(-2);
+					d.set(-2);
 					to(function() {
 						expect(1, 0, -2);
 						
-						a(7);
+						a.set(7);
 						to(function() {
 							expect(0, 0, 0); // change a has no effect
 
-							a(4);
-							b(2);
-							d(2)
+							a.set(4);
+							b.set(2);
+							d.set(2)
 							
 							to(function() {
 								expect(1, 1, 32);
 								
 								disp();
-								a(1);
-								b(2);
-								d(4);
+								a.set(1);
+								b.set(2);
+								d.set(4);
 								to(function() {
 									expect(0, 0, 0);
 									t.end();
