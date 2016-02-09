@@ -78,14 +78,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.autorunUntil = core_1.autorunUntil;
 	exports.autorunAsync = core_1.autorunAsync;
 	exports.expr = core_1.expr;
-	exports.transaction = core_1.transaction;
 	exports.toJSON = core_1.toJSON;
 	exports.isReactive = core_1.isObservable;
 	exports.map = core_1.map;
+	exports.fastArray = core_1.fastArray;
 	exports.makeReactive = core_1.observable;
 	exports.extendReactive = core_1.extendObservable;
 	exports.observeUntil = core_1.autorunUntil;
 	exports.observeAsync = core_1.autorunAsync;
+	var transform_1 = __webpack_require__(12);
+	exports.createTransformer = transform_1.createTransformer;
+	var dnode_2 = __webpack_require__(2);
+	exports.untracked = dnode_2.untracked;
+	exports.transaction = dnode_2.transaction;
+	var observablemap_1 = __webpack_require__(10);
+	exports.ObservableMap = observablemap_1.ObservableMap;
 	exports._ = {
 	    isComputingView: dnode_1.isComputingView,
 	    quickDiff: utils_1.quickDiff
@@ -104,11 +111,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * mobservable
-	 * (c) 2015 - Michel Weststrate
-	 * https://github.com/mweststrate/mobservable
-	 */
 	var dnode_1 = __webpack_require__(2);
 	var utils_1 = __webpack_require__(7);
 	var observablevalue_1 = __webpack_require__(9);
@@ -160,6 +162,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return new observablemap_1.ObservableMap(initialValues, valueModifier);
 	}
 	exports.map = map;
+	function fastArray(initialValues) {
+	    return observablearray_1.createObservableArray(initialValues, ValueMode.Flat, false, null);
+	}
+	exports.fastArray = fastArray;
 	function asReference(value) {
 	    return new AsReference(value);
 	}
@@ -172,9 +178,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return new AsFlat(value);
 	}
 	exports.asFlat = asFlat;
-	function isObservable(value) {
+	function isObservable(value, property) {
 	    if (value === null || value === undefined)
 	        return false;
+	    if (property !== undefined) {
+	        if (value instanceof observablemap_1.ObservableMap || value instanceof observablearray_1.ObservableArray)
+	            throw new Error("[mobservable.isObservable] isObservable(object, propertyName) is not supported for arrays and maps. Use map.has or array.length instead.");
+	        else if (value.$mobservable instanceof observableobject_1.ObservableObject) {
+	            var o = value.$mobservable;
+	            return o.values && !!o.values[property];
+	        }
+	        return false;
+	    }
 	    return !!value.$mobservable || value instanceof dnode_2.DataNode;
 	}
 	exports.isObservable = isObservable;
@@ -188,25 +203,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	        object: scope || view,
 	        name: view.name
 	    }, mode === ValueMode.Structure);
-	    observable.setRefCount(+1);
+	    var disposedPrematurely = false;
+	    var started = false;
+	    dnode_2.runAfterTransaction(function () {
+	        if (!disposedPrematurely) {
+	            observable.setRefCount(+1);
+	            started = true;
+	        }
+	    });
 	    var disposer = utils_1.once(function () {
-	        observable.setRefCount(-1);
+	        if (started)
+	            observable.setRefCount(-1);
+	        else
+	            disposedPrematurely = true;
 	    });
 	    disposer.$mobservable = observable;
 	    return disposer;
 	}
 	exports.autorun = autorun;
 	function autorunUntil(predicate, effect, scope) {
+	    var disposeImmediately = false;
 	    var disposer = autorun(function () {
 	        if (predicate.call(scope)) {
-	            disposer();
-	            effect.call(scope);
+	            if (disposer)
+	                disposer();
+	            else
+	                disposeImmediately = true;
+	            dnode_1.untracked(function () { return effect.call(scope); });
 	        }
 	    });
+	    if (disposeImmediately)
+	        disposer();
 	    return disposer;
 	}
 	exports.autorunUntil = autorunUntil;
-	function autorunAsync(view, effect, delay, scope) {
+	function autorunAsyncDeprecated(view, effect, delay, scope) {
 	    if (delay === void 0) { delay = 1; }
 	    var latestValue = undefined;
 	    var timeoutHandle;
@@ -223,6 +254,49 @@ return /******/ (function(modules) { // webpackBootstrap
 	        disposer();
 	        if (timeoutHandle)
 	            clearTimeout(timeoutHandle);
+	    });
+	}
+	function autorunAsync(func, delay, scope) {
+	    if (delay === void 0) { delay = 1; }
+	    if (typeof delay === "function") {
+	        console.warn("[mobservable] autorun(func, func) is deprecated and will removed in 2.0");
+	        return autorunAsyncDeprecated.apply(null, arguments);
+	    }
+	    var shouldRun = false;
+	    var tickScheduled = false;
+	    var tick = observable(0);
+	    var observedValues = [];
+	    var disposer;
+	    var isDisposed = false;
+	    function schedule(f) {
+	        setTimeout(f, delay);
+	    }
+	    function doTick() {
+	        tickScheduled = false;
+	        shouldRun = true;
+	        tick(tick() + 1);
+	    }
+	    disposer = autorun(function () {
+	        if (isDisposed)
+	            return;
+	        tick();
+	        if (shouldRun) {
+	            func.call(scope);
+	            observedValues = disposer.$mobservable.observing;
+	            shouldRun = false;
+	        }
+	        else {
+	            observedValues.forEach(function (o) { return o.notifyObserved(); });
+	            if (!tickScheduled) {
+	                tickScheduled = true;
+	                schedule(doTick);
+	            }
+	        }
+	    });
+	    return utils_1.once(function () {
+	        isDisposed = true;
+	        if (disposer)
+	            disposer();
 	    });
 	}
 	exports.autorunAsync = autorunAsync;
@@ -297,32 +371,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return descriptor;
 	    }
 	}
-	function toJSON(source) {
+	function toJSON(source, detectCycles, __alreadySeen) {
+	    if (detectCycles === void 0) { detectCycles = true; }
+	    if (__alreadySeen === void 0) { __alreadySeen = null; }
+	    function cache(value) {
+	        if (detectCycles)
+	            __alreadySeen.push([source, value]);
+	        return value;
+	    }
+	    if (detectCycles && __alreadySeen === null)
+	        __alreadySeen = [];
+	    if (detectCycles && source !== null && typeof source === "object") {
+	        for (var i = 0, l = __alreadySeen.length; i < l; i++)
+	            if (__alreadySeen[i][0] === source)
+	                return __alreadySeen[i][1];
+	    }
 	    if (!source)
 	        return source;
-	    if (Array.isArray(source) || source instanceof observablearray_1.ObservableArray)
-	        return source.map(toJSON);
+	    if (Array.isArray(source) || source instanceof observablearray_1.ObservableArray) {
+	        var res = cache([]);
+	        res.push.apply(res, source.map(function (value) { return toJSON(value, detectCycles, __alreadySeen); }));
+	        return res;
+	    }
 	    if (source instanceof observablemap_1.ObservableMap) {
-	        var res_1 = {};
-	        source.forEach(function (value, key) { return res_1[key] = value; });
-	        return res_1;
+	        var res = cache({});
+	        source.forEach(function (value, key) { return res[key] = toJSON(value, detectCycles, __alreadySeen); });
+	        return res;
 	    }
 	    if (typeof source === "object" && utils_1.isPlainObject(source)) {
-	        var res = {};
+	        var res = cache({});
 	        for (var key in source)
 	            if (source.hasOwnProperty(key))
-	                res[key] = toJSON(source[key]);
+	                res[key] = toJSON(source[key], detectCycles, __alreadySeen);
 	        return res;
 	    }
 	    if (isObservable(source) && source.$mobservable instanceof observablevalue_1.ObservableValue)
-	        return source();
+	        return toJSON(source(), detectCycles, __alreadySeen);
 	    return source;
 	}
 	exports.toJSON = toJSON;
-	function transaction(action) {
-	    return dnode_1.transaction(action);
-	}
-	exports.transaction = transaction;
 	var strict = false;
 	function getStrict() {
 	    return strict;
@@ -460,9 +547,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        default:
 	            throw "Illegal State";
 	    }
-	    if (Array.isArray(value))
-	        return observablearray_1.createObservableArray(value.slice(), childMode, context);
-	    if (utils_1.isPlainObject(value))
+	    if (Array.isArray(value) && Object.isExtensible(value))
+	        return observablearray_1.createObservableArray(value, childMode, true, context);
+	    if (utils_1.isPlainObject(value) && Object.isExtensible(value))
 	        return extendObservableHelper(value, value, childMode, context);
 	    return value;
 	    var _a;
@@ -485,17 +572,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return thing instanceof observablemap_1.ObservableMap;
 	}
 	exports.isObservableMap = isObservableMap;
-	function observe(thing, listener) {
+	function observe(thing, property, listener) {
+	    if (arguments.length === 2) {
+	        listener = property;
+	        property = undefined;
+	    }
 	    if (typeof thing === "function") {
 	        console.error("[mobservable.observe] is deprecated in combination with a function, use 'mobservable.autorun' instead");
 	        return autorun(thing);
 	    }
 	    if (typeof listener !== "function")
 	        throw new Error("[mobservable.observe] expected second argument to be a function");
-	    if (isObservableArray(thing) || isObservableMap(thing))
+	    if (isObservableArray(thing))
 	        return thing.observe(listener);
-	    if (isObservableObject(thing))
+	    if (isObservableMap(thing)) {
+	        if (property) {
+	            if (!thing._has(property))
+	                throw new Error("[mobservable.observe] the provided observable map has no key with name: " + property);
+	            return thing._data[property].observe(listener);
+	        }
+	        else {
+	            return thing.observe(listener);
+	        }
+	    }
+	    if (isObservableObject(thing)) {
+	        if (property) {
+	            if (!isObservable(thing, property))
+	                throw new Error("[mobservable.observe] the provided object has no observable property with name: " + property);
+	            return thing.$mobservable.values[property].observe(listener);
+	        }
 	        return thing.$mobservable.observe(listener);
+	    }
 	    if (utils_1.isPlainObject(thing))
 	        return observable(thing).$mobservable.observe(listener);
 	    throw new Error("[mobservable.observe] first argument should be an observable array, observable map, observable object or plain object.");
@@ -507,12 +614,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {/**
-	 * mobservable
-	 * (c) 2015 - Michel Weststrate
-	 * https://github.com/mweststrate/mobservable
-	 */
-	var __extends = (this && this.__extends) || function (d, b) {
+	/* WEBPACK VAR INJECTION */(function(global) {var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -522,6 +624,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	global.__mobservableViewStack = [];
 	var inTransaction = 0;
 	var changedValues = [];
+	var afterTransactionItems = [];
 	var mobservableId = 0;
 	function checkIfStateIsBeingModifiedDuringView(context) {
 	    if (core_1.getStrict() === true && isComputingView()) {
@@ -530,24 +633,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	exports.checkIfStateIsBeingModifiedDuringView = checkIfStateIsBeingModifiedDuringView;
-	function transaction(action) {
+	function transaction(action, thisArg) {
 	    inTransaction += 1;
 	    try {
-	        return action();
+	        return action.call(thisArg);
 	    }
 	    finally {
 	        if (--inTransaction === 0) {
-	            console.log("TRANSEND");
-	            var length_1 = changedValues.length;
-	            for (var i = 0; i < length_1; i++)
-	                changedValues[i].markReady(true);
-	            changedValues.splice(0, length_1);
-	            if (changedValues.length)
-	                throw new Error("[mobservable] Illegal State, please file a bug report");
+	            var values = changedValues.splice(0);
+	            for (var i = 0, l = values.length; i < l; i++)
+	                values[i].markReady(true);
+	            var actions = afterTransactionItems.splice(0);
+	            for (var i = 0, l = actions.length; i < l; i++)
+	                actions[i]();
 	        }
 	    }
 	}
 	exports.transaction = transaction;
+	function runAfterTransaction(action) {
+	    if (inTransaction === 0)
+	        action();
+	    else
+	        afterTransactionItems.push(action);
+	}
+	exports.runAfterTransaction = runAfterTransaction;
+	function isInTransaction() {
+	    return inTransaction > 0;
+	}
+	exports.isInTransaction = isInTransaction;
+	function untracked(action) {
+	    try {
+	        var dnode = new ViewNode({ object: null, name: "untracked" });
+	        global.__mobservableViewStack.push(dnode);
+	        return action();
+	    }
+	    finally {
+	        global.__mobservableViewStack.pop();
+	    }
+	}
+	exports.untracked = untracked;
 	(function (NodeState) {
 	    NodeState[NodeState["STALE"] = 0] = "STALE";
 	    NodeState[NodeState["PENDING"] = 1] = "PENDING";
@@ -588,8 +712,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    DataNode.prototype.markReady = function (stateDidActuallyChange) {
 	        if (inTransaction > 0) {
 	            changedValues.push(this);
-	            if (!stateDidActuallyChange)
-	                throw new Error("[mobservable] Illegal state; only data values can be readied while in transaction. Please file a bug with stacktrace.");
 	            return;
 	        }
 	        this.state = NodeState.READY;
@@ -632,6 +754,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.prevObserving = null;
 	        this.dependencyChangeCount = 0;
 	        this.dependencyStaleCount = 0;
+	        this.onSleepEmitter = null;
 	    }
 	    ViewNode.prototype.setRefCount = function (delta) {
 	        var rc = this.externalRefenceCount += delta;
@@ -650,6 +773,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.observing[i].removeObserver(this);
 	            this.observing = [];
 	            this.isSleeping = true;
+	            if (this.onSleepEmitter !== null)
+	                this.onSleepEmitter.emit(this._value);
 	        }
 	    };
 	    ViewNode.prototype.wakeUp = function () {
@@ -667,7 +792,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        else {
 	            if (stateDidActuallyChange)
 	                this.dependencyChangeCount += 1;
-	            if (--this.dependencyStaleCount === 0) {
+	            if (this.dependencyStaleCount > 0 && --this.dependencyStaleCount === 0) {
 	                this.state = NodeState.PENDING;
 	                if (this.dependencyChangeCount > 0)
 	                    this.computeNextState();
@@ -734,6 +859,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return true;
 	        return false;
 	    };
+	    ViewNode.prototype.onceSleep = function (onSleep) {
+	        if (this.onSleepEmitter === null)
+	            this.onSleepEmitter = new simpleeventemitter_1.default();
+	        this.onSleepEmitter.once(onSleep);
+	    };
 	    ViewNode.prototype.dispose = function () {
 	        if (this.observing)
 	            for (var l = this.observing.length, i = 0; i < l; i++)
@@ -755,6 +885,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var core_1 = __webpack_require__(1);
 	var extras_1 = __webpack_require__(3);
 	var utils_1 = __webpack_require__(7);
+	var simpleeventemitter_1 = __webpack_require__(6);
 	//# sourceMappingURL=dnode.js.map
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
@@ -769,19 +900,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	var utils_1 = __webpack_require__(7);
 	var core_1 = __webpack_require__(1);
 	function getDNode(thing, property) {
-	    if (!core_1.isObservable(thing))
-	        throw new Error("[mobservable.getDNode] " + thing + " doesn't seem to be reactive");
-	    if (property !== undefined) {
-	        var dnode;
-	        if (thing instanceof observablemap_1.ObservableMap)
-	            dnode = thing._data[property];
-	        else if (thing.$mobservable instanceof observableobject_1.ObservableObject) {
-	            var o = thing.$mobservable;
-	            dnode = o.values && o.values[property];
-	        }
+	    var propError = "[mobservable.getDNode] property '" + property + "' of '" + thing + "' doesn't seem to be a reactive property";
+	    if (thing instanceof observablemap_1.ObservableMap && property) {
+	        var dnode = thing._data[property];
 	        if (!dnode)
-	            throw new Error("[mobservable.getDNode] property '" + property + "' of '" + thing + "' doesn't seem to be a reactive property");
+	            throw new Error(propError);
 	        return dnode;
+	    }
+	    if (!core_1.isObservable(thing, property)) {
+	        if (property)
+	            throw new Error(propError);
+	        throw new Error("[mobservable.getDNode] " + thing + " doesn't seem to be reactive");
+	    }
+	    if (property !== undefined) {
+	        if (thing.$mobservable instanceof observableobject_1.ObservableObject)
+	            return thing.$mobservable.values[property];
+	        throw new Error(propError);
 	    }
 	    if (thing instanceof dnode_1.DataNode)
 	        return thing;
@@ -964,11 +1098,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * mobservable
-	 * (c) 2015 - Michel Weststrate
-	 * https://github.com/mweststrate/mobservable
-	 */
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
@@ -996,6 +1125,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ObservableView.prototype.get = function () {
 	        if (this.isComputing)
 	            throw new Error("[mobservable.view '" + this.context.name + "'] Cycle detected");
+	        if (this.state === dnode_1.NodeState.STALE && dnode_1.isInTransaction()) {
+	            return this.func.call(this.scope);
+	        }
 	        if (this.isSleeping) {
 	            if (dnode_1.isComputingView()) {
 	                this.wakeUp();
@@ -1104,11 +1236,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * mobservable
-	 * (c) 2015 - Michel Weststrate
-	 * https://github.com/mweststrate/mobservable
-	 */
 	function once(func) {
 	    var invoked = false;
 	    return function () {
@@ -1228,11 +1355,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * mobservable
-	 * (c) 2015 - Michel Weststrate
-	 * https://github.com/mweststrate/mobservable
-	 */
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
@@ -1251,12 +1373,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	StubArray.prototype = [];
 	var ObservableArrayAdministration = (function (_super) {
 	    __extends(ObservableArrayAdministration, _super);
-	    function ObservableArrayAdministration(array, mode, context) {
+	    function ObservableArrayAdministration(array, mode, supportEnumerable, context) {
 	        _super.call(this, context ? context : { name: undefined, object: undefined });
 	        this.array = array;
 	        this.mode = mode;
-	        this.values = [];
-	        this.changeEvent = new simpleeventemitter_1.default();
+	        this.supportEnumerable = supportEnumerable;
+	        this.lastKnownLength = 0;
 	        if (!this.context.object)
 	            this.context.object = array;
 	    }
@@ -1276,17 +1398,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.spliceWithArray(newLength, currentLength - newLength);
 	    };
 	    ObservableArrayAdministration.prototype.updateLength = function (oldLength, delta) {
+	        if (oldLength !== this.lastKnownLength)
+	            throw new Error("[mobservable] Modification exception: the internal structure of an observable array was changed. Did you use peek() to change it?");
+	        this.lastKnownLength += delta;
 	        if (delta < 0) {
 	            dnode_1.checkIfStateIsBeingModifiedDuringView(this.context);
-	            for (var i = oldLength + delta; i < oldLength; i++)
-	                delete this.array[i];
+	            if (this.supportEnumerable)
+	                for (var i = oldLength + delta; i < oldLength; i++)
+	                    delete this.array[i];
 	        }
 	        else if (delta > 0) {
 	            dnode_1.checkIfStateIsBeingModifiedDuringView(this.context);
 	            if (oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
 	                reserveArrayBuffer(oldLength + delta);
-	            for (var i = oldLength, end = oldLength + delta; i < end; i++)
-	                Object.defineProperty(this.array, i, ENUMERABLE_PROPS[i]);
+	            if (this.supportEnumerable)
+	                for (var i = oldLength, end = oldLength + delta; i < end; i++)
+	                    Object.defineProperty(this.array, i, ENUMERABLE_PROPS[i]);
 	        }
 	    };
 	    ObservableArrayAdministration.prototype.spliceWithArray = function (index, deleteCount, newItems) {
@@ -1319,6 +1446,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    ObservableArrayAdministration.prototype.makeReactiveArrayItem = function (value) {
 	        core_1.assertUnwrapped(value, "Array values cannot have modifiers");
+	        if (this.mode === core_1.ValueMode.Flat || this.mode === core_1.ValueMode.Reference)
+	            return value;
 	        return core_1.makeChildObservable(value, this.mode, {
 	            object: this.context.object,
 	            name: this.context.name + "[x]"
@@ -1326,13 +1455,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    ObservableArrayAdministration.prototype.notifyChildUpdate = function (index, oldValue) {
 	        this.notifyChanged();
-	        this.changeEvent.emit({ object: this.array, type: 'update', index: index, oldValue: oldValue });
+	        if (this.changeEvent)
+	            this.changeEvent.emit({ object: this.array, type: 'update', index: index, oldValue: oldValue });
 	    };
 	    ObservableArrayAdministration.prototype.notifySplice = function (index, deleted, added) {
 	        if (deleted.length === 0 && added.length === 0)
 	            return;
 	        this.notifyChanged();
-	        this.changeEvent.emit({ object: this.array, type: 'splice', index: index, addedCount: added.length, removed: deleted });
+	        if (this.changeEvent)
+	            this.changeEvent.emit({ object: this.array, type: 'splice', index: index, addedCount: added.length, removed: deleted });
 	    };
 	    ObservableArrayAdministration.prototype.notifyChanged = function () {
 	        this.markStale();
@@ -1341,24 +1472,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ObservableArrayAdministration;
 	})(dnode_1.DataNode);
 	exports.ObservableArrayAdministration = ObservableArrayAdministration;
-	function createObservableArray(initialValues, mode, context) {
-	    return new ObservableArray(initialValues, mode, context);
+	function createObservableArray(initialValues, mode, supportEnumerable, context) {
+	    return new ObservableArray(initialValues, mode, supportEnumerable, context);
 	}
 	exports.createObservableArray = createObservableArray;
 	var ObservableArray = (function (_super) {
 	    __extends(ObservableArray, _super);
-	    function ObservableArray(initialValues, mode, context) {
+	    function ObservableArray(initialValues, mode, supportEnumerable, context) {
 	        _super.call(this);
+	        var adm = new ObservableArrayAdministration(this, mode, supportEnumerable, context);
 	        Object.defineProperty(this, "$mobservable", {
 	            enumerable: false,
 	            configurable: false,
-	            value: new ObservableArrayAdministration(this, mode, context)
+	            value: adm
 	        });
-	        if (initialValues && initialValues.length)
-	            this.replace(initialValues);
+	        if (initialValues && initialValues.length) {
+	            adm.updateLength(0, initialValues.length);
+	            adm.values = initialValues.map(function (v) { return adm.makeReactiveArrayItem(v); });
+	        }
+	        else
+	            adm.values = [];
 	    }
 	    ObservableArray.prototype.observe = function (listener, fireImmediately) {
 	        if (fireImmediately === void 0) { fireImmediately = false; }
+	        if (this.$mobservable.changeEvent === undefined)
+	            this.$mobservable.changeEvent = new simpleeventemitter_1.default();
 	        if (fireImmediately)
 	            listener({ object: this, type: 'splice', index: 0, addedCount: this.$mobservable.values.length, removed: [] });
 	        return this.$mobservable.changeEvent.on(listener);
@@ -1372,6 +1510,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ObservableArray.prototype.toJSON = function () {
 	        this.$mobservable.notifyObserved();
 	        return this.$mobservable.values.slice();
+	    };
+	    ObservableArray.prototype.peek = function () {
+	        this.$mobservable.notifyObserved();
+	        return this.$mobservable.values;
 	    };
 	    ObservableArray.prototype.find = function (predicate, thisArg, fromIndex) {
 	        if (fromIndex === void 0) { fromIndex = 0; }
@@ -1420,10 +1562,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.$mobservable.values.length;
 	    };
 	    ObservableArray.prototype.reverse = function () {
-	        return this.replace(this.$mobservable.values.reverse());
+	        this.$mobservable.notifyObserved();
+	        var clone = this.slice();
+	        return clone.reverse.apply(clone, arguments);
 	    };
 	    ObservableArray.prototype.sort = function (compareFn) {
-	        return this.replace(this.$mobservable.values.sort.apply(this.$mobservable.values, arguments));
+	        this.$mobservable.notifyObserved();
+	        var clone = this.slice();
+	        return clone.sort.apply(clone, arguments);
 	    };
 	    ObservableArray.prototype.remove = function (value) {
 	        var idx = this.$mobservable.values.indexOf(value);
@@ -1448,6 +1594,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    "find",
 	    "observe",
 	    "pop",
+	    "peek",
 	    "push",
 	    "remove",
 	    "replace",
@@ -1610,15 +1757,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	var observablevalue_1 = __webpack_require__(9);
 	var core_1 = __webpack_require__(1);
 	var simpleeventemitter_1 = __webpack_require__(6);
+	var dnode_1 = __webpack_require__(2);
 	var observablearray_1 = __webpack_require__(8);
 	var utils_1 = __webpack_require__(7);
 	var ObservableMap = (function () {
 	    function ObservableMap(initialData, valueModeFunc) {
 	        var _this = this;
-	        this.$mobservable = true;
+	        this.$mobservable = {};
 	        this._data = {};
 	        this._hasMap = {};
-	        this._keys = new observablearray_1.ObservableArray(null, core_1.ValueMode.Reference, {
+	        this._keys = new observablearray_1.ObservableArray(null, core_1.ValueMode.Reference, false, {
 	            name: ".keys()",
 	            object: this
 	        });
@@ -1658,7 +1806,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	        else {
-	            core_1.transaction(function () {
+	            dnode_1.transaction(function () {
 	                _this._data[key] = new observablevalue_1.ObservableValue(value, _this._valueMode, {
 	                    name: "." + key,
 	                    object: _this
@@ -1678,7 +1826,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.assertValidKey(key);
 	        if (this._has(key)) {
 	            var oldValue = this._data[key]._value;
-	            core_1.transaction(function () {
+	            dnode_1.transaction(function () {
 	                _this._keys.remove(key);
 	                _this._updateHasMapEntry(key, false);
 	                var observable = _this._data[key];
@@ -1728,7 +1876,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    ObservableMap.prototype.merge = function (other) {
 	        var _this = this;
-	        core_1.transaction(function () {
+	        dnode_1.transaction(function () {
 	            if (other instanceof ObservableMap)
 	                other.keys().forEach(function (key) { return _this.set(key, other.get(key)); });
 	            else
@@ -1738,7 +1886,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    ObservableMap.prototype.clear = function () {
 	        var _this = this;
-	        core_1.transaction(function () {
+	        dnode_1.transaction(function () {
 	            _this.keys().forEach(_this.delete, _this);
 	        });
 	    };
@@ -1778,6 +1926,47 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	//# sourceMappingURL=interfaces.js.map
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var observableview_1 = __webpack_require__(5);
+	function createTransformer(transformer, onCleanup) {
+	    var _this = this;
+	    if (typeof transformer !== "function" || transformer.length !== 1)
+	        throw new Error("[mobservable] transformer parameter should be a function that accepts one argument");
+	    var objectCache = {};
+	    return function (object) {
+	        var identifier = getMemoizationId(object);
+	        var reactiveTransformer = objectCache[identifier];
+	        if (reactiveTransformer)
+	            return reactiveTransformer.get();
+	        reactiveTransformer = objectCache[identifier] = new observableview_1.ObservableView(function () {
+	            return transformer(object);
+	        }, _this, {
+	            object: object,
+	            name: "transformer-" + transformer.name + "-" + identifier
+	        }, false);
+	        reactiveTransformer.onceSleep(function (lastValue) {
+	            delete objectCache[identifier];
+	            if (onCleanup)
+	                onCleanup(lastValue, object);
+	        });
+	        return reactiveTransformer.get();
+	    };
+	}
+	exports.createTransformer = createTransformer;
+	var transformId = 0;
+	function getMemoizationId(object) {
+	    if (object === null || typeof object !== "object")
+	        throw new Error("[mobservable] transform expected some kind of object, got: " + object);
+	    var tid = object.$transformId;
+	    if (tid === undefined)
+	        return object.$transformId = ++transformId;
+	    return tid;
+	}
+	//# sourceMappingURL=transform.js.map
 
 /***/ }
 /******/ ])

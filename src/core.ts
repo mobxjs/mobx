@@ -4,7 +4,7 @@
  * https://github.com/mweststrate/mobservable
  */
 
-import {isComputingView, transaction} from './dnode';
+import {isComputingView, transaction, untracked} from './dnode';
 import {Lambda, IObservableArray, IObservableValue, IContextInfoStruct, IContextInfo, IArrayChange, IArraySplice, IObjectChange} from './interfaces';
 import {isPlainObject, once} from './utils';
 import {ObservableValue} from './observablevalue';
@@ -12,7 +12,8 @@ import {ObservableView, throwingViewSetter} from './observableview';
 import {createObservableArray, ObservableArray} from './observablearray';
 import {ObservableObject} from './observableobject';
 import {ObservableMap, KeyValueMap} from './observablemap';
-import {DataNode} from './dnode';
+import {DataNode, runAfterTransaction} from './dnode';
+import {getDNode} from './extras';
 
 /**
     * Turns an object, array or function into a reactive structure.
@@ -73,6 +74,10 @@ export function map<V>(initialValues?: KeyValueMap<V>, valueModifier?: Function)
     return new ObservableMap(initialValues, valueModifier);
 }
 
+export function fastArray<V>(initialValues?: V[]): IObservableArray<V> {
+    return createObservableArray(initialValues, ValueMode.Flat, false, null);
+}
+
 /**
     * Can be used in combination with makeReactive / extendReactive.
     * Enforces that a reference to 'value' is stored as property,
@@ -114,9 +119,18 @@ export function asFlat<T>(value:T):T {
     * @param value object, function or array
     * @param propertyName if propertyName is specified, checkes whether value.propertyName is reactive.
     */
-export function isObservable(value):boolean {
+export function isObservable(value, property?:string):boolean {
     if (value === null || value === undefined)
         return false;
+    if (property !== undefined) {
+        if (value instanceof ObservableMap || value instanceof ObservableArray)
+            throw new Error("[mobservable.isObservable] isObservable(object, propertyName) is not supported for arrays and maps. Use map.has or array.length instead.");
+        else if (value.$mobservable instanceof ObservableObject) {
+            const o = <ObservableObject>value.$mobservable;
+            return o.values && !!o.values[property];
+        }
+        return false;
+    }
     return !!value.$mobservable || value instanceof DataNode;
 }
 
@@ -133,14 +147,27 @@ export function autorun(view:Lambda, scope?:any):Lambda {
         throw new Error("[mobservable.autorun] expects a function");
     if (unwrappedView.length !== 0)
         throw new Error("[mobservable.autorun] expects a function without arguments");
+
     const observable = new ObservableView(unwrappedView, scope, {
         object: scope || view,
         name: view.name
     }, mode === ValueMode.Structure);
-    observable.setRefCount(+1);
+
+    let disposedPrematurely = false;
+    let started = false;
+
+    runAfterTransaction(() => {
+        if (!disposedPrematurely) {
+            observable.setRefCount(+1);
+            started = true;
+        }
+    });
 
     const disposer = once(() => {
-        observable.setRefCount(-1);
+        if (started)
+            observable.setRefCount(-1);
+        else
+            disposedPrematurely = true;
     });
     (<any>disposer).$mobservable = observable;
     return disposer;
@@ -155,12 +182,18 @@ export function autorun(view:Lambda, scope?:any):Lambda {
     * @returns disposer function to prematurely end the observer.
     */
 export function autorunUntil(predicate: ()=>boolean, effect: Lambda, scope?: any): Lambda {
+    let disposeImmediately = false;
     const disposer = autorun(() => {
         if (predicate.call(scope)) {
-            disposer();
-            effect.call(scope);
+            if (disposer)
+                disposer();
+            else
+                disposeImmediately = true;
+            untracked(() => effect.call(scope));
         }
     });
+    if (disposeImmediately)
+        disposer();
     return disposer;
 }
 
@@ -175,7 +208,7 @@ export function autorunUntil(predicate: ()=>boolean, effect: Lambda, scope?: any
     * @param delay, optional. After how many milleseconds the effect should fire.
     * @param scope, optional, the 'this' value of 'view' and 'effect'.
     */
-export function autorunAsync<T>(view: () => T, effect: (latestValue : T ) => void, delay:number = 1, scope?: any): Lambda {
+function autorunAsyncDeprecated<T>(view: () => T, effect: (latestValue : T ) => void, delay:number = 1, scope?: any): Lambda {
     var latestValue: T = undefined;
     var timeoutHandle;
 
@@ -196,6 +229,59 @@ export function autorunAsync<T>(view: () => T, effect: (latestValue : T ) => voi
     });
 }
 
+// Deprecate:
+export function autorunAsync<T>(view: () => T, effect: (latestValue : T ) => void, delay?:number, scope?: any): Lambda;
+export function autorunAsync(func: Lambda, delay?:number, scope?: any): Lambda;
+// Deprecate weird overload:
+export function autorunAsync<T>(func: Lambda | {():T}, delay:number | {(x:T):void} = 1, scope?: any): Lambda {
+    if (typeof delay === "function") {
+        console.warn("[mobservable] autorun(func, func) is deprecated and will removed in 2.0");
+        return autorunAsyncDeprecated.apply(null, arguments);
+    }
+    let shouldRun = false;
+    let tickScheduled = false;
+    let tick = observable(0);
+    let observedValues: DataNode[] = [];
+    let disposer: Lambda;
+    let isDisposed = false;
+    
+    function schedule(f: Lambda) {
+        setTimeout(f, delay);
+    }
+    
+    function doTick() {
+        tickScheduled = false;
+        shouldRun = true;
+        tick(tick() + 1);
+    }
+    
+    disposer = autorun(() => {
+        if (isDisposed)
+            return;
+        tick(); // observe so that autorun fires on next tick
+        if (shouldRun) {
+            func.call(scope);
+            observedValues = (<any>disposer).$mobservable.observing;
+            shouldRun = false;
+        } else {
+            // keep observed values eager, probably cheaper then forgetting 
+            // about the value and later re-evaluating lazily, 
+            // probably cheaper when computations are expensive 
+            observedValues.forEach(o => o.notifyObserved()); 
+            if (!tickScheduled) {
+                tickScheduled = true;
+                schedule(doTick);
+            }
+        }
+    });
+
+    return once(() => {
+        isDisposed = true; // short-circuit any pending calculation
+        if (disposer)
+            disposer();
+    });
+}
+
 /**
     * expr can be used to create temporarily views inside views.
     * This can be improved to improve performance if a value changes often, but usually doesn't affect the outcome of an expression.
@@ -213,6 +299,7 @@ export function autorunAsync<T>(view: () => T, effect: (latestValue : T ) => voi
 export function expr<T>(expr: () => T, scope?):T {
     if (!isComputingView())
         console.warn("[mobservable.expr] 'expr' should only be used inside other reactive functions.");
+    // optimization: would be more efficient if the expr itself wouldn't be evaluated first on the next change, but just a 'changed' signal would be fired
     return observable(expr, scope) ();
 }
 
@@ -305,39 +392,47 @@ function observableDecorator(target:Object, key:string, baseDescriptor:PropertyD
 
 /**
     * Basically, a deep clone, so that no reactive property will exist anymore.
-    * Doesn't follow references.
     */
-export function toJSON(source) {
+export function toJSON(source, detectCycles: boolean = true, __alreadySeen:[any,any][] = null) {
+    // optimization: using ES6 map would be more efficient!
+    function cache(value) {
+        if (detectCycles)
+            __alreadySeen.push([source, value]);
+        return value;
+    }
+
+    if (detectCycles && __alreadySeen === null)
+        __alreadySeen = [];
+    if (detectCycles && source !== null && typeof source === "object") {
+        for (let i = 0, l = __alreadySeen.length; i < l; i++)
+            if (__alreadySeen[i][0] === source)
+                return __alreadySeen[i][1];
+    }
+
     if (!source)
         return source;
-    if (Array.isArray(source) || source instanceof ObservableArray)
-        return source.map(toJSON);
+    if (Array.isArray(source) || source instanceof ObservableArray) {
+        const res = cache([]);
+        res.push(...source.map(value => toJSON(value, detectCycles, __alreadySeen)));
+        return res;
+    }
     if (source instanceof ObservableMap) {
-        const res = {};
-        source.forEach((value, key) => res[key] = value);
+        const res = cache({});
+        source.forEach(
+            (value, key) => res[key] = toJSON(value, detectCycles, __alreadySeen)
+        );
         return res;
     }
     if (typeof source === "object" && isPlainObject(source)) {
-        var res = {};
+        const res = cache({});
         for (var key in source) if (source.hasOwnProperty(key))
-            res[key] = toJSON(source[key]);
+            res[key] = toJSON(source[key], detectCycles, __alreadySeen);
         return res;
     }
     if (isObservable(source) && source.$mobservable instanceof ObservableValue)
-        return source();
+        return toJSON(source(), detectCycles, __alreadySeen);
     return source;
 }
-
-/**
-    * During a transaction no views are updated until the end of the transaction.
-    * The transaction will be run synchronously nonetheless.
-    * @param action a function that updates some reactive state
-    * @returns any value that was returned by the 'action' parameter.
-    */
-export function transaction<T>(action:()=>T):T {
-    return transaction(action);
-}
-
 /**
     * If strict is enabled, views are not allowed to modify the state.
     * This is a recommended practice, as it makes reasoning about your application simpler.
@@ -471,9 +566,9 @@ export function makeChildObservable(value, parentMode:ValueMode, context) {
 			throw "Illegal State";
 	}
 
-	if (Array.isArray(value))
-		return createObservableArray(<[]> value.slice(), childMode, context);
-	if (isPlainObject(value))
+	if (Array.isArray(value) && Object.isExtensible(value))
+		return createObservableArray(<[]> value, childMode, true, context);
+	if (isPlainObject(value) && Object.isExtensible(value))
 		return extendObservableHelper(value, value, childMode, context);
 	return value;
 }
@@ -499,16 +594,37 @@ export function observe<T>(observableArray:IObservableArray<T>, listener:(change
 export function observe<T>(observableMap:ObservableMap<T>, listener:(change:IObjectChange<T, ObservableMap<T>>) => void): Lambda;
 export function observe(func:()=>void): Lambda;
 export function observe<T extends Object>(object:T, listener:(change:IObjectChange<any, T>) => void): Lambda;
-export function observe(thing, listener?):Lambda {
+export function observe<T extends Object,Y>(object:T, prop: string, listener:(newValue:Y, oldValue?: Y) => void): Lambda;
+export function observe(thing, property?, listener?):Lambda {
+    if (arguments.length === 2) {
+        listener = property;
+        property = undefined;
+    }
     if (typeof thing === "function") {
         console.error("[mobservable.observe] is deprecated in combination with a function, use 'mobservable.autorun' instead");
         return autorun(thing);
-    } if (typeof listener !== "function")
+    }
+    if (typeof listener !== "function")
         throw new Error("[mobservable.observe] expected second argument to be a function");
-    if (isObservableArray(thing) || isObservableMap(thing))
+    if (isObservableArray(thing))
         return thing.observe(listener);
-    if (isObservableObject(thing))
+    if (isObservableMap(thing)) {
+        if (property) {
+            if (!thing._has(property))
+                throw new Error("[mobservable.observe] the provided observable map has no key with name: " + property);
+            return thing._data[property].observe(listener);
+        } else {
+            return thing.observe(listener);
+        }
+    }
+    if (isObservableObject(thing)) {
+        if (property) {
+            if (!isObservable(thing, property))
+                throw new Error("[mobservable.observe] the provided object has no observable property with name: " + property);
+            return thing.$mobservable.values[property].observe(listener);
+        }
         return thing.$mobservable.observe(listener);
+    }
     if (isPlainObject(thing))
         return (<any>observable(thing)).$mobservable.observe(listener);
     throw new Error("[mobservable.observe] first argument should be an observable array, observable map, observable object or plain object.");

@@ -7,7 +7,7 @@ class Box {
     @observable uninitialized;
     @observable height = 20;
     @observable sizes = [2];
-    @observable someFunc = function () { return 2; }
+    @observable someFunc = function () { return 2; };
     @observable get width() {
         return this.height * this.sizes.length * this.someFunc() * (this.uninitialized ? 2 : 1);
     }

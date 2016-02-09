@@ -1,5 +1,5 @@
 import * as core from './core';
-import {isComputingView} from './dnode';
+import {isComputingView, untracked} from './dnode';
 import {quickDiff} from './utils';
 import {IDependencyTree, IObserverTree, ITransitionEvent, Lambda} from './interfaces';
 import {getDependencyTree, getDNode, getObserverTree, trackTransitions} from './extras';
@@ -22,16 +22,29 @@ export {
 	autorunUntil,
 	autorunAsync,
 	expr,
-	transaction,
 	toJSON,
 	// deprecated, add warning?
 	isObservable as isReactive,
 	map,
+	fastArray,
 	observable as makeReactive,
 	extendObservable as extendReactive,
 	autorunUntil as observeUntil,
 	autorunAsync as observeAsync
 } from './core';
+
+export {
+	createTransformer
+} from './transform';
+
+export {
+	untracked,
+	transaction
+} from './dnode';
+
+export {
+	ObservableMap
+} from './observablemap';
 
 /**
  * 'Private' elements that are exposed for testing and debugging utilities

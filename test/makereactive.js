@@ -32,6 +32,7 @@ test('isObservable', function(t) {
 
     t.equal(m.isObservable(m.observable([])), true);
     t.equal(m.isObservable(m.observable({})), true);
+    t.equal(m.isObservable(m.observable(Object.freeze({}))), false);
     t.equal(m.isObservable(m.observable(function() {})), true);
 
     t.equal(m.isObservable([]), false);
@@ -49,6 +50,11 @@ test('isObservable', function(t) {
 
     t.equal(m.isObservable(m.observable(function(){})), true);
     t.equal(m.isObservable(m.autorun(function(){})), true);
+
+    t.equal(m.isObservable(m.observable({ a: 1}), "a"), true);
+    t.equal(m.isObservable(m.observable({ a: 1}), "b"), false);
+
+    t.equal(m.isObservable(m.map()), true);
 
     t.end();
 
@@ -354,9 +360,9 @@ test('as structure', function(t) {
     x.x = [3,2,1];
     c();
     x.x.sort();
-    c();
+    nc();
     x.x.sort();
-    c(); // But.., Ideally, no change here ..! nc();
+    nc();
     x.x[1] = 2;
     nc();
     x.x[0] = 0;

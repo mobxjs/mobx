@@ -1,3 +1,70 @@
+# 1.2.4
+
+* Fixed: observable arrays didn't properly apply modifiers if created using `asFlat([])` or `fastArray([])`
+* Don't try to make frozen objects observable (by @andykog)
+* `observableArray.reverse` no longer mutates the arry but just returns a sorted copy
+* Updated tests to use babel6
+
+# 1.2.3
+
+* observableArray.sort no longer mutates the array being sorted but returns a sorted clone instead (#90)
+* removed an incorrect internal state assumption (#97)
+
+# 1.2.2
+
+* Add bower support
+
+# 1.2.1
+
+* Computed value now yields consistent results when being inspected while in transaction
+
+# 1.2.0
+
+* Implemented #67: Reactive graph transformations. See: http://mweststrate.github.io/mobservable/refguide/create-transformer.html
+
+# 1.1.8
+
+* Implemented #59, `isObservable` and `observe` now support a property name as second param to observe individual values on maps and objects.
+
+# 1.1.7
+
+* Fixed #77: package consumers with --noImplicitAny should be able to build
+
+# 1.1.6
+
+* Introduced `mobservable.fastArray(array)`, in addition to `mobservable.observable(array)`. Which is much faster when adding items but doesn't support enumerability (`for (var idx in ar) ..` loops).
+* Introduced `observableArray.peek()`, for fast access to the array values. Should be used read-only.
+
+# 1.1.5
+
+* Fixed 71: transactions should not influence running computations
+
+# 1.1.4
+
+* Fixed #65; illegal state exception when using a transaction inside a reactive function. Credits: @kmalakoff
+
+# 1.1.3
+
+* Fixed #61; if autorun was created during a transaction, postpone execution until the end of the transaction
+
+# 1.1.2
+
+* Fixed exception when autorunUntil finished immediately
+
+# 1.1.1
+
+* `toJSON` now serializes object trees with cycles as well. If you know the object tree is acyclic, pass in `false` as second parameter for a performance gain. 
+
+# 1.1.0
+
+* Exposed `ObservableMap` type
+* Introduced `mobservable.untracked(block)`
+* Introduced `mobservable.autorunAsync(block, delay)`
+
+# 1.0.9
+
+Removed accidental log message
+
 # 1.0.7 / 1.0.8
 
 Fixed inconsistency when using `transaction` and `@observer`, which sometimes caused stale values to be displayed.

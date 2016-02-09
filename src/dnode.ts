@@ -14,6 +14,7 @@ global.__mobservableViewStack = [];
 
 let inTransaction = 0;
 const changedValues : DataNode[] = [];
+const afterTransactionItems: {():void}[] = [];
 
 var mobservableId = 0;
 
@@ -30,20 +31,48 @@ Current stack size is ${ts.length}, active view: "${ts[ts.length -1].toString()}
     }
 }
 
-export function transaction<T>(action:()=>T):T {
+
+/**
+    * During a transaction no views are updated until the end of the transaction.
+    * The transaction will be run synchronously nonetheless.
+    * @param action a function that updates some reactive state
+    * @returns any value that was returned by the 'action' parameter.
+    */
+export function transaction<T>(action:()=>T, thisArg?):T {
     inTransaction += 1;
     try {
-        return action();
+        return action.call(thisArg);
     } finally {
         if (--inTransaction === 0) {
-            console.log("TRANSEND");
-            const length = changedValues.length;
-            for (var i = 0; i < length; i++)
-                changedValues[i].markReady(true);
-            changedValues.splice(0, length);
-            if (changedValues.length)
-                throw new Error("[mobservable] Illegal State, please file a bug report");
+            const values = changedValues.splice(0);
+            for (var i = 0, l = values.length; i < l; i++)
+                values[i].markReady(true);
+
+            const actions = afterTransactionItems.splice(0);
+            for (var i = 0, l = actions.length; i < l; i++)
+                actions[i]();
         }
+    }
+}
+
+export function runAfterTransaction(action: () => void) {
+    if (inTransaction === 0)
+        action();
+    else
+        afterTransactionItems.push(action);
+}
+
+export function isInTransaction() {
+    return inTransaction > 0;
+}
+
+export function untracked<T>(action:()=>T):T {
+    try {
+        var dnode = new ViewNode({ object: null, name: "untracked" });
+        global.__mobservableViewStack.push(dnode);
+        return action();
+    } finally {
+        global.__mobservableViewStack.pop();
     }
 }
 
@@ -101,8 +130,6 @@ export class DataNode {
     markReady(stateDidActuallyChange:boolean) {
        if (inTransaction > 0) {
             changedValues.push(this);
-            if (!stateDidActuallyChange)
-                throw new Error("[mobservable] Illegal state; only data values can be readied while in transaction. Please file a bug with stacktrace.");
             return;
         }
         this.state = NodeState.READY;
@@ -152,6 +179,7 @@ export class ViewNode extends DataNode {
     private prevObserving: DataNode[] = null; // nodes we were looking at before. Used to determine changes in the dependency tree
     private dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
     private dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
+    private onSleepEmitter: SimpleEventEmitter = null;
 
     setRefCount(delta:number) {
         var rc = this.externalRefenceCount += delta;
@@ -172,6 +200,8 @@ export class ViewNode extends DataNode {
                 this.observing[i].removeObserver(this);
             this.observing = [];
             this.isSleeping = true;
+            if (this.onSleepEmitter !== null)
+                this.onSleepEmitter.emit((<any>this)._value); // mwe: XXX: fix when flatten
         }
     }
 
@@ -191,7 +221,7 @@ export class ViewNode extends DataNode {
         } else { // not stale, thus ready since pending states are not propagated
             if (stateDidActuallyChange)
                 this.dependencyChangeCount += 1;
-            if (--this.dependencyStaleCount === 0) { // all dependencies are ready
+            if (this.dependencyStaleCount > 0 && --this.dependencyStaleCount === 0) { // all dependencies are ready
                 this.state = NodeState.PENDING;
                 // did any of the observables really change?
                 if (this.dependencyChangeCount > 0)
@@ -270,6 +300,12 @@ export class ViewNode extends DataNode {
         return false;
     }
 
+    public onceSleep(onSleep: (lastValue:any) => void) {
+        if (this.onSleepEmitter === null)
+            this.onSleepEmitter = new SimpleEventEmitter();
+        this.onSleepEmitter.once(onSleep);
+    }
+
     public dispose() {
         if (this.observing) for(var l=this.observing.length, i=0; i<l; i++)
             this.observing[i].removeObserver(this);
@@ -290,3 +326,4 @@ import {getStrict, withStrict} from './core';
 import {transitionTracker, reportTransition} from './extras';
 import {quickDiff} from './utils';
 import {IContextInfoStruct} from './interfaces';
+import SimpleEventEmitter from './simpleeventemitter';

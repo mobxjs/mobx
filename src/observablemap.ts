@@ -1,8 +1,8 @@
 import {ObservableValue} from './observablevalue';
-import {ValueMode, observable, transaction, assertUnwrapped, getValueModeFromModifierFunc} from './core';
+import {ValueMode, observable, assertUnwrapped, getValueModeFromModifierFunc} from './core';
 import {IObservableArray, Lambda, IObjectChange} from './interfaces';
 import SimpleEventEmitter from './simpleeventemitter';
-import {isComputingView} from './dnode';
+import {isComputingView, transaction} from './dnode';
 import {ObservableArray} from './observablearray';
 import {isPlainObject} from './utils';
 
@@ -15,10 +15,10 @@ export type Entries<V> = [string, V][]
 export type IObservableMapChange<T> = IObjectChange<T, ObservableMap<T>>;
 
 export class ObservableMap<V> {
-	$mobservable = true;
+	$mobservable = {};
 	private _data: { [key:string]: ObservableValue<V> } = {};
 	private _hasMap: { [key:string]: ObservableValue<boolean> } = {}; // hasMap, not hashMap >-).
-	private _keys: IObservableArray<string> = <any> new ObservableArray(null, ValueMode.Reference, {
+	private _keys: IObservableArray<string> = <any> new ObservableArray(null, ValueMode.Reference, false, {
 		name: ".keys()", 
 		object: this
 	});

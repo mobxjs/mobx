@@ -139,7 +139,7 @@ test('batch', function(t) {
         a(2);
         b(3);
         a(6);
-        t.deepEqual(100, d()); // still hunderd
+        t.deepEqual(100, mobservable.extras.getDNode(d)._value); // still hunderd
         return 2;
     });
 
@@ -787,6 +787,25 @@ test('when', function(t) {
     t.end();
 })
 
+test('when 2', function(t) {
+    var x = m(3);
+
+    var called = 0;
+    mobservable.autorunUntil(function() {
+        return (x() === 3);
+    }, function() {
+        called += 1;
+    });
+
+    t.equal(called, 1);
+    t.equal(x.$mobservable.observers.length, 0)
+    x(5);
+    x(3);
+    t.equal(called, 1);
+    
+    t.end();
+})
+
 test('async', function(t) {
     var called = 0;
     var x = m(3);
@@ -1042,7 +1061,7 @@ test('json2', function(t) {
 
     o.todos[1].details = mobservable.observable({ url: "google" });
     o.todos[1].tags = ["foo", "bar"];
-    t.deepEqual(mobservable.toJSON(o), {
+    t.deepEqual(mobservable.toJSON(o, false), {
          "todos": [
             {
                 "title": "write blog",
@@ -1076,6 +1095,35 @@ test('json2', function(t) {
     t.end();
 })
 
+test('json cycles', function(t) {
+    var a = observable({
+        b: 1,
+        c: [2],
+        d: mobservable.map(),
+        e: a
+    });
+    
+    a.e = a;
+    a.c.push(a, a.d);
+    a.d.set("f", a);
+    a.d.set("d", a.d);
+    a.d.set("c", a.c);
+
+    var cloneA = mobservable.toJSON(a, true);
+    var cloneC = cloneA.c;
+    var cloneD = cloneA.d;
+    
+    t.equal(cloneA.b, 1);
+    t.equal(cloneA.c[0], 2);
+    t.equal(cloneA.c[1], cloneA);
+    t.equal(cloneA.c[2], cloneD);
+    t.equal(cloneD.f, cloneA);
+    t.equal(cloneD.d, cloneD);
+    t.equal(cloneD.c, cloneC);
+    t.equal(cloneA.e, cloneA);
+    
+    t.end();
+})
 
 test('issue 50', function(t) {
     var x = observable({
@@ -1206,5 +1254,222 @@ test("verify array in transaction", function(t) {
     });
     t.equal(aValue, 10);
     t.equal(aCount, 2);
+    t.end();
+})
+
+test('delay autorun until end of transaction', function(t) {
+    var events = [];
+    var x = observable({
+        a: 2,
+        b: function() {
+            events.push("calc y");
+            return this.a;
+        }
+    });
+    var disposer1; 
+    var disposer2 = mobservable.extras.trackTransitions(true, function(info) {
+        events.push([info.state, info.name]);
+    });
+
+    mobservable.transaction(function() {
+        mobservable.transaction(function() {
+            
+            disposer1 = mobservable.autorun(function test() {
+                events.push("auto");
+                x.b;
+            });
+            
+            x.a = 3;
+            x.a = 4;
+            
+            events.push("end1");
+        });
+        x.a = 5;
+        events.push("end2");
+    });
+    events.push("post trans1");
+    x.a = 6;
+    events.push("post trans2");
+    disposer1();
+    x.a = 3;
+    events.push("post trans3");
+
+    t.deepEqual(events, [
+            [ 'STALE', '.a' ], 
+            [ 'STALE', '.a' ],
+            "end1",
+            [ 'STALE', '.a' ],
+            "end2",
+            [ 'READY', '.a'],
+            [ 'READY', '.a'],
+            [ 'READY', '.a'],
+            [ 'PENDING', 'test'],
+            'auto',
+            [ 'PENDING', '.b'],
+            'calc y',
+            [ 'READY', '.b'],
+            [ 'READY', 'test'],
+            "post trans1",
+            [ 'STALE', '.a'],
+            [ 'STALE', '.b'],
+            [ 'STALE', 'test' ],
+            [ 'READY', '.a'],
+            [ 'PENDING', '.b'],
+            'calc y',
+            [ 'READY', '.b'],
+            [ 'PENDING', 'test'],
+            "auto",
+            [ 'READY', 'test'],
+            'post trans2',
+            [ 'STALE', '.a'],
+            [ 'READY', '.a'],
+            'post trans3'
+    ]);
+    
+    disposer2();
+    t.end();
+});
+
+test('prematurely end autorun', function(t) {
+    var x = observable(2);
+    var dis1, dis2;
+    mobservable.transaction(function() {
+        dis1 =  mobservable.autorun(function() {
+            x();
+        });
+        dis2 =  mobservable.autorun(function() {
+            x();
+        });
+
+        t.equal(x.$mobservable.observers.length, 0);
+        t.equal(x.$mobservable.externalRefenceCount, 0);
+        t.equal(dis1.$mobservable.observing.length, 0);
+        t.equal(dis2.$mobservable.observing.length, 0);
+        
+        dis1();
+
+    });
+    t.equal(x.$mobservable.observers.length, 1);
+    t.equal(dis1.$mobservable.externalRefenceCount, 0);
+    t.equal(dis2.$mobservable.externalRefenceCount, 1);
+    t.equal(dis1.$mobservable.observing.length, 0);
+    t.equal(dis2.$mobservable.observing.length, 1);
+    
+    dis2();
+
+    t.equal(x.$mobservable.observers.length, 0);
+    t.equal(dis1.$mobservable.externalRefenceCount, 0);
+    t.equal(dis2.$mobservable.externalRefenceCount, 0);
+    t.equal(dis1.$mobservable.observing.length, 0);
+    t.equal(dis2.$mobservable.observing.length, 0);
+    
+    t.end();
+});
+
+test('issue 65; transaction causing transaction', function(t) {
+    var x = mobservable.observable({
+        a: 3,
+        b: function() {
+            return mobservable.transaction(function() {
+                return this.a * 2;
+            }, this);
+        }
+    });
+    
+    var res;
+    mobservable.autorun(function() {
+        res = x.a + x.b;
+    });
+    
+    mobservable.transaction(function() {
+        x.a = 2;
+        x.a = 5;
+    });
+    t.equal(res, 15);
+    t.end();
+});
+
+test('issue 71, transacting running transformation', function(t) {
+    var state = mobservable.observable({
+        things: []
+    });
+    
+    function Thing(value) {
+        mobservable.extendObservable(this, {
+            value: value,
+            pos: function() {
+                return state.things.indexOf(this);
+            },
+            isVisible: function() {
+                return this.pos !== -1;
+            }
+        });
+
+        mobservable.observeUntil(function() {
+            return this.isVisible;
+        }, function() {
+            if (this.pos < 4)
+                state.things.push(new Thing(value + 1));
+        }, this);
+    }
+    
+    var copy;
+    var vSum;
+    mobservable.autorun(function() {
+        copy = state.things.map(function(thing) { return thing.value });
+        vSum = state.things.reduce(function(a, thing) {
+            return a  + thing.value
+        }, 0);
+    });
+    
+    t.deepEqual(copy, []);
+    
+    mobservable.transaction(function() {
+        state.things.push(new Thing(1));
+    });
+    
+    t.deepEqual(copy, [1,2,3,4,5]);
+    t.equal(vSum, 15);
+    
+    state.things.splice(0,2);
+    state.things.push(new Thing(6));
+
+    t.deepEqual(copy, [3,4,5,6,7]);
+    t.equal(vSum, 25);
+    
+    t.end();
+});
+
+test('eval in transaction', function(t) {
+    var bCalcs = 0;
+    var x = mobservable.observable({
+        a: 1,
+        b: function() {
+            bCalcs++;
+            return this.a * 2;
+        }
+    });
+    var c;
+    
+    mobservable.autorun(function() {
+       c = x.b; 
+    });
+    
+    t.equal(bCalcs, 1);
+    t.equal(c, 2);
+    
+    mobservable.transaction(function() {
+        x.a = 3;
+        t.equal(x.b, 6);
+        t.equal(bCalcs, 2);
+        t.equal(c, 2);
+
+        x.a = 4;
+        t.equal(x.b, 8);
+        t.equal(bCalcs, 3);
+        t.equal(c, 2);
+    });
+    t.equal(bCalcs, 4); // 2 or 3 would be fine as well 
+    t.equal(c, 8);
     t.end();
 })

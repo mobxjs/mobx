@@ -82,10 +82,11 @@ test('test1', function(t) {
         t.deepEqual(a.slice(), [1,2]);
 
         t.deepEqual(a.reverse(), [2,1]);
-        t.deepEqual(a.slice(), [2,1]);
-
-        t.deepEqual(a.sort(), [1,2]);
         t.deepEqual(a.slice(), [1,2]);
+
+        a.unshift(3);
+        t.deepEqual(a.sort(), [1,2,3]);
+        t.deepEqual(a.slice(), [3,1,2]);
 
         t.end();
     }
@@ -288,13 +289,50 @@ test('array modification2', function(t) {
         a2.replace(a1);
         var res1 = a1.splice.apply(a1, [inputs[i], inputs[j]].concat(arrays[l]));
         var res2 = a2.splice.apply(a2, [inputs[i], inputs[j]].concat(arrays[l]));
-        t.deepEqual(a1.slice(), a2, "values wrong: " + msg); // TODO: or just a2?
+        t.deepEqual(a1.slice(), a2, "values wrong: " + msg);
         t.deepEqual(res1, res2, "results wrong: " + msg);
         t.equal(a1.length, a2.length, "length wrong: " + msg);
     }
 
     t.end();
 })
+
+test('fastArray modifications', function(t) {
+
+    var a2 = mobservable.fastArray([]);
+    var inputs = [undefined, -10, -4, -3, -1, 0, 1, 3, 4, 10];
+    var arrays = [[], [1], [1,2,3,4], [1,2,3,4,5,6,7,8,9,10,11],[1,undefined],[undefined]]
+    for (var i = 0; i < inputs.length; i++)
+    for (var j = 0; j< inputs.length; j++)
+    for (var k = 0; k < arrays.length; k++)
+    for (var l = 0; l < arrays.length; l++) {
+        var msg = ["array mod: [", arrays[k].toString(),"] i: ",inputs[i]," d: ", inputs[j]," [", arrays[l].toString(),"]"].join(' ');
+        var a1 = arrays[k].slice();
+        a2.replace(a1);
+        var res1 = a1.splice.apply(a1, [inputs[i], inputs[j]].concat(arrays[l]));
+        var res2 = a2.splice.apply(a2, [inputs[i], inputs[j]].concat(arrays[l]));
+        t.deepEqual(a1.slice(), a2.slice(), "values wrong: " + msg); // TODO: or just a2?
+        t.deepEqual(res1, res2, "results wrong: " + msg);
+        t.equal(a1.length, a2.length, "length wrong: " + msg);
+    }
+
+    t.end();
+})
+
+test('new fast array values won\'t be observable', function(t) {
+   // See: https://mweststrate.github.io/mobservable/refguide/fast-array.html#comment-2486090381
+    var booksA = mobservable.fastArray([]);
+    // mobservable.observe(booksA, (change) => {
+    //     console.log(change);
+    // })
+    var rowling = { name: 'J.K.Rowling', birth: 1965 };
+    debugger;
+    booksA.push(rowling)
+    t.equal(mobservable.isObservable(booksA[0], "name"), false);
+    var removed = booksA.splice(0, 1);
+    t.equal(mobservable.isObservable(removed[0], "name"), false);
+    t.end(); 
+});
 
 test('is array', function(t) {
     var x = mobservable.observable([]);
@@ -303,5 +341,40 @@ test('is array', function(t) {
     // would be cool if these two would return true...
     t.equal(typeof x === "array", false);
     t.equal(Array.isArray(x), false);
+    t.end();
+})
+
+test('peek', function(t) {
+    var x = mobservable.observable([1, 2, 3]);
+    t.deepEqual(x.peek(), [1, 2, 3]);
+    t.equal(x.$mobservable.values, x.peek());
+    
+    x.peek().push(4); //noooo!
+    t.throws(function() {
+        x.push(5); // detect alien change
+    }, "modification exception");
+    t.end();
+})
+
+test('react to sort changes', function(t) {
+    var x = mobservable.observable([4, 2, 3]);
+    var sortedX = mobservable.observable(function() {
+        debugger;
+        return x.sort();
+    });
+    var sorted;
+    
+    mobservable.autorun(function() {
+        sorted = sortedX();
+    });
+    
+    t.deepEqual(x.slice(), [4,2,3]);
+    t.deepEqual(sorted, [2,3,4]);
+    x.push(1);
+    t.deepEqual(x.slice(), [4,2,3,1]);
+    t.deepEqual(sorted, [1,2,3,4]);
+    x.shift();
+    t.deepEqual(x.slice(), [2,3,1]);
+    t.deepEqual(sorted, [1,2,3]);
     t.end();
 })
