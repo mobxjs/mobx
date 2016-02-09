@@ -56,13 +56,12 @@ export const _ = {
 }
 
 import {
-	getDNode, getDependencyTree, getObserverTree, trackTransitions, allowStateChanges,
+	getDependencyTree, getObserverTree, trackTransitions, allowStateChanges,
 	ITransitionEvent, IObserverTree, IDependencyTree
 } from "./api/extras";
 import {Lambda} from "./utils/utils";
 
 export const extras = {
-	getDNode: <(thing:any) => any> getDNode,
 	getDependencyTree,
 	getObserverTree,
 	trackTransitions,

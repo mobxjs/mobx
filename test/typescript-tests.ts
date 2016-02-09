@@ -33,7 +33,6 @@ class Order {
 test('observable', function(t) {
     var a = observable(3);
     var b = observable(() => a.get() * 2);
-    t.ok(extras.getDNode(a));
     t.equal(b.get(), 6);
     t.end();
 })

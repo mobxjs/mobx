@@ -237,26 +237,6 @@ test('cleanup', function(t) {
 	t.end();
 })
 
-test('extras', function(t) {
-	var m = map({a : 1});
-	t.equal(mobservable.isObservable(m), true);
-
-	t.deepEqual(mobservable.toJSON(m), m.toJs());
-
-	t.ok(mobservable.extras.getDNode(m._data.a));
-	t.equal(mobservable.extras.getDNode(m, "a"),  mobservable.extras.getDNode(m._data.a));
-
-	function name(thing, prop) {
-		return mobservable.extras.getDNode(thing, prop).name;
-	}
-
-	t.equal(name(m, "a"), ".a");
-	t.equal(name(m._data.a), ".a");
-	t.equal(name(m._hasMap.a), ".(has)a");
-	t.equal(name(m._keys), ".keys()");
-	t.end();
-})
-
 test('strict', function(t) {
 	var x = map();
 	autorun(function() {

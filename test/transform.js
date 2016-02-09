@@ -58,8 +58,8 @@ test('transform1', function(t) {
 	t.equal(unloaded.length, 1);
 	t.equal(unloaded[0][0], tea);
 	t.equal(unloaded[0][1], "TEA");
-	t.equal(m.extras.getDNode(tea, "title").observers.length, 0);
-	t.equal(m.extras.getDNode(state.todos[0], "title").observers.length, 1);
+	t.equal(tea.$mobservable.values.title.observers.length, 0);
+	t.equal(state.todos[0].$mobservable.values.title.observers.length, 1);
 
 
 	tea.title = "mint";

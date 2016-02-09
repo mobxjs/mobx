@@ -47,32 +47,6 @@ export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T):
 	return res;
 }
 
-export function getDNode(thing: any, property?: string): IDepTreeNode {
-	if (property !== undefined)
-		return getChildDNode(thing, property);
-	if (thing instanceof Atom || thing instanceof Reaction || thing instanceof ComputedValue)
-		return thing;
-	if (thing instanceof ObservableArray)
-		return thing.$mobservable;
-	if (thing.$mobservable instanceof Reaction)
-		return thing.$mobservable;
-	if (thing.$mobservable instanceof ObservableObject || thing instanceof ObservableMap)
-		throw new Error(`[mobservable.getDNode] missing properties parameter. Please specify a property of '${thing}'.`);
-	throw new Error(`[mobservable.getDNode] ${thing} doesn't seem to be reactive`);
-}
-
-function getChildDNode(thing: any, property: string): IDepTreeNode {
-	let observable;
-	if (thing.$mobservable instanceof ObservableObject) {
-		observable = thing.$mobservable.values[property];
-	} else if (thing instanceof ObservableMap) {
-		observable = thing._data[property];
-	}
-	if (!observable)
-		throw new Error(`[mobservable.getDNode] property '${property}' of '${thing}' doesn't seem to be a reactive property`);
-	return observable;
-}
-
 let transitionTracker: SimpleEventEmitter = null;
 
 export function reportTransition(node: IDepTreeNode, state: string, changed: boolean = false) {
@@ -83,8 +57,8 @@ export function reportTransition(node: IDepTreeNode, state: string, changed: boo
 	});
 }
 
-export function getDependencyTree(thing: any, property?: string): IDependencyTree {
-	return nodeToDependencyTree(getDNode(thing, property));
+export function getDependencyTree(thing: any): IDependencyTree {
+	return nodeToDependencyTree(thing);
 }
 
 function nodeToDependencyTree(node: IDepTreeNode): IDependencyTree {
@@ -97,8 +71,8 @@ function nodeToDependencyTree(node: IDepTreeNode): IDependencyTree {
 	return result;
 }
 
-export function getObserverTree(thing: any, property?: string): IObserverTree {
-	return nodeToObserverTree(getDNode(thing, property));
+export function getObserverTree(thing: any): IObserverTree {
+	return nodeToObserverTree(thing);
 }
 
 function nodeToObserverTree(node: IDepTreeNode): IObserverTree {

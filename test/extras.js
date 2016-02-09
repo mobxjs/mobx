@@ -2,59 +2,6 @@ var test = require('tape');
 var mobservable = require('..');
 var m = mobservable;
 
-test('getDNode', function(t) {
-    var getD = mobservable.extras.getDNode;
-
-    t.throws(function() {
-        getD({});
-    });
-    t.throws(function() {
-        getD([]);
-    });
-    t.throws(function() {
-        getD(null);
-    });
-    t.throws(function() {
-        getD({ x: 3}, "x");
-    });
-    t.throws(function() {
-        getD(m.observable({ x: 3}));
-    });
-    t.throws(function() {
-        getD(function() {});
-    });
-    t.throws(function() {
-        getD(Object.assign(m.observable({ x: 3}), { y:2}), "y");
-    });
-    t.throws(function() {
-        getD(m.map());
-    });
-    t.throws(function() {
-        getD(m.map({}), "a");
-    });
-
-    t.ok(getD(m.observable([])));
-    t.ok(getD(m.observable({x:3}), "x"));
-    t.ok(getD(m.observable(3)));
-    t.ok(getD(m.observable({x:function() { return 3 }}), "x"));
-    t.ok(getD(m.observable(function() {})));
-    t.ok(getD(mobservable.autorun(function() {})));
-    t.ok(getD(m.map({a: 1}), "a"));
-
-    var a;
-    a = m.observable({x:{}});
-    t.ok(getD(a,"x"));
-    a = m.observable({x:[]});
-    t.ok(getD(a,"x"));
-    t.ok(getD(a.x));
-    a = m.observable({x:[[]]});
-    t.ok(getD(a,"x"));
-    t.ok(getD(a.x));
-    t.ok(getD(a.x[0]));
-
-    t.end();
-})
-
 test('treeD', function(t) {
     var a = m.observable(3);
     var aName = a.name;
@@ -82,7 +29,7 @@ test('treeD', function(t) {
     };
     var c = m.autorun(cFunc);
     var cName = c.$mobservable.name;
-    t.deepEqual(dtree(c), {
+    t.deepEqual(dtree(c.$mobservable), {
         name: cName,
         id: c.$mobservable.id,
         dependencies: [{
@@ -115,10 +62,6 @@ test('treeD', function(t) {
 })
 
 test('names', function(t) {
-    function name(thing, prop) {
-        return m.extras.getDNode(thing, prop).name;
-    }
-
     var struct = {
         x: 3,
         y: {
@@ -136,28 +79,25 @@ test('names', function(t) {
     m.extendObservable(rstruct.y, { a:  { b : 2}});
     rstruct.ar.push({ b : 2});
     rstruct.ar.push([]);
-    t.equal(name(rstruct,"x"), ".x");
-    t.equal(name(rstruct, "y"), ".y");
-    t.equal(name(rstruct.y,"z"), ".y.z");
-    t.equal(name(rstruct, "ar"), ".ar");
-    t.equal(name(rstruct.ar), ".ar");
-    t.equal(name(rstruct.ar[1],"w"), ".ar[x].w");
-    t.equal(name(rstruct.y.a,"b"), ".y.a.b");
-    t.equal(name(rstruct.ar[2], "b"), ".ar[x].b");
-    t.equal(name(rstruct.ar[3]), ".ar[x]");
+    t.equal(rstruct.$mobservable.values.x.name, ".x");
+    t.equal(rstruct.$mobservable.values.y.name, ".y");
+    t.equal(rstruct.y.$mobservable.values.z.name, ".y.z");
+    t.equal(rstruct.$mobservable.values.ar.name, ".ar");
+    t.equal(rstruct.ar.$mobservable.name, ".ar");
+    t.equal(rstruct.ar[1].$mobservable.values.w.name, ".ar[x].w");
+    t.equal(rstruct.y.a.$mobservable.values.b.name, ".y.a.b");
+    t.equal(rstruct.ar[2].$mobservable.values.b.name, ".ar[x].b");
 
     var d = m.autorun(function() {
     });
-    t.ok(name(d));
+    t.ok(d.$mobservable.name);
 
-    t.equal(name(m.autorun(function namedFunction() {
-    })), "namedFunction");
+    t.equal(m.autorun(function namedFunction() {
+    }).$mobservable.name, "namedFunction");
 
-    t.ok(name(m.observable(function() {
-    })));
+    t.ok(m.observable(function() {}));
 
-    t.equal(name(m.observable(function namedFunction() {
-    })), "namedFunction");
+    t.equal(m.observable(function namedFunction() {}).name, "namedFunction");
 
     t.end();
 })

@@ -8,6 +8,7 @@ This means that it is allowed in an to change the state in such a way that the s
 * Removed deprecated methods: `isReactive`, `makeReactive`, `observeUntil`, `observeAsync`
 * (TODO) observableValue.observe(listener, fireImmediately) -> observe(observableValue, listener, fireImmediately?)
 * no getter/setter func for primitives
+* Removed getDNode
 
 # 1.2.4
 
