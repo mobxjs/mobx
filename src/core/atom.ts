@@ -42,14 +42,14 @@ export class Atom implements IAtom {
 	/**
 	 * Invoke this method to notify mobservable that your atom has been used somehow. 
 	 */
-	reportObserved() {
+	public reportObserved() {
 		reportObserved(this);
 	}
 
 	/**
 	 * Invoke this method _after_ this method has changed to signal mobservable that all its observers should invalidate.
 	 */
-	reportChanged() {
+	public reportChanged() {
 		if (!this.isDirty) {
 			this.reportStale();
 			this.reportReady(true);

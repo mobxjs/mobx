@@ -30,7 +30,7 @@ export class ObservableMap<V> {
 			initialData.forEach(([key, value]) => this.set(key, value));
 	}
 
-	_has(key: string): boolean {
+	private _has(key: string): boolean {
 		return typeof this._data[key] !== "undefined";
 	}
 
@@ -90,7 +90,7 @@ export class ObservableMap<V> {
 		}
 	}
 
-	_updateHasMapEntry(key: string, value: boolean): ObservableValue<boolean> {
+	private _updateHasMapEntry(key: string, value: boolean): ObservableValue<boolean> {
 		// optimization; don't fill the hasMap if we are not observing, or remove entry if there are no observers anymore
 		let entry = this._hasMap[key];
 		if (entry) {

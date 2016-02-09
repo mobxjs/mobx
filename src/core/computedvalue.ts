@@ -26,7 +26,7 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 	 * Peek into the current value of this computedObservable. Re-evaluate if needed but don't bind the current
 	 * exeuction context as an observer.
 	 */
-	peek: () => T;
+	public peek: () => T;
 
 	/**
 	 * Create a new computed value based on a function expression.
@@ -79,7 +79,7 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 	 * Returns the current value of this computed value.
 	 * Will evaluate it's computation first if needed.
 	 */
-	get(): T {
+	public get(): T {
 		if (this.isComputing)
 			throw new Error(`[DerivedValue '${this.name}'] Cycle detected`);
 		if (this.dependencyStaleCount > 0 && globalState.inTransaction > 0) {
@@ -105,11 +105,11 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 		return this.value;
 	}
 
-	set(_: T) {
+	public set(_: T) {
 		throw new Error(`[DerivedValue '${name}'] View functions do not accept new values`);
 	}
 
-	trackAndCompute(): boolean {
+	private trackAndCompute(): boolean {
 		let oldValue = this.value;
 		this.value = trackDerivedFunction(this, this.peek);
 		return valueDidChange(this.compareStructural, this.value, oldValue);

@@ -8,8 +8,7 @@ import {once, Lambda} from "./utils";
 export class SimpleEventEmitter {
 	listeners:{(...data: any[]): void}[] = [];
 
-	emit(...data: any[]);
-	emit() {
+	emit(...data: any[]) {
 		const listeners = this.listeners.slice();
 		for (let i = 0, l = listeners.length; i < l; i++)
 			listeners[i].apply(null, arguments);

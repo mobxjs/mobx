@@ -31,6 +31,7 @@ export class ObservableObject {
 			value: this
 		});
 	}
+
 	static asReactive(target, name: string, mode: ValueMode):ObservableObject {
 		if (target.$mobservable)
 			return target.$mobservable;
