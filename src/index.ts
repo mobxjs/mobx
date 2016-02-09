@@ -21,7 +21,7 @@ registerGlobals();
 
 // TODO: all exports in sync with docs?
 // TODO: optimize packaging?
-export {    observable                                           } from "./api/observable";
+export {    observable, IObservableValue                         } from "./api/observable";
 export {    isObservable                                         } from "./api/isobservable";
 export {    extendObservable                                     } from "./api/extendobservable";
 export {    observe                                              } from "./api/observe";
@@ -31,7 +31,6 @@ export {    toJSON                                               } from "./api/t
 export {    createTransformer                                    } from "./api/createtransformer";
 
 export {    asReference, asFlat, asStructure                     } from "./types/modifiers";
-export {    IObservableValue                                     } from "./types/observablevalue";
 export {    isObservableObject                                   } from "./types/observableobject";
 export {    isObservableArray, fastArray,
 			IObservableArray, IArrayChange, IArraySplice         } from "./types/observablearray";

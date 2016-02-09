@@ -1,10 +1,15 @@
-import {ObservableValue, IObservableValue} from "../types/observablevalue";
+import {ObservableValue} from "../types/observablevalue";
 import {ValueMode, getValueModeFromValue, makeChildObservable} from "../types/modifiers";
 import {ComputedValue} from "../core/computedvalue";
 import {isPlainObject} from "../utils/utils";
 import {observableDecorator} from "./observabledecorator";
 import {isObservable} from "./isobservable";
 import {IObservableArray, ObservableArray} from "../types/observablearray";
+
+export interface IObservableValue<T> {
+	get(): T;
+	set(value: T): void;
+}
 
 /**
 	* Turns an object, array or function into a reactive structure.

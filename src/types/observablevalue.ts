@@ -40,24 +40,3 @@ export class ObservableValue<T> extends Atom {
 		return `ObservableValue[${this.name}:${this.value}]`;
 	}
 }
-
-// TODO: deprecate / use on computed value / observable value!
-export interface IObservableValue<T> {
-	get(): T;
-	set(value: T): void;
-}
-
-// TODO: deprecate?
-export function XXXtoGetterSetterFunction<T>(observable: ObservableValue<T> | ComputedValue<T>): IObservableValue<T> {
-	const f: any = function(value?) {
-		if (arguments.length > 0)
-			observable.set(value);
-		else
-			return observable.get();
-	};
-	f.$mobservable = observable;
-	f.toString = function() {
-		return observable.toString();
-	};
-	return f;
-}
