@@ -801,7 +801,7 @@ test('when 2', function(t) {
     });
 
     t.equal(called, 1);
-    t.equal(x.atom.observers.length, 0)
+    t.equal(x.observers.length, 0)
     x.set(5);
     x.set(3);
     t.equal(called, 1);
@@ -1297,19 +1297,19 @@ test('prematurely end autorun', function(t) {
             x.get();
         });
 
-        t.equal(x.atom.observers.length, 0);
+        t.equal(x.observers.length, 0);
         t.equal(dis1.$mobservable.observing.length, 0);
         t.equal(dis2.$mobservable.observing.length, 0);
         
         dis1();
     });
-    t.equal(x.atom.observers.length, 1);
+    t.equal(x.observers.length, 1);
     t.equal(dis1.$mobservable.observing.length, 0);
     t.equal(dis2.$mobservable.observing.length, 1);
     
     dis2();
 
-    t.equal(x.atom.observers.length, 0);
+    t.equal(x.observers.length, 0);
     t.equal(dis1.$mobservable.observing.length, 0);
     t.equal(dis2.$mobservable.observing.length, 0);
     

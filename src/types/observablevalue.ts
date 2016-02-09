@@ -1,18 +1,16 @@
 import {Atom} from "../core/atom";
 import {checkIfStateModificationsAreAllowed} from "../core/globalstate";
 import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} from "./modifiers";
-import {valueDidChange, Lambda} from "../utils/utils";
+import {valueDidChange} from "../utils/utils";
 import {ComputedValue} from "../core/computedvalue";
-import {observe} from "../api/observe";
 
-export class ObservableValue<T> {
-	atom: Atom;
+export class ObservableValue<T> extends Atom {
 	hasUnreportedChange = false;
 
 	protected value: T = undefined;
 
 	constructor(value: T, protected mode: ValueMode, public name?: string) {
-		this.atom = new Atom(name);
+		super(name);
 		const [childmode, unwrappedValue] = getValueModeFromValue(value, ValueMode.Recursive);
 		// If the value mode is recursive, modifiers like 'structure', 'reference', or 'flat' could apply
 		if (this.mode === ValueMode.Recursive)
@@ -28,13 +26,13 @@ export class ObservableValue<T> {
 		const changed = valueDidChange(this.mode === ValueMode.Structure, oldValue, newValue);
 		if (changed) {
 			this.value = makeChildObservable(newValue, this.mode, this.name);
-			this.atom.reportChanged();
+			this.reportChanged();
 		}
 		return changed;
 	}
 
 	get(): T {
-		this.atom.reportObserved();
+		this.reportObserved();
 		return this.value;
 	}
 

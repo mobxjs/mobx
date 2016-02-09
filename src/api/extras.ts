@@ -3,15 +3,15 @@
  * (c) 2015 - Michel Weststrate
  * https://github.com/mweststrate/mobservable
  */
-import {ObservableValue} from "../types/observablevalue";
-import {ComputedValue} from "../core/computedvalue";
+import {Atom} from "../core/atom";
+import {ObservableArray} from "../types/observablearray";
 import {Reaction} from "../core/reaction";
+import {ComputedValue} from "../core/computedvalue";
 import {IDepTreeNode} from "../core/observable";
 import {ObservableObject} from "../types/observableobject";
 import {ObservableMap} from "../types/observablemap";
 import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {once, unique, Lambda} from "../utils/utils";
-import {isObservable} from "../api/isobservable";
 import {globalState} from "../core/globalstate";
 
 export interface IDependencyTree {
@@ -47,39 +47,30 @@ export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T):
 	return res;
 }
 
-
-
 export function getDNode(thing: any, property?: string): IDepTreeNode {
-	const propError = `[mobservable.getDNode] property '${property}' of '${thing}' doesn't seem to be a reactive property`;
-
-	if (thing instanceof ObservableMap && property) {
-		const value = thing._data[property];
-		if (!value)
-			throw new Error(propError);
-		return getDNode(value);
-	}
-	if (!isObservable(thing, property)) {
-		if (property)
-			throw new Error(propError);
-		throw new Error(`[mobservable.getDNode] ${thing} doesn't seem to be reactive`);
-	}
-	if (property !== undefined) {
-		if (thing.$mobservable instanceof ObservableObject)
-			return getDNode(thing.$mobservable.values[property]);
-		throw new Error(propError);
-	}
-	if (thing instanceof ObservableValue)
-		return thing.atom;
-	if (thing instanceof ComputedValue || thing instanceof Reaction)
+	if (property !== undefined)
+		return getChildDNode(thing, property);
+	if (thing instanceof Atom || thing instanceof Reaction || thing instanceof ComputedValue)
 		return thing;
-	if (thing.$mobservable) {
-		if (thing.$mobservable instanceof ObservableObject || thing instanceof ObservableMap)
-			throw new Error(`[mobservable.getDNode] missing properties parameter. Please specify a property of '${thing}'.`);
-		if (thing.$mobservable instanceof ObservableValue)
-			return thing. $mobservable.atom;
+	if (thing instanceof ObservableArray)
 		return thing.$mobservable;
-	}
+	if (thing.$mobservable instanceof Reaction)
+		return thing.$mobservable;
+	if (thing.$mobservable instanceof ObservableObject || thing instanceof ObservableMap)
+		throw new Error(`[mobservable.getDNode] missing properties parameter. Please specify a property of '${thing}'.`);
 	throw new Error(`[mobservable.getDNode] ${thing} doesn't seem to be reactive`);
+}
+
+function getChildDNode(thing: any, property: string): IDepTreeNode {
+	let observable;
+	if (thing.$mobservable instanceof ObservableObject) {
+		observable = thing.$mobservable.values[property];
+	} else if (thing instanceof ObservableMap) {
+		observable = thing._data[property];
+	}
+	if (!observable)
+		throw new Error(`[mobservable.getDNode] property '${property}' of '${thing}' doesn't seem to be a reactive property`);
+	return observable;
 }
 
 let transitionTracker: SimpleEventEmitter = null;

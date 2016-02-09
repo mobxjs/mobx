@@ -214,26 +214,26 @@ test('cleanup', function(t) {
 	var observable = x._data.a;
 
 	t.equal(aValue, 1);
-	t.equal(observable.atom.observers.length, 1);
-	t.equal(x._hasMap.a.atom.observers.length, 1);
+	t.equal(observable.observers.length, 1);
+	t.equal(x._hasMap.a.observers.length, 1);
 
 	x.delete("a");
 
 	t.equal(aValue, undefined);
-	t.equal(observable.atom.observers.length, 0);
-	t.equal(x._hasMap.a.atom.observers.length, 1);
+	t.equal(observable.observers.length, 0);
+	t.equal(x._hasMap.a.observers.length, 1);
 
 	x.set("a", 2);
 	observable = x._data.a;
 
 	t.equal(aValue, 2);
-	t.equal(observable.atom.observers.length, 1);
-	t.equal(x._hasMap.a.atom.observers.length, 1);
+	t.equal(observable.observers.length, 1);
+	t.equal(x._hasMap.a.observers.length, 1);
 
 	disposer();
 	t.equal(aValue, 2);
-	t.equal(observable.atom.observers.length, 0);
-	t.equal(x._hasMap.a.atom.observers.length, 0);
+	t.equal(observable.observers.length, 0);
+	t.equal(x._hasMap.a.observers.length, 0);
 	t.end();
 })
 
