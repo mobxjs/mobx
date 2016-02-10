@@ -1,8 +1,8 @@
 import {Atom} from "../core/atom";
 import {checkIfStateModificationsAreAllowed} from "../core/globalstate";
 import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} from "./modifiers";
-import {valueDidChange} from "../utils/utils";
-import {ComputedValue} from "../core/computedvalue";
+import {valueDidChange, deprecated, Lambda} from "../utils/utils";
+import {observe} from "../api/observe";
 
 export class ObservableValue<T> extends Atom {
 	hasUnreportedChange = false;
@@ -34,6 +34,11 @@ export class ObservableValue<T> extends Atom {
 	get(): T {
 		this.reportObserved();
 		return this.value;
+	}
+
+	observe(listener, fireImmediately?) {
+		deprecated("Use 'mobservable.observe(value, listener)' instead.");
+		return observe(this, listener, fireImmediately);
 	}
 
 	toString() {

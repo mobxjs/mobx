@@ -1,8 +1,8 @@
 import {IObservable, reportObserved, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction} from "./derivation";
 import {globalState, getNextId, isComputingDerivation} from "./globalstate";
-import {autorun} from "../api/autorun";
-import {valueDidChange, Lambda} from "../utils/utils";
+import {observe} from "../api/observe";
+import {valueDidChange, deprecated, Lambda} from "../utils/utils";
 import {reportTransition} from "../api/extras";
 
 /**
@@ -113,6 +113,11 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 		let oldValue = this.value;
 		this.value = trackDerivedFunction(this, this.peek);
 		return valueDidChange(this.compareStructural, this.value, oldValue);
+	}
+
+	observe(listener, fireImmediately?) {
+		deprecated("Use 'mobservable.observe(value, listener)' instead.");
+		return observe(this, listener, fireImmediately);
 	}
 
 	toString() {

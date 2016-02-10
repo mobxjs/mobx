@@ -9,6 +9,7 @@ This means that it is allowed in an to change the state in such a way that the s
 * (TODO) observableValue.observe(listener, fireImmediately) -> observe(observableValue, listener, fireImmediately?)
 * no getter/setter func for primitives
 * Removed getDNode
+* Changed error handling
 
 # 1.2.4
 
