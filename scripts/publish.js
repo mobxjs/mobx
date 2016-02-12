@@ -1,6 +1,7 @@
 #!/usr/bin/nscript
 /* To run this script, nscript is needed: [sudo] npm install -g nscript
 /* Publish.js, publish a new version of the npm package as found in the current directory */
+/* Run this file from the root of the repository */
 module.exports = function(shell, npm, git) {
     var pkg = JSON.parse(shell.read('package.json'));
 

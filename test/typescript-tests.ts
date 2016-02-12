@@ -4,7 +4,7 @@ import {
     observe, observable, asStructure, autorun, autorunAsync, extendObservable, 
     IObservableArray, IArrayChange, IArraySplice, IObservableValue,
     extras
-} from "../lib/index";
+} from "../lib/mobservable";
 import * as test from 'tape';
 
 var v = observable(3);

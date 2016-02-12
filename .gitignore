@@ -8,3 +8,5 @@ lib
 test/babel-tests.js
 test/typescript-tests.js*
 .vscode
+dist/
+.build/

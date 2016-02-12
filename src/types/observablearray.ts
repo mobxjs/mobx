@@ -41,8 +41,6 @@ export interface IArraySplice<T> {
  * properties on the fly.
  */
 let OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
-const ENUMERABLE_PROPS : PropertyDescriptor[] = [];
-
 
 // Typescript workaround to make sure ObservableArray extends Array
 export class StubArray {

@@ -10,9 +10,11 @@ export interface IKeyValueMap<V> {
 	[key: string]: V;
 }
 
-export type Entries<V> = [string, V][]
+export type IMapEntries<V> = [string, V][]
 
-export type IObservableMapChange<T> = IObjectChange<T, ObservableMap<T>>;
+export interface IObservableMapChange<T> extends IObjectChange<T, ObservableMap<T>> {
+	
+}
 
 export class ObservableMap<V> {
 	$mobservable = {};
@@ -22,7 +24,7 @@ export class ObservableMap<V> {
 	private _valueMode: ValueMode;
 	private _events = new SimpleEventEmitter();
 
-	constructor(initialData?: Entries<V> | IKeyValueMap<V>, valueModeFunc?: Function) {
+	constructor(initialData?: IMapEntries<V> | IKeyValueMap<V>, valueModeFunc?: Function) {
 		this._valueMode = getValueModeFromModifierFunc(valueModeFunc);
 		if (isPlainObject(initialData))
 			this.merge(<IKeyValueMap<V>> initialData);
@@ -116,7 +118,7 @@ export class ObservableMap<V> {
 		return this.keys().map(this.get, this);
 	}
 
-	entries(): Entries<V> {
+	entries(): IMapEntries<V> {
 		return this.keys().map(key => <[string, V]>[key, this.get(key)]);
 	}
 

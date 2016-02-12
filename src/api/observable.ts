@@ -17,8 +17,8 @@ export interface IObservableValue<T> {
 	*/
 export function observable(target: Object, key: string, baseDescriptor?: PropertyDescriptor): any;
 export function observable<T>(value: T[]): IObservableArray<T>;
-export function observable<T, S extends Object>(value: () => T, thisArg?: S): ComputedValue<T>;
-export function observable<T extends string|number|boolean|Date|RegExp|Function|void>(value: T): ObservableValue<T>;
+export function observable<T, S extends Object>(value: () => T, thisArg?: S): IObservableValue<T>;
+export function observable<T extends string|number|boolean|Date|RegExp|Function|void>(value: T): IObservableValue<T>;
 export function observable<T extends Object>(value: T): T;
 export function observable(v: any, keyOrScope?: string | any) {
 	if (typeof arguments[1] === "string")

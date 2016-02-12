@@ -6,11 +6,12 @@
         "sourceMap": true,
         "declaration": true,
         "module": "commonjs",
-        "removeComments": true
+        "removeComments": false
     },
     "exclude": [
         "node_modules",
         "test",
-        "lib"
+        "lib",
+        ".build"
     ]
 }

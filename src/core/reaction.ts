@@ -24,7 +24,7 @@ import {EMPTY_ARRAY} from "../utils/utils";
  */
 export class Reaction implements IDerivation {
 	id = getNextId();
-	name; string;
+	name: string;
 	staleObservers:  IDerivation[] = EMPTY_ARRAY; // Won't change
 	observers: IDerivation[] = EMPTY_ARRAY;       // Won't change
 	observing: IObservable[] = []; // nodes we are looking at. Our value depends on these nodes

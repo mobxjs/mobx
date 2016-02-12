@@ -1,7 +1,7 @@
 import {IObservableArray, IArrayChange, IArraySplice, isObservableArray} from "../types/observablearray";
 import {ObservableMap, IObservableMapChange, isObservableMap} from "../types/observablemap";
 import {IObjectChange, isObservableObject} from "../types/observableobject";
-import {observable} from "./observable";
+import {observable, IObservableValue} from "./observable";
 import {ComputedValue} from "../core/computedvalue";
 import {ObservableValue} from "../types/observablevalue";
 import {Lambda, isPlainObject} from "../utils/utils";
@@ -13,7 +13,7 @@ export function observe<T>(observableMap: ObservableMap<T>, listener: (change: I
 export function observe(func: () => void): Lambda;
 export function observe<T extends Object>(object: T, listener: (change: IObjectChange<any, T>) => void): Lambda;
 export function observe<T extends Object, Y>(object: T, prop: string, listener: (newValue: Y, oldValue?: Y) => void): Lambda;
-export function observe<T>(value: ObservableValue<T>|ComputedValue<T>, listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
+export function observe<T>(value: IObservableValue<T>, listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
 export function observe(thing, property?, listener?): Lambda {
 	const fireImmediately = arguments[2] === true;
 	if (typeof property === "function") {

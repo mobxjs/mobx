@@ -10,6 +10,10 @@ This means that it is allowed in an to change the state in such a way that the s
 * no getter/setter func for primitives
 * Removed getDNode
 * Changed error handling
+* `dist/` folder is no longer in git, use npmcdn.com instead
+* minified file moved
+* smaller distro: 74 -> 60 KB unminified, 54 -> 30 KB minified
+* Faster
 
 # 1.2.4
 

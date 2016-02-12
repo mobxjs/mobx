@@ -2,24 +2,27 @@
   "name": "mobservable",
   "version": "2.0.0",
   "description": "Observable data. Reactive functions. Simple code.",
-  "main": "lib/index.js",
-  "typings": "lib/index.d.ts",
+  "main": "lib/mobservable.js",
+  "typings": "lib/mobservable.d.ts",
   "scripts": {
-    "test": "npm run buildtest && npm run tape",
-	"tape": "tape test/*.js | faucet",
-    "test-browser": "npm run buildtest && ( browserify test/*.js | tape-run )",
-    "test-travis": "npm run clean && npm run test-browser && istanbul cover tape test/*.js",
-    "coverage": "npm run buildtest && istanbul cover tape test/*.js && cat ./coverage/lcov.info|coveralls",
-    "perf": "npm run build && time node --expose-gc test/perf/index.js",
-    "prepublish": "npm run clean && npm run build-dist",
-    "clean": "rm -rf lib/ dist/",
-    "build": "tsc",
-    "clean-build": "npm run clean && npm run build",
-    "build-dist": "npm run build && webpack && uglifyjs --in-source-map dist/mobservable.js.map -s dist/mobservable.js --source-map dist/mobservable.min.js.map -o dist/mobservable.min.js",
-    "buildtest": "npm run build && npm run build-typescript-tests && npm run build-babel-tests",
+    "test": "npm run quick-build && npm run tape",
+    "full-test": "npm run small-build && npm run build-tests && npm run use-minified && npm run tape && npm run perf",
+    "tape": "tape test/*.js | faucet",
+    "perf": "npm run small-build && time node --expose-gc test/perf/index.js",
+
+    "prepublish": "npm run small-build",
+    "quick-build": "tsc",
+    "small-build": "scripts/single-file-build.sh",
+
+    "test-browser": "npm run small-build && ( browserify test/*.js | tape-run )",
+    "test-travis": "npm run test-browser && npm run use-minified && istanbul cover tape test/*.js test/perf/index.js",
+    "coverage": "npm run small-build && npm run build-tests && istanbul cover tape test/*.js test/perf/index.js && cat ./coverage/lcov.info|coveralls",
+    
+    "build-tests": "npm run build-typescript-tests && npm run build-babel-tests",
     "build-typescript-tests": "tsc -m commonjs -t es5 --experimentalDecorators --noImplicitAny --outDir test test/typescript-tests.ts",
     "build-babel-tests": "babel test/babel/babel-tests.js -o test/babel-tests.js",
-	"lint": "tslint -c tslint.json src/*.ts src/types/*.ts src/api/*.ts src/core/*.ts src/utils/*.ts"
+    "use-minified": "cp lib/mobservable.min.js lib/mobservable.js",
+    "lint": "tslint -c tslint.json src/*.ts src/types/*.ts src/api/*.ts src/core/*.ts src/utils/*.ts"
   },
   "repository": {
     "type": "git",
@@ -45,10 +48,10 @@
     "lodash.intersection": "^3.2.0",
     "tape": "^4.2.2",
     "tape-run": "^2.1.0",
-    "typescript": "^1.6.2",
-    "uglify-js": "^2.5.0",
-    "webpack": "^1.12.9"
+    "typescript": "^1.7.5",
+    "uglify-js": "^2.6.1"
   },
+  "dependencies": {},
   "keywords": [
     "mobservable",
     "observable",
