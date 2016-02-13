@@ -1,6 +1,7 @@
 import {ValueMode, asReference} from "../types/modifiers";
 import {allowStateChanges} from "../api/extras";
 import {asObservableObject, setObservableObjectProperty} from "../types/observableobject";
+import {invariant} from "../utils/utils";
 
 /**
  * ES6 / Typescript decorator which can to make class properties and getter functions reactive.
@@ -14,8 +15,7 @@ import {asObservableObject, setObservableObjectProperty} from "../types/observab
  * }
  */
 export function observableDecorator(target: Object, key: string, baseDescriptor: PropertyDescriptor) {
-	if (arguments.length < 2 || arguments.length > 3)
-		throw new Error("[mobservable.@observable] A decorator expects 2 or 3 arguments, got: " + arguments.length);
+	invariant(arguments.length >= 2 && arguments.length <= 3, "Illegal decorator config", key);
 	// - In typescript, observable annotations are invoked on the prototype, not on actual instances,
 	// so upon invocation, determine the 'this' instance, and define a property on the
 	// instance as well (that hides the propotype property)
@@ -37,15 +37,11 @@ export function observableDecorator(target: Object, key: string, baseDescriptor:
 		}
 	}
 
-	if (!target || typeof target !== "object")
-		throw new Error(`The @observable decorator can only be used on objects`);
+	invariant(typeof target === "object", `The @observable decorator can only be used on objects`, key);
 	if (isDecoratingGetter) {
-		if (typeof baseValue !== "function")
-			throw new Error(`@observable expects a getter function if used on a property (in member: '${key}').`);
-		if (descriptor.set)
-			throw new Error(`@observable properties cannot have a setter (in member: '${key}').`);
-		if (baseValue.length !== 0)
-			throw new Error(`@observable getter functions should not take arguments (in member: '${key}').`);
+		invariant(typeof baseValue === "function", `@observable expects a getter function if used on a property.`, key);
+		invariant(!descriptor.set, `@observable properties cannot have a setter.`, key);
+		invariant(baseValue.length === 0, `@observable getter functions should not take arguments.`, key);
 	}
 
 	descriptor.configurable = true;
@@ -59,7 +55,7 @@ export function observableDecorator(target: Object, key: string, baseDescriptor:
 		return this[key];
 	};
 	descriptor.set = isDecoratingGetter
-		? () => {throw new Error(`[DerivedValue '${key}'] View functions do not accept new values`); }
+		? () => { throw new Error(`[ComputedValue '${key}'] New values cannot be assigned to computed properties.`); }
 		: function(value) {
 			setObservableObjectProperty(asObservableObject(this, null, ValueMode.Recursive), key, typeof value === "function" ? asReference(value) : value);
 		}

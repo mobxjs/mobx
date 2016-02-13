@@ -1,4 +1,4 @@
-import {isPlainObject} from "../utils/utils";
+import {isPlainObject, invariant} from "../utils/utils";
 import {isObservable} from "../api/isobservable";
 import {extendObservableHelper} from "../api/extendobservable";
 import {createObservableArray} from "../types/observablearray";
@@ -83,8 +83,7 @@ export function getValueModeFromModifierFunc(func?: Function): ValueMode {
 		return ValueMode.Structure;
 	else if (func === asFlat)
 		return ValueMode.Flat;
-	else if (func !== undefined)
-		throw new Error("[mobservable] Cannot determine value mode from function. Please pass in one of these: mobservable.asReference, mobservable.asStructure or mobservable.asFlat, got: " + func);
+	invariant(func === undefined, "Cannot determine value mode from function. Please pass in one of these: mobservable.asReference, mobservable.asStructure or mobservable.asFlat, got: " + func);
 	return ValueMode.Recursive;
 }
 
@@ -109,7 +108,7 @@ export function makeChildObservable(value, parentMode: ValueMode, context) {
 			[childMode, value] = getValueModeFromValue(value, ValueMode.Recursive);
 			break;
 		default:
-			throw "Illegal State";
+			invariant(false, "Illegal State");
 	}
 
 	if (Array.isArray(value) && Object.isExtensible(value))

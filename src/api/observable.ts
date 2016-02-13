@@ -1,7 +1,7 @@
 import {ObservableValue} from "../types/observablevalue";
 import {ValueMode, getValueModeFromValue, makeChildObservable} from "../types/modifiers";
 import {ComputedValue} from "../core/computedvalue";
-import {isPlainObject} from "../utils/utils";
+import {isPlainObject, invariant} from "../utils/utils";
 import {observableDecorator} from "./observabledecorator";
 import {isObservable} from "./isobservable";
 import {IObservableArray, ObservableArray} from "../types/observablearray";
@@ -23,19 +23,8 @@ export function observable<T extends Object>(value: T): T;
 export function observable(v: any, keyOrScope?: string | any) {
 	if (typeof arguments[1] === "string")
 		return observableDecorator.apply(null, arguments);
-	switch (arguments.length) {
-		case 0:
-			throw new Error("[mobservable.observable] Please provide at least one argument.");
-		case 1:
-			break;
-		case 2:
-			if (typeof v === "function")
-				break;
-			throw new Error("[mobservable.observable] Only one argument expected.");
-		default:
-			throw new Error("[mobservable.observable] Too many arguments. Please provide exactly one argument, or a function and a scope.");
-	}
 
+	invariant(arguments.length === 1 || arguments.length === 2, "observable expects one or two arguments");
 	if (isObservable(v))
 		return v;
 
@@ -54,7 +43,7 @@ export function observable(v: any, keyOrScope?: string | any) {
 		case ValueType.PlainObject:
 			return makeChildObservable(value, mode, undefined);
 	}
-	throw "Illegal State";
+	invariant(false, "Illegal State");
 }
 
 export enum ValueType { Reference, PlainObject, ComplexObject, Array, ViewFunction, ComplexFunction }

@@ -12,9 +12,9 @@ export interface Lambda {
 	name?: string;
 }
 
-export function invariant(check: boolean) {
+export function invariant(check: boolean, message: string, thing?) {
 	if (!check)
-		throw new Error("[mobservable] Invariant failed, please report this as a bug. Be sure to including the stacktrace of this error.");
+		throw new Error("[mobservable] Invariant failed: " + message + (thing ? ` in '${thing}'` : ""));
 }
 
 const deprecatedMessages = [];

@@ -6,7 +6,7 @@
 import {ObservableValue} from "./observablevalue";
 import {ComputedValue} from "../core/computedvalue";
 import {ValueMode, AsStructure} from "./modifiers";
-import {Lambda} from "../utils/utils";
+import {Lambda, invariant} from "../utils/utils";
 import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {getNextId} from "../core/globalstate";
 
@@ -105,8 +105,7 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 	* for callback details
 	*/
 export function observeObservableObject(object: IIsObservableObject, callback: (changes: IObjectChange<any, any>) => void): Lambda {
-	if (!isObservableObject(object))
-		throw new Error("Expected observable object");
+	invariant(isObservableObject(object), "Expected observable object");
 	return object.$mobservable._events.on(callback);
 }
 

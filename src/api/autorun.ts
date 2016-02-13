@@ -1,4 +1,4 @@
-import {Lambda, once, deprecated} from "../utils/utils";
+import {Lambda, once, deprecated, invariant} from "../utils/utils";
 import {assertUnwrapped} from "../types/modifiers";
 import {Reaction} from "../core/reaction";
 import {globalState, isComputingDerivation} from "../core/globalstate";
@@ -14,12 +14,10 @@ import {IObservable, reportObserved} from "../core/observable";
  */
 export function autorun(view: Lambda, scope?: any): Lambda {
 	assertUnwrapped(view, "autorun methods cannot have modifiers");
-	if (typeof view !== "function")
-		throw new Error("[mobservable.autorun] expects a function");
-	if (view.length !== 0)
-		throw new Error("[mobservable.autorun] expects a function without arguments");
+	invariant(typeof view === "function", "autorun expects a function");
+	invariant(view.length === 0, "autorun expects a function without arguments");
 	if (scope)
-		view = view.bind(scope);
+		view = view.bind(scope); // TODO: or is closure faster?
 
 	const reaction = new Reaction(view.name, function () {
 		this.track(view);

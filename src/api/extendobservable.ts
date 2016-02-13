@@ -1,6 +1,7 @@
 import {ValueMode} from "../types/modifiers";
 import {ObservableMap} from "../types/observablemap";
 import {asObservableObject, setObservableObjectProperty} from "../types/observableobject";
+import {invariant} from "../utils/utils";
 
 /**
  * Extends an object with reactive capabilities.
@@ -9,13 +10,11 @@ import {asObservableObject, setObservableObjectProperty} from "../types/observab
  * @returns targer
  */
 export function extendObservable<A extends Object, B extends Object>(target: A, ...properties: B[]): A & B {
-	if (arguments.length < 2)
-		throw new Error("[mobservable.extendObservable] expected 2 or more arguments");
-	if (target instanceof ObservableMap || properties instanceof ObservableMap)
-		throw new Error("[mobservable.extendObservable] 'extendObservable' should not be used on maps, use map.merge instead");
+	invariant(arguments.length >= 2, "extendObservable expected 2 or more arguments");
+	invariant(typeof target === "object", "extendObservable expects an object as first argument");
+	invariant(!(target instanceof ObservableMap), "extendObservable should not be used on maps, use map.merge instead");
 	properties.forEach(propSet => {
-		if (!propSet || typeof target !== "object")
-			throw new Error("[mobservable.extendObservable] 'extendObservable' expects one or more objects with properties to define");
+		invariant(typeof propSet === "object", "all arguments of extendObservable should be objects");
 		extendObservableHelper(target, propSet, ValueMode.Recursive, null);
 	});
 	return <A & B> target;

@@ -2,7 +2,7 @@ import {IObservable, reportObserved, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction} from "./derivation";
 import {globalState, getNextId, isComputingDerivation} from "./globalstate";
 import {observe} from "../api/observe";
-import {valueDidChange, deprecated, Lambda} from "../utils/utils";
+import {valueDidChange, deprecated, invariant, Lambda} from "../utils/utils";
 import {reportTransition} from "../api/extras";
 
 /**
@@ -80,8 +80,7 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 	 * Will evaluate it's computation first if needed.
 	 */
 	public get(): T {
-		if (this.isComputing)
-			throw new Error(`[DerivedValue '${this.name}'] Cycle detected`);
+		invariant(!this.isComputing, `Cycle detected`, this.derivation);
 		if (this.dependencyStaleCount > 0 && globalState.inTransaction > 0) {
 			// somebody is inspecting this computed value while being stale (because it is in a transaction)
 			// so peek into the value
@@ -106,7 +105,7 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 	}
 
 	public set(_: T) {
-		throw new Error(`[DerivedValue '${name}'] View functions do not accept new values`);
+		throw new Error(`[ComputedValue '${name}'] It is not possible to assign a new value to a computed value.`);
 	}
 
 	private trackAndCompute(): boolean {
@@ -115,7 +114,7 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 		return valueDidChange(this.compareStructural, this.value, oldValue);
 	}
 
-	observe(listener, fireImmediately?) {
+	observe(listener, fireImmediately?): Lambda {
 		deprecated("Use 'mobservable.observe(value, listener)' instead.");
 		return observe(this, listener, fireImmediately);
 	}

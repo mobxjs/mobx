@@ -32,7 +32,7 @@ export function notifyDependencyStale(derivation: IDerivation) {
  * will be scheduled for re-evaluation.
  */
 export function notifyDependencyReady(derivation: IDerivation, dependencyDidChange: boolean) {
-	invariant(derivation.dependencyStaleCount > 0);
+	invariant(derivation.dependencyStaleCount > 0, "unexpected ready notification");
 	if (dependencyDidChange)
 		derivation.dependencyChangeCount += 1;
 	if (--derivation.dependencyStaleCount === 0) {
@@ -73,8 +73,7 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
 	for (let i = 0, l = added.length; i < l; i++) {
 		let dependency = added[i];
 		// only check for cycles on new dependencies, existing dependencies cannot cause a cycle..
-		if (findCycle(derivation, dependency))
-			throw new Error(`${this.toString()}: Found cyclic dependency in computed value '${this.derivation.toString()}'`);
+		invariant(!findCycle(derivation, dependency), `Cycle detected`, derivation);
 		addObserver(added[i], derivation);
 	}
 

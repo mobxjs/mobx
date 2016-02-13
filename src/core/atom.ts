@@ -12,7 +12,7 @@ export interface IAtom extends IObservable {
  * Used by the transaction manager to signal observers that an atom is ready as soon as the transaction has ended.
  */
 export function propagateAtomReady(atom: IAtom) {
-	invariant(atom.isDirty);
+	invariant(atom.isDirty, "atom not dirty");
 	atom.isDirty = false;
 	reportTransition(atom, "READY", true);
 	propagateReadiness(atom, true);
@@ -65,7 +65,7 @@ export class Atom implements IAtom {
 	}
 
 	private reportReady(changed: boolean) {
-		invariant(this.isDirty);
+		invariant(this.isDirty, "atom not dirty");
 		if (globalState.inTransaction > 0)
 			globalState.changedAtoms.push(this);
 		else {

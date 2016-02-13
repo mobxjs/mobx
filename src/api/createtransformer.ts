@@ -1,10 +1,10 @@
 import {ComputedValue} from "../core/computedvalue";
+import {invariant} from "../utils/utils";
 
 export type ITransformer<A, B> = (object: A) => B;
 
 export function createTransformer<A, B>(transformer: ITransformer<A, B>, onCleanup?: (resultObject: B, sourceObject?: A) => void): ITransformer<A, B> {
-	if (typeof transformer !== "function" || transformer.length !== 1)
-		throw new Error("[mobservable] transformer parameter should be a function that accepts one argument");
+	invariant(typeof transformer === "function" && transformer.length === 1, "createTransformer expects a function that accepts one argument");
 
 	// Memoizes: object id -> reactive view that applies transformer to the object
 	const objectCache: {[id: number]: ComputedValue<B>} = {};

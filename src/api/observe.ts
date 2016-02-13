@@ -4,7 +4,7 @@ import {IObjectChange, isObservableObject, observeObservableObject} from "../typ
 import {IObservableValue, observable} from "./observable";
 import {ComputedValue} from "../core/computedvalue";
 import {ObservableValue} from "../types/observablevalue";
-import {Lambda, isPlainObject} from "../utils/utils";
+import {Lambda, isPlainObject, invariant} from "../utils/utils";
 import {autorun} from "../api/autorun";
 import {isObservable} from "./isobservable";
 
@@ -16,6 +16,7 @@ export function observe<T extends Object, Y>(object: T, prop: string, listener: 
 export function observe<T>(value: IObservableValue<T>, listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
 export function observe(thing, property?, listener?): Lambda {
 	const fireImmediately = arguments[2] === true;
+	const propError = "[mobservable.observe] the provided observable map has no key with name: " + property;
 	if (typeof property === "function") {
 		listener = property;
 		property = undefined;
@@ -25,7 +26,7 @@ export function observe(thing, property?, listener?): Lambda {
 	if (isObservableMap(thing)) {
 		if (property !== undefined) {
 			if (!thing._has(property))
-				throw new Error("[mobservable.observe] the provided observable map has no key with name: " + property);
+				throw new Error(propError);
 			return observe(thing._data[property], listener);
 		} else {
 			return thing.observe(listener);
@@ -34,7 +35,7 @@ export function observe(thing, property?, listener?): Lambda {
 	if (isObservableObject(thing)) {
 		if (property !== undefined) {
 			if (!isObservable(thing, property))
-				throw new Error("[mobservable.observe] the provided object has no observable property with name: " + property);
+				throw new Error(propError);
 			return observe(thing.$mobservable.values[property], listener);
 		}
 		return observeObservableObject(thing, listener);
@@ -45,7 +46,7 @@ export function observe(thing, property?, listener?): Lambda {
 		return observeObservableValue(thing.$mobservable, listener, fireImmediately);
 	if (isPlainObject(thing))
 		return observeObservableObject(<any> observable(<Object> thing), listener);
-	throw new Error("[mobservable.observe] first argument should be an observable array, observable map, observable object, observable value, computed value or plain object.");
+	invariant(false, "first argument of observabe should be some observable value or plain object");
 }
 
 function observeObservableValue<T>(observable: ObservableValue<T>|ComputedValue<T>, listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda {
