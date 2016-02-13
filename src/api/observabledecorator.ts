@@ -1,6 +1,6 @@
 import {ValueMode, asReference} from "../types/modifiers";
 import {allowStateChanges} from "../api/extras";
-import {ObservableObject} from "../types/observableobject";
+import {asObservableObject, setObservableObjectProperty} from "../types/observableobject";
 
 /**
  * ES6 / Typescript decorator which can to make class properties and getter functions reactive.
@@ -54,14 +54,14 @@ export function observableDecorator(target: Object, key: string, baseDescriptor:
 		// the getter might create a reactive property lazily, so this might even happen during a view.
 		// TODO: eliminate non-strict; creating observables during views is allowed, just don't use set.
 		allowStateChanges(true, () => {
-			ObservableObject.asReactive(this, null, ValueMode.Recursive).set(key, baseValue);
+			setObservableObjectProperty(asObservableObject(this, null, ValueMode.Recursive), key, baseValue);
 		});
 		return this[key];
 	};
 	descriptor.set = isDecoratingGetter
 		? () => {throw new Error(`[DerivedValue '${key}'] View functions do not accept new values`); }
 		: function(value) {
-			ObservableObject.asReactive(this, null, ValueMode.Recursive).set(key, typeof value === "function" ? asReference(value) : value);
+			setObservableObjectProperty(asObservableObject(this, null, ValueMode.Recursive), key, typeof value === "function" ? asReference(value) : value);
 		}
 	;
 	if (!baseDescriptor) {

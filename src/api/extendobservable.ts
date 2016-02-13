@@ -1,6 +1,6 @@
 import {ValueMode} from "../types/modifiers";
 import {ObservableMap} from "../types/observablemap";
-import {ObservableObject} from "../types/observableobject";
+import {asObservableObject, setObservableObjectProperty} from "../types/observableobject";
 
 /**
  * Extends an object with reactive capabilities.
@@ -23,9 +23,9 @@ export function extendObservable<A extends Object, B extends Object>(target: A, 
 
 
 export function extendObservableHelper(target, properties, mode: ValueMode, name: string): Object {
-	const meta = ObservableObject.asReactive(target, name, mode);
+	const adm = asObservableObject(target, name, mode);
 	for (let key in properties) if (properties.hasOwnProperty(key)) {
-		meta.set(key, properties[key]);
+		setObservableObjectProperty(adm, key, properties[key]);
 	}
 	return target;
 }

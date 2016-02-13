@@ -1,6 +1,6 @@
 import {ObservableArray} from "../types/observablearray";
 import {ObservableMap} from "../types/observablemap";
-import {ObservableObject} from "../types/observableobject";
+import {isObservableObject, IObservableObjectAdministration} from "../types/observableobject";
 import {Atom} from "../core/atom";
 import {ComputedValue} from "../core/computedvalue";
 import {Reaction} from "../core/reaction";
@@ -16,8 +16,8 @@ export function isObservable(value, property?: string): boolean {
 	if (property !== undefined) {
 		if (value instanceof ObservableMap || value instanceof ObservableArray)
 			throw new Error("[mobservable.isObservable] isObservable(object, propertyName) is not supported for arrays and maps. Use map.has or array.length instead.");
-		else if (value.$mobservable instanceof ObservableObject) {
-			const o = <ObservableObject>value.$mobservable;
+		else if (isObservableObject(value)) {
+			const o = <IObservableObjectAdministration> value.$mobservable;
 			return o.values && !!o.values[property];
 		}
 		return false;

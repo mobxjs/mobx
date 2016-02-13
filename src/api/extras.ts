@@ -3,13 +3,7 @@
  * (c) 2015 - Michel Weststrate
  * https://github.com/mweststrate/mobservable
  */
-import {Atom} from "../core/atom";
-import {ObservableArray} from "../types/observablearray";
-import {Reaction} from "../core/reaction";
-import {ComputedValue} from "../core/computedvalue";
 import {IDepTreeNode} from "../core/observable";
-import {ObservableObject} from "../types/observableobject";
-import {ObservableMap} from "../types/observablemap";
 import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {once, unique, Lambda} from "../utils/utils";
 import {globalState} from "../core/globalstate";

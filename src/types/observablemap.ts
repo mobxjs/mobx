@@ -12,9 +12,7 @@ export interface IKeyValueMap<V> {
 
 export type IMapEntries<V> = [string, V][]
 
-export interface IObservableMapChange<T> extends IObjectChange<T, ObservableMap<T>> {
-	
-}
+export interface IObservableMapChange<T> extends IObjectChange<T, ObservableMap<T>> { }
 
 export class ObservableMap<V> {
 	$mobservable = {};

@@ -1,7 +1,7 @@
 import {IObservableArray, IArrayChange, IArraySplice, isObservableArray} from "../types/observablearray";
 import {ObservableMap, IObservableMapChange, isObservableMap} from "../types/observablemap";
-import {IObjectChange, isObservableObject} from "../types/observableobject";
-import {observable, IObservableValue} from "./observable";
+import {IObjectChange, isObservableObject, observeObservableObject} from "../types/observableobject";
+import {IObservableValue, observable} from "./observable";
 import {ComputedValue} from "../core/computedvalue";
 import {ObservableValue} from "../types/observablevalue";
 import {Lambda, isPlainObject} from "../utils/utils";
@@ -23,7 +23,7 @@ export function observe(thing, property?, listener?): Lambda {
 	if (isObservableArray(thing))
 		return thing.observe(listener);
 	if (isObservableMap(thing)) {
-		if (property) {
+		if (property !== undefined) {
 			if (!thing._has(property))
 				throw new Error("[mobservable.observe] the provided observable map has no key with name: " + property);
 			return observe(thing._data[property], listener);
@@ -32,19 +32,19 @@ export function observe(thing, property?, listener?): Lambda {
 		}
 	}
 	if (isObservableObject(thing)) {
-		if (property) {
+		if (property !== undefined) {
 			if (!isObservable(thing, property))
 				throw new Error("[mobservable.observe] the provided object has no observable property with name: " + property);
 			return observe(thing.$mobservable.values[property], listener);
 		}
-		return thing.$mobservable.observe(listener);
+		return observeObservableObject(thing, listener);
 	}
 	if (thing instanceof ObservableValue || thing instanceof ComputedValue)
 		return observeObservableValue(thing, listener, fireImmediately);
 	if (thing.$mobservable instanceof ObservableValue || thing.$mobservable instanceof ComputedValue)
 		return observeObservableValue(thing.$mobservable, listener, fireImmediately);
 	if (isPlainObject(thing))
-		return (<any>observable(thing)).$mobservable.observe(listener);
+		return observeObservableObject(<any> observable(<Object> thing), listener);
 	throw new Error("[mobservable.observe] first argument should be an observable array, observable map, observable object, observable value, computed value or plain object.");
 }
 
