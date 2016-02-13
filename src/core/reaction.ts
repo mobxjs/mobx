@@ -2,7 +2,7 @@ import {IObservable, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction} from "./derivation";
 import {globalState, getNextId} from "./globalstate";
 import {reportTransition} from "../api/extras";
-import {EMPTY_ARRAY} from "../utils/utils";
+import {EMPTY_ARRAY, Lambda} from "../utils/utils";
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations
@@ -30,8 +30,8 @@ export class Reaction implements IDerivation {
 	observing: IObservable[] = []; // nodes we are looking at. Our value depends on these nodes
 	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
-	disposed = false;
-	scheduled = false;
+	isDisposed = false;
+	_isScheduled = false;
 
 	constructor(name: string = "", private onInvalidate: () => void) {
 		this.name = name || ("Reaction#" + this.id);
@@ -46,23 +46,23 @@ export class Reaction implements IDerivation {
 	}
 
 	onDependenciesReady(): boolean {
-		if (!this.scheduled) {
-			this.scheduled = true;
+		if (!this._isScheduled) {
+			this._isScheduled = true;
 			globalState.pendingReactions.push(this);
 		}
 		return false; // reactions never propagate changes
 	}
 
 	isScheduled() {
-		return this.dependencyStaleCount > 0 || this.scheduled;
+		return this.dependencyStaleCount > 0 || this._isScheduled;
 	}
 
 	/**
 	 * internal
 	 */
 	runReaction() {
-		if (!this.disposed) {
-			this.scheduled = false;
+		if (!this.isDisposed) {
+			this._isScheduled = false;
 			this.onInvalidate();
 			reportTransition(this, "READY", true); // a reaction has always 'changed'.
 		}
@@ -73,12 +73,18 @@ export class Reaction implements IDerivation {
 	}
 
 	dispose() {
-		if (!this.disposed) {
-			this.disposed = true;
+		if (!this.isDisposed) {
+			this.isDisposed = true;
 			const deps = this.observing.splice(0);
 			for (let i = 0, l = deps.length; i < l; i++)
 				removeObserver(deps[i], this);
 		}
+	}
+
+	getDisposer(): Lambda & { $mosbservable: Reaction } {
+		const r = this.dispose.bind(this);
+		r.$mobservable = this;
+		return r;
 	}
 
 	toString() {

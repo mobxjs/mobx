@@ -26,7 +26,6 @@ test('autorun 1', function(t) {
 	var autorun = function() {
 		_fired++;
 		_result = d.get() > 0 ? a.get() * c.get() : d.get();
-		
 	};
 	var disp = m.autorunAsync(autorun, 20);
 	
@@ -71,10 +70,10 @@ test('autorun 1', function(t) {
 								to(function() {
 									expect(0, 0, 0);
 									t.end();
-								},20)
-							}, 20);
-						}, 20);
-					}, 20);
+								},30)
+							}, 30);
+						}, 30);
+					}, 30);
 				}, 30);
 			}, 30);			
 		}, 30);

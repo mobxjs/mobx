@@ -12,7 +12,7 @@ import {IObservable, reportObserved} from "../core/observable";
  * @param scope (optional)
  * @returns disposer function, which can be used to stop the view from being updated in the future.
  */
-export function autorun(view: Lambda, scope?: any): Lambda {
+export function autorun(view: Lambda, scope?: any) {
 	assertUnwrapped(view, "autorun methods cannot have modifiers");
 	invariant(typeof view === "function", "autorun expects a function");
 	invariant(view.length === 0, "autorun expects a function without arguments");
@@ -29,9 +29,7 @@ export function autorun(view: Lambda, scope?: any): Lambda {
 	else
 		reaction.runReaction();
 
-	const disposer = () => reaction.dispose();
-	(<any>disposer).$mobservable = reaction;
-	return disposer;
+	return reaction.getDisposer();
 }
 
 /**
@@ -42,7 +40,7 @@ export function autorun(view: Lambda, scope?: any): Lambda {
  * @param scope (optional)
  * @returns disposer function to prematurely end the observer.
  */
-export function when(predicate: () => boolean, effect: Lambda, scope?: any): Lambda {
+export function when(predicate: () => boolean, effect: Lambda, scope?: any) {
 	let disposeImmediately = false;
 	const disposer = autorun(() => {
 		if (predicate.call(scope)) {
@@ -58,52 +56,27 @@ export function when(predicate: () => boolean, effect: Lambda, scope?: any): Lam
 	return disposer;
 }
 
-export function autorunUntil(predicate: () => boolean, effect: Lambda, scope?: any): Lambda {
+export function autorunUntil(predicate: () => boolean, effect: Lambda, scope?: any) {
 	deprecated("`autorunUntil` is deprecated, please use `when`.");
 	return when.apply(null, arguments);
 }
 
-export function autorunAsync(func: Lambda, delay: number = 1, scope?: any): Lambda {
-	let shouldRun = false;
-	let tickScheduled = false;
-	let tick = observable(0);
-	let observedValues: IObservable[] = [];
-	let disposer: Lambda;
-	let isDisposed = false;
+export function autorunAsync(func: Lambda, delay: number = 1, scope?: any) {
+	if (scope)
+		func = func.bind(scope);
+	let isScheduled = false;
 
-	function schedule(f: Lambda) {
-		setTimeout(f, delay);
-	}
-
-	function doTick() {
-		tickScheduled = false;
-		shouldRun = true;
-		tick.set(tick.get() + 1);
-	}
-
-	disposer = autorun(() => {
-		if (isDisposed)
-			return;
-		tick.get(); // observe so that autorun fires on next tick
-		if (shouldRun) {
-			func.call(scope);
-			observedValues = (<any>disposer).$mobservable.observing;
-			shouldRun = false;
-		} else {
-			// keep observed values eager, probably cheaper then forgetting
-			// about the value and later re-evaluating lazily,
-			// probably cheaper when computations are expensive
-			observedValues.forEach(o => reportObserved(o));
-			if (!tickScheduled) {
-				tickScheduled = true;
-				schedule(doTick);
-			}
+	const r = new Reaction("bla", () => {
+		if (!isScheduled) {
+			isScheduled = true;
+			setTimeout(() => {
+				isScheduled = false;
+				if (!r.isDisposed) // TODO: is disposed
+					r.track(func);
+			}, delay);
 		}
 	});
 
-	return once(() => {
-		isDisposed = true; // short-circuit any pending calculation
-		if (disposer)
-			disposer();
-	});
+	r.runReaction();
+	return r.getDisposer();
 }
