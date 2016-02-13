@@ -33,6 +33,10 @@
   "bugs": {
     "url": "https://github.com/mweststrate/mobservable/issues"
   },
+  "files": [
+    "lib",
+    "LICENSE"  
+  ],
   "homepage": "https://mweststrate.github.io/mobservable",
   "devDependencies": {
     "babel-cli": "^6.4.5",
