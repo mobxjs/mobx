@@ -20,7 +20,6 @@ export class ObservableValue<T> extends Atom {
 
 	set(newValue: T): boolean {
 		assertUnwrapped(newValue, "Modifiers cannot be used on non-initial values.");
-		// TODO: check if derived value is running (not reactor)
 		checkIfStateModificationsAreAllowed();
 		const oldValue = this.value;
 		const changed = valueDidChange(this.mode === ValueMode.Structure, oldValue, newValue);

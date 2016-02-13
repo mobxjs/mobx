@@ -14,82 +14,76 @@ function buffer() {
 }
 
 test('test1', function(t) {
-    try {
-        var a = observable([]);
-        t.equal(a.length, 0);
-        t.deepEqual(Object.keys(a), []);
-        t.deepEqual(a.slice(), []);
+    var a = observable([]);
+    t.equal(a.length, 0);
+    t.deepEqual(Object.keys(a), []);
+    t.deepEqual(a.slice(), []);
 
-        a.push(1);
-        t.equal(a.length, 1);
-        t.deepEqual(a.slice(), [1]);
+    a.push(1);
+    t.equal(a.length, 1);
+    t.deepEqual(a.slice(), [1]);
 
-        a[1] = 2;
-        t.equal(a.length, 2);
-        t.deepEqual(a.slice(), [1,2]);
+    a[1] = 2;
+    t.equal(a.length, 2);
+    t.deepEqual(a.slice(), [1,2]);
 
-        var sum = observable(function() {
-            return -1 + a.reduce(function(a,b) {
-                return a + b;
-            }, 1);
-        });
+    var sum = observable(function() {
+        return -1 + a.reduce(function(a,b) {
+            return a + b;
+        }, 1);
+    });
 
-        t.equal(sum.get(), 3);
+    t.equal(sum.get(), 3);
 
-        a[1] = 3;
-        t.equal(a.length, 2);
-        t.deepEqual(a.slice(), [1,3]);
-        t.equal(sum.get(), 4);
+    a[1] = 3;
+    t.equal(a.length, 2);
+    t.deepEqual(a.slice(), [1,3]);
+    t.equal(sum.get(), 4);
 
-        a.splice(1,1,4,5);
-        t.equal(a.length, 3);
-        t.deepEqual(a.slice(), [1,4,5]);
-        t.equal(sum.get(), 10);
+    a.splice(1,1,4,5);
+    t.equal(a.length, 3);
+    t.deepEqual(a.slice(), [1,4,5]);
+    t.equal(sum.get(), 10);
 
-        a.replace([2,4]);
-        t.equal(sum.get(), 6);
+    a.replace([2,4]);
+    t.equal(sum.get(), 6);
 
-        a.splice(1,1);
-        t.equal(sum.get(), 2);
-        t.deepEqual(a.slice(), [2])
+    a.splice(1,1);
+    t.equal(sum.get(), 2);
+    t.deepEqual(a.slice(), [2])
 
-        a.splice(0,0,4,3);
-        t.equal(sum.get(), 9);
-        t.deepEqual(a.slice(), [4,3,2]);
+    a.splice(0,0,4,3);
+    t.equal(sum.get(), 9);
+    t.deepEqual(a.slice(), [4,3,2]);
 
-        a.clear();
-        t.equal(sum.get(), 0);
-        t.deepEqual(a.slice(), []);
+    a.clear();
+    t.equal(sum.get(), 0);
+    t.deepEqual(a.slice(), []);
 
-        a.length = 4;
-        t.equal(isNaN(sum.get()), true);
-        t.deepEqual(a.length, 4);
+    a.length = 4;
+    t.equal(isNaN(sum.get()), true);
+    t.deepEqual(a.length, 4);
 
-        t.deepEqual(a.slice(), [undefined, undefined, undefined, undefined]);
+    t.deepEqual(a.slice(), [undefined, undefined, undefined, undefined]);
 
-        a.replace([1,2, 2,4]);
-        t.equal(sum.get(), 9);
-        a.length = 4;
-        t.equal(sum.get(), 9);
+    a.replace([1,2, 2,4]);
+    t.equal(sum.get(), 9);
+    a.length = 4;
+    t.equal(sum.get(), 9);
 
 
-        a.length = 2;
-        t.equal(sum.get(), 3);
-        t.deepEqual(a.slice(), [1,2]);
+    a.length = 2;
+    t.equal(sum.get(), 3);
+    t.deepEqual(a.slice(), [1,2]);
 
-        t.deepEqual(a.reverse(), [2,1]);
-        t.deepEqual(a.slice(), [1,2]);
+    t.deepEqual(a.reverse(), [2,1]);
+    t.deepEqual(a.slice(), [1,2]);
 
-        a.unshift(3);
-        t.deepEqual(a.sort(), [1,2,3]);
-        t.deepEqual(a.slice(), [3,1,2]);
+    a.unshift(3);
+    t.deepEqual(a.sort(), [1,2,3]);
+    t.deepEqual(a.slice(), [3,1,2]);
 
-        t.end();
-    }
-    catch(e) {
-        console.error(e);
-        throw e;
-    }
+    t.end();
 })
 
 test('find and remove', function(t) {

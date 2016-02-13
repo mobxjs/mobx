@@ -25,7 +25,7 @@ export interface IObservableObjectAdministration {
 	name: string;
 	mode: ValueMode;
 	values: {[key: string]: ObservableValue<any>|ComputedValue<any>};
-	_events: SimpleEventEmitter;
+	events: SimpleEventEmitter;
 }
 
 export interface IIsObservableObject {
@@ -41,7 +41,7 @@ export function asObservableObject(target, name: string = "" /* TODO: "Observabl
 	const adm: IObservableObjectAdministration = {
 		type: ObservableObjectMarker,
 		values: {},
-		_events: new SimpleEventEmitter(), // TODO create lazy, rename
+		events: undefined,
 		target, name, mode
 	};
 	Object.defineProperty(target, "$mobservable", {
@@ -76,23 +76,22 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 		configurable: true,
 		enumerable: observable instanceof ObservableValue,
 		get: function() {
-			// TODO: why the ternary if?
-			return this.$mobservable ? this.$mobservable.values[propName].get() : undefined;
+			return observable.get();
 		},
 		set: function(newValue) {
-			const self = <IObservableObjectAdministration> this.$mobservable; // TODO: faster to just use adm?
-			const oldValue = self.values[propName].get();
-			self.values[propName].set(newValue);
-			self._events.emit(<IObjectChange<any, any>> {
-				type: "update",
-				object: this,
-				name: propName,
-				oldValue
-			});
+			const oldValue = observable.get();
+			if (observable.set(newValue) && adm.events) {
+				adm.events.emit(<IObjectChange<any, any>> {
+					type: "update",
+					object: this,
+					name: propName,
+					oldValue
+				});
+			}
 		}
 	});
 
-	adm._events.emit(<IObjectChange<any, any>> {
+	adm.events && adm.events.emit(<IObjectChange<any, any>> {
 		type: "add",
 		object: adm.target,
 		name: propName
@@ -106,7 +105,10 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 	*/
 export function observeObservableObject(object: IIsObservableObject, callback: (changes: IObjectChange<any, any>) => void): Lambda {
 	invariant(isObservableObject(object), "Expected observable object");
-	return object.$mobservable._events.on(callback);
+	const adm = object.$mobservable;
+	if (!adm.events)
+		adm.events = new SimpleEventEmitter();
+	return object.$mobservable.events.on(callback);
 }
 
 export function isObservableObject(thing): boolean {

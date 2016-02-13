@@ -296,11 +296,15 @@ test('as structure', function(t) {
     
     function c() {
         t.equal(changed, 1, "expected a change");
+        if (changed !== 1)
+            console.trace();
         changed = 0;
     }
 
     function nc() {
         t.equal(changed, 0, "expected no change");
+        if (changed !== 0)
+            console.trace();
         changed = 0;
     }
     

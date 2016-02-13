@@ -17,7 +17,7 @@ export function autorun(view: Lambda, scope?: any): Lambda {
 	invariant(typeof view === "function", "autorun expects a function");
 	invariant(view.length === 0, "autorun expects a function without arguments");
 	if (scope)
-		view = view.bind(scope); // TODO: or is closure faster?
+		view = view.bind(scope);
 
 	const reaction = new Reaction(view.name, function () {
 		this.track(view);

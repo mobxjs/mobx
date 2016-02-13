@@ -4,7 +4,7 @@
  * https://github.com/mweststrate/mobservable
  */
 
-import {deepEquals, makeNonEnumerable, Lambda, deprecated} from "../utils/utils";
+import {deepEquals, makeNonEnumerable, Lambda, deprecated, EMPTY_ARRAY} from "../utils/utils";
 import {Atom} from "../core/atom";
 import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {ValueMode, assertUnwrapped, makeChildObservable} from "./modifiers";
@@ -103,7 +103,7 @@ function spliceWithArray<T>(adm: IObservableArrayAdministration<T>, index: numbe
 		deleteCount = Math.max(0, Math.min(deleteCount, length - index));
 
 	if (newItems === undefined)
-		newItems = []; // TODO: use utils.empty array
+		newItems = EMPTY_ARRAY;
 	else
 		newItems = <T[]> newItems.map((value) => makeReactiveArrayItem(adm, value)); // TODO: use bound func?
 
@@ -355,7 +355,7 @@ function createArrayBufferItem(index: number) {
 				}
 			}
 			else if (index === values.length)
-				spliceWithArray(impl, index, 0, [makeReactiveArrayItem(impl, value)]); // TODO: make reactive not needed?!
+				spliceWithArray(impl, index, 0, [value]); // TODO: make reactive not needed?!
 			else
 				throw new Error(`[mobservable.array] Index out of bounds, ${index} is larger than ${values.length}`);
 		},
