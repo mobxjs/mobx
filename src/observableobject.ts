@@ -69,17 +69,25 @@ export class ObservableObject {
 			},
 			set: function(newValue) {
 				const oldValue = this.$mobservable.values[propName].get();
+				this.$mobservable._events.emit(<IObjectChange<any, any>>{
+					type: "preupdate",
+					object: this,
+					name: propName,
+					newValue,
+					oldValue
+				});
 				this.$mobservable.values[propName].set(newValue);
-				this.$mobservable._events.emit(<IObjectChange<any, any>>{ 
+				this.$mobservable._events.emit(<IObjectChange<any, any>>{
 					type: "update",
 					object: this,
 					name: propName,
+					newValue,
 					oldValue
 				});
 			}
 		});
 
-		this._events.emit(<IObjectChange<any, any>>{ 
+		this._events.emit(<IObjectChange<any, any>>{
 			type: "add",
 			object: this.target,
 			name: propName
@@ -88,7 +96,7 @@ export class ObservableObject {
 
 	/**
 	 * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
-	 * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe 
+	 * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
 	 * for callback details
 	 */
 	observe(callback: (changes:IObjectChange<any, any>) => void): Lambda {

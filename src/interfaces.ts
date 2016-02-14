@@ -50,6 +50,7 @@ export interface IObjectChange<T, R> {
 	object: R;
 	type: string;
 	oldValue?: T;
+	newValue?: T;
 }
 
 export interface IDependencyTree {
