@@ -26,6 +26,7 @@ registerGlobals();
 
 // TODO: all exports in sync with docs?
 export { Lambda                                               } from "./utils/utils";
+export { SimpleEventEmitter                                   } from "./utils/simpleeventemitter";
 export { ITransitionEvent, IObserverTree, IDependencyTree     } from "./api/extras";
 export { IObservable, IDepTreeNode                            } from "./core/observable";
 export { IDerivation                                          } from "./core/derivation";
@@ -46,8 +47,8 @@ export { ITransformer, createTransformer                      } from "./api/crea
 
 export { untracked                                            } from "./core/globalstate";
 export { transaction                                          } from "./core/transaction";
-export { Reaction } from "./core/reaction";
-
+export { Reaction                                             } from "./core/reaction";
+export { IAtom, Atom                                          } from "./core/atom";
 
 import { isComputingDerivation, resetGlobalState } from "./core/globalstate";
 import { quickDiff } from "./utils/utils";
@@ -58,12 +59,10 @@ export const _ = {
 }
 
 import { ITransitionEvent, IObserverTree, IDependencyTree } from "./api/extras";
-import { SimpleEventEmitter } from "./utils/simpleeventemitter";
 import { getDependencyTree, getObserverTree, trackTransitions, allowStateChanges } from "./api/extras";
 import { Lambda } from "./utils/utils";
 
 export const extras = {
-	SimpleEventEmitter: <any> SimpleEventEmitter,
 	getDependencyTree,
 	getObserverTree,
 	trackTransitions,

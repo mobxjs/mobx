@@ -23,7 +23,7 @@ cat src/mobservable.ts | grep -v '^import' | sed -e 's/from.*$//g' >> .build/mob
 ls  src/{core,types,api,utils}/*.ts | xargs awk 'BEGINFILE {print "/* file:", FILENAME, "*/"} {print $0}' | grep -v '^import ' | sed -e 's/^export //g' >> .build/mobservable.ts
 
 # compile, generate declaration, no comments
-tsc -m umd -t es5 -d --removeComments --sourcemap --outDir lib .build/mobservable.ts 
+tsc -m commonjs -t es5 -d --removeComments --sourcemap --outDir lib .build/mobservable.ts 
 
 # idea: strip invariants from compiled result. However, difference is not really significant in speed and size, disabled for now. 
 # cat lib/mobservable.js | grep -v -P '^\s+invariant' > .build/mobservable-prod.js 

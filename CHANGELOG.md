@@ -14,6 +14,7 @@ This means that it is allowed in an to change the state in such a way that the s
 * minified file moved
 * smaller distro: 74 -> 60 KB unminified, 54 -> 30 KB minified
 * Faster
+* extras.SimpleEventEmitter -> SimpleEventEmitter
 
 # 1.2.4
 
