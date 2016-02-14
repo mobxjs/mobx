@@ -80,7 +80,7 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 		},
 		set: function(newValue) {
 			const oldValue = observable.get();
-			if (observable.set(newValue) && adm.events) {
+			if (observable.set(newValue) && adm.events !== undefined) {
 				adm.events.emit(<IObjectChange<any, any>> {
 					type: "update",
 					object: this,
@@ -91,11 +91,13 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 		}
 	});
 
-	adm.events && adm.events.emit(<IObjectChange<any, any>> {
-		type: "add",
-		object: adm.target,
-		name: propName
-	});
+	if (adm.events !== undefined) {
+		adm.events.emit(<IObjectChange<any, any>> {
+			type: "add",
+			object: adm.target,
+			name: propName
+		});
+	};
 }
 
 /**
@@ -106,7 +108,7 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 export function observeObservableObject(object: IIsObservableObject, callback: (changes: IObjectChange<any, any>) => void): Lambda {
 	invariant(isObservableObject(object), "Expected observable object");
 	const adm = object.$mobservable;
-	if (!adm.events)
+	if (adm.events === undefined)
 		adm.events = new SimpleEventEmitter();
 	return object.$mobservable.events.on(callback);
 }

@@ -17,14 +17,19 @@ mkdir -p .build
 echo '/** Mobservable - (c) Michel Weststrate 2015, 2016 - MIT Licensed */' > .build/mobservable.ts
 
 # generate exports config
-cat src/mobservable.ts | grep -v 'import' | sed -e 's/from.*$//g' >> .build/mobservable.ts
+cat src/mobservable.ts | grep -v '^import' | sed -e 's/from.*$//g' >> .build/mobservable.ts
 
 # find all ts files, concat them (with newlines), remove all import statements, remove export keyword
-ls src/{core,types,api,utils}/*.ts | xargs awk 'BEGINFILE {print "/* file:", FILENAME, "*/"} {print $0}' | grep -v 'import ' | sed -e 's/^export //g' >> .build/mobservable.ts
+ls  src/{core,types,api,utils}/*.ts | xargs awk 'BEGINFILE {print "/* file:", FILENAME, "*/"} {print $0}' | grep -v '^import ' | sed -e 's/^export //g' >> .build/mobservable.ts
 
 # compile, generate declaration, no comments
 tsc -m umd -t es5 -d --removeComments --sourcemap --outDir lib .build/mobservable.ts 
 
-# minify, mangle, compress, wrap in function
+# idea: strip invariants from compiled result. However, difference is not really significant in speed and size, disabled for now. 
+# cat lib/mobservable.js | grep -v -P '^\s+invariant' > .build/mobservable-prod.js 
+
+# minify, mangle, compress, wrap in function, use build without invariant
 # N.B: don't worry about the dead code warnings, see https://github.com/Microsoft/TypeScript/issues/7017#issuecomment-182789529
-uglifyjs -m sort,toplevel -c --screw-ie8 --preamble '/** Mobservable - (c) Michel Weststrate 2015, 2016 - MIT Licensed */' --in-source-map lib/mobservable.js.map --source-map lib/mobservable.min.js.map -o lib/mobservable.min.js lib/mobservable.js
+uglifyjs -m sort,toplevel -c --screw-ie8 --preamble '/** Mobservable - (c) Michel Weststrate 2015, 2016 - MIT Licensed */' --in-source-map lib/mobservable.js.map --source-map lib/mobservable.min.js.map -o lib/mobservable.min.js lib/mobservable.js 
+  # -- OR -- (see above)
+  # .build/mobservable-prod.js

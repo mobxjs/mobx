@@ -88,7 +88,7 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
  */
 function findCycle(needle: IDerivation, node: IObservable): boolean {
 	const obs = node.observing;
-	if (!obs)
+	if (obs === undefined)
 		return false;
 	if (obs.indexOf(node) !== -1)
 		return true;

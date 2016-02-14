@@ -134,3 +134,58 @@ test('emulate rendering', function(t) {
 
   t.end();
 });
+
+
+test('efficient selection', function(t) {
+    
+    function Item(value) {
+        m.extendObservable(this, {
+            selected: false,
+            value: value
+        });
+    }
+    
+    function Store() {
+        this.prevSelection = null;
+        m.extendObservable(this, {
+            selection: null,
+            items: [
+                new Item(1),
+                new Item(2),
+                new Item(3)
+            ]
+        });
+        m.autorun(function() {
+            m.transaction(function() {
+                if (this.previousSelection === this.selection)
+                    return true; // converging condition
+                if (this.previousSelection)
+                    this.previousSelection.selected = false;
+                if (this.selection)
+                    this.selection.selected = true;
+                this.previousSelection = this.selection;
+            }, this);
+        }, this);
+    }
+    
+    var store = new Store();
+    
+    t.equal(store.selection, null);
+    t.equal(store.items.filter(function (i) { return i.selected }).length, 0);
+    
+    store.selection = store.items[1];
+    t.equal(store.items.filter(function (i) { return i.selected }).length, 1);
+    t.equal(store.selection, store.items[1]);
+    t.equal(store.items[1].selected, true);
+    
+    store.selection = store.items[2];
+    t.equal(store.items.filter(function (i) { return i.selected }).length, 1);
+    t.equal(store.selection, store.items[2]);
+    t.equal(store.items[2].selected, true);
+
+    store.selection = null;
+    t.equal(store.items.filter(function (i) { return i.selected }).length, 0);
+    t.equal(store.selection, null);
+    
+    t.end();
+});
