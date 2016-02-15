@@ -60,7 +60,7 @@ export function valueDidChange(compareStructural: boolean, oldValue, newValue): 
 }
 
 export function makeNonEnumerable(object: any, props: string[]) {
-	for(let i = 0; i < props.length; i++) {
+	for (let i = 0; i < props.length; i++) {
 		Object.defineProperty(object, props[i], {
 			configurable: true,
 			writable: true,

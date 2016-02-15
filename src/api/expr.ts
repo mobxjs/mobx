@@ -1,5 +1,5 @@
-import {isComputingDerivation} from "../core/globalstate";
 import {observable} from "../api/observable";
+import {isComputingDerivation} from "../core/derivation";
 
 /**
 	* expr can be used to create temporarily views inside views.

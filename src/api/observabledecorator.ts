@@ -48,7 +48,6 @@ export function observableDecorator(target: Object, key: string, baseDescriptor:
 	descriptor.enumerable = true;
 	descriptor.get = function() {
 		// the getter might create a reactive property lazily, so this might even happen during a view.
-		// TODO: eliminate non-strict; creating observables during views is allowed, just don't use set.
 		allowStateChanges(true, () => {
 			setObservableObjectProperty(asObservableObject(this, undefined, ValueMode.Recursive), key, baseValue);
 		});

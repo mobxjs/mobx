@@ -6,7 +6,7 @@
 import {once, Lambda} from "./utils";
 
 export class SimpleEventEmitter {
-	listeners:{(...data: any[]): void}[] = [];
+	listeners: {(...data: any[]): void}[] = [];
 
 	emit(...data: any[]) {
 		const listeners = this.listeners.slice();

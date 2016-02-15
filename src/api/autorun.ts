@@ -1,7 +1,8 @@
-import {Lambda, once, deprecated, invariant} from "../utils/utils";
+import {Lambda, deprecated, invariant} from "../utils/utils";
 import {assertUnwrapped} from "../types/modifiers";
 import {Reaction} from "../core/reaction";
-import {globalState, isComputingDerivation} from "../core/globalstate";
+import {globalState} from "../core/globalstate";
+import {isComputingDerivation} from "../core/derivation";
 
 /**
  * Creates a reactive view and keeps it alive, so that the view is always

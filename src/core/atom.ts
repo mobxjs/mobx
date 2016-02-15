@@ -2,7 +2,7 @@ import {IObservable, propagateReadiness, propagateStaleness, reportObserved} fro
 import {invariant, noop} from "../utils/utils";
 import {globalState, getNextId} from "./globalstate";
 import {reportTransition} from "../api/extras";
-import {runReactions} from "./transaction";
+import {runReactions} from "./reaction";
 
 export interface IAtom extends IObservable {
 	isDirty: boolean;
@@ -49,7 +49,7 @@ export class Atom implements IAtom {
 	public reportChanged() {
 		if (!this.isDirty) {
 			this.reportStale();
-			this.reportReady(true);
+			this.reportReady();
 		}
 	}
 
@@ -61,7 +61,7 @@ export class Atom implements IAtom {
 		}
 	}
 
-	private reportReady(changed: boolean) { // TODO: unused?!
+	private reportReady() {
 		invariant(this.isDirty, "atom not dirty");
 		if (globalState.inTransaction > 0)
 			globalState.changedAtoms.push(this);

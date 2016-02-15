@@ -56,3 +56,10 @@ export function propagateReadiness(observable: IObservable|IDerivation, valueDid
 		o => notifyDependencyReady(o, valueDidActuallyChange)
 	);
 }
+
+export function untracked<T>(action: () => T): T {
+	globalState.inUntracked++;
+	const res = action();
+	globalState.inUntracked--;
+	return res;
+}

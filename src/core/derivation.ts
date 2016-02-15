@@ -16,6 +16,14 @@ export interface IDerivation extends IDepTreeNode, IObservable {
 	onDependenciesReady(): boolean;
 }
 
+export function isComputingDerivation() {
+	return globalState.derivationStack.length > 0;
+}
+
+export function checkIfStateModificationsAreAllowed() {
+	invariant(globalState.allowStateChanges, `It is not allowed to change the state when a computed value is being evaluated. Use 'autorun' to create reactive functions with side-effects. Or use 'extras.allowStateChanges(true, block)' to supress this message.`);
+}
+
 /**
  * Notify a derivation that one of the values it is observing has become stale
  */

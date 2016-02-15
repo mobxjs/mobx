@@ -1,5 +1,5 @@
 import {Atom} from "../core/atom";
-import {checkIfStateModificationsAreAllowed} from "../core/globalstate";
+import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} from "./modifiers";
 import {valueDidChange, deprecated, Lambda} from "../utils/utils";
 import {observe} from "../api/observe";

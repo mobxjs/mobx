@@ -88,3 +88,26 @@ export class Reaction implements IDerivation {
 		return `Reaction[${this.name}]`;
 	}
 }
+
+/**
+ * Magic number alert!
+ * Defines within how many times a reaction is allowed to re-trigger itself
+ * until it is assumed that this is gonna be a never ending loop...
+ */
+const MAX_REACTION_ITERATIONS = 100;
+
+export function runReactions() {
+	if (globalState.isRunningReactions)
+		return;
+	globalState.isRunningReactions = true;
+	const pr = globalState.pendingReactions;
+	let iterations = 0;
+	while (pr.length) {
+		if (++iterations === MAX_REACTION_ITERATIONS)
+			throw new Error("Reaction doesn't converge to a stable state. Probably there is a cycle in the reactive function: " + pr[0].toString());
+		let rs = pr.splice(0);
+		for (let i = 0, l = rs.length; i < l; i++)
+			rs[i].runReaction();
+	}
+	globalState.isRunningReactions = false;
+}

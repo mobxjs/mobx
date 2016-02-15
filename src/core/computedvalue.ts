@@ -1,6 +1,6 @@
 import {IObservable, reportObserved, removeObserver} from "./observable";
-import {IDerivation, trackDerivedFunction} from "./derivation";
-import {globalState, getNextId, isComputingDerivation} from "./globalstate";
+import {IDerivation, trackDerivedFunction, isComputingDerivation} from "./derivation";
+import {globalState, getNextId} from "./globalstate";
 import {observe} from "../api/observe";
 import {valueDidChange, deprecated, invariant, Lambda} from "../utils/utils";
 import {reportTransition} from "../api/extras";

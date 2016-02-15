@@ -19,16 +19,10 @@
 import {registerGlobals} from "./core/globalstate";
 registerGlobals();
 
-/**
- * 'Private' elements that are exposed for testing and debugging utilities
- */
-
-
-// TODO: all exports in sync with docs?
 export { Lambda                                               } from "./utils/utils";
 export { SimpleEventEmitter                                   } from "./utils/simpleeventemitter";
 export { ITransitionEvent, IObserverTree, IDependencyTree     } from "./api/extras";
-export { IObservable, IDepTreeNode                            } from "./core/observable";
+export { IObservable, IDepTreeNode, untracked                 } from "./core/observable";
 export { IDerivation                                          } from "./core/derivation";
 
 export { asReference, asFlat, asStructure                     } from "./types/modifiers";
@@ -45,22 +39,22 @@ export { expr                                                 } from "./api/expr
 export { toJSON                                               } from "./api/tojson";
 export { ITransformer, createTransformer                      } from "./api/createtransformer";
 
-export { untracked                                            } from "./core/globalstate";
 export { transaction                                          } from "./core/transaction";
 export { Reaction                                             } from "./core/reaction";
 export { IAtom, Atom                                          } from "./core/atom";
 
-import { isComputingDerivation, resetGlobalState } from "./core/globalstate";
+import { resetGlobalState } from "./core/globalstate";
 import { quickDiff } from "./utils/utils";
 
 export const _ = {
 	quickDiff,
 	resetGlobalState
-}
+};
 
 import { ITransitionEvent, IObserverTree, IDependencyTree } from "./api/extras";
 import { getDependencyTree, getObserverTree, trackTransitions, allowStateChanges } from "./api/extras";
 import { Lambda } from "./utils/utils";
+import { isComputingDerivation } from "./core/derivation";
 
 export const extras = {
 	getDependencyTree,
