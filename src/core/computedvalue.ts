@@ -38,9 +38,7 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 	 * However, enabling compareStructural can be convienent if you always produce an new aggregated object and don't want to notify observers if it is structurally the same.
 	 * This is useful for working with vectors, mouse coordinates etc.
 	 */
-	constructor(public derivation: () => T, private scope: Object, public name: string, private compareStructural: boolean) {
-		if (!this.name)
-			this.name = "DerivedValue#" + this.id;
+	constructor(public derivation: () => T, private scope: Object, private compareStructural: boolean, public name = "ComputedValue") {
 		this.peek = () => {
 			// MWE: hmm.. to many state vars here...
 			this.isComputing = true;
@@ -52,9 +50,9 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 
 			globalState.allowStateChanges = prevAllowStateChanges;
 			globalState.isComputingComputedValue--;
-			this.isComputing = false
+			this.isComputing = false;
 			return res;
-		}
+		};
 	}
 
 	onBecomeObserved() {
@@ -120,6 +118,6 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 	}
 
 	toString() {
-		return `ComputedValue[${this.name}]`;
+		return `${this.name}@${this.id}[${this.derivation.toString()}]`;
 	}
 }

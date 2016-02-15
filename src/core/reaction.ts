@@ -24,7 +24,6 @@ import {EMPTY_ARRAY, Lambda} from "../utils/utils";
  */
 export class Reaction implements IDerivation {
 	id = getNextId();
-	name: string;
 	staleObservers:  IDerivation[] = EMPTY_ARRAY; // Won't change
 	observers: IDerivation[] = EMPTY_ARRAY;       // Won't change
 	observing: IObservable[] = []; // nodes we are looking at. Our value depends on these nodes
@@ -33,9 +32,7 @@ export class Reaction implements IDerivation {
 	isDisposed = false;
 	_isScheduled = false;
 
-	constructor(name: string = "", private onInvalidate: () => void) {
-		this.name = name || ("Reaction#" + this.id);
-	}
+	constructor(public name: string = "Reaction", private onInvalidate: () => void) { }
 
 	onBecomeObserved() {
 		// noop, reaction is always unobserved

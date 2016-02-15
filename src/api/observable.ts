@@ -34,14 +34,14 @@ export function observable(v: any, keyOrScope?: string | any) {
 	switch (sourceType) {
 		case ValueType.Reference:
 		case ValueType.ComplexObject:
-			return new ObservableValue(value, mode, undefined);
+			return new ObservableValue(value, mode);
 		case ValueType.ComplexFunction:
 			throw new Error("[mobservable.observable] To be able to make a function reactive it should not have arguments. If you need an observable reference to a function, use `observable(asReference(f))`");
 		case ValueType.ViewFunction:
-			return new ComputedValue(value, keyOrScope, value.name, mode === ValueMode.Structure);
+			return new ComputedValue(value, keyOrScope, mode === ValueMode.Structure, value.name || "ComputedValue");
 		case ValueType.Array:
 		case ValueType.PlainObject:
-			return makeChildObservable(value, mode, undefined);
+			return makeChildObservable(value, mode);
 	}
 	invariant(false, "Illegal State");
 }

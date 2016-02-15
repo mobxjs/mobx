@@ -88,7 +88,7 @@ export function getValueModeFromModifierFunc(func?: Function): ValueMode {
 }
 
 
-export function makeChildObservable(value, parentMode: ValueMode, context) {
+export function makeChildObservable(value, parentMode: ValueMode, name?: string) {
 	let childMode: ValueMode;
 	if (isObservable(value))
 		return value;
@@ -112,9 +112,9 @@ export function makeChildObservable(value, parentMode: ValueMode, context) {
 	}
 
 	if (Array.isArray(value) && Object.isExtensible(value))
-		return createObservableArray(<[]> value, childMode, context);
+		return createObservableArray(<[]> value, childMode, name);
 	if (isPlainObject(value) && Object.isExtensible(value))
-		return extendObservableHelper(value, value, childMode, context);
+		return extendObservableHelper(value, value, childMode, name);
 	return value;
 }
 

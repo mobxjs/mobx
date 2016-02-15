@@ -23,6 +23,7 @@ export interface IObservableObjectAdministration {
 	type: Object;
 	target: any;
 	name: string;
+	id: number;
 	mode: ValueMode;
 	values: {[key: string]: ObservableValue<any>|ComputedValue<any>};
 	events: SimpleEventEmitter;
@@ -32,7 +33,7 @@ export interface IIsObservableObject {
 	$mobservable: IObservableObjectAdministration;
 }
 
-export function asObservableObject(target, name: string = "" /* TODO: "ObservableObject" + getNextId() */, mode: ValueMode = ValueMode.Recursive): IObservableObjectAdministration {
+export function asObservableObject(target, name: string = "ObservableObject", mode: ValueMode = ValueMode.Recursive): IObservableObjectAdministration {
 	if (target.$mobservable) {
 		if (target.$mobservable.type !== ObservableObjectMarker)
 			throw new Error("The given object is observable but not an observable object");
@@ -42,6 +43,7 @@ export function asObservableObject(target, name: string = "" /* TODO: "Observabl
 		type: ObservableObjectMarker,
 		values: {},
 		events: undefined,
+		id: getNextId(),
 		target, name, mode
 	};
 	Object.defineProperty(target, "$mobservable", {
@@ -62,12 +64,12 @@ export function setObservableObjectProperty(adm: IObservableObjectAdministration
 
 function defineObservableProperty(adm: IObservableObjectAdministration, propName: string, value) {
 	let observable: ComputedValue<any>|ObservableValue<any>;
-	let name = `${adm.name}.${propName}`;
+	let name = `${adm.name}@${adm.id} / Prop "${propName}"`;
 
 	if (typeof value === "function" && value.length === 0)
-		observable = new ComputedValue(value, adm.target, name, false);
+		observable = new ComputedValue(value, adm.target, false, name);
 	else if (value instanceof AsStructure && typeof value.value === "function" && value.value.length === 0)
-		observable = new ComputedValue(value.value, adm.target, name, true);
+		observable = new ComputedValue(value.value, adm.target, true, name);
 	else
 		observable = new ObservableValue(value, adm.mode, name);
 

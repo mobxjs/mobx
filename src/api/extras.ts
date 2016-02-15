@@ -18,7 +18,6 @@ export interface IObserverTree {
 	id: number;
 	name: string;
 	observers?: IObserverTree[];
-	listeners?: number; // amount of functions manually attached using an .observe method
 }
 
 export interface ITransitionEvent {
@@ -46,7 +45,7 @@ let transitionTracker: SimpleEventEmitter = null;
 export function reportTransition(node: IDepTreeNode, state: string, changed: boolean = false) {
 	if (transitionTracker) transitionTracker.emit({
 		id: node.id,
-		name: node.name,
+		name: `${node.name}@${node.id}`,
 		node, state, changed
 	});
 }
@@ -58,7 +57,7 @@ export function getDependencyTree(thing: any): IDependencyTree {
 function nodeToDependencyTree(node: IDepTreeNode): IDependencyTree {
 	const result: IDependencyTree = {
 		id: node.id,
-		name: node.name
+		name: `${node.name}@${node.id}`
 	};
 	if (node.observing && node.observing.length)
 		result.dependencies = unique(node.observing).map(nodeToDependencyTree);
@@ -72,7 +71,7 @@ export function getObserverTree(thing: any): IObserverTree {
 function nodeToObserverTree(node: IDepTreeNode): IObserverTree {
 	const result: IObserverTree = {
 		id: node.id,
-		name: node.name
+		name: `${node.name}@${node.id}`
 	};
 	if (node.observers && node.observers.length)
 		result.observers = <any>unique(node.observers).map(<any>nodeToObserverTree);

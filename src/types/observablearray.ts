@@ -119,7 +119,7 @@ function makeReactiveArrayItem(adm: IObservableArrayAdministration<any>, value) 
 	assertUnwrapped(value, "Array values cannot have modifiers");
 	if (adm.mode === ValueMode.Flat || adm.mode === ValueMode.Reference)
 		return value;
-	return makeChildObservable(value, adm.mode, adm.atom.name + "[x]");
+	return makeChildObservable(value, adm.mode, `${adm.atom.name}@${adm.atom.id} / ArrayEntry`);
 }
 
 function notifyArrayChildUpdate<T>(adm: IObservableArrayAdministration<T>, index: number, oldValue: T) {
@@ -149,8 +149,7 @@ export class ObservableArray<T> extends StubArray {
 			changeEvent: undefined,
 			lastKnownLength: 0,
 			mode: mode,
-			array: this,
-			name: name // TODO: should not be here!
+			array: this
 		};
 		Object.defineProperty(this, "$mobservable", {
 			enumerable: false,

@@ -20,7 +20,6 @@ export function extendObservable<A extends Object, B extends Object>(target: A, 
 	return <A & B> target;
 }
 
-
 export function extendObservableHelper(target, properties, mode: ValueMode, name: string): Object {
 	const adm = asObservableObject(target, name, mode);
 	for (let key in properties) if (properties.hasOwnProperty(key)) {

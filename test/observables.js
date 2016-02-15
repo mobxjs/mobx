@@ -1082,6 +1082,7 @@ test('json cycles', function(t) {
 })
 
 test('issue 50', function(t) {
+    m._.resetGlobalState();
     var x = observable({
         a: true,
         b: false,
@@ -1114,23 +1115,24 @@ test('issue 50', function(t) {
         t.equal(x.c, x.b);
   
         t.deepEqual(events, [
-             'auto', 
-             'calc c', 
-             'transstart', 
-             [ 'STALE', '.a' ], 
-             [ 'STALE', 'ar' ],
-             [ 'STALE', '.b' ], 
-             [ 'STALE', '.c' ], 
-             'transpreend', 
-             [ 'READY', '.a' ], 
-             [ 'READY', '.b' ],
-             [ 'PENDING', '.c' ],  
-             'calc c', 
-             [ 'READY', '.c' ], 
-             [ 'PENDING', 'ar' ],
-             'auto', 
-             [ 'READY', 'ar' ], 
-             'transpostend' 
+            'auto',
+            'calc c',
+            'transstart',
+            [ 'STALE', 'ObservableObject@1 / Prop "a"@2' ],
+            [ 'STALE', 'ar@5' ],
+            [ 'STALE', 'ObservableObject@1 / Prop "b"@3' ],
+            [ 'STALE', 'ObservableObject@1 / Prop "c"@4' ],
+            'transpreend',
+            [ 'READY', 'ObservableObject@1 / Prop "a"@2' ],
+            [ 'READY', 'ObservableObject@1 / Prop "b"@3' ],
+            [ 'PENDING', 'ObservableObject@1 / Prop "c"@4' ],
+            'calc c',
+            [ 'READY', 'ObservableObject@1 / Prop "c"@4' ],
+            [ 'PENDING',
+            'ar@5' ],
+            'auto',
+            [ 'READY', 'ar@5' ],
+            'transpostend'           
         ]);
         
         disposer1();
@@ -1141,6 +1143,7 @@ test('issue 50', function(t) {
 });
 
 test('verify transaction events', function(t) {
+    m._.resetGlobalState();
     var x = observable({
         b: 1,
         c: function() {
@@ -1168,21 +1171,21 @@ test('verify transaction events', function(t) {
     events.push("transpostend");
 
     t.deepEqual(events, [
-            'auto', 
-            'calc c', 
-            'transstart', 
-            [ 'STALE', '.b' ], 
-            [ 'STALE', '.c' ],
-            [ 'STALE', 'ar' ],
-            'transpreend', 
-            [ 'READY', '.b' ],
-            [ 'PENDING', '.c' ], 
-            'calc c', 
-            [ 'READY', '.c' ], 
-            [ 'PENDING', 'ar' ],
-            'auto', 
-            [ 'READY', 'ar' ], 
-            'transpostend' 
+        'auto',
+        'calc c',
+        'transstart',
+        [ 'STALE', 'ObservableObject@1 / Prop "b"@2' ],
+        [ 'STALE', 'ObservableObject@1 / Prop "c"@3' ],
+        [ 'STALE', 'ar@4' ],
+        'transpreend',
+        [ 'READY', 'ObservableObject@1 / Prop "b"@2' ],
+        [ 'PENDING', 'ObservableObject@1 / Prop "c"@3' ],
+        'calc c',
+        [ 'READY', 'ObservableObject@1 / Prop "c"@3' ],
+        [ 'PENDING', 'ar@4' ],
+        'auto',
+        [ 'READY', 'ar@4' ],
+        'transpostend' 
     ]);
     
     disposer1();
@@ -1214,6 +1217,7 @@ test("verify array in transaction", function(t) {
 })
 
 test('delay autorun until end of transaction', function(t) {
+    m._.resetGlobalState();
     var events = [];
     var x = observable({
         a: 2,
@@ -1258,28 +1262,28 @@ test('delay autorun until end of transaction', function(t) {
     events.push("post trans3");
 
     t.deepEqual(events, [
-            [ 'STALE', '.a' ], 
-            "end1",
-            "end2",
-            [ 'READY', '.a'],
-            'auto',
-            'calc y',
-            [ 'READY', 'test'],
-            "post trans1",
-            [ 'STALE', '.a'],
-            [ 'STALE', '.b'],
-            [ 'STALE', 'test' ],
-            [ 'READY', '.a'],
-            [ 'PENDING', '.b'],
-            'calc y',
-            [ 'READY', '.b'],
-            [ 'PENDING', 'test'],
-            "auto",
-            [ 'READY', 'test'],
-            'post trans2',
-            [ 'STALE', '.a'],
-            [ 'READY', '.a'],
-            'post trans3'
+        [ 'STALE', 'ObservableObject@1 / Prop "a"@2' ],
+        'end1',
+        'end2', 
+        [ 'READY', 'ObservableObject@1 / Prop "a"@2' ],
+        'auto',
+        'calc y',
+        [ 'READY', 'test@4' ],
+        'post trans1',
+        [ 'STALE', 'ObservableObject@1 / Prop "a"@2' ],
+        [ 'STALE', 'ObservableObject@1 / Prop "b"@3' ],
+        [ 'STALE', 'test@4' ],
+        [ 'READY', 'ObservableObject@1 / Prop "a"@2' ],
+        [ 'PENDING', 'ObservableObject@1 / Prop "b"@3' ],
+        'calc y',
+        [ 'READY', 'ObservableObject@1 / Prop "b"@3' ],
+        [ 'PENDING', 'test@4' ],
+        'auto',
+        [ 'READY', 'test@4' ],
+        'post trans2',
+        [ 'STALE', 'ObservableObject@1 / Prop "a"@2' ],
+        [ 'READY', 'ObservableObject@1 / Prop "a"@2' ],
+        'post trans3'
     ]);
     
     disposer2();

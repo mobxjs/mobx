@@ -9,7 +9,7 @@ export class ObservableValue<T> extends Atom {
 
 	protected value: T = undefined;
 
-	constructor(value: T, protected mode: ValueMode, public name?: string) {
+	constructor(value: T, protected mode: ValueMode, name = "ObservableValue") {
 		super(name);
 		const [childmode, unwrappedValue] = getValueModeFromValue(value, ValueMode.Recursive);
 		// If the value mode is recursive, modifiers like 'structure', 'reference', or 'flat' could apply
@@ -41,6 +41,6 @@ export class ObservableValue<T> extends Atom {
 	}
 
 	toString() {
-		return `ObservableValue[${this.name}:${this.value}]`;
+		return `${this.name}@${this.id}[${this.value}]`;
 	}
 }

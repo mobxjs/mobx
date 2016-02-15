@@ -26,7 +26,6 @@ export function propagateAtomReady(atom: IAtom) {
  */
 export class Atom implements IAtom {
 	id = getNextId();
-	name: string;
 	isDirty = false;
 	staleObservers = [];
 	observers = [];
@@ -35,9 +34,7 @@ export class Atom implements IAtom {
 	 * Create a new atom. For debugging purposes it is recommended to give it a name.
 	 * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
 	 */
-	constructor(name?: string, public onBecomeObserved: () => void = noop, public onBecomeUnobserved = noop) {
-		this.name = name || ("Atom#" + this.id);
-	}
+	constructor(public name = "Atom", public onBecomeObserved: () => void = noop, public onBecomeUnobserved = noop) { }
 
 	/**
 	 * Invoke this method to notify mobservable that your atom has been used somehow. 
@@ -64,7 +61,7 @@ export class Atom implements IAtom {
 		}
 	}
 
-	private reportReady(changed: boolean) {
+	private reportReady(changed: boolean) { // TODO: unused?!
 		invariant(this.isDirty, "atom not dirty");
 		if (globalState.inTransaction > 0)
 			globalState.changedAtoms.push(this);
@@ -75,6 +72,6 @@ export class Atom implements IAtom {
 	}
 
 	toString() {
-		return `${this.name}`;
+		return `${this.name}@${this.id}`;
 	}
 }

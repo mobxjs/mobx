@@ -50,14 +50,14 @@ export function observableDecorator(target: Object, key: string, baseDescriptor:
 		// the getter might create a reactive property lazily, so this might even happen during a view.
 		// TODO: eliminate non-strict; creating observables during views is allowed, just don't use set.
 		allowStateChanges(true, () => {
-			setObservableObjectProperty(asObservableObject(this, null, ValueMode.Recursive), key, baseValue);
+			setObservableObjectProperty(asObservableObject(this, undefined, ValueMode.Recursive), key, baseValue);
 		});
 		return this[key];
 	};
 	descriptor.set = isDecoratingGetter
 		? () => { throw new Error(`[ComputedValue '${key}'] New values cannot be assigned to computed properties.`); }
 		: function(value) {
-			setObservableObjectProperty(asObservableObject(this, null, ValueMode.Recursive), key, typeof value === "function" ? asReference(value) : value);
+			setObservableObjectProperty(asObservableObject(this, undefined, ValueMode.Recursive), key, typeof value === "function" ? asReference(value) : value);
 		}
 	;
 	if (!baseDescriptor) {

@@ -1,5 +1,6 @@
 import {IAtom} from "./atom";
 import {IDerivation} from "./derivation";
+import {Reaction} from "./reaction";
 
 declare const global: any;
 
@@ -15,7 +16,6 @@ export class MobservableGlobals {
 	pendingReactions: Reaction[] = [];
 	allowStateChanges = true;
 }
-
 
 export const globalState = (() => {
 	const res = new MobservableGlobals();
@@ -76,6 +76,3 @@ export function resetGlobalState() {
 	for (let key in defaultGlobals)
 		globalState[key] = defaultGlobals[key];
 }
-
-import {Reaction} from "./reaction";
-import {Lambda} from "../utils/utils";

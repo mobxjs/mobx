@@ -5,6 +5,7 @@ import {transaction} from "../core/transaction";
 import {ObservableArray, IObservableArray} from "./observablearray";
 import {ObservableValue} from "./observablevalue";
 import {isPlainObject, Lambda} from "../utils/utils";
+import {getNextId} from "../core/globalstate";
 
 export interface IKeyValueMap<V> {
 	[key: string]: V;
@@ -14,13 +15,17 @@ export type IMapEntries<V> = [string, V][]
 
 export interface IObservableMapChange<T> extends IObjectChange<T, ObservableMap<T>> { }
 
+const ObservableMapMarker = {};
+
 export class ObservableMap<V> {
-	$mobservable = {};
+	$mobservable = ObservableMapMarker;
 	private _data: { [key: string]: ObservableValue<V> } = {};
 	private _hasMap: { [key: string]: ObservableValue<boolean> } = {}; // hasMap, not hashMap >-).
-	private _keys: IObservableArray<string> = <any> new ObservableArray(null, ValueMode.Reference, ".keys()");
 	private _valueMode: ValueMode;
 	private _events = new SimpleEventEmitter();
+	public name = "ObservableMap";
+	public id = getNextId();
+	private _keys: IObservableArray<string> = <any> new ObservableArray(null, ValueMode.Reference, `${this.name}@${this.id} / keys()`);
 
 	constructor(initialData?: IMapEntries<V> | IKeyValueMap<V>, valueModeFunc?: Function) {
 		this._valueMode = getValueModeFromModifierFunc(valueModeFunc);
@@ -58,7 +63,7 @@ export class ObservableMap<V> {
 		}
 		else {
 			transaction(() => {
-				this._data[key] = new ObservableValue(value, this._valueMode, "." + key);
+				this._data[key] = new ObservableValue(value, this._valueMode, `${this.name}@${this.id} / Entry "${key}"`);
 				this._updateHasMapEntry(key, true);
 				this._keys.push(key);
 			});
@@ -96,7 +101,7 @@ export class ObservableMap<V> {
 		if (entry) {
 			entry.set(value);
 		} else {
-			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, ".(has)" + key);
+			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, `${this.name}@${this.id} / Contains "${key}"`);
 		}
 		return entry;
 	}

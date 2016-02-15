@@ -2,8 +2,6 @@ import {Lambda, once, deprecated, invariant} from "../utils/utils";
 import {assertUnwrapped} from "../types/modifiers";
 import {Reaction} from "../core/reaction";
 import {globalState, isComputingDerivation} from "../core/globalstate";
-import {observable} from "../api/observable";
-import {IObservable, reportObserved} from "../core/observable";
 
 /**
  * Creates a reactive view and keeps it alive, so that the view is always
@@ -19,7 +17,7 @@ export function autorun(view: Lambda, scope?: any) {
 	if (scope)
 		view = view.bind(scope);
 
-	const reaction = new Reaction(view.name, function () {
+	const reaction = new Reaction(view.name || "Autorun", function () {
 		this.track(view);
 	});
 
@@ -66,12 +64,12 @@ export function autorunAsync(func: Lambda, delay: number = 1, scope?: any) {
 		func = func.bind(scope);
 	let isScheduled = false;
 
-	const r = new Reaction("bla", () => {
+	const r = new Reaction(func.name || "AutorunAsync", () => {
 		if (!isScheduled) {
 			isScheduled = true;
 			setTimeout(() => {
 				isScheduled = false;
-				if (!r.isDisposed) // TODO: is disposed
+				if (!r.isDisposed)
 					r.track(func);
 			}, delay);
 		}
