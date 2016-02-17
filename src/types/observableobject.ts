@@ -107,8 +107,9 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 	* See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe 
 	* for callback details
 	*/
-export function observeObservableObject(object: IIsObservableObject, callback: (changes: IObjectChange<any, any>) => void): Lambda {
+export function observeObservableObject(object: IIsObservableObject, callback: (changes: IObjectChange<any, any>) => void, fireImmediately?: boolean): Lambda {
 	invariant(isObservableObject(object), "Expected observable object");
+	invariant(fireImmediately !== true, "`observe` doesn't support the fire immediately property for observable objects.");
 	const adm = object.$mobservable;
 	if (adm.events === undefined)
 		adm.events = new SimpleEventEmitter();

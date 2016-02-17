@@ -7,46 +7,54 @@ import {ObservableValue} from "../types/observablevalue";
 import {Lambda, isPlainObject, invariant} from "../utils/utils";
 import {autorun} from "../api/autorun";
 import {isObservable} from "./isobservable";
+import {extendObservable} from "./extendobservable";
 
-export function observe<T>(observableArray: IObservableArray<T>, listener: (change: IArrayChange<T> | IArraySplice<T>) => void): Lambda;
-export function observe<T>(observableMap: ObservableMap<T>, listener: (change: IObservableMapChange<T>) => void): Lambda;
-export function observe(func: () => void): Lambda;
-export function observe<T extends Object>(object: T, listener: (change: IObjectChange<any, T>) => void): Lambda;
-export function observe<T extends Object, Y>(object: T, prop: string, listener: (newValue: Y, oldValue?: Y) => void): Lambda;
 export function observe<T>(value: IObservableValue<T>, listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
-export function observe(thing, property?, listener?): Lambda {
-	const fireImmediately = arguments[2] === true;
-	const propError = "[mobservable.observe] the provided observable map has no key with name: " + property;
-	if (typeof property === "function") {
-		listener = property;
-		property = undefined;
-	}
+export function observe<T>(observableArray: IObservableArray<T>, listener: (change: IArrayChange<T> | IArraySplice<T>) => void, fireImmediately?: boolean): Lambda;
+export function observe<T>(observableMap: ObservableMap<T>, listener: (change: IObservableMapChange<T>) => void, fireImmediately?: boolean): Lambda;
+export function observe<T>(observableMap: ObservableMap<T>, property: string, listener: (change: IObservableMapChange<T>) => void, fireImmediately?: boolean): Lambda;
+export function observe<T extends Object>(object: T, listener: (change: IObjectChange<any, T>) => void, fireImmediately?: boolean): Lambda;
+export function observe<T extends Object>(object: T, property: string, listener: (change: IObjectChange<any, T>) => void, fireImmediately?: boolean): Lambda;
+export function observe(thing, propOrCb?, cbOrFire?, fireImmediately?): Lambda {
+	if (typeof cbOrFire === "function")
+		return observeObservableProperty(thing, propOrCb, cbOrFire, fireImmediately);
+	else
+		return observeObservable(thing, propOrCb, cbOrFire);
+}
+
+function observeObservable(thing, listener, fireImmediately: boolean) {
 	if (isObservableArray(thing))
 		return thing.observe(listener);
-	if (isObservableMap(thing)) {
-		if (property !== undefined) {
-			if (!thing._has(property))
-				throw new Error(propError);
-			return observe(thing._data[property], listener);
-		} else {
-			return thing.observe(listener);
-		}
-	}
-	if (isObservableObject(thing)) {
-		if (property !== undefined) {
-			if (!isObservable(thing, property))
-				throw new Error(propError);
-			return observe(thing.$mobservable.values[property], listener);
-		}
-		return observeObservableObject(thing, listener);
-	}
+	if (isObservableMap(thing))
+		return thing.observe(listener);
+	if (isObservableObject(thing))
+		return observeObservableObject(thing, listener, fireImmediately);
 	if (thing instanceof ObservableValue || thing instanceof ComputedValue)
 		return observeObservableValue(thing, listener, fireImmediately);
-	if (thing.$mobservable instanceof ObservableValue || thing.$mobservable instanceof ComputedValue)
-		return observeObservableValue(thing.$mobservable, listener, fireImmediately);
 	if (isPlainObject(thing))
-		return observeObservableObject(<any> observable(<Object> thing), listener);
-	invariant(false, "first argument of observabe should be some observable value or plain object");
+		return observeObservable(observable(<Object> thing), listener, fireImmediately);
+	invariant(false, "first argument of observe should be some observable value or plain object");
+}
+
+function observeObservableProperty(thing, property, listener, fireImmediately: boolean) {
+	const propError = "[mobservable.observe] the provided observable map has no key with name: " + property;
+	if (isObservableMap(thing)) {
+		if (!thing._has(property))
+			throw new Error(propError);
+		return observe(thing._data[property], listener);
+	}
+	if (isObservableObject(thing)) {
+		if (!isObservable(thing, property))
+			throw new Error(propError);
+		return observe(thing.$mobservable.values[property], listener, fireImmediately);
+	}
+	if (isPlainObject(thing)) {
+		extendObservable(thing, {
+			property: thing[property]
+		});
+		return observeObservableProperty(thing, property, listener, fireImmediately);
+	}
+	invariant(false, "first argument of observe should be an (observable)object or observableMap if a property name is given");
 }
 
 function observeObservableValue<T>(observable: ObservableValue<T>|ComputedValue<T>, listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda {
