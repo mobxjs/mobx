@@ -49,6 +49,7 @@ In Mobservable 2 it is no longer allowed for a computed function or autorun to t
 * Commonjs build: https://npmcdn.com/mobservable@^2.0.0/lib/mobservable.js
 * Minified commonjs build: https://npmcdn.com/mobservable@^2.0.0/lib/mobservable.min.js
 * UMD build: https://npmcdn.com/mobservable@^2.0.0/lib/mobservable.umd.js
+* To use the minified build, require / import the lib from `"mobservable/lib/mobservable.min.js"` (or set up an alias in your webpack configuration if applicable)
 
 ## Other changes
 

@@ -22,7 +22,7 @@ export class ObservableMap<V> {
 	private _data: { [key: string]: ObservableValue<V> } = {};
 	private _hasMap: { [key: string]: ObservableValue<boolean> } = {}; // hasMap, not hashMap >-).
 	private _valueMode: ValueMode;
-	private _events = new SimpleEventEmitter();
+	private _events = undefined;
 	public name = "ObservableMap";
 	public id = getNextId();
 	private _keys: IObservableArray<string> = <any> new ObservableArray(null, ValueMode.Reference, `${this.name}@${this.id} / keys()`);
@@ -52,7 +52,7 @@ export class ObservableMap<V> {
 		if (this._has(key)) {
 			const oldValue = (<any>this._data[key]).value;
 			const changed = this._data[key].set(value);
-			if (changed) {
+			if (changed && this._events) {
 				this._events.emit(<IObservableMapChange<V>>{
 					type: "update",
 					object: this,
@@ -67,7 +67,7 @@ export class ObservableMap<V> {
 				this._updateHasMapEntry(key, true);
 				this._keys.push(key);
 			});
-			this._events.emit(<IObservableMapChange<V>>{
+			this._events && this._events.emit(<IObservableMapChange<V>>{
 				type: "add",
 				object: this,
 				name: key
@@ -86,7 +86,7 @@ export class ObservableMap<V> {
 				observable.set(undefined);
 				this._data[key] = undefined;
 			});
-			this._events.emit(<IObservableMapChange<V>>{
+			this._events && this._events.emit(<IObservableMapChange<V>>{
 				type: "delete",
 				object: this,
 				name: key,
@@ -177,6 +177,8 @@ export class ObservableMap<V> {
 	 * for callback details
 	 */
 	observe(callback: (changes: IObservableMapChange<V>) => void): Lambda {
+		if (!this._events)
+			this._events = new SimpleEventEmitter();
 		return this._events.on(callback);
 	}
 }
