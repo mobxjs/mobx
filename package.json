@@ -1,6 +1,6 @@
 {
   "name": "mobservable",
-  "version": "2.0.0",
+  "version": "2.0.0-0",
   "description": "Observable data. Reactive functions. Simple code.",
   "main": "lib/mobservable.js",
   "typings": "lib/mobservable.d.ts",
@@ -9,15 +9,12 @@
     "full-test": "npm run small-build && npm run build-tests && npm run use-minified && npm run tape && npm run perf",
     "tape": "tape test/*.js | faucet",
     "perf": "npm run small-build && time node --expose-gc test/perf/index.js",
-
     "prepublish": "npm run small-build",
     "quick-build": "tsc",
     "small-build": "scripts/single-file-build.sh",
-
     "test-browser": "npm run small-build && ( browserify test/*.js | tape-run )",
     "test-travis": "npm run test-browser && npm run use-minified && istanbul cover tape test/*.js test/perf/index.js",
     "coverage": "npm run small-build && npm run build-tests && istanbul cover tape test/*.js test/perf/index.js && cat ./coverage/lcov.info|coveralls",
-    
     "build-tests": "npm run build-typescript-tests && npm run build-babel-tests",
     "build-typescript-tests": "tsc -m commonjs -t es5 --experimentalDecorators --noImplicitAny --outDir test test/typescript-tests.ts",
     "build-babel-tests": "babel test/babel/babel-tests.js -o test/babel-tests.js",
@@ -35,7 +32,7 @@
   },
   "files": [
     "lib",
-    "LICENSE"  
+    "LICENSE"
   ],
   "homepage": "https://mweststrate.github.io/mobservable",
   "devDependencies": {
