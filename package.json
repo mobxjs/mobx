@@ -1,6 +1,6 @@
 {
   "name": "mobservable",
-  "version": "2.0.0-0",
+  "version": "2.0.0-1",
   "description": "Observable data. Reactive functions. Simple code.",
   "main": "lib/mobservable.js",
   "typings": "lib/mobservable.d.ts",
