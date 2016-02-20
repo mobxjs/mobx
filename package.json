@@ -14,8 +14,8 @@
         "clean": "rm -rf lib/ dist/",
         "build": "tsc",
         "clean-build": "npm run clean && npm run build",
-        "build-dist": "npm run build && webpack && uglifyjs --in-source-map dist/mobservable.js.map -s dist/mobservable.js --source-map dist/mobservable.min.js.map -o dist/mobservable.min.js",
-        "buildtest": "npm run build && npm run build-typescript-tests && npm run build-babel-tests",
+        "build-dist": "tsc && webpack && uglifyjs --source-map dist/mobservable.min.js.map -o dist/mobservable.min.js dist/mobservable.js",
+        "buildtest": "tsc --sourceMap && npm run build-typescript-tests && npm run build-babel-tests",
         "build-typescript-tests": "tsc -m commonjs -t es5 --experimentalDecorators --noImplicitAny --outDir test test/typescript-tests.ts",
         "build-babel-tests": "babel test/babel/babel-tests.js -o test/babel-tests.js"
     },

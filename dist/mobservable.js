@@ -11,41 +11,41 @@
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
-/******/
+
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
-/******/
+
 /******/ 		// Check if module is in cache
 /******/ 		if(installedModules[moduleId])
 /******/ 			return installedModules[moduleId].exports;
-/******/
+
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			exports: {},
 /******/ 			id: moduleId,
 /******/ 			loaded: false
 /******/ 		};
-/******/
+
 /******/ 		// Execute the module function
 /******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
+
 /******/ 		// Flag the module as loaded
 /******/ 		module.loaded = true;
-/******/
+
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/
-/******/
+
+
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = modules;
-/******/
+
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-/******/
+
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
-/******/
+
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(0);
 /******/ })
@@ -105,7 +105,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    SimpleEventEmitter: simpleeventemitter_1.default,
 	    withStrict: core.withStrict
 	};
-	//# sourceMappingURL=index.js.map
+
 
 /***/ },
 /* 1 */
@@ -608,7 +608,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    throw new Error("[mobservable.observe] first argument should be an observable array, observable map, observable object or plain object.");
 	}
 	exports.observe = observe;
-	//# sourceMappingURL=core.js.map
+
 
 /***/ },
 /* 2 */
@@ -886,7 +886,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var extras_1 = __webpack_require__(3);
 	var utils_1 = __webpack_require__(7);
 	var simpleeventemitter_1 = __webpack_require__(6);
-	//# sourceMappingURL=dnode.js.map
+
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
@@ -1005,7 +1005,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	}
 	exports.trackTransitions = trackTransitions;
-	//# sourceMappingURL=extras.js.map
+
 
 /***/ },
 /* 4 */
@@ -1092,7 +1092,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ObservableObject;
 	})();
 	exports.ObservableObject = ObservableObject;
-	//# sourceMappingURL=observableobject.js.map
+
 
 /***/ },
 /* 5 */
@@ -1181,7 +1181,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ObservableView;
 	})(dnode_1.ViewNode);
 	exports.ObservableView = ObservableView;
-	//# sourceMappingURL=observableview.js.map
+
 
 /***/ },
 /* 6 */
@@ -1230,7 +1230,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = SimpleEventEmitter;
-	//# sourceMappingURL=simpleeventemitter.js.map
+
 
 /***/ },
 /* 7 */
@@ -1349,7 +1349,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.quickDiff = quickDiff;
 	var observablearray_1 = __webpack_require__(8);
-	//# sourceMappingURL=utils.js.map
+
 
 /***/ },
 /* 8 */
@@ -1689,7 +1689,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    OBSERVABLE_ARRAY_BUFFER_SIZE = max;
 	}
 	reserveArrayBuffer(1000);
-	//# sourceMappingURL=observablearray.js.map
+
 
 /***/ },
 /* 9 */
@@ -1748,7 +1748,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ObservableValue;
 	})(dnode_1.DataNode);
 	exports.ObservableValue = ObservableValue;
-	//# sourceMappingURL=observablevalue.js.map
+
 
 /***/ },
 /* 10 */
@@ -1919,13 +1919,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ObservableMap;
 	})();
 	exports.ObservableMap = ObservableMap;
-	//# sourceMappingURL=observablemap.js.map
+
 
 /***/ },
 /* 11 */
 /***/ function(module, exports) {
 
-	//# sourceMappingURL=interfaces.js.map
+	
 
 /***/ },
 /* 12 */
@@ -1966,10 +1966,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return object.$transformId = ++transformId;
 	    return tid;
 	}
-	//# sourceMappingURL=transform.js.map
+
 
 /***/ }
 /******/ ])
 });
 ;
-//# sourceMappingURL=mobservable.js.map
