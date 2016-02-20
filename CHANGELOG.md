@@ -1,3 +1,8 @@
+# 1.2.5
+
+* Map no longer throws when `.has`, `.get` or `.delete` is invoked with an invalid key (#116)
+* Files are now compiled without sourcemap to avoid issues when loading mobservable in a debugger when `src/` folder is not available.
+
 # 1.2.4
 
 * Fixed: observable arrays didn't properly apply modifiers if created using `asFlat([])` or `fastArray([])`

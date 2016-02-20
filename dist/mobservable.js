@@ -1784,7 +1784,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return typeof this._data[key] !== 'undefined';
 	    };
 	    ObservableMap.prototype.has = function (key) {
-	        this.assertValidKey(key);
+	        if (!this.isValidKey(key))
+	            return false;
 	        if (this._hasMap[key])
 	            return this._hasMap[key].get();
 	        return this._updateHasMapEntry(key, false).get();
@@ -1823,7 +1824,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    ObservableMap.prototype.delete = function (key) {
 	        var _this = this;
-	        this.assertValidKey(key);
 	        if (this._has(key)) {
 	            var oldValue = this._data[key]._value;
 	            dnode_1.transaction(function () {
@@ -1855,7 +1855,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return entry;
 	    };
 	    ObservableMap.prototype.get = function (key) {
-	        this.assertValidKey(key);
 	        if (this.has(key))
 	            return this._data[key].get();
 	        return undefined;
@@ -1903,10 +1902,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.keys().forEach(function (key) { return res[key] = _this.get(key); });
 	        return res;
 	    };
-	    ObservableMap.prototype.assertValidKey = function (key) {
+	    ObservableMap.prototype.isValidKey = function (key) {
 	        if (key === null || key === undefined)
-	            throw new Error("[mobservable.map] Invalid key: '" + key + "'");
+	            return false;
 	        if (typeof key !== "string" && typeof key !== "number")
+	            return false;
+	        return true;
+	    };
+	    ObservableMap.prototype.assertValidKey = function (key) {
+	        if (!this.isValidKey(key))
 	            throw new Error("[mobservable.map] Invalid key: '" + key + "'");
 	    };
 	    ObservableMap.prototype.toString = function () {
