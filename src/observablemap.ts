@@ -38,7 +38,8 @@ export class ObservableMap<V> {
 	}
 	
 	has(key: string): boolean {
-		this.assertValidKey(key);
+		if (!this.isValidKey(key))
+			return false;
 		if (this._hasMap[key])
 			return this._hasMap[key].get();
 		return this._updateHasMapEntry(key, false).get();
@@ -77,7 +78,6 @@ export class ObservableMap<V> {
 	}
 
 	delete(key: string) {
-		this.assertValidKey(key);
 		if (this._has(key)) {
 			const oldValue = (<any>this._data[key])._value;
 			transaction(() => {
@@ -111,7 +111,6 @@ export class ObservableMap<V> {
 	}
 
 	get(key: string): V {
-		this.assertValidKey(key);
 		if (this.has(key))
 			return this._data[key].get();
 		return undefined;
@@ -164,10 +163,16 @@ export class ObservableMap<V> {
 		return res;
 	}
 
-	private assertValidKey(key: string) {
+	private isValidKey(key: string): boolean {
 		if (key === null || key === undefined)
-			throw new Error(`[mobservable.map] Invalid key: '${key}'`);
+			return false;
 		if (typeof key !== "string" && typeof key !== "number")
+			return false;
+		return true;
+	}
+
+	private assertValidKey(key: string) {
+		if (!this.isValidKey(key))
 			throw new Error(`[mobservable.map] Invalid key: '${key}'`);
 	}
 

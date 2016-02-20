@@ -276,3 +276,15 @@ test('issue 100', function(t) {
 	t.equal(typeof that.myMap.observe, "function");
 	t.end();
 });
+
+test('issue 116 - has should not throw on invalid keys', function(t) {
+	var x = map();
+	t.equal(x.has(undefined), false);
+	t.equal(x.has({}), false);
+	t.equal(x.get({}), undefined);
+	t.equal(x.get(undefined), undefined);
+	t.throws(function() {
+		x.set({});
+	});
+	t.end();
+});
