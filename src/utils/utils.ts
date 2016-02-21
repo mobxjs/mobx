@@ -70,6 +70,18 @@ export function makeNonEnumerable(object: any, props: string[]) {
 	}
 }
 
+export function isPropertyConfigurable(object: any, prop: string): boolean {
+	const descriptor = Object.getOwnPropertyDescriptor(object, prop);
+	return !descriptor || (descriptor.configurable !== false && descriptor.writable !== false);
+}
+
+export function assertPropertyConfigurable(object: any, prop: string) {
+	invariant(
+		isPropertyConfigurable(object, prop),
+		`Cannot make property '${prop}' observable, it is not configurable and writable in the target object`
+	);
+}
+
 /**
  * Naive deepEqual. Doesn't check for prototype, non-enumerable or out-of-range properties on arrays.
  * If you have such a case, you probably should use this function but something fancier :).

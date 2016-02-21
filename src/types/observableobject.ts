@@ -6,7 +6,7 @@
 import {ObservableValue} from "./observablevalue";
 import {ComputedValue} from "../core/computedvalue";
 import {ValueMode, AsStructure} from "./modifiers";
-import {Lambda, invariant} from "../utils/utils";
+import {Lambda, invariant, assertPropertyConfigurable} from "../utils/utils";
 import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {getNextId} from "../core/globalstate";
 
@@ -63,6 +63,8 @@ export function setObservableObjectProperty(adm: IObservableObjectAdministration
 }
 
 function defineObservableProperty(adm: IObservableObjectAdministration, propName: string, value) {
+	assertPropertyConfigurable(adm.target, propName);
+
 	let observable: ComputedValue<any>|ObservableValue<any>;
 	let name = `${adm.name}@${adm.id} / Prop "${propName}"`;
 

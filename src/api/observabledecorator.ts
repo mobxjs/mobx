@@ -1,7 +1,7 @@
 import {ValueMode, asReference} from "../types/modifiers";
 import {allowStateChanges} from "../api/extras";
 import {asObservableObject, setObservableObjectProperty} from "../types/observableobject";
-import {invariant} from "../utils/utils";
+import {invariant, assertPropertyConfigurable} from "../utils/utils";
 
 /**
  * ES6 / Typescript decorator which can to make class properties and getter functions reactive.
@@ -16,6 +16,8 @@ import {invariant} from "../utils/utils";
  */
 export function observableDecorator(target: Object, key: string, baseDescriptor: PropertyDescriptor) {
 	invariant(arguments.length >= 2 && arguments.length <= 3, "Illegal decorator config", key);
+	assertPropertyConfigurable(target, key);
+
 	// - In typescript, observable annotations are invoked on the prototype, not on actual instances,
 	// so upon invocation, determine the 'this' instance, and define a property on the
 	// instance as well (that hides the propotype property)
