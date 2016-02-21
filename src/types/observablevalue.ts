@@ -1,11 +1,12 @@
 import {Atom} from "../core/atom";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} from "./modifiers";
-import {valueDidChange, deprecated, Lambda} from "../utils/utils";
-import {observe} from "../api/observe";
+import {valueDidChange, Lambda} from "../utils/utils";
+import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 
 export class ObservableValue<T> extends Atom {
 	hasUnreportedChange = false;
+	private events: SimpleEventEmitter = null;
 
 	protected value: T = undefined;
 
@@ -26,6 +27,8 @@ export class ObservableValue<T> extends Atom {
 		if (changed) {
 			this.value = makeChildObservable(newValue, this.mode, this.name);
 			this.reportChanged();
+			if (this.events)
+				this.events.emit(newValue, oldValue);
 		}
 		return changed;
 	}
@@ -35,9 +38,12 @@ export class ObservableValue<T> extends Atom {
 		return this.value;
 	}
 
-	observe(listener, fireImmediately?) {
-		deprecated("Use 'mobservable.observe(value, listener)' instead.");
-		return observe(this, listener, fireImmediately);
+	observe(listener: (newValue, oldValue) => void, fireImmediately?: boolean): Lambda {
+		if (!this.events)
+			this.events = new SimpleEventEmitter();
+		if (fireImmediately)
+			listener(this.value, undefined);
+		return this.events.on(listener);
 	}
 
 	toString() {

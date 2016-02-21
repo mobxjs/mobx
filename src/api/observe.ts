@@ -30,7 +30,7 @@ function observeObservable(thing, listener, fireImmediately: boolean) {
 	if (isObservableObject(thing))
 		return observeObservableObject(thing, listener, fireImmediately);
 	if (thing instanceof ObservableValue || thing instanceof ComputedValue)
-		return observeObservableValue(thing, listener, fireImmediately);
+		return thing.observe(listener, fireImmediately);
 	if (isPlainObject(thing))
 		return observeObservable(observable(<Object> thing), listener, fireImmediately);
 	invariant(false, "first argument of observe should be some observable value or plain object");
@@ -55,17 +55,4 @@ function observeObservableProperty(thing, property, listener, fireImmediately: b
 		return observeObservableProperty(thing, property, listener, fireImmediately);
 	}
 	invariant(false, "first argument of observe should be an (observable)object or observableMap if a property name is given");
-}
-
-function observeObservableValue<T>(observable: ObservableValue<T>|ComputedValue<T>, listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda {
-	let firstTime = true;
-	let prevValue = undefined;
-	return autorun(() => {
-		let newValue = observable.get();
-		if (!firstTime || fireImmediately) {
-			listener(newValue, prevValue);
-		}
-		firstTime = false;
-		prevValue = newValue;
-	});
 }

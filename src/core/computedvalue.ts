@@ -1,9 +1,9 @@
 import {IObservable, reportObserved, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction, isComputingDerivation} from "./derivation";
 import {globalState, getNextId} from "./globalstate";
-import {observe} from "../api/observe";
-import {valueDidChange, deprecated, invariant, Lambda} from "../utils/utils";
+import {valueDidChange, invariant, Lambda} from "../utils/utils";
 import {reportTransition} from "../api/extras";
+import {autorun} from "../api/autorun";
 
 /**
  * A node in the state dependency root that observes other nodes, and can be observed itself.
@@ -112,9 +112,17 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 		return valueDidChange(this.compareStructural, this.value, oldValue);
 	}
 
-	observe(listener, fireImmediately?): Lambda {
-		deprecated("Use 'mobservable.observe(value, listener)' instead.");
-		return observe(this, listener, fireImmediately);
+	observe(listener: (newValue, oldValue) => void, fireImmediately?: boolean): Lambda {
+		let firstTime = true;
+		let prevValue = undefined;
+		return autorun(() => {
+			let newValue = this.get();
+			if (!firstTime || fireImmediately) {
+				listener(newValue, prevValue);
+			}
+			firstTime = false;
+			prevValue = newValue;
+		});
 	}
 
 	toString() {
