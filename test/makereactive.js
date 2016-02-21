@@ -451,9 +451,12 @@ test('ES5 non reactive props', function (t) {
     writable: true,
     value: 'static'
   })
+  // should throw if trying to reconfigure an existing non-configurable prop
   t.throws(function() {
-	 const a = m.observable(te)
+	 const a = m.extendObservable(te2, { notConfigurable: 1 });
   });
+  // should skip non-configurable / writable props when using `observable`
+  te = m.observable(te);
   const d1 = Object.getOwnPropertyDescriptor(te, 'nonConfigurable')
   t.equal(d1.value, 'static')
 
@@ -464,12 +467,14 @@ test('ES5 non reactive props', function (t) {
     writable: false,
     value: 'static'
   })
+  // should throw if trying to reconfigure an existing non-writable prop
   t.throws(function() {
-	 const a = m.observable(te2)
+	 const a = m.extendObservable(te2, { notWritable: 1 });
   });
   const d2 = Object.getOwnPropertyDescriptor(te2, 'notWritable')
   t.equal(d2.value, 'static')
   
+  // should not throw for other props
   t.equal(m.extendObservable(te, { 'bla' : 3}).bla, 3);
   
   t.end();
