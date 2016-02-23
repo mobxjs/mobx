@@ -112,7 +112,7 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 		return valueDidChange(this.compareStructural, this.value, oldValue);
 	}
 
-	observe(listener: (newValue, oldValue) => void, fireImmediately?: boolean): Lambda {
+	observe(listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda {
 		let firstTime = true;
 		let prevValue = undefined;
 		return autorun(() => {

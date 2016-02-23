@@ -58,6 +58,7 @@ In Mobservable 2 it is no longer allowed for a computed function or autorun to t
 * Removed already deprecated methods: `isReactive`, `makeReactive`, `observeUntil`, `observeAsync`
 * Removed `extras.getDNode`
 * invoking `ObservableArray.peek` is no longer registered as listener
+* Deprecated `untracked`. It wasn't documented and nobody seems to miss it.
 
 # 1.2.4
 
