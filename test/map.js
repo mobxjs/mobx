@@ -244,7 +244,7 @@ test('strict', function(t) {
 	});
 	t.end();
 })
-
+	
 test('issue 100', function(t) {
 	var that = {};
 	mobservable.extendObservable(that, {
@@ -254,3 +254,27 @@ test('issue 100', function(t) {
 	t.equal(typeof that.myMap.observe, "function");
 	t.end();
 });
+
+test('issue 119 - unobserve before delete', function(t) {
+	var propValues = [];
+	var myObservable = mobservable.observable({
+		myMap: map()
+	});
+	myObservable.myMap.set('myId', {
+		myProp: 'myPropValue',
+		myCalculatedProp: function() {
+			return myObservable.myMap.get('myId').myProp + ' calculated';
+		}
+	});
+	// the error only happens if the value is observed
+	mobservable.autorun(function() {
+    	myObservable.myMap.values().forEach(function(value) {
+			console.log('x');
+        	propValues.push(value.myCalculatedProp);
+    	});
+	});
+	myObservable.myMap.delete('myId');
+	
+	t.deepEqual(propValues, ['myPropValue calculated']);
+	t.end();
+})

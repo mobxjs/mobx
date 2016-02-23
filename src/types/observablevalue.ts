@@ -38,7 +38,7 @@ export class ObservableValue<T> extends Atom {
 		return this.value;
 	}
 
-	observe(listener: (newValue, oldValue) => void, fireImmediately?: boolean): Lambda {
+	observe(listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda {
 		if (!this.events)
 			this.events = new SimpleEventEmitter();
 		if (fireImmediately)

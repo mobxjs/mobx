@@ -3,7 +3,7 @@
 import {
     observe, observable, asStructure, autorun, autorunAsync, extendObservable, 
     IObservableArray, IArrayChange, IArraySplice, IObservableValue,
-    extras
+    extras, Atom
 } from "../lib/mobservable";
 import * as test from 'tape';
 
@@ -211,3 +211,77 @@ test('box', function(t) {
 
     t.end();
 })
+
+
+test('atom clock example', function(t) {
+	let ticks = 0;
+	const time_factor = 50; // speed up / slow down tests
+
+	class Clock {
+		atom: Atom;
+		intervalHandler: number = null;
+		currentDateTime: string;
+
+		constructor() {
+			console.log("create");
+			// creates an atom to interact with the mobservable core algorithm
+			this.atom =	new Atom(
+				// first param a name for this atom, for debugging purposes
+				"Clock",
+				// second (optional) parameter: callback for when this atom transitions from unobserved to observed.
+				() => this.startTicking(),
+				// third (optional) parameter: callback for when this atom transitions from observed to unobserved
+				// note that the same atom transition multiple times between these two states
+				() => this.stopTicking()
+			);
+		}
+
+		getTime() {
+			console.log("get time");
+			// let mobservable now this observable data source has been used
+			this.atom.reportObserved();
+			if (!this.intervalHandler)
+				this.tick(); // get the initial data
+			return this.currentDateTime;
+		}
+
+		tick() {
+			console.log("tick");
+			ticks++;
+			this.currentDateTime = new Date().toString();
+			this.atom.reportChanged();
+		}
+
+		startTicking() {
+			console.log("start ticking");
+			this.intervalHandler = setInterval(() => this.tick(), 1 * time_factor);
+		}
+
+		stopTicking() {
+			console.log("stop ticking");
+			clearInterval(this.intervalHandler);
+			this.intervalHandler = null;
+		}
+	}
+
+	const clock = new Clock();
+
+	const values: string[] = [];
+
+	// ... prints the time each second
+	const disposer = autorun(() => {
+		values.push(clock.getTime());
+		console.log(clock.getTime());
+	});
+
+	// printing stops. If nobody else uses the same `clock` the clock will stop ticking as well.
+	setTimeout(disposer, 4.5 * time_factor);
+
+	setTimeout(() => {
+		t.equal(ticks, 6);
+		t.equal(values.length, 5);
+		t.equal(values.filter(x => x.length > 0).length, 5);
+		t.end();
+	}, 10 * time_factor);
+
+});
