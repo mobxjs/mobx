@@ -263,7 +263,9 @@ test('issue 119 - unobserve before delete', function(t) {
 	myObservable.myMap.set('myId', {
 		myProp: 'myPropValue',
 		myCalculatedProp: function() {
-			return myObservable.myMap.get('myId').myProp + ' calculated';
+			if (myObservable.myMap.has('myId'))
+				return myObservable.myMap.get('myId').myProp + ' calculated';
+			return undefined;
 		}
 	});
 	// the error only happens if the value is observed
