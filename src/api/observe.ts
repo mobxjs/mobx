@@ -12,9 +12,9 @@ import {extendObservable} from "./extendobservable";
 export function observe<T>(value: IObservableValue<T>, listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
 export function observe<T>(observableArray: IObservableArray<T>, listener: (change: IArrayChange<T> | IArraySplice<T>) => void, fireImmediately?: boolean): Lambda;
 export function observe<T>(observableMap: ObservableMap<T>, listener: (change: IObservableMapChange<T>) => void, fireImmediately?: boolean): Lambda;
-export function observe<T>(observableMap: ObservableMap<T>, property: string, listener: (change: IObservableMapChange<T>) => void, fireImmediately?: boolean): Lambda;
+export function observe<T>(observableMap: ObservableMap<T>, property: string, listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
 export function observe<T extends Object>(object: T, listener: (change: IObjectChange<any, T>) => void, fireImmediately?: boolean): Lambda;
-export function observe<T extends Object>(object: T, property: string, listener: (change: IObjectChange<any, T>) => void, fireImmediately?: boolean): Lambda;
+export function observe<T extends Object>(object: T, property: string, listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
 export function observe(thing, propOrCb?, cbOrFire?, fireImmediately?): Lambda {
 	if (typeof cbOrFire === "function")
 		return observeObservableProperty(thing, propOrCb, cbOrFire, fireImmediately);
