@@ -1,7 +1,7 @@
 /// <reference path='require.d.ts' />
 /// <reference path='tape.d.ts' />
 import {
-    observe, observable, asStructure, autorun, autorunAsync, extendObservable, 
+    observe, computed, observable, asStructure, autorun, autorunAsync, extendObservable, 
     IObservableArray, IArrayChange, IArraySplice, IObservableValue,
     extras, Atom
 } from "../lib/mobservable";
@@ -21,7 +21,7 @@ class Order {
     @observable aFunction = testFunction;
     @observable someStruct = asStructure({ x: 1, y: 2});
 
-    @observable get total() {
+    @computed get total() {
         return this.amount * this.price * (1 + this.orders.length);
     }
     
@@ -185,7 +185,7 @@ class Box {
     @observable height = 20;
     @observable sizes = [2];
     @observable someFunc = function () { return 2; }
-    @observable get width() {
+    @computed get width() {
         return this.height * this.sizes.length * this.someFunc() * (this.uninitialized ? 2 : 1);
     }
 }
@@ -215,7 +215,7 @@ test('box', function(t) {
 test('observable setter should fail', function(t) {
 	t.throws(() => {
 		class Bla {
-			@observable get propX() {
+			@computed get propX() {
 				return 3;
 			}
 			set propX(v) {

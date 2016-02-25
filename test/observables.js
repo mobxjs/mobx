@@ -51,7 +51,7 @@ test('basic2', function(t) {
 test('dynamic', function(t) {
     try {
         var x = observable(3);
-        var y = observable(function() {
+        var y = m.computed(function() {
             return x.get();
         });
         var b = buffer();

@@ -1,7 +1,8 @@
 import {ValueMode, asReference} from "../types/modifiers";
 import {allowStateChanges} from "../api/extras";
+import {computed} from "../api/computeddecorator";
 import {asObservableObject, setObservableObjectProperty} from "../types/observableobject";
-import {invariant, assertPropertyConfigurable} from "../utils/utils";
+import {invariant, assertPropertyConfigurable, deprecated} from "../utils/utils";
 
 /**
  * ES6 / Typescript decorator which can to make class properties and getter functions reactive.
@@ -24,13 +25,14 @@ export function observableDecorator(target: Object, key: string, baseDescriptor:
 	// - In typescript, the baseDescriptor is empty for attributes without initial value
 	// - In babel, the initial value is passed as the closure baseDiscriptor.initializer'
 
-	const isDecoratingGetter = baseDescriptor && baseDescriptor.hasOwnProperty("get");
+	if (baseDescriptor && baseDescriptor.hasOwnProperty("get")) {
+		deprecated("Using @observable on computed values is deprecated. Use @computed instead.");
+		return computed.apply(null, arguments);
+	}
 	const descriptor: PropertyDescriptor = {};
 	let baseValue = undefined;
 	if (baseDescriptor) {
-		if (baseDescriptor.hasOwnProperty("get"))
-			baseValue = baseDescriptor.get;
-		else if (baseDescriptor.hasOwnProperty("value"))
+		if (baseDescriptor.hasOwnProperty("value"))
 			baseValue = baseDescriptor.value;
 		else if ((<any>baseDescriptor).initializer) { // For babel
 			baseValue = (<any>baseDescriptor).initializer();
@@ -40,12 +42,6 @@ export function observableDecorator(target: Object, key: string, baseDescriptor:
 	}
 
 	invariant(typeof target === "object", `The @observable decorator can only be used on objects`, key);
-	if (isDecoratingGetter) {
-		invariant(typeof baseValue === "function", `@observable expects a getter function if used on a property.`, key);
-		invariant(!baseDescriptor.set, `@observable properties cannot have a setter.`, key);
-		invariant(baseValue.length === 0, `@observable getter functions should not take arguments.`, key);
-	}
-
 	descriptor.configurable = true;
 	descriptor.enumerable = true;
 	descriptor.get = function() {
@@ -55,12 +51,9 @@ export function observableDecorator(target: Object, key: string, baseDescriptor:
 		});
 		return this[key];
 	};
-	descriptor.set = isDecoratingGetter
-		? () => { throw new Error(`[ComputedValue '${key}'] New values cannot be assigned to computed properties.`); }
-		: function(value) {
-			setObservableObjectProperty(asObservableObject(this, undefined, ValueMode.Recursive), key, typeof value === "function" ? asReference(value) : value);
-		}
-	;
+	descriptor.set = function(value) {
+		setObservableObjectProperty(asObservableObject(this, undefined, ValueMode.Recursive), key, typeof value === "function" ? asReference(value) : value);
+	};
 	if (!baseDescriptor) {
 		Object.defineProperty(target, key, descriptor); // For typescript
 	} else {
