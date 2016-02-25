@@ -59,11 +59,15 @@ In MobX 2 it is no longer allowed for a computed function or autorun to throw an
 * Removed `extras.getDNode`
 * invoking `ObservableArray.peek` is no longer registered as listener
 * Deprecated `untracked`. It wasn't documented and nobody seems to miss it.
-* @computed
+* Introduced `@computed` as replacement for `@observable` on getter properties to make a clearer distinction between observable state values and derived values. 
 * @computed({ asStructure: boolean })
 * @computed properties are no longer enumerable by default
 * Deprecated `observable(scalar)`
 
+# 1.2.5
+
+* Map no longer throws when `.has`, `.get` or `.delete` is invoked with an invalid key (#116)
+* Files are now compiled without sourcemap to avoid issues when loading mobservable in a debugger when `src/` folder is not available.
 
 # 1.2.4
 
