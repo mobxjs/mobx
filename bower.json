@@ -20,7 +20,7 @@
 	"state management",
 	"data flow"
   ],
-  "homepage": "https://mweststrate.github.io/mobx",
+  "homepage": "https://mobxjs.github.io/mobx",
   "moduleType": [
     "amd",
     "globals",

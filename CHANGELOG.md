@@ -33,7 +33,7 @@ The core algorithm of MobX has been largely rewritten to improve the clarity, ex
 It is now possible to define your own custom observable data sources by using the `Atom` class.
 It is also possible to create your own reactive functinos using the `Reaction` class. `autorun`, `autorunAsync` and `@observer` have now all been implemented using the concept of Reactions.
 So feel free to write your own reactive constructions!
-(both [Atom](https://github.com/mweststrate/mobservable/blob/master/src/core/atom.ts) and [Reaction](https://github.com/mweststrate/mobservable/blob/master/src/core/reaction.ts) will be documented in more detail soon, but the source code should already be pretty self explanatory).
+(both [Atom](https://github.com/mobx/mobservable/blob/master/src/core/atom.ts) and [Reaction](https://github.com/mobx/mobservable/blob/master/src/core/reaction.ts) will be documented in more detail soon, but the source code should already be pretty self explanatory).
 
 ## Mobservable now fails fast
 
@@ -87,7 +87,7 @@ In MobX 2 it is no longer allowed for a computed function or autorun to throw an
 
 # 1.2.0
 
-* Implemented #67: Reactive graph transformations. See: http://mweststrate.github.io/mobservable/refguide/create-transformer.html
+* Implemented #67: Reactive graph transformations. See: http://mobxjs.github.io/mobservable/refguide/create-transformer.html
 
 # 1.1.8
 

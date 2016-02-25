@@ -250,7 +250,7 @@ test('array modifications', function(t) {
 })
 
 test('new fast array values won\'t be observable', function(t) {
-   // See: https://mweststrate.github.io/mobx/refguide/fast-array.html#comment-2486090381
+   // See: https://mobxjs.github.io/mobx/refguide/fast-array.html#comment-2486090381
     var booksA = mobx.fastArray([]);
     var rowling = { name: 'J.K.Rowling', birth: 1965 };
     booksA.push(rowling)

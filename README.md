@@ -1,26 +1,26 @@
 # mobx
 
-<img src="https://mweststrate.github.io/mobx/images/mobx.png" align="right" width="120px" />
+<img src="https://mobxjs.github.io/mobx/images/mobx.png" align="right" width="120px" />
 
 ##### _Simple, scalable state management._
 
-[![Build Status](https://travis-ci.org/mweststrate/mobx.svg?branch=master)](https://travis-ci.org/mweststrate/mobx)
-[![Coverage Status](https://coveralls.io/repos/mweststrate/mobx/badge.svg?branch=master&service=github)](https://coveralls.io/github/mweststrate/mobx?branch=master)
-[![Join the chat at https://gitter.im/mweststrate/mobx](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mweststrate/mobx?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![#mobx channel on reactiflux discord](https://img.shields.io/badge/discord-%23mobx%20%40reactiflux-blue.svg)](https://discord.gg/0ZcbPKXt5bYAa2J1)
+[![Build Status](https://travis-ci.org/mobxjs/mobx.svg?branch=master)](https://travis-ci.org/mobxjs/mobx)
+[![Coverage Status](https://coveralls.io/repos/mobxjs/mobx/badge.svg?branch=master&service=github)](https://coveralls.io/github/mobxjs/mobx?branch=master)
+[![Join the chat at https://gitter.im/mobxjs/mobx](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mobxjs/mobx?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![#mobservable channel on reactiflux discord](https://img.shields.io/badge/discord-%23mobx%20%40reactiflux-blue.svg)](https://discord.gg/0ZcbPKXt5bYAa2J1)
 
 ### Note: MobX was formerly known as Mobservable
 
 <br/>
-* New to MobX? Take the [five minute, interactive introduction](https://mweststrate.github.io/mobx/getting-started.html)
-* [Official documentation](https://mweststrate.github.io/mobx/)
+* New to MobX? Take the [five minute, interactive introduction](https://mobxjs.github.io/mobx/getting-started.html)
+* [Official documentation](https://mobxjs.github.io/mobx/)
 * MobX talk on [Reactive2015](https://www.youtube.com/watch?v=FEwLwiizlk0)
 
 
 ## Introduction
 
 MobX enables your data structures to become observable.
-Next to that it can make your functions (or [React components](https://github.com/mweststrate/mobx-react)) reactive, so that they re-evaluate whenever relevant data is altered. 
+Next to that it can make your functions (or [React components](https://github.com/mobxjs/mobx-react)) reactive, so that they re-evaluate whenever relevant data is altered. 
 It's like Excel for JavaScript: any data structure can be turned into a 'data cell', and every function or user interface component can be turned into a 'formula' that updates automatically.
 MobX is unopiniated about which data structures to use;
 it can work with mutable objects, arrays, (cyclic) references, classes etc.
@@ -72,12 +72,12 @@ Observing added properties is impossible to achieve without native Proxy support
 ## Getting started
 
 * `npm install mobx --save`.
-* For (Native) React apps `npm install mobx-react --save` as well. You might also be interested in the [dev tools for React and MobX](https://github.com/mweststrate/mobx-react-devtools).
-* [Five minute interactive introduction to MobX and React](https://mweststrate.github.io/mobx/getting-started.html)
+* For (Native) React apps `npm install mobx-react --save` as well. You might also be interested in the [dev tools for React and MobX](https://github.com/mobxjs/mobx-react-devtools).
+* [Five minute interactive introduction to MobX and React](https://mobxjs.github.io/mobx/getting-started.html)
 
 ## Top level api
 
-For the full api, see the [API documentation](https://mweststrate.github.io/mobx/refguide/observable.html).
+For the full api, see the [API documentation](https://mobxjs.github.io/mobx/refguide/observable.html).
 This is an overview of most important functions available in the `mobx` namespace:
 
 **observable(value, options?)**
@@ -92,17 +92,17 @@ From there on it will responds automatically to any relevant change in _observab
 
 ## Examples
 
-* Online: Live edit the Todo example from the [introduction](https://mweststrate.github.io/mobx/getting-started.html#demo).
+* Online: Live edit the Todo example from the [introduction](https://mobxjs.github.io/mobx/getting-started.html#demo).
 * Online: Simple timer example on [JSFiddle](https://jsfiddle.net/mweststrate/wgbe4guu/).
-* Repo: [Minimal boilerplate repostory](https://github.com/mweststrate/mobx-react-boilerplate).
-* Repo: [Full TodoMVC implementation](https://github.com/mweststrate/mobx-react-todomvc).
+* Repo: [Minimal boilerplate repostory](https://github.com/mobxjs/mobx-react-boilerplate).
+* Repo: [Full TodoMVC implementation](https://github.com/mobxjs/mobx-react-todomvc).
 * External example: The ports of the _Notes_ and _Kanban_ [examples of the "SurviveJS - Webpack and React"](https://github.com/survivejs/mobx-demo).
 
 ## Philosophy
 
-* [Official homepage introduction](http://mweststrate.github.io/mobx/)
+* [Official homepage introduction](http://mobxjs.github.io/mobx/)
 * [Making React reactive: the pursuit of high performing, easily maintainable React apps](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/)
-* [SurviveJS interview on MobX, React and Flux](http://survivejs.com/blog/mobx-interview/)
+* [SurviveJS interview on MobX, React and Flux](http://survivejs.com/blog/mobservable-interview/)
 * [Pure rendering in the light of time and state](https://medium.com/@mweststrate/pure-rendering-in-the-light-of-time-and-state-4b537d8d40b1)
 
 MobX is inspired by Microsoft Excel and existing TFRP implementations like MeteorJS tracker, knockout and Vue.js.
@@ -112,7 +112,7 @@ MobX is inspired by Microsoft Excel and existing TFRP implementations like Meteo
 > _Elegant! I love it!_
 > &dash; Johan den Haan, CTO of Mendix
 
-> _We ported the book Notes and Kanban examples to MobX. Check out [the source](https://github.com/survivejs/mobx-demo) to see how this worked out. Compared to the original I was definitely positively surprised. MobX seems like a good fit for these problems._
+> _We ported the book Notes and Kanban examples to MobX. Check out [the source](https://github.com/survivejs/mobservable-demo) to see how this worked out. Compared to the original I was definitely positively surprised. MobX seems like a good fit for these problems._
 > &dash; Juho Vepsäläinen, author of "SurviveJS - Webpack and React" and jster.net curator
 
 > _Great job with MobX! Really gives current conventions and libraries a run for their money._

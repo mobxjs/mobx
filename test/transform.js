@@ -161,7 +161,7 @@ test('transform into reactive graph', function(t) {
 	
 });
 
-// testing: https://github.com/mweststrate/mobx/issues/67
+// testing: https://github.com/mobxjs/mobx/issues/67
 test('transform tree (modifying tree incrementally)', function(t) {
 	var pluckFn = TransformUtils.pluckFn;
 	var identity = TransformUtils.identity;

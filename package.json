@@ -23,18 +23,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mweststrate/mobx.git"
+    "url": "https://github.com/mobxjs/mobx.git"
   },
   "author": "Michel Weststrate",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mweststrate/mobx/issues"
+    "url": "https://github.com/mobxjs/mobx/issues"
   },
   "files": [
     "lib",
     "LICENSE"
   ],
-  "homepage": "https://mweststrate.github.io/mobx",
+  "homepage": "https://mobxjs.github.io/mobx",
   "devDependencies": {
     "babel-cli": "^6.4.5",
     "babel-core": "^6.4.5",
