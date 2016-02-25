@@ -212,6 +212,19 @@ test('box', function(t) {
     t.end();
 })
 
+test('observable setter should fail', function(t) {
+	t.throws(() => {
+		class Bla {
+			@observable get propX() {
+				return 3;
+			}
+			set propX(v) {
+				
+			}
+		}
+	}, 'propX');
+	t.end();
+});
 
 test('atom clock example', function(t) {
 	let ticks = 0;

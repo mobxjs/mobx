@@ -42,7 +42,7 @@ export function observableDecorator(target: Object, key: string, baseDescriptor:
 	invariant(typeof target === "object", `The @observable decorator can only be used on objects`, key);
 	if (isDecoratingGetter) {
 		invariant(typeof baseValue === "function", `@observable expects a getter function if used on a property.`, key);
-		invariant(!descriptor.set, `@observable properties cannot have a setter.`, key);
+		invariant(!baseDescriptor.set, `@observable properties cannot have a setter.`, key);
 		invariant(baseValue.length === 0, `@observable getter functions should not take arguments.`, key);
 	}
 
