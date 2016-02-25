@@ -31,7 +31,7 @@ export { IObservableArray, IArrayChange, IArraySplice, isObservableArray, fastAr
 export { IObservableMapChange, IKeyValueMap, ObservableMap, IMapEntries, isObservableMap, map } from "./types/observablemap"
 
 export { IObservableValue, observable                         } from "./api/observable";
-export { computed                                             } from "./api/computeddecorator";
+export { computed, IComputedValueOptions                      } from "./api/computeddecorator";
 export { isObservable                                         } from "./api/isobservable";
 export { extendObservable                                     } from "./api/extendobservable";
 export { observe                                              } from "./api/observe";

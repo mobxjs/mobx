@@ -3,7 +3,7 @@
 import {
     observe, computed, observable, asStructure, autorun, autorunAsync, extendObservable, 
     IObservableArray, IArrayChange, IArraySplice, IObservableValue,
-    extras, Atom
+    extras, Atom, transaction
 } from "../lib/mobservable";
 import * as test from 'tape';
 
@@ -297,4 +297,35 @@ test('atom clock example', function(t) {
 		t.end();
 	}, 10 * time_factor);
 
+});
+
+test('typescript: parameterized computed decorator', (t) => {
+	class TestClass {
+		@observable x = 3;
+		@observable y = 3;
+		@computed({ asStructure: true }) get boxedSum() {
+			return { sum: Math.round(this.x) + Math.round(this.y) };
+		}
+	}
+	
+	const t1 = new TestClass();
+	const changes: { sum: number}[] = [];
+	const d = autorun(() => changes.push(t1.boxedSum));
+	
+	t1.y = 4; // change
+	t.equal(changes.length, 2);
+	t1.y = 4.2; // no change
+	t.equal(changes.length, 2);
+	transaction(() => {
+		t1.y = 3;
+		t1.x = 4;
+	}); // no change
+	t.equal(changes.length, 2);
+	t1.x = 6; // change
+	t.equal(changes.length, 3);
+	d();
+	
+	t.deepEqual(changes, [{ sum: 6 }, { sum: 7 }, { sum: 9 }]);
+	
+	t.end();
 });
