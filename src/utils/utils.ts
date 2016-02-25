@@ -1,9 +1,3 @@
-/**
- * mobservable
- * (c) 2015 - Michel Weststrate
- * https://github.com/mweststrate/mobservable
- */
-
 export const EMPTY_ARRAY = [];
 Object.freeze(EMPTY_ARRAY);
 
@@ -14,7 +8,7 @@ export interface Lambda {
 
 export function invariant(check: boolean, message: string, thing?) {
 	if (!check)
-		throw new Error("[mobservable] Invariant failed: " + message + (thing ? ` in '${thing}'` : ""));
+		throw new Error("[mobx] Invariant failed: " + message + (thing ? ` in '${thing}'` : ""));
 }
 
 const deprecatedMessages = [];
@@ -22,7 +16,7 @@ export function deprecated(msg: string) {
 	if (deprecatedMessages.indexOf(msg) !== -1)
 		return;
 	deprecatedMessages.push(msg);
-	console.error("[mobservable] Deprecated: " + msg);
+	console.error("[mobx] Deprecated: " + msg);
 }
 
 /**

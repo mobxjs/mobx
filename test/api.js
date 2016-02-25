@@ -1,8 +1,8 @@
-var mobservable = require('../');
+var mobx = require('../');
 var test = require('tape');
 
 test('correct api should be exposed', function(t) {
-	t.deepEquals(Object.keys(mobservable).sort(), [
+	t.deepEquals(Object.keys(mobx).sort(), [
 		'Atom',
 		'ObservableMap',
 		'Reaction',
@@ -32,27 +32,27 @@ test('correct api should be exposed', function(t) {
 		'untracked',
 		'when' 
 	]);
-	t.equals(Object.keys(mobservable).filter(function(key) {
-		return mobservable[key] == undefined;
+	t.equals(Object.keys(mobx).filter(function(key) {
+		return mobx[key] == undefined;
 	}).length, 0);
 	
-	t.deepEquals(Object.keys(mobservable._).sort(), [
+	t.deepEquals(Object.keys(mobx._).sort(), [
 		'quickDiff', 
 		'resetGlobalState'
 	]);
-	t.equals(Object.keys(mobservable._).filter(function(key) {
-		return mobservable._[key] == undefined;
+	t.equals(Object.keys(mobx._).filter(function(key) {
+		return mobx._[key] == undefined;
 	}).length, 0);
 	
-	t.deepEquals(Object.keys(mobservable.extras).sort(), [
+	t.deepEquals(Object.keys(mobx.extras).sort(), [
 			'allowStateChanges',
 			'getDependencyTree',
 			'getObserverTree',
 			'isComputingDerivation',
 			'trackTransitions'
 	]);
-	t.equals(Object.keys(mobservable.extras).filter(function(key) {
-		return mobservable.extras[key] == undefined;
+	t.equals(Object.keys(mobx.extras).filter(function(key) {
+		return mobx.extras[key] == undefined;
 	}).length, 0);
 
 	t.end();

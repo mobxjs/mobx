@@ -1,8 +1,8 @@
 var test = require('tape');
-var mobservable = require('..');
-var m = mobservable;
+var mobx = require('..');
+var m = mobx;
 
-var value = mobservable.value;
+var value = mobx.value;
 var voidObserver = function(){};
 
 function buffer() {
@@ -227,7 +227,7 @@ test('flat array', function(t) {
     var updates = 0;
     var dis = m.autorun(function() {
         updates++;
-        result = mobservable.toJSON(x);
+        result = mobx.toJSON(x);
     });
 
     t.deepEqual(result, { x: [{ a: 1 }]});
@@ -261,7 +261,7 @@ test('flat object', function(t) {
     var updates = 0;
     var dis = m.autorun(function() {
         updates++;
-        result = mobservable.toJSON(y);
+        result = mobx.toJSON(y);
     });
 
     t.deepEqual(result, { x: { z: 3 }});

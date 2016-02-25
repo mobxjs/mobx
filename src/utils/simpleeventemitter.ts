@@ -1,8 +1,3 @@
-/**
- * mobservable
- * (c) 2015 - Michel Weststrate
- * https://github.com/mweststrate/mobservable
- */
 import {once, Lambda} from "./utils";
 
 export class SimpleEventEmitter {

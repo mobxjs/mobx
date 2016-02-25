@@ -1,9 +1,9 @@
 {
-  "name": "mobservable",
+  "name": "mobx",
   "version": "2.0.0-1",
-  "description": "Observable data. Reactive functions. Simple code.",
-  "main": "lib/mobservable.js",
-  "typings": "lib/mobservable.d.ts",
+  "description": "Simple, scalable state management.",
+  "main": "lib/mobx.js",
+  "typings": "lib/mobx.d.ts",
   "scripts": {
     "test": "npm run quick-build && npm run tape",
     "full-test": "npm run small-build && npm run build-tests && npm run use-minified && npm run tape && npm run perf",
@@ -18,23 +18,23 @@
     "build-tests": "npm run build-typescript-tests && npm run build-babel-tests",
     "build-typescript-tests": "tsc -m commonjs -t es5 --experimentalDecorators --noImplicitAny --outDir test test/typescript-tests.ts",
     "build-babel-tests": "babel test/babel/babel-tests.js -o test/babel-tests.js",
-    "use-minified": "cp lib/mobservable.min.js lib/mobservable.js",
+    "use-minified": "cp lib/mobx.min.js lib/mobx.js",
     "lint": "tslint -c tslint.json src/*.ts src/types/*.ts src/api/*.ts src/core/*.ts src/utils/*.ts"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mweststrate/mobservable.git"
+    "url": "https://github.com/mweststrate/mobx.git"
   },
   "author": "Michel Weststrate",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mweststrate/mobservable/issues"
+    "url": "https://github.com/mweststrate/mobx/issues"
   },
   "files": [
     "lib",
     "LICENSE"
   ],
-  "homepage": "https://mweststrate.github.io/mobservable",
+  "homepage": "https://mweststrate.github.io/mobx",
   "devDependencies": {
     "babel-cli": "^6.4.5",
     "babel-core": "^6.4.5",
@@ -54,6 +54,7 @@
   },
   "dependencies": {},
   "keywords": [
+    "mobx",
     "mobservable",
     "observable",
     "react-component",
@@ -62,6 +63,8 @@
     "reactive",
     "model",
     "frp",
-    "functional-reactive-programming"
+    "functional-reactive-programming",
+	"state management",
+	"data flow"
   ]
 }

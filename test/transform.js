@@ -58,8 +58,8 @@ test('transform1', function(t) {
 	t.equal(unloaded.length, 1);
 	t.equal(unloaded[0][0], tea);
 	t.equal(unloaded[0][1], "TEA");
-	t.equal(tea.$mobservable.values.title.observers.length, 0);
-	t.equal(state.todos[0].$mobservable.values.title.observers.length, 1);
+	t.equal(tea.$mobx.values.title.observers.length, 0);
+	t.equal(state.todos[0].$mobx.values.title.observers.length, 1);
 
 
 	tea.title = "mint";
@@ -161,7 +161,7 @@ test('transform into reactive graph', function(t) {
 	
 });
 
-// testing: https://github.com/mweststrate/mobservable/issues/67
+// testing: https://github.com/mweststrate/mobx/issues/67
 test('transform tree (modifying tree incrementally)', function(t) {
 	var pluckFn = TransformUtils.pluckFn;
 	var identity = TransformUtils.identity;

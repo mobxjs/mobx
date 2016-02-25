@@ -2,7 +2,7 @@
  * (c) Michel Weststrate 2015 - 2016
  * MIT Licensed
  * 
- * Welcome to the mobservable sources! To get an global overview of how Mobservable internally works,
+ * Welcome to the mobx sources! To get an global overview of how MobX internally works,
  * this is a good place to start: 
  * https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.xvbh6qd74
  * 
@@ -10,7 +10,7 @@
  * ===============
  * 
  * - api/     Most of the public static methods exposed by the module can be found here.
- * - core/    Implementation of the Mobservable algorithm; atoms, derivations, reactions, dependency trees, optimizations. Cool stuff can be found here.
+ * - core/    Implementation of the MobX algorithm; atoms, derivations, reactions, dependency trees, optimizations. Cool stuff can be found here.
  * - types/   All the magic that is need to have observable objects, arrays and values is in this folder. Including the modifiers like `asFlat`.
  * - utils/   Utility stuff.
  * 

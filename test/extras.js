@@ -1,6 +1,6 @@
 var test = require('tape');
-var mobservable = require('..');
-var m = mobservable;
+var mobx = require('..');
+var m = mobx;
 
 test('treeD', function(t) {
     m._.resetGlobalState();
@@ -30,9 +30,9 @@ test('treeD', function(t) {
     };
     var c = m.autorun(cFunc);
     var cName = 'Autorun@3';
-    t.deepEqual(dtree(c.$mobservable), {
+    t.deepEqual(dtree(c.$mobx), {
         name: cName,
-        id: c.$mobservable.id,
+        id: c.$mobx.id,
         dependencies: [{
             name: bName,
             id: b.id,
@@ -54,20 +54,20 @@ test('treeD', function(t) {
             id: b.id,
             observers: [{
                 name: cName,
-                id: c.$mobservable.id
+                id: c.$mobx.id
             }]
         }]
     });
 
-    var x = mobservable.map({ temperature: 0 });
-    var d = mobservable.autorun(function() {
+    var x = mobx.map({ temperature: 0 });
+    var d = mobx.autorun(function() {
         x.keys();
         if (x.has('temperature'))
             x.get('temperature');
         x.has('absent');
     });
     
-    t.deepEqual(m.extras.getDependencyTree(d.$mobservable), {
+    t.deepEqual(m.extras.getDependencyTree(d.$mobx), {
         id: 8, 
         name: 'Autorun@8', 
         dependencies: [{ 
@@ -107,21 +107,21 @@ test('names', function(t) {
     m.extendObservable(rstruct.y, { a:  { b : 2}});
     rstruct.ar.push({ b : 2});
     rstruct.ar.push([]);
-    t.equal(rstruct.$mobservable.values.x.name, "ObservableObject@1 / Prop \"x\"");
-    t.equal(rstruct.$mobservable.values.y.name, "ObservableObject@1 / Prop \"y\"");
-    t.equal(rstruct.y.$mobservable.values.z.name, "ObservableObject@1 / Prop \"y\"@4 / Prop \"z\"");
-    t.equal(rstruct.$mobservable.values.ar.name, "ObservableObject@1 / Prop \"ar\"");
-    t.equal(rstruct.ar.$mobservable.atom.name, "ObservableObject@1 / Prop \"ar\"");
-    t.equal(rstruct.ar[1].$mobservable.values.w.name, "ObservableObject@1 / Prop \"ar\"@7 / ArrayEntry@8 / Prop \"w\"");
-    t.equal(rstruct.y.a.$mobservable.values.b.name, "ObservableObject@1 / Prop \"y\"@4 / Prop \"a\"@11 / Prop \"b\"");
-    t.equal(rstruct.ar[2].$mobservable.values.b.name, "ObservableObject@1 / Prop \"ar\"@7 / ArrayEntry@13 / Prop \"b\"");
+    t.equal(rstruct.$mobx.values.x.name, "ObservableObject@1 / Prop \"x\"");
+    t.equal(rstruct.$mobx.values.y.name, "ObservableObject@1 / Prop \"y\"");
+    t.equal(rstruct.y.$mobx.values.z.name, "ObservableObject@1 / Prop \"y\"@4 / Prop \"z\"");
+    t.equal(rstruct.$mobx.values.ar.name, "ObservableObject@1 / Prop \"ar\"");
+    t.equal(rstruct.ar.$mobx.atom.name, "ObservableObject@1 / Prop \"ar\"");
+    t.equal(rstruct.ar[1].$mobx.values.w.name, "ObservableObject@1 / Prop \"ar\"@7 / ArrayEntry@8 / Prop \"w\"");
+    t.equal(rstruct.y.a.$mobx.values.b.name, "ObservableObject@1 / Prop \"y\"@4 / Prop \"a\"@11 / Prop \"b\"");
+    t.equal(rstruct.ar[2].$mobx.values.b.name, "ObservableObject@1 / Prop \"ar\"@7 / ArrayEntry@13 / Prop \"b\"");
 
     var d = m.autorun(function() {
     });
-    t.ok(d.$mobservable.name);
+    t.ok(d.$mobx.name);
 
     t.equal(m.autorun(function namedFunction() {
-    }).$mobservable.name, "namedFunction");
+    }).$mobx.name, "namedFunction");
 
     t.ok(m.observable(function() {}));
 
@@ -148,7 +148,7 @@ var trackerOutput1 = function(a, b,c) {
     { id: b.id,
         changed: true,
         state: 'READY' },
-    { id: c.$mobservable.id,
+    { id: c.$mobx.id,
         changed: true,
         state: 'READY' } 
     ];
@@ -163,7 +163,7 @@ var trackerOutput2 = function(a, b, c) {
     state: 'STALE',
     changed: false,
   }, 
-  { id: c.$mobservable.id,
+  { id: c.$mobx.id,
     state: 'STALE',
     changed: false,
   }, 
@@ -179,11 +179,11 @@ var trackerOutput2 = function(a, b, c) {
     state: 'READY',
     changed: true,
   }, 
-  { id: c.$mobservable.id,
+  { id: c.$mobx.id,
     state: 'PENDING',
     changed: false,
   }, 
-  { id: c.$mobservable.id,
+  { id: c.$mobx.id,
     state: 'READY',
     changed: true,
   }];
@@ -286,18 +286,18 @@ test('transition tracker 4', function(t) {
 })
 
 test('strict mode checks', function(t) {
-    var x = mobservable.observable(3);
+    var x = mobx.observable(3);
     
-    mobservable.extras.allowStateChanges(false, function() {
+    mobx.extras.allowStateChanges(false, function() {
         x.get();        
     });
 
-    mobservable.extras.allowStateChanges(true, function() {
+    mobx.extras.allowStateChanges(true, function() {
         x.set(7);        
     });
         
     t.throws(function() {
-        mobservable.extras.allowStateChanges(false, function() {
+        mobx.extras.allowStateChanges(false, function() {
             x.set(4);        
         });
     });

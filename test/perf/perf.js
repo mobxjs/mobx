@@ -1,6 +1,6 @@
 var test = require('tape');
-var mobservable = require('../..');
-var observable = mobservable.observable;
+var mobx = require('../..');
+var observable = mobx.observable;
 
 function gc() {
     if (typeof global.gc === "function")
@@ -45,7 +45,7 @@ test('one observes ten thousand that observe one', function (t) {
 
     var start = now();
 
-    mobservable.observe(b, voidObserver, true); // start observers
+    mobx.observe(b, voidObserver, true); // start observers
     t.equal(99990000, b.get());
     var initial = now();
 
@@ -70,7 +70,7 @@ test('five hundrend properties that observe their sibling', function (t) {
     var start = now();
 
     var last = observables[observables.length -1];
-    mobservable.observe(last, voidObserver);
+    mobx.observe(last, voidObserver);
     t.equal(501, last.get());
     var initial = now();
 
@@ -95,7 +95,7 @@ test('late dependency change', function(t) {
         return sum;
     })
 
-    mobservable.observe(sum, voidObserver, true);
+    mobx.observe(sum, voidObserver, true);
 
     var start = new Date();
 
@@ -130,7 +130,7 @@ test('lots of unused computables', function(t) {
     });
 
     var sum = 0;
-    var subscription = mobservable.observe(b, function(newValue) {
+    var subscription = mobx.observe(b, function(newValue) {
         sum = newValue;
     }, true);
 
@@ -182,7 +182,7 @@ test('array reduce', function(t) {
             return a + c * b.get();
         }, 0);
     });
-    mobservable.observe(sum, voidObserver);
+    mobx.observe(sum, voidObserver);
 
     var start = now();
 
@@ -220,7 +220,7 @@ test('array classic loop', function(t) {
             s+=ar[i] * b.get();
         return s;
     });
-    mobservable.observe(sum, voidObserver, true); // calculate
+    mobx.observe(sum, voidObserver, true); // calculate
 
     var start = now();
 
@@ -249,7 +249,7 @@ test('array classic loop', function(t) {
 
 function order_system_helper(t, usebatch, keepObserving) {
     gc();
-    t.equal(mobservable.extras.isComputingDerivation(), false);
+    t.equal(mobx.extras.isComputingDerivation(), false);
     var orders = observable([]);
     var vat = observable(2);
 
@@ -288,7 +288,7 @@ function order_system_helper(t, usebatch, keepObserving) {
 
     var disp;
     if (keepObserving)
-        disp = mobservable.observe(totalAmount, voidObserver);
+        disp = mobx.observe(totalAmount, voidObserver);
 
     var start = now();
 
@@ -302,7 +302,7 @@ function order_system_helper(t, usebatch, keepObserving) {
     }
 
     if (usebatch)
-        mobservable.transaction(setup);
+        mobx.transaction(setup);
     else
         setup();
 
@@ -317,7 +317,7 @@ function order_system_helper(t, usebatch, keepObserving) {
     }
 
     if (usebatch)
-        mobservable.transaction(update)
+        mobx.transaction(update)
     else
         update();
 
@@ -367,7 +367,7 @@ test('create array (fast)', function(t) {
         a.push(i);
     var start = now();
     for(var i = 0; i < 1000; i++)
-        mobservable.fastArray(a);
+        mobx.fastArray(a);
     console.log('\n  Created in ' + (now() - start) + 'ms.');
     t.end();
 })

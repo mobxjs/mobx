@@ -1,8 +1,3 @@
-/**
- * mobservable
- * (c) 2015 - Michel Weststrate
- * https://github.com/mweststrate/mobservable
- */
 import {ObservableValue} from "./observablevalue";
 import {ComputedValue} from "../core/computedvalue";
 import {ValueMode, AsStructure} from "./modifiers";
@@ -30,14 +25,14 @@ export interface IObservableObjectAdministration {
 }
 
 export interface IIsObservableObject {
-	$mobservable: IObservableObjectAdministration;
+	$mobx: IObservableObjectAdministration;
 }
 
 export function asObservableObject(target, name: string = "ObservableObject", mode: ValueMode = ValueMode.Recursive): IObservableObjectAdministration {
-	if (target.$mobservable) {
-		if (target.$mobservable.type !== ObservableObjectMarker)
+	if (target.$mobx) {
+		if (target.$mobx.type !== ObservableObjectMarker)
 			throw new Error("The given object is observable but not an observable object");
-		return target.$mobservable;
+		return target.$mobx;
 	}
 	const adm: IObservableObjectAdministration = {
 		type: ObservableObjectMarker,
@@ -46,7 +41,7 @@ export function asObservableObject(target, name: string = "ObservableObject", mo
 		id: getNextId(),
 		target, name, mode
 	};
-	Object.defineProperty(target, "$mobservable", {
+	Object.defineProperty(target, "$mobx", {
 		enumerable: false,
 		configurable: false,
 		writable: false,
@@ -112,12 +107,12 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 export function observeObservableObject(object: IIsObservableObject, callback: (changes: IObjectChange<any, any>) => void, fireImmediately?: boolean): Lambda {
 	invariant(isObservableObject(object), "Expected observable object");
 	invariant(fireImmediately !== true, "`observe` doesn't support the fire immediately property for observable objects.");
-	const adm = object.$mobservable;
+	const adm = object.$mobx;
 	if (adm.events === undefined)
 		adm.events = new SimpleEventEmitter();
-	return object.$mobservable.events.on(callback);
+	return object.$mobx.events.on(callback);
 }
 
 export function isObservableObject(thing): boolean {
-	return thing && thing.$mobservable && thing.$mobservable.type === ObservableObjectMarker;
+	return thing && thing.$mobx && thing.$mobx.type === ObservableObjectMarker;
 }

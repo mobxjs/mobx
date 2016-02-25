@@ -1,8 +1,8 @@
 var testBase = require('tape');
-var mobservable = require('..');
-var m = mobservable;
+var mobx = require('..');
+var m = mobx;
 
-var observable = mobservable.observable;
+var observable = mobx.observable;
 var voidObserver = function(){};
 
 function test(name, func) {
@@ -10,7 +10,7 @@ function test(name, func) {
         try {
             func(t);    
         } finally {
-            mobservable._.resetGlobalState();
+            mobx._.resetGlobalState();
         }
     });
 }
@@ -67,7 +67,7 @@ test('allow state changes in autorun', function(t) {
     t.equal(x.get(), 5);
     t.equal(z.get(), 5);
 
-    t.equal(mobservable.extras.isComputingDerivation(), false);
+    t.equal(mobx.extras.isComputingDerivation(), false);
     t.end();
 })
 
@@ -85,7 +85,7 @@ test('deny array change in view', function(t) {
         }, 'It is not allowed to change the state during the computation of a reactive derivation');
         
         t.deepEqual(z.slice(), []);
-        t.equal(mobservable.extras.isComputingDerivation(), false);
+        t.equal(mobx.extras.isComputingDerivation(), false);
 
         t.end();
     }
@@ -108,7 +108,7 @@ test('allow array change in autorun', function(t) {
     x.set(2);
     t.deepEqual(z.slice(), [5, 6])
 
-    t.equal(mobservable.extras.isComputingDerivation(), false);
+    t.equal(mobx.extras.isComputingDerivation(), false);
     t.end();
 })
 
@@ -170,15 +170,15 @@ test('issue 86, converging cycles', function(t) {
         return -1;
     }
     
-    const deleteThisId = mobservable.observable(1);
-    const state = mobservable.observable({ someArray: [] });
+    const deleteThisId = mobx.observable(1);
+    const state = mobx.observable({ someArray: [] });
     var calcs = 0;
 
     state.someArray.push({ id: 1, text: 'I am 1' });
     state.someArray.push({ id: 2, text: 'I am 2' });
     
     // should delete item 1 in first run, which works fine
-    mobservable.autorun(() => {
+    mobx.autorun(() => {
         calcs++;
         const i = findIndex(state.someArray, item => item.id === deleteThisId.get());
         state.someArray.remove(state.someArray[i]);
@@ -195,9 +195,9 @@ test('issue 86, converging cycles', function(t) {
 });
 
 test('slow converging cycle', function(t) {
-    var x = mobservable.observable(1);
+    var x = mobx.observable(1);
     var res = -1;
-    mobservable.autorun(() => {
+    mobx.autorun(() => {
         if (x.get() === 100)
             res = x.get();
         else

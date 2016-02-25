@@ -1,6 +1,6 @@
 var test = require('tape');
-var mobservable = require('..');
-var observable = mobservable.observable;
+var mobx = require('..');
+var observable = mobx.observable;
 
 function buffer() {
     var b = [];
@@ -87,7 +87,7 @@ test('test1', function(t) {
 })
 
 test('find and remove', function(t) {
-    var a = mobservable.observable([10,20,20]);
+    var a = mobx.observable([10,20,20]);
     var idx = -1;
     function predicate(item, index) {
         if (item === 20) {
@@ -122,7 +122,7 @@ test('find and remove', function(t) {
 
 test('quickDiff', function(t) {
     function check(current, base, added, removed) {
-        var res = mobservable._.quickDiff(current, base);
+        var res = mobx._.quickDiff(current, base);
         t.deepEqual(res[0], added);
         t.deepEqual(res[1], removed);
     }
@@ -144,7 +144,7 @@ test('quickDiff', function(t) {
 })
 
 test('observe', function(t) {
-    var ar = mobservable.observable([1,4]);
+    var ar = mobx.observable([1,4]);
     var buf = [];
     var disposer = ar.observe(function(changes) {
         buf.push(changes);
@@ -189,7 +189,7 @@ test('observe', function(t) {
 })
 
 test('array modification1', function(t) {
-    var a = mobservable.observable([1,2,3]);
+    var a = mobx.observable([1,2,3]);
     var r = a.splice(-10, 5, 4,5,6);
     t.deepEqual(a.slice(), [4,5,6]);
     t.deepEqual(r, [1,2,3]);
@@ -198,7 +198,7 @@ test('array modification1', function(t) {
 
 test('serialize', function(t) {
     var a = [1,2,3];
-    var m = mobservable.observable(a);
+    var m = mobx.observable(a);
 
     t.deepEqual(JSON.stringify(m), JSON.stringify(a));
     t.deepEqual(a, m.peek());
@@ -217,7 +217,7 @@ test('array modification functions', function(t) {
     funcs.forEach(function(f) {
         ars.forEach(function (ar) {
             var a = ar.slice();
-            var b = mobservable.observable(a);
+            var b = mobx.observable(a);
             var res1 = a[f](4);
             var res2 = b[f](4);
             t.deepEqual(res1, res2);
@@ -229,7 +229,7 @@ test('array modification functions', function(t) {
 
 test('array modifications', function(t) {
 
-    var a2 = mobservable.fastArray([]);
+    var a2 = mobx.fastArray([]);
     var inputs = [undefined, -10, -4, -3, -1, 0, 1, 3, 4, 10];
     var arrays = [[], [1], [1,2,3,4], [1,2,3,4,5,6,7,8,9,10,11],[1,undefined],[undefined]]
     for (var i = 0; i < inputs.length; i++)
@@ -250,18 +250,18 @@ test('array modifications', function(t) {
 })
 
 test('new fast array values won\'t be observable', function(t) {
-   // See: https://mweststrate.github.io/mobservable/refguide/fast-array.html#comment-2486090381
-    var booksA = mobservable.fastArray([]);
+   // See: https://mweststrate.github.io/mobx/refguide/fast-array.html#comment-2486090381
+    var booksA = mobx.fastArray([]);
     var rowling = { name: 'J.K.Rowling', birth: 1965 };
     booksA.push(rowling)
-    t.equal(mobservable.isObservable(booksA[0], "name"), false);
+    t.equal(mobx.isObservable(booksA[0], "name"), false);
     var removed = booksA.splice(0, 1);
-    t.equal(mobservable.isObservable(removed[0], "name"), false);
+    t.equal(mobx.isObservable(removed[0], "name"), false);
     t.end(); 
 });
 
 test('is array', function(t) {
-    var x = mobservable.observable([]);
+    var x = mobx.observable([]);
     t.equal(x instanceof Array, true);
 
     // would be cool if these two would return true...
@@ -271,9 +271,9 @@ test('is array', function(t) {
 })
 
 test('peek', function(t) {
-    var x = mobservable.observable([1, 2, 3]);
+    var x = mobx.observable([1, 2, 3]);
     t.deepEqual(x.peek(), [1, 2, 3]);
-    t.equal(x.$mobservable.values, x.peek());
+    t.equal(x.$mobx.values, x.peek());
     
     x.peek().push(4); //noooo!
     t.throws(function() {
@@ -283,13 +283,13 @@ test('peek', function(t) {
 })
 
 test('react to sort changes', function(t) {
-    var x = mobservable.observable([4, 2, 3]);
-    var sortedX = mobservable.observable(function() {
+    var x = mobx.observable([4, 2, 3]);
+    var sortedX = mobx.observable(function() {
         return x.sort();
     });
     var sorted;
     
-    mobservable.autorun(function() {
+    mobx.autorun(function() {
         sorted = sortedX.get();
     });
     

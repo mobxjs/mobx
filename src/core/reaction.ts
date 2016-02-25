@@ -80,7 +80,7 @@ export class Reaction implements IDerivation {
 
 	getDisposer(): Lambda & { $mosbservable: Reaction } {
 		const r = this.dispose.bind(this);
-		r.$mobservable = this;
+		r.$mobx = this;
 		return r;
 	}
 

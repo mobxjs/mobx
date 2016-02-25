@@ -4,10 +4,10 @@ import {Reaction} from "./reaction";
 
 declare const global: any;
 
-export class MobservableGlobals {
+export class MobXGlobals {
 	version = 1; //
 	derivationStack: IDerivation[] = [];
-	mobservableObjectId = 0;
+	mobxGuid = 0;
 	inTransaction = 0;
 	inUntracked = 0;
 	isRunningReactions = false;
@@ -18,19 +18,21 @@ export class MobservableGlobals {
 }
 
 export const globalState = (() => {
-	const res = new MobservableGlobals();
+	const res = new MobXGlobals();
 	/**
 	 * Backward compatibility check
 	 */
-	if (global.__mobservableTrackingStack || global.__mobservableViewStack || (global.__mobservableGlobal && global.__mobservableGlobal.version !== globalState.version))
-		throw new Error("[mobservable] An incompatible version of mobservable is already loaded.");
-	if (global.__mobservableGlobal)
-		return global.__mobservableGlobal;
-	return global.__mobservableGlobal = res;
+	if (global.__mobservableTrackingStack || global.__mobservableViewStack)
+		throw new Error("[mobx] An incompatible version of mobservable is already loaded.");
+	if (global.__mobxGlobal && global.__mobxGlobal.version !== globalState.version)
+		throw new Error("[mobx] An incompatible version of mobx is already loaded.");
+	if (global.__mobxGlobal)
+		return global.__mobxGlobal;
+	return global.__mobxGlobal = res;
 })();
 
 export function getNextId() {
-	return ++globalState.mobservableObjectId;
+	return ++globalState.mobxGuid;
 }
 
 export function registerGlobals() {
@@ -42,7 +44,7 @@ export function registerGlobals() {
  * but can be used to get back at a stable state after throwing errors
  */
 export function resetGlobalState() {
-	const defaultGlobals = new MobservableGlobals();
+	const defaultGlobals = new MobXGlobals();
 	for (let key in defaultGlobals)
 		globalState[key] = defaultGlobals[key];
 }

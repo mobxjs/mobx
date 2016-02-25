@@ -1,13 +1,13 @@
 # 2.0.0
 
-Welcome to Mobservable 2. Migrating from Mobservable 1 should be pretty straight-forward as the public api is largely the same.
-However there are some conceptual changes which justifies a Major version bump as it might alter the behavior of Mobservable in edge cases.
-Besides that, Mobservable is just a large collection of minor improvements over Mobservable 1.
+Welcome to ~Mobservable~ MobX 2! First of all, there is the name change. Secondly, migrating from Mobservable 1 should be pretty straight-forward as the public api is largely the same.
+However there are some conceptual changes which justifies a Major version bump as it might alter the behavior of MobX in edge cases.
+Besides that, MobX is just a large collection of minor improvements over Mobservable 1.
 So enjoy!  
 
 ## `autorun`'s are now allowed to cause cycles!
 `autorun` is now allowed to have cycles. In Mobservable 1 an exception was thrown as soon as an autorun modified a variable which it was reading as well.  
-In Mobservable 2 these situations are now allowed and the autorun will trigger itself to be fired again immediately after the current execution.
+In MobX 2 these situations are now allowed and the autorun will trigger itself to be fired again immediately after the current execution.
 This is fine as long as the autorun terminates within a reasonable amount of iterations (100).
 This should avoid the need for work-arounds involving `setTimeout` etc.
 Note that computed values (created using `observable(func)` are still not allowed to have cycles.
@@ -24,12 +24,12 @@ temperature.set(15); // previously: temperature(15)
 temperature.get();   // previously: temperature()
 ```
 
-The `.observe` method is still available on observable scalars but deprecated. Use `mobservable.observe(observable, listener)` instead.
+The `.observe` method is still available on observable scalars but deprecated. Use `mobx.observe(observable, listener)` instead.
 Note that often `.autorun` is a more powerful alternative to `.observe`.
 
-## Mobservable is now extensible!
+## MobX is now extensible!
 
-The core algorithm of Mobservable has been largely rewritten to improve the clarity, extensibility, performance and stability of the source code.
+The core algorithm of MobX has been largely rewritten to improve the clarity, extensibility, performance and stability of the source code.
 It is now possible to define your own custom observable data sources by using the `Atom` class.
 It is also possible to create your own reactive functinos using the `Reaction` class. `autorun`, `autorunAsync` and `@observer` have now all been implemented using the concept of Reactions.
 So feel free to write your own reactive constructions!
@@ -39,21 +39,21 @@ So feel free to write your own reactive constructions!
 
 In Mobservable 1 exceptions would be caught and sometimes rethrown after logging them.
 This was confusing and not all derivations were able to recover from these exceptions.
-In Mobservable 2 it is no longer allowed for a computed function or autorun to throw an exception. 
+In MobX 2 it is no longer allowed for a computed function or autorun to throw an exception. 
 
 ## Improved build
 
-* Mobservable is roughly 20% faster
-* Mobservable is smaller: 75KB -> 60KB unminified, and 54KB -> 30KB minified.
+* MobX is roughly 20% faster
+* MobX is smaller: 75KB -> 60KB unminified, and 54KB -> 30KB minified.
 * Distributable builds are no longer available in the git repository, use npmcdn instead:
-* Commonjs build: https://npmcdn.com/mobservable@^2.0.0/lib/mobservable.js
-* Minified commonjs build: https://npmcdn.com/mobservable@^2.0.0/lib/mobservable.min.js
-* UMD build: https://npmcdn.com/mobservable@^2.0.0/lib/mobservable.umd.js
-* To use the minified build, require / import the lib from `"mobservable/lib/mobservable.min.js"` (or set up an alias in your webpack configuration if applicable)
+* Commonjs build: https://npmcdn.com/mobx@^2.0.0/lib/mobx.js
+* Minified commonjs build: https://npmcdn.com/mobx@^2.0.0/lib/mobx.min.js
+* UMD build: https://npmcdn.com/mobx@^2.0.0/lib/mobx.umd.js
+* To use the minified build, require / import the lib from `"mobx/lib/mobx.min.js"` (or set up an alias in your webpack configuration if applicable)
 
 ## Other changes
 
-* Improved debug names of all observables. This is especially visible when using `mobservable-react-devtools` or `extras.trackTransitions`.
+* Improved debug names of all observables. This is especially visible when using `mobx-react-devtools` or `extras.trackTransitions`.
 * Renamed `extras.SimpleEventEmitter` to `SimpleEventEmitter`
 * Removed already deprecated methods: `isReactive`, `makeReactive`, `observeUntil`, `observeAsync`
 * Removed `extras.getDNode`
@@ -62,6 +62,7 @@ In Mobservable 2 it is no longer allowed for a computed function or autorun to t
 * @computed
 * @computed({ asStructure: boolean })
 * @computed properties are no longer enumerable by default
+* Deprecated `observable(scalar)`
 
 
 # 1.2.4

@@ -1,8 +1,3 @@
-/**
- * mobservable
- * (c) 2015 - Michel Weststrate
- * https://github.com/mweststrate/mobservable
- */
 import {IDepTreeNode} from "../core/observable";
 import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {once, unique, Lambda} from "../utils/utils";

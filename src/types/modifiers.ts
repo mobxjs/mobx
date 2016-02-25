@@ -28,7 +28,7 @@ export function asReference<T>(value: T): T {
 /**
 	* Can be used in combination with makeReactive / extendReactive.
 	* Enforces that values that are deeply equalled identical to the previous are considered to unchanged.
-	* (the default equality used by mobservable is reference equality).
+	* (the default equality used by mobx is reference equality).
 	* Values that are still reference equal, but not deep equal, are considered to be changed.
 	* asStructure can only be used incombinations with arrays or objects.
 	* It does not support cyclic structures.
@@ -83,7 +83,7 @@ export function getValueModeFromModifierFunc(func?: Function): ValueMode {
 		return ValueMode.Structure;
 	else if (func === asFlat)
 		return ValueMode.Flat;
-	invariant(func === undefined, "Cannot determine value mode from function. Please pass in one of these: mobservable.asReference, mobservable.asStructure or mobservable.asFlat, got: " + func);
+	invariant(func === undefined, "Cannot determine value mode from function. Please pass in one of these: mobx.asReference, mobx.asStructure or mobx.asFlat, got: " + func);
 	return ValueMode.Recursive;
 }
 
@@ -120,5 +120,5 @@ export function makeChildObservable(value, parentMode: ValueMode, name?: string)
 
 export function assertUnwrapped(value, message) {
 	if (value instanceof AsReference || value instanceof AsStructure || value instanceof AsFlat)
-		throw new Error(`[mobservable] asStructure / asReference / asFlat cannot be used here. ${message}`);
+		throw new Error(`[mobx] asStructure / asReference / asFlat cannot be used here. ${message}`);
 }

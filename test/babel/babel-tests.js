@@ -1,6 +1,6 @@
 import {
     observable, computed, transaction, asStructure, autorun, extendObservable, 
-    default as mobservable
+    default as mobx
 } from "../";
 
 class Box {

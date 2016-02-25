@@ -37,7 +37,7 @@ function observeObservable(thing, listener, fireImmediately: boolean) {
 }
 
 function observeObservableProperty(thing, property, listener, fireImmediately: boolean) {
-	const propError = "[mobservable.observe] the provided observable map has no key with name: " + property;
+	const propError = "[mobx.observe] the provided observable map has no key with name: " + property;
 	if (isObservableMap(thing)) {
 		if (!thing._has(property))
 			throw new Error(propError);
@@ -46,7 +46,7 @@ function observeObservableProperty(thing, property, listener, fireImmediately: b
 	if (isObservableObject(thing)) {
 		if (!isObservable(thing, property))
 			throw new Error(propError);
-		return observe(thing.$mobservable.values[property], listener, fireImmediately);
+		return observe(thing.$mobx.values[property], listener, fireImmediately);
 	}
 	if (isPlainObject(thing)) {
 		extendObservable(thing, {

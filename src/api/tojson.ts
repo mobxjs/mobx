@@ -43,7 +43,7 @@ export function toJSON(source, detectCycles: boolean = true, __alreadySeen: [any
 			res[key] = toJSON(source[key], detectCycles, __alreadySeen);
 		return res;
 	}
-	if (isObservable(source) && source.$mobservable instanceof ObservableValue)
+	if (isObservable(source) && source.$mobx instanceof ObservableValue)
 		return toJSON(source(), detectCycles, __alreadySeen);
 	return source;
 }

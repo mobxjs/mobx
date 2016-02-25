@@ -19,10 +19,10 @@ export function propagateAtomReady(atom: IAtom) {
 }
 
 /**
- * Anything that can be used to _store_ state is an Atom in mobservable. Atom's have two important jobs
+ * Anything that can be used to _store_ state is an Atom in mobx. Atom's have two important jobs
  * 
- * 1) detect when they are being _used_ and report this (using reportObserved). This allows mobservable to make the connection between running functions and the data they used
- * 2) they should notify mobservable whenever they have _changed_. This way mobservable can re-run any functions (derivations) that are using this atom. 
+ * 1) detect when they are being _used_ and report this (using reportObserved). This allows mobx to make the connection between running functions and the data they used
+ * 2) they should notify mobx whenever they have _changed_. This way mobx can re-run any functions (derivations) that are using this atom. 
  */
 export class Atom implements IAtom {
 	id = getNextId();
@@ -37,14 +37,14 @@ export class Atom implements IAtom {
 	constructor(public name = "Atom", public onBecomeObserved: () => void = noop, public onBecomeUnobserved = noop) { }
 
 	/**
-	 * Invoke this method to notify mobservable that your atom has been used somehow. 
+	 * Invoke this method to notify mobx that your atom has been used somehow. 
 	 */
 	public reportObserved() {
 		reportObserved(this);
 	}
 
 	/**
-	 * Invoke this method _after_ this method has changed to signal mobservable that all its observers should invalidate.
+	 * Invoke this method _after_ this method has changed to signal mobx that all its observers should invalidate.
 	 */
 	public reportChanged() {
 		if (!this.isDirty) {

@@ -41,7 +41,7 @@ export function observable(v: any, keyOrScope?: string | any) {
 			return new ObservableValue(value, mode);
 		case ValueType.ComplexFunction:
 			observableIsDeprecated();
-			throw new Error("[mobservable.observable] To be able to make a function reactive it should not have arguments. If you need an observable reference to a function, use `observable(asReference(f))`");
+			throw new Error("[mobx.observable] To be able to make a function reactive it should not have arguments. If you need an observable reference to a function, use `observable(asReference(f))`");
 		case ValueType.ViewFunction:
 			observableIsDeprecated();
 			return new ComputedValue(value, keyOrScope, mode === ValueMode.Structure, value.name || "ComputedValue");

@@ -4,7 +4,7 @@ import {
     observe, computed, observable, asStructure, autorun, autorunAsync, extendObservable, 
     IObservableArray, IArrayChange, IArraySplice, IObservableValue,
     extras, Atom, transaction
-} from "../lib/mobservable";
+} from "../lib/mobx";
 import * as test from 'tape';
 
 var v = observable(3);
@@ -237,7 +237,7 @@ test('atom clock example', function(t) {
 
 		constructor() {
 			console.log("create");
-			// creates an atom to interact with the mobservable core algorithm
+			// creates an atom to interact with the mobx core algorithm
 			this.atom =	new Atom(
 				// first param a name for this atom, for debugging purposes
 				"Clock",
@@ -251,7 +251,7 @@ test('atom clock example', function(t) {
 
 		getTime() {
 			console.log("get time");
-			// let mobservable now this observable data source has been used
+			// let mobx now this observable data source has been used
 			this.atom.reportObserved();
 			if (!this.intervalHandler)
 				this.tick(); // get the initial data

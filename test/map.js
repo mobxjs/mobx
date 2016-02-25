@@ -1,7 +1,7 @@
 var test = require('tape');
-var mobservable = require('..');
-var map = mobservable.map;
-var autorun = mobservable.autorun;
+var mobx = require('..');
+var map = mobx.map;
+var autorun = mobx.autorun;
 
 test('map crud', function(t) {
 	var events = [];
@@ -28,14 +28,14 @@ test('map crud', function(t) {
 	t.deepEqual(m.values(), [2, 3]);
 	t.deepEqual(m.entries(), [["a", 2], ["b", 3]]);
 	t.deepEqual(m.toJs(), { a: 2, b: 3});
-	t.deepEqual(m.toString(), "[mobservable.map { a: 2, b: 3 }]");
+	t.deepEqual(m.toString(), "[mobx.map { a: 2, b: 3 }]");
 	t.equal(m.size, 2);
 
 	m.clear();
 	t.deepEqual(m.keys(), []);
 	t.deepEqual(m.values(), []);
 	t.deepEqual(m.toJs(), { });
-	t.deepEqual(m.toString(), "[mobservable.map {  }]");
+	t.deepEqual(m.toString(), "[mobx.map {  }]");
 	t.equal(m.size, 0);
 
 	t.equal(m.has("a"), false);
@@ -176,7 +176,7 @@ test('observe collections', function(t) {
 })
 
 test('asStructure', function(t) {
-	var x = map({}, mobservable.asStructure);
+	var x = map({}, mobx.asStructure);
 	var triggerCount = 0;
 	var value = null;
 
@@ -247,17 +247,17 @@ test('strict', function(t) {
 	
 test('issue 100', function(t) {
 	var that = {};
-	mobservable.extendObservable(that, {
+	mobx.extendObservable(that, {
 		myMap: map()
 	})
-	t.equal(mobservable.isObservableMap(that.myMap), true);
+	t.equal(mobx.isObservableMap(that.myMap), true);
 	t.equal(typeof that.myMap.observe, "function");
 	t.end();
 });
 
 test('issue 119 - unobserve before delete', function(t) {
 	var propValues = [];
-	var myObservable = mobservable.observable({
+	var myObservable = mobx.observable({
 		myMap: map()
 	});
 	myObservable.myMap.set('myId', {
@@ -269,7 +269,7 @@ test('issue 119 - unobserve before delete', function(t) {
 		}
 	});
 	// the error only happens if the value is observed
-	mobservable.autorun(function() {
+	mobx.autorun(function() {
     	myObservable.myMap.values().forEach(function(value) {
 			console.log('x');
         	propValues.push(value.myCalculatedProp);

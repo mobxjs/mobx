@@ -18,7 +18,7 @@ export interface IObservableMapChange<T> extends IObjectChange<T, ObservableMap<
 const ObservableMapMarker = {};
 
 export class ObservableMap<V> {
-	$mobservable = ObservableMapMarker;
+	$mobx = ObservableMapMarker;
 	private _data: { [key: string]: ObservableValue<V> } = {};
 	private _hasMap: { [key: string]: ObservableValue<boolean> } = {}; // hasMap, not hashMap >-).
 	private _valueMode: ValueMode;
@@ -48,7 +48,7 @@ export class ObservableMap<V> {
 
 	set(key: string, value: V) {
 		this.assertValidKey(key);
-		assertUnwrapped(value, `[mobservable.map.set] Expected unwrapped value to be inserted to key '${key}'. If you need to use modifiers pass them as second argument to the constructor`);
+		assertUnwrapped(value, `[mobx.map.set] Expected unwrapped value to be inserted to key '${key}'. If you need to use modifiers pass them as second argument to the constructor`);
 		if (this._has(key)) {
 			const oldValue = (<any>this._data[key]).value;
 			const changed = this._data[key].set(value);
@@ -152,7 +152,7 @@ export class ObservableMap<V> {
 
 	/**
 	 * Returns a shallow non observable object clone of this map.
-	 * Note that the values migth still be observable. For a deep clone use mobservable.toJSON.
+	 * Note that the values migth still be observable. For a deep clone use mobx.toJSON.
 	 */
 	toJs(): IKeyValueMap<V> {
 		const res: IKeyValueMap<V> = {};
@@ -162,13 +162,13 @@ export class ObservableMap<V> {
 
 	private assertValidKey(key: string) {
 		if (key === null || key === undefined)
-			throw new Error(`[mobservable.map] Invalid key: '${key}'`);
+			throw new Error(`[mobx.map] Invalid key: '${key}'`);
 		if (typeof key !== "string" && typeof key !== "number")
-			throw new Error(`[mobservable.map] Invalid key: '${key}'`);
+			throw new Error(`[mobx.map] Invalid key: '${key}'`);
 	}
 
 	toString(): string {
-		return "[mobservable.map { " + this.keys().map(key => `${key}: ${"" + this.get(key)}`).join(", ") + " }]";
+		return "[mobx.map { " + this.keys().map(key => `${key}: ${"" + this.get(key)}`).join(", ") + " }]";
 	}
 
 	/**

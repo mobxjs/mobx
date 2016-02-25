@@ -1,8 +1,8 @@
 var test = require('tape');
-var mobservable = require('..');
-var m = mobservable;
-var observable = mobservable.observable;
-var transaction = mobservable.transaction;
+var mobx = require('..');
+var m = mobx;
+var observable = mobx.observable;
+var transaction = mobx.transaction;
 
 var voidObserver = function(){};
 
@@ -26,7 +26,7 @@ test('basic', function(t) {
     x.set(5);
     t.equal(5, x.get());
     t.deepEqual([5], b.toArray());
-    t.equal(mobservable.extras.isComputingDerivation(), false);
+    t.equal(mobx.extras.isComputingDerivation(), false);
     t.end();
 })
 
@@ -44,7 +44,7 @@ test('basic2', function(t) {
     t.equal(z.get(), 10);
     t.equal(y.get(), 15);
 
-    t.equal(mobservable.extras.isComputingDerivation(), false);
+    t.equal(mobx.extras.isComputingDerivation(), false);
     t.end();
 })
 
@@ -63,7 +63,7 @@ test('dynamic', function(t) {
         t.equal(5, y.get());
 
         t.deepEqual(b.toArray(), [3, 5]);
-        t.equal(mobservable.extras.isComputingDerivation(), false);
+        t.equal(mobx.extras.isComputingDerivation(), false);
 
         t.end();
     }
@@ -88,7 +88,7 @@ test('dynamic2', function(t) {
 
         //no intermediate value 15!
         t.deepEqual([25], b.toArray());
-        t.equal(mobservable.extras.isComputingDerivation(), false);
+        t.equal(mobx.extras.isComputingDerivation(), false);
 
         t.end();
     }
@@ -116,7 +116,7 @@ test('readme1', function(t) {
         t.deepEqual([24],b.toArray());
         order.price.set(10);
         t.deepEqual([24,12],b.toArray());
-        t.equal(mobservable.extras.isComputingDerivation(), false);
+        t.equal(mobx.extras.isComputingDerivation(), false);
 
         t.end();
     } catch (e) {
@@ -137,7 +137,7 @@ test('batch', function(t) {
     // Note, 60 should not happen! (that is d beign computed before c after update of b)
     t.deepEqual(buf.toArray(), [36, 100]);
 
-    var x = mobservable.transaction(function() {
+    var x = mobx.transaction(function() {
         a.set(2);
         b.set(3);
         a.set(6);
@@ -160,7 +160,7 @@ test('transaction with inspection', function(t) {
     });
 
     // if not inspected during transaction, postpone value to end
-    mobservable.transaction(function() {
+    mobx.transaction(function() {
         a.set(3);
         t.equal(b.get(), 6);
         t.equal(calcs, 1);
@@ -169,7 +169,7 @@ test('transaction with inspection', function(t) {
     t.equal(calcs, 2);
 
     // if inspected, evaluate eagerly
-    mobservable.transaction(function() {
+    mobx.transaction(function() {
         a.set(4);
         t.equal(b.get(), 8);
         t.equal(calcs, 3);
@@ -184,13 +184,13 @@ test('transaction with inspection 2', function(t) {
     var a = observable(2);
     var calcs = 0;
     var b;
-    mobservable.autorun(function() {
+    mobx.autorun(function() {
         calcs++;
         b = a.get() * 2;
     });
 
     // if not inspected during transaction, postpone value to end
-    mobservable.transaction(function() {
+    mobx.transaction(function() {
         a.set(3);
         t.equal(b, 4);
         t.equal(calcs, 1);
@@ -199,7 +199,7 @@ test('transaction with inspection 2', function(t) {
     t.equal(calcs, 2);
 
     // if inspected, evaluate eagerly
-    mobservable.transaction(function() {
+    mobx.transaction(function() {
         a.set(4);
         t.equal(b, 6);
         t.equal(calcs, 2);
@@ -225,7 +225,7 @@ test('scope', function(t) {
     order.price.set(10);
     order.amount.set(3);
     t.equal(36, order.total.get());
-    t.equal(mobservable.extras.isComputingDerivation(), false);
+    t.equal(mobx.extras.isComputingDerivation(), false);
 
     t.end();
 })
@@ -233,7 +233,7 @@ test('scope', function(t) {
 test('props1', function(t) {
     var vat = observable(0.2);
     var Order = function() {
-        mobservable.extendObservable(this, {
+        mobx.extendObservable(this, {
             'price' : 20,
             'amount' : 2,
             'total': function() {
@@ -249,7 +249,7 @@ test('props1', function(t) {
     t.equal(36, order.total);
 
     var totals = [];
-    var sub = mobservable.autorun(function() {
+    var sub = mobx.autorun(function() {
         totals.push(order.total);
     });
     order.amount = 4;
@@ -257,14 +257,14 @@ test('props1', function(t) {
     order.amount = 5;
     t.deepEqual(totals, [36,48]);
 
-    t.equal(mobservable.extras.isComputingDerivation(), false);
+    t.equal(mobx.extras.isComputingDerivation(), false);
     t.end();
 })
 
 test('props2', function(t) {
     var vat = observable(0.2);
     var Order = function() {
-        mobservable.extendObservable(this, {
+        mobx.extendObservable(this, {
             price: 20,
             amount: 2,
             total: function() {
@@ -289,7 +289,7 @@ test('props3', function(t) {
         this.total = function() {
             return (1+vat.get()) * this.price * this.amount; // price and amount are now properties!
         };
-        mobservable.extendObservable(this, this);
+        mobx.extendObservable(this, this);
     };
 
     var order = new Order();
@@ -302,7 +302,7 @@ test('props3', function(t) {
 
 test('props4', function(t) {
     function Bzz() {
-        mobservable.extendObservable(this, {
+        mobx.extendObservable(this, {
             fluff: [1,2],
             sum: function() {
                 return this.fluff.reduce(function(a,b) {
@@ -326,7 +326,7 @@ test('props4', function(t) {
 
 test('extend observable multiple prop maps', function(t) {
     var x = { a: 1 };
-    mobservable.extendObservable(x, {
+    mobx.extendObservable(x, {
         b: 2,
         c: 2
     }, {
@@ -337,7 +337,7 @@ test('extend observable multiple prop maps', function(t) {
     });
     
     var sum = 0;
-    var disposer = mobservable.autorun(function() {
+    var disposer = mobx.autorun(function() {
         sum = x.a + x.b + x.c + x.d;
     });
     t.equal(sum, 14);
@@ -348,13 +348,13 @@ test('extend observable multiple prop maps', function(t) {
 })
 
 test('object enumerable props', function(t) {
-    var x = mobservable.observable({
+    var x = mobx.observable({
         a: 3,
         b: function() {
             return 2 * this.a;
         }
     });
-    mobservable.extendObservable(x, { c: 4 });
+    mobx.extendObservable(x, { c: 4 });
     var ar = [];
     for(var key in x)
         ar.push(key);
@@ -367,7 +367,7 @@ test('observe property', function(t) {
     var mb = [];
 
     var Wrapper = function (chocolateBar) {
-        mobservable.extendObservable(this, {
+        mobx.extendObservable(this, {
             chocolateBar: chocolateBar,
             calories: function () {
                 return this.chocolateBar.calories;
@@ -375,20 +375,20 @@ test('observe property', function(t) {
         });
     };
 
-    var snickers = mobservable.observable({
+    var snickers = mobx.observable({
         calories: null
     });
-    var mars = mobservable.observable({
+    var mars = mobx.observable({
         calories: undefined
     });
 
     var wrappedSnickers = new Wrapper(snickers);
     var wrappedMars = new Wrapper(mars);
 
-    var disposeSnickers = mobservable.autorun(function () {
+    var disposeSnickers = mobx.autorun(function () {
         sb.push(wrappedSnickers.calories);
     });
-    var disposeMars = mobservable.autorun(function () {
+    var disposeMars = mobx.autorun(function () {
         mb.push(wrappedMars.calories);
     });
     snickers.calories = 10;
@@ -416,7 +416,7 @@ test('observe object', function(t) {
     });
     
     a.a = 2;
-    mobservable.extendObservable(a, {
+    mobx.extendObservable(a, {
         a: 3, b: 3
     });
     a.a = 4;
@@ -451,19 +451,19 @@ test('observe object', function(t) {
     t.end();
 });
 
-test('mobservable.observe', function(t) {
+test('mobx.observe', function(t) {
     var events = [];
     var po = { a: 1 };
     var o = observable({ b: 2 });
     var ar = observable([ 3 ]);
-    var map = mobservable.map({ });
+    var map = mobx.map({ });
     
     var push = function(event) { events.push(event); };
     
-    var stop1 = mobservable.observe(po, push);
-    var stop2 = mobservable.observe(o, push);
-    var stop3 = mobservable.observe(ar, push);
-    var stop4 = mobservable.observe(map, push);
+    var stop1 = mobx.observe(po, push);
+    var stop2 = mobx.observe(o, push);
+    var stop3 = mobx.observe(ar, push);
+    var stop4 = mobx.observe(map, push);
     
     po.a = 4;
     o.b = 5;
@@ -528,7 +528,7 @@ test('change count optimization', function(t) {
     t.equal(bCalcs, 2);
     t.equal(cCalcs, 1);
 
-    t.equal(mobservable.extras.isComputingDerivation(), false);
+    t.equal(mobx.extras.isComputingDerivation(), false);
     t.end();
 })
 
@@ -560,7 +560,7 @@ test('observables removed', function(t) {
     t.equal(c.get(), 9);
     t.equal(calcs, 3);
 
-    t.equal(mobservable.extras.isComputingDerivation(), false);
+    t.equal(mobx.extras.isComputingDerivation(), false);
     t.end();
 })
 
@@ -635,7 +635,7 @@ test('lazy evaluation', function (t) {
 
     t.equal(observerChanges, 1);
 
-    t.equal(mobservable.extras.isComputingDerivation(), false);
+    t.equal(mobx.extras.isComputingDerivation(), false);
     t.end();
 })
 
@@ -656,7 +656,7 @@ test('multiple view dependencies', function(t) {
     var zwitch = true;
     var buffer = [];
     var fCalcs = 0;
-    var dis = mobservable.autorun(function() {
+    var dis = mobx.autorun(function() {
         fCalcs++;
         if (zwitch)
             buffer.push(b.get() + d.get());
@@ -726,7 +726,7 @@ test('expr', function(t) {
 
     var total = observable(function() {
         totalCalcs += 1; // outer observable shouldn't recalc if inner observable didn't publish a real change
-        return price.get() * mobservable.expr(function() {
+        return price.get() * mobx.expr(function() {
             innerCalcs += 1;
             return factor.get() % 2 === 0 ? 1 : 3;
         });
@@ -754,7 +754,7 @@ test('observe', function(t) {
     var x2 = observable(function() { return x.get() * 2; });
     var b = [];
 
-    var cancel = mobservable.autorun(function() {
+    var cancel = mobx.autorun(function() {
         b.push(x2.get());
     });
 
@@ -772,7 +772,7 @@ test('when', function(t) {
     var x = observable(3);
 
     var called = 0;
-    mobservable.autorunUntil(function() {
+    mobx.autorunUntil(function() {
         return (x.get() === 4);
     }, function() {
         called += 1;
@@ -794,7 +794,7 @@ test('when 2', function(t) {
     var x = observable(3);
 
     var called = 0;
-    mobservable.autorunUntil(function() {
+    mobx.autorunUntil(function() {
         return (x.get() === 3);
     }, function() {
         called += 1;
@@ -817,7 +817,7 @@ test('expr2', function(t) {
     
     var total = observable(function() {
         totalCalcs += 1; // outer observable shouldn't recalc if inner observable didn't publish a real change
-        return price.get() * mobservable.expr(function() {
+        return price.get() * mobx.expr(function() {
             innerCalcs += 1;
             return factor.get() % 2 === 0 ? 1 : 3;
         });
@@ -851,7 +851,7 @@ test('json1', function(t) {
     ]);
 
     var output;
-    mobservable.autorun(function() {
+    mobx.autorun(function() {
         output = todos.map(function(todo) { return todo.title; }).join(", ");
     });
 
@@ -883,9 +883,9 @@ test('json2', function(t) {
         ]
     };
 
-    var o = mobservable.observable(JSON.parse(JSON.stringify(source)));
+    var o = mobx.observable(JSON.parse(JSON.stringify(source)));
 
-    t.deepEqual(mobservable.toJSON(o), source);
+    t.deepEqual(mobx.toJSON(o), source);
 
     var analyze = observable(function() {
         return [
@@ -911,7 +911,7 @@ test('json2', function(t) {
     o.todos[0].tags[0] = "reactjs";
     o.todos[1].tags.push("pff");
 
-    t.deepEqual(mobservable.toJSON(o), {
+    t.deepEqual(mobx.toJSON(o), {
         "todos": [
             {
                 "title": "write blog",
@@ -939,12 +939,12 @@ test('json2', function(t) {
     ab = [];
     tb = [];
 
-    o.todos.push(mobservable.observable({
+    o.todos.push(mobx.observable({
         title: "test",
         tags: ["x"]
     }));
 
-    t.deepEqual(mobservable.toJSON(o), {
+    t.deepEqual(mobx.toJSON(o), {
         "todos": [
             {
                 "title": "write blog",
@@ -976,7 +976,7 @@ test('json2', function(t) {
     ab = [];
     tb = [];
 
-    o.todos[1] = mobservable.observable({
+    o.todos[1] = mobx.observable({
         title: "clean the attic",
         tags: ["needs sabbatical"],
         details: {
@@ -1015,9 +1015,9 @@ test('json2', function(t) {
     ab = [];
     tb = [];
 
-    o.todos[1].details = mobservable.observable({ url: "google" });
+    o.todos[1].details = mobx.observable({ url: "google" });
     o.todos[1].tags = ["foo", "bar"];
-    t.deepEqual(mobservable.toJSON(o, false), {
+    t.deepEqual(mobx.toJSON(o, false), {
          "todos": [
             {
                 "title": "write blog",
@@ -1044,7 +1044,7 @@ test('json2', function(t) {
             }
         ]
     });
-    t.deepEqual(mobservable.toJSON(o, true), mobservable.toJSON(o, false));
+    t.deepEqual(mobx.toJSON(o, true), mobx.toJSON(o, false));
     t.deepEqual(ab, [[3, "google"]]);
     t.deepEqual(tb, ["reactjs,frp,foo,bar,x"]);
 
@@ -1055,7 +1055,7 @@ test('json cycles', function(t) {
     var a = observable({
         b: 1,
         c: [2],
-        d: mobservable.map(),
+        d: mobx.map(),
         e: a
     });
     
@@ -1065,7 +1065,7 @@ test('json cycles', function(t) {
     a.d.set("d", a.d);
     a.d.set("c", a.c);
 
-    var cloneA = mobservable.toJSON(a, true);
+    var cloneA = mobx.toJSON(a, true);
     var cloneC = cloneA.c;
     var cloneD = cloneA.d;
     
@@ -1094,17 +1094,17 @@ test('issue 50', function(t) {
     
     var result
     var events = [];
-    var disposer1 = mobservable.autorun(function ar() {
+    var disposer1 = mobx.autorun(function ar() {
         events.push("auto");
         result = [x.a, x.b, x.c].join(",");
     });
     
-    var disposer2 = mobservable.extras.trackTransitions(true, function(info) {
+    var disposer2 = mobx.extras.trackTransitions(true, function(info) {
         events.push([info.state, info.name]);
     });
     
     setTimeout(function() {
-        mobservable.transaction(function() {
+        mobx.transaction(function() {
             events.push("transstart");
             x.a = !x.a;
             x.b = !x.b;
@@ -1153,16 +1153,16 @@ test('verify transaction events', function(t) {
     });
     
     var events = [];
-    var disposer1 = mobservable.autorun(function ar() {
+    var disposer1 = mobx.autorun(function ar() {
         events.push("auto");
         x.c;
     });
     
-    var disposer2 = mobservable.extras.trackTransitions(true, function(info) {
+    var disposer2 = mobx.extras.trackTransitions(true, function(info) {
         events.push([info.state, info.name]);
     });
     
-    mobservable.transaction(function() {
+    mobx.transaction(function() {
         events.push("transstart");
         x.b = 1;
         x.b = 2;
@@ -1198,14 +1198,14 @@ test("verify array in transaction", function(t) {
     var aCount= 0;
     var aValue;
     
-    mobservable.autorun(function() {
+    mobx.autorun(function() {
         aCount++;
         aValue = 0;
         for(var i = 0; i < ar.length; i++)
             aValue += ar[i];
     });
     
-    mobservable.transaction(function() {
+    mobx.transaction(function() {
         ar.push(2);
         ar.push(3);
         ar.push(4);
@@ -1227,15 +1227,15 @@ test('delay autorun until end of transaction', function(t) {
         }
     });
     var disposer1; 
-    var disposer2 = mobservable.extras.trackTransitions(true, function(info) {
+    var disposer2 = mobx.extras.trackTransitions(true, function(info) {
         events.push([info.state, info.name]);
     });
     var didRun = false;
 
-    mobservable.transaction(function() {
-        mobservable.transaction(function() {
+    mobx.transaction(function() {
+        mobx.transaction(function() {
             
-            disposer1 = mobservable.autorun(function test() {
+            disposer1 = mobx.autorun(function test() {
                 didRun = true;
                 events.push("auto");
                 x.b;
@@ -1293,49 +1293,49 @@ test('delay autorun until end of transaction', function(t) {
 test('prematurely end autorun', function(t) {
     var x = observable(2);
     var dis1, dis2;
-    mobservable.transaction(function() {
-        dis1 =  mobservable.autorun(function() {
+    mobx.transaction(function() {
+        dis1 =  mobx.autorun(function() {
             x.get();
         });
-        dis2 =  mobservable.autorun(function() {
+        dis2 =  mobx.autorun(function() {
             x.get();
         });
 
         t.equal(x.observers.length, 0);
-        t.equal(dis1.$mobservable.observing.length, 0);
-        t.equal(dis2.$mobservable.observing.length, 0);
+        t.equal(dis1.$mobx.observing.length, 0);
+        t.equal(dis2.$mobx.observing.length, 0);
         
         dis1();
     });
     t.equal(x.observers.length, 1);
-    t.equal(dis1.$mobservable.observing.length, 0);
-    t.equal(dis2.$mobservable.observing.length, 1);
+    t.equal(dis1.$mobx.observing.length, 0);
+    t.equal(dis2.$mobx.observing.length, 1);
     
     dis2();
 
     t.equal(x.observers.length, 0);
-    t.equal(dis1.$mobservable.observing.length, 0);
-    t.equal(dis2.$mobservable.observing.length, 0);
+    t.equal(dis1.$mobx.observing.length, 0);
+    t.equal(dis2.$mobx.observing.length, 0);
     
     t.end();
 });
 
 test('issue 65; transaction causing transaction', function(t) {
-    var x = mobservable.observable({
+    var x = mobx.observable({
         a: 3,
         b: function() {
-            return mobservable.transaction(function() {
+            return mobx.transaction(function() {
                 return this.a * 2;
             }, this);
         }
     });
     
     var res;
-    mobservable.autorun(function() {
+    mobx.autorun(function() {
         res = x.a + x.b;
     });
     
-    mobservable.transaction(function() {
+    mobx.transaction(function() {
         x.a = 2;
         x.a = 5;
     });
@@ -1344,12 +1344,12 @@ test('issue 65; transaction causing transaction', function(t) {
 });
 
 test('issue 71, transacting running transformation', function(t) {
-    var state = mobservable.observable({
+    var state = mobx.observable({
         things: []
     });
     
     function Thing(value) {
-        mobservable.extendObservable(this, {
+        mobx.extendObservable(this, {
             value: value,
             pos: function() {
                 return state.things.indexOf(this);
@@ -1359,7 +1359,7 @@ test('issue 71, transacting running transformation', function(t) {
             }
         });
 
-        mobservable.autorunUntil(function() {
+        mobx.autorunUntil(function() {
             return this.isVisible;
         }, function() {
             if (this.pos < 4)
@@ -1369,7 +1369,7 @@ test('issue 71, transacting running transformation', function(t) {
     
     var copy;
     var vSum;
-    mobservable.autorun(function() {
+    mobx.autorun(function() {
         copy = state.things.map(function(thing) { return thing.value });
         vSum = state.things.reduce(function(a, thing) {
             return a  + thing.value
@@ -1378,7 +1378,7 @@ test('issue 71, transacting running transformation', function(t) {
     
     t.deepEqual(copy, []);
     
-    mobservable.transaction(function() {
+    mobx.transaction(function() {
         state.things.push(new Thing(1));
     });
     
@@ -1396,7 +1396,7 @@ test('issue 71, transacting running transformation', function(t) {
 
 test('eval in transaction', function(t) {
     var bCalcs = 0;
-    var x = mobservable.observable({
+    var x = mobx.observable({
         a: 1,
         b: function() {
             bCalcs++;
@@ -1405,14 +1405,14 @@ test('eval in transaction', function(t) {
     });
     var c;
     
-    mobservable.autorun(function() {
+    mobx.autorun(function() {
        c = x.b; 
     });
     
     t.equal(bCalcs, 1);
     t.equal(c, 2);
     
-    mobservable.transaction(function() {
+    mobx.transaction(function() {
         x.a = 3;
         t.equal(x.b, 6);
         t.equal(bCalcs, 2);
@@ -1436,7 +1436,7 @@ test('forcefully tracked reaction should still yield valid results', function(t)
         runCount++;
         z = x.get();
     };
-    var a = new mobservable.Reaction("test", function() {
+    var a = new mobx.Reaction("test", function() {
         this.track(identity);
     });
     a.runReaction();
