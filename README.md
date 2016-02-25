@@ -1,8 +1,8 @@
-# mobx
+# MobX
 
 <img src="https://mobxjs.github.io/mobx/images/mobx.png" align="right" width="120px" />
 
-##### _Simple, scalable state management._
+### _Simple, scalable state management._
 
 [![Build Status](https://travis-ci.org/mobxjs/mobx.svg?branch=master)](https://travis-ci.org/mobxjs/mobx)
 [![Coverage Status](https://coveralls.io/repos/mobxjs/mobx/badge.svg?branch=master&service=github)](https://coveralls.io/github/mobxjs/mobx?branch=master)
