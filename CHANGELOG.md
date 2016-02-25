@@ -59,6 +59,10 @@ In Mobservable 2 it is no longer allowed for a computed function or autorun to t
 * Removed `extras.getDNode`
 * invoking `ObservableArray.peek` is no longer registered as listener
 * Deprecated `untracked`. It wasn't documented and nobody seems to miss it.
+* @computed
+* @computed({ asStructure: boolean })
+* @computed properties are no longer enumerable by default
+
 
 # 1.2.4
 

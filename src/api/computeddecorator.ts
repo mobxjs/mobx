@@ -36,7 +36,7 @@ export function computed(target: any, key?: any, baseDescriptor?: PropertyDescri
 	invariant(getter.length === 0, `@observable getter functions should not take arguments.`, key);
 
 	descriptor.configurable = true;
-	descriptor.enumerable = true; // TODO: should be false?
+	descriptor.enumerable = false;
 	descriptor.get = function() {
 		setObservableObjectProperty(
 			asObservableObject(this, undefined, ValueMode.Recursive),
