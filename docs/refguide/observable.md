@@ -11,17 +11,14 @@ but these are the available variations:
 ## Primitive values and references
 
 For all type of values, with the exception of _plain objects_, _arrays_ and _functions without arguments_ this overload is run.
-`observable` accepts a value and returns a getter / setter function that holds this value.
-The returned function can be invoked without arguments to get the currently stored value,
-or it can be invoked with one argument to update the currently stored value.
-
+`observable` accepts a value and returns an object with a getter / setter function that holds this value.
 Furthermore you can register a callback using its `.observe` method to listen to changes on the stored value.
-But usually it is more convenient to use [`mobservable.observe`](observe.md) instead.
+But in most cases it is better to use [`mobservable.autorun`](autorun.md) instead.
 
-So the signature of the return value of `observable` is:
-* `func()` Returns the current value.
-* `func(value)` Replaces the currently stored value. Notifies all observers.
-* `func.observe(callback: (newValue, previousValue) => void, fireImmediately = false): disposerFunction`. Registers an observer function that will fire each time the stored value is replaced. Returns a function to cancel the observer.
+So the signature of object returned by `observable(scalar)` is:
+* `.get()` Returns the current value.
+* `.set(value)` Replaces the currently stored value. Notifies all observers.
+* `.observe(callback: (newValue, previousValue) => void, fireImmediately = false): disposerFunction`. Registers an observer function that will fire each time the stored value is replaced. Returns a function to cancel the observer.
 
 Example:
 
@@ -30,20 +27,20 @@ import {observable} from "mobservable";
 
 const cityName = observable("Vienna");
 
-console.log(cityName());
+console.log(cityName.get());
 // prints 'Vienna'
 
 cityName.observe(function(newCity, oldCity) {
 	console.log(oldCity, "->", newCity);
 });
 
-cityName("Amsterdam");
+cityName.set("Amsterdam");
 // prints 'city: Vienna -> Amsterdam'
-
-
 ```
 
-## View functions
+N.B. in mobservable1 `cityName` would be a function. Invoking without arguments returns the current value. Invoking it with an argument updates it.
+
+## Expressions
 
 If an argumentless function is passed to `observable`,
 Mobservable will make sure that that function is run each time that any of the values used by the function is changed.
@@ -57,31 +54,31 @@ var age = observable(42);
 var showAge = observable(false);
 
 var labelText = observable(() =>
-	showAge() ? `${name()} (age: ${age()})` : name();
+	showAge.get() ? `${name.get()} (age: ${age.get()})` : name.get();
 );
 
 var disposer = labelText.observe(newLabel => console.log(newLabel));
 
-name("Dave");
+name.set("Dave");
 // prints: 'Dave'
 
-age(21);
+age.set(21);
 // doesn't print
 
-showAge(true);
+showAge.set(true);
 // prints: 'Dave (age: 21)'
 
-age(42);
+age.set(42);
 // prints: 'Dave (age: 42)'
 
 // cancel the observer
 disposer();
 
-name("Matthew");
+name.set("Matthew");
 // doesn't print anymore...
 
 // ... but the value can still be inspected if needed.
-console.log(labelText());
+console.log(labelText.get());
 ```
 
 Note how the function now automatically reacts to data changes,

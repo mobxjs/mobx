@@ -11,7 +11,7 @@ var timerData = observable({
 	secondsPassed: 0
 });
 
-setInterval(function() {
+setInterval(() => {
 	timerData.secondsPassed++;
 }, 1000);
 
@@ -38,6 +38,35 @@ So here we are, simple, straightforward reactive components that will render whe
 * Reactive components sideways load data; parent components won't re-render unnecessarily even when child components will.
 * `@observer` does not depend on React's context system.
 
+### Reactive local component state
+
+Just like normal classes, you can introduce observable properties on a component by using the `@observable` decorator.
+This means that you can have local state in components that doesn't need to be manged by React's verbose and imperative `setState` mechanism, but is as powerful.
+The reactive state will be picked up by `render` but will not explicitly invoke other React lifecycle methods like `componentShouldUpdate` or `componentWillUpdate`.
+If you need those, just use the normal React `state` object.
+
+The example above could also have been written as:
+
+```javascript
+import {observer} from "mobservable-react";
+import {observable} from "mobservable";
+
+@observer class Timer extends React.Component {
+	@observable secondsPassed = 0;
+	
+	componentWillMount() {
+		setInterval(() => {
+			this.secondsPassed++;
+		}, 1000);
+	}
+	
+	render() {
+		return (<span>Seconds passed: { this.secondsPassed } </span> )
+	}
+});
+
+React.render(<Timer timerData={timerData} />, document.body);
+```
 
 ### Mobservable-React-DevTools
 

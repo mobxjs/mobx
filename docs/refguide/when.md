@@ -1,8 +1,8 @@
-# autorunUntil
+# when
 
-`autorunUntil(predicate: () => boolean, effect: () => void, scope?)`
+`when(predicate: () => boolean, effect: () => void, scope?)`
 
-`autorunUntil` observes & runs the given `predicate` until it returns true.
+`when` observes & runs the given `predicate` until it returns true.
 Once that happens, the given `effect` is executed and the autorunner is disposed.
 The function returns a disposer to cancel the autorunner prematurely.
 
@@ -12,7 +12,7 @@ For example:
 ```javascript
 class MyResource {
 	constructor() {
-		autorunUntil(
+		when(
 			// once...
 			() => !this.isVisible,
 			// ... then
@@ -30,3 +30,5 @@ class MyResource {
 }
 
 ```
+
+_In mobservable 1.0 this method was called `autorunUntil`._

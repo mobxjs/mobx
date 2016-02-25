@@ -1,5 +1,7 @@
 # fastArray
 
+*** Deprecated in 2.0, use `observable(asFlat([]))` instead ***
+
 `fastArray` creates observable arrays, similar to [`observable([])`](observable.md) with two differences:
 1. The indices of arrays created by `fastArray` are not enumerable, so `Object.keys(array)` will always return an empty set.  
 This means that `for .. in ` loops won't work on them (but normal `for ;; ` loops will).  

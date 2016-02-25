@@ -11,11 +11,9 @@
   * [@observer](refguide/observer-component.md)
 * Advanced API
   * [autorunAsync](refguide/autorun-async.md)
-  * [autorunUntil](refguide/autorun-until.md)
   * [createTransformer](refguide/create-transformer.md)
   * [expr](refguide/expr.md)
   * [extendObservable](refguide/extend-observable.md)
-  * [extras](refguide/extras.md)
   * [fastArray](refguide/fast-array.md)
   * [isObservable(..)](refguide/is-observable.md)
   * [map](refguide/map.md)
@@ -23,6 +21,10 @@
   * [observe](refguide/observe.md)
   * [tojson](refguide/tojson.md)
   * [transaction](refguide/transaction.md)
+  * [untracked](refguide/untracked.md)
+  * [when](refguide/when.md)
+  * [extending mobservable](refguide/extending.md)
+  * [miscellaneous](refguide/extras.md)
 * Best Practices For Large Apps
   * [Definging data stores](best/store.md)
   * [Writing (async) actions](best/actions.md)

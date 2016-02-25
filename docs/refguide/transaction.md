@@ -5,6 +5,7 @@
 No observers are notified until this function has completed.
 `transaction` returns any value that was returned by the `worker` function.
 Note that `transaction` runs completely synchronously.
+Transactions can be nested. Only after completing the outermost `transaction` pending reactions will be run.
 
 ```javascript
 import {observable, transaction, autorun} from "mobservable";
@@ -15,8 +16,10 @@ autorun(() => console.log(numbers.length, "numbers!"));
 // Prints: '0 numbers!'
 
 transaction(() => {
-	numbers.push(1);
-	numbers.push(2);
+	transaction(() => {
+		numbers.push(1);
+		numbers.push(2);
+	});
 	numbers.push(3);
 });
 // Prints: '3 numbers!'
