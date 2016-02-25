@@ -58,8 +58,8 @@ test('transform1', function(t) {
 	t.equal(unloaded.length, 1);
 	t.equal(unloaded[0][0], tea);
 	t.equal(unloaded[0][1], "TEA");
-	t.equal(m.extras.getDNode(tea, "title").observers.length, 0);
-	t.equal(m.extras.getDNode(state.todos[0], "title").observers.length, 1);
+	t.equal(tea.$mobx.values.title.observers.length, 0);
+	t.equal(state.todos[0].$mobx.values.title.observers.length, 1);
 
 
 	tea.title = "mint";
@@ -161,7 +161,7 @@ test('transform into reactive graph', function(t) {
 	
 });
 
-// testing: https://github.com/mweststrate/mobservable/issues/67
+// testing: https://github.com/mobxjs/mobx/issues/67
 test('transform tree (modifying tree incrementally)', function(t) {
 	var pluckFn = TransformUtils.pluckFn;
 	var identity = TransformUtils.identity;
@@ -544,7 +544,7 @@ test('transform tree (modifying render observable)', function(t) {
 
 	// custom transform
 	TreeNode.prototype.transform = function(iteratee, results) {
-		node.icon();  // icon dependency
+		node.icon.get();  // icon dependency
 
 		results = results || [];
 		results.push(iteratee(this));
@@ -572,7 +572,7 @@ test('transform tree (modifying render observable)', function(t) {
 	////////////////////////////////////
 
 	// update root icon
-	state.root.icon('file');
+	state.root.icon.set('file');
 	t.equal(nodeCreateCount,	5 + 0);
 	t.equal(stats.refCount, 	5 + 0);
 	t.equal(renderCount, 			2 + 1);
@@ -625,7 +625,7 @@ test('transform tree (modifying render-only observable)', function(t) {
 		state.renderedNodes.forEach(function(renderedNode) {
 			m.autorun(function() {
 				renderIconCalc++;
-				renderedNode.node.icon();  // icon dependency
+				renderedNode.node.icon.get();  // icon dependency
 			});
 		});
 	});
@@ -651,7 +651,7 @@ test('transform tree (modifying render-only observable)', function(t) {
 	////////////////////////////////////
 
 	// update root icon
-	state.root.icon('file');
+	state.root.icon.set('file');
 	t.equal(nodeCreateCount,	5 + 0);
 	t.equal(stats.refCount, 	5 + 0);
 	t.equal(renderCount, 			2 + 0);

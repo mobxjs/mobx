@@ -7,27 +7,27 @@ test('untracked 1', function(t) {
 	var b = m.observable(2);
 	var c = m.observable(function() {
 		cCalcs++;
-		return a() + m.untracked(function() {
-			return b();
+		return a.get() + m.untracked(function() {
+			return b.get();
 		});
 	});
 	var result;
 	
-	var d = m.observe(function() {
+	var d = m.autorun(function() {
 		dCalcs++;
-		result = c();
+		result = c.get();
 	});
 	
 	t.equal(result, 3);
 	t.equal(cCalcs, 1);
 	t.equal(dCalcs, 1);
 	
-	b(3);
+	b.set(3);
 	t.equal(result, 3);
 	t.equal(cCalcs, 1);
 	t.equal(dCalcs, 1);
 	
-	a(2);
+	a.set(2);
 	t.equal(result, 5);
 	t.equal(cCalcs, 2);
 	t.equal(dCalcs, 2);

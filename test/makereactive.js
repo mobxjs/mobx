@@ -1,8 +1,8 @@
 var test = require('tape');
-var mobservable = require('..');
-var m = mobservable;
+var mobx = require('..');
+var m = mobx;
 
-var value = mobservable.value;
+var value = mobx.value;
 var voidObserver = function(){};
 
 function buffer() {
@@ -64,6 +64,7 @@ test('observable1', function(t) {
     t.throws(function() {
         m.observable(function(a,b) {});
     });
+    m._.resetGlobalState();
 
     // recursive structure
     var x = m.observable({
@@ -154,9 +155,9 @@ test('observable4', function(t) {
     ]);
 
     var b = buffer();
-    m.observable(function() {
+    m.observe(m.observable(function() {
         return x.map(function(d) { return d.x });
-    }).observe(b, true);
+    }), b, true);
 
     x[0].x = 3;
     x.shift();
@@ -170,9 +171,9 @@ test('observable4', function(t) {
     ]));
 
     var b2 = buffer();
-    m.observable(function() {
+    m.observe(m.observable(function() {
         return x2.map(function(d) { return d.x });
-    }).observe(b2, true);
+    }), b2, true);
 
     x2[0].x = 3;
     x2.shift();
@@ -186,13 +187,13 @@ test('observable5', function(t) {
 
     var x = m.observable(function() { });
     t.throws(function() {
-        x(7); // set not allowed
+        x.set(7); // set not allowed
     });
 
     var f = function() {};
     var x2 = m.observable(m.asReference(f));
-    t.equal(x2(), f);
-    x2(null); // allowed
+    t.equal(x2.get(), f);
+    x2.set(null); // allowed
 
     f = function() { return this.price };
 
@@ -221,33 +222,33 @@ test('flat array', function(t) {
             a: 1
         }])
     });
-    
+
     var result;
     var updates = 0;
     var dis = m.autorun(function() {
         updates++;
-        result = mobservable.toJSON(x);
+        result = mobx.toJSON(x);
     });
-    
+
     t.deepEqual(result, { x: [{ a: 1 }]});
     t.equal(updates, 1);
-    
+
     x.x[0].a = 2; // not picked up; object is not made reactive
     t.deepEqual(result, { x: [{ a: 1 }]});
     t.equal(updates, 1);
-    
+
     x.x.push({ a: 3 }); // picked up, array is reactive
     t.deepEqual(result, { x: [{ a: 2}, { a: 3 }]});
     t.equal(updates, 2);
-    
+
     x.x[0] = { a: 4 }; // picked up, array is reactive
     t.deepEqual(result, { x: [{ a: 4 }, { a: 3 }]});
     t.equal(updates, 3);
 
-    x.x[1].a = 6; // not picked up    
+    x.x[1].a = 6; // not picked up
     t.deepEqual(result, { x: [{ a: 4 }, { a: 3 }]});
     t.equal(updates, 3);
-    
+
     t.end();
 })
 
@@ -255,21 +256,21 @@ test('flat object', function(t) {
     var y = m.observable(m.asFlat({
         x : { z: 3 }
     }));
-    
+
     var result;
     var updates = 0;
     var dis = m.autorun(function() {
         updates++;
-        result = mobservable.toJSON(y);
+        result = mobx.toJSON(y);
     });
 
     t.deepEqual(result, { x: { z: 3 }});
     t.equal(updates, 1);
-    
+
     y.x.z = 4; // not picked up
     t.deepEqual(result, { x: { z: 3 }});
     t.equal(updates, 1);
-    
+
     y.x = { z: 5 };
     t.deepEqual(result, { x: { z: 5 }});
     t.equal(updates, 2);
@@ -277,32 +278,36 @@ test('flat object', function(t) {
     y.x.z = 6; // not picked up
     t.deepEqual(result, { x: { z: 5 }});
     t.equal(updates, 2);
-    
+
     t.end();
 })
 
 test('as structure', function(t) {
-    
+
     var x = m.observable({
         x: m.asStructure(null)
     });
-    
+
     var changed = 0;
     var dis = m.autorun(function() {
         changed++;
         JSON.stringify(x);
     });
-    
+
     function c() {
         t.equal(changed, 1, "expected a change");
+        if (changed !== 1)
+            console.trace();
         changed = 0;
     }
 
     function nc() {
         t.equal(changed, 0, "expected no change");
+        if (changed !== 0)
+            console.trace();
         changed = 0;
     }
-    
+
     // nc = no change, c = changed.
     c();
     x.x = null;
@@ -395,7 +400,7 @@ test('as structure', function(t) {
     nc();
     x.x.a[0].b = 3;
     nc();
-    
+
     dis();
     t.end();
 })
@@ -420,7 +425,7 @@ test('as structure view', function(t) {
         bc++;
     });
     t.equal(bc, 1);
-    
+
     var cc = 0;
     var co = m.autorun(function() {
         x.c;
@@ -438,6 +443,43 @@ test('as structure view', function(t) {
     t.end();
 })
 
+test('ES5 non reactive props', function (t) {
+  var te = {}
+  Object.defineProperty(te, 'nonConfigurable', {
+    enumerable: true,
+    configurable: false,
+    writable: true,
+    value: 'static'
+  })
+  // should throw if trying to reconfigure an existing non-configurable prop
+  t.throws(function() {
+	 const a = m.extendObservable(te2, { notConfigurable: 1 });
+  });
+  // should skip non-configurable / writable props when using `observable`
+  te = m.observable(te);
+  const d1 = Object.getOwnPropertyDescriptor(te, 'nonConfigurable')
+  t.equal(d1.value, 'static')
+
+  var te2 = {};
+  Object.defineProperty(te2, 'notWritable', {
+    enumerable: true,
+    configurable: true,
+    writable: false,
+    value: 'static'
+  })
+  // should throw if trying to reconfigure an existing non-writable prop
+  t.throws(function() {
+	 const a = m.extendObservable(te2, { notWritable: 1 });
+  });
+  const d2 = Object.getOwnPropertyDescriptor(te2, 'notWritable')
+  t.equal(d2.value, 'static')
+  
+  // should not throw for other props
+  t.equal(m.extendObservable(te, { 'bla' : 3}).bla, 3);
+  
+  t.end();
+})
+
 test('exceptions', function(t) {
     t.throws(function() {
         m.asReference(m.asFlat(3));
@@ -446,7 +488,7 @@ test('exceptions', function(t) {
     var x = m.observable({
         y: m.asReference(null)
     });
-    
+
     t.throws(function() {
         x.y = m.asStructure(3)
     });
@@ -464,7 +506,7 @@ test('exceptions', function(t) {
     t.throws(function() {
         ar[1] = m.asReference(3)
     });
-    
+
     t.throws(function() {
         ar = m.observable([m.asStructure(3)]);
     });

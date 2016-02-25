@@ -1,6 +1,6 @@
 var test = require('tape');
-var mobservable = require('..');
-var observable = mobservable.observable;
+var mobx = require('..');
+var observable = mobx.observable;
 
 function buffer() {
     var b = [];
@@ -14,112 +14,80 @@ function buffer() {
 }
 
 test('test1', function(t) {
-    try {
-        var a = observable([]);
-        t.equal(a.length, 0);
-        t.deepEqual(Object.keys(a), []);
-        t.deepEqual(a.slice(), []);
+    var a = observable([]);
+    t.equal(a.length, 0);
+    t.deepEqual(Object.keys(a), []);
+    t.deepEqual(a.slice(), []);
 
-        a.push(1);
-        t.equal(a.length, 1);
-        t.deepEqual(Object.keys(a), ["0"]);
-        t.deepEqual(a.slice(), [1]);
+    a.push(1);
+    t.equal(a.length, 1);
+    t.deepEqual(a.slice(), [1]);
 
-        a[1] = 2;
-        t.equal(a.length, 2);
-        t.deepEqual(Object.keys(a), ["0", "1"]);
-        t.deepEqual(a.slice(), [1,2]);
+    a[1] = 2;
+    t.equal(a.length, 2);
+    t.deepEqual(a.slice(), [1,2]);
 
-        var sum = observable(function() {
-            return -1 + a.reduce(function(a,b) {
-                return a + b;
-            }, 1);
-        });
+    var sum = observable(function() {
+        return -1 + a.reduce(function(a,b) {
+            return a + b;
+        }, 1);
+    });
 
-        t.equal(sum(), 3);
+    t.equal(sum.get(), 3);
 
-        a[1] = 3;
-        t.equal(a.length, 2);
-        t.deepEqual(Object.keys(a), ["0", "1"]);
-        t.deepEqual(a.slice(), [1,3]);
-        t.equal(sum(), 4);
+    a[1] = 3;
+    t.equal(a.length, 2);
+    t.deepEqual(a.slice(), [1,3]);
+    t.equal(sum.get(), 4);
 
-        a.splice(1,1,4,5);
-        t.equal(a.length, 3);
-        t.deepEqual(Object.keys(a), ["0", "1", "2"]);
-        t.deepEqual(a.slice(), [1,4,5]);
-        t.equal(sum(), 10);
+    a.splice(1,1,4,5);
+    t.equal(a.length, 3);
+    t.deepEqual(a.slice(), [1,4,5]);
+    t.equal(sum.get(), 10);
 
-        a.replace([2,4]);
-        t.equal(sum(), 6);
+    a.replace([2,4]);
+    t.equal(sum.get(), 6);
 
-        a.splice(1,1);
-        t.equal(sum(), 2);
-        t.deepEqual(a.slice(), [2])
+    a.splice(1,1);
+    t.equal(sum.get(), 2);
+    t.deepEqual(a.slice(), [2])
 
-        a.splice(0,0,4,3);
-        t.equal(sum(), 9);
-        t.deepEqual(a.slice(), [4,3,2]);
+    a.splice(0,0,4,3);
+    t.equal(sum.get(), 9);
+    t.deepEqual(a.slice(), [4,3,2]);
 
-        a.clear();
-        t.equal(sum(), 0);
-        t.deepEqual(a.slice(), []);
+    a.clear();
+    t.equal(sum.get(), 0);
+    t.deepEqual(a.slice(), []);
 
-        a.length = 4;
-        t.equal(isNaN(sum()), true);
-        t.deepEqual(a.length, 4);
+    a.length = 4;
+    t.equal(isNaN(sum.get()), true);
+    t.deepEqual(a.length, 4);
 
-        t.deepEqual(a.slice(), [undefined, undefined, undefined, undefined]);
+    t.deepEqual(a.slice(), [undefined, undefined, undefined, undefined]);
 
-        a.replace([1,2, 2,4]);
-        t.equal(sum(), 9);
-        a.length = 4;
-        t.equal(sum(), 9);
+    a.replace([1,2, 2,4]);
+    t.equal(sum.get(), 9);
+    a.length = 4;
+    t.equal(sum.get(), 9);
 
 
-        a.length = 2;
-        t.equal(sum(), 3);
-        t.deepEqual(a.slice(), [1,2]);
+    a.length = 2;
+    t.equal(sum.get(), 3);
+    t.deepEqual(a.slice(), [1,2]);
 
-        t.deepEqual(a.reverse(), [2,1]);
-        t.deepEqual(a.slice(), [1,2]);
+    t.deepEqual(a.reverse(), [2,1]);
+    t.deepEqual(a.slice(), [1,2]);
 
-        a.unshift(3);
-        t.deepEqual(a.sort(), [1,2,3]);
-        t.deepEqual(a.slice(), [3,1,2]);
+    a.unshift(3);
+    t.deepEqual(a.sort(), [1,2,3]);
+    t.deepEqual(a.slice(), [3,1,2]);
 
-        t.end();
-    }
-    catch(e) {
-        console.error(e);
-        throw e;
-    }
-})
-
-test('enumerable', function(t) {
-    function getKeys(ar) {
-        var res = [];
-        for(var key in ar)
-            res.push(key);
-        return res;
-    }
-
-    var ar = mobservable.observable([1,2,3]);
-    t.deepEqual(getKeys(ar), ['0','1','2']);
-    
-    ar.push(5,6);
-    t.deepEqual(getKeys(ar), ['0','1','2','3','4']);
-
-    ar.pop();
-    t.deepEqual(getKeys(ar), ['0','1','2','3']);
-    
-    ar.shift();
-    t.deepEqual(getKeys(ar), ['0','1','2']);
     t.end();
 })
 
 test('find and remove', function(t) {
-    var a = mobservable.observable([10,20,20]);
+    var a = mobx.observable([10,20,20]);
     var idx = -1;
     function predicate(item, index) {
         if (item === 20) {
@@ -154,7 +122,7 @@ test('find and remove', function(t) {
 
 test('quickDiff', function(t) {
     function check(current, base, added, removed) {
-        var res = mobservable._.quickDiff(current, base);
+        var res = mobx._.quickDiff(current, base);
         t.deepEqual(res[0], added);
         t.deepEqual(res[1], removed);
     }
@@ -176,7 +144,7 @@ test('quickDiff', function(t) {
 })
 
 test('observe', function(t) {
-    var ar = mobservable.observable([1,4]);
+    var ar = mobx.observable([1,4]);
     var buf = [];
     var disposer = ar.observe(function(changes) {
         buf.push(changes);
@@ -221,7 +189,7 @@ test('observe', function(t) {
 })
 
 test('array modification1', function(t) {
-    var a = mobservable.observable([1,2,3]);
+    var a = mobx.observable([1,2,3]);
     var r = a.splice(-10, 5, 4,5,6);
     t.deepEqual(a.slice(), [4,5,6]);
     t.deepEqual(r, [1,2,3]);
@@ -230,15 +198,15 @@ test('array modification1', function(t) {
 
 test('serialize', function(t) {
     var a = [1,2,3];
-    var m = mobservable.observable(a);
+    var m = mobx.observable(a);
 
-    t.deepEqual(JSON.stringify(a), JSON.stringify(m));
-    t.deepEqual(a, m);
+    t.deepEqual(JSON.stringify(m), JSON.stringify(a));
+    t.deepEqual(a, m.peek());
 
     a = [4];
     m.replace(a);
-    t.deepEqual(JSON.stringify(a), JSON.stringify(m));
-    t.deepEqual(a, m);
+    t.deepEqual(JSON.stringify(m), JSON.stringify(a));
+    t.deepEqual(a, m.toJSON());
 
     t.end();
 })
@@ -249,35 +217,19 @@ test('array modification functions', function(t) {
     funcs.forEach(function(f) {
         ars.forEach(function (ar) {
             var a = ar.slice();
-            var b = mobservable.observable(a);
+            var b = mobx.observable(a);
             var res1 = a[f](4);
             var res2 = b[f](4);
             t.deepEqual(res1, res2);
-            t.deepEqual(a, b);
+            t.deepEqual(a, b.slice());
         });
     });
     t.end();
 })
 
-test('array write functions', function(t) {
-    var ars = [[], [1,2,3]];
-    var funcs = ["push","pop","shift","unshift"];
-    funcs.forEach(function(f) {
-        ars.forEach(function (ar) {
-            var a = ar.slice();
-            var b = mobservable.observable(a);
-            var res1 = a[f](4);
-            var res2 = b[f](4);
-            t.deepEqual(res1, res2);
-            t.deepEqual(a, b);
-        });
-    });
-    t.end();
-})
+test('array modifications', function(t) {
 
-test('array modification2', function(t) {
-
-    var a2 = mobservable.observable([]);
+    var a2 = mobx.fastArray([]);
     var inputs = [undefined, -10, -4, -3, -1, 0, 1, 3, 4, 10];
     var arrays = [[], [1], [1,2,3,4], [1,2,3,4,5,6,7,8,9,10,11],[1,undefined],[undefined]]
     for (var i = 0; i < inputs.length; i++)
@@ -289,29 +241,7 @@ test('array modification2', function(t) {
         a2.replace(a1);
         var res1 = a1.splice.apply(a1, [inputs[i], inputs[j]].concat(arrays[l]));
         var res2 = a2.splice.apply(a2, [inputs[i], inputs[j]].concat(arrays[l]));
-        t.deepEqual(a1.slice(), a2, "values wrong: " + msg);
-        t.deepEqual(res1, res2, "results wrong: " + msg);
-        t.equal(a1.length, a2.length, "length wrong: " + msg);
-    }
-
-    t.end();
-})
-
-test('fastArray modifications', function(t) {
-
-    var a2 = mobservable.fastArray([]);
-    var inputs = [undefined, -10, -4, -3, -1, 0, 1, 3, 4, 10];
-    var arrays = [[], [1], [1,2,3,4], [1,2,3,4,5,6,7,8,9,10,11],[1,undefined],[undefined]]
-    for (var i = 0; i < inputs.length; i++)
-    for (var j = 0; j< inputs.length; j++)
-    for (var k = 0; k < arrays.length; k++)
-    for (var l = 0; l < arrays.length; l++) {
-        var msg = ["array mod: [", arrays[k].toString(),"] i: ",inputs[i]," d: ", inputs[j]," [", arrays[l].toString(),"]"].join(' ');
-        var a1 = arrays[k].slice();
-        a2.replace(a1);
-        var res1 = a1.splice.apply(a1, [inputs[i], inputs[j]].concat(arrays[l]));
-        var res2 = a2.splice.apply(a2, [inputs[i], inputs[j]].concat(arrays[l]));
-        t.deepEqual(a1.slice(), a2.slice(), "values wrong: " + msg); // TODO: or just a2?
+        t.deepEqual(a1.slice(), a2.slice(), "values wrong: " + msg);
         t.deepEqual(res1, res2, "results wrong: " + msg);
         t.equal(a1.length, a2.length, "length wrong: " + msg);
     }
@@ -320,22 +250,18 @@ test('fastArray modifications', function(t) {
 })
 
 test('new fast array values won\'t be observable', function(t) {
-   // See: https://mweststrate.github.io/mobservable/refguide/fast-array.html#comment-2486090381
-    var booksA = mobservable.fastArray([]);
-    // mobservable.observe(booksA, (change) => {
-    //     console.log(change);
-    // })
+   // See: https://mobxjs.github.io/mobx/refguide/fast-array.html#comment-2486090381
+    var booksA = mobx.fastArray([]);
     var rowling = { name: 'J.K.Rowling', birth: 1965 };
-    debugger;
     booksA.push(rowling)
-    t.equal(mobservable.isObservable(booksA[0], "name"), false);
+    t.equal(mobx.isObservable(booksA[0], "name"), false);
     var removed = booksA.splice(0, 1);
-    t.equal(mobservable.isObservable(removed[0], "name"), false);
+    t.equal(mobx.isObservable(removed[0], "name"), false);
     t.end(); 
 });
 
 test('is array', function(t) {
-    var x = mobservable.observable([]);
+    var x = mobx.observable([]);
     t.equal(x instanceof Array, true);
 
     // would be cool if these two would return true...
@@ -345,9 +271,9 @@ test('is array', function(t) {
 })
 
 test('peek', function(t) {
-    var x = mobservable.observable([1, 2, 3]);
+    var x = mobx.observable([1, 2, 3]);
     t.deepEqual(x.peek(), [1, 2, 3]);
-    t.equal(x.$mobservable.values, x.peek());
+    t.equal(x.$mobx.values, x.peek());
     
     x.peek().push(4); //noooo!
     t.throws(function() {
@@ -357,15 +283,14 @@ test('peek', function(t) {
 })
 
 test('react to sort changes', function(t) {
-    var x = mobservable.observable([4, 2, 3]);
-    var sortedX = mobservable.observable(function() {
-        debugger;
+    var x = mobx.observable([4, 2, 3]);
+    var sortedX = mobx.observable(function() {
         return x.sort();
     });
     var sorted;
     
-    mobservable.autorun(function() {
-        sorted = sortedX();
+    mobx.autorun(function() {
+        sorted = sortedX.get();
     });
     
     t.deepEqual(x.slice(), [4,2,3]);

@@ -1,29 +1,17 @@
 {
-    "version": "1.6.2",
+    "version": "1.7.5",
     "compilerOptions": {
         "target": "es5",
         "outDir": "lib",
         "sourceMap": false,
         "declaration": true,
         "module": "commonjs",
-        "removeComments": true
+        "removeComments": false
     },
-    "files": [
-        "./src/core.ts",
-        "./src/dnode.ts",
-        "./src/extras.ts",
-        "./src/index.ts",
-        "./src/interfaces.ts",
-        "./src/observablearray.ts",
-        "./src/observableobject.ts",
-        "./src/observablevalue.ts",
-        "./src/observableview.ts",
-        "./src/simpleeventemitter.ts",
-        "./src/utils.ts"
-    ],
-    "filesGlob": [
-        "!./node_modules/**/*.ts",
-        "!./dist/*.d.ts",
-        "!./test/*.ts"
+    "exclude": [
+        "node_modules",
+        "test",
+        "lib",
+        ".build"
     ]
 }

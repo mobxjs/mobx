@@ -1,14 +1,14 @@
 /// <reference path='require.d.ts' />
 /// <reference path='tape.d.ts' />
 import {
-    observable, asStructure, autorun, autorunAsync, extendObservable, 
+    observe, computed, observable, asStructure, autorun, autorunAsync, extendObservable, 
     IObservableArray, IArrayChange, IArraySplice, IObservableValue,
-    extras
-} from "../lib/index";
+    extras, Atom, transaction
+} from "../lib/mobx";
 import * as test from 'tape';
 
 var v = observable(3);
-v.observe(() => {});
+observe(v, () => {});
 
 var a = observable([1,2,3]);
 
@@ -21,7 +21,7 @@ class Order {
     @observable aFunction = testFunction;
     @observable someStruct = asStructure({ x: 1, y: 2});
 
-    @observable get total() {
+    @computed get total() {
         return this.amount * this.price * (1 + this.orders.length);
     }
     
@@ -32,9 +32,8 @@ class Order {
 
 test('observable', function(t) {
     var a = observable(3);
-    var b = observable(() => a() * 2);
-    t.ok(extras.getDNode(a));
-    t.equal(b(), 6);
+    var b = observable(() => a.get() * 2);
+    t.equal(b.get(), 6);
     t.end();
 })
 
@@ -139,14 +138,8 @@ test('typing', function(t) {
 
     var x:IObservableValue<number> = observable(3);
 
-    var d1 = autorunAsync(() => 3, (num:number) => {
-        // noop
-    });
-    
     var d2 = autorunAsync(function() {
         
-    }, function() {
-        // noop
     });
 
     t.end();
@@ -192,7 +185,7 @@ class Box {
     @observable height = 20;
     @observable sizes = [2];
     @observable someFunc = function () { return 2; }
-    @observable get width() {
+    @computed get width() {
         return this.height * this.sizes.length * this.someFunc() * (this.uninitialized ? 2 : 1);
     }
 }
@@ -218,3 +211,121 @@ test('box', function(t) {
 
     t.end();
 })
+
+test('observable setter should fail', function(t) {
+	t.throws(() => {
+		class Bla {
+			@computed get propX() {
+				return 3;
+			}
+			set propX(v) {
+				
+			}
+		}
+	}, 'propX');
+	t.end();
+});
+
+test('atom clock example', function(t) {
+	let ticks = 0;
+	const time_factor = 50; // speed up / slow down tests
+
+	class Clock {
+		atom: Atom;
+		intervalHandler: number = null;
+		currentDateTime: string;
+
+		constructor() {
+			console.log("create");
+			// creates an atom to interact with the mobx core algorithm
+			this.atom =	new Atom(
+				// first param a name for this atom, for debugging purposes
+				"Clock",
+				// second (optional) parameter: callback for when this atom transitions from unobserved to observed.
+				() => this.startTicking(),
+				// third (optional) parameter: callback for when this atom transitions from observed to unobserved
+				// note that the same atom transition multiple times between these two states
+				() => this.stopTicking()
+			);
+		}
+
+		getTime() {
+			console.log("get time");
+			// let mobx now this observable data source has been used
+			this.atom.reportObserved();
+			if (!this.intervalHandler)
+				this.tick(); // get the initial data
+			return this.currentDateTime;
+		}
+
+		tick() {
+			console.log("tick");
+			ticks++;
+			this.currentDateTime = new Date().toString();
+			this.atom.reportChanged();
+		}
+
+		startTicking() {
+			console.log("start ticking");
+			this.intervalHandler = setInterval(() => this.tick(), 1 * time_factor);
+		}
+
+		stopTicking() {
+			console.log("stop ticking");
+			clearInterval(this.intervalHandler);
+			this.intervalHandler = null;
+		}
+	}
+
+	const clock = new Clock();
+
+	const values: string[] = [];
+
+	// ... prints the time each second
+	const disposer = autorun(() => {
+		values.push(clock.getTime());
+		console.log(clock.getTime());
+	});
+
+	// printing stops. If nobody else uses the same `clock` the clock will stop ticking as well.
+	setTimeout(disposer, 4.5 * time_factor);
+
+	setTimeout(() => {
+		t.equal(ticks, 6);
+		t.equal(values.length, 5);
+		t.equal(values.filter(x => x.length > 0).length, 5);
+		t.end();
+	}, 10 * time_factor);
+
+});
+
+test('typescript: parameterized computed decorator', (t) => {
+	class TestClass {
+		@observable x = 3;
+		@observable y = 3;
+		@computed({ asStructure: true }) get boxedSum() {
+			return { sum: Math.round(this.x) + Math.round(this.y) };
+		}
+	}
+	
+	const t1 = new TestClass();
+	const changes: { sum: number}[] = [];
+	const d = autorun(() => changes.push(t1.boxedSum));
+	
+	t1.y = 4; // change
+	t.equal(changes.length, 2);
+	t1.y = 4.2; // no change
+	t.equal(changes.length, 2);
+	transaction(() => {
+		t1.y = 3;
+		t1.x = 4;
+	}); // no change
+	t.equal(changes.length, 2);
+	t1.x = 6; // change
+	t.equal(changes.length, 3);
+	d();
+	
+	t.deepEqual(changes, [{ sum: 6 }, { sum: 7 }, { sum: 9 }]);
+	
+	t.end();
+});

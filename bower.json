@@ -1,13 +1,14 @@
 {
-  "name": "mobservable",
-  "description": "Observable data. Reactive functions. Simple code.",
-  "main": "dist/mobservable.js",
+  "name": "mobx",
+  "description": "Simple, scalable state management.",
+  "main": "lib/mobx.umd.js",
   "authors": [
     "Michel Weststrate"
   ],
   "license": "MIT",
   "keywords": [
-    "mobservable",
+    "mobx",
+	"mobservable",
     "observable",
     "react-component",
     "react",
@@ -15,9 +16,11 @@
     "reactive",
     "model",
     "frp",
-    "functional-reactive-programming"
+    "functional-reactive-programming",
+	"state management",
+	"data flow"
   ],
-  "homepage": "https://mweststrate.github.io/mobservable",
+  "homepage": "https://mobxjs.github.io/mobx",
   "moduleType": [
     "amd",
     "globals",

@@ -1,6 +1,7 @@
 #!/usr/bin/nscript
 /* To run this script, nscript is needed: [sudo] npm install -g nscript
 /* Publish.js, publish a new version of the npm package as found in the current directory */
+/* Run this file from the root of the repository */
 module.exports = function(shell, npm, git) {
     var pkg = JSON.parse(shell.read('package.json'));
 
@@ -18,7 +19,7 @@ module.exports = function(shell, npm, git) {
         if (publishedPackageInfo.versions == version || publishedPackageInfo.versions.indexOf(version) != -1)
             shell.exit(2, "Version " + pkg.version + " is already published to npm");
 
-        shell.write('package.json', JSON.stringify(pkg, null, 4));
+        shell.write('package.json', JSON.stringify(pkg, null, 2));
 
         // Finally, commit and publish!
         npm("publish");

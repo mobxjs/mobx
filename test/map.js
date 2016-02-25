@@ -1,7 +1,7 @@
 var test = require('tape');
-var mobservable = require('..');
-var map = mobservable.map;
-var autorun = mobservable.autorun;
+var mobx = require('..');
+var map = mobx.map;
+var autorun = mobx.autorun;
 
 test('map crud', function(t) {
 	var events = [];
@@ -28,14 +28,14 @@ test('map crud', function(t) {
 	t.deepEqual(m.values(), [2, 3]);
 	t.deepEqual(m.entries(), [["a", 2], ["b", 3]]);
 	t.deepEqual(m.toJs(), { a: 2, b: 3});
-	t.deepEqual(m.toString(), "[mobservable.map { a: 2, b: 3 }]");
+	t.deepEqual(m.toString(), "[mobx.map { a: 2, b: 3 }]");
 	t.equal(m.size, 2);
 
 	m.clear();
 	t.deepEqual(m.keys(), []);
 	t.deepEqual(m.values(), []);
 	t.deepEqual(m.toJs(), { });
-	t.deepEqual(m.toString(), "[mobservable.map {  }]");
+	t.deepEqual(m.toString(), "[mobx.map {  }]");
 	t.equal(m.size, 0);
 
 	t.equal(m.has("a"), false);
@@ -43,20 +43,20 @@ test('map crud', function(t) {
 	t.equal(m.get("a"), undefined);
 	t.equal(m.get("b"), undefined);
 
-	t.deepEqual(events,
+	function removeObjectProp(item) {
+		delete item.object;
+		return item;
+	};
+	t.deepEqual(events.map(removeObjectProp),
 		[ { type: 'update',
-			object: m,
 			name: 'a',
 			oldValue: 1 },
 		{ type: 'add',
-			object:  m,
 			name: 'b' },
 		{ type: 'delete',
-			object:  m,
 			name: 'a',
 			oldValue: 2 },
 		{ type: 'delete',
-			object: m,
 			name: 'b',
 			oldValue: 3 }
 		]
@@ -176,7 +176,7 @@ test('observe collections', function(t) {
 })
 
 test('asStructure', function(t) {
-	var x = map({}, mobservable.asStructure);
+	var x = map({}, mobx.asStructure);
 	var triggerCount = 0;
 	var value = null;
 
@@ -237,45 +237,49 @@ test('cleanup', function(t) {
 	t.end();
 })
 
-test('extras', function(t) {
-	var m = map({a : 1});
-	t.equal(mobservable.isObservable(m), true);
-
-	t.deepEqual(mobservable.toJSON(m), m.toJs());
-
-	t.ok(mobservable.extras.getDNode(m._data.a));
-	t.equal(mobservable.extras.getDNode(m, "a"),  mobservable.extras.getDNode(m._data.a));
-
-	function name(thing, prop) {
-		return mobservable.extras.getDNode(thing, prop).context.name;
-	}
-
-	t.equal(name(m, "a"), ".a");
-	t.equal(name(m._data.a), ".a");
-	t.equal(name(m._hasMap.a), ".(has)a");
-	t.equal(name(m._keys), ".keys()");
-	t.end();
-})
-
 test('strict', function(t) {
 	var x = map();
 	autorun(function() {
-		mobservable.extras.withStrict(true, function() {
-			x.get("y"); // should not throw
-		});
+		x.get("y"); // should not throw
 	});
 	t.end();
 })
-
+	
 test('issue 100', function(t) {
 	var that = {};
-	mobservable.extendObservable(that, {
+	mobx.extendObservable(that, {
 		myMap: map()
 	})
-	t.equal(mobservable.isObservableMap(that.myMap), true);
+	t.equal(mobx.isObservableMap(that.myMap), true);
 	t.equal(typeof that.myMap.observe, "function");
 	t.end();
 });
+
+test('issue 119 - unobserve before delete', function(t) {
+	var propValues = [];
+	var myObservable = mobx.observable({
+		myMap: map()
+	});
+	myObservable.myMap.set('myId', {
+		myProp: 'myPropValue',
+		myCalculatedProp: function() {
+			if (myObservable.myMap.has('myId'))
+				return myObservable.myMap.get('myId').myProp + ' calculated';
+			return undefined;
+		}
+	});
+	// the error only happens if the value is observed
+	mobx.autorun(function() {
+    	myObservable.myMap.values().forEach(function(value) {
+			console.log('x');
+        	propValues.push(value.myCalculatedProp);
+    	});
+	});
+	myObservable.myMap.delete('myId');
+	
+	t.deepEqual(propValues, ['myPropValue calculated']);
+	t.end();
+})
 
 test('issue 116 - has should not throw on invalid keys', function(t) {
 	var x = map();

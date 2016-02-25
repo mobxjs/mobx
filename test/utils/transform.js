@@ -1,6 +1,5 @@
 var m = require('../../');
 
-// TODO: should this development depdendency be removed? (it's for tag tests)
 module.exports.intersection = require('lodash.intersection');
 
 module.exports.pluckFn = function(key) {

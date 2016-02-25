@@ -1,101 +1,44 @@
 var test = require('tape');
-var mobservable = require('..');
-var m = mobservable;
-
-test('getDNode', function(t) {
-    var getD = mobservable.extras.getDNode;
-
-    t.throws(function() {
-        getD({});
-    });
-    t.throws(function() {
-        getD([]);
-    });
-    t.throws(function() {
-        getD(null);
-    });
-    t.throws(function() {
-        getD({ x: 3}, "x");
-    });
-    t.throws(function() {
-        getD(m.observable({ x: 3}));
-    });
-    t.throws(function() {
-        getD(function() {});
-    });
-    t.throws(function() {
-        getD(Object.assign(m.observable({ x: 3}), { y:2}), "y");
-    });
-    t.throws(function() {
-        getD(m.map());
-    });
-    t.throws(function() {
-        getD(m.map({}), "a");
-    });
-
-    t.ok(getD(m.observable([])));
-    t.ok(getD(m.observable({x:3}), "x"));
-    t.ok(getD(m.observable(3)));
-    t.ok(getD(m.observable({x:function() { return 3 }}), "x"));
-    t.ok(getD(m.observable(function() {})));
-    t.ok(getD(mobservable.autorun(function() {})));
-    t.ok(getD(m.map({a: 1}), "a"));
-
-    var a;
-    a = m.observable({x:{}});
-    t.ok(getD(a,"x"));
-    a = m.observable({x:[]});
-    t.ok(getD(a,"x"));
-    t.ok(getD(a.x));
-    a = m.observable({x:[[]]});
-    t.ok(getD(a,"x"));
-    t.ok(getD(a.x));
-    t.ok(getD(a.x[0]));
-
-    t.end();
-})
+var mobx = require('..');
+var m = mobx;
 
 test('treeD', function(t) {
+    m._.resetGlobalState();
     var a = m.observable(3);
-    var aName = a.$mobservable.context.name;
+    var aName = 'ObservableValue@1';
 
     var dtree = m.extras.getDependencyTree;
     t.deepEqual(dtree(a), {
-       context:null,
        name: aName,
-       id: a.$mobservable.id
+       id: a.id
     });
 
 
     var bFunc =function () {
-        return a() * a();
+        return a.get() * a.get();
     };
     var b = m.observable(bFunc);
-    var bName = b.$mobservable.context.name
+    var bName = 'ComputedValue@2';
     t.deepEqual(dtree(b), {
-        context:bFunc,
         name: bName,
-        id: b.$mobservable.id,
+        id: b.id,
         // no dependencies yet, since it isn't observed yet
     });
 
     var cFunc =function() {
-        return b();
+        return b.get();
     };
     var c = m.autorun(cFunc);
-    var cName = c.$mobservable.context.name;
-    t.deepEqual(dtree(c), {
-        context: cFunc,
+    var cName = 'Autorun@3';
+    t.deepEqual(dtree(c.$mobx), {
         name: cName,
-        id: c.$mobservable.id,
+        id: c.$mobx.id,
         dependencies: [{
-            context: bFunc,
             name: bName,
-            id: b.$mobservable.id,
+            id: b.id,
             dependencies: [{
-                context: null,
                 name: aName,
-                id: a.$mobservable.id
+                id: a.id
             }]
         }]
     });
@@ -104,19 +47,41 @@ test('treeD', function(t) {
     t.ok(bName !== cName);
 
     t.deepEqual(m.extras.getObserverTree(a), {
-        context: null,
         name: aName,
-        id: a.$mobservable.id,
+        id: a.id,
         observers: [{
-            context: bFunc,
             name: bName,
-            id: b.$mobservable.id,
+            id: b.id,
             observers: [{
-                context: cFunc,
                 name: cName,
-                id: c.$mobservable.id,
-                listeners: 1
+                id: c.$mobx.id
             }]
+        }]
+    });
+
+    var x = mobx.map({ temperature: 0 });
+    var d = mobx.autorun(function() {
+        x.keys();
+        if (x.has('temperature'))
+            x.get('temperature');
+        x.has('absent');
+    });
+    
+    t.deepEqual(m.extras.getDependencyTree(d.$mobx), {
+        id: 8, 
+        name: 'Autorun@8', 
+        dependencies: [{ 
+            id: 5, 
+            name: 'ObservableMap@4 / keys()@5' 
+        }, {
+            id: 7, 
+            name: 'ObservableMap@4 / Contains "temperature"@7'
+        }, { 
+            id: 6, 
+            name: 'ObservableMap@4 / Entry "temperature"@6' 
+        }, {
+            id: 9, 
+            name: 'ObservableMap@4 / Contains "absent"@9'
         }]
     });
 
@@ -124,16 +89,9 @@ test('treeD', function(t) {
 })
 
 test('names', function(t) {
-    function name(thing, prop) {
-        return m.extras.getDNode(thing, prop).context.name;
-    }
-
-    function contextObj(thing, prop) {
-        return m.extras.getDNode(thing, prop).context.object;
-    }
-
+    m._.resetGlobalState();
     var struct = {
-        x: 3,
+        x: 'ObservableValue@1',
         y: {
             z: 7
         },
@@ -149,39 +107,25 @@ test('names', function(t) {
     m.extendObservable(rstruct.y, { a:  { b : 2}});
     rstruct.ar.push({ b : 2});
     rstruct.ar.push([]);
-    t.equal(name(rstruct,"x"), ".x");
-    t.equal(name(rstruct, "y"), ".y");
-    t.equal(name(rstruct.y,"z"), ".y.z");
-    t.equal(name(rstruct, "ar"), ".ar");
-    t.equal(name(rstruct.ar), ".ar");
-    t.equal(name(rstruct.ar[1],"w"), ".ar[x].w");
-    t.equal(name(rstruct.y.a,"b"), ".y.a.b");
-    t.equal(name(rstruct.ar[2], "b"), ".ar[x].b");
-    t.equal(name(rstruct.ar[3]), ".ar[x]");
-
-    t.equal(contextObj(rstruct,"x"), rstruct);
-    t.equal(contextObj(rstruct, "y"), rstruct);
-    t.equal(contextObj(rstruct.y,"z"), rstruct);
-    t.equal(contextObj(rstruct, "ar"), rstruct);
-    t.equal(contextObj(rstruct.ar), rstruct);
-    t.equal(contextObj(rstruct.ar), rstruct);
-    t.equal(contextObj(rstruct.ar[1],"w"), rstruct);
-    t.equal(contextObj(rstruct.y.a,"b"), rstruct);
-    t.equal(contextObj(rstruct.ar[2], "b"), rstruct);
-    t.equal(contextObj(rstruct.ar[3]), rstruct);
+    t.equal(rstruct.$mobx.values.x.name, "ObservableObject@1 / Prop \"x\"");
+    t.equal(rstruct.$mobx.values.y.name, "ObservableObject@1 / Prop \"y\"");
+    t.equal(rstruct.y.$mobx.values.z.name, "ObservableObject@1 / Prop \"y\"@4 / Prop \"z\"");
+    t.equal(rstruct.$mobx.values.ar.name, "ObservableObject@1 / Prop \"ar\"");
+    t.equal(rstruct.ar.$mobx.atom.name, "ObservableObject@1 / Prop \"ar\"");
+    t.equal(rstruct.ar[1].$mobx.values.w.name, "ObservableObject@1 / Prop \"ar\"@7 / ArrayEntry@8 / Prop \"w\"");
+    t.equal(rstruct.y.a.$mobx.values.b.name, "ObservableObject@1 / Prop \"y\"@4 / Prop \"a\"@11 / Prop \"b\"");
+    t.equal(rstruct.ar[2].$mobx.values.b.name, "ObservableObject@1 / Prop \"ar\"@7 / ArrayEntry@13 / Prop \"b\"");
 
     var d = m.autorun(function() {
     });
-    t.ok(name(d));
+    t.ok(d.$mobx.name);
 
-    t.equal(name(m.autorun(function namedFunction() {
-    })), "namedFunction");
+    t.equal(m.autorun(function namedFunction() {
+    }).$mobx.name, "namedFunction");
 
-    t.ok(name(m.observable(function() {
-    })));
+    t.ok(m.observable(function() {}));
 
-    t.equal(name(m.observable(function namedFunction() {
-    })), "namedFunction");
+    t.equal(m.observable(function namedFunction() {}).name, "namedFunction");
 
     t.end();
 })
@@ -190,7 +134,7 @@ function stripTrackerOutput(output) {
     return output.map(function (i) {
         if (Array.isArray(i))
             return stripTrackerOutput(i);
-        delete i.context;
+        delete i.node;
         delete i.name;
         return i;
     });
@@ -198,93 +142,93 @@ function stripTrackerOutput(output) {
 
 var trackerOutput1 = function(a, b,c) {
     return [
-    { id: a.$mobservable.id,
+    { id: a.id,
         changed: true,
-        state: 'READY',
-        newValue: 4 },
-    { id: b.$mobservable.id,
+        state: 'READY' },
+    { id: b.id,
         changed: true,
-        state: 'READY',
-        newValue: 8 },
-    { id: c.$mobservable.id,
+        state: 'READY' },
+    { id: c.$mobx.id,
         changed: true,
-        state: 'READY',
-        newValue: null } ];
+        state: 'READY' } 
+    ];
 }
 
 var trackerOutput2 = function(a, b, c) {
-    return [ { id: a.$mobservable.id,
+    return [ { id: a.id,
     state: 'STALE',
     changed: false,
-    newValue: null },
-  { id: b.$mobservable.id,
+    }, 
+  { id: b.id,
     state: 'STALE',
     changed: false,
-    newValue: null },
-  { id: c.$mobservable.id,
+  }, 
+  { id: c.$mobx.id,
     state: 'STALE',
     changed: false,
-    newValue: null },
-  { id: a.$mobservable.id,
+  }, 
+  { id: a.id,
     state: 'READY',
     changed: true,
-    newValue: 4 },
-  { id: b.$mobservable.id,
+  }, 
+  { id: b.id,
     state: 'PENDING',
     changed: false,
-    newValue: null },
-  { id: b.$mobservable.id,
+  }, 
+  { id: b.id,
     state: 'READY',
     changed: true,
-    newValue: 8 },
-  { id: c.$mobservable.id,
+  }, 
+  { id: c.$mobx.id,
     state: 'PENDING',
     changed: false,
-    newValue: null },
-  { id: c.$mobservable.id,
+  }, 
+  { id: c.$mobx.id,
     state: 'READY',
     changed: true,
-    newValue: null }
-  ];
+  }];
 }
 
 test('transition tracker 1', function(t) {
+    m._.resetGlobalState();
     var lines = [];
-
+    
     var a = m.observable(3);
-    var b = m.observable(function() { return a() * 2 });
-    var c = m.autorun(function() { b(); });
+    var b = m.observable(function() { return a.get() * 2 });
+    var c = m.autorun(function() { b.get(); });
     var stop = m.extras.trackTransitions(false, function(line) {
         lines.push(line);
     });
 
-    a(4);
+    a.set(4);
     stop();
-    a(5);
+    a.set(5);
     t.deepEqual(stripTrackerOutput(lines), trackerOutput1(a,b,c));
 
     t.end();
 })
 
 test('transition tracker 2', function(t) {
+    m._.resetGlobalState();
     var lines = [];
-
+    
     var a = m.observable(3);
-    var b = m.observable(function() { return a() * 2 });
-    var c = m.autorun(function() { b(); });
+    var b = m.observable(function() { return a.get() * 2 });
+    var c = m.autorun(function() { b.get(); });
     var stop = m.extras.trackTransitions(true, function(line) {
         lines.push(line);
     });
 
-    a(4);
+    a.set(4);
     stop();
-    a(5);
+    a.set(5);
     t.deepEqual(stripTrackerOutput(lines), trackerOutput2(a,b,c));
 
     t.end();
 })
 
 test('transition tracker 3', function(t) {
+    m._.resetGlobalState();
     var base = console.table;
     var lines = [];
     console.table = function(d) {
@@ -292,23 +236,22 @@ test('transition tracker 3', function(t) {
     }
 
     var a = m.observable(3);
-    var b = m.observable(function() { return a() * 2 });
-    var c = m.autorun(function() { b(); });
+    var b = m.observable(function() { return a.get() * 2 });
+    var c = m.autorun(function() { b.get(); });
     var d = m.observable(4);
 
     var stop = m.extras.trackTransitions(false)
 
 
-    a(4);
-    d(6);
+    a.set(4);
+    d.set(6);
     stop();
-    a(5);
+    a.set(5);
 
     setTimeout(function() {
         t.deepEqual(stripTrackerOutput(lines), [trackerOutput1(a,b,c).concat([{
-            id: d.$mobservable.id,
+            id: d.id,
             state: "READY",
-            newValue: 6,
             changed: true
         }])]);
 
@@ -318,6 +261,7 @@ test('transition tracker 3', function(t) {
 })
 
 test('transition tracker 4', function(t) {
+    m._.resetGlobalState();
     var base = console.dir;
     var lines = [];
     var method = console.table ? "table" : "dir";
@@ -326,13 +270,13 @@ test('transition tracker 4', function(t) {
     }
 
     var a = m.observable(3);
-    var b = m.observable(function() { return a() * 2 });
-    var c = m.autorun(function() { b(); });
+    var b = m.observable(function() { return a.get() * 2 });
+    var c = m.autorun(function() { b.get(); });
     var stop = m.extras.trackTransitions(true);
 
-    a(4);
+    a.set(4);
     stop();
-    a(5);
+    a.set(5);
     setTimeout(function() {
         t.deepEqual(stripTrackerOutput(lines), [trackerOutput2(a,b,c)]);
 
@@ -340,3 +284,23 @@ test('transition tracker 4', function(t) {
         t.end();
     }, 100);
 })
+
+test('strict mode checks', function(t) {
+    var x = mobx.observable(3);
+    
+    mobx.extras.allowStateChanges(false, function() {
+        x.get();        
+    });
+
+    mobx.extras.allowStateChanges(true, function() {
+        x.set(7);        
+    });
+        
+    t.throws(function() {
+        mobx.extras.allowStateChanges(false, function() {
+            x.set(4);        
+        });
+    });
+    
+    t.end();
+});

@@ -1,6 +1,6 @@
 import {
-    observable, asStructure, autorun, extendObservable, 
-    default as mobservable
+    observable, computed, transaction, asStructure, autorun, extendObservable, 
+    default as mobx
 } from "../";
 
 class Box {
@@ -8,7 +8,7 @@ class Box {
     @observable height = 20;
     @observable sizes = [2];
     @observable someFunc = function () { return 2; };
-    @observable get width() {
+    @computed get width() {
         return this.height * this.sizes.length * this.someFunc() * (this.uninitialized ? 2 : 1);
     }
 }
@@ -40,3 +40,34 @@ test('babel', function (t) {
   t.deepEqual(s, [40, 20, 60, 210, 420])
   t.end()
 })
+
+test('babel: parameterized computed decorator', (t) => {
+	class TestClass {
+		@observable x = 3;
+		@observable y = 3;
+		@computed({ asStructure: true }) get boxedSum() {
+			return { sum: Math.round(this.x) + Math.round(this.y) };
+		}
+	}
+	
+	const t1 = new TestClass();
+	const changes: { sum: number}[] = [];
+	const d = autorun(() => changes.push(t1.boxedSum));
+	
+	t1.y = 4; // change
+	t.equal(changes.length, 2);
+	t1.y = 4.2; // no change
+	t.equal(changes.length, 2);
+	transaction(() => {
+		t1.y = 3;
+		t1.x = 4;
+	}); // no change
+	t.equal(changes.length, 2);
+	t1.x = 6; // change
+	t.equal(changes.length, 3);
+	d();
+	
+	t.deepEqual(changes, [{ sum: 6 }, { sum: 7 }, { sum: 9 }]);
+	
+	t.end();
+});
