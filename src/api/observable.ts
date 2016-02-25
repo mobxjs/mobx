@@ -1,7 +1,7 @@
 import {ObservableValue} from "../types/observablevalue";
 import {ValueMode, getValueModeFromValue, makeChildObservable} from "../types/modifiers";
 import {ComputedValue} from "../core/computedvalue";
-import {isPlainObject, invariant} from "../utils/utils";
+import {isPlainObject, invariant, deprecated} from "../utils/utils";
 import {observableDecorator} from "./observabledecorator";
 import {isObservable} from "./isobservable";
 import {IObservableArray, ObservableArray} from "../types/observablearray";
@@ -32,18 +32,25 @@ export function observable(v: any, keyOrScope?: string | any) {
 	const sourceType = mode === ValueMode.Reference ? ValueType.Reference : getTypeOfValue(value);
 
 	switch (sourceType) {
-		case ValueType.Reference:
-		case ValueType.ComplexObject:
-			return new ObservableValue(value, mode);
-		case ValueType.ComplexFunction:
-			throw new Error("[mobservable.observable] To be able to make a function reactive it should not have arguments. If you need an observable reference to a function, use `observable(asReference(f))`");
-		case ValueType.ViewFunction:
-			return new ComputedValue(value, keyOrScope, mode === ValueMode.Structure, value.name || "ComputedValue");
 		case ValueType.Array:
 		case ValueType.PlainObject:
 			return makeChildObservable(value, mode);
+		case ValueType.Reference:
+		case ValueType.ComplexObject:
+			observableIsDeprecated();
+			return new ObservableValue(value, mode);
+		case ValueType.ComplexFunction:
+			observableIsDeprecated();
+			throw new Error("[mobservable.observable] To be able to make a function reactive it should not have arguments. If you need an observable reference to a function, use `observable(asReference(f))`");
+		case ValueType.ViewFunction:
+			observableIsDeprecated();
+			return new ComputedValue(value, keyOrScope, mode === ValueMode.Structure, value.name || "ComputedValue");
 	}
 	invariant(false, "Illegal State");
+}
+
+function observableIsDeprecated() {
+	deprecated("Invoking observable() on scalar values is deprecated. Use extendObservable or @observable instead.");	
 }
 
 export enum ValueType { Reference, PlainObject, ComplexObject, Array, ViewFunction, ComplexFunction }
