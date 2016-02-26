@@ -8,7 +8,7 @@ Instead the component will only re-render each time that the relevant todo is (d
 
 ```javascript
 const TodoView = observer(({todo, editorState}) => {
-    const isSelected = mobservable.expr(() => editorState.selection === todo);
+    const isSelected = mobx.expr(() => editorState.selection === todo);
     return <div className={isSelected ? "todo todo-selected" : "todo"}>{todo.title}</div>;
 });
 ```

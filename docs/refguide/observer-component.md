@@ -1,11 +1,11 @@
 # @observer
 
 The `observer` function / decorator can be used to turn ReactJS components into reactive components.
-It wraps the component's render function in `mobservable.autorun` to make sure that any data that is used during the rendering of a component forces a rerendering upon change.
-It is available through the separate `mobservable-react` package.
+It wraps the component's render function in `mobx.autorun` to make sure that any data that is used during the rendering of a component forces a rerendering upon change.
+It is available through the separate `mobx-react` package.
 
 ```javascript
-import {observer} from "mobservable-react";
+import {observer} from "mobx-react";
 
 var timerData = observable({
 	secondsPassed: 0
@@ -48,8 +48,8 @@ If you need those, just use the normal React `state` object.
 The example above could also have been written as:
 
 ```javascript
-import {observer} from "mobservable-react";
-import {observable} from "mobservable";
+import {observer} from "mobx-react";
+import {observable} from "mobx";
 
 @observer class Timer extends React.Component {
 	@observable secondsPassed = 0;
@@ -68,9 +68,9 @@ import {observable} from "mobservable";
 React.render(<Timer timerData={timerData} />, document.body);
 ```
 
-### Mobservable-React-DevTools
+### MobX-React-DevTools
 
-In combination with `@observer` you can use the Mobservable-React-DevTools, it shows exactly when your components are rerendered and you can inspect the data dependencies of your components.
+In combination with `@observer` you can use the MobX-React-DevTools, it shows exactly when your components are rerendered and you can inspect the data dependencies of your components.
 
 ### Alternative syntaxes
 
@@ -90,4 +90,4 @@ const Timer = observer( ({timerData}) =>
 Decorators are not supported by default when using TypeScript or Babel pending a definitive definition in the ES standard.
 * For _typescript_, enable the `--experimentalDecorators` compiler flag or set the compiler option `experimentalDecorators` to `true` in `tsconfig.json` (Recommended)
 * For _babel5_, make sure `--stage 0` is passed to the babel CLI
-* For _babel6_, see the example configuration as suggested in this [issue](https://github.com/mweststrate/mobservable/issues/105)
+* For _babel6_, see the example configuration as suggested in this [issue](https://github.com/mobxjs/mobx/issues/105)

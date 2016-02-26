@@ -1,8 +1,8 @@
 # Best Practices for building large scale maintainable projects
 
-This section contains some best practices we discovered at Mendix while working with Mobservable.
+This section contains some best practices we discovered at Mendix while working with MobX.
 This section is opiniated and you are in no way forced to apply this practices.
-There are many ways of working with Mobservable and React, and this is just one of them.
+There are many ways of working with MobX and React, and this is just one of them.
 
 # Stores
 
@@ -49,7 +49,7 @@ For testing purposes, I recommend to just pass it through the component tree.
 Example of a store (using ES6 syntax):
 
 ```javascript
-import {extendObservable} from 'mobservable';
+import {extendObservable} from 'mobx';
 import jquery from 'jquery';
 
 class UiState {
@@ -118,7 +118,7 @@ There is no need to treat your client-side application state as some kind of dat
 Real references, cyclic data structures and instance methods are powerful concepts in javascript.
 Domain objects are allowed to refer directly to domain objects from other stores.
 Remember; we want to keep our actions and views as simple as possible and needing to manage references and doing garbage collection yourself might be a step backward.
-Unlike many flux architectures, with `mobservable` there is no need to denormalize your data, and this makes it a lot simpler to build the _essentially_ complex parts of your application:
+Unlike many flux architectures, with `mobx` there is no need to denormalize your data, and this makes it a lot simpler to build the _essentially_ complex parts of your application:
 Your business rules, actions and user interface.
 
 Domain objects can delegate all their logic to the store they belong to if that suits your application well.
@@ -136,7 +136,7 @@ Especially in large applications this is important.
 ### Example domain store
 
 ```javascript
-import {observable, autorun} from 'mobservable';
+import {observable, autorun} from 'mobx';
 import uuid from 'node-uuid';
 
 export class TodoStore {

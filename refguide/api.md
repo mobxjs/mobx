@@ -2,7 +2,7 @@ Disclaimer: this document is work in progress but reflects the latest 0.6 releas
 
 # Reference Guide
 
-Mobservable divides your application into three different concepts:
+MobX divides your application into three different concepts:
 
 1. State
 2. Views on your state
@@ -10,7 +10,7 @@ Mobservable divides your application into three different concepts:
 
 _State_ is is all the factual information that lives inside your application.
 This might be the profile of the user that is logged in, the tasks he needs to manage, or the fact that the sidebar currently collapsed.
-With Mobservable you can make your state reactive. This means that all derived views based on your state are updated automatically.
+With MobX you can make your state reactive. This means that all derived views based on your state are updated automatically.
 The first section of this api documentation describes how to [make data reactive](#making-state-reactive).
 
 _Views_ are all pieces of information that can be derived from the _State_ or its mutations.
@@ -19,10 +19,10 @@ Those are all forms of views.
 The second section describes how to [react to data changes](#reacting-to-state-changes).
 
 Finally your application has actions that _change state_.
-Mobservable does not dictate how to change your state.
-Instead of that, Mobservable tries to be as unobtrusive as possible.
+MobX does not dictate how to change your state.
+Instead of that, MobX tries to be as unobtrusive as possible.
 You can use mutable objects and arrays, real references, classes and cyclic data structures to store your state.
-With Mobservable you are free to mutate that state in any way you think is the best.
+With MobX you are free to mutate that state in any way you think is the best.
 
 Different examples of storing state in ES5, ES6, or TypeScript, using plain objects, constructor functions or classes can be found in the [syntax documentation](syntax.md).
 
@@ -32,7 +32,7 @@ The third section describes some [utility functions](#utility-functions) that mi
 
 ### makeReactive(data, options)
 
-`makeReactive` is the swiss knife of `mobservable`. It converts `data` to something reactive.
+`makeReactive` is the swiss knife of `mobx`. It converts `data` to something reactive.
 The following types are distinguished, details are described below.
 
 * `Primitive`: Any boolean, string, number, null, undefined, date, or regex.
@@ -89,7 +89,7 @@ var orderLine = makeReactive({
 });
 
 // observe is explained below,
-mobservable.observe(function() {
+mobx.observe(function() {
   console.log(orderline.total);
 });
 // prints: 10
@@ -101,7 +101,7 @@ orderLine.amount = 3;
 The recommended way to create reactive objects is to create a constructor function and use `extendReactive(this, properties)` inside the constructor;
 this keeps the responsibility of making an object inside the object and makes it impossible to accidentally use a non-reactive version of the object.
 However, some prefer to not use constructor functions at all in javascript applications.
-So Mobservable will work just as fine when using `makeReactive(plainObject)`.
+So MobX will work just as fine when using `makeReactive(plainObject)`.
 
 #### Complex objects
 
@@ -154,7 +154,7 @@ The second `options` parameter object is optional but can define using following
 
 More flags will be made available in the feature.
 
-`makeReactive` is the default export of the `mobservable` module, so you can use `mobservable(data, opts)` as a shorthand.
+`makeReactive` is the default export of the `mobx` module, so you can use `mobx(data, opts)` as a shorthand.
 
 ### extendReactive(target, properties)
 
@@ -190,8 +190,7 @@ Note that in ES6 the annotation can only be used on getter functions, as ES6 doe
 See also the [syntax section](syntax.md) to see how `@observable` can be combined with different flavors of javascript code.
 
 ```javascript
-/// <reference path="./node_modules/mobservable/dist/mobservable.d.ts"/>
-import {observable} from "mobservable";
+import {observable} from "mobx";
 
 class Order {
     @observable orderLines: OrderLine[] = [];
@@ -219,8 +218,8 @@ class OrderLine {
 ### makeReactive(function, options)
 
 Responding to changes in your state is simply the matter of passing a `function` that takes no parameters to `makeReactive`.
-Mobservable will track which reactive objects, array and other reactive functions are used by the provided function.
-Mobservable will call `function` again when any of those values have changed.
+MobX will track which reactive objects, array and other reactive functions are used by the provided function.
+MobX will call `function` again when any of those values have changed.
 
 This will happen in such a way one can never observe a stale output of `function`; updates are pushed synchronously.
 Invocations of `function` will only happen when none of its dependencies is stale, so that updates are atomic.
@@ -287,7 +286,7 @@ Fun fact: `observe(func)` is actually an alias for `makeReactive(func).observe(f
 
 ### reactiveComponent(component)
 
-`reactiveComponent` turns a ReactJS component into a reactive one and is provided through the separate (and minimal) `mobservable-react` package.
+`reactiveComponent` turns a ReactJS component into a reactive one and is provided through the separate (and minimal) `mobx-react` package.
 Making a component reactive means that it will automatically observe any reactive data it uses.
 
 It is quite similar to `@connect` as found in several flux libraries, yet there are two important differences.
@@ -300,7 +299,7 @@ Its overhead is neglectable and it makes sure that whenever you start using reac
 One exception are general purposes components that are not specific for your app. As these probably don't depend on the actual state of your application.
 For that reason it doesn't make sense to add `reactiveComponent` to them (unless their own state is expressed using reactive data structures as well).
 
-The `reactiveComponent` function / decorator supports both components that are constructed using `React.createClass` or using ES6 classes that extend `React.Component`. `reactiveComponent` is also available as mixin: `mobservable.reactiveMixin`.
+The `reactiveComponent` function / decorator supports both components that are constructed using `React.createClass` or using ES6 classes that extend `React.Component`. `reactiveComponent` is also available as mixin: `mobx.reactiveMixin`.
 
 `reactiveComponent` also prevents re-renderings when the *props* of the component have only shallowly changed, which makes a lot of sense if the data passed into the component is reactive.
 This behavior is similar to [React PureRender mixin](https://facebook.github.io/react/docs/pure-render-mixin.html), except that *state* changes are still always processed.
@@ -346,11 +345,11 @@ var MyComponent = reactiveComponent(function (props) {
 
 ### isReactive(value)
 
-Returns true if the given value was created or extended by mobservable. Note: this function cannot be used to tell whether a property is reactive; it will determine the reactiveness of its actual value.
+Returns true if the given value was created or extended by mobx. Note: this function cannot be used to tell whether a property is reactive; it will determine the reactiveness of its actual value.
 
 ### toJson(value)
 
-Converts a non-cyclic tree of observable objects into a JSON structure that is not observable. It is kind of the inverse of `mobservable.makeReactive`
+Converts a non-cyclic tree of observable objects into a JSON structure that is not observable. It is kind of the inverse of `mobx.makeReactive`
 
 ### transaction(workerFunction)
 
@@ -359,9 +358,9 @@ This is useful if you want to apply a bunch of different updates throughout your
 In practice, you will probably never need `.transaction`, since observables typically update wickedly fast.
 
 ```javascript
-var amount = mobservable(3);
-var price = mobservable(2.5);
-var total = mobservable(function() {
+var amount = mobx(3);
+var price = mobx(2.5);
+var total = mobx(function() {
     return amount() * price();
 });
 total.observe(console.log);
@@ -371,7 +370,7 @@ amount(2); // Prints 5
 price(3); // Prints 6
 
 // with transaction:
-mobservable.transaction(function() {
+mobx.transaction(function() {
     amount(3);
     price(4);
 });
@@ -382,7 +381,7 @@ mobservable.transaction(function() {
 
 Accepts something reactive and prints its current dependency tree; other reactive values it depends on. For observers, this method can be invoked on its disposer.
 Works for React components as well, but only if they are actually mounted (otherwise they won't be observing any data).
-For object properties, pass in the property name as second argument. `id` is unique and generated by mobservable.
+For object properties, pass in the property name as second argument. `id` is unique and generated by mobx.
 `name` and `context` are determined automatically, unless they were overriden in the options passed to `makeReactive`.
 The returned dependency tree is a recursive structure with the following signature:
 

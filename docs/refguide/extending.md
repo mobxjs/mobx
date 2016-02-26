@@ -4,8 +4,8 @@
 
 At some point you might want to have more data structures or other things (like streams) that can be used in reactive computations.
 Achieving that is pretty simple by using the `Atom` class.
-Atoms can be used to signal mobservable that some observable data source has been observed or changed.
-And mobservable will signal the atom whenever it is used or no longer in use.
+Atoms can be used to signal mobx that some observable data source has been observed or changed.
+And mobx will signal the atom whenever it is used or no longer in use.
 
 The following example demonstrates how you can create an observable `Clock`, which can be used in reactive functions,
 and returns the current date time.
@@ -14,7 +14,7 @@ This clock will only actually tick if it is observed by someone.
 The complete API of the `Atom` class is demonstrated by this example.
 
 ```javascript
-import {Atom, autorun} from "mobservable";
+import {Atom, autorun} from "mobx";
 
 class Clock {
 	atom;
@@ -22,7 +22,7 @@ class Clock {
 	currentDateTime;
 	
 	constructor() {
-		// creates an atom to interact with the mobservable core algorithm
+		// creates an atom to interact with the mobx core algorithm
 		this.atom =	new Atom(
 			// first param a name for this atom, for debugging purposes
 			"Clock",
@@ -35,7 +35,7 @@ class Clock {
 	}
 	
 	getTime() {
-		// let mobservable now this observable data source has been used
+		// let mobx now this observable data source has been used
 		this.atom.reportObserved();	
 		if (!this.intervalHandler) {
 			this.tick(); // do the initial tick
@@ -45,7 +45,7 @@ class Clock {
 	
 	tick() {
 		this.currentDateTime = new Date();
-		// let mobservable now that this data source has changed
+		// let mobx now that this data source has changed
 		this.atom.reportChanged();
 	}
 	

@@ -8,7 +8,7 @@ Note that `transaction` runs completely synchronously.
 Transactions can be nested. Only after completing the outermost `transaction` pending reactions will be run.
 
 ```javascript
-import {observable, transaction, autorun} from "mobservable";
+import {observable, transaction, autorun} from "mobx";
 
 const numbers = observable([]);
 

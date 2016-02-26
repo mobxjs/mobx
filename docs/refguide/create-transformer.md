@@ -22,7 +22,7 @@ This all might still be a bit vague, so here are two examples that explain this 
 
 ## Tracking mutable state using immutable, shared data structures.
 
-This example is taken from the [Reactive2015 conference demo](https://github.com/mweststrate/mobservable-reactive2015-demo):
+This example is taken from the [Reactive2015 conference demo](https://github.com/mobxjs/mobx-reactive2015-demo):
 
 ```javascript
 /*
@@ -67,7 +67,7 @@ the serializeBox transformation is executed and an entry containing box#3 and it
 2. Imagine that another box is added to the `store.boxes` list.
 This would cause the `serializeState` function to re-compute, resulting in a complete remapping of all the boxes.
 However, all the invocations of `serializeBox` will now return their old values from the memoization tables since their transformation functions didn't (need to) run again.
-3. Secondly, if somebody changes a property of box#3 this will cause the application of the `serializeBox` to box#3 to re-compute, just like any other reactive function in Mobservable.
+3. Secondly, if somebody changes a property of box#3 this will cause the application of the `serializeBox` to box#3 to re-compute, just like any other reactive function in MobX.
 Since the transformation will now produce a new json object based on box#3, all observers of that specific transformation will be forced to run again as well.
 The `serializeState` transformation in this case.
 `serializeState` will now produce a new value in turn and map all the boxes again. But except for box#3, all other boxes will be returned from the memoization table.
@@ -87,7 +87,7 @@ This can be used to transform an observable data graph into a another observable
 
 Here is small example that encodes a reactive file explorer that will update it's representation upon each change. 
 Data graphs that are built this way will in general react a lot faster and will consist of much more straight-forward code,
-in comparison to derived data graph that are updated using your own code. See the [performance tests](https://github.com/mweststrate/mobservable/blob/3ea1f4af20a51a1cb30be3e4a55ec8f964a8c495/test/perf/transform-perf.js#L4) for some examples.
+in comparison to derived data graph that are updated using your own code. See the [performance tests](https://github.com/mobxjs/mobx/blob/3ea1f4af20a51a1cb30be3e4a55ec8f964a8c495/test/perf/transform-perf.js#L4) for some examples.
 
 Unlike the previous example, the `transformFolder` will only run once as long as a folder remains visible;
 the `DisplayFolder` objects track the associated `Folder` objects themselves.

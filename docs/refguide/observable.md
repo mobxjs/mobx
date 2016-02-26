@@ -1,6 +1,6 @@
 # observable
 
-`observable` is to Mobservable as `$` is to jQuery.
+`observable` is to MobX as `$` is to jQuery.
 Making data observable starts with this function.
 If data is observable, views that depend on that data will update automatically.
 
@@ -13,7 +13,7 @@ but these are the available variations:
 For all type of values, with the exception of _plain objects_, _arrays_ and _functions without arguments_ this overload is run.
 `observable` accepts a value and returns an object with a getter / setter function that holds this value.
 Furthermore you can register a callback using its `.observe` method to listen to changes on the stored value.
-But in most cases it is better to use [`mobservable.autorun`](autorun.md) instead.
+But in most cases it is better to use [`mobx.autorun`](autorun.md) instead.
 
 So the signature of object returned by `observable(scalar)` is:
 * `.get()` Returns the current value.
@@ -23,7 +23,7 @@ So the signature of object returned by `observable(scalar)` is:
 Example:
 
 ```javascript
-import {observable} from "mobservable";
+import {observable} from "mobx";
 
 const cityName = observable("Vienna");
 
@@ -38,17 +38,17 @@ cityName.set("Amsterdam");
 // prints 'city: Vienna -> Amsterdam'
 ```
 
-N.B. in mobservable1 `cityName` would be a function. Invoking without arguments returns the current value. Invoking it with an argument updates it.
+N.B. in mobx1 `cityName` would be a function. Invoking without arguments returns the current value. Invoking it with an argument updates it.
 
 ## Expressions
 
 If an argumentless function is passed to `observable`,
-Mobservable will make sure that that function is run each time that any of the values used by the function is changed.
+MobX will make sure that that function is run each time that any of the values used by the function is changed.
 A new function is returned which has the same signature as the function returned for primitives, except that it is not allowed to assign a new value manually.
 
 Example:
 ```javascript
-import {observable} from "mobservable";
+import {observable} from "mobx";
 var name = observable("John");
 var age = observable(42);
 var showAge = observable(false);
@@ -84,26 +84,26 @@ console.log(labelText.get());
 Note how the function now automatically reacts to data changes,
 but only if they occurred in data that was actually used to produce the output.
 Hence the first change to `age` didn't result in a re-evaluation of the `labelText` function.
-Mobservable will automatically determine whether the function should run _eagerly_ or _lazily_ based on how the views are used throughout your application,
+MobX will automatically determine whether the function should run _eagerly_ or _lazily_ based on how the views are used throughout your application,
 so make sure your code doesn't rely on any side effects in those functions.
 
 
 ---
 
-These two forms of `observable`, one for primitives and references, and one for functions, form the core of Mobservable.
+These two forms of `observable`, one for primitives and references, and one for functions, form the core of MobX.
 The rest of the api is just syntactic sugar around these two core operations.
 Nonetheless, you will rarely use these forms; using objects is just a tat more convenient.
 
 ## Objects
 
 If a plain javascript object is passed to `observable` (that is, an object that wasn't created using a constructor function),
-Mobservable will recursively pass all its values through `observable`.
+MobX will recursively pass all its values through `observable`.
 This way the complete object (tree) is in-place instrumented to make it observable.
 
 So we can rewrite the previous example as:
 
 ```javascript
-import {observable, autorun} from "mobservable";
+import {observable, autorun} from "mobx";
 
 var person = observable({
 	name: "John",
@@ -115,7 +115,7 @@ var person = observable({
 };
 
 // object properties don't expose an 'observe' method,
-// but don't worry, 'mobservable.autorun' is even more powerful
+// but don't worry, 'mobx.autorun' is even more powerful
 autorun(() => console.log(person.labelText));
 
 person.name = "Dave";
@@ -142,7 +142,7 @@ Similar to objects, arrays can be made observable using `observable`.
 This works recursively as well, so all (future) values of the array will be observable as well.
 
 ```javascript
-import {observable, autorun} from "mobservable";
+import {observable, autorun} from "mobx";
 
 var todos = observable([
 	{ title: "Spoil tea", completed: true },

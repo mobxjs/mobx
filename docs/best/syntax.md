@@ -2,29 +2,15 @@
 
 Here are some examples show you how you can make the state of a simple todo application observable,
 using either plain objects or classes.
-Mobservable ships with TypeScript typings in the package (supported in TypeScript 1.6 and higher).
-So `import * as mobservable from "mobservable"` gives access to the strongly typed api without further imports.
-
-## Exposed TypeScript types
-
-The following types can be imported from the `"mobservable"` package to assist you with using strong types (the types will still be infered if needed, even if you don't import them).
-The full definitions can be found [here](https://github.com/mweststrate/mobservable/blob/master/src/interfaces.ts)
-
-* ObservableMap
-* Lambda (`() => void`).
-* IObservable
-* IObservableValue
-* IObservableArray
-* IArrayChange
-* IArraySplice
-* IObjectChange
+MobX ships with TypeScript typings in the package (supported in TypeScript 1.6 and higher).
+So `import * as mobx from "mobx"` gives access to the strongly typed api without further imports.
 
 ## Creating objects
 
 ### ES5 / ES6 / TS: Making plain objects observable
 
 ```javascript
-var todoStore = mobservable.observable({
+var todoStore = mobx.observable({
     todos: [{
           title: 'Find a clean mug',
           completed: true
@@ -44,7 +30,7 @@ If `TodoStore` is a constructor function that is typically invoked using the `ne
 
 ```javascript
 function TodoStore() {
-    mobservable.extendObservable(this, {
+    mobx.extendObservable(this, {
         todos: [{
             title: 'Find a clean mug',
             completed: true
@@ -81,7 +67,7 @@ class TodoStore {
 
 ## React components
 
-In combination with `@observer` decorator from the `mobservable-react` package:
+In combination with `@observer` decorator from the `mobx-react` package:
 
 ## Components in ES5
 
@@ -139,4 +125,4 @@ but it will also cause the `button` (or any other component) to be always re-ren
 Decorators are not supported by default when using TypeScript or Babel pending a definitive definition in the ES standard.
 * For _typescript_, enable the `--experimentalDecorators` compiler flag or set the compiler option `experimentalDecorators` to `true` in `tsconfig.json` (Recommended)
 * For _babel5_, make sure `--stage 0` is passed to the babel CLI
-* For _babel6_, see the example configuration as suggested in this [issue](https://github.com/mweststrate/mobservable/issues/105)
+* For _babel6_, see the example configuration as suggested in this [issue](https://github.com/mobxjs/mobx/issues/105)

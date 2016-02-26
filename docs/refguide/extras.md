@@ -1,4 +1,4 @@
-This are utilities exposed by mobservable which might come in handy at some point. But most probably you won't need them. Ever.
+This are utilities exposed by mobx which might come in handy at some point. But most probably you won't need them. Ever.
 
 ## SimpleEventEmitter
 
@@ -6,7 +6,7 @@ Constructorless class that can be used to register and emit events.
 Mainly here for internal purposes.
 
 ```javascript
-const eachSecondEvent = new mobservable.SimpleEventEmitter();
+const eachSecondEvent = new mobx.SimpleEventEmitter();
 
 setInterval(() => {
 	eachSecondEvent.emit(new Date(), Date.now());

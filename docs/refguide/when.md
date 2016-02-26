@@ -31,4 +31,4 @@ class MyResource {
 
 ```
 
-_In mobservable 1.0 this method was called `autorunUntil`._
+_In mobx 1.0 this method was called `autorunUntil`._

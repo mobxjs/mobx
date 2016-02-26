@@ -2,54 +2,53 @@
 
 ##### Which browsers are supported?
 
-Mobservable runs on any ES5 environment. That means that all browsers except IE8, Node.js and Rhine are supported. See [caniuse.com](http://caniuse.com/#feat=es5)
+MobX runs on any ES5 environment. That means that all browsers except IE8, Node.js and Rhine are supported. See [caniuse.com](http://caniuse.com/#feat=es5)
 
-##### Can Mobservable be combined with RxJS?
-Yes, see the [rx-mobservable](https://www.npmjs.com/package/rx-mobservable) interoperability package.
+##### Can MobX be combined with RxJS?
+Yes, see the [rx-mobx](https://www.npmjs.com/package/rx-mobx) interoperability package.
 
-##### When to use RxJS instead of Mobservable?
+##### When to use RxJS instead of MobX?
 For anything that involves explictly working with the concept of time such,
 or when you need to combine reason about the historical values / events of an observable (and not just th elatest) RxJs is recommended as it provides the more low level primitives.
-Whenever you want react to _state_ instead of _events_, Mobservable offers an easier and more high level approach.
+Whenever you want react to _state_ instead of _events_, MobX offers an easier and more high level approach.
+In practice, combining `RxJS` and `MobX` might result in really powerful constructions.
+Use for example `RxJS` to process and throttle user events and as a result of that update the state.
+If the state has been made observable by `mobx`, `mobx` will then take care of updating the UI and other derivations accordingly. 
 
 ##### Is React Native supported?
 
-Yes, `mobservable` and `mobservable-react` will work on React Native. The latter through importing `"mobservable-react/native"`.
+Yes, `mobx` and `mobx-react` will work on React Native. The latter through importing `"mobx-react/native"`.
 The devtools don't support React Native.
 
-##### How does Mobservable compare to other Reactive frameworks?
+##### How does MobX compare to other Reactive frameworks?
 
-See this [issue](https://github.com/mweststrate/mobservable/issues/18) for some considerations.
+See this [issue](https://github.com/mobxjs/mobx/issues/18) for some considerations.
 
-##### Is mobservable a framework?
+##### Is mobx a framework?
 
 Mobservabe is *not* a framework. It does not tell you how to structure your code, where to store state or how to process events. Yet it might free you from frameworks that poses all kinds of restrictions on your code in the name of performance.
 
-##### Does mobservable and mobservable-react work on react native?
+##### Does mobx and mobx-react work on react native?
 
 Yes.
 
-##### Can I combine mobservable with flux?
+##### Can I combine mobx with flux?
 
-Flux implementations that do not work on the assumption that the data in their stores is immutable should work well with mobservable.
-However, the need for flux is less when using mobservable.
-Mobservable already optimizes rendering and since it works with most kinds of data, including cycles and classes.
-So other programming paradigms like classic MVC are now can be easily applied in applications that combine ReactJS with mobservable.
+Flux implementations that do not work on the assumption that the data in their stores is immutable should work well with mobx.
+However, the need for flux is less when using mobx.
+MobX already optimizes rendering and since it works with most kinds of data, including cycles and classes.
+So other programming paradigms like classic MVC are now can be easily applied in applications that combine ReactJS with mobx.
 
-##### Can I use mobservable together with framework X?
+##### Can I use mobx together with framework X?
 
 Probably.
-Mobservable is framework agnostic and can be applied in any JS environment.
+MobX is framework agnostic and can be applied in any JS environment.
 It just ships with a small function to transform Reactjs components into reactive view functions for convenience.
-Mobservable works just as well server side, and is already combined with JQuery (see this [Fiddle](http://jsfiddle.net/mweststrate/vxn7qgdw)) and [Deku](https://gist.github.com/mattmccray/d8740ea97013c7505a9b).
-
-##### Why should I use Mobservable instead of reactive library X?
-
-See: https://github.com/mweststrate/mobservable/issues/18
+MobX works just as well server side, and is already combined with JQuery (see this [Fiddle](http://jsfiddle.net/mweststrate/vxn7qgdw)) and [Deku](https://gist.github.com/mattmccray/d8740ea97013c7505a9b).
 
 ##### Can I record states and re-hydrate them?
 
-Yes, see [createTransformer](http://mweststrate.github.io/mobservable/refguide/create-transformer.html) for some examples.
+Yes, see [createTransformer](http://mobxjs.github.io/mobx/refguide/create-transformer.html) for some examples.
 
 ##### Can you tell me how it works?
 

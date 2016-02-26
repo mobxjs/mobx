@@ -1,8 +1,8 @@
-# Mobservable
+# MobX
 
-* Introduction to Mobservable
-  * [Why Mobservable?](README.md)
-  * [The Gist of Mobservable](intro/overview.md)
+* Introduction to MobX
+  * [Why MobX?](README.md)
+  * [The Gist of MobX](intro/overview.md)
   * [Concepts & Principles](intro/concepts.md)
 * [Core API](refguide/api.md)
   * [observable](refguide/observable.md)
@@ -23,15 +23,15 @@
   * [transaction](refguide/transaction.md)
   * [untracked](refguide/untracked.md)
   * [when](refguide/when.md)
-  * [extending mobservable](refguide/extending.md)
+  * [extending mobx](refguide/extending.md)
   * [miscellaneous](refguide/extras.md)
 * Best Practices For Large Apps
   * [Definging data stores](best/store.md)
   * [Writing (async) actions](best/actions.md)
   * [Organizing React components](best/components.md)
 <!--  * Routing Universal applications -->
-* How does Mobservable work?
-  * [In depth explanation of Mobservable](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.gh651s1ta)
+* How does MobX work?
+  * [In depth explanation of MobX](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.gh651s1ta)
 * Tips & Tricks
   * [DevTools](best/devtools.md)
   * [ES5 / ES6 / TypeScript syntax](best/syntax.md)

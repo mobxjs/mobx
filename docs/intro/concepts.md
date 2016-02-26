@@ -2,7 +2,7 @@
 
 ## Concepts
 
-Mobservable distinguishes the following concepts in your application. You saw them in the previous gist, but let's dive into them in a bit more detail.
+MobX distinguishes the following concepts in your application. You saw them in the previous gist, but let's dive into them in a bit more detail.
 
 ### 1. State
 
@@ -29,7 +29,7 @@ An action is like a user that enters a new value in a spreadsheet cell.
 
 ## Principles
 
-Mobservable supports an uni-directional data flow where _actions_ changes the _state_, which in turn updates all affected _views_.
+MobX supports an uni-directional data flow where _actions_ changes the _state_, which in turn updates all affected _views_.
 
 ![Action, State, View](../images/action-state-view.png)
 
@@ -48,7 +48,7 @@ All _views_ should be **pure**. They are not supposed to change _state_.
 The following listing illustrates the above concepts and principles:
 
 ```javascript
-import {observable, autorun} from 'mobservable';
+import {observable, autorun} from 'mobx';
 
 var todoStore = observable({
 	/* some observable state */
@@ -80,4 +80,4 @@ todoStore.todos[0].completed = true;
 
 ```
 
-In the [5 minute introduction to Mobservable and React](https://mweststrate.github.io/mobservable/getting-started.html) you can dive deeper into this example and build an user interface using [React](https://facebook.github.io/react/) around it.
+In the [5 minute introduction to MobX and React](https://mobxjs.github.io/mobx/getting-started.html) you can dive deeper into this example and build an user interface using [React](https://facebook.github.io/react/) around it.

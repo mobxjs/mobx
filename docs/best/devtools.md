@@ -1,6 +1,6 @@
-# Mobservable + React DevTools
+# MobX + React DevTools
 
-Mobservable ships with DevTools that can be used to track the rendering behavior and data depenencies of your app.
+MobX ships with DevTools that can be used to track the rendering behavior and data depenencies of your app.
 
 ![devtools](../images/devtools.gif)
 
@@ -8,10 +8,10 @@ Mobservable ships with DevTools that can be used to track the rendering behavior
 
 Install:
 
-`npm install mobservable-react-devtools`
+`npm install mobx-react-devtools`
 
 To enable devtools, require the devtools somewhere in your code-base.
 
-`require('mobservable-react-devtools')`
+`require('mobx-react-devtools')`
 
-For more details check the [mobservable-react-devtools](https://github.com/mweststrate/mobservable-react-devtools) repository.
+For more details check the [mobx-react-devtools](https://github.com/mobxjs/mobx-react-devtools) repository.

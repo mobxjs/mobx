@@ -18,7 +18,7 @@ It is not needed to use the `new` keyword, `map` will always return a newly crea
 * `clear()`. Removes all entries from this map.
 * `size`. Returns the amount of entries in this map.
 
-The following functions are not in the ES6 spec but available in Mobservable:
-* `toJs()`. Returns a shallow plain object representation of this map. (For a deep copy use `mobservable.toJSON(map)`). 
+The following functions are not in the ES6 spec but available in MobX:
+* `toJs()`. Returns a shallow plain object representation of this map. (For a deep copy use `mobx.toJSON(map)`). 
 * `observe(listener)`. Registers a listener that fires upon each change in this map, similarly to the events that are emitted for [Object.observe](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe).
 * `merge(object | map)`. Copies all entries from the provided object into this map.
