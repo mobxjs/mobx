@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>autorunAsync | MobX</title>
+        <title>extending mobx | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.2.0">
@@ -29,10 +29,10 @@
         
     
     
-    <link rel="next" href="../refguide/create-transformer.html" />
+    <link rel="next" href="../refguide/extras.html" />
     
     
-    <link rel="prev" href="../refguide/observer-component.html" />
+    <link rel="prev" href="../refguide/when.html" />
     
 
         
@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="3.1" data-basepath=".." data-revision="Fri Feb 26 2016 11:38:16 GMT+0100 (CET)">
+    <div class="book" data-level="3.14" data-basepath=".." data-revision="Fri Feb 26 2016 11:38:16 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -217,7 +217,7 @@
             <ul class="articles">
                 
     
-        <li class="chapter active" data-level="3.1" data-path="refguide/autorun-async.html">
+        <li class="chapter " data-level="3.1" data-path="refguide/autorun-async.html">
             
                 
                     <a href="../refguide/autorun-async.html">
@@ -412,7 +412,7 @@
             
         </li>
     
-        <li class="chapter " data-level="3.14" data-path="refguide/extending.html">
+        <li class="chapter active" data-level="3.14" data-path="refguide/extending.html">
             
                 
                     <a href="../refguide/extending.html">
@@ -725,20 +725,95 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/autorun-async.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="autorunasync">autorunAsync</h1>
-<p><code>autorunAsync(action: () =&gt; void, minimumDelay?: number, scope?)</code></p>
-<p>Just like <code>autorun</code> except that the action won&apos;t be invoked synchronously but asynchronously after the minimum amount of milliseconds has passed.
-The <code>action</code> will be run and observed.
-However, instead of running the action immediately when the values observed by it have changed, the <code>minimumDelay</code> will be awaited before re-execution the <code>action</code> again.</p>
-<p>If observed values are changed multiple times while waiting, the action is still triggered only once, so in the sense it achieves a similar effect as a transaction.
-This might be useful for stuff that is expensive and doesn&apos;t need to happen synchronously; such as debouncing server communication.</p>
-<p>Returns a disposer to cancel the autorun.</p>
-<pre><code class="lang-javascript">autorunAsync(() =&gt; {
-    <span class="hljs-comment">// assuming that profile.asJson returns an observable json representation of profile,</span>
-    <span class="hljs-comment">// send it to the server each time it is changed, but await at least 300mseconds before sending it</span>
-    <span class="hljs-comment">// when send, the latest value of profile.asJson will be used.</span>
-    sendProfileToServer(profile.asJson);
-}, <span class="hljs-number">300</span>);
+                        <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/extending.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="creating-observable-data-structures-and-reactions">Creating observable data structures and reactions</h1>
+<h2 id="atoms">Atoms</h2>
+<p>At some point you might want to have more data structures or other things (like streams) that can be used in reactive computations.
+Achieving that is pretty simple by using the <code>Atom</code> class.
+Atoms can be used to signal mobx that some observable data source has been observed or changed.
+And mobx will signal the atom whenever it is used or no longer in use.</p>
+<p>The following example demonstrates how you can create an observable <code>Clock</code>, which can be used in reactive functions,
+and returns the current date time.
+This clock will only actually tick if it is observed by someone. </p>
+<p>The complete API of the <code>Atom</code> class is demonstrated by this example.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {Atom, autorun} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Clock</span> </span>{
+    atom;
+    intervalHandler = <span class="hljs-literal">null</span>;
+    currentDateTime;
+
+    constructor() {
+        <span class="hljs-comment">// creates an atom to interact with the mobx core algorithm</span>
+        <span class="hljs-keyword">this</span>.atom =    <span class="hljs-keyword">new</span> Atom(
+            <span class="hljs-comment">// first param a name for this atom, for debugging purposes</span>
+            <span class="hljs-string">&quot;Clock&quot;</span>,
+            <span class="hljs-comment">// second (optional) parameter: callback for when this atom transitions from unobserved to observed.</span>
+            () =&gt; <span class="hljs-keyword">this</span>.startTicking(),
+            <span class="hljs-comment">// third (optional) parameter: callback for when this atom transitions from observed to unobserved</span>
+            <span class="hljs-comment">// note that the same atom transition multiple times between these two states</span>
+            () =&gt; <span class="hljs-keyword">this</span>.stopTicking()
+        ); 
+    }
+
+    getTime() {
+        <span class="hljs-comment">// let mobx now this observable data source has been used</span>
+        <span class="hljs-keyword">this</span>.atom.reportObserved();    
+        <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.intervalHandler) {
+            <span class="hljs-keyword">this</span>.tick(); <span class="hljs-comment">// do the initial tick</span>
+        }
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.currentDateTime;
+    }
+
+    tick() {
+        <span class="hljs-keyword">this</span>.currentDateTime = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>();
+        <span class="hljs-comment">// let mobx now that this data source has changed</span>
+        <span class="hljs-keyword">this</span>.atom.reportChanged();
+    }
+
+    startTicking() {
+        <span class="hljs-keyword">this</span>.intervalHandler = setInterval(
+            () =&gt; <span class="hljs-keyword">this</span>.tick(), 
+            <span class="hljs-number">1000</span>
+        );
+    }
+
+    stopTicking() {
+        clearInterval(<span class="hljs-keyword">this</span>.intervalHandler);
+        <span class="hljs-keyword">this</span>.intervalHandler = <span class="hljs-literal">null</span>;    
+    }
+}
+
+<span class="hljs-keyword">const</span> clock = <span class="hljs-keyword">new</span> Clock();
+
+<span class="hljs-keyword">const</span> disposer = autorun(() =&gt; <span class="hljs-built_in">console</span>.log(clock.getTime()));
+
+<span class="hljs-comment">// ... prints the time each second</span>
+
+disposer();
+
+<span class="hljs-comment">// printing stops. If nobody else uses the same `clock` the clock will stop ticking as well.</span>
+</code></pre>
+<h2 id="reactions">Reactions</h2>
+<p><code>Reaction</code> allows you to create your own &apos;auto runner&apos;.
+Reactions track a function and signal when they function should be executed again because one or more dependencies have changed, in which case, for example, 
+the function should be re-executed. </p>
+<p>This is for example how <code>autorun</code> is defined using <code>Reaction</code>:</p>
+<pre><code class="lang-typescript"><span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">autorun</span>(<span class="hljs-params">view: Lambda, scope?: <span class="hljs-built_in">any</span></span>) </span>{
+    <span class="hljs-keyword">if</span> (scope)
+        view = view.bind(scope);
+
+    <span class="hljs-keyword">const</span> reaction = <span class="hljs-keyword">new</span> Reaction(view.name || <span class="hljs-string">&quot;Autorun&quot;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">this</span>.track(view);
+    });
+
+    <span class="hljs-comment">// Start or schedule the just created reaction</span>
+    <span class="hljs-keyword">if</span> (isComputingDerivation() || globalState.inTransaction &gt; <span class="hljs-number">0</span>)
+        globalState.pendingReactions.push(reaction);
+    <span class="hljs-keyword">else</span>
+        reaction.runReaction();
+
+    <span class="hljs-keyword">return</span> reaction.getDisposer();
+}
 </code></pre>
 
                     
@@ -750,10 +825,10 @@ This might be useful for stuff that is expensive and doesn&apos;t need to happen
         </div>
 
         
-        <a href="../refguide/observer-component.html" class="navigation navigation-prev " aria-label="Previous page: @observer"><i class="fa fa-angle-left"></i></a>
+        <a href="../refguide/when.html" class="navigation navigation-prev " aria-label="Previous page: when"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../refguide/create-transformer.html" class="navigation navigation-next " aria-label="Next page: createTransformer"><i class="fa fa-angle-right"></i></a>
+        <a href="../refguide/extras.html" class="navigation navigation-next " aria-label="Next page: miscellaneous"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

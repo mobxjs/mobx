@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>autorunAsync | MobX</title>
+        <title>untracked | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.2.0">
@@ -29,10 +29,10 @@
         
     
     
-    <link rel="next" href="../refguide/create-transformer.html" />
+    <link rel="next" href="../refguide/when.html" />
     
     
-    <link rel="prev" href="../refguide/observer-component.html" />
+    <link rel="prev" href="../refguide/transaction.html" />
     
 
         
@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="3.1" data-basepath=".." data-revision="Fri Feb 26 2016 11:38:16 GMT+0100 (CET)">
+    <div class="book" data-level="3.12" data-basepath=".." data-revision="Fri Feb 26 2016 11:38:16 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -217,7 +217,7 @@
             <ul class="articles">
                 
     
-        <li class="chapter active" data-level="3.1" data-path="refguide/autorun-async.html">
+        <li class="chapter " data-level="3.1" data-path="refguide/autorun-async.html">
             
                 
                     <a href="../refguide/autorun-async.html">
@@ -382,7 +382,7 @@
             
         </li>
     
-        <li class="chapter " data-level="3.12" data-path="refguide/untracked.html">
+        <li class="chapter active" data-level="3.12" data-path="refguide/untracked.html">
             
                 
                     <a href="../refguide/untracked.html">
@@ -725,20 +725,31 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/autorun-async.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="autorunasync">autorunAsync</h1>
-<p><code>autorunAsync(action: () =&gt; void, minimumDelay?: number, scope?)</code></p>
-<p>Just like <code>autorun</code> except that the action won&apos;t be invoked synchronously but asynchronously after the minimum amount of milliseconds has passed.
-The <code>action</code> will be run and observed.
-However, instead of running the action immediately when the values observed by it have changed, the <code>minimumDelay</code> will be awaited before re-execution the <code>action</code> again.</p>
-<p>If observed values are changed multiple times while waiting, the action is still triggered only once, so in the sense it achieves a similar effect as a transaction.
-This might be useful for stuff that is expensive and doesn&apos;t need to happen synchronously; such as debouncing server communication.</p>
-<p>Returns a disposer to cancel the autorun.</p>
-<pre><code class="lang-javascript">autorunAsync(() =&gt; {
-    <span class="hljs-comment">// assuming that profile.asJson returns an observable json representation of profile,</span>
-    <span class="hljs-comment">// send it to the server each time it is changed, but await at least 300mseconds before sending it</span>
-    <span class="hljs-comment">// when send, the latest value of profile.asJson will be used.</span>
-    sendProfileToServer(profile.asJson);
-}, <span class="hljs-number">300</span>);
+                        <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/untracked.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="untracked">Untracked</h1>
+<p><em>Untracked is an experimental feature that might or might not be useful. If you use this feature in production, please report it here:
+<a href="https://github.com/mobxjs/mobx/issues/49" target="_blank">https://github.com/mobxjs/mobx/issues/49</a>, otherwise it might be removed in a future minor release.</em></p>
+<p>Untracked allows you to run a piece of code without establishing observers. For example:</p>
+<pre><code class="lang-javascript">
+<span class="hljs-keyword">const</span> person = observable({
+    firstName: <span class="hljs-string">&quot;Michel&quot;</span>,
+    lastName: <span class="hljs-string">&quot;Weststrate&quot;</span>
+});
+
+autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(
+        person.lastName,
+        <span class="hljs-string">&quot;,&quot;</span>,
+        <span class="hljs-comment">// this untracked block will return the person&apos;s firstName without establishing a dependency</span>
+        untracked(() =&gt; person.firstName)
+    );        
+});
+<span class="hljs-comment">// prints: Weststrate, Michel</span>
+
+person.firstName = <span class="hljs-string">&quot;G.K.&quot;</span>;
+<span class="hljs-comment">// doesn&apos;t print!</span>
+
+person.lastName = <span class="hljs-string">&quot;Chesterton&quot;</span>;
+<span class="hljs-comment">// prints: Chesterton, G.K.</span>
 </code></pre>
 
                     
@@ -750,10 +761,10 @@ This might be useful for stuff that is expensive and doesn&apos;t need to happen
         </div>
 
         
-        <a href="../refguide/observer-component.html" class="navigation navigation-prev " aria-label="Previous page: @observer"><i class="fa fa-angle-left"></i></a>
+        <a href="../refguide/transaction.html" class="navigation navigation-prev " aria-label="Previous page: transaction"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../refguide/create-transformer.html" class="navigation navigation-next " aria-label="Next page: createTransformer"><i class="fa fa-angle-right"></i></a>
+        <a href="../refguide/when.html" class="navigation navigation-next " aria-label="Next page: when"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

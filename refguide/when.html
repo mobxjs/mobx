@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>autorunAsync | MobX</title>
+        <title>when | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.2.0">
@@ -29,10 +29,10 @@
         
     
     
-    <link rel="next" href="../refguide/create-transformer.html" />
+    <link rel="next" href="../refguide/extending.html" />
     
     
-    <link rel="prev" href="../refguide/observer-component.html" />
+    <link rel="prev" href="../refguide/untracked.html" />
     
 
         
@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="3.1" data-basepath=".." data-revision="Fri Feb 26 2016 11:38:16 GMT+0100 (CET)">
+    <div class="book" data-level="3.13" data-basepath=".." data-revision="Fri Feb 26 2016 11:38:16 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -217,7 +217,7 @@
             <ul class="articles">
                 
     
-        <li class="chapter active" data-level="3.1" data-path="refguide/autorun-async.html">
+        <li class="chapter " data-level="3.1" data-path="refguide/autorun-async.html">
             
                 
                     <a href="../refguide/autorun-async.html">
@@ -397,7 +397,7 @@
             
         </li>
     
-        <li class="chapter " data-level="3.13" data-path="refguide/when.html">
+        <li class="chapter active" data-level="3.13" data-path="refguide/when.html">
             
                 
                     <a href="../refguide/when.html">
@@ -725,21 +725,33 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/autorun-async.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="autorunasync">autorunAsync</h1>
-<p><code>autorunAsync(action: () =&gt; void, minimumDelay?: number, scope?)</code></p>
-<p>Just like <code>autorun</code> except that the action won&apos;t be invoked synchronously but asynchronously after the minimum amount of milliseconds has passed.
-The <code>action</code> will be run and observed.
-However, instead of running the action immediately when the values observed by it have changed, the <code>minimumDelay</code> will be awaited before re-execution the <code>action</code> again.</p>
-<p>If observed values are changed multiple times while waiting, the action is still triggered only once, so in the sense it achieves a similar effect as a transaction.
-This might be useful for stuff that is expensive and doesn&apos;t need to happen synchronously; such as debouncing server communication.</p>
-<p>Returns a disposer to cancel the autorun.</p>
-<pre><code class="lang-javascript">autorunAsync(() =&gt; {
-    <span class="hljs-comment">// assuming that profile.asJson returns an observable json representation of profile,</span>
-    <span class="hljs-comment">// send it to the server each time it is changed, but await at least 300mseconds before sending it</span>
-    <span class="hljs-comment">// when send, the latest value of profile.asJson will be used.</span>
-    sendProfileToServer(profile.asJson);
-}, <span class="hljs-number">300</span>);
+                        <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/when.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="when">when</h1>
+<p><code>when(predicate: () =&gt; boolean, effect: () =&gt; void, scope?)</code></p>
+<p><code>when</code> observes &amp; runs the given <code>predicate</code> until it returns true.
+Once that happens, the given <code>effect</code> is executed and the autorunner is disposed.
+The function returns a disposer to cancel the autorunner prematurely.</p>
+<p>This function is really useful to dispose or cancel stuff in a reactive way.
+For example:</p>
+<pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyResource</span> </span>{
+    constructor() {
+        when(
+            <span class="hljs-comment">// once...</span>
+            () =&gt; !<span class="hljs-keyword">this</span>.isVisible,
+            <span class="hljs-comment">// ... then</span>
+            () =&gt; <span class="hljs-keyword">this</span>.dispose()
+        );
+    }
+
+    @observable get isVisible() {
+        <span class="hljs-comment">// indicate whether this item is visible</span>
+    }
+
+    dispose() {
+        <span class="hljs-comment">// dispose</span>
+    }
+}
 </code></pre>
+<p><em>In mobx 1.0 this method was called <code>autorunUntil</code>.</em></p>
 
                     
                     </section>
@@ -750,10 +762,10 @@ This might be useful for stuff that is expensive and doesn&apos;t need to happen
         </div>
 
         
-        <a href="../refguide/observer-component.html" class="navigation navigation-prev " aria-label="Previous page: @observer"><i class="fa fa-angle-left"></i></a>
+        <a href="../refguide/untracked.html" class="navigation navigation-prev " aria-label="Previous page: untracked"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../refguide/create-transformer.html" class="navigation navigation-next " aria-label="Next page: createTransformer"><i class="fa fa-angle-right"></i></a>
+        <a href="../refguide/extending.html" class="navigation navigation-next " aria-label="Next page: extending mobx"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>
