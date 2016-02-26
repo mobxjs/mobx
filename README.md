@@ -113,7 +113,7 @@ This can be done in a Flux like manner.
 Or by processing events using RxJS.
 Or by simply handling events in the most straightforward way possible, as demonstrated in the above `onClick` handler.
 In the end it all boils down to: Somehow the state should be updated.
-After updating the state,t `MobX` will take care of the rest, in an efficient, glitch-free manner.
+After updating the state, `MobX` will take care of the rest, in an efficient, glitch-free manner.
 So simple statements like below are enough to automatically update the user interface.
 There is no technical need for firing events, calling dispatcher or what more.
 A React component is in the end nothing more than a fancy representation of your state.
@@ -141,7 +141,7 @@ Since data doesn't need to be normalized, and MobX automatically tracks the rela
 As demonstrated above, modifying state when using MobX is very straightforward. You simply write down your intentions. MobX will take care of the rest.
 
 ### Fine grained observability is efficient
-MobX builds a graph of all the derivations in your application to find the least amount of re-computations that is needed to prevent staleness. "Derive everything" migh sound expensive, MobX builds a virtual derivation graph to minimize the amount re-computations need to keep derivations in sync with the state. In fact, when testing MobX at Mendix we found out that using this library to track the relations in our code is often a lot more efficient then pushing changes through our application by using handwritten events or "smart" selector based container components.
+MobX builds a graph of all the derivations in your application to find the least amount of re-computations that is needed to prevent staleness. "Derive everything" might sound expensive, MobX builds a virtual derivation graph to minimize the amount re-computations need to keep derivations in sync with the state. In fact, when testing MobX at Mendix we found out that using this library to track the relations in our code is often a lot more efficient then pushing changes through our application by using handwritten events or "smart" selector based container components.
 The simple reason is that MobX will establish far more fine grained 'listeners' on your data then you would do as a programmer.
 Secondly MobX sees the causality between derivations so it can order them in such a way that no derivation has to run twice or introduces a glitch.
 How that works? See this [in-depth explanation of MobX](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.a2j1rww8g).
