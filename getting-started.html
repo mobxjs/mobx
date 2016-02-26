@@ -4,13 +4,13 @@
 <head>
   <meta charset='utf-8'>
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
-  <meta name="description" content="Five minute introduction to Mobservable + React">
+  <meta name="description" content="Five minute introduction to MobX + React">
 
   <link rel="stylesheet" type="text/css" media="screen" href="getting-started-assets/stylesheets/stylesheet.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.1.1/gh-fork-ribbon.min.css" />
   <link rel="shortcut icon" type="image/png" href="getting-started-assets/images/favicon.png"/>
 
-  <title>mobservable</title>
+  <title>MobX: Five minute introduction</title>
   <style>
        textarea {
           width: 600px;
@@ -164,7 +164,7 @@
     <!-- TOP RIGHT RIBBON: START COPYING HERE -->
 <div class="github-fork-ribbon-wrapper right">
     <div class="github-fork-ribbon">
-        <a href="https://github.com/mweststrate/mobservable">Fork me on GitHub</a>
+        <a href="https://github.com/mobxjs/mobx">Fork me on GitHub</a>
     </div>
 </div>
 <!-- TOP RIGHT RIBBON: END COPYING HERE -->
@@ -185,8 +185,8 @@
     <header class="inner">
 
       <a href="index.html"><img src="getting-started-assets/images/mobservable.png" id="logo" /></a>
-      <h1 id="project_title">Mobservable</h1>
-      <h2 id="project_tagline">Five minute introduction to Mobservable + React</h2>
+      <h1 id="project_title">MobX</h1>
+      <h2 id="project_tagline">Five minute introduction to MobX + React</h2>
       <hr/>
     </header>
   </div>
@@ -195,11 +195,11 @@
   <div id="main_content_wrap" class="outer">
     <section id="main_content" class="inner">
                     <h3 id="getting-started">Introduction</h3>
-                    <p><code>Mobservable</code> is a library to create reactive state and views.
-                        Mobservable updates views automatically when the state changes,
+                    <p><code>MobX</code> is a library to create reactive state and views.
+                        MobX updates views automatically when the state changes,
                         and thereby achieves <a target="-_blank" href="https://en.wikipedia.org/wiki/Inversion_of_control">inversion of control</a>.
                         This has major benefits for the simplicity, maintainability and performance of your code.
-                        This is <em>the promise of Mobservable</em>:
+                        This is <em>the promise of MobX</em>:
                         <!--This removes boilerplate code from your app.
                         You can drop all the interface refreshes, state subscriptions and data cursors!-->
                         <p/>
@@ -278,15 +278,15 @@ What if the data used in the report would make sure our report prints automatica
 Then we would have achieved inversion of control!
 </p>
 <p>
-That is exactly what Mobservable can do for you.
+That is exactly what MobX can do for you.
 Automatically execute code that solely depends on state.
 To achieve that, the <code>TodoStore</code> has to become reactive.
 Let's alter the constructor function just enough to achieve that:</p>
 
 <textarea spellcheck="false" class="prettyprint" id="code3" rows="8">
 function ObservableTodoStore() {
-    this.todos = mobservable.observable([]);
-    mobservable.autorun(function() {
+    this.todos = mobx.observable([]);
+    mobx.autorun(function() {
         console.log(this.report());
     }, this);
 }
@@ -329,9 +329,9 @@ Because the report did not <em>actually</em> change as a result of the rename, a
 They will not re-render automatically when their underlying data changes.
 So you need to either call <code>setState</code> or you need to maintain data subscriptions or cursors to update your components.</p>
 
-<p>To avoid such boilerplate, the <code>mobservable-react</code> package provides the <code>observer</code> decorator that turns any component into an observer.
+<p>To avoid such boilerplate, the <code>mobx-react</code> package provides the <code>observer</code> decorator that turns any component into an observer.
 From there on, you never have to worry about when to update your component!  Just like what we did with the <code>report</code> function.
-As shown below, Mobservable will determine the smallest amount of components that need an update.
+As shown below, MobX will determine the smallest amount of components that need an update.
 So reactive components render <a target="_blank" href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/">extremely efficient</a>.
 </p>
 
@@ -344,7 +344,7 @@ function renderTodoApp() {
         document.getElementById('reactjs-app'));
 }
 
-var TodoList = mobservableReact.observer(React.createClass({
+var TodoList = mobxReact.observer(React.createClass({
     displayName: 'TodoList',
 
     render: function() {
@@ -366,7 +366,7 @@ var TodoList = mobservableReact.observer(React.createClass({
     }
 }));
 
-var TodoView = mobservableReact.observer(React.createClass({
+var TodoView = mobxReact.observer(React.createClass({
     displayName: 'TodoView',
 
     render: function() {
@@ -395,7 +395,7 @@ renderTodoApp();
 <button onClick="runCode(['#code1', '#code3', '#code4', '#react1'])" class="btn-run">Run code</button>
 
 <p>That's it! No boilerplate! Just some simple, declarative components that form our complete UI.
-    You are now ready to start using <code>mobservable</code> in your own applications.
+    You are now ready to start using <code>mobx</code> in your own applications.
     Feel free to fiddle around by adjusting the  above components.
     Or alter the data using the listing below.
     The counters on the right show how many times each part of the UI is re-rendered.
@@ -412,10 +412,9 @@ observableTodoStore.todos[observableTodoStore.todos.length] = { task: "Find a fi
 <h3 id="learn-more">Learn more</32>
 <p>Intrigued? Here are some useful resources:</p>
 <ul>
-    <li><a href="index.html">Mobservable</a> homepage</li>
-    <li>Join the #mobservable discussion on the reactiflux <a href="https://reactiflux.slack.com/messages/mobservable/" target="_blank">slack channel</a>.
-    <li>The <a href="https://github.com/mweststrate/mobservable" target="_blank">git repository</a>.</li>
-    <li>A <a href="https://github.com/mweststrate/react-mobservable-boilerplate" target="_blank">React mobservable boilerplate</a> project.</li>
+    <li><a href="index.html">MobX</a> homepage</li>
+    <li>The <a href="https://github.com/mobxjs/mobx" target="_blank">git repository</a>.</li>
+    <li>A <a href="https://github.com/mobxjs/react-mobx-boilerplate" target="_blank">React mobx boilerplate</a> project.</li>
     <li>The original <a href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/" target="_blank">blog post</a> introducing reactive react.</li>
     <li>A full CRUD webshop on <a href="https://jsfiddle.net/mweststrate/46vL0phw" target="_blank">JSFiddle</a>.</li>
 </ul>
@@ -423,10 +422,10 @@ observableTodoStore.todos[observableTodoStore.todos.length] = { task: "Find a fi
 <ul>
     <p><em>&ldquo;Elegant! I love it!&rdquo;</em>
         <div style="text-align:right">&dash; Johan den Haan, CTO of Mendix</div><br/></p>
-    <p><em>&ldquo;We ported the book Notes and Kanban examples to Mobservable. Check out <a href="https://github.com/survivejs/mobservable-demo" target="_blank">the source</a> to see how this worked out. Compared to the original I was definitely positively surprised. Mobservable seems like a good fit for these problems.&rdquo;
+    <p><em>&ldquo;We ported the book Notes and Kanban examples to MobX (Mobservable). Check out <a href="https://github.com/survivejs/mobservable-demo" target="_blank">the source</a> to see how this worked out. Compared to the original I was definitely positively surprised. MobX seems like a good fit for these problems.&rdquo;
         </em>
         <div style="text-align:right">&dash; Juho Vepsäläinen, <br/>author of "SurviveJS - Webpack and React" and jster.net curator</div><br/></p>
-    <p><em>&ldquo;Great job with Mobservable! Really gives current conventions and libraries a run for their money.&rdquo;</em>
+    <p><em>&ldquo;Great job with MobX! Really gives current conventions and libraries a run for their money.&rdquo;</em>
         <div style="text-align:right">&dash; Daniel Dunderfelt</div><br/></p>
     <p><em>&ldquo;I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated.&rdquo;</em>
         <div style="text-align:right">&dash; David Schalk</div><br/></p>
@@ -434,8 +433,8 @@ observableTodoStore.todos[observableTodoStore.todos.length] = { task: "Find a fi
 
 
 <div style="text-align:center;">
-  <a class="github-button" href="https://github.com/mweststrate/mobservable" data-icon="octicon-star" data-style="small" data-count-href="/mweststrate/mobservable/stargazers" data-count-api="/repos/mweststrate/mobservable#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star mweststrate/mobservable on GitHub">Star</a>
-  <a href="https://twitter.com/share" class="twitter-share-button" data-via="mweststrate" data-hashtags="mobservable">Tweet</a>
+  <a class="github-button" href="https://github.com/mobxjs/mobx" data-icon="octicon-star" data-style="small" data-count-href="/mobxjs/mobx/stargazers" data-count-api="/repos/mobxjs/mobx#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star mobxjs/mobx on GitHub">Star</a>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-via="mweststrate" data-hashtags="mobx">Tweet</a>
 </div>
 
  </div>
@@ -446,7 +445,7 @@ observableTodoStore.todos[observableTodoStore.todos.length] = { task: "Find a fi
         <!-- FOOTER  -->
         <div id="footer_wrap" class="outer">
           <footer class="inner">
-            <p class="copyright">mobservable maintained by <a href="https://github.com/mweststrate">mweststrate</a></p>
+            <p class="copyright">mobx maintained by <a href="https://github.com/mweststrate">mweststrate</a></p>
             <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
           </footer>
         </div>
@@ -458,8 +457,8 @@ observableTodoStore.todos[observableTodoStore.todos.length] = { task: "Find a fi
         <script src="getting-started-assets/javascripts/codemirror/javascript/javascript.js"></script>
         <script src="getting-started-assets/javascripts/react-with-addons.js"></script>
         <script src="getting-started-assets/javascripts/JSXTransformer.js"></script>
-        <script src="getting-started-assets/javascripts/mobservable.js"></script>
-        <script src="getting-started-assets/javascripts/mobservable-react.js"></script>
+        <script src="getting-started-assets/javascripts/mobx.umd.js"></script>
+        <script src="getting-started-assets/javascripts/mobx-react.js"></script>
 
         <script type="text/javascript">
         var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
