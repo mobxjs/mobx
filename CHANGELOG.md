@@ -1,9 +1,20 @@
 # 2.0.0
 
-Welcome to ~Mobservable~ MobX 2! First of all, there is the name change. Secondly, migrating from Mobservable 1 should be pretty straight-forward as the public api is largely the same.
+## A new name...
+Welcome to ~Mobservable~ MobX 2! First of all, there is the name change.
+The new name is shorter and funnier and it has the right emphasis: MobX is about reactive programming.
+Not about observability of data structures, which is just a technical necessity.
+MobX now has its own [mobxjs](https://github.com/mobxjs) organization on GitHub. Just report an issue if you want to join.
+
+All MobX 2.0 two compatible packages and repo's have been renamed. So `mobx-react`, `mobx-react-devtools` etc.
+For the 1.0 versions, use the old `mobservable` based names.
+
+## Migrating from Mobservable 1.x to MobX 2.0
+
+Migrating from Mobservable should be pretty straight-forward as the public api is largely the same.
 However there are some conceptual changes which justifies a Major version bump as it might alter the behavior of MobX in edge cases.
-Besides that, MobX is just a large collection of minor improvements over Mobservable 1.
-So enjoy!  
+Besides that, MobX is just a large collection of minor improvements over Mobservable.
+Make sure to remove your old `mobservable` dependencies when installing the new `mobx` dependencies!
 
 ## `autorun`'s are now allowed to cause cycles!
 `autorun` is now allowed to have cycles. In Mobservable 1 an exception was thrown as soon as an autorun modified a variable which it was reading as well.  
@@ -12,7 +23,7 @@ This is fine as long as the autorun terminates within a reasonable amount of ite
 This should avoid the need for work-arounds involving `setTimeout` etc.
 Note that computed values (created using `observable(func)` are still not allowed to have cycles.
 
-## [Breaking] `observable(primitive)` returns an object instead of a function.
+## [Breaking] `observable(scalar)` returns an object instead of a function and has been deprecated.
 
 Creating an observable from a primitive or a reference no longer returns a getter/setter function, but a method with a `.get` and `.set` method.
 This is less confusing, easier to debug and more efficient.
@@ -24,22 +35,30 @@ temperature.set(15); // previously: temperature(15)
 temperature.get();   // previously: temperature()
 ```
 
-The `.observe` method is still available on observable scalars but deprecated. Use `mobx.observe(observable, listener)` instead.
-Note that often `.autorun` is a more powerful alternative to `.observe`.
+`observable(scalar)` has been deprecated to make the api smaller and the syntax more uniform. In practice having observable objects, arrays and decorators seems to suffice in 99% of the cases. Deprecating this functionality means that people have simply less concepts to learn. Probably creating observable scalars will continue to work for a long time, as it is important to the internals of MobX and very convenient for testing.
+
+## Introduced `@computed`
+
+MobX introduced the `@computed` decorator for ES6 class properties with getter functions.
+It does technically the same as `@observable` for getter properties. But having a separate decorator makes it easier to communicate about the code.
+`@observable` is for mutable state properties, `@computed` is for derived values.
+
+`@computed` can now also be parameterized. `@computed({asStructure: true})` makes sure that the result of a derivation is compared structurally instead of referentially with its preview value. This makes sure that observers of the computation don't re-evaluate if new structures are returned that are structurally equal to the original ones. This is very useful when working with point, vector or color structures for example. It behaves the same as the `asStructure` modifier for observable values.
+
+`@computed` properties are no longer enumerable.
 
 ## MobX is now extensible!
 
 The core algorithm of MobX has been largely rewritten to improve the clarity, extensibility, performance and stability of the source code.
 It is now possible to define your own custom observable data sources by using the `Atom` class.
-It is also possible to create your own reactive functinos using the `Reaction` class. `autorun`, `autorunAsync` and `@observer` have now all been implemented using the concept of Reactions.
-So feel free to write your own reactive constructions!
-(both [Atom](https://github.com/mobx/mobservable/blob/master/src/core/atom.ts) and [Reaction](https://github.com/mobx/mobservable/blob/master/src/core/reaction.ts) will be documented in more detail soon, but the source code should already be pretty self explanatory).
+It is also possible to create your own reactive functions using the `Reaction` class. `autorun`, `autorunAsync` and `@observer` have now all been implemented using the concept of Reactions.
+So feel free to write your own reactive [constructions](http://mobxjs.github.io/mobx/refguide/extending.html)!
 
 ## Mobservable now fails fast
 
-In Mobservable 1 exceptions would be caught and sometimes rethrown after logging them.
+In Mobservable 1 exceptions would be caught and sometimes re-thrown after logging them.
 This was confusing and not all derivations were able to recover from these exceptions.
-In MobX 2 it is no longer allowed for a computed function or autorun to throw an exception. 
+In MobX 2 it is no longer allowed for a computed function or `autorun` to throw an exception. 
 
 ## Improved build
 
@@ -57,12 +76,8 @@ In MobX 2 it is no longer allowed for a computed function or autorun to throw an
 * Renamed `extras.SimpleEventEmitter` to `SimpleEventEmitter`
 * Removed already deprecated methods: `isReactive`, `makeReactive`, `observeUntil`, `observeAsync`
 * Removed `extras.getDNode`
-* invoking `ObservableArray.peek` is no longer registered as listener
+* Invoking `ObservableArray.peek` is no longer registered as listener
 * Deprecated `untracked`. It wasn't documented and nobody seems to miss it.
-* Introduced `@computed` as replacement for `@observable` on getter properties to make a clearer distinction between observable state values and derived values. 
-* @computed({ asStructure: boolean })
-* @computed properties are no longer enumerable by default
-* Deprecated `observable(scalar)`
 
 # 1.2.5
 

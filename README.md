@@ -9,7 +9,9 @@
 [![Join the chat at https://gitter.im/mobxjs/mobx](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mobxjs/mobx?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![#mobservable channel on reactiflux discord](https://img.shields.io/badge/discord-%23mobx%20%40reactiflux-blue.svg)](https://discord.gg/0ZcbPKXt5bYAa2J1)
 
-### Note: MobX was formerly known as Mobservable
+## MobX was formerly known as Mobservable. 
+To use install pre `2.0` `mobx*` compatible packages, use `mobservable` instead of `mobx`.
+See the [changelog](https://github.com/mobxjs/mobx/blob/master/CHANGELOG.md) for all the details.
 
 <br/>
 * New to MobX? Take the [five minute, interactive introduction](https://mobxjs.github.io/mobx/getting-started.html)
@@ -112,7 +114,7 @@ MobX is inspired by Microsoft Excel and existing TFRP implementations like Meteo
 > _Elegant! I love it!_
 > &dash; Johan den Haan, CTO of Mendix
 
-> _We ported the book Notes and Kanban examples to MobX. Check out [the source](https://github.com/survivejs/mobservable-demo) to see how this worked out. Compared to the original I was definitely positively surprised. MobX seems like a good fit for these problems._
+> _We ported the book Notes and Kanban examples to Mobservable. Check out [the source](https://github.com/survivejs/mobservable-demo) to see how this worked out. Compared to the original I was definitely positively surprised. MobX seems like a good fit for these problems._
 > &dash; Juho Vepsäläinen, author of "SurviveJS - Webpack and React" and jster.net curator
 
 > _Great job with MobX! Really gives current conventions and libraries a run for their money._
