@@ -24,7 +24,7 @@ See the [changelog](https://github.com/mobxjs/mobx/blob/master/CHANGELOG.md) for
 
 ## Core concepts
 
-MobX has a few core concepts. The following snippets can be tried online using [JSiddle](https://jsfiddle.net/mweststrate/wv3yopo0/).
+MobX has a few core concepts. The following snippets can be tried online using [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/).
 
 ### Observable state
 
