@@ -146,18 +146,26 @@ The simple reason is that MobX will establish far more fine grained 'listeners' 
 Secondly MobX sees the causality between derivations so it can order them in such a way that no derivation has to run twice or introduces a glitch.
 How that works? See this [in-depth explanation of MobX](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.a2j1rww8g).
 
+### Easy interoperability
+MobX works plain javascript structures. Due to it's unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific library flavors.
+So you can simple keep using your existing router-, data fetching and utility libraries like `react-router`, `director`, `superagent`, `lodash` etc.
+For the same reason you can use it out of the box both server- and client side, in isomorphic applications and with react-native. 
+
 ## Credits
 
 MobX is inspired by reactive programming principles as found in spreadsheets. It is inspired by MVVM frameworks like in MeteorJS tracker, knockout and Vue.js. But MobX brings Transparent Functional Reactive Programming to the next level and provides a stand alone implementation. It implements TFRP in a glitch-free, synchronous, predicatable and efficient manner.
 
-And a lot of credits for [Mendix](https://github.com/mendix), for providing the flexibility and support to maintain MobX and the chance to proof the philosophy of MobX in a real, complex, performance critical applications.
+A ton of credits for [Mendix](https://github.com/mendix), for providing the flexibility and support to maintain MobX and the chance to proof the philosophy of MobX in a real, complex, performance critical applications.
+
+And finally kudo's for all the people that believed in, tried and validated MobX.
 
 ## Further examples and documentation
 
 * [Full API documentation](http://mobxjs.github.io/mobx/)
 * Boilerplate and example projects for ES5, Babel, Typescript can be found in the [MobX](https://github.com/mobxjs) organization on github.
 
-Blogs:
+Blogs & Videos:
+* [Reactive 2015 Conference Talk on MobX (mobservable): React, transparent reactive programming and mutable data structures](https://www.youtube.com/watch?v=FEwLwiizlk0)
 * [Making React reactive: the pursuit of high performing, easily maintainable React apps](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/)
 * [Becoming fully reactive: an in-depth explanation of Mobservable](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.a2j1rww8g)
 * [Pure rendering in the light of time and state](https://medium.com/@mweststrate/pure-rendering-in-the-light-of-time-and-state-4b537d8d40b1)
@@ -177,7 +185,9 @@ Blogs:
 > _I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated._
 > &dash;David Schalk, fpcomplete.com
 
+More testimonials from people using MobX in production can be found on [hacker news](https://news.ycombinator.com/item?id=11181980), [reddit 1](https://www.reddit.com/r/reactjs/comments/46m2zg/has_anybody_used_mobservable_for_their_react/), [reddit 2](https://www.reddit.com/r/javascript/comments/47omi9/mobx_20_previously_mobservable_has_been_released/) or on twitter under the [#mobx](https://twitter.com/search?q=mobx&src=typd) and [#mobservable](https://twitter.com/search?q=mobservable&src=typd) hashtags.
+
 ## Contributing
 
-* Feel free to send pr requests.
+* Feel free to send pull requests.
 * Use `npm test` to run the basic test suite, `npm run coverage` for the test suite with coverage and `npm run perf` for the performance tests.
