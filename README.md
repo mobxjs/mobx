@@ -12,11 +12,12 @@
 MobX is a battle tested library that makes state management simple and scalable by transparently applying functional reactive programming (TFRP).
 The philosophy behind MobX is very simple:
 
-_Everything that can be derived from the application state, should be derived_.
+_Everything that can be derived from the application state, should be derived. Automatically._
 
 This includes the UI, data serialization, server communication etc.
 If React allows you to declaratively define your component tree and uses the virtual DOM as black box to minify the amount of DOM mutations,
-then MobX is the library that allows you to declaratively define your state model and derivations in a declarative manner, and provides the black box to make your wishes come true.
+then MobX is the library that allows you to define your state model and derivations in a declarative manner while minimizing the amount of computations.
+It maintains a virtual dependency graph to make sure that your derivations will never be stale, nor executed more often than strictly needed.
 
 ## MobX was formerly known as Mobservable.
 To use install pre- 2.0 `mobx*` compatible packages, use `mobservable` instead of `mobx`.
@@ -24,7 +25,7 @@ See the [changelog](https://github.com/mobxjs/mobx/blob/master/CHANGELOG.md) for
 
 ## Core concepts
 
-MobX has a few core concepts. The following snippets can be tried online using [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/).
+MobX has a only few core concepts. The following snippets can be tried online using [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/).
 
 ### Observable state
 
@@ -46,7 +47,6 @@ With MobX you can simply define derived values that will update automatically wh
 
 ```javascript
 class TodoList {
-
     @observable todos = [];
     @computed get unfinishedTodoCount() {
         return this.todos.filter(todo => !todo.finished).length;
@@ -149,7 +149,8 @@ How that works? See this [in-depth explanation of MobX](https://medium.com/@mwes
 ### Easy interoperability
 MobX works plain javascript structures. Due to it's unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific library flavors.
 So you can simple keep using your existing router-, data fetching and utility libraries like `react-router`, `director`, `superagent`, `lodash` etc.
-For the same reason you can use it out of the box both server- and client side, in isomorphic applications and with react-native. 
+For the same reason you can use it out of the box both server- and client side, in isomorphic applications and with react-native.
+The result of this is that you often need to learn less new concepts when using MobX in comparison to other state management solutions.
 
 ## Credits
 
