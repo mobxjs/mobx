@@ -108,7 +108,7 @@ You can verify this yourself by changing the [JSFiddle](https://jsfiddle.net/mwe
 
 ### Actions
 
-Unlike many flux frameworks, MobX is unopiniated about how user events should be handled.
+Unlike many flux frameworks, MobX is unopinionated about how user events should be handled.
 This can be done in a Flux like manner.
 Or by processing events using RxJS.
 Or by simply handling events in the most straightforward way possible, as demonstrated in the above `onClick` handler.
