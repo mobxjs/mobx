@@ -8,7 +8,7 @@
 [![#mobservable channel on reactiflux discord](https://img.shields.io/badge/discord-%23mobx%20%40reactiflux-blue.svg)](https://discord.gg/0ZcbPKXt5bYAa2J1)
 
 * Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`
-* Api documentation (including ES5, ES6, Typescript examples): http://mobxjs.github.io/mobx
+* Api documentation (including ES5, ES6, Typescript examples): http://mobxjs.github.io/
 
 MobX is a battle tested library that makes state management simple and scalable by transparently applying functional reactive programming (TFRP).
 The philosophy behind MobX is very simple:
@@ -164,6 +164,7 @@ And finally kudo's for all the people that believed in, tried and validated MobX
 ## Further examples and documentation
 
 * [Full API documentation](http://mobxjs.github.io/mobx/)
+* Five minute, [interactive introduction](https://mobxjs.github.io/mobx/getting-started.html) (with just ES5)
 * Boilerplate and example projects for ES5, Babel, Typescript can be found in the [MobX](https://github.com/mobxjs) organization on github.
 
 Blogs & Videos:
