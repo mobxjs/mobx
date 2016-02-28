@@ -31,7 +31,7 @@ otherwise it might do nothing at all._
 
 So here we are, simple, straightforward reactive components that will render whenever needed. These components have some interesting characteristics:
 
-* They only subscribe to the data structures that where actively used during the last render. This means that you cannot under-subscribe or over-subscribe. You can even use data in your rendering that will only be available at later moment in time. This is ideal for asynchronously loading data.
+* They only subscribe to the data structures that were actively used during the last render. This means that you cannot under-subscribe or over-subscribe. You can even use data in your rendering that will only be available at later moment in time. This is ideal for asynchronously loading data.
 * You are not required to declare what data a component will use. Instead, dependencies are determined at runtime and tracked in a very fine-grained manner.
 * Usually reactive components have no state. But you are still free to use state.
 * `@observer` implements `shouldComponentUpdate` so that children are not re-rendered unnecessary.
