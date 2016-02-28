@@ -15,7 +15,7 @@ class OrderLine {
         this.price = price;
     }
 
-    @observable get total() {
+    @computed get total() {
         return this.price * this.amount;
     }
 }

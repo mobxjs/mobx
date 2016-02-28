@@ -7,6 +7,7 @@
 * [Core API](refguide/api.md)
   * [observable](refguide/observable.md)
   * [@observable](refguide/observable-decorator.md)
+  * [@computed](refguide/computed-decorator.md) 
   * [autorun](refguide/autorun.md)
   * [@observer](refguide/observer-component.md)
 * Advanced API
