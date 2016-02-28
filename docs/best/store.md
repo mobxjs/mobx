@@ -94,7 +94,7 @@ Todo items, users, books, movies, orders, you name it.
 Your application will most probably have at least one domain store.
 
 A single domain store should be responsible for a single concept in your application.
-However a single concept might take the form of multiple subtypes and it often a (cyclic) tree structure.
+However a single concept might take the form of multiple subtypes and it is often a (cyclic) tree structure.
 For example: one domain store for your products, and one for our orders and orderlines.
 As a rule of thumb: if the nature of the relationship between two items is containment, they should typically be in the same store.
 So a store just manages _domain objects_.
