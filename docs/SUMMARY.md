@@ -27,7 +27,7 @@
   * [extending mobx](refguide/extending.md)
   * [miscellaneous](refguide/extras.md)
 * Best Practices For Large Apps
-  * [Definging data stores](best/store.md)
+  * [Defining data stores](best/store.md)
   * [Writing (async) actions](best/actions.md)
   * [Organizing React components](best/components.md)
 <!--  * Routing Universal applications -->
