@@ -187,7 +187,7 @@ Blogs & Videos:
 > _I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated._
 > &dash;David Schalk, fpcomplete.com
 
-More testimonials from people using MobX in production can be found on [hacker news](https://news.ycombinator.com/item?id=11181980), [reddit 1](https://www.reddit.com/r/reactjs/comments/46m2zg/has_anybody_used_mobservable_for_their_react/), [reddit 2](https://www.reddit.com/r/javascript/comments/47omi9/mobx_20_previously_mobservable_has_been_released/) or on twitter under the [#mobx](https://twitter.com/search?q=mobx&src=typd) and [#mobservable](https://twitter.com/search?q=mobservable&src=typd) hashtags.
+More testimonials from people using MobX in production can be found on [medium: functional reactive flux blog](https://medium.com/@kenneth_chau/the-2-fundamental-laws-of-flux-and-the-functional-reactive-flux-c9368ac008d3#.h41y0i22h), [hacker news](https://news.ycombinator.com/item?id=11181980), [reddit 1](https://www.reddit.com/r/reactjs/comments/46m2zg/has_anybody_used_mobservable_for_their_react/), [reddit 2](https://www.reddit.com/r/javascript/comments/47omi9/mobx_20_previously_mobservable_has_been_released/) or on twitter under the [#mobx](https://twitter.com/search?q=mobx&src=typd) and [#mobservable](https://twitter.com/search?q=mobservable&src=typd) hashtags.
 
 ## Contributing
 
