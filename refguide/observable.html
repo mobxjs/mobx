@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="2.1" data-basepath=".." data-revision="Sun Feb 28 2016 08:24:12 GMT+0100 (CET)">
+    <div class="book" data-level="2.1" data-basepath=".." data-revision="Sun Feb 28 2016 08:26:24 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -779,12 +779,12 @@ cityName.set(<span class="hljs-string">&quot;Amsterdam&quot;</span>);
 MobX will make sure that that function is run each time that any of the values used by the function is changed.
 A new function is returned which has the same signature as the function returned for primitives, except that it is not allowed to assign a new value manually.</p>
 <p>Example:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, computed} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
 <span class="hljs-keyword">var</span> name = observable(<span class="hljs-string">&quot;John&quot;</span>);
 <span class="hljs-keyword">var</span> age = observable(<span class="hljs-number">42</span>);
 <span class="hljs-keyword">var</span> showAge = observable(<span class="hljs-literal">false</span>);
 
-<span class="hljs-keyword">var</span> labelText = observable(() =&gt;
+<span class="hljs-keyword">var</span> labelText = computed(() =&gt;
     showAge.get() ? <span class="hljs-string">`<span class="hljs-subst">${name.get()}</span> (age: <span class="hljs-subst">${age.get()}</span>)`</span> : name.get();
 );
 

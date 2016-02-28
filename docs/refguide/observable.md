@@ -48,12 +48,12 @@ A new function is returned which has the same signature as the function returned
 
 Example:
 ```javascript
-import {observable} from "mobx";
+import {observable, computed} from "mobx";
 var name = observable("John");
 var age = observable(42);
 var showAge = observable(false);
 
-var labelText = observable(() =>
+var labelText = computed(() =>
 	showAge.get() ? `${name.get()} (age: ${age.get()})` : name.get();
 );
 
