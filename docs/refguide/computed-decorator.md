@@ -1,7 +1,7 @@
 # @computed
 
 Decorator that can be used on ES6 or TypeScript derivable class properties to make them observable.
-The @computed can only be used on `get` functions for isntance properties. 
+The @computed can only be used on `get` functions for instance properties. 
 
 Use `@computed` if you have a value that can be derived in a pure manner from other observables.
 
