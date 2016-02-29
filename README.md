@@ -15,10 +15,9 @@ The philosophy behind MobX is very simple:
 
 _Everything that can be derived from the application state, should be derived. Automatically._
 
-This includes the UI, data serialization, server communication etc.
-If React allows you to declaratively define your component tree and uses the virtual DOM as black box to minify the amount of DOM mutations,
-then MobX is the library that allows you to define your state model and derivations in a declarative manner while minimizing the amount of computations.
-It maintains a virtual dependency graph to make sure that your derivations will never be stale, nor executed more often than strictly needed.
+which includes the UI, data serialization, server communication, etc.
+
+If React allows you to declaratively define your component tree and uses the virtual DOM as black box to minify the number of DOM mutations, then MobX is the library that allows you to define your state model and derivations in a declarative manner while minimizing the number of computations. MobX maintains a virtual dependency graph to ensure that your derivations will never be stale nor executed more often than strictly needed.
 
 ## MobX was formerly known as Mobservable.
 To use install pre- 2.0 `mobx*` compatible packages, use `mobservable` instead of `mobx`.
@@ -30,7 +29,7 @@ MobX has a only few core concepts. The following snippets can be tried online us
 
 ### Observable state
 
-MobX adds observable capabilities to existing data structures like objects, arrays and class instances. This can simply be done by annotating your class properties with the [@observable](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) decorator (ES2015), or by invoking the [`observable`](http://mobxjs.github.io/mobx/refguide/observable.html) or [`extendObservable`](http://mobxjs.github.io/mobx/refguide/extend-observable.html) functions (ES5).
+MobX adds observable capabilities to existing data structures like objects, arrays and class instances. This can simply be done by annotating your class properties with the [@observable](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) decorator (ES2015), or by invoking the [`observable`](http://mobxjs.github.io/mobx/refguide/observable.html) or [`extendObservable`](http://mobxjs.github.io/mobx/refguide/extend-observable.html) functions (ES5). See [Language support](https://github.com/mobxjs/mobx/wiki/Language-Support) for language-specific examples.
 
 ```javascript
 class Todo {
@@ -60,7 +59,7 @@ Computations like these can very well be compared with formulas in spreadsheet p
 ### Reactions
 
 A reaction is a bit similar to a computed value, but instead of producing a new value it produces a side effect.
-Reactions bridge reactive and imperative programming for things like printing to the console, making network requests, incrementally updating the React component tree to patch the DOM, etc.
+Reactions bridge [reactive](https://en.wikipedia.org/wiki/Reactive_programming) and [imperative](https://en.wikipedia.org/wiki/Imperative_programming) programming for things like printing to the console, making network requests, incrementally updating the React component tree to patch the DOM, etc.
 
 Reactions can be created by using the [`autorun`](http://mobxjs.github.io/mobx/refguide/autorun.html), [`autorunAsync`](http://mobxjs.github.io/mobx/refguide/autorun-async.html) or [`when`](http://mobxjs.github.io/mobx/refguide/when.html) functions.
 Or, if you are using for example ReactJS, you can turn your (stateless function) components into reactive components by simply slapping the [`@observer`](http://mobxjs.github.io/mobx/refguide/observer-component.html) decorator from the `mobx-react` package onto them.
