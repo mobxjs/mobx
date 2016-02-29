@@ -17,7 +17,7 @@ _Everything that can be derived from the application state, should be derived. A
 
 which includes the UI, data serialization, server communication, etc.
 
-If React allows you to declaratively define your component tree and uses the virtual DOM as black box to minify the number of DOM mutations, then MobX is the library that allows you to define your state model and derivations in a declarative manner while minimizing the number of computations. MobX maintains a virtual dependency graph to ensure that your derivations will never be stale nor executed more often than strictly needed.
+If React allows you to declaratively define your component tree and uses the virtual DOM as black box to minimize the number of DOM mutations, then MobX is the library that allows you to define your state model and derivations in a declarative manner while minimizing the number of computations. MobX maintains a virtual dependency graph to ensure that your derivations will never be stale nor executed more often than strictly needed.
 
 ## MobX was formerly known as Mobservable.
 To use install pre- 2.0 `mobx*` compatible packages, use `mobservable` instead of `mobx`.
@@ -58,11 +58,9 @@ Computations like these can very well be compared with formulas in spreadsheet p
 
 ### Reactions
 
-A reaction is a bit similar to a computed value, but instead of producing a new value it produces a side effect.
-Reactions bridge [reactive](https://en.wikipedia.org/wiki/Reactive_programming) and [imperative](https://en.wikipedia.org/wiki/Imperative_programming) programming for things like printing to the console, making network requests, incrementally updating the React component tree to patch the DOM, etc.
+Reactions are similar to a computed value, but instead of producing a new value, a reaction produces a side effect for things like printing to the console, making network requests, incrementally updating the React component tree to patch the DOM, etc. In short, reactions bridge [reactive](https://en.wikipedia.org/wiki/Reactive_programming) and [imperative](https://en.wikipedia.org/wiki/Imperative_programming) programming.
 
-Reactions can be created by using the [`autorun`](http://mobxjs.github.io/mobx/refguide/autorun.html), [`autorunAsync`](http://mobxjs.github.io/mobx/refguide/autorun-async.html) or [`when`](http://mobxjs.github.io/mobx/refguide/when.html) functions.
-Or, if you are using for example ReactJS, you can turn your (stateless function) components into reactive components by simply slapping the [`@observer`](http://mobxjs.github.io/mobx/refguide/observer-component.html) decorator from the `mobx-react` package onto them.
+If you are using React, you can turn your (stateless function) components into reactive components by simply adding the [`@observer`](http://mobxjs.github.io/mobx/refguide/observer-component.html) decorator from the `mobx-react` package onto them.
 
 ```javascript
 import React, {Component} from 'react';
@@ -97,11 +95,14 @@ React.render(<TodoListView todoList={store} />, document.getElementById('mount')
 ```
 
 `observer` turns React (function) components into derivations of the data they render.
+
+Also, reactions can be created using the [`autorun`](http://mobxjs.github.io/mobx/refguide/autorun.html), [`autorunAsync`](http://mobxjs.github.io/mobx/refguide/autorun-async.html) or [`when`](http://mobxjs.github.io/mobx/refguide/when.html) functions to fit your specific situations.
+
 When using MobX there are no smart or dumb components.
 All components render smartly but are defined in a dumb manner. MobX will simple make sure the components are always re-rendered whenever needed,
 but also no more than that.
 So the `onClick` handler in the above example will force the proper `TodoView` to render,
-and it will cause the `TodoListView` to render if the amount of unfinished tasks has changed.
+and it will cause the `TodoListView` to render if the number of unfinished tasks has changed.
 
 However, if you would remove the `Tasks left` line (or put it into a separate component), the `TodoListView` will no longer re-render when ticking a box.
 You can verify this yourself by changing the [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/).
@@ -141,7 +142,7 @@ Since data doesn't need to be normalized, and MobX automatically tracks the rela
 As demonstrated above, modifying state when using MobX is very straightforward. You simply write down your intentions. MobX will take care of the rest.
 
 ### Fine grained observability is efficient
-MobX builds a graph of all the derivations in your application to find the least amount of re-computations that is needed to prevent staleness. "Derive everything" might sound expensive, MobX builds a virtual derivation graph to minimize the amount re-computations need to keep derivations in sync with the state. In fact, when testing MobX at Mendix we found out that using this library to track the relations in our code is often a lot more efficient then pushing changes through our application by using handwritten events or "smart" selector based container components.
+MobX builds a graph of all the derivations in your application to find the least number of re-computations that is needed to prevent staleness. "Derive everything" might sound expensive, MobX builds a virtual derivation graph to minimize the number of recomputations needed to keep derivations in sync with the state. In fact, when testing MobX at Mendix we found out that using this library to track the relations in our code is often a lot more efficient then pushing changes through our application by using handwritten events or "smart" selector based container components.
 The simple reason is that MobX will establish far more fine grained 'listeners' on your data then you would do as a programmer.
 Secondly MobX sees the causality between derivations so it can order them in such a way that no derivation has to run twice or introduces a glitch.
 How that works? See this [in-depth explanation of MobX](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.a2j1rww8g).
