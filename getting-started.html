@@ -194,29 +194,39 @@
   <!-- MAIN CONTENT -->
   <div id="main_content_wrap" class="outer">
     <section id="main_content" class="inner">
-                    <h3 id="getting-started">Introduction</h3>
-                    <p><code>MobX</code> is a library to create reactive state and views.
-                        MobX updates views automatically when the state changes,
-                        and thereby achieves <a target="-_blank" href="https://en.wikipedia.org/wiki/Inversion_of_control">inversion of control</a>.
-                        This has major benefits for the simplicity, maintainability and performance of your code.
-                        This is <em>the promise of MobX</em>:
-                        <!--This removes boilerplate code from your app.
-                        You can drop all the interface refreshes, state subscriptions and data cursors!-->
-                        <p/>
-                        <ul>
-                        <li>Write complex applications which unmatched simple code.</li>
-                        <li>Enable unobtrusive state management: be free to use mutable objects, cyclic references, classes, real references...</li>
-                        <li>Write declarative views that track their own dependencies. No subscriptions, cursors or other redundant declarations to manage.</li>
-                        <li>Build high performing React applications without Flux or Immutable data structures.</li>
-                        <li>Predictable behavior: all views are updated synchronously and atomically.</li>
-                        </ul>
-                    <p><a href="#demo" onclick="runCodePerLine();">Demo link</a> for impatient people.
-                    </p>
-                    <h3 id="going-from-imperative-to-reactive-code">Going from imperative to reactive</h3>
-                    <p>Sounds promising right? Let's start with a simple example to see how reactive programming might benefit us.
-                        All the code blocks below are editable, use the <em>run</em> button to execute them.
-                        For originality's sake let's start with a simple ToDo model:
-                    </p>
+        <h3 id="getting-started">Introduction</h3>
+        <p><a href="https://github.com/mobxjs/mobx"><code>MobX</code></a> helps you in managing your state in a simple and scalable manner.
+            
+            Note that this tutorial uses only plain ES5 code, but know that <a href="http://mobxjs.github.io/mobx/best/syntax.html" target="_blank">ES7 decorators</a> might even further simplify your code.
+            First, a high level overview of MobX:
+        </p>
+        <h3>Core concepts</h3>
+        <ol>
+            <li>First there is <em>data</em> that describes the <em>state</em> of your application.
+            Data can have many forms, objects, arrays, references, class instances.
+            Unlike many other state management libraries, MobX <em>doesn't</em> care.
+            If you would be creating a spreadsheet; the values of your data cells together are your application state.
+            If you are building an todo application, your state is the list of todo's. See below.
+            </li>
+            <li>Secondly there are <em>derivations</em>. Basically any values that can be recomputed automatically if you know the <em>state</em> of your applications.
+            These computed values can range from be simple values like the number of unfinished todo's, to complex stuff like a visual HTML representation of your todo's.
+            In spreadsheet terms: these are the formulas and charts of your application.
+            </li>
+            <li><em>Reactions</em> are very similar to derivations. The main difference: they don't produce a value, 
+            by they execute some task for you whenever relevant state is changed. Like making network requests and logging debug information.
+            </li>
+            <li>Finally there are <em>actions</em>. 
+            Basically; all other code. Actions live outside MobX but might alter your <em>state</em>.
+            MobX will make sure that any changes to the application state caused by your actions are automatically processed by all derivations and reactions.
+            </li>
+        </ol>
+        <h3>A simple store...</h3>
+        <p>
+        Enough theory, seeing it in action probably explains more that carefully reading the above stuff.
+        For originality's sake let's start with a very simple ToDo model.
+        Note that all the code blocks below are editable, use the <em>run</em> button to execute them.
+        Here is a very straight forward TodoStore. No MobX involved yet.
+        </p>
 
 <textarea spellcheck="false" class="prettyprint" id="code1" rows="25">
 function TodoStore() {
@@ -273,39 +283,65 @@ console.log(todoStore.report());
 
 
 <p>So far, there is nothing special about this code.
-But what if we didn't have to call <code>report</code> explicitly?
-What if the data used in the report would make sure our report prints automatically upon each change?
-Then we would have achieved inversion of control!
+But what if we didn't have to call <code>report</code> explicitly, but could just declare that we want it to be invoked upon each state change?
+That would free us from the responsibility of calling <code>report</code> from any place in our code base that <em>might</em> influence our report.
 </p>
 <p>
-That is exactly what MobX can do for you.
+And that is exactly what MobX can do for you.
 Automatically execute code that solely depends on state.
-To achieve that, the <code>TodoStore</code> has to become reactive.
-Let's alter the constructor function just enough to achieve that:</p>
+So that our <code>report</code> method updates automatically, just like a chart in a spreadsheet.
+To achieve that, the <code>TodoStore</code> has to become observable so that MobX can track all the changes that are being made.
+Let's alter the constructor function of the store just enough to achieve that.</p>
+<p>Also, the <code>completedTodosCount</code> property could be derived from just the todo list.
+Using <code>mobx.extendObservable</code> we can introduce observable properties on an object:
 
 <textarea spellcheck="false" class="prettyprint" id="code3" rows="8">
 function ObservableTodoStore() {
+    mobx.extendObservable(this, {
+        todos: [],
+        completedTodosCount: function() {
+            return this.todos.filter(function(todo) {
+                return todo.completed === true;
+            }).length;
+        }
+    })
     this.todos = mobx.observable([]);
     mobx.autorun(function() {
         console.log(this.report());
     }, this);
 }
 
-/** addTodo, completedTodosCount and report remain untouched,
-    so, let's just copy them... */
-ObservableTodoStore.prototype.addTodo = TodoStore.prototype.addTodo;
-ObservableTodoStore.prototype.completedTodosCount =
-    TodoStore.prototype.completedTodosCount;
-ObservableTodoStore.prototype.report = TodoStore.prototype.report;
+/** The rest is still pretty much the same! */
+ObservableTodoStore.prototype.addTodo = function(task) {
+    this.todos.push({
+        task: task,
+        completed: false
+    });
+}
+
+ObservableTodoStore.prototype.report = function() {
+    if (this.todos.length === 0)
+        return "<none>";
+    return "First todo: '" + this.todos[0].task
+        + "'. Progress: "
+        + this.completedTodosCount + "/" + this.todos.length;
+}
 
 var observableTodoStore = new ObservableTodoStore();
 </textarea>
 <center style="margin-top:-20px"><small>(This store is editable, use the 'run' button on the next listing to test it)</small></center>
 
-<p>We just changed two things. First, we defined <code>todos</code> as an observable array.
-Next, we created a function that <code>autorun</code>s the <code>report</code> and prints it whenever it has changes.
-That's too simple to be true right? Let's try altering the data again,
-but this time without explicitly logging the <code>report</code>:</p>
+<p>We just changed two things. First, we defined two observable properties, <code>todos</code> and <code>completedTodosCount</code>.
+Because we used a argumentless function as initial value for <code>completedTodosCount</code>, <code>extendObservable</code> infers that the property should 
+become a computed value (computed values are just a special kind of observable values).
+The rest of the listing hardly changes for you as a programmer, but <code>extendObservable</code> ensures that MobX can track all changes of the given properties.
+</p>
+<p>
+    Secondly, we introduced a function in the constructor that prints the <code>report</code> and is wrapped in <code>autorun</code>.
+    Autorun creates a <em>reaction</em> that runs once, and after that automatically re-runs whenever any observable data that was used inside the function changes.
+    Because <code>report</code> uses the observable <code>todos</code> property, it will print the report whenever appropiate.
+    As demonstrated in the next listing, just press the <em>run</em> button to try this.
+</p>
 
 <textarea spellcheck="false" class="prettyprint" id="code4" rows="6">
 observableTodoStore.addTodo("write intro");
@@ -316,28 +352,32 @@ observableTodoStore.todos[0].task = "finish intro";
 </textarea>
 <button onClick="runCode(['#code1', '#code3', '#code4'])" class="btn-run">Run code</button>
 
-<p>Fascinating isn't it? The <code>report</code> did print automatically, synchronously and without leaking intermediate values.
+<p>Pure fun, right? The <code>report</code> did print automatically, synchronously and without leaking intermediate values.
 If you investigate the log carefully, you will see that the fourth line didn't result in a new log-line.
 Because the report did not <em>actually</em> change as a result of the rename, although the backing data did.
+On the other hand, changing the name of the first task did update the report, since that one is used in the report.
+This demonstrates nicely that not just the <code>todos</code> property is being observed by the <code>autorun</code>,
+but also the individual properties inside the todo items.
 </p>
-<p>Now that we can establish reactive relationships between <em>state</em> and <em>views</em>,
-    we can also build complex user interfaces that relate to their data automatically.
+<h3 id="reactive-reactjs-components">Making react components reactive</h3>
+<p>Ok, so far we made a silly report reactive. Let's build a reactive user interface around this very same store.
+React components are (despite their name) not reactive out of the box, you need to explicitly call <code>setState</code> 
+or re-instantiate them in the parent's <code>render</code> method to force them to re-render after data has been changed.
 </p>
-
-<h3 id="reactive-reactjs-components">Reactive React components</h3>
-<p>React components are (despite their name) not reactive out of the box.
-They will not re-render automatically when their underlying data changes.
-So you need to either call <code>setState</code> or you need to maintain data subscriptions or cursors to update your components.</p>
-
-<p>To avoid such boilerplate, the <code>mobx-react</code> package provides the <code>observer</code> decorator that turns any component into an observer.
-From there on, you never have to worry about when to update your component!  Just like what we did with the <code>report</code> function.
-As shown below, MobX will determine the smallest amount of components that need an update.
-So reactive components render <a target="_blank" href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/">extremely efficient</a>.
+<p>To avoid boilerplate and to make sure components update <em>smartly</em>,
+(that is, only when the data being renderd has changed),
+the <code>mobx-react</code> package provides the <code>observer</code> decorator/ function that turns a component into an observer.
+From there on, you never have to worry about when to update your component!
+It's conceptually no different from auto-running the <code>report</code> function.
 </p>
-
-<a name="demo"></a><h3 id="demo">Editable demo</h3>
-<p>A basic, self updating user interface for our <code>ObservableTodoStore</code> is now just a matter of writing the following dumb, yet reactive, components:</p>
-
+<p>
+The listing below defines some plain old react components.
+The only MobX thing in there is that they are passed through the <em>observer</em> to make them reactive.
+After that, each component will individually re-render when data changes, without ever call <code>React.render</code> or <code>setState</code>.
+Basically, all components have become smart but are still defined in a a dumb, declarative manner.
+Feel free to play with it. Try for example to remove all the <code>observer</code> calls, or just the one decorating the <code>TodoView</code>.
+The numbers in the preview highlight each time a component is re-rendered.
+</p>
 <textarea spellcheck="false" class="" id="react1" rows="44">
 function renderTodoApp() {
     React.render(<TodoList store={observableTodoStore} />,
@@ -394,7 +434,7 @@ renderTodoApp();
 </textarea>
 <button onClick="runCode(['#code1', '#code3', '#code4', '#react1'])" class="btn-run">Run code</button>
 
-<p>That's it! No boilerplate! Just some simple, declarative components that form our complete UI.
+<p>That's it! No boilerplate! Just some simple, declarative components that form our complete UI, which is derived completely from our state.
     You are now ready to start using <code>mobx</code> in your own applications.
     Feel free to fiddle around by adjusting the  above components.
     Or alter the data using the listing below.
