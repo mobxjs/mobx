@@ -8,6 +8,7 @@
 [![#mobservable channel on reactiflux discord](https://img.shields.io/badge/discord-%23mobx%20%40reactiflux-blue.svg)](https://discord.gg/0ZcbPKXt5bYAa2J1)
 
 * Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`
+* [Ten minute, interactive MobX + React tutorial](https://mobxjs.github.io/mobx/getting-started.html)
 * Api documentation (including ES5, ES6, Typescript examples): https://mobxjs.github.io/mobx
 
 ---
