@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.1.1/gh-fork-ribbon.min.css" />
   <link rel="shortcut icon" type="image/png" href="getting-started-assets/images/favicon.png"/>
 
-  <title>MobX: Five minute introduction</title>
+  <title>MobX: Ten minute, interactive MobX + React tutorial</title>
   <style>
        textarea {
           width: 600px;
@@ -28,10 +28,10 @@
       body .CodeMirror {
         height: auto;
         font-size: 10pt;
-        box-shadow: #ccc 2px 2px 2px;
         font-family: courier new;
         margin-top: 30px;
         margin-bottom: 30px;
+        padding: 14px;
       }
       #preview {
           position: fixed;
@@ -39,7 +39,7 @@
           right: 0px;
           top: 0px;
           height: 100%;
-          padding: 40px 20% 40px 40px;
+          padding: 40px 10% 40px 40px;
           background: #ddd;
           border-left: 4px solid #ddd;
       }
@@ -56,6 +56,7 @@
       }
       .inner {
           margin-right:40px;
+          max-width: 780px;
       }
       #main_layout td, #main_layout {
           border-style: none;
@@ -157,6 +158,10 @@
           font-size: 10pt;
           font-style: italic;
       }
+      li > small {
+          color: #333;
+          padding-left: 10px;
+      }
   </style>
 </head>
 
@@ -172,6 +177,7 @@
 
     <div id="preview">
         <h3>React preview</h3>
+        <div id="devtools"></div>
         <div id="reactjs-app"><small>Read on and press any <em>run</em> buttons you encounter!</small></div>
         <hr/>
         <h4>Console log
@@ -186,7 +192,7 @@
 
       <a href="index.html"><img src="getting-started-assets/images/mobservable.png" id="logo" /></a>
       <h1 id="project_title">MobX</h1>
-      <h2 id="project_tagline">Five minute introduction to MobX + React</h2>
+      <h2 id="project_tagline">Ten minute, interactive MobX + React tutorial</h2>
       <hr/>
     </header>
   </div>
@@ -196,35 +202,42 @@
     <section id="main_content" class="inner">
         <h3 id="getting-started">Introduction</h3>
         <p><a href="https://github.com/mobxjs/mobx"><code>MobX</code></a> helps you in managing your state in a simple and scalable manner.
-            
-            Note that this tutorial uses only plain ES5 code, but know that <a href="http://mobxjs.github.io/mobx/best/syntax.html" target="_blank">ES7 decorators</a> might even further simplify your code.
+            This tutorial will teach you all the imporant concepts of MobX in ten minutes.
+            This tutorial uses only plain ES5 code, but know that <a href="http://mobxjs.github.io/mobx/best/syntax.html" target="_blank">ES7 decorators</a> might even further simplify your code.
             First, a high level overview of MobX:
         </p>
         <h3>Core concepts</h3>
         <ol>
-            <li>First there is <em>data</em> that describes the <em>state</em> of your application.
+            <li>MobX helps you managing all the <em>data</em> that describes the <em>state</em> of your application.
             Data can have many forms, objects, arrays, references, class instances.
             Unlike many other state management libraries, MobX <em>doesn't</em> care.
             If you would be creating a spreadsheet; the values of your data cells together are your application state.
-            If you are building an todo application, your state is the list of todo's. See below.
+            If you are building an todo application, your state is the list of todos.
             </li>
-            <li>Secondly there are <em>derivations</em>. Basically any values that can be recomputed automatically if you know the <em>state</em> of your applications.
-            These computed values can range from be simple values like the number of unfinished todo's, to complex stuff like a visual HTML representation of your todo's.
+            <li>Secondly there are <em>derivations</em>.
+            Basically, and this is the core idea of MobX: 
+            <em><b>Any value that can be computed automatically from the state of your application,
+            should be (re-)computed automatically.</b></em>
+            MobX will take care of this, as long as you provide a derivation. 
+            These derivations, or computed values, can range from be simple values like the number of unfinished todos,
+            to complex stuff like a visual HTML representation of your todos.
             In spreadsheet terms: these are the formulas and charts of your application.
             </li>
             <li><em>Reactions</em> are very similar to derivations. The main difference: they don't produce a value, 
-            by they execute some task for you whenever relevant state is changed. Like making network requests and logging debug information.
+            but they execute some task for you whenever relevant state is changed. 
+            They make sure that network requests are made automatically at the right time, or that debug information is printed upon each change.
             </li>
             <li>Finally there are <em>actions</em>. 
             Basically; all other code. Actions live outside MobX but might alter your <em>state</em>.
             MobX will make sure that any changes to the application state caused by your actions are automatically processed by all derivations and reactions.
+            Syncronously and glitch-free.
             </li>
         </ol>
         <h3>A simple store...</h3>
         <p>
         Enough theory, seeing it in action probably explains more that carefully reading the above stuff.
-        For originality's sake let's start with a very simple ToDo model.
-        Note that all the code blocks below are editable, use the <em>run</em> button to execute them.
+        For originality's sake let's start with a very simple ToDo store.
+        Note that all the code blocks below are editable, use the <em>run code</em> buttons to execute them.
         Here is a very straight forward TodoStore. No MobX involved yet.
         </p>
 
@@ -236,7 +249,8 @@ function TodoStore() {
 TodoStore.prototype.addTodo = function(task) {
     this.todos.push({
         task: task,
-        completed: false
+        completed: false,
+        assignee: null
     });
 }
 
@@ -249,7 +263,7 @@ TodoStore.prototype.completedTodosCount = function() {
 TodoStore.prototype.report = function() {
     if (this.todos.length === 0)
         return "<none>";
-    return "First todo: '" + this.todos[0].task
+    return "Next todo: '" + this.todos[0].task
         + "'. Progress: "
         + this.completedTodosCount() + "/" + this.todos.length;
 }
@@ -264,19 +278,19 @@ To make sure we see effects of our changes we invoke <code>todoStore.report</cod
 </p>
 
 <textarea spellcheck="false" class="prettyprint" id="code2" rows="15">
-todoStore.addTodo("write intro");
+todoStore.addTodo("read MobX tutorial");
 console.log(todoStore.report());
 
-todoStore.addTodo("present at meekup");
+todoStore.addTodo("try MobX");
 console.log(todoStore.report());
 
 todoStore.todos[0].completed = true;
 console.log(todoStore.report());
 
-todoStore.todos[1].task = "present at meetup";
+todoStore.todos[1].task = "try MobX in own project";
 console.log(todoStore.report());
 
-todoStore.todos[0].task = "finish intro";
+todoStore.todos[0].task = "grok MobX tutorial";
 console.log(todoStore.report());
 </textarea>
 <button onClick="runCode(['#code1', '#code2'])" class="btn-run">Run code</button>
@@ -292,8 +306,8 @@ Automatically execute code that solely depends on state.
 So that our <code>report</code> method updates automatically, just like a chart in a spreadsheet.
 To achieve that, the <code>TodoStore</code> has to become observable so that MobX can track all the changes that are being made.
 Let's alter the constructor function of the store just enough to achieve that.</p>
-<p>Also, the <code>completedTodosCount</code> property could be derived from just the todo list.
-Using <code>mobx.extendObservable</code> we can introduce observable properties on an object:
+<p>Also, the <code>completedTodosCount</code> function could be derived automatically from the todo list.
+By using <code>mobx.extendObservable</code> we can introduce observable properties on an object:
 
 <textarea spellcheck="false" class="prettyprint" id="code3" rows="8">
 function ObservableTodoStore() {
@@ -305,7 +319,6 @@ function ObservableTodoStore() {
             }).length;
         }
     })
-    this.todos = mobx.observable([]);
     mobx.autorun(function() {
         console.log(this.report());
     }, this);
@@ -315,14 +328,15 @@ function ObservableTodoStore() {
 ObservableTodoStore.prototype.addTodo = function(task) {
     this.todos.push({
         task: task,
-        completed: false
+        completed: false,
+        assignee: null
     });
 }
 
 ObservableTodoStore.prototype.report = function() {
     if (this.todos.length === 0)
         return "<none>";
-    return "First todo: '" + this.todos[0].task
+    return "Next todo: '" + this.todos[0].task
         + "'. Progress: "
         + this.completedTodosCount + "/" + this.todos.length;
 }
@@ -334,21 +348,23 @@ var observableTodoStore = new ObservableTodoStore();
 <p>We just changed two things. First, we defined two observable properties, <code>todos</code> and <code>completedTodosCount</code>.
 Because we used a argumentless function as initial value for <code>completedTodosCount</code>, <code>extendObservable</code> infers that the property should 
 become a computed value (computed values are just a special kind of observable values).
-The rest of the listing hardly changes for you as a programmer, but <code>extendObservable</code> ensures that MobX can track all changes of the given properties.
+The rest of the listing hardly changes for you as a programmer, 
+but <code>extendObservable</code> ensures that MobX can track all changes made to the given properties.
 </p>
 <p>
     Secondly, we introduced a function in the constructor that prints the <code>report</code> and is wrapped in <code>autorun</code>.
     Autorun creates a <em>reaction</em> that runs once, and after that automatically re-runs whenever any observable data that was used inside the function changes.
     Because <code>report</code> uses the observable <code>todos</code> property, it will print the report whenever appropiate.
-    As demonstrated in the next listing, just press the <em>run</em> button to try this.
+    This is demonstrated in the next listing. 
+    Just press the <em>run</em> button to try this.
 </p>
 
 <textarea spellcheck="false" class="prettyprint" id="code4" rows="6">
-observableTodoStore.addTodo("write intro");
-observableTodoStore.addTodo("present at meekup");
+observableTodoStore.addTodo("read MobX tutorial");
+observableTodoStore.addTodo("try MobX");
 observableTodoStore.todos[0].completed = true;
-observableTodoStore.todos[1].task = "present at meetup";
-observableTodoStore.todos[0].task = "finish intro";
+observableTodoStore.todos[1].task = "try MobX in own project";
+observableTodoStore.todos[0].task = "grok MobX tutorial";
 </textarea>
 <button onClick="runCode(['#code1', '#code3', '#code4'])" class="btn-run">Run code</button>
 
@@ -365,22 +381,27 @@ React components are (despite their name) not reactive out of the box, you need 
 or re-instantiate them in the parent's <code>render</code> method to force them to re-render after data has been changed.
 </p>
 <p>To avoid boilerplate and to make sure components update <em>smartly</em>,
-(that is, only when the data being renderd has changed),
-the <code>mobx-react</code> package provides the <code>observer</code> decorator/ function that turns a component into an observer.
-From there on, you never have to worry about when to update your component!
+the <code>mobx-react</code> package provides the <code>observer</code> decorator / function that turns a component into a <em>reaction</em>.
+From there on, you never have to worry about when to update your components!
 It's conceptually no different from auto-running the <code>report</code> function.
 </p>
 <p>
 The listing below defines some plain old react components.
 The only MobX thing in there is that they are passed through the <em>observer</em> to make them reactive.
-After that, each component will individually re-render when data changes, without ever call <code>React.render</code> or <code>setState</code>.
-Basically, all components have become smart but are still defined in a a dumb, declarative manner.
-Feel free to play with it. Try for example to remove all the <code>observer</code> calls, or just the one decorating the <code>TodoView</code>.
-The numbers in the preview highlight each time a component is re-rendered.
+After that, each component will individually re-render when data changes.
+You don't have to call <code>setState</code> anymore, nor do you have to figure out how subscribe to the proper parts of your application state
+using selectors or higher order components that need to be configured.
+Basically, all components have become smart but are still defined in a dumb, declarative manner.
+</p>
+<p>
+Press the <em>Run code</em> button to see the code below in action. 
+The listing is editable so feel free to play with it. 
+Try for example to remove all the <code>observer</code> calls, or just the one decorating the <code>TodoView</code>.
+The numbers in the preview on the right highlight each time a component is rendered.
 </p>
 <textarea spellcheck="false" class="" id="react1" rows="44">
 function renderTodoApp() {
-    React.render(<TodoList store={observableTodoStore} />,
+    React.render(<TodoList store={ observableTodoStore } />,
         document.getElementById('reactjs-app'));
 }
 
@@ -389,7 +410,8 @@ var TodoList = mobxReact.observer(React.createClass({
 
     render: function() {
         var store = this.props.store;
-        return (<div><RenderCounter />
+        return (<div>
+            <RenderCounter />
             { store.report() }
             <ul><hr/>
                 { store.todos.map(function(todo, idx) {
@@ -415,7 +437,11 @@ var TodoView = mobxReact.observer(React.createClass({
             <RenderCounter />
             <input type='checkbox' checked={ todo.completed }
                 onChange={ this.onToggleCompleted } />
-            <code>{todo.task}</code>
+            <code>{ todo.task }</code>
+            { todo.assignee 
+                ? <small>{ todo.assignee.name }</small>
+                : null
+            }
         </li>);
     },
 
@@ -434,12 +460,11 @@ renderTodoApp();
 </textarea>
 <button onClick="runCode(['#code1', '#code3', '#code4', '#react1'])" class="btn-run">Run code</button>
 
-<p>That's it! No boilerplate! Just some simple, declarative components that form our complete UI, which is derived completely from our state.
-    You are now ready to start using <code>mobx</code> in your own applications.
-    Feel free to fiddle around by adjusting the  above components.
-    Or alter the data using the listing below.
-    The counters on the right show how many times each part of the UI is re-rendered.
+<p>
+    The next listing shows nicely that we just have to alter our data without doing anything else.
+    MobX will automatically derive the relevant parts of the user interface again from the state in the store.
 </p>
+
 <textarea spellcheck="false" class="" id="play1" rows="8">
 observableTodoStore.todos[0].completed = !observableTodoStore.todos[0].completed
 observableTodoStore.todos[1].task = "Random todo " + Math.random();
@@ -449,28 +474,86 @@ observableTodoStore.todos[observableTodoStore.todos.length] = { task: "Find a fi
 <button onClick="if (typeof observableTodoStore === 'undefined') { runCode(['#code1', '#code3', '#code4', '#react1']) } runCode(['#play1'])" class="btn-run">Run code</button>
 <button id="runline-btn" onClick="runCodePerLine()" class="btn-run">Run line-by-line</button>
 <p>&nbsp;</p>
+
+<h3>Working with references</h3>
+<p>
+So far we have created observable objects (both prototyped and plain objects), arrays and primitives.
+You might be wondering, how are references handled in MobX?
+Is my state allowed to form a graph?
+In the previous listings you might have noticed that there is an <code>assignee</code> property on the todos.
+Let's give them some values by introducing a &ldquo;store&rdquo; (ok, it's just a glorified array) containing people, and assign tasks to them.
+</p>
+<textarea spellcheck="false" class="" id="store2" rows="8">
+var peopleStore = mobx.observable([
+    {
+        name: "Michel"
+    },
+    {
+        name: "Me"
+    }
+]);
+
+observableTodoStore.todos[0].assignee = peopleStore[0];
+observableTodoStore.todos[1].assignee = peopleStore[1];
+peopleStore[0].name = "Michel Weststrate";
+</textarea>
+<button onClick="runCode(['#code1', '#code3', '#code4', '#react1', '#store2'])" class="btn-run">Run code</button>
+<p>We now have two indepent stores. One with people and one with todos.
+To assign an <code>assignee</code> to a person from the people store, we just assigned a reference.
+These changes will be picked up automatically by the <code>TodoView</code>.
+With MobX there is no need to normalize data first and to write selectors to make sure our components will be updated.
+If fact, it doesn't even matter where the data is stored.
+As long as objects are made <em>observable</em>, MobX will be able to track them. 
+Real javascript references will just work. MobX will track them automatically if they are relevant for a derivation.
+To test that, just try changing your name in the next input box (make sure you have pressed the above <em>Run code</em> button first!).
+</p>
+ <hr/>
+ <p>Your name: <input onkeyup="peopleStore[1].name = event.target.value" /></p>
+ <hr/>
+ <p>By the way, the HTML of the above input box is simply: <pre>&lt;input onkeyup="peopleStore[1].name = event.target.value" /&gt;</pre>
+ 
+<h3>Conclusion</h3>
+<p>
+That's all! No boilerplate. Just some simple, declarative components that form our complete UI. 
+And which are derived completely, reactively from our state.
+You are now ready to start using the <code>mobx</code> and <code>mobx-react</code> packages in your own applications.
+A short summary of the things you learned so far:
+</p>
+<ol>
+    <li>
+        Use <code>observable(object or array)</code> or <code>extendObservable(object, propertiesMap)</code> to make objects suitable for using them in derivations.
+    </li>
+    <li>
+        Passing argumentless functions to <code>extendObservable</code> allows you to create &ldquo;formulas&rdquo;. 
+        Functions that compute a value from the current state and which will be recomputed automatically (if observed).
+    </li>
+    <li>
+        Use <code>autorun</code> to automatically run functions that depend on some observable state.
+        This is useful for logging, making network requests etc.
+    </li>
+    <li>
+        Use the <code>observer(react component)</code> function from the <code>mobx-react</code> package
+        to make your React components truly reactive. They will update automatically and efficiently.
+        Even when used in large complex applications with large amounts of data. 
+    </li>
+</ol>
+<p>
+    Feel free to play around a bit longer with the editable code blocks above to get a basic feeling how MobX reacts to all your changes.
+    You could for example add a log statement to the <code>report</code> function to see when it is called.
+    Or don't show the <code>report</code> at all and see how that influences the rendering of the <code>TodoList</code>.
+    Or show it only under specific circumstances...
+</p>
+
 <h3 id="learn-more">Learn more</32>
 <p>Intrigued? Here are some useful resources:</p>
 <ul>
-    <li><a href="index.html">MobX</a> homepage</li>
-    <li>The <a href="https://github.com/mobxjs/mobx" target="_blank">git repository</a>.</li>
-    <li>A <a href="https://github.com/mobxjs/react-mobx-boilerplate" target="_blank">React mobx boilerplate</a> project.</li>
-    <li>The original <a href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/" target="_blank">blog post</a> introducing reactive react.</li>
-    <li>A full CRUD webshop on <a href="https://jsfiddle.net/mweststrate/46vL0phw" target="_blank">JSFiddle</a>.</li>
+    <li><a href="https://github.com/mobxjs/mobx">MobX on GitHub</a></li>
+    <li><a href="https://mobxjs.github.io/mobx">Api documentation</a></li>
+    <li><a href="https://jsfiddle.net/mweststrate/wv3yopo0/">JSFiddle</a> with a simple todo app, demonstrating ES6 syntax</li>
+    <li><a href="https://github.com/mobxjs">Boilerplate & demo projects for an easy start</a></li>
+    <li>(Blog) <a href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/" target="_blank">Making React reactive: the pursuit of high performing, easily maintainable React apps</a></li>
+    <li>(Blog) <a href="https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.4kvwpd2nh" target="_blank">Becoming fully reactive: an in-depth explanation of Mobservable</a></li>
 </ul>
-<h3 id="quotes">What others are saying...</h3>
-<ul>
-    <p><em>&ldquo;Elegant! I love it!&rdquo;</em>
-        <div style="text-align:right">&dash; Johan den Haan, CTO of Mendix</div><br/></p>
-    <p><em>&ldquo;We ported the book Notes and Kanban examples to MobX (Mobservable). Check out <a href="https://github.com/survivejs/mobservable-demo" target="_blank">the source</a> to see how this worked out. Compared to the original I was definitely positively surprised. MobX seems like a good fit for these problems.&rdquo;
-        </em>
-        <div style="text-align:right">&dash; Juho Vepsäläinen, <br/>author of "SurviveJS - Webpack and React" and jster.net curator</div><br/></p>
-    <p><em>&ldquo;Great job with MobX! Really gives current conventions and libraries a run for their money.&rdquo;</em>
-        <div style="text-align:right">&dash; Daniel Dunderfelt</div><br/></p>
-    <p><em>&ldquo;I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated.&rdquo;</em>
-        <div style="text-align:right">&dash; David Schalk</div><br/></p>
-</ul>
-
 
 <div style="text-align:center;">
   <a class="github-button" href="https://github.com/mobxjs/mobx" data-icon="octicon-star" data-style="small" data-count-href="/mobxjs/mobx/stargazers" data-count-api="/repos/mobxjs/mobx#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star mobxjs/mobx on GitHub">Star</a>
@@ -497,8 +580,8 @@ observableTodoStore.todos[observableTodoStore.todos.length] = { task: "Find a fi
         <script src="getting-started-assets/javascripts/codemirror/javascript/javascript.js"></script>
         <script src="getting-started-assets/javascripts/react-with-addons.js"></script>
         <script src="getting-started-assets/javascripts/JSXTransformer.js"></script>
-        <script src="getting-started-assets/javascripts/mobx.umd.js"></script>
-        <script src="getting-started-assets/javascripts/mobx-react.js"></script>
+        <script src="https://npmcdn.com/mobx@2.0.0/lib/mobx.umd.js"></script>
+        <script src="https://npmcdn.com/mobx-react@3.0.0/index.js"></script>
 
         <script type="text/javascript">
         var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
@@ -614,7 +697,7 @@ observableTodoStore.todos[observableTodoStore.todos.length] = { task: "Find a fi
             $(function() {
                 $("textarea").each(function(i, t) {
                      var cm = CodeMirror.fromTextArea(t, {
-                         lineNumbers: true,
+                         lineNumbers: false,
                          mode: "javascript",
                          theme: 'xq-light'
                      });
