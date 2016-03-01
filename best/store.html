@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>Definging data stores | MobX</title>
+        <title>Defining data stores | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.2.0">
@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="4.1" data-basepath=".." data-revision="Sun Feb 28 2016 08:26:24 GMT+0100 (CET)">
+    <div class="book" data-level="4.1" data-basepath=".." data-revision="Tue Mar 01 2016 22:04:47 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -479,7 +479,7 @@
                         
                             <b>4.1.</b>
                         
-                        Definging data stores
+                        Defining data stores
                     </a>
             
             
@@ -747,7 +747,7 @@ There are many ways of working with MobX and React, and this is just one of them
 <h1 id="stores">Stores</h1>
 <p>Let&apos;s start with <em>stores</em>.
 In the next sections we will discuss <em>actions</em> and React <em>components</em> as well.
-Stores are can be found in any flux architecture and can be compared a bit with controllers in the MVC pattern.
+Stores can be found in any flux architecture and can be compared a bit with controllers in the MVC pattern.
 The main responsibility of stores is to move <em>logic</em> and <em>state</em> out of your components into a standalone testable unit that can be used in both frontend and backend javascript.</p>
 <h2 id="stores-for-the-user-interface-state">Stores for the user interface state</h2>
 <p>Most applications benefit from having at least two stores.
@@ -828,7 +828,7 @@ These stores store the data your application is all about.
 Todo items, users, books, movies, orders, you name it.
 Your application will most probably have at least one domain store.</p>
 <p>A single domain store should be responsible for a single concept in your application.
-However a single concept might take the form of multiple subtypes and it often a (cyclic) tree structure.
+However a single concept might take the form of multiple subtypes and it is often a (cyclic) tree structure.
 For example: one domain store for your products, and one for our orders and orderlines.
 As a rule of thumb: if the nature of the relationship between two items is containment, they should typically be in the same store.
 So a store just manages <em>domain objects</em>.</p>

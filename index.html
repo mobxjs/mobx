@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="1.1" data-basepath="." data-revision="Sun Feb 28 2016 08:26:24 GMT+0100 (CET)">
+    <div class="book" data-level="1.1" data-basepath="." data-revision="Tue Mar 01 2016 22:04:47 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -479,7 +479,7 @@
                         
                             <b>4.1.</b>
                         
-                        Definging data stores
+                        Defining data stores
                     </a>
             
             
@@ -741,96 +741,143 @@
                     <section class="normal" id="section-">
                     
                         <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/README.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="mobx">MobX</h1>
-<p><img src="https://mobxjs.github.io/mobx/images/mobx.png" align="right" width="120px"></p>
-<h3 id="-simple-scalable-state-management"><em>Simple, scalable state management.</em></h3>
+<h2 id="-simple-scalable-state-management"><em>Simple, scalable state management</em></h2>
 <p><a href="https://travis-ci.org/mobxjs/mobx" target="_blank"><img src="https://travis-ci.org/mobxjs/mobx.svg?branch=master" alt="Build Status"></a>
 <a href="https://coveralls.io/github/mobxjs/mobx?branch=master" target="_blank"><img src="https://coveralls.io/repos/mobxjs/mobx/badge.svg?branch=master&amp;service=github" alt="Coverage Status"></a>
 <a href="https://gitter.im/mobxjs/mobx?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge" target="_blank"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Join the chat at https://gitter.im/mobxjs/mobx"></a>
 <a href="https://discord.gg/0ZcbPKXt5bYAa2J1" target="_blank"><img src="https://img.shields.io/badge/discord-%23mobx%20%40reactiflux-blue.svg" alt="#mobservable channel on reactiflux discord"></a></p>
-<h3 id="note-mobx-was-formerly-known-as-mobservable">Note: MobX was formerly known as Mobservable.</h3>
-<p>To use install pre <code>2.0</code> <code>mobx*</code> compatible packages, use <code>mobservable</code> instead of <code>mobx</code>.</p>
-<p><br></p>
 <ul>
-<li>New to MobX? Take the <a href="https://mobxjs.github.io/mobx/getting-started.html" target="_blank">five minute, interactive introduction</a></li>
-<li><a href="https://mobxjs.github.io/mobx/" target="_blank">Official documentation</a></li>
-<li>MobX talk on <a href="https://www.youtube.com/watch?v=FEwLwiizlk0" target="_blank">Reactive2015</a></li>
+<li>Installation: <code>npm install mobx --save</code>. React bindings: <code>npm install mobx-react --save</code></li>
+<li><a href="https://mobxjs.github.io/mobx/getting-started.html" target="_blank">Ten minute, interactive MobX + React tutorial</a></li>
+<li>Api documentation (including ES5, ES6, Typescript examples): <a href="https://mobxjs.github.io/mobx" target="_blank">https://mobxjs.github.io/mobx</a></li>
 </ul>
-<h2 id="introduction">Introduction</h2>
-<p>MobX enables your data structures to become observable.
-Next to that it can make your functions (or <a href="https://github.com/mobxjs/mobx-react" target="_blank">React components</a>) reactive, so that they re-evaluate whenever relevant data is altered. 
-It&apos;s like Excel for JavaScript: any data structure can be turned into a &apos;data cell&apos;, and every function or user interface component can be turned into a &apos;formula&apos; that updates automatically.
-MobX is unopiniated about which data structures to use;
-it can work with mutable objects, arrays, (cyclic) references, classes etc.
-So that your actions, stores and user interface can remain KISS.
-Besides that, it is <a href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/" target="_blank">fast</a>.</p>
-<h2 id="the-essentials">The essentials</h2>
-<p>MobX can be summarized in two functions that will fundamentally simplify the way you write React applications.
-Let&apos;s start by building a really really simple timer application:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> timerData = mobx.observable({
-  secondsPassed: <span class="hljs-number">0</span>
-});
+<hr>
+<p>MobX is a battle tested library that makes state management simple and scalable by transparently applying functional reactive programming (TFRP).
+The philosophy behind MobX is very simple:</p>
+<p><em>Everything that can be derived from the application state, should be derived. Automatically.</em></p>
+<p>which includes the UI, data serialization, server communication, etc.</p>
+<p>React and MobX together are a powerful combination. React renders the application state by providing mechanisms to translate it into a tree of renderable components. MobX provides the mechanism to store and update the application state that React then uses.</p>
+<p>Both React and MobX provide very optimal and unique solutions to common problems in application development. React provides mechanisms to optimally render UI by using a virtual DOM that reduces the number of costly DOM mutations. MobX provides mechanisms to optimally synchronize application state with your React components by using a reactive virtual dependency state graph that is only updated when strictly needed and is never stale.</p>
+<h2 id="mobx-was-formerly-known-as-mobservable">MobX was formerly known as Mobservable.</h2>
+<p>To use install pre- 2.0 <code>mobx*</code> compatible packages, use <code>mobservable</code> instead of <code>mobx</code>.
+See the <a href="https://github.com/mobxjs/mobx/blob/master/CHANGELOG.md" target="_blank">changelog</a> for all the details.</p>
+<h2 id="core-concepts">Core concepts</h2>
+<p>MobX has a only few core concepts. The following snippets can be tried online using <a href="https://jsfiddle.net/mweststrate/wv3yopo0/" target="_blank">JSFiddle</a> (or <a href="https://jsfiddle.net/rubyred/3rL0183y/10/" target="_blank">without ES6 and JSX</a>).</p>
+<h3 id="observable-state">Observable state</h3>
+<p>MobX adds observable capabilities to existing data structures like objects, arrays and class instances. This can simply be done by annotating your class properties with the <a href="http://mobxjs.github.io/mobx/refguide/observable-decorator.html" target="_blank">@observable</a> decorator (ES2015), or by invoking the <a href="http://mobxjs.github.io/mobx/refguide/observable.html" target="_blank"><code>observable</code></a> or <a href="http://mobxjs.github.io/mobx/refguide/extend-observable.html" target="_blank"><code>extendObservable</code></a> functions (ES5). See <a href="https://github.com/mobxjs/mobx/wiki/Language-Support" target="_blank">Language support</a> for language-specific examples.</p>
+<pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span> </span>{
+    id = <span class="hljs-built_in">Math</span>.random();
+    @observable title = <span class="hljs-string">&quot;&quot;</span>;
+    @observable finished = <span class="hljs-literal">false</span>;
+}
+</code></pre>
+<p>Using <code>@observable</code> is like turning a value into a spreadsheet cell. But unlike spreadsheets, these values can be not just primitive values, but references, objects and arrays as well. You can even <a href="http://mobxjs.github.io/mobx/refguide/extending.html" target="_blank">define your own</a> observable data sources.</p>
+<h3 id="reactive-derivations">Reactive derivations</h3>
+<p>With MobX you can simply define derived values that will update automatically when relevant data is modified. For example by using the <a href="http://mobxjs.github.io/mobx/refguide/computed-decorator.html" target="_blank"><code>@computed</code></a> decorator or by using parameterless functions as property values in <code>extendObservable</code>.</p>
+<pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoList</span> </span>{
+    @observable todos = [];
+    @computed get unfinishedTodoCount() {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.todos.filter(todo =&gt; !todo.finished).length;
+    }
+}
+</code></pre>
+<p>MobX will ensure that <code>unfinishedTodoCount</code> is updated automatically when a todo is added or when one of the <code>finished</code> properties is modified.
+Computations like these can very well be compared with formulas in spreadsheet programs like MS Excel. They update automatically whenever, and only when, needed.</p>
+<h3 id="reactions">Reactions</h3>
+<p>Reactions are similar to a computed value, but instead of producing a new value, a reaction produces a side effect for things like printing to the console, making network requests, incrementally updating the React component tree to patch the DOM, etc. In short, reactions bridge <a href="https://en.wikipedia.org/wiki/Reactive_programming" target="_blank">reactive</a> and <a href="https://en.wikipedia.org/wiki/Imperative_programming" target="_blank">imperative</a> programming.</p>
+<p>If you are using React, you can turn your (stateless function) components into reactive components by simply adding the <a href="http://mobxjs.github.io/mobx/refguide/observer-component.html" target="_blank"><code>@observer</code></a> decorator from the <code>mobx-react</code> package onto them.</p>
+<pre><code class="lang-javascript">import React, {Component} from &apos;react&apos;;
+import {observer} from &quot;mobx-react&quot;;
 
-setInterval(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-  timerData.secondsPassed++;
-}, <span class="hljs-number">1000</span>);
+@observer
+class TodoListView extends Component {
+    render() {
+        return &lt;div&gt;
+            &lt;ul&gt;
+                {this.props.todoList.todos.map(todo =&gt;
+                    &lt;TodoView todo={todo} key={todo.id} /&gt;
+                )}
+            &lt;/ul&gt;
+            Tasks left: {this.props.todoList.unfinishedTodoCount}
+        &lt;/div&gt;
+    }
+}
 
-<span class="hljs-keyword">var</span> Timer = mobx.observer(React.createClass({
-  render: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-    <span class="hljs-keyword">return</span> (<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">span</span>&gt;</span>Seconds passed: { this.props.timerData.secondsPassed } <span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span> )</span>
-  }
-}));
+const TodoView = observer(({todo}) =&gt;
+    &lt;li&gt;
+        &lt;input
+            type=&quot;checkbox&quot;
+            checked={todo.finished}
+            onClick={() =&gt; todo.finished = !todo.finished}
+        /&gt;{todo.title}
+    &lt;/li&gt;
+);
 
-React.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">Timer</span> <span class="hljs-attribute">timerData</span>=<span class="hljs-value">{timerData}</span> /&gt;</span>, document.body);
-</span></code></pre>
-<p>In the example above the <code>timerData</code> data structure is made observable and the <code>Timer</code> component is turned into an <code>observer</code>.
-MobX will automatically track all relations between <em>observable data</em> and <em>observing functions (or components)</em> so that the minimum amount of observers is updated to keep all observers fresh. </p>
-<p>Its as simple as that. In the example above the <code>Timer</code> will automatically update each time the property <code>timerData.secondsPassed</code> is altered. This is because setter notifies the Timer observer.
-The actual interesting thing about this approach are the things that are <em>not</em> in the code:</p>
+const store = new TodoList();
+React.render(&lt;TodoListView todoList={store} /&gt;, document.getElementById(&apos;mount&apos;));
+</code></pre>
+<p><code>observer</code> turns React (function) components into derivations of the data they render.</p>
+<p>Also, reactions can be created using the <a href="http://mobxjs.github.io/mobx/refguide/autorun.html" target="_blank"><code>autorun</code></a>, <a href="http://mobxjs.github.io/mobx/refguide/autorun-async.html" target="_blank"><code>autorunAsync</code></a> or <a href="http://mobxjs.github.io/mobx/refguide/when.html" target="_blank"><code>when</code></a> functions to fit your specific situations.</p>
+<p>When using MobX there are no smart or dumb components.
+All components render smartly but are defined in a dumb manner. MobX will simple make sure the components are always re-rendered whenever needed,
+but also no more than that.
+So the <code>onClick</code> handler in the above example will force the proper <code>TodoView</code> to render,
+and it will cause the <code>TodoListView</code> to render if the number of unfinished tasks has changed.</p>
+<p>However, if you would remove the <code>Tasks left</code> line (or put it into a separate component), the <code>TodoListView</code> will no longer re-render when ticking a box.
+You can verify this yourself by changing the <a href="https://jsfiddle.net/mweststrate/wv3yopo0/" target="_blank">JSFiddle</a>.</p>
+<h3 id="actions">Actions</h3>
+<p>Unlike many flux frameworks, MobX is unopinionated about how user events should be handled.
+This can be done in a Flux like manner.
+Or by processing events using RxJS.
+Or by simply handling events in the most straightforward way possible, as demonstrated in the above <code>onClick</code> handler.
+In the end it all boils down to: Somehow the state should be updated.
+After updating the state, <code>MobX</code> will take care of the rest, in an efficient, glitch-free manner.
+So simple statements like below are enough to automatically update the user interface.
+There is no technical need for firing events, calling dispatcher or what more.
+A React component is in the end nothing more than a fancy representation of your state.
+A derivation that will be managed by MobX.</p>
+<pre><code class="lang-javascript">store.todos.push(
+    <span class="hljs-keyword">new</span> Todo(<span class="hljs-string">&quot;Get Coffee&quot;</span>),
+    <span class="hljs-keyword">new</span> Todo(<span class="hljs-string">&quot;Write simpler code&quot;</span>)
+);
+store.todos[<span class="hljs-number">0</span>].finished = <span class="hljs-literal">true</span>;
+</code></pre>
+<h2 id="mobx-simple-and-scalable">MobX: Simple and scalable</h2>
+<p>MobX is one of the least obtrusive libraries you can use for state management. That makes the <code>MobX</code> approach not just simple, but very scalable as well:</p>
+<h3 id="using-classes-and-real-references">Using classes and real references</h3>
+<p>With MobX you don&apos;t need to normalize your data. This makes the library very suitable for very complex domain models (At Mendix for example ~500 different domain classes in a single application).</p>
+<h3 id="referential-integrity-is-guaranteed">Referential integrity is guaranteed</h3>
+<p>Since data doesn&apos;t need to be normalized, and MobX automatically tracks the relations between state and derivations, you get referential integrity for free. Rendering something that is accessed through three levels of indirection? No problem, MobX will track them and re-render whenever one of the references changes. As a result staleness bugs are a thing of the past. As a programmer you might forget that changing some data might influence an seemingly unrelated component in a corner case. MobX won&apos;t forget.</p>
+<h3 id="simpler-actions-are-easier-to-maintain">Simpler actions are easier to maintain</h3>
+<p>As demonstrated above, modifying state when using MobX is very straightforward. You simply write down your intentions. MobX will take care of the rest.</p>
+<h3 id="fine-grained-observability-is-efficient">Fine grained observability is efficient</h3>
+<p>MobX builds a graph of all the derivations in your application to find the least number of re-computations that is needed to prevent staleness. &quot;Derive everything&quot; might sound expensive, MobX builds a virtual derivation graph to minimize the number of recomputations needed to keep derivations in sync with the state. In fact, when testing MobX at Mendix we found out that using this library to track the relations in our code is often a lot more efficient then pushing changes through our application by using handwritten events or &quot;smart&quot; selector based container components.
+The simple reason is that MobX will establish far more fine grained &apos;listeners&apos; on your data then you would do as a programmer.
+Secondly MobX sees the causality between derivations so it can order them in such a way that no derivation has to run twice or introduces a glitch.
+How that works? See this <a href="https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.a2j1rww8g" target="_blank">in-depth explanation of MobX</a>.</p>
+<h3 id="easy-interoperability">Easy interoperability</h3>
+<p>MobX works plain javascript structures. Due to it&apos;s unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific library flavors.
+So you can simple keep using your existing router-, data fetching and utility libraries like <code>react-router</code>, <code>director</code>, <code>superagent</code>, <code>lodash</code> etc.
+For the same reason you can use it out of the box both server- and client side, in isomorphic applications and with react-native.
+The result of this is that you often need to learn less new concepts when using MobX in comparison to other state management solutions.</p>
+<h2 id="credits">Credits</h2>
+<p>MobX is inspired by reactive programming principles as found in spreadsheets. It is inspired by MVVM frameworks like in MeteorJS tracker, knockout and Vue.js. But MobX brings Transparent Functional Reactive Programming to the next level and provides a stand alone implementation. It implements TFRP in a glitch-free, synchronous, predictable and efficient manner.</p>
+<p>A ton of credits for <a href="https://github.com/mendix" target="_blank">Mendix</a>, for providing the flexibility and support to maintain MobX and the chance to proof the philosophy of MobX in a real, complex, performance critical applications.</p>
+<p>And finally kudo&apos;s for all the people that believed in, tried and validated MobX.</p>
+<h2 id="further-examples-and-documentation">Further examples and documentation</h2>
 <ul>
-<li>The <code>setInterval</code> method didn&apos;t alter. It still treats <code>timerData</code> as a plain JS object.</li>
-<li>If the <code>Timer</code> component would be somewhere deep in our app; only the <code>Timer</code> would be re-rendered. Nothing else (sideways data loading).</li>
-<li>There are no subscriptions of any kind that need to be managed.</li>
-<li>There is no forced UI update in our &apos;controller&apos;.</li>
-<li>There is no state in the component. Timer is a dumb component.</li>
-<li>This approach is unobtrusive; you are not forced to apply certain techniques like keeping all data denormalized and immutable.</li>
-<li>There is no higher order component that needs configuration; no scopes, lenses or cursors.</li>
-<li>There is no magic context being passed through components.</li>
+<li><a href="http://mobxjs.github.io/mobx/" target="_blank">Full API documentation</a></li>
+<li>Five minute, <a href="https://mobxjs.github.io/mobx/getting-started.html" target="_blank">interactive introduction</a> (with just ES5)</li>
+<li>Boilerplate and example projects for ES5, Babel, Typescript can be found in the <a href="https://github.com/mobxjs" target="_blank">MobX</a> organization on github.</li>
 </ul>
-<h3 id="notice">Notice</h3>
-<p>Unlike Object.observe, you cannot track added properties. So remeber to initialize any property you want to observe. Null values work if you don&apos;t have any value yet. 
-Observing added properties is impossible to achieve without native Proxy support or dirty checking.</p>
-<h2 id="getting-started">Getting started</h2>
+<p>Blogs &amp; Videos:</p>
 <ul>
-<li><code>npm install mobx --save</code>.</li>
-<li>For (Native) React apps <code>npm install mobx-react --save</code> as well. You might also be interested in the <a href="https://github.com/mobxjs/mobx-react-devtools" target="_blank">dev tools for React and MobX</a>.</li>
-<li><a href="https://mobxjs.github.io/mobx/getting-started.html" target="_blank">Five minute interactive introduction to MobX and React</a></li>
-</ul>
-<h2 id="top-level-api">Top level api</h2>
-<p>For the full api, see the <a href="https://mobxjs.github.io/mobx/refguide/observable.html" target="_blank">API documentation</a>.
-This is an overview of most important functions available in the <code>mobx</code> namespace:</p>
-<p><strong>observable(value, options?)</strong>
-The <code>observable</code> function is the swiss knife of mobx and enriches any data structure or function with observable capabilities. </p>
-<p><strong>autorun(function)</strong>
-Turns a function into an observer so that it will automatically be re-evaluated if any data values it uses changes.</p>
-<p><strong>observer(reactJsComponent)</strong>
-The <code>observer</code> function (and ES6 decorator) from the <code>mobx-react</code> turns any Reactjs component into a reactive one.
-From there on it will responds automatically to any relevant change in <em>observable</em> data that was used by its render method.</p>
-<h2 id="examples">Examples</h2>
-<ul>
-<li>Online: Live edit the Todo example from the <a href="https://mobxjs.github.io/mobx/getting-started.html#demo" target="_blank">introduction</a>.</li>
-<li>Online: Simple timer example on <a href="https://jsfiddle.net/mweststrate/wgbe4guu/" target="_blank">JSFiddle</a>.</li>
-<li>Repo: <a href="https://github.com/mobxjs/mobx-react-boilerplate" target="_blank">Minimal boilerplate repostory</a>.</li>
-<li>Repo: <a href="https://github.com/mobxjs/mobx-react-todomvc" target="_blank">Full TodoMVC implementation</a>.</li>
-<li>External example: The ports of the <em>Notes</em> and <em>Kanban</em> <a href="https://github.com/survivejs/mobx-demo" target="_blank">examples of the &quot;SurviveJS - Webpack and React&quot;</a>.</li>
-</ul>
-<h2 id="philosophy">Philosophy</h2>
-<ul>
-<li><a href="http://mobxjs.github.io/mobx/" target="_blank">Official homepage introduction</a></li>
+<li><a href="https://www.youtube.com/watch?v=FEwLwiizlk0" target="_blank">Reactive 2015 Conference Talk on MobX (mobservable): React, transparent reactive programming and mutable data structures</a></li>
 <li><a href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/" target="_blank">Making React reactive: the pursuit of high performing, easily maintainable React apps</a></li>
-<li><a href="http://survivejs.com/blog/mobservable-interview/" target="_blank">SurviveJS interview on MobX, React and Flux</a></li>
+<li><a href="https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.a2j1rww8g" target="_blank">Becoming fully reactive: an in-depth explanation of Mobservable</a></li>
 <li><a href="https://medium.com/@mweststrate/pure-rendering-in-the-light-of-time-and-state-4b537d8d40b1" target="_blank">Pure rendering in the light of time and state</a></li>
+<li><a href="http://survivejs.com/blog/mobservable-interview/" target="_blank">SurviveJS interview on MobX, React and Flux</a></li>
 </ul>
-<p>MobX is inspired by Microsoft Excel and existing TFRP implementations like MeteorJS tracker, knockout and Vue.js.</p>
 <h2 id="what-others-are-saying">What others are saying...</h2>
 <blockquote>
 <p><em>Elegant! I love it!</em>
@@ -842,9 +889,10 @@ From there on it will responds automatically to any relevant change in <em>obser
 <p><em>I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can&apos;t think of any reason not to do things the simple, elegant way you have demonstrated.</em>
 &#x2010;David Schalk, fpcomplete.com</p>
 </blockquote>
+<p>More testimonials from people using MobX in production can be found on <a href="https://medium.com/@kenneth_chau/the-2-fundamental-laws-of-flux-and-the-functional-reactive-flux-c9368ac008d3#.h41y0i22h" target="_blank">medium: functional reactive flux blog</a>, <a href="https://news.ycombinator.com/item?id=11181980" target="_blank">hacker news</a>, <a href="https://www.reddit.com/r/reactjs/comments/46m2zg/has_anybody_used_mobservable_for_their_react/" target="_blank">reddit 1</a>, <a href="https://www.reddit.com/r/javascript/comments/47omi9/mobx_20_previously_mobservable_has_been_released/" target="_blank">reddit 2</a> or on twitter under the <a href="https://twitter.com/search?q=mobx&amp;src=typd" target="_blank">#mobx</a> and <a href="https://twitter.com/search?q=mobservable&amp;src=typd" target="_blank">#mobservable</a> hashtags.</p>
 <h2 id="contributing">Contributing</h2>
 <ul>
-<li>Feel free to send pr requests.</li>
+<li>Feel free to send pull requests.</li>
 <li>Use <code>npm test</code> to run the basic test suite, <code>npm run coverage</code> for the test suite with coverage and <code>npm run perf</code> for the performance tests.</li>
 </ul>
 
