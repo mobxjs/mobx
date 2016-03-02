@@ -30,7 +30,7 @@ But here is an (ES6) example of a view in the form of a React component.
 import {observer} from 'mobx-react';
 
 @observer
-class TimerView extend React.Component {
+class TimerView extends React.Component {
     render() {
         return (<button onClick={this.onReset}>
                 Seconds passed: {this.props.appState.timer}
