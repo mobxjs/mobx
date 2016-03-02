@@ -201,17 +201,17 @@
   <div id="main_content_wrap" class="outer">
     <section id="main_content" class="inner">
         <h3 id="getting-started">Introduction</h3>
-        <p><a href="https://github.com/mobxjs/mobx"><code>MobX</code></a> helps you in managing your state in a simple and scalable manner.
+        <p><a href="https://github.com/mobxjs/mobx"><code>MobX</code></a> helps you manage your state in a simple and scalable manner.
             This tutorial will teach you all the imporant concepts of MobX in ten minutes.
             This tutorial uses only plain ES5 code, but know that <a href="http://mobxjs.github.io/mobx/best/syntax.html" target="_blank">ES7 decorators</a> might even further simplify your code.
             First, a high level overview of MobX:
         </p>
         <h3>Core concepts</h3>
         <ol>
-            <li>MobX helps you managing all the <em>data</em> that describes the <em>state</em> of your application.
-            Data can have many forms, objects, arrays, references, class instances.
+            <li>MobX helps you manage all the <em>data</em> that describes the <em>state</em> of your application.
+            Data comes in many forms: objects, arrays, references and class instances.
             Unlike many other state management libraries, MobX <em>doesn't</em> care.
-            If you would be creating a spreadsheet; the values of your data cells together are your application state.
+            If you create a spreadsheet, the values of your data cells together are your application state.
             If you are building an todo application, your state is the list of todos.
             </li>
             <li>Secondly there are <em>derivations</em>.
@@ -219,23 +219,23 @@
             <em><b>Any value that can be computed automatically from the state of your application,
             should be (re-)computed automatically.</b></em>
             MobX will take care of this, as long as you provide a derivation. 
-            These derivations, or computed values, can range from be simple values like the number of unfinished todos,
+            These derivations, or computed values, can range from simple values like the number of unfinished todos,
             to complex stuff like a visual HTML representation of your todos.
             In spreadsheet terms: these are the formulas and charts of your application.
             </li>
-            <li><em>Reactions</em> are very similar to derivations. The main difference: they don't produce a value, 
-            but they execute some task for you whenever relevant state is changed. 
+            <li><em>Reactions</em> are very similar to derivations. The main difference is that they don't produce a value, 
+            but they execute a task for you whenever relevant state is changed. 
             They make sure that network requests are made automatically at the right time, or that debug information is printed upon each change.
             </li>
             <li>Finally there are <em>actions</em>. 
-            Basically; all other code. Actions live outside MobX but might alter your <em>state</em>.
+            Basically, all your other code. Actions live outside MobX but might alter your <em>state</em>.
             MobX will make sure that any changes to the application state caused by your actions are automatically processed by all derivations and reactions.
             Syncronously and glitch-free.
             </li>
         </ol>
         <h3>A simple store...</h3>
         <p>
-        Enough theory, seeing it in action probably explains more that carefully reading the above stuff.
+        Enough theory, seeing it in action will explain more than carefully reading the description above.
         For originality's sake let's start with a very simple ToDo store.
         Note that all the code blocks below are editable, use the <em>run code</em> buttons to execute them.
         Here is a very straight forward TodoStore. No MobX involved yet.
