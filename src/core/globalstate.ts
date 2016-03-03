@@ -24,7 +24,7 @@ export const globalState = (() => {
 	 */
 	if (global.__mobservableTrackingStack || global.__mobservableViewStack)
 		throw new Error("[mobx] An incompatible version of mobservable is already loaded.");
-	if (global.__mobxGlobal && global.__mobxGlobal.version !== globalState.version)
+	if (global.__mobxGlobal && global.__mobxGlobal.version !== res.version)
 		throw new Error("[mobx] An incompatible version of mobx is already loaded.");
 	if (global.__mobxGlobal)
 		return global.__mobxGlobal;
