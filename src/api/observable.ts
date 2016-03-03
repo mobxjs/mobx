@@ -1,6 +1,6 @@
 import {ObservableValue} from "../types/observablevalue";
 import {ValueMode, getValueModeFromValue, makeChildObservable} from "../types/modifiers";
-import {ComputedValue} from "../core/computedvalue";
+import {computed} from "./computeddecorator";
 import {isPlainObject, invariant, deprecated} from "../utils/utils";
 import {observableDecorator} from "./observabledecorator";
 import {isObservable} from "./isobservable";
@@ -12,9 +12,9 @@ export interface IObservableValue<T> {
 }
 
 /**
-	* Turns an object, array or function into a reactive structure.
-	* @param value the value which should become observable.
-	*/
+ * Turns an object, array or function into a reactive structure.
+ * @param value the value which should become observable.
+ */
 export function observable(target: Object, key: string, baseDescriptor?: PropertyDescriptor): any;
 export function observable<T>(value: T[]): IObservableArray<T>;
 export function observable<T, S extends Object>(value: () => T, thisArg?: S): IObservableValue<T>;
@@ -37,20 +37,14 @@ export function observable(v: any, keyOrScope?: string | any) {
 			return makeChildObservable(value, mode);
 		case ValueType.Reference:
 		case ValueType.ComplexObject:
-			observableIsDeprecated();
 			return new ObservableValue(value, mode);
 		case ValueType.ComplexFunction:
-			observableIsDeprecated();
 			throw new Error("[mobx.observable] To be able to make a function reactive it should not have arguments. If you need an observable reference to a function, use `observable(asReference(f))`");
 		case ValueType.ViewFunction:
-			observableIsDeprecated();
-			return new ComputedValue(value, keyOrScope, mode === ValueMode.Structure, value.name || "ComputedValue");
+			deprecated("Use `computed(expr)` instead of `observable(expr)`");
+			return computed(v, keyOrScope);
 	}
 	invariant(false, "Illegal State");
-}
-
-function observableIsDeprecated() {
-	deprecated("Invoking observable() on scalar values is deprecated. Use extendObservable or @observable instead.");	
 }
 
 export enum ValueType { Reference, PlainObject, ComplexObject, Array, ViewFunction, ComplexFunction }
