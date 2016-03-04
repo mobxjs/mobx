@@ -1,3 +1,9 @@
+# 2.0.1
+
+* Undeprecated `observable(scalar)` (see 143)
+* `expr` no longer prints incorrect deprecated messages (see 143)
+* Requires `mobx` twice no longer fails. 
+
 # 2.0.0
 
 ## A new name...
