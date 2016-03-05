@@ -26,6 +26,7 @@
           margin: 30px 0 20px;
       }
       body .CodeMirror {
+        position: static; /* fixes issue with devtools */
         height: auto;
         font-size: 10pt;
         font-family: courier new;
@@ -55,6 +56,7 @@
           overflow: hidden;
       }
       .inner {
+          position: static;
           margin-right:40px;
           max-width: 780px;
       }
@@ -177,7 +179,6 @@
 
     <div id="preview">
         <h3>React preview</h3>
-        <div id="devtools"></div>
         <div id="reactjs-app"><small>Read on and press any <em>run</em> buttons you encounter!</small></div>
         <hr/>
         <h4>Console log
@@ -211,8 +212,8 @@
             <li>MobX helps you managing all the <em>data</em> that describes the <em>state</em> of your application.
             Data can have many forms, objects, arrays, references, class instances.
             Unlike many other state management libraries, MobX <em>doesn't</em> care.
-            If you would be creating a spreadsheet; the values of your data cells together are your application state.
-            If you are building an todo application, your state is the list of todos.
+            If you were creating a spreadsheet; the values of your data cells together are your application state.
+            If you are building a todo application, your state is the list of todos.
             </li>
             <li>Secondly there are <em>derivations</em>.
             Basically, and this is the core idea of MobX: 
@@ -242,6 +243,9 @@
         </p>
 
 <textarea spellcheck="false" class="prettyprint" id="code1" rows="25">
+class Test {
+//   @mobx.observable x = 3;
+}
 function TodoStore() {
     this.todos = [];
 }
@@ -572,17 +576,23 @@ A short summary of the things you learned so far:
             <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
           </footer>
         </div>
+        <div id="devtools"></div>
 
         <script src="getting-started-assets/javascripts/jquery-2.1.4.min.js"></script>
         <script src="getting-started-assets/javascripts/codemirror/lib/codemirror.js"></script>
         <link rel="stylesheet" href="getting-started-assets/javascripts/codemirror/lib/codemirror.css">
         <link rel="stylesheet" href="getting-started-assets/javascripts/codemirror/theme/xq-light.css">
         <script src="getting-started-assets/javascripts/codemirror/javascript/javascript.js"></script>
-        <script src="getting-started-assets/javascripts/react-with-addons.js"></script>
-        <script src="getting-started-assets/javascripts/JSXTransformer.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.7/react-with-addons.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.7/react-dom.js"></script>
+        <script src="getting-started-assets/babel.min.js"></script>
         <script src="https://npmcdn.com/mobx@2.0.0/lib/mobx.umd.js"></script>
-        <script src="https://npmcdn.com/mobx-react@3.0.0/index.js"></script>
-
+        <script src="getting-started-assets/mobx-react.js"></script>
+<!--        <script src="https://npmcdn.com/mobx-react@3.0.0/index.js"></script>-->
+        <script src="getting-started-assets/index.js"></script>
+        <script>
+            React.render(React.createElement(window.mobxDevtools.default, {}), document.getElementById("devtools"));
+        </script>
         <script type="text/javascript">
         var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
         document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
@@ -614,7 +624,10 @@ A short summary of the things you learned so far:
 
             function runCodeHelper(code) {
                 var globalEval = eval; // global scope trick, See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval
-                code = JSXTransformer.transform(code).code;
+
+                code = Babel.transform(code, { presets: ['react', 'es2015-no-commonjs', 'stage-1'], plugins: [
+                    'transform-decorators-legacy'
+                    ] }).code.replace(/"use strict"/g,"");
                 try {
                     globalEval(code);
                 } catch (e) {
