@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="1.2" data-basepath=".." data-revision="Sun Mar 06 2016 13:49:44 GMT+0100 (CET)">
+    <div class="book" data-level="1.2" data-basepath=".." data-revision="Sun Mar 06 2016 13:53:57 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -747,7 +747,7 @@ But here is an (ES6) example of a view in the form of a React component.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;mobx-react&apos;</span>;
 
 @observer
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TimerView</span> <span class="hljs-title">extend</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TimerView</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
     render() {
         <span class="hljs-keyword">return</span> (<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{this.onReset}</span>&gt;</span>
                 Seconds passed: {this.props.appState.timer}
