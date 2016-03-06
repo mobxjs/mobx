@@ -46,7 +46,7 @@ function TodoStore() {
 
 ### ES6 / TypeScript classes
 
-When using ES6 or TypeScript it is recommended to use the `@observable` decorator to make observable properties or derivations.
+When using ES6 or TypeScript it is recommended to use the `@observable` decorator to make observable properties and `@computed` for derivations.
 Note that getters should be used to define observable functions on a class.This is to keep the type of a derived value consistent between ES5 / ES6 and TypeScript:
 Use `store.completedCount` to obtain a derived value; not `store.completedCount()`.
 In contrast, `@observable someFunction() {}` will just create an observable reference to `someFunction`, but `someFunction` itself won't become reactive.
@@ -59,7 +59,7 @@ class TodoStore {
         completed: true
     }]
 
-    @observable get completedCount() {
+    @computed get completedCount() {
         return this.todos.filter((todo) => todo.completed).length;
     }
 }

@@ -8,92 +8,6 @@ If data is observable, views that depend on that data will update automatically.
 Probably you will only use the version that takes objects,
 but these are the available variations:
 
-## Primitive values and references
-
-For all type of values, with the exception of _plain objects_, _arrays_ and _functions without arguments_ this overload is run.
-`observable` accepts a value and returns an object with a getter / setter function that holds this value.
-Furthermore you can register a callback using its `.observe` method to listen to changes on the stored value.
-But in most cases it is better to use [`mobx.autorun`](autorun.md) instead.
-
-So the signature of object returned by `observable(scalar)` is:
-* `.get()` Returns the current value.
-* `.set(value)` Replaces the currently stored value. Notifies all observers.
-* `.observe(callback: (newValue, previousValue) => void, fireImmediately = false): disposerFunction`. Registers an observer function that will fire each time the stored value is replaced. Returns a function to cancel the observer.
-
-Example:
-
-```javascript
-import {observable} from "mobx";
-
-const cityName = observable("Vienna");
-
-console.log(cityName.get());
-// prints 'Vienna'
-
-cityName.observe(function(newCity, oldCity) {
-	console.log(oldCity, "->", newCity);
-});
-
-cityName.set("Amsterdam");
-// prints 'city: Vienna -> Amsterdam'
-```
-
-N.B. in mobx1 `cityName` would be a function. Invoking without arguments returns the current value. Invoking it with an argument updates it.
-
-## Expressions
-
-If an argumentless function is passed to `observable`,
-MobX will make sure that that function is run each time that any of the values used by the function is changed.
-A new function is returned which has the same signature as the function returned for primitives, except that it is not allowed to assign a new value manually.
-
-Example:
-```javascript
-import {observable, computed} from "mobx";
-var name = observable("John");
-var age = observable(42);
-var showAge = observable(false);
-
-var labelText = computed(() =>
-	showAge.get() ? `${name.get()} (age: ${age.get()})` : name.get();
-);
-
-var disposer = labelText.observe(newLabel => console.log(newLabel));
-
-name.set("Dave");
-// prints: 'Dave'
-
-age.set(21);
-// doesn't print
-
-showAge.set(true);
-// prints: 'Dave (age: 21)'
-
-age.set(42);
-// prints: 'Dave (age: 42)'
-
-// cancel the observer
-disposer();
-
-name.set("Matthew");
-// doesn't print anymore...
-
-// ... but the value can still be inspected if needed.
-console.log(labelText.get());
-```
-
-Note how the function now automatically reacts to data changes,
-but only if they occurred in data that was actually used to produce the output.
-Hence the first change to `age` didn't result in a re-evaluation of the `labelText` function.
-MobX will automatically determine whether the function should run _eagerly_ or _lazily_ based on how the views are used throughout your application,
-so make sure your code doesn't rely on any side effects in those functions.
-
-
----
-
-These two forms of `observable`, one for primitives and references, and one for functions, form the core of MobX.
-The rest of the api is just syntactic sugar around these two core operations.
-Nonetheless, you will rarely use these forms; using objects is just a tat more convenient.
-
 ## Objects
 
 If a plain javascript object is passed to `observable` (that is, an object that wasn't created using a constructor function),
@@ -131,7 +45,7 @@ Some things to keep in mind when making objects observable:
 Properties that are added to the object at a later time won't become observable, unless [`extendObservable`](extend-observable.md) is used.
 * Only plain objects will be made observable. For non-plain objects it is considered the responsibility of the constructor to initialize the observable properties.
 Either use the [`@observable`](observable.md) annotation or the [`extendObservable`](extend-observable.md) function.
-* Argumentless functions will be automatically turned into views. For view `this` will be automatically bound to the object it is defined on.
+* Argumentless functions will be automatically turned into views, just like [`@computed`](computed-decorator) would do. For view `this` will be automatically bound to the object it is defined on.
 However, if a function expression (ES6 / typescript) is used, `this` will be bound to undefined, so you probably want to either refer to the object directly, or use a classic function.
 * `observable` is applied recursively, both on instantiation and to any new values that will be assigned to observable properties in the future.
 * These defaults are fine in 95% of the cases, but for more fine-grained on how and which properties should be made observable, see the [modifiers](modifiers.md) section.
@@ -188,3 +102,37 @@ Besides all built-in functions, the following goodies are available as well on o
 * `peek()` Returns an array with all the values which can safely be passed to other libraries, similar to `slice()`.  
 In contrast to `slice`, `peek` peek doesn't create a defensive copy. Use this in performance critical applications if you know for sure that you use the array in a read-only manner.  
 In performance cricital sections it is recommend to use [fastArray](../refguide/fast-array.md) as well.
+
+
+## Primitive values and references
+
+For all type of values, with the exception of _plain objects_, _arrays_ and _functions without arguments_ this overload is run.
+In practice, you probably won't use this overload as it is often more convenient to use `observable` on an object or 
+[`extendObservable`](../refguide/extend-observable.md) (or `@observable`) to introduce observable properties on existing objects.
+
+`observable` accepts scalar values and returns an object with a getter / setter function that holds this value.
+Furthermore you can register a callback using its `.observe` method to listen to changes on the stored value.
+But in most cases it is better to use [`mobx.autorun`](autorun.md) instead.
+
+So the signature of object returned by `observable(scalar)` is:
+* `.get()` Returns the current value.
+* `.set(value)` Replaces the currently stored value. Notifies all observers.
+* `.observe(callback: (newValue, previousValue) => void, fireImmediately = false): disposerFunction`. Registers an observer function that will fire each time the stored value is replaced. Returns a function to cancel the observer.
+
+Example:
+
+```javascript
+import {observable} from "mobx";
+
+const cityName = observable("Vienna");
+
+console.log(cityName.get());
+// prints 'Vienna'
+
+cityName.observe(function(newCity, oldCity) {
+	console.log(oldCity, "->", newCity);
+});
+
+cityName.set("Amsterdam");
+// prints 'city: Vienna -> Amsterdam'
+```

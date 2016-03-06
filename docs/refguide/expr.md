@@ -12,3 +12,5 @@ const TodoView = observer(({todo, editorState}) => {
     return <div className={isSelected ? "todo todo-selected" : "todo"}>{todo.title}</div>;
 });
 ```
+
+`expr(func)` is an alias for `computed(func).get()`.

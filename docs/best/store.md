@@ -49,36 +49,28 @@ For testing purposes, I recommend to just pass it through the component tree.
 Example of a store (using ES6 syntax):
 
 ```javascript
-import {extendObservable} from 'mobx';
+import {observable, computed, asStructure} from 'mobx';
 import jquery from 'jquery';
 
 class UiState {
+    @observable language = "en_US";    
+    @observable pendingRequestCount = 0;
+
+    // asStructure makes sure observer won't be signaled onlyif the 
+    // dimensions object changed in a deepEqual manner
+    @observable windowDimensions = asStructure({
+        width: jquery(window).width(),
+        height: jquery(window).height()
+    });
+    
 	constructor() {
-        const $window = jquery(window);
-        extendObservable(this, {
-            // make window dimensions available as observable information
-            windowDimensions: this.getWindowDimensions(),
-
-            // active translation
-            language: "en_US",
-
-            // info about pending requests, used for the component that shows the current sync state
-            pendingRequestCount: 0,
-            appIsInSync: function() {
-                return this.pendingRequestCount === 0
-            }
-        });
-
         jquery.resize(() => {
             this.windowDimensions = getWindowDimensions();
         });
     }
 
-    getWindowDimensions() {
-        return {
-            width: $(window).width(),
-            height: $(window).height()
-        };
+    @computed get appIsInSync() {
+        return this.pendingRequestCount === 0
     }
 }
 
@@ -140,6 +132,8 @@ import {observable, autorun} from 'mobx';
 import uuid from 'node-uuid';
 
 export class TodoStore {
+    authorStore;
+    transportLayer;
     @observable todos = [];
     @observable isLoading = true;
 
@@ -232,7 +226,7 @@ export class Todo {
 
         this.saveHandler = autorun(() => {
             // observe everything that is used in the JSON:
-            var json = this.toJson();
+            var json = this.asJson;
             // if autoSave is on, send json to server
             if (this.autoSave) {
                 this.store.transportLayer.saveTodo(todoJson);
@@ -248,7 +242,7 @@ export class Todo {
         this.store.removeTodo(this);
     }
 
-    toJson() {
+    @computed get asJson() {
         return {
             id: this.id,
             completed: this.completed,

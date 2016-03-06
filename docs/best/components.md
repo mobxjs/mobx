@@ -1,6 +1,6 @@
 # Organizing React Components
 
-TODO:
+See also [@observer](../refguide/observer-component.md)
 
 `@observer` is quite similar to decorators like `@connect` as found in several flux libraries, yet there are some important differences.
 1. `@observer` needs no configuration; dependencies will be detected automatically.

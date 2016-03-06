@@ -44,3 +44,57 @@ Decorators are not supported by default when using TypeScript or Babel pending a
 * For _typescript_, enable the `--experimentalDecorators` compiler flag or set the compiler option `experimentalDecorators` to `true` in `tsconfig.json` (Recommended)
 * For _babel5_, make sure `--stage 0` is passed to the babel CLI
 * For _babel6_, see the example configuration as suggested in this [issue](https://github.com/mobxjs/mobx/issues/105)
+
+# `computed(expression)`
+
+`computed` can also be invoked directly as function. 
+Just like `observable(primitive value)` it will create a stand-alone observable.
+Use `.get()` on the returned object to get the current value of the computation, or `.observe(callback)` to observe it's changes.
+
+Example:
+```javascript
+import {observable, computed} from "mobx";
+var name = observable("John");
+var age = observable(42);
+var showAge = observable(false);
+
+var labelText = computed(() =>
+	showAge.get() ? `${name.get()} (age: ${age.get()})` : name.get();
+);
+
+var disposer = labelText.observe(newLabel => console.log(newLabel));
+
+name.set("Dave");
+// prints: 'Dave'
+
+age.set(21);
+// doesn't print
+
+showAge.set(true);
+// prints: 'Dave (age: 21)'
+
+age.set(42);
+// prints: 'Dave (age: 42)'
+
+// cancel the observer
+disposer();
+
+name.set("Matthew");
+// doesn't print anymore...
+
+// ... but the value can still be inspected if needed.
+console.log(labelText.get());
+```
+
+Note how the function now automatically reacts to data changes,
+but only if they occurred in data that was actually used to produce the output.
+Hence the first change to `age` didn't result in a re-evaluation of the `labelText` function.
+MobX will automatically determine whether the function should run _eagerly_ or _lazily_ based on how the views are used throughout your application,
+so make sure your code doesn't rely on any side effects in those functions.
+
+
+---
+
+These two forms of `observable`, one for primitives and references, and one for functions, form the core of MobX.
+The rest of the api is just syntactic sugar around these two core operations.
+Nonetheless, you will rarely use these forms; using objects is just a tat more convenient.

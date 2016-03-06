@@ -7,7 +7,7 @@
 * [Core API](refguide/api.md)
   * [observable](refguide/observable.md)
   * [@observable](refguide/observable-decorator.md)
-  * [@computed](refguide/computed-decorator.md) 
+  * [(@)computed](refguide/computed-decorator.md) 
   * [autorun](refguide/autorun.md)
   * [@observer](refguide/observer-component.md)
 * Advanced API
@@ -15,7 +15,6 @@
   * [createTransformer](refguide/create-transformer.md)
   * [expr](refguide/expr.md)
   * [extendObservable](refguide/extend-observable.md)
-  * [fastArray](refguide/fast-array.md)
   * [isObservable(..)](refguide/is-observable.md)
   * [map](refguide/map.md)
   * [modifiers](refguide/modifiers.md)
