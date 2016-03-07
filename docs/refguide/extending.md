@@ -35,7 +35,7 @@ class Clock {
 	}
 	
 	getTime() {
-		// let mobx now this observable data source has been used
+		// let mobx know this observable data source has been used
 		this.atom.reportObserved();	
 		if (!this.intervalHandler) {
 			this.tick(); // do the initial tick
@@ -45,7 +45,7 @@ class Clock {
 	
 	tick() {
 		this.currentDateTime = new Date();
-		// let mobx now that this data source has changed
+		// let mobx know that this data source has changed
 		this.atom.reportChanged();
 	}
 	

@@ -9,7 +9,7 @@ Don't confuse `@computed` with `autorun`. They are both reactively invoked expre
 but use `@computed` if you want to reactively produce a new value that can be used by other observers and 
 `autorun` if you don't want to produce a new value but rather invoke some imperative code like logging, network requests etc.
 
-Computed properties can be optimized away in many cases by Mobservable as they are assumed to be pure.
+Computed properties can be optimized away in many cases by MobX as they are assumed to be pure.
 So they will not be invoked when there input parameters didn't modifiy or if they are not observed by some other computed value or autorun. 
  
 
