@@ -26,7 +26,7 @@ var person = observable({
 	labelText: function() {
 		return this.showAge ? `${this.name} (age: ${this.age})` : this.name;
 	}
-};
+});
 
 // object properties don't expose an 'observe' method,
 // but don't worry, 'mobx.autorun' is even more powerful
