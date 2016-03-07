@@ -1,12 +1,10 @@
 require([
     "gitbook",
-    "jQuery",
-    "URIjs/URI",
-    "utils/url",
-], function(gitbook, $, URI, URL) {
+    "jQuery"
+], function(gitbook, $) {
     var use_identifier = false;
 
-    var resetDisqus = function() {
+    function resetDisqus() {
         var $disqusDiv = $("<div>", {
             "id": "disqus_thread"
         });
@@ -15,7 +13,7 @@ require([
         if (typeof DISQUS !== "undefined") {
             DISQUS.reset({
                 reload: true,
-                config: function () {  
+                config: function () {
                     this.language = $('html').attr('lang') || "en";
                     this.page.url = window.location.href;
 
@@ -25,14 +23,22 @@ require([
                 }
             });
         }
-    };
+    }
 
-    var currentUrl = function() {
+    function joinURL(baseUrl, url) {
+        var theUrl = new URI(url);
+        if (theUrl.is("relative")) {
+            theUrl = theUrl.absoluteTo(baseUrl);
+        }
+        return theUrl.toString();
+    }
+
+    function currentUrl() {
         var location = new URI(window.location.href),
-            base     = URL.join(window.location.href, gitbook.state.basePath),
+            base     = joinURL(window.location.href, gitbook.state.basePath),
             current  = location.relativeTo(base).toString(),
             language = $('html').attr('lang'),
-            parent   = URL.dirname(base),
+            parent   = joinURL(base, '..'),
             folder   = new URI(base).relativeTo(parent).toString();
 
         // If parent folder is the same as language, we assume translated books
@@ -41,7 +47,7 @@ require([
         }
 
         return current;
-    };
+    }
 
     gitbook.events.bind("start", function(e, config) {
         config.disqus = config.disqus || {};
