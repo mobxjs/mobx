@@ -63,6 +63,6 @@ function computedDecorator(target: any, key?: any, baseDescriptor?: PropertyDesc
 	}
 }
 
-function throwingComputedValueSetter() {
+export function throwingComputedValueSetter() {
 	throw new Error(`[ComputedValue] It is not allowed to assign new values to computed properties.`);
 }

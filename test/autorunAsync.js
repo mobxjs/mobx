@@ -79,3 +79,25 @@ test('autorun 1', function(t) {
 		}, 30);
 	}, 30);
 });
+
+test('autorun should not result in loop', function(t) {
+	var i = 0;
+	var a = m.observable({
+		x: i
+	});
+
+	var autoRunsCalled = 0;
+	var d = m.autorunAsync(function() {
+		autoRunsCalled++;
+		a.x = ++i;
+		setTimeout(function() {
+			a.x = ++i;
+		}, 10);
+	}, 10);
+	
+	setTimeout(function() {
+		t.equal(autoRunsCalled, 1);
+		t.end();
+		d();
+	}, 100);
+});

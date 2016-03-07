@@ -1,3 +1,7 @@
+# 2.0.2
+
+* Fixed issue where changing an object property was tracked, which could lead to unending loops in `autorunAsync`.
+
 # 2.0.1
 
 * Undeprecated `observable(scalar)` (see 143)

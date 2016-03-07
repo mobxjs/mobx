@@ -4,6 +4,7 @@ import {ValueMode, AsStructure} from "./modifiers";
 import {Lambda, invariant, assertPropertyConfigurable} from "../utils/utils";
 import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {getNextId} from "../core/globalstate";
+import {throwingComputedValueSetter} from "../api/computeddecorator";
 
 export interface IObjectChange<T, R> {
 	name: string;
@@ -62,32 +63,37 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 
 	let observable: ComputedValue<any>|ObservableValue<any>;
 	let name = `${adm.name}@${adm.id} / Prop "${propName}"`;
+	let isComputed = true;
 
 	if (typeof value === "function" && value.length === 0)
 		observable = new ComputedValue(value, adm.target, false, name);
 	else if (value instanceof AsStructure && typeof value.value === "function" && value.value.length === 0)
 		observable = new ComputedValue(value.value, adm.target, true, name);
-	else
+	else {
+		isComputed = false;
 		observable = new ObservableValue(value, adm.mode, name);
+	}
 
 	adm.values[propName] = observable;
 	Object.defineProperty(adm.target, propName, {
 		configurable: true,
-		enumerable: observable instanceof ObservableValue,
+		enumerable: !isComputed,
 		get: function() {
 			return observable.get();
 		},
-		set: function(newValue) {
-			const oldValue = observable.get();
-			if (observable.set(newValue) && adm.events !== undefined) {
-				adm.events.emit(<IObjectChange<any, any>> {
-					type: "update",
-					object: this,
-					name: propName,
-					oldValue
-				});
+		set: isComputed
+			? throwingComputedValueSetter 
+			: function(newValue) {
+				const oldValue = (observable as any).value;
+				if (observable.set(newValue) && adm.events !== undefined) {
+					adm.events.emit(<IObjectChange<any, any>> {
+						type: "update",
+						object: this,
+						name: propName,
+						oldValue
+					});
+				}
 			}
-		}
 	});
 
 	if (adm.events !== undefined) {
