@@ -2,8 +2,8 @@
 /// <reference path='tape.d.ts' />
 import {
     observe, computed, observable, asStructure, autorun, autorunAsync, extendObservable, 
-    IObservableArray, IArrayChange, IArraySplice, IObservableValue,
-    extras, Atom, transaction
+    IObservableArray, IArrayChange, IArraySplice, IObservableValue, isObservable, isObservableObject,
+    extras, Atom, transaction, IObjectChange
 } from "../lib/mobx";
 import * as test from 'tape';
 
@@ -29,6 +29,38 @@ class Order {
     // but if the next line is enabled it should throw...
     // @observable hoepie() { return 3; }
 }
+
+test('decorators', function(t) {
+	var o = new Order();
+	t.equal(o.total, 6); // hmm this is required to initialize the props which are made reactive lazily..
+	t.equal(isObservableObject(o), true);
+	t.equal(isObservable(o, 'amount'), true);
+	t.equal(isObservable(o, 'total'), true);
+	
+	var events: any[] = [];
+	var d1 = observe(o, (ev: IObjectChange<any, any>) => events.push(ev.name, ev.oldValue));
+	var d2 = observe(o, 'price', (newValue, oldValue) => events.push(newValue, oldValue));
+	var d3 = observe(o, 'total', (newValue, oldValue) => events.push(newValue, oldValue));
+	
+	o.price = 4;
+	
+	d1();
+	d2();
+	d3();
+	
+	o.price = 5;
+	
+	t.deepEqual(events, [
+		8, // new total
+		6, // old total
+		4, // new price
+		3, // old price
+		"price", // event name
+		3, // event oldValue
+	]);
+	
+	t.end();
+})
 
 test('observable', function(t) {
     var a = observable(3);

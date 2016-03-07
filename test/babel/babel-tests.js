@@ -1,5 +1,6 @@
 import {
     observable, computed, transaction, asStructure, autorun, extendObservable, 
+	isObservableObject, observe, isObservable,
     default as mobx
 } from "../";
 
@@ -71,3 +72,47 @@ test('babel: parameterized computed decorator', (t) => {
 	
 	t.end();
 });
+
+class Order {
+    @observable price = 3;
+    @observable amount = 2;
+    @observable orders = [];
+    @observable aFunction = function(a) { };
+    @observable someStruct = asStructure({ x: 1, y: 2});
+
+    @computed get total() {
+        return this.amount * this.price * (1 + this.orders.length);
+    }
+}
+
+test('decorators', function(t) {
+	var o = new Order();
+	t.equal(o.total, 6); // hmm this is required to initialize the props which are made reactive lazily..
+	t.equal(isObservableObject(o), true);
+	t.equal(isObservable(o, 'amount'), true);
+	t.equal(isObservable(o, 'total'), true);
+	
+	var events = [];
+	var d1 = observe(o, (ev) => events.push(ev.name, ev.oldValue));
+	var d2 = observe(o, 'price', (newValue, oldValue) => events.push(newValue, oldValue));
+	var d3 = observe(o, 'total', (newValue, oldValue) => events.push(newValue, oldValue));
+	
+	o.price = 4;
+	
+	d1();
+	d2();
+	d3();
+	
+	o.price = 5;
+	
+	t.deepEqual(events, [
+		8, // new total
+		6, // old total
+		4, // new price
+		3, // old price
+		"price", // event name
+		3, // event oldValue
+	]);
+	
+	t.end();
+})
