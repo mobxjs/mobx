@@ -84,15 +84,15 @@ code {
     margin: 0;
     box-shadow: none;
     color: #007edf;
-    font-family: courier new;
+    font-family: 'courier new';
+    font-size: 11pt;
     background: none;
-    font-weight: bold;
 }
-.right li code {
+.right li {
 	color: white;
+    padding-left: 10px;
 }
-#clear-btn {
-    font-size: 8pt;
+button {
     cursor: pointer;
 }
 .btn-run {
@@ -100,7 +100,6 @@ code {
     float: right;
     position: relative;
     padding: 4px 10px;
-    cursor: pointer;
     top: -22px;
     left: 7px;
 }
@@ -156,11 +155,23 @@ small {
     font-size: 10pt;
     font-style: italic;
 }
-li > small {
-    color: #aaa;
+#reactjs-app {
+    font-size: 16pt;
+}
+#reactjs-app small {
+    color: white;
     padding-left: 10px;
 }
 
 body .github-fork-ribbon {
     background-color: cornflowerblue;
+}
+
+#devtools {
+    color: black;
+}
+
+pre {
+    background-color: #e9e9e9;
+    padding: 20px;
 }
