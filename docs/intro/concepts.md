@@ -56,7 +56,7 @@ var todoStore = observable({
 
 	/* a reactive view */
 	completedCount: function() {
-		return this.todos.filter(() => todo.completed).length;
+		return this.todos.filter(todo => todo.completed).length;
 	}
 });
 
