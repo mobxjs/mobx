@@ -80,4 +80,4 @@ todoStore.todos[0].completed = true;
 
 ```
 
-In the [5 minute introduction to MobX and React](https://mobxjs.github.io/mobx/getting-started.html) you can dive deeper into this example and build an user interface using [React](https://facebook.github.io/react/) around it.
+In the [10 minute introduction to MobX and React](https://mobxjs.github.io/mobx/getting-started.html) you can dive deeper into this example and build an user interface using [React](https://facebook.github.io/react/) around it.
