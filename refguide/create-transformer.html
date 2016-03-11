@@ -8,7 +8,7 @@
         <title>createTransformer | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
-        <meta name="generator" content="GitBook 2.6.7">
+        <meta name="generator" content="GitBook 2.2.0">
         
         
         <meta name="HandheldFriendly" content="true"/>
@@ -21,19 +21,7 @@
     <link rel="stylesheet" href="../gitbook/style.css">
     
         
-        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-disqus/plugin.css">
-        
-    
-        
-        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
-        
-    
-        
-        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-search/search.css">
-        
-    
-        
-        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-fontsettings/website.css">
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-edit-link/plugin.css">
         
     
     
@@ -52,26 +40,22 @@
     <body>
         
         
-    <div class="book"
-        data-level="3.2"
-        data-chapter-title="createTransformer"
-        data-filepath="refguide/create-transformer.md"
-        data-basepath=".."
-        data-revision="Mon Mar 07 2016 20:08:07 GMT+0100 (CET)"
-        data-innerlanguage="">
+    <div class="book" data-level="3.2" data-basepath=".." data-revision="Fri Mar 11 2016 10:57:38 GMT+0100 (CET)">
     
 
 <div class="book-summary">
-    <nav role="navigation">
-        <ul class="summary">
-            
-            
-            
-            
+    <div class="book-search">
+        <input type="text" placeholder="Type to search" class="form-control" />
+    </div>
+    <ul class="summary">
+        
+        
+        
+        
 
-            
+        
 
-            
+        
     
         <li class="chapter " data-level="0" data-path="index.html">
             
@@ -94,14 +78,29 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="1.1" data-path="intro/overview.html">
+        <li class="chapter " data-level="1.1" data-path="index.html">
+            
+                
+                    <a href="../index.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>1.1.</b>
+                        
+                        Why MobX?
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="intro/overview.html">
             
                 
                     <a href="../intro/overview.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>1.1.</b>
+                            <b>1.2.</b>
                         
                         The Gist of MobX
                     </a>
@@ -109,14 +108,14 @@
             
         </li>
     
-        <li class="chapter " data-level="1.2" data-path="intro/concepts.html">
+        <li class="chapter " data-level="1.3" data-path="intro/concepts.html">
             
                 
                     <a href="../intro/concepts.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>1.2.</b>
+                            <b>1.3.</b>
                         
                         Concepts &amp; Principles
                     </a>
@@ -623,23 +622,95 @@
     
 
 
-            
-            <li class="divider"></li>
-            <li>
-                <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
-                    Published with GitBook
-                </a>
-            </li>
-            
-        </ul>
-    </nav>
+        
+        <li class="divider"></li>
+        <li>
+            <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+                Published with GitBook
+            </a>
+        </li>
+        
+    </ul>
 </div>
 
     <div class="book-body">
         <div class="body-inner">
-            <div class="book-header" role="navigation">
+            <div class="book-header">
     <!-- Actions Left -->
+    <a href="#" class="btn pull-left toggle-summary" aria-label="Table of Contents"><i class="fa fa-align-justify"></i></a>
+    <a href="#" class="btn pull-left toggle-search" aria-label="Search"><i class="fa fa-search"></i></a>
     
+    <div id="font-settings-wrapper" class="dropdown pull-left">
+        <a href="#" class="btn toggle-dropdown" aria-label="Font Settings"><i class="fa fa-font"></i>
+        </a>
+        <div class="dropdown-menu font-settings">
+    <div class="dropdown-caret">
+        <span class="caret-outer"></span>
+        <span class="caret-inner"></span>
+    </div>
+
+    <div class="buttons">
+        <button type="button" id="reduce-font-size" class="button size-2">A</button>
+        <button type="button" id="enlarge-font-size" class="button size-2">A</button>
+    </div>
+
+    <div class="buttons font-family-list">
+        <button type="button" data-font="0" class="button">Serif</button>
+        <button type="button" data-font="1" class="button">Sans</button>
+    </div>
+
+    <div class="buttons color-theme-list">
+        <button type="button" id="color-theme-preview-0" class="button size-3" data-theme="0">White</button>
+        <button type="button" id="color-theme-preview-1" class="button size-3" data-theme="1">Sepia</button>
+        <button type="button" id="color-theme-preview-2" class="button size-3" data-theme="2">Night</button>
+    </div>
+</div>
+
+    </div>
+
+    <!-- Actions Right -->
+    
+    <div class="dropdown pull-right">
+        <a href="#" class="btn toggle-dropdown" aria-label="Share"><i class="fa fa-share-alt"></i>
+        </a>
+        <div class="dropdown-menu font-settings dropdown-left">
+            <div class="dropdown-caret">
+                <span class="caret-outer"></span>
+                <span class="caret-inner"></span>
+            </div>
+            <div class="buttons">
+                <button type="button" data-sharing="twitter" class="button">
+                    Share on Twitter
+                </button>
+                <button type="button" data-sharing="google-plus" class="button">
+                    Share on Google
+                </button>
+                <button type="button" data-sharing="facebook" class="button">
+                    Share on Facebook
+                </button>
+                <button type="button" data-sharing="weibo" class="button">
+                    Share on Weibo
+                </button>
+                <button type="button" data-sharing="instapaper" class="button">
+                    Share on Instapaper
+                </button>
+            </div>
+        </div>
+    </div>
+    
+
+    
+    <a href="#" target="_blank" class="btn pull-right google-plus-sharing-link sharing-link" data-sharing="google-plus" aria-label="Google"><i class="fa fa-google-plus"></i></a>
+    
+    
+    <a href="#" target="_blank" class="btn pull-right facebook-sharing-link sharing-link" data-sharing="facebook" aria-label="Facebook"><i class="fa fa-facebook"></i></a>
+    
+    
+    <a href="#" target="_blank" class="btn pull-right twitter-sharing-link sharing-link" data-sharing="twitter" aria-label="Twitter"><i class="fa fa-twitter"></i></a>
+    
+    
+    
+
 
     <!-- Title -->
     <h1>
@@ -648,13 +719,13 @@
     </h1>
 </div>
 
-            <div class="page-wrapper" tabindex="-1" role="main">
+            <div class="page-wrapper" tabindex="-1">
                 <div class="page-inner">
                 
                 
                     <section class="normal" id="section-">
                     
-                        <h1 id="createtransformer">createTransformer</h1>
+                        <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/create-transformer.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="createtransformer">createTransformer</h1>
 <p><code>createTransformer&lt;A, B&gt;(transformation: (value: A) =&gt; B, onCleanup?: (result: B, value?: A) =&gt; void): (value: A) =&gt; B</code></p>
 <p><code>createTransformer</code> turns a function (that should transforms one value into another value) into a reactive and memoizing function.
 In other words, if the <code>transformation</code> functions computes B given a specific A, the same B will be returned for all other future invocations of the transformation with the same A.
@@ -813,10 +884,6 @@ m.autorun(<span class="hljs-function"><span class="hljs-keyword">function</span>
     
 
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/URI.js/1.16.1/URI.min.js"></script>
-    
-
-    
     <script src="../gitbook/plugins/gitbook-plugin-disqus/plugin.js"></script>
     
 
@@ -824,30 +891,14 @@ m.autorun(<span class="hljs-function"><span class="hljs-keyword">function</span>
     <script src="../gitbook/plugins/gitbook-plugin-edit-link/plugin.js"></script>
     
 
-    
-    <script src="../gitbook/plugins/gitbook-plugin-search/lunr.min.js"></script>
-    
-
-    
-    <script src="../gitbook/plugins/gitbook-plugin-search/search.js"></script>
-    
-
-    
-    <script src="../gitbook/plugins/gitbook-plugin-sharing/buttons.js"></script>
-    
-
-    
-    <script src="../gitbook/plugins/gitbook-plugin-fontsettings/buttons.js"></script>
-    
-
 <script>
 require(["gitbook"], function(gitbook) {
-    var config = {"edit-link":{"base":"https://github.com/mweststrate/mobservable/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable","useIdentifier":false},"highlight":{},"search":{"maxIndexSize":1000000},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}};
+    var config = {"fontSettings":{"theme":null,"family":"sans","size":2},"edit-link":{"base":"https://github.com/mweststrate/mobservable/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"}};
     gitbook.start(config);
 });
 </script>
 
-        
+        <script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'UA-65632006-1', 'auto');ga('send', 'pageview');</script>
     </body>
     
 </html>
