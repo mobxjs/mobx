@@ -38,6 +38,7 @@
                         <p>
                             <a href="https://github.com/mobxjs/mobx"><code>MobX</code></a> is a simple, scalable and battle tested state management solution.
 							This tutorial will teach you all the important concepts of MobX in ten minutes.
+                            MobX is a standalone library, but most people are using it with React and this tutorial focuses on that combination.
                         </p>
                         <h3>The core idea</h3>
 						<p>
@@ -256,64 +257,64 @@ observableTodoStore.todos[0].task = "grok MobX tutorial";
                         <textarea spellcheck="false" class="" id="react1" rows="44">
 @observer
 class TodoList extends React.Component {
-	render() {
-		const store = this.props.store; 
-		return (
-			<div>
-				<RenderCounter />
-                { store.report }
-				<ul>
-					{ store.todos.map(
-                        (todo, idx) => <TodoView todo={ todo } key={ idx } />
-                    ) }
-				</ul>
-                { store.pendingRequests > 0 ? <marquee>Loading...</marquee> : null }
-				<button onClick={ this.onNewTodo }>New Todo</button>
-				<small> (double-click a todo to edit)</small>
-			</div>
-		);
-	}
+  render() {
+    const store = this.props.store; 
+    return (
+      <div>
+        { store.report }
+        <ul>
+        { store.todos.map(
+          (todo, idx) => <TodoView todo={ todo } key={ idx } />
+        ) }
+        </ul>
+        { store.pendingRequests > 0 ? <marquee>Loading...</marquee> : null }
+        <button onClick={ this.onNewTodo }>New Todo</button>
+        <small> (double-click a todo to edit)</small>
+        <RenderCounter />
+      </div>
+    );
+  }
 
-	onNewTodo = () => { 
-		this.props.store.addTodo(prompt('Enter a new todo:','coffee plz')); 
-	} 
+  onNewTodo = () => { 
+    this.props.store.addTodo(prompt('Enter a new todo:','coffee plz')); 
+  } 
 }
 
 @observer
 class TodoView extends React.Component {
-	render() {
-		const todo = this.props.todo;
-		return (
-			<li onDoubleClick={ this.onRename }>
-				<RenderCounter />
-				<input 
-                    type='checkbox'
-                    checked={ todo.completed }
-                    onChange={ this.onToggleCompleted } 
-                />
-				{ todo.task }
-                { todo.assignee 
-                    ? <small>{ todo.assignee.name }</small> 
-                    : null
-                }
-			</li>
-		); 
-	}
+  render() {
+    const todo = this.props.todo;
+    return (
+      <li onDoubleClick={ this.onRename }>
+        <input 
+          type='checkbox'
+          checked={ todo.completed }
+          onChange={ this.onToggleCompleted } 
+        />
+        { todo.task }
+        { todo.assignee 
+          ? <small>{ todo.assignee.name }</small> 
+          : null
+        }
+        <RenderCounter />
+      </li>
+    ); 
+  }
 
-	onToggleCompleted = () => {
-		const todo = this.props.todo;
-		todo.completed = !todo.completed;
-	}
+  onToggleCompleted = () => {
+    const todo = this.props.todo;
+    todo.completed = !todo.completed;
+  }
 
-	onRename = () => {
-		const todo = this.props.todo;
-        todo.task = prompt('Task name', todo.task) || ""; 
-	} 
+  onRename = () => {
+    const todo = this.props.todo;
+    todo.task = prompt('Task name', todo.task) || ""; 
+  } 
 }
 
 ReactDOM.render(
-    <TodoList store={ observableTodoStore } />, 
-    document.getElementById('reactjs-app')
+  <TodoList store={ observableTodoStore } />, 
+  document.getElementById('reactjs-app')
 );
                         </textarea>
                         <button onClick="runCode(['#code1', '#code3', '#code4', '#react1'])" class="btn-run">Run code</button>
@@ -345,7 +346,7 @@ store.todos.push({ task: "Find a fine cheese", completed: true });
                         </p>
                         <textarea spellcheck="false" class="" id="store2" rows="8">
 var peopleStore = mobx.observable([
-	{ name: "Michel" }, 
+    { name: "Michel" }, 
 	{ name: "Me" } 
 ]);
 observableTodoStore.todos[0].assignee = peopleStore[0];
@@ -426,6 +427,21 @@ setTimeout(function() {
                             changes. You could for example add a log statement to the <code>report</code> function to see when it is called.
                             Or don't show the <code>report</code> at all and see how that
                             influences the rendering of the <code>TodoList</code>. Or show it only under specific circumstances...
+                        </p>
+                        
+                        <h3>MobX is not a state container</h3>
+                        <p>
+                            People often use MobX as alternative for Redux. 
+                            But please note that MobX is just a library to 
+                            solve a technical problem and not an architecture or even state container in itself.
+                            In that sense the above examples are contrived and it is recommended to use proper engineering practices like
+                            encapsulating logic in methods, organize them in stores or controllers etc.
+                            Or, as somebody on HackerNews put it:
+                            <blockquote><em>
+&ldquo;MobX, it's been mentioned elsewhere but I can't help but sing its praises. 
+Writing in MobX means that using controllers/ dispatchers/ actions/ supervisors or another form of managing dataflow returns to being an architectural concern you can pattern to your application's needs,
+rather than being something that's required by default for anything more than a Todo app.&rdquo;
+                            </em></blockquote>
                         </p>
 
                         <h3 id="learn-more">Learn more</h3>
