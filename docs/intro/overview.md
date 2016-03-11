@@ -51,8 +51,9 @@ React.render(<TimerView appState={appState} />, document.body);
 
 The third relevant thing to do is modifying the state.
 That is what your app is about after all.
-Now, unlike many other frameworks, MobX doesn't dictate you how to do this (but there are best practices).
-But remember, the key thing here is: MobX helps you to do things in a simple straightforward way.
+Unlike many other frameworks, MobX doesn't dictate you how to do this.
+There are best practices, but the key thing to remember is:
+***MobX helps you to do things in a simple straightforward way***.
 
 The following code will alter your data every second, and the UI will update automatically when needed.
 No explicit relations are defined in either in the controller functions that _change_ the state or in the views that should _update_.
