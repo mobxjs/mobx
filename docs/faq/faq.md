@@ -8,8 +8,8 @@ MobX runs on any ES5 environment. That means that all browsers except IE8, Node.
 Yes, see the [rx-mobx](https://www.npmjs.com/package/rx-mobx) interoperability package.
 
 ##### When to use RxJS instead of MobX?
-For anything that involves explictly working with the concept of time such,
-or when you need to combine reason about the historical values / events of an observable (and not just th elatest) RxJs is recommended as it provides the more low level primitives.
+For anything that involves explictly working with the concept of time,
+or when you need to reason about the historical values / events of an observable (and not just the latest) RxJs is recommended as it provides the more low level primitives.
 Whenever you want react to _state_ instead of _events_, MobX offers an easier and more high level approach.
 In practice, combining `RxJS` and `MobX` might result in really powerful constructions.
 Use for example `RxJS` to process and throttle user events and as a result of that update the state.
