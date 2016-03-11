@@ -76,12 +76,11 @@ disposer();
 ## Reactions
 
 `Reaction` allows you to create your own 'auto runner'.
-Reactions track a function and signal when they function should be executed again because one or more dependencies have changed, in which case, for example, 
-the function should be re-executed. 
+Reactions track a function and signal when the function should be executed again because one or more dependencies have changed. 
 
 
 
-This is for example how `autorun` is defined using `Reaction`:
+This is how `autorun` is defined using `Reaction`:
 
 ```typescript
 export function autorun(view: Lambda, scope?: any) {
