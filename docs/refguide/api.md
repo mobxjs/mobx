@@ -2,7 +2,7 @@
 
 These are the most important functions available in the `mobx` namespace:
 
-### [observable(value)](observble)
+### [observable(value)](observable)
 The `observable` function is the swiss knife of mobx and enriches any data structure or function with observable capabilities.
 
 ### [autorun(function)](autorun)
