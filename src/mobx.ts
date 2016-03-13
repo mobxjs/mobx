@@ -20,7 +20,7 @@ import {registerGlobals} from "./core/globalstate";
 registerGlobals();
 
 export { Lambda                                               } from "./utils/utils";
-export { SimpleEventEmitter                                   } from "./utils/simpleeventemitter";
+export { SimpleEventEmitter, ISimpleEventListener             } from "./utils/simpleeventemitter";
 export { ITransitionEvent, IObserverTree, IDependencyTree     } from "./api/extras";
 export { IObservable, IDepTreeNode, untracked                 } from "./core/observable";
 export { IDerivation                                          } from "./core/derivation";

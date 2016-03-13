@@ -1,15 +1,18 @@
 import {once, Lambda} from "./utils";
 
-export class SimpleEventEmitter {
-	listeners: {(...data: any[]): void}[] = [];
+export type ISimpleEventListener = {(...data: any[]): void}
 
-	emit(...data: any[]) {
+export class SimpleEventEmitter {
+	listeners: ISimpleEventListener[] = [];
+
+	emit(...data: any[]);
+	emit() {
 		const listeners = this.listeners.slice();
 		for (let i = 0, l = listeners.length; i < l; i++)
 			listeners[i].apply(null, arguments);
 	}
 
-	on(listener: (...data: any[]) => void): Lambda {
+	on(listener: ISimpleEventListener): Lambda {
 		this.listeners.push(listener);
 		return once(() => {
 			const idx = this.listeners.indexOf(listener);
@@ -18,7 +21,7 @@ export class SimpleEventEmitter {
 		});
 	}
 
-	once(listener: (...data: any[]) => void): Lambda {
+	once(listener: ISimpleEventListener): Lambda {
 		const subscription = this.on(function() {
 			subscription();
 			listener.apply(this, arguments);
