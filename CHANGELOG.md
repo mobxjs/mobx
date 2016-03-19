@@ -1,3 +1,7 @@
+# 2.0.3
+
+* Always peek if inspecting a stale, computed value. Fixes #165.
+
 # 2.0.2
 
 * Fixed issue where changing an object property was tracked, which could lead to unending loops in `autorunAsync`.
