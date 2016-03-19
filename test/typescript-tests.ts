@@ -361,3 +361,54 @@ test('typescript: parameterized computed decorator', (t) => {
 	
 	t.end();
 });
+
+test('issue 165', function(t) {
+	function report<T>(msg: string, value: T) {
+		console.log(msg, ':', value);
+		return value;
+	}
+	
+	class Card {
+		constructor(public game: Game, public id: number) {
+		}
+
+		@computed get isWrong() {
+			return report('Computing isWrong for card ' + this.id, this.isSelected && this.game.isMatchWrong);
+		}
+
+		@computed get isSelected() {
+			return report('Computing isSelected for card'+ this.id,
+				this.game.firstCardSelected === this || this.game.secondCardSelected === this);
+		}
+	}
+
+	class Game {
+		@observable firstCardSelected: Card = null;
+		@observable secondCardSelected: Card = null;
+
+		@computed get isMatchWrong() {
+			return report('Computing isMatchWrong',
+				this.secondCardSelected !== null && this.firstCardSelected.id !== this.secondCardSelected.id);
+		}
+	}
+
+	let game = new Game();
+	let card1 = new Card(game, 1), card2 = new Card(game, 2);
+
+	autorun(() => {
+		console.log('card1.isWrong =', card1.isWrong);
+		console.log('card2.isWrong =', card2.isWrong);
+		console.log('------------------------------');
+	});
+
+	debugger;
+	console.log('Selecting first card');
+	game.firstCardSelected = card1;
+	console.log('Selecting second card');
+	game.secondCardSelected = card2;
+	
+	t.equal(card1.isWrong, true);
+	t.equal(card2.isWrong, true);
+	
+	t.end();
+});

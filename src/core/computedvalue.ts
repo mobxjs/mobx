@@ -79,9 +79,14 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 	 */
 	public get(): T {
 		invariant(!this.isComputing, `Cycle detected`, this.derivation);
-		if (this.dependencyStaleCount > 0 && globalState.inTransaction > 0) {
-			// somebody is inspecting this computed value while being stale (because it is in a transaction)
-			// so peek into the value
+		reportObserved(this);
+		if (this.dependencyStaleCount > 0) {
+			// This is worst case, somebody is inspecting our value while we are stale.
+			// This can happen in two cases:
+			// 1) somebody explicitly requests our value during a transaction
+			// 2) this computed value is used in another computed value in which it wasn't used
+			//    before, and hence it is required now 'too early'. See for an example issue 165.
+			// we have no other option than to (possible recursively) forcefully recompute.
 			return this.peek();
 		}
 		if (this.isLazy) {
@@ -89,16 +94,13 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 				// somebody depends on the outcome of this computation
 				this.isLazy = false;
 				this.trackAndCompute();
-				reportObserved(this);
 			} else {
 				// nobody depends on this computable;
 				// so just compute fresh value and continue to sleep
 				return this.peek();
 			}
-		} else {
-			// we are already up to date, somebody is just inspecting our current value
-			reportObserved(this);
 		}
+		// we are up to date. Return the value
 		return this.value;
 	}
 
