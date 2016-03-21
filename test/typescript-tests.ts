@@ -401,7 +401,6 @@ test('issue 165', function(t) {
 		console.log('------------------------------');
 	});
 
-	debugger;
 	console.log('Selecting first card');
 	game.firstCardSelected = card1;
 	console.log('Selecting second card');
