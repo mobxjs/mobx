@@ -38,8 +38,15 @@ export function createTransformer<A, B>(transformer: ITransformer<A, B>, onClean
 function getMemoizationId(object) {
 	if (object === null  || typeof object !== "object")
 		throw new Error("[mobx] transform expected some kind of object, got: " + object);
-	const tid = object.$transformId;
-	if (tid === undefined)
-		return object.$transformId = getNextId();
+	let tid = object.$transformId;
+	if (tid === undefined) {
+		tid = getNextId();
+		Object.defineProperty(object, '$transformId', {
+			configurable: true,
+			writable: true,
+			enumerable: false,
+			value: tid
+		});
+	}
 	return tid;
 }

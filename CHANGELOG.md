@@ -1,3 +1,7 @@
+# 2.0.4
+
+* `$transformId` property on transformed objects should be non-enumerable. Fixes #170.
+
 # 2.0.3
 
 * Always peek if inspecting a stale, computed value. Fixes #165.

@@ -67,6 +67,8 @@ test('transform1', function(t) {
 	t.equal(stateCalc, 5);
 	t.equal(todoCalc, 3);
 
+	t.deepEqual(Object.keys(state.todos[0]), ["title"]);
+
 
 	t.end();
 });
