@@ -20,6 +20,7 @@ For instance, here's a stateless component built with an arrow function:
 const ToDoItem = observer(props => <div>{props.item}</div>);
 
 export default ToDoItem;
+
 ```
 
 And here's how that will appear in the React DevTools:
@@ -34,6 +35,7 @@ function ToDoItem(props) {
 }
 
 export default observer(ToDoItem);
+
 ```
 
 And now the component shows up correctly in the DevTools:
@@ -45,6 +47,8 @@ And now the component shows up correctly in the DevTools:
 By "stateful observer", all I really mean is a component created with `React.Component` or `React.createClass` and which uses the `@observer` decorator, like so:
 
 ```javascript
+import { observer } from 'mobx-react';
+
 @observer
 class App extends React.Component {
   constructor(props) {
@@ -63,6 +67,7 @@ class App extends React.Component {
     );
   }
 }
+
 ```
 
 In this case, `ToDoItem` is stateless, but will still work with HMR because the root-level of the UI tree is a stateful observer. As a result, any time we change **any** stateless component, it will be still hot-reloaded because the observers will trigger computations in the root-level component as well. And since the root-level component is a good old-fashioned React component, it'll trigger the HMR for all of its children and voila! All the magic of stateless components, observables, and hot module reloading working together beautifully.
