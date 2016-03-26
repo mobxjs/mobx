@@ -38,7 +38,7 @@
     <body>
         
         
-    <div class="book" data-level="8" data-basepath=".." data-revision="Fri Mar 11 2016 10:57:38 GMT+0100 (CET)">
+    <div class="book" data-level="8" data-basepath=".." data-revision="Sat Mar 26 2016 19:58:47 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -569,16 +569,31 @@
             
         </li>
     
-        <li class="chapter " data-level="6.3" >
+        <li class="chapter " data-level="6.3" data-path="best/stateless-HMR.html">
             
-            <span><b>6.3.</b> Tracking state changes</span>
+                
+                    <a href="../best/stateless-HMR.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.3.</b>
+                        
+                        Stateless Components and Hot Module Reloading
+                    </a>
             
             
         </li>
     
         <li class="chapter " data-level="6.4" >
             
-            <span><b>6.4.</b> Performance considerations</span>
+            <span><b>6.4.</b> Tracking state changes</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="6.5" >
+            
+            <span><b>6.5.</b> Performance considerations</span>
             
             
         </li>
@@ -729,8 +744,8 @@
 <h5 id="can-mobx-be-combined-with-rxjs">Can MobX be combined with RxJS?</h5>
 <p>Yes, see the <a href="https://www.npmjs.com/package/rx-mobx" target="_blank">rx-mobx</a> interoperability package.</p>
 <h5 id="when-to-use-rxjs-instead-of-mobx">When to use RxJS instead of MobX?</h5>
-<p>For anything that involves explictly working with the concept of time such,
-or when you need to combine reason about the historical values / events of an observable (and not just th elatest) RxJs is recommended as it provides the more low level primitives.
+<p>For anything that involves explictly working with the concept of time,
+or when you need to reason about the historical values / events of an observable (and not just the latest) RxJs is recommended as it provides the more low level primitives.
 Whenever you want react to <em>state</em> instead of <em>events</em>, MobX offers an easier and more high level approach.
 In practice, combining <code>RxJS</code> and <code>MobX</code> might result in really powerful constructions.
 Use for example <code>RxJS</code> to process and throttle user events and as a result of that update the state.
