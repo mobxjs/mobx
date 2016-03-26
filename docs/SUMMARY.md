@@ -35,6 +35,7 @@
 * Tips & Tricks
   * [DevTools](best/devtools.md)
   * [ES5 / ES6 / TypeScript syntax](best/syntax.md)
+  * [Stateless Components and Hot Module Reloading](best/stateless-HMR.md)
   * Tracking state changes
   * Performance considerations
 * [Resources](LINKS.md)
