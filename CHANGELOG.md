@@ -1,3 +1,7 @@
+# 2.0.5
+
+* WIP on bower support
+
 # 2.0.4
 
 * `$transformId` property on transformed objects should be non-enumerable. Fixes #170.
