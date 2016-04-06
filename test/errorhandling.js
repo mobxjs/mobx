@@ -3,12 +3,14 @@ var mobx = require('..');
 var m = mobx;
 
 var observable = mobx.observable;
+var computed = mobx.computed;
+
 var voidObserver = function(){};
 
 function test(name, func) {
     testBase(name, function(t) {
         try {
-            func(t);    
+            func(t);
         } finally {
             mobx._.resetGlobalState();
         }
@@ -27,7 +29,7 @@ function buffer() {
 }
 
 test('exception1', function(t) {
-    var a = observable(function() {
+    var a = computed(function() {
         throw "hoi";
     });
     t.throws(() => a(), "hoi");
@@ -42,7 +44,7 @@ test('deny state changes in views', function(t) {
         return x() * x();
     });
 
-    
+
     t.throws(() => {
         y()
     }, 'It is not allowed to change the state during the computation of a reactive view');
@@ -53,12 +55,12 @@ test('deny state changes in views', function(t) {
 test('allow state changes in autorun', function(t) {
     var x = observable(3);
     var z = observable(3);
-    
+
     m.autorun(function() {
         if (x.get() !== 3)
             z.set(x.get());
     });
-    
+
     t.equal(x.get(), 3);
     t.equal(z.get(), 3);
 
@@ -83,7 +85,7 @@ test('deny array change in view', function(t) {
         t.throws(function() {
             t.equal(9, y());
         }, 'It is not allowed to change the state during the computation of a reactive derivation');
-        
+
         t.deepEqual(z.slice(), []);
         t.equal(mobx.extras.isComputingDerivation(), false);
 
@@ -101,7 +103,7 @@ test('allow array change in autorun', function(t) {
         if (x.get() > 4)
             z.push(x.get());
     });
-    
+
     x.set(5);
     x.set(6);
     t.deepEqual(z.slice(), [5, 6])
@@ -169,29 +171,29 @@ test('issue 86, converging cycles', function(t) {
                 return i;
         return -1;
     }
-    
+
     const deleteThisId = mobx.observable(1);
     const state = mobx.observable({ someArray: [] });
     var calcs = 0;
 
     state.someArray.push({ id: 1, text: 'I am 1' });
     state.someArray.push({ id: 2, text: 'I am 2' });
-    
+
     // should delete item 1 in first run, which works fine
     mobx.autorun(() => {
         calcs++;
         const i = findIndex(state.someArray, item => item.id === deleteThisId.get());
         state.someArray.remove(state.someArray[i]);
     });
-    
+
     t.equal(state.someArray.length, 1); // should be 1, which prints fine
     t.equal(calcs, 1);
     deleteThisId.set(2); // should delete item 2, but it errors on cycle
-    
+
     t.equal(console.log(state.someArray.length, 0)); // should be 0, which never prints
     t.equal(calcs, 3);
-    
-    t.end(); 
+
+    t.end();
 });
 
 test('slow converging cycle', function(t) {
@@ -203,7 +205,7 @@ test('slow converging cycle', function(t) {
         else
             x.set(x.get() + 1);
     });
-    
+
     // ideally the outcome should be 100 / 100.
     // autorun is only an observer of x *after* the first run, hence the initial outcome is not as expected..
     // is there a practical use case where such a pattern would be expected?
@@ -211,10 +213,63 @@ test('slow converging cycle', function(t) {
     // or detect cycles and re-run the autorun in that case once?
     t.equal(x.get(), 2)
     t.equal(res, -1);
-    
+
     x.set(7);
     t.equal(x.get(), 100)
     t.equal(res, 100);
-    
+
     t.end();
 });
+
+test('error handling assistence ', function(t) {
+    var base = console.error;
+    var errors = []; // logged errors
+    var values = []; // produced errors
+    var thrown = []; // list of actually thrown exceptons
+
+    console.error = function(msg) {
+        base.apply(console, arguments);
+        errors.push(msg);
+    }
+
+    var a = observable(3);
+    var b = computed(function() {
+        if (a.get() === 42)
+            throw 'should not be 42';
+        return a.get() * 2;
+    });
+
+    var c = m.autorun(function() {
+        values.push(b.get());
+    });
+
+    a.set(2);
+    try{
+        a.set(42);
+    } catch (e) {
+        thrown.push(e);
+    }
+    try {
+        // fails as state is not reset yet..
+        a.set(3);
+    } catch (e) {
+        thrown.push(e);
+    }
+
+    // Test recovery
+    setTimeout(function() {
+        a.set(4);
+        try {
+            a.set(42);
+        } catch (e) {
+            thrown.push(e);
+        }
+
+        t.equal(errors.length, 2);
+        t.deepEqual(values, [6, 4, 8]);
+        t.equal(thrown.length, 3);
+
+        console.error = base;
+        t.end();
+    }, 10);
+})

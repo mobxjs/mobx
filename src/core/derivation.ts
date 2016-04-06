@@ -1,7 +1,7 @@
 import {IObservable, IDepTreeNode, propagateReadiness, propagateStaleness, addObserver, removeObserver} from "./observable";
 import {quickDiff, invariant} from "../utils/utils";
 import {reportTransition} from "../api/extras";
-import {globalState} from "./globalstate";
+import {globalState, resetGlobalState} from "./globalstate";
 
 /**
  * A derivation is everything that can be derived from the state (all the atoms) in a pure manner.
@@ -65,12 +65,27 @@ export function notifyDependencyReady(derivation: IDerivation, dependencyDidChan
  * as observer of any of the accessed observables.
  */
 export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
+	let hasException = true;
 	const prevObserving = derivation.observing;
 	derivation.observing = [];
 	globalState.derivationStack.push(derivation);
-	const result = f();
-	bindDependencies(derivation, prevObserving);
-	return result;
+	try {
+		const result = f();
+		hasException = false;
+		bindDependencies(derivation, prevObserving);
+		return result;
+	} finally {
+		if (hasException) {
+			console.error(
+				`[mobx] An uncaught exception occurred while calculating your computed value, autorun or transformer. Or inside the render method of a React component. ` +
+				`These methods should never throw exceptions as MobX will usually not be able to recover from them. ` +
+				`Please enable 'Pause on (caught) exceptions' in your debugger to find the root cause. In: '${derivation.name}#${derivation.id}'`
+			);
+
+			// poor mans recovery attempt
+			setTimeout(() => resetGlobalState(), 0);
+		}
+	}
 }
 
 function bindDependencies(derivation: IDerivation, prevObserving: IObservable[]) {
@@ -91,7 +106,7 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
 }
 
 /**
- * Find out whether the dependency tree of this derivation contains a cycle, as would be the case in a 
+ * Find out whether the dependency tree of this derivation contains a cycle, as would be the case in a
  * computation like `a = a * 2`
  */
 function findCycle(needle: IDerivation, node: IObservable): boolean {

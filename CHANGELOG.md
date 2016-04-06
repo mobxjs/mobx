@@ -1,3 +1,8 @@
+# 2.1.0
+
+* MobX is now chatty again when an exception occurs inside a autorun / computed value / React.render. Previously this was considered to be the responsibility of the surrounding code. But if exceptions were eaten this would be really tricky to debug.
+* (Experimental) MobX will now do a poor attempt to recover from exceptions that occured in autorun / computed value / React.render.
+
 # 2.0.6
 
 * `resetGlobalState` is now part of the `mobx.extras` namespace, as it is useful for test setup, to restore inconsistent state after test failures.
