@@ -73,15 +73,49 @@ test('transform1', function(t) {
 	t.end();
 });
 
+test('163 - resetGlobalState should clear cache', function(t) {
+	var runs = 0;
+	function doubler(x) {
+		runs++;
+		return { value: x.value * 2 };
+	}
+
+	var doubleTransformer = m.createTransformer(doubler);
+	var a = { value: 2 };
+
+	var autorunTrigger = m.observable(1);
+	var transformOutputs = [];
+
+	m.autorun(function() {
+		autorunTrigger.get();
+		transformOutputs.push(doubleTransformer(a));
+	});
+	t.equal(runs, 1);
+
+	autorunTrigger.set(2);
+	t.equal(runs, 1);
+	t.equal(transformOutputs.length, 2);
+	t.equal(transformOutputs[1], transformOutputs[0], "transformer should have returned from cache");
+
+	m.extras.resetGlobalState();
+
+	autorunTrigger.set(3);
+	t.equal(runs, 2);
+	t.equal(transformOutputs.length, 3);
+	t.notEqual(transformOutputs[2], transformOutputs[1], "transformer should NOT have returned from cache");
+
+	t.end();
+});
+
 test('transform into reactive graph', function(t) {
-	
+
 	function Folder(name) {
 		m.extendObservable(this, {
 			name: name,
 			children: []
 		});
 	}
-	
+
 	var _childrenRecalc = 0;
 	function DerivedFolder(state, baseFolder) {
 		this.state = state;
@@ -101,7 +135,7 @@ test('transform into reactive graph', function(t) {
 			}
 		})
 	}
-	
+
 	var state = m.observable({
 		filter: null,
 	});
@@ -118,7 +152,7 @@ test('transform into reactive graph', function(t) {
 		state.derived = transformFolder(state.root);
 		state.derived.children;
 	});
-	
+
 	/** test convience */
 	function childrenRecalcs() {
 		var  a = _childrenRecalc;
@@ -136,20 +170,20 @@ test('transform into reactive graph', function(t) {
 	t.equal(state.derived.children.length, 0);
 	t.equal(transformCount(), 1);
 	t.equal(childrenRecalcs(), 1);
-	
+
 	state.root.children.push(new Folder("hoi"));
 	t.equal(state.derived.name, "/");
 	t.equal(state.derived.children.length, 1);
 	t.equal(state.derived.children[0].name, "hoi");
 	t.equal(transformCount(), 1);
-	t.equal(childrenRecalcs(), 1);	
-	
+	t.equal(childrenRecalcs(), 1);
+
 	state.filter = "boe";
 	t.equal(state.derived.name, "/");
 	t.equal(state.derived.isVisible, false);
 	t.equal(state.derived.children.length, 0);
 	t.equal(transformCount(), 0);
-	t.equal(childrenRecalcs(), 2);	
+	t.equal(childrenRecalcs(), 2);
 
 	state.filter = "oi";
 	t.equal(state.derived.name, "/");
@@ -158,9 +192,9 @@ test('transform into reactive graph', function(t) {
 	t.equal(state.derived.children[0].name, "hoi");
 	t.equal(transformCount(), 0);
 	t.equal(childrenRecalcs(), 1);
-	
+
 	t.end();
-	
+
 });
 
 // testing: https://github.com/mobxjs/mobx/issues/67

@@ -1,6 +1,7 @@
 import {ComputedValue} from "../core/computedvalue";
 import {invariant} from "../utils/utils";
 import {getNextId} from "../core/globalstate";
+import {globalState} from "../core/globalstate";
 
 export type ITransformer<A, B> = (object: A) => B;
 
@@ -8,7 +9,11 @@ export function createTransformer<A, B>(transformer: ITransformer<A, B>, onClean
 	invariant(typeof transformer === "function" && transformer.length === 1, "createTransformer expects a function that accepts one argument");
 
 	// Memoizes: object id -> reactive view that applies transformer to the object
-	const objectCache: {[id: number]: ComputedValue<B>} = {};
+	let objectCache: {[id: number]: ComputedValue<B>} = {};
+
+	// If the resetId changes, we will clear the object cache, see #163
+	// This construction is used to avoid leaking refs to the objectCache directly
+	let resetId = globalState.resetId;
 
 	// Local transformer class specifically for this transformer
 	class Transformer extends ComputedValue<B> {
@@ -25,6 +30,11 @@ export function createTransformer<A, B>(transformer: ITransformer<A, B>, onClean
 	}
 
 	return (object: A) => {
+		if (resetId !== globalState.resetId) {
+			objectCache = {};
+			resetId = globalState.resetId;
+		}
+
 		const identifier = getMemoizationId(object);
 		let reactiveTransformer = objectCache[identifier];
 		if (reactiveTransformer)

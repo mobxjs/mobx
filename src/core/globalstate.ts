@@ -15,6 +15,7 @@ export class MobXGlobals {
 	changedAtoms: IAtom[] = [];
 	pendingReactions: Reaction[] = [];
 	allowStateChanges = true;
+	resetId = 0;
 }
 
 export const globalState = (() => {
@@ -44,7 +45,9 @@ export function registerGlobals() {
  * but can be used to get back at a stable state after throwing errors
  */
 export function resetGlobalState() {
+	const resetId = globalState.resetId;
 	const defaultGlobals = new MobXGlobals();
 	for (let key in defaultGlobals)
 		globalState[key] = defaultGlobals[key];
+	globalState.resetId = resetId + 1;
 }

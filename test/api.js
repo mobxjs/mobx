@@ -30,25 +30,26 @@ test('correct api should be exposed', function(t) {
 		'toJSON',
 		'transaction',
 		'untracked',
-		'when' 
+		'when'
 	]);
 	t.equals(Object.keys(mobx).filter(function(key) {
 		return mobx[key] == undefined;
 	}).length, 0);
-	
+
 	t.deepEquals(Object.keys(mobx._).sort(), [
-		'quickDiff', 
+		'quickDiff',
 		'resetGlobalState'
 	]);
 	t.equals(Object.keys(mobx._).filter(function(key) {
 		return mobx._[key] == undefined;
 	}).length, 0);
-	
+
 	t.deepEquals(Object.keys(mobx.extras).sort(), [
 			'allowStateChanges',
 			'getDependencyTree',
 			'getObserverTree',
 			'isComputingDerivation',
+			'resetGlobalState',
 			'trackTransitions'
 	]);
 	t.equals(Object.keys(mobx.extras).filter(function(key) {

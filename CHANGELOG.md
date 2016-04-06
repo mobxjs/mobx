@@ -1,3 +1,8 @@
+# 2.0.6
+
+* `resetGlobalState` is now part of the `mobx.extras` namespace, as it is useful for test setup, to restore inconsistent state after test failures.
+* `resetGlobalState` now also resets the caches of `createTransformer`, see #163.
+
 # 2.0.5
 
 * WIP on bower support
@@ -18,7 +23,7 @@
 
 * Undeprecated `observable(scalar)` (see 143)
 * `expr` no longer prints incorrect deprecated messages (see 143)
-* Requires `mobx` twice no longer fails. 
+* Requires `mobx` twice no longer fails.
 
 # 2.0.0
 
@@ -39,7 +44,7 @@ Besides that, MobX is just a large collection of minor improvements over Mobserv
 Make sure to remove your old `mobservable` dependencies when installing the new `mobx` dependencies!
 
 ## `autorun`'s are now allowed to cause cycles!
-`autorun` is now allowed to have cycles. In Mobservable 1 an exception was thrown as soon as an autorun modified a variable which it was reading as well.  
+`autorun` is now allowed to have cycles. In Mobservable 1 an exception was thrown as soon as an autorun modified a variable which it was reading as well.
 In MobX 2 these situations are now allowed and the autorun will trigger itself to be fired again immediately after the current execution.
 This is fine as long as the autorun terminates within a reasonable amount of iterations (100).
 This should avoid the need for work-arounds involving `setTimeout` etc.
@@ -53,7 +58,7 @@ This is less confusing, easier to debug and more efficient.
 So to read or write from an observable scalar use:
 ```javascript
 const temperature =  observable(27);
-temperature.set(15); // previously: temperature(15) 
+temperature.set(15); // previously: temperature(15)
 temperature.get();   // previously: temperature()
 ```
 
@@ -80,7 +85,7 @@ So feel free to write your own reactive [constructions](http://mobxjs.github.io/
 
 In Mobservable 1 exceptions would be caught and sometimes re-thrown after logging them.
 This was confusing and not all derivations were able to recover from these exceptions.
-In MobX 2 it is no longer allowed for a computed function or `autorun` to throw an exception. 
+In MobX 2 it is no longer allowed for a computed function or `autorun` to throw an exception.
 
 ## Improved build
 
@@ -161,7 +166,7 @@ In MobX 2 it is no longer allowed for a computed function or `autorun` to throw 
 
 # 1.1.1
 
-* `toJSON` now serializes object trees with cycles as well. If you know the object tree is acyclic, pass in `false` as second parameter for a performance gain. 
+* `toJSON` now serializes object trees with cycles as well. If you know the object tree is acyclic, pass in `false` as second parameter for a performance gain.
 
 # 1.1.0
 
@@ -209,12 +214,12 @@ Fix incompatibility issue with systemjs bundler (see PR 52)
 * `extendReactive` -> `extendObservable`
 * `observe` -> `autorun`
 * `observeUntil` -> `autorunUntil`
-* `observeAsync` -> `autorunAsync` 
+* `observeAsync` -> `autorunAsync`
 * `reactiveComponent` -> `observer` (in `mobservable-react` package)
 
 ## Breaking changes
 
-* dropped the `strict` and `logLevel` settings of mobservable. View functions are by default run in `strict` mode, `autorun` (formerly: `observe`) functions in `non-strict` mode (strict indicates that it is allowed to change other observable values during the computation of a view funtion). 
+* dropped the `strict` and `logLevel` settings of mobservable. View functions are by default run in `strict` mode, `autorun` (formerly: `observe`) functions in `non-strict` mode (strict indicates that it is allowed to change other observable values during the computation of a view funtion).
 Use `extras.withStrict(boolean, block)` if you want to deviate from the default behavior.
 * `observable` (formerly `makeReactive`) no longer accepts an options object. The modifiers `asReference`, `asStructure` and `asFlat` can be used instead.
 * dropped the `default` export of observable
@@ -227,12 +232,12 @@ Use `extras.withStrict(boolean, block)` if you want to deviate from the default 
 * Improved debugger support
 * `for (var key in observablearray)` now lists the correct keys
 * `@observable` now works correct on classes that are transpiled by either TypeScript or Babel (Not all constructions where supported in Babel earlier)
-* Simplified error handling, mobservable will no longer catch errors in views, which makes the stack traces easier to debug. 
+* Simplified error handling, mobservable will no longer catch errors in views, which makes the stack traces easier to debug.
 * Removed the initial 'welcom to mobservable' logline that was printed during start-up.
 
 # 0.7.1
 
-* Backported Babel support for the @observable decorator from the 1.0 branch. The decorator should now behave the same when compiled with either Typescript or Babeljs. 
+* Backported Babel support for the @observable decorator from the 1.0 branch. The decorator should now behave the same when compiled with either Typescript or Babeljs.
 
 # 0.7.0
 
@@ -242,14 +247,14 @@ Use `extras.withStrict(boolean, block)` if you want to deviate from the default 
 * Introduced `observeAsync`.
 * Fixed issue where changing the `logLevel` was not picked up.
 * Improved typings.
-* Introduces `asStructure` (see [#8]()) and `asFlat`. 
+* Introduces `asStructure` (see [#8]()) and `asFlat`.
 * Assigning a plain object to a reactive structure no longer clones the object, instead, the original object is decorated. (Arrays are still cloned due to Javascript limitations to extend arrays).
 * Reintroduced `expr(func)` as shorthand for `makeReactive(func)()`, which is useful to create temporarily views inside views
 * Deprecated the options object that could be passed to `makeReactive`.
 * Deprecated the options object that could be passed to `makeReactive`:
   * A `thisArg` can be passed as second param.
   * A name (for debugging) can be passed as second or third param
-  * The `as` modifier is no longer needed, use `asReference` (instead of `as:'reference'`) or `asFlat` (instead of `recurse:false`). 
+  * The `as` modifier is no longer needed, use `asReference` (instead of `as:'reference'`) or `asFlat` (instead of `recurse:false`).
 
 # 0.6.10
 
@@ -279,7 +284,7 @@ Use `extras.withStrict(boolean, block)` if you want to deviate from the default 
 * It is no longer possible to create impure views; views that alter other reactive values.
 * Update links to the new documentation.
 
-# 0.6.4: 
+# 0.6.4:
 
 * 2nd argument of sideEffect is now the scope, instead of an options object which hadn't any useful properties
 
