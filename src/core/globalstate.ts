@@ -5,16 +5,60 @@ import {Reaction} from "./reaction";
 declare const global: any;
 
 export class MobXGlobals {
-	version = 1; //
+	/**
+	 * MobXGlobals version.
+	 * MobX compatiblity with other versions loaded in memory as long as this version matches.
+	 * It indicates that the global state still stores similar information
+	 */
+	version = 1;
+
+	/**
+	 * Stack of currently running derivations
+	 */
 	derivationStack: IDerivation[] = [];
+
+	/**
+	 * 'guid' for general purpose. Mostly debugging.
+	 */
 	mobxGuid = 0;
+
+	/**
+	 * Are we in a transaction block? (and how many of them)
+	 */
 	inTransaction = 0;
+
+	/**
+	 * Are we in an untracked block? (and how many of them)
+	 */
 	inUntracked = 0;
+
+	/**
+	 * Are we currently running reactions?
+	 * Reactions are run after derivations using a trampoline.
+	 */
 	isRunningReactions = false;
-	isComputingComputedValue = 0;
+
+	/**
+	 * List of observables that have changed in a transaction.
+	 * After completing the transaction(s) thise atoms will notify their observers.
+	 */
 	changedAtoms: IAtom[] = [];
+
+	/**
+	 * List of scheduled, not yet executed, reactions.
+	 */
 	pendingReactions: Reaction[] = [];
+
+	/**
+	 * Is it allowed to change observables at this point?
+	 * In general, MobX doesn't allow that when running computations and React.render.
+	 * To ensure that those functions stay pure.
+	 */
 	allowStateChanges = true;
+
+	/**
+	 * Used by createTransformer to detect that the global state has been reset.
+	 */
 	resetId = 0;
 }
 
@@ -45,9 +89,9 @@ export function registerGlobals() {
  * but can be used to get back at a stable state after throwing errors
  */
 export function resetGlobalState() {
-	const resetId = globalState.resetId;
+	globalState.resetId++;
 	const defaultGlobals = new MobXGlobals();
 	for (let key in defaultGlobals)
-		globalState[key] = defaultGlobals[key];
-	globalState.resetId = resetId + 1;
+		if (key !== "mobxGuid" && key !== "resetId")
+			globalState[key] = defaultGlobals[key];
 }

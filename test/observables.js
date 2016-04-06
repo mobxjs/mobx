@@ -335,7 +335,7 @@ test('extend observable multiple prop maps', function(t) {
     }, {
         a: 5
     });
-    
+
     var sum = 0;
     var disposer = mobx.autorun(function() {
         sum = x.a + x.b + x.c + x.d;
@@ -343,7 +343,7 @@ test('extend observable multiple prop maps', function(t) {
     t.equal(sum, 14);
     x.a = 1;
     t.equal(sum, 10);
-    
+
     t.end();
 })
 
@@ -359,7 +359,7 @@ test('object enumerable props', function(t) {
     for(var key in x)
         ar.push(key);
     t.deepEqual(ar, ['a', 'c']); // or should 'b' be in here as well?
-    t.end();    
+    t.end();
 })
 
 test('observe property', function(t) {
@@ -414,7 +414,7 @@ test('observe object', function(t) {
     var stop = m.observe(a, function(change) {
         events.push(change);
     });
-    
+
     a.a = 2;
     mobx.extendObservable(a, {
         a: 3, b: 3
@@ -440,14 +440,14 @@ test('observe object', function(t) {
         { type: 'update',
             object: a,
             name: 'b',
-            oldValue: 3 } 
+            oldValue: 3 }
     ]);
 
     stop();
     events = [];
     a.a = 6;
     t.equals(events.length, 0);
-    
+
     t.end();
 });
 
@@ -457,30 +457,30 @@ test('mobx.observe', function(t) {
     var o = observable({ b: 2 });
     var ar = observable([ 3 ]);
     var map = mobx.map({ });
-    
+
     var push = function(event) { events.push(event); };
-    
+
     var stop1 = mobx.observe(po, push);
     var stop2 = mobx.observe(o, push);
     var stop3 = mobx.observe(ar, push);
     var stop4 = mobx.observe(map, push);
-    
+
     po.a = 4;
     o.b = 5;
     ar[0] = 6;
     map.set("d", 7);
-    
+
     stop1();
     stop2();
     stop3();
     stop4();
-    
+
     po.a = 8;
     o.b = 9;
     ar[0] = 10;
     map.set("d", 11);
-    
-    t.deepEqual(events, [ 
+
+    t.deepEqual(events, [
         { type: 'update',
             object: po,
             name: 'a',
@@ -495,9 +495,9 @@ test('mobx.observe', function(t) {
             oldValue: 3 },
         { type: 'add',
             object: map,
-            name: 'd' } 
+            name: 'd' }
     ]);
-    
+
     t.end();
 });
 
@@ -683,7 +683,7 @@ test('multiple view dependencies', function(t) {
     t.equal(dCalcs, 3);
     t.equal(fCalcs, 3);
     t.deepEqual(buffer, [8, 11, 14]);
-    
+
     t.end();
 })
 
@@ -786,7 +786,7 @@ test('when', function(t) {
     t.equal(called, 1);
     x.set(4);
     t.equal(called, 1);
-    
+
     t.end();
 })
 
@@ -805,7 +805,7 @@ test('when 2', function(t) {
     x.set(5);
     x.set(3);
     t.equal(called, 1);
-    
+
     t.end();
 })
 
@@ -814,7 +814,7 @@ test('expr2', function(t) {
     var price = observable(100);
     var totalCalcs = 0;
     var innerCalcs = 0;
-    
+
     var total = observable(function() {
         totalCalcs += 1; // outer observable shouldn't recalc if inner observable didn't publish a real change
         return price.get() * mobx.expr(function() {
@@ -822,21 +822,21 @@ test('expr2', function(t) {
             return factor.get() % 2 === 0 ? 1 : 3;
         });
     });
-    
+
     var b = [];
     var sub = m.observe(total, function(x) { b.push(x); }, true);
-    
+
     price.set(150);
     factor.set(7); // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
     factor.set(5); // doesn't trigger outer calc
     factor.set(3); // doesn't trigger outer calc
     factor.set(4); // triggers innerCalc twice
     price.set(20);
-    
+
     t.deepEqual(b, [100,150,450,150,20]);
     t.equal(innerCalcs, 9);
-    t.equal(totalCalcs, 5);    
-    
+    t.equal(totalCalcs, 5);
+
     t.end();
 })
 
@@ -1058,7 +1058,7 @@ test('json cycles', function(t) {
         d: mobx.map(),
         e: a
     });
-    
+
     a.e = a;
     a.c.push(a, a.d);
     a.d.set("f", a);
@@ -1068,7 +1068,7 @@ test('json cycles', function(t) {
     var cloneA = mobx.toJSON(a, true);
     var cloneC = cloneA.c;
     var cloneD = cloneA.d;
-    
+
     t.equal(cloneA.b, 1);
     t.equal(cloneA.c[0], 2);
     t.equal(cloneA.c[1], cloneA);
@@ -1077,12 +1077,13 @@ test('json cycles', function(t) {
     t.equal(cloneD.d, cloneD);
     t.equal(cloneD.c, cloneC);
     t.equal(cloneA.e, cloneA);
-    
+
     t.end();
 })
 
 test('issue 50', function(t) {
     m._.resetGlobalState();
+    global.__mobxGlobal.mobxGuid = 0;
     var x = observable({
         a: true,
         b: false,
@@ -1091,18 +1092,18 @@ test('issue 50', function(t) {
             return this.b;
         }
     });
-    
+
     var result
     var events = [];
     var disposer1 = mobx.autorun(function ar() {
         events.push("auto");
         result = [x.a, x.b, x.c].join(",");
     });
-    
+
     var disposer2 = mobx.extras.trackTransitions(true, function(info) {
         events.push([info.state, info.name]);
     });
-    
+
     setTimeout(function() {
         mobx.transaction(function() {
             events.push("transstart");
@@ -1113,7 +1114,7 @@ test('issue 50', function(t) {
         events.push("transpostend");
         t.equal(result, "false,true,true");
         t.equal(x.c, x.b);
-  
+
         t.deepEqual(events, [
             'auto',
             'calc c',
@@ -1132,18 +1133,20 @@ test('issue 50', function(t) {
             'ar@5' ],
             'auto',
             [ 'READY', 'ar@5' ],
-            'transpostend'           
+            'transpostend'
         ]);
-        
+
         disposer1();
         disposer2();
         t.end();
     }, 500);
-    
+
 });
 
 test('verify transaction events', function(t) {
     m._.resetGlobalState();
+    global.__mobxGlobal.mobxGuid = 0;
+
     var x = observable({
         b: 1,
         c: function() {
@@ -1151,17 +1154,17 @@ test('verify transaction events', function(t) {
             return this.b;
         }
     });
-    
+
     var events = [];
     var disposer1 = mobx.autorun(function ar() {
         events.push("auto");
         x.c;
     });
-    
+
     var disposer2 = mobx.extras.trackTransitions(true, function(info) {
         events.push([info.state, info.name]);
     });
-    
+
     mobx.transaction(function() {
         events.push("transstart");
         x.b = 1;
@@ -1185,9 +1188,9 @@ test('verify transaction events', function(t) {
         [ 'PENDING', 'ar@4' ],
         'auto',
         [ 'READY', 'ar@4' ],
-        'transpostend' 
+        'transpostend'
     ]);
-    
+
     disposer1();
     disposer2();
     t.end();
@@ -1197,14 +1200,14 @@ test("verify array in transaction", function(t) {
     var ar = observable([]);
     var aCount= 0;
     var aValue;
-    
+
     mobx.autorun(function() {
         aCount++;
         aValue = 0;
         for(var i = 0; i < ar.length; i++)
             aValue += ar[i];
     });
-    
+
     mobx.transaction(function() {
         ar.push(2);
         ar.push(3);
@@ -1218,6 +1221,7 @@ test("verify array in transaction", function(t) {
 
 test('delay autorun until end of transaction', function(t) {
     m._.resetGlobalState();
+    global.__mobxGlobal.mobxGuid = 0;
     var events = [];
     var x = observable({
         a: 2,
@@ -1226,7 +1230,7 @@ test('delay autorun until end of transaction', function(t) {
             return this.a;
         }
     });
-    var disposer1; 
+    var disposer1;
     var disposer2 = mobx.extras.trackTransitions(true, function(info) {
         events.push([info.state, info.name]);
     });
@@ -1234,18 +1238,18 @@ test('delay autorun until end of transaction', function(t) {
 
     mobx.transaction(function() {
         mobx.transaction(function() {
-            
+
             disposer1 = mobx.autorun(function test() {
                 didRun = true;
                 events.push("auto");
                 x.b;
             });
-            
+
             t.equal(didRun, false, "autorun should not have run yet");
-            
+
             x.a = 3;
             x.a = 4;
-            
+
             events.push("end1");
         });
         t.equal(didRun, false, "autorun should not have run yet");
@@ -1264,7 +1268,7 @@ test('delay autorun until end of transaction', function(t) {
     t.deepEqual(events, [
         [ 'STALE', 'ObservableObject@1 / Prop "a"@2' ],
         'end1',
-        'end2', 
+        'end2',
         [ 'READY', 'ObservableObject@1 / Prop "a"@2' ],
         'auto',
         'calc y',
@@ -1285,7 +1289,7 @@ test('delay autorun until end of transaction', function(t) {
         [ 'READY', 'ObservableObject@1 / Prop "a"@2' ],
         'post trans3'
     ]);
-    
+
     disposer2();
     t.end();
 });
@@ -1304,19 +1308,19 @@ test('prematurely end autorun', function(t) {
         t.equal(x.observers.length, 0);
         t.equal(dis1.$mobx.observing.length, 0);
         t.equal(dis2.$mobx.observing.length, 0);
-        
+
         dis1();
     });
     t.equal(x.observers.length, 1);
     t.equal(dis1.$mobx.observing.length, 0);
     t.equal(dis2.$mobx.observing.length, 1);
-    
+
     dis2();
 
     t.equal(x.observers.length, 0);
     t.equal(dis1.$mobx.observing.length, 0);
     t.equal(dis2.$mobx.observing.length, 0);
-    
+
     t.end();
 });
 
@@ -1329,12 +1333,12 @@ test('issue 65; transaction causing transaction', function(t) {
             }, this);
         }
     });
-    
+
     var res;
     mobx.autorun(function() {
         res = x.a + x.b;
     });
-    
+
     mobx.transaction(function() {
         x.a = 2;
         x.a = 5;
@@ -1347,7 +1351,7 @@ test('issue 71, transacting running transformation', function(t) {
     var state = mobx.observable({
         things: []
     });
-    
+
     function Thing(value) {
         mobx.extendObservable(this, {
             value: value,
@@ -1366,7 +1370,7 @@ test('issue 71, transacting running transformation', function(t) {
                 state.things.push(new Thing(value + 1));
         }, this);
     }
-    
+
     var copy;
     var vSum;
     mobx.autorun(function() {
@@ -1375,22 +1379,22 @@ test('issue 71, transacting running transformation', function(t) {
             return a  + thing.value
         }, 0);
     });
-    
+
     t.deepEqual(copy, []);
-    
+
     mobx.transaction(function() {
         state.things.push(new Thing(1));
     });
-    
+
     t.deepEqual(copy, [1,2,3,4,5]);
     t.equal(vSum, 15);
-    
+
     state.things.splice(0,2);
     state.things.push(new Thing(6));
 
     t.deepEqual(copy, [3,4,5,6,7]);
     t.equal(vSum, 25);
-    
+
     t.end();
 });
 
@@ -1404,14 +1408,14 @@ test('eval in transaction', function(t) {
         }
     });
     var c;
-    
+
     mobx.autorun(function() {
-       c = x.b; 
+       c = x.b;
     });
-    
+
     t.equal(bCalcs, 1);
     t.equal(c, 2);
-    
+
     mobx.transaction(function() {
         x.a = 3;
         t.equal(x.b, 6);
@@ -1423,7 +1427,7 @@ test('eval in transaction', function(t) {
         t.equal(bCalcs, 3);
         t.equal(c, 2);
     });
-    t.equal(bCalcs, 4); // 2 or 3 would be fine as well 
+    t.equal(bCalcs, 4); // 2 or 3 would be fine as well
     t.equal(c, 8);
     t.end();
 })
@@ -1440,10 +1444,10 @@ test('forcefully tracked reaction should still yield valid results', function(t)
         this.track(identity);
     });
     a.runReaction();
-    
+
     t.equal(z, 3);
     t.equal(runCount, 1);
-    
+
     transaction(function() {
         x.set(4);
         a.track(identity);
@@ -1451,7 +1455,7 @@ test('forcefully tracked reaction should still yield valid results', function(t)
         t.equal(z, 4);
         t.equal(runCount, 2);
     });
-    
+
     t.equal(z, 4);
     t.equal(runCount, 3);
 
@@ -1462,7 +1466,7 @@ test('forcefully tracked reaction should still yield valid results', function(t)
         t.equal(z, 5);
         t.equal(runCount, 4);
         t.equal(a.isScheduled(), true);
-        
+
         x.set(6);
         t.equal(z, 5);
         t.equal(runCount, 4);

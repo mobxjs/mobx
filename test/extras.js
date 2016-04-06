@@ -4,6 +4,7 @@ var m = mobx;
 
 test('treeD', function(t) {
     m._.resetGlobalState();
+    global.__mobxGlobal.mobxGuid = 0;
     var a = m.observable(3);
     var aName = 'ObservableValue@1';
 
@@ -66,21 +67,21 @@ test('treeD', function(t) {
             x.get('temperature');
         x.has('absent');
     });
-    
+
     t.deepEqual(m.extras.getDependencyTree(d.$mobx), {
-        id: 8, 
-        name: 'Autorun@8', 
-        dependencies: [{ 
-            id: 5, 
-            name: 'ObservableMap@4 / keys()@5' 
+        id: 8,
+        name: 'Autorun@8',
+        dependencies: [{
+            id: 5,
+            name: 'ObservableMap@4 / keys()@5'
         }, {
-            id: 7, 
+            id: 7,
             name: 'ObservableMap@4 / Contains "temperature"@7'
-        }, { 
-            id: 6, 
-            name: 'ObservableMap@4 / Entry "temperature"@6' 
         }, {
-            id: 9, 
+            id: 6,
+            name: 'ObservableMap@4 / Entry "temperature"@6'
+        }, {
+            id: 9,
             name: 'ObservableMap@4 / Contains "absent"@9'
         }]
     });
@@ -90,6 +91,8 @@ test('treeD', function(t) {
 
 test('names', function(t) {
     m._.resetGlobalState();
+    global.__mobxGlobal.mobxGuid = 0;
+
     var struct = {
         x: 'ObservableValue@1',
         y: {
@@ -150,7 +153,7 @@ var trackerOutput1 = function(a, b,c) {
         state: 'READY' },
     { id: c.$mobx.id,
         changed: true,
-        state: 'READY' } 
+        state: 'READY' }
     ];
 }
 
@@ -158,31 +161,31 @@ var trackerOutput2 = function(a, b, c) {
     return [ { id: a.id,
     state: 'STALE',
     changed: false,
-    }, 
+    },
   { id: b.id,
     state: 'STALE',
     changed: false,
-  }, 
+  },
   { id: c.$mobx.id,
     state: 'STALE',
     changed: false,
-  }, 
+  },
   { id: a.id,
     state: 'READY',
     changed: true,
-  }, 
+  },
   { id: b.id,
     state: 'PENDING',
     changed: false,
-  }, 
+  },
   { id: b.id,
     state: 'READY',
     changed: true,
-  }, 
+  },
   { id: c.$mobx.id,
     state: 'PENDING',
     changed: false,
-  }, 
+  },
   { id: c.$mobx.id,
     state: 'READY',
     changed: true,
@@ -192,7 +195,7 @@ var trackerOutput2 = function(a, b, c) {
 test('transition tracker 1', function(t) {
     m._.resetGlobalState();
     var lines = [];
-    
+
     var a = m.observable(3);
     var b = m.observable(function() { return a.get() * 2 });
     var c = m.autorun(function() { b.get(); });
@@ -211,7 +214,7 @@ test('transition tracker 1', function(t) {
 test('transition tracker 2', function(t) {
     m._.resetGlobalState();
     var lines = [];
-    
+
     var a = m.observable(3);
     var b = m.observable(function() { return a.get() * 2 });
     var c = m.autorun(function() { b.get(); });
@@ -287,20 +290,20 @@ test('transition tracker 4', function(t) {
 
 test('strict mode checks', function(t) {
     var x = mobx.observable(3);
-    
+
     mobx.extras.allowStateChanges(false, function() {
-        x.get();        
+        x.get();
     });
 
     mobx.extras.allowStateChanges(true, function() {
-        x.set(7);        
+        x.set(7);
     });
-        
+
     t.throws(function() {
         mobx.extras.allowStateChanges(false, function() {
-            x.set(4);        
+            x.set(4);
         });
     });
-    
+
     t.end();
 });
