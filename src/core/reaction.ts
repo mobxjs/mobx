@@ -100,14 +100,18 @@ export function runReactions() {
 	if (globalState.isRunningReactions)
 		return;
 	globalState.isRunningReactions = true;
-	const pr = globalState.pendingReactions;
+	const allReactions = globalState.pendingReactions;
 	let iterations = 0;
-	while (pr.length) {
+
+	// While running reactions, new reactions might be triggered.
+	// Hence we work with two variables and check whether
+	// we converge to no remaining reactions after a while.
+	while (allReactions.length > 0) {
 		if (++iterations === MAX_REACTION_ITERATIONS)
-			throw new Error("Reaction doesn't converge to a stable state. Probably there is a cycle in the reactive function: " + pr[0].toString());
-		let rs = pr.splice(0);
-		for (let i = 0, l = rs.length; i < l; i++)
-			rs[i].runReaction();
+			throw new Error("Reaction doesn't converge to a stable state. Probably there is a cycle in the reactive function: " + allReactions[0].toString());
+		let remainingReactions = allReactions.splice(0);
+		for (let i = 0, l = remainingReactions.length; i < l; i++)
+			remainingReactions[i].runReaction();
 	}
 	globalState.isRunningReactions = false;
 }
