@@ -249,12 +249,7 @@ test('error handling assistence ', function(t) {
     } catch (e) {
         thrown.push(e);
     }
-    try {
-        // fails as state is not reset yet..
-        a.set(3);
-    } catch (e) {
-        thrown.push(e);
-    }
+    a.set(7);
 
     // Test recovery
     setTimeout(function() {
@@ -265,9 +260,9 @@ test('error handling assistence ', function(t) {
             thrown.push(e);
         }
 
+        t.deepEqual(values, [6, 4, 14, 8]);
         t.equal(errors.length, 2);
-        t.deepEqual(values, [6, 4, 8]);
-        t.equal(thrown.length, 3);
+        t.equal(thrown.length, 2);
 
         console.error = base;
         t.end();

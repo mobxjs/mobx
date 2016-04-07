@@ -82,8 +82,11 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 				`Please enable 'Pause on (caught) exceptions' in your debugger to find the root cause. In: '${derivation.name}#${derivation.id}'`
 			);
 
-			// poor mans recovery attempt
-			setTimeout(() => resetGlobalState(), 0);
+			// Poor mans recovery attempt
+			// Assumption here is that this is the only exception handler in MobX.
+			// So functions higher up in the stack (like transanction) won't be modifying the globalState anymore after this call.
+			// (Except for other trackDerivedFunction calls of course, but that is just)
+			resetGlobalState();
 		}
 	}
 }
