@@ -1,3 +1,9 @@
+# 2.1.1
+
+* Fixed issue where `autorun`'s created inside `autorun`'s were not always kicked off. (`mobx-react`'s `observer` was not affected). Please upgrade if you often use autorun.
+* Fixed typings of `mobx.map`, a list of entries is also acceptable.
+* (Experimental) Improved error recovery a bit further
+
 # 2.1.0
 
 * MobX is now chatty again when an exception occurs inside a autorun / computed value / React.render. Previously this was considered to be the responsibility of the surrounding code. But if exceptions were eaten this would be really tricky to debug.
