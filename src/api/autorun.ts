@@ -69,6 +69,6 @@ export function autorunAsync(func: Lambda, delay: number = 1, scope?: any) {
 		}
 	});
 
-	r.runReaction();
+	r.schedule();
 	return r.getDisposer();
 }
