@@ -1476,3 +1476,29 @@ test('forcefully tracked reaction should still yield valid results', function(t)
     t.equal(runCount, 5);
     t.end();
 });
+
+test('autoruns created in autoruns should kick off', function(t) {
+	var x = observable(3);
+	var x2 = [];
+	var d;
+
+	var a = m.autorun(function() {
+		if (d) {
+			// dispose previous autorun
+			d();
+		}
+		d = m.autorun(function() {
+			x2.push(x.get() * 2);
+		});
+	})
+
+	// a should be observed by the inner autorun, not the outer
+	t.equal(a.$mobx.observing.length, 0);
+	t.equal(d.$mobx.observing.length, 1);
+
+	x.set(4);
+	t.deepEqual(x2, [6, 8]);
+
+
+	t.end();
+});

@@ -1,8 +1,6 @@
 import {Lambda, deprecated, invariant} from "../utils/utils";
 import {assertUnwrapped} from "../types/modifiers";
 import {Reaction} from "../core/reaction";
-import {globalState} from "../core/globalstate";
-import {isComputingDerivation} from "../core/derivation";
 
 /**
  * Creates a reactive view and keeps it alive, so that the view is always
@@ -21,12 +19,7 @@ export function autorun(view: Lambda, scope?: any) {
 	const reaction = new Reaction(view.name || "Autorun", function () {
 		this.track(view);
 	});
-
-	// Start or schedule the just created reaction
-	if (isComputingDerivation() || globalState.inTransaction > 0)
-		globalState.pendingReactions.push(reaction);
-	else
-		reaction.runReaction();
+	reaction.schedule();
 
 	return reaction.getDisposer();
 }

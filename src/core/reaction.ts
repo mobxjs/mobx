@@ -43,11 +43,16 @@ export class Reaction implements IDerivation {
 	}
 
 	onDependenciesReady(): boolean {
+		this.schedule();
+		return false; // reactions never propagate changes
+	}
+
+	schedule() {
 		if (!this._isScheduled) {
 			this._isScheduled = true;
 			globalState.pendingReactions.push(this);
+			runReactions();
 		}
-		return false; // reactions never propagate changes
 	}
 
 	isScheduled() {
@@ -55,7 +60,7 @@ export class Reaction implements IDerivation {
 	}
 
 	/**
-	 * internal
+	 * internal, use schedule() if you intend to kick off a reaction
 	 */
 	runReaction() {
 		if (!this.isDisposed) {
@@ -97,7 +102,7 @@ export class Reaction implements IDerivation {
 const MAX_REACTION_ITERATIONS = 100;
 
 export function runReactions() {
-	if (globalState.isRunningReactions)
+	if (globalState.isRunningReactions === true || globalState.inTransaction > 0)
 		return;
 	globalState.isRunningReactions = true;
 	const allReactions = globalState.pendingReactions;
