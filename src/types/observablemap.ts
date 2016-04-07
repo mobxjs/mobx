@@ -193,7 +193,7 @@ export class ObservableMap<V> {
  * Creates a map, similar to ES6 maps (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map),
  * yet observable.
  */
-export function map<V>(initialValues?: IKeyValueMap<V>, valueModifier?: Function): ObservableMap<V> {
+export function map<V>(initialValues?: IMapEntries<V> | IKeyValueMap<V>, valueModifier?: Function): ObservableMap<V> {
 	return new ObservableMap(initialValues, valueModifier);
 }
 
