@@ -24,7 +24,7 @@ React and MobX together are a powerful combination. React renders the applicatio
 Both React and MobX provide very optimal and unique solutions to common problems in application development. React provides mechanisms to optimally render UI by using a virtual DOM that reduces the number of costly DOM mutations. MobX provides mechanisms to optimally synchronize application state with your React components by using a reactive virtual dependency state graph that is only updated when strictly needed and is never stale.
 
 ## MobX was formerly known as Mobservable.
-To use install pre- 2.0 `mobx*` compatible packages, use `mobservable` instead of `mobx`.
+To use / install pre- 2.0 `mobx*` compatible packages, use `mobservable` instead of `mobx`.
 See the [changelog](https://github.com/mobxjs/mobx/blob/master/CHANGELOG.md) for all the details.
 
 ## Core concepts
@@ -113,12 +113,12 @@ You can verify this yourself by changing the [JSFiddle](https://jsfiddle.net/mwe
 
 ### Actions
 
-Unlike many flux frameworks, MobX is unopinionated about how user events should be handled.
-This can be done in a Flux like manner.
+Unlike many Flux frameworks, MobX is unopinionated about how user events should be handled.
+This can be done in a Flux-like manner.
 Or by processing events using RxJS.
 Or by simply handling events in the most straightforward way possible, as demonstrated in the above `onClick` handler.
 In the end it all boils down to: Somehow the state should be updated.
-After updating the state, `MobX` will take care of the rest, in an efficient, glitch-free manner.
+After updating the state, MobX will take care of the rest, in an efficient, glitch-free manner.
 So simple statements like below are enough to automatically update the user interface.
 There is no technical need for firing events, calling dispatcher or what more.
 A React component is in the end nothing more than a fancy representation of your state.
@@ -134,42 +134,42 @@ store.todos[0].finished = true;
 
 ## MobX: Simple and scalable
 
-MobX is one of the least obtrusive libraries you can use for state management. That makes the `MobX` approach not just simple, but very scalable as well:
+MobX is one of the least obtrusive libraries you can use for state management. That makes the MobX approach not just simple, but very scalable as well:
 
 ### Using classes and real references
 With MobX you don't need to normalize your data. This makes the library very suitable for very complex domain models (At Mendix for example ~500 different domain classes in a single application).
 
 ### Referential integrity is guaranteed
-Since data doesn't need to be normalized, and MobX automatically tracks the relations between state and derivations, you get referential integrity for free. Rendering something that is accessed through three levels of indirection? No problem, MobX will track them and re-render whenever one of the references changes. As a result staleness bugs are a thing of the past. As a programmer you might forget that changing some data might influence an seemingly unrelated component in a corner case. MobX won't forget.
+Since data doesn't need to be normalized, and MobX automatically tracks the relations between state and derivations, you get referential integrity for free. Rendering something that is accessed through three levels of indirection? No problem, MobX will track them and re-render whenever one of the references changes. As a result staleness bugs are a thing of the past. As a programmer you might forget that changing some data might influence a seemingly unrelated component in a corner case. MobX won't forget.
 
 ### Simpler actions are easier to maintain
 As demonstrated above, modifying state when using MobX is very straightforward. You simply write down your intentions. MobX will take care of the rest.
 
 ### Fine grained observability is efficient
 MobX builds a graph of all the derivations in your application to find the least number of re-computations that is needed to prevent staleness. "Derive everything" might sound expensive, MobX builds a virtual derivation graph to minimize the number of recomputations needed to keep derivations in sync with the state. In fact, when testing MobX at Mendix we found out that using this library to track the relations in our code is often a lot more efficient then pushing changes through our application by using handwritten events or "smart" selector based container components.
-The simple reason is that MobX will establish far more fine grained 'listeners' on your data then you would do as a programmer.
-Secondly MobX sees the causality between derivations so it can order them in such a way that no derivation has to run twice or introduces a glitch.
+The simple reason is that MobX will establish far more fine grained 'listeners' on your data than you would do as a programmer.
+Moreover MobX sees the causality between derivations so it can order them in such a way that no derivation has to run twice or introduces a glitch.
 How that works? See this [in-depth explanation of MobX](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.a2j1rww8g).
 
 ### Easy interoperability
-MobX works plain javascript structures. Due to it's unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific library flavors.
-So you can simple keep using your existing router-, data fetching and utility libraries like `react-router`, `director`, `superagent`, `lodash` etc.
-For the same reason you can use it out of the box both server- and client side, in isomorphic applications and with react-native.
-The result of this is that you often need to learn less new concepts when using MobX in comparison to other state management solutions.
+MobX works with plain JavaScript structures. Due to it's unobtrusiveness it works with most JavaScript libraries out of the box, without needing MobX specific library flavors.
+So you can simply keep using your existing router-, data fetching and utility libraries like `react-router`, `director`, `superagent`, `lodash`, etc.
+For the same reason you can use it out of the box both server- and client side, in isomorphic applications and with `react-native`.
+The result of this is that you often need to learn less new concepts when using MobX than with other state management solutions.
 
 ## Credits
 
-MobX is inspired by reactive programming principles as found in spreadsheets. It is inspired by MVVM frameworks like in MeteorJS tracker, knockout and Vue.js. But MobX brings Transparent Functional Reactive Programming to the next level and provides a stand alone implementation. It implements TFRP in a glitch-free, synchronous, predictable and efficient manner.
+MobX is inspired by reactive programming principles found in spreadsheets. It is inspired by MVVM frameworks like in MeteorJS tracker, Knockout and Vue.js. But MobX brings Transparent Functional Reactive Programming to the next level and provides a standalone implementation. It implements TFRP in a glitch-free, synchronous, predictable and efficient manner.
 
-A ton of credits for [Mendix](https://github.com/mendix), for providing the flexibility and support to maintain MobX and the chance to proof the philosophy of MobX in a real, complex, performance critical applications.
+A ton of credits to [Mendix](https://github.com/mendix), for providing the flexibility and support to maintain MobX and the chance to proof the philosophy of MobX in real, complex, performance critical applications.
 
 And finally kudo's for all the people that believed in, tried and validated MobX.
 
 ## Further examples and documentation
 
 * [Full API documentation](http://mobxjs.github.io/mobx/)
-* Five minute, [interactive introduction](https://mobxjs.github.io/mobx/getting-started.html) (with just ES5)
-* Boilerplate and example projects for ES5, Babel, Typescript can be found in the [MobX](https://github.com/mobxjs) organization on github.
+* Five minute, [interactive introduction](https://mobxjs.github.io/mobx/getting-started.html)
+* Boilerplate and example projects for ES5, Babel, Typescript can be found in the [MobX](https://github.com/mobxjs) organization on GitHub.
 
 Blogs & Videos:
 * [Reactive 2015 Conference Talk on MobX (mobservable): React, transparent reactive programming and mutable data structures](https://www.youtube.com/watch?v=FEwLwiizlk0)
@@ -192,7 +192,7 @@ Blogs & Videos:
 > _I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated._
 > &dash;David Schalk, fpcomplete.com
 
-More testimonials from people using MobX in production can be found on [medium: functional reactive flux blog](https://medium.com/@kenneth_chau/the-2-fundamental-laws-of-flux-and-the-functional-reactive-flux-c9368ac008d3#.h41y0i22h), [hacker news](https://news.ycombinator.com/item?id=11181980), [reddit 1](https://www.reddit.com/r/reactjs/comments/46m2zg/has_anybody_used_mobservable_for_their_react/), [reddit 2](https://www.reddit.com/r/javascript/comments/47omi9/mobx_20_previously_mobservable_has_been_released/) or on twitter under the [#mobx](https://twitter.com/search?q=mobx&src=typd) and [#mobservable](https://twitter.com/search?q=mobservable&src=typd) hashtags.
+More testimonials from people using MobX in production can be found on [Medium: functional reactive flux blog](https://medium.com/@kenneth_chau/the-2-fundamental-laws-of-flux-and-the-functional-reactive-flux-c9368ac008d3#.h41y0i22h), [Hacker News](https://news.ycombinator.com/item?id=11181980), [Reddit 1](https://www.reddit.com/r/reactjs/comments/46m2zg/has_anybody_used_mobservable_for_their_react/), [Reddit 2](https://www.reddit.com/r/javascript/comments/47omi9/mobx_20_previously_mobservable_has_been_released/) or on Twitter under the [#mobx](https://twitter.com/search?q=mobx&src=typd) and [#mobservable](https://twitter.com/search?q=mobservable&src=typd) hashtags.
 
 ## Contributing
 
