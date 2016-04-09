@@ -10,6 +10,21 @@
   * [(@)computed](refguide/computed-decorator.md) 
   * [autorun](refguide/autorun.md)
   * [@observer](refguide/observer-component.md)
+* Best Practices For Large Apps
+  * [Defining data stores](best/store.md)
+  * [Writing (async) actions](best/actions.md)
+  * [Optimizing React components](best/react-performance.md)
+<!--  * Routing Universal applications -->
+* How does MobX work?
+  * [In depth explanation of MobX](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.gh651s1ta)
+* Tips & Tricks
+  * [DevTools](best/devtools.md)
+  * [ES5 / ES6 / TypeScript syntax](best/syntax.md)
+  * Optimizing MobX
+  * Testing
+  * [Stateless Components and Hot Module Reloading](best/stateless-HMR.md)
+* [Examples, related projects](LINKS.md)
+* [Frequently Asked Questions](faq/faq.md)
 * Advanced API
   * [autorunAsync](refguide/autorun-async.md)
   * [createTransformer](refguide/create-transformer.md)
@@ -25,19 +40,3 @@
   * [when](refguide/when.md)
   * [extending mobx](refguide/extending.md)
   * [miscellaneous](refguide/extras.md)
-* Best Practices For Large Apps
-  * [Defining data stores](best/store.md)
-  * [Writing (async) actions](best/actions.md)
-  * [Organizing React components](best/components.md)
-<!--  * Routing Universal applications -->
-* How does MobX work?
-  * [In depth explanation of MobX](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.gh651s1ta)
-* Tips & Tricks
-  * [DevTools](best/devtools.md)
-  * [ES5 / ES6 / TypeScript syntax](best/syntax.md)
-  * [Optimizing React components](best/react-performance.md)
-  * Optimizing MobX
-  * Testing
-  * [Stateless Components and Hot Module Reloading](best/stateless-HMR.md)
-* [Resources](LINKS.md)
-* [Frequently Asked Questions](faq/faq.md)
