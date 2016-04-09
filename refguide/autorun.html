@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="2.4" data-basepath=".." data-revision="Sat Mar 26 2016 19:58:47 GMT+0100 (CET)">
+    <div class="book" data-level="2.4" data-basepath=".." data-revision="Sat Apr 09 2016 11:29:19 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -487,15 +487,7 @@
     
         <li class="chapter " data-level="4.3" data-path="best/components.html">
             
-                
-                    <a href="../best/components.html">
-                
-                        <i class="fa fa-check"></i>
-                        
-                            <b>4.3.</b>
-                        
-                        Organizing React components
-                    </a>
+            <span><b>4.3.</b> Organizing React components</span>
             
             
         </li>
@@ -571,16 +563,16 @@
             
         </li>
     
-        <li class="chapter " data-level="6.3" data-path="best/stateless-HMR.html">
+        <li class="chapter " data-level="6.3" data-path="best/react-performance.html">
             
                 
-                    <a href="../best/stateless-HMR.html">
+                    <a href="../best/react-performance.html">
                 
                         <i class="fa fa-check"></i>
                         
                             <b>6.3.</b>
                         
-                        Stateless Components and Hot Module Reloading
+                        Optimizing React components
                     </a>
             
             
@@ -588,14 +580,29 @@
     
         <li class="chapter " data-level="6.4" >
             
-            <span><b>6.4.</b> Tracking state changes</span>
+            <span><b>6.4.</b> Optimizing MobX</span>
             
             
         </li>
     
         <li class="chapter " data-level="6.5" >
             
-            <span><b>6.5.</b> Performance considerations</span>
+            <span><b>6.5.</b> Testing</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="6.6" data-path="best/stateless-HMR.html">
+            
+                
+                    <a href="../best/stateless-HMR.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.6.</b>
+                        
+                        Stateless Components and Hot Module Reloading
+                    </a>
             
             
         </li>
@@ -747,7 +754,7 @@ When <code>autorun</code> is used, the provided function will always be triggere
 In contrast, <code>computed(function)</code> creates functions that only re-evaluate if it has
 observers on its own, otherwise its value is considered to be irrelevant.
 As a rule of thumb: use <code>autorun</code> if you have a function that should run automatically but that doesn&apos;t result in a new value.
-Use <code>computed</code> for everything else.</p>
+Use <code>computed</code> for everything else. Autoruns are about initiating <em>effects</em>, not about producing new values.  </p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> numbers = observable([<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>]);
 <span class="hljs-keyword">var</span> sum = computed(() =&gt; numbers.reduce((a, b) =&gt; a + b, <span class="hljs-number">0</span>));
 

@@ -1,16 +1,17 @@
 # Optimizing rendering React components 
 
-## Optimization tip: use many small components
+## Use many small components
 
 `@observer` components will track all values they use and re-render if any of them changes.
 So the smaller your components are, the smaller the change they have to re-render; it means that more parts of your user interface have the possibility to render independently of each other. 
 
-## Optimization tip: render lists in dedicated components
+## Render lists in dedicated components
 This is especially true when rendering big collections.
 React is notouriosly bad at rendering large collections as the reconciler has to evaluate the components produced by a collection on each collection change.
 It is therefor recommended to have components that just map over a collection and render it, and render nothing else:
 
 Bad:
+
 ```javascript
 @observer class MyComponent extends Component {
     render() {
@@ -28,6 +29,7 @@ Bad:
 In the above listing React will unnecessarily need to reconcile all TodoView components when the `user.name` changes. They won't re-render, but the reconcile process is expensive in itself.
 
 Good:
+
 ```javascript
 @observer class MyComponent extends Component {
     render() {
@@ -53,17 +55,17 @@ Good:
 
 Just don't. Search google to find out why.
 
-## Optimization tip: dereference values lately
+## Dereference values lately
 
 When using `mobx-react` it is recommended to dereference values as late as possible.
 This is because MobX will re-render components that dereference observable values automatically.
 If this happens deeper in your component tree, less components have to re-render.
 
-So in general it is faster to have:
+Fast:
 
 `<DisplayName person={person} />`
  
-Compared to:
+Slower:
 
 `<DisplayName name={person.name} />`.
 
@@ -74,11 +76,12 @@ To have the best of both worlds, consider making smaller components:
 
 `const PersonNameDispayer = observer(({ props }) => <DisplayName name={props.person.name} />)` 
 
-## Optimization tip: bind functions early
+## Bind functions early
 
 This tip applies to React in general and libraries using `PureRenderMixin` especially, try to avoid creating new closures in render methods.
 
 Bad:
+
 ```javascript
 render() {
     return <MyWidget onClick={() => { alert('hi') }} />  
@@ -86,6 +89,7 @@ render() {
 ```
 
 Good:
+
 ```javascript
 render() {
     return <MyWidget onClick={this.handleClick} />  

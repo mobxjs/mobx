@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="2.5" data-basepath=".." data-revision="Sat Mar 26 2016 19:58:47 GMT+0100 (CET)">
+    <div class="book" data-level="2.5" data-basepath=".." data-revision="Sat Apr 09 2016 11:29:19 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -487,15 +487,7 @@
     
         <li class="chapter " data-level="4.3" data-path="best/components.html">
             
-                
-                    <a href="../best/components.html">
-                
-                        <i class="fa fa-check"></i>
-                        
-                            <b>4.3.</b>
-                        
-                        Organizing React components
-                    </a>
+            <span><b>4.3.</b> Organizing React components</span>
             
             
         </li>
@@ -571,16 +563,16 @@
             
         </li>
     
-        <li class="chapter " data-level="6.3" data-path="best/stateless-HMR.html">
+        <li class="chapter " data-level="6.3" data-path="best/react-performance.html">
             
                 
-                    <a href="../best/stateless-HMR.html">
+                    <a href="../best/react-performance.html">
                 
                         <i class="fa fa-check"></i>
                         
                             <b>6.3.</b>
                         
-                        Stateless Components and Hot Module Reloading
+                        Optimizing React components
                     </a>
             
             
@@ -588,14 +580,29 @@
     
         <li class="chapter " data-level="6.4" >
             
-            <span><b>6.4.</b> Tracking state changes</span>
+            <span><b>6.4.</b> Optimizing MobX</span>
             
             
         </li>
     
         <li class="chapter " data-level="6.5" >
             
-            <span><b>6.5.</b> Performance considerations</span>
+            <span><b>6.5.</b> Testing</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="6.6" data-path="best/stateless-HMR.html">
+            
+                
+                    <a href="../best/stateless-HMR.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.6.</b>
+                        
+                        Stateless Components and Hot Module Reloading
+                    </a>
             
             
         </li>
@@ -744,72 +751,86 @@
 <p>The <code>observer</code> function / decorator can be used to turn ReactJS components into reactive components.
 It wraps the component&apos;s render function in <code>mobx.autorun</code> to make sure that any data that is used during the rendering of a component forces a rerendering upon change.
 It is available through the separate <code>mobx-react</code> package.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>;
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>
 
-<span class="hljs-keyword">var</span> timerData = observable({
-    secondsPassed: <span class="hljs-number">0</span>
-});
+var timerData = observable({
+    secondsPassed: 0
+})
 
 setInterval(() =&gt; {
-    timerData.secondsPassed++;
-}, <span class="hljs-number">1000</span>);
+    timerData.secondsPassed++
+}, 1000)
 
-@observer <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Timer</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
+@observer class Timer extends React.Component {
     render() {
-        <span class="hljs-keyword">return</span> (<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">span</span>&gt;</span>Seconds passed: { this.props.timerData.secondsPassed } <span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span> )</span>
+        return (&lt;span&gt;Seconds passed: { this.props.timerData.secondsPassed } &lt;/span&gt; )
     }
-});
+})
 
-React.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">Timer</span> <span class="hljs-attribute">timerData</span>=<span class="hljs-value">{timerData}</span> /&gt;</span>, document.body);
-</span></code></pre>
-<p><em>Note: when <code>observer</code> needs to be combined with other decorators or higher-order-components, make sure that <code>observer</code> is the most inner (first applied) decorator;
-otherwise it might do nothing at all.</em></p>
-<h3 id="characteristics-of-reactive-components">Characteristics of reactive components</h3>
-<p>So here we are, simple, straightforward reactive components that will render whenever needed. These components have some interesting characteristics:</p>
-<ul>
-<li>They only subscribe to the data structures that were actively used during the last render. This means that you cannot under-subscribe or over-subscribe. You can even use data in your rendering that will only be available at later moment in time. This is ideal for asynchronously loading data.</li>
-<li>You are not required to declare what data a component will use. Instead, dependencies are determined at runtime and tracked in a very fine-grained manner.</li>
-<li>Usually reactive components have no state. But you are still free to use state.</li>
-<li><code>@observer</code> implements <code>shouldComponentUpdate</code> so that children are not re-rendered unnecessary.</li>
-<li>Reactive components sideways load data; parent components won&apos;t re-render unnecessarily even when child components will.</li>
-<li><code>@observer</code> does not depend on React&apos;s context system.</li>
-</ul>
-<h3 id="reactive-local-component-state">Reactive local component state</h3>
+React.render(&lt;Timer timerData={timerData} /&gt;, document.body)
+</code></pre>
+<p>Tip: when <code>observer</code> needs to be combined with other decorators or higher-order-components, make sure that <code>observer</code> is the most inner (first applied) decorator;
+otherwise it might do nothing at all.</p>
+<h2 id="es5-support">ES5 support</h2>
+<p>In ES5 environments, observer components can be simple declared using <code>observer(React.createClass({ ...</code>. See also the <a href="../best/syntax">syntax guide</a></p>
+<h2 id="stateless-function-components">Stateless function components</h2>
+<p>The above timer widget could also be written using stateless function components that are passed through <code>observer</code>:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>
+
+const Timer = observer(({ props }) =&gt;
+    &lt;span&gt;Seconds passed: { props.timerData.secondsPassed } &lt;/span&gt;
+)
+</code></pre>
+<h2 id="observable-local-component-state">Observable local component state</h2>
 <p>Just like normal classes, you can introduce observable properties on a component by using the <code>@observable</code> decorator.
 This means that you can have local state in components that doesn&apos;t need to be manged by React&apos;s verbose and imperative <code>setState</code> mechanism, but is as powerful.
 The reactive state will be picked up by <code>render</code> but will not explicitly invoke other React lifecycle methods like <code>componentShouldUpdate</code> or <code>componentWillUpdate</code>.
-If you need those, just use the normal React <code>state</code> object.</p>
+If you need those, just use the normal React <code>state</code> based api&apos;s.</p>
 <p>The example above could also have been written as:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>;
-<span class="hljs-keyword">import</span> {observable} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>
+<span class="hljs-keyword">import</span> {observable} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>
 
-@observer <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Timer</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
-    @observable secondsPassed = <span class="hljs-number">0</span>;
+@observer class Timer extends React.Component {
+    @observable secondsPassed = 0
 
     componentWillMount() {
         setInterval(() =&gt; {
-            <span class="hljs-keyword">this</span>.secondsPassed++;
-        }, <span class="hljs-number">1000</span>);
+            this.secondsPassed++
+        }, 1000)
     }
 
     render() {
-        <span class="hljs-keyword">return</span> (<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">span</span>&gt;</span>Seconds passed: { this.secondsPassed } <span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span> )</span>
+        return (&lt;span&gt;Seconds passed: { this.secondsPassed } &lt;/span&gt; )
     }
-});
+})
 
-React.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">Timer</span> <span class="hljs-attribute">timerData</span>=<span class="hljs-value">{timerData}</span> /&gt;</span>, document.body);
-</span></code></pre>
-<h3 id="mobx-react-devtools">MobX-React-DevTools</h3>
-<p>In combination with <code>@observer</code> you can use the MobX-React-DevTools, it shows exactly when your components are rerendered and you can inspect the data dependencies of your components.</p>
-<h3 id="alternative-syntaxes">Alternative syntaxes</h3>
-<p>In ES5 environments, reactive components can be simple declared using <code>observer(React.createClass({ ...</code>. See also the <a href="../best/syntax">syntax guide</a></p>
-<p>When using <code>@observer</code>, a lot of components will become stateless.
-In such cases you can also write reactive function components using <code>@observer</code> (this works also on ES5 and with React 0.13):</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> Timer = observer( ({timerData}) =&gt;
-    (<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">span</span>&gt;</span>Seconds passed: { timerData.secondsPassed } <span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span> )</span>
-);
+React.render(&lt;Timer timerData={timerData} /&gt;, document.body)
 </code></pre>
-<h3 id="enabling-decorators-in-your-transpiler">Enabling decorators in your transpiler</h3>
+<h2 id="when-to-apply-observer">When to apply <code>observer</code>?</h2>
+<p>Rule of thumb is to use <code>observer</code> on every component in your application that is specific for your application.
+With <code>@observer</code> there is no need to distinguish &apos;smart&apos; components from &apos;dumb&apos; components.
+All components become responsible for updating when their <em>own</em> dependencies change.
+Its overhead is neglectable and it makes sure that whenever you start using observable data the component will respond to it.</p>
+<h2 id="-observer-and-purerendermixin"><code>observer</code> and <code>PureRenderMixin</code></h2>
+<p><code>observer</code> also prevents re-renderings when the <em>props</em> of the component have only shallowly changed, which makes a lot of sense if the data passed into the component is reactive.
+This behavior is similar to <a href="https://facebook.github.io/react/docs/pure-render-mixin.html" target="_blank">React PureRender mixin</a>, except that <em>state</em> changes are still always processed.
+If a component provides its own <code>shouldComponentUpdate</code>, that one takes precedence.
+See for an explanation this <a href="https://github.com/mobxjs/mobx/issues/101" target="_blank">github issue</a></p>
+<h2 id="optimizing-components">Optimizing components</h2>
+<p>See the relevant <a href="../best/react-performance.html">section</a>.</p>
+<h2 id="mobx-react-devtools">MobX-React-DevTools</h2>
+<p>In combination with <code>@observer</code> you can use the MobX-React-DevTools, it shows exactly when your components are rerendered and you can inspect the data dependencies of your components.
+See the <a href="../best/devtools.html">DevTools</a> section.</p>
+<h2 id="characteristics-of-observer-components">Characteristics of observer components</h2>
+<ul>
+<li>Observer only subscribe to the data structures that were actively used during the last render. This means that you cannot under-subscribe or over-subscribe. You can even use data in your rendering that will only be available at later moment in time. This is ideal for asynchronously loading data.</li>
+<li>You are not required to declare what data a component will use. Instead, dependencies are determined at runtime and tracked in a very fine-grained manner.</li>
+<li>Usually reactive components have no or little state, as it is often more convenient to encapsulate (view) state in objects that are shared with other component. But you are still free to use state.</li>
+<li><code>@observer</code> implements <code>shouldComponentUpdate</code> in the same way as <code>PureRenderMixin</code> so that children are not re-rendered unnecessary.</li>
+<li>Reactive components sideways load data; parent components won&apos;t re-render unnecessarily even when child components will.</li>
+<li><code>@observer</code> does not depend on React&apos;s context system.</li>
+</ul>
+<h2 id="enabling-es6-decorators-in-your-transpiler">Enabling ES6 decorators in your transpiler</h2>
 <p>Decorators are not supported by default when using TypeScript or Babel pending a definitive definition in the ES standard.</p>
 <ul>
 <li>For <em>typescript</em>, enable the <code>--experimentalDecorators</code> compiler flag or set the compiler option <code>experimentalDecorators</code> to <code>true</code> in <code>tsconfig.json</code> (Recommended)</li>
