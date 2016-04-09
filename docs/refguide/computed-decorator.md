@@ -14,7 +14,7 @@ So they will not be invoked when there input parameters didn't modifiy or if the
  
 
 ```javascript
-import {observable} from "mobx";
+import {observable, computed} from "mobx";
 
 class OrderLine {
     @observable price:number = 0;
