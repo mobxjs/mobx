@@ -40,7 +40,7 @@ export class MobXGlobals {
 
 	/**
 	 * List of observables that have changed in a transaction.
-	 * After completing the transaction(s) thise atoms will notify their observers.
+	 * After completing the transaction(s) these atoms will notify their observers.
 	 */
 	changedAtoms: IAtom[] = [];
 

@@ -97,11 +97,11 @@ export function makeChildObservable(value, parentMode: ValueMode, name?: string)
 		case ValueMode.Reference:
 			return value;
 		case ValueMode.Flat:
-			assertUnwrapped(value, "Items inside 'asFlat' canont have modifiers");
+			assertUnwrapped(value, "Items inside 'asFlat' cannot have modifiers");
 			childMode = ValueMode.Reference;
 			break;
 		case ValueMode.Structure:
-			assertUnwrapped(value, "Items inside 'asStructure' canont have modifiers");
+			assertUnwrapped(value, "Items inside 'asStructure' cannot have modifiers");
 			childMode = ValueMode.Structure;
 			break;
 		case ValueMode.Recursive:
