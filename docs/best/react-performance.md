@@ -1,0 +1,99 @@
+# Optimizing rendering React components 
+
+## Optimization tip: use many small components
+
+`@observer` components will track all values they use and re-render if any of them changes.
+So the smaller your components are, the smaller the change they have to re-render; it means that more parts of your user interface have the possibility to render independently of each other. 
+
+## Optimization tip: render lists in dedicated components
+This is especially true when rendering big collections.
+React is notouriosly bad at rendering large collections as the reconciler has to evaluate the components produced by a collection on each collection change.
+It is therefor recommended to have components that just map over a collection and render it, and render nothing else:
+
+Bad:
+```javascript
+@observer class MyComponent extends Component {
+    render() {
+        const {todos, user} = this.props;
+        return (<div>
+            {user.name}
+            <ul>
+                {todos.map(todo => <TodoView todo={todo} key={todo.id} />)}
+            </ul>
+        </div>)
+    }
+}
+```         
+
+In the above listing React will unnecessarily need to reconcile all TodoView components when the `user.name` changes. They won't re-render, but the reconcile process is expensive in itself.
+
+Good:
+```javascript
+@observer class MyComponent extends Component {
+    render() {
+        const {todos, user} = this.props;
+        return (<div>
+            {user.name}
+            <TodosView todos={todos} />
+        </div>)
+    }
+}
+
+@observer class TodosView extends Component {
+    render() {
+        const {todos} = this.props;
+        return <ul>
+            {todos.map(todo => <TodoView todo={todo} key={todo.id} />)}
+        </ul>)
+    }
+}
+```         
+
+## Don't use array indexes as keys
+
+Just don't. Search google to find out why.
+
+## Optimization tip: dereference values lately
+
+When using `mobx-react` it is recommended to dereference values as late as possible.
+This is because MobX will re-render components that dereference observable values automatically.
+If this happens deeper in your component tree, less components have to re-render.
+
+So in general it is faster to have:
+
+`<DisplayName person={person} />`
+ 
+Compared to:
+
+`<DisplayName name={person.name} />`.
+
+There is nothing wrong the the latter.
+But a change in the `name` property will in the first case trigger the `DisplayName` to re-render, while in the latter the owner of the component has to re-render.
+However, it is more important for your components to have an comprehensible api then applying this optimization.
+To have the best of both worlds, consider making smaller components:
+
+`const PersonNameDispayer = observer(({ props }) => <DisplayName name={props.person.name} />)` 
+
+## Optimization tip: bind functions early
+
+This tip applies to React in general and libraries using `PureRenderMixin` especially, try to avoid creating new closures in render methods.
+
+Bad:
+```javascript
+render() {
+    return <MyWidget onClick={() => { alert('hi') }} />  
+}
+```
+
+Good:
+```javascript
+render() {
+    return <MyWidget onClick={this.handleClick} />  
+}
+
+handleClick = () => {
+    alert('hi')
+}
+```
+
+The bad example will always yield the `shouldComponent` of `PureRenderMixin` used in `MyWidget` to always yield false as you pass a new function each time the parent is re-rendered. 

@@ -35,8 +35,9 @@
 * Tips & Tricks
   * [DevTools](best/devtools.md)
   * [ES5 / ES6 / TypeScript syntax](best/syntax.md)
+  * [Optimizing React components](best/react-performance.md)
+  * Optimizing MobX
+  * Testing
   * [Stateless Components and Hot Module Reloading](best/stateless-HMR.md)
-  * Tracking state changes
-  * Performance considerations
 * [Resources](LINKS.md)
 * [Frequently Asked Questions](faq/faq.md)

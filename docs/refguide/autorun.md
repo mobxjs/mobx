@@ -6,7 +6,7 @@ When `autorun` is used, the provided function will always be triggered when one 
 In contrast, `computed(function)` creates functions that only re-evaluate if it has
 observers on its own, otherwise its value is considered to be irrelevant.
 As a rule of thumb: use `autorun` if you have a function that should run automatically but that doesn't result in a new value.
-Use `computed` for everything else.
+Use `computed` for everything else. Autoruns are about initiating _effects_, not about producing new values.  
 
 ```javascript
 var numbers = observable([1,2,3]);
