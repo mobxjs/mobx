@@ -54,10 +54,10 @@ In contrast, `@observable someFunction() {}` will just create an observable refe
 
 ```javascript
 class TodoStore {
-    @observable todos = todos: [{
+    @observable todos = [{
         title: 'Find a clean mug',
         completed: true
-    }]
+    }];
 
     @computed get completedCount() {
         return this.todos.filter((todo) => todo.completed).length;
