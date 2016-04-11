@@ -422,25 +422,15 @@ test('observe object', function(t) {
     a.a = 4;
     a.b = 5;
     t.deepEqual(events, [
-        { type: 'update',
-            object: a,
-            name: 'a',
-            oldValue: 1 },
-        { type: 'update',
-            object: a,
-            name: 'a',
-            oldValue: 2 },
-        { type: 'add',
-            object: a,
-            name: 'b' },
-        { type: 'update',
-            object: a,
-            name: 'a',
-            oldValue: 3 },
-        { type: 'update',
-            object: a,
-            name: 'b',
-            oldValue: 3 }
+        { name: 'a', newValue: 2, object: { a: 4, b: 5 }, oldValue: 1, type: 'preupdate' },
+        { name: 'a', object: { a: 4, b: 5 }, oldValue: 1, type: 'update' },
+        { name: 'a', newValue: 3, object: { a: 4, b: 5 }, oldValue: 2, type: 'preupdate' },
+        { name: 'a', object: { a: 4, b: 5 }, oldValue: 2, type: 'update' },
+        { name: 'b', object: { a: 4, b: 5 }, type: 'add' },
+        { name: 'a', newValue: 4, object: { a: 4, b: 5 }, oldValue: 3, type: 'preupdate' },
+        { name: 'a', object: { a: 4, b: 5 }, oldValue: 3, type: 'update' },
+        { name: 'b', newValue: 5, object: { a: 4, b: 5 }, oldValue: 3, type: 'preupdate' },
+        { name: 'b', object: { a: 4, b: 5 }, oldValue: 3, type: 'update' }
     ]);
 
     stop();
@@ -481,23 +471,13 @@ test('mobx.observe', function(t) {
     map.set("d", 11);
 
     t.deepEqual(events, [
-        { type: 'update',
-            object: po,
-            name: 'a',
-            oldValue: 1 },
-        { type: 'update',
-            object: o,
-            name: 'b',
-            oldValue: 2 },
-        { object: ar,
-            type: 'update',
-            index: 0,
-            oldValue: 3 },
-        { type: 'add',
-            object: map,
-            name: 'd' }
+        { name: 'a', newValue: 4, object: { a: 8 }, oldValue: 1, type: 'preupdate' },
+        { name: 'a', object: { a: 8 }, oldValue: 1, type: 'update' },
+        { name: 'b', newValue: 5, object: { b: 9 }, oldValue: 2, type: 'preupdate' },
+        { name: 'b', object: { b: 9 }, oldValue: 2, type: 'update' },
+        { index: 0, object: {}, oldValue: 3, type: 'update' },
+        { name: 'd', object: map, type: 'add' }
     ]);
-
     t.end();
 });
 

@@ -82,9 +82,18 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 			return observable.get();
 		},
 		set: isComputed
-			? throwingComputedValueSetter 
+			? throwingComputedValueSetter
 			: function(newValue) {
 				const oldValue = (observable as any).value;
+				if (adm.events) {
+					adm.events.emit(<IObjectChange<any, any>> {
+						type: "preupdate",
+						object: this,
+						name: propName,
+						oldValue,
+						newValue
+					});
+				}
 				if (observable.set(newValue) && adm.events !== undefined) {
 					adm.events.emit(<IObjectChange<any, any>> {
 						type: "update",
@@ -107,7 +116,7 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 
 /**
 	* Observes this object. Triggers for the events 'add', 'update' and 'delete'.
-	* See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe 
+	* See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
 	* for callback details
 	*/
 export function observeObservableObject(object: IIsObservableObject, callback: (changes: IObjectChange<any, any>) => void, fireImmediately?: boolean): Lambda {
