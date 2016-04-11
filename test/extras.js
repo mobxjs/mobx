@@ -130,6 +130,16 @@ test('names', function(t) {
 
     t.equal(m.observable(function namedFunction() {}).name, "namedFunction");
 
+	function Task() {
+		m.extendObservable(this, {
+			title: "test"
+		});
+	}
+	
+	var task = new Task();
+	t.equal(task.$mobx.name, "Task");
+	t.equal(task.$mobx.values.title.name, "Task@20 / Prop \"title\"");
+
     t.end();
 })
 

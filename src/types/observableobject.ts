@@ -1,7 +1,7 @@
 import {ObservableValue} from "./observablevalue";
 import {ComputedValue} from "../core/computedvalue";
 import {ValueMode, AsStructure} from "./modifiers";
-import {Lambda, invariant, assertPropertyConfigurable} from "../utils/utils";
+import {Lambda, invariant, assertPropertyConfigurable, isPlainObject} from "../utils/utils";
 import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {getNextId} from "../core/globalstate";
 import {throwingComputedValueSetter} from "../api/computeddecorator";
@@ -29,12 +29,18 @@ export interface IIsObservableObject {
 	$mobx: IObservableObjectAdministration;
 }
 
-export function asObservableObject(target, name: string = "ObservableObject", mode: ValueMode = ValueMode.Recursive): IObservableObjectAdministration {
+export function asObservableObject(target, name: string, mode: ValueMode = ValueMode.Recursive): IObservableObjectAdministration {
 	if (target.$mobx) {
 		if (target.$mobx.type !== ObservableObjectMarker)
 			throw new Error("The given object is observable but not an observable object");
 		return target.$mobx;
 	}
+
+	if (!isPlainObject(target))
+		name = target.constructor.name;
+	if (!name)
+		name = "ObservableObject";
+
 	const adm: IObservableObjectAdministration = {
 		type: ObservableObjectMarker,
 		values: {},
