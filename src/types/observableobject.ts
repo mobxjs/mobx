@@ -115,7 +115,7 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 }
 
 /**
-	* Observes this object. Triggers for the events 'add', 'update' and 'delete'.
+	* Observes this object. Triggers for the events 'add', 'update', 'preupdate' and 'delete'.
 	* See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
 	* for callback details
 	*/
