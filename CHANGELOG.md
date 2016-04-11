@@ -1,3 +1,8 @@
+# 2.1.2
+
+* Improved debug names of objects created using a constructor
+* Fixed(?) some issues with iOS7 as reported in #60 by @bstst
+
 # 2.1.1
 
 * Fixed issue where `autorun`'s created inside `autorun`'s were not always kicked off. (`mobx-react`'s `observer` was not affected). Please upgrade if you often use autorun.
