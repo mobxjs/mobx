@@ -198,3 +198,10 @@ More testimonials from people using MobX in production can be found on [medium: 
 
 * Feel free to send pull requests.
 * Use `npm test` to run the basic test suite, `npm run coverage` for the test suite with coverage and `npm run perf` for the performance tests.
+
+## Bower support
+
+Bower support is available through the infamous npmcdn.com:
+`bower install https://npmcdn.com/mobx/bower.zip`
+
+Then use `lib/mobx.umd.js` or `lib/mobx.umd.min.js`
