@@ -8,8 +8,9 @@ MobX is very fast, [often even faster than Redux](https://twitter.com/mweststrat
 So the smaller your components are, the smaller the change they have to re-render; it means that more parts of your user interface have the possibility to render independently of each other. 
 
 ## Render lists in dedicated components
+
 This is especially true when rendering big collections.
-React is notouriosly bad at rendering large collections as the reconciler has to evaluate the components produced by a collection on each collection change.
+React is notoriously bad at rendering large collections as the reconciler has to evaluate the components produced by a collection on each collection change.
 It is therefor recommended to have components that just map over a collection and render it, and render nothing else:
 
 Bad:
