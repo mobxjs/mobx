@@ -168,7 +168,7 @@ And finally kudo's for all the people that believed in, tried and validated MobX
 ## Further examples and documentation
 
 * [Full API documentation](http://mobxjs.github.io/mobx/)
-* Five minute, [interactive introduction](https://mobxjs.github.io/mobx/getting-started.html) (with just ES5)
+* Ten minute, [interactive introduction](https://mobxjs.github.io/mobx/getting-started.html) (with just ES5)
 * Boilerplate and example projects for ES5, Babel, Typescript can be found in the [MobX](https://github.com/mobxjs) organization on github.
 
 Blogs & Videos:
