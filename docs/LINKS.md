@@ -11,6 +11,7 @@
 * [rfx-stack](https://github.com/foxhound87/rfx-stack) RFX Stack - Universal App featuring: React + Feathers + MobX
 * [mobx-reactor](https://github.com/amsb/mobx-reactor) Connect MobX data stores to functional stateless React components with async actions and unidirectional data flow.
 * [mobx-model](https://github.com/ikido/mobx-model) Simplify mobx data stores that mimic backend models 
+* [rx-mobx](https://github.com/chicoxyzzy/rx-mobx) Convert Mobx observables to RxJS and vice versa
 
 ## More examples
 
