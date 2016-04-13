@@ -1,7 +1,7 @@
 # Best Practices for building large scale maintainable projects
 
 This section contains some best practices we discovered at Mendix while working with MobX.
-This section is opiniated and you are in no way forced to apply this practices.
+This section is opinionated and you are in no way forced to apply these practices.
 There are many ways of working with MobX and React, and this is just one of them.
 
 # Stores
@@ -18,12 +18,12 @@ One for the _ui state_ and one or more for the _domain state_.
 The advantage of separating those two is you can reuse and test _domain state_ universally, and you might very well reuse it in other applications.
 The _ui-state-store_ however is often very specific for your application.
 But usually very simple as well.
-This store typically doesn't have much logic in it, but will store a plethorea of loosely coupled pieces of information about the ui.
+This store typically doesn't have much logic in it, but will store a plethora of loosely coupled pieces of information about the ui.
 This is ideal as most applications will change the ui state often during the development process.
 
 Things you will typically find in ui stores:
 * Session information
-* Information about how far you applications has loaded
+* Information about how far your application has loaded
 * Information that will not be stored in the backend
 * Information that affects the UI globally
   * Window dimensions
@@ -42,7 +42,7 @@ Instead of pushing state in such a case upwards in the component tree, like you 
 
 Make sure this state is a singleton.
 For isomorphic applications you might also want to provide a stub implementation of this store with sane defaults so that all components render as expected.
-You might distribute the _ui-state-store_ through your application by passing it as property through your component tree.
+You might distribute the _ui-state-store_ through your application by passing it as a property through your component tree.
 You can also pass this store by using context or make it globally available as a module.
 For testing purposes, I recommend to just pass it through the component tree.
 
@@ -95,7 +95,7 @@ These are the responsibility of a store:
 * Instantiate domain objects. Make sure domain objects know the store they belong to.
 * Make sure there is only one instance of each of your domain objects.
 The same user, order or todo should not be twice in your memory.
-This way you can safely use refences and also be sure you are looking at the latest instance, without ever having to resolve a references.
+This way you can safely use references and also be sure you are looking at the latest instance, without ever having to resolve a reference.
 This is fast, straight forward and convenient when debugging.
 * Provide backend integration. Store data when needed.
 * Update existing instances if updates are received from the backend.
@@ -121,7 +121,7 @@ Just pass objects around.
 You don't have to pass stores around, or have to figure out which actions can be applied to an object if they are just available as instance methods.
 Especially in large applications this is important.
 * They offer fine grained control over the visibility of attributes and methods.
-* Objects created a using a constructor function can freely mix observable properties and functions, and non-observable properties and methods.
+* Objects created using a constructor function can freely mix observable properties and functions, and non-observable properties and methods.
 * They are easily recognizable and can strictly be type-checked.
 
 
