@@ -116,3 +116,28 @@ test('decorators', function(t) {
 	
 	t.end();
 })
+
+test('issue 191 - shared initializers (babel)', function(t) {
+	class Test {
+		@observable obj = { a: 1 };
+		@observable array = [2];
+	}
+	
+	var t1 = new Test();
+	t1.obj.a = 2;
+	t1.array.push(3);
+	
+	var t2 = new Test();
+	t2.obj.a = 3;
+	t2.array.push(4);
+	
+	t.notEqual(t1.obj, t2.obj);
+	t.notEqual(t1.array, t2.array);
+	t.equal(t1.obj.a, 2);
+	t.equal(t2.obj.a, 3);
+	
+	t.deepEqual(t1.array.slice(), [2,3]);
+	t.deepEqual(t2.array.slice(), [2,4]);
+	
+	t.end();
+})

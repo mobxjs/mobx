@@ -1,3 +1,7 @@
+# 2.1.3
+
+* Fixed #191, when using babel, complex field initializers where shared. By @andykog
+
 # 2.1.2
 
 * Improved debug names of objects created using a constructor
