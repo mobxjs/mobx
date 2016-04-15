@@ -22,7 +22,6 @@ export function observableDecorator(target: Object, key: string, baseDescriptor:
 	// - In typescript, observable annotations are invoked on the prototype, not on actual instances,
 	// so upon invocation, determine the 'this' instance, and define a property on the
 	// instance as well (that hides the propotype property)
-	// - In typescript, the baseDescriptor is empty for attributes without initial value
 	// - In babel, the initial value is passed as the closure baseDiscriptor.initializer'
 
 	if (baseDescriptor && baseDescriptor.hasOwnProperty("get")) {
@@ -36,14 +35,10 @@ export function observableDecorator(target: Object, key: string, baseDescriptor:
 	descriptor.enumerable = true;
 	descriptor.get = function() {
 		let baseValue = undefined;
-		if (baseDescriptor) {
-			if (baseDescriptor.hasOwnProperty("value"))
-				baseValue = baseDescriptor.value;
-			else if ((<any>baseDescriptor).initializer) { // For babel
-				baseValue = (<any>baseDescriptor).initializer();
-				if (typeof baseValue === "function")
-					baseValue = asReference(baseValue);
-			}
+		if (baseDescriptor && (<any>baseDescriptor).initializer) { // For babel
+			baseValue = (<any>baseDescriptor).initializer();
+			if (typeof baseValue === "function")
+				baseValue = asReference(baseValue);
 		}
 		// the getter might create a reactive property lazily, so this might even happen during a view.
 		allowStateChanges(true, () => {
