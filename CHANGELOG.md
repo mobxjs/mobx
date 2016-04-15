@@ -1,6 +1,7 @@
 # 2.1.3
 
 * Fixed #191, when using babel, complex field initializers where shared. By @andykog
+* Added `lib/mobx.umd.min.js` for minified cdn builds, see #85
 
 # 2.1.2
 
