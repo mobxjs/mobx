@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="3.3" data-basepath=".." data-revision="Sat Apr 09 2016 11:45:06 GMT+0200 (CEST)">
+    <div class="book" data-level="3.3" data-basepath=".." data-revision="Tue Apr 19 2016 20:46:46 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -293,7 +293,7 @@
         <li class="chapter " data-level="4.1" >
             
                 
-                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.gh651s1ta">
+                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254">
                 
                         <i class="fa fa-check"></i>
                         
@@ -549,7 +549,7 @@
                         
                             <b>8.9.</b>
                         
-                        tojson
+                        toJSON
                     </a>
             
             
@@ -744,11 +744,11 @@
 <p>MobX is very fast, <a href="https://twitter.com/mweststrate/status/718444275239882753" target="_blank">often even faster than Redux</a>. But here are some tips to get most out of React and MobX. Note that most tips apply to React in general and are not specific for MobX.</p>
 <h2 id="use-many-small-components">Use many small components</h2>
 <p><code>@observer</code> components will track all values they use and re-render if any of them changes.
-So the smaller your components are, the smaller the change they have to re-render; it means that more parts of your user interface have the possibility to render independently of each other. </p>
+So the smaller your components are, the smaller the change they have to re-render; it means that more parts of your user interface have the possibility to render independently of each other.</p>
 <h2 id="render-lists-in-dedicated-components">Render lists in dedicated components</h2>
 <p>This is especially true when rendering big collections.
-React is notouriosly bad at rendering large collections as the reconciler has to evaluate the components produced by a collection on each collection change.
-It is therefor recommended to have components that just map over a collection and render it, and render nothing else:</p>
+React is notoriously bad at rendering large collections as the reconciler has to evaluate the components produced by a collection on each collection change.
+It is therefore recommended to have components that just map over a collection and render it, and render nothing else:</p>
 <p>Bad:</p>
 <pre><code class="lang-javascript">@observer class MyComponent extends Component {
     render() {
@@ -793,28 +793,28 @@ If this happens deeper in your component tree, less components have to re-render
 <p><code>&lt;DisplayName person={person} /&gt;</code></p>
 <p>Slower:</p>
 <p><code>&lt;DisplayName name={person.name} /&gt;</code>.</p>
-<p>There is nothing wrong the the latter.
-But a change in the <code>name</code> property will in the first case trigger the <code>DisplayName</code> to re-render, while in the latter the owner of the component has to re-render.
-However, it is more important for your components to have an comprehensible api then applying this optimization.
+<p>There is nothing wrong to the latter.
+But a change in the <code>name</code> property will, in the first case, trigger the <code>DisplayName</code> to re-render, while in the latter, the owner of the component has to re-render.
+However, it is more important for your components to have an comprehensible API then applying this optimization.
 To have the best of both worlds, consider making smaller components:</p>
-<p><code>const PersonNameDispayer = observer(({ props }) =&gt; &lt;DisplayName name={props.person.name} /&gt;)</code> </p>
+<p><code>const PersonNameDispayer = observer(({ props }) =&gt; &lt;DisplayName name={props.person.name} /&gt;)</code></p>
 <h2 id="bind-functions-early">Bind functions early</h2>
 <p>This tip applies to React in general and libraries using <code>PureRenderMixin</code> especially, try to avoid creating new closures in render methods.</p>
 <p>Bad:</p>
 <pre><code class="lang-javascript">render() {
-    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">MyWidget</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{()</span> =&gt;</span> { alert(&apos;hi&apos;) }} /&gt;  
+    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">MyWidget</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{()</span> =&gt;</span> { alert(&apos;hi&apos;) }} /&gt;
 }
 </span></code></pre>
 <p>Good:</p>
 <pre><code class="lang-javascript">render() {
-    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">MyWidget</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{this.handleClick}</span> /&gt;</span>  
+    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">MyWidget</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{this.handleClick}</span> /&gt;</span>
 }
 
 handleClick = () =&gt; {
     alert(&apos;hi&apos;)
 }
 </span></code></pre>
-<p>The bad example will always yield the <code>shouldComponent</code> of <code>PureRenderMixin</code> used in <code>MyWidget</code> to always yield false as you pass a new function each time the parent is re-rendered. </p>
+<p>The bad example will always yield the <code>shouldComponent</code> of <code>PureRenderMixin</code> used in <code>MyWidget</code> to always yield false as you pass a new function each time the parent is re-rendered.</p>
 
                     
                     </section>

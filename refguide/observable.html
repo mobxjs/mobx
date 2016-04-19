@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="2.1" data-basepath=".." data-revision="Sat Apr 09 2016 11:45:06 GMT+0200 (CEST)">
+    <div class="book" data-level="2.1" data-basepath=".." data-revision="Tue Apr 19 2016 20:46:46 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -293,7 +293,7 @@
         <li class="chapter " data-level="4.1" >
             
                 
-                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.gh651s1ta">
+                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254">
                 
                         <i class="fa fa-check"></i>
                         
@@ -549,7 +549,7 @@
                         
                             <b>8.9.</b>
                         
-                        tojson
+                        toJSON
                     </a>
             
             
@@ -741,14 +741,14 @@
                     <section class="normal" id="section-">
                     
                         <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/observable.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="observable">observable</h1>
-<p><code>observable</code> is to MobX as <code>$</code> is to jQuery.
+<p><code>observable</code> is to MobX what <code>$</code> is to jQuery.
 Making data observable starts with this function.
 If data is observable, views that depend on that data will update automatically.</p>
 <p><code>observable</code> provides overloads for different kinds of data.
 Probably you will only use the version that takes objects,
 but these are the available variations:</p>
 <h2 id="objects">Objects</h2>
-<p>If a plain javascript object is passed to <code>observable</code> (that is, an object that wasn&apos;t created using a constructor function),
+<p>If a plain JavaScript object is passed to <code>observable</code> (that is, an object that wasn&apos;t created using a constructor function),
 MobX will recursively pass all its values through <code>observable</code>.
 This way the complete object (tree) is in-place instrumented to make it observable.</p>
 <p>So we can rewrite the previous example as:</p>
@@ -780,7 +780,7 @@ Properties that are added to the object at a later time won&apos;t become observ
 <li>Only plain objects will be made observable. For non-plain objects it is considered the responsibility of the constructor to initialize the observable properties.
 Either use the <a href="observable.html"><code>@observable</code></a> annotation or the <a href="extend-observable.html"><code>extendObservable</code></a> function.</li>
 <li>Argumentless functions will be automatically turned into views, just like <a href="computed-decorator"><code>@computed</code></a> would do. For view <code>this</code> will be automatically bound to the object it is defined on.
-However, if a function expression (ES6 / typescript) is used, <code>this</code> will be bound to undefined, so you probably want to either refer to the object directly, or use a classic function.</li>
+However, if a function expression (ES6 / TypeScript) is used, <code>this</code> will be bound to <code>undefined</code>, so you probably want to either to refer to the object directly, or to use a classic function.</li>
 <li><code>observable</code> is applied recursively, both on instantiation and to any new values that will be assigned to observable properties in the future.</li>
 <li>These defaults are fine in 95% of the cases, but for more fine-grained on how and which properties should be made observable, see the <a href="modifiers.html">modifiers</a> section.</li>
 </ul>
@@ -818,7 +818,7 @@ In practice, these arrays work just as fine as native arrays and all native meth
 <p>Bear in mind that <code>Array.isArray(observable([]))</code> will yield <code>false</code>, so whenever you need to pass an observable array to an external library,
 it is a good idea to <em>create a shallow copy before passing it to other libraries or built-in functions</em> (which is good practice anyway) by using <code>array.slice()</code> or <code>array.peek()</code>.
 So <code>Array.isArray(observable([]).slice())</code> will yield <code>true</code>.</p>
-<p>Unlike the built-in implementation of the functions <code>sort</code> and <code>reverse</code>, observableArray.sort and reverse  will not change the array in-place, but only will return a sorted / reversed copy. </p>
+<p>Unlike the built-in implementation of the functions <code>sort</code> and <code>reverse</code>, observableArray.sort and reverse  will not change the array in-place, but only will return a sorted / reversed copy.</p>
 <p>Besides all built-in functions, the following goodies are available as well on observable arrays:</p>
 <ul>
 <li><code>observe(listener, fireImmediately? = false)</code> Listen to changes in this array. The callback will receive arguments that express an array splice or array change, conforming to <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe" target="_blank">ES7 proposal</a>. It returns a disposer function to stop the listener.</li>
@@ -826,11 +826,13 @@ So <code>Array.isArray(observable([]).slice())</code> will yield <code>true</cod
 <li><code>replace(newItems)</code> Replaces all existing entries in the array with new ones.</li>
 <li><code>find(predicate: (item, index, array) =&gt; boolean, thisArg?, fromIndex?)</code> Basically the same as the ES7 <code>Array.find</code> proposal, except for the additional <code>fromIndex</code> parameter.</li>
 <li><code>remove(value)</code> Remove a single item by value from the array. Returns <code>true</code> if the item was found and removed.</li>
-<li><code>peek()</code> Returns an array with all the values which can safely be passed to other libraries, similar to <code>slice()</code>.<br>In contrast to <code>slice</code>, <code>peek</code> peek doesn&apos;t create a defensive copy. Use this in performance critical applications if you know for sure that you use the array in a read-only manner.<br>In performance cricital sections it is recommend to use <a href="fast-array.md">fastArray</a> as well.</li>
+<li><code>peek()</code> Returns an array with all the values which can safely be passed to other libraries, similar to <code>slice()</code>.
+In contrast to <code>slice</code>, <code>peek</code> doesn&apos;t create a defensive copy. Use this in performance critical applications if you know for sure that you use the array in a read-only manner.
+In performance critical sections it is recommend to use a flat observable array as well.</li>
 </ul>
 <h2 id="primitive-values-and-references">Primitive values and references</h2>
 <p>For all type of values, with the exception of <em>plain objects</em>, <em>arrays</em> and <em>functions without arguments</em> this overload is run.
-In practice, you probably won&apos;t use this overload as it is often more convenient to use <code>observable</code> on an object or 
+In practice, you probably won&apos;t use this overload as it is often more convenient to use <code>observable</code> on an object or
 <a href="extend-observable.html"><code>extendObservable</code></a> (or <code>@observable</code>) to introduce observable properties on existing objects.</p>
 <p><code>observable</code> accepts scalar values and returns an object with a getter / setter function that holds this value.
 Furthermore you can register a callback using its <code>.observe</code> method to listen to changes on the stored value.

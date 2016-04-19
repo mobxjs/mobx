@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="8.8" data-basepath=".." data-revision="Sat Apr 09 2016 11:45:06 GMT+0200 (CEST)">
+    <div class="book" data-level="8.8" data-basepath=".." data-revision="Tue Apr 19 2016 20:46:46 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -293,7 +293,7 @@
         <li class="chapter " data-level="4.1" >
             
                 
-                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.gh651s1ta">
+                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254">
                 
                         <i class="fa fa-check"></i>
                         
@@ -549,7 +549,7 @@
                         
                             <b>8.9.</b>
                         
-                        tojson
+                        toJSON
                     </a>
             
             
@@ -742,22 +742,22 @@
                     
                         <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/observe.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="observe">Observe</h1>
 <p>Given an observable <code>object</code> and a <code>listener</code> method, <code>observe(object, listener)</code> starts listening for changes on the given object.
-The callbacks are invoked with values as described in the specs of 
+The callbacks are invoked with values as described in the specs of
 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe" target="_blank">Object.observe</a>
 and <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe" target="_blank">Array.observe</a>.</p>
 <p>Unlike <code>autorun</code>, <code>observe</code> does not respect transactions and is always invoked immediately after altering an object. This makes it useful for invariant checking or input transformations.
-But note that in most cases <code>autorun</code> is a better and more powerful alternative to observe. Especially for scalars and objects.</p>
+But note that in most cases <code>autorun</code> is a better and more powerful alternative to <code>observe</code>. Especially for scalars and objects.</p>
 <p>Accepted objects are:</p>
 <ul>
 <li>Observable maps (created using <code>mobx.map(object)</code>). Possibly emitted event types are: <code>&quot;add&quot;</code>, <code>&quot;update&quot;</code> and <code>&quot;delete&quot;</code>.</li>
 <li>Observable objects (created using <code>mobx.observable(object)</code>). Possibly emitted event types are <code>&quot;update&quot;</code>, and in combination with <code>extendObservable</code>, <code>&quot;add&quot;</code> might fire as well.</li>
 <li>Observable arrays (created using <code>mobx.observable(array)</code>). Possibly emitted event types are <code>&quot;update&quot;</code> and <code>&quot;splice&quot;</code>.</li>
-<li>Plain objects will be passed through <code>mobx.observable</code> first. See &apos;Observable objects&apos; for further details. </li>
+<li>Plain objects will be passed through <code>mobx.observable</code> first. See &apos;Observable objects&apos; for further details.</li>
 <li>Plain arrays are <em>not</em> accepted by <code>observe</code>. Pass them through <code>mobx.observable</code> first.</li>
 <li>Observable object / map + property name (string) can be used to observe a single property.</li>
 </ul>
 <p>The function returns a <code>disposer</code> function that can be used to cancel the observer.
-Note that <code>transaction</code> does not affect the working of the <code>observe</code> method(s). This means that even inside an transaction <code>observe</code> will fire its listeners for each mutation.
+Note that <code>transaction</code> does not affect the working of the <code>observe</code> method(s). This means that even inside a transaction <code>observe</code> will fire its listeners for each mutation.
 Hence <code>autorun</code> is usually a more powerful alternative.</p>
 <p>Example:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, observe} <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;mobx&apos;</span>;
@@ -796,7 +796,7 @@ disposer();
         <a href="../refguide/modifiers.html" class="navigation navigation-prev " aria-label="Previous page: modifiers"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../refguide/tojson.html" class="navigation navigation-next " aria-label="Next page: tojson"><i class="fa fa-angle-right"></i></a>
+        <a href="../refguide/tojson.html" class="navigation navigation-next " aria-label="Next page: toJSON"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

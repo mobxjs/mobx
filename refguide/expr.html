@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="8.3" data-basepath=".." data-revision="Sat Apr 09 2016 11:45:06 GMT+0200 (CEST)">
+    <div class="book" data-level="8.3" data-basepath=".." data-revision="Tue Apr 19 2016 20:46:46 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -293,7 +293,7 @@
         <li class="chapter " data-level="4.1" >
             
                 
-                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.gh651s1ta">
+                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254">
                 
                         <i class="fa fa-check"></i>
                         
@@ -549,7 +549,7 @@
                         
                             <b>8.9.</b>
                         
-                        tojson
+                        toJSON
                     </a>
             
             
@@ -742,9 +742,9 @@
                     
                         <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/expr.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="expr">Expr</h1>
 <p><code>expr</code> can be used to create temporarily computed values inside computed values.
-Nesting computed values is useful when you use it to split of cheap computations to prevent expensive computations to run.</p>
-<p>In the following example the expression prevents that the <code>TodoView</code> component is re-rendered if the selection changes.
-Instead the component will only re-render each time that the relevant todo is (de)selected.</p>
+Nesting computed values is useful to create cheap computations to prevent expensive computations to run.</p>
+<p>In the following example the expression prevents that the <code>TodoView</code> component is re-rendered if the selection changes elsewhere.
+Instead the component will only re-render when the relevant todo is (de)selected.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> TodoView = observer(({todo, editorState}) =&gt; {
     <span class="hljs-keyword">const</span> isSelected = mobx.expr(() =&gt; editorState.selection === todo);
     <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">className</span>=<span class="hljs-value">{isSelected</span> ? &quot;<span class="hljs-attribute">todo</span> <span class="hljs-attribute">todo-selected</span>&quot; <span class="hljs-attribute">:</span> &quot;<span class="hljs-attribute">todo</span>&quot;}&gt;</span>{todo.title}<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>;</span>

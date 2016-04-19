@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="3.1" data-basepath=".." data-revision="Sat Apr 09 2016 11:45:06 GMT+0200 (CEST)">
+    <div class="book" data-level="3.1" data-basepath=".." data-revision="Tue Apr 19 2016 20:46:46 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -293,7 +293,7 @@
         <li class="chapter " data-level="4.1" >
             
                 
-                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.gh651s1ta">
+                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254">
                 
                         <i class="fa fa-check"></i>
                         
@@ -549,7 +549,7 @@
                         
                             <b>8.9.</b>
                         
-                        tojson
+                        toJSON
                     </a>
             
             
@@ -742,25 +742,25 @@
                     
                         <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/best/store.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="best-practices-for-building-large-scale-maintainable-projects">Best Practices for building large scale maintainable projects</h1>
 <p>This section contains some best practices we discovered at Mendix while working with MobX.
-This section is opiniated and you are in no way forced to apply this practices.
+This section is opinionated and you are in no way forced to apply these practices.
 There are many ways of working with MobX and React, and this is just one of them.</p>
 <h1 id="stores">Stores</h1>
 <p>Let&apos;s start with <em>stores</em>.
 In the next sections we will discuss <em>actions</em> and React <em>components</em> as well.
-Stores can be found in any flux architecture and can be compared a bit with controllers in the MVC pattern.
-The main responsibility of stores is to move <em>logic</em> and <em>state</em> out of your components into a standalone testable unit that can be used in both frontend and backend javascript.</p>
+Stores can be found in any Flux architecture and can be compared a bit with controllers in the MVC pattern.
+The main responsibility of stores is to move <em>logic</em> and <em>state</em> out of your components into a standalone testable unit that can be used in both frontend and backend JavaScript.</p>
 <h2 id="stores-for-the-user-interface-state">Stores for the user interface state</h2>
 <p>Most applications benefit from having at least two stores.
-One for the <em>ui state</em> and one or more for the <em>domain state</em>.
+One for the <em>UI state</em> and one or more for the <em>domain state</em>.
 The advantage of separating those two is you can reuse and test <em>domain state</em> universally, and you might very well reuse it in other applications.
 The <em>ui-state-store</em> however is often very specific for your application.
 But usually very simple as well.
-This store typically doesn&apos;t have much logic in it, but will store a plethorea of loosely coupled pieces of information about the ui.
-This is ideal as most applications will change the ui state often during the development process.</p>
-<p>Things you will typically find in ui stores:</p>
+This store typically doesn&apos;t have much logic in it, but will store a plethora of loosely coupled pieces of information about the UI.
+This is ideal as most applications will change the UI state often during the development process.</p>
+<p>Things you will typically find in UI stores:</p>
 <ul>
 <li>Session information</li>
-<li>Information about how far you applications has loaded</li>
+<li>Information about how far your application has loaded</li>
 <li>Information that will not be stored in the backend</li>
 <li>Information that affects the UI globally<ul>
 <li>Window dimensions</li>
@@ -771,7 +771,7 @@ This is ideal as most applications will change the ui state often during the dev
 </li>
 <li>User interface state as soon as it effects multiple, further unrelated components:<ul>
 <li>Current selection</li>
-<li>Visibility of toolbars, etc..</li>
+<li>Visibility of toolbars, etc.</li>
 <li>State of a wizard</li>
 <li>State of a global overlay</li>
 </ul>
@@ -779,10 +779,10 @@ This is ideal as most applications will change the ui state often during the dev
 </ul>
 <p>It might very well be that these pieces of information start as internal state of a specific component (for example the visibility of a toolbar).
 But after a while you discover that you need this information somewhere else in your application.
-Instead of pushing state in such a case upwards in the component tree, like you would do in plain react apps, you just move that state to the <em>ui-state-store</em>.</p>
+Instead of pushing state in such a case upwards in the component tree, like you would do in plain React apps, you just move that state to the <em>ui-state-store</em>.</p>
 <p>Make sure this state is a singleton.
 For isomorphic applications you might also want to provide a stub implementation of this store with sane defaults so that all components render as expected.
-You might distribute the <em>ui-state-store</em> through your application by passing it as property through your component tree.
+You might distribute the <em>ui-state-store</em> through your application by passing it as a property through your component tree.
 You can also pass this store by using context or make it globally available as a module.
 For testing purposes, I recommend to just pass it through the component tree.</p>
 <p>Example of a store (using ES6 syntax):</p>
@@ -790,10 +790,10 @@ For testing purposes, I recommend to just pass it through the component tree.</p
 <span class="hljs-keyword">import</span> jquery <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;jquery&apos;</span>;
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UiState</span> </span>{
-    @observable language = <span class="hljs-string">&quot;en_US&quot;</span>;    
+    @observable language = <span class="hljs-string">&quot;en_US&quot;</span>;
     @observable pendingRequestCount = <span class="hljs-number">0</span>;
 
-    <span class="hljs-comment">// asStructure makes sure observer won&apos;t be signaled onlyif the </span>
+    <span class="hljs-comment">// asStructure makes sure observer won&apos;t be signaled only if the</span>
     <span class="hljs-comment">// dimensions object changed in a deepEqual manner</span>
     @observable windowDimensions = asStructure({
         width: jquery(<span class="hljs-built_in">window</span>).width(),
@@ -829,8 +829,8 @@ So a store just manages <em>domain objects</em>.</p>
 <li>Instantiate domain objects. Make sure domain objects know the store they belong to.</li>
 <li>Make sure there is only one instance of each of your domain objects.
 The same user, order or todo should not be twice in your memory.
-This way you can safely use refences and also be sure you are looking at the latest instance, without ever having to resolve a references.
-This is fast, straight forward and convenient when debugging.</li>
+This way you can safely use references and also be sure you are looking at the latest instance, without ever having to resolve a reference.
+This is fast, straightforward and convenient when debugging.</li>
 <li>Provide backend integration. Store data when needed.</li>
 <li>Update existing instances if updates are received from the backend.</li>
 <li>Provide a stand-alone, universal, testable component of your application.</li>
@@ -841,11 +841,11 @@ This is fast, straight forward and convenient when debugging.</li>
 <p>Each domain object should be expressed using its own class (or constructor function).
 It is recommended to store your data in <em>denormalized</em> form.
 There is no need to treat your client-side application state as some kind of database.
-Real references, cyclic data structures and instance methods are powerful concepts in javascript.
+Real references, cyclic data structures and instance methods are powerful concepts in JavaScript.
 Domain objects are allowed to refer directly to domain objects from other stores.
-Remember; we want to keep our actions and views as simple as possible and needing to manage references and doing garbage collection yourself might be a step backward.
-Unlike many flux architectures, with <code>mobx</code> there is no need to denormalize your data, and this makes it a lot simpler to build the <em>essentially</em> complex parts of your application:
-Your business rules, actions and user interface.</p>
+Remember: we want to keep our actions and views as simple as possible and needing to manage references and doing garbage collection yourself might be a step backward.
+Unlike many Flux architectures, with MobX there is no need to denormalize your data, and this makes it a lot simpler to build the <em>essentially</em> complex parts of your application:
+your business rules, actions and user interface.</p>
 <p>Domain objects can delegate all their logic to the store they belong to if that suits your application well.
 It is possible to express your domain objects as plain objects, but classes have some important advantages over plain objects:</p>
 <ul>
@@ -855,7 +855,7 @@ Just pass objects around.
 You don&apos;t have to pass stores around, or have to figure out which actions can be applied to an object if they are just available as instance methods.
 Especially in large applications this is important.</li>
 <li>They offer fine grained control over the visibility of attributes and methods.</li>
-<li>Objects created a using a constructor function can freely mix observable properties and functions, and non-observable properties and methods.</li>
+<li>Objects created using a constructor function can freely mix observable properties and functions, and non-observable properties and methods.</li>
 <li>They are easily recognizable and can strictly be type-checked.</li>
 </ul>
 <h3 id="example-domain-store">Example domain store</h3>

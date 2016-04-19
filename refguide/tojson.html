@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>tojson | MobX</title>
+        <title>toJSON | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.2.0">
@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="8.9" data-basepath=".." data-revision="Sat Apr 09 2016 11:45:06 GMT+0200 (CEST)">
+    <div class="book" data-level="8.9" data-basepath=".." data-revision="Tue Apr 19 2016 20:46:46 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -293,7 +293,7 @@
         <li class="chapter " data-level="4.1" >
             
                 
-                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.gh651s1ta">
+                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254">
                 
                         <i class="fa fa-check"></i>
                         
@@ -549,7 +549,7 @@
                         
                             <b>8.9.</b>
                         
-                        tojson
+                        toJSON
                     </a>
             
             
@@ -742,11 +742,19 @@
                     
                         <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/tojson.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="tojson">toJSON</h1>
 <p><code>toJSON(value, supportCycles = true)</code></p>
-<p>Recursively converts an (observable) object to a JSON structure.
+<p>Recursively converts an (observable) object to a JSON <em>structure</em>.
 Supports observable arrays, objects, maps and primitives.
 Computed values and other non-enumerable properties won&apos;t be part of the result.
 Cycles are supported by default, but this can be disabled to improve performance.</p>
+<pre><code>var obj = mobx.observable({
+    x: 1
+});
 
+var clone = mobx.toJSON(obj);
+
+console.log(mobx.isObservableObject(obj)); // true
+console.log(mobx.isObservableObject(clone)); // false
+</code></pre>
                     
                     </section>
                 

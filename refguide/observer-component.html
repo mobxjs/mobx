@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="2.5" data-basepath=".." data-revision="Sat Apr 09 2016 11:45:06 GMT+0200 (CEST)">
+    <div class="book" data-level="2.5" data-basepath=".." data-revision="Tue Apr 19 2016 20:46:46 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -293,7 +293,7 @@
         <li class="chapter " data-level="4.1" >
             
                 
-                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.gh651s1ta">
+                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254">
                 
                         <i class="fa fa-check"></i>
                         
@@ -549,7 +549,7 @@
                         
                             <b>8.9.</b>
                         
-                        tojson
+                        toJSON
                     </a>
             
             
@@ -742,7 +742,7 @@
                     
                         <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/observer-component.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="-observer">@observer</h1>
 <p>The <code>observer</code> function / decorator can be used to turn ReactJS components into reactive components.
-It wraps the component&apos;s render function in <code>mobx.autorun</code> to make sure that any data that is used during the rendering of a component forces a rerendering upon change.
+It wraps the component&apos;s render function in <code>mobx.autorun</code> to make sure that any data that is used during the rendering of a component forces a re-rendering upon change.
 It is available through the separate <code>mobx-react</code> package.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>
 
@@ -762,23 +762,23 @@ setInterval(() =&gt; {
 
 React.render(&lt;Timer timerData={timerData} /&gt;, document.body)
 </code></pre>
-<p>Tip: when <code>observer</code> needs to be combined with other decorators or higher-order-components, make sure that <code>observer</code> is the most inner (first applied) decorator;
+<p>Tip: when <code>observer</code> needs to be combined with other decorators or higher-order-components, make sure that <code>observer</code> is the innermost (first applied) decorator;
 otherwise it might do nothing at all.</p>
 <h2 id="es5-support">ES5 support</h2>
-<p>In ES5 environments, observer components can be simple declared using <code>observer(React.createClass({ ...</code>. See also the <a href="../best/syntax">syntax guide</a></p>
+<p>In ES5 environments, observer components can be simple declared using <code>observer(React.createClass({ ...</code>. See also the <a href="../best/syntax.html">syntax guide</a></p>
 <h2 id="stateless-function-components">Stateless function components</h2>
 <p>The above timer widget could also be written using stateless function components that are passed through <code>observer</code>:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>
 
-const Timer = observer(({ props }) =&gt;
-    &lt;span&gt;Seconds passed: { props.timerData.secondsPassed } &lt;/span&gt;
+const Timer = observer(({ timerData }) =&gt;
+    &lt;span&gt;Seconds passed: { timerData.secondsPassed } &lt;/span&gt;
 )
 </code></pre>
 <h2 id="observable-local-component-state">Observable local component state</h2>
 <p>Just like normal classes, you can introduce observable properties on a component by using the <code>@observable</code> decorator.
 This means that you can have local state in components that doesn&apos;t need to be manged by React&apos;s verbose and imperative <code>setState</code> mechanism, but is as powerful.
 The reactive state will be picked up by <code>render</code> but will not explicitly invoke other React lifecycle methods like <code>componentShouldUpdate</code> or <code>componentWillUpdate</code>.
-If you need those, just use the normal React <code>state</code> based api&apos;s.</p>
+If you need those, just use the normal React <code>state</code> based APIs.</p>
 <p>The example above could also have been written as:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>
 <span class="hljs-keyword">import</span> {observable} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>
@@ -812,7 +812,7 @@ See for an explanation this <a href="https://github.com/mobxjs/mobx/issues/101" 
 <h2 id="optimizing-components">Optimizing components</h2>
 <p>See the relevant <a href="../best/react-performance.html">section</a>.</p>
 <h2 id="mobx-react-devtools">MobX-React-DevTools</h2>
-<p>In combination with <code>@observer</code> you can use the MobX-React-DevTools, it shows exactly when your components are rerendered and you can inspect the data dependencies of your components.
+<p>In combination with <code>@observer</code> you can use the MobX-React-DevTools, it shows exactly when your components are re-rendered and you can inspect the data dependencies of your components.
 See the <a href="../best/devtools.html">DevTools</a> section.</p>
 <h2 id="characteristics-of-observer-components">Characteristics of observer components</h2>
 <ul>
@@ -827,7 +827,7 @@ See the <a href="../best/devtools.html">DevTools</a> section.</p>
 <p>Decorators are not supported by default when using TypeScript or Babel pending a definitive definition in the ES standard.</p>
 <ul>
 <li>For <em>typescript</em>, enable the <code>--experimentalDecorators</code> compiler flag or set the compiler option <code>experimentalDecorators</code> to <code>true</code> in <code>tsconfig.json</code> (Recommended)</li>
-<li>For <em>babel5</em>, make sure <code>--stage 0</code> is passed to the babel CLI</li>
+<li>For <em>babel5</em>, make sure <code>--stage 0</code> is passed to the Babel CLI</li>
 <li>For <em>babel6</em>, see the example configuration as suggested in this <a href="https://github.com/mobxjs/mobx/issues/105" target="_blank">issue</a></li>
 </ul>
 

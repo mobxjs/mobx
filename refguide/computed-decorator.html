@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="2.3" data-basepath=".." data-revision="Sat Apr 09 2016 11:45:06 GMT+0200 (CEST)">
+    <div class="book" data-level="2.3" data-basepath=".." data-revision="Tue Apr 19 2016 20:46:46 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -293,7 +293,7 @@
         <li class="chapter " data-level="4.1" >
             
                 
-                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.gh651s1ta">
+                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254">
                 
                         <i class="fa fa-check"></i>
                         
@@ -549,7 +549,7 @@
                         
                             <b>8.9.</b>
                         
-                        tojson
+                        toJSON
                     </a>
             
             
@@ -742,13 +742,13 @@
                     
                         <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/computed-decorator.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="-computed">@computed</h1>
 <p>Decorator that can be used on ES6 or TypeScript derivable class properties to make them observable.
-The @computed can only be used on <code>get</code> functions for instance properties. </p>
+The <code>@computed</code> can only be used on <code>get</code> functions for instance properties.</p>
 <p>Use <code>@computed</code> if you have a value that can be derived in a pure manner from other observables.</p>
-<p>Don&apos;t confuse <code>@computed</code> with <code>autorun</code>. They are both reactively invoked expressions, 
-but use <code>@computed</code> if you want to reactively produce a new value that can be used by other observers and 
+<p>Don&apos;t confuse <code>@computed</code> with <code>autorun</code>. They are both reactively invoked expressions,
+but use <code>@computed</code> if you want to reactively produce a new value that can be used by other observers and
 <code>autorun</code> if you don&apos;t want to produce a new value but rather invoke some imperative code like logging, network requests etc.</p>
 <p>Computed properties can be optimized away in many cases by MobX as they are assumed to be pure.
-So they will not be invoked when there input parameters didn&apos;t modifiy or if they are not observed by some other computed value or autorun. </p>
+So they will not be invoked when their input parameters didn&apos;t modifiy or if they are not observed by some other computed value or autorun.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, computed} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OrderLine</span> </span>{
@@ -766,17 +766,17 @@ So they will not be invoked when there input parameters didn&apos;t modifiy or i
 </code></pre>
 <p>If your environment doesn&apos;t support decorators or field initializers,
 <code>@computed get funcName() { }</code> is sugar for <a href="extend-observable.html"><code>extendObservable(this, { funcName: func })</code></a></p>
-<p>@computed be parameterized. @computed({asStructure: true}) makes sure that the result of a derivation is compared structurally instead of referentially with its preview value. This makes sure that observers of the computation don&apos;t re-evaluate if new structures are returned that are structurally equal to the original ones. This is very useful when working with point, vector or color structures for example. It behaves the same as the asStructure modifier for observable values.</p>
-<p>@computed properties are not enumerable.</p>
+<p><code>@computed</code> be parameterized. <code>@computed({asStructure: true})</code> makes sure that the result of a derivation is compared structurally instead of referentially with its preview value. This makes sure that observers of the computation don&apos;t re-evaluate if new structures are returned that are structurally equal to the original ones. This is very useful when working with point, vector or color structures for example. It behaves the same as the <code>asStructure</code> modifier for observable values.</p>
+<p><code>@computed</code> properties are not enumerable.</p>
 <h3 id="enabling-decorators-in-your-transpiler">Enabling decorators in your transpiler</h3>
 <p>Decorators are not supported by default when using TypeScript or Babel pending a definitive definition in the ES standard.</p>
 <ul>
 <li>For <em>typescript</em>, enable the <code>--experimentalDecorators</code> compiler flag or set the compiler option <code>experimentalDecorators</code> to <code>true</code> in <code>tsconfig.json</code> (Recommended)</li>
-<li>For <em>babel5</em>, make sure <code>--stage 0</code> is passed to the babel CLI</li>
+<li>For <em>babel5</em>, make sure <code>--stage 0</code> is passed to the Babel CLI</li>
 <li>For <em>babel6</em>, see the example configuration as suggested in this <a href="https://github.com/mobxjs/mobx/issues/105" target="_blank">issue</a></li>
 </ul>
 <h1 id="-computed-expression"><code>computed(expression)</code></h1>
-<p><code>computed</code> can also be invoked directly as function. 
+<p><code>computed</code> can also be invoked directly as function.
 Just like <code>observable(primitive value)</code> it will create a stand-alone observable.
 Use <code>.get()</code> on the returned object to get the current value of the computation, or <code>.observe(callback)</code> to observe it&apos;s changes.</p>
 <p>Example:</p>
@@ -819,7 +819,7 @@ MobX will automatically determine whether the function should run <em>eagerly</e
 so make sure your code doesn&apos;t rely on any side effects in those functions.</p>
 <hr>
 <p>These two forms of <code>observable</code>, one for primitives and references, and one for functions, form the core of MobX.
-The rest of the api is just syntactic sugar around these two core operations.
+The rest of the API is just syntactic sugar around these two core operations.
 Nonetheless, you will rarely use these forms; using objects is just a tat more convenient.</p>
 
                     

@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="1.3" data-basepath=".." data-revision="Sat Apr 09 2016 11:45:06 GMT+0200 (CEST)">
+    <div class="book" data-level="1.3" data-basepath=".." data-revision="Tue Apr 19 2016 20:46:46 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -293,7 +293,7 @@
         <li class="chapter " data-level="4.1" >
             
                 
-                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.gh651s1ta">
+                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254">
                 
                         <i class="fa fa-check"></i>
                         
@@ -549,7 +549,7 @@
                         
                             <b>8.9.</b>
                         
-                        tojson
+                        toJSON
                     </a>
             
             
@@ -763,7 +763,7 @@ An action is like a user that enters a new value in a spreadsheet cell.</p>
 <h2 id="principles">Principles</h2>
 <p>MobX supports an uni-directional data flow where <em>actions</em> changes the <em>state</em>, which in turn updates all affected <em>views</em>.</p>
 <p><img src="../images/action-state-view.png" alt="Action, State, View"></p>
-<p><em>Views</em> are updated <strong>atomically</strong> when the <em>state</em> changes. As a result it is not possible to ever observe intermediate values.</p>
+<p><em>Views</em> are updated <strong>automatically</strong> and <strong>atomically</strong> when the <em>state</em> changes. As a result it is not possible to ever observe intermediate values.</p>
 <p><em>Views</em> are updated <strong>synchonously</strong> by default. This means that for example <em>actions</em> can safely inspect a <em>view</em> directly after altering the <em>state</em>.</p>
 <p><em>Views</em> are updated <strong>lazily</strong>. A View that is not actively in use will not be updated.
 This largely avoids the need to dispose views.
@@ -801,7 +801,7 @@ todoStore.todos[<span class="hljs-number">0</span>] = {
 todoStore.todos[<span class="hljs-number">0</span>].completed = <span class="hljs-literal">true</span>;
 <span class="hljs-comment">// -&gt; synchronously prints &apos;Completed 1 of 1 items&apos;</span>
 </code></pre>
-<p>In the <a href="https://mobxjs.github.io/mobx/getting-started.html" target="_blank">10 minute introduction to MobX and React</a> you can dive deeper into this example and build an user interface using <a href="https://facebook.github.io/react/" target="_blank">React</a> around it.</p>
+<p>In the <a href="https://mobxjs.github.io/mobx/getting-started.html" target="_blank">10 minute introduction to MobX and React</a> you can dive deeper into this example and build a user interface using <a href="https://facebook.github.io/react/" target="_blank">React</a> around it.</p>
 
                     
                     </section>

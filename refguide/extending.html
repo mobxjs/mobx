@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="8.13" data-basepath=".." data-revision="Sat Apr 09 2016 11:45:06 GMT+0200 (CEST)">
+    <div class="book" data-level="8.13" data-basepath=".." data-revision="Tue Apr 19 2016 20:46:46 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -293,7 +293,7 @@
         <li class="chapter " data-level="4.1" >
             
                 
-                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.gh651s1ta">
+                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254">
                 
                         <i class="fa fa-check"></i>
                         
@@ -549,7 +549,7 @@
                         
                             <b>8.9.</b>
                         
-                        tojson
+                        toJSON
                     </a>
             
             
@@ -744,11 +744,11 @@
 <h2 id="atoms">Atoms</h2>
 <p>At some point you might want to have more data structures or other things (like streams) that can be used in reactive computations.
 Achieving that is pretty simple by using the <code>Atom</code> class.
-Atoms can be used to signal mobx that some observable data source has been observed or changed.
-And mobx will signal the atom whenever it is used or no longer in use.</p>
+Atoms can be used to signal MobX that some observable data source has been observed or changed.
+And MobX will signal the atom whenever it is used or no longer in use.</p>
 <p>The following example demonstrates how you can create an observable <code>Clock</code>, which can be used in reactive functions,
-and returns the current date time.
-This clock will only actually tick if it is observed by someone. </p>
+and returns the current date-time.
+This clock will only actually tick if it is observed by someone.</p>
 <p>The complete API of the <code>Atom</code> class is demonstrated by this example.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {Atom, autorun} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
 
@@ -758,21 +758,21 @@ This clock will only actually tick if it is observed by someone. </p>
     currentDateTime;
 
     constructor() {
-        <span class="hljs-comment">// creates an atom to interact with the mobx core algorithm</span>
+        <span class="hljs-comment">// creates an atom to interact with the MobX core algorithm</span>
         <span class="hljs-keyword">this</span>.atom =    <span class="hljs-keyword">new</span> Atom(
-            <span class="hljs-comment">// first param a name for this atom, for debugging purposes</span>
+            <span class="hljs-comment">// first param: a name for this atom, for debugging purposes</span>
             <span class="hljs-string">&quot;Clock&quot;</span>,
             <span class="hljs-comment">// second (optional) parameter: callback for when this atom transitions from unobserved to observed.</span>
             () =&gt; <span class="hljs-keyword">this</span>.startTicking(),
             <span class="hljs-comment">// third (optional) parameter: callback for when this atom transitions from observed to unobserved</span>
-            <span class="hljs-comment">// note that the same atom transition multiple times between these two states</span>
+            <span class="hljs-comment">// note that the same atom transitions multiple times between these two states</span>
             () =&gt; <span class="hljs-keyword">this</span>.stopTicking()
-        ); 
+        );
     }
 
     getTime() {
-        <span class="hljs-comment">// let mobx know this observable data source has been used</span>
-        <span class="hljs-keyword">this</span>.atom.reportObserved();    
+        <span class="hljs-comment">// let MobX know this observable data source has been used</span>
+        <span class="hljs-keyword">this</span>.atom.reportObserved();
         <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.intervalHandler) {
             <span class="hljs-keyword">this</span>.tick(); <span class="hljs-comment">// do the initial tick</span>
         }
@@ -781,20 +781,20 @@ This clock will only actually tick if it is observed by someone. </p>
 
     tick() {
         <span class="hljs-keyword">this</span>.currentDateTime = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>();
-        <span class="hljs-comment">// let mobx know that this data source has changed</span>
+        <span class="hljs-comment">// let MobX know that this data source has changed</span>
         <span class="hljs-keyword">this</span>.atom.reportChanged();
     }
 
     startTicking() {
         <span class="hljs-keyword">this</span>.intervalHandler = setInterval(
-            () =&gt; <span class="hljs-keyword">this</span>.tick(), 
+            () =&gt; <span class="hljs-keyword">this</span>.tick(),
             <span class="hljs-number">1000</span>
         );
     }
 
     stopTicking() {
         clearInterval(<span class="hljs-keyword">this</span>.intervalHandler);
-        <span class="hljs-keyword">this</span>.intervalHandler = <span class="hljs-literal">null</span>;    
+        <span class="hljs-keyword">this</span>.intervalHandler = <span class="hljs-literal">null</span>;
     }
 }
 
@@ -810,7 +810,7 @@ disposer();
 </code></pre>
 <h2 id="reactions">Reactions</h2>
 <p><code>Reaction</code> allows you to create your own &apos;auto runner&apos;.
-Reactions track a function and signal when the function should be executed again because one or more dependencies have changed. </p>
+Reactions track a function and signal when the function should be executed again because one or more dependencies have changed.</p>
 <p>This is how <code>autorun</code> is defined using <code>Reaction</code>:</p>
 <pre><code class="lang-typescript"><span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">autorun</span>(<span class="hljs-params">view: Lambda, scope?: <span class="hljs-built_in">any</span></span>) </span>{
     <span class="hljs-keyword">if</span> (scope)

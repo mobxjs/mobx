@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="5.2" data-basepath=".." data-revision="Sat Apr 09 2016 11:45:06 GMT+0200 (CEST)">
+    <div class="book" data-level="5.2" data-basepath=".." data-revision="Tue Apr 19 2016 20:46:46 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -293,7 +293,7 @@
         <li class="chapter " data-level="4.1" >
             
                 
-                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.gh651s1ta">
+                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254">
                 
                         <i class="fa fa-check"></i>
                         
@@ -549,7 +549,7 @@
                         
                             <b>8.9.</b>
                         
-                        tojson
+                        toJSON
                     </a>
             
             
@@ -744,7 +744,7 @@
 <p>Here are some examples show you how you can make the state of a simple todo application observable,
 using either plain objects or classes.
 MobX ships with TypeScript typings in the package (supported in TypeScript 1.6 and higher).
-So <code>import * as mobx from &quot;mobx&quot;</code> gives access to the strongly typed api without further imports.</p>
+So <code>import * as mobx from &quot;mobx&quot;</code> gives access to the strongly typed API without further imports.</p>
 <h2 id="creating-objects">Creating objects</h2>
 <h3 id="es5-es6-ts-making-plain-objects-observable">ES5 / ES6 / TS: Making plain objects observable</h3>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> todoStore = mobx.observable({
@@ -782,10 +782,10 @@ Note that getters should be used to define observable functions on a class.This 
 Use <code>store.completedCount</code> to obtain a derived value; not <code>store.completedCount()</code>.
 In contrast, <code>@observable someFunction() {}</code> will just create an observable reference to <code>someFunction</code>, but <code>someFunction</code> itself won&apos;t become reactive.</p>
 <pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoStore</span> </span>{
-    @observable todos = todos: [{
+    @observable todos = [{
         title: <span class="hljs-string">&apos;Find a clean mug&apos;</span>,
         completed: <span class="hljs-literal">true</span>
-    }]
+    }];
 
     @computed get completedCount() {
         <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.todos.filter((todo) =&gt; todo.completed).length;
@@ -826,16 +826,16 @@ In contrast, <code>@observable someFunction() {}</code> will just create an obse
     &lt;div&gt;{props.user.name{/div}
 );
 </code></pre>
-<p>Please note that <code>onButtonClick</code> is not just a class method, but an instance field which get a bound function.
+<p>Please note that <code>onButtonClick</code> is not just a class method, but an instance field which gets a bound function.
 This is the most convenient and the fastest way to create bound event handlers.
 If <code>{this.onButtonClick.bind(this)}</code> or <code>{(e) =&gt; this.onButtonClick(e)}</code> was used instead in the rendering, each render invocation would create a new closures.
-That is not only slightly slower in itself, 
-but it will also cause the <code>button</code> (or any other component) to be always re-rendered because you are effectively passing a new event handler to the button each time <code>MyComponent</code> is rendered.  </p>
+That is not only slightly slower in itself,
+but it will also cause the <code>button</code> (or any other component) to be always re-rendered because you are effectively passing a new event handler to the button each time <code>MyComponent</code> is rendered.</p>
 <h2 id="enabling-decorators-in-your-transpiler">Enabling decorators in your transpiler</h2>
 <p>Decorators are not supported by default when using TypeScript or Babel pending a definitive definition in the ES standard.</p>
 <ul>
 <li>For <em>typescript</em>, enable the <code>--experimentalDecorators</code> compiler flag or set the compiler option <code>experimentalDecorators</code> to <code>true</code> in <code>tsconfig.json</code> (Recommended)</li>
-<li>For <em>babel5</em>, make sure <code>--stage 0</code> is passed to the babel CLI</li>
+<li>For <em>babel5</em>, make sure <code>--stage 0</code> is passed to the Babel CLI</li>
 <li>For <em>babel6</em>, see the example configuration as suggested in this <a href="https://github.com/mobxjs/mobx/issues/105" target="_blank">issue</a></li>
 </ul>
 

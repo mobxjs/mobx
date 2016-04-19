@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="8.1" data-basepath=".." data-revision="Sat Apr 09 2016 11:45:06 GMT+0200 (CEST)">
+    <div class="book" data-level="8.1" data-basepath=".." data-revision="Tue Apr 19 2016 20:46:46 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -293,7 +293,7 @@
         <li class="chapter " data-level="4.1" >
             
                 
-                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.gh651s1ta">
+                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254">
                 
                         <i class="fa fa-check"></i>
                         
@@ -549,7 +549,7 @@
                         
                             <b>8.9.</b>
                         
-                        tojson
+                        toJSON
                     </a>
             
             
@@ -744,14 +744,14 @@
 <p><code>autorunAsync(action: () =&gt; void, minimumDelay?: number, scope?)</code></p>
 <p>Just like <code>autorun</code> except that the action won&apos;t be invoked synchronously but asynchronously after the minimum amount of milliseconds has passed.
 The <code>action</code> will be run and observed.
-However, instead of running the action immediately when the values observed by it have changed, the <code>minimumDelay</code> will be awaited before re-execution the <code>action</code> again.</p>
-<p>If observed values are changed multiple times while waiting, the action is still triggered only once, so in the sense it achieves a similar effect as a transaction.
+However, instead of running the action immediately when the values it observes have changed, the <code>minimumDelay</code> will be awaited before re-execution the <code>action</code> again.</p>
+<p>If observed values are changed multiple times while waiting, the action is still triggered only once, so in a sense it achieves a similar effect than a transaction.
 This might be useful for stuff that is expensive and doesn&apos;t need to happen synchronously; such as debouncing server communication.</p>
 <p>Returns a disposer to cancel the autorun.</p>
 <pre><code class="lang-javascript">autorunAsync(() =&gt; {
-    <span class="hljs-comment">// assuming that profile.asJson returns an observable json representation of profile,</span>
-    <span class="hljs-comment">// send it to the server each time it is changed, but await at least 300mseconds before sending it</span>
-    <span class="hljs-comment">// when send, the latest value of profile.asJson will be used.</span>
+    <span class="hljs-comment">// Assuming that profile.asJson returns an observable Json representation of profile,</span>
+    <span class="hljs-comment">// send it to the server each time it is changed, but await at least 300 milliseconds before sending it.</span>
+    <span class="hljs-comment">// When sent, the latest value of profile.asJson will be used.</span>
     sendProfileToServer(profile.asJson);
 }, <span class="hljs-number">300</span>);
 </code></pre>

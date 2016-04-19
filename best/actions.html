@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="3.2" data-basepath=".." data-revision="Sat Apr 09 2016 11:45:06 GMT+0200 (CEST)">
+    <div class="book" data-level="3.2" data-basepath=".." data-revision="Tue Apr 19 2016 20:46:46 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -293,7 +293,7 @@
         <li class="chapter " data-level="4.1" >
             
                 
-                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.gh651s1ta">
+                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254">
                 
                         <i class="fa fa-check"></i>
                         
@@ -549,7 +549,7 @@
                         
                             <b>8.9.</b>
                         
-                        tojson
+                        toJSON
                     </a>
             
             
@@ -743,7 +743,7 @@
                         <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/best/actions.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="writing-actions">Writing Actions</h1>
 <p>Writing actions is straight-forward when using MobX.
 Just create, change or delete data and MobX will make sure that changes are picked up by the store and the components that depend on your data.
-Based on the store we have created in the previous paragraph, actions become as simple as:</p>
+Based on the store we have created in the previous section, actions become as simple as:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> todo = todoStore.createTodo();
 todo.task = <span class="hljs-string">&quot;make coffee&quot;</span>;
 </code></pre>
@@ -761,7 +761,7 @@ This is what happens with the <code>isLoading</code> property in the <code>todoS
 <span class="hljs-comment">// ...</span>
 </code></pre>
 <p>After completing the asynchronous action, just update your data and your views will update.
-The render function of a React component could be come as simple as:</p>
+The render function of a React component could become as simple as:</p>
 <pre><code class="lang-javascript">import {observer} from &quot;mobx-react&quot;;
 
 var TodoOverview = observer(function(props) {
