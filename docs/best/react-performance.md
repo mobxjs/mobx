@@ -1,17 +1,17 @@
-# Optimizing rendering React components 
+# Optimizing rendering React components
 
 MobX is very fast, [often even faster than Redux](https://twitter.com/mweststrate/status/718444275239882753). But here are some tips to get most out of React and MobX. Note that most tips apply to React in general and are not specific for MobX.
 
 ## Use many small components
 
 `@observer` components will track all values they use and re-render if any of them changes.
-So the smaller your components are, the smaller the change they have to re-render; it means that more parts of your user interface have the possibility to render independently of each other. 
+So the smaller your components are, the smaller the change they have to re-render; it means that more parts of your user interface have the possibility to render independently of each other.
 
 ## Render lists in dedicated components
 
 This is especially true when rendering big collections.
 React is notoriously bad at rendering large collections as the reconciler has to evaluate the components produced by a collection on each collection change.
-It is therefor recommended to have components that just map over a collection and render it, and render nothing else:
+It is therefore recommended to have components that just map over a collection and render it, and render nothing else:
 
 Bad:
 
@@ -27,7 +27,7 @@ Bad:
         </div>)
     }
 }
-```         
+```
 
 In the above listing React will unnecessarily need to reconcile all TodoView components when the `user.name` changes. They won't re-render, but the reconcile process is expensive in itself.
 
@@ -52,7 +52,7 @@ Good:
         </ul>)
     }
 }
-```         
+```
 
 ## Don't use array indexes as keys
 
@@ -67,17 +67,17 @@ If this happens deeper in your component tree, less components have to re-render
 Fast:
 
 `<DisplayName person={person} />`
- 
+
 Slower:
 
 `<DisplayName name={person.name} />`.
 
-There is nothing wrong the the latter.
-But a change in the `name` property will in the first case trigger the `DisplayName` to re-render, while in the latter the owner of the component has to re-render.
-However, it is more important for your components to have an comprehensible api then applying this optimization.
+There is nothing wrong to the latter.
+But a change in the `name` property will, in the first case, trigger the `DisplayName` to re-render, while in the latter, the owner of the component has to re-render.
+However, it is more important for your components to have an comprehensible API then applying this optimization.
 To have the best of both worlds, consider making smaller components:
 
-`const PersonNameDispayer = observer(({ props }) => <DisplayName name={props.person.name} />)` 
+`const PersonNameDispayer = observer(({ props }) => <DisplayName name={props.person.name} />)`
 
 ## Bind functions early
 
@@ -87,7 +87,7 @@ Bad:
 
 ```javascript
 render() {
-    return <MyWidget onClick={() => { alert('hi') }} />  
+    return <MyWidget onClick={() => { alert('hi') }} />
 }
 ```
 
@@ -95,7 +95,7 @@ Good:
 
 ```javascript
 render() {
-    return <MyWidget onClick={this.handleClick} />  
+    return <MyWidget onClick={this.handleClick} />
 }
 
 handleClick = () => {
@@ -103,4 +103,4 @@ handleClick = () => {
 }
 ```
 
-The bad example will always yield the `shouldComponent` of `PureRenderMixin` used in `MyWidget` to always yield false as you pass a new function each time the parent is re-rendered. 
+The bad example will always yield the `shouldComponent` of `PureRenderMixin` used in `MyWidget` to always yield false as you pass a new function each time the parent is re-rendered.

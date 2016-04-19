@@ -1,7 +1,7 @@
 # Transaction
 
 `transaction(worker: () => void)` can be used to batch a bunch of updates without notifying any observers until the end of the transaction.
-`transaction` takes a single, paremeterless `worker` function as argument and runs it.
+`transaction` takes a single, parameterless `worker` function as argument and runs it.
 No observers are notified until this function has completed.
 `transaction` returns any value that was returned by the `worker` function.
 Note that `transaction` runs completely synchronously.

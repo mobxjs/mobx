@@ -1,6 +1,6 @@
 # observable
 
-`observable` is to MobX as `$` is to jQuery.
+`observable` is to MobX what `$` is to jQuery.
 Making data observable starts with this function.
 If data is observable, views that depend on that data will update automatically.
 
@@ -10,7 +10,7 @@ but these are the available variations:
 
 ## Objects
 
-If a plain javascript object is passed to `observable` (that is, an object that wasn't created using a constructor function),
+If a plain JavaScript object is passed to `observable` (that is, an object that wasn't created using a constructor function),
 MobX will recursively pass all its values through `observable`.
 This way the complete object (tree) is in-place instrumented to make it observable.
 
@@ -46,7 +46,7 @@ Properties that are added to the object at a later time won't become observable,
 * Only plain objects will be made observable. For non-plain objects it is considered the responsibility of the constructor to initialize the observable properties.
 Either use the [`@observable`](observable.md) annotation or the [`extendObservable`](extend-observable.md) function.
 * Argumentless functions will be automatically turned into views, just like [`@computed`](computed-decorator) would do. For view `this` will be automatically bound to the object it is defined on.
-However, if a function expression (ES6 / typescript) is used, `this` will be bound to undefined, so you probably want to either refer to the object directly, or use a classic function.
+However, if a function expression (ES6 / TypeScript) is used, `this` will be bound to `undefined`, so you probably want to either to refer to the object directly, or to use a classic function.
 * `observable` is applied recursively, both on instantiation and to any new values that will be assigned to observable properties in the future.
 * These defaults are fine in 95% of the cases, but for more fine-grained on how and which properties should be made observable, see the [modifiers](modifiers.md) section.
 
@@ -90,7 +90,7 @@ Bear in mind that `Array.isArray(observable([]))` will yield `false`, so wheneve
 it is a good idea to _create a shallow copy before passing it to other libraries or built-in functions_ (which is good practice anyway) by using `array.slice()` or `array.peek()`.
 So `Array.isArray(observable([]).slice())` will yield `true`.
 
-Unlike the built-in implementation of the functions `sort` and `reverse`, observableArray.sort and reverse  will not change the array in-place, but only will return a sorted / reversed copy. 
+Unlike the built-in implementation of the functions `sort` and `reverse`, observableArray.sort and reverse  will not change the array in-place, but only will return a sorted / reversed copy.
 
 Besides all built-in functions, the following goodies are available as well on observable arrays:
 
@@ -99,15 +99,15 @@ Besides all built-in functions, the following goodies are available as well on o
 * `replace(newItems)` Replaces all existing entries in the array with new ones.
 * `find(predicate: (item, index, array) => boolean, thisArg?, fromIndex?)` Basically the same as the ES7 `Array.find` proposal, except for the additional `fromIndex` parameter.
 * `remove(value)` Remove a single item by value from the array. Returns `true` if the item was found and removed.
-* `peek()` Returns an array with all the values which can safely be passed to other libraries, similar to `slice()`.  
-In contrast to `slice`, `peek` peek doesn't create a defensive copy. Use this in performance critical applications if you know for sure that you use the array in a read-only manner.  
-In performance cricital sections it is recommend to use [fastArray](../refguide/fast-array.md) as well.
+* `peek()` Returns an array with all the values which can safely be passed to other libraries, similar to `slice()`.
+In contrast to `slice`, `peek` doesn't create a defensive copy. Use this in performance critical applications if you know for sure that you use the array in a read-only manner.
+In performance critical sections it is recommend to use a flat observable array as well.
 
 
 ## Primitive values and references
 
 For all type of values, with the exception of _plain objects_, _arrays_ and _functions without arguments_ this overload is run.
-In practice, you probably won't use this overload as it is often more convenient to use `observable` on an object or 
+In practice, you probably won't use this overload as it is often more convenient to use `observable` on an object or
 [`extendObservable`](../refguide/extend-observable.md) (or `@observable`) to introduce observable properties on existing objects.
 
 `observable` accepts scalar values and returns an object with a getter / setter function that holds this value.

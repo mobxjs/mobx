@@ -1,4 +1,4 @@
-This are utilities exposed by mobx which might come in handy at some point. But most probably you won't need them. Ever.
+This are utilities exposed by MobX which might come in handy at some point. But most probably you won't need them. Ever.
 
 ## SimpleEventEmitter
 

@@ -7,7 +7,7 @@
 * [Core API](refguide/api.md)
   * [observable](refguide/observable.md)
   * [@observable](refguide/observable-decorator.md)
-  * [(@)computed](refguide/computed-decorator.md) 
+  * [(@)computed](refguide/computed-decorator.md)
   * [autorun](refguide/autorun.md)
   * [@observer](refguide/observer-component.md)
 * Best Practices For Large Apps
@@ -16,7 +16,7 @@
   * [Optimizing React components](best/react-performance.md)
 <!--  * Routing Universal applications -->
 * How does MobX work?
-  * [In depth explanation of MobX](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.gh651s1ta)
+  * [In depth explanation of MobX](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254)
 * Tips & Tricks
   * [DevTools](best/devtools.md)
   * [ES5 / ES6 / TypeScript syntax](best/syntax.md)

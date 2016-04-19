@@ -1,6 +1,6 @@
 # isObservable
 
-Returns true if the given value was made observable by mobx.
+Returns true if the given value was made observable by MobX.
 Optionally accepts a second string parameter to see whether a specific property is observable.
 
 ```javascript
@@ -19,12 +19,12 @@ isObservable(person, "age"); // false
 
 # isObservableMap
 
-Returns true if the given object is created using `mobx.map`
+Returns true if the given object is created using `mobx.map`.
 
 # isObservableArray
 
-Returns true if the given obect is an array that was made observable using `mobx.observable(array)`
+Returns true if the given obect is an array that was made observable using `mobx.observable(array)`.
 
 # isObservableObject
 
-Returns true if the given object is an object that was made observable using `mobx.observable(object)`
+Returns true if the given object is an object that was made observable using `mobx.observable(object)`.
