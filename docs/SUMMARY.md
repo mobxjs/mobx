@@ -34,7 +34,7 @@
   * [map](refguide/map.md)
   * [modifiers](refguide/modifiers.md)
   * [observe](refguide/observe.md)
-  * [tojson](refguide/tojson.md)
+  * [toJSON](refguide/tojson.md)
   * [transaction](refguide/transaction.md)
   * [untracked](refguide/untracked.md)
   * [when](refguide/when.md)

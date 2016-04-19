@@ -38,8 +38,8 @@ The above timer widget could also be written using stateless function components
 ```javascript
 import {observer} from "mobx-react"
 
-const Timer = observer(({ props }) =>
-	<span>Seconds passed: { props.timerData.secondsPassed } </span>
+const Timer = observer(({ timerData }) =>
+	<span>Seconds passed: { timerData.secondsPassed } </span>
 )
 ```
 

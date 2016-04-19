@@ -2,7 +2,7 @@
 
 ##### Which browsers are supported?
 
-MobX runs on any ES5 environment. That means that all browsers except IE8, old Node.js and Rhino are supported. See [caniuse.com](http://caniuse.com/#feat=es5)
+MobX runs on any ES5 environment. That means that Node.js, Rhino and all browsers except for IE8 are supported. See [caniuse.com](http://caniuse.com/#feat=es5)
 
 ##### Can MobX be combined with RxJS?
 Yes, see the [rx-mobx](https://www.npmjs.com/package/rx-mobx) interoperability package.
