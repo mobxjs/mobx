@@ -19,11 +19,11 @@ class MyResource {
 			() => this.dispose()
 		);
 	}
-	
+
 	@observable get isVisible() {
 		// indicate whether this item is visible
 	}
-	
+
 	dispose() {
 		// dispose
 	}
@@ -31,4 +31,4 @@ class MyResource {
 
 ```
 
-_In mobx 1.0 this method was called `autorunUntil`._
+_In MobX 1.0 this method was called `autorunUntil`._

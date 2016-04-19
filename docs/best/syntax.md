@@ -3,7 +3,7 @@
 Here are some examples show you how you can make the state of a simple todo application observable,
 using either plain objects or classes.
 MobX ships with TypeScript typings in the package (supported in TypeScript 1.6 and higher).
-So `import * as mobx from "mobx"` gives access to the strongly typed api without further imports.
+So `import * as mobx from "mobx"` gives access to the strongly typed API without further imports.
 
 ## Creating objects
 
@@ -113,16 +113,16 @@ const MyOtherComponent = observer(props => // ..or with destructuring: ({user}) 
 );
 ```
 
-Please note that `onButtonClick` is not just a class method, but an instance field which get a bound function.
+Please note that `onButtonClick` is not just a class method, but an instance field which gets a bound function.
 This is the most convenient and the fastest way to create bound event handlers.
 If `{this.onButtonClick.bind(this)}` or `{(e) => this.onButtonClick(e)}` was used instead in the rendering, each render invocation would create a new closures.
-That is not only slightly slower in itself, 
-but it will also cause the `button` (or any other component) to be always re-rendered because you are effectively passing a new event handler to the button each time `MyComponent` is rendered.  
+That is not only slightly slower in itself,
+but it will also cause the `button` (or any other component) to be always re-rendered because you are effectively passing a new event handler to the button each time `MyComponent` is rendered.
 
 
 ## Enabling decorators in your transpiler
 
 Decorators are not supported by default when using TypeScript or Babel pending a definitive definition in the ES standard.
 * For _typescript_, enable the `--experimentalDecorators` compiler flag or set the compiler option `experimentalDecorators` to `true` in `tsconfig.json` (Recommended)
-* For _babel5_, make sure `--stage 0` is passed to the babel CLI
+* For _babel5_, make sure `--stage 0` is passed to the Babel CLI
 * For _babel6_, see the example configuration as suggested in this [issue](https://github.com/mobxjs/mobx/issues/105)

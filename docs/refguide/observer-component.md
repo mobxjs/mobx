@@ -1,7 +1,7 @@
 # @observer
 
 The `observer` function / decorator can be used to turn ReactJS components into reactive components.
-It wraps the component's render function in `mobx.autorun` to make sure that any data that is used during the rendering of a component forces a rerendering upon change.
+It wraps the component's render function in `mobx.autorun` to make sure that any data that is used during the rendering of a component forces a re-rendering upon change.
 It is available through the separate `mobx-react` package.
 
 ```javascript
@@ -24,12 +24,12 @@ setInterval(() => {
 React.render(<Timer timerData={timerData} />, document.body)
 ```
 
-Tip: when `observer` needs to be combined with other decorators or higher-order-components, make sure that `observer` is the most inner (first applied) decorator;
+Tip: when `observer` needs to be combined with other decorators or higher-order-components, make sure that `observer` is the innermost (first applied) decorator;
 otherwise it might do nothing at all.
 
 ## ES5 support
 
-In ES5 environments, observer components can be simple declared using `observer(React.createClass({ ... `. See also the [syntax guide](../best/syntax)
+In ES5 environments, observer components can be simple declared using `observer(React.createClass({ ... `. See also the [syntax guide](../best/syntax.md)
 
 ## Stateless function components
 
@@ -48,7 +48,7 @@ const Timer = observer(({ props }) =>
 Just like normal classes, you can introduce observable properties on a component by using the `@observable` decorator.
 This means that you can have local state in components that doesn't need to be manged by React's verbose and imperative `setState` mechanism, but is as powerful.
 The reactive state will be picked up by `render` but will not explicitly invoke other React lifecycle methods like `componentShouldUpdate` or `componentWillUpdate`.
-If you need those, just use the normal React `state` based api's.
+If you need those, just use the normal React `state` based APIs.
 
 The example above could also have been written as:
 
@@ -58,13 +58,13 @@ import {observable} from "mobx"
 
 @observer class Timer extends React.Component {
 	@observable secondsPassed = 0
-	
+
 	componentWillMount() {
 		setInterval(() => {
 			this.secondsPassed++
 		}, 1000)
 	}
-	
+
 	render() {
 		return (<span>Seconds passed: { this.secondsPassed } </span> )
 	}
@@ -92,7 +92,7 @@ See the relevant [section](../best/react-performance.md).
 
 ## MobX-React-DevTools
 
-In combination with `@observer` you can use the MobX-React-DevTools, it shows exactly when your components are rerendered and you can inspect the data dependencies of your components.
+In combination with `@observer` you can use the MobX-React-DevTools, it shows exactly when your components are re-rendered and you can inspect the data dependencies of your components.
 See the [DevTools](../best/devtools.md) section.
 
 ## Characteristics of observer components
@@ -108,5 +108,5 @@ See the [DevTools](../best/devtools.md) section.
 
 Decorators are not supported by default when using TypeScript or Babel pending a definitive definition in the ES standard.
 * For _typescript_, enable the `--experimentalDecorators` compiler flag or set the compiler option `experimentalDecorators` to `true` in `tsconfig.json` (Recommended)
-* For _babel5_, make sure `--stage 0` is passed to the babel CLI
+* For _babel5_, make sure `--stage 0` is passed to the Babel CLI
 * For _babel6_, see the example configuration as suggested in this [issue](https://github.com/mobxjs/mobx/issues/105)

@@ -1,4 +1,4 @@
-# modifiers for observable
+# Modifiers for observable
 
 By default, `observable` recursively makes all the values of _plain_ objects and arrays recursively observable.
 Besides that it automatically converts functions without arguments into reactive views or derived properties.
@@ -8,7 +8,7 @@ Note that modifiers are 'sticky', they are interpreted as being annotations.
 They do not only apply to the current value, but also to all values that are assigned in the future to the same attribute.
 
 Note that the attributes class instances (all objects that have a prototype) will not be made observable automatically by `observable`.
-It is considered to be the responsibility of the class definition / constructor function to mark the necessary attributes of an class instance observable / computed. 
+It is considered to be the responsibility of the class definition / constructor function to mark the necessary attributes of an class instance observable / computed.
 
 ## asReference
 
@@ -35,7 +35,7 @@ console.log(test.someFunc); // still a function
 
 ## asStructure
 
-Can be used on non-cyclic, plain javascript values.
+Can be used on non-cyclic, plain JavaScript values.
 Instead of comparing old values with new values based on whether the reference has changed, values are compared using deep equality before notifying any observers.
 This is useful if you are working with 'struct' like objects like colors or coordinates.
 `asStructure` can be used on reactive functions, plain objects and arrays.

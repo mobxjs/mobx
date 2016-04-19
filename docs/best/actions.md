@@ -2,7 +2,7 @@
 
 Writing actions is straight-forward when using MobX.
 Just create, change or delete data and MobX will make sure that changes are picked up by the store and the components that depend on your data.
-Based on the store we have created in the previous paragraph, actions become as simple as:
+Based on the store we have created in the previous section, actions become as simple as:
 
 ```javascript
 var todo = todoStore.createTodo();
@@ -28,7 +28,7 @@ This is what happens with the `isLoading` property in the `todoStore` for exampl
 ```
 
 After completing the asynchronous action, just update your data and your views will update.
-The render function of a React component could be come as simple as:
+The render function of a React component could become as simple as:
 
 ```javascript
 import {observer} from "mobx-react";

@@ -21,9 +21,9 @@ var appState = observable({
 We didn't make our `appState` observable just for nothing;
 you can now create views that automatically update whenever relevant data in the `appState` changes.
 MobX will find the minimal way to update your views.
-This single fact saves you ton's of boilerplate and is [wickedly efficient](mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/).
+This single fact saves you tons of boilerplate and is [wickedly efficient](https://mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/).
 
-Generally speaking any function can become a reactive view that observes it data, and MobX can be applied in any ES5 conformant JavaScript environment.
+Generally speaking any function can become a reactive view that observes its data, and MobX can be applied in any ES5 conformant JavaScript environment.
 But here is an (ES6) example of a view in the form of a React component.
 
 ```javascript
