@@ -1,3 +1,7 @@
+# 2.1.4
+
+* Fixed #201 (see also #160), another iOS enumerability issue... By @luosong 
+
 # 2.1.3
 
 * Fixed #191, when using babel, complex field initializers where shared. By @andykog
