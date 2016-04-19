@@ -33,7 +33,7 @@ MobX supports an uni-directional data flow where _actions_ changes the _state_, 
 
 ![Action, State, View](../images/action-state-view.png)
 
-_Views_ are updated **automatically** when the _state_ changes. As a result it is not possible to ever observe intermediate values.
+_Views_ are updated **automatically** and **atomically** when the _state_ changes. As a result it is not possible to ever observe intermediate values.
 
 _Views_ are updated **synchonously** by default. This means that for example _actions_ can safely inspect a _view_ directly after altering the _state_.
 
