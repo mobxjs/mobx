@@ -183,7 +183,7 @@ Blogs & Videos:
 > _Elegant! I love it!_
 > &dash; Johan den Haan, CTO of Mendix
 
-> _We ported the book Notes and Kanban examples to Mobservable. Check out [the source](https://github.com/survivejs/mobservable-demo) to see how this worked out. Compared to the original I was definitely positively surprised. MobX seems like a good fit for these problems._
+> _We ported the book Notes and Kanban examples to Mobservable. Check out [the source](https://github.com/survivejs-demos/mobx-demo) to see how this worked out. Compared to the original I was definitely positively surprised. MobX seems like a good fit for these problems._
 > &dash; Juho Vepsäläinen, author of "SurviveJS - Webpack and React" and jster.net curator
 
 > _Great job with MobX! Really gives current conventions and libraries a run for their money._
