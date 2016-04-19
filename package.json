@@ -1,5 +1,5 @@
 {
-  "name": "chanjet-mobx",
+  "name": "mobx",
   "version": "2.1.3",
   "description": "Simple, scalable state management.",
   "main": "lib/mobx.js",
