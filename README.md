@@ -1,6 +1,7 @@
+<img src="docs/mobx.png" alt="logo" height="120" align="right" />
 # MobX
 
-## _Simple, scalable state management_
+_Simple, scalable state management_
 
 [![Build Status](https://travis-ci.org/mobxjs/mobx.svg?branch=master)](https://travis-ci.org/mobxjs/mobx)
 [![Coverage Status](https://coveralls.io/repos/mobxjs/mobx/badge.svg?branch=master&service=github)](https://coveralls.io/github/mobxjs/mobx?branch=master)
@@ -11,7 +12,8 @@
 * [Ten minute, interactive MobX + React tutorial](https://mobxjs.github.io/mobx/getting-started.html)
 * Api documentation (including ES5, ES6, Typescript examples): https://mobxjs.github.io/mobx
 
----
+## Introduction
+
 MobX is a battle tested library that makes state management simple and scalable by transparently applying functional reactive programming (TFRP).
 The philosophy behind MobX is very simple:
 
@@ -19,7 +21,7 @@ _Everything that can be derived from the application state, should be derived. A
 
 which includes the UI, data serialization, server communication, etc.
 
-<img alt="MobX unidirectional flow" src="docs/flow.png" height="200" />
+<img alt="MobX unidirectional flow" src="docs/flow.png" height="200" align="center" />
 
 React and MobX together are a powerful combination. React renders the application state by providing mechanisms to translate it into a tree of renderable components. MobX provides the mechanism to store and update the application state that React then uses.
 
