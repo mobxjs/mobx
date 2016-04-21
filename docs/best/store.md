@@ -230,7 +230,7 @@ export class Todo {
             var json = this.asJson;
             // if autoSave is on, send json to server
             if (this.autoSave) {
-                this.store.transportLayer.saveTodo(todoJson);
+                this.store.transportLayer.saveTodo(json);
             }
         });
     }
