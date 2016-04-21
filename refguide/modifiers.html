@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="8.7" data-basepath=".." data-revision="Tue Apr 19 2016 20:46:46 GMT+0200 (CEST)">
+    <div class="book" data-level="8.7" data-basepath=".." data-revision="Thu Apr 21 2016 16:59:29 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -771,26 +771,56 @@ You can also use it to prevent that plain objects or arrays are made observable 
 <h2 id="asstructure">asStructure</h2>
 <p>Can be used on non-cyclic, plain JavaScript values.
 Instead of comparing old values with new values based on whether the reference has changed, values are compared using deep equality before notifying any observers.
-This is useful if you are working with &apos;struct&apos; like objects like colors or coordinates.
+This is useful if you are working with &apos;struct&apos; like objects like colors or coordinates and each time return fresh objects with possibly the same values.
 <code>asStructure</code> can be used on reactive functions, plain objects and arrays.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> vector1 = observable({ x: <span class="hljs-number">10</span>, y : <span class="hljs-number">10</span> });
-<span class="hljs-keyword">var</span> vector2 = observable({ x: <span class="hljs-number">0</span>, y: <span class="hljs-number">20</span> });
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> ViewPort = mobxReact.observer(React.createClass({
+    displayName: <span class="hljs-string">&apos;ViewPort&apos;</span>,
 
-<span class="hljs-keyword">var</span> boundingVector = observable(asStructure(() =&gt; {
-    <span class="hljs-keyword">return</span> {
-        x: <span class="hljs-built_in">Math</span>.max(vector1.x, vector2.x),
-        y: <span class="hljs-built_in">Math</span>.max(vector1.y, vector2.y)
+    componentWillMount: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        mobx.extendObservable({
+            screenSize: {
+                width: <span class="hljs-number">0</span>,
+                height: <span class="hljs-number">0</span>
+            },
+            minSize: {
+                width: <span class="hljs-number">400</span>,
+                height: <span class="hljs-number">300</span>
+            },
+            viewPortSize: mobx.asStructure(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+                <span class="hljs-keyword">return</span> {
+                    width: <span class="hljs-built_in">Math</span>.max(screenSize.width, minSize.width),
+                    height: <span class="hljs-built_in">Math</span>.max(screenSize.height, minSize.height)
+                }
+            }
+        });
+
+        <span class="hljs-built_in">window</span>.onresize = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+            mobx.transaction(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+                <span class="hljs-keyword">this</span>.screenSize.width = <span class="hljs-built_in">window</span>.clientWidth;
+                <span class="hljs-keyword">this</span>.screenSize.height = <span class="hljs-built_in">window</span>.clientHeight;
+            });
+        }.bind(<span class="hljs-keyword">this</span>);
+    },
+
+    render: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">return</span> (
+            <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">style</span>=<span class="hljs-value">{{</span>
+                <span class="hljs-attribute">width:</span> <span class="hljs-attribute">this.viewPortSize.width</span>,
+                <span class="hljs-attribute">height:</span> <span class="hljs-attribute">this.viewPortSize.height</span>
+            }}&gt;</span>
+                test
+            <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
+        )</span>;
     }
-});
-
-boundingVector.observe((vector) =&gt; <span class="hljs-built_in">console</span>.log(vector.x, vector.y));
-
-vector1.x = <span class="hljs-number">30</span>;
-<span class="hljs-comment">// prints &apos;30 20&apos;</span>
-
-vector2.x = <span class="hljs-number">10</span>;
-<span class="hljs-comment">// doesn&apos;t print, but without &apos;asStructure&apos; it would print because &apos;boundingVector&apos; always returns a new object.</span>
+}));
 </code></pre>
+<p>In the above example, the computed method <code>viewPortSize</code> returns a fresh object on each re-computation.
+So MobX considers it to have changed always. This means that each <code>resize</code> event of the browser will trigger a re-render of the
+<code>ViewPort</code> component.</p>
+<p>However, if the window size is smaller that the <code>minSize</code>, the resize doesn&apos;t need to influence the rendering anymore, as the computed 
+will return the same dimensions after each run. <code>asStructure</code> signals to MobX that observers of this computation should only be triggered
+if the value returned by the computed has <em>structurally</em> changed (by default strict equality is used to determine whether observers need to be notified).
+This means that a new object that is returned from <code>viewPortSize</code> won&apos;t trigger a <code>render</code> if its contents are (structurally) the same as the previous value.   </p>
 <h2 id="asflat">asFlat</h2>
 <p>Similar to <code>asReference</code>, except that <code>asFlat</code> does not prevent its value to become observable, but only the children of the value.
 It can be used for example to create an observable array or object that should not automatically make its children observable.</p>
