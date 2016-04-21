@@ -9,7 +9,7 @@ var todo = todoStore.createTodo();
 todo.task = "make coffee";
 ```
 
-That is enough create a todo, submit it to the server and update our user interface accordingly.
+That is enough to create a todo, submit it to the server and update our user interface accordingly.
 
 ## Asynchronous actions
 
