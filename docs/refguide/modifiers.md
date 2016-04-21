@@ -37,28 +37,60 @@ console.log(test.someFunc); // still a function
 
 Can be used on non-cyclic, plain JavaScript values.
 Instead of comparing old values with new values based on whether the reference has changed, values are compared using deep equality before notifying any observers.
-This is useful if you are working with 'struct' like objects like colors or coordinates.
+This is useful if you are working with 'struct' like objects like colors or coordinates and each time return fresh objects with possibly the same values.
 `asStructure` can be used on reactive functions, plain objects and arrays.
 
 ```javascript
-var vector1 = observable({ x: 10, y : 10 });
-var vector2 = observable({ x: 0, y: 20 });
-
-var boundingVector = observable(asStructure(() => {
-	return {
-		x: Math.max(vector1.x, vector2.x),
-		y: Math.max(vector1.y, vector2.y)
-	}
-});
-
-boundingVector.observe((vector) => console.log(vector.x, vector.y));
-
-vector1.x = 30;
-// prints '30 20'
-
-vector2.x = 10;
-// doesn't print, but without 'asStructure' it would print because 'boundingVector' always returns a new object.
+var ViewPort = mobxReact.observer(React.createClass({
+    displayName: 'ViewPort',
+    
+    componentWillMount: function() {
+        mobx.extendObservable({
+            screenSize: {
+                width: 0,
+                height: 0
+            },
+            minSize: {
+                width: 400,
+                height: 300
+            },
+            viewPortSize: mobx.asStructure(function() {
+                return {
+                    width: Math.max(screenSize.width, minSize.width),
+                    height: Math.max(screenSize.height, minSize.height)
+                }
+            }
+        });
+        
+        window.onresize = function() {
+            mobx.transaction(function() {
+                this.screenSize.width = window.clientWidth;
+                this.screenSize.height = window.clientHeight;
+            });
+        }.bind(this);
+    },
+    
+    render: function() {
+        return (
+            <div style={{
+                width: this.viewPortSize.width,
+                height: this.viewPortSize.height
+            }}>
+                test
+            </div>
+        );
+    }
+}));
 ```
+
+In the above example, the computed method `viewPortSize` returns a fresh object on each re-computation.
+So MobX considers it to have changed always. This means that each `resize` event of the browser will trigger a re-render of the
+`ViewPort` component.
+
+However, if the window size is smaller that the `minSize`, the resize doesn't need to influence the rendering anymore, as the computed 
+will return the same dimensions after each run. `asStructure` signals to MobX that observers of this computation should only be triggered
+if the value returned by the computed has _structurally_ changed (by default strict equality is used to determine whether observers need to be notified).
+This means that a new object that is returned from `viewPortSize` won't trigger a `render` if its contents are (structurally) the same as the previous value.   
 
 ## asFlat
 
