@@ -30,6 +30,7 @@ export { IObjectChange, isObservableObject                    } from "./types/ob
 export { IObservableArray, IArrayChange, IArraySplice, isObservableArray, fastArray } from "./types/observablearray";
 export { IObservableMapChange, IKeyValueMap, ObservableMap, IMapEntries, isObservableMap, map } from "./types/observablemap"
 
+export { action                                               } from "./api/action";
 export { IObservableValue, observable                         } from "./api/observable";
 export { computed, IComputedValueOptions                      } from "./api/computeddecorator";
 export { isObservable                                         } from "./api/isobservable";
