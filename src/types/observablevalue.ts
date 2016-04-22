@@ -3,6 +3,7 @@ import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} from "./modifiers";
 import {valueDidChange, Lambda} from "../utils/utils";
 import {SimpleEventEmitter} from "../utils/simpleeventemitter";
+import {reportStateChange} from "../api/action";
 
 export class ObservableValue<T> extends Atom {
 	hasUnreportedChange = false;
@@ -10,7 +11,7 @@ export class ObservableValue<T> extends Atom {
 
 	protected value: T = undefined;
 
-	constructor(value: T, protected mode: ValueMode, name = "ObservableValue") {
+	constructor(value: T, protected mode: ValueMode, name = "ObservableValue", private reportStateChanges = true) {
 		super(name);
 		const [childmode, unwrappedValue] = getValueModeFromValue(value, ValueMode.Recursive);
 		// If the value mode is recursive, modifiers like 'structure', 'reference', or 'flat' could apply
@@ -30,6 +31,8 @@ export class ObservableValue<T> extends Atom {
 			if (this.events)
 				this.events.emit(newValue, oldValue);
 		}
+		if (this.reportStateChanges)
+			reportStateChange(`${this.name}@${this.id}`, null, null, this.value, oldValue, changed);
 		return changed;
 	}
 

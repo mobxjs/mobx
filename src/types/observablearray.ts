@@ -3,6 +3,7 @@ import {Atom} from "../core/atom";
 import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {ValueMode, assertUnwrapped, makeChildObservable} from "./modifiers";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
+import {reportStateChange} from "../api/action";
 
 export interface IObservableArray<T> extends Array<T> {
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[];
@@ -107,6 +108,7 @@ function spliceWithArray<T>(adm: IObservableArrayAdministration<T>, index: numbe
 	const res: T[] = adm.values.splice(index, deleteCount, ...newItems);
 
 	notifyArraySplice(adm, index, res, newItems);
+	reportStateChange(`${adm.atom.name}@${adm.atom.id}[${index}] (splice)`, adm.array, index, newItems, res, true);
 	return res;
 }
 
@@ -345,7 +347,10 @@ function createArrayBufferItem(index: number) {
 				const changed = impl.mode === ValueMode.Structure ? !deepEquals(oldValue, value) : oldValue !== value;
 				if (changed) {
 					values[index] = impl.makeChildReactive(value);
+					reportStateChange(`${impl.atom.name}@${impl.atom.id}`, impl.array, index, values[index], oldValue, true);
 					notifyArrayChildUpdate(impl, index, oldValue);
+				} else {
+					reportStateChange(`${impl.atom.name}@${impl.atom.id}`, impl.array, index, value, oldValue, false);
 				}
 			}
 			else if (index === values.length)

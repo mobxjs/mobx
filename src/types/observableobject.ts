@@ -5,6 +5,7 @@ import {Lambda, invariant, assertPropertyConfigurable, isPlainObject} from "../u
 import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {getNextId} from "../core/globalstate";
 import {throwingComputedValueSetter} from "../api/computeddecorator";
+import {reportStateChange} from "../api/action";
 
 export interface IObjectChange<T, R> {
 	name: string;
@@ -77,7 +78,7 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 		observable = new ComputedValue(value.value, adm.target, true, name);
 	else {
 		isComputed = false;
-		observable = new ObservableValue(value, adm.mode, name);
+		observable = new ObservableValue(value, adm.mode, name, false);
 	}
 
 	adm.values[propName] = observable;
@@ -91,7 +92,9 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 			? throwingComputedValueSetter 
 			: function(newValue) {
 				const oldValue = (observable as any).value;
-				if (observable.set(newValue) && adm.events !== undefined) {
+				const changed = observable.set(newValue);
+				reportStateChange(`${adm.name}@${adm.id}`, adm.target, propName, newValue, oldValue, changed);
+				if (changed && adm.events !== undefined) {
 					adm.events.emit(<IObjectChange<any, any>> {
 						type: "update",
 						object: this,
@@ -102,13 +105,16 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 			}
 	});
 
-	if (adm.events !== undefined) {
-		adm.events.emit(<IObjectChange<any, any>> {
-			type: "add",
-			object: adm.target,
-			name: propName
-		});
-	};
+	if (!isComputed) {
+		if (adm.events !== undefined) {
+			adm.events.emit(<IObjectChange<any, any>> {
+				type: "add",
+				object: adm.target,
+				name: propName
+			});
+		};
+		reportStateChange(`${adm.name}@${adm.id}`, adm.target, propName, value, undefined, true);
+	}
 }
 
 /**

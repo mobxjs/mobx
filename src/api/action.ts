@@ -2,8 +2,28 @@ import {transaction} from "../core/transaction";
 import {isObservableObject} from "../types/observableobject";
 import {invariant} from "../utils/utils";
 
-export function reportStateChange(propertyName, object, property, newValue, oldValue, changed) {
-	
+const tracing = true;
+
+export function reportStateChange(observableName, object, propertyName, newValue, oldValue, changed) {
+	if (tracing) {
+		console.groupCollapsed([
+			"changed '",
+			observableName,
+			propertyName === null ? "" : ("." + propertyName),
+			"'",
+			isPrimitive(newValue) ? " to '" + newValue + "'" : "",
+			changed ? "" : " (unchanged)"
+		].join(""));
+		console.dir({
+			observable: observableName,
+			propertyName: propertyName,
+			newValue: newValue,
+			oldValue: oldValue,
+			target: object
+		});
+		console.trace();
+		console.groupEnd();
+	}
 }
 
 export function action<T extends Function>(fn: T): T;
@@ -24,16 +44,25 @@ export function action(arg1, arg2?, arg3?): any {
 
 function actionDecorator(descriptor: PropertyDescriptor) {
 	const base = descriptor.value;
-	descriptor.value = actionImplementation(base);
+	descriptor.value = actionImplementation(base.name, base);
 }
 
 export function actionImplementation(actionName: string, fn?: Function): Function {
 	return function () {
-		const logName = actionName + getNameForThis(this);
-		//console.log("Starting action", logName);
-		const args = arguments;
-		return transaction(() => fn.apply(this, args));
+		executeWrapped(actionName, fn, this, arguments);
 	};
+}
+
+function executeWrapped(actionName: string, fn: Function, scope: any, args: IArguments) {
+	if (tracing) {
+		actionName = actionName + getNameForThis(this);
+		(console as any).groupCollapsed("%c" + actionName, "color: blue");
+	}
+	const res = transaction(() => fn.apply(scope, args));
+	if (tracing) {
+		console.groupEnd();
+	}
+	return res;
 }
 
 function getNameForThis(who) {
@@ -41,4 +70,8 @@ function getNameForThis(who) {
 		return ` (${who.$mobx.name}#${who.$mobx.id})`;
 	}
 	return "";
+}
+
+function isPrimitive(value) {
+	return value === null || value === undefined || typeof value === "string" || typeof value === "number";
 }

@@ -6,6 +6,7 @@ import {ObservableArray, IObservableArray} from "./observablearray";
 import {ObservableValue} from "./observablevalue";
 import {isPlainObject, Lambda} from "../utils/utils";
 import {getNextId} from "../core/globalstate";
+import {reportStateChange} from "../api/action";
 
 export interface IKeyValueMap<V> {
 	[key: string]: V;
@@ -53,6 +54,7 @@ export class ObservableMap<V> {
 		if (this._has(key)) {
 			const oldValue = (<any>this._data[key]).value;
 			const changed = this._data[key].set(value);
+			reportStateChange(`${this.name}@${this.id}`, this, key, (<any>this._data[key]).value, oldValue, changed);
 			if (changed && this._events) {
 				this._events.emit(<IObservableMapChange<V>>{
 					type: "update",
@@ -64,10 +66,11 @@ export class ObservableMap<V> {
 		}
 		else {
 			transaction(() => {
-				this._data[key] = new ObservableValue(value, this._valueMode, `${this.name}@${this.id} / Entry "${key}"`);
+				this._data[key] = new ObservableValue(value, this._valueMode, `${this.name}@${this.id} / Entry "${key}"`, false);
 				this._updateHasMapEntry(key, true);
 				this._keys.push(key);
 			});
+			reportStateChange(`${this.name}@${this.id}`, this, key, value, undefined, true);
 			this._events && this._events.emit(<IObservableMapChange<V>>{
 				type: "add",
 				object: this,
@@ -92,6 +95,9 @@ export class ObservableMap<V> {
 				name: key,
 				oldValue
 			});
+			reportStateChange(`${this.name}@${this.id}`, this, `(delete) ${key}`, undefined, oldValue, true);
+		} else {
+			reportStateChange(`${this.name}@${this.id}`, this, `(delete) ${key}`, undefined, undefined, false);
 		}
 	}
 
@@ -101,7 +107,7 @@ export class ObservableMap<V> {
 		if (entry) {
 			entry.set(value);
 		} else {
-			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, `${this.name}@${this.id} / Contains "${key}"`);
+			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, `${this.name}@${this.id} / Contains "${key}"`, false);
 		}
 		return entry;
 	}
