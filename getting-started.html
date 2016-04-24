@@ -42,8 +42,8 @@
                         </p>
                         <h3>The core idea</h3>
 						<p>
-							State is the heart of each application and there is no quicker way to create buggy, unmanageable applications then by 
-							producing inconsistent state. Or state that is inconsistent with local variables that linger around.
+							State is the heart of each application and there is no quicker way to create buggy, unmanageable applications than by 
+							producing inconsistent state. Or state that is inconsistent, with local variables that linger around.
 							Hence many state management solutions try to restrict the ways in which you can modify state, for example by making state immutable.
 							But this introduces new problems; data needs to be normalized, referential integrity can no longer be guaranteed and it becomes next to impossible to use powerful concepts like prototypes.
 						</p><p>	 
@@ -234,17 +234,17 @@ observableTodoStore.todos[0].task = "grok MobX tutorial";
                         <h3 id="reactive-reactjs-components">Making React reactive</h3>
                         <p>Ok, so far we made a silly report reactive. Time to build a reactive user interface around this very
                             same store. React components are (despite their name) not reactive out of the box.
-                            The <code>@observer</code> decorator from the <code>mobx-react</code> package fixes that.
-                            It simply wraps the <code>render</code> method of React components in <code>autorun</code>.
-                            So that you never no longer have to worry about keeping your components in sync with the state.
-                            That is conceptually not different from what we did with the <code>report</code> before.
+                            The <code>@observer</code> decorator from the <code>mobx-react</code> package fixes that by 
+                            wrapping the React component <code>render</code> method in <code>autorun</code>, automatically
+                            keeping your components in sync with the state. That is conceptually not different from what we did 
+                            with the <code>report</code> before.
                         </p>
                         <p>
-                            The next listing defines a few react components.
+                            The next listing defines a few React components.
                             The only MobX thing in there is the <code>@observer</code> decorator.
                             That is enough to make sure that each component individually re-renders when relevant data changes.
                             You don't need to call <code>setState</code> anymore,
-                            nor do you have to figure out how subscribe to the proper parts
+                            nor do you have to figure out how to subscribe to the proper parts
                             of your application state using selectors or higher order components that need configuration.
                             Basically, all components have become smart. Yet they are defined in a dumb, declarative manner.
                         </p>
@@ -371,7 +371,7 @@ peopleStore[0].name = "Michel Weststrate";
 
                         <h3>Asynchronous actions</h3>
                         <p>Since everything in our small Todo application is derived from the state, it really doesn't matter <em>when</em> state is changed.
-                            That makes creating asynchronous actions really straight forward.
+                            That makes creating asynchronous actions really straightforward.
                             Just press the the following button (multiple times) to emulate asynchronously loading new todo items:
                         </p>
                         <hr/>
