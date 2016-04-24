@@ -2,14 +2,14 @@
     "plugins":["ga", "disqus", "edit-link"],
     "pluginsConfig": {
         "edit-link": {
-            "base": "https://github.com/mweststrate/mobservable/tree/gh-pages/docs",
+            "base": "https://github.com/mobxjs/mobx/tree/gh-pages/docs",
             "label": "Edit This Page"
         },
         "ga": {
             "token": "UA-65632006-1"
         },
         "disqus": {
-            "shortName": "mobservable"
+            "shortName": "mobx"
         }
     }
 }
