@@ -188,6 +188,10 @@ And finally kudo's for all the people that believed in, tried and validated MobX
 * [mobx-reactor](https://github.com/amsb/mobx-reactor) Connect MobX data stores to functional stateless React components with async actions and unidirectional data flow.
 * [mobx-model](https://github.com/ikido/mobx-model) Simplify mobx data stores that mimic backend models 
 * [rx-mobx](https://github.com/chicoxyzzy/rx-mobx) Convert Mobx observables to RxJS and vice versa
+* [mobx-store](https://github.com/AriaFallah/mobx-store) A lowdb inspired data store with declarative querying, observable state, and easy undo/redo.
+* [reaxor](https://github.com/KadoBOT/reaxor) Boilerplate for better state management, styling, testing and cleaner code
+
+_Feel free to create a PR to add your own!_
 
 ### More examples
 * [mobx-react-todomvc](https://github.com/mobxjs/mobx-react-todomvc) TodoMVC reference implementation on top of react-mobx-boilerplate
