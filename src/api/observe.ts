@@ -4,7 +4,7 @@ import {IObjectDidChange, isObservableObject, observeObservableObject} from "../
 import {IObservableValue, observable} from "./observable";
 import {ComputedValue} from "../core/computedvalue";
 import {ObservableValue} from "../types/observablevalue";
-import {Lambda, isPlainObject, invariant} from "../utils/utils";
+import {Lambda, isPlainObject, invariant, deprecated} from "../utils/utils";
 import {isObservable} from "./isobservable";
 import {extendObservable} from "./extendobservable";
 
@@ -30,8 +30,10 @@ function observeObservable(thing, listener, fireImmediately: boolean) {
 		return observeObservableObject(thing, listener, fireImmediately);
 	if (thing instanceof ObservableValue || thing instanceof ComputedValue)
 		return thing.observe(listener, fireImmediately);
-	if (isPlainObject(thing))
+	if (isPlainObject(thing)) {
+		deprecated("Passing plain objects to intercept / observe is deprecated and will be removed in 3.0");
 		return observeObservable(observable(<Object> thing), listener, fireImmediately);
+	}
 	invariant(false, "first argument of observe should be some observable value or plain object");
 }
 

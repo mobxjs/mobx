@@ -4,7 +4,7 @@ import {ObservableMap, IMapWillChange, isObservableMap} from "../types/observabl
 import {IObjectWillChange, IIsObservableObject, isObservableObject} from "../types/observableobject";
 import {IObservableValue, observable} from "./observable";
 import {ObservableValue, IValueWillChange} from "../types/observablevalue";
-import {Lambda, isPlainObject, invariant} from "../utils/utils";
+import {Lambda, isPlainObject, invariant, deprecated} from "../utils/utils";
 import {isObservable} from "./isobservable";
 import {extendObservable} from "./extendobservable";
 
@@ -28,8 +28,10 @@ function interceptInterceptable(thing, handler) {
 		return thing.intercept(handler);
 	if (thing instanceof ObservableValue)
 		return thing.intercept(handler);
-	if (isPlainObject(thing) || isObservableObject(thing))
+	if (isPlainObject(thing) || isObservableObject(thing)) {
+		deprecated("Passing plain objects to intercept / observe is deprecated and will be removed in 3.0");
 		return (observable(thing) as any as IIsObservableObject).$mobx.intercept(handler);
+	}
 	invariant(false, "first argument of intercept should be some observable value or plain object");
 }
 

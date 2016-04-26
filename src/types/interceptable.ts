@@ -1,4 +1,4 @@
-import {Lambda, once} from "../utils/utils";
+import {Lambda, once, invariant} from "../utils/utils";
 
 export type IInterceptor<T> = (change: T) => T;
 
@@ -26,6 +26,7 @@ export function interceptChange<T>(interceptable: IInterceptable<T>, change: T):
 	if (interceptors) {
 		for (let i = 0, l = interceptors.length; i < l; i++) {
 			change = interceptors[i](change);
+			invariant(!change || (change as any).type, "Intercept handlers should return nothing or a change object");
 			if (!change)
 				return null;
 		}

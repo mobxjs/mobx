@@ -55,3 +55,48 @@ test('intercept observable value', t => {
 	
 	t.end();
 });
+
+test('intercept array', t => {
+	var a = m.observable([1, 2]);
+	
+	var d = a.intercept(c => null);
+	a.push(2);
+	t.deepEqual(a.slice(), [1, 2]);
+	
+	d();
+	
+	d = intercept(a, c => {
+		if (c.type === "splice") {
+			c.added.push(c.added[0] * 2);
+			c.removedCount = 1;
+			return c;
+		} else if (c.type === "update") {
+			c.newValue = c.newValue * 3;
+			return c;
+		}			
+	});
+	
+	a.unshift(3,4);
+	
+	t.deepEqual(a.slice(), [3, 4, 6, 2], "splice has been modified");
+	a[2] = 5;
+	t.deepEqual(a.slice(), [3, 4, 15, 2], "update has tribled");
+	
+	t.end();
+});
+
+test('intercept object', t => {
+	var a = {
+		b: 3
+	}
+	
+	// bit magical, but intercept makes a observable, to be consistent with observe.
+	// deprecated immediately :)
+	var d = intercept(a, c => {
+		c.newValue *= 3;
+		return c;
+	});
+	
+	//a.b = // todo continue
+	t.end(); 
+})
