@@ -24,9 +24,9 @@ export { SimpleEventEmitter, ISimpleEventListener             } from "./utils/si
 export { ITransitionEvent, IObserverTree, IDependencyTree     } from "./api/extras";
 export { IObservable, IDepTreeNode, untracked                 } from "./core/observable";
 export { IDerivation                                          } from "./core/derivation";
-export { IInterceptable, IInterceptor                         } from "./core/interceptable";
 
 export { asReference, asFlat, asStructure                     } from "./types/modifiers";
+export { IInterceptable, IInterceptor                         } from "./types/interceptable";
 export { IObjectDidChange, isObservableObject } from "./types/observableobject";
 export { IObservableArray, IArrayDidChange, IArrayDidSplice, isObservableArray, fastArray } from "./types/observablearray";
 export { IKeyValueMap, ObservableMap, IMapEntries, IMapWillChange, IMapDidChange, isObservableMap, map } from "./types/observablemap"
@@ -37,6 +37,7 @@ export { computed, IComputedValueOptions                      } from "./api/comp
 export { isObservable                                         } from "./api/isobservable";
 export { extendObservable                                     } from "./api/extendobservable";
 export { observe                                              } from "./api/observe";
+export { intercept                                            } from "./api/intercept";
 export { autorun, autorunAsync, autorunUntil, when            } from "./api/autorun";
 export { expr                                                 } from "./api/expr";
 export { toJSON                                               } from "./api/tojson";

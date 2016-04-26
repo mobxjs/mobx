@@ -3,11 +3,12 @@ import {Atom} from "../core/atom";
 import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {ValueMode, assertUnwrapped, makeChildObservable} from "./modifiers";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
-import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "../core/interceptable";
+import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./interceptable";
 
 export interface IObservableArray<T> extends Array<T> {
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[];
 	observe(listener: (changeData: IArrayDidChange<T>|IArrayDidSplice<T>) => void, fireImmediately?: boolean): Lambda;
+	intercept<T>(handler: IInterceptor<IArrayDidChange<T> | IArrayDidSplice<T>>): Lambda;
 	clear(): T[];
 	peek(): T[];
 	replace(newItems: T[]): T[];
@@ -60,7 +61,7 @@ export class StubArray {
 }
 StubArray.prototype = [];
 
-interface IObservableArrayAdministration<T> extends IInterceptable<IArrayWillChange<T> | IArrayWillSplice<T>>{
+interface IObservableArrayAdministration<T> extends IInterceptable<IArrayWillChange<T> | IArrayWillSplice<T>> {
 	atom: Atom;
 	values: T[];
 	changeEvent: SimpleEventEmitter;
@@ -211,7 +212,7 @@ export class ObservableArray<T> extends StubArray {
 			adm.values = [];
 	}
 
-	interceptArray<T>(handler: IInterceptor<IArrayDidChange<T> | IArrayDidSplice<T>>): Lambda {
+	intercept<T>(handler: IInterceptor<IArrayDidChange<T> | IArrayDidSplice<T>>): Lambda {
 		return registerInterceptor<IArrayDidChange<T>|IArrayDidSplice<T>>(this.$mobx as any, handler);
 	}
 
@@ -351,7 +352,7 @@ makeNonEnumerable(ObservableArray.prototype, [
 	"sort",
 	"toString",
 	"toLocaleString",
-	"remove",
+	"remove"
 ]);
 Object.defineProperty(ObservableArray.prototype, "length", {
 	enumerable: false,
@@ -442,7 +443,7 @@ function createArrayGetter(index: number) {
 			return impl.values[index];
 		}
 		return undefined;
-	}
+	};
 }
 
 function reserveArrayBuffer(max: number) {

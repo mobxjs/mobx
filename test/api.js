@@ -21,6 +21,7 @@ test('correct api should be exposed', function(t) {
 		'extendObservable',
 		'extras',
 		'fastArray',
+		'intercept',
 		'isObservable',
 		'isObservableArray',
 		'isObservableMap',

@@ -5,7 +5,7 @@ import {ObservableArray, IObservableArray} from "./observablearray";
 import {ObservableValue} from "./observablevalue";
 import {isPlainObject, Lambda} from "../utils/utils";
 import {getNextId} from "../core/globalstate";
-import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "../core/interceptable";
+import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./interceptable";
 
 export interface IKeyValueMap<V> {
 	[key: string]: V;

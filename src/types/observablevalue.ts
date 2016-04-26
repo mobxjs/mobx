@@ -3,7 +3,7 @@ import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} from "./modifiers";
 import {valueDidChange, Lambda} from "../utils/utils";
 import {SimpleEventEmitter} from "../utils/simpleeventemitter";
-import {hasInterceptors, IInterceptable, IInterceptor, registerInterceptor, interceptChange} from "../core/interceptable";
+import {hasInterceptors, IInterceptable, IInterceptor, registerInterceptor, interceptChange} from "./interceptable";
 
 export interface IValueWillChange<T> {
 	object: ObservableValue<T>;

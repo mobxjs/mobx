@@ -5,7 +5,7 @@ import {Lambda, invariant, assertPropertyConfigurable, isPlainObject} from "../u
 import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {getNextId} from "../core/globalstate";
 import {throwingComputedValueSetter} from "../api/computeddecorator";
-import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "../core/interceptable";
+import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "./interceptable";
 
 export interface IObjectDidChange {
 	name: string;
