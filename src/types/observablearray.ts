@@ -3,11 +3,11 @@ import {Atom} from "../core/atom";
 import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {ValueMode, assertUnwrapped, makeChildObservable} from "./modifiers";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
-import {reportStateChange} from "../api/action";
+import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "../core/interceptable";
 
 export interface IObservableArray<T> extends Array<T> {
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[];
-	observe(listener: (changeData: IArrayChange<T>|IArraySplice<T>) => void, fireImmediately?: boolean): Lambda;
+	observe(listener: (changeData: IArrayDidChange<T>|IArrayDidSplice<T>) => void, fireImmediately?: boolean): Lambda;
 	clear(): T[];
 	peek(): T[];
 	replace(newItems: T[]): T[];
@@ -15,19 +15,37 @@ export interface IObservableArray<T> extends Array<T> {
 	remove(value: T): boolean;
 }
 
-export interface IArrayChange<T> {
-	type:  string; // Always:  "update'
-	object:  IObservableArray<T>;
-	index:  number;
-	oldValue:  T;
+export interface IArrayDidChange<T> {
+	type: "update";
+	object: IObservableArray<T>;
+	index: number;
+	newValue: T;
+	oldValue: T;
 }
 
-export interface IArraySplice<T> {
-	type:  string; // Always:  'splice'
-	object:  IObservableArray<T>;
-	index:  number;
-	removed:  T[];
-	addedCount:  number;
+export interface IArrayDidSplice<T> {
+	type: "splice";
+	object: IObservableArray<T>;
+	index: number;
+	added: T[];
+	addedCount: number;
+	removed: T[];
+	removedCount: number;
+}
+
+export interface IArrayWillChange<T> {
+	type: "update";
+	object: IObservableArray<T>;
+	index: number;
+	newValue: T;
+}
+
+export interface IArrayWillSplice<T> {
+	type: "splice";
+	object: IObservableArray<T>;
+	index: number;
+	added: T[];
+	removedCount: number;
 }
 
 /**
@@ -42,13 +60,13 @@ export class StubArray {
 }
 StubArray.prototype = [];
 
-interface IObservableArrayAdministration<T> {
+interface IObservableArrayAdministration<T> extends IInterceptable<IArrayWillChange<T> | IArrayWillSplice<T>>{
 	atom: Atom;
 	values: T[];
 	changeEvent: SimpleEventEmitter;
 	lastKnownLength: number;
 	mode: ValueMode;
-	array: ObservableArray<T>;
+	array: IObservableArray<T>;
 	makeChildReactive: (item: T) => T;
 }
 
@@ -81,8 +99,9 @@ function updateArrayLength(adm: IObservableArrayAdministration<any>, oldLength: 
 
 function spliceWithArray<T>(adm: IObservableArrayAdministration<T>, index: number, deleteCount?: number, newItems?: T[]): T[] {
 	const length = adm.values.length;
+	// TODO: remove this early exit to make it interceptable?
 	if  ((newItems === undefined || newItems.length === 0) && (deleteCount === 0 || length === 0))
-		return [];
+		return EMPTY_ARRAY;
 
 	if (index === undefined)
 		index = 0;
@@ -99,16 +118,28 @@ function spliceWithArray<T>(adm: IObservableArrayAdministration<T>, index: numbe
 		deleteCount = Math.max(0, Math.min(deleteCount, length - index));
 
 	if (newItems === undefined)
-		newItems = EMPTY_ARRAY;
-	else
-		newItems = <T[]> newItems.map(adm.makeChildReactive);
+		newItems = [];
 
+	if (hasInterceptors(adm)) {
+		const change = interceptChange<IArrayWillSplice<T>>(adm as any, {
+			object: this,
+			type: "splice",
+			index,
+			removedCount: deleteCount,
+			added: newItems
+		});
+		if (!change)
+			return EMPTY_ARRAY;
+		deleteCount = change.removedCount;
+		newItems = change.added;
+	}
+
+	newItems = <T[]> newItems.map(adm.makeChildReactive);
 	const lengthDelta = newItems.length - deleteCount;
 	updateArrayLength(adm, length, lengthDelta); // create or remove new entries
 	const res: T[] = adm.values.splice(index, deleteCount, ...newItems);
 
-	notifyArraySplice(adm, index, res, newItems);
-	reportStateChange(`${adm.atom.name}@${adm.atom.id}[${index}] (splice)`, adm.array, index, newItems, res, true);
+	notifyArraySplice(adm, index, newItems, res);
 	return res;
 }
 
@@ -120,20 +151,36 @@ function makeReactiveArrayItem(value) {
 	return makeChildObservable(value, this.mode, `${this.atom.name}@${this.atom.id} / ArrayEntry`);
 }
 
-function notifyArrayChildUpdate<T>(adm: IObservableArrayAdministration<T>, index: number, oldValue: T) {
+function notifyArrayChildUpdate<T>(adm: IObservableArrayAdministration<T>, index: number, newValue: T, oldValue: T) {
 	adm.atom.reportChanged();
 	// conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-	if (adm.changeEvent)
-		adm.changeEvent.emit(<IArrayChange<T>>{ object: <IObservableArray<T>><any> adm.array, type: "update", index: index, oldValue: oldValue});
+	if (adm.changeEvent) {
+		adm.changeEvent.emit(<IArrayDidChange<T>> {
+			object: <IObservableArray<T>><any> adm.array,
+			type: "update",
+			index,
+			newValue,
+			oldValue
+		});
+	}
 }
 
-function notifyArraySplice<T>(adm: IObservableArrayAdministration<T>, index: number, deleted: T[], added: T[]) {
-	if (deleted.length === 0 && added.length === 0)
+function notifyArraySplice<T>(adm: IObservableArrayAdministration<T>, index: number, added: T[], removed: T[]) {
+	if (removed.length === 0 && added.length === 0)
 		return;
 	adm.atom.reportChanged();
 	// conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-	if (adm.changeEvent)
-		adm.changeEvent.emit(<IArraySplice<T>>{ object: <IObservableArray<T>><any> adm.array, type: "splice", index: index, addedCount: added.length, removed: deleted});
+	if (adm.changeEvent) {
+		adm.changeEvent.emit(<IArrayDidSplice<T>> {
+			object: adm.array as any,
+			type: "splice",
+			index,
+			removed,
+			removedCount: removed.length,
+			added,
+			addedCount: added.length
+		});
+	}
 }
 
 export class ObservableArray<T> extends StubArray {
@@ -147,8 +194,9 @@ export class ObservableArray<T> extends StubArray {
 			changeEvent: undefined,
 			lastKnownLength: 0,
 			mode: mode,
-			array: this,
-			makeChildReactive: (v) => makeReactiveArrayItem.call(adm, v)
+			array: this as any,
+			makeChildReactive: (v) => makeReactiveArrayItem.call(adm, v),
+			interceptors: null
 		};
 		Object.defineProperty(this, "$mobx", {
 			enumerable: false,
@@ -163,11 +211,24 @@ export class ObservableArray<T> extends StubArray {
 			adm.values = [];
 	}
 
-	observe(listener: (changeData: IArrayChange<T>|IArraySplice<T>) => void, fireImmediately = false): Lambda {
+	interceptArray<T>(handler: IInterceptor<IArrayDidChange<T> | IArrayDidSplice<T>>): Lambda {
+		return registerInterceptor<IArrayDidChange<T>|IArrayDidSplice<T>>(this.$mobx as any, handler);
+	}
+
+	observe(listener: (changeData: IArrayDidChange<T>|IArrayDidSplice<T>) => void, fireImmediately = false): Lambda {
 		if (this.$mobx.changeEvent === undefined)
 			this.$mobx.changeEvent = new SimpleEventEmitter();
-		if (fireImmediately)
-			listener(<IArraySplice<T>>{ object: <IObservableArray<T>><any> this, type: "splice", index: 0, addedCount: this.$mobx.values.length, removed: []});
+		if (fireImmediately) {
+			listener(<IArrayDidSplice<T>>{
+				object: this as any,
+				type: "splice",
+				index: 0,
+				added: this.$mobx.values.slice(),
+				addedCount: this.$mobx.values.length,
+				removed: [],
+				removedCount: 0
+			});
+		}
 		return this.$mobx.changeEvent.on(listener);
 	}
 
@@ -337,36 +398,51 @@ function createArrayBufferItem(index: number) {
 	Object.defineProperty(ObservableArray.prototype, "" + index, {
 		enumerable: false,
 		configurable: false,
-		set: function(value) {
-			const impl = <IObservableArrayAdministration<any>> this.$mobx;
-			const values = impl.values;
-			assertUnwrapped(value, "Modifiers cannot be used on array values. For non-reactive array values use makeReactive(asFlat(array)).");
-			if (index < values.length) {
-				checkIfStateModificationsAreAllowed();
-				const oldValue = values[index];
-				const changed = impl.mode === ValueMode.Structure ? !deepEquals(oldValue, value) : oldValue !== value;
-				if (changed) {
-					values[index] = impl.makeChildReactive(value);
-					reportStateChange(`${impl.atom.name}@${impl.atom.id}`, impl.array, index, values[index], oldValue, true);
-					notifyArrayChildUpdate(impl, index, oldValue);
-				} else {
-					reportStateChange(`${impl.atom.name}@${impl.atom.id}`, impl.array, index, value, oldValue, false);
-				}
-			}
-			else if (index === values.length)
-				spliceWithArray(impl, index, 0, [value]);
-			else
-				throw new Error(`[mobx.array] Index out of bounds, ${index} is larger than ${values.length}`);
-		},
-		get: function() {
-			const impl = <IObservableArrayAdministration<any>> this.$mobx;
-			if (impl && index < impl.values.length) {
-				impl.atom.reportObserved();
-				return impl.values[index];
-			}
-			return undefined;
-		}
+		set: createArraySetter(index),
+		get: createArrayGetter(index)
 	});
+}
+
+function createArraySetter(index: number) {
+	return function<T>(value: T) {
+		const adm = <IObservableArrayAdministration<T>> this.$mobx;
+		const values = adm.values;
+		assertUnwrapped(value, "Modifiers cannot be used on array values. For non-reactive array values use makeReactive(asFlat(array)).");
+		if (index < values.length) {
+			checkIfStateModificationsAreAllowed();
+			const oldValue = values[index];
+			if (hasInterceptors(adm)) {
+				const change = interceptChange<IArrayWillChange<T>>(adm as any, {
+					type: "update",
+					object: adm.array,
+					index,
+					newValue: value
+				});
+				if (!change)
+					return;
+				value = change.newValue;
+			}
+			const changed = adm.mode === ValueMode.Structure ? !deepEquals(oldValue, value) : oldValue !== value;
+			if (changed) {
+				values[index] = adm.makeChildReactive(value);
+				notifyArrayChildUpdate(adm, index, value, oldValue);
+			}
+		} else if (index === values.length) {
+			spliceWithArray(adm, index, 0, [value]);
+		} else
+			throw new Error(`[mobx.array] Index out of bounds, ${index} is larger than ${values.length}`);
+	};
+}
+
+function createArrayGetter(index: number) {
+	return function () {
+		const impl = <IObservableArrayAdministration<any>> this.$mobx;
+		if (impl && index < impl.values.length) {
+			impl.atom.reportObserved();
+			return impl.values[index];
+		}
+		return undefined;
+	}
 }
 
 function reserveArrayBuffer(max: number) {

@@ -1,10 +1,11 @@
 import {IAtom} from "./atom";
 import {IDerivation} from "./derivation";
 import {Reaction} from "./reaction";
+import {IInterceptable, IInterceptor, registerInterceptor} from "./interceptable";
 
 declare const global: any;
 
-export class MobXGlobals {
+export class MobXGlobals implements IInterceptable<any> {
 	/**
 	 * MobXGlobals version.
 	 * MobX compatiblity with other versions loaded in memory as long as this version matches.
@@ -60,6 +61,15 @@ export class MobXGlobals {
 	 * Used by createTransformer to detect that the global state has been reset.
 	 */
 	resetId = 0;
+
+	/**
+	 * Global interceptors that will be run before applying state changes
+	 */
+	interceptors: IInterceptor<any>[] = [];
+
+	intercept(handler) {
+		return registerInterceptor(this, handler);
+	}
 }
 
 export const globalState = (() => {

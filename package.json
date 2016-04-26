@@ -50,7 +50,7 @@
     "lodash.intersection": "^3.2.0",
     "tape": "^4.2.2",
     "tape-run": "^2.1.0",
-    "typescript": "^1.7.5",
+    "typescript": "^1.8.10",
     "uglify-js": "^2.6.1"
   },
   "dependencies": {},

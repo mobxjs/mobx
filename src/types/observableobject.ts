@@ -5,18 +5,25 @@ import {Lambda, invariant, assertPropertyConfigurable, isPlainObject} from "../u
 import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {getNextId} from "../core/globalstate";
 import {throwingComputedValueSetter} from "../api/computeddecorator";
-import {reportStateChange} from "../api/action";
+import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "../core/interceptable";
 
-export interface IObjectChange<T, R> {
+export interface IObjectDidChange {
 	name: string;
-	object: R;
-	type: string;
-	oldValue?: T;
+	object: any;
+	type: "update" | "add";
+	oldValue?: any;
+}
+
+export interface IObjectWillChange {
+	object: any;
+	type: "update" | "add";
+	name: string;
+	newValue: any;
 }
 
 const ObservableObjectMarker = {};
 
-export interface IObservableObjectAdministration {
+export interface IObservableObjectAdministration extends IInterceptable<IObjectWillChange> {
 	type: Object;
 	target: any;
 	name: string;
@@ -47,7 +54,9 @@ export function asObservableObject(target, name: string, mode: ValueMode = Value
 		values: {},
 		events: undefined,
 		id: getNextId(),
-		target, name, mode
+		target, name, mode,
+		interceptors: null,
+		intercept: interceptObjectChange
 	};
 	Object.defineProperty(target, "$mobx", {
 		enumerable: false,
@@ -78,7 +87,18 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 		observable = new ComputedValue(value.value, adm.target, true, name);
 	else {
 		isComputed = false;
-		observable = new ObservableValue(value, adm.mode, name, false);
+		if (hasInterceptors(adm)) {
+			const change = interceptChange<IObjectWillChange>(adm, {
+				object: adm.target,
+				name: propName,
+				type: "add",
+				newValue: value
+			});
+			if (!change)
+				return;
+			value = change.newValue;
+		}
+		observable = new ObservableValue(value, adm.mode, name);
 	}
 
 	adm.values[propName] = observable;
@@ -89,32 +109,46 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 			return observable.get();
 		},
 		set: isComputed
-			? throwingComputedValueSetter 
-			: function(newValue) {
-				const oldValue = (observable as any).value;
-				const changed = observable.set(newValue);
-				reportStateChange(`${adm.name}@${adm.id}`, adm.target, propName, newValue, oldValue, changed);
-				if (changed && adm.events !== undefined) {
-					adm.events.emit(<IObjectChange<any, any>> {
-						type: "update",
-						object: this,
-						name: propName,
-						oldValue
-					});
-				}
-			}
+			? throwingComputedValueSetter
+			: createSetter(adm, observable as ObservableValue<any>, propName)
 	});
 
 	if (!isComputed) {
 		if (adm.events !== undefined) {
-			adm.events.emit(<IObjectChange<any, any>> {
+			adm.events.emit(<IObjectDidChange> {
 				type: "add",
 				object: adm.target,
-				name: propName
+				name: propName,
+				newValue: value
 			});
 		};
-		reportStateChange(`${adm.name}@${adm.id}`, adm.target, propName, value, undefined, true);
 	}
+}
+
+function createSetter(adm: IObservableObjectAdministration, observable: ObservableValue<any>, propName: string) {
+	return function (newValue) {
+		const oldValue = (observable as any).value;
+		if (hasInterceptors(adm)) {
+			const change = interceptChange(adm, {
+				object: this,
+				name: propName,
+				newValue
+			});
+			if (!change)
+				return;
+			newValue = change.newValue;
+		}
+		const changed = observable.set(newValue);
+		if (changed && adm.events !== undefined) {
+			adm.events.emit(<IObjectDidChange> {
+				type: "update",
+				object: this,
+				name: propName,
+				newValue,
+				oldValue
+			});
+		}
+	};
 }
 
 /**
@@ -122,7 +156,7 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 	* See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe 
 	* for callback details
 	*/
-export function observeObservableObject(object: IIsObservableObject, callback: (changes: IObjectChange<any, any>) => void, fireImmediately?: boolean): Lambda {
+export function observeObservableObject(object: IIsObservableObject, callback: (changes: IObjectDidChange) => void, fireImmediately?: boolean): Lambda {
 	invariant(isObservableObject(object), "Expected observable object");
 	invariant(fireImmediately !== true, "`observe` doesn't support the fire immediately property for observable objects.");
 	const adm = object.$mobx;
@@ -133,4 +167,8 @@ export function observeObservableObject(object: IIsObservableObject, callback: (
 
 export function isObservableObject(thing): boolean {
 	return thing && thing.$mobx && thing.$mobx.type === ObservableObjectMarker;
+}
+
+function interceptObjectChange(handler): Lambda {
+	return registerInterceptor(this, handler);
 }

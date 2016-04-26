@@ -8,6 +8,7 @@ test('correct api should be exposed', function(t) {
 		'Reaction',
 		'SimpleEventEmitter',
 		'_',
+		'action',
 		'asFlat',
 		'asReference',
 		'asStructure',

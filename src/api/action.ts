@@ -30,6 +30,10 @@ export function action<T extends Function>(fn: T): T;
 export function action<T extends Function>(name: string, fn: T): T;
 export function action(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
 export function action(arg1, arg2?, arg3?): any {
+	// TODO: introduce reaction as well?
+	// TODO: untracked?
+	// TODO: empty derivation stack warning?
+	// TODO: introduce transiationTracker event
 	switch (arguments.length) {
 		case 1:
 			return actionImplementation(arg1.name || "<unnamed action>", arg1);

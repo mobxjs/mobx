@@ -1,12 +1,11 @@
 import {ValueMode, assertUnwrapped, getValueModeFromModifierFunc} from "./modifiers";
-import {IObjectChange} from "./observableobject";
 import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {transaction} from "../core/transaction";
 import {ObservableArray, IObservableArray} from "./observablearray";
 import {ObservableValue} from "./observablevalue";
 import {isPlainObject, Lambda} from "../utils/utils";
 import {getNextId} from "../core/globalstate";
-import {reportStateChange} from "../api/action";
+import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "../core/interceptable";
 
 export interface IKeyValueMap<V> {
 	[key: string]: V;
@@ -14,11 +13,24 @@ export interface IKeyValueMap<V> {
 
 export type IMapEntries<V> = [string, V][]
 
-export interface IObservableMapChange<T> extends IObjectChange<T, ObservableMap<T>> { }
+export interface IMapDidChange<T> {
+	object: ObservableMap<T>;
+	type: "update" | "add" | "delete";
+	name: string;
+	newValue?: any;
+	oldValue?: any;
+}
+
+export interface IMapWillChange<T> {
+	object: ObservableMap<T>;
+	type: "update" | "delete";
+	name: string;
+	newValue?: any;
+}
 
 const ObservableMapMarker = {};
 
-export class ObservableMap<V> {
+export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>> {
 	$mobx = ObservableMapMarker;
 	private _data: { [key: string]: ObservableValue<V> } = {};
 	private _hasMap: { [key: string]: ObservableValue<boolean> } = {}; // hasMap, not hashMap >-).
@@ -27,6 +39,7 @@ export class ObservableMap<V> {
 	public name = "ObservableMap";
 	public id = getNextId();
 	private _keys: IObservableArray<string> = <any> new ObservableArray(null, ValueMode.Reference, `${this.name}@${this.id} / keys()`);
+	interceptors = null;
 
 	constructor(initialData?: IMapEntries<V> | IKeyValueMap<V>, valueModeFunc?: Function) {
 		this._valueMode = getValueModeFromModifierFunc(valueModeFunc);
@@ -51,35 +64,55 @@ export class ObservableMap<V> {
 	set(key: string, value: V) {
 		this.assertValidKey(key);
 		assertUnwrapped(value, `[mobx.map.set] Expected unwrapped value to be inserted to key '${key}'. If you need to use modifiers pass them as second argument to the constructor`);
+		if (hasInterceptors(this)) {
+			const change = interceptChange<IMapWillChange<V>>(this, {
+				type: "update",
+				object: this,
+				newValue: value,
+				name: key
+			});
+			if (!change)
+				return;
+			value = change.newValue;
+		}
 		if (this._has(key)) {
 			const oldValue = (<any>this._data[key]).value;
 			const changed = this._data[key].set(value);
-			reportStateChange(`${this.name}@${this.id}`, this, key, (<any>this._data[key]).value, oldValue, changed);
 			if (changed && this._events) {
-				this._events.emit(<IObservableMapChange<V>>{
+				this._events.emit(<IMapDidChange<V>>{
 					type: "update",
 					object: this,
 					name: key,
+					newValue: value,
 					oldValue
 				});
 			}
 		}
 		else {
 			transaction(() => {
-				this._data[key] = new ObservableValue(value, this._valueMode, `${this.name}@${this.id} / Entry "${key}"`, false);
+				this._data[key] = new ObservableValue(value, this._valueMode, `${this.name}@${this.id} / Entry "${key}"`);
 				this._updateHasMapEntry(key, true);
 				this._keys.push(key);
 			});
-			reportStateChange(`${this.name}@${this.id}`, this, key, value, undefined, true);
-			this._events && this._events.emit(<IObservableMapChange<V>>{
+			this._events && this._events.emit(<IMapDidChange<V>>{
 				type: "add",
 				object: this,
-				name: key
+				name: key,
+				newValue: value
 			});
 		}
 	}
 
 	delete(key: string) {
+		if (hasInterceptors(this)) {
+			const change = interceptChange<IMapWillChange<V>>(this, {
+				type: "delete",
+				object: this,
+				name: key
+			});
+			if (!change)
+				return;
+		}
 		if (this._has(key)) {
 			const oldValue = (<any>this._data[key]).value;
 			transaction(() => {
@@ -89,15 +122,12 @@ export class ObservableMap<V> {
 				observable.set(undefined);
 				this._data[key] = undefined;
 			});
-			this._events && this._events.emit(<IObservableMapChange<V>>{
+			this._events && this._events.emit(<IMapDidChange<V>>{
 				type: "delete",
 				object: this,
 				name: key,
 				oldValue
 			});
-			reportStateChange(`${this.name}@${this.id}`, this, `(delete) ${key}`, undefined, oldValue, true);
-		} else {
-			reportStateChange(`${this.name}@${this.id}`, this, `(delete) ${key}`, undefined, undefined, false);
 		}
 	}
 
@@ -107,7 +137,7 @@ export class ObservableMap<V> {
 		if (entry) {
 			entry.set(value);
 		} else {
-			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, `${this.name}@${this.id} / Contains "${key}"`, false);
+			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, `${this.name}@${this.id} / Contains "${key}"`);
 		}
 		return entry;
 	}
@@ -187,10 +217,14 @@ export class ObservableMap<V> {
 	 * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
 	 * for callback details
 	 */
-	observe(callback: (changes: IObservableMapChange<V>) => void): Lambda {
+	observe(callback: (changes: IMapDidChange<V>) => void): Lambda {
 		if (!this._events)
 			this._events = new SimpleEventEmitter();
 		return this._events.on(callback);
+	}
+
+	intercept(handler: IInterceptor<IMapWillChange<V>>): Lambda {
+		return registerInterceptor(this, handler);
 	}
 }
 

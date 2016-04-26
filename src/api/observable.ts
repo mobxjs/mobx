@@ -21,6 +21,7 @@ export function observable<T, S extends Object>(value: () => T, thisArg?: S): IO
 export function observable<T extends string|number|boolean|Date|RegExp|Function|void>(value: T): IObservableValue<T>;
 export function observable<T extends Object>(value: T): T;
 export function observable(v: any, keyOrScope?: string | any) {
+	// TOOD: mirror structure of interceptable?
 	if (typeof arguments[1] === "string")
 		return observableDecorator.apply(null, arguments);
 

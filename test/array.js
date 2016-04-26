@@ -169,14 +169,14 @@ test('observe', function(t) {
     });
 
     var result = [
-        { type: "splice", index: 0, addedCount: 2, removed: [] },
-        { type: "update", index: 1, oldValue: 4 },
-        { type: "splice", index: 2, addedCount: 1, removed: [] },
-        { type: "splice", index: 0, addedCount: 0, removed: [1] },
-        { type: "splice", index: 2, addedCount: 2, removed: [] },
-        { type: "splice", index: 1, addedCount: 2, removed: [0,1] },
-        { type: "splice", index: 0, addedCount: 1, removed: [3,3,4,2] },
-        { type: "splice", index: 0, addedCount: 0, removed: ['a'] },
+        { type: "splice", index: 0, addedCount: 2, removed: [], added: [1, 4], removedCount: 0 },
+        { type: "update", index: 1, oldValue: 4, newValue: 3 },
+        { type: "splice", index: 2, addedCount: 1, removed: [], added: [0], removedCount: 0 },
+        { type: "splice", index: 0, addedCount: 0, removed: [1], added: [], removedCount: 1 },
+        { type: "splice", index: 2, addedCount: 2, removed: [], added: [1,2], removedCount: 0 },
+        { type: "splice", index: 1, addedCount: 2, removed: [0,1], added: [3, 4], removedCount: 2 },
+        { type: "splice", index: 0, addedCount: 1, removed: [3,3,4,2], added:['a'], removedCount: 4 },
+        { type: "splice", index: 0, addedCount: 0, removed: ['a'], added: [], removedCount: 1 },
     ]
 
     t.deepEqual(buf, result);
