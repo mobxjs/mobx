@@ -120,7 +120,9 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 		return autorun(() => {
 			let newValue = this.get();
 			if (!firstTime || fireImmediately) {
+				globalState.inUntracked++;
 				listener(newValue, prevValue);
+				globalState.inUntracked--;
 			}
 			firstTime = false;
 			prevValue = newValue;
