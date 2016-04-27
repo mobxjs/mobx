@@ -190,6 +190,7 @@ And finally kudo's for all the people that believed in, tried and validated MobX
 * [rx-mobx](https://github.com/chicoxyzzy/rx-mobx) Convert Mobx observables to RxJS and vice versa
 * [mobx-store](https://github.com/AriaFallah/mobx-store) A lowdb inspired data store with declarative querying, observable state, and easy undo/redo.
 * [reaxor](https://github.com/KadoBOT/reaxor) Boilerplate for better state management, styling, testing and cleaner code
+* [Smalldots MobX Store](https://github.com/smalldots/mobx-store) Store API for MobX
 
 _Feel free to create a PR to add your own!_
 
