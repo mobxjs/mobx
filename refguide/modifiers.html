@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="8.7" data-basepath=".." data-revision="Thu Apr 21 2016 16:59:29 GMT+0200 (CEST)">
+    <div class="book" data-level="8.7" data-basepath=".." data-revision="Wed Apr 27 2016 19:43:30 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -740,7 +740,7 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/modifiers.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="modifiers-for-observable">Modifiers for observable</h1>
+                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/modifiers.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="modifiers-for-observable">Modifiers for observable</h1>
 <p>By default, <code>observable</code> recursively makes all the values of <em>plain</em> objects and arrays recursively observable.
 Besides that it automatically converts functions without arguments into reactive views or derived properties.
 For all other types of values just a reference is stored.
@@ -821,6 +821,14 @@ So MobX considers it to have changed always. This means that each <code>resize</
 will return the same dimensions after each run. <code>asStructure</code> signals to MobX that observers of this computation should only be triggered
 if the value returned by the computed has <em>structurally</em> changed (by default strict equality is used to determine whether observers need to be notified).
 This means that a new object that is returned from <code>viewPortSize</code> won&apos;t trigger a <code>render</code> if its contents are (structurally) the same as the previous value.   </p>
+<p>To use the <code>asStructure</code> modifier in combination with the <code>@computed</code> decorator, use the following:</p>
+<pre><code class="lang-javascript">@computed({ asStructure: <span class="hljs-literal">true</span> }) get viewPortSize() {
+    <span class="hljs-keyword">return</span> {
+        width: <span class="hljs-built_in">Math</span>.max(screenSize.width, minSize.width),
+        height: <span class="hljs-built_in">Math</span>.max(screenSize.height, minSize.height)
+    }
+}
+</code></pre>
 <h2 id="asflat">asFlat</h2>
 <p>Similar to <code>asReference</code>, except that <code>asFlat</code> does not prevent its value to become observable, but only the children of the value.
 It can be used for example to create an observable array or object that should not automatically make its children observable.</p>
@@ -868,7 +876,7 @@ isObservable(todos[<span class="hljs-number">0</span>], <span class="hljs-string
 
 <script>
 require(["gitbook"], function(gitbook) {
-    var config = {"fontSettings":{"theme":null,"family":"sans","size":2},"edit-link":{"base":"https://github.com/mweststrate/mobservable/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"}};
+    var config = {"fontSettings":{"theme":null,"family":"sans","size":2},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobx"}};
     gitbook.start(config);
 });
 </script>

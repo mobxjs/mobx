@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="3.1" data-basepath=".." data-revision="Thu Apr 21 2016 16:59:29 GMT+0200 (CEST)">
+    <div class="book" data-level="3.1" data-basepath=".." data-revision="Wed Apr 27 2016 19:43:30 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -740,7 +740,7 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/best/store.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="best-practices-for-building-large-scale-maintainable-projects">Best Practices for building large scale maintainable projects</h1>
+                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/store.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="best-practices-for-building-large-scale-maintainable-projects">Best Practices for building large scale maintainable projects</h1>
 <p>This section contains some best practices we discovered at Mendix while working with MobX.
 This section is opinionated and you are in no way forced to apply these practices.
 There are many ways of working with MobX and React, and this is just one of them.</p>
@@ -960,7 +960,7 @@ Especially in large applications this is important.</li>
             <span class="hljs-keyword">var</span> json = <span class="hljs-keyword">this</span>.asJson;
             <span class="hljs-comment">// if autoSave is on, send json to server</span>
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.autoSave) {
-                <span class="hljs-keyword">this</span>.store.transportLayer.saveTodo(todoJson);
+                <span class="hljs-keyword">this</span>.store.transportLayer.saveTodo(json);
             }
         });
     }
@@ -1035,7 +1035,7 @@ Especially in large applications this is important.</li>
 
 <script>
 require(["gitbook"], function(gitbook) {
-    var config = {"fontSettings":{"theme":null,"family":"sans","size":2},"edit-link":{"base":"https://github.com/mweststrate/mobservable/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"}};
+    var config = {"fontSettings":{"theme":null,"family":"sans","size":2},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobx"}};
     gitbook.start(config);
 });
 </script>

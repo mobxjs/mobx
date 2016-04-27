@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="2.5" data-basepath=".." data-revision="Thu Apr 21 2016 16:59:29 GMT+0200 (CEST)">
+    <div class="book" data-level="2.5" data-basepath=".." data-revision="Wed Apr 27 2016 19:43:30 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -740,7 +740,7 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mweststrate/mobservable/tree/gh-pages/docs/refguide/observer-component.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="-observer">@observer</h1>
+                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/observer-component.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="-observer">@observer</h1>
 <p>The <code>observer</code> function / decorator can be used to turn ReactJS components into reactive components.
 It wraps the component&apos;s render function in <code>mobx.autorun</code> to make sure that any data that is used during the rendering of a component forces a re-rendering upon change.
 It is available through the separate <code>mobx-react</code> package.</p>
@@ -809,6 +809,27 @@ Its overhead is neglectable and it makes sure that whenever you start using obse
 This behavior is similar to <a href="https://facebook.github.io/react/docs/pure-render-mixin.html" target="_blank">React PureRender mixin</a>, except that <em>state</em> changes are still always processed.
 If a component provides its own <code>shouldComponentUpdate</code>, that one takes precedence.
 See for an explanation this <a href="https://github.com/mobxjs/mobx/issues/101" target="_blank">github issue</a></p>
+<h2 id="-componentwillreact-lifecycle-hook"><code>componentWillReact</code> (lifecycle hook)</h2>
+<p>React components usually render on a fresh stack, so that makes it often hard to figure out what <em>caused</em> a component to re-render.
+When using <code>mobx-react</code> you can define a new life cycle hook, <code>componentWillReact</code> (pun intended) that will be triggered when a component will be scheduled to re-render because
+data it observes has changed. This makes it easy to trace renders back to the action that caused the rendering.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>;
+
+@observer <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoView</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
+    componentWillReact() {
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;I will re-render, since the todo has changed!&quot;</span>);    
+    }
+
+    render() {
+        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>this.props.todo.title<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>   
+    }   
+}
+</span></code></pre>
+<ul>
+<li><code>componentWillReact</code> doesn&apos;t take arguments</li>
+<li><code>componentWillReact</code> won&apos;t fire before the initial render (use <code>componentWillMount</code> instead)</li>
+<li><code>componentWillReact</code> won&apos;t fire when receiving new props or after <code>setState</code> calls (use <code>componentWillUpdate</code> instead)</li>
+</ul>
 <h2 id="optimizing-components">Optimizing components</h2>
 <p>See the relevant <a href="../best/react-performance.html">section</a>.</p>
 <h2 id="mobx-react-devtools">MobX-React-DevTools</h2>
@@ -865,7 +886,7 @@ See the <a href="../best/devtools.html">DevTools</a> section.</p>
 
 <script>
 require(["gitbook"], function(gitbook) {
-    var config = {"fontSettings":{"theme":null,"family":"sans","size":2},"edit-link":{"base":"https://github.com/mweststrate/mobservable/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"}};
+    var config = {"fontSettings":{"theme":null,"family":"sans","size":2},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobx"}};
     gitbook.start(config);
 });
 </script>
