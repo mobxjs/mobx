@@ -125,4 +125,4 @@ but it will also cause the `button` (or any other component) to be always re-ren
 Decorators are not supported by default when using TypeScript or Babel pending a definitive definition in the ES standard.
 * For _typescript_, enable the `--experimentalDecorators` compiler flag or set the compiler option `experimentalDecorators` to `true` in `tsconfig.json` (Recommended)
 * For _babel5_, make sure `--stage 0` is passed to the Babel CLI
-* For _babel6_, see the example configuration as suggested in this [issue](https://github.com/mobxjs/mobx/issues/105)
+* For _babel6_, see the example configuration as suggested in this [issue](https://github.com/mobxjs/mobx/issues/105). In short, use the transform plugin `transform-decorators-legacy` and make sure it is first in the plugins list!

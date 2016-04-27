@@ -1,6 +1,6 @@
 # @observable
 
-Decorator that can be used on ES6 or TypeScript class properties to make them observable.
+Decorator that can be used on ES7- or TypeScript class properties to make them observable.
 The @observable can be used on instance fields and property getters.
 This offers fine-grained control on which parts of your object become observable.
 

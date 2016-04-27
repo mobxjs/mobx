@@ -92,6 +92,17 @@ will return the same dimensions after each run. `asStructure` signals to MobX th
 if the value returned by the computed has _structurally_ changed (by default strict equality is used to determine whether observers need to be notified).
 This means that a new object that is returned from `viewPortSize` won't trigger a `render` if its contents are (structurally) the same as the previous value.   
 
+To use the `asStructure` modifier in combination with the `@computed` decorator, use the following:
+
+```javascript
+@computed({ asStructure: true }) get viewPortSize() {
+    return {
+        width: Math.max(screenSize.width, minSize.width),
+        height: Math.max(screenSize.height, minSize.height)
+    }
+}
+```
+
 ## asFlat
 
 Similar to `asReference`, except that `asFlat` does not prevent its value to become observable, but only the children of the value.
