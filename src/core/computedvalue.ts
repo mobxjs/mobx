@@ -2,8 +2,8 @@ import {IObservable, reportObserved, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction, isComputingDerivation} from "./derivation";
 import {globalState, getNextId} from "./globalstate";
 import {valueDidChange, invariant, Lambda} from "../utils/utils";
-import {reportTransition} from "../api/extras";
 import {autorun} from "../api/autorun";
+import {hasListeners, notifyListeners} from "../types/listen-utils";
 
 /**
  * A node in the state dependency root that observes other nodes, and can be observed itself.
@@ -69,7 +69,6 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 
 	onDependenciesReady(): boolean {
 		const changed = this.trackAndCompute();
-		reportTransition(this, "READY", changed);
 		return changed;
 	}
 
@@ -109,9 +108,15 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 	}
 
 	private trackAndCompute(): boolean {
-		let oldValue = this.value;
-		this.value = trackDerivedFunction(this, this.peek);
-		return valueDidChange(this.compareStructural, this.value, oldValue);
+		const oldValue = this.value;
+		const newValue = this.value = trackDerivedFunction(this, this.peek);
+		if (hasListeners(globalState))
+			notifyListeners(globalState, {
+				object: this,
+				type: "compute",
+				newValue, oldValue
+			});
+		return valueDidChange(this.compareStructural, newValue, oldValue);
 	}
 
 	observe(listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda {

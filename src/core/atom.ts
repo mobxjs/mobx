@@ -1,7 +1,6 @@
 import {IObservable, propagateReadiness, propagateStaleness, reportObserved} from "./observable";
 import {invariant, noop} from "../utils/utils";
 import {globalState, getNextId} from "./globalstate";
-import {reportTransition} from "../api/extras";
 import {runReactions} from "./reaction";
 
 export interface IAtom extends IObservable {
@@ -14,7 +13,6 @@ export interface IAtom extends IObservable {
 export function propagateAtomReady(atom: IAtom) {
 	invariant(atom.isDirty, "atom not dirty");
 	atom.isDirty = false;
-	reportTransition(atom, "READY", true);
 	propagateReadiness(atom, true);
 }
 
@@ -56,7 +54,6 @@ export class Atom implements IAtom {
 	private reportStale() {
 		if (!this.isDirty) {
 			this.isDirty = true;
-			reportTransition(this, "STALE");
 			propagateStaleness(this);
 		}
 	}

@@ -1,5 +1,6 @@
 import {Lambda, once} from "../utils/utils";
-import {globalState} from "../core/globalstate";
+import {globalState, MobXGlobals} from "../core/globalstate";
+import {untracked} from "../core/observable";
 
 export interface IListenable {
 	changeListeners: Function[];
@@ -20,15 +21,20 @@ export function registerListener<T>(listenable: IListenable, handler: Function):
 }
 
 export function notifyListeners<T>(listenable: IListenable, change: T, supressGlobalEvent?: boolean, changeNormalizer? : (change: T, callback: Function) => void) {
-	if (listenable !== globalState && globalState.changeListeners.length > 0 && supressGlobalEvent !== true)
-		notifyListeners.apply(globalState, change); // global state events are never normalized
-	const listeners = listenable.changeListeners.slice();
-	if (changeNormalizer) {
-		for (let i = 0, l = listeners.length; i < l; i++)
-			changeNormalizer(change, listeners[i]);
-	}
-	else {
-		for (let i = 0, l = listeners.length; i < l; i++)
-			listeners[i](change);
-	}
+	untracked(() => {
+		if (!(listenable instanceof MobXGlobals) && globalState.changeListeners.length > 0 && supressGlobalEvent !== true)
+			notifyListeners(globalState, change); // global state events are never normalized
+		let listeners = listenable.changeListeners;
+		if (!listeners)
+			return;
+		listeners = listeners.slice();
+		if (changeNormalizer) {
+			for (let i = 0, l = listeners.length; i < l; i++)
+				changeNormalizer(change, listeners[i]);
+		}
+		else {
+			for (let i = 0, l = listeners.length; i < l; i++)
+				listeners[i](change);
+		}
+	});
 }

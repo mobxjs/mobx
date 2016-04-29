@@ -1,8 +1,8 @@
 import {IObservable, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction} from "./derivation";
 import {globalState, getNextId} from "./globalstate";
-import {reportTransition} from "../api/extras";
 import {EMPTY_ARRAY, Lambda} from "../utils/utils";
+import {hasListeners, notifyListeners} from "../types/listen-utils";
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations
@@ -66,11 +66,15 @@ export class Reaction implements IDerivation {
 		if (!this.isDisposed) {
 			this._isScheduled = false;
 			this.onInvalidate();
-			reportTransition(this, "READY", true); // a reaction has always 'changed'.
 		}
 	}
 
 	track(fn: () => void) {
+		if (hasListeners(globalState))
+			notifyListeners(globalState, {
+				object: this,
+				type: "react"
+			});
 		trackDerivedFunction(this, fn);
 	}
 

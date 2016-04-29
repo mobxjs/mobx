@@ -1,6 +1,5 @@
 import {IObservable, IDepTreeNode, propagateReadiness, propagateStaleness, addObserver, removeObserver} from "./observable";
 import {quickDiff, invariant} from "../utils/utils";
-import {reportTransition} from "../api/extras";
 import {globalState, resetGlobalState} from "./globalstate";
 
 /**
@@ -29,7 +28,6 @@ export function checkIfStateModificationsAreAllowed() {
  */
 export function notifyDependencyStale(derivation: IDerivation) {
 	if (++derivation.dependencyStaleCount === 1) {
-		reportTransition(derivation, "STALE");
 		propagateStaleness(derivation);
 	}
 }
@@ -48,12 +46,10 @@ export function notifyDependencyReady(derivation: IDerivation, dependencyDidChan
 		if (derivation.dependencyChangeCount > 0) {
 			// did any of the observables really change?
 			derivation.dependencyChangeCount = 0;
-			reportTransition(derivation, "PENDING");
 			const changed = derivation.onDependenciesReady();
 			propagateReadiness(derivation, changed);
 		} else {
 			// we're done, but didn't change, lets make sure verybody knows..
-			reportTransition(derivation, "READY", false);
 			propagateReadiness(derivation, false);
 		}
 	}

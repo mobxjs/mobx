@@ -6,13 +6,13 @@ import {hasInterceptors, IInterceptable, IInterceptor, registerInterceptor, inte
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 
 export interface IValueWillChange<T> {
-	object: ObservableValue<T>;
+	object: any;
 	type: "set";
 	newValue: T;
 }
 
 export interface IValueDidChange<T> {
-	object: ObservableValue<T>;
+	object: any;
 	type: "set";
 	newValue: T;
 	oldValue: T;

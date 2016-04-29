@@ -21,14 +21,17 @@ registerGlobals();
 
 export { Lambda                                               } from "./utils/utils";
 export { SimpleEventEmitter, ISimpleEventListener             } from "./utils/simpleeventemitter";
-export { ITransitionEvent, IObserverTree, IDependencyTree     } from "./api/extras";
+export { IObserverTree, IDependencyTree                       } from "./api/extras";
 export { IObservable, IDepTreeNode, untracked                 } from "./core/observable";
 export { IDerivation                                          } from "./core/derivation";
 
 export { asReference, asFlat, asStructure                     } from "./types/modifiers";
 export { IInterceptable, IInterceptor                         } from "./types/intercept-utils";
-export { IObjectDidChange, isObservableObject } from "./types/observableobject";
-export { IObservableArray, IArrayDidChange, IArrayDidSplice, isObservableArray, fastArray } from "./types/observablearray";
+export { IListenable                                          } from "./types/listen-utils";
+export { IObjectWillChange, IObjectDidChange, isObservableObject } from "./types/observableobject";
+export { IValueDidChange, IValueWillChange                    } from "./types/observablevalue";
+
+export { IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayDidChange, IArrayDidSplice, isObservableArray, fastArray } from "./types/observablearray";
 export { IKeyValueMap, ObservableMap, IMapEntries, IMapWillChange, IMapDidChange, isObservableMap, map } from "./types/observablemap"
 
 export { action                                               } from "./api/action";
@@ -55,7 +58,7 @@ export const _ = {
 	resetGlobalState
 };
 
-import { ITransitionEvent, IObserverTree, IDependencyTree } from "./api/extras";
+import { IObserverTree, IDependencyTree } from "./api/extras";
 import { getDependencyTree, getObserverTree, trackTransitions, allowStateChanges } from "./api/extras";
 import { Lambda } from "./utils/utils";
 import { isComputingDerivation } from "./core/derivation";
