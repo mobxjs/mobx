@@ -68,6 +68,7 @@ interface IObservableArrayAdministration<T> extends IInterceptable<IArrayWillCha
 	mode: ValueMode;
 	array: IObservableArray<T>;
 	makeChildReactive: (item: T) => T;
+	owned: boolean; // If owned by another object, supress global events for this object (e.g: keys in observableMap)
 }
 
 function getArrayLength(adm: IObservableArrayAdministration<any>): number {
@@ -158,7 +159,7 @@ function notifyArrayChildUpdate<T>(adm: IObservableArrayAdministration<T>, index
 			index,
 			newValue,
 			oldValue
-		});
+		}, adm.owned);
 	}
 }
 
@@ -176,14 +177,14 @@ function notifyArraySplice<T>(adm: IObservableArrayAdministration<T>, index: num
 			removedCount: removed.length,
 			added,
 			addedCount: added.length
-		});
+		}, adm.owned);
 	}
 }
 
 export class ObservableArray<T> extends StubArray {
 	private $mobx: IObservableArrayAdministration<T>;
 
-	constructor(initialValues: T[], mode: ValueMode, name: string) {
+	constructor(initialValues: T[], mode: ValueMode, name: string, owned = false) {
 		super();
 		const adm = this.$mobx = <IObservableArrayAdministration<T>> {
 			atom: new Atom(name || "ObservableArray"),
@@ -193,6 +194,7 @@ export class ObservableArray<T> extends StubArray {
 			array: this as any,
 			makeChildReactive: (v) => makeReactiveArrayItem.call(adm, v),
 			interceptors: null,
+			owned,
 			changeListeners: null
 		};
 		Object.defineProperty(this, "$mobx", {

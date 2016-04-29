@@ -37,7 +37,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	private _valueMode: ValueMode;
 	public name = "ObservableMap";
 	public id = getNextId();
-	private _keys: IObservableArray<string> = <any> new ObservableArray(null, ValueMode.Reference, `${this.name}@${this.id} / keys()`);
+	private _keys: IObservableArray<string> = <any> new ObservableArray(null, ValueMode.Reference, `${this.name}@${this.id} / keys()`, true);
 	interceptors = null;
 	changeListeners = null;
 
@@ -91,7 +91,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		}
 		else {
 			transaction(() => {
-				this._data[key] = new ObservableValue(value, this._valueMode, `${this.name}@${this.id} / Entry "${key}"`);
+				this._data[key] = new ObservableValue(value, this._valueMode, `${this.name}@${this.id} / Entry "${key}"`, true);
 				this._updateHasMapEntry(key, true);
 				this._keys.push(key);
 			});
@@ -142,7 +142,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		if (entry) {
 			entry.set(value);
 		} else {
-			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, `${this.name}@${this.id} / Contains "${key}"`);
+			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, `${this.name}@${this.id} / Contains "${key}"`, true);
 		}
 		return entry;
 	}

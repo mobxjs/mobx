@@ -97,7 +97,7 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 				return;
 			value = change.newValue;
 		}
-		observable = new ObservableValue(value, adm.mode, name);
+		observable = new ObservableValue(value, adm.mode, name, true);
 	}
 
 	adm.values[propName] = observable;

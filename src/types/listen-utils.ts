@@ -19,8 +19,8 @@ export function registerListener<T>(listenable: IListenable, handler: Function):
 	});
 }
 
-export function notifyListeners<T>(listenable: IListenable, change: T, changeNormalizer? : (change: T, callback: Function) => void) {
-	if (listenable !== globalState && globalState.changeListeners.length > 0)
+export function notifyListeners<T>(listenable: IListenable, change: T, supressGlobalEvent?: boolean, changeNormalizer? : (change: T, callback: Function) => void) {
+	if (listenable !== globalState && globalState.changeListeners.length > 0 && supressGlobalEvent !== true)
 		notifyListeners.apply(globalState, change); // global state events are never normalized
 	const listeners = listenable.changeListeners.slice();
 	if (changeNormalizer) {
