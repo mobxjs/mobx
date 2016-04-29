@@ -2,10 +2,10 @@ import {ObservableValue} from "./observablevalue";
 import {ComputedValue} from "../core/computedvalue";
 import {ValueMode, AsStructure} from "./modifiers";
 import {Lambda, invariant, assertPropertyConfigurable, isPlainObject} from "../utils/utils";
-import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {getNextId} from "../core/globalstate";
 import {throwingComputedValueSetter} from "../api/computeddecorator";
 import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "./intercept-utils";
+import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 
 export interface IObjectDidChange {
 	name: string;
@@ -23,14 +23,13 @@ export interface IObjectWillChange {
 
 const ObservableObjectMarker = {};
 
-export interface IObservableObjectAdministration extends IInterceptable<IObjectWillChange> {
+export interface IObservableObjectAdministration extends IInterceptable<IObjectWillChange>, IListenable {
 	type: Object;
 	target: any;
 	name: string;
 	id: number;
 	mode: ValueMode;
 	values: {[key: string]: ObservableValue<any>|ComputedValue<any>};
-	events: SimpleEventEmitter;
 }
 
 export interface IIsObservableObject {
@@ -52,11 +51,11 @@ export function asObservableObject(target, name: string, mode: ValueMode = Value
 	const adm: IObservableObjectAdministration = {
 		type: ObservableObjectMarker,
 		values: {},
-		events: undefined,
 		id: getNextId(),
 		target, name, mode,
 		interceptors: null,
-		intercept: interceptObjectChange
+		intercept: interceptObjectChange,
+		changeListeners: null
 	};
 	Object.defineProperty(target, "$mobx", {
 		enumerable: false,
@@ -114,8 +113,8 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 	});
 
 	if (!isComputed) {
-		if (adm.events !== undefined) {
-			adm.events.emit(<IObjectDidChange> {
+		if (hasListeners(adm)) {
+			notifyListeners(adm, <IObjectDidChange> {
 				type: "add",
 				object: adm.target,
 				name: propName,
@@ -140,8 +139,8 @@ function createSetter(adm: IObservableObjectAdministration, observable: Observab
 			newValue = change.newValue;
 		}
 		const changed = observable.set(newValue);
-		if (changed && adm.events !== undefined) {
-			adm.events.emit(<IObjectDidChange> {
+		if (changed && hasListeners(adm)) {
+			notifyListeners(adm, <IObjectDidChange> {
 				type: "update",
 				object: this,
 				name: propName,
@@ -160,10 +159,7 @@ function createSetter(adm: IObservableObjectAdministration, observable: Observab
 export function observeObservableObject(object: IIsObservableObject, callback: (changes: IObjectDidChange) => void, fireImmediately?: boolean): Lambda {
 	invariant(isObservableObject(object), "Expected observable object");
 	invariant(fireImmediately !== true, "`observe` doesn't support the fire immediately property for observable objects.");
-	const adm = object.$mobx;
-	if (adm.events === undefined)
-		adm.events = new SimpleEventEmitter();
-	return object.$mobx.events.on(callback);
+	return registerListener(object.$mobx, callback);
 }
 
 export function isObservableObject(thing): boolean {

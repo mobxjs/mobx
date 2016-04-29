@@ -1,11 +1,11 @@
 import {ValueMode, assertUnwrapped, getValueModeFromModifierFunc} from "./modifiers";
-import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {transaction} from "../core/transaction";
 import {ObservableArray, IObservableArray} from "./observablearray";
 import {ObservableValue} from "./observablevalue";
-import {isPlainObject, Lambda} from "../utils/utils";
+import {isPlainObject, Lambda, invariant} from "../utils/utils";
 import {getNextId} from "../core/globalstate";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
+import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 
 export interface IKeyValueMap<V> {
 	[key: string]: V;
@@ -30,16 +30,16 @@ export interface IMapWillChange<T> {
 
 const ObservableMapMarker = {};
 
-export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>> {
+export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, IListenable {
 	$mobx = ObservableMapMarker;
 	private _data: { [key: string]: ObservableValue<V> } = {};
 	private _hasMap: { [key: string]: ObservableValue<boolean> } = {}; // hasMap, not hashMap >-).
 	private _valueMode: ValueMode;
-	private _events = undefined;
 	public name = "ObservableMap";
 	public id = getNextId();
 	private _keys: IObservableArray<string> = <any> new ObservableArray(null, ValueMode.Reference, `${this.name}@${this.id} / keys()`);
 	interceptors = null;
+	changeListeners = null;
 
 	constructor(initialData?: IMapEntries<V> | IKeyValueMap<V>, valueModeFunc?: Function) {
 		this._valueMode = getValueModeFromModifierFunc(valueModeFunc);
@@ -79,8 +79,8 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>> {
 		if (this._has(key)) {
 			const oldValue = (<any>this._data[key]).value;
 			const changed = this._data[key].set(value);
-			if (changed && this._events) {
-				this._events.emit(<IMapDidChange<V>>{
+			if (changed && hasListeners(this)) {
+				notifyListeners(this, <IMapDidChange<V>>{
 					type: "update",
 					object: this,
 					name: key,
@@ -95,12 +95,14 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>> {
 				this._updateHasMapEntry(key, true);
 				this._keys.push(key);
 			});
-			this._events && this._events.emit(<IMapDidChange<V>>{
-				type: "add",
-				object: this,
-				name: key,
-				newValue: value
-			});
+			if (hasListeners(this)) {
+				notifyListeners(this, <IMapDidChange<V>>{
+					type: "add",
+					object: this,
+					name: key,
+					newValue: value
+				});
+			}
 		}
 	}
 
@@ -123,12 +125,14 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>> {
 				observable.set(undefined);
 				this._data[key] = undefined;
 			});
-			this._events && this._events.emit(<IMapDidChange<V>>{
-				type: "delete",
-				object: this,
-				name: key,
-				oldValue
-			});
+			if (hasListeners(this)) {
+				notifyListeners(this, <IMapDidChange<V>>{
+					type: "delete",
+					object: this,
+					name: key,
+					oldValue
+				});
+			}
 		}
 	}
 
@@ -218,10 +222,9 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>> {
 	 * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
 	 * for callback details
 	 */
-	observe(callback: (changes: IMapDidChange<V>) => void): Lambda {
-		if (!this._events)
-			this._events = new SimpleEventEmitter();
-		return this._events.on(callback);
+	observe(listener: (changes: IMapDidChange<V>) => void, fireImmediately?: boolean): Lambda {
+		invariant(fireImmediately !== true, "`observe` doesn't support the fire immediately property for observable maps.");
+		return registerListener(this, listener);
 	}
 
 	intercept(handler: IInterceptor<IMapWillChange<V>>): Lambda {

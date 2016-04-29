@@ -1,9 +1,9 @@
 import {deepEquals, makeNonEnumerable, Lambda, deprecated, EMPTY_ARRAY} from "../utils/utils";
 import {Atom} from "../core/atom";
-import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {ValueMode, assertUnwrapped, makeChildObservable} from "./modifiers";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
+import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 
 export interface IObservableArray<T> extends Array<T> {
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[];
@@ -61,10 +61,9 @@ export class StubArray {
 }
 StubArray.prototype = [];
 
-interface IObservableArrayAdministration<T> extends IInterceptable<IArrayWillChange<T> | IArrayWillSplice<T>> {
+interface IObservableArrayAdministration<T> extends IInterceptable<IArrayWillChange<T> | IArrayWillSplice<T>>, IListenable {
 	atom: Atom;
 	values: T[];
-	changeEvent: SimpleEventEmitter;
 	lastKnownLength: number;
 	mode: ValueMode;
 	array: IObservableArray<T>;
@@ -152,8 +151,8 @@ function makeReactiveArrayItem(value) {
 function notifyArrayChildUpdate<T>(adm: IObservableArrayAdministration<T>, index: number, newValue: T, oldValue: T) {
 	adm.atom.reportChanged();
 	// conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-	if (adm.changeEvent) {
-		adm.changeEvent.emit(<IArrayDidChange<T>> {
+	if (hasListeners(adm)) {
+		notifyListeners(adm, <IArrayDidChange<T>> {
 			object: <IObservableArray<T>><any> adm.array,
 			type: "update",
 			index,
@@ -168,8 +167,8 @@ function notifyArraySplice<T>(adm: IObservableArrayAdministration<T>, index: num
 		return;
 	adm.atom.reportChanged();
 	// conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-	if (adm.changeEvent) {
-		adm.changeEvent.emit(<IArrayDidSplice<T>> {
+	if (hasListeners(adm)) {
+		notifyListeners(adm, <IArrayDidSplice<T>> {
 			object: adm.array as any,
 			type: "splice",
 			index,
@@ -189,12 +188,12 @@ export class ObservableArray<T> extends StubArray {
 		const adm = this.$mobx = <IObservableArrayAdministration<T>> {
 			atom: new Atom(name || "ObservableArray"),
 			values: undefined,
-			changeEvent: undefined,
 			lastKnownLength: 0,
 			mode: mode,
 			array: this as any,
 			makeChildReactive: (v) => makeReactiveArrayItem.call(adm, v),
-			interceptors: null
+			interceptors: null,
+			changeListeners: null
 		};
 		Object.defineProperty(this, "$mobx", {
 			enumerable: false,
@@ -214,8 +213,6 @@ export class ObservableArray<T> extends StubArray {
 	}
 
 	observe(listener: (changeData: IArrayDidChange<T>|IArrayDidSplice<T>) => void, fireImmediately = false): Lambda {
-		if (this.$mobx.changeEvent === undefined)
-			this.$mobx.changeEvent = new SimpleEventEmitter();
 		if (fireImmediately) {
 			listener(<IArrayDidSplice<T>>{
 				object: this as any,
@@ -227,7 +224,7 @@ export class ObservableArray<T> extends StubArray {
 				removedCount: 0
 			});
 		}
-		return this.$mobx.changeEvent.on(listener);
+		return registerListener(this.$mobx, listener);
 	}
 
 	clear(): T[] {
