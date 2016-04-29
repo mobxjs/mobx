@@ -130,6 +130,7 @@ function createSetter(adm: IObservableObjectAdministration, observable: Observab
 		const oldValue = (observable as any).value;
 		if (hasInterceptors(adm)) {
 			const change = interceptChange(adm, {
+				type: "object",
 				object: this,
 				name: propName,
 				newValue

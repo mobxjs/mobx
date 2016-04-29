@@ -62,6 +62,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>> {
 	}
 
 	set(key: string, value: V) {
+		// TODO: rename params to leverage object structurings everywhere :)
 		this.assertValidKey(key);
 		assertUnwrapped(value, `[mobx.map.set] Expected unwrapped value to be inserted to key '${key}'. If you need to use modifiers pass them as second argument to the constructor`);
 		if (hasInterceptors(this)) {

@@ -315,5 +315,6 @@ test('strict mode checks', function(t) {
         });
     });
 
+	mobx.extras.resetGlobalState();
     t.end();
 });
