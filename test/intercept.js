@@ -110,6 +110,9 @@ test('intercept object', t => {
 	t.equal(a.b, 16, "attribute selector applied last");
 	
 	var d3 = intercept(a, c => {
+		t.equal(c.name, "b"),
+		t.equal(c.object, a);
+		t.equal(c.type, "update");
 		return null;
 	})
 	
@@ -121,8 +124,9 @@ test('intercept object', t => {
 	t.equal(a.b, 22, "interceptor applied again");
 	
 	var d4 = intercept(a, c => {
-		if (c.type === "add")
+		if (c.type === "add") {
 			return null;
+		}
 		return c;
 	});
 	
@@ -162,6 +166,9 @@ test('intercept map', t => {
 	t.equal(a.get("b"), 16, "attribute selector applied last");
 	
 	var d3 = intercept(a, c => {
+		t.equal(c.name, "b"),
+		t.equal(c.object, a);
+		t.equal(c.type, "update");
 		return null;
 	})
 	

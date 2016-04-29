@@ -60,9 +60,10 @@ export function propagateReadiness(observable: IObservable|IDerivation, valueDid
 
 /**
  * TODO: just delete this, and introduce peek() on observables (and computed) instead? This is unelegant and unecessarily weird.
+ * TODO: undeprecate if used by @action
  */
 export function untracked<T>(action: () => T): T {
-	deprecated("This feature is experimental and might be removed in a future minor release. Please report if you use this feature in production: https://github.com/mobxjs/mobx/issues/49");
+	deprecated("This feature is exxperimental and might be removed in a future minor release. Please report if you use this feature in production: https://github.com/mobxjs/mobx/issues/49");
 	globalState.inUntracked++;
 	const res = action();
 	globalState.inUntracked--;

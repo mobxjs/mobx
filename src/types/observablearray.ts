@@ -100,9 +100,6 @@ function updateArrayLength(adm: IObservableArrayAdministration<any>, oldLength: 
 
 function spliceWithArray<T>(adm: IObservableArrayAdministration<T>, index: number, deleteCount?: number, newItems?: T[]): T[] {
 	const length = adm.values.length;
-	// TODO: remove this early exit to make it interceptable?
-	if  ((newItems === undefined || newItems.length === 0) && (deleteCount === 0 || length === 0))
-		return EMPTY_ARRAY;
 
 	if (index === undefined)
 		index = 0;
