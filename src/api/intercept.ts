@@ -1,4 +1,4 @@
-import {IInterceptor} from "../types/interceptable";
+import {IInterceptor} from "../types/intercept-utils";
 import {IObservableArray, IArrayWillChange, IArrayWillSplice, isObservableArray} from "../types/observablearray";
 import {ObservableMap, IMapWillChange, isObservableMap} from "../types/observablemap";
 import {IObjectWillChange, IIsObservableObject, isObservableObject} from "../types/observableobject";

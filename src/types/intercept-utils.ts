@@ -23,13 +23,11 @@ export function registerInterceptor<T>(interceptable: IInterceptable<T>, handler
 
 export function interceptChange<T>(interceptable: IInterceptable<T>, change: T): T {
 	const interceptors = interceptable.interceptors;
-	if (interceptors) {
-		for (let i = 0, l = interceptors.length; i < l; i++) {
-			change = interceptors[i](change);
-			invariant(!change || (change as any).type, "Intercept handlers should return nothing or a change object");
-			if (!change)
-				return null;
-		}
+	for (let i = 0, l = interceptors.length; i < l; i++) {
+		change = interceptors[i](change);
+		invariant(!change || (change as any).type, "Intercept handlers should return nothing or a change object");
+		if (!change)
+			return null;
 	}
 	return change;
 }

@@ -1,16 +1,17 @@
 import {IAtom} from "./atom";
 import {IDerivation} from "./derivation";
 import {Reaction} from "./reaction";
+import {IListenable} from "../types/listen-utils";
 
 declare const global: any;
 
-export class MobXGlobals {
+export class MobXGlobals implements IListenable {
 	/**
 	 * MobXGlobals version.
 	 * MobX compatiblity with other versions loaded in memory as long as this version matches.
 	 * It indicates that the global state still stores similar information
 	 */
-	version = 1;
+	version = 2;
 
 	/**
 	 * Stack of currently running derivations
@@ -60,6 +61,11 @@ export class MobXGlobals {
 	 * Used by createTransformer to detect that the global state has been reset.
 	 */
 	resetId = 0;
+
+	/**
+	 * Listeners that listen to global events, mainly for debug / dev purposes.
+	 */
+	changeListeners = [];
 }
 
 export const globalState = (() => {

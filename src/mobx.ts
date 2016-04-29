@@ -26,7 +26,7 @@ export { IObservable, IDepTreeNode, untracked                 } from "./core/obs
 export { IDerivation                                          } from "./core/derivation";
 
 export { asReference, asFlat, asStructure                     } from "./types/modifiers";
-export { IInterceptable, IInterceptor                         } from "./types/interceptable";
+export { IInterceptable, IInterceptor                         } from "./types/intercept-utils";
 export { IObjectDidChange, isObservableObject } from "./types/observableobject";
 export { IObservableArray, IArrayDidChange, IArrayDidSplice, isObservableArray, fastArray } from "./types/observablearray";
 export { IKeyValueMap, ObservableMap, IMapEntries, IMapWillChange, IMapDidChange, isObservableMap, map } from "./types/observablemap"

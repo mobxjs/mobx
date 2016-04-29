@@ -2,8 +2,8 @@ import {Atom} from "../core/atom";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} from "./modifiers";
 import {valueDidChange, Lambda} from "../utils/utils";
-import {SimpleEventEmitter} from "../utils/simpleeventemitter";
-import {hasInterceptors, IInterceptable, IInterceptor, registerInterceptor, interceptChange} from "./interceptable";
+import {hasInterceptors, IInterceptable, IInterceptor, registerInterceptor, interceptChange} from "./intercept-utils";
+import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 
 export interface IValueWillChange<T> {
 	object: ObservableValue<T>;
@@ -11,10 +11,17 @@ export interface IValueWillChange<T> {
 	newValue: T;
 }
 
-export class ObservableValue<T> extends Atom implements IInterceptable<IValueWillChange<T>> {
+export interface IValueDidChange<T> {
+	object: ObservableValue<T>;
+	type: "set";
+	newValue: T;
+	oldValue: T;
+}
+
+export class ObservableValue<T> extends Atom implements IInterceptable<IValueWillChange<T>>, IListenable {
 	hasUnreportedChange = false;
 	interceptors;
-	private events: SimpleEventEmitter = null;
+	changeListeners;
 	protected value: T = undefined;
 
 	constructor(value: T, protected mode: ValueMode, name = "ObservableValue") {
@@ -40,8 +47,13 @@ export class ObservableValue<T> extends Atom implements IInterceptable<IValueWil
 		if (changed) {
 			this.value = makeChildObservable(newValue, this.mode, this.name);
 			this.reportChanged();
-			if (this.events)
-				this.events.emit(newValue, oldValue);
+			if (hasListeners(this))
+				notifyListeners(this, <IValueDidChange<T>> {
+					object: this,
+					type: "set",
+					newValue,
+					oldValue
+				}, normalizeChangeEvent);
 		}
 		return changed;
 	}
@@ -56,14 +68,16 @@ export class ObservableValue<T> extends Atom implements IInterceptable<IValueWil
 	}
 
 	observe(listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda {
-		if (!this.events)
-			this.events = new SimpleEventEmitter();
 		if (fireImmediately)
 			listener(this.value, undefined);
-		return this.events.on(listener);
+		return registerListener(this, listener);
 	}
 
 	toString() {
 		return `${this.name}@${this.id}[${this.value}]`;
 	}
+}
+
+export function normalizeChangeEvent<T>({newValue, oldValue}: IValueDidChange<T>, listener) {
+	listener(newValue, oldValue);
 }

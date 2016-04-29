@@ -1,9 +1,13 @@
-import {once, Lambda} from "./utils";
+import {once, Lambda, deprecated} from "./utils";
 
 export type ISimpleEventListener = {(...data: any[]): void}
 
 export class SimpleEventEmitter {
 	listeners: ISimpleEventListener[] = [];
+
+	constructor() {
+		deprecated("extras.SimpleEventEmitter is deprecated and will be removed in the next major release");
+	}
 
 	emit(...data: any[]);
 	emit() {

@@ -3,7 +3,7 @@ import {Atom} from "../core/atom";
 import {SimpleEventEmitter} from "../utils/simpleeventemitter";
 import {ValueMode, assertUnwrapped, makeChildObservable} from "./modifiers";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
-import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./interceptable";
+import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
 
 export interface IObservableArray<T> extends Array<T> {
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[];
