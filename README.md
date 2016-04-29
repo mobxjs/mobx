@@ -104,7 +104,7 @@ React.render(<TodoListView todoList={store} />, document.getElementById('mount')
 Also, reactions can be created using the [`autorun`](http://mobxjs.github.io/mobx/refguide/autorun.html), [`autorunAsync`](http://mobxjs.github.io/mobx/refguide/autorun-async.html) or [`when`](http://mobxjs.github.io/mobx/refguide/when.html) functions to fit your specific situations.
 
 When using MobX there are no smart or dumb components.
-All components render smartly but are defined in a dumb manner. MobX will simple make sure the components are always re-rendered whenever needed,
+All components render smartly but are defined in a dumb manner. MobX will simply make sure the components are always re-rendered whenever needed,
 but also no more than that.
 So the `onClick` handler in the above example will force the proper `TodoView` to render,
 and it will cause the `TodoListView` to render if the number of unfinished tasks has changed.
