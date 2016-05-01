@@ -1,6 +1,7 @@
 import {IObservable, IDepTreeNode, propagateReadiness, propagateStaleness, addObserver, removeObserver} from "./observable";
 import {quickDiff, invariant} from "../utils/utils";
 import {globalState, resetGlobalState} from "./globalstate";
+import {hasListeners, notifyListeners} from "../types/listen-utils";
 
 /**
  * A derivation is everything that can be derived from the state (all the atoms) in a pure manner.
@@ -72,12 +73,19 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 		return result;
 	} finally {
 		if (hasException) {
-			console.error(
+			const message = (
 				`[mobx] An uncaught exception occurred while calculating your computed value, autorun or transformer. Or inside the render method of a React component. ` +
 				`These methods should never throw exceptions as MobX will usually not be able to recover from them. ` +
 				`Please enable 'Pause on (caught) exceptions' in your debugger to find the root cause. In: '${derivation.name}#${derivation.id}'`
 			);
-
+			if (hasListeners(globalState)) {
+				notifyListeners(globalState, {
+					type: "error",
+					object: this,
+					message: message
+				});
+			}
+			console.error(message);
 			// Poor mans recovery attempt
 			// Assumption here is that this is the only exception handler in MobX.
 			// So functions higher up in the stack (like transanction) won't be modifying the globalState anymore after this call.

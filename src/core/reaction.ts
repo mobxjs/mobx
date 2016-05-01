@@ -70,12 +70,19 @@ export class Reaction implements IDerivation {
 	}
 
 	track(fn: () => void) {
-		if (hasListeners(globalState))
+		const notify = hasListeners(globalState);
+		if (notify) {
 			notifyListeners(globalState, {
 				object: this,
-				type: "react"
+				type: "reaction"
 			});
+		}
 		trackDerivedFunction(this, fn);
+		if (notify) {
+			notifyListeners(globalState, {
+				type: "end"
+			});
+		}
 	}
 
 	dispose() {

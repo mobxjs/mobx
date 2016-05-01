@@ -109,13 +109,16 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 
 	private trackAndCompute(): boolean {
 		const oldValue = this.value;
-		const newValue = this.value = trackDerivedFunction(this, this.peek);
-		if (hasListeners(globalState))
+		const notify = hasListeners(globalState);
+		if (notify) {
 			notifyListeners(globalState, {
 				object: this,
 				type: "compute",
-				newValue, oldValue
+				scope: this.scope
 			});
+		}
+		const newValue = this.value = trackDerivedFunction(this, this.peek);
+		// TODO: emit 'end'?
 		return valueDidChange(this.compareStructural, newValue, oldValue);
 	}
 

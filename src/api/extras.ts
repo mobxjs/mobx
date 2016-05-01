@@ -1,5 +1,5 @@
 import {IDepTreeNode} from "../core/observable";
-import {unique, Lambda} from "../utils/utils";
+import {unique, Lambda, deprecated} from "../utils/utils";
 import {globalState} from "../core/globalstate";
 import {registerListener} from "../types/listen-utils";
 
@@ -70,12 +70,16 @@ function createConsoleReporter(extensive: boolean) {
 */
 }
 
-export function trackTransitions(extensive = false, onReport?: (c) => void): Lambda {
-	return registerListener(globalState, change => {
-		if (onReport)
-			onReport(change);
-		console.log(change);
-	});
+export function trackTransitions(onReport?: (c) => void): Lambda {
+	if (typeof onReport === "boolean") {
+		deprecated("trackTransitions only takes a single callback function. If you are using the mobx-react-devtools, please update them first");
+		onReport = arguments[1];
+	}
+	if (!onReport) {
+		deprecated("trackTransitions without callback has been deprecated and is a no-op now. If you are using the mobx-react-devtools, please update them first");
+		return;
+	}
+	return registerListener(globalState, onReport);
 	// if (!transitionTracker)
 	// 	transitionTracker = new SimpleEventEmitter();
 

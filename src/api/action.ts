@@ -1,10 +1,14 @@
 import {transaction} from "../core/transaction";
 import {isObservableObject} from "../types/observableobject";
 import {invariant} from "../utils/utils";
+import {globalState} from "../core/globalstate";
+import {untracked} from "../core/observable";
+import {allowStateChanges} from "./extras";
+import {hasListeners, notifyListeners} from "../types/listen-utils";
 
 const tracing = true;
-
-export function reportStateChange(observableName, object, propertyName, newValue, oldValue, changed) {
+// TODO: remove stuff
+function reportStateChange(observableName, object, propertyName, newValue, oldValue, changed) {
 	if (tracing) {
 		console.groupCollapsed([
 			"changed '",
@@ -58,15 +62,27 @@ export function actionImplementation(actionName: string, fn?: Function): Functio
 }
 
 function executeWrapped(actionName: string, fn: Function, scope: any, args: IArguments) {
-	if (tracing) {
-		actionName = actionName + getNameForThis(this);
-		(console as any).groupCollapsed("%c" + actionName, "color: blue");
-	}
-	const res = transaction(() => fn.apply(scope, args));
-	if (tracing) {
-		console.groupEnd();
-	}
+	if (hasListeners(globalState))
+		notifyListeners(globalState, {
+			type: "action",
+			fn, scope, args
+		});
+	// TODO: unfold this to avoid 5 closures
+	const res = untracked(() => transaction(() => allowStateChanges(true, () => fn.apply(scope, args))));
+	if (hasListeners(globalState))
+		notifyListeners(globalState, {
+			type: "end"
+		});
 	return res;
+	// if (tracing) {
+	// 	actionName = actionName + getNameForThis(this);
+	// 	(console as any).groupCollapsed("%c" + actionName, "color: blue");
+	// }
+	// const res = transaction(() => fn.apply(scope, args));
+	// if (tracing) {
+	// 	console.groupEnd();
+	// }
+	// return res;
 }
 
 function getNameForThis(who) {

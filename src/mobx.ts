@@ -22,6 +22,7 @@ registerGlobals();
 export { Lambda                                               } from "./utils/utils";
 export { SimpleEventEmitter, ISimpleEventListener             } from "./utils/simpleeventemitter";
 export { IObserverTree, IDependencyTree                       } from "./api/extras";
+// TODO: move untracked to sane place
 export { IObservable, IDepTreeNode, untracked                 } from "./core/observable";
 export { IDerivation                                          } from "./core/derivation";
 
