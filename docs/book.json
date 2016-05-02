@@ -9,7 +9,7 @@
             "token": "UA-65632006-1"
         },
         "disqus": {
-            "shortName": "mobx"
+            "shortName": "mobservable"
         }
     }
 }
