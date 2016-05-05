@@ -1,3 +1,7 @@
+# 2.1.6
+
+* Fixed #236, #237 call stack issues when working with large arrays
+
 # 2.1.5
 
 * Fix #222 (by @andykog) run `observe` callback of computed properties in untracked mode.
