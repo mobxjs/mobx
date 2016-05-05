@@ -82,7 +82,7 @@ todos.shift();
 // Prints: 'Remaining: Make coffee, Take a nap'
 ```
 
-Due to limitations of native arrays in ES5 (`array.observe` is only available in ES7, and arrays cannot be extend),
+Due to limitations of native arrays in ES5 (`array.observe` is only available in ES7, and arrays cannot be extended),
 `observable` will instrument a clone of the provided array instead of the original one.
 In practice, these arrays work just as fine as native arrays and all native methods are supported, including index assignments, up-to and including the length of the array.
 
