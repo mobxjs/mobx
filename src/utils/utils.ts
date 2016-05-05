@@ -126,8 +126,8 @@ export function quickDiff<T>(current: T[], base: T[]): [T[], T[]] {
 	if (!current || !current.length)
 		return [[], base];
 
-	const added: T[] = [];
-	const removed: T[] = [];
+	let added: T[] = [];
+	let removed: T[] = [];
 
 	let currentIndex = 0,
 		currentSearch = 0,
@@ -163,23 +163,24 @@ export function quickDiff<T>(current: T[], base: T[]): [T[], T[]] {
 
 		if (!currentExhausted && current[currentSearch] === base[baseIndex]) {
 			// items where added
-			added.push(...current.slice(currentIndex, currentSearch));
+			added = added.concat(current.slice(currentIndex, currentSearch));
 			currentIndex = currentSearch + 1;
 			baseIndex ++;
 			isSearching = false;
 		}
 		else if (!baseExhausted && base[baseSearch] === current[currentIndex]) {
 			// items where removed
-			removed.push(...base.slice(baseIndex, baseSearch));
+			removed = removed.concat(base.slice(baseIndex, baseSearch));
 			baseIndex = baseSearch + 1;
 			currentIndex ++;
 			isSearching = false;
 		}
 	}
 
-	added.push(...current.slice(currentIndex));
-	removed.push(...base.slice(baseIndex));
-	return [added, removed];
+	return [
+		added.concat(current.slice(currentIndex)),
+		removed.concat(base.slice(baseIndex))
+	];
 }
 
 import {isObservableArray} from "../types/observablearray";

@@ -27,7 +27,10 @@ export function toJSON(source, detectCycles: boolean = true, __alreadySeen: [any
 		return source;
 	if (Array.isArray(source) || source instanceof ObservableArray) {
 		const res = cache([]);
-		res.push(...source.map(value => toJSON(value, detectCycles, __alreadySeen)));
+		const toAdd = source.map(value => toJSON(value, detectCycles, __alreadySeen));
+		res.length = toAdd.length;
+		for (let i = 0, l = toAdd.length; i < l; i++)
+			res[i] = toAdd[i];
 		return res;
 	}
 	if (source instanceof ObservableMap) {
