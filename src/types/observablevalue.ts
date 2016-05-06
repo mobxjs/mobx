@@ -66,7 +66,7 @@ export class ObservableValue<T> extends Atom implements IInterceptable<IValueWil
 		if (hasInterceptors(this)) {
 			const change = interceptChange<IValueWillChange<T>>(this, { object: this, type: "set", newValue });
 			if (!change)
-				return;
+				return UNCHANGED;
 			newValue = change.newValue;
 		}
 		const changed = valueDidChange(this.mode === ValueMode.Structure, this.value, newValue);

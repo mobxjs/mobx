@@ -1090,6 +1090,13 @@ test('json cycles', function(t) {
     t.end();
 })
 
+function stripSpyOutput(events) {
+	events.forEach(ev => {
+		delete ev.object;
+	});
+	return events;
+}
+
 test('issue 50', function(t) {
     m._.resetGlobalState();
     global.__mobxGlobal.mobxGuid = 0;
@@ -1109,8 +1116,8 @@ test('issue 50', function(t) {
         result = [x.a, x.b, x.c].join(",");
     });
 
-    var disposer2 = mobx.extras.trackTransitions(true, function(info) {
-        events.push([info.state, info.name]);
+    var disposer2 = mobx.spy(function(info) {
+        events.push(info);
     });
 
     setTimeout(function() {
@@ -1124,25 +1131,21 @@ test('issue 50', function(t) {
         t.equal(result, "false,true,true");
         t.equal(x.c, x.b);
 
-        t.deepEqual(events, [
-            'auto',
-            'calc c',
-            'transstart',
-            [ 'STALE', 'ObservableObject@1 / Prop "a"@2' ],
-            [ 'STALE', 'ar@5' ],
-            [ 'STALE', 'ObservableObject@1 / Prop "b"@3' ],
-            [ 'STALE', 'ObservableObject@1 / Prop "c"@4' ],
-            'transpreend',
-            [ 'READY', 'ObservableObject@1 / Prop "a"@2' ],
-            [ 'READY', 'ObservableObject@1 / Prop "b"@3' ],
-            [ 'PENDING', 'ObservableObject@1 / Prop "c"@4' ],
-            'calc c',
-            [ 'READY', 'ObservableObject@1 / Prop "c"@4' ],
-            [ 'PENDING',
-            'ar@5' ],
-            'auto',
-            [ 'READY', 'ar@5' ],
-            'transpostend'
+        t.deepEqual(stripSpyOutput(events), [
+			'auto',
+			'calc c',
+			{ name: 'anonymous transaction', spyReportStart: true, target: undefined, type: 'transaction' },
+			'transstart',
+			{ name: 'a', newValue: false, oldValue: true, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
+			{ name: 'b', newValue: true, oldValue: false, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
+			'transpreend',
+			{ target: { a: false, b: true }, type: 'compute' },
+			'calc c',
+			{ spyReportStart: true, type: 'reaction' },
+			'auto', 
+			{ spyReportEnd: true },
+			{ spyReportEnd: true },
+			'transpostend'			
         ]);
 
         disposer1();
@@ -1170,8 +1173,8 @@ test('verify transaction events', function(t) {
         x.c;
     });
 
-    var disposer2 = mobx.extras.trackTransitions(true, function(info) {
-        events.push([info.state, info.name]);
+    var disposer2 = mobx.spy(function(info) {
+        events.push(info);
     });
 
     mobx.transaction(function() {
@@ -1182,22 +1185,19 @@ test('verify transaction events', function(t) {
     });
     events.push("transpostend");
 
-    t.deepEqual(events, [
-        'auto',
-        'calc c',
-        'transstart',
-        [ 'STALE', 'ObservableObject@1 / Prop "b"@2' ],
-        [ 'STALE', 'ObservableObject@1 / Prop "c"@3' ],
-        [ 'STALE', 'ar@4' ],
-        'transpreend',
-        [ 'READY', 'ObservableObject@1 / Prop "b"@2' ],
-        [ 'PENDING', 'ObservableObject@1 / Prop "c"@3' ],
-        'calc c',
-        [ 'READY', 'ObservableObject@1 / Prop "c"@3' ],
-        [ 'PENDING', 'ar@4' ],
-        'auto',
-        [ 'READY', 'ar@4' ],
-        'transpostend'
+	t.deepEqual(stripSpyOutput(events), [
+		'auto',
+		'calc c',
+		{ name: 'anonymous transaction', spyReportStart: true, target: undefined, type: 'transaction' },
+		'transstart',
+		{ name: 'b', newValue: 2, oldValue: 1, spyReportStart: true, type: 'update' }, { spyReportEnd: true }, 
+		'transpreend', { target: { b: 2 }, type: 'compute' },
+		'calc c',
+		{ spyReportStart: true, type: 'reaction' },
+		'auto',
+		{ spyReportEnd: true },
+		{ spyReportEnd: true },
+		'transpostend'
     ]);
 
     disposer1();
@@ -1240,8 +1240,8 @@ test('delay autorun until end of transaction', function(t) {
         }
     });
     var disposer1;
-    var disposer2 = mobx.extras.trackTransitions(true, function(info) {
-        events.push([info.state, info.name]);
+    var disposer2 = mobx.spy(function(info) {
+        events.push(info);
     });
     var didRun = false;
 
@@ -1274,29 +1274,32 @@ test('delay autorun until end of transaction', function(t) {
     x.a = 3;
     events.push("post trans3");
 
-    t.deepEqual(events, [
-        [ 'STALE', 'ObservableObject@1 / Prop "a"@2' ],
-        'end1',
-        'end2',
-        [ 'READY', 'ObservableObject@1 / Prop "a"@2' ],
-        'auto',
-        'calc y',
-        [ 'READY', 'test@4' ],
-        'post trans1',
-        [ 'STALE', 'ObservableObject@1 / Prop "a"@2' ],
-        [ 'STALE', 'ObservableObject@1 / Prop "b"@3' ],
-        [ 'STALE', 'test@4' ],
-        [ 'READY', 'ObservableObject@1 / Prop "a"@2' ],
-        [ 'PENDING', 'ObservableObject@1 / Prop "b"@3' ],
-        'calc y',
-        [ 'READY', 'ObservableObject@1 / Prop "b"@3' ],
-        [ 'PENDING', 'test@4' ],
-        'auto',
-        [ 'READY', 'test@4' ],
-        'post trans2',
-        [ 'STALE', 'ObservableObject@1 / Prop "a"@2' ],
-        [ 'READY', 'ObservableObject@1 / Prop "a"@2' ],
-        'post trans3'
+    t.deepEqual(stripSpyOutput(events), [
+		{ name: 'anonymous transaction', spyReportStart: true, target: undefined, type: 'transaction' },
+			{ name: 'anonymous transaction', spyReportStart: true, target: undefined, type: 'transaction' },
+				{ name: 'a', newValue: 3, oldValue: 2, spyReportStart: true, type: 'update' }, { spyReportEnd: true }, 
+				{ name: 'a', newValue: 4, oldValue: 3, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
+				'end1', 
+			{ spyReportEnd: true },
+			{ name: 'a', newValue: 5, oldValue: 4, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
+			'end2', 
+			{ spyReportStart: true, type: 'reaction' },
+				'auto',
+				{ target: { a: 3 }, type: 'compute' },
+				'calc y',
+			{ spyReportEnd: true },
+		{ spyReportEnd: true },
+		'post trans1',
+		{ name: 'a', newValue: 6, oldValue: 5, spyReportStart: true, type: 'update' },
+			{ target: { a: 3 }, type: 'compute' },
+			'calc y',
+			{ spyReportStart: true, type: 'reaction' },
+				'auto',
+			{ spyReportEnd: true },
+		{ spyReportEnd: true },
+		'post trans2', 
+		{ name: 'a', newValue: 3, oldValue: 6, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
+		'post trans3'
     ]);
 
     disposer2();
