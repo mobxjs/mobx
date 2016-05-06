@@ -74,7 +74,7 @@ Slower:
 
 There is nothing wrong to the latter.
 But a change in the `name` property will, in the first case, trigger the `DisplayName` to re-render, while in the latter, the owner of the component has to re-render.
-However, it is more important for your components to have an comprehensible API then applying this optimization.
+However, it is more important for your components to have a comprehensible API than applying this optimization.
 To have the best of both worlds, consider making smaller components:
 
 `const PersonNameDispayer = observer(({ props }) => <DisplayName name={props.person.name} />)`
