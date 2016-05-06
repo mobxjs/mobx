@@ -1,11 +1,10 @@
 import {IAtom} from "./atom";
 import {IDerivation} from "./derivation";
 import {Reaction} from "./reaction";
-import {IListenable} from "../types/listen-utils";
 
 declare const global: any;
 
-export class MobXGlobals implements IListenable {
+export class MobXGlobals {
 	/**
 	 * MobXGlobals version.
 	 * MobX compatiblity with other versions loaded in memory as long as this version matches.
@@ -63,10 +62,15 @@ export class MobXGlobals implements IListenable {
 	resetId = 0;
 
 	/**
-	 * Listeners that listen to global events, mainly for debug / dev purposes.
+	 * Spy callbacks
 	 */
-	changeListeners = [];
+	spyListeners: {(change: any): void}[] = [];
 }
+
+/**
+ * These values will persist if global state is reset
+ */
+const persistentKeys = ["mobxGuid", "resetId", "spyListeners"];
 
 export const globalState = (() => {
 	const res = new MobXGlobals();
@@ -98,6 +102,6 @@ export function resetGlobalState() {
 	globalState.resetId++;
 	const defaultGlobals = new MobXGlobals();
 	for (let key in defaultGlobals)
-		if (key !== "mobxGuid" && key !== "resetId")
+		if (persistentKeys.indexOf(key) === -1)
 			globalState[key] = defaultGlobals[key];
 }

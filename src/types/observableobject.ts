@@ -1,4 +1,4 @@
-import {ObservableValue} from "./observablevalue";
+import {ObservableValue, UNCHANGED} from "./observablevalue";
 import {ComputedValue} from "../core/computedvalue";
 import {ValueMode, AsStructure} from "./modifiers";
 import {Lambda, invariant, assertPropertyConfigurable, isPlainObject} from "../utils/utils";
@@ -6,6 +6,7 @@ import {getNextId} from "../core/globalstate";
 import {throwingComputedValueSetter} from "../api/computeddecorator";
 import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
+import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 
 export interface IObjectDidChange {
 	name: string;
@@ -73,17 +74,17 @@ export function setObservableObjectProperty(adm: IObservableObjectAdministration
 		defineObservableProperty(adm, propName, value);
 }
 
-function defineObservableProperty(adm: IObservableObjectAdministration, propName: string, value) {
+function defineObservableProperty(adm: IObservableObjectAdministration, propName: string, newValue) {
 	assertPropertyConfigurable(adm.target, propName);
 
 	let observable: ComputedValue<any>|ObservableValue<any>;
 	let name = `${adm.name}@${adm.id} / Prop "${propName}"`;
 	let isComputed = true;
 
-	if (typeof value === "function" && value.length === 0)
-		observable = new ComputedValue(value, adm.target, false, name);
-	else if (value instanceof AsStructure && typeof value.value === "function" && value.value.length === 0)
-		observable = new ComputedValue(value.value, adm.target, true, name);
+	if (typeof newValue === "function" && newValue.length === 0)
+		observable = new ComputedValue(newValue, adm.target, false, name);
+	else if (newValue instanceof AsStructure && typeof newValue.value === "function" && newValue.value.length === 0)
+		observable = new ComputedValue(newValue.value, adm.target, true, name);
 	else {
 		isComputed = false;
 		if (hasInterceptors(adm)) {
@@ -91,13 +92,14 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 				object: adm.target,
 				name: propName,
 				type: "add",
-				newValue: value
+				newValue
 			});
 			if (!change)
 				return;
-			value = change.newValue;
+			newValue = change.newValue;
 		}
-		observable = new ObservableValue(value, adm.mode, name, true);
+		observable = new ObservableValue(newValue, adm.mode, name);
+		newValue = (observable as any).value; // observableValue might have changed it
 	}
 
 	adm.values[propName] = observable;
@@ -112,43 +114,62 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 			: createSetter(adm, observable as ObservableValue<any>, propName)
 	});
 
-	if (!isComputed) {
-		if (hasListeners(adm)) {
-			notifyListeners(adm, <IObjectDidChange> {
-				type: "add",
-				object: adm.target,
-				name: propName,
-				newValue: value
-			});
-		};
-	}
+	if (!isComputed)
+		notifyPropertyAddition(adm, adm.target, name, newValue);
 }
 
-function createSetter(adm: IObservableObjectAdministration, observable: ObservableValue<any>, propName: string) {
+function createSetter(adm: IObservableObjectAdministration, observable: ObservableValue<any>, name: string) {
 	return function (newValue) {
-		const oldValue = (observable as any).value;
+
+		// intercept
 		if (hasInterceptors(adm)) {
 			const change = interceptChange<IObjectWillChange>(adm, {
 				type: "update",
 				object: this,
-				name: propName,
-				newValue
+				name, newValue
 			});
 			if (!change)
 				return;
 			newValue = change.newValue;
 		}
-		const changed = observable.set(newValue);
-		if (changed && hasListeners(adm)) {
-			notifyListeners(adm, <IObjectDidChange> {
-				type: "update",
-				object: this,
-				name: propName,
-				newValue,
-				oldValue
-			});
+		newValue = observable.prepareNewValue(newValue);
+
+		// notify spy & observers
+		if (newValue !== UNCHANGED) {
+			const notify = hasListeners(adm);
+			const notifySpy = isSpyEnabled();
+			const change = notifyListeners || hasListeners ? {
+					type: "update",
+					object: this,
+					oldValue: (observable as any).value,
+					name, newValue
+				} : null;
+
+			if (notifySpy)
+				spyReportStart(change);
+			observable.setNewValue(newValue);
+			if (notify)
+				notifyListeners(adm, change);
+			if (notifySpy)
+				spyReportEnd();
 		}
 	};
+}
+
+function notifyPropertyAddition(adm, object, name: string, newValue) {
+	const notify = hasListeners(adm);
+	const notifySpy = isSpyEnabled();
+	const change = notify || notifySpy ? {
+			type: "add",
+			object, name, newValue
+		} : null;
+
+	if (notifySpy)
+		spyReportStart(change);
+	if (notify)
+		notifyListeners(adm, change);
+	if (notifySpy)
+		spyReportEnd();
 }
 
 /**

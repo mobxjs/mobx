@@ -1,7 +1,6 @@
 import {IDepTreeNode} from "../core/observable";
-import {unique, Lambda, deprecated} from "../utils/utils";
+import {unique, Lambda, deprecated, once} from "../utils/utils";
 import {globalState} from "../core/globalstate";
-import {registerListener} from "../types/listen-utils";
 
 export interface IDependencyTree {
 	id: number;
@@ -51,25 +50,6 @@ function nodeToObserverTree(node: IDepTreeNode): IObserverTree {
 	return result;
 }
 
-function createConsoleReporter(extensive: boolean) {
-/*	let lines: ITransitionEvent[] = [];
-	let scheduled = false;
-
-	return (line: ITransitionEvent) => {
-		if (extensive || line.changed)
-			lines.push(line);
-		if (!scheduled) {
-			scheduled = true;
-			setTimeout(() => {
-				console[console["table"] ? "table" : "dir"](lines);
-				lines = [];
-				scheduled = false;
-			}, 1);
-		}
-	};
-*/
-}
-
 export function trackTransitions(onReport?: (c) => void): Lambda {
 	if (typeof onReport === "boolean") {
 		deprecated("trackTransitions only takes a single callback function. If you are using the mobx-react-devtools, please update them first");
@@ -77,23 +57,12 @@ export function trackTransitions(onReport?: (c) => void): Lambda {
 	}
 	if (!onReport) {
 		deprecated("trackTransitions without callback has been deprecated and is a no-op now. If you are using the mobx-react-devtools, please update them first");
-		return;
+		return () => {};
 	}
-	return registerListener(globalState, onReport);
-	// if (!transitionTracker)
-	// 	transitionTracker = new SimpleEventEmitter();
-
-	// const reporter = onReport
-	// 	? 	(line: ITransitionEvent) => {
-	// 			if (extensive || line.changed)
-	// 				onReport(line);
-	// 		}
-	// 	: 	createConsoleReporter(extensive);
-	// const disposer = transitionTracker.on(reporter);
-
-	// return once(() => {
-	// 	disposer();
-	// 	if (transitionTracker.listeners.length === 0)
-	// 		transitionTracker = null;
-	// });
+	globalState.spyListeners.push(onReport);
+	return once(() => {
+		const idx = globalState.spyListeners.indexOf(onReport);
+		if (idx !== -1)
+			globalState.spyListeners.splice(idx, 1);
+	});
 }

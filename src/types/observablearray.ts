@@ -4,6 +4,7 @@ import {ValueMode, assertUnwrapped, makeChildObservable} from "./modifiers";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
+import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 
 export interface IObservableArray<T> extends Array<T> {
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[];
@@ -135,9 +136,10 @@ function spliceWithArray<T>(adm: IObservableArrayAdministration<T>, index: numbe
 	newItems = <T[]> newItems.map(adm.makeChildReactive);
 	const lengthDelta = newItems.length - deleteCount;
 	updateArrayLength(adm, length, lengthDelta); // create or remove new entries
-	const res: T[] = adm.values.splice(index, deleteCount, ...newItems);
+	const res: T[] = adm.values.splice(index, deleteCount, ...newItems); // FIXME: splat might exceed callstack size!
 
-	notifyArraySplice(adm, index, newItems, res);
+	if (deleteCount !== 0 || newItems.length !== 0)
+		notifyArraySplice(adm, index, newItems, res);
 	return res;
 }
 
@@ -150,35 +152,42 @@ function makeReactiveArrayItem(value) {
 }
 
 function notifyArrayChildUpdate<T>(adm: IObservableArrayAdministration<T>, index: number, newValue: T, oldValue: T) {
-	adm.atom.reportChanged();
-	// conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-	if (hasListeners(adm)) {
-		notifyListeners(adm, <IArrayDidChange<T>> {
-			object: <IObservableArray<T>><any> adm.array,
+	const notifySpy = !adm.owned && isSpyEnabled();
+	const notify = hasListeners(adm);
+	const change = notify || notifySpy ? {
+			object: adm.array,
 			type: "update",
-			index,
-			newValue,
-			oldValue
-		}, adm.owned);
-	}
+			index, newValue, oldValue
+		} : null;
+
+	if (notifySpy)
+		spyReportStart(change);
+	adm.atom.reportChanged();
+	if (notify)
+		notifyListeners(adm, change);
+	if (notifySpy)
+		spyReportEnd();
 }
 
 function notifyArraySplice<T>(adm: IObservableArrayAdministration<T>, index: number, added: T[], removed: T[]) {
-	if (removed.length === 0 && added.length === 0)
-		return;
+	const notifySpy = !adm.owned && isSpyEnabled();
+	const notify = hasListeners(adm);
+	const change = notify || notifySpy ? {
+			object: adm.array,
+			type: "splice",
+			index, removed, added,
+			removedCount: removed.length,
+			addedCount: added.length
+		} : null;
+
+	if (notifySpy)
+		spyReportStart(change);
 	adm.atom.reportChanged();
 	// conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-	if (hasListeners(adm)) {
-		notifyListeners(adm, <IArrayDidSplice<T>> {
-			object: adm.array as any,
-			type: "splice",
-			index,
-			removed,
-			removedCount: removed.length,
-			added,
-			addedCount: added.length
-		}, adm.owned);
-	}
+	if (notify)
+		notifyListeners(adm, change);
+	if (notifySpy)
+		spyReportEnd();
 }
 
 export class ObservableArray<T> extends StubArray {
@@ -401,32 +410,35 @@ function createArrayBufferItem(index: number) {
 }
 
 function createArraySetter(index: number) {
-	return function<T>(value: T) {
+	return function<T>(newValue: T) {
 		const adm = <IObservableArrayAdministration<T>> this.$mobx;
 		const values = adm.values;
-		assertUnwrapped(value, "Modifiers cannot be used on array values. For non-reactive array values use makeReactive(asFlat(array)).");
+		assertUnwrapped(newValue, "Modifiers cannot be used on array values. For non-reactive array values use makeReactive(asFlat(array)).");
 		if (index < values.length) {
+			// update at index in range 
 			checkIfStateModificationsAreAllowed();
 			const oldValue = values[index];
 			if (hasInterceptors(adm)) {
 				const change = interceptChange<IArrayWillChange<T>>(adm as any, {
 					type: "update",
 					object: adm.array,
-					index,
-					newValue: value
+					index, newValue
 				});
 				if (!change)
 					return;
-				value = change.newValue;
+				newValue = change.newValue;
 			}
-			const changed = adm.mode === ValueMode.Structure ? !deepEquals(oldValue, value) : oldValue !== value;
+			newValue = adm.makeChildReactive(newValue);
+			const changed = (adm.mode === ValueMode.Structure) ? !deepEquals(oldValue, newValue) : oldValue !== newValue;
 			if (changed) {
-				values[index] = adm.makeChildReactive(value);
-				notifyArrayChildUpdate(adm, index, value, oldValue);
+				values[index] = newValue;
+				notifyArrayChildUpdate(adm, index, newValue, oldValue);
 			}
 		} else if (index === values.length) {
-			spliceWithArray(adm, index, 0, [value]);
+			// add a new item
+			spliceWithArray(adm, index, 0, [newValue]);
 		} else
+			// out of bounds
 			throw new Error(`[mobx.array] Index out of bounds, ${index} is larger than ${values.length}`);
 	};
 }

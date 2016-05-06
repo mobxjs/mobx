@@ -1,5 +1,4 @@
 import {Lambda, once} from "../utils/utils";
-import {globalState, MobXGlobals} from "../core/globalstate";
 import {untracked} from "../core/observable";
 
 export interface IListenable {
@@ -7,7 +6,7 @@ export interface IListenable {
 }
 
 export function hasListeners(listenable: IListenable) {
-	return globalState.changeListeners.length > 0 || (listenable.changeListeners && listenable.changeListeners.length > 0);
+	return listenable.changeListeners && listenable.changeListeners.length > 0;
 }
 
 export function registerListener<T>(listenable: IListenable, handler: Function): Lambda {
@@ -20,17 +19,15 @@ export function registerListener<T>(listenable: IListenable, handler: Function):
 	});
 }
 
-export function notifyListeners<T>(listenable: IListenable, change: T, supressGlobalEvent?: boolean, changeNormalizer? : (change: T, callback: Function) => void) {
+export function notifyListeners<T>(listenable: IListenable, change: T | T[]) {
 	untracked(() => {
-		if (!(listenable instanceof MobXGlobals) && globalState.changeListeners.length > 0 && supressGlobalEvent !== true)
-			notifyListeners(globalState, change); // global state events are never normalized
 		let listeners = listenable.changeListeners;
 		if (!listeners)
 			return;
 		listeners = listeners.slice();
-		if (changeNormalizer) {
+		if (Array.isArray(change)) {
 			for (let i = 0, l = listeners.length; i < l; i++)
-				changeNormalizer(change, listeners[i]);
+				listeners[i].apply(null, change);
 		}
 		else {
 			for (let i = 0, l = listeners.length; i < l; i++)

@@ -3,7 +3,7 @@ import {IDerivation, trackDerivedFunction, isComputingDerivation} from "./deriva
 import {globalState, getNextId} from "./globalstate";
 import {valueDidChange, invariant, Lambda} from "../utils/utils";
 import {autorun} from "../api/autorun";
-import {hasListeners, notifyListeners} from "../types/listen-utils";
+import {isSpyEnabled, spyReport} from "../core/spy";
 
 /**
  * A node in the state dependency root that observes other nodes, and can be observed itself.
@@ -109,12 +109,11 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 
 	private trackAndCompute(): boolean {
 		const oldValue = this.value;
-		const notify = hasListeners(globalState);
-		if (notify) {
-			notifyListeners(globalState, {
+		if (isSpyEnabled()) {
+			spyReport({
 				object: this,
 				type: "compute",
-				scope: this.scope
+				target: this.scope
 			});
 		}
 		const newValue = this.value = trackDerivedFunction(this, this.peek);

@@ -1,11 +1,12 @@
 import {ValueMode, assertUnwrapped, getValueModeFromModifierFunc} from "./modifiers";
 import {transaction} from "../core/transaction";
 import {ObservableArray, IObservableArray} from "./observablearray";
-import {ObservableValue} from "./observablevalue";
+import {ObservableValue, UNCHANGED} from "./observablevalue";
 import {isPlainObject, Lambda, invariant} from "../utils/utils";
 import {getNextId} from "../core/globalstate";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
+import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 
 export interface IKeyValueMap<V> {
 	[key: string]: V;
@@ -23,7 +24,7 @@ export interface IMapDidChange<T> {
 
 export interface IMapWillChange<T> {
 	object: ObservableMap<T>;
-	type: "update" | "delete";
+	type: "update" | "add" | "delete";
 	name: string;
 	newValue?: any;
 }
@@ -62,12 +63,12 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	}
 
 	set(key: string, value: V) {
-		// TODO: rename params to leverage object structurings everywhere :)
 		this.assertValidKey(key);
+		const hasKey = this._has(key);
 		assertUnwrapped(value, `[mobx.map.set] Expected unwrapped value to be inserted to key '${key}'. If you need to use modifiers pass them as second argument to the constructor`);
 		if (hasInterceptors(this)) {
 			const change = interceptChange<IMapWillChange<V>>(this, {
-				type: "update",
+				type: hasKey ? "add" : "update",
 				object: this,
 				newValue: value,
 				name: key
@@ -76,33 +77,10 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 				return;
 			value = change.newValue;
 		}
-		if (this._has(key)) {
-			const oldValue = (<any>this._data[key]).value;
-			const changed = this._data[key].set(value);
-			if (changed && hasListeners(this)) {
-				notifyListeners(this, <IMapDidChange<V>>{
-					type: "update",
-					object: this,
-					name: key,
-					newValue: value,
-					oldValue
-				});
-			}
-		}
-		else {
-			transaction(() => {
-				this._data[key] = new ObservableValue(value, this._valueMode, `${this.name}@${this.id} / Entry "${key}"`, true);
-				this._updateHasMapEntry(key, true);
-				this._keys.push(key);
-			});
-			if (hasListeners(this)) {
-				notifyListeners(this, <IMapDidChange<V>>{
-					type: "add",
-					object: this,
-					name: key,
-					newValue: value
-				});
-			}
+		if (hasKey) {
+			this._updateValue(key, value);
+		} else {
+			this._addValue(key, value);
 		}
 	}
 
@@ -116,23 +94,31 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 			if (!change)
 				return;
 		}
+
 		if (this._has(key)) {
-			const oldValue = (<any>this._data[key]).value;
+			const notifySpy = isSpyEnabled();
+			const notify = hasListeners(this);
+			const change = notify || notifySpy ? <IMapDidChange<V>>{
+					type: "delete",
+					object: this,
+					oldValue: (<any>this._data[key]).value,
+					name: key
+				} : null;
+
+			if (notifySpy)
+				spyReportStart(change);
 			transaction(() => {
 				this._keys.remove(key);
 				this._updateHasMapEntry(key, false);
 				const observable = this._data[key];
 				observable.set(undefined);
 				this._data[key] = undefined;
-			});
-			if (hasListeners(this)) {
-				notifyListeners(this, <IMapDidChange<V>>{
-					type: "delete",
-					object: this,
-					name: key,
-					oldValue
-				});
-			}
+			}, undefined, false);
+			if (notify)
+				notifyListeners(this, change);
+			if (notifySpy)
+				spyReportEnd();
+
 		}
 	}
 
@@ -142,9 +128,56 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		if (entry) {
 			entry.set(value);
 		} else {
-			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, `${this.name}@${this.id} / Contains "${key}"`, true);
+			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, `${this.name}@${this.id} / Contains "${key}"`);
 		}
 		return entry;
+	}
+
+	private _updateValue(name: string, newValue: V) {
+		const observable = this._data[name];
+		newValue = observable.prepareNewValue(newValue) as V;
+		if (newValue !== UNCHANGED) {
+			const notifySpy = isSpyEnabled();
+			const notify = hasListeners(this);
+			const change = notify || notifySpy ? <IMapDidChange<V>>{
+					type: "update",
+					object: this,
+					oldValue: (observable as any).value,
+					name, newValue
+				} : null;
+
+			if (notifySpy)
+				spyReportStart(change);
+			observable.setNewValue(newValue as V);
+			if (notify)
+				notifyListeners(this, change);
+			if (notifySpy)
+				spyReportEnd();
+		}
+	}
+
+	private _addValue(name: string, newValue: V) {
+		transaction(() => {
+			const observable = this._data[name] = new ObservableValue(newValue, this._valueMode, `${this.name}@${this.id} / Entry "${name}"`);
+			newValue = (observable as any).value; // value might have been changed
+			this._updateHasMapEntry(name, true);
+			this._keys.push(name);
+		}, undefined, false);
+
+		const notifySpy = isSpyEnabled();
+		const notify = hasListeners(this);
+		const change = notify || notifySpy ? <IMapDidChange<V>>{
+				type: "add",
+				object: this,
+				name, newValue
+			} : null;
+
+		if (notifySpy)
+			spyReportStart(change);
+		if (notify)
+			notifyListeners(this, change);
+		if (notifySpy)
+			spyReportEnd();
 	}
 
 	get(key: string): V {

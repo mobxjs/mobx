@@ -4,6 +4,7 @@ import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} 
 import {valueDidChange, Lambda} from "../utils/utils";
 import {hasInterceptors, IInterceptable, IInterceptor, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
+import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 
 export interface IValueWillChange<T> {
 	object: any;
@@ -18,13 +19,17 @@ export interface IValueDidChange<T> {
 	oldValue: T;
 }
 
+export type IUNCHANGED = {};
+
+export const UNCHANGED: IUNCHANGED = {};
+
 export class ObservableValue<T> extends Atom implements IInterceptable<IValueWillChange<T>>, IListenable {
 	hasUnreportedChange = false;
 	interceptors;
 	changeListeners;
 	protected value: T = undefined;
 
-	constructor(value: T, protected mode: ValueMode, name = "ObservableValue", private owned = false) {
+	constructor(value: T, protected mode: ValueMode, name = "ObservableValue") {
 		super(name);
 		const [childmode, unwrappedValue] = getValueModeFromValue(value, ValueMode.Recursive);
 		// If the value mode is recursive, modifiers like 'structure', 'reference', or 'flat' could apply
@@ -33,29 +38,45 @@ export class ObservableValue<T> extends Atom implements IInterceptable<IValueWil
 		this.value = makeChildObservable(unwrappedValue, this.mode, this.name);
 	}
 
-	set(newValue: T): boolean {
+	set(newValue: T) {
+		const oldValue = this.value;
+		newValue = this.prepareNewValue(newValue) as any;
+		if (newValue !== UNCHANGED) {
+			const notifySpy = isSpyEnabled();
+			if (notifySpy) {
+				spyReportStart({
+					type: "set",
+					object: this,
+					newValue, oldValue
+				});
+			}
+			this.setNewValue(newValue);
+			if (notifySpy)
+				spyReportEnd();
+		}
+	}
+
+	prepareNewValue(newValue): T | IUNCHANGED {
 		assertUnwrapped(newValue, "Modifiers cannot be used on non-initial values.");
 		checkIfStateModificationsAreAllowed();
-		const oldValue = this.value;
 		if (hasInterceptors(this)) {
 			const change = interceptChange<IValueWillChange<T>>(this, { object: this, type: "set", newValue });
 			if (!change)
 				return;
 			newValue = change.newValue;
 		}
-		const changed = valueDidChange(this.mode === ValueMode.Structure, oldValue, newValue);
-		if (changed) {
-			this.value = makeChildObservable(newValue, this.mode, this.name);
-			this.reportChanged();
-			if (hasListeners(this))
-				notifyListeners(this, <IValueDidChange<T>> {
-					object: this,
-					type: "set",
-					newValue,
-					oldValue
-				}, this.owned, normalizeChangeEvent);
-		}
-		return changed;
+		const changed = valueDidChange(this.mode === ValueMode.Structure, this.value, newValue);
+		if (changed)
+			return makeChildObservable(newValue, this.mode, this.name);
+		return UNCHANGED;
+	}
+
+	setNewValue(newValue: T) {
+		const oldValue = this.value;
+		this.value = newValue;
+		this.reportChanged();
+		if (hasListeners(this))
+			notifyListeners(this, [newValue, oldValue]); // in 3.0, use an object instead!
 	}
 
 	get(): T {
@@ -76,8 +97,4 @@ export class ObservableValue<T> extends Atom implements IInterceptable<IValueWil
 	toString() {
 		return `${this.name}@${this.id}[${this.value}]`;
 	}
-}
-
-export function normalizeChangeEvent<T>({newValue, oldValue}: IValueDidChange<T>, listener) {
-	listener(newValue, oldValue);
 }

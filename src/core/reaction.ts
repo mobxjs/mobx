@@ -2,7 +2,7 @@ import {IObservable, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction} from "./derivation";
 import {globalState, getNextId} from "./globalstate";
 import {EMPTY_ARRAY, Lambda} from "../utils/utils";
-import {hasListeners, notifyListeners} from "../types/listen-utils";
+import {isSpyEnabled, spyReportStart, spyReportEnd} from "./spy";
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations
@@ -70,19 +70,16 @@ export class Reaction implements IDerivation {
 	}
 
 	track(fn: () => void) {
-		const notify = hasListeners(globalState);
+		const notify = isSpyEnabled();
 		if (notify) {
-			notifyListeners(globalState, {
+			spyReportStart({
 				object: this,
 				type: "reaction"
 			});
 		}
 		trackDerivedFunction(this, fn);
-		if (notify) {
-			notifyListeners(globalState, {
-				type: "end"
-			});
-		}
+		if (notify)
+			spyReportEnd();
 	}
 
 	dispose() {
