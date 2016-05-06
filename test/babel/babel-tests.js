@@ -1,6 +1,6 @@
 import {
-    observable, computed, transaction, asStructure, autorun, extendObservable, 
-	isObservableObject, observe, isObservable,
+    observable, computed, transaction, asStructure, autorun, extendObservable, action,
+	isObservableObject, observe, isObservable, spy,
     default as mobx
 } from "../";
 
@@ -141,3 +141,24 @@ test('issue 191 - shared initializers (babel)', function(t) {
 	
 	t.end();
 })
+
+test("action decorator (babel)", function(t) {
+	class Store {
+		@action
+		add(a, b) {
+			return a + b;
+		}
+	}
+
+	const store =  new Store();
+	const events: any[] = [];
+	const d = spy(events.push.bind(events));
+	t.equal(store.add(3, 4), 7);
+	t.deepEqual(events,	[
+		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, target: store, type: "action" },
+		{ spyReportEnd: true }
+	]);
+
+	d();
+	t.end();
+});

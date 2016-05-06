@@ -24,7 +24,7 @@ export function spyReportEnd() {
 	spyReport(END_EVENT);
 }
 
-export function spy(listener:(change: any) => void): Lambda {
+export function spy(listener: (change: any) => void): Lambda {
 	globalState.spyListeners.push(listener);
 	spyEnabled = globalState.spyListeners.length > 0;
 	return once(() => {
@@ -35,7 +35,7 @@ export function spy(listener:(change: any) => void): Lambda {
 	});
 }
 
-export function trackTransitions(onReport?: (c) => void): Lambda {
+export function trackTransitions(onReport?: (c: any) => void): Lambda {
 	deprecated("trackTransitions is deprecated. Use mobx.spy instead");
 	if (typeof onReport === "boolean") {
 		deprecated("trackTransitions only takes a single callback function. If you are using the mobx-react-devtools, please update them first");

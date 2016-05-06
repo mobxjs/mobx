@@ -17,20 +17,20 @@ export function action(arg1, arg2?, arg3?): any {
 		case 2:
 			return actionImplementation(arg1, arg2);
 		case 3:
-			return actionDecorator(arg3);
+			return actionDecorator(arg2, arg3);
 		default:
 			invariant(false, "Invalid arguments for (@)action, please provide a function, name and function or use it as decorator on a class instance method");
 	}
 }
 
-function actionDecorator(descriptor: PropertyDescriptor) {
+function actionDecorator(name: string, descriptor: PropertyDescriptor) {
 	const base = descriptor.value;
-	descriptor.value = actionImplementation(base.name, base);
+	descriptor.value = actionImplementation(name, base);
 }
 
 export function actionImplementation(actionName: string, fn?: Function): Function {
 	return function () {
-		executeWrapped(actionName, fn, this, arguments);
+		return executeWrapped(actionName, fn, this, arguments);
 	};
 }
 
@@ -58,15 +58,4 @@ function executeWrapped(actionName: string, fn: Function, scope: any, args: IArg
 	if (notifySpy)
 		spyReportEnd();
 	return res;
-}
-
-function getNameForThis(who) {
-	if (isObservableObject(who)) {
-		return ` (${who.$mobx.name}#${who.$mobx.id})`;
-	}
-	return "";
-}
-
-function isPrimitive(value) {
-	return value === null || value === undefined || typeof value === "string" || typeof value === "number";
 }

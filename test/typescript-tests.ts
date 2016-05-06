@@ -1,9 +1,9 @@
 /// <reference path='require.d.ts' />
 /// <reference path='tape.d.ts' />
 import {
-    observe, computed, observable, asStructure, autorun, autorunAsync, extendObservable, 
+    observe, computed, observable, asStructure, autorun, autorunAsync, extendObservable, action,
     IObservableArray, IArrayChange, IArraySplice, IObservableValue, isObservable, isObservableObject,
-    extras, Atom, transaction, IObjectChange
+    extras, Atom, transaction, IObjectChange, spy
 } from "../lib/mobx";
 import * as test from 'tape';
 
@@ -24,7 +24,7 @@ class Order {
     @computed get total() {
         return this.amount * this.price * (1 + this.orders.length);
     }
-    
+
     // Typescript classes cannot be defined inside functions,
     // but if the next line is enabled it should throw...
     // @observable hoepie() { return 3; }
@@ -36,20 +36,20 @@ test('decorators', function(t) {
 	t.equal(isObservableObject(o), true);
 	t.equal(isObservable(o, 'amount'), true);
 	t.equal(isObservable(o, 'total'), true);
-	
+
 	var events: any[] = [];
-	var d1 = observe(o, (ev: IObjectChange<any, any>) => events.push(ev.name, ev.oldValue));
+	var d1 = observe(o, (ev: IObjectChange) => events.push(ev.name, ev.oldValue));
 	var d2 = observe(o, 'price', (newValue, oldValue) => events.push(newValue, oldValue));
 	var d3 = observe(o, 'total', (newValue, oldValue) => events.push(newValue, oldValue));
-	
+
 	o.price = 4;
-	
+
 	d1();
 	d2();
 	d3();
-	
+
 	o.price = 5;
-	
+
 	t.deepEqual(events, [
 		8, // new total
 		6, // old total
@@ -58,7 +58,7 @@ test('decorators', function(t) {
 		"price", // event name
 		3, // event oldValue
 	]);
-	
+
 	t.end();
 })
 
@@ -94,12 +94,12 @@ test('annotations', function(t) {
     order1.orders.pop();
     t.equal(order1.total, 6);
     t.deepEqual(order1totals, [6,3,9]);
-    
+
     t.equal(order1.aFunction, testFunction);
     var x = function() { return 3; };
     order1.aFunction = x;
     t.equal(order1.aFunction, x);
-    
+
     var coords:{x:number, y:number} = null;
     var coordsCalcs = 0;
     var disposer2 = autorun(() => {
@@ -108,7 +108,7 @@ test('annotations', function(t) {
     });
     t.equal(coordsCalcs, 1);
     t.deepEqual(coords, { x: 1, y: 2});
-    
+
     order1.someStruct.x = 1;
     order1.someStruct = { x: 1, y: 2};
     t.equal(coordsCalcs, 1);
@@ -117,11 +117,11 @@ test('annotations', function(t) {
     order1.someStruct.x = 2;
     t.deepEqual(coords, { x: 2, y: 2 });
     t.equal(coordsCalcs, 2);
-    
+
     order1.someStruct = { x: 3, y: 3 };
     t.equal(coordsCalcs, 3);
     t.deepEqual(coords, { x: 3, y: 3 });
-    
+
     t.end();
 })
 
@@ -131,11 +131,11 @@ test('scope', function(t) {
         // this wo't work here.
         z: () => 2 * x.y
     });
-    
+
     t.equal(x.z, 6);
     x.y = 4;
     t.equal(x.z, 8);
-    
+
     interface IThing {
         z: number;
         y: number;
@@ -171,7 +171,7 @@ test('typing', function(t) {
     var x:IObservableValue<number> = observable(3);
 
     var d2 = autorunAsync(function() {
-        
+
     });
 
     t.end();
@@ -198,16 +198,16 @@ test('issue8', function(t){
     var fired = 0;
 
     const store = new LoginStoreTest();
-    
+
     autorun(() => {
         fired++;
         store.loggedIn;
     });
-    
+
     t.equal(fired, 1);
     state.authToken = 'a';
     state.authToken = 'b';
-    
+
     t.equal(fired, 2);
     t.end();
 })
@@ -224,9 +224,9 @@ class Box {
 
 test('box', function(t) {
     var box = new Box();
-    
+
     var ar:number[] = []
-    
+
     autorun(() => {
         ar.push(box.width);
     });
@@ -251,7 +251,7 @@ test('observable setter should fail', function(t) {
 				return 3;
 			}
 			set propX(v) {
-				
+
 			}
 		}
 	}, 'propX');
@@ -339,11 +339,11 @@ test('typescript: parameterized computed decorator', (t) => {
 			return { sum: Math.round(this.x) + Math.round(this.y) };
 		}
 	}
-	
+
 	const t1 = new TestClass();
 	const changes: { sum: number}[] = [];
 	const d = autorun(() => changes.push(t1.boxedSum));
-	
+
 	t1.y = 4; // change
 	t.equal(changes.length, 2);
 	t1.y = 4.2; // no change
@@ -356,9 +356,9 @@ test('typescript: parameterized computed decorator', (t) => {
 	t1.x = 6; // change
 	t.equal(changes.length, 3);
 	d();
-	
+
 	t.deepEqual(changes, [{ sum: 6 }, { sum: 7 }, { sum: 9 }]);
-	
+
 	t.end();
 });
 
@@ -367,7 +367,7 @@ test('issue 165', function(t) {
 		console.log(msg, ':', value);
 		return value;
 	}
-	
+
 	class Card {
 		constructor(public game: Game, public id: number) {
 		}
@@ -405,10 +405,10 @@ test('issue 165', function(t) {
 	game.firstCardSelected = card1;
 	console.log('Selecting second card');
 	game.secondCardSelected = card2;
-	
+
 	t.equal(card1.isWrong, true);
 	t.equal(card2.isWrong, true);
-	
+
 	t.end();
 });
 
@@ -417,22 +417,43 @@ test('issue 191 - shared initializers (ts)', function(t) {
 		@observable obj = { a: 1 };
 		@observable array = [2];
 	}
-	
+
 	var t1 = new Test();
 	t1.obj.a = 2;
 	t1.array.push(3);
-	
+
 	var t2 = new Test();
 	t2.obj.a = 3;
 	t2.array.push(4);
-	
+
 	t.notEqual(t1.obj, t2.obj);
 	t.notEqual(t1.array, t2.array);
 	t.equal(t1.obj.a, 2);
 	t.equal(t2.obj.a, 3);
-	
+
 	t.deepEqual(t1.array.slice(), [2,3]);
 	t.deepEqual(t2.array.slice(), [2,4]);
-	
+
+	t.end();
+});
+
+test("action decorator (typescript)", function(t) {
+	class Store {
+		@action
+		add(a: number, b: number): number {
+			return a + b;
+		}
+	}
+
+	const store =  new Store();
+	const events: any[] = [];
+	const d = spy(events.push.bind(events));
+	t.equal(store.add(3, 4), 7);
+	t.deepEqual(events,	[
+		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, target: store, type: "action" },
+		{ spyReportEnd: true }
+	]);
+
+	d();
 	t.end();
 });
