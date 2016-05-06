@@ -30,11 +30,11 @@ export { spy                                                  } from "./core/spy
 export { asReference, asFlat, asStructure                     } from "./types/modifiers";
 export { IInterceptable, IInterceptor                         } from "./types/intercept-utils";
 export { IListenable                                          } from "./types/listen-utils";
-export { IObjectWillChange, IObjectDidChange, isObservableObject } from "./types/observableobject";
-export { IValueDidChange, IValueWillChange                    } from "./types/observablevalue";
+export { IObjectWillChange, IObjectChange, isObservableObject } from "./types/observableobject";
+export { /* 3.0: IValueDidChange, */ IValueWillChange         } from "./types/observablevalue";
 
-export { IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayDidChange, IArrayDidSplice, isObservableArray, fastArray } from "./types/observablearray";
-export { IKeyValueMap, ObservableMap, IMapEntries, IMapWillChange, IMapDidChange, isObservableMap, map } from "./types/observablemap"
+export { IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, isObservableArray, fastArray } from "./types/observablearray";
+export { IKeyValueMap, ObservableMap, IMapEntries, IMapWillChange, IMapChange, isObservableMap, map } from "./types/observablemap"
 
 export { action                                               } from "./api/action";
 export { IObservableValue, observable                         } from "./api/observable";

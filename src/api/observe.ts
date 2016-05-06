@@ -1,6 +1,6 @@
-import {IObservableArray, IArrayDidChange, IArrayDidSplice, isObservableArray} from "../types/observablearray";
-import {ObservableMap, IMapDidChange, isObservableMap} from "../types/observablemap";
-import {IObjectDidChange, isObservableObject, observeObservableObject} from "../types/observableobject";
+import {IObservableArray, IArrayChange, IArraySplice, isObservableArray} from "../types/observablearray";
+import {ObservableMap, IMapChange, isObservableMap} from "../types/observablemap";
+import {IObjectChange, isObservableObject, observeObservableObject} from "../types/observableobject";
 import {IObservableValue, observable} from "./observable";
 import {ComputedValue} from "../core/computedvalue";
 import {ObservableValue} from "../types/observablevalue";
@@ -9,10 +9,10 @@ import {isObservable} from "./isobservable";
 import {extendObservable} from "./extendobservable";
 
 export function observe<T>(value: IObservableValue<T>, listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
-export function observe<T>(observableArray: IObservableArray<T>, listener: (change: IArrayDidChange<T> | IArrayDidSplice<T>) => void, fireImmediately?: boolean): Lambda;
-export function observe<T>(observableMap: ObservableMap<T>, listener: (change: IMapDidChange<T>) => void, fireImmediately?: boolean): Lambda;
+export function observe<T>(observableArray: IObservableArray<T>, listener: (change: IArrayChange<T> | IArraySplice<T>) => void, fireImmediately?: boolean): Lambda;
+export function observe<T>(observableMap: ObservableMap<T>, listener: (change: IMapChange<T>) => void, fireImmediately?: boolean): Lambda;
 export function observe<T>(observableMap: ObservableMap<T>, property: string, listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
-export function observe(object: Object, listener: (change: IObjectDidChange) => void, fireImmediately?: boolean): Lambda;
+export function observe(object: Object, listener: (change: IObjectChange) => void, fireImmediately?: boolean): Lambda;
 export function observe(object: Object, property: string, listener: (newValue: any, oldValue: any) => void, fireImmediately?: boolean): Lambda;
 export function observe(thing, propOrCb?, cbOrFire?, fireImmediately?): Lambda {
 	if (typeof cbOrFire === "function")

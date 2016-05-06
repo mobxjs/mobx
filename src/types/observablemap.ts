@@ -14,7 +14,8 @@ export interface IKeyValueMap<V> {
 
 export type IMapEntries<V> = [string, V][]
 
-export interface IMapDidChange<T> {
+// In 3.0, change to IObjectMapChange
+export interface IMapChange<T> {
 	object: ObservableMap<T>;
 	type: "update" | "add" | "delete";
 	name: string;
@@ -98,7 +99,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		if (this._has(key)) {
 			const notifySpy = isSpyEnabled();
 			const notify = hasListeners(this);
-			const change = notify || notifySpy ? <IMapDidChange<V>>{
+			const change = notify || notifySpy ? <IMapChange<V>>{
 					type: "delete",
 					object: this,
 					oldValue: (<any>this._data[key]).value,
@@ -139,7 +140,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		if (newValue !== UNCHANGED) {
 			const notifySpy = isSpyEnabled();
 			const notify = hasListeners(this);
-			const change = notify || notifySpy ? <IMapDidChange<V>>{
+			const change = notify || notifySpy ? <IMapChange<V>>{
 					type: "update",
 					object: this,
 					oldValue: (observable as any).value,
@@ -166,7 +167,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 
 		const notifySpy = isSpyEnabled();
 		const notify = hasListeners(this);
-		const change = notify || notifySpy ? <IMapDidChange<V>>{
+		const change = notify || notifySpy ? <IMapChange<V>>{
 				type: "add",
 				object: this,
 				name, newValue
@@ -255,7 +256,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	 * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
 	 * for callback details
 	 */
-	observe(listener: (changes: IMapDidChange<V>) => void, fireImmediately?: boolean): Lambda {
+	observe(listener: (changes: IMapChange<V>) => void, fireImmediately?: boolean): Lambda {
 		invariant(fireImmediately !== true, "`observe` doesn't support the fire immediately property for observable maps.");
 		return registerListener(this, listener);
 	}

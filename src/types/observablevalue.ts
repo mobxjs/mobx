@@ -12,12 +12,13 @@ export interface IValueWillChange<T> {
 	newValue: T;
 }
 
-export interface IValueDidChange<T> {
-	object: any;
-	type: "set";
-	newValue: T;
-	oldValue: T;
-}
+// Introduce in 3.0
+// export interface IValueDidChange<T> {
+// 	object: any;
+// 	type: "set";
+// 	newValue: T;
+// 	oldValue: T;
+// }
 
 export type IUNCHANGED = {};
 

@@ -8,8 +8,8 @@ import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 
 export interface IObservableArray<T> extends Array<T> {
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[];
-	observe(listener: (changeData: IArrayDidChange<T>|IArrayDidSplice<T>) => void, fireImmediately?: boolean): Lambda;
-	intercept<T>(handler: IInterceptor<IArrayDidChange<T> | IArrayDidSplice<T>>): Lambda;
+	observe(listener: (changeData: IArrayChange<T>|IArraySplice<T>) => void, fireImmediately?: boolean): Lambda;
+	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda;
 	clear(): T[];
 	peek(): T[];
 	replace(newItems: T[]): T[];
@@ -17,7 +17,8 @@ export interface IObservableArray<T> extends Array<T> {
 	remove(value: T): boolean;
 }
 
-export interface IArrayDidChange<T> {
+// In 3.0, change to IArrayDidChange
+export interface IArrayChange<T> {
 	type: "update";
 	object: IObservableArray<T>;
 	index: number;
@@ -25,7 +26,8 @@ export interface IArrayDidChange<T> {
 	oldValue: T;
 }
 
-export interface IArrayDidSplice<T> {
+// In 3.0, change to IArrayDidSplice
+export interface IArraySplice<T> {
 	type: "splice";
 	object: IObservableArray<T>;
 	index: number;
@@ -221,13 +223,13 @@ export class ObservableArray<T> extends StubArray {
 		}
 	}
 
-	intercept<T>(handler: IInterceptor<IArrayDidChange<T> | IArrayDidSplice<T>>): Lambda {
-		return registerInterceptor<IArrayDidChange<T>|IArrayDidSplice<T>>(this.$mobx as any, handler);
+	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
+		return registerInterceptor<IArrayChange<T>|IArraySplice<T>>(this.$mobx as any, handler);
 	}
 
-	observe(listener: (changeData: IArrayDidChange<T>|IArrayDidSplice<T>) => void, fireImmediately = false): Lambda {
+	observe(listener: (changeData: IArrayChange<T>|IArraySplice<T>) => void, fireImmediately = false): Lambda {
 		if (fireImmediately) {
-			listener(<IArrayDidSplice<T>>{
+			listener(<IArraySplice<T>>{
 				object: this as any,
 				type: "splice",
 				index: 0,

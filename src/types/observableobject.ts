@@ -8,7 +8,8 @@ import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} f
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 
-export interface IObjectDidChange {
+// In 3.0, change to IObjectDidChange
+export interface IObjectChange {
 	name: string;
 	object: any;
 	type: "update" | "add";
@@ -177,7 +178,7 @@ function notifyPropertyAddition(adm, object, name: string, newValue) {
 	* See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe 
 	* for callback details
 	*/
-export function observeObservableObject(object: IIsObservableObject, callback: (changes: IObjectDidChange) => void, fireImmediately?: boolean): Lambda {
+export function observeObservableObject(object: IIsObservableObject, callback: (changes: IObjectChange) => void, fireImmediately?: boolean): Lambda {
 	invariant(isObservableObject(object), "Expected observable object");
 	invariant(fireImmediately !== true, "`observe` doesn't support the fire immediately property for observable objects.");
 	return registerListener(object.$mobx, callback);
