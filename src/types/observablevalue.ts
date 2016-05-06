@@ -4,7 +4,7 @@ import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} 
 import {valueDidChange, Lambda} from "../utils/utils";
 import {hasInterceptors, IInterceptable, IInterceptor, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
-import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
+import {isSpyEnabled, spyReportStart, spyReportEnd, spyReport} from "../core/spy";
 
 export interface IValueWillChange<T> {
 	object: any;
@@ -29,13 +29,17 @@ export class ObservableValue<T> extends Atom implements IInterceptable<IValueWil
 	changeListeners;
 	protected value: T = undefined;
 
-	constructor(value: T, protected mode: ValueMode, name = "ObservableValue") {
+	constructor(value: T, protected mode: ValueMode, name = "ObservableValue", notifySpy = true) {
 		super(name);
 		const [childmode, unwrappedValue] = getValueModeFromValue(value, ValueMode.Recursive);
 		// If the value mode is recursive, modifiers like 'structure', 'reference', or 'flat' could apply
 		if (this.mode === ValueMode.Recursive)
 			this.mode = childmode;
 		this.value = makeChildObservable(unwrappedValue, this.mode, this.name);
+		if (notifySpy && isSpyEnabled()) {
+			// only notify spy if this is a stand-alone observable
+			spyReport({ type: "create", object: this, newValue: this.value });
+		}
 	}
 
 	set(newValue: T) {

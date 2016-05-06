@@ -98,7 +98,7 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 				return;
 			newValue = change.newValue;
 		}
-		observable = new ObservableValue(newValue, adm.mode, name);
+		observable = new ObservableValue(newValue, adm.mode, name, false);
 		newValue = (observable as any).value; // observableValue might have changed it
 	}
 
@@ -115,7 +115,7 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 	});
 
 	if (!isComputed)
-		notifyPropertyAddition(adm, adm.target, name, newValue);
+		notifyPropertyAddition(adm, adm.target, propName, newValue);
 }
 
 function createSetter(adm: IObservableObjectAdministration, observable: ObservableValue<any>, name: string) {

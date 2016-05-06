@@ -215,8 +215,10 @@ export class ObservableArray<T> extends StubArray {
 		if (initialValues && initialValues.length) {
 			updateArrayLength(adm, 0, initialValues.length);
 			adm.values = initialValues.map(adm.makeChildReactive);
-		} else
+			notifyArraySplice(adm, 0, adm.values.slice(), EMPTY_ARRAY);
+		} else {
 			adm.values = [];
+		}
 	}
 
 	intercept<T>(handler: IInterceptor<IArrayDidChange<T> | IArrayDidSplice<T>>): Lambda {

@@ -111,7 +111,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 				this._keys.remove(key);
 				this._updateHasMapEntry(key, false);
 				const observable = this._data[key];
-				observable.set(undefined);
+				observable.setNewValue(undefined);
 				this._data[key] = undefined;
 			}, undefined, false);
 			if (notify)
@@ -126,9 +126,9 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		// optimization; don't fill the hasMap if we are not observing, or remove entry if there are no observers anymore
 		let entry = this._hasMap[key];
 		if (entry) {
-			entry.set(value);
+			entry.setNewValue(value);
 		} else {
-			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, `${this.name}@${this.id} / Contains "${key}"`);
+			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, `${this.name}@${this.id} / Contains "${key}"`, false);
 		}
 		return entry;
 	}
@@ -158,7 +158,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 
 	private _addValue(name: string, newValue: V) {
 		transaction(() => {
-			const observable = this._data[name] = new ObservableValue(newValue, this._valueMode, `${this.name}@${this.id} / Entry "${name}"`);
+			const observable = this._data[name] = new ObservableValue(newValue, this._valueMode, `${this.name}@${this.id} / Entry "${name}"`, false);
 			newValue = (observable as any).value; // value might have been changed
 			this._updateHasMapEntry(name, true);
 			this._keys.push(name);
@@ -209,14 +209,14 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 				other.keys().forEach(key => this.set(key, other.get(key)));
 			else
 				Object.keys(other).forEach(key => this.set(key, other[key]));
-		});
+		}, undefined, false);
 		return this;
 	}
 
 	clear() {
 		transaction(() => {
 			this.keys().forEach(this.delete, this);
-		});
+		}, undefined, false);
 	}
 
 	get size(): number {

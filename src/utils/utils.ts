@@ -47,6 +47,18 @@ export function isPlainObject(value) {
 	return value !== null && typeof value === "object" && Object.getPrototypeOf(value) === Object.prototype;
 }
 
+export function objectAssign(...objs: Object[]): Object;
+export function objectAssign() {
+	const res = arguments[0];
+	for (let i = 1, l = arguments.length; i < l; i++) {
+		const source = arguments[i];
+		for (let key in source) if (source.hasOwnProperty(key)) {
+			res[key] = source[key];
+		}
+	}
+	return res;
+}
+
 export function valueDidChange(compareStructural: boolean, oldValue, newValue): boolean {
 	return compareStructural
 		? !deepEquals(oldValue, newValue)

@@ -1,43 +1,16 @@
 import {transaction} from "../core/transaction";
 import {isObservableObject} from "../types/observableobject";
 import {invariant} from "../utils/utils";
-import {globalState} from "../core/globalstate";
 import {untracked} from "../core/observable";
 import {allowStateChanges} from "./extras";
-import {hasListeners, notifyListeners} from "../types/listen-utils";
-
-const tracing = true;
-// TODO: remove stuff
-function reportStateChange(observableName, object, propertyName, newValue, oldValue, changed) {
-	if (tracing) {
-		console.groupCollapsed([
-			"changed '",
-			observableName,
-			propertyName === null ? "" : ("." + propertyName),
-			"'",
-			isPrimitive(newValue) ? " to '" + newValue + "'" : "",
-			changed ? "" : " (unchanged)"
-		].join(""));
-		console.dir({
-			observable: observableName,
-			propertyName: propertyName,
-			newValue: newValue,
-			oldValue: oldValue,
-			target: object
-		});
-		console.trace();
-		console.groupEnd();
-	}
-}
+import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 
 export function action<T extends Function>(fn: T): T;
 export function action<T extends Function>(name: string, fn: T): T;
 export function action(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
 export function action(arg1, arg2?, arg3?): any {
 	// TODO: introduce reaction as well?
-	// TODO: untracked?
 	// TODO: empty derivation stack warning?
-	// TODO: introduce transiationTracker event
 	switch (arguments.length) {
 		case 1:
 			return actionImplementation(arg1.name || "<unnamed action>", arg1);
@@ -62,27 +35,29 @@ export function actionImplementation(actionName: string, fn?: Function): Functio
 }
 
 function executeWrapped(actionName: string, fn: Function, scope: any, args: IArguments) {
-	if (hasListeners(globalState))
-		notifyListeners(globalState, {
+	const notifySpy = isSpyEnabled();
+	if (notifySpy) {
+		const flattendArgs = [];
+		for (let i = 0, l = args.length; i < l; i++)
+			flattendArgs.push(args[i]);
+		spyReportStart({
 			type: "action",
-			fn, scope, args
+			name: actionName,
+			target: scope,
+			arguments: flattendArgs
 		});
+	}
 	// TODO: unfold this to avoid 5 closures
-	const res = untracked(() => transaction(() => allowStateChanges(true, () => fn.apply(scope, args))));
-	if (hasListeners(globalState))
-		notifyListeners(globalState, {
-			type: "end"
-		});
+	const res = untracked(
+		() => transaction(
+			() => allowStateChanges(true, () => fn.apply(scope, args)),
+			undefined,
+			false
+		)
+	);
+	if (notifySpy)
+		spyReportEnd();
 	return res;
-	// if (tracing) {
-	// 	actionName = actionName + getNameForThis(this);
-	// 	(console as any).groupCollapsed("%c" + actionName, "color: blue");
-	// }
-	// const res = transaction(() => fn.apply(scope, args));
-	// if (tracing) {
-	// 	console.groupEnd();
-	// }
-	// return res;
 }
 
 function getNameForThis(who) {

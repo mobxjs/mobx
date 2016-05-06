@@ -147,60 +147,11 @@ function stripTrackerOutput(output) {
     return output.map(function (i) {
         if (Array.isArray(i))
             return stripTrackerOutput(i);
-        delete i.node;
-        delete i.name;
+        delete i.object;
         return i;
     });
 }
 
-var trackerOutput1 = function(a, b,c) {
-    return [
-    { id: a.id,
-        changed: true,
-        state: 'READY' },
-    { id: b.id,
-        changed: true,
-        state: 'READY' },
-    { id: c.$mobx.id,
-        changed: true,
-        state: 'READY' }
-    ];
-}
-
-var trackerOutput2 = function(a, b, c) {
-    return [ { id: a.id,
-    state: 'STALE',
-    changed: false,
-    },
-  { id: b.id,
-    state: 'STALE',
-    changed: false,
-  },
-  { id: c.$mobx.id,
-    state: 'STALE',
-    changed: false,
-  },
-  { id: a.id,
-    state: 'READY',
-    changed: true,
-  },
-  { id: b.id,
-    state: 'PENDING',
-    changed: false,
-  },
-  { id: b.id,
-    state: 'READY',
-    changed: true,
-  },
-  { id: c.$mobx.id,
-    state: 'PENDING',
-    changed: false,
-  },
-  { id: c.$mobx.id,
-    state: 'READY',
-    changed: true,
-  }];
-}
 
 test('transition tracker 1', function(t) {
     m._.resetGlobalState();
@@ -216,7 +167,13 @@ test('transition tracker 1', function(t) {
     a.set(4);
     stop();
     a.set(5);
-    t.deepEqual(stripTrackerOutput(lines), trackerOutput1(a,b,c));
+    t.deepEqual(stripTrackerOutput(lines), [ 
+		{ newValue: 4, oldValue: 3, spyReportStart: true, type: 'set' },
+		{ target: undefined, type: 'compute' },
+		{ spyReportStart: true, type: 'reaction' },
+		{ spyReportEnd: true },
+		{ spyReportEnd: true } 
+	]);
 
     t.end();
 })
@@ -228,74 +185,22 @@ test('transition tracker 2', function(t) {
     var a = m.observable(3);
     var b = m.observable(function() { return a.get() * 2 });
     var c = m.autorun(function() { b.get(); });
-    var stop = m.extras.trackTransitions(true, function(line) {
+    var stop = m.spy(function(line) {
         lines.push(line);
     });
 
     a.set(4);
     stop();
     a.set(5);
-    t.deepEqual(stripTrackerOutput(lines), trackerOutput2(a,b,c));
+    t.deepEqual(stripTrackerOutput(lines), [
+		{ newValue: 4, oldValue: 3, spyReportStart: true, type: 'set' },
+		{ target: undefined, type: 'compute' },
+		{ spyReportStart: true, type: 'reaction' },
+		{ spyReportEnd: true },
+		{ spyReportEnd: true }
+	]);
 
     t.end();
-})
-
-test('transition tracker 3', function(t) {
-    m._.resetGlobalState();
-    var base = console.table;
-    var lines = [];
-    console.table = function(d) {
-        lines.push(d);
-    }
-
-    var a = m.observable(3);
-    var b = m.observable(function() { return a.get() * 2 });
-    var c = m.autorun(function() { b.get(); });
-    var d = m.observable(4);
-
-    var stop = m.extras.trackTransitions(false)
-
-
-    a.set(4);
-    d.set(6);
-    stop();
-    a.set(5);
-
-    setTimeout(function() {
-        t.deepEqual(stripTrackerOutput(lines), [trackerOutput1(a,b,c).concat([{
-            id: d.id,
-            state: "READY",
-            changed: true
-        }])]);
-
-        console.table = base;
-        t.end();
-    }, 100);
-})
-
-test('transition tracker 4', function(t) {
-    m._.resetGlobalState();
-    var base = console.dir;
-    var lines = [];
-    var method = console.table ? "table" : "dir";
-    console[method] = function(d) {
-        lines.push(d);
-    }
-
-    var a = m.observable(3);
-    var b = m.observable(function() { return a.get() * 2 });
-    var c = m.autorun(function() { b.get(); });
-    var stop = m.extras.trackTransitions(true);
-
-    a.set(4);
-    stop();
-    a.set(5);
-    setTimeout(function() {
-        t.deepEqual(stripTrackerOutput(lines), [trackerOutput2(a,b,c)]);
-
-        console[method] = base;
-        t.end();
-    }, 100);
 })
 
 test('strict mode checks', function(t) {

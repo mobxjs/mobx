@@ -1,5 +1,5 @@
 import {IDepTreeNode} from "../core/observable";
-import {unique, Lambda, deprecated, once} from "../utils/utils";
+import {unique} from "../utils/utils";
 import {globalState} from "../core/globalstate";
 
 export interface IDependencyTree {
@@ -48,21 +48,4 @@ function nodeToObserverTree(node: IDepTreeNode): IObserverTree {
 	if (node.observers && node.observers.length)
 		result.observers = <any>unique(node.observers).map(<any>nodeToObserverTree);
 	return result;
-}
-
-export function trackTransitions(onReport?: (c) => void): Lambda {
-	if (typeof onReport === "boolean") {
-		deprecated("trackTransitions only takes a single callback function. If you are using the mobx-react-devtools, please update them first");
-		onReport = arguments[1];
-	}
-	if (!onReport) {
-		deprecated("trackTransitions without callback has been deprecated and is a no-op now. If you are using the mobx-react-devtools, please update them first");
-		return () => {};
-	}
-	globalState.spyListeners.push(onReport);
-	return once(() => {
-		const idx = globalState.spyListeners.indexOf(onReport);
-		if (idx !== -1)
-			globalState.spyListeners.splice(idx, 1);
-	});
 }

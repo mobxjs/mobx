@@ -25,6 +25,7 @@ export { IObserverTree, IDependencyTree                       } from "./api/extr
 // TODO: move untracked to sane place
 export { IObservable, IDepTreeNode, untracked                 } from "./core/observable";
 export { IDerivation                                          } from "./core/derivation";
+export { spy                                                  } from "./core/spy";
 
 export { asReference, asFlat, asStructure                     } from "./types/modifiers";
 export { IInterceptable, IInterceptor                         } from "./types/intercept-utils";
@@ -60,7 +61,8 @@ export const _ = {
 };
 
 import { IObserverTree, IDependencyTree } from "./api/extras";
-import { getDependencyTree, getObserverTree, trackTransitions, allowStateChanges } from "./api/extras";
+import { getDependencyTree, getObserverTree, allowStateChanges } from "./api/extras";
+import { trackTransitions } from "./core/spy";
 import { Lambda } from "./utils/utils";
 import { isComputingDerivation } from "./core/derivation";
 
