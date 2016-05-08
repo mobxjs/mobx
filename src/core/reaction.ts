@@ -71,15 +71,20 @@ export class Reaction implements IDerivation {
 
 	track(fn: () => void) {
 		const notify = isSpyEnabled();
+		let startTime;
 		if (notify) {
+			startTime = Date.now();
 			spyReportStart({
 				object: this,
 				type: "reaction"
 			});
 		}
 		trackDerivedFunction(this, fn);
-		if (notify)
-			spyReportEnd();
+		if (notify) {
+			spyReportEnd({
+				time: Date.now() - startTime
+			});
+		}
 	}
 
 	dispose() {

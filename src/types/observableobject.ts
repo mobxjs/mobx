@@ -79,7 +79,7 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 	assertPropertyConfigurable(adm.target, propName);
 
 	let observable: ComputedValue<any>|ObservableValue<any>;
-	let name = `${adm.name}@${adm.id} / Prop "${propName}"`;
+	let name = `${adm.name}@${adm.id}.${propName}`;
 	let isComputed = true;
 
 	if (typeof newValue === "function" && newValue.length === 0)

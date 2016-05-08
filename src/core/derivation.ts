@@ -1,7 +1,7 @@
 import {IObservable, IDepTreeNode, propagateReadiness, propagateStaleness, addObserver, removeObserver} from "./observable";
 import {quickDiff, invariant} from "../utils/utils";
 import {globalState, resetGlobalState} from "./globalstate";
-import {hasListeners, notifyListeners} from "../types/listen-utils";
+import {isSpyEnabled, spyReport} from "./spy";
 
 /**
  * A derivation is everything that can be derived from the state (all the atoms) in a pure manner.
@@ -78,11 +78,11 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 				`These methods should never throw exceptions as MobX will usually not be able to recover from them. ` +
 				`Please enable 'Pause on (caught) exceptions' in your debugger to find the root cause. In: '${derivation.name}#${derivation.id}'`
 			);
-			if (hasListeners(globalState)) {
-				notifyListeners(globalState, {
+			if (isSpyEnabled()) {
+				spyReport({
 					type: "error",
 					object: this,
-					message: message
+					message
 				});
 			}
 			console.error(message);

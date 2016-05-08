@@ -150,7 +150,7 @@ function makeReactiveArrayItem(value) {
 	assertUnwrapped(value, "Array values cannot have modifiers");
 	if (this.mode === ValueMode.Flat || this.mode === ValueMode.Reference)
 		return value;
-	return makeChildObservable(value, this.mode, `${this.atom.name}@${this.atom.id} / ArrayEntry`);
+	return makeChildObservable(value, this.mode, `${this.atom.name}@${this.atom.id}[..]`);
 }
 
 function notifyArrayChildUpdate<T>(adm: IObservableArrayAdministration<T>, index: number, newValue: T, oldValue: T) {

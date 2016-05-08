@@ -108,7 +108,6 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 	}
 
 	private trackAndCompute(): boolean {
-		const oldValue = this.value;
 		if (isSpyEnabled()) {
 			spyReport({
 				object: this,
@@ -116,8 +115,8 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 				target: this.scope
 			});
 		}
+		const oldValue = this.value;
 		const newValue = this.value = trackDerivedFunction(this, this.peek);
-		// TODO: emit 'end'?
 		return valueDidChange(this.compareStructural, newValue, oldValue);
 	}
 

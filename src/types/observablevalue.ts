@@ -8,14 +8,14 @@ import {isSpyEnabled, spyReportStart, spyReportEnd, spyReport} from "../core/spy
 
 export interface IValueWillChange<T> {
 	object: any;
-	type: "set";
+	type: "update";
 	newValue: T;
 }
 
 // Introduce in 3.0
 // export interface IValueDidChange<T> {
 // 	object: any;
-// 	type: "set";
+// 	type: "update" | "create";
 // 	newValue: T;
 // 	oldValue: T;
 // }
@@ -50,7 +50,7 @@ export class ObservableValue<T> extends Atom implements IInterceptable<IValueWil
 			const notifySpy = isSpyEnabled();
 			if (notifySpy) {
 				spyReportStart({
-					type: "set",
+					type: "update",
 					object: this,
 					newValue, oldValue
 				});
@@ -65,7 +65,7 @@ export class ObservableValue<T> extends Atom implements IInterceptable<IValueWil
 		assertUnwrapped(newValue, "Modifiers cannot be used on non-initial values.");
 		checkIfStateModificationsAreAllowed();
 		if (hasInterceptors(this)) {
-			const change = interceptChange<IValueWillChange<T>>(this, { object: this, type: "set", newValue });
+			const change = interceptChange<IValueWillChange<T>>(this, { object: this, type: "update", newValue });
 			if (!change)
 				return UNCHANGED;
 			newValue = change.newValue;

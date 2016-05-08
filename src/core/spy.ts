@@ -20,8 +20,11 @@ export function spyReportStart(event) {
 
 const END_EVENT = { spyReportEnd: true };
 
-export function spyReportEnd() {
-	spyReport(END_EVENT);
+export function spyReportEnd(change?) {
+	if (change)
+		spyReport(objectAssign({}, change, END_EVENT));
+	else
+		spyReport(END_EVENT);
 }
 
 export function spy(listener: (change: any) => void): Lambda {

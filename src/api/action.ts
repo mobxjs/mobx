@@ -36,7 +36,9 @@ export function actionImplementation(actionName: string, fn?: Function): Functio
 
 function executeWrapped(actionName: string, fn: Function, scope: any, args: IArguments) {
 	const notifySpy = isSpyEnabled();
+	let startTime: number;
 	if (notifySpy) {
+		startTime = Date.now();
 		const flattendArgs = [];
 		for (let i = 0, l = args.length; i < l; i++)
 			flattendArgs.push(args[i]);
@@ -47,7 +49,6 @@ function executeWrapped(actionName: string, fn: Function, scope: any, args: IArg
 			arguments: flattendArgs
 		});
 	}
-	// TODO: unfold this to avoid 5 closures
 	const res = untracked(
 		() => transaction(
 			() => allowStateChanges(true, () => fn.apply(scope, args)),
@@ -56,6 +57,6 @@ function executeWrapped(actionName: string, fn: Function, scope: any, args: IArg
 		)
 	);
 	if (notifySpy)
-		spyReportEnd();
+		spyReportEnd({ time: Date.now() - startTime });
 	return res;
 }
