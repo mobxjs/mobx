@@ -62,7 +62,7 @@ export const _ = {
 
 import { IObserverTree, IDependencyTree } from "./api/extras";
 import { getDependencyTree, getObserverTree, allowStateChanges } from "./api/extras";
-import { trackTransitions } from "./core/spy";
+import { trackTransitions, spyReport, spyReportEnd, spyReportStart, isSpyEnabled } from "./core/spy";
 import { Lambda } from "./utils/utils";
 import { isComputingDerivation } from "./core/derivation";
 
@@ -71,6 +71,10 @@ export const extras = {
 	getDependencyTree,
 	getObserverTree,
 	isComputingDerivation,
+	isSpyEnabled,
 	resetGlobalState,
+	spyReport,
+	spyReportEnd,
+	spyReportStart,
 	trackTransitions
 };

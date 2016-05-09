@@ -1092,6 +1092,8 @@ test('json cycles', function(t) {
 
 function stripSpyOutput(events) {
 	events.forEach(ev => {
+		delete ev.time;
+		delete ev.fn;
 		delete ev.object;
 	});
 	return events;

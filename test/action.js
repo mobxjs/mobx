@@ -19,6 +19,13 @@ test('action should wrap in transaction', t => {
 	t.end();
 });
 
+// test action should be untracked
+
+test('action modifications should be picked up', t => {
+	
+	t.end();
+});
+
 // test('action should respect strict mode', t => {
 
 // });

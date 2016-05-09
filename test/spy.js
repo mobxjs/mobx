@@ -13,7 +13,7 @@ test('spy output', t => {
 	
 	doStuff();	
 
-	events.forEach(ev => { delete ev.object; });
+	events.forEach(ev => { delete ev.object; delete ev.fn; delete ev.time; });
 	
 	t.equal(events.length, doStuffEvents.length, "amount of events doesn't match");
 	//t.deepEqual(events, doStuffEvents);
@@ -79,7 +79,7 @@ function doStuff() {
 
 const doStuffEvents = [
 	{ newValue: 2, type: 'create' },
-	{ newValue: 3, oldValue: 2, type: 'set', spyReportStart: true },
+	{ newValue: 3, oldValue: 2, type: 'update', spyReportStart: true },
 	{ spyReportEnd: true },
 	{ name: 'c', newValue: 4, spyReportStart: true, type: 'add' },
 	{ spyReportEnd: true },
@@ -108,22 +108,22 @@ const doStuffEvents = [
 	{ spyReportStart: true, type: 'reaction' },
 	{ target: undefined, type: 'compute' },
 	{ spyReportEnd: true },
-	{ newValue: 4, oldValue: 3, spyReportStart: true, type: 'set' },
+	{ newValue: 4, oldValue: 3, spyReportStart: true, type: 'update' },
 	{ target: undefined, type: 'compute' },
 	{ spyReportStart: true, type: 'reaction' },
 	{ spyReportEnd: true },
 	{ spyReportEnd: true },
 	{ name: 'myTransaction', spyReportStart: true, target: undefined, type: 'transaction' },
-	{ newValue: 5, oldValue: 4, spyReportStart: true, type: 'set' },
+	{ newValue: 5, oldValue: 4, spyReportStart: true, type: 'update' },
 	{ spyReportEnd: true },
-	{ newValue: 6, oldValue: 5, spyReportStart: true, type: 'set' },
+	{ newValue: 6, oldValue: 5, spyReportStart: true, type: 'update' },
 	{ spyReportEnd: true },
 	{ target: undefined, type: 'compute' },
 	{ spyReportStart: true, type: 'reaction' },
 	{ spyReportEnd: true },
 	{ spyReportEnd: true },
 	{ name: 'myTestAction', spyReportStart: true, arguments: [7], type: 'action', target: undefined },
-	{ newValue: 7, oldValue: 6, spyReportStart: true, type: 'set' },
+	{ newValue: 7, oldValue: 6, spyReportStart: true, type: 'update' },
 	{ spyReportEnd: true },
 	{ target: undefined, type: 'compute' },
 	{ spyReportStart: true, type: 'reaction' },

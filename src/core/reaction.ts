@@ -2,7 +2,7 @@ import {IObservable, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction} from "./derivation";
 import {globalState, getNextId} from "./globalstate";
 import {EMPTY_ARRAY, Lambda} from "../utils/utils";
-import {isSpyEnabled, spyReportStart, spyReportEnd} from "./spy";
+import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations
@@ -31,6 +31,7 @@ export class Reaction implements IDerivation {
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 	isDisposed = false;
 	_isScheduled = false;
+	_isTrackPending = false;
 
 	constructor(public name: string = "Reaction", private onInvalidate: () => void) { }
 
@@ -65,7 +66,15 @@ export class Reaction implements IDerivation {
 	runReaction() {
 		if (!this.isDisposed) {
 			this._isScheduled = false;
+			this._isTrackPending = true;
 			this.onInvalidate();
+			if (this._isTrackPending && isSpyEnabled()) {
+				// onInvalidate didn't trigger track right away..
+				spyReport({
+					object: this,
+					type: "scheduled-reaction"
+				});
+			}
 		}
 	}
 
@@ -76,10 +85,12 @@ export class Reaction implements IDerivation {
 			startTime = Date.now();
 			spyReportStart({
 				object: this,
-				type: "reaction"
+				type: "reaction",
+				fn
 			});
 		}
 		trackDerivedFunction(this, fn);
+		this._isTrackPending = false;
 		if (notify) {
 			spyReportEnd({
 				time: Date.now() - startTime

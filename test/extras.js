@@ -73,16 +73,16 @@ test('treeD', function(t) {
         name: 'Autorun@8',
         dependencies: [{
             id: 5,
-            name: 'ObservableMap@4 / keys()@5'
+            name: 'ObservableMap@4.keys()@5'
         }, {
             id: 7,
-            name: 'ObservableMap@4 / Contains "temperature"@7'
+            name: 'ObservableMap@4.temperature?@7'
         }, {
             id: 6,
-            name: 'ObservableMap@4 / Entry "temperature"@6'
+            name: 'ObservableMap@4.temperature@6'
         }, {
             id: 9,
-            name: 'ObservableMap@4 / Contains "absent"@9'
+            name: 'ObservableMap@4.absent?@9'
         }]
     });
 
@@ -110,14 +110,14 @@ test('names', function(t) {
     m.extendObservable(rstruct.y, { a:  { b : 2}});
     rstruct.ar.push({ b : 2});
     rstruct.ar.push([]);
-    t.equal(rstruct.$mobx.values.x.name, "ObservableObject@1 / Prop \"x\"");
-    t.equal(rstruct.$mobx.values.y.name, "ObservableObject@1 / Prop \"y\"");
-    t.equal(rstruct.y.$mobx.values.z.name, "ObservableObject@1 / Prop \"y\"@4 / Prop \"z\"");
-    t.equal(rstruct.$mobx.values.ar.name, "ObservableObject@1 / Prop \"ar\"");
-    t.equal(rstruct.ar.$mobx.atom.name, "ObservableObject@1 / Prop \"ar\"");
-    t.equal(rstruct.ar[1].$mobx.values.w.name, "ObservableObject@1 / Prop \"ar\"@7 / ArrayEntry@8 / Prop \"w\"");
-    t.equal(rstruct.y.a.$mobx.values.b.name, "ObservableObject@1 / Prop \"y\"@4 / Prop \"a\"@11 / Prop \"b\"");
-    t.equal(rstruct.ar[2].$mobx.values.b.name, "ObservableObject@1 / Prop \"ar\"@7 / ArrayEntry@13 / Prop \"b\"");
+    t.equal(rstruct.$mobx.values.x.name, "ObservableObject@1.x");
+    t.equal(rstruct.$mobx.values.y.name, "ObservableObject@1.y");
+    t.equal(rstruct.y.$mobx.values.z.name, "ObservableObject@1.y@4.z");
+    t.equal(rstruct.$mobx.values.ar.name, "ObservableObject@1.ar");
+    t.equal(rstruct.ar.$mobx.atom.name, "ObservableObject@1.ar");
+    t.equal(rstruct.ar[1].$mobx.values.w.name, "ObservableObject@1.ar@7[..]@8.w");
+    t.equal(rstruct.y.a.$mobx.values.b.name, "ObservableObject@1.y@4.a@11.b");
+    t.equal(rstruct.ar[2].$mobx.values.b.name, "ObservableObject@1.ar@7[..]@13.b");
 
     var d = m.autorun(function() {
     });
@@ -138,7 +138,7 @@ test('names', function(t) {
 	
 	var task = new Task();
 	t.equal(task.$mobx.name, "Task");
-	t.equal(task.$mobx.values.title.name, "Task@20 / Prop \"title\"");
+	t.equal(task.$mobx.values.title.name, "Task@20.title");
 
     t.end();
 })
@@ -148,6 +148,8 @@ function stripTrackerOutput(output) {
         if (Array.isArray(i))
             return stripTrackerOutput(i);
         delete i.object;
+		delete i.time;
+		delete i.fn;
         return i;
     });
 }
@@ -168,7 +170,7 @@ test('transition tracker 1', function(t) {
     stop();
     a.set(5);
     t.deepEqual(stripTrackerOutput(lines), [ 
-		{ newValue: 4, oldValue: 3, spyReportStart: true, type: 'set' },
+		{ newValue: 4, oldValue: 3, spyReportStart: true, type: 'update' },
 		{ target: undefined, type: 'compute' },
 		{ spyReportStart: true, type: 'reaction' },
 		{ spyReportEnd: true },
@@ -193,7 +195,7 @@ test('transition tracker 2', function(t) {
     stop();
     a.set(5);
     t.deepEqual(stripTrackerOutput(lines), [
-		{ newValue: 4, oldValue: 3, spyReportStart: true, type: 'set' },
+		{ newValue: 4, oldValue: 3, spyReportStart: true, type: 'update' },
 		{ target: undefined, type: 'compute' },
 		{ spyReportStart: true, type: 'reaction' },
 		{ spyReportEnd: true },

@@ -28,7 +28,7 @@ function actionDecorator(name: string, descriptor: PropertyDescriptor) {
 	descriptor.value = actionImplementation(name, base);
 }
 
-export function actionImplementation(actionName: string, fn?: Function): Function {
+export function actionImplementation(actionName: string, fn: Function): Function {
 	return function () {
 		return executeWrapped(actionName, fn, this, arguments);
 	};
@@ -45,6 +45,7 @@ function executeWrapped(actionName: string, fn: Function, scope: any, args: IArg
 		spyReportStart({
 			type: "action",
 			name: actionName,
+			fn,
 			target: scope,
 			arguments: flattendArgs
 		});

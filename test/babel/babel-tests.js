@@ -154,6 +154,10 @@ test("action decorator (babel)", function(t) {
 	const events: any[] = [];
 	const d = spy(events.push.bind(events));
 	t.equal(store.add(3, 4), 7);
+
+	delete events[0].fn;
+	delete events[1].time;
+
 	t.deepEqual(events,	[
 		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, target: store, type: "action" },
 		{ spyReportEnd: true }

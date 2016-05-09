@@ -52,7 +52,11 @@ test('correct api should be exposed', function(t) {
 			'getDependencyTree',
 			'getObserverTree',
 			'isComputingDerivation',
+			'isSpyEnabled',
 			'resetGlobalState',
+			'spyReport',
+			'spyReportEnd',
+			'spyReportStart',
 			'trackTransitions'
 	]);
 	t.equals(Object.keys(mobx.extras).filter(function(key) {

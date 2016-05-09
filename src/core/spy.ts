@@ -8,6 +8,8 @@ export function isSpyEnabled() {
 }
 
 export function spyReport(event) {
+	if (!spyEnabled)
+		return false;
 	const listeners = globalState.spyListeners;
 	for (let i = 0, l = listeners.length; i < l; i++)
 		listeners[i](event);

@@ -112,6 +112,7 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 			spyReport({
 				object: this,
 				type: "compute",
+				fn: this.derivation,
 				target: this.scope
 			});
 		}
