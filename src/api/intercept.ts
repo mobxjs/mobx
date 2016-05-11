@@ -1,12 +1,12 @@
 import {IInterceptor} from "../types/intercept-utils";
-import {IObservableArray, IArrayWillChange, IArrayWillSplice, isObservableArray} from "../types/observablearray";
-import {ObservableMap, IMapWillChange, isObservableMap} from "../types/observablemap";
-import {IObjectWillChange, IIsObservableObject, isObservableObject} from "../types/observableobject";
+import {IObservableArray, IArrayWillChange, IArrayWillSplice} from "../types/observablearray";
+import {ObservableMap, IMapWillChange} from "../types/observablemap";
+import {IObjectWillChange, isObservableObject} from "../types/observableobject";
 import {IObservableValue, observable} from "./observable";
-import {ObservableValue, IValueWillChange} from "../types/observablevalue";
-import {Lambda, isPlainObject, invariant, deprecated} from "../utils/utils";
-import {isObservable} from "./isobservable";
+import {IValueWillChange} from "../types/observablevalue";
+import {Lambda, isPlainObject, deprecated} from "../utils/utils";
 import {extendObservable} from "./extendobservable";
+import {getAdministration} from "./extras";
 
 export function intercept<T>(value: IObservableValue<T>, handler: IInterceptor<IValueWillChange<T>>): Lambda;
 export function intercept<T>(observableArray: IObservableArray<T>, handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>): Lambda;
@@ -22,36 +22,20 @@ export function intercept(thing, propOrHandler?, handler?): Lambda {
 }
 
 function interceptInterceptable(thing, handler) {
-	if (isObservableArray(thing))
-		return thing.intercept(handler);
-	if (isObservableMap(thing))
-		return thing.intercept(handler);
-	if (thing instanceof ObservableValue)
-		return thing.intercept(handler);
-	if (isPlainObject(thing) || isObservableObject(thing)) {
+	if (isPlainObject(thing) && !isObservableObject(thing)) {
 		deprecated("Passing plain objects to intercept / observe is deprecated and will be removed in 3.0");
-		return (observable(thing) as any as IIsObservableObject).$mobx.intercept(handler);
+		return getAdministration(observable(thing) as any).intercept(handler);
 	}
-	invariant(false, "first argument of intercept should be some observable value or plain object");
+	return getAdministration(thing).intercept(handler);
 }
 
 function interceptProperty(thing, property, handler) {
-	const propError = "[mobx.intercept] the provided observable map has no key with name: " + property;
-	if (isObservableMap(thing)) {
-		if (!thing._has(property))
-			throw new Error(propError);
-		return interceptInterceptable(thing._data[property], handler);
-	}
-	if (isObservableObject(thing)) {
-		if (!isObservable(thing, property))
-			throw new Error(propError);
-		return interceptInterceptable(thing.$mobx.values[property], handler);
-	}
-	if (isPlainObject(thing)) {
+	if (isPlainObject(thing) && !isObservableObject(thing)) {
+		deprecated("Passing plain objects to intercept / observe is deprecated and will be removed in 3.0");
 		extendObservable(thing, {
 			property: thing[property]
 		});
 		return interceptProperty(thing, property, handler);
 	}
-	invariant(false, "first argument of intercept should be an (observable)object or observableMap if a property name is given");
+	return getAdministration(thing, property).intercept(handler);
 }

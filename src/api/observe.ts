@@ -1,12 +1,10 @@
-import {IObservableArray, IArrayChange, IArraySplice, isObservableArray} from "../types/observablearray";
-import {ObservableMap, IMapChange, isObservableMap} from "../types/observablemap";
-import {IObjectChange, isObservableObject, observeObservableObject} from "../types/observableobject";
+import {IObservableArray, IArrayChange, IArraySplice} from "../types/observablearray";
+import {ObservableMap, IMapChange} from "../types/observablemap";
+import {IObjectChange, isObservableObject} from "../types/observableobject";
 import {IObservableValue, observable} from "./observable";
-import {ComputedValue} from "../core/computedvalue";
-import {ObservableValue} from "../types/observablevalue";
-import {Lambda, isPlainObject, invariant, deprecated} from "../utils/utils";
-import {isObservable} from "./isobservable";
+import {Lambda, isPlainObject, deprecated} from "../utils/utils";
 import {extendObservable} from "./extendobservable";
+import {getAdministration} from "./extras";
 
 export function observe<T>(value: IObservableValue<T>, listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
 export function observe<T>(observableArray: IObservableArray<T>, listener: (change: IArrayChange<T> | IArraySplice<T>) => void, fireImmediately?: boolean): Lambda;
@@ -22,38 +20,20 @@ export function observe(thing, propOrCb?, cbOrFire?, fireImmediately?): Lambda {
 }
 
 function observeObservable(thing, listener, fireImmediately: boolean) {
-	if (isObservableArray(thing))
-		return thing.observe(listener);
-	if (isObservableMap(thing))
-		return thing.observe(listener);
-	if (isObservableObject(thing))
-		return observeObservableObject(thing, listener, fireImmediately);
-	if (thing instanceof ObservableValue || thing instanceof ComputedValue)
-		return thing.observe(listener, fireImmediately);
-	if (isPlainObject(thing)) {
+	if (isPlainObject(thing) && !isObservableObject(thing)) {
 		deprecated("Passing plain objects to intercept / observe is deprecated and will be removed in 3.0");
-		return observeObservable(observable(<Object> thing), listener, fireImmediately);
+		return getAdministration(observable(thing) as any).observe(listener, fireImmediately);
 	}
-	invariant(false, "first argument of observe should be some observable value or plain object");
+	return getAdministration(thing).observe(listener, fireImmediately);
 }
 
 function observeObservableProperty(thing, property, listener, fireImmediately: boolean) {
-	const propError = "[mobx.observe] the provided observable map has no key with name: " + property;
-	if (isObservableMap(thing)) {
-		if (!thing._has(property))
-			throw new Error(propError);
-		return observe(thing._data[property], listener);
-	}
-	if (isObservableObject(thing)) {
-		if (!isObservable(thing, property))
-			throw new Error(propError);
-		return observe(thing.$mobx.values[property], listener, fireImmediately);
-	}
-	if (isPlainObject(thing)) {
+	if (isPlainObject(thing) && !isObservableObject(thing)) {
+		deprecated("Passing plain objects to intercept / observe is deprecated and will be removed in 3.0");
 		extendObservable(thing, {
 			property: thing[property]
 		});
 		return observeObservableProperty(thing, property, listener, fireImmediately);
 	}
-	invariant(false, "first argument of observe should be an (observable)object or observableMap if a property name is given");
+	return getAdministration(thing, property).observe(listener, fireImmediately);
 }

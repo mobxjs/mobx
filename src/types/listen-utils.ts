@@ -3,6 +3,7 @@ import {untracked} from "../core/observable";
 
 export interface IListenable {
 	changeListeners: Function[];
+	observe(handler: (change: any, oldValue?: any) => void, fireImmediately?: boolean): Lambda;
 }
 
 export function hasListeners(listenable: IListenable) {

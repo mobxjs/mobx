@@ -356,7 +356,7 @@ test('get administration', function(t) {
 	t.equal(adm(c, "b"), ovClassName);
 	t.throws(() => adm(c, "c"), /the entry 'c' does not exist in the observable map 'ObservableMap@4'/, "expected throw");
 
-	t.equal(adm(d), "Object");
+	t.equal(adm(d), mobx.observable([]).constructor.name);
 	t.throws(() => adm(d, 0), /It is not possible to get index atoms from arrays/, "expected throw");
 
 	t.equal(adm(e), mobx.computed(() => {}).constructor.name);

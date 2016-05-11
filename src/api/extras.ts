@@ -6,7 +6,7 @@ import {ComputedValue} from "../core/computedvalue";
 import {Reaction} from "../core/reaction";
 import {isObservableArray} from "../types/observablearray";
 import {isObservableMap} from "../types/observablemap";
-import {isObservableObject, observeObservableObject} from "../types/observableobject";
+import {isObservableObject} from "../types/observableobject";
 
 export interface IDependencyTree {
 	id: number;
@@ -56,13 +56,13 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
 	invariant(false, "Cannot obtain atom from " + thing);
 }
 
-export function getAdministration(thing, property?) {
+export function getAdministration(thing: any, property?: string) {
 	invariant(thing, "Expection some object");
 	if (property !== undefined)
 		return getAdministration(getAtom(thing, property));
 	if (thing instanceof Atom || thing instanceof ComputedValue || thing instanceof Reaction)
 		return thing;
-	if (isObservableMap(thing))
+	if (isObservableArray(thing) || isObservableMap(thing))
 		return thing;
 	if (thing.$mobx)
 		return thing.$mobx;

@@ -58,6 +58,7 @@ export function asObservableObject(target, name: string, mode: ValueMode = Value
 		target, name, mode,
 		interceptors: null,
 		intercept: interceptObjectChange,
+		observe: observeObservableObject,
 		changeListeners: null
 	};
 	Object.defineProperty(target, "$mobx", {
@@ -179,10 +180,9 @@ function notifyPropertyAddition(adm, object, name: string, newValue) {
 	* See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe 
 	* for callback details
 	*/
-export function observeObservableObject(object: IIsObservableObject, callback: (changes: IObjectChange) => void, fireImmediately?: boolean): Lambda {
-	invariant(isObservableObject(object), "Expected observable object");
+function observeObservableObject(callback: (changes: IObjectChange) => void, fireImmediately?: boolean): Lambda {
 	invariant(fireImmediately !== true, "`observe` doesn't support the fire immediately property for observable objects.");
-	return registerListener(object.$mobx, callback);
+	return registerListener(this, callback);
 }
 
 export function isObservableObject(thing): boolean {
