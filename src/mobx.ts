@@ -60,14 +60,18 @@ export const _ = {
 	resetGlobalState
 };
 
+import { IDepTreeNode } from "./core/observable";
 import { IObserverTree, IDependencyTree } from "./api/extras";
-import { getDependencyTree, getObserverTree, allowStateChanges } from "./api/extras";
+import { getDependencyTree, getObserverTree, allowStateChanges, getDebugName, getAtom, getAdministration } from "./api/extras";
 import { trackTransitions, spyReport, spyReportEnd, spyReportStart, isSpyEnabled } from "./core/spy";
 import { Lambda } from "./utils/utils";
 import { isComputingDerivation } from "./core/derivation";
 
 export const extras = {
 	allowStateChanges,
+	getAdministration,
+	getAtom,
+	getDebugName,
 	getDependencyTree,
 	getObserverTree,
 	isComputingDerivation,

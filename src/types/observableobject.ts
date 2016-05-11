@@ -25,6 +25,7 @@ export interface IObjectWillChange {
 
 const ObservableObjectMarker = {};
 
+// TODO: might be slightly faster if object?
 export interface IObservableObjectAdministration extends IInterceptable<IObjectWillChange>, IListenable {
 	type: Object;
 	target: any;

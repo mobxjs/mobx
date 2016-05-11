@@ -64,6 +64,7 @@ export class StubArray {
 }
 StubArray.prototype = [];
 
+// TODO: might be slightly faster if object?
 interface IObservableArrayAdministration<T> extends IInterceptable<IArrayWillChange<T> | IArrayWillSplice<T>>, IListenable {
 	atom: Atom;
 	values: T[];

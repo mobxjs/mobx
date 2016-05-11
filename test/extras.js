@@ -225,3 +225,146 @@ test('strict mode checks', function(t) {
 	mobx.extras.resetGlobalState();
     t.end();
 });
+
+test('get atom', function(t) {
+	mobx.extras.resetGlobalState();
+	global.__mobxGlobal.mobxGuid = 0; // hmm dangerous reset?
+
+	function Clazz () {
+		mobx.extendObservable(this, {
+			a: 17
+		});
+	}
+
+	var a = mobx.observable(3);
+	var b = mobx.observable({ a: 3 });
+	var c = mobx.map({ a: 3});
+	var d = mobx.observable([1, 2]);
+	var e = mobx.computed(() => 3);
+	var f = mobx.autorun(() => c.has('b'));
+	var g = new Clazz();
+	
+	function atom(thing, prop) {
+		return mobx.extras.getAtom(thing, prop).constructor.name;
+	}
+
+	var ovClassName = mobx.observable(3).constructor.name;
+	var atomClassName = mobx.Atom.name;
+	var reactionClassName = mobx.Reaction.name;
+
+	t.equal(atom(a), ovClassName);
+	
+	t.equal(atom(b, "a"), ovClassName);
+	t.throws(() => atom(b), /please specify a property/, "expected throw");
+	t.throws(() => atom(b, "b"), /no observable property 'b' found on the observable object 'ObservableObject@2'/, "expected throw");
+	
+	t.equal(atom(c), atomClassName); // returns ke, "bla".constructor, === "Atomys
+	t.equal(atom(c, "a"), ovClassName); // returns ent, "bla".constructor, === "Atomry
+	t.equal(atom(c, "b"), ovClassName); // returns has entry (see autoru, "bla", "Atomn)
+	t.throws(() => atom(c, "c"), /the entry 'c' does not exist in the observable map 'ObservableMap@4'/, "expected throw");
+
+	t.equal(atom(d), atomClassName);
+	t.throws(() => atom(d, 0), /It is not possible to get index atoms from arrays/, "expected throw");
+
+	t.equal(atom(e), mobx.computed(() => {}).constructor.name);
+	t.equal(atom(f), mobx.Reaction.name);
+
+	t.throws(() => atom(g), /please specify a property/);
+	t.equal(atom(g, "a"), ovClassName);
+	
+	f();
+	t.end();
+});
+
+test('get debug name', function(t) {
+	mobx.extras.resetGlobalState();
+	global.__mobxGlobal.mobxGuid = 0; // hmm dangerous reset?
+
+	function Clazz () {
+		mobx.extendObservable(this, {
+			a: 17
+		});
+	}
+
+	var a = mobx.observable(3);
+	var b = mobx.observable({ a: 3 });
+	var c = mobx.map({ a: 3});
+	var d = mobx.observable([1, 2]);
+	var e = mobx.computed(() => 3);
+	var f = mobx.autorun(() => c.has('b'));
+	var g = new Clazz();
+	
+	function name(thing, prop) {
+		return mobx.extras.getDebugName(thing, prop);
+	}
+
+	t.equal(name(a), "ObservableValue@1");
+	
+	t.equal(name(b, "a"), "ObservableObject@2.a@3"); // TODO: remove @3..! (also in the other tests)
+	t.throws(() => name(b, "b"), /no observable property 'b' found on the observable object 'ObservableObject@2'/, "expected throw");
+	
+	t.equal(name(c), "ObservableMap@4"); // returns ke, "bla"ys
+	t.equal(name(c, "a"), "ObservableMap@4.a@6"); // returns ent, "bla"ry
+	t.equal(name(c, "b"), "ObservableMap@4.b?@11"); // returns has entry (see autoru, "bla"n)
+	t.throws(() => name(c, "c"), /the entry 'c' does not exist in the observable map 'ObservableMap@4'/, "expected throw");
+
+	t.equal(name(d), "ObservableArray@8");
+	t.throws(() => name(d, 0), /It is not possible to get index atoms from arrays/, "expected throw");
+
+	t.equal(name(e), "ComputedValue@9");
+	t.equal(name(f), "Autorun@10");
+
+	t.equal(name(g), "Clazz@12");
+	t.equal(name(g, "a"), "Clazz@12.a@13");
+	
+	f();
+	t.end();
+});
+
+test('get administration', function(t) {
+	mobx.extras.resetGlobalState();
+	global.__mobxGlobal.mobxGuid = 0; // hmm dangerous reset?
+
+	function Clazz () {
+		mobx.extendObservable(this, {
+			a: 17
+		});
+	}
+
+	var a = mobx.observable(3);
+	var b = mobx.observable({ a: 3 });
+	var c = mobx.map({ a: 3});
+	var d = mobx.observable([1, 2]);
+	var e = mobx.computed(() => 3);
+	var f = mobx.autorun(() => c.has('b'));
+	var g = new Clazz();
+	
+	function adm(thing, prop) {
+		return mobx.extras.getAdministration(thing, prop).constructor.name;
+	}
+
+	var ovClassName = mobx.observable(3).constructor.name;
+
+	t.equal(adm(a), ovClassName);
+	
+	t.equal(adm(b, "a"), ovClassName);
+	t.equal(adm(b), "Object");
+	t.throws(() => adm(b, "b"), /no observable property 'b' found on the observable object 'ObservableObject@2'/, "expected throw");
+	
+	t.equal(adm(c), mobx.ObservableMap.name);
+	t.equal(adm(c, "a"), ovClassName);
+	t.equal(adm(c, "b"), ovClassName);
+	t.throws(() => adm(c, "c"), /the entry 'c' does not exist in the observable map 'ObservableMap@4'/, "expected throw");
+
+	t.equal(adm(d), "Object");
+	t.throws(() => adm(d, 0), /It is not possible to get index atoms from arrays/, "expected throw");
+
+	t.equal(adm(e), mobx.computed(() => {}).constructor.name);
+	t.equal(adm(f), mobx.Reaction.name);
+
+	t.throws(adm(g), "Object");
+	t.equal(adm(g, "a"), ovClassName);
+	
+	f();
+	t.end();
+});
