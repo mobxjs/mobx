@@ -28,6 +28,8 @@ export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T):
 	return res;
 }
 
+// TODO: Move the next 3 functions to types
+// TODO: strong typing for the following methods:
 export function getAtom(thing: any, property?: string): IDepTreeNode {
 	if (typeof thing === "object" && thing !== null) {
 		if (isObservableArray(thing)) {

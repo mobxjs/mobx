@@ -348,7 +348,7 @@ test('get administration', function(t) {
 	t.equal(adm(a), ovClassName);
 	
 	t.equal(adm(b, "a"), ovClassName);
-	t.equal(adm(b), "Object");
+	t.equal(adm(b), b.$mobx.constructor.name);
 	t.throws(() => adm(b, "b"), /no observable property 'b' found on the observable object 'ObservableObject@2'/, "expected throw");
 	
 	t.equal(adm(c), mobx.ObservableMap.name);

@@ -7,6 +7,7 @@ import {throwingComputedValueSetter} from "../api/computeddecorator";
 import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
+import {isObservable} from "../api/isobservable";
 
 // In 3.0, change to IObjectDidChange
 export interface IObjectChange {
@@ -23,44 +24,43 @@ export interface IObjectWillChange {
 	newValue: any;
 }
 
-const ObservableObjectMarker = {};
+export class ObservableObjectAdministration implements IInterceptable<IObjectWillChange>, IListenable {
+	values: {[key: string]: ObservableValue<any>|ComputedValue<any>} = {};
+	changeListeners = null;
+	interceptors = null;
 
-// TODO: might be slightly faster if object?
-export interface IObservableObjectAdministration extends IInterceptable<IObjectWillChange>, IListenable {
-	type: Object;
-	target: any;
-	name: string;
-	id: number;
-	mode: ValueMode;
-	values: {[key: string]: ObservableValue<any>|ComputedValue<any>};
+	constructor(public target: any, public name: string, public mode: ValueMode, public id: number) { }
+
+	/**
+		* Observes this object. Triggers for the events 'add', 'update' and 'delete'.
+		* See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe 
+		* for callback details
+		*/
+	observe(callback: (changes: IObjectChange) => void, fireImmediately?: boolean): Lambda {
+		invariant(fireImmediately !== true, "`observe` doesn't support the fire immediately property for observable objects.");
+		return registerListener(this, callback);
+	}
+
+
+	intercept(handler): Lambda {
+		return registerInterceptor(this, handler);
+	}
 }
 
 export interface IIsObservableObject {
-	$mobx: IObservableObjectAdministration;
+	$mobx: ObservableObjectAdministration;
 }
 
-export function asObservableObject(target, name: string, mode: ValueMode = ValueMode.Recursive): IObservableObjectAdministration {
-	if (target.$mobx) {
-		if (target.$mobx.type !== ObservableObjectMarker)
-			throw new Error("The given object is observable but not an observable object");
+export function asObservableObject(target, name: string, mode: ValueMode = ValueMode.Recursive): ObservableObjectAdministration {
+	if (isObservableObject(target))
 		return target.$mobx;
-	}
 
 	if (!isPlainObject(target))
 		name = target.constructor.name;
 	if (!name)
 		name = "ObservableObject";
 
-	const adm: IObservableObjectAdministration = {
-		type: ObservableObjectMarker,
-		values: {},
-		id: getNextId(),
-		target, name, mode,
-		interceptors: null,
-		intercept: interceptObjectChange,
-		observe: observeObservableObject,
-		changeListeners: null
-	};
+	const adm = new ObservableObjectAdministration(target, name, mode, getNextId());
 	Object.defineProperty(target, "$mobx", {
 		enumerable: false,
 		configurable: false,
@@ -70,14 +70,14 @@ export function asObservableObject(target, name: string, mode: ValueMode = Value
 	return adm;
 }
 
-export function setObservableObjectProperty(adm: IObservableObjectAdministration, propName: string, value) {
+export function setObservableObjectProperty(adm: ObservableObjectAdministration, propName: string, value) {
 	if (adm.values[propName])
 		adm.target[propName] = value; // the property setter will make 'value' reactive if needed.
 	else
 		defineObservableProperty(adm, propName, value);
 }
 
-function defineObservableProperty(adm: IObservableObjectAdministration, propName: string, newValue) {
+function defineObservableProperty(adm: ObservableObjectAdministration, propName: string, newValue) {
 	assertPropertyConfigurable(adm.target, propName);
 
 	let observable: ComputedValue<any>|ObservableValue<any>;
@@ -121,7 +121,7 @@ function defineObservableProperty(adm: IObservableObjectAdministration, propName
 		notifyPropertyAddition(adm, adm.target, propName, newValue);
 }
 
-function createSetter(adm: IObservableObjectAdministration, observable: ObservableValue<any>, name: string) {
+function createSetter(adm: ObservableObjectAdministration, observable: ObservableValue<any>, name: string) {
 	return function (newValue) {
 
 		// intercept
@@ -175,20 +175,6 @@ function notifyPropertyAddition(adm, object, name: string, newValue) {
 		spyReportEnd();
 }
 
-/**
-	* Observes this object. Triggers for the events 'add', 'update' and 'delete'.
-	* See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe 
-	* for callback details
-	*/
-function observeObservableObject(callback: (changes: IObjectChange) => void, fireImmediately?: boolean): Lambda {
-	invariant(fireImmediately !== true, "`observe` doesn't support the fire immediately property for observable objects.");
-	return registerListener(this, callback);
-}
-
 export function isObservableObject(thing): boolean {
-	return thing && thing.$mobx && thing.$mobx.type === ObservableObjectMarker;
-}
-
-function interceptObjectChange(handler): Lambda {
-	return registerInterceptor(this, handler);
+	return thing && thing.$mobx instanceof ObservableObjectAdministration;
 }
