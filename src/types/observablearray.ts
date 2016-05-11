@@ -103,116 +103,116 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 		}
 		return registerListener(this, listener);
 	}
-}
 
-function getArrayLength(adm: ObservableArrayAdministration<any>): number {
-	adm.atom.reportObserved();
-	return adm.values.length;
-}
-
-function setArrayLength(adm: ObservableArrayAdministration<any>, newLength: number): number {
-	if (typeof newLength !== "number" || newLength < 0)
-		throw new Error("[mobx.array] Out of range: " + newLength);
-	let currentLength = adm.values.length;
-	if (newLength === currentLength)
-		return;
-	else if (newLength > currentLength)
-		spliceWithArray(adm, currentLength, 0, new Array(newLength - currentLength));
-	else
-		spliceWithArray(adm, newLength, currentLength - newLength);
-}
-
-// adds / removes the necessary numeric properties to this object
-function updateArrayLength(adm: ObservableArrayAdministration<any>, oldLength: number, delta: number) {
-	if (oldLength !== adm.lastKnownLength)
-		throw new Error("[mobx] Modification exception: the internal structure of an observable array was changed. Did you use peek() to change it?");
-	checkIfStateModificationsAreAllowed();
-	adm.lastKnownLength += delta;
-	if (delta > 0 && oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
-		reserveArrayBuffer(oldLength + delta);
-}
-
-function spliceWithArray<T>(adm: ObservableArrayAdministration<T>, index: number, deleteCount?: number, newItems?: T[]): T[] {
-	const length = adm.values.length;
-
-	if (index === undefined)
-		index = 0;
-	else if (index > length)
-		index = length;
-	else if (index < 0)
-		index = Math.max(0, length + index);
-
-	if (arguments.length === 2)
-		deleteCount = length - index;
-	else if (deleteCount === undefined || deleteCount === null)
-		deleteCount = 0;
-	else
-		deleteCount = Math.max(0, Math.min(deleteCount, length - index));
-
-	if (newItems === undefined)
-		newItems = [];
-
-	if (hasInterceptors(adm)) {
-		const change = interceptChange<IArrayWillSplice<T>>(adm as any, {
-			object: this,
-			type: "splice",
-			index,
-			removedCount: deleteCount,
-			added: newItems
-		});
-		if (!change)
-			return EMPTY_ARRAY;
-		deleteCount = change.removedCount;
-		newItems = change.added;
+	getArrayLength(): number {
+		this.atom.reportObserved();
+		return this.values.length;
 	}
 
-	newItems = <T[]> newItems.map(adm.makeReactiveArrayItem, adm);
-	const lengthDelta = newItems.length - deleteCount;
-	updateArrayLength(adm, length, lengthDelta); // create or remove new entries
-	const res: T[] = adm.values.splice(index, deleteCount, ...newItems); // FIXME: splat might exceed callstack size!
+	setArrayLength(newLength: number): number {
+		if (typeof newLength !== "number" || newLength < 0)
+			throw new Error("[mobx.array] Out of range: " + newLength);
+		let currentLength = this.values.length;
+		if (newLength === currentLength)
+			return;
+		else if (newLength > currentLength)
+			this.spliceWithArray(currentLength, 0, new Array(newLength - currentLength));
+		else
+			this.spliceWithArray(newLength, currentLength - newLength);
+	}
 
-	if (deleteCount !== 0 || newItems.length !== 0)
-		notifyArraySplice(adm, index, newItems, res);
-	return res;
-}
+	// adds / removes the necessary numeric properties to this object
+	updateArrayLength(oldLength: number, delta: number) {
+		if (oldLength !== this.lastKnownLength)
+			throw new Error("[mobx] Modification exception: the internal structure of an observable array was changed. Did you use peek() to change it?");
+		checkIfStateModificationsAreAllowed();
+		this.lastKnownLength += delta;
+		if (delta > 0 && oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
+			reserveArrayBuffer(oldLength + delta);
+	}
 
-function notifyArrayChildUpdate<T>(adm: ObservableArrayAdministration<T>, index: number, newValue: T, oldValue: T) {
-	const notifySpy = !adm.owned && isSpyEnabled();
-	const notify = hasListeners(adm);
-	const change = notify || notifySpy ? {
-			object: adm.array,
-			type: "update",
-			index, newValue, oldValue
-		} : null;
+	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[] {
+		const length = this.values.length;
 
-	if (notifySpy)
-		spyReportStart(change);
-	adm.atom.reportChanged();
-	if (notify)
-		notifyListeners(adm, change);
-	if (notifySpy)
-		spyReportEnd();
-}
+		if (index === undefined)
+			index = 0;
+		else if (index > length)
+			index = length;
+		else if (index < 0)
+			index = Math.max(0, length + index);
 
-function notifyArraySplice<T>(adm: ObservableArrayAdministration<T>, index: number, added: T[], removed: T[]) {
-	const notifySpy = !adm.owned && isSpyEnabled();
-	const notify = hasListeners(adm);
-	const change = notify || notifySpy ? {
-			object: adm.array,
-			type: "splice",
-			index, removed, added,
-			removedCount: removed.length,
-			addedCount: added.length
-		} : null;
+		if (arguments.length === 1)
+			deleteCount = length - index;
+		else if (deleteCount === undefined || deleteCount === null)
+			deleteCount = 0;
+		else
+			deleteCount = Math.max(0, Math.min(deleteCount, length - index));
 
-	if (notifySpy)
-		spyReportStart(change);
-	adm.atom.reportChanged();
-	// conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-	if (notify)
-		notifyListeners(adm, change);
-	if (notifySpy)
-		spyReportEnd();
+		if (newItems === undefined)
+			newItems = [];
+
+		if (hasInterceptors(this)) {
+			const change = interceptChange<IArrayWillSplice<T>>(this as any, {
+				object: this.array,
+				type: "splice",
+				index,
+				removedCount: deleteCount,
+				added: newItems
+			});
+			if (!change)
+				return EMPTY_ARRAY;
+			deleteCount = change.removedCount;
+			newItems = change.added;
+		}
+
+		newItems = <T[]> newItems.map(this.makeReactiveArrayItem, this);
+		const lengthDelta = newItems.length - deleteCount;
+		this.updateArrayLength(length, lengthDelta); // create or remove new entries
+		const res: T[] = this.values.splice(index, deleteCount, ...newItems); // FIXME: splat might exceed callstack size!
+
+		if (deleteCount !== 0 || newItems.length !== 0)
+			this.notifyArraySplice(index, newItems, res);
+		return res;
+	}
+
+	notifyArrayChildUpdate<T>(index: number, newValue: T, oldValue: T) {
+		const notifySpy = !this.owned && isSpyEnabled();
+		const notify = hasListeners(this);
+		const change = notify || notifySpy ? {
+				object: this.array,
+				type: "update",
+				index, newValue, oldValue
+			} : null;
+
+		if (notifySpy)
+			spyReportStart(change);
+		this.atom.reportChanged();
+		if (notify)
+			notifyListeners(this, change);
+		if (notifySpy)
+			spyReportEnd();
+	}
+
+	notifyArraySplice<T>(index: number, added: T[], removed: T[]) {
+		const notifySpy = !this.owned && isSpyEnabled();
+		const notify = hasListeners(this);
+		const change = notify || notifySpy ? {
+				object: this.array,
+				type: "splice",
+				index, removed, added,
+				removedCount: removed.length,
+				addedCount: added.length
+			} : null;
+
+		if (notifySpy)
+			spyReportStart(change);
+		this.atom.reportChanged();
+		// conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
+		if (notify)
+			notifyListeners(this, change);
+		if (notifySpy)
+			spyReportEnd();
+	}
 }
 
 export class ObservableArray<T> extends StubArray {
@@ -229,9 +229,9 @@ export class ObservableArray<T> extends StubArray {
 		});
 
 		if (initialValues && initialValues.length) {
-			updateArrayLength(adm, 0, initialValues.length);
+			adm.updateArrayLength(0, initialValues.length);
 			adm.values = initialValues.map(adm.makeReactiveArrayItem, adm);
-			notifyArraySplice(adm, 0, adm.values.slice(), EMPTY_ARRAY);
+			adm.notifyArraySplice(0, adm.values.slice(), EMPTY_ARRAY);
 		} else {
 			adm.values = [];
 		}
@@ -250,7 +250,7 @@ export class ObservableArray<T> extends StubArray {
 	}
 
 	replace(newItems: T[]) {
-		return spliceWithArray(this.$mobx, 0, this.$mobx.values.length, newItems);
+		return this.$mobx.spliceWithArray(0, this.$mobx.values.length, newItems);
 	}
 
 	toJSON(): T[] {
@@ -284,16 +284,17 @@ export class ObservableArray<T> extends StubArray {
 			case 0:
 				return [];
 			case 1:
-				return spliceWithArray(this.$mobx, index);
+				return this.$mobx.spliceWithArray(index);
 			case 2:
-				return spliceWithArray(this.$mobx, index, deleteCount);
+				return this.$mobx.spliceWithArray(index, deleteCount);
 		}
-		return spliceWithArray(this.$mobx, index, deleteCount, newItems);
+		return this.$mobx.spliceWithArray(index, deleteCount, newItems);
 	}
 
 	push(...items: T[]): number {
-		spliceWithArray(this.$mobx, this.$mobx.values.length, 0, items);
-		return this.$mobx.values.length;
+		const adm = this.$mobx;
+		adm.spliceWithArray(adm.values.length, 0, items);
+		return adm.values.length;
 	}
 
 	pop(): T {
@@ -305,8 +306,9 @@ export class ObservableArray<T> extends StubArray {
 	}
 
 	unshift(...items: T[]): number {
-		spliceWithArray(this.$mobx, 0, 0, items);
-		return this.$mobx.values.length;
+		const adm = this.$mobx;
+		adm.spliceWithArray(0, 0, items);
+		return adm.values.length;
 	}
 
 	reverse(): T[] {
@@ -370,10 +372,10 @@ Object.defineProperty(ObservableArray.prototype, "length", {
 	enumerable: false,
 	configurable: true,
 	get: function(): number {
-		return getArrayLength(this.$mobx);
+		return this.$mobx.getArrayLength();
 	},
 	set: function(newLength: number) {
-		setArrayLength(this.$mobx, newLength);
+		this.$mobx.setArrayLength(newLength);
 	}
 });
 
@@ -439,11 +441,11 @@ function createArraySetter(index: number) {
 			const changed = (adm.mode === ValueMode.Structure) ? !deepEquals(oldValue, newValue) : oldValue !== newValue;
 			if (changed) {
 				values[index] = newValue;
-				notifyArrayChildUpdate(adm, index, newValue, oldValue);
+				adm.notifyArrayChildUpdate(index, newValue, oldValue);
 			}
 		} else if (index === values.length) {
 			// add a new item
-			spliceWithArray(adm, index, 0, [newValue]);
+			adm.spliceWithArray(index, 0, [newValue]);
 		} else
 			// out of bounds
 			throw new Error(`[mobx.array] Index out of bounds, ${index} is larger than ${values.length}`);
