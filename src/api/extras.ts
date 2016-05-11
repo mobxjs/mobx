@@ -64,7 +64,7 @@ export function getAdministration(thing: any, property?: string) {
 		return getAdministration(getAtom(thing, property));
 	if (thing instanceof Atom || thing instanceof ComputedValue || thing instanceof Reaction)
 		return thing;
-	if (isObservableArray(thing) || isObservableMap(thing))
+	if (isObservableMap(thing))
 		return thing;
 	if (thing.$mobx)
 		return thing.$mobx;
