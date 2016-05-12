@@ -3,6 +3,8 @@ import {invariant} from "../utils/utils";
 import {untracked} from "../core/derivation";
 import {allowStateChanges} from "./extras";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
+import {ComputedValue} from "../core/computedvalue";
+import {globalState} from "../core/globalstate";
 
 export function action<T extends Function>(fn: T): T;
 export function action<T extends Function>(name: string, fn: T): T;
@@ -34,6 +36,10 @@ export function actionImplementation(actionName: string, fn: Function): Function
 }
 
 function executeWrapped(actionName: string, fn: Function, scope: any, args: IArguments) {
+	// actions should not be called from computeds. check only works if the computed is actively observed, but that is fine enough as heuristic
+	const ds = globalState.derivationStack;
+	invariant(!(ds[ds.length - 1] instanceof ComputedValue), "Computed values should not invoke actions or trigger other side effects");
+
 	const notifySpy = isSpyEnabled();
 	let startTime: number;
 	if (notifySpy) {

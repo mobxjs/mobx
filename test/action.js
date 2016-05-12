@@ -93,7 +93,49 @@ test('action modifications should be picked up 3', t => {
 });
 
 
-// test action should be untracked
+test('test action should be untracked', t => {
+	var a = mobx.observable(3);
+	var b = mobx.observable(4);
+	var latest = 0;
+	var runs = 0;
+
+	var action = mobx.action((baseValue) => {
+		b.set(baseValue * 2);
+		latest = b.get(); // without action this would trigger loop
+	});
+
+	var d = mobx.autorun(() => {
+		runs++;
+		var current = a.get();
+		action(current);
+	});
+
+	t.equal(b.get(), 6);
+	t.equal(latest, 6);
+
+	a.set(7);
+	t.equal(b.get(), 14);
+	t.equal(latest, 14);
+
+	a.set(8);
+	t.equal(b.get(), 16);
+	t.equal(latest, 16);
+
+	b.set(7); // should have no effect
+	t.equal(a.get(), 8)
+	t.equal(b.get(), 7);
+	t.equal(latest, 16); // effect not triggered
+
+	a.set(3);
+	t.equal(b.get(), 6);
+	t.equal(latest, 6);
+
+	t.equal(runs, 4);
+
+	d();
+	t.end();
+});
+
 // test('action should respect strict mode', t => {
 
 // });
@@ -101,3 +143,20 @@ test('action modifications should be picked up 3', t => {
 // test('strict mode should not allow changes outside action', t => {
 
 // });
+
+test('should not be possible to invoke action in a computed block', t => {
+	var a = mobx.observable(2);
+
+	var noopAction = mobx.action(() => {});
+
+	var c = mobx.computed(() => {
+		debugger;
+		noopAction();
+		return a.get();
+	});
+
+	t.throws(() => {
+		mobx.autorun(() => c.get());
+	}, /Computed values should not invoke actions or trigger other side effects/, 'expected throw');
+	t.end();
+});
