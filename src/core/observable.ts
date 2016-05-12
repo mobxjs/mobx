@@ -1,6 +1,5 @@
 import {IDerivation, notifyDependencyReady, notifyDependencyStale} from "./derivation";
 import {globalState} from "./globalstate";
-import {deprecated} from "../utils/utils";
 
 export interface IDepTreeNode {
 	id: number;
@@ -32,7 +31,7 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 }
 
 export function reportObserved(observable: IObservable) {
-	if (globalState.inUntracked > 0)
+	if (globalState.isTracking === false)
 		return;
 	const {derivationStack} = globalState;
 	const l = derivationStack.length;
@@ -56,15 +55,4 @@ export function propagateReadiness(observable: IObservable|IDerivation, valueDid
 	observable.staleObservers.splice(0).forEach(
 		o => notifyDependencyReady(o, valueDidActuallyChange)
 	);
-}
-
-/**
- * TODO: just delete this, and introduce peek() on observables (and computed) instead? This is unelegant and unecessarily weird.
- * TODO: undeprecate if used by @action
- */
-export function untracked<T>(action: () => T): T {
-	globalState.inUntracked++;
-	const res = action();
-	globalState.inUntracked--;
-	return res;
 }

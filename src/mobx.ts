@@ -23,8 +23,8 @@ export { Lambda                                               } from "./utils/ut
 export { SimpleEventEmitter, ISimpleEventListener             } from "./utils/simpleeventemitter";
 export { IObserverTree, IDependencyTree                       } from "./api/extras";
 // TODO: move untracked to sane place
-export { IObservable, IDepTreeNode, untracked                 } from "./core/observable";
-export { IDerivation                                          } from "./core/derivation";
+export { IObservable, IDepTreeNode                            } from "./core/observable";
+export { IDerivation, untracked                               } from "./core/derivation";
 export { spy                                                  } from "./core/spy";
 
 export { asReference, asFlat, asStructure                     } from "./types/modifiers";

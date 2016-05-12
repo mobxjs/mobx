@@ -66,10 +66,13 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	const prevObserving = derivation.observing;
 	derivation.observing = [];
 	globalState.derivationStack.push(derivation);
+	const prevTracking = globalState.isTracking;
+	globalState.isTracking = true;
 	try {
 		const result = f();
 		hasException = false;
 		bindDependencies(derivation, prevObserving);
+		globalState.isTracking = prevTracking;
 		return result;
 	} finally {
 		if (hasException) {
@@ -126,4 +129,13 @@ function findCycle(needle: IDerivation, node: IObservable): boolean {
 		if (findCycle(needle, obs[i]))
 			return true;
 	return false;
+}
+
+
+export function untracked<T>(action: () => T): T {
+	const prevTracking = globalState.isTracking;
+	globalState.isTracking = false;
+	const res = action();
+	globalState.isTracking = prevTracking;
+	return res;
 }

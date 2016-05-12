@@ -1,5 +1,5 @@
 import {Lambda, once} from "../utils/utils";
-import {untracked} from "../core/observable";
+import {untracked} from "../core/derivation";
 
 export interface IListenable {
 	changeListeners: Function[];

@@ -1,7 +1,6 @@
 import {transaction} from "../core/transaction";
-import {isObservableObject} from "../types/observableobject";
 import {invariant} from "../utils/utils";
-import {untracked} from "../core/observable";
+import {untracked} from "../core/derivation";
 import {allowStateChanges} from "./extras";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 

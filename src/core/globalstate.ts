@@ -4,6 +4,12 @@ import {Reaction} from "./reaction";
 
 declare const global: any;
 
+
+/**
+ * These values will persist if global state is reset
+ */
+const persistentKeys = ["mobxGuid", "resetId", "spyListeners"];
+
 export class MobXGlobals {
 	/**
 	 * MobXGlobals version.
@@ -28,9 +34,9 @@ export class MobXGlobals {
 	inTransaction = 0;
 
 	/**
-	 * Are we in an untracked block? (and how many of them)
+	 * Are we in an (un)tracked block?
 	 */
-	inUntracked = 0;
+	isTracking: boolean = false;
 
 	/**
 	 * Are we currently running reactions?
@@ -67,12 +73,7 @@ export class MobXGlobals {
 	spyListeners: {(change: any): void}[] = [];
 }
 
-/**
- * These values will persist if global state is reset
- */
-const persistentKeys = ["mobxGuid", "resetId", "spyListeners"];
-
-export const globalState = (() => {
+export const globalState: MobXGlobals = (() => {
 	const res = new MobXGlobals();
 	/**
 	 * Backward compatibility check

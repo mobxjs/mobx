@@ -1,5 +1,5 @@
 import {IObservable, reportObserved, removeObserver} from "./observable";
-import {IDerivation, trackDerivedFunction, isComputingDerivation} from "./derivation";
+import {IDerivation, trackDerivedFunction, isComputingDerivation, untracked} from "./derivation";
 import {globalState, getNextId} from "./globalstate";
 import {valueDidChange, invariant, Lambda} from "../utils/utils";
 import {autorun} from "../api/autorun";
@@ -42,14 +42,12 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 		this.peek = () => {
 			// MWE: hmm.. to many state vars here...
 			this.isComputing = true;
-			globalState.isComputingComputedValue++;
 			const prevAllowStateChanges = globalState.allowStateChanges;
 			globalState.allowStateChanges = false;
 
 			const res = derivation.call(scope);
 
 			globalState.allowStateChanges = prevAllowStateChanges;
-			globalState.isComputingComputedValue--;
 			this.isComputing = false;
 			return res;
 		};
@@ -127,9 +125,9 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 		return autorun(() => {
 			let newValue = this.get();
 			if (!firstTime || fireImmediately) {
-				globalState.inUntracked++;
-				listener(newValue, prevValue);
-				globalState.inUntracked--;
+				untracked(() => {
+					listener(newValue, prevValue);
+				});
 			}
 			firstTime = false;
 			prevValue = newValue;

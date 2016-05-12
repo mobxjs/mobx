@@ -1,5 +1,5 @@
 import {Lambda, once, invariant} from "../utils/utils";
-import {untracked} from "../core/observable";
+import {untracked} from "../core/derivation";
 
 export type IInterceptor<T> = (change: T) => T;
 
