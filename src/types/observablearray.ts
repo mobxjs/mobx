@@ -364,9 +364,9 @@ makeNonEnumerable(ObservableArray.prototype, [
 	"unshift",
 	"reverse",
 	"sort",
+	"remove",
 	"toString",
-	"toLocaleString",
-	"remove"
+	"toLocaleString"
 ]);
 Object.defineProperty(ObservableArray.prototype, "length", {
 	enumerable: false,

@@ -43,3 +43,27 @@ test('observe object and map properties', function(t) {
 	
 	t.end();	
 });
+
+test('observe computed values', function(t) {
+	var events = [];
+
+	var v = m.observable(0);
+	var f = m.observable(0);
+	var c = m.computed(function() { return v.get(); });
+
+	var d2 = c.observe(function(newV, oldV) {
+		v.get();
+		f.get();
+		events.push([newV, oldV]);
+	});
+
+	v.set(6);
+	f.set(10);
+
+	t.deepEqual(events, [
+		[6, 0]
+	]);
+
+	t.end();
+
+});

@@ -1,3 +1,15 @@
+# 2.1.6
+
+* Fixed #236, #237 call stack issues when working with large arrays
+
+# 2.1.5
+
+* Fix #222 (by @andykog) run `observe` callback of computed properties in untracked mode.
+
+# 2.1.4
+
+* Fixed #201 (see also #160), another iOS enumerability issue... By @luosong 
+
 # 2.1.3
 
 * Fixed #191, when using babel, complex field initializers where shared. By @andykog
