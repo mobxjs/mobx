@@ -1,6 +1,7 @@
 import {Lambda, deprecated, invariant} from "../utils/utils";
 import {assertUnwrapped} from "../types/modifiers";
 import {Reaction} from "../core/reaction";
+import {untracked} from "../core/derivation";
 
 /**
  * Creates a reactive view and keeps it alive, so that the view is always
@@ -40,7 +41,7 @@ export function when(predicate: () => boolean, effect: Lambda, scope?: any) {
 				disposer();
 			else
 				disposeImmediately = true;
-			effect.call(scope);
+			untracked(() => effect.call(scope));
 		}
 	});
 	if (disposeImmediately)
