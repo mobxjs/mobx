@@ -25,6 +25,7 @@ export { IObserverTree, IDependencyTree                       } from "./api/extr
 // TODO: move untracked to sane place
 export { IObservable, IDepTreeNode                            } from "./core/observable";
 export { IDerivation, untracked                               } from "./core/derivation";
+export { action                                               } from "./core/action";
 export { spy                                                  } from "./core/spy";
 
 export { asReference, asFlat, asStructure                     } from "./types/modifiers";
@@ -36,7 +37,6 @@ export { /* 3.0: IValueDidChange, */ IValueWillChange         } from "./types/ob
 export { IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, isObservableArray, fastArray } from "./types/observablearray";
 export { IKeyValueMap, ObservableMap, IMapEntries, IMapWillChange, IMapChange, isObservableMap, map } from "./types/observablemap"
 
-export { action                                               } from "./api/action";
 export { IObservableValue, observable                         } from "./api/observable";
 export { computed, IComputedValueOptions                      } from "./api/computeddecorator";
 export { isObservable                                         } from "./api/isobservable";

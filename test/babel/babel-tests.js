@@ -166,3 +166,28 @@ test("action decorator (babel)", function(t) {
 	d();
 	t.end();
 });
+
+test("custom action decorator (babel)", function(t) {
+	class Store {
+		@action("zoem zoem")
+		add(a, b) {
+			return a + b;
+		}
+	}
+
+	const store =  new Store();
+	const events: any[] = [];
+	const d = spy(events.push.bind(events));
+	t.equal(store.add(3, 4), 7);
+
+	delete events[0].fn;
+	delete events[1].time;
+
+	t.deepEqual(events,	[
+		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, target: store, type: "action" },
+		{ spyReportEnd: true }
+	]);
+
+	d();
+	t.end();
+});

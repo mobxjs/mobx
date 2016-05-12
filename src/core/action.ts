@@ -1,23 +1,29 @@
 import {transaction} from "../core/transaction";
 import {invariant} from "../utils/utils";
 import {untracked} from "../core/derivation";
-import {allowStateChanges} from "./extras";
+import {allowStateChanges} from "../api/extras";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {ComputedValue} from "../core/computedvalue";
 import {globalState} from "../core/globalstate";
 
 export function action<T extends Function>(fn: T): T;
 export function action<T extends Function>(name: string, fn: T): T;
+export function action(customName: string): (target: Object, key: string, baseDescriptor?: PropertyDescriptor) => void;
 export function action(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
-export function action(arg1, arg2?, arg3?): any {
-	// TODO: introduce reaction as well?
-	// TODO: empty derivation stack warning?
+export function action(arg1, arg2?, arg3?, arg4?): any {
 	switch (arguments.length) {
 		case 1:
-			return actionImplementation(arg1.name || "<unnamed action>", arg1);
+			// action(someFunction)
+			if (typeof arg1 === "function")
+				return actionImplementation(arg1.name || "<unnamed action>", arg1);
+			// @action("custom name") someFunction
+			else
+				return (target, key, descriptor) => actionDecorator(arg1, descriptor);
 		case 2:
+			// action("custom name", someFunction)
 			return actionImplementation(arg1, arg2);
 		case 3:
+			// @action someFunction
 			return actionDecorator(arg2, arg3);
 		default:
 			invariant(false, "Invalid arguments for (@)action, please provide a function, name and function or use it as decorator on a class instance method");
