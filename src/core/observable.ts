@@ -34,15 +34,13 @@ export function reportObserved(observable: IObservable) {
 	if (globalState.isTracking === false)
 		return;
 	const {derivationStack} = globalState;
-	const l = derivationStack.length;
-	if (l > 0) {
-		const deps = derivationStack[l - 1].observing, depslength = deps.length;
-		// this last item added check is an optimization especially for array loops,
-		// because an array.length read with subsequent reads from the array
-		// might trigger many observed events, while just checking the latest added items is cheap
-		if (deps[depslength - 1] !== observable && deps[depslength - 2] !== observable)
-			deps[depslength] = observable;
-	}
+	const deps = derivationStack[derivationStack.length - 1].observing;
+	const depslength = deps.length;
+	// this last item added check is an optimization especially for array loops,
+	// because an array.length read with subsequent reads from the array
+	// might trigger many observed events, while just checking the latest added items is cheap
+	if (deps[depslength - 1] !== observable && deps[depslength - 2] !== observable)
+		deps[depslength] = observable;
 }
 
 export function propagateStaleness(observable: IObservable|IDerivation) {

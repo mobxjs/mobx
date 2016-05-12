@@ -23,12 +23,6 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 	protected value: T = undefined;
 
 	/**
-	 * Peek into the current value of this computedObservable. Re-evaluate if needed but don't bind the current
-	 * exeuction context as an observer.
-	 */
-	public peek: () => T;
-
-	/**
 	 * Create a new computed value based on a function expression.
 	 *
 	 * The `name` property is for debug purposes only.
@@ -38,20 +32,19 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 	 * However, enabling compareStructural can be convienent if you always produce an new aggregated object and don't want to notify observers if it is structurally the same.
 	 * This is useful for working with vectors, mouse coordinates etc.
 	 */
-	constructor(public derivation: () => T, private scope: Object, private compareStructural: boolean, public name = "ComputedValue") {
-		this.peek = () => {
-			// MWE: hmm.. to many state vars here...
-			this.isComputing = true;
-			const prevAllowStateChanges = globalState.allowStateChanges;
-			globalState.allowStateChanges = false;
+	constructor(public derivation: () => T, private scope: Object, private compareStructural: boolean, public name = "ComputedValue") { }
 
-			const res = derivation.call(scope);
+	peek() {
+		this.isComputing = true;
+		const prevAllowStateChanges = globalState.allowStateChanges;
+		globalState.allowStateChanges = false;
 
-			globalState.allowStateChanges = prevAllowStateChanges;
-			this.isComputing = false;
-			return res;
-		};
-	}
+		const res = this.derivation.call(this.scope);
+
+		globalState.allowStateChanges = prevAllowStateChanges;
+		this.isComputing = false;
+		return res;
+	};
 
 	onBecomeObserved() {
 		// noop, handled by .get()
