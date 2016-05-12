@@ -17,6 +17,15 @@ function buffer() {
     return res;
 }
 
+test('argumentless observable', t => {
+	var a = observable();
+
+	t.equal(m.isObservable(a), true);
+	t.equal(a.get(), undefined);
+
+	t.end();
+})
+
 test('basic', function(t) {
     var x = observable(3);
     var b = buffer();
