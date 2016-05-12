@@ -136,13 +136,35 @@ test('test action should be untracked', t => {
 	t.end();
 });
 
-// test('action should respect strict mode', t => {
+test('should be possible to create autorun in ation', t => {
+	var a = mobx.observable(1);
+	var values = [];
+	
+	var adder = mobx.action(inc => {
+		return mobx.autorun(() => {
+			values.push(a.get() + inc);
+		})
+	});
+	
+	var d1 = adder(2);
+	a.set(3);
+	var d2 = adder(17);
+	a.set(24);
+	d1();
+	a.set(11);
+	d2();
+	a.set(100);
 
-// });
-
-// test('strict mode should not allow changes outside action', t => {
-
-// });
+	t.deepEqual(values, [
+		3,
+		5,
+		20,
+		26,
+		41,
+		28
+	]);
+	t.end();
+})
 
 test('should not be possible to invoke action in a computed block', t => {
 	var a = mobx.observable(2);
@@ -160,3 +182,11 @@ test('should not be possible to invoke action in a computed block', t => {
 	}, /Computed values should not invoke actions or trigger other side effects/, 'expected throw');
 	t.end();
 });
+
+// test('action should respect strict mode', t => {
+
+// });
+
+// test('strict mode should not allow changes outside action', t => {
+
+// });
