@@ -12,7 +12,6 @@ import {isSpyEnabled, spyReport} from "../core/spy";
  * If a computed value isn't actively used by another observer, but is inspect, it will compute lazily to return at least a consistent value.
  */
 export class ComputedValue<T> implements IObservable, IDerivation {
-	id = getNextId();
 	isLazy = true; // nobody is observing this derived value, so don't bother tracking upstream values
 	isComputing = false;
 	staleObservers: IDerivation[] = [];
@@ -21,6 +20,7 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 	protected value: T = undefined;
+	name: string;
 
 	/**
 	 * Create a new computed value based on a function expression.
@@ -32,7 +32,9 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 	 * However, enabling compareStructural can be convienent if you always produce an new aggregated object and don't want to notify observers if it is structurally the same.
 	 * This is useful for working with vectors, mouse coordinates etc.
 	 */
-	constructor(public derivation: () => T, private scope: Object, private compareStructural: boolean, public name = "ComputedValue") { }
+	constructor(public derivation: () => T, private scope: Object, private compareStructural: boolean, name: string) {
+		this.name  = name || "ComputedValue@" + getNextId();
+	}
 
 	peek() {
 		this.isComputing = true;
@@ -128,6 +130,6 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 	}
 
 	toString() {
-		return `${this.name}@${this.id}[${this.derivation.toString()}]`;
+		return `${this.name}[${this.derivation.toString()}]`;
 	}
 }

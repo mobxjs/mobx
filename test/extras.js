@@ -10,8 +10,7 @@ test('treeD', function(t) {
 
     var dtree = m.extras.getDependencyTree;
     t.deepEqual(dtree(a), {
-       name: aName,
-       id: a.id
+       name: aName
     });
 
 
@@ -21,8 +20,7 @@ test('treeD', function(t) {
     var b = m.observable(bFunc);
     var bName = 'ComputedValue@2';
     t.deepEqual(dtree(b), {
-        name: bName,
-        id: b.id,
+        name: bName
         // no dependencies yet, since it isn't observed yet
     });
 
@@ -33,13 +31,10 @@ test('treeD', function(t) {
     var cName = 'Autorun@3';
     t.deepEqual(dtree(c.$mobx), {
         name: cName,
-        id: c.$mobx.id,
         dependencies: [{
             name: bName,
-            id: b.id,
             dependencies: [{
                 name: aName,
-                id: a.id
             }]
         }]
     });
@@ -49,13 +44,10 @@ test('treeD', function(t) {
 
     t.deepEqual(m.extras.getObserverTree(a), {
         name: aName,
-        id: a.id,
         observers: [{
             name: bName,
-            id: b.id,
             observers: [{
                 name: cName,
-                id: c.$mobx.id
             }]
         }]
     });
@@ -69,20 +61,15 @@ test('treeD', function(t) {
     });
 
     t.deepEqual(m.extras.getDependencyTree(d.$mobx), {
-        id: 8,
-        name: 'Autorun@8',
+        name: 'Autorun@5',
         dependencies: [{
-            id: 5,
-            name: 'ObservableMap@4.keys()@5'
+            name: 'ObservableMap@4.keys()'
         }, {
-            id: 7,
-            name: 'ObservableMap@4.temperature?@7'
+            name: 'ObservableMap@4.temperature?'
         }, {
-            id: 6,
-            name: 'ObservableMap@4.temperature@6'
+            name: 'ObservableMap@4.temperature'
         }, {
-            id: 9,
-            name: 'ObservableMap@4.absent?@9'
+            name: 'ObservableMap@4.absent?'
         }]
     });
 
@@ -112,12 +99,12 @@ test('names', function(t) {
     rstruct.ar.push([]);
     t.equal(rstruct.$mobx.values.x.name, "ObservableObject@1.x");
     t.equal(rstruct.$mobx.values.y.name, "ObservableObject@1.y");
-    t.equal(rstruct.y.$mobx.values.z.name, "ObservableObject@1.y@4.z");
+    t.equal(rstruct.y.$mobx.values.z.name, "ObservableObject@1.y.z");
     t.equal(rstruct.$mobx.values.ar.name, "ObservableObject@1.ar");
     t.equal(rstruct.ar.$mobx.atom.name, "ObservableObject@1.ar");
-    t.equal(rstruct.ar[1].$mobx.values.w.name, "ObservableObject@1.ar@7[..]@8.w");
-    t.equal(rstruct.y.a.$mobx.values.b.name, "ObservableObject@1.y@4.a@11.b");
-    t.equal(rstruct.ar[2].$mobx.values.b.name, "ObservableObject@1.ar@7[..]@13.b");
+    t.equal(rstruct.ar[1].$mobx.values.w.name, "ObservableObject@1.ar[..].w");
+    t.equal(rstruct.y.a.$mobx.values.b.name, "ObservableObject@1.y.a.b");
+    t.equal(rstruct.ar[2].$mobx.values.b.name, "ObservableObject@1.ar[..].b");
 
     var d = m.autorun(function() {
     });
@@ -137,8 +124,8 @@ test('names', function(t) {
 	}
 	
 	var task = new Task();
-	t.equal(task.$mobx.name, "Task");
-	t.equal(task.$mobx.values.title.name, "Task@20.title");
+	t.equal(task.$mobx.name, "Task@4");
+	t.equal(task.$mobx.values.title.name, "Task@4.title");
 
     t.end();
 })
@@ -261,7 +248,7 @@ test('get atom', function(t) {
 	t.equal(atom(c), atomClassName); // returns ke, "bla".constructor, === "Atomys
 	t.equal(atom(c, "a"), ovClassName); // returns ent, "bla".constructor, === "Atomry
 	t.equal(atom(c, "b"), ovClassName); // returns has entry (see autoru, "bla", "Atomn)
-	t.throws(() => atom(c, "c"), /the entry 'c' does not exist in the observable map 'ObservableMap@4'/, "expected throw");
+	t.throws(() => atom(c, "c"), /the entry 'c' does not exist in the observable map 'ObservableMap@3'/, "expected throw");
 
 	t.equal(atom(d), atomClassName);
 	t.throws(() => atom(d, 0), /It is not possible to get index atoms from arrays/, "expected throw");
@@ -300,22 +287,22 @@ test('get debug name', function(t) {
 
 	t.equal(name(a), "ObservableValue@1");
 	
-	t.equal(name(b, "a"), "ObservableObject@2.a@3"); // TODO: remove @3..! (also in the other tests)
+	t.equal(name(b, "a"), "ObservableObject@2.a"); // TODO: remove @3..! (also in the other tests)
 	t.throws(() => name(b, "b"), /no observable property 'b' found on the observable object 'ObservableObject@2'/, "expected throw");
 	
-	t.equal(name(c), "ObservableMap@4"); // returns ke, "bla"ys
-	t.equal(name(c, "a"), "ObservableMap@4.a@6"); // returns ent, "bla"ry
-	t.equal(name(c, "b"), "ObservableMap@4.b?@11"); // returns has entry (see autoru, "bla"n)
-	t.throws(() => name(c, "c"), /the entry 'c' does not exist in the observable map 'ObservableMap@4'/, "expected throw");
+	t.equal(name(c), "ObservableMap@3"); // returns ke, "bla"ys
+	t.equal(name(c, "a"), "ObservableMap@3.a"); // returns ent, "bla"ry
+	t.equal(name(c, "b"), "ObservableMap@3.b?"); // returns has entry (see autoru, "bla"n)
+	t.throws(() => name(c, "c"), /the entry 'c' does not exist in the observable map 'ObservableMap@3'/, "expected throw");
 
-	t.equal(name(d), "ObservableArray@8");
+	t.equal(name(d), "ObservableArray@4");
 	t.throws(() => name(d, 0), /It is not possible to get index atoms from arrays/, "expected throw");
 
-	t.equal(name(e), "ComputedValue@9");
-	t.equal(name(f), "Autorun@10");
+	t.equal(name(e), "ComputedValue@5");
+	t.equal(name(f), "Autorun@6");
 
-	t.equal(name(g), "Clazz@12");
-	t.equal(name(g, "a"), "Clazz@12.a@13");
+	t.equal(name(g), "Clazz@7");
+	t.equal(name(g, "a"), "Clazz@7.a");
 	
 	f();
 	t.end();
@@ -354,7 +341,7 @@ test('get administration', function(t) {
 	t.equal(adm(c), mobx.ObservableMap.name);
 	t.equal(adm(c, "a"), ovClassName);
 	t.equal(adm(c, "b"), ovClassName);
-	t.throws(() => adm(c, "c"), /the entry 'c' does not exist in the observable map 'ObservableMap@4'/, "expected throw");
+	t.throws(() => adm(c, "c"), /the entry 'c' does not exist in the observable map 'ObservableMap@3'/, "expected throw");
 
 	t.equal(adm(d), d.$mobx.constructor.name);
 	t.throws(() => adm(d, 0), /It is not possible to get index atoms from arrays/, "expected throw");

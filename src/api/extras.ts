@@ -9,13 +9,11 @@ import {isObservableMap} from "../types/observablemap";
 import {isObservableObject} from "../types/observableobject";
 
 export interface IDependencyTree {
-	id: number;
 	name: string;
 	dependencies?: IDependencyTree[];
 }
 
 export interface IObserverTree {
-	id: number;
 	name: string;
 	observers?: IObserverTree[];
 }
@@ -79,7 +77,7 @@ export function getDebugName(thing: any, property?: string): string {
 		named = getAdministration(thing);
 	else
 		named = getAtom(thing); // valid for arrays as well
-	return `${named.name}@${named.id}`;
+	return named.name;
 }
 
 export function getDependencyTree(thing: any, property?: string): IDependencyTree {
@@ -88,8 +86,7 @@ export function getDependencyTree(thing: any, property?: string): IDependencyTre
 
 function nodeToDependencyTree(node: IDepTreeNode): IDependencyTree {
 	const result: IDependencyTree = {
-		id: node.id,
-		name: `${node.name}@${node.id}` // TODO: use debug name
+		name: node.name
 	};
 	if (node.observing && node.observing.length)
 		result.dependencies = unique(node.observing).map(nodeToDependencyTree);
@@ -102,8 +99,7 @@ export function getObserverTree(thing: any, property?: string): IObserverTree {
 
 function nodeToObserverTree(node: IDepTreeNode): IObserverTree {
 	const result: IObserverTree = {
-		id: node.id,
-		name: `${node.name}@${node.id}` // TODO: use debug name
+		name: node.name
 	};
 	if (node.observers && node.observers.length)
 		result.observers = <any>unique(node.observers).map(<any>nodeToObserverTree);

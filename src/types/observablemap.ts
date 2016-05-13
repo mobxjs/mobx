@@ -37,9 +37,8 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	private _data: { [key: string]: ObservableValue<V> } = {};
 	private _hasMap: { [key: string]: ObservableValue<boolean> } = {}; // hasMap, not hashMap >-).
 	private _valueMode: ValueMode;
-	public name = "ObservableMap";
-	public id = getNextId();
-	private _keys: IObservableArray<string> = <any> new ObservableArray(null, ValueMode.Reference, `${this.name}@${this.id}.keys()`, true);
+	public name = "ObservableMap@" + getNextId();
+	private _keys: IObservableArray<string> = <any> new ObservableArray(null, ValueMode.Reference, `${this.name}.keys()`, true);
 	interceptors = null;
 	changeListeners = null;
 
@@ -129,7 +128,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		if (entry) {
 			entry.setNewValue(value);
 		} else {
-			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, `${this.name}@${this.id}.${key}?`, false);
+			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, `${this.name}.${key}?`, false);
 		}
 		return entry;
 	}
@@ -159,7 +158,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 
 	private _addValue(name: string, newValue: V) {
 		transaction(() => {
-			const observable = this._data[name] = new ObservableValue(newValue, this._valueMode, `${this.name}@${this.id}.${name}`, false);
+			const observable = this._data[name] = new ObservableValue(newValue, this._valueMode, `${this.name}.${name}`, false);
 			newValue = (observable as any).value; // value might have been changed
 			this._updateHasMapEntry(name, true);
 			this._keys.push(name);
@@ -248,7 +247,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	}
 
 	toString(): string {
-		return "[mobx.map { " + this.keys().map(key => `${key}: ${"" + this.get(key)}`).join(", ") + " }]";
+		return this.name + "[{ " + this.keys().map(key => `${key}: ${"" + this.get(key)}`).join(", ") + " }]";
 	}
 
 	/**

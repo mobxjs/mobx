@@ -23,7 +23,6 @@ import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
  *
  */
 export class Reaction implements IDerivation {
-	id = getNextId();
 	staleObservers:  IDerivation[] = EMPTY_ARRAY; // Won't change
 	observers: IDerivation[] = EMPTY_ARRAY;       // Won't change
 	observing: IObservable[] = []; // nodes we are looking at. Our value depends on these nodes
@@ -33,7 +32,7 @@ export class Reaction implements IDerivation {
 	_isScheduled = false;
 	_isTrackPending = false;
 
-	constructor(public name: string = "Reaction", private onInvalidate: () => void) { }
+	constructor(public name: string = "Reaction@" + getNextId(), private onInvalidate: () => void) { }
 
 	onBecomeObserved() {
 		// noop, reaction is always unobserved

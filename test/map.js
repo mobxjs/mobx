@@ -4,6 +4,8 @@ var map = mobx.map;
 var autorun = mobx.autorun;
 
 test('map crud', function(t) {
+	global.__mobxGlobal.mobxGuid = 0; // hmm dangerous reset?
+
 	var events = [];
 	var m = map({ a: 1});
 	m.observe(function(changes) {
@@ -28,14 +30,14 @@ test('map crud', function(t) {
 	t.deepEqual(m.values(), [2, 3]);
 	t.deepEqual(m.entries(), [["a", 2], ["b", 3]]);
 	t.deepEqual(m.toJs(), { a: 2, b: 3});
-	t.deepEqual(m.toString(), "[mobx.map { a: 2, b: 3 }]");
+	t.deepEqual(m.toString(), "ObservableMap@1[{ a: 2, b: 3 }]");
 	t.equal(m.size, 2);
 
 	m.clear();
 	t.deepEqual(m.keys(), []);
 	t.deepEqual(m.values(), []);
 	t.deepEqual(m.toJs(), { });
-	t.deepEqual(m.toString(), "[mobx.map {  }]");
+	t.deepEqual(m.toString(), "ObservableMap@1[{  }]");
 	t.equal(m.size, 0);
 
 	t.equal(m.has("a"), false);

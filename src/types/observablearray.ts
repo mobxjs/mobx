@@ -5,6 +5,7 @@ import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
+import {getNextId} from "../core/globalstate";
 
 export interface IObservableArray<T> extends Array<T> {
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[];
@@ -74,7 +75,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 	changeListeners = null;
 
 	constructor(name, public mode: ValueMode, public array: IObservableArray<T>, public owned: boolean) {
-		this.atom = new Atom(name || "ObservableArray");
+		this.atom = new Atom(name || ("ObservableArray@" + getNextId()));
 	}
 
 	makeReactiveArrayItem(value) {
@@ -82,7 +83,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 		assertUnwrapped(value, "Array values cannot have modifiers");
 		if (this.mode === ValueMode.Flat || this.mode === ValueMode.Reference)
 			return value;
-		return makeChildObservable(value, this.mode, `${this.atom.name}@${this.atom.id}[..]`);
+		return makeChildObservable(value, this.mode, `${this.atom.name}[..]`);
 	}
 
 	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {

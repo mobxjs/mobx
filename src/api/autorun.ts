@@ -2,6 +2,7 @@ import {Lambda, deprecated, invariant} from "../utils/utils";
 import {assertUnwrapped} from "../types/modifiers";
 import {Reaction} from "../core/reaction";
 import {untracked} from "../core/derivation";
+import {getNextId} from "../core/globalstate";
 
 /**
  * Creates a reactive view and keeps it alive, so that the view is always
@@ -17,7 +18,7 @@ export function autorun(view: Lambda, scope?: any) {
 	if (scope)
 		view = view.bind(scope);
 
-	const reaction = new Reaction(view.name || "Autorun", function () {
+	const reaction = new Reaction(view.name || ("Autorun@" + getNextId()), function () {
 		this.track(view);
 	});
 	reaction.schedule();

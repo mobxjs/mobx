@@ -5,6 +5,7 @@ import {valueDidChange, Lambda} from "../utils/utils";
 import {hasInterceptors, IInterceptable, IInterceptor, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd, spyReport} from "../core/spy";
+import {getNextId} from "../core/globalstate";
 
 export interface IValueWillChange<T> {
 	object: any;
@@ -30,7 +31,7 @@ export class ObservableValue<T> extends Atom implements IInterceptable<IValueWil
 	changeListeners;
 	protected value: T = undefined;
 
-	constructor(value: T, protected mode: ValueMode, name = "ObservableValue", notifySpy = true) {
+	constructor(value: T, protected mode: ValueMode, name = "ObservableValue@" + getNextId(), notifySpy = true) {
 		super(name);
 		const [childmode, unwrappedValue] = getValueModeFromValue(value, ValueMode.Recursive);
 		// If the value mode is recursive, modifiers like 'structure', 'reference', or 'flat' could apply
@@ -100,6 +101,6 @@ export class ObservableValue<T> extends Atom implements IInterceptable<IValueWil
 	}
 
 	toString() {
-		return `${this.name}@${this.id}[${this.value}]`;
+		return `${this.name}[${this.value}]`;
 	}
 }

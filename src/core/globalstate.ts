@@ -87,6 +87,7 @@ export const globalState: MobXGlobals = (() => {
 	return global.__mobxGlobal = res;
 })();
 
+// TODO: move to utils
 export function getNextId() {
 	return ++globalState.mobxGuid;
 }

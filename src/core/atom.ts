@@ -23,7 +23,6 @@ export function propagateAtomReady(atom: IAtom) {
  * 2) they should notify mobx whenever they have _changed_. This way mobx can re-run any functions (derivations) that are using this atom. 
  */
 export class Atom implements IAtom {
-	id = getNextId();
 	isDirty = false;
 	staleObservers = [];
 	observers = [];
@@ -32,7 +31,7 @@ export class Atom implements IAtom {
 	 * Create a new atom. For debugging purposes it is recommended to give it a name.
 	 * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
 	 */
-	constructor(public name = "Atom", public onBecomeObserved: () => void = noop, public onBecomeUnobserved = noop) { }
+	constructor(public name = "Atom@" + getNextId(), public onBecomeObserved: () => void = noop, public onBecomeUnobserved = noop) { }
 
 	/**
 	 * Invoke this method to notify mobx that your atom has been used somehow. 
@@ -69,6 +68,6 @@ export class Atom implements IAtom {
 	}
 
 	toString() {
-		return `${this.name}@${this.id}`;
+		return this.name;
 	}
 }

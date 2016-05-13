@@ -29,7 +29,7 @@ export class ObservableObjectAdministration implements IInterceptable<IObjectWil
 	changeListeners = null;
 	interceptors = null;
 
-	constructor(public target: any, public name: string, public mode: ValueMode, public id: number) { }
+	constructor(public target: any, public name: string, public mode: ValueMode) { }
 
 	/**
 		* Observes this object. Triggers for the events 'add', 'update' and 'delete'.
@@ -56,11 +56,11 @@ export function asObservableObject(target, name: string, mode: ValueMode = Value
 		return target.$mobx;
 
 	if (!isPlainObject(target))
-		name = target.constructor.name;
+		name = target.constructor.name + "@" + getNextId();
 	if (!name)
-		name = "ObservableObject";
+		name = "ObservableObject@" + getNextId();
 
-	const adm = new ObservableObjectAdministration(target, name, mode, getNextId());
+	const adm = new ObservableObjectAdministration(target, name, mode);
 	Object.defineProperty(target, "$mobx", {
 		enumerable: false,
 		configurable: false,
@@ -81,7 +81,7 @@ function defineObservableProperty(adm: ObservableObjectAdministration, propName:
 	assertPropertyConfigurable(adm.target, propName);
 
 	let observable: ComputedValue<any>|ObservableValue<any>;
-	let name = `${adm.name}@${adm.id}.${propName}`;
+	let name = `${adm.name}.${propName}`;
 	let isComputed = true;
 
 	if (typeof newValue === "function" && newValue.length === 0)

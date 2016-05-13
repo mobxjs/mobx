@@ -23,7 +23,7 @@ export function computed(targetOrExpr: any, keyOrScope?: any, baseDescriptor?: P
 
 function computedExpr<T>(expr: () => T, scope?: any) {
 	const [mode, value] = getValueModeFromValue(expr, ValueMode.Recursive);
-	return new ComputedValue(value, scope, mode === ValueMode.Structure, value.name || "ComputedValue");
+	return new ComputedValue(value, scope, mode === ValueMode.Structure, value.name);
 }
 
 function computedDecorator(target: any, key?: any, baseDescriptor?: PropertyDescriptor, options?: IComputedValueOptions): any {
