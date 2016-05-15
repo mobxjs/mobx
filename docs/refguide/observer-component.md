@@ -70,7 +70,7 @@ import {observable} from "mobx"
 	}
 })
 
-React.render(<Timer timerData={timerData} />, document.body)
+React.render(<Timer />, document.body)
 ```
 
 ## When to apply `observer`?
