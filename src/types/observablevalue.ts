@@ -33,7 +33,6 @@ export class ObservableValue<T> extends Atom implements IInterceptable<IValueWil
 
 	constructor(value: T, protected mode: ValueMode, name = "ObservableValue@" + getNextId(), notifySpy = true) {
 		super(name);
-		checkIfStateModificationsAreAllowed();
 		const [childmode, unwrappedValue] = getValueModeFromValue(value, ValueMode.Recursive);
 		// If the value mode is recursive, modifiers like 'structure', 'reference', or 'flat' could apply
 		if (this.mode === ValueMode.Recursive)

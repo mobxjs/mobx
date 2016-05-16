@@ -126,13 +126,13 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 	updateArrayLength(oldLength: number, delta: number) {
 		if (oldLength !== this.lastKnownLength)
 			throw new Error("[mobx] Modification exception: the internal structure of an observable array was changed. Did you use peek() to change it?");
-		checkIfStateModificationsAreAllowed();
 		this.lastKnownLength += delta;
 		if (delta > 0 && oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
 			reserveArrayBuffer(oldLength + delta);
 	}
 
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[] {
+		checkIfStateModificationsAreAllowed();
 		const length = this.values.length;
 
 		if (index === undefined)
@@ -221,7 +221,6 @@ export class ObservableArray<T> extends StubArray {
 
 	constructor(initialValues: T[], mode: ValueMode, name: string, owned = false) {
 		super();
-		checkIfStateModificationsAreAllowed();
 
 		const adm = new ObservableArrayAdministration<T>(name, mode, this as any, owned);
 		Object.defineProperty(this, "$mobx", {

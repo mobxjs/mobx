@@ -7,7 +7,6 @@ import {throwingComputedValueSetter} from "../api/computeddecorator";
 import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
-import {isObservable} from "../api/isobservable";
 
 // In 3.0, change to IObjectDidChange
 export interface IObjectChange {

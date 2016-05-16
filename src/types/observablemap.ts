@@ -3,7 +3,7 @@ import {transaction} from "../core/transaction";
 import {ObservableArray, IObservableArray} from "./observablearray";
 import {ObservableValue, UNCHANGED} from "./observablevalue";
 import {isPlainObject, Lambda, invariant} from "../utils/utils";
-import {getNextId} from "../core/globalstate";
+import {getNextId, allowStateChanges} from "../core/globalstate";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
@@ -44,10 +44,12 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 
 	constructor(initialData?: IMapEntries<V> | IKeyValueMap<V>, valueModeFunc?: Function) {
 		this._valueMode = getValueModeFromModifierFunc(valueModeFunc);
-		if (isPlainObject(initialData))
-			this.merge(<IKeyValueMap<V>> initialData);
-		else if (Array.isArray(initialData))
-			initialData.forEach(([key, value]) => this.set(key, value));
+		allowStateChanges(true, () => {
+			if (isPlainObject(initialData))
+				this.merge(<IKeyValueMap<V>> initialData);
+			else if (Array.isArray(initialData))
+				initialData.forEach(([key, value]) => this.set(key, value));
+		});
 	}
 
 	private _has(key: string): boolean {

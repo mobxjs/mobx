@@ -5,14 +5,11 @@ var strictError = /It is not allowed to create or change state outside an `actio
 
 test('strict mode should not allow changes outside action', t => {
 	var a = mobx.observable(2);
-	debugger;
 	mobx.useStrict(true);
-	
-	
-	t.throws(() => mobx.observable(3), strictError);
 	t.throws(() => a.set(3), strictError);
-	
 	mobx.useStrict(false);
+	a.set(4);
+	t.equal(a.get(), 4);
 	t.end();
 });
 
@@ -91,12 +88,14 @@ test('cannot create or modify objects in strict mode without action', t => {
 
 	mobx.useStrict(true);
 
-	t.throws(() => mobx.observable({ a: 2, b: function() { return this.a }}), strictError);
-	t.throws(() => mobx.map({ a: 2}), strictError);
-	t.throws(() => mobx.observable([1, 2, 3]), strictError);
+	// introducing new observables is ok!
+	mobx.observable({ a: 2, b: function() { return this.a }});
+	mobx.observable({ b: function() { return this.a } });
+	mobx.map({ a: 2});
+	mobx.observable([1, 2, 3]);
+	mobx.extendObservable(obj, { b: 4});
 
 	t.throws(() => obj.a = 3, strictError);
-	t.throws(() => mobx.extendObservable(obj, { b: 4}), strictError);
 	t.throws(() => ar[0] = 2, strictError);
 	t.throws(() => ar.push(3), strictError);
 	t.throws(() => map.set("a", 3), strictError);
@@ -104,6 +103,10 @@ test('cannot create or modify objects in strict mode without action', t => {
 	t.throws(() => map.delete("a"), strictError);
 
 	mobx.useStrict(false);
+	
+	// can modify again
+	obj.a  = 42;
+
 	t.end();
 })
 

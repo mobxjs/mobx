@@ -51,7 +51,7 @@ function getMemoizationId(object) {
 	let tid = object.$transformId;
 	if (tid === undefined) {
 		tid = getNextId();
-		Object.defineProperty(object, '$transformId', {
+		Object.defineProperty(object, "$transformId", {
 			configurable: true,
 			writable: true,
 			enumerable: false,
