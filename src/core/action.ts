@@ -16,26 +16,80 @@ export function action(arg1, arg2?, arg3?, arg4?): any {
 			// action(someFunction)
 			if (typeof arg1 === "function")
 				return actionImplementation(arg1.name || "<unnamed action>", arg1);
-			// @action("custom name") someFunction
+			// @action("custom name") someFunction () {}
+			// @action("custom name") someFunction = () => {}
 			else
-				return (target, key, descriptor) => actionDecorator(arg1, descriptor);
+				return (target, key, descriptor) => actionDecorator(arg1, target, key, descriptor);
 		case 2:
 			// action("custom name", someFunction)
 			return actionImplementation(arg1, arg2);
 		case 3:
-			// @action someFunction
-			return actionDecorator(arg2, arg3);
+			// @action someFunction () {}
+			// @action someFunction = () => {}
+			return actionDecorator(arg2, arg1, arg2, arg3);
 		default:
 			invariant(false, "Invalid arguments for (@)action, please provide a function, name and function or use it as decorator on a class instance method");
 	}
 }
 
-function actionDecorator(name: string, descriptor: PropertyDescriptor) {
+function actionDecorator(name: string, target: any, key: string, descriptor: PropertyDescriptor) {
+	if (descriptor === undefined) {
+		// typescript: @action f = () => { } 
+		typescriptActionValueDecorator(name, target, key);
+		return;
+	}
+	if (descriptor.value === undefined && typeof (descriptor as any).initializer === "function") {
+		// typescript: @action f = () => { } 
+		return babelActionValueDecorator(name, target, key, descriptor);
+	}
 	const base = descriptor.value;
 	descriptor.value = actionImplementation(name, base);
 }
 
+/**
+ * Decorators the following pattern @action method = () => {} by desugaring it to method = action(() => {}) 
+ */
+function babelActionValueDecorator(name: string, target, prop, descriptor): PropertyDescriptor {
+	return {
+		configurable: true,
+		enumerable: false,
+		get: function() {
+			const implementation = action(name, descriptor.initializer.call(this));
+			Object.defineProperty(target, prop, {
+				enumerable: false,
+				writable: false,
+				value: implementation
+			});
+			return implementation;
+		},
+		set: function() {
+			invariant(false, "@action decorated fields cannot be overwritten");
+		}
+	};
+}
+
+function typescriptActionValueDecorator(name: string, target, prop) {
+	Object.defineProperty(target, prop, {
+		configurable: true,
+		enumerable: false,
+		get: function() {
+			invariant(false, "Typescript @action decorator: field not initialized");
+		},
+		set: function(implementation) {
+			implementation = action(name, implementation);
+			Object.defineProperty(target, prop, {
+				enumerable: false,
+				writable: false,
+				value: implementation
+			});
+			return implementation;
+		}
+	});
+}
+
 export function actionImplementation(actionName: string, fn: Function): Function {
+	invariant(typeof fn === "function", "`action` can only be invoked on functions");
+	invariant(typeof actionName === "string" && actionName.length > 0, `actions should have valid names, got: '${actionName}'`);
 	return function () {
 		return executeWrapped(actionName, fn, this, arguments);
 	};

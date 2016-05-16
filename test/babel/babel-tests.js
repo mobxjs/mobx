@@ -191,3 +191,35 @@ test("custom action decorator (babel)", function(t) {
 	d();
 	t.end();
 });
+
+test("custom action decorator on field (babel)", function(t) {
+	class Store {
+		multiplier = 2;
+
+		@action("zoem zoem")
+		add = (a, b) => {
+			return (a + b) * this.multiplier;
+		};
+	}
+
+	const store =  new Store();
+	const events: any[] = [];
+	const d = spy(events.push.bind(events));
+	t.equal(store.add(3, 4), 14);
+	t.equal(store.add(2, 2), 8);
+
+	delete events[0].fn;
+	delete events[1].time;
+	delete events[2].fn;
+	delete events[3].time;
+
+	t.deepEqual(events,	[
+		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, target: store, type: "action" },
+		{ spyReportEnd: true },
+		{ arguments: [ 2, 2 ], name: "zoem zoem", spyReportStart: true, target: store, type: "action" },
+		{ spyReportEnd: true }
+	]);
+
+	d();
+	t.end();
+});
