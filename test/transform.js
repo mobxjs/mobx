@@ -73,6 +73,82 @@ test('transform1', function(t) {
 	t.end();
 });
 
+test('createTransformer as off-instance computed', t => {
+	var runs = 0;
+
+	// observable in closure
+	var capitalize = m.observable(false);
+
+	var _computeDisplayName = person => {
+		runs++; // count the runs
+		var res = person.firstName + " "  + person.lastName;
+		if (capitalize.get())
+			return res.toUpperCase();
+		return res;
+	};
+	
+	// transformer creates a computed but reuses it for every time the same object is passed in
+	var displayName = m.createTransformer(_computeDisplayName);
+	
+	var person1 = m.observable({
+		firstName: "Mickey",
+		lastName: "Mouse"
+	});
+	
+	var person2 = m.observable({
+		firstName: "Donald",
+		lastName: "Duck"
+	});
+
+	var persons = m.observable([]);
+	var displayNames = [];
+	
+	var disposer = m.autorun(() => {
+		displayNames = persons.map(p => displayName(p));
+	});
+	
+	t.equal(runs, 0);
+	t.deepEqual(displayNames, []);
+	
+	persons.push(person1);
+	t.equal(runs, 1);
+	t.deepEqual(displayNames, ["Mickey Mouse"]);
+	
+	t.equal(displayName(person1), "Mickey Mouse");
+	t.equal(runs, 1, "No new run needed; behaves like a normal computes");
+	
+	persons.push(person2);
+	t.equal(runs, 2, "person 2 calculated");
+	t.deepEqual(displayNames, ["Mickey Mouse", "Donald Duck"]);
+	
+	persons.push(person1);
+	t.equal(runs, 2, "person 1 not recalculated");
+	t.deepEqual(displayNames, ["Mickey Mouse", "Donald Duck", "Mickey Mouse"]);
+	
+	person1.firstName = "Minnie";
+	t.equal(runs, 3, "computed run only one other time");
+	t.deepEqual(displayNames, ["Minnie Mouse", "Donald Duck", "Minnie Mouse"]);
+
+	capitalize.set(true);
+	t.equal(runs, 5, "both computeds were invalidated")
+	t.deepEqual(displayNames, ["MINNIE MOUSE", "DONALD DUCK", "MINNIE MOUSE"]);
+
+	persons.splice(1, 1);
+	t.deepEqual(displayNames, ["MINNIE MOUSE", "MINNIE MOUSE"]);
+	
+	person2.firstName = "Dagobert";
+	t.equal(runs, 5, "No re-run for person2; not observed anymore");
+	
+	disposer();
+	person1.lastName = "Maxi";
+	t.equal(runs, 5, "No re-run for person1; not observed anymore");
+
+	t.equal(displayName(person1), "MINNIE MAXI", "display name still consistent");
+	t.equal(runs, 6, "Re-run was needed because lazy mode");
+
+	t.end();
+});
+
 test('163 - resetGlobalState should clear cache', function(t) {
 	var runs = 0;
 	function doubler(x) {

@@ -104,26 +104,24 @@ React.render(<TodoListView todoList={store} />, document.getElementById('mount')
 Also, reactions can be created using the [`autorun`](http://mobxjs.github.io/mobx/refguide/autorun.html), [`autorunAsync`](http://mobxjs.github.io/mobx/refguide/autorun-async.html) or [`when`](http://mobxjs.github.io/mobx/refguide/when.html) functions to fit your specific situations.
 
 When using MobX there are no smart or dumb components.
-All components render smartly but are defined in a dumb manner. MobX will simply make sure the components are always re-rendered whenever needed,
-but also no more than that.
-So the `onClick` handler in the above example will force the proper `TodoView` to render,
-and it will cause the `TodoListView` to render if the number of unfinished tasks has changed.
 
-However, if you would remove the `Tasks left` line (or put it into a separate component), the `TodoListView` will no longer re-render when ticking a box.
-You can verify this yourself by changing the [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/).
+All components render smartly but are defined in a dumb manner. MobX will simply make sure the components are always re-rendered whenever needed, but also no more than that. So the `onClick` handler in the above example will force the proper `TodoView` to render, and it will cause the `TodoListView` to render if the number of unfinished tasks has changed.
+
+However, if you would remove the `Tasks left` line (or put it into a separate component), the `TodoListView` will no longer re-render when ticking a box. You can verify this yourself by changing the [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/).
 
 ### Actions
 
 Unlike many flux frameworks, MobX is unopinionated about how user events should be handled.
-This can be done in a Flux like manner.
-Or by processing events using RxJS.
-Or by simply handling events in the most straightforward way possible, as demonstrated in the above `onClick` handler.
+
+* This can be done in a Flux like manner.
+* Or by processing events using RxJS.
+* Or by simply handling events in the most straightforward way possible, as demonstrated in the above `onClick` handler.
+
 In the end it all boils down to: Somehow the state should be updated.
-After updating the state, `MobX` will take care of the rest, in an efficient, glitch-free manner.
-So simple statements like below are enough to automatically update the user interface.
-There is no technical need for firing events, calling dispatcher or what more.
-A React component is in the end nothing more than a fancy representation of your state.
-A derivation that will be managed by MobX.
+
+After updating the state `MobX` will take care of the rest in an efficient, glitch-free manner. So simple statements, like below, are enough to automatically update the user interface.
+
+There is no technical need for firing events, calling dispatcher or what more. A React component is in the end nothing more than a fancy representation of your state. A derivation that will be managed by MobX.
 
 ```javascript
 store.todos.push(
@@ -138,24 +136,39 @@ store.todos[0].finished = true;
 MobX is one of the least obtrusive libraries you can use for state management. That makes the `MobX` approach not just simple, but very scalable as well:
 
 ### Using classes and real references
+
 With MobX you don't need to normalize your data. This makes the library very suitable for very complex domain models (At Mendix for example ~500 different domain classes in a single application).
 
 ### Referential integrity is guaranteed
-Since data doesn't need to be normalized, and MobX automatically tracks the relations between state and derivations, you get referential integrity for free. Rendering something that is accessed through three levels of indirection? No problem, MobX will track them and re-render whenever one of the references changes. As a result staleness bugs are a thing of the past. As a programmer you might forget that changing some data might influence a seemingly unrelated component in a corner case. MobX won't forget.
+
+Since data doesn't need to be normalized, and MobX automatically tracks the relations between state and derivations, you get referential integrity for free. Rendering something that is accessed through three levels of indirection?
+
+No problem, MobX will track them and re-render whenever one of the references changes. As a result staleness bugs are a thing of the past. As a programmer you might forget that changing some data might influence a seemingly unrelated component in a corner case. MobX won't forget.
 
 ### Simpler actions are easier to maintain
+
 As demonstrated above, modifying state when using MobX is very straightforward. You simply write down your intentions. MobX will take care of the rest.
 
 ### Fine grained observability is efficient
-MobX builds a graph of all the derivations in your application to find the least number of re-computations that is needed to prevent staleness. "Derive everything" might sound expensive, MobX builds a virtual derivation graph to minimize the number of recomputations needed to keep derivations in sync with the state. In fact, when testing MobX at Mendix we found out that using this library to track the relations in our code is often a lot more efficient then pushing changes through our application by using handwritten events or "smart" selector based container components.
+
+MobX builds a graph of all the derivations in your application to find the least number of re-computations that is needed to prevent staleness. "Derive everything" might sound expensive, MobX builds a virtual derivation graph to minimize the number of recomputations needed to keep derivations in sync with the state.
+
+In fact, when testing MobX at Mendix we found out that using this library to track the relations in our code is often a lot more efficient then pushing changes through our application by using handwritten events or "smart" selector based container components.
+
 The simple reason is that MobX will establish far more fine grained 'listeners' on your data then you would do as a programmer.
+
 Secondly MobX sees the causality between derivations so it can order them in such a way that no derivation has to run twice or introduces a glitch.
+
 How that works? See this [in-depth explanation of MobX](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254).
 
 ### Easy interoperability
+
 MobX works plain javascript structures. Due to it's unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific library flavors.
+
 So you can simple keep using your existing router-, data fetching and utility libraries like `react-router`, `director`, `superagent`, `lodash` etc.
+
 For the same reason you can use it out of the box both server- and client side, in isomorphic applications and with react-native.
+
 The result of this is that you often need to learn less new concepts when using MobX in comparison to other state management solutions.
 
 ## Credits
@@ -169,12 +182,14 @@ And finally kudo's for all the people that believed in, tried and validated MobX
 ## Further resources and documentation
 
 ### Get Started
+
 * [Getting Started](https://mobxjs.github.io/mobx/getting-started.html) Ten minute, interactive introduction (with just ES5)
 * [Full API documentation](http://mobxjs.github.io/mobx/)
 * [react-mobservable-boilerplate](https://github.com/mweststrate/react-mobservable-boilerplate) Clone the boilerplate repository containing the above example 
 * [MobX Github](https://github.com/mobxjs) Further boilerplate and example projects for ES5, Babel and Typescript can be found in the  organization on github
 
 ### Blogs & Videos
+
 * [Screencast: intro to MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8) State Management Is Easy, React Amsterdam 2016 conf (coming soon) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
 * [Reactive 2015 Conference](https://www.youtube.com/watch?v=FEwLwiizlk0) Talk on MobX (mobservable): React, transparent reactive programming and mutable data structures ([slides](https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures))
 * [Making React reactive: the pursuit of high performing, easily maintainable React apps](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/)
@@ -183,6 +198,7 @@ And finally kudo's for all the people that believed in, tried and validated MobX
 * [MobX Interview](http://survivejs.com/blog/mobx-interview/) SurviveJS interview on MobX, React and Flux
 
 ### Related projects
+
 * [mobx-connect](https://github.com/nightwolfz/mobx-connect) MobX @connect decorator for react components. Similar to redux's @connect.
 * [rfx-stack](https://github.com/foxhound87/rfx-stack) RFX Stack - Universal App featuring: React + Feathers + MobX
 * [mobx-reactor](https://github.com/amsb/mobx-reactor) Connect MobX data stores to functional stateless React components with async actions and unidirectional data flow.
@@ -195,6 +211,7 @@ And finally kudo's for all the people that believed in, tried and validated MobX
 _Feel free to create a PR to add your own!_
 
 ### More examples
+
 * [mobx-react-todomvc](https://github.com/mobxjs/mobx-react-todomvc) TodoMVC reference implementation on top of react-mobx-boilerplate
 * [mobx-react-typescript](https://github.com/contacts-mvc/mobx-react-typescript) An example project using Typescript
 * [TodoMVC Benchmarking](https://github.com/mweststrate/mobx-todomvc)
@@ -232,5 +249,6 @@ Bower support is available through the infamous npmcdn.com:
 Then use `lib/mobx.umd.js` or `lib/mobx.umd.min.js`
 
 ## MobX was formerly known as Mobservable.
+
 See the [changelog](https://github.com/mobxjs/mobx/blob/master/CHANGELOG.md#200) for all the details about `mobservable` to `mobx`.
 
