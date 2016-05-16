@@ -3,6 +3,7 @@ var test = require('tape');
 var TransformUtils = require('./utils/transform');
 
 test('transform1', function(t) {
+	m.extras.resetGlobalState();
 	var todoCalc = 0;
 	var stateCalc = 0;
 	var state = m.observable({

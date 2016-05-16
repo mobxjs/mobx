@@ -13,7 +13,7 @@
     "quick-build": "tsc",
     "small-build": "scripts/single-file-build.sh",
     "test-browser": "npm run small-build && ( browserify test/*.js | tape-run )",
-    "test-travis": "npm run test-browser && istanbul cover tape test/*.js test/perf/index.js && npm run use-minified && npm run tape",
+    "test-travis": "npm run small-build && tape test/*.js test/perf/index.js && tsc && istanbul cover tape test/*.js",
     "coverage": "npm run small-build && npm run build-tests && istanbul cover tape test/*.js test/perf/index.js && cat ./coverage/lcov.info|coveralls",
     "build-tests": "npm run build-typescript-tests && npm run build-babel-tests",
     "build-typescript-tests": "tsc -m commonjs -t es5 --experimentalDecorators --noImplicitAny --outDir test test/typescript-tests.ts",
