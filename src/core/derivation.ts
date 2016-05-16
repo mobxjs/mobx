@@ -21,7 +21,12 @@ export function isComputingDerivation() {
 }
 
 export function checkIfStateModificationsAreAllowed() {
-	invariant(globalState.allowStateChanges, `It is not allowed to change the state when a computed value is being evaluated. Use 'autorun' to create reactive functions with side-effects.`);
+	if (!globalState.allowStateChanges) {
+		invariant(false, globalState.strictMode
+			? "It is not allowed to create or change state outside an `action` when MobX is in strict mode. Wrap the current method in `action` if this state change is intended"
+			: "It is not allowed to change the state when a computed value is being evaluated. Use 'autorun' to create reactive functions with side-effects."
+		);
+	}
 }
 
 /**

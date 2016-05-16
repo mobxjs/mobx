@@ -1,14 +1,14 @@
 import {IAtom} from "./atom";
 import {IDerivation} from "./derivation";
 import {Reaction} from "./reaction";
+import {invariant} from "../utils/utils";
 
 declare const global: any;
-
 
 /**
  * These values will persist if global state is reset
  */
-const persistentKeys = ["mobxGuid", "resetId", "spyListeners"];
+const persistentKeys = ["mobxGuid", "resetId", "spyListeners", "strictMode"];
 
 export class MobXGlobals {
 	/**
@@ -61,6 +61,10 @@ export class MobXGlobals {
 	 * To ensure that those functions stay pure.
 	 */
 	allowStateChanges = true;
+	/**
+	 * If strict mode is enabled, state changes are by default not allowed
+	 */
+	strictMode = false;
 
 	/**
 	 * Used by createTransformer to detect that the global state has been reset.
@@ -106,4 +110,19 @@ export function resetGlobalState() {
 	for (let key in defaultGlobals)
 		if (persistentKeys.indexOf(key) === -1)
 			globalState[key] = defaultGlobals[key];
+	globalState.allowStateChanges = !globalState.strictMode;
+}
+
+export function useStrict(strict: boolean) {
+	invariant(globalState.derivationStack.length === 0, "It is not allowed to set `useStrict` when a derivation is running");
+	globalState.strictMode = strict;
+	globalState.allowStateChanges = !strict;
+}
+
+export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T): T {
+	const prev = globalState.allowStateChanges;
+	globalState.allowStateChanges = allowStateChanges;
+	const res = func();
+	globalState.allowStateChanges = prev;
+	return res;
 }

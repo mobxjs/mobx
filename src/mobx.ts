@@ -27,6 +27,7 @@ export { IObservable, IDepTreeNode                            } from "./core/obs
 export { IDerivation, untracked                               } from "./core/derivation";
 export { action                                               } from "./core/action";
 export { spy                                                  } from "./core/spy";
+export { useStrict                                            } from "./core/globalstate";
 
 export { asReference, asFlat, asStructure                     } from "./types/modifiers";
 export { IInterceptable, IInterceptor                         } from "./types/intercept-utils";
@@ -62,7 +63,8 @@ export const _ = {
 
 import { IDepTreeNode } from "./core/observable";
 import { IObserverTree, IDependencyTree } from "./api/extras";
-import { getDependencyTree, getObserverTree, allowStateChanges, getDebugName, getAtom, getAdministration } from "./api/extras";
+import { getDependencyTree, getObserverTree, getDebugName, getAtom, getAdministration } from "./api/extras";
+import { allowStateChanges } from "./core/globalstate";
 import { trackTransitions, spyReport, spyReportEnd, spyReportStart, isSpyEnabled } from "./core/spy";
 import { Lambda } from "./utils/utils";
 import { isComputingDerivation } from "./core/derivation";

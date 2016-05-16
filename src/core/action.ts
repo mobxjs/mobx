@@ -1,7 +1,7 @@
 import {transaction} from "../core/transaction";
 import {invariant} from "../utils/utils";
 import {untracked} from "../core/derivation";
-import {allowStateChanges} from "../api/extras";
+import {allowStateChanges} from "../core/globalstate";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {ComputedValue} from "../core/computedvalue";
 import {globalState} from "../core/globalstate";

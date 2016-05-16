@@ -221,6 +221,8 @@ export class ObservableArray<T> extends StubArray {
 
 	constructor(initialValues: T[], mode: ValueMode, name: string, owned = false) {
 		super();
+		checkIfStateModificationsAreAllowed();
+
 		const adm = new ObservableArrayAdministration<T>(name, mode, this as any, owned);
 		Object.defineProperty(this, "$mobx", {
 			enumerable: false,

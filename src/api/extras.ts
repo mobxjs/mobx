@@ -18,14 +18,6 @@ export interface IObserverTree {
 	observers?: IObserverTree[];
 }
 
-export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T): T {
-	const prev = globalState.allowStateChanges;
-	globalState.allowStateChanges = allowStateChanges;
-	const res = func();
-	globalState.allowStateChanges = prev;
-	return res;
-}
-
 // TODO: Move the next 3 functions to types
 // TODO: strong typing for the following methods:
 export function getAtom(thing: any, property?: string): IDepTreeNode {

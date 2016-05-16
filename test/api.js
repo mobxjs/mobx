@@ -33,6 +33,7 @@ test('correct api should be exposed', function(t) {
 		'toJSON',
 		'transaction',
 		'untracked',
+		'useStrict',
 		'when'
 	]);
 	t.equals(Object.keys(mobx).filter(function(key) {

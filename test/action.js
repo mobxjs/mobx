@@ -182,11 +182,3 @@ test('should not be possible to invoke action in a computed block', t => {
 	}, /Computed values should not invoke actions or trigger other side effects/, 'expected throw');
 	t.end();
 });
-
-// test('action should respect strict mode', t => {
-
-// });
-
-// test('strict mode should not allow changes outside action', t => {
-
-// });

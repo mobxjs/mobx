@@ -1,8 +1,9 @@
 import {ValueMode, asReference} from "../types/modifiers";
-import {allowStateChanges} from "../api/extras";
+import {allowStateChanges} from "../core/globalstate";
 import {computed} from "../api/computeddecorator";
 import {asObservableObject, setObservableObjectProperty} from "../types/observableobject";
 import {invariant, assertPropertyConfigurable, deprecated} from "../utils/utils";
+import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 
 /**
  * ES6 / Typescript decorator which can to make class properties and getter functions reactive.
@@ -18,6 +19,7 @@ import {invariant, assertPropertyConfigurable, deprecated} from "../utils/utils"
 export function observableDecorator(target: Object, key: string, baseDescriptor: PropertyDescriptor) {
 	invariant(arguments.length >= 2 && arguments.length <= 3, "Illegal decorator config", key);
 	assertPropertyConfigurable(target, key);
+	checkIfStateModificationsAreAllowed();
 
 	// - In typescript, observable annotations are invoked on the prototype, not on actual instances,
 	// so upon invocation, determine the 'this' instance, and define a property on the
