@@ -182,3 +182,29 @@ test('should not be possible to invoke action in a computed block', t => {
 	}, /Computed values should not invoke actions or trigger other side effects/, 'expected throw');
 	t.end();
 });
+
+test('action in autorun should be untracked', t => {
+	var a = mobx.observable(2);
+	var b = mobx.observable(3);
+	
+	var data = [];
+	var multiplier = mobx.action(val => val * b.get());
+	
+	var d = mobx.autorun(() => {
+		data.push(multiplier(a.get()));
+	});
+	
+	a.set(3);
+	b.set(4);
+	a.set(5);
+	
+	d();
+	
+	a.set(6);
+	
+	t.deepEqual(data, [
+		6, 9, 20
+	]);
+	
+	t.end();
+})

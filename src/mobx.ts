@@ -44,7 +44,7 @@ export { isObservable                                         } from "./api/isob
 export { extendObservable                                     } from "./api/extendobservable";
 export { observe                                              } from "./api/observe";
 export { intercept                                            } from "./api/intercept";
-export { autorun, autorunAsync, autorunUntil, when            } from "./api/autorun";
+export { autorun, autorunAsync, autorunUntil, when, reaction  } from "./api/autorun";
 export { expr                                                 } from "./api/expr";
 export { toJSON                                               } from "./api/tojson";
 export { ITransformer, createTransformer                      } from "./api/createtransformer";

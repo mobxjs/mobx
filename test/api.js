@@ -29,6 +29,7 @@ test('correct api should be exposed', function(t) {
 		'map',
 		'observable',
 		'observe',
+		'reaction',
 		'spy',
 		'toJSON',
 		'transaction',

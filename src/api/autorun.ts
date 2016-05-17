@@ -3,6 +3,7 @@ import {assertUnwrapped} from "../types/modifiers";
 import {Reaction} from "../core/reaction";
 import {untracked} from "../core/derivation";
 import {getNextId} from "../core/globalstate";
+import {action} from "../core/action";
 
 /**
  * Creates a reactive view and keeps it alive, so that the view is always
@@ -60,13 +61,55 @@ export function autorunAsync(func: Lambda, delay: number = 1, scope?: any) {
 		func = func.bind(scope);
 	let isScheduled = false;
 
-	const r = new Reaction(func.name || "AutorunAsync", () => {
+	const r = new Reaction(func.name || ("AutorunAsync@" + getNextId()), () => {
 		if (!isScheduled) {
 			isScheduled = true;
 			setTimeout(() => {
 				isScheduled = false;
 				if (!r.isDisposed)
 					r.track(func);
+			}, delay);
+		}
+	});
+
+	r.schedule();
+	return r.getDisposer();
+}
+
+/**
+ * 
+ * Basically sugar for computed(expr).observe(action(effect))
+ * or
+ * autorun(() => action(effect)(expr));
+ */
+export function reaction<T>(expression: () => T, effect: (arg: T) => void, fireImmediately = false, delay = 0, scope?: any) {
+	const name = (expression as any).name || (effect as any).name || ("Reaction@" + getNextId());
+	if (scope) {
+		expression = expression.bind(scope);
+		effect = action(name, effect.bind(scope));
+	}
+
+	let firstTime = true;
+	let isScheduled = false;
+
+	function reactionRunner () {
+		if (r.isDisposed)
+			return;
+		const nextValue = expression();
+		if (!firstTime || fireImmediately)
+			effect(nextValue);
+		if (firstTime)
+			firstTime = false;
+	}
+
+	const r = new Reaction(name, () => {
+		if (delay < 1) {
+			reactionRunner();
+		} else if (!isScheduled) {
+			isScheduled = true;
+			setTimeout(() => {
+				isScheduled = false;
+				reactionRunner();
 			}, delay);
 		}
 	});
