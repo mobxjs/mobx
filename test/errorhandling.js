@@ -268,3 +268,50 @@ test('error handling assistence ', function(t) {
         t.end();
     }, 10);
 })
+
+test('236 - cycles', t => {
+	var Parent = function() {
+		m.extendObservable(this, {
+			children: [],
+			total0: function() {
+				// Sum "value" of children of kind "0"
+				return this.children.filter(c => c.kind === 0).map(c => c.value).reduce((a, b) => a+b, 0);
+			},
+			total1: function() {
+				// Sum "value" of children of kind "1"
+				return this.children.filter(c => c.kind === 1).map(c => c.value).reduce((a, b) => a+b, 0);
+			}
+		});
+	};
+
+	var Child = function(parent, kind) {
+		this.parent = parent;
+		m.extendObservable(this, {
+			kind: kind,
+			value: function() {
+				if (this.kind === 0) {
+					return 3;
+				} else {
+					// Value of child of kind "1" depends on the total value for all children of kind "0"
+					return this.parent.total0 * 2;
+				}
+			}
+		});
+	};
+
+	const parent = new Parent();
+	parent.children.push(new Child(parent, 0));
+	parent.children.push(new Child(parent, 0));
+	parent.children.push(new Child(parent, 0));
+
+	m.autorun(() => {
+		console.log('total0:', parent.total0, 'total1:', parent.total1);
+	});
+	// So far, so good: total0: 9 total1: 0
+
+	t.throws(() => {
+		parent.children[0].kind = 1;
+	}, /Cycle detected in/);
+	
+	t.end();
+})

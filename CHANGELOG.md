@@ -1,3 +1,7 @@
+# 2.1.7
+
+* Fixed a false negative in cycle detection, as reported in #236
+
 # 2.1.6
 
 * Fixed #236, #237 call stack issues when working with large arrays

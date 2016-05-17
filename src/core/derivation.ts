@@ -125,6 +125,8 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
  * computation like `a = a * 2`
  */
 function findCycle(needle: IDerivation, node: IObservable): boolean {
+	if (needle === node)
+		return true;
 	const obs = node.observing;
 	if (obs === undefined)
 		return false;
