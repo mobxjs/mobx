@@ -1,8 +1,7 @@
-import {Lambda, deprecated, invariant} from "../utils/utils";
+import {Lambda, getNextId, deprecated, invariant} from "../utils/utils";
 import {assertUnwrapped} from "../types/modifiers";
 import {Reaction} from "../core/reaction";
 import {untracked} from "../core/derivation";
-import {getNextId} from "../core/globalstate";
 import {action} from "../core/action";
 
 /**

@@ -2,8 +2,8 @@ import {ValueMode, assertUnwrapped, getValueModeFromModifierFunc} from "./modifi
 import {transaction} from "../core/transaction";
 import {ObservableArray, IObservableArray} from "./observablearray";
 import {ObservableValue, UNCHANGED} from "./observablevalue";
-import {isPlainObject, Lambda, invariant} from "../utils/utils";
-import {getNextId, allowStateChanges} from "../core/globalstate";
+import {isPlainObject, getNextId, Lambda, invariant} from "../utils/utils";
+import {allowStateChanges} from "../core/action";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";

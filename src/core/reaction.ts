@@ -1,7 +1,7 @@
 import {IObservable, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction} from "./derivation";
-import {globalState, getNextId} from "./globalstate";
-import {EMPTY_ARRAY, Lambda} from "../utils/utils";
+import {globalState} from "./globalstate";
+import {EMPTY_ARRAY, getNextId, Lambda} from "../utils/utils";
 import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
 
 /**

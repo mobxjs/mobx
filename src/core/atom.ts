@@ -1,6 +1,6 @@
 import {IObservable, propagateReadiness, propagateStaleness, reportObserved} from "./observable";
-import {invariant, noop} from "../utils/utils";
-import {globalState, getNextId} from "./globalstate";
+import {invariant, noop, getNextId} from "../utils/utils";
+import {globalState} from "./globalstate";
 import {runReactions} from "./reaction";
 
 export interface IAtom extends IObservable {

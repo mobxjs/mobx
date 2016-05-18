@@ -91,11 +91,6 @@ export const globalState: MobXGlobals = (() => {
 	return global.__mobxGlobal = res;
 })();
 
-// TODO: move to utils
-export function getNextId() {
-	return ++globalState.mobxGuid;
-}
-
 export function registerGlobals() {
 	// no-op to make explicit why this file is loaded
 }
@@ -111,18 +106,4 @@ export function resetGlobalState() {
 		if (persistentKeys.indexOf(key) === -1)
 			globalState[key] = defaultGlobals[key];
 	globalState.allowStateChanges = !globalState.strictMode;
-}
-
-export function useStrict(strict: boolean) {
-	invariant(globalState.derivationStack.length === 0, "It is not allowed to set `useStrict` when a derivation is running");
-	globalState.strictMode = strict;
-	globalState.allowStateChanges = !strict;
-}
-
-export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T): T {
-	const prev = globalState.allowStateChanges;
-	globalState.allowStateChanges = allowStateChanges;
-	const res = func();
-	globalState.allowStateChanges = prev;
-	return res;
 }

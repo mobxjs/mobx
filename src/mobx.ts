@@ -22,12 +22,10 @@ registerGlobals();
 export { Lambda                                               } from "./utils/utils";
 export { SimpleEventEmitter, ISimpleEventListener             } from "./utils/simpleeventemitter";
 export { IObserverTree, IDependencyTree                       } from "./api/extras";
-// TODO: move untracked to sane place
 export { IObservable, IDepTreeNode                            } from "./core/observable";
 export { IDerivation, untracked                               } from "./core/derivation";
-export { action                                               } from "./core/action";
+export { action, useStrict                                    } from "./core/action";
 export { spy                                                  } from "./core/spy";
-export { useStrict                                            } from "./core/globalstate";
 
 export { asReference, asFlat, asStructure                     } from "./types/modifiers";
 export { IInterceptable, IInterceptor                         } from "./types/intercept-utils";
@@ -62,9 +60,9 @@ export const _ = {
 };
 
 import { IDepTreeNode } from "./core/observable";
-import { IObserverTree, IDependencyTree } from "./api/extras";
-import { getDependencyTree, getObserverTree, getDebugName, getAtom, getAdministration } from "./api/extras";
-import { allowStateChanges } from "./core/globalstate";
+import { IObserverTree, IDependencyTree, getDependencyTree, getObserverTree } from "./api/extras";
+import { getDebugName, getAtom, getAdministration } from "./types/type-utils";
+import { allowStateChanges } from "./core/action";
 import { trackTransitions, spyReport, spyReportEnd, spyReportStart, isSpyEnabled } from "./core/spy";
 import { Lambda } from "./utils/utils";
 import { isComputingDerivation } from "./core/derivation";

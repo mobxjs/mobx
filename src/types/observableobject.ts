@@ -1,8 +1,7 @@
 import {ObservableValue, UNCHANGED} from "./observablevalue";
 import {ComputedValue} from "../core/computedvalue";
 import {ValueMode, AsStructure} from "./modifiers";
-import {Lambda, invariant, assertPropertyConfigurable, isPlainObject} from "../utils/utils";
-import {getNextId} from "../core/globalstate";
+import {Lambda, getNextId, invariant, assertPropertyConfigurable, isPlainObject} from "../utils/utils";
 import {throwingComputedValueSetter} from "../api/computeddecorator";
 import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";

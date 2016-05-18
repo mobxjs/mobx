@@ -1,11 +1,10 @@
 import {Atom} from "../core/atom";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} from "./modifiers";
-import {valueDidChange, Lambda} from "../utils/utils";
+import {valueDidChange, Lambda, getNextId} from "../utils/utils";
 import {hasInterceptors, IInterceptable, IInterceptor, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd, spyReport} from "../core/spy";
-import {getNextId} from "../core/globalstate";
 
 export interface IValueWillChange<T> {
 	object: any;

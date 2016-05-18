@@ -6,7 +6,7 @@ import {IObservableValue, observable} from "./observable";
 import {IValueWillChange} from "../types/observablevalue";
 import {Lambda, isPlainObject, deprecated} from "../utils/utils";
 import {extendObservable} from "./extendobservable";
-import {getAdministration} from "./extras";
+import {getAdministration} from "../types/type-utils";
 
 export function intercept<T>(value: IObservableValue<T>, handler: IInterceptor<IValueWillChange<T>>): Lambda;
 export function intercept<T>(observableArray: IObservableArray<T>, handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>): Lambda;

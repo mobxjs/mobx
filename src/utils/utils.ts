@@ -6,6 +6,10 @@ export interface Lambda {
 	name?: string;
 }
 
+export function getNextId() {
+	return ++globalState.mobxGuid;
+}
+
 export function invariant(check: boolean, message: string, thing?) {
 	if (!check)
 		throw new Error("[mobx] Invariant failed: " + message + (thing ? ` in '${thing}'` : ""));
@@ -195,4 +199,5 @@ export function quickDiff<T>(current: T[], base: T[]): [T[], T[]] {
 	];
 }
 
+import {globalState} from "../core/globalstate";
 import {isObservableArray} from "../types/observablearray";

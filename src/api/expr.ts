@@ -16,6 +16,7 @@ import {isComputingDerivation} from "../core/derivation";
 	* 
 	*/
 export function expr<T>(expr: () => T, scope?): T {
+	// TODO: deprecate in 3.0? seems to be hardly used..
 	if (!isComputingDerivation())
 		console.warn("[mobx.expr] 'expr' should only be used inside other reactive functions.");
 	// optimization: would be more efficient if the expr itself wouldn't be evaluated first on the next change, but just a 'changed' signal would be fired

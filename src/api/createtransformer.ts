@@ -1,6 +1,5 @@
 import {ComputedValue} from "../core/computedvalue";
-import {invariant} from "../utils/utils";
-import {getNextId} from "../core/globalstate";
+import {invariant, getNextId} from "../utils/utils";
 import {globalState} from "../core/globalstate";
 
 export type ITransformer<A, B> = (object: A) => B;

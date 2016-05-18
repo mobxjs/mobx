@@ -1,5 +1,5 @@
 import {ValueMode, asReference} from "../types/modifiers";
-import {allowStateChanges} from "../core/globalstate";
+import {allowStateChanges} from "../core/action";
 import {computed} from "../api/computeddecorator";
 import {asObservableObject, setObservableObjectProperty} from "../types/observableobject";
 import {invariant, assertPropertyConfigurable, deprecated} from "../utils/utils";

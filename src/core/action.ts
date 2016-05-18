@@ -1,7 +1,6 @@
 import {transaction} from "../core/transaction";
 import {invariant} from "../utils/utils";
 import {untracked} from "../core/derivation";
-import {allowStateChanges} from "../core/globalstate";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {ComputedValue} from "../core/computedvalue";
 import {globalState} from "../core/globalstate";
@@ -124,5 +123,19 @@ function executeWrapped(actionName: string, fn: Function, scope: any, args: IArg
 	);
 	if (notifySpy)
 		spyReportEnd({ time: Date.now() - startTime });
+	return res;
+}
+
+export function useStrict(strict: boolean) {
+	invariant(globalState.derivationStack.length === 0, "It is not allowed to set `useStrict` when a derivation is running");
+	globalState.strictMode = strict;
+	globalState.allowStateChanges = !strict;
+}
+
+export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T): T {
+	const prev = globalState.allowStateChanges;
+	globalState.allowStateChanges = allowStateChanges;
+	const res = func();
+	globalState.allowStateChanges = prev;
 	return res;
 }
