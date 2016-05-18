@@ -95,7 +95,8 @@ export function reaction<T>(expression: () => T, effect: (arg: T) => void, fireI
 	function reactionRunner () {
 		if (r.isDisposed)
 			return;
-		const nextValue = expression();
+		let nextValue;
+		r.track(() => nextValue = expression());
 		if (!firstTime || fireImmediately)
 			effect(nextValue);
 		if (firstTime)
