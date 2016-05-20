@@ -21,3 +21,4 @@ eachSecondEvent.on((dateObject, epoch) => {
 eachSecondEvent.once((dateObject, epoch) => {
 	console.log(dateObject, epoch);
 });
+```
