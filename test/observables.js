@@ -903,7 +903,7 @@ test('json2', function(t) {
 
     var o = mobx.observable(JSON.parse(JSON.stringify(source)));
 
-    t.deepEqual(mobx.toJSON(o), source);
+    t.deepEqual(mobx.toJS(o), source);
 
     var analyze = observable(function() {
         return [
@@ -929,7 +929,7 @@ test('json2', function(t) {
     o.todos[0].tags[0] = "reactjs";
     o.todos[1].tags.push("pff");
 
-    t.deepEqual(mobx.toJSON(o), {
+    t.deepEqual(mobx.toJS(o), {
         "todos": [
             {
                 "title": "write blog",
