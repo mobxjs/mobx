@@ -1,5 +1,6 @@
 import {ValueMode, assertUnwrapped, getValueModeFromModifierFunc} from "./modifiers";
 import {transaction} from "../core/transaction";
+import {untracked} from "../core/derivation";
 import {ObservableArray, IObservableArray} from "./observablearray";
 import {ObservableValue, UNCHANGED} from "./observablevalue";
 import {isPlainObject, getNextId, Lambda, invariant} from "../utils/utils";
@@ -219,7 +220,9 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 
 	clear() {
 		transaction(() => {
-			this.keys().forEach(this.delete, this);
+			untracked(() => {
+				this.keys().forEach(this.delete, this);
+			});
 		}, undefined, false);
 	}
 

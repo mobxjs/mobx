@@ -332,7 +332,7 @@ test('map modifier with modifier', t => {
 	t.equal(mobx.isObservableObject(x.get("a")), false);
 	x.set("b", { d: 4 });
 	t.equal(mobx.isObservableObject(x.get("b")), false);
-	
+
 	x = mobx.observable({ a: mobx.asMap({ b: {} }, mobx.asFlat)});
 	t.equal(mobx.isObservableObject(x), true);
 	t.equal(mobx.isObservableMap(x.a), true);
@@ -344,3 +344,42 @@ test('map modifier with modifier', t => {
 });
 
 // TODO: test, asMap should be sticky?
+
+test('256, map.clear should not be tracked', t => {
+	var x = mobx.observable(mobx.asMap({ a: 3 }));
+	var c = 0;
+	var d = mobx.autorun(() => { c++; x.clear() });
+
+	t.equal(c, 1);
+	x.set("b", 3);
+	t.equal(c, 1);
+
+	d();
+	t.end();
+})
+
+
+test('256, map.merge should be not be tracked for target', t => {
+	var x = mobx.observable(mobx.asMap({ a: 3 }));
+	var y = mobx.observable(mobx.asMap({ b: 3 }));
+	var c = 0;
+
+	var d = mobx.autorun(() => {
+		c++;
+		x.merge(y);
+	});
+
+	t.equal(c, 1);
+	t.deepEqual(x.keys(), ["a", "b"]);
+
+	y.set("c", 4)
+	t.equal(c, 2);
+	t.deepEqual(x.keys(), ["a", "b", "c"]);
+
+	x.set("d", 5);
+	t.equal(c, 2, "autorun should not have been triggered");
+	t.deepEqual(x.keys(), ["a", "b", "c", "d"]);
+
+	d();
+	t.end();
+})
