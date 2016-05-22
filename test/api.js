@@ -10,6 +10,7 @@ test('correct api should be exposed', function(t) {
 		'_',
 		'action',
 		'asFlat',
+		'asMap',
 		'asReference',
 		'asStructure',
 		'autorun',

@@ -2,6 +2,7 @@ import {isPlainObject, invariant} from "../utils/utils";
 import {isObservable} from "../api/isobservable";
 import {extendObservableHelper} from "../api/extendobservable";
 import {createObservableArray} from "../types/observablearray";
+import {map, ObservableMap, IMapEntries, IKeyValueMap} from "../types/observablemap";
 
 export enum ValueMode {
 	Recursive, // If the value is an plain object, it will be made reactive, and so will all its future children.
@@ -66,6 +67,13 @@ export class AsFlat {
 	}
 }
 
+export function asMap<T>(): ObservableMap<T>;
+export function asMap<T>(entries: IMapEntries<T>, modifierFunc?: Function): ObservableMap<T>;
+export function asMap<T>(data: IKeyValueMap<T>, modifierFunc?: Function): ObservableMap<T>;
+export function asMap(data?, modifierFunc?): ObservableMap<any> {
+	return map(data, modifierFunc);
+}
+
 export function getValueModeFromValue(value: any, defaultMode: ValueMode): [ValueMode, any] {
 	if (value instanceof AsReference)
 		return [ValueMode.Reference, value.value];
@@ -111,7 +119,7 @@ export function makeChildObservable(value, parentMode: ValueMode, name?: string)
 			invariant(false, "Illegal State");
 	}
 
-	if (Array.isArray(value) && Object.isExtensible(value))
+	if (Array.isArray(value))
 		return createObservableArray(<[]> value, childMode, name);
 	if (isPlainObject(value) && Object.isExtensible(value))
 		return extendObservableHelper(value, value, childMode, name);

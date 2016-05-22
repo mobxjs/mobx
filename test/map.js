@@ -333,7 +333,7 @@ test('map modifier with modifier', t => {
 	x.set("b", { d: 4 });
 	t.equal(mobx.isObservableObject(x.get("b")), false);
 	
-	x = mobx.observable({ a: mobx.asMap({ b: 2 }, mobx.asFlat)});
+	x = mobx.observable({ a: mobx.asMap({ b: {} }, mobx.asFlat)});
 	t.equal(mobx.isObservableObject(x), true);
 	t.equal(mobx.isObservableMap(x.a), true);
 	t.equal(mobx.isObservableObject(x.a.get("b")), false);
@@ -342,3 +342,5 @@ test('map modifier with modifier', t => {
 
 	t.end();
 });
+
+// TODO: test, asMap should be sticky?
