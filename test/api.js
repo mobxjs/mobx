@@ -32,6 +32,7 @@ test('correct api should be exposed', function(t) {
 		'observe',
 		'reaction',
 		'spy',
+		'toJS',
 		'toJSON',
 		'transaction',
 		'untracked',
