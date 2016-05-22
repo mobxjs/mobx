@@ -44,6 +44,7 @@ test('correct api should be exposed', function(t) {
 	}).length, 0);
 
 	t.deepEquals(Object.keys(mobx._).sort(), [
+		'getAdministration',
 		'quickDiff',
 		'resetGlobalState'
 	]);
@@ -53,7 +54,6 @@ test('correct api should be exposed', function(t) {
 
 	t.deepEquals(Object.keys(mobx.extras).sort(), [
 			'allowStateChanges',
-			'getAdministration',
 			'getAtom',
 			'getDebugName',
 			'getDependencyTree',

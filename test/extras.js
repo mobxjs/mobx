@@ -327,7 +327,7 @@ test('get administration', function(t) {
 	var g = new Clazz();
 	
 	function adm(thing, prop) {
-		return mobx.extras.getAdministration(thing, prop).constructor.name;
+		return mobx._.getAdministration(thing, prop).constructor.name;
 	}
 
 	var ovClassName = mobx.observable(3).constructor.name;

@@ -54,11 +54,6 @@ export { IAtom, Atom                                          } from "./core/ato
 import { resetGlobalState } from "./core/globalstate";
 import { quickDiff } from "./utils/utils";
 
-export const _ = {
-	quickDiff,
-	resetGlobalState
-};
-
 import { IDepTreeNode } from "./core/observable";
 import { IObserverTree, IDependencyTree, getDependencyTree, getObserverTree } from "./api/extras";
 import { getDebugName, getAtom, getAdministration } from "./types/type-utils";
@@ -80,4 +75,11 @@ export const extras = {
 	spyReportEnd,
 	spyReportStart,
 	trackTransitions
+};
+
+// Experimental or internal api's (exposed for testing for example)
+export const _ = {
+	getAdministration,
+	quickDiff,
+	resetGlobalState
 };
