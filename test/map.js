@@ -248,7 +248,7 @@ test('strict', function(t) {
 	});
 	t.end();
 })
-	
+
 test('issue 100', function(t) {
 	var that = {};
 	mobx.extendObservable(that, {
@@ -280,7 +280,7 @@ test('issue 119 - unobserve before delete', function(t) {
     	});
 	});
 	myObservable.myMap.delete('myId');
-	
+
 	t.deepEqual(propValues, ['myPropValue calculated']);
 	t.end();
 })
@@ -294,5 +294,51 @@ test('issue 116 - has should not throw on invalid keys', function(t) {
 	t.throws(function() {
 		x.set({});
 	});
+	t.end();
+});
+
+test('map modifier', t => {
+	var x = mobx.observable(mobx.asMap({ a: 1 }));
+	t.equal(x instanceof mobx.ObservableMap, true);
+	t.equal(mobx.isObservableMap(x), true);
+	t.equal(x.get("a"), 1);
+	x.set("b", {});
+	t.equal(mobx.isObservableObject(x.get("b")), true);
+
+	x = mobx.observable(mobx.asMap([["a", 1]]));
+	t.equal(x instanceof mobx.ObservableMap, true);
+	t.equal(x.get("a"), 1);
+
+	x = mobx.observable(mobx.asMap());
+	t.equal(x instanceof mobx.ObservableMap, true);
+	t.deepEqual(x.keys(), []);
+
+	x = mobx.observable({ a: mobx.asMap({ b: { c: 3 } })});
+	t.equal(mobx.isObservableObject(x), true);
+	t.equal(mobx.isObservableObject(x.a), false);
+	t.equal(mobx.isObservableMap(x.a), true);
+	t.equal(mobx.isObservableObject(x.a.get("b")), true);
+
+	t.end();
+});
+
+test('map modifier with modifier', t => {
+	var x = mobx.observable(mobx.asMap({ a: { c: 3 } }));
+	t.equal(mobx.isObservableObject(x.get("a")), true);
+	x.set("b", { d: 4 });
+	t.equal(mobx.isObservableObject(x.get("b")), true);
+
+	x = mobx.observable(mobx.asMap({ a: { c: 3 } }, mobx.asFlat));
+	t.equal(mobx.isObservableObject(x.get("a")), false);
+	x.set("b", { d: 4 });
+	t.equal(mobx.isObservableObject(x.get("b")), false);
+	
+	x = mobx.observable({ a: mobx.asMap({ b: 2 }, mobx.asFlat)});
+	t.equal(mobx.isObservableObject(x), true);
+	t.equal(mobx.isObservableMap(x.a), true);
+	t.equal(mobx.isObservableObject(x.a.get("b")), false);
+	x.a.set("e", { });
+	t.equal(mobx.isObservableObject(x.a.get("e")), false);
+
 	t.end();
 });

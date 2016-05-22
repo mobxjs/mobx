@@ -27,7 +27,7 @@ export { IDerivation, untracked                               } from "./core/der
 export { action, useStrict                                    } from "./core/action";
 export { spy                                                  } from "./core/spy";
 
-export { asReference, asFlat, asStructure                     } from "./types/modifiers";
+export { asReference, asFlat, asStructure, asMap              } from "./types/modifiers";
 export { IInterceptable, IInterceptor                         } from "./types/intercept-utils";
 export { IListenable                                          } from "./types/listen-utils";
 export { IObjectWillChange, IObjectChange, isObservableObject } from "./types/observableobject";
@@ -69,7 +69,6 @@ import { isComputingDerivation } from "./core/derivation";
 
 export const extras = {
 	allowStateChanges,
-	getAdministration,
 	getAtom,
 	getDebugName,
 	getDependencyTree,
