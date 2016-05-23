@@ -10,6 +10,10 @@ They do not only apply to the current value, but also to all values that are ass
 Note that the attributes class instances (all objects that have a prototype) will not be made observable automatically by `observable`.
 It is considered to be the responsibility of the class definition / constructor function to mark the necessary attributes of an class instance observable / computed.
 
+## asMap
+
+Creates a new Observable Map instead of an Obsevable Object. See [`asMap`](map.md)
+
 ## asReference
 
 The most common modifier is `asReference`.

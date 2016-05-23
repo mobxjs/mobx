@@ -16,7 +16,7 @@ var appState = observable({
 });
 ```
 
-## 2. Create a View that responds to changes in the State
+## 2. Create a view that responds to changes in the State
 
 We didn't make our `appState` observable just for nothing;
 you can now create views that automatically update whenever relevant data in the `appState` changes.
@@ -61,13 +61,15 @@ Decorating your _state_ and _views_ with `observable` is enough for MobX to dete
 Here are two examples of changing the state:
 
 ```javascript
-appState.resetTimer = function() {
+appState.resetTimer = action(function reset() {
     appState.timer = 0;
-};
+});
 
-setInterval(function() {
+setInterval(action(function tick() {
     appState.timer += 1;
-}, 1000);
+}, 1000));
 ```
+
+The `action` wrapper is only needed when using MobX in strict mode (by default of), but will help you to better structure applications and expresses the intention of a function to modify state.
 
 Feel free to try this example on [JSFiddle](http://jsfiddle.net/mweststrate/wgbe4guu/) or by cloning the [MobX boilerplate project](https://github.com/mobxjs/mobx-react-boilerplate)

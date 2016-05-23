@@ -56,7 +56,8 @@ Good:
 
 ## Don't use array indexes as keys
 
-Just don't. Search google to find out why.
+Don't use array indexes or any value that might change in the future as key. Generate id's for your objects if needed.
+See also this [blog](https://medium.com/@robinpokorny/index-as-a-key-is-an-anti-pattern-e0349aece318).
 
 ## Dereference values lately
 

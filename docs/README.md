@@ -23,10 +23,6 @@ React and MobX together are a powerful combination. React renders the applicatio
 
 Both React and MobX provide very optimal and unique solutions to common problems in application development. React provides mechanisms to optimally render UI by using a virtual DOM that reduces the number of costly DOM mutations. MobX provides mechanisms to optimally synchronize application state with your React components by using a reactive virtual dependency state graph that is only updated when strictly needed and is never stale.
 
-## MobX was formerly known as Mobservable.
-To use / install pre- 2.0 `mobx*` compatible packages, use `mobservable` instead of `mobx`.
-See the [changelog](https://github.com/mobxjs/mobx/blob/master/CHANGELOG.md) for all the details.
-
 ## Core concepts
 
 MobX has a only few core concepts. The following snippets can be tried online using [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/) (or [without ES6 and JSX](https://jsfiddle.net/rubyred/3rL0183y/10/)).
