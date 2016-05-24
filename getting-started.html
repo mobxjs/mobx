@@ -308,7 +308,7 @@ class TodoView extends React.Component {
 
   onRename = () => {
     const todo = this.props.todo;
-    todo.task = prompt('Task name', todo.task) || ""; 
+    todo.task = prompt('Task name', todo.task) || todo.task; 
   } 
 }
 
