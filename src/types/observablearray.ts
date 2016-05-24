@@ -252,10 +252,17 @@ export class ObservableArray<T> extends StubArray {
 		return this.$mobx.spliceWithArray(0, this.$mobx.values.length, newItems);
 	}
 
+	/**
+	 * Converts this array back to a (shallow) javascript structure.
+	 * For a deep clone use mobx.toJS
+	 */
+	toJS(): T[] {
+		return (this as any).slice();
+	}
+
 	toJSON(): T[] {
-		this.$mobx.atom.reportObserved();
-		// JSON.stringify recurses on returned objects, so this will work fine
-		return this.$mobx.values.slice();
+		deprecated("toJSON is deprecated, use toJS intead");
+		return this.toJS();
 	}
 
 	peek(): T[] {

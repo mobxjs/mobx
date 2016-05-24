@@ -3,7 +3,7 @@ import {transaction} from "../core/transaction";
 import {untracked} from "../core/derivation";
 import {ObservableArray, IObservableArray} from "./observablearray";
 import {ObservableValue, UNCHANGED} from "./observablevalue";
-import {isPlainObject, getNextId, Lambda, invariant} from "../utils/utils";
+import {deprecated, isPlainObject, getNextId, Lambda, invariant} from "../utils/utils";
 import {allowStateChanges} from "../core/action";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
@@ -232,12 +232,17 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 
 	/**
 	 * Returns a shallow non observable object clone of this map.
-	 * Note that the values migth still be observable. For a deep clone use mobx.toJSON.
+	 * Note that the values migth still be observable. For a deep clone use mobx.toJS.
 	 */
-	toJs(): IKeyValueMap<V> {
+	toJS(): IKeyValueMap<V> {
 		const res: IKeyValueMap<V> = {};
 		this.keys().forEach(key => res[key] = this.get(key));
 		return res;
+	}
+
+	toJs(): IKeyValueMap<V> {
+		deprecated("toJs is deprecated, use toJS instead");
+		return this.toJS();
 	}
 
 	private isValidKey(key: string) {
