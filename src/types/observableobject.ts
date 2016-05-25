@@ -13,6 +13,7 @@ export interface IObjectChange {
 	object: any;
 	type: "update" | "add";
 	oldValue?: any;
+	newValue: any;
 }
 
 export interface IObjectWillChange {
