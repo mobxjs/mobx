@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>expr | MobX</title>
+        <title>arrays | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.2.0">
@@ -29,10 +29,10 @@
         
     
     
-    <link rel="next" href="../refguide/extend-observable.html" />
+    <link rel="next" href="../refguide/map.html" />
     
     
-    <link rel="prev" href="../refguide/create-transformer.html" />
+    <link rel="prev" href="../refguide/object.html" />
     
 
         
@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="9.3" data-basepath=".." data-revision="Wed May 25 2016 23:37:30 GMT+0200 (CEST)">
+    <div class="book" data-level="3.2" data-basepath=".." data-revision="Wed May 25 2016 23:37:30 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -262,7 +262,7 @@
             
         </li>
     
-        <li class="chapter " data-level="3.2" data-path="refguide/array.html">
+        <li class="chapter active" data-level="3.2" data-path="refguide/array.html">
             
                 
                     <a href="../refguide/array.html">
@@ -538,7 +538,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="9.3" data-path="refguide/expr.html">
+        <li class="chapter " data-level="9.3" data-path="refguide/expr.html">
             
                 
                     <a href="../refguide/expr.html">
@@ -828,17 +828,53 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/expr.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="expr">Expr</h1>
-<p><code>expr</code> can be used to create temporarily computed values inside computed values.
-Nesting computed values is useful to create cheap computations to prevent expensive computations to run.</p>
-<p>In the following example the expression prevents that the <code>TodoView</code> component is re-rendered if the selection changes elsewhere.
-Instead the component will only re-render when the relevant todo is (de)selected.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> TodoView = observer(({todo, editorState}) =&gt; {
-    <span class="hljs-keyword">const</span> isSelected = mobx.expr(() =&gt; editorState.selection === todo);
-    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">className</span>=<span class="hljs-value">{isSelected</span> ? &quot;<span class="hljs-attribute">todo</span> <span class="hljs-attribute">todo-selected</span>&quot; <span class="hljs-attribute">:</span> &quot;<span class="hljs-attribute">todo</span>&quot;}&gt;</span>{todo.title}<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>;</span>
+                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/array.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h2 id="observable-arrays">Observable Arrays</h2>
+<p>Similar to objects, arrays can be made observable using <code>observable</code>.
+This works recursively as well, so all (future) values of the array will also be observable.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, autorun} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
+
+<span class="hljs-keyword">var</span> todos = observable([
+    { title: <span class="hljs-string">&quot;Spoil tea&quot;</span>, completed: <span class="hljs-literal">true</span> },
+    { title: <span class="hljs-string">&quot;Make coffee&quot;</span>, completed: <span class="hljs-literal">false</span> }
+]);
+
+autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Remaining:&quot;</span>, todos
+        .filter(todo =&gt; !todo.completed)
+        .map(todo =&gt; todo.title)
+        .join(<span class="hljs-string">&quot;, &quot;</span>)
+    );
 });
+<span class="hljs-comment">// Prints: &apos;Remaining: Make coffee&apos;</span>
+
+todos[<span class="hljs-number">0</span>].completed = <span class="hljs-literal">false</span>;
+<span class="hljs-comment">// Prints: &apos;Remaining: Spoil tea, Make coffee&apos;</span>
+
+todos[<span class="hljs-number">2</span>] = { title: <span class="hljs-string">&apos;Take a nap&apos;</span>, completed: <span class="hljs-literal">false</span> };
+<span class="hljs-comment">// Prints: &apos;Remaining: Spoil tea, Make coffee, Take a nap&apos;</span>
+
+todos.shift();
+<span class="hljs-comment">// Prints: &apos;Remaining: Make coffee, Take a nap&apos;</span>
 </code></pre>
-<p><code>expr(func)</code> is an alias for <code>computed(func).get()</code>.</p>
+<p>Due to limitations of native arrays in ES5 (<code>array.observe</code> is only available in ES7, and arrays cannot be extend),
+<code>observable</code> will instrument a clone of the provided array instead of the original one.
+In practice, these arrays work just as fine as native arrays and all native methods are supported, including index assignments, up-to and including the length of the array.</p>
+<p>Bear in mind however that <code>Array.isArray(observable([]))</code> will yield <code>false</code>, so whenever you need to pass an observable array to an external library,
+it is a good idea to <em>create a shallow copy before passing it to other libraries or built-in functions</em> (which is good practice anyway) by using <code>array.slice()</code>.
+In other words, <code>Array.isArray(observable([]).slice())</code> will yield <code>true</code>.</p>
+<p>Unlike the built-in implementation of the functions <code>sort</code> and <code>reverse</code>, observableArray.sort and reverse  will not change the array in-place, but only will return a sorted / reversed copy.</p>
+<p>Besides all built-in functions, the following goodies are available as well on observable arrays:</p>
+<ul>
+<li><code>intercept(interceptor)</code>. Can be used to intercept any change before it is applied to the array. See <a href="observe.html">observe &amp; intercept</a> </li>
+<li><code>observe(listener, fireImmediately? = false)</code> Listen to changes in this array. The callback will receive arguments that express an array splice or array change, conforming to <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe" target="_blank">ES7 proposal</a>. It returns a disposer function to stop the listener.</li>
+<li><code>clear()</code> Remove all current entries from the array.</li>
+<li><code>replace(newItems)</code> Replaces all existing entries in the array with new ones.</li>
+<li><code>find(predicate: (item, index, array) =&gt; boolean, thisArg?, fromIndex?)</code> Basically the same as the ES7 <code>Array.find</code> proposal, except for the additional <code>fromIndex</code> parameter.</li>
+<li><code>remove(value)</code> Remove a single item by value from the array. Returns <code>true</code> if the item was found and removed.</li>
+<li><code>peek()</code> Returns an array with all the values which can safely be passed to other libraries, similar to <code>slice()</code>.
+In contrast to <code>slice</code>, <code>peek</code> doesn&apos;t create a defensive copy. Use this in performance critical applications if you know for sure that you use the array in a read-only manner.
+In performance critical sections it is recommend to use a flat observable array as well.</li>
+</ul>
 
                     
                     </section>
@@ -849,10 +885,10 @@ Instead the component will only re-render when the relevant todo is (de)selected
         </div>
 
         
-        <a href="../refguide/create-transformer.html" class="navigation navigation-prev " aria-label="Previous page: createTransformer"><i class="fa fa-angle-left"></i></a>
+        <a href="../refguide/object.html" class="navigation navigation-prev " aria-label="Previous page: objects"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../refguide/extend-observable.html" class="navigation navigation-next " aria-label="Next page: extendObservable"><i class="fa fa-angle-right"></i></a>
+        <a href="../refguide/map.html" class="navigation navigation-next " aria-label="Next page: maps"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

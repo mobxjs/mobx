@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>expr | MobX</title>
+        <title>boxed values | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.2.0">
@@ -29,10 +29,10 @@
         
     
     
-    <link rel="next" href="../refguide/extend-observable.html" />
+    <link rel="next" href="../best/store.html" />
     
     
-    <link rel="prev" href="../refguide/create-transformer.html" />
+    <link rel="prev" href="../refguide/map.html" />
     
 
         
@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="9.3" data-basepath=".." data-revision="Wed May 25 2016 23:37:30 GMT+0200 (CEST)">
+    <div class="book" data-level="3.4" data-basepath=".." data-revision="Wed May 25 2016 23:37:30 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -292,7 +292,7 @@
             
         </li>
     
-        <li class="chapter " data-level="3.4" data-path="refguide/boxed.html">
+        <li class="chapter active" data-level="3.4" data-path="refguide/boxed.html">
             
                 
                     <a href="../refguide/boxed.html">
@@ -538,7 +538,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="9.3" data-path="refguide/expr.html">
+        <li class="chapter " data-level="9.3" data-path="refguide/expr.html">
             
                 
                     <a href="../refguide/expr.html">
@@ -828,17 +828,37 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/expr.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="expr">Expr</h1>
-<p><code>expr</code> can be used to create temporarily computed values inside computed values.
-Nesting computed values is useful to create cheap computations to prevent expensive computations to run.</p>
-<p>In the following example the expression prevents that the <code>TodoView</code> component is re-rendered if the selection changes elsewhere.
-Instead the component will only re-render when the relevant todo is (de)selected.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> TodoView = observer(({todo, editorState}) =&gt; {
-    <span class="hljs-keyword">const</span> isSelected = mobx.expr(() =&gt; editorState.selection === todo);
-    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">className</span>=<span class="hljs-value">{isSelected</span> ? &quot;<span class="hljs-attribute">todo</span> <span class="hljs-attribute">todo-selected</span>&quot; <span class="hljs-attribute">:</span> &quot;<span class="hljs-attribute">todo</span>&quot;}&gt;</span>{todo.title}<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>;</span>
+                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/boxed.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h2 id="primitive-values-and-references">Primitive values and references</h2>
+<p>All primitive values in JavaScript are immutable and hence per definition not observable.
+Usually that is fine, as MobX usually can just make the <em>property</em> that contains the value observable.
+See also <a href="object.html">observable objects</a>.
+In rare cases it can be convenient to to have an observable &quot;primitive&quot; that is not owned by an object.
+For these cases it is possible to create an observable box that manages such a primitive. </p>
+<p>So <code>observable</code> accepts scalar values as well and returns an object with a getter / setter function that holds this value.
+Furthermore you can register a callback using its <code>.observe</code> method to listen to changes on the stored value.
+But in most cases it is better to use <a href="autorun.html"><code>mobx.autorun</code></a> instead.</p>
+<p>So the signature of object returned by <code>observable(scalar)</code> is:</p>
+<ul>
+<li><code>.get()</code> Returns the current value.</li>
+<li><code>.set(value)</code> Replaces the currently stored value. Notifies all observers.</li>
+<li><code>intercept(interceptor)</code>. Can be used to intercept changes before they are applied. See <a href="observe.html">observe &amp; intercept</a></li>
+<li><code>.observe(callback: (newValue, previousValue) =&gt; void, fireImmediately = false): disposerFunction</code>. Registers an observer function that will fire each time the stored value is replaced. Returns a function to cancel the observer. See <a href="observe.html">observe &amp; intercept</a></li>
+</ul>
+<p>Example:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
+
+<span class="hljs-keyword">const</span> cityName = observable(<span class="hljs-string">&quot;Vienna&quot;</span>);
+
+<span class="hljs-built_in">console</span>.log(cityName.get());
+<span class="hljs-comment">// prints &apos;Vienna&apos;</span>
+
+cityName.observe(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">newCity, oldCity</span>) </span>{
+    <span class="hljs-built_in">console</span>.log(oldCity, <span class="hljs-string">&quot;-&gt;&quot;</span>, newCity);
 });
+
+cityName.set(<span class="hljs-string">&quot;Amsterdam&quot;</span>);
+<span class="hljs-comment">// prints &apos;city: Vienna -&gt; Amsterdam&apos;</span>
 </code></pre>
-<p><code>expr(func)</code> is an alias for <code>computed(func).get()</code>.</p>
 
                     
                     </section>
@@ -849,10 +869,10 @@ Instead the component will only re-render when the relevant todo is (de)selected
         </div>
 
         
-        <a href="../refguide/create-transformer.html" class="navigation navigation-prev " aria-label="Previous page: createTransformer"><i class="fa fa-angle-left"></i></a>
+        <a href="../refguide/map.html" class="navigation navigation-prev " aria-label="Previous page: maps"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../refguide/extend-observable.html" class="navigation navigation-next " aria-label="Next page: extendObservable"><i class="fa fa-angle-right"></i></a>
+        <a href="../best/store.html" class="navigation navigation-next " aria-label="Next page: Defining data stores"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

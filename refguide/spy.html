@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>expr | MobX</title>
+        <title>spy | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.2.0">
@@ -29,10 +29,10 @@
         
     
     
-    <link rel="next" href="../refguide/extend-observable.html" />
+    <link rel="next" href="../refguide/tojson.html" />
     
     
-    <link rel="prev" href="../refguide/create-transformer.html" />
+    <link rel="prev" href="../refguide/reaction.html" />
     
 
         
@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="9.3" data-basepath=".." data-revision="Wed May 25 2016 23:37:30 GMT+0200 (CEST)">
+    <div class="book" data-level="9.10" data-basepath=".." data-revision="Wed May 25 2016 23:37:30 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -538,7 +538,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="9.3" data-path="refguide/expr.html">
+        <li class="chapter " data-level="9.3" data-path="refguide/expr.html">
             
                 
                     <a href="../refguide/expr.html">
@@ -643,7 +643,7 @@
             
         </li>
     
-        <li class="chapter " data-level="9.10" data-path="refguide/spy.html">
+        <li class="chapter active" data-level="9.10" data-path="refguide/spy.html">
             
                 
                     <a href="../refguide/spy.html">
@@ -828,17 +828,95 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/expr.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="expr">Expr</h1>
-<p><code>expr</code> can be used to create temporarily computed values inside computed values.
-Nesting computed values is useful to create cheap computations to prevent expensive computations to run.</p>
-<p>In the following example the expression prevents that the <code>TodoView</code> component is re-rendered if the selection changes elsewhere.
-Instead the component will only re-render when the relevant todo is (de)selected.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> TodoView = observer(({todo, editorState}) =&gt; {
-    <span class="hljs-keyword">const</span> isSelected = mobx.expr(() =&gt; editorState.selection === todo);
-    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">className</span>=<span class="hljs-value">{isSelected</span> ? &quot;<span class="hljs-attribute">todo</span> <span class="hljs-attribute">todo-selected</span>&quot; <span class="hljs-attribute">:</span> &quot;<span class="hljs-attribute">todo</span>&quot;}&gt;</span>{todo.title}<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>;</span>
-});
-</code></pre>
-<p><code>expr(func)</code> is an alias for <code>computed(func).get()</code>.</p>
+                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/spy.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="spy">Spy</h1>
+<p>Usage: <code>spy(listener)</code>.
+Registers a global spy listener that listens to all events that happen in MobX.
+It is similar to attaching an <code>observe</code> listener to <em>all</em> observables at once, but also notifies about running (trans/re)actions and computations.
+Used for example by the <code>mobx-react-devtools</code>.  </p>
+<p>Spy listeners always receive one object, which has at least a <code>type</code> field. The following events are emitted by default by spy.</p>
+<table>
+<thead>
+<tr>
+<th>event</th>
+<th>fields</th>
+<th>nested</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>action</td>
+<td>name, target (scope), arguments, fn (source function of the action</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>transaction</td>
+<td>name, target (scope)</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>scheduled-reaction</td>
+<td>object (Reaction instance)</td>
+<td>no</td>
+</tr>
+<tr>
+<td>reaction</td>
+<td>object (Reaction instance), fn (source of the reaction)</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>compute</td>
+<td>object (ComputedValue instance), target (scope), fn (source)</td>
+<td>no</td>
+</tr>
+<tr>
+<td>error</td>
+<td>message</td>
+<td>no</td>
+</tr>
+<tr>
+<td>update (array)</td>
+<td>object (the array), index, newValue, oldValue</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>update (map)</td>
+<td>object (observable map instance), name, newValue, oldValue</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>update (object)</td>
+<td>object (instance), name, newValue, oldValue</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>splice (array)</td>
+<td>object (the array), index, added, removed, addedCount, removedCount</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>add (map)</td>
+<td>object, name, newValue</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>add (object)</td>
+<td>object, name, newValue</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>delete (map)</td>
+<td>object, name, oldValue</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>create (boxed observable)</td>
+<td>object (ObservableValue instance), newValue</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<p>The spy events for observable values are identical to the events passed to <code>observe</code>. See <a href="observe.html">intercept &amp; observe</a> for an extensive overview.</p>
+<p>It is possible to emit your own spy events as well. See <code>extras.spyReport</code>, <code>extras.spyReportStart</code> and <code>extras.spyReportEnd</code></p>
 
                     
                     </section>
@@ -849,10 +927,10 @@ Instead the component will only re-render when the relevant todo is (de)selected
         </div>
 
         
-        <a href="../refguide/create-transformer.html" class="navigation navigation-prev " aria-label="Previous page: createTransformer"><i class="fa fa-angle-left"></i></a>
+        <a href="../refguide/reaction.html" class="navigation navigation-prev " aria-label="Previous page: reaction"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../refguide/extend-observable.html" class="navigation navigation-next " aria-label="Next page: extendObservable"><i class="fa fa-angle-right"></i></a>
+        <a href="../refguide/tojson.html" class="navigation navigation-next " aria-label="Next page: toJS"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>expr | MobX</title>
+        <title>reaction | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.2.0">
@@ -29,10 +29,10 @@
         
     
     
-    <link rel="next" href="../refguide/extend-observable.html" />
+    <link rel="next" href="../refguide/spy.html" />
     
     
-    <link rel="prev" href="../refguide/create-transformer.html" />
+    <link rel="prev" href="../refguide/observe.html" />
     
 
         
@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="9.3" data-basepath=".." data-revision="Wed May 25 2016 23:37:30 GMT+0200 (CEST)">
+    <div class="book" data-level="9.9" data-basepath=".." data-revision="Wed May 25 2016 23:37:30 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -538,7 +538,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="9.3" data-path="refguide/expr.html">
+        <li class="chapter " data-level="9.3" data-path="refguide/expr.html">
             
                 
                     <a href="../refguide/expr.html">
@@ -628,7 +628,7 @@
             
         </li>
     
-        <li class="chapter " data-level="9.9" data-path="refguide/reaction.html">
+        <li class="chapter active" data-level="9.9" data-path="refguide/reaction.html">
             
                 
                     <a href="../refguide/reaction.html">
@@ -828,17 +828,55 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/expr.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="expr">Expr</h1>
-<p><code>expr</code> can be used to create temporarily computed values inside computed values.
-Nesting computed values is useful to create cheap computations to prevent expensive computations to run.</p>
-<p>In the following example the expression prevents that the <code>TodoView</code> component is re-rendered if the selection changes elsewhere.
-Instead the component will only re-render when the relevant todo is (de)selected.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> TodoView = observer(({todo, editorState}) =&gt; {
-    <span class="hljs-keyword">const</span> isSelected = mobx.expr(() =&gt; editorState.selection === todo);
-    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">className</span>=<span class="hljs-value">{isSelected</span> ? &quot;<span class="hljs-attribute">todo</span> <span class="hljs-attribute">todo-selected</span>&quot; <span class="hljs-attribute">:</span> &quot;<span class="hljs-attribute">todo</span>&quot;}&gt;</span>{todo.title}<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>;</span>
-});
+                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/reaction.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="reaction">Reaction</h1>
+<p>Usage: <code>reaction(() =&gt; data, data =&gt; { sideEffect }, fireImmediately = false, delay = 0)</code>.</p>
+<p>A variation on <code>autorun</code> that gives more fine grained control on which observables that will be tracked.
+It takes two function, the first one is tracked and returns data that is used as input for the second one, the side effect.
+Unlike <code>autorun</code> the side effect won&apos;t be run directly when created, but only when the data expression returns a new value for the first time. 
+Any observables that are accessed while executing the side effect will not be tracked.
+The side effect can be debounced, just like <code>autorunAsync</code>.
+<code>reaction</code> returns a disposer function.</p>
+<p>It is important to notice that the side effect will <em>only</em> react to data that was <em>accessed</em> in the data expression, which might be less then the data that is actually used in the effect.</p>
+<p>In the following example both <code>reaction1</code>, <code>reaction2</code> and <code>autorun1</code> will react to the addition, removal or replacement of todo&apos;s in the <code>todos</code> array.
+But only <code>reaction2</code> and <code>autorun</code> will react to the change of a <code>title</code> in one of the todo items, because <code>title</code> is used in the data expression of reaction 2, while it isn&apos;t in the data expression of reaction 1.
+<code>autorun</code> tracks the complete side effect, hence it will always trigger correctly, but is also more suspectible to accidentally accessing unrelevant data.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> todos = observable([
+    {
+        title: <span class="hljs-string">&quot;Make coffee&quot;</span>,
+        done: <span class="hljs-literal">true</span>, 
+    },
+    {
+        title: <span class="hljs-string">&quot;Find biscuit&quot;</span>,
+        done: <span class="hljs-literal">false</span>
+    }
+]);
+
+<span class="hljs-keyword">const</span> reaction1 = reaction(
+    () =&gt; todos,
+    todos =&gt; <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;reaction 1:&quot;</span>, todos.map(todo =&gt; todo.title).join(<span class="hljs-string">&quot;, &quot;</span>))
+);
+
+<span class="hljs-keyword">const</span> reaction2 = reaction(
+    () =&gt; todos.map(todo =&gt; { title: todo.title }),
+    todos =&gt; <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;reaction 2:&quot;</span>, todos.map(todo =&gt; todo.title).join(<span class="hljs-string">&quot;, &quot;</span>))
+);
+
+<span class="hljs-keyword">const</span> autorun1 = autorun(
+    () =&gt; <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;autorun 1:&quot;</span>, todos.map(todo =&gt; todo.title).join(<span class="hljs-string">&quot;, &quot;</span>))
+);
+
+todos.push({ title: <span class="hljs-string">&quot;explain reactions&quot;</span>, done: <span class="hljs-literal">false</span> });
+<span class="hljs-comment">// prints:</span>
+<span class="hljs-comment">// reaction 1: Make coffee, find biscuit, explain reactions</span>
+<span class="hljs-comment">// reaction 2: Make coffee, find biscuit, explain reactions</span>
+<span class="hljs-comment">// autorun 1: Make coffee, find biscuit, explain reactions</span>
+
+todos[<span class="hljs-number">0</span>].title = <span class="hljs-string">&quot;Make tea&quot;</span>
+<span class="hljs-comment">// prints:</span>
+<span class="hljs-comment">// reaction 2: Make tea, find biscuit, explain reactions</span>
+<span class="hljs-comment">// autorun 1: Make tea, find biscuit, explain reactions</span>
 </code></pre>
-<p><code>expr(func)</code> is an alias for <code>computed(func).get()</code>.</p>
+<p>Reaction is roughly speaking sugar for: <code>computed(expression).observe(action(sideEffect))</code> or <code>autorun(() =&gt; action(sideEffect)(expression)</code></p>
 
                     
                     </section>
@@ -849,10 +887,10 @@ Instead the component will only re-render when the relevant todo is (de)selected
         </div>
 
         
-        <a href="../refguide/create-transformer.html" class="navigation navigation-prev " aria-label="Previous page: createTransformer"><i class="fa fa-angle-left"></i></a>
+        <a href="../refguide/observe.html" class="navigation navigation-prev " aria-label="Previous page: observe"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../refguide/extend-observable.html" class="navigation navigation-next " aria-label="Next page: extendObservable"><i class="fa fa-angle-right"></i></a>
+        <a href="../refguide/spy.html" class="navigation navigation-next " aria-label="Next page: spy"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

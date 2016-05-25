@@ -27,7 +27,7 @@ In that case the parent object interceptors are run before the property intercep
 
 ```javascript
 const theme = observable({
-    backgroundColor: "#ffffff"
+  backgroundColor: "#ffffff"
 })
 
 intercept(theme, "backgroundColor", change => {

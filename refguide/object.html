@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>expr | MobX</title>
+        <title>objects | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.2.0">
@@ -29,10 +29,10 @@
         
     
     
-    <link rel="next" href="../refguide/extend-observable.html" />
+    <link rel="next" href="../refguide/array.html" />
     
     
-    <link rel="prev" href="../refguide/create-transformer.html" />
+    <link rel="prev" href="../refguide/action.html" />
     
 
         
@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="9.3" data-basepath=".." data-revision="Wed May 25 2016 23:37:30 GMT+0200 (CEST)">
+    <div class="book" data-level="3.1" data-basepath=".." data-revision="Wed May 25 2016 23:37:30 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -247,7 +247,7 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="3.1" data-path="refguide/object.html">
+        <li class="chapter active" data-level="3.1" data-path="refguide/object.html">
             
                 
                     <a href="../refguide/object.html">
@@ -538,7 +538,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="9.3" data-path="refguide/expr.html">
+        <li class="chapter " data-level="9.3" data-path="refguide/expr.html">
             
                 
                     <a href="../refguide/expr.html">
@@ -828,17 +828,42 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/expr.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="expr">Expr</h1>
-<p><code>expr</code> can be used to create temporarily computed values inside computed values.
-Nesting computed values is useful to create cheap computations to prevent expensive computations to run.</p>
-<p>In the following example the expression prevents that the <code>TodoView</code> component is re-rendered if the selection changes elsewhere.
-Instead the component will only re-render when the relevant todo is (de)selected.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> TodoView = observer(({todo, editorState}) =&gt; {
-    <span class="hljs-keyword">const</span> isSelected = mobx.expr(() =&gt; editorState.selection === todo);
-    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">className</span>=<span class="hljs-value">{isSelected</span> ? &quot;<span class="hljs-attribute">todo</span> <span class="hljs-attribute">todo-selected</span>&quot; <span class="hljs-attribute">:</span> &quot;<span class="hljs-attribute">todo</span>&quot;}&gt;</span>{todo.title}<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>;</span>
+                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/object.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h2 id="observable-objects">Observable Objects</h2>
+<p>If a plain JavaScript object is passed to <code>observable</code> (that is, an object that wasn&apos;t created using a constructor function),
+MobX will recursively pass all its values through <code>observable</code>.
+This way the complete object (tree) is in-place instrumented to make it observable.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, autorun} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
+
+<span class="hljs-keyword">var</span> person = observable({
+    name: <span class="hljs-string">&quot;John&quot;</span>,
+    age: <span class="hljs-number">42</span>,
+    showAge: <span class="hljs-literal">false</span>,
+    labelText: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.showAge ? <span class="hljs-string">`<span class="hljs-subst">${this.name}</span> (age: <span class="hljs-subst">${this.age}</span>)`</span> : <span class="hljs-keyword">this</span>.name;
+    }
 });
+
+<span class="hljs-comment">// object properties don&apos;t expose an &apos;observe&apos; method,</span>
+<span class="hljs-comment">// but don&apos;t worry, &apos;mobx.autorun&apos; is even more powerful</span>
+autorun(() =&gt; <span class="hljs-built_in">console</span>.log(person.labelText));
+
+person.name = <span class="hljs-string">&quot;Dave&quot;</span>;
+<span class="hljs-comment">// prints: &apos;Dave&apos;</span>
+
+person.age = <span class="hljs-number">21</span>;
+<span class="hljs-comment">// etc</span>
 </code></pre>
-<p><code>expr(func)</code> is an alias for <code>computed(func).get()</code>.</p>
+<p>Some things to keep in mind when making objects observable:</p>
+<ul>
+<li>When passing objects through <code>observable</code>, only the properties that exist at the time of making the object observable will be observable.
+Properties that are added to the object at a later time won&apos;t become observable, unless <a href="extend-observable.html"><code>extendObservable</code></a> is used.</li>
+<li>Only plain objects will be made observable. For non-plain objects it is considered the responsibility of the constructor to initialize the observable properties.
+Either use the <a href="observable.html"><code>@observable</code></a> annotation or the <a href="extend-observable.html"><code>extendObservable</code></a> function.</li>
+<li>Argumentless functions will be automatically turned into views, just like <a href="computed-decorator"><code>@computed</code></a> would do. For view <code>this</code> will be automatically bound to the object it is defined on.
+However, if a function expression (ES6 / TypeScript) is used, <code>this</code> will be bound to <code>undefined</code>, so you probably want to either to refer to the object directly, or to use a classic function.</li>
+<li><code>observable</code> is applied recursively, both on instantiation and to any new values that will be assigned to observable properties in the future.</li>
+<li>These defaults are fine in 95% of the cases, but for more fine-grained on how and which properties should be made observable, see the <a href="modifiers.html">modifiers</a> section.</li>
+</ul>
 
                     
                     </section>
@@ -849,10 +874,10 @@ Instead the component will only re-render when the relevant todo is (de)selected
         </div>
 
         
-        <a href="../refguide/create-transformer.html" class="navigation navigation-prev " aria-label="Previous page: createTransformer"><i class="fa fa-angle-left"></i></a>
+        <a href="../refguide/action.html" class="navigation navigation-prev " aria-label="Previous page: action"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../refguide/extend-observable.html" class="navigation navigation-next " aria-label="Next page: extendObservable"><i class="fa fa-angle-right"></i></a>
+        <a href="../refguide/array.html" class="navigation navigation-next " aria-label="Next page: arrays"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>
