@@ -1,3 +1,23 @@
+# 2.2.0
+
+See the [release announcement](https://medium.com/@mweststrate/45cdc73c7c8d) for the full details of this release:
+
+Introduced:
+* `action` / `@action`
+* `intercept`
+* `spy`
+* `reaction`
+* `useStrict`
+* improved debug names
+* `toJSON` was renamed to `toJS`
+* `observable(asMap())` is the new idiomatic way to create maps
+* the effect of `when` is now untracked, similar to `reaction.
+* `extras.trackTransations` is deprecated, use `spy` instead
+* `untracked` has been undeprecated
+* introduced / documented: `getAtom`, `getDebugName`, `isSpyEnabled`, `spyReport`, `spyReportStart`, `spyReportEnd`
+* deprecated `extras.SimpleEventEmitter`
+* array splice events now also report the `added` collection and `removedCount`
+
 # 2.1.7
 
 * Fixed a false negative in cycle detection, as reported in #236

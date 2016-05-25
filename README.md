@@ -10,7 +10,7 @@ _Simple, scalable state management_
 
 * Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`
 * [Ten minute, interactive MobX + React tutorial](https://mobxjs.github.io/mobx/getting-started.html)
-* Api documentation (including ES5, ES6, Typescript examples): https://mobxjs.github.io/mobx
+* [Official documentation and API overview](https://mobxjs.github.io/mobx/refguide/api.html)
 * Videos: [Screencast: intro to MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8) &mdash; State Management Is Easy, React Amsterdam 2016 conf (coming soon) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx)) &mdash; [Transparent Reactive Programming and Mutable Data, Reactive2015 conf](https://www.youtube.com/watch?v=FEwLwiizlk0) ([slides](https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures))
 
 ## Introduction
@@ -46,9 +46,9 @@ class Todo {
 
 Using `@observable` is like turning a value into a spreadsheet cell. But unlike spreadsheets, these values can be not just primitive values, but references, objects and arrays as well. You can even [define your own](http://mobxjs.github.io/mobx/refguide/extending.html) observable data sources.
 
-### Reactive derivations
+### Computed values
 
-With MobX you can simply define derived values that will update automatically when relevant data is modified. For example by using the [`@computed`](http://mobxjs.github.io/mobx/refguide/computed-decorator.html) decorator or by using parameterless functions as property values in `extendObservable`.
+With MobX you can define values that will be derived automatically when relevant data is modified. By using the [`@computed`](http://mobxjs.github.io/mobx/refguide/computed-decorator.html) decorator or by using parameterless functions as property values in `extendObservable`.
 
 ```javascript
 class TodoList {
@@ -63,7 +63,8 @@ Computations like these can very well be compared with formulas in spreadsheet p
 
 ### Reactions
 
-Reactions are similar to a computed value, but instead of producing a new value, a reaction produces a side effect for things like printing to the console, making network requests, incrementally updating the React component tree to patch the DOM, etc. In short, reactions bridge [reactive](https://en.wikipedia.org/wiki/Reactive_programming) and [imperative](https://en.wikipedia.org/wiki/Imperative_programming) programming.
+Reactions are similar to a computed value, but instead of producing a new value, a reaction produces a side effect for things like printing to the console, making network requests, incrementally updating the React component tree to patch the DOM, etc.
+In short, reactions bridge [reactive](https://en.wikipedia.org/wiki/Reactive_programming) and [imperative](https://en.wikipedia.org/wiki/Imperative_programming) programming.
 
 If you are using React, you can turn your (stateless function) components into reactive components by simply adding the [`@observer`](http://mobxjs.github.io/mobx/refguide/observer-component.html) decorator from the `mobx-react` package onto them.
 
@@ -131,6 +132,9 @@ store.todos.push(
 store.todos[0].finished = true;
 ```
 
+Nonetheless, MobX has an optional built-in concept of [`actions`](https://mobxjs.github.io/mobx/refguide/action.html).
+Use them to your advantage; they will help you to structure your code better and make wise decisions about when and where state should be modified. 
+
 ## MobX: Simple and scalable
 
 MobX is one of the least obtrusive libraries you can use for state management. That makes the `MobX` approach not just simple, but very scalable as well:
@@ -170,6 +174,16 @@ So you can simple keep using your existing router-, data fetching and utility li
 For the same reason you can use it out of the box both server- and client side, in isomorphic applications and with react-native.
 
 The result of this is that you often need to learn less new concepts when using MobX in comparison to other state management solutions.
+
+---
+
+
+
+<center>
+<img src="https://www.mendix.com/styleguide/img/logo-mendix.png" align="center" width="200"/>
+
+__MobX is proudly used in mission critical systems at [Mendix](https://www.mendix.com)__
+</center>
 
 ## Credits
 
