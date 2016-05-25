@@ -48,7 +48,7 @@ The expression will autoromatically be re-evaluted if any observables it uses ch
 Any application has actions. Actions are anything that modify the state.
 
 With MobX you can make it explicit in your code where your actions live by marking them. 
-Actions helps you to structure your code better. It takes a function and returns it after wrapping it in `untracked` and `transaction`.
+Actions helps you to structure your code better.
 It is adviced to use them on any function that modifies observables or has side effects.
 `action` also provides useful debugging information in combination with the devtools.
 Note: using `action` is mandatory when *strict mode* is enabled, see `useStrict`.
@@ -88,17 +88,17 @@ Whenever one of the used observables is changed in the future, the same sideEffe
 Returns a disposer function to cancel the side effect. [&laquo;details&raquo;](autorun.md)
 
 ### `when`
-Usage `when(() => condition, () => { sideEffect })`.
+Usage: `when(() => condition, () => { sideEffect })`.
 The condition expression will react automatically to any observables is uses.
 As soon as the expression returns true the sideEffect function will be invoked, but only once.
 `when` returns a disposer to prematurely cancel the whole thing. [&laquo;details&raquo;](when.md)
 
 ### `autorunAsync`
-Usage `autorunAsync(() => { sideEffect }, delay)`. Similar to `autorun`, but the sideEffect will be delayed and debounced with the given `delay`.
+Usage: `autorunAsync(() => { sideEffect }, delay)`. Similar to `autorun`, but the sideEffect will be delayed and debounced with the given `delay`.
 [&laquo;details&raquo;](autorun-async.md)
 
 ### `reaction`
-Usage `reaction(() => data, data => { sideEffect }, fireImmediately = false, delay = 0)`.
+Usage: `reaction(() => data, data => { sideEffect }, fireImmediately = false, delay = 0)`.
 A variation on `autorun` that gives more fine grained control on which observables that will be tracked.
 It takes two function, the first one is tracked and returns data that is used as input for the second one, the side effect.
 Unlike `autorun` the side effect won't be run initially, and any observables that are accessed while executing the side effect will not be tracked.
