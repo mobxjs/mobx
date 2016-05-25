@@ -111,7 +111,7 @@ There is no need to treat your client-side application state as some kind of dat
 Real references, cyclic data structures and instance methods are powerful concepts in JavaScript.
 Domain objects are allowed to refer directly to domain objects from other stores.
 Remember: we want to keep our actions and views as simple as possible and needing to manage references and doing garbage collection yourself might be a step backward.
-Unlike many Flux architectures, with MobX there is no need to denormalize your data, and this makes it a lot simpler to build the _essentially_ complex parts of your application:
+Unlike many Flux architectures, with MobX there is no need to normalize your data, and this makes it a lot simpler to build the _essentially_ complex parts of your application:
 your business rules, actions and user interface.
 
 Domain objects can delegate all their logic to the store they belong to if that suits your application well.

@@ -64,18 +64,18 @@
                             <li>Secondly there are <em>derivations</em>. 
 								Basically, any value that can be computed automatically from the state of your application.
             					These derivations, or computed values, can range from
-                                be simple values like the number of unfinished todos, to complex stuff like a visual HTML
+                                simple values, like the number of unfinished todos, to complex stuff like a visual HTML
                                 representation of your todos. In spreadsheet terms: these are the formulas and charts of
                                 your application.
                             </li>
-                            <li><em>Reactions</em> are very similar to derivations. The main difference: these are functions that don't produce a
-                                value, but instead they run automatically to perform some task.
+                            <li><em>Reactions</em> are very similar to derivations. The main difference is these functions don't produce a
+                                value. Instead, they run automatically to perform some task.
                                 Usually this is I/O related.
                                 They make sure that the DOM is updated or 
                                 that network requests are made automatically at the right time.                                
                             </li>
                             <li>Finally there are <em>actions</em>. Actions are all the things that alter the <em>state</em>.
-                            MobX will make sure that any changes to the application
+                            MobX will make sure that all changes to the application
                                 state caused by your actions are automatically processed by all derivations and reactions.
                                 Synchronously and glitch-free.
                             </li>
@@ -308,7 +308,7 @@ class TodoView extends React.Component {
 
   onRename = () => {
     const todo = this.props.todo;
-    todo.task = prompt('Task name', todo.task) || ""; 
+    todo.task = prompt('Task name', todo.task) || todo.task; 
   } 
 }
 
