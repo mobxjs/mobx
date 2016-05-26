@@ -437,24 +437,38 @@ test('issue 191 - shared initializers (ts)', function(t) {
 	t.end();
 });
 
+function normalizeSpyEvents(events: any[]) {
+	events.forEach(ev => {
+		delete ev.fn;
+		delete ev.time;
+	});
+	return events;
+}
+
 test("action decorator (typescript)", function(t) {
 	class Store {
+		constructor(private multiplier: number) {}
+		
 		@action
 		add(a: number, b: number): number {
-			return a + b;
+			return (a + b) * this.multiplier;
 		}
 	}
 
-	const store =  new Store();
+	const store1 =  new Store(2);
+	const store2 = new Store(3);
 	const events: any[] = [];
 	const d = spy(events.push.bind(events));
-	t.equal(store.add(3, 4), 7);
+	t.equal(store1.add(3, 4), 14);
+	t.equal(store2.add(2, 2), 12);
+	t.equal(store1.add(1, 1), 4);
 
-	delete events[0].fn;
-	delete events[1].time;
-
-	t.deepEqual(events,	[
-		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, target: store, type: "action" },
+	t.deepEqual(normalizeSpyEvents(events),	[
+		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, target: store1, type: "action" },
+		{ spyReportEnd: true },
+		{ arguments: [ 2, 2 ], name: "add", spyReportStart: true, target: store2, type: "action" },
+		{ spyReportEnd: true },
+		{ arguments: [ 1, 1 ], name: "add", spyReportStart: true, target: store1, type: "action" },
 		{ spyReportEnd: true }
 	]);
 
@@ -464,22 +478,28 @@ test("action decorator (typescript)", function(t) {
 
 test("custom action decorator (typescript)", function(t) {
 	class Store {
+		constructor(private multiplier: number) {}
+		
 		@action("zoem zoem")
 		add(a: number, b: number): number {
-			return a + b;
+			return (a + b) * this.multiplier;
 		}
 	}
 
-	const store =  new Store();
+	const store1 =  new Store(2);
+	const store2 =  new Store(3);
 	const events: any[] = [];
 	const d = spy(events.push.bind(events));
-	t.equal(store.add(3, 4), 7);
+	t.equal(store1.add(3, 4), 14);
+	t.equal(store2.add(2, 2), 12);
+	t.equal(store1.add(1, 1), 4);
 
-	delete events[0].fn;
-	delete events[1].time;
-
-	t.deepEqual(events,	[
-		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, target: store, type: "action" },
+	t.deepEqual(normalizeSpyEvents(events),	[
+		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, target: store2, type: "action" },
+		{ spyReportEnd: true },
+		{ arguments: [ 2, 2 ], name: "zoem zoem", spyReportStart: true, target: store2, type: "action" },
+		{ spyReportEnd: true },
+		{ arguments: [ 1, 1 ], name: "zoem zoem", spyReportStart: true, target: store2, type: "action" },
 		{ spyReportEnd: true }
 	]);
 
@@ -490,7 +510,7 @@ test("custom action decorator (typescript)", function(t) {
 
 test("custom action decorator on field (typescript)", function(t) {
 	class Store {
-		multiplier = 2;
+		constructor(private multiplier: number) {}
 
 		@action("zoem zoem")
 		add = (a: number, b: number) => {
@@ -498,21 +518,21 @@ test("custom action decorator on field (typescript)", function(t) {
 		};
 	}
 
-	const store =  new Store();
+	const store1 = new Store(2);
+	const store2 = new Store(7);
+
 	const events: any[] = [];
 	const d = spy(events.push.bind(events));
-	t.equal(store.add(3, 4), 14);
-	t.equal(store.add(2, 2), 8);
+	t.equal(store1.add(3, 4), 14);
+	t.equal(store2.add(4, 5), 140);
+	t.equal(store1.add(2, 2), 8);
 
-	delete events[0].fn;
-	delete events[1].time;
-	delete events[2].fn;
-	delete events[3].time;
-
-	t.deepEqual(events,	[
-		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, target: store, type: "action" },
+	t.deepEqual(normalizeSpyEvents(events),	[
+		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, target: store1, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 2, 2 ], name: "zoem zoem", spyReportStart: true, target: store, type: "action" },
+		{ arguments: [ 4, 5 ], name: "zoem zoem", spyReportStart: true, target: store2, type: "action" },
+		{ spyReportEnd: true },
+		{ arguments: [ 2, 2 ], name: "zoem zoem", spyReportStart: true, target: store1, type: "action" },
 		{ spyReportEnd: true }
 	]);
 
