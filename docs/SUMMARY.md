@@ -44,6 +44,6 @@
     * [reaction](refguide/reaction.md)
     * [spy](refguide/spy.md)
     * [toJS](refguide/tojson.md)
-    * [transactoin](refguide/transaction.md)
+    * [transaction](refguide/transaction.md)
     * [untracked](refguide/untracked.md)
     * [when](refguide/when.md)
