@@ -11,7 +11,7 @@ _Simple, scalable state management_
 * Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`
 * [Ten minute, interactive MobX + React tutorial](https://mobxjs.github.io/mobx/getting-started.html)
 * [Official documentation and API overview](https://mobxjs.github.io/mobx/refguide/api.html)
-* Videos: [Screencast: intro to MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8) &mdash; State Management Is Easy, React Amsterdam 2016 conf (coming soon) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx)) &mdash; [Transparent Reactive Programming and Mutable Data, Reactive2015 conf](https://www.youtube.com/watch?v=FEwLwiizlk0) ([slides](https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures))
+* Videos: [Screencast: intro to MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8) &mdash; [State Management Is Easy, React Amsterdam 2016 conf](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx)) &mdash; [Transparent Reactive Programming and Mutable Data, Reactive2015 conf](https://www.youtube.com/watch?v=FEwLwiizlk0) ([slides](https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures))
 
 ## Introduction
 
