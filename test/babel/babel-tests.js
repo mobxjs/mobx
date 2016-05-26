@@ -216,6 +216,42 @@ test("custom action decorator (babel)", function(t) {
 	t.end();
 });
 
+
+test("action decorator on field (babel)", function(t) {
+	class Store {
+		constructor(multiplier) {
+			this.multiplier = multiplier;
+		}
+
+
+		@action
+		add = (a, b) => {
+			return (a + b) * this.multiplier;
+		};
+	}
+
+	const store1 =  new Store(2);
+	const store2 =  new Store(7);
+	
+	const events: any[] = [];
+	const d = spy(events.push.bind(events));
+	t.equal(store1.add(3, 4), 14);
+	t.equal(store2.add(5, 4), 63);
+	t.equal(store1.add(2, 2), 8);
+
+	t.deepEqual(normalizeSpyEvents(events),	[
+		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, target: store1, type: "action" },
+		{ spyReportEnd: true },
+		{ arguments: [ 5, 4 ], name: "add", spyReportStart: true, target: store2, type: "action" },
+		{ spyReportEnd: true },
+		{ arguments: [ 2, 2 ], name: "add", spyReportStart: true, target: store1, type: "action" },
+		{ spyReportEnd: true }
+	]);
+
+	d();
+	t.end();
+});
+
 test("custom action decorator on field (babel)", function(t) {
 	class Store {
 		constructor(multiplier) {
@@ -235,7 +271,7 @@ test("custom action decorator on field (babel)", function(t) {
 	const events: any[] = [];
 	const d = spy(events.push.bind(events));
 	t.equal(store1.add(3, 4), 14);
-	t.equal(store2.add(5, 4), 18);
+	t.equal(store2.add(5, 4), 63);
 	t.equal(store1.add(2, 2), 8);
 
 	t.deepEqual(normalizeSpyEvents(events),	[

@@ -495,11 +495,11 @@ test("custom action decorator (typescript)", function(t) {
 	t.equal(store1.add(1, 1), 4);
 
 	t.deepEqual(normalizeSpyEvents(events),	[
-		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, target: store2, type: "action" },
+		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, target: store1, type: "action" },
 		{ spyReportEnd: true },
 		{ arguments: [ 2, 2 ], name: "zoem zoem", spyReportStart: true, target: store2, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 1, 1 ], name: "zoem zoem", spyReportStart: true, target: store2, type: "action" },
+		{ arguments: [ 1, 1 ], name: "zoem zoem", spyReportStart: true, target: store1, type: "action" },
 		{ spyReportEnd: true }
 	]);
 
@@ -507,6 +507,37 @@ test("custom action decorator (typescript)", function(t) {
 	t.end();
 });
 
+test("action decorator on field (typescript)", function(t) {
+	class Store {
+		constructor(private multiplier: number) {}
+
+		@action
+		add = (a: number, b: number) => {
+			return (a + b) * this.multiplier;
+		};
+	}
+
+	const store1 = new Store(2);
+	const store2 = new Store(7);
+
+	const events: any[] = [];
+	const d = spy(events.push.bind(events));
+	t.equal(store1.add(3, 4), 14);
+	t.equal(store2.add(4, 5), 63);
+	t.equal(store1.add(2, 2), 8);
+
+	t.deepEqual(normalizeSpyEvents(events),	[
+		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, target: store1, type: "action" },
+		{ spyReportEnd: true },
+		{ arguments: [ 4, 5 ], name: "add", spyReportStart: true, target: store2, type: "action" },
+		{ spyReportEnd: true },
+		{ arguments: [ 2, 2 ], name: "add", spyReportStart: true, target: store1, type: "action" },
+		{ spyReportEnd: true }
+	]);
+
+	d();
+	t.end();
+});
 
 test("custom action decorator on field (typescript)", function(t) {
 	class Store {
@@ -524,7 +555,7 @@ test("custom action decorator on field (typescript)", function(t) {
 	const events: any[] = [];
 	const d = spy(events.push.bind(events));
 	t.equal(store1.add(3, 4), 14);
-	t.equal(store2.add(4, 5), 140);
+	t.equal(store2.add(4, 5), 63);
 	t.equal(store1.add(2, 2), 8);
 
 	t.deepEqual(normalizeSpyEvents(events),	[
