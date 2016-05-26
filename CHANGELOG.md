@@ -1,3 +1,8 @@
+# 2.2.1
+
+* Fixed issue where typescript threw a compile error when using `@action` without params on a field
+* Fixed issue where context was accidentally shared between class instances when using `@action` on a field
+
 # 2.2.0
 
 See the [release announcement](https://medium.com/@mweststrate/45cdc73c7c8d) for the full details of this release:
