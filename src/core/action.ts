@@ -53,13 +53,7 @@ function babelActionValueDecorator(name: string, target, prop, descriptor): Prop
 		configurable: true,
 		enumerable: false,
 		get: function() {
-			const implementation = action(name, descriptor.initializer.call(this));
-			Object.defineProperty(target, prop, {
-				enumerable: false,
-				writable: false,
-				value: implementation
-			});
-			return implementation;
+			return action(name, descriptor.initializer.call(this));
 		},
 		set: function() {
 			invariant(false, "@action decorated fields cannot be overwritten");
