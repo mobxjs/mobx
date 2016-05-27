@@ -237,6 +237,7 @@ _Feel free to create a PR to add your own!_
 * [react-particles-experiment](https://github.com/mobxjs/react-particles-experiment) MobX port of React-Particles-Experiment, showing MobX + Flux action dispatching
 * A simple webshop using [React + mobx](https://jsfiddle.net/mweststrate/46vL0phw) or [JQuery + mobx](http://jsfiddle.net/mweststrate/vxn7qgdw).
 * [Simple timer](https://jsfiddle.net/mweststrate/wgbe4guu/) application in JSFiddle.
+* [Google Play Music Desktop Remote](https://github.com/GPMDP/google-play-music-desktop-remote) A React-Native app for remote controlling Google Play Music Desktop: MobX + WebSocket.
 
 ## What others are saying...
 
