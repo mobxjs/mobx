@@ -11,7 +11,7 @@ Usage:
 * `observable(value)`
 * `@observable classProperty = value` 
 
-Observable values can be JS primitives, references, plain objects, class intances, arrays and maps.
+Observable values can be JS primitives, references, plain objects, class instances, arrays and maps.
 The following conversion rules are applied, but can be fine-tuned by using *modifiers*. See below.
 
 1. If *value* is wrapped in the *modifier* `asMap`: a new [Observable Map](map.md) will be returned. Observable maps are very useful if you don't want to react just to the change of a specific entry, but also to the addition or removal of entries.
