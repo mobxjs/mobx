@@ -1,4 +1,4 @@
-# Next:
+# 2.2.2:
 
 * Fixed issue #267: exception when `useStrict(true)` was invoked in combination with `@observable` attributes when using Babel
 * Fixed issue #269: @action in combination with typescript targeting ES6 and reflect.ts
