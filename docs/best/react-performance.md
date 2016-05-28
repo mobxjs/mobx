@@ -84,6 +84,11 @@ To have the best of both worlds, consider making smaller components:
 
 This tip applies to React in general and libraries using `PureRenderMixin` especially, try to avoid creating new closures in render methods.
 
+See also these resources:
+* [Autobinding with property initializers](https://facebook.github.io/react/blog/2015/01/27/react-v0.13.0-beta-1.html#autobinding)
+* [ESLint rule for no-bind](https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-no-bind.md)
+
+
 Bad:
 
 ```javascript
