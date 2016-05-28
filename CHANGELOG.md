@@ -1,5 +1,6 @@
 # Next:
 
+* Fixed issue #267: exception when `useStrict(true)` was invoked in combination with `@observable` attributes when using Babel
 * Fixed issue #269: @action in combination with typescript targeting ES6 and reflect.ts
 * Improved compatibility with `JSON.stringify`, removed incorrect deprecation message
 * Improved some error messages
