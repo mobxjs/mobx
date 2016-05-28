@@ -40,7 +40,7 @@ Usage:
 * `@computed get classProperty() { return expression; }`
 
 Creates a computed property. The `expression` should not have side effects but return a value.
-The expression will autoromatically be re-evaluted if any observables it uses changes, but only if it is in use by some *reaction*.
+The expression will automatically be re-evaluted if any observables it uses changes, but only if it is in use by some *reaction*.
 [&laquo;details&raquo;](computed-decorator.md)
 
 ## Actions
