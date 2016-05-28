@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="1.3" data-basepath=".." data-revision="Wed May 25 2016 23:42:15 GMT+0200 (CEST)">
+    <div class="book" data-level="1.3" data-basepath=".." data-revision="Sat May 28 2016 16:18:55 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -500,9 +500,17 @@
             
         </li>
     
-        <li class="chapter " data-level="9" >
+        <li class="chapter " data-level="9" data-path="refguide/api.html">
             
-            <span><b>9.</b> (Ignore below, just links to make gitbook work)</span>
+                
+                    <a href="../refguide/api.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>9.</b>
+                        
+                        Utilities
+                    </a>
             
             
             <ul class="articles">
@@ -523,14 +531,29 @@
             
         </li>
     
-        <li class="chapter " data-level="9.2" data-path="refguide/create-transformer.html">
+        <li class="chapter " data-level="9.2" data-path="refguide/extending.html">
+            
+                
+                    <a href="../refguide/extending.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>9.2.</b>
+                        
+                        Atom &amp; Reaction
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="9.3" data-path="refguide/create-transformer.html">
             
                 
                     <a href="../refguide/create-transformer.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>9.2.</b>
+                            <b>9.3.</b>
                         
                         createTransformer
                     </a>
@@ -538,14 +561,14 @@
             
         </li>
     
-        <li class="chapter " data-level="9.3" data-path="refguide/expr.html">
+        <li class="chapter " data-level="9.4" data-path="refguide/expr.html">
             
                 
                     <a href="../refguide/expr.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>9.3.</b>
+                            <b>9.4.</b>
                         
                         expr
                     </a>
@@ -553,31 +576,16 @@
             
         </li>
     
-        <li class="chapter " data-level="9.4" data-path="refguide/extend-observable.html">
+        <li class="chapter " data-level="9.5" data-path="refguide/extend-observable.html">
             
                 
                     <a href="../refguide/extend-observable.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>9.4.</b>
-                        
-                        extendObservable
-                    </a>
-            
-            
-        </li>
-    
-        <li class="chapter " data-level="9.5" data-path="refguide/extending.html">
-            
-                
-                    <a href="../refguide/extending.html">
-                
-                        <i class="fa fa-check"></i>
-                        
                             <b>9.5.</b>
                         
-                        Atom &amp; Reaction
+                        extendObservable
                     </a>
             
             
@@ -682,7 +690,7 @@
                         
                             <b>9.12.</b>
                         
-                        transactoin
+                        transaction
                     </a>
             
             
@@ -848,7 +856,7 @@ Derivations exist in many forms:</p>
 <li><em>Computed values</em>. These are values that can always be derived from the current observable state using a pure function.</li>
 <li><em>Reactions</em>. Reactions are side effects that need to happen automatically if the state changes. These are needed to as bridge between imperative and reactive programming. Or to make it more clear, they are ultimately needed to achieve I/O.</li>
 </ul>
-<p>People starting with MobX tend to use reactions to often.
+<p>People starting with MobX tend to use reactions too often.
 The golden rule is: if you want to create a value based on the current state, use <code>computed</code>. </p>
 <p>Back to the spreadsheet analogy, formulas are derivations that <em>compute</em> a value. But for you as a user to be able to see it on the screen a <em>reaction</em> is needed that repaints part of the GUI.</p>
 <h3 id="3-actions">3. Actions</h3>

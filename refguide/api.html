@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>API overview | MobX</title>
+        <title>Utilities | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.2.0">
@@ -29,10 +29,10 @@
         
     
     
-    <link rel="next" href="../refguide/observable.html" />
+    <link rel="next" href="../refguide/autorun-async.html" />
     
     
-    <link rel="prev" href="../intro/concepts.html" />
+    <link rel="prev" href="../faq/faq.html" />
     
 
         
@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="2" data-basepath=".." data-revision="Wed May 25 2016 23:42:15 GMT+0200 (CEST)">
+    <div class="book" data-level="9" data-basepath=".." data-revision="Sat May 28 2016 16:18:55 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -500,9 +500,17 @@
             
         </li>
     
-        <li class="chapter " data-level="9" >
+        <li class="chapter active" data-level="9" data-path="refguide/api.html">
             
-            <span><b>9.</b> (Ignore below, just links to make gitbook work)</span>
+                
+                    <a href="../refguide/api.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>9.</b>
+                        
+                        Utilities
+                    </a>
             
             
             <ul class="articles">
@@ -523,14 +531,29 @@
             
         </li>
     
-        <li class="chapter " data-level="9.2" data-path="refguide/create-transformer.html">
+        <li class="chapter " data-level="9.2" data-path="refguide/extending.html">
+            
+                
+                    <a href="../refguide/extending.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>9.2.</b>
+                        
+                        Atom &amp; Reaction
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="9.3" data-path="refguide/create-transformer.html">
             
                 
                     <a href="../refguide/create-transformer.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>9.2.</b>
+                            <b>9.3.</b>
                         
                         createTransformer
                     </a>
@@ -538,14 +561,14 @@
             
         </li>
     
-        <li class="chapter " data-level="9.3" data-path="refguide/expr.html">
+        <li class="chapter " data-level="9.4" data-path="refguide/expr.html">
             
                 
                     <a href="../refguide/expr.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>9.3.</b>
+                            <b>9.4.</b>
                         
                         expr
                     </a>
@@ -553,31 +576,16 @@
             
         </li>
     
-        <li class="chapter " data-level="9.4" data-path="refguide/extend-observable.html">
+        <li class="chapter " data-level="9.5" data-path="refguide/extend-observable.html">
             
                 
                     <a href="../refguide/extend-observable.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>9.4.</b>
-                        
-                        extendObservable
-                    </a>
-            
-            
-        </li>
-    
-        <li class="chapter " data-level="9.5" data-path="refguide/extending.html">
-            
-                
-                    <a href="../refguide/extending.html">
-                
-                        <i class="fa fa-check"></i>
-                        
                             <b>9.5.</b>
                         
-                        Atom &amp; Reaction
+                        extendObservable
                     </a>
             
             
@@ -682,7 +690,7 @@
                         
                             <b>9.12.</b>
                         
-                        transactoin
+                        transaction
                     </a>
             
             
@@ -838,7 +846,7 @@
 <li><code>observable(value)</code></li>
 <li><code>@observable classProperty = value</code> </li>
 </ul>
-<p>Observable values can be JS primitives, references, plain objects, class intances, arrays and maps.
+<p>Observable values can be JS primitives, references, plain objects, class instances, arrays and maps.
 The following conversion rules are applied, but can be fine-tuned by using <em>modifiers</em>. See below.</p>
 <ol>
 <li>If <em>value</em> is wrapped in the <em>modifier</em> <code>asMap</code>: a new <a href="map.html">Observable Map</a> will be returned. Observable maps are very useful if you don&apos;t want to react just to the change of a specific entry, but also to the addition or removal of entries.</li>
@@ -1048,10 +1056,10 @@ In general it is simpler and better to just split the function in multiple small
         </div>
 
         
-        <a href="../intro/concepts.html" class="navigation navigation-prev " aria-label="Previous page: Concepts &amp; Principles"><i class="fa fa-angle-left"></i></a>
+        <a href="../faq/faq.html" class="navigation navigation-prev " aria-label="Previous page: Frequently Asked Questions"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../refguide/observable.html" class="navigation navigation-next " aria-label="Next page: observable"><i class="fa fa-angle-right"></i></a>
+        <a href="../refguide/autorun-async.html" class="navigation navigation-next " aria-label="Next page: autorunAsync"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>
