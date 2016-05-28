@@ -245,6 +245,11 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		return this.toJS();
 	}
 
+	toJSON(): IKeyValueMap<V> {
+		// Used by JSON.stringify
+		return this.toJS();
+	}
+
 	private isValidKey(key: string) {
 		if (key === null || key === undefined)
 			return false;

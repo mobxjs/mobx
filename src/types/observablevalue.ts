@@ -99,6 +99,10 @@ export class ObservableValue<T> extends Atom implements IInterceptable<IValueWil
 		return registerListener(this, listener);
 	}
 
+	toJSON() {
+		return this.get();
+	}
+
 	toString() {
 		return `${this.name}[${this.value}]`;
 	}

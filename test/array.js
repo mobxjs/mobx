@@ -83,6 +83,8 @@ test('test1', function(t) {
     t.deepEqual(a.sort(), [1,2,3]);
     t.deepEqual(a.slice(), [3,1,2]);
 
+	t.equal(JSON.stringify(a), "[3,1,2]");
+
     t.end();
 })
 

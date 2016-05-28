@@ -261,7 +261,7 @@ export class ObservableArray<T> extends StubArray {
 	}
 
 	toJSON(): T[] {
-		deprecated("toJSON is deprecated, use toJS intead");
+		// Used by JSON.stringify
 		return this.toJS();
 	}
 

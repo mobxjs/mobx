@@ -30,6 +30,7 @@ test('map crud', function(t) {
 	t.deepEqual(m.values(), [2, 3]);
 	t.deepEqual(m.entries(), [["a", 2], ["b", 3]]);
 	t.deepEqual(m.toJs(), { a: 2, b: 3});
+	t.deepEqual(JSON.stringify(m), '{"a":2,"b":3}');
 	t.deepEqual(m.toString(), "ObservableMap@1[{ a: 2, b: 3 }]");
 	t.equal(m.size, 2);
 

@@ -129,6 +129,10 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 		});
 	}
 
+	toJSON() {
+		return this.get();
+	}
+
 	toString() {
 		return `${this.name}[${this.derivation.toString()}]`;
 	}
