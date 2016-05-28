@@ -19,7 +19,6 @@ import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 export function observableDecorator(target: Object, key: string, baseDescriptor: PropertyDescriptor) {
 	invariant(arguments.length >= 2 && arguments.length <= 3, "Illegal decorator config", key);
 	assertPropertyConfigurable(target, key);
-	checkIfStateModificationsAreAllowed();
 
 	// - In typescript, observable annotations are invoked on the prototype, not on actual instances,
 	// so upon invocation, determine the 'this' instance, and define a property on the

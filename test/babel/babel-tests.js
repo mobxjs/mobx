@@ -286,3 +286,14 @@ test("custom action decorator on field (babel)", function(t) {
 	d();
 	t.end();
 });
+
+test("267 (babel) should be possible to declare properties observable outside strict mode", t => {
+	mobx.useStrict(true);
+
+	class Store {
+		@observable timer;
+	}
+
+	mobx.useStrict(false);
+	t.end();
+})

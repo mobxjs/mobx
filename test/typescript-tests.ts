@@ -3,7 +3,7 @@
 import {
     observe, computed, observable, asStructure, autorun, autorunAsync, extendObservable, action,
     IObservableArray, IArrayChange, IArraySplice, IObservableValue, isObservable, isObservableObject,
-    extras, Atom, transaction, IObjectChange, spy
+    extras, Atom, transaction, IObjectChange, spy, useStrict
 } from "../lib/mobx";
 import * as test from 'tape';
 
@@ -568,5 +568,16 @@ test("custom action decorator on field (typescript)", function(t) {
 	]);
 
 	d();
+	t.end();
+});
+
+test("267 (babel) should be possible to declare properties observable outside strict mode", t => {
+	useStrict(true);
+
+	class Store {
+		@observable timer: number;
+	}
+
+	useStrict(false);
 	t.end();
 });
