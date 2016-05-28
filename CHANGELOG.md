@@ -1,5 +1,7 @@
 # Next:
 
+* Fixed issue #269: @action in combination with typescript targeting ES6 and reflect.ts
+* Improved compatibility with `JSON.stringify`, removed incorrect deprecation message
 * Improved some error messages
 
 # 2.2.1

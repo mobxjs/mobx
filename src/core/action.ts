@@ -21,7 +21,10 @@ export function action(arg1, arg2?, arg3?, arg4?): any {
 				return (target, key, descriptor) => actionDecorator(arg1, target, key, descriptor);
 		case 2:
 			// action("custom name", someFunction)
-			return actionImplementation(arg1, arg2);
+			if (typeof arg2 === "function")
+				return actionImplementation(arg1, arg2);
+			else
+				return actionDecorator(arg2, arg1, arg2, undefined); // See #269
 		case 3:
 			// @action someFunction () {}
 			// @action someFunction = () => {}
