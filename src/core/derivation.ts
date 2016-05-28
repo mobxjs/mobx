@@ -24,7 +24,7 @@ export function checkIfStateModificationsAreAllowed() {
 	if (!globalState.allowStateChanges) {
 		invariant(false, globalState.strictMode
 			? "It is not allowed to create or change state outside an `action` when MobX is in strict mode. Wrap the current method in `action` if this state change is intended"
-			: "It is not allowed to change the state when a computed value is being evaluated. Use 'autorun' to create reactive functions with side-effects."
+			: "It is not allowed to change the state when a computed value or transformer is being evaluated. Use 'autorun' to create reactive functions with side-effects."
 		);
 	}
 }

@@ -1,3 +1,7 @@
+# Next:
+
+* Improved some error messages
+
 # 2.2.1
 
 * Fixed issue where typescript threw a compile error when using `@action` without params on a field
