@@ -239,6 +239,7 @@ _Feel free to create a PR to add your own!_
 * A simple webshop using [React + mobx](https://jsfiddle.net/mweststrate/46vL0phw) or [JQuery + mobx](http://jsfiddle.net/mweststrate/vxn7qgdw).
 * [Simple timer](https://jsfiddle.net/mweststrate/wgbe4guu/) application in JSFiddle.
 * [Google Play Music Desktop Remote](https://github.com/GPMDP/google-play-music-desktop-remote) A React-Native app for remote controlling Google Play Music Desktop: MobX + WebSocket.
+* [React Portal](https://github.com/vinej/react-portal) A Dashboard example created with React/Mobx with a Flux pattern inspired by Redux.
 
 ## What others are saying...
 
