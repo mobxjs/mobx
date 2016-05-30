@@ -1,14 +1,14 @@
 # Modifiers for observable
 
 By default, `observable` recursively makes all the values of _plain_ objects and arrays recursively observable.
-Besides that it automatically converts functions without arguments into reactive views or derived properties.
+Besides that, it automatically converts functions without arguments into reactive views or derived properties.
 For all other types of values just a reference is stored.
 In general, this should just do what you need, but if you want you can override the default behavior using _modifiers_.
 Note that modifiers are 'sticky', they are interpreted as being annotations.
 They do not only apply to the current value, but also to all values that are assigned in the future to the same attribute.
 
 Note that the attributes class instances (all objects that have a prototype) will not be made observable automatically by `observable`.
-It is considered to be the responsibility of the class definition / constructor function to mark the necessary attributes of an class instance observable / computed.
+It is considered to be the responsibility of the class definition / constructor function to mark the necessary attributes of a class instance observable / computed.
 
 ## asMap
 

@@ -10,9 +10,9 @@ Usage:
 
 Any application has actions. Actions are anything that modify the state.
 With MobX you can make it explicit in your code where your actions live by marking them. 
-Actions helps you to structure your code better.
+Actions help you to structure your code better.
 It takes a function and returns it after wrapping it with `untracked`, `transaction` and `allowStateChanges`.
-It is adviced to use them on any function that modifies observables or has side effects.
+It is advised to use them on any function that modifies observables or has side effects.
 `action` also provides useful debugging information in combination with the devtools.
 Note: using `action` is mandatory when *strict mode* is enabled, see `useStrict`.
 
