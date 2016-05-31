@@ -40,7 +40,7 @@ Usage:
 * `@computed get classProperty() { return expression; }`
 
 Creates a computed property. The `expression` should not have side effects but return a value.
-The expression will automatically be re-evaluted if any observables it uses changes, but only if it is in use by some *reaction*.
+The expression will automatically be re-evaluated if any observables it uses changes, but only if it is in use by some *reaction*.
 [&laquo;details&raquo;](computed-decorator.md)
 
 ## Actions
@@ -49,7 +49,7 @@ Any application has actions. Actions are anything that modify the state.
 
 With MobX you can make it explicit in your code where your actions live by marking them. 
 Actions helps you to structure your code better.
-It is adviced to use them on any function that modifies observables or has side effects.
+It is advised to use them on any function that modifies observables or has side effects.
 `action` also provides useful debugging information in combination with the devtools.
 Note: using `action` is mandatory when *strict mode* is enabled, see `useStrict`.
 [&laquo;details&raquo;](action.md) 
@@ -99,17 +99,17 @@ Usage: `autorunAsync(() => { sideEffect }, delay)`. Similar to `autorun`, but th
 
 ### `reaction`
 Usage: `reaction(() => data, data => { sideEffect }, fireImmediately = false, delay = 0)`.
-A variation on `autorun` that gives more fine grained control on which observables that will be tracked.
+A variation on `autorun` that gives more fine-grained control on which observables that will be tracked.
 It takes two function, the first one is tracked and returns data that is used as input for the second one, the side effect.
 Unlike `autorun` the side effect won't be run initially, and any observables that are accessed while executing the side effect will not be tracked.
 The side effect can be debounced, just like `autorunAsync`. [&laquo;details&raquo;](reaction.md)
 
 ## Modifiers for `observable` 
 
-By default `oservable` is applied recursively and to values that are assigned in the future as well.
+By default `observable` is applied recursively and to values that are assigned in the future as well.
 Modifiers can be used to influence how `observable` treats specific values.
 * `asMap`: This is the most important modifier. Instead of creating an object with observable properties, an *Observable Map* is created instead. The main difference with observable objects is that the addition and removal of properties can be easily observed. Use `asMap` if you want a map like data structure where the keys will change over time. 
-* `asFlat`: Don't apply `observable` recursively. The passed object / collection itself will be observable, but the values in it won't. This disables the possibilty to deeply observe objects.
+* `asFlat`: Don't apply `observable` recursively. The passed object / collection itself will be observable, but the values in it won't. This disables the possibility to deeply observe objects.
 * `asReference`: Use the passed in value verbatim, just create an observable reference to the object.
 * `asStructure`: When new values are assigned, ignore the new value if it structurally equal to the previous value.
 

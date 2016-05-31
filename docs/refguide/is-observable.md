@@ -23,7 +23,7 @@ Returns true if the given object is created using `mobx.map`.
 
 # isObservableArray
 
-Returns true if the given obect is an array that was made observable using `mobx.observable(array)`.
+Returns true if the given object is an array that was made observable using `mobx.observable(array)`.
 
 # isObservableObject
 

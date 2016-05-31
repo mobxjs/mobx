@@ -14,7 +14,7 @@ Usage: `intercept(target, propertyName?, interceptor)`
 The `intercept` should tell MobX what needs to happen with the current change.
 Therefor it should do one of the following things:
 1. Return the received `change` object as-is from the function, in wich case the mutation will be applied.   
-2. Modify the `change` object and return it, for example to normalize the data. Not all fields are modifyable, see below.
+2. Modify the `change` object and return it, for example to normalize the data. Not all fields are modifiable, see below.
 3. Return `null`, this indicates that the change can be ignored and shouldn't be applied. This is a powerful concept to make your objects for example temporarily immutable.
 4. Throw an exception, for example if some invariant isn't met.
 

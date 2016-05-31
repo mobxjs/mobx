@@ -3,7 +3,7 @@
 All primitive values in JavaScript are immutable and hence per definition not observable.
 Usually that is fine, as MobX usually can just make the _property_ that contains the value observable.
 See also [observable objects](object.md).
-In rare cases it can be convenient to to have an observable "primitive" that is not owned by an object.
+In rare cases it can be convenient to have an observable "primitive" that is not owned by an object.
 For these cases it is possible to create an observable box that manages such a primitive. 
 
 So `observable` accepts scalar values as well and returns an object with a getter / setter function that holds this value.

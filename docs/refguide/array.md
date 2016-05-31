@@ -50,5 +50,5 @@ Besides all built-in functions, the following goodies are available as well on o
 * `remove(value)` Remove a single item by value from the array. Returns `true` if the item was found and removed.
 * `peek()` Returns an array with all the values which can safely be passed to other libraries, similar to `slice()`.
 In contrast to `slice`, `peek` doesn't create a defensive copy. Use this in performance critical applications if you know for sure that you use the array in a read-only manner.
-In performance critical sections it is recommend to use a flat observable array as well.
+In performance critical sections it is recommended to use a flat observable array as well.
 
