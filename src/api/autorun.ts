@@ -11,14 +11,36 @@ import {action} from "../core/action";
  * @param scope (optional)
  * @returns disposer function, which can be used to stop the view from being updated in the future.
  */
-export function autorun(view: Lambda, scope?: any) {
+export function autorun(view: Lambda, scope?: any);
+
+/**
+ * Creates a named reactive view and keeps it alive, so that the view is always
+ * updated if one of the dependencies changes, even when the view is not further used by something else.
+ * @param name The view name
+ * @param view The reactive view
+ * @param scope (optional)
+ * @returns disposer function, which can be used to stop the view from being updated in the future.
+ */
+export function autorun(name: string, view: Lambda, scope?: any);
+export function autorun(arg1: any, arg2: any, arg3?: any) {
+	let name: string, view: Lambda, scope: any;
+	if (typeof arg1 === "string") {
+		name = arg1;
+		view = arg2;
+		scope = arg3;
+	} else if (typeof arg1 === "function") {
+		name = arg1.name || ("Autorun@" + getNextId());
+		view = arg1;
+		scope = arg2;
+	}
+
 	assertUnwrapped(view, "autorun methods cannot have modifiers");
 	invariant(typeof view === "function", "autorun expects a function");
 	invariant(view.length === 0, "autorun expects a function without arguments");
 	if (scope)
 		view = view.bind(scope);
 
-	const reaction = new Reaction(view.name || ("Autorun@" + getNextId()), function () {
+	const reaction = new Reaction(name, function () {
 		this.track(view);
 	});
 	reaction.schedule();
@@ -76,7 +98,7 @@ export function autorunAsync(func: Lambda, delay: number = 1, scope?: any) {
 }
 
 /**
- * 
+ *
  * Basically sugar for computed(expr).observe(action(effect))
  * or
  * autorun(() => action(effect)(expr));
