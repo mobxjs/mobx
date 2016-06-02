@@ -2,7 +2,7 @@
 
 `observe` and `intercept` can be used to monitor the changes of a single observable. 
 `intercept` can be used to detect and modify mutations before they are applied to the observable.
-`observer` allows you to intercept changes after they have been made.
+`observe` allows you to intercept changes after they have been made.
 
 ## Intercept
 Usage: `intercept(target, propertyName?, interceptor)`
