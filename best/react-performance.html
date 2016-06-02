@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="4.3" data-basepath=".." data-revision="Sat May 28 2016 16:18:55 GMT+0200 (CEST)">
+    <div class="book" data-level="4.3" data-basepath=".." data-revision="Thu Jun 02 2016 07:47:13 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -897,6 +897,11 @@ To have the best of both worlds, consider making smaller components:</p>
 <p><code>const PersonNameDispayer = observer(({ props }) =&gt; &lt;DisplayName name={props.person.name} /&gt;)</code></p>
 <h2 id="bind-functions-early">Bind functions early</h2>
 <p>This tip applies to React in general and libraries using <code>PureRenderMixin</code> especially, try to avoid creating new closures in render methods.</p>
+<p>See also these resources:</p>
+<ul>
+<li><a href="https://facebook.github.io/react/blog/2015/01/27/react-v0.13.0-beta-1.html#autobinding" target="_blank">Autobinding with property initializers</a></li>
+<li><a href="https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-no-bind.md" target="_blank">ESLint rule for no-bind</a></li>
+</ul>
 <p>Bad:</p>
 <pre><code class="lang-javascript">render() {
     <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">MyWidget</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{()</span> =&gt;</span> { alert(&apos;hi&apos;) }} /&gt;

@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="9.7" data-basepath=".." data-revision="Sat May 28 2016 16:18:55 GMT+0200 (CEST)">
+    <div class="book" data-level="9.7" data-basepath=".." data-revision="Thu Jun 02 2016 07:47:13 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -838,13 +838,13 @@
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/modifiers.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="modifiers-for-observable">Modifiers for observable</h1>
 <p>By default, <code>observable</code> recursively makes all the values of <em>plain</em> objects and arrays recursively observable.
-Besides that it automatically converts functions without arguments into reactive views or derived properties.
+Besides that, it automatically converts functions without arguments into reactive views or derived properties.
 For all other types of values just a reference is stored.
 In general, this should just do what you need, but if you want you can override the default behavior using <em>modifiers</em>.
 Note that modifiers are &apos;sticky&apos;, they are interpreted as being annotations.
 They do not only apply to the current value, but also to all values that are assigned in the future to the same attribute.</p>
 <p>Note that the attributes class instances (all objects that have a prototype) will not be made observable automatically by <code>observable</code>.
-It is considered to be the responsibility of the class definition / constructor function to mark the necessary attributes of an class instance observable / computed.</p>
+It is considered to be the responsibility of the class definition / constructor function to mark the necessary attributes of a class instance observable / computed.</p>
 <h2 id="asmap">asMap</h2>
 <p>Creates a new Observable Map instead of an Obsevable Object. See <a href="map.html"><code>asMap</code></a></p>
 <h2 id="asreference">asReference</h2>

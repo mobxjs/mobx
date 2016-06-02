@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="1.2" data-basepath=".." data-revision="Sat May 28 2016 16:18:55 GMT+0200 (CEST)">
+    <div class="book" data-level="1.2" data-basepath=".." data-revision="Thu Jun 02 2016 07:47:13 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -860,12 +860,12 @@ But here is an (ES6) example of a view in the form of a React component.</p>
 @observer
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TimerView</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
     render() {
-        <span class="hljs-keyword">return</span> (<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{this.onReset}</span>&gt;</span>
+        <span class="hljs-keyword">return</span> (<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{this.onReset.bind(this)}</span>&gt;</span>
                 Seconds passed: {this.props.appState.timer}
             <span class="hljs-tag">&lt;/<span class="hljs-title">button</span>&gt;</span>)</span>;
     }
 
-    onReset = () =&gt; {
+    onReset () {
         <span class="hljs-keyword">this</span>.props.appState.resetTimer();
     }
 };
@@ -889,7 +889,7 @@ Here are two examples of changing the state:</p>
 
 setInterval(action(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">tick</span>(<span class="hljs-params"></span>) </span>{
     appState.timer += <span class="hljs-number">1</span>;
-}, <span class="hljs-number">1000</span>));
+}), <span class="hljs-number">1000</span>);
 </code></pre>
 <p>The <code>action</code> wrapper is only needed when using MobX in strict mode (by default off), but will help you to better structure applications and expresses the intention of a function to modify state.</p>
 <p>Feel free to try this example on <a href="http://jsfiddle.net/mweststrate/wgbe4guu/" target="_blank">JSFiddle</a> or by cloning the <a href="https://github.com/mobxjs/mobx-react-boilerplate" target="_blank">MobX boilerplate project</a></p>
