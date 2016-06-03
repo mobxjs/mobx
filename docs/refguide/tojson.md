@@ -12,7 +12,7 @@ var obj = mobx.observable({
     x: 1
 });
 
-var clone = mobx.toJSON(obj);
+var clone = mobx.toJS(obj);
 
 console.log(mobx.isObservableObject(obj)); // true
 console.log(mobx.isObservableObject(clone)); // false
