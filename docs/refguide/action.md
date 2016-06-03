@@ -40,3 +40,16 @@ Two example actions from the `contact-list` project:
 	}
 ```
 
+## Note on async actions
+
+`action` only affects the currently running function, not functions that are scheduled (but not invoked) by the current function!
+This means that if you have a `setTimeout`, promise`.then` or `async` construction, and in that callback some more state is changed, those callbacks should be wrapped in `action` as well!
+For debugging purposes, you can then give them a nice name as well :)
+
+So the second `action` is required in the next example if in _strict mode_, as the asynchronous function will modify state:
+```javascript
+@action /*optional*/ updateDocument = async action/*required!*/(() => {
+   this.isSaving = true;
+   ....
+})
+```
