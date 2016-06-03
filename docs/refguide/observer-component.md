@@ -27,6 +27,17 @@ React.render(<Timer timerData={timerData} />, document.body)
 Tip: when `observer` needs to be combined with other decorators or higher-order-components, make sure that `observer` is the innermost (first applied) decorator;
 otherwise it might do nothing at all.
 
+**Gotcha**: MobX can do a lot, but it cannot make primitive values observable (although it can wrap them in an object see [boxed observables](boxed.md)).
+So it are not the _values_ that are observable, but the _properties_ of an object. This means that `@observer` actually reacts to the fact that you dereference a value.
+So in our above example, the `Timer` component would **not** react if it was initialized as follows:
+
+```javascript
+React.render(<Timer timerData={timerData.secondsPassed} />, document.body)
+```
+In this snippet just the current value of `secondsPassed` is passed to the `Timer`, which is the immutable value `0` (all primitives are immutable in JS).
+That number won't change anymore in the future, so `Timer` will never update. It is the property `secondsPassed` that will change in the future,
+so we need to access it *in* the component. Or in other words: values need to be passed _by reference_ and not by value.
+
 ## ES5 support
 
 In ES5 environments, observer components can be simple declared using `observer(React.createClass({ ... `. See also the [syntax guide](../best/syntax.md)
