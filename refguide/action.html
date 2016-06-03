@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="2.6" data-basepath=".." data-revision="Thu Jun 02 2016 07:47:13 GMT+0200 (CEST)">
+    <div class="book" data-level="2.6" data-basepath=".." data-revision="Sat Jun 04 2016 00:44:08 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -370,31 +370,18 @@
             
         </li>
     
-        <li class="chapter " data-level="5" >
-            
-            <span><b>5.</b> How does MobX work?</span>
-            
-            
-            <ul class="articles">
-                
-    
-        <li class="chapter " data-level="5.1" >
+        <li class="chapter " data-level="5" data-path="faq/explanation.html">
             
                 
-                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254">
+                    <a href="../faq/explanation.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>5.1.</b>
+                            <b>5.</b>
                         
-                        In depth explanation of MobX
+                        How does MobX work?
                     </a>
             
-            
-        </li>
-    
-
-            </ul>
             
         </li>
     
@@ -872,6 +859,16 @@ Note: using <code>action</code> is mandatory when <em>strict mode</em> is enable
                 }
             }));
     }
+</code></pre>
+<h2 id="note-on-async-actions">Note on async actions</h2>
+<p><code>action</code> only affects the currently running function, not functions that are scheduled (but not invoked) by the current function!
+This means that if you have a <code>setTimeout</code>, promise<code>.then</code> or <code>async</code> construction, and in that callback some more state is changed, those callbacks should be wrapped in <code>action</code> as well!
+For debugging purposes, you can then give them a nice name as well :)</p>
+<p>So the second <code>action</code> is required in the next example if in <em>strict mode</em>, as the asynchronous function will modify state:</p>
+<pre><code class="lang-javascript">@action <span class="hljs-comment">/*optional*/</span> updateDocument = <span class="hljs-keyword">async</span> action<span class="hljs-comment">/*required!*/</span>(() =&gt; {
+   <span class="hljs-keyword">this</span>.isSaving = <span class="hljs-literal">true</span>;
+   ....
+})
 </code></pre>
 
                     

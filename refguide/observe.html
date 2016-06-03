@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="9.8" data-basepath=".." data-revision="Thu Jun 02 2016 07:47:13 GMT+0200 (CEST)">
+    <div class="book" data-level="9.8" data-basepath=".." data-revision="Sat Jun 04 2016 00:44:08 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -370,31 +370,18 @@
             
         </li>
     
-        <li class="chapter " data-level="5" >
-            
-            <span><b>5.</b> How does MobX work?</span>
-            
-            
-            <ul class="articles">
-                
-    
-        <li class="chapter " data-level="5.1" >
+        <li class="chapter " data-level="5" data-path="faq/explanation.html">
             
                 
-                    <a target="_blank" href="https:/medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254">
+                    <a href="../faq/explanation.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>5.1.</b>
+                            <b>5.</b>
                         
-                        In depth explanation of MobX
+                        How does MobX work?
                     </a>
             
-            
-        </li>
-    
-
-            </ul>
             
         </li>
     
@@ -837,9 +824,9 @@
                     <section class="normal" id="section-">
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/observe.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="intercept-observe">Intercept &amp; Observe</h1>
-<p><code>observe</code> and <code>intercept</code> can be used to monitor the changes of a single observable. 
+<p><code>observe</code> and <code>intercept</code> can be used to monitor the changes of a single observable (they <strong><em>don&apos;t</em></strong> track nested observables).
 <code>intercept</code> can be used to detect and modify mutations before they are applied to the observable.
-<code>observer</code> allows you to intercept changes after they have been made.</p>
+<code>observe</code> allows you to intercept changes after they have been made.</p>
 <h2 id="intercept">Intercept</h2>
 <p>Usage: <code>intercept(target, propertyName?, interceptor)</code></p>
 <ul>
