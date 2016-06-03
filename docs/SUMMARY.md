@@ -21,8 +21,7 @@
   * [Writing (async) actions](best/actions.md)
   * [Optimizing React components](best/react-performance.md)
 <!--  * Routing Universal applications -->
-* How does MobX work?
-  * [In depth explanation of MobX](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254)
+* [How does MobX work?](faq/explanation.md)
 * Tips & Tricks
   * [DevTools](best/devtools.md)
   * [ES5 / ES6 / TypeScript syntax](best/syntax.md)
