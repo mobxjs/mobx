@@ -22,6 +22,7 @@ export function autorun(view: Lambda, scope?: any);
  * @returns disposer function, which can be used to stop the view from being updated in the future.
  */
 export function autorun(name: string, view: Lambda, scope?: any);
+
 export function autorun(arg1: any, arg2: any, arg3?: any) {
 	let name: string, view: Lambda, scope: any;
 	if (typeof arg1 === "string") {
@@ -51,14 +52,40 @@ export function autorun(arg1: any, arg2: any, arg3?: any) {
 /**
  * Similar to 'observer', observes the given predicate until it returns true.
  * Once it returns true, the 'effect' function is invoked an the observation is cancelled.
+ * @param name
  * @param predicate
  * @param effect
  * @param scope (optional)
  * @returns disposer function to prematurely end the observer.
  */
-export function when(predicate: () => boolean, effect: Lambda, scope?: any) {
+export function when(name: string, predicate: () => boolean, effect: Lambda, scope?: any);
+
+/**
+ * Similar to 'observer', observes the given predicate until it returns true.
+ * Once it returns true, the 'effect' function is invoked an the observation is cancelled.
+ * @param predicate
+ * @param effect
+ * @param scope (optional)
+ * @returns disposer function to prematurely end the observer.
+ */
+export function when(predicate: () => boolean, effect: Lambda, scope?: any);
+
+export function when(arg1: any, arg2: any, arg3?: any, arg4?: any) {
+	let name: string, predicate: () => boolean, effect: Lambda, scope: any;
+	if (typeof arg1 === "string") {
+		name = arg1;
+		predicate = arg2;
+		effect = arg3;
+		scope = arg4;
+	} else {
+		name = ("Autorun@" + getNextId());
+		predicate = arg1;
+		effect = arg2;
+		scope = arg3;
+	}
+
 	let disposeImmediately = false;
-	const disposer = autorun(() => {
+	const disposer = autorun(name, () => {
 		if (predicate.call(scope)) {
 			if (disposer)
 				disposer();
