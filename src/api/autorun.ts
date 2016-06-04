@@ -77,7 +77,7 @@ export function when(arg1: any, arg2: any, arg3?: any, arg4?: any) {
 		predicate = arg2;
 		effect = arg3;
 		scope = arg4;
-	} else {
+	} else if (typeof arg1 === "function") {
 		name = ("Autorun@" + getNextId());
 		predicate = arg1;
 		effect = arg2;
@@ -104,12 +104,32 @@ export function autorunUntil(predicate: () => boolean, effect: Lambda, scope?: a
 	return when.apply(null, arguments);
 }
 
-export function autorunAsync(func: Lambda, delay: number = 1, scope?: any) {
+export function autorunAsync(name: string, func: Lambda, delay?: number, scope?: any);
+
+export function autorunAsync(func: Lambda, delay?: number, scope?: any);
+
+export function autorunAsync(arg1: any, arg2: any, arg3?: any, arg4?: any) {
+	let name: string, func: Lambda, delay: number, scope: any;
+	if (typeof arg1 === "string") {
+		name = arg1;
+		func = arg2;
+		delay = arg3;
+		scope = arg4;
+	} else if (typeof arg1 === "function") {
+		name = arg1.name || ("AutorunAsync@" + getNextId());
+		func = arg1;
+		delay = arg2;
+		scope = arg3;
+	}
+
+	if (delay === void 0)
+		delay = 1;
+
 	if (scope)
 		func = func.bind(scope);
 	let isScheduled = false;
 
-	const r = new Reaction(func.name || ("AutorunAsync@" + getNextId()), () => {
+	const r = new Reaction(name, () => {
 		if (!isScheduled) {
 			isScheduled = true;
 			setTimeout(() => {
