@@ -127,6 +127,7 @@ export function autorunAsync(arg1: any, arg2: any, arg3?: any, arg4?: any) {
 
 	if (scope)
 		func = func.bind(scope);
+
 	let isScheduled = false;
 
 	const r = new Reaction(name, () => {
@@ -150,8 +151,40 @@ export function autorunAsync(arg1: any, arg2: any, arg3?: any, arg4?: any) {
  * or
  * autorun(() => action(effect)(expr));
  */
-export function reaction<T>(expression: () => T, effect: (arg: T) => void, fireImmediately = false, delay = 0, scope?: any) {
-	const name = (expression as any).name || (effect as any).name || ("Reaction@" + getNextId());
+export function reaction<T>(name: string, expression: () => T, effect: (arg: T) => void, fireImmediately?: boolean, delay?: number, scope?: any);
+
+/**
+ *
+ * Basically sugar for computed(expr).observe(action(effect))
+ * or
+ * autorun(() => action(effect)(expr));
+ */
+export function reaction<T>(expression: () => T, effect: (arg: T) => void, fireImmediately?: boolean, delay?: number, scope?: any);
+
+export function reaction<T>(arg1: any, arg2: any, arg3: any, arg4?: any, arg5?: any, arg6?: any) {
+	let name: string, expression: () => T, effect: (arg: T) => void, fireImmediately: boolean, delay: number, scope: any;
+	if (typeof arg1 === "string") {
+		name = arg1;
+		expression = arg2;
+		effect = arg3;
+		fireImmediately = arg4;
+		delay = arg5;
+		scope = arg6;
+	} else if (typeof arg1 === "function") {
+		name = arg1.name || arg2.name || ("Reaction@" + getNextId());
+		expression = arg1;
+		effect = arg2;
+		fireImmediately = arg3;
+		delay = arg4;
+		scope = arg5;
+	}
+
+	if (fireImmediately === void 0)
+		fireImmediately = false;
+
+	if (delay === void 0)
+		delay = 0;
+
 	if (scope) {
 		expression = expression.bind(scope);
 		effect = action(name, effect.bind(scope));
