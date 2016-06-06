@@ -4,34 +4,37 @@ import {untracked} from "../core/derivation";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {ComputedValue} from "../core/computedvalue";
 import {globalState} from "../core/globalstate";
+import {decoratorFactory} from "../utils/decorators";
+
+const actionDecoratorImpl = decoratorFactory(
+	true,
+	true,
+	(target, propName, method, args) => {
+		const name = (args && args.length === 1 && args[0]) || method.name || propName;
+		const implementation = action(name, method);
+
+		return {
+			enumerable: false,
+			configurable: false,
+			writable: false,
+			value: implementation
+		} as PropertyDescriptor;
+	}
+);
+
+
 
 export function action<T extends Function>(fn: T): T;
 export function action<T extends Function>(name: string, fn: T): T;
 export function action(customName: string): (target: Object, key: string, baseDescriptor?: PropertyDescriptor) => void;
 export function action(target: Object, propertyKey: string, descriptor?: PropertyDescriptor): void;
 export function action(arg1, arg2?, arg3?, arg4?): any {
-	switch (arguments.length) {
-		case 1:
-			// action(someFunction)
-			if (typeof arg1 === "function")
-				return actionImplementation(arg1.name || "<unnamed action>", arg1);
-			// @action("custom name") someFunction () {}
-			// @action("custom name") someFunction = () => {}
-			else
-				return (target, key, descriptor) => actionDecorator(arg1, target, key, descriptor);
-		case 2:
-			// action("custom name", someFunction)
-			if (typeof arg2 === "function")
-				return actionImplementation(arg1, arg2);
-			else
-				return actionDecorator(arg2, arg1, arg2, undefined); // See #269
-		case 3:
-			// @action someFunction () {}
-			// @action someFunction = () => {}
-			return actionDecorator(arg2, arg1, arg2, arg3);
-		default:
-			invariant(false, "Invalid arguments for (@)action, please provide a function, name and function or use it as decorator on a class instance method");
-	}
+	if (arguments.length === 1 && typeof arg1 === "function")
+		return actionImplementation(arg1.name || "<unnamed action>", arg1);
+	if (arguments.length === 2  && typeof arg2 === "function")
+		return actionImplementation(arg1, arg2);
+
+	return actionDecoratorImpl.apply(null, arguments);
 }
 
 function actionDecorator(name: string, target: any, key: string, descriptor: PropertyDescriptor) {
@@ -41,7 +44,7 @@ function actionDecorator(name: string, target: any, key: string, descriptor: Pro
 		return;
 	}
 	if (descriptor.value === undefined && typeof (descriptor as any).initializer === "function") {
-		// typescript: @action f = () => { } 
+		// babel: @action f = () => { } 
 		return babelActionValueDecorator(name, target, key, descriptor);
 	}
 	const base = descriptor.value;

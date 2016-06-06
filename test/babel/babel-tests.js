@@ -151,6 +151,7 @@ function normalizeSpyEvents(events) {
 }
 
 test("action decorator (babel)", function(t) {
+	debugger;
 	class Store {
 		constructor(multiplier) {
 			this.multiplier = multiplier;
@@ -297,3 +298,22 @@ test("267 (babel) should be possible to declare properties observable outside st
 	mobx.useStrict(false);
 	t.end();
 })
+
+test("288 atom not detected for object property", t => {
+	debugger;
+	class Store {
+		@mobx.observable foo = '';
+	}
+
+	const store = new Store();
+
+	mobx.observe(store, 'foo', () => {
+		console.log('Change observed');
+	}, true);
+
+	t.end()
+})
+
+// TODO: test unbound methods
+
+// TODO: test sharing of methods, test non sharing of bound methods

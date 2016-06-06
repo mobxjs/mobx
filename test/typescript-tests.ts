@@ -571,7 +571,7 @@ test("custom action decorator on field (typescript)", function(t) {
 	t.end();
 });
 
-test("267 (babel) should be possible to declare properties observable outside strict mode", t => {
+test("267 (typescript) should be possible to declare properties observable outside strict mode", t => {
 	useStrict(true);
 
 	class Store {
