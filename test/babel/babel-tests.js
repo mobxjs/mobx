@@ -297,3 +297,38 @@ test("267 (babel) should be possible to declare properties observable outside st
 	mobx.useStrict(false);
 	t.end();
 })
+
+test("observable performance", t => {
+	const AMOUNT = 100000;
+
+	class A {
+		@observable a = 1;
+		@observable b = 2;
+		@observable c = 3;
+		@computed get d() {
+			return this.a + this.b + this.c;
+		}
+	}
+
+	const objs = [];
+	const start = Date.now();
+
+	for (var i = 0; i < AMOUNT; i++)
+		objs.push(new A());
+	
+	console.log("created in ", Date.now() - start);
+
+	for (var j = 0; j < 4; j++) {
+		for (var i = 0; i < AMOUNT; i++) {
+			const obj = objs[i]
+			obj.a += 3;
+			obj.b *= 4;
+			obj.c = obj.b - obj.a;
+			obj.d;
+		}
+	} 
+
+	console.log("changed in ", Date.now() - start);
+
+	t.end();
+})
