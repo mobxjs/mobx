@@ -6,10 +6,20 @@ import {ComputedValue} from "../core/computedvalue";
 import {globalState} from "../core/globalstate";
 import {createClassPropertyDecorator} from "../utils/decorators";
 
-const actionDecoratorImpl = createClassPropertyDecorator(
-	function (target, key, value, args) {
+const actionFieldDecorator = createClassPropertyDecorator(
+	function (target, key, value, args, originalDescriptor) {
 		const actionName = (args && args.length === 1) ? args[0] : (value.name || key || "<unnamed action>");
-		addBoundAction(target, key, action(actionName, value));
+		const wrappedAction = action(actionName, value);
+		if (originalDescriptor.value && target.constructor && target.constructor.prototype) {
+			// shared method, replace this very property on the prototype with the right value
+			Object.defineProperty(target.constructor.prototype, key, {
+				configurable: true, enumerable: false, writable: false,
+				value: wrappedAction
+			});
+		} else {
+			// bound instance methods
+			addBoundAction(target, key, wrappedAction);
+		}
 	},
 	function (key) {
 		return this[key];
@@ -21,7 +31,6 @@ const actionDecoratorImpl = createClassPropertyDecorator(
 	true
 );
 
-
 export function action<T extends Function>(fn: T): T;
 export function action<T extends Function>(name: string, fn: T): T;
 export function action(customName: string): (target: Object, key: string, baseDescriptor?: PropertyDescriptor) => void;
@@ -32,7 +41,7 @@ export function action(arg1, arg2?, arg3?, arg4?): any {
 	if (arguments.length === 2  && typeof arg2 === "function")
 		return actionImplementation(arg1, arg2);
 
-	return actionDecoratorImpl.apply(null, arguments);
+	return actionFieldDecorator.apply(null, arguments);
 }
 
 function actionDecorator(name: string, target: any, key: string, descriptor: PropertyDescriptor) {

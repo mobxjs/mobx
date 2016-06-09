@@ -87,7 +87,6 @@ class Order {
 }
 
 test('decorators', function(t) {
-	debugger;
 	var o = new Order();
 	t.equal(isObservableObject(o), true);
 	t.equal(isObservable(o, 'amount'), true);
@@ -153,7 +152,6 @@ function normalizeSpyEvents(events) {
 }
 
 test("action decorator (babel)", function(t) {
-	debugger;
 	class Store {
 		constructor(multiplier) {
 			this.multiplier = multiplier;
@@ -316,7 +314,8 @@ test("288 atom not detected for object property", t => {
 })
 
 test("observable performance", t => {
-	const AMOUNT = 100000;
+	//const AMOUNT = 100000;
+	const AMOUNT = 1;
 
 	class A {
 		@observable a = 1;
@@ -350,12 +349,118 @@ test("observable performance", t => {
 	t.end();
 })
 
-// TODO: test unbound methods
+test("unbound methods", t => {
+	class A {
+		// shared across all instances
+		@action m1() {
 
-// TODO: test sharing of methods, test non sharing of bound methods
+		}
 
-// TODO: test inheritance
+		// per instance
+		@action m2 = () => {};
+	}
 
-// TODO: test inherited observables
+	const a1 = new A();
+	const a2 = new A();
 
-// TODO: test initializers that use each other
+	t.equal(a1.m1, a2.m1);
+	t.notEqual(a1.m2, a2.m2);
+	t.equal(a1.hasOwnProperty("m1"), false);
+	t.equal(a1.hasOwnProperty("m2"), true);
+	t.equal(a2.hasOwnProperty("m1"), false);
+	t.equal(a2.hasOwnProperty("m2"), true);
+	t.end();
+
+})
+
+test("inheritance", t => {
+	class A {
+		@observable a = 2;
+	}
+
+	class B extends A {
+		@observable b = 3;
+		@computed get c() {
+			return this.a + this.b;
+		}
+	}
+
+	const b1 = new B();
+	const b2 = new B();
+	const values = []
+	mobx.autorun(() => values.push(b1.c + b2.c));
+
+	b1.a = 3;
+	b1.b = 4;
+	b2.b = 5;
+	b2.a = 6;
+
+	t.deepEqual(values, [
+		10,
+		11,
+		12,
+		14,
+		18
+	])
+
+	t.end();
+})
+
+test("inheritance overrides observable", t => {
+	class A {
+		@observable a = 2;
+	}
+
+	class B {
+		@observable a = 5;
+		@observable b = 3;
+		@computed get c() {
+			return this.a + this.b;
+		}
+	}
+
+	const b1 = new B();
+	const b2 = new B();
+	const values = []
+	mobx.autorun(() => values.push(b1.c + b2.c));
+
+	b1.a = 3;
+	b1.b = 4;
+	b2.b = 5;
+	b2.a = 6;
+
+	t.deepEqual(values, [
+		16,
+		14,
+		15,
+		17,
+		18
+	])
+
+	t.end();
+})
+
+test("reusing initializers", t => {
+	class A {
+		@observable a = 3;
+		@observable b = this.a + 2;
+		@computed get c() { 
+			return this.a + this.b;
+		}
+		@computed get d() {
+			return this.c + 1;
+		}
+	}
+
+	const a = new A();
+	const values = [];
+	mobx.autorun(() => values.push(a.d));
+
+	a.a = 4;
+	t.deepEqual(values, [
+		9,
+		10
+	])
+
+	t.end();
+})

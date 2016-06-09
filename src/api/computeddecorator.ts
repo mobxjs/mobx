@@ -31,7 +31,8 @@ function computedExpr<T>(expr: () => T, scope?: any) {
 }
 
 const computedDecoratorImpl = createClassPropertyDecorator(
-	(target, name, baseValue, decoratorArgs) => {
+	(target, name, _, decoratorArgs, originalDescriptor) => {
+		const baseValue = originalDescriptor.get;
 		invariant(typeof baseValue === "function", "@computed can only be used on getter functions, like: '@computed get myProps() { return ...; }'");
 
 		let compareStructural = false;

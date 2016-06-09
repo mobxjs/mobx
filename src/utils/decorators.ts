@@ -19,7 +19,7 @@ export function createClassPropertyDecorator(
 	 * Babel, sometimes Typescript: during the first get / set
 	 * Both: when calling `runLazyInitializers(instance)`
 	 */
-	onInitialize: (target, property, initialValue, customArgs?: IArguments) => void,
+	onInitialize: (target, property, initialValue, customArgs?: IArguments, originalDescriptor?) => void,
 	get: (name) => any,
 	set: (name, newValue) => void,
 	enumerable: boolean,
@@ -42,12 +42,12 @@ export function createClassPropertyDecorator(
 				configurable: true,
 				get: function() {
 					if (!this.__mobxInitializedProps || this.__mobxInitializedProps[key] !== true)
-						typescriptInitializeProperty(this, key, undefined, onInitialize, customArgs);
+						typescriptInitializeProperty(this, key, undefined, onInitialize, customArgs, descriptor);
 					return get.call(this, key);
 				},
 				set: function(v) {
 					if (!this.__mobxInitializedProps || this.__mobxInitializedProps[key] !== true) {
-						typescriptInitializeProperty(this, key, v, onInitialize, customArgs);
+						typescriptInitializeProperty(this, key, v, onInitialize, customArgs, descriptor);
 					} else {
 						set.call(this, key, v);
 					}
@@ -58,7 +58,7 @@ export function createClassPropertyDecorator(
 			if (!target.hasOwnProperty("__mobxLazyInitializers")) {
 				Object.defineProperty(target, "__mobxLazyInitializers", {
 					writable: false, configurable: false, enumerable: false,
-					value: (target.__mobxDidRunLazyInitializers && target.__mobxLazyInitializers.slice()) || [] // support inheritance
+					value: (target.__mobxLazyInitializers && target.__mobxLazyInitializers.slice()) || [] // support inheritance
 				});
 			}
 
@@ -69,7 +69,8 @@ export function createClassPropertyDecorator(
 					instance,
 					key,
 					useGetterAsInitialValue ? getter : (initializer ? initializer.call(instance) : value),
-					customArgs
+					customArgs,
+					descriptor
 				);
 			});
 
@@ -103,7 +104,7 @@ export function createClassPropertyDecorator(
 	return classPropertyDecorator;
 }
 
-function typescriptInitializeProperty(instance, key, v, onInitialize, customArgs) {
+function typescriptInitializeProperty(instance, key, v, onInitialize, customArgs, baseDescriptor) {
 	if (!instance.hasOwnProperty("__mobxInitializedProps")) {
 		Object.defineProperty(instance, "__mobxInitializedProps", {
 			enumerable: false, configurable: false, writable: true,
@@ -111,7 +112,7 @@ function typescriptInitializeProperty(instance, key, v, onInitialize, customArgs
 		});
 	}
 	instance.__mobxInitializedProps[key] = true;
-	onInitialize(instance, key, v, customArgs);
+	onInitialize(instance, key, v, customArgs, baseDescriptor);
 }
 
 function isPropInitialized(instance, prop) {
