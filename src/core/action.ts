@@ -4,24 +4,22 @@ import {untracked} from "../core/derivation";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {ComputedValue} from "../core/computedvalue";
 import {globalState} from "../core/globalstate";
-import {decoratorFactory} from "../utils/decorators";
+import {decoratorFactory2} from "../utils/decorators";
 
-const actionDecoratorImpl = decoratorFactory(
-	true,
-	true,
-	(target, propName, method, args) => {
-		const name = (args && args.length === 1 && args[0]) || method.name || propName;
-		const implementation = action(name, method);
-
-		return {
-			enumerable: false,
-			configurable: false,
-			writable: false,
-			value: implementation
-		} as PropertyDescriptor;
-	}
+const actionDecoratorImpl = decoratorFactory2(
+	function (target, key, value, args) {
+		const actionName = (args && args.length === 1) ? args[0] : (value.name || "<unnamed action>"); 
+		addBoundAction(target, key, action(actionName, value));
+	},
+	false,
+	function (key) {
+		return this[key]
+	},
+	function (key, value) {
+		this.key = value;
+	},
+	true
 );
-
 
 
 export function action<T extends Function>(fn: T): T;

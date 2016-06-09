@@ -301,15 +301,15 @@ test("267 (babel) should be possible to declare properties observable outside st
 })
 
 test("288 atom not detected for object property", t => {
-	// class Store {
-	// 	@mobx.observable foo = '';
-	// }
+	class Store {
+		@mobx.observable foo = '';
+	}
 
-	// const store = new Store();
+	const store = new Store();
 
-	// mobx.observe(store, 'foo', () => {
-	// 	console.log('Change observed');
-	// }, true);
+	mobx.observe(store, 'foo', () => {
+		console.log('Change observed');
+	}, true);
 
 	t.end()
 })
