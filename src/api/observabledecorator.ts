@@ -4,9 +4,49 @@ import {computed} from "../api/computeddecorator";
 import {asObservableObject, setObservableObjectProperty} from "../types/observableobject";
 import {invariant, assertPropertyConfigurable, deprecated} from "../utils/utils";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
+import {decoratorFactory2, decoratorFactory3} from "../utils/decorators";
+import {ObservableValue} from "../types/observablevalue";
+
+const decoratorImpl = decoratorFactory2(
+	(target, name, baseValue) => {
+		allowStateChanges(true, () => {
+			if (typeof baseValue === "function")
+				baseValue = asReference(baseValue);
+			//setObservableObjectProperty(
+			const adm = asObservableObject(target, undefined, ValueMode.Recursive);
+			adm.values[name] =  new ObservableValue(baseValue, adm.mode, name, false)
+		});
+	},
+	true,
+	function (name) {
+		return this.$mobx.values[name].get(); 
+	},
+	function (name, value) {
+		this.$mobx.values[name].set(value);
+	},
+	false
+)
+
+const decoratorImpl3 = decoratorFactory3(
+	(target, name, baseValue) => {
+		allowStateChanges(true, () => {
+			if (typeof baseValue === "function")
+				baseValue = asReference(baseValue);
+			//setObservableObjectProperty(
+			const adm = asObservableObject(target, undefined, ValueMode.Recursive);
+			adm.values[name] =  new ObservableValue(baseValue, adm.mode, name, false)
+		});
+	},
+	function (name) {
+		return this.$mobx.values[name].get(); 
+	},
+	function (name, value) {
+		this.$mobx.values[name].set(value);
+	}
+)
 
 /**
- * ES6 / Typescript decorator which can to make class properties and getter functions reactive.
+ * ESNext / Typescript decorator which can to make class properties and getter functions reactive.
  * Use this annotation to wrap properties of an object in an observable, for example:
  * class OrderLine {
  *   @observable amount = 3;
@@ -19,12 +59,13 @@ import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 export function observableDecorator(target: Object, key: string, baseDescriptor: PropertyDescriptor) {
 	invariant(arguments.length >= 2 && arguments.length <= 3, "Illegal decorator config", key);
 	assertPropertyConfigurable(target, key);
+	decoratorImpl3.apply(null, arguments);
 
 	// - In typescript, observable annotations are invoked on the prototype, not on actual instances,
 	// so upon invocation, determine the 'this' instance, and define a property on the
 	// instance as well (that hides the propotype property)
 	// - In babel, the initial value is passed as the closure baseDiscriptor.initializer'
-
+/*
 	if (baseDescriptor && baseDescriptor.hasOwnProperty("get")) {
 		deprecated("Using @observable on computed values is deprecated. Use @computed instead.");
 		return computed.apply(null, arguments);
@@ -55,4 +96,6 @@ export function observableDecorator(target: Object, key: string, baseDescriptor:
 	} else {
 		return descriptor;
 	}
+*/
 }
+
