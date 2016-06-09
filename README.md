@@ -74,6 +74,7 @@ If you are using React, you can turn your (stateless function) components into r
 
 ```javascript
 import React, {Component} from 'react';
+import ReactDOM from 'react-dom';
 import {observer} from "mobx-react";
 
 @observer
@@ -101,7 +102,7 @@ const TodoView = observer(({todo}) =>
 );
 
 const store = new TodoList();
-React.render(<TodoListView todoList={store} />, document.getElementById('mount'));
+ReactDOM.render(<TodoListView todoList={store} />, document.getElementById('mount'));
 ```
 
 `observer` turns React (function) components into derivations of the data they render.
