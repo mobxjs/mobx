@@ -357,3 +357,5 @@ test("observable performance", t => {
 // TODO: test inheritance
 
 // TODO: test inherited observables
+
+// TODO: test initializers that use each other

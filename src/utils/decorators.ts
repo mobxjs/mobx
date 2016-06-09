@@ -15,12 +15,6 @@ export function decoratorFactory2(
 		invariant(allowCustomArguments || quacksLikeADecorator(arguments), "This function is a decorator, but it wasn't invoked like a decorator");
 
 		// TODO: prebind get / set / onInitialize for faster results?
-		if (!target.hasOwnProperty("__mobxLazyInitializers")) {
-			Object.defineProperty(target, "__mobxLazyInitializers", {
-				writable: false, configurable: false, enumerable: false,
-				value: (target.__mobxDidRunLazyInitializers && target.__mobxLazyInitializers.slice()) || [] // support inheritance
-			});
-		}
 
 		if (!descriptor) {
 			// typescript
@@ -28,26 +22,29 @@ export function decoratorFactory2(
 				enumerable,
 				configurable: true,
 				get: function() {
-					if (this.__mobxDidRunLazyInitializers !== true)
-						runLazyInitializers(this);
+					if (!this.__mobxInitializedProps || this.__mobxInitializedProps[key] !== true)
+						typescriptInitializeProperty(this, key, undefined, onInitialize, customArgs);
 					return get.call(this, key);
 				},
 				set: function(v) {
-				// 	if (this.__mobxDidRunLazyInitializers !== true) 
-				// 		if (this.__initialValuesLength < lazyInitializersLength) {
-				// 			push
-				// 		else
-				// 			run initailzers
-				// 	}
-					
-					set.call(this, key, v);
+					if (!this.__mobxInitializedProps || this.__mobxInitializedProps[key] !== true) {
+						typescriptInitializeProperty(this, key, v, onInitialize, customArgs);
+					} else {
+						set.call(this, key, v);
+					}
 				}
-			}
+			};
 		} else {
-			// babel
+			// babel and typescript getter / setter props
+			if (!target.hasOwnProperty("__mobxLazyInitializers")) {
+				Object.defineProperty(target, "__mobxLazyInitializers", {
+					writable: false, configurable: false, enumerable: false,
+					value: (target.__mobxDidRunLazyInitializers && target.__mobxLazyInitializers.slice()) || [] // support inheritance
+				});
+			}
+
 			const {value, initializer} = descriptor;
 			const getter = descriptor.get;
-			const baseDescriptor = objectAssign({}, descriptor);
 			target.__mobxLazyInitializers.push(instance => {
 				onInitialize(
 					instance,
@@ -57,21 +54,19 @@ export function decoratorFactory2(
 				);
 			});
 
-			delete descriptor.value;
-			delete descriptor.initializer;
-			delete descriptor.writable;
-			descriptor.enumerable = enumerable;
-			descriptor.configurable = true;
-			descriptor.get = function() {
-				if (this.__mobxDidRunLazyInitializers !== true)
-					runLazyInitializers(this);
-				return get.call(this, key);
-			};
-			descriptor.set =  function(v) {
-				if (this.__mobxDidRunLazyInitializers !== true)
-					runLazyInitializers(this);
-				set.call(this, key, v);
-			};
+			return {
+				enumerable, configurable: true,
+				get : function() {
+					if (this.__mobxDidRunLazyInitializers !== true)
+						runLazyInitializers(this);
+					return get.call(this, key);
+				},
+				set : function(v) {
+					if (this.__mobxDidRunLazyInitializers !== true)
+						runLazyInitializers(this);
+					set.call(this, key, v);
+				}
+			}
 		}
 	}
 
@@ -87,6 +82,17 @@ export function decoratorFactory2(
 		};
 	}
 	return theDecorator;
+}
+
+function typescriptInitializeProperty(instance, key, v, onInitialize, customArgs) {
+	if (!instance.hasOwnProperty("__mobxInitializedProps")) {
+		Object.defineProperty(instance, "__mobxInitializedProps", {
+			enumerable: false, configurable: false, writable: true,
+			value: {}
+		});
+	}
+	instance.__mobxInitializedProps[key] = true;
+	onInitialize(instance, key, v, customArgs);
 }
 
 function isPropInitialized(instance, prop) {
@@ -109,7 +115,7 @@ export function runLazyInitializers(instance) {
 			writable: false,
 			value: true
 		});
-		instance.__mobxLazyInitializers.forEach(initializer => initializer(instance));
+		instance.__mobxDidRunLazyInitializers && instance.__mobxLazyInitializers.forEach(initializer => initializer(instance));
 	}
 }
 

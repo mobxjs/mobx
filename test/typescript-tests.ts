@@ -32,7 +32,6 @@ class Order {
 
 test('decorators', function(t) {
 	var o = new Order();
-	t.equal(o.total, 6); // hmm this is required to initialize the props which are made reactive lazily..
 	t.equal(isObservableObject(o), true);
 	t.equal(isObservable(o, 'amount'), true);
 	t.equal(isObservable(o, 'total'), true);

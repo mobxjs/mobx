@@ -40,7 +40,7 @@ const decoratorImpl = decoratorFactory2(
 export function observableDecorator(target: Object, key: string, baseDescriptor: PropertyDescriptor) {
 	invariant(arguments.length >= 2 && arguments.length <= 3, "Illegal decorator config", key);
 	assertPropertyConfigurable(target, key);
-	decoratorImpl.apply(null, arguments);
+	return decoratorImpl.apply(null, arguments);
 
 	// - In typescript, observable annotations are invoked on the prototype, not on actual instances,
 	// so upon invocation, determine the 'this' instance, and define a property on the
