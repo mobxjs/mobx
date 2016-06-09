@@ -10,7 +10,7 @@ const actionFieldDecorator = createClassPropertyDecorator(
 	function (target, key, value, args, originalDescriptor) {
 		const actionName = (args && args.length === 1) ? args[0] : (value.name || key || "<unnamed action>");
 		const wrappedAction = action(actionName, value);
-		if (originalDescriptor.value && target.constructor && target.constructor.prototype) {
+		if (originalDescriptor && originalDescriptor.value && target.constructor && target.constructor.prototype) {
 			// shared method, replace this very property on the prototype with the right value
 			Object.defineProperty(target.constructor.prototype, key, {
 				configurable: true, enumerable: false, writable: false,

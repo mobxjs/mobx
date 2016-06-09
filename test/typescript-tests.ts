@@ -6,6 +6,7 @@ import {
     extras, Atom, transaction, IObjectChange, spy, useStrict
 } from "../lib/mobx";
 import * as test from 'tape';
+import * as mobx from "../lib/mobx";
 
 var v = observable(3);
 observe(v, () => {});
@@ -569,3 +570,168 @@ test("267 (typescript) should be possible to declare properties observable outsi
 	useStrict(false);
 	t.end();
 });
+
+test("288 atom not detected for object property", t => {
+	class Store {
+		@observable foo = '';
+	}
+
+	const store = new Store();
+
+	mobx.observe(store, 'foo', () => {
+		console.log('Change observed');
+	}, true);
+
+	t.end()
+})
+
+test("observable performance", t => {
+	const AMOUNT = 100000;
+
+	class A {
+		@observable a = 1;
+		@observable b = 2;
+		@observable c = 3;
+		@computed get d() {
+			return this.a + this.b + this.c;
+		}
+	}
+
+	const objs: any[] = [];
+	const start = Date.now();
+
+	for (var i = 0; i < AMOUNT; i++)
+		objs.push(new A());
+	
+	console.log("created in ", Date.now() - start);
+
+	for (var j = 0; j < 4; j++) {
+		for (var i = 0; i < AMOUNT; i++) {
+			const obj = objs[i]
+			obj.a += 3;
+			obj.b *= 4;
+			obj.c = obj.b - obj.a;
+			obj.d;
+		}
+	} 
+
+	console.log("changed in ", Date.now() - start);
+
+	t.end();
+})
+
+test("unbound methods", t => {
+	class A {
+		// shared across all instances
+		@action m1() {
+
+		}
+
+		// per instance
+		@action m2 = () => {};
+	}
+
+	const a1 = new A();
+	const a2 = new A();
+
+	t.equal(a1.m1, a2.m1);
+	t.notEqual(a1.m2, a2.m2);
+	t.equal(a1.hasOwnProperty("m1"), false);
+	t.equal(a1.hasOwnProperty("m2"), true);
+	t.equal(a2.hasOwnProperty("m1"), false);
+	t.equal(a2.hasOwnProperty("m2"), true);
+	t.end();
+
+})
+
+test("inheritance", t => {
+	class A {
+		@observable a = 2;
+	}
+
+	class B extends A {
+		@observable b = 3;
+		@computed get c() {
+			return this.a + this.b;
+		}
+	}
+
+	const b1 = new B();
+	const b2 = new B();
+	const values: any[] = []
+	mobx.autorun(() => values.push(b1.c + b2.c));
+
+	b1.a = 3;
+	b1.b = 4;
+	b2.b = 5;
+	b2.a = 6;
+
+	t.deepEqual(values, [
+		10,
+		11,
+		12,
+		14,
+		18
+	])
+
+	t.end();
+})
+
+test("inheritance overrides observable", t => {
+	class A {
+		@observable a = 2;
+	}
+
+	class B {
+		@observable a = 5;
+		@observable b = 3;
+		@computed get c() {
+			return this.a + this.b;
+		}
+	}
+
+	const b1 = new B();
+	const b2 = new B();
+	const values: any[] = []
+	mobx.autorun(() => values.push(b1.c + b2.c));
+
+	b1.a = 3;
+	b1.b = 4;
+	b2.b = 5;
+	b2.a = 6;
+
+	t.deepEqual(values, [
+		16,
+		14,
+		15,
+		17,
+		18
+	])
+
+	t.end();
+})
+
+test("reusing initializers", t => {
+	class A {
+		@observable a = 3;
+		@observable b = this.a + 2;
+		@computed get c() { 
+			return this.a + this.b;
+		}
+		@computed get d() {
+			return this.c + 1;
+		}
+	}
+
+	const a = new A();
+	const values: any[] = [];
+	mobx.autorun(() => values.push(a.d));
+
+	a.a = 4;
+	t.deepEqual(values, [
+		9,
+		10
+	])
+
+	t.end();
+})

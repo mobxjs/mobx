@@ -314,8 +314,7 @@ test("288 atom not detected for object property", t => {
 })
 
 test("observable performance", t => {
-	//const AMOUNT = 100000;
-	const AMOUNT = 1;
+	const AMOUNT = 100000;
 
 	class A {
 		@observable a = 1;
