@@ -1,7 +1,7 @@
 import {ValueMode, asReference} from "../types/modifiers";
 import {allowStateChanges} from "../core/action";
 import {computed} from "../api/computeddecorator";
-import {asObservableObject, setObservableObjectProperty} from "../types/observableobject";
+import {asObservableObject, defineObservableProperty, setPropertyValue} from "../types/observableobject";
 import {invariant, assertPropertyConfigurable, deprecated} from "../utils/utils";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {decoratorFactory2} from "../utils/decorators";
@@ -12,20 +12,19 @@ const decoratorImpl = decoratorFactory2(
 		allowStateChanges(true, () => {
 			if (typeof baseValue === "function")
 				baseValue = asReference(baseValue);
-			//setObservableObjectProperty(
 			const adm = asObservableObject(target, undefined, ValueMode.Recursive);
-			adm.values[name] =  new ObservableValue(baseValue, adm.mode, name, false)
+			defineObservableProperty(adm, name, baseValue, false);
 		});
 	},
 	true,
 	function (name) {
-		return this.$mobx.values[name].get(); 
+		return this.$mobx.values[name].get();
 	},
 	function (name, value) {
-		this.$mobx.values[name].set(value);
+		setPropertyValue(this, name, value);
 	},
 	false
-)
+);
 
 /**
  * ESNext / Typescript decorator which can to make class properties and getter functions reactive.

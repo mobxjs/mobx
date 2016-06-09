@@ -1,4 +1,4 @@
-import {invariant} from "./utils";
+import {invariant, objectAssign} from "./utils";
 
 /** Given a decorator, construcs a decorator, that normalizes the differences between 
  * TypeScript and Babel. Sigh
@@ -8,9 +8,12 @@ export function decoratorFactory2(
 	enumerable: boolean,
 	get: (name) => any,
 	set: (name, newValue) => void,
-	allowCustomArguments: boolean
+	allowCustomArguments: boolean,
+	useGetterAsInitialValue: boolean = false
 ): any {
 	function theDecorator(target: any, key: string, descriptor, customArgs?: IArguments) {
+		invariant(allowCustomArguments || quacksLikeADecorator(arguments), "This function is a decorator, but it wasn't invoked like a decorator");
+
 		// TODO: prebind get / set / onInitialize for faster results?
 		if (!target.hasOwnProperty("__mobxLazyInitializers")) {
 			Object.defineProperty(target, "__mobxLazyInitializers", {
@@ -43,11 +46,13 @@ export function decoratorFactory2(
 		} else {
 			// babel
 			const {value, initializer} = descriptor;
+			const getter = descriptor.get;
+			const baseDescriptor = objectAssign({}, descriptor);
 			target.__mobxLazyInitializers.push(instance => {
 				onInitialize(
 					instance,
 					key,
-					initializer ? initializer.call(instance) : value,
+					useGetterAsInitialValue ? getter : (initializer ? initializer.call(instance) : value),
 					customArgs
 				);
 			});

@@ -2,6 +2,7 @@ import {ObservableValue, UNCHANGED} from "./observablevalue";
 import {ComputedValue} from "../core/computedvalue";
 import {ValueMode, AsStructure} from "./modifiers";
 import {Lambda, getNextId, invariant, assertPropertyConfigurable, isPlainObject} from "../utils/utils";
+import {runLazyInitializers} from "../utils/decorators";
 import {throwingComputedValueSetter} from "../api/computeddecorator";
 import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
@@ -69,15 +70,16 @@ export function asObservableObject(target, name: string, mode: ValueMode = Value
 	return adm;
 }
 
-export function setObservableObjectProperty(adm: ObservableObjectAdministration, propName: string, value) {
+export function setObservableObjectInstanceProperty(adm: ObservableObjectAdministration, propName: string, value) {
 	if (adm.values[propName])
 		adm.target[propName] = value; // the property setter will make 'value' reactive if needed.
 	else
-		defineObservableProperty(adm, propName, value);
+		defineObservableProperty(adm, propName, value, true);
 }
 
-function defineObservableProperty(adm: ObservableObjectAdministration, propName: string, newValue) {
-	assertPropertyConfigurable(adm.target, propName);
+export function defineObservableProperty(adm: ObservableObjectAdministration, propName: string, newValue, asInstanceProperty: boolean) {
+	if (asInstanceProperty)
+		assertPropertyConfigurable(adm.target, propName);
 
 	let observable: ComputedValue<any>|ObservableValue<any>;
 	let name = `${adm.name}.${propName}`;
@@ -105,57 +107,60 @@ function defineObservableProperty(adm: ObservableObjectAdministration, propName:
 	}
 
 	adm.values[propName] = observable;
-	Object.defineProperty(adm.target, propName, {
-		configurable: true,
-		enumerable: !isComputed,
-		get: function() {
-			return observable.get();
-		},
-		set: isComputed
-			? throwingComputedValueSetter
-			: createSetter(adm, observable as ObservableValue<any>, propName)
-	});
-
+	if (asInstanceProperty) {
+		Object.defineProperty(adm.target, propName, {
+			configurable: true,
+			enumerable: !isComputed,
+			get: function() {
+				return observable.get();
+			},
+			set: isComputed
+				? throwingComputedValueSetter
+				: function(v) {
+					setPropertyValue(this, propName, v);
+				}
+		});
+	}
 	if (!isComputed)
 		notifyPropertyAddition(adm, adm.target, propName, newValue);
 }
 
-function createSetter(adm: ObservableObjectAdministration, observable: ObservableValue<any>, name: string) {
-	return function (newValue) {
+export function setPropertyValue(instance, name: string, newValue) {
+	const adm = instance.$mobx;
+	const observable = instance.$mobx.values[name];
 
-		// intercept
-		if (hasInterceptors(adm)) {
-			const change = interceptChange<IObjectWillChange>(adm, {
+	// intercept
+	if (hasInterceptors(adm)) {
+		const change = interceptChange<IObjectWillChange>(adm, {
+			type: "update",
+			object: instance,
+			name, newValue
+		});
+		if (!change)
+			return;
+		newValue = change.newValue;
+	}
+	newValue = observable.prepareNewValue(newValue);
+
+	// notify spy & observers
+	if (newValue !== UNCHANGED) {
+		const notify = hasListeners(adm);
+		const notifySpy = isSpyEnabled();
+		const change = notifyListeners || hasListeners ? {
 				type: "update",
-				object: this,
+				object: instance,
+				oldValue: (observable as any).value,
 				name, newValue
-			});
-			if (!change)
-				return;
-			newValue = change.newValue;
-		}
-		newValue = observable.prepareNewValue(newValue);
+			} : null;
 
-		// notify spy & observers
-		if (newValue !== UNCHANGED) {
-			const notify = hasListeners(adm);
-			const notifySpy = isSpyEnabled();
-			const change = notifyListeners || hasListeners ? {
-					type: "update",
-					object: this,
-					oldValue: (observable as any).value,
-					name, newValue
-				} : null;
-
-			if (notifySpy)
-				spyReportStart(change);
-			observable.setNewValue(newValue);
-			if (notify)
-				notifyListeners(adm, change);
-			if (notifySpy)
-				spyReportEnd();
-		}
-	};
+		if (notifySpy)
+			spyReportStart(change);
+		observable.setNewValue(newValue);
+		if (notify)
+			notifyListeners(adm, change);
+		if (notifySpy)
+			spyReportEnd();
+	}
 }
 
 function notifyPropertyAddition(adm, object, name: string, newValue) {
@@ -175,5 +180,10 @@ function notifyPropertyAddition(adm, object, name: string, newValue) {
 }
 
 export function isObservableObject(thing): boolean {
-	return thing && thing.$mobx instanceof ObservableObjectAdministration;
+	if (typeof thing === "object" && thing !== null) {
+		// Initializers run lazily when transpiling to babel, so make sure they are run...
+		runLazyInitializers(thing);
+		return thing.$mobx instanceof ObservableObjectAdministration;
+	}
+	return false;
 }

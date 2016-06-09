@@ -1,8 +1,10 @@
 import {ValueMode, getValueModeFromValue, asStructure} from "../types/modifiers";
 import {IObservableValue} from "./observable";
-import {asObservableObject, setObservableObjectProperty} from "../types/observableobject";
+import {asObservableObject, setObservableObjectInstanceProperty, defineObservableProperty} from "../types/observableobject";
 import {invariant, assertPropertyConfigurable} from "../utils/utils";
+import {decoratorFactory2} from "../utils/decorators";
 import {ComputedValue} from "../core/computedvalue";
+import {getDebugName} from "../types/type-utils";
 
 export interface IComputedValueOptions {
 	asStructure: boolean;
@@ -17,14 +19,38 @@ export function computed(opts: IComputedValueOptions): (target: Object, key: str
 export function computed(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void;
 export function computed(targetOrExpr: any, keyOrScope?: any, baseDescriptor?: PropertyDescriptor, options?: IComputedValueOptions) {
 	if (arguments.length < 3 && typeof targetOrExpr === "function")
-		return computedExpr(targetOrExpr, keyOrScope)
-	return computedDecorator.apply(null, arguments);
+		return computedExpr(targetOrExpr, keyOrScope);
+	return computedDecoratorImpl.apply(null, arguments);
+//	return computedDecorator.apply(null, arguments);
 }
 
 function computedExpr<T>(expr: () => T, scope?: any) {
 	const [mode, value] = getValueModeFromValue(expr, ValueMode.Recursive);
 	return new ComputedValue(value, scope, mode === ValueMode.Structure, value.name);
 }
+
+const computedDecoratorImpl = decoratorFactory2(
+	(target, name, baseValue, decoratorArgs) => {
+		invariant(typeof baseValue === "function", "@computed can only be used on getter functions, like: '@computed get myProps() { return ...; }'");
+
+		let compareStructural = false;
+		if (decoratorArgs && decoratorArgs.length === 1 && decoratorArgs[0].asStructure === true)
+			compareStructural = true;
+
+		const adm = asObservableObject(target, undefined, ValueMode.Recursive);
+		defineObservableProperty(adm, name, compareStructural ? asStructure(baseValue) : baseValue, false);
+	},
+	false,
+	function (name) {
+		return this.$mobx.values[name].get();
+	},
+	function (name) {
+		invariant(false, `It is not allowed to assign new values to @computed properties: ${getDebugName(this)}.${name}`);
+	},
+	true,
+	true
+);
+
 
 function computedDecorator(target: any, key?: any, baseDescriptor?: PropertyDescriptor, options?: IComputedValueOptions): any {
 	// invoked as decorator factory with options
@@ -46,7 +72,7 @@ function computedDecorator(target: any, key?: any, baseDescriptor?: PropertyDesc
 	descriptor.configurable = true;
 	descriptor.enumerable = false;
 	descriptor.get = function() {
-		setObservableObjectProperty(
+		setObservableObjectInstanceProperty(
 			asObservableObject(this, undefined, ValueMode.Recursive),
 			key,
 			options && options.asStructure === true ? asStructure(getter) : getter

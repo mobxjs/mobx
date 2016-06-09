@@ -8,15 +8,15 @@ import {decoratorFactory2} from "../utils/decorators";
 
 const actionDecoratorImpl = decoratorFactory2(
 	function (target, key, value, args) {
-		const actionName = (args && args.length === 1) ? args[0] : (value.name || "<unnamed action>"); 
+		const actionName = (args && args.length === 1) ? args[0] : (value.name || key || "<unnamed action>");
 		addBoundAction(target, key, action(actionName, value));
 	},
 	false,
 	function (key) {
-		return this[key]
+		return this[key];
 	},
-	function (key, value) {
-		this.key = value;
+	function () {
+		invariant(false, "It is not allowed to assign new values to @action fields");
 	},
 	true
 );
