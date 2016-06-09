@@ -2,7 +2,7 @@ import {ValueMode, getValueModeFromValue, asStructure} from "../types/modifiers"
 import {IObservableValue} from "./observable";
 import {asObservableObject, setObservableObjectInstanceProperty, defineObservableProperty} from "../types/observableobject";
 import {invariant, assertPropertyConfigurable} from "../utils/utils";
-import {decoratorFactory2} from "../utils/decorators";
+import {createClassPropertyDecorator} from "../utils/decorators";
 import {ComputedValue} from "../core/computedvalue";
 import {getDebugName} from "../types/type-utils";
 
@@ -20,6 +20,7 @@ export function computed(target: Object, key: string | symbol, baseDescriptor?: 
 export function computed(targetOrExpr: any, keyOrScope?: any, baseDescriptor?: PropertyDescriptor, options?: IComputedValueOptions) {
 	if (arguments.length < 3 && typeof targetOrExpr === "function")
 		return computedExpr(targetOrExpr, keyOrScope);
+	invariant(!baseDescriptor || !baseDescriptor.set, `@observable properties cannot have a setter: ${keyOrScope}`);
 	return computedDecoratorImpl.apply(null, arguments);
 //	return computedDecorator.apply(null, arguments);
 }
@@ -29,7 +30,7 @@ function computedExpr<T>(expr: () => T, scope?: any) {
 	return new ComputedValue(value, scope, mode === ValueMode.Structure, value.name);
 }
 
-const computedDecoratorImpl = decoratorFactory2(
+const computedDecoratorImpl = createClassPropertyDecorator(
 	(target, name, baseValue, decoratorArgs) => {
 		invariant(typeof baseValue === "function", "@computed can only be used on getter functions, like: '@computed get myProps() { return ...; }'");
 
@@ -40,13 +41,13 @@ const computedDecoratorImpl = decoratorFactory2(
 		const adm = asObservableObject(target, undefined, ValueMode.Recursive);
 		defineObservableProperty(adm, name, compareStructural ? asStructure(baseValue) : baseValue, false);
 	},
-	false,
 	function (name) {
 		return this.$mobx.values[name].get();
 	},
 	function (name) {
 		invariant(false, `It is not allowed to assign new values to @computed properties: ${getDebugName(this)}.${name}`);
 	},
+	false,
 	true,
 	true
 );

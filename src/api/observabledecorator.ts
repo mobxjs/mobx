@@ -4,10 +4,10 @@ import {computed} from "../api/computeddecorator";
 import {asObservableObject, defineObservableProperty, setPropertyValue} from "../types/observableobject";
 import {invariant, assertPropertyConfigurable, deprecated} from "../utils/utils";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
-import {decoratorFactory2} from "../utils/decorators";
+import {createClassPropertyDecorator} from "../utils/decorators";
 import {ObservableValue} from "../types/observablevalue";
 
-const decoratorImpl = decoratorFactory2(
+const decoratorImpl = createClassPropertyDecorator(
 	(target, name, baseValue) => {
 		allowStateChanges(true, () => {
 			if (typeof baseValue === "function")
@@ -16,13 +16,13 @@ const decoratorImpl = decoratorFactory2(
 			defineObservableProperty(adm, name, baseValue, false);
 		});
 	},
-	true,
 	function (name) {
 		return this.$mobx.values[name].get();
 	},
 	function (name, value) {
 		setPropertyValue(this, name, value);
 	},
+	true,
 	false
 );
 
@@ -40,6 +40,7 @@ const decoratorImpl = decoratorFactory2(
 export function observableDecorator(target: Object, key: string, baseDescriptor: PropertyDescriptor) {
 	invariant(arguments.length >= 2 && arguments.length <= 3, "Illegal decorator config", key);
 	assertPropertyConfigurable(target, key);
+	invariant(!baseDescriptor || !baseDescriptor.get, "@observable can not be used on getters, use @computed instead");
 	return decoratorImpl.apply(null, arguments);
 
 	// - In typescript, observable annotations are invoked on the prototype, not on actual instances,

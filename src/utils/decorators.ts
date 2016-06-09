@@ -1,23 +1,42 @@
-import {invariant, objectAssign} from "./utils";
+import {invariant} from "./utils";
 
-/** Given a decorator, construcs a decorator, that normalizes the differences between 
- * TypeScript and Babel. Sigh
+/** 
+ * Construcs a decorator, that normalizes the differences between 
+ * TypeScript and Babel. Mainly caused by the fact that legacy-decorator cannot assign 
+ * values during instance creation to properties that have a getter setter. 
+ * 
+ * - Sigh -
+ * 
+ * Also takes care of the difference between @decorator field and @decorator(args) field, and different forms of values.
+ * For performance (cpu and mem) reasons the properties are always defined on the prototype (at least initially). 
+ * This means that these properties despite being enumerable might not show up in Object.keys() (but they will show up in for...in loops).
  */
-export function decoratorFactory2(
+export function createClassPropertyDecorator(
+	/**
+	 * This function is invoked once, when the property is added to a new instance.
+	 * When this happens is not strictly determined due to differences in TS and Babel:
+	 * Typescript: Usually when constructing the new instance
+	 * Babel, sometimes Typescript: during the first get / set
+	 * Both: when calling `runLazyInitializers(instance)`
+	 */
 	onInitialize: (target, property, initialValue, customArgs?: IArguments) => void,
-	enumerable: boolean,
 	get: (name) => any,
 	set: (name, newValue) => void,
+	enumerable: boolean,
+	/**
+	 * Can this decorator invoked with arguments? e.g. @decorator(args)
+	 */
 	allowCustomArguments: boolean,
+	/**
+	 * Usually the initial value will be based on either the .value or .initializer or initial assignment to the property.
+	 * If this flag is set, the initial value will be the original defined get value. This is used by @computed.
+	 */
 	useGetterAsInitialValue: boolean = false
 ): any {
-	function theDecorator(target: any, key: string, descriptor, customArgs?: IArguments) {
+	function classPropertyDecorator(target: any, key: string, descriptor, customArgs?: IArguments) {
 		invariant(allowCustomArguments || quacksLikeADecorator(arguments), "This function is a decorator, but it wasn't invoked like a decorator");
-
-		// TODO: prebind get / set / onInitialize for faster results?
-
 		if (!descriptor) {
-			// typescript
+			// typescript (except for getter / setters)
 			return {
 				enumerable,
 				configurable: true,
@@ -66,7 +85,7 @@ export function decoratorFactory2(
 						runLazyInitializers(this);
 					set.call(this, key, v);
 				}
-			}
+			};
 		}
 	}
 
@@ -75,13 +94,13 @@ export function decoratorFactory2(
 		return function() {
 			/** Direct invocation: @decorator bla */
 			if (quacksLikeADecorator(arguments))
-				return theDecorator.apply(null, arguments);
+				return classPropertyDecorator.apply(null, arguments);
 			/** Indirect invocation: @decorator(args) bla */
 			const outerArgs = arguments;
-			return (target, key, descriptor) => theDecorator(target, key, descriptor, outerArgs);
+			return (target, key, descriptor) => classPropertyDecorator(target, key, descriptor, outerArgs);
 		};
 	}
-	return theDecorator;
+	return classPropertyDecorator;
 }
 
 function typescriptInitializeProperty(instance, key, v, onInitialize, customArgs) {

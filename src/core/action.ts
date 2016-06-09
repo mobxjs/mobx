@@ -4,20 +4,20 @@ import {untracked} from "../core/derivation";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {ComputedValue} from "../core/computedvalue";
 import {globalState} from "../core/globalstate";
-import {decoratorFactory2} from "../utils/decorators";
+import {createClassPropertyDecorator} from "../utils/decorators";
 
-const actionDecoratorImpl = decoratorFactory2(
+const actionDecoratorImpl = createClassPropertyDecorator(
 	function (target, key, value, args) {
 		const actionName = (args && args.length === 1) ? args[0] : (value.name || key || "<unnamed action>");
 		addBoundAction(target, key, action(actionName, value));
 	},
-	false,
 	function (key) {
 		return this[key];
 	},
 	function () {
 		invariant(false, "It is not allowed to assign new values to @action fields");
 	},
+	false,
 	true
 );
 

@@ -180,34 +180,23 @@ const state:any = observable({
     authToken: null
 });
 
-class LoginStoreTest {
-    loggedIn2: boolean;
-    constructor() {
-        extendObservable(this, {
-            loggedIn2: () => !!state.authToken
-        });
-    }
-
-    @observable get loggedIn() {
-        return !!state.authToken;
-    }
-}
 
 test('issue8', function(t){
-    var fired = 0;
+	t.throws(() => {
+		class LoginStoreTest {
+			loggedIn2: boolean;
+			constructor() {
+				extendObservable(this, {
+					loggedIn2: () => !!state.authToken
+				});
+			}
 
-    const store = new LoginStoreTest();
-
-    autorun(() => {
-        fired++;
-        store.loggedIn;
-    });
-
-    t.equal(fired, 1);
-    state.authToken = 'a';
-    state.authToken = 'b';
-
-    t.equal(fired, 2);
+			@observable get loggedIn() {
+				return !!state.authToken;
+			}
+		}
+		const store = new LoginStoreTest();
+	}, /@computed/);
     t.end();
 })
 
