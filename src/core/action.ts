@@ -18,7 +18,10 @@ const actionFieldDecorator = createClassPropertyDecorator(
 			});
 		} else {
 			// bound instance methods
-			addBoundAction(target, key, wrappedAction);
+			Object.defineProperty(target, key, {
+				configurable: true, enumerable: false,	writable: false,
+				value: wrappedAction
+			});
 		}
 	},
 	function (key) {
@@ -42,62 +45,6 @@ export function action(arg1, arg2?, arg3?, arg4?): any {
 		return actionImplementation(arg1, arg2);
 
 	return actionFieldDecorator.apply(null, arguments);
-}
-
-function actionDecorator(name: string, target: any, key: string, descriptor: PropertyDescriptor) {
-	if (descriptor === undefined) {
-		// typescript: @action f = () => { } 
-		typescriptActionValueDecorator(name, target, key);
-		return;
-	}
-	if (descriptor.value === undefined && typeof (descriptor as any).initializer === "function") {
-		// babel: @action f = () => { } 
-		return babelActionValueDecorator(name, target, key, descriptor);
-	}
-	const base = descriptor.value;
-	descriptor.value = actionImplementation(name, base);
-}
-
-/**
- * Decorators the following pattern @action method = () => {} by desugaring it to method = action(() => {}) 
- */
-function babelActionValueDecorator(name: string, target, prop, descriptor): PropertyDescriptor {
-	return {
-		configurable: true,
-		enumerable: false,
-		get: function() {
-			const  v = descriptor.initializer.call(this);
-			invariant(typeof v === "function", `Babel @action decorator expects the field '${prop} to be initialized with a function`);
-			const implementation = action(name, v);
-			addBoundAction(this, prop, implementation);
-			return implementation;
-		},
-		set: function() {
-			invariant(false, `Babel @action decorator: field '${prop}' not initialized`);
-		}
-	};
-}
-
-function typescriptActionValueDecorator(name: string, target, prop) {
-	Object.defineProperty(target, prop, {
-		configurable: true,
-		enumerable: false,
-		get: function() {
-			invariant(false, `TypeScript @action decorator: field '${prop}' not initialized`);
-		},
-		set: function(v) {
-			invariant(typeof v === "function", `TypeScript @action decorator expects the field '${prop} to be initialized with a function`);
-			addBoundAction(this, prop, action(name, v));
-		}
-	});
-}
-
-function addBoundAction(target, prop, implementation) {
-	Object.defineProperty(target, prop, {
-		enumerable: false,
-		writable: false,
-		value: implementation
-	});
 }
 
 export function actionImplementation(actionName: string, fn: Function): Function {
