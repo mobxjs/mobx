@@ -6,7 +6,7 @@ import {ComputedValue} from "../core/computedvalue";
 import {globalState} from "../core/globalstate";
 import {createClassPropertyDecorator} from "../utils/decorators";
 
-const actionFieldDecorator = createClassPropertyDecorator(
+const actionDecorator = createClassPropertyDecorator(
 	function (target, key, value, args, originalDescriptor) {
 		const actionName = (args && args.length === 1) ? args[0] : (value.name || key || "<unnamed action>");
 		const wrappedAction = action(actionName, value);
@@ -44,7 +44,7 @@ export function action(arg1, arg2?, arg3?, arg4?): any {
 	if (arguments.length === 2  && typeof arg2 === "function")
 		return actionImplementation(arg1, arg2);
 
-	return actionFieldDecorator.apply(null, arguments);
+	return actionDecorator.apply(null, arguments);
 }
 
 export function actionImplementation(actionName: string, fn: Function): Function {

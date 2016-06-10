@@ -735,3 +735,59 @@ test("reusing initializers", t => {
 
 	t.end();
 })
+
+test("enumerability", t => {
+	class A {
+		@observable a = 1; // enumerable, on proto
+		@computed get b () { return this.a } // non-enumerable, on proto
+		@action m() {} // non-enumerable, on proto
+		@action m2 = () => {}; // non-enumerable, on self
+	}
+
+	const a = new A();
+	
+	// not initialized yet
+	let ownProps = Object.keys(a);
+	let props: string[] = [];
+	for (var key in a)
+		props.push(key);
+
+	t.deepEqual(ownProps, [
+	]);
+
+	t.deepEqual(props, [ // also 'a' would be ok
+		"a"
+	]);
+
+	t.equal(a.hasOwnProperty("a"), false); // true would be ok as well
+	t.equal(a.hasOwnProperty("b"), false);
+	t.equal(a.hasOwnProperty("m"), false);
+	t.equal(a.hasOwnProperty("m2"), true); // false would be ok as well
+
+	// after initialization
+	a.a;
+	a.b;
+	a.m;
+	a.m2;
+	
+	ownProps = Object.keys(a);
+	props = [];
+	for (var key in a)
+		props.push(key);
+
+	t.deepEqual(ownProps, [ // also 'a' would be ok
+	]);
+
+	t.deepEqual(props, [
+		"a"
+	]);
+
+	t.equal(a.hasOwnProperty("a"), false); // true would be ok as well
+	t.equal(a.hasOwnProperty("b"), false);
+	t.equal(a.hasOwnProperty("m"), false);
+	t.equal(a.hasOwnProperty("m2"), true);
+
+
+	t.end();
+})
+
