@@ -1,6 +1,6 @@
 import {ValueMode} from "../types/modifiers";
 import {ObservableMap} from "../types/observablemap";
-import {asObservableObject, setObservableObjectProperty} from "../types/observableobject";
+import {asObservableObject, setObservableObjectInstanceProperty} from "../types/observableobject";
 import {invariant, isPropertyConfigurable} from "../utils/utils";
 
 /**
@@ -25,7 +25,7 @@ export function extendObservableHelper(target, properties, mode: ValueMode, name
 	for (let key in properties) if (properties.hasOwnProperty(key)) {
 		if (target === properties && !isPropertyConfigurable(target, key))
 			continue; // see #111, skip non-configurable or non-writable props for `observable(object)`.
-		setObservableObjectProperty(adm, key, properties[key]);
+		setObservableObjectInstanceProperty(adm, key, properties[key]);
 	}
 	return target;
 }
