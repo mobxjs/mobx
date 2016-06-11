@@ -47,12 +47,18 @@ export function action(arg1, arg2?, arg3?, arg4?): any {
 	return actionDecorator.apply(null, arguments);
 }
 
+export function isAction(thing: any) {
+	return typeof thing === "function" && thing.isMobxAction === true;
+}
+
 export function actionImplementation(actionName: string, fn: Function): Function {
 	invariant(typeof fn === "function", "`action` can only be invoked on functions");
 	invariant(typeof actionName === "string" && actionName.length > 0, `actions should have valid names, got: '${actionName}'`);
-	return function () {
+	const res = function () {
 		return executeWrapped(actionName, fn, this, arguments);
 	};
+	(res as any).isMobxAction = true;
+	return res;
 }
 
 function executeWrapped(actionName: string, fn: Function, scope: any, args: IArguments) {

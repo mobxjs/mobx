@@ -1,3 +1,9 @@
+# 2.3.0
+
+* Implemented #290: `isAction(fn)`
+* Improved performance of decorators signficantly, and removed subtle differences between the implementation in babel and typescript.
+* `@observable` is now always defined on the class and not in the instances. This means that `@observable` properties are enumerable, but won't appear if `Object.keys` or `hasOwnProperty` is used on a class _instance_.
+
 # 2.2.2:
 
 * Fixed issue #267: exception when `useStrict(true)` was invoked in combination with `@observable` attributes when using Babel

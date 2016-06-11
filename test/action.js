@@ -12,6 +12,9 @@ test('action should wrap in transaction', t => {
 		observable.set(observable.get() - amount); // oops
 	});
 
+	t.equal(mobx.isAction(increment), true);
+	t.equal(mobx.isAction(function () {}), false);
+
 	increment(7);
 
 	t.deepEqual(values, [0, 7]);

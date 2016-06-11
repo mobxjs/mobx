@@ -24,7 +24,7 @@ export { SimpleEventEmitter, ISimpleEventListener             } from "./utils/si
 export { IObserverTree, IDependencyTree                       } from "./api/extras";
 export { IObservable, IDepTreeNode                            } from "./core/observable";
 export { IDerivation, untracked                               } from "./core/derivation";
-export { action, useStrict                                    } from "./core/action";
+export { action, useStrict, isAction                          } from "./core/action";
 export { spy                                                  } from "./core/spy";
 
 export { asReference, asFlat, asStructure, asMap              } from "./types/modifiers";

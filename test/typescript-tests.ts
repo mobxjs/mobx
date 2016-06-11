@@ -759,10 +759,14 @@ test("enumerability", t => {
 		"a"
 	]);
 
+	t.equal("a" in a, true);
 	t.equal(a.hasOwnProperty("a"), false); // true would be ok as well
 	t.equal(a.hasOwnProperty("b"), false);
 	t.equal(a.hasOwnProperty("m"), false);
 	t.equal(a.hasOwnProperty("m2"), true); // false would be ok as well
+
+	t.equal(mobx.isAction(a.m), true);
+	t.equal(mobx.isAction(a.m2), true);
 
 	// after initialization
 	a.a;
@@ -782,6 +786,7 @@ test("enumerability", t => {
 		"a"
 	]);
 
+	t.equal("a" in a, true);
 	t.equal(a.hasOwnProperty("a"), false); // true would be ok as well
 	t.equal(a.hasOwnProperty("b"), false);
 	t.equal(a.hasOwnProperty("m"), false);
