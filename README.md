@@ -13,6 +13,7 @@ _Simple, scalable state management_
 * [Official documentation and API overview](https://mobxjs.github.io/mobx/refguide/api.html)
 * Videos: 
   * [Egghead.io lesson 1: syncing the UI with the app state using observable and observer](https://egghead.io/lessons/javascript-mobx-and-react-intro-syncing-the-ui-with-the-app-state-using-observable-and-observer)
+  * [Practical React with MobX](https://www.youtube.com/watch?v=XGwuM_u7UeQ). In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth.
   * [Screencast: intro to MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8)
   * [State Management Is Easy, React Amsterdam 2016 conf](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
   * [Transparent Reactive Programming and Mutable Data, Reactive2015 conf](https://www.youtube.com/watch?v=FEwLwiizlk0) ([slides](https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures))
@@ -22,7 +23,7 @@ _Simple, scalable state management_
 MobX is a battle tested library that makes state management simple and scalable by transparently applying functional reactive programming (TFRP).
 The philosophy behind MobX is very simple:
 
-_Everything that can be derived from the application state, should be derived. Automatically._
+_Anything that can be derived from the application state, should be derived. Automatically._
 
 which includes the UI, data serialization, server communication, etc.
 
