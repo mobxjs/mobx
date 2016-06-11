@@ -27,7 +27,7 @@ _Anything that can be derived from the application state, should be derived. Aut
 
 which includes the UI, data serialization, server communication, etc.
 
-<img alt="MobX unidirectional flow" src="docs/flow.png" height="200" align="center" />
+<img alt="MobX unidirectional flow" src="docs/flow.png" align="center" />
 
 React and MobX together are a powerful combination. React renders the application state by providing mechanisms to translate it into a tree of renderable components. MobX provides the mechanism to store and update the application state that React then uses.
 
