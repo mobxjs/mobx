@@ -142,13 +142,13 @@ test('test action should be untracked', t => {
 test('should be possible to create autorun in ation', t => {
 	var a = mobx.observable(1);
 	var values = [];
-	
+
 	var adder = mobx.action(inc => {
 		return mobx.autorun(() => {
 			values.push(a.get() + inc);
 		})
 	});
-	
+
 	var d1 = adder(2);
 	a.set(3);
 	var d2 = adder(17);
@@ -189,25 +189,50 @@ test('should not be possible to invoke action in a computed block', t => {
 test('action in autorun should be untracked', t => {
 	var a = mobx.observable(2);
 	var b = mobx.observable(3);
-	
+
 	var data = [];
 	var multiplier = mobx.action(val => val * b.get());
-	
+
 	var d = mobx.autorun(() => {
 		data.push(multiplier(a.get()));
 	});
-	
+
 	a.set(3);
 	b.set(4);
 	a.set(5);
-	
+
 	d();
-	
+
 	a.set(6);
-	
+
 	t.deepEqual(data, [
 		6, 9, 20
 	]);
-	
+
+	t.end();
+})
+
+test('action should not be converted to computed when using (extend)observable', t => {
+	var a = mobx.observable({
+		a: 1,
+		b: mobx.action(function() {
+			this.a++;
+		})
+	})
+
+	t.equal(mobx.isAction(a.b), true);
+	a.b();
+	t.equal(a.a, 2);
+
+	mobx.extendObservable(a, {
+		c: mobx.action(function() {
+			this.a *= 3;
+		})
+	});
+
+	t.equal(mobx.isAction(a.c), true);
+	a.c();
+	t.equal(a.a, 6);
+
 	t.end();
 })
