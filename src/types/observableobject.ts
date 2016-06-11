@@ -1,5 +1,6 @@
 import {ObservableValue, UNCHANGED} from "./observablevalue";
 import {ComputedValue} from "../core/computedvalue";
+import {isAction} from "../core/action";
 import {ValueMode, AsStructure} from "./modifiers";
 import {Lambda, getNextId, invariant, assertPropertyConfigurable, isPlainObject} from "../utils/utils";
 import {runLazyInitializers} from "../utils/decorators";
@@ -85,7 +86,7 @@ export function defineObservableProperty(adm: ObservableObjectAdministration, pr
 	let name = `${adm.name}.${propName}`;
 	let isComputed = true;
 
-	if (typeof newValue === "function" && newValue.length === 0)
+	if (typeof newValue === "function" && newValue.length === 0 && !isAction(newValue))
 		observable = new ComputedValue(newValue, adm.target, false, name);
 	else if (newValue instanceof AsStructure && typeof newValue.value === "function" && newValue.value.length === 0)
 		observable = new ComputedValue(newValue.value, adm.target, true, name);
