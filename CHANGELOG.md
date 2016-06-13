@@ -5,6 +5,7 @@
 * `@observable` is now always defined on the class and not in the instances. This means that `@observable` properties are enumerable, but won't appear if `Object.keys` or `hasOwnProperty` is used on a class _instance_.
 * if an (argumentless) action is passed to `observable` / `extendObservable`, it will not be converted into a computed property.
 * Implemented #316: `whyRun()`
+* Fixed #285: class instances are now also converted by `toJS`. Also members defined on prototypes which are enumerable are converted.
 
 # 2.2.2:
 

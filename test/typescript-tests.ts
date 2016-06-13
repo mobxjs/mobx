@@ -796,3 +796,27 @@ test("enumerability", t => {
 	t.end();
 })
 
+test("issue 285 (babel)", t => {
+	const {observable, toJS} = mobx;
+
+	class Todo {
+		id = 1;
+		@observable title: string;
+		@observable finished = false;
+		@observable childThings = [1,2,3];
+		constructor(title: string) {
+			this.title = title;
+		}
+	}
+
+	var todo = new Todo("Something to do");
+
+	t.deepEqual(toJS(todo), {
+		id: 1,
+		title: "Something to do",
+		finished: false,
+		childThings: [1,2,3]
+	})
+
+	t.end();
+})

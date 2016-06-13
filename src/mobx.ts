@@ -44,7 +44,7 @@ export { observe                                              } from "./api/obse
 export { intercept                                            } from "./api/intercept";
 export { autorun, autorunAsync, autorunUntil, when, reaction  } from "./api/autorun";
 export { expr                                                 } from "./api/expr";
-export { toJSON, toJS                                         } from "./api/tojson";
+export { toJSON, toJS                                         } from "./api/tojs";
 export { ITransformer, createTransformer                      } from "./api/createtransformer";
 export { whyRun                                               } from "./api/whyrun";
 
