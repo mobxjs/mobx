@@ -46,6 +46,7 @@ export { autorun, autorunAsync, autorunUntil, when, reaction  } from "./api/auto
 export { expr                                                 } from "./api/expr";
 export { toJSON, toJS                                         } from "./api/tojson";
 export { ITransformer, createTransformer                      } from "./api/createtransformer";
+export { whyRun                                               } from "./api/extras";
 
 export { transaction                                          } from "./core/transaction";
 export { Reaction                                             } from "./core/reaction";
