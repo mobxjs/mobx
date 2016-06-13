@@ -62,6 +62,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	has(key: string): boolean {
 		if (!this.isValidKey(key))
 			return false;
+		key = "" + key;
 		if (this._hasMap[key])
 			return this._hasMap[key].get();
 		return this._updateHasMapEntry(key, false).get();
@@ -69,6 +70,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 
 	set(key: string, value: V) {
 		this.assertValidKey(key);
+		key = "" + key;
 		const hasKey = this._has(key);
 		assertUnwrapped(value, `[mobx.map.set] Expected unwrapped value to be inserted to key '${key}'. If you need to use modifiers pass them as second argument to the constructor`);
 		if (hasInterceptors(this)) {
@@ -90,6 +92,8 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	}
 
 	delete(key: string) {
+		this.assertValidKey(key);
+		key = "" + key;
 		if (hasInterceptors(this)) {
 			const change = interceptChange<IMapWillChange<V>>(this, {
 				type: "delete",
@@ -186,6 +190,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	}
 
 	get(key: string): V {
+		key = "" + key;
 		if (this.has(key))
 			return this._data[key].get();
 		return undefined;
@@ -253,7 +258,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	private isValidKey(key: string) {
 		if (key === null || key === undefined)
 			return false;
-		if (typeof key !== "string" && typeof key !== "number")
+		if (typeof key !== "string" && typeof key !== "number" && typeof key !== "boolean")
 			return false;
 		return true;
 	}

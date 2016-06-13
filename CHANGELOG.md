@@ -6,6 +6,7 @@
 * if an (argumentless) action is passed to `observable` / `extendObservable`, it will not be converted into a computed property.
 * Implemented #316: `whyRun()`
 * Fixed #285: class instances are now also converted by `toJS`. Also members defined on prototypes which are enumerable are converted.
+* Map keys are now always coerced to strings. Fixes #308
 
 # 2.2.2:
 

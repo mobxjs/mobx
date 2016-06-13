@@ -384,3 +384,25 @@ test('256, map.merge should be not be tracked for target', t => {
 	d();
 	t.end();
 })
+
+test('308, map keys should be coerced to strings correctly', t => {
+	var m = mobx.map()
+	m.set(1, true) // => "[mobx.map { 1: true }]"
+	m.delete(1) // => "[mobx.map { }]"
+	t.deepEqual(m.keys(), [])
+
+	m.set(1, true) // => "[mobx.map { 1: true }]"
+	m.delete('1') // => "[mobx.map { 1: undefined }]"
+	t.deepEqual(m.keys(), [])
+
+	m.set(1, true) // => "[mobx.map { 1: true, 1: true }]"
+	m.delete('1') // => "[mobx.map { 1: undefined, 1: undefined }]"
+	t.deepEqual(m.keys(), [])
+
+	m.set(true, true)
+	t.equal(m.get("true"), true)
+	m.delete(true)
+	t.deepEqual(m.keys(), [])
+
+	t.end()	
+})
