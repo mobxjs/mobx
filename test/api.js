@@ -38,7 +38,8 @@ test('correct api should be exposed', function(t) {
 		'transaction',
 		'untracked',
 		'useStrict',
-		'when'
+		'when',
+		'whyRun'
 	]);
 	t.equals(Object.keys(mobx).filter(function(key) {
 		return mobx[key] == undefined;

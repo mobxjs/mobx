@@ -1,7 +1,3 @@
-import {IObservable, propagateReadiness, propagateStaleness, reportObserved} from "./observable";
-import {invariant, noop, getNextId} from "../utils/utils";
-import {globalState} from "./globalstate";
-import {runReactions} from "./reaction";
 
 export interface IAtom extends IObservable {
 	isDirty: boolean;
@@ -71,3 +67,8 @@ export class Atom implements IAtom {
 		return this.name;
 	}
 }
+
+import {globalState} from "./globalstate";
+import {IObservable, propagateReadiness, propagateStaleness, reportObserved} from "./observable";
+import {runReactions} from "./reaction";
+import {invariant, noop, getNextId} from "../utils/utils";
