@@ -7,6 +7,7 @@
 * Implemented #316: `whyRun()`
 * Fixed #285: class instances are now also converted by `toJS`. Also members defined on prototypes which are enumerable are converted.
 * Map keys are now always coerced to strings. Fixes #308
+* `when`, `autorun` and `autorunAsync` now accept custom debug names (see #293, by @jamiewinder)
 
 # 2.2.2:
 

@@ -33,7 +33,7 @@ test("whyrun", t => {
 	t.ok(whyRun(x, "fullname").match(/\[idle\]/));
 	t.ok(whyRun(x, "fullname").match(/suspended/));
 
-	const d = mobx.autorun(() => {
+	const d = mobx.autorun("loggerzz", () => {
 		x.fullname;
 		whyRun();
 	})
@@ -42,7 +42,7 @@ test("whyrun", t => {
 	t.ok(lastButOneLine.match(/will re-run/));
 	t.ok(lastButOneLine.match(/\.firstname/));
 	t.ok(lastButOneLine.match(/\.lastname/));
-	t.ok(lastButOneLine.match(/Autorun@/));
+	t.ok(lastButOneLine.match(/loggerzz/));
 
 	t.ok(lastLine.match(/\[running\]/));
 	t.ok(lastLine.match(/\.fullname/));
@@ -50,12 +50,12 @@ test("whyrun", t => {
 	t.ok(whyRun(x, "fullname").match(/\[idle\]/));
 	t.ok(whyRun(x, "fullname").match(/\.firstname/));
 	t.ok(whyRun(x, "fullname").match(/\.lastname/));
-	t.ok(whyRun(x, "fullname").match(/Autorun@/));
+	t.ok(whyRun(x, "fullname").match(/loggerzz/));
 
 	t.ok(whyRun(d).match(/\[idle\]/));
 	t.ok(whyRun(d).match(/\.fullname/));
 
-	t.ok(whyRun(d).match(/Autorun@/));
+	t.ok(whyRun(d).match(/loggerzz/));
 
 	mobx.transaction(() => {
 		x.firstname = "Veria";
@@ -69,7 +69,7 @@ test("whyrun", t => {
 	t.ok(lastButOneLine.match(/will re-run/));
 	t.ok(lastButOneLine.match(/\.firstname/));
 	t.ok(lastButOneLine.match(/\.lastname/));
-	t.ok(lastButOneLine.match(/\Autorun@/));
+	t.ok(lastButOneLine.match(/\loggerzz/));
 
 	t.ok(lastLine.match(/\[running\]/));
 	t.ok(lastLine.match(/\.fullname/));
@@ -77,11 +77,11 @@ test("whyrun", t => {
 	t.ok(whyRun(x, "fullname").match(/\[idle\]/));
 	t.ok(whyRun(x, "fullname").match(/\.firstname/));
 	t.ok(whyRun(x, "fullname").match(/\.lastname/));
-	t.ok(whyRun(x, "fullname").match(/Autorun@/));
+	t.ok(whyRun(x, "fullname").match(/loggerzz/));
 
 	t.ok(whyRun(d).match(/\[idle\]/));
 	t.ok(whyRun(d).match(/\.fullname/));
-	t.ok(whyRun(d).match(/Autorun@/));
+	t.ok(whyRun(d).match(/loggerzz/));
 
 	d();
 

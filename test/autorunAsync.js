@@ -87,7 +87,7 @@ test('autorun should not result in loop', function(t) {
 	});
 
 	var autoRunsCalled = 0;
-	var d = m.autorunAsync(function() {
+	var d = m.autorunAsync("named async", function() {
 		autoRunsCalled++;
 		a.x = ++i;
 		setTimeout(function() {
@@ -98,6 +98,8 @@ test('autorun should not result in loop', function(t) {
 	setTimeout(function() {
 		t.equal(autoRunsCalled, 1);
 		t.end();
+
+		t.equal(d.$mobx.name, "named async");
 		d();
 	}, 100);
 });

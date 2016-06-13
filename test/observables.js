@@ -812,7 +812,7 @@ test('when 2', function(t) {
     var x = observable(3);
 
     var called = 0;
-    mobx.autorunUntil(function() {
+    var d = mobx.when("when x is 3", function() {
         return (x.get() === 3);
     }, function() {
         called += 1;
@@ -823,6 +823,8 @@ test('when 2', function(t) {
     x.set(5);
     x.set(3);
     t.equal(called, 1);
+
+	t.equal(d.$mobx.name, "when x is 3")
 
     t.end();
 })
