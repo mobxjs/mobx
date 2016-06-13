@@ -40,14 +40,16 @@ export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, 
 		);
 		return res;
 	}
-	if (typeof source === "object" && isPlainObject(source)) {
+	if (isObservable(source) && source.$mobx instanceof ObservableValue)
+		return toJS(source(), detectCycles, __alreadySeen);
+	if (source instanceof ObservableValue)
+		return toJS(source.get(), detectCycles, __alreadySeen);
+	if (typeof source === "object") {
 		const res = cache({});
-		for (let key in source) if (source.hasOwnProperty(key))
+		for (let key in source)
 			res[key] = toJS(source[key], detectCycles, __alreadySeen);
 		return res;
 	}
-	if (isObservable(source) && source.$mobx instanceof ObservableValue)
-		return toJS(source(), detectCycles, __alreadySeen);
 	return source;
 }
 

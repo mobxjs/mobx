@@ -1099,6 +1099,58 @@ test('json cycles', function(t) {
     t.end();
 })
 
+test('#285 class instances with toJS', t => {
+	function Person() {
+		this.firstName = "michel";
+		mobx.extendObservable(this, {
+			lastName: "weststrate",
+			tags: ["user", "mobx-member"],
+			fullName: function() {
+				return this.firstName + this.lastName
+			}
+		})
+	}
+	
+	const p1 = new Person();
+	// check before lazy initialization
+	t.deepEqual(mobx.toJS(p1), {
+		firstName: "michel",
+		lastName: "weststrate",
+		tags: ["user", "mobx-member"]
+	});
+
+	// check after lazy initialization
+	t.deepEqual(mobx.toJS(p1), {
+		firstName: "michel",
+		lastName: "weststrate",
+		tags: ["user", "mobx-member"]
+	});
+
+	t.end()
+})
+
+test('#285 non-mobx class instances with toJS', t => {
+	function Person() {
+		this.firstName = "michel";
+		this.lastName = mobx.observable("weststrate");
+	}
+	
+	const p1 = new Person();
+	// check before lazy initialization
+	t.deepEqual(mobx.toJS(p1), {
+		firstName: "michel",
+		lastName: "weststrate"
+	});
+
+	// check after lazy initialization
+	t.deepEqual(mobx.toJS(p1), {
+		firstName: "michel",
+		lastName: "weststrate"
+	});
+	
+	t.end()
+})
+
 function stripSpyOutput(events) {
 	events.forEach(ev => {
 		delete ev.time;
