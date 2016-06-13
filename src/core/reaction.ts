@@ -1,7 +1,7 @@
 import {IObservable, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction} from "./derivation";
 import {globalState} from "./globalstate";
-import {EMPTY_ARRAY, getNextId, Lambda} from "../utils/utils";
+import {EMPTY_ARRAY, getNextId, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
 
 /**
@@ -31,6 +31,7 @@ export class Reaction implements IDerivation {
 	isDisposed = false;
 	_isScheduled = false;
 	_isTrackPending = false;
+	_isRunning = false;
 
 	constructor(public name: string = "Reaction@" + getNextId(), private onInvalidate: () => void) { }
 
@@ -88,7 +89,9 @@ export class Reaction implements IDerivation {
 				fn
 			});
 		}
+		this._isRunning = true;
 		trackDerivedFunction(this, fn);
+		this._isRunning = false;
 		this._isTrackPending = false;
 		if (notify) {
 			spyReportEnd({
@@ -114,6 +117,22 @@ export class Reaction implements IDerivation {
 
 	toString() {
 		return `Reaction[${this.name}]`;
+	}
+
+	whyRun() {
+		const observing = unique(this.observing).map(dep => dep.name);
+
+		return (`
+WhyRun? reaction '${this.name}':
+ * Status: [${this.isDisposed ? "stopped" : this._isRunning ? "running" : this.isScheduled() ? "scheduled" : "idle"}]
+ * This reaction will re-run if any of the following observables changes:
+    ${joinStrings(observing)}
+    ${(this._isRunning) ? " (... or any observable accessed during the remainder of the current run)" : ""}
+	Missing items in this list?
+	  1. Check whether all used values are properly marked as observable (use isObservable to verify)
+	  2. Make sure you didn't dereference values too early. MobX observes props, not primitives. E.g: use 'person.name' instead of 'name' in your computation.
+`
+		);
 	}
 }
 
@@ -143,3 +162,4 @@ export function runReactions() {
 	}
 	globalState.isRunningReactions = false;
 }
+

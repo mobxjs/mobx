@@ -19,13 +19,13 @@
 import {registerGlobals} from "./core/globalstate";
 registerGlobals();
 
-export { Lambda                                               } from "./utils/utils";
-export { SimpleEventEmitter, ISimpleEventListener             } from "./utils/simpleeventemitter";
-export { IObserverTree, IDependencyTree                       } from "./api/extras";
+export { IAtom, Atom                                          } from "./core/atom";
 export { IObservable, IDepTreeNode                            } from "./core/observable";
+export { Reaction                                             } from "./core/reaction";
 export { IDerivation, untracked                               } from "./core/derivation";
 export { action, useStrict, isAction                          } from "./core/action";
 export { spy                                                  } from "./core/spy";
+export { transaction                                          } from "./core/transaction";
 
 export { asReference, asFlat, asStructure, asMap              } from "./types/modifiers";
 export { IInterceptable, IInterceptor                         } from "./types/intercept-utils";
@@ -46,11 +46,11 @@ export { autorun, autorunAsync, autorunUntil, when, reaction  } from "./api/auto
 export { expr                                                 } from "./api/expr";
 export { toJSON, toJS                                         } from "./api/tojson";
 export { ITransformer, createTransformer                      } from "./api/createtransformer";
-export { whyRun                                               } from "./api/extras";
+export { whyRun                                               } from "./api/whyrun";
 
-export { transaction                                          } from "./core/transaction";
-export { Reaction                                             } from "./core/reaction";
-export { IAtom, Atom                                          } from "./core/atom";
+export { Lambda                                               } from "./utils/utils";
+export { SimpleEventEmitter, ISimpleEventListener             } from "./utils/simpleeventemitter";
+export { IObserverTree, IDependencyTree                       } from "./api/extras";
 
 import { resetGlobalState } from "./core/globalstate";
 import { quickDiff } from "./utils/utils";

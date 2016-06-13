@@ -47,6 +47,13 @@ export function unique<T>(list: T[]): T[] {
 	return res;
 }
 
+export function joinStrings(things: string[], limit: number = 100, separator = " - "): string {
+	if (!things)
+		return "";
+	const sliced = things.slice(0, limit);
+	return `${sliced.join(separator)}${things.length > limit ? " (... and " + (things.length - limit) + "more)" : ""}`;
+}
+
 export function isPlainObject(value) {
 	return value !== null && typeof value === "object" && Object.getPrototypeOf(value) === Object.prototype;
 }

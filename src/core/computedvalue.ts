@@ -1,9 +1,9 @@
 import {IObservable, reportObserved, removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction, isComputingDerivation, untracked} from "./derivation";
 import {globalState} from "./globalstate";
-import {getNextId, valueDidChange, invariant, Lambda, unique} from "../utils/utils";
-import {autorun} from "../api/autorun";
+import {getNextId, valueDidChange, invariant, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "../core/spy";
+import {autorun} from "../api/autorun";
 
 /**
  * A node in the state dependency root that observes other nodes, and can be observed itself.
@@ -139,48 +139,54 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 
 	whyRun() {
 		const isTracking = globalState.derivationStack.length > 0;
-		const observing = unique(this.observing).map(dep => dep.name).join(" - ");
-		const observers = unique(this.observers).map(dep => dep.name).join(" - ");
-		const runReason = ( 
+		const observing = unique(this.observing).map(dep => dep.name);
+		const observers = unique(this.observers).map(dep => dep.name);
+		const runReason = (
 			this.isComputing
 				? isTracking
-					? this.dependencyChangeCount > 0
+					? this.observers.length > 0 // this computation already had observers
 							? RunReason.INVALIDATED
 							: RunReason.REQUIRED
 					: RunReason.PEEK
 				: RunReason.NOT_RUNNING
 		);
+		if (runReason === RunReason.REQUIRED) {
+			const requiredBy = globalState.derivationStack[globalState.derivationStack.length - 2];
+			if (requiredBy)
+				observers.push(requiredBy.name);
+		}
 
 		return (`
-WhyRun? computation '${this.name}'
- * Running because: ${runReasonText[runReason]}` +
+WhyRun? computation '${this.name}':
+ * Running because: ${runReasonTexts[runReason]} ${(runReason === RunReason.NOT_RUNNING) && this.dependencyStaleCount > 0 ? "(a next run is scheduled)" : ""}
+` +
 (this.isLazy
 ? 
 ` * This computation is suspended (not in use by any reaction) and won't run automatically.
 	Didn't expect this computation to be suspended at this point?
 	  1. Make sure this computation is used by a reaction (reaction, autorun, observer).
-	  2. Check whether you are using this computation synchronously (in the same stack as they reaction that needs it).`
+	  2. Check whether you are using this computation synchronously (in the same stack as they reaction that needs it).
+`
 : 
 ` * This computation will re-run if any of the following observables changes:
-    ${observing.slice(0, whyRunNodeLimit)}${observing.length > whyRunNodeLimit ? "(... and " + (observing.length - whyRunNodeLimit) + "more)" : ""}
-    ${(this.isComputing && isTracking) ? "(... and any observable accessed during the remainder of the current run)" : ""}
+    ${joinStrings(observing)}
+    ${(this.isComputing && isTracking) ? " (... or any observable accessed during the remainder of the current run)" : ""}
 	Missing items in this list?
 	  1. Check whether all used values are properly marked as observable (use isObservable to verify)
 	  2. Make sure you didn't dereference values too early. MobX observes props, not primitives. E.g: use 'person.name' instead of 'name' in your computation.
   * If the outcome of this computation changes, the following observers will be re-run:
-    ${observers.slice(0, whyRunNodeLimit)}${observers.length > whyRunNodeLimit ? "(... and " + (observers.length - whyRunNodeLimit) + "more)" : ""}`
+    ${joinStrings(observers)}
+`
 )
-// TODO: if required, then the thing in the stack should be listed here..
 		);
 	}
 }
 
-enum RunReason { PEEK, INVALIDATED, REQUIRED, NOT_RUNNING }
-const runReasonText = {
-	[RunReason.PEEK]: "The value of this computed value was requested outside an reaction",
-	[RunReason.INVALIDATED]: "Some observables used by this computation did change",
-	[RunReason.REQUIRED]: "This computation is required by another computed value / reaction",
-	[RunReason.NOT_RUNNING]: "This compution is currently not running"
-};
+export enum RunReason { PEEK, INVALIDATED, REQUIRED, NOT_RUNNING }
 
-const whyRunNodeLimit = 100;
+export const runReasonTexts = {
+	[RunReason.PEEK]: "[peek] The value of this computed value was requested outside an reaction",
+	[RunReason.INVALIDATED]: "[invalidated] Some observables used by this computation did change",
+	[RunReason.REQUIRED]: "[started] This computation is required by another computed value / reaction",
+	[RunReason.NOT_RUNNING]: "[idle] This compution is currently not running"
+};

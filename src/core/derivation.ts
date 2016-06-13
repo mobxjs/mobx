@@ -1,6 +1,6 @@
 import {IObservable, IDepTreeNode, propagateReadiness, propagateStaleness, addObserver, removeObserver} from "./observable";
-import {quickDiff, invariant} from "../utils/utils";
 import {globalState, resetGlobalState} from "./globalstate";
+import {quickDiff, invariant} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "./spy";
 
 /**

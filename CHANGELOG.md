@@ -4,6 +4,7 @@
 * Improved performance of decorators signficantly, and removed subtle differences between the implementation in babel and typescript.
 * `@observable` is now always defined on the class and not in the instances. This means that `@observable` properties are enumerable, but won't appear if `Object.keys` or `hasOwnProperty` is used on a class _instance_.
 * if an (argumentless) action is passed to `observable` / `extendObservable`, it will not be converted into a computed property.
+* Implemented #316: `whyRun()`
 
 # 2.2.2:
 
