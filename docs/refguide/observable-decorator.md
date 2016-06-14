@@ -33,6 +33,13 @@ console.log("price" in line) // true
 console.log(line.hasOwnProperty("price")) // false, the price _property_ is defined on the class, although the value will be stored per instance.
 ```
 
+The `@observable` decorator can be combined with modifiers like `asStructure`:
+
+```javascript
+@observable position = asStructure({ x: 0, y: 0})
+```
+
+
 ### Enabling decorators in your transpiler
 
 Decorators are not supported by default when using TypeScript or Babel pending a definitive definition in the ES standard.
