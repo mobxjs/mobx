@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="2.4" data-basepath=".." data-revision="Sat Jun 04 2016 00:44:08 GMT+0200 (CEST)">
+    <div class="book" data-level="2.4" data-basepath=".." data-revision="Tue Jun 14 2016 11:45:14 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -830,7 +830,7 @@ When <code>autorun</code> is used, the provided function will always be triggere
 In contrast, <code>computed(function)</code> creates functions that only re-evaluate if it has
 observers on its own, otherwise its value is considered to be irrelevant.
 As a rule of thumb: use <code>autorun</code> if you have a function that should run automatically but that doesn&apos;t result in a new value.
-Use <code>computed</code> for everything else. Autoruns are about initiating <em>effects</em>, not about producing new values.  </p>
+Use <code>computed</code> for everything else. Autoruns are about initiating <em>effects</em>, not about producing new values.<br>If a string is passed as first argument to <code>autorun</code>, it will be used as debug name.</p>
 <p>Just like the <a href="observer-component.html"><code>@observer</code> decorator/function</a>, <code>autorun</code> will only observe data that is used during the execution of the provided function.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> numbers = observable([<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>]);
 <span class="hljs-keyword">var</span> sum = computed(() =&gt; numbers.reduce((a, b) =&gt; a + b, <span class="hljs-number">0</span>));

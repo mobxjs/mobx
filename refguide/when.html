@@ -38,7 +38,7 @@
     <body>
         
         
-    <div class="book" data-level="9.14" data-basepath=".." data-revision="Sat Jun 04 2016 00:44:08 GMT+0200 (CEST)">
+    <div class="book" data-level="9.14" data-basepath=".." data-revision="Tue Jun 14 2016 11:45:14 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -822,7 +822,7 @@
                     <section class="normal" id="section-">
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/when.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="when">when</h1>
-<p><code>when(predicate: () =&gt; boolean, effect: () =&gt; void, scope?)</code></p>
+<p><code>when(debugName?, predicate: () =&gt; boolean, effect: () =&gt; void, scope?)</code></p>
 <p><code>when</code> observes &amp; runs the given <code>predicate</code> until it returns true.
 Once that happens, the given <code>effect</code> is executed and the autorunner is disposed.
 The function returns a disposer to cancel the autorunner prematurely.</p>

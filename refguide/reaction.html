@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="9.9" data-basepath=".." data-revision="Sat Jun 04 2016 00:44:08 GMT+0200 (CEST)">
+    <div class="book" data-level="9.9" data-basepath=".." data-revision="Tue Jun 14 2016 11:45:14 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -830,8 +830,11 @@ It takes two function, the first one is tracked and returns data that is used as
 Unlike <code>autorun</code> the side effect won&apos;t be run directly when created, but only when the data expression returns a new value for the first time. 
 Any observables that are accessed while executing the side effect will not be tracked.
 The side effect can be debounced, just like <code>autorunAsync</code>.
-<code>reaction</code> returns a disposer function.</p>
-<p>It is important to notice that the side effect will <em>only</em> react to data that was <em>accessed</em> in the data expression, which might be less then the data that is actually used in the effect.</p>
+<code>reaction</code> returns a disposer function.
+If a string is passed as first argument to <code>reaction</code>, it will be used as debug name.</p>
+<p>It is important to notice that the side effect will <em>only</em> react to data that was <em>accessed</em> in the data expression, which might be less then the data that is actually used in the effect.
+Also, the side effect will only be triggered when the data returned by the expression has changed (the <code>asStructure</code> modifier can be used to enforce deep comparison).
+In other words: reaction requires you to produce the things you need in your side effect.</p>
 <p>In the following example both <code>reaction1</code>, <code>reaction2</code> and <code>autorun1</code> will react to the addition, removal or replacement of todo&apos;s in the <code>todos</code> array.
 But only <code>reaction2</code> and <code>autorun</code> will react to the change of a <code>title</code> in one of the todo items, because <code>title</code> is used in the data expression of reaction 2, while it isn&apos;t in the data expression of reaction 1.
 <code>autorun</code> tracks the complete side effect, hence it will always trigger correctly, but is also more suspectible to accidentally accessing unrelevant data.</p>

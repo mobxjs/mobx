@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="1.1" data-basepath="." data-revision="Sat Jun 04 2016 00:44:08 GMT+0200 (CEST)">
+    <div class="book" data-level="1.1" data-basepath="." data-revision="Tue Jun 14 2016 11:45:14 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -828,24 +828,30 @@
 <p><em>Simple, scalable state management</em></p>
 <p><a href="https://travis-ci.org/mobxjs/mobx" target="_blank"><img src="https://travis-ci.org/mobxjs/mobx.svg?branch=master" alt="Build Status"></a>
 <a href="https://coveralls.io/github/mobxjs/mobx?branch=master" target="_blank"><img src="https://coveralls.io/repos/mobxjs/mobx/badge.svg?branch=master&amp;service=github" alt="Coverage Status"></a>
-<a href="https://gitter.im/mobxjs/mobx?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge" target="_blank"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Join the chat at https://gitter.im/mobxjs/mobx"></a>
-<a href="https://discord.gg/0ZcbPKXt5bYAa2J1" target="_blank"><img src="https://img.shields.io/badge/discord-%23mobx%20%40reactiflux-blue.svg" alt="#mobx channel on reactiflux discord"></a></p>
+<a href="https://gitter.im/mobxjs/mobx?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge" target="_blank"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Join the chat at https://gitter.im/mobxjs/mobx"></a></p>
 <ul>
 <li>Installation: <code>npm install mobx --save</code>. React bindings: <code>npm install mobx-react --save</code></li>
 <li><a href="https://mobxjs.github.io/mobx/getting-started.html" target="_blank">Ten minute, interactive MobX + React tutorial</a></li>
 <li><a href="https://mobxjs.github.io/mobx/refguide/api.html" target="_blank">Official documentation and API overview</a></li>
-<li>Videos: <a href="https://www.youtube.com/watch?v=K8dr8BMU7-8" target="_blank">Screencast: intro to MobX</a> &#x2014; State Management Is Easy, React Amsterdam 2016 conf (coming soon) (<a href="https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx" target="_blank">slides</a>) &#x2014; <a href="https://www.youtube.com/watch?v=FEwLwiizlk0" target="_blank">Transparent Reactive Programming and Mutable Data, Reactive2015 conf</a> (<a href="https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures" target="_blank">slides</a>)</li>
+<li>Videos: <ul>
+<li><a href="https://egghead.io/lessons/javascript-mobx-and-react-intro-syncing-the-ui-with-the-app-state-using-observable-and-observer" target="_blank">Egghead.io lesson 1: syncing the UI with the app state using observable and observer</a></li>
+<li><a href="https://www.youtube.com/watch?v=XGwuM_u7UeQ" target="_blank">Practical React with MobX</a>. In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth.</li>
+<li><a href="https://www.youtube.com/watch?v=K8dr8BMU7-8" target="_blank">Screencast: intro to MobX</a></li>
+<li><a href="https://www.youtube.com/watch?v=ApmSsu3qnf0&amp;feature=youtu.be" target="_blank">State Management Is Easy, React Amsterdam 2016 conf</a> (<a href="https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx" target="_blank">slides</a>)</li>
+<li><a href="https://www.youtube.com/watch?v=FEwLwiizlk0" target="_blank">Transparent Reactive Programming and Mutable Data, Reactive2015 conf</a> (<a href="https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures" target="_blank">slides</a>)</li>
+</ul>
+</li>
 </ul>
 <h2 id="introduction">Introduction</h2>
 <p>MobX is a battle tested library that makes state management simple and scalable by transparently applying functional reactive programming (TFRP).
 The philosophy behind MobX is very simple:</p>
-<p><em>Everything that can be derived from the application state, should be derived. Automatically.</em></p>
+<p><em>Anything that can be derived from the application state, should be derived. Automatically.</em></p>
 <p>which includes the UI, data serialization, server communication, etc.</p>
-<p><img alt="MobX unidirectional flow" src="docs/flow.png" height="200" align="center"></p>
+<p><img alt="MobX unidirectional flow" src="docs/flow.png" align="center"></p>
 <p>React and MobX together are a powerful combination. React renders the application state by providing mechanisms to translate it into a tree of renderable components. MobX provides the mechanism to store and update the application state that React then uses.</p>
 <p>Both React and MobX provide very optimal and unique solutions to common problems in application development. React provides mechanisms to optimally render UI by using a virtual DOM that reduces the number of costly DOM mutations. MobX provides mechanisms to optimally synchronize application state with your React components by using a reactive virtual dependency state graph that is only updated when strictly needed and is never stale.</p>
 <h2 id="core-concepts">Core concepts</h2>
-<p>MobX has a only few core concepts. The following snippets can be tried online using <a href="https://jsfiddle.net/mweststrate/wv3yopo0/" target="_blank">JSFiddle</a> (or <a href="https://jsfiddle.net/rubyred/3rL0183y/10/" target="_blank">without ES6 and JSX</a>).</p>
+<p>MobX has only a few core concepts. The following snippets can be tried online using <a href="https://jsfiddle.net/mweststrate/wv3yopo0/" target="_blank">JSFiddle</a> (or <a href="https://jsfiddle.net/rubyred/55oc981v/" target="_blank">without ES6 and JSX</a>).</p>
 <h3 id="observable-state">Observable state</h3>
 <p>MobX adds observable capabilities to existing data structures like objects, arrays and class instances. This can simply be done by annotating your class properties with the <a href="http://mobxjs.github.io/mobx/refguide/observable-decorator.html" target="_blank">@observable</a> decorator (ES.Next), or by invoking the <a href="http://mobxjs.github.io/mobx/refguide/observable.html" target="_blank"><code>observable</code></a> or <a href="http://mobxjs.github.io/mobx/refguide/extend-observable.html" target="_blank"><code>extendObservable</code></a> functions (ES5). See <a href="https://github.com/mobxjs/mobx/wiki/Language-Support" target="_blank">Language support</a> for language-specific examples.</p>
 <pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span> </span>{
@@ -871,6 +877,7 @@ Computations like these can very well be compared with formulas in spreadsheet p
 In short, reactions bridge <a href="https://en.wikipedia.org/wiki/Reactive_programming" target="_blank">reactive</a> and <a href="https://en.wikipedia.org/wiki/Imperative_programming" target="_blank">imperative</a> programming.</p>
 <p>If you are using React, you can turn your (stateless function) components into reactive components by simply adding the <a href="http://mobxjs.github.io/mobx/refguide/observer-component.html" target="_blank"><code>@observer</code></a> decorator from the <code>mobx-react</code> package onto them.</p>
 <pre><code class="lang-javascript">import React, {Component} from &apos;react&apos;;
+import ReactDOM from &apos;react-dom&apos;;
 import {observer} from &quot;mobx-react&quot;;
 
 @observer
@@ -898,7 +905,7 @@ const TodoView = observer(({todo}) =&gt;
 );
 
 const store = new TodoList();
-React.render(&lt;TodoListView todoList={store} /&gt;, document.getElementById(&apos;mount&apos;));
+ReactDOM.render(&lt;TodoListView todoList={store} /&gt;, document.getElementById(&apos;mount&apos;));
 </code></pre>
 <p><code>observer</code> turns React (function) components into derivations of the data they render.</p>
 <p>Also, reactions can be created using the <a href="http://mobxjs.github.io/mobx/refguide/autorun.html" target="_blank"><code>autorun</code></a>, <a href="http://mobxjs.github.io/mobx/refguide/autorun-async.html" target="_blank"><code>autorunAsync</code></a> or <a href="http://mobxjs.github.io/mobx/refguide/when.html" target="_blank"><code>when</code></a> functions to fit your specific situations.</p>
@@ -981,6 +988,7 @@ __MobX is proudly used in mission critical systems at [Mendix](https://www.mendi
 <li><a href="https://github.com/AriaFallah/mobx-store" target="_blank">mobx-store</a> A lowdb inspired data store with declarative querying, observable state, and easy undo/redo.</li>
 <li><a href="https://github.com/KadoBOT/reaxor" target="_blank">reaxor</a> Boilerplate for better state management, styling, testing and cleaner code</li>
 <li><a href="https://github.com/smalldots/mobx-store" target="_blank">Smalldots MobX Store</a> Store API for MobX</li>
+<li><a href="https://github.com/mobx-roof/mobx-roof" target="_blank">mobx-roof</a> Simple, React MVVM framework based on mobx</li>
 </ul>
 <p><em>Feel free to create a PR to add your own!</em></p>
 <h3 id="more-examples">More examples</h3>
@@ -992,6 +1000,8 @@ __MobX is proudly used in mission critical systems at [Mendix](https://www.mendi
 <li><a href="https://github.com/mobxjs/react-particles-experiment" target="_blank">react-particles-experiment</a> MobX port of React-Particles-Experiment, showing MobX + Flux action dispatching</li>
 <li>A simple webshop using <a href="https://jsfiddle.net/mweststrate/46vL0phw" target="_blank">React + mobx</a> or <a href="http://jsfiddle.net/mweststrate/vxn7qgdw" target="_blank">JQuery + mobx</a>.</li>
 <li><a href="https://jsfiddle.net/mweststrate/wgbe4guu/" target="_blank">Simple timer</a> application in JSFiddle.</li>
+<li><a href="https://github.com/GPMDP/google-play-music-desktop-remote" target="_blank">Google Play Music Desktop Remote</a> A React-Native app for remote controlling Google Play Music Desktop: MobX + WebSocket.</li>
+<li><a href="https://github.com/vinej/react-portal" target="_blank">React Portal</a> A Dashboard example created with React/Mobx with a Flux pattern inspired by Redux.</li>
 </ul>
 <h2 id="what-others-are-saying">What others are saying...</h2>
 <blockquote>

@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="9" data-basepath=".." data-revision="Sat Jun 04 2016 00:44:08 GMT+0200 (CEST)">
+    <div class="book" data-level="9" data-basepath=".." data-revision="Tue Jun 14 2016 11:45:14 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -880,6 +880,7 @@ Note: using <code>action</code> is mandatory when <em>strict mode</em> is enable
 <li><code>@action boundClassMethod = (args) =&gt; { body }</code></li>
 <li><code>@action(name) boundClassMethod = (args) =&gt; { body }</code></li>
 </ul>
+<p>For one-time-actions <code>runInAction(name?, fn, scope?)</code> can be used, which is sugar for <code>action(name, fn, scope)()</code>.</p>
 <h2 id="reactions">Reactions</h2>
 <p><em>Computed values</em> are <strong>values</strong> that react automatically to state changes.
 <em>Reactions</em> are <strong>side effects</strong> that react automatically to state changes.
@@ -898,19 +899,19 @@ Note that <code>observer</code> is provided by the <code>&quot;mobx-react&quot;<
 <li><code>@observer class MyComponent extends React.Component { ... })</code></li>
 </ul>
 <h3 id="-autorun"><code>autorun</code></h3>
-<p>Usage: <code>autorun(() =&gt; { sideEffect })</code>. Autorun runs the provided <code>sideEffect</code> and tracks which observable state is accessed while running the side effect.
+<p>Usage: <code>autorun(debugname?, () =&gt; { sideEffect })</code>. Autorun runs the provided <code>sideEffect</code> and tracks which observable state is accessed while running the side effect.
 Whenever one of the used observables is changed in the future, the same sideEffect will be run again.
 Returns a disposer function to cancel the side effect. <a href="autorun.html">&#xAB;details&#xBB;</a></p>
 <h3 id="-when"><code>when</code></h3>
-<p>Usage: <code>when(() =&gt; condition, () =&gt; { sideEffect })</code>.
+<p>Usage: <code>when(debugname?, () =&gt; condition, () =&gt; { sideEffect })</code>.
 The condition expression will react automatically to any observables is uses.
 As soon as the expression returns true the sideEffect function will be invoked, but only once.
 <code>when</code> returns a disposer to prematurely cancel the whole thing. <a href="when.html">&#xAB;details&#xBB;</a></p>
 <h3 id="-autorunasync"><code>autorunAsync</code></h3>
-<p>Usage: <code>autorunAsync(() =&gt; { sideEffect }, delay)</code>. Similar to <code>autorun</code>, but the sideEffect will be delayed and debounced with the given <code>delay</code>.
+<p>Usage: <code>autorunAsync(debugname?, () =&gt; { sideEffect }, delay)</code>. Similar to <code>autorun</code>, but the sideEffect will be delayed and debounced with the given <code>delay</code>.
 <a href="autorun-async.html">&#xAB;details&#xBB;</a></p>
 <h3 id="-reaction"><code>reaction</code></h3>
-<p>Usage: <code>reaction(() =&gt; data, data =&gt; { sideEffect }, fireImmediately = false, delay = 0)</code>.
+<p>Usage: <code>reaction(debugname?, () =&gt; data, data =&gt; { sideEffect }, fireImmediately = false, delay = 0)</code>.
 A variation on <code>autorun</code> that gives more fine-grained control on which observables that will be tracked.
 It takes two function, the first one is tracked and returns data that is used as input for the second one, the side effect.
 Unlike <code>autorun</code> the side effect won&apos;t be run initially, and any observables that are accessed while executing the side effect will not be tracked.
@@ -935,6 +936,8 @@ Modifiers can be used to influence how <code>observable</code> treats specific v
 Works for all observables, computed values and disposer functions of reactions. <a href="is-observable">&#xAB;details&#xBB;</a>  </p>
 <h3 id="-isobservableobject-array-map"><code>isObservableObject|Array|Map</code></h3>
 <p>Usage: <code>isObservableObject(thing)</code>, <code>isObservableArray(thing)</code>, <code>isObservableMap(thing)</code>. Returns <code>true</code> if.., well, do the math.  </p>
+<h3 id="-isaction"><code>isAction</code></h3>
+<p>Usage: <code>isAction(func)</code>. Returns true if the given function is wrapped / decorated with <code>action</code>.</p>
 <h3 id="-createtransformer"><code>createTransformer</code></h3>
 <p>Usage: <code>createTransformer(transformation: A =&gt; B, onCleanup?): A = B</code>. 
 Can be used to make functions that transforms one value into another value reactive and memoized.
@@ -963,6 +966,16 @@ Also has a powerful logger utility based on <code>spy</code>. <a href="../best/d
 Registers a global spy listener that listens to all events that happen in MobX.
 It is similar to attaching an <code>observe</code> listener to <em>all</em> observables at once, but also notifies about running (trans/re)actions and computations.
 Used for example by the <code>mobx-react-devtools</code>.<br><a href="spy.html">&#xAB;details&#xBB;</a> </p>
+<h3 id="-whyrun"><code>whyRun</code></h3>
+<p>Usage:</p>
+<ul>
+<li><code>whyRun()</code></li>
+<li><code>whyRun(Reaction object / ComputedValue object / disposer function)</code></li>
+<li><code>whyRun(object, &quot;computed property name&quot;)</code></li>
+</ul>
+<p><code>whyRun</code> is a small utility that can be used inside computed value or reaction (<code>autorun</code>, <code>reaction</code> or the <code>render</code> method of an <code>observer</code> React component)
+and prints why the derivation is currently running, and under which circumstances it will run again. 
+This should help to get a deeper understanding when and why MobX runs stuff, and prevent some beginner mistakes. </p>
 <h3 id="-extras-getatom"><code>extras.getAtom</code></h3>
 <p>Usage: <code>getAtom(thing, property?)</code>.
 Returns the backing <em>Atom</em> of a given observable object, property, reaction etc.  </p>

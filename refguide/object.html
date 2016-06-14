@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="3.1" data-basepath=".." data-revision="Sat Jun 04 2016 00:44:08 GMT+0200 (CEST)">
+    <div class="book" data-level="3.1" data-basepath=".." data-revision="Tue Jun 14 2016 11:45:14 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -827,15 +827,21 @@
 <p>If a plain JavaScript object is passed to <code>observable</code> (that is, an object that wasn&apos;t created using a constructor function),
 MobX will recursively pass all its values through <code>observable</code>.
 This way the complete object (tree) is in-place instrumented to make it observable.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, autorun} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, autorun, action} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
 
 <span class="hljs-keyword">var</span> person = observable({
+    <span class="hljs-comment">// observable properties:</span>
     name: <span class="hljs-string">&quot;John&quot;</span>,
     age: <span class="hljs-number">42</span>,
     showAge: <span class="hljs-literal">false</span>,
+    <span class="hljs-comment">// computed property:</span>
     labelText: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
         <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.showAge ? <span class="hljs-string">`<span class="hljs-subst">${this.name}</span> (age: <span class="hljs-subst">${this.age}</span>)`</span> : <span class="hljs-keyword">this</span>.name;
-    }
+    },
+    <span class="hljs-comment">// action:</span>
+    setAge: action(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">this</span>.age = <span class="hljs-number">21</span>;
+    })
 });
 
 <span class="hljs-comment">// object properties don&apos;t expose an &apos;observe&apos; method,</span>
@@ -845,7 +851,7 @@ autorun(() =&gt; <span class="hljs-built_in">console</span>.log(person.labelText
 person.name = <span class="hljs-string">&quot;Dave&quot;</span>;
 <span class="hljs-comment">// prints: &apos;Dave&apos;</span>
 
-person.age = <span class="hljs-number">21</span>;
+person.setAge(<span class="hljs-number">21</span>);
 <span class="hljs-comment">// etc</span>
 </code></pre>
 <p>Some things to keep in mind when making objects observable:</p>
@@ -856,6 +862,7 @@ Properties that are added to the object at a later time won&apos;t become observ
 Either use the <a href="observable.html"><code>@observable</code></a> annotation or the <a href="extend-observable.html"><code>extendObservable</code></a> function.</li>
 <li>Argumentless functions will be automatically turned into views, just like <a href="computed-decorator"><code>@computed</code></a> would do. For view <code>this</code> will be automatically bound to the object it is defined on.
 However, if a function expression (ES6 / TypeScript) is used, <code>this</code> will be bound to <code>undefined</code>, so you probably want to either to refer to the object directly, or to use a classic function.</li>
+<li>However (argumentless) functions that are declared as <code>action</code> will not be converted into computed views, but will keep their semantics.</li>
 <li><code>observable</code> is applied recursively, both on instantiation and to any new values that will be assigned to observable properties in the future.</li>
 <li>These defaults are fine in 95% of the cases, but for more fine-grained on how and which properties should be made observable, see the <a href="modifiers.html">modifiers</a> section.</li>
 </ul>

@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="2.2" data-basepath=".." data-revision="Sat Jun 04 2016 00:44:08 GMT+0200 (CEST)">
+    <div class="book" data-level="2.2" data-basepath=".." data-revision="Tue Jun 14 2016 11:45:14 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -844,6 +844,12 @@ This offers fine-grained control on which parts of your object become observable
 </code></pre>
 <p>If your environment doesn&apos;t support decorators or field initializers,
 <code>@observable key = value;</code> is sugar for <a href="extend-observable.html"><code>extendObservable(this, { key: value })</code></a></p>
+<p>Enumerability: properties decorator with <code>@observable</code> are enumerable, but defined on the class prototype and not on the class instances.
+In other words:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> line = <span class="hljs-keyword">new</span> OrderLine();
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;price&quot;</span> <span class="hljs-keyword">in</span> line) <span class="hljs-comment">// true</span>
+<span class="hljs-built_in">console</span>.log(line.hasOwnProperty(<span class="hljs-string">&quot;price&quot;</span>)) <span class="hljs-comment">// false, the price _property_ is defined on the class, although the value will be stored per instance.</span>
+</code></pre>
 <h3 id="enabling-decorators-in-your-transpiler">Enabling decorators in your transpiler</h3>
 <p>Decorators are not supported by default when using TypeScript or Babel pending a definitive definition in the ES standard.</p>
 <ul>
