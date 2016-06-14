@@ -1,16 +1,31 @@
 # 2.3.0
 
-* Implemented #290: `isAction(fn)`
-* Improved performance of decorators signficantly, and removed subtle differences between the implementation in babel and typescript.
-* `@observable` is now always defined on the class and not in the instances. This means that `@observable` properties are enumerable, but won't appear if `Object.keys` or `hasOwnProperty` is used on a class _instance_.
-* if an (argumentless) action is passed to `observable` / `extendObservable`, it will not be converted into a computed property.
-* Implemented #316: `whyRun()`
-* Fixed #285: class instances are now also converted by `toJS`. Also members defined on prototypes which are enumerable are converted.
+### Introduced `whyRun`:
+Usage:
+* `whyRun()`
+* `whyRun(Reaction object / ComputedValue object / disposer function)`
+* `whyRun(object, "computed property name")`
+
+`whyRun` is a small utility that can be used inside computed value or reaction (`autorun`, `reaction` or the `render` method of an `observer` React component)
+and prints why the derivation is currently running, and under which circumstances it will run again. 
+This should help to get a deeper understanding when and why MobX runs stuff, and prevent some beginner mistakes. 
+
+This feature can probably be improved based on your feedback, so feel free to file issues with suggestions!
+
+### Semantic changes:
+* `@observable` is now always defined on the class prototypes and not in the instances. This means that `@observable` properties are enumerable, but won't appear if `Object.keys` or `hasOwnProperty` is used on a class _instance_.
+* Updated semantics of `reaction` as discussed in `#278`. The expression now needs to return a value and the side effect won't be triggered if the result didn't change. `asStructure` is supported in these cases. In contrast to MobX 2.2, effects will no longer be run if the output of the expression didn't change.
+
+### Enhancements
+
+* Introduces `isAction(fn)` #290
+* If an (argumentless) action is passed to `observable` / `extendObservable`, it will not be converted into a computed property.
+* Fixed #285: class instances are now also supported by `toJS`. Also members defined on prototypes which are enumerable are converted.
 * Map keys are now always coerced to strings. Fixes #308
 * `when`, `autorun` and `autorunAsync` now accept custom debug names (see #293, by @jamiewinder)
 * Fixed #286: autorun's no longer stop working if an action throws an exception
-* Implemented `runInAction`, can be used to create on the fly actions, see #299
-* Updated semantics of `reaction` as discussed in `#278`. The expression now needs to return a value and the side effect won't be triggered if the result didn't change. `asStructure` is supported in these cases.
+* Implemented `runInAction`, can be used to create on the fly actions (especially useful in combination with `async/await`, see #299
+* Updated logo as per #244. Tnx @osenvosem!
 
 # 2.2.2:
 
