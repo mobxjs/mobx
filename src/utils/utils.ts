@@ -99,6 +99,13 @@ export function assertPropertyConfigurable(object: any, prop: string) {
 	);
 }
 
+export function getEnumerableKeys(obj) {
+	const res = [];
+	for (let key in obj)
+		res.push(key);
+	return res;
+}
+
 /**
  * Naive deepEqual. Doesn't check for prototype, non-enumerable or out-of-range properties on arrays.
  * If you have such a case, you probably should use this function but something fancier :).
@@ -121,10 +128,10 @@ export function deepEquals(a, b) {
 	} else if (typeof a === "object" && typeof b === "object") {
 		if (a === null || b === null)
 			return false;
-		if (Object.keys(a).length !== Object.keys(b).length)
+		if (getEnumerableKeys(a).length !== getEnumerableKeys(b).length)
 			return false;
 		for (let prop in a) {
-			if (!b.hasOwnProperty(prop))
+			if (!(prop in b))
 				return false;
 			if (!deepEquals(a[prop], b[prop]))
 				return false;
