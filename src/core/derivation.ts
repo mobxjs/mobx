@@ -138,9 +138,18 @@ function findCycle(needle: IDerivation, node: IObservable): boolean {
 
 
 export function untracked<T>(action: () => T): T {
-	const prevTracking = globalState.isTracking;
-	globalState.isTracking = false;
+	const prev = untrackedStart();
 	const res = action();
-	globalState.isTracking = prevTracking;
+	untrackedEnd(prev);
 	return res;
+}
+
+export function untrackedStart() {
+	const prev = globalState.isTracking;
+	globalState.isTracking = false;
+	return prev;
+}
+
+export function untrackedEnd(prev: boolean) {
+	globalState.isTracking = prev;
 }

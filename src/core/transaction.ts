@@ -10,15 +10,24 @@ import {isSpyEnabled, spyReportStart, spyReportEnd} from "./spy";
  * @returns any value that was returned by the 'action' parameter.
  */
 export function transaction<T>(action: () => T, thisArg = undefined, report = true): T {
+	transactionStart(((action as any).name) || "anonymous transaction", thisArg, report);
+	const res = action.call(thisArg);
+	transactionEnd(report);
+	return res;
+}
+
+export function transactionStart<T>(name: string, thisArg = undefined, report = true) {
 	globalState.inTransaction += 1;
 	if (report && isSpyEnabled()) {
 		spyReportStart({
 			type: "transaction",
 			target: thisArg,
-			name: ((action as any).name) || "anonymous transaction"
+			name: name
 		});
 	}
-	const res = action.call(thisArg);
+}
+
+export function transactionEnd<T>(report = true) {
 	if (--globalState.inTransaction === 0) {
 		const values = globalState.changedAtoms.splice(0);
 		for (let i = 0, l = values.length; i < l; i++)
@@ -28,5 +37,4 @@ export function transaction<T>(action: () => T, thisArg = undefined, report = tr
 	}
 	if (report && isSpyEnabled())
 		spyReportEnd();
-	return res;
 }

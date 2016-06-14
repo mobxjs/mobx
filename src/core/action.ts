@@ -1,6 +1,6 @@
-import {transaction} from "../core/transaction";
+import {transactionStart, transactionEnd} from "../core/transaction";
 import {invariant} from "../utils/utils";
-import {untracked} from "../core/derivation";
+import {untrackedStart, untrackedEnd} from "../core/derivation";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {ComputedValue} from "../core/computedvalue";
 import {globalState} from "../core/globalstate";
@@ -81,16 +81,20 @@ function executeWrapped(actionName: string, fn: Function, scope: any, args: IArg
 			arguments: flattendArgs
 		});
 	}
-	const res = untracked(
-		() => transaction(
-			() => allowStateChanges(true, () => fn.apply(scope, args)),
-			undefined,
-			false
-		)
-	);
-	if (notifySpy)
-		spyReportEnd({ time: Date.now() - startTime });
-	return res;
+	const prevUntracked = untrackedStart();
+	transactionStart(actionName, scope, false);
+	const prevAllowStateChanges = allowStateChangesStart(true);
+
+	try {
+		return fn.apply(scope, args);
+	}
+	finally {
+		allowStateChangesEnd(prevAllowStateChanges);
+		transactionEnd(false);
+		untrackedEnd(prevUntracked);
+		if (notifySpy)
+			spyReportEnd({ time: Date.now() - startTime });
+	}
 }
 
 export function useStrict(strict: boolean) {
@@ -100,9 +104,18 @@ export function useStrict(strict: boolean) {
 }
 
 export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T): T {
+	const prev = allowStateChangesStart(allowStateChanges);
+	const res = func();
+	allowStateChangesEnd(prev);
+	return res;
+}
+
+function allowStateChangesStart(allowStateChanges: boolean) {
 	const prev = globalState.allowStateChanges;
 	globalState.allowStateChanges = allowStateChanges;
-	const res = func();
+	return prev;
+}
+
+function allowStateChangesEnd(prev: boolean) {
 	globalState.allowStateChanges = prev;
-	return res;
 }

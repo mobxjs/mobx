@@ -236,3 +236,33 @@ test('action should not be converted to computed when using (extend)observable',
 
 	t.end();
 })
+
+test('#286 exceptions in actions should not affect global state', t => {
+	var autorunTimes = 0;
+    function Todos() {
+		mobx.extendObservable(this, {
+			count: 0,
+			add: mobx.action(function() {
+				this.count++;
+				if (this.count === 2) {
+					throw new Error('An Action Error!');
+				}
+			})
+		})
+    }
+    const todo = new Todos;
+    mobx.autorun(() => {
+		autorunTimes++;
+		return todo.count;
+    });
+    try {
+		todo.add();
+		t.equal(autorunTimes, 2);
+		todo.add();
+    } catch (e) {
+		t.equal(autorunTimes, 3);
+		todo.add();
+		t.equal(autorunTimes, 4);
+    }
+	t.end();
+})
