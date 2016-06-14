@@ -1,7 +1,7 @@
 import {Lambda, getNextId, deprecated, invariant} from "../utils/utils";
 import {assertUnwrapped} from "../types/modifiers";
 import {Reaction} from "../core/reaction";
-import {untracked} from "../core/derivation";
+import {untrackedStart, untrackedEnd} from "../core/derivation";
 import {action} from "../core/action";
 
 /**
@@ -91,7 +91,9 @@ export function when(arg1: any, arg2: any, arg3?: any, arg4?: any) {
 				disposer();
 			else
 				disposeImmediately = true;
-			untracked(() => effect.call(scope));
+			const prevUntracked = untrackedStart();
+			effect.call(scope);
+			untrackedEnd(prevUntracked);
 		}
 	});
 	if (disposeImmediately)

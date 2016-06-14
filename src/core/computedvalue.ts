@@ -1,6 +1,7 @@
 import {IObservable, reportObserved, removeObserver} from "./observable";
-import {IDerivation, trackDerivedFunction, isComputingDerivation, untracked} from "./derivation";
+import {IDerivation, trackDerivedFunction, isComputingDerivation, untrackedStart, untrackedEnd} from "./derivation";
 import {globalState} from "./globalstate";
+import {allowStateChangesStart, allowStateChangesEnd} from "./action";
 import {getNextId, valueDidChange, invariant, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "../core/spy";
 import {autorun} from "../api/autorun";
@@ -38,12 +39,9 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 
 	peek() {
 		this.isComputing = true;
-		const prevAllowStateChanges = globalState.allowStateChanges;
-		globalState.allowStateChanges = false;
-
+		const prevAllowStateChanges = allowStateChangesStart(false);
 		const res = this.derivation.call(this.scope);
-
-		globalState.allowStateChanges = prevAllowStateChanges;
+		allowStateChangesEnd(prevAllowStateChanges);
 		this.isComputing = false;
 		return res;
 	};
@@ -120,9 +118,9 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 		return autorun(() => {
 			let newValue = this.get();
 			if (!firstTime || fireImmediately) {
-				untracked(() => {
-					listener(newValue, prevValue);
-				});
+				const prevU = untrackedStart();
+				listener(newValue, prevValue);
+				untrackedEnd(prevU);
 			}
 			firstTime = false;
 			prevValue = newValue;

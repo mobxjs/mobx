@@ -1,5 +1,5 @@
 import {Lambda, once} from "../utils/utils";
-import {untracked} from "../core/derivation";
+import {untrackedStart, untrackedEnd} from "../core/derivation";
 
 export interface IListenable {
 	changeListeners: Function[];
@@ -21,18 +21,18 @@ export function registerListener<T>(listenable: IListenable, handler: Function):
 }
 
 export function notifyListeners<T>(listenable: IListenable, change: T | T[]) {
-	untracked(() => {
-		let listeners = listenable.changeListeners;
-		if (!listeners)
-			return;
-		listeners = listeners.slice();
-		if (Array.isArray(change)) {
-			for (let i = 0, l = listeners.length; i < l; i++)
-				listeners[i].apply(null, change);
-		}
-		else {
-			for (let i = 0, l = listeners.length; i < l; i++)
-				listeners[i](change);
-		}
-	});
+	const prevU = untrackedStart();
+	let listeners = listenable.changeListeners;
+	if (!listeners)
+		return;
+	listeners = listeners.slice();
+	if (Array.isArray(change)) {
+		for (let i = 0, l = listeners.length; i < l; i++)
+			listeners[i].apply(null, change);
+	}
+	else {
+		for (let i = 0, l = listeners.length; i < l; i++)
+			listeners[i](change);
+	}
+	untrackedEnd(prevU);
 }

@@ -110,12 +110,12 @@ export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T):
 	return res;
 }
 
-function allowStateChangesStart(allowStateChanges: boolean) {
+export function allowStateChangesStart(allowStateChanges: boolean) {
 	const prev = globalState.allowStateChanges;
 	globalState.allowStateChanges = allowStateChanges;
 	return prev;
 }
 
-function allowStateChangesEnd(prev: boolean) {
+export function allowStateChangesEnd(prev: boolean) {
 	globalState.allowStateChanges = prev;
 }
