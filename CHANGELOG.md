@@ -9,6 +9,7 @@
 * Map keys are now always coerced to strings. Fixes #308
 * `when`, `autorun` and `autorunAsync` now accept custom debug names (see #293, by @jamiewinder)
 * Fixed #286: autorun's no longer stop working if an action throws an exception
+* Implemented `runInAction`, can be used to create on the fly actions, see #299
 
 # 2.2.2:
 

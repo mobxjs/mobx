@@ -32,6 +32,7 @@ test('correct api should be exposed', function(t) {
 		'observable',
 		'observe',
 		'reaction',
+		'runInAction',
 		'spy',
 		'toJS',
 		'toJSON',

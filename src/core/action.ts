@@ -51,6 +51,20 @@ export function isAction(thing: any) {
 	return typeof thing === "function" && thing.isMobxAction === true;
 }
 
+export function runInAction<T>(block: () => T, scope?: any);
+export function runInAction<T>(name: string, block: () => T, scope?: any);
+export function runInAction<T>(arg1, arg2?, arg3?) {
+	const actionName = typeof arg1 === "string" ? arg1 : arg1.name || "<unnamed action>";
+	const fn = typeof arg1 === "function" ? arg1 : arg2;
+	const scope = typeof arg1 === "function" ? arg2 : arg3;
+
+	invariant(typeof fn === "function", "`runInAction` expects a function");
+	invariant(fn.length === 0, "`runInAction` expects a function without arguments");
+	invariant(typeof actionName === "string" && actionName.length > 0, `actions should have valid names, got: '${actionName}'`);
+
+	return executeWrapped(actionName, fn, scope, undefined);
+}
+
 export function actionImplementation(actionName: string, fn: Function): Function {
 	invariant(typeof fn === "function", "`action` can only be invoked on functions");
 	invariant(typeof actionName === "string" && actionName.length > 0, `actions should have valid names, got: '${actionName}'`);

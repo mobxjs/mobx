@@ -23,7 +23,7 @@ export { IAtom, Atom                                          } from "./core/ato
 export { IObservable, IDepTreeNode                            } from "./core/observable";
 export { Reaction                                             } from "./core/reaction";
 export { IDerivation, untracked                               } from "./core/derivation";
-export { action, useStrict, isAction                          } from "./core/action";
+export { action, useStrict, isAction, runInAction             } from "./core/action";
 export { spy                                                  } from "./core/spy";
 export { transaction                                          } from "./core/transaction";
 
