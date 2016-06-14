@@ -8,8 +8,11 @@ Unlike `autorun` the side effect won't be run directly when created, but only wh
 Any observables that are accessed while executing the side effect will not be tracked.
 The side effect can be debounced, just like `autorunAsync`.
 `reaction` returns a disposer function.
+If a string is passed as first argument to `reaction`, it will be used as debug name.
 
 It is important to notice that the side effect will *only* react to data that was *accessed* in the data expression, which might be less then the data that is actually used in the effect.
+Also, the side effect will only be triggered when the data returned by the expression has changed (the `asStructure` modifier can be used to enforce deep comparison).
+In other words: reaction requires you to produce the things you need in your side effect.
 
 In the following example both `reaction1`, `reaction2` and `autorun1` will react to the addition, removal or replacement of todo's in the `todos` array.
 But only `reaction2` and `autorun` will react to the change of a `title` in one of the todo items, because `title` is used in the data expression of reaction 2, while it isn't in the data expression of reaction 1.

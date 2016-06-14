@@ -62,6 +62,7 @@ Usage:
 * `@action boundClassMethod = (args) => { body }`
 * `@action(name) boundClassMethod = (args) => { body }`
 
+For one-time-actions `runInAction(name?, fn, scope?)` can be used, which is sugar for `action(name, fn, scope)()`.
 
 ## Reactions
 *Computed values* are **values** that react automatically to state changes.
@@ -83,22 +84,22 @@ Usage:
 
 
 ### `autorun`
-Usage: `autorun(() => { sideEffect })`. Autorun runs the provided `sideEffect` and tracks which observable state is accessed while running the side effect.
+Usage: `autorun(debugname?, () => { sideEffect })`. Autorun runs the provided `sideEffect` and tracks which observable state is accessed while running the side effect.
 Whenever one of the used observables is changed in the future, the same sideEffect will be run again.
 Returns a disposer function to cancel the side effect. [&laquo;details&raquo;](autorun.md)
 
 ### `when`
-Usage: `when(() => condition, () => { sideEffect })`.
+Usage: `when(debugname?, () => condition, () => { sideEffect })`.
 The condition expression will react automatically to any observables is uses.
 As soon as the expression returns true the sideEffect function will be invoked, but only once.
 `when` returns a disposer to prematurely cancel the whole thing. [&laquo;details&raquo;](when.md)
 
 ### `autorunAsync`
-Usage: `autorunAsync(() => { sideEffect }, delay)`. Similar to `autorun`, but the sideEffect will be delayed and debounced with the given `delay`.
+Usage: `autorunAsync(debugname?, () => { sideEffect }, delay)`. Similar to `autorun`, but the sideEffect will be delayed and debounced with the given `delay`.
 [&laquo;details&raquo;](autorun-async.md)
 
 ### `reaction`
-Usage: `reaction(() => data, data => { sideEffect }, fireImmediately = false, delay = 0)`.
+Usage: `reaction(debugname?, () => data, data => { sideEffect }, fireImmediately = false, delay = 0)`.
 A variation on `autorun` that gives more fine-grained control on which observables that will be tracked.
 It takes two function, the first one is tracked and returns data that is used as input for the second one, the side effect.
 Unlike `autorun` the side effect won't be run initially, and any observables that are accessed while executing the side effect will not be tracked.
@@ -130,6 +131,9 @@ Works for all observables, computed values and disposer functions of reactions. 
 
 ### `isObservableObject|Array|Map`
 Usage: `isObservableObject(thing)`, `isObservableArray(thing)`, `isObservableMap(thing)`. Returns `true` if.., well, do the math.  
+
+### `isAction`
+Usage: `isAction(func)`. Returns true if the given function is wrapped / decorated with `action`.
 
 ### `createTransformer`
 Usage: `createTransformer(transformation: A => B, onCleanup?): A = B`. 
@@ -170,6 +174,17 @@ Registers a global spy listener that listens to all events that happen in MobX.
 It is similar to attaching an `observe` listener to *all* observables at once, but also notifies about running (trans/re)actions and computations.
 Used for example by the `mobx-react-devtools`.  
 [&laquo;details&raquo;](spy.md) 
+
+### `whyRun`
+Usage:
+* `whyRun()`
+* `whyRun(Reaction object / ComputedValue object / disposer function)`
+* `whyRun(object, "computed property name")`
+
+`whyRun` is a small utility that can be used inside computed value or reaction (`autorun`, `reaction` or the `render` method of an `observer` React component)
+and prints why the derivation is currently running, and under which circumstances it will run again. 
+This should help to get a deeper understanding when and why MobX runs stuff, and prevent some beginner mistakes. 
+
 
 ### `extras.getAtom`
 Usage: `getAtom(thing, property?)`.

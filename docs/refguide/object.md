@@ -5,15 +5,21 @@ MobX will recursively pass all its values through `observable`.
 This way the complete object (tree) is in-place instrumented to make it observable.
 
 ```javascript
-import {observable, autorun} from "mobx";
+import {observable, autorun, action} from "mobx";
 
 var person = observable({
+    // observable properties:
 	name: "John",
 	age: 42,
 	showAge: false,
+    // computed property:
 	labelText: function() {
 		return this.showAge ? `${this.name} (age: ${this.age})` : this.name;
-	}
+	},
+    // action:
+    setAge: action(function() {
+        this.age = 21;
+    })
 });
 
 // object properties don't expose an 'observe' method,
@@ -23,7 +29,7 @@ autorun(() => console.log(person.labelText));
 person.name = "Dave";
 // prints: 'Dave'
 
-person.age = 21;
+person.setAge(21);
 // etc
 ```
 
@@ -35,6 +41,7 @@ Properties that are added to the object at a later time won't become observable,
 Either use the [`@observable`](observable.md) annotation or the [`extendObservable`](extend-observable.md) function.
 * Argumentless functions will be automatically turned into views, just like [`@computed`](computed-decorator) would do. For view `this` will be automatically bound to the object it is defined on.
 However, if a function expression (ES6 / TypeScript) is used, `this` will be bound to `undefined`, so you probably want to either to refer to the object directly, or to use a classic function.
+* However (argumentless) functions that are declared as `action` will not be converted into computed views, but will keep their semantics.
 * `observable` is applied recursively, both on instantiation and to any new values that will be assigned to observable properties in the future.
 * These defaults are fine in 95% of the cases, but for more fine-grained on how and which properties should be made observable, see the [modifiers](modifiers.md) section.
 

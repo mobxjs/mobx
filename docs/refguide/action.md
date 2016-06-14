@@ -40,16 +40,26 @@ Two example actions from the `contact-list` project:
 	}
 ```
 
-## Note on async actions
+## `async` actions and `runInAction`.
 
 `action` only affects the currently running function, not functions that are scheduled (but not invoked) by the current function!
 This means that if you have a `setTimeout`, promise`.then` or `async` construction, and in that callback some more state is changed, those callbacks should be wrapped in `action` as well!
-For debugging purposes, you can then give them a nice name as well :)
+This is demonstrated above with the `"createRandomContact-callback"` action.
 
-So the second `action` is required in the next example if in _strict mode_, as the asynchronous function will modify state:
+If you use `async` / `await`, this is a bit trickier as you cannot just wrap the async function body in `action`.
+In this situation `runInAction` can come in handy, wrap this around the places where you intend to update the state.
+(But don't make `await` calls in these blocks).
+
+Example:
 ```javascript
-@action /*optional*/ updateDocument = async action/*required!*/(() => {
-   this.isSaving = true;
-   ....
-})
+@action /*optional*/ updateDocument = async () => {
+    const data = await fetchDataFromUrl();
+    /* required in strict mode to be allowed to update state: */
+    runInAction("update state after fetching data", () => {
+        this.data.replace(data);
+        this.isSaving = true;
+    })
+}
 ```
+
+The usage of `runInAction` is: `runInAction(name?, fn, scope?)`.

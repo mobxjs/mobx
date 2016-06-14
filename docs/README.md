@@ -6,23 +6,27 @@ _Simple, scalable state management_
 [![Build Status](https://travis-ci.org/mobxjs/mobx.svg?branch=master)](https://travis-ci.org/mobxjs/mobx)
 [![Coverage Status](https://coveralls.io/repos/mobxjs/mobx/badge.svg?branch=master&service=github)](https://coveralls.io/github/mobxjs/mobx?branch=master)
 [![Join the chat at https://gitter.im/mobxjs/mobx](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mobxjs/mobx?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![#mobx channel on reactiflux discord](https://img.shields.io/badge/discord-%23mobx%20%40reactiflux-blue.svg)](https://discord.gg/0ZcbPKXt5bYAa2J1)
 
 * Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`
 * [Ten minute, interactive MobX + React tutorial](https://mobxjs.github.io/mobx/getting-started.html)
 * [Official documentation and API overview](https://mobxjs.github.io/mobx/refguide/api.html)
-* Videos: [Screencast: intro to MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8) &mdash; State Management Is Easy, React Amsterdam 2016 conf (coming soon) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx)) &mdash; [Transparent Reactive Programming and Mutable Data, Reactive2015 conf](https://www.youtube.com/watch?v=FEwLwiizlk0) ([slides](https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures))
+* Videos: 
+  * [Egghead.io lesson 1: syncing the UI with the app state using observable and observer](https://egghead.io/lessons/javascript-mobx-and-react-intro-syncing-the-ui-with-the-app-state-using-observable-and-observer)
+  * [Practical React with MobX](https://www.youtube.com/watch?v=XGwuM_u7UeQ). In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth.
+  * [Screencast: intro to MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8)
+  * [State Management Is Easy, React Amsterdam 2016 conf](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
+  * [Transparent Reactive Programming and Mutable Data, Reactive2015 conf](https://www.youtube.com/watch?v=FEwLwiizlk0) ([slides](https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures))
 
 ## Introduction
 
 MobX is a battle tested library that makes state management simple and scalable by transparently applying functional reactive programming (TFRP).
 The philosophy behind MobX is very simple:
 
-_Everything that can be derived from the application state, should be derived. Automatically._
+_Anything that can be derived from the application state, should be derived. Automatically._
 
 which includes the UI, data serialization, server communication, etc.
 
-<img alt="MobX unidirectional flow" src="docs/flow.png" height="200" align="center" />
+<img alt="MobX unidirectional flow" src="docs/flow.png" align="center" />
 
 React and MobX together are a powerful combination. React renders the application state by providing mechanisms to translate it into a tree of renderable components. MobX provides the mechanism to store and update the application state that React then uses.
 
@@ -30,7 +34,7 @@ Both React and MobX provide very optimal and unique solutions to common problems
 
 ## Core concepts
 
-MobX has a only few core concepts. The following snippets can be tried online using [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/) (or [without ES6 and JSX](https://jsfiddle.net/rubyred/3rL0183y/10/)).
+MobX has only a few core concepts. The following snippets can be tried online using [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/) (or [without ES6 and JSX](https://jsfiddle.net/rubyred/55oc981v/)).
 
 ### Observable state
 
@@ -70,6 +74,7 @@ If you are using React, you can turn your (stateless function) components into r
 
 ```javascript
 import React, {Component} from 'react';
+import ReactDOM from 'react-dom';
 import {observer} from "mobx-react";
 
 @observer
@@ -97,7 +102,7 @@ const TodoView = observer(({todo}) =>
 );
 
 const store = new TodoList();
-React.render(<TodoListView todoList={store} />, document.getElementById('mount'));
+ReactDOM.render(<TodoListView todoList={store} />, document.getElementById('mount'));
 ```
 
 `observer` turns React (function) components into derivations of the data they render.
@@ -221,6 +226,7 @@ And finally kudo's for all the people that believed in, tried and validated MobX
 * [mobx-store](https://github.com/AriaFallah/mobx-store) A lowdb inspired data store with declarative querying, observable state, and easy undo/redo.
 * [reaxor](https://github.com/KadoBOT/reaxor) Boilerplate for better state management, styling, testing and cleaner code
 * [Smalldots MobX Store](https://github.com/smalldots/mobx-store) Store API for MobX
+* [mobx-roof](https://github.com/mobx-roof/mobx-roof) Simple, React MVVM framework based on mobx
 
 _Feel free to create a PR to add your own!_
 
@@ -233,6 +239,8 @@ _Feel free to create a PR to add your own!_
 * [react-particles-experiment](https://github.com/mobxjs/react-particles-experiment) MobX port of React-Particles-Experiment, showing MobX + Flux action dispatching
 * A simple webshop using [React + mobx](https://jsfiddle.net/mweststrate/46vL0phw) or [JQuery + mobx](http://jsfiddle.net/mweststrate/vxn7qgdw).
 * [Simple timer](https://jsfiddle.net/mweststrate/wgbe4guu/) application in JSFiddle.
+* [Google Play Music Desktop Remote](https://github.com/GPMDP/google-play-music-desktop-remote) A React-Native app for remote controlling Google Play Music Desktop: MobX + WebSocket.
+* [React Portal](https://github.com/vinej/react-portal) A Dashboard example created with React/Mobx with a Flux pattern inspired by Redux.
 
 ## What others are saying...
 

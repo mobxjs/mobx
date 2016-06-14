@@ -1,6 +1,6 @@
 # when
 
-`when(predicate: () => boolean, effect: () => void, scope?)`
+`when(debugName?, predicate: () => boolean, effect: () => void, scope?)`
 
 `when` observes & runs the given `predicate` until it returns true.
 Once that happens, the given `effect` is executed and the autorunner is disposed.

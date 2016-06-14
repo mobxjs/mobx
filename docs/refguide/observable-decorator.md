@@ -24,6 +24,14 @@ class OrderLine {
 If your environment doesn't support decorators or field initializers,
 `@observable key = value;` is sugar for [`extendObservable(this, { key: value })`](extend-observable.md)
 
+Enumerability: properties decorator with `@observable` are enumerable, but defined on the class prototype and not on the class instances.
+In other words:
+
+```javascript
+const line = new OrderLine();
+console.log("price" in line) // true
+console.log(line.hasOwnProperty("price")) // false, the price _property_ is defined on the class, although the value will be stored per instance.
+```
 
 ### Enabling decorators in your transpiler
 
