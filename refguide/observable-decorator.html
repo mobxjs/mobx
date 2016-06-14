@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="2.2" data-basepath=".." data-revision="Tue Jun 14 2016 11:45:14 GMT+0200 (CEST)">
+    <div class="book" data-level="2.2" data-basepath=".." data-revision="Tue Jun 14 2016 13:05:26 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -849,6 +849,9 @@ In other words:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> line = <span class="hljs-keyword">new</span> OrderLine();
 <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;price&quot;</span> <span class="hljs-keyword">in</span> line) <span class="hljs-comment">// true</span>
 <span class="hljs-built_in">console</span>.log(line.hasOwnProperty(<span class="hljs-string">&quot;price&quot;</span>)) <span class="hljs-comment">// false, the price _property_ is defined on the class, although the value will be stored per instance.</span>
+</code></pre>
+<p>The <code>@observable</code> decorator can be combined with modifiers like <code>asStructure</code>:</p>
+<pre><code class="lang-javascript">@observable position = asStructure({ x: <span class="hljs-number">0</span>, y: <span class="hljs-number">0</span>})
 </code></pre>
 <h3 id="enabling-decorators-in-your-transpiler">Enabling decorators in your transpiler</h3>
 <p>Decorators are not supported by default when using TypeScript or Babel pending a definitive definition in the ES standard.</p>
