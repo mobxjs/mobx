@@ -78,7 +78,7 @@ export function when(arg1: any, arg2: any, arg3?: any, arg4?: any) {
 		effect = arg3;
 		scope = arg4;
 	} else if (typeof arg1 === "function") {
-		name = ("Autorun@" + getNextId());
+		name = ("When@" + getNextId());
 		predicate = arg1;
 		effect = arg2;
 		scope = arg3;
