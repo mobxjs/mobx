@@ -25,6 +25,7 @@ This feature can probably be improved based on your feedback, so feel free to fi
 * `when`, `autorun` and `autorunAsync` now accept custom debug names (see #293, by @jamiewinder)
 * Fixed #286: autorun's no longer stop working if an action throws an exception
 * Implemented `runInAction`, can be used to create on the fly actions (especially useful in combination with `async/await`, see #299
+* Improved performance and reduced mem usage of decorators signficantly (by defining the properties on the prototype if possible), and removed subtle differences between the implementation and behavior in babel and typescript.
 * Updated logo as per #244. Tnx @osenvosem!
 
 # 2.2.2:
