@@ -105,3 +105,62 @@ test('effect debounce + fire immediately is honored', t => {
 		t.equal(exprCount, 3)
 	}, 500)
 })
+
+test("#278 do not rerun if expr output doesn't change", t => {
+	var a = mobx.observable(1);
+	var values = [];
+
+	var d = reaction(() => a.get() < 10 ? a.get() : 11, newValue => {
+		values.push(newValue);
+	})
+
+	a.set(2);
+	a.set(3);
+	a.set(10);
+	a.set(11);
+	a.set(12);
+	a.set(4);
+	a.set(5);
+	a.set(13);
+
+	d();
+	a.set(4);
+
+	t.deepEqual(values, [2, 3, 11, 4, 5, 11]);
+	t.end();
+})
+
+test("#278 do not rerun if expr output doesn't change structurally", t => {
+	var users = mobx.observable([
+		{
+			name: "jan",
+			uppername: function() { return this.name.toUpperCase() }
+		},
+		{
+			name: "piet",
+			uppername: function() { return this.name.toUpperCase() }
+		}
+	]);
+	var values = [];
+
+	var d = reaction(mobx.asStructure(
+		() => users.map(user => user.uppername)	
+	), newValue => {
+		values.push(newValue);
+	}, true)
+
+	users[0].name = "john";
+	users[0].name = "JoHn";
+	users[0].name = "jOHN";
+	users[1].name = "johan";
+
+	d();
+	users[1].name = "w00t";
+
+	t.deepEqual(values, [
+		["JAN", "PIET"],
+		["JOHN", "PIET"],
+		["JOHN", "JOHAN"]
+	]);
+	t.end();
+})

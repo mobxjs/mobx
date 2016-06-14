@@ -10,6 +10,7 @@
 * `when`, `autorun` and `autorunAsync` now accept custom debug names (see #293, by @jamiewinder)
 * Fixed #286: autorun's no longer stop working if an action throws an exception
 * Implemented `runInAction`, can be used to create on the fly actions, see #299
+* Updated semantics of `reaction` as discussed in `#278`. The expression now needs to return a value and the side effect won't be triggered if the result didn't change. `asStructure` is supported in these cases.
 
 # 2.2.2:
 

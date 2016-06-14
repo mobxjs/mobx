@@ -1,5 +1,5 @@
-import {Lambda, getNextId, deprecated, invariant} from "../utils/utils";
-import {assertUnwrapped} from "../types/modifiers";
+import {Lambda, getNextId, deprecated, invariant, valueDidChange} from "../utils/utils";
+import {assertUnwrapped, ValueMode, getValueModeFromValue} from "../types/modifiers";
 import {Reaction} from "../core/reaction";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
 import {action} from "../core/action";
@@ -172,7 +172,7 @@ export function reaction<T>(arg1: any, arg2: any, arg3: any, arg4?: any, arg5?: 
 		fireImmediately = arg4;
 		delay = arg5;
 		scope = arg6;
-	} else if (typeof arg1 === "function") {
+	} else {
 		name = arg1.name || arg2.name || ("Reaction@" + getNextId());
 		expression = arg1;
 		effect = arg2;
@@ -187,20 +187,30 @@ export function reaction<T>(arg1: any, arg2: any, arg3: any, arg4?: any, arg5?: 
 	if (delay === void 0)
 		delay = 0;
 
+	let [valueMode, unwrappedExpression] = getValueModeFromValue(expression, ValueMode.Reference);
+	const compareStructural = valueMode === ValueMode.Structure;
+
 	if (scope) {
-		expression = expression.bind(scope);
+		unwrappedExpression = unwrappedExpression.bind(scope);
 		effect = action(name, effect.bind(scope));
 	}
 
 	let firstTime = true;
 	let isScheduled = false;
+	let nextValue = undefined;
 
 	function reactionRunner () {
 		if (r.isDisposed)
 			return;
-		let nextValue;
-		r.track(() => nextValue = expression());
-		if (!firstTime || fireImmediately)
+		let changed = false;
+		r.track(() => {
+			const v = unwrappedExpression();
+			changed = valueDidChange(compareStructural, nextValue, v);
+			nextValue = v;
+		});
+		if (firstTime && fireImmediately)
+			effect(nextValue);
+		if (!firstTime && changed === true)
 			effect(nextValue);
 		if (firstTime)
 			firstTime = false;
