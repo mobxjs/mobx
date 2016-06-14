@@ -122,7 +122,9 @@ const todoStore = new TodoStore();
 
                         <p>We just created a <code>todoStore</code> instance with a <code>todos</code> collection. 
                             Time to fill the todoStore with some objects. 
-                            To make sure we see the effects of our changes we invoke <code>todoStore.report</code> after each change and log it:
+                            To make sure we see the effects of our changes we invoke <code>todoStore.report</code> after each change and log it.
+                            Note that the report intentionally always prints the <em>first</em> task only.
+                            It makes this example a bit artificial, but as you will see below it nicely demonstrates that MobX's dependency tracking is dynamic. 
                         </p>
 
                         <textarea spellcheck="false" class="prettyprint" id="code2" rows="15">
