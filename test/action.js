@@ -270,6 +270,13 @@ test('#286 exceptions in actions should not affect global state', t => {
 test('runInAction', t => {
 	mobx.useStrict(true);
 	var values = [];
+	var events = [];
+	var spyDisposer = mobx.spy(ev => {
+		if (ev.type === 'action') events.push({
+			name: ev.name,
+			arguments: ev.arguments
+		})
+	});
 
 	var observable = mobx.observable(0);
 	var d = mobx.autorun(() => values.push(observable.get()));
@@ -291,7 +298,14 @@ test('runInAction', t => {
 
 	t.equal(res, 3);
 	t.deepEqual(values, [0, 9, 15]);
+	t.deepEqual(events, [ 
+		{ arguments: [], name: 'increment' },
+		{ arguments: [], name: '<unnamed action>' } 
+	]);
 
 	mobx.useStrict(false);
+	spyDisposer();
+
+	d();
 	t.end();
 })

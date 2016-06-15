@@ -1,3 +1,7 @@
+# 2.3.1
+
+* Fixed #327: spy not working with runInAction
+
 # 2.3.0
 
 ### Introduced `whyRun`:

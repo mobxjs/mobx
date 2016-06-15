@@ -1,5 +1,5 @@
 import {transactionStart, transactionEnd} from "../core/transaction";
-import {invariant} from "../utils/utils";
+import {invariant, EMPTY_ARRAY} from "../utils/utils";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {ComputedValue} from "../core/computedvalue";
@@ -85,7 +85,7 @@ function executeWrapped(actionName: string, fn: Function, scope: any, args: IArg
 	if (notifySpy) {
 		startTime = Date.now();
 		const flattendArgs = [];
-		for (let i = 0, l = args.length; i < l; i++)
+		if (args) for (let i = 0, l = args.length; i < l; i++)
 			flattendArgs.push(args[i]);
 		spyReportStart({
 			type: "action",
