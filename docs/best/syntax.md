@@ -91,7 +91,7 @@ If stateless component functions are used:
 
 ```javascript
 var MyOtherComponent = observer(function(props) {
-    return <div>{props.user.name{/div};
+    return <div>{props.user.name}</div>;
 });
 ```
 
