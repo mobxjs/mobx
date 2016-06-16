@@ -89,7 +89,7 @@ export function createClassPropertyDecorator(
 		return function() {
 			/** Direct invocation: @decorator bla */
 			if (quacksLikeADecorator(arguments))
-				return classPropertyDecorator.apply(null, arguments);
+				return classPropertyDecorator(...arguments);
 			/** Indirect invocation: @decorator(args) bla */
 			const outerArgs = arguments;
 			return (target, key, descriptor) => classPropertyDecorator(target, key, descriptor, outerArgs);

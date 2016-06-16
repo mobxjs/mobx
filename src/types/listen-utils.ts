@@ -26,13 +26,13 @@ export function notifyListeners<T>(listenable: IListenable, change: T | T[]) {
 	if (!listeners)
 		return;
 	listeners = listeners.slice();
-	if (Array.isArray(change)) {
-		for (let i = 0, l = listeners.length; i < l; i++)
-			listeners[i].apply(null, change);
-	}
-	else {
-		for (let i = 0, l = listeners.length; i < l; i++)
+	for (let i = 0, l = listeners.length; i < l; i++) {
+		if (Array.isArray(change)) {
+			listeners[i](...change);
+		}
+		else {
 			listeners[i](change);
+		}
 	}
 	untrackedEnd(prevU);
 }

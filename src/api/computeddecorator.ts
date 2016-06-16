@@ -40,7 +40,7 @@ export function computed(targetOrExpr: any, keyOrScope?: any, baseDescriptor?: P
 	if (arguments.length < 3 && typeof targetOrExpr === "function")
 		return computedExpr(targetOrExpr, keyOrScope);
 	invariant(!baseDescriptor || !baseDescriptor.set, `@observable properties cannot have a setter: ${keyOrScope}`);
-	return computedDecorator.apply(null, arguments);
+	return computedDecorator(...arguments);
 }
 
 function computedExpr<T>(expr: () => T, scope?: any) {

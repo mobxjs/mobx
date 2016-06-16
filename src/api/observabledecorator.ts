@@ -39,5 +39,5 @@ export function observableDecorator(target: Object, key: string, baseDescriptor:
 	invariant(arguments.length >= 2 && arguments.length <= 3, "Illegal decorator config", key);
 	assertPropertyConfigurable(target, key);
 	invariant(!baseDescriptor || !baseDescriptor.get, "@observable can not be used on getters, use @computed instead");
-	return decoratorImpl.apply(null, arguments);
+	return decoratorImpl(...arguments);
 }

@@ -13,7 +13,7 @@ export class SimpleEventEmitter {
 	emit() {
 		const listeners = this.listeners.slice();
 		for (let i = 0, l = listeners.length; i < l; i++)
-			listeners[i].apply(null, arguments);
+			listeners[i](...arguments);
 	}
 
 	on(listener: ISimpleEventListener): Lambda {
