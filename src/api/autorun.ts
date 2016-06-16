@@ -103,7 +103,7 @@ export function when(arg1: any, arg2: any, arg3?: any, arg4?: any) {
 
 export function autorunUntil(predicate: () => boolean, effect: Lambda, scope?: any) {
 	deprecated("`autorunUntil` is deprecated, please use `when`.");
-	return when(...arguments);
+	return when.apply(null, arguments);
 }
 
 export function autorunAsync(name: string, func: Lambda, delay?: number, scope?: any);

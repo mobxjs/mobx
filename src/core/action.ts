@@ -44,7 +44,7 @@ export function action(arg1, arg2?, arg3?, arg4?): any {
 	if (arguments.length === 2  && typeof arg2 === "function")
 		return actionImplementation(arg1, arg2);
 
-	return actionDecorator(...arguments);
+	return actionDecorator.apply(null, arguments);
 }
 
 export function isAction(thing: any) {

@@ -23,7 +23,7 @@ export function observable<T extends string|number|boolean|Date|RegExp|Function|
 export function observable<T extends Object>(value: T): T;
 export function observable(v: any = undefined, keyOrScope?: string | any) {
 	if (typeof arguments[1] === "string")
-		return observableDecorator(...arguments);
+		return observableDecorator.apply(null, arguments);
 
 	invariant(arguments.length < 3, "observable expects zero, one or two arguments");
 	if (isObservable(v))

@@ -55,5 +55,5 @@ export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, 
 
 export function toJSON(source, detectCycles: boolean = true, __alreadySeen: [any, any][] = null) {
 	deprecated("toJSON is deprecated. Use toJS instead");
-	return toJS(...arguments);
+	return toJS.apply(null, arguments);
 }

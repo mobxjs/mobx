@@ -28,7 +28,7 @@ export function notifyListeners<T>(listenable: IListenable, change: T | T[]) {
 	listeners = listeners.slice();
 	for (let i = 0, l = listeners.length; i < l; i++) {
 		if (Array.isArray(change)) {
-			listeners[i](...change);
+			listeners[i].apply(null, change);
 		}
 		else {
 			listeners[i](change);
