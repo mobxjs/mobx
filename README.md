@@ -234,6 +234,7 @@ _Feel free to create a PR to add your own!_
 
 * [mobx-react-todomvc](https://github.com/mobxjs/mobx-react-todomvc) TodoMVC reference implementation on top of react-mobx-boilerplate
 * [mobx-react-typescript](https://github.com/contacts-mvc/mobx-react-typescript) An example project using Typescript
+* [ts-mobx-react-starter-kit](https://github.com/Torwori/ts-mobx-react-starter-kit) A starter kit using Typescript
 * [TodoMVC Benchmarking](https://github.com/mweststrate/mobx-todomvc)
 * [mobservable-demo](https://github.com/survivejs/mobservable-demo) The ports of the _Notes_ and _Kanban_ examples from the book "SurviveJS - Webpack and React" to mobservable.
 * [react-particles-experiment](https://github.com/mobxjs/react-particles-experiment) MobX port of React-Particles-Experiment, showing MobX + Flux action dispatching
