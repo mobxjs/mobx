@@ -2,7 +2,7 @@
 
 `observable(asMap(values?, modifier?))` (and `map(values?, modifier?)`) creates a dynamic keyed observable map.
 Observable maps are very useful if you don't want to react just to the change of a specific entry, but also to the addition or removal of entries.
-Optionally takes an object or entries array with initially values.
+Optionally takes an object or entries array with initial values.
 Unlike ES6 maps, only strings are accepted as keys.
 The modifier param can be one of the MobX [modifiers](modifiers.md), such as `asReference`.
 
