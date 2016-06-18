@@ -1,6 +1,7 @@
 # 2.3.2
 
-* Fixed #328: Exception when inspecting observable in `onBecomeObserved`
+* Fixed #328: Fixed exception when inspecting observable in `onBecomeObserved`
+* Fixed #341: `array.find` now returns `undefined` instead of `null` when nothing was found, behavior now matches the docs. (By @hellectronic)
 
 # 2.3.1
 

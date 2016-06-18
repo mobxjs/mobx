@@ -106,7 +106,7 @@ test('find and remove', function(t) {
     t.equal(a.find(predicate, null, 2), 20);
     t.equal(idx, 2);
     idx = -1;
-    t.equal(a.find(predicate, null, 3), null);
+    t.equal(a.find(predicate, null, 3), undefined);
     t.equal(idx, -1);
 
     t.equal(a.remove(20), true);
@@ -114,7 +114,7 @@ test('find and remove', function(t) {
     t.equal(idx, 1);
     idx = -1;
     t.equal(a.remove(20), true);
-    t.equal(a.find(predicate), null);
+    t.equal(a.find(predicate), undefined);
     t.equal(idx, -1);
 
     t.equal(a.remove(20), false);
