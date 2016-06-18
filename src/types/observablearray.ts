@@ -276,7 +276,7 @@ export class ObservableArray<T> extends StubArray {
 		for (let i = fromIndex; i < l; i++)
 			if (predicate.call(thisArg, items[i], i, this))
 				return items[i];
-		return null;
+		return undefined;
 	}
 
 	/*
