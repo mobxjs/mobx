@@ -1,3 +1,7 @@
+# 2.3.2
+
+* Fixed #328: Exception when inspecting observable in `onBecomeObserved`
+
 # 2.3.1
 
 * Fixed #327: spy not working with runInAction

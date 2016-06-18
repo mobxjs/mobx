@@ -76,8 +76,8 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	try {
 		const result = f.call(derivation);
 		hasException = false;
-		bindDependencies(derivation, prevObserving);
 		globalState.isTracking = prevTracking;
+		bindDependencies(derivation, prevObserving);
 		return result;
 	} finally {
 		if (hasException) {

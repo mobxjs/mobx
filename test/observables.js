@@ -1579,3 +1579,16 @@ test('autoruns created in autoruns should kick off', function(t) {
 
 	t.end();
 });
+
+test('#328 atom throwing exception if observing stuff in onObserved', t => {
+	var b = mobx.observable(1)
+	var a = new mobx.Atom('test atom', () => {
+		b.get();
+	});
+	var d = mobx.autorun(() => {
+		a.reportObserved(); // threw
+	})
+	d();
+	t.end()
+});
+
