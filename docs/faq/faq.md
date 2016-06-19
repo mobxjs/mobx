@@ -18,7 +18,7 @@ If the state has been made observable by MobX, it will then take care of updatin
 ##### Is React Native supported?
 
 Yes, `mobx` and `mobx-react` will work on React Native. The latter through importing `"mobx-react/native"`.
-The devtools don't support React Native.
+The devtools don't support React Native. Note that if you indend to store state in a component that you want to be able to use with hot reloading, do not use decorators (annotations) in the component, use the functions instead (eg. `action(fn)` instead of `@actions`).
 
 ##### How does MobX compare to other Reactive frameworks?
 
