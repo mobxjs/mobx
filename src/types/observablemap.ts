@@ -203,7 +203,11 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	values(): V[] {
 		return this.keys().map(this.get, this);
 	}
-
+	
+	[Symbol.iterator](): IMapEntries<V> {
+		return this.entries();
+	}
+	
 	entries(): IMapEntries<V> {
 		return this.keys().map(key => <[string, V]>[key, this.get(key)]);
 	}
