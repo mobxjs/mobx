@@ -73,11 +73,16 @@ In combination with `@observer` decorator from the `mobx-react` package:
 
 ```javascript
 var MyComponent = observer(React.createClass({
+    componentWillMount: function() {
+        mobx.extendObservable(this, {
+            greeting: "Hello"
+        });
+    },
     render: function() {
-        return <button onClick={this.onButtonClick}>Hi</button>
+        return <button onClick={this.onButtonClick}>{this.greeting}, world</button>
     },
     onButtonClick: function(e) {
-        // bound function
+        this.greeting = "Hi"
     }
 });
 ```
@@ -86,7 +91,7 @@ If stateless component functions are used:
 
 ```javascript
 var MyOtherComponent = observer(function(props) {
-    return <div>{props.user.name{/div};
+    return <div>{props.user.name}</div>;
 });
 ```
 

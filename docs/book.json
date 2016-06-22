@@ -1,6 +1,9 @@
 {
-    "plugins":["ga", "disqus", "edit-link"],
+    "plugins":["github", "ga", "disqus", "edit-link"],
     "pluginsConfig": {
+        "github": {
+            "url": "https://github.com/mobxjs/mobx"
+        },
         "edit-link": {
             "base": "https://github.com/mobxjs/mobx/tree/gh-pages/docs",
             "label": "Edit This Page"
