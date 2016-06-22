@@ -122,6 +122,10 @@ Modifiers can be used to influence how `observable` treats specific values.
 
 _Here are some utilities that might make working with observable objects or computed values more convenient._
 
+### `Provider` (`mobx-react` package)
+
+Can be used to pass stores to child components using React's context mechanism. See the [`mobx-react` docs](https://github.com/mobxjs/mobx-react#provider-experimental).
+
 ### `toJS`
 Usage: `toJS(observableDataStructure)`. Converts observable data structures back to plain javascript objects, ignoring computed values. [&laquo;details&raquo;](toJS.md)
 

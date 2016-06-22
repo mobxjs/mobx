@@ -85,6 +85,45 @@ import {observable} from "mobx"
 React.render(<Timer />, document.body)
 ```
 
+For more advantages of using observable local component state, see [3 reasons why I stopped using `setState`](https://medium.com/@mweststrate/3-reasons-why-i-stopped-using-react-setstate-ab73fc67a42e).
+
+## Connect `observer` to stores
+
+The `mobx-react` package also provides the `Provider` component that can be used to pass down stores using React's context mechanism. 
+To connect to those stores, pass an array of store names to `observer`, which will make the stores available as props.
+This is supported when using the decorator (`@observer(["store"]) class ...`, or the function `observer(["store"], React.createClass({ ...``.
+
+Example: 
+
+```javascript
+const colors = observable({
+   foreground: '#000',
+   background: '#fff'
+})
+
+const App = () => {
+  <Provider colors={colors}>
+     <app stuff... />
+  </Provider>
+}
+
+const Button = observer(["colors"], ({ colors, label, onClick }) => 
+  <button style={{
+      color: colors.foreground,
+      backgroundColor: colors.background
+    }}
+    onClick={onClick}
+  >{label}<button>
+)
+
+// later..
+colors.foreground = 'blue';
+// all buttons updated
+```
+
+See for more information the [`mobx-react` docs](https://github.com/mobxjs/mobx-react#provider-experimental).
+
+
 ## When to apply `observer`?
 
 Rule of thumb is to use `observer` on every component in your application that is specific for your application.
