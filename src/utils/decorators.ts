@@ -32,7 +32,7 @@ export function createClassPropertyDecorator(
 		invariant(allowCustomArguments || quacksLikeADecorator(arguments), "This function is a decorator, but it wasn't invoked like a decorator");
 		if (!descriptor) {
 			// typescript (except for getter / setters)
-			return {
+			const descriptor = {
 				enumerable,
 				configurable: true,
 				get: function() {
@@ -48,6 +48,13 @@ export function createClassPropertyDecorator(
 					}
 				}
 			};
+			if (arguments.length < 3) {
+				// Typescript target is ES3, so it won't define property for us
+				// or using Reflect.decorate polyfill, which will return no descriptor
+				// (see https://github.com/mobxjs/mobx/issues/333)
+				Object.defineProperty(target, key, descriptor);
+			}
+			return descriptor;
 		} else {
 			// babel and typescript getter / setter props
 			if (!target.hasOwnProperty("__mobxLazyInitializers")) {
