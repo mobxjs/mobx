@@ -109,26 +109,49 @@ export function defineObservableProperty(adm: ObservableObjectAdministration, pr
 
 	adm.values[propName] = observable;
 	if (asInstanceProperty) {
-		Object.defineProperty(adm.target, propName, {
-			configurable: true,
-			enumerable: !isComputed,
-			get: function() {
-				return observable.get();
-			},
-			set: isComputed
-				? throwingComputedValueSetter
-				: function(v) {
-					setPropertyValue(this, propName, v);
-				}
-		});
+		Object.defineProperty(adm.target, propName, isComputed ? generateComputedPropConfig(propName) : generateObservablePropConfig(propName));
 	}
 	if (!isComputed)
 		notifyPropertyAddition(adm, adm.target, propName, newValue);
 }
 
+const observablePropertyConfigs = {};
+const computedPropertyConfigs = {};
+
+export function generateObservablePropConfig(propName) {
+	const config = observablePropertyConfigs[propName];
+	if (config)
+		return config;
+	return observablePropertyConfigs[propName] = {
+		configurable: true,
+		enumerable: true,
+		get: function() {
+			return this.$mobx.values[propName].get();
+		},
+		set: function(v) {
+			setPropertyValue(this, propName, v);
+		}
+	};
+}
+
+export function generateComputedPropConfig(propName) {
+	const config = computedPropertyConfigs[propName];
+	if (config)
+		return config;
+	return computedPropertyConfigs[propName] = {
+		configurable: true,
+		enumerable: false,
+		get: function() {
+			return this.$mobx.values[propName].get();
+		},
+		set: throwingComputedValueSetter
+	};
+}
+
+
 export function setPropertyValue(instance, name: string, newValue) {
 	const adm = instance.$mobx;
-	const observable = instance.$mobx.values[name];
+	const observable = adm.values[name];
 
 	// intercept
 	if (hasInterceptors(adm)) {

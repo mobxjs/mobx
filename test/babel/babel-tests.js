@@ -481,14 +481,15 @@ test("enumerability", t => {
 		props.push(key);
 
 	t.deepEqual(ownProps, [
+		// should have a, not supported yet in babel...
 	]);
 
-	t.deepEqual(props, [ // also 'a' would be ok
+	t.deepEqual(props, [
 		"a"
 	]);
 
 	t.equal("a" in a, true);
-	t.equal(a.hasOwnProperty("a"), false); // true would be ok as well
+	t.equal(a.hasOwnProperty("a"), false); // true would better..
 	t.equal(a.hasOwnProperty("b"), false);
 	t.equal(a.hasOwnProperty("m"), false);
 	t.equal(a.hasOwnProperty("m2"), false); // true would be ok as well
@@ -507,7 +508,8 @@ test("enumerability", t => {
 	for (var key in a)
 		props.push(key);
 
-	t.deepEqual(ownProps, [ // also 'a' would be ok
+	t.deepEqual(ownProps, [
+		"a"
 	]);
 
 	t.deepEqual(props, [
@@ -515,7 +517,7 @@ test("enumerability", t => {
 	]);
 
 	t.equal("a" in a, true);
-	t.equal(a.hasOwnProperty("a"), false); // true would be ok as well
+	t.equal(a.hasOwnProperty("a"), true);
 	t.equal(a.hasOwnProperty("b"), false);
 	t.equal(a.hasOwnProperty("m"), false);
 	t.equal(a.hasOwnProperty("m2"), true);
@@ -548,3 +550,26 @@ test("issue 285 (babel)", t => {
 
 	t.end();
 })
+
+test("verify object assign (babel)", t => {
+	class Todo {
+		@observable title = "test";
+		@computed get upperCase() {
+			return this.title.toUpperCase()
+		}
+	}
+
+	const todo = new Todo();
+	t.deepEqual(Object.assign({}, todo), {
+//		Should be:	title: "test"! 
+	});
+
+	todo.title; // lazy initialization :'(
+
+	t.deepEqual(Object.assign({}, todo), {
+		title: "test"
+	});
+
+	t.end();
+})
+

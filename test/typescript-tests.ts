@@ -753,6 +753,7 @@ test("enumerability", t => {
 		props.push(key);
 
 	t.deepEqual(ownProps, [
+		"a" // yeej!
 	]);
 
 	t.deepEqual(props, [ // also 'a' would be ok
@@ -760,7 +761,7 @@ test("enumerability", t => {
 	]);
 
 	t.equal("a" in a, true);
-	t.equal(a.hasOwnProperty("a"), false); // true would be ok as well
+	t.equal(a.hasOwnProperty("a"), true);
 	t.equal(a.hasOwnProperty("b"), false);
 	t.equal(a.hasOwnProperty("m"), false);
 	t.equal(a.hasOwnProperty("m2"), true); // false would be ok as well
@@ -779,7 +780,8 @@ test("enumerability", t => {
 	for (var key in a)
 		props.push(key);
 
-	t.deepEqual(ownProps, [ // also 'a' would be ok
+	t.deepEqual(ownProps, [
+		"a"
 	]);
 
 	t.deepEqual(props, [
@@ -787,7 +789,7 @@ test("enumerability", t => {
 	]);
 
 	t.equal("a" in a, true);
-	t.equal(a.hasOwnProperty("a"), false); // true would be ok as well
+	t.equal(a.hasOwnProperty("a"), true);
 	t.equal(a.hasOwnProperty("b"), false);
 	t.equal(a.hasOwnProperty("m"), false);
 	t.equal(a.hasOwnProperty("m2"), true);
@@ -818,5 +820,19 @@ test("issue 285 (babel)", t => {
 		childThings: [1,2,3]
 	})
 
+	t.end();
+})
+
+test("verify object assign (typescript)", t => {
+	class Todo {
+		@observable title = "test";
+		@computed get upperCase() {
+			return this.title.toUpperCase()
+		}
+	}
+
+	t.deepEqual((Object as any).assign({}, new Todo()), {
+		title: "test"
+	});
 	t.end();
 })
