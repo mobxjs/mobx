@@ -1,3 +1,9 @@
+# 3.3.3
+
+* Fixed #186: Log a warning instead of an error if an exception is thrown in a derivation. Fixes issue where React Native would produce unusable error screens (because it shows the first logged error)
+* Fixed #333: Fixed some interoperability issues in combination with `Reflect` / `InversifyJS` decorators.  @andykog
+* Fixed #333: `@observable` class properties are now _owned_ by their instance again, meaning they will show up in `Object.keys()` and `.hasOwnProperty` @andykog
+
 # 2.3.2
 
 * Fixed #328: Fixed exception when inspecting observable in `onBecomeObserved`
