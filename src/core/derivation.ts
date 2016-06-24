@@ -83,8 +83,8 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 		if (hasException) {
 			const message = (
 				`[mobx] An uncaught exception occurred while calculating your computed value, autorun or transformer. Or inside the render() method of an observer based React component. ` +
-				`These methods should never throw exceptions as MobX will usually not be able to recover from them. ` +
-				`Please enable 'Pause on (caught) exceptions' in your debugger to find the root cause. In: '${derivation.name}'`
+				`These functions should never throw exceptions as MobX will not always be able to recover from them. ` +
+				`Please fix the error reported after this message or enable 'Pause on (caught) exceptions' in your debugger to find the root cause. In: '${derivation.name}'`
 			);
 			if (isSpyEnabled()) {
 				spyReport({
@@ -93,7 +93,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 					message
 				});
 			}
-			console.error(message);
+			console.warn(message); // In next major, maybe don't emit this message at all?
 			// Poor mans recovery attempt
 			// Assumption here is that this is the only exception handler in MobX.
 			// So functions higher up in the stack (like transanction) won't be modifying the globalState anymore after this call.

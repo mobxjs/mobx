@@ -222,14 +222,20 @@ test('slow converging cycle', function(t) {
 });
 
 test('error handling assistence ', function(t) {
-    var base = console.error;
+    var baseError = console.error;
+	var baseWarn = console.warn;
     var errors = []; // logged errors
-    var values = []; // produced errors
+    var warns = [];  // logged warns
+	var values = []; // produced errors
     var thrown = []; // list of actually thrown exceptons
 
     console.error = function(msg) {
-        base.apply(console, arguments);
+        baseError.apply(console, arguments);
         errors.push(msg);
+    }
+    console.warn = function(msg) {
+        baseWarn.apply(console, arguments);
+        warns.push(msg);
     }
 
     var a = observable(3);
@@ -261,10 +267,12 @@ test('error handling assistence ', function(t) {
         }
 
         t.deepEqual(values, [6, 4, 14, 8]);
-        t.equal(errors.length, 2);
+        t.equal(errors.length, 0);
+		t.equal(warns.length, 2);
         t.equal(thrown.length, 2);
 
-        console.error = base;
+        console.error = baseError;
+		console.warn = baseWarn;
         t.end();
     }, 10);
 })
