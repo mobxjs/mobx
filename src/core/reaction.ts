@@ -11,7 +11,7 @@ import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
  * This means that they are very suitable for triggering side effects like logging, updating the DOM and making network requests.
  * 2) They are not observable themselves
  * 3) They will always run after any 'normal' derivations
- * 4) They are allowed to change the state and thereby triggering themselvs again, as long as they make sure the state propagates to a stable state in a reasonable amount of iterations.
+ * 4) They are allowed to change the state and thereby triggering themselves again, as long as they make sure the state propagates to a stable state in a reasonable amount of iterations.
  *
  * The state machine of a Reaction is as follows:
  *
