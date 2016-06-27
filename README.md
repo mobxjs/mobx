@@ -204,7 +204,8 @@ And finally kudo's for all the people that believed in, tried and validated MobX
 
 * [Getting Started](https://mobxjs.github.io/mobx/getting-started.html) Ten minute, interactive introduction (with just ES5)
 * [Full API documentation](http://mobxjs.github.io/mobx/)
-* [react-mobservable-boilerplate](https://github.com/mweststrate/react-mobservable-boilerplate) Clone the boilerplate repository containing the above example 
+* [react-mobservable-boilerplate](https://github.com/mweststrate/react-mobservable-boilerplate) Clone the boilerplate repository containing the above example
+* [React-MobX-Webpack-boilerplate](https://github.com/mobxjs/mobx) Easy to use boilerplate to work ReactJS , MobX and webpack
 * [MobX Github](https://github.com/mobxjs) Further boilerplate and example projects for ES5, Babel and Typescript can be found in the  organization on github
 
 ### Blogs & Videos
