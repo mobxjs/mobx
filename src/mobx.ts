@@ -47,6 +47,7 @@ export { expr                                                 } from "./api/expr
 export { toJSON, toJS                                         } from "./api/tojs";
 export { ITransformer, createTransformer                      } from "./api/createtransformer";
 export { whyRun                                               } from "./api/whyrun";
+export { dispose                                              } from "./api/dispose";
 
 export { Lambda                                               } from "./utils/utils";
 export { SimpleEventEmitter, ISimpleEventListener             } from "./utils/simpleeventemitter";
