@@ -40,6 +40,7 @@ Boilerplate projects, example projects with sources, Libraries.
 * The [ports of the _Notes_ and _Kanban_ examples](https://github.com/survivejs/mobx-demo) from the book "SurviveJS - Webpack and React" to MobX.
 * Flux challenge, implemeted with MobX: https://github.com/staltz/flux-challenge/tree/master/submissions/mweststrate
 * MobX + D3 codepen: http://codepen.io/timelyportfolio/pen/zrJwvE
+* TypeScript + React + MobX + JSPM - Simple CRUD App example: https://github.com/piotrwitek/training-management-tool
 
 ## Libraries
 
