@@ -1,0 +1,946 @@
+<!DOCTYPE HTML>
+<html lang="en" >
+    
+    <head>
+        
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <title>Pitfalls &amp; best practices | MobX</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 2.4.3">
+        
+        
+        <meta name="HandheldFriendly" content="true"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+        <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+        
+    <link rel="stylesheet" href="../gitbook/style.css">
+    
+        
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-edit-link/plugin.css">
+        
+    
+        
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
+        
+    
+    
+
+        
+    
+    
+    <link rel="next" href="../best/store.html" />
+    
+    
+    <link rel="prev" href="../faq/faq.html" />
+    
+
+        
+    </head>
+    <body>
+        
+        
+    <div class="book" data-level="7.1" data-basepath=".." data-revision="Tue Jun 28 2016 08:57:11 GMT+0200 (CEST)">
+    
+
+<div class="book-summary">
+    <div class="book-search" role="search">
+        <input type="text" placeholder="Type to search" class="form-control" />
+    </div>
+    <nav role="navigation">
+        <ul class="summary">
+            
+            
+            
+            
+
+            
+
+            
+    
+        <li class="chapter " data-level="0" data-path="index.html">
+            
+                
+                    <a href="../index.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                        Introduction
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="1" >
+            
+            <span><b>1.</b> Introduction to MobX</span>
+            
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.1" data-path="intro/overview.html">
+            
+                
+                    <a href="../intro/overview.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>1.1.</b>
+                        
+                        The Gist of MobX
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="intro/concepts.html">
+            
+                
+                    <a href="../intro/concepts.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>1.2.</b>
+                        
+                        Concepts &amp; Principles
+                    </a>
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="2" data-path="refguide/api.html">
+            
+                
+                    <a href="../refguide/api.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.</b>
+                        
+                        API overview
+                    </a>
+            
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="2.1" data-path="refguide/observable.html">
+            
+                
+                    <a href="../refguide/observable.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.1.</b>
+                        
+                        observable
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="2.2" data-path="refguide/observable-decorator.html">
+            
+                
+                    <a href="../refguide/observable-decorator.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.2.</b>
+                        
+                        @observable
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="2.3" data-path="refguide/computed-decorator.html">
+            
+                
+                    <a href="../refguide/computed-decorator.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.3.</b>
+                        
+                        (@)computed
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="2.4" data-path="refguide/autorun.html">
+            
+                
+                    <a href="../refguide/autorun.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.4.</b>
+                        
+                        autorun
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="2.5" data-path="refguide/observer-component.html">
+            
+                
+                    <a href="../refguide/observer-component.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.5.</b>
+                        
+                        @observer
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="2.6" data-path="refguide/action.html">
+            
+                
+                    <a href="../refguide/action.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>2.6.</b>
+                        
+                        action
+                    </a>
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="3" >
+            
+            <span><b>3.</b> Observable Types</span>
+            
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="3.1" data-path="refguide/object.html">
+            
+                
+                    <a href="../refguide/object.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.1.</b>
+                        
+                        objects
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="3.2" data-path="refguide/array.html">
+            
+                
+                    <a href="../refguide/array.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.2.</b>
+                        
+                        arrays
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="3.3" data-path="refguide/map.html">
+            
+                
+                    <a href="../refguide/map.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.3.</b>
+                        
+                        maps
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="3.4" data-path="refguide/boxed.html">
+            
+                
+                    <a href="../refguide/boxed.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.4.</b>
+                        
+                        boxed values
+                    </a>
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="4" data-path="faq/blogs.html">
+            
+                
+                    <a href="../faq/blogs.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>4.</b>
+                        
+                        Videos, blogs and tutorials
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="5" data-path="faq/related.html">
+            
+                
+                    <a href="../faq/related.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>5.</b>
+                        
+                        Examples, related projects
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="6" data-path="faq/faq.html">
+            
+                
+                    <a href="../faq/faq.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.</b>
+                        
+                        Frequently Asked Questions
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="7" >
+            
+            <span><b>7.</b> Tips &amp; Tricks</span>
+            
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter active" data-level="7.1" data-path="best/pitfalls.html">
+            
+                
+                    <a href="../best/pitfalls.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.1.</b>
+                        
+                        Pitfalls &amp; best practices
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="7.2" data-path="best/store.html">
+            
+                
+                    <a href="../best/store.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.2.</b>
+                        
+                        Defining data stores
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="7.3" data-path="best/actions.html">
+            
+                
+                    <a href="../best/actions.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.3.</b>
+                        
+                        Writing (async) actions
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="7.4" data-path="best/syntax.html">
+            
+                
+                    <a href="../best/syntax.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.4.</b>
+                        
+                        ES5 / ES6 / TypeScript syntax
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="7.5" data-path="best/devtools.html">
+            
+                
+                    <a href="../best/devtools.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.5.</b>
+                        
+                        DevTools
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="7.6" data-path="best/react-performance.html">
+            
+                
+                    <a href="../best/react-performance.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.6.</b>
+                        
+                        Optimizing React components
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="7.7" data-path="best/stateless-HMR.html">
+            
+                
+                    <a href="../best/stateless-HMR.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.7.</b>
+                        
+                        Stateless Components and Hot Module Reloading
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="7.8" >
+            
+            <span><b>7.8.</b> Optimizing MobX</span>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="7.9" >
+            
+            <span><b>7.9.</b> Testing</span>
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="8" >
+            
+                
+                    <a target="_blank" href="https:/mobxjs.github.io/mobx/refguide/api.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.</b>
+                        
+                        Utility functions
+                    </a>
+            
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="8.1" data-path="refguide/autorun-async.html">
+            
+                
+                    <a href="../refguide/autorun-async.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.1.</b>
+                        
+                        autorunAsync
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="8.2" data-path="refguide/extending.html">
+            
+                
+                    <a href="../refguide/extending.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.2.</b>
+                        
+                        Atom &amp; Reaction
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="8.3" data-path="refguide/create-transformer.html">
+            
+                
+                    <a href="../refguide/create-transformer.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.3.</b>
+                        
+                        createTransformer
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="8.4" data-path="refguide/expr.html">
+            
+                
+                    <a href="../refguide/expr.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.4.</b>
+                        
+                        expr
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="8.5" data-path="refguide/extend-observable.html">
+            
+                
+                    <a href="../refguide/extend-observable.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.5.</b>
+                        
+                        extendObservable
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="8.6" data-path="refguide/is-observable.html">
+            
+                
+                    <a href="../refguide/is-observable.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.6.</b>
+                        
+                        isObservable
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="8.7" data-path="refguide/modifiers.html">
+            
+                
+                    <a href="../refguide/modifiers.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.7.</b>
+                        
+                        modifiers
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="8.8" data-path="refguide/observe.html">
+            
+                
+                    <a href="../refguide/observe.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.8.</b>
+                        
+                        observe
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="8.9" data-path="refguide/reaction.html">
+            
+                
+                    <a href="../refguide/reaction.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.9.</b>
+                        
+                        reaction
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="8.10" data-path="refguide/spy.html">
+            
+                
+                    <a href="../refguide/spy.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.10.</b>
+                        
+                        spy
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="8.11" data-path="refguide/tojson.html">
+            
+                
+                    <a href="../refguide/tojson.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.11.</b>
+                        
+                        toJS
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="8.12" data-path="refguide/transaction.html">
+            
+                
+                    <a href="../refguide/transaction.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.12.</b>
+                        
+                        transaction
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="8.13" data-path="refguide/untracked.html">
+            
+                
+                    <a href="../refguide/untracked.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.13.</b>
+                        
+                        untracked
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="8.14" data-path="refguide/when.html">
+            
+                
+                    <a href="../refguide/when.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.14.</b>
+                        
+                        when
+                    </a>
+            
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+
+            
+            <li class="divider"></li>
+            <li>
+                <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+                    Published with GitBook
+                </a>
+            </li>
+            
+        </ul>
+    </nav>
+</div>
+
+    <div class="book-body">
+        <div class="body-inner">
+            <div class="book-header" role="navigation">
+    <!-- Actions Left -->
+    <a href="#" class="btn pull-left toggle-summary" aria-label="Table of Contents"><i class="fa fa-align-justify"></i></a>
+    <a href="#" class="btn pull-left toggle-search" aria-label="Search"><i class="fa fa-search"></i></a>
+    
+    <div id="font-settings-wrapper" class="dropdown pull-left">
+        <a href="#" class="btn toggle-dropdown" aria-label="Font Settings"><i class="fa fa-font"></i>
+        </a>
+        <div class="dropdown-menu font-settings">
+    <div class="dropdown-caret">
+        <span class="caret-outer"></span>
+        <span class="caret-inner"></span>
+    </div>
+
+    <div class="buttons">
+        <button type="button" id="reduce-font-size" class="button size-2">A</button>
+        <button type="button" id="enlarge-font-size" class="button size-2">A</button>
+    </div>
+
+    <div class="buttons font-family-list">
+        <button type="button" data-font="0" class="button">Serif</button>
+        <button type="button" data-font="1" class="button">Sans</button>
+    </div>
+
+    <div class="buttons color-theme-list">
+        <button type="button" id="color-theme-preview-0" class="button size-3" data-theme="0">White</button>
+        <button type="button" id="color-theme-preview-1" class="button size-3" data-theme="1">Sepia</button>
+        <button type="button" id="color-theme-preview-2" class="button size-3" data-theme="2">Night</button>
+    </div>
+</div>
+
+    </div>
+
+    <!-- Actions Right -->
+    
+    <div class="dropdown pull-right">
+        <a href="#" class="btn toggle-dropdown" aria-label="Share"><i class="fa fa-share-alt"></i>
+        </a>
+        <div class="dropdown-menu font-settings dropdown-left">
+            <div class="dropdown-caret">
+                <span class="caret-outer"></span>
+                <span class="caret-inner"></span>
+            </div>
+            <div class="buttons">
+                <button type="button" data-sharing="twitter" class="button">
+                    Share on Twitter
+                </button>
+                <button type="button" data-sharing="google-plus" class="button">
+                    Share on Google
+                </button>
+                <button type="button" data-sharing="facebook" class="button">
+                    Share on Facebook
+                </button>
+                <button type="button" data-sharing="weibo" class="button">
+                    Share on Weibo
+                </button>
+                <button type="button" data-sharing="instapaper" class="button">
+                    Share on Instapaper
+                </button>
+            </div>
+        </div>
+    </div>
+    
+
+    
+    <a href="#" target="_blank" class="btn pull-right google-plus-sharing-link sharing-link" data-sharing="google-plus" aria-label="Google"><i class="fa fa-google-plus"></i></a>
+    
+    
+    <a href="#" target="_blank" class="btn pull-right facebook-sharing-link sharing-link" data-sharing="facebook" aria-label="Facebook"><i class="fa fa-facebook"></i></a>
+    
+    
+    <a href="#" target="_blank" class="btn pull-right twitter-sharing-link sharing-link" data-sharing="twitter" aria-label="Twitter"><i class="fa fa-twitter"></i></a>
+    
+    
+    
+
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="../" >MobX</a>
+    </h1>
+</div>
+
+            <div class="page-wrapper" tabindex="-1" role="main">
+                <div class="page-inner">
+                
+                
+                    <section class="normal" id="section-">
+                    
+                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/pitfalls.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="common-pitfalls-best-practices">Common pitfalls &amp; best practices</h1>
+<p>Stuck with MobX? This section contains a list of common issues people new to MobX might run into.</p>
+<h4 id="-array-isarray-observable-1-2-3-false"><code>Array.isArray(observable([1,2,3])) === false</code></h4>
+<p>In ES5 there is no way to reliably inherit from arrays, and hence observable arrays inherit from objects.
+This means that regularly libraries are not able to recognize observable arrays as normal arrays (like lodash, or built-in operations like <code>Array.concat</code>).
+This can simply be fixed by passing calling <code>observable.toJS()</code> or <code>observable.slice()</code> before passing the array to another library.
+As long as the external library has no intent to modify the array, this will further work completely as expected.
+You can use <code>isObservableArray(observable)</code> to check whether something is an observable array.</p>
+<h4 id="-object-somenewprop-value-is-not-picked-up"><code>object.someNewProp = value</code> is not picked up</h4>
+<p>MobX observable <em>objects</em> do not detect or react to property assignments that weren&apos;t declared observable before.
+So MobX observable objects act as records with predefined keys.
+You can use <code>extendObservable(target, props)</code> to introduce new observable properties to an object.
+However object iterators like <code>for .. in</code> or <code>Object.keys()</code> won&apos;t react to this automatically.
+If you need a dynamically keyed object, for example to store users by id, create observable _map_s using <code>asMap</code>. </p>
+<h3 id="use-observer-on-all-components-that-render-observable-s">Use <code>@observer</code> on all components that render <code>@observable</code>&apos;s.</h3>
+<p><code>@observer</code> only enhances the component you are decorating, not the components used inside it.
+So usually all your components should be decorated. Don&apos;t worry, this is not inefficient, in contrast, more <code>observer</code> components make rendering more efficient.</p>
+<h3 id="dereference-values-as-lately-as-possible">Dereference values as lately as possible</h3>
+<p>MobX can do a lot, but it cannot make primitive values observable (although it can wrap them in an object see <a href="boxed.md">boxed observables</a>).
+So it are not the <em>values</em> that are observable, but the <em>properties</em> of an object. This means that <code>@observer</code> actually reacts to the fact that you dereference a value.
+So in our above example, the <code>Timer</code> component would <strong>not</strong> react if it was initialized as follows:</p>
+<pre><code class="lang-javascript">React.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">Timer</span> <span class="hljs-attribute">timerData</span>=<span class="hljs-value">{timerData.secondsPassed}</span> /&gt;</span>, document.body)
+</span></code></pre>
+<p>In this snippet just the current value of <code>secondsPassed</code> is passed to the <code>Timer</code>, which is the immutable value <code>0</code> (all primitives are immutable in JS).
+That number won&apos;t change anymore in the future, so <code>Timer</code> will never update. It is the property <code>secondsPassed</code> that will change in the future,
+so we need to access it <em>in</em> the component. Or in other words: always try to pass the owning object of an observable property.</p>
+<h4 id="computed-values-run-more-often-then-expected">Computed values run more often then expected</h4>
+<p>If a computed property is <em>not</em> in use by some reaction (<code>autorun</code>, <code>observer</code> etc), computed expressions will be evaluated lazily; each time their value is requested (so they just act as normal property).
+Computed values will only track their dependencies if they are observed.
+This allows MobX to automatically suspend computations that are not actively in use.
+See this <a href="https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254" target="_blank">blog</a> or <a href="https://github.com/mobxjs/mobx/issues/356" target="_blank">issue #356</a> for an explanation.
+So if you fiddle arounds, computed properties might not seem efficient. But when applied in a project that uses <code>observer</code>, <code>autorun</code> etc, they become very efficient.</p>
+<h4 id="i-have-a-weird-exception-when-using-observable-in-a-react-component">I have a weird exception when using <code>@observable</code> in a React component.</h4>
+<p>The following exception: <code>Uncaught TypeError: Cannot assign to read only property &apos;__mobxLazyInitializers&apos; of object</code> occurs when using a <code>react-hot-loader</code> that does not support decorators.
+Either use <code>extendObservable</code> in <code>componentWillMount</code> instead of <code>@observable</code>, or upgrade to <code>react-hot-loader</code> <code>&quot;^3.0.0-beta.2&quot;</code> or higher.</p>
+<h4 id="the-display-name-of-react-components-is-not-set">The display name of react components is not set</h4>
+<p>If you use <code>export const MyComponent = observer((props =&gt; &lt;div&gt;hi&lt;/div&gt;))</code>, no display name will be visible in the devtools.
+The following approaches can be used to fix this:</p>
+<pre><code class="lang-javascript"><span class="hljs-comment">// 1 (set displayName explicitly)</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> MyComponent = observer((props =&gt; <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>)</span>)
+myComponent.displayName = <span class="hljs-string">&quot;MyComponent&quot;</span>
+
+<span class="hljs-comment">// 2 (MobX infers component name from function name)</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> MyComponent = observer(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">MyComponent</span>(<span class="hljs-params">props</span>) </span>{ <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span> })
+
+// 3 (transpiler will infer component name from variable name)
+const _MyComponent = observer((props =&gt; <span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>)</span>) <span class="hljs-comment">// </span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> MyComponent = observer(_MyComponent)
+
+<span class="hljs-comment">// 4 (with default export)</span>
+<span class="hljs-keyword">const</span> MyComponent = observer((props =&gt; <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>)</span>)
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> observer(MyComponent)
+</code></pre>
+<p>See also: <a href="http://mobxjs.github.io/mobx/best/stateless-HMR.html" target="_blank">http://mobxjs.github.io/mobx/best/stateless-HMR.html</a> or <a href="https://github.com/mobxjs/mobx/issues/141#issuecomment-228457886" target="_blank">#141</a>.</p>
+<h4 id="the-proptype-of-an-observable-array-is-object">The propType of an observable array is object</h4>
+<p>Observable arrays are actually objects, so they comply to <code>propTypes.object</code> instead of <code>array</code>.
+<code>mobx-react</code> will <a href="https://github.com/mobxjs/mobx-react/pull/59" target="_blank">soon</a> provide explicit propTypes for observable data structures.</p>
+<h4 id="declaring-proptypes-might-cause-unnecessary-renders-in-dev-mode">Declaring propTypes might cause unnecessary renders in dev mode</h4>
+<p>See: <a href="https://github.com/mobxjs/mobx-react/issues/56" target="_blank">https://github.com/mobxjs/mobx-react/issues/56</a> </p>
+<h4 id="-observable-properties-initialize-lazily-when-using-babel"><code>@observable</code> properties initialize lazily when using Babel</h4>
+<p>This issue only occurs when transpiling with Babel and not with Typescript (in which decorator support is more mature).
+Observable properties will not be instantiated upon an instance until the first read / write to a property (at that point they all will be initialized).
+This results in the following subtle bug:</p>
+<pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span> </span>{
+    @observable done = <span class="hljs-literal">true</span>
+    @observable title = <span class="hljs-string">&quot;test&quot;</span>
+}
+<span class="hljs-keyword">const</span> todo = <span class="hljs-keyword">new</span> Todo()
+
+<span class="hljs-string">&quot;done&quot;</span> <span class="hljs-keyword">in</span> todo <span class="hljs-comment">// true</span>
+todo.hasOwnProperty(<span class="hljs-string">&quot;done&quot;</span>) <span class="hljs-comment">// false</span>
+<span class="hljs-built_in">Object</span>.keys(todo) <span class="hljs-comment">// []</span>
+
+<span class="hljs-built_in">console</span>.log(todo.title)
+<span class="hljs-string">&quot;done&quot;</span> <span class="hljs-keyword">in</span> todo <span class="hljs-comment">// true</span>
+todo.hasOwnProperty(<span class="hljs-string">&quot;done&quot;</span>) <span class="hljs-comment">// true</span>
+<span class="hljs-built_in">Object</span>.keys(todo) <span class="hljs-comment">// [&quot;done&quot;, &quot;title&quot;]</span>
+</code></pre>
+<p>In practice this is rarely an issue, only when using generic methods like <code>Object.assign(target, todo)</code> or <code>assert.deepEquals</code> <em>before</em> reading or writing any property of the object.
+If you want to make sure that this issue doesn&apos;t occur, just initialize the fields in the constructor instead of at the field declaration or use <code>extendObservable</code> to create the observable properties. </p>
+
+                    
+                    </section>
+                
+                
+                </div>
+            </div>
+        </div>
+
+        
+        <a href="../faq/faq.html" class="navigation navigation-prev " aria-label="Previous page: Frequently Asked Questions"><i class="fa fa-angle-left"></i></a>
+        
+        
+        <a href="../best/store.html" class="navigation navigation-next " aria-label="Next page: Defining data stores"><i class="fa fa-angle-right"></i></a>
+        
+    </div>
+</div>
+
+        
+<script src="../gitbook/app.js"></script>
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-github/plugin.js"></script>
+    
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-ga/plugin.js"></script>
+    
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-disqus/plugin.js"></script>
+    
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-edit-link/plugin.js"></script>
+    
+
+<script>
+require(["gitbook"], function(gitbook) {
+    var config = {"fontSettings":{"theme":null,"family":"sans","size":2},"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"}};
+    gitbook.start(config);
+});
+</script>
+
+        <script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'UA-65632006-1', 'auto');ga('send', 'pageview');</script>
+    </body>
+    
+</html>
