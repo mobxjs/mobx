@@ -127,7 +127,7 @@ _Here are some utilities that might make working with observable objects or comp
 Can be used to pass stores to child components using React's context mechanism. See the [`mobx-react` docs](https://github.com/mobxjs/mobx-react#provider-experimental).
 
 ### `toJS`
-Usage: `toJS(observableDataStructure)`. Converts observable data structures back to plain javascript objects, ignoring computed values. [&laquo;details&raquo;](toJS.md)
+Usage: `toJS(observableDataStructure)`. Converts observable data structures back to plain javascript objects, ignoring computed values. [&laquo;details&raquo;](tojson.md)
 
 ### `isObservable`
 Usage: `isObservable(thing, property?)`. Returns true if the given thing, or the `property` of the given thing is observable.
