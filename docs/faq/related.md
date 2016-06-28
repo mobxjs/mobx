@@ -13,7 +13,7 @@ Boilerplate projects, example projects with sources, Libraries.
 * [rfx-stack](https://github.com/foxhound87/rfx-stack) RFX Stack - Universal App featuring: React + Feathers + MobX
 * [reaxor](https://github.com/KadoBOT/reaxor) Boilerplate for better state management, styling, testing and cleaner code
 * [react-portal](https://github.com/vinej/react-portal) MobX, React with Flux architecture
-* [react-mobx-webpack(https://github.com/tapos007/ReactJS-MobX-Webpack-Boilerplate/tree/master/app/store) Quickstart project template for learning React
+* [react-mobx-webpack](https://github.com/tapos007/ReactJS-MobX-Webpack-Boilerplate/tree/master/app/store) Quickstart project template for learning React
 * [gulp-es6-sass-mobx](https://github.com/pixelkritzel/gulp_es6_sass_boilerplate)
 * [react-mobx-boilerplate](https://github.com/osenvosem/react-mobx-boilerplate) A small React + React Router + MobX boilerplate with a small example app.
 * [Small project to quickly start with deku, MobX, JSX, ES6, Babel](https://github.com/micnews/mobx-deku-boilerplate)
