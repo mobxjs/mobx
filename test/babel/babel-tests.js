@@ -467,6 +467,7 @@ test("reusing initializers", t => {
 test("enumerability", t => {
 	class A {
 		@observable a = 1; // enumerable, on proto
+		@observable a2 = 2; 
 		@computed get b () { return this.a } // non-enumerable, on proto
 		@action m() {} // non-enumerable, on proto
 		@action m2 = () => {}; // non-enumerable, on self
@@ -485,7 +486,8 @@ test("enumerability", t => {
 	]);
 
 	t.deepEqual(props, [
-		"a"
+		"a",
+		"a2"
 	]);
 
 	t.equal("a" in a, true);
@@ -509,15 +511,60 @@ test("enumerability", t => {
 		props.push(key);
 
 	t.deepEqual(ownProps, [
-		"a"
+		"a",
+		"a2" // a2 is now initialized as well, altough never accessed!
 	]);
 
 	t.deepEqual(props, [
-		"a"
+		"a",
+		"a2"
 	]);
 
 	t.equal("a" in a, true);
 	t.equal(a.hasOwnProperty("a"), true);
+	t.equal(a.hasOwnProperty("a2"), true);
+	t.equal(a.hasOwnProperty("b"), false);
+	t.equal(a.hasOwnProperty("m"), false);
+	t.equal(a.hasOwnProperty("m2"), true);
+
+
+	t.end();
+})
+
+test("enumerability - workaround", t => {
+	class A {
+		@observable a = 1; // enumerable, on proto
+		@observable a2 = 2; 
+		@computed get b () { return this.a } // non-enumerable, on proto
+		@action m() {} // non-enumerable, on proto
+		@action m2 = () => {}; // non-enumerable, on self
+
+		constructor() {
+			this.a = 1
+			this.a2 = 2
+		}
+	}
+
+	const a = new A();
+
+	const ownProps = Object.keys(a);
+	const props = [];
+	for (var key in a)
+		props.push(key);
+
+	t.deepEqual(ownProps, [
+		"a",
+		"a2" // a2 is now initialized as well, altough never accessed!
+	]);
+
+	t.deepEqual(props, [
+		"a",
+		"a2"
+	]);
+
+	t.equal("a" in a, true);
+	t.equal(a.hasOwnProperty("a"), true);
+	t.equal(a.hasOwnProperty("a2"), true);
 	t.equal(a.hasOwnProperty("b"), false);
 	t.equal(a.hasOwnProperty("m"), false);
 	t.equal(a.hasOwnProperty("m2"), true);
