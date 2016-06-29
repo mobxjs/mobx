@@ -126,6 +126,12 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 		this.lastKnownLength += delta;
 		if (delta > 0 && oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
 			reserveArrayBuffer(oldLength + delta);
+		if (delta > 0)
+			for (let i = 0; i < delta; i++)
+				Object.defineProperty(this.array, "" + (oldLength + i), ENUMERABLE_ENTRIES[oldLength + i]);
+		else if (delta < 0)
+			for (let i = 0; i > delta; i--)
+				delete this.array["" + (oldLength + i)];
 	}
 
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[] {
@@ -415,12 +421,20 @@ Object.defineProperty(ObservableArray.prototype, "length", {
 	});
 });
 
+const ENUMERABLE_ENTRIES = [];
+
 function createArrayBufferItem(index: number) {
+	const set = createArraySetter(index);
+	const get = createArrayGetter(index);
+	ENUMERABLE_ENTRIES[index] = {
+		enumerable: true,
+		configurable: true,
+		set, get
+	};
 	Object.defineProperty(ObservableArray.prototype, "" + index, {
 		enumerable: false,
-		configurable: false,
-		set: createArraySetter(index),
-		get: createArrayGetter(index)
+		configurable: true,
+		set, get
 	});
 }
 
