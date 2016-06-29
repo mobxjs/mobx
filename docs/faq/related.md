@@ -29,7 +29,7 @@ Boilerplate projects, example projects with sources, Libraries.
 * [Google Play Music Desktop Remote](https://github.com/GPMDP/google-play-music-desktop-remote) A React-Native app for remote controlling Google Play Music Desktop: MobX + WebSocket.
 * Example with Server Side Rendering, react-router: https://github.com/kuuup/mobx-ssr-example
 * Accounting System built in ASP.NET MVC, ReactJS, MobX http://www.accountgo.ph/ [source](https://github.com/AccountGo/accountgo)
-* Easy MobX example with React, MobX, cosmicJS, shorti,  https://github.com/tonyspiro/easy-mobx-example
+* Easy MobX example with React, MobX, Cosmic JS, shorti,  https://github.com/tonyspiro/easy-mobx-example
 * A simple webshop using [React + mobx](https://jsfiddle.net/mweststrate/46vL0phw)
 * A simple webshop using [JQuery + mobx](http://jsfiddle.net/mweststrate/vxn7qgdw).
 * Simple app with Ajax, authentication, context, routing: http://stackoverflow.com/a/36164488/1983583
