@@ -111,7 +111,6 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
 	for (let i = 0, l = added.length; i < l; i++) {
 		let dependency = added[i];
 		// only check for cycles on new dependencies, existing dependencies cannot cause a cycle..
-		invariant(!findCycle(derivation, dependency), `Cycle detected`, derivation);
 		addObserver(added[i], derivation);
 	}
 
@@ -119,23 +118,6 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
 	for (let i = 0, l = removed.length; i < l; i++)
 		removeObserver(removed[i], derivation);
 }
-
-/**
- * Find out whether the dependency tree of this derivation contains a cycle, as would be the case in a
- * computation like `a = a * 2`
- */
-function findCycle(needle: IDerivation, node: IObservable): boolean {
-	if (needle === node)
-		return true;
-	const obs = node.observing;
-	if (obs === undefined)
-		return false;
-	for (let l = obs.length, i = 0; i < l; i++)
-		if (findCycle(needle, obs[i]))
-			return true;
-	return false;
-}
-
 
 export function untracked<T>(action: () => T): T {
 	const prev = untrackedStart();
