@@ -461,8 +461,10 @@ function createArraySetter(index: number) {
 function createArrayGetter(index: number) {
 	return function () {
 		const impl = <ObservableArrayAdministration<any>> this.$mobx;
-		if (impl && index < impl.values.length) {
+		if (impl) {
 			impl.atom.reportObserved();
+		}
+		if (index < impl.values.length) {
 			return impl.values[index];
 		}
 		return undefined;
