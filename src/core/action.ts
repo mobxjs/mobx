@@ -6,23 +6,14 @@ import {ComputedValue} from "../core/computedvalue";
 import {globalState} from "../core/globalstate";
 import {createClassPropertyDecorator} from "../utils/decorators";
 
-const actionDecorator = createClassPropertyDecorator(
+const actionFieldDecorator = createClassPropertyDecorator(
 	function (target, key, value, args, originalDescriptor) {
 		const actionName = (args && args.length === 1) ? args[0] : (value.name || key || "<unnamed action>");
 		const wrappedAction = action(actionName, value);
-		if (originalDescriptor && originalDescriptor.value && target.constructor && target.constructor.prototype) {
-			// shared method, replace this very property on the prototype with the right value
-			Object.defineProperty(target.constructor.prototype, key, {
-				configurable: true, enumerable: false, writable: false,
-				value: wrappedAction
-			});
-		} else {
-			// bound instance methods
-			Object.defineProperty(target, key, {
-				configurable: true, enumerable: false,	writable: false,
-				value: wrappedAction
-			});
-		}
+		Object.defineProperty(target, key, {
+			configurable: true, enumerable: false,	writable: false,
+			value: wrappedAction
+		});
 	},
 	function (key) {
 		return this[key];
@@ -44,7 +35,25 @@ export function action(arg1, arg2?, arg3?, arg4?): any {
 	if (arguments.length === 2  && typeof arg2 === "function")
 		return actionImplementation(arg1, arg2);
 
-	return actionDecorator.apply(null, arguments);
+	if (arguments.length === 1 && typeof arg1 === "string")
+		return namedActionDecorator(arg1);
+
+	return namedActionDecorator(arg2).apply(null, arguments);
+	
+}
+
+function namedActionDecorator(name: string) {
+	return function (target, prop, descriptor) {
+		if (descriptor && typeof descriptor.value === "function") {
+			// TypeScript @action method() { }. Defined on proto before being decorated
+			// Don't use the field decorator if we are just decorating a method
+			descriptor.value = actionImplementation(name, descriptor.value);
+			descriptor.enumerable = false;
+			return descriptor;
+		}
+		// bound instance methods
+		return actionFieldDecorator(name).apply(this, arguments);
+	}
 }
 
 export function isAction(thing: any) {
