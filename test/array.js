@@ -190,6 +190,18 @@ test('observe', function(t) {
     t.end();
 })
 
+test('observe array non-existing keys', function(t) {
+	var ar = mobx.observable([]);
+	var index0;
+	mobx.autorun(() => {
+		index0 = ar[0];
+	});
+	ar[0] = 1;
+	t.equal(index0, 1);
+
+	t.end();
+});
+
 test('array modification1', function(t) {
     var a = mobx.observable([1,2,3]);
     var r = a.splice(-10, 5, 4,5,6);
