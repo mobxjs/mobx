@@ -16,6 +16,9 @@ _Simple, scalable state management_
   * [Screencast: intro to MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8)
   * [State Management Is Easy, React Amsterdam 2016 conf](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
   * [Transparent Reactive Programming and Mutable Data, Reactive2015 conf](https://www.youtube.com/watch?v=FEwLwiizlk0) ([slides](https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures))
+* More tutorials, blogs and videos can be found on the [MobX homepage](http://mobxjs.github.io/mobx/faq/blogs.html)
+* [Boilerplates and related projects](http://mobxjs.github.io/mobx/faq/related.html)
+
 
 ## Introduction
 
@@ -200,49 +203,10 @@ And finally kudo's for all the people that believed in, tried and validated MobX
 
 ## Further resources and documentation
 
-### Get Started
-
-* [Getting Started](https://mobxjs.github.io/mobx/getting-started.html) Ten minute, interactive introduction (with just ES5)
-* [Full API documentation](http://mobxjs.github.io/mobx/)
-* [react-mobservable-boilerplate](https://github.com/mweststrate/react-mobservable-boilerplate) Clone the boilerplate repository containing the above example
-* [React-MobX-Webpack-boilerplate](https://github.com/tapos007/ReactJS-MobX-Webpack-Boilerplate) Easy to use boilerplate to work ReactJS , MobX and webpack
-* [MobX Github](https://github.com/mobxjs) Further boilerplate and example projects for ES5, Babel and Typescript can be found in the  organization on github
-
-### Blogs & Videos
-
-* [Screencast: intro to MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8) State Management Is Easy, React Amsterdam 2016 conf (coming soon) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
-* [Reactive 2015 Conference](https://www.youtube.com/watch?v=FEwLwiizlk0) Talk on MobX (mobservable): React, transparent reactive programming and mutable data structures ([slides](https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures))
-* [Making React reactive: the pursuit of high performing, easily maintainable React apps](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/)
-* [Becoming fully reactive: an in-depth explanation of MobX](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.a2j1rww8g)
-* [Pure rendering in the light of time and state](https://medium.com/@mweststrate/pure-rendering-in-the-light-of-time-and-state-4b537d8d40b1)
-* [MobX Interview](http://survivejs.com/blog/mobx-interview/) SurviveJS interview on MobX, React and Flux
-
-### Related projects
-
-* [mobx-connect](https://github.com/nightwolfz/mobx-connect) MobX @connect decorator for react components. Similar to redux's @connect.
-* [rfx-stack](https://github.com/foxhound87/rfx-stack) RFX Stack - Universal App featuring: React + Feathers + MobX
-* [mobx-reactor](https://github.com/amsb/mobx-reactor) Connect MobX data stores to functional stateless React components with async actions and unidirectional data flow.
-* [mobx-model](https://github.com/ikido/mobx-model) Simplify mobx data stores that mimic backend models 
-* [rx-mobx](https://github.com/chicoxyzzy/rx-mobx) Convert Mobx observables to RxJS and vice versa
-* [mobx-store](https://github.com/AriaFallah/mobx-store) A lowdb inspired data store with declarative querying, observable state, and easy undo/redo.
-* [reaxor](https://github.com/KadoBOT/reaxor) Boilerplate for better state management, styling, testing and cleaner code
-* [Smalldots MobX Store](https://github.com/smalldots/mobx-store) Store API for MobX
-* [mobx-roof](https://github.com/mobx-roof/mobx-roof) Simple, React MVVM framework based on mobx
-
-_Feel free to create a PR to add your own!_
-
-### More examples
-
-* [mobx-react-todomvc](https://github.com/mobxjs/mobx-react-todomvc) TodoMVC reference implementation on top of react-mobx-boilerplate
-* [mobx-react-typescript](https://github.com/contacts-mvc/mobx-react-typescript) An example project using Typescript
-* [ts-mobx-react-starter-kit](https://github.com/Torwori/ts-mobx-react-starter-kit) A starter kit using Typescript
-* [TodoMVC Benchmarking](https://github.com/mweststrate/mobx-todomvc)
-* [mobservable-demo](https://github.com/survivejs/mobservable-demo) The ports of the _Notes_ and _Kanban_ examples from the book "SurviveJS - Webpack and React" to mobservable.
-* [react-particles-experiment](https://github.com/mobxjs/react-particles-experiment) MobX port of React-Particles-Experiment, showing MobX + Flux action dispatching
-* A simple webshop using [React + mobx](https://jsfiddle.net/mweststrate/46vL0phw) or [JQuery + mobx](http://jsfiddle.net/mweststrate/vxn7qgdw).
-* [Simple timer](https://jsfiddle.net/mweststrate/wgbe4guu/) application in JSFiddle.
-* [Google Play Music Desktop Remote](https://github.com/GPMDP/google-play-music-desktop-remote) A React-Native app for remote controlling Google Play Music Desktop: MobX + WebSocket.
-* [React Portal](https://github.com/vinej/react-portal) A Dashboard example created with React/Mobx with a Flux pattern inspired by Redux.
+* [MobX homepage](http://mobxjs.github.io/mobx/faq/blogs.html)
+* [API overview](http://mobxjs.github.io/mobx/refguide/api.html)
+* [Tutorials, Blogs & Videos](http://mobxjs.github.io/mobx/faq/blogs.html)
+* [Boilerplate and related projects](http://mobxjs.github.io/mobx/faq/related.html)
 
 ## What others are saying...
 
@@ -258,11 +222,9 @@ _Feel free to create a PR to add your own!_
 > _I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated._
 > &dash;David Schalk, fpcomplete.com
 
-More testimonials from people using MobX in production can be found on [medium: functional reactive flux blog](https://medium.com/@kenneth_chau/the-2-fundamental-laws-of-flux-and-the-functional-reactive-flux-c9368ac008d3#.h41y0i22h), [hacker news](https://news.ycombinator.com/item?id=11181980), [reddit 1](https://www.reddit.com/r/reactjs/comments/46m2zg/has_anybody_used_mobservable_for_their_react/), [reddit 2](https://www.reddit.com/r/javascript/comments/47omi9/mobx_20_previously_mobservable_has_been_released/) or on twitter under the [#mobx](https://twitter.com/search?q=mobx&src=typd) tag.
-
 ## Contributing
 
-* Feel free to send pull requests.
+* Feel free to send small pull requests. Please discuss new features or big changes in a GitHub issue first.
 * Use `npm test` to run the basic test suite, `npm run coverage` for the test suite with coverage and `npm run perf` for the performance tests.
 
 ## Bower support
