@@ -3,7 +3,7 @@
 import {
     observe, computed, observable, asStructure, autorun, autorunAsync, extendObservable, action,
     IObservableArray, IArrayChange, IArraySplice, IObservableValue, isObservable, isObservableObject,
-    extras, Atom, transaction, IObjectChange, spy, useStrict
+    extras, Atom, transaction, IObjectChange, spy, useStrict, isAction
 } from "../lib/mobx";
 import * as test from 'tape';
 import * as mobx from "../lib/mobx";
@@ -835,4 +835,74 @@ test("verify object assign (typescript)", t => {
 		title: "test"
 	});
 	t.end();
+})
+
+
+test("379, inheritable actions (typescript)", t => {
+	class A {
+		@action method() {
+			return 42;
+		}
+	}
+
+	class B extends A {
+		@action method() {
+			return super.method() * 2
+		}
+	}
+
+	class C extends B {
+		@action method() {
+			return super.method() + 3
+		}
+	}
+
+	const b = new B()
+	t.equal(b.method(), 84)
+	t.equal(isAction(b.method), true)
+
+	const a = new A()
+	t.equal(a.method(), 42)
+	t.equal(isAction(a.method), true)
+	
+	const c = new C()
+	t.equal(c.method(), 87)
+	t.equal(isAction(c.method), true)
+
+	t.end()
+})
+
+
+test("379, inheritable actions - 2 (typescript)", t => {
+	class A {
+		@action("a method") method() {
+			return 42;
+		}
+	}
+
+	class B extends A {
+		@action("b method") method() {
+			return super.method() * 2
+		}
+	}
+
+	class C extends B {
+		@action("c method") method() {
+			return super.method() + 3
+		}
+	}
+
+	const b = new B()
+	t.equal(b.method(), 84)
+	t.equal(isAction(b.method), true)
+
+	const a = new A()
+	t.equal(a.method(), 42)
+	t.equal(isAction(a.method), true)
+	
+	const c = new C()
+	t.equal(c.method(), 87)
+	t.equal(isAction(c.method), true)
+
+	t.end()
 })

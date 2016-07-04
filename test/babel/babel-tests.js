@@ -1,6 +1,6 @@
 import {
     observable, computed, transaction, asStructure, autorun, extendObservable, action,
-	isObservableObject, observe, isObservable, spy,
+	isObservableObject, observe, isObservable, spy, isAction,
     default as mobx
 } from "../";
 
@@ -620,3 +620,71 @@ test("verify object assign (babel)", t => {
 	t.end();
 })
 
+
+test("379, inheritable actions (babel)", t => {
+	class A {
+		@action method() {
+			return 42;
+		}
+	}
+
+	class B extends A {
+		@action method() {
+			return super.method() * 2
+		}
+	}
+
+	class C extends B {
+		@action method() {
+			return super.method() + 3
+		}
+	}
+
+	const b = new B()
+	t.equal(b.method(), 84)
+	t.equal(isAction(b.method), true)
+
+	const a = new A()
+	t.equal(a.method(), 42)
+	t.equal(isAction(a.method), true)
+	
+	const c = new C()
+	t.equal(c.method(), 87)
+	t.equal(isAction(c.method), true)
+
+	t.end()
+})
+
+test("379, inheritable actions - 2 (babel)", t => {
+	class A {
+		@action("a method") method() {
+			return 42;
+		}
+	}
+
+	class B extends A {
+		@action("b method") method() {
+			return super.method() * 2
+		}
+	}
+
+	class C extends B {
+		@action("c method") method() {
+			return super.method() + 3
+		}
+	}
+
+	const b = new B()
+	t.equal(b.method(), 84)
+	t.equal(isAction(b.method), true)
+
+	const a = new A()
+	t.equal(a.method(), 42)
+	t.equal(isAction(a.method), true)
+	
+	const c = new C()
+	t.equal(c.method(), 87)
+	t.equal(isAction(c.method), true)
+
+	t.end()
+})
