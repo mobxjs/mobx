@@ -1,3 +1,9 @@
+# 2.3.4
+
+* Fixed #360: Removed expensive cycle detection (cycles are still detected, but a bit later)
+* Fixed #377: `toJS` serialization of Dates and Regexes preserves the original values
+* Fixed #379: `@action` decorated methods can now be inherited / overriden
+
 # 2.3.3
 
 * Fixed #186: Log a warning instead of an error if an exception is thrown in a derivation. Fixes issue where React Native would produce unusable error screens (because it shows the first logged error)
