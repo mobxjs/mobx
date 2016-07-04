@@ -48,7 +48,7 @@ class Todo {
 }
 ```
 
-Using `@observable` is like turning a value into a spreadsheet cell. But unlike spreadsheets, these values can be not just primitive values, but references, objects and arrays as well. You can even [define your own](http://mobxjs.github.io/mobx/refguide/extending.html) observable data sources.
+Using `@observable` is like turning a value into a spreadsheet cell. But unlike spreadsheets, not only can these values be primitive values, but references, objects and arrays as well. You can even [define your own](http://mobxjs.github.io/mobx/refguide/extending.html) observable data sources.
 
 ### Computed values
 
