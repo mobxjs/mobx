@@ -1071,6 +1071,17 @@ test('json2', function(t) {
     t.end();
 })
 
+test('toJS handles dates', t => {
+	var a = observable({
+		d: new Date()
+	});
+
+	var b = mobx.toJS(a);
+	t.equal(b.d instanceof Date, true)
+	t.equal(a.d === b.d, true)
+	t.end()
+})
+
 test('json cycles', function(t) {
     var a = observable({
         b: 1,

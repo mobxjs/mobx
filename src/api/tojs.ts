@@ -14,6 +14,8 @@ export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, 
 			__alreadySeen.push([source, value]);
 		return value;
 	}
+	if (source instanceof Date || source instanceof RegExp)
+		return source;
 
 	if (detectCycles && __alreadySeen === null)
 		__alreadySeen = [];
