@@ -312,14 +312,17 @@ test('236 - cycles', t => {
 	parent.children.push(new Child(parent, 0));
 	parent.children.push(new Child(parent, 0));
 
-	m.autorun(() => {
-		console.log('total0:', parent.total0, 'total1:', parent.total1);
+	var msg = [];
+	d = m.autorun(() => {
+		msg.push('total0:', parent.total0, 'total1:', parent.total1);
 	});
 	// So far, so good: total0: 9 total1: 0
+	t.deepEqual(msg, ["total0:", 9, "total1:", 0])
+	parent.children[0].kind = 1;
+	t.deepEqual(msg, [
+		"total0:", 9, "total1:", 0,
+		"total0:", 6, "total1:", 12
+	])
 
-	t.throws(() => {
-		parent.children[0].kind = 1;
-	}, /Cycle detected in/);
-	
 	t.end();
 })

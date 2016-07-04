@@ -68,7 +68,7 @@ export class ComputedValue<T> implements IObservable, IDerivation {
 	 * Will evaluate it's computation first if needed.
 	 */
 	public get(): T {
-		invariant(!this.isComputing, `Cycle detected`, this.derivation);
+		invariant(!this.isComputing, `Cycle detected in computation ${this.name}`, this.derivation);
 		reportObserved(this);
 		if (this.dependencyStaleCount > 0) {
 			// This is worst case, somebody is inspecting our value while we are stale.
