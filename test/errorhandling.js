@@ -313,7 +313,7 @@ test('236 - cycles', t => {
 	parent.children.push(new Child(parent, 0));
 
 	var msg = [];
-	d = m.autorun(() => {
+	var d = m.autorun(() => {
 		msg.push('total0:', parent.total0, 'total1:', parent.total1);
 	});
 	// So far, so good: total0: 9 total1: 0

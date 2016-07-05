@@ -19,7 +19,7 @@ test('actions can modify state in strict mode', t => {
 	mobx.useStrict(true);
 	mobx.action(() => {
 		a.set(3);
-		b = mobx.observable(4);
+		var b = mobx.observable(4);
 	})();
 
 	mobx.useStrict(false);
