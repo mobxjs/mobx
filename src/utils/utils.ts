@@ -121,7 +121,7 @@ export function deepEquals(a, b) {
 	} else if (aIsArray) {
 		if (a.length !== b.length)
 			return false;
-		for (let i = a.length; i >= 0; i--)
+		for (let i = a.length -1; i >= 0; i--)
 			if (!deepEquals(a[i], b[i]))
 				return false;
 		return true;
