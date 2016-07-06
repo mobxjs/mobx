@@ -169,15 +169,15 @@ test('efficient selection', function(t) {
     }
     
     var store = new Store();
-    
+
     t.equal(store.selection, null);
     t.equal(store.items.filter(function (i) { return i.selected }).length, 0);
-    
+
     store.selection = store.items[1];
     t.equal(store.items.filter(function (i) { return i.selected }).length, 1);
     t.equal(store.selection, store.items[1]);
     t.equal(store.items[1].selected, true);
-    
+
     store.selection = store.items[2];
     t.equal(store.items.filter(function (i) { return i.selected }).length, 1);
     t.equal(store.selection, store.items[2]);

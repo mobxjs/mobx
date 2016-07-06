@@ -6,7 +6,6 @@ test('spy output', t => {
 	
 	var stop = mobx.spy(c => events.push(c));
 	
-	debugger;
 	doStuff();
 	
 	stop();
