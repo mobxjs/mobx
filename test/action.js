@@ -175,7 +175,6 @@ test('should not be possible to invoke action in a computed block', t => {
 	var noopAction = mobx.action(() => {});
 
 	var c = mobx.computed(() => {
-		debugger;
 		noopAction();
 		return a.get();
 	});

@@ -261,7 +261,7 @@ test('new fast array values won\'t be observable', function(t) {
     t.equal(mobx.isObservable(booksA[0], "name"), false);
     var removed = booksA.splice(0, 1);
     t.equal(mobx.isObservable(removed[0], "name"), false);
-    t.end(); 
+    t.end();
 });
 
 test('is array', function(t) {
@@ -278,7 +278,7 @@ test('peek', function(t) {
     var x = mobx.observable([1, 2, 3]);
     t.deepEqual(x.peek(), [1, 2, 3]);
     t.equal(x.$mobx.values, x.peek());
-    
+
     x.peek().push(4); //noooo!
     t.throws(function() {
         x.push(5); // detect alien change
@@ -292,11 +292,11 @@ test('react to sort changes', function(t) {
         return x.sort();
     });
     var sorted;
-    
+
     mobx.autorun(function() {
         sorted = sortedX.get();
     });
-    
+
     t.deepEqual(x.slice(), [4,2,3]);
     t.deepEqual(sorted, [2,3,4]);
     x.push(1);
