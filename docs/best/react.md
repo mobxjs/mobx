@@ -1,23 +1,23 @@
 # What does MobX react to?
 
-MobX usually reacts to exactly those things you expect it to react to.
-Which makes that in 90% you really don't put any thought it it and it "just works".
+MobX usually reacts to exactly the things you expect it to.
+Which means that in 90% of your use cases mobx "just works".
 However, at some point you will encounter a case where it might not do what you expected.
-At that point it is invaluable to understand a bit better how MobX determines what to react to.
+At that point it is invaluable to understand how MobX determines what to react to.
 
 > MobX reacts to any an _existing_ **observable** _property_ that is read during the execution of a tracked function.
 
 * _"reading"_ is "dotting into" an observable property, also called dereferencing.
-* _"trackable functions"_ are the expression of `computed`, the `render()` method of an observer component, and the functions that are passed as first param to `when`, `reaction` and `autorun`.
-* _"during"_ means that only those observables that are being read while the function is executing, are tracked. It doesn't matter whether these values are used directly or indirectly by the tracked function.  
+* _"trackable functions"_ are the expression of `computed`, the `render()` method of an observer component, and the functions that are passed as the first param to `when`, `reaction` and `autorun`.
+* _"during"_ means that only those observables that are being read while the function is executing are tracked. It doesn't matter whether these values are used directly or indirectly by the tracked function.  
 
 In other words, MobX will not react to:
- * Value that are obtained from observables, but outside a tracked function
- * Observables that are read in an asynchronously invoded code block
+ * Values that are obtained from observables, but outside a tracked function
+ * Observables that are read in an asynchronously invoked code block
 
 ## MobX tracks property access, not values
 
-To elaborate the above rules with an example, suppose that you have the following observable data structure (`observable` applies itself recursively be default, so all fields in this example are observable):
+To elaborate on the above rules with an example, suppose that you have the following observable data structure (`observable` applies itself recursively by default, so all fields in this example are observable):
 
 ```javascript
 let message = observable({
@@ -39,7 +39,7 @@ Now what MobX basically does is recording which _arrows_ you use in your functio
 
 ## Examples
 
-Lets show that in a bunch of examples (based on the `message` variable defined above):
+Lets show that with a bunch of examples (based on the `message` variable defined above):
 
 #### Correct: dereference inside the tracked function
 
@@ -50,9 +50,9 @@ autorun(() => {
 message.title = "Bar"
 ```
 
-This will react as expected, the `.title` property was dereferences by the autorun, and changed afterwards, so this change is detected.
+This will react as expected, the `.title` property was dereferenced by the autorun, and changed afterwards, so this change is detected.
 
-You can verify what MobX will track by alling `whyRun()` inside the tracked function. In case of the above function it will output the following:
+You can verify what MobX will track by calling `whyRun()` inside the tracked function. In the case of the above function it will output the following:
 
 ```javascript
 autorun(() => {
@@ -103,7 +103,7 @@ message.author.name = "Sara";
 message.autor = { name: "John" };
 ```
  
-This will react to both changes. Both `author` and `author.name` are dotted into, allow MobX to track these references.
+This will react to both changes. Both `author` and `author.name` are dotted into, allowing MobX to track these references.
 
 #### Incorrect: store a local reference to an observable object without tracking
 
@@ -117,7 +117,7 @@ message.autor = { name: "John" };
 ```
 
 The first change will be picked up, `message.author` and `author` are the same object, and the `.name` property is dereferenced in the autorun.
-However the second change will **not** be picked up, the `message.author` relation is not tracked by the `autorun` after all. Autorun is still using the "old" `author`.
+However the second change will **not** be picked up, the `message.author` relation is not tracked by the `autorun`. Autorun is still using the "old" `author`.
 
 #### Correct: access array properties in tracked function
 
@@ -177,7 +177,7 @@ autorun(() => {
 message.likes.push("Jennifer");
 ```
 
-This will **not** react. Simple because the `likes` array itself is not being used by the `autorun`, only the refence to the array.
+This will **not** react. Simply because the `likes` array itself is not being used by the `autorun`, only the refence to the array.
 So in contrast, `messages.likes = ["Jennifer"]` would be picked up; that statement does not modify the array, but the `likes` property itself.
 
 #### Incorrect: using non-observable object properties
@@ -203,8 +203,8 @@ extendObservable(message, {
 })
 ```
 
-This will **not** react. MobX will not react to observable properties that did not exist when starting tracking. 
-If the two statements are swapped, or if any other observabe causes the `autorun` the run to re-run, the `autorun` will start track the `postDate` as well.
+This will **not** react. MobX will not react to observable properties that did not exist when tracking started. 
+If the two statements are swapped, or if any other observable causes the `autorun` to re-run, the `autorun` will start tracking the `postDate` as well.
 
 #### Correct: using not yet existing map entries
 
@@ -219,7 +219,7 @@ autorun(() => {
 twitterUrls.set("Sara", "twitter.com/horsejs")
 ```
 
-This **will** react. Observable maps support observing not yet existing entries.
+This **will** react. Observable maps support observing entries that may not exist.
 Note that this will initially print `undefined`.
 You can check for the existence of an entry first by using `twitterUrls.has("Sara")`.
 So for dynamically keyed collections, always use observable maps.
