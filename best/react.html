@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>Videos, tutorials and blogs | MobX</title>
+        <title>What does MobX react to? | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.4.3">
@@ -33,10 +33,10 @@
         
     
     
-    <link rel="next" href="../faq/related.html" />
+    <link rel="next" href="../best/pitfalls.html" />
     
     
-    <link rel="prev" href="../refguide/boxed.html" />
+    <link rel="prev" href="../faq/related.html" />
     
 
         
@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="4" data-basepath=".." data-revision="Wed Jul 06 2016 20:26:18 GMT+0200 (CEST)">
+    <div class="book" data-level="6.1" data-basepath=".." data-revision="Wed Jul 06 2016 20:26:18 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -302,7 +302,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="4" data-path="faq/blogs.html">
+        <li class="chapter " data-level="4" data-path="faq/blogs.html">
             
                 
                     <a href="../faq/blogs.html">
@@ -340,7 +340,7 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="6.1" data-path="best/react.html">
+        <li class="chapter active" data-level="6.1" data-path="best/react.html">
             
                 
                     <a href="../best/react.html">
@@ -838,56 +838,295 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/faq/blogs.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h2 id="blogs-tutorials-videos">Blogs, tutorials, videos</h2>
-<h2 id="videos">Videos</h2>
+                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/react.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="what-does-mobx-react-to">What does MobX react to?</h1>
+<p>MobX usually reacts to exactly those things you expect it to react to.
+Which makes that in 90% you really don&apos;t put any thought it it and it &quot;just works&quot;.
+However, at some point you will encounter a case where it might not do what you expected.
+At that point it is invaluable to understand a bit better how MobX determines what to react to.</p>
+<blockquote>
+<p>MobX reacts to any an <em>existing</em> <strong>observable</strong> <em>property</em> that is read during the execution of a tracked function.</p>
+</blockquote>
 <ul>
-<li><a href="https://egghead.io/lessons/javascript-mobx-and-react-intro-syncing-the-ui-with-the-app-state-using-observable-and-observer" target="_blank">Egghead.io lesson 1: syncing the UI with the app state using observable and observer</a></li>
-<li><a href="https://www.youtube.com/watch?v=XGwuM_u7UeQ" target="_blank">Practical React with MobX</a>. In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth. (<a href="http://slides.com/mattruby/deck" target="_blank">slides</a>)</li>
-<li><a href="https://www.youtube.com/watch?v=K8dr8BMU7-8" target="_blank">Screencast: 8 minute overview of MobX</a></li>
-<li><a href="https://www.youtube.com/watch?v=ApmSsu3qnf0&amp;feature=youtu.be" target="_blank">State Management Is Easy, React Amsterdam 2016 conf</a> (<a href="https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx" target="_blank">slides</a>)</li>
-<li><a href="https://www.youtube.com/watch?v=FEwLwiizlk0" target="_blank">Transparent Reactive Programming and Mutable Data, Reactive2015 conf</a> (<a href="https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures" target="_blank">slides</a>)</li>
-<li><a href="https://www.youtube.com/watch?v=83v8cdvGfeA" target="_blank">Understanding MobX versus Redux</a> (related thread: <a href="https://github.com/mobxjs/mobx/issues/199" target="_blank">https://github.com/mobxjs/mobx/issues/199</a>)</li>
+<li><em>&quot;reading&quot;</em> is &quot;dotting into&quot; an observable property, also called dereferencing.</li>
+<li><em>&quot;trackable functions&quot;</em> are the expression of <code>computed</code>, the <code>render()</code> method of an observer component, and the functions that are passed as first param to <code>when</code>, <code>reaction</code> and <code>autorun</code>.</li>
+<li><em>&quot;during&quot;</em> means that only those observables that are being read while the function is executing, are tracked. It doesn&apos;t matter whether these values are used directly or indirectly by the tracked function.  </li>
 </ul>
-<h2 id="tutorials">Tutorials</h2>
+<p>In other words, MobX will not react to:</p>
 <ul>
-<li><a href="https://mobxjs.github.io/mobx/getting-started.html#demo" target="_blank">Ten minute interactive introduction to MobX and React</a></li>
-<li><a href="https://github.com/mattruby/mobx-examples" target="_blank">Simple ES5 MobX examples</a> Bite sized MobX examples all setup to run in jsFiddle.</li>
-<li><a href="https://onsen.io/blog/mobx-tutorial-react-stopwatch/" target="_blank">It&apos;s all about time: Building a performant Stopwatch with MobX and React - fast</a></li>
-<li><a href="https://tonyspiro.com/getting-started-with-mobx-an-easy-example" target="_blank">Getting started with MobX: an easy example</a></li>
+<li>Value that are obtained from observables, but outside a tracked function</li>
+<li>Observables that are read in an asynchronously invoded code block</li>
 </ul>
-<h2 id="articles-blogs-explaining-the-inner-working-of-mobx">Articles / blogs explaining the inner working of MobX:</h2>
-<ul>
-<li><a href="https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254" target="_blank">In depth explanation of MobX</a></li>
-<li><a href="https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/" target="_blank">Making React reactive: the pursuit of high performing, easily maintainable React apps</a></li>
-</ul>
-<h2 id="blogs">Blogs</h2>
-<ul>
-<li><a href="http://formidable.com/blog/2016/06/02/why-we-chose-mobx-over-redux-for-spectacle-editor/" target="_blank">Why we chose MobX over Redux for Spectacle Editor</a></li>
-<li><a href="https://medium.com/@lavrton/how-to-optimise-rendering-of-a-set-of-elements-in-react-ad01f5b161ae#.ijw98ktg5" target="_blank">Optimising React rendering - tips to optimise rendering of a set of elements in React</a></li>
-<li><a href="https://blog.risingstack.com/handling-react-forms-with-mobx-observables/" target="_blank">Handling React Forms with Mobx Observables</a></li>
-<li><a href="https://medium.com/@mweststrate/mobx-2-2-explicit-actions-controlled-mutations-and-improved-dx-45cdc73c7c8d#.h5jt4nlwf" target="_blank">MobX 2.2: explicit actions, controlled mutations and improved DX</a></li>
-<li><a href="https://github.com/mobxjs/mobx/issues/199" target="_blank">Understanding MobX and when to use it (Github issue)</a></li>
-<li><a href="https://medium.com/@foxhound87/state-management-hydration-with-mobx-we-must-react-ep-05-1922a72453c6#.gbzf4e7nb" target="_blank">State Management &amp; Hydration with MobX &#x200A;&#x2014; &#x200A;We must React [Ep. 05]</a></li>
-<li><a href="https://medium.com/@botverse/enjoying-mobx-jsx-and-virtual-dom-621dcc2a2bd5#.3xoj3b1kg" target="_blank">Enjoying MobX, JSX and virtual-dom. Without React!</a></li>
-<li><a href="http://survivejs.com/blog/mobx-interview/" target="_blank">SurviveJS interview on MobX, React and Flux</a></li>
-<li><a href="https://medium.com/@mweststrate/pure-rendering-in-the-light-of-time-and-state-4b537d8d40b1" target="_blank">Pure rendering in the light of time and state</a></li>
-<li><a href="https://medium.com/@kenneth_chau/the-2-fundamental-laws-of-flux-and-the-functional-reactive-flux-c9368ac008d3#.h41y0i22h" target="_blank">The 2 fundamental laws of Flux and the functional reactive Flux</a></li>
-<li><a href="https://twitter.com/mweststrate/status/720177443521343488" target="_blank">Performance of observables versus immutables</a></li>
-<li><a href="https://medium.com/@mweststrate/object-observe-is-dead-long-live-mobservable-observe-ad96930140c5#.krm1pec8p" target="_blank">Object.observe is dead. Long live MobX.observe</a></li>
-<li><a href="https://hashnode.com/ama/with-mobx-cinspo7i500vyxs53buh8ebls" target="_blank">Hashnode AMA on MobX</a></li>
-</ul>
-<h2 id="testimonials">Testimonials</h2>
-<p>Want to know how people experience starting or porting projects to MobX? Besides the above listed blogs, the following threads might shed some light:</p>
-<ul>
-<li><a href="https://twitter.com/search?q=mobx&amp;src=typd" target="_blank">search twitter</a></li>
-<li><a href="https://news.ycombinator.com/item?id=11181980" target="_blank">hacker news</a></li>
-<li><a href="https://www.reddit.com/r/reactjs/comments/4pgbhq/redux_like_dan_abramov/d4kod21" target="_blank">reddit</a></li>
-<li><a href="https://www.reddit.com/r/reactjs/comments/4l44a2/mobx_22_has_been_released_explicit_actions/" target="_blank">reddit</a></li>
-<li><a href="https://www.reddit.com/r/reactjs/comments/4npzq5/confused_redux_or_mobx/" target="_blank">reddit</a></li>
-<li><a href="https://www.reddit.com/r/reactjs/comments/4fojit/what_is_your_structure_when_using_mobx_with/" target="_blank">reddit</a></li>
-<li><a href="https://www.reddit.com/r/reactjs/comments/46m2zg/has_anybody_used_mobservable_for_their_react/" target="_blank">reddit</a></li>
-<li><a href="https://www.reddit.com/r/javascript/comments/47omi9/mobx_20_previously_mobservable_has_been_released/" target="_blank">reddit</a> </li>
-</ul>
+<h2 id="mobx-tracks-property-access-not-values">MobX tracks property access, not values</h2>
+<p>To elaborate the above rules with an example, suppose that you have the following observable data structure (<code>observable</code> applies itself recursively be default, so all fields in this example are observable):</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">let</span> message = observable({
+    title: <span class="hljs-string">&quot;Foo&quot;</span>,
+    author: {
+        name: <span class="hljs-string">&quot;Michel&quot;</span>
+    },
+    likes: [
+        <span class="hljs-string">&quot;John&quot;</span>, <span class="hljs-string">&quot;Sara&quot;</span>
+    ]
+})
+</code></pre>
+<p>In memory that looks as follows. The green boxes indicate <em>observable</em> properties. Note that the <em>values</em> themselves are not observable!</p>
+<p><img src="../images/observed-refs.png" alt="MobX reacts to changing references"></p>
+<p>Now what MobX basically does is recording which <em>arrows</em> you use in your function. After that, it will re-run whenever one of this <em>arrows</em> changes; when they start to refer to something else.</p>
+<h2 id="examples">Examples</h2>
+<p>Lets show that in a bunch of examples (based on the <code>message</code> variable defined above):</p>
+<h4 id="correct-dereference-inside-the-tracked-function">Correct: dereference inside the tracked function</h4>
+<pre><code class="lang-javascript">autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(message.title)
+})
+message.title = <span class="hljs-string">&quot;Bar&quot;</span>
+</code></pre>
+<p>This will react as expected, the <code>.title</code> property was dereferences by the autorun, and changed afterwards, so this change is detected.</p>
+<p>You can verify what MobX will track by alling <code>whyRun()</code> inside the tracked function. In case of the above function it will output the following:</p>
+<pre><code class="lang-javascript">autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(message.title)
+    whyRun() 
+})
+
+<span class="hljs-comment">// Outputs:</span>
+WhyRun? reaction <span class="hljs-string">&apos;Autorun@1&apos;</span>:
+ * Status: [running]
+ * This reaction will re-run <span class="hljs-keyword">if</span> any <span class="hljs-keyword">of</span> the following observables changes:
+    ObservableObject@<span class="hljs-number">1.</span>title
+</code></pre>
+<h4 id="incorrect-changing-a-non-observable-reference">Incorrect: changing a non-observable reference</h4>
+<pre><code class="lang-javascript">autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(message.title)
+})
+message = observable({ title: <span class="hljs-string">&quot;Bar&quot;</span> })
+</code></pre>
+<p>This will <strong>not</strong> react. <code>message</code> was changed, but <code>message</code> is not an observable, just a variable which <em>refers to</em> an observable,
+but the variable (reference) itself is not observable.   </p>
+<h4 id="incorrect-dereference-outside-a-tracked-function">Incorrect: dereference outside a tracked function</h4>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> title = message.title;
+autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(title)
+})
+message.title = <span class="hljs-string">&quot;Bar&quot;</span>
+</code></pre>
+<p>This will <strong>not</strong> react. <code>message.title</code> was dereferenced outside the <code>autorun</code>, and just contains the value of <code>message.title</code> at the  moment of dereferencing (the string <code>&quot;Foo&quot;</code>).
+<code>title</code> is not an observable so <code>autorun</code> will never react.  </p>
+<h4 id="correct-dereference-inside-the-tracked-function">Correct: dereference inside the tracked function</h4>
+<pre><code class="lang-javascript">autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(message.author.name)
+})
+message.author.name = <span class="hljs-string">&quot;Sara&quot;</span>;
+message.autor = { name: <span class="hljs-string">&quot;John&quot;</span> };
+</code></pre>
+<p>This will react to both changes. Both <code>author</code> and <code>author.name</code> are dotted into, allow MobX to track these references.</p>
+<h4 id="incorrect-store-a-local-reference-to-an-observable-object-without-tracking">Incorrect: store a local reference to an observable object without tracking</h4>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> author = message.auhtor;
+autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(author.name)
+})
+message.author.name = <span class="hljs-string">&quot;Sara&quot;</span>;
+message.autor = { name: <span class="hljs-string">&quot;John&quot;</span> };
+</code></pre>
+<p>The first change will be picked up, <code>message.author</code> and <code>author</code> are the same object, and the <code>.name</code> property is dereferenced in the autorun.
+However the second change will <strong>not</strong> be picked up, the <code>message.author</code> relation is not tracked by the <code>autorun</code> after all. Autorun is still using the &quot;old&quot; <code>author</code>.</p>
+<h4 id="correct-access-array-properties-in-tracked-function">Correct: access array properties in tracked function</h4>
+<pre><code class="lang-javascript">autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(message.likes.length);
+})
+message.likes.push(<span class="hljs-string">&quot;Jennifer&quot;</span>);
+</code></pre>
+<p>This will react as expected. <code>.length</code> counts towards a property.
+Note that this will react to <em>any</em> change in the array.
+Arrays are not tracked per index / property (like observable objects and maps) but as a whole.</p>
+<h4 id="incorrect-access-out-of-bounds-indices-in-tracked-function">Incorrect: access out-of-bounds indices in tracked function</h4>
+<pre><code class="lang-javascript">autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(message.likes[<span class="hljs-number">0</span>]);
+})
+message.likes.push(<span class="hljs-string">&quot;Jennifer&quot;</span>);
+</code></pre>
+<p>This will react with the above sample data, array indexers count as property acces. But <strong>only</strong> if the provided <code>index &lt; length</code>.
+MobX will not track not-yet-existing indices or object properties (except when using maps).
+So always guard your array index based access with a <code>.length</code> check.</p>
+<h4 id="correct-access-array-functions-in-tracked-function">Correct: access array functions in tracked function</h4>
+<pre><code class="lang-javascript">autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(message.likes.join(<span class="hljs-string">&quot;, &quot;</span>));
+})
+message.likes.push(<span class="hljs-string">&quot;Jennifer&quot;</span>);
+</code></pre>
+<p>This will react as expected. All array functions that do not mutate the array are tracked automatically. </p>
+<hr>
+<pre><code class="lang-javascript">autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(message.likes.join(<span class="hljs-string">&quot;, &quot;</span>));
+})
+message.likes[<span class="hljs-number">2</span>] = <span class="hljs-string">&quot;Jennifer&quot;</span>;
+</code></pre>
+<p>This will react as expected. All array index assignments are detected, but only if <code>index &lt;= length</code>.</p>
+<h4 id="incorrect-use-an-observable-but-without-accessing-any-of-its-properties">Incorrect: &quot;use&quot; an observable but without accessing any of its properties</h4>
+<pre><code class="lang-javascript">autorun(() =&gt; {
+    message.likes;
+})
+message.likes.push(<span class="hljs-string">&quot;Jennifer&quot;</span>);
+</code></pre>
+<p>This will <strong>not</strong> react. Simple because the <code>likes</code> array itself is not being used by the <code>autorun</code>, only the refence to the array.
+So in contrast, <code>messages.likes = [&quot;Jennifer&quot;]</code> would be picked up; that statement does not modify the array, but the <code>likes</code> property itself.</p>
+<h4 id="incorrect-using-non-observable-object-properties">Incorrect: using non-observable object properties</h4>
+<pre><code class="lang-javascript">autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(message.postDate)
+})
+message.postDate = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>()
+</code></pre>
+<p>This will <strong>not</strong> react. MobX can only track observable properties.</p>
+<h4 id="incorrect-using-not-yet-existing-observable-object-properties">Incorrect: using not yet existing observable object properties</h4>
+<pre><code class="lang-javascript">autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(message.postDate)
+})
+extendObservable(message, {
+    postDate: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>()
+})
+</code></pre>
+<p>This will <strong>not</strong> react. MobX will not react to observable properties that did not exist when starting tracking. 
+If the two statements are swapped, or if any other observabe causes the <code>autorun</code> the run to re-run, the <code>autorun</code> will start track the <code>postDate</code> as well.</p>
+<h4 id="correct-using-not-yet-existing-map-entries">Correct: using not yet existing map entries</h4>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> twitterUrls = observable(asMap({
+    <span class="hljs-string">&quot;John&quot;</span>: <span class="hljs-string">&quot;twitter.com/johnny&quot;</span>
+}))
+
+autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(twitterUrls.get(<span class="hljs-string">&quot;Sara&quot;</span>))
+})
+twitterUrls.set(<span class="hljs-string">&quot;Sara&quot;</span>, <span class="hljs-string">&quot;twitter.com/horsejs&quot;</span>)
+</code></pre>
+<p>This <strong>will</strong> react. Observable maps support observing not yet existing entries.
+Note that this will initially print <code>undefined</code>.
+You can check for the existence of an entry first by using <code>twitterUrls.has(&quot;Sara&quot;)</code>.
+So for dynamically keyed collections, always use observable maps.</p>
+<h2 id="mobx-only-tracks-synchronously-accessed-data">MobX only tracks synchronously accessed data</h2>
+<pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">upperCaseAuthorName</span>(<span class="hljs-params">author</span>) </span>{
+    <span class="hljs-keyword">const</span> baseName = author.name;
+    <span class="hljs-keyword">return</span> baseName.toUpperCase();
+}
+autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(upperCaseAuthorName(message.author))
+})
+message.author.name = <span class="hljs-string">&quot;Chesterton&quot;</span>
+</code></pre>
+<p>This will react. Even though <code>author.name</code> is not dereferenced by the thunk passed to <code>autorun</code> itself,
+MobX will still track the derefencing that happens in <code>upperCaseAuthorName</code>,
+because it happens <em>during</em> the execution of the autorun.</p>
+<hr>
+<pre><code class="lang-javascript">autorun(() =&gt; {
+    setTimeout(
+        () =&gt; <span class="hljs-built_in">console</span>.log(message.likes.join(<span class="hljs-string">&quot;, &quot;</span>)),
+        <span class="hljs-number">10</span>
+    )
+})
+message.likes.push(<span class="hljs-string">&quot;Jennifer&quot;</span>);
+</code></pre>
+<p>This will <strong>not</strong> react, during the execution of the <code>autorun</code> no observables where accessed, only during the <code>setTimeout</code>.
+In general this is quite obvious and rarely causes issues. 
+The notable caveat here is passing renderable callbacks to React components, take for example the following example:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> MyComponent = observer(({ message }) =&gt; 
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">SomeContainer</span>
+        <span class="hljs-attribute">title</span> = {() =&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>{message.title}<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>}
+    /&gt;
+)</span>
+
+message.title = <span class="hljs-string">&quot;Bar&quot;</span>
+</code></pre>
+<p>At first glance everything might seem ok here, except that the <code>&lt;div&gt;</code> is actually not rendered by <code>MyComponent</code> (which has a tracked rendering), but by <code>SomeContainer</code>.
+So to make sure that the title of <code>SomeContainer</code> correctly reacts to a new <code>message.title</code>, <code>SomeContainer</code> should be an <code>observer</code> as well.
+If <code>SomeContainer</code> comes from an external lib, you can also fix this by wrapping the <code>div</code> in it&apos;s own stateless <code>observer</code> based component, and instantiating that one in the callback:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> MyComponent = observer(({ message }) =&gt; 
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">SomeContainer</span>
+        <span class="hljs-attribute">title</span> = {() =&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-title">TitleRenderer</span> <span class="hljs-attribute">message</span>=<span class="hljs-value">{message}</span> /&gt;</span>}
+    /&gt;
+)</span>
+
+<span class="hljs-keyword">const</span> TitleRenderer = observer(({ message }) =&gt; 
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>{message.title}<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>}
+)
+
+message.title = &quot;Bar&quot;
+</span></code></pre>
+<h2 id="avoid-caching-observables-in-local-fields">Avoid caching observables in local fields</h2>
+<p>A common mistake is to store local variables that derefence observables, and then expect components to react. For example:</p>
+<pre><code class="lang-javascript">@observer <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyComponent</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">component</span> </span>{
+    author;
+    constructor(props) {
+        <span class="hljs-keyword">super</span>(props)
+        <span class="hljs-keyword">this</span>.author = props.message.author;
+    }
+
+    render() {
+        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>{author.name}<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
+    }
+}
+</span></code></pre>
+<p>This component will react to changes in the <code>author</code>&apos;s name, but it won&apos;t react to changing the <code>.author</code> of the <code>message</code> itself! Because that dereferencing happened outside <code>render()</code>,
+which is the only tracked function of an <code>observer</code> component.
+Note that even marking the <code>author</code> component field as <code>@observable</code> field does not solve this; that field is still assigned only once. 
+This can simply be solved by doing the dereferencing inside <code>render()</code>, or by introducing a computed property on the component instance:</p>
+<pre><code class="lang-javascript">@observer <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyComponent</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">component</span> </span>{
+    @computed get author() {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.props.message.author
+    }
+<span class="hljs-comment">// ...</span>
+</code></pre>
+<h2 id="how-multiple-components-will-render">How multiple components will render</h2>
+<p>Suppose that we use the following components are used to render our above <code>message</code> object.</p>
+<pre><code class="lang-javascript">const Message = observer(({ message }) =&gt; 
+    &lt;div&gt;
+        {message.title}
+        &lt;Author author={ message.author } /&gt;
+        &lt;Likes likes={ message.likes } /&gt;
+    &lt;/div&gt;
+)
+
+const Author = observer(({ author }) =&gt; 
+    &lt;span&gt;{auhtor.name}&lt;/span&gt;
+)
+
+const Likes = observer(({ likes }) =&gt; 
+    &lt;ul&gt;
+        {likes.map(like =&gt;
+            &lt;li&gt;{like}&lt;/li&gt;
+        )}
+    &lt;/ul&gt;
+)
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>change</th>
+<th>re-rendering component</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>message.title = &quot;Bar&quot;</code></td>
+<td><code>Message</code></td>
+</tr>
+<tr>
+<td><code>message.author.name = &quot;Susan&quot;</code></td>
+<td><code>Author</code> (<code>.author</code> is derefferenced in <code>Message</code>, but didn&apos;t change)*</td>
+</tr>
+<tr>
+<td><code>message.author = { name: &quot;Susan&quot;}</code></td>
+<td><code>Message</code>, <code>Author</code></td>
+</tr>
+<tr>
+<td><code>message.likes[0] = &quot;Michel&quot;</code></td>
+<td><code>Likes</code></td>
+</tr>
+</tbody>
+</table>
+<p>Notes:</p>
+<ol>
+<li>* If the <code>Author</code> component was invoked like: <code>&lt;Author author={ message.author.name} /&gt;</code>. Then <code>Message</code> would be the dereferencing component and react to changes to <code>message.author.name</code>. Nonetheless <code>&lt;Author&gt;</code> would rerender as well, because it receives a new value. So performance wise it is best to dereference as late as possible.</li>
+<li>** If likes where objects instead of strings, and if they were rendered by their own <code>Like</code> component, the <code>Likes</code> component would not rerender for changes happening inside a specific like.</li>
+</ol>
+<h2 id="tl-dr">TL;DR</h2>
+<blockquote>
+<p>MobX reacts to any an <em>existing</em> <strong>observable</strong> <em>property</em> that is read during the execution of a tracked function.</p>
+</blockquote>
 
                     
                     </section>
@@ -898,10 +1137,10 @@
         </div>
 
         
-        <a href="../refguide/boxed.html" class="navigation navigation-prev " aria-label="Previous page: boxed values"><i class="fa fa-angle-left"></i></a>
+        <a href="../faq/related.html" class="navigation navigation-prev " aria-label="Previous page: Examples, Boilerplates &amp; Related Projects"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../faq/related.html" class="navigation navigation-next " aria-label="Next page: Examples, Boilerplates &amp; Related Projects"><i class="fa fa-angle-right"></i></a>
+        <a href="../best/pitfalls.html" class="navigation navigation-next " aria-label="Next page: Common Pitfalls &amp; Best Practices"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>
@@ -927,7 +1166,7 @@
 
 <script>
 require(["gitbook"], function(gitbook) {
-    var config = {"fontSettings":{"theme":null,"family":"sans","size":2},"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1"},"disqus":{"shortName":"mobservable"}};
+    var config = {"fontSettings":{"theme":null,"family":"sans","size":2},"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"}};
     gitbook.start(config);
 });
 </script>

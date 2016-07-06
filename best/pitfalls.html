@@ -36,7 +36,7 @@
     <link rel="next" href="../best/store.html" />
     
     
-    <link rel="prev" href="../faq/related.html" />
+    <link rel="prev" href="../best/react.html" />
     
 
         
@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="6.1" data-basepath=".." data-revision="Tue Jun 28 2016 14:16:10 GMT+0200 (CEST)">
+    <div class="book" data-level="6.2" data-basepath=".." data-revision="Wed Jul 06 2016 20:26:18 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -340,14 +340,29 @@
             <ul class="articles">
                 
     
-        <li class="chapter active" data-level="6.1" data-path="best/pitfalls.html">
+        <li class="chapter " data-level="6.1" data-path="best/react.html">
+            
+                
+                    <a href="../best/react.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>6.1.</b>
+                        
+                        What does MobX react to?
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter active" data-level="6.2" data-path="best/pitfalls.html">
             
                 
                     <a href="../best/pitfalls.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>6.1.</b>
+                            <b>6.2.</b>
                         
                         Common Pitfalls &amp; Best Practices
                     </a>
@@ -355,14 +370,14 @@
             
         </li>
     
-        <li class="chapter " data-level="6.2" data-path="best/store.html">
+        <li class="chapter " data-level="6.3" data-path="best/store.html">
             
                 
                     <a href="../best/store.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>6.2.</b>
+                            <b>6.3.</b>
                         
                         Defining data stores
                     </a>
@@ -370,14 +385,14 @@
             
         </li>
     
-        <li class="chapter " data-level="6.3" data-path="best/actions.html">
+        <li class="chapter " data-level="6.4" data-path="best/actions.html">
             
                 
                     <a href="../best/actions.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>6.3.</b>
+                            <b>6.4.</b>
                         
                         Writing (async) actions
                     </a>
@@ -385,14 +400,14 @@
             
         </li>
     
-        <li class="chapter " data-level="6.4" data-path="best/react-performance.html">
+        <li class="chapter " data-level="6.5" data-path="best/react-performance.html">
             
                 
                     <a href="../best/react-performance.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>6.4.</b>
+                            <b>6.5.</b>
                         
                         Optimizing React components
                     </a>
@@ -400,14 +415,14 @@
             
         </li>
     
-        <li class="chapter " data-level="6.5" data-path="best/devtools.html">
+        <li class="chapter " data-level="6.6" data-path="best/devtools.html">
             
                 
                     <a href="../best/devtools.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>6.5.</b>
+                            <b>6.6.</b>
                         
                         DevTools
                     </a>
@@ -415,14 +430,14 @@
             
         </li>
     
-        <li class="chapter " data-level="6.6" data-path="best/syntax.html">
+        <li class="chapter " data-level="6.7" data-path="best/syntax.html">
             
                 
                     <a href="../best/syntax.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>6.6.</b>
+                            <b>6.7.</b>
                         
                         ES5 / ES6 / TypeScript syntax
                     </a>
@@ -430,14 +445,14 @@
             
         </li>
     
-        <li class="chapter " data-level="6.7" data-path="best/stateless-HMR.html">
+        <li class="chapter " data-level="6.8" data-path="best/stateless-HMR.html">
             
                 
                     <a href="../best/stateless-HMR.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>6.7.</b>
+                            <b>6.8.</b>
                         
                         Stateless Components and Hot Module Reloading
                     </a>
@@ -445,16 +460,16 @@
             
         </li>
     
-        <li class="chapter " data-level="6.8" >
+        <li class="chapter " data-level="6.9" >
             
-            <span><b>6.8.</b> Optimizing MobX</span>
+            <span><b>6.9.</b> Optimizing MobX</span>
             
             
         </li>
     
-        <li class="chapter " data-level="6.9" >
+        <li class="chapter " data-level="6.10" >
             
-            <span><b>6.9.</b> Testing</span>
+            <span><b>6.10.</b> Testing</span>
             
             
         </li>
@@ -836,7 +851,8 @@ You can use <code>isObservableArray(observable)</code> to check whether somethin
 So MobX observable objects act as records with predefined keys.
 You can use <code>extendObservable(target, props)</code> to introduce new observable properties to an object.
 However object iterators like <code>for .. in</code> or <code>Object.keys()</code> won&apos;t react to this automatically.
-If you need a dynamically keyed object, for example to store users by id, create observable _map_s using <code>asMap</code>. </p>
+If you need a dynamically keyed object, for example to store users by id, create observable _map_s using <code>asMap</code>.
+For more info see <a href="react.html">what will MobX react to?</a>.</p>
 <h3 id="use-observer-on-all-components-that-render-observable-s">Use <code>@observer</code> on all components that render <code>@observable</code>&apos;s.</h3>
 <p><code>@observer</code> only enhances the component you are decorating, not the components used inside it.
 So usually all your components should be decorated. Don&apos;t worry, this is not inefficient, in contrast, more <code>observer</code> components make rendering more efficient.</p>
@@ -848,7 +864,8 @@ So in our above example, the <code>Timer</code> component would <strong>not</str
 </span></code></pre>
 <p>In this snippet just the current value of <code>secondsPassed</code> is passed to the <code>Timer</code>, which is the immutable value <code>0</code> (all primitives are immutable in JS).
 That number won&apos;t change anymore in the future, so <code>Timer</code> will never update. It is the property <code>secondsPassed</code> that will change in the future,
-so we need to access it <em>in</em> the component. Or in other words: always try to pass the owning object of an observable property.</p>
+so we need to access it <em>in</em> the component. Or in other words: always try to pass the owning object of an observable property.
+For more info see <a href="react.html">what will MobX react to?</a>.</p>
 <h4 id="computed-values-run-more-often-then-expected">Computed values run more often then expected</h4>
 <p>If a computed property is <em>not</em> in use by some reaction (<code>autorun</code>, <code>observer</code> etc), computed expressions will be evaluated lazily; each time their value is requested (so they just act as normal property).
 Computed values will only track their dependencies if they are observed.
@@ -913,7 +930,7 @@ If you want to make sure that this issue doesn&apos;t occur, just initialize the
         </div>
 
         
-        <a href="../faq/related.html" class="navigation navigation-prev " aria-label="Previous page: Examples, Boilerplates &amp; Related Projects"><i class="fa fa-angle-left"></i></a>
+        <a href="../best/react.html" class="navigation navigation-prev " aria-label="Previous page: What does MobX react to?"><i class="fa fa-angle-left"></i></a>
         
         
         <a href="../best/store.html" class="navigation navigation-next " aria-label="Next page: Defining data stores"><i class="fa fa-angle-right"></i></a>
