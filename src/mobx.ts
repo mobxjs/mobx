@@ -26,17 +26,18 @@ export { IDerivation, untracked                               } from "./core/der
 export { action, useStrict, isAction, runInAction             } from "./core/action";
 export { spy                                                  } from "./core/spy";
 export { transaction                                          } from "./core/transaction";
+export { IComputedValue                                       } from "./core/computedvalue";
 
 export { asReference, asFlat, asStructure, asMap              } from "./types/modifiers";
 export { IInterceptable, IInterceptor                         } from "./types/intercept-utils";
 export { IListenable                                          } from "./types/listen-utils";
 export { IObjectWillChange, IObjectChange, isObservableObject } from "./types/observableobject";
-export { /* 3.0: IValueDidChange, */ IValueWillChange         } from "./types/observablevalue";
+export { /* 3.0: IValueDidChange, */ IValueWillChange, IObservableValue } from "./types/observablevalue";
 
 export { IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, isObservableArray, fastArray } from "./types/observablearray";
 export { IKeyValueMap, ObservableMap, IMapEntries, IMapWillChange, IMapChange, isObservableMap, map } from "./types/observablemap"
 
-export { IObservableValue, observable                         } from "./api/observable";
+export { observable                                           } from "./api/observable";
 export { computed, IComputedValueOptions                      } from "./api/computeddecorator";
 export { isObservable                                         } from "./api/isobservable";
 export { extendObservable                                     } from "./api/extendobservable";

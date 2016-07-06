@@ -1,9 +1,9 @@
 import {ValueMode, getValueModeFromValue, asStructure} from "../types/modifiers";
-import {IObservableValue} from "./observable";
+import {IObservableValue} from "../types/observablevalue";
 import {asObservableObject, defineObservableProperty} from "../types/observableobject";
 import {invariant} from "../utils/utils";
 import {createClassPropertyDecorator} from "../utils/decorators";
-import {ComputedValue} from "../core/computedvalue";
+import {ComputedValue, IComputedValue} from "../core/computedvalue";
 
 export interface IComputedValueOptions {
 	asStructure: boolean;
@@ -33,7 +33,7 @@ const computedDecorator = createClassPropertyDecorator(
  * Decorator for class properties: @computed get value() { return expr; }.
  * For legacy purposes also invokable as ES5 observable created: `computed(() => expr)`;
  */
-export function computed<T>(func: () => T, scope?: any): IObservableValue<T>;
+export function computed<T>(func: () => T, scope?: any): IComputedValue<T>;
 export function computed(opts: IComputedValueOptions): (target: Object, key: string, baseDescriptor?: PropertyDescriptor) => void;
 export function computed(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void;
 export function computed(targetOrExpr: any, keyOrScope?: any, baseDescriptor?: PropertyDescriptor, options?: IComputedValueOptions) {

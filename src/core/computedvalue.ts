@@ -6,13 +6,19 @@ import {getNextId, valueDidChange, invariant, Lambda, unique, joinStrings} from 
 import {isSpyEnabled, spyReport} from "../core/spy";
 import {autorun} from "../api/autorun";
 
+export interface IComputedValue<T> {
+	get(): T;
+	set(value: T): void;
+	observe(listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
+}
+
 /**
  * A node in the state dependency root that observes other nodes, and can be observed itself.
  *
  * Computed values will update automatically if any observed value changes and if they are observed themselves.
  * If a computed value isn't actively used by another observer, but is inspect, it will compute lazily to return at least a consistent value.
  */
-export class ComputedValue<T> implements IObservable, IDerivation {
+export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDerivation {
 	isLazy = true; // nobody is observing this derived value, so don't bother tracking upstream values
 	isComputing = false;
 	staleObservers: IDerivation[] = [];

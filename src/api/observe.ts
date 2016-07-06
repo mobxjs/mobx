@@ -1,12 +1,15 @@
 import {IObservableArray, IArrayChange, IArraySplice} from "../types/observablearray";
 import {ObservableMap, IMapChange} from "../types/observablemap";
 import {IObjectChange, isObservableObject} from "../types/observableobject";
-import {IObservableValue, observable} from "./observable";
+import {IComputedValue} from "../core/computedvalue";
+
+import {IObservableValue} from "../types/observablevalue";
+import {observable} from "./observable";
 import {Lambda, isPlainObject, deprecated} from "../utils/utils";
 import {extendObservable} from "./extendobservable";
 import {getAdministration} from "../types/type-utils";
 
-export function observe<T>(value: IObservableValue<T>, listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
+export function observe<T>(value: IObservableValue<T> | IComputedValue<T>, listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
 export function observe<T>(observableArray: IObservableArray<T>, listener: (change: IArrayChange<T> | IArraySplice<T>) => void, fireImmediately?: boolean): Lambda;
 export function observe<T>(observableMap: ObservableMap<T>, listener: (change: IMapChange<T>) => void, fireImmediately?: boolean): Lambda;
 export function observe<T>(observableMap: ObservableMap<T>, property: string, listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;

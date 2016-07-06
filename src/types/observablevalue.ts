@@ -24,7 +24,14 @@ export type IUNCHANGED = {};
 
 export const UNCHANGED: IUNCHANGED = {};
 
-export class ObservableValue<T> extends Atom implements IInterceptable<IValueWillChange<T>>, IListenable {
+export interface IObservableValue<T> {
+	get(): T;
+	set(value: T): void;
+	intercept(handler: IInterceptor<IValueWillChange<T>>): Lambda;
+	observe(listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
+}
+
+export class ObservableValue<T> extends Atom implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable {
 	hasUnreportedChange = false;
 	interceptors;
 	changeListeners;
@@ -43,7 +50,7 @@ export class ObservableValue<T> extends Atom implements IInterceptable<IValueWil
 		}
 	}
 
-	set(newValue: T) {
+	public set(newValue: T) {
 		const oldValue = this.value;
 		newValue = this.prepareNewValue(newValue) as any;
 		if (newValue !== UNCHANGED) {
@@ -84,16 +91,16 @@ export class ObservableValue<T> extends Atom implements IInterceptable<IValueWil
 			notifyListeners(this, [newValue, oldValue]); // in 3.0, use an object instead!
 	}
 
-	get(): T {
+	public get(): T {
 		this.reportObserved();
 		return this.value;
 	}
 
-	intercept(handler: IInterceptor<IValueWillChange<T>>): Lambda {
+	public intercept(handler: IInterceptor<IValueWillChange<T>>): Lambda {
 		return registerInterceptor(this, handler);
 	}
 
-	observe(listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda {
+	public observe(listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda {
 		if (fireImmediately)
 			listener(this.value, undefined);
 		return registerListener(this, listener);
