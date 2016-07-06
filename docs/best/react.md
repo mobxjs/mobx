@@ -57,7 +57,7 @@ You can verify what MobX will track by calling `whyRun()` inside the tracked fun
 ```javascript
 autorun(() => {
     console.log(message.title)
-    whyRun()
+    whyRun() 
 })
 
 // Outputs:
@@ -102,7 +102,7 @@ autorun(() => {
 message.author.name = "Sara";
 message.author = { name: "John" };
 ```
-
+ 
 This will react to both changes. Both `author` and `author.name` are dotted into, allowing MobX to track these references.
 
 #### Incorrect: store a local reference to an observable object without tracking
@@ -155,7 +155,7 @@ autorun(() => {
 message.likes.push("Jennifer");
 ```
 
-This will react as expected. All array functions that do not mutate the array are tracked automatically.
+This will react as expected. All array functions that do not mutate the array are tracked automatically. 
 
 ---
 
@@ -168,7 +168,7 @@ message.likes[2] = "Jennifer";
 
 This will react as expected. All array index assignments are detected, but only if `index <= length`.
 
-#### Incorrect: "use" an observable but without accessing any of its properties
+#### Incorrect: "use" an observable but without accessing any of its properties 
 
 ```javascript
 autorun(() => {
@@ -203,7 +203,7 @@ extendObservable(message, {
 })
 ```
 
-This will **not** react. MobX will not react to observable properties that did not exist when tracking started.
+This will **not** react. MobX will not react to observable properties that did not exist when tracking started. 
 If the two statements are swapped, or if any other observable causes the `autorun` to re-run, the `autorun` will start tracking the `postDate` as well.
 
 #### Correct: using not yet existing map entries
@@ -254,17 +254,17 @@ message.likes.push("Jennifer");
 ```
 
 This will **not** react, during the execution of the `autorun` no observables where accessed, only during the `setTimeout`.
-In general this is quite obvious and rarely causes issues.
+In general this is quite obvious and rarely causes issues. 
 The notable caveat here is passing renderable callbacks to React components, take for example the following example:
 
 ```javascript
-const MyComponent = observer(({ message }) =>
+const MyComponent = observer(({ message }) => 
     <SomeContainer
         title = {() => <div>{message.title}</div>}
     />
 )
 
-message.title = "Bar"
+message.title = "Bar" 
 ```
 
 At first glance everything might seem ok here, except that the `<div>` is actually not rendered by `MyComponent` (which has a tracked rendering), but by `SomeContainer`.
@@ -272,17 +272,17 @@ So to make sure that the title of `SomeContainer` correctly reacts to a new `mes
 If `SomeContainer` comes from an external lib, you can also fix this by wrapping the `div` in it's own stateless `observer` based component, and instantiating that one in the callback:
 
 ```javascript
-const MyComponent = observer(({ message }) =>
+const MyComponent = observer(({ message }) => 
     <SomeContainer
         title = {() => <TitleRenderer message={message} />}
     />
 )
 
-const TitleRenderer = observer(({ message }) =>
+const TitleRenderer = observer(({ message }) => 
     <div>{message.title}</div>}
 )
 
-message.title = "Bar"
+message.title = "Bar" 
 ```
 
 ## Avoid caching observables in local fields
@@ -305,10 +305,10 @@ A common mistake is to store local variables that dereference observables, and t
 
 This component will react to changes in the `author`'s name, but it won't react to changing the `.author` of the `message` itself! Because that dereferencing happened outside `render()`,
 which is the only tracked function of an `observer` component.
-Note that even marking the `author` component field as `@observable` field does not solve this; that field is still assigned only once.
+Note that even marking the `author` component field as `@observable` field does not solve this; that field is still assigned only once. 
 This can simply be solved by doing the dereferencing inside `render()`, or by introducing a computed property on the component instance:
 
-```javascript
+```javascript 
 @observer class MyComponent extends React.component {
     @computed get author() {
         return this.props.message.author
@@ -321,7 +321,7 @@ This can simply be solved by doing the dereferencing inside `render()`, or by in
 Suppose that we use the following components are used to render our above `message` object.
 
 ```javascript
-const Message = observer(({ message }) =>
+const Message = observer(({ message }) => 
     <div>
         {message.title}
         <Author author={ message.author } />
@@ -329,11 +329,11 @@ const Message = observer(({ message }) =>
     </div>
 )
 
-const Author = observer(({ author }) =>
+const Author = observer(({ author }) => 
     <span>{author.name}</span>
 )
 
-const Likes = observer(({ likes }) =>
+const Likes = observer(({ likes }) => 
     <ul>
         {likes.map(like =>
             <li>{like}</li>
