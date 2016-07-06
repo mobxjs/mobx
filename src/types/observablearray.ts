@@ -5,6 +5,20 @@ import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
+/**
+ * Detects bug in some browsers, when instance doesn't use prototype setter,
+ * if property name looks like number. See https://github.com/mobxjs/mobx/issues/364
+ */
+const canUsePrototypeSetter = (() => {
+	var can = false;
+	const xPrototype = {};
+	Object.defineProperty(xPrototype, "0", {
+		set: () => { can = true }
+	});
+	const x = Object.create(xPrototype);
+	x["0"] = 1;
+	return can;
+})();
 
 export interface IObservableArray<T> extends Array<T> {
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[];
@@ -52,12 +66,8 @@ export interface IArrayWillSplice<T> {
 	removedCount: number;
 }
 
-/**
- * This array buffer contains two lists of properties, so that all arrays
- * can recycle their property definitions, which significantly improves performance of creating
- * properties on the fly.
- */
-let OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
+let SHARED_BUFFER_LENGTH = 1000;
+const INITIAL_INSTANCE_BUFFER_LENGTH = 3;
 
 // Typescript workaround to make sure ObservableArray extends Array
 export class StubArray {
@@ -68,6 +78,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 	atom: Atom;
 	values: T[];
 	lastKnownLength: number = 0;
+	bufferLength: number = 0;
 	interceptors = null;
 	changeListeners = null;
 
@@ -123,9 +134,27 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 	updateArrayLength(oldLength: number, delta: number) {
 		if (oldLength !== this.lastKnownLength)
 			throw new Error("[mobx] Modification exception: the internal structure of an observable array was changed. Did you use peek() to change it?");
-		this.lastKnownLength += delta;
-		if (delta > 0 && oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
-			reserveArrayBuffer(oldLength + delta);
+		const newLength = oldLength + delta;
+		this.lastKnownLength = newLength;
+		this.setBufferLengthEnoughtFor(newLength + 1);
+	}
+
+	setBufferLengthEnoughtFor(length: number) {
+		if (canUsePrototypeSetter && length > SHARED_BUFFER_LENGTH) {
+			reserveArrayBuffer(ObservableArray.prototype, SHARED_BUFFER_LENGTH, length);
+			SHARED_BUFFER_LENGTH = length;
+		} else if (!canUsePrototypeSetter && length > this.bufferLength) {
+			reserveArrayBuffer(this.array, this.bufferLength, length);
+			this.bufferLength = length;
+		}
+	}
+
+	// Used in tests
+	getBufferLength() {
+		if (canUsePrototypeSetter) {
+			return SHARED_BUFFER_LENGTH;
+		}
+		return this.bufferLength;
 	}
 
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[] {
@@ -211,6 +240,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 		if (notifySpy)
 			spyReportEnd();
 	}
+
 }
 
 export class ObservableArray<T> extends StubArray {
@@ -227,13 +257,16 @@ export class ObservableArray<T> extends StubArray {
 			value: adm
 		});
 
-		if (initialValues && initialValues.length) {
-			adm.updateArrayLength(0, initialValues.length);
+		const initialLength = initialValues && initialValues.length || 0;
+
+		if (initialLength > 0) {
+			adm.updateArrayLength(0, initialLength);
 			adm.values = initialValues.map(adm.makeReactiveArrayItem, adm);
 			adm.notifyArraySplice(0, adm.values.slice(), EMPTY_ARRAY);
 		} else {
 			adm.values = [];
 		}
+		adm.setBufferLengthEnoughtFor(INITIAL_INSTANCE_BUFFER_LENGTH);
 	}
 
 	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
@@ -374,6 +407,8 @@ makeNonEnumerable(ObservableArray.prototype, [
 	"toString",
 	"toLocaleString"
 ]);
+
+
 Object.defineProperty(ObservableArray.prototype, "length", {
 	enumerable: false,
 	configurable: true,
@@ -415,22 +450,14 @@ Object.defineProperty(ObservableArray.prototype, "length", {
 	});
 });
 
-function createArrayBufferItem(index: number) {
-	Object.defineProperty(ObservableArray.prototype, "" + index, {
-		enumerable: false,
-		configurable: false,
-		set: createArraySetter(index),
-		get: createArrayGetter(index)
-	});
-}
-
 function createArraySetter(index: number) {
 	return function<T>(newValue: T) {
 		const adm = <ObservableArrayAdministration<T>> this.$mobx;
 		const values = adm.values;
 		assertUnwrapped(newValue, "Modifiers cannot be used on array values. For non-reactive array values use makeReactive(asFlat(array)).");
+
 		if (index < values.length) {
-			// update at index in range 
+			// update at index in range
 			checkIfStateModificationsAreAllowed();
 			const oldValue = values[index];
 			if (hasInterceptors(adm)) {
@@ -470,13 +497,20 @@ function createArrayGetter(index: number) {
 	};
 }
 
-function reserveArrayBuffer(max: number) {
-	for (let index = OBSERVABLE_ARRAY_BUFFER_SIZE; index < max; index++)
-		createArrayBufferItem(index);
-	OBSERVABLE_ARRAY_BUFFER_SIZE = max;
+function reserveArrayBuffer(target: any, min: number, max: number) {
+	for (let index = min; index < max; index++)
+		Object.defineProperty(target, "" + index, {
+			enumerable: false,
+			configurable: false,
+			set: createArraySetter(index),
+			get: createArrayGetter(index)
+		});
 }
 
-reserveArrayBuffer(1000);
+debugger;
+if (canUsePrototypeSetter) {
+	reserveArrayBuffer(ObservableArray.prototype, 0, SHARED_BUFFER_LENGTH);
+}
 
 export function createObservableArray<T>(initialValues: T[], mode: ValueMode, name: string): IObservableArray<T> {
 	return <IObservableArray<T>><any> new ObservableArray(initialValues, mode, name);
