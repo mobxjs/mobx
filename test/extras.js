@@ -14,20 +14,14 @@ test('treeD', function(t) {
     });
 
 
-    var bFunc =function () {
-        return a.get() * a.get();
-    };
-    var b = m.observable(bFunc);
+    var b = m.observable(() => a.get() * a.get());
     var bName = 'ComputedValue@2';
     t.deepEqual(dtree(b), {
         name: bName
         // no dependencies yet, since it isn't observed yet
     });
 
-    var cFunc =function() {
-        return b.get();
-    };
-    var c = m.autorun(cFunc);
+    var c = m.autorun(() => b.get());
     var cName = 'Autorun@3';
     t.deepEqual(dtree(c.$mobx), {
         name: cName,
