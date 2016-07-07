@@ -307,3 +307,16 @@ test('react to sort changes', function(t) {
     t.deepEqual(sorted, [1,2,3]);
     t.end();
 })
+
+test('autoextend buffer length', function(t) {
+	var ar = observable(new Array(1000));
+	var changesCount = 0;
+	ar.observe(changes => ++changesCount);
+
+	ar[ar.length] = 0;
+	ar.push(0);
+
+	t.equal(changesCount, 2);
+
+	t.end();
+})

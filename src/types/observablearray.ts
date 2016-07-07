@@ -124,8 +124,8 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 		if (oldLength !== this.lastKnownLength)
 			throw new Error("[mobx] Modification exception: the internal structure of an observable array was changed. Did you use peek() to change it?");
 		this.lastKnownLength += delta;
-		if (delta > 0 && oldLength + delta > OBSERVABLE_ARRAY_BUFFER_SIZE)
-			reserveArrayBuffer(oldLength + delta);
+		if (delta > 0 && oldLength + delta + 1 > OBSERVABLE_ARRAY_BUFFER_SIZE)
+			reserveArrayBuffer(oldLength + delta + 1);
 		if (delta > 0)
 			for (let i = 0; i < delta; i++)
 				Object.defineProperty(this.array, "" + (oldLength + i), ENUMERABLE_ENTRIES[oldLength + i]);
