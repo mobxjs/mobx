@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="6.1" data-basepath=".." data-revision="Wed Jul 06 2016 20:26:18 GMT+0200 (CEST)">
+    <div class="book" data-level="6.1" data-basepath=".." data-revision="Thu Jul 07 2016 23:11:57 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -839,25 +839,25 @@
                     <section class="normal" id="section-">
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/react.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="what-does-mobx-react-to">What does MobX react to?</h1>
-<p>MobX usually reacts to exactly those things you expect it to react to.
-Which makes that in 90% you really don&apos;t put any thought it it and it &quot;just works&quot;.
+<p>MobX usually reacts to exactly the things you expect it to.
+Which means that in 90% of your use cases mobx &quot;just works&quot;.
 However, at some point you will encounter a case where it might not do what you expected.
-At that point it is invaluable to understand a bit better how MobX determines what to react to.</p>
+At that point it is invaluable to understand how MobX determines what to react to.</p>
 <blockquote>
 <p>MobX reacts to any an <em>existing</em> <strong>observable</strong> <em>property</em> that is read during the execution of a tracked function.</p>
 </blockquote>
 <ul>
 <li><em>&quot;reading&quot;</em> is &quot;dotting into&quot; an observable property, also called dereferencing.</li>
-<li><em>&quot;trackable functions&quot;</em> are the expression of <code>computed</code>, the <code>render()</code> method of an observer component, and the functions that are passed as first param to <code>when</code>, <code>reaction</code> and <code>autorun</code>.</li>
-<li><em>&quot;during&quot;</em> means that only those observables that are being read while the function is executing, are tracked. It doesn&apos;t matter whether these values are used directly or indirectly by the tracked function.  </li>
+<li><em>&quot;trackable functions&quot;</em> are the expression of <code>computed</code>, the <code>render()</code> method of an observer component, and the functions that are passed as the first param to <code>when</code>, <code>reaction</code> and <code>autorun</code>.</li>
+<li><em>&quot;during&quot;</em> means that only those observables that are being read while the function is executing are tracked. It doesn&apos;t matter whether these values are used directly or indirectly by the tracked function.  </li>
 </ul>
 <p>In other words, MobX will not react to:</p>
 <ul>
-<li>Value that are obtained from observables, but outside a tracked function</li>
-<li>Observables that are read in an asynchronously invoded code block</li>
+<li>Values that are obtained from observables, but outside a tracked function</li>
+<li>Observables that are read in an asynchronously invoked code block</li>
 </ul>
 <h2 id="mobx-tracks-property-access-not-values">MobX tracks property access, not values</h2>
-<p>To elaborate the above rules with an example, suppose that you have the following observable data structure (<code>observable</code> applies itself recursively be default, so all fields in this example are observable):</p>
+<p>To elaborate on the above rules with an example, suppose that you have the following observable data structure (<code>observable</code> applies itself recursively by default, so all fields in this example are observable):</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">let</span> message = observable({
     title: <span class="hljs-string">&quot;Foo&quot;</span>,
     author: {
@@ -872,15 +872,15 @@ At that point it is invaluable to understand a bit better how MobX determines wh
 <p><img src="../images/observed-refs.png" alt="MobX reacts to changing references"></p>
 <p>Now what MobX basically does is recording which <em>arrows</em> you use in your function. After that, it will re-run whenever one of this <em>arrows</em> changes; when they start to refer to something else.</p>
 <h2 id="examples">Examples</h2>
-<p>Lets show that in a bunch of examples (based on the <code>message</code> variable defined above):</p>
+<p>Lets show that with a bunch of examples (based on the <code>message</code> variable defined above):</p>
 <h4 id="correct-dereference-inside-the-tracked-function">Correct: dereference inside the tracked function</h4>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(message.title)
 })
 message.title = <span class="hljs-string">&quot;Bar&quot;</span>
 </code></pre>
-<p>This will react as expected, the <code>.title</code> property was dereferences by the autorun, and changed afterwards, so this change is detected.</p>
-<p>You can verify what MobX will track by alling <code>whyRun()</code> inside the tracked function. In case of the above function it will output the following:</p>
+<p>This will react as expected, the <code>.title</code> property was dereferenced by the autorun, and changed afterwards, so this change is detected.</p>
+<p>You can verify what MobX will track by calling <code>whyRun()</code> inside the tracked function. In the case of the above function it will output the following:</p>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(message.title)
     whyRun() 
@@ -914,19 +914,19 @@ message.title = <span class="hljs-string">&quot;Bar&quot;</span>
     <span class="hljs-built_in">console</span>.log(message.author.name)
 })
 message.author.name = <span class="hljs-string">&quot;Sara&quot;</span>;
-message.autor = { name: <span class="hljs-string">&quot;John&quot;</span> };
+message.author = { name: <span class="hljs-string">&quot;John&quot;</span> };
 </code></pre>
-<p>This will react to both changes. Both <code>author</code> and <code>author.name</code> are dotted into, allow MobX to track these references.</p>
+<p>This will react to both changes. Both <code>author</code> and <code>author.name</code> are dotted into, allowing MobX to track these references.</p>
 <h4 id="incorrect-store-a-local-reference-to-an-observable-object-without-tracking">Incorrect: store a local reference to an observable object without tracking</h4>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> author = message.auhtor;
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> author = message.author;
 autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(author.name)
 })
 message.author.name = <span class="hljs-string">&quot;Sara&quot;</span>;
-message.autor = { name: <span class="hljs-string">&quot;John&quot;</span> };
+message.author = { name: <span class="hljs-string">&quot;John&quot;</span> };
 </code></pre>
 <p>The first change will be picked up, <code>message.author</code> and <code>author</code> are the same object, and the <code>.name</code> property is dereferenced in the autorun.
-However the second change will <strong>not</strong> be picked up, the <code>message.author</code> relation is not tracked by the <code>autorun</code> after all. Autorun is still using the &quot;old&quot; <code>author</code>.</p>
+However the second change will <strong>not</strong> be picked up, the <code>message.author</code> relation is not tracked by the <code>autorun</code>. Autorun is still using the &quot;old&quot; <code>author</code>.</p>
 <h4 id="correct-access-array-properties-in-tracked-function">Correct: access array properties in tracked function</h4>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(message.likes.length);
@@ -942,7 +942,7 @@ Arrays are not tracked per index / property (like observable objects and maps) b
 })
 message.likes.push(<span class="hljs-string">&quot;Jennifer&quot;</span>);
 </code></pre>
-<p>This will react with the above sample data, array indexers count as property acces. But <strong>only</strong> if the provided <code>index &lt; length</code>.
+<p>This will react with the above sample data, array indexers count as property access. But <strong>only</strong> if the provided <code>index &lt; length</code>.
 MobX will not track not-yet-existing indices or object properties (except when using maps).
 So always guard your array index based access with a <code>.length</code> check.</p>
 <h4 id="correct-access-array-functions-in-tracked-function">Correct: access array functions in tracked function</h4>
@@ -965,7 +965,7 @@ message.likes[<span class="hljs-number">2</span>] = <span class="hljs-string">&q
 })
 message.likes.push(<span class="hljs-string">&quot;Jennifer&quot;</span>);
 </code></pre>
-<p>This will <strong>not</strong> react. Simple because the <code>likes</code> array itself is not being used by the <code>autorun</code>, only the refence to the array.
+<p>This will <strong>not</strong> react. Simply because the <code>likes</code> array itself is not being used by the <code>autorun</code>, only the reference to the array.
 So in contrast, <code>messages.likes = [&quot;Jennifer&quot;]</code> would be picked up; that statement does not modify the array, but the <code>likes</code> property itself.</p>
 <h4 id="incorrect-using-non-observable-object-properties">Incorrect: using non-observable object properties</h4>
 <pre><code class="lang-javascript">autorun(() =&gt; {
@@ -982,8 +982,8 @@ extendObservable(message, {
     postDate: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>()
 })
 </code></pre>
-<p>This will <strong>not</strong> react. MobX will not react to observable properties that did not exist when starting tracking. 
-If the two statements are swapped, or if any other observabe causes the <code>autorun</code> the run to re-run, the <code>autorun</code> will start track the <code>postDate</code> as well.</p>
+<p>This will <strong>not</strong> react. MobX will not react to observable properties that did not exist when tracking started. 
+If the two statements are swapped, or if any other observable causes the <code>autorun</code> to re-run, the <code>autorun</code> will start tracking the <code>postDate</code> as well.</p>
 <h4 id="correct-using-not-yet-existing-map-entries">Correct: using not yet existing map entries</h4>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> twitterUrls = observable(asMap({
     <span class="hljs-string">&quot;John&quot;</span>: <span class="hljs-string">&quot;twitter.com/johnny&quot;</span>
@@ -994,7 +994,7 @@ autorun(() =&gt; {
 })
 twitterUrls.set(<span class="hljs-string">&quot;Sara&quot;</span>, <span class="hljs-string">&quot;twitter.com/horsejs&quot;</span>)
 </code></pre>
-<p>This <strong>will</strong> react. Observable maps support observing not yet existing entries.
+<p>This <strong>will</strong> react. Observable maps support observing entries that may not exist.
 Note that this will initially print <code>undefined</code>.
 You can check for the existence of an entry first by using <code>twitterUrls.has(&quot;Sara&quot;)</code>.
 So for dynamically keyed collections, always use observable maps.</p>
@@ -1009,7 +1009,7 @@ autorun(() =&gt; {
 message.author.name = <span class="hljs-string">&quot;Chesterton&quot;</span>
 </code></pre>
 <p>This will react. Even though <code>author.name</code> is not dereferenced by the thunk passed to <code>autorun</code> itself,
-MobX will still track the derefencing that happens in <code>upperCaseAuthorName</code>,
+MobX will still track the dereferencing that happens in <code>upperCaseAuthorName</code>,
 because it happens <em>during</em> the execution of the autorun.</p>
 <hr>
 <pre><code class="lang-javascript">autorun(() =&gt; {
@@ -1047,7 +1047,7 @@ If <code>SomeContainer</code> comes from an external lib, you can also fix this 
 message.title = &quot;Bar&quot;
 </span></code></pre>
 <h2 id="avoid-caching-observables-in-local-fields">Avoid caching observables in local fields</h2>
-<p>A common mistake is to store local variables that derefence observables, and then expect components to react. For example:</p>
+<p>A common mistake is to store local variables that dereference observables, and then expect components to react. For example:</p>
 <pre><code class="lang-javascript">@observer <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyComponent</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">component</span> </span>{
     author;
     constructor(props) {
@@ -1081,7 +1081,7 @@ This can simply be solved by doing the dereferencing inside <code>render()</code
 )
 
 const Author = observer(({ author }) =&gt; 
-    &lt;span&gt;{auhtor.name}&lt;/span&gt;
+    &lt;span&gt;{author.name}&lt;/span&gt;
 )
 
 const Likes = observer(({ likes }) =&gt; 
@@ -1106,7 +1106,7 @@ const Likes = observer(({ likes }) =&gt;
 </tr>
 <tr>
 <td><code>message.author.name = &quot;Susan&quot;</code></td>
-<td><code>Author</code> (<code>.author</code> is derefferenced in <code>Message</code>, but didn&apos;t change)*</td>
+<td><code>Author</code> (<code>.author</code> is dereferenced in <code>Message</code>, but didn&apos;t change)*</td>
 </tr>
 <tr>
 <td><code>message.author = { name: &quot;Susan&quot;}</code></td>
