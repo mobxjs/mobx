@@ -100,7 +100,7 @@ autorun(() => {
     console.log(message.author.name)
 })
 message.author.name = "Sara";
-message.autor = { name: "John" };
+message.author = { name: "John" };
 ```
  
 This will react to both changes. Both `author` and `author.name` are dotted into, allowing MobX to track these references.
@@ -113,7 +113,7 @@ autorun(() => {
     console.log(author.name)
 })
 message.author.name = "Sara";
-message.autor = { name: "John" };
+message.author = { name: "John" };
 ```
 
 The first change will be picked up, `message.author` and `author` are the same object, and the `.name` property is dereferenced in the autorun.
@@ -142,7 +142,7 @@ autorun(() => {
 message.likes.push("Jennifer");
 ```
 
-This will react with the above sample data, array indexers count as property acces. But **only** if the provided `index < length`.
+This will react with the above sample data, array indexers count as property access. But **only** if the provided `index < length`.
 MobX will not track not-yet-existing indices or object properties (except when using maps).
 So always guard your array index based access with a `.length` check.
 
@@ -177,7 +177,7 @@ autorun(() => {
 message.likes.push("Jennifer");
 ```
 
-This will **not** react. Simply because the `likes` array itself is not being used by the `autorun`, only the refence to the array.
+This will **not** react. Simply because the `likes` array itself is not being used by the `autorun`, only the reference to the array.
 So in contrast, `messages.likes = ["Jennifer"]` would be picked up; that statement does not modify the array, but the `likes` property itself.
 
 #### Incorrect: using non-observable object properties
@@ -238,7 +238,7 @@ autorun(() => {
 message.author.name = "Chesterton"
 ```
 This will react. Even though `author.name` is not dereferenced by the thunk passed to `autorun` itself,
-MobX will still track the derefencing that happens in `upperCaseAuthorName`,
+MobX will still track the dereferencing that happens in `upperCaseAuthorName`,
 because it happens _during_ the execution of the autorun.
 
 ----
@@ -287,7 +287,7 @@ message.title = "Bar"
 
 ## Avoid caching observables in local fields
 
-A common mistake is to store local variables that derefence observables, and then expect components to react. For example:
+A common mistake is to store local variables that dereference observables, and then expect components to react. For example:
 
 ```javascript
 @observer class MyComponent extends React.component {
@@ -345,7 +345,7 @@ const Likes = observer(({ likes }) =>
 | change | re-rendering component |
 | --- | -- |
 | `message.title = "Bar"` | `Message` |
-| `message.author.name = "Susan"` | `Author` (`.author` is derefferenced in `Message`, but didn't change)* |
+| `message.author.name = "Susan"` | `Author` (`.author` is dereferenced in `Message`, but didn't change)* |
 | `message.author = { name: "Susan"}` | `Message`, `Author` |
 | `message.likes[0] = "Michel"` | `Likes` |
 
