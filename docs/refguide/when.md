@@ -20,7 +20,7 @@ class MyResource {
 		);
 	}
 
-	@observable get isVisible() {
+	@computed get isVisible() {
 		// indicate whether this item is visible
 	}
 
