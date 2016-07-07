@@ -5,6 +5,7 @@ import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
+
 /**
  * Detects bug in some browsers, when instance doesn't use prototype setter,
  * if property name looks like number. See https://github.com/mobxjs/mobx/issues/364
@@ -507,7 +508,6 @@ function reserveArrayBuffer(target: any, min: number, max: number) {
 		});
 }
 
-debugger;
 if (canUsePrototypeSetter) {
 	reserveArrayBuffer(ObservableArray.prototype, 0, SHARED_BUFFER_LENGTH);
 }
