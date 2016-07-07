@@ -250,7 +250,7 @@ export class ObservableArray<T> extends StubArray {
 			adm.values = [];
 		}
 
-		if (safariPrototypeSetterInheritanceBug) {
+		if (safariPrototypeSetterInheritanceBug && initialValues.length === 0) {
 			// Seems that Safari won't use numeric prototype setter untill any * numeric property is
 			// defined on the instance. After that it works fine, even if this property is deleted.
 			const { get, set } = ENUMERABLE_ENTRIES[0];
