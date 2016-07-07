@@ -108,7 +108,7 @@ This will react to both changes. Both `author` and `author.name` are dotted into
 #### Incorrect: store a local reference to an observable object without tracking
 
 ```javascript
-const author = message.auhtor;
+const author = message.author;
 autorun(() => {
     console.log(author.name)
 })
@@ -330,7 +330,7 @@ const Message = observer(({ message }) =>
 )
 
 const Author = observer(({ author }) => 
-    <span>{auhtor.name}</span>
+    <span>{author.name}</span>
 )
 
 const Likes = observer(({ likes }) => 
