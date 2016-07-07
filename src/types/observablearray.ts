@@ -6,6 +6,15 @@ import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, inte
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 
+// Detects bug in safari 9.1.1 (or iOS 9 safari mobile). See #364
+const safariPrototypeSetterInheritanceBug = (() => {
+	var v = false;
+	const p = {};
+	Object.defineProperty(p, "0", { set: () => { v = true } });
+	Object.create(p)["0"] = 1;
+	return v === false;
+})();
+
 export interface IObservableArray<T> extends Array<T> {
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[];
 	observe(listener: (changeData: IArrayChange<T>|IArraySplice<T>) => void, fireImmediately?: boolean): Lambda;
@@ -239,6 +248,18 @@ export class ObservableArray<T> extends StubArray {
 			adm.notifyArraySplice(0, adm.values.slice(), EMPTY_ARRAY);
 		} else {
 			adm.values = [];
+		}
+
+		if (safariPrototypeSetterInheritanceBug) {
+			// Seems that Safari won't use numeric prototype setter untill any * numeric property is
+			// defined on the instance. After that it works fine, even if this property is deleted.
+			const { get, set } = ENUMERABLE_ENTRIES[0];
+			Object.defineProperty(adm.array, "0", {
+				enumerable: false,
+				configurable: true,
+				get,
+				set,
+			});
 		}
 	}
 
