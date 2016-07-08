@@ -2,8 +2,8 @@
 
 Usage: `reaction(() => data, data => { sideEffect }, fireImmediately = false, delay = 0)`.
 
-A variation on `autorun` that gives more fine grained control on which observables that will be tracked.
-It takes two function, the first one is tracked and returns data that is used as input for the second one, the side effect.
+A variation on `autorun` that gives more fine grained control on which observables will be tracked.
+It takes two functions, the first one is tracked and returns data that is used as input for the second one, the side effect.
 Unlike `autorun` the side effect won't be run directly when created, but only when the data expression returns a new value for the first time. 
 Any observables that are accessed while executing the side effect will not be tracked.
 The side effect can be debounced, just like `autorunAsync`.
