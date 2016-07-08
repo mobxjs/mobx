@@ -1,3 +1,9 @@
+# 2.3.5
+
+* Fixed #364: Observable arrays not reacting properly to index assignments under iOS safari (mobile) 9.1.1 By @andykog
+* Fixed #387: Typings of boxed values
+* Added warning when reading array entries out of bounds. See #381
+
 # 2.3.4
 
 * Fixed #360: Removed expensive cycle detection (cycles are still detected, but a bit later)
