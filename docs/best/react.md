@@ -343,7 +343,7 @@ const Likes = observer(({ likes }) =>
 ```
 
 | change | re-rendering component |
-| --- | -- |
+| --- | --- |
 | `message.title = "Bar"` | `Message` |
 | `message.author.name = "Susan"` | `Author` (`.author` is dereferenced in `Message`, but didn't change)* |
 | `message.author = { name: "Susan"}` | `Message`, `Author` |
