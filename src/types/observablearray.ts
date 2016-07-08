@@ -135,14 +135,6 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 		this.lastKnownLength += delta;
 		if (delta > 0 && oldLength + delta + 1 > OBSERVABLE_ARRAY_BUFFER_SIZE)
 			reserveArrayBuffer(oldLength + delta + 1);
-		if (safariPrototypeSetterInheritanceBug) {
-			if (delta > 0)
-				for (let i = 0; i < delta; i++)
-					Object.defineProperty(this.array, "" + (oldLength + i), ENUMERABLE_ENTRIES[oldLength + i]);
-			else if (delta < 0)
-				for (let i = 0; i > delta; i--)
-					delete this.array["" + (oldLength + i)];
-		}
 	}
 
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[] {
@@ -252,16 +244,10 @@ export class ObservableArray<T> extends StubArray {
 			adm.values = [];
 		}
 
-		if (safariPrototypeSetterInheritanceBug && initialValues.length === 0) {
+		if (safariPrototypeSetterInheritanceBug) {
 			// Seems that Safari won't use numeric prototype setter untill any * numeric property is
 			// defined on the instance. After that it works fine, even if this property is deleted.
-			const { get, set } = ENUMERABLE_ENTRIES[0];
-			Object.defineProperty(adm.array, "0", {
-				enumerable: false,
-				configurable: true,
-				get,
-				set,
-			});
+			Object.defineProperty(adm.array, "0", ENTRY_0);
 		}
 	}
 
@@ -444,16 +430,17 @@ Object.defineProperty(ObservableArray.prototype, "length", {
 	});
 });
 
-const ENUMERABLE_ENTRIES = [];
+// See #364
+const ENTRY_0 = {
+	configurable: true,
+	enumerable:false,
+	set: createArraySetter(0),
+	get: createArrayGetter(0)	
+};
 
 function createArrayBufferItem(index: number) {
 	const set = createArraySetter(index);
 	const get = createArrayGetter(index);
-	ENUMERABLE_ENTRIES[index] = {
-		enumerable: false, // ideally true, but currently we use this only on iOS (to fix #364, cause in general this is 10 times slower)
-		configurable: true,
-		set, get
-	};
 	Object.defineProperty(ObservableArray.prototype, "" + index, {
 		enumerable: false,
 		configurable: true,
