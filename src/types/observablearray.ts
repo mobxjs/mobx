@@ -135,12 +135,14 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 		this.lastKnownLength += delta;
 		if (delta > 0 && oldLength + delta + 1 > OBSERVABLE_ARRAY_BUFFER_SIZE)
 			reserveArrayBuffer(oldLength + delta + 1);
-		if (delta > 0)
-			for (let i = 0; i < delta; i++)
-				Object.defineProperty(this.array, "" + (oldLength + i), ENUMERABLE_ENTRIES[oldLength + i]);
-		else if (delta < 0)
-			for (let i = 0; i > delta; i--)
-				delete this.array["" + (oldLength + i)];
+		if (safariPrototypeSetterInheritanceBug) {
+			if (delta > 0)
+				for (let i = 0; i < delta; i++)
+					Object.defineProperty(this.array, "" + (oldLength + i), ENUMERABLE_ENTRIES[oldLength + i]);
+			else if (delta < 0)
+				for (let i = 0; i > delta; i--)
+					delete this.array["" + (oldLength + i)];
+		}
 	}
 
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[] {
@@ -448,7 +450,7 @@ function createArrayBufferItem(index: number) {
 	const set = createArraySetter(index);
 	const get = createArrayGetter(index);
 	ENUMERABLE_ENTRIES[index] = {
-		enumerable: true,
+		enumerable: false, // ideally true, but currently we use this only on iOS (to fix #364, cause in general this is 10 times slower)
 		configurable: true,
 		set, get
 	};

@@ -85,7 +85,8 @@ test('test1', function(t) {
 
 	t.equal(JSON.stringify(a), "[3,1,2]");
 
-	t.deepEqual(Object.keys(a), ['0', '1', '2']);
+//	t.deepEqual(Object.keys(a), ['0', '1', '2']); // ideally....
+	t.deepEqual(Object.keys(a), []);
 
     t.end();
 })
