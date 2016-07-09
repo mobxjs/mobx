@@ -29,7 +29,6 @@
   * [Stateless Components and Hot Module Reloading](best/stateless-HMR.md)
   * Optimizing MobX
   * Testing
-* [Examples, related projects](LINKS.md)
 * [Frequently Asked Questions](faq/faq.md)
 * Utility functions
   * [autorunAsync](refguide/autorun-async.md)
