@@ -101,11 +101,10 @@ const colors = observable({
    background: '#fff'
 })
 
-const App = () => {
+const App = () =>
   <Provider colors={colors}>
      <app stuff... />
   </Provider>
-}
 
 const Button = observer(["colors"], ({ colors, label, onClick }) => 
   <button style={{
