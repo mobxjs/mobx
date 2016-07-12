@@ -1,3 +1,6 @@
+# 2.3.6
+* Fixed #406: Observable maps doesn't work with empty initial value in Safari
+
 # 2.3.5
 
 * Fixed #364: Observable arrays not reacting properly to index assignments under iOS safari (mobile) 9.1.1 By @andykog
