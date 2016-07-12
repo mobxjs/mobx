@@ -4,8 +4,9 @@ import {invariant, addHiddenFinalProp} from "./utils";
 
 declare var Symbol;
 
-const SYMBOL_ITERATOR = typeof Symbol === "function" && Symbol.iterator;
-export const $$iterator = SYMBOL_ITERATOR || "@@iterator";
+function iteratorSymbol() {
+	return (typeof Symbol === "function" && Symbol.iterator) || "@@iterator";
+}
 
 export const IS_ITERATING_MARKER = "__$$iterating";
 
@@ -17,6 +18,8 @@ export interface Iterator<T> {
 }
 
 export function arrayAsIterator<T>(array: T[]): T[] & Iterator<T> {
+	// TODO: this should be removed in the next major version of MobX
+	// returning an array for entries(), values() etc for maps was a mis-interpretation of the specs..
 	invariant(array[IS_ITERATING_MARKER] !== true, "Illegal state: cannot recycle array as iterator");
 	addHiddenFinalProp(array, IS_ITERATING_MARKER, true);
 
@@ -32,5 +35,5 @@ export function arrayAsIterator<T>(array: T[]): T[] & Iterator<T> {
 }
 
 export function declareIterator<T>(prototType, iteratorFactory: () => Iterator<T>) {
-	addHiddenFinalProp(prototType, $$iterator, iteratorFactory);
+	addHiddenFinalProp(prototType, iteratorSymbol(), iteratorFactory);
 }
