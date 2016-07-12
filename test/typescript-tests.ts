@@ -899,10 +899,24 @@ test("379, inheritable actions - 2 (typescript)", t => {
 	const a = new A()
 	t.equal(a.method(), 42)
 	t.equal(isAction(a.method), true)
-	
+
 	const c = new C()
 	t.equal(c.method(), 87)
 	t.equal(isAction(c.method), true)
 
 	t.end()
+})
+
+test("373 - fix isObservable for unused computed", t => {
+	class Bla {
+		@computed get computedVal() { return 3 }
+		constructor() {
+			t.equal(isObservable(this, "computedVal"), true)
+			this.computedVal;
+			t.equal(isObservable(this, "computedVal"), true)
+		}
+	}
+
+	new Bla();
+	t.end();
 })
