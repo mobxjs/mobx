@@ -131,6 +131,22 @@ test('initialize with entries', function(t) {
 	t.end();
 })
 
+test('initialize with empty value', function(t) {
+	var a = map();
+	var b = map({});
+	var c = map([]);
+	
+	a.set('0', 0);
+	b.set('0', 0);
+	c.set('0', 0);
+
+	t.deepEqual(a.toJs(), { '0': 0 });
+	t.deepEqual(b.toJs(), { '0': 0 });
+	t.deepEqual(c.toJs(), { '0': 0 });
+
+	t.end();
+})
+
 test('observe collections', function(t) {
 	var x = map();
 	var keys, values, entries;
