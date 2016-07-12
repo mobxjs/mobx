@@ -1,6 +1,7 @@
 var test = require('tape');
 var mobx = require('..');
 var observable = mobx.observable;
+var iterall = require('iterall');
 
 function buffer() {
     var b = [];
@@ -89,6 +90,30 @@ test('test1', function(t) {
 	t.deepEqual(Object.keys(a), []);
 
     t.end();
+})
+
+test('array should support iterall / iterable ', t => {
+	var a = observable([1,2,3])
+
+	t.equal(iterall.isIterable(a), true);
+	t.equal(iterall.isArrayLike(a), true);
+	
+	var values = [];
+	iterall.forEach(a, v => values.push(v))
+
+	t.deepEqual(values, [1,2,3])
+
+	var iter = iterall.getIterator(a)
+	t.deepEqual(iter.next(), { value: 1, done: false })
+	t.deepEqual(iter.next(), { value: 2, done: false })
+	t.deepEqual(iter.next(), { value: 3, done: false })
+	t.deepEqual(iter.next(), { value: undefined, done: true })
+
+	a.replace([])
+	iter = iterall.getIterator(a)
+	t.deepEqual(iter.next(), { value: undefined, done: true })
+
+	t.end()
 })
 
 test('find and remove', function(t) {

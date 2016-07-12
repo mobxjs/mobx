@@ -51,6 +51,7 @@
     "coveralls": "^2.11.4",
     "faucet": "0.0.1",
     "istanbul": "^0.3.21",
+    "iterall": "^1.0.2",
     "lodash.intersection": "^3.2.0",
     "tape": "^4.2.2",
     "tape-run": "^2.1.0",

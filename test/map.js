@@ -2,6 +2,7 @@ var test = require('tape');
 var mobx = require('..');
 var map = mobx.map;
 var autorun = mobx.autorun;
+var iterall = require('iterall');
 
 test('map crud', function(t) {
 	global.__mobxGlobal.mobxGuid = 0; // hmm dangerous reset?
@@ -405,4 +406,35 @@ test('308, map keys should be coerced to strings correctly', t => {
 	t.deepEqual(m.keys(), [])
 
 	t.end()	
+})
+
+test('map should support iterall / iterable ', t => {
+	var a = mobx.map({ a: 1, b: 2 })
+
+	function leech(iter) {
+		var values = [];
+		do {
+			var v = iter.next();
+			if (!v.done)
+				values.push(v.value);
+		} while (!v.done)
+		return values;
+	}
+
+	t.equal(iterall.isIterable(a), true)
+
+	t.deepEqual(leech(iterall.getIterator(a)), [
+		["a", 1],
+		["b", 2]
+	])
+
+	t.deepEqual(leech(a.entries()), [
+		["a", 1],
+		["b", 2]
+	])
+
+	t.deepEqual(leech(a.keys()), ["a", "b"])
+	t.deepEqual(leech(a.values()), [1, 2])
+
+	t.end()
 })

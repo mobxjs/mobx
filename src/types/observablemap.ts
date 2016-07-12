@@ -8,12 +8,14 @@ import {allowStateChanges} from "../core/action";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
+import {arrayAsIterator, declareIterator, Iterator} from "../utils/iterable";
 
 export interface IKeyValueMap<V> {
 	[key: string]: V;
 }
 
-export type IMapEntries<V> = [string, V][]
+export type IMapEntry<V> = [string, V];
+export type IMapEntries<V> = IMapEntry<V>[];
 
 // In 3.0, change to IObjectMapChange
 export interface IMapChange<T> {
@@ -196,16 +198,16 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		return undefined;
 	}
 
-	keys(): string[] {
-		return this._keys.slice();
+	keys(): string[] & Iterator<string> {
+		return arrayAsIterator(this._keys.slice());
 	}
 
-	values(): V[] {
-		return this.keys().map(this.get, this);
+	values(): V[] & Iterator<V> {
+		return arrayAsIterator(this._keys.map(this.get, this));
 	}
 
-	entries(): IMapEntries<V> {
-		return this.keys().map(key => <[string, V]>[key, this.get(key)]);
+	entries(): IMapEntries<V> & Iterator<IMapEntry<V>> {
+		return arrayAsIterator(this._keys.map(key => <[string, V]>[key, this.get(key)]));
 	}
 
 	forEach(callback: (value: V, key: string, object: IKeyValueMap<V>) => void, thisArg?) {
@@ -287,6 +289,9 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	}
 }
 
+declareIterator(ObservableMap.prototype, function() {
+	return this.entries();
+});
 
 /**
  * Creates a map, similar to ES6 maps (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map),

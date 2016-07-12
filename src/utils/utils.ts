@@ -87,6 +87,15 @@ export function makeNonEnumerable(object: any, props: string[]) {
 	}
 }
 
+export function addHiddenFinalProp(object: any, propName: string, value: any) {
+	Object.defineProperty(object, propName, {
+		enumerable: false,
+		writable: false,
+		configurable: false,
+		value
+	});
+}
+
 export function isPropertyConfigurable(object: any, prop: string): boolean {
 	const descriptor = Object.getOwnPropertyDescriptor(object, prop);
 	return !descriptor || (descriptor.configurable !== false && descriptor.writable !== false);

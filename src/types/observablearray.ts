@@ -5,6 +5,7 @@ import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
+import {arrayAsIterator, declareIterator} from "../utils/iterable";
 
 // Detects bug in safari 9.1.1 (or iOS 9 safari mobile). See #364
 const safariPrototypeSetterInheritanceBug = (() => {
@@ -367,6 +368,10 @@ export class ObservableArray<T> extends StubArray {
 	}
 }
 
+declareIterator(ObservableArray.prototype, function() {
+	return arrayAsIterator(this.slice());
+});
+
 /**
  * We don't want those to show up in `for (const key in ar)` ...
  */
@@ -389,6 +394,7 @@ makeNonEnumerable(ObservableArray.prototype, [
 	"toString",
 	"toLocaleString"
 ]);
+
 Object.defineProperty(ObservableArray.prototype, "length", {
 	enumerable: false,
 	configurable: true,
