@@ -17,6 +17,7 @@ Boilerplate projects, example projects with sources, Libraries.
 * [gulp-es6-sass-mobx](https://github.com/pixelkritzel/gulp_es6_sass_boilerplate)
 * [react-mobx-boilerplate](https://github.com/osenvosem/react-mobx-boilerplate) A small React + React Router + MobX boilerplate with a small example app.
 * [Small project to quickly start with deku, MobX, JSX, ES6, Babel](https://github.com/micnews/mobx-deku-boilerplate)
+* [React MobX Seed: Seed project using a wide set of best practices](https://github.com/sapientglobalmarkets/react-mobx-seed)
 
 ## Example projects
 
