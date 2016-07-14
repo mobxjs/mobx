@@ -1,5 +1,5 @@
 import {ComputedValue} from "../core/computedvalue";
-import {invariant, getNextId} from "../utils/utils";
+import {invariant, getNextId, addHiddenProp} from "../utils/utils";
 import {globalState} from "../core/globalstate";
 
 export type ITransformer<A, B> = (object: A) => B;
@@ -50,12 +50,7 @@ function getMemoizationId(object) {
 	let tid = object.$transformId;
 	if (tid === undefined) {
 		tid = getNextId();
-		Object.defineProperty(object, "$transformId", {
-			configurable: true,
-			writable: true,
-			enumerable: false,
-			value: tid
-		});
+		addHiddenProp(object, "$transformId", tid);
 	}
 	return tid;
 }

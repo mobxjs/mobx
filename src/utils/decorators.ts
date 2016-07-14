@@ -1,4 +1,4 @@
-import {invariant} from "./utils";
+import {invariant, addHiddenProp} from "./utils";
 
 /** 
  * Construcs a decorator, that normalizes the differences between 
@@ -32,7 +32,7 @@ export function createClassPropertyDecorator(
 		invariant(allowCustomArguments || quacksLikeADecorator(arguments), "This function is a decorator, but it wasn't invoked like a decorator");
 		if (!descriptor) {
 			// typescript (except for getter / setters)
-			const descriptor = {
+			const newDescriptor = {
 				enumerable,
 				configurable: true,
 				get: function() {
@@ -54,14 +54,13 @@ export function createClassPropertyDecorator(
 				// (see https://github.com/mobxjs/mobx/issues/333)
 				Object.defineProperty(target, key, descriptor);
 			}
-			return descriptor;
+			return newDescriptor;
 		} else {
 			// babel and typescript getter / setter props
 			if (!target.hasOwnProperty("__mobxLazyInitializers")) {
-				Object.defineProperty(target, "__mobxLazyInitializers", {
-					writable: false, configurable: false, enumerable: false,
-					value: (target.__mobxLazyInitializers && target.__mobxLazyInitializers.slice()) || [] // support inheritance
-				});
+				addHiddenProp(target, "__mobxLazyInitializers",
+					(target.__mobxLazyInitializers && target.__mobxLazyInitializers.slice()) || [] // support inheritance
+				);
 			}
 
 			const {value, initializer} = descriptor;
@@ -106,12 +105,8 @@ export function createClassPropertyDecorator(
 }
 
 function typescriptInitializeProperty(instance, key, v, onInitialize, customArgs, baseDescriptor) {
-	if (!instance.hasOwnProperty("__mobxInitializedProps")) {
-		Object.defineProperty(instance, "__mobxInitializedProps", {
-			enumerable: false, configurable: false, writable: true,
-			value: {}
-		});
-	}
+	if (!instance.hasOwnProperty("__mobxInitializedProps"))
+		addHiddenProp(instance, "__mobxInitializedProps", {});
 	instance.__mobxInitializedProps[key] = true;
 	onInitialize(instance, key, v, customArgs, baseDescriptor);
 }
@@ -120,12 +115,7 @@ export function runLazyInitializers(instance) {
 	if (instance.__mobxDidRunLazyInitializers === true)
 		return;
 	if (instance.__mobxLazyInitializers) {
-		Object.defineProperty(instance, "__mobxDidRunLazyInitializers", {
-			enumerable: false,
-			configurable: false,
-			writable: false,
-			value: true
-		});
+		addHiddenProp(instance, "__mobxDidRunLazyInitializers", true);
 		instance.__mobxDidRunLazyInitializers && instance.__mobxLazyInitializers.forEach(initializer => initializer(instance));
 	}
 }

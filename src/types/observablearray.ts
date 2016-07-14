@@ -1,4 +1,4 @@
-import {getNextId, deepEquals, makeNonEnumerable, Lambda, deprecated, EMPTY_ARRAY} from "../utils/utils";
+import {getNextId, deepEquals, makeNonEnumerable, Lambda, deprecated, EMPTY_ARRAY, addHiddenFinalProp, addHiddenProp} from "../utils/utils";
 import {Atom} from "../core/atom";
 import {ValueMode, assertUnwrapped, makeChildObservable} from "./modifiers";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
@@ -9,9 +9,9 @@ import {arrayAsIterator, declareIterator} from "../utils/iterable";
 
 // Detects bug in safari 9.1.1 (or iOS 9 safari mobile). See #364
 const safariPrototypeSetterInheritanceBug = (() => {
-	var v = false;
+	let v = false;
 	const p = {};
-	Object.defineProperty(p, "0", { set: () => { v = true } });
+	Object.defineProperty(p, "0", { set: () => { v = true; } });
 	Object.create(p)["0"] = 1;
 	return v === false;
 })();
@@ -230,12 +230,7 @@ export class ObservableArray<T> extends StubArray {
 		super();
 
 		const adm = new ObservableArrayAdministration<T>(name, mode, this as any, owned);
-		Object.defineProperty(this, "$mobx", {
-			enumerable: false,
-			configurable: false,
-			writable: false,
-			value: adm
-		});
+		addHiddenFinalProp(this, "$mobx", adm);
 
 		if (initialValues && initialValues.length) {
 			adm.updateArrayLength(0, initialValues.length);
@@ -425,14 +420,9 @@ Object.defineProperty(ObservableArray.prototype, "length", {
 	"some"
 ].forEach(funcName => {
 	const baseFunc = Array.prototype[funcName];
-	Object.defineProperty(ObservableArray.prototype, funcName, {
-		configurable: false,
-		writable: true,
-		enumerable: false,
-		value: function() {
-			this.$mobx.atom.reportObserved();
-			return baseFunc.apply(this.$mobx.values, arguments);
-		}
+	addHiddenProp(ObservableArray.prototype, funcName, function() {
+		this.$mobx.atom.reportObserved();
+		return baseFunc.apply(this.$mobx.values, arguments);
 	});
 });
 

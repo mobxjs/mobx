@@ -2,7 +2,7 @@ import {ObservableValue, UNCHANGED} from "./observablevalue";
 import {ComputedValue} from "../core/computedvalue";
 import {isAction} from "../core/action";
 import {ValueMode, AsStructure} from "./modifiers";
-import {Lambda, getNextId, invariant, assertPropertyConfigurable, isPlainObject} from "../utils/utils";
+import {Lambda, getNextId, invariant, assertPropertyConfigurable, isPlainObject, addHiddenFinalProp} from "../utils/utils";
 import {runLazyInitializers} from "../utils/decorators";
 import {throwingComputedValueSetter} from "../api/computeddecorator";
 import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "./intercept-utils";
@@ -62,12 +62,7 @@ export function asObservableObject(target, name: string, mode: ValueMode = Value
 		name = "ObservableObject@" + getNextId();
 
 	const adm = new ObservableObjectAdministration(target, name, mode);
-	Object.defineProperty(target, "$mobx", {
-		enumerable: false,
-		configurable: false,
-		writable: false,
-		value: adm
-	});
+	addHiddenFinalProp(target, "$mobx", adm);
 	return adm;
 }
 

@@ -1,5 +1,5 @@
 import {transactionStart, transactionEnd} from "../core/transaction";
-import {invariant, EMPTY_ARRAY} from "../utils/utils";
+import {invariant, addHiddenProp} from "../utils/utils";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {ComputedValue} from "../core/computedvalue";
@@ -10,10 +10,7 @@ const actionFieldDecorator = createClassPropertyDecorator(
 	function (target, key, value, args, originalDescriptor) {
 		const actionName = (args && args.length === 1) ? args[0] : (value.name || key || "<unnamed action>");
 		const wrappedAction = action(actionName, value);
-		Object.defineProperty(target, key, {
-			configurable: true, enumerable: false,	writable: false,
-			value: wrappedAction
-		});
+		addHiddenProp(target, key, wrappedAction);
 	},
 	function (key) {
 		return this[key];
@@ -39,7 +36,6 @@ export function action(arg1, arg2?, arg3?, arg4?): any {
 		return namedActionDecorator(arg1);
 
 	return namedActionDecorator(arg2).apply(null, arguments);
-	
 }
 
 function namedActionDecorator(name: string) {
