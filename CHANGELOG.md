@@ -1,3 +1,7 @@
+# 2.3.7
+
+* Fixed issue where computed values were tracked and accidentally kept alive during actions
+
 # 2.3.6
 * Fixed #406: Observable maps doesn't work with empty initial value in Safari
 * Implemented #357, #348: ObservableMap and ObservableArray now support iterators. Use [`@@iterator()` or iterall](https://github.com/leebyron/iterall) in ES5 environments. 

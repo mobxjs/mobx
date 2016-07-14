@@ -17,7 +17,8 @@ export interface IDerivation extends IDepTreeNode, IObservable {
 }
 
 export function isComputingDerivation() {
-	return globalState.derivationStack.length > 0;
+	return globalState.derivationStack.length > 0
+		&& globalState.isTracking; // filter out actions inside computations
 }
 
 export function checkIfStateModificationsAreAllowed() {

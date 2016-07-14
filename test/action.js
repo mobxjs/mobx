@@ -1,3 +1,5 @@
+"use strict"
+
 var test = require('tape');
 var mobx = require('../');
 
@@ -307,4 +309,62 @@ test('runInAction', t => {
 
 	d();
 	t.end();
+})
+
+test('action in autorun does not keep / make computed values alive', t => {
+	let calls = 0
+	const myComputed = mobx.computed(() => calls++)
+	const callComputedTwice = () => {
+		myComputed.get()
+		myComputed.get()
+	}
+
+	const runWithMemoizing = fun => { mobx.autorun(fun)() }
+
+	callComputedTwice()
+	t.equal(calls, 2)
+
+	runWithMemoizing(callComputedTwice)
+	t.equal(calls, 3)
+
+	callComputedTwice()
+	t.equal(calls, 5)
+
+	runWithMemoizing(mobx.action(callComputedTwice))
+	t.equal(calls, 7)
+
+	callComputedTwice()
+	t.equal(calls, 9)
+
+	t.end()
+})
+
+test('computed values and actions', t => {
+	let calls = 0
+
+	const number = mobx.observable(1)
+	const squared = mobx.computed(() => {
+		calls++
+		return number.get() * number.get()
+	})
+	const changeNumber10Times = mobx.action(() => {
+		squared.get()
+		squared.get()
+		for (let i = 0; i < 10; i++)
+			number.set(number.get() + 1)
+	})
+
+	changeNumber10Times()
+	t.equal(calls, 2)
+
+	mobx.autorun(() => {
+		changeNumber10Times()
+		t.equal(calls, 4)
+	})()
+	t.equal(calls, 4)
+
+	changeNumber10Times()
+	t.equal(calls, 6)
+
+	t.end()
 })
