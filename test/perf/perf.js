@@ -372,6 +372,87 @@ test('create array (fast)', function(t) {
     t.end();
 })
 
+test('observe and dispose', t => {
+	gc()
+
+	var start = now();
+	var a = mobx.observable(1)
+	var observers = []
+	var MAX = 50000;
+
+	for(var i = 0; i < MAX * 2; i++)
+		observers.push(mobx.autorun(() => a.get()));
+	a.set(2);
+	// favorable order
+	// + unfavorable order
+	for(var i = 0; i < MAX; i++) {
+		observers[i]()
+		observers[observers.length - 1 - i]()
+	}
+	
+	console.log("setup and disposed in " + (now() - start) + "ms")
+	t.end()
+})
+
+test('sort', t => {
+	gc()
+
+	function Item(a, b, c) {
+		mobx.extendObservable(this, {
+			a: a, b: b, c: c
+		})
+	}
+	var items = mobx.observable([])
+
+	var sorted = mobx.computed(() => {
+		items.sort(function(l, r) {
+			if (l.a > r.a)
+				return 1
+			if (l.a < r.a)
+				return -1;
+			if (l.b > r.b)
+				return 1;
+			if (l.b < r.b)
+				return -1;
+			if (l.c > r.c)
+				return 1;
+			if (l.c < r.c)
+				return -1;
+			return 0;
+		})
+	})
+
+
+	var start = now();
+	var MAX = 50000;
+
+	var ar = mobx.autorun(() => sorted.get())
+
+	mobx.transaction(() => {
+		for (var i = 0; i < MAX; i++)
+			items.push(new Item(i % 10, i % 3, i %7))
+	})
+
+	console.log("created", now() - start)
+	var start = now();
+
+	for (var i = 0; i < 20; i++) {
+		items[i * 10].a = 7;
+		items[i * 11].b = 5;
+		items[i * 12].c = 9;
+	}
+
+	console.log("updated", now() - start)
+	var start = now();
+
+	ar();
+
+	console.log("disposed", now() - start)
+	var start = now();
+
+	t.end()	
+})
+
 function now() {
     return + new Date();
 }
