@@ -1,14 +1,21 @@
 
 export class Set<T> {
-	data = [];
+	data = new global.Set();
 
 	// TODO: faster if not using getter?
 	get length(): number {
-		return this.data.length;
+		return this.data.size;
 	}
 
 	asArray(): T[] {
-		return this.data.slice();
+		const res = [];
+		const iter = this.data.values();
+		let v = iter.next();
+		while (!v.done) {
+			res.push(v.value);
+			v = iter.next();
+		}
+		return res;
 	}
 
 	/**
@@ -16,18 +23,16 @@ export class Set<T> {
 	 * @returns {number} new length
 	 */
 	add(value: T) {
-		const idx = this.data.indexOf(value);
-		if (idx === -1)
-			this.data.push(value);
+		this.data.add(value);
 	}
 
 	remove(value: T) {
-		const idx = this.data.indexOf(value);
-		if (idx !== -1)
-			this.data.splice(idx, 1);
+		this.data.delete(value);
 	}
 
 	cloneAndClear(): T[] {
-		return this.data.splice(0);
+		const res = this.asArray();
+		this.data.clear();
+		return res;
 	}
 }
