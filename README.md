@@ -44,10 +44,20 @@ MobX has only a few core concepts. The following snippets can be tried online us
 MobX adds observable capabilities to existing data structures like objects, arrays and class instances. This can simply be done by annotating your class properties with the [@observable](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) decorator (ES.Next), or by invoking the [`observable`](http://mobxjs.github.io/mobx/refguide/observable.html) or [`extendObservable`](http://mobxjs.github.io/mobx/refguide/extend-observable.html) functions (ES5). See [Language support](https://github.com/mobxjs/mobx/wiki/Language-Support) for language-specific examples.
 
 ```javascript
+// ESNext class example: 
 class Todo {
     id = Math.random();
     @observable title = "";
     @observable finished = false;
+}
+
+// ES5 constructor function example:
+function Todo() {
+	this.id = Math.random()
+	extendObservable(this, {
+		title: "",
+		finished: false
+	})
 }
 ```
 
@@ -58,11 +68,24 @@ Using `@observable` is like turning a value into a spreadsheet cell. But unlike 
 With MobX you can define values that will be derived automatically when relevant data is modified. By using the [`@computed`](http://mobxjs.github.io/mobx/refguide/computed-decorator.html) decorator or by using parameterless functions as property values in `extendObservable`.
 
 ```javascript
+// ESNext class example: 
 class TodoList {
     @observable todos = [];
     @computed get unfinishedTodoCount() {
         return this.todos.filter(todo => !todo.finished).length;
     }
+}
+
+// ES5 constructor function example:
+function TodoList() {
+	extendObservable(this, {
+		todos: [],
+		unfinishedTodoCount: function() {
+	        return this.todos.filter(function (todo) {
+				return !todo.finished
+			}).length;
+		}
+	})
 }
 ```
 MobX will ensure that `unfinishedTodoCount` is updated automatically when a todo is added or when one of the `finished` properties is modified.
@@ -80,6 +103,7 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import {observer} from "mobx-react";
 
+// ESNext decorator / JSX
 @observer
 class TodoListView extends Component {
     render() {
@@ -106,6 +130,11 @@ const TodoView = observer(({todo}) =>
 
 const store = new TodoList();
 ReactDOM.render(<TodoListView todoList={store} />, document.getElementById('mount'));
+```
+
+In ES5 a component declaration looks like this: 
+```javascript
+var TodoListView = observer(React.createClass({ /* etc */ }))
 ```
 
 `observer` turns React (function) components into derivations of the data they render.
