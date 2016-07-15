@@ -2,15 +2,16 @@ import {IObservable, IDepTreeNode, propagateReadiness, propagateStaleness, addOb
 import {globalState, resetGlobalState} from "./globalstate";
 import {quickDiff, invariant} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "./spy";
+import {Set} from "../utils/set";
 
 /**
  * A derivation is everything that can be derived from the state (all the atoms) in a pure manner.
  * See https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.xvbh6qd74
  */
 export interface IDerivation extends IDepTreeNode, IObservable {
-	observing: IObservable[];
+	observing: Set<IObservable>;
 	staleObservers: IDerivation[];
-	observers: IDerivation[];
+	observers: Set<IDerivation>;
 	dependencyStaleCount: number;
 	dependencyChangeCount: number;
 	onDependenciesReady(): boolean;
@@ -69,8 +70,7 @@ export function notifyDependencyReady(derivation: IDerivation, dependencyDidChan
  */
 export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	let hasException = true;
-	const prevObserving = derivation.observing;
-	derivation.observing = [];
+	const prevObserving = derivation.observing.cloneAndClear();
 	globalState.derivationStack.push(derivation);
 	const prevTracking = globalState.isTracking;
 	globalState.isTracking = true;
@@ -78,6 +78,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 		const result = f.call(derivation);
 		hasException = false;
 		globalState.isTracking = prevTracking;
+		// TODO: can this be smarter when using sets?
 		bindDependencies(derivation, prevObserving);
 		return result;
 	} finally {
@@ -107,7 +108,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 function bindDependencies(derivation: IDerivation, prevObserving: IObservable[]) {
 	globalState.derivationStack.length -= 1;
 
-	let [added, removed] = quickDiff(derivation.observing, prevObserving);
+	let [added, removed] = quickDiff(derivation.observing.asArray(), prevObserving);
 
 	for (let i = 0, l = added.length; i < l; i++) {
 		let dependency = added[i];

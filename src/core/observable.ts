@@ -1,51 +1,44 @@
 import {IDerivation, notifyDependencyReady, notifyDependencyStale} from "./derivation";
 import {globalState} from "./globalstate";
+import {Set} from "../utils/set";
 
 export interface IDepTreeNode {
 	name: string;
-	observers?: IDerivation[];
-	observing?: IObservable[];
+	observers?: Set<IDerivation>;
+	observing?: Set<IObservable>;
 }
 
 export interface IObservable extends IDepTreeNode {
 	staleObservers: IDerivation[];
-	observers: IDerivation[];
+	observers: Set<IDerivation>;
 	onBecomeObserved();
 	onBecomeUnobserved();
 }
 
 export function addObserver(observable: IObservable, node: IDerivation) {
-	const obs = observable.observers, l = obs.length;
-	obs[l] = node;
+	const l = observable.observers.length;
+	observable.observers.add(node);
 	if (l === 0)
 		observable.onBecomeObserved();
 }
 
 export function removeObserver(observable: IObservable, node: IDerivation) {
-	let obs = observable.observers, idx = obs.indexOf(node);
-	if (idx !== -1)
-		obs.splice(idx, 1);
-	if (obs.length === 0)
-		observable.onBecomeUnobserved();
+	observable.observers.remove(node);
+	if (observable.observers.length === 0)
+		observable.onBecomeUnobserved(); // TODO: test if this happens only once, e.g. remove returns bool!
 }
 
 export function reportObserved(observable: IObservable) {
 	if (globalState.isTracking === false)
 		return;
-	const {derivationStack} = globalState;
-	const deps = derivationStack[derivationStack.length - 1].observing;
-	const depslength = deps.length;
-	// this last item added check is an optimization especially for array loops,
-	// because an array.length read with subsequent reads from the array
-	// might trigger many observed events, while just checking the latest added items is cheap
-	if (deps[depslength - 1] !== observable && deps[depslength - 2] !== observable)
-		deps[depslength] = observable;
+	globalState.derivationStack[globalState.derivationStack.length - 1].observing.add(observable);
+	// TODO: still use diff with last few optimization?
 }
 
 export function propagateStaleness(observable: IObservable|IDerivation) {
-	const os = observable.observers.slice();
+	const os = observable.observers.asArray();
 	os.forEach(notifyDependencyStale);
-	observable.staleObservers = observable.staleObservers.concat(os);
+	observable.staleObservers = observable.staleObservers.concat(os); // TODO: could be faster if this was set as well?
 }
 
 export function propagateReadiness(observable: IObservable|IDerivation, valueDidActuallyChange: boolean) {

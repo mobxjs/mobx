@@ -1,7 +1,6 @@
 import {IAtom} from "./atom";
 import {IDerivation} from "./derivation";
 import {Reaction} from "./reaction";
-import {invariant} from "../utils/utils";
 
 declare const global: any;
 
@@ -48,7 +47,7 @@ export class MobXGlobals {
 	 * List of observables that have changed in a transaction.
 	 * After completing the transaction(s) these atoms will notify their observers.
 	 */
-	changedAtoms: IAtom[] = [];
+	changedAtoms: IAtom[] = []; // TODO: use set?
 
 	/**
 	 * List of scheduled, not yet executed, reactions.
