@@ -150,7 +150,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		const runReason = (
 			this.isComputing
 				? isTracking
-					? this.observers.length > 0 // this computation already had observers
+					? !this.observers.isEmpty() // this computation already had observers
 							? RunReason.INVALIDATED
 							: RunReason.REQUIRED
 					: RunReason.PEEK

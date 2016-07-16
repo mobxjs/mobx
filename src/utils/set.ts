@@ -1,19 +1,19 @@
+let mapCounter = 0;
 
 export class Set<T> {
-	data = new global.Set();
+	size = 0;
+	data = {};
 
-	// TODO: faster if not using getter?
-	get length(): number {
-		return this.data.size;
+	isEmpty(): boolean {
+		return this.size > 0;
 	}
 
 	asArray(): T[] {
-		const res = [];
-		const iter = this.data.values();
-		let v = iter.next();
-		while (!v.done) {
-			res.push(v.value);
-			v = iter.next();
+		const res = new Array(this.size);
+		let i = 0;
+		for (let key in this.data) {
+			res[i] = this.data[key];
+			i++;
 		}
 		return res;
 	}
@@ -22,17 +22,25 @@ export class Set<T> {
 	 * @param {T} value
 	 * @returns {number} new length
 	 */
-	add(value: T) {
-		this.data.add(value);
+	add(value: any) {
+		let m = value.__mapid || (value.__mapid = "#" + (++mapCounter));
+		if (!(m in this.data)) {
+			this.data[m] = value;
+			this.size++;
+		}
 	}
 
-	remove(value: T) {
-		this.data.delete(value);
+	remove(value: any) {
+		if (value.__mapid in this.data) {
+			delete this.data[value.__mapid];
+			this.size--;
+		}
 	}
 
 	cloneAndClear(): T[] {
 		const res = this.asArray();
-		this.data.clear();
+		this.data = {};
+		this.size = 0;
 		return res;
 	}
 }
