@@ -97,7 +97,7 @@ test('array should support iterall / iterable ', t => {
 
 	t.equal(iterall.isIterable(a), true);
 	t.equal(iterall.isArrayLike(a), true);
-	
+
 	var values = [];
 	iterall.forEach(a, v => values.push(v))
 
@@ -157,18 +157,31 @@ test('quickDiff', function(t) {
         t.deepEqual(res[1], removed);
     }
 
+	var
+		a = { a: 1 },
+		b = { b: 1 },
+		c = { c: 1 },
+		d = { d: 1 },
+		e = { e: 1 },
+		f = { f: 1 },
+		g = { g: 1 },
+		h = { h: 1 },
+		i = { i: 1 }
+	;
+
     check([],[],[],[]);
-    check([1],[],[1],[]);
-    check([],[1],[],[1]);
-    check([1],[2],[1],[2]);
+    check([a],[],[a],[]);
+    check([],[a],[],[a]);
+    check([a],[b],[a],[b]);
 
-    check([1,2,3],[1,3],[2],[]);
-    check([1,2,3],[1,2],[3],[]);
+    check([a,b,c],[a,c],[b],[]);
+    check([a,b,c],[a,b],[c],[]);
 
-    check([1,2],[0,1,2],[],[0]);
+    check([a,b],[d,a,b],[],[d]);
 
-    check([1,4,6,7,8], [1,2,3,4,5,6], [7,8], [2,3,5]);
-    check([1,2,3,4], [4,3,2,1], [1,2,3], [3,2,1]); // suboptimal, but correct
+    check([a,e,g,h,i], [a,b,c,e,f,g], [h,i], [b,c,f]);
+    //check([a,b,c,e], [e,c,b,a], [a,b,c], [c,b,a]); // suboptimal, but correct
+    check([a,b,c,e], [e,c,b,a], [], []);
 
     t.end();
 })

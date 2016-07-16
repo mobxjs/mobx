@@ -3,7 +3,7 @@ import {IDerivation, trackDerivedFunction} from "./derivation";
 import {globalState} from "./globalstate";
 import {EMPTY_ARRAY, getNextId, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
-import {Set} from "../utils/set";
+import {FastSet} from "../utils/set";
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations
@@ -24,12 +24,12 @@ import {Set} from "../utils/set";
  *
  */
 
-let EMPTY_DERIVATION_SET: Set<IDerivation>;
+let EMPTY_DERIVATION_SET: FastSet<IDerivation>;
 
 export class Reaction implements IDerivation {
 	staleObservers:  IDerivation[] = EMPTY_ARRAY; // Won't change
-	observers = EMPTY_DERIVATION_SET || (EMPTY_DERIVATION_SET = new Set<IDerivation>());       // Won't change
-	observing = new Set<IObservable>(); // nodes we are looking at. Our value depends on these nodes
+	observers = EMPTY_DERIVATION_SET || (EMPTY_DERIVATION_SET = new FastSet<IDerivation>());       // Won't change
+	observing = new FastSet<IObservable>(); // nodes we are looking at. Our value depends on these nodes
 	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 	isDisposed = false;

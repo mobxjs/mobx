@@ -163,7 +163,24 @@ export function deepEquals(a, b) {
  * returns a tuple<addedItems, removedItems>
  * @type {T[]}
  */
+
 export function quickDiff<T>(current: T[], base: T[]): [T[], T[]] {
+	if (!base || !base.length)
+		return [current, []];
+	if (!current || !current.length)
+		return [[], base];
+
+	base.forEach(t => t['__diff'] = 0);
+	current.forEach(t => t['__diff'] = 0);
+	base.forEach(t => t['__diff'] -= 1)
+	current.forEach(t => t['__diff'] += 1);
+	return [
+		current.filter(t => t['__diff'] === 1),
+		base.filter(t => t['__diff'] === -1)
+	];
+}
+
+export function quickDiff2<T>(current: T[], base: T[]): [T[], T[]] {
 	if (!base || !base.length)
 		return [current, []];
 	if (!current || !current.length)

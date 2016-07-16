@@ -2,16 +2,16 @@ import {IObservable, IDepTreeNode, propagateReadiness, propagateStaleness, addOb
 import {globalState, resetGlobalState} from "./globalstate";
 import {quickDiff, invariant} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "./spy";
-import {Set} from "../utils/set";
+import {FastSet} from "../utils/set";
 
 /**
  * A derivation is everything that can be derived from the state (all the atoms) in a pure manner.
  * See https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.xvbh6qd74
  */
 export interface IDerivation extends IDepTreeNode, IObservable {
-	observing: Set<IObservable>;
+	observing: FastSet<IObservable>;
 	staleObservers: IDerivation[];
-	observers: Set<IDerivation>;
+	observers: FastSet<IDerivation>;
 	dependencyStaleCount: number;
 	dependencyChangeCount: number;
 	onDependenciesReady(): boolean;
@@ -110,6 +110,7 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
 
 	// TODO: don't diff list but merge sets
 	// TODO: or do a sweep-mark to see which ones need to be added / removed
+	// TODO: don't copy
 	let [added, removed] = quickDiff(derivation.observing.asArray(), prevObserving);
 
 	for (let i = 0, l = added.length; i < l; i++)

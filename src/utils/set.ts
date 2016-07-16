@@ -1,6 +1,7 @@
+declare var Set;
 
-export class Set<T> {
-	data = new global.Set();
+export class FastSet<T> {
+	data = new Set();
 
 	// TODO: faster if not using getter?
 	get length(): number {

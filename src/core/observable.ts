@@ -1,16 +1,16 @@
 import {IDerivation, notifyDependencyReady, notifyDependencyStale} from "./derivation";
 import {globalState} from "./globalstate";
-import {Set} from "../utils/set";
+import {FastSet} from "../utils/set";
 
 export interface IDepTreeNode {
 	name: string;
-	observers?: Set<IDerivation>;
-	observing?: Set<IObservable>;
+	observers?: FastSet<IDerivation>;
+	observing?: FastSet<IObservable>;
 }
 
 export interface IObservable extends IDepTreeNode {
 	staleObservers: IDerivation[];
-	observers: Set<IDerivation>;
+	observers: FastSet<IDerivation>;
 	onBecomeObserved();
 	onBecomeUnobserved();
 }

@@ -5,7 +5,7 @@ import {allowStateChangesStart, allowStateChangesEnd} from "./action";
 import {getNextId, valueDidChange, invariant, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "../core/spy";
 import {autorun} from "../api/autorun";
-import {Set} from "../utils/set";
+import {FastSet} from "../utils/set";
 
 export interface IComputedValue<T> {
 	get(): T;
@@ -23,8 +23,8 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	isLazy = true; // nobody is observing this derived value, so don't bother tracking upstream values
 	isComputing = false;
 	staleObservers: IDerivation[] = [];
-	observers = new Set<IDerivation>();      // nodes that are dependent on this node. Will be notified when our state change
-	observing = new Set<IObservable>();       // nodes we are looking at. Our value depends on these nodes
+	observers = new FastSet<IDerivation>();      // nodes that are dependent on this node. Will be notified when our state change
+	observing = new FastSet<IObservable>();       // nodes we are looking at. Our value depends on these nodes
 	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 	protected value: T = undefined;

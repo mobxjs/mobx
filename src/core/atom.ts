@@ -21,7 +21,7 @@ export function propagateAtomReady(atom: IAtom) {
 export class Atom implements IAtom {
 	isDirty = false;
 	staleObservers = [];
-	observers = new Set<IDerivation>();
+	observers = new FastSet<IDerivation>();
 
 	/**
 	 * Create a new atom. For debugging purposes it is recommended to give it a name.
@@ -73,4 +73,4 @@ import {IObservable, propagateReadiness, propagateStaleness, reportObserved} fro
 import {IDerivation} from "./derivation";
 import {runReactions} from "./reaction";
 import {invariant, noop, getNextId} from "../utils/utils";
-import {Set} from "../utils/set";
+import {FastSet} from "../utils/set";
