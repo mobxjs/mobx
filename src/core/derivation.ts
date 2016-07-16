@@ -1,4 +1,4 @@
-import {IObservable, IDepTreeNode, propagateReadiness, propagateStaleness, addObserver, removeObserver} from "./observable";
+import {IObservable, IDepTreeNode, propagateReadiness, propagateStaleness, addObserver, removeObserver, resetWindow} from "./observable";
 import {globalState, resetGlobalState} from "./globalstate";
 import {quickDiff, invariant} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "./spy";
@@ -72,6 +72,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	let hasException = true;
 	const prevObserving = derivation.observing.cloneAndClear();
 	globalState.derivationStack.push(derivation);
+	resetWindow();
 	const prevTracking = globalState.isTracking;
 	globalState.isTracking = true;
 	try {

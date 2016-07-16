@@ -29,11 +29,21 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 		observable.onBecomeUnobserved(); // TODO: test if this happens only once, e.g. remove returns bool!
 }
 
+const LATEST_ACCESSED_CACHE_SIZE = 5;
+let latestAccessed: IObservable[] = new Array(LATEST_ACCESSED_CACHE_SIZE);
+let windowIdx = 0;
+
+export function resetWindow() {
+	latestAccessed.splice(0, LATEST_ACCESSED_CACHE_SIZE, null, null, null, null, null);
+}
+
 export function reportObserved(observable: IObservable) {
 	if (globalState.isTracking === false)
 		return;
+	if (latestAccessed.indexOf(observable) !== -1)
+		return;
+	latestAccessed[(++windowIdx) % LATEST_ACCESSED_CACHE_SIZE] = observable;
 	globalState.derivationStack[globalState.derivationStack.length - 1].observing.add(observable);
-	// TODO: still use diff with last few optimization?
 }
 
 export function propagateStaleness(observable: IObservable|IDerivation) {
