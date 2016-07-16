@@ -434,7 +434,7 @@ test('sort', t => {
 			items.push(new Item(i % 10, i % 3, i %7))
 	})
 
-	log("expensive sort: created", now() - start)
+	log("expensive sort: created " + (now() - start))
 	var start = now();
 
 	for (var i = 0; i < 20; i++) {
@@ -443,12 +443,12 @@ test('sort', t => {
 		items[i * 12].c = 9;
 	}
 
-	log("expensive sort: updated", now() - start)
+	log("expensive sort: updated " + (now() - start))
 	var start = now();
 
 	ar();
 
-	log("expensive sort: disposed", now() - start)
+	log("expensive sort: disposed" + (now() - start))
 	var start = now();
 
 	t.end()

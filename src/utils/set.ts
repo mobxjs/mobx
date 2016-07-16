@@ -9,11 +9,12 @@ export class FastSet<T> {
 	}
 
 	asArray(): T[] {
-		const res = [];
+		const res = new Array(this.data.size);
 		const iter = this.data.values();
+		let i = -1;
 		let v = iter.next();
 		while (!v.done) {
-			res.push(v.value);
+			res[++i] = v.value;
 			v = iter.next();
 		}
 		return res;
