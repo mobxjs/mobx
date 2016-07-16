@@ -9,6 +9,7 @@ export interface IDepTreeNode {
 }
 
 export interface IObservable extends IDepTreeNode {
+	diffValue: number;
 	staleObservers: IDerivation[];
 	observers: FastSet<IDerivation>;
 	onBecomeObserved();

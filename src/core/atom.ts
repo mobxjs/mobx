@@ -22,6 +22,7 @@ export class Atom implements IAtom {
 	isDirty = false;
 	staleObservers = [];
 	observers = new FastSet<IDerivation>();
+	diffValue = 0;
 
 	/**
 	 * Create a new atom. For debugging purposes it is recommended to give it a name.

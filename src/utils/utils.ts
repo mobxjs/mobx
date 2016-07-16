@@ -164,6 +164,7 @@ export function deepEquals(a, b) {
  * @type {T[]}
  */
 
+// TODO: remove quickDiff
 export function quickDiff<T>(current: T[], base: T[]): [T[], T[]] {
 	if (!base || !base.length)
 		return [current, []];
@@ -180,6 +181,7 @@ export function quickDiff<T>(current: T[], base: T[]): [T[], T[]] {
 	];
 }
 
+// TODO: remove quickDiff
 export function quickDiff2<T>(current: T[], base: T[]): [T[], T[]] {
 	if (!base || !base.length)
 		return [current, []];

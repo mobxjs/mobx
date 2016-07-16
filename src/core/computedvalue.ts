@@ -25,6 +25,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	staleObservers: IDerivation[] = [];
 	observers = new FastSet<IDerivation>();      // nodes that are dependent on this node. Will be notified when our state change
 	observing = new FastSet<IObservable>();       // nodes we are looking at. Our value depends on these nodes
+	diffValue = 0;
 	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 	protected value: T = undefined;

@@ -30,6 +30,7 @@ export class Reaction implements IDerivation {
 	staleObservers:  IDerivation[] = EMPTY_ARRAY; // Won't change
 	observers = EMPTY_DERIVATION_SET || (EMPTY_DERIVATION_SET = new FastSet<IDerivation>());       // Won't change
 	observing = new FastSet<IObservable>(); // nodes we are looking at. Our value depends on these nodes
+	diffValue = 0;
 	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 	isDisposed = false;

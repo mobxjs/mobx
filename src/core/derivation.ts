@@ -110,15 +110,46 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
 
 	// TODO: don't diff list but merge sets
 	// TODO: or do a sweep-mark to see which ones need to be added / removed
-	// TODO: don't copy
-	let [added, removed] = quickDiff(derivation.observing.asArray(), prevObserving);
+	// TODO: don't copy prevObserving
 
-	for (let i = 0, l = added.length; i < l; i++)
-		addObserver(added[i], derivation);
+	// reset all diff values to 0
+	const prevLength = prevObserving.length;
+	for (let i = 0; i < prevLength; i++)
+		prevObserving[i].diffValue = 0;
 
+	let newIter = derivation.observing.data.values();
+	let v = newIter.next();
+	while (!v.done) {
+		v.value.diffValue = 0;
+		v = newIter.next();
+	}
+
+	// drop count for old ones
+	for (let i = 0; i < prevLength; i++)
+		prevObserving[i].diffValue--;
+
+	// increase count for new ones
+	newIter = derivation.observing.data.values();
+	v = newIter.next();
+	while (!v.done) {
+		v.value.diffValue++;
+		v = newIter.next();
+	}
+
+	// register new observers
+	newIter = derivation.observing.data.values();
+	v = newIter.next();
+	while (!v.done) {
+		if (v.value.diffValue === 1)
+			addObserver(v.value, derivation);
+		v = newIter.next();
+	}
+
+	// remove old observer
 	// remove observers after adding them, so that they don't go in lazy mode to early
-	for (let i = 0, l = removed.length; i < l; i++)
-		removeObserver(removed[i], derivation);
+	for (let i = 0; i < prevLength; i++)
+		if (prevObserving[i].diffValue === -1)
+			removeObserver(prevObserving[i], derivation);
 }
 
 export function untracked<T>(action: () => T): T {
