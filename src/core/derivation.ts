@@ -69,19 +69,17 @@ export function notifyDependencyReady(derivation: IDerivation, dependencyDidChan
  * as observer of any of the accessed observables.
  */
 export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
-	let hasException = true;
+	// TODO:don't clone?
 	const prevObserving = derivation.observing.cloneAndClear();
 	globalState.derivationStack.push(derivation);
 	resetWindow();
 	const prevTracking = globalState.isTracking;
 	globalState.isTracking = true;
+	let hasException = true;
+	let result: T;
 	try {
-		const result = f.call(derivation);
+		result = f.call(derivation);
 		hasException = false;
-		globalState.isTracking = prevTracking;
-		// TODO: can this be smarter when using sets?
-		bindDependencies(derivation, prevObserving);
-		return result;
 	} finally {
 		if (hasException) {
 			const message = (
@@ -102,8 +100,12 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 			// So functions higher up in the stack (like transanction) won't be modifying the globalState anymore after this call.
 			// (Except for other trackDerivedFunction calls of course, but that is just)
 			resetGlobalState();
+		} else {
+			globalState.isTracking = prevTracking;
+			bindDependencies(derivation, prevObserving);
 		}
 	}
+	return result;
 }
 
 function bindDependencies(derivation: IDerivation, prevObserving: IObservable[]) {

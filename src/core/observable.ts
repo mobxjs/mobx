@@ -29,6 +29,7 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 		observable.onBecomeUnobserved(); // TODO: test if this happens only once, e.g. remove returns bool!
 }
 
+// TODO: move LRU to globalstate?
 const LATEST_ACCESSED_CACHE_SIZE = 5;
 let latestAccessed: IObservable[] = new Array(LATEST_ACCESSED_CACHE_SIZE);
 let windowIdx = 0;
