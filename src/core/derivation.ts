@@ -108,13 +108,12 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 function bindDependencies(derivation: IDerivation, prevObserving: IObservable[]) {
 	globalState.derivationStack.length -= 1;
 
+	// TODO: don't diff list but merge sets
+	// TODO: or do a sweep-mark to see which ones need to be added / removed
 	let [added, removed] = quickDiff(derivation.observing.asArray(), prevObserving);
 
-	for (let i = 0, l = added.length; i < l; i++) {
-		let dependency = added[i];
-		// only check for cycles on new dependencies, existing dependencies cannot cause a cycle..
+	for (let i = 0, l = added.length; i < l; i++)
 		addObserver(added[i], derivation);
-	}
 
 	// remove observers after adding them, so that they don't go in lazy mode to early
 	for (let i = 0, l = removed.length; i < l; i++)
