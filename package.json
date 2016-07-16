@@ -8,7 +8,7 @@
     "test": "npm run quick-build && npm run tape",
     "full-test": "npm run small-build && npm run build-tests && npm run use-minified && npm run tape && npm run perf",
     "tape": "tape test/*.js | faucet",
-    "perf": "npm run small-build && time node --expose-gc test/perf/index.js",
+    "perf": "npm run small-build && PERSIST=true time node --expose-gc test/perf/index.js",
     "prepublish": "npm run small-build",
     "quick-build": "tsc",
     "small-build": "scripts/single-file-build.sh",

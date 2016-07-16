@@ -1,6 +1,7 @@
 var test = require('tape');
 var mobx = require('../..');
 var observable = mobx.observable;
+var log = require('./index.js').logMeasurement;
 
 function gc() {
     if (typeof global.gc === "function")
@@ -54,7 +55,7 @@ test('one observes ten thousand that observe one', function (t) {
     //t.equal(2, bCalcs);
     var end = now();
 
-    console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
+    log("One observers many observes one - Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
     t.end();
 })
 
@@ -78,7 +79,7 @@ test('five hundrend properties that observe their sibling', function (t) {
     t.equal(502, last.get());
     var end = now();
 
-    console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
+    log("500 props observing sibling -  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
     t.end();
 })
 
@@ -103,7 +104,7 @@ test('late dependency change', function(t) {
 	    values[99].set(i);
 
     t.equal(sum.get(), 9999);
-    console.log("\n  Updated in " + ((new Date) - start) + "ms.");
+    log("Late dependency change - Updated in " + ((new Date) - start) + "ms.");
     t.end();
 })
 
@@ -146,7 +147,7 @@ test('lots of unused computables', function(t) {
 
     var end = now();
 
-    console.log("\n  Updated in " + (end - start) + " ms.");
+    log("Unused computables -   Updated in " + (end - start) + " ms.");
     t.end();
 })
 
@@ -165,7 +166,7 @@ test('many unreferenced observables', function(t) {
     }
     var end = now();
 
-    console.log("\n  Updated in " + (end - start) + " ms.");
+    log("Unused observables -  Updated in " + (end - start) + " ms.");
 
     t.end();
 })
@@ -204,7 +205,7 @@ test('array reduce', function(t) {
 
     var end = now();
 
-    console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
+    log("Array reduce -  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
     t.end();
 })
 
@@ -243,7 +244,7 @@ test('array classic loop', function(t) {
 
     var end = now();
 
-    console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
+    log("Array loop -  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
     t.end();
 })
 
@@ -327,7 +328,7 @@ function order_system_helper(t, usebatch, keepObserving) {
         disp();
 
     var end = now()
-    console.log("\n  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
+    log("Order system batched: " + usebatch + " tracked: " + keepObserving + "  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.");
 
     t.end();
 };
@@ -356,7 +357,7 @@ test('create array', function(t) {
     var start = now();
     for(var i = 0; i < 1000; i++)
         observable(a);
-    console.log('\n  Created in ' + (now() - start) + 'ms.');
+    log('\nCreate array -  Created in ' + (now() - start) + 'ms.');
     t.end();
 })
 
@@ -368,7 +369,7 @@ test('create array (fast)', function(t) {
     var start = now();
     for(var i = 0; i < 1000; i++)
         mobx.fastArray(a);
-    console.log('\n  Created in ' + (now() - start) + 'ms.');
+    log('\nCreate array (non-recursive)  Created in ' + (now() - start) + 'ms.');
     t.end();
 })
 
@@ -389,8 +390,8 @@ test('observe and dispose', t => {
 		observers[i]()
 		observers[observers.length - 1 - i]()
 	}
-	
-	console.log("setup and disposed in " + (now() - start) + "ms")
+
+	log("Observable with many observers  + dispose: " + (now() - start) + "ms")
 	t.end()
 })
 
@@ -433,7 +434,7 @@ test('sort', t => {
 			items.push(new Item(i % 10, i % 3, i %7))
 	})
 
-	console.log("created", now() - start)
+	log("expensive sort: created", now() - start)
 	var start = now();
 
 	for (var i = 0; i < 20; i++) {
@@ -442,15 +443,15 @@ test('sort', t => {
 		items[i * 12].c = 9;
 	}
 
-	console.log("updated", now() - start)
+	log("expensive sort: updated", now() - start)
 	var start = now();
 
 	ar();
 
-	console.log("disposed", now() - start)
+	log("expensive sort: disposed", now() - start)
 	var start = now();
 
-	t.end()	
+	t.end()
 })
 
 function now() {
