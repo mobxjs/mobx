@@ -117,27 +117,34 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
 	const newLength = observing.length;
 	const prevLength = prevObserving.length;
 
-	// reset all diff values to 0
-	for (let i = 0; i < newLength; i++)
-		observing[i].diffValue = 0;
+	// Idea of this algorithm is start with marking all observables in observing and prevObserving with weight 0
+	// After that all prevObserving weights are decreased with -1
+	// And all new observing are increased with +1.
+	// After that holds: 0 = old dep that is still in use, -1 = old dep, no longer in use, +1 = new dep, was not in use before
+
+	// This process is optimized by making sure deps are always left 'clean', with value 0, so that they don't need to be reset at the start of this process
+	// after that, all prevObserving items are marked with -1 directly, instead of 0 and doing -- after that
+	// further the +1 and addObserver can be done in one go.
+
+	// TODO: do these things still need to be sets? what about arrays and using --1, < 0 and > 0?
 	for (let i = 0; i < prevLength; i++)
 		prevObserving[i].diffValue = -1; // expected 0 here, but -1 disables next loop:
 
-	// drop count for old ones, combined with above loop
-	// for (let i = 0; i < prevLength; i++)
-	// 	prevObserving[i].diffValue--;
+	for (let i = 0; i < newLength; i++) {
+		const dep = observing[i];
+		if ((++dep.diffValue) === 1) {
+			dep.diffValue = 0;
+			addObserver(dep, derivation);
+		}
+	}
 
-	// increase count for new ones
-	// + register new observers
-	for (let i = 0; i < newLength; i++)
-		if ((++observing[i].diffValue) === 1)
-			addObserver(observing[i], derivation);
-
-	// remove old observer
-	// remove observers after adding them, so that they don't go in lazy mode to early
-	for (let i = 0; i < prevLength; i++)
-		if (prevObserving[i].diffValue === -1)
-			removeObserver(prevObserving[i], derivation);
+	for (let i = 0; i < prevLength; i++) {
+		const dep = prevObserving[i];
+		if (dep.diffValue === -1) {
+			dep.diffValue = 0;
+			removeObserver(dep, derivation);
+		}
+	}
 }
 
 export function untracked<T>(action: () => T): T {
