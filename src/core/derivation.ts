@@ -73,7 +73,7 @@ let runId = 1; // TODO: global state
  */
 export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	// TODO:don't clone?
-	const prevObserving = derivation.observing.cloneAndClear();
+	const prevObserving = derivation.observing.cloneAsArrayAndClear();
 	derivation.runId = ++runId;
 	globalState.derivationStack.push(derivation);
 	const prevTracking = globalState.isTracking;

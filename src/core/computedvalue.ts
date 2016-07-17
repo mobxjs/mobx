@@ -61,9 +61,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	}
 
 	onBecomeUnobserved() {
-		const deps = this.observing.cloneAndClear();
-		for (let i = 0, l = deps.length; i < l; i++)
-			removeObserver(deps[i], this);
+		this.observing.cloneAndClear().forEach(dep => removeObserver(dep, this));
 
 		this.isLazy = true;
 		this.value = undefined;

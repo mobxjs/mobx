@@ -20,6 +20,16 @@ export class FastSet<T> {
 		return res;
 	}
 
+	// TODO: factor out forEaches?
+	forEach(fn: (v: T) => void) {
+		const iter = this.data.values();
+		let v = iter.next();
+		while (!v.done) {
+			fn(v.value);
+			v = iter.next();
+		}
+	}
+
 	/**
 	 * @param {T} value
 	 * @returns {number} new length
@@ -32,9 +42,16 @@ export class FastSet<T> {
 		this.data.delete(value);
 	}
 
-	cloneAndClear(): T[] {
+	cloneAndClear(): FastSet<T> {
+		const res = this.data;
+		this.data = new Set();
+		return res;
+	}
+
+	cloneAsArrayAndClear(): T[] {
 		const res = this.asArray();
 		this.data.clear();
 		return res;
 	}
+
 }

@@ -110,9 +110,7 @@ export class Reaction implements IDerivation {
 	dispose() {
 		if (!this.isDisposed) {
 			this.isDisposed = true;
-			const deps = this.observing.cloneAndClear();
-			for (let i = 0, l = deps.length; i < l; i++)
-				removeObserver(deps[i], this);
+			this.observing.cloneAndClear().forEach(dep => removeObserver(dep, this));
 		}
 	}
 
