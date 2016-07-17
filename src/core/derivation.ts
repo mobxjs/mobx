@@ -105,6 +105,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 			resetGlobalState();
 		} else {
 			globalState.isTracking = prevTracking;
+			globalState.derivationStack.length -= 1;
 			bindDependencies(derivation, prevObserving);
 		}
 	}
@@ -112,44 +113,25 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 }
 
 function bindDependencies(derivation: IDerivation, prevObserving: IObservable[]) {
-	globalState.derivationStack.length -= 1;
-
-	// TODO: don't diff list but merge sets
-	// TODO: or do a sweep-mark to see which ones need to be added / removed
-	// TODO: don't copy prevObserving
+	const observing = derivation.observing.asArray();
+	const newLength = observing.length;
+	const prevLength = prevObserving.length;
 
 	// reset all diff values to 0
-	const prevLength = prevObserving.length;
+	for (let i = 0; i < newLength; i++)
+		observing[i].diffValue = 0;
 	for (let i = 0; i < prevLength; i++)
-		prevObserving[i].diffValue = 0;
+		prevObserving[i].diffValue = -1; // expected 0 here, but -1 disables next loop:
 
-	let newIter = derivation.observing.data.values();
-	let v = newIter.next();
-	while (!v.done) {
-		v.value.diffValue = 0;
-		v = newIter.next();
-	}
-
-	// drop count for old ones
-	for (let i = 0; i < prevLength; i++)
-		prevObserving[i].diffValue--;
+	// drop count for old ones, combined with above loop
+	// for (let i = 0; i < prevLength; i++)
+	// 	prevObserving[i].diffValue--;
 
 	// increase count for new ones
-	newIter = derivation.observing.data.values();
-	v = newIter.next();
-	while (!v.done) {
-		v.value.diffValue++;
-		v = newIter.next();
-	}
-
-	// register new observers
-	newIter = derivation.observing.data.values();
-	v = newIter.next();
-	while (!v.done) {
-		if (v.value.diffValue === 1)
-			addObserver(v.value, derivation);
-		v = newIter.next();
-	}
+	// + register new observers
+	for (let i = 0; i < newLength; i++)
+		if ((++observing[i].diffValue) === 1)
+			addObserver(observing[i], derivation);
 
 	// remove old observer
 	// remove observers after adding them, so that they don't go in lazy mode to early
