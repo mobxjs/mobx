@@ -10,6 +10,7 @@ export interface IDepTreeNode {
 
 export interface IObservable extends IDepTreeNode {
 	diffValue: number;
+	laRunId: number;
 	staleObservers: IDerivation[];
 	observers: FastSet<IDerivation>;
 	onBecomeObserved();
@@ -29,22 +30,19 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 		observable.onBecomeUnobserved(); // TODO: test if this happens only once, e.g. remove returns bool!
 }
 
-// TODO: move LRU to globalstate?
-const LATEST_ACCESSED_CACHE_SIZE = 5;
-let latestAccessed: IObservable[] = new Array(LATEST_ACCESSED_CACHE_SIZE);
-let windowIdx = 0;
-
-export function resetWindow() {
-	latestAccessed.splice(0, LATEST_ACCESSED_CACHE_SIZE, null, null, null, null, null);
-}
-
 export function reportObserved(observable: IObservable) {
 	if (globalState.isTracking === false)
 		return;
-	if (latestAccessed.indexOf(observable) !== -1)
-		return;
-	latestAccessed[(++windowIdx) % LATEST_ACCESSED_CACHE_SIZE] = observable;
-	globalState.derivationStack[globalState.derivationStack.length - 1].observing.add(observable);
+	const derivation = globalState.derivationStack[globalState.derivationStack.length - 1];
+	/**
+	 * Simple optimization, give each derivation run an unique id (runId)
+	 * Check if last time this observable was accessed the same runId is used
+	 * if this is the case, the relation is already known
+	 */
+	if (derivation.runId !== observable.laRunId) {
+		observable.laRunId = derivation.runId;
+		derivation.observing.add(observable);
+	}
 }
 
 export function propagateStaleness(observable: IObservable|IDerivation) {

@@ -31,6 +31,8 @@ export class Reaction implements IDerivation {
 	observers = EMPTY_DERIVATION_SET || (EMPTY_DERIVATION_SET = new FastSet<IDerivation>());       // Won't change
 	observing = new FastSet<IObservable>(); // nodes we are looking at. Our value depends on these nodes
 	diffValue = 0;
+	runId = 0;
+	laRunId = 0;
 	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 	isDisposed = false;

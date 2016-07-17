@@ -1,4 +1,4 @@
-import {IObservable, IDepTreeNode, propagateReadiness, propagateStaleness, addObserver, removeObserver, resetWindow} from "./observable";
+import {IObservable, IDepTreeNode, propagateReadiness, propagateStaleness, addObserver, removeObserver} from "./observable";
 import {globalState, resetGlobalState} from "./globalstate";
 import {quickDiff, invariant} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "./spy";
@@ -15,6 +15,7 @@ export interface IDerivation extends IDepTreeNode, IObservable {
 	dependencyStaleCount: number;
 	dependencyChangeCount: number;
 	onDependenciesReady(): boolean;
+	runId: number;
 }
 
 export function isComputingDerivation() {
@@ -63,6 +64,8 @@ export function notifyDependencyReady(derivation: IDerivation, dependencyDidChan
 	}
 }
 
+let runId = 1; // TODO: global state
+
 /**
  * Executes the provided function `f` and tracks which observables are being accessed.
  * The tracking information is stored on the `derivation` object and the derivation is registered
@@ -71,8 +74,8 @@ export function notifyDependencyReady(derivation: IDerivation, dependencyDidChan
 export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	// TODO:don't clone?
 	const prevObserving = derivation.observing.cloneAndClear();
+	derivation.runId = ++runId;
 	globalState.derivationStack.push(derivation);
-	resetWindow();
 	const prevTracking = globalState.isTracking;
 	globalState.isTracking = true;
 	let hasException = true;
