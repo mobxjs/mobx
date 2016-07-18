@@ -29,7 +29,7 @@ let EMPTY_DERIVATION_SET: FastSet<IDerivation>;
 export class Reaction implements IDerivation {
 	staleObservers:  IDerivation[] = EMPTY_ARRAY; // Won't change
 	observers = EMPTY_DERIVATION_SET || (EMPTY_DERIVATION_SET = new FastSet<IDerivation>());       // Won't change
-	observing = new FastSet<IObservable>(); // nodes we are looking at. Our value depends on these nodes
+	observing = []; // nodes we are looking at. Our value depends on these nodes
 	diffValue = 0;
 	runId = 0;
 	laRunId = 0;
@@ -110,7 +110,7 @@ export class Reaction implements IDerivation {
 	dispose() {
 		if (!this.isDisposed) {
 			this.isDisposed = true;
-			this.observing.cloneAndClear().forEach(dep => removeObserver(dep, this));
+			this.observing.forEach(dep => removeObserver(dep, this));
 		}
 	}
 
@@ -125,7 +125,7 @@ export class Reaction implements IDerivation {
 	}
 
 	whyRun() {
-		const observing = unique(this.observing.asArray()).map(dep => dep.name);
+		const observing = unique(this.observing).map(dep => dep.name);
 
 		return (`
 WhyRun? reaction '${this.name}':

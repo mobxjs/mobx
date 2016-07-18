@@ -9,7 +9,7 @@ import {FastSet} from "../utils/set";
  * See https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.xvbh6qd74
  */
 export interface IDerivation extends IDepTreeNode, IObservable {
-	observing: FastSet<IObservable>;
+	observing: IObservable[]; // TODO: should be array
 	staleObservers: IDerivation[];
 	observers: FastSet<IDerivation>;
 	dependencyStaleCount: number;
@@ -72,8 +72,7 @@ let runId = 1; // TODO: global state
  * as observer of any of the accessed observables.
  */
 export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
-	// TODO:don't clone?
-	const prevObserving = derivation.observing.cloneAsArrayAndClear();
+	const prevObserving = derivation.observing.splice(0);
 	derivation.runId = ++runId;
 	globalState.derivationStack.push(derivation);
 	const prevTracking = globalState.isTracking;
@@ -113,7 +112,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 }
 
 function bindDependencies(derivation: IDerivation, prevObserving: IObservable[]) {
-	const observing = derivation.observing.asArray();
+	const observing = derivation.observing;
 	const newLength = observing.length;
 	const prevLength = prevObserving.length;
 
@@ -128,20 +127,20 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
 
 	// TODO: do these things still need to be sets? what about arrays and using --1, < 0 and > 0?
 	for (let i = 0; i < prevLength; i++)
-		prevObserving[i].diffValue = -1; // expected 0 here, but -1 disables next loop:
+		prevObserving[i].diffValue--; // expected 0 here, but -1 disables next loop:
 
 	for (let i = 0; i < newLength; i++) {
 		const dep = observing[i];
-		if ((++dep.diffValue) === 1) {
-			dep.diffValue = 0;
+		if ((++dep.diffValue) > 0) {
+			dep.diffValue = 0; // this also short circuits add if a dep is multiple times in the observing list
 			addObserver(dep, derivation);
 		}
 	}
 
 	for (let i = 0; i < prevLength; i++) {
 		const dep = prevObserving[i];
-		if (dep.diffValue === -1) {
-			dep.diffValue = 0;
+		if (dep.diffValue < 0) {
+			dep.diffValue = 0; // this also short circuits add if a dep is multiple times in the observing list
 			removeObserver(dep, derivation);
 		}
 	}

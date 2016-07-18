@@ -24,7 +24,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	isComputing = false;
 	staleObservers: IDerivation[] = [];
 	observers = new FastSet<IDerivation>();      // nodes that are dependent on this node. Will be notified when our state change
-	observing = new FastSet<IObservable>();       // nodes we are looking at. Our value depends on these nodes
+	observing = [];       // nodes we are looking at. Our value depends on these nodes
 	diffValue = 0;
 	runId = 0;
 	laRunId = 0;
@@ -61,7 +61,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	}
 
 	onBecomeUnobserved() {
-		this.observing.cloneAndClear().forEach(dep => removeObserver(dep, this));
+		this.observing.forEach(dep => removeObserver(dep, this));
 
 		this.isLazy = true;
 		this.value = undefined;
@@ -146,7 +146,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
 	whyRun() {
 		const isTracking = globalState.derivationStack.length > 0;
-		const observing = unique(this.observing.asArray()).map(dep => dep.name);
+		const observing = unique(this.observing).map(dep => dep.name);
 		const observers = unique(this.observers.asArray()).map(dep => dep.name);
 		const runReason = (
 			this.isComputing

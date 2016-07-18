@@ -22,7 +22,7 @@ function nodeToDependencyTree(node: IDepTreeNode): IDependencyTree {
 	};
 	// TODO: unique not needed anymore with sets
 	if (node.observing && node.observing.length > 0)
-		result.dependencies = unique(node.observing.asArray()).map(nodeToDependencyTree);
+		result.dependencies = unique(node.observing).map(nodeToDependencyTree);
 	return result;
 }
 

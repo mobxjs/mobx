@@ -5,7 +5,7 @@ import {FastSet} from "../utils/set";
 export interface IDepTreeNode {
 	name: string;
 	observers?: FastSet<IDerivation>;
-	observing?: FastSet<IObservable>;
+	observing?: IObservable[];
 }
 
 export interface IObservable extends IDepTreeNode {
@@ -41,7 +41,7 @@ export function reportObserved(observable: IObservable) {
 	 */
 	if (derivation.runId !== observable.laRunId) {
 		observable.laRunId = derivation.runId;
-		derivation.observing.add(observable);
+		derivation.observing.push(observable);
 	}
 }
 
