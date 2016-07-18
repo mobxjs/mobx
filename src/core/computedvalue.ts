@@ -28,6 +28,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	diffValue = 0;
 	runId = 0;
 	laRunId = 0;
+	l = 0;
 	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 	protected value: T = undefined;

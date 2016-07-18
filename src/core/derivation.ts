@@ -16,6 +16,7 @@ export interface IDerivation extends IDepTreeNode, IObservable {
 	dependencyChangeCount: number;
 	onDependenciesReady(): boolean;
 	runId: number;
+	l: number; // TODO: rename
 }
 
 export function isComputingDerivation() {
@@ -72,7 +73,9 @@ let runId = 1; // TODO: global state
  * as observer of any of the accessed observables.
  */
 export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
-	const prevObserving = derivation.observing.splice(0);
+	const prevObserving = derivation.observing;
+	derivation.observing = new Array(prevObserving.length/* + 10*/); // faster array allocation
+	derivation.l = 0;
 	derivation.runId = ++runId;
 	globalState.derivationStack.push(derivation);
 	const prevTracking = globalState.isTracking;
@@ -113,7 +116,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 
 function bindDependencies(derivation: IDerivation, prevObserving: IObservable[]) {
 	const observing = derivation.observing;
-	const newLength = observing.length;
+	const newLength = observing.length = derivation.l;
 	const prevLength = prevObserving.length;
 
 	// Idea of this algorithm is start with marking all observables in observing and prevObserving with weight 0

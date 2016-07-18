@@ -41,7 +41,7 @@ export function reportObserved(observable: IObservable) {
 	 */
 	if (derivation.runId !== observable.laRunId) {
 		observable.laRunId = derivation.runId;
-		derivation.observing.push(observable);
+		derivation.observing[derivation.l++] = observable;
 	}
 }
 
