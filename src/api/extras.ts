@@ -35,7 +35,7 @@ function nodeToObserverTree(node: IDepTreeNode): IObserverTree {
 		name: node.name
 	};
 	// TODO: unique not needed anymore with sets
-	if (node.observers && node.observers.length)
+	if (node.observers && !node.observers.isEmpty())
 		result.observers = <any>unique(node.observers.asArray()).map(<any>nodeToObserverTree);
 	return result;
 }

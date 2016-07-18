@@ -1,57 +1,51 @@
-declare var Set;
+let mapCounter = 0;
 
 export class FastSet<T> {
-	data = new Set();
+	size = 0;
+	data = {};
 
-	// TODO: faster if not using getter?
-	get length(): number {
-		return this.data.size;
+	isEmpty(): boolean {
+		return this.size === 0;
+	}
+
+	get length() {
+		return this.size;
 	}
 
 	asArray(): T[] {
-		const res = new Array(this.data.size);
-		const iter = this.data.values();
-		let i = -1;
-		let v = iter.next();
-		while (!v.done) {
-			res[++i] = v.value;
-			v = iter.next();
+		const res = new Array(this.size);
+		let i = 0;
+		for (let key in this.data) {
+			res[i] = this.data[key];
+			i++;
 		}
 		return res;
-	}
-
-	// TODO: factor out forEaches?
-	forEach(fn: (v: T) => void) {
-		const iter = this.data.values();
-		let v = iter.next();
-		while (!v.done) {
-			fn(v.value);
-			v = iter.next();
-		}
 	}
 
 	/**
 	 * @param {T} value
 	 * @returns {number} new length
 	 */
-	add(value: T) {
-		this.data.add(value);
+	// TODO: standardize __mapid
+	add(value: any) {
+		let m = value.__mapid || (value.__mapid = "#" + (++mapCounter));
+		if (!(m in this.data)) {
+			this.data[m] = value;
+			this.size++;
+		}
 	}
 
-	remove(value: T) {
-		this.data.delete(value);
+	remove(value: any) {
+		if (value.__mapid in this.data) {
+			delete this.data[value.__mapid];
+			this.size--;
+		}
 	}
 
-	cloneAndClear(): FastSet<T> {
-		const res = this.data;
-		this.data = new Set();
-		return res;
-	}
-
-	cloneAsArrayAndClear(): T[] {
+	cloneAndClear(): T[] {
 		const res = this.asArray();
-		this.data.clear();
+		this.data = {};
+		this.size = 0;
 		return res;
 	}
-
 }

@@ -62,6 +62,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
 	onBecomeUnobserved() {
 		this.observing.forEach(dep => removeObserver(dep, this));
+		this.observing.splice(0);
 
 		this.isLazy = true;
 		this.value = undefined;
@@ -151,7 +152,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		const runReason = (
 			this.isComputing
 				? isTracking
-					? this.observers.length > 0 // this computation already had observers
+					? !this.observers.isEmpty() // this computation already had observers
 							? RunReason.INVALIDATED
 							: RunReason.REQUIRED
 					: RunReason.PEEK

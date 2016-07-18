@@ -18,15 +18,15 @@ export interface IObservable extends IDepTreeNode {
 }
 
 export function addObserver(observable: IObservable, node: IDerivation) {
-	const l = observable.observers.length;
+	const wasEmpty = observable.observers.isEmpty();
 	observable.observers.add(node);
-	if (l === 0)
+	if (wasEmpty)
 		observable.onBecomeObserved();
 }
 
 export function removeObserver(observable: IObservable, node: IDerivation) {
 	observable.observers.remove(node);
-	if (observable.observers.length === 0)
+	if (observable.observers.isEmpty())
 		observable.onBecomeUnobserved(); // TODO: test if this happens only once, e.g. remove returns bool!
 }
 

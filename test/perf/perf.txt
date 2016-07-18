@@ -1,50 +1,50 @@
 
-One observers many observes one - Started/Updated in 34/52 ms.
-500 props observing sibling -  Started/Updated in 6/5 ms.
-Late dependency change - Updated in 124ms.
-Unused computables -   Updated in 1 ms.
-Unused observables -  Updated in 11 ms.
-Array reduce -  Started/Updated in 42/60 ms.
-Array loop -  Started/Updated in 187/261 ms.
-Order system batched: false tracked: true  Started/Updated in 543/53 ms.
-Order system batched: true tracked: true  Started/Updated in 100/49 ms.
-Order system batched: false tracked: false  Started/Updated in 88/7 ms.
-Order system batched: true tracked: false  Started/Updated in 80/7 ms.
+One observers many observes one - Started/Updated in 35/59 ms.
+500 props observing sibling -  Started/Updated in 4/9 ms.
+Late dependency change - Updated in 121ms.
+Unused computables -   Updated in 0 ms.
+Unused observables -  Updated in 14 ms.
+Array reduce -  Started/Updated in 46/63 ms.
+Array loop -  Started/Updated in 150/262 ms.
+Order system batched: false tracked: true  Started/Updated in 586/74 ms.
+Order system batched: true tracked: true  Started/Updated in 115/82 ms.
+Order system batched: false tracked: false  Started/Updated in 68/16 ms.
+Order system batched: true tracked: false  Started/Updated in 65/6 ms.
 
-Create array -  Created in 303ms.
+Create array -  Created in 301ms.
 
-Create array (non-recursive)  Created in 65ms.
-Observable with many observers  + dispose: 1244ms
-expensive sort: created 3416
-expensive sort: updated 13100
-expensive sort: disposed199
-native plain sort: updated 637
-create folders 1ms.
+Create array (non-recursive)  Created in 62ms.
+Observable with many observers  + dispose: 1478ms
+expensive sort: created 3805
+expensive sort: updated 13735
+expensive sort: disposed565
+native plain sort: updated 656
+create folders 0ms.
 create displayfolders 0ms.
-create text 227ms.
+create text 230ms.
 collapse folder 1ms.
 uncollapse folder 1ms.
-change name of folder 219ms.
-search 53ms.
-unsearch 219ms.
+change name of folder 225ms.
+search 54ms.
+unsearch 221ms.
 reactive folder tree [total]
- 723ms.
-create folders 22ms.
-create displayfolders 1ms.
-create text 72ms.
+ 735ms.
+create folders 21ms.
+create displayfolders 2ms.
+create text 84ms.
 collapse folder 3ms.
-uncollapse folder 8ms.
-change name of folder 16ms.
-search 25ms.
-unsearch 35ms.
+uncollapse folder 16ms.
+change name of folder 24ms.
+search 45ms.
+unsearch 36ms.
 reactive folder tree [total]
- 185ms.
-create boxes 118ms.
-mutations 597ms.
-total 725ms.
-create boxes 123ms.
-mutations 473ms.
-total 678ms.
+ 232ms.
+create boxes 98ms.
+mutations 525ms.
+total 641ms.
+create boxes 107ms.
+mutations 529ms.
+total 742ms.
 
 
-Completed performance suite in 23.944 sec.
+Completed performance suite in 25.766 sec.

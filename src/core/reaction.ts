@@ -111,6 +111,7 @@ export class Reaction implements IDerivation {
 		if (!this.isDisposed) {
 			this.isDisposed = true;
 			this.observing.forEach(dep => removeObserver(dep, this));
+			this.observing = EMPTY_ARRAY;
 		}
 	}
 
