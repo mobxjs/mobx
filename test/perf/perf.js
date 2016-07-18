@@ -400,12 +400,17 @@ test('sort', t => {
 
 	function Item(a, b, c) {
 		mobx.extendObservable(this, {
-			a: a, b: b, c: c
+			a: a, b: b, c: c, d: function() {
+				return this.a + this.b + this.c;
+			}
 		})
 	}
 	var items = mobx.observable([])
 
 	function sortFn (l, r) {
+		items.length; // screw all optimizations!
+		l.d;
+		r.d;
 		if (l.a > r.a)
 			return 1
 		if (l.a < r.a)
