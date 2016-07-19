@@ -12,7 +12,7 @@ It is considered to be the responsibility of the class definition / constructor 
 
 ## asMap
 
-Creates a new Observable Map instead of an Obsevable Object. See [`asMap`](map.md)
+Creates a new Observable Map instead of an Observable Object. See [`asMap`](map.md)
 
 ## asReference
 
