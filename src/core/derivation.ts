@@ -106,6 +106,8 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 			// Assumption here is that this is the only exception handler in MobX.
 			// So functions higher up in the stack (like transanction) won't be modifying the globalState anymore after this call.
 			// (Except for other trackDerivedFunction calls of course, but that is just)
+			derivation.l = 0;
+			derivation.observing = prevObserving;
 			resetGlobalState();
 		} else {
 			globalState.isTracking = prevTracking;
@@ -150,6 +152,13 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
 			removeObserver(dep, derivation);
 		}
 	}
+}
+
+export function clearObserving(derivation: IDerivation) {
+	// TODO: no foreach
+	derivation.observing.forEach(dep => removeObserver(dep, derivation));
+	derivation.observing.length = 0;
+	derivation.l = 0; // avoid issues if a reaction is disposed in its own run, e.g. before it's observing nodes are bound. Note that this will cause removeObserver to be called twice for the old deps..
 }
 
 export function untracked<T>(action: () => T): T {

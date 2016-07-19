@@ -15,14 +15,14 @@ test('treeD', function(t) {
 
 
     var b = m.observable(() => a.get() * a.get());
-    var bName = 'ComputedValue@2';
+    var bName = 'ComputedValue@3';
     t.deepEqual(dtree(b), {
         name: bName
         // no dependencies yet, since it isn't observed yet
     });
 
     var c = m.autorun(() => b.get());
-    var cName = 'Autorun@3';
+    var cName = 'Autorun@4';
     t.deepEqual(dtree(c.$mobx), {
         name: cName,
         dependencies: [{
@@ -55,15 +55,15 @@ test('treeD', function(t) {
     });
 
     t.deepEqual(m.extras.getDependencyTree(d.$mobx), {
-        name: 'Autorun@5',
+        name: 'Autorun@7',
         dependencies: [{
-            name: 'ObservableMap@4.keys()'
+            name: 'ObservableMap@6.keys()'
         }, {
-            name: 'ObservableMap@4.temperature?'
+            name: 'ObservableMap@6.temperature?'
         }, {
-            name: 'ObservableMap@4.temperature'
+            name: 'ObservableMap@6.temperature'
         }, {
-            name: 'ObservableMap@4.absent?'
+            name: 'ObservableMap@6.absent?'
         }]
     });
 
@@ -116,10 +116,10 @@ test('names', function(t) {
 			title: "test"
 		});
 	}
-	
+
 	var task = new Task();
-	t.equal(task.$mobx.name, "Task@4");
-	t.equal(task.$mobx.values.title.name, "Task@4.title");
+	t.equal(task.$mobx.name, "Task@8");
+	t.equal(task.$mobx.values.title.name, "Task@8.title");
 
     t.end();
 })
@@ -150,12 +150,12 @@ test('transition tracker 1', function(t) {
     a.set(4);
     stop();
     a.set(5);
-    t.deepEqual(stripTrackerOutput(lines), [ 
+    t.deepEqual(stripTrackerOutput(lines), [
 		{ newValue: 4, oldValue: 3, spyReportStart: true, type: 'update' },
 		{ target: undefined, type: 'compute' },
 		{ spyReportStart: true, type: 'reaction' },
 		{ spyReportEnd: true },
-		{ spyReportEnd: true } 
+		{ spyReportEnd: true }
 	]);
 
     t.end();
@@ -224,7 +224,7 @@ test('get atom', function(t) {
 	var e = mobx.computed(() => 3);
 	var f = mobx.autorun(() => c.has('b'));
 	var g = new Clazz();
-	
+
 	function atom(thing, prop) {
 		return mobx.extras.getAtom(thing, prop).constructor.name;
 	}
@@ -234,11 +234,11 @@ test('get atom', function(t) {
 	var reactionClassName = mobx.Reaction.name;
 
 	t.equal(atom(a), ovClassName);
-	
+
 	t.equal(atom(b, "a"), ovClassName);
 	t.throws(() => atom(b), /please specify a property/, "expected throw");
 	t.throws(() => atom(b, "b"), /no observable property 'b' found on the observable object 'ObservableObject@2'/, "expected throw");
-	
+
 	t.equal(atom(c), atomClassName); // returns ke, "bla".constructor, === "Atomys
 	t.equal(atom(c, "a"), ovClassName); // returns ent, "bla".constructor, === "Atomry
 	t.equal(atom(c, "b"), ovClassName); // returns has entry (see autoru, "bla", "Atomn)
@@ -252,7 +252,7 @@ test('get atom', function(t) {
 
 	t.throws(() => atom(g), /please specify a property/);
 	t.equal(atom(g, "a"), ovClassName);
-	
+
 	f();
 	t.end();
 });
@@ -274,16 +274,16 @@ test('get debug name', function(t) {
 	var e = mobx.computed(() => 3);
 	var f = mobx.autorun(() => c.has('b'));
 	var g = new Clazz();
-	
+
 	function name(thing, prop) {
 		return mobx.extras.getDebugName(thing, prop);
 	}
 
 	t.equal(name(a), "ObservableValue@1");
-	
+
 	t.equal(name(b, "a"), "ObservableObject@2.a"); // TODO: remove @3..! (also in the other tests)
 	t.throws(() => name(b, "b"), /no observable property 'b' found on the observable object 'ObservableObject@2'/, "expected throw");
-	
+
 	t.equal(name(c), "ObservableMap@3"); // returns ke, "bla"ys
 	t.equal(name(c, "a"), "ObservableMap@3.a"); // returns ent, "bla"ry
 	t.equal(name(c, "b"), "ObservableMap@3.b?"); // returns has entry (see autoru, "bla"n)
@@ -292,12 +292,12 @@ test('get debug name', function(t) {
 	t.equal(name(d), "ObservableArray@4");
 	t.throws(() => name(d, 0), /It is not possible to get index atoms from arrays/, "expected throw");
 
-	t.equal(name(e), "ComputedValue@5");
-	t.equal(name(f), "Autorun@6");
+	t.equal(name(e), "ComputedValue@6");
+	t.equal(name(f), "Autorun@7");
 
-	t.equal(name(g), "Clazz@7");
-	t.equal(name(g, "a"), "Clazz@7.a");
-	
+	t.equal(name(g), "Clazz@9");
+	t.equal(name(g, "a"), "Clazz@9.a");
+
 	f();
 	t.end();
 });
@@ -319,7 +319,7 @@ test('get administration', function(t) {
 	var e = mobx.computed(() => 3);
 	var f = mobx.autorun(() => c.has('b'));
 	var g = new Clazz();
-	
+
 	function adm(thing, prop) {
 		return mobx._.getAdministration(thing, prop).constructor.name;
 	}
@@ -327,11 +327,11 @@ test('get administration', function(t) {
 	var ovClassName = mobx.observable(3).constructor.name;
 
 	t.equal(adm(a), ovClassName);
-	
+
 	t.equal(adm(b, "a"), ovClassName);
 	t.equal(adm(b), b.$mobx.constructor.name);
 	t.throws(() => adm(b, "b"), /no observable property 'b' found on the observable object 'ObservableObject@2'/, "expected throw");
-	
+
 	t.equal(adm(c), mobx.ObservableMap.name);
 	t.equal(adm(c, "a"), ovClassName);
 	t.equal(adm(c, "b"), ovClassName);
@@ -345,7 +345,7 @@ test('get administration', function(t) {
 
 	t.equal(adm(g), b.$mobx.constructor.name);
 	t.equal(adm(g, "a"), ovClassName);
-	
+
 	f();
 	t.end();
 });

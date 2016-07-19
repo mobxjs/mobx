@@ -1,5 +1,4 @@
-import {removeObserver} from "./observable";
-import {IDerivation, trackDerivedFunction} from "./derivation";
+import {IDerivation, trackDerivedFunction, clearObserving} from "./derivation";
 import {globalState} from "./globalstate";
 import {EMPTY_ARRAY, getNextId, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
@@ -34,7 +33,7 @@ export class Reaction implements IDerivation {
 	runId = 0;
 	laRunId = 0;
 	l = 0;
-	__mapid = "#" + (++globalState.mobxGuid);
+	__mapid = "#" + getNextId();   // use strings for map distribution, just nrs will result in accidental sparse arrays...
 	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 	isDisposed = false;
@@ -112,8 +111,7 @@ export class Reaction implements IDerivation {
 	dispose() {
 		if (!this.isDisposed) {
 			this.isDisposed = true;
-			this.observing.forEach(dep => removeObserver(dep, this));
-			this.observing = EMPTY_ARRAY;
+			clearObserving(this);
 		}
 	}
 

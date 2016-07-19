@@ -1,5 +1,5 @@
-import {IObservable, reportObserved, removeObserver} from "./observable";
-import {IDerivation, trackDerivedFunction, isComputingDerivation, untrackedStart, untrackedEnd} from "./derivation";
+import {IObservable, reportObserved} from "./observable";
+import {IDerivation, trackDerivedFunction, isComputingDerivation, clearObserving, untrackedStart, untrackedEnd} from "./derivation";
 import {globalState} from "./globalstate";
 import {allowStateChangesStart, allowStateChangesEnd} from "./action";
 import {getNextId, valueDidChange, invariant, Lambda, unique, joinStrings} from "../utils/utils";
@@ -29,7 +29,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	runId = 0;
 	laRunId = 0;
 	l = 0;
-	__mapid = "#" + (++globalState.mobxGuid);
+	__mapid = "#" + getNextId();
 	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 	protected value: T = undefined;
@@ -63,10 +63,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	}
 
 	onBecomeUnobserved() {
-		// TODO: no foreach
-		this.observing.forEach(dep => removeObserver(dep, this));
-		this.observing.length = 0;
-
+		clearObserving(this);
 		this.isLazy = true;
 		this.value = undefined;
 	}
