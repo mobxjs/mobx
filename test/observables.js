@@ -1636,3 +1636,53 @@ test('prematurely ended autoruns are cleaned up properly', t => {
 
 	t.end()
 })
+
+test('unoptimizable subscriptions are diffed correctly', t => {
+	var a = mobx.observable(1);
+	var b = mobx.observable(1);
+	var c = mobx.computed(() => {
+		a.get()
+		return 3
+	});
+	var called = 0;
+	var val = 0
+
+	const d = mobx.autorun(() => {
+		called++
+		a.get()
+		c.get() // reads a as well
+		val = a.get()
+		if (b.get() === 1) // only on first run
+			a.get() // second run: one read less for a
+	})
+
+	t.equal(called, 1)
+	t.equal(val, 1)
+	t.equal(a.observers.length, 2)
+	t.equal(b.observers.length, 1)
+	t.equal(c.observers.length, 1)
+	t.equal(d.$mobx.observing.length, 4) // 3 would be better!
+
+	b.set(2)
+
+	t.equal(called, 2)
+	t.equal(val, 1)
+	t.equal(a.observers.length, 2)
+	t.equal(b.observers.length, 1)
+	t.equal(c.observers.length, 1)
+	t.equal(d.$mobx.observing.length, 3) // c was cached so accessing a was optimizable
+
+	a.set(2)
+
+	t.equal(called, 3)
+	t.equal(val, 2)
+	t.equal(a.observers.length, 2)
+	t.equal(b.observers.length, 1)
+	t.equal(c.observers.length, 1)
+	t.equal(d.$mobx.observing.length, 3) // c was cached so accessing a was optimizable
+
+	d();
+
+	t.end()
+
+})

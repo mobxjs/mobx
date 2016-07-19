@@ -132,16 +132,21 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
 	// Idea of this algorithm is start with marking all observables in observing and prevObserving with weight 0
 	// After that all prevObserving weights are decreased with -1
 	// And all new observing are increased with +1.
-	// After that holds: 0 = old dep that is still in use, -1 = old dep, no longer in use, +1 = new dep, was not in use before
+	// After that holds: 0 = old dep that is still in use, -1 = old dep, no longer in use, +1 = (seemingly) new dep, was not in use before
 
 	// This process is optimized by making sure deps are always left 'clean', with value 0, so that they don't need to be reset at the start of this process
 	// after that, all prevObserving items are marked with -1 directly, instead of 0 and doing -- after that
 	// further the +1 and addObserver can be done in one go.
 	for (let i = 0; i < prevLength; i++)
-		prevObserving[i].diffValue--; // expected 0 here, but -1 disables next loop:
+		prevObserving[i].diffValue = -1;
 
 	for (let i = 0; i < newLength; i++) {
 		const dep = observing[i];
+		// there is no guarantee that the observing collection is unique, so especially in the first run of the derivation
+		// this check might succeed too often (namely, for each double dep). That is no problem because addObserve is backed by a set
+		// In subsequent runs of the derivation, double entries are a lot less likely to happen, because then the used derivations are hot and executed
+		// _before_ this derivation, meaning that the lastAccessedDerivation optimization will most probably have skip all the doubles already.
+		// see also the "unoptimizable subscriptions are diffed correctly" test
 		if ((++dep.diffValue) > 0) {
 			dep.diffValue = 0; // this also short circuits add if a dep is multiple times in the observing list
 			addObserver(dep, derivation);
