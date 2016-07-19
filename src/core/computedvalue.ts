@@ -29,6 +29,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	runId = 0;
 	laRunId = 0;
 	l = 0;
+	__mapid = "#" + (++globalState.mobxGuid);
 	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 	protected value: T = undefined;
@@ -62,8 +63,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	}
 
 	onBecomeUnobserved() {
+		// TODO: no foreach
 		this.observing.forEach(dep => removeObserver(dep, this));
-		this.observing.splice(0);
+		this.observing.length = 0;
 
 		this.isLazy = true;
 		this.value = undefined;

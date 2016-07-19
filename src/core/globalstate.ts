@@ -23,7 +23,7 @@ export class MobXGlobals {
 	derivationStack: IDerivation[] = [];
 
 	/**
-	 * 'guid' for general purpose. Mostly debugging.
+	 * 'guid' for general purpose. Will be persisted amongst resets.
 	 */
 	mobxGuid = 0;
 

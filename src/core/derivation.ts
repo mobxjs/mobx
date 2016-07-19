@@ -1,14 +1,14 @@
 import {IObservable, IDepTreeNode, propagateReadiness, propagateStaleness, addObserver, removeObserver} from "./observable";
 import {globalState, resetGlobalState} from "./globalstate";
-import {quickDiff, invariant} from "../utils/utils";
+import {invariant} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "./spy";
-import {FastSet} from "../utils/set";
+import {FastSet, ISetEntry} from "../utils/set";
 
 /**
  * A derivation is everything that can be derived from the state (all the atoms) in a pure manner.
  * See https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.xvbh6qd74
  */
-export interface IDerivation extends IDepTreeNode, IObservable {
+export interface IDerivation extends IDepTreeNode, IObservable, ISetEntry {
 	observing: IObservable[]; // TODO: should be array
 	staleObservers: IDerivation[];
 	observers: FastSet<IDerivation>;
@@ -74,7 +74,9 @@ let runId = 1; // TODO: global state
  */
 export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	const prevObserving = derivation.observing;
-	derivation.observing = new Array(prevObserving.length/* + 10*/); // faster array allocation
+	// pre allocate array allocation + room for variation in deps
+	// array will be trimmed by bindDependencies
+	derivation.observing = new Array(prevObserving.length + 100);
 	derivation.l = 0;
 	derivation.runId = ++runId;
 	globalState.derivationStack.push(derivation);
@@ -115,9 +117,10 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 }
 
 function bindDependencies(derivation: IDerivation, prevObserving: IObservable[]) {
+	const prevLength = prevObserving.length;
+	// trim and determina new observing length
 	const observing = derivation.observing;
 	const newLength = observing.length = derivation.l;
-	const prevLength = prevObserving.length;
 
 	// Idea of this algorithm is start with marking all observables in observing and prevObserving with weight 0
 	// After that all prevObserving weights are decreased with -1

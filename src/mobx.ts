@@ -50,7 +50,7 @@ export { ITransformer, createTransformer                      } from "./api/crea
 export { whyRun                                               } from "./api/whyrun";
 
 export { Lambda                                               } from "./utils/utils";
-export { FastSet                                                  } from "./utils/set";
+export { FastSet, ISetEntry                                   } from "./utils/set";
 export { Iterator                                             } from "./utils/iterable";
 export { SimpleEventEmitter, ISimpleEventListener             } from "./utils/simpleeventemitter";
 export { IObserverTree, IDependencyTree                       } from "./api/extras";

@@ -1,4 +1,4 @@
-import {IObservable, removeObserver} from "./observable";
+import {removeObserver} from "./observable";
 import {IDerivation, trackDerivedFunction} from "./derivation";
 import {globalState} from "./globalstate";
 import {EMPTY_ARRAY, getNextId, Lambda, unique, joinStrings} from "../utils/utils";
@@ -34,6 +34,7 @@ export class Reaction implements IDerivation {
 	runId = 0;
 	laRunId = 0;
 	l = 0;
+	__mapid = "#" + (++globalState.mobxGuid);
 	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 	isDisposed = false;

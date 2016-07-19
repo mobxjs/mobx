@@ -1,6 +1,9 @@
-let mapCounter = 0;
+export interface ISetEntry {
+	__mapid: string;
+}
 
-export class FastSet<T> {
+// ... cause .Set is not available in all browsers..
+export class FastSet<T extends ISetEntry> {
 	size = 0;
 	data = {};
 
@@ -26,16 +29,15 @@ export class FastSet<T> {
 	 * @param {T} value
 	 * @returns {number} new length
 	 */
-	// TODO: standardize __mapid
-	add(value: any) {
-		let m = value.__mapid || (value.__mapid = "#" + (++mapCounter));
+	add(value: T) {
+		let m = value.__mapid;
 		if (!(m in this.data)) {
 			this.data[m] = value;
 			this.size++;
 		}
 	}
 
-	remove(value: any) {
+	remove(value: T) {
 		if (value.__mapid in this.data) {
 			delete this.data[value.__mapid];
 			this.size--;
