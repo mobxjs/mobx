@@ -1603,3 +1603,36 @@ test('#328 atom throwing exception if observing stuff in onObserved', t => {
 	t.end()
 });
 
+test('prematurely ended autoruns are cleaned up properly', t => {
+	var a = mobx.observable(1);
+	var b = mobx.observable(2);
+	var c = mobx.observable(3);
+	var called = 0;
+
+	var d = mobx.autorun(() => {
+		called++;
+		if (a.get() === 2) {
+			d(); // dispose
+			b.get(); // consume
+			a.set(3); // cause itself to re-run, but, disposed!
+		} else {
+			c.get();
+		}
+	})
+
+	t.equal(called, 1)
+	t.equal(a.observers.length, 1)
+	t.equal(b.observers.length, 0)
+	t.equal(c.observers.length, 1)
+	t.equal(d.$mobx.observing.length, 2)
+
+	a.set(2)
+
+	t.equal(called, 2)
+	t.equal(a.observers.length, 0)
+	t.equal(b.observers.length, 0)
+	t.equal(c.observers.length, 0)
+	t.equal(d.$mobx.observing.length, 0)
+
+	t.end()
+})

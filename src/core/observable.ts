@@ -47,8 +47,10 @@ export function reportObserved(observable: IObservable) {
 
 export function propagateStaleness(observable: IObservable|IDerivation) {
 	const os = observable.observers.asArray();
-	os.forEach(notifyDependencyStale);
-	observable.staleObservers = observable.staleObservers.concat(os); // TODO: could be faster if this was set as well?
+	const l = os.length;
+	for (let i = 0; i < l; i++)
+		notifyDependencyStale(os[i]);
+	observable.staleObservers = observable.staleObservers.concat(os);
 }
 
 export function propagateReadiness(observable: IObservable|IDerivation, valueDidActuallyChange: boolean) {

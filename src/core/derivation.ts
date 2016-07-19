@@ -155,10 +155,11 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
 }
 
 export function clearObserving(derivation: IDerivation) {
-	// TODO: no foreach
-	derivation.observing.forEach(dep => removeObserver(dep, derivation));
-	derivation.observing.length = 0;
-	derivation.l = 0; // avoid issues if a reaction is disposed in its own run, e.g. before it's observing nodes are bound. Note that this will cause removeObserver to be called twice for the old deps..
+	const obs = derivation.observing;
+	const l = obs.length;
+	for (let i = 0; i < l; i++)
+		removeObserver(obs[i], derivation);
+	obs.length = 0;
 }
 
 export function untracked<T>(action: () => T): T {

@@ -101,6 +101,10 @@ export class Reaction implements IDerivation {
 		trackDerivedFunction(this, fn);
 		this._isRunning = false;
 		this._isTrackPending = false;
+		if (this.isDisposed) {
+			// disposed during last run. Clean up everything that was bound after the dispose call.
+			clearObserving(this);
+		}
 		if (notify) {
 			spyReportEnd({
 				time: Date.now() - startTime
@@ -111,7 +115,8 @@ export class Reaction implements IDerivation {
 	dispose() {
 		if (!this.isDisposed) {
 			this.isDisposed = true;
-			clearObserving(this);
+			if (!this._isRunning)
+				clearObserving(this); // if disposed while running, clean up later. Maybe not optimal, but rare case
 		}
 	}
 
