@@ -7,7 +7,7 @@ declare const global: any;
 /**
  * These values will persist if global state is reset
  */
-const persistentKeys = ["mobxGuid", "resetId", "spyListeners", "strictMode"];
+const persistentKeys = ["mobxGuid", "resetId", "spyListeners", "strictMode", "runId"];
 
 export class MobXGlobals {
 	/**
@@ -15,12 +15,17 @@ export class MobXGlobals {
 	 * MobX compatiblity with other versions loaded in memory as long as this version matches.
 	 * It indicates that the global state still stores similar information
 	 */
-	version = 2;
+	version = 3;
 
 	/**
 	 * Stack of currently running derivations
 	 */
 	derivationStack: IDerivation[] = [];
+
+	/**
+	 * Each time a derivation is tracked, it is assigned a unique run-id
+	 */
+	runId = 0;
 
 	/**
 	 * 'guid' for general purpose. Will be persisted amongst resets.
@@ -47,7 +52,7 @@ export class MobXGlobals {
 	 * List of observables that have changed in a transaction.
 	 * After completing the transaction(s) these atoms will notify their observers.
 	 */
-	changedAtoms: IAtom[] = []; // TODO: use set?
+	changedAtoms: IAtom[] = [];
 
 	/**
 	 * List of scheduled, not yet executed, reactions.

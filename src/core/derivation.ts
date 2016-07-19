@@ -9,14 +9,21 @@ import {SimpleSet, ISetEntry} from "../utils/set";
  * See https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.xvbh6qd74
  */
 export interface IDerivation extends IDepTreeNode, IObservable, ISetEntry {
-	observing: IObservable[]; // TODO: should be array
+	observing: IObservable[];
 	staleObservers: IDerivation[];
 	observers: SimpleSet<IDerivation>;
 	dependencyStaleCount: number;
 	dependencyChangeCount: number;
 	onDependenciesReady(): boolean;
+	/**
+	 * Id of the current run of a derivation. Each time the derivation is tracked
+	 * this number is increased by one. This number is globally unique
+	 */
 	runId: number;
-	l: number; // TODO: rename
+	/**
+	 * amount of dependencies used by the derivation in this run, which has not been bound yet.
+	 */
+	unboundDepsCount: number;
 }
 
 export function isComputingDerivation() {
@@ -65,8 +72,6 @@ export function notifyDependencyReady(derivation: IDerivation, dependencyDidChan
 	}
 }
 
-let runId = 1; // TODO: global state
-
 /**
  * Executes the provided function `f` and tracks which observables are being accessed.
  * The tracking information is stored on the `derivation` object and the derivation is registered
@@ -77,8 +82,8 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	// pre allocate array allocation + room for variation in deps
 	// array will be trimmed by bindDependencies
 	derivation.observing = new Array(prevObserving.length + 100);
-	derivation.l = 0;
-	derivation.runId = ++runId;
+	derivation.unboundDepsCount = 0;
+	derivation.runId = ++globalState.runId;
 	globalState.derivationStack.push(derivation);
 	const prevTracking = globalState.isTracking;
 	globalState.isTracking = true;
@@ -106,7 +111,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 			// Assumption here is that this is the only exception handler in MobX.
 			// So functions higher up in the stack (like transanction) won't be modifying the globalState anymore after this call.
 			// (Except for other trackDerivedFunction calls of course, but that is just)
-			derivation.l = 0;
+			derivation.unboundDepsCount = 0;
 			derivation.observing = prevObserving;
 			resetGlobalState();
 		} else {
@@ -122,7 +127,7 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
 	const prevLength = prevObserving.length;
 	// trim and determina new observing length
 	const observing = derivation.observing;
-	const newLength = observing.length = derivation.l;
+	const newLength = observing.length = derivation.unboundDepsCount;
 
 	// Idea of this algorithm is start with marking all observables in observing and prevObserving with weight 0
 	// After that all prevObserving weights are decreased with -1
@@ -132,8 +137,6 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
 	// This process is optimized by making sure deps are always left 'clean', with value 0, so that they don't need to be reset at the start of this process
 	// after that, all prevObserving items are marked with -1 directly, instead of 0 and doing -- after that
 	// further the +1 and addObserver can be done in one go.
-
-	// TODO: do these things still need to be sets? what about arrays and using --1, < 0 and > 0?
 	for (let i = 0; i < prevLength; i++)
 		prevObserving[i].diffValue--; // expected 0 here, but -1 disables next loop:
 

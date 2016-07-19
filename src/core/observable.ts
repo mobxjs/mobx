@@ -10,7 +10,12 @@ export interface IDepTreeNode {
 
 export interface IObservable extends IDepTreeNode {
 	diffValue: number;
-	laRunId: number;
+	/**
+	 * Id of the derivation *run* that last accesed this observable.
+	 * If this id equals the *run* id of the current derivation,
+	 * the dependency is already established
+	 */
+	lastAccessedBy: number;
 	staleObservers: IDerivation[];
 	observers: SimpleSet<IDerivation>;
 	onBecomeObserved();
@@ -39,9 +44,9 @@ export function reportObserved(observable: IObservable) {
 	 * Check if last time this observable was accessed the same runId is used
 	 * if this is the case, the relation is already known
 	 */
-	if (derivation.runId !== observable.laRunId) {
-		observable.laRunId = derivation.runId;
-		derivation.observing[derivation.l++] = observable;
+	if (derivation.runId !== observable.lastAccessedBy) {
+		observable.lastAccessedBy = derivation.runId;
+		derivation.observing[derivation.unboundDepsCount++] = observable;
 	}
 }
 

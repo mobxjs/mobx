@@ -27,8 +27,8 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	observing = [];       // nodes we are looking at. Our value depends on these nodes
 	diffValue = 0;
 	runId = 0;
-	laRunId = 0;
-	l = 0;
+	lastAccessedBy = 0;
+	unboundDepsCount = 0;
 	__mapid = "#" + getNextId();
 	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
