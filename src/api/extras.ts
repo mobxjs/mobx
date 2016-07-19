@@ -20,7 +20,6 @@ function nodeToDependencyTree(node: IDepTreeNode): IDependencyTree {
 	const result: IDependencyTree = {
 		name: node.name
 	};
-	// TODO: unique not needed anymore with sets
 	if (node.observing && node.observing.length > 0)
 		result.dependencies = unique(node.observing).map(nodeToDependencyTree);
 	return result;
@@ -34,8 +33,7 @@ function nodeToObserverTree(node: IDepTreeNode): IObserverTree {
 	const result: IObserverTree = {
 		name: node.name
 	};
-	// TODO: unique not needed anymore with sets
-	if (node.observers && !node.observers.isEmpty())
-		result.observers = <any>unique(node.observers.asArray()).map(<any>nodeToObserverTree);
+	if (node.observers && node.observers.length > 0)
+		result.observers = <any>node.observers.asArray().map(<any>nodeToObserverTree);
 	return result;
 }

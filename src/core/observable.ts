@@ -1,10 +1,10 @@
 import {IDerivation, notifyDependencyReady, notifyDependencyStale} from "./derivation";
 import {globalState} from "./globalstate";
-import {FastSet} from "../utils/set";
+import {SimpleSet} from "../utils/set";
 
 export interface IDepTreeNode {
 	name: string;
-	observers?: FastSet<IDerivation>;
+	observers?: SimpleSet<IDerivation>;
 	observing?: IObservable[];
 }
 
@@ -12,13 +12,13 @@ export interface IObservable extends IDepTreeNode {
 	diffValue: number;
 	laRunId: number;
 	staleObservers: IDerivation[];
-	observers: FastSet<IDerivation>;
+	observers: SimpleSet<IDerivation>;
 	onBecomeObserved();
 	onBecomeUnobserved();
 }
 
 export function addObserver(observable: IObservable, node: IDerivation) {
-	const wasEmpty = observable.observers.isEmpty();
+	const wasEmpty = observable.observers.length === 0;
 	observable.observers.add(node);
 	if (wasEmpty)
 		observable.onBecomeObserved();
@@ -26,7 +26,7 @@ export function addObserver(observable: IObservable, node: IDerivation) {
 
 export function removeObserver(observable: IObservable, node: IDerivation) {
 	observable.observers.remove(node);
-	if (observable.observers.isEmpty())
+	if (observable.observers.length === 0)
 		observable.onBecomeUnobserved(); // TODO: test if this happens only once, e.g. remove returns bool!
 }
 

@@ -5,7 +5,7 @@ import {allowStateChangesStart, allowStateChangesEnd} from "./action";
 import {getNextId, valueDidChange, invariant, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "../core/spy";
 import {autorun} from "../api/autorun";
-import {FastSet} from "../utils/set";
+import {SimpleSet} from "../utils/set";
 
 export interface IComputedValue<T> {
 	get(): T;
@@ -23,7 +23,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	isLazy = true; // nobody is observing this derived value, so don't bother tracking upstream values
 	isComputing = false;
 	staleObservers: IDerivation[] = [];
-	observers = new FastSet<IDerivation>();      // nodes that are dependent on this node. Will be notified when our state change
+	observers = new SimpleSet<IDerivation>();      // nodes that are dependent on this node. Will be notified when our state change
 	observing = [];       // nodes we are looking at. Our value depends on these nodes
 	diffValue = 0;
 	runId = 0;
@@ -152,7 +152,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		const runReason = (
 			this.isComputing
 				? isTracking
-					? !this.observers.isEmpty() // this computation already had observers
+					? this.observers.length > 0 // this computation already had observers
 							? RunReason.INVALIDATED
 							: RunReason.REQUIRED
 					: RunReason.PEEK

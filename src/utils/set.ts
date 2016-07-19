@@ -3,13 +3,9 @@ export interface ISetEntry {
 }
 
 // ... cause .Set is not available in all browsers..
-export class FastSet<T extends ISetEntry> {
+export class SimpleSet<T extends ISetEntry> {
 	size = 0;
 	data = {};
-
-	isEmpty(): boolean {
-		return this.size === 0;
-	}
 
 	get length() {
 		return this.size;
@@ -42,12 +38,5 @@ export class FastSet<T extends ISetEntry> {
 			delete this.data[value.__mapid];
 			this.size--;
 		}
-	}
-
-	cloneAndClear(): T[] {
-		const res = this.asArray();
-		this.data = {};
-		this.size = 0;
-		return res;
 	}
 }

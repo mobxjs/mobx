@@ -2,7 +2,7 @@ import {IObservable, IDepTreeNode, propagateReadiness, propagateStaleness, addOb
 import {globalState, resetGlobalState} from "./globalstate";
 import {invariant} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "./spy";
-import {FastSet, ISetEntry} from "../utils/set";
+import {SimpleSet, ISetEntry} from "../utils/set";
 
 /**
  * A derivation is everything that can be derived from the state (all the atoms) in a pure manner.
@@ -11,7 +11,7 @@ import {FastSet, ISetEntry} from "../utils/set";
 export interface IDerivation extends IDepTreeNode, IObservable, ISetEntry {
 	observing: IObservable[]; // TODO: should be array
 	staleObservers: IDerivation[];
-	observers: FastSet<IDerivation>;
+	observers: SimpleSet<IDerivation>;
 	dependencyStaleCount: number;
 	dependencyChangeCount: number;
 	onDependenciesReady(): boolean;

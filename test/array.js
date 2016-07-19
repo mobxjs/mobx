@@ -150,42 +150,6 @@ test('find and remove', function(t) {
     t.end();
 })
 
-test('quickDiff', function(t) {
-    function check(current, base, added, removed) {
-        var res = mobx._.quickDiff(current, base);
-        t.deepEqual(res[0], added);
-        t.deepEqual(res[1], removed);
-    }
-
-	var
-		a = { a: 1 },
-		b = { b: 1 },
-		c = { c: 1 },
-		d = { d: 1 },
-		e = { e: 1 },
-		f = { f: 1 },
-		g = { g: 1 },
-		h = { h: 1 },
-		i = { i: 1 }
-	;
-
-    check([],[],[],[]);
-    check([a],[],[a],[]);
-    check([],[a],[],[a]);
-    check([a],[b],[a],[b]);
-
-    check([a,b,c],[a,c],[b],[]);
-    check([a,b,c],[a,b],[c],[]);
-
-    check([a,b],[d,a,b],[],[d]);
-
-    check([a,e,g,h,i], [a,b,c,e,f,g], [h,i], [b,c,f]);
-    //check([a,b,c,e], [e,c,b,a], [a,b,c], [c,b,a]); // suboptimal, but correct
-    check([a,b,c,e], [e,c,b,a], [], []);
-
-    t.end();
-})
-
 test('observe', function(t) {
     var ar = mobx.observable([1,4]);
     var buf = [];

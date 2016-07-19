@@ -21,7 +21,7 @@ export function propagateAtomReady(atom: IAtom) {
 export class Atom implements IAtom {
 	isDirty = false;
 	staleObservers = [];
-	observers = new FastSet<IDerivation>();
+	observers = new SimpleSet<IDerivation>();
 	diffValue = 0;
 	laRunId = 0;
 
@@ -75,4 +75,4 @@ import {IObservable, propagateReadiness, propagateStaleness, reportObserved} fro
 import {IDerivation} from "./derivation";
 import {runReactions} from "./reaction";
 import {invariant, noop, getNextId} from "../utils/utils";
-import {FastSet} from "../utils/set";
+import {SimpleSet} from "../utils/set";
