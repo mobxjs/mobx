@@ -1,10 +1,16 @@
+# 2.4.0
+
+* _Note: the internal version of MobX has been bumped. This version has no breaking api changes, but if you have MobX loaded multiple times in your project, they all have to be upgraded to `2.4.0`. MobX will report this when starting._
+* Made dependency tracking and binding significant faster. Should result in huge performance improvements when working with large collections.
+* Fixed typescript decorator issue, #423, #425? (by @bb)
+
 # 2.3.7
 
 * Fixed issue where computed values were tracked and accidentally kept alive during actions
 
 # 2.3.6
 * Fixed #406: Observable maps doesn't work with empty initial value in Safari
-* Implemented #357, #348: ObservableMap and ObservableArray now support iterators. Use [`@@iterator()` or iterall](https://github.com/leebyron/iterall) in ES5 environments. 
+* Implemented #357, #348: ObservableMap and ObservableArray now support iterators. Use [`@@iterator()` or iterall](https://github.com/leebyron/iterall) in ES5 environments.
 
 # 2.3.5
 
@@ -42,8 +48,8 @@ Usage:
 * `whyRun(object, "computed property name")`
 
 `whyRun` is a small utility that can be used inside computed value or reaction (`autorun`, `reaction` or the `render` method of an `observer` React component)
-and prints why the derivation is currently running, and under which circumstances it will run again. 
-This should help to get a deeper understanding when and why MobX runs stuff, and prevent some beginner mistakes. 
+and prints why the derivation is currently running, and under which circumstances it will run again.
+This should help to get a deeper understanding when and why MobX runs stuff, and prevent some beginner mistakes.
 
 This feature can probably be improved based on your feedback, so feel free to file issues with suggestions!
 
@@ -109,7 +115,7 @@ Introduced:
 
 # 2.1.4
 
-* Fixed #201 (see also #160), another iOS enumerability issue... By @luosong 
+* Fixed #201 (see also #160), another iOS enumerability issue... By @luosong
 
 # 2.1.3
 
