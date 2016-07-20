@@ -1,8 +1,8 @@
-import {IObservable, removeObserver} from "./observable";
-import {IDerivation, trackDerivedFunction} from "./derivation";
+import {IDerivation, trackDerivedFunction, clearObserving} from "./derivation";
 import {globalState} from "./globalstate";
 import {EMPTY_ARRAY, getNextId, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
+import {SimpleSet} from "../utils/set";
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations
@@ -22,10 +22,18 @@ import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
  * 5) `onInvalidate` will be called, and we are back at step 1.
  *
  */
+
+let EMPTY_DERIVATION_SET: SimpleSet<IDerivation>;
+
 export class Reaction implements IDerivation {
 	staleObservers:  IDerivation[] = EMPTY_ARRAY; // Won't change
-	observers: IDerivation[] = EMPTY_ARRAY;       // Won't change
-	observing: IObservable[] = []; // nodes we are looking at. Our value depends on these nodes
+	observers = EMPTY_DERIVATION_SET || (EMPTY_DERIVATION_SET = new SimpleSet<IDerivation>());       // Won't change
+	observing = []; // nodes we are looking at. Our value depends on these nodes
+	diffValue = 0;
+	runId = 0;
+	lastAccessedBy = 0;
+	unboundDepsCount = 0;
+	__mapid = "#" + getNextId();   // use strings for map distribution, just nrs will result in accidental sparse arrays...
 	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 	isDisposed = false;
@@ -93,6 +101,10 @@ export class Reaction implements IDerivation {
 		trackDerivedFunction(this, fn);
 		this._isRunning = false;
 		this._isTrackPending = false;
+		if (this.isDisposed) {
+			// disposed during last run. Clean up everything that was bound after the dispose call.
+			clearObserving(this);
+		}
 		if (notify) {
 			spyReportEnd({
 				time: Date.now() - startTime
@@ -103,9 +115,8 @@ export class Reaction implements IDerivation {
 	dispose() {
 		if (!this.isDisposed) {
 			this.isDisposed = true;
-			const deps = this.observing.splice(0);
-			for (let i = 0, l = deps.length; i < l; i++)
-				removeObserver(deps[i], this);
+			if (!this._isRunning)
+				clearObserving(this); // if disposed while running, clean up later. Maybe not optimal, but rare case
 		}
 	}
 

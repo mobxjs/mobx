@@ -1123,7 +1123,7 @@ test('#285 class instances with toJS', t => {
 			}
 		})
 	}
-	
+
 	const p1 = new Person();
 	// check before lazy initialization
 	t.deepEqual(mobx.toJS(p1), {
@@ -1147,7 +1147,7 @@ test('#285 non-mobx class instances with toJS', t => {
 		this.firstName = "michel";
 		this.lastName = mobx.observable("weststrate");
 	}
-	
+
 	const p1 = new Person();
 	// check before lazy initialization
 	t.deepEqual(mobx.toJS(p1), {
@@ -1160,7 +1160,7 @@ test('#285 non-mobx class instances with toJS', t => {
 		firstName: "michel",
 		lastName: "weststrate"
 	});
-	
+
 	t.end()
 })
 
@@ -1218,10 +1218,10 @@ test('issue 50', function(t) {
 			{ target: { a: false, b: true }, type: 'compute' },
 			'calc c',
 			{ spyReportStart: true, type: 'reaction' },
-			'auto', 
+			'auto',
 			{ spyReportEnd: true },
 			{ spyReportEnd: true },
-			'transpostend'			
+			'transpostend'
         ]);
 
         disposer1();
@@ -1266,7 +1266,7 @@ test('verify transaction events', function(t) {
 		'calc c',
 		{ name: 'anonymous transaction', spyReportStart: true, target: undefined, type: 'transaction' },
 		'transstart',
-		{ name: 'b', newValue: 2, oldValue: 1, spyReportStart: true, type: 'update' }, { spyReportEnd: true }, 
+		{ name: 'b', newValue: 2, oldValue: 1, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
 		'transpreend', { target: { b: 2 }, type: 'compute' },
 		'calc c',
 		{ spyReportStart: true, type: 'reaction' },
@@ -1353,12 +1353,12 @@ test('delay autorun until end of transaction', function(t) {
     t.deepEqual(stripSpyOutput(events), [
 		{ name: 'anonymous transaction', spyReportStart: true, target: undefined, type: 'transaction' },
 			{ name: 'anonymous transaction', spyReportStart: true, target: undefined, type: 'transaction' },
-				{ name: 'a', newValue: 3, oldValue: 2, spyReportStart: true, type: 'update' }, { spyReportEnd: true }, 
+				{ name: 'a', newValue: 3, oldValue: 2, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
 				{ name: 'a', newValue: 4, oldValue: 3, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
-				'end1', 
+				'end1',
 			{ spyReportEnd: true },
 			{ name: 'a', newValue: 5, oldValue: 4, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
-			'end2', 
+			'end2',
 			{ spyReportStart: true, type: 'reaction' },
 				'auto',
 				{ target: { a: 3 }, type: 'compute' },
@@ -1373,7 +1373,7 @@ test('delay autorun until end of transaction', function(t) {
 				'auto',
 			{ spyReportEnd: true },
 		{ spyReportEnd: true },
-		'post trans2', 
+		'post trans2',
 		{ name: 'a', newValue: 3, oldValue: 6, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
 		'post trans3'
     ]);
@@ -1603,3 +1603,86 @@ test('#328 atom throwing exception if observing stuff in onObserved', t => {
 	t.end()
 });
 
+test('prematurely ended autoruns are cleaned up properly', t => {
+	var a = mobx.observable(1);
+	var b = mobx.observable(2);
+	var c = mobx.observable(3);
+	var called = 0;
+
+	var d = mobx.autorun(() => {
+		called++;
+		if (a.get() === 2) {
+			d(); // dispose
+			b.get(); // consume
+			a.set(3); // cause itself to re-run, but, disposed!
+		} else {
+			c.get();
+		}
+	})
+
+	t.equal(called, 1)
+	t.equal(a.observers.length, 1)
+	t.equal(b.observers.length, 0)
+	t.equal(c.observers.length, 1)
+	t.equal(d.$mobx.observing.length, 2)
+
+	a.set(2)
+
+	t.equal(called, 2)
+	t.equal(a.observers.length, 0)
+	t.equal(b.observers.length, 0)
+	t.equal(c.observers.length, 0)
+	t.equal(d.$mobx.observing.length, 0)
+
+	t.end()
+})
+
+test('unoptimizable subscriptions are diffed correctly', t => {
+	var a = mobx.observable(1);
+	var b = mobx.observable(1);
+	var c = mobx.computed(() => {
+		a.get()
+		return 3
+	});
+	var called = 0;
+	var val = 0
+
+	const d = mobx.autorun(() => {
+		called++
+		a.get()
+		c.get() // reads a as well
+		val = a.get()
+		if (b.get() === 1) // only on first run
+			a.get() // second run: one read less for a
+	})
+
+	t.equal(called, 1)
+	t.equal(val, 1)
+	t.equal(a.observers.length, 2)
+	t.equal(b.observers.length, 1)
+	t.equal(c.observers.length, 1)
+	t.equal(d.$mobx.observing.length, 4) // 3 would be better!
+
+	b.set(2)
+
+	t.equal(called, 2)
+	t.equal(val, 1)
+	t.equal(a.observers.length, 2)
+	t.equal(b.observers.length, 1)
+	t.equal(c.observers.length, 1)
+	t.equal(d.$mobx.observing.length, 3) // c was cached so accessing a was optimizable
+
+	a.set(2)
+
+	t.equal(called, 3)
+	t.equal(val, 2)
+	t.equal(a.observers.length, 2)
+	t.equal(b.observers.length, 1)
+	t.equal(c.observers.length, 1)
+	t.equal(d.$mobx.observing.length, 3) // c was cached so accessing a was optimizable
+
+	d();
+
+	t.end()
+
+})

@@ -7,6 +7,7 @@ test('correct api should be exposed', function(t) {
 		'ObservableMap',
 		'Reaction',
 		'SimpleEventEmitter',
+		'SimpleSet', // TODO: remove somehow
 		'_',
 		'action',
 		'asFlat',
@@ -48,7 +49,6 @@ test('correct api should be exposed', function(t) {
 
 	t.deepEquals(Object.keys(mobx._).sort(), [
 		'getAdministration',
-		'quickDiff',
 		'resetGlobalState'
 	]);
 	t.equals(Object.keys(mobx._).filter(function(key) {

@@ -400,32 +400,39 @@ test('sort', t => {
 
 	function Item(a, b, c) {
 		mobx.extendObservable(this, {
-			a: a, b: b, c: c
+			a: a, b: b, c: c, d: function() {
+				return this.a + this.b + this.c;
+			}
 		})
 	}
 	var items = mobx.observable([])
 
+	function sortFn (l, r) {
+		items.length; // screw all optimizations!
+		l.d;
+		r.d;
+		if (l.a > r.a)
+			return 1
+		if (l.a < r.a)
+			return -1;
+		if (l.b > r.b)
+			return 1;
+		if (l.b < r.b)
+			return -1;
+		if (l.c > r.c)
+			return 1;
+		if (l.c < r.c)
+			return -1;
+		return 0;
+	}
+
 	var sorted = mobx.computed(() => {
-		items.sort(function(l, r) {
-			if (l.a > r.a)
-				return 1
-			if (l.a < r.a)
-				return -1;
-			if (l.b > r.b)
-				return 1;
-			if (l.b < r.b)
-				return -1;
-			if (l.c > r.c)
-				return 1;
-			if (l.c < r.c)
-				return -1;
-			return 0;
-		})
+		items.sort(sortFn)
 	})
 
 
 	var start = now();
-	var MAX = 50000;
+	var MAX = 100000;
 
 	var ar = mobx.autorun(() => sorted.get())
 
@@ -434,22 +441,35 @@ test('sort', t => {
 			items.push(new Item(i % 10, i % 3, i %7))
 	})
 
-	log("expensive sort: created", now() - start)
+	log("expensive sort: created " + (now() - start))
 	var start = now();
 
-	for (var i = 0; i < 20; i++) {
-		items[i * 10].a = 7;
-		items[i * 11].b = 5;
-		items[i * 12].c = 9;
+	for (var i = 0; i < 5; i++) {
+		items[i * 1000].a = 7;
+		items[i * 1100].b = 5;
+		items[i * 1200].c = 9;
 	}
 
-	log("expensive sort: updated", now() - start)
+	log("expensive sort: updated " + (now() - start))
 	var start = now();
 
 	ar();
 
-	log("expensive sort: disposed", now() - start)
+	log("expensive sort: disposed" + (now() - start))
+
+	var plain = mobx.toJS(items, false);
+	t.equal(plain.length, MAX)
+
 	var start = now();
+	for (var i = 0; i <5; i++) {
+		plain[i * 1000].a = 7;
+		plain.sort(sortFn);
+		plain[i * 1100].b = 5;
+		plain.sort(sortFn);
+		plain[i * 1200].c = 9;
+		plain.sort(sortFn);
+	}
+	log("native plain sort: updated " + (now() - start))
 
 	t.end()
 })

@@ -97,7 +97,7 @@ test('array should support iterall / iterable ', t => {
 
 	t.equal(iterall.isIterable(a), true);
 	t.equal(iterall.isArrayLike(a), true);
-	
+
 	var values = [];
 	iterall.forEach(a, v => values.push(v))
 
@@ -146,29 +146,6 @@ test('find and remove', function(t) {
     t.equal(idx, -1);
 
     t.equal(a.remove(20), false);
-
-    t.end();
-})
-
-test('quickDiff', function(t) {
-    function check(current, base, added, removed) {
-        var res = mobx._.quickDiff(current, base);
-        t.deepEqual(res[0], added);
-        t.deepEqual(res[1], removed);
-    }
-
-    check([],[],[],[]);
-    check([1],[],[1],[]);
-    check([],[1],[],[1]);
-    check([1],[2],[1],[2]);
-
-    check([1,2,3],[1,3],[2],[]);
-    check([1,2,3],[1,2],[3],[]);
-
-    check([1,2],[0,1,2],[],[0]);
-
-    check([1,4,6,7,8], [1,2,3,4,5,6], [7,8], [2,3,5]);
-    check([1,2,3,4], [4,3,2,1], [1,2,3], [3,2,1]); // suboptimal, but correct
 
     t.end();
 })

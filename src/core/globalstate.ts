@@ -1,14 +1,13 @@
 import {IAtom} from "./atom";
 import {IDerivation} from "./derivation";
 import {Reaction} from "./reaction";
-import {invariant} from "../utils/utils";
 
 declare const global: any;
 
 /**
  * These values will persist if global state is reset
  */
-const persistentKeys = ["mobxGuid", "resetId", "spyListeners", "strictMode"];
+const persistentKeys = ["mobxGuid", "resetId", "spyListeners", "strictMode", "runId"];
 
 export class MobXGlobals {
 	/**
@@ -16,7 +15,7 @@ export class MobXGlobals {
 	 * MobX compatiblity with other versions loaded in memory as long as this version matches.
 	 * It indicates that the global state still stores similar information
 	 */
-	version = 2;
+	version = 3;
 
 	/**
 	 * Stack of currently running derivations
@@ -24,7 +23,12 @@ export class MobXGlobals {
 	derivationStack: IDerivation[] = [];
 
 	/**
-	 * 'guid' for general purpose. Mostly debugging.
+	 * Each time a derivation is tracked, it is assigned a unique run-id
+	 */
+	runId = 0;
+
+	/**
+	 * 'guid' for general purpose. Will be persisted amongst resets.
 	 */
 	mobxGuid = 0;
 
