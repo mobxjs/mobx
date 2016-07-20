@@ -135,7 +135,7 @@ test('initialize with empty value', function(t) {
 	var a = map();
 	var b = map({});
 	var c = map([]);
-	
+
 	a.set('0', 0);
 	b.set('0', 0);
 	c.set('0', 0);
@@ -421,7 +421,7 @@ test('308, map keys should be coerced to strings correctly', t => {
 	m.delete(true)
 	t.deepEqual(m.keys(), [])
 
-	t.end()	
+	t.end()
 })
 
 test('map should support iterall / iterable ', t => {

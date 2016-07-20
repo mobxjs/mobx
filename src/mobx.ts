@@ -50,12 +50,12 @@ export { ITransformer, createTransformer                      } from "./api/crea
 export { whyRun                                               } from "./api/whyrun";
 
 export { Lambda                                               } from "./utils/utils";
+export { SimpleSet, ISetEntry                                   } from "./utils/set";
 export { Iterator                                             } from "./utils/iterable";
 export { SimpleEventEmitter, ISimpleEventListener             } from "./utils/simpleeventemitter";
 export { IObserverTree, IDependencyTree                       } from "./api/extras";
 
 import { resetGlobalState } from "./core/globalstate";
-import { quickDiff } from "./utils/utils";
 
 import { IDepTreeNode } from "./core/observable";
 import { IObserverTree, IDependencyTree, getDependencyTree, getObserverTree } from "./api/extras";
@@ -83,6 +83,5 @@ export const extras = {
 // Experimental or internal api's (exposed for testing for example)
 export const _ = {
 	getAdministration,
-	quickDiff,
 	resetGlobalState
 };

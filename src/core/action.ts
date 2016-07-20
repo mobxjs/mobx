@@ -89,9 +89,10 @@ function executeWrapped(actionName: string, fn: Function, scope: any, args: IArg
 	let startTime: number;
 	if (notifySpy) {
 		startTime = Date.now();
-		const flattendArgs = [];
-		if (args) for (let i = 0, l = args.length; i < l; i++)
-			flattendArgs.push(args[i]);
+		const l = (args && args.length) || 0;
+		const flattendArgs = new Array(l);
+		if (l > 0) for (let i = 0; i < l; i++)
+			flattendArgs[i] = args[i];
 		spyReportStart({
 			type: "action",
 			name: actionName,
