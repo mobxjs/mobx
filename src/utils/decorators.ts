@@ -1,14 +1,14 @@
 import {invariant, addHiddenProp} from "./utils";
 
-/** 
- * Construcs a decorator, that normalizes the differences between 
- * TypeScript and Babel. Mainly caused by the fact that legacy-decorator cannot assign 
- * values during instance creation to properties that have a getter setter. 
- * 
+/**
+ * Construcs a decorator, that normalizes the differences between
+ * TypeScript and Babel. Mainly caused by the fact that legacy-decorator cannot assign
+ * values during instance creation to properties that have a getter setter.
+ *
  * - Sigh -
- * 
+ *
  * Also takes care of the difference between @decorator field and @decorator(args) field, and different forms of values.
- * For performance (cpu and mem) reasons the properties are always defined on the prototype (at least initially). 
+ * For performance (cpu and mem) reasons the properties are always defined on the prototype (at least initially).
  * This means that these properties despite being enumerable might not show up in Object.keys() (but they will show up in for...in loops).
  */
 export function createClassPropertyDecorator(
@@ -52,7 +52,7 @@ export function createClassPropertyDecorator(
 				// Typescript target is ES3, so it won't define property for us
 				// or using Reflect.decorate polyfill, which will return no descriptor
 				// (see https://github.com/mobxjs/mobx/issues/333)
-				Object.defineProperty(target, key, descriptor || newDescriptor);
+				Object.defineProperty(target, key, newDescriptor);
 			}
 			return newDescriptor;
 		} else {
