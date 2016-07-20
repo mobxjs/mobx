@@ -49,6 +49,12 @@ export class MobXGlobals {
 	isRunningReactions = false;
 
 	/**
+	 * Current reaction (if any is running).
+	 * Reactions are run after derivations using a trampoline.
+	 */
+	currentReaction: Reaction = undefined;
+
+	/**
 	 * List of observables that have changed in a transaction.
 	 * After completing the transaction(s) these atoms will notify their observers.
 	 */
