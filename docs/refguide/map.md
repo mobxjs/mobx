@@ -20,7 +20,7 @@ The following methods are exposed according to the [ES6 Map spec](https://develo
 * `size`. Returns the amount of entries in this map.
 
 The following functions are not in the ES6 spec but are available in MobX:
-* `toJS()`. Returns a shallow plain object representation of this map. (For a deep copy use `mobx.toJSON(map)`).
+* `toJS()`. Returns a shallow plain object representation of this map. (For a deep copy use `mobx.toJS(map)`).
 
 * `intercept(interceptor)`. Registers an interceptor that will be triggered before any changes are applied to the map. See [observe & intercept](observe.md). 
 * `observe(listener, fireImmediately?)`. Registers a listener that fires upon each change in this map, similarly to the events that are emitted for [Object.observe](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe). See [observe & intercept](observe.md) for more details.
