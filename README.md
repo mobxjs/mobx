@@ -10,7 +10,7 @@ _Simple, scalable state management_
 * Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`
 * [Ten minute, interactive MobX + React tutorial](https://mobxjs.github.io/mobx/getting-started.html)
 * [Official documentation and API overview](https://mobxjs.github.io/mobx/refguide/api.html)
-* Videos: 
+* Videos:
   * [Egghead.io lesson 1: syncing the UI with the app state using observable and observer](https://egghead.io/lessons/javascript-mobx-and-react-intro-syncing-the-ui-with-the-app-state-using-observable-and-observer)
   * [Practical React with MobX](https://www.youtube.com/watch?v=XGwuM_u7UeQ). In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth.
   * [Screencast: intro to MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8)
@@ -44,7 +44,7 @@ MobX has only a few core concepts. The following snippets can be tried online us
 MobX adds observable capabilities to existing data structures like objects, arrays and class instances. This can simply be done by annotating your class properties with the [@observable](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) decorator (ES.Next), or by invoking the [`observable`](http://mobxjs.github.io/mobx/refguide/observable.html) or [`extendObservable`](http://mobxjs.github.io/mobx/refguide/extend-observable.html) functions (ES5). See [Language support](https://github.com/mobxjs/mobx/wiki/Language-Support) for language-specific examples.
 
 ```javascript
-// ESNext class example: 
+// ESNext class example:
 class Todo {
     id = Math.random();
     @observable title = "";
@@ -78,7 +78,7 @@ Using `@observable` is like turning a value into a spreadsheet cell. But unlike 
 With MobX you can define values that will be derived automatically when relevant data is modified. By using the [`@computed`](http://mobxjs.github.io/mobx/refguide/computed-decorator.html) decorator or by using parameterless functions as property values in `extendObservable`.
 
 ```javascript
-// ESNext class example: 
+// ESNext class example:
 class TodoList {
     @observable todos = [];
     @computed get unfinishedTodoCount() {
@@ -142,7 +142,7 @@ const store = new TodoList();
 ReactDOM.render(<TodoListView todoList={store} />, document.getElementById('mount'));
 ```
 
-In ES5 a component declaration looks like this: 
+In ES5 a component declaration looks like this:
 ```javascript
 var TodoListView = observer(React.createClass({ /* etc */ }))
 ```
@@ -180,7 +180,7 @@ store.todos[0].finished = true;
 ```
 
 Nonetheless, MobX has an optional built-in concept of [`actions`](https://mobxjs.github.io/mobx/refguide/action.html).
-Use them to your advantage; they will help you to structure your code better and make wise decisions about when and where state should be modified. 
+Use them to your advantage; they will help you to structure your code better and make wise decisions about when and where state should be modified.
 
 ## MobX: Simple and scalable
 
@@ -249,17 +249,15 @@ And finally kudo's for all the people that believed in, tried and validated MobX
 
 ## What others are saying...
 
-> _Elegant! I love it!_
-> &dash; Johan den Haan, CTO of Mendix
+> After using #mobx for lone projects for a few weeks, it feels awesome to introduce it to the team. Time: 1/2, Fun: 2X
 
-> _We ported the book Notes and Kanban examples to MobX. Check out [the source](https://github.com/survivejs-demos/mobx-demo) to see how this worked out. Compared to the original I was definitely positively surprised. MobX seems like a good fit for these problems._
-> &dash; Juho Vepsäläinen, author of "SurviveJS - Webpack and React" and jster.net curator
+> Working with #mobx is basically a continuous loop of me going “this is way too simple, it definitely won’t work” only to be proven wrong
 
-> _Great job with MobX! Really gives current conventions and libraries a run for their money._
-> &dash; Daniel Dunderfelt
+> Try react-mobx with es6 and you will love it so much that you will hug someone.
 
-> _I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated._
-> &dash;David Schalk, fpcomplete.com
+> I have built big apps with MobX already and comparing to the one before that which was using Redux, it is simpler to read and much easier to reason about.
+
+> The #mobx is the way I always want things to be! It's really surprising simple and fast! Totally awesome! Don't miss it!
 
 ## Contributing
 
