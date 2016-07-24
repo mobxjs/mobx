@@ -1,6 +1,6 @@
 import {Lambda, getNextId, deprecated, invariant, valueDidChange} from "../utils/utils";
 import {assertUnwrapped, ValueMode, getValueModeFromValue} from "../types/modifiers";
-import {Reaction} from "../core/reaction";
+import {Reaction, IReactionPublic} from "../core/reaction";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
 import {action} from "../core/action";
 
@@ -11,7 +11,7 @@ import {action} from "../core/action";
  * @param scope (optional)
  * @returns disposer function, which can be used to stop the view from being updated in the future.
  */
-export function autorun(view: (r: Reaction) => void, scope?: any);
+export function autorun(view: (r: IReactionPublic) => void, scope?: any);
 
 /**
  * Creates a named reactive view and keeps it alive, so that the view is always
@@ -21,10 +21,10 @@ export function autorun(view: (r: Reaction) => void, scope?: any);
  * @param scope (optional)
  * @returns disposer function, which can be used to stop the view from being updated in the future.
  */
-export function autorun(name: string, view: (r: Reaction) => void, scope?: any);
+export function autorun(name: string, view: (r: IReactionPublic) => void, scope?: any);
 
 export function autorun(arg1: any, arg2: any, arg3?: any) {
-	let name: string, view: (r: Reaction) => void, scope: any;
+	let name: string, view: (r: IReactionPublic) => void, scope: any;
 	if (typeof arg1 === "string") {
 		name = arg1;
 		view = arg2;
@@ -99,17 +99,17 @@ export function when(arg1: any, arg2: any, arg3?: any, arg4?: any) {
 	return disposer;
 }
 
-export function autorunUntil(predicate: () => boolean, effect: (r: Reaction) => void, scope?: any) {
+export function autorunUntil(predicate: () => boolean, effect: (r: IReactionPublic) => void, scope?: any) {
 	deprecated("`autorunUntil` is deprecated, please use `when`.");
 	return when.apply(null, arguments);
 }
 
-export function autorunAsync(name: string, func: (r: Reaction) => void, delay?: number, scope?: any);
+export function autorunAsync(name: string, func: (r: IReactionPublic) => void, delay?: number, scope?: any);
 
-export function autorunAsync(func: (r: Reaction) => void, delay?: number, scope?: any);
+export function autorunAsync(func: (r: IReactionPublic) => void, delay?: number, scope?: any);
 
 export function autorunAsync(arg1: any, arg2: any, arg3?: any, arg4?: any) {
-	let name: string, func: (r: Reaction) => void, delay: number, scope: any;
+	let name: string, func: (r: IReactionPublic) => void, delay: number, scope: any;
 	if (typeof arg1 === "string") {
 		name = arg1;
 		func = arg2;
@@ -153,7 +153,7 @@ export function autorunAsync(arg1: any, arg2: any, arg3?: any, arg4?: any) {
  * or
  * autorun(() => action(effect)(expr));
  */
-export function reaction<T>(name: string, expression: () => T, effect: (arg: T, r: Reaction) => void, fireImmediately?: boolean, delay?: number, scope?: any);
+export function reaction<T>(name: string, expression: () => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately?: boolean, delay?: number, scope?: any);
 
 /**
  *
@@ -161,10 +161,10 @@ export function reaction<T>(name: string, expression: () => T, effect: (arg: T, 
  * or
  * autorun(() => action(effect)(expr));
  */
-export function reaction<T>(expression: () => T, effect: (arg: T, r: Reaction) => void, fireImmediately?: boolean, delay?: number, scope?: any);
+export function reaction<T>(expression: () => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately?: boolean, delay?: number, scope?: any);
 
 export function reaction<T>(arg1: any, arg2: any, arg3: any, arg4?: any, arg5?: any, arg6?: any) {
-	let name: string, expression: () => T, effect: (arg: T, r: Reaction) => void, fireImmediately: boolean, delay: number, scope: any;
+	let name: string, expression: () => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately: boolean, delay: number, scope: any;
 	if (typeof arg1 === "string") {
 		name = arg1;
 		expression = arg2;
