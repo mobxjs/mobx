@@ -1,8 +1,8 @@
 ## Observable Objects
 
-If a plain JavaScript object is passed to `observable` (that is, an object that wasn't created using a constructor function),
-MobX will recursively pass all its values through `observable`.
-This way the complete object (tree) is in-place instrumented to make it observable.
+If a plain JavaScript object is passed to `observable` all properties inside that object will be made observable. 
+(A plain object is an object that wasn't created using a constructor function)
+`observable` is by default applied recursively, so if one of the encoutered values is an object or array, that value will be passed through `observable` as well.
 
 ```javascript
 import {observable, autorun, action} from "mobx";
@@ -42,6 +42,6 @@ Either use the [`@observable`](observable.md) annotation or the [`extendObservab
 * Argumentless functions will be automatically turned into views, just like [`@computed`](computed-decorator) would do. For view `this` will be automatically bound to the object it is defined on.
 However, if a function expression (ES6 / TypeScript) is used, `this` will be bound to `undefined`, so you probably want to either to refer to the object directly, or to use a classic function.
 * However (argumentless) functions that are declared as `action` will not be converted into computed views, but will keep their semantics.
-* `observable` is applied recursively, both on instantiation and to any new values that will be assigned to observable properties in the future.
+* `observable` is applied recursively to a whole object graph automatically. Both on instantiation and to any new values that will be assigned to observable properties in the future. Observable will not recurse into non-plain objects.
 * These defaults are fine in 95% of the cases, but for more fine-grained on how and which properties should be made observable, see the [modifiers](modifiers.md) section.
 

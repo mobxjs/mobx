@@ -15,11 +15,15 @@
   * [objects](refguide/object.md)
   * [arrays](refguide/array.md)
   * [maps](refguide/map.md)
-  * [boxed values](refguide/boxed.md)  
-* [Videos, tutorials and blogs](faq/blogs.md) 
-* [Examples, Boilerplates & Related Projects](faq/related.md)
+  * [boxed values](refguide/boxed.md)
+* [Underestanding what MobX reacts to](best/react.md)
+* Resources
+  * [Tutorials, talks and blogs](faq/blogs.md)
+  * [Related Projects](faq/related.md)
+  * [Examples projects](faq/Examples.md)
+  * [Boilerplates](faq/Boilerplates.md)
+  * [Frequently Asked Questions](faq/faq.md)
 * Tips & Tricks
-  * [What does MobX react to?](best/react.md)
   * [Common Pitfalls & Best Practices](best/pitfalls.md)
   * [Defining data stores](best/store.md)
   * [Writing (async) actions](best/actions.md)
@@ -27,9 +31,6 @@
   * [DevTools](best/devtools.md)
   * [ES5 / ES6 / TypeScript syntax](best/syntax.md)
   * [Stateless Components and Hot Module Reloading](best/stateless-HMR.md)
-  * Optimizing MobX
-  * Testing
-* [Frequently Asked Questions](faq/faq.md)
 * Utility functions
   * [autorunAsync](refguide/autorun-async.md)
   * [Atom & Reaction](refguide/extending.md)
