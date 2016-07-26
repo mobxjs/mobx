@@ -1,4 +1,4 @@
-import {Atom} from "../core/atom";
+import {BaseAtom} from "../core/atom";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} from "./modifiers";
 import {valueDidChange, Lambda, getNextId} from "../utils/utils";
@@ -31,7 +31,7 @@ export interface IObservableValue<T> {
 	observe(listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
 }
 
-export class ObservableValue<T> extends Atom implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable {
+export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable {
 	hasUnreportedChange = false;
 	interceptors;
 	changeListeners;

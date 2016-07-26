@@ -1,5 +1,5 @@
 import {getNextId, deepEquals, makeNonEnumerable, Lambda, deprecated, EMPTY_ARRAY, addHiddenFinalProp, addHiddenProp} from "../utils/utils";
-import {Atom} from "../core/atom";
+import {BaseAtom} from "../core/atom";
 import {ValueMode, assertUnwrapped, makeChildObservable} from "./modifiers";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
@@ -75,14 +75,14 @@ export class StubArray {
 StubArray.prototype = [];
 
 class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChange<T> | IArrayWillSplice<T>>, IListenable {
-	atom: Atom;
+	atom: BaseAtom;
 	values: T[];
 	lastKnownLength: number = 0;
 	interceptors = null;
 	changeListeners = null;
 
 	constructor(name, public mode: ValueMode, public array: IObservableArray<T>, public owned: boolean) {
-		this.atom = new Atom(name || ("ObservableArray@" + getNextId()));
+		this.atom = new BaseAtom(name || ("ObservableArray@" + getNextId()));
 	}
 
 	makeReactiveArrayItem(value) {
@@ -431,7 +431,7 @@ const ENTRY_0 = {
 	configurable: true,
 	enumerable:false,
 	set: createArraySetter(0),
-	get: createArrayGetter(0)	
+	get: createArrayGetter(0)
 };
 
 function createArrayBufferItem(index: number) {
@@ -450,7 +450,7 @@ function createArraySetter(index: number) {
 		const values = adm.values;
 		assertUnwrapped(newValue, "Modifiers cannot be used on array values. For non-reactive array values use makeReactive(asFlat(array)).");
 		if (index < values.length) {
-			// update at index in range 
+			// update at index in range
 			checkIfStateModificationsAreAllowed();
 			const oldValue = values[index];
 			if (hasInterceptors(adm)) {

@@ -19,7 +19,7 @@
 import {registerGlobals} from "./core/globalstate";
 registerGlobals();
 
-export { IAtom, Atom                                          } from "./core/atom";
+export { IAtom, Atom, BaseAtom                                } from "./core/atom";
 export { IObservable, IDepTreeNode                            } from "./core/observable";
 export { Reaction                                             } from "./core/reaction";
 export { IDerivation, untracked                               } from "./core/derivation";

@@ -43,10 +43,6 @@ export class Reaction implements IDerivation {
 
 	constructor(public name: string = "Reaction@" + getNextId(), private onInvalidate: () => void) { }
 
-	onBecomeObserved() {
-		// noop, reaction is always unobserved
-	}
-
 	onBecomeUnobserved() {
 		// noop, reaction is always unobserved
 	}

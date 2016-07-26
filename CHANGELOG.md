@@ -1,6 +1,7 @@
 # 2.4.1
 
 * `@action` decorated methods are now configurable. Fixes #441
+* The `onBecomeObserved` event handler is now triggered when an atom is observed, instead of when it is bound as dependency. Fixes #427 and makes atoms easier to extend.
 
 # 2.4.0
 

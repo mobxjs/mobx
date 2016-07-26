@@ -1686,3 +1686,53 @@ test('unoptimizable subscriptions are diffed correctly', t => {
 	t.end()
 
 })
+
+test('atom events #427', t => {
+	var start = 0;
+	var stop = 0;
+
+	var a = new mobx.Atom("test", () => start++, () => stop++);
+	a.reportObserved();
+	a.reportObserved();
+
+	t.equal(start, 0)
+	t.equal(stop, 0)
+
+	var d = mobx.autorun(() => {
+		a.reportObserved()
+		t.equal(start, 1)
+		a.reportObserved()
+		t.equal(start, 1)
+	})
+
+	t.equal(start, 1)
+	t.equal(stop, 0)
+	a.reportChanged()
+	t.equal(start, 1)
+	t.equal(stop, 0)
+
+	d()
+	t.equal(start, 1)
+	t.equal(stop, 1)
+
+	t.equal(a.reportObserved(), false);
+	t.equal(start, 1)
+	t.equal(stop, 1)
+
+	d = mobx.autorun(() => {
+		t.equal(a.reportObserved(), true)
+		t.equal(start, 2)
+		a.reportObserved()
+		t.equal(start, 2)
+	})
+
+	t.equal(start, 2)
+	t.equal(stop, 1)
+	a.reportChanged()
+	t.equal(start, 2)
+	t.equal(stop, 1)
+
+	d()
+	t.equal(stop, 2)
+	t.end()
+})

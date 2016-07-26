@@ -273,9 +273,7 @@ test('atom clock example', function(t) {
 		getTime() {
 			console.log("get time");
 			// let mobx now this observable data source has been used
-			this.atom.reportObserved();
-			if (!this.intervalHandler)
-				this.tick(); // get the initial data
+			this.atom.reportObserved(); // will trigger startTicking and thus tick
 			return this.currentDateTime;
 		}
 
@@ -288,6 +286,7 @@ test('atom clock example', function(t) {
 
 		startTicking() {
 			console.log("start ticking");
+			this.tick();
 			this.intervalHandler = setInterval(() => this.tick(), 1 * time_factor);
 		}
 
@@ -312,7 +311,7 @@ test('atom clock example', function(t) {
 	setTimeout(disposer, 4.5 * time_factor);
 
 	setTimeout(() => {
-		t.equal(ticks, 6);
+		t.equal(ticks, 5);
 		t.equal(values.length, 5);
 		t.equal(values.filter(x => x.length > 0).length, 5);
 		t.end();
@@ -437,7 +436,7 @@ function normalizeSpyEvents(events: any[]) {
 test("action decorator (typescript)", function(t) {
 	class Store {
 		constructor(private multiplier: number) {}
-		
+
 		@action
 		add(a: number, b: number): number {
 			return (a + b) * this.multiplier;
@@ -468,7 +467,7 @@ test("action decorator (typescript)", function(t) {
 test("custom action decorator (typescript)", function(t) {
 	class Store {
 		constructor(private multiplier: number) {}
-		
+
 		@action("zoem zoem")
 		add(a: number, b: number): number {
 			return (a + b) * this.multiplier;
@@ -602,7 +601,7 @@ test("observable performance", t => {
 
 	for (var i = 0; i < AMOUNT; i++)
 		objs.push(new A());
-	
+
 	console.log("created in ", Date.now() - start);
 
 	for (var j = 0; j < 4; j++) {
@@ -613,7 +612,7 @@ test("observable performance", t => {
 			obj.c = obj.b - obj.a;
 			obj.d;
 		}
-	} 
+	}
 
 	console.log("changed in ", Date.now() - start);
 
@@ -715,7 +714,7 @@ test("reusing initializers", t => {
 	class A {
 		@observable a = 3;
 		@observable b = this.a + 2;
-		@computed get c() { 
+		@computed get c() {
 			return this.a + this.b;
 		}
 		@computed get d() {
@@ -745,7 +744,7 @@ test("enumerability", t => {
 	}
 
 	const a = new A();
-	
+
 	// not initialized yet
 	let ownProps = Object.keys(a);
 	let props: string[] = [];
@@ -774,7 +773,7 @@ test("enumerability", t => {
 	a.b;
 	a.m;
 	a.m2;
-	
+
 	ownProps = Object.keys(a);
 	props = [];
 	for (var key in a)
@@ -864,7 +863,7 @@ test("379, inheritable actions (typescript)", t => {
 	const a = new A()
 	t.equal(a.method(), 42)
 	t.equal(isAction(a.method), true)
-	
+
 	const c = new C()
 	t.equal(c.method(), 87)
 	t.equal(isAction(c.method), true)

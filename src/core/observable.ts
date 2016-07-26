@@ -18,15 +18,11 @@ export interface IObservable extends IDepTreeNode {
 	lastAccessedBy: number;
 	staleObservers: IDerivation[];
 	observers: SimpleSet<IDerivation>;
-	onBecomeObserved();
 	onBecomeUnobserved();
 }
 
 export function addObserver(observable: IObservable, node: IDerivation) {
-	const wasEmpty = observable.observers.length === 0;
 	observable.observers.add(node);
-	if (wasEmpty)
-		observable.onBecomeObserved();
 }
 
 export function removeObserver(observable: IObservable, node: IDerivation) {

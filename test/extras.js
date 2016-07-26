@@ -230,7 +230,7 @@ test('get atom', function(t) {
 	}
 
 	var ovClassName = mobx.observable(3).constructor.name;
-	var atomClassName = mobx.Atom.name;
+	var atomClassName = mobx.BaseAtom.name;
 	var reactionClassName = mobx.Reaction.name;
 
 	t.equal(atom(a), ovClassName);

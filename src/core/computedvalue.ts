@@ -58,10 +58,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		return res;
 	};
 
-	onBecomeObserved() {
-		// noop, handled by .get()
-	}
-
 	onBecomeUnobserved() {
 		clearObserving(this);
 		this.isLazy = true;

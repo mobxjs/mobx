@@ -1,7 +1,7 @@
 import {ObservableArray} from "../types/observablearray";
 import {ObservableMap} from "../types/observablemap";
 import {isObservableObject, ObservableObjectAdministration} from "../types/observableobject";
-import {Atom} from "../core/atom";
+import {BaseAtom} from "../core/atom";
 import {ComputedValue} from "../core/computedvalue";
 import {Reaction} from "../core/reaction";
 
@@ -22,5 +22,5 @@ export function isObservable(value, property?: string): boolean {
 		}
 		return false;
 	}
-	return !!value.$mobx || value instanceof Atom || value instanceof Reaction || value instanceof ComputedValue;
+	return !!value.$mobx || value instanceof BaseAtom || value instanceof Reaction || value instanceof ComputedValue;
 }
