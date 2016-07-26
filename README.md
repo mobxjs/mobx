@@ -157,6 +157,8 @@ All components render smartly but are defined in a dumb manner. MobX will simply
 
 However, if you would remove the `Tasks left` line (or put it into a separate component), the `TodoListView` will no longer re-render when ticking a box. You can verify this yourself by changing the [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/).
 
+For an in-depth explanation about how MobX determines to which observables needs to be reacted, check out: [Understanding what MobX reacts to](https://github.com/mobxjs/mobx/blob/gh-pages/docs/best/react.md)
+
 ### Actions
 
 Unlike many flux frameworks, MobX is unopinionated about how user events should be handled.
