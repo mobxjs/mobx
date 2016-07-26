@@ -17,7 +17,7 @@ _Simple, scalable state management_
   * [State Management Is Easy, React Amsterdam 2016 conf](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
   * [Transparent Reactive Programming and Mutable Data, Reactive2015 conf](https://www.youtube.com/watch?v=FEwLwiizlk0) ([slides](https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures))
 * More tutorials, blogs and videos can be found on the [MobX homepage](http://mobxjs.github.io/mobx/faq/blogs.html)
-* [Boilerplates and related projects](http://mobxjs.github.io/mobx/faq/related.html)
+* [Boilerplates and related projects](http://mobxjs.github.io/mobx/faq/boilerplates.html)
 
 
 ## Introduction
@@ -277,3 +277,8 @@ Then use `lib/mobx.umd.js` or `lib/mobx.umd.min.js`
 
 See the [changelog](https://github.com/mobxjs/mobx/blob/master/CHANGELOG.md#200) for all the details about `mobservable` to `mobx`.
 
+## Donating
+
+Was MobX key in making your project a success? Share the victory by using the [donate button](https://mobxjs.github.io/mobx/donating.html)!
+MobX is developed largely in free time, so any ROI is appreciated :-).
+If you leave a name it will be added to the sponsors list.
