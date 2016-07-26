@@ -10,12 +10,15 @@ _Simple, scalable state management_
 * Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`
 * [Ten minute, interactive MobX + React tutorial](https://mobxjs.github.io/mobx/getting-started.html)
 * [Official documentation and API overview](https://mobxjs.github.io/mobx/refguide/api.html)
-* Videos: 
+* Videos:
   * [Egghead.io lesson 1: syncing the UI with the app state using observable and observer](https://egghead.io/lessons/javascript-mobx-and-react-intro-syncing-the-ui-with-the-app-state-using-observable-and-observer)
   * [Practical React with MobX](https://www.youtube.com/watch?v=XGwuM_u7UeQ). In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth.
   * [Screencast: intro to MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8)
   * [State Management Is Easy, React Amsterdam 2016 conf](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
   * [Transparent Reactive Programming and Mutable Data, Reactive2015 conf](https://www.youtube.com/watch?v=FEwLwiizlk0) ([slides](https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures))
+* More tutorials, blogs and videos can be found on the [MobX homepage](http://mobxjs.github.io/mobx/faq/blogs.html)
+* [Boilerplates and related projects](http://mobxjs.github.io/mobx/faq/boilerpates.html)
+
 
 ## Introduction
 
@@ -41,25 +44,58 @@ MobX has only a few core concepts. The following snippets can be tried online us
 MobX adds observable capabilities to existing data structures like objects, arrays and class instances. This can simply be done by annotating your class properties with the [@observable](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) decorator (ES.Next), or by invoking the [`observable`](http://mobxjs.github.io/mobx/refguide/observable.html) or [`extendObservable`](http://mobxjs.github.io/mobx/refguide/extend-observable.html) functions (ES5). See [Language support](https://github.com/mobxjs/mobx/wiki/Language-Support) for language-specific examples.
 
 ```javascript
+// ESNext class example:
 class Todo {
     id = Math.random();
     @observable title = "";
     @observable finished = false;
 }
+
+// ES5 constructor function example:
+function Todo() {
+	this.id = Math.random()
+	extendObservable(this, {
+		title: "",
+		finished: false
+	})
+}
+
+// ... or just create plain objects:
+function createTodo() {
+	return observable({
+		id: Math.random(),
+		title: "",
+		finished: false
+	})
+}
+
 ```
 
-Using `@observable` is like turning a value into a spreadsheet cell. But unlike spreadsheets, these values can be not just primitive values, but references, objects and arrays as well. You can even [define your own](http://mobxjs.github.io/mobx/refguide/extending.html) observable data sources.
+Using `@observable` is like turning a value into a spreadsheet cell. But unlike spreadsheets, not only can these values be primitive values, but references, objects and arrays as well. You can even [define your own](http://mobxjs.github.io/mobx/refguide/extending.html) observable data sources.
 
 ### Computed values
 
 With MobX you can define values that will be derived automatically when relevant data is modified. By using the [`@computed`](http://mobxjs.github.io/mobx/refguide/computed-decorator.html) decorator or by using parameterless functions as property values in `extendObservable`.
 
 ```javascript
+// ESNext class example:
 class TodoList {
     @observable todos = [];
     @computed get unfinishedTodoCount() {
         return this.todos.filter(todo => !todo.finished).length;
     }
+}
+
+// ES5 constructor function example:
+function TodoList() {
+	extendObservable(this, {
+		todos: [],
+		unfinishedTodoCount: function() {
+	        return this.todos.filter(function (todo) {
+				return !todo.finished
+			}).length;
+		}
+	})
 }
 ```
 MobX will ensure that `unfinishedTodoCount` is updated automatically when a todo is added or when one of the `finished` properties is modified.
@@ -77,6 +113,7 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import {observer} from "mobx-react";
 
+// ESNext decorator / JSX
 @observer
 class TodoListView extends Component {
     render() {
@@ -105,6 +142,11 @@ const store = new TodoList();
 ReactDOM.render(<TodoListView todoList={store} />, document.getElementById('mount'));
 ```
 
+In ES5 a component declaration looks like this:
+```javascript
+var TodoListView = observer(React.createClass({ /* etc */ }))
+```
+
 `observer` turns React (function) components into derivations of the data they render.
 
 Also, reactions can be created using the [`autorun`](http://mobxjs.github.io/mobx/refguide/autorun.html), [`autorunAsync`](http://mobxjs.github.io/mobx/refguide/autorun-async.html) or [`when`](http://mobxjs.github.io/mobx/refguide/when.html) functions to fit your specific situations.
@@ -114,6 +156,8 @@ When using MobX there are no smart or dumb components.
 All components render smartly but are defined in a dumb manner. MobX will simply make sure the components are always re-rendered whenever needed, but also no more than that. So the `onClick` handler in the above example will force the proper `TodoView` to render, and it will cause the `TodoListView` to render if the number of unfinished tasks has changed.
 
 However, if you would remove the `Tasks left` line (or put it into a separate component), the `TodoListView` will no longer re-render when ticking a box. You can verify this yourself by changing the [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/).
+
+For an in-depth explanation about how MobX determines to which observables needs to be reacted, check out: [Understanding what MobX reacts to](https://github.com/mobxjs/mobx/blob/gh-pages/docs/best/react.md)
 
 ### Actions
 
@@ -138,7 +182,7 @@ store.todos[0].finished = true;
 ```
 
 Nonetheless, MobX has an optional built-in concept of [`actions`](https://mobxjs.github.io/mobx/refguide/action.html).
-Use them to your advantage; they will help you to structure your code better and make wise decisions about when and where state should be modified. 
+Use them to your advantage; they will help you to structure your code better and make wise decisions about when and where state should be modified.
 
 ## MobX: Simple and scalable
 
@@ -200,67 +244,26 @@ And finally kudo's for all the people that believed in, tried and validated MobX
 
 ## Further resources and documentation
 
-### Get Started
-
-* [Getting Started](https://mobxjs.github.io/mobx/getting-started.html) Ten minute, interactive introduction (with just ES5)
-* [Full API documentation](http://mobxjs.github.io/mobx/)
-* [react-mobservable-boilerplate](https://github.com/mweststrate/react-mobservable-boilerplate) Clone the boilerplate repository containing the above example 
-* [MobX Github](https://github.com/mobxjs) Further boilerplate and example projects for ES5, Babel and Typescript can be found in the  organization on github
-
-### Blogs & Videos
-
-* [Screencast: intro to MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8) State Management Is Easy, React Amsterdam 2016 conf (coming soon) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
-* [Reactive 2015 Conference](https://www.youtube.com/watch?v=FEwLwiizlk0) Talk on MobX (mobservable): React, transparent reactive programming and mutable data structures ([slides](https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures))
-* [Making React reactive: the pursuit of high performing, easily maintainable React apps](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/)
-* [Becoming fully reactive: an in-depth explanation of MobX](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.a2j1rww8g)
-* [Pure rendering in the light of time and state](https://medium.com/@mweststrate/pure-rendering-in-the-light-of-time-and-state-4b537d8d40b1)
-* [MobX Interview](http://survivejs.com/blog/mobx-interview/) SurviveJS interview on MobX, React and Flux
-
-### Related projects
-
-* [mobx-connect](https://github.com/nightwolfz/mobx-connect) MobX @connect decorator for react components. Similar to redux's @connect.
-* [rfx-stack](https://github.com/foxhound87/rfx-stack) RFX Stack - Universal App featuring: React + Feathers + MobX
-* [mobx-reactor](https://github.com/amsb/mobx-reactor) Connect MobX data stores to functional stateless React components with async actions and unidirectional data flow.
-* [mobx-model](https://github.com/ikido/mobx-model) Simplify mobx data stores that mimic backend models 
-* [rx-mobx](https://github.com/chicoxyzzy/rx-mobx) Convert Mobx observables to RxJS and vice versa
-* [mobx-store](https://github.com/AriaFallah/mobx-store) A lowdb inspired data store with declarative querying, observable state, and easy undo/redo.
-* [reaxor](https://github.com/KadoBOT/reaxor) Boilerplate for better state management, styling, testing and cleaner code
-* [Smalldots MobX Store](https://github.com/smalldots/mobx-store) Store API for MobX
-* [mobx-roof](https://github.com/mobx-roof/mobx-roof) Simple, React MVVM framework based on mobx
-
-_Feel free to create a PR to add your own!_
-
-### More examples
-
-* [mobx-react-todomvc](https://github.com/mobxjs/mobx-react-todomvc) TodoMVC reference implementation on top of react-mobx-boilerplate
-* [mobx-react-typescript](https://github.com/contacts-mvc/mobx-react-typescript) An example project using Typescript
-* [TodoMVC Benchmarking](https://github.com/mweststrate/mobx-todomvc)
-* [mobservable-demo](https://github.com/survivejs/mobservable-demo) The ports of the _Notes_ and _Kanban_ examples from the book "SurviveJS - Webpack and React" to mobservable.
-* [react-particles-experiment](https://github.com/mobxjs/react-particles-experiment) MobX port of React-Particles-Experiment, showing MobX + Flux action dispatching
-* A simple webshop using [React + mobx](https://jsfiddle.net/mweststrate/46vL0phw) or [JQuery + mobx](http://jsfiddle.net/mweststrate/vxn7qgdw).
-* [Simple timer](https://jsfiddle.net/mweststrate/wgbe4guu/) application in JSFiddle.
-* [Google Play Music Desktop Remote](https://github.com/GPMDP/google-play-music-desktop-remote) A React-Native app for remote controlling Google Play Music Desktop: MobX + WebSocket.
-* [React Portal](https://github.com/vinej/react-portal) A Dashboard example created with React/Mobx with a Flux pattern inspired by Redux.
+* [MobX homepage](http://mobxjs.github.io/mobx/faq/blogs.html)
+* [API overview](http://mobxjs.github.io/mobx/refguide/api.html)
+* [Tutorials, Blogs & Videos](http://mobxjs.github.io/mobx/faq/blogs.html)
+* [Boilerplate and related projects](http://mobxjs.github.io/mobx/faq/related.html)
 
 ## What others are saying...
 
-> _Elegant! I love it!_
-> &dash; Johan den Haan, CTO of Mendix
+> After using #mobx for lone projects for a few weeks, it feels awesome to introduce it to the team. Time: 1/2, Fun: 2X
 
-> _We ported the book Notes and Kanban examples to MobX. Check out [the source](https://github.com/survivejs-demos/mobx-demo) to see how this worked out. Compared to the original I was definitely positively surprised. MobX seems like a good fit for these problems._
-> &dash; Juho Vepsäläinen, author of "SurviveJS - Webpack and React" and jster.net curator
+> Working with #mobx is basically a continuous loop of me going “this is way too simple, it definitely won’t work” only to be proven wrong
 
-> _Great job with MobX! Really gives current conventions and libraries a run for their money._
-> &dash; Daniel Dunderfelt
+> Try react-mobx with es6 and you will love it so much that you will hug someone.
 
-> _I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated._
-> &dash;David Schalk, fpcomplete.com
+> I have built big apps with MobX already and comparing to the one before that which was using Redux, it is simpler to read and much easier to reason about.
 
-More testimonials from people using MobX in production can be found on [medium: functional reactive flux blog](https://medium.com/@kenneth_chau/the-2-fundamental-laws-of-flux-and-the-functional-reactive-flux-c9368ac008d3#.h41y0i22h), [hacker news](https://news.ycombinator.com/item?id=11181980), [reddit 1](https://www.reddit.com/r/reactjs/comments/46m2zg/has_anybody_used_mobservable_for_their_react/), [reddit 2](https://www.reddit.com/r/javascript/comments/47omi9/mobx_20_previously_mobservable_has_been_released/) or on twitter under the [#mobx](https://twitter.com/search?q=mobx&src=typd) tag.
+> The #mobx is the way I always want things to be! It's really surprising simple and fast! Totally awesome! Don't miss it!
 
 ## Contributing
 
-* Feel free to send pull requests.
+* Feel free to send small pull requests. Please discuss new features or big changes in a GitHub issue first.
 * Use `npm test` to run the basic test suite, `npm run coverage` for the test suite with coverage and `npm run perf` for the performance tests.
 
 ## Bower support
@@ -274,3 +277,8 @@ Then use `lib/mobx.umd.js` or `lib/mobx.umd.min.js`
 
 See the [changelog](https://github.com/mobxjs/mobx/blob/master/CHANGELOG.md#200) for all the details about `mobservable` to `mobx`.
 
+## Donating
+
+Was MobX key in making your project a success? Share the victory by using the [donate button](https://mobxjs.github.io/mobx/donating.html)!
+MobX is developed largely in free time, so any ROI is appreciated :-).
+If you leave a name it will be added to the sponsors list.
