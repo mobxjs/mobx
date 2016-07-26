@@ -1,3 +1,7 @@
+# 2.4.1
+
+* `@action` decorated methods are now configurable. Fixes #441
+
 # 2.4.0
 
 * _Note: the internal version of MobX has been bumped. This version has no breaking api changes, but if you have MobX loaded multiple times in your project, they all have to be upgraded to `2.4.0`. MobX will report this when starting._

@@ -45,6 +45,7 @@ function namedActionDecorator(name: string) {
 			// Don't use the field decorator if we are just decorating a method
 			descriptor.value = actionImplementation(name, descriptor.value);
 			descriptor.enumerable = false;
+			descriptor.configurable = true;
 			return descriptor;
 		}
 		// bound instance methods
