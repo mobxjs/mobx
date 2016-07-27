@@ -42,6 +42,7 @@ Boilerplate projects, example projects with sources, Libraries.
 * Flux challenge, implemeted with MobX: https://github.com/staltz/flux-challenge/tree/master/submissions/mweststrate
 * MobX + D3 codepen: http://codepen.io/timelyportfolio/pen/zrJwvE
 * TypeScript + React + MobX + JSPM - Simple CRUD App example: https://github.com/piotrwitek/training-management-tool
+* [Logpipe](https://github.com/jeffijoe/logpipe-server), a dev-logging app using MobX with Socket.IO for **real-time updates**
 
 ## Libraries
 
