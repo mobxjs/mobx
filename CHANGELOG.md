@@ -3,6 +3,7 @@
 * `@action` decorated methods are now configurable. Fixes #441
 * The `onBecomeObserved` event handler is now triggered when an atom is observed, instead of when it is bound as dependency. Fixes #427 and makes atoms easier to extend.
 * if `useStrict()` is invoked without arguments, it now returns the current value of strict mode.
+* the current reaction is now always passed as first argument to the callbacks of `autorun`, `autorunAsync`, `when` and `reaction`. This allows reactions to be immediately disposed during the first run. See #438, by @andykog
 
 # 2.4.0
 
