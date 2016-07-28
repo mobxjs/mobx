@@ -103,3 +103,25 @@ test('autorun should not result in loop', function(t) {
 		d();
 	}, 100);
 });
+
+test('autorunAsync passes Reaction as an argument to view function', function(t) {
+	var a = m.observable(1);
+
+	var autoRunsCalled = 0;
+
+	m.autorunAsync(r => {
+		t.equal(typeof r.dispose, 'function');
+		autoRunsCalled++;
+		if (a.get() === 'pleaseDispose') r.dispose();
+	}, 10);
+
+	setTimeout(() => a.set(2), 25);
+	setTimeout(() => a.set('pleaseDispose'), 40);
+	setTimeout(() => a.set(3), 55);
+	setTimeout(() => a.set(4), 70);
+
+	setTimeout(function() {
+		t.equal(autoRunsCalled, 3);
+		t.end();
+	}, 100);
+});

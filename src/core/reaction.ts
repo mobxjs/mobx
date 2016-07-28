@@ -25,7 +25,11 @@ import {SimpleSet} from "../utils/set";
 
 let EMPTY_DERIVATION_SET: SimpleSet<IDerivation>;
 
-export class Reaction implements IDerivation {
+export interface IReactionPublic {
+	dispose: () => void,
+}
+
+export class Reaction implements IDerivation, IReactionPublic {
 	staleObservers:  IDerivation[] = EMPTY_ARRAY; // Won't change
 	observers = EMPTY_DERIVATION_SET || (EMPTY_DERIVATION_SET = new SimpleSet<IDerivation>());       // Won't change
 	observing = []; // nodes we are looking at. Our value depends on these nodes

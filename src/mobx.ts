@@ -21,7 +21,7 @@ registerGlobals();
 
 export { IAtom, Atom, BaseAtom                                } from "./core/atom";
 export { IObservable, IDepTreeNode                            } from "./core/observable";
-export { Reaction                                             } from "./core/reaction";
+export { Reaction, IReactionPublic                            } from "./core/reaction";
 export { IDerivation, untracked                               } from "./core/derivation";
 export { action, useStrict, isAction, runInAction             } from "./core/action";
 export { spy                                                  } from "./core/spy";
