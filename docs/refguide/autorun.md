@@ -6,8 +6,10 @@ When `autorun` is used, the provided function will always be triggered when one 
 In contrast, `computed(function)` creates functions that only re-evaluate if it has
 observers on its own, otherwise its value is considered to be irrelevant.
 As a rule of thumb: use `autorun` if you have a function that should run automatically but that doesn't result in a new value.
-Use `computed` for everything else. Autoruns are about initiating _effects_, not about producing new values.  
+Use `computed` for everything else. Autoruns are about initiating _effects_, not about producing new values.
 If a string is passed as first argument to `autorun`, it will be used as debug name.
+
+The function passed to autorun will receive one argument when invoked, the current reaction (autorun), which can be used to dispose the autorun during execution.
 
 Just like the [`@observer` decorator/function](./observer-component.md), `autorun` will only observe data that is used during the execution of the provided function.
 

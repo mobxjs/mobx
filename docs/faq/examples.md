@@ -2,10 +2,12 @@
 
 * [Simple ES5 MobX examples](https://github.com/mattruby/mobx-examples) Bite sized MobX examples all setup to run in jsFiddle.
 * TodoMVC application, including Server Side Rendering: https://github.com/mobxjs/mobx-react-todomvc
-* Contact list application (simple data fetching, routing, complex components, material UI): https://github.com/mobxjs/mobx-contacts-list
 * Spectacle editor: Official editor for building presentations using the Spectacle library: https://github.com/FormidableLabs/spectacle-editor
+* [PokemonGo webspoof](https://github.com/iam4x/pokemongo-webspoof/) Play PokemonGo on your Mac
+* Contact list application (simple data fetching, routing, complex components, material UI): https://github.com/mobxjs/mobx-contacts-list
 * DWatch - docker container manager, Electron, typescript, inversifyJS: https://github.com/Mercateo/dwatch
 * Kratelabs interactive map / map order service https://kratelabs.addxy.com/#/ source: https://github.com/KrateLabs/KrateLabs-App
+* [Logpipe](https://github.com/jeffijoe/logpipe-server), a dev-logging app using MobX with Socket.IO for **real-time updates**
 * [Google Play Music Desktop Remote](https://github.com/GPMDP/google-play-music-desktop-remote) A React-Native app for remote controlling Google Play Music Desktop: MobX + WebSocket.
 * Example with Server Side Rendering, react-router: https://github.com/kuuup/mobx-ssr-example
 * Server Side Api Mocking made easy with UI: https://github.com/Raathigesh/Atmo
@@ -23,3 +25,4 @@
 * MobX + D3 codepen: http://codepen.io/timelyportfolio/pen/zrJwvE
 * TypeScript + React + MobX + JSPM - Simple CRUD App example: https://github.com/piotrwitek/training-management-tool
 * Github Note Taker in MobX: https://github.com/eswat2/egghead-mobx
+* vcash-electron - Electron UI for the Vcash crypto currency: https://github.com/whphhg/vcash-electron

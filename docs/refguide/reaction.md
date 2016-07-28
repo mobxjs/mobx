@@ -4,11 +4,12 @@ Usage: `reaction(() => data, data => { sideEffect }, fireImmediately = false, de
 
 A variation on `autorun` that gives more fine grained control on which observables will be tracked.
 It takes two functions, the first one is tracked and returns data that is used as input for the second one, the side effect.
-Unlike `autorun` the side effect won't be run directly when created, but only when the data expression returns a new value for the first time. 
+Unlike `autorun` the side effect won't be run directly when created, but only when the data expression returns a new value for the first time.
 Any observables that are accessed while executing the side effect will not be tracked.
 The side effect can be debounced, just like `autorunAsync`.
 `reaction` returns a disposer function.
 If a string is passed as first argument to `reaction`, it will be used as debug name.
+The functions passed to `when` will receive one argument when invoked, the current reaction, which can be used to dispose the when during execution.
 
 It is important to notice that the side effect will *only* react to data that was *accessed* in the data expression, which might be less then the data that is actually used in the effect.
 Also, the side effect will only be triggered when the data returned by the expression has changed (the `asStructure` modifier can be used to enforce deep comparison).
@@ -22,7 +23,7 @@ But only `reaction2` and `autorun` will react to the change of a `title` in one 
 const todos = observable([
     {
         title: "Make coffee",
-        done: true, 
+        done: true,
     },
     {
         title: "Find biscuit",

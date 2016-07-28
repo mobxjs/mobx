@@ -7,7 +7,7 @@ _Simple, scalable state management_
 [![Coverage Status](https://coveralls.io/repos/mobxjs/mobx/badge.svg?branch=master&service=github)](https://coveralls.io/github/mobxjs/mobx?branch=master)
 [![Join the chat at https://gitter.im/mobxjs/mobx](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mobxjs/mobx?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-* Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`
+* Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`. To enable ESNext decorators (optional), see below.
 * [Ten minute, interactive MobX + React tutorial](https://mobxjs.github.io/mobx/getting-started.html)
 * [Official documentation and API overview](https://mobxjs.github.io/mobx/refguide/api.html)
 * Videos:
@@ -17,7 +17,7 @@ _Simple, scalable state management_
   * [State Management Is Easy, React Amsterdam 2016 conf](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
   * [Transparent Reactive Programming and Mutable Data, Reactive2015 conf](https://www.youtube.com/watch?v=FEwLwiizlk0) ([slides](https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures))
 * More tutorials, blogs and videos can be found on the [MobX homepage](http://mobxjs.github.io/mobx/faq/blogs.html)
-* [Boilerplates and related projects](http://mobxjs.github.io/mobx/faq/boilerpates.html)
+* [Boilerplates and related projects](http://mobxjs.github.io/mobx/faq/boilerplates.html)
 
 
 ## Introduction
@@ -247,7 +247,8 @@ And finally kudo's for all the people that believed in, tried and validated MobX
 * [MobX homepage](http://mobxjs.github.io/mobx/faq/blogs.html)
 * [API overview](http://mobxjs.github.io/mobx/refguide/api.html)
 * [Tutorials, Blogs & Videos](http://mobxjs.github.io/mobx/faq/blogs.html)
-* [Boilerplate and related projects](http://mobxjs.github.io/mobx/faq/related.html)
+* [Boilerplates](http://mobxjs.github.io/mobx/faq/boilerplates.html)
+* [Related projects](http://mobxjs.github.io/mobx/faq/related.html)
 
 ## What others are saying...
 
@@ -265,6 +266,27 @@ And finally kudo's for all the people that believed in, tried and validated MobX
 
 * Feel free to send small pull requests. Please discuss new features or big changes in a GitHub issue first.
 * Use `npm test` to run the basic test suite, `npm run coverage` for the test suite with coverage and `npm run perf` for the performance tests.
+
+## Enabling decorators (optional)
+
+**TypeScript**
+
+Enable the compiler option `experimentalDecorators` in `tsconfig.json` or pass it as flag `--experimentalDecorators` to the compiler.
+
+**Babel:**
+
+Install support for decorators: `npm i --save-dev babel-plugin-transform-decorators-legacy`. And enable it in your `.babelrc` file:
+
+```
+{
+  "presets": [
+    "es2015",
+    "stage-1"
+  ],
+  "plugins": ["transform-decorators-legacy"]
+}
+```
+Probably you have more plugins and presets in your `.babelrc` already, note that the order is important and `transform-decorators-legacy` should come as first.
 
 ## Bower support
 
