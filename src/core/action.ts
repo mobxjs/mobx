@@ -118,10 +118,16 @@ function executeWrapped(actionName: string, fn: Function, scope: any, args: IArg
 	}
 }
 
-export function useStrict(strict: boolean) {
-	invariant(globalState.derivationStack.length === 0, "It is not allowed to set `useStrict` when a derivation is running");
-	globalState.strictMode = strict;
-	globalState.allowStateChanges = !strict;
+export function useStrict(): boolean;
+export function useStrict(strict: boolean);
+export function useStrict(strict?: boolean): any {
+	if (arguments.length === 0)
+		return globalState.strictMode;
+	else {
+		invariant(globalState.derivationStack.length === 0, "It is not allowed to set `useStrict` when a derivation is running");
+		globalState.strictMode = strict;
+		globalState.allowStateChanges = !strict;
+	}
 }
 
 export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T): T {

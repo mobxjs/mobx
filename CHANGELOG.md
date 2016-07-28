@@ -2,6 +2,7 @@
 
 * `@action` decorated methods are now configurable. Fixes #441
 * The `onBecomeObserved` event handler is now triggered when an atom is observed, instead of when it is bound as dependency. Fixes #427 and makes atoms easier to extend.
+* if `useStrict()` is invoked without arguments, it now returns the current value of strict mode.
 
 # 2.4.0
 
