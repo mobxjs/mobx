@@ -16,12 +16,12 @@
   * [arrays](refguide/array.md)
   * [maps](refguide/map.md)
   * [boxed values](refguide/boxed.md)
-* [Underestanding what MobX reacts to](best/react.md)
+* [Understanding what MobX reacts to](best/react.md)
 * Resources
-  * [Tutorials, talks and blogs](faq/blogs.md)
+  * [Tutorials, videos and blogs](faq/blogs.md)
   * [Related Projects](faq/related.md)
-  * [Examples projects](faq/Examples.md)
-  * [Boilerplates](faq/Boilerplates.md)
+  * [Examples projects](faq/examples.md)
+  * [Boilerplates](faq/boilerplates.md)
   * [Frequently Asked Questions](faq/faq.md)
 * Tips & Tricks
   * [Common Pitfalls & Best Practices](best/pitfalls.md)

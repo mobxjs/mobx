@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>Concepts &amp; Principles | MobX</title>
+        <title>Boilerplates | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.4.3">
@@ -33,10 +33,10 @@
         
     
     
-    <link rel="next" href="../refguide/api.html" />
+    <link rel="next" href="../faq/faq.html" />
     
     
-    <link rel="prev" href="../intro/overview.html" />
+    <link rel="prev" href="../faq/examples.html" />
     
 
         
@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="1.2" data-basepath=".." data-revision="Thu Jul 28 2016 16:42:53 GMT+0200 (CEST)">
+    <div class="book" data-level="5.4" data-basepath=".." data-revision="Thu Jul 28 2016 16:42:53 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -98,7 +98,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.2" data-path="intro/concepts.html">
+        <li class="chapter " data-level="1.2" data-path="intro/concepts.html">
             
                 
                     <a href="../intro/concepts.html">
@@ -370,7 +370,7 @@
             
         </li>
     
-        <li class="chapter " data-level="5.4" data-path="faq/boilerplates.html">
+        <li class="chapter active" data-level="5.4" data-path="faq/boilerplates.html">
             
                 
                     <a href="../faq/boilerplates.html">
@@ -852,75 +852,27 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/intro/concepts.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="concepts-principles">Concepts &amp; Principles</h1>
-<h2 id="concepts">Concepts</h2>
-<p>MobX distinguishes the following concepts in your application. You saw them in the previous gist, but let&apos;s dive into them in a bit more detail.</p>
-<h3 id="1-state">1. State</h3>
-<p><em>State</em> is the data that drives your application.
-Usually there is <em>domain specific state</em> like a list of todo items and there is <em>view state</em> such as the currently selected element.
-Remember, state is like spreadsheets cells that hold a value.</p>
-<h3 id="2-derivations">2. Derivations</h3>
-<p><em>Anything</em> that can be derived from the <em>state</em> without any further interaction is a derivation.
-Derivations exist in many forms:</p>
+                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/faq/boilerplates.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="boilerplate-projects">Boilerplate projects</h1>
 <ul>
-<li>The <em>user interface</em>.</li>
-<li><em>Derived data</em>, such as the amount of todos left.</li>
-<li><em>Backend integrations</em> like sending changes to the server.</li>
+<li>React, Babel, Webpack: <a href="https://github.com/mweststrate/react-mobservable-boilerplate" target="_blank">https://github.com/mweststrate/react-mobservable-boilerplate</a></li>
+<li>React, Typescript, Webpack: <a href="https://github.com/mobxjs/mobx-react-typescript-boilerplate" target="_blank">https://github.com/mobxjs/mobx-react-typescript-boilerplate</a></li>
+<li>MobX + React JSFiddle: <a href="https://jsfiddle.net/mweststrate/wgbe4guu/" target="_blank">https://jsfiddle.net/mweststrate/wgbe4guu/</a></li>
+<li>MobX + React JSFiddle with just ES5: <a href="https://jsfiddle.net/rubyred/55oc981v/" target="_blank">https://jsfiddle.net/rubyred/55oc981v/</a></li>
+<li><a href="https://www.npmjs.com/package/generator-mobx-react" target="_blank">generator-mobx-react</a> Yeoman MobX, React, Webpack, Babel / Typescript project generator</li>
+<li><a href="https://github.com/nightwolfz/mobx-starter" target="_blank">react-starter</a>: Starting base for an mobx react project with optional isomorphism. MongoDB auth &amp; sessions, hot reload, react-router</li>
+<li><a href="https://github.com/foxhound87/rfx-stack" target="_blank">rfx-stack</a> RFX Stack - Universal App featuring: React + Feathers + MobX</li>
+<li><a href="https://github.com/KadoBOT/reaxor" target="_blank">reaxor</a> Boilerplate for better state management, styling, testing and cleaner code</li>
+<li><a href="https://github.com/capaj/jspm-react" target="_blank">jspm-react</a> lightweight React.js ES6 boilerplate with JSPM and proper hot reloading modules</li>
+<li><a href="https://github.com/vinej/react-portal" target="_blank">react-portal</a> MobX, React with Flux architecture</li>
+<li><a href="https://github.com/tapos007/ReactJS-MobX-Webpack-Boilerplate/tree/master/app/store" target="_blank">react-mobx-webpack</a> Quickstart project template for learning React</li>
+<li><a href="https://github.com/pixelkritzel/gulp_es6_sass_boilerplate" target="_blank">gulp-es6-sass-mobx</a></li>
+<li><a href="https://github.com/osenvosem/react-mobx-boilerplate" target="_blank">react-mobx-boilerplate</a> A small React + React Router + MobX boilerplate with a small example app.</li>
+<li><a href="https://github.com/micnews/mobx-deku-boilerplate" target="_blank">Small project to quickly start with deku, MobX, JSX, ES6, Babel</a></li>
+<li><a href="https://github.com/sapientglobalmarkets/react-mobx-seed" target="_blank">React MobX Seed: Seed project using a wide set of best practices</a></li>
+<li><a href="https://github.com/vinej/react-remux" target="_blank">ReMux - MobX with flux pattern boilerplate</a></li>
+<li><a href="https://github.com/tranqy/react-routing-mobx-bootstrap-boilerplate" target="_blank">react-routing-mobx-bootstrap-boilerplate</a> Simple boilerplate with webpack, react, mobx, react router and css modules</li>
+<li><a href="https://github.com/iam4x/futureRX" target="_blank">FutureRX</a> The futuristic stack to create universal React applications with MobX as state manager</li>
 </ul>
-<p>MobX distinguishes two kind of derivations:</p>
-<ul>
-<li><em>Computed values</em>. These are values that can always be derived from the current observable state using a pure function.</li>
-<li><em>Reactions</em>. Reactions are side effects that need to happen automatically if the state changes. These are needed to as bridge between imperative and reactive programming. Or to make it more clear, they are ultimately needed to achieve I/O.</li>
-</ul>
-<p>People starting with MobX tend to use reactions too often.
-The golden rule is: if you want to create a value based on the current state, use <code>computed</code>. </p>
-<p>Back to the spreadsheet analogy, formulas are derivations that <em>compute</em> a value. But for you as a user to be able to see it on the screen a <em>reaction</em> is needed that repaints part of the GUI.</p>
-<h3 id="3-actions">3. Actions</h3>
-<p>An <em>action</em> is any piece of code that changes the <em>state</em>. User events, backend data pushes, scheduled events etc.
-An action is like a user that enters a new value in a spreadsheet cell.</p>
-<p>Actions can be defined explicitly in MobX to help you to structure code more clearly.
-If MobX is used in <em>strict mode</em>, MobX will enforce that no state can be modified outside actions.</p>
-<h2 id="principles">Principles</h2>
-<p>MobX supports an uni-directional data flow where <em>actions</em> changes the <em>state</em>, which in turn updates all affected <em>views</em>.</p>
-<p><img src="../images/action-state-view.png" alt="Action, State, View"></p>
-<p>All <em>Derivations</em> are updated <strong>automatically</strong> and <strong>atomically</strong> when the <em>state</em> changes. As a result it is not possible to ever observe intermediate values.</p>
-<p>All <em>Derivations</em> are updated <strong>synchonously</strong> by default. This means that for example <em>actions</em> can safely inspect a computed value directly after altering the <em>state</em>.</p>
-<p><em>Computed values</em> are updated <strong>lazily</strong>. Any computed value that is not actively in use will not be updated until it is needed for a side effect (I/O).
-If a view is no longer in use it will be garbage collected automatically.</p>
-<p>All <em>Computed values</em> should be <strong>pure</strong>. They are not supposed to change <em>state</em>.</p>
-<h2 id="illustration">Illustration</h2>
-<p>The following listing illustrates the above concepts and principles:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, autorun} <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;mobx&apos;</span>;
-
-<span class="hljs-keyword">var</span> todoStore = observable({
-    <span class="hljs-comment">/* some observable state */</span>
-    todos: [],
-
-    <span class="hljs-comment">/* a reactive view */</span>
-    completedCount: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.todos.filter(todo =&gt; todo.completed).length;
-    }
-});
-
-<span class="hljs-comment">/* a function that observes the state */</span>
-autorun(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Completed %d of %d items&quot;</span>,
-        todoStore.completedCount,
-        todoStore.todos.length
-    );
-});
-
-<span class="hljs-comment">/* ..and some actions that modify the state */</span>
-todoStore.todos[<span class="hljs-number">0</span>] = {
-    title: <span class="hljs-string">&quot;Take a walk&quot;</span>,
-    completed: <span class="hljs-literal">false</span>
-};
-<span class="hljs-comment">// -&gt; synchronously prints &apos;Completed 0 of 1 items&apos;</span>
-
-todoStore.todos[<span class="hljs-number">0</span>].completed = <span class="hljs-literal">true</span>;
-<span class="hljs-comment">// -&gt; synchronously prints &apos;Completed 1 of 1 items&apos;</span>
-</code></pre>
-<p>In the <a href="https://mobxjs.github.io/mobx/getting-started.html" target="_blank">10 minute introduction to MobX and React</a> you can dive deeper into this example and build a user interface using <a href="https://facebook.github.io/react/" target="_blank">React</a> around it.</p>
 
                     
                     </section>
@@ -931,10 +883,10 @@ todoStore.todos[<span class="hljs-number">0</span>].completed = <span class="hlj
         </div>
 
         
-        <a href="../intro/overview.html" class="navigation navigation-prev " aria-label="Previous page: The Gist of MobX"><i class="fa fa-angle-left"></i></a>
+        <a href="../faq/examples.html" class="navigation navigation-prev " aria-label="Previous page: Examples projects"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../refguide/api.html" class="navigation navigation-next " aria-label="Next page: API overview"><i class="fa fa-angle-right"></i></a>
+        <a href="../faq/faq.html" class="navigation navigation-next " aria-label="Next page: Frequently Asked Questions"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>
