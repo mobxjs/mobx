@@ -1,7 +1,7 @@
 ## Blogs, tutorials, videos
 
 ## Videos
-* [Egghead.io lesson 1: syncing the UI with the app state using observable and observer](https://egghead.io/lessons/javascript-mobx-and-react-intro-syncing-the-ui-with-the-app-state-using-observable-and-observer)
+* [Egghead.io course: Manage Complex State in React Apps with MobX](https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx)
 * [Practical React with MobX](https://www.youtube.com/watch?v=XGwuM_u7UeQ). In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth. ([slides](http://slides.com/mattruby/deck))
 * [Screencast: 8 minute overview of MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8)
 * [Understanding MobX versus Redux](https://www.youtube.com/watch?v=83v8cdvGfeA) (related thread: https://github.com/mobxjs/mobx/issues/199)
