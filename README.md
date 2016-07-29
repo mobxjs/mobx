@@ -302,6 +302,6 @@ See the [changelog](https://github.com/mobxjs/mobx/blob/master/CHANGELOG.md#200)
 
 ## Donating
 
-Was MobX key in making your project a success? Share the victory by using the [donate button](https://mobxjs.github.io/mobx/donating.html)!
+Was MobX key in making your project a success? Share the victory by using the [donate button](https://mobxjs.github.io/mobx/donate.html)!
 MobX is developed largely in free time, so any ROI is appreciated :-).
 If you leave a name it will be added to the sponsors list.
