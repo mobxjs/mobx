@@ -91,34 +91,31 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	let result: T;
 	try {
 		result = f.call(derivation);
-		hasException = false;
-	} finally {
-		if (hasException) {
-			const message = (
-				`[mobx] An uncaught exception occurred while calculating your computed value, autorun or transformer. Or inside the render() method of an observer based React component. ` +
-				`These functions should never throw exceptions as MobX will not always be able to recover from them. ` +
-				`Please fix the error reported after this message or enable 'Pause on (caught) exceptions' in your debugger to find the root cause. In: '${derivation.name}'`
-			);
-			if (isSpyEnabled()) {
-				spyReport({
-					type: "error",
-					object: this,
-					message
-				});
-			}
-			console.warn(message); // In next major, maybe don't emit this message at all?
-			// Poor mans recovery attempt
-			// Assumption here is that this is the only exception handler in MobX.
-			// So functions higher up in the stack (like transanction) won't be modifying the globalState anymore after this call.
-			// (Except for other trackDerivedFunction calls of course, but that is just)
-			derivation.unboundDepsCount = 0;
-			derivation.observing = prevObserving;
-			resetGlobalState();
-		} else {
-			globalState.isTracking = prevTracking;
-			globalState.derivationStack.length -= 1;
-			bindDependencies(derivation, prevObserving);
+		globalState.isTracking = prevTracking;
+		globalState.derivationStack.length -= 1;
+		bindDependencies(derivation, prevObserving);
+	} catch (error) {
+		const message = (
+			`[mobx] An uncaught exception in '${derivation.name}' occurred while calculating your computed value, autorun or transformer. Or inside the render() method of an observer based React component. ` +
+			`These functions should never throw exceptions as MobX will not always be able to recover from them. ` +
+			`Please fix the error reported after this message or enable 'Pause on (caught) exceptions' in your debugger to find the root cause.`
+		);
+		if (isSpyEnabled()) {
+			spyReport({
+				type: "error",
+				object: this,
+				message
+			});
 		}
+		console.warn(message + `\nOriginal error:`, error);
+		// Poor mans recovery attempt
+		// Assumption here is that this is the only exception handler in MobX.
+		// So functions higher up in the stack (like transanction) won't be modifying the globalState anymore after this call.
+		// (Except for other trackDerivedFunction calls of course, but that is just)
+		derivation.unboundDepsCount = 0;
+		derivation.observing = prevObserving;
+		resetGlobalState();
+		throw error;
 	}
 	return result;
 }
