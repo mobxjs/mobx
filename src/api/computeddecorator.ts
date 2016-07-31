@@ -11,6 +11,7 @@ export interface IComputedValueOptions {
 
 const computedDecorator = createClassPropertyDecorator(
 	(target, name, _, decoratorArgs, originalDescriptor) => {
+		invariant(typeof originalDescriptor !== "undefined", "@computed can only be used on getter functions, like: '@computed get myProps() { return ...; }'. It looks like it was used on a property.");
 		const baseValue = originalDescriptor.get;
 		invariant(typeof baseValue === "function", "@computed can only be used on getter functions, like: '@computed get myProps() { return ...; }'");
 
