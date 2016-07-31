@@ -1,20 +1,23 @@
-import {IObservable, IDepTreeNode, propagateReadiness, propagateStaleness, addObserver, removeObserver} from "./observable";
+import {IObservable, IDepTreeNode, addObserver, removeObserver} from "./observable";
 import {globalState, resetGlobalState} from "./globalstate";
 import {invariant} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "./spy";
-import {SimpleSet, ISetEntry} from "../utils/set";
+import {ISetEntry} from "../utils/set";
 
 /**
  * A derivation is everything that can be derived from the state (all the atoms) in a pure manner.
  * See https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.xvbh6qd74
  */
-export interface IDerivation extends IDepTreeNode, IObservable, ISetEntry {
+export interface IDerivation extends IDepTreeNode, ISetEntry {
 	observing: IObservable[];
-	staleObservers: IDerivation[];
-	observers: SimpleSet<IDerivation>;
-	dependencyStaleCount: number;
-	dependencyChangeCount: number;
-	onDependenciesReady(): boolean;
+	/**
+	 * Describes state of observing dependencies to know whet it's needed to rerun
+	 * -1 <- not tracking dependencies
+	 * 0 <- all up to date
+	 * 1 <- some dependencies might have changed
+	 * 2 <- for sure dependency changed
+	 */
+	dependenciesState: number;
 	/**
 	 * Id of the current run of a derivation. Each time the derivation is tracked
 	 * this number is increased by one. This number is globally unique
@@ -24,6 +27,24 @@ export interface IDerivation extends IDepTreeNode, IObservable, ISetEntry {
 	 * amount of dependencies used by the derivation in this run, which has not been bound yet.
 	 */
 	unboundDepsCount: number;
+	onBecomeStale();
+}
+
+export function shouldCompute(derivation: IDerivation): boolean {
+	const dependenciesState = derivation.dependenciesState;
+	if (dependenciesState === 0) return false;
+	if (dependenciesState === -1 || dependenciesState === 2) return true;
+	// this.dependencyChange === 1
+	for (let i = 0; i < this.observing.length; i++) {
+		const obj = this.observing[i];
+		if ("dependenciesState" in obj) {
+			// obj is instance of ComputedValue
+			obj.get();
+			if (derivation.dependenciesState === 2) return true;
+		}
+	}
+	derivation.dependenciesState = 0;
+	return false;
 }
 
 export function isComputingDerivation() {
@@ -41,38 +62,6 @@ export function checkIfStateModificationsAreAllowed() {
 }
 
 /**
- * Notify a derivation that one of the values it is observing has become stale
- */
-export function notifyDependencyStale(derivation: IDerivation) {
-	if (++derivation.dependencyStaleCount === 1) {
-		propagateStaleness(derivation);
-	}
-}
-
-/**
- * Notify a derivation that one of the values it is observing has become stable again.
- * If all observed values are stable and at least one of them has changed, the derivation
- * will be scheduled for re-evaluation.
- */
-export function notifyDependencyReady(derivation: IDerivation, dependencyDidChange: boolean) {
-	invariant(derivation.dependencyStaleCount > 0, "unexpected ready notification");
-	if (dependencyDidChange)
-		derivation.dependencyChangeCount += 1;
-	if (--derivation.dependencyStaleCount === 0) {
-		// all dependencies are ready
-		if (derivation.dependencyChangeCount > 0) {
-			// did any of the observables really change?
-			derivation.dependencyChangeCount = 0;
-			const changed = derivation.onDependenciesReady();
-			propagateReadiness(derivation, changed);
-		} else {
-			// we're done, but didn't change, lets make sure verybody knows..
-			propagateReadiness(derivation, false);
-		}
-	}
-}
-
-/**
  * Executes the provided function `f` and tracks which observables are being accessed.
  * The tracking information is stored on the `derivation` object and the derivation is registered
  * as observer of any of the accessed observables.
@@ -83,6 +72,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	// array will be trimmed by bindDependencies
 	derivation.observing = new Array(prevObserving.length + 100);
 	derivation.unboundDepsCount = 0;
+	derivation.dependenciesState = 0; // set it to 0 so if dependency change autorun can immediately rerun
 	derivation.runId = ++globalState.runId;
 	globalState.derivationStack.push(derivation);
 	const prevTracking = globalState.isTracking;
@@ -167,6 +157,7 @@ export function clearObserving(derivation: IDerivation) {
 	const l = obs.length;
 	for (let i = 0; i < l; i++)
 		removeObserver(obs[i], derivation);
+	this.dependenciesState = -1;
 	obs.length = 0;
 }
 
@@ -185,4 +176,15 @@ export function untrackedStart() {
 
 export function untrackedEnd(prev: boolean) {
 	globalState.isTracking = prev;
+}
+
+export function changeDependenciesState(targetState, derivation: IDerivation) {
+	const oldState = derivation.dependenciesState;
+	if (oldState === targetState) return;
+	derivation.dependenciesState = targetState;
+	for (let i in derivation.observing) {
+		const observable = this.observing[i];
+		observable["observers" + oldState].remove(derivation);
+		observable["observers" + targetState].add(derivation);
+	}
 }

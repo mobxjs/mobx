@@ -1,15 +1,5 @@
 
 export interface IAtom extends IObservable {
-	isDirty: boolean;
-}
-
-/**
- * Used by the transaction manager to signal observers that an atom is ready as soon as the transaction has ended.
- */
-export function propagateAtomReady(atom: IAtom) {
-	invariant(atom.isDirty, "atom not dirty");
-	atom.isDirty = false;
-	propagateReadiness(atom, true);
 }
 
 /**
@@ -19,9 +9,12 @@ export function propagateAtomReady(atom: IAtom) {
  * 2) they should notify mobx whenever they have _changed_. This way mobx can re-run any functions (derivations) that are using this atom.
  */
 export class Atom implements IAtom {
-	isDirty = false;
-	staleObservers = [];
-	observers = new SimpleSet<IDerivation>();
+	isPendingUnobservation: boolean; // for effective unobserving
+	isObserved = false;
+	observers0 = new SimpleSet<IDerivation>();
+	observers1 = new SimpleSet<IDerivation>();
+	observers2 = new SimpleSet<IDerivation>();
+
 	diffValue = 0;
 	lastAccessedBy = 0;
 
@@ -42,27 +35,8 @@ export class Atom implements IAtom {
 	 * Invoke this method _after_ this method has changed to signal mobx that all its observers should invalidate.
 	 */
 	public reportChanged() {
-		if (!this.isDirty) {
-			this.reportStale();
-			this.reportReady();
-		}
-	}
-
-	private reportStale() {
-		if (!this.isDirty) {
-			this.isDirty = true;
-			propagateStaleness(this);
-		}
-	}
-
-	private reportReady() {
-		invariant(this.isDirty, "atom not dirty");
-		if (globalState.inTransaction > 0)
-			globalState.changedAtoms.push(this);
-		else {
-			propagateAtomReady(this);
-			runReactions();
-		}
+		propagateChanged(this);
+		runReactions();
 	}
 
 	toString() {
@@ -70,9 +44,8 @@ export class Atom implements IAtom {
 	}
 }
 
-import {globalState} from "./globalstate";
-import {IObservable, propagateReadiness, propagateStaleness, reportObserved} from "./observable";
+import {IObservable, propagateChanged, reportObserved} from "./observable";
 import {IDerivation} from "./derivation";
 import {runReactions} from "./reaction";
-import {invariant, noop, getNextId} from "../utils/utils";
+import {noop, getNextId} from "../utils/utils";
 import {SimpleSet} from "../utils/set";

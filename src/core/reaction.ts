@@ -1,8 +1,7 @@
-import {IDerivation, trackDerivedFunction, clearObserving} from "./derivation";
+import {IDerivation, trackDerivedFunction, clearObserving, shouldCompute} from "./derivation";
 import {globalState} from "./globalstate";
-import {EMPTY_ARRAY, getNextId, Lambda, unique, joinStrings} from "../utils/utils";
+import {getNextId, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
-import {SimpleSet} from "../utils/set";
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations
@@ -23,19 +22,13 @@ import {SimpleSet} from "../utils/set";
  *
  */
 
-let EMPTY_DERIVATION_SET: SimpleSet<IDerivation>;
-
 export class Reaction implements IDerivation {
-	staleObservers:  IDerivation[] = EMPTY_ARRAY; // Won't change
-	observers = EMPTY_DERIVATION_SET || (EMPTY_DERIVATION_SET = new SimpleSet<IDerivation>());       // Won't change
 	observing = []; // nodes we are looking at. Our value depends on these nodes
+	dependenciesState = -1;
 	diffValue = 0;
 	runId = 0;
-	lastAccessedBy = 0;
 	unboundDepsCount = 0;
 	__mapid = "#" + getNextId();   // use strings for map distribution, just nrs will result in accidental sparse arrays...
-	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
-	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 	isDisposed = false;
 	_isScheduled = false;
 	_isTrackPending = false;
@@ -43,17 +36,8 @@ export class Reaction implements IDerivation {
 
 	constructor(public name: string = "Reaction@" + getNextId(), private onInvalidate: () => void) { }
 
-	onBecomeObserved() {
-		// noop, reaction is always unobserved
-	}
-
-	onBecomeUnobserved() {
-		// noop, reaction is always unobserved
-	}
-
-	onDependenciesReady(): boolean {
+	onBecomeStale() {
 		this.schedule();
-		return false; // reactions never propagate changes
 	}
 
 	schedule() {
@@ -65,7 +49,7 @@ export class Reaction implements IDerivation {
 	}
 
 	isScheduled() {
-		return this.dependencyStaleCount > 0 || this._isScheduled;
+		return this.dependenciesState > 0 || this._isScheduled;
 	}
 
 	/**
@@ -74,14 +58,17 @@ export class Reaction implements IDerivation {
 	runReaction() {
 		if (!this.isDisposed) {
 			this._isScheduled = false;
-			this._isTrackPending = true;
-			this.onInvalidate();
-			if (this._isTrackPending && isSpyEnabled()) {
-				// onInvalidate didn't trigger track right away..
-				spyReport({
-					object: this,
-					type: "scheduled-reaction"
-				});
+			if (shouldCompute(this)) {
+				this._isTrackPending = true;
+
+				this.onInvalidate();
+				if (this._isTrackPending && isSpyEnabled()) {
+					// onInvalidate didn't trigger track right away..
+					spyReport({
+						object: this,
+						type: "scheduled-reaction"
+					});
+				}
 			}
 		}
 	}
@@ -173,4 +160,3 @@ export function runReactions() {
 	}
 	globalState.isRunningReactions = false;
 }
-
