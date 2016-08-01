@@ -299,9 +299,9 @@ test('runInAction', t => {
 
 	t.equal(res, 3);
 	t.deepEqual(values, [0, 9, 15]);
-	t.deepEqual(events, [ 
+	t.deepEqual(events, [
 		{ arguments: [], name: 'increment' },
-		{ arguments: [], name: '<unnamed action>' } 
+		{ arguments: [], name: '<unnamed action>' }
 	]);
 
 	mobx.useStrict(false);
@@ -331,10 +331,10 @@ test('action in autorun does not keep / make computed values alive', t => {
 	t.equal(calls, 5)
 
 	runWithMemoizing(mobx.action(callComputedTwice))
-	t.equal(calls, 7)
+	t.equal(calls, 6)
 
 	callComputedTwice()
-	t.equal(calls, 9)
+	t.equal(calls, 8)
 
 	t.end()
 })
@@ -355,16 +355,16 @@ test('computed values and actions', t => {
 	})
 
 	changeNumber10Times()
-	t.equal(calls, 2)
+	t.equal(calls, 1)
 
 	mobx.autorun(() => {
 		changeNumber10Times()
-		t.equal(calls, 4)
+		t.equal(calls, 2)
 	})()
-	t.equal(calls, 4)
+	t.equal(calls, 2)
 
 	changeNumber10Times()
-	t.equal(calls, 6)
+	t.equal(calls, 3)
 
 	t.end()
 })
