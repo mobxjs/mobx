@@ -22,7 +22,11 @@ import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
  *
  */
 
-export class Reaction implements IDerivation {
+export interface IReactionPublic {
+		dispose: () => void;
+	}
+
+export class Reaction implements IDerivation, IReactionPublic {
 	observing = []; // nodes we are looking at. Our value depends on these nodes
 	newObserving = [];
 	dependenciesState = -1;
@@ -70,7 +74,6 @@ export class Reaction implements IDerivation {
 						type: "scheduled-reaction"
 					});
 				}
-			} else {
 			}
 		}
 	}

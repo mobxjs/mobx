@@ -8,7 +8,7 @@ export interface IAtom extends IObservable {
  * 1) detect when they are being _used_ and report this (using reportObserved). This allows mobx to make the connection between running functions and the data they used
  * 2) they should notify mobx whenever they have _changed_. This way mobx can re-run any functions (derivations) that are using this atom.
  */
-export class Atom implements IAtom {
+export class BaseAtom implements IAtom {
 	isPendingUnobservation: boolean; // for effective unobserving
 	isObserved = false;
 	observers = new DerivationsSets();
@@ -20,7 +20,11 @@ export class Atom implements IAtom {
 	 * Create a new atom. For debugging purposes it is recommended to give it a name.
 	 * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
 	 */
-	constructor(public name = "Atom@" + getNextId(), public onBecomeObserved: () => void = noop, public onBecomeUnobserved = noop) { }
+	constructor(public name = "Atom@" + getNextId()) { }
+
+	public onBecomeUnobserved() {
+		// noop
+	}
 
 	/**
 	 * Invoke this method to notify mobx that your atom has been used somehow.
@@ -43,6 +47,34 @@ export class Atom implements IAtom {
 	}
 }
 
+export class Atom extends BaseAtom implements IAtom {
+	public isBeingTracked = false;
+
+	/**
+	 * Create a new atom. For debugging purposes it is recommended to give it a name.
+	 * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
+	 */
+	constructor(public name = "Atom@" + getNextId(), public onBecomeObservedHandler: () => void = noop, public onBecomeUnobservedHandler: () => void = noop) {
+		super(name);
+	}
+
+	public reportObserved(): boolean {
+		super.reportObserved();
+		const tracking = globalState.isTracking;
+		if (tracking && !this.isBeingTracked) {
+			this.isBeingTracked = true;
+			this.onBecomeObservedHandler();
+		}
+		return tracking;
+	}
+
+	public onBecomeUnobserved() {
+		this.isBeingTracked = false;
+		this.onBecomeUnobservedHandler();
+	}
+}
+
+import {globalState} from "./globalstate";
 import {IObservable, propagateChanged, reportObserved, DerivationsSets} from "./observable";
 import {transactionStart, transactionEnd} from "../core/transaction";
 import {noop, getNextId} from "../utils/utils";

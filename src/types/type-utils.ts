@@ -1,7 +1,7 @@
 import {IDepTreeNode} from "../core/observable";
 import {invariant} from "../utils/utils";
 import {runLazyInitializers} from "../utils/decorators";
-import {Atom} from "../core/atom";
+import {BaseAtom} from "../core/atom";
 import {ComputedValue} from "../core/computedvalue";
 import {Reaction} from "../core/reaction";
 import {isObservableArray} from "../types/observablearray";
@@ -29,7 +29,7 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
 			invariant(!!observable, `no observable property '${property}' found on the observable object '${getDebugName(thing)}'`);
 			return observable;
 		}
-		if (thing instanceof Atom || thing instanceof ComputedValue || thing instanceof Reaction) {
+		if (thing instanceof BaseAtom || thing instanceof ComputedValue || thing instanceof Reaction) {
 			return thing;
 		}
 	} else if (typeof thing === "function") {
@@ -45,7 +45,7 @@ export function getAdministration(thing: any, property?: string) {
 	invariant(thing, "Expection some object");
 	if (property !== undefined)
 		return getAdministration(getAtom(thing, property));
-	if (thing instanceof Atom || thing instanceof ComputedValue || thing instanceof Reaction)
+	if (thing instanceof BaseAtom || thing instanceof ComputedValue || thing instanceof Reaction)
 		return thing;
 	if (isObservableMap(thing))
 		return thing;

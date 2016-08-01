@@ -4,6 +4,8 @@ var test = require('tape');
 test('correct api should be exposed', function(t) {
 	t.deepEquals(Object.keys(mobx).sort(), [
 		'Atom',
+		'BaseAtom', // TODO: remove somehow
+		'DerivationsSets', // TODO: remove somehow
 		'ObservableMap',
 		'Reaction',
 		'SimpleEventEmitter',

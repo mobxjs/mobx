@@ -64,10 +64,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		propagateMaybeChanged(this);
 	}
 
-	onBecomeObserved() {
-		// noop, handled by .get()
-	}
-
 	onBecomeUnobserved() {
 		invariant(globalState.inBatch === 0, "computeds should be freed only outside batch");
 		clearObserving(this);

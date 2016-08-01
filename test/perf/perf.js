@@ -474,6 +474,20 @@ test('sort', t => {
 	t.end()
 })
 
+test('computed temporary memoization', t => {
+  var computeds = []
+  for(let i = 0; i < 40; i++) {
+    computeds.push(mobx.computed(() =>
+      i ? computeds[i - 1].get() + computeds[i - 1].get() : 1
+    ))
+  }
+  var start = now()
+  t.equal(computeds[27].get(), 134217728)
+
+  log("computed memoization " + (now() - start) + 'ms')
+  t.end()
+})
+
 function now() {
     return + new Date();
 }

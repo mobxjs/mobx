@@ -33,20 +33,26 @@ export interface IDerivation extends IDepTreeNode, ISetEntry {
 	recoverFromError();
 }
 
-export function shouldCompute(derivation: IDerivation): boolean {
+export function shouldCompute(derivation: IDerivation, onError?): boolean {
 	const dependenciesState = derivation.dependenciesState;
 	if (dependenciesState === 0) return false;
 	if (dependenciesState === -1 || dependenciesState === 2) return true;
 	// derivation.dependencyChange === 1
-	for (let i = 0; i < derivation.observing.length; i++) {
-		const obj = derivation.observing[i];
-		if (obj instanceof ComputedValue) {
-			obj.get();
-			if (derivation.dependenciesState === 2) return true;
+	let hasError = true;
+	try {
+		for (let i = 0; i < derivation.observing.length; i++) {
+			const obj = derivation.observing[i];
+			if (obj instanceof ComputedValue) {
+				obj.get();
+				if (derivation.dependenciesState === 2) return true;
+			}
 		}
+		hasError = false;
+		changeDependenciesState(0, derivation);
+		return false;
+	} finally {
+		changeDependenciesState(0, derivation);
 	}
-	changeDependenciesState(0, derivation);
-	return false;
 }
 
 export function isComputingDerivation() {
@@ -105,7 +111,9 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 			// Assumption here is that this is the only exception handler in MobX.
 			// So functions higher up in the stack (like transanction) won't be modifying the globalState anymore after this call.
 			// (Except for other trackDerivedFunction calls of course, but that is just)
-			derivation.dependenciesState = prevDependenciesState;
+			if (prevDependenciesState !== 0) {
+				changeDependenciesState(0, derivation);
+			}
 			derivation.newObserving = null;
 			derivation.unboundDepsCount = 0;
 			derivation.recoverFromError();

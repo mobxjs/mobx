@@ -101,10 +101,91 @@ test('effect debounce + fire immediately is honored', t => {
 
 	setTimeout(() => {
 		d();
-		t.deepEqual(values, [1, 3, 4])
+		t.deepEqual(values, [1, 3, 4]);
 		t.equal(exprCount, 3)
 	}, 500)
 })
+
+test('passes Reaction as an argument to expression function', t => {
+	var a = mobx.observable(1);
+	var values = [];
+
+	reaction(r => {
+		if (a.get() === 'pleaseDispose') r.dispose();
+		return a.get();
+	}, newValue => {
+		values.push(newValue);
+	}, true);
+
+	a.set(2);
+	a.set(2);
+	a.set('pleaseDispose');
+	a.set(3);
+	a.set(4);
+
+	t.deepEqual(values, [1, 2, 'pleaseDispose']);
+	t.end();
+});
+
+test('passes Reaction as an argument to effect function', t => {
+	var a = mobx.observable(1);
+	var values = [];
+
+	reaction(() => a.get(), (newValue, r) => {
+		if (a.get() === 'pleaseDispose') r.dispose();
+		values.push(newValue);
+	}, true);
+
+	a.set(2);
+	a.set(2);
+	a.set('pleaseDispose');
+	a.set(3);
+	a.set(4);
+
+	t.deepEqual(values, [1, 2, 'pleaseDispose']);
+	t.end();
+});
+
+test('can dispose reaction on first run', t => {
+	var a = mobx.observable(1);
+
+	var valuesExpr1st = [];
+	reaction(() => a.get(), (newValue, r) => {
+		r.dispose();
+		valuesExpr1st.push(newValue);
+	}, true);
+
+	var valuesEffect1st = [];
+	reaction(r => {
+		r.dispose();
+		return a.get();
+	}, newValue => {
+		valuesEffect1st.push(newValue);
+	}, true);
+
+	var valuesExpr = [];
+	reaction(() => a.get(), (newValue, r) => {
+		r.dispose();
+		valuesExpr.push(newValue);
+	});
+
+	var valuesEffect = [];
+	reaction(r => {
+		r.dispose();
+		return a.get();
+	}, newValue => {
+		valuesEffect.push(newValue);
+	});
+
+	a.set(2);
+	a.set(3);
+
+	t.deepEqual(valuesExpr1st, [1]);
+	t.deepEqual(valuesEffect1st, [1]);
+	t.deepEqual(valuesExpr, [2]);
+	t.deepEqual(valuesEffect, []);
+	t.end();
+});
 
 test("#278 do not rerun if expr output doesn't change", t => {
 	var a = mobx.observable(1);

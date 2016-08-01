@@ -70,7 +70,6 @@ export interface IObservable extends IDepTreeNode {
 	// sets of observers grouped their state to only notify about changes.
 	observers: DerivationsSets;
 
-	onBecomeObserved();
 	onBecomeUnobserved();
 }
 
@@ -78,7 +77,6 @@ export function addObserver(observable: IObservable, node: IDerivation) {
 	observable.observers.add(node);
 	if (!observable.isObserved) {
 		observable.isObserved = true;
-		observable.onBecomeObserved();
 	}
 }
 
@@ -122,7 +120,6 @@ export function reportObserved(observable: IObservable) {
 		if (globalState.inBatch > 0 && !observable.isObserved) {
 			// pseudoobserving by batch
 			observable.isObserved = true;
-			observable.onBecomeObserved();
 			// probably will want to unobserve it at the end of the batch
 			if (!observable.isPendingUnobservation) {
 				observable.isPendingUnobservation = true;

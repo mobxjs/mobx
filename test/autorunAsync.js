@@ -10,6 +10,11 @@ test('autorun 1', function(t) {
 	function expect(fired, cCalcs, result) {
 		t.equal(_fired, fired, "autorun fired");
 		t.equal(_cCalcs, cCalcs, "'c' fired");
+		if(_cCalcs !== cCalcs) {
+			console.log('\n')
+			console.trace()
+			console.log('\n')
+		}
 		if (fired)
 			t.equal(_result, result, "result");
 		_fired = 0;
@@ -40,9 +45,9 @@ test('autorun 1', function(t) {
 			a.set(4);
 			b.set(5);
 			a.set(6);
-			expect(0, 1, null); // after first set autorun reruns
+			expect(0, 0, null); // a change triggered async rerun, compute will trigger after 20ms of async timeout
 			to(function() {
-				expect(1, 1, 180); // c() invalidated with next sets
+				expect(1, 1, 180);
 				d.set(2);
 
 				to(function() {
@@ -101,5 +106,27 @@ test('autorun should not result in loop', function(t) {
 
 		t.equal(d.$mobx.name, "named async");
 		d();
+	}, 100);
+});
+
+test('autorunAsync passes Reaction as an argument to view function', function(t) {
+	var a = m.observable(1);
+
+	var autoRunsCalled = 0;
+
+	m.autorunAsync(r => {
+		t.equal(typeof r.dispose, 'function');
+		autoRunsCalled++;
+		if (a.get() === 'pleaseDispose') r.dispose();
+	}, 10);
+
+	setTimeout(() => a.set(2), 25);
+	setTimeout(() => a.set('pleaseDispose'), 40);
+	setTimeout(() => a.set(3), 55);
+	setTimeout(() => a.set(4), 70);
+
+	setTimeout(function() {
+		t.equal(autoRunsCalled, 3);
+		t.end();
 	}, 100);
 });

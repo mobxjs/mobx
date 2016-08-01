@@ -7,17 +7,17 @@ _Simple, scalable state management_
 [![Coverage Status](https://coveralls.io/repos/mobxjs/mobx/badge.svg?branch=master&service=github)](https://coveralls.io/github/mobxjs/mobx?branch=master)
 [![Join the chat at https://gitter.im/mobxjs/mobx](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mobxjs/mobx?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-* Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`
+* Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`. To enable ESNext decorators (optional), see below.
 * [Ten minute, interactive MobX + React tutorial](https://mobxjs.github.io/mobx/getting-started.html)
 * [Official documentation and API overview](https://mobxjs.github.io/mobx/refguide/api.html)
-* Videos: 
-  * [Egghead.io lesson 1: syncing the UI with the app state using observable and observer](https://egghead.io/lessons/javascript-mobx-and-react-intro-syncing-the-ui-with-the-app-state-using-observable-and-observer)
+* Videos:
+  * [Egghead.io course: Manage Complex State in React Apps with MobX](https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx)
   * [Practical React with MobX](https://www.youtube.com/watch?v=XGwuM_u7UeQ). In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth.
   * [Screencast: intro to MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8)
   * [State Management Is Easy, React Amsterdam 2016 conf](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
   * [Transparent Reactive Programming and Mutable Data, Reactive2015 conf](https://www.youtube.com/watch?v=FEwLwiizlk0) ([slides](https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures))
 * More tutorials, blogs and videos can be found on the [MobX homepage](http://mobxjs.github.io/mobx/faq/blogs.html)
-* [Boilerplates and related projects](http://mobxjs.github.io/mobx/faq/related.html)
+* [Boilerplates and related projects](http://mobxjs.github.io/mobx/faq/boilerplates.html)
 
 
 ## Introduction
@@ -44,7 +44,7 @@ MobX has only a few core concepts. The following snippets can be tried online us
 MobX adds observable capabilities to existing data structures like objects, arrays and class instances. This can simply be done by annotating your class properties with the [@observable](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) decorator (ES.Next), or by invoking the [`observable`](http://mobxjs.github.io/mobx/refguide/observable.html) or [`extendObservable`](http://mobxjs.github.io/mobx/refguide/extend-observable.html) functions (ES5). See [Language support](https://github.com/mobxjs/mobx/wiki/Language-Support) for language-specific examples.
 
 ```javascript
-// ESNext class example: 
+// ESNext class example:
 class Todo {
     id = Math.random();
     @observable title = "";
@@ -78,7 +78,7 @@ Using `@observable` is like turning a value into a spreadsheet cell. But unlike 
 With MobX you can define values that will be derived automatically when relevant data is modified. By using the [`@computed`](http://mobxjs.github.io/mobx/refguide/computed-decorator.html) decorator or by using parameterless functions as property values in `extendObservable`.
 
 ```javascript
-// ESNext class example: 
+// ESNext class example:
 class TodoList {
     @observable todos = [];
     @computed get unfinishedTodoCount() {
@@ -142,7 +142,7 @@ const store = new TodoList();
 ReactDOM.render(<TodoListView todoList={store} />, document.getElementById('mount'));
 ```
 
-In ES5 a component declaration looks like this: 
+In ES5 a component declaration looks like this:
 ```javascript
 var TodoListView = observer(React.createClass({ /* etc */ }))
 ```
@@ -156,6 +156,8 @@ When using MobX there are no smart or dumb components.
 All components render smartly but are defined in a dumb manner. MobX will simply make sure the components are always re-rendered whenever needed, but also no more than that. So the `onClick` handler in the above example will force the proper `TodoView` to render, and it will cause the `TodoListView` to render if the number of unfinished tasks has changed.
 
 However, if you would remove the `Tasks left` line (or put it into a separate component), the `TodoListView` will no longer re-render when ticking a box. You can verify this yourself by changing the [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/).
+
+For an in-depth explanation about how MobX determines to which observables needs to be reacted, check out: [Understanding what MobX reacts to](https://github.com/mobxjs/mobx/blob/gh-pages/docs/best/react.md)
 
 ### Actions
 
@@ -180,7 +182,7 @@ store.todos[0].finished = true;
 ```
 
 Nonetheless, MobX has an optional built-in concept of [`actions`](https://mobxjs.github.io/mobx/refguide/action.html).
-Use them to your advantage; they will help you to structure your code better and make wise decisions about when and where state should be modified. 
+Use them to your advantage; they will help you to structure your code better and make wise decisions about when and where state should be modified.
 
 ## MobX: Simple and scalable
 
@@ -245,26 +247,47 @@ And finally kudo's for all the people that believed in, tried and validated MobX
 * [MobX homepage](http://mobxjs.github.io/mobx/faq/blogs.html)
 * [API overview](http://mobxjs.github.io/mobx/refguide/api.html)
 * [Tutorials, Blogs & Videos](http://mobxjs.github.io/mobx/faq/blogs.html)
-* [Boilerplate and related projects](http://mobxjs.github.io/mobx/faq/related.html)
+* [Boilerplates](http://mobxjs.github.io/mobx/faq/boilerplates.html)
+* [Related projects](http://mobxjs.github.io/mobx/faq/related.html)
+
 
 ## What others are saying...
 
-> _Elegant! I love it!_
-> &dash; Johan den Haan, CTO of Mendix
+> After using #mobx for lone projects for a few weeks, it feels awesome to introduce it to the team. Time: 1/2, Fun: 2X
 
-> _We ported the book Notes and Kanban examples to MobX. Check out [the source](https://github.com/survivejs-demos/mobx-demo) to see how this worked out. Compared to the original I was definitely positively surprised. MobX seems like a good fit for these problems._
-> &dash; Juho Vepsäläinen, author of "SurviveJS - Webpack and React" and jster.net curator
+> Working with #mobx is basically a continuous loop of me going “this is way too simple, it definitely won’t work” only to be proven wrong
 
-> _Great job with MobX! Really gives current conventions and libraries a run for their money._
-> &dash; Daniel Dunderfelt
+> Try react-mobx with es6 and you will love it so much that you will hug someone.
 
-> _I was reluctant to abandon immutable data and the PureRenderMixin, but I no longer have any reservations. I can't think of any reason not to do things the simple, elegant way you have demonstrated._
-> &dash;David Schalk, fpcomplete.com
+> I have built big apps with MobX already and comparing to the one before that which was using Redux, it is simpler to read and much easier to reason about.
+
+> The #mobx is the way I always want things to be! It's really surprising simple and fast! Totally awesome! Don't miss it!
 
 ## Contributing
 
 * Feel free to send small pull requests. Please discuss new features or big changes in a GitHub issue first.
 * Use `npm test` to run the basic test suite, `npm run coverage` for the test suite with coverage and `npm run perf` for the performance tests.
+
+## Enabling decorators (optional)
+
+**TypeScript**
+
+Enable the compiler option `experimentalDecorators` in `tsconfig.json` or pass it as flag `--experimentalDecorators` to the compiler.
+
+**Babel:**
+
+Install support for decorators: `npm i --save-dev babel-plugin-transform-decorators-legacy`. And enable it in your `babelrc` file:
+
+```
+{
+  "presets": [
+    "es2015",
+    "stage-1"
+  ],
+  "plugins": ["transform-decorators-legacy"]
+}
+```
+Probably you have more plugins and presets in your `.babelrc` already, note that the order is important and `transform-decorators-legacy` should come as first.
 
 ## Bower support
 
@@ -277,3 +300,8 @@ Then use `lib/mobx.umd.js` or `lib/mobx.umd.min.js`
 
 See the [changelog](https://github.com/mobxjs/mobx/blob/master/CHANGELOG.md#200) for all the details about `mobservable` to `mobx`.
 
+## Donating
+
+Was MobX key in making your project a success? Share the victory by using the [donate button](https://mobxjs.github.io/mobx/donate.html)!
+MobX is developed largely in free time, so any ROI is appreciated :-).
+If you leave a name it will be added to the sponsors list.

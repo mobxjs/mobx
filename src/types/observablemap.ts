@@ -48,7 +48,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	constructor(initialData?: IMapEntries<V> | IKeyValueMap<V>, valueModeFunc?: Function) {
 		this._valueMode = getValueModeFromModifierFunc(valueModeFunc);
 		if (this._valueMode === ValueMode.Flat)
-			this._valueMode = ValueMode.Reference; // TODO: modifiers really need a clean up! 
+			this._valueMode = ValueMode.Reference; // TODO: modifiers really need a clean up!
 		allowStateChanges(true, () => {
 			if (isPlainObject(initialData))
 				this.merge(<IKeyValueMap<V>> initialData);
@@ -218,7 +218,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	merge(other: ObservableMap<V> | IKeyValueMap<V>): ObservableMap<V> {
 		transaction(() => {
 			if (other instanceof ObservableMap)
-				other.keys().forEach(key => this.set(key, other.get(key)));
+				other.keys().forEach(key => this.set(key, (other as ObservableMap<V>).get(key)));
 			else
 				Object.keys(other).forEach(key => this.set(key, other[key]));
 		}, undefined, false);
