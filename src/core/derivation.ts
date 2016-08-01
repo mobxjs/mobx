@@ -3,6 +3,7 @@ import {globalState, resetGlobalState} from "./globalstate";
 import {invariant} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "./spy";
 import {ISetEntry} from "../utils/set";
+import {ComputedValue} from "./computedvalue";
 
 /**
  * A derivation is everything that can be derived from the state (all the atoms) in a pure manner.
@@ -10,6 +11,7 @@ import {ISetEntry} from "../utils/set";
  */
 export interface IDerivation extends IDepTreeNode, ISetEntry {
 	observing: IObservable[];
+	newObserving: IObservable[];
 	/**
 	 * Describes state of observing dependencies to know whet it's needed to rerun
 	 * -1 <- not tracking dependencies
@@ -28,22 +30,22 @@ export interface IDerivation extends IDepTreeNode, ISetEntry {
 	 */
 	unboundDepsCount: number;
 	onBecomeStale();
+	recoverFromError();
 }
 
 export function shouldCompute(derivation: IDerivation): boolean {
 	const dependenciesState = derivation.dependenciesState;
 	if (dependenciesState === 0) return false;
 	if (dependenciesState === -1 || dependenciesState === 2) return true;
-	// this.dependencyChange === 1
-	for (let i = 0; i < this.observing.length; i++) {
-		const obj = this.observing[i];
-		if ("dependenciesState" in obj) {
-			// obj is instance of ComputedValue
+	// derivation.dependencyChange === 1
+	for (let i = 0; i < derivation.observing.length; i++) {
+		const obj = derivation.observing[i];
+		if (obj instanceof ComputedValue) {
 			obj.get();
 			if (derivation.dependenciesState === 2) return true;
 		}
 	}
-	derivation.dependenciesState = 0;
+	changeDependenciesState(0, derivation);
 	return false;
 }
 
@@ -67,12 +69,14 @@ export function checkIfStateModificationsAreAllowed() {
  * as observer of any of the accessed observables.
  */
 export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
-	const prevObserving = derivation.observing;
 	// pre allocate array allocation + room for variation in deps
 	// array will be trimmed by bindDependencies
-	derivation.observing = new Array(prevObserving.length + 100);
+	let prevDependenciesState = derivation.dependenciesState
+	if (prevDependenciesState !== 0) {
+		changeDependenciesState(0, derivation);
+	}
+	derivation.newObserving = new Array(derivation.observing.length + 100);
 	derivation.unboundDepsCount = 0;
-	derivation.dependenciesState = 0; // set it to 0 so if dependency change autorun can immediately rerun
 	derivation.runId = ++globalState.runId;
 	globalState.derivationStack.push(derivation);
 	const prevTracking = globalState.isTracking;
@@ -101,23 +105,33 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 			// Assumption here is that this is the only exception handler in MobX.
 			// So functions higher up in the stack (like transanction) won't be modifying the globalState anymore after this call.
 			// (Except for other trackDerivedFunction calls of course, but that is just)
+			derivation.dependenciesState = prevDependenciesState;
+			derivation.newObserving = null;
 			derivation.unboundDepsCount = 0;
-			derivation.observing = prevObserving;
+			derivation.recoverFromError();
 			resetGlobalState();
 		} else {
+			// if (derivation.dependenciesState !== 0) {
+			// 	changeDependenciesState(0, derivation);
+			// }
 			globalState.isTracking = prevTracking;
 			globalState.derivationStack.length -= 1;
-			bindDependencies(derivation, prevObserving);
+			bindDependencies(derivation);
 		}
 	}
 	return result;
 }
 
-function bindDependencies(derivation: IDerivation, prevObserving: IObservable[]) {
+function bindDependencies(derivation: IDerivation) {
+	const prevObserving = derivation.observing;
 	const prevLength = prevObserving.length;
 	// trim and determina new observing length
-	const observing = derivation.observing;
-	const newLength = observing.length = derivation.unboundDepsCount;
+	const observing = derivation.observing = derivation.newObserving;
+	const observingLength = observing.length = derivation.unboundDepsCount;
+
+	// derivation.observing should be unique to avoid weird corner cases
+	const uniqueObserving = derivation.observing = [];
+	derivation.newObserving = null; // <- newObserving shouldn't be outside tracking
 
 	// Idea of this algorithm is start with marking all observables in observing and prevObserving with weight 0
 	// After that all prevObserving weights are decreased with -1
@@ -126,28 +140,27 @@ function bindDependencies(derivation: IDerivation, prevObserving: IObservable[])
 
 	// This process is optimized by making sure deps are always left 'clean', with value 0, so that they don't need to be reset at the start of this process
 	// after that, all prevObserving items are marked with -1 directly, instead of 0 and doing -- after that
-	// further the +1 and addObserver can be done in one go.
-	for (let i = 0; i < prevLength; i++)
-		prevObserving[i].diffValue = -1;
-
-	for (let i = 0; i < newLength; i++) {
+	for (let i = 0; i < observingLength; i++) {
 		const dep = observing[i];
-		// there is no guarantee that the observing collection is unique, so especially in the first run of the derivation
-		// this check might succeed too often (namely, for each double dep). That is no problem because addObserve is backed by a set
-		// In subsequent runs of the derivation, double entries are a lot less likely to happen, because then the used derivations are hot and executed
-		// _before_ this derivation, meaning that the lastAccessedDerivation optimization will most probably have skip all the doubles already.
-		// see also the "unoptimizable subscriptions are diffed correctly" test
-		if ((++dep.diffValue) > 0) {
-			dep.diffValue = 0; // this also short circuits add if a dep is multiple times in the observing list
-			addObserver(dep, derivation);
+		if ((++dep.diffValue) === 1) {
+			uniqueObserving.push(dep);
 		}
 	}
 
+	// further the -1 and removeObserver can be done in one go.
 	for (let i = 0; i < prevLength; i++) {
 		const dep = prevObserving[i];
-		if (dep.diffValue < 0) {
+		if (--prevObserving[i].diffValue === -1) {
 			dep.diffValue = 0; // this also short circuits add if a dep is multiple times in the observing list
 			removeObserver(dep, derivation);
+		}
+	}
+
+	for (let i = 0; i < uniqueObserving.length; i++) {
+		const dep = uniqueObserving[i];
+		if (dep.diffValue > 0) {
+			dep.diffValue = 0; // this also short circuits add if a dep is multiple times in the observing list
+			addObserver(dep, derivation);
 		}
 	}
 }
@@ -157,7 +170,7 @@ export function clearObserving(derivation: IDerivation) {
 	const l = obs.length;
 	for (let i = 0; i < l; i++)
 		removeObserver(obs[i], derivation);
-	this.dependenciesState = -1;
+	derivation.dependenciesState = -1;
 	obs.length = 0;
 }
 
@@ -182,9 +195,9 @@ export function changeDependenciesState(targetState, derivation: IDerivation) {
 	const oldState = derivation.dependenciesState;
 	if (oldState === targetState) return;
 	derivation.dependenciesState = targetState;
-	for (let i in derivation.observing) {
-		const observable = this.observing[i];
-		observable["observers" + oldState].remove(derivation);
-		observable["observers" + targetState].add(derivation);
+	const obs = derivation.observing;
+	const l = obs.length;
+	for (let i = 0; i < l; i++) {
+		obs[i].observers.move(targetState, derivation);
 	}
 }

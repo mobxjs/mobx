@@ -1,11 +1,10 @@
-import {IObservable, reportObserved, propagateMaybeChanged, observersArray, startBatch, endBatch} from "./observable";
+import {IObservable, reportObserved, propagateMaybeChanged, propagateChangeConfirmed, DerivationsSets, startBatch, endBatch} from "./observable";
 import {IDerivation, trackDerivedFunction, clearObserving, untrackedStart, untrackedEnd, shouldCompute } from "./derivation";
 import {globalState} from "./globalstate";
 import {allowStateChangesStart, allowStateChangesEnd} from "./action";
 import {getNextId, valueDidChange, invariant, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "../core/spy";
 import {autorun} from "../api/autorun";
-import {SimpleSet} from "../utils/set";
 
 export interface IComputedValue<T> {
 	get(): T;
@@ -24,12 +23,11 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
 	dependenciesState = -1;
 	observing = [];       // nodes we are looking at. Our value depends on these nodes
+	newObserving = null; // during tracking it's array with new observed observers
 
 	isPendingUnobservation: boolean; // for effective unobserving
-  isObserved = false;
-	observers0 = new SimpleSet<IDerivation>();
-	observers1 = new SimpleSet<IDerivation>();
-	observers2 = new SimpleSet<IDerivation>();
+	isObserved = false;
+	observers = new DerivationsSets();
 
 	diffValue = 0;
 	runId = 0;
@@ -85,11 +83,20 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		startBatch();
 		reportObserved(this);
 		if (shouldCompute(this)) {
-			this.trackAndCompute();
+			if (this.trackAndCompute()) {
+				propagateChangeConfirmed(this);
+			}
 		}
+		const result = this.value;
 		endBatch();
 		// we are up to date. Return the value
-		return this.value;
+		return result;
+	}
+
+	public recoverFromError() {
+		// this.derivation.call(this.scope) in peek returned error, let's run all cleanups, that would be run
+		this.isComputing = false;
+		endBatch();
 	}
 
 	public set(_: T) {
@@ -137,7 +144,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	whyRun() {
 		const isTracking = globalState.derivationStack.length > 0;
 		const observing = unique(this.observing).map(dep => dep.name);
-		const observers = unique(observersArray(this).map(dep => dep.name));
+		const observers = unique(this.observers.asArray().map(dep => dep.name));
 		const runReason = (
 			this.isComputing
 				? isTracking

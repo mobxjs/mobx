@@ -24,6 +24,7 @@ import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
 
 export class Reaction implements IDerivation {
 	observing = []; // nodes we are looking at. Our value depends on these nodes
+	newObserving = [];
 	dependenciesState = -1;
 	diffValue = 0;
 	runId = 0;
@@ -69,6 +70,7 @@ export class Reaction implements IDerivation {
 						type: "scheduled-reaction"
 					});
 				}
+			} else {
 			}
 		}
 	}
@@ -97,6 +99,11 @@ export class Reaction implements IDerivation {
 				time: Date.now() - startTime
 			});
 		}
+	}
+
+	recoverFromError() {
+		this._isRunning = false;
+		this._isTrackPending = false;
 	}
 
 	dispose() {

@@ -6,7 +6,7 @@ test('autorun 1', function(t) {
 	var _result = null;
 	var _cCalcs = 0;
 	var to = setTimeout;
-	
+
 	function expect(fired, cCalcs, result) {
 		t.equal(_fired, fired, "autorun fired");
 		t.equal(_cCalcs, cCalcs, "'c' fired");
@@ -15,7 +15,7 @@ test('autorun 1', function(t) {
 		_fired = 0;
 		_cCalcs = 0;
 	}
-	
+
 	var a = m.observable(2);
 	var b = m.observable(3);
 	var c = m.observable(function() {
@@ -28,30 +28,30 @@ test('autorun 1', function(t) {
 		_result = d.get() > 0 ? a.get() * c.get() : d.get();
 	};
 	var disp = m.autorunAsync(autorun, 20);
-	
+
 	expect(0, 0, null);
 	disp();
 	to(function() {
 		expect(0, 0, null);
 		disp = m.autorunAsync(autorun, 20);
-		
+
 		to(function() {
 			expect(1, 1, 12);
 			a.set(4);
 			b.set(5);
 			a.set(6);
-			expect(0, 3, null);
+			expect(0, 1, null); // after first set autorun reruns
 			to(function() {
-				expect(1, 0, 180); // c() is cached, not refired since previous expect
+				expect(1, 1, 180); // c() invalidated with next sets
 				d.set(2);
-				
+
 				to(function() {
 					expect(1, 0, 180);
-					
+
 					d.set(-2);
 					to(function() {
 						expect(1, 0, -2);
-						
+
 						a.set(7);
 						to(function() {
 							expect(0, 0, 0); // change a has no effect
@@ -59,10 +59,10 @@ test('autorun 1', function(t) {
 							a.set(4);
 							b.set(2);
 							d.set(2)
-							
+
 							to(function() {
 								expect(1, 1, 32);
-								
+
 								disp();
 								a.set(1);
 								b.set(2);
@@ -75,7 +75,7 @@ test('autorun 1', function(t) {
 						}, 30);
 					}, 30);
 				}, 30);
-			}, 30);			
+			}, 30);
 		}, 30);
 	}, 30);
 });
@@ -94,7 +94,7 @@ test('autorun should not result in loop', function(t) {
 			a.x = ++i;
 		}, 10);
 	}, 10);
-	
+
 	setTimeout(function() {
 		t.equal(autoRunsCalled, 1);
 		t.end();

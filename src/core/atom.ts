@@ -11,9 +11,7 @@ export interface IAtom extends IObservable {
 export class Atom implements IAtom {
 	isPendingUnobservation: boolean; // for effective unobserving
 	isObserved = false;
-	observers0 = new SimpleSet<IDerivation>();
-	observers1 = new SimpleSet<IDerivation>();
-	observers2 = new SimpleSet<IDerivation>();
+	observers = new DerivationsSets();
 
 	diffValue = 0;
 	lastAccessedBy = 0;
@@ -35,8 +33,9 @@ export class Atom implements IAtom {
 	 * Invoke this method _after_ this method has changed to signal mobx that all its observers should invalidate.
 	 */
 	public reportChanged() {
+		transactionStart("propagatingAtomChange", null, false);
 		propagateChanged(this);
-		runReactions();
+		transactionEnd(false);
 	}
 
 	toString() {
@@ -44,8 +43,6 @@ export class Atom implements IAtom {
 	}
 }
 
-import {IObservable, propagateChanged, reportObserved} from "./observable";
-import {IDerivation} from "./derivation";
-import {runReactions} from "./reaction";
+import {IObservable, propagateChanged, reportObserved, DerivationsSets} from "./observable";
+import {transactionStart, transactionEnd} from "../core/transaction";
 import {noop, getNextId} from "../utils/utils";
-import {SimpleSet} from "../utils/set";

@@ -158,7 +158,7 @@ test('many unreferenced observables', function(t) {
     var c = observable(7);
     var d = observable(function() { return a.get() * b.get() * c.get() });
     t.equal(d.get(), 126);
-    t.equal(d.isLazy, true);
+    t.equal(d.dependenciesState, -1);
     var start = now();
     for(var i = 0; i < 10000; i++) {
         c.set(i);
