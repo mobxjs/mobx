@@ -43,11 +43,11 @@ export class DerivationsSets {
 			this.size--;
 		}
 	}
-	move(targetState: number, value: IDerivation) {
-		const m = value.__mapid;
-		delete this["data" + value.dependenciesState][m];
-		this["data" + targetState][m] = value;
-	}
+	// move(targetState: number, value: IDerivation) {
+	// 	const m = value.__mapid;
+	// 	delete this["data" + value.dependenciesState][m];
+	// 	this["data" + targetState][m] = value;
+	// }
 }
 
 export interface IDepTreeNode {

@@ -197,7 +197,50 @@ export function changeDependenciesState(targetState, derivation: IDerivation) {
 	derivation.dependenciesState = targetState;
 	const obs = derivation.observing;
 	const l = obs.length;
-	for (let i = 0; i < l; i++) {
-		obs[i].observers.move(targetState, derivation);
+
+	const m = derivation.__mapid;
+
+	// just because it can be bottleneck
+	if (oldState === 0) {
+		if (targetState === 2)
+			for (let i = 0; i < l; i++) {
+				const o = obs[i];
+				delete o.observers.data0[m];
+				o.observers.data2[m] = derivation;
+			}
+		else // targetState === 1
+			for (let i = 0; i < l; i++) {
+				const o = obs[i];
+				delete o.observers.data0[m];
+				o.observers.data1[m] = derivation;
+			}
+	}
+	else if (oldState === 1) {
+		if (targetState === 2)
+			for (let i = 0; i < l; i++) {
+				const o = obs[i];
+				delete o.observers.data1[m];
+				o.observers.data2[m] = derivation;
+			}
+		else // targetState === 0
+			for (let i = 0; i < l; i++) {
+				const o = obs[i];
+				delete o.observers.data1[m];
+				o.observers.data0[m] = derivation;
+			}
+	}
+	else { // oldState === 2
+		if (targetState === 0)
+			for (let i = 0; i < l; i++) {
+				const o = obs[i];
+				delete o.observers.data2[m];
+				o.observers.data0[m] = derivation;
+			}
+		else // targetState === 1
+			for (let i = 0; i < l; i++) {
+				const o = obs[i];
+				delete o.observers.data2[m];
+				o.observers.data1[m] = derivation;
+			}
 	}
 }
