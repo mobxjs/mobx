@@ -89,11 +89,11 @@ For more advantages of using observable local component state, see [3 reasons wh
 
 ## Connect `observer` to stores
 
-The `mobx-react` package also provides the `Provider` component that can be used to pass down stores using React's context mechanism. 
+The `mobx-react` package also provides the `Provider` component that can be used to pass down stores using React's context mechanism.
 To connect to those stores, pass an array of store names to `observer`, which will make the stores available as props.
 This is supported when using the decorator (`@observer(["store"]) class ...`, or the function `observer(["store"], React.createClass({ ...``.
 
-Example: 
+Example:
 
 ```javascript
 const colors = observable({
@@ -106,7 +106,7 @@ const App = () =>
      <app stuff... />
   </Provider>
 
-const Button = observer(["colors"], ({ colors, label, onClick }) => 
+const Button = observer(["colors"], ({ colors, label, onClick }) =>
   <button style={{
       color: colors.foreground,
       backgroundColor: colors.background
@@ -125,10 +125,14 @@ See for more information the [`mobx-react` docs](https://github.com/mobxjs/mobx-
 
 ## When to apply `observer`?
 
-Rule of thumb is to use `observer` on every component in your application that is specific for your application.
-With `@observer` there is no need to distinguish 'smart' components from 'dumb' components.
+The simple rule of thumb is: _all components that render observable data_.
+If you don't want to mark a component as observer, for example to reduce the dependencies of a generic component package, make sure you only pass it plain data.
+
+With `@observer` there is no need to distinguish 'smart' components from 'dumb' components for the purpose of rendering.
+It is stil a good separation of concerns for where to handle events, make requests etc.
 All components become responsible for updating when their _own_ dependencies change.
 Its overhead is neglectable and it makes sure that whenever you start using observable data the component will respond to it.
+See this [thread](https://www.reddit.com/r/reactjs/comments/4vnxg5/free_eggheadio_course_learn_mobx_react_in_30/d61oh0l) for more details.
 
 ## `observer` and `PureRenderMixin`
 `observer` also prevents re-renderings when the *props* of the component have only shallowly changed, which makes a lot of sense if the data passed into the component is reactive.
@@ -147,12 +151,12 @@ import {observer} from "mobx-react";
 
 @observer class TodoView extends React.Component {
     componentWillReact() {
-        console.log("I will re-render, since the todo has changed!");    
+        console.log("I will re-render, since the todo has changed!");
     }
 
     render() {
-        return <div>this.props.todo.title</div>   
-    }   
+        return <div>this.props.todo.title</div>
+    }
 }
 ```
 

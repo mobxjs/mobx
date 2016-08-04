@@ -7,7 +7,7 @@
 * [Understanding MobX versus Redux](https://www.youtube.com/watch?v=83v8cdvGfeA) (related thread: https://github.com/mobxjs/mobx/issues/199)
 * [State Management Is Easy, React Amsterdam 2016 conf](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
 * [Transparent Reactive Programming and Mutable Data, Reactive2015 conf](https://www.youtube.com/watch?v=FEwLwiizlk0) ([slides](https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures))
-* Magic MobX, RuhrJS 2016 (video coming soon) ([slides](magixmobx.surge.sh) and [more slides](https://docs.google.com/presentation/d/1d54mSxF0VOAFlsUGM8eonZDs9gZecTOz1ErSbnydChQ/edit?usp=sharing))
+* Magic MobX, RuhrJS 2016 (video coming soon) ([slides](http://magixmobx.surge.sh) and [more slides](https://docs.google.com/presentation/d/1d54mSxF0VOAFlsUGM8eonZDs9gZecTOz1ErSbnydChQ/edit?usp=sharing))
 
 ## Tutorials
 * [Ten minute interactive introduction to MobX and React](https://mobxjs.github.io/mobx/getting-started.html#demo)
@@ -39,7 +39,7 @@
 * [Performance of observables versus immutables](https://twitter.com/mweststrate/status/720177443521343488)
 * [Object.observe is dead. Long live MobX.observe](https://medium.com/@mweststrate/object-observe-is-dead-long-live-mobservable-observe-ad96930140c5#.krm1pec8p)
 * [Hashnode AMA on MobX](https://hashnode.com/ama/with-mobx-cinspo7i500vyxs53buh8ebls)
-
+* [How I use MobX 2 in an AngularJS 1 application](https://philhosoft.github.io/Programming/AngularJS-1-and-MobX-2/)
 
 ## Testimonials
 

@@ -7,9 +7,12 @@
 * [MobX deku bindings](https://github.com/micnews/mobx-deku)
 * For Preact the [preact-compat](https://github.com/developit/preact-compat) module + mobx-react can be used.
 * [tracker-mobx-autorun](https://github.com/meteor-space/tracker-mobx-autorun) Integrate Meteor reactive data with MobX for simple yet highly optimized state management
+
 * [mobx-form](https://github.com/royriojas/mobx-form) Declaratively build forms using MobX
 * [mobx-ajv-form](https://github.com/foxhound87/mobx-ajv-form) Build forms and validate them using json-schema rules
 * [Form abstraction in one fiddle](https://jsfiddle.net/darthapo/k63ujjsp/)
+
+* [serializr](https://github.com/mobxjs/serializr) Small library to (de)serialize complex object graphs to JSON
 * [mobx-model](https://github.com/ikido/mobx-model) Simplify mobx data stores that mimic backend models
 * [mobx-store](https://github.com/AriaFallah/mobx-store) A lowdb inspired data store with declarative querying, observable state, and easy undo/redo.
 * [mobx-firebase-store](https://github.com/nyura123/mobx-firebase-store) Subscribe MobX observables to firebase

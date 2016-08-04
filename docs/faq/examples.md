@@ -26,3 +26,4 @@
 * TypeScript + React + MobX + JSPM - Simple CRUD App example: https://github.com/piotrwitek/training-management-tool
 * Github Note Taker in MobX: https://github.com/eswat2/egghead-mobx
 * vcash-electron - Electron UI for the Vcash crypto currency: https://github.com/whphhg/vcash-electron
+* SoundCloud client, in MobX and React: [React-MobX-SoundCloud](https://github.com/rwieruch/react-mobx-soundcloud)
