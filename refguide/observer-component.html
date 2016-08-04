@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.5" data-basepath=".." data-revision="Thu Jul 28 2016 17:11:32 GMT+0200 (CEST)">
+    <div class="book" data-level="2.5" data-basepath=".." data-revision="Thu Aug 04 2016 21:45:25 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -922,10 +922,10 @@ React.render(&lt;Timer /&gt;, document.body)
 </code></pre>
 <p>For more advantages of using observable local component state, see <a href="https://medium.com/@mweststrate/3-reasons-why-i-stopped-using-react-setstate-ab73fc67a42e" target="_blank">3 reasons why I stopped using <code>setState</code></a>.</p>
 <h2 id="connect-observer-to-stores">Connect <code>observer</code> to stores</h2>
-<p>The <code>mobx-react</code> package also provides the <code>Provider</code> component that can be used to pass down stores using React&apos;s context mechanism. 
+<p>The <code>mobx-react</code> package also provides the <code>Provider</code> component that can be used to pass down stores using React&apos;s context mechanism.
 To connect to those stores, pass an array of store names to <code>observer</code>, which will make the stores available as props.
 This is supported when using the decorator (<code>@observer([&quot;store&quot;]) class ...</code>, or the function `observer([&quot;store&quot;], React.createClass({ ...``.</p>
-<p>Example: </p>
+<p>Example:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> colors = observable({
    foreground: <span class="hljs-string">&apos;#000&apos;</span>,
    background: <span class="hljs-string">&apos;#fff&apos;</span>
@@ -936,7 +936,7 @@ This is supported when using the decorator (<code>@observer([&quot;store&quot;])
      <span class="hljs-tag">&lt;<span class="hljs-title">app</span> <span class="hljs-attribute">stuff...</span> /&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-title">Provider</span>&gt;</span>
 
-const Button = observer([&quot;colors&quot;], ({ colors, label, onClick }) =&gt; 
+const Button = observer([&quot;colors&quot;], ({ colors, label, onClick }) =&gt;
   <span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">style</span>=<span class="hljs-value">{{</span>
       <span class="hljs-attribute">color:</span> <span class="hljs-attribute">colors.foreground</span>,
       <span class="hljs-attribute">backgroundColor:</span> <span class="hljs-attribute">colors.background</span>
@@ -951,10 +951,13 @@ colors.foreground = <span class="hljs-string">&apos;blue&apos;</span>;
 </code></pre>
 <p>See for more information the <a href="https://github.com/mobxjs/mobx-react#provider-experimental" target="_blank"><code>mobx-react</code> docs</a>.</p>
 <h2 id="when-to-apply-observer">When to apply <code>observer</code>?</h2>
-<p>Rule of thumb is to use <code>observer</code> on every component in your application that is specific for your application.
-With <code>@observer</code> there is no need to distinguish &apos;smart&apos; components from &apos;dumb&apos; components.
+<p>The simple rule of thumb is: <em>all components that render observable data</em>.
+If you don&apos;t want to mark a component as observer, for example to reduce the dependencies of a generic component package, make sure you only pass it plain data.</p>
+<p>With <code>@observer</code> there is no need to distinguish &apos;smart&apos; components from &apos;dumb&apos; components for the purpose of rendering.
+It is stil a good separation of concerns for where to handle events, make requests etc.
 All components become responsible for updating when their <em>own</em> dependencies change.
-Its overhead is neglectable and it makes sure that whenever you start using observable data the component will respond to it.</p>
+Its overhead is neglectable and it makes sure that whenever you start using observable data the component will respond to it.
+See this <a href="https://www.reddit.com/r/reactjs/comments/4vnxg5/free_eggheadio_course_learn_mobx_react_in_30/d61oh0l" target="_blank">thread</a> for more details.</p>
 <h2 id="-observer-and-purerendermixin"><code>observer</code> and <code>PureRenderMixin</code></h2>
 <p><code>observer</code> also prevents re-renderings when the <em>props</em> of the component have only shallowly changed, which makes a lot of sense if the data passed into the component is reactive.
 This behavior is similar to <a href="https://facebook.github.io/react/docs/pure-render-mixin.html" target="_blank">React PureRender mixin</a>, except that <em>state</em> changes are still always processed.
@@ -968,12 +971,12 @@ data it observes has changed. This makes it easy to trace renders back to the ac
 
 @observer <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoView</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
     componentWillReact() {
-        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;I will re-render, since the todo has changed!&quot;</span>);    
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;I will re-render, since the todo has changed!&quot;</span>);
     }
 
     render() {
-        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>this.props.todo.title<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>   
-    }   
+        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>this.props.todo.title<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
+    }
 }
 </span></code></pre>
 <ul>
