@@ -98,7 +98,7 @@ export function addHiddenFinalProp(object: any, propName: string, value: any) {
 	Object.defineProperty(object, propName, {
 		enumerable: false,
 		writable: false,
-		configurable: false,
+		configurable: true,
 		value
 	});
 }
