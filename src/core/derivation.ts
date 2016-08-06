@@ -97,7 +97,8 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 			const message = (
 				`[mobx] An uncaught exception occurred while calculating your computed value, autorun or transformer. Or inside the render() method of an observer based React component. ` +
 				`These functions should never throw exceptions as MobX will not always be able to recover from them. ` +
-				`Please fix the error reported after this message or enable 'Pause on (caught) exceptions' in your debugger to find the root cause. In: '${derivation.name}'`
+				`Please fix the error reported after this message or enable 'Pause on (caught) exceptions' in your debugger to find the root cause. In: '${derivation.name}'. ` +
+				`For more details see https://github.com/mobxjs/mobx/issues/462`
 			);
 			if (isSpyEnabled()) {
 				spyReport({
