@@ -150,6 +150,13 @@ test('find and remove', function(t) {
     t.end();
 })
 
+test('concat should automatically slice observable arrays, #260', t => {
+	var a1 = mobx.observable([1,2])
+	var a2 = mobx.observable([3,4])
+	t.deepEqual(a1.concat(a2), [1,2,3,4])
+	t.end()
+})
+
 test('observe', function(t) {
     var ar = mobx.observable([1,4]);
     var buf = [];

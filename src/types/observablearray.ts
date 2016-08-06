@@ -259,6 +259,11 @@ export class ObservableArray<T> extends StubArray {
 		return this.splice(0);
 	}
 
+	concat(...arrays: T[][]): T[] {
+		this.$mobx.atom.reportObserved();
+		return Array.prototype.concat.apply((this as any).slice(), arrays.map(a => isObservableArray(a) ? a.slice() : a));
+	}
+
 	replace(newItems: T[]) {
 		return this.$mobx.spliceWithArray(0, this.$mobx.values.length, newItems);
 	}
@@ -374,6 +379,7 @@ makeNonEnumerable(ObservableArray.prototype, [
 	"constructor",
 	"observe",
 	"clear",
+	"concat",
 	"replace",
 	"toJSON",
 	"peek",
@@ -406,7 +412,6 @@ Object.defineProperty(ObservableArray.prototype, "length", {
  * Wrap function from prototype
  */
 [
-	"concat",
 	"every",
 	"filter",
 	"forEach",
