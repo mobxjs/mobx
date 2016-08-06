@@ -1,10 +1,15 @@
+# 2.4.2
+
+* Improved error message when wrongly using `@computed`, by @bb (#450)
+* `observableArray.slice` now automatically converts observable arrays to plain arrays, fixes #460
+* Improved error message when an uncaught exception is thrown by a MobX tracked function
+
 # 2.4.1
 
 * `@action` decorated methods are now configurable. Fixes #441
 * The `onBecomeObserved` event handler is now triggered when an atom is observed, instead of when it is bound as dependency. Fixes #427 and makes atoms easier to extend.
 * if `useStrict()` is invoked without arguments, it now returns the current value of strict mode.
 * the current reaction is now always passed as first argument to the callbacks of `autorun`, `autorunAsync`, `when` and `reaction`. This allows reactions to be immediately disposed during the first run. See #438, by @andykog
-* `observableArray.slice` now automatically converts observable arrays to plain arrays, fixes #460
 
 # 2.4.0
 
