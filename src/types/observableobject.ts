@@ -1,6 +1,6 @@
 import {ObservableValue, UNCHANGED} from "./observablevalue";
 import {ComputedValue} from "../core/computedvalue";
-import {isAction} from "../core/action";
+import {isAction} from "../api/action";
 import {ValueMode, AsStructure} from "./modifiers";
 import {Lambda, getNextId, invariant, assertPropertyConfigurable, isPlainObject, addHiddenFinalProp} from "../utils/utils";
 import {runLazyInitializers} from "../utils/decorators";
@@ -34,7 +34,7 @@ export class ObservableObjectAdministration implements IInterceptable<IObjectWil
 
 	/**
 		* Observes this object. Triggers for the events 'add', 'update' and 'delete'.
-		* See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe 
+		* See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
 		* for callback details
 		*/
 	observe(callback: (changes: IObjectChange) => void, fireImmediately?: boolean): Lambda {

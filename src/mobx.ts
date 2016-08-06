@@ -23,7 +23,7 @@ export { IAtom, Atom, BaseAtom                                } from "./core/ato
 export { IObservable, IDepTreeNode                            } from "./core/observable";
 export { Reaction, IReactionPublic                            } from "./core/reaction";
 export { IDerivation, untracked                               } from "./core/derivation";
-export { action, useStrict, isAction, runInAction             } from "./core/action";
+export { useStrict                                            } from "./core/action";
 export { spy                                                  } from "./core/spy";
 export { transaction                                          } from "./core/transaction";
 export { IComputedValue                                       } from "./core/computedvalue";
@@ -44,6 +44,8 @@ export { extendObservable                                     } from "./api/exte
 export { observe                                              } from "./api/observe";
 export { intercept                                            } from "./api/intercept";
 export { autorun, autorunAsync, autorunUntil, when, reaction  } from "./api/autorun";
+export { action, isAction, runInAction                        } from "./api/action";
+
 export { expr                                                 } from "./api/expr";
 export { toJSON, toJS                                         } from "./api/tojs";
 export { ITransformer, createTransformer                      } from "./api/createtransformer";

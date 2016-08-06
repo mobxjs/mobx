@@ -2,7 +2,7 @@ import {Lambda, getNextId, deprecated, invariant, valueDidChange} from "../utils
 import {assertUnwrapped, ValueMode, getValueModeFromValue} from "../types/modifiers";
 import {Reaction, IReactionPublic} from "../core/reaction";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
-import {action} from "../core/action";
+import {action} from "../api/action";
 
 /**
  * Creates a reactive view and keeps it alive, so that the view is always
