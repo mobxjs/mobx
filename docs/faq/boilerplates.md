@@ -5,7 +5,7 @@
 * MobX + React JSFiddle: https://jsfiddle.net/mweststrate/wgbe4guu/
 * MobX + React JSFiddle with just ES5: https://jsfiddle.net/rubyred/55oc981v/
 * [generator-mobx-react](https://www.npmjs.com/package/generator-mobx-react) Yeoman MobX, React, Webpack, Babel / Typescript project generator
-* [react-starter](https://github.com/nightwolfz/mobx-starter): Starting base for an mobx react project with optional isomorphism. MongoDB auth & sessions, hot reload, react-router
+* [mobx-starter](https://github.com/nightwolfz/mobx-starter): Starting base for an mobx react project with optional isomorphism. MongoDB auth & sessions, hot reload, react-router
 * [rfx-stack](https://github.com/foxhound87/rfx-stack) RFX Stack - Universal App featuring: React + Feathers + MobX
 * [reaxor](https://github.com/KadoBOT/reaxor) Boilerplate for better state management, styling, testing and cleaner code
 * [jspm-react](https://github.com/capaj/jspm-react) lightweight React.js ES6 boilerplate with JSPM and proper hot reloading modules
@@ -18,3 +18,4 @@
 * [ReMux - MobX with flux pattern boilerplate](https://github.com/vinej/react-remux)
 * [react-routing-mobx-bootstrap-boilerplate](https://github.com/tranqy/react-routing-mobx-bootstrap-boilerplate) Simple boilerplate with webpack, react, mobx, react router and css modules
 * [FutureRX](https://github.com/iam4x/futureRX) The futuristic stack to create universal React applications with MobX as state manager
+* [mobx-isomorphic-starter](https://github.com/Xerios/mobx-isomorphic-starter) Clean isomorphic starter-kit using Mobx + React + React-router + Webpack
