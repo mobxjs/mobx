@@ -35,7 +35,6 @@ export class Reaction implements IDerivation, IReactionPublic {
 	diffValue = 0;
 	runId = 0;
 	unboundDepsCount = 0;
-	__mapid = "#" + getNextId();   // use strings for map distribution, just nrs will result in accidental sparse arrays... // NOT NEEDED ANYMORE
 	isDisposed = false;
 	_isScheduled = false;
 	_isTrackPending = false;

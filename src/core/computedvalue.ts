@@ -34,7 +34,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	lastAccessedBy = 0;
 	lowestObserverState = 0;
 	unboundDepsCount = 0;
-	__mapid = "#" + getNextId(); // NOT NEEDED ANYMORE
 	protected value: T = undefined;
 	name: string;
 
