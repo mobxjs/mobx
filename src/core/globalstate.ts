@@ -1,6 +1,6 @@
 import {IDerivation} from "./derivation";
 import {Reaction} from "./reaction";
-import {IObservable, DerivationsSets} from "./observable";
+import {IObservable} from "./observable";
 
 declare const global: any;
 
@@ -15,7 +15,7 @@ export class MobXGlobals {
 	 * MobX compatiblity with other versions loaded in memory as long as this version matches.
 	 * It indicates that the global state still stores similar information
 	 */
-	version = 3;
+	version = 4;
 
 	/**
 	 * Stack of currently running derivations
@@ -52,7 +52,7 @@ export class MobXGlobals {
 
 	pendingUnobservations: IObservable[] = [];
 
-	pendingDeletions: DerivationsSets[] = [];
+	pendingDeletions: IObservable[] = [];
 	/**
 	 * List of scheduled, not yet executed, reactions.
 	 */

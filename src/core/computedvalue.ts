@@ -1,4 +1,4 @@
-import {IObservable, reportObserved, propagateMaybeChanged, propagateChangeConfirmed, DerivationsSets, startBatch, endBatch} from "./observable";
+import {IObservable, reportObserved, propagateMaybeChanged, propagateChangeConfirmed, legacyObservers, startBatch, endBatch, getObservers} from "./observable";
 import {IDerivation, trackDerivedFunction, clearObserving, untrackedStart, untrackedEnd, shouldCompute } from "./derivation";
 import {globalState} from "./globalstate";
 import {allowStateChangesStart, allowStateChangesEnd} from "./action";
@@ -27,7 +27,8 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
 	isPendingUnobservation: boolean; // for effective unobserving
 	isObserved = false;
-	observers = new DerivationsSets();
+	_observers = [];
+	_observersToDelete = [];
 
 	diffValue = 0;
 	runId = 0;
@@ -49,6 +50,10 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	 */
 	constructor(public derivation: () => T, private scope: Object, private compareStructural: boolean, name: string) {
 		this.name  = name || "ComputedValue@" + getNextId();
+	}
+
+	get observers() {
+		return legacyObservers(this);
 	}
 
 	peek() {
@@ -139,7 +144,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	whyRun() {
 		const isTracking = globalState.derivationStack.length > 0;
 		const observing = unique(this.observing).map(dep => dep.name);
-		const observers = unique(this.observers.asArray().map(dep => dep.name));
+		const observers = unique(getObservers(this).map(dep => dep.name));
 		const runReason = (
 			this.isComputing
 				? isTracking

@@ -2,65 +2,14 @@ import {IDerivation} from "./derivation";
 import {globalState} from "./globalstate";
 import {invariant} from "../utils/utils";
 
-export class DerivationsSets {
-	list: IDerivation[] = [];
-	toDelete: IDerivation[] = [];
-
-	get length() {
-		return this.list.length - this.toDelete.length;
-	}
-
-	clearDeleted() {
-		const toDelete = this.toDelete;
-		if (toDelete.length !== 0) {
-			const list = this.list;
-			for (let i = 0; i < toDelete.length; i++) {
-				toDelete[i].diffValue++;
-			}
-
-			let i0 = 0;
-			for (let i = 0; i < list.length; i++) {
-				if (list[i].diffValue === 0) {
-					if (i !== i0) list[i0] = list[i];
-					i0++;
-				} else {
-					list[i].diffValue--;
-				}
-			}
-
-			// invariant(toDelete.every(a => a.diffValue === 0), "INTERNAL ERROR, clear deleted should leave diffValue everywhere 0");
-			this.toDelete = [];
-			list.length = i0;
-		}
-	}
-
-	asArray() {
-		this.clearDeleted();
-		return this.list;
-	}
-
-	add(value: IDerivation) {
-		// invariant(value.dependenciesState !== -1, "INTERNAL ERROR, can add only dependenciesState !== -1");
-		this.list.push(value);
-	}
-
-	remove(value: IDerivation) {
-		// invariant(globalState.inBatch > 0, "INTERNAL ERROR, remove should be called only inside batch");
-		if (this.toDelete.length === 0) {
-			globalState.pendingDeletions.push(this);
-		}
-		this.toDelete.push(value);
-	}
-	// move(targetState: number, value: IDerivation) {
-	// 	const m = value.__mapid;
-	// 	delete this["data" + value.dependenciesState][m];
-	// 	this["data" + targetState][m] = value;
-	// }
+export interface LegacyObservers {
+	asArray(): IDerivation[];
+	length: number;
 }
 
 export interface IDepTreeNode {
 	name: string;
-	observers?: DerivationsSets;
+	observers?: LegacyObservers;
 	observing?: IObservable[];
 }
 
@@ -73,26 +22,85 @@ export interface IObservable extends IDepTreeNode {
 	 */
 	lastAccessedBy: number;
 
-	lowestObserverState: number;
+	lowestObserverState: number; // to not repeat same propagations, see `invariantLOS`
 	isPendingUnobservation: boolean; // for effective unobserving
 	isObserved: boolean; // for unobserving only once ber observation
 	// sets of observers grouped their state to only notify about changes.
-	observers: DerivationsSets;
+	observers: LegacyObservers;
+	_observers: IDerivation[]; // a is observer if it occurs in _observers one time more than in _observersToDelete
+	_observersToDelete: IDerivation[]; // must be empty when nothing is running
 
 	onBecomeUnobserved();
 }
 
+export function legacyObservers(observable: IObservable): LegacyObservers {
+	return {
+		get length() {
+			return observable._observers.length - observable._observersToDelete.length;
+		},
+		asArray() {
+			return getObservers(observable);
+		}
+	};
+}
+
+export function isObjectObservable(arg: any): arg is IObservable {
+	return arg ? arg.lastAccessedBy !== undefined : false;
+}
+
+export function hasObservers(observable: IObservable): boolean {
+	return observable._observers.length - observable._observersToDelete.length > 0;
+}
+
+// the trick is to only clear deleted elements when observers will be read whole anyway or when batch ends
+function clearDeletedObservers(observable: IObservable) {
+	const _observersToDelete = observable._observersToDelete;
+	if (_observersToDelete.length !== 0) {
+		const _observers = observable._observers;
+		for (let i = 0; i < _observersToDelete.length; i++) {
+			_observersToDelete[i].diffValue++;
+		}
+
+		let i0 = 0;
+		for (let i = 0; i < _observers.length; i++) {
+			if (_observers[i].diffValue === 0) {
+				if (i !== i0) _observers[i0] = _observers[i];
+				i0++;
+			} else {
+				_observers[i].diffValue--;
+			}
+		}
+
+		// invariant(_observersToDelete.every(a => a.diffValue === 0), "INTERNAL ERROR, clear deleted should leave diffValue everywhere 0");
+		observable._observersToDelete = [];
+		_observers.length = i0;
+	}
+}
+
+export function getObservers(observable: IObservable): IDerivation[] {
+	clearDeletedObservers(observable);
+	return observable._observers;
+}
+
 export function addObserver(observable: IObservable, node: IDerivation) {
-	observable.observers.add(node);
-	observable.lowestObserverState = Math.min(observable.lowestObserverState, node.dependenciesState);
+	// invariant(node.dependenciesState !== -1, "INTERNAL ERROR, can add only dependenciesState !== -1");
+	observable._observers.push(node);
+
+	// observable.lowestObserverState = Math.min(observable.lowestObserverState, node.dependenciesState);
+	if (observable.lowestObserverState > node.dependenciesState) observable.lowestObserverState = node.dependenciesState;
 	if (!observable.isObserved) {
 		observable.isObserved = true;
 	}
 }
 
 export function removeObserver(observable: IObservable, node: IDerivation) {
-	observable.observers.remove(node);
-	if (observable.isObserved && observable.observers.length === 0) {
+	// invariant(globalState.inBatch > 0, "INTERNAL ERROR, remove should be called only inside batch");
+	if (observable._observersToDelete.length === 0) {
+		globalState.pendingDeletions.push(observable);
+	}
+	observable._observersToDelete.push(node);
+
+	if (observable.isObserved && !hasObservers(observable)) {
 		if (globalState.inBatch > 0) {
 			/**
 			 * Wan't to observe/unobserve max once per observable during batch.
@@ -119,12 +127,12 @@ export function endBatch() {
 		while (globalState.pendingUnobservations.length > 0) {
 			globalState.pendingUnobservations.splice(0).forEach(observable => {
 				observable.isPendingUnobservation = false;
-				if (observable.isObserved && observable.observers.length === 0) {
+				if (observable.isObserved && !hasObservers(observable)) {
 					observable.isObserved = false;
 					observable.onBecomeUnobserved(); // TODO: test if this happens only once, e.g. remove returns bool!
 				}
 			});
-			globalState.pendingDeletions.splice(0).forEach(d => d.clearDeleted());
+			globalState.pendingDeletions.splice(0).forEach(clearDeletedObservers);
 		}
 		globalState.inBatch = 0;
 	}
@@ -157,9 +165,8 @@ export function reportObserved(observable: IObservable) {
 }
 
 function invariantLOS(observable: IObservable, msg) {
-	console.log("check invariantLOS for", msg);
-	const min = observable.observers.asArray().reduce((a, b) => Math.min(a, b.dependenciesState), 2);
-	if (min >= observable.lowestObserverState) return;
+	const min = getObservers(observable).reduce((a, b) => Math.min(a, b.dependenciesState), 2);
+	if (min >= observable.lowestObserverState) return; // <- the only assumption about `lowestObserverState`
 	throw new Error("lowestObserverState is wrong for " + msg + " because " + min  + " < " + observable.lowestObserverState);
 }
 
@@ -168,7 +175,7 @@ export function propagateChanged(observable: IObservable) {
 	if (observable.lowestObserverState === 2) return;
 	observable.lowestObserverState = 2;
 
-	const observers = observable.observers.asArray();
+	const observers = getObservers(observable);
 	for (let i = 0; i < observers.length; i++) {
 		const d = observers[i];
 		if (d.dependenciesState === 0) {
@@ -184,7 +191,7 @@ export function propagateChangeConfirmed(observable: IObservable) {
 	if (observable.lowestObserverState === 2) return;
 	observable.lowestObserverState = 2;
 
-	const observers = observable.observers.asArray();
+	const observers = getObservers(observable);
 	for (let i = 0; i < observers.length; i++) {
 		const d = observers[i];
 		if (d.dependenciesState === 1) {
@@ -201,7 +208,7 @@ export function propagateMaybeChanged(observable: IObservable) {
 	if (observable.lowestObserverState !== 0) return;
 	observable.lowestObserverState = 1;
 
-	const observers = observable.observers.asArray();
+	const observers = getObservers(observable);
 	for (let i = 0; i < observers.length; i++) {
 		const d = observers[i];
 		if (d.dependenciesState === 0) {

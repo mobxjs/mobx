@@ -11,7 +11,8 @@ export interface IAtom extends IObservable {
 export class BaseAtom implements IAtom {
 	isPendingUnobservation: boolean; // for effective unobserving
 	isObserved = false;
-	observers = new DerivationsSets();
+	_observers = [];
+	_observersToDelete = [];
 
 	diffValue = 0;
 	lastAccessedBy = 0;
@@ -26,6 +27,9 @@ export class BaseAtom implements IAtom {
 		// noop
 	}
 
+	get observers() {
+		return legacyObservers(this);
+	}
 	/**
 	 * Invoke this method to notify mobx that your atom has been used somehow.
 	 */
@@ -75,6 +79,6 @@ export class Atom extends BaseAtom implements IAtom {
 }
 
 import {globalState} from "./globalstate";
-import {IObservable, propagateChanged, reportObserved, DerivationsSets} from "./observable";
+import {IObservable, propagateChanged, reportObserved, legacyObservers} from "./observable";
 import {transactionStart, transactionEnd} from "../core/transaction";
 import {noop, getNextId} from "../utils/utils";
