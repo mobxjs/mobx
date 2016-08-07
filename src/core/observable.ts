@@ -129,7 +129,7 @@ export function startBatch() {
 export function endBatch() {
 	if (--globalState.inBatch === 0) {
 		globalState.inBatch = 1;
-		while (globalState.pendingUnobservations.length > 0) {
+		while (globalState.pendingUnobservations.length > 0 || globalState.pendingDeletions.length > 0) {
 			globalState.pendingUnobservations.splice(0).forEach(observable => {
 				observable.isPendingUnobservation = false;
 				if (observable.isObserved && !hasObservers(observable)) {
