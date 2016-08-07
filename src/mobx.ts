@@ -20,7 +20,7 @@ import {registerGlobals} from "./core/globalstate";
 registerGlobals();
 
 export { IAtom, Atom, BaseAtom                                } from "./core/atom";
-export { IObservable, IDepTreeNode, LegacyObservers           } from "./core/observable";
+export { IObservable, IDepTreeNode, ILegacyObservers           } from "./core/observable";
 export { Reaction, IReactionPublic                            } from "./core/reaction";
 export { IDerivation, untracked                               } from "./core/derivation";
 export { action, useStrict, isAction, runInAction             } from "./core/action";

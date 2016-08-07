@@ -2,14 +2,14 @@ import {IDerivation} from "./derivation";
 import {globalState} from "./globalstate";
 import {invariant} from "../utils/utils";
 
-export interface LegacyObservers {
+export interface ILegacyObservers {
 	asArray(): IDerivation[];
 	length: number;
 }
 
 export interface IDepTreeNode {
 	name: string;
-	observers?: LegacyObservers;
+	observers?: ILegacyObservers;
 	observing?: IObservable[];
 }
 
@@ -26,14 +26,14 @@ export interface IObservable extends IDepTreeNode {
 	isPendingUnobservation: boolean; // for effective unobserving
 	isObserved: boolean; // for unobserving only once ber observation
 	// sets of observers grouped their state to only notify about changes.
-	observers: LegacyObservers;
+	observers: ILegacyObservers;
 	_observers: IDerivation[]; // a is observer if it occurs in _observers one time more than in _observersToDelete
 	_observersToDelete: IDerivation[]; // must be empty when nothing is running
 
 	onBecomeUnobserved();
 }
 
-export function legacyObservers(observable: IObservable): LegacyObservers {
+export function legacyObservers(observable: IObservable): ILegacyObservers {
 	return {
 		get length() {
 			return observable._observers.length - observable._observersToDelete.length;
