@@ -3,7 +3,6 @@ import {globalState} from "./globalstate";
 import {invariant} from "../utils/utils";
 
 export class DerivationsSets {
-	size: number = 0;
 	list: IDerivation[] = [];
 	toDelete: IDerivation[] = [];
 
@@ -182,10 +181,7 @@ export function propagateChanged(observable: IObservable) {
 
 export function propagateChangeConfirmed(observable: IObservable) {
 	// invariantLOS(observable, "confirmed start");
-	if (observable.lowestObserverState === 2) {
-		invariant(observable.observers.asArray().every(a => a.dependenciesState === 2), "lowestObserverState works in propagateChangeConfirmed");
-		return;
-	}
+	if (observable.lowestObserverState === 2) return;
 	observable.lowestObserverState = 2;
 
 	const observers = observable.observers.asArray();
@@ -202,13 +198,7 @@ export function propagateChangeConfirmed(observable: IObservable) {
 
 export function propagateMaybeChanged(observable: IObservable) {
 	// invariantLOS(observable, "maybe start");
-	if (observable.lowestObserverState !== 0) {
-		if (!observable.observers.asArray().every(a => a.dependenciesState !== 0)) {
-			console.log(observable.lowestObserverState, observable.name, observable.observers.asArray().map(a => a.name));
-		}
-		invariant(observable.observers.asArray().every(a => a.dependenciesState !== 0), "lowestObserverState works in propagateMaybeChanged");
-		return;
-	}
+	if (observable.lowestObserverState !== 0) return;
 	observable.lowestObserverState = 1;
 
 	const observers = observable.observers.asArray();

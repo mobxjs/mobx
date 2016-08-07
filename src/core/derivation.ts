@@ -34,17 +34,19 @@ export interface IDerivation extends IDepTreeNode {
 	recoverFromError();
 }
 
-export function shouldCompute(derivation: IDerivation, onError?): boolean {
+export function shouldCompute(derivation: IDerivation): boolean {
 	const dependenciesState = derivation.dependenciesState;
 	if (dependenciesState === 0) return false;
 	if (dependenciesState === -1 || dependenciesState === 2) return true;
-	// derivation.dependencyChange === 1
+	// if derivation.dependenciesState === 1 we want it to identify itself as 0 or 2 to give accurate answer.
 	let hasError = true;
 	try {
 		for (let i = 0; i < derivation.observing.length; i++) {
 			const obj = derivation.observing[i];
 			if (obj instanceof ComputedValue) {
 				obj.get();
+				// if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
+				// and `derivation` is an observer of `obj`
 				if (derivation.dependenciesState === 2) return true;
 			}
 		}
@@ -78,7 +80,7 @@ export function checkIfStateModificationsAreAllowed() {
 export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	// pre allocate array allocation + room for variation in deps
 	// array will be trimmed by bindDependencies
-	let prevDependenciesState = derivation.dependenciesState
+	let prevDependenciesState = derivation.dependenciesState;
 	if (prevDependenciesState !== 0) {
 		changeDependenciesState(0, derivation);
 	}
