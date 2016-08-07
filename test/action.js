@@ -164,8 +164,8 @@ test('should be possible to create autorun in ation', t => {
 		3,
 		5,
 		20,
-		26,
 		41,
+		26,
 		28
 	]);
 	t.end();

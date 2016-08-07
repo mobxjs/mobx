@@ -41,8 +41,9 @@ export function shouldCompute(derivation: IDerivation): boolean {
 	// if derivation.dependenciesState === 1 we want it to identify itself as 0 or 2 to give accurate answer.
 	let hasError = true;
 	try {
-		for (let i = 0; i < derivation.observing.length; i++) {
-			const obj = derivation.observing[i];
+		const obs = derivation.observing, l = obs.length;
+		for (let i = 0; i < l; i++) {
+			const obj = obs[i];
 			if (obj instanceof ComputedValue) {
 				obj.get();
 				// if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
@@ -53,7 +54,7 @@ export function shouldCompute(derivation: IDerivation): boolean {
 		hasError = false;
 		changeDependenciesState(0, derivation);
 		return false;
-	} finally {
+	} finally { // needed to gracefully recover from errors
 		changeDependenciesState(0, derivation);
 	}
 }
@@ -135,15 +136,12 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 
 function bindDependencies(derivation: IDerivation) {
 	invariant(derivation.dependenciesState !== -1, "INTERNAL ERROR bindDependencies expects derivation.dependenciesState !== -1");
-
+	// derivation.observing should always have unique elements outside bindDependencies
 	const prevObserving = derivation.observing;
-	const prevLength = prevObserving.length;
 	// trim and determina new observing length
 	const observing = derivation.observing = derivation.newObserving;
-	const observingLength = observing.length = derivation.unboundDepsCount;
 
 	// derivation.observing should be unique to avoid weird corner cases
-	const uniqueObserving = derivation.observing = [];
 	derivation.newObserving = null; // <- newObserving shouldn't be outside tracking
 
 	// Idea of this algorithm is start with marking all observables in observing and prevObserving with weight 0
@@ -153,25 +151,30 @@ function bindDependencies(derivation: IDerivation) {
 
 	// This process is optimized by making sure deps are always left 'clean', with value 0, so that they don't need to be reset at the start of this process
 	// after that, all prevObserving items are marked with -1 directly, instead of 0 and doing -- after that
-	for (let i = 0; i < observingLength; i++) {
+	let i0 = 0, l = derivation.unboundDepsCount;
+	for (let i = 0; i < l; i++) {
+		// console.log(i, l, observing.length, observing);
 		const dep = observing[i];
 		if (dep.diffValue === 0) {
-			dep.diffValue++;
-			uniqueObserving.push(dep);
+			dep.diffValue = 1;
+			if (i0 !== i) observing[i0] = dep;
+			i0++;
 		}
 	}
+	observing.length = i0;
 
 	// further the -1 and removeObserver can be done in one go.
-	for (let i = 0; i < prevLength; i++) {
+	l = prevObserving.length;
+	for (let i = 0; i < l; i++) {
 		const dep = prevObserving[i];
-		if (--prevObserving[i].diffValue === -1) {
-			dep.diffValue = 0; // this also short circuits add if a dep is multiple times in the observing list
+		if (--dep.diffValue === -1) {
+			dep.diffValue = 0;
 			removeObserver(dep, derivation);
 		}
 	}
 
-	for (let i = 0; i < uniqueObserving.length; i++) {
-		const dep = uniqueObserving[i];
+	for (let i = 0; i < i0; i++) {
+		const dep = observing[i];
 		if (dep.diffValue > 0) {
 			dep.diffValue = 0; // this also short circuits add if a dep is multiple times in the observing list
 			addObserver(dep, derivation);
@@ -181,14 +184,12 @@ function bindDependencies(derivation: IDerivation) {
 
 export function clearObserving(derivation: IDerivation) {
 	invariant(globalState.inBatch > 0, "INTERNAL ERROR clearObserving should be called only inside batch");
-	startBatch();
 	const obs = derivation.observing;
-	const l = obs.length;
-	for (let i = 0; i < l; i++)
+	let i = obs.length;
+	while (i--)
 		removeObserver(obs[i], derivation);
 	derivation.dependenciesState = -1;
 	obs.length = 0;
-	endBatch();
 }
 
 export function untracked<T>(action: () => T): T {
@@ -214,7 +215,7 @@ export function changeDependenciesState(targetState, derivation: IDerivation) {
 	derivation.dependenciesState = 0;
 
 	const obs = derivation.observing;
-	for (let i = 0; i < obs.length; i++) {
+	let i = obs.length;
+	while (i--)
 		obs[i].lowestObserverState = 0;
-	}
 }

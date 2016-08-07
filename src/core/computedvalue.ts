@@ -23,7 +23,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
 	dependenciesState = -1;
 	observing = [];       // nodes we are looking at. Our value depends on these nodes
-	newObserving = null; // during tracking it's array with new observed observers
+	newObserving = null; // during tracking it's an array with new observed observers
 
 	isPendingUnobservation: boolean; // for effective unobserving
 	isObserved = false;
@@ -147,14 +147,10 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		const observers = unique(getObservers(this).map(dep => dep.name));
 		const runReason = (
 			this.isComputing
-				? isTracking
-					? observers.length > 0 // this computation already had observers
-							? RunReason.INVALIDATED
-							: RunReason.REQUIRED
-					: RunReason.PEEK
+				? RunReason.GET
 				: RunReason.NOT_RUNNING
 		);
-		if (runReason === RunReason.REQUIRED) {
+		if (runReason === RunReason.GET) {
 			const requiredBy = globalState.derivationStack[globalState.derivationStack.length - 2];
 			if (requiredBy)
 				observers.push(requiredBy.name);
@@ -186,11 +182,9 @@ WhyRun? computation '${this.name}':
 	}
 }
 
-export enum RunReason { PEEK, INVALIDATED, REQUIRED, NOT_RUNNING }
+export enum RunReason { GET, NOT_RUNNING }
 
 export const runReasonTexts = {
-	[RunReason.PEEK]: "[peek] The value of this computed value was requested outside an reaction",
-	[RunReason.INVALIDATED]: "[invalidated] Some observables used by this computation did change",
-	[RunReason.REQUIRED]: "[started] This computation is required by another computed value / reaction",
+	[RunReason.GET]: "[get] The value of this computed value was requested",
 	[RunReason.NOT_RUNNING]: "[idle] This compution is currently not running"
 };
