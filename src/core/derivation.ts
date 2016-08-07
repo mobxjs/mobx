@@ -2,14 +2,14 @@ import {IObservable, IDepTreeNode, addObserver, removeObserver} from "./observab
 import {globalState, resetGlobalState} from "./globalstate";
 import {invariant} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "./spy";
-import {ISetEntry} from "../utils/set";
 import {ComputedValue} from "./computedvalue";
+import {startBatch, endBatch} from "./observable";
 
 /**
  * A derivation is everything that can be derived from the state (all the atoms) in a pure manner.
  * See https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.xvbh6qd74
  */
-export interface IDerivation extends IDepTreeNode, ISetEntry {
+export interface IDerivation extends IDepTreeNode {
 	observing: IObservable[];
 	newObserving: IObservable[];
 	/**
@@ -29,6 +29,7 @@ export interface IDerivation extends IDepTreeNode, ISetEntry {
 	 * amount of dependencies used by the derivation in this run, which has not been bound yet.
 	 */
 	unboundDepsCount: number;
+	diffValue: number;
 	onBecomeStale();
 	recoverFromError();
 }
@@ -131,6 +132,8 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 }
 
 function bindDependencies(derivation: IDerivation) {
+	invariant(derivation.dependenciesState !== -1, "INTERNAL ERROR bindDependencies expects derivation.dependenciesState !== -1");
+
 	const prevObserving = derivation.observing;
 	const prevLength = prevObserving.length;
 	// trim and determina new observing length
@@ -150,7 +153,8 @@ function bindDependencies(derivation: IDerivation) {
 	// after that, all prevObserving items are marked with -1 directly, instead of 0 and doing -- after that
 	for (let i = 0; i < observingLength; i++) {
 		const dep = observing[i];
-		if ((++dep.diffValue) === 1) {
+		if (dep.diffValue === 0) {
+			dep.diffValue++;
 			uniqueObserving.push(dep);
 		}
 	}
@@ -174,12 +178,15 @@ function bindDependencies(derivation: IDerivation) {
 }
 
 export function clearObserving(derivation: IDerivation) {
+	invariant(globalState.inBatch > 0, "INTERNAL ERROR clearObserving should be called only inside batch");
+	startBatch();
 	const obs = derivation.observing;
 	const l = obs.length;
 	for (let i = 0; i < l; i++)
 		removeObserver(obs[i], derivation);
 	derivation.dependenciesState = -1;
 	obs.length = 0;
+	endBatch();
 }
 
 export function untracked<T>(action: () => T): T {
@@ -200,55 +207,12 @@ export function untrackedEnd(prev: boolean) {
 }
 
 export function changeDependenciesState(targetState, derivation: IDerivation) {
-	const oldState = derivation.dependenciesState;
-	if (oldState === targetState) return;
-	derivation.dependenciesState = targetState;
+	invariant(targetState === 0, "INTERNAL ERROR changeDependenciesState now is needed only for changing to state 0");
+	if (derivation.dependenciesState === 0) return;
+	derivation.dependenciesState = 0;
+
 	const obs = derivation.observing;
-	const l = obs.length;
-
-	const m = derivation.__mapid;
-
-	// just because it can be bottleneck
-	if (oldState === 0) {
-		if (targetState === 2)
-			for (let i = 0; i < l; i++) {
-				const o = obs[i];
-				delete o.observers.data0[m];
-				o.observers.data2[m] = derivation;
-			}
-		else // targetState === 1
-			for (let i = 0; i < l; i++) {
-				const o = obs[i];
-				delete o.observers.data0[m];
-				o.observers.data1[m] = derivation;
-			}
-	}
-	else if (oldState === 1) {
-		if (targetState === 2)
-			for (let i = 0; i < l; i++) {
-				const o = obs[i];
-				delete o.observers.data1[m];
-				o.observers.data2[m] = derivation;
-			}
-		else // targetState === 0
-			for (let i = 0; i < l; i++) {
-				const o = obs[i];
-				delete o.observers.data1[m];
-				o.observers.data0[m] = derivation;
-			}
-	}
-	else { // oldState === 2
-		if (targetState === 0)
-			for (let i = 0; i < l; i++) {
-				const o = obs[i];
-				delete o.observers.data2[m];
-				o.observers.data0[m] = derivation;
-			}
-		else // targetState === 1
-			for (let i = 0; i < l; i++) {
-				const o = obs[i];
-				delete o.observers.data2[m];
-				o.observers.data1[m] = derivation;
-			}
+	for (let i = 0; i < obs.length; i++) {
+		obs[i].lowestObserverState = 0;
 	}
 }

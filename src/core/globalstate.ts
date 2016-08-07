@@ -1,6 +1,6 @@
 import {IDerivation} from "./derivation";
 import {Reaction} from "./reaction";
-import {IObservable} from "./observable";
+import {IObservable, DerivationsSets} from "./observable";
 
 declare const global: any;
 
@@ -51,6 +51,8 @@ export class MobXGlobals {
 	inBatch: number = 0;
 
 	pendingUnobservations: IObservable[] = [];
+
+	pendingDeletions: DerivationsSets[] = [];
 	/**
 	 * List of scheduled, not yet executed, reactions.
 	 */

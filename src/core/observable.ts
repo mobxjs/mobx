@@ -1,47 +1,56 @@
-import {IDerivation, changeDependenciesState} from "./derivation";
+import {IDerivation} from "./derivation";
 import {globalState} from "./globalstate";
+import {invariant} from "../utils/utils";
 
 export class DerivationsSets {
 	size: number = 0;
-	data0 = {};
-	data1 = {};
-	data2 = {};
+	list: IDerivation[] = [];
+	toDelete: IDerivation[] = [];
 
 	get length() {
-		return this.size;
+		return this.list.length - this.toDelete.length;
 	}
+
+	clearDeleted() {
+		const toDelete = this.toDelete;
+		if (toDelete.length !== 0) {
+			const list = this.list;
+			for (let i = 0; i < toDelete.length; i++) {
+				toDelete[i].diffValue++;
+			}
+
+			let i0 = 0;
+			for (let i = 0; i < list.length; i++) {
+				if (list[i].diffValue === 0) {
+					if (i !== i0) list[i0] = list[i];
+					i0++;
+				} else {
+					list[i].diffValue--;
+				}
+			}
+
+			// invariant(toDelete.every(a => a.diffValue === 0), "INTERNAL ERROR, clear deleted should leave diffValue everywhere 0");
+			this.toDelete = [];
+			list.length = i0;
+		}
+	}
+
 	asArray() {
-		const res = new Array(this.size);
-		let i = 0;
-		for (let key in this.data0) {
-			res[i] = this.data0[key];
-			i++;
-		}
-		for (let key in this.data1) {
-			res[i] = this.data1[key];
-			i++;
-		}
-		for (let key in this.data2) {
-			res[i] = this.data2[key];
-			i++;
-		}
-		return res;
+		this.clearDeleted();
+		return this.list;
 	}
+
 	add(value: IDerivation) {
-		const data = this["data" + value.dependenciesState];
-		const m = value.__mapid;
-		if (!(m in data)) {
-			data[m] = value;
-			this.size++;
-		}
+		// invariant(value.dependenciesState !== -1, "INTERNAL ERROR, can add only dependenciesState !== -1");
+		this.list.push(value);
 	}
+
 	remove(value: IDerivation) {
-		const data = this["data" + value.dependenciesState];
-		const m = value.__mapid;
-		if (m in data) {
-			delete data[m];
-			this.size--;
+		// invariant(globalState.inBatch > 0, "INTERNAL ERROR, remove should be called only inside batch");
+		if (this.toDelete.length === 0) {
+			globalState.pendingDeletions.push(this);
 		}
+		this.toDelete.push(value);
 	}
 	// move(targetState: number, value: IDerivation) {
 	// 	const m = value.__mapid;
@@ -65,6 +74,7 @@ export interface IObservable extends IDepTreeNode {
 	 */
 	lastAccessedBy: number;
 
+	lowestObserverState: number;
 	isPendingUnobservation: boolean; // for effective unobserving
 	isObserved: boolean; // for unobserving only once ber observation
 	// sets of observers grouped their state to only notify about changes.
@@ -75,6 +85,7 @@ export interface IObservable extends IDepTreeNode {
 
 export function addObserver(observable: IObservable, node: IDerivation) {
 	observable.observers.add(node);
+	observable.lowestObserverState = Math.min(observable.lowestObserverState, node.dependenciesState);
 	if (!observable.isObserved) {
 		observable.isObserved = true;
 	}
@@ -105,13 +116,18 @@ export function startBatch() {
 
 export function endBatch() {
 	if (--globalState.inBatch === 0) {
-		globalState.pendingUnobservations.splice(0).forEach(observable => {
-			observable.isPendingUnobservation = false;
-			if (observable.isObserved && observable.observers.length === 0) {
-				observable.isObserved = false;
-				observable.onBecomeUnobserved(); // TODO: test if this happens only once, e.g. remove returns bool!
-			}
-		});
+		globalState.inBatch = 1;
+		while (globalState.pendingUnobservations.length > 0) {
+			globalState.pendingUnobservations.splice(0).forEach(observable => {
+				observable.isPendingUnobservation = false;
+				if (observable.isObserved && observable.observers.length === 0) {
+					observable.isObserved = false;
+					observable.onBecomeUnobserved(); // TODO: test if this happens only once, e.g. remove returns bool!
+				}
+			});
+			globalState.pendingDeletions.splice(0).forEach(d => d.clearDeleted());
+		}
+		globalState.inBatch = 0;
 	}
 }
 
@@ -141,38 +157,67 @@ export function reportObserved(observable: IObservable) {
 	}
 }
 
+function invariantLOS(observable: IObservable, msg) {
+	console.log("check invariantLOS for", msg);
+	const min = observable.observers.asArray().reduce((a, b) => Math.min(a, b.dependenciesState), 2);
+	if (min >= observable.lowestObserverState) return;
+	throw new Error("lowestObserverState is wrong for " + msg + " because " + min  + " < " + observable.lowestObserverState);
+}
+
 export function propagateChanged(observable: IObservable) {
-	const observers0 = observable.observers.data0;
-	for (let key in observers0) {
-		const derivation = observers0[key];
+	// invariantLOS(observable, "changed start");
+	if (observable.lowestObserverState === 2) return;
+	observable.lowestObserverState = 2;
 
-		changeDependenciesState(2, derivation);
-		derivation.onBecomeStale();
+	const observers = observable.observers.asArray();
+	for (let i = 0; i < observers.length; i++) {
+		const d = observers[i];
+		if (d.dependenciesState === 0) {
+			d.onBecomeStale();
+		}
+		d.dependenciesState = 2;
 	}
-
-	const observers1 = observable.observers.data1;
-	for (let key in observers1) {
-		const derivation = observers1[key];
-
-		changeDependenciesState(2, derivation);
-	}
+	// invariantLOS(observable, "changed end");
 }
 
 export function propagateChangeConfirmed(observable: IObservable) {
-	const observers1 = observable.observers.data1;
-	for (let key in observers1) {
-		const derivation = observers1[key];
-
-		changeDependenciesState(2, derivation);
+	// invariantLOS(observable, "confirmed start");
+	if (observable.lowestObserverState === 2) {
+		invariant(observable.observers.asArray().every(a => a.dependenciesState === 2), "lowestObserverState works in propagateChangeConfirmed");
+		return;
 	}
+	observable.lowestObserverState = 2;
+
+	const observers = observable.observers.asArray();
+	for (let i = 0; i < observers.length; i++) {
+		const d = observers[i];
+		if (d.dependenciesState === 1) {
+			d.dependenciesState = 2;
+		} else if (d.dependenciesState === 0) {
+			observable.lowestObserverState = 0;
+		}
+	}
+	// invariantLOS(observable, "confirmed end");
 }
 
 export function propagateMaybeChanged(observable: IObservable) {
-	const observers0 = observable.observers.data0;
-	for (let key in observers0) {
-		const derivation = observers0[key];
-
-		changeDependenciesState(1, derivation);
-		derivation.onBecomeStale();
+	// invariantLOS(observable, "maybe start");
+	if (observable.lowestObserverState !== 0) {
+		if (!observable.observers.asArray().every(a => a.dependenciesState !== 0)) {
+			console.log(observable.lowestObserverState, observable.name, observable.observers.asArray().map(a => a.name));
+		}
+		invariant(observable.observers.asArray().every(a => a.dependenciesState !== 0), "lowestObserverState works in propagateMaybeChanged");
+		return;
 	}
+	observable.lowestObserverState = 1;
+
+	const observers = observable.observers.asArray();
+	for (let i = 0; i < observers.length; i++) {
+		const d = observers[i];
+		if (d.dependenciesState === 0) {
+			d.dependenciesState = 1;
+			d.onBecomeStale();
+		}
+	}
+	// invariantLOS(observable, "maybe end");
 }

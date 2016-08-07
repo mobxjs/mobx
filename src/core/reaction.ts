@@ -2,6 +2,8 @@ import {IDerivation, trackDerivedFunction, clearObserving, shouldCompute} from "
 import {globalState} from "./globalstate";
 import {getNextId, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
+import {startBatch, endBatch} from "./observable";
+import {invariant} from "../utils/utils";
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations
@@ -33,7 +35,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 	diffValue = 0;
 	runId = 0;
 	unboundDepsCount = 0;
-	__mapid = "#" + getNextId();   // use strings for map distribution, just nrs will result in accidental sparse arrays...
+	__mapid = "#" + getNextId();   // use strings for map distribution, just nrs will result in accidental sparse arrays... // NOT NEEDED ANYMORE
 	isDisposed = false;
 	_isScheduled = false;
 	_isTrackPending = false;
@@ -49,7 +51,9 @@ export class Reaction implements IDerivation, IReactionPublic {
 		if (!this._isScheduled) {
 			this._isScheduled = true;
 			globalState.pendingReactions.push(this);
+			startBatch();
 			runReactions();
+			endBatch();
 		}
 	}
 
@@ -79,6 +83,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 	}
 
 	track(fn: () => void) {
+		startBatch();
 		const notify = isSpyEnabled();
 		let startTime;
 		if (notify) {
@@ -102,6 +107,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 				time: Date.now() - startTime
 			});
 		}
+		endBatch();
 	}
 
 	recoverFromError() {
@@ -112,8 +118,11 @@ export class Reaction implements IDerivation, IReactionPublic {
 	dispose() {
 		if (!this.isDisposed) {
 			this.isDisposed = true;
-			if (!this._isRunning)
+			if (!this._isRunning) {
+				startBatch();
 				clearObserving(this); // if disposed while running, clean up later. Maybe not optimal, but rare case
+				endBatch();
+			}
 		}
 	}
 
@@ -126,7 +135,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 	toString() {
 		return `Reaction[${this.name}]`;
 	}
-
+	// TODO  change whyRun messages to be adequate to new system???
 	whyRun() {
 		const observing = unique(this.observing).map(dep => dep.name);
 
@@ -152,6 +161,7 @@ WhyRun? reaction '${this.name}':
 const MAX_REACTION_ITERATIONS = 100;
 
 export function runReactions() {
+	invariant(globalState.inBatch > 0, "INTERNAL ERROR runReactions should be called only inside batch");
 	if (globalState.isRunningReactions === true || globalState.inTransaction > 0)
 		return;
 	globalState.isRunningReactions = true;

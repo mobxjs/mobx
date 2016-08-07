@@ -15,7 +15,7 @@ export class BaseAtom implements IAtom {
 
 	diffValue = 0;
 	lastAccessedBy = 0;
-
+	lowestObserverState = 0;
 	/**
 	 * Create a new atom. For debugging purposes it is recommended to give it a name.
 	 * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.

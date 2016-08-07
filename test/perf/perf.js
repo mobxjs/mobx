@@ -476,6 +476,7 @@ test('sort', t => {
 
 test('computed temporary memoization', t => {
   "use strict";
+  gc()
   var computeds = []
   for(let i = 0; i < 40; i++) {
     computeds.push(mobx.computed(() =>

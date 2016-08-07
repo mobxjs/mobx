@@ -32,8 +32,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	diffValue = 0;
 	runId = 0;
 	lastAccessedBy = 0;
+	lowestObserverState = 0;
 	unboundDepsCount = 0;
-	__mapid = "#" + getNextId();
+	__mapid = "#" + getNextId(); // NOT NEEDED ANYMORE
 	protected value: T = undefined;
 	name: string;
 
@@ -65,7 +66,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	}
 
 	onBecomeUnobserved() {
-		invariant(globalState.inBatch === 0, "computeds should be freed only outside batch");
 		clearObserving(this);
 		this.value = undefined;
 	}
