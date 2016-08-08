@@ -12,7 +12,7 @@ export class BaseAtom implements IAtom {
 	isPendingUnobservation: boolean; // for effective unobserving
 	isObserved = false;
 	_observers = [];
-	_observersToDelete = [];
+	_observersIndexes = {};
 
 	diffValue = 0;
 	lastAccessedBy = 0;
@@ -64,7 +64,7 @@ export class Atom extends BaseAtom implements IAtom {
 
 	public reportObserved(): boolean {
 		super.reportObserved();
-		const tracking = globalState.isTracking;
+		const tracking = globalState.trackingDerivation !== null;
 		if (tracking && !this.isBeingTracked) {
 			this.isBeingTracked = true;
 			this.onBecomeObservedHandler();

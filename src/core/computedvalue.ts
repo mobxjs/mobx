@@ -28,13 +28,13 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	isPendingUnobservation: boolean; // for effective unobserving
 	isObserved = false;
 	_observers = [];
-	_observersToDelete = [];
-
+	_observersIndexes = {};
 	diffValue = 0;
 	runId = 0;
 	lastAccessedBy = 0;
 	lowestObserverState = 0;
 	unboundDepsCount = 0;
+	__mapid = "#" + getNextId();
 	protected value: T = undefined;
 	name: string;
 
@@ -142,7 +142,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
   // TODO  change whyRun messages to be adequate to new system???
 	whyRun() {
-		const isTracking = globalState.derivationStack.length > 0;
+		const isTracking = Boolean(globalState.trackingDerivation);
 		const observing = unique(this.observing).map(dep => dep.name);
 		const observers = unique(getObservers(this).map(dep => dep.name));
 		const runReason = (
@@ -151,7 +151,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 				: RunReason.NOT_RUNNING
 		);
 		if (runReason === RunReason.GET) {
-			const requiredBy = globalState.derivationStack[globalState.derivationStack.length - 2];
+			const requiredBy = globalState.trackingDerivation; // <- this one will always be wrong.
 			if (requiredBy)
 				observers.push(requiredBy.name);
 		}

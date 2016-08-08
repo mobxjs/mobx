@@ -20,7 +20,7 @@ export class MobXGlobals {
 	/**
 	 * Stack of currently running derivations
 	 */
-	derivationStack: IDerivation[] = [];
+	trackingDerivation: IDerivation = null;
 
 	/**
 	 * Each time a derivation is tracked, it is assigned a unique run-id
@@ -38,11 +38,6 @@ export class MobXGlobals {
 	inTransaction = 0;
 
 	/**
-	 * Are we in an (un)tracked block?
-	 */
-	isTracking: boolean = false;
-
-	/**
 	 * Are we currently running reactions?
 	 * Reactions are run after derivations using a trampoline.
 	 */
@@ -51,8 +46,6 @@ export class MobXGlobals {
 	inBatch: number = 0;
 
 	pendingUnobservations: IObservable[] = [];
-
-	pendingDeletions: IObservable[] = [];
 	/**
 	 * List of scheduled, not yet executed, reactions.
 	 */

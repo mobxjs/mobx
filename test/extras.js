@@ -15,14 +15,14 @@ test('treeD', function(t) {
 
 
     var b = m.observable(() => a.get() * a.get());
-    var bName = 'ComputedValue@2';
+    var bName = 'ComputedValue@3';
     t.deepEqual(dtree(b), {
         name: bName
         // no dependencies yet, since it isn't observed yet
     });
 
     var c = m.autorun(() => b.get());
-    var cName = 'Autorun@3';
+    var cName = 'Autorun@4';
     t.deepEqual(dtree(c.$mobx), {
         name: cName,
         dependencies: [{
@@ -55,15 +55,15 @@ test('treeD', function(t) {
     });
 
     t.deepEqual(m.extras.getDependencyTree(d.$mobx), {
-        name: 'Autorun@5',
+        name: 'Autorun@7',
         dependencies: [{
-            name: 'ObservableMap@4.keys()'
+            name: 'ObservableMap@6.keys()'
         }, {
-            name: 'ObservableMap@4.temperature?'
+            name: 'ObservableMap@6.temperature?'
         }, {
-            name: 'ObservableMap@4.temperature'
+            name: 'ObservableMap@6.temperature'
         }, {
-            name: 'ObservableMap@4.absent?'
+            name: 'ObservableMap@6.absent?'
         }]
     });
 
@@ -118,8 +118,8 @@ test('names', function(t) {
 	}
 
 	var task = new Task();
-	t.equal(task.$mobx.name, "Task@4");
-	t.equal(task.$mobx.values.title.name, "Task@4.title");
+	t.equal(task.$mobx.name, "Task@8");
+	t.equal(task.$mobx.values.title.name, "Task@8.title");
 
     t.end();
 })
@@ -292,11 +292,11 @@ test('get debug name', function(t) {
 	t.equal(name(d), "ObservableArray@4");
 	t.throws(() => name(d, 0), /It is not possible to get index atoms from arrays/, "expected throw");
 
-	t.equal(name(e), "ComputedValue@5");
-	t.equal(name(f), "Autorun@6");
+	t.equal(name(e), "ComputedValue@6");
+	t.equal(name(f), "Autorun@7");
 
-	t.equal(name(g), "Clazz@7");
-	t.equal(name(g, "a"), "Clazz@7.a");
+	t.equal(name(g), "Clazz@9");
+	t.equal(name(g, "a"), "Clazz@9.a");
 
 	f();
 	t.end();

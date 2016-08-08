@@ -29,6 +29,7 @@ export interface IDerivation extends IDepTreeNode {
 	 * amount of dependencies used by the derivation in this run, which has not been bound yet.
 	 */
 	unboundDepsCount: number;
+	__mapid: string;
 	diffValue: number;
 	onBecomeStale();
 	recoverFromError();
@@ -60,8 +61,7 @@ export function shouldCompute(derivation: IDerivation): boolean {
 }
 
 export function isComputingDerivation() {
-	return globalState.derivationStack.length > 0
-		&& globalState.isTracking; // filter out actions inside computations
+	return globalState.trackingDerivation !== null; // filter out actions inside computations
 }
 
 export function checkIfStateModificationsAreAllowed() {
@@ -88,9 +88,8 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	derivation.newObserving = new Array(derivation.observing.length + 100);
 	derivation.unboundDepsCount = 0;
 	derivation.runId = ++globalState.runId;
-	globalState.derivationStack.push(derivation);
-	const prevTracking = globalState.isTracking;
-	globalState.isTracking = true;
+	const prevTracking = globalState.trackingDerivation;
+	globalState.trackingDerivation = derivation;
 	let hasException = true;
 	let result: T;
 	try {
@@ -126,8 +125,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 			// if (derivation.dependenciesState !== 0) {
 			// 	changeDependenciesState(0, derivation);
 			// }
-			globalState.isTracking = prevTracking;
-			globalState.derivationStack.length -= 1;
+			globalState.trackingDerivation = prevTracking;
 			bindDependencies(derivation);
 		}
 	}
@@ -200,13 +198,13 @@ export function untracked<T>(action: () => T): T {
 }
 
 export function untrackedStart() {
-	const prev = globalState.isTracking;
-	globalState.isTracking = false;
+	const prev = globalState.trackingDerivation;
+	globalState.trackingDerivation = null;
 	return prev;
 }
 
-export function untrackedEnd(prev: boolean) {
-	globalState.isTracking = prev;
+export function untrackedEnd(prev: IDerivation) {
+	globalState.trackingDerivation = prev;
 }
 
 export function changeDependenciesState(targetState, derivation: IDerivation) {

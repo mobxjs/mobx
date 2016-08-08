@@ -83,8 +83,7 @@ export function actionImplementation(actionName: string, fn: Function): Function
 
 function executeWrapped(actionName: string, fn: Function, scope: any, args: IArguments) {
 	// actions should not be called from computeds. check only works if the computed is actively observed, but that is fine enough as heuristic
-	const ds = globalState.derivationStack;
-	invariant(!(ds[ds.length - 1] instanceof ComputedValue), "Computed values or transformers should not invoke actions or trigger other side effects");
+	invariant(!(globalState.trackingDerivation instanceof ComputedValue), "Computed values or transformers should not invoke actions or trigger other side effects");
 
 	const notifySpy = isSpyEnabled();
 	let startTime: number;
@@ -124,7 +123,7 @@ export function useStrict(strict?: boolean): any {
 	if (arguments.length === 0)
 		return globalState.strictMode;
 	else {
-		invariant(globalState.derivationStack.length === 0, "It is not allowed to set `useStrict` when a derivation is running");
+		invariant(globalState.trackingDerivation === null, "It is not allowed to set `useStrict` when a derivation is running");
 		globalState.strictMode = strict;
 		globalState.allowStateChanges = !strict;
 	}
