@@ -27,10 +27,10 @@ export interface IObservable extends IDepTreeNode {
 	isObserved: boolean; // for unobserving only once ber observation
 	// sets of observers grouped their state to only notify about changes.
 	observers: ILegacyObservers;
-	_observers: IDerivation[]; // a is observer if it occurs in _observers one time more than in _observersToDelete
+	_observers: IDerivation[]; // mantain _observers in raw array for for way faster iterating in propagation.
 	_observersIndexes: {}; // must be empty when nothing is running
 
-	onBecomeUnobserved();
+	onBecomeUnobserved?();
 }
 
 export function legacyObservers(observable: IObservable): ILegacyObservers {
@@ -66,15 +66,13 @@ export function addObserver(observable: IObservable, node: IDerivation) {
 
 export function removeObserver(observable: IObservable, node: IDerivation) {
 	// invariant(globalState.inBatch > 0, "INTERNAL ERROR, remove should be called only inside batch");
-
-	const list = observable._observers;
-	const targetLength = list.length - 1;
-	if (targetLength === 0) {
+	// invariant(observable.isObserved, "INTERNAL ERROR, remove should be called only on observed observables");
+	if (observable._observers.length === 1) {
 		// deleting last observer
 		delete observable._observersIndexes[node.__mapid];
-		list.length = 0;
+		observable._observers.length = 0;
 
-		if (observable.isObserved && !observable.isPendingUnobservation) {
+		if (!observable.isPendingUnobservation) {
 			/**
 			 * Wan't to observe/unobserve max once per observable during batch.
 			 * Let's postpone it to end of the batch
@@ -83,13 +81,12 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 			globalState.pendingUnobservations.push(observable);
 		}
 	} else {
+		// deleting from _observersIndexes is straight forward, to delete from _observers, let's swap `node` with last element.
+		const list = observable._observers;
 		const map = observable._observersIndexes;
-		const current_index = map[node.__mapid];
+		const filler = list.pop();
+		list[map[filler.__mapid] = map[node.__mapid]] = filler;
 		delete map[node.__mapid];
-		const filler = list[targetLength];
-		map[filler.__mapid] = current_index;
-		list[current_index] = filler;
-		list.length = targetLength;
 	}
 }
 
@@ -100,15 +97,16 @@ export function startBatch() {
 export function endBatch() {
 	if (--globalState.inBatch === 0) {
 		globalState.inBatch = 1;
-		while (globalState.pendingUnobservations.length > 0) {
-			globalState.pendingUnobservations.splice(0).forEach(observable => {
-				observable.isPendingUnobservation = false;
-				if (observable.isObserved && !hasObservers(observable)) {
-					observable.isObserved = false;
-					observable.onBecomeUnobserved(); // TODO: test if this happens only once, e.g. remove returns bool!
-				}
-			});
+		const list = globalState.pendingUnobservations;
+		for (let i = 0; i < list.length; i++) {
+			const observable = list[i];
+			observable.isPendingUnobservation = false;
+			if (observable.isObserved && observable._observers.length === 0) {
+				observable.isObserved = false;
+				observable.onBecomeUnobserved();
+			}
 		}
+		globalState.pendingUnobservations = [];
 		globalState.inBatch = 0;
 	}
 }
@@ -151,7 +149,7 @@ export function propagateChanged(observable: IObservable) {
 	if (observable.lowestObserverState === 2) return;
 	observable.lowestObserverState = 2;
 
-	const observers = getObservers(observable);
+	const observers = observable._observers;
 	let i = observers.length;
 	while (i--) {
 		const d = observers[i];
@@ -168,7 +166,7 @@ export function propagateChangeConfirmed(observable: IObservable) {
 	if (observable.lowestObserverState === 2) return;
 	observable.lowestObserverState = 2;
 
-	const observers = getObservers(observable);
+	const observers = observable._observers;
 	let i = observers.length;
 	while (i--) {
 		const d = observers[i];
@@ -186,7 +184,7 @@ export function propagateMaybeChanged(observable: IObservable) {
 	if (observable.lowestObserverState !== 0) return;
 	observable.lowestObserverState = 1;
 
-	const observers = getObservers(observable);
+	const observers = observable._observers;
 	let i = observers.length;
 	while (i--) { // using while or for loop influence order of shceduling reactions, but it shuoldn't matter.
 		const d = observers[i];

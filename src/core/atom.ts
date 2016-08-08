@@ -9,7 +9,7 @@ export interface IAtom extends IObservable {
  * 2) they should notify mobx whenever they have _changed_. This way mobx can re-run any functions (derivations) that are using this atom.
  */
 export class BaseAtom implements IAtom {
-	isPendingUnobservation: boolean; // for effective unobserving
+	isPendingUnobservation = true; // for effective unobserving. BaseAtom has true, for extra optimization, so it's onBecomeUnobserved never get's called, because it's not needed
 	isObserved = false;
 	_observers = [];
 	_observersIndexes = {};
@@ -52,6 +52,7 @@ export class BaseAtom implements IAtom {
 }
 
 export class Atom extends BaseAtom implements IAtom {
+	isPendingUnobservation = false; // for effective unobserving.
 	public isBeingTracked = false;
 
 	/**

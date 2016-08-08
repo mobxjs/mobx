@@ -181,11 +181,12 @@ function bindDependencies(derivation: IDerivation) {
 }
 
 export function clearObserving(derivation: IDerivation) {
-	invariant(globalState.inBatch > 0, "INTERNAL ERROR clearObserving should be called only inside batch");
+	// invariant(globalState.inBatch > 0, "INTERNAL ERROR clearObserving should be called only inside batch");
 	const obs = derivation.observing;
 	let i = obs.length;
-	while (i--)
+	while (i--) {
 		removeObserver(obs[i], derivation);
+	}
 	derivation.dependenciesState = -1;
 	obs.length = 0;
 }
