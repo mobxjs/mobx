@@ -43,6 +43,9 @@ export class MobXGlobals {
 	 */
 	isRunningReactions = false;
 
+	/**
+	 * Are we in a batch block? (and how many of them)
+	 */
 	inBatch: number = 0;
 
 	pendingUnobservations: IObservable[] = [];

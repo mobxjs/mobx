@@ -3,7 +3,6 @@ import {globalState, resetGlobalState} from "./globalstate";
 import {invariant} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "./spy";
 import {ComputedValue} from "./computedvalue";
-import {startBatch, endBatch} from "./observable";
 
 /**
  * A derivation is everything that can be derived from the state (all the atoms) in a pure manner.
@@ -30,7 +29,6 @@ export interface IDerivation extends IDepTreeNode {
 	 */
 	unboundDepsCount: number;
 	__mapid: string;
-	diffValue: number;
 	onBecomeStale();
 	recoverFromError();
 }
@@ -165,10 +163,10 @@ function bindDependencies(derivation: IDerivation) {
 	l = prevObserving.length;
 	for (let i = 0; i < l; i++) {
 		const dep = prevObserving[i];
-		if (--dep.diffValue === -1) {
-			dep.diffValue = 0;
+		if (dep.diffValue === 0) {
 			removeObserver(dep, derivation);
 		}
+		dep.diffValue = 0;
 	}
 
 	for (let i = 0; i < i0; i++) {

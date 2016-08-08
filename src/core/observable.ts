@@ -30,7 +30,7 @@ export interface IObservable extends IDepTreeNode {
 	_observers: IDerivation[]; // mantain _observers in raw array for for way faster iterating in propagation.
 	_observersIndexes: {}; // must be empty when nothing is running
 
-	onBecomeUnobserved?();
+	onBecomeUnobserved();
 }
 
 export function legacyObservers(observable: IObservable): ILegacyObservers {
@@ -56,20 +56,46 @@ export function getObservers(observable: IObservable): IDerivation[] {
 	return observable._observers;
 }
 
+function invariantObservers(observable: IObservable) {
+	const list = observable._observers;
+	const map = observable._observersIndexes;
+	const l = list.length;
+	for (let i = 0; i < l; i++) {
+		const id = list[i].__mapid;
+		if (i) {
+			invariant(map[id] === i, "INTERNAL ERROR maps derivation.__mapid to index in list"); // for performance
+		} else {
+			invariant(!(id in map), "INTERNAL ERROR observer on index 0 shouldnt be held in map."); // for performance
+		}
+	}
+	invariant(list.length === 0 || Object.keys(map).length === list.length - 1, "INTERNAL ERROR there is no junk in map");
+}
 export function addObserver(observable: IObservable, node: IDerivation) {
 	// invariant(node.dependenciesState !== -1, "INTERNAL ERROR, can add only dependenciesState !== -1");
 	// invariant(observable.isObserved, "INTERNAL ERROR, isObserved should be already set during reportObserved");
+	// invariant(observable._observers.indexOf(node) === -1, "INTERNAL ERROR add already added node");
+	// invariantObservers(observable);
 
-	observable._observersIndexes[node.__mapid] = observable._observers.push(node) - 1;
+	const l = observable._observers.length;
+	if (l) { // because object assignment is relatively expensive, let's not store data about index 0.
+		observable._observersIndexes[node.__mapid] = l;
+	}
+	observable._observers[l] = node;
+
 	if (observable.lowestObserverState > node.dependenciesState) observable.lowestObserverState = node.dependenciesState;
+
+	// invariantObservers(observable);
+	// invariant(observable._observers.indexOf(node) !== -1 && (node.__mapid in observable._observersIndexes), "INTERNAL ERROR add already added node2");
 }
 
 export function removeObserver(observable: IObservable, node: IDerivation) {
 	// invariant(globalState.inBatch > 0, "INTERNAL ERROR, remove should be called only inside batch");
 	// invariant(observable.isObserved, "INTERNAL ERROR, remove should be called only on observed observables");
+	// invariant(observable._observers.indexOf(node) !== -1, "INTERNAL ERROR remove already removed node");
+	// invariantObservers(observable);
+
 	if (observable._observers.length === 1) {
 		// deleting last observer
-		delete observable._observersIndexes[node.__mapid];
 		observable._observers.length = 0;
 
 		if (!observable.isPendingUnobservation) {
@@ -85,9 +111,20 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 		const list = observable._observers;
 		const map = observable._observersIndexes;
 		const filler = list.pop();
-		list[map[filler.__mapid] = map[node.__mapid]] = filler;
+		if (filler !== node) {
+			const index = map[node.__mapid] || 0;
+			if (index) { // map store all indexes but 0, see comment in `addObserver`
+				map[filler.__mapid] = index;
+			} else {
+				delete map[filler.__mapid];
+			}
+			list[index] = filler;
+		}
 		delete map[node.__mapid];
 	}
+
+	// invariantObservers(observable);
+	// invariant(observable._observers.indexOf(node) === -1, "INTERNAL ERROR remove already removed node2");
 }
 
 export function startBatch() {

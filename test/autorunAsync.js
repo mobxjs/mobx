@@ -10,11 +10,6 @@ test('autorun 1', function(t) {
 	function expect(fired, cCalcs, result) {
 		t.equal(_fired, fired, "autorun fired");
 		t.equal(_cCalcs, cCalcs, "'c' fired");
-		if(_cCalcs !== cCalcs) {
-			console.log('\n')
-			console.trace()
-			console.log('\n')
-		}
 		if (fired)
 			t.equal(_result, result, "result");
 		_fired = 0;
