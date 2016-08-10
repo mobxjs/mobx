@@ -55,7 +55,10 @@ export function joinStrings(things: string[], limit: number = 100, separator = "
 }
 
 export function isPlainObject(value) {
-	return value !== null && typeof value === "object" && Object.getPrototypeOf(value) === Object.prototype;
+	if (value === null || typeof value !== "object")
+		return false;
+	const proto = Object.getPrototypeOf(value);
+	return proto === Object.prototype || proto === null;
 }
 
 export function objectAssign(...objs: Object[]): Object;
