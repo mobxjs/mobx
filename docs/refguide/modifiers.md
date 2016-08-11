@@ -109,7 +109,7 @@ To use the `asStructure` modifier in combination with the `@computed` decorator,
 
 ## asFlat
 
-Similar to `asReference`, except that `asFlat` does not prevent its value to become observable, but only the children of the value.
+Similar to `asReference`, except that `asFlat` does not prevent its value from becoming observable, but only the children of the value.
 It can be used for example to create an observable array or object that should not automatically make its children observable.
 
 ```javascript
