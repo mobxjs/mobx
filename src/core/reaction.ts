@@ -166,7 +166,8 @@ export function runReactions() {
 	// we converge to no remaining reactions after a while.
 	while (allReactions.length > 0) {
 		if (++iterations === MAX_REACTION_ITERATIONS)
-			throw new Error("Reaction doesn't converge to a stable state. Probably there is a cycle in the reactive function: " + allReactions[0].toString());
+			throw new Error(`Reaction doesn't converge to a stable state after ${MAX_REACTION_ITERATIONS} iterations.`
+				+ ` Probably there is a cycle in the reactive function: ${allReactions[0]}`);
 		let remainingReactions = allReactions.splice(0);
 		for (let i = 0, l = remainingReactions.length; i < l; i++)
 			remainingReactions[i].runReaction();
