@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="6.1" data-basepath=".." data-revision="Thu Aug 04 2016 21:45:25 GMT+0200 (CEST)">
+    <div class="book" data-level="6.1" data-basepath=".." data-revision="Fri Aug 12 2016 23:15:16 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -746,6 +746,21 @@
             
         </li>
     
+        <li class="chapter " data-level="8" >
+            
+                
+                    <a target="_blank" href="https:/mobxjs.github.io/mobx/donate.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.</b>
+                        
+                        Donate
+                    </a>
+            
+            
+        </li>
+    
 
 
             
@@ -865,7 +880,9 @@ You can use <code>isObservableArray(observable)</code> to check whether somethin
 So MobX observable objects act as records with predefined keys.
 You can use <code>extendObservable(target, props)</code> to introduce new observable properties to an object.
 However object iterators like <code>for .. in</code> or <code>Object.keys()</code> won&apos;t react to this automatically.
-If you need a dynamically keyed object, for example to store users by id, create observable _map_s using <code>asMap</code>.<br>More info on <a href="https://github.com/mobxjs/mobx/issues/219#issuecomment-220224813" target="_blank">asMap</a>.<br>For more info see <a href="react.html">what will MobX react to?</a>.</p>
+If you need a dynamically keyed object, for example to store users by id, create observable _map_s using <code>asMap</code>.
+More info on <a href="https://github.com/mobxjs/mobx/issues/219#issuecomment-220224813" target="_blank">asMap</a>.
+For more info see <a href="react.html">what will MobX react to?</a>.</p>
 <h3 id="use-observer-on-all-components-that-render-observable-s">Use <code>@observer</code> on all components that render <code>@observable</code>&apos;s.</h3>
 <p><code>@observer</code> only enhances the component you are decorating, not the components used inside it.
 So usually all your components should be decorated. Don&apos;t worry, this is not inefficient, in contrast, more <code>observer</code> components make rendering more efficient.</p>
@@ -885,6 +902,37 @@ Computed values will only track their dependencies if they are observed.
 This allows MobX to automatically suspend computations that are not actively in use.
 See this <a href="https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254" target="_blank">blog</a> or <a href="https://github.com/mobxjs/mobx/issues/356" target="_blank">issue #356</a> for an explanation.
 So if you fiddle arounds, computed properties might not seem efficient. But when applied in a project that uses <code>observer</code>, <code>autorun</code> etc, they become very efficient.</p>
+<p><em>N.B. in a next version of MobX computeds will automatically be kept alive during transactions as well, see PR: #452</em></p>
+<h4 id="always-dispose-reactions">Always dispose reactions</h4>
+<p>all forms of <code>autorun</code>, <code>observe</code> and <code>intercept</code> will only be garbage collected if all objects they observe are garbage collection themselves.
+So it is recommend to use the disposer function that is returned from these methods to stop them when you no longer need them.
+Usually for <code>observe</code> and <code>intercept</code> it is not strictly necessary to dispose them if when targed <code>this</code>.
+For reactions like <code>autorun</code> it is more tricky, as they might observe many different observables, and as long as one of them is still in scope,
+the reaction will remain in scope which means that all other observables it uses are also kept alive to support future recomputions.
+So make sure to always dispose your reactions when you no longer need them!</p>
+<p>Example:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> VAT = observable(<span class="hljs-number">1.20</span>)
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OrderLIne</span> </span>{
+    @observable price = <span class="hljs-number">10</span>;
+    @observable amount = <span class="hljs-number">1</span>;
+    constructor() {
+        <span class="hljs-comment">// this autorun will be GC-ed together with the current orderline instance</span>
+        <span class="hljs-keyword">this</span>.handler = autorun(() =&gt; {
+            doSomethingWith(<span class="hljs-keyword">this</span>.price * <span class="hljs-keyword">this</span>.amount)
+        })
+        <span class="hljs-comment">// this autorun won&apos;t be GC-ed together with the current orderline instance</span>
+        <span class="hljs-comment">// since VAT keeps a reference to notify this autorun,</span>
+        <span class="hljs-comment">// which in turn keeps &apos;this&apos; in scope</span>
+        <span class="hljs-keyword">this</span>.handler = autorun(() =&gt; {
+            doSomethingWith(<span class="hljs-keyword">this</span>.price * <span class="hljs-keyword">this</span>.amount * VAT.get())
+        })
+        <span class="hljs-comment">// So, to avoid subtle memory issues, always call..</span>
+        <span class="hljs-keyword">this</span>.handler()
+        <span class="hljs-comment">// When the reaction is no longer needed!</span>
+    }
+}
+</code></pre>
 <h4 id="i-have-a-weird-exception-when-using-observable-in-a-react-component">I have a weird exception when using <code>@observable</code> in a React component.</h4>
 <p>The following exception: <code>Uncaught TypeError: Cannot assign to read only property &apos;__mobxLazyInitializers&apos; of object</code> occurs when using a <code>react-hot-loader</code> that does not support decorators.
 Either use <code>extendObservable</code> in <code>componentWillMount</code> instead of <code>@observable</code>, or upgrade to <code>react-hot-loader</code> <code>&quot;^3.0.0-beta.2&quot;</code> or higher.</p>
@@ -899,7 +947,7 @@ myComponent.displayName = <span class="hljs-string">&quot;MyComponent&quot;</spa
 <span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> MyComponent = observer(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">MyComponent</span>(<span class="hljs-params">props</span>) </span>{ <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span> })
 
 // 3 (transpiler will infer component name from variable name)
-const _MyComponent = observer((props =&gt; <span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>)</span>) <span class="hljs-comment">// </span>
+const _MyComponent = observer((props =&gt; <span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>)</span>) <span class="hljs-comment">//</span>
 <span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> MyComponent = observer(_MyComponent)
 
 <span class="hljs-comment">// 4 (with default export)</span>
@@ -911,7 +959,7 @@ const _MyComponent = observer((props =&gt; <span class="hljs-tag">&lt;<span clas
 <p>Observable arrays are actually objects, so they comply to <code>propTypes.object</code> instead of <code>array</code>.
 <code>mobx-react</code> will <a href="https://github.com/mobxjs/mobx-react/pull/59" target="_blank">soon</a> provide explicit propTypes for observable data structures.</p>
 <h4 id="declaring-proptypes-might-cause-unnecessary-renders-in-dev-mode">Declaring propTypes might cause unnecessary renders in dev mode</h4>
-<p>See: <a href="https://github.com/mobxjs/mobx-react/issues/56" target="_blank">https://github.com/mobxjs/mobx-react/issues/56</a> </p>
+<p>See: <a href="https://github.com/mobxjs/mobx-react/issues/56" target="_blank">https://github.com/mobxjs/mobx-react/issues/56</a></p>
 <h4 id="-observable-properties-initialize-lazily-when-using-babel"><code>@observable</code> properties initialize lazily when using Babel</h4>
 <p>This issue only occurs when transpiling with Babel and not with Typescript (in which decorator support is more mature).
 Observable properties will not be instantiated upon an instance until the first read / write to a property (at that point they all will be initialized).
@@ -932,7 +980,7 @@ todo.hasOwnProperty(<span class="hljs-string">&quot;done&quot;</span>) <span cla
 <span class="hljs-built_in">Object</span>.keys(todo) <span class="hljs-comment">// [&quot;done&quot;, &quot;title&quot;]</span>
 </code></pre>
 <p>In practice this is rarely an issue, only when using generic methods like <code>Object.assign(target, todo)</code> or <code>assert.deepEquals</code> <em>before</em> reading or writing any property of the object.
-If you want to make sure that this issue doesn&apos;t occur, just initialize the fields in the constructor instead of at the field declaration or use <code>extendObservable</code> to create the observable properties. </p>
+If you want to make sure that this issue doesn&apos;t occur, just initialize the fields in the constructor instead of at the field declaration or use <code>extendObservable</code> to create the observable properties.</p>
 
                     
                     </section>

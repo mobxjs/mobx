@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="6.2" data-basepath=".." data-revision="Thu Aug 04 2016 21:45:25 GMT+0200 (CEST)">
+    <div class="book" data-level="6.2" data-basepath=".." data-revision="Fri Aug 12 2016 23:15:16 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -746,6 +746,21 @@
             
         </li>
     
+        <li class="chapter " data-level="8" >
+            
+                
+                    <a target="_blank" href="https:/mobxjs.github.io/mobx/donate.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>8.</b>
+                        
+                        Donate
+                    </a>
+            
+            
+        </li>
+    
 
 
             
@@ -1067,12 +1082,14 @@ Especially in large applications this is important.</li>
         <span class="hljs-keyword">this</span>.store = store;
         <span class="hljs-keyword">this</span>.id = id;
 
-        <span class="hljs-keyword">this</span>.saveHandler = autorun(() =&gt; {
+        <span class="hljs-keyword">this</span>.saveHandler = reaction(
             <span class="hljs-comment">// observe everything that is used in the JSON:</span>
-            <span class="hljs-keyword">var</span> json = <span class="hljs-keyword">this</span>.asJson;
+            () =&gt; <span class="hljs-keyword">this</span>.asJson,
             <span class="hljs-comment">// if autoSave is on, send json to server</span>
-            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.autoSave) {
-                <span class="hljs-keyword">this</span>.store.transportLayer.saveTodo(json);
+            (json) =&gt; {
+                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.autoSave) {
+                    <span class="hljs-keyword">this</span>.store.transportLayer.saveTodo(json);
+                }
             }
         });
     }
@@ -1100,8 +1117,8 @@ Especially in large applications this is important.</li>
     updateFromJson(json) {
         <span class="hljs-comment">// make sure our changes aren&apos;t send back to the server</span>
         <span class="hljs-keyword">this</span>.autoSave = <span class="hljs-literal">false</span>;
-        todo.completed = json.completed;
-        todo.task = json.task;
+        <span class="hljs-keyword">this</span>.completed = json.completed;
+        <span class="hljs-keyword">this</span>.task = json.task;
         <span class="hljs-keyword">this</span>.author = <span class="hljs-keyword">this</span>.store.authorStore.resolveAuthor(json.authorId);
         <span class="hljs-keyword">this</span>.autoSave = <span class="hljs-literal">true</span>;
     }
