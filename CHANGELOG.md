@@ -1,3 +1,9 @@
+# 2.4.3
+
+* Objects with a `null` prototype are now considered plain objects as well
+* Improved error message for non-converging cyclic reactions
+* Fixed potential HMR issue
+
 # 2.4.2
 
 * Improved error message when wrongly using `@computed`, by @bb (#450)
