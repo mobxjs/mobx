@@ -9,6 +9,10 @@ import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} f
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 
+export interface IObservableObject {
+	"observable-object": IObservableObject;
+}
+
 // In 3.0, change to IObjectDidChange
 export interface IObjectChange {
 	name: string;
@@ -198,11 +202,11 @@ function notifyPropertyAddition(adm, object, name: string, newValue) {
 		spyReportEnd();
 }
 
-export function isObservableObject(thing): boolean {
+export function isObservableObject<T>(thing: T): thing is T & IObservableObject {
 	if (typeof thing === "object" && thing !== null) {
 		// Initializers run lazily when transpiling to babel, so make sure they are run...
 		runLazyInitializers(thing);
-		return thing.$mobx instanceof ObservableObjectAdministration;
+		return (thing as T & {$mobx: any}).$mobx instanceof ObservableObjectAdministration;
 	}
 	return false;
 }
