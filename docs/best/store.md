@@ -225,12 +225,14 @@ export class Todo {
         this.store = store;
         this.id = id;
 
-        this.saveHandler = autorun(() => {
+        this.saveHandler = reaction(
             // observe everything that is used in the JSON:
-            var json = this.asJson;
+            () => this.asJson,
             // if autoSave is on, send json to server
-            if (this.autoSave) {
-                this.store.transportLayer.saveTodo(json);
+            (json) => {
+                if (this.autoSave) {
+                    this.store.transportLayer.saveTodo(json);
+                }
             }
         });
     }
@@ -258,8 +260,8 @@ export class Todo {
     updateFromJson(json) {
         // make sure our changes aren't send back to the server
         this.autoSave = false;
-        todo.completed = json.completed;
-        todo.task = json.task;
+        this.completed = json.completed;
+        this.task = json.task;
         this.author = this.store.authorStore.resolveAuthor(json.authorId);
         this.autoSave = true;
     }

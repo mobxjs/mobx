@@ -46,3 +46,4 @@
   * [transaction](refguide/transaction.md)
   * [untracked](refguide/untracked.md)
   * [when](refguide/when.md)
+* [Donate](/donate.html)

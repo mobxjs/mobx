@@ -13,6 +13,7 @@
 * [Form abstraction in one fiddle](https://jsfiddle.net/darthapo/k63ujjsp/)
 
 * [serializr](https://github.com/mobxjs/serializr) Small library to (de)serialize complex object graphs to JSON
+* [mobx-utils](https://github.com/mobxjs/mobx-utils) Utility belt for MobX with several common patterns, like subscribing to external resources, converting promises etc.
 * [mobx-model](https://github.com/ikido/mobx-model) Simplify mobx data stores that mimic backend models
 * [mobx-store](https://github.com/AriaFallah/mobx-store) A lowdb inspired data store with declarative querying, observable state, and easy undo/redo.
 * [mobx-firebase-store](https://github.com/nyura123/mobx-firebase-store) Subscribe MobX observables to firebase
@@ -23,6 +24,7 @@
 * [Smalldots MobX Store](https://github.com/smalldots/mobx-store) Store API for MobX
 * [mobx-roof](https://github.com/mobx-roof/mobx-roof) Simple, React MVVM framework based on mobx
 * [mobx-translate](https://github.com/tomaash/mobx-translate) Simple translations library for mobx
+* [react-mobx-translatable](https://github.com/infinum/react-mobx-translatable) Make React components translatable using MobX. Can be used both on the server (SSR) and in the browser.
 
 ## ... More
 

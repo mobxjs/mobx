@@ -10,14 +10,14 @@ This can simply be fixed by passing calling `observable.toJS()` or `observable.s
 As long as the external library has no intent to modify the array, this will further work completely as expected.
 You can use `isObservableArray(observable)` to check whether something is an observable array.
 
-#### `object.someNewProp = value` is not picked up 
+#### `object.someNewProp = value` is not picked up
 
 MobX observable _objects_ do not detect or react to property assignments that weren't declared observable before.
 So MobX observable objects act as records with predefined keys.
 You can use `extendObservable(target, props)` to introduce new observable properties to an object.
 However object iterators like `for .. in` or `Object.keys()` won't react to this automatically.
-If you need a dynamically keyed object, for example to store users by id, create observable _map_s using `asMap`.  
-More info on [asMap](https://github.com/mobxjs/mobx/issues/219#issuecomment-220224813).  
+If you need a dynamically keyed object, for example to store users by id, create observable _map_s using `asMap`.
+More info on [asMap](https://github.com/mobxjs/mobx/issues/219#issuecomment-220224813).
 For more info see [what will MobX react to?](react.md).
 
 ### Use `@observer` on all components that render `@observable`'s.
@@ -48,6 +48,44 @@ This allows MobX to automatically suspend computations that are not actively in 
 See this [blog](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254) or [issue #356](https://github.com/mobxjs/mobx/issues/356) for an explanation.
 So if you fiddle arounds, computed properties might not seem efficient. But when applied in a project that uses `observer`, `autorun` etc, they become very efficient.
 
+_N.B. in a next version of MobX computeds will automatically be kept alive during transactions as well, see PR: #452_
+
+#### Always dispose reactions
+
+all forms of `autorun`, `observe` and `intercept` will only be garbage collected if all objects they observe are garbage collection themselves.
+So it is recommend to use the disposer function that is returned from these methods to stop them when you no longer need them.
+Usually for `observe` and `intercept` it is not strictly necessary to dispose them if when targed `this`.
+For reactions like `autorun` it is more tricky, as they might observe many different observables, and as long as one of them is still in scope,
+the reaction will remain in scope which means that all other observables it uses are also kept alive to support future recomputions.
+So make sure to always dispose your reactions when you no longer need them!
+
+Example:
+
+```javascript
+const VAT = observable(1.20)
+
+class OrderLIne {
+    @observable price = 10;
+    @observable amount = 1;
+    constructor() {
+        // this autorun will be GC-ed together with the current orderline instance
+        this.handler = autorun(() => {
+            doSomethingWith(this.price * this.amount)
+        })
+        // this autorun won't be GC-ed together with the current orderline instance
+        // since VAT keeps a reference to notify this autorun,
+        // which in turn keeps 'this' in scope
+        this.handler = autorun(() => {
+            doSomethingWith(this.price * this.amount * VAT.get())
+        })
+        // So, to avoid subtle memory issues, always call..
+        this.handler()
+        // When the reaction is no longer needed!
+    }
+}
+
+```
+
 #### I have a weird exception when using `@observable` in a React component.
 
 The following exception: `Uncaught TypeError: Cannot assign to read only property '__mobxLazyInitializers' of object` occurs when using a `react-hot-loader` that does not support decorators.
@@ -67,7 +105,7 @@ myComponent.displayName = "MyComponent"
 export const MyComponent = observer(function MyComponent(props) { return <div>hi</div> })
 
 // 3 (transpiler will infer component name from variable name)
-const _MyComponent = observer((props => <div>hi</div>)) // 
+const _MyComponent = observer((props => <div>hi</div>)) //
 export const MyComponent = observer(_MyComponent)
 
 // 4 (with default export)
@@ -84,7 +122,7 @@ Observable arrays are actually objects, so they comply to `propTypes.object` ins
 
 #### Declaring propTypes might cause unnecessary renders in dev mode
 
-See: https://github.com/mobxjs/mobx-react/issues/56 
+See: https://github.com/mobxjs/mobx-react/issues/56
 
 #### `@observable` properties initialize lazily when using Babel
 
@@ -107,7 +145,7 @@ console.log(todo.title)
 "done" in todo // true
 todo.hasOwnProperty("done") // true
 Object.keys(todo) // ["done", "title"]
-``` 
+```
 
 In practice this is rarely an issue, only when using generic methods like `Object.assign(target, todo)` or `assert.deepEquals` *before* reading or writing any property of the object.
-If you want to make sure that this issue doesn't occur, just initialize the fields in the constructor instead of at the field declaration or use `extendObservable` to create the observable properties. 
+If you want to make sure that this issue doesn't occur, just initialize the fields in the constructor instead of at the field declaration or use `extendObservable` to create the observable properties.

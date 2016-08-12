@@ -19,3 +19,4 @@
 * [react-routing-mobx-bootstrap-boilerplate](https://github.com/tranqy/react-routing-mobx-bootstrap-boilerplate) Simple boilerplate with webpack, react, mobx, react router and css modules
 * [FutureRX](https://github.com/iam4x/futureRX) The futuristic stack to create universal React applications with MobX as state manager
 * [mobx-isomorphic-starter](https://github.com/Xerios/mobx-isomorphic-starter) Clean isomorphic starter-kit using Mobx + React + React-router + Webpack
+* [koa-mobx-react-starter](https://github.com/lostpebble/koa-mobx-react-starter) A straightforward starter for Node javascript web projects. Using Koa, MobX, Pug and ReactJS (with universal / isomorphic server rendering)

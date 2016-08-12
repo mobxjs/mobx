@@ -7,7 +7,7 @@
 * [Understanding MobX versus Redux](https://www.youtube.com/watch?v=83v8cdvGfeA) (related thread: https://github.com/mobxjs/mobx/issues/199)
 * [State Management Is Easy, React Amsterdam 2016 conf](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
 * [Transparent Reactive Programming and Mutable Data, Reactive2015 conf](https://www.youtube.com/watch?v=FEwLwiizlk0) ([slides](https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures))
-* Magic MobX, RuhrJS 2016 (video coming soon) ([slides](http://magixmobx.surge.sh) and [more slides](https://docs.google.com/presentation/d/1d54mSxF0VOAFlsUGM8eonZDs9gZecTOz1ErSbnydChQ/edit?usp=sharing))
+* Magic MobX, [RuhrJS 2016](https://www.youtube.com/watch?v=TfxfRkNCnmk) ([slides](http://magixmobx.surge.sh) and [more slides](https://docs.google.com/presentation/d/1d54mSxF0VOAFlsUGM8eonZDs9gZecTOz1ErSbnydChQ/edit?usp=sharing))
 
 ## Tutorials
 * [Ten minute interactive introduction to MobX and React](https://mobxjs.github.io/mobx/getting-started.html#demo)
@@ -17,6 +17,7 @@
 * [Real time Chat App with OnsenUI, Horizon and MobX](http://tutorials.pluralsight.com/html-css/real-time-chat-app-with-onsenui-and-horizon?hearted=1)
 * [React Native With MobX - Getting Started](https://medium.com/@dabit3/react-native-with-mobx-getting-started-ba7e18d8ff44#.uge82y49s)
 * [MobX React: Simplified State Management in React](http://www.robinwieruch.de/mobx-react/?utm_content=bufferd1bb1&utm_medium=social&utm_source=twitter.com&utm_campaign=buffer). Tutorial on converting the SoundCloud client from React+Redux to React+MobX.
+* [Introducing serializr: serializing and deserializing object graphs with ease](https://medium.com/@mweststrate/introducing-serializr-serializing-and-deserializing-object-graphs-with-ease-8833c3fcea02#.lghi3ybjm)
 
 ## Articles / blogs explaining the inner working of MobX:
 
