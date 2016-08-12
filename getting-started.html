@@ -82,11 +82,11 @@
                         </ol>
                         <h3>A simple todo store...</h3>
                         <p>
-                            Enough theory, seeing it in action probably explains more that carefully reading the above stuff. For originality's sake
+                            Enough theory, seeing it in action probably explains more than carefully reading the above stuff. For originality's sake
                             let's start with a very simple ToDo store.
                             Note that all the code blocks below are editable,
                             So use the <em>run code</em> buttons to execute them. 
-                            Below is a very straight forward <code>TodoStore</code> that maintains a collection of todos.
+                            Below is a very straightforward <code>TodoStore</code> that maintains a collection of todos.
                             No MobX involved yet. 
                         </p>
 
@@ -356,9 +356,10 @@ observableTodoStore.todos[1].assignee = peopleStore[1];
 peopleStore[0].name = "Michel Weststrate";
                         </textarea>
                         <button onClick="runCode(['#code1', '#code3', '#code4', '#react1', '#store2'])" class="btn-run">Run code</button>
-                        <p>We now have two independent stores. One with people and one with todos. To assign an <code>assignee</code>                            to a person from the people store, we just assigned a reference. These changes will be picked
+                        <p>We now have two independent stores. One with people and one with todos. To assign an <code>assignee</code>
+                            to a person from the people store, we just assigned a reference. These changes will be picked
                             up automatically by the <code>TodoView</code>. With MobX there is no need to normalize data first
-                            and to write selectors to make sure our components will be updated. If fact, it doesn't even
+                            and to write selectors to make sure our components will be updated. In fact, it doesn't even
                             matter where the data is stored. As long as objects are made <em>observable</em>, MobX will be
                             able to track them. Real JavaScript references will just work. MobX will track them automatically
                             if they are relevant for a derivation. To test that, just try changing your name in the next
@@ -381,9 +382,9 @@ peopleStore[0].name = "Michel Weststrate";
                             <button onclick="observableTodoStore.pendingRequests++; setTimeout(function() { observableTodoStore.addTodo('Random Todo ' + Math.random()); observableTodoStore.pendingRequests--;  }, 2000);">Load todo</button>
                         </p>
                         <hr/>
-                        <p>The code behind that is really straight forward. 
+                        <p>The code behind that is really straightforward. 
                             We start with updating the store property <code>pendingRequests</code> to have the UI reflect the current loading status.
-                            Once loading is finished, we update the todo's of the store and decrease the <code>pendingRequests</code> counter again.
+                            Once loading is finished, we update the todos of the store and decrease the <code>pendingRequests</code> counter again.
                             Just compare this snippet with the earlier <code>TodoList</code> definition to see how the pendingRequests property is used.
 <pre>observableTodoStore.pendingRequests++;
 setTimeout(function() {
@@ -416,7 +417,7 @@ setTimeout(function() {
                             </li>
                             <li>
                                 Use <code>autorun</code> to automatically run functions that depend on some observable state.
-                                This is useful for logging, making network requests etc.
+                                This is useful for logging, making network requests, etc.
                             </li>
                             <li>
                                 Use the <code>@observer</code> decorator from the <code>mobx-react</code> package to make your React components truly reactive.
