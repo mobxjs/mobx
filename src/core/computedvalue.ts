@@ -1,11 +1,10 @@
-import {IObservable, reportObserved} from "./observable";
-import {IDerivation, trackDerivedFunction, isComputingDerivation, clearObserving, untrackedStart, untrackedEnd} from "./derivation";
+import {IObservable, reportObserved, propagateMaybeChanged, propagateChangeConfirmed, legacyObservers, startBatch, endBatch, getObservers} from "./observable";
+import {IDerivation, trackDerivedFunction, clearObserving, untrackedStart, untrackedEnd, shouldCompute } from "./derivation";
 import {globalState} from "./globalstate";
 import {allowStateChangesStart, allowStateChangesEnd} from "./action";
 import {getNextId, valueDidChange, invariant, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "../core/spy";
 import {autorun} from "../api/autorun";
-import {SimpleSet} from "../utils/set";
 
 export interface IComputedValue<T> {
 	get(): T;
@@ -20,18 +19,22 @@ export interface IComputedValue<T> {
  * If a computed value isn't actively used by another observer, but is inspect, it will compute lazily to return at least a consistent value.
  */
 export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDerivation {
-	isLazy = true; // nobody is observing this derived value, so don't bother tracking upstream values
 	isComputing = false;
-	staleObservers: IDerivation[] = [];
-	observers = new SimpleSet<IDerivation>();      // nodes that are dependent on this node. Will be notified when our state change
+
+	dependenciesState = -1;
 	observing = [];       // nodes we are looking at. Our value depends on these nodes
+	newObserving = null; // during tracking it's an array with new observed observers
+
+	isPendingUnobservation: boolean; // for effective unobserving
+	isObserved = false;
+	_observers = [];
+	_observersToDelete = [];
+
 	diffValue = 0;
 	runId = 0;
 	lastAccessedBy = 0;
+	lowestObserverState = 0;
 	unboundDepsCount = 0;
-	__mapid = "#" + getNextId();
-	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
-	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 	protected value: T = undefined;
 	name: string;
 
@@ -49,6 +52,10 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		this.name  = name || "ComputedValue@" + getNextId();
 	}
 
+	get observers() {
+		return legacyObservers(this);
+	}
+
 	peek() {
 		this.isComputing = true;
 		const prevAllowStateChanges = allowStateChangesStart(false);
@@ -58,15 +65,13 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		return res;
 	};
 
-	onBecomeUnobserved() {
-		clearObserving(this);
-		this.isLazy = true;
-		this.value = undefined;
+	onBecomeStale() {
+		propagateMaybeChanged(this);
 	}
 
-	onDependenciesReady(): boolean {
-		const changed = this.trackAndCompute();
-		return changed;
+	onBecomeUnobserved() {
+		clearObserving(this);
+		this.value = undefined;
 	}
 
 	/**
@@ -75,29 +80,23 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	 */
 	public get(): T {
 		invariant(!this.isComputing, `Cycle detected in computation ${this.name}`, this.derivation);
+		startBatch();
 		reportObserved(this);
-		if (this.dependencyStaleCount > 0) {
-			// This is worst case, somebody is inspecting our value while we are stale.
-			// This can happen in two cases:
-			// 1) somebody explicitly requests our value during a transaction
-			// 2) this computed value is used in another computed value in which it wasn't used
-			//    before, and hence it is required now 'too early'. See for an example issue 165.
-			// we have no other option than to (possible recursively) forcefully recompute.
-			return this.peek();
-		}
-		if (this.isLazy) {
-			if (isComputingDerivation()) {
-				// somebody depends on the outcome of this computation
-				this.isLazy = false;
-				this.trackAndCompute();
-			} else {
-				// nobody depends on this computable;
-				// so just compute fresh value and continue to sleep
-				return this.peek();
+		if (shouldCompute(this)) {
+			if (this.trackAndCompute()) {
+				propagateChangeConfirmed(this);
 			}
 		}
+		const result = this.value;
+		endBatch();
 		// we are up to date. Return the value
-		return this.value;
+		return result;
+	}
+
+	public recoverFromError() {
+		// this.derivation.call(this.scope) in peek returned error, let's run all cleanups, that would be run
+		this.isComputing = false;
+		endBatch();
 	}
 
 	public set(_: T) {
@@ -141,20 +140,17 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		return `${this.name}[${this.derivation.toString()}]`;
 	}
 
+  // TODO  change whyRun messages to be adequate to new system???
 	whyRun() {
 		const isTracking = globalState.derivationStack.length > 0;
 		const observing = unique(this.observing).map(dep => dep.name);
-		const observers = unique(this.observers.asArray()).map(dep => dep.name);
+		const observers = unique(getObservers(this).map(dep => dep.name));
 		const runReason = (
 			this.isComputing
-				? isTracking
-					? this.observers.length > 0 // this computation already had observers
-							? RunReason.INVALIDATED
-							: RunReason.REQUIRED
-					: RunReason.PEEK
+				? RunReason.GET
 				: RunReason.NOT_RUNNING
 		);
-		if (runReason === RunReason.REQUIRED) {
+		if (runReason === RunReason.GET) {
 			const requiredBy = globalState.derivationStack[globalState.derivationStack.length - 2];
 			if (requiredBy)
 				observers.push(requiredBy.name);
@@ -162,9 +158,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
 		return (`
 WhyRun? computation '${this.name}':
- * Running because: ${runReasonTexts[runReason]} ${(runReason === RunReason.NOT_RUNNING) && this.dependencyStaleCount > 0 ? "(a next run is scheduled)" : ""}
+ * Running because: ${runReasonTexts[runReason]} ${(runReason === RunReason.NOT_RUNNING) && this.dependenciesState > 0 ? "(a next run is scheduled)" : ""}
 ` +
-(this.isLazy
+(this.dependenciesState === -1
 ?
 ` * This computation is suspended (not in use by any reaction) and won't run automatically.
 	Didn't expect this computation to be suspended at this point?
@@ -186,11 +182,9 @@ WhyRun? computation '${this.name}':
 	}
 }
 
-export enum RunReason { PEEK, INVALIDATED, REQUIRED, NOT_RUNNING }
+export enum RunReason { GET, NOT_RUNNING }
 
 export const runReasonTexts = {
-	[RunReason.PEEK]: "[peek] The value of this computed value was requested outside an reaction",
-	[RunReason.INVALIDATED]: "[invalidated] Some observables used by this computation did change",
-	[RunReason.REQUIRED]: "[started] This computation is required by another computed value / reaction",
+	[RunReason.GET]: "[get] The value of this computed value was requested",
 	[RunReason.NOT_RUNNING]: "[idle] This compution is currently not running"
 };

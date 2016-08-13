@@ -1,6 +1,6 @@
-import {IAtom} from "./atom";
 import {IDerivation} from "./derivation";
 import {Reaction} from "./reaction";
+import {IObservable} from "./observable";
 
 declare const global: any;
 
@@ -15,7 +15,7 @@ export class MobXGlobals {
 	 * MobX compatiblity with other versions loaded in memory as long as this version matches.
 	 * It indicates that the global state still stores similar information
 	 */
-	version = 3;
+	version = 4;
 
 	/**
 	 * Stack of currently running derivations
@@ -48,12 +48,11 @@ export class MobXGlobals {
 	 */
 	isRunningReactions = false;
 
-	/**
-	 * List of observables that have changed in a transaction.
-	 * After completing the transaction(s) these atoms will notify their observers.
-	 */
-	changedAtoms: IAtom[] = [];
+	inBatch: number = 0;
 
+	pendingUnobservations: IObservable[] = [];
+
+	pendingDeletions: IObservable[] = [];
 	/**
 	 * List of scheduled, not yet executed, reactions.
 	 */
