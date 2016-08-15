@@ -1687,6 +1687,7 @@ test('unoptimizable subscriptions are diffed correctly', t => {
 
 })
 
+// TODO: revisit this test after estabilishing desired behaviour
 test('atom events #427', t => {
 	var start = 0;
 	var stop = 0;
@@ -1695,44 +1696,44 @@ test('atom events #427', t => {
 	a.reportObserved();
 	a.reportObserved();
 
-	t.equal(start, 0)
-	t.equal(stop, 0)
+	t.equal(start, 2)
+	t.equal(stop, 2)
 
 	var d = mobx.autorun(() => {
 		a.reportObserved()
-		t.equal(start, 1)
+		t.equal(start, 3)
 		a.reportObserved()
-		t.equal(start, 1)
+		t.equal(start, 3)
 	})
 
-	t.equal(start, 1)
-	t.equal(stop, 0)
+	t.equal(start, 3)
+	t.equal(stop, 2)
 	a.reportChanged()
-	t.equal(start, 1)
-	t.equal(stop, 0)
+	t.equal(start, 3)
+	t.equal(stop, 2)
 
 	d()
-	t.equal(start, 1)
-	t.equal(stop, 1)
+	t.equal(start, 3)
+	t.equal(stop, 3)
 
 	t.equal(a.reportObserved(), false);
-	t.equal(start, 1)
-	t.equal(stop, 1)
+	t.equal(start, 4)
+	t.equal(stop, 4)
 
 	d = mobx.autorun(() => {
 		t.equal(a.reportObserved(), true)
-		t.equal(start, 2)
+		t.equal(start, 5)
 		a.reportObserved()
-		t.equal(start, 2)
+		t.equal(start, 5)
 	})
 
-	t.equal(start, 2)
-	t.equal(stop, 1)
+	t.equal(start, 5)
+	t.equal(stop, 4)
 	a.reportChanged()
-	t.equal(start, 2)
-	t.equal(stop, 1)
+	t.equal(start, 5)
+	t.equal(stop, 4)
 
 	d()
-	t.equal(stop, 2)
+	t.equal(stop, 5)
 	t.end()
 })

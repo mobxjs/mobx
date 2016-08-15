@@ -16,7 +16,7 @@ export class BaseAtom implements IAtom {
 
 	diffValue = 0;
 	lastAccessedBy = 0;
-	lowestObserverState = 0;
+	lowestObserverState = IDerivationState.NOT_TRACKING;
 	/**
 	 * Create a new atom. For debugging purposes it is recommended to give it a name.
 	 * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
@@ -64,13 +64,19 @@ export class Atom extends BaseAtom implements IAtom {
 	}
 
 	public reportObserved(): boolean {
+		startBatch();
+
 		super.reportObserved();
-		const tracking = globalState.trackingDerivation !== null;
-		if (tracking && !this.isBeingTracked) {
+
+		if (!this.isBeingTracked) {
 			this.isBeingTracked = true;
 			this.onBecomeObservedHandler();
 		}
-		return tracking;
+
+		endBatch();
+		return !!globalState.trackingDerivation;
+		// return doesn't really give usefull info, because it can be as well calling computed which calls atom (no reactions)
+		// also it could not trigger when calculating reaction dependent on Atom because Atom's value was cached by computed called by given reaction.
 	}
 
 	public onBecomeUnobserved() {
@@ -80,6 +86,7 @@ export class Atom extends BaseAtom implements IAtom {
 }
 
 import {globalState} from "./globalstate";
-import {IObservable, propagateChanged, reportObserved, legacyObservers} from "./observable";
+import {IObservable, propagateChanged, reportObserved, legacyObservers, startBatch, endBatch} from "./observable";
+import {IDerivationState} from "./derivation";
 import {transactionStart, transactionEnd} from "../core/transaction";
 import {noop, getNextId} from "../utils/utils";

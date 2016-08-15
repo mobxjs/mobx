@@ -1,4 +1,4 @@
-import {IDerivation} from "./derivation";
+import {IDerivation, IDerivationState} from "./derivation";
 import {globalState} from "./globalstate";
 import {invariant} from "../utils/utils";
 
@@ -22,13 +22,12 @@ export interface IObservable extends IDepTreeNode {
 	 */
 	lastAccessedBy: number;
 
-	lowestObserverState: number; // to not repeat same propagations, see `invariantLOS`
-	isPendingUnobservation: boolean; // for effective unobserving
-	isObserved: boolean; // for unobserving only once ber observation
-	// sets of observers grouped their state to only notify about changes.
-	observers: ILegacyObservers;
+	lowestObserverState: IDerivationState; // Used to avoid redundant propagations
+	isPendingUnobservation: boolean; // Used to push itself to global.pendingUnobservations at most once per batch.
+
+	observers: ILegacyObservers; // TODO: clear it up
 	_observers: IDerivation[]; // mantain _observers in raw array for for way faster iterating in propagation.
-	_observersIndexes: {}; // must be empty when nothing is running
+	_observersIndexes: {}; // map derivation.__mapid to _observers.indexOf(derivation) (see removeObserver)
 
 	onBecomeUnobserved();
 }
@@ -72,7 +71,6 @@ function invariantObservers(observable: IObservable) {
 }
 export function addObserver(observable: IObservable, node: IDerivation) {
 	// invariant(node.dependenciesState !== -1, "INTERNAL ERROR, can add only dependenciesState !== -1");
-	// invariant(observable.isObserved, "INTERNAL ERROR, isObserved should be already set during reportObserved");
 	// invariant(observable._observers.indexOf(node) === -1, "INTERNAL ERROR add already added node");
 	// invariantObservers(observable);
 
@@ -85,12 +83,11 @@ export function addObserver(observable: IObservable, node: IDerivation) {
 	if (observable.lowestObserverState > node.dependenciesState) observable.lowestObserverState = node.dependenciesState;
 
 	// invariantObservers(observable);
-	// invariant(observable._observers.indexOf(node) !== -1 && (node.__mapid in observable._observersIndexes), "INTERNAL ERROR add already added node2");
+	// invariant(observable._observers.indexOf(node) !== -1, "INTERNAL ERROR didnt add node");
 }
 
 export function removeObserver(observable: IObservable, node: IDerivation) {
 	// invariant(globalState.inBatch > 0, "INTERNAL ERROR, remove should be called only inside batch");
-	// invariant(observable.isObserved, "INTERNAL ERROR, remove should be called only on observed observables");
 	// invariant(observable._observers.indexOf(node) !== -1, "INTERNAL ERROR remove already removed node");
 	// invariantObservers(observable);
 
@@ -98,21 +95,14 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 		// deleting last observer
 		observable._observers.length = 0;
 
-		if (!observable.isPendingUnobservation) {
-			/**
-			 * Wan't to observe/unobserve max once per observable during batch.
-			 * Let's postpone it to end of the batch
-			 */
-			observable.isPendingUnobservation = true;
-			globalState.pendingUnobservations.push(observable);
-		}
+		queueForUnobservation(observable);
 	} else {
-		// deleting from _observersIndexes is straight forward, to delete from _observers, let's swap `node` with last element.
+		// deleting from _observersIndexes is straight forward, to delete from _observers, let's swap `node` with last element
 		const list = observable._observers;
 		const map = observable._observersIndexes;
-		const filler = list.pop();
-		if (filler !== node) {
-			const index = map[node.__mapid] || 0;
+		const filler = list.pop(); // get last element, which should fill the place of `node`, so the array doesnt have holes
+		if (filler !== node) { // otherwise node was the last element, which already got removed from array
+			const index = map[node.__mapid] || 0; // getting index of `node`. this is the only place we actually use map.
 			if (index) { // map store all indexes but 0, see comment in `addObserver`
 				map[filler.__mapid] = index;
 			} else {
@@ -122,36 +112,48 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 		}
 		delete map[node.__mapid];
 	}
-
 	// invariantObservers(observable);
 	// invariant(observable._observers.indexOf(node) === -1, "INTERNAL ERROR remove already removed node2");
 }
 
+export function queueForUnobservation(observable: IObservable) {
+	if (!observable.isPendingUnobservation) {
+		// invariant(globalState.inBatch > 0, "INTERNAL ERROR, remove should be called only inside batch");
+		// invariant(observable._observers.length === 0, "INTERNAL ERROR, shuold only queue for unobservation unobserved observables");
+		observable.isPendingUnobservation = true;
+		globalState.pendingUnobservations.push(observable);
+	}
+}
+
+/**
+ * Batch is a pseudotransaction, just for purposes of memoizing ComputedValues when nothing else does.
+ * During a batch `onBecomeUnobserved` will be called at most once per observable.
+ * Avoids unnecessary recalculations.
+ */
 export function startBatch() {
 	globalState.inBatch++;
 }
 
 export function endBatch() {
-	if (--globalState.inBatch === 0) {
-		globalState.inBatch = 1;
+	if (globalState.inBatch === 1) {
+		// the batch is actually about to finish, all unobserving should happen here.
 		const list = globalState.pendingUnobservations;
 		for (let i = 0; i < list.length; i++) {
 			const observable = list[i];
 			observable.isPendingUnobservation = false;
-			if (observable.isObserved && observable._observers.length === 0) {
-				observable.isObserved = false;
+			if (observable._observers.length === 0) {
 				observable.onBecomeUnobserved();
+				// NOTE: onBecomeUnobserved might push to `pendingUnobservations`
 			}
 		}
 		globalState.pendingUnobservations = [];
-		globalState.inBatch = 0;
 	}
+	globalState.inBatch--;
 }
 
 export function reportObserved(observable: IObservable) {
 	const derivation = globalState.trackingDerivation;
 	if (derivation !== null) {
-		observable.isObserved = true;
 		/**
 		 * Simple optimization, give each derivation run an unique id (runId)
 		 * Check if last time this observable was accessed the same runId is used
@@ -161,72 +163,77 @@ export function reportObserved(observable: IObservable) {
 			observable.lastAccessedBy = derivation.runId;
 			derivation.newObserving[derivation.unboundDepsCount++] = observable;
 		}
-	} else {
-		if (globalState.inBatch > 0 && !observable.isObserved) {
-			// pseudoobserving by batch
-			observable.isObserved = true;
-			// probably will want to unobserve it at the end of the batch
-			if (!observable.isPendingUnobservation) {
-				observable.isPendingUnobservation = true;
-				globalState.pendingUnobservations.push(observable);
-			}
-		}
+	} else if (observable._observers.length === 0) {
+		queueForUnobservation(observable);
 	}
 }
 
 function invariantLOS(observable: IObservable, msg) {
 	// it's expensive so better not run it in produciton. but temporarily helpful for testing
-	const min = getObservers(observable).reduce((a, b) => Math.min(a, b.dependenciesState), 2);
+	const min = getObservers(observable).reduce(
+		(a, b) => Math.min(a, b.dependenciesState),
+		2
+	);
 	if (min >= observable.lowestObserverState) return; // <- the only assumption about `lowestObserverState`
 	throw new Error("lowestObserverState is wrong for " + msg + " because " + min  + " < " + observable.lowestObserverState);
 }
 
+/**
+ * NOTE: current propagation mechanism will in case of self reruning autoruns behave unexpectedly
+ * It will propagate changes to observers from previous run
+ * It's hard or maybe inpossible (with reasonable perf) to get it right with current approach
+ * Hopefully self reruning autoruns aren't a feature people shuold depend on
+ * Also most basic use cases shuold be ok
+ * TODO: create description of autorun behaviour or change this behaviour?
+ */
+
+// Called by Atom when it's value changes
 export function propagateChanged(observable: IObservable) {
 	// invariantLOS(observable, "changed start");
-	if (observable.lowestObserverState === 2) return;
-	observable.lowestObserverState = 2;
+	if (observable.lowestObserverState === IDerivationState.STALE) return;
+	observable.lowestObserverState = IDerivationState.STALE;
 
 	const observers = observable._observers;
 	let i = observers.length;
 	while (i--) {
 		const d = observers[i];
-		if (d.dependenciesState === 0) {
+		if (d.dependenciesState === IDerivationState.UP_TO_DATE)
 			d.onBecomeStale();
-		}
-		d.dependenciesState = 2;
+		d.dependenciesState = IDerivationState.STALE;
 	}
 	// invariantLOS(observable, "changed end");
 }
 
+// Called by ComputedValue when it recalculate and it's value changed
 export function propagateChangeConfirmed(observable: IObservable) {
 	// invariantLOS(observable, "confirmed start");
-	if (observable.lowestObserverState === 2) return;
-	observable.lowestObserverState = 2;
+	if (observable.lowestObserverState === IDerivationState.STALE) return;
+	observable.lowestObserverState = IDerivationState.STALE;
 
 	const observers = observable._observers;
 	let i = observers.length;
 	while (i--) {
 		const d = observers[i];
-		if (d.dependenciesState === 1) {
-			d.dependenciesState = 2;
-		} else if (d.dependenciesState === 0) {
-			observable.lowestObserverState = 0;
-		}
+		if (d.dependenciesState === IDerivationState.POSSIBLY_STALE)
+			d.dependenciesState = IDerivationState.STALE;
+		else if (d.dependenciesState === IDerivationState.UP_TO_DATE) // this happens during computing of `d`, just keep lowestObserverState up to date.
+			observable.lowestObserverState = IDerivationState.UP_TO_DATE;
 	}
 	// invariantLOS(observable, "confirmed end");
 }
 
+// Used by computed when it's dependency changed, but we don't wan't to immidiately recompute.
 export function propagateMaybeChanged(observable: IObservable) {
 	// invariantLOS(observable, "maybe start");
-	if (observable.lowestObserverState !== 0) return;
-	observable.lowestObserverState = 1;
+	if (observable.lowestObserverState !== IDerivationState.UP_TO_DATE) return;
+	observable.lowestObserverState = IDerivationState.POSSIBLY_STALE;
 
 	const observers = observable._observers;
 	let i = observers.length;
-	while (i--) { // using while or for loop influence order of shceduling reactions, but it shuoldn't matter.
+	while (i--) {
 		const d = observers[i];
-		if (d.dependenciesState === 0) {
-			d.dependenciesState = 1;
+		if (d.dependenciesState === IDerivationState.UP_TO_DATE) {
+			d.dependenciesState = IDerivationState.POSSIBLY_STALE;
 			d.onBecomeStale();
 		}
 	}

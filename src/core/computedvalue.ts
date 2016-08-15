@@ -1,5 +1,5 @@
 import {IObservable, reportObserved, propagateMaybeChanged, propagateChangeConfirmed, legacyObservers, startBatch, endBatch, getObservers} from "./observable";
-import {IDerivation, trackDerivedFunction, clearObserving, untrackedStart, untrackedEnd, shouldCompute } from "./derivation";
+import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, untrackedStart, untrackedEnd, shouldCompute } from "./derivation";
 import {globalState} from "./globalstate";
 import {allowStateChangesStart, allowStateChangesEnd} from "./action";
 import {getNextId, valueDidChange, invariant, Lambda, unique, joinStrings} from "../utils/utils";
@@ -15,28 +15,38 @@ export interface IComputedValue<T> {
 /**
  * A node in the state dependency root that observes other nodes, and can be observed itself.
  *
- * Computed values will update automatically if any observed value changes and if they are observed themselves.
- * If a computed value isn't actively used by another observer, but is inspect, it will compute lazily to return at least a consistent value.
+ * ComputedValue will remember result of the computation for duration of a batch, or being observed
+ * During this time it will recompute only when one of it's direct dependencies changed,
+ * but only when it is being accessed with `ComputedValue.get()`.
+ *
+ * Implementation description:
+ * 1. First time it's being accessed it will compute and remember result
+ *    give back remembered result until 2. happens
+ * 2. First time any deep dependency change, propagate POSSIBLY_STALE to all observers, wait for 3.
+ * 3. When it's being accessed, recompute if any shallow dependency changed.
+ *    if result changed: propagate STALE to all observers, that were POSSIBLY_STALE from the last step.
+ *    go to step 2. either way
+ *
+ * If at any point it's outside batch and it isn't observed: reset everything and go to 1.
  */
 export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDerivation {
-	isComputing = false;
-
-	dependenciesState = -1;
+	dependenciesState = IDerivationState.NOT_TRACKING;
 	observing = [];       // nodes we are looking at. Our value depends on these nodes
 	newObserving = null; // during tracking it's an array with new observed observers
 
-	isPendingUnobservation: boolean; // for effective unobserving
+	isPendingUnobservation: boolean;
 	isObserved = false;
 	_observers = [];
 	_observersIndexes = {};
 	diffValue = 0;
 	runId = 0;
 	lastAccessedBy = 0;
-	lowestObserverState = 0;
+	lowestObserverState = IDerivationState.UP_TO_DATE;
 	unboundDepsCount = 0;
 	__mapid = "#" + getNextId();
 	protected value: T = undefined;
 	name: string;
+	isComputing: boolean = false; // to check for cycles
 
 	/**
 	 * Create a new computed value based on a function expression.
@@ -70,6 +80,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	}
 
 	onBecomeUnobserved() {
+		invariant(this.dependenciesState !== IDerivationState.NOT_TRACKING, "INTERNAL ERROR only onBecomeUnobserved shouldn't be called twice in a row");
 		clearObserving(this);
 		this.value = undefined;
 	}
@@ -81,15 +92,23 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	public get(): T {
 		invariant(!this.isComputing, `Cycle detected in computation ${this.name}`, this.derivation);
 		startBatch();
-		reportObserved(this);
-		if (shouldCompute(this)) {
-			if (this.trackAndCompute()) {
-				propagateChangeConfirmed(this);
-			}
+		if (globalState.inBatch === 1) { // just for small optimization, can be droped for simplicity
+			// computed called outside of any mobx stuff. batch observing shuold be enough, don't need tracking
+			// because it will never be called again inside this batch
+			if (shouldCompute(this))
+				this.value = this.peek(); // TODO: add error catching?
+
+		} else {
+
+			reportObserved(this);
+			if (shouldCompute(this))
+				if (this.trackAndCompute())
+					propagateChangeConfirmed(this);
+
 		}
 		const result = this.value;
 		endBatch();
-		// we are up to date. Return the value
+
 		return result;
 	}
 
@@ -158,9 +177,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
 		return (`
 WhyRun? computation '${this.name}':
- * Running because: ${runReasonTexts[runReason]} ${(runReason === RunReason.NOT_RUNNING) && this.dependenciesState > 0 ? "(a next run is scheduled)" : ""}
+ * Running because: ${runReasonTexts[runReason]} ${(runReason === RunReason.NOT_RUNNING) && this.dependenciesState > IDerivationState.UP_TO_DATE ? "(a next run is scheduled)" : ""}
 ` +
-(this.dependenciesState === -1
+(this.dependenciesState === IDerivationState.NOT_TRACKING
 ?
 ` * This computation is suspended (not in use by any reaction) and won't run automatically.
 	Didn't expect this computation to be suspended at this point?

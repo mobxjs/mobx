@@ -4,21 +4,35 @@ import {invariant} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "./spy";
 import {ComputedValue} from "./computedvalue";
 
+export enum IDerivationState {
+	// before being run or (outside batch and not being observed)
+	// at this point derivation is not holding any data about dependency tree
+	NOT_TRACKING = -1,
+	// no shallow dependency changed since last computation
+	// won't recalculate derivation
+	// this is what makes mobx fast
+	UP_TO_DATE = 0,
+	// some deep dependency changed, but don't know if shallow dependency changed
+	// will require to check first if UP_TO_DATE or POSSIBLY_STALE
+	// currently only ComputedValue will propagate POSSIBLY_STALE
+	//
+	// having this state is second big optimization:
+	// don't have to recompute on every dependency change, but only when it's needed
+	POSSIBLY_STALE = 1,
+	// shallow dependency changed
+	// will need to recompute when it's needed
+	STALE = 2
+}
+
 /**
  * A derivation is everything that can be derived from the state (all the atoms) in a pure manner.
  * See https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.xvbh6qd74
+ * TODO: the one above is outdated, new one?
  */
 export interface IDerivation extends IDepTreeNode {
 	observing: IObservable[];
 	newObserving: IObservable[];
-	/**
-	 * Describes state of observing dependencies to know whet it's needed to rerun
-	 * -1 <- not tracking dependencies
-	 * 0 <- all up to date
-	 * 1 <- some dependencies might have changed
-	 * 2 <- for sure dependency changed
-	 */
-	dependenciesState: number;
+	dependenciesState: IDerivationState;
 	/**
 	 * Id of the current run of a derivation. Each time the derivation is tracked
 	 * this number is increased by one. This number is globally unique
@@ -30,31 +44,51 @@ export interface IDerivation extends IDepTreeNode {
 	unboundDepsCount: number;
 	__mapid: string;
 	onBecomeStale();
-	recoverFromError();
+	recoverFromError(); // TODO: revisit implementation of error handling
 }
 
+/**
+ * Finds out wether any dependency of derivation actually changed
+ * If dependenciesState is 1 it will recalculate dependencies,
+ * if any dependency changed it will propagate it by changing dependenciesState to 2.
+ *
+ * By iterating over dependencies in the same order they were reported and stoping on first change
+ * all recalculations are called only for ComputedValues that will be tracked anyway by derivation.
+ * That is because we assume that if first x dependencies of derivation doesn't change
+ * than derivation shuold run the same way up until accessing x-th dependency.
+ */
 export function shouldCompute(derivation: IDerivation): boolean {
-	const dependenciesState = derivation.dependenciesState;
-	if (dependenciesState === 0) return false;
-	if (dependenciesState === -1 || dependenciesState === 2) return true;
-	// if derivation.dependenciesState === 1 we want it to identify itself as 0 or 2 to give accurate answer.
-	let hasError = true;
-	try {
-		const obs = derivation.observing, l = obs.length;
-		for (let i = 0; i < l; i++) {
-			const obj = obs[i];
-			if (obj instanceof ComputedValue) {
-				obj.get();
-				// if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
-				// and `derivation` is an observer of `obj`
-				if (derivation.dependenciesState === 2) return true;
+	switch (derivation.dependenciesState) {
+		case IDerivationState.UP_TO_DATE: return false;
+		case IDerivationState.NOT_TRACKING: case IDerivationState.STALE: return true;
+		case IDerivationState.POSSIBLY_STALE: {
+			let hasError = true;
+			const prevUntracked = untrackedStart(); // no need for those computeds to be reported, they will be picked up in trackDerivedFunction.
+			try {
+				const obs = derivation.observing, l = obs.length;
+				for (let i = 0; i < l; i++) {
+					const obj = obs[i];
+					if (obj instanceof ComputedValue) {
+						obj.get();
+						// if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
+						// and `derivation` is an observer of `obj`
+						if (derivation.dependenciesState === IDerivationState.STALE) {
+							hasError = false;
+							untrackedEnd(prevUntracked);
+							return true;
+						}
+					}
+				}
+				hasError = false;
+				changeDependenciesStateTo0(derivation);
+				untrackedEnd(prevUntracked);
+				return false;
+			} finally { // needed to recover from errors. TODO check more cases
+				if (hasError) {
+					changeDependenciesStateTo0(derivation);
+				}
 			}
 		}
-		hasError = false;
-		changeDependenciesState(0, derivation);
-		return false;
-	} finally { // needed to gracefully recover from errors
-		changeDependenciesState(0, derivation);
 	}
 }
 
@@ -79,10 +113,7 @@ export function checkIfStateModificationsAreAllowed() {
 export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	// pre allocate array allocation + room for variation in deps
 	// array will be trimmed by bindDependencies
-	let prevDependenciesState = derivation.dependenciesState;
-	if (prevDependenciesState !== 0) {
-		changeDependenciesState(0, derivation);
-	}
+	changeDependenciesStateTo0(derivation);
 	derivation.newObserving = new Array(derivation.observing.length + 100);
 	derivation.unboundDepsCount = 0;
 	derivation.runId = ++globalState.runId;
@@ -112,17 +143,12 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 			// Assumption here is that this is the only exception handler in MobX.
 			// So functions higher up in the stack (like transanction) won't be modifying the globalState anymore after this call.
 			// (Except for other trackDerivedFunction calls of course, but that is just)
-			if (prevDependenciesState !== 0) {
-				changeDependenciesState(0, derivation);
-			}
+			changeDependenciesStateTo0(derivation);
 			derivation.newObserving = null;
 			derivation.unboundDepsCount = 0;
 			derivation.recoverFromError();
 			resetGlobalState();
 		} else {
-			// if (derivation.dependenciesState !== 0) {
-			// 	changeDependenciesState(0, derivation);
-			// }
 			globalState.trackingDerivation = prevTracking;
 			bindDependencies(derivation);
 		}
@@ -130,26 +156,24 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	return result;
 }
 
+/**
+ * diffs newObserving with obsering.
+ * update observing to be newObserving with unique observables
+ * notify observers that become observed/unobserved
+ */
 function bindDependencies(derivation: IDerivation) {
-	invariant(derivation.dependenciesState !== -1, "INTERNAL ERROR bindDependencies expects derivation.dependenciesState !== -1");
-	// derivation.observing should always have unique elements outside bindDependencies
+	// invariant(derivation.dependenciesState !== IDerivationState.NOT_TRACKING, "INTERNAL ERROR bindDependencies expects derivation.dependenciesState !== -1");
+
 	const prevObserving = derivation.observing;
-	// trim and determina new observing length
 	const observing = derivation.observing = derivation.newObserving;
 
-	// derivation.observing should be unique to avoid weird corner cases
-	derivation.newObserving = null; // <- newObserving shouldn't be outside tracking
+	derivation.newObserving = null; // newObserving shouldn't be needed outside tracking
 
-	// Idea of this algorithm is start with marking all observables in observing and prevObserving with weight 0
-	// After that all prevObserving weights are decreased with -1
-	// And all new observing are increased with +1.
-	// After that holds: 0 = old dep that is still in use, -1 = old dep, no longer in use, +1 = (seemingly) new dep, was not in use before
-
-	// This process is optimized by making sure deps are always left 'clean', with value 0, so that they don't need to be reset at the start of this process
-	// after that, all prevObserving items are marked with -1 directly, instead of 0 and doing -- after that
+	// Go through all new observables and check diffValue: (this list can contain duplicates):
+	//   0: first occurence, change to 1 and keep it
+	//   1: extra occurence, drop it
 	let i0 = 0, l = derivation.unboundDepsCount;
 	for (let i = 0; i < l; i++) {
-		// console.log(i, l, observing.length, observing);
 		const dep = observing[i];
 		if (dep.diffValue === 0) {
 			dep.diffValue = 1;
@@ -159,20 +183,25 @@ function bindDependencies(derivation: IDerivation) {
 	}
 	observing.length = i0;
 
-	// further the -1 and removeObserver can be done in one go.
+	// Go through all old observables and check diffValue: (it is unique after last bindDependencies)
+	//   0: it's not in new observables, unobserve it
+	//   1: it keeps being observed, don't want to notify it. change to 0
 	l = prevObserving.length;
-	for (let i = 0; i < l; i++) {
-		const dep = prevObserving[i];
+	while (l--) {
+		const dep = prevObserving[l];
 		if (dep.diffValue === 0) {
 			removeObserver(dep, derivation);
 		}
 		dep.diffValue = 0;
 	}
 
-	for (let i = 0; i < i0; i++) {
-		const dep = observing[i];
-		if (dep.diffValue > 0) {
-			dep.diffValue = 0; // this also short circuits add if a dep is multiple times in the observing list
+	// Go through all new observables and check diffValue: (now it should be unique)
+	//   0: it was set to 0 in last loop. don't need to do anything.
+	//   1: it wasn't observed, let's observe it. set back to 0
+	while (i0--) {
+		const dep = observing[i0];
+		if (dep.diffValue === 1) {
+			dep.diffValue = 0;
 			addObserver(dep, derivation);
 		}
 	}
@@ -182,10 +211,10 @@ export function clearObserving(derivation: IDerivation) {
 	// invariant(globalState.inBatch > 0, "INTERNAL ERROR clearObserving should be called only inside batch");
 	const obs = derivation.observing;
 	let i = obs.length;
-	while (i--) {
+	while (i--)
 		removeObserver(obs[i], derivation);
-	}
-	derivation.dependenciesState = -1;
+
+	derivation.dependenciesState = IDerivationState.NOT_TRACKING;
 	obs.length = 0;
 }
 
@@ -196,7 +225,7 @@ export function untracked<T>(action: () => T): T {
 	return res;
 }
 
-export function untrackedStart() {
+export function untrackedStart(): IDerivation {
 	const prev = globalState.trackingDerivation;
 	globalState.trackingDerivation = null;
 	return prev;
@@ -206,13 +235,16 @@ export function untrackedEnd(prev: IDerivation) {
 	globalState.trackingDerivation = prev;
 }
 
-export function changeDependenciesState(targetState, derivation: IDerivation) {
-	invariant(targetState === 0, "INTERNAL ERROR changeDependenciesState now is needed only for changing to state 0");
-	if (derivation.dependenciesState === 0) return;
-	derivation.dependenciesState = 0;
+/**
+ * needed to keep `lowestObserverState` correct. when changing from (2 or 1) to 0
+ *
+ */
+export function changeDependenciesStateTo0(derivation: IDerivation) {
+	if (derivation.dependenciesState === IDerivationState.UP_TO_DATE) return;
+	derivation.dependenciesState = IDerivationState.UP_TO_DATE;
 
 	const obs = derivation.observing;
 	let i = obs.length;
 	while (i--)
-		obs[i].lowestObserverState = 0;
+		obs[i].lowestObserverState = IDerivationState.UP_TO_DATE;
 }

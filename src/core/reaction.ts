@@ -1,9 +1,8 @@
-import {IDerivation, trackDerivedFunction, clearObserving, shouldCompute} from "./derivation";
+import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, shouldCompute} from "./derivation";
 import {globalState} from "./globalstate";
 import {getNextId, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
 import {startBatch, endBatch} from "./observable";
-import {invariant} from "../utils/utils";
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations
@@ -31,7 +30,7 @@ export interface IReactionPublic {
 export class Reaction implements IDerivation, IReactionPublic {
 	observing = []; // nodes we are looking at. Our value depends on these nodes
 	newObserving = [];
-	dependenciesState = -1;
+	dependenciesState = IDerivationState.NOT_TRACKING;
 	diffValue = 0;
 	runId = 0;
 	unboundDepsCount = 0;
@@ -58,7 +57,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 	}
 
 	isScheduled() {
-		return this.dependenciesState > 0 || this._isScheduled;
+		return this._isScheduled;
 	}
 
 	/**
@@ -161,7 +160,7 @@ WhyRun? reaction '${this.name}':
 const MAX_REACTION_ITERATIONS = 100;
 
 export function runReactions() {
-	invariant(globalState.inBatch > 0, "INTERNAL ERROR runReactions should be called only inside batch");
+	// invariant(globalState.inBatch > 0, "INTERNAL ERROR runReactions should be called only inside batch");
 	if (globalState.isRunningReactions === true || globalState.inTransaction > 0)
 		return;
 	globalState.isRunningReactions = true;
