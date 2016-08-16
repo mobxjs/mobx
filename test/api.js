@@ -5,6 +5,7 @@ test('correct api should be exposed', function(t) {
 	t.deepEquals(Object.keys(mobx).sort(), [
 		'Atom',
 		'BaseAtom', // TODO: remove somehow
+		'IDerivationState',
 		'ObservableMap',
 		'Reaction',
 		'SimpleEventEmitter',

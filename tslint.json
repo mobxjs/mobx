@@ -12,7 +12,7 @@
         ],
         "interface-name": true,
         "jsdoc-format": true,
-        "no-consecutive-blank-line" : true,
+        "no-consecutive-blank-lines" : true,
         "no-debugger": true,
         "no-duplicate-key": true,
         "no-duplicate-variable": true,
@@ -22,7 +22,7 @@
         "no-shadowed-variable": true,
         "no-switch-case-fall-through": true,
         "no-unreachable": true,
-        "no-unused-expressions": true,
+        "no-unused-expression": true,
         "no_unused-variable": [
             true,
             "check-parameters"

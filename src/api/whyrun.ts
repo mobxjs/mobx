@@ -12,7 +12,7 @@ function log(msg: string): string {
 export function whyRun(thing?: any, prop?: string) {
 	switch (arguments.length) {
 		case 0:
-			thing = globalState.derivationStack[globalState.derivationStack.length - 1];
+			thing = globalState.trackingDerivation;
 			if (!thing)
 				return log("whyRun() can only be used if a derivation is active, or by passing an computed value / reaction explicitly. If you invoked whyRun from inside a computation; the computation is currently suspended but re-evaluating because somebody requested it's value.");
 			break;

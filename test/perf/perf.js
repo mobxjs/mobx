@@ -158,7 +158,7 @@ test('many unreferenced observables', function(t) {
     var c = observable(7);
     var d = observable(function() { return a.get() * b.get() * c.get() });
     t.equal(d.get(), 126);
-    t.equal(d.isLazy, true);
+    t.equal(d.dependenciesState, -1);
     var start = now();
     for(var i = 0; i < 10000; i++) {
         c.set(i);
@@ -472,6 +472,22 @@ test('sort', t => {
 	log("native plain sort: updated " + (now() - start))
 
 	t.end()
+})
+
+test('computed temporary memoization', t => {
+  "use strict";
+  gc()
+  var computeds = []
+  for(let i = 0; i < 40; i++) {
+    computeds.push(mobx.computed(() =>
+      i ? computeds[i - 1].get() + computeds[i - 1].get() : 1
+    ))
+  }
+  var start = now()
+  t.equal(computeds[27].get(), 134217728)
+
+  log("computed memoization " + (now() - start) + 'ms')
+  t.end()
 })
 
 function now() {

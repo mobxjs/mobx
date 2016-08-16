@@ -1,15 +1,5 @@
 
 export interface IAtom extends IObservable {
-	isDirty: boolean;
-}
-
-/**
- * Used by the transaction manager to signal observers that an atom is ready as soon as the transaction has ended.
- */
-export function propagateAtomReady(atom: IAtom) {
-	invariant(atom.isDirty, "atom not dirty");
-	atom.isDirty = false;
-	propagateReadiness(atom, true);
 }
 
 /**
@@ -19,12 +9,14 @@ export function propagateAtomReady(atom: IAtom) {
  * 2) they should notify mobx whenever they have _changed_. This way mobx can re-run any functions (derivations) that are using this atom.
  */
 export class BaseAtom implements IAtom {
-	isDirty = false;
-	staleObservers = [];
-	observers = new SimpleSet<IDerivation>();
+	isPendingUnobservation = true; // for effective unobserving. BaseAtom has true, for extra optimization, so it's onBecomeUnobserved never get's called, because it's not needed
+	isObserved = false;
+	_observers = [];
+	_observersIndexes = {};
+
 	diffValue = 0;
 	lastAccessedBy = 0;
-
+	lowestObserverState = IDerivationState.NOT_TRACKING;
 	/**
 	 * Create a new atom. For debugging purposes it is recommended to give it a name.
 	 * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
@@ -35,6 +27,9 @@ export class BaseAtom implements IAtom {
 		// noop
 	}
 
+	get observers() {
+		return legacyObservers(this);
+	}
 	/**
 	 * Invoke this method to notify mobx that your atom has been used somehow.
 	 */
@@ -46,27 +41,9 @@ export class BaseAtom implements IAtom {
 	 * Invoke this method _after_ this method has changed to signal mobx that all its observers should invalidate.
 	 */
 	public reportChanged() {
-		if (!this.isDirty) {
-			this.reportStale();
-			this.reportReady();
-		}
-	}
-
-	private reportStale() {
-		if (!this.isDirty) {
-			this.isDirty = true;
-			propagateStaleness(this);
-		}
-	}
-
-	private reportReady() {
-		invariant(this.isDirty, "atom not dirty");
-		if (globalState.inTransaction > 0)
-			globalState.changedAtoms.push(this);
-		else {
-			propagateAtomReady(this);
-			runReactions();
-		}
+		transactionStart("propagatingAtomChange", null, false);
+		propagateChanged(this);
+		transactionEnd(false);
 	}
 
 	toString() {
@@ -75,6 +52,7 @@ export class BaseAtom implements IAtom {
 }
 
 export class Atom extends BaseAtom implements IAtom {
+	isPendingUnobservation = false; // for effective unobserving.
 	public isBeingTracked = false;
 
 	/**
@@ -86,13 +64,19 @@ export class Atom extends BaseAtom implements IAtom {
 	}
 
 	public reportObserved(): boolean {
+		startBatch();
+
 		super.reportObserved();
-		const tracking = globalState.isTracking;
-		if (tracking && !this.isBeingTracked) {
+
+		if (!this.isBeingTracked) {
 			this.isBeingTracked = true;
 			this.onBecomeObservedHandler();
 		}
-		return tracking;
+
+		endBatch();
+		return !!globalState.trackingDerivation;
+		// return doesn't really give usefull info, because it can be as well calling computed which calls atom (no reactions)
+		// also it could not trigger when calculating reaction dependent on Atom because Atom's value was cached by computed called by given reaction.
 	}
 
 	public onBecomeUnobserved() {
@@ -102,8 +86,7 @@ export class Atom extends BaseAtom implements IAtom {
 }
 
 import {globalState} from "./globalstate";
-import {IObservable, propagateReadiness, propagateStaleness, reportObserved} from "./observable";
-import {IDerivation} from "./derivation";
-import {runReactions} from "./reaction";
-import {invariant, noop, getNextId} from "../utils/utils";
-import {SimpleSet} from "../utils/set";
+import {IObservable, propagateChanged, reportObserved, legacyObservers, startBatch, endBatch} from "./observable";
+import {IDerivationState} from "./derivation";
+import {transactionStart, transactionEnd} from "../core/transaction";
+import {noop, getNextId} from "../utils/utils";
