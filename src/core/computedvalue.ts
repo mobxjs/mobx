@@ -1,4 +1,4 @@
-import {IObservable, reportObserved, propagateMaybeChanged, propagateChangeConfirmed, legacyObservers, startBatch, endBatch, getObservers} from "./observable";
+import {IObservable, reportObserved, propagateMaybeChanged, propagateChangeConfirmed, startBatch, endBatch, getObservers} from "./observable";
 import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, untrackedStart, untrackedEnd, shouldCompute } from "./derivation";
 import {globalState} from "./globalstate";
 import {allowStateChangesStart, allowStateChangesEnd} from "./action";
@@ -36,8 +36,8 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
 	isPendingUnobservation: boolean;
 	isObserved = false;
-	_observers = [];
-	_observersIndexes = {};
+	observers = [];
+	observersIndexes = {};
 	diffValue = 0;
 	runId = 0;
 	lastAccessedBy = 0;
@@ -60,10 +60,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	 */
 	constructor(public derivation: () => T, private scope: Object, private compareStructural: boolean, name: string) {
 		this.name  = name || "ComputedValue@" + getNextId();
-	}
-
-	get observers() {
-		return legacyObservers(this);
 	}
 
 	peek() {

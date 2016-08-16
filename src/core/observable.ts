@@ -2,14 +2,8 @@ import {IDerivation, IDerivationState} from "./derivation";
 import {globalState} from "./globalstate";
 import {invariant} from "../utils/utils";
 
-export interface ILegacyObservers {
-	asArray(): IDerivation[];
-	length: number;
-}
-
 export interface IDepTreeNode {
 	name: string;
-	observers?: ILegacyObservers;
 	observing?: IObservable[];
 }
 
@@ -25,39 +19,23 @@ export interface IObservable extends IDepTreeNode {
 	lowestObserverState: IDerivationState; // Used to avoid redundant propagations
 	isPendingUnobservation: boolean; // Used to push itself to global.pendingUnobservations at most once per batch.
 
-	observers: ILegacyObservers; // TODO: clear it up
-	_observers: IDerivation[]; // mantain _observers in raw array for for way faster iterating in propagation.
-	_observersIndexes: {}; // map derivation.__mapid to _observers.indexOf(derivation) (see removeObserver)
+	observers: IDerivation[]; // mantain _observers in raw array for for way faster iterating in propagation.
+	observersIndexes: {}; // map derivation.__mapid to _observers.indexOf(derivation) (see removeObserver)
 
 	onBecomeUnobserved();
 }
 
-export function legacyObservers(observable: IObservable): ILegacyObservers {
-	return {
-		get length() {
-			return observable._observers.length;
-		},
-		asArray() {
-			return getObservers(observable);
-		}
-	};
-}
-
-export function isObjectObservable(arg: any): arg is IObservable {
-	return arg ? arg.lastAccessedBy !== undefined : false;
-}
-
 export function hasObservers(observable: IObservable): boolean {
-	return observable._observers.length > 0;
+	return observable.observers && observable.observers.length > 0;
 }
 
 export function getObservers(observable: IObservable): IDerivation[] {
-	return observable._observers;
+	return observable.observers;
 }
 
 function invariantObservers(observable: IObservable) {
-	const list = observable._observers;
-	const map = observable._observersIndexes;
+	const list = observable.observers;
+	const map = observable.observersIndexes;
 	const l = list.length;
 	for (let i = 0; i < l; i++) {
 		const id = list[i].__mapid;
@@ -74,11 +52,11 @@ export function addObserver(observable: IObservable, node: IDerivation) {
 	// invariant(observable._observers.indexOf(node) === -1, "INTERNAL ERROR add already added node");
 	// invariantObservers(observable);
 
-	const l = observable._observers.length;
+	const l = observable.observers.length;
 	if (l) { // because object assignment is relatively expensive, let's not store data about index 0.
-		observable._observersIndexes[node.__mapid] = l;
+		observable.observersIndexes[node.__mapid] = l;
 	}
-	observable._observers[l] = node;
+	observable.observers[l] = node;
 
 	if (observable.lowestObserverState > node.dependenciesState) observable.lowestObserverState = node.dependenciesState;
 
@@ -91,15 +69,15 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 	// invariant(observable._observers.indexOf(node) !== -1, "INTERNAL ERROR remove already removed node");
 	// invariantObservers(observable);
 
-	if (observable._observers.length === 1) {
+	if (observable.observers.length === 1) {
 		// deleting last observer
-		observable._observers.length = 0;
+		observable.observers.length = 0;
 
 		queueForUnobservation(observable);
 	} else {
 		// deleting from _observersIndexes is straight forward, to delete from _observers, let's swap `node` with last element
-		const list = observable._observers;
-		const map = observable._observersIndexes;
+		const list = observable.observers;
+		const map = observable.observersIndexes;
 		const filler = list.pop(); // get last element, which should fill the place of `node`, so the array doesnt have holes
 		if (filler !== node) { // otherwise node was the last element, which already got removed from array
 			const index = map[node.__mapid] || 0; // getting index of `node`. this is the only place we actually use map.
@@ -141,7 +119,7 @@ export function endBatch() {
 		for (let i = 0; i < list.length; i++) {
 			const observable = list[i];
 			observable.isPendingUnobservation = false;
-			if (observable._observers.length === 0) {
+			if (observable.observers.length === 0) {
 				observable.onBecomeUnobserved();
 				// NOTE: onBecomeUnobserved might push to `pendingUnobservations`
 			}
@@ -163,7 +141,7 @@ export function reportObserved(observable: IObservable) {
 			observable.lastAccessedBy = derivation.runId;
 			derivation.newObserving[derivation.unboundDepsCount++] = observable;
 		}
-	} else if (observable._observers.length === 0) {
+	} else if (observable.observers.length === 0) {
 		queueForUnobservation(observable);
 	}
 }
@@ -193,7 +171,7 @@ export function propagateChanged(observable: IObservable) {
 	if (observable.lowestObserverState === IDerivationState.STALE) return;
 	observable.lowestObserverState = IDerivationState.STALE;
 
-	const observers = observable._observers;
+	const observers = observable.observers;
 	let i = observers.length;
 	while (i--) {
 		const d = observers[i];
@@ -210,7 +188,7 @@ export function propagateChangeConfirmed(observable: IObservable) {
 	if (observable.lowestObserverState === IDerivationState.STALE) return;
 	observable.lowestObserverState = IDerivationState.STALE;
 
-	const observers = observable._observers;
+	const observers = observable.observers;
 	let i = observers.length;
 	while (i--) {
 		const d = observers[i];
@@ -228,7 +206,7 @@ export function propagateMaybeChanged(observable: IObservable) {
 	if (observable.lowestObserverState !== IDerivationState.UP_TO_DATE) return;
 	observable.lowestObserverState = IDerivationState.POSSIBLY_STALE;
 
-	const observers = observable._observers;
+	const observers = observable.observers;
 	let i = observers.length;
 	while (i--) {
 		const d = observers[i];
