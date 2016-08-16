@@ -155,25 +155,14 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		return `${this.name}[${this.derivation.toString()}]`;
 	}
 
-  // TODO  change whyRun messages to be adequate to new system???
 	whyRun() {
 		const isTracking = Boolean(globalState.trackingDerivation);
-		const observing = unique(this.observing).map(dep => dep.name);
+		const observing = unique(this.isComputing ? this.newObserving : this.observing).map((dep: any) => dep.name);
 		const observers = unique(getObservers(this).map(dep => dep.name));
-		const runReason = (
-			this.isComputing
-				? RunReason.GET
-				: RunReason.NOT_RUNNING
-		);
-		if (runReason === RunReason.GET) {
-			const requiredBy = globalState.trackingDerivation; // <- this one will always be wrong.
-			if (requiredBy)
-				observers.push(requiredBy.name);
-		}
 
 		return (`
 WhyRun? computation '${this.name}':
- * Running because: ${runReasonTexts[runReason]} ${(runReason === RunReason.NOT_RUNNING) && this.dependenciesState > IDerivationState.UP_TO_DATE ? "(a next run is scheduled)" : ""}
+ * Running because: ${isTracking ? "[active] the value of this computation is needed by a reaction" : this.isComputing ? "[get] The value of this computed was requested outside a reaction" : "[idle] not running at the moment"}
 ` +
 (this.dependenciesState === IDerivationState.NOT_TRACKING
 ?
@@ -197,9 +186,3 @@ WhyRun? computation '${this.name}':
 	}
 }
 
-export enum RunReason { GET, NOT_RUNNING }
-
-export const runReasonTexts = {
-	[RunReason.GET]: "[get] The value of this computed value was requested",
-	[RunReason.NOT_RUNNING]: "[idle] This compution is currently not running"
-};

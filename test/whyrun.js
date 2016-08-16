@@ -38,12 +38,11 @@ test("whyrun", t => {
 		whyRun();
 	})
 
-	t.ok(lastButOneLine.match(/\[started\]/), "created autorun");
-	t.ok(lastButOneLine.match(/will re-run/));
+	t.ok(lastButOneLine.match(/\[active\]/));
 	t.ok(lastButOneLine.match(/\.firstname/));
 	t.ok(lastButOneLine.match(/\.lastname/));
-	t.ok(lastButOneLine.match(/loggerzz/));
 
+	t.ok(lastLine.match(/loggerzz/));
 	t.ok(lastLine.match(/\[running\]/));
 	t.ok(lastLine.match(/\.fullname/));
 
@@ -60,12 +59,10 @@ test("whyrun", t => {
 	mobx.transaction(() => {
 		x.firstname = "Veria";
 		t.ok(whyRun(x, "fullname").match(/\[idle\]/), "made change in transaction");
-		t.ok(whyRun(x, "fullname").match(/next run is scheduled/));
 
 		t.ok(whyRun(d).match(/\[scheduled\]/));
 	})
 
-	t.ok(lastButOneLine.match(/\[invalidated\]/),"post transaction");
 	t.ok(lastButOneLine.match(/will re-run/));
 	t.ok(lastButOneLine.match(/\.firstname/));
 	t.ok(lastButOneLine.match(/\.lastname/));

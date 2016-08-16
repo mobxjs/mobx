@@ -134,9 +134,9 @@ export class Reaction implements IDerivation, IReactionPublic {
 	toString() {
 		return `Reaction[${this.name}]`;
 	}
-	// TODO  change whyRun messages to be adequate to new system???
+
 	whyRun() {
-		const observing = unique(this.observing).map(dep => dep.name);
+		const observing = unique(this._isRunning ? this.newObserving : this.observing).map(dep => dep.name);
 
 		return (`
 WhyRun? reaction '${this.name}':
