@@ -67,6 +67,7 @@ export class AsFlat {
 	}
 }
 
+export function asMap(): ObservableMap<any>;
 export function asMap<T>(): ObservableMap<T>;
 export function asMap<T>(entries: IMapEntries<T>, modifierFunc?: Function): ObservableMap<T>;
 export function asMap<T>(data: IKeyValueMap<T>, modifierFunc?: Function): ObservableMap<T>;
