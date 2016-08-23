@@ -302,6 +302,6 @@ export function map<V>(initialValues?: IMapEntries<V> | IKeyValueMap<V>, valueMo
 	return new ObservableMap(initialValues, valueModifier);
 }
 
-export function isObservableMap(thing): boolean {
+export function isObservableMap(thing): thing is ObservableMap<any> {
 	return thing instanceof ObservableMap;
 }

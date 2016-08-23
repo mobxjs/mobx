@@ -512,6 +512,6 @@ export function fastArray<V>(initialValues?: V[]): IObservableArray<V> {
 	return createObservableArray(initialValues, ValueMode.Flat, null);
 }
 
-export function isObservableArray(thing): boolean {
+export function isObservableArray(thing): thing is IObservableArray<any> {
 	return thing instanceof ObservableArray;
 }
