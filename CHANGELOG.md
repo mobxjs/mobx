@@ -6,6 +6,7 @@
 * Use TypeScript typeguards, #487 by @Strate
 * Added overloads to `action` for better type inference, #500 by @Strate
 * Fixed #502: `extendObservable` fails on objects created with `Object.create(null)`
+* Implemented #480 / #488: better typings for `asMap`, by @Strate
 
 # 2.4.3
 

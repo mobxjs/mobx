@@ -694,8 +694,8 @@ test("505, don't throw when accessing subclass fields in super constructor (babe
 	class A {
 		@observable a = 1
 		constructor() {
-			values.a = this.a
 			values.b = this.b
+			values.a = this.a
 		}
 	}
 
