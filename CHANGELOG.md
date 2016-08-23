@@ -1,6 +1,10 @@
 # 2.4.4
 
 * Fixed #503: map.delete returns boolean
+* Fix return type of `runInAction`, #499 by @Strate
+* Fixed enumerability of observable array methods, see #496.
+* Use TypeScript typeguards, #487 by @Strate
+* Added overloads to `action` for better type inference, #500 by @Strate
 
 # 2.4.3
 

@@ -377,10 +377,12 @@ declareIterator(ObservableArray.prototype, function() {
  */
 makeNonEnumerable(ObservableArray.prototype, [
 	"constructor",
+	"intercept",
 	"observe",
 	"clear",
 	"concat",
 	"replace",
+	"toJS",
 	"toJSON",
 	"peek",
 	"find",
