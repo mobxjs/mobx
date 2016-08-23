@@ -66,7 +66,7 @@ export function objectAssign() {
 	const res = arguments[0];
 	for (let i = 1, l = arguments.length; i < l; i++) {
 		const source = arguments[i];
-		for (let key in source) if (source.hasOwnProperty(key)) {
+		for (let key in source) if (hasOwnProperty(source, key)) {
 			res[key] = source[key];
 		}
 	}
@@ -77,6 +77,10 @@ export function valueDidChange(compareStructural: boolean, oldValue, newValue): 
 	return compareStructural
 		? !deepEquals(oldValue, newValue)
 		: oldValue !== newValue;
+}
+
+export function hasOwnProperty(object: any, propName: string) {
+	return Object.prototype.hasOwnProperty.call(object, propName);
 }
 
 export function makeNonEnumerable(object: any, propNames: string[]) {

@@ -1,7 +1,7 @@
 import {ValueMode} from "../types/modifiers";
 import {ObservableMap} from "../types/observablemap";
 import {asObservableObject, setObservableObjectInstanceProperty} from "../types/observableobject";
-import {invariant, isPropertyConfigurable} from "../utils/utils";
+import {invariant, isPropertyConfigurable, hasOwnProperty} from "../utils/utils";
 
 /**
  * Extends an object with reactive capabilities.
@@ -22,7 +22,7 @@ export function extendObservable<A extends Object, B extends Object>(target: A, 
 
 export function extendObservableHelper(target, properties, mode: ValueMode, name: string): Object {
 	const adm = asObservableObject(target, name, mode);
-	for (let key in properties) if (properties.hasOwnProperty(key)) {
+	for (let key in properties) if (hasOwnProperty(properties, key)) {
 		if (target === properties && !isPropertyConfigurable(target, key))
 			continue; // see #111, skip non-configurable or non-writable props for `observable(object)`.
 		setObservableObjectInstanceProperty(adm, key, properties[key]);

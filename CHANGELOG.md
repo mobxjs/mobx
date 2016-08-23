@@ -5,6 +5,7 @@
 * Fixed enumerability of observable array methods, see #496.
 * Use TypeScript typeguards, #487 by @Strate
 * Added overloads to `action` for better type inference, #500 by @Strate
+* Fixed #502: `extendObservable` fails on objects created with `Object.create(null)`
 
 # 2.4.3
 
