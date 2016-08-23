@@ -22,6 +22,7 @@ export function spyReportStart(event) {
 
 const END_EVENT = { spyReportEnd: true };
 
+// TODO: change signature to spyReportEnd(time?: number)
 export function spyReportEnd(change?) {
 	if (change)
 		spyReport(objectAssign({}, change, END_EVENT));
