@@ -1008,7 +1008,7 @@ Especially in large applications this is important.</li>
     loadTodos() {
         <span class="hljs-keyword">this</span>.isLoading = <span class="hljs-literal">true</span>;
         <span class="hljs-keyword">this</span>.transportLayer.fetchTodos().then(fetchedTodos =&gt; {
-            todos.forEach(json =&gt; <span class="hljs-keyword">this</span>.updateTodoFromServer(json));
+            fetchedTodos.forEach(json =&gt; <span class="hljs-keyword">this</span>.updateTodoFromServer(json));
             <span class="hljs-keyword">this</span>.isLoading = <span class="hljs-literal">false</span>;
         });
     }

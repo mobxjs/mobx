@@ -882,7 +882,7 @@ This is what happens with the <code>isLoading</code> property in the <code>todoS
 <pre><code class="lang-javascript"><span class="hljs-comment">// ...</span>
     <span class="hljs-keyword">this</span>.isLoading = <span class="hljs-literal">true</span>;
     <span class="hljs-keyword">this</span>.transportLayer.fetchTodos().then(fetchedTodos =&gt; {
-        todos.forEach(json =&gt; <span class="hljs-keyword">this</span>.updateTodoFromServer(json));
+        fetchedTodos.forEach(json =&gt; <span class="hljs-keyword">this</span>.updateTodoFromServer(json));
         <span class="hljs-keyword">this</span>.isLoading = <span class="hljs-literal">false</span>;
     });
 <span class="hljs-comment">// ...</span>
