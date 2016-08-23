@@ -79,8 +79,9 @@ export function valueDidChange(compareStructural: boolean, oldValue, newValue): 
 		: oldValue !== newValue;
 }
 
-export function hasOwnProperty(object: any, propName: string) {
-	return Object.prototype.hasOwnProperty.call(object, propName);
+const prototypeHasOwnProperty = Object.prototype.hasOwnProperty;
+export function hasOwnProperty(object: Object, propName: string) {
+	return prototypeHasOwnProperty.call(object, propName);
 }
 
 export function makeNonEnumerable(object: any, propNames: string[]) {
