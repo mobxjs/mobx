@@ -1591,6 +1591,13 @@ test('autoruns created in autoruns should kick off', function(t) {
 	t.end();
 });
 
+test('#502 extendObservable throws on objects created with Object.create(null)', t => {
+	var a = Object.create(null)
+	mobx.extendObservable(a, { b: 3 })
+	t.equal(mobx.isObservable(a, "b"), true)
+	t.end()
+})
+
 test('#328 atom throwing exception if observing stuff in onObserved', t => {
 	var b = mobx.observable(1)
 	var a = new mobx.Atom('test atom', () => {
