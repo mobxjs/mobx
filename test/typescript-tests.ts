@@ -919,3 +919,22 @@ test("373 - fix isObservable for unused computed", t => {
 	new Bla();
 	t.end();
 })
+
+test("505, don't throw when accessing subclass fields in super constructor (typescript)", t => {
+	const values: any = { }
+	class A {
+		@observable a = 1
+		constructor() {
+			values.a = this.a
+			values.b = (this as any)['b']
+		}
+	}
+
+	class B extends A {
+		@observable b = 2
+	}
+
+	new B()
+	t.deepEqual(values, { a: 1, b: undefined}) // undefined, as A constructor runs before B constructor
+	t.end()
+})
