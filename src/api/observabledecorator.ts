@@ -15,7 +15,10 @@ const decoratorImpl = createClassPropertyDecorator(
 		allowStateChangesEnd(prevA);
 	},
 	function (name) {
-		return this.$mobx.values[name].get();
+		const observable = this.$mobx.values[name];
+		if (observable === undefined) // See #505
+			return undefined;
+		return observable.get();
 	},
 	function (name, value) {
 		setPropertyValue(this, name, value);
