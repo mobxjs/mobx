@@ -1,3 +1,7 @@
+# 2.4.4
+
+* Fixed #503: map.delete returns boolean
+
 # 2.4.3
 
 * Objects with a `null` prototype are now considered plain objects as well
