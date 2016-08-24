@@ -83,7 +83,7 @@ export function shouldCompute(derivation: IDerivation): boolean {
 				changeDependenciesStateTo0(derivation);
 				untrackedEnd(prevUntracked);
 				return false;
-			} finally { // needed to recover from errors. TODO check more cases
+			} finally {
 				if (hasError) {
 					changeDependenciesStateTo0(derivation);
 				}

@@ -365,7 +365,6 @@ test('peeking inside erroring computed value doesn\'t bork (global) state', t =>
 
 	t.equal(a.isPendingUnobservation, true) // true is a default for optimization
 	t.equal(a.observers.length, 0)
-	t.deepEqual(a.observerIndexes, undefined)
 	t.equal(a.diffValue, 0)
 	t.equal(a.lowestObserverState, -1)
 	t.equal(a.hasUnreportedChange, false)
@@ -376,7 +375,6 @@ test('peeking inside erroring computed value doesn\'t bork (global) state', t =>
 	t.equal(b.newObserving, null)
 	t.equal(b.isPendingUnobservation, false)
 	t.equal(b.observers.length, 0)
-	t.deepEqual(b.observerIndexes, undefined)
 	t.equal(b.diffValue, 0)
 	t.equal(b.lowestObserverState, 0)
 	t.equal(b.unboundDepsCount, 0)
@@ -407,7 +405,6 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 	test("it should update correctly initially", t => {
 		t.equal(a.isPendingUnobservation, true) // true is a default for optimization
 		t.equal(a.observers.length, 1)
-		t.deepEqual(a.observerIndexes, undefined) // is this correct?!
 		t.equal(a.diffValue, 0)
 		t.equal(a.lowestObserverState, -1)
 		t.equal(a.hasUnreportedChange, false)
@@ -417,12 +414,10 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 		t.equal(b.observing.length, 1)
 		t.equal(b.newObserving, null)
 		t.equal(b.isPendingUnobservation, false)
-		t.equal(b.isObserved, false)
 		t.equal(b.observers.length, 1)
-		t.deepEqual(b.observerIndexes, undefined) // is this correct?
 		t.equal(b.diffValue, 0)
 		t.equal(b.lowestObserverState, 0)
-		t.equal(b.unboundDepsCount, 1) // is this correct?
+		t.equal(b.unboundDepsCount, 1) // value is always the last bound amount of observers
 		t.equal(b.value, 1, "value should be 1")
 		t.equal(b.isComputing, false)
 
@@ -430,7 +425,7 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 		t.equal(c.observing.length, 1)
 		t.equal(c.newObserving, null)
 		t.equal(c.diffValue, 0)
-		t.equal(c.unboundDepsCount, 1) // is this correct?
+		t.equal(c.unboundDepsCount, 1)
 		t.equal(c.isDisposed, false)
 		t.equal(c._isScheduled, false)
 		t.equal(c._isTrackPending, false)
@@ -446,7 +441,6 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 
 		t.equal(a.isPendingUnobservation, true) // true is a default for optimization
 		t.equal(a.observers.length, 1)
-		t.deepEqual(a.observerIndexes, undefined) // is this correct?!
 		t.equal(a.diffValue, 0)
 		t.equal(a.lowestObserverState, 0)
 		t.equal(a.hasUnreportedChange, false)
@@ -457,7 +451,6 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 		t.equal(b.newObserving, null)
 		t.equal(b.isPendingUnobservation, false)
 		t.equal(b.observers.length, 1)
-		t.deepEqual(b.observerIndexes, undefined) // is this correct?
 		t.equal(b.diffValue, 0)
 		t.equal(b.lowestObserverState, 0)
 		t.equal(b.unboundDepsCount, 0)
@@ -468,7 +461,7 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 		t.equal(c.observing.length, 1)
 		t.equal(c.newObserving, null)
 		t.equal(c.diffValue, 0)
-		t.equal(c.unboundDepsCount, 1) // is this correct?
+		t.equal(c.unboundDepsCount, 1)
 		t.equal(c.isDisposed, false)
 		t.equal(c._isScheduled, false)
 		t.equal(c._isTrackPending, false)
@@ -485,21 +478,19 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 
 		t.equal(a.isPendingUnobservation, true) // true is a default for optimization
 		t.equal(a.observers.length, 1)
-		t.deepEqual(a.observerIndexes, undefined) // is this correct?!
 		t.equal(a.diffValue, 0)
 		t.equal(a.lowestObserverState, 0)
 		t.equal(a.hasUnreportedChange, false)
 		t.equal(a.value, 3)
 
-		t.equal(b.dependenciesState, 0) // up to date (for what it's worth)
+		t.equal(b.dependenciesState, 0) // up to date
 		t.equal(b.observing.length, 1)
 		t.equal(b.newObserving, null)
 		t.equal(b.isPendingUnobservation, false)
 		t.equal(b.observers.length, 1)
-		t.deepEqual(b.observerIndexes, undefined) // is this correct?
 		t.equal(b.diffValue, 0)
 		t.equal(b.lowestObserverState, 0)
-		t.equal(b.unboundDepsCount, 1) // should be zero?
+		t.equal(b.unboundDepsCount, 1)
 		t.equal(b.value, 3, "value should be 3")
 		t.equal(b.isComputing, false)
 
@@ -507,7 +498,7 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 		t.equal(c.observing.length, 1)
 		t.equal(c.newObserving, null)
 		t.equal(c.diffValue, 0)
-		t.equal(c.unboundDepsCount, 1) // is this correct?
+		t.equal(c.unboundDepsCount, 1)
 		t.equal(c.isDisposed, false)
 		t.equal(c._isScheduled, false)
 		t.equal(c._isTrackPending, false)
@@ -522,7 +513,6 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 
 		t.equal(a.isPendingUnobservation, true) // true is a default for optimization
 		t.equal(a.observers.length, 0)
-		t.deepEqual(a.observerIndexes, undefined) // is this correct?!
 		t.equal(a.diffValue, 0)
 		t.equal(a.lowestObserverState, 0)
 		t.equal(a.hasUnreportedChange, false)
@@ -533,10 +523,9 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 		t.equal(b.newObserving, null)
 		t.equal(b.isPendingUnobservation, false)
 		t.equal(b.observers.length, 0)
-		t.deepEqual(b.observerIndexes, undefined) // is this correct?
 		t.equal(b.diffValue, 0)
 		t.equal(b.lowestObserverState, 0)
-		t.equal(b.unboundDepsCount, 1) // should be zero?
+		t.equal(b.unboundDepsCount, 1)
 		t.equal(b.value, undefined)
 		t.equal(b.isComputing, false)
 
@@ -544,7 +533,7 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 		t.equal(c.observing.length, 0)
 		t.equal(c.newObserving, null)
 		t.equal(c.diffValue, 0)
-		t.equal(c.unboundDepsCount, 1) // is this correct?
+		t.equal(c.unboundDepsCount, 1)
 		t.equal(c.isDisposed, true)
 		t.equal(c._isScheduled, false)
 		t.equal(c._isTrackPending, false)
