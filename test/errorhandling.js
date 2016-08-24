@@ -389,3 +389,181 @@ test('peeking inside erroring computed value doesn\'t bork (global) state', t =>
 
 	t.end()
 })
+
+
+test('peeking inside autorun doesn\'t bork (global) state', t => {
+	var r = -1
+	const a = mobx.observable(1)
+	const b = mobx.computed(() => {
+		const res = r = a.get()
+		if (res === 2)
+			throw "chocolademelk"
+		return res
+	})
+	const d = mobx.autorun(() => b.get())
+	const c = d.$mobx;
+
+	t.equal(b.get(), 1)
+	t.equal(r, 1)
+
+	test("it should update correctly initially", t => {
+		t.equal(a.isPendingUnobservation, true) // true is a default for optimization
+		t.equal(a.isObserved, false) // should be true?
+		t.equal(a.observers.length, 1)
+		t.deepEqual(a.observerIndexes, undefined) // is this correct?!
+		t.equal(a.diffValue, 0)
+		t.equal(a.lowestObserverState, -1)
+		t.equal(a.hasUnreportedChange, false)
+		t.equal(a.value, 1)
+
+		t.equal(b.dependenciesState, 0)
+		t.equal(b.observing.length, 1)
+		t.equal(b.newObserving, null)
+		t.equal(b.isPendingUnobservation, false)
+		t.equal(b.isObserved, false)
+		t.equal(b.observers.length, 1)
+		t.deepEqual(b.observerIndexes, undefined) // is this correct?
+		t.equal(b.diffValue, 0)
+		t.equal(b.lowestObserverState, 0)
+		t.equal(b.unboundDepsCount, 1) // is this correct?
+		t.equal(b.value, 1, "value should be 1")
+		t.equal(b.isComputing, false)
+
+		t.equal(c.dependenciesState, 0)
+		t.equal(c.observing.length, 1)
+		t.equal(c.newObserving, null)
+		t.equal(c.diffValue, 0)
+		t.equal(c.unboundDepsCount, 1) // is this correct?
+		t.equal(c.isDisposed, false)
+		t.equal(c._isScheduled, false)
+		t.equal(c._isTrackPending, false)
+		t.equal(c._isRunning, false)
+		checkGlobalState(t)
+		t.end()
+	})
+
+	test("it should not break internal consistency when exception occurred", t => {
+		// Trigger exception
+		t.throws(() => { a.set(2) }, /chocolademelk/)
+		t.equal(r, 2)
+
+		t.equal(a.isPendingUnobservation, true) // true is a default for optimization
+		t.equal(a.isObserved, false) // should be true?
+		t.equal(a.observers.length, 1)
+		t.deepEqual(a.observerIndexes, undefined) // is this correct?!
+		t.equal(a.diffValue, 0)
+		t.equal(a.lowestObserverState, 0)
+		t.equal(a.hasUnreportedChange, false)
+		t.equal(a.value, 2)
+
+		t.equal(b.dependenciesState, 0) // up to date (for what it's worth)
+		t.equal(b.observing.length, 1)
+		t.equal(b.newObserving, null)
+		t.equal(b.isPendingUnobservation, false)
+		t.equal(b.isObserved, false) // should be true?
+		t.equal(b.observers.length, 1)
+		t.deepEqual(b.observerIndexes, undefined) // is this correct?
+		t.equal(b.diffValue, 0)
+		t.equal(b.lowestObserverState, 0)
+		t.equal(b.unboundDepsCount, 0)
+		t.equal(b.value, 1, "value should be 1")
+		t.equal(b.isComputing, false)
+
+		t.equal(c.dependenciesState, 0)
+		t.equal(c.observing.length, 1)
+		t.equal(c.newObserving, null)
+		t.equal(c.diffValue, 0)
+		t.equal(c.unboundDepsCount, 1) // is this correct?
+		t.equal(c.isDisposed, false)
+		t.equal(c._isScheduled, false)
+		t.equal(c._isTrackPending, false)
+		t.equal(c._isRunning, false)
+		checkGlobalState(t)
+		t.end()
+	})
+
+	// Trigger a new change, will this recover?
+	// is this actually a supported case or should we just give up?
+	test("it should recover from errors", t => {
+		a.set(3)
+		t.equal(r, 3, "recovered from error")
+
+		t.equal(a.isPendingUnobservation, true) // true is a default for optimization
+		t.equal(a.isObserved, false) // should be true?
+		t.equal(a.observers.length, 1)
+		t.deepEqual(a.observerIndexes, undefined) // is this correct?!
+		t.equal(a.diffValue, 0)
+		t.equal(a.lowestObserverState, 0)
+		t.equal(a.hasUnreportedChange, false)
+		t.equal(a.value, 3)
+
+		t.equal(b.dependenciesState, 0) // up to date (for what it's worth)
+		t.equal(b.observing.length, 1)
+		t.equal(b.newObserving, null)
+		t.equal(b.isPendingUnobservation, false)
+		t.equal(b.isObserved, false) // should be true?
+		t.equal(b.observers.length, 1)
+		t.deepEqual(b.observerIndexes, undefined) // is this correct?
+		t.equal(b.diffValue, 0)
+		t.equal(b.lowestObserverState, 0)
+		t.equal(b.unboundDepsCount, 1) // should be zero?
+		t.equal(b.value, 3, "value should be 3")
+		t.equal(b.isComputing, false)
+
+		t.equal(c.dependenciesState, 0)
+		t.equal(c.observing.length, 1)
+		t.equal(c.newObserving, null)
+		t.equal(c.diffValue, 0)
+		t.equal(c.unboundDepsCount, 1) // is this correct?
+		t.equal(c.isDisposed, false)
+		t.equal(c._isScheduled, false)
+		t.equal(c._isTrackPending, false)
+		t.equal(c._isRunning, false)
+
+		checkGlobalState(t)
+		t.end()
+	})
+
+	test("it should clean up correctly", t => {
+		d()
+
+		t.equal(a.isPendingUnobservation, true) // true is a default for optimization
+		t.equal(a.isObserved, false)
+		t.equal(a.observers.length, 0)
+		t.deepEqual(a.observerIndexes, undefined) // is this correct?!
+		t.equal(a.diffValue, 0)
+		t.equal(a.lowestObserverState, 0)
+		t.equal(a.hasUnreportedChange, false)
+		t.equal(a.value, 3)
+
+		t.equal(b.dependenciesState, -1) // not tracking
+		t.equal(b.observing.length, 0)
+		t.equal(b.newObserving, null)
+		t.equal(b.isPendingUnobservation, false)
+		t.equal(b.isObserved, false)
+		t.equal(b.observers.length, 0)
+		t.deepEqual(b.observerIndexes, undefined) // is this correct?
+		t.equal(b.diffValue, 0)
+		t.equal(b.lowestObserverState, 0)
+		t.equal(b.unboundDepsCount, 1) // should be zero?
+		t.equal(b.value, undefined)
+		t.equal(b.isComputing, false)
+
+		t.equal(c.dependenciesState, -1)
+		t.equal(c.observing.length, 0)
+		t.equal(c.newObserving, null)
+		t.equal(c.diffValue, 0)
+		t.equal(c.unboundDepsCount, 1) // is this correct?
+		t.equal(c.isDisposed, true)
+		t.equal(c._isScheduled, false)
+		t.equal(c._isTrackPending, false)
+		t.equal(c._isRunning, false)
+
+		t.equal(b.get(), 3)
+
+		checkGlobalState(t)
+		t.end()
+	})
+
+	t.end()
+})
