@@ -7,12 +7,12 @@ import {createClassPropertyDecorator} from "../utils/decorators";
 const decoratorImpl = createClassPropertyDecorator(
 	(target, name, baseValue) => {
 		// might happen lazily (on first read), so temporarily allow state changes..
-		allowStateChangesStart(true);
+		const prevA = allowStateChangesStart(true);
 		if (typeof baseValue === "function")
 			baseValue = asReference(baseValue);
 		const adm = asObservableObject(target, undefined, ValueMode.Recursive);
 		defineObservableProperty(adm, name, baseValue, true);
-		allowStateChangesEnd();
+		allowStateChangesEnd(prevA);
 	},
 	function (name) {
 		return this.$mobx.values[name].get();

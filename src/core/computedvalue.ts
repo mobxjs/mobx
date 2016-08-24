@@ -64,9 +64,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
 	peek() {
 		this.isComputing = true;
-		allowStateChangesStart(false);
+		const prevAllowStateChanges = allowStateChangesStart(false);
 		const res = this.derivation.call(this.scope);
-		allowStateChangesEnd();
+		allowStateChangesEnd(prevAllowStateChanges);
 		this.isComputing = false;
 		return res;
 	};
@@ -159,6 +159,8 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		const isTracking = Boolean(globalState.trackingDerivation);
 		const observing = unique(this.isComputing ? this.newObserving : this.observing).map((dep: any) => dep.name);
 		const observers = unique(getObservers(this).map(dep => dep.name));
+// TODO: use issue
+// TOOD; expand wiht more states
 		return (`
 WhyRun? computation '${this.name}':
  * Running because: ${isTracking ? "[active] the value of this computation is needed by a reaction" : this.isComputing ? "[get] The value of this computed was requested outside a reaction" : "[idle] not running at the moment"}
