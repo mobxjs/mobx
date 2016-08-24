@@ -1737,3 +1737,70 @@ test('atom events #427', t => {
 	t.equal(stop, 5)
 	t.end()
 })
+
+test("verify calculation count", t => {
+	var calcs = []
+	var a = observable(1)
+	var b = mobx.computed(() => {
+		calcs.push("b")
+		return a.get()
+	})
+	var c = mobx.computed(() => {
+		calcs.push("c")
+		return b.get()
+	})
+	var d = mobx.autorun(() => {
+		calcs.push("d")
+		return b.get()
+	})
+	var e = mobx.autorun(() => {
+		calcs.push("e")
+		return c.get()
+	})
+	var f = mobx.computed(() => {
+		calcs.push("f")
+		return c.get()
+	})
+
+	t.equal(f.get(), 1)
+
+	calcs.push("change")
+	a.set(2)
+
+	t.equal(f.get(), 2)
+
+	calcs.push("transaction")
+	transaction(() => {
+		t.equal(b.get(), 2)
+		t.equal(c.get(), 2)
+		t.equal(f.get(), 2)
+		t.equal(f.get(), 2)
+		calcs.push("change")
+		a.set(3)
+		t.equal(b.get(), 3)
+		t.equal(b.get(), 3)
+		calcs.push("try c")
+		t.equal(c.get(), 3)
+		t.equal(c.get(), 3)
+		calcs.push("try f")
+		t.equal(f.get(), 3)
+		t.equal(f.get(), 3)
+		calcs.push("end transaction")
+	})
+
+	t.deepEqual(calcs, [
+		"d", "b", "e", "c",
+		"f",
+		"change", "b", "c", "e", "d", "f", // would have expected b c e d f, but alas
+		"transaction", "f",
+		"change", "b",
+		"try c", "c",
+		"try f", "f",
+		"end transaction", "e", "d" // would have expected e d
+	])
+
+	d()
+	e()
+
+	t.end()
+})
