@@ -1,5 +1,5 @@
 import {IObservable, reportObserved, propagateMaybeChanged, propagateChangeConfirmed, startBatch, endBatch, getObservers} from "./observable";
-import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, untrackedStart, untrackedEnd, shouldCompute } from "./derivation";
+import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, untrackedStart, untrackedEnd, shouldCompute, handleExceptionInDerivation} from "./derivation";
 import {globalState} from "./globalstate";
 import {allowStateChangesStart, allowStateChangesEnd} from "./action";
 import {getNextId, valueDidChange, invariant, Lambda, unique, joinStrings} from "../utils/utils";
@@ -34,7 +34,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	observing = [];       // nodes we are looking at. Our value depends on these nodes
 	newObserving = null; // during tracking it's an array with new observed observers
 
-	isPendingUnobservation: boolean;
+	isPendingUnobservation: boolean = false;
 	isObserved = false;
 	observers = [];
 	observersIndexes = {};
@@ -71,6 +71,19 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		return res;
 	};
 
+	peekUntracked() {
+		let hasError = true;
+		try {
+			const res = this.peek();
+			hasError = false;
+			return res;
+		} finally {
+			if (hasError)
+				handleExceptionInDerivation(this);
+		}
+
+	}
+
 	onBecomeStale() {
 		propagateMaybeChanged(this);
 	}
@@ -92,8 +105,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 			// computed called outside of any mobx stuff. batch observing shuold be enough, don't need tracking
 			// because it will never be called again inside this batch
 			if (shouldCompute(this))
-				this.value = this.peek(); // TODO: add error catching?
-
+				this.value = this.peekUntracked();
 		} else {
 
 			reportObserved(this);

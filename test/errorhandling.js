@@ -28,11 +28,22 @@ function buffer() {
     return res;
 }
 
+function checkGlobalState(t) {
+	const gs = global.__mobxGlobal;
+	t.equal(gs.trackingDerivation, null)
+	t.equal(gs.inTransaction, 0)
+	t.equal(gs.isRunningReactions, false)
+	t.equal(gs.inBatch, 0)
+	t.equal(gs.allowStateChanges, !gs.strictMode)
+	t.equal(gs.pendingUnobservations.length, 0)
+}
+
 test('exception1', function(t) {
     var a = computed(function() {
         throw "hoi";
     });
     t.throws(() => a(), "hoi");
+	checkGlobalState(t);
     t.end();
 })
 
@@ -49,6 +60,7 @@ test('deny state changes in views', function(t) {
         y()
     }, 'It is not allowed to change the state during the computation of a reactive view');
 
+	checkGlobalState(t);
     t.end();
 })
 
@@ -70,6 +82,7 @@ test('allow state changes in autorun', function(t) {
     t.equal(z.get(), 5);
 
     t.equal(mobx.extras.isComputingDerivation(), false);
+	checkGlobalState(t);
     t.end();
 })
 
@@ -89,6 +102,7 @@ test('deny array change in view', function(t) {
         t.deepEqual(z.slice(), []);
         t.equal(mobx.extras.isComputingDerivation(), false);
 
+		checkGlobalState(t);
         t.end();
     }
     catch(e) {
@@ -111,6 +125,7 @@ test('allow array change in autorun', function(t) {
     t.deepEqual(z.slice(), [5, 6])
 
     t.equal(mobx.extras.isComputingDerivation(), false);
+	checkGlobalState(t);
     t.end();
 })
 
@@ -122,6 +137,7 @@ test('throw error if modification loop', function(t) {
     t.throws(() => {
         x.set(5);
     }, "Reaction doesn't converge to a stable state")
+	checkGlobalState(t);
     t.end();
 })
 
@@ -130,6 +146,7 @@ test('cycle1', function(t) {
         var p = observable(function() { return p() * 2; }); // thats a cycle!
         p.observe(voidObserver, true);
     }, "Found cyclic dependency");
+	checkGlobalState(t);
     t.end();
 })
 
@@ -139,6 +156,7 @@ test('cycle2', function(t) {
     t.throws(() => {
         b.get()
     }, "Found cyclic dependency");
+	checkGlobalState(t);
     t.end();
 })
 
@@ -147,6 +165,7 @@ test('cycle3', function(t) {
     t.throws(() => {
         p.get();
     }, "Found cyclic dependency");
+	checkGlobalState(t);
     t.end();
 })
 
@@ -161,6 +180,7 @@ test('cycle3', function(t) {
     t.throws(() => {
         z.set(false); // introduces a cycle!
     }, "Found cyclic dependency");
+	checkGlobalState(t);
     t.end();
 });
 
@@ -193,6 +213,7 @@ test('issue 86, converging cycles', function(t) {
     t.equal(console.log(state.someArray.length, 0)); // should be 0, which never prints
     t.equal(calcs, 3);
 
+	checkGlobalState(t);
     t.end();
 });
 
@@ -218,6 +239,7 @@ test('slow converging cycle', function(t) {
     t.equal(x.get(), 100)
     t.equal(res, 100);
 
+	checkGlobalState(t);
     t.end();
 });
 
@@ -273,6 +295,8 @@ test('error handling assistence ', function(t) {
 
         console.error = baseError;
 		console.warn = baseWarn;
+
+		checkGlobalState(t);
         t.end();
     }, 10);
 })
@@ -324,5 +348,44 @@ test('236 - cycles', t => {
 		"total0:", 6, "total1:", 12
 	])
 
+	checkGlobalState(t);
 	t.end();
+})
+
+test('peeking inside erroring computed value doesn\'t bork (global) state', t => {
+	const a = mobx.observable(1)
+	const b = mobx.computed(() => {
+		a.get()
+		throw "chocolademelk"
+	})
+
+	t.throws(() => {
+		b.get()
+	}, /chocolademelk/)
+
+	t.equal(a.isPendingUnobservation, true) // true is a default for optimization
+	t.equal(a.isObserved, false)
+	t.equal(a.observers.length, 0)
+	t.deepEqual(a.observerIndexes, undefined)
+	t.equal(a.diffValue, 0)
+	t.equal(a.lowestObserverState, -1)
+	t.equal(a.hasUnreportedChange, false)
+	t.equal(a.value, 1)
+
+	t.equal(b.dependenciesState, 0)
+	t.equal(b.observing.length, 0)
+	t.equal(b.newObserving, null)
+	t.equal(b.isPendingUnobservation, false)
+	t.equal(b.isObserved, false)
+	t.equal(b.observers.length, 0)
+	t.deepEqual(b.observerIndexes, undefined)
+	t.equal(b.diffValue, 0)
+	t.equal(b.lowestObserverState, 0)
+	t.equal(b.unboundDepsCount, 0)
+	t.equal(b.value, undefined)
+	t.equal(b.isComputing, false)
+
+	checkGlobalState(t)
+
+	t.end()
 })

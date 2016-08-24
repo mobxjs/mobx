@@ -1,5 +1,5 @@
 import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, shouldCompute} from "./derivation";
-import {globalState} from "./globalstate";
+import {globalState, resetGlobalState} from "./globalstate";
 import {getNextId, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
 import {startBatch, endBatch} from "./observable";
@@ -171,9 +171,11 @@ export function runReactions() {
 	// Hence we work with two variables and check whether
 	// we converge to no remaining reactions after a while.
 	while (allReactions.length > 0) {
-		if (++iterations === MAX_REACTION_ITERATIONS)
+		if (++iterations === MAX_REACTION_ITERATIONS) {
+			resetGlobalState();
 			throw new Error(`Reaction doesn't converge to a stable state after ${MAX_REACTION_ITERATIONS} iterations.`
 				+ ` Probably there is a cycle in the reactive function: ${allReactions[0]}`);
+		}
 		let remainingReactions = allReactions.splice(0);
 		for (let i = 0, l = remainingReactions.length; i < l; i++)
 			remainingReactions[i].runReaction();

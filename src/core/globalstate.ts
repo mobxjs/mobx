@@ -48,7 +48,14 @@ export class MobXGlobals {
 	 */
 	inBatch: number = 0;
 
+	/**
+	 * Observables that don't have observers anymore, and are about to be
+	 * suspended, unless somebody else accesses it in the same batch
+	 *
+	 * @type {IObservable[]}
+	 */
 	pendingUnobservations: IObservable[] = [];
+
 	/**
 	 * List of scheduled, not yet executed, reactions.
 	 */
