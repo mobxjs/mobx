@@ -64,9 +64,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
 	peek() {
 		this.isComputing = true;
-		const prevAllowStateChanges = allowStateChangesStart(false);
+		allowStateChangesStart(false);
 		const res = this.derivation.call(this.scope);
-		allowStateChangesEnd(prevAllowStateChanges);
+		allowStateChangesEnd();
 		this.isComputing = false;
 		return res;
 	};
@@ -110,8 +110,8 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
 	public recoverFromError() {
 		// this.derivation.call(this.scope) in peek returned error, let's run all cleanups, that would be run
+		// note that resetGlobalState will run afterwards
 		this.isComputing = false;
-		endBatch();
 	}
 
 	public set(_: T) {
@@ -159,8 +159,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		const isTracking = Boolean(globalState.trackingDerivation);
 		const observing = unique(this.isComputing ? this.newObserving : this.observing).map((dep: any) => dep.name);
 		const observers = unique(getObservers(this).map(dep => dep.name));
-// TODO: use issue
-// TOOD; expand wiht more states
 		return (`
 WhyRun? computation '${this.name}':
  * Running because: ${isTracking ? "[active] the value of this computation is needed by a reaction" : this.isComputing ? "[get] The value of this computed was requested outside a reaction" : "[idle] not running at the moment"}

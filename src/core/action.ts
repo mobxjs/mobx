@@ -37,13 +37,13 @@ export function executeAction(actionName: string, fn: Function, scope: any, args
 	}
 	const prevUntracked = untrackedStart();
 	transactionStart(actionName, scope, false);
-	const prevAllowStateChanges = allowStateChangesStart(true);
+	allowStateChangesStart(true);
 
 	try {
 		return fn.apply(scope, args);
 	}
 	finally {
-		allowStateChangesEnd(prevAllowStateChanges);
+		allowStateChangesEnd();
 		transactionEnd(false);
 		untrackedEnd(prevUntracked);
 		if (notifySpy)
@@ -64,18 +64,17 @@ export function useStrict(strict?: boolean): any {
 }
 
 export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T): T {
-	const prev = allowStateChangesStart(allowStateChanges);
+	allowStateChangesStart(allowStateChanges);
 	const res = func();
-	allowStateChangesEnd(prev);
+	allowStateChangesEnd();
 	return res;
 }
 
 export function allowStateChangesStart(allowStateChanges: boolean) {
-	const prev = globalState.allowStateChanges;
+	globalState.allowStateChangesStack.push(globalState.allowStateChanges);
 	globalState.allowStateChanges = allowStateChanges;
-	return prev;
 }
 
-export function allowStateChangesEnd(prev: boolean) {
-	globalState.allowStateChanges = prev;
+export function allowStateChangesEnd() {
+	globalState.allowStateChanges = globalState.allowStateChangesStack.pop();
 }
