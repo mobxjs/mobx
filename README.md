@@ -45,11 +45,22 @@ MobX has only a few core concepts. The following snippets can be tried online us
 MobX adds observable capabilities to existing data structures like objects, arrays and class instances. This can simply be done by annotating your class properties with the [@observable](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) decorator (ES.Next), or by invoking the [`observable`](http://mobxjs.github.io/mobx/refguide/observable.html) or [`extendObservable`](http://mobxjs.github.io/mobx/refguide/extend-observable.html) functions (ES5). See [Language support](https://github.com/mobxjs/mobx/wiki/Language-Support) for language-specific examples.
 
 ```javascript
-// ESNext class example:
+// ESNext class example with decorators:
 class Todo {
     id = Math.random();
     @observable title = "";
     @observable finished = false;
+}
+
+// ES6 class without decorators:
+class Todo {
+	constructor() {
+		this.id = Math.random()
+		extendObservable(this, {
+			title: "",
+			finished: false
+		})
+	}
 }
 
 // ES5 constructor function example:
