@@ -9,7 +9,6 @@ test('correct api should be exposed', function(t) {
 		'ObservableMap',
 		'Reaction',
 		'SimpleEventEmitter',
-		'SimpleSet', // TODO: remove somehow
 		'_',
 		'action',
 		'asFlat',
