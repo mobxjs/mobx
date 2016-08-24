@@ -364,7 +364,6 @@ test('peeking inside erroring computed value doesn\'t bork (global) state', t =>
 	}, /chocolademelk/)
 
 	t.equal(a.isPendingUnobservation, true) // true is a default for optimization
-	t.equal(a.isObserved, false)
 	t.equal(a.observers.length, 0)
 	t.deepEqual(a.observerIndexes, undefined)
 	t.equal(a.diffValue, 0)
@@ -376,7 +375,6 @@ test('peeking inside erroring computed value doesn\'t bork (global) state', t =>
 	t.equal(b.observing.length, 0)
 	t.equal(b.newObserving, null)
 	t.equal(b.isPendingUnobservation, false)
-	t.equal(b.isObserved, false)
 	t.equal(b.observers.length, 0)
 	t.deepEqual(b.observerIndexes, undefined)
 	t.equal(b.diffValue, 0)
@@ -408,7 +406,6 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 
 	test("it should update correctly initially", t => {
 		t.equal(a.isPendingUnobservation, true) // true is a default for optimization
-		t.equal(a.isObserved, false) // should be true?
 		t.equal(a.observers.length, 1)
 		t.deepEqual(a.observerIndexes, undefined) // is this correct?!
 		t.equal(a.diffValue, 0)
@@ -448,7 +445,6 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 		t.equal(r, 2)
 
 		t.equal(a.isPendingUnobservation, true) // true is a default for optimization
-		t.equal(a.isObserved, false) // should be true?
 		t.equal(a.observers.length, 1)
 		t.deepEqual(a.observerIndexes, undefined) // is this correct?!
 		t.equal(a.diffValue, 0)
@@ -460,7 +456,6 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 		t.equal(b.observing.length, 1)
 		t.equal(b.newObserving, null)
 		t.equal(b.isPendingUnobservation, false)
-		t.equal(b.isObserved, false) // should be true?
 		t.equal(b.observers.length, 1)
 		t.deepEqual(b.observerIndexes, undefined) // is this correct?
 		t.equal(b.diffValue, 0)
@@ -489,7 +484,6 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 		t.equal(r, 3, "recovered from error")
 
 		t.equal(a.isPendingUnobservation, true) // true is a default for optimization
-		t.equal(a.isObserved, false) // should be true?
 		t.equal(a.observers.length, 1)
 		t.deepEqual(a.observerIndexes, undefined) // is this correct?!
 		t.equal(a.diffValue, 0)
@@ -501,7 +495,6 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 		t.equal(b.observing.length, 1)
 		t.equal(b.newObserving, null)
 		t.equal(b.isPendingUnobservation, false)
-		t.equal(b.isObserved, false) // should be true?
 		t.equal(b.observers.length, 1)
 		t.deepEqual(b.observerIndexes, undefined) // is this correct?
 		t.equal(b.diffValue, 0)
@@ -528,7 +521,6 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 		d()
 
 		t.equal(a.isPendingUnobservation, true) // true is a default for optimization
-		t.equal(a.isObserved, false)
 		t.equal(a.observers.length, 0)
 		t.deepEqual(a.observerIndexes, undefined) // is this correct?!
 		t.equal(a.diffValue, 0)
@@ -540,7 +532,6 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 		t.equal(b.observing.length, 0)
 		t.equal(b.newObserving, null)
 		t.equal(b.isPendingUnobservation, false)
-		t.equal(b.isObserved, false)
 		t.equal(b.observers.length, 0)
 		t.deepEqual(b.observerIndexes, undefined) // is this correct?
 		t.equal(b.diffValue, 0)

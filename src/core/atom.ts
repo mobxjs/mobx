@@ -10,7 +10,6 @@ export interface IAtom extends IObservable {
  */
 export class BaseAtom implements IAtom {
 	isPendingUnobservation = true; // for effective unobserving. BaseAtom has true, for extra optimization, so it's onBecomeUnobserved never get's called, because it's not needed
-	isObserved = false;
 	observers = [];
 	observersIndexes = {};
 

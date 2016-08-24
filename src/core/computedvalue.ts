@@ -35,7 +35,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	newObserving = null; // during tracking it's an array with new observed observers
 
 	isPendingUnobservation: boolean = false;
-	isObserved = false;
 	observers = [];
 	observersIndexes = {};
 	diffValue = 0;
