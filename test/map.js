@@ -239,7 +239,8 @@ test('cleanup', function(t) {
 	t.equal(observable.observers.length, 1);
 	t.equal(x._hasMap.a.observers.length, 1);
 
-	x.delete("a");
+	t.equal(x.delete("a"), true);
+	t.equal(x.delete("not-existing"), false);
 
 	t.equal(aValue, undefined);
 	t.equal(observable.observers.length, 0);

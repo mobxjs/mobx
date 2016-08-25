@@ -93,7 +93,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		}
 	}
 
-	delete(key: string) {
+	delete(key: string): boolean {
 		this.assertValidKey(key);
 		key = "" + key;
 		if (hasInterceptors(this)) {
@@ -103,7 +103,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 				name: key
 			});
 			if (!change)
-				return;
+				return false;
 		}
 
 		if (this._has(key)) {
@@ -129,8 +129,9 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 				notifyListeners(this, change);
 			if (notifySpy)
 				spyReportEnd();
-
+			return true;
 		}
+		return false;
 	}
 
 	private _updateHasMapEntry(key: string, value: boolean): ObservableValue<boolean> {
@@ -301,6 +302,6 @@ export function map<V>(initialValues?: IMapEntries<V> | IKeyValueMap<V>, valueMo
 	return new ObservableMap(initialValues, valueModifier);
 }
 
-export function isObservableMap(thing): boolean {
+export function isObservableMap(thing): thing is ObservableMap<any> {
 	return thing instanceof ObservableMap;
 }

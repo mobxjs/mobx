@@ -1,4 +1,4 @@
-import {invariant, addHiddenProp} from "./utils";
+import {invariant, addHiddenProp, hasOwnProperty} from "./utils";
 
 /**
  * Construcs a decorator, that normalizes the differences between
@@ -57,7 +57,7 @@ export function createClassPropertyDecorator(
 			return newDescriptor;
 		} else {
 			// babel and typescript getter / setter props
-			if (!target.hasOwnProperty("__mobxLazyInitializers")) {
+			if (!hasOwnProperty(target, "__mobxLazyInitializers")) {
 				addHiddenProp(target, "__mobxLazyInitializers",
 					(target.__mobxLazyInitializers && target.__mobxLazyInitializers.slice()) || [] // support inheritance
 				);
@@ -105,7 +105,7 @@ export function createClassPropertyDecorator(
 }
 
 function typescriptInitializeProperty(instance, key, v, onInitialize, customArgs, baseDescriptor) {
-	if (!instance.hasOwnProperty("__mobxInitializedProps"))
+	if (!hasOwnProperty(instance, "__mobxInitializedProps"))
 		addHiddenProp(instance, "__mobxInitializedProps", {});
 	instance.__mobxInitializedProps[key] = true;
 	onInitialize(instance, key, v, customArgs, baseDescriptor);

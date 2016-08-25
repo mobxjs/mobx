@@ -51,11 +51,11 @@ test('babel: parameterized computed decorator', (t) => {
 			return { sum: Math.round(this.x) + Math.round(this.y) };
 		}
 	}
-	
+
 	const t1 = new TestClass();
 	const changes: { sum: number}[] = [];
 	const d = autorun(() => changes.push(t1.boxedSum));
-	
+
 	t1.y = 4; // change
 	t.equal(changes.length, 2);
 	t1.y = 4.2; // no change
@@ -68,9 +68,9 @@ test('babel: parameterized computed decorator', (t) => {
 	t1.x = 6; // change
 	t.equal(changes.length, 3);
 	d();
-	
+
 	t.deepEqual(changes, [{ sum: 6 }, { sum: 7 }, { sum: 9 }]);
-	
+
 	t.end();
 });
 
@@ -92,20 +92,20 @@ test('decorators', function(t) {
 	t.equal(isObservable(o, 'amount'), true);
 	t.equal(o.total, 6); // TODO: remove hmm this is required to initialize the props which are made reactive lazily..
 	t.equal(isObservable(o, 'total'), true);
-	
+
 	var events = [];
 	var d1 = observe(o, (ev) => events.push(ev.name, ev.oldValue));
 	var d2 = observe(o, 'price', (newValue, oldValue) => events.push(newValue, oldValue));
 	var d3 = observe(o, 'total', (newValue, oldValue) => events.push(newValue, oldValue));
-	
+
 	o.price = 4;
-	
+
 	d1();
 	d2();
 	d3();
-	
+
 	o.price = 5;
-	
+
 	t.deepEqual(events, [
 		8, // new total
 		6, // old total
@@ -114,7 +114,7 @@ test('decorators', function(t) {
 		"price", // event name
 		3, // event oldValue
 	]);
-	
+
 	t.end();
 })
 
@@ -123,23 +123,23 @@ test('issue 191 - shared initializers (babel)', function(t) {
 		@observable obj = { a: 1 };
 		@observable array = [2];
 	}
-	
+
 	var t1 = new Test();
 	t1.obj.a = 2;
 	t1.array.push(3);
-	
+
 	var t2 = new Test();
 	t2.obj.a = 3;
 	t2.array.push(4);
-	
+
 	t.notEqual(t1.obj, t2.obj);
 	t.notEqual(t1.array, t2.array);
 	t.equal(t1.obj.a, 2);
 	t.equal(t2.obj.a, 3);
-	
+
 	t.deepEqual(t1.array.slice(), [2,3]);
 	t.deepEqual(t2.array.slice(), [2,4]);
-	
+
 	t.end();
 })
 
@@ -156,7 +156,7 @@ test("action decorator (babel)", function(t) {
 		constructor(multiplier) {
 			this.multiplier = multiplier;
 		}
-		
+
 		@action
 		add(a, b) {
 			return (a + b) * this.multiplier;
@@ -233,7 +233,7 @@ test("action decorator on field (babel)", function(t) {
 
 	const store1 =  new Store(2);
 	const store2 =  new Store(7);
-	
+
 	const events: any[] = [];
 	const d = spy(events.push.bind(events));
 	t.equal(store1.add(3, 4), 14);
@@ -268,7 +268,7 @@ test("custom action decorator on field (babel)", function(t) {
 
 	const store1 =  new Store(2);
 	const store2 =  new Store(7);
-	
+
 	const events: any[] = [];
 	const d = spy(events.push.bind(events));
 	t.equal(store1.add(3, 4), 14);
@@ -330,7 +330,7 @@ test("observable performance", t => {
 
 	for (var i = 0; i < AMOUNT; i++)
 		objs.push(new A());
-	
+
 	console.log("created in ", Date.now() - start);
 
 	for (var j = 0; j < 4; j++) {
@@ -341,7 +341,7 @@ test("observable performance", t => {
 			obj.c = obj.b - obj.a;
 			obj.d;
 		}
-	} 
+	}
 
 	console.log("changed in ", Date.now() - start);
 
@@ -443,7 +443,7 @@ test("reusing initializers", t => {
 	class A {
 		@observable a = 3;
 		@observable b = this.a + 2;
-		@computed get c() { 
+		@computed get c() {
 			return this.a + this.b;
 		}
 		@computed get d() {
@@ -467,14 +467,14 @@ test("reusing initializers", t => {
 test("enumerability", t => {
 	class A {
 		@observable a = 1; // enumerable, on proto
-		@observable a2 = 2; 
+		@observable a2 = 2;
 		@computed get b () { return this.a } // non-enumerable, on proto
 		@action m() {} // non-enumerable, on proto
 		@action m2 = () => {}; // non-enumerable, on self
 	}
 
 	const a = new A();
-	
+
 	// not initialized yet
 	let ownProps = Object.keys(a);
 	let props = [];
@@ -504,7 +504,7 @@ test("enumerability", t => {
 	a.b;
 	a.m;
 	a.m2;
-	
+
 	ownProps = Object.keys(a);
 	props = [];
 	for (var key in a)
@@ -534,7 +534,7 @@ test("enumerability", t => {
 test("enumerability - workaround", t => {
 	class A {
 		@observable a = 1; // enumerable, on proto
-		@observable a2 = 2; 
+		@observable a2 = 2;
 		@computed get b () { return this.a } // non-enumerable, on proto
 		@action m() {} // non-enumerable, on proto
 		@action m2 = () => {}; // non-enumerable, on self
@@ -608,7 +608,7 @@ test("verify object assign (babel)", t => {
 
 	const todo = new Todo();
 	t.deepEqual(Object.assign({}, todo), {
-//		Should be:	title: "test"! 
+//		Should be:	title: "test"!
 	});
 
 	todo.title; // lazy initialization :'(
@@ -647,7 +647,7 @@ test("379, inheritable actions (babel)", t => {
 	const a = new A()
 	t.equal(a.method(), 42)
 	t.equal(isAction(a.method), true)
-	
+
 	const c = new C()
 	t.equal(c.method(), 87)
 	t.equal(isAction(c.method), true)
@@ -681,10 +681,29 @@ test("379, inheritable actions - 2 (babel)", t => {
 	const a = new A()
 	t.equal(a.method(), 42)
 	t.equal(isAction(a.method), true)
-	
+
 	const c = new C()
 	t.equal(c.method(), 87)
 	t.equal(isAction(c.method), true)
 
+	t.end()
+})
+
+test("505, don't throw when accessing subclass fields in super constructor (babel)", t => {
+	const values = {}
+	class A {
+		@observable a = 1
+		constructor() {
+			values.b = this.b
+			values.a = this.a
+		}
+	}
+
+	class B extends A {
+		@observable b = 2
+	}
+
+	new B()
+	t.deepEqual(values, { a: 1, b: 2}) // In the TS test b is undefined, which is actually the expected behavior?
 	t.end()
 })

@@ -18,6 +18,14 @@ const actionFieldDecorator = createClassPropertyDecorator(
 	true
 );
 
+export function action<A1, R, T extends (a1: A1) => R>(fn: T): T;
+export function action<A1, A2, R, T extends (a1: A1, a2: A2) => R>(fn: T): T;
+export function action<A1, A2, A3, R, T extends (a1: A1, a2: A2, a3: A3) => R>(fn: T): T;
+export function action<A1, A2, A3, A4, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4) => R>(fn: T): T;
+export function action<A1, R, T extends (a1: A1) => R>(name: string, fn: T): T;
+export function action<A1, A2, R, T extends (a1: A1, a2: A2) => R>(name: string, fn: T): T;
+export function action<A1, A2, A3, R, T extends (a1: A1, a2: A2, a3: A3) => R>(name: string, fn: T): T;
+export function action<A1, A2, A3, A4, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4) => R>(name: string, fn: T): T;
 export function action<T extends Function>(fn: T): T;
 export function action<T extends Function>(name: string, fn: T): T;
 export function action(customName: string): (target: Object, key: string, baseDescriptor?: PropertyDescriptor) => void;
@@ -49,8 +57,8 @@ function namedActionDecorator(name: string) {
 	};
 }
 
-export function runInAction<T>(block: () => T, scope?: any);
-export function runInAction<T>(name: string, block: () => T, scope?: any);
+export function runInAction<T>(block: () => T, scope?: any): T;
+export function runInAction<T>(name: string, block: () => T, scope?: any): T;
 export function runInAction<T>(arg1, arg2?, arg3?) {
 	const actionName = typeof arg1 === "string" ? arg1 : arg1.name || "<unnamed action>";
 	const fn = typeof arg1 === "function" ? arg1 : arg2;

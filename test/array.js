@@ -330,3 +330,13 @@ test('autoextend buffer length', function(t) {
 
 	t.end();
 })
+
+test('array exposes correct keys', t => {
+	var keys = []
+	var ar = observable([1,2])
+	for (var key in ar)
+		keys.push(key)
+
+	t.deepEqual(keys, [])
+	t.end()
+})
