@@ -42,7 +42,7 @@
     <body>
         
         
-    <div class="book" data-level="0" data-basepath="." data-revision="Fri Aug 12 2016 23:15:16 GMT+0200 (CEST)">
+    <div class="book" data-level="0" data-basepath="." data-revision="Thu Aug 25 2016 15:29:37 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -201,7 +201,7 @@
                         
                             <b>2.5.</b>
                         
-                        @observer
+                        (@)observer
                     </a>
             
             
@@ -876,9 +876,10 @@
 <li><a href="https://mobxjs.github.io/mobx/getting-started.html" target="_blank">Ten minute, interactive MobX + React tutorial</a></li>
 <li><a href="https://mobxjs.github.io/mobx/refguide/api.html" target="_blank">Official documentation and API overview</a></li>
 <li>Videos:<ul>
-<li><a href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx" target="_blank">Egghead.io course: Manage Complex State in React Apps with MobX</a></li>
-<li><a href="https://www.youtube.com/watch?v=XGwuM_u7UeQ" target="_blank">Practical React with MobX</a>. In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth.</li>
-<li><a href="https://www.youtube.com/watch?v=K8dr8BMU7-8" target="_blank">Screencast: intro to MobX</a></li>
+<li><a href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx" target="_blank">Egghead.io course: Manage Complex State in React Apps with MobX</a> - 30m.</li>
+<li><a href="https://www.youtube.com/watch?v=XGwuM_u7UeQ" target="_blank">Practical React with MobX</a>. In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth (ES5 only) - 42m.</li>
+<li>LearnCode.academy MobX tutorial <a href="https://www.youtube.com/watch?v=_q50BXqkAfI" target="_blank">Part I: MobX + React is AWESOME (7m)</a> <a href="https://www.youtube.com/watch?v=nYvNqKrl69s" target="_blank">Part II: Computed Values and Nested/Referenced Observables (12m.)</a></li>
+<li><a href="https://www.youtube.com/watch?v=K8dr8BMU7-8" target="_blank">Screencast: intro to MobX</a> - 8m</li>
 <li><a href="https://www.youtube.com/watch?v=ApmSsu3qnf0&amp;feature=youtu.be" target="_blank">State Management Is Easy, React Amsterdam 2016 conf</a> (<a href="https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx" target="_blank">slides</a>)</li>
 <li><a href="https://www.youtube.com/watch?v=TfxfRkNCnmk" target="_blank">Magix MobX, RuhrJS 2016</a></li>
 <li><a href="https://www.youtube.com/watch?v=FEwLwiizlk0" target="_blank">Transparent Reactive Programming and Mutable Data, Reactive2015 conf</a> (<a href="https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures" target="_blank">slides</a>)</li>
@@ -904,6 +905,18 @@ The philosophy behind MobX is very simple:</p>
     id = <span class="hljs-built_in">Math</span>.random();
     @observable title = <span class="hljs-string">&quot;&quot;</span>;
     @observable finished = <span class="hljs-literal">false</span>;
+}
+
+
+<span class="hljs-comment">// ES6 class without decorators:</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span> </span>{
+    constructor() {
+        <span class="hljs-keyword">this</span>.id = <span class="hljs-built_in">Math</span>.random()
+        extendObservable(<span class="hljs-keyword">this</span>, {
+            title: <span class="hljs-string">&quot;&quot;</span>,
+            finished: <span class="hljs-literal">false</span>
+        })
+    }
 }
 
 <span class="hljs-comment">// ES5 constructor function example:</span>

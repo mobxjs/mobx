@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="7.11" data-basepath=".." data-revision="Fri Aug 12 2016 23:15:16 GMT+0200 (CEST)">
+    <div class="book" data-level="7.11" data-basepath=".." data-revision="Thu Aug 25 2016 15:29:37 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -203,7 +203,7 @@
                         
                             <b>2.5.</b>
                         
-                        @observer
+                        (@)observer
                     </a>
             
             
@@ -873,6 +873,7 @@
 Supports observable arrays, objects, maps and primitives.
 Computed values and other non-enumerable properties won&apos;t be part of the result.
 Cycles are detected and properly supported by default, but this can be disabled to improve performance.</p>
+<p>For more complex (de)serialization scenario&apos;s, one can use <a href="https://github.com/mobxjs/serializr" target="_blank">serializr</a></p>
 <pre><code>var obj = mobx.observable({
     x: 1
 });

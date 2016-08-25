@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="7.13" data-basepath=".." data-revision="Fri Aug 12 2016 23:15:16 GMT+0200 (CEST)">
+    <div class="book" data-level="7.13" data-basepath=".." data-revision="Thu Aug 25 2016 15:29:37 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -203,7 +203,7 @@
                         
                             <b>2.5.</b>
                         
-                        @observer
+                        (@)observer
                     </a>
             
             
@@ -868,9 +868,9 @@
                     <section class="normal" id="section-">
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/untracked.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="untracked">Untracked</h1>
-<p><em>Untracked is an experimental feature that might or might not be useful. If you use this feature in production, please report it here:
-<a href="https://github.com/mobxjs/mobx/issues/49" target="_blank">https://github.com/mobxjs/mobx/issues/49</a>, otherwise it might be removed in a future minor release.</em></p>
-<p>Untracked allows you to run a piece of code without establishing observers. For example:</p>
+<p>Untracked allows you to run a piece of code without establishing observers.
+Like <code>transaction</code>, <code>untracked</code> is automatically applied by <code>(@)action</code>, so usually it makes more sense to use actions then <code>untracked</code> directly.
+Example:</p>
 <pre><code class="lang-javascript">
 <span class="hljs-keyword">const</span> person = observable({
     firstName: <span class="hljs-string">&quot;Michel&quot;</span>,
@@ -883,7 +883,7 @@ autorun(() =&gt; {
         <span class="hljs-string">&quot;,&quot;</span>,
         <span class="hljs-comment">// this untracked block will return the person&apos;s firstName without establishing a dependency</span>
         untracked(() =&gt; person.firstName)
-    );        
+    );
 });
 <span class="hljs-comment">// prints: Weststrate, Michel</span>
 

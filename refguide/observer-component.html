@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>@observer | MobX</title>
+        <title>(@)observer | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.4.3">
@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.5" data-basepath=".." data-revision="Fri Aug 12 2016 23:15:16 GMT+0200 (CEST)">
+    <div class="book" data-level="2.5" data-basepath=".." data-revision="Thu Aug 25 2016 15:29:37 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -203,7 +203,7 @@
                         
                             <b>2.5.</b>
                         
-                        @observer
+                        (@)observer
                     </a>
             
             
@@ -891,6 +891,7 @@ React.render(&lt;Timer timerData={timerData} /&gt;, document.body)
 </code></pre>
 <p>Tip: when <code>observer</code> needs to be combined with other decorators or higher-order-components, make sure that <code>observer</code> is the innermost (first applied) decorator;
 otherwise it might do nothing at all.</p>
+<p>Note that using <code>@observer</code> as decorator is optional, <code>observer(class Timer ... { })</code> achieves exactly the same.</p>
 <h2 id="gotcha-dereference-values-inside-your-components">Gotcha: dereference values <em>inside</em> your components</h2>
 <p>MobX can do a lot, but it cannot make primitive values observable (although it can wrap them in an object see <a href="boxed.html">boxed observables</a>).
 So not the <em>values</em> that are observable, but the <em>properties</em> of an object. This means that <code>@observer</code> actually reacts to the fact that you dereference a value.
