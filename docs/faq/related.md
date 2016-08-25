@@ -7,6 +7,7 @@
 * [MobX deku bindings](https://github.com/micnews/mobx-deku)
 * For Preact the [preact-compat](https://github.com/developit/preact-compat) module + mobx-react can be used.
 * [tracker-mobx-autorun](https://github.com/meteor-space/tracker-mobx-autorun) Integrate Meteor reactive data with MobX for simple yet highly optimized state management
+* [react-native-mobx](https://github.com/aksonov/react-native-mobx) Make your app reactive with MobX and react-native-router-flux
 
 * [mobx-form](https://github.com/royriojas/mobx-form) Declaratively build forms using MobX
 * [mobx-ajv-form](https://github.com/foxhound87/mobx-ajv-form) Build forms and validate them using json-schema rules
@@ -25,6 +26,7 @@
 * [mobx-roof](https://github.com/mobx-roof/mobx-roof) Simple, React MVVM framework based on mobx
 * [mobx-translate](https://github.com/tomaash/mobx-translate) Simple translations library for mobx
 * [react-mobx-translatable](https://github.com/infinum/react-mobx-translatable) Make React components translatable using MobX. Can be used both on the server (SSR) and in the browser.
+* [mobx-logger](https://github.com/winterbe/mobx-logger) Always know what is really going on in your MobX application by logging just the right information.
 
 ## ... More
 

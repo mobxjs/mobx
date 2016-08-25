@@ -27,6 +27,8 @@ React.render(<Timer timerData={timerData} />, document.body)
 Tip: when `observer` needs to be combined with other decorators or higher-order-components, make sure that `observer` is the innermost (first applied) decorator;
 otherwise it might do nothing at all.
 
+Note that using `@observer` as decorator is optional, `observer(class Timer ... { })` achieves exactly the same.
+
 ## Gotcha: dereference values _inside_ your components
 MobX can do a lot, but it cannot make primitive values observable (although it can wrap them in an object see [boxed observables](boxed.md)).
 So not the _values_ that are observable, but the _properties_ of an object. This means that `@observer` actually reacts to the fact that you dereference a value.

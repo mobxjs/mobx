@@ -18,6 +18,7 @@ In other words: reaction requires you to produce the things you need in your sid
 In the following example both `reaction1`, `reaction2` and `autorun1` will react to the addition, removal or replacement of todo's in the `todos` array.
 But only `reaction2` and `autorun` will react to the change of a `title` in one of the todo items, because `title` is used in the data expression of reaction 2, while it isn't in the data expression of reaction 1.
 `autorun` tracks the complete side effect, hence it will always trigger correctly, but is also more suspectible to accidentally accessing unrelevant data.
+See also [what will MobX React to?](../best/react).
 
 ```javascript
 const todos = observable([
@@ -32,13 +33,13 @@ const todos = observable([
 ]);
 
 const reaction1 = reaction(
-    () => todos,
+    () => todos.length,
     todos => console.log("reaction 1:", todos.map(todo => todo.title).join(", "))
 );
 
 const reaction2 = reaction(
-    () => todos.map(todo => { title: todo.title }),
-    todos => console.log("reaction 2:", todos.map(todo => todo.title).join(", "))
+    () => todos.map(todo => todo.title),
+    titles => console.log("reaction 2:", titles.join(", "))
 );
 
 const autorun1 = autorun(

@@ -2,7 +2,8 @@
 
 ## Videos
 * [Egghead.io course: Manage Complex State in React Apps with MobX](https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx)
-* [Practical React with MobX](https://www.youtube.com/watch?v=XGwuM_u7UeQ). In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth. ([slides](http://slides.com/mattruby/deck))
+* LearnCode.academy MobX tutorial [Part I: MobX + React is AWESOME (7m)](https://www.youtube.com/watch?v=_q50BXqkAfI) [Part II: Computed Values and Nested/Referenced Observables (12m.)](https://www.youtube.com/watch?v=nYvNqKrl69s)
+* [Practical React with MobX](https://www.youtube.com/watch?v=XGwuM_u7UeQ). In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth (ES5 only). ([slides](http://slides.com/mattruby/deck))
 * [Screencast: 8 minute overview of MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8)
 * [Understanding MobX versus Redux](https://www.youtube.com/watch?v=83v8cdvGfeA) (related thread: https://github.com/mobxjs/mobx/issues/199)
 * [State Management Is Easy, React Amsterdam 2016 conf](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
@@ -14,10 +15,13 @@
 * [Simple ES5 MobX examples](https://github.com/mattruby/mobx-examples) Bite sized MobX examples all setup to run in jsFiddle.
 * [It's all about time: Building a performant Stopwatch with MobX and React - fast](https://onsen.io/blog/mobx-tutorial-react-stopwatch/)
 * [Getting started with MobX: an easy example](https://tonyspiro.com/getting-started-with-mobx-an-easy-example)
+* [How to Test React and MobX with Jest](https://semaphoreci.com/community/tutorials/how-to-test-react-and-mobx-with-jest?utm_content=buffer15b42&utm_medium=social&utm_source=twitter.com&utm_campaign=buffer)
 * [Real time Chat App with OnsenUI, Horizon and MobX](http://tutorials.pluralsight.com/html-css/real-time-chat-app-with-onsenui-and-horizon?hearted=1)
 * [React Native With MobX - Getting Started](https://medium.com/@dabit3/react-native-with-mobx-getting-started-ba7e18d8ff44#.uge82y49s)
 * [MobX React: Simplified State Management in React](http://www.robinwieruch.de/mobx-react/?utm_content=bufferd1bb1&utm_medium=social&utm_source=twitter.com&utm_campaign=buffer). Tutorial on converting the SoundCloud client from React+Redux to React+MobX.
 * [Introducing serializr: serializing and deserializing object graphs with ease](https://medium.com/@mweststrate/introducing-serializr-serializing-and-deserializing-object-graphs-with-ease-8833c3fcea02#.lghi3ybjm)
+* [How to decouple state and UI (a.k.a. you don’t need componentWillMount) - data fetching, authentication, routing and testing](https://medium.com/@mweststrate/how-to-decouple-state-and-ui-a-k-a-you-dont-need-componentwillmount-cc90b787aa37#.7zvpxt746)
+* [Getting Started ReactJS with MobX](https://codequs.com/p/HyTu8aIK/getting-started-reactjs-with-mobx/)
 
 ## Articles / blogs explaining the inner working of MobX:
 
@@ -29,6 +33,7 @@
 * [Why we chose MobX over Redux for Spectacle Editor](http://formidable.com/blog/2016/06/02/why-we-chose-mobx-over-redux-for-spectacle-editor/)
 * [Optimising React rendering - tips to optimise rendering of a set of elements in React](https://medium.com/@lavrton/how-to-optimise-rendering-of-a-set-of-elements-in-react-ad01f5b161ae#.ijw98ktg5)
 * [Handling React Forms with Mobx Observables](https://blog.risingstack.com/handling-react-forms-with-mobx-observables/)
+* [mobx-utils: community driven utility belt for MobX](https://medium.com/@mweststrate/mobx-utils-community-driven-utility-belt-for-mobx-264346cb2744#.n8cweziy9)
 * [MobX 2.2: explicit actions, controlled mutations and improved DX](https://medium.com/@mweststrate/mobx-2-2-explicit-actions-controlled-mutations-and-improved-dx-45cdc73c7c8d#.h5jt4nlwf)
 * [Understanding MobX and when to use it (Github issue)](https://github.com/mobxjs/mobx/issues/199)
 * [Creating a multi-page form using MobX with Meteor & React](http://markshust.com/2016/06/02/creating-multi-page-form-using-mobx-meteor-react)
@@ -41,6 +46,8 @@
 * [Object.observe is dead. Long live MobX.observe](https://medium.com/@mweststrate/object-observe-is-dead-long-live-mobservable-observe-ad96930140c5#.krm1pec8p)
 * [Hashnode AMA on MobX](https://hashnode.com/ama/with-mobx-cinspo7i500vyxs53buh8ebls)
 * [How I use MobX 2 in an AngularJS 1 application](https://philhosoft.github.io/Programming/AngularJS-1-and-MobX-2/)
+* [A Notification System with MobX and ReactJS](https://medium.com/@GiacomoRebonato/a-notification-system-with-mobx-and-reactjs-ecbadca258c1#.ps9j0i4lg)
+* [Using MobX in Angular 1.5 todo app](http://gaui.is/angular-1-5-todo-app/)
 
 ## Testimonials
 

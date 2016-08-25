@@ -120,7 +120,8 @@ Modifiers can be used to influence how `observable` treats specific values.
 
 # Utilities
 
-_Here are some utilities that might make working with observable objects or computed values more convenient._
+_Here are some utilities that might make working with observable objects or computed values more convenient.
+More, less trivial utilities can be found in the * [mobx-utils](https://github.com/mobxjs/mobx-utils) package._
 
 ### `Provider` (`mobx-react` package)
 

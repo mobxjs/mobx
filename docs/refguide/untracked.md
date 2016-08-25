@@ -1,9 +1,8 @@
 # Untracked
 
-*Untracked is an experimental feature that might or might not be useful. If you use this feature in production, please report it here:
-https://github.com/mobxjs/mobx/issues/49, otherwise it might be removed in a future minor release.*
-
-Untracked allows you to run a piece of code without establishing observers. For example:
+Untracked allows you to run a piece of code without establishing observers.
+Like `transaction`, `untracked` is automatically applied by `(@)action`, so usually it makes more sense to use actions then `untracked` directly.
+Example:
 
 ```javascript
 
@@ -18,7 +17,7 @@ autorun(() => {
 		",",
 		// this untracked block will return the person's firstName without establishing a dependency
 		untracked(() => person.firstName)
-	);		
+	);
 });
 // prints: Weststrate, Michel
 
