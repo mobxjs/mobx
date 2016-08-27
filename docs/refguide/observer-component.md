@@ -131,7 +131,7 @@ The simple rule of thumb is: _all components that render observable data_.
 If you don't want to mark a component as observer, for example to reduce the dependencies of a generic component package, make sure you only pass it plain data.
 
 With `@observer` there is no need to distinguish 'smart' components from 'dumb' components for the purpose of rendering.
-It is stil a good separation of concerns for where to handle events, make requests etc.
+It is still a good separation of concerns for where to handle events, make requests etc.
 All components become responsible for updating when their _own_ dependencies change.
 Its overhead is neglectable and it makes sure that whenever you start using observable data the component will respond to it.
 See this [thread](https://www.reddit.com/r/reactjs/comments/4vnxg5/free_eggheadio_course_learn_mobx_react_in_30/d61oh0l) for more details.
