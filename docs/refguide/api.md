@@ -161,7 +161,7 @@ Api that can be used to intercept changes before they are applied to an observab
 
 ### `observe`
 Usage: `observe(object, property?, listener, fireImmediately = false)`
-Low-level api that can be used be used to observe a single observable value.
+Low-level api that can be used to observe a single observable value.
 [&laquo;details&raquo;](observe.md)
 
 ### `useStrict`
