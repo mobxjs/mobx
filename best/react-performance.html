@@ -925,7 +925,7 @@ If this happens deeper in your component tree, less components have to re-render
 But a change in the <code>name</code> property will, in the first case, trigger the <code>DisplayName</code> to re-render, while in the latter, the owner of the component has to re-render.
 However, it is more important for your components to have a comprehensible API than applying this optimization.
 To have the best of both worlds, consider making smaller components:</p>
-<p><code>const PersonNameDispayer = observer(({ props }) =&gt; &lt;DisplayName name={props.person.name} /&gt;)</code></p>
+<p><code>const PersonNameDisplayer = observer(({ props }) =&gt; &lt;DisplayName name={props.person.name} /&gt;)</code></p>
 <h2 id="bind-functions-early">Bind functions early</h2>
 <p>This tip applies to React in general and libraries using <code>PureRenderMixin</code> especially, try to avoid creating new closures in render methods.</p>
 <p>See also these resources:</p>

@@ -78,7 +78,7 @@ But a change in the `name` property will, in the first case, trigger the `Displa
 However, it is more important for your components to have a comprehensible API than applying this optimization.
 To have the best of both worlds, consider making smaller components:
 
-`const PersonNameDispayer = observer(({ props }) => <DisplayName name={props.person.name} />)`
+`const PersonNameDisplayer = observer(({ props }) => <DisplayName name={props.person.name} />)`
 
 ## Bind functions early
 
