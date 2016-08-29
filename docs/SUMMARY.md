@@ -46,4 +46,4 @@
   * [transaction](refguide/transaction.md)
   * [untracked](refguide/untracked.md)
   * [when](refguide/when.md)
-* [Donate](https://mobxjs.github.io/mobx/donate.html)
+* [Donate](donate.md)

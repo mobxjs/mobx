@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="6.1" data-basepath=".." data-revision="Thu Aug 25 2016 15:29:37 GMT+0200 (CEST)">
+    <div class="book" data-level="6.1" data-basepath=".." data-revision="Mon Aug 29 2016 13:33:21 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -746,10 +746,10 @@
             
         </li>
     
-        <li class="chapter " data-level="8" >
+        <li class="chapter " data-level="8" data-path="donate.html">
             
                 
-                    <a target="_blank" href="https:/mobxjs.github.io/mobx/donate.html">
+                    <a href="../donate.html">
                 
                         <i class="fa fa-check"></i>
                         
@@ -888,7 +888,7 @@ For more info see <a href="react.html">what will MobX react to?</a>.</p>
 So usually all your components should be decorated. Don&apos;t worry, this is not inefficient, in contrast, more <code>observer</code> components make rendering more efficient.</p>
 <h3 id="dereference-values-as-lately-as-possible">Dereference values as lately as possible</h3>
 <p>MobX can do a lot, but it cannot make primitive values observable (although it can wrap them in an object see <a href="../refguide/boxed.html">boxed observables</a>).
-So it are not the <em>values</em> that are observable, but the <em>properties</em> of an object. This means that <code>@observer</code> actually reacts to the fact that you dereference a value.
+So it is not the <em>values</em> that are observable, but the <em>properties</em> of an object. This means that <code>@observer</code> actually reacts to the fact that you dereference a value.
 So in our above example, the <code>Timer</code> component would <strong>not</strong> react if it was initialized as follows:</p>
 <pre><code class="lang-javascript">React.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">Timer</span> <span class="hljs-attribute">timerData</span>=<span class="hljs-value">{timerData.secondsPassed}</span> /&gt;</span>, document.body)
 </span></code></pre>
