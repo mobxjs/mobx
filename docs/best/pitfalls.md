@@ -28,7 +28,7 @@ So usually all your components should be decorated. Don't worry, this is not ine
 ### Dereference values as lately as possible
 
 MobX can do a lot, but it cannot make primitive values observable (although it can wrap them in an object see [boxed observables](../refguide/boxed.md)).
-So it are not the _values_ that are observable, but the _properties_ of an object. This means that `@observer` actually reacts to the fact that you dereference a value.
+So it is not the _values_ that are observable, but the _properties_ of an object. This means that `@observer` actually reacts to the fact that you dereference a value.
 So in our above example, the `Timer` component would **not** react if it was initialized as follows:
 
 ```javascript
