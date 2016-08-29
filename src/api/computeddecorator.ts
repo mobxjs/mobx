@@ -23,7 +23,10 @@ const computedDecorator = createClassPropertyDecorator(
 		defineObservableProperty(adm, name, compareStructural ? asStructure(baseValue) : baseValue, false);
 	},
 	function (name) {
-		return this.$mobx.values[name].get();
+		const observable = this.$mobx.values[name];
+		if (observable === undefined) // See #505
+			return undefined;
+		return observable.get();
 	},
 	throwingComputedValueSetter,
 	false,
