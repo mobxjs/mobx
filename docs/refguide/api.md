@@ -90,7 +90,7 @@ Returns a disposer function to cancel the side effect. [&laquo;details&raquo;](a
 
 ### `when`
 Usage: `when(debugname?, () => condition, () => { sideEffect })`.
-The condition expression will react automatically to any observables is uses.
+The condition expression will react automatically to any observables it uses.
 As soon as the expression returns true the sideEffect function will be invoked, but only once.
 `when` returns a disposer to prematurely cancel the whole thing. [&laquo;details&raquo;](when.md)
 
@@ -283,7 +283,7 @@ For the full api of the returned `ObservableMap` see *Observable maps*.
 [&laquo;details&raquo;](map.md)
 
 ### `expr`
-Usage: `expr(() => someExpression`. Just a shorthand for `computed(() => someExpression).get()`.
+Usage: `expr(() => someExpression)`. Just a shorthand for `computed(() => someExpression).get()`.
 `expr` is useful in some rare cases to optimize another computed function or reaction.
 In general it is simpler and better to just split the function in multiple smaller computed's to achieve the same effect.
 [&laquo;details&raquo;](expr.md)
