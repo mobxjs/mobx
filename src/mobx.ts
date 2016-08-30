@@ -23,7 +23,7 @@ export { IAtom, Atom, BaseAtom                                } from "./core/ato
 export { IObservable, IDepTreeNode                            } from "./core/observable";
 export { Reaction, IReactionPublic                            } from "./core/reaction";
 export { IDerivation, untracked, IDerivationState             } from "./core/derivation";
-export { useStrict                                            } from "./core/action";
+export { useStrict, isStrictModeEnabled                       } from "./core/action";
 export { spy                                                  } from "./core/spy";
 export { transaction                                          } from "./core/transaction";
 export { IComputedValue                                       } from "./core/computedvalue";
@@ -86,3 +86,9 @@ export const _ = {
 	getAdministration,
 	resetGlobalState
 };
+
+declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: ((any) => void)};
+declare var module: { exports: any };
+if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === 'object') {
+	__MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx(module.exports)
+}

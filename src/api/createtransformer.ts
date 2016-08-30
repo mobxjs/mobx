@@ -17,7 +17,7 @@ export function createTransformer<A, B>(transformer: ITransformer<A, B>, onClean
 	// Local transformer class specifically for this transformer
 	class Transformer extends ComputedValue<B> {
 		constructor(private sourceIdentifier: string, private sourceObject: A) {
-			super(() => transformer(sourceObject), null, false, `Transformer-${(<any>transformer).name}-${sourceIdentifier}`);
+			super(() => transformer(sourceObject), null, false, `Transformer-${(<any>transformer).name}-${sourceIdentifier}`, undefined);
 		}
 		onBecomeUnobserved() {
 			const lastValue = this.value;

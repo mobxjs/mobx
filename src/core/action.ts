@@ -1,5 +1,5 @@
 import {transactionStart, transactionEnd} from "../core/transaction";
-import {invariant} from "../utils/utils";
+import {invariant, deprecated} from "../utils/utils";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {ComputedValue} from "../core/computedvalue";
@@ -54,13 +54,18 @@ export function executeAction(actionName: string, fn: Function, scope: any, args
 export function useStrict(): boolean;
 export function useStrict(strict: boolean);
 export function useStrict(strict?: boolean): any {
-	if (arguments.length === 0)
+	if (arguments.length === 0) {
+		deprecated("`useStrict` without arguments is deprecated, use `isStrictModeEnabled()` instead");
 		return globalState.strictMode;
-	else {
+	} else {
 		invariant(globalState.trackingDerivation === null, "It is not allowed to set `useStrict` when a derivation is running");
 		globalState.strictMode = strict;
 		globalState.allowStateChanges = !strict;
 	}
+}
+
+export function isStrictModeEnabled(): boolean {
+	return globalState.strictMode;
 }
 
 export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T): T {

@@ -707,3 +707,22 @@ test("505, don't throw when accessing subclass fields in super constructor (babe
 	t.deepEqual(values, { a: 1, b: 2}) // In the TS test b is undefined, which is actually the expected behavior?
 	t.end()
 })
+
+test('computed setter should succeed (babel)', function(t) {
+	class Bla {
+		@observable a = 3;
+		@computed get propX() {
+			return this.a * 2;
+		}
+		set propX(v) {
+			this.a = v
+		}
+	}
+
+	const b = new Bla();
+	t.equal(b.propX, 6);
+	b.propX = 4;
+	t.equal(b.propX, 8);
+
+	t.end();
+});

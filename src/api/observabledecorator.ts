@@ -11,11 +11,14 @@ const decoratorImpl = createClassPropertyDecorator(
 		if (typeof baseValue === "function")
 			baseValue = asReference(baseValue);
 		const adm = asObservableObject(target, undefined, ValueMode.Recursive);
-		defineObservableProperty(adm, name, baseValue, true);
+		defineObservableProperty(adm, name, baseValue, true, undefined);
 		allowStateChangesEnd(prevA);
 	},
 	function (name) {
-		return this.$mobx.values[name].get();
+		const observable = this.$mobx.values[name];
+		if (observable === undefined) // See #505
+			return undefined;
+		return observable.get();
 	},
 	function (name, value) {
 		setPropertyValue(this, name, value);
