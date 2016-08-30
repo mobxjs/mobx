@@ -1,8 +1,56 @@
 # 2.5.0
 
-* Introduced setters for computed properties, use `computed(expr, setter)` or `@computed name get() { return expr } set(value) { action }`, #421, #463
+* Core derivation algorithm has received some majore improvements by @asterius1! See below. Pr #452, 489
+* Introduced setters for computed properties, use `computed(expr, setter)` or `@computed name get() { return expr } set(value) { action }`. `computed` can now be used as modifier in `observable` / `extendObservable`, #421, #463
 * Introduced `isStrictModeEnabled()`, deprecated `useStrict()` without arguments, see #464
 * Fixed #505, accessing an observable property throws before it is initialized
+
+MobX is now able track and memoize computed values while an (trans)action is running.
+Before 2.5, accessing a computed value during a transaction always resulted in a recomputation each time the computed value was accessed, because one of the upstream observables (might) have changed.
+In 2.5, MobX actively tracks whether one of the observables has changed and won't recompute computed values unnecessary.
+This means that computed values are now always memoized for the duration of the current action.
+In specific cases, this might signficantly speed up actions that extensively make decisions based on computed values.
+
+Example:
+```javascript
+class Square {
+	@observable length = 2
+	@computed get squared() {
+		return this.length * this.length
+	}
+	// mobx now supports setters for computed values
+	set squared(surfaceSize) {
+		this.length = Math.sqrt(surfaceSize)
+	}
+
+	// core changes make actions more efficient if extensively using computed values:
+	@action stuff() {
+		this.length = 3
+		console.log(this.squared) // recomputes in both 2.5 and before
+		console.log(this.squared) // no longer recomputes
+		this.length = 4
+		console.log(this.squared) // recomputes in both 2.5 and before
+		// after the action, before 2.5 squared would compute another time (if in use by a reaction), that is no longer the case
+	}
+}
+```
+
+ES5 example for setters:
+```javascript
+function Square() {
+	extendObservable(this, {
+		length: 2,
+		squared: computed(
+			function() {
+				return this.squared * this.squared
+			},
+			function(surfaceSize) {
+				this.length = Math.sqrt(surfaceSize)
+			}
+		)
+	})
+}
+```
 
 # 2.4.4
 
