@@ -1,4 +1,4 @@
-import {IDepTreeNode} from "../core/observable";
+import {IDepTreeNode, getObservers, hasObservers} from "../core/observable";
 import {unique} from "../utils/utils";
 import {getAtom} from "../types/type-utils";
 
@@ -33,7 +33,7 @@ function nodeToObserverTree(node: IDepTreeNode): IObserverTree {
 	const result: IObserverTree = {
 		name: node.name
 	};
-	if (node.observers && node.observers.length > 0)
-		result.observers = <any>node.observers.asArray().map(<any>nodeToObserverTree);
+	if (hasObservers(node as any))
+		result.observers = <any>getObservers(node as any).map(<any>nodeToObserverTree);
 	return result;
 }

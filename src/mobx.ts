@@ -22,7 +22,7 @@ registerGlobals();
 export { IAtom, Atom, BaseAtom                                } from "./core/atom";
 export { IObservable, IDepTreeNode                            } from "./core/observable";
 export { Reaction, IReactionPublic                            } from "./core/reaction";
-export { IDerivation, untracked                               } from "./core/derivation";
+export { IDerivation, untracked, IDerivationState             } from "./core/derivation";
 export { useStrict, isStrictModeEnabled                       } from "./core/action";
 export { spy                                                  } from "./core/spy";
 export { transaction                                          } from "./core/transaction";
@@ -52,7 +52,6 @@ export { ITransformer, createTransformer                      } from "./api/crea
 export { whyRun                                               } from "./api/whyrun";
 
 export { Lambda                                               } from "./utils/utils";
-export { SimpleSet, ISetEntry                                   } from "./utils/set";
 export { Iterator                                             } from "./utils/iterable";
 export { SimpleEventEmitter, ISimpleEventListener             } from "./utils/simpleeventemitter";
 export { IObserverTree, IDependencyTree                       } from "./api/extras";

@@ -1,8 +1,8 @@
-import {IDerivation, trackDerivedFunction, clearObserving} from "./derivation";
-import {globalState} from "./globalstate";
-import {EMPTY_ARRAY, getNextId, Lambda, unique, joinStrings} from "../utils/utils";
+import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, shouldCompute} from "./derivation";
+import {globalState, resetGlobalState} from "./globalstate";
+import {getNextId, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
-import {SimpleSet} from "../utils/set";
+import {startBatch, endBatch} from "./observable";
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations
@@ -23,23 +23,18 @@ import {SimpleSet} from "../utils/set";
  *
  */
 
-let EMPTY_DERIVATION_SET: SimpleSet<IDerivation>;
-
 export interface IReactionPublic {
-	dispose: () => void,
-}
+		dispose: () => void;
+	}
 
 export class Reaction implements IDerivation, IReactionPublic {
-	staleObservers:  IDerivation[] = EMPTY_ARRAY; // Won't change
-	observers = EMPTY_DERIVATION_SET || (EMPTY_DERIVATION_SET = new SimpleSet<IDerivation>());       // Won't change
 	observing = []; // nodes we are looking at. Our value depends on these nodes
+	newObserving = [];
+	dependenciesState = IDerivationState.NOT_TRACKING;
 	diffValue = 0;
 	runId = 0;
-	lastAccessedBy = 0;
 	unboundDepsCount = 0;
-	__mapid = "#" + getNextId();   // use strings for map distribution, just nrs will result in accidental sparse arrays...
-	dependencyChangeCount = 0;     // nr of nodes being observed that have received a new value. If > 0, we should recompute
-	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
+	__mapid = "#" + getNextId();
 	isDisposed = false;
 	_isScheduled = false;
 	_isTrackPending = false;
@@ -47,25 +42,22 @@ export class Reaction implements IDerivation, IReactionPublic {
 
 	constructor(public name: string = "Reaction@" + getNextId(), private onInvalidate: () => void) { }
 
-	onBecomeUnobserved() {
-		// noop, reaction is always unobserved
-	}
-
-	onDependenciesReady(): boolean {
+	onBecomeStale() {
 		this.schedule();
-		return false; // reactions never propagate changes
 	}
 
 	schedule() {
 		if (!this._isScheduled) {
 			this._isScheduled = true;
 			globalState.pendingReactions.push(this);
+			startBatch();
 			runReactions();
+			endBatch();
 		}
 	}
 
 	isScheduled() {
-		return this.dependencyStaleCount > 0 || this._isScheduled;
+		return this._isScheduled;
 	}
 
 	/**
@@ -74,19 +66,23 @@ export class Reaction implements IDerivation, IReactionPublic {
 	runReaction() {
 		if (!this.isDisposed) {
 			this._isScheduled = false;
-			this._isTrackPending = true;
-			this.onInvalidate();
-			if (this._isTrackPending && isSpyEnabled()) {
-				// onInvalidate didn't trigger track right away..
-				spyReport({
-					object: this,
-					type: "scheduled-reaction"
-				});
+			if (shouldCompute(this)) {
+				this._isTrackPending = true;
+
+				this.onInvalidate();
+				if (this._isTrackPending && isSpyEnabled()) {
+					// onInvalidate didn't trigger track right away..
+					spyReport({
+						object: this,
+						type: "scheduled-reaction"
+					});
+				}
 			}
 		}
 	}
 
 	track(fn: () => void) {
+		startBatch();
 		const notify = isSpyEnabled();
 		let startTime;
 		if (notify) {
@@ -110,13 +106,22 @@ export class Reaction implements IDerivation, IReactionPublic {
 				time: Date.now() - startTime
 			});
 		}
+		endBatch();
+	}
+
+	recoverFromError() {
+		this._isRunning = false;
+		this._isTrackPending = false;
 	}
 
 	dispose() {
 		if (!this.isDisposed) {
 			this.isDisposed = true;
-			if (!this._isRunning)
+			if (!this._isRunning) {
+				startBatch();
 				clearObserving(this); // if disposed while running, clean up later. Maybe not optimal, but rare case
+				endBatch();
+			}
 		}
 	}
 
@@ -131,7 +136,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 	}
 
 	whyRun() {
-		const observing = unique(this.observing).map(dep => dep.name);
+		const observing = unique(this._isRunning ? this.newObserving : this.observing).map(dep => dep.name);
 
 		return (`
 WhyRun? reaction '${this.name}':
@@ -155,6 +160,7 @@ WhyRun? reaction '${this.name}':
 const MAX_REACTION_ITERATIONS = 100;
 
 export function runReactions() {
+	// invariant(globalState.inBatch > 0, "INTERNAL ERROR runReactions should be called only inside batch");
 	if (globalState.isRunningReactions === true || globalState.inTransaction > 0)
 		return;
 	globalState.isRunningReactions = true;
@@ -165,13 +171,14 @@ export function runReactions() {
 	// Hence we work with two variables and check whether
 	// we converge to no remaining reactions after a while.
 	while (allReactions.length > 0) {
-		if (++iterations === MAX_REACTION_ITERATIONS)
+		if (++iterations === MAX_REACTION_ITERATIONS) {
+			resetGlobalState();
 			throw new Error(`Reaction doesn't converge to a stable state after ${MAX_REACTION_ITERATIONS} iterations.`
 				+ ` Probably there is a cycle in the reactive function: ${allReactions[0]}`);
+		}
 		let remainingReactions = allReactions.splice(0);
 		for (let i = 0, l = remainingReactions.length; i < l; i++)
 			remainingReactions[i].runReaction();
 	}
 	globalState.isRunningReactions = false;
 }
-

@@ -28,11 +28,22 @@ function buffer() {
     return res;
 }
 
+function checkGlobalState(t) {
+	const gs = global.__mobxGlobal;
+	t.equal(gs.trackingDerivation, null)
+	t.equal(gs.inTransaction, 0)
+	t.equal(gs.isRunningReactions, false)
+	t.equal(gs.inBatch, 0)
+	t.equal(gs.allowStateChanges, !gs.strictMode)
+	t.equal(gs.pendingUnobservations.length, 0)
+}
+
 test('exception1', function(t) {
     var a = computed(function() {
         throw "hoi";
     });
     t.throws(() => a(), "hoi");
+	checkGlobalState(t);
     t.end();
 })
 
@@ -49,6 +60,7 @@ test('deny state changes in views', function(t) {
         y()
     }, 'It is not allowed to change the state during the computation of a reactive view');
 
+	checkGlobalState(t);
     t.end();
 })
 
@@ -70,6 +82,7 @@ test('allow state changes in autorun', function(t) {
     t.equal(z.get(), 5);
 
     t.equal(mobx.extras.isComputingDerivation(), false);
+	checkGlobalState(t);
     t.end();
 })
 
@@ -89,6 +102,7 @@ test('deny array change in view', function(t) {
         t.deepEqual(z.slice(), []);
         t.equal(mobx.extras.isComputingDerivation(), false);
 
+		checkGlobalState(t);
         t.end();
     }
     catch(e) {
@@ -111,6 +125,7 @@ test('allow array change in autorun', function(t) {
     t.deepEqual(z.slice(), [5, 6])
 
     t.equal(mobx.extras.isComputingDerivation(), false);
+	checkGlobalState(t);
     t.end();
 })
 
@@ -122,6 +137,7 @@ test('throw error if modification loop', function(t) {
     t.throws(() => {
         x.set(5);
     }, "Reaction doesn't converge to a stable state")
+	checkGlobalState(t);
     t.end();
 })
 
@@ -130,6 +146,7 @@ test('cycle1', function(t) {
         var p = observable(function() { return p() * 2; }); // thats a cycle!
         p.observe(voidObserver, true);
     }, "Found cyclic dependency");
+	checkGlobalState(t);
     t.end();
 })
 
@@ -139,6 +156,7 @@ test('cycle2', function(t) {
     t.throws(() => {
         b.get()
     }, "Found cyclic dependency");
+	checkGlobalState(t);
     t.end();
 })
 
@@ -147,6 +165,7 @@ test('cycle3', function(t) {
     t.throws(() => {
         p.get();
     }, "Found cyclic dependency");
+	checkGlobalState(t);
     t.end();
 })
 
@@ -161,6 +180,7 @@ test('cycle3', function(t) {
     t.throws(() => {
         z.set(false); // introduces a cycle!
     }, "Found cyclic dependency");
+	checkGlobalState(t);
     t.end();
 });
 
@@ -193,6 +213,7 @@ test('issue 86, converging cycles', function(t) {
     t.equal(console.log(state.someArray.length, 0)); // should be 0, which never prints
     t.equal(calcs, 3);
 
+	checkGlobalState(t);
     t.end();
 });
 
@@ -218,6 +239,7 @@ test('slow converging cycle', function(t) {
     t.equal(x.get(), 100)
     t.equal(res, 100);
 
+	checkGlobalState(t);
     t.end();
 });
 
@@ -273,6 +295,8 @@ test('error handling assistence ', function(t) {
 
         console.error = baseError;
 		console.warn = baseWarn;
+
+		checkGlobalState(t);
         t.end();
     }, 10);
 })
@@ -324,5 +348,202 @@ test('236 - cycles', t => {
 		"total0:", 6, "total1:", 12
 	])
 
+	checkGlobalState(t);
 	t.end();
+})
+
+test('peeking inside erroring computed value doesn\'t bork (global) state', t => {
+	const a = mobx.observable(1)
+	const b = mobx.computed(() => {
+		a.get()
+		throw "chocolademelk"
+	})
+
+	t.throws(() => {
+		b.get()
+	}, /chocolademelk/)
+
+	t.equal(a.isPendingUnobservation, true) // true is a default for optimization
+	t.equal(a.observers.length, 0)
+	t.equal(a.diffValue, 0)
+	t.equal(a.lowestObserverState, -1)
+	t.equal(a.hasUnreportedChange, false)
+	t.equal(a.value, 1)
+
+	t.equal(b.dependenciesState, 0)
+	t.equal(b.observing.length, 0)
+	t.equal(b.newObserving, null)
+	t.equal(b.isPendingUnobservation, false)
+	t.equal(b.observers.length, 0)
+	t.equal(b.diffValue, 0)
+	t.equal(b.lowestObserverState, 0)
+	t.equal(b.unboundDepsCount, 0)
+	t.equal(b.value, undefined)
+	t.equal(b.isComputing, false)
+
+	checkGlobalState(t)
+
+	t.end()
+})
+
+
+test('peeking inside autorun doesn\'t bork (global) state', t => {
+	var r = -1
+	const a = mobx.observable(1)
+	const b = mobx.computed(() => {
+		const res = r = a.get()
+		if (res === 2)
+			throw "chocolademelk"
+		return res
+	})
+	const d = mobx.autorun(() => b.get())
+	const c = d.$mobx;
+
+	t.equal(b.get(), 1)
+	t.equal(r, 1)
+
+	test("it should update correctly initially", t => {
+		t.equal(a.isPendingUnobservation, true) // true is a default for optimization
+		t.equal(a.observers.length, 1)
+		t.equal(a.diffValue, 0)
+		t.equal(a.lowestObserverState, -1)
+		t.equal(a.hasUnreportedChange, false)
+		t.equal(a.value, 1)
+
+		t.equal(b.dependenciesState, 0)
+		t.equal(b.observing.length, 1)
+		t.equal(b.newObserving, null)
+		t.equal(b.isPendingUnobservation, false)
+		t.equal(b.observers.length, 1)
+		t.equal(b.diffValue, 0)
+		t.equal(b.lowestObserverState, 0)
+		t.equal(b.unboundDepsCount, 1) // value is always the last bound amount of observers
+		t.equal(b.value, 1, "value should be 1")
+		t.equal(b.isComputing, false)
+
+		t.equal(c.dependenciesState, 0)
+		t.equal(c.observing.length, 1)
+		t.equal(c.newObserving, null)
+		t.equal(c.diffValue, 0)
+		t.equal(c.unboundDepsCount, 1)
+		t.equal(c.isDisposed, false)
+		t.equal(c._isScheduled, false)
+		t.equal(c._isTrackPending, false)
+		t.equal(c._isRunning, false)
+		checkGlobalState(t)
+		t.end()
+	})
+
+	test("it should not break internal consistency when exception occurred", t => {
+		// Trigger exception
+		t.throws(() => { a.set(2) }, /chocolademelk/)
+		t.equal(r, 2)
+
+		t.equal(a.isPendingUnobservation, true) // true is a default for optimization
+		t.equal(a.observers.length, 1)
+		t.equal(a.diffValue, 0)
+		t.equal(a.lowestObserverState, 0)
+		t.equal(a.hasUnreportedChange, false)
+		t.equal(a.value, 2)
+
+		t.equal(b.dependenciesState, 0) // up to date (for what it's worth)
+		t.equal(b.observing.length, 1)
+		t.equal(b.newObserving, null)
+		t.equal(b.isPendingUnobservation, false)
+		t.equal(b.observers.length, 1)
+		t.equal(b.diffValue, 0)
+		t.equal(b.lowestObserverState, 0)
+		t.equal(b.unboundDepsCount, 0)
+		t.equal(b.value, 1, "value should be 1")
+		t.equal(b.isComputing, false)
+
+		t.equal(c.dependenciesState, 0)
+		t.equal(c.observing.length, 1)
+		t.equal(c.newObserving, null)
+		t.equal(c.diffValue, 0)
+		t.equal(c.unboundDepsCount, 1)
+		t.equal(c.isDisposed, false)
+		t.equal(c._isScheduled, false)
+		t.equal(c._isTrackPending, false)
+		t.equal(c._isRunning, false)
+		checkGlobalState(t)
+		t.end()
+	})
+
+	// Trigger a new change, will this recover?
+	// is this actually a supported case or should we just give up?
+	test("it should recover from errors", t => {
+		a.set(3)
+		t.equal(r, 3, "recovered from error")
+
+		t.equal(a.isPendingUnobservation, true) // true is a default for optimization
+		t.equal(a.observers.length, 1)
+		t.equal(a.diffValue, 0)
+		t.equal(a.lowestObserverState, 0)
+		t.equal(a.hasUnreportedChange, false)
+		t.equal(a.value, 3)
+
+		t.equal(b.dependenciesState, 0) // up to date
+		t.equal(b.observing.length, 1)
+		t.equal(b.newObserving, null)
+		t.equal(b.isPendingUnobservation, false)
+		t.equal(b.observers.length, 1)
+		t.equal(b.diffValue, 0)
+		t.equal(b.lowestObserverState, 0)
+		t.equal(b.unboundDepsCount, 1)
+		t.equal(b.value, 3, "value should be 3")
+		t.equal(b.isComputing, false)
+
+		t.equal(c.dependenciesState, 0)
+		t.equal(c.observing.length, 1)
+		t.equal(c.newObserving, null)
+		t.equal(c.diffValue, 0)
+		t.equal(c.unboundDepsCount, 1)
+		t.equal(c.isDisposed, false)
+		t.equal(c._isScheduled, false)
+		t.equal(c._isTrackPending, false)
+		t.equal(c._isRunning, false)
+
+		checkGlobalState(t)
+		t.end()
+	})
+
+	test("it should clean up correctly", t => {
+		d()
+
+		t.equal(a.isPendingUnobservation, true) // true is a default for optimization
+		t.equal(a.observers.length, 0)
+		t.equal(a.diffValue, 0)
+		t.equal(a.lowestObserverState, 0)
+		t.equal(a.hasUnreportedChange, false)
+		t.equal(a.value, 3)
+
+		t.equal(b.dependenciesState, -1) // not tracking
+		t.equal(b.observing.length, 0)
+		t.equal(b.newObserving, null)
+		t.equal(b.isPendingUnobservation, false)
+		t.equal(b.observers.length, 0)
+		t.equal(b.diffValue, 0)
+		t.equal(b.lowestObserverState, 0)
+		t.equal(b.unboundDepsCount, 1)
+		t.equal(b.value, undefined)
+		t.equal(b.isComputing, false)
+
+		t.equal(c.dependenciesState, -1)
+		t.equal(c.observing.length, 0)
+		t.equal(c.newObserving, null)
+		t.equal(c.diffValue, 0)
+		t.equal(c.unboundDepsCount, 1)
+		t.equal(c.isDisposed, true)
+		t.equal(c._isScheduled, false)
+		t.equal(c._isTrackPending, false)
+		t.equal(c._isRunning, false)
+
+		t.equal(b.get(), 3)
+
+		checkGlobalState(t)
+		t.end()
+	})
+
+	t.end()
 })

@@ -1,6 +1,6 @@
 import {globalState} from "./globalstate";
-import {propagateAtomReady} from "./atom";
 import {runReactions} from "./reaction";
+import {startBatch, endBatch} from "./observable";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "./spy";
 
 /**
@@ -17,6 +17,7 @@ export function transaction<T>(action: () => T, thisArg = undefined, report = tr
 }
 
 export function transactionStart<T>(name: string, thisArg = undefined, report = true) {
+	startBatch();
 	globalState.inTransaction += 1;
 	if (report && isSpyEnabled()) {
 		spyReportStart({
@@ -29,12 +30,9 @@ export function transactionStart<T>(name: string, thisArg = undefined, report = 
 
 export function transactionEnd<T>(report = true) {
 	if (--globalState.inTransaction === 0) {
-		const values = globalState.changedAtoms.splice(0);
-		for (let i = 0, l = values.length; i < l; i++)
-			propagateAtomReady(values[i]);
-
 		runReactions();
 	}
 	if (report && isSpyEnabled())
 		spyReportEnd();
+	endBatch();
 }

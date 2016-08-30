@@ -1,6 +1,6 @@
-import {IAtom} from "./atom";
 import {IDerivation} from "./derivation";
 import {Reaction} from "./reaction";
+import {IObservable} from "./observable";
 
 declare const global: any;
 
@@ -15,12 +15,12 @@ export class MobXGlobals {
 	 * MobX compatiblity with other versions loaded in memory as long as this version matches.
 	 * It indicates that the global state still stores similar information
 	 */
-	version = 3;
+	version = 4;
 
 	/**
 	 * Stack of currently running derivations
 	 */
-	derivationStack: IDerivation[] = [];
+	trackingDerivation: IDerivation = null;
 
 	/**
 	 * Each time a derivation is tracked, it is assigned a unique run-id
@@ -38,21 +38,23 @@ export class MobXGlobals {
 	inTransaction = 0;
 
 	/**
-	 * Are we in an (un)tracked block?
-	 */
-	isTracking: boolean = false;
-
-	/**
 	 * Are we currently running reactions?
 	 * Reactions are run after derivations using a trampoline.
 	 */
 	isRunningReactions = false;
 
 	/**
-	 * List of observables that have changed in a transaction.
-	 * After completing the transaction(s) these atoms will notify their observers.
+	 * Are we in a batch block? (and how many of them)
 	 */
-	changedAtoms: IAtom[] = [];
+	inBatch: number = 0;
+
+	/**
+	 * Observables that don't have observers anymore, and are about to be
+	 * suspended, unless somebody else accesses it in the same batch
+	 *
+	 * @type {IObservable[]}
+	 */
+	pendingUnobservations: IObservable[] = [];
 
 	/**
 	 * List of scheduled, not yet executed, reactions.
