@@ -1,7 +1,7 @@
 # 2.5.0
 
 * Core derivation algorithm has received some majore improvements by @asterius1! See below. Pr #452, 489
-* Introduced setters for computed properties, use `computed(expr, setter)` or `@computed name get() { return expr } set(value) { action }`. `computed` can now be used as modifier in `observable` / `extendObservable`, #421, #463
+* Introduced setters for computed properties, use `computed(expr, setter)` or `@computed get name() { return expr } set name (value) { action }`. `computed` can now be used as modifier in `observable` / `extendObservable`, #421, #463 (see below for example)
 * Introduced `isStrictModeEnabled()`, deprecated `useStrict()` without arguments, see #464
 * Fixed #505, accessing an observable property throws before it is initialized
 
