@@ -1,6 +1,6 @@
 {
   "name": "mobx",
-  "version": "2.5.0-rc1",
+  "version": "2.5.0",
   "description": "Simple, scalable state management.",
   "main": "lib/mobx.js",
   "typings": "lib/mobx.d.ts",
