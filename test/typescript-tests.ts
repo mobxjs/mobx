@@ -233,17 +233,22 @@ test('box', function(t) {
     t.end();
 })
 
-test('observable setter should fail', function(t) {
-	t.throws(() => {
-		class Bla {
-			@computed get propX() {
-				return 3;
-			}
-			set propX(v) {
-
-			}
+test('computed setter should succeed', function(t) {
+	class Bla {
+		@observable a = 3;
+		@computed get propX() {
+			return this.a * 2;
 		}
-	}, 'propX');
+		set propX(v) {
+			this.a = v
+		}
+	}
+
+	const b = new Bla();
+	t.equal(b.propX, 6);
+	b.propX = 4;
+	t.equal(b.propX, 8);
+
 	t.end();
 });
 

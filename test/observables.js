@@ -1,3 +1,5 @@
+"use strict"
+
 var test = require('tape');
 var mobx = require('..');
 var m = mobx;
@@ -1741,5 +1743,44 @@ test('atom events #427', t => {
 
 	d()
 	t.equal(stop, 2)
+	t.end()
+})
+
+test("support computed property getters / setters", t => {
+	let a = observable({
+		size: 1,
+		volume: mobx.computed(function() {
+			return this.size * this.size
+		})
+	})
+
+	t.equal(a.volume, 1)
+	a.size = 3
+	t.equal(a.volume, 9)
+
+	t.throws(() => a.volume = 9, /It is not possible to assign a new value to a computed value/)
+
+	a = {}
+	mobx.extendObservable(a, {
+		size: 2,
+		volume: mobx.computed(
+			function() { return this.size * this.size },
+			function(v) { this.size = Math.sqrt(v) }
+		)
+	})
+
+	const values = []
+	const d = mobx.autorun(() => values.push(a.volume))
+
+	a.volume = 9
+	mobx.transaction(() => {
+		a.volume = 100
+		a.volume = 64
+	})
+
+	t.deepEqual(values, [4, 9, 64])
+	t.deepEqual(a.size, 8)
+
+	d()
 	t.end()
 })

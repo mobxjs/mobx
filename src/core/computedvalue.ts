@@ -1,7 +1,7 @@
 import {IObservable, reportObserved} from "./observable";
 import {IDerivation, trackDerivedFunction, isComputingDerivation, clearObserving, untrackedStart, untrackedEnd} from "./derivation";
 import {globalState} from "./globalstate";
-import {allowStateChangesStart, allowStateChangesEnd} from "./action";
+import {allowStateChangesStart, allowStateChangesEnd, createAction} from "./action";
 import {getNextId, valueDidChange, invariant, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "../core/spy";
 import {autorun} from "../api/autorun";
@@ -34,6 +34,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	dependencyStaleCount = 0;      // nr of nodes being observed that are currently not ready
 	protected value: T = undefined;
 	name: string;
+	setter: (value: T) => void;
 
 	/**
 	 * Create a new computed value based on a function expression.
@@ -45,8 +46,10 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	 * However, enabling compareStructural can be convienent if you always produce an new aggregated object and don't want to notify observers if it is structurally the same.
 	 * This is useful for working with vectors, mouse coordinates etc.
 	 */
-	constructor(public derivation: () => T, private scope: Object, private compareStructural: boolean, name: string) {
+	constructor(public derivation: () => T, private scope: Object, private compareStructural: boolean, name: string, setter: (v: T) => void) {
 		this.name  = name || "ComputedValue@" + getNextId();
+		if (setter)
+			this.setter = createAction(name + "-setter", setter) as any;
 	}
 
 	peek() {
@@ -100,8 +103,11 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		return this.value;
 	}
 
-	public set(_: T) {
-		throw new Error(`[ComputedValue '${name}'] It is not possible to assign a new value to a computed value.`);
+	public set(value: T) {
+		if (this.setter)
+			this.setter.call(this.scope, value);
+		else
+			throw new Error(`[ComputedValue '${this.name}'] It is not possible to assign a new value to a computed value.`);
 	}
 
 	private trackAndCompute(): boolean {

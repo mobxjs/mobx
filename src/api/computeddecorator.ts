@@ -13,6 +13,7 @@ const computedDecorator = createClassPropertyDecorator(
 	(target, name, _, decoratorArgs, originalDescriptor) => {
 		invariant(typeof originalDescriptor !== "undefined", "@computed can only be used on getter functions, like: '@computed get myProps() { return ...; }'. It looks like it was used on a property.");
 		const baseValue = originalDescriptor.get;
+		const setter = originalDescriptor.set;
 		invariant(typeof baseValue === "function", "@computed can only be used on getter functions, like: '@computed get myProps() { return ...; }'");
 
 		let compareStructural = false;
@@ -20,7 +21,7 @@ const computedDecorator = createClassPropertyDecorator(
 			compareStructural = true;
 
 		const adm = asObservableObject(target, undefined, ValueMode.Recursive);
-		defineObservableProperty(adm, name, compareStructural ? asStructure(baseValue) : baseValue, false);
+		defineObservableProperty(adm, name, compareStructural ? asStructure(baseValue) : baseValue, false, setter);
 	},
 	function (name) {
 		const observable = this.$mobx.values[name];
@@ -28,7 +29,9 @@ const computedDecorator = createClassPropertyDecorator(
 			return undefined;
 		return observable.get();
 	},
-	throwingComputedValueSetter,
+	function (name, value) {
+		this.$mobx.values[name].set(value);
+	},
 	false,
 	true
 );
@@ -37,21 +40,21 @@ const computedDecorator = createClassPropertyDecorator(
  * Decorator for class properties: @computed get value() { return expr; }.
  * For legacy purposes also invokable as ES5 observable created: `computed(() => expr)`;
  */
+export function computed<T>(func: () => T, setter: (value: T) => void): IComputedValue<T>;
 export function computed<T>(func: () => T, scope?: any): IComputedValue<T>;
 export function computed(opts: IComputedValueOptions): (target: Object, key: string, baseDescriptor?: PropertyDescriptor) => void;
 export function computed(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void;
-export function computed(targetOrExpr: any, keyOrScope?: any, baseDescriptor?: PropertyDescriptor, options?: IComputedValueOptions) {
-	if (arguments.length < 3 && typeof targetOrExpr === "function")
-		return computedExpr(targetOrExpr, keyOrScope);
-	invariant(!baseDescriptor || !baseDescriptor.set, `@observable properties cannot have a setter: ${keyOrScope}`);
+export function computed(targetOrExpr: any, keyOrScopeOrSetter?: any, baseDescriptor?: PropertyDescriptor, options?: IComputedValueOptions) {
+	if (typeof targetOrExpr === "function" && arguments.length < 3) {
+		if (typeof keyOrScopeOrSetter === "function")
+			return computedExpr(targetOrExpr, keyOrScopeOrSetter, undefined);
+		else
+			return computedExpr(targetOrExpr, undefined, keyOrScopeOrSetter);
+	}
 	return computedDecorator.apply(null, arguments);
 }
 
-function computedExpr<T>(expr: () => T, scope?: any) {
+function computedExpr<T>(expr: () => T, setter, scope: any) {
 	const [mode, value] = getValueModeFromValue(expr, ValueMode.Recursive);
-	return new ComputedValue(value, scope, mode === ValueMode.Structure, value.name);
-}
-
-export function throwingComputedValueSetter() {
-	throw new Error(`[ComputedValue] It is not allowed to assign new values to computed properties.`);
+	return new ComputedValue(value, scope, mode === ValueMode.Structure, value.name, setter);
 }

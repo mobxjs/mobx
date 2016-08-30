@@ -4,7 +4,6 @@ import {isAction} from "../api/action";
 import {ValueMode, AsStructure} from "./modifiers";
 import {Lambda, getNextId, invariant, assertPropertyConfigurable, isPlainObject, addHiddenFinalProp} from "../utils/utils";
 import {runLazyInitializers} from "../utils/decorators";
-import {throwingComputedValueSetter} from "../api/computeddecorator";
 import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
@@ -70,10 +69,10 @@ export function setObservableObjectInstanceProperty(adm: ObservableObjectAdminis
 	if (adm.values[propName])
 		adm.target[propName] = value; // the property setter will make 'value' reactive if needed.
 	else
-		defineObservableProperty(adm, propName, value, true);
+		defineObservableProperty(adm, propName, value, true, undefined);
 }
 
-export function defineObservableProperty(adm: ObservableObjectAdministration, propName: string, newValue, asInstanceProperty: boolean) {
+export function defineObservableProperty(adm: ObservableObjectAdministration, propName: string, newValue, asInstanceProperty: boolean, setter) {
 	if (asInstanceProperty)
 		assertPropertyConfigurable(adm.target, propName);
 
@@ -81,11 +80,20 @@ export function defineObservableProperty(adm: ObservableObjectAdministration, pr
 	let name = `${adm.name}.${propName}`;
 	let isComputed = true;
 
-	if (typeof newValue === "function" && newValue.length === 0 && !isAction(newValue))
-		observable = new ComputedValue(newValue, adm.target, false, name);
-	else if (newValue instanceof AsStructure && typeof newValue.value === "function" && newValue.value.length === 0)
-		observable = new ComputedValue(newValue.value, adm.target, true, name);
-	else {
+	if (newValue instanceof ObservableValue) {
+		observable = newValue;
+		isComputed = false;
+	} else if (newValue instanceof ComputedValue) {
+		observable = newValue;
+		if (!newValue.scope)
+			newValue.scope = adm.target;
+	} else if (typeof newValue === "function" && newValue.length === 0 && !isAction(newValue)) {
+		// TODO: add warning in 2.6, see https://github.com/mobxjs/mobx/issues/421
+		// TODO: remove in 3.0
+		observable = new ComputedValue(newValue, adm.target, false, name, setter);
+	} else if (newValue instanceof AsStructure && typeof newValue.value === "function" && newValue.value.length === 0) {
+		observable = new ComputedValue(newValue.value, adm.target, true, name, setter);
+	} else {
 		isComputed = false;
 		if (hasInterceptors(adm)) {
 			const change = interceptChange<IObjectWillChange>(adm, {
@@ -139,10 +147,11 @@ export function generateComputedPropConfig(propName) {
 		get: function() {
 			return this.$mobx.values[propName].get();
 		},
-		set: throwingComputedValueSetter
+		set: function(v) {
+			return this.$mobx.values[propName].set(v);
+		}
 	};
 }
-
 
 export function setPropertyValue(instance, name: string, newValue) {
 	const adm = instance.$mobx;

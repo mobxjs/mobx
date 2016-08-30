@@ -11,7 +11,7 @@ const decoratorImpl = createClassPropertyDecorator(
 		if (typeof baseValue === "function")
 			baseValue = asReference(baseValue);
 		const adm = asObservableObject(target, undefined, ValueMode.Recursive);
-		defineObservableProperty(adm, name, baseValue, true);
+		defineObservableProperty(adm, name, baseValue, true, undefined);
 		allowStateChangesEnd(prevA);
 	},
 	function (name) {
