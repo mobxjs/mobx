@@ -30,6 +30,7 @@ test('correct api should be exposed', function(t) {
 		'isObservableArray',
 		'isObservableMap',
 		'isObservableObject',
+		'isStrictModeEnabled',
 		'map',
 		'observable',
 		'observe',

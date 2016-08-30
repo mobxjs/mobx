@@ -1,3 +1,8 @@
+# 2.5.0
+
+* Introduced `isStrictModeEnabled()`, deprecated `useStrict()` without arguments, see #464
+* Fixed #505, accessing an observable property throws before it is initialized
+
 # 2.4.4
 
 * Fixed #503: map.delete returns boolean

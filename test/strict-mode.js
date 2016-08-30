@@ -5,9 +5,12 @@ var strictError = /It is not allowed to create or change state outside an `actio
 
 test('strict mode should not allow changes outside action', t => {
 	var a = mobx.observable(2);
+	t.equal(mobx.isStrictModeEnabled(), false)
 	mobx.useStrict(true);
+	t.equal(mobx.isStrictModeEnabled(), true)
 	t.throws(() => a.set(3), strictError);
 	mobx.useStrict(false);
+	t.equal(mobx.isStrictModeEnabled(), false)
 	a.set(4);
 	t.equal(a.get(), 4);
 	t.end();
@@ -38,14 +41,14 @@ test('reactions cannot modify state in strict mode', t => {
 			b.set(3)
 		}, strictError);
 	});
-	
+
 	d = mobx.autorun(() => {
 		if (a.get() > 5)
 			b.set(7);
 	});
-	
+
 	mobx.action(() => a.set(4))(); // ok
-	
+
 	t.throws(() => a.set(5), strictError);
 
 	mobx.useStrict(false);
@@ -59,7 +62,7 @@ test('action inside reaction in strict mode can modify state', t => {
 
 	mobx.useStrict(true);
 	var act = mobx.action(() => b.set(b.get() + 1));
-	
+
 	var d = mobx.autorun(() => {
 		if (a.get() % 2 === 0)
 			act();
@@ -74,9 +77,9 @@ test('action inside reaction in strict mode can modify state', t => {
 	t.equal(b.get(), 3);
 	setA(5);
 	t.equal(b.get(), 3);
-	setA(16);	
+	setA(16);
 	t.equal(b.get(), 4, "b should not be 55");
-	
+
 	mobx.useStrict(false);
 	t.end();
 });
@@ -103,7 +106,7 @@ test('cannot create or modify objects in strict mode without action', t => {
 	t.throws(() => map.delete("a"), strictError);
 
 	mobx.useStrict(false);
-	
+
 	// can modify again
 	obj.a  = 42;
 
