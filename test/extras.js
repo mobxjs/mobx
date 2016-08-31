@@ -274,6 +274,7 @@ test('get debug name', function(t) {
 	var e = mobx.computed(() => 3);
 	var f = mobx.autorun(() => c.has('b'));
 	var g = new Clazz();
+	var h = mobx.observable({ b: function() {}, c: mobx.computed(function(){}) });
 
 	function name(thing, prop) {
 		return mobx.extras.getDebugName(thing, prop);
@@ -297,6 +298,9 @@ test('get debug name', function(t) {
 
 	t.equal(name(g), "Clazz@9");
 	t.equal(name(g, "a"), "Clazz@9.a");
+
+	t.equal(name(h, "b"), "ObservableObject@12.b");
+	t.equal(name(h, "c"), "ObservableObject@12.c");
 
 	f();
 	t.end();

@@ -82,9 +82,11 @@ export function defineObservableProperty(adm: ObservableObjectAdministration, pr
 
 	if (newValue instanceof ObservableValue) {
 		observable = newValue;
+		newValue.name = name;
 		isComputed = false;
 	} else if (newValue instanceof ComputedValue) {
 		observable = newValue;
+		newValue.name = name;
 		if (!newValue.scope)
 			newValue.scope = adm.target;
 	} else if (typeof newValue === "function" && newValue.length === 0 && !isAction(newValue)) {
