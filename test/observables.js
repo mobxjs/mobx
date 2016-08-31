@@ -1852,3 +1852,27 @@ test("support computed property getters / setters", t => {
 	d()
 	t.end()
 })
+
+test('computed getter / setter for plan objects should succeed', function (t) {
+	var b = observable({
+		a: 3,
+		get propX() {
+			return this.a * 2;
+		},
+		set propX(v) {
+			this.a = v;
+		}
+	});
+
+	var values = [];
+	mobx.autorun(function () {
+		return values.push(b.propX);
+	});
+	t.equal(b.propX, 6);
+	b.propX = 4;
+	t.equal(b.propX, 8);
+
+	t.deepEqual(values, [6, 8]);
+
+	t.end();
+});

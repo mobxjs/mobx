@@ -726,3 +726,22 @@ test('computed setter should succeed (babel)', function(t) {
 
 	t.end();
 });
+
+test('computed getter / setter for plan objects should succeed (babel)', function(t) {
+	const b = observable({
+		a: 3,
+		get propX() { return this.a * 2 },
+		set propX(v) { this.a = v }
+	})
+
+	const values = []
+	mobx.autorun(() => values.push(b.propX))
+	t.equal(b.propX, 6);
+	b.propX = 4;
+	t.equal(b.propX, 8);
+
+	t.deepEqual(values, [6, 8])
+
+	t.end();
+});
+

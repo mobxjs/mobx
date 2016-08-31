@@ -25,7 +25,8 @@ export function extendObservableHelper(target, properties, mode: ValueMode, name
 	for (let key in properties) if (hasOwnProperty(properties, key)) {
 		if (target === properties && !isPropertyConfigurable(target, key))
 			continue; // see #111, skip non-configurable or non-writable props for `observable(object)`.
-		setObservableObjectInstanceProperty(adm, key, properties[key]);
+		const descriptor = Object.getOwnPropertyDescriptor(properties, key);
+		setObservableObjectInstanceProperty(adm, key, descriptor);
 	}
 	return target;
 }

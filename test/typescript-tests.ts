@@ -943,3 +943,22 @@ test("505, don't throw when accessing subclass fields in super constructor (type
 	t.deepEqual(values, { a: 1, b: undefined}) // undefined, as A constructor runs before B constructor
 	t.end()
 })
+
+
+test('computed getter / setter for plan objects should succeed (typescript)', function(t) {
+	const b = observable({
+		a: 3,
+		get propX() { return this.a * 2 },
+		set propX(v) { this.a = v }
+	})
+
+	const values: number[] = []
+	mobx.autorun(() => values.push(b.propX))
+	t.equal(b.propX, 6);
+	b.propX = 4;
+	t.equal(b.propX, 8);
+
+	t.deepEqual(values, [6, 8])
+
+	t.end();
+});

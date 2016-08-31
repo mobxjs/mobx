@@ -65,11 +65,16 @@ export function asObservableObject(target, name: string, mode: ValueMode = Value
 	return adm;
 }
 
-export function setObservableObjectInstanceProperty(adm: ObservableObjectAdministration, propName: string, value) {
-	if (adm.values[propName])
-		adm.target[propName] = value; // the property setter will make 'value' reactive if needed.
-	else
-		defineObservableProperty(adm, propName, value, true, undefined);
+export function setObservableObjectInstanceProperty(adm: ObservableObjectAdministration, propName: string, descriptor: PropertyDescriptor) {
+	if (adm.values[propName]) {
+		invariant("value" in descriptor, "cannot redefine property " + propName);
+		adm.target[propName] = descriptor.value; // the property setter will make 'value' reactive if needed.
+	} else {
+		if ("value" in descriptor)
+			defineObservableProperty(adm, propName, descriptor.value, true, undefined);
+		else
+			defineObservableProperty(adm, propName, descriptor.get, true, descriptor.set);
+	}
 }
 
 export function defineObservableProperty(adm: ObservableObjectAdministration, propName: string, newValue, asInstanceProperty: boolean, setter) {
