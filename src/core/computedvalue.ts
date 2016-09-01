@@ -46,6 +46,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	protected value: T = undefined;
 	name: string;
 	isComputing: boolean = false; // to check for cycles
+	isRunningSetter: boolean = false; // TODO optimize, see: https://reaktor.com/blog/javascript-performance-fundamentals-make-bluebird-fast/
 	setter: (value: T) => void;
 
 	/**
@@ -129,10 +130,17 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	}
 
 	public set(value: T) {
-		if (this.setter)
-			this.setter.call(this.scope, value);
+		if (this.setter) {
+			invariant(!this.isRunningSetter, `The setter of computed value '${this.name}' is trying to update itself. Did you intend to update an _observable_ value, instead of the computed property?`);
+			this.isRunningSetter = true;
+			try {
+				this.setter.call(this.scope, value);
+			} finally {
+				this.isRunningSetter = false;
+			}
+		}
 		else
-			throw new Error(`[ComputedValue '${this.name}'] It is not possible to assign a new value to a computed value.`);
+			invariant(false, `[ComputedValue '${this.name}'] It is not possible to assign a new value to a computed value.`);
 	}
 
 	private trackAndCompute(): boolean {

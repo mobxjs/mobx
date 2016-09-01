@@ -1876,3 +1876,19 @@ test('computed getter / setter for plan objects should succeed', function (t) {
 
 	t.end();
 });
+
+test('helpful error for self referencing setter', function(t) {
+	var a = observable({
+		x: 1,
+		get y() {
+			return this.x
+		},
+		set y(v) {
+			this.y = v // woops...;-)
+		}
+	})
+
+	t.throws(() => a.y = 2, /The setter of computed value/)
+
+	t.end()
+})
