@@ -1,3 +1,19 @@
+# 2.5.1
+
+* Computed properties can now be created by using getter / setter functions. This is the idiomatic way to introduce computed properties from now on:
+
+```javascript
+const box = observable({
+	length: 2,
+	get squared() {
+		return this.length * this.length
+	},
+	set squared(value) {
+		this.length = Math.sqrt(value)
+	}
+})
+```
+
 # 2.5.0
 
 * Core derivation algorithm has received some majore improvements by @asterius1! See below. Pr #452, 489
