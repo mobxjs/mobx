@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2" data-basepath=".." data-revision="Mon Aug 29 2016 13:33:21 GMT+0200 (CEST)">
+    <div class="book" data-level="2" data-basepath=".." data-revision="Fri Sep 02 2016 10:37:51 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -948,7 +948,7 @@ Whenever one of the used observables is changed in the future, the same sideEffe
 Returns a disposer function to cancel the side effect. <a href="autorun.html">&#xAB;details&#xBB;</a></p>
 <h3 id="-when"><code>when</code></h3>
 <p>Usage: <code>when(debugname?, () =&gt; condition, () =&gt; { sideEffect })</code>.
-The condition expression will react automatically to any observables is uses.
+The condition expression will react automatically to any observables it uses.
 As soon as the expression returns true the sideEffect function will be invoked, but only once.
 <code>when</code> returns a disposer to prematurely cancel the whole thing. <a href="when.html">&#xAB;details&#xBB;</a></p>
 <h3 id="-autorunasync"><code>autorunAsync</code></h3>
@@ -1098,7 +1098,7 @@ This is useful if you want to store data based on string keys.
 For the full api of the returned <code>ObservableMap</code> see <em>Observable maps</em>.
 <a href="map.html">&#xAB;details&#xBB;</a></p>
 <h3 id="-expr"><code>expr</code></h3>
-<p>Usage: <code>expr(() =&gt; someExpression</code>. Just a shorthand for <code>computed(() =&gt; someExpression).get()</code>.
+<p>Usage: <code>expr(() =&gt; someExpression)</code>. Just a shorthand for <code>computed(() =&gt; someExpression).get()</code>.
 <code>expr</code> is useful in some rare cases to optimize another computed function or reaction.
 In general it is simpler and better to just split the function in multiple smaller computed&apos;s to achieve the same effect.
 <a href="expr.html">&#xAB;details&#xBB;</a></p>
