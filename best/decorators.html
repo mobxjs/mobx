@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>boxed values | MobX</title>
+        <title>How to (not) use decorators | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.4.3">
@@ -33,10 +33,10 @@
         
     
     
-    <link rel="next" href="../best/react.html" />
+    <link rel="next" href="../faq/blogs.html" />
     
     
-    <link rel="prev" href="../refguide/map.html" />
+    <link rel="prev" href="../best/react.html" />
     
 
         
@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="3.4" data-basepath=".." data-revision="Sat Sep 03 2016 21:52:21 GMT+0200 (CEST)">
+    <div class="book" data-level="5" data-basepath=".." data-revision="Sat Sep 03 2016 21:52:21 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -282,7 +282,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="3.4" data-path="refguide/boxed.html">
+        <li class="chapter " data-level="3.4" data-path="refguide/boxed.html">
             
                 
                     <a href="../refguide/boxed.html">
@@ -317,7 +317,7 @@
             
         </li>
     
-        <li class="chapter " data-level="5" data-path="best/decorators.html">
+        <li class="chapter active" data-level="5" data-path="best/decorators.html">
             
                 
                     <a href="../best/decorators.html">
@@ -882,38 +882,105 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/boxed.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h2 id="primitive-values-and-references">Primitive values and references</h2>
-<p>All primitive values in JavaScript are immutable and hence per definition not observable.
-Usually that is fine, as MobX usually can just make the <em>property</em> that contains the value observable.
-See also <a href="object.html">observable objects</a>.
-In rare cases it can be convenient to have an observable &quot;primitive&quot; that is not owned by an object.
-For these cases it is possible to create an observable box that manages such a primitive.</p>
-<p>So <code>observable</code> accepts scalar values as well and returns an object with a getter / setter function that holds this value.
-Furthermore you can register a callback using its <code>.observe</code> method to listen to changes on the stored value.
-But in most cases it is better to use <a href="autorun.html"><code>mobx.autorun</code></a> instead.</p>
-<p>So the signature of object returned by <code>observable(scalar)</code> is:</p>
+                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/decorators.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="how-to-not-use-decorators">How to (not) use decorators</h1>
+<p>Using ES.next decorators in MobX is optional. This section explains how to use them, or how to avoid them.</p>
+<p>Advantages of using decorators:</p>
 <ul>
-<li><code>.get()</code> Returns the current value.</li>
-<li><code>.set(value)</code> Replaces the currently stored value. Notifies all observers.</li>
-<li><code>intercept(interceptor)</code>. Can be used to intercept changes before they are applied. See <a href="observe.html">observe &amp; intercept</a></li>
-<li><code>.observe(callback: (newValue, previousValue) =&gt; void, fireImmediately = false): disposerFunction</code>. Registers an observer function that will fire each time the stored value is replaced. Returns a function to cancel the observer. See <a href="observe.html">observe &amp; intercept</a></li>
+<li>Minimizes boilerplate, declarative.</li>
+<li>Easy to use and read. A majority of the MobX users use them.</li>
 </ul>
-<p>Example:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
-
-<span class="hljs-keyword">const</span> cityName = observable(<span class="hljs-string">&quot;Vienna&quot;</span>);
-
-<span class="hljs-built_in">console</span>.log(cityName.get());
-<span class="hljs-comment">// prints &apos;Vienna&apos;</span>
-
-cityName.observe(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">newCity, oldCity</span>) </span>{
-    <span class="hljs-built_in">console</span>.log(oldCity, <span class="hljs-string">&quot;-&gt;&quot;</span>, newCity);
-});
-
-cityName.set(<span class="hljs-string">&quot;Amsterdam&quot;</span>);
-<span class="hljs-comment">// prints &apos;city: Vienna -&gt; Amsterdam&apos;</span>
+<p>Disadvantages of using decorators:</p>
+<ul>
+<li>Stage-2 ES.next feature</li>
+<li>Requires a little setup and transpilation, only supported with Babel / Typescript transpilation so far</li>
+</ul>
+<h2 id="enabling-decorators">Enabling decorators</h2>
+<p>If you want to use decorators follow the following steps.</p>
+<p><strong>TypeScript</strong></p>
+<p>Enable the compiler option <code>experimentalDecorators</code> in <code>tsconfig.json</code> or pass it as flag <code>--experimentalDecorators</code> to the compiler.</p>
+<p><strong>Babel:</strong></p>
+<p>Install support for decorators: <code>npm i --save-dev babel-plugin-transform-decorators-legacy</code>. And enable it in your <code>.babelrc</code> file:</p>
+<pre><code>{
+  &quot;presets&quot;: [
+    &quot;es2015&quot;,
+    &quot;stage-1&quot;
+  ],
+  &quot;plugins&quot;: [&quot;transform-decorators-legacy&quot;]
+}
+</code></pre><p>Note that the order of plugins is important: <code>transform-decorators-legacy</code> should be listed <em>first</em>.
+Having issues with the babel setup? Check this <a href="https://github.com/mobxjs/mobx/issues/105" target="_blank">issue</a> first.</p>
+<h2 id="creating-observable-properties-without-decorators">Creating observable properties without decorators</h2>
+<p>Without decorators <code>extendObservable</code> can be used to introduce observable properties on an object.
+Typically this is done inside a constructor function.
+The following example introduces observable properties, a computed property and an action on a class instance:</p>
+<pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Timer</span>(<span class="hljs-params"></span>) </span>{
+    extendObservable(<span class="hljs-keyword">this</span>, {
+        start: <span class="hljs-built_in">Date</span>.now(),
+        current: <span class="hljs-built_in">Date</span>.now(),
+        get elapsedTime() {
+            <span class="hljs-keyword">return</span> (<span class="hljs-keyword">this</span>.current - <span class="hljs-keyword">this</span>.start) + <span class="hljs-string">&quot;seconds&quot;</span>
+        },
+        tick: action(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+              <span class="hljs-keyword">this</span>.current = <span class="hljs-built_in">Date</span>.now()
+        })
+    })
+}
 </code></pre>
-<p>Similar to <code>observable</code>, <code>computed(function)</code> creates a boxed computed value. See <a href="http://mobxjs.github.io/mobx/refguide/computed-decorator.html" target="_blank"><code>computed</code></a></p>
+<p>Or, when using classes:</p>
+<pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Timer</span> </span>{
+    constructor() {
+        extendObservable(<span class="hljs-keyword">this</span>, {
+            <span class="hljs-comment">/* See previous listing */</span>
+        })
+    }
+}
+</code></pre>
+<h2 id="creating-observable-properties-with-decorators">Creating observable properties with decorators</h2>
+<p>Decorators combine very nicely with classes.
+When using decorators, observables, computed values and actions can be simply introduced by using the decorators:</p>
+<pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Timer</span> </span>{
+    @observabe start = <span class="hljs-built_in">Date</span>.now();
+    @observable current = <span class="hljs-built_in">Date</span>.now();
+
+    @computed get elapsedTime() {
+        <span class="hljs-keyword">return</span> (<span class="hljs-keyword">this</span>.current - <span class="hljs-keyword">this</span>.start) + <span class="hljs-string">&quot;seconds&quot;</span>
+    }
+
+    @action tick() {
+        <span class="hljs-keyword">this</span>.current = <span class="hljs-built_in">Date</span>.now()
+    }
+}
+</code></pre>
+<h2 id="creating-observer-components">Creating observer components</h2>
+<p>The <code>observer</code> function / decorator from the mobx-package converts react components into observer components.
+The rule to remember here is that <code>@observer class ComponentName {}</code> is simply sugar for <code>const ComponentName = observer(class { })</code>.
+So all the following forms of creating observer components are valid:</p>
+<p>Stateless function component, ES5:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> Timer = observer(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">props</span>) </span>{
+    <span class="hljs-keyword">return</span> React.createElement(<span class="hljs-string">&quot;div&quot;</span>, {}, props.timer.elapsedTime)
+})
+</code></pre>
+<p>Stateless function component, ES6:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> Timer = observer(({ timer }) =&gt;
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>{ props.timer.elapsedTime }<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
+)</span>
+</code></pre>
+<p>React component, ES5:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> Timer = observer(React.createClass({
+    <span class="hljs-comment">/* ... */</span>
+}))
+</code></pre>
+<p>React component class, ES6:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> Timer = observer(<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Timer</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
+    <span class="hljs-comment">/* ... */</span>
+})
+</code></pre>
+<p>React component class with decorator, ES.next:</p>
+<pre><code class="lang-javascript">@observer
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Timer</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
+    <span class="hljs-comment">/* ... */</span>
+}
+</code></pre>
 
                     
                     </section>
@@ -924,10 +991,10 @@ cityName.set(<span class="hljs-string">&quot;Amsterdam&quot;</span>);
         </div>
 
         
-        <a href="../refguide/map.html" class="navigation navigation-prev " aria-label="Previous page: maps"><i class="fa fa-angle-left"></i></a>
+        <a href="../best/react.html" class="navigation navigation-prev " aria-label="Previous page: Understanding what MobX reacts to"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../best/react.html" class="navigation navigation-next " aria-label="Next page: Understanding what MobX reacts to"><i class="fa fa-angle-right"></i></a>
+        <a href="../faq/blogs.html" class="navigation navigation-next " aria-label="Next page: Tutorials, videos and blogs"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>
