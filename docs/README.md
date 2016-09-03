@@ -7,7 +7,13 @@ _Simple, scalable state management_
 [![Coverage Status](https://coveralls.io/repos/mobxjs/mobx/badge.svg?branch=master&service=github)](https://coveralls.io/github/mobxjs/mobx?branch=master)
 [![Join the chat at https://gitter.im/mobxjs/mobx](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mobxjs/mobx?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+![npm install mobx](https://nodei.co/npm/mobx.png?downloadRank=true&downloads=true)
+
 * Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`. To enable ESNext decorators (optional), see below.
+* CDN: https://unpkg.com/mobx/lib/mobx.umd.js
+
+## Getting started
+
 * [Ten minute, interactive MobX + React tutorial](https://mobxjs.github.io/mobx/getting-started.html)
 * [Official documentation and API overview](https://mobxjs.github.io/mobx/refguide/api.html)
 * Videos:
@@ -15,11 +21,9 @@ _Simple, scalable state management_
   * [Practical React with MobX](https://www.youtube.com/watch?v=XGwuM_u7UeQ). In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth (ES5 only) - 42m.
   * LearnCode.academy MobX tutorial [Part I: MobX + React is AWESOME (7m)](https://www.youtube.com/watch?v=_q50BXqkAfI) [Part II: Computed Values and Nested/Referenced Observables (12m.)](https://www.youtube.com/watch?v=nYvNqKrl69s)
   * [Screencast: intro to MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8) - 8m
-  * [State Management Is Easy, React Amsterdam 2016 conf](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
-  * [Magix MobX, RuhrJS 2016](https://www.youtube.com/watch?v=TfxfRkNCnmk)
-  * [Transparent Reactive Programming and Mutable Data, Reactive2015 conf](https://www.youtube.com/watch?v=FEwLwiizlk0) ([slides](https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures))
-* More tutorials, blogs and videos can be found on the [MobX homepage](http://mobxjs.github.io/mobx/faq/blogs.html)
+  * [Talk: State Management Is Easy, React Amsterdam 2016 conf](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
 * [Boilerplates and related projects](http://mobxjs.github.io/mobx/faq/boilerplates.html)
+* More tutorials, blogs and videos can be found on the [MobX homepage](http://mobxjs.github.io/mobx/faq/blogs.html)
 
 
 ## Introduction
@@ -43,75 +47,54 @@ MobX has only a few core concepts. The following snippets can be tried online us
 
 ### Observable state
 
-MobX adds observable capabilities to existing data structures like objects, arrays and class instances. This can simply be done by annotating your class properties with the [@observable](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) decorator (ES.Next), or by invoking the [`observable`](http://mobxjs.github.io/mobx/refguide/observable.html) or [`extendObservable`](http://mobxjs.github.io/mobx/refguide/extend-observable.html) functions (ES5). See [Language support](https://github.com/mobxjs/mobx/wiki/Language-Support) for language-specific examples.
+MobX adds observable capabilities to existing data structures like objects, arrays and class instances.
+This can simply be done by annotating your class properties with the [@observable](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) decorator (ES.Next).
 
 ```javascript
-// ESNext class example:
 class Todo {
     id = Math.random();
     @observable title = "";
     @observable finished = false;
 }
-
-
-// ES6 class without decorators:
-class Todo {
-	constructor() {
-		this.id = Math.random()
-		extendObservable(this, {
-			title: "",
-			finished: false
-		})
-	}
-}
-
-// ES5 constructor function example:
-function Todo() {
-	this.id = Math.random()
-	extendObservable(this, {
-		title: "",
-		finished: false
-	})
-}
-
-// ... or just create plain objects:
-function createTodo() {
-	return observable({
-		id: Math.random(),
-		title: "",
-		finished: false
-	})
-}
-
 ```
 
-Using `@observable` is like turning a value into a spreadsheet cell. But unlike spreadsheets, not only can these values be primitive values, but references, objects and arrays as well. You can even [define your own](http://mobxjs.github.io/mobx/refguide/extending.html) observable data sources.
+Using `observable` is like turning the properties of an object into a spreadsheet cells.
+But unlike spreadsheets, these values cannot just be primitive values, but also references, objects and arrays.
+You can even [define your own](http://mobxjs.github.io/mobx/refguide/extending.html) observable data sources.
+
+### Intermezzo: Using MobX in ES5, ES6 and ES.next environments
+
+If these `@` thingies look alien to you, these are ES.next decorators.
+Using them is entirely optional in MobX. See the [documentation](http://mobxjs.github.io/mobx/best/decorators.html) for details how to either use or avoid them.
+MobX runs on any ES5 environment, but leveraging ES.next features like decorators are the cherry on the pie when using MobX.
+The remainder of this readme uses decorators, but remember, _they are optional_.
+
+For example, in good ol' ES5 the above snippet would look like:
+
+```javascript
+function Todo() {
+    this.id = Math.random()
+    extendObservable(this, {
+        title: "",
+        finished: false
+    })
+}
+```
 
 ### Computed values
 
-With MobX you can define values that will be derived automatically when relevant data is modified. By using the [`@computed`](http://mobxjs.github.io/mobx/refguide/computed-decorator.html) decorator or by using parameterless functions as property values in `extendObservable`.
+With MobX you can define values that will be derived automatically when relevant data is modified.
+By using the [`@computed`](http://mobxjs.github.io/mobx/refguide/computed-decorator.html) decorator or by using getter / setter functions when using `(extend)Observable`.
 
 ```javascript
-// ESNext class example:
 class TodoList {
     @observable todos = [];
     @computed get unfinishedTodoCount() {
         return this.todos.filter(todo => !todo.finished).length;
     }
 }
-
-// ES5 constructor function example:
-function TodoList() {
-	extendObservable(this, {
-		todos: [],
-		unfinishedTodoCount: function() {
-	        return this.todos.filter(function (todo) {
-				return !todo.finished
-			}).length;
-		}
-	})
-}
 ```
+
 MobX will ensure that `unfinishedTodoCount` is updated automatically when a todo is added or when one of the `finished` properties is modified.
 Computations like these can very well be compared with formulas in spreadsheet programs like MS Excel. They update automatically whenever, and only when, needed.
 
@@ -120,14 +103,14 @@ Computations like these can very well be compared with formulas in spreadsheet p
 Reactions are similar to a computed value, but instead of producing a new value, a reaction produces a side effect for things like printing to the console, making network requests, incrementally updating the React component tree to patch the DOM, etc.
 In short, reactions bridge [reactive](https://en.wikipedia.org/wiki/Reactive_programming) and [imperative](https://en.wikipedia.org/wiki/Imperative_programming) programming.
 
-If you are using React, you can turn your (stateless function) components into reactive components by simply adding the [`@observer`](http://mobxjs.github.io/mobx/refguide/observer-component.html) decorator from the `mobx-react` package onto them.
+#### React components
+If you are using React, you can turn your (stateless function) components into reactive components by simply adding the [`observer`](http://mobxjs.github.io/mobx/refguide/observer-component.html) function / decorator from the `mobx-react` package onto them.
 
 ```javascript
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import {observer} from "mobx-react";
 
-// ESNext decorator / JSX
 @observer
 class TodoListView extends Component {
     render() {
@@ -150,28 +133,35 @@ const TodoView = observer(({todo}) =>
             onClick={() => todo.finished = !todo.finished}
         />{todo.title}
     </li>
-);
+)
 
 const store = new TodoList();
 ReactDOM.render(<TodoListView todoList={store} />, document.getElementById('mount'));
 ```
 
-In ES5 a component declaration looks like this:
-```javascript
-var TodoListView = observer(React.createClass({ /* etc */ }))
-```
-
 `observer` turns React (function) components into derivations of the data they render.
-
-Also, reactions can be created using the [`autorun`](http://mobxjs.github.io/mobx/refguide/autorun.html), [`autorunAsync`](http://mobxjs.github.io/mobx/refguide/autorun-async.html) or [`when`](http://mobxjs.github.io/mobx/refguide/when.html) functions to fit your specific situations.
-
 When using MobX there are no smart or dumb components.
-
 All components render smartly but are defined in a dumb manner. MobX will simply make sure the components are always re-rendered whenever needed, but also no more than that. So the `onClick` handler in the above example will force the proper `TodoView` to render, and it will cause the `TodoListView` to render if the number of unfinished tasks has changed.
-
 However, if you would remove the `Tasks left` line (or put it into a separate component), the `TodoListView` will no longer re-render when ticking a box. You can verify this yourself by changing the [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/).
 
-For an in-depth explanation about how MobX determines to which observables needs to be reacted, check out: [Understanding what MobX reacts to](https://github.com/mobxjs/mobx/blob/gh-pages/docs/best/react.md)
+#### Custom reactions
+Custom reactions can simply be created using the [`autorun`](http://mobxjs.github.io/mobx/refguide/autorun.html),
+[`autorunAsync`](http://mobxjs.github.io/mobx/refguide/autorun-async.html) or [`when`](http://mobxjs.github.io/mobx/refguide/when.html) functions to fit your specific situations.
+
+For example the following `autorun` prints a log message each time the amount of `unfinishedTodoCount` changes:
+
+```javascript
+autorun(() => {
+    console.log("Tasks left: " + todos.unfinishedTodoCount)
+})
+```
+
+### What will MobX react to?
+
+Why does a new message get printed each time the `unfinishedTodoCount` is changed? The answer is this rule of thumb:
+_MobX reacts to any existing observable property that is read during the execution of a tracked function._
+
+For an in-depth explanation about how MobX determines to which observables needs to be reacted, check [understanding what MobX reacts to](https://github.com/mobxjs/mobx/blob/gh-pages/docs/best/react.md)
 
 ### Actions
 
@@ -254,7 +244,7 @@ MobX is inspired by reactive programming principles as found in spreadsheets. It
 
 A ton of credits for [Mendix](https://github.com/mendix), for providing the flexibility and support to maintain MobX and the chance to proof the philosophy of MobX in a real, complex, performance critical applications.
 
-And finally kudo's for all the people that believed in, tried and validated MobX.
+And finally kudo's for all the people that believed in, tried, validated and even [sponsored](https://github.com/mobxjs/mobx/blob/master/sponsors.md) MobX.
 
 ## Further resources and documentation
 
@@ -263,6 +253,7 @@ And finally kudo's for all the people that believed in, tried and validated MobX
 * [Tutorials, Blogs & Videos](http://mobxjs.github.io/mobx/faq/blogs.html)
 * [Boilerplates](http://mobxjs.github.io/mobx/faq/boilerplates.html)
 * [Related projects](http://mobxjs.github.io/mobx/faq/related.html)
+
 
 ## What others are saying...
 
@@ -281,27 +272,6 @@ And finally kudo's for all the people that believed in, tried and validated MobX
 * Feel free to send small pull requests. Please discuss new features or big changes in a GitHub issue first.
 * Use `npm test` to run the basic test suite, `npm run coverage` for the test suite with coverage and `npm run perf` for the performance tests.
 
-## Enabling decorators (optional)
-
-**TypeScript**
-
-Enable the compiler option `experimentalDecorators` in `tsconfig.json` or pass it as flag `--experimentalDecorators` to the compiler.
-
-**Babel:**
-
-Install support for decorators: `npm i --save-dev babel-plugin-transform-decorators-legacy`. And enable it in your `.babelrc` file:
-
-```
-{
-  "presets": [
-    "es2015",
-    "stage-1"
-  ],
-  "plugins": ["transform-decorators-legacy"]
-}
-```
-Probably you have more plugins and presets in your `.babelrc` already, note that the order is important and `transform-decorators-legacy` should come as first.
-
 ## Bower support
 
 Bower support is available through the infamous npmcdn.com:
@@ -317,4 +287,4 @@ See the [changelog](https://github.com/mobxjs/mobx/blob/master/CHANGELOG.md#200)
 
 Was MobX key in making your project a success? Share the victory by using the [donate button](https://mobxjs.github.io/mobx/donate.html)!
 MobX is developed largely in free time, so any ROI is appreciated :-).
-If you leave a name it will be added to the sponsors list.
+If you leave a name you will be added to the [sponsors](https://github.com/mobxjs/mobx/blob/master/sponsors.md) list :).

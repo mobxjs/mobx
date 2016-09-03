@@ -1,6 +1,6 @@
 ## Observable Objects
 
-If a plain JavaScript object is passed to `observable` all properties inside that object will be made observable. 
+If a plain JavaScript object is passed to `observable` all properties inside that object will be made observable.
 (A plain object is an object that wasn't created using a constructor function)
 `observable` is by default applied recursively, so if one of the encoutered values is an object or array, that value will be passed through `observable` as well.
 
@@ -13,7 +13,7 @@ var person = observable({
 	age: 42,
 	showAge: false,
     // computed property:
-	labelText: function() {
+	get labelText() {
 		return this.showAge ? `${this.name} (age: ${this.age})` : this.name;
 	},
     // action:
@@ -39,9 +39,8 @@ Some things to keep in mind when making objects observable:
 Properties that are added to the object at a later time won't become observable, unless [`extendObservable`](extend-observable.md) is used.
 * Only plain objects will be made observable. For non-plain objects it is considered the responsibility of the constructor to initialize the observable properties.
 Either use the [`@observable`](observable.md) annotation or the [`extendObservable`](extend-observable.md) function.
-* Argumentless functions will be automatically turned into views, just like [`@computed`](computed-decorator) would do. For view `this` will be automatically bound to the object it is defined on.
-However, if a function expression (ES6 / TypeScript) is used, `this` will be bound to `undefined`, so you probably want to either to refer to the object directly, or to use a classic function.
-* However (argumentless) functions that are declared as `action` will not be converted into computed views, but will keep their semantics.
+* Property getters will be automatically turned into derived properties, just like [`@computed`](computed-decorator) would do.
+* _Deprecated_ Argumentless functions will be automatically turned into derived properties, just like [`@computed`](computed-decorator) would do.
 * `observable` is applied recursively to a whole object graph automatically. Both on instantiation and to any new values that will be assigned to observable properties in the future. Observable will not recurse into non-plain objects.
 * These defaults are fine in 95% of the cases, but for more fine-grained on how and which properties should be made observable, see the [modifiers](modifiers.md) section.
 

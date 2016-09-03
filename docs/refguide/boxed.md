@@ -4,7 +4,7 @@ All primitive values in JavaScript are immutable and hence per definition not ob
 Usually that is fine, as MobX usually can just make the _property_ that contains the value observable.
 See also [observable objects](object.md).
 In rare cases it can be convenient to have an observable "primitive" that is not owned by an object.
-For these cases it is possible to create an observable box that manages such a primitive. 
+For these cases it is possible to create an observable box that manages such a primitive.
 
 So `observable` accepts scalar values as well and returns an object with a getter / setter function that holds this value.
 Furthermore you can register a callback using its `.observe` method to listen to changes on the stored value.
@@ -33,3 +33,5 @@ cityName.observe(function(newCity, oldCity) {
 cityName.set("Amsterdam");
 // prints 'city: Vienna -> Amsterdam'
 ```
+
+Similar to `observable`, `computed(function)` creates a boxed computed value. See [`computed`](http://mobxjs.github.io/mobx/refguide/computed-decorator.html)

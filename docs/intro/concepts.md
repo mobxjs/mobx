@@ -24,7 +24,7 @@ MobX distinguishes two kind of derivations:
 * *Reactions*. Reactions are side effects that need to happen automatically if the state changes. These are needed to as bridge between imperative and reactive programming. Or to make it more clear, they are ultimately needed to achieve I/O.
 
 People starting with MobX tend to use reactions too often.
-The golden rule is: if you want to create a value based on the current state, use `computed`. 
+The golden rule is: if you want to create a value based on the current state, use `computed`.
 
 Back to the spreadsheet analogy, formulas are derivations that *compute* a value. But for you as a user to be able to see it on the screen a *reaction* is needed that repaints part of the GUI.
 
@@ -62,8 +62,8 @@ var todoStore = observable({
 	/* some observable state */
 	todos: [],
 
-	/* a reactive view */
-	completedCount: function() {
+	/* a derived value */
+	get completedCount() {
 		return this.todos.filter(todo => todo.completed).length;
 	}
 });

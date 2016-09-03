@@ -48,6 +48,7 @@
 * [How I use MobX 2 in an AngularJS 1 application](https://philhosoft.github.io/Programming/AngularJS-1-and-MobX-2/)
 * [A Notification System with MobX and ReactJS](https://medium.com/@GiacomoRebonato/a-notification-system-with-mobx-and-reactjs-ecbadca258c1#.ps9j0i4lg)
 * [Using MobX in Angular 1.5 todo app](http://gaui.is/angular-1-5-todo-app/)
+* [Building a React & MobX application with MVVM](https://medium.com/@MattiaManzati/building-a-react-mobx-application-with-mvvm-ec0b3e3c8786#.de5tzghcx)
 
 ## Testimonials
 

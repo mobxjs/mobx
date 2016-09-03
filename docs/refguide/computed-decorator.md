@@ -38,63 +38,61 @@ If your environment doesn't support decorators or field initializers,
 
 `@computed` properties are not enumerable.
 
-### Enabling decorators in your transpiler
+# Creating computed values with `observable` or `extendObservable`.
 
-Decorators are not supported by default when using TypeScript or Babel pending a definitive definition in the ES standard.
-* For _typescript_, enable the `--experimentalDecorators` compiler flag or set the compiler option `experimentalDecorators` to `true` in `tsconfig.json` (Recommended)
-* For _babel5_, make sure `--stage 0` is passed to the Babel CLI
-* For _babel6_, see the example configuration as suggested in this [issue](https://github.com/mobxjs/mobx/issues/105)
+The functions `observable(object)` or `extendObservable(target, properties)` can be used to introduce computed properties as well,
+as alternative to using the decorator. For this ES5 getters can be used, so the above example can also be written as:
+
+```javascript
+var orderLine = observable({
+    price: 0,
+    amount: 1,
+    get total() {
+        return this.price * this.amount
+    }
+})
+```
+
+_Note: The support for getters was introduced in MobX 2.5.1. MobX will automatically convert any argumentless function that is passed as property value to `observable` / `extendObservable` to a computed property as well,
+but that form will disappear in the next major version_.
+
+# Setters for computed values
+
+It is possible to define a setter for computed values as well. Note that these setters cannot be used to alter the value of the computed property directly,
+but they can be used as 'inverse' of the derivation. For example:
+
+```javascript
+const box = observable({
+    length: 2,
+    get squared() {
+        return this.length * this.length
+    },
+    set squared(value) {
+        this.length = Math.sqrt(value)
+    }
+})
+```
+
+_Note: setters require MobX 2.5.1 or higher_
 
 # `computed(expression)`
 
 `computed` can also be invoked directly as function.
 Just like `observable(primitive value)` it will create a stand-alone observable.
 Use `.get()` on the returned object to get the current value of the computation, or `.observe(callback)` to observe it's changes.
+This form of `computed` is not used very often, but in some cases where you need to pass a "boxed" computed value around it might prove useful.
 
 Example:
 ```javascript
 import {observable, computed} from "mobx";
 var name = observable("John");
-var age = observable(42);
-var showAge = observable(false);
 
-var labelText = computed(() =>
-	showAge.get() ? `${name.get()} (age: ${age.get()})` : name.get();
+var upperCaseName = computed(() =>
+	name.get().toUpperCase()
 );
 
-var disposer = labelText.observe(newLabel => console.log(newLabel));
+var disposer = uperCaseName.observe(name => console.log(name));
 
 name.set("Dave");
-// prints: 'Dave'
-
-age.set(21);
-// doesn't print
-
-showAge.set(true);
-// prints: 'Dave (age: 21)'
-
-age.set(42);
-// prints: 'Dave (age: 42)'
-
-// cancel the observer
-disposer();
-
-name.set("Matthew");
-// doesn't print anymore...
-
-// ... but the value can still be inspected if needed.
-console.log(labelText.get());
+// prints: 'DAVE'
 ```
-
-Note how the function now automatically reacts to data changes,
-but only if they occurred in data that was actually used to produce the output.
-Hence the first change to `age` didn't result in a re-evaluation of the `labelText` function.
-MobX will automatically determine whether the function should run _eagerly_ or _lazily_ based on how the views are used throughout your application,
-so make sure your code doesn't rely on any side effects in those functions.
-
-
----
-
-These two forms of `observable`, one for primitives and references, and one for functions, form the core of MobX.
-The rest of the API is just syntactic sugar around these two core operations.
-Nonetheless, you will rarely use these forms; using objects is just a tat more convenient.

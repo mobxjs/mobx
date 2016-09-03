@@ -17,6 +17,7 @@
   * [maps](refguide/map.md)
   * [boxed values](refguide/boxed.md)
 * [Understanding what MobX reacts to](best/react.md)
+* [How to (not) use decorators](best/decorators.md)
 * Resources
   * [Tutorials, videos and blogs](faq/blogs.md)
   * [Related Projects](faq/related.md)
