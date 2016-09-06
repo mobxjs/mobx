@@ -44,7 +44,7 @@ MobX supports an uni-directional data flow where _actions_ changes the _state_, 
 
 All _Derivations_ are updated **automatically** and **atomically** when the _state_ changes. As a result it is not possible to ever observe intermediate values.
 
-All _Derivations_ are updated **synchonously** by default. This means that for example _actions_ can safely inspect a computed value directly after altering the _state_.
+All _Derivations_ are updated **synchronously** by default. This means that for example _actions_ can safely inspect a computed value directly after altering the _state_.
 
 _Computed values_ are updated **lazily**. Any computed value that is not actively in use will not be updated until it is needed for a side effect (I/O).
 If a view is no longer in use it will be garbage collected automatically.
