@@ -75,7 +75,7 @@ When using decorators, observables, computed values and actions can be simply in
 
 ```javascript
 class Timer {
-	@observabe start = Date.now();
+	@observable start = Date.now();
 	@observable current = Date.now();
 
 	@computed get elapsedTime() {
