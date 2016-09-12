@@ -330,10 +330,10 @@ In MobX 2 it is no longer allowed for a computed function or `autorun` to throw 
 
 * MobX is roughly 20% faster
 * MobX is smaller: 75KB -> 60KB unminified, and 54KB -> 30KB minified.
-* Distributable builds are no longer available in the git repository, use npmcdn instead:
-* Commonjs build: https://npmcdn.com/mobx@^2.0.0/lib/mobx.js
-* Minified commonjs build: https://npmcdn.com/mobx@^2.0.0/lib/mobx.min.js
-* UMD build: https://npmcdn.com/mobx@^2.0.0/lib/mobx.umd.js
+* Distributable builds are no longer available in the git repository, use unpkg instead:
+* Commonjs build: https://unpkg.com/mobx@^2.0.0/lib/mobx.js
+* Minified commonjs build: https://unpkg.com/mobx@^2.0.0/lib/mobx.min.js
+* UMD build: https://unpkg.com/mobx@^2.0.0/lib/mobx.umd.js
 * To use the minified build, require / import the lib from `"mobx/lib/mobx.min.js"` (or set up an alias in your webpack configuration if applicable)
 
 ## Other changes
