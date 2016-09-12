@@ -276,8 +276,8 @@ And finally kudo's for all the people that believed in, tried, validated and eve
 
 ## Bower support
 
-Bower support is available through the infamous npmcdn.com:
-`bower install https://npmcdn.com/mobx/bower.zip`
+Bower support is available through the infamous unpkg.com:
+`bower install https://unpkg.com/mobx/bower.zip`
 
 Then use `lib/mobx.umd.js` or `lib/mobx.umd.min.js`
 
