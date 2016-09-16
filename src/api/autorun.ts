@@ -23,9 +23,13 @@ export function autorun(view: (r: IReactionPublic) => void, scope?: any);
  */
 export function autorun(name: string, view: (r: IReactionPublic) => void, scope?: any);
 
-export function autorun(arg1: any, arg2: any, arg3?: any) {
+export function autorun(customName: string): (target: Object, key: string, baseDescriptor?: PropertyDescriptor) => void;
+export function autorun(target: Object, propertyKey: string, descriptor?: PropertyDescriptor): void;
+
+
+export function autorun(arg1: any, arg2?: any, arg3?: any) {
 	let name: string, view: (r: IReactionPublic) => void, scope: any;
-	if (typeof arg1 === "string") {
+	if (typeof arg1 === "string" && typeof arg2 !== "undefined") {
 		name = arg1;
 		view = arg2;
 		scope = arg3;
@@ -33,6 +37,14 @@ export function autorun(arg1: any, arg2: any, arg3?: any) {
 		name = arg1.name || ("Autorun@" + getNextId());
 		view = arg1;
 		scope = arg2;
+	} else if (typeof arg1 === "object" && typeof arg2 === "string" && "value" in arg3) { // unnamed decorator
+		name = arg2;
+		view = arg3.value;
+		scope = arg1;
+	} else if (typeof arg1 === "string") { // named decorator
+		console.log("args", arguments)
+		name = arg1;
+		invariant(false, "sorry, named autorun decorators are not supported yet")
 	}
 
 	assertUnwrapped(view, "autorun methods cannot have modifiers");

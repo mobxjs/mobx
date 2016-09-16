@@ -962,3 +962,43 @@ test('computed getter / setter for plan objects should succeed (typescript)', fu
 
 	t.end();
 });
+
+test('autorun as (unnamed) decorator', function(t) {
+	var autorunResult:number = 0;
+	var noAutoResult: number = 0;
+	class SomeClass {
+		@observable foo:number = 1;
+
+		@autorun auto() {
+			autorunResult = this.foo;
+		}
+
+		noauto() {
+			noAutoResult = this.foo;
+		}
+	}
+
+	const a = new SomeClass();
+	t.equal(autorunResult, 1);
+	a.foo = 2;
+	t.equal(autorunResult, 2);
+	t.equal(noAutoResult, 0);
+	t.end();
+});
+
+test.skip('autorun as named decorator', function(t) {
+	var autorunResult:number = 0;
+	class SomeClass {
+		@observable foo:number = 1;
+
+		@autorun("autoRunMethodCustomName") auto() {
+			autorunResult = this.foo;
+		}
+	}
+
+	const a = new SomeClass();
+	t.equal(autorunResult, 1);
+	a.foo = 2;
+	t.equal(autorunResult, 2);
+	t.end();
+})
