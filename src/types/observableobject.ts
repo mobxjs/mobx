@@ -181,7 +181,7 @@ export function setPropertyValue(instance, name: string, newValue) {
 	if (newValue !== UNCHANGED) {
 		const notify = hasListeners(adm);
 		const notifySpy = isSpyEnabled();
-		const change = notifyListeners || hasListeners ? {
+		const change = notify || notifySpy ? {
 				type: "update",
 				object: instance,
 				oldValue: (observable as any).value,
