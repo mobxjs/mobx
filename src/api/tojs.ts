@@ -14,7 +14,7 @@ export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, 
 			__alreadySeen.push([source, value]);
 		return value;
 	}
-	if (source instanceof Date || source instanceof RegExp)
+	if (source instanceof Date || source instanceof RegExp || isHTMLElement(source))
 		return source;
 
 	if (detectCycles && __alreadySeen === null)
@@ -58,4 +58,18 @@ export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, 
 export function toJSON(source, detectCycles: boolean = true, __alreadySeen: [any, any][] = null) {
 	deprecated("toJSON is deprecated. Use toJS instead");
 	return toJS.apply(null, arguments);
+}
+
+function isHTMLElement(source) {
+	try {
+		return source instanceof HTMLElement;
+	} catch (err) {
+		return (
+			source !== null &&
+			typeof source === "object" &&
+			source.nodeType === 1 &&
+			typeof source.style === "object" &&
+			typeof source.ownerDocument === "object"
+		);
+	}
 }
