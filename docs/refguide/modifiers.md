@@ -76,8 +76,8 @@ var ViewPort = mobxReact.observer(React.createClass({
 
         window.onresize = function() {
             mobx.transaction(function() {
-                this.screenSize.width = window.clientWidth;
-                this.screenSize.height = window.clientHeight;
+                this.screenSize.width = window.innerWidth;
+                this.screenSize.height = window.innerHeight;
             });
         }.bind(this);
     },
