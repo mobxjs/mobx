@@ -4,11 +4,11 @@ var observable = mobx.observable;
 var toJS = mobx.toJS;
 
 test('toJS should ignore HTMLElement', function(t) {
-	if (!process.env.BROWSER) {
+	if (typeof document !== 'object') {
 		return t.end();
 	}
 
-	var image = observable(new Image());
+	var image = observable(document.createElement('img'));
 
 	try {
 		toJS(image);

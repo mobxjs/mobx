@@ -14,7 +14,7 @@ export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, 
 			__alreadySeen.push([source, value]);
 		return value;
 	}
-	if (source instanceof Date || source instanceof RegExp || isHTMLElement(source))
+	if (source instanceof Date || source instanceof RegExp || isDOMNode(source))
 		return source;
 
 	if (detectCycles && __alreadySeen === null)
@@ -60,16 +60,18 @@ export function toJSON(source, detectCycles: boolean = true, __alreadySeen: [any
 	return toJS.apply(null, arguments);
 }
 
-function isHTMLElement(source) {
-	try {
-		return source instanceof HTMLElement;
-	} catch (err) {
-		return (
-			source !== null &&
-			typeof source === "object" &&
-			source.nodeType === 1 &&
-			typeof source.style === "object" &&
-			typeof source.ownerDocument === "object"
-		);
+function isDOMNode(source) {
+	const isDOMAvailable = (
+		typeof document === "object" &&
+		document &&
+		document.createElement &&
+		typeof HTMLElement === "function" &&
+		typeof Node === "function"
+	);
+
+	if (!isDOMAvailable) {
+		return false;
 	}
+
+	return source instanceof Node;
 }
