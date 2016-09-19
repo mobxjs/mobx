@@ -4,6 +4,18 @@ import {ObservableValue} from "../types/observablevalue";
 import {isObservable} from "../api/isobservable";
 import {isPlainObject, deprecated} from "../utils/utils";
 
+const isDOMAvailable = (
+	typeof document === "object" &&
+	document &&
+	document.createElement &&
+	typeof HTMLElement === "function" &&
+	typeof Node === "function"
+);
+
+const isDOMNode = isDOMAvailable
+	? source => source instanceof Node
+	: () => false;
+
 /**
 	* Basically, a deep clone, so that no reactive property will exist anymore.
 	*/
@@ -58,20 +70,4 @@ export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, 
 export function toJSON(source, detectCycles: boolean = true, __alreadySeen: [any, any][] = null) {
 	deprecated("toJSON is deprecated. Use toJS instead");
 	return toJS.apply(null, arguments);
-}
-
-function isDOMNode(source) {
-	const isDOMAvailable = (
-		typeof document === "object" &&
-		document &&
-		document.createElement &&
-		typeof HTMLElement === "function" &&
-		typeof Node === "function"
-	);
-
-	if (!isDOMAvailable) {
-		return false;
-	}
-
-	return source instanceof Node;
 }
