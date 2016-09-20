@@ -8,8 +8,8 @@ const isDOMAvailable = (
 	typeof document === "object" &&
 	document &&
 	document.createElement &&
-	typeof HTMLElement === "function" &&
-	typeof Node === "function"
+	typeof Node !== "undefined" &&
+	typeof HTMLElement !== "undefined"
 );
 
 const isDOMNode = isDOMAvailable
