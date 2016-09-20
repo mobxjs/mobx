@@ -1091,10 +1091,9 @@ test('toJS should ignore DOM nodes', function(t) {
 
 	var image = observable(document.createElement('img'));
 	t.doesNotThrow(function() {
-		throw new Error('hey fool')
 		toJS(image);
 	});
-	t.equal(toJS(image) === 2, true);
+	t.equal(toJS(image) === image, true);
 
 	t.end();
 })
