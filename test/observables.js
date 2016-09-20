@@ -1089,11 +1089,21 @@ test('toJS should ignore DOM nodes', function(t) {
 		return t.end();
 	}
 
-	var image = observable(document.createElement('img'));
+	var image = document.createElement('img');
+	t.equal(mobx.toJS(image) === image, true);
+
+	var observableImage = observable(document.createElement('img'));
 	t.doesNotThrow(function() {
-		toJS(image);
+		mobx.toJS(observableImage);
 	});
-	t.equal(toJS(image) === image, true);
+
+	var imageMap = mobx.asMap({
+		1: document.createElement('img'),
+		2: document.createElement('img')
+	});
+	t.doesNotThrow(function() {
+		mobx.toJS(imageMap);
+	});
 
 	t.end();
 })
