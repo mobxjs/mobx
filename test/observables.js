@@ -1084,6 +1084,21 @@ test('toJS handles dates', t => {
 	t.end()
 })
 
+test('toJS should ignore DOM nodes', function(t) {
+	if (typeof document !== 'object') {
+		return t.end();
+	}
+
+	var image = observable(document.createElement('img'));
+	t.doesNotThrow(function() {
+		throw new Error('hey fool')
+		toJS(image);
+	});
+	t.equal(toJS(image) === 2, true);
+
+	t.end();
+})
+
 test('json cycles', function(t) {
     var a = observable({
         b: 1,
