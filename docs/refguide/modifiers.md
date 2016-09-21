@@ -68,16 +68,16 @@ var ViewPort = mobxReact.observer(React.createClass({
             },
             viewPortSize: mobx.asStructure(function() {
                 return {
-                    width: Math.max(screenSize.width, minSize.width),
-                    height: Math.max(screenSize.height, minSize.height)
+                    width: Math.max(this.screenSize.width, this.minSize.width),
+                    height: Math.max(this.screenSize.height, this.minSize.height)
                 }
             }
         });
 
         window.onresize = function() {
             mobx.transaction(function() {
-                this.screenSize.width = window.clientWidth;
-                this.screenSize.height = window.clientHeight;
+                this.screenSize.width = window.innerWidth;
+                this.screenSize.height = window.innerHeight;
             });
         }.bind(this);
     },
@@ -109,8 +109,8 @@ To use the `asStructure` modifier in combination with the `@computed` decorator,
 ```javascript
 @computed({ asStructure: true }) get viewPortSize() {
     return {
-        width: Math.max(screenSize.width, minSize.width),
-        height: Math.max(screenSize.height, minSize.height)
+        width: Math.max(this.screenSize.width, this.minSize.width),
+        height: Math.max(this.screenSize.height, this.minSize.height)
     }
 }
 ```
