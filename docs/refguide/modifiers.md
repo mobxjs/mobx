@@ -57,7 +57,7 @@ var ViewPort = mobxReact.observer(React.createClass({
     displayName: 'ViewPort',
 
     componentWillMount: function() {
-        mobx.extendObservable({
+        mobx.extendObservable(this, {
             screenSize: {
                 width: 0,
                 height: 0
