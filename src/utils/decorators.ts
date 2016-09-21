@@ -28,7 +28,7 @@ export function createClassPropertyDecorator(
 	 */
 	allowCustomArguments: boolean
 ): any {
-	function classPropertyDecorator(target: any, key: string, descriptor, customArgs?: IArguments) {
+	function classPropertyDecorator(target: any, key: string, descriptor, customArgs?: IArguments, argLen?: number) {
 		invariant(allowCustomArguments || quacksLikeADecorator(arguments), "This function is a decorator, but it wasn't invoked like a decorator");
 		if (!descriptor) {
 			// typescript (except for getter / setters)
@@ -48,7 +48,7 @@ export function createClassPropertyDecorator(
 					}
 				}
 			};
-			if (arguments.length < 3) {
+			if (arguments.length < 3 || arguments.length === 5 && argLen < 3) {
 				// Typescript target is ES3, so it won't define property for us
 				// or using Reflect.decorate polyfill, which will return no descriptor
 				// (see https://github.com/mobxjs/mobx/issues/333)
@@ -98,7 +98,8 @@ export function createClassPropertyDecorator(
 				return classPropertyDecorator.apply(null, arguments);
 			/** Indirect invocation: @decorator(args) bla */
 			const outerArgs = arguments;
-			return (target, key, descriptor) => classPropertyDecorator(target, key, descriptor, outerArgs);
+			const argLen = arguments.length;
+			return (target, key, descriptor) => classPropertyDecorator(target, key, descriptor, outerArgs, argLen);
 		};
 	}
 	return classPropertyDecorator;
