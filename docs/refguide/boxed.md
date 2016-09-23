@@ -31,7 +31,40 @@ cityName.observe(function(newCity, oldCity) {
 });
 
 cityName.set("Amsterdam");
-// prints 'city: Vienna -> Amsterdam'
+// prints 'Vienna -> Amsterdam'
+```
+
+Array Example:
+
+```javascript
+import {observable} from "mobx";
+
+const myArray = ["Vienna"];
+const cityName = observable(myArray);
+
+console.log(cityName[0]);
+// prints 'Vienna'
+
+cityName.observe(function(observedArray) {
+	if (observedArray.type === "update") {
+		console.log(observedArray.oldValue + "->" + observedArray.newValue);
+	} else if (observedArray.type === "splice") {
+		if (observedArray.addedCount > 0) {
+			console.log(observedArray.added + " added");
+		} else if (observedArray.removedCount > 0) {
+			console.log(observedArray.removed + " removed");
+		}   
+	}
+});
+
+cityName[0] = "Amsterdam";
+// prints 'Vienna -> Amsterdam'
+
+cityName[1] = "Cleveland";
+// prints 'Cleveland added'
+
+cityName.splice(0, 1); 
+// prints 'Amsterdam removed'
 ```
 
 Similar to `observable`, `computed(function)` creates a boxed computed value. See [`computed`](http://mobxjs.github.io/mobx/refguide/computed-decorator.html)
