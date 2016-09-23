@@ -1,5 +1,6 @@
 # 2.5.2
 
+* Introduced `isComputed`
 * Observable objects can now have a type: `IObservableObject`, see [#484](https://github.com/mobxjs/mobx/pull/484) by @spiffytech
 * Restored 2.4 behavior of boxed observables inside observable objects, see [#558](https://github.com/mobxjs/mobx/issues/558)
 

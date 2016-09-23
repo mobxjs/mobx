@@ -40,6 +40,7 @@ export { IKeyValueMap, ObservableMap, IMapEntries, IMapEntry, IMapWillChange, IM
 export { observable                                           } from "./api/observable";
 export { computed, IComputedValueOptions                      } from "./api/computeddecorator";
 export { isObservable                                         } from "./api/isobservable";
+export { isComputed                                           } from "./api/iscomputed";
 export { extendObservable                                     } from "./api/extendobservable";
 export { observe                                              } from "./api/observe";
 export { intercept                                            } from "./api/intercept";

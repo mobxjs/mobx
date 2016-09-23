@@ -1902,3 +1902,19 @@ test('#558 boxed observables stay boxed observables', function(t) {
 	t.equal(typeof a.x.get, "function")
 	t.end()
 })
+
+test('iscomputed', function(t) {
+	t.equal(mobx.isComputed(observable(3)), false)
+	t.equal(mobx.isComputed(mobx.computed(function() { return 3 })), true)
+
+	var x = observable({
+		a: 3,
+		get b() {
+			return this.a
+		}
+	})
+
+	t.equal(mobx.isComputed(x, "a"), false)
+	t.equal(mobx.isComputed(x, "b"), true)
+	t.end()
+})
