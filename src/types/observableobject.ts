@@ -89,11 +89,10 @@ export function defineObservableProperty(adm: ObservableObjectAdministration, pr
 	let name = `${adm.name}.${propName}`;
 	let isComputed = true;
 
-	if (newValue instanceof ObservableValue) {
-		observable = newValue;
-		newValue.name = name;
-		isComputed = false;
-	} else if (newValue instanceof ComputedValue) {
+	if (newValue instanceof ComputedValue) {
+		// desugger computed(getter, setter)
+		// TODO: deprecate this and remove in 3.0, to keep them boxed
+		// get / set is now the idiomatic syntax for non-boxed computed values
 		observable = newValue;
 		newValue.name = name;
 		if (!newValue.scope)

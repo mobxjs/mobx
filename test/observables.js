@@ -1892,3 +1892,13 @@ test('helpful error for self referencing setter', function(t) {
 
 	t.end()
 })
+
+test('#558 boxed observables stay boxed observables', function(t) {
+	var a = observable({
+		x: observable(3)
+	})
+
+	t.equal(typeof a.x, "object")
+	t.equal(typeof a.x.get, "function")
+	t.end()
+})
