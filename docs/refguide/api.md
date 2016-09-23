@@ -132,7 +132,7 @@ Can be used to pass stores to child components using React's context mechanism. 
 Higher order component and counterpart of `Provider`. Can be used to pick stores from React's context and pass it as props to the target component. Usage:
 * `inject("store1", "store2")(observer(MyComponent))`
 * `@inject("store1", "store2") @observer MyComponent`
-* `@inject((stores, props, context) => props) @observer MyComponent
+* `@inject((stores, props, context) => props) @observer MyComponent`
 * `@observer(["store1", "store2"]) MyComponent` is a shorthand for the the `@inject() @observer` combo.
 
 ### `toJS`

@@ -8,7 +8,12 @@ However, instead of running the action immediately when the values it observes h
 
 If observed values are changed multiple times while waiting, the action is still triggered only once, so in a sense it achieves a similar effect than a transaction.
 This might be useful for stuff that is expensive and doesn't need to happen synchronously; such as debouncing server communication.
-If a string is passed as first argument to `autorun`, it will be used as debug name.
+
+If a scope is given, the action will be bound to this scope object.
+
+`autorunAsync(debugName: string, action: () => void, minimumDelay?: number, scope?)`
+
+If a string is passed as first argument to `autorunAsync`, it will be used as debug name.
 
 `autorunAsync` returns a disposer to cancel the autorun.
 

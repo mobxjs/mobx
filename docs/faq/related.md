@@ -9,9 +9,9 @@
 * [tracker-mobx-autorun](https://github.com/meteor-space/tracker-mobx-autorun) Integrate Meteor reactive data with MobX for simple yet highly optimized state management
 * [react-native-mobx](https://github.com/aksonov/react-native-mobx) Make your app reactive with MobX and react-native-router-flux
 
+* [mobx-react-form](https://github.com/foxhound87/mobx-react-form) Build forms and validate them using json-schema rules
 * [mobx-forms](https://github.com/oreqizer/mobx-forms) A simple form manager for React and Mobx, heavily inspired by redux-forms
 * [mobx-form](https://github.com/royriojas/mobx-form) Declaratively build forms using MobX
-* [mobx-ajv-form](https://github.com/foxhound87/mobx-ajv-form) Build forms and validate them using json-schema rules
 * [mobx-input](https://github.com/tomaash/mobx-input) Form validation for MobX and react-bootstrap.
 * [Form abstraction in one fiddle](https://jsfiddle.net/darthapo/k63ujjsp/)
 
