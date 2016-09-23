@@ -31,7 +31,7 @@ export { IComputedValue                                       } from "./core/com
 export { asReference, asFlat, asStructure, asMap              } from "./types/modifiers";
 export { IInterceptable, IInterceptor                         } from "./types/intercept-utils";
 export { IListenable                                          } from "./types/listen-utils";
-export { IObjectWillChange, IObjectChange, isObservableObject } from "./types/observableobject";
+export { IObjectWillChange, IObjectChange, IObservableObject, isObservableObject } from "./types/observableobject";
 export { /* 3.0: IValueDidChange, */ IValueWillChange, IObservableValue } from "./types/observablevalue";
 
 export { IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, isObservableArray, fastArray } from "./types/observablearray";

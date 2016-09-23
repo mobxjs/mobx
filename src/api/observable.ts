@@ -4,6 +4,7 @@ import {computed} from "./computeddecorator";
 import {isPlainObject, invariant, deprecated} from "../utils/utils";
 import {observableDecorator} from "./observabledecorator";
 import {isObservable} from "./isobservable";
+import {IObservableObject} from "../types/observableobject";
 import {IObservableArray, ObservableArray} from "../types/observablearray";
 
 /**
@@ -15,7 +16,7 @@ export function observable(target: Object, key: string, baseDescriptor?: Propert
 export function observable<T>(value: T[]): IObservableArray<T>;
 export function observable<T, S extends Object>(value: () => T, thisArg?: S): IObservableValue<T>;
 export function observable<T extends string|number|boolean|Date|RegExp|Function|void>(value: T): IObservableValue<T>;
-export function observable<T extends Object>(value: T): T;
+export function observable<T extends Object>(value: T): T & IObservableObject;
 export function observable(v: any = undefined, keyOrScope?: string | any) {
 	if (typeof arguments[1] === "string")
 		return observableDecorator.apply(null, arguments);

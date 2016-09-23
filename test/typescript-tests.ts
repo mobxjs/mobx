@@ -2,7 +2,7 @@
 /// <reference path='tape.d.ts' />
 import {
     observe, computed, observable, asStructure, autorun, autorunAsync, extendObservable, action,
-    IObservableArray, IArrayChange, IArraySplice, IObservableValue, isObservable, isObservableObject,
+    IObservableObject, IObservableArray, IArrayChange, IArraySplice, IObservableValue, isObservable, isObservableObject,
     extras, Atom, transaction, IObjectChange, spy, useStrict, isAction
 } from "../lib/mobx";
 import * as test from 'tape';
@@ -959,6 +959,45 @@ test('computed getter / setter for plan objects should succeed (typescript)', fu
 	t.equal(b.propX, 8);
 
 	t.deepEqual(values, [6, 8])
+	t.end()
+})
 
+test("484 - observable objects are IObservableObject", t => {
+	const needs_observable_object = (o: IObservableObject): any => null;
+	const o = observable({stuff: "things"});
+
+	needs_observable_object(o);
+	t.pass();
+	t.end();
+});
+
+test("484 - observable objects are still type T", t => {
+	const o = observable({stuff: "things"});
+	o.stuff = "new things";
+	t.pass();
+	t.end();
+});
+
+test("484 - isObservableObject type guard includes type T", t => {
+	const o = observable({stuff: "things"});
+	if(isObservableObject(o)) {
+		o.stuff = "new things";
+		t.pass();
+	} else {
+		t.fail("object should have been observable");
+	}
+	t.end();
+});
+
+test("484 - isObservableObject type guard includes type IObservableObject", t => {
+	const requires_observable_object = (o: IObservableObject): void => null;
+	const o = observable({stuff: "things"});
+
+	if(isObservableObject(o)) {
+		requires_observable_object(o);
+		t.pass();
+	} else {
+		t.fail("object should have been IObservableObject");
+	}
 	t.end();
 });

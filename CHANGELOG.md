@@ -1,3 +1,7 @@
+# 2.5.2
+
+* Observable objects can now have a type: `IObservableObject`, see [#484](https://github.com/mobxjs/mobx/pull/484) by @spiffytech
+
 # 2.5.1
 
 * Computed properties can now be created by using getter / setter functions. This is the idiomatic way to introduce computed properties from now on:
