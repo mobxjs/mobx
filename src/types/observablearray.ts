@@ -1,4 +1,4 @@
-import {getNextId, deepEquals, makeNonEnumerable, Lambda, deprecated, EMPTY_ARRAY, addHiddenFinalProp, addHiddenProp} from "../utils/utils";
+import {getNextId, deepEquals, makeNonEnumerable, Lambda, deprecated, EMPTY_ARRAY, addHiddenFinalProp, addHiddenProp, invariant} from "../utils/utils";
 import {BaseAtom} from "../core/atom";
 import {ValueMode, assertUnwrapped, makeChildObservable} from "./modifiers";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
@@ -427,6 +427,7 @@ Object.defineProperty(ObservableArray.prototype, "length", {
 	"some"
 ].forEach(funcName => {
 	const baseFunc = Array.prototype[funcName];
+	invariant(typeof baseFunc === "function", `Base function not defined on Array prototype: '${funcName}'`);
 	addHiddenProp(ObservableArray.prototype, funcName, function() {
 		this.$mobx.atom.reportObserved();
 		return baseFunc.apply(this.$mobx.values, arguments);
@@ -436,7 +437,7 @@ Object.defineProperty(ObservableArray.prototype, "length", {
 // See #364
 const ENTRY_0 = {
 	configurable: true,
-	enumerable:false,
+	enumerable: false,
 	set: createArraySetter(0),
 	get: createArrayGetter(0)
 };
