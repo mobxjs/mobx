@@ -51,9 +51,10 @@ cityName.observe(function(observedArray) {
 	} else if (observedArray.type === "splice") {
 		if (observedArray.addedCount > 0) {
 			console.log(observedArray.added + " added");
-		} else if (observedArray.removedCount > 0) {
+		}
+        if (observedArray.removedCount > 0) {
 			console.log(observedArray.removed + " removed");
-		}   
+		}
 	}
 });
 
@@ -63,7 +64,7 @@ cityName[0] = "Amsterdam";
 cityName[1] = "Cleveland";
 // prints 'Cleveland added'
 
-cityName.splice(0, 1); 
+cityName.splice(0, 1);
 // prints 'Amsterdam removed'
 ```
 
