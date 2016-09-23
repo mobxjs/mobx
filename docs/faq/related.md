@@ -17,6 +17,7 @@
 
 * [serializr](https://github.com/mobxjs/serializr) Small library to (de)serialize complex object graphs to JSON
 * [mobx-utils](https://github.com/mobxjs/mobx-utils) Utility belt for MobX with several common patterns, like subscribing to external resources, converting promises etc.
+* [mobx-rest](https://github.com/masylum/mobx-rest) REST conventions for MobX.
 * [mobx-model](https://github.com/ikido/mobx-model) Simplify mobx data stores that mimic backend models
 * [mobx-store](https://github.com/AriaFallah/mobx-store) A lowdb inspired data store with declarative querying, observable state, and easy undo/redo.
 * [mobx-firebase-store](https://github.com/nyura123/mobx-firebase-store) Subscribe MobX observables to firebase

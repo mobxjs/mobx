@@ -39,7 +39,7 @@ Having issues with the babel setup? Check this [issue](https://github.com/mobxjs
 
 Without decorators `extendObservable` can be used to introduce observable properties on an object.
 Typically this is done inside a constructor function.
-The following example introduces observable properties, a computed property and an action on a class instance:
+The following example introduces observable properties, a computed property and an action in a constructor function / class:
 
 ```javascript
 function Timer() {

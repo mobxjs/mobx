@@ -1,6 +1,7 @@
 # Public projects using MobX
 
 * Spectacle editor: Official editor for building presentations using the Spectacle library: https://github.com/FormidableLabs/spectacle-editor
+* React-Game-Kit https://github.com/FormidableLabs/react-game-kit
 * The SoundCloud Client in React + MobX https://github.com/rwieruch/favesound-mobx
 * DWatch - docker container manager, Electron, typescript, inversifyJS: https://github.com/Mercateo/dwatch
 * Kratelabs interactive map / map order service https://kratelabs.addxy.com/#/ source: https://github.com/KrateLabs/KrateLabs-App

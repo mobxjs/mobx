@@ -4,10 +4,10 @@
 * React, Typescript, Webpack: https://github.com/mobxjs/mobx-react-typescript-boilerplate
 * MobX + React JSFiddle: https://jsfiddle.net/mweststrate/wgbe4guu/
 * MobX + React JSFiddle with just ES5: https://jsfiddle.net/rubyred/55oc981v/
-* MobX, TypeScript, React, React Router, Server Side Rendering and Webpack: https://github.com/contacts-mvc/mobx-react-typescript
 * [generator-mobx-react](https://www.npmjs.com/package/generator-mobx-react) Yeoman MobX, React, Webpack, Babel / Typescript project generator
 * [mobx-starter](https://github.com/nightwolfz/mobx-starter): Starting base for an mobx react project with optional isomorphism. MongoDB auth & sessions, hot reload, react-router
 * [rfx-stack](https://github.com/foxhound87/rfx-stack) RFX Stack - Universal App featuring: React + Feathers + MobX
+* MobX, TypeScript, React, React Router, Server Side Rendering and Webpack: https://github.com/contacts-mvc/mobx-react-typescript
 * [reaxor](https://github.com/KadoBOT/reaxor) Boilerplate for better state management, styling, testing and cleaner code
 * [jspm-react](https://github.com/capaj/jspm-react) lightweight React.js ES6 boilerplate with JSPM and proper hot reloading modules
 * [react-portal](https://github.com/vinej/react-portal) MobX, React with Flux architecture

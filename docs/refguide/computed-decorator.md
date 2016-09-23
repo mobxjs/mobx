@@ -36,7 +36,7 @@ If your environment doesn't support decorators or field initializers,
 
 `@computed` can be parameterized. `@computed({asStructure: true})` makes sure that the result of a derivation is compared structurally instead of referentially with its preview value. This makes sure that observers of the computation don't re-evaluate if new structures are returned that are structurally equal to the original ones. This is very useful when working with point, vector or color structures for example. It behaves the same as the `asStructure` modifier for observable values.
 
-`@computed` properties are not enumerable.
+`@computed` properties are not enumerable. Nor can they be overwritten in an inheritance chain.
 
 # Creating computed values with `observable` or `extendObservable`.
 
