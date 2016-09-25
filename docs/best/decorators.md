@@ -106,7 +106,7 @@ Stateless function component, ES6:
 
 ```javascript
 const Timer = observer(({ timer }) =>
-	<div>{ props.timer.elapsedTime }</div>
+	<div>{ timer.elapsedTime }</div>
 )
 ```
 
