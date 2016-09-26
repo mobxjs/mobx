@@ -50,7 +50,7 @@ var orderLine = observable({
     get total() {
         return this.price * this.amount
     }
-})
+});
 ```
 
 _Note: The support for getters was introduced in MobX 2.5.1. MobX will automatically convert any argumentless function that is passed as property value to `observable` / `extendObservable` to a computed property as well,
@@ -65,12 +65,12 @@ but they can be used as 'inverse' of the derivation. For example:
 const box = observable({
     length: 2,
     get squared() {
-        return this.length * this.length
+        return this.length * this.length;
     },
     set squared(value) {
-        this.length = Math.sqrt(value)
+        this.length = Math.sqrt(value);
     }
-})
+});
 ```
 
 _Note: setters require MobX 2.5.1 or higher_

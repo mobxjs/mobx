@@ -5,23 +5,23 @@ It wraps the component's render function in `mobx.autorun` to make sure that any
 It is available through the separate `mobx-react` package.
 
 ```javascript
-import {observer} from "mobx-react"
+import {observer} from "mobx-react";
 
 var timerData = observable({
 	secondsPassed: 0
-})
+});
 
 setInterval(() => {
-	timerData.secondsPassed++
-}, 1000)
+	timerData.secondsPassed++;
+}, 1000);
 
 @observer class Timer extends React.Component {
 	render() {
 		return (<span>Seconds passed: { this.props.timerData.secondsPassed } </span> )
 	}
-})
+});
 
-React.render(<Timer timerData={timerData} />, document.body)
+React.render(<Timer timerData={timerData} />, document.body);
 ```
 
 Tip: when `observer` needs to be combined with other decorators or higher-order-components, make sure that `observer` is the innermost (first applied) decorator;
@@ -50,11 +50,11 @@ In ES5 environments, observer components can be simple declared using `observer(
 The above timer widget could also be written using stateless function components that are passed through `observer`:
 
 ```javascript
-import {observer} from "mobx-react"
+import {observer} from "mobx-react";
 
 const Timer = observer(({ timerData }) =>
 	<span>Seconds passed: { timerData.secondsPassed } </span>
-)
+);
 ```
 
 ## Observable local component state
@@ -101,12 +101,12 @@ Example:
 const colors = observable({
    foreground: '#000',
    background: '#fff'
-})
+});
 
 const App = () =>
   <Provider colors={colors}>
      <app stuff... />
-  </Provider>
+  </Provider>;
 
 const Button = observer(["colors"], ({ colors, label, onClick }) =>
   <button style={{
@@ -115,7 +115,7 @@ const Button = observer(["colors"], ({ colors, label, onClick }) =>
     }}
     onClick={onClick}
   >{label}<button>
-)
+);
 
 // later..
 colors.foreground = 'blue';
@@ -157,7 +157,7 @@ import {observer} from "mobx-react";
     }
 
     render() {
-        return <div>this.props.todo.title</div>
+        return <div>this.props.todo.title</div>;
     }
 }
 ```

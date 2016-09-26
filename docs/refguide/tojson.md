@@ -9,7 +9,7 @@ Cycles are detected and properly supported by default, but this can be disabled 
 
 For more complex (de)serialization scenario's, one can use [serializr](https://github.com/mobxjs/serializr)
 
-```
+```javascript
 var obj = mobx.observable({
     x: 1
 });
