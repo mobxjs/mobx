@@ -52,7 +52,7 @@ cityName.observe(function(observedArray) {
 		if (observedArray.addedCount > 0) {
 			console.log(observedArray.added + " added");
 		}
-        if (observedArray.removedCount > 0) {
+		if (observedArray.removedCount > 0) {
 			console.log(observedArray.removed + " removed");
 		}
 	}

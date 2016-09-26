@@ -29,8 +29,8 @@ In other words:
 
 ```javascript
 const line = new OrderLine();
-console.log("price" in line) // true
-console.log(line.hasOwnProperty("price")) // false, the price _property_ is defined on the class, although the value will be stored per instance.
+console.log("price" in line); // true
+console.log(line.hasOwnProperty("price")); // false, the price _property_ is defined on the class, although the value will be stored per instance.
 ```
 
 The `@observable` decorator can be combined with modifiers like `asStructure`:
