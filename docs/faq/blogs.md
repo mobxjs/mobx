@@ -9,6 +9,7 @@
 * [State Management Is Easy, React Amsterdam 2016 conf](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
 * [Transparent Reactive Programming and Mutable Data, Reactive2015 conf](https://www.youtube.com/watch?v=FEwLwiizlk0) ([slides](https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures))
 * Magic MobX, [RuhrJS 2016](https://www.youtube.com/watch?v=TfxfRkNCnmk) ([slides](http://magixmobx.surge.sh) and [more slides](https://docs.google.com/presentation/d/1d54mSxF0VOAFlsUGM8eonZDs9gZecTOz1ErSbnydChQ/edit?usp=sharing))
+* [Spacedojo Show - Reactive Programming with Mobx](https://www.youtube.com/watch?v=QTptEw2cYt0&feature=youtu.be&a)
 
 ## Tutorials
 * [Ten minute interactive introduction to MobX and React](https://mobxjs.github.io/mobx/getting-started.html#demo)
@@ -49,6 +50,7 @@
 * [A Notification System with MobX and ReactJS](https://medium.com/@GiacomoRebonato/a-notification-system-with-mobx-and-reactjs-ecbadca258c1#.ps9j0i4lg)
 * [Using MobX in Angular 1.5 todo app](http://gaui.is/angular-1-5-todo-app/)
 * [Building a React & MobX application with MVVM](https://medium.com/@MattiaManzati/building-a-react-mobx-application-with-mvvm-ec0b3e3c8786#.de5tzghcx)
+* [Videolog: integrate MobX with Firebase](https://www.youtube.com/watch?v=MMQH9vxbzRw&feature=youtu.be&a)
 
 ## Testimonials
 

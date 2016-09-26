@@ -148,6 +148,9 @@ Usage: `isObservableObject(thing)`, `isObservableArray(thing)`, `isObservableMap
 ### `isAction`
 Usage: `isAction(func)`. Returns true if the given function is wrapped / decorated with `action`.
 
+### `isComputed`
+Usage: `isComputed(thing, property?)`. Returns true if the giving thing is a boxed computed value, or if the designated property is a computed value.
+
 ### `createTransformer`
 Usage: `createTransformer(transformation: A => B, onCleanup?): A = B`.
 Can be used to make functions that transforms one value into another value reactive and memoized.

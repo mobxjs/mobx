@@ -19,11 +19,11 @@
 * [mobx-utils](https://github.com/mobxjs/mobx-utils) Utility belt for MobX with several common patterns, like subscribing to external resources, converting promises etc.
 * [mobx-rest](https://github.com/masylum/mobx-rest) REST conventions for MobX.
 * [mobx-model](https://github.com/ikido/mobx-model) Simplify mobx data stores that mimic backend models
-* [mobx-store](https://github.com/AriaFallah/mobx-store) A lowdb inspired data store with declarative querying, observable state, and easy undo/redo.
+* [mobx-router](https://github.com/kitze/mobx-router) A simple router for MobX apps
 * [mobx-firebase-store](https://github.com/nyura123/mobx-firebase-store) Subscribe MobX observables to firebase
+* [mobx-store](https://github.com/AriaFallah/mobx-store) A lowdb inspired data store with declarative querying, observable state, and easy undo/redo.
 * [rx-mobx](https://github.com/chicoxyzzy/rx-mobx) Convert Mobx observables to RxJS and vice versa
 * [mobx-reactor](https://github.com/amsb/mobx-reactor) Connect MobX data stores to functional stateless React components with async actions and unidirectional data flow.
-* [mobx-connect](https://github.com/nightwolfz/mobx-connect) MobX @connect decorator for react components. Similar to redux's @connect.
 * [mobx-autorun-async-immediate](https://github.com/dettier/mobx-autorun-async-immediate) Mobx debounced autorun function with immediate synchronous first call
 * [Smalldots MobX Store](https://github.com/smalldots/mobx-store) Store API for MobX
 * [mobx-roof](https://github.com/mobx-roof/mobx-roof) Simple, React MVVM framework based on mobx
@@ -31,6 +31,9 @@
 * [react-mobx-translatable](https://github.com/infinum/react-mobx-translatable) Make React components translatable using MobX. Can be used both on the server (SSR) and in the browser.
 * [mobx-logger](https://github.com/winterbe/mobx-logger) Always know what is really going on in your MobX application by logging just the right information.
 * [mobx-react-matchmedia](https://github.com/foxhound87/mobx-react-matchmedia) A React HOC with mediaqueries for responsive layout.
+* [mobx-server-wait](https://www.npmjs.com/package/mobx-server-wait) Render universally with server awaited mobx actions.
+* [mobx-cache](https://github.com/mdebbar/mobx-cache) An observable data cache with MobX
+* [mobx-persist](https://github.com/pinqy520/mobx-persist) create and persist mobx stores
 
 ## ... More
 

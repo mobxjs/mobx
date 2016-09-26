@@ -6,6 +6,7 @@
 * MobX + React JSFiddle with just ES5: https://jsfiddle.net/rubyred/55oc981v/
 * [generator-mobx-react](https://www.npmjs.com/package/generator-mobx-react) Yeoman MobX, React, Webpack, Babel / Typescript project generator
 * [mobx-starter](https://github.com/nightwolfz/mobx-starter): Starting base for an mobx react project with optional isomorphism. MongoDB auth & sessions, hot reload, react-router
+* [custom-react-scripts](https://www.npmjs.com/package/custom-react-scripts) for [create-react-app](https://github.com/facebookincubator/create-react-app) that enables using decorators; add `REACT_APP_DECORATORS=true` to `.env` to enable decorators.
 * [rfx-stack](https://github.com/foxhound87/rfx-stack) RFX Stack - Universal App featuring: React + Feathers + MobX
 * MobX, TypeScript, React, React Router, Server Side Rendering and Webpack: https://github.com/contacts-mvc/mobx-react-typescript
 * [reaxor](https://github.com/KadoBOT/reaxor) Boilerplate for better state management, styling, testing and cleaner code

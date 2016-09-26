@@ -32,16 +32,19 @@ const todos = observable([
     }
 ]);
 
+// wrong use of reaction: reacts to length changes, but not to title changes!
 const reaction1 = reaction(
     () => todos.length,
-    todos => console.log("reaction 1:", todos.map(todo => todo.title).join(", "))
+    length => console.log("reaction 1:", todos.map(todo => todo.title).join(", "))
 );
 
+// correct use of reaction: reacts to length and title changes
 const reaction2 = reaction(
     () => todos.map(todo => todo.title),
     titles => console.log("reaction 2:", titles.join(", "))
 );
 
+// autorun reacts to just everything that is used in it's function
 const autorun1 = autorun(
     () => console.log("autorun 1:", todos.map(todo => todo.title).join(", "))
 );
