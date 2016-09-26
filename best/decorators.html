@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="5" data-basepath=".." data-revision="Sat Sep 03 2016 21:52:21 GMT+0200 (CEST)">
+    <div class="book" data-level="5" data-basepath=".." data-revision="Mon Sep 26 2016 20:58:55 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -912,7 +912,7 @@ Having issues with the babel setup? Check this <a href="https://github.com/mobxj
 <h2 id="creating-observable-properties-without-decorators">Creating observable properties without decorators</h2>
 <p>Without decorators <code>extendObservable</code> can be used to introduce observable properties on an object.
 Typically this is done inside a constructor function.
-The following example introduces observable properties, a computed property and an action on a class instance:</p>
+The following example introduces observable properties, a computed property and an action in a constructor function / class:</p>
 <pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Timer</span>(<span class="hljs-params"></span>) </span>{
     extendObservable(<span class="hljs-keyword">this</span>, {
         start: <span class="hljs-built_in">Date</span>.now(),
@@ -939,7 +939,7 @@ The following example introduces observable properties, a computed property and 
 <p>Decorators combine very nicely with classes.
 When using decorators, observables, computed values and actions can be simply introduced by using the decorators:</p>
 <pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Timer</span> </span>{
-    @observabe start = <span class="hljs-built_in">Date</span>.now();
+    @observable start = <span class="hljs-built_in">Date</span>.now();
     @observable current = <span class="hljs-built_in">Date</span>.now();
 
     @computed get elapsedTime() {
@@ -962,7 +962,7 @@ So all the following forms of creating observer components are valid:</p>
 </code></pre>
 <p>Stateless function component, ES6:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> Timer = observer(({ timer }) =&gt;
-    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>{ props.timer.elapsedTime }<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>{ timer.elapsedTime }<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
 )</span>
 </code></pre>
 <p>React component, ES5:</p>

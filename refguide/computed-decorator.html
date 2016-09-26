@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.3" data-basepath=".." data-revision="Sat Sep 03 2016 21:52:21 GMT+0200 (CEST)">
+    <div class="book" data-level="2.3" data-basepath=".." data-revision="Mon Sep 26 2016 20:58:55 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -909,7 +909,7 @@ So they will not be invoked when their input parameters didn&apos;t modifiy or i
 <p>If your environment doesn&apos;t support decorators or field initializers,
 <code>@computed get funcName() { }</code> is sugar for <a href="extend-observable.html"><code>extendObservable(this, { funcName: func })</code></a></p>
 <p><code>@computed</code> can be parameterized. <code>@computed({asStructure: true})</code> makes sure that the result of a derivation is compared structurally instead of referentially with its preview value. This makes sure that observers of the computation don&apos;t re-evaluate if new structures are returned that are structurally equal to the original ones. This is very useful when working with point, vector or color structures for example. It behaves the same as the <code>asStructure</code> modifier for observable values.</p>
-<p><code>@computed</code> properties are not enumerable.</p>
+<p><code>@computed</code> properties are not enumerable. Nor can they be overwritten in an inheritance chain.</p>
 <h1 id="creating-computed-values-with-observable-or-extendobservable">Creating computed values with <code>observable</code> or <code>extendObservable</code>.</h1>
 <p>The functions <code>observable(object)</code> or <code>extendObservable(target, properties)</code> can be used to introduce computed properties as well,
 as alternative to using the decorator. For this ES5 getters can be used, so the above example can also be written as:</p>

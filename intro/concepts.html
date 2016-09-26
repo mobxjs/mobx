@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="1.2" data-basepath=".." data-revision="Sat Sep 03 2016 21:52:21 GMT+0200 (CEST)">
+    <div class="book" data-level="1.2" data-basepath=".." data-revision="Mon Sep 26 2016 20:58:55 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -914,7 +914,7 @@ If MobX is used in <em>strict mode</em>, MobX will enforce that no state can be 
 <p>MobX supports an uni-directional data flow where <em>actions</em> changes the <em>state</em>, which in turn updates all affected <em>views</em>.</p>
 <p><img src="../images/action-state-view.png" alt="Action, State, View"></p>
 <p>All <em>Derivations</em> are updated <strong>automatically</strong> and <strong>atomically</strong> when the <em>state</em> changes. As a result it is not possible to ever observe intermediate values.</p>
-<p>All <em>Derivations</em> are updated <strong>synchonously</strong> by default. This means that for example <em>actions</em> can safely inspect a computed value directly after altering the <em>state</em>.</p>
+<p>All <em>Derivations</em> are updated <strong>synchronously</strong> by default. This means that for example <em>actions</em> can safely inspect a computed value directly after altering the <em>state</em>.</p>
 <p><em>Computed values</em> are updated <strong>lazily</strong>. Any computed value that is not actively in use will not be updated until it is needed for a side effect (I/O).
 If a view is no longer in use it will be garbage collected automatically.</p>
 <p>All <em>Computed values</em> should be <strong>pure</strong>. They are not supposed to change <em>state</em>.</p>

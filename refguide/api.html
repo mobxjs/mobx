@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2" data-basepath=".." data-revision="Sat Sep 03 2016 21:52:21 GMT+0200 (CEST)">
+    <div class="book" data-level="2" data-basepath=".." data-revision="Mon Sep 26 2016 20:58:55 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -996,7 +996,7 @@ More, less trivial utilities can be found in the * <a href="https://github.com/m
 <ul>
 <li><code>inject(&quot;store1&quot;, &quot;store2&quot;)(observer(MyComponent))</code></li>
 <li><code>@inject(&quot;store1&quot;, &quot;store2&quot;) @observer MyComponent</code></li>
-<li>`@inject((stores, props, context) =&gt; props) @observer MyComponent</li>
+<li><code>@inject((stores, props, context) =&gt; props) @observer MyComponent</code></li>
 <li><code>@observer([&quot;store1&quot;, &quot;store2&quot;]) MyComponent</code> is a shorthand for the the <code>@inject() @observer</code> combo.</li>
 </ul>
 <h3 id="-tojs"><code>toJS</code></h3>
@@ -1008,6 +1008,8 @@ Works for all observables, computed values and disposer functions of reactions. 
 <p>Usage: <code>isObservableObject(thing)</code>, <code>isObservableArray(thing)</code>, <code>isObservableMap(thing)</code>. Returns <code>true</code> if.., well, do the math.</p>
 <h3 id="-isaction"><code>isAction</code></h3>
 <p>Usage: <code>isAction(func)</code>. Returns true if the given function is wrapped / decorated with <code>action</code>.</p>
+<h3 id="-iscomputed"><code>isComputed</code></h3>
+<p>Usage: <code>isComputed(thing, property?)</code>. Returns true if the giving thing is a boxed computed value, or if the designated property is a computed value.</p>
 <h3 id="-createtransformer"><code>createTransformer</code></h3>
 <p>Usage: <code>createTransformer(transformation: A =&gt; B, onCleanup?): A = B</code>.
 Can be used to make functions that transforms one value into another value reactive and memoized.

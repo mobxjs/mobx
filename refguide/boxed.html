@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="3.4" data-basepath=".." data-revision="Sat Sep 03 2016 21:52:21 GMT+0200 (CEST)">
+    <div class="book" data-level="3.4" data-basepath=".." data-revision="Mon Sep 26 2016 20:58:55 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -911,7 +911,38 @@ cityName.observe(<span class="hljs-function"><span class="hljs-keyword">function
 });
 
 cityName.set(<span class="hljs-string">&quot;Amsterdam&quot;</span>);
-<span class="hljs-comment">// prints &apos;city: Vienna -&gt; Amsterdam&apos;</span>
+<span class="hljs-comment">// prints &apos;Vienna -&gt; Amsterdam&apos;</span>
+</code></pre>
+<p>Array Example:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
+
+<span class="hljs-keyword">const</span> myArray = [<span class="hljs-string">&quot;Vienna&quot;</span>];
+<span class="hljs-keyword">const</span> cityName = observable(myArray);
+
+<span class="hljs-built_in">console</span>.log(cityName[<span class="hljs-number">0</span>]);
+<span class="hljs-comment">// prints &apos;Vienna&apos;</span>
+
+cityName.observe(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">observedArray</span>) </span>{
+    <span class="hljs-keyword">if</span> (observedArray.type === <span class="hljs-string">&quot;update&quot;</span>) {
+        <span class="hljs-built_in">console</span>.log(observedArray.oldValue + <span class="hljs-string">&quot;-&gt;&quot;</span> + observedArray.newValue);
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (observedArray.type === <span class="hljs-string">&quot;splice&quot;</span>) {
+        <span class="hljs-keyword">if</span> (observedArray.addedCount &gt; <span class="hljs-number">0</span>) {
+            <span class="hljs-built_in">console</span>.log(observedArray.added + <span class="hljs-string">&quot; added&quot;</span>);
+        }
+        <span class="hljs-keyword">if</span> (observedArray.removedCount &gt; <span class="hljs-number">0</span>) {
+            <span class="hljs-built_in">console</span>.log(observedArray.removed + <span class="hljs-string">&quot; removed&quot;</span>);
+        }
+    }
+});
+
+cityName[<span class="hljs-number">0</span>] = <span class="hljs-string">&quot;Amsterdam&quot;</span>;
+<span class="hljs-comment">// prints &apos;Vienna -&gt; Amsterdam&apos;</span>
+
+cityName[<span class="hljs-number">1</span>] = <span class="hljs-string">&quot;Cleveland&quot;</span>;
+<span class="hljs-comment">// prints &apos;Cleveland added&apos;</span>
+
+cityName.splice(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>);
+<span class="hljs-comment">// prints &apos;Amsterdam removed&apos;</span>
 </code></pre>
 <p>Similar to <code>observable</code>, <code>computed(function)</code> creates a boxed computed value. See <a href="http://mobxjs.github.io/mobx/refguide/computed-decorator.html" target="_blank"><code>computed</code></a></p>
 

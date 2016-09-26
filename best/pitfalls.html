@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="7.1" data-basepath=".." data-revision="Sat Sep 03 2016 21:52:21 GMT+0200 (CEST)">
+    <div class="book" data-level="7.1" data-basepath=".." data-revision="Mon Sep 26 2016 20:58:55 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -972,7 +972,9 @@ const _MyComponent = observer((props =&gt; <span class="hljs-tag">&lt;<span clas
 <p>See also: <a href="http://mobxjs.github.io/mobx/best/stateless-HMR.html" target="_blank">http://mobxjs.github.io/mobx/best/stateless-HMR.html</a> or <a href="https://github.com/mobxjs/mobx/issues/141#issuecomment-228457886" target="_blank">#141</a>.</p>
 <h4 id="the-proptype-of-an-observable-array-is-object">The propType of an observable array is object</h4>
 <p>Observable arrays are actually objects, so they comply to <code>propTypes.object</code> instead of <code>array</code>.
-<code>mobx-react</code> will <a href="https://github.com/mobxjs/mobx-react/pull/59" target="_blank">soon</a> provide explicit propTypes for observable data structures.</p>
+<code>mobx-react</code> provides it&apos;s explicit <code>PropTypes</code> for observable data structures.</p>
+<h4 id="rendering-listviews-in-react-native">Rendering ListViews in React Native</h4>
+<p><code>ListView.DataSource</code> in React Native expects real arrays, so make sure to <code>.slice()</code> arrays first before passing them to list views. For more info see <a href="https://github.com/mobxjs/mobx/issues/476" target="_blank">#476</a></p>
 <h4 id="declaring-proptypes-might-cause-unnecessary-renders-in-dev-mode">Declaring propTypes might cause unnecessary renders in dev mode</h4>
 <p>See: <a href="https://github.com/mobxjs/mobx-react/issues/56" target="_blank">https://github.com/mobxjs/mobx-react/issues/56</a></p>
 <h4 id="-observable-properties-initialize-lazily-when-using-babel"><code>@observable</code> properties initialize lazily when using Babel</h4>

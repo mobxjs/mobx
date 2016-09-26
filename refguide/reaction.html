@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="8.9" data-basepath=".." data-revision="Sat Sep 03 2016 21:52:21 GMT+0200 (CEST)">
+    <div class="book" data-level="8.9" data-basepath=".." data-revision="Mon Sep 26 2016 20:58:55 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -910,16 +910,19 @@ See also <a href="../best/react">what will MobX React to?</a>.</p>
     }
 ]);
 
+<span class="hljs-comment">// wrong use of reaction: reacts to length changes, but not to title changes!</span>
 <span class="hljs-keyword">const</span> reaction1 = reaction(
     () =&gt; todos.length,
-    todos =&gt; <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;reaction 1:&quot;</span>, todos.map(todo =&gt; todo.title).join(<span class="hljs-string">&quot;, &quot;</span>))
+    length =&gt; <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;reaction 1:&quot;</span>, todos.map(todo =&gt; todo.title).join(<span class="hljs-string">&quot;, &quot;</span>))
 );
 
+<span class="hljs-comment">// correct use of reaction: reacts to length and title changes</span>
 <span class="hljs-keyword">const</span> reaction2 = reaction(
     () =&gt; todos.map(todo =&gt; todo.title),
     titles =&gt; <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;reaction 2:&quot;</span>, titles.join(<span class="hljs-string">&quot;, &quot;</span>))
 );
 
+<span class="hljs-comment">// autorun reacts to just everything that is used in it&apos;s function</span>
 <span class="hljs-keyword">const</span> autorun1 = autorun(
     () =&gt; <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;autorun 1:&quot;</span>, todos.map(todo =&gt; todo.title).join(<span class="hljs-string">&quot;, &quot;</span>))
 );

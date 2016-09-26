@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="8.1" data-basepath=".." data-revision="Sat Sep 03 2016 21:52:21 GMT+0200 (CEST)">
+    <div class="book" data-level="8.1" data-basepath=".." data-revision="Mon Sep 26 2016 20:58:55 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -888,8 +888,10 @@
 The <code>action</code> will be run and observed.
 However, instead of running the action immediately when the values it observes have changed, the <code>minimumDelay</code> will be awaited before re-execution the <code>action</code> again.</p>
 <p>If observed values are changed multiple times while waiting, the action is still triggered only once, so in a sense it achieves a similar effect than a transaction.
-This might be useful for stuff that is expensive and doesn&apos;t need to happen synchronously; such as debouncing server communication.
-If a string is passed as first argument to <code>autorun</code>, it will be used as debug name.</p>
+This might be useful for stuff that is expensive and doesn&apos;t need to happen synchronously; such as debouncing server communication.</p>
+<p>If a scope is given, the action will be bound to this scope object.</p>
+<p><code>autorunAsync(debugName: string, action: () =&gt; void, minimumDelay?: number, scope?)</code></p>
+<p>If a string is passed as first argument to <code>autorunAsync</code>, it will be used as debug name.</p>
 <p><code>autorunAsync</code> returns a disposer to cancel the autorun.</p>
 <pre><code class="lang-javascript">autorunAsync(() =&gt; {
     <span class="hljs-comment">// Assuming that profile.asJson returns an observable Json representation of profile,</span>

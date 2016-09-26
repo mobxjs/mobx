@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="8.7" data-basepath=".." data-revision="Sat Sep 03 2016 21:52:21 GMT+0200 (CEST)">
+    <div class="book" data-level="8.7" data-basepath=".." data-revision="Mon Sep 26 2016 20:58:55 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -925,7 +925,7 @@ This is useful if you are working with &apos;struct&apos; like objects like colo
     displayName: <span class="hljs-string">&apos;ViewPort&apos;</span>,
 
     componentWillMount: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-        mobx.extendObservable({
+        mobx.extendObservable(<span class="hljs-keyword">this</span>, {
             screenSize: {
                 width: <span class="hljs-number">0</span>,
                 height: <span class="hljs-number">0</span>
@@ -936,16 +936,16 @@ This is useful if you are working with &apos;struct&apos; like objects like colo
             },
             viewPortSize: mobx.asStructure(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
                 <span class="hljs-keyword">return</span> {
-                    width: <span class="hljs-built_in">Math</span>.max(screenSize.width, minSize.width),
-                    height: <span class="hljs-built_in">Math</span>.max(screenSize.height, minSize.height)
+                    width: <span class="hljs-built_in">Math</span>.max(<span class="hljs-keyword">this</span>.screenSize.width, <span class="hljs-keyword">this</span>.minSize.width),
+                    height: <span class="hljs-built_in">Math</span>.max(<span class="hljs-keyword">this</span>.screenSize.height, <span class="hljs-keyword">this</span>.minSize.height)
                 }
             }
         });
 
         <span class="hljs-built_in">window</span>.onresize = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
             mobx.transaction(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-                <span class="hljs-keyword">this</span>.screenSize.width = <span class="hljs-built_in">window</span>.clientWidth;
-                <span class="hljs-keyword">this</span>.screenSize.height = <span class="hljs-built_in">window</span>.clientHeight;
+                <span class="hljs-keyword">this</span>.screenSize.width = <span class="hljs-built_in">window</span>.innerWidth;
+                <span class="hljs-keyword">this</span>.screenSize.height = <span class="hljs-built_in">window</span>.innerHeight;
             });
         }.bind(<span class="hljs-keyword">this</span>);
     },
@@ -972,8 +972,8 @@ This means that a new object that is returned from <code>viewPortSize</code> won
 <p>To use the <code>asStructure</code> modifier in combination with the <code>@computed</code> decorator, use the following:</p>
 <pre><code class="lang-javascript">@computed({ asStructure: <span class="hljs-literal">true</span> }) get viewPortSize() {
     <span class="hljs-keyword">return</span> {
-        width: <span class="hljs-built_in">Math</span>.max(screenSize.width, minSize.width),
-        height: <span class="hljs-built_in">Math</span>.max(screenSize.height, minSize.height)
+        width: <span class="hljs-built_in">Math</span>.max(<span class="hljs-keyword">this</span>.screenSize.width, <span class="hljs-keyword">this</span>.minSize.width),
+        height: <span class="hljs-built_in">Math</span>.max(<span class="hljs-keyword">this</span>.screenSize.height, <span class="hljs-keyword">this</span>.minSize.height)
     }
 }
 </code></pre>
