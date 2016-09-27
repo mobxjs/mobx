@@ -210,9 +210,9 @@ As demonstrated above, modifying state when using MobX is very straightforward. 
 
 MobX builds a graph of all the derivations in your application to find the least number of re-computations that is needed to prevent staleness. "Derive everything" might sound expensive, MobX builds a virtual derivation graph to minimize the number of recomputations needed to keep derivations in sync with the state.
 
-In fact, when testing MobX at Mendix we found out that using this library to track the relations in our code is often a lot more efficient then pushing changes through our application by using handwritten events or "smart" selector based container components.
+In fact, when testing MobX at Mendix we found out that using this library to track the relations in our code is often a lot more efficient than pushing changes through our application by using handwritten events or "smart" selector based container components.
 
-The simple reason is that MobX will establish far more fine grained 'listeners' on your data then you would do as a programmer.
+The simple reason is that MobX will establish far more fine grained 'listeners' on your data than you would do as a programmer.
 
 Secondly MobX sees the causality between derivations so it can order them in such a way that no derivation has to run twice or introduces a glitch.
 
@@ -220,13 +220,13 @@ How that works? See this [in-depth explanation of MobX](https://medium.com/@mwes
 
 ### Easy interoperability
 
-MobX works plain javascript structures. Due to it's unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific library flavors.
+MobX works plain javascript structures. Due to its unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific library flavors.
 
-So you can simple keep using your existing router-, data fetching and utility libraries like `react-router`, `director`, `superagent`, `lodash` etc.
+So you can simply keep using your existing router, data fetching and utility libraries like `react-router`, `director`, `superagent`, `lodash` etc.
 
 For the same reason you can use it out of the box both server- and client side, in isomorphic applications and with react-native.
 
-The result of this is that you often need to learn less new concepts when using MobX in comparison to other state management solutions.
+The result of this is that you often need to learn fewer new concepts when using MobX in comparison to other state management solutions.
 
 ---
 
@@ -244,7 +244,7 @@ MobX is inspired by reactive programming principles as found in spreadsheets. It
 
 A ton of credits for [Mendix](https://github.com/mendix), for providing the flexibility and support to maintain MobX and the chance to proof the philosophy of MobX in a real, complex, performance critical applications.
 
-And finally kudo's for all the people that believed in, tried, validated and even [sponsored](https://github.com/mobxjs/mobx/blob/master/sponsors.md) MobX.
+And finally kudos for all the people that believed in, tried, validated and even [sponsored](https://github.com/mobxjs/mobx/blob/master/sponsors.md) MobX.
 
 ## Further resources and documentation
 
