@@ -2,7 +2,7 @@ import {IObservable, IDepTreeNode, addObserver, removeObserver, endBatch} from "
 import {globalState, resetGlobalState} from "./globalstate";
 import {invariant} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "./spy";
-import {ComputedValue} from "./computedvalue";
+import {isComputedValue} from "./computedvalue";
 
 export enum IDerivationState {
 	// before being run or (outside batch and not being observed)
@@ -68,7 +68,7 @@ export function shouldCompute(derivation: IDerivation): boolean {
 				const obs = derivation.observing, l = obs.length;
 				for (let i = 0; i < l; i++) {
 					const obj = obs[i];
-					if (obj instanceof ComputedValue) {
+					if (isComputedValue(obj)) {
 						obj.get();
 						// if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
 						// and `derivation` is an observer of `obj`

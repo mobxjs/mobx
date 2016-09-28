@@ -1,6 +1,6 @@
 import {globalState} from "../core/globalstate";
-import {ComputedValue} from "../core/computedvalue";
-import {Reaction} from "../core/reaction";
+import {isComputedValue} from "../core/computedvalue";
+import {isReaction} from "../core/reaction";
 import {getAtom} from "../types/type-utils";
 import {invariant} from "../utils/utils";
 
@@ -21,9 +21,9 @@ export function whyRun(thing?: any, prop?: string) {
 			break;
 	}
 	thing = getAtom(thing);
-	if (thing instanceof ComputedValue)
+	if (isComputedValue(thing))
 		return log(thing.whyRun());
-	else if (thing instanceof Reaction)
+	else if (isReaction(thing))
 		return log(thing.whyRun());
 	else
 		invariant(false, "whyRun can only be used on reactions and computed values");

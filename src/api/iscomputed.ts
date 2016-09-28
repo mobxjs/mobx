@@ -1,6 +1,6 @@
 import {isObservableObject} from "../types/observableobject";
 import {getAtom} from "../types/type-utils";
-import {ComputedValue} from "../core/computedvalue";
+import {isComputedValue} from "../core/computedvalue";
 
 export function isComputed(value, property?: string): boolean {
 	if (value === null || value === undefined)
@@ -9,7 +9,7 @@ export function isComputed(value, property?: string): boolean {
 		if (isObservableObject(value) === false)
 			return false;
 		const atom = getAtom(value, property);
-		return atom instanceof ComputedValue;
+		return isComputedValue(atom)
 	}
-	return value instanceof ComputedValue;
+	return isComputedValue(value);
 }

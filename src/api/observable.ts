@@ -5,7 +5,7 @@ import {isPlainObject, invariant, deprecated} from "../utils/utils";
 import {observableDecorator} from "./observabledecorator";
 import {isObservable} from "./isobservable";
 import {IObservableObject} from "../types/observableobject";
-import {IObservableArray, ObservableArray} from "../types/observablearray";
+import {IObservableArray, isObservableArray} from "../types/observablearray";
 
 /**
  * Turns an object, array or function into a reactive structure.
@@ -51,7 +51,7 @@ export function getTypeOfValue(value): ValueType {
 		return ValueType.Reference;
 	if (typeof value === "function")
 		return value.length ? ValueType.ComplexFunction : ValueType.ViewFunction;
-	if (Array.isArray(value) || value instanceof ObservableArray)
+	if (Array.isArray(value) || isObservableArray(value))
 		return ValueType.Array;
 	if (typeof value === "object")
 		return isPlainObject(value) ? ValueType.PlainObject : ValueType.ComplexObject;

@@ -2,7 +2,7 @@ import {IObservable, reportObserved, propagateMaybeChanged, propagateChangeConfi
 import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, untrackedStart, untrackedEnd, shouldCompute, handleExceptionInDerivation} from "./derivation";
 import {globalState} from "./globalstate";
 import {allowStateChangesStart, allowStateChangesEnd, createAction} from "./action";
-import {getNextId, valueDidChange, invariant, Lambda, unique, joinStrings} from "../utils/utils";
+import {createInstanceofPredicate, getNextId, valueDidChange, invariant, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "../core/spy";
 import {autorun} from "../api/autorun";
 
@@ -212,3 +212,4 @@ WhyRun? computation '${this.name}':
 	}
 }
 
+export const isComputedValue = createInstanceofPredicate("ComputedValue", ComputedValue);

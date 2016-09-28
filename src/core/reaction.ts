@@ -1,6 +1,6 @@
 import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, shouldCompute} from "./derivation";
 import {globalState, resetGlobalState} from "./globalstate";
-import {getNextId, Lambda, unique, joinStrings} from "../utils/utils";
+import {createInstanceofPredicate, getNextId, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
 import {startBatch, endBatch} from "./observable";
 
@@ -24,8 +24,8 @@ import {startBatch, endBatch} from "./observable";
  */
 
 export interface IReactionPublic {
-		dispose: () => void;
-	}
+	dispose: () => void;
+}
 
 export class Reaction implements IDerivation, IReactionPublic {
 	observing = []; // nodes we are looking at. Our value depends on these nodes
@@ -182,3 +182,5 @@ export function runReactions() {
 	}
 	globalState.isRunningReactions = false;
 }
+
+export const isReaction = createInstanceofPredicate("Reaction", Reaction);
