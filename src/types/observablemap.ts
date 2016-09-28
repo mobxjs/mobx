@@ -302,4 +302,5 @@ export function map<V>(initialValues?: IMapEntries<V> | IKeyValueMap<V>, valueMo
 	return new ObservableMap(initialValues, valueModifier);
 }
 
-export const isObservableMap = createInstanceofPredicate("ObservableMap", ObservableMap);
+/* 'var' fixes small-build issue */
+export var isObservableMap = createInstanceofPredicate("ObservableMap", ObservableMap);
