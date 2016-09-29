@@ -304,3 +304,19 @@ test('#285 non-mobx class instances with toJS', t => {
 
 	t.end()
 })
+
+test("verify #566 solution", t => {
+	function MyClass() {}
+	const a = new MyClass()
+	const b = mobx.observable({ x: 3 })
+	const c = mobx.observable({ a: a, b: b })
+
+	t.ok(mobx.toJS(c).a === a) // true
+	t.ok(mobx.toJS(c).b !== b) // false, cloned
+	t.ok(mobx.toJS(c).b.x === b.x) // true, both 3
+
+	t.ok(mobx.toJSlegacy(c).a !== a) // false, cloned as well
+	t.ok(mobx.toJSlegacy(c).b !== b) // false, cloned
+	t.ok(mobx.toJSlegacy(c).b.x === b.x) // true, both 3
+	t.end()
+})
