@@ -39,6 +39,7 @@ test('correct api should be exposed', function(t) {
 		'runInAction',
 		'spy',
 		'toJS',
+		'toJSlegacy',
 		'toJSON',
 		'transaction',
 		'untracked',

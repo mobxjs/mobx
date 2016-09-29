@@ -48,7 +48,7 @@ export { autorun, autorunAsync, autorunUntil, when, reaction  } from "./api/auto
 export { action, isAction, runInAction                        } from "./api/action";
 
 export { expr                                                 } from "./api/expr";
-export { toJSON, toJS                                         } from "./api/tojs";
+export { toJSON, toJS, toJSlegacy                             } from "./api/tojs";
 export { ITransformer, createTransformer                      } from "./api/createtransformer";
 export { whyRun                                               } from "./api/whyrun";
 
