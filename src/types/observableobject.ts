@@ -1,7 +1,7 @@
-import {isObservableValue, ObservableValue, UNCHANGED} from "./observablevalue";
+import {ObservableValue, UNCHANGED} from "./observablevalue";
 import {isComputedValue, ComputedValue} from "../core/computedvalue";
 import {isAction} from "../api/action";
-import {ValueMode, AsStructure} from "./modifiers";
+import {ValueMode, getModifier} from "./modifiers";
 import {createInstanceofPredicate, isObject, Lambda, getNextId, invariant, assertPropertyConfigurable, isPlainObject, addHiddenFinalProp} from "../utils/utils";
 import {runLazyInitializers} from "../utils/decorators";
 import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "./intercept-utils";
@@ -101,7 +101,7 @@ export function defineObservableProperty(adm: ObservableObjectAdministration, pr
 		// TODO: add warning in 2.6, see https://github.com/mobxjs/mobx/issues/421
 		// TODO: remove in 3.0
 		observable = new ComputedValue(newValue, adm.target, false, name, setter);
-	} else if (newValue instanceof AsStructure && typeof newValue.value === "function" && newValue.value.length === 0) {
+	} else if (getModifier(newValue) === ValueMode.Structure && typeof newValue.value === "function" && newValue.value.length === 0) {
 		observable = new ComputedValue(newValue.value, adm.target, true, name, setter);
 	} else {
 		isComputed = false;
