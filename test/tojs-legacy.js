@@ -7,6 +7,8 @@ var observable = mobx.observable;
 var transaction = mobx.transaction;
 
 test('(legacy) json1', function(t) {
+	mobx.extras.resetGlobalState()
+
     var todos = observable([
         {
             title: "write blog"
