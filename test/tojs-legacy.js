@@ -6,7 +6,7 @@ var m = mobx;
 var observable = mobx.observable;
 var transaction = mobx.transaction;
 
-test('json1', function(t) {
+test('(legacy) json1', function(t) {
     var todos = observable([
         {
             title: "write blog"
@@ -29,7 +29,7 @@ test('json1', function(t) {
     t.end();
 })
 
-test('json2', function(t) {
+test('(legacy) json2', function(t) {
     var source = {
         todos: [
             {
@@ -217,7 +217,7 @@ test('json2', function(t) {
     t.end();
 })
 
-test('toJS handles dates', t => {
+test('(legacy) toJS handles dates', t => {
 	var a = observable({
 		d: new Date()
 	});
@@ -228,7 +228,7 @@ test('toJS handles dates', t => {
 	t.end()
 })
 
-test('json cycles', function(t) {
+test('(legacy) json cycles', function(t) {
     var a = observable({
         b: 1,
         c: [2],
@@ -258,7 +258,7 @@ test('json cycles', function(t) {
     t.end();
 })
 
-test('#285 class instances with toJS', t => {
+test('(legacy) #285 class instances with toJS', t => {
 	function Person() {
 		this.firstName = "michel";
 		mobx.extendObservable(this, {
@@ -288,7 +288,7 @@ test('#285 class instances with toJS', t => {
 	t.end()
 })
 
-test('#285 non-mobx class instances with toJS', t => {
+test('(legacy) #285 non-mobx class instances with toJS', t => {
 	function Person() {
 		this.firstName = "michel";
 		this.lastName = mobx.observable("weststrate");
