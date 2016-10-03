@@ -1,7 +1,7 @@
 import {BaseAtom} from "../core/atom";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} from "./modifiers";
-import {valueDidChange, Lambda, getNextId} from "../utils/utils";
+import {valueDidChange, Lambda, getNextId, createInstanceofPredicate} from "../utils/utils";
 import {hasInterceptors, IInterceptable, IInterceptor, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd, spyReport} from "../core/spy";
@@ -114,3 +114,5 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 		return `${this.name}[${this.value}]`;
 	}
 }
+
+export const isObservableValue = createInstanceofPredicate("ObservableValue", ObservableValue);

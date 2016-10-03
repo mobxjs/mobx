@@ -3,7 +3,7 @@ import {transaction} from "../core/transaction";
 import {untracked} from "../core/derivation";
 import {ObservableArray, IObservableArray} from "./observablearray";
 import {ObservableValue, UNCHANGED} from "./observablevalue";
-import {deprecated, isPlainObject, getNextId, Lambda, invariant} from "../utils/utils";
+import {createInstanceofPredicate, deprecated, isPlainObject, getNextId, Lambda, invariant} from "../utils/utils";
 import {allowStateChanges} from "../core/action";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
@@ -218,7 +218,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	/** Merge another object into this object, returns this. */
 	merge(other: ObservableMap<V> | IKeyValueMap<V>): ObservableMap<V> {
 		transaction(() => {
-			if (other instanceof ObservableMap)
+			if (isObservableMap(other))
 				other.keys().forEach(key => this.set(key, (other as ObservableMap<V>).get(key)));
 			else
 				Object.keys(other).forEach(key => this.set(key, other[key]));
@@ -302,6 +302,5 @@ export function map<V>(initialValues?: IMapEntries<V> | IKeyValueMap<V>, valueMo
 	return new ObservableMap(initialValues, valueModifier);
 }
 
-export function isObservableMap(thing): thing is ObservableMap<any> {
-	return thing instanceof ObservableMap;
-}
+/* 'var' fixes small-build issue */
+export var isObservableMap = createInstanceofPredicate("ObservableMap", ObservableMap);

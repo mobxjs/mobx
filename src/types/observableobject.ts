@@ -1,8 +1,8 @@
 import {ObservableValue, UNCHANGED} from "./observablevalue";
-import {ComputedValue} from "../core/computedvalue";
+import {isComputedValue, ComputedValue} from "../core/computedvalue";
 import {isAction} from "../api/action";
-import {ValueMode, AsStructure} from "./modifiers";
-import {Lambda, getNextId, invariant, assertPropertyConfigurable, isPlainObject, addHiddenFinalProp} from "../utils/utils";
+import {ValueMode, getModifier} from "./modifiers";
+import {createInstanceofPredicate, isObject, Lambda, getNextId, invariant, assertPropertyConfigurable, isPlainObject, addHiddenFinalProp} from "../utils/utils";
 import {runLazyInitializers} from "../utils/decorators";
 import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
@@ -89,7 +89,7 @@ export function defineObservableProperty(adm: ObservableObjectAdministration, pr
 	let name = `${adm.name}.${propName}`;
 	let isComputed = true;
 
-	if (newValue instanceof ComputedValue) {
+	if (isComputedValue(newValue)) {
 		// desugger computed(getter, setter)
 		// TODO: deprecate this and remove in 3.0, to keep them boxed
 		// get / set is now the idiomatic syntax for non-boxed computed values
@@ -101,7 +101,7 @@ export function defineObservableProperty(adm: ObservableObjectAdministration, pr
 		// TODO: add warning in 2.6, see https://github.com/mobxjs/mobx/issues/421
 		// TODO: remove in 3.0
 		observable = new ComputedValue(newValue, adm.target, false, name, setter);
-	} else if (newValue instanceof AsStructure && typeof newValue.value === "function" && newValue.value.length === 0) {
+	} else if (getModifier(newValue) === ValueMode.Structure && typeof newValue.value === "function" && newValue.value.length === 0) {
 		observable = new ComputedValue(newValue.value, adm.target, true, name, setter);
 	} else {
 		isComputed = false;
@@ -217,11 +217,14 @@ function notifyPropertyAddition(adm, object, name: string, newValue) {
 		spyReportEnd();
 }
 
+
+const isObservableObjectAdministration = createInstanceofPredicate("ObservableObjectAdministration", ObservableObjectAdministration);
+
 export function isObservableObject<T>(thing: T): thing is T & IObservableObject {
-	if (typeof thing === "object" && thing !== null) {
+	if (isObject(thing)) {
 		// Initializers run lazily when transpiling to babel, so make sure they are run...
 		runLazyInitializers(thing);
-		return (thing as T & {$mobx: any}).$mobx instanceof ObservableObjectAdministration;
+		return isObservableObjectAdministration((thing as any).$mobx);
 	}
 	return false;
 }

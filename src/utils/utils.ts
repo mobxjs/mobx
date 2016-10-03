@@ -54,6 +54,10 @@ export function joinStrings(things: string[], limit: number = 100, separator = "
 	return `${sliced.join(separator)}${things.length > limit ? " (... and " + (things.length - limit) + "more)" : ""}`;
 }
 
+export function isObject(value: any): boolean {
+	return value !== null && typeof value === "object";
+}
+
 export function isPlainObject(value) {
 	if (value === null || typeof value !== "object")
 		return false;
@@ -160,6 +164,15 @@ export function deepEquals(a, b) {
 		return true;
 	}
 	return a === b;
+}
+
+export function createInstanceofPredicate<T>(name: string, clazz: new (...args:any[]) => T): (x: any) => x is T {
+	// TODO: this is quite a slow aproach, find something faster?
+	const propName = "isMobX" + name;
+	clazz.prototype[propName] = true;
+	return function (x) {
+		return isObject(x) && x[propName] === true;
+	} as any;
 }
 
 import {globalState} from "../core/globalstate";

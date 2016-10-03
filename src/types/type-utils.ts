@@ -1,9 +1,9 @@
 import {IDepTreeNode} from "../core/observable";
 import {invariant} from "../utils/utils";
 import {runLazyInitializers} from "../utils/decorators";
-import {BaseAtom} from "../core/atom";
-import {ComputedValue} from "../core/computedvalue";
-import {Reaction} from "../core/reaction";
+import {isAtom} from "../core/atom";
+import {isComputedValue} from "../core/computedvalue";
+import {isReaction} from "../core/reaction";
 import {isObservableArray} from "../types/observablearray";
 import {isObservableMap} from "../types/observablemap";
 import {isObservableObject} from "../types/observableobject";
@@ -29,11 +29,11 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
 			invariant(!!observable, `no observable property '${property}' found on the observable object '${getDebugName(thing)}'`);
 			return observable;
 		}
-		if (thing instanceof BaseAtom || thing instanceof ComputedValue || thing instanceof Reaction) {
+		if (isAtom(thing) || isComputedValue(thing) || isReaction(thing)) {
 			return thing;
 		}
 	} else if (typeof thing === "function") {
-		if (thing.$mobx instanceof Reaction) {
+		if (isReaction(thing.$mobx)) {
 			// disposer function
 			return thing.$mobx;
 		}
@@ -45,7 +45,7 @@ export function getAdministration(thing: any, property?: string) {
 	invariant(thing, "Expection some object");
 	if (property !== undefined)
 		return getAdministration(getAtom(thing, property));
-	if (thing instanceof BaseAtom || thing instanceof ComputedValue || thing instanceof Reaction)
+	if (isAtom(thing) || isComputedValue(thing) || isReaction(thing))
 		return thing;
 	if (isObservableMap(thing))
 		return thing;

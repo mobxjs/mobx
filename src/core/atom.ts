@@ -81,8 +81,11 @@ export class Atom extends BaseAtom implements IAtom {
 	}
 }
 
+
 import {globalState} from "./globalstate";
 import {IObservable, propagateChanged, reportObserved, startBatch, endBatch} from "./observable";
 import {IDerivationState} from "./derivation";
 import {transactionStart, transactionEnd} from "../core/transaction";
-import {noop, getNextId} from "../utils/utils";
+import {createInstanceofPredicate, noop, getNextId, isObject} from "../utils/utils";
+
+export const isAtom = createInstanceofPredicate("Atom", BaseAtom);

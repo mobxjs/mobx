@@ -1,8 +1,7 @@
-import {ObservableArray} from "../types/observablearray";
-import {ObservableMap} from "../types/observablemap";
-import {ObservableValue} from "../types/observablevalue";
-import {isObservable} from "../api/isobservable";
-import {isPlainObject, deprecated} from "../utils/utils";
+import {isObservableArray} from "../types/observablearray";
+import {isObservableMap} from "../types/observablemap";
+import {isObservableValue} from "../types/observablevalue";
+import {deprecated} from "../utils/utils";
 
 /**
 	* Basically, a deep clone, so that no reactive property will exist anymore.
@@ -27,7 +26,7 @@ export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, 
 
 	if (!source)
 		return source;
-	if (Array.isArray(source) || source instanceof ObservableArray) {
+	if (Array.isArray(source) || isObservableArray(source)) {
 		const res = cache([]);
 		const toAdd = source.map(value => toJS(value, detectCycles, __alreadySeen));
 		res.length = toAdd.length;
@@ -35,16 +34,14 @@ export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, 
 			res[i] = toAdd[i];
 		return res;
 	}
-	if (source instanceof ObservableMap) {
+	if (isObservableMap(source)) {
 		const res = cache({});
 		source.forEach(
 			(value, key) => res[key] = toJS(value, detectCycles, __alreadySeen)
 		);
 		return res;
 	}
-	if (isObservable(source) && source.$mobx instanceof ObservableValue)
-		return toJS(source(), detectCycles, __alreadySeen);
-	if (source instanceof ObservableValue)
+	if (isObservableValue(source))
 		return toJS(source.get(), detectCycles, __alreadySeen);
 	if (typeof source === "object") {
 		const res = cache({});

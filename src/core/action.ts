@@ -2,7 +2,7 @@ import {transactionStart, transactionEnd} from "../core/transaction";
 import {invariant, deprecated} from "../utils/utils";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
-import {ComputedValue} from "../core/computedvalue";
+import {isComputedValue} from "../core/computedvalue";
 import {globalState} from "../core/globalstate";
 
 export function createAction(actionName: string, fn: Function): Function {
@@ -17,7 +17,7 @@ export function createAction(actionName: string, fn: Function): Function {
 
 export function executeAction(actionName: string, fn: Function, scope: any, args: IArguments) {
 	// actions should not be called from computeds. check only works if the computed is actively observed, but that is fine enough as heuristic
-	invariant(!(globalState.trackingDerivation instanceof ComputedValue), "Computed values or transformers should not invoke actions or trigger other side effects");
+	invariant(!isComputedValue(globalState.trackingDerivation), "Computed values or transformers should not invoke actions or trigger other side effects");
 
 	const notifySpy = isSpyEnabled();
 	let startTime: number;

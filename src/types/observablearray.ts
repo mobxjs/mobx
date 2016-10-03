@@ -1,4 +1,4 @@
-import {getNextId, deepEquals, makeNonEnumerable, Lambda, deprecated, EMPTY_ARRAY, addHiddenFinalProp, addHiddenProp, invariant} from "../utils/utils";
+import {isObject, createInstanceofPredicate, getNextId, deepEquals, makeNonEnumerable, Lambda, deprecated, EMPTY_ARRAY, addHiddenFinalProp, addHiddenProp, invariant} from "../utils/utils";
 import {BaseAtom} from "../core/atom";
 import {ValueMode, assertUnwrapped, makeChildObservable} from "./modifiers";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
@@ -515,6 +515,8 @@ export function fastArray<V>(initialValues?: V[]): IObservableArray<V> {
 	return createObservableArray(initialValues, ValueMode.Flat, null);
 }
 
+const isObservableArrayAdministration = createInstanceofPredicate("ObservableArrayAdministration", ObservableArrayAdministration);
+
 export function isObservableArray(thing): thing is IObservableArray<any> {
-	return thing instanceof ObservableArray;
+	return isObject(thing) && isObservableArrayAdministration(thing.$mobx);
 }

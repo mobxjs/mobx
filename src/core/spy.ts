@@ -1,14 +1,12 @@
 import {globalState} from "./globalstate";
 import {objectAssign, deprecated, once, Lambda} from "../utils/utils";
 
-let spyEnabled = false;
-
 export function isSpyEnabled() {
-	return spyEnabled;
+	return !!globalState.spyListeners.length;
 }
 
 export function spyReport(event) {
-	if (!spyEnabled)
+	if (!globalState.spyListeners.length)
 		return false;
 	const listeners = globalState.spyListeners;
 	for (let i = 0, l = listeners.length; i < l; i++)
@@ -32,12 +30,10 @@ export function spyReportEnd(change?) {
 
 export function spy(listener: (change: any) => void): Lambda {
 	globalState.spyListeners.push(listener);
-	spyEnabled = globalState.spyListeners.length > 0;
 	return once(() => {
 		const idx = globalState.spyListeners.indexOf(listener);
 		if (idx !== -1)
 			globalState.spyListeners.splice(idx, 1);
-		spyEnabled = globalState.spyListeners.length > 0;
 	});
 }
 
