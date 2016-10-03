@@ -1084,6 +1084,30 @@ test('toJS handles dates', t => {
 	t.end()
 })
 
+test('toJS should ignore DOM nodes', function(t) {
+	if (typeof document !== 'object') {
+		return t.end();
+	}
+
+	var image = document.createElement('img');
+	t.equal(mobx.toJS(image) === image, true);
+
+	var observableImage = observable(document.createElement('img'));
+	t.doesNotThrow(function() {
+		mobx.toJS(observableImage);
+	});
+
+	var imageMap = mobx.asMap({
+		1: document.createElement('img'),
+		2: document.createElement('img')
+	});
+	t.doesNotThrow(function() {
+		mobx.toJS(imageMap);
+	});
+
+	t.end();
+})
+
 test('json cycles', function(t) {
     var a = observable({
         b: 1,
