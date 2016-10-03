@@ -37,3 +37,10 @@ test('autorun can be disposed on first run', function(t) {
 
 	t.end()
 });
+
+test('autorun warns when passed an action', function(t) {
+	var action = m.action(() => {});
+	t.plan(1);
+	t.throws(() => m.autorun(action), /attempted to pass an action to autorun/);
+	t.end();
+});
