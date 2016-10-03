@@ -1,3 +1,7 @@
+# 2.6.0
+
+* Extending observable objects with other observable (objects) is now explicitly forbidden, fixes #540.
+
 # 2.5.2
 
 * Introduced `isComputed`
