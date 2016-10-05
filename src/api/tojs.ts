@@ -13,7 +13,7 @@ export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, 
 			__alreadySeen.push([source, value]);
 		return value;
 	}
-	if (source instanceof Date || source instanceof RegExp)
+	if (source instanceof Date || source instanceof RegExp || source instanceof EventTarget)
 		return source;
 
 	if (detectCycles && __alreadySeen === null)
