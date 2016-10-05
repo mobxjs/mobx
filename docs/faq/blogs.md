@@ -23,6 +23,7 @@
 * [Introducing serializr: serializing and deserializing object graphs with ease](https://medium.com/@mweststrate/introducing-serializr-serializing-and-deserializing-object-graphs-with-ease-8833c3fcea02#.lghi3ybjm)
 * [How to decouple state and UI (a.k.a. you don’t need componentWillMount) - data fetching, authentication, routing and testing](https://medium.com/@mweststrate/how-to-decouple-state-and-ui-a-k-a-you-dont-need-componentwillmount-cc90b787aa37#.7zvpxt746)
 * [Getting Started ReactJS with MobX](https://codequs.com/p/HyTu8aIK/getting-started-reactjs-with-mobx/)
+* [Redux vs. MobX by example — Part II: The Simplicity of MobX & Conclusion](https://hashnode.com/post/redux-vs-mobx-by-example-part-ii-the-simplicity-of-mobx-and-conclusion-citpp2tbu003za853ua1tx228) - A two part tutorial, comparing Redux and MobX, by implementing them in a simple ES6 + React todo app.
 
 ## Articles / blogs explaining the inner working of MobX:
 
