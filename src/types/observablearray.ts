@@ -245,6 +245,10 @@ export class ObservableArray<T> extends StubArray {
 			// defined on the instance. After that it works fine, even if this property is deleted.
 			Object.defineProperty(adm.array, "0", ENTRY_0);
 		}
+        Object.getOwnPropertyNames(initialValues).forEach(prop => {
+            if (prop == 'length' || !isNaN(prop)) return;
+            this[prop] = initialValues[prop];
+        })
 	}
 
 	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
