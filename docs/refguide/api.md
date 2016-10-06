@@ -110,7 +110,7 @@ The side effect can be debounced, just like `autorunAsync`. [&laquo;details&raqu
 By default `observable` is applied recursively and to values that are assigned in the future as well.
 Modifiers can be used to influence how `observable` treats specific values.
 * `asMap`: This is the most important modifier. Instead of creating an object with observable properties, an *Observable Map* is created instead. The main difference with observable objects is that the addition and removal of properties can be easily observed. Use `asMap` if you want a map like data structure where the keys will change over time.
-* `asFlat`: Don't apply `observable` recursively. The passed object / collection itself will be observable, but the values in it won't. This disables the possibility to deeply observe objects.
+* `asFlat`: Will not apply `observable` recursively. The passed object / collection itself will be observable, but the values in it won't. This disables the possibility to deeply observe objects.
 * `asReference`: Use the passed in value verbatim, just create an observable reference to the object.
 * `asStructure`: When new values are assigned, ignore the new value if it structurally equal to the previous value.
 
