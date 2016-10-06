@@ -40,7 +40,7 @@
   * [extendObservable](refguide/extend-observable.md)
   * [isObservable](refguide/is-observable.md)
   * [modifiers](refguide/modifiers.md)
-  * [observe](refguide/observe.md)
+  * [intercept & observe](refguide/observe.md)
   * [reaction](refguide/reaction.md)
   * [spy](refguide/spy.md)
   * [toJS](refguide/tojson.md)
