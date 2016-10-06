@@ -100,7 +100,7 @@ class TodoList {
 ```
 
 MobX will ensure that `unfinishedTodoCount` is updated automatically when a todo is added or when one of the `finished` properties is modified.
-Computations like these can very well be compared with formulas in spreadsheet programs like MS Excel. They update automatically whenever, and only when, needed.
+Computations like these can very well be compared with formulas in spreadsheet programs like MS Excel. They update automatically only when required.
 
 ### Reactions
 
