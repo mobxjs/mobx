@@ -91,7 +91,7 @@ var upperCaseName = computed(() =>
 	name.get().toUpperCase()
 );
 
-var disposer = uperCaseName.observe(name => console.log(name));
+var disposer = upperCaseName.observe(name => console.log(name));
 
 name.set("Dave");
 // prints: 'DAVE'
