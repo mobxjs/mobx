@@ -32,3 +32,4 @@
 * TypeScript + React + MobX + JSPM - Simple CRUD App example: https://github.com/piotrwitek/training-management-tool
 * Github Note Taker in MobX: https://github.com/eswat2/egghead-mobx
 * SoundCloud client, in MobX and React: [React-MobX-SoundCloud](https://github.com/rwieruch/react-mobx-soundcloud)
+* Lightweight support service via ReactJS, Mobx, Grape (ruby) and Mongodb: [support-service](https://github.com/ifokeev/support-service)
