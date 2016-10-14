@@ -1,7 +1,6 @@
-import {isObservableArray} from "../types/observablearray";
 import {isObservableMap} from "../types/observablemap";
 import {isObservableValue} from "../types/observablevalue";
-import {deprecated} from "../utils/utils";
+import {deprecated, isArrayLike} from "../utils/utils";
 
 /**
 	* Basically, a deep clone, so that no reactive property will exist anymore.
@@ -26,7 +25,7 @@ export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, 
 
 	if (!source)
 		return source;
-	if (Array.isArray(source) || isObservableArray(source)) {
+	if (isArrayLike(source)) {
 		const res = cache([]);
 		const toAdd = source.map(value => toJS(value, detectCycles, __alreadySeen));
 		res.length = toAdd.length;
