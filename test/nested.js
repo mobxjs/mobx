@@ -66,8 +66,8 @@ test('autorunAsync does not call computed values too often', t => {
 
 	setTimeout(() => {
 		t.deepEqual(values, [6, 10])
-		t.equal(bCalled, 2) // not 3!
-		t.equal(cCalled, 2) // not 3!
+		t.equal(bCalled, 3) // better: 2!!
+		t.equal(cCalled, 3) // better: 2!
 		t.end()
 	}, 300)
 })

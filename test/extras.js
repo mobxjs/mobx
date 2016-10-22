@@ -4,7 +4,7 @@ var m = mobx;
 
 test('treeD', function(t) {
     m._.resetGlobalState();
-    global.__mobxGlobal.mobxGuid = 0;
+    mobx.extras.getGlobalState().mobxGuid = 0;
     var a = m.observable(3);
     var aName = 'ObservableValue@1';
 
@@ -72,7 +72,7 @@ test('treeD', function(t) {
 
 test('names', function(t) {
     m._.resetGlobalState();
-    global.__mobxGlobal.mobxGuid = 0;
+    mobx.extras.getGlobalState().mobxGuid = 0;
 
     var struct = {
         x: 'ObservableValue@1',
@@ -209,7 +209,7 @@ test('strict mode checks', function(t) {
 
 test('get atom', function(t) {
 	mobx.extras.resetGlobalState();
-	global.__mobxGlobal.mobxGuid = 0; // hmm dangerous reset?
+	mobx.extras.getGlobalState().mobxGuid = 0; // hmm dangerous reset?
 
 	function Clazz () {
 		mobx.extendObservable(this, {
@@ -259,7 +259,7 @@ test('get atom', function(t) {
 
 test('get debug name', function(t) {
 	mobx.extras.resetGlobalState();
-	global.__mobxGlobal.mobxGuid = 0; // hmm dangerous reset?
+	mobx.extras.getGlobalState().mobxGuid = 0; // hmm dangerous reset?
 
 	function Clazz () {
 		mobx.extendObservable(this, {
@@ -308,7 +308,7 @@ test('get debug name', function(t) {
 
 test('get administration', function(t) {
 	mobx.extras.resetGlobalState();
-	global.__mobxGlobal.mobxGuid = 0; // hmm dangerous reset?
+	mobx.extras.getGlobalState().mobxGuid = 0; // hmm dangerous reset?
 
 	function Clazz () {
 		mobx.extendObservable(this, {
