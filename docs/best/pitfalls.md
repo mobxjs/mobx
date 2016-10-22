@@ -122,7 +122,39 @@ Observable arrays are actually objects, so they comply to `propTypes.object` ins
 
 #### Rendering ListViews in React Native
 
-`ListView.DataSource` in React Native expects real arrays, so make sure to `.slice()` arrays first before passing them to list views. For more info see [#476](https://github.com/mobxjs/mobx/issues/476)
+`ListView.DataSource` in React Native expects real arrays. Observable arrays are actually objects, make sure to `.slice()` them first before passing to list views. Furthermore, `ListView.DataSource` itself should be moved to the store so that it can be updated automatically with a `@computed`.
+
+```javascript
+class ListStore {
+  @observable list = [
+    'Hello World!',
+    'Hello React Native!',
+    'Hello MobX!'
+  ];
+
+  ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
+
+  @computed get dataSource() {
+    return this.ds.cloneWithRows(this.list.slice());
+  }
+}
+
+const listStore = new ListStore();
+
+@observer class List extends Component {
+  render() {
+    return (
+      <ListView
+        dataSource={listStore.dataSource}
+        renderRow={row => <Text>{row}</Text>}
+        enableEmptySections={true}
+      />
+    );
+  }
+}
+```
+
+For more info see [#476](https://github.com/mobxjs/mobx/issues/476)
 
 #### Declaring propTypes might cause unnecessary renders in dev mode
 
