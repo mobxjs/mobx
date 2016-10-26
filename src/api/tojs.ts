@@ -2,7 +2,7 @@ import {isObservableArray} from "../types/observablearray";
 import {isObservableMap} from "../types/observablemap";
 import {isObservableValue} from "../types/observablevalue";
 import {deprecated} from "../utils/utils";
-
+const isBrowser = typeof EventTarget != 'undefined'
 /**
 	* Basically, a deep clone, so that no reactive property will exist anymore.
 	*/
@@ -13,7 +13,7 @@ export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, 
 			__alreadySeen.push([source, value]);
 		return value;
 	}
-	if (source instanceof Date || source instanceof RegExp)
+	if (source instanceof Date || source instanceof RegExp || isBrowser && source instanceof EventTarget)
 		return source;
 
 	if (detectCycles && __alreadySeen === null)
