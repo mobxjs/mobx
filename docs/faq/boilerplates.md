@@ -23,4 +23,4 @@
 * [mobx-isomorphic-starter](https://github.com/Xerios/mobx-isomorphic-starter) Clean isomorphic starter-kit using Mobx + React + React-router + Webpack
 * [koa-mobx-react-starter](https://github.com/lostpebble/koa-mobx-react-starter) A straightforward starter for Node javascript web projects. Using Koa, MobX, Pug and ReactJS (with universal / isomorphic server rendering)
 * [modular-mobx-boilerplate](https://github.com/code-shoily/modular-mobx-boilerplate) This is a boilerplate for developing with React + MobX. It uses a modular structure of folders for larger apps.
-* [react-router-intl-routing - React Router 4 and React-Intl translated routes glued together with Mobx](https://github.com/jamiehill/react-router-intl-routing)
+* [react-router-intl-routing](https://github.com/jamiehill/react-router-intl-routing) React Router 4 and React-Intl translated routes glued together with Mobx
