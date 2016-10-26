@@ -52,7 +52,7 @@ export { toJSON, toJS                                         } from "./api/tojs
 export { ITransformer, createTransformer                      } from "./api/createtransformer";
 export { whyRun                                               } from "./api/whyrun";
 
-export { Lambda                                               } from "./utils/utils";
+export { Lambda, isArrayLike                                  } from "./utils/utils";
 export { Iterator                                             } from "./utils/iterable";
 export { SimpleEventEmitter, ISimpleEventListener             } from "./utils/simpleeventemitter";
 export { IObserverTree, IDependencyTree                       } from "./api/extras";
