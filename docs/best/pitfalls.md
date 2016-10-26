@@ -122,7 +122,7 @@ Observable arrays are actually objects, so they comply to `propTypes.object` ins
 
 #### Rendering ListViews in React Native
 
-`ListView.DataSource` in React Native expects real arrays. Observable arrays are actually objects, make sure to `.slice()` them first before passing to list views. Furthermore, `ListView.DataSource` itself should be moved to the store so that it can be updated automatically with a `@computed`.
+`ListView.DataSource` in React Native expects real arrays. Observable arrays are actually objects, make sure to `.slice()` them first before passing to list views. Furthermore, `ListView.DataSource` itself can be moved to the store and have it automatically updated with a `@computed`, this step can also be done on the component level.
 
 ```javascript
 class ListStore {
