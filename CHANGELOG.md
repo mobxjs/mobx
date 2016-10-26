@@ -1,3 +1,7 @@
+# Next version
+
+* Introduced convenience `isArrayLike`: returns whether the argument is either a JS- or observable array.
+
 # 2.6.0
 
 _Marked as minor release as the behavior of `toJS` has been changed, which might be interpreted both as bug-fix or as breaking change, depending of how you interpreted the docs_
