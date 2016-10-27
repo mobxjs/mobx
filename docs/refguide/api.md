@@ -145,6 +145,11 @@ Works for all observables, computed values and disposer functions of reactions. 
 ### `isObservableObject|Array|Map`
 Usage: `isObservableObject(thing)`, `isObservableArray(thing)`, `isObservableMap(thing)`. Returns `true` if.., well, do the math.
 
+### `isArrayLike`
+Usage: `isArrayLike(thing)`. Returns `true` if the given thing is either a true JS-array or an observable (MobX-)array.
+This is intended as convenience/shorthand.
+Note that observable arrays can be `.slice()`d to turn them into true JS-arrays.
+
 ### `isAction`
 Usage: `isAction(func)`. Returns true if the given function is wrapped / decorated with `action`.
 
