@@ -63,7 +63,7 @@ class Todo {
 }
 ```
 
-Using `observable` is like turning the properties of an object into a spreadsheet cells.
+Using `observable` is like turning a property of an object into a spreadsheet cell.
 But unlike spreadsheets, these values cannot just be primitive values, but also references, objects and arrays.
 You can even [define your own](http://mobxjs.github.io/mobx/refguide/extending.html) observable data sources.
 
@@ -101,7 +101,7 @@ class TodoList {
 ```
 
 MobX will ensure that `unfinishedTodoCount` is updated automatically when a todo is added or when one of the `finished` properties is modified.
-Computations like these can very well be compared with formulas in spreadsheet programs like MS Excel. They update automatically only when required.
+Computations like these resemble formulas in spreadsheet programs like MS Excel. They update automatically and only when required.
 
 ### Reactions
 
@@ -180,7 +180,7 @@ In the end it all boils down to: Somehow the state should be updated.
 
 After updating the state `MobX` will take care of the rest in an efficient, glitch-free manner. So simple statements, like below, are enough to automatically update the user interface.
 
-There is no technical need for firing events, calling dispatcher or what more. A React component is in the end nothing more than a fancy representation of your state. A derivation that will be managed by MobX.
+There is no technical need for firing events, calling a dispatcher or what more. A React component in the end is nothing more than a fancy representation of your state. A derivation that will be managed by MobX.
 
 ```javascript
 store.todos.push(
@@ -227,9 +227,9 @@ How that works? See this [in-depth explanation of MobX](https://medium.com/@mwes
 
 MobX works plain javascript structures. Due to it's unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific library flavors.
 
-So you can simple keep using your existing router-, data fetching and utility libraries like `react-router`, `director`, `superagent`, `lodash` etc.
+So you can simply keep using your existing router, data fetching, and utility libraries like `react-router`, `director`, `superagent`, `lodash` etc.
 
-For the same reason you can use it out of the box both server- and client side, in isomorphic applications and with react-native.
+For the same reason you can use it out of the box both server and client side, in isomorphic applications and with react-native.
 
 The result of this is that you often need to learn less new concepts when using MobX in comparison to other state management solutions.
 
