@@ -10,3 +10,4 @@ test/typescript-tests.js*
 .vscode
 dist/
 .build/
+yarn.lock

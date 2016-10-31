@@ -340,3 +340,19 @@ test('array exposes correct keys', t => {
 	t.deepEqual(keys, [])
 	t.end()
 })
+
+test('isArrayLike', t => {
+	var arr = [0, 1, 2];
+	var observableArr = observable(arr);
+
+	var isArrayLike = mobx.isArrayLike;
+	t.equal(typeof isArrayLike, "function");
+
+	t.equal(isArrayLike(observableArr), true);
+	t.equal(isArrayLike(arr), true);
+	t.equal(isArrayLike(42), false);
+	t.equal(isArrayLike({}), false);
+
+	t.end();
+})
+

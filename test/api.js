@@ -26,6 +26,7 @@ test('correct api should be exposed', function(t) {
 		'fastArray',
 		'intercept',
 		'isAction',
+		'isArrayLike',
 		'isComputed',
 		'isObservable',
 		'isObservableArray',
