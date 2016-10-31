@@ -1,6 +1,9 @@
-# Next version
+# 2.6.1
 
-* Introduced convenience `isArrayLike`: returns whether the argument is either a JS- or observable array.
+* Introduced convenience `isArrayLike`: returns whether the argument is either a JS- or observable array. By @dslmeinte
+* Improved readme. By @DavidLGoldberg
+* Improved assertion message, by @ncammarate (See [#618](https://github.com/mobxjs/mobx/pull/618))
+* Added HashNode badge, by @sandeeppanda92
 
 # 2.6.0
 
