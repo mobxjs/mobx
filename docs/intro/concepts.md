@@ -21,7 +21,7 @@ Derivations exist in many forms:
 
 MobX distinguishes two kind of derivations:
 * *Computed values*. These are values that can always be derived from the current observable state using a pure function.
-* *Reactions*. Reactions are side effects that need to happen automatically if the state changes. These are needed to as bridge between imperative and reactive programming. Or to make it more clear, they are ultimately needed to achieve I/O.
+* *Reactions*. Reactions are side effects that need to happen automatically if the state changes. These are needed as a bridge between imperative and reactive programming. Or to make it more clear, they are ultimately needed to achieve I/O.
 
 People starting with MobX tend to use reactions too often.
 The golden rule is: if you want to create a value based on the current state, use `computed`.
@@ -42,7 +42,7 @@ MobX supports an uni-directional data flow where _actions_ changes the _state_, 
 
 ![Action, State, View](../images/action-state-view.png)
 
-All _Derivations_ are updated **automatically** and **atomically** when the _state_ changes. As a result it is not possible to ever observe intermediate values.
+All _Derivations_ are updated **automatically** and **atomically** when the _state_ changes. As a result it is never possible to observe intermediate values.
 
 All _Derivations_ are updated **synchronously** by default. This means that for example _actions_ can safely inspect a computed value directly after altering the _state_.
 
