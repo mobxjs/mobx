@@ -18,7 +18,7 @@ var appState = observable({
 
 ## 2. Create a view that responds to changes in the State
 
-We didn't make our `appState` observable just for nothing;
+We didn't make our `appState` observable for nothing;
 you can now create views that automatically update whenever relevant data in the `appState` changes.
 MobX will find the minimal way to update your views.
 This single fact saves you tons of boilerplate and is [wickedly efficient](https://mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/).
@@ -49,14 +49,14 @@ React.render(<TimerView appState={appState} />, document.body);
 
 ## 3. Modify the State
 
-The third relevant thing to do is modifying the state.
-That is what your app is about after all.
-Unlike many other frameworks, MobX doesn't dictate you how to do this.
+The third thing to do is to modify the state.
+That is what your app is all about after all.
+Unlike many other frameworks, MobX doesn't dictate how you do this.
 There are best practices, but the key thing to remember is:
-***MobX helps you to do things in a simple straightforward way***.
+***MobX helps you do things in a simple straightforward way***.
 
 The following code will alter your data every second, and the UI will update automatically when needed.
-No explicit relations are defined in either in the controller functions that _change_ the state or in the views that should _update_.
+No explicit relations are defined in either the controller functions that _change_ the state or in the views that should _update_.
 Decorating your _state_ and _views_ with `observable` is enough for MobX to detect all relationships.
 Here are two examples of changing the state:
 
