@@ -1,3 +1,76 @@
+# 2.7.0
+
+### Automatic inference of computed properties has been depcreated.
+
+A deprecation message will now be printed if creating computed properties while relying on automatical inferrence of argumentless functions as computed values. In other words, when using `observable` or `extendObservable` in the following manner:
+
+```
+const x = observable({
+	computedProp: function() {
+		return someComputation
+	}
+})
+
+// Due to automatic inferrence now available as computed property:
+x.computedProp
+// And not !
+x.computedProp()
+```
+
+Instead, to create a computed property, use:
+
+```
+observable({
+	get computedProp() {
+		return someComputation
+	}
+})
+```
+
+or alternatively:
+
+```
+observable({
+	computedProp: computed(function() {
+		return someComputation
+	})
+})
+```
+
+This change should avoid confusing experiences when trying to create methods that don't take arguments.
+The current behavior will be kept as-is in the MobX 2.* range,
+but from MobX 3 onward the argumentless functions will no longer be turned
+automatically into computed values; they will be treated the same as function with arguments.
+An observable _reference_ to the function will be made and the function itself will be preserved.
+See for more details [#532](https://github.com/mobxjs/mobx/issues/532)
+
+N.B. If you want to introduce actions on an observable that modify it's state, using `action` is still the recommended approach:
+```
+observable({
+	counter: 0,
+	increment: action(function() {
+		this.counter++
+	})
+})
+```
+
+### MobX will no longer share global state by default
+
+For historical reasons (at Mendix), MobX had a feature that it would warn if different versions of the MobX package are being loaded into the same javascript runtime multiple times.
+This is because multiple instances by default try to share their state.
+This allows reactions from one package to react to observables created by another package,
+even when both packages where shipped with their own (embedded) version of MobX (!).
+
+Obviously this is a nasty default as it breaks package isolation and might actually start to throw errors unintentionally when MobX is loaded multiple times in the same runtime by completely unrelated packages.
+So this sharing behavior is now by default turned off.
+Sharing MobX should be achieved by means of proper bundling, de-duplication of packages or using peer dependencies / externals if needed.
+This is similar to packages like React, which will also bail out if you try to load it multiple times.
+
+If you still want to use the old behavior, this can be achieved by running `mobx.extras.shareGlobalState()` on _all_ packages that want to share state with each other.
+Since this behavior is probably not used outside Mendix, it has been deprecated immediately, so if you rely on this feature, please report in #621, so that it can be undeprecated if there is no more elegant solution.
+
+See [#621](https://github.com/mobxjs/mobx/issues/621)
+
 # 2.6.1
 
 * Introduced convenience `isArrayLike`: returns whether the argument is either a JS- or observable array. By @dslmeinte
