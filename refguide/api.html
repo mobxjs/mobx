@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2" data-basepath=".." data-revision="Mon Sep 26 2016 20:58:55 GMT+0200 (CEST)">
+    <div class="book" data-level="2" data-basepath=".." data-revision="Tue Nov 01 2016 21:45:36 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -660,7 +660,7 @@
                         
                             <b>8.8.</b>
                         
-                        observe
+                        intercept &amp; observe
                     </a>
             
             
@@ -980,7 +980,7 @@ The side effect can be debounced, just like <code>autorunAsync</code>. <a href="
 Modifiers can be used to influence how <code>observable</code> treats specific values.</p>
 <ul>
 <li><code>asMap</code>: This is the most important modifier. Instead of creating an object with observable properties, an <em>Observable Map</em> is created instead. The main difference with observable objects is that the addition and removal of properties can be easily observed. Use <code>asMap</code> if you want a map like data structure where the keys will change over time.</li>
-<li><code>asFlat</code>: Don&apos;t apply <code>observable</code> recursively. The passed object / collection itself will be observable, but the values in it won&apos;t. This disables the possibility to deeply observe objects.</li>
+<li><code>asFlat</code>: Will not apply <code>observable</code> recursively. The passed object / collection itself will be observable, but the values in it won&apos;t. This disables the possibility to deeply observe objects.</li>
 <li><code>asReference</code>: Use the passed in value verbatim, just create an observable reference to the object.</li>
 <li><code>asStructure</code>: When new values are assigned, ignore the new value if it structurally equal to the previous value.</li>
 </ul>
@@ -1006,6 +1006,10 @@ More, less trivial utilities can be found in the * <a href="https://github.com/m
 Works for all observables, computed values and disposer functions of reactions. <a href="is-observable">&#xAB;details&#xBB;</a></p>
 <h3 id="-isobservableobject-array-map"><code>isObservableObject|Array|Map</code></h3>
 <p>Usage: <code>isObservableObject(thing)</code>, <code>isObservableArray(thing)</code>, <code>isObservableMap(thing)</code>. Returns <code>true</code> if.., well, do the math.</p>
+<h3 id="-isarraylike"><code>isArrayLike</code></h3>
+<p>Usage: <code>isArrayLike(thing)</code>. Returns <code>true</code> if the given thing is either a true JS-array or an observable (MobX-)array.
+This is intended as convenience/shorthand.
+Note that observable arrays can be <code>.slice()</code>d to turn them into true JS-arrays.</p>
 <h3 id="-isaction"><code>isAction</code></h3>
 <p>Usage: <code>isAction(func)</code>. Returns true if the given function is wrapped / decorated with <code>action</code>.</p>
 <h3 id="-iscomputed"><code>isComputed</code></h3>

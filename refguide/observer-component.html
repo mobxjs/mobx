@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.5" data-basepath=".." data-revision="Mon Sep 26 2016 20:58:55 GMT+0200 (CEST)">
+    <div class="book" data-level="2.5" data-basepath=".." data-revision="Tue Nov 01 2016 21:45:36 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -660,7 +660,7 @@
                         
                             <b>8.8.</b>
                         
-                        observe
+                        intercept &amp; observe
                     </a>
             
             
@@ -886,24 +886,24 @@
 <p>The <code>observer</code> function / decorator can be used to turn ReactJS components into reactive components.
 It wraps the component&apos;s render function in <code>mobx.autorun</code> to make sure that any data that is used during the rendering of a component forces a re-rendering upon change.
 It is available through the separate <code>mobx-react</code> package.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>;
 
-var timerData = observable({
-    secondsPassed: 0
-})
+<span class="hljs-keyword">var</span> timerData = observable({
+    secondsPassed: <span class="hljs-number">0</span>
+});
 
 setInterval(() =&gt; {
-    timerData.secondsPassed++
-}, 1000)
+    timerData.secondsPassed++;
+}, <span class="hljs-number">1000</span>);
 
-@observer class Timer extends React.Component {
+@observer <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Timer</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
     render() {
-        return (&lt;span&gt;Seconds passed: { this.props.timerData.secondsPassed } &lt;/span&gt; )
+        <span class="hljs-keyword">return</span> (<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">span</span>&gt;</span>Seconds passed: { this.props.timerData.secondsPassed } <span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span> )</span>
     }
-})
+});
 
-React.render(&lt;Timer timerData={timerData} /&gt;, document.body)
-</code></pre>
+React.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">Timer</span> <span class="hljs-attribute">timerData</span>=<span class="hljs-value">{timerData}</span> /&gt;</span>, document.body);
+</span></code></pre>
 <p>Tip: when <code>observer</code> needs to be combined with other decorators or higher-order-components, make sure that <code>observer</code> is the innermost (first applied) decorator;
 otherwise it might do nothing at all.</p>
 <p>Note that using <code>@observer</code> as decorator is optional, <code>observer(class Timer ... { })</code> achieves exactly the same.</p>
@@ -920,11 +920,11 @@ so we need to access it <em>in</em> the component. Or in other words: values nee
 <p>In ES5 environments, observer components can be simple declared using <code>observer(React.createClass({ ...</code>. See also the <a href="../best/syntax.html">syntax guide</a></p>
 <h2 id="stateless-function-components">Stateless function components</h2>
 <p>The above timer widget could also be written using stateless function components that are passed through <code>observer</code>:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>;
 
-const Timer = observer(({ timerData }) =&gt;
-    &lt;span&gt;Seconds passed: { timerData.secondsPassed } &lt;/span&gt;
-)
+<span class="hljs-keyword">const</span> Timer = observer(({ timerData }) =&gt;
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">span</span>&gt;</span>Seconds passed: { timerData.secondsPassed } <span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span>
+)</span>;
 </code></pre>
 <h2 id="observable-local-component-state">Observable local component state</h2>
 <p>Just like normal classes, you can introduce observable properties on a component by using the <code>@observable</code> decorator.
@@ -960,21 +960,21 @@ This is supported when using the decorator (<code>@observer([&quot;store&quot;])
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> colors = observable({
    foreground: <span class="hljs-string">&apos;#000&apos;</span>,
    background: <span class="hljs-string">&apos;#fff&apos;</span>
-})
+});
 
 <span class="hljs-keyword">const</span> App = () =&gt;
   <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">Provider</span> <span class="hljs-attribute">colors</span>=<span class="hljs-value">{colors}</span>&gt;</span>
      <span class="hljs-tag">&lt;<span class="hljs-title">app</span> <span class="hljs-attribute">stuff...</span> /&gt;</span>
-  <span class="hljs-tag">&lt;/<span class="hljs-title">Provider</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-title">Provider</span>&gt;</span>;</span>
 
-const Button = observer([&quot;colors&quot;], ({ colors, label, onClick }) =&gt;
-  <span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">style</span>=<span class="hljs-value">{{</span>
+<span class="hljs-keyword">const</span> Button = observer([<span class="hljs-string">&quot;colors&quot;</span>], ({ colors, label, onClick }) =&gt;
+  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">style</span>=<span class="hljs-value">{{</span>
       <span class="hljs-attribute">color:</span> <span class="hljs-attribute">colors.foreground</span>,
       <span class="hljs-attribute">backgroundColor:</span> <span class="hljs-attribute">colors.background</span>
     }}
     <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{onClick}</span>
   &gt;</span>{label}<span class="hljs-tag">&lt;<span class="hljs-title">button</span>&gt;</span>
-)</span>
+)</span>;
 
 <span class="hljs-comment">// later..</span>
 colors.foreground = <span class="hljs-string">&apos;blue&apos;</span>;
@@ -1006,10 +1006,10 @@ data it observes has changed. This makes it easy to trace renders back to the ac
     }
 
     render() {
-        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>this.props.todo.title<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
+        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>this.props.todo.title<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>;</span>
     }
 }
-</span></code></pre>
+</code></pre>
 <ul>
 <li><code>componentWillReact</code> doesn&apos;t take arguments</li>
 <li><code>componentWillReact</code> won&apos;t fire before the initial render (use <code>componentWillMount</code> instead)</li>

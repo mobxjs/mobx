@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.3" data-basepath=".." data-revision="Mon Sep 26 2016 20:58:55 GMT+0200 (CEST)">
+    <div class="book" data-level="2.3" data-basepath=".." data-revision="Tue Nov 01 2016 21:45:36 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -660,7 +660,7 @@
                         
                             <b>8.8.</b>
                         
-                        observe
+                        intercept &amp; observe
                     </a>
             
             
@@ -919,7 +919,7 @@ as alternative to using the decorator. For this ES5 getters can be used, so the 
     get total() {
         <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.price * <span class="hljs-keyword">this</span>.amount
     }
-})
+});
 </code></pre>
 <p><em>Note: The support for getters was introduced in MobX 2.5.1. MobX will automatically convert any argumentless function that is passed as property value to <code>observable</code> / <code>extendObservable</code> to a computed property as well,
 but that form will disappear in the next major version</em>.</p>
@@ -929,12 +929,12 @@ but they can be used as &apos;inverse&apos; of the derivation. For example:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> box = observable({
     length: <span class="hljs-number">2</span>,
     get squared() {
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.length * <span class="hljs-keyword">this</span>.length
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.length * <span class="hljs-keyword">this</span>.length;
     },
     set squared(value) {
-        <span class="hljs-keyword">this</span>.length = <span class="hljs-built_in">Math</span>.sqrt(value)
+        <span class="hljs-keyword">this</span>.length = <span class="hljs-built_in">Math</span>.sqrt(value);
     }
-})
+});
 </code></pre>
 <p><em>Note: setters require MobX 2.5.1 or higher</em></p>
 <h1 id="-computed-expression"><code>computed(expression)</code></h1>
@@ -950,7 +950,7 @@ This form of <code>computed</code> is not used very often, but in some cases whe
     name.get().toUpperCase()
 );
 
-<span class="hljs-keyword">var</span> disposer = uperCaseName.observe(name =&gt; <span class="hljs-built_in">console</span>.log(name));
+<span class="hljs-keyword">var</span> disposer = upperCaseName.observe(name =&gt; <span class="hljs-built_in">console</span>.log(name));
 
 name.set(<span class="hljs-string">&quot;Dave&quot;</span>);
 <span class="hljs-comment">// prints: &apos;DAVE&apos;</span>

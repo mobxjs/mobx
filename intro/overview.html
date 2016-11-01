@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="1.1" data-basepath=".." data-revision="Mon Sep 26 2016 20:58:55 GMT+0200 (CEST)">
+    <div class="book" data-level="1.1" data-basepath=".." data-revision="Tue Nov 01 2016 21:45:36 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -660,7 +660,7 @@
                         
                             <b>8.8.</b>
                         
-                        observe
+                        intercept &amp; observe
                     </a>
             
             
@@ -895,7 +895,7 @@ Just make sure that all properties that you want to change over time are marked 
 });
 </code></pre>
 <h2 id="2-create-a-view-that-responds-to-changes-in-the-state">2. Create a view that responds to changes in the State</h2>
-<p>We didn&apos;t make our <code>appState</code> observable just for nothing;
+<p>We didn&apos;t make our <code>appState</code> observable for nothing;
 you can now create views that automatically update whenever relevant data in the <code>appState</code> changes.
 MobX will find the minimal way to update your views.
 This single fact saves you tons of boilerplate and is <a href="https://mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/" target="_blank">wickedly efficient</a>.</p>
@@ -920,13 +920,13 @@ React.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-titl
 </span></code></pre>
 <p>(For the implementation of <code>resetTimer</code> function see the next section)</p>
 <h2 id="3-modify-the-state">3. Modify the State</h2>
-<p>The third relevant thing to do is modifying the state.
-That is what your app is about after all.
-Unlike many other frameworks, MobX doesn&apos;t dictate you how to do this.
+<p>The third thing to do is to modify the state.
+That is what your app is all about after all.
+Unlike many other frameworks, MobX doesn&apos;t dictate how you do this.
 There are best practices, but the key thing to remember is:
-<strong><em>MobX helps you to do things in a simple straightforward way</em></strong>.</p>
+<strong><em>MobX helps you do things in a simple straightforward way</em></strong>.</p>
 <p>The following code will alter your data every second, and the UI will update automatically when needed.
-No explicit relations are defined in either in the controller functions that <em>change</em> the state or in the views that should <em>update</em>.
+No explicit relations are defined in either the controller functions that <em>change</em> the state or in the views that should <em>update</em>.
 Decorating your <em>state</em> and <em>views</em> with <code>observable</code> is enough for MobX to detect all relationships.
 Here are two examples of changing the state:</p>
 <pre><code class="lang-javascript">appState.resetTimer = action(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">reset</span>(<span class="hljs-params"></span>) </span>{

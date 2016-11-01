@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="7.1" data-basepath=".." data-revision="Mon Sep 26 2016 20:58:55 GMT+0200 (CEST)">
+    <div class="book" data-level="7.1" data-basepath=".." data-revision="Tue Nov 01 2016 21:45:36 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -660,7 +660,7 @@
                         
                             <b>8.8.</b>
                         
-                        observe
+                        intercept &amp; observe
                     </a>
             
             
@@ -974,7 +974,36 @@ const _MyComponent = observer((props =&gt; <span class="hljs-tag">&lt;<span clas
 <p>Observable arrays are actually objects, so they comply to <code>propTypes.object</code> instead of <code>array</code>.
 <code>mobx-react</code> provides it&apos;s explicit <code>PropTypes</code> for observable data structures.</p>
 <h4 id="rendering-listviews-in-react-native">Rendering ListViews in React Native</h4>
-<p><code>ListView.DataSource</code> in React Native expects real arrays, so make sure to <code>.slice()</code> arrays first before passing them to list views. For more info see <a href="https://github.com/mobxjs/mobx/issues/476" target="_blank">#476</a></p>
+<p><code>ListView.DataSource</code> in React Native expects real arrays. Observable arrays are actually objects, make sure to <code>.slice()</code> them first before passing to list views. Furthermore, <code>ListView.DataSource</code> itself can be moved to the store and have it automatically updated with a <code>@computed</code>, this step can also be done on the component level.</p>
+<pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ListStore</span> </span>{
+  @observable list = [
+    <span class="hljs-string">&apos;Hello World!&apos;</span>,
+    <span class="hljs-string">&apos;Hello React Native!&apos;</span>,
+    <span class="hljs-string">&apos;Hello MobX!&apos;</span>
+  ];
+
+  ds = <span class="hljs-keyword">new</span> ListView.DataSource({ rowHasChanged: (r1, r2) =&gt; r1 !== r2 });
+
+  @computed get dataSource() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.ds.cloneWithRows(<span class="hljs-keyword">this</span>.list.slice());
+  }
+}
+
+<span class="hljs-keyword">const</span> listStore = <span class="hljs-keyword">new</span> ListStore();
+
+@observer <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">List</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Component</span> </span>{
+  render() {
+    <span class="hljs-keyword">return</span> (
+      <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">ListView</span>
+        <span class="hljs-attribute">dataSource</span>=<span class="hljs-value">{listStore.dataSource}</span>
+        <span class="hljs-attribute">renderRow</span>=<span class="hljs-value">{row</span> =&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-title">Text</span>&gt;</span>{row}<span class="hljs-tag">&lt;/<span class="hljs-title">Text</span>&gt;</span>}
+        enableEmptySections={true}
+      /&gt;
+    )</span>;
+  }
+}
+</code></pre>
+<p>For more info see <a href="https://github.com/mobxjs/mobx/issues/476" target="_blank">#476</a></p>
 <h4 id="declaring-proptypes-might-cause-unnecessary-renders-in-dev-mode">Declaring propTypes might cause unnecessary renders in dev mode</h4>
 <p>See: <a href="https://github.com/mobxjs/mobx-react/issues/56" target="_blank">https://github.com/mobxjs/mobx-react/issues/56</a></p>
 <h4 id="-observable-properties-initialize-lazily-when-using-babel"><code>@observable</code> properties initialize lazily when using Babel</h4>

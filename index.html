@@ -42,7 +42,7 @@
     <body>
         
         
-    <div class="book" data-level="0" data-basepath="." data-revision="Mon Sep 26 2016 20:58:55 GMT+0200 (CEST)">
+    <div class="book" data-level="0" data-basepath="." data-revision="Tue Nov 01 2016 21:45:36 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -658,7 +658,7 @@
                         
                             <b>8.8.</b>
                         
-                        observe
+                        intercept &amp; observe
                     </a>
             
             
@@ -897,6 +897,7 @@
 <li><a href="https://mobxjs.github.io/mobx/refguide/api.html" target="_blank">Official documentation and API overview</a></li>
 <li>Videos:<ul>
 <li><a href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx" target="_blank">Egghead.io course: Manage Complex State in React Apps with MobX</a> - 30m.</li>
+<li><a href="https://www.youtube.com/watch?v=Aws40KOx90U" target="_blank">ReactNext 2016: Real World MobX</a> - 40m <a href="https://docs.google.com/presentation/d/1DrI6Hc2xIPTLBkfNH8YczOcPXQTOaCIcDESdyVfG_bE/edit?usp=sharing" target="_blank">slides</a></li>
 <li><a href="https://www.youtube.com/watch?v=XGwuM_u7UeQ" target="_blank">Practical React with MobX</a>. In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth (ES5 only) - 42m.</li>
 <li>LearnCode.academy MobX tutorial <a href="https://www.youtube.com/watch?v=_q50BXqkAfI" target="_blank">Part I: MobX + React is AWESOME (7m)</a> <a href="https://www.youtube.com/watch?v=nYvNqKrl69s" target="_blank">Part II: Computed Values and Nested/Referenced Observables (12m.)</a></li>
 <li><a href="https://www.youtube.com/watch?v=K8dr8BMU7-8" target="_blank">Screencast: intro to MobX</a> - 8m</li>
@@ -1035,15 +1036,15 @@ Use them to your advantage; they will help you to structure your code better and
 <p>As demonstrated above, modifying state when using MobX is very straightforward. You simply write down your intentions. MobX will take care of the rest.</p>
 <h3 id="fine-grained-observability-is-efficient">Fine grained observability is efficient</h3>
 <p>MobX builds a graph of all the derivations in your application to find the least number of re-computations that is needed to prevent staleness. &quot;Derive everything&quot; might sound expensive, MobX builds a virtual derivation graph to minimize the number of recomputations needed to keep derivations in sync with the state.</p>
-<p>In fact, when testing MobX at Mendix we found out that using this library to track the relations in our code is often a lot more efficient then pushing changes through our application by using handwritten events or &quot;smart&quot; selector based container components.</p>
-<p>The simple reason is that MobX will establish far more fine grained &apos;listeners&apos; on your data then you would do as a programmer.</p>
+<p>In fact, when testing MobX at Mendix we found out that using this library to track the relations in our code is often a lot more efficient than pushing changes through our application by using handwritten events or &quot;smart&quot; selector based container components.</p>
+<p>The simple reason is that MobX will establish far more fine grained &apos;listeners&apos; on your data than you would do as a programmer.</p>
 <p>Secondly MobX sees the causality between derivations so it can order them in such a way that no derivation has to run twice or introduces a glitch.</p>
 <p>How that works? See this <a href="https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254" target="_blank">in-depth explanation of MobX</a>.</p>
 <h3 id="easy-interoperability">Easy interoperability</h3>
-<p>MobX works plain javascript structures. Due to it&apos;s unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific library flavors.</p>
-<p>So you can simple keep using your existing router-, data fetching and utility libraries like <code>react-router</code>, <code>director</code>, <code>superagent</code>, <code>lodash</code> etc.</p>
+<p>MobX works plain javascript structures. Due to its unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific library flavors.</p>
+<p>So you can simply keep using your existing router, data fetching and utility libraries like <code>react-router</code>, <code>director</code>, <code>superagent</code>, <code>lodash</code> etc.</p>
 <p>For the same reason you can use it out of the box both server- and client side, in isomorphic applications and with react-native.</p>
-<p>The result of this is that you often need to learn less new concepts when using MobX in comparison to other state management solutions.</p>
+<p>The result of this is that you often need to learn fewer new concepts when using MobX in comparison to other state management solutions.</p>
 <hr>
 <center>
 <img src="https://www.mendix.com/styleguide/img/logo-mendix.png" align="center" width="200">
@@ -1053,8 +1054,8 @@ __MobX is proudly used in mission critical systems at [Mendix](https://www.mendi
 
 <h2 id="credits">Credits</h2>
 <p>MobX is inspired by reactive programming principles as found in spreadsheets. It is inspired by MVVM frameworks like in MeteorJS tracker, knockout and Vue.js. But MobX brings Transparent Functional Reactive Programming to the next level and provides a stand alone implementation. It implements TFRP in a glitch-free, synchronous, predictable and efficient manner.</p>
-<p>A ton of credits for <a href="https://github.com/mendix" target="_blank">Mendix</a>, for providing the flexibility and support to maintain MobX and the chance to proof the philosophy of MobX in a real, complex, performance critical applications.</p>
-<p>And finally kudo&apos;s for all the people that believed in, tried, validated and even <a href="https://github.com/mobxjs/mobx/blob/master/sponsors.md" target="_blank">sponsored</a> MobX.</p>
+<p>A ton of credits for <a href="https://github.com/mendix" target="_blank">Mendix</a>, for providing the flexibility and support to maintain MobX and the chance to prove the philosophy of MobX in a real, complex, performance critical applications.</p>
+<p>And finally kudos for all the people that believed in, tried, validated and even <a href="https://github.com/mobxjs/mobx/blob/master/sponsors.md" target="_blank">sponsored</a> MobX.</p>
 <h2 id="further-resources-and-documentation">Further resources and documentation</h2>
 <ul>
 <li><a href="http://mobxjs.github.io/mobx/faq/blogs.html" target="_blank">MobX homepage</a></li>
