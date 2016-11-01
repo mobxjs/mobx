@@ -1,6 +1,6 @@
 # 2.7.0
 
-### Automatic inference of computed properties has been depcreated.
+### Automatic inference of computed properties has been deprecated.
 
 A deprecation message will now be printed if creating computed properties while relying on automatical inferrence of argumentless functions as computed values. In other words, when using `observable` or `extendObservable` in the following manner:
 
