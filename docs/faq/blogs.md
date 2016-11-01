@@ -3,6 +3,7 @@
 ## Videos
 * [Egghead.io course: Manage Complex State in React Apps with MobX](https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx)
 * LearnCode.academy MobX tutorial [Part I: MobX + React is AWESOME (7m)](https://www.youtube.com/watch?v=_q50BXqkAfI) [Part II: Computed Values and Nested/Referenced Observables (12m.)](https://www.youtube.com/watch?v=nYvNqKrl69s)
+* [ReactNext 2016: Real World MobX](https://www.youtube.com/watch?v=Aws40KOx90U) - 40m [slides](https://docs.google.com/presentation/d/1DrI6Hc2xIPTLBkfNH8YczOcPXQTOaCIcDESdyVfG_bE/edit?usp=sharing)
 * [Practical React with MobX](https://www.youtube.com/watch?v=XGwuM_u7UeQ). In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth (ES5 only). ([slides](http://slides.com/mattruby/deck))
 * [Screencast: 8 minute overview of MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8)
 * [Understanding MobX versus Redux](https://www.youtube.com/watch?v=83v8cdvGfeA) (related thread: https://github.com/mobxjs/mobx/issues/199)
@@ -10,6 +11,7 @@
 * [Transparent Reactive Programming and Mutable Data, Reactive2015 conf](https://www.youtube.com/watch?v=FEwLwiizlk0) ([slides](https://speakerdeck.com/mweststrate/react-transparent-reactive-programming-and-mutable-data-structures))
 * Magic MobX, [RuhrJS 2016](https://www.youtube.com/watch?v=TfxfRkNCnmk) ([slides](http://magixmobx.surge.sh) and [more slides](https://docs.google.com/presentation/d/1d54mSxF0VOAFlsUGM8eonZDs9gZecTOz1ErSbnydChQ/edit?usp=sharing))
 * [Spacedojo Show - Reactive Programming with Mobx](https://www.youtube.com/watch?v=QTptEw2cYt0&feature=youtu.be&a)
+* [The Quest For Immer Mutable Data, Reactive2016 conf](https://youtu.be/1Urj4TZ5BLI?t=5h27m40s) ([slides](http://immer-mutable-state.surge.sh/#1))
 
 ## Tutorials
 * [Ten minute interactive introduction to MobX and React](https://mobxjs.github.io/mobx/getting-started.html#demo)
@@ -34,11 +36,20 @@
 
 * [Why we chose MobX over Redux for Spectacle Editor](http://formidable.com/blog/2016/06/02/why-we-chose-mobx-over-redux-for-spectacle-editor/)
 * [Optimising React rendering - tips to optimise rendering of a set of elements in React](https://medium.com/@lavrton/how-to-optimise-rendering-of-a-set-of-elements-in-react-ad01f5b161ae#.ijw98ktg5)
+* [A MobX introduction and case study](https://blog.wearewizards.io/a-mobx-introduction-and-case-study)
+* [How to Manage Your JavaScript Application State with MobX](https://www.sitepoint.com/manage-javascript-application-state-mobx/)
 * [Handling React Forms with Mobx Observables](https://blog.risingstack.com/handling-react-forms-with-mobx-observables/)
 * [mobx-utils: community driven utility belt for MobX](https://medium.com/@mweststrate/mobx-utils-community-driven-utility-belt-for-mobx-264346cb2744#.n8cweziy9)
 * [MobX 2.2: explicit actions, controlled mutations and improved DX](https://medium.com/@mweststrate/mobx-2-2-explicit-actions-controlled-mutations-and-improved-dx-45cdc73c7c8d#.h5jt4nlwf)
 * [Understanding MobX and when to use it (Github issue)](https://github.com/mobxjs/mobx/issues/199)
+* [How to use MobX with create-react-app](https://swizec.com/blog/mobx-with-create-react-app/swizec/7158)
+* [Simple MobX-driven modals](https://swizec.com/blog/simple-mobx-driven-modals/swizec/7166)
+* [Livecoding #25: Adding MobX to a vanilla React project](https://swizec.com/blog/livecoding-25-adding-mobx-vanilla-react-project/swizec/7170?utm_content=buffer92a0d&utm_medium=social&utm_source=twitter.com&utm_campaign=buffer)
 * [Creating a multi-page form using MobX with Meteor & React](http://markshust.com/2016/06/02/creating-multi-page-form-using-mobx-meteor-react)
+* [Effective MobX patterns (Part 1)](https://blog.pixelingene.com/2016/10/effective-mobx-patterns-part-1/)
+* [Effective MobX Patterns (Part 2)](https://blog.pixelingene.com/2016/10/effective-mobx-patterns-part-2/)
+* [Effective MobX Patterns (Part 3)](https://blog.pixelingene.com/2016/10/effective-mobx-patterns-part-3/)
+* [If not Redux then what?](https://medium.com/@sanketsahu/if-not-redux-then-what-fc433234f5b4#.xid2z4oon)
 * [State Management & Hydration with MobX  —  We must React [Ep. 05]](https://medium.com/@foxhound87/state-management-hydration-with-mobx-we-must-react-ep-05-1922a72453c6#.gbzf4e7nb)
 * [Enjoying MobX, JSX and virtual-dom. Without React!](https://medium.com/@botverse/enjoying-mobx-jsx-and-virtual-dom-621dcc2a2bd5#.3xoj3b1kg)
 * [SurviveJS interview on MobX, React and Flux](http://survivejs.com/blog/mobx-interview/)
@@ -52,11 +63,12 @@
 * [Using MobX in Angular 1.5 todo app](http://gaui.is/angular-1-5-todo-app/)
 * [Building a React & MobX application with MVVM](https://medium.com/@MattiaManzati/building-a-react-mobx-application-with-mvvm-ec0b3e3c8786#.de5tzghcx)
 * [Videolog: integrate MobX with Firebase](https://www.youtube.com/watch?v=MMQH9vxbzRw&feature=youtu.be&a)
+* [React form validation with MobX](https://medium.com/@KozhukharenkoN/react-form-validation-with-mobx-8ce00233ae27#.d8biky8cv)
 
 ## Testimonials
 
 Want to know how people experience starting or porting projects to MobX? Besides the above listed blogs, the following threads might shed some light:
-* [search twitter](https://twitter.com/search?q=mobx&src=typd)
+* [search twitter](https://twitter.com/search?q=mobx&src=typd) ([example](https://twitter.com/jason_kelly6/status/792043911573303296))
 * [hacker news](https://news.ycombinator.com/item?id=11181980)
 * [reddit](https://www.reddit.com/r/reactjs/comments/4pgbhq/redux_like_dan_abramov/d4kod21)
 * [reddit](https://www.reddit.com/r/reactjs/comments/4l44a2/mobx_22_has_been_released_explicit_actions/)

@@ -35,6 +35,15 @@ Install support for decorators: `npm i --save-dev babel-plugin-transform-decorat
 Note that the order of plugins is important: `transform-decorators-legacy` should be listed *first*.
 Having issues with the babel setup? Check this [issue](https://github.com/mobxjs/mobx/issues/105) first.
 
+When using react native, the following preset can be used instead of `transform-decorators-legacy`:
+```
+{
+  "presets": ["stage-2", "react-native-stage-0/decorator-support"]
+}
+```
+
+_Tip: if you want to use decorators with create-react-app, without ejecting, check out: [custom-react-scripts](https://www.npmjs.com/package/custom-react-scripts)_
+
 ## Creating observable properties without decorators
 
 Without decorators `extendObservable` can be used to introduce observable properties on an object.

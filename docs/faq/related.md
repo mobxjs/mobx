@@ -8,8 +8,9 @@
 * For Preact the [preact-compat](https://github.com/developit/preact-compat) module + mobx-react can be used.
 * [tracker-mobx-autorun](https://github.com/meteor-space/tracker-mobx-autorun) Integrate Meteor reactive data with MobX for simple yet highly optimized state management
 * [react-native-mobx](https://github.com/aksonov/react-native-mobx) Make your app reactive with MobX and react-native-router-flux
+* [ng2-mobx](https://github.com/500tech/ng2-mobx)
 
-* [mobx-react-form](https://github.com/foxhound87/mobx-react-form) Build forms and validate them using json-schema rules
+* Staff pick: [mobx-react-form](https://foxhound87.github.io/mobx-react-form/docs/devtools.html) Build forms and validate them using json-schema rules
 * [mobx-forms](https://github.com/oreqizer/mobx-forms) A simple form manager for React and Mobx, heavily inspired by redux-forms
 * [mobx-form](https://github.com/royriojas/mobx-form) Declaratively build forms using MobX
 * [mobx-input](https://github.com/tomaash/mobx-input) Form validation for MobX and react-bootstrap.
@@ -17,6 +18,7 @@
 
 * [serializr](https://github.com/mobxjs/serializr) Small library to (de)serialize complex object graphs to JSON
 * [mobx-utils](https://github.com/mobxjs/mobx-utils) Utility belt for MobX with several common patterns, like subscribing to external resources, converting promises etc.
+* [mobx-state-tree](https://github.com/mobxjs/mobx-state-tree) Idiomatic state container, supporting time traveling, patches, replayable actions etc.
 * [mobx-rest](https://github.com/masylum/mobx-rest) REST conventions for MobX.
 * [mobx-model](https://github.com/ikido/mobx-model) Simplify mobx data stores that mimic backend models
 * [mobx-router](https://github.com/kitze/mobx-router) A simple router for MobX apps
@@ -34,6 +36,8 @@
 * [mobx-server-wait](https://www.npmjs.com/package/mobx-server-wait) Render universally with server awaited mobx actions.
 * [mobx-cache](https://github.com/mdebbar/mobx-cache) An observable data cache with MobX
 * [mobx-persist](https://github.com/pinqy520/mobx-persist) create and persist mobx stores
+* [gwt-mobx](https://github.com/GWTReact/gwt-mobx) GWT Java bindings for MobX
+* [mobx-app](https://github.com/danieldunderfelt/mobx-app) A functional structure for mobx
 
 ## ... More
 

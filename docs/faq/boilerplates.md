@@ -4,9 +4,10 @@
 * React, Typescript, Webpack: https://github.com/mobxjs/mobx-react-typescript-boilerplate
 * MobX + React JSFiddle: https://jsfiddle.net/mweststrate/wgbe4guu/
 * MobX + React JSFiddle with just ES5: https://jsfiddle.net/rubyred/55oc981v/
+* [custom-react-scripts](https://www.npmjs.com/package/custom-react-scripts) for [create-react-app](https://github.com/facebookincubator/create-react-app) that enables using decorators; add `REACT_APP_DECORATORS=true` to `.env` to enable decorators.
 * [generator-mobx-react](https://www.npmjs.com/package/generator-mobx-react) Yeoman MobX, React, Webpack, Babel / Typescript project generator
 * [mobx-starter](https://github.com/nightwolfz/mobx-starter): Starting base for an mobx react project with optional isomorphism. MongoDB auth & sessions, hot reload, react-router
-* [custom-react-scripts](https://www.npmjs.com/package/custom-react-scripts) for [create-react-app](https://github.com/facebookincubator/create-react-app) that enables using decorators; add `REACT_APP_DECORATORS=true` to `.env` to enable decorators.
+* [React, React-Router 4, MobX and Webpack 2-boilerplate with async routes](https://github.com/mhaagens/react-mobx-react-router4-boilerplate)
 * [rfx-stack](https://github.com/foxhound87/rfx-stack) RFX Stack - Universal App featuring: React + Feathers + MobX
 * MobX, TypeScript, React, React Router, Server Side Rendering and Webpack: https://github.com/contacts-mvc/mobx-react-typescript
 * [reaxor](https://github.com/KadoBOT/reaxor) Boilerplate for better state management, styling, testing and cleaner code
@@ -24,3 +25,5 @@
 * [koa-mobx-react-starter](https://github.com/lostpebble/koa-mobx-react-starter) A straightforward starter for Node javascript web projects. Using Koa, MobX, Pug and ReactJS (with universal / isomorphic server rendering)
 * [modular-mobx-boilerplate](https://github.com/code-shoily/modular-mobx-boilerplate) This is a boilerplate for developing with React + MobX. It uses a modular structure of folders for larger apps.
 * [react-router-intl-routing](https://github.com/jamiehill/react-router-intl-routing) React Router 4 and React-Intl translated routes glued together with Mobx
+* [spfx-react-mobx-webpart-starter](https://github.com/kmees/spfx-react-mobx-webpart-starter) A react & mobx powered spfx webpart
+* [rn_mobx_temmplate](https://github.com/hiaw/rn_mobx_template) React Native with MobX template
