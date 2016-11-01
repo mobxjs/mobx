@@ -83,19 +83,27 @@ export class MobXGlobals {
 	spyListeners: {(change: any): void}[] = [];
 }
 
-export const globalState: MobXGlobals = (() => {
-	const res = new MobXGlobals();
+export let globalState: MobXGlobals = new MobXGlobals();
+
+export function shareGlobalState() {
+	const ownState = globalState;
+
 	/**
 	 * Backward compatibility check
 	 */
 	if (global.__mobservableTrackingStack || global.__mobservableViewStack)
 		throw new Error("[mobx] An incompatible version of mobservable is already loaded.");
-	if (global.__mobxGlobal && global.__mobxGlobal.version !== res.version)
+	if (global.__mobxGlobal && global.__mobxGlobal.version !== ownState.version)
 		throw new Error("[mobx] An incompatible version of mobx is already loaded.");
 	if (global.__mobxGlobal)
-		return global.__mobxGlobal;
-	return global.__mobxGlobal = res;
-})();
+		globalState = global.__mobxGlobal;
+	else
+		global.__mobxGlobal = ownState;
+}
+
+export function getGlobalState(): any {
+	return globalState;
+}
 
 export function registerGlobals() {
 	// no-op to make explicit why this file is loaded

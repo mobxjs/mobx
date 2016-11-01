@@ -57,7 +57,7 @@ export { Iterator                                             } from "./utils/it
 export { SimpleEventEmitter, ISimpleEventListener             } from "./utils/simpleeventemitter";
 export { IObserverTree, IDependencyTree                       } from "./api/extras";
 
-import { resetGlobalState } from "./core/globalstate";
+import { resetGlobalState, shareGlobalState, getGlobalState } from "./core/globalstate";
 
 import { IDepTreeNode } from "./core/observable";
 import { IObserverTree, IDependencyTree, getDependencyTree, getObserverTree } from "./api/extras";
@@ -72,10 +72,12 @@ export const extras = {
 	getAtom,
 	getDebugName,
 	getDependencyTree,
+	getGlobalState,
 	getObserverTree,
 	isComputingDerivation,
 	isSpyEnabled,
 	resetGlobalState,
+	shareGlobalState,
 	spyReport,
 	spyReportEnd,
 	spyReportStart,

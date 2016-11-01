@@ -5,7 +5,7 @@ var autorun = mobx.autorun;
 var iterall = require('iterall');
 
 test('map crud', function(t) {
-	global.__mobxGlobal.mobxGuid = 0; // hmm dangerous reset?
+	mobx.extras.getGlobalState().mobxGuid = 0; // hmm dangerous reset?
 
 	var events = [];
 	var m = map({ a: 1});

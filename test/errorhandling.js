@@ -29,7 +29,7 @@ function buffer() {
 }
 
 function checkGlobalState(t) {
-	const gs = global.__mobxGlobal;
+	const gs = mobx.extras.getGlobalState();
 	t.equal(gs.trackingDerivation, null)
 	t.equal(gs.inTransaction, 0)
 	t.equal(gs.isRunningReactions, false)

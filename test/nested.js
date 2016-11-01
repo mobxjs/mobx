@@ -38,4 +38,3 @@ test('nested computeds should not run unnecessary', t => {
 
 	t.end()
 })
-
