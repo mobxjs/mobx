@@ -16,11 +16,17 @@ export function invariant(check: boolean, message: string, thing?) {
 }
 
 const deprecatedMessages = [];
-export function deprecated(msg: string) {
+
+/**
+ * Prints a deprecation message, but only one time.
+ * Returns false if the deprecated message was already printed before
+ */
+export function deprecated(msg: string): boolean {
 	if (deprecatedMessages.indexOf(msg) !== -1)
-		return;
+		return false;
 	deprecatedMessages.push(msg);
 	console.error("[mobx] Deprecated: " + msg);
+	return true;
 }
 
 /**

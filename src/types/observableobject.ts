@@ -2,11 +2,19 @@ import {ObservableValue, UNCHANGED} from "./observablevalue";
 import {isComputedValue, ComputedValue} from "../core/computedvalue";
 import {isAction} from "../api/action";
 import {ValueMode, getModifier} from "./modifiers";
-import {createInstanceofPredicate, isObject, Lambda, getNextId, invariant, assertPropertyConfigurable, isPlainObject, addHiddenFinalProp} from "../utils/utils";
+import {createInstanceofPredicate, isObject, Lambda, getNextId, invariant, assertPropertyConfigurable, isPlainObject, addHiddenFinalProp, deprecated} from "../utils/utils";
 import {runLazyInitializers} from "../utils/decorators";
 import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
+
+const COMPUTED_FUNC_DEPRECATED = (
+`
+In MobX 2.* passing a function without arguments to (extend)observable will automatically be inferred to be a computed value.
+This behavior is ambiguous and will change in the future to create just an observable reference to the value passed in.
+To disambiguate, please pass the function wrapped with a modifier: use 'computed(fn)' (current behavior), 'asReference(fn)' (future behavior) or 'action(fn)'.
+Note that computed properties can also be written as '{ get propertyName() { ... }}'.
+For more details, see https://github.com/mobxjs/mobx/issues/532`);
 
 export interface IObservableObject {
 	"observable-object": IObservableObject;
@@ -60,7 +68,7 @@ export function asObservableObject(target, name: string, mode: ValueMode = Value
 		return target.$mobx;
 
 	if (!isPlainObject(target))
-		name = target.constructor.name + "@" + getNextId();
+		name = (target.constructor.name || "ObservableObject") + "@" + getNextId();
 	if (!name)
 		name = "ObservableObject@" + getNextId();
 
@@ -69,15 +77,27 @@ export function asObservableObject(target, name: string, mode: ValueMode = Value
 	return adm;
 }
 
+function handleAsComputedValue(value): boolean {
+	return typeof value === "function" && value.length === 0 && !isAction(value)
+}
+
 export function setObservableObjectInstanceProperty(adm: ObservableObjectAdministration, propName: string, descriptor: PropertyDescriptor) {
 	if (adm.values[propName]) {
 		invariant("value" in descriptor, "cannot redefine property " + propName);
 		adm.target[propName] = descriptor.value; // the property setter will make 'value' reactive if needed.
 	} else {
-		if ("value" in descriptor)
+		if ("value" in descriptor) {
+			if (handleAsComputedValue(descriptor.value)) {
+				// warn about automatic inference, see https://github.com/mobxjs/mobx/issues/421
+				if (deprecated(COMPUTED_FUNC_DEPRECATED)) {
+					console.error(`in: ${adm.name}.${propName}`);
+					console.trace();
+				}
+			}
 			defineObservableProperty(adm, propName, descriptor.value, true, undefined);
-		else
+		} else {
 			defineObservableProperty(adm, propName, descriptor.get, true, descriptor.set);
+		}
 	}
 }
 
@@ -90,15 +110,14 @@ export function defineObservableProperty(adm: ObservableObjectAdministration, pr
 	let isComputed = true;
 
 	if (isComputedValue(newValue)) {
-		// desugger computed(getter, setter)
-		// TODO: deprecate this and remove in 3.0, to keep them boxed
+		// desugar computed(getter, setter)
+		// TODO: deprecate this and remove in 3.0, to keep them boxed?
 		// get / set is now the idiomatic syntax for non-boxed computed values
 		observable = newValue;
 		newValue.name = name;
 		if (!newValue.scope)
 			newValue.scope = adm.target;
-	} else if (typeof newValue === "function" && newValue.length === 0 && !isAction(newValue)) {
-		// TODO: add warning in 2.6, see https://github.com/mobxjs/mobx/issues/421
+	} else if (handleAsComputedValue(newValue)) {
 		// TODO: remove in 3.0
 		observable = new ComputedValue(newValue, adm.target, false, name, setter);
 	} else if (getModifier(newValue) === ValueMode.Structure && typeof newValue.value === "function" && newValue.value.length === 0) {
