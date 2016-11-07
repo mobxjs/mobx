@@ -140,8 +140,8 @@ export function deepEquals(a, b) {
 		return true;
 	if (a === undefined && b === undefined)
 		return true;
-	const aIsArray = Array.isArray(a) || isObservableArray(a);
-	if (aIsArray !== (Array.isArray(b) || isObservableArray(b))) {
+	const aIsArray = isArrayLike(a);
+	if (aIsArray !== isArrayLike(b)) {
 		return false;
 	} else if (aIsArray) {
 		if (a.length !== b.length)
@@ -166,13 +166,20 @@ export function deepEquals(a, b) {
 	return a === b;
 }
 
-export function createInstanceofPredicate<T>(name: string, clazz: new (...args:any[]) => T): (x: any) => x is T {
+export function createInstanceofPredicate<T>(name: string, clazz: new (...args: any[]) => T): (x: any) => x is T {
 	// TODO: this is quite a slow aproach, find something faster?
 	const propName = "isMobX" + name;
 	clazz.prototype[propName] = true;
 	return function (x) {
 		return isObject(x) && x[propName] === true;
 	} as any;
+}
+
+/**
+ * Returns whether the argument is an array, disregarding observability.
+ */
+export function isArrayLike(x: any): boolean {
+	return Array.isArray(x) || isObservableArray(x);
 }
 
 import {globalState} from "../core/globalstate";

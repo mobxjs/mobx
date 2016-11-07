@@ -473,10 +473,10 @@ test('ES5 non reactive props', function (t) {
   });
   const d2 = Object.getOwnPropertyDescriptor(te2, 'notWritable')
   t.equal(d2.value, 'static')
-  
+
   // should not throw for other props
   t.equal(m.extendObservable(te, { 'bla' : 3}).bla, 3);
-  
+
   t.end();
 })
 
@@ -512,4 +512,25 @@ test('exceptions', function(t) {
     });
 
     return t.end();
+})
+
+test("540 - extendobservable should not report cycles", function(t) {
+	var objWrapper = mobx.observable({
+		value: null,
+	});
+
+	var obj = {
+		name: "Hello",
+	};
+
+	objWrapper.value = obj;
+	t.throws(
+		() => mobx.extendObservable(objWrapper, obj),
+		/extending an object with another observable \(object\) is not supported/
+	);
+
+	mobx.autorun(() => {
+		console.log(objWrapper.name);
+	});
+	t.end();
 })

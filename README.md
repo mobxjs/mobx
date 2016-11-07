@@ -6,13 +6,15 @@ _Simple, scalable state management_
 [![Build Status](https://travis-ci.org/mobxjs/mobx.svg?branch=master)](https://travis-ci.org/mobxjs/mobx)
 [![Coverage Status](https://coveralls.io/repos/mobxjs/mobx/badge.svg?branch=master&service=github)](https://coveralls.io/github/mobxjs/mobx?branch=master)
 [![Join the chat at https://gitter.im/mobxjs/mobx](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mobxjs/mobx?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Discuss MobX on Hashnode](https://hashnode.github.io/badges/mobx.svg)](https://hashnode.com/n/mobx)
+[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://mobxjs.github.io/mobx/donate.html)
 
 ![npm install mobx](https://nodei.co/npm/mobx.png?downloadRank=true&downloads=true)
 
 * Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`. To enable ESNext decorators (optional), see below.
-* CDN: 
-- https://cdnjs.com/libraries/mobx
+* CDN:
 - https://unpkg.com/mobx/lib/mobx.umd.js
+- https://cdnjs.com/libraries/mobx
 
 ## Getting started
 
@@ -20,6 +22,7 @@ _Simple, scalable state management_
 * [Official documentation and API overview](https://mobxjs.github.io/mobx/refguide/api.html)
 * Videos:
   * [Egghead.io course: Manage Complex State in React Apps with MobX](https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx) - 30m.
+  * [ReactNext 2016: Real World MobX](https://www.youtube.com/watch?v=Aws40KOx90U) - 40m [slides](https://docs.google.com/presentation/d/1DrI6Hc2xIPTLBkfNH8YczOcPXQTOaCIcDESdyVfG_bE/edit?usp=sharing)
   * [Practical React with MobX](https://www.youtube.com/watch?v=XGwuM_u7UeQ). In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth (ES5 only) - 42m.
   * LearnCode.academy MobX tutorial [Part I: MobX + React is AWESOME (7m)](https://www.youtube.com/watch?v=_q50BXqkAfI) [Part II: Computed Values and Nested/Referenced Observables (12m.)](https://www.youtube.com/watch?v=nYvNqKrl69s)
   * [Screencast: intro to MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8) - 8m
@@ -60,7 +63,7 @@ class Todo {
 }
 ```
 
-Using `observable` is like turning the properties of an object into a spreadsheet cells.
+Using `observable` is like turning a property of an object into a spreadsheet cell.
 But unlike spreadsheets, these values cannot just be primitive values, but also references, objects and arrays.
 You can even [define your own](http://mobxjs.github.io/mobx/refguide/extending.html) observable data sources.
 
@@ -98,7 +101,7 @@ class TodoList {
 ```
 
 MobX will ensure that `unfinishedTodoCount` is updated automatically when a todo is added or when one of the `finished` properties is modified.
-Computations like these can very well be compared with formulas in spreadsheet programs like MS Excel. They update automatically whenever, and only when, needed.
+Computations like these resemble formulas in spreadsheet programs like MS Excel. They update automatically and only when required.
 
 ### Reactions
 
@@ -177,7 +180,7 @@ In the end it all boils down to: Somehow the state should be updated.
 
 After updating the state `MobX` will take care of the rest in an efficient, glitch-free manner. So simple statements, like below, are enough to automatically update the user interface.
 
-There is no technical need for firing events, calling dispatcher or what more. A React component is in the end nothing more than a fancy representation of your state. A derivation that will be managed by MobX.
+There is no technical need for firing events, calling a dispatcher or what more. A React component in the end is nothing more than a fancy representation of your state. A derivation that will be managed by MobX.
 
 ```javascript
 store.todos.push(
@@ -224,9 +227,9 @@ How that works? See this [in-depth explanation of MobX](https://medium.com/@mwes
 
 MobX works plain javascript structures. Due to it's unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific library flavors.
 
-So you can simple keep using your existing router-, data fetching and utility libraries like `react-router`, `director`, `superagent`, `lodash` etc.
+So you can simply keep using your existing router, data fetching, and utility libraries like `react-router`, `director`, `superagent`, `lodash` etc.
 
-For the same reason you can use it out of the box both server- and client side, in isomorphic applications and with react-native.
+For the same reason you can use it out of the box both server and client side, in isomorphic applications and with react-native.
 
 The result of this is that you often need to learn less new concepts when using MobX in comparison to other state management solutions.
 

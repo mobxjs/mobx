@@ -1,11 +1,11 @@
 import {ObservableValue, IObservableValue} from "../types/observablevalue";
 import {ValueMode, getValueModeFromValue, makeChildObservable} from "../types/modifiers";
 import {computed} from "./computeddecorator";
-import {isPlainObject, invariant, deprecated} from "../utils/utils";
+import {isPlainObject, invariant, deprecated, isArrayLike} from "../utils/utils";
 import {observableDecorator} from "./observabledecorator";
 import {isObservable} from "./isobservable";
 import {IObservableObject} from "../types/observableobject";
-import {IObservableArray, isObservableArray} from "../types/observablearray";
+import {IObservableArray} from "../types/observablearray";
 
 /**
  * Turns an object, array or function into a reactive structure.
@@ -51,7 +51,7 @@ export function getTypeOfValue(value): ValueType {
 		return ValueType.Reference;
 	if (typeof value === "function")
 		return value.length ? ValueType.ComplexFunction : ValueType.ViewFunction;
-	if (Array.isArray(value) || isObservableArray(value))
+	if (isArrayLike(value))
 		return ValueType.Array;
 	if (typeof value === "object")
 		return isPlainObject(value) ? ValueType.PlainObject : ValueType.ComplexObject;

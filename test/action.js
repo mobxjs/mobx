@@ -330,7 +330,9 @@ test('action in autorun does not keep / make computed values alive', t => {
 	callComputedTwice()
 	t.equal(calls, 5)
 
-	runWithMemoizing(mobx.action(callComputedTwice))
+	runWithMemoizing(function() {
+		mobx.runInAction(callComputedTwice)
+	})
 	t.equal(calls, 6)
 
 	callComputedTwice()

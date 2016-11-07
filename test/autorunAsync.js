@@ -125,3 +125,10 @@ test('autorunAsync passes Reaction as an argument to view function', function(t)
 		t.end();
 	}, 100);
 });
+
+test('autorunAsync warns when passed an action', function(t) {
+	var action = m.action(() => {});
+	t.plan(1);
+	t.throws(() => m.autorunAsync(action), /attempted to pass an action to autorunAsync/);
+	t.end();
+});

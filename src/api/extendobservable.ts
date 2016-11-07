@@ -1,6 +1,7 @@
 import {ValueMode} from "../types/modifiers";
 import {isObservableMap} from "../types/observablemap";
 import {asObservableObject, setObservableObjectInstanceProperty} from "../types/observableobject";
+import {isObservable} from "../api/isobservable";
 import {invariant, isPropertyConfigurable, hasOwnProperty} from "../utils/utils";
 
 /**
@@ -15,6 +16,7 @@ export function extendObservable<A extends Object, B extends Object>(target: A, 
 	invariant(!(isObservableMap(target)), "extendObservable should not be used on maps, use map.merge instead");
 	properties.forEach(propSet => {
 		invariant(typeof propSet === "object", "all arguments of extendObservable should be objects");
+		invariant(!isObservable(propSet), "extending an object with another observable (object) is not supported. Please construct an explicit propertymap, using `toJS` if need. See issue #540");
 		extendObservableHelper(target, propSet, ValueMode.Recursive, null);
 	});
 	return <A & B> target;

@@ -1,3 +1,19 @@
+# 2.6.1
+
+* Introduced convenience `isArrayLike`: returns whether the argument is either a JS- or observable array. By @dslmeinte
+* Improved readme. By @DavidLGoldberg
+* Improved assertion message, by @ncammarate (See [#618](https://github.com/mobxjs/mobx/pull/618))
+* Added HashNode badge, by @sandeeppanda92
+
+# 2.6.0
+
+_Marked as minor release as the behavior of `toJS` has been changed, which might be interpreted both as bug-fix or as breaking change, depending of how you interpreted the docs_
+
+* Fixed [#566](https://github.com/mobxjs/mobx/pull/566): Fixed incorrect behavior of `toJS`: `toJS` will now only recurse into observable object, not all objects. The new behavior is now aligned with what is suggested in the docs, but as a result the semantics changed a bit. `toJSlegacy` will be around for a while implementing the old behavior. See [#589](See https://github.com/mobxjs/mobx/pull/589) for more details.
+* Fixed [#571](https://github.com/mobxjs/mobx/pull/571): Don't use `instanceof` operator. Should fix issues if MobX is included multiple times in the same bundle.
+* Fixed [#576](https://github.com/mobxjs/mobx/pull/576): disallow passing actions directly to `autorun`; as they won't be tracked by @jeffijoe
+* Extending observable objects with other observable (objects) is now explicitly forbidden, fixes [#540](https://github.com/mobxjs/mobx/pull/540).
+
 # 2.5.2
 
 * Introduced `isComputed`

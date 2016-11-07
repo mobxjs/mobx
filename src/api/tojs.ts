@@ -3,7 +3,7 @@ import {isObservableObject} from "../types/observableobject";
 import {isObservableMap} from "../types/observablemap";
 import {isObservableValue} from "../types/observablevalue";
 import {isObservable} from "../api/isobservable";
-import {deprecated} from "../utils/utils";
+import {deprecated, isArrayLike} from "../utils/utils";
 
 /**
 	* Basically, a deep clone, so that no reactive property will exist anymore.
@@ -77,7 +77,7 @@ export function toJSlegacy(source, detectCycles: boolean = true, __alreadySeen: 
 
 	if (!source)
 		return source;
-	if (Array.isArray(source) || isObservableArray(source)) {
+	if (isArrayLike(source)) {
 		const res = cache([]);
 		const toAdd = source.map(value => toJSlegacy(value, detectCycles, __alreadySeen));
 		res.length = toAdd.length;

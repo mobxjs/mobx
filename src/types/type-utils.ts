@@ -42,7 +42,7 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
 }
 
 export function getAdministration(thing: any, property?: string) {
-	invariant(thing, "Expection some object");
+	invariant(thing, "Expecting some object");
 	if (property !== undefined)
 		return getAdministration(getAtom(thing, property));
 	if (isAtom(thing) || isComputedValue(thing) || isReaction(thing))

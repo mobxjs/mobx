@@ -2,7 +2,7 @@ import {Lambda, getNextId, deprecated, invariant, valueDidChange} from "../utils
 import {assertUnwrapped, ValueMode, getValueModeFromValue} from "../types/modifiers";
 import {Reaction, IReactionPublic} from "../core/reaction";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
-import {action} from "../api/action";
+import {action, isAction} from "../api/action";
 
 /**
  * Creates a reactive view and keeps it alive, so that the view is always
@@ -37,6 +37,10 @@ export function autorun(arg1: any, arg2: any, arg3?: any) {
 
 	assertUnwrapped(view, "autorun methods cannot have modifiers");
 	invariant(typeof view === "function", "autorun expects a function");
+	invariant(
+		isAction(view) === false,
+		"Warning: attempted to pass an action to autorun. Actions are untracked and will not trigger on state changes. Use `reaction` or wrap only your state modification code in an action."
+	);
 	if (scope)
 		view = view.bind(scope);
 
@@ -121,7 +125,10 @@ export function autorunAsync(arg1: any, arg2: any, arg3?: any, arg4?: any) {
 		delay = arg2;
 		scope = arg3;
 	}
-
+	invariant(
+		isAction(func) === false,
+		"Warning: attempted to pass an action to autorunAsync. Actions are untracked and will not trigger on state changes. Use `reaction` or wrap only your state modification code in an action."
+	);
 	if (delay === void 0)
 		delay = 1;
 
