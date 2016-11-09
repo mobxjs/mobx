@@ -118,7 +118,7 @@ class TodoStore {
 
 const todoStore = new TodoStore();
                         </textarea>
-                        <button onClick="runCode(['#code1', '#code2'])" class="btn-run">Run code</button>
+                        <button onClick="runCode(['#code1'])" class="btn-run">Run code</button>
 
                         <p>We just created a <code>todoStore</code> instance with a <code>todos</code> collection. 
                             Time to fill the todoStore with some objects. 
@@ -196,7 +196,7 @@ class ObservableTodoStore {
 
 const observableTodoStore = new ObservableTodoStore();
                         </textarea>
-                        <button onClick="runCode(['#code1', '#code3', '#code4'])" class="btn-run">Run code</button>
+                        <button onClick="runCode(['#code1', '#code3'])" class="btn-run">Run code</button>
 
                         <p>That's it! We marked some properties as being <code>@observable</code> to signal MobX that these values can change over time.
                             The computations are decorated with <code>@computed</code> to identify that these can be derived from the state.
