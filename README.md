@@ -114,7 +114,7 @@ If you are using React, you can turn your (stateless function) components into r
 ```javascript
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import {observer} from "mobx-react";
+import {observer} from 'mobx-react';
 
 @observer
 class TodoListView extends Component {
