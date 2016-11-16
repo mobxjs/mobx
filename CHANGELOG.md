@@ -71,6 +71,10 @@ Since this behavior is probably not used outside Mendix, it has been deprecated 
 
 See [#621](https://github.com/mobxjs/mobx/issues/621)
 
+# 2.6.2
+
+* Changes related to `toJS` as mentioned in version `2.6.0` where not actually shipped. This has been fixed, so see release notes below.
+
 # 2.6.1
 
 * Introduced convenience `isArrayLike`: returns whether the argument is either a JS- or observable array. By @dslmeinte

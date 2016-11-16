@@ -40,13 +40,14 @@ test('correct api should be exposed', function(t) {
 		'runInAction',
 		'spy',
 		'toJS',
+		'toJSlegacy',
 		'toJSON',
 		'transaction',
 		'untracked',
 		'useStrict',
 		'when',
 		'whyRun'
-	]);
+	].sort());
 	t.equals(Object.keys(mobx).filter(function(key) {
 		return mobx[key] == undefined;
 	}).length, 0);
