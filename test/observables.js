@@ -1605,3 +1605,26 @@ test('iscomputed', function(t) {
 	t.equal(mobx.isComputed(x, "b"), true)
 	t.end()
 })
+
+test('603 - transaction should not kill reactions', t => {
+	var a = observable(1)
+	var b = 1;
+	var d = mobx.autorun(() => { b = a.get() })
+
+	try {
+		mobx.transaction(() => {
+			a.set(2)
+			throw 3
+		})
+
+	} catch (e) {
+
+	}
+
+	t.equal(b, 2)
+	a.set(3)
+	t.equal(b, 3)
+
+	t.end()
+
+})

@@ -73,6 +73,7 @@ See [#621](https://github.com/mobxjs/mobx/issues/621)
 
 ### Other changes
 
+* Fixed #603: exceptions in transaction breaks future reactions
 * Passing a function to `observable` will now create a boxed observable refering to that function
 * Deprecated `whyRun` (as it seems hardly used, please let us know if it should stay)
 * The following deprecated methods have been removed:
