@@ -28,7 +28,7 @@ test('test1', function(t) {
     t.equal(a.length, 2);
     t.deepEqual(a.slice(), [1,2]);
 
-    var sum = observable(function() {
+    var sum = mobx.computed(function() {
         return -1 + a.reduce(function(a,b) {
             return a + b;
         }, 1);
@@ -243,7 +243,7 @@ test('array modification functions', function(t) {
 
 test('array modifications', function(t) {
 
-    var a2 = mobx.fastArray([]);
+    var a2 = mobx.observable([]);
     var inputs = [undefined, -10, -4, -3, -1, 0, 1, 3, 4, 10];
     var arrays = [[], [1], [1,2,3,4], [1,2,3,4,5,6,7,8,9,10,11],[1,undefined],[undefined]]
     for (var i = 0; i < inputs.length; i++)
@@ -262,17 +262,6 @@ test('array modifications', function(t) {
 
     t.end();
 })
-
-test('new fast array values won\'t be observable', function(t) {
-   // See: https://mobxjs.github.io/mobx/refguide/fast-array.html#comment-2486090381
-    var booksA = mobx.fastArray([]);
-    var rowling = { name: 'J.K.Rowling', birth: 1965 };
-    booksA.push(rowling)
-    t.equal(mobx.isObservable(booksA[0], "name"), false);
-    var removed = booksA.splice(0, 1);
-    t.equal(mobx.isObservable(removed[0], "name"), false);
-    t.end();
-});
 
 test('is array', function(t) {
     var x = mobx.observable([]);
@@ -298,7 +287,7 @@ test('peek', function(t) {
 
 test('react to sort changes', function(t) {
     var x = mobx.observable([4, 2, 3]);
-    var sortedX = mobx.observable(function() {
+    var sortedX = mobx.computed(function() {
         return x.sort();
     });
     var sorted;

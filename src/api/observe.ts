@@ -1,12 +1,10 @@
 import {IObservableArray, IArrayChange, IArraySplice} from "../types/observablearray";
 import {ObservableMap, IMapChange} from "../types/observablemap";
-import {IObjectChange, isObservableObject} from "../types/observableobject";
+import {IObjectChange} from "../types/observableobject";
 import {IComputedValue} from "../core/computedvalue";
 
 import {IObservableValue} from "../types/observablevalue";
-import {observable} from "./observable";
-import {Lambda, isPlainObject, deprecated} from "../utils/utils";
-import {extendObservable} from "./extendobservable";
+import {Lambda} from "../utils/utils";
 import {getAdministration} from "../types/type-utils";
 
 export function observe<T>(value: IObservableValue<T> | IComputedValue<T>, listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
@@ -23,20 +21,9 @@ export function observe(thing, propOrCb?, cbOrFire?, fireImmediately?): Lambda {
 }
 
 function observeObservable(thing, listener, fireImmediately: boolean) {
-	if (isPlainObject(thing) && !isObservableObject(thing)) {
-		deprecated("Passing plain objects to intercept / observe is deprecated and will be removed in 3.0");
-		return getAdministration(observable(thing) as any).observe(listener, fireImmediately);
-	}
 	return getAdministration(thing).observe(listener, fireImmediately);
 }
 
 function observeObservableProperty(thing, property, listener, fireImmediately: boolean) {
-	if (isPlainObject(thing) && !isObservableObject(thing)) {
-		deprecated("Passing plain objects to intercept / observe is deprecated and will be removed in 3.0");
-		extendObservable(thing, {
-			property: thing[property]
-		});
-		return observeObservableProperty(thing, property, listener, fireImmediately);
-	}
 	return getAdministration(thing, property).observe(listener, fireImmediately);
 }

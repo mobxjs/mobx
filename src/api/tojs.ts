@@ -9,7 +9,6 @@ import {deprecated, isArrayLike} from "../utils/utils";
 	* Basically, a deep clone, so that no reactive property will exist anymore.
 	*/
 export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, any][] = null) {
-	// TODO: in 3.0, detectCycles should default to false?
 	// optimization: using ES6 map would be more efficient!
 	// optimization: lift this function outside toJS, this makes recursion expensive
 	function cache(value) {
@@ -101,9 +100,4 @@ export function toJSlegacy(source, detectCycles: boolean = true, __alreadySeen: 
 		return res;
 	}
 	return source;
-}
-
-export function toJSON(source, detectCycles: boolean = true, __alreadySeen: [any, any][] = null) {
-	deprecated("toJSON is deprecated. Use toJS instead");
-	return toJSlegacy.apply(null, arguments);
 }

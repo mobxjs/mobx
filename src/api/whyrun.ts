@@ -2,7 +2,7 @@ import {globalState} from "../core/globalstate";
 import {isComputedValue} from "../core/computedvalue";
 import {isReaction} from "../core/reaction";
 import {getAtom} from "../types/type-utils";
-import {invariant} from "../utils/utils";
+import {invariant, deprecated} from "../utils/utils";
 
 function log(msg: string): string {
 	console.log(msg);
@@ -10,6 +10,7 @@ function log(msg: string): string {
 }
 
 export function whyRun(thing?: any, prop?: string) {
+	deprecated("The `whyRun` function seems barely used and will be removed in the next major. If it is useful to you, please open an issue.");
 	switch (arguments.length) {
 		case 0:
 			thing = globalState.trackingDerivation;

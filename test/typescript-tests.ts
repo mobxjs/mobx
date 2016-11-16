@@ -64,7 +64,7 @@ test('decorators', function(t) {
 
 test('observable', function(t) {
     var a = observable(3);
-    var b = observable(() => a.get() * 2);
+    var b = computed(() => a.get() * 2);
     t.equal(b.get(), 6);
     t.end();
 })

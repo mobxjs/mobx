@@ -34,6 +34,7 @@ test('isObservable', function(t) {
     t.equal(m.isObservable(m.observable({})), true);
     t.equal(m.isObservable(m.observable(Object.freeze({}))), false);
     t.equal(m.isObservable(m.observable(function() {})), true);
+    t.equal(m.isObservable(m.computed(function() {})), true);
 
     t.equal(m.isObservable([]), false);
     t.equal(m.isObservable({}), false);
@@ -61,9 +62,6 @@ test('isObservable', function(t) {
 })
 
 test('observable1', function(t) {
-    t.throws(function() {
-        m.observable(function(a,b) {});
-    });
     m._.resetGlobalState();
 
     // recursive structure
@@ -155,7 +153,7 @@ test('observable4', function(t) {
     ]);
 
     var b = buffer();
-    m.observe(m.observable(function() {
+    m.observe(m.computed(function() {
         return x.map(function(d) { return d.x });
     }), b, true);
 
@@ -171,7 +169,7 @@ test('observable4', function(t) {
     ]));
 
     var b2 = buffer();
-    m.observe(m.observable(function() {
+    m.observe(m.computed(function() {
         return x2.map(function(d) { return d.x });
     }), b2, true);
 
@@ -185,7 +183,7 @@ test('observable4', function(t) {
 
 test('observable5', function(t) {
 
-    var x = m.observable(function() { });
+    var x = m.computed(function() { });
     t.throws(function() {
         x.set(7); // set not allowed
     });
@@ -227,7 +225,7 @@ test('flat array', function(t) {
     var updates = 0;
     var dis = m.autorun(function() {
         updates++;
-        result = mobx.toJSON(x);
+        result = mobx.toJSlegacy(x);
     });
 
     t.deepEqual(result, { x: [{ a: 1 }]});
@@ -261,7 +259,7 @@ test('flat object', function(t) {
     var updates = 0;
     var dis = m.autorun(function() {
         updates++;
-        result = mobx.toJSON(y);
+        result = mobx.toJSlegacy(y);
     });
 
     t.deepEqual(result, { x: { z: 3 }});

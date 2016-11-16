@@ -71,6 +71,19 @@ Since this behavior is probably not used outside Mendix, it has been deprecated 
 
 See [#621](https://github.com/mobxjs/mobx/issues/621)
 
+### Other changes
+
+* Passing a function to `observable` will now create a boxed observable refering to that function
+* Deprecated `whyRun` (as it seems hardly used, please let us know if it should stay)
+* The following deprecated methods have been removed:
+  * `autorunUntil`
+  * `trackTransitions`
+  * `fastArray`
+  * `SimpleEventEmitter`
+  * `ObservableMap.toJs` (use `toJS`)
+  * invoking `observe` and `inject` with plain javascript objects
+
+
 # 2.6.2
 
 * Changes related to `toJS` as mentioned in version `2.6.0` where not actually shipped. This has been fixed, so see release notes below.

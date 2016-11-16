@@ -3,7 +3,7 @@ import {transaction} from "../core/transaction";
 import {untracked} from "../core/derivation";
 import {ObservableArray, IObservableArray} from "./observablearray";
 import {ObservableValue, UNCHANGED} from "./observablevalue";
-import {createInstanceofPredicate, deprecated, isPlainObject, getNextId, Lambda, invariant} from "../utils/utils";
+import {createInstanceofPredicate, isPlainObject, getNextId, Lambda, invariant} from "../utils/utils";
 import {allowStateChanges} from "../core/action";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
@@ -246,11 +246,6 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		const res: IKeyValueMap<V> = {};
 		this.keys().forEach(key => res[key] = this.get(key));
 		return res;
-	}
-
-	toJs(): IKeyValueMap<V> {
-		deprecated("toJs is deprecated, use toJS instead");
-		return this.toJS();
 	}
 
 	toJSON(): IKeyValueMap<V> {

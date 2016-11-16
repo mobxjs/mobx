@@ -4,6 +4,7 @@ var test = require('tape');
 var mobx = require('..');
 var m = mobx;
 var observable = mobx.observable;
+var computed = mobx.computed;
 var transaction = mobx.transaction;
 
 var voidObserver = function(){};
@@ -43,8 +44,8 @@ test('basic', function(t) {
 
 test('basic2', function(t) {
     var x = observable(3);
-    var z = observable(function () { return x.get() * 2});
-    var y = observable(function () { return x.get() * 3});
+    var z = computed(function () { return x.get() * 2});
+    var y = computed(function () { return x.get() * 3});
 
     m.observe(z, voidObserver);
 
@@ -86,7 +87,7 @@ test('dynamic', function(t) {
 test('dynamic2', function(t) {
     try {
         var x = observable(3);
-        var y = observable(function() {
+        var y = computed(function() {
             return x.get() * x.get();
         });
 
@@ -117,7 +118,7 @@ test('readme1', function(t) {
         order.price = observable(10);
         // Prints: New price: 24
         //in TS, just: value(() => this.price() * (1+vat()))
-        order.priceWithVat = observable(function() {
+        order.priceWithVat = computed(function() {
             return order.price.get() * (1 + vat.get());
         });
 
@@ -138,8 +139,8 @@ test('readme1', function(t) {
 test('batch', function(t) {
     var a = observable(2);
     var b = observable(3);
-    var c = observable(function() { return a.get() * b.get() });
-    var d = observable(function() { return c.get() * b.get() });
+    var c = computed(function() { return a.get() * b.get() });
+    var d = computed(function() { return c.get() * b.get() });
     var buf = buffer();
     m.observe(d, buf);
 
@@ -165,7 +166,7 @@ test('batch', function(t) {
 test('transaction with inspection', function(t) {
     var a = observable(2);
     var calcs = 0;
-    var b = observable(function() {
+    var b = computed(function() {
         calcs++;
         return a.get() * 2;
     });
@@ -226,7 +227,7 @@ test('scope', function(t) {
     var Order = function() {
         this.price = observable(20);
         this.amount = observable(2);
-        this.total = observable(function() {
+        this.total = computed(function() {
             return (1+vat.get()) * this.price.get() * this.amount.get();
         }, this);
     };
@@ -469,39 +470,29 @@ test('observe object', function(t) {
 
 test('mobx.observe', function(t) {
     var events = [];
-    var po = { a: 1 };
     var o = observable({ b: 2 });
     var ar = observable([ 3 ]);
     var map = mobx.map({ });
 
     var push = function(event) { events.push(event); };
 
-    var stop1 = mobx.observe(po, push);
     var stop2 = mobx.observe(o, push);
     var stop3 = mobx.observe(ar, push);
     var stop4 = mobx.observe(map, push);
 
-    po.a = 4;
     o.b = 5;
     ar[0] = 6;
     map.set("d", 7);
 
-    stop1();
     stop2();
     stop3();
     stop4();
 
-    po.a = 8;
     o.b = 9;
     ar[0] = 10;
     map.set("d", 11);
 
     t.deepEqual(events, [
-        { type: 'update',
-            object: po,
-            name: 'a',
-			newValue: 4,
-            oldValue: 1 },
         { type: 'update',
             object: o,
             name: 'b',
@@ -525,11 +516,11 @@ test('change count optimization', function(t) {
     var bCalcs = 0;
     var cCalcs = 0;
     var a = observable(3);
-    var b = observable(function() {
+    var b = computed(function() {
         bCalcs += 1;
         return 4 + a.get() - a.get();
     });
-    var c = observable(function() {
+    var c = computed(function() {
         cCalcs += 1;
         return b.get();
     });
@@ -556,7 +547,7 @@ test('observables removed', function(t) {
     var calcs = 0;
     var a = observable(1);
     var b = observable(2);
-    var c = observable(function() {
+    var c = computed(function() {
         calcs ++;
         if (a.get() === 1)
         return b.get() * a.get() * b.get();
@@ -591,12 +582,12 @@ test('lazy evaluation', function (t) {
     var observerChanges = 0;
 
     var a = observable(1);
-    var b = observable(function() {
+    var b = computed(function() {
         bCalcs += 1;
         return a.get() +1;
     });
 
-    var c = observable(function() {
+    var c = computed(function() {
         cCalcs += 1;
         return b.get() +1;
     });
@@ -619,7 +610,7 @@ test('lazy evaluation', function (t) {
     t.equal(bCalcs,3);
     t.equal(cCalcs,3);
 
-    var d = observable(function() {
+    var d = computed(function() {
         dCalcs += 1;
         return b.get() * 2;
     });
@@ -663,12 +654,12 @@ test('multiple view dependencies', function(t) {
     var bCalcs = 0;
     var dCalcs = 0;
     var a = observable(1);
-    var b = observable(function() {
+    var b = computed(function() {
         bCalcs++;
         return 2 * a.get();
     });
     var c = observable(2);
-    var d = observable(function() {
+    var d = computed(function() {
         dCalcs++;
         return 3 * c.get();
     });
@@ -713,9 +704,9 @@ test('nested observable2', function(t) {
     var totalCalcs = 0;
     var innerCalcs = 0;
 
-    var total = observable(function() {
+    var total = computed(function() {
         totalCalcs += 1; // outer observable shouldn't recalc if inner observable didn't publish a real change
-        return price.get() * observable(function() {
+        return price.get() * computed(function() {
             innerCalcs += 1;
             return factor.get() % 2 === 0 ? 1 : 3;
         }).get();
@@ -744,7 +735,7 @@ test('expr', function(t) {
     var totalCalcs = 0;
     var innerCalcs = 0;
 
-    var total = observable(function() {
+    var total = computed(function() {
         totalCalcs += 1; // outer observable shouldn't recalc if inner observable didn't publish a real change
         return price.get() * mobx.expr(function() {
             innerCalcs += 1;
@@ -771,7 +762,7 @@ test('expr', function(t) {
 
 test('observe', function(t) {
     var x = observable(3);
-    var x2 = observable(function() { return x.get() * 2; });
+    var x2 = computed(function() { return x.get() * 2; });
     var b = [];
 
     var cancel = mobx.autorun(function() {
@@ -792,7 +783,7 @@ test('when', function(t) {
     var x = observable(3);
 
     var called = 0;
-    mobx.autorunUntil(function() {
+    mobx.when(function() {
         return (x.get() === 4);
     }, function() {
         called += 1;
@@ -837,7 +828,7 @@ test('expr2', function(t) {
     var totalCalcs = 0;
     var innerCalcs = 0;
 
-    var total = observable(function() {
+    var total = computed(function() {
         totalCalcs += 1; // outer observable shouldn't recalc if inner observable didn't publish a real change
         return price.get() * mobx.expr(function() {
             innerCalcs += 1;
@@ -1149,7 +1140,7 @@ test('issue 71, transacting running transformation', function(t) {
             }
         });
 
-        mobx.autorunUntil(function() {
+        mobx.when(function() {
             return this.isVisible;
         }, function() {
             if (this.pos < 4)

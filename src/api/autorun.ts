@@ -1,4 +1,4 @@
-import {Lambda, getNextId, deprecated, invariant, valueDidChange} from "../utils/utils";
+import {Lambda, getNextId, invariant, valueDidChange} from "../utils/utils";
 import {assertUnwrapped, ValueMode, getValueModeFromValue} from "../types/modifiers";
 import {Reaction, IReactionPublic} from "../core/reaction";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
@@ -101,11 +101,6 @@ export function when(arg1: any, arg2: any, arg3?: any, arg4?: any) {
 		}
 	});
 	return disposer;
-}
-
-export function autorunUntil(predicate: () => boolean, effect: (r: IReactionPublic) => void, scope?: any) {
-	deprecated("`autorunUntil` is deprecated, please use `when`.");
-	return when.apply(null, arguments);
 }
 
 export function autorunAsync(name: string, func: (r: IReactionPublic) => void, delay?: number, scope?: any);

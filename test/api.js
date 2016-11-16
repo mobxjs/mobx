@@ -8,7 +8,6 @@ test('correct api should be exposed', function(t) {
 		'IDerivationState',
 		'ObservableMap',
 		'Reaction',
-		'SimpleEventEmitter',
 		'_',
 		'action',
 		'asFlat',
@@ -17,13 +16,11 @@ test('correct api should be exposed', function(t) {
 		'asStructure',
 		'autorun',
 		'autorunAsync',
-		'autorunUntil',
 		'computed',
 		'createTransformer',
 		'expr',
 		'extendObservable',
 		'extras',
-		'fastArray',
 		'intercept',
 		'isAction',
 		'isArrayLike',
@@ -41,7 +38,6 @@ test('correct api should be exposed', function(t) {
 		'spy',
 		'toJS',
 		'toJSlegacy',
-		'toJSON',
 		'transaction',
 		'untracked',
 		'useStrict',
@@ -73,8 +69,7 @@ test('correct api should be exposed', function(t) {
 			'shareGlobalState',
 			'spyReport',
 			'spyReportEnd',
-			'spyReportStart',
-			'trackTransitions'
+			'spyReportStart'
 	]);
 	t.equals(Object.keys(mobx.extras).filter(function(key) {
 		return mobx.extras[key] == undefined;

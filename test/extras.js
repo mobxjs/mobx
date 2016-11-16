@@ -14,7 +14,7 @@ test('treeD', function(t) {
     });
 
 
-    var b = m.observable(() => a.get() * a.get());
+    var b = m.computed(() => a.get() * a.get());
     var bName = 'ComputedValue@3';
     t.deepEqual(dtree(b), {
         name: bName
@@ -107,9 +107,9 @@ test('names', function(t) {
     t.equal(m.autorun(function namedFunction() {
     }).$mobx.name, "namedFunction");
 
-    t.ok(m.observable(function() {}));
+    t.ok(m.computed(function() {}));
 
-    t.equal(m.observable(function namedFunction() {}).name, "namedFunction");
+    t.equal(m.computed(function namedFunction() {}).name, "namedFunction");
 
 	function Task() {
 		m.extendObservable(this, {
@@ -135,38 +135,12 @@ function stripTrackerOutput(output) {
     });
 }
 
-
-test('transition tracker 1', function(t) {
+test('spy 1', function(t) {
     m._.resetGlobalState();
     var lines = [];
 
     var a = m.observable(3);
-    var b = m.observable(function() { return a.get() * 2 });
-    var c = m.autorun(function() { b.get(); });
-    var stop = m.extras.trackTransitions(false, function(line) {
-        lines.push(line);
-    });
-
-    a.set(4);
-    stop();
-    a.set(5);
-    t.deepEqual(stripTrackerOutput(lines), [
-		{ newValue: 4, oldValue: 3, spyReportStart: true, type: 'update' },
-		{ target: undefined, type: 'compute' },
-		{ spyReportStart: true, type: 'reaction' },
-		{ spyReportEnd: true },
-		{ spyReportEnd: true }
-	]);
-
-    t.end();
-})
-
-test('transition tracker 2', function(t) {
-    m._.resetGlobalState();
-    var lines = [];
-
-    var a = m.observable(3);
-    var b = m.observable(function() { return a.get() * 2 });
+    var b = m.computed(function() { return a.get() * 2 });
     var c = m.autorun(function() { b.get(); });
     var stop = m.spy(function(line) {
         lines.push(line);

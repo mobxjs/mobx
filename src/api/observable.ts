@@ -1,7 +1,7 @@
 import {ObservableValue, IObservableValue} from "../types/observablevalue";
 import {ValueMode, getValueModeFromValue, makeChildObservable} from "../types/modifiers";
 import {computed} from "./computeddecorator";
-import {isPlainObject, invariant, deprecated, isArrayLike} from "../utils/utils";
+import {isPlainObject, invariant, isArrayLike} from "../utils/utils";
 import {observableDecorator} from "./observabledecorator";
 import {isObservable} from "./isobservable";
 import {IObservableObject} from "../types/observableobject";
@@ -34,12 +34,9 @@ export function observable(v: any = undefined, keyOrScope?: string | any) {
 			return makeChildObservable(value, mode);
 		case ValueType.Reference:
 		case ValueType.ComplexObject:
-			return new ObservableValue(value, mode);
-		case ValueType.ComplexFunction:
-			throw new Error("[mobx.observable] To be able to make a function reactive it should not have arguments. If you need an observable reference to a function, use `observable(asReference(f))`");
 		case ValueType.ViewFunction:
-			deprecated("Use `computed(expr)` instead of `observable(expr)`");
-			return computed(v, keyOrScope);
+		case ValueType.ComplexFunction:
+			return new ObservableValue(value, mode);
 	}
 	invariant(false, "Illegal State");
 }

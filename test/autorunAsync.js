@@ -18,7 +18,7 @@ test('autorun 1', function(t) {
 
 	var a = m.observable(2);
 	var b = m.observable(3);
-	var c = m.observable(function() {
+	var c = m.computed(function() {
 		_cCalcs++;
 		return a.get() * b.get();
 	});
