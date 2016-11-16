@@ -8,6 +8,9 @@ import {deprecated, isArrayLike} from "../utils/utils";
 /**
 	* Basically, a deep clone, so that no reactive property will exist anymore.
 	*/
+export function toJS<T>(source: T, detectCycles?: boolean): T;
+export function toJS(source: any, detectCycles?: boolean): any;
+export function toJS(source, detectCycles: boolean, __alreadySeen: [any, any][]); // internal overload
 export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, any][] = null) {
 	// TODO: in 3.0, detectCycles should default to false?
 	// optimization: using ES6 map would be more efficient!
