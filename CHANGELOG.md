@@ -1,3 +1,8 @@
+# 2.6.3
+
+* Fixed #603: exceptions in transaction breaks future reactions
+* Improved typings of `toJS`
+
 # 2.6.2
 
 * Changes related to `toJS` as mentioned in version `2.6.0` where not actually shipped. This has been fixed, so see release notes below.

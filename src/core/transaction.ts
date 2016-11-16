@@ -11,9 +11,11 @@ import {isSpyEnabled, spyReportStart, spyReportEnd} from "./spy";
  */
 export function transaction<T>(action: () => T, thisArg = undefined, report = true): T {
 	transactionStart(((action as any).name) || "anonymous transaction", thisArg, report);
-	const res = action.call(thisArg);
-	transactionEnd(report);
-	return res;
+	try {
+		return action.call(thisArg);
+	} finally {
+		transactionEnd(report);
+	}
 }
 
 export function transactionStart<T>(name: string, thisArg = undefined, report = true) {
