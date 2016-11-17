@@ -1630,6 +1630,14 @@ test('603 - transaction should not kill reactions', t => {
 
 	}
 
+	t.equal(a.observers.length, 1)
+	t.equal(d.$mobx.observing.length, 1)
+	t.deepEqual(__mobxGlobal.inBatch, 0)
+	t.deepEqual(__mobxGlobal.inTransaction, 0)
+	t.deepEqual(__mobxGlobal.pendingReactions.length, 0)
+	t.deepEqual(__mobxGlobal.pendingUnobservations.length, 0)
+	t.deepEqual(__mobxGlobal.trackingDerivation, null)
+
 	t.equal(b, 2)
 	a.set(3)
 	t.equal(b, 3)
