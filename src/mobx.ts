@@ -66,6 +66,7 @@ import { allowStateChanges } from "./core/action";
 import { trackTransitions, spyReport, spyReportEnd, spyReportStart, isSpyEnabled } from "./core/spy";
 import { Lambda } from "./utils/utils";
 import { isComputingDerivation } from "./core/derivation";
+import { setReactionScheduler } from "./core/reaction";
 
 export const extras = {
 	allowStateChanges,
@@ -79,7 +80,8 @@ export const extras = {
 	spyReport,
 	spyReportEnd,
 	spyReportStart,
-	trackTransitions
+	trackTransitions,
+	setReactionScheduler
 };
 
 // Experimental or internal api's (exposed for testing for example)
