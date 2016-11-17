@@ -11,7 +11,7 @@ The following methods are exposed according to the [ES6 Map spec](https://develo
 * `has(key)` Returns whether this map has an entry the provided key. Note that the presence of a key is an observable fact in itself.
 * `set(key, value)`. Sets the given `key` to `value`. The provided key will be added to the map if it didn't exist yet.
 * `delete(key)`. Deletes the given key and its value from the map.
-* `get(key)`. Returns the value at the given key (or `undefined`). Make sure that you guard `get` calls with `has`.
+* `get(key)`. Returns the value at the given key (or `undefined`). 
 * `keys()`. Returns all keys present in this map. The insertion order is preserved.
 * `values()`. Returns all values present in this map. Insertion order is preserved.
 * `entries()`. Returns an (insertion ordered) array that for each key/value pair in the map contains an array `[key, value]`.
