@@ -2,6 +2,7 @@
 
 * Fixed #603: exceptions in transaction breaks future reactions
 * Improved typings of `toJS`
+* Introduced `setReactionScheduler`. Internal api used by mobx-react@4 to be notified when reactions will be run
 
 # 2.6.2
 
