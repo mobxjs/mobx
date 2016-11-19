@@ -5,6 +5,15 @@ Registers a global spy listener that listens to all events that happen in MobX.
 It is similar to attaching an `observe` listener to *all* observables at once, but also notifies about running (trans/re)actions and computations.
 Used for example by the `mobx-react-devtools`.
 
+Example usage of spying all actions:
+```
+spy((event) => {
+    if (event.type === 'action') {
+        console.log(`${event.name} with args: ${event.arguments}`)
+    }
+})
+```
+
 Spy listeners always receive one object, which usually has at least a `type` field. The following events are emitted by default by spy.
 
 | event | fields | nested |
