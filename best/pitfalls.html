@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="7.1" data-basepath=".." data-revision="Tue Nov 01 2016 21:45:36 GMT+0100 (CET)">
+    <div class="book" data-level="7.1" data-basepath=".." data-revision="Mon Nov 21 2016 20:51:16 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -884,6 +884,8 @@
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/pitfalls.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="common-pitfalls-best-practices">Common pitfalls &amp; best practices</h1>
 <p>Stuck with MobX? This section contains a list of common issues people new to MobX might run into.</p>
+<h4 id="issues-with-decorators">Issues with decorators?</h4>
+<p>For setup tips and limitations on decorators, check the <a href="decorators.html">decorators</a> page</p>
 <h4 id="-array-isarray-observable-1-2-3-false"><code>Array.isArray(observable([1,2,3])) === false</code></h4>
 <p>In ES5 there is no way to reliably inherit from arrays, and hence observable arrays inherit from objects.
 This means that regularly libraries are not able to recognize observable arrays as normal arrays (like lodash, or built-in operations like <code>Array.concat</code>).

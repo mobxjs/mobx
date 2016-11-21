@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="8.7" data-basepath=".." data-revision="Tue Nov 01 2016 21:45:36 GMT+0100 (CET)">
+    <div class="book" data-level="8.7" data-basepath=".." data-revision="Mon Nov 21 2016 20:51:16 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -965,7 +965,7 @@ This is useful if you are working with &apos;struct&apos; like objects like colo
 <p>In the above example, the computed method <code>viewPortSize</code> returns a fresh object on each re-computation.
 So MobX considers it to have changed always. This means that each <code>resize</code> event of the browser will trigger a re-render of the
 <code>ViewPort</code> component.</p>
-<p>However, if the window size is smaller that the <code>minSize</code>, the resize doesn&apos;t need to influence the rendering anymore, as the computed
+<p>However, if the window size is smaller than the <code>minSize</code>, the resize doesn&apos;t need to influence the rendering anymore, as the computed
 will return the same dimensions after each run. <code>asStructure</code> signals to MobX that observers of this computation should only be triggered
 if the value returned by the computed has <em>structurally</em> changed (by default strict equality is used to determine whether observers need to be notified).
 This means that a new object that is returned from <code>viewPortSize</code> won&apos;t trigger a <code>render</code> if its contents are (structurally) the same as the previous value.</p>
