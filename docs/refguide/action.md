@@ -14,7 +14,10 @@ Actions help you to structure your code better.
 It takes a function and returns it after wrapping it with `untracked`, `transaction` and `allowStateChanges`.
 It is advised to use them on any function that modifies observables or has side effects.
 `action` also provides useful debugging information in combination with the devtools.
-Note: using `action` is mandatory when *strict mode* is enabled, see [`useStrict`](https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/api.md#usestrict). Using the `@action` decorator with [ES 5.1 setters](http://www.ecma-international.org/ecma-262/5.1/#sec-11.1.5) (i.e. `@action set propertyName`) is not supported.
+Using the `@action` decorator with [ES 5.1 setters](http://www.ecma-international.org/ecma-262/5.1/#sec-11.1.5) (i.e. `@action set propertyName`) is not supported, however setters of [computed properties are automatically actions](https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/computed-decorator.md#setters-for-computed-values).
+
+
+Note: using `action` is mandatory when *strict mode* is enabled, see [`useStrict`](https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/api.md#usestrict). 
 
 For an extensive introduction to `action` see also the [MobX 2.2 release notes](https://medium.com/p/45cdc73c7c8d/).
 
