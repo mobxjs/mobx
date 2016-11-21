@@ -2,6 +2,10 @@
 
 Stuck with MobX? This section contains a list of common issues people new to MobX might run into.
 
+#### Issues with decorators?
+
+For setup tips and limitations on decorators, check the [decorators](decorators.md) page
+
 #### `Array.isArray(observable([1,2,3])) === false`
 
 In ES5 there is no way to reliably inherit from arrays, and hence observable arrays inherit from objects.
