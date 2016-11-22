@@ -32,7 +32,6 @@ test('isObservable', function(t) {
 
     t.equal(m.isObservable(m.observable([])), true);
     t.equal(m.isObservable(m.observable({})), true);
-    t.equal(m.isObservable(m.observable(Object.freeze({}))), false);
     t.equal(m.isObservable(m.observable(function() {})), true);
     t.equal(m.isObservable(m.computed(function() {})), true);
 
@@ -57,8 +56,14 @@ test('isObservable', function(t) {
 
     t.equal(m.isObservable(m.map()), true);
 
-    t.end();
+	const base = { a: 3 };
+	const obs = m.observable(base);
+	t.equal(m.isObservable(base), false);
+	t.equal(m.isObservable(base, "a"), false);
+	t.equal(m.isObservable(obs), true);
+	t.equal(m.isObservable(obs, "a"), true);
 
+    t.end();
 })
 
 test('observable1', function(t) {
@@ -454,7 +459,7 @@ test('ES5 non reactive props', function (t) {
 	 const a = m.extendObservable(te2, { notConfigurable: 1 });
   });
   // should skip non-configurable / writable props when using `observable`
-  te = m.observable(te);
+  te = m.extendObservable(te, te);
   const d1 = Object.getOwnPropertyDescriptor(te, 'nonConfigurable')
   t.equal(d1.value, 'static')
 
@@ -513,6 +518,11 @@ test('exceptions', function(t) {
 })
 
 test("540 - extendobservable should not report cycles", function(t) {
+	t.throws(
+		() => m.extendObservable(Object.freeze({}), {}),
+		/Cannot extend the designated object/
+	);
+
 	var objWrapper = mobx.observable({
 		value: null,
 	});
@@ -523,7 +533,7 @@ test("540 - extendobservable should not report cycles", function(t) {
 
 	objWrapper.value = obj;
 	t.throws(
-		() => mobx.extendObservable(objWrapper, obj),
+		() => mobx.extendObservable(objWrapper, objWrapper.value),
 		/extending an object with another observable \(object\) is not supported/
 	);
 

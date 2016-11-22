@@ -71,6 +71,23 @@ Since this behavior is probably not used outside Mendix, it has been deprecated 
 
 See [#621](https://github.com/mobxjs/mobx/issues/621)
 
+### `observable(plainObject)` will no longer enhance objects, but clone instead
+
+When passing a plain object to `observable`, MobX used to modify that object inplace and give it observable capabilities.
+This also happened when assigning a plain object to an observable array etc.
+However, this behavior has changed for a few reasons
+
+1.  Both arrays and maps create new data structure, however, `observable(object)` didn't
+2.  It resulted in unnecessary and confusing side effects. If you passed an object you received from some api to a function that added it, for example, to an observable collection. Suddenly your object would be modified as side effect of passing it down to that function. This was often confusing for beginners and could lead to subtle bugs.
+3.  If MobX in the future uses Proxies behind the scenes, this would need to change as well
+
+If you want, you can still enhance existing plainObjects, but simply using `extendObserable(data, data)`. This was actually the old implementation, which has now changed to `extendObservable({}, data)`.
+
+As always, it is best practice not to have transportation objects etc lingering around; there should be only one source of truth, and that is the data that is in your observable state.
+If you already adhered to this rule, this change won't impact you.
+
+See [#649](https://github.com/mobxjs/mobx/issues/649)
+
 ### Other changes
 
 * Fixed #603: exceptions in transaction breaks future reactions

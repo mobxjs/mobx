@@ -23,6 +23,7 @@ export function extendObservable<A extends Object, B extends Object>(target: A, 
 }
 
 export function extendObservableHelper(target, properties, mode: ValueMode, name: string): Object {
+	invariant(Object.isExtensible(target), "Cannot extend the designated object; it is not extensible");
 	const adm = asObservableObject(target, name, mode);
 	for (let key in properties) if (hasOwnProperty(properties, key)) {
 		if (target === properties && !isPropertyConfigurable(target, key))
