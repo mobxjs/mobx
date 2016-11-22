@@ -1,4 +1,4 @@
-# 2.7.0
+# 3.0.0
 
 ### Automatic inference of computed properties has been deprecated.
 
@@ -84,6 +84,11 @@ See [#621](https://github.com/mobxjs/mobx/issues/621)
   * `ObservableMap.toJs` (use `toJS`)
   * invoking `observe` and `inject` with plain javascript objects
 
+# 2.6.3
+
+* Fixed #603: exceptions in transaction breaks future reactions
+* Improved typings of `toJS`
+* Introduced `setReactionScheduler`. Internal api used by mobx-react@4 to be notified when reactions will be run
 
 # 2.6.2
 

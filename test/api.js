@@ -66,6 +66,7 @@ test('correct api should be exposed', function(t) {
 			'isComputingDerivation',
 			'isSpyEnabled',
 			'resetGlobalState',
+			'setReactionScheduler',
 			'shareGlobalState',
 			'spyReport',
 			'spyReportEnd',

@@ -159,10 +159,16 @@ WhyRun? reaction '${this.name}':
  */
 const MAX_REACTION_ITERATIONS = 100;
 
+let reactionScheduler: (fn: () => void) => void = f => f();
+
 export function runReactions() {
 	// invariant(globalState.inBatch > 0, "INTERNAL ERROR runReactions should be called only inside batch");
 	if (globalState.isRunningReactions === true || globalState.inTransaction > 0)
 		return;
+	reactionScheduler(runReactionsHelper);
+}
+
+function runReactionsHelper() {
 	globalState.isRunningReactions = true;
 	const allReactions = globalState.pendingReactions;
 	let iterations = 0;
@@ -184,3 +190,8 @@ export function runReactions() {
 }
 
 export const isReaction = createInstanceofPredicate("Reaction", Reaction);
+
+export function setReactionScheduler(fn: (f: () => void) => void) {
+	const baseScheduler = reactionScheduler;
+	reactionScheduler = f => fn(() => baseScheduler(f));
+}
