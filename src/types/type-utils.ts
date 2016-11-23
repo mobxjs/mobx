@@ -12,12 +12,13 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
 	if (typeof thing === "object" && thing !== null) {
 		if (isObservableArray(thing)) {
 			invariant(property === undefined, "It is not possible to get index atoms from arrays");
-			return thing.$mobx.atom;
+			return (thing as any).$mobx.atom;
 		}
 		if (isObservableMap(thing)) {
+			const anyThing = thing as any;
 			if (property === undefined)
-				return getAtom(thing._keys);
-			const observable = thing._data[property] || thing._hasMap[property];
+				return getAtom(anyThing._keys);
+			const observable = anyThing._data[property] || anyThing._hasMap[property];
 			invariant(!!observable, `the entry '${property}' does not exist in the observable map '${getDebugName(thing)}'`);
 			return observable;
 		}
@@ -25,7 +26,7 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
 		runLazyInitializers(thing);
 		if (isObservableObject(thing)) {
 			invariant(!!property, `please specify a property`);
-			const observable = thing.$mobx.values[property];
+			const observable = (thing as any).$mobx.values[property];
 			invariant(!!observable, `no observable property '${property}' found on the observable object '${getDebugName(thing)}'`);
 			return observable;
 		}

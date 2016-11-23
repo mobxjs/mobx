@@ -59,7 +59,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	 * However, enabling compareStructural can be convienent if you always produce an new aggregated object and don't want to notify observers if it is structurally the same.
 	 * This is useful for working with vectors, mouse coordinates etc.
 	 */
-	constructor(public derivation: () => T, private scope: Object, private compareStructural: boolean, name: string, setter: (v: T) => void) {
+	constructor(public derivation: () => T, public scope: Object, private compareStructural: boolean, name: string, setter: (v: T) => void) {
 		this.name  = name || "ComputedValue@" + getNextId();
 		if (setter)
 			this.setter = createAction(name + "-setter", setter) as any;

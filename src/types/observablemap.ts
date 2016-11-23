@@ -298,4 +298,4 @@ export function map<V>(initialValues?: IMapEntries<V> | IKeyValueMap<V>, valueMo
 }
 
 /* 'var' fixes small-build issue */
-export var isObservableMap = createInstanceofPredicate("ObservableMap", ObservableMap);
+export var isObservableMap = createInstanceofPredicate("ObservableMap", ObservableMap) as (thing: any) => thing is ObservableMap<any>;

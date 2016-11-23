@@ -65,7 +65,7 @@ export interface IIsObservableObject {
 
 export function asObservableObject(target, name: string, mode: ValueMode = ValueMode.Recursive): ObservableObjectAdministration {
 	if (isObservableObject(target))
-		return target.$mobx;
+		return (target as any).$mobx;
 
 	if (!isPlainObject(target))
 		name = (target.constructor.name || "ObservableObject") + "@" + getNextId();
@@ -111,8 +111,6 @@ export function defineObservableProperty(adm: ObservableObjectAdministration, pr
 
 	if (isComputedValue(newValue)) {
 		// desugar computed(getter, setter)
-		// TODO: deprecate this and remove in 3.0, to keep them boxed?
-		// get / set is now the idiomatic syntax for non-boxed computed values
 		observable = newValue;
 		newValue.name = name;
 		if (!newValue.scope)
@@ -239,7 +237,7 @@ function notifyPropertyAddition(adm, object, name: string, newValue) {
 
 const isObservableObjectAdministration = createInstanceofPredicate("ObservableObjectAdministration", ObservableObjectAdministration);
 
-export function isObservableObject<T>(thing: T): thing is T & IObservableObject {
+export function isObservableObject(thing: any): thing is IObservableObject {
 	if (isObject(thing)) {
 		// Initializers run lazily when transpiling to babel, so make sure they are run...
 		runLazyInitializers(thing);
