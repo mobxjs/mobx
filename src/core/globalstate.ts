@@ -20,7 +20,7 @@ export class MobXGlobals {
 	/**
 	 * Stack of currently running derivations
 	 */
-	trackingDerivation: IDerivation = null;
+	trackingDerivation: IDerivation | null = null;
 
 	/**
 	 * Each time a derivation is tracked, it is assigned a unique run-id

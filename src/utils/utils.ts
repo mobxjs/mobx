@@ -10,12 +10,17 @@ export function getNextId() {
 	return ++globalState.mobxGuid;
 }
 
+export function fail(message: string, thing?): never {
+	invariant(false, message, thing);
+	throw "X"; // unreachable
+}
+
 export function invariant(check: boolean, message: string, thing?) {
 	if (!check)
 		throw new Error("[mobx] Invariant failed: " + message + (thing ? ` in '${thing}'` : ""));
 }
 
-const deprecatedMessages = [];
+const deprecatedMessages: string[] = [];
 
 /**
  * Prints a deprecation message, but only one time.
@@ -45,7 +50,7 @@ export function once(func: Lambda): Lambda {
 export const noop = () => {};
 
 export function unique<T>(list: T[]): T[] {
-	const res = [];
+	const res: T[] = [];
 	list.forEach(item => {
 		if (res.indexOf(item) === -1)
 			res.push(item);
@@ -131,7 +136,7 @@ export function assertPropertyConfigurable(object: any, prop: string) {
 }
 
 export function getEnumerableKeys(obj) {
-	const res = [];
+	const res: string[] = [];
 	for (let key in obj)
 		res.push(key);
 	return res;

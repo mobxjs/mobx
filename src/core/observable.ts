@@ -78,7 +78,7 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 		// deleting from _observersIndexes is straight forward, to delete from _observers, let's swap `node` with last element
 		const list = observable.observers;
 		const map = observable.observersIndexes;
-		const filler = list.pop(); // get last element, which should fill the place of `node`, so the array doesnt have holes
+		const filler = list.pop()!; // get last element, which should fill the place of `node`, so the array doesnt have holes
 		if (filler !== node) { // otherwise node was the last element, which already got removed from array
 			const index = map[node.__mapid] || 0; // getting index of `node`. this is the only place we actually use map.
 			if (index) { // map store all indexes but 0, see comment in `addObserver`
@@ -139,7 +139,7 @@ export function reportObserved(observable: IObservable) {
 		 */
 		if (derivation.runId !== observable.lastAccessedBy) {
 			observable.lastAccessedBy = derivation.runId;
-			derivation.newObserving[derivation.unboundDepsCount++] = observable;
+			derivation.newObserving![derivation.unboundDepsCount++] = observable;
 		}
 	} else if (observable.observers.length === 0) {
 		queueForUnobservation(observable);

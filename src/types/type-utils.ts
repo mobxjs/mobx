@@ -1,5 +1,5 @@
 import {IDepTreeNode} from "../core/observable";
-import {invariant} from "../utils/utils";
+import {invariant, fail} from "../utils/utils";
 import {runLazyInitializers} from "../utils/decorators";
 import {isAtom} from "../core/atom";
 import {isComputedValue} from "../core/computedvalue";
@@ -25,7 +25,8 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
 		// Initializers run lazily when transpiling to babel, so make sure they are run...
 		runLazyInitializers(thing);
 		if (isObservableObject(thing)) {
-			invariant(!!property, `please specify a property`);
+			if (!property)
+				return fail(`please specify a property`);
 			const observable = (thing as any).$mobx.values[property];
 			invariant(!!observable, `no observable property '${property}' found on the observable object '${getDebugName(thing)}'`);
 			return observable;
@@ -39,7 +40,7 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
 			return thing.$mobx;
 		}
 	}
-	invariant(false, "Cannot obtain atom from " + thing);
+	return fail("Cannot obtain atom from " + thing);
 }
 
 export function getAdministration(thing: any, property?: string) {

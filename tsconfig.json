@@ -7,7 +7,7 @@
         "declaration": true,
         "module": "commonjs",
         "removeComments": false,
-		"strictNullChecks": false
+		"strictNullChecks": true
     },
     "exclude": [
         "node_modules",

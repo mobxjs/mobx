@@ -4,7 +4,7 @@ import {globalState} from "../core/globalstate";
 
 export type ITransformer<A, B> = (object: A) => B;
 
-export function createTransformer<A, B>(transformer: ITransformer<A, B>, onCleanup?: (resultObject: B, sourceObject?: A) => void): ITransformer<A, B> {
+export function createTransformer<A, B>(transformer: ITransformer<A, B>, onCleanup?: (resultObject: B | undefined, sourceObject?: A) => void): ITransformer<A, B> {
 	invariant(typeof transformer === "function" && transformer.length === 1, "createTransformer expects a function that accepts one argument");
 
 	// Memoizes: object id -> reactive view that applies transformer to the object
@@ -17,7 +17,7 @@ export function createTransformer<A, B>(transformer: ITransformer<A, B>, onClean
 	// Local transformer class specifically for this transformer
 	class Transformer extends ComputedValue<B> {
 		constructor(private sourceIdentifier: string, private sourceObject: A) {
-			super(() => transformer(sourceObject), null, false, `Transformer-${(<any>transformer).name}-${sourceIdentifier}`, undefined);
+			super(() => transformer(sourceObject), undefined, false, `Transformer-${(<any>transformer).name}-${sourceIdentifier}`, undefined);
 		}
 		onBecomeUnobserved() {
 			const lastValue = this.value;

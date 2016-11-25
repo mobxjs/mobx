@@ -63,7 +63,7 @@ export interface IIsObservableObject {
 	$mobx: ObservableObjectAdministration;
 }
 
-export function asObservableObject(target, name: string, mode: ValueMode = ValueMode.Recursive): ObservableObjectAdministration {
+export function asObservableObject(target, name: string | undefined, mode: ValueMode = ValueMode.Recursive): ObservableObjectAdministration {
 	if (isObservableObject(target))
 		return (target as any).$mobx;
 

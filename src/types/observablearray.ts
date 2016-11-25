@@ -117,7 +117,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 		return this.values.length;
 	}
 
-	setArrayLength(newLength: number): number {
+	setArrayLength(newLength: number) {
 		if (typeof newLength !== "number" || newLength < 0)
 			throw new Error("[mobx.array] Out of range: " + newLength);
 		let currentLength = this.values.length;
@@ -226,7 +226,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 export class ObservableArray<T> extends StubArray {
 	private $mobx: ObservableArrayAdministration<T>;
 
-	constructor(initialValues: T[], mode: ValueMode, name: string, owned = false) {
+	constructor(initialValues: T[] | null, mode: ValueMode, name: string | undefined, owned = false) {
 		super();
 
 		const adm = new ObservableArrayAdministration<T>(name, mode, this as any, owned);
@@ -286,7 +286,7 @@ export class ObservableArray<T> extends StubArray {
 	}
 
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
-	find(predicate: (item: T, index: number, array: ObservableArray<T>) => boolean, thisArg?, fromIndex = 0): T {
+	find(predicate: (item: T, index: number, array: ObservableArray<T>) => boolean, thisArg?, fromIndex = 0): T | undefined {
 		this.$mobx.atom.reportObserved();
 		const items = this.$mobx.values, l = items.length;
 		for (let i = fromIndex; i < l; i++)
@@ -506,7 +506,7 @@ function reserveArrayBuffer(max: number) {
 
 reserveArrayBuffer(1000);
 
-export function createObservableArray<T>(initialValues: T[], mode: ValueMode, name: string): IObservableArray<T> {
+export function createObservableArray<T>(initialValues: T[], mode: ValueMode, name?: string): IObservableArray<T> {
 	return <IObservableArray<T>><any> new ObservableArray(initialValues, mode, name);
 }
 

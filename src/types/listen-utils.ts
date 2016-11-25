@@ -2,7 +2,7 @@ import {Lambda, once} from "../utils/utils";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
 
 export interface IListenable {
-	changeListeners: Function[];
+	changeListeners: Function[] | null;
 	observe(handler: (change: any, oldValue?: any) => void, fireImmediately?: boolean): Lambda;
 }
 

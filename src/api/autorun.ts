@@ -22,14 +22,16 @@ export function autorun(view: (r: IReactionPublic) => void, scope?: any);
  * @returns disposer function, which can be used to stop the view from being updated in the future.
  */
 export function autorun(name: string, view: (r: IReactionPublic) => void, scope?: any);
-
 export function autorun(arg1: any, arg2: any, arg3?: any) {
-	let name: string, view: (r: IReactionPublic) => void, scope: any;
+	let name: string,
+		view: (r: IReactionPublic) => void,
+		scope: any;
+
 	if (typeof arg1 === "string") {
 		name = arg1;
 		view = arg2;
 		scope = arg3;
-	} else if (typeof arg1 === "function") {
+	} else {
 		name = arg1.name || ("Autorun@" + getNextId());
 		view = arg1;
 		scope = arg2;
@@ -85,7 +87,7 @@ export function when(arg1: any, arg2: any, arg3?: any, arg4?: any) {
 		predicate = arg2;
 		effect = arg3;
 		scope = arg4;
-	} else if (typeof arg1 === "function") {
+	} else {
 		name = ("When@" + getNextId());
 		predicate = arg1;
 		effect = arg2;
@@ -114,7 +116,7 @@ export function autorunAsync(arg1: any, arg2: any, arg3?: any, arg4?: any) {
 		func = arg2;
 		delay = arg3;
 		scope = arg4;
-	} else if (typeof arg1 === "function") {
+	} else {
 		name = arg1.name || ("AutorunAsync@" + getNextId());
 		func = arg1;
 		delay = arg2;
@@ -199,7 +201,7 @@ export function reaction<T>(arg1: any, arg2: any, arg3: any, arg4?: any, arg5?: 
 
 	let firstTime = true;
 	let isScheduled = false;
-	let nextValue = undefined;
+	let nextValue: T;
 
 	const r = new Reaction(name, () => {
 		if (delay < 1) {

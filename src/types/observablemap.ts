@@ -37,7 +37,7 @@ const ObservableMapMarker = {};
 
 export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, IListenable {
 	$mobx = ObservableMapMarker;
-	private _data: { [key: string]: ObservableValue<V> } = {};
+	private _data: { [key: string]: ObservableValue<V> | undefined } = {};
 	private _hasMap: { [key: string]: ObservableValue<boolean> } = {}; // hasMap, not hashMap >-).
 	private _valueMode: ValueMode;
 	public name = "ObservableMap@" + getNextId();
@@ -121,8 +121,8 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 			transaction(() => {
 				this._keys.remove(key);
 				this._updateHasMapEntry(key, false);
-				const observable = this._data[key];
-				observable.setNewValue(undefined);
+				const observable = this._data[key]!;
+				observable.setNewValue(undefined as any);
 				this._data[key] = undefined;
 			}, undefined, false);
 			if (notify)
@@ -146,7 +146,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	}
 
 	private _updateValue(name: string, newValue: V) {
-		const observable = this._data[name];
+		const observable = this._data[name]!;
 		newValue = observable.prepareNewValue(newValue) as V;
 		if (newValue !== UNCHANGED) {
 			const notifySpy = isSpyEnabled();
@@ -192,10 +192,10 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 			spyReportEnd();
 	}
 
-	get(key: string): V {
+	get(key: string): V | undefined {
 		key = "" + key;
 		if (this.has(key))
-			return this._data[key].get();
+			return this._data[key]!.get();
 		return undefined;
 	}
 
@@ -204,7 +204,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	}
 
 	values(): V[] & Iterator<V> {
-		return arrayAsIterator(this._keys.map(this.get, this));
+		return (arrayAsIterator as any)(this._keys.map(this.get, this));
 	}
 
 	entries(): IMapEntries<V> & Iterator<IMapEntry<V>> {
@@ -219,7 +219,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	merge(other: ObservableMap<V> | IKeyValueMap<V>): ObservableMap<V> {
 		transaction(() => {
 			if (isObservableMap(other))
-				other.keys().forEach(key => this.set(key, (other as ObservableMap<V>).get(key)));
+				other.keys().forEach(key => this.set(key, (other as ObservableMap<V>).get(key)!));
 			else
 				Object.keys(other).forEach(key => this.set(key, other[key]));
 		}, undefined, false);
@@ -244,7 +244,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	 */
 	toJS(): IKeyValueMap<V> {
 		const res: IKeyValueMap<V> = {};
-		this.keys().forEach(key => res[key] = this.get(key));
+		this.keys().forEach(key => res[key] = this.get(key)!);
 		return res;
 	}
 

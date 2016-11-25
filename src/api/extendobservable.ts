@@ -17,12 +17,12 @@ export function extendObservable<A extends Object, B extends Object>(target: A, 
 	properties.forEach(propSet => {
 		invariant(typeof propSet === "object", "all arguments of extendObservable should be objects");
 		invariant(!isObservable(propSet), "extending an object with another observable (object) is not supported. Please construct an explicit propertymap, using `toJS` if need. See issue #540");
-		extendObservableHelper(target, propSet, ValueMode.Recursive, null);
+		extendObservableHelper(target, propSet, ValueMode.Recursive, undefined);
 	});
 	return <A & B> target;
 }
 
-export function extendObservableHelper(target, properties, mode: ValueMode, name: string): Object {
+export function extendObservableHelper(target, properties, mode: ValueMode, name?: string): Object {
 	invariant(Object.isExtensible(target), "Cannot extend the designated object; it is not extensible");
 	const adm = asObservableObject(target, name, mode);
 	for (let key in properties) if (hasOwnProperty(properties, key)) {

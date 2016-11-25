@@ -1,4 +1,5 @@
 import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, shouldCompute} from "./derivation";
+import {IObservable} from "./observable";
 import {globalState, resetGlobalState} from "./globalstate";
 import {createInstanceofPredicate, getNextId, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
@@ -28,8 +29,8 @@ export interface IReactionPublic {
 }
 
 export class Reaction implements IDerivation, IReactionPublic {
-	observing = []; // nodes we are looking at. Our value depends on these nodes
-	newObserving = [];
+	observing: IObservable[] = []; // nodes we are looking at. Our value depends on these nodes
+	newObserving: IObservable[] = [];
 	dependenciesState = IDerivationState.NOT_TRACKING;
 	diffValue = 0;
 	runId = 0;

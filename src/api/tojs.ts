@@ -11,7 +11,7 @@ import {deprecated, isArrayLike} from "../utils/utils";
 export function toJS<T>(source: T, detectCycles?: boolean): T;
 export function toJS(source: any, detectCycles?: boolean): any;
 export function toJS(source, detectCycles: boolean, __alreadySeen: [any, any][]); // internal overload
-export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, any][] = null) {
+export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, any][] = []) {
 	// optimization: using ES6 map would be more efficient!
 	// optimization: lift this function outside toJS, this makes recursion expensive
 	function cache(value) {
@@ -58,7 +58,7 @@ export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, 
 /**
 	* Basically, a deep clone, so that no reactive property will exist anymore.
 	*/
-export function toJSlegacy(source, detectCycles: boolean = true, __alreadySeen: [any, any][] = null) {
+export function toJSlegacy(source, detectCycles: boolean = true, __alreadySeen: [any, any][] = []) {
 	deprecated("toJSlegacy is deprecated and will be removed in the next major. Use `toJS` instead. See #566");
 	// optimization: using ES6 map would be more efficient!
 	function cache(value) {
