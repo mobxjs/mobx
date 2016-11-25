@@ -7,7 +7,10 @@
         "declaration": true,
         "module": "commonjs",
         "removeComments": false,
-		"strictNullChecks": true
+		"strictNullChecks": true,
+		"noImplicitReturns": true,
+		"noImplicitUseStrict": true,
+		"noImplicitAny": false // but should be true for all publicly exposed things!
     },
     "exclude": [
         "node_modules",

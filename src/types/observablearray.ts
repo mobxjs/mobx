@@ -319,11 +319,11 @@ export class ObservableArray<T> extends StubArray {
 		return adm.values.length;
 	}
 
-	pop(): T {
+	pop(): T | undefined {
 		return this.splice(Math.max(this.$mobx.values.length - 1, 0), 1)[0];
 	}
 
-	shift(): T {
+	shift(): T | undefined {
 		return this.splice(0, 1)[0];
 	}
 

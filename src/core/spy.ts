@@ -7,7 +7,7 @@ export function isSpyEnabled() {
 
 export function spyReport(event) {
 	if (!globalState.spyListeners.length)
-		return false;
+		return;
 	const listeners = globalState.spyListeners;
 	for (let i = 0, l = listeners.length; i < l; i++)
 		listeners[i](event);

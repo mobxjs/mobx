@@ -2,7 +2,7 @@ import {globalState} from "../core/globalstate";
 import {isComputedValue} from "../core/computedvalue";
 import {isReaction} from "../core/reaction";
 import {getAtom} from "../types/type-utils";
-import {invariant, deprecated} from "../utils/utils";
+import {fail, deprecated} from "../utils/utils";
 
 function log(msg: string): string {
 	console.log(msg);
@@ -26,6 +26,5 @@ export function whyRun(thing?: any, prop?: string) {
 		return log(thing.whyRun());
 	else if (isReaction(thing))
 		return log(thing.whyRun());
-	else
-		invariant(false, "whyRun can only be used on reactions and computed values");
+	return fail("whyRun can only be used on reactions and computed values");
 }
