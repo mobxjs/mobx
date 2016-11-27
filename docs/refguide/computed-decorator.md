@@ -73,6 +73,19 @@ const box = observable({
 });
 ```
 
+This also works:
+```javascript
+class Foo {
+    @observable length: 2,
+    @computed get squared() {
+        return this.length * this.length;
+    },
+    set squared(value) { //this is automatically an action, no annotation necessary
+        this.length = Math.sqrt(value);
+    }
+}
+```
+
 _Note: setters require MobX 2.5.1 or higher_
 
 # `computed(expression)`
