@@ -15,6 +15,11 @@ declare module 'mobx' {
     setReactionScheduler: (fn: (f: () => void) => void) => void
   };
 
+  declare interface IInterceptable<T> {
+    interceptors: IInterceptor<T>[],
+    intercept(handler: IInterceptor<T>): Lambda
+  }
+
   declare type _ = {
     getAdministration: (thing: any, property?: string) => any,
     resetGlobalState: () => void
@@ -51,6 +56,9 @@ declare module 'mobx' {
   declare interface IAtom {
 
   }
+
+  declare type IDerivationState = 'NOT_TRACKING' | 'UP_TO_DATE' | 'POSSIBLY_STALE' | 'STALE'
+  declare type PropertyDescriptor = any
 
   declare interface IComputedValue<T> {
     get(): T,
@@ -92,11 +100,6 @@ declare module 'mobx' {
     dispose: () => void
   }
 
-  declare interface IInterceptable<T> {
-    interceptors: IInterceptor<T>[],
-    intercept(handler: IInterceptor<T>): Lambda
-  }
-
   declare interface IListenable {
     changeListeners: Function[],
     observe(
@@ -104,7 +107,7 @@ declare module 'mobx' {
     ): Lambda
   }
 
-  declare interface IObservableArray<T> {
+  declare interface IObservableArray<T> extends Array<T> {
     spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[],
     observe(
       listener: (changeData: IArrayChange<T> | IArraySplice<T>) => void, fireImmediately?: boolean
@@ -114,13 +117,13 @@ declare module 'mobx' {
     peek(): T[],
     replace(newItems: T[]): T[],
     find(
-      predicate: (item: T, index: number, array: IObservableArray<T>) => boolean, thisArg?: any, fromIndex?: number
+      predicate: (item: T, index: number, array: Array<T>) => boolean, thisArg?: any, fromIndex?: number
     ): T,
     remove(value: T): boolean
   }
 
   declare interface IArrayChange<T> {
-    type: "update",
+    type: 'update',
     object: IObservableArray<T>,
     index: number,
     newValue: T,
@@ -128,7 +131,7 @@ declare module 'mobx' {
   }
 
   declare interface IArraySplice<T> {
-    type: "splice",
+    type: 'splice',
     object: IObservableArray<T>,
     index: number,
     added: T[],
@@ -138,14 +141,14 @@ declare module 'mobx' {
   }
 
   declare interface IArrayWillChange<T> {
-    type: "update",
+    type: 'update',
     object: IObservableArray<T>,
     index: number,
     newValue: T
   }
 
   declare interface IArrayWillSplice<T> {
-    type: "splice",
+    type: 'splice',
     object: IObservableArray<T>,
     index: number,
     added: T[],
@@ -158,7 +161,7 @@ declare module 'mobx' {
 
   declare interface IMapChange<T> {
     object: ObservableMap<T>,
-    type: "update" | "add" | "delete",
+    type: 'update' | 'add' | 'delete',
     name: string,
     newValue?: any,
     oldValue?: any
@@ -166,33 +169,31 @@ declare module 'mobx' {
 
   declare interface IMapWillChange<T> {
     object: ObservableMap<T>,
-    type: "update" | "add" | "delete",
+    type: 'update' | 'add' | 'delete',
     name: string,
     newValue?: any
   }
 
-  declare interface IObservableObject {
-    "observable-object": IObservableObject
-  }
+  declare interface IObservableObject {}
 
   declare interface IObjectChange {
     name: string,
     object: any,
-    type: "update" | "add",
+    type: 'update' | 'add',
     oldValue?: any,
     newValue: any
   }
 
   declare interface IObjectWillChange {
     object: any,
-    type: "update" | "add",
+    type: 'update' | 'add',
     name: string,
     newValue: any
   }
 
   declare interface IValueWillChange<T> {
     object: any,
-    type: "update",
+    type: 'update',
     newValue: T
   }
 
@@ -217,10 +218,37 @@ declare module 'mobx' {
     name?: string
   }
 
-  declare function action(target: Object, propertyKey: string, descriptor?: PropertyDescriptor): void;
+  declare class ObservableMap<V> {
+    $mobx: {};
+    name: string;
+    interceptors: any;
+    changeListeners: any;
+    constructor(initialData?: IMapEntries<V> | IKeyValueMap<V>, valueModeFunc?: Function): this;
+    has(key: string): boolean;
+    set(key: string, value: V): void;
+    delete(key: string): boolean;
+    get(key: string): V;
+    keys(): string[] & Iterator<string>;
+    values(): V[] & Iterator<V>;
+    entries(): IMapEntries<V> & Iterator<IMapEntry<V>>;
+    forEach(
+      callback: (value: V, key: string, object: IKeyValueMap<V>) => void, thisArg?: any
+    ): void;
+    merge(other: ObservableMap<V> | IKeyValueMap<V>): ObservableMap<V>;
+    clear(): void;
+    size: number;
+    toJS(): IKeyValueMap<V>;
+    toJs(): IKeyValueMap<V>;
+    toJSON(): IKeyValueMap<V>;
+    toString(): string;
+    observe(listener: (changes: IMapChange<V>) => void, fireImmediately?: boolean): Lambda;
+    intercept(handler: IInterceptor<IMapWillChange<V>>): Lambda
+  }
+
+  declare function action(targetOrName: any, propertyKeyOrFuc?: any, descriptor?: PropertyDescriptor): any;
   declare function runInAction<T>(name: string, block: () => T, scope?: any): T;
   declare function isAction(thing: any): boolean;
-  declare function autorun(name: string, view: (r: IReactionPublic) => void, scope?: any): any;
+  declare function autorun(nameOrFunction: string | (r: IReactionPublic) => void, viewOrScope?: any, scope?: any): any;
   declare function when(predicate: () => boolean, effect: Lambda, scope?: any): any
   declare function autorunUntil(
     predicate: () => boolean, effect: (r: IReactionPublic) => void, scope?: any
@@ -230,17 +258,22 @@ declare module 'mobx' {
     expression: () => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately?: boolean, delay?: number, scope?: any
   ): any
 
-  declare function computed(target: Object, key: string, baseDescriptor?: PropertyDescriptor): IComputedValue<T> | void
+  declare function computed<T>(target: any, key?: string, baseDescriptor?: PropertyDescriptor): any
   declare function createTransformer<A, B>(
     transformer: ITransformer<A, B>, onCleanup?: (resultObject: B, sourceObject?: A) => void
   ): ITransformer<A, B>
   declare function expr<T>(expr: () => T, scope?: any): T
   declare function extendObservable<A, B>(target: A, ...properties: B[]): A & B
-  declare function intercept(object: Object, property: string, handler: IInterceptor<IValueWillChange<any>>): Lambda
+
+
+  declare function intercept(object: Object, property: string, handler: IInterceptor<any>): Lambda;
+
   declare function isComputed(value: any, property?: string): boolean
 
   declare function isObservable(value: any, property?: string): boolean
-  declare function observable<T>(value: T): T & IObservableObject
+
+  declare function observable<T>(value: T): any
+
   declare function observe(
     object: Object, property: string, listener: (newValue: any, oldValue: any) => void, fireImmediately?: boolean
   ): Lambda
@@ -273,7 +306,7 @@ declare module 'mobx' {
 
   declare function isArrayLike(x: any): boolean
 
-  declare class BaseAtom extends IAtom {
+  declare class BaseAtom {
     name: string;
     isPendingUnobservation: boolean;
     observers: any[];
@@ -288,7 +321,7 @@ declare module 'mobx' {
     toString(): string
   }
 
-  declare class Atom extends BaseAtom, IAtom {
+  declare class Atom {
     name: string;
     onBecomeObservedHandler: () => void;
     onBecomeUnobservedHandler: () => void;
@@ -299,7 +332,7 @@ declare module 'mobx' {
     onBecomeUnobserved(): void
   }
 
-  declare class Reaction extends IDerivation {
+  declare class Reaction {
     name: string;
     observing: any[];
     newObserving: any[];
@@ -325,32 +358,5 @@ declare module 'mobx' {
     };
     toString(): string;
     whyRun(): string
-  }
-
-  declare class ObservableMap<V> extends IInterceptable<IMapWillChange<V>> {
-    $mobx: {};
-    name: string;
-    interceptors: any;
-    changeListeners: any;
-    constructor(initialData?: IMapEntries<V> | IKeyValueMap<V>, valueModeFunc?: Function): this;
-    has(key: string): boolean;
-    set(key: string, value: V): void;
-    delete(key: string): boolean;
-    get(key: string): V;
-    keys(): string[] & Iterator<string>;
-    values(): V[] & Iterator<V>;
-    entries(): IMapEntries<V> & Iterator<IMapEntry<V>>;
-    forEach(
-      callback: (value: V, key: string, object: IKeyValueMap<V>) => void, thisArg?: any
-    ): void;
-    merge(other: ObservableMap<V> | IKeyValueMap<V>): ObservableMap<V>;
-    clear(): void;
-    size: number;
-    toJS(): IKeyValueMap<V>;
-    toJs(): IKeyValueMap<V>;
-    toJSON(): IKeyValueMap<V>;
-    toString(): string;
-    observe(listener: (changes: IMapChange<V>) => void, fireImmediately?: boolean): Lambda;
-    intercept(handler: IInterceptor<IMapWillChange<V>>): Lambda
   }
 }
