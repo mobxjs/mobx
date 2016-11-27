@@ -17,7 +17,7 @@ const observableArray: IObservableArray<number> = mobx.observable([1,2,3]);
 // $ExpectError
 const initialArray: Array<string> = observableArray.peek();
 
-const sum: IComputedValue<any> = mobx.computed(() => {
+const sum: IComputedValue<number> = mobx.computed(() => {
   return observableArray.reduce((a: number, b: number): number => {
     return a + b;
   }, 0);

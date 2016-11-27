@@ -275,7 +275,7 @@ declare module 'mobx' {
   declare function observable<T>(value: T): any
 
   declare function observe(
-    object: Object, property: string, listener: (newValue: any, oldValue: any) => void, fireImmediately?: boolean
+    object: any, property: string, listener: (newValue: any, oldValue: any) => void, fireImmediately?: boolean
   ): Lambda
 
   declare function toJS(source: any, detectCycles: boolean, ___alreadySeen: [any, any][]): any
