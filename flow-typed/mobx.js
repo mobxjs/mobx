@@ -4,19 +4,20 @@ declare module 'mobx' {
     getAtom: (thing: any, property?: string) => IDepTreeNode,
     getDebugName: (thing: any, property?: string) => string,
     getDependencyTree: (thing: any, property?: string) => IDependencyTree,
+    getGlobalState: () => any;
     getObserverTree: (thing: any, property?: string) => IObserverTree,
     isComputingDerivation: () => boolean,
     isSpyEnabled: () => boolean,
     resetGlobalState: () => void,
+    shareGlobalState: () => void;
     spyReport: (event: any) => boolean,
     spyReportEnd: (change?: any) => void,
     spyReportStart: (event: any) => void,
-    trackTransitions: (onReport?: (c: any) => void) => Lambda,
     setReactionScheduler: (fn: (f: () => void) => void) => void
   };
 
   declare interface IInterceptable<T> {
-    interceptors: IInterceptor<T>[],
+    interceptors: IInterceptor<T>[] | any,
     intercept(handler: IInterceptor<T>): Lambda
   }
 
@@ -68,22 +69,6 @@ declare module 'mobx' {
     ): Lambda
   }
 
-  declare interface IDerivation {
-    observing: IObservable[],
-    newObserving: IObservable[],
-    dependenciesState: IDerivationState,
-    runId: number,
-    unboundDepsCount: number,
-    ___mapid: string,
-    onBecomeStale(): any,
-    recoverFromError(): any
-  }
-
-  declare interface IDepTreeNode {
-    name: string,
-    observing?: IObservable[]
-  }
-
   declare interface IObservable {
     diffValue: number,
     lastAccessedBy: number,
@@ -96,12 +81,29 @@ declare module 'mobx' {
     onBecomeUnobserved(): any
   }
 
+  declare interface IDepTreeNode {
+    name: string,
+    observing?: IObservable[]
+  }
+
+  declare interface IDerivation  {
+    name: string,
+    observing: IObservable[],
+    newObserving: ?IObservable[],
+    dependenciesState: IDerivationState,
+    runId: number,
+    unboundDepsCount: number,
+    ___mapid: string,
+    onBecomeStale(): any,
+    recoverFromError(): any
+  }
+
   declare interface IReactionPublic {
     dispose: () => void
   }
 
   declare interface IListenable {
-    changeListeners: Function[],
+    changeListeners: any,
     observe(
       handler: (change: any, oldValue?: any) => void, fireImmediately?: boolean
     ): Lambda
@@ -118,7 +120,7 @@ declare module 'mobx' {
     replace(newItems: T[]): T[],
     find(
       predicate: (item: T, index: number, array: Array<T>) => boolean, thisArg?: any, fromIndex?: number
-    ): T,
+    ): T | any,
     remove(value: T): boolean
   }
 
@@ -250,9 +252,6 @@ declare module 'mobx' {
   declare function isAction(thing: any): boolean;
   declare function autorun(nameOrFunction: string | (r: IReactionPublic) => void, viewOrScope?: any, scope?: any): any;
   declare function when(predicate: () => boolean, effect: Lambda, scope?: any): any
-  declare function autorunUntil(
-    predicate: () => boolean, effect: (r: IReactionPublic) => void, scope?: any
-  ): any
   declare function autorunAsync(func: (r: IReactionPublic) => void, delay?: number, scope?: any): any
   declare function reaction<T>(
     expression: () => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately?: boolean, delay?: number, scope?: any
@@ -260,7 +259,7 @@ declare module 'mobx' {
 
   declare function computed<T>(target: any, key?: string, baseDescriptor?: PropertyDescriptor): any
   declare function createTransformer<A, B>(
-    transformer: ITransformer<A, B>, onCleanup?: (resultObject: B, sourceObject?: A) => void
+    transformer: ITransformer<A, B>, onCleanup?: (resultObject: ?B | any, sourceObject?: A) => void
   ): ITransformer<A, B>
   declare function expr<T>(expr: () => T, scope?: any): T
   declare function extendObservable<A, B>(target: A, ...properties: B[]): A & B
@@ -275,12 +274,11 @@ declare module 'mobx' {
   declare function observable<T>(value: T): any
 
   declare function observe(
-    object: any, property: string, listener: (newValue: any, oldValue: any) => void, fireImmediately?: boolean
+    object: any, property: string, listener: (newValue: any, oldValue?: any) => void, fireImmediately?: boolean
   ): Lambda
 
   declare function toJS(source: any, detectCycles: boolean, ___alreadySeen: [any, any][]): any
   declare function toJSlegacy(source: any, detectCycles?: boolean, ___alreadySeen?: [any, any][]): any
-  declare function toJSON(source: any, detectCycles?: boolean, ___alreadySeen?: [any, any][]): any
   declare function whyRun(thing?: any, prop?: string): string
   declare function useStrict(strict: boolean): any
 
@@ -295,7 +293,6 @@ declare module 'mobx' {
   declare function asStructure<T>(value: T): T
   declare function asFlat<T>(value: T): T
   declare function asMap<T>(data: IKeyValueMap<T>, modifierFunc?: Function): ObservableMap<T>
-  declare function fastArray<V>(initialValues?: V[]): IObservableArray<V>
   declare function isObservableArray(thing: any): boolean
 
   declare function map<V>(
