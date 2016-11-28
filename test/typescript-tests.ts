@@ -254,7 +254,7 @@ test('computed setter should succeed', function(t) {
 
 test('atom clock example', function(t) {
 	let ticks = 0;
-	const time_factor = 50; // speed up / slow down tests
+	const time_factor = 500; // speed up / slow down tests
 
 	class Clock {
 		atom: Atom;
