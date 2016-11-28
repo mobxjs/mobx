@@ -4,7 +4,7 @@
 
 A deprecation message will now be printed if creating computed properties while relying on automatical inferrence of argumentless functions as computed values. In other words, when using `observable` or `extendObservable` in the following manner:
 
-```
+```js
 const x = observable({
 	computedProp: function() {
 		return someComputation
@@ -19,7 +19,7 @@ x.computedProp()
 
 Instead, to create a computed property, use:
 
-```
+```js
 observable({
 	get computedProp() {
 		return someComputation
@@ -29,7 +29,7 @@ observable({
 
 or alternatively:
 
-```
+```js
 observable({
 	computedProp: computed(function() {
 		return someComputation
@@ -45,7 +45,7 @@ An observable _reference_ to the function will be made and the function itself w
 See for more details [#532](https://github.com/mobxjs/mobx/issues/532)
 
 N.B. If you want to introduce actions on an observable that modify it's state, using `action` is still the recommended approach:
-```
+```js
 observable({
 	counter: 0,
 	increment: action(function() {
@@ -87,6 +87,20 @@ As always, it is best practice not to have transportation objects etc lingering 
 If you already adhered to this rule, this change won't impact you.
 
 See [#649](https://github.com/mobxjs/mobx/issues/649)
+
+### Flow-Types Support 🎉🎉🎉
+
+Add flow types for methods and interfaces of observable variables:
+```js
+const observableValue: IObservableValue<number> = observable(1)
+const observableArray: IObservableArray<number> = observable([1,2,3])
+
+const sum: IComputedValue<number> = computed(() => {
+	return observableArray.reduce((a: number, b: number): number => a + b, 0)
+})
+```
+
+See [#640](https://github.com/mobxjs/mobx/issues/640)
 
 ### Other changes
 
