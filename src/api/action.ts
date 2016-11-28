@@ -68,7 +68,7 @@ export function runInAction<T>(arg1, arg2?, arg3?) {
 	invariant(fn.length === 0, "`runInAction` expects a function without arguments");
 	invariant(typeof actionName === "string" && actionName.length > 0, `actions should have valid names, got: '${actionName}'`);
 
-	return executeAction(actionName, fn, scope);
+	return executeAction(actionName, fn, scope, undefined);
 }
 
 export function isAction(thing: any) {
