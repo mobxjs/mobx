@@ -11,3 +11,4 @@ test/typescript-tests.js*
 dist/
 .build/
 yarn.lock
+.idea
