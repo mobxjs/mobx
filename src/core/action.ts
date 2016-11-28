@@ -1,5 +1,5 @@
 import {transactionStart, transactionEnd} from "../core/transaction";
-import {invariant, deprecated} from "../utils/utils";
+import {invariant} from "../utils/utils";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {isComputedValue} from "../core/computedvalue";
@@ -15,18 +15,18 @@ export function createAction(actionName: string, fn: Function): Function {
 	return res;
 }
 
-export function executeAction(actionName: string, fn: Function, scope: any, args: IArguments) {
+export function executeAction(actionName: string, fn: Function, scope: any, args?: IArguments) {
 	// actions should not be called from computeds. check only works if the computed is actively observed, but that is fine enough as heuristic
 	invariant(!isComputedValue(globalState.trackingDerivation), "Computed values or transformers should not invoke actions or trigger other side effects");
 
 	const notifySpy = isSpyEnabled();
-	let startTime: number;
+	let startTime: number = 0;
 	if (notifySpy) {
 		startTime = Date.now();
 		const l = (args && args.length) || 0;
 		const flattendArgs = new Array(l);
 		if (l > 0) for (let i = 0; i < l; i++)
-			flattendArgs[i] = args[i];
+			flattendArgs[i] = args![i];
 		spyReportStart({
 			type: "action",
 			name: actionName,
@@ -51,17 +51,10 @@ export function executeAction(actionName: string, fn: Function, scope: any, args
 	}
 }
 
-export function useStrict(): boolean;
-export function useStrict(strict: boolean);
-export function useStrict(strict?: boolean): any {
-	if (arguments.length === 0) {
-		deprecated("`useStrict` without arguments is deprecated, use `isStrictModeEnabled()` instead");
-		return globalState.strictMode;
-	} else {
-		invariant(globalState.trackingDerivation === null, "It is not allowed to set `useStrict` when a derivation is running");
-		globalState.strictMode = strict;
-		globalState.allowStateChanges = !strict;
-	}
+export function useStrict(strict: boolean): any {
+	invariant(globalState.trackingDerivation === null, "It is not allowed to set `useStrict` when a derivation is running");
+	globalState.strictMode = strict;
+	globalState.allowStateChanges = !strict;
 }
 
 export function isStrictModeEnabled(): boolean {

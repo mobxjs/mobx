@@ -34,7 +34,7 @@ export { IListenable                                          } from "./types/li
 export { IObjectWillChange, IObjectChange, IObservableObject, isObservableObject } from "./types/observableobject";
 export { /* 3.0: IValueDidChange, */ IValueWillChange, IObservableValue } from "./types/observablevalue";
 
-export { IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, isObservableArray, fastArray } from "./types/observablearray";
+export { IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, isObservableArray } from "./types/observablearray";
 export { IKeyValueMap, ObservableMap, IMapEntries, IMapEntry, IMapWillChange, IMapChange, isObservableMap, map } from "./types/observablemap"
 
 export { observable                                           } from "./api/observable";
@@ -44,26 +44,25 @@ export { isComputed                                           } from "./api/isco
 export { extendObservable                                     } from "./api/extendobservable";
 export { observe                                              } from "./api/observe";
 export { intercept                                            } from "./api/intercept";
-export { autorun, autorunAsync, autorunUntil, when, reaction  } from "./api/autorun";
+export { autorun, autorunAsync, when, reaction  } from "./api/autorun";
 export { action, isAction, runInAction                        } from "./api/action";
 
 export { expr                                                 } from "./api/expr";
-export { toJSON, toJS, toJSlegacy                             } from "./api/tojs";
+export { toJS, toJSlegacy                             } from "./api/tojs";
 export { ITransformer, createTransformer                      } from "./api/createtransformer";
 export { whyRun                                               } from "./api/whyrun";
 
 export { Lambda, isArrayLike                                  } from "./utils/utils";
 export { Iterator                                             } from "./utils/iterable";
-export { SimpleEventEmitter, ISimpleEventListener             } from "./utils/simpleeventemitter";
 export { IObserverTree, IDependencyTree                       } from "./api/extras";
 
-import { resetGlobalState } from "./core/globalstate";
+import { resetGlobalState, shareGlobalState, getGlobalState } from "./core/globalstate";
 
 import { IDepTreeNode } from "./core/observable";
 import { IObserverTree, IDependencyTree, getDependencyTree, getObserverTree } from "./api/extras";
 import { getDebugName, getAtom, getAdministration } from "./types/type-utils";
 import { allowStateChanges } from "./core/action";
-import { trackTransitions, spyReport, spyReportEnd, spyReportStart, isSpyEnabled } from "./core/spy";
+import { spyReport, spyReportEnd, spyReportStart, isSpyEnabled } from "./core/spy";
 import { Lambda } from "./utils/utils";
 import { isComputingDerivation } from "./core/derivation";
 import { setReactionScheduler } from "./core/reaction";
@@ -73,14 +72,15 @@ export const extras = {
 	getAtom,
 	getDebugName,
 	getDependencyTree,
+	getGlobalState,
 	getObserverTree,
 	isComputingDerivation,
 	isSpyEnabled,
 	resetGlobalState,
+	shareGlobalState,
 	spyReport,
 	spyReportEnd,
 	spyReportStart,
-	trackTransitions,
 	setReactionScheduler
 };
 

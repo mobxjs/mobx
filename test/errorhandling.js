@@ -29,7 +29,7 @@ function buffer() {
 }
 
 function checkGlobalState(t) {
-	const gs = global.__mobxGlobal;
+	const gs = mobx.extras.getGlobalState();
 	t.equal(gs.trackingDerivation, null)
 	t.equal(gs.inTransaction, 0)
 	t.equal(gs.isRunningReactions, false)
@@ -50,7 +50,7 @@ test('exception1', function(t) {
 test('deny state changes in views', function(t) {
     var x = observable(3);
     var z = observable(5);
-    var y = observable(function() {
+    var y = computed(function() {
         z(6);
         return x() * x();
     });
@@ -90,7 +90,7 @@ test('deny array change in view', function(t) {
     try {
         var x = observable(3);
         var z = observable([]);
-        var y = observable(function() {
+        var y = computed(function() {
             z.push(3);
             return x() * x();
         });
@@ -143,7 +143,7 @@ test('throw error if modification loop', function(t) {
 
 test('cycle1', function(t) {
     t.throws(() => {
-        var p = observable(function() { return p() * 2; }); // thats a cycle!
+        var p = computed(function() { return p() * 2; }); // thats a cycle!
         p.observe(voidObserver, true);
     }, "Found cyclic dependency");
 	checkGlobalState(t);
@@ -151,8 +151,8 @@ test('cycle1', function(t) {
 })
 
 test('cycle2', function(t) {
-    var a = observable(function() { return b.get() * 2; });
-    var b = observable(function() { return a.get() * 2; });
+    var a = computed(function() { return b.get() * 2; });
+    var b = computed(function() { return a.get() * 2; });
     t.throws(() => {
         b.get()
     }, "Found cyclic dependency");
@@ -161,7 +161,7 @@ test('cycle2', function(t) {
 })
 
 test('cycle3', function(t) {
-    var p = observable(function() { return p.get() * 2; });
+    var p = computed(function() { return p.get() * 2; });
     t.throws(() => {
         p.get();
     }, "Found cyclic dependency");
@@ -171,8 +171,8 @@ test('cycle3', function(t) {
 
 test('cycle3', function(t) {
     var z = observable(true);
-    var a = observable(function() { return z.get() ? 1 : b.get() * 2; });
-    var b = observable(function() { return a.get() * 2; });
+    var a = computed(function() { return z.get() ? 1 : b.get() * 2; });
+    var b = computed(function() { return a.get() * 2; });
 
     m.observe(b, voidObserver);
     t.equal(1, a.get());

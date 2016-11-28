@@ -64,7 +64,7 @@ test('decorators', function(t) {
 
 test('observable', function(t) {
     var a = observable(3);
-    var b = observable(() => a.get() * 2);
+    var b = computed(() => a.get() * 2);
     t.equal(b.get(), 6);
     t.end();
 })
@@ -254,7 +254,7 @@ test('computed setter should succeed', function(t) {
 
 test('atom clock example', function(t) {
 	let ticks = 0;
-	const time_factor = 50; // speed up / slow down tests
+	const time_factor = 500; // speed up / slow down tests
 
 	class Clock {
 		atom: Atom;

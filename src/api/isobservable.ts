@@ -17,7 +17,7 @@ export function isObservable(value, property?: string): boolean {
 		if (isObservableArray(value) || isObservableMap(value))
 			throw new Error("[mobx.isObservable] isObservable(object, propertyName) is not supported for arrays and maps. Use map.has or array.length instead.");
 		else if (isObservableObject(value)) {
-			const o = <ObservableObjectAdministration> value.$mobx;
+			const o = <ObservableObjectAdministration> (value as any).$mobx;
 			return o.values && !!o.values[property];
 		}
 		return false;

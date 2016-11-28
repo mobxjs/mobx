@@ -4,7 +4,7 @@ import {untrackedStart, untrackedEnd} from "../core/derivation";
 export type IInterceptor<T> = (change: T) => T;
 
 export interface IInterceptable<T> {
-	interceptors: IInterceptor<T>[];
+	interceptors: IInterceptor<T>[] | null;
 	intercept(handler: IInterceptor<T>): Lambda;
 }
 
@@ -24,13 +24,16 @@ export function registerInterceptor<T>(interceptable: IInterceptable<T>, handler
 
 export function interceptChange<T>(interceptable: IInterceptable<T>, change: T): T {
 	const prevU = untrackedStart();
-	const interceptors = interceptable.interceptors;
-	for (let i = 0, l = interceptors.length; i < l; i++) {
-		change = interceptors[i](change);
-		invariant(!change || (change as any).type, "Intercept handlers should return nothing or a change object");
-		if (!change)
-			return null;
+	try {
+		const interceptors = interceptable.interceptors;
+		if (interceptors) for (let i = 0, l = interceptors.length; i < l; i++) {
+			change = interceptors[i](change);
+			invariant(!change || (change as any).type, "Intercept handlers should return nothing or a change object");
+			if (!change)
+				break;
+		}
+		return change;
+	} finally {
+		untrackedEnd(prevU);
 	}
-	untrackedEnd(prevU);
-	return change;
 }

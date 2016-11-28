@@ -43,7 +43,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	lowestObserverState = IDerivationState.UP_TO_DATE;
 	unboundDepsCount = 0;
 	__mapid = "#" + getNextId();
-	protected value: T = undefined;
+	protected value: T | undefined = undefined;
 	name: string;
 	isComputing: boolean = false; // to check for cycles
 	isRunningSetter: boolean = false; // TODO optimize, see: https://reaktor.com/blog/javascript-performance-fundamentals-make-bluebird-fast/
@@ -59,7 +59,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	 * However, enabling compareStructural can be convienent if you always produce an new aggregated object and don't want to notify observers if it is structurally the same.
 	 * This is useful for working with vectors, mouse coordinates etc.
 	 */
-	constructor(public derivation: () => T, private scope: Object, private compareStructural: boolean, name: string, setter: (v: T) => void) {
+	constructor(public derivation: () => T, public scope: Object | undefined, private compareStructural: boolean, name: string, setter?: (v: T) => void) {
 		this.name  = name || "ComputedValue@" + getNextId();
 		if (setter)
 			this.setter = createAction(name + "-setter", setter) as any;
@@ -117,7 +117,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 					propagateChangeConfirmed(this);
 
 		}
-		const result = this.value;
+		const result = this.value!;
 		endBatch();
 
 		return result;
@@ -157,9 +157,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		return valueDidChange(this.compareStructural, newValue, oldValue);
 	}
 
-	observe(listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda {
+	observe(listener: (newValue: T, oldValue: T | undefined) => void, fireImmediately?: boolean): Lambda {
 		let firstTime = true;
-		let prevValue = undefined;
+		let prevValue: T | undefined = undefined;
 		return autorun(() => {
 			let newValue = this.get();
 			if (!firstTime || fireImmediately) {
@@ -182,7 +182,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
 	whyRun() {
 		const isTracking = Boolean(globalState.trackingDerivation);
-		const observing = unique(this.isComputing ? this.newObserving : this.observing).map((dep: any) => dep.name);
+		const observing = unique(this.isComputing ? this.newObserving! : this.observing).map((dep: any) => dep.name);
 		const observers = unique(getObservers(this).map(dep => dep.name));
 // TODO: use issue
 // TOOD; expand wiht more states

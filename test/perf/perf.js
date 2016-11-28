@@ -1,6 +1,7 @@
 var test = require('tape');
 var mobx = require('../..');
 var observable = mobx.observable;
+var computed = mobx.computed;
 var log = require('./index.js').logMeasurement;
 
 function gc() {
@@ -28,7 +29,7 @@ test('one observes ten thousand that observe one', function (t) {
     var observers = [];
     for (var i = 0; i < 10000; i++) {
         (function(idx) {
-            observers.push(observable(function() {
+            observers.push(computed(function() {
                 return a.get() * idx;
             }))
         })(i);
@@ -36,7 +37,7 @@ test('one observes ten thousand that observe one', function (t) {
 
     var bCalcs = 0;
     // one observers that listens to many..
-    var b = observable(function() {
+    var b = computed(function() {
         var res = 0;
         for(var i = 0; i < observers.length; i++)
         	res += observers[i].get();
@@ -64,7 +65,7 @@ test('five hundrend properties that observe their sibling', function (t) {
     var observables = [observable(1)];
     for(var i = 0; i < 500; i++) {
         (function(idx) {
-            observables.push(observable(function() { return observables[idx].get() + 1 }));
+            observables.push(computed(function() { return observables[idx].get() + 1 }));
         })(i);
     }
 
@@ -89,7 +90,7 @@ test('late dependency change', function(t) {
 	for(var i = 0; i < 100; i++)
 		values.push(observable(0))
 
-    var sum = observable(function() {
+    var sum = computed(function() {
         var sum = 0;
         for(var i = 0; i < 100; i++)
     	    sum += values[i].get();
@@ -116,14 +117,14 @@ test('lots of unused computables', function(t) {
     var observers = [];
     for (var i = 0; i < 10000; i++) {
         (function(idx) {
-            observers.push(observable(function() {
+            observers.push(computed(function() {
                 return a.get() * idx;
             }))
         })(i);
     }
 
     // one observers that listens to many..
-    var b = observable(function() {
+    var b = computed(function() {
         var res = 0;
         for(var i = 0; i < observers.length; i++)
         	res += observers[i].get();
@@ -156,7 +157,7 @@ test('many unreferenced observables', function(t) {
     var a = observable(3);
     var b = observable(6);
     var c = observable(7);
-    var d = observable(function() { return a.get() * b.get() * c.get() });
+    var d = computed(function() { return a.get() * b.get() * c.get() });
     t.equal(d.get(), 126);
     t.equal(d.dependenciesState, -1);
     var start = now();
@@ -177,7 +178,7 @@ test('array reduce', function(t) {
     var ar = observable([]);
     var b = observable(1);
 
-    var sum = observable(function() {
+    var sum = computed(function() {
         aCalc++;
         return ar.reduce(function(a, c) {
             return a + c * b.get();
@@ -214,7 +215,7 @@ test('array classic loop', function(t) {
     var ar = observable([]);
     var aCalc = 0;
     var b = observable(1);
-    var sum = observable(function() {
+    var sum = computed(function() {
         var s = 0;
         aCalc++;
         for(var i = 0; i < ar.length; i++)
@@ -254,7 +255,7 @@ function order_system_helper(t, usebatch, keepObserving) {
     var orders = observable([]);
     var vat = observable(2);
 
-    var totalAmount = observable(function() {
+    var totalAmount = computed(function() {
         var sum = 0, l = orders.length;
         for(var i = 0; i < l; i++)
         	sum += orders[i].total.get();
@@ -265,7 +266,7 @@ function order_system_helper(t, usebatch, keepObserving) {
     function OrderLine(order, price, amount) {
         this.price = observable(price);
         this.amount = observable(amount);
-        this.total = observable(function() {
+        this.total = computed(function() {
             return order.vat.get() * this.price.get() * this.amount.get();
         }, this);
     }
@@ -274,13 +275,13 @@ function order_system_helper(t, usebatch, keepObserving) {
         this.includeVat = observable(includeVat);
         this.lines = observable([]);
 
-        this.vat = observable(function() {
+        this.vat = computed(function() {
             if (this.includeVat.get())
             	return vat.get();
             return 1;
         }, this);
 
-        this.total = observable(function() {
+        this.total = computed(function() {
             return this.lines.reduce(function(acc, order) {
                 return acc + order.total.get();
             }, 0);
@@ -368,7 +369,7 @@ test('create array (fast)', function(t) {
         a.push(i);
     var start = now();
     for(var i = 0; i < 1000; i++)
-        mobx.fastArray(a);
+        mobx.observable(mobx.asFlat(a));
     log('\nCreate array (non-recursive)  Created in ' + (now() - start) + 'ms.');
     t.end();
 })

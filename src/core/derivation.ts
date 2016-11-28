@@ -31,7 +31,7 @@ export enum IDerivationState {
  */
 export interface IDerivation extends IDepTreeNode {
 	observing: IObservable[];
-	newObserving: IObservable[];
+	newObserving: null | IObservable[];
 	dependenciesState: IDerivationState;
 	/**
 	 * Id of the current run of a derivation. Each time the derivation is tracked
@@ -72,7 +72,7 @@ export function shouldCompute(derivation: IDerivation): boolean {
 						obj.get();
 						// if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
 						// and `derivation` is an observer of `obj`
-						if (derivation.dependenciesState === IDerivationState.STALE) {
+						if ((derivation as any).dependenciesState === IDerivationState.STALE) {
 							hasError = false;
 							untrackedEnd(prevUntracked);
 							return true;
@@ -171,7 +171,7 @@ function bindDependencies(derivation: IDerivation) {
 	// invariant(derivation.dependenciesState !== IDerivationState.NOT_TRACKING, "INTERNAL ERROR bindDependencies expects derivation.dependenciesState !== -1");
 
 	const prevObserving = derivation.observing;
-	const observing = derivation.observing = derivation.newObserving;
+	const observing = derivation.observing = derivation.newObserving!;
 
 	derivation.newObserving = null; // newObserving shouldn't be needed outside tracking
 
@@ -231,13 +231,13 @@ export function untracked<T>(action: () => T): T {
 	return res;
 }
 
-export function untrackedStart(): IDerivation {
+export function untrackedStart(): IDerivation | null {
 	const prev = globalState.trackingDerivation;
 	globalState.trackingDerivation = null;
 	return prev;
 }
 
-export function untrackedEnd(prev: IDerivation) {
+export function untrackedEnd(prev: IDerivation | null) {
 	globalState.trackingDerivation = prev;
 }
 

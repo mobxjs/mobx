@@ -20,7 +20,7 @@ const computedDecorator = createClassPropertyDecorator(
 		if (decoratorArgs && decoratorArgs.length === 1 && decoratorArgs[0].asStructure === true)
 			compareStructural = true;
 
-		const adm = asObservableObject(target, undefined, ValueMode.Recursive);
+		const adm = asObservableObject(target, "", ValueMode.Recursive);
 		defineObservableProperty(adm, name, compareStructural ? asStructure(baseValue) : baseValue, false, setter);
 	},
 	function (name) {

@@ -35,7 +35,7 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 	hasUnreportedChange = false;
 	interceptors;
 	changeListeners;
-	protected value: T = undefined;
+	protected value;
 
 	constructor(value: T, protected mode: ValueMode, name = "ObservableValue@" + getNextId(), notifySpy = true) {
 		super(name);
@@ -100,7 +100,7 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 		return registerInterceptor(this, handler);
 	}
 
-	public observe(listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda {
+	public observe(listener: (newValue: T, oldValue: T | undefined) => void, fireImmediately?: boolean): Lambda {
 		if (fireImmediately)
 			listener(this.value, undefined);
 		return registerListener(this, listener);

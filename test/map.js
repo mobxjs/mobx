@@ -5,7 +5,7 @@ var autorun = mobx.autorun;
 var iterall = require('iterall');
 
 test('map crud', function(t) {
-	global.__mobxGlobal.mobxGuid = 0; // hmm dangerous reset?
+	mobx.extras.getGlobalState().mobxGuid = 0; // hmm dangerous reset?
 
 	var events = [];
 	var m = map({ a: 1});
@@ -30,7 +30,7 @@ test('map crud', function(t) {
 	t.deepEqual(m.keys(), ["a", "b"]);
 	t.deepEqual(m.values(), [2, 3]);
 	t.deepEqual(m.entries(), [["a", 2], ["b", 3]]);
-	t.deepEqual(m.toJs(), { a: 2, b: 3});
+	t.deepEqual(m.toJS(), { a: 2, b: 3});
 	t.deepEqual(JSON.stringify(m), '{"a":2,"b":3}');
 	t.deepEqual(m.toString(), "ObservableMap@1[{ a: 2, b: 3 }]");
 	t.equal(m.size, 2);
@@ -38,7 +38,7 @@ test('map crud', function(t) {
 	m.clear();
 	t.deepEqual(m.keys(), []);
 	t.deepEqual(m.values(), []);
-	t.deepEqual(m.toJs(), { });
+	t.deepEqual(m.toJS(), { });
 	t.deepEqual(m.toString(), "ObservableMap@1[{  }]");
 	t.equal(m.size, 0);
 
@@ -74,7 +74,7 @@ test('map merge', function(t) {
 	var a = map({a: 1, b: 2, c: 2});
 	var b = map({c: 3, d: 4});
 	a.merge(b);
-	t.deepEqual(a.toJs(), { a: 1, b: 2, c: 3, d: 4 });
+	t.deepEqual(a.toJS(), { a: 1, b: 2, c: 3, d: 4 });
 
 	t.end();
 })
@@ -127,7 +127,7 @@ test('observe value', function(t) {
 
 test('initialize with entries', function(t) {
 	var a = map([["a", 1], ["b", 2]]);
-	t.deepEqual(a.toJs(), { a: 1, b: 2});
+	t.deepEqual(a.toJS(), { a: 1, b: 2});
 	t.end();
 })
 
@@ -140,9 +140,9 @@ test('initialize with empty value', function(t) {
 	b.set('0', 0);
 	c.set('0', 0);
 
-	t.deepEqual(a.toJs(), { '0': 0 });
-	t.deepEqual(b.toJs(), { '0': 0 });
-	t.deepEqual(c.toJs(), { '0': 0 });
+	t.deepEqual(a.toJS(), { '0': 0 });
+	t.deepEqual(b.toJS(), { '0': 0 });
+	t.deepEqual(c.toJS(), { '0': 0 });
 
 	t.end();
 })

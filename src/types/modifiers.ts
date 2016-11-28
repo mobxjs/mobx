@@ -1,4 +1,4 @@
-import {isPlainObject, invariant, isObject} from "../utils/utils";
+import {isPlainObject, invariant, fail} from "../utils/utils";
 import {isObservable} from "../api/isobservable";
 import {extendObservableHelper} from "../api/extendobservable";
 import {createObservableArray} from "../types/observablearray";
@@ -25,7 +25,7 @@ function withModifier(modifier: ValueMode, value: any): IModifierWrapper {
 	};
 }
 
-export function getModifier(value: any): ValueMode {
+export function getModifier(value: any): ValueMode | null {
 	if (value) { // works for both objects and functions
 		return (value.mobxModifier as ValueMode) || null;
 	}
@@ -91,8 +91,9 @@ export function getValueModeFromModifierFunc(func?: Function): ValueMode {
 	if (func === undefined)
 		return ValueMode.Recursive;
 	const mod = getModifier(func);
-	invariant(mod !== null, "Cannot determine value mode from function. Please pass in one of these: mobx.asReference, mobx.asStructure or mobx.asFlat, got: " + func);
-	return mod;
+	if (mod !== null)
+		return mod;
+	return fail("Cannot determine value mode from function. Please pass in one of these: mobx.asReference, mobx.asStructure or mobx.asFlat, got: " + func);
 }
 
 
@@ -116,13 +117,13 @@ export function makeChildObservable(value, parentMode: ValueMode, name?: string)
 			[childMode, value] = getValueModeFromValue(value, ValueMode.Recursive);
 			break;
 		default:
-			invariant(false, "Illegal State");
+			return fail("Illegal State");
 	}
 
 	if (Array.isArray(value))
 		return createObservableArray(value as any[], childMode, name);
-	if (isPlainObject(value) && Object.isExtensible(value))
-		return extendObservableHelper(value, value, childMode, name);
+	if (isPlainObject(value))
+		return extendObservableHelper({}, value, childMode, name);
 	return value;
 }
 

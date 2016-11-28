@@ -162,7 +162,7 @@ test('reactive folder tree', function(t) {
 		this.parent = parent;
 		m.extendObservable(this, {
 			name: "" + name,
-			children: m.fastArray(),
+			children: m.observable([]),
 		});
 	}
 
@@ -287,7 +287,7 @@ function serializationTester(t, transformerFactory) {
 		});
 	}
 
-	var boxes = m.fastArray();
+	var boxes = m.observable([]);
 	var states = [];
 
 	var serializeBox = transformerFactory(box => {
