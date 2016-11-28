@@ -6,7 +6,7 @@
   "typings": "lib/mobx.d.ts",
   "scripts": {
     "test": "npm run quick-build && npm run tape",
-    "full-test": "npm run small-build && npm run build-tests && npm run use-minified && npm run tape && npm run perf",
+    "full-test": "npm run small-build && npm run build-tests && npm run use-minified && npm run tape && npm run perf && npm run test-flow",
     "tape": "tape test/*.js | faucet",
     "perf": "npm run small-build && PERSIST=true time node --expose-gc test/perf/index.js",
     "prepublish": "npm run small-build",
@@ -16,7 +16,7 @@
     "test-browser-chrome": "npm run small-build && ( browserify test/*.js | tape-run --browser chrome )",
     "test-browser-safari": "npm run small-build && ( browserify test/*.js -t [ babelify --presets [ es2015 ] ] | tape-run --browser safari )",
     "test-browser-firefox": "npm run small-build && ( browserify test/*.js  | tape-run --browser firefox )",
-    "test-travis": "npm run small-build && npm run build-tests && tape test/*.js test/perf/index.js && tsc && istanbul cover tape test/*.js",
+    "test-travis": "npm run small-build && npm run build-tests && tape test/*.js test/perf/index.js && tsc && istanbul cover tape test/*.js && npm run test-flow",
     "test-flow": "node_modules/.bin/flow check",
     "coverage": "npm run quick-build && npm run build-tests && istanbul cover tape test/*.js",
     "build-tests": "npm run build-typescript-tests && npm run build-babel-tests",
