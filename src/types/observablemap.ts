@@ -290,7 +290,7 @@ declareIterator(ObservableMap.prototype, function() {
  * Creates a map, similar to ES6 maps (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map),
  * yet observable.
  */
-export function map<V>(initialValues?: IMapEntries<V> | IKeyValueMap<V>, valueModifier?: IModifier<any, V, any>): ObservableMap<V> {
+export function map<V>(initialValues?: IMapEntries<V> | IKeyValueMap<V>, valueModifier?: IModifier<any, V>): ObservableMap<V> {
 	return new ObservableMap(initialValues, valueModifier);
 }
 

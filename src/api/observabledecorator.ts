@@ -9,7 +9,7 @@ const decoratorImpl = createClassPropertyDecorator(
 	(target, name, baseValue, modifiers) => {
 		// might happen lazily (on first read), so temporarily allow state changes..
 		const prevA = allowStateChangesStart(true);
-		const modifier: IModifier<any, any, any> = modifiers && modifiers.length === 1
+		const modifier: IModifier<any, any> = modifiers && modifiers.length === 1
 			? modifiers[0]
 			: recursiveModifier
 		;

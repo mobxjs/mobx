@@ -38,7 +38,7 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 	changeListeners;
 	protected value;
 
-	constructor(value: T, protected modifier: IModifier<any, T, any>, name = "ObservableValue@" + getNextId(), notifySpy = true) {
+	constructor(value: T, protected modifier: IModifier<any, T>, name = "ObservableValue@" + getNextId(), notifySpy = true) {
 		super(name);
 		this.value = modifier(value, undefined);
 		if (notifySpy && isSpyEnabled()) {

@@ -97,7 +97,7 @@ export function setObservableObjectInstanceProperty(adm: ObservableObjectAdminis
 			}
 
 			if (isModifierDescriptor(descriptor.value)) {
-				const modifierDescriptor = descriptor.value as IModifierDescriptor<any, any, any>;
+				const modifierDescriptor = descriptor.value as IModifierDescriptor<any, any>;
 				defineObservableProperty(adm, propName, modifierDescriptor.initialValue, modifierDescriptor.modifier, true, undefined);
 			}
 			else {
@@ -110,7 +110,7 @@ export function setObservableObjectInstanceProperty(adm: ObservableObjectAdminis
 	}
 }
 
-export function defineObservableProperty(adm: ObservableObjectAdministration, propName: string, newValue, modifier: IModifier<any, any, any>, asInstanceProperty: boolean, setter) {
+export function defineObservableProperty(adm: ObservableObjectAdministration, propName: string, newValue, modifier: IModifier<any, any>, asInstanceProperty: boolean, setter) {
 	if (asInstanceProperty)
 		assertPropertyConfigurable(adm.target, propName);
 
