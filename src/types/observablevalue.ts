@@ -5,6 +5,7 @@ import {valueDidChange, Lambda, getNextId, createInstanceofPredicate} from "../u
 import {hasInterceptors, IInterceptable, IInterceptor, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd, spyReport} from "../core/spy";
+import {recursiveModifier, IModifier} from "../types/modifiers2";
 
 export interface IValueWillChange<T> {
 	object: any;
@@ -37,13 +38,9 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 	changeListeners;
 	protected value;
 
-	constructor(value: T, protected mode: ValueMode, name = "ObservableValue@" + getNextId(), notifySpy = true) {
+	constructor(value: T, protected modifier: IModifier<any, T, any>, name = "ObservableValue@" + getNextId(), notifySpy = true) {
 		super(name);
-		const [childmode, unwrappedValue] = getValueModeFromValue(value, ValueMode.Recursive);
-		// If the value mode is recursive, modifiers like 'structure', 'reference', or 'flat' could apply
-		if (this.mode === ValueMode.Recursive)
-			this.mode = childmode;
-		this.value = makeChildObservable(unwrappedValue, this.mode, this.name);
+		this.value = modifier(value, undefined);
 		if (notifySpy && isSpyEnabled()) {
 			// only notify spy if this is a stand-alone observable
 			spyReport({ type: "create", object: this, newValue: this.value });
@@ -77,9 +74,11 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 				return UNCHANGED;
 			newValue = change.newValue;
 		}
-		const changed = valueDidChange(this.mode === ValueMode.Structure, this.value, newValue);
+		// apply modifier
+		newValue = this.modifier(newValue, this.value);
+		const changed = this.value !== newValue;
 		if (changed)
-			return makeChildObservable(newValue, this.mode, this.name);
+			return this.value = newValue;
 		return UNCHANGED;
 	}
 

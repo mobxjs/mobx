@@ -7,6 +7,7 @@ import {runLazyInitializers} from "../utils/decorators";
 import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
+import {IModifier, isModifierDescriptor, IModifierDescriptor, recursiveModifier, referenceModifier} from "../types/modifiers2";
 
 const COMPUTED_FUNC_DEPRECATED = (
 `
@@ -41,7 +42,7 @@ export class ObservableObjectAdministration implements IInterceptable<IObjectWil
 	changeListeners = null;
 	interceptors = null;
 
-	constructor(public target: any, public name: string, public mode: ValueMode) { }
+	constructor(public target: any, public name: string) { }
 
 	/**
 		* Observes this object. Triggers for the events 'add', 'update' and 'delete'.
@@ -63,7 +64,7 @@ export interface IIsObservableObject {
 	$mobx: ObservableObjectAdministration;
 }
 
-export function asObservableObject(target, name: string | undefined, mode: ValueMode = ValueMode.Recursive): ObservableObjectAdministration {
+export function asObservableObject(target, name: string | undefined): ObservableObjectAdministration {
 	if (isObservableObject(target))
 		return (target as any).$mobx;
 
@@ -72,7 +73,7 @@ export function asObservableObject(target, name: string | undefined, mode: Value
 	if (!name)
 		name = "ObservableObject@" + getNextId();
 
-	const adm = new ObservableObjectAdministration(target, name, mode);
+	const adm = new ObservableObjectAdministration(target, name);
 	addHiddenFinalProp(target, "$mobx", adm);
 	return adm;
 }
@@ -94,14 +95,22 @@ export function setObservableObjectInstanceProperty(adm: ObservableObjectAdminis
 					console.trace();
 				}
 			}
-			defineObservableProperty(adm, propName, descriptor.value, true, undefined);
+
+			if (isModifierDescriptor(descriptor.value)) {
+				const modifierDescriptor = descriptor.value as IModifierDescriptor<any, any, any>;
+				defineObservableProperty(adm, propName, modifierDescriptor.initialValue, modifierDescriptor.modifier, true, undefined);
+			}
+			else {
+				// without modifier, use the default
+				defineObservableProperty(adm, propName, descriptor.value, recursiveModifier, true, undefined);
+			}
 		} else {
-			defineObservableProperty(adm, propName, descriptor.get, true, descriptor.set);
+			defineObservableProperty(adm, propName, descriptor.get, referenceModifier, true, descriptor.set);
 		}
 	}
 }
 
-export function defineObservableProperty(adm: ObservableObjectAdministration, propName: string, newValue, asInstanceProperty: boolean, setter) {
+export function defineObservableProperty(adm: ObservableObjectAdministration, propName: string, newValue, modifier: IModifier<any, any, any>, asInstanceProperty: boolean, setter) {
 	if (asInstanceProperty)
 		assertPropertyConfigurable(adm.target, propName);
 
@@ -116,9 +125,10 @@ export function defineObservableProperty(adm: ObservableObjectAdministration, pr
 		if (!newValue.scope)
 			newValue.scope = adm.target;
 	} else if (handleAsComputedValue(newValue)) {
-		// TODO: remove in 3.0
+		// TODO: rewrite to modifier
 		observable = new ComputedValue(newValue, adm.target, false, name, setter);
 	} else if (getModifier(newValue) === ValueMode.Structure && typeof newValue.value === "function" && newValue.value.length === 0) {
+		// TODO: rewrite to modifier
 		observable = new ComputedValue(newValue.value, adm.target, true, name, setter);
 	} else {
 		isComputed = false;
@@ -133,7 +143,7 @@ export function defineObservableProperty(adm: ObservableObjectAdministration, pr
 				return;
 			newValue = change.newValue;
 		}
-		observable = new ObservableValue(newValue, adm.mode, name, false);
+		observable = new ObservableValue(newValue, modifier, name, false);
 		newValue = (observable as any).value; // observableValue might have changed it
 	}
 

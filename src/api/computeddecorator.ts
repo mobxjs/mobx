@@ -1,4 +1,5 @@
 import {ValueMode, getValueModeFromValue, asStructure} from "../types/modifiers";
+import {referenceModifier, structureModifier} from "../types/modifiers2";
 import {IObservableValue} from "../types/observablevalue";
 import {asObservableObject, defineObservableProperty} from "../types/observableobject";
 import {invariant} from "../utils/utils";
@@ -20,8 +21,9 @@ const computedDecorator = createClassPropertyDecorator(
 		if (decoratorArgs && decoratorArgs.length === 1 && decoratorArgs[0].asStructure === true)
 			compareStructural = true;
 
-		const adm = asObservableObject(target, "", ValueMode.Recursive);
-		defineObservableProperty(adm, name, compareStructural ? asStructure(baseValue) : baseValue, false, setter);
+		const adm = asObservableObject(target, "");
+		// TODO: rewrite as modifier
+		defineObservableProperty(adm, name, compareStructural ? asStructure(baseValue) : baseValue, compareStructural ? structureModifier : referenceModifier, false, setter);
 	},
 	function (name) {
 		const observable = this.$mobx.values[name];

@@ -1,5 +1,7 @@
 import {ObservableValue, IObservableValue} from "../types/observablevalue";
 import {ValueMode, getValueModeFromValue, makeChildObservable} from "../types/modifiers";
+import {recursiveModifier} from "../types/modifiers2";
+
 import {computed} from "./computeddecorator";
 import {isPlainObject, invariant, isArrayLike} from "../utils/utils";
 import {observableDecorator} from "./observabledecorator";
@@ -28,6 +30,7 @@ export function observable(v: any = undefined, keyOrScope?: string | any) {
 	let [mode, value] = getValueModeFromValue(v, ValueMode.Recursive);
 	const sourceType = mode === ValueMode.Reference ? ValueType.Reference : getTypeOfValue(value);
 
+	// TODO: rewrite
 	switch (sourceType) {
 		case ValueType.Array:
 		case ValueType.PlainObject:
@@ -36,7 +39,7 @@ export function observable(v: any = undefined, keyOrScope?: string | any) {
 		case ValueType.ComplexObject:
 		case ValueType.ViewFunction:
 		case ValueType.ComplexFunction:
-			return new ObservableValue(value, mode);
+			return new ObservableValue(value, recursiveModifier);
 	}
 	invariant(false, "Illegal State");
 }

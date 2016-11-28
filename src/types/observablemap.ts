@@ -1,4 +1,5 @@
 import {ValueMode, assertUnwrapped, getValueModeFromModifierFunc} from "./modifiers";
+import {referenceModifier, IModifier, recursiveModifier} from "./modifiers2";
 import {transaction} from "../core/transaction";
 import {untracked} from "../core/derivation";
 import {ObservableArray, IObservableArray} from "./observablearray";
@@ -39,16 +40,12 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	$mobx = ObservableMapMarker;
 	private _data: { [key: string]: ObservableValue<V> | undefined } = {};
 	private _hasMap: { [key: string]: ObservableValue<boolean> } = {}; // hasMap, not hashMap >-).
-	private _valueMode: ValueMode;
 	public name = "ObservableMap@" + getNextId();
 	private _keys: IObservableArray<string> = <any> new ObservableArray(null, ValueMode.Reference, `${this.name}.keys()`, true);
 	interceptors = null;
 	changeListeners = null;
 
-	constructor(initialData?: IMapEntries<V> | IKeyValueMap<V>, valueModeFunc?: Function) {
-		this._valueMode = getValueModeFromModifierFunc(valueModeFunc);
-		if (this._valueMode === ValueMode.Flat)
-			this._valueMode = ValueMode.Reference; // TODO: modifiers really need a clean up!
+	constructor(initialData?: IMapEntries<V> | IKeyValueMap<V>, public modifier = recursiveModifier) {
 		allowStateChanges(true, () => {
 			if (isPlainObject(initialData))
 				this.merge(<IKeyValueMap<V>> initialData);
@@ -140,7 +137,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		if (entry) {
 			entry.setNewValue(value);
 		} else {
-			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, `${this.name}.${key}?`, false);
+			entry = this._hasMap[key] = new ObservableValue(value, referenceModifier, `${this.name}.${key}?`, false);
 		}
 		return entry;
 	}
@@ -170,7 +167,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 
 	private _addValue(name: string, newValue: V) {
 		transaction(() => {
-			const observable = this._data[name] = new ObservableValue(newValue, this._valueMode, `${this.name}.${name}`, false);
+			const observable = this._data[name] = new ObservableValue(newValue, this.modifier, `${this.name}.${name}`, false);
 			newValue = (observable as any).value; // value might have been changed
 			this._updateHasMapEntry(name, true);
 			this._keys.push(name);
@@ -293,7 +290,7 @@ declareIterator(ObservableMap.prototype, function() {
  * Creates a map, similar to ES6 maps (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map),
  * yet observable.
  */
-export function map<V>(initialValues?: IMapEntries<V> | IKeyValueMap<V>, valueModifier?: Function): ObservableMap<V> {
+export function map<V>(initialValues?: IMapEntries<V> | IKeyValueMap<V>, valueModifier?: IModifier<any, V, any>): ObservableMap<V> {
 	return new ObservableMap(initialValues, valueModifier);
 }
 
