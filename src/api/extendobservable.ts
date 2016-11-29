@@ -15,13 +15,17 @@ export function extendObservable<A extends Object, B extends Object>(target: A, 
 	invariant(typeof target === "object", "extendObservable expects an object as first argument");
 	invariant(!(isObservableMap(target)), "extendObservable should not be used on maps, use map.merge instead");
 	invariant(Object.isExtensible(target), "Cannot extend the designated object; it is not extensible");
-	const adm = asObservableObject(target, name);
-	const definedProps = {};
-	for (let i = properties.length - 1; i >= 0; i--) {
-		const propSet = properties[i];
+	properties.forEach(propSet => {
 		invariant(typeof propSet === "object", "all arguments of extendObservable should be objects");
 		invariant(!isObservable(propSet), "extending an object with another observable (object) is not supported. Please construct an explicit propertymap, using `toJS` if need. See issue #540");
-		for (let key in properties) if (definedProps[key] !== true && hasOwnProperty(properties, key)) {
+	});
+
+	const adm = asObservableObject(target);
+	const definedProps = {};
+	// TODO: could be optimised if properties.length === 1
+	for (let i = properties.length - 1; i >= 0; i--) {
+		const propSet = properties[i];
+		for (let key in propSet) if (definedProps[key] !== true && hasOwnProperty(propSet, key)) {
 			definedProps[key] = true;
 			if (target as any === propSet && !isPropertyConfigurable(target, key))
 				continue; // see #111, skip non-configurable or non-writable props for `observable(object)`.

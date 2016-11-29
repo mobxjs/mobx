@@ -64,7 +64,7 @@ export interface IIsObservableObject {
 	$mobx: ObservableObjectAdministration;
 }
 
-export function asObservableObject(target, name: string | undefined): ObservableObjectAdministration {
+export function asObservableObject(target, name?: string): ObservableObjectAdministration {
 	if (isObservableObject(target))
 		return (target as any).$mobx;
 

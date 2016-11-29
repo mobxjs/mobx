@@ -6,6 +6,8 @@ import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, inte
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {arrayAsIterator, declareIterator} from "../utils/iterable";
+import {IModifier, recursiveModifier} from "../types/modifiers2";
+
 
 // Detects bug in safari 9.1.1 (or iOS 9 safari mobile). See #364
 const safariPrototypeSetterInheritanceBug = (() => {
@@ -81,16 +83,8 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 	interceptors = null;
 	changeListeners = null;
 
-	constructor(name, public mode: ValueMode, public array: IObservableArray<T>, public owned: boolean) {
+	constructor(name, public modifier: IModifier<any, T>, public array: IObservableArray<T>, public owned: boolean) {
 		this.atom = new BaseAtom(name || ("ObservableArray@" + getNextId()));
-	}
-
-	makeReactiveArrayItem(value) {
-		// this = IObservableArrayAdministration, bound during construction
-		assertUnwrapped(value, "Array values cannot have modifiers");
-		if (this.mode === ValueMode.Flat || this.mode === ValueMode.Reference)
-			return value;
-		return makeChildObservable(value, this.mode, `${this.atom.name}[..]`);
 	}
 
 	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
@@ -173,7 +167,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 			newItems = change.added;
 		}
 
-		newItems = <T[]> newItems.map(this.makeReactiveArrayItem, this);
+		newItems = <T[]> newItems.map(this.modifier as any, this);
 		const lengthDelta = newItems.length - deleteCount;
 		this.updateArrayLength(length, lengthDelta); // create or remove new entries
 		const res: T[] = this.values.splice(index, deleteCount, ...newItems); // FIXME: splat might exceed callstack size!
@@ -226,15 +220,15 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 export class ObservableArray<T> extends StubArray {
 	private $mobx: ObservableArrayAdministration<T>;
 
-	constructor(initialValues: T[] | null, mode: ValueMode, name: string | undefined, owned = false) {
+	constructor(initialValues: T[] | null, modifier: IModifier<T, T>, name: string | undefined, owned = false) {
 		super();
 
-		const adm = new ObservableArrayAdministration<T>(name, mode, this as any, owned);
+		const adm = new ObservableArrayAdministration<T>(name, modifier, this as any, owned);
 		addHiddenFinalProp(this, "$mobx", adm);
 
 		if (initialValues && initialValues.length) {
 			adm.updateArrayLength(0, initialValues.length);
-			adm.values = initialValues.map(adm.makeReactiveArrayItem, adm);
+			adm.values = initialValues.map(modifier as any, adm) as any;
 			adm.notifyArraySplice(0, adm.values.slice(), EMPTY_ARRAY);
 		} else {
 			adm.values = [];
@@ -471,8 +465,8 @@ function createArraySetter(index: number) {
 					return;
 				newValue = change.newValue;
 			}
-			newValue = adm.makeReactiveArrayItem(newValue);
-			const changed = (adm.mode === ValueMode.Structure) ? !deepEquals(oldValue, newValue) : oldValue !== newValue;
+			newValue = adm.modifier(newValue, oldValue);
+			const changed = newValue !== oldValue;
 			if (changed) {
 				values[index] = newValue;
 				adm.notifyArrayChildUpdate(index, newValue, oldValue);
@@ -506,8 +500,8 @@ function reserveArrayBuffer(max: number) {
 
 reserveArrayBuffer(1000);
 
-export function createObservableArray<T>(initialValues: T[], mode: ValueMode, name?: string): IObservableArray<T> {
-	return <IObservableArray<T>><any> new ObservableArray(initialValues, mode, name);
+export function createObservableArray<T>(initialValues: T[], modifier: IModifier<any, T>, name?: string): IObservableArray<T> {
+	return <IObservableArray<T>><any> new ObservableArray(initialValues, modifier, name);
 }
 
 const isObservableArrayAdministration = createInstanceofPredicate("ObservableArrayAdministration", ObservableArrayAdministration);

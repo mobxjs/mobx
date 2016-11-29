@@ -120,10 +120,10 @@ export function makeChildObservable(value, parentMode: ValueMode, name?: string)
 			return fail("Illegal State");
 	}
 
-	if (Array.isArray(value))
-		return createObservableArray(value as any[], childMode, name);
-	if (isPlainObject(value))
-		return extendObservableHelper({}, value, childMode, name);
+	// if (Array.isArray(value))
+	// 	return createObservableArray(value as any[], childMode, name);
+	// if (isPlainObject(value))
+	// 	return extendObservableHelper({}, value, childMode, name);
 	return value;
 }
 

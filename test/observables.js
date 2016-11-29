@@ -421,7 +421,7 @@ test('observe object', function(t) {
     var events = [];
     var a = observable({
         a: 1,
-        da: function() { return this.a * 2 }
+        get da() { return this.a * 2 }
     });
     var stop = m.observe(a, function(change) {
         events.push(change);
@@ -1623,11 +1623,12 @@ test('603 - transaction should not kill reactions', t => {
 
 	t.equal(a.observers.length, 1)
 	t.equal(d.$mobx.observing.length, 1)
-	t.deepEqual(__mobxGlobal.inBatch, 0)
-	t.deepEqual(__mobxGlobal.inTransaction, 0)
-	t.deepEqual(__mobxGlobal.pendingReactions.length, 0)
-	t.deepEqual(__mobxGlobal.pendingUnobservations.length, 0)
-	t.deepEqual(__mobxGlobal.trackingDerivation, null)
+	const g = m.extras.getGlobalState()
+	t.deepEqual(g.inBatch, 0)
+	t.deepEqual(g.inTransaction, 0)
+	t.deepEqual(g.pendingReactions.length, 0)
+	t.deepEqual(g.pendingUnobservations.length, 0)
+	t.deepEqual(g.trackingDerivation, null)
 
 	t.equal(b, 2)
 	a.set(3)

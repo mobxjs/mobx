@@ -41,7 +41,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	private _data: { [key: string]: ObservableValue<V> | undefined } = {};
 	private _hasMap: { [key: string]: ObservableValue<boolean> } = {}; // hasMap, not hashMap >-).
 	public name = "ObservableMap@" + getNextId();
-	private _keys: IObservableArray<string> = <any> new ObservableArray(null, ValueMode.Reference, `${this.name}.keys()`, true);
+	private _keys: IObservableArray<string> = <any> new ObservableArray(null, referenceModifier, `${this.name}.keys()`, true);
 	interceptors = null;
 	changeListeners = null;
 

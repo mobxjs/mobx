@@ -76,10 +76,10 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 		}
 		// apply modifier
 		newValue = this.modifier(newValue, this.value);
-		const changed = this.value !== newValue;
-		if (changed)
-			return this.value = newValue;
-		return UNCHANGED;
+		return this.value !== newValue
+			? newValue
+			: UNCHANGED
+		;
 	}
 
 	setNewValue(newValue: T) {
