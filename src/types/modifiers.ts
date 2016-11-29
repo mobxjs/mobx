@@ -57,7 +57,9 @@ export function asReference<T>(value: T): T {
 	* Future assignments to the same property will inherit this behavior.
 	* @param value initial value of the reactive property that is being defined.
 	*/
-export function asStructure<T>(value: T): T {
+export function asStructure<T>(value: () => T): () => T;
+export function asStructure<T>(value: T): T;
+export function asStructure<T>(value) {
 	return withModifier(ValueMode.Structure, value) as any as T;
 }
 (asStructure as any).mobxModifier = ValueMode.Structure;
