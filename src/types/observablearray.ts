@@ -6,7 +6,7 @@ import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, inte
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {arrayAsIterator, declareIterator} from "../utils/iterable";
-import {IModifier, recursiveModifier} from "../types/modifiers2";
+import {IModifier, modifiers} from "../types/modifiers2";
 
 
 // Detects bug in safari 9.1.1 (or iOS 9 safari mobile). See #364
@@ -167,7 +167,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 			newItems = change.added;
 		}
 
-		newItems = <T[]> newItems.map(this.modifier as any, this);
+		newItems = <T[]> newItems.map(v => this.modifier.implementation(v));
 		const lengthDelta = newItems.length - deleteCount;
 		this.updateArrayLength(length, lengthDelta); // create or remove new entries
 		const res: T[] = this.values.splice(index, deleteCount, ...newItems); // FIXME: splat might exceed callstack size!
@@ -228,7 +228,7 @@ export class ObservableArray<T> extends StubArray {
 
 		if (initialValues && initialValues.length) {
 			adm.updateArrayLength(0, initialValues.length);
-			adm.values = initialValues.map(modifier as any, adm) as any;
+			adm.values = initialValues.map(v => modifier.implementation(v));
 			adm.notifyArraySplice(0, adm.values.slice(), EMPTY_ARRAY);
 		} else {
 			adm.values = [];
@@ -465,7 +465,7 @@ function createArraySetter(index: number) {
 					return;
 				newValue = change.newValue;
 			}
-			newValue = adm.modifier(newValue, oldValue);
+			newValue = adm.modifier.implementation(newValue, oldValue);
 			const changed = newValue !== oldValue;
 			if (changed) {
 				values[index] = newValue;

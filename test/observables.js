@@ -316,7 +316,7 @@ test('props4', function(t) {
     function Bzz() {
         mobx.extendObservable(this, {
             fluff: [1,2],
-            sum: function() {
+            get sum() {
                 return this.fluff.reduce(function(a,b) {
                     return a + b;
                 }, 0);

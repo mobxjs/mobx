@@ -1,11 +1,11 @@
 import {BaseAtom} from "../core/atom";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
-import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} from "./modifiers";
-import {valueDidChange, Lambda, getNextId, createInstanceofPredicate} from "../utils/utils";
+import {assertUnwrapped} from "./modifiers";
+import {Lambda, getNextId, createInstanceofPredicate} from "../utils/utils";
 import {hasInterceptors, IInterceptable, IInterceptor, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd, spyReport} from "../core/spy";
-import {recursiveModifier, IModifier} from "../types/modifiers2";
+import {modifiers, IModifier} from "../types/modifiers2";
 
 export interface IValueWillChange<T> {
 	object: any;
@@ -40,7 +40,7 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 
 	constructor(value: T, protected modifier: IModifier<any, T>, name = "ObservableValue@" + getNextId(), notifySpy = true) {
 		super(name);
-		this.value = modifier(value, undefined);
+		this.value = modifier.implementation(value, undefined);
 		if (notifySpy && isSpyEnabled()) {
 			// only notify spy if this is a stand-alone observable
 			spyReport({ type: "create", object: this, newValue: this.value });
@@ -75,7 +75,7 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 			newValue = change.newValue;
 		}
 		// apply modifier
-		newValue = this.modifier(newValue, this.value);
+		newValue = this.modifier.implementation(newValue, this.value);
 		return this.value !== newValue
 			? newValue
 			: UNCHANGED

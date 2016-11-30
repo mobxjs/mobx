@@ -1,6 +1,5 @@
 import {ValueMode, getValueModeFromValue, asStructure} from "../types/modifiers";
-import {referenceModifier, structureModifier} from "../types/modifiers2";
-import {IObservableValue} from "../types/observablevalue";
+import {modifiers} from "../types/modifiers2";
 import {asObservableObject, defineObservableProperty} from "../types/observableobject";
 import {invariant} from "../utils/utils";
 import {createClassPropertyDecorator} from "../utils/decorators";
@@ -23,7 +22,7 @@ const computedDecorator = createClassPropertyDecorator(
 
 		const adm = asObservableObject(target, "");
 		// TODO: rewrite as modifier
-		defineObservableProperty(adm, name, compareStructural ? asStructure(baseValue) : baseValue, compareStructural ? structureModifier : referenceModifier, false, setter);
+		defineObservableProperty(adm, name, compareStructural ? asStructure(baseValue) : baseValue, compareStructural ? modifiers.structure : modifiers.ref, false, setter);
 	},
 	function (name) {
 		const observable = this.$mobx.values[name];

@@ -1,5 +1,5 @@
 import {ValueMode, assertUnwrapped, getValueModeFromModifierFunc} from "./modifiers";
-import {referenceModifier, IModifier, recursiveModifier} from "./modifiers2";
+import {modifiers, IModifier} from "./modifiers2";
 import {transaction} from "../core/transaction";
 import {untracked} from "../core/derivation";
 import {ObservableArray, IObservableArray} from "./observablearray";
@@ -36,16 +36,18 @@ export interface IMapWillChange<T> {
 
 const ObservableMapMarker = {};
 
+export type IObservableMapInitialValues<V> = IMapEntries<V> | IKeyValueMap<V>; // TODO: | Map<V> support initializing with map
+
 export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, IListenable {
 	$mobx = ObservableMapMarker;
 	private _data: { [key: string]: ObservableValue<V> | undefined } = {};
 	private _hasMap: { [key: string]: ObservableValue<boolean> } = {}; // hasMap, not hashMap >-).
 	public name = "ObservableMap@" + getNextId();
-	private _keys: IObservableArray<string> = <any> new ObservableArray(null, referenceModifier, `${this.name}.keys()`, true);
+	private _keys: IObservableArray<string> = <any> new ObservableArray(null, modifiers.ref, `${this.name}.keys()`, true);
 	interceptors = null;
 	changeListeners = null;
 
-	constructor(initialData?: IMapEntries<V> | IKeyValueMap<V>, public modifier = recursiveModifier) {
+	constructor(initialData?: IObservableMapInitialValues<V>, public modifier: IModifier<any, any> = modifiers.recursive) {
 		allowStateChanges(true, () => {
 			if (isPlainObject(initialData))
 				this.merge(<IKeyValueMap<V>> initialData);
@@ -137,7 +139,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		if (entry) {
 			entry.setNewValue(value);
 		} else {
-			entry = this._hasMap[key] = new ObservableValue(value, referenceModifier, `${this.name}.${key}?`, false);
+			entry = this._hasMap[key] = new ObservableValue(value, modifiers.ref, `${this.name}.${key}?`, false);
 		}
 		return entry;
 	}
@@ -230,6 +232,8 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 			});
 		}, undefined, false);
 	}
+
+	// TODO: replace
 
 	get size(): number {
 		return this._keys.length;

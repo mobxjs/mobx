@@ -7,7 +7,7 @@ import {runLazyInitializers} from "../utils/decorators";
 import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
-import {IModifier, isModifierDescriptor, IModifierDescriptor, recursiveModifier, referenceModifier} from "../types/modifiers2";
+import {IModifier, isModifierDescriptor, IModifierDescriptor, modifiers} from "../types/modifiers2";
 
 const COMPUTED_FUNC_DEPRECATED = (
 `
@@ -82,7 +82,7 @@ function handleAsComputedValue(value): boolean {
 	return typeof value === "function" && value.length === 0 && !isAction(value)
 }
 
-export function setObservableObjectInstanceProperty(adm: ObservableObjectAdministration, propName: string, descriptor: PropertyDescriptor) {
+export function setObservableObjectInstanceProperty(adm: ObservableObjectAdministration, propName: string, descriptor: PropertyDescriptor, defaultModifier: IModifier<any, any>) {
 	if (adm.values[propName]) {
 		invariant("value" in descriptor, "cannot redefine property " + propName);
 		adm.target[propName] = descriptor.value; // the property setter will make 'value' reactive if needed.
@@ -102,10 +102,10 @@ export function setObservableObjectInstanceProperty(adm: ObservableObjectAdminis
 			}
 			else {
 				// without modifier, use the default
-				defineObservableProperty(adm, propName, descriptor.value, recursiveModifier, true, undefined);
+				defineObservableProperty(adm, propName, descriptor.value, defaultModifier, true, undefined);
 			}
 		} else {
-			defineObservableProperty(adm, propName, descriptor.get, referenceModifier, true, descriptor.set);
+			defineObservableProperty(adm, propName, descriptor.get, modifiers.ref, true, descriptor.set);
 		}
 	}
 }

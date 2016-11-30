@@ -3,15 +3,15 @@ import {allowStateChangesStart, allowStateChangesEnd} from "../core/action";
 import {asObservableObject, defineObservableProperty, setPropertyValue} from "../types/observableobject";
 import {invariant, assertPropertyConfigurable} from "../utils/utils";
 import {createClassPropertyDecorator} from "../utils/decorators";
-import {recursiveModifier, IModifier} from "../types/modifiers2";
+import {modifiers, IModifier} from "../types/modifiers2";
 
 const decoratorImpl = createClassPropertyDecorator(
-	(target, name, baseValue, modifiers) => {
+	(target, name, baseValue, mods) => {
 		// might happen lazily (on first read), so temporarily allow state changes..
 		const prevA = allowStateChangesStart(true);
-		const modifier: IModifier<any, any> = modifiers && modifiers.length === 1
-			? modifiers[0]
-			: recursiveModifier
+		const modifier: IModifier<any, any> = mods && mods.length === 1
+			? mods[0]
+			: modifiers.recursive
 		;
 		const adm = asObservableObject(target, undefined);
 		defineObservableProperty(adm, name, baseValue, modifier, true, undefined);
