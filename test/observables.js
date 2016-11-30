@@ -59,6 +59,39 @@ test('basic2', function(t) {
     t.end();
 })
 
+test('computed with asStructure modifier', function(t) {
+    try {
+        var x1 = observable(3);
+        var x2 = observable(5);
+        var y = m.computed(m.asStructure(function() {
+            return {
+              sum: x1.get() + x2.get()
+            }
+        }));
+        var b = buffer();
+        m.observe(y, b, true);
+
+        t.equal(8, y.get().sum);
+
+        x1.set(4);
+        t.equal(9, y.get().sum);
+
+        m.transaction(function() {
+          // swap values, computation results is structuraly unchanged
+          x1.set(5);
+          x2.set(4);
+        })
+
+        t.deepEqual(b.toArray(), [{sum: 8}, {sum: 9}]);
+        t.equal(mobx.extras.isComputingDerivation(), false);
+
+        t.end();
+    }
+    catch(e) {
+        console.log(e.stack);
+    }
+})
+
 test('dynamic', function(t) {
     try {
         var x = observable(3);

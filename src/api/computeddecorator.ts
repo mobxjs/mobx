@@ -1,4 +1,4 @@
-import {ValueMode, getValueModeFromValue, asStructure} from "../types/modifiers";
+import {ValueMode, getValueModeFromValue, asStructure, isModifierWrapper, IModifierWrapper} from "../types/modifiers";
 import {IObservableValue} from "../types/observablevalue";
 import {asObservableObject, defineObservableProperty} from "../types/observableobject";
 import {invariant} from "../utils/utils";
@@ -40,12 +40,15 @@ const computedDecorator = createClassPropertyDecorator(
  * Decorator for class properties: @computed get value() { return expr; }.
  * For legacy purposes also invokable as ES5 observable created: `computed(() => expr)`;
  */
-export function computed<T>(func: () => T, setter: (value: T) => void): IComputedValue<T>;
-export function computed<T>(func: () => T, scope?: any): IComputedValue<T>;
+export function computed<T>(expr: IModifierWrapper, setter: (value: T) => void): IComputedValue<T>;
+export function computed<T>(expr: IModifierWrapper, scope?: any): IComputedValue<T>;
+export function computed<T>(expr: () => T, setter: (value: T) => void): IComputedValue<T>;
+export function computed<T>(expr: () => T, scope?: any): IComputedValue<T>;
+
 export function computed(opts: IComputedValueOptions): (target: Object, key: string, baseDescriptor?: PropertyDescriptor) => void;
 export function computed(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void;
 export function computed(targetOrExpr: any, keyOrScopeOrSetter?: any, baseDescriptor?: PropertyDescriptor, options?: IComputedValueOptions) {
-	if (typeof targetOrExpr === "function" && arguments.length < 3) {
+	if ((typeof targetOrExpr === "function" || isModifierWrapper(targetOrExpr)) && arguments.length < 3) {
 		if (typeof keyOrScopeOrSetter === "function")
 			return computedExpr(targetOrExpr, keyOrScopeOrSetter, undefined);
 		else
@@ -54,7 +57,7 @@ export function computed(targetOrExpr: any, keyOrScopeOrSetter?: any, baseDescri
 	return computedDecorator.apply(null, arguments);
 }
 
-function computedExpr<T>(expr: () => T, setter, scope: any) {
+function computedExpr<T>(expr: () => T | IModifierWrapper, setter, scope: any) {
 	const [mode, value] = getValueModeFromValue(expr, ValueMode.Recursive);
 	return new ComputedValue(value, scope, mode === ValueMode.Structure, value.name, setter);
 }

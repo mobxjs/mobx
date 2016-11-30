@@ -95,6 +95,9 @@ export function getValueModeFromModifierFunc(func?: Function): ValueMode {
 	return mod;
 }
 
+export function isModifierWrapper(value: any): value is IModifierWrapper {
+   return (<IModifierWrapper>value).mobxModifier !== undefined;
+}
 
 export function makeChildObservable(value, parentMode: ValueMode, name?: string) {
 	let childMode: ValueMode;

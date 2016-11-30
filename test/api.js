@@ -9,6 +9,7 @@ test('correct api should be exposed', function(t) {
 		'ObservableMap',
 		'Reaction',
 		'SimpleEventEmitter',
+		'ValueMode',
 		'_',
 		'action',
 		'asFlat',
