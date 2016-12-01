@@ -27,7 +27,6 @@ export interface IModifiersFactoryA {
 	// 1: @observable(modifier.ref) field = value
 	// 2: extendObservable(target, { field: modifier.ref(value) })
 	ref<T>(initialValue: T): IModifierDescriptor<T, T>;
-	box<T>(initialValue: T): IModifierDescriptor<T, IObservableValue<T>>;
 	shallow<T>(initialValue: T[]): IModifierDescriptor<T[], T[]>;
 	shallow<T extends Object>(initialValue: T): IModifierDescriptor<T, T>;
 	recursive<T>(initialValue: T): IModifierDescriptor<T, T>;
@@ -38,7 +37,6 @@ export interface IModifiersFactoryA {
 // MWE: modifiers type split into two, to make sure that ref is by default generic
 export interface IModifiersFactoryB {
 	ref: IModifier<any, any>;
-	box: IModifier<any, any>;
 	shallow: IModifier<any, any>;
 	recursive: IModifier<any, any>;
 	structure: IModifier<any, any>;
@@ -60,7 +58,6 @@ export function isModifier(thing): thing is IModifier<any, any> {
  * Modifier implementation
  */
 modifiers.ref = createModifier(referenceModifierImpl);
-modifiers.box = createModifier(boxModifierImpl);
 modifiers.shallow = createModifier(shallowModifierImpl);
 modifiers.recursive = createModifier(recursiveModifierImpl);
 modifiers.structure = createModifier(structureModifierImpl);
@@ -97,45 +94,24 @@ function assertUnwrapped(value) {
 }
 
 function recursiveModifierImpl(newValue) {
-	if (isPlainObject(newValue) && !isObservable(newValue)) {
-		return extendObservable({}, modifiers.recursive, newValue);
-	} else if (Array.isArray(newValue) && !isObservable(newValue)) {
-		return createObservableArray(newValue, modifiers.recursive);
-	}
-	// TODO: support map
-	return newValue;
+	return observable(newValue, modifiers.recursive);
 }
 
-function shallowModifierImpl(newValue) {
-	if (isPlainObject(newValue) && !isObservable(newValue)) {
-		return extendObservable({}, modifiers.ref, newValue);
-	} else if (Array.isArray(newValue) && !isObservable(newValue)) {
-		return createObservableArray(newValue, modifiers.ref);
-	}
-	// TODO: support map
-	return newValue;
+function shallowModifierImpl(newValue): any {
+	// this might look confusing, but the modifier to
+	// *items* inside a shallow collection is ref;
+	return observable(newValue, modifiers.ref);
 }
 
 function referenceModifierImpl(newValue) {
+	// never turn into an observable
 	return newValue;
 }
 
 function structureModifierImpl(newValue, oldValue) {
 	if (deepEquals(newValue, oldValue))
 		return oldValue;
-	if (isObservable(newValue))
-		return newValue;
-	if (isPlainObject(newValue))
-		return extendObservable({}, modifiers.structure, newValue);
-	if (Array.isArray(newValue))
-		return createObservableArray(newValue, modifiers.structure);
-	return newValue;
-}
-
-function boxModifierImpl(newValue) {
-	if (isObservableValue(newValue))
-		return newValue;
-	return new ObservableValue(newValue, modifiers.ref);
+	return observable(newValue, modifiers.structure);
 }
 
 function mapModifierImpl(newValue) {
