@@ -1,5 +1,4 @@
-import {ValueMode, assertUnwrapped, getValueModeFromModifierFunc} from "./modifiers";
-import {modifiers, IModifier} from "./modifiers2";
+import {modifiers, IModifier} from "./modifiers";
 import {transaction} from "../core/transaction";
 import {untracked} from "../core/derivation";
 import {ObservableArray, IObservableArray} from "./observablearray";
@@ -73,7 +72,6 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		this.assertValidKey(key);
 		key = "" + key;
 		const hasKey = this._has(key);
-		assertUnwrapped(value, `[mobx.map.set] Expected unwrapped value to be inserted to key '${key}'. If you need to use modifiers pass them as second argument to the constructor`);
 		if (hasInterceptors(this)) {
 			const change = interceptChange<IMapWillChange<V>>(this, {
 				type: hasKey ? "update" : "add",

@@ -1,5 +1,5 @@
 import {Lambda, getNextId, invariant, valueDidChange} from "../utils/utils";
-import {assertUnwrapped, ValueMode, getValueModeFromValue} from "../types/modifiers";
+import {isModifierDescriptor, modifiers} from "../types/modifiers";
 import {Reaction, IReactionPublic} from "../core/reaction";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
 import {action, isAction} from "../api/action";
@@ -37,7 +37,6 @@ export function autorun(arg1: any, arg2: any, arg3?: any) {
 		scope = arg2;
 	}
 
-	assertUnwrapped(view, "autorun methods cannot have modifiers");
 	invariant(typeof view === "function", "autorun expects a function");
 	invariant(
 		isAction(view) === false,
@@ -157,7 +156,7 @@ export function autorunAsync(arg1: any, arg2: any, arg3?: any, arg4?: any) {
  * or
  * autorun(() => action(effect)(expr));
  */
-export function reaction<T>(name: string, expression: () => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately?: boolean, delay?: number, scope?: any);
+export function reaction<T>(name: string, expression: (r: IReactionPublic) => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately?: boolean, delay?: number, scope?: any);
 
 /**
  *
@@ -165,7 +164,7 @@ export function reaction<T>(name: string, expression: () => T, effect: (arg: T, 
  * or
  * autorun(() => action(effect)(expr));
  */
-export function reaction<T>(expression: () => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately?: boolean, delay?: number, scope?: any);
+export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately?: boolean, delay?: number, scope?: any);
 
 export function reaction<T>(arg1: any, arg2: any, arg3: any, arg4?: any, arg5?: any, arg6?: any) {
 	let name: string, expression: () => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately: boolean, delay: number, scope: any;
@@ -191,8 +190,12 @@ export function reaction<T>(arg1: any, arg2: any, arg3: any, arg4?: any, arg5?: 
 	if (delay === void 0)
 		delay = 0;
 
-	let [valueMode, unwrappedExpression] = getValueModeFromValue(expression, ValueMode.Reference);
-	const compareStructural = valueMode === ValueMode.Structure;
+	let compareStructural = false;
+	let unwrappedExpression: (r: IReactionPublic) => T = expression;
+	if (isModifierDescriptor(expression) && expression.modifier === modifiers.structure) {
+		compareStructural =  true;
+		unwrappedExpression = expression.initialValue;
+	}
 
 	if (scope) {
 		unwrappedExpression = unwrappedExpression.bind(scope);

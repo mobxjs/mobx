@@ -1,5 +1,4 @@
-import {ValueMode, getValueModeFromValue, asStructure} from "../types/modifiers";
-import {modifiers} from "../types/modifiers2";
+import {modifiers, isModifierDescriptor} from "../types/modifiers";
 import {asObservableObject, defineObservableProperty} from "../types/observableobject";
 import {invariant} from "../utils/utils";
 import {createClassPropertyDecorator} from "../utils/decorators";
@@ -17,12 +16,11 @@ const computedDecorator = createClassPropertyDecorator(
 		invariant(typeof baseValue === "function", "@computed can only be used on getter functions, like: '@computed get myProps() { return ...; }'");
 
 		let compareStructural = false;
-		if (decoratorArgs && decoratorArgs.length === 1 && decoratorArgs[0].asStructure === true)
+		if (decoratorArgs && decoratorArgs.length === 1 && decoratorArgs[0] === modifiers.structure)
 			compareStructural = true;
 
 		const adm = asObservableObject(target, "");
-		// TODO: rewrite as modifier
-		defineObservableProperty(adm, name, compareStructural ? asStructure(baseValue) : baseValue, compareStructural ? modifiers.structure : modifiers.ref, false, setter);
+		defineObservableProperty(adm, name, true, baseValue, compareStructural ? modifiers.structure : modifiers.ref, false, setter);
 	},
 	function (name) {
 		const observable = this.$mobx.values[name];
@@ -48,14 +46,15 @@ export function computed(target: Object, key: string | symbol, baseDescriptor?: 
 export function computed(targetOrExpr: any, keyOrScopeOrSetter?: any, baseDescriptor?: PropertyDescriptor, options?: IComputedValueOptions) {
 	if (typeof targetOrExpr === "function" && arguments.length < 3) {
 		if (typeof keyOrScopeOrSetter === "function")
-			return computedExpr(targetOrExpr, keyOrScopeOrSetter, undefined);
+			return computedExpr(targetOrExpr, keyOrScopeOrSetter, undefined, false);
 		else
-			return computedExpr(targetOrExpr, undefined, keyOrScopeOrSetter);
+			return computedExpr(targetOrExpr, undefined, keyOrScopeOrSetter, false);
+	} else if (isModifierDescriptor(targetOrExpr) && targetOrExpr.modifier === modifiers.structure) {
+		return computedExpr(targetOrExpr.initialValue, keyOrScopeOrSetter, undefined, true);
 	}
 	return computedDecorator.apply(null, arguments);
 }
 
-function computedExpr<T>(expr: () => T, setter, scope: any) {
-	const [mode, value] = getValueModeFromValue(expr, ValueMode.Recursive);
-	return new ComputedValue(value, scope, mode === ValueMode.Structure, value.name, setter);
+function computedExpr<T>(expr: () => T, setter, scope: any, compareStructural: boolean) {
+	return new ComputedValue(expr, scope, compareStructural, (expr as any).name, setter);
 }

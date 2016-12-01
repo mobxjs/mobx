@@ -60,6 +60,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	 * This is useful for working with vectors, mouse coordinates etc.
 	 */
 	constructor(public derivation: () => T, public scope: Object | undefined, private compareStructural: boolean, name: string, setter?: (v: T) => void) {
+		// TODO: instead of comparestructural, pass a modifier
 		this.name  = name || "ComputedValue@" + getNextId();
 		if (setter)
 			this.setter = createAction(name + "-setter", setter) as any;

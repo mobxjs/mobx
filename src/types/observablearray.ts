@@ -1,12 +1,11 @@
 import {isObject, createInstanceofPredicate, getNextId, deepEquals, makeNonEnumerable, Lambda, EMPTY_ARRAY, addHiddenFinalProp, addHiddenProp, invariant} from "../utils/utils";
 import {BaseAtom} from "../core/atom";
-import {ValueMode, assertUnwrapped, makeChildObservable} from "./modifiers";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {arrayAsIterator, declareIterator} from "../utils/iterable";
-import {IModifier, modifiers} from "../types/modifiers2";
+import {IModifier} from "../types/modifiers";
 
 
 // Detects bug in safari 9.1.1 (or iOS 9 safari mobile). See #364
@@ -450,7 +449,6 @@ function createArraySetter(index: number) {
 	return function<T>(newValue: T) {
 		const adm = <ObservableArrayAdministration<T>> this.$mobx;
 		const values = adm.values;
-		assertUnwrapped(newValue, "Modifiers cannot be used on array values. For non-reactive array values use makeReactive(asFlat(array)).");
 		if (index < values.length) {
 			// update at index in range
 			checkIfStateModificationsAreAllowed();

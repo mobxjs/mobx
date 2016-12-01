@@ -1,9 +1,8 @@
-import {ValueMode, asReference} from "../types/modifiers";
 import {allowStateChangesStart, allowStateChangesEnd} from "../core/action";
 import {asObservableObject, defineObservableProperty, setPropertyValue} from "../types/observableobject";
 import {invariant, assertPropertyConfigurable} from "../utils/utils";
 import {createClassPropertyDecorator} from "../utils/decorators";
-import {modifiers, IModifier} from "../types/modifiers2";
+import {modifiers, IModifier} from "../types/modifiers";
 
 const decoratorImpl = createClassPropertyDecorator(
 	(target, name, baseValue, mods) => {
@@ -14,7 +13,7 @@ const decoratorImpl = createClassPropertyDecorator(
 			: modifiers.recursive
 		;
 		const adm = asObservableObject(target, undefined);
-		defineObservableProperty(adm, name, baseValue, modifier, true, undefined);
+		defineObservableProperty(adm, name, false, baseValue, modifier, true, undefined);
 		allowStateChangesEnd(prevA);
 	},
 	function (name) {

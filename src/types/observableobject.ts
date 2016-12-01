@@ -1,13 +1,12 @@
 import {ObservableValue, UNCHANGED} from "./observablevalue";
 import {isComputedValue, ComputedValue} from "../core/computedvalue";
 import {isAction} from "../api/action";
-import {ValueMode, getModifier} from "./modifiers";
 import {createInstanceofPredicate, isObject, Lambda, getNextId, invariant, assertPropertyConfigurable, isPlainObject, addHiddenFinalProp, deprecated} from "../utils/utils";
 import {runLazyInitializers} from "../utils/decorators";
 import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
-import {IModifier, isModifierDescriptor, IModifierDescriptor, modifiers} from "../types/modifiers2";
+import {IModifier, isModifierDescriptor, IModifierDescriptor, modifiers} from "../types/modifiers";
 
 const COMPUTED_FUNC_DEPRECATED = (
 `
@@ -78,39 +77,27 @@ export function asObservableObject(target, name?: string): ObservableObjectAdmin
 	return adm;
 }
 
-function handleAsComputedValue(value): boolean {
-	return typeof value === "function" && value.length === 0 && !isAction(value)
-}
-
 export function setObservableObjectInstanceProperty(adm: ObservableObjectAdministration, propName: string, descriptor: PropertyDescriptor, defaultModifier: IModifier<any, any>) {
 	if (adm.values[propName]) {
 		invariant("value" in descriptor, "cannot redefine property " + propName);
 		adm.target[propName] = descriptor.value; // the property setter will make 'value' reactive if needed.
 	} else {
 		if ("value" in descriptor) {
-			if (handleAsComputedValue(descriptor.value)) {
-				// warn about automatic inference, see https://github.com/mobxjs/mobx/issues/421
-				if (deprecated(COMPUTED_FUNC_DEPRECATED)) {
-					console.error(`in: ${adm.name}.${propName}`);
-					console.trace();
-				}
-			}
-
 			if (isModifierDescriptor(descriptor.value)) {
 				const modifierDescriptor = descriptor.value as IModifierDescriptor<any, any>;
-				defineObservableProperty(adm, propName, modifierDescriptor.initialValue, modifierDescriptor.modifier, true, undefined);
+				defineObservableProperty(adm, propName, false, modifierDescriptor.initialValue, modifierDescriptor.modifier, true, undefined);
 			}
 			else {
 				// without modifier, use the default
-				defineObservableProperty(adm, propName, descriptor.value, defaultModifier, true, undefined);
+				defineObservableProperty(adm, propName, false, descriptor.value, defaultModifier, true, undefined);
 			}
 		} else {
-			defineObservableProperty(adm, propName, descriptor.get, modifiers.ref, true, descriptor.set);
+			defineObservableProperty(adm, propName, true, descriptor.get, modifiers.ref, true, descriptor.set);
 		}
 	}
 }
 
-export function defineObservableProperty(adm: ObservableObjectAdministration, propName: string, newValue, modifier: IModifier<any, any>, asInstanceProperty: boolean, setter) {
+export function defineObservableProperty(adm: ObservableObjectAdministration, propName: string, computed: boolean, newValue, modifier: IModifier<any, any>, asInstanceProperty: boolean, setter) {
 	if (asInstanceProperty)
 		assertPropertyConfigurable(adm.target, propName);
 
@@ -124,12 +111,12 @@ export function defineObservableProperty(adm: ObservableObjectAdministration, pr
 		newValue.name = name;
 		if (!newValue.scope)
 			newValue.scope = adm.target;
-	} else if (handleAsComputedValue(newValue)) {
+	} else if (isModifierDescriptor(newValue) && newValue.modifier === modifiers.structure && typeof newValue.initialValue === "function" && newValue.initialValue.length === 0) {
 		// TODO: rewrite to modifier
+		observable = new ComputedValue(newValue.initialValue, adm.target, true, name, setter);
+	} else if (computed) {
+		// TODO: blegh, simplify all this!
 		observable = new ComputedValue(newValue, adm.target, false, name, setter);
-	} else if (getModifier(newValue) === ValueMode.Structure && typeof newValue.value === "function" && newValue.value.length === 0) {
-		// TODO: rewrite to modifier
-		observable = new ComputedValue(newValue.value, adm.target, true, name, setter);
 	} else {
 		isComputed = false;
 		if (hasInterceptors(adm)) {

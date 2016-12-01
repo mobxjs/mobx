@@ -1,133 +1,151 @@
-import {isPlainObject, invariant, fail} from "../utils/utils";
+import {isPlainObject, deepEquals} from "../utils/utils";
 import {isObservable} from "../api/isobservable";
-import {extendObservableHelper} from "../api/extendobservable";
+import {observable} from "../api/observable";
 import {createObservableArray} from "../types/observablearray";
-import {map, ObservableMap, IMapEntries, IKeyValueMap} from "../types/observablemap";
+import {isObservableValue, ObservableValue, IObservableValue} from "../types/observablevalue";
+import {IObservableMapInitialValues, ObservableMap, isObservableMap} from "../types/observablemap";
+import {extendObservable} from "../api/extendobservable";
 
-export enum ValueMode {
-	Recursive, // If the value is an plain object, it will be made reactive, and so will all its future children.
-	Reference, // Treat this value always as a reference, without any further processing.
-	Structure, // Similar to recursive. However, this structure can only exist of plain arrays and objects.
-				// No observers will be triggered if a new value is assigned (to a part of the tree) that deeply equals the old value.
-	Flat       // If the value is an plain object, it will be made reactive, and so will all its future children.
+export interface IModifierImpl<S, T> {
+	(newValue: S, oldValue?: T): T;
 }
 
-export interface IModifierWrapper {
-	mobxModifier: ValueMode;
-	value: any;
+export interface IModifier<S, T> {
+	isMobxModifier: boolean;
+	implementation: IModifierImpl<S, T>;
+	(initialValue: S): T & IModifierDescriptor<S, T>;
 }
 
-function withModifier(modifier: ValueMode, value: any): IModifierWrapper {
-	assertUnwrapped(value, "Modifiers are not allowed to be nested");
+export interface IModifierDescriptor<S, T> {
+	isMobxModifierDescriptor: boolean;
+	initialValue: S | undefined;
+	modifier: IModifier<S, T>;
+}
+
+export interface IModifiersFactoryA {
+	// factories for modifers, handles:
+	// 1: @observable(modifier.ref) field = value
+	// 2: extendObservable(target, { field: modifier.ref(value) })
+	ref<T>(initialValue: T): IModifierDescriptor<T, T>;
+	box<T>(initialValue: T): IModifierDescriptor<T, IObservableValue<T>>;
+	shallow<T>(initialValue: T[]): IModifierDescriptor<T[], T[]>;
+	shallow<T extends Object>(initialValue: T): IModifierDescriptor<T, T>;
+	recursive<T>(initialValue: T): IModifierDescriptor<T, T>;
+	structure<T>(initialValue: T): IModifierDescriptor<T, T>;
+	map<T>(initialValue: IObservableMapInitialValues<T>): IModifierDescriptor<IObservableMapInitialValues<T>, ObservableMap<T>>;
+	shallowMap<T>(initialValue: IObservableMapInitialValues<T>): IModifierDescriptor<IObservableMapInitialValues<T>, ObservableMap<T>>;
+}
+// MWE: modifiers type split into two, to make sure that ref is by default generic
+export interface IModifiersFactoryB {
+	ref: IModifier<any, any>;
+	box: IModifier<any, any>;
+	shallow: IModifier<any, any>;
+	recursive: IModifier<any, any>;
+	structure: IModifier<any, any>;
+	map: IModifier<any, any>;
+	shallowMap: IModifier<any, any>;
+}
+
+export var modifiers: IModifiersFactoryA & IModifiersFactoryB = {} as any;
+
+export function isModifierDescriptor(thing): thing is IModifierDescriptor<any, any> {
+	return typeof thing === "object" && thing !== null && thing.isMobxModifierDescriptor === true;
+}
+
+export function isModifier(thing): thing is IModifier<any, any> {
+	return typeof thing === "function" && thing.isMobxModifier === true;
+}
+
+/**
+ * Modifier implementation
+ */
+modifiers.ref = createModifier(referenceModifierImpl);
+modifiers.box = createModifier(boxModifierImpl);
+modifiers.shallow = createModifier(shallowModifierImpl);
+modifiers.recursive = createModifier(recursiveModifierImpl);
+modifiers.structure = createModifier(structureModifierImpl);
+modifiers.map = createModifier(mapModifierImpl);
+modifiers.shallowMap = createModifier(shallowMapModifierImpl);
+
+Object.keys(modifiers).forEach(mod => {
+	observable[mod] = createDecoratorForModifier(modifiers[mod]);
+});
+
+// TODO: export
+export function createModifier<S, T>(modifier: IModifierImpl<S, T>): IModifier<S, T> {
+	const res: IModifier<S, T> = ((initialValue: S) => createModifierDescriptor(res, initialValue)) as any;
+	res.isMobxModifier = true;
+	res.implementation = modifier;
+	return res;
+}
+
+function createModifierDescriptor<S, T>(modifier: IModifier<S, T>, initialValue: S | undefined): IModifierDescriptor<S, T> {
 	return {
-		mobxModifier: modifier,
-		value
+		isMobxModifierDescriptor: true,
+		initialValue,
+		modifier
 	};
 }
 
-export function getModifier(value: any): ValueMode | null {
-	if (value) { // works for both objects and functions
-		return (value.mobxModifier as ValueMode) || null;
+function createDecoratorForModifier<S, T>(modifier: IModifier<S, T>) {
+	// TODO: implement
+	//return (observableDecorator as any)(modifier); // Todo fix type
+}
+
+function assertUnwrapped(value) {
+
+}
+
+function recursiveModifierImpl(newValue) {
+	if (isPlainObject(newValue) && !isObservable(newValue)) {
+		return extendObservable({}, modifiers.recursive, newValue);
+	} else if (Array.isArray(newValue) && !isObservable(newValue)) {
+		return createObservableArray(newValue, modifiers.recursive);
 	}
-	return null;
+	// TODO: support map
+	return newValue;
 }
 
-
-/**
-	* Can be used in combination with makeReactive / extendReactive.
-	* Enforces that a reference to 'value' is stored as property,
-	* but that 'value' itself is not turned into something reactive.
-	* Future assignments to the same property will inherit this behavior.
-	* @param value initial value of the reactive property that is being defined.
-	*/
-export function asReference<T>(value: T): T {
-	// unsound typecast, but in combination with makeReactive, the end result should be of the correct type this way
-	// e.g: makeReactive({ x : asReference(number)}) -> { x : number }
-	return withModifier(ValueMode.Reference, value) as any as T;
-}
-(asReference as any).mobxModifier = ValueMode.Reference;
-
-/**
-	* Can be used in combination with makeReactive / extendReactive.
-	* Enforces that values that are deeply equalled identical to the previous are considered to unchanged.
-	* (the default equality used by mobx is reference equality).
-	* Values that are still reference equal, but not deep equal, are considered to be changed.
-	* asStructure can only be used incombinations with arrays or objects.
-	* It does not support cyclic structures.
-	* Future assignments to the same property will inherit this behavior.
-	* @param value initial value of the reactive property that is being defined.
-	*/
-export function asStructure<T>(value: T): T {
-	return withModifier(ValueMode.Structure, value) as any as T;
-}
-(asStructure as any).mobxModifier = ValueMode.Structure;
-
-/**
-	* Can be used in combination with makeReactive / extendReactive.
-	* The value will be made reactive, but, if the value is an object or array,
-	* children will not automatically be made reactive as well.
-	*/
-export function asFlat<T>(value: T): T {
-	return withModifier(ValueMode.Flat, value) as any as T;
-}
-(asFlat as any).mobxModifier = ValueMode.Flat;
-
-export function asMap(): ObservableMap<any>;
-export function asMap<T>(): ObservableMap<T>;
-export function asMap<T>(entries: IMapEntries<T>, modifierFunc?: Function): ObservableMap<T>;
-export function asMap<T>(data: IKeyValueMap<T>, modifierFunc?: Function): ObservableMap<T>;
-export function asMap(data?, modifierFunc?): ObservableMap<any> {
-	return map(data, modifierFunc);
-}
-
-export function getValueModeFromValue(value: any, defaultMode: ValueMode): [ValueMode, any] {
-	const mode = getModifier(value);
-	if (mode)
-		return [mode, value.value];
-	return [defaultMode, value];
-}
-
-export function getValueModeFromModifierFunc(func?: Function): ValueMode {
-	if (func === undefined)
-		return ValueMode.Recursive;
-	const mod = getModifier(func);
-	if (mod !== null)
-		return mod;
-	return fail("Cannot determine value mode from function. Please pass in one of these: mobx.asReference, mobx.asStructure or mobx.asFlat, got: " + func);
-}
-
-
-export function makeChildObservable(value, parentMode: ValueMode, name?: string) {
-	let childMode: ValueMode;
-	if (isObservable(value))
-		return value;
-
-	switch (parentMode) {
-		case ValueMode.Reference:
-			return value;
-		case ValueMode.Flat:
-			assertUnwrapped(value, "Items inside 'asFlat' cannot have modifiers");
-			childMode = ValueMode.Reference;
-			break;
-		case ValueMode.Structure:
-			assertUnwrapped(value, "Items inside 'asStructure' cannot have modifiers");
-			childMode = ValueMode.Structure;
-			break;
-		case ValueMode.Recursive:
-			[childMode, value] = getValueModeFromValue(value, ValueMode.Recursive);
-			break;
-		default:
-			return fail("Illegal State");
+function shallowModifierImpl(newValue) {
+	if (isPlainObject(newValue) && !isObservable(newValue)) {
+		return extendObservable({}, modifiers.ref, newValue);
+	} else if (Array.isArray(newValue) && !isObservable(newValue)) {
+		return createObservableArray(newValue, modifiers.ref);
 	}
-
-	// if (Array.isArray(value))
-	// 	return createObservableArray(value as any[], childMode, name);
-	// if (isPlainObject(value))
-	// 	return extendObservableHelper({}, value, childMode, name);
-	return value;
+	// TODO: support map
+	return newValue;
 }
 
-export function assertUnwrapped(value, message) {
-	if (getModifier(value) !== null)
-		throw new Error(`[mobx] asStructure / asReference / asFlat cannot be used here. ${message}`);
+function referenceModifierImpl(newValue) {
+	return newValue;
+}
+
+function structureModifierImpl(newValue, oldValue) {
+	if (deepEquals(newValue, oldValue))
+		return oldValue;
+	if (isObservable(newValue))
+		return newValue;
+	if (isPlainObject(newValue))
+		return extendObservable({}, modifiers.structure, newValue);
+	if (Array.isArray(newValue))
+		return createObservableArray(newValue, modifiers.structure);
+	return newValue;
+}
+
+function boxModifierImpl(newValue) {
+	if (isObservableValue(newValue))
+		return newValue;
+	return new ObservableValue(newValue, modifiers.ref);
+}
+
+function mapModifierImpl(newValue) {
+	if (isObservableMap(newValue))
+		return newValue;
+	return new ObservableMap(newValue, modifiers.recursive);
+}
+
+function shallowMapModifierImpl(newValue) {
+	if (isObservableMap(newValue))
+		return newValue;
+	return new ObservableMap(newValue, modifiers.ref);
 }

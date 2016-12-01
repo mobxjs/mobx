@@ -88,7 +88,7 @@ test('observable1', function(t) {
     // recursive structure, but asReference passed in
     t.equal(m.isObservable(x.a.b), true);
     var x2 = m.observable({
-        a: m.asReference({
+        a: m.modifiers.ref({
             b: {
                 c: 3
             }
@@ -108,7 +108,7 @@ test('observable1', function(t) {
     t.deepEqual(b2.toArray(), [3, 4]);
 
     // non recursive structure
-    var x3 = m.observable(m.asFlat({
+    var x3 = m.observable(m.modifiers.shallow({
         a: {
             b: {
                 c: 3
@@ -168,7 +168,7 @@ test('observable4', function(t) {
     t.deepEqual(b.toArray(), [[1,2], [3,2], [2], [2, 5]]);
 
     // non recursive
-    var x2 = m.observable(m.asFlat([
+    var x2 = m.observable(m.modifiers.shallow([
         { x : 1 },
         { x : 2 }
     ]));
@@ -194,7 +194,7 @@ test('observable5', function(t) {
     });
 
     var f = function() {};
-    var x2 = m.observable(m.asReference(f));
+    var x2 = m.observable(f);
     t.equal(x2.get(), f);
     x2.set(null); // allowed
 
@@ -202,8 +202,8 @@ test('observable5', function(t) {
 
     var x = m.observable({
         price : 17,
-        reactive: f,
-        nonReactive: m.asReference(f)
+        reactive: m.computed(f),
+        nonReactive: f
     });
 
     var b = buffer();
@@ -221,7 +221,7 @@ test('observable5', function(t) {
 
 test('flat array', function(t) {
     var x = m.observable({
-        x: m.asFlat([{
+        x: m.modifiers.shallow([{
             a: 1
         }])
     });
@@ -256,7 +256,7 @@ test('flat array', function(t) {
 })
 
 test('flat object', function(t) {
-    var y = m.observable(m.asFlat({
+    var y = m.observable(m.modifiers.shallow({
         x : { z: 3 }
     }));
 
@@ -288,7 +288,7 @@ test('flat object', function(t) {
 test('as structure', function(t) {
 
     var x = m.observable({
-        x: m.asStructure(null)
+        x: m.modifiers.structure(null)
     });
 
     var changed = 0;
@@ -373,6 +373,7 @@ test('as structure', function(t) {
     nc();
     x.x[1] = 2;
     nc();
+	console.log("test")
     x.x[0] = 0;
     c();
     x.x[1] = {
@@ -412,14 +413,14 @@ test('as structure view', function(t) {
     var x = m.observable({
         a: 1,
         aa: 1,
-        b: function() {
+        get b() {
             this.a;
             return { a: this.aa };
         },
-        c: m.asStructure(function() {
+        c: m.computed(m.modifiers.structure(function() {
             this.b
             return { a : this.aa };
-        })
+        }))
     });
 
     var bc = 0;

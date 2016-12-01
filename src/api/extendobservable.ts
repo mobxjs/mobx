@@ -1,9 +1,8 @@
-import {ValueMode} from "../types/modifiers";
 import {isObservableMap} from "../types/observablemap";
 import {asObservableObject, setObservableObjectInstanceProperty} from "../types/observableobject";
 import {isObservable} from "../api/isobservable";
 import {invariant, isPropertyConfigurable, hasOwnProperty} from "../utils/utils";
-import {isModifier, IModifier, modifiers} from "../types/modifiers2";
+import {isModifier, IModifier, modifiers} from "../types/modifiers";
 
 /**
  * Extends an object with reactive capabilities.
@@ -44,18 +43,3 @@ export function extendObservable(target: Object, childModifier: IModifier<any, a
 	}
 	return target;
 }
-
-
-// TODO: remove
-export function extendObservableHelper(target, properties, mode: ValueMode, name?: string): Object {
-	invariant(Object.isExtensible(target), "Cannot extend the designated object; it is not extensible");
-	const adm = asObservableObject(target, name);
-	for (let key in properties) if (hasOwnProperty(properties, key)) {
-		if (target === properties && !isPropertyConfigurable(target, key))
-			continue; // see #111, skip non-configurable or non-writable props for `observable(object)`.
-		const descriptor = Object.getOwnPropertyDescriptor(properties, key);
-		setObservableObjectInstanceProperty(adm, key, descriptor, modifiers.recursive);
-	}
-	return target;
-}
-

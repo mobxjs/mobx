@@ -1,11 +1,10 @@
 import {BaseAtom} from "../core/atom";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
-import {assertUnwrapped} from "./modifiers";
 import {Lambda, getNextId, createInstanceofPredicate} from "../utils/utils";
 import {hasInterceptors, IInterceptable, IInterceptor, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd, spyReport} from "../core/spy";
-import {modifiers, IModifier} from "../types/modifiers2";
+import {IModifier} from "../types/modifiers";
 
 export interface IValueWillChange<T> {
 	object: any;
@@ -13,7 +12,7 @@ export interface IValueWillChange<T> {
 	newValue: T;
 }
 
-// Introduce in 3.0
+// TODO: Introduce in 4.0
 // export interface IValueDidChange<T> {
 // 	object: any;
 // 	type: "update" | "create";
@@ -66,7 +65,6 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 	}
 
 	prepareNewValue(newValue): T | IUNCHANGED {
-		assertUnwrapped(newValue, "Modifiers cannot be used on non-initial values.");
 		checkIfStateModificationsAreAllowed();
 		if (hasInterceptors(this)) {
 			const change = interceptChange<IValueWillChange<T>>(this, { object: this, type: "update", newValue });
