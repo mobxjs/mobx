@@ -1,6 +1,6 @@
 import {IObservableValue, ObservableValue} from "../types/observablevalue";
 import {IObservableArray} from "../types/observablearray";
-import {isPlainObject, invariant, isObject} from "../utils/utils";
+import {isPlainObject, fail, invariant} from "../utils/utils";
 import {observableDecorator} from "./observabledecorator";
 import {isObservable} from "./isobservable";
 import {IObservableObject} from "../types/observableobject";
@@ -13,6 +13,8 @@ import {createObservableArray} from "../types/observablearray";
  * @param value the value which should become observable.
  */
 function toObservable(v: any = undefined, childModifier?) {
+	// TODO: pass in name as well?
+
 	// @observable someProp;
 	if (typeof arguments[1] === "string")
 		return observableDecorator.apply(null, arguments);
@@ -23,28 +25,41 @@ function toObservable(v: any = undefined, childModifier?) {
 
 	// observable(modifiers.shallow([]))  etc..
 	// TODO: deprecate this pattern. it is mostly relevant in MobX2
-	if (isModifierDescriptor(v))
+	if (isModifierDescriptor(v)) {
+		invariant(!childModifier, "You tried to assign a modifier wrapped value to a collection, please define modifiers when creating the collection, not when modifying it");
 		return v.modifier.implementation(v.initialValue);
+	}
 
 	// it is an observable already, done
 	if (isObservable(v))
 		return v;
 
-	// no modifier set?
-	if (!childModifier) {
+	// something that can be converted and mutated?
+	// observable([])  --> use recursive
+	// observable([], modifiers.shallow)  --> use shallow
+	if (couldBeMadeObservabe(v))
+		return convertToObservable(v, childModifier || modifiers.recursive);
 
-		// something that can be converted and mutated?
-		// observable([])  --> use recursive
-		if (couldBeMadeObservabe(v))
-			return toObservable(v, modifiers.recursive);
+	// something that is immutable / could (should) not be made observable
+	// so just reference it
 
-		// something that is immutable, just reference it
-		// no childModifier set, so not to be owned by a collection
-		// observable(3)   --> box the thing
-		else
-			return new ObservableValue(v, modifiers.ref);
-	}
+	// no childModifier set, so not to be owned by a collection
+	// observable(3)   --> box the thing (unboxed it is pretty useless if not owned)
+	if (!childModifier)
+		return new ObservableValue(v, modifiers.ref);
 
+	// there was a childModifier passed in,
+	// but not a value that could be made observable, just return original value
+	// a ref to it will be stored in the parent
+	return v;
+}
+
+function couldBeMadeObservabe(v): boolean {
+	// TODO: more generic, should support Map etc
+	return isPlainObject(v) || Array.isArray(v);
+}
+
+function convertToObservable(v, childModifier: IModifier<any, any>): any {
 	// TODO: make these checks generic?
 
 	// plain object, copy, use original as props for the new object
@@ -56,16 +71,7 @@ function toObservable(v: any = undefined, childModifier?) {
 		return createObservableArray(v, childModifier);
 
 	// TODO: map
-
-	// there was a childModifier passed in,
-	// but not a value that could be mae observable, just return original value
-	// a ref to it will be stored in the parent
-	return v;
-}
-
-function couldBeMadeObservabe(thing): boolean {
-	// TODO: more generic, should support Map etc
-	return isPlainObject(thing) || Array.isArray(thing);
+	return fail("Illegal state");
 }
 
 // TODO: expose all constuctors, reduce interfaces, etc..
