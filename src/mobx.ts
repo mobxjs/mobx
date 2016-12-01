@@ -28,7 +28,7 @@ export { spy                                                  } from "./core/spy
 export { transaction                                          } from "./core/transaction";
 export { IComputedValue                                       } from "./core/computedvalue";
 
-export { asReference, asFlat, asStructure, asMap              } from "./types/modifiers";
+export { asReference, asFlat, asStructure, asMap, IModifierWrapper, ValueMode } from "./types/modifiers";
 export { IInterceptable, IInterceptor                         } from "./types/intercept-utils";
 export { IListenable                                          } from "./types/listen-utils";
 export { IObjectWillChange, IObjectChange, IObservableObject, isObservableObject } from "./types/observableobject";
