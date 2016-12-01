@@ -1,3 +1,9 @@
+# 2.6.4
+
+* Fixed potential clean up issue if an exception was thrown from an intercept handler
+* Improved typings of `asStructure` (by @nidu, see #687)
+* Added support for `computed(asStructure(() => expr))` (by @yotambarzilay, see #685)
+
 # 2.6.3
 
 * Fixed #603: exceptions in transaction breaks future reactions
