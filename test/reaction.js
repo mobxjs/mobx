@@ -215,16 +215,16 @@ test("#278 do not rerun if expr output doesn't change structurally", t => {
 	var users = mobx.observable([
 		{
 			name: "jan",
-			uppername: function() { return this.name.toUpperCase() }
+			get uppername() { return this.name.toUpperCase() }
 		},
 		{
 			name: "piet",
-			uppername: function() { return this.name.toUpperCase() }
+			get uppername() { return this.name.toUpperCase() }
 		}
 	]);
 	var values = [];
 
-	var d = reaction(mobx.asStructure(
+	var d = reaction(mobx.modifiers.structure(
 		() => users.map(user => user.uppername)
 	), newValue => {
 		values.push(newValue);

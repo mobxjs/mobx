@@ -248,7 +248,7 @@ test('props1', function(t) {
         mobx.extendObservable(this, {
             'price' : 20,
             'amount' : 2,
-            'total': function() {
+            get total() {
                 return (1+vat.get()) * this.price * this.amount; // price and amount are now properties!
             }
         });
@@ -279,7 +279,7 @@ test('props2', function(t) {
         mobx.extendObservable(this, {
             price: 20,
             amount: 2,
-            total: function() {
+            get total() {
                 return (1+vat.get()) * this.price * this.amount; // price and amount are now properties!
             }
         });
@@ -298,9 +298,9 @@ test('props3', function(t) {
     var Order = function() {
         this.price = 20;
         this.amount = 2;
-        this.total = function() {
+        this.total = mobx.computed(function() {
             return (1+vat.get()) * this.price * this.amount; // price and amount are now properties!
-        };
+        });
         mobx.extendObservable(this, this);
     };
 
@@ -362,9 +362,9 @@ test('extend observable multiple prop maps', function(t) {
 test('object enumerable props', function(t) {
     var x = mobx.observable({
         a: 3,
-        b: function() {
+        b: mobx.computed(function() {
             return 2 * this.a;
-        }
+        })
     });
     mobx.extendObservable(x, { c: 4 });
     var ar = [];
@@ -381,7 +381,7 @@ test('observe property', function(t) {
     var Wrapper = function (chocolateBar) {
         mobx.extendObservable(this, {
             chocolateBar: chocolateBar,
-            calories: function () {
+            get calories () {
                 return this.chocolateBar.calories;
             }
         });
@@ -868,7 +868,7 @@ test('issue 50', function(t) {
     var x = observable({
         a: true,
         b: false,
-        c: function() {
+        get c() {
             events.push("calc c");
             return this.b;
         }
@@ -926,7 +926,7 @@ test('verify transaction events', function(t) {
 
     var x = observable({
         b: 1,
-        c: function() {
+        get c() {
             events.push("calc c");
             return this.b;
         }
@@ -999,7 +999,7 @@ test('delay autorun until end of transaction', function(t) {
     var events = [];
     var x = observable({
         a: 2,
-        b: function() {
+        get b() {
             events.push("calc y");
             return this.a;
         }
@@ -1104,7 +1104,7 @@ test('prematurely end autorun', function(t) {
 test('issue 65; transaction causing transaction', function(t) {
     var x = mobx.observable({
         a: 3,
-        b: function() {
+        get b() {
             return mobx.transaction(function() {
                 return this.a * 2;
             }, this);
@@ -1132,10 +1132,10 @@ test('issue 71, transacting running transformation', function(t) {
     function Thing(value) {
         mobx.extendObservable(this, {
             value: value,
-            pos: function() {
+            get pos() {
                 return state.things.indexOf(this);
             },
-            isVisible: function() {
+            get isVisible() {
                 return this.pos !== -1;
             }
         });
@@ -1179,7 +1179,7 @@ test('eval in transaction', function(t) {
     var bCalcs = 0;
     var x = mobx.observable({
         a: 1,
-        b: function() {
+        get b() {
             bCalcs++;
             return this.a * 2;
         }

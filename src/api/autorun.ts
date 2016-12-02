@@ -1,5 +1,5 @@
 import {Lambda, getNextId, invariant, valueDidChange} from "../utils/utils";
-import {isModifierDescriptor, modifiers} from "../types/modifiers";
+import {isModifierDescriptor, modifiers, IModifierDescriptor} from "../types/modifiers";
 import {Reaction, IReactionPublic} from "../core/reaction";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
 import {action, isAction} from "../api/action";
@@ -164,8 +164,8 @@ export function reaction<T>(name: string, expression: (r: IReactionPublic) => T,
  * or
  * autorun(() => action(effect)(expr));
  */
+export function reaction<T>(expression: IModifierDescriptor<() => T, ()=> T>, effect: (arg: T, r: IReactionPublic) => void, fireImmediately?: boolean, delay?: number, scope?: any);
 export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately?: boolean, delay?: number, scope?: any);
-
 export function reaction<T>(arg1: any, arg2: any, arg3: any, arg4?: any, arg5?: any, arg6?: any) {
 	let name: string, expression: () => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately: boolean, delay: number, scope: any;
 	if (typeof arg1 === "string") {

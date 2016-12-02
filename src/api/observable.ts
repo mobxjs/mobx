@@ -4,7 +4,7 @@ import {isPlainObject, fail, invariant} from "../utils/utils";
 import {observableDecorator} from "./observabledecorator";
 import {isObservable} from "./isobservable";
 import {IObservableObject} from "../types/observableobject";
-import {modifiers, IModifier, isModifier, isModifierDescriptor} from "../types/modifiers";
+import {modifiers, IModifier, isModifier, isModifierDescriptor, IModifierDescriptor} from "../types/modifiers";
 import {extendObservable} from "../api/extendobservable";
 import {createObservableArray} from "../types/observablearray";
 
@@ -12,7 +12,7 @@ import {createObservableArray} from "../types/observablearray";
  * Turns an object, array or function into a reactive structure.
  * @param value the value which should become observable.
  */
-function toObservable(v: any = undefined, childModifier?) {
+function toObservable(v: any = undefined) {
 	// TODO: pass in name as well?
 
 	// @observable someProp;
@@ -26,7 +26,6 @@ function toObservable(v: any = undefined, childModifier?) {
 	// observable(modifiers.shallow([]))  etc..
 	// TODO: deprecate this pattern. it is mostly relevant in MobX2
 	if (isModifierDescriptor(v)) {
-		invariant(!childModifier, "You tried to assign a modifier wrapped value to a collection, please define modifiers when creating the collection, not when modifying it");
 		return v.modifier.implementation(v.initialValue);
 	}
 
@@ -38,19 +37,39 @@ function toObservable(v: any = undefined, childModifier?) {
 	// observable([])  --> use recursive
 	// observable([], modifiers.shallow)  --> use shallow
 	if (couldBeMadeObservabe(v))
-		return convertToObservable(v, childModifier || modifiers.recursive);
+		return convertToObservable(v, modifiers.recursive);
+
+	// something that is immutable / or something that could (should) not be made observable
+	// so just reference it
+	// observable(3)   --> box the thing (unboxed it is pretty useless if not owned)
+	return new ObservableValue(v, modifiers.ref);
+}
+
+/**
+ * Turns an object, array or function into a reactive structure, and cascades the given modifier.
+ * Returns immutables objects as is
+ */
+export function makeChildObservable<S, T>(v: S, childModifier: IModifier<T, T>): S | T {
+	// TODO: pass in name as well?
+
+	// observable(modifiers.shallow([]))  etc..
+	// TODO: deprecate this pattern. it is mostly relevant in MobX2
+	if (isModifierDescriptor(v)) {
+		invariant(!childModifier, "You tried to assign a modifier wrapped value to a collection, please define modifiers when creating the collection, not when modifying it");
+	}
+
+	// it is an observable already, done
+	if (isObservable(v))
+		return v;
+
+	// something that can be converted and mutated?
+	// observable([])  --> use recursive
+	// observable([], modifiers.shallow)  --> use shallow
+	if (couldBeMadeObservabe(v))
+		return convertToObservable(v, childModifier);
 
 	// something that is immutable / could (should) not be made observable
 	// so just reference it
-
-	// no childModifier set, so not to be owned by a collection
-	// observable(3)   --> box the thing (unboxed it is pretty useless if not owned)
-	if (!childModifier)
-		return new ObservableValue(v, modifiers.ref);
-
-	// there was a childModifier passed in,
-	// but not a value that could be made observable, just return original value
-	// a ref to it will be stored in the parent
 	return v;
 }
 
@@ -79,10 +98,12 @@ function convertToObservable(v, childModifier: IModifier<any, any>): any {
 export interface IObservableFactory {
 	// observable overloads
 	<T>(): IObservableValue<T>;
+	<T>(wrapped: IModifierDescriptor<any, T>): T;
 	(target: Object, key: string, baseDescriptor?: PropertyDescriptor): any;
-	<T>(value: T[], modifier?: IModifier<T, T>): IObservableArray<T>;
-	<T extends string|number|boolean|Date|RegExp|Function|null|undefined>(value: T, modifier?: IModifier<T, T>): IObservableValue<T>;
-	<T extends Object>(value: T, modifier?: IModifier<T, T>): T & IObservableObject;
+	<T>(value: T[]): IObservableArray<T>;
+	<T extends string|number|boolean|Date|RegExp|Function|null|undefined>(value: T): IObservableValue<T>;
+	<S, T>(value: S): T;
+	<T extends Object>(value: T): T & IObservableObject;
 
 	// convenience decorator for observable + modifier
 	// handles:

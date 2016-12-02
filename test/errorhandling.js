@@ -305,11 +305,11 @@ test('236 - cycles', t => {
 	var Parent = function() {
 		m.extendObservable(this, {
 			children: [],
-			total0: function() {
+			get total0() {
 				// Sum "value" of children of kind "0"
 				return this.children.filter(c => c.kind === 0).map(c => c.value).reduce((a, b) => a+b, 0);
 			},
-			total1: function() {
+			get total1() {
 				// Sum "value" of children of kind "1"
 				return this.children.filter(c => c.kind === 1).map(c => c.value).reduce((a, b) => a+b, 0);
 			}
@@ -320,7 +320,7 @@ test('236 - cycles', t => {
 		this.parent = parent;
 		m.extendObservable(this, {
 			kind: kind,
-			value: function() {
+			get value() {
 				if (this.kind === 0) {
 					return 3;
 				} else {

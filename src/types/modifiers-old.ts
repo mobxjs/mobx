@@ -1,5 +1,5 @@
 import {ObservableMap, IMapEntries, IKeyValueMap} from "../types/observablemap";
-import {deprecated} from "../utils/utils";
+import {deprecated, fail} from "../utils/utils";
 import {modifiers} from "./modifiers";
 
 /**
@@ -11,7 +11,7 @@ import {modifiers} from "./modifiers";
 	* @param value initial value of the reactive property that is being defined.
 	*/
 export function asReference<T>(value: T): T {
-	deprecated("asReference is deprecated, use modifiers.ref instead");
+	fail("asReference is deprecated, use modifiers.ref instead");
 	// unsound typecast, but in combination with makeReactive, the end result should be of the correct type this way
 	// e.g: makeReactive({ x : asReference(number)}) -> { x : number }
 	return modifiers.ref(value) as any;
@@ -29,7 +29,7 @@ export function asReference<T>(value: T): T {
 	* @param value initial value of the reactive property that is being defined.
 	*/
 export function asStructure<T>(value: T): T {
-	deprecated("asStructure is deprecated, use modifiers.structure instead");
+	fail("asStructure is deprecated, use modifiers.structure instead");
 	return modifiers.structure(value) as any;
 }
 
@@ -40,7 +40,7 @@ export function asStructure<T>(value: T): T {
 	* children will not automatically be made reactive as well.
 	*/
 export function asFlat<T>(value: T): T {
-	deprecated("asFlat is deprecated, use modifiers.shallow instead");
+	fail("asFlat is deprecated, use modifiers.shallow instead");
 	return modifiers.shallow(value) as any;
 }
 
@@ -49,7 +49,7 @@ export function asMap<T>(): ObservableMap<T>;
 export function asMap<T>(entries: IMapEntries<T>, modifierFunc?: Function): ObservableMap<T>;
 export function asMap<T>(data: IKeyValueMap<T>, modifierFunc?: Function): ObservableMap<T>;
 export function asMap(data?, modifierFunc?): ObservableMap<any> {
-	deprecated("asMap is deprecated, use modifiers.map / modifiers.shallowMap instead");
+	fail("asMap is deprecated, use modifiers.map / modifiers.shallowMap instead");
 	if (modifierFunc === asStructure || modifierFunc === asFlat)
 		return modifiers.shallowMap(data);
 	return modifiers.map(data);

@@ -1,6 +1,6 @@
 import {isPlainObject, deepEquals} from "../utils/utils";
 import {isObservable} from "../api/isobservable";
-import {observable} from "../api/observable";
+import {observable, makeChildObservable} from "../api/observable";
 import {createObservableArray} from "../types/observablearray";
 import {isObservableValue, ObservableValue, IObservableValue} from "../types/observablevalue";
 import {IObservableMapInitialValues, ObservableMap, isObservableMap} from "../types/observablemap";
@@ -94,13 +94,13 @@ function assertUnwrapped(value) {
 }
 
 function recursiveModifierImpl(newValue) {
-	return observable(newValue, modifiers.recursive);
+	return makeChildObservable(newValue, modifiers.recursive);
 }
 
 function shallowModifierImpl(newValue): any {
 	// this might look confusing, but the modifier to
 	// *items* inside a shallow collection is ref;
-	return observable(newValue, modifiers.ref);
+	return makeChildObservable(newValue, modifiers.ref);
 }
 
 function referenceModifierImpl(newValue) {
@@ -111,7 +111,7 @@ function referenceModifierImpl(newValue) {
 function structureModifierImpl(newValue, oldValue) {
 	if (deepEquals(newValue, oldValue))
 		return oldValue;
-	return observable(newValue, modifiers.structure);
+	return makeChildObservable(newValue, modifiers.structure);
 }
 
 function mapModifierImpl(newValue) {

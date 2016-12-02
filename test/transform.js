@@ -87,15 +87,15 @@ test('createTransformer as off-instance computed', t => {
 			return res.toUpperCase();
 		return res;
 	};
-	
+
 	// transformer creates a computed but reuses it for every time the same object is passed in
 	var displayName = m.createTransformer(_computeDisplayName);
-	
+
 	var person1 = m.observable({
 		firstName: "Mickey",
 		lastName: "Mouse"
 	});
-	
+
 	var person2 = m.observable({
 		firstName: "Donald",
 		lastName: "Duck"
@@ -103,29 +103,29 @@ test('createTransformer as off-instance computed', t => {
 
 	var persons = m.observable([]);
 	var displayNames = [];
-	
+
 	var disposer = m.autorun(() => {
 		displayNames = persons.map(p => displayName(p));
 	});
-	
+
 	t.equal(runs, 0);
 	t.deepEqual(displayNames, []);
-	
+
 	persons.push(person1);
 	t.equal(runs, 1);
 	t.deepEqual(displayNames, ["Mickey Mouse"]);
-	
+
 	t.equal(displayName(person1), "Mickey Mouse");
 	t.equal(runs, 1, "No new run needed; behaves like a normal computes");
-	
+
 	persons.push(person2);
 	t.equal(runs, 2, "person 2 calculated");
 	t.deepEqual(displayNames, ["Mickey Mouse", "Donald Duck"]);
-	
+
 	persons.push(person1);
 	t.equal(runs, 2, "person 1 not recalculated");
 	t.deepEqual(displayNames, ["Mickey Mouse", "Donald Duck", "Mickey Mouse"]);
-	
+
 	person1.firstName = "Minnie";
 	t.equal(runs, 3, "computed run only one other time");
 	t.deepEqual(displayNames, ["Minnie Mouse", "Donald Duck", "Minnie Mouse"]);
@@ -136,10 +136,10 @@ test('createTransformer as off-instance computed', t => {
 
 	persons.splice(1, 1);
 	t.deepEqual(displayNames, ["MINNIE MOUSE", "MINNIE MOUSE"]);
-	
+
 	person2.firstName = "Dagobert";
 	t.equal(runs, 5, "No re-run for person2; not observed anymore");
-	
+
 	disposer();
 	person1.lastName = "Maxi";
 	t.equal(runs, 5, "No re-run for person1; not observed anymore");
@@ -198,13 +198,13 @@ test('transform into reactive graph', function(t) {
 		this.state = state;
 		this.baseFolder = baseFolder;
 		m.extendObservable(this, {
-			name: function() {
+			get name() {
 				return this.baseFolder.name;
 			},
-			isVisible: function() {
+			get isVisible() {
 				return !this.state.filter || this.name.indexOf(this.state.filter) !== -1 || this.children.length > 0;
 			},
-			children: function() {
+			get children() {
 				_childrenRecalc++;
 				return this.baseFolder.children.map(transformFolder).filter(function(folder) {
 					return folder.isVisible === true;
@@ -295,7 +295,7 @@ test('transform tree (modifying tree incrementally)', function(t) {
 
 	// transform nodes to renderedNodes
 	m.autorun(function() {
-		// KM: ideally, I would like to do an assignment here, but it creates a cycle and would need to preserve ms.asStructure:
+		// KM: ideally, I would like to do an assignment here, but it creates a cycle and would need to preserve ms.modifiers.structure:
 		//
 		// state.renderedNodes = state.root ? state.root.map(transformNode) : [];
 		//
@@ -818,7 +818,7 @@ test('transform tree (static tags / global filter only)', function(t) {
 	});
 
 	// no tags
-	state.tags = m.observable(m.asStructure([]));
+	state.tags = m.observable(m.modifiers.structure([]));
 
 	// custom transform
 	TreeNode.prototype.transform = function(iteratee, results) {
@@ -930,7 +930,7 @@ test('transform tree (dynamic tags - peek / rebuild)', function(t) {
 	});
 
 	// no tags
-	state.tags = m.observable(m.asStructure([]));
+	state.tags = m.observable(m.modifiers.structure([]));
 
 	// custom transform
 	TreeNode.prototype.transform = function(iteratee, results) {
@@ -941,11 +941,11 @@ test('transform tree (dynamic tags - peek / rebuild)', function(t) {
 	}
 
 	// setup
-	var node = new TreeNode('root', {tags: m.observable(m.asStructure([1]))});
-	node.addChild(new TreeNode('root-child-1', {tags: m.observable(m.asStructure([2]))}));
-	node.children[0].addChild(new TreeNode('root-child-1-child-1', {tags: m.observable(m.asStructure([3]))}));
-	node.addChild(new TreeNode('root-child-2', {tags: m.observable(m.asStructure([2]))}));
-	node.children[1].addChild(new TreeNode('root-child-2-child-1', {tags: m.observable(m.asStructure([3]))}));
+	var node = new TreeNode('root', {tags: m.observable(m.modifiers.structure([1]))});
+	node.addChild(new TreeNode('root-child-1', {tags: m.observable(m.modifiers.structure([2]))}));
+	node.children[0].addChild(new TreeNode('root-child-1-child-1', {tags: m.observable(m.modifiers.structure([3]))}));
+	node.addChild(new TreeNode('root-child-2', {tags: m.observable(m.modifiers.structure([2]))}));
+	node.children[1].addChild(new TreeNode('root-child-2-child-1', {tags: m.observable(m.modifiers.structure([3]))}));
 	state.root = node;
 	t.equal(nodeCreateCount,	5);
 	t.equal(stats.refCount, 	5);

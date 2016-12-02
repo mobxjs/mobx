@@ -267,7 +267,7 @@ test('#285 class instances with toJS', t => {
 		mobx.extendObservable(this, {
 			lastName: "weststrate",
 			tags: ["user", "mobx-member"],
-			fullName: function() {
+			get fullName() {
 				return this.firstName + this.lastName
 			}
 		})

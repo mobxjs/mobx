@@ -198,7 +198,7 @@ test('observe collections', function(t) {
 })
 
 test('asStructure', function(t) {
-	var x = map({}, mobx.asStructure);
+	var x = new mobx.ObservableMap({}, mobx.modifiers.structure);
 	var triggerCount = 0;
 	var value = null;
 
@@ -285,11 +285,11 @@ test('issue 119 - unobserve before delete', function(t) {
 	});
 	myObservable.myMap.set('myId', {
 		myProp: 'myPropValue',
-		myCalculatedProp: function() {
+		myCalculatedProp: mobx.computed(function() {
 			if (myObservable.myMap.has('myId'))
 				return myObservable.myMap.get('myId').myProp + ' calculated';
 			return undefined;
-		}
+		})
 	});
 	// the error only happens if the value is observed
 	mobx.autorun(function() {
@@ -317,22 +317,22 @@ test('issue 116 - has should not throw on invalid keys', function(t) {
 });
 
 test('map modifier', t => {
-	var x = mobx.observable(mobx.asMap({ a: 1 }));
+	var x = mobx.observable(mobx.modifiers.map({ a: 1 }));
 	t.equal(x instanceof mobx.ObservableMap, true);
 	t.equal(mobx.isObservableMap(x), true);
 	t.equal(x.get("a"), 1);
 	x.set("b", {});
 	t.equal(mobx.isObservableObject(x.get("b")), true);
 
-	x = mobx.observable(mobx.asMap([["a", 1]]));
+	x = mobx.observable(mobx.modifiers.map([["a", 1]]));
 	t.equal(x instanceof mobx.ObservableMap, true);
 	t.equal(x.get("a"), 1);
 
-	x = mobx.observable(mobx.asMap());
+	x = mobx.observable(mobx.modifiers.map());
 	t.equal(x instanceof mobx.ObservableMap, true);
 	t.deepEqual(x.keys(), []);
 
-	x = mobx.observable({ a: mobx.asMap({ b: { c: 3 } })});
+	x = mobx.observable({ a: mobx.modifiers.map({ b: { c: 3 } })});
 	t.equal(mobx.isObservableObject(x), true);
 	t.equal(mobx.isObservableObject(x.a), false);
 	t.equal(mobx.isObservableMap(x.a), true);
@@ -342,17 +342,17 @@ test('map modifier', t => {
 });
 
 test('map modifier with modifier', t => {
-	var x = mobx.observable(mobx.asMap({ a: { c: 3 } }));
+	var x = mobx.observable(mobx.modifiers.map({ a: { c: 3 } }));
 	t.equal(mobx.isObservableObject(x.get("a")), true);
 	x.set("b", { d: 4 });
 	t.equal(mobx.isObservableObject(x.get("b")), true);
 
-	x = mobx.observable(mobx.asMap({ a: { c: 3 } }, mobx.asFlat));
+	x = mobx.observable(mobx.modifiers.shallowMap({ a: { c: 3 } }));
 	t.equal(mobx.isObservableObject(x.get("a")), false);
 	x.set("b", { d: 4 });
 	t.equal(mobx.isObservableObject(x.get("b")), false);
 
-	x = mobx.observable({ a: mobx.asMap({ b: {} }, mobx.asFlat)});
+	x = mobx.observable({ a: mobx.modifiers.shallowMap({ b: {} })});
 	t.equal(mobx.isObservableObject(x), true);
 	t.equal(mobx.isObservableMap(x.a), true);
 	t.equal(mobx.isObservableObject(x.a.get("b")), false);
@@ -362,10 +362,8 @@ test('map modifier with modifier', t => {
 	t.end();
 });
 
-// TODO: test, asMap should be sticky?
-
 test('256, map.clear should not be tracked', t => {
-	var x = mobx.observable(mobx.asMap({ a: 3 }));
+	var x = new mobx.ObservableMap({ a: 3 });
 	var c = 0;
 	var d = mobx.autorun(() => { c++; x.clear() });
 
@@ -379,8 +377,8 @@ test('256, map.clear should not be tracked', t => {
 
 
 test('256, map.merge should be not be tracked for target', t => {
-	var x = mobx.observable(mobx.asMap({ a: 3 }));
-	var y = mobx.observable(mobx.asMap({ b: 3 }));
+	var x = mobx.observable(mobx.modifiers.map({ a: 3 }));
+	var y = mobx.observable(mobx.modifiers.map({ b: 3 }));
 	var c = 0;
 
 	var d = mobx.autorun(() => {
