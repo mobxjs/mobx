@@ -4,7 +4,7 @@ import {Lambda, getNextId, createInstanceofPredicate} from "../utils/utils";
 import {hasInterceptors, IInterceptable, IInterceptor, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd, spyReport} from "../core/spy";
-import {IModifier} from "../types/modifiers";
+import {IModifier, modifiers} from "../types/modifiers";
 
 export interface IValueWillChange<T> {
 	object: any;
@@ -37,7 +37,7 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 	changeListeners;
 	protected value;
 
-	constructor(value: T, protected modifier: IModifier<any, T>, name = "ObservableValue@" + getNextId(), notifySpy = true) {
+	constructor(value: T, protected modifier: IModifier<any, T> = modifiers.ref, name = "ObservableValue@" + getNextId(), notifySpy = true) {
 		super(name);
 		this.value = modifier.implementation(value, undefined);
 		if (notifySpy && isSpyEnabled()) {

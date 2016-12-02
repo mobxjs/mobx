@@ -5,7 +5,7 @@ import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, inte
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {arrayAsIterator, declareIterator} from "../utils/iterable";
-import {IModifier} from "../types/modifiers";
+import {IModifier, modifiers} from "../types/modifiers";
 
 
 // Detects bug in safari 9.1.1 (or iOS 9 safari mobile). See #364
@@ -219,7 +219,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 export class ObservableArray<T> extends StubArray {
 	private $mobx: ObservableArrayAdministration<T>;
 
-	constructor(initialValues: T[] | null, modifier: IModifier<T, T>, name: string | undefined, owned = false) {
+	constructor(initialValues: T[] | null, modifier: IModifier<T, T> = modifiers.ref, name = "ObservableArray@" + getNextId(), owned = false) {
 		super();
 
 		const adm = new ObservableArrayAdministration<T>(name, modifier, this as any, owned);
@@ -497,10 +497,6 @@ function reserveArrayBuffer(max: number) {
 }
 
 reserveArrayBuffer(1000);
-
-export function createObservableArray<T>(initialValues: T[], modifier: IModifier<any, T>, name?: string): IObservableArray<T> {
-	return <IObservableArray<T>><any> new ObservableArray(initialValues, modifier, name);
-}
 
 const isObservableArrayAdministration = createInstanceofPredicate("ObservableArrayAdministration", ObservableArrayAdministration);
 

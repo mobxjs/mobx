@@ -3,7 +3,7 @@ import {transaction} from "../core/transaction";
 import {untracked} from "../core/derivation";
 import {ObservableArray, IObservableArray} from "./observablearray";
 import {ObservableValue, UNCHANGED} from "./observablevalue";
-import {createInstanceofPredicate, isPlainObject, getNextId, Lambda, invariant} from "../utils/utils";
+import {createInstanceofPredicate, isPlainObject, getNextId, Lambda, invariant, deprecated} from "../utils/utils";
 import {allowStateChanges} from "../core/action";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
@@ -41,12 +41,11 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	$mobx = ObservableMapMarker;
 	private _data: { [key: string]: ObservableValue<V> | undefined } = {};
 	private _hasMap: { [key: string]: ObservableValue<boolean> } = {}; // hasMap, not hashMap >-).
-	public name = "ObservableMap@" + getNextId();
 	private _keys: IObservableArray<string> = <any> new ObservableArray(null, modifiers.ref, `${this.name}.keys()`, true);
 	interceptors = null;
 	changeListeners = null;
 
-	constructor(initialData?: IObservableMapInitialValues<V>, public modifier: IModifier<any, any> = modifiers.recursive) {
+	constructor(initialData?: IObservableMapInitialValues<V>, public modifier: IModifier<any, any> = modifiers.ref, public name = "ObservableMap@" + getNextId()) {
 		allowStateChanges(true, () => {
 			if (isPlainObject(initialData))
 				this.merge(<IKeyValueMap<V>> initialData);
@@ -292,7 +291,8 @@ declareIterator(ObservableMap.prototype, function() {
  * Creates a map, similar to ES6 maps (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map),
  * yet observable.
  */
-export function map<V>(initialValues?: IMapEntries<V> | IKeyValueMap<V>, valueModifier?: IModifier<any, V>): ObservableMap<V> {
+export function map<V>(initialValues?: IMapEntries<V> | IKeyValueMap<V>, valueModifier: IModifier<any, V> = modifiers.recursive): ObservableMap<V> {
+	deprecated("`mobx.map` is deprecated, use `new ObservableMap` or `mobx.modifiers.map` instead");
 	return new ObservableMap(initialValues, valueModifier);
 }
 

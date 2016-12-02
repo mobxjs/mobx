@@ -8,14 +8,6 @@ import {IListenable, registerListener, hasListeners, notifyListeners} from "./li
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {IModifier, isModifierDescriptor, IModifierDescriptor, modifiers} from "../types/modifiers";
 
-const COMPUTED_FUNC_DEPRECATED = (
-`
-In MobX 2.* / MobX 3.* passing a function without arguments to (extend)observable will automatically be inferred to be a computed value.
-This behavior is ambiguous and will change in the future to create just an observable reference to the value passed in.
-To disambiguate, please pass the function wrapped with a modifier: use 'computed(fn)' (current behavior), 'asReference(fn)' (future behavior) or 'action(fn)'.
-Note that computed properties can also be written as '{ get propertyName() { ... }}'.
-For more details, see https://github.com/mobxjs/mobx/issues/532`);
-
 export interface IObservableObject {
 	"observable-object": IObservableObject;
 }
