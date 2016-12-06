@@ -25,6 +25,7 @@ export interface IObservableArray<T> extends Array<T> {
 	replace(newItems: T[]): T[];
 	find(predicate: (item: T, index: number, array: IObservableArray<T>) => boolean, thisArg?: any, fromIndex?: number): T;
 	remove(value: T): boolean;
+	move(fromIndex: number, toIndex: number): void;
 }
 
 // In 3.0, change to IArrayDidChange
@@ -359,6 +360,31 @@ export class ObservableArray<T> extends StubArray {
 		return false;
 	}
 
+	move(fromIndex: number, toIndex: number): void {
+		function checkIndex(index: number) {
+			if (index < 0) {
+				throw new Error(`[mobx.array] Index out of bounds: ${index} is negative`);
+			}
+			const length = this.$mobx.values.length;
+			if (index >= length) {
+				throw new Error(`[mobx.array] Index out of bounds: ${index} is not smaller than ${length}`);
+			}
+		}
+		checkIndex.call(this, fromIndex);
+		checkIndex.call(this, toIndex);
+		if (fromIndex === toIndex) {
+			return;
+		}
+		const oldItems = this.$mobx.values;
+		let newItems: T[];
+		if (fromIndex < toIndex) {
+			newItems = [...oldItems.slice(0, fromIndex), ...oldItems.slice(fromIndex + 1, toIndex + 1), oldItems[fromIndex], ...oldItems.slice(toIndex + 1)];
+		} else {	// toIndex < fromIndex
+			newItems = [...oldItems.slice(0, toIndex), oldItems[fromIndex], ...oldItems.slice(toIndex, fromIndex), ...oldItems.slice(fromIndex + 1)];
+		}
+		this.replace(newItems);
+	}
+
 	toString(): string {
 		return "[mobx.array] " + Array.prototype.toString.apply(this.$mobx.values, arguments);
 	}
@@ -394,6 +420,7 @@ makeNonEnumerable(ObservableArray.prototype, [
 	"reverse",
 	"sort",
 	"remove",
+	"move",
 	"toString",
 	"toLocaleString"
 ]);
