@@ -381,7 +381,7 @@ test('.move(i, i) does nothing', t => {
 	t.end();
 });
 
-test.only('.move works correctly', t => {
+test('.move works correctly', t => {
 	const arr = [0, 1, 2, 3];
 
 	function checkMove(fromIndex, toIndex, expected) {

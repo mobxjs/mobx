@@ -1,3 +1,7 @@
+# 2.6.5
+
+* Added `move` operation to observable array, see [#697](https://github.com/mobxjs/mobx/pull/697)
+
 # 2.6.4
 
 * Fixed potential clean up issue if an exception was thrown from an intercept handler
