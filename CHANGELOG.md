@@ -1,3 +1,63 @@
+# 2.7.0
+
+### Misc
+
+* Fixed typings for `when` / `autorun` / `reaction`; they all return a disposer function.
+
+### Automatic inference of computed properties has been deprecated.
+
+A deprecation message will now be printed if creating computed properties while relying on automatical inferrence of argumentless functions as computed values. In other words, when using `observable` or `extendObservable` in the following manner:
+
+```
+const x = observable({
+	computedProp: function() {
+		return someComputation
+	}
+})
+
+// Due to automatic inferrence now available as computed property:
+x.computedProp
+// And not !
+x.computedProp()
+```
+
+Instead, to create a computed property, use:
+
+```
+observable({
+	get computedProp() {
+		return someComputation
+	}
+})
+```
+
+or alternatively:
+
+```
+observable({
+	computedProp: computed(function() {
+		return someComputation
+	})
+})
+```
+
+This change should avoid confusing experiences when trying to create methods that don't take arguments.
+The current behavior will be kept as-is in the MobX 2.* range,
+but from MobX 3 onward the argumentless functions will no longer be turned
+automatically into computed values; they will be treated the same as function with arguments.
+An observable _reference_ to the function will be made and the function itself will be preserved.
+See for more details [#532](https://github.com/mobxjs/mobx/issues/532)
+
+N.B. If you want to introduce actions on an observable that modify it's state, using `action` is still the recommended approach:
+```
+observable({
+	counter: 0,
+	increment: action(function() {
+		this.counter++
+	})
+})
+```
+
 # 2.6.5
 
 * Added `move` operation to observable array, see [#697](https://github.com/mobxjs/mobx/pull/697)
