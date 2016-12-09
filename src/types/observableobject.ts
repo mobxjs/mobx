@@ -89,7 +89,8 @@ export function setObservableObjectInstanceProperty(adm: ObservableObjectAdminis
 		if ("value" in descriptor) {
 			if (handleAsComputedValue(descriptor.value)) {
 				// warn about automatic inference, see https://github.com/mobxjs/mobx/issues/421
-				deprecated(`${COMPUTED_FUNC_DEPRECATED})in: ${adm.name}.${propName}`);
+				if (deprecated(COMPUTED_FUNC_DEPRECATED))
+					console.warn(`in: ${adm.name}.${propName}`);
 			}
 			defineObservableProperty(adm, propName, descriptor.value, true, undefined);
 		} else {
