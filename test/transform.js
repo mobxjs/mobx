@@ -818,7 +818,7 @@ test('transform tree (static tags / global filter only)', function(t) {
 	});
 
 	// no tags
-	state.tags = m.observable(m.modifiers.structure([]));
+	state.tags = m.observable.array([])
 
 	// custom transform
 	TreeNode.prototype.transform = function(iteratee, results) {
@@ -930,7 +930,7 @@ test('transform tree (dynamic tags - peek / rebuild)', function(t) {
 	});
 
 	// no tags
-	state.tags = m.observable(m.modifiers.structure([]));
+	state.tags = m.observable.array([])
 
 	// custom transform
 	TreeNode.prototype.transform = function(iteratee, results) {
@@ -941,11 +941,11 @@ test('transform tree (dynamic tags - peek / rebuild)', function(t) {
 	}
 
 	// setup
-	var node = new TreeNode('root', {tags: m.observable(m.modifiers.structure([1]))});
-	node.addChild(new TreeNode('root-child-1', {tags: m.observable(m.modifiers.structure([2]))}));
-	node.children[0].addChild(new TreeNode('root-child-1-child-1', {tags: m.observable(m.modifiers.structure([3]))}));
-	node.addChild(new TreeNode('root-child-2', {tags: m.observable(m.modifiers.structure([2]))}));
-	node.children[1].addChild(new TreeNode('root-child-2-child-1', {tags: m.observable(m.modifiers.structure([3]))}));
+	var node = new TreeNode('root', {tags: m.observable.array([1])});
+	node.addChild(new TreeNode('root-child-1', {tags: m.observable.array([2])}));
+	node.children[0].addChild(new TreeNode('root-child-1-child-1', {tags: m.observable.array([3])}));
+	node.addChild(new TreeNode('root-child-2', {tags: m.observable.array([2])}));
+	node.children[1].addChild(new TreeNode('root-child-2-child-1', {tags: m.observable.array([3])}));
 	state.root = node;
 	t.equal(nodeCreateCount,	5);
 	t.equal(stats.refCount, 	5);

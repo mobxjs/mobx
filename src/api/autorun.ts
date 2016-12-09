@@ -183,12 +183,11 @@ export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg:
 	if (typeof arg3 === "object") {
 		opts = arg3;
 	} else {
-		opts = {
-			name: (expression as any).name || (effect as any).name || ("Reaction@" + getNextId())
-		};
+		opts = {};
 	}
 
-	opts.fireImmediately = arg3 === true;
+	opts.name = opts.name || (expression as any).name || (effect as any).name || ("Reaction@" + getNextId());
+	opts.fireImmediately = arg3 === true || opts.fireImmediately === true;
 	opts.delay = opts.delay || 0;
 	opts.compareStructural = opts.compareStructural || false;
 	effect = action(opts.name!, opts.context ? effect.bind(opts.context) : effect);
@@ -200,7 +199,7 @@ export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg:
 	let isScheduled = false;
 	let nextValue: T;
 
-	const r = new Reaction(name, () => {
+	const r = new Reaction(opts.name, () => {
 		if (opts.delay < 1) {
 			reactionRunner();
 		} else if (!isScheduled) {

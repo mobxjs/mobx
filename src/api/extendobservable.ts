@@ -1,27 +1,21 @@
 import {isObservableMap} from "../types/observablemap";
-import {asObservableObject, setObservableObjectInstanceProperty} from "../types/observableobject";
+import {asObservableObject, defineObservablePropertyFromDescriptor} from "../types/observableobject";
 import {isObservable} from "../api/isobservable";
 import {invariant, isPropertyConfigurable, hasOwnProperty} from "../utils/utils";
-import {isModifier, IModifier, modifiers} from "../types/modifiers";
+import {deepEnhancer, referenceEnhancer, IEnhancer} from "../types/modifiers";
 
-/**
- * Extends an object with reactive capabilities.
- * @param target the object to which reactive properties should be added
- * @param properties the properties that should be added and made reactive
- * @returns targer
- */
-export function extendObservable<A extends Object, B extends Object>(target: A, ...properties: B[]): A & B;
-export function extendObservable<A extends Object, B extends Object>(target: A, childModifier: IModifier<any, any>, ...properties: B[]): A & B;
-export function extendObservable(target: Object, childModifier: IModifier<any, any>, ...properties: Object[]): Object {
+export function extendObservable<A extends Object, B extends Object>(target: A, ...properties: B[]): A & B {
+	return extendObservableHelper(target, deepEnhancer, properties) as any;
+}
+
+export function extendShallowObservable<A extends Object, B extends Object>(target: A, ...properties: B[]): A & B {
+	return extendObservableHelper(target, referenceEnhancer, properties) as any;
+}
+
+function extendObservableHelper(target: Object, defaultEnhancer: IEnhancer<any>, properties: Object[]): Object {
 	invariant(arguments.length >= 2, "extendObservable expected 2 or more arguments");
 	invariant(typeof target === "object", "extendObservable expects an object as first argument");
 	invariant(!(isObservableMap(target)), "extendObservable should not be used on maps, use map.merge instead");
-	invariant(Object.isExtensible(target), "Cannot extend the designated object; it is not extensible");
-
-	if (!isModifier(childModifier)) {
-		properties.unshift(childModifier);
-		childModifier = modifiers.recursive;
-	}
 
 	properties.forEach(propSet => {
 		invariant(typeof propSet === "object", "all arguments of extendObservable should be objects");
@@ -38,7 +32,7 @@ export function extendObservable(target: Object, childModifier: IModifier<any, a
 			if (target as any === propSet && !isPropertyConfigurable(target, key))
 				continue; // see #111, skip non-configurable or non-writable props for `observable(object)`.
 			const descriptor = Object.getOwnPropertyDescriptor(propSet, key);
-			setObservableObjectInstanceProperty(adm, key, descriptor, childModifier);
+			defineObservablePropertyFromDescriptor(adm, key, descriptor, defaultEnhancer);
 		}
 	}
 	return target;

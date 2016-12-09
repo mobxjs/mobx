@@ -67,7 +67,9 @@ test('effect debounce is honored', t => {
 		return a.get()
 	}, newValue => {
 		values.push(newValue);
-	}, false, 100)
+	}, {
+		delay: 100
+	})
 
 	setTimeout(() => a.set(2), 30); // should not become visible nor evaluate expr; first is skipped
 	setTimeout(() => a.set(3), 150); // should not be visible, combined with the next
@@ -94,7 +96,10 @@ test('effect debounce + fire immediately is honored', t => {
 		return a.get()
 	}, newValue => {
 		values.push(newValue);
-	}, true, 100)
+	}, {
+		fireImmediately: true,
+		delay: 100
+	})
 
 	setTimeout(() => a.set(3), 150);
 	setTimeout(() => a.set(4), 300);
@@ -224,11 +229,16 @@ test("#278 do not rerun if expr output doesn't change structurally", t => {
 	]);
 	var values = [];
 
-	var d = reaction(mobx.modifiers.structure(
-		() => users.map(user => user.uppername)
-	), newValue => {
-		values.push(newValue);
-	}, true)
+	var d = reaction(
+		() => users.map(user => user.uppername),
+		newValue => {
+			values.push(newValue);
+		},
+		{
+			fireImmediately: true,
+			compareStructural: true
+		}
+	)
 
 	users[0].name = "john";
 	users[0].name = "JoHn";

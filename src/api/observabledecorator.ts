@@ -2,18 +2,17 @@ import {allowStateChangesStart, allowStateChangesEnd} from "../core/action";
 import {asObservableObject, defineObservableProperty, setPropertyValue} from "../types/observableobject";
 import {invariant, assertPropertyConfigurable} from "../utils/utils";
 import {createClassPropertyDecorator} from "../utils/decorators";
-import {modifiers, IModifier} from "../types/modifiers";
+import {deepEnhancer} from "../types/modifiers";
+
+// TODO: @observable.shallow
+// TODO: @observable.ref
 
 const decoratorImpl = createClassPropertyDecorator(
-	(target, name, baseValue, mods) => {
+	(target, name, baseValue) => {
 		// might happen lazily (on first read), so temporarily allow state changes..
 		const prevA = allowStateChangesStart(true);
-		const modifier: IModifier<any, any> = mods && mods.length === 1
-			? mods[0]
-			: modifiers.recursive
-		;
 		const adm = asObservableObject(target, undefined);
-		defineObservableProperty(adm, name, false, baseValue, modifier, true, undefined);
+		defineObservableProperty(adm, name, baseValue, deepEnhancer, true);
 		allowStateChangesEnd(prevA);
 	},
 	function (name) {

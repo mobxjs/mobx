@@ -1,12 +1,11 @@
-import {isObject, createInstanceofPredicate, getNextId, deepEquals, makeNonEnumerable, Lambda, EMPTY_ARRAY, addHiddenFinalProp, addHiddenProp, invariant} from "../utils/utils";
+import {isObject, createInstanceofPredicate, getNextId, makeNonEnumerable, Lambda, EMPTY_ARRAY, addHiddenFinalProp, addHiddenProp, invariant} from "../utils/utils";
 import {BaseAtom} from "../core/atom";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {arrayAsIterator, declareIterator} from "../utils/iterable";
-import {IModifier, modifiers} from "../types/modifiers";
-
+import {IEnhancer} from "../types/modifiers";
 
 // Detects bug in safari 9.1.1 (or iOS 9 safari mobile). See #364
 const safariPrototypeSetterInheritanceBug = (() => {
@@ -82,7 +81,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 	interceptors = null;
 	changeListeners = null;
 
-	constructor(name, public modifier: IModifier<any, T>, public array: IObservableArray<T>, public owned: boolean) {
+	constructor(name, public enhancer: IEnhancer<T>, public array: IObservableArray<T>, public owned: boolean) {
 		this.atom = new BaseAtom(name || ("ObservableArray@" + getNextId()));
 	}
 
@@ -166,7 +165,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 			newItems = change.added;
 		}
 
-		newItems = <T[]> newItems.map(v => this.modifier.implementation(v));
+		newItems = <T[]> newItems.map(this.enhancer as any);
 		const lengthDelta = newItems.length - deleteCount;
 		this.updateArrayLength(length, lengthDelta); // create or remove new entries
 		const res: T[] = this.values.splice(index, deleteCount, ...newItems); // FIXME: splat might exceed callstack size!
@@ -219,15 +218,15 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 export class ObservableArray<T> extends StubArray {
 	private $mobx: ObservableArrayAdministration<T>;
 
-	constructor(initialValues: T[] | null, modifier: IModifier<T, T> = modifiers.ref, name = "ObservableArray@" + getNextId(), owned = false) {
+	constructor(initialValues: T[] | undefined, enhancer: IEnhancer<T>, name = "ObservableArray@" + getNextId(), owned = false) {
 		super();
 
-		const adm = new ObservableArrayAdministration<T>(name, modifier, this as any, owned);
+		const adm = new ObservableArrayAdministration<T>(name, enhancer, this as any, owned);
 		addHiddenFinalProp(this, "$mobx", adm);
 
 		if (initialValues && initialValues.length) {
 			adm.updateArrayLength(0, initialValues.length);
-			adm.values = initialValues.map(v => modifier.implementation(v));
+			adm.values = initialValues.map(enhancer as (t:T) => T);
 			adm.notifyArraySplice(0, adm.values.slice(), EMPTY_ARRAY);
 		} else {
 			adm.values = [];
@@ -463,7 +462,7 @@ function createArraySetter(index: number) {
 					return;
 				newValue = change.newValue;
 			}
-			newValue = adm.modifier.implementation(newValue, oldValue);
+			newValue = adm.enhancer(newValue);
 			const changed = newValue !== oldValue;
 			if (changed) {
 				values[index] = newValue;

@@ -4,7 +4,7 @@ import {Lambda, getNextId, createInstanceofPredicate} from "../utils/utils";
 import {hasInterceptors, IInterceptable, IInterceptor, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd, spyReport} from "../core/spy";
-import {IModifier, modifiers} from "../types/modifiers";
+import {IEnhancer} from "../types/modifiers";
 
 export interface IValueWillChange<T> {
 	object: any;
@@ -37,9 +37,9 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 	changeListeners;
 	protected value;
 
-	constructor(value: T, protected modifier: IModifier<any, T> = modifiers.ref, name = "ObservableValue@" + getNextId(), notifySpy = true) {
+	constructor(value: T, protected enhancer: IEnhancer<T>, name = "ObservableValue@" + getNextId(), notifySpy = true) {
 		super(name);
-		this.value = modifier.implementation(value, undefined);
+		this.value = enhancer(value);
 		if (notifySpy && isSpyEnabled()) {
 			// only notify spy if this is a stand-alone observable
 			spyReport({ type: "create", object: this, newValue: this.value });
@@ -64,7 +64,7 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 		}
 	}
 
-	prepareNewValue(newValue): T | IUNCHANGED {
+	private prepareNewValue(newValue): T | IUNCHANGED {
 		checkIfStateModificationsAreAllowed();
 		if (hasInterceptors(this)) {
 			const change = interceptChange<IValueWillChange<T>>(this, { object: this, type: "update", newValue });
@@ -73,7 +73,7 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 			newValue = change.newValue;
 		}
 		// apply modifier
-		newValue = this.modifier.implementation(newValue, this.value);
+		newValue = this.enhancer(newValue);
 		return this.value !== newValue
 			? newValue
 			: UNCHANGED

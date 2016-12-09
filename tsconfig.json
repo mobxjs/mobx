@@ -10,7 +10,7 @@
 		"strictNullChecks": true,
 		"noImplicitReturns": true,
 		"noImplicitUseStrict": true,
-		"noImplicitAny": false // but should be true for all publicly exposed things!
+		"noImplicitAny": false
     },
     "exclude": [
         "node_modules",

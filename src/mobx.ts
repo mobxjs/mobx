@@ -29,27 +29,27 @@ export { transaction                                          } from "./core/tra
 export { IComputedValue                                       } from "./core/computedvalue";
 
 export { asReference, asFlat, asStructure, asMap              } from "./types/modifiers-old";
-export { IModifier, IModifierDescriptor, modifiers, createModifier, IModifierImpl, IModifiersFactoryA, IModifiersFactoryB  } from "./types/modifiers";
+export { IModifierDescriptor, IEnhancer, isModifierDescriptor } from "./types/modifiers";
 export { IInterceptable, IInterceptor                         } from "./types/intercept-utils";
 export { IListenable                                          } from "./types/listen-utils";
 export { IObjectWillChange, IObjectChange, IObservableObject, isObservableObject } from "./types/observableobject";
 
 export { /* 3.0: IValueDidChange, */ IValueWillChange, IObservableValue, ObservableValue } from "./types/observablevalue";
-export { IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, isObservableArray, ObservableArray } from "./types/observablearray";
+export { IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, isObservableArray } from "./types/observablearray";
 export { IKeyValueMap, ObservableMap, IMapEntries, IMapEntry, IMapWillChange, IMapChange, isObservableMap, map, IObservableMapInitialValues } from "./types/observablemap"
 
-export { observable, IObservableFactory                       } from "./api/observable";
+export { observable, IObservableFactory, IObservableFactories } from "./api/observable";
 export { computed, IComputedValueOptions                      } from "./api/computeddecorator";
 export { isObservable                                         } from "./api/isobservable";
 export { isComputed                                           } from "./api/iscomputed";
-export { extendObservable                                     } from "./api/extendobservable";
+export { extendObservable, extendShallowObservable            } from "./api/extendobservable";
 export { observe                                              } from "./api/observe";
 export { intercept                                            } from "./api/intercept";
-export { autorun, autorunAsync, when, reaction  } from "./api/autorun";
+export { autorun, autorunAsync, when, reaction, IReactionOptions  } from "./api/autorun";
 export { action, isAction, runInAction                        } from "./api/action";
 
 export { expr                                                 } from "./api/expr";
-export { toJS, toJSlegacy                             } from "./api/tojs";
+export { toJS                                                 } from "./api/tojs";
 export { ITransformer, createTransformer                      } from "./api/createtransformer";
 export { whyRun                                               } from "./api/whyrun";
 
@@ -93,6 +93,6 @@ export const _ = {
 
 declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: ((any) => void)};
 declare var module: { exports: any };
-if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === 'object') {
+if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
 	__MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx(module.exports)
 }

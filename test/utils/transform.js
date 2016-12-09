@@ -16,7 +16,7 @@ module.exports.testSet = function() {
 
   var state = testSet.state = m.observable({
     root: null,
-    renderedNodes: m.modifiers.map([]),
+    renderedNodes: m.observable.map(),
     collapsed: new m.map() // KM: ideally, I would like to use a set
   });
 
@@ -25,7 +25,7 @@ module.exports.testSet = function() {
   }
 
   var TreeNode = testSet.TreeNode = function(name, extensions) {
-    this.children = m.observable(m.modifiers.map([]));
+    this.children = m.observable.map();
     this.icon = m.observable('folder');
 
     this.parent = null; // not observed

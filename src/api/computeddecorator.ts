@@ -1,5 +1,4 @@
-import {modifiers, isModifierDescriptor} from "../types/modifiers";
-import {asObservableObject, defineObservableProperty} from "../types/observableobject";
+import {asObservableObject, defineComputedProperty} from "../types/observableobject";
 import {invariant} from "../utils/utils";
 import {createClassPropertyDecorator} from "../utils/decorators";
 import {ComputedValue, IComputedValue} from "../core/computedvalue";
@@ -8,19 +7,14 @@ export interface IComputedValueOptions {
 	asStructure: boolean;
 }
 
+// TODO: add computed.struct modifier
 const computedDecorator = createClassPropertyDecorator(
-	(target, name, _, decoratorArgs, originalDescriptor) => {
+	(target, name, _, __, originalDescriptor) => {
 		invariant(typeof originalDescriptor !== "undefined", "@computed can only be used on getter functions, like: '@computed get myProps() { return ...; }'. It looks like it was used on a property.");
-		const baseValue = originalDescriptor.get;
-		const setter = originalDescriptor.set;
-		invariant(typeof baseValue === "function", "@computed can only be used on getter functions, like: '@computed get myProps() { return ...; }'");
-
-		let compareStructural = false;
-		if (decoratorArgs && decoratorArgs.length === 1 && decoratorArgs[0] === modifiers.structure)
-			compareStructural = true;
+		invariant(typeof originalDescriptor.get === "function", "@computed can only be used on getter functions, like: '@computed get myProps() { return ...; }'");
 
 		const adm = asObservableObject(target, "");
-		defineObservableProperty(adm, name, true, baseValue, compareStructural ? modifiers.structure : modifiers.ref, false, setter);
+		defineComputedProperty(adm, name, originalDescriptor.get, originalDescriptor.set, false, true)
 	},
 	function (name) {
 		const observable = this.$mobx.values[name];
@@ -32,28 +26,29 @@ const computedDecorator = createClassPropertyDecorator(
 		this.$mobx.values[name].set(value);
 	},
 	false,
-	true
+	false
 );
 
 /**
  * Decorator for class properties: @computed get value() { return expr; }.
  * For legacy purposes also invokable as ES5 observable created: `computed(() => expr)`;
  */
-export function computed<T>(func: () => T, setter: (value: T) => void): IComputedValue<T>;
-export function computed<T>(func: () => T, scope?: any): IComputedValue<T>;
-export function computed(opts: IComputedValueOptions): (target: Object, key: string, baseDescriptor?: PropertyDescriptor) => void;
+export function computed<T>(func: () => T, setter: (value: T) => void, compareStructural?: boolean): IComputedValue<T>;
+export function computed<T>(func: () => T, context?: Object): IComputedValue<T>;
 export function computed(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void;
-export function computed(targetOrExpr: any, keyOrScopeOrSetter?: any, baseDescriptor?: PropertyDescriptor, options?: IComputedValueOptions) {
-	if (typeof targetOrExpr === "function" && arguments.length < 3) {
+export function computed(targetOrExpr: any, keyOrScopeOrSetter?: any, descOrStruct?: any, options?: IComputedValueOptions) {
+	// TODO: improve this api, computed.struct instead of third arg?
+	if (typeof targetOrExpr === "function" && (arguments.length < 3 || typeof keyOrScopeOrSetter !== "string")) {
+		invariant(typeof targetOrExpr === "function", "First argument to `computed` should be an expression. If using computed as decorator, don't pass it arguments");
 		if (typeof keyOrScopeOrSetter === "function")
-			return computedExpr(targetOrExpr, keyOrScopeOrSetter, undefined, false);
+			return computedExpr(targetOrExpr, keyOrScopeOrSetter, undefined, descOrStruct === true);
 		else
-			return computedExpr(targetOrExpr, undefined, keyOrScopeOrSetter, false);
-	} else if (isModifierDescriptor(targetOrExpr) && targetOrExpr.modifier === modifiers.structure) {
-		return computedExpr(targetOrExpr.initialValue, keyOrScopeOrSetter, undefined, true);
+			return computedExpr(targetOrExpr, undefined, keyOrScopeOrSetter, descOrStruct === true);
 	}
 	return computedDecorator.apply(null, arguments);
 }
+
+// TODO: export computed.struct
 
 function computedExpr<T>(expr: () => T, setter, scope: any, compareStructural: boolean) {
 	return new ComputedValue(expr, scope, compareStructural, (expr as any).name, setter);
