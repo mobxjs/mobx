@@ -2,6 +2,7 @@
 
 ### Misc
 
+* Fixed #701: `toJS` sometimes failing to convert objects decorated with `@observable` (cause: `isObservable` sometimes returned false on these object)
 * Fixed typings for `when` / `autorun` / `reaction`; they all return a disposer function.
 
 ### Automatic inference of computed properties has been deprecated.
