@@ -1,7 +1,7 @@
 import {IEnhancer, deepEnhancer} from "./modifiers";
 import {transaction} from "../core/transaction";
 import {untracked} from "../core/derivation";
-import {IObservableArray} from "./observablearray";
+import {IObservableArray, ObservableArray} from "./observablearray";
 import {ObservableValue, UNCHANGED} from "./observablevalue";
 import {createInstanceofPredicate, isPlainObject, getNextId, Lambda, invariant, deprecated} from "../utils/utils";
 import {allowStateChanges} from "../core/action";
@@ -43,13 +43,12 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	$mobx = ObservableMapMarker;
 	private _data: { [key: string]: ObservableValue<V> | undefined } = {};
 	private _hasMap: { [key: string]: ObservableValue<boolean> } = {}; // hasMap, not hashMap >-).
-	private _keys: IObservableArray<string>;
+	private _keys: IObservableArray<string> = <any> new ObservableArray(undefined, referenceEnhancer, `${this.name}.keys()`, true);
 	interceptors = null;
 	changeListeners = null;
 
 	constructor(initialData?: IObservableMapInitialValues<V>, public enhancer: IEnhancer<V> = deepEnhancer, public name = "ObservableMap@" + getNextId()) {
 		allowStateChanges(true, () => {
-	 		this._keys = observable.shallowArray<string>([], name + ".keys()");
 			if (isPlainObject(initialData))
 				this.merge(<IKeyValueMap<V>> initialData);
 			else if (Array.isArray(initialData))

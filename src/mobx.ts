@@ -34,7 +34,7 @@ export { IInterceptable, IInterceptor                         } from "./types/in
 export { IListenable                                          } from "./types/listen-utils";
 export { IObjectWillChange, IObjectChange, IObservableObject, isObservableObject } from "./types/observableobject";
 
-export { /* 3.0: IValueDidChange, */ IValueWillChange, IObservableValue, ObservableValue } from "./types/observablevalue";
+export { /* 3.0: IValueDidChange, */ IValueWillChange, IObservableValue } from "./types/observablevalue";
 export { IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, isObservableArray } from "./types/observablearray";
 export { IKeyValueMap, ObservableMap, IMapEntries, IMapEntry, IMapWillChange, IMapChange, isObservableMap, map, IObservableMapInitialValues } from "./types/observablemap"
 

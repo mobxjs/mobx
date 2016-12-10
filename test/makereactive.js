@@ -491,7 +491,8 @@ test('exceptions', function(t) {
     }, "nested");
 
     var x = m.observable({
-        y: m.observable.ref(null)
+        y: m.observable.ref(null),
+		z: 2
     });
 
     t.throws(function() {
@@ -499,7 +500,7 @@ test('exceptions', function(t) {
     });
 
     t.throws(function() {
-        x.y = m.asReference(3)
+        x.z = m.asReference(3)
     });
 
     var ar = m.observable([2]);

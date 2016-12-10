@@ -25,7 +25,7 @@ function deepObservable(v: any = undefined) {
 		return v;
 
 	// something that can be converted and mutated?
-	const res = deepEnhancer(v);
+	const res = deepEnhancer(v, undefined, undefined);
 
 	// this value could be converted to a new observable data structure, return it
 	if (res !== v)

@@ -39,7 +39,7 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 
 	constructor(value: T, protected enhancer: IEnhancer<T>, name = "ObservableValue@" + getNextId(), notifySpy = true) {
 		super(name);
-		this.value = enhancer(value);
+		this.value = enhancer(value, undefined, name);
 		if (notifySpy && isSpyEnabled()) {
 			// only notify spy if this is a stand-alone observable
 			spyReport({ type: "create", object: this, newValue: this.value });
@@ -73,7 +73,7 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 			newValue = change.newValue;
 		}
 		// apply modifier
-		newValue = this.enhancer(newValue);
+		newValue = this.enhancer(newValue, this.value, this.name);
 		return this.value !== newValue
 			? newValue
 			: UNCHANGED

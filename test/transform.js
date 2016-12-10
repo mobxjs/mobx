@@ -941,7 +941,7 @@ test('transform tree (dynamic tags - peek / rebuild)', function(t) {
 	}
 
 	// setup
-	var node = new TreeNode('root', {tags: m.observable.array([1])});
+	var node = new TreeNode('root', {tags: m.observable.array([1]	)});
 	node.addChild(new TreeNode('root-child-1', {tags: m.observable.array([2])}));
 	node.children[0].addChild(new TreeNode('root-child-1-child-1', {tags: m.observable.array([3])}));
 	node.addChild(new TreeNode('root-child-2', {tags: m.observable.array([2])}));

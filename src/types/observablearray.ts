@@ -80,9 +80,11 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 	lastKnownLength: number = 0;
 	interceptors = null;
 	changeListeners = null;
+	enhancer: (newV: T, oldV: T | undefined) => T;
 
-	constructor(name, public enhancer: IEnhancer<T>, public array: IObservableArray<T>, public owned: boolean) {
+	constructor(name, enhancer: IEnhancer<T>, public array: IObservableArray<T>, public owned: boolean) {
 		this.atom = new BaseAtom(name || ("ObservableArray@" + getNextId()));
+		this.enhancer = (newV, oldV) => enhancer(newV, oldV, name + "[..]");
 	}
 
 	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
@@ -165,7 +167,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 			newItems = change.added;
 		}
 
-		newItems = <T[]> newItems.map(this.enhancer as any); // TODO: extract mapper func
+		newItems = <T[]> newItems.map(v => this.enhancer(v, undefined));
 		const lengthDelta = newItems.length - deleteCount;
 		this.updateArrayLength(length, lengthDelta); // create or remove new entries
 		const res: T[] = this.values.splice(index, deleteCount, ...newItems); // FIXME: splat might exceed callstack size!
@@ -226,7 +228,7 @@ export class ObservableArray<T> extends StubArray {
 
 		if (initialValues && initialValues.length) {
 			adm.updateArrayLength(0, initialValues.length);
-			adm.values = initialValues.map(enhancer as (t:T) => T);
+			adm.values = initialValues.map(v => enhancer(v, undefined, name + "[..]"));
 			adm.notifyArraySplice(0, adm.values.slice(), EMPTY_ARRAY);
 		} else {
 			adm.values = [];
@@ -462,7 +464,7 @@ function createArraySetter(index: number) {
 					return;
 				newValue = change.newValue;
 			}
-			newValue = adm.enhancer(newValue);
+			newValue = adm.enhancer(newValue, oldValue);
 			const changed = newValue !== oldValue;
 			if (changed) {
 				values[index] = newValue;

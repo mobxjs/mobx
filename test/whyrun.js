@@ -20,7 +20,7 @@ test("whyrun", t => {
 	const x = mobx.observable({
 		firstname: "Michel",
 		lastname: "Weststrate",
-		fullname: function() {
+		get fullname() {
 			var res = this.firstname + " " + this.lastname;
 			whyRun();
 			return res;
