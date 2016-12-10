@@ -87,6 +87,8 @@ export class IObservableFactories {
 		return res as any;
 	}
 
+
+	// TODO: move to modifiers
 	ref<T>(initialValue: T): T {
 		// TODO: decorator overload
 		// although ref creates actually a modifier descriptor, the type of the resultig properties

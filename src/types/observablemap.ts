@@ -43,12 +43,13 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	$mobx = ObservableMapMarker;
 	private _data: { [key: string]: ObservableValue<V> | undefined } = {};
 	private _hasMap: { [key: string]: ObservableValue<boolean> } = {}; // hasMap, not hashMap >-).
-	private _keys: IObservableArray<string> = observable.shallowArray<string>()
+	private _keys: IObservableArray<string>;
 	interceptors = null;
 	changeListeners = null;
 
 	constructor(initialData?: IObservableMapInitialValues<V>, public enhancer: IEnhancer<V> = deepEnhancer, public name = "ObservableMap@" + getNextId()) {
 		allowStateChanges(true, () => {
+	 		this._keys = observable.shallowArray<string>([], name + ".keys()");
 			if (isPlainObject(initialData))
 				this.merge(<IKeyValueMap<V>> initialData);
 			else if (Array.isArray(initialData))

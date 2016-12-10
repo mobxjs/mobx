@@ -165,7 +165,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 			newItems = change.added;
 		}
 
-		newItems = <T[]> newItems.map(this.enhancer as any);
+		newItems = <T[]> newItems.map(this.enhancer as any); // TODO: extract mapper func
 		const lengthDelta = newItems.length - deleteCount;
 		this.updateArrayLength(length, lengthDelta); // create or remove new entries
 		const res: T[] = this.values.splice(index, deleteCount, ...newItems); // FIXME: splat might exceed callstack size!
