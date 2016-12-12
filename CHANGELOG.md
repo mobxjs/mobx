@@ -2,12 +2,12 @@
 
 ### Misc
 
-* Fixed #701: `toJS` sometimes failing to convert objects decorated with `@observable` (cause: `isObservable` sometimes returned false on these object)
+* Fixed #701: `toJS` sometimes failing to convert objects decorated with `@observable` (cause: `isObservable` sometimes returned false on these objects)
 * Fixed typings for `when` / `autorun` / `reaction`; they all return a disposer function.
 
 ### Automatic inference of computed properties has been deprecated.
 
-A deprecation message will now be printed if creating computed properties while relying on automatical inferrence of argumentless functions as computed values. In other words, when using `observable` or `extendObservable` in the following manner:
+A deprecation message will now be printed if creating computed properties while relying on automatic inference of argumentless functions as computed values. In other words, when using `observable` or `extendObservable` in the following manner:
 
 ```
 const x = observable({
@@ -16,7 +16,7 @@ const x = observable({
 	}
 })
 
-// Due to automatic inferrence now available as computed property:
+// Due to automatic inference now available as computed property:
 x.computedProp
 // And not !
 x.computedProp()
@@ -49,7 +49,7 @@ automatically into computed values; they will be treated the same as function wi
 An observable _reference_ to the function will be made and the function itself will be preserved.
 See for more details [#532](https://github.com/mobxjs/mobx/issues/532)
 
-N.B. If you want to introduce actions on an observable that modify it's state, using `action` is still the recommended approach:
+N.B. If you want to introduce actions on an observable that modify its state, using `action` is still the recommended approach:
 ```
 observable({
 	counter: 0,
@@ -77,7 +77,7 @@ observable({
 
 # 2.6.2
 
-* Changes related to `toJS` as mentioned in version `2.6.0` where not actually shipped. This has been fixed, so see release notes below.
+* Changes related to `toJS` as mentioned in version `2.6.0` were not actually shipped. This has been fixed, so see release notes below.
 
 # 2.6.1
 
@@ -119,7 +119,7 @@ const box = observable({
 
 # 2.5.0
 
-* Core derivation algorithm has received some majore improvements by @asterius1! See below. Pr #452, 489
+* Core derivation algorithm has received some major improvements by @asterius1! See below. Pr #452, 489
 * Introduced setters for computed properties, use `computed(expr, setter)` or `@computed get name() { return expr } set name (value) { action }`. `computed` can now be used as modifier in `observable` / `extendObservable`, #421, #463 (see below for example)
 * Introduced `isStrictModeEnabled()`, deprecated `useStrict()` without arguments, see #464
 * Fixed #505, accessing an observable property throws before it is initialized
@@ -380,7 +380,7 @@ For the 1.0 versions, use the old `mobservable` based names.
 
 ## Migrating from Mobservable 1.x to MobX 2.0
 
-Migrating from Mobservable should be pretty straight-forward as the public api is largely the same.
+Migrating from Mobservable should be pretty straightforward as the public api is largely the same.
 However there are some conceptual changes which justifies a Major version bump as it might alter the behavior of MobX in edge cases.
 Besides that, MobX is just a large collection of minor improvements over Mobservable.
 Make sure to remove your old `mobservable` dependencies when installing the new `mobx` dependencies!
