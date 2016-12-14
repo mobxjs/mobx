@@ -4,6 +4,7 @@ import {createAction, executeAction} from "../core/action";
 
 const actionFieldDecorator = createClassPropertyDecorator(
 	function (target, key, value, args, originalDescriptor) {
+		debugger;
 		const actionName = (args && args.length === 1) ? args[0] : (value.name || key || "<unnamed action>");
 		const wrappedAction = action(actionName, value);
 		addHiddenProp(target, key, wrappedAction);
@@ -17,6 +18,9 @@ const actionFieldDecorator = createClassPropertyDecorator(
 	false,
 	true
 );
+
+
+// TODO action.bind
 
 export function action<A1, R, T extends (a1: A1) => R>(fn: T): T;
 export function action<A1, A2, R, T extends (a1: A1, a2: A2) => R>(fn: T): T;

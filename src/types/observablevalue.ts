@@ -1,10 +1,10 @@
 import {BaseAtom} from "../core/atom";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
-import {ValueMode, getValueModeFromValue, makeChildObservable, assertUnwrapped} from "./modifiers";
-import {valueDidChange, Lambda, getNextId, createInstanceofPredicate} from "../utils/utils";
+import {Lambda, getNextId, createInstanceofPredicate} from "../utils/utils";
 import {hasInterceptors, IInterceptable, IInterceptor, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd, spyReport} from "../core/spy";
+import {IEnhancer} from "../types/modifiers";
 
 export interface IValueWillChange<T> {
 	object: any;
@@ -12,7 +12,7 @@ export interface IValueWillChange<T> {
 	newValue: T;
 }
 
-// Introduce in 3.0
+// TODO: Introduce in 4.0
 // export interface IValueDidChange<T> {
 // 	object: any;
 // 	type: "update" | "create";
@@ -37,13 +37,9 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 	changeListeners;
 	protected value;
 
-	constructor(value: T, protected mode: ValueMode, name = "ObservableValue@" + getNextId(), notifySpy = true) {
+	constructor(value: T, protected enhancer: IEnhancer<T>, name = "ObservableValue@" + getNextId(), notifySpy = true) {
 		super(name);
-		const [childmode, unwrappedValue] = getValueModeFromValue(value, ValueMode.Recursive);
-		// If the value mode is recursive, modifiers like 'structure', 'reference', or 'flat' could apply
-		if (this.mode === ValueMode.Recursive)
-			this.mode = childmode;
-		this.value = makeChildObservable(unwrappedValue, this.mode, this.name);
+		this.value = enhancer(value, undefined, name);
 		if (notifySpy && isSpyEnabled()) {
 			// only notify spy if this is a stand-alone observable
 			spyReport({ type: "create", object: this, newValue: this.value });
@@ -68,8 +64,7 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 		}
 	}
 
-	prepareNewValue(newValue): T | IUNCHANGED {
-		assertUnwrapped(newValue, "Modifiers cannot be used on non-initial values.");
+	private prepareNewValue(newValue): T | IUNCHANGED {
 		checkIfStateModificationsAreAllowed();
 		if (hasInterceptors(this)) {
 			const change = interceptChange<IValueWillChange<T>>(this, { object: this, type: "update", newValue });
@@ -77,10 +72,12 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 				return UNCHANGED;
 			newValue = change.newValue;
 		}
-		const changed = valueDidChange(this.mode === ValueMode.Structure, this.value, newValue);
-		if (changed)
-			return makeChildObservable(newValue, this.mode, this.name);
-		return UNCHANGED;
+		// apply modifier
+		newValue = this.enhancer(newValue, this.value, this.name);
+		return this.value !== newValue
+			? newValue
+			: UNCHANGED
+		;
 	}
 
 	setNewValue(newValue: T) {

@@ -1,14 +1,16 @@
-import {ValueMode, assertUnwrapped, getValueModeFromModifierFunc} from "./modifiers";
+import {IEnhancer, deepEnhancer} from "./modifiers";
 import {transaction} from "../core/transaction";
 import {untracked} from "../core/derivation";
-import {ObservableArray, IObservableArray} from "./observablearray";
+import {IObservableArray, ObservableArray} from "./observablearray";
 import {ObservableValue, UNCHANGED} from "./observablevalue";
-import {createInstanceofPredicate, isPlainObject, getNextId, Lambda, invariant} from "../utils/utils";
+import {createInstanceofPredicate, isPlainObject, getNextId, Lambda, invariant, deprecated} from "../utils/utils";
 import {allowStateChanges} from "../core/action";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {arrayAsIterator, declareIterator, Iterator} from "../utils/iterable";
+import {observable} from "../api/observable";
+import {referenceEnhancer} from "./modifiers";
 
 export interface IKeyValueMap<V> {
 	[key: string]: V;
@@ -35,20 +37,17 @@ export interface IMapWillChange<T> {
 
 const ObservableMapMarker = {};
 
+export type IObservableMapInitialValues<V> = IMapEntries<V> | IKeyValueMap<V>; // TODO: | Map<V> support initializing with map
+
 export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, IListenable {
 	$mobx = ObservableMapMarker;
 	private _data: { [key: string]: ObservableValue<V> | undefined } = {};
 	private _hasMap: { [key: string]: ObservableValue<boolean> } = {}; // hasMap, not hashMap >-).
-	private _valueMode: ValueMode;
-	public name = "ObservableMap@" + getNextId();
-	private _keys: IObservableArray<string> = <any> new ObservableArray(null, ValueMode.Reference, `${this.name}.keys()`, true);
+	private _keys: IObservableArray<string> = <any> new ObservableArray(undefined, referenceEnhancer, `${this.name}.keys()`, true);
 	interceptors = null;
 	changeListeners = null;
 
-	constructor(initialData?: IMapEntries<V> | IKeyValueMap<V>, valueModeFunc?: Function) {
-		this._valueMode = getValueModeFromModifierFunc(valueModeFunc);
-		if (this._valueMode === ValueMode.Flat)
-			this._valueMode = ValueMode.Reference; // TODO: modifiers really need a clean up!
+	constructor(initialData?: IObservableMapInitialValues<V>, public enhancer: IEnhancer<V> = deepEnhancer, public name = "ObservableMap@" + getNextId()) {
 		allowStateChanges(true, () => {
 			if (isPlainObject(initialData))
 				this.merge(<IKeyValueMap<V>> initialData);
@@ -74,7 +73,6 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		this.assertValidKey(key);
 		key = "" + key;
 		const hasKey = this._has(key);
-		assertUnwrapped(value, `[mobx.map.set] Expected unwrapped value to be inserted to key '${key}'. If you need to use modifiers pass them as second argument to the constructor`);
 		if (hasInterceptors(this)) {
 			const change = interceptChange<IMapWillChange<V>>(this, {
 				type: hasKey ? "update" : "add",
@@ -140,14 +138,14 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		if (entry) {
 			entry.setNewValue(value);
 		} else {
-			entry = this._hasMap[key] = new ObservableValue(value, ValueMode.Reference, `${this.name}.${key}?`, false);
+			entry = this._hasMap[key] = new ObservableValue(value, referenceEnhancer, `${this.name}.${key}?`, false);
 		}
 		return entry;
 	}
 
 	private _updateValue(name: string, newValue: V) {
 		const observable = this._data[name]!;
-		newValue = observable.prepareNewValue(newValue) as V;
+		newValue = (observable as any).prepareNewValue(newValue) as V;
 		if (newValue !== UNCHANGED) {
 			const notifySpy = isSpyEnabled();
 			const notify = hasListeners(this);
@@ -170,7 +168,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 
 	private _addValue(name: string, newValue: V) {
 		transaction(() => {
-			const observable = this._data[name] = new ObservableValue(newValue, this._valueMode, `${this.name}.${name}`, false);
+			const observable = this._data[name] = new ObservableValue(newValue, this.enhancer, `${this.name}.${name}`, false);
 			newValue = (observable as any).value; // value might have been changed
 			this._updateHasMapEntry(name, true);
 			this._keys.push(name);
@@ -234,6 +232,8 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		}, undefined, false);
 	}
 
+	// TODO: replace
+
 	get size(): number {
 		return this._keys.length;
 	}
@@ -289,12 +289,9 @@ declareIterator(ObservableMap.prototype, function() {
 	return this.entries();
 });
 
-/**
- * Creates a map, similar to ES6 maps (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map),
- * yet observable.
- */
-export function map<V>(initialValues?: IMapEntries<V> | IKeyValueMap<V>, valueModifier?: Function): ObservableMap<V> {
-	return new ObservableMap(initialValues, valueModifier);
+export function map<V>(initialValues?: IMapEntries<V> | IKeyValueMap<V>): ObservableMap<V> {
+	deprecated("`mobx.map` is deprecated, use `new ObservableMap` or `mobx.modifiers.map` instead");
+	return observable.map(initialValues);
 }
 
 /* 'var' fixes small-build issue */

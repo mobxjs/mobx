@@ -1,20 +1,11 @@
 import {ObservableValue, UNCHANGED} from "./observablevalue";
 import {isComputedValue, ComputedValue} from "../core/computedvalue";
-import {isAction} from "../api/action";
-import {ValueMode, getModifier} from "./modifiers";
-import {createInstanceofPredicate, isObject, Lambda, getNextId, invariant, assertPropertyConfigurable, isPlainObject, addHiddenFinalProp, deprecated} from "../utils/utils";
+import {createInstanceofPredicate, isObject, Lambda, getNextId, invariant, assertPropertyConfigurable, isPlainObject, addHiddenFinalProp} from "../utils/utils";
 import {runLazyInitializers} from "../utils/decorators";
 import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
-
-const COMPUTED_FUNC_DEPRECATED = (
-`
-In MobX 2.* / MobX 3.* passing a function without arguments to (extend)observable will automatically be inferred to be a computed value.
-This behavior is ambiguous and will change in the future to create just an observable reference to the value passed in.
-To disambiguate, please pass the function wrapped with a modifier: use 'computed(fn)' (current behavior), 'asReference(fn)' (future behavior) or 'action(fn)'.
-Note that computed properties can also be written as '{ get propertyName() { ... }}'.
-For more details, see https://github.com/mobxjs/mobx/issues/532`);
+import {IEnhancer, isModifierDescriptor, IModifierDescriptor, deepEnhancer} from "../types/modifiers";
 
 export interface IObservableObject {
 	"observable-object": IObservableObject;
@@ -41,7 +32,7 @@ export class ObservableObjectAdministration implements IInterceptable<IObjectWil
 	changeListeners = null;
 	interceptors = null;
 
-	constructor(public target: any, public name: string, public mode: ValueMode) { }
+	constructor(public target: any, public name: string) { }
 
 	/**
 		* Observes this object. Triggers for the events 'add', 'update' and 'delete'.
@@ -53,7 +44,6 @@ export class ObservableObjectAdministration implements IInterceptable<IObjectWil
 		return registerListener(this, callback);
 	}
 
-
 	intercept(handler): Lambda {
 		return registerInterceptor(this, handler);
 	}
@@ -63,86 +53,109 @@ export interface IIsObservableObject {
 	$mobx: ObservableObjectAdministration;
 }
 
-export function asObservableObject(target, name: string | undefined, mode: ValueMode = ValueMode.Recursive): ObservableObjectAdministration {
+export function asObservableObject(target, name?: string): ObservableObjectAdministration {
 	if (isObservableObject(target))
 		return (target as any).$mobx;
 
+	invariant(Object.isExtensible(target), "Cannot make the designated object observable; it is not extensible");
 	if (!isPlainObject(target))
 		name = (target.constructor.name || "ObservableObject") + "@" + getNextId();
 	if (!name)
 		name = "ObservableObject@" + getNextId();
 
-	const adm = new ObservableObjectAdministration(target, name, mode);
+	const adm = new ObservableObjectAdministration(target, name);
 	addHiddenFinalProp(target, "$mobx", adm);
 	return adm;
 }
 
-function handleAsComputedValue(value): boolean {
-	return typeof value === "function" && value.length === 0 && !isAction(value)
-}
-
-export function setObservableObjectInstanceProperty(adm: ObservableObjectAdministration, propName: string, descriptor: PropertyDescriptor) {
+export function defineObservablePropertyFromDescriptor(adm: ObservableObjectAdministration, propName: string, descriptor: PropertyDescriptor, defaultEnhancer: IEnhancer<any>) {
 	if (adm.values[propName]) {
-		invariant("value" in descriptor, "cannot redefine property " + propName);
+		// already observable property
+		invariant("value" in descriptor, `The property ${propName} in ${adm.name} is already observable, cannot redefine it as computed property`);
 		adm.target[propName] = descriptor.value; // the property setter will make 'value' reactive if needed.
-	} else {
-		if ("value" in descriptor) {
-			if (handleAsComputedValue(descriptor.value)) {
-				// warn about automatic inference, see https://github.com/mobxjs/mobx/issues/421
-				if (deprecated(COMPUTED_FUNC_DEPRECATED)) {
-					console.error(`in: ${adm.name}.${propName}`);
-					console.trace();
-				}
-			}
-			defineObservableProperty(adm, propName, descriptor.value, true, undefined);
-		} else {
-			defineObservableProperty(adm, propName, descriptor.get, true, descriptor.set);
+		return;
+	}
+
+	// not yet observable property
+
+	if ("value" in descriptor) {
+		// not a computed value
+		if (isModifierDescriptor(descriptor.value)) {
+			// x : ref(someValue)
+			const modifierDescriptor = descriptor.value as IModifierDescriptor<any>;
+			defineObservableProperty(adm, propName, modifierDescriptor.initialValue, modifierDescriptor.enhancer, true);
 		}
+		// TODO: if is action, name and bind
+		else if (isComputedValue(descriptor.value)) {
+			// x: computed(someExpr)
+			defineComputedPropertyFromComputedValue(adm, propName, descriptor.value, true);
+		} else {
+			// x: someValue
+			defineObservableProperty(adm, propName, descriptor.value, defaultEnhancer, true);
+		}
+	} else {
+		// get x() { return 3 } set x(v) { }
+		defineComputedProperty(adm, propName, descriptor.get, descriptor.set, false, true);
 	}
 }
 
-export function defineObservableProperty(adm: ObservableObjectAdministration, propName: string, newValue, asInstanceProperty: boolean, setter) {
+export function defineObservableProperty(
+	adm: ObservableObjectAdministration,
+	propName: string,
+	newValue,
+	enhancer: IEnhancer<any>,
+	asInstanceProperty: boolean
+) {
+	// TODO: heck if asInstanceProperty abstraction is correct? probably always true for observable properties?
 	if (asInstanceProperty)
 		assertPropertyConfigurable(adm.target, propName);
 
-	let observable: ComputedValue<any>|ObservableValue<any>;
-	let name = `${adm.name}.${propName}`;
-	let isComputed = true;
-
-	if (isComputedValue(newValue)) {
-		// desugar computed(getter, setter)
-		observable = newValue;
-		newValue.name = name;
-		if (!newValue.scope)
-			newValue.scope = adm.target;
-	} else if (handleAsComputedValue(newValue)) {
-		// TODO: remove in 3.0
-		observable = new ComputedValue(newValue, adm.target, false, name, setter);
-	} else if (getModifier(newValue) === ValueMode.Structure && typeof newValue.value === "function" && newValue.value.length === 0) {
-		observable = new ComputedValue(newValue.value, adm.target, true, name, setter);
-	} else {
-		isComputed = false;
-		if (hasInterceptors(adm)) {
-			const change = interceptChange<IObjectWillChange>(adm, {
-				object: adm.target,
-				name: propName,
-				type: "add",
-				newValue
-			});
-			if (!change)
-				return;
-			newValue = change.newValue;
-		}
-		observable = new ObservableValue(newValue, adm.mode, name, false);
-		newValue = (observable as any).value; // observableValue might have changed it
+	if (hasInterceptors(adm)) {
+		const change = interceptChange<IObjectWillChange>(adm, {
+			object: adm.target,
+			name: propName,
+			type: "add",
+			newValue
+		});
+		if (!change)
+			return;
+		newValue = change.newValue;
 	}
+	const observable = adm.values[propName] = new ObservableValue(newValue, enhancer, `${adm.name}.${propName}`, false);
+	newValue = (observable as any).value; // observableValue might have changed it
 
-	adm.values[propName] = observable;
 	if (asInstanceProperty) {
-		Object.defineProperty(adm.target, propName, isComputed ? generateComputedPropConfig(propName) : generateObservablePropConfig(propName));
+		Object.defineProperty(adm.target, propName, generateObservablePropConfig(propName));
 	}
-	if (!isComputed)
-		notifyPropertyAddition(adm, adm.target, propName, newValue);
+	notifyPropertyAddition(adm, adm.target, propName, newValue);
+}
+
+export function defineComputedProperty(
+	adm: ObservableObjectAdministration,
+	propName: string,
+	getter,
+	setter,
+	compareStructural: boolean,
+	asInstanceProperty: boolean
+) {
+	if (asInstanceProperty) // TODO: always false?
+		assertPropertyConfigurable(adm.target, propName);
+
+	adm.values[propName] = new ComputedValue(getter, adm.target, compareStructural, `${adm.name}.${propName}`, setter);
+	if (asInstanceProperty) {
+		Object.defineProperty(adm.target, propName, generateComputedPropConfig(propName));
+	}
+}
+
+export function defineComputedPropertyFromComputedValue(adm: ObservableObjectAdministration, propName: string, computedValue: ComputedValue<any>, asInstanceProperty: boolean) {
+	let name = `${adm.name}.${propName}`;
+	computedValue.name = name;
+	if (!computedValue.scope)
+		computedValue.scope = adm.target;
+
+	adm.values[propName] = computedValue;
+	if (asInstanceProperty)
+		Object.defineProperty(adm.target, propName, generateComputedPropConfig(propName));
 }
 
 const observablePropertyConfigs = {};
@@ -233,7 +246,6 @@ function notifyPropertyAddition(adm, object, name: string, newValue) {
 	if (notifySpy)
 		spyReportEnd();
 }
-
 
 const isObservableObjectAdministration = createInstanceofPredicate("ObservableObjectAdministration", ObservableObjectAdministration);
 

@@ -1,5 +1,57 @@
 # 3.0.0
 
+## `observable` api has been redesigned
+
+The api to create observables has been redesigned.
+By default, it keeps the automatic conversion behavior from MobX 2.
+However, one can now have more fine grained control on how  / which observables are constructed.
+Modifiers still exists, but they are more regular, and there should be less need for them.
+
+First of all, there are now explicit methods to create an observable of a specific type:
+
+### Factories per observable type
+
+* `observable.object(props, name?)` creates a new observable object, by cloning the give props and making them observable
+* `observable.array(initialValues, name?)`. Take a guess..
+* `observable.map(initialValues, name?)`
+* `observable.box(initialValue, name?)`. Creates a [boxed](http://mobxjs.github.io/mobx/refguide/boxed.html) value, which can be read from / written to using `.get()` and `.set(newValue)`
+* `observable(value)`, as-is, based on the type of `value`, uses any of the above four functions to create a new observable.
+
+### Shallow factories per type
+
+The standard observable factories create observable structures that will try to turn any plain javascript value (arrays, objects or Maps) into observables.
+Allthough this is fine in most cases, in some cases you might want to disable this autoconversion.
+For example when storing objects from external libraries.
+In MobX 2 you needed to use `asFlat` or `asReference` modifiers for this.
+In MobX 3, there are factories to directly create non-converting data structures:
+
+* `observable.shallowObject(props, name?)`
+* `observable.shallowArray(initialValues, name?)`
+* `observable.shallowMap(initialValues, name?)`
+* `observable.shallowBox(initialValue, name?)`
+
+So for example, `observable.shallowArray([todo1, todo2])` will create an observable array, but it won't try to convert the todos inside the array into observables as well.
+
+### Shallow properties
+
+The `@observable` decorator can still be used to introduce observable properties. And like in MobX 2, it will automatically convert it's values.
+
+However, sometimes you want to create an observable property that does not convert it's _value_ into an observable automatically.
+Previously that could be written as `@observable x = asReference(value)`.
+
+
+
+
+
+
+
+### Structurally comparing observables have been removed
+
+This was not for a technical reason, but they just seemed hardly used.
+Structural comparision for computed properties and reactions is still possible.
+Feel free to file an issue, including use case, to re-introduce this feature if you think you really need it.
+
+
 ### Automatic inference of computed properties has been deprecated.
 
 A deprecation message will now be printed if creating computed properties while relying on automatical inferrence of argumentless functions as computed values. In other words, when using `observable` or `extendObservable` in the following manner:

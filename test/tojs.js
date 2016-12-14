@@ -267,7 +267,7 @@ test('#285 class instances with toJS', t => {
 		mobx.extendObservable(this, {
 			lastName: "weststrate",
 			tags: ["user", "mobx-member"],
-			fullName: function() {
+			get fullName() {
 				return this.firstName + this.lastName
 			}
 		})
@@ -318,8 +318,5 @@ test("verify #566 solution", t => {
 	t.ok(mobx.toJS(c).b !== b) // false, cloned
 	t.ok(mobx.toJS(c).b.x === b.x) // true, both 3
 
-	t.ok(mobx.toJSlegacy(c).a !== a) // false, cloned as well
-	t.ok(mobx.toJSlegacy(c).b !== b) // false, cloned
-	t.ok(mobx.toJSlegacy(c).b.x === b.x) // true, both 3
 	t.end()
 })

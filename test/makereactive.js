@@ -1,6 +1,7 @@
 var test = require('tape');
 var mobx = require('..');
 var m = mobx;
+var o = mobx.observable;
 
 var value = mobx.value;
 var voidObserver = function(){};
@@ -88,7 +89,7 @@ test('observable1', function(t) {
     // recursive structure, but asReference passed in
     t.equal(m.isObservable(x.a.b), true);
     var x2 = m.observable({
-        a: m.asReference({
+        a: m.observable.ref({
             b: {
                 c: 3
             }
@@ -108,13 +109,13 @@ test('observable1', function(t) {
     t.deepEqual(b2.toArray(), [3, 4]);
 
     // non recursive structure
-    var x3 = m.observable(m.asFlat({
+    var x3 = o.shallowObject({
         a: {
             b: {
                 c: 3
             }
         }
-    }));
+    });
     var b3 = buffer();
     m.autorun(function() {
         b3(x3.a.b.c)
@@ -168,10 +169,10 @@ test('observable4', function(t) {
     t.deepEqual(b.toArray(), [[1,2], [3,2], [2], [2, 5]]);
 
     // non recursive
-    var x2 = m.observable(m.asFlat([
+    var x2 = o.shallowArray([
         { x : 1 },
         { x : 2 }
-    ]));
+    ]);
 
     var b2 = buffer();
     m.observe(m.computed(function() {
@@ -194,7 +195,7 @@ test('observable5', function(t) {
     });
 
     var f = function() {};
-    var x2 = m.observable(m.asReference(f));
+    var x2 = m.observable(f);
     t.equal(x2.get(), f);
     x2.set(null); // allowed
 
@@ -202,8 +203,8 @@ test('observable5', function(t) {
 
     var x = m.observable({
         price : 17,
-        reactive: f,
-        nonReactive: m.asReference(f)
+        reactive: m.computed(f),
+        nonReactive: f
     });
 
     var b = buffer();
@@ -221,7 +222,7 @@ test('observable5', function(t) {
 
 test('flat array', function(t) {
     var x = m.observable({
-        x: m.asFlat([{
+        x: m.observable.shallow([{
             a: 1
         }])
     });
@@ -230,65 +231,65 @@ test('flat array', function(t) {
     var updates = 0;
     var dis = m.autorun(function() {
         updates++;
-        result = mobx.toJSlegacy(x);
+        result = JSON.stringify(mobx.toJS(x));
     });
 
-    t.deepEqual(result, { x: [{ a: 1 }]});
+    t.deepEqual(result, JSON.stringify({ x: [{ a: 1 }]}));
     t.equal(updates, 1);
 
     x.x[0].a = 2; // not picked up; object is not made reactive
-    t.deepEqual(result, { x: [{ a: 1 }]});
+    t.deepEqual(result, JSON.stringify({ x: [{ a: 1 }]}));
     t.equal(updates, 1);
 
     x.x.push({ a: 3 }); // picked up, array is reactive
-    t.deepEqual(result, { x: [{ a: 2}, { a: 3 }]});
+    t.deepEqual(result, JSON.stringify({ x: [{ a: 2}, { a: 3 }]}));
     t.equal(updates, 2);
 
     x.x[0] = { a: 4 }; // picked up, array is reactive
-    t.deepEqual(result, { x: [{ a: 4 }, { a: 3 }]});
+    t.deepEqual(result, JSON.stringify({ x: [{ a: 4 }, { a: 3 }]}));
     t.equal(updates, 3);
 
     x.x[1].a = 6; // not picked up
-    t.deepEqual(result, { x: [{ a: 4 }, { a: 3 }]});
+    t.deepEqual(result, JSON.stringify({ x: [{ a: 4 }, { a: 3 }]}));
     t.equal(updates, 3);
 
     t.end();
 })
 
 test('flat object', function(t) {
-    var y = m.observable(m.asFlat({
+    var y = m.observable.shallowObject({
         x : { z: 3 }
-    }));
+    });
 
     var result;
     var updates = 0;
     var dis = m.autorun(function() {
         updates++;
-        result = mobx.toJSlegacy(y);
+        result = JSON.stringify(mobx.toJS(y));
     });
 
-    t.deepEqual(result, { x: { z: 3 }});
+    t.deepEqual(result, JSON.stringify({ x: { z: 3 }}));
     t.equal(updates, 1);
 
     y.x.z = 4; // not picked up
-    t.deepEqual(result, { x: { z: 3 }});
+    t.deepEqual(result, JSON.stringify({ x: { z: 3 }}));
     t.equal(updates, 1);
 
     y.x = { z: 5 };
-    t.deepEqual(result, { x: { z: 5 }});
+    t.deepEqual(result, JSON.stringify({ x: { z: 5 }}));
     t.equal(updates, 2);
 
     y.x.z = 6; // not picked up
-    t.deepEqual(result, { x: { z: 5 }});
+    t.deepEqual(result, JSON.stringify({ x: { z: 5 }}));
     t.equal(updates, 2);
 
     t.end();
 })
 
-test('as structure', function(t) {
+test.skip('as structure', function(t) {
 
     var x = m.observable({
-        x: m.asStructure(null)
+        x: m.observable.structure(null)
     });
 
     var changed = 0;
@@ -373,6 +374,7 @@ test('as structure', function(t) {
     nc();
     x.x[1] = 2;
     nc();
+	console.log("test")
     x.x[0] = 0;
     c();
     x.x[1] = {
@@ -412,14 +414,14 @@ test('as structure view', function(t) {
     var x = m.observable({
         a: 1,
         aa: 1,
-        b: function() {
+        get b() {
             this.a;
             return { a: this.aa };
         },
-        c: m.asStructure(function() {
+        c: m.computed((function() {
             this.b
             return { a : this.aa };
-        })
+        }), null, true)
     });
 
     var bc = 0;
@@ -489,7 +491,8 @@ test('exceptions', function(t) {
     }, "nested");
 
     var x = m.observable({
-        y: m.asReference(null)
+        y: m.observable.ref(null),
+		z: 2
     });
 
     t.throws(function() {
@@ -497,7 +500,7 @@ test('exceptions', function(t) {
     });
 
     t.throws(function() {
-        x.y = m.asReference(3)
+        x.z = m.asReference(3)
     });
 
     var ar = m.observable([2]);
@@ -520,7 +523,7 @@ test('exceptions', function(t) {
 test("540 - extendobservable should not report cycles", function(t) {
 	t.throws(
 		() => m.extendObservable(Object.freeze({}), {}),
-		/Cannot extend the designated object/
+		/Cannot make the designated object observable/
 	);
 
 	var objWrapper = mobx.observable({

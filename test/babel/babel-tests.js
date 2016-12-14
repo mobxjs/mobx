@@ -1,5 +1,5 @@
 import {
-    observable, computed, transaction, asStructure, autorun, extendObservable, action,
+    observable, computed, transaction, autorun, extendObservable, action,
 	isObservableObject, observe, isObservable, spy, isAction,
     default as mobx
 } from "../";
@@ -47,7 +47,7 @@ test('babel: parameterized computed decorator', (t) => {
 	class TestClass {
 		@observable x = 3;
 		@observable y = 3;
-		@computed({ asStructure: true }) get boxedSum() {
+		@computed.struct get boxedSum() {
 			return { sum: Math.round(this.x) + Math.round(this.y) };
 		}
 	}
@@ -79,7 +79,6 @@ class Order {
     @observable amount = 2;
     @observable orders = [];
     @observable aFunction = function(a) { };
-    @observable someStruct = asStructure({ x: 1, y: 2});
 
     @computed get total() {
         return this.amount * this.price * (1 + this.orders.length);
@@ -140,6 +139,52 @@ test('issue 191 - shared initializers (babel)', function(t) {
 	t.deepEqual(t1.array.slice(), [2,3]);
 	t.deepEqual(t2.array.slice(), [2,4]);
 
+	t.end();
+})
+
+test.only("705 - setter undoing caching (babel)", t => {
+	let recomputes = 0;
+	let autoruns = 0;
+
+	class Person {
+		@observable name: string;
+		@observable title: string;
+		set fullName(val) {
+			// Noop
+		}
+		@computed get fullName() {
+			debugger;
+			recomputes++;
+			return this.title+" "+this.name;
+		}
+	}
+
+	let p1 = new Person();
+	p1.name="Tom Tank";
+	p1.title="Mr.";
+
+	t.equal(recomputes, 0);
+	t.equal(autoruns, 0);
+
+	const d1 = autorun(()=> {
+		autoruns++;
+		p1.fullName;
+	})
+
+	const d2 = autorun(()=> {
+		autoruns++;
+		p1.fullName;
+	})
+
+	t.equal(recomputes, 1);
+	t.equal(autoruns, 2);
+
+	p1.title="Master";
+	t.equal(recomputes, 2);
+	t.equal(autoruns, 4);
+
+	d1();
+	d2();
 	t.end();
 })
 

@@ -369,7 +369,7 @@ test('create array (fast)', function(t) {
         a.push(i);
     var start = now();
     for(var i = 0; i < 1000; i++)
-        mobx.observable(mobx.asFlat(a));
+        mobx.observable.shallowArray(a);
     log('\nCreate array (non-recursive)  Created in ' + (now() - start) + 'ms.');
     t.end();
 })
@@ -401,7 +401,7 @@ test('sort', t => {
 
 	function Item(a, b, c) {
 		mobx.extendObservable(this, {
-			a: a, b: b, c: c, d: function() {
+			a: a, b: b, c: c, get d() {
 				return this.a + this.b + this.c;
 			}
 		})

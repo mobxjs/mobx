@@ -1,11 +1,11 @@
-import {isObject, createInstanceofPredicate, getNextId, deepEquals, makeNonEnumerable, Lambda, EMPTY_ARRAY, addHiddenFinalProp, addHiddenProp, invariant} from "../utils/utils";
+import {isObject, createInstanceofPredicate, getNextId, makeNonEnumerable, Lambda, EMPTY_ARRAY, addHiddenFinalProp, addHiddenProp, invariant} from "../utils/utils";
 import {BaseAtom} from "../core/atom";
-import {ValueMode, assertUnwrapped, makeChildObservable} from "./modifiers";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {arrayAsIterator, declareIterator} from "../utils/iterable";
+import {IEnhancer} from "../types/modifiers";
 
 // Detects bug in safari 9.1.1 (or iOS 9 safari mobile). See #364
 const safariPrototypeSetterInheritanceBug = (() => {
@@ -80,17 +80,11 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 	lastKnownLength: number = 0;
 	interceptors = null;
 	changeListeners = null;
+	enhancer: (newV: T, oldV: T | undefined) => T;
 
-	constructor(name, public mode: ValueMode, public array: IObservableArray<T>, public owned: boolean) {
+	constructor(name, enhancer: IEnhancer<T>, public array: IObservableArray<T>, public owned: boolean) {
 		this.atom = new BaseAtom(name || ("ObservableArray@" + getNextId()));
-	}
-
-	makeReactiveArrayItem(value) {
-		// this = IObservableArrayAdministration, bound during construction
-		assertUnwrapped(value, "Array values cannot have modifiers");
-		if (this.mode === ValueMode.Flat || this.mode === ValueMode.Reference)
-			return value;
-		return makeChildObservable(value, this.mode, `${this.atom.name}[..]`);
+		this.enhancer = (newV, oldV) => enhancer(newV, oldV, name + "[..]");
 	}
 
 	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
@@ -173,7 +167,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 			newItems = change.added;
 		}
 
-		newItems = <T[]> newItems.map(this.makeReactiveArrayItem, this);
+		newItems = <T[]> newItems.map(v => this.enhancer(v, undefined));
 		const lengthDelta = newItems.length - deleteCount;
 		this.updateArrayLength(length, lengthDelta); // create or remove new entries
 		const res: T[] = this.values.splice(index, deleteCount, ...newItems); // FIXME: splat might exceed callstack size!
@@ -226,15 +220,15 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 export class ObservableArray<T> extends StubArray {
 	private $mobx: ObservableArrayAdministration<T>;
 
-	constructor(initialValues: T[] | null, mode: ValueMode, name: string | undefined, owned = false) {
+	constructor(initialValues: T[] | undefined, enhancer: IEnhancer<T>, name = "ObservableArray@" + getNextId(), owned = false) {
 		super();
 
-		const adm = new ObservableArrayAdministration<T>(name, mode, this as any, owned);
+		const adm = new ObservableArrayAdministration<T>(name, enhancer, this as any, owned);
 		addHiddenFinalProp(this, "$mobx", adm);
 
 		if (initialValues && initialValues.length) {
 			adm.updateArrayLength(0, initialValues.length);
-			adm.values = initialValues.map(adm.makeReactiveArrayItem, adm);
+			adm.values = initialValues.map(v => enhancer(v, undefined, name + "[..]"));
 			adm.notifyArraySplice(0, adm.values.slice(), EMPTY_ARRAY);
 		} else {
 			adm.values = [];
@@ -456,7 +450,6 @@ function createArraySetter(index: number) {
 	return function<T>(newValue: T) {
 		const adm = <ObservableArrayAdministration<T>> this.$mobx;
 		const values = adm.values;
-		assertUnwrapped(newValue, "Modifiers cannot be used on array values. For non-reactive array values use makeReactive(asFlat(array)).");
 		if (index < values.length) {
 			// update at index in range
 			checkIfStateModificationsAreAllowed();
@@ -471,8 +464,8 @@ function createArraySetter(index: number) {
 					return;
 				newValue = change.newValue;
 			}
-			newValue = adm.makeReactiveArrayItem(newValue);
-			const changed = (adm.mode === ValueMode.Structure) ? !deepEquals(oldValue, newValue) : oldValue !== newValue;
+			newValue = adm.enhancer(newValue, oldValue);
+			const changed = newValue !== oldValue;
 			if (changed) {
 				values[index] = newValue;
 				adm.notifyArrayChildUpdate(index, newValue, oldValue);
@@ -505,10 +498,6 @@ function reserveArrayBuffer(max: number) {
 }
 
 reserveArrayBuffer(1000);
-
-export function createObservableArray<T>(initialValues: T[], mode: ValueMode, name?: string): IObservableArray<T> {
-	return <IObservableArray<T>><any> new ObservableArray(initialValues, mode, name);
-}
 
 const isObservableArrayAdministration = createInstanceofPredicate("ObservableArrayAdministration", ObservableArrayAdministration);
 

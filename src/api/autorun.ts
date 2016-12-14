@@ -1,5 +1,5 @@
-import {Lambda, getNextId, invariant, valueDidChange} from "../utils/utils";
-import {assertUnwrapped, ValueMode, getValueModeFromValue} from "../types/modifiers";
+import {Lambda, getNextId, invariant, valueDidChange, fail} from "../utils/utils";
+import {isModifierDescriptor} from "../types/modifiers";
 import {Reaction, IReactionPublic} from "../core/reaction";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
 import {action, isAction} from "../api/action";
@@ -11,7 +11,7 @@ import {action, isAction} from "../api/action";
  * @param scope (optional)
  * @returns disposer function, which can be used to stop the view from being updated in the future.
  */
-export function autorun(view: (r: IReactionPublic) => void, scope?: any);
+export function autorun(view: (r: IReactionPublic) => void, scope?: any): Lambda;
 
 /**
  * Creates a named reactive view and keeps it alive, so that the view is always
@@ -21,7 +21,7 @@ export function autorun(view: (r: IReactionPublic) => void, scope?: any);
  * @param scope (optional)
  * @returns disposer function, which can be used to stop the view from being updated in the future.
  */
-export function autorun(name: string, view: (r: IReactionPublic) => void, scope?: any);
+export function autorun(name: string, view: (r: IReactionPublic) => void, scope?: any): Lambda;
 export function autorun(arg1: any, arg2: any, arg3?: any) {
 	let name: string,
 		view: (r: IReactionPublic) => void,
@@ -37,7 +37,6 @@ export function autorun(arg1: any, arg2: any, arg3?: any) {
 		scope = arg2;
 	}
 
-	assertUnwrapped(view, "autorun methods cannot have modifiers");
 	invariant(typeof view === "function", "autorun expects a function");
 	invariant(
 		isAction(view) === false,
@@ -68,7 +67,7 @@ export function autorun(arg1: any, arg2: any, arg3?: any) {
  * @param scope (optional)
  * @returns disposer function to prematurely end the observer.
  */
-export function when(name: string, predicate: () => boolean, effect: Lambda, scope?: any);
+export function when(name: string, predicate: () => boolean, effect: Lambda, scope?: any): Lambda;
 
 /**
  * Similar to 'observer', observes the given predicate until it returns true.
@@ -78,7 +77,7 @@ export function when(name: string, predicate: () => boolean, effect: Lambda, sco
  * @param scope (optional)
  * @returns disposer function to prematurely end the observer.
  */
-export function when(predicate: () => boolean, effect: Lambda, scope?: any);
+export function when(predicate: () => boolean, effect: Lambda, scope?: any): Lambda;
 
 export function when(arg1: any, arg2: any, arg3?: any, arg4?: any) {
 	let name: string, predicate: () => boolean, effect: Lambda, scope: any;
@@ -105,10 +104,8 @@ export function when(arg1: any, arg2: any, arg3?: any, arg4?: any) {
 	return disposer;
 }
 
-export function autorunAsync(name: string, func: (r: IReactionPublic) => void, delay?: number, scope?: any);
-
-export function autorunAsync(func: (r: IReactionPublic) => void, delay?: number, scope?: any);
-
+export function autorunAsync(name: string, func: (r: IReactionPublic) => void, delay?: number, scope?: any): Lambda;
+export function autorunAsync(func: (r: IReactionPublic) => void, delay?: number, scope?: any): Lambda;
 export function autorunAsync(arg1: any, arg2: any, arg3?: any, arg4?: any) {
 	let name: string, func: (r: IReactionPublic) => void, delay: number, scope: any;
 	if (typeof arg1 === "string") {
@@ -151,13 +148,13 @@ export function autorunAsync(arg1: any, arg2: any, arg3?: any, arg4?: any) {
 	return r.getDisposer();
 }
 
-/**
- *
- * Basically sugar for computed(expr).observe(action(effect))
- * or
- * autorun(() => action(effect)(expr));
- */
-export function reaction<T>(name: string, expression: () => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately?: boolean, delay?: number, scope?: any);
+export interface IReactionOptions {
+	context?: any;
+	fireImmediately?: boolean;
+	delay?: number;
+	compareStructural?: boolean;
+	name?: string;
+}
 
 /**
  *
@@ -165,53 +162,52 @@ export function reaction<T>(name: string, expression: () => T, effect: (arg: T, 
  * or
  * autorun(() => action(effect)(expr));
  */
-export function reaction<T>(expression: () => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately?: boolean, delay?: number, scope?: any);
 
-export function reaction<T>(arg1: any, arg2: any, arg3: any, arg4?: any, arg5?: any, arg6?: any) {
-	let name: string, expression: () => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately: boolean, delay: number, scope: any;
-	if (typeof arg1 === "string") {
-		name = arg1;
-		expression = arg2;
-		effect = arg3;
-		fireImmediately = arg4;
-		delay = arg5;
-		scope = arg6;
-	} else {
-		name = arg1.name || arg2.name || ("Reaction@" + getNextId());
-		expression = arg1;
-		effect = arg2;
-		fireImmediately = arg3;
-		delay = arg4;
-		scope = arg5;
+/**
+ *
+ * Basically sugar for computed(expr).observe(action(effect))
+ * or
+ * autorun(() => action(effect)(expr));
+ */
+export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg: T, r: IReactionPublic) => void, opts?: IReactionOptions): Lambda;
+export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately?: boolean): Lambda;
+export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg: T, r: IReactionPublic) => void, arg3: any) {
+	if (arguments.length > 3) {
+		fail("reaction only accepts 2 or 3 arguments. If migrating from MobX 2, please provide an options object");
+	}
+	if (isModifierDescriptor(expression)) {
+		fail("wrapping reaction expression in `asReference` is no longer supported, use options object instead");
 	}
 
-	if (fireImmediately === void 0)
-		fireImmediately = false;
+	let opts: IReactionOptions;
+	if (typeof arg3 === "object") {
+		opts = arg3;
+	} else {
+		opts = {};
+	}
 
-	if (delay === void 0)
-		delay = 0;
-
-	let [valueMode, unwrappedExpression] = getValueModeFromValue(expression, ValueMode.Reference);
-	const compareStructural = valueMode === ValueMode.Structure;
-
-	if (scope) {
-		unwrappedExpression = unwrappedExpression.bind(scope);
-		effect = action(name, effect.bind(scope));
+	opts.name = opts.name || (expression as any).name || (effect as any).name || ("Reaction@" + getNextId());
+	opts.fireImmediately = arg3 === true || opts.fireImmediately === true;
+	opts.delay = opts.delay || 0;
+	opts.compareStructural = opts.compareStructural || false;
+	effect = action(opts.name!, opts.context ? effect.bind(opts.context) : effect);
+	if (opts.context) {
+		expression = expression.bind(opts.context);
 	}
 
 	let firstTime = true;
 	let isScheduled = false;
 	let nextValue: T;
 
-	const r = new Reaction(name, () => {
-		if (delay < 1) {
+	const r = new Reaction(opts.name, () => {
+		if (opts.delay < 1) {
 			reactionRunner();
 		} else if (!isScheduled) {
 			isScheduled = true;
 			setTimeout(() => {
 				isScheduled = false;
 				reactionRunner();
-			}, delay);
+			}, opts.delay);
 		}
 	});
 
@@ -220,11 +216,11 @@ export function reaction<T>(arg1: any, arg2: any, arg3: any, arg4?: any, arg5?: 
 			return;
 		let changed = false;
 		r.track(() => {
-			const v = unwrappedExpression(r);
-			changed = valueDidChange(compareStructural, nextValue, v);
+			const v = expression(r);
+			changed = valueDidChange(opts.compareStructural!, nextValue, v);
 			nextValue = v;
 		});
-		if (firstTime && fireImmediately)
+		if (firstTime && opts.fireImmediately!)
 			effect(nextValue, r);
 		if (!firstTime && changed === true)
 			effect(nextValue, r);
