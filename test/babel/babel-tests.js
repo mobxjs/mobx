@@ -142,6 +142,52 @@ test('issue 191 - shared initializers (babel)', function(t) {
 	t.end();
 })
 
+test.only("705 - setter undoing caching (babel)", t => {
+	let recomputes = 0;
+	let autoruns = 0;
+
+	class Person {
+		@observable name: string;
+		@observable title: string;
+		set fullName(val) {
+			// Noop
+		}
+		@computed get fullName() {
+			debugger;
+			recomputes++;
+			return this.title+" "+this.name;
+		}
+	}
+
+	let p1 = new Person();
+	p1.name="Tom Tank";
+	p1.title="Mr.";
+
+	t.equal(recomputes, 0);
+	t.equal(autoruns, 0);
+
+	const d1 = autorun(()=> {
+		autoruns++;
+		p1.fullName;
+	})
+
+	const d2 = autorun(()=> {
+		autoruns++;
+		p1.fullName;
+	})
+
+	t.equal(recomputes, 1);
+	t.equal(autoruns, 2);
+
+	p1.title="Master";
+	t.equal(recomputes, 2);
+	t.equal(autoruns, 4);
+
+	d1();
+	d2();
+	t.end();
+})
+
 function normalizeSpyEvents(events) {
 	events.forEach(ev => {
 		delete ev.fn;
