@@ -1,12 +1,12 @@
 /// <reference path='require.d.ts' />
 /// <reference path='tape.d.ts' />
 import {
-    observe, computed, observable, asStructure, autorun, autorunAsync, extendObservable, action,
+    observe, computed, observable, autorun, autorunAsync, extendObservable, action,
     IObservableObject, IObservableArray, IArrayChange, IArraySplice, IObservableValue, isObservable, isObservableObject,
     extras, Atom, transaction, IObjectChange, spy, useStrict, isAction
-} from "../lib/mobx";
+} from "../../lib/mobx";
 import * as test from 'tape';
-import * as mobx from "../lib/mobx";
+import * as mobx from "../../lib/mobx";
 
 var v = observable(3);
 observe(v, () => {});
@@ -20,7 +20,6 @@ class Order {
     @observable amount:number = 2;
     @observable orders:string[] = [];
     @observable aFunction = testFunction;
-    @observable someStruct = asStructure({ x: 1, y: 2});
 
     @computed get total() {
         return this.amount * this.price * (1 + this.orders.length);
@@ -100,28 +99,6 @@ test('annotations', function(t) {
     order1.aFunction = x;
     t.equal(order1.aFunction, x);
 
-    var coords:{x:number, y:number} = null;
-    var coordsCalcs = 0;
-    var disposer2 = autorun(() => {
-        coordsCalcs++;
-        coords = { x : order1.someStruct.x, y: order1.someStruct.y };
-    });
-    t.equal(coordsCalcs, 1);
-    t.deepEqual(coords, { x: 1, y: 2});
-
-    order1.someStruct.x = 1;
-    order1.someStruct = { x: 1, y: 2};
-    t.equal(coordsCalcs, 1);
-    t.deepEqual(coords, { x: 1, y: 2});
-
-    order1.someStruct.x = 2;
-    t.deepEqual(coords, { x: 2, y: 2 });
-    t.equal(coordsCalcs, 2);
-
-    order1.someStruct = { x: 3, y: 3 };
-    t.equal(coordsCalcs, 3);
-    t.deepEqual(coords, { x: 3, y: 3 });
-
     t.end();
 })
 
@@ -129,7 +106,9 @@ test('scope', function(t) {
     var x = observable({
         y: 3,
         // this wo't work here.
-        z: () => 2 * x.y
+        get z () {
+			return 2 * this.y
+		}
     });
 
     t.equal(x.z, 6);
@@ -145,7 +124,7 @@ test('scope', function(t) {
         extendObservable(this, {
             y: 3,
             // this will work here
-            z: () => 2 * this.y
+            z: computed(() => 2 * this.y)
         });
     }
 
@@ -328,7 +307,7 @@ test('typescript: parameterized computed decorator', (t) => {
 	class TestClass {
 		@observable x = 3;
 		@observable y = 3;
-		@computed({ asStructure: true }) get boxedSum() {
+		@computed.struct get boxedSum() {
 			return { sum: Math.round(this.x) + Math.round(this.y) };
 		}
 	}
@@ -740,7 +719,8 @@ test("reusing initializers", t => {
 	t.end();
 })
 
-test("enumerability", t => {
+test.only("enumerability", t => {
+	debugger;
 	class A {
 		@observable a = 1; // enumerable, on proto
 		@computed get b () { return this.a } // non-enumerable, on proto
@@ -768,7 +748,7 @@ test("enumerability", t => {
 	t.equal(a.hasOwnProperty("a"), true);
 	t.equal(a.hasOwnProperty("b"), false);
 	t.equal(a.hasOwnProperty("m"), false);
-	t.equal(a.hasOwnProperty("m2"), true); // false would be ok as well
+	t.equal(a.hasOwnProperty("m2"), true);
 
 	t.equal(mobx.isAction(a.m), true);
 	t.equal(mobx.isAction(a.m2), true);

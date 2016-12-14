@@ -7,7 +7,7 @@
   "scripts": {
     "test": "npm run quick-build && npm run tape",
     "full-test": "npm run small-build && npm run build-tests && npm run use-minified && npm run tape && npm run perf",
-    "tape": "tape test/*.js | faucet",
+    "tape": "tape test/*.js test/typescript/typescript-tests.js | faucet",
     "perf": "npm run small-build && PERSIST=true time node --expose-gc test/perf/index.js",
     "_prepublish": "npm run small-build",
     "quick-build": "tsc --pretty",
@@ -16,10 +16,10 @@
     "test-browser-chrome": "npm run small-build && ( browserify test/*.js | tape-run --browser chrome | faucet )",
     "test-browser-safari": "npm run small-build && ( browserify test/*.js -t [ babelify --presets [ es2015 ] ] | tape-run --browser safari | faucet )",
     "test-browser-firefox": "npm run small-build && ( browserify test/*.js  | tape-run --browser firefox | faucet )",
-    "test-travis": "npm run small-build && npm run build-tests && tape test/*.js test/perf/index.js && tsc && istanbul cover tape test/*.js",
-    "coverage": "npm run quick-build && npm run build-tests && istanbul cover tape test/*.js",
+    "test-travis": "npm run small-build && npm run build-tests && tape test/*.js test/perf/index.js && tsc && istanbul cover tape test/*.js test/typescript/typescript-tests.js",
+    "coverage": "npm run quick-build && npm run build-tests && istanbul cover tape test/*.js test/typescript/typescript-tests.js",
     "build-tests": "npm run build-typescript-tests && npm run build-babel-tests",
-    "build-typescript-tests": "tsc -m commonjs -t es5 --experimentalDecorators --noImplicitAny --outDir test test/typescript-tests.ts",
+    "build-typescript-tests": "tsc -p test/typescript",
     "build-babel-tests": "babel test/babel/babel-tests.js -o test/babel-tests.js",
     "use-minified": "cp lib/mobx.min.js lib/mobx.js",
     "lint": "tslint -c tslint.json src/*.ts src/types/*.ts src/api/*.ts src/core/*.ts src/utils/*.ts"
