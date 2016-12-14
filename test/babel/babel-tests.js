@@ -1,5 +1,5 @@
 import {
-    observable, computed, transaction, asStructure, autorun, extendObservable, action,
+    observable, computed, transaction, autorun, extendObservable, action,
 	isObservableObject, observe, isObservable, spy, isAction,
     default as mobx
 } from "../";
@@ -47,7 +47,7 @@ test('babel: parameterized computed decorator', (t) => {
 	class TestClass {
 		@observable x = 3;
 		@observable y = 3;
-		@computed({ asStructure: true }) get boxedSum() {
+		@computed.struct get boxedSum() {
 			return { sum: Math.round(this.x) + Math.round(this.y) };
 		}
 	}
@@ -79,7 +79,6 @@ class Order {
     @observable amount = 2;
     @observable orders = [];
     @observable aFunction = function(a) { };
-    @observable someStruct = asStructure({ x: 1, y: 2});
 
     @computed get total() {
         return this.amount * this.price * (1 + this.orders.length);

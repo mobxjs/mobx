@@ -1,9 +1,3 @@
-import { isObservable } from "../api/isobservable";
-import { observable } from "../api/observable";
-import { fail, isPlainObject, invariant } from "../utils/utils";
-import { isObservableObject } from "./observableobject";
-import { isObservableArray } from "./observablearray";
-
 export interface IEnhancer<T> {
 	(newValue: T, oldValue: T | undefined, name: string): T;
 }
@@ -69,3 +63,9 @@ export function referenceEnhancer(newValue) {
 	// never turn into an observable
 	return newValue;
 }
+
+import { isObservable } from "../api/isobservable";
+import { observable } from "../api/observable";
+import { fail, isPlainObject, invariant } from "../utils/utils";
+import { isObservableObject } from "./observableobject";
+import { isObservableArray } from "./observablearray";

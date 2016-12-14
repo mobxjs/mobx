@@ -4,6 +4,7 @@ import {createAction, executeAction} from "../core/action";
 
 const actionFieldDecorator = createClassPropertyDecorator(
 	function (target, key, value, args, originalDescriptor) {
+		debugger;
 		const actionName = (args && args.length === 1) ? args[0] : (value.name || key || "<unnamed action>");
 		const wrappedAction = action(actionName, value);
 		addHiddenProp(target, key, wrappedAction);

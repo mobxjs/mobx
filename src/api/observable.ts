@@ -1,12 +1,16 @@
+import {invariant} from "../utils/utils";
+import {isModifierDescriptor, IModifierDescriptor, deepEnhancer, referenceEnhancer, shallowEnhancer, createModifierDescriptor} from "../types/modifiers";
 import {IObservableValue, ObservableValue} from "../types/observablevalue";
 import {IObservableArray, ObservableArray} from "../types/observablearray";
-import {invariant} from "../utils/utils";
-import {observableDecorator} from "./observabledecorator";
+import {createDecoratorForEnhancer} from "./observabledecorator";
 import {isObservable} from "./isobservable";
 import {IObservableObject, asObservableObject} from "../types/observableobject";
-import {isModifierDescriptor, IModifierDescriptor, deepEnhancer, referenceEnhancer, shallowEnhancer, createModifierDescriptor} from "../types/modifiers";
 import {extendObservable, extendShallowObservable} from "../api/extendobservable";
 import {IObservableMapInitialValues, ObservableMap} from "../types/observablemap";
+
+const deepObservableDecorator = createDecoratorForEnhancer(deepEnhancer);
+const shallowObservableDecorator = createDecoratorForEnhancer(shallowEnhancer);
+const refObservableDecorator = createDecoratorForEnhancer(referenceEnhancer);
 
 /**
  * Turns an object, array or function into a reactive structure.
@@ -15,7 +19,7 @@ import {IObservableMapInitialValues, ObservableMap} from "../types/observablemap
 function deepObservable(v: any = undefined) {
 	// @observable someProp;
 	if (typeof arguments[1] === "string")
-		return observableDecorator.apply(null, arguments);
+		return deepObservableDecorator.apply(null, arguments);
 
 	invariant(arguments.length <= 1, "observable expects zero or one arguments");
 	invariant(!isModifierDescriptor(v), "modifiers can only be used for induvidual object properties");
@@ -42,8 +46,15 @@ export interface IObservableFactory {
 	(target: Object, key: string, baseDescriptor?: PropertyDescriptor): any;
 	<T>(value: T[]): IObservableArray<T>;
 	// TODO: add map overload
-	<T extends string|number|boolean|Date|RegExp|Function|null|undefined>(value: T): IObservableValue<T>;
-	<S, T>(value: S): T;
+	(value: string): IObservableValue<string>;
+	(value: boolean): IObservableValue<boolean>;
+	(value: number): IObservableValue<number>;
+	(value: Date): IObservableValue<Date>;
+	(value: RegExp): IObservableValue<RegExp>;
+	(value: Function): IObservableValue<Function>;
+	<T>(value: null | undefined): IObservableValue<T>;
+	(value: null | undefined): IObservableValue<any>;
+	(): IObservableValue<any>;
 	<T extends Object>(value: T): T & IObservableObject;
 }
 
@@ -88,27 +99,44 @@ export class IObservableFactories {
 	}
 
 
-	// TODO: move to modifiers
-	ref<T>(initialValue: T): T {
-		// TODO: decorator overload
-		// although ref creates actually a modifier descriptor, the type of the resultig properties
-		// of the object is `T` in the end, when the descriptors are interpreted
-		return createModifierDescriptor(referenceEnhancer, initialValue) as any;
+	ref<T>(initialValue: T): T;
+	ref(target: Object, property: string, descriptor: PropertyDescriptor);
+	ref() {
+		if (arguments.length < 2) {
+			// although ref creates actually a modifier descriptor, the type of the resultig properties
+			// of the object is `T` in the end, when the descriptors are interpreted
+			return createModifierDescriptor(referenceEnhancer, arguments[0]) as any;
+		} else {
+			return refObservableDecorator.apply(null, arguments);
+		}
 	}
 
 
 	shallow<T>(initialValues: T[]): IObservableArray<T>;
 // TODO: ES6 Map	shallow<T>(initialValues: T[]): IObservableArray<T>;
 	shallow<T extends Object>(value: T): T;
-	shallow(initialValue) {
-		// TODO: decorator overload
-
-		// although ref creates actually a modifier descriptor, the type of the resultig properties
-		// of the object is `T` in the end, when the descriptors are interpreted
-		return createModifierDescriptor(shallowEnhancer, initialValue) as any;
+	shallow(target: Object, property: string, descriptor: PropertyDescriptor);
+	shallow() {
+		if (arguments.length < 2) {
+			// although ref creates actually a modifier descriptor, the type of the resultig properties
+			// of the object is `T` in the end, when the descriptors are interpreted
+			return createModifierDescriptor(shallowEnhancer, arguments[0]) as any;
+		} else {
+			return shallowObservableDecorator.apply(null, arguments);
+		}
 	}
 
-	// TODO: modifier.deep
+	deep<T>(initialValue: T): T;
+	deep(target: Object, property: string, descriptor: PropertyDescriptor);
+	deep() {
+		if (arguments.length < 2) {
+			// although ref creates actually a modifier descriptor, the type of the resultig properties
+			// of the object is `T` in the end, when the descriptors are interpreted
+			return createModifierDescriptor(deepEnhancer, arguments[0]) as any;
+		} else {
+			return deepObservableDecorator.apply(null, arguments);
+		}
+	}
 }
 
 export var observable: IObservableFactory & IObservableFactories = deepObservable as any;

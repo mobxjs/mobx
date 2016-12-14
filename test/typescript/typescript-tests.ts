@@ -719,8 +719,7 @@ test("reusing initializers", t => {
 	t.end();
 })
 
-test.only("enumerability", t => {
-	debugger;
+test("enumerability", t => {
 	class A {
 		@observable a = 1; // enumerable, on proto
 		@computed get b () { return this.a } // non-enumerable, on proto
