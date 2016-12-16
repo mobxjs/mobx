@@ -92,7 +92,7 @@ _Note: setters require MobX 2.5.1 or higher_
 
 `computed` can also be invoked directly as function.
 Just like `observable(primitive value)` it will create a stand-alone observable.
-Use `.get()` on the returned object to get the current value of the computation, or `.observe(callback)` to observe it's changes.
+Use `.get()` on the returned object to get the current value of the computation, or `.observe(callback)` to observe its changes.
 This form of `computed` is not used very often, but in some cases where you need to pass a "boxed" computed value around it might prove useful.
 
 Example:
