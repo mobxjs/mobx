@@ -51,12 +51,18 @@ This was not for a technical reason, but they just seemed hardly used.
 Structural comparision for computed properties and reactions is still possible.
 Feel free to file an issue, including use case, to re-introduce this feature if you think you really need it.
 
+# 2.7.0
+
+### Misc
+
+* Fixed #701: `toJS` sometimes failing to convert objects decorated with `@observable` (cause: `isObservable` sometimes returned false on these object)
+* Fixed typings for `when` / `autorun` / `reaction`; they all return a disposer function.
 
 ### Automatic inference of computed properties has been deprecated.
 
 A deprecation message will now be printed if creating computed properties while relying on automatical inferrence of argumentless functions as computed values. In other words, when using `observable` or `extendObservable` in the following manner:
 
-```js
+```javascript
 const x = observable({
 	computedProp: function() {
 		return someComputation
@@ -71,7 +77,7 @@ x.computedProp()
 
 Instead, to create a computed property, use:
 
-```js
+```javascript
 observable({
 	get computedProp() {
 		return someComputation
@@ -81,7 +87,7 @@ observable({
 
 or alternatively:
 
-```js
+```javascript
 observable({
 	computedProp: computed(function() {
 		return someComputation
@@ -97,7 +103,8 @@ An observable _reference_ to the function will be made and the function itself w
 See for more details [#532](https://github.com/mobxjs/mobx/issues/532)
 
 N.B. If you want to introduce actions on an observable that modify it's state, using `action` is still the recommended approach:
-```js
+
+```javascript
 observable({
 	counter: 0,
 	increment: action(function() {
@@ -166,6 +173,17 @@ See [#640](https://github.com/mobxjs/mobx/issues/640)
   * `SimpleEventEmitter`
   * `ObservableMap.toJs` (use `toJS`)
   * invoking `observe` and `inject` with plain javascript objects
+=======
+# 2.6.5
+
+* Added `move` operation to observable array, see [#697](https://github.com/mobxjs/mobx/pull/697)
+
+# 2.6.4
+
+* Fixed potential clean up issue if an exception was thrown from an intercept handler
+* Improved typings of `asStructure` (by @nidu, see #687)
+* Added support for `computed(asStructure(() => expr))` (by @yotambarzilay, see #685)
+>>>>>>> master
 
 # 2.6.3
 

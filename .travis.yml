@@ -8,7 +8,7 @@ script: npm run test-travis
 after_success:
   - cat ./coverage/lcov.info|./node_modules/coveralls/bin/coveralls.js
 node_js:
-  - 4
+  - 6
 addons:
     apt:
         packages:

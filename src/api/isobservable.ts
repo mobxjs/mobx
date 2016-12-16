@@ -22,5 +22,6 @@ export function isObservable(value, property?: string): boolean {
 		}
 		return false;
 	}
-	return !!value.$mobx || isAtom(value) || isReaction(value) || isComputedValue(value);
+	// For first check, see #701
+	return isObservableObject(value) || !!value.$mobx || isAtom(value) || isReaction(value) || isComputedValue(value);
 }

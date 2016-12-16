@@ -156,12 +156,6 @@ export interface IReactionOptions {
 	name?: string;
 }
 
-/**
- *
- * Basically sugar for computed(expr).observe(action(effect))
- * or
- * autorun(() => action(effect)(expr));
- */
 
 /**
  *

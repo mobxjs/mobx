@@ -44,7 +44,7 @@ const computedStructDecorator = createComputedDecorator(true);
  */
 export var computed: IComputed = (
 	function computed(targetOrExpr: any, keyOrScopeOrSetter?: any, descOrStruct?: any) {
-		// TODO: improve this api, computed.struct instead of third arg?
+		// TODO: improve this api, computed.struct instead of third arg?, options object with settor as second arg
 		if (typeof targetOrExpr === "function" && (arguments.length < 3 || typeof keyOrScopeOrSetter !== "string")) {
 			invariant(typeof targetOrExpr === "function", "First argument to `computed` should be an expression. If using computed as decorator, don't pass it arguments");
 			if (typeof keyOrScopeOrSetter === "function")

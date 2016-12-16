@@ -142,7 +142,7 @@ test('issue 191 - shared initializers (babel)', function(t) {
 	t.end();
 })
 
-test.only("705 - setter undoing caching (babel)", t => {
+test("705 - setter undoing caching (babel)", t => {
 	let recomputes = 0;
 	let autoruns = 0;
 
@@ -790,3 +790,17 @@ test('computed getter / setter for plan objects should succeed (babel)', functio
 	t.end();
 });
 
+test('issue #701', t => {
+
+	class Model {
+	@observable a = 5
+	}
+
+	const model = new Model()
+
+	t.deepEqual(mobx.toJS(model), { a: 5 })
+	t.equal(mobx.isObservable(model), true);
+	t.equal(mobx.isObservableObject(model), true);
+
+	t.end()
+})

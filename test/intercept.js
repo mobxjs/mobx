@@ -19,8 +19,10 @@ test('intercept observable value', t => {
 	t.equal(a.get(), 3, "should be changed");
 
 	d = intercept(a, (c) => {
-		if (c.newValue % 2 === 0)
+		if (c.newValue % 2 === 0) {
+			debugger;
 			throw "value should be odd!";
+		}
 		return c;
 	});
 
@@ -81,6 +83,64 @@ test('intercept array', t => {
 	t.deepEqual(a.slice(), [3, 4, 6, 2], "splice has been modified");
 	a[2] = 5;
 	t.deepEqual(a.slice(), [3, 4, 15, 2], "update has tripled");
+
+	t.end();
+});
+
+test('intercept object', t => {
+	var a = m.observable({
+		b: 3
+	})
+
+	// bit magical, but intercept makes a observable, to be consistent with observe.
+	// deprecated immediately :)
+	var d = intercept(a, c => {
+		c.newValue *= 3;
+		return c;
+	});
+
+	a.b = 4;
+
+	t.equal(a.b, 12, "intercept applied");
+
+	var d2 = intercept(a, "b", c => {
+		c.newValue += 1;
+		return c;
+	});
+
+	a.b = 5;
+	t.equal(a.b, 16, "attribute selector applied last");
+
+	var d3 = intercept(a, c => {
+		t.equal(c.name, "b"),
+		t.equal(c.object, a);
+		t.equal(c.type, "update");
+		return null;
+	})
+
+	a.b = 7;
+	t.equal(a.b, 16, "interceptor not applied");
+
+	d3();
+	a.b = 7;
+	t.equal(a.b, 22, "interceptor applied again");
+
+	var d4 = intercept(a, c => {
+		if (c.type === "add") {
+			return null;
+		}
+		return c;
+	});
+
+	m.extendObservable(a, { c: 1 });
+	t.equal(a.c, undefined, "extension intercepted");
+	t.equal(m.isObservable(a, "c"), false);
+
+	d4();
+
+	m.extendObservable(a, { c: 2 });
+	t.equal(a.c, 6, "extension not intercepted");
+	t.equal(m.isObservable(a, "c"), true);
 
 	t.end();
 });

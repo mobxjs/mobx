@@ -20,12 +20,13 @@ export function invariant(check: boolean, message: string, thing?) {
 		throw new Error("[mobx] Invariant failed: " + message + (thing ? ` in '${thing}'` : ""));
 }
 
-const deprecatedMessages: string[] = [];
 
 /**
  * Prints a deprecation message, but only one time.
  * Returns false if the deprecated message was already printed before
  */
+const deprecatedMessages: string[] = [];
+
 export function deprecated(msg: string): boolean {
 	if (deprecatedMessages.indexOf(msg) !== -1)
 		return false;
