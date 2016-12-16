@@ -39,7 +39,7 @@ export { IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IAr
 export { IKeyValueMap, ObservableMap, IMapEntries, IMapEntry, IMapWillChange, IMapChange, isObservableMap, map, IObservableMapInitialValues } from "./types/observablemap"
 
 export { observable, IObservableFactory, IObservableFactories } from "./api/observable";
-export { computed, IComputed                                  } from "./api/computeddecorator";
+export { computed, IComputed, IComputedValueOptions           } from "./api/computed";
 export { isObservable                                         } from "./api/isobservable";
 export { isComputed                                           } from "./api/iscomputed";
 export { extendObservable, extendShallowObservable            } from "./api/extendobservable";

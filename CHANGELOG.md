@@ -39,17 +39,19 @@ The `@observable` decorator can still be used to introduce observable properties
 However, sometimes you want to create an observable property that does not convert it's _value_ into an observable automatically.
 Previously that could be written as `@observable x = asReference(value)`.
 
-
-
-
-
-
-
-### Structurally comparing observables have been removed
+### Structurally comparison of observables have been removed
 
 This was not for a technical reason, but they just seemed hardly used.
 Structural comparision for computed properties and reactions is still possible.
 Feel free to file an issue, including use case, to re-introduce this feature if you think you really need it.
+
+### `computed` api has been simplified
+
+Using `computed` to create boxed observables has been simplified, and `computed` can now be invoked as follows:
+* `computed(expr)`
+* `computed(expr, setter)`
+* `computed(expr, options)`, where options is an object that can specify one or more of the following fields: `name`, `setter`, `compareStructural` or `context` (the "this").
+
 
 # 2.7.0
 

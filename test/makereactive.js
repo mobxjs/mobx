@@ -421,7 +421,7 @@ test('as structure view', function(t) {
         c: m.computed((function() {
             this.b
             return { a : this.aa };
-        }), null, true)
+        }), { compareStructural: true })
     });
 
     var bc = 0;

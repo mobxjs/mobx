@@ -68,7 +68,7 @@ test('computed with asStructure modifier', function(t) {
             return {
               sum: x1.get() + x2.get()
             }
-        }, null, true);
+        }, { compareStructural: true });
         var b = buffer();
         m.observe(y, b, true);
 
@@ -262,7 +262,7 @@ test('scope', function(t) {
         this.amount = observable(2);
         this.total = computed(function() {
             return (1+vat.get()) * this.price.get() * this.amount.get();
-        }, this);
+        }, { context: this });
     };
 
     var order = new Order();

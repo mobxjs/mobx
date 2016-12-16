@@ -3,9 +3,17 @@ import {invariant} from "../utils/utils";
 import {createClassPropertyDecorator} from "../utils/decorators";
 import {ComputedValue, IComputedValue} from "../core/computedvalue";
 
+
+export interface IComputedValueOptions<T> {
+	compareStructural?: boolean;
+	name?: string;
+	setter?: (value: T) => void;
+	context?: any;
+}
+
 export interface IComputed {
-	<T>(func: () => T, setter?: (value: T) => void, compareStructural?: boolean): IComputedValue<T>;
-	<T>(func: () => T, context?: Object): IComputedValue<T>;
+	<T>(func: () => T, setter?: (value: T) => void): IComputedValue<T>;
+	<T>(func: () => T, options: IComputedValueOptions<T>): IComputedValue<T>;
 	(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void;
 	struct(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void;
 }
@@ -37,28 +45,21 @@ function createComputedDecorator(compareStructural) {
 const computedDecorator = createComputedDecorator(false);
 const computedStructDecorator = createComputedDecorator(true);
 
-
 /**
  * Decorator for class properties: @computed get value() { return expr; }.
  * For legacy purposes also invokable as ES5 observable created: `computed(() => expr)`;
  */
 export var computed: IComputed = (
-	function computed(targetOrExpr: any, keyOrScopeOrSetter?: any, descOrStruct?: any) {
-		// TODO: improve this api, computed.struct instead of third arg?, options object with settor as second arg
-		if (typeof targetOrExpr === "function" && (arguments.length < 3 || typeof keyOrScopeOrSetter !== "string")) {
-			invariant(typeof targetOrExpr === "function", "First argument to `computed` should be an expression. If using computed as decorator, don't pass it arguments");
-			if (typeof keyOrScopeOrSetter === "function")
-				return computedExpr(targetOrExpr, keyOrScopeOrSetter, undefined, descOrStruct === true);
-			else
-				return computedExpr(targetOrExpr, undefined, keyOrScopeOrSetter, descOrStruct === true);
+	function computed(arg1, arg2, arg3) {
+		if (typeof arg2 === "string") {
+			return computedDecorator.apply(null, arguments);
 		}
-		return computedDecorator.apply(null, arguments);
+		invariant(typeof arg1 === "function", "First argument to `computed` should be an expression. If using computed as decorator, don't pass it arguments");
+		invariant(arguments.length < 3, "computed takes one or two arguments if used as function");
+		const opts: IComputedValueOptions<any> = typeof arg2 === "object" ? arg2 : {};
+		opts.setter = typeof arg2 === "function" ? arg2 : opts.setter;
+		return new ComputedValue(arg1, opts.context, opts.compareStructural || false, opts.name || arg1.name || "", opts.setter);
 	}
 ) as any;
 
 computed.struct = computedStructDecorator;
-
-// TODO: use options object?
-function computedExpr<T>(expr: () => T, setter, scope: any, compareStructural: boolean) {
-	return new ComputedValue(expr, scope, compareStructural, (expr as any).name, setter);
-}
