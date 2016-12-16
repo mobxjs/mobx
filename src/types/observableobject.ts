@@ -91,7 +91,7 @@ export function defineObservablePropertyFromDescriptor(adm: ObservableObjectAdmi
 		if (isModifierDescriptor(descriptor.value)) {
 			// x : ref(someValue)
 			const modifierDescriptor = descriptor.value as IModifierDescriptor<any>;
-			defineObservableProperty(adm, propName, modifierDescriptor.initialValue, modifierDescriptor.enhancer, true);
+			defineObservableProperty(adm, propName, modifierDescriptor.initialValue, modifierDescriptor.enhancer);
 		}
 		// TODO: if is action, name and bind
 		else if (isComputedValue(descriptor.value)) {
@@ -99,7 +99,7 @@ export function defineObservablePropertyFromDescriptor(adm: ObservableObjectAdmi
 			defineComputedPropertyFromComputedValue(adm, propName, descriptor.value, true);
 		} else {
 			// x: someValue
-			defineObservableProperty(adm, propName, descriptor.value, defaultEnhancer, true);
+			defineObservableProperty(adm, propName, descriptor.value, defaultEnhancer);
 		}
 	} else {
 		// get x() { return 3 } set x(v) { }
@@ -111,12 +111,9 @@ export function defineObservableProperty(
 	adm: ObservableObjectAdministration,
 	propName: string,
 	newValue,
-	enhancer: IEnhancer<any>,
-	asInstanceProperty: boolean
+	enhancer: IEnhancer<any>
 ) {
-	// TODO: heck if asInstanceProperty abstraction is correct? probably always true for observable properties?
-	if (asInstanceProperty)
-		assertPropertyConfigurable(adm.target, propName);
+	assertPropertyConfigurable(adm.target, propName);
 
 	if (hasInterceptors(adm)) {
 		const change = interceptChange<IObjectWillChange>(adm, {
@@ -132,9 +129,7 @@ export function defineObservableProperty(
 	const observable = adm.values[propName] = new ObservableValue(newValue, enhancer, `${adm.name}.${propName}`, false);
 	newValue = (observable as any).value; // observableValue might have changed it
 
-	if (asInstanceProperty) {
-		Object.defineProperty(adm.target, propName, generateObservablePropConfig(propName));
-	}
+	Object.defineProperty(adm.target, propName, generateObservablePropConfig(propName));
 	notifyPropertyAddition(adm, adm.target, propName, newValue);
 }
 

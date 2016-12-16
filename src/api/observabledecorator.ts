@@ -14,7 +14,7 @@ export function createDecoratorForEnhancer(enhancer: IEnhancer<any>) {
 			// might happen lazily (on first read), so temporarily allow state changes..
 			const prevA = allowStateChangesStart(true);
 			const adm = asObservableObject(target, undefined);
-			defineObservableProperty(adm, name, baseValue, enhancer, true);
+			defineObservableProperty(adm, name, baseValue, enhancer);
 			allowStateChangesEnd(prevA);
 		},
 		function (name) {
