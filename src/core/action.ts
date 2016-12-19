@@ -1,3 +1,4 @@
+import {IDerivation} from "../core/derivation";
 import {transactionStart, transactionEnd} from "../core/transaction";
 import {invariant} from "../utils/utils";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
@@ -16,7 +17,24 @@ export function createAction(actionName: string, fn: Function): Function {
 }
 
 export function executeAction(actionName: string, fn: Function, scope: any, args?: IArguments) {
-	// actions should not be called from computeds. check only works if the computed is actively observed, but that is fine enough as heuristic
+	const runInfo = startAction(actionName, fn, scope, args);
+	try {
+		return fn.apply(scope, args);
+	}
+	finally {
+		endAction(runInfo);
+	}
+}
+
+interface IActionRunInfo {
+	prevDerivation: IDerivation | null;
+	prevAllowStateChanges: boolean;
+	notifySpy: boolean;
+	startTime: number;
+}
+
+function startAction(actionName: string, fn: Function, scope: any, args?: IArguments): IActionRunInfo {
+		// actions should not be called from computeds. check only works if the computed is actively observed, but that is fine enough as heuristic
 	invariant(!isComputedValue(globalState.trackingDerivation), "Computed values or transformers should not invoke actions or trigger other side effects");
 
 	const notifySpy = isSpyEnabled();
@@ -35,20 +53,23 @@ export function executeAction(actionName: string, fn: Function, scope: any, args
 			arguments: flattendArgs
 		});
 	}
-	const prevUntracked = untrackedStart();
+	const prevDerivation = untrackedStart();
 	transactionStart(actionName, scope, false);
 	const prevAllowStateChanges = allowStateChangesStart(true);
+	return {
+		prevDerivation,
+		prevAllowStateChanges,
+		notifySpy,
+		startTime
+	};
+}
 
-	try {
-		return fn.apply(scope, args);
-	}
-	finally {
-		allowStateChangesEnd(prevAllowStateChanges);
-		transactionEnd(false);
-		untrackedEnd(prevUntracked);
-		if (notifySpy)
-			spyReportEnd({ time: Date.now() - startTime });
-	}
+function endAction(runInfo: IActionRunInfo) {
+	allowStateChangesEnd(runInfo.prevAllowStateChanges);
+	transactionEnd(false);
+	untrackedEnd(runInfo.prevDerivation);
+	if (runInfo.notifySpy)
+		spyReportEnd({ time: Date.now() - runInfo.startTime });
 }
 
 export function useStrict(strict: boolean): any {
