@@ -18,7 +18,7 @@ export function transaction<T>(action: () => T, thisArg = undefined, report = tr
 	}
 }
 
-export function transactionStart<T>(name: string, thisArg = undefined, report = true) {
+export function transactionStart<T>(name: string, thisArg, report: boolean) {
 	startBatch();
 	globalState.inTransaction += 1;
 	if (report && isSpyEnabled()) {
@@ -30,7 +30,7 @@ export function transactionStart<T>(name: string, thisArg = undefined, report = 
 	}
 }
 
-export function transactionEnd<T>(report = true) {
+export function transactionEnd<T>(report: boolean) {
 	if (--globalState.inTransaction === 0) {
 		runReactions();
 	}

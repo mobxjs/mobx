@@ -99,8 +99,8 @@ export class IObservableFactories {
 	}
 
 
+	ref(target: Object, property: string, descriptor?: PropertyDescriptor): any;
 	ref<T>(initialValue: T): T;
-	ref(target: Object, property: string, descriptor: PropertyDescriptor);
 	ref() {
 		if (arguments.length < 2) {
 			// although ref creates actually a modifier descriptor, the type of the resultig properties
@@ -112,10 +112,10 @@ export class IObservableFactories {
 	}
 
 
+	shallow(target: Object, property: string, descriptor?: PropertyDescriptor): any;
 	shallow<T>(initialValues: T[]): IObservableArray<T>;
 // TODO: ES6 Map	shallow<T>(initialValues: T[]): IObservableArray<T>;
 	shallow<T extends Object>(value: T): T;
-	shallow(target: Object, property: string, descriptor: PropertyDescriptor);
 	shallow() {
 		if (arguments.length < 2) {
 			// although ref creates actually a modifier descriptor, the type of the resultig properties
@@ -126,8 +126,8 @@ export class IObservableFactories {
 		}
 	}
 
+	deep(target: Object, property: string, descriptor?: PropertyDescriptor): any;
 	deep<T>(initialValue: T): T;
-	deep(target: Object, property: string, descriptor: PropertyDescriptor);
 	deep() {
 		if (arguments.length < 2) {
 			// although ref creates actually a modifier descriptor, the type of the resultig properties

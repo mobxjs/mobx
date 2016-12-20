@@ -545,3 +545,72 @@ test("540 - extendobservable should not report cycles", function(t) {
 	});
 	t.end();
 })
+
+test('mobx 3', t => {
+	const x = mobx.observable({ a: 1 })
+
+	t.ok(x === mobx.observable(x));
+
+	const y = mobx.observable.shallowBox(null);
+	const obj = { a: 2 };
+	y.set(obj);
+	t.ok(y.get() === obj);
+	t.equal(mobx.isObservable(y.get()), false);
+
+
+
+	t.end()
+})
+
+test("computed value", t => {
+	mobx.extras.getGlobalState().mobxGuid = 0;
+	var c = mobx.computed(() => 3);
+
+	t.equal(c.toJSON(), 3);
+	t.equal(mobx.isComputed(c), true);
+	t.equal(c.toString(), "ComputedValue@2[() => 3]");
+	t.end();
+
+})
+
+test("boxed value json", t => {
+	var a = mobx.observable.box({ x: 1 })
+	t.deepEqual(a.get().x, 1);
+	a.set(3);
+	t.deepEqual(a.get(), 3);
+	t.equal("" + a, 'ObservableValue@3[3]');
+	t.equal(a.toJSON(), 3);
+	t.end();
+})
+
+test("computed value scope", t => {
+	var a = mobx.observable({
+		x: 1,
+		y: mobx.computed(function() {
+			return this.x * 2
+		}, function(v) {
+			this.x = v;
+		})
+	})
+
+	t.equal(a.y, 2);
+	a.x = 2;
+	t.equal(a.y, 4);
+	a.y = 3;
+	t.equal(a.y, 6);
+
+	t.end();
+});
+
+test("shallow array", t => {
+	var a = mobx.observable.shallowArray();
+	a.push({ x: 1 }, [], 2, mobx.observable({ y: 3 }));
+
+	t.equal(mobx.isObservable(a), true);
+	t.equal(mobx.isObservable(a[0]), false);
+	t.equal(mobx.isObservable(a[1]), false);
+	t.equal(mobx.isObservable(a[2]), false);
+	t.equal(mobx.isObservable(a[3]), true);
+
+	t.end();
+})

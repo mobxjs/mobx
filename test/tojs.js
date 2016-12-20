@@ -320,3 +320,14 @@ test("verify #566 solution", t => {
 
 	t.end()
 })
+
+test("verify already seen", t => {
+	const a = mobx.observable({ x: null, y: 3 })
+	a.x = a;
+
+	const res = mobx.toJS(a);
+	t.equal(res.y, 3);
+	t.ok(res.x === res)
+	t.notOk(res.x === a);
+	t.end();
+})

@@ -96,7 +96,7 @@ export function defineObservablePropertyFromDescriptor(adm: ObservableObjectAdmi
 		// TODO: if is action, name and bind
 		else if (isComputedValue(descriptor.value)) {
 			// x: computed(someExpr)
-			defineComputedPropertyFromComputedValue(adm, propName, descriptor.value, true);
+			defineComputedPropertyFromComputedValue(adm, propName, descriptor.value);
 		} else {
 			// x: someValue
 			defineObservableProperty(adm, propName, descriptor.value, defaultEnhancer);
@@ -150,15 +150,14 @@ export function defineComputedProperty(
 	}
 }
 
-export function defineComputedPropertyFromComputedValue(adm: ObservableObjectAdministration, propName: string, computedValue: ComputedValue<any>, asInstanceProperty: boolean) {
+export function defineComputedPropertyFromComputedValue(adm: ObservableObjectAdministration, propName: string, computedValue: ComputedValue<any>) {
 	let name = `${adm.name}.${propName}`;
 	computedValue.name = name;
 	if (!computedValue.scope)
 		computedValue.scope = adm.target;
 
 	adm.values[propName] = computedValue;
-	if (asInstanceProperty)
-		Object.defineProperty(adm.target, propName, generateComputedPropConfig(propName));
+	Object.defineProperty(adm.target, propName, generateComputedPropConfig(propName));
 }
 
 const observablePropertyConfigs = {};

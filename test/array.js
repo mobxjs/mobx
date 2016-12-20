@@ -397,3 +397,21 @@ test('.move works correctly', t => {
 	t.end();
 });
 
+test("accessing out of bound values throws", t => {
+	const a = mobx.observable([]);
+
+	var warns = 0;
+	const baseWarn = console.warn;
+	console.warn = () => { warns++ }
+
+	a[0]; // out of bounds
+	a[1]; // out of bounds
+
+	t.equal(warns, 2);
+
+	t.doesNotThrow(() => a[0] = 3);
+	t.throws(() => a[2] = 4);
+
+	console.warn = baseWarn;
+	t.end();
+})

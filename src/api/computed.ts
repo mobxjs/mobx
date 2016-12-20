@@ -26,7 +26,7 @@ function createComputedDecorator(compareStructural) {
 			invariant(typeof originalDescriptor.get === "function", "@computed can only be used on getter functions, like: '@computed get myProps() { return ...; }'");
 
 			const adm = asObservableObject(target, "");
-			defineComputedProperty(adm, name, originalDescriptor.get, originalDescriptor.set, compareStructural , false);
+			defineComputedProperty(adm, name, originalDescriptor.get, originalDescriptor.set, compareStructural, false);
 		},
 		function (name) {
 			const observable = this.$mobx.values[name];

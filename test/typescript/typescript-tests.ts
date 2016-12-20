@@ -1027,3 +1027,52 @@ test("705 - setter undoing caching (typescript)", t => {
 	t.end();
 })
 
+test("@observable.ref (TS)", t => {
+	class A {
+		@observable.ref ref = { a: 3}
+	}
+
+	const a = new A();
+	t.equal(a.ref.a, 3);
+	t.equal(mobx.isObservable(a.ref), false);
+	t.equal(mobx.isObservable(a, "ref"), true);
+
+	t.end();
+})
+
+test("@observable.shallow (TS)", t => {
+	class A {
+		@observable.shallow arr = [{ todo: 1 }]
+	}
+
+	const a = new A();
+	const todo2 = { todo: 2 };
+	a.arr.push(todo2)
+	t.equal(mobx.isObservable(a.arr), true);
+	t.equal(mobx.isObservable(a, "arr"), true);
+	t.equal(mobx.isObservable(a.arr[0]), false);
+	t.equal(mobx.isObservable(a.arr[1]), false);
+	t.ok(a.arr[1] === todo2)
+
+	t.end();
+})
+
+
+test("@observable.deep (TS)", t => {
+	class A {
+		@observable.deep arr = [{ todo: 1 }]
+	}
+
+	const a = new A();
+	const todo2 = { todo: 2 };
+	a.arr.push(todo2)
+
+	t.equal(mobx.isObservable(a.arr), true);
+	t.equal(mobx.isObservable(a, "arr"), true);
+	t.equal(mobx.isObservable(a.arr[0]), true);
+	t.equal(mobx.isObservable(a.arr[1]), true);
+	t.ok(a.arr[1] !== todo2)
+	t.equal(isObservable(todo2), false);
+
+	t.end();
+})
