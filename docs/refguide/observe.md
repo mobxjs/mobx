@@ -18,7 +18,7 @@ Therefore it should do one of the following things:
 3. Return `null`, this indicates that the change can be ignored and shouldn't be applied. This is a powerful concept to make your objects for example temporarily immutable.
 4. Throw an exception, for example if some invariant isn't met.
 
-The function returns a `disposer` function that can be used to cancel the interceptor.
+The function returns a `disposer` function that can be used to cancel the interceptor when invoked.
 It is possible to register multiple interceptors to the same observable.
 They will be chained in registration order.
 If one of the interceptors returns `null` or throw an exception, the other interceptors won't be evaluated anymore.
@@ -30,7 +30,7 @@ const theme = observable({
   backgroundColor: "#ffffff"
 })
 
-intercept(theme, "backgroundColor", change => {
+const disposer = intercept(theme, "backgroundColor", change => {
   if (!change.newValue) {
     // ignore attempts to unset the background color
     return null;   
@@ -44,8 +44,9 @@ intercept(theme, "backgroundColor", change => {
       // this must be a properly formatted color code!
       return change;
   }
+  if (change.newValue.length > 10) disposer(); // stop intercepting future changes
   throw new Error("This doesn't like a color at all: " + change.newValue);
-}) 
+})
 ```
 
 ## Observe
