@@ -34,9 +34,8 @@ export function deepEnhancer(v, _, name) {
 		return observable.array(v, name);
 	if (isPlainObject(v))
 		return observable.object(v, name);
-	// TODO:
-	// if (isES6Map(v))
-		// return observable.map(v);
+	if (isES6Map(v))
+		return observable.shallowMap(v, name);
 
 	return v;
 }
@@ -51,9 +50,13 @@ export function shallowEnhancer(v, _, name): any {
 		return observable.shallowArray(v, name);
 	if (isPlainObject(v))
 		return observable.shallowObject(v, name);
+	if (isES6Map(v))
+		return observable.shallowMap(v, name);
 	if (isObservableObject(v))
 		return v;
 	if (isObservableArray(v))
+		return v;
+	if (isObservableMap(v))
 		return v;
 
 	return fail("The shallow modifier / decorator can only used in combination with arrays and objects");
@@ -66,6 +69,7 @@ export function referenceEnhancer(newValue) {
 
 import { isObservable } from "../api/isobservable";
 import { observable } from "../api/observable";
-import { fail, isPlainObject, invariant } from "../utils/utils";
+import { fail, isPlainObject, invariant, isES6Map } from "../utils/utils";
 import { isObservableObject } from "./observableobject";
 import { isObservableArray } from "./observablearray";
+import { isObservableMap } from "./observablemap";

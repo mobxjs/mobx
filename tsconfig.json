@@ -10,7 +10,12 @@
 		"strictNullChecks": true,
 		"noImplicitReturns": true,
 		"noImplicitUseStrict": true,
-		"noImplicitAny": false
+		"noImplicitAny": false,
+		"lib": [
+			"es5",
+			"dom",
+			"es2015.collection"
+		]
     },
     "exclude": [
         "node_modules",

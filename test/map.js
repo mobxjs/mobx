@@ -453,3 +453,26 @@ test('map should support iterall / iterable ', t => {
 
 	t.end()
 })
+
+test('support for ES6 Map', t => {
+	var x = new Map()
+	x.set("x", 3)
+	x.set("y", 2)
+
+	var m = mobx.observable(x);
+	t.equal(mobx.isObservableMap(m), true);
+	t.deepEqual(m.entries(), [["x", 3], ["y", 2]]);
+
+	var x2 = new Map()
+	x2.set("y", 4)
+	x2.set("z", 5)
+	m.merge(x2);
+	t.deepEqual(m.get("z"), 5)
+
+	var x3 = new Map()
+	x3.set({ y: 2}, {z: 4})
+
+	t.throws(() => mobx.observable.shallowMap(x3), /only strings, numbers and booleans are accepted as key in observable maps/)
+
+	t.end();
+})

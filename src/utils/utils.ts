@@ -1,3 +1,5 @@
+export const GLOBAL: any = function() { return this; }();
+
 export const EMPTY_ARRAY = [];
 Object.freeze(EMPTY_ARRAY);
 
@@ -192,6 +194,12 @@ export function createInstanceofPredicate<T>(name: string, clazz: new (...args: 
  */
 export function isArrayLike(x: any): boolean {
 	return Array.isArray(x) || isObservableArray(x);
+}
+
+export function isES6Map(thing): boolean {
+	if (thing instanceof GLOBAL.Map)
+		return true;
+	return false;
 }
 
 import {globalState} from "../core/globalstate";

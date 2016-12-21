@@ -52,6 +52,10 @@ Using `computed` to create boxed observables has been simplified, and `computed`
 * `computed(expr, setter)`
 * `computed(expr, options)`, where options is an object that can specify one or more of the following fields: `name`, `setter`, `compareStructural` or `context` (the "this").
 
+### Other changes
+
+* It is now possible to pass ES6 Maps to `observable` / observable maps. The map will be converted to an observable map (if keys are string like)
+* Made `action` more debug friendly, it should now be easier to step through
 
 # 2.7.0
 

@@ -3,7 +3,7 @@ import {transaction} from "../core/transaction";
 import {untracked} from "../core/derivation";
 import {IObservableArray, ObservableArray} from "./observablearray";
 import {ObservableValue, UNCHANGED} from "./observablevalue";
-import {createInstanceofPredicate, isPlainObject, getNextId, Lambda, invariant, deprecated} from "../utils/utils";
+import {createInstanceofPredicate, isPlainObject, getNextId, Lambda, invariant, deprecated, isES6Map, fail} from "../utils/utils";
 import {allowStateChanges} from "../core/action";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
@@ -37,7 +37,7 @@ export interface IMapWillChange<T> {
 
 const ObservableMapMarker = {};
 
-export type IObservableMapInitialValues<V> = IMapEntries<V> | IKeyValueMap<V>; // TODO: | Map<V> support initializing with map
+export type IObservableMapInitialValues<V> = IMapEntries<V> | IKeyValueMap<V> | Map<string | number | boolean, V>;
 
 export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, IListenable {
 	$mobx = ObservableMapMarker;
@@ -48,12 +48,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	changeListeners = null;
 
 	constructor(initialData?: IObservableMapInitialValues<V>, public enhancer: IEnhancer<V> = deepEnhancer, public name = "ObservableMap@" + getNextId()) {
-		allowStateChanges(true, () => {
-			if (isPlainObject(initialData))
-				this.merge(<IKeyValueMap<V>> initialData);
-			else if (Array.isArray(initialData))
-				initialData.forEach(([key, value]) => this.set(key, value));
-		});
+		this.merge(initialData);
 	}
 
 	private _has(key: string): boolean {
@@ -214,12 +209,19 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	}
 
 	/** Merge another object into this object, returns this. */
-	merge(other: ObservableMap<V> | IKeyValueMap<V>): ObservableMap<V> {
+	merge(other: ObservableMap<V> | IKeyValueMap<V> | any): ObservableMap<V> {
 		transaction(() => {
 			if (isObservableMap(other))
 				other.keys().forEach(key => this.set(key, (other as ObservableMap<V>).get(key)!));
-			else
+			else if (isPlainObject(other))
 				Object.keys(other).forEach(key => this.set(key, other[key]));
+			else if (Array.isArray(other))
+				other.forEach(([key, value]) => this.set(key, value));
+			else if (isES6Map(other))
+				other.forEach((value, key) => this.set(key, value));
+			else if (other !== null && other !== undefined)
+				fail("Cannot initialize map from " + other)
+
 		}, undefined, false);
 		return this;
 	}
@@ -256,14 +258,14 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	private isValidKey(key: string) {
 		if (key === null || key === undefined)
 			return false;
-		if (typeof key !== "string" && typeof key !== "number" && typeof key !== "boolean")
-			return false;
-		return true;
+		if (typeof key === "string" || typeof key === "number" || typeof key === "boolean")
+			return true;
+		return false;
 	}
 
 	private assertValidKey(key: string) {
 		if (!this.isValidKey(key))
-			throw new Error(`[mobx.map] Invalid key: '${key}'`);
+			throw new Error(`[mobx.map] Invalid key: '${key}', only strings, numbers and booleans are accepted as key in observable maps.`);
 	}
 
 	toString(): string {
@@ -289,9 +291,9 @@ declareIterator(ObservableMap.prototype, function() {
 	return this.entries();
 });
 
-export function map<V>(initialValues?: IMapEntries<V> | IKeyValueMap<V>): ObservableMap<V> {
-	deprecated("`mobx.map` is deprecated, use `new ObservableMap` or `mobx.modifiers.map` instead");
-	return observable.map(initialValues);
+export function map<V>(initialValues?: IObservableMapInitialValues<V>): ObservableMap<V> {
+	deprecated("`mobx.map` is deprecated, use `new ObservableMap` or `mobx.observable.map` instead");
+	return observable.map<V>(initialValues);
 }
 
 /* 'var' fixes small-build issue */

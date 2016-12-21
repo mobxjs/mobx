@@ -1,4 +1,4 @@
-import {invariant} from "../utils/utils";
+import {invariant, isES6Map} from "../utils/utils";
 import {isModifierDescriptor, IModifierDescriptor, deepEnhancer, referenceEnhancer, shallowEnhancer, createModifierDescriptor} from "../types/modifiers";
 import {IObservableValue, ObservableValue} from "../types/observablevalue";
 import {IObservableArray, ObservableArray} from "../types/observablearray";
@@ -55,6 +55,7 @@ export interface IObservableFactory {
 	<T>(value: null | undefined): IObservableValue<T>;
 	(value: null | undefined): IObservableValue<any>;
 	(): IObservableValue<any>;
+	<T>(value: Map<string | number | boolean, T>): ObservableMap<T>;
 	<T extends Object>(value: T): T & IObservableObject;
 }
 
@@ -114,7 +115,7 @@ export class IObservableFactories {
 
 	shallow(target: Object, property: string, descriptor?: PropertyDescriptor): any;
 	shallow<T>(initialValues: T[]): IObservableArray<T>;
-// TODO: ES6 Map	shallow<T>(initialValues: T[]): IObservableArray<T>;
+	shallow<T>(initialValues: Map<string | number | boolean, T>): ObservableMap<T>;
 	shallow<T extends Object>(value: T): T;
 	shallow() {
 		if (arguments.length < 2) {
@@ -127,6 +128,8 @@ export class IObservableFactories {
 	}
 
 	deep(target: Object, property: string, descriptor?: PropertyDescriptor): any;
+	deep<T>(initialValues: T[]): IObservableArray<T>;
+	deep<T>(initialValues: Map<string | number | boolean, T>): ObservableMap<T>;
 	deep<T>(initialValue: T): T;
 	deep() {
 		if (arguments.length < 2) {
