@@ -6,7 +6,7 @@ import {createDecoratorForEnhancer} from "./observabledecorator";
 import {isObservable} from "./isobservable";
 import {IObservableObject, asObservableObject} from "../types/observableobject";
 import {extendObservable, extendShallowObservable} from "../api/extendobservable";
-import {IObservableMapInitialValues, ObservableMap} from "../types/observablemap";
+import {IObservableMapInitialValues, ObservableMap, IMap} from "../types/observablemap";
 
 const deepObservableDecorator = createDecoratorForEnhancer(deepEnhancer);
 const shallowObservableDecorator = createDecoratorForEnhancer(shallowEnhancer);
@@ -55,7 +55,7 @@ export interface IObservableFactory {
 	<T>(value: null | undefined): IObservableValue<T>;
 	(value: null | undefined): IObservableValue<any>;
 	(): IObservableValue<any>;
-	<T>(value: Map<string | number | boolean, T>): ObservableMap<T>;
+	<T>(value: IMap<string | number | boolean, T>): ObservableMap<T>;
 	<T extends Object>(value: T): T & IObservableObject;
 }
 
@@ -115,7 +115,7 @@ export class IObservableFactories {
 
 	shallow(target: Object, property: string, descriptor?: PropertyDescriptor): any;
 	shallow<T>(initialValues: T[]): IObservableArray<T>;
-	shallow<T>(initialValues: Map<string | number | boolean, T>): ObservableMap<T>;
+	shallow<T>(initialValues: IMap<string | number | boolean, T>): ObservableMap<T>;
 	shallow<T extends Object>(value: T): T;
 	shallow() {
 		if (arguments.length < 2) {
@@ -129,7 +129,7 @@ export class IObservableFactories {
 
 	deep(target: Object, property: string, descriptor?: PropertyDescriptor): any;
 	deep<T>(initialValues: T[]): IObservableArray<T>;
-	deep<T>(initialValues: Map<string | number | boolean, T>): ObservableMap<T>;
+	deep<T>(initialValues: IMap<string | number | boolean, T>): ObservableMap<T>;
 	deep<T>(initialValue: T): T;
 	deep() {
 		if (arguments.length < 2) {

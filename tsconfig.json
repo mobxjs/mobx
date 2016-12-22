@@ -13,8 +13,7 @@
 		"noImplicitAny": false,
 		"lib": [
 			"es5",
-			"dom",
-			"es2015.collection"
+			"dom"
 		]
     },
     "exclude": [

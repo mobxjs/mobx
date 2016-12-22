@@ -36,7 +36,7 @@ export { IObjectWillChange, IObjectChange, IObservableObject, isObservableObject
 
 export { /* 3.0: IValueDidChange, */ IValueWillChange, IObservableValue } from "./types/observablevalue";
 export { IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, isObservableArray } from "./types/observablearray";
-export { IKeyValueMap, ObservableMap, IMapEntries, IMapEntry, IMapWillChange, IMapChange, isObservableMap, map, IObservableMapInitialValues } from "./types/observablemap"
+export { IKeyValueMap, ObservableMap, IMapEntries, IMapEntry, IMapWillChange, IMapChange, isObservableMap, map, IObservableMapInitialValues, IMap } from "./types/observablemap"
 
 export { observable, IObservableFactory, IObservableFactories } from "./api/observable";
 export { computed, IComputed, IComputedValueOptions           } from "./api/computed";
