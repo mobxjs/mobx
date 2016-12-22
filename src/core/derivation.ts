@@ -27,7 +27,6 @@ export enum IDerivationState {
 /**
  * A derivation is everything that can be derived from the state (all the atoms) in a pure manner.
  * See https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.xvbh6qd74
- * TODO: the one above is outdated, new one?
  */
 export interface IDerivation extends IDepTreeNode {
 	observing: IObservable[];
@@ -44,7 +43,7 @@ export interface IDerivation extends IDepTreeNode {
 	unboundDepsCount: number;
 	__mapid: string;
 	onBecomeStale();
-	recoverFromError(); // TODO: revisit implementation of error handling
+	recoverFromError();
 }
 
 /**

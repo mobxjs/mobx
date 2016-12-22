@@ -256,7 +256,7 @@ test('get debug name', function(t) {
 
 	t.equal(name(a), "ObservableValue@1");
 
-	t.equal(name(b, "a"), "ObservableObject@2.a"); // TODO: remove @3..! (also in the other tests)
+	t.equal(name(b, "a"), "ObservableObject@2.a");
 	t.throws(() => name(b, "b"), /no observable property 'b' found on the observable object 'ObservableObject@2'/, "expected throw");
 
 	t.equal(name(c), "ObservableMap@3"); // returns ke, "bla"ys

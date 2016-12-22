@@ -181,7 +181,6 @@ export function deepEquals(a, b) {
 }
 
 export function createInstanceofPredicate<T>(name: string, clazz: new (...args: any[]) => T): (x: any) => x is T {
-	// TODO: this is quite a slow aproach, find something faster?
 	const propName = "isMobX" + name;
 	clazz.prototype[propName] = true;
 	return function (x) {

@@ -18,8 +18,9 @@ export interface Iterator<T> {
 }
 
 export function arrayAsIterator<T>(array: T[]): T[] & Iterator<T> {
-	// TODO: this should be removed in the next major version of MobX
-	// returning an array for entries(), values() etc for maps was a mis-interpretation of the specs..
+	// returning an array for entries(), values() etc for maps was a mis-interpretation of the specs..,
+	// yet it is quite convenient to be able to use the response both as array directly and as iterator
+	// it is suboptimal, but alas...
 	invariant(array[IS_ITERATING_MARKER] !== true, "Illegal state: cannot recycle array as iterator");
 	addHiddenFinalProp(array, IS_ITERATING_MARKER, true);
 

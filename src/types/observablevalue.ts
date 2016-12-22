@@ -12,14 +12,6 @@ export interface IValueWillChange<T> {
 	newValue: T;
 }
 
-// TODO: Introduce in 4.0
-// export interface IValueDidChange<T> {
-// 	object: any;
-// 	type: "update" | "create";
-// 	newValue: T;
-// 	oldValue: T;
-// }
-
 export type IUNCHANGED = {};
 
 export const UNCHANGED: IUNCHANGED = {};

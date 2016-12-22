@@ -24,7 +24,7 @@ function extendObservableHelper(target: Object, defaultEnhancer: IEnhancer<any>,
 
 	const adm = asObservableObject(target);
 	const definedProps = {};
-	// TODO: could be optimised if properties.length === 1
+	// Note could be optimised if properties.length === 1
 	for (let i = properties.length - 1; i >= 0; i--) {
 		const propSet = properties[i];
 		for (let key in propSet) if (definedProps[key] !== true && hasOwnProperty(propSet, key)) {

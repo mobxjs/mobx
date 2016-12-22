@@ -252,7 +252,13 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		}, undefined, false);
 	}
 
-	// TODO: replace
+	replace(values: ObservableMap<V> | IKeyValueMap<V> | any): ObservableMap<V> {
+		transaction(() => {
+			this.clear();
+			this.merge(values);
+		});
+		return this;
+	}
 
 	get size(): number {
 		return this._keys.length;

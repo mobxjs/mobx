@@ -162,7 +162,6 @@ function invariantLOS(observable: IObservable, msg) {
  * It's hard or maybe inpossible (with reasonable perf) to get it right with current approach
  * Hopefully self reruning autoruns aren't a feature people shuold depend on
  * Also most basic use cases shuold be ok
- * TODO: create description of autorun behaviour or change this behaviour?
  */
 
 // Called by Atom when it's value changes

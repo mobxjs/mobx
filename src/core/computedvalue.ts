@@ -46,7 +46,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	protected value: T | undefined = undefined;
 	name: string;
 	isComputing: boolean = false; // to check for cycles
-	isRunningSetter: boolean = false; // TODO optimize, see: https://reaktor.com/blog/javascript-performance-fundamentals-make-bluebird-fast/
+	isRunningSetter: boolean = false;
 	setter: (value: T) => void;
 
 	/**
@@ -60,7 +60,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	 * This is useful for working with vectors, mouse coordinates etc.
 	 */
 	constructor(public derivation: () => T, public scope: Object | undefined, private compareStructural: boolean, name: string, setter?: (v: T) => void) {
-		// TODO: instead of comparestructural, pass a modifier
 		this.name  = name || "ComputedValue@" + getNextId();
 		if (setter)
 			this.setter = createAction(name + "-setter", setter) as any;
@@ -185,8 +184,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		const isTracking = Boolean(globalState.trackingDerivation);
 		const observing = unique(this.isComputing ? this.newObserving! : this.observing).map((dep: any) => dep.name);
 		const observers = unique(getObservers(this).map(dep => dep.name));
-// TODO: use issue
-// TOOD; expand wiht more states
 		return (`
 WhyRun? computation '${this.name}':
  * Running because: ${isTracking ? "[active] the value of this computation is needed by a reaction" : this.isComputing ? "[get] The value of this computed was requested outside a reaction" : "[idle] not running at the moment"}

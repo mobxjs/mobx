@@ -19,9 +19,6 @@ const actionFieldDecorator = createClassPropertyDecorator(
 	true
 );
 
-
-// TODO action.bind
-
 export function action<A1, R, T extends (a1: A1) => R>(fn: T): T;
 export function action<A1, A2, R, T extends (a1: A1, a2: A2) => R>(fn: T): T;
 export function action<A1, A2, A3, R, T extends (a1: A1, a2: A2, a3: A3) => R>(fn: T): T;

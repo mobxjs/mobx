@@ -122,6 +122,10 @@ test('observe value', function(t) {
 	a.merge({y: 'hello'});
 	t.equal(valueY, 'hello');
 
+	a.replace({ y: "stuff", z: "zoef"});
+	t.equal(valueY, "stuff");
+	t.deepEqual(a.keys(), ["y", "z"])
+
 	t.end();
 })
 

@@ -45,7 +45,6 @@ export interface IObservableFactory {
 	<T>(wrapped: IModifierDescriptor<T>): T;
 	(target: Object, key: string, baseDescriptor?: PropertyDescriptor): any;
 	<T>(value: T[]): IObservableArray<T>;
-	// TODO: add map overload
 	(value: string): IObservableValue<string>;
 	(value: boolean): IObservableValue<boolean>;
 	(value: number): IObservableValue<number>;

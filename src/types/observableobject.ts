@@ -141,7 +141,7 @@ export function defineComputedProperty(
 	compareStructural: boolean,
 	asInstanceProperty: boolean
 ) {
-	if (asInstanceProperty) // TODO: always false?
+	if (asInstanceProperty)
 		assertPropertyConfigurable(adm.target, propName);
 
 	adm.values[propName] = new ComputedValue(getter, adm.target, compareStructural, `${adm.name}.${propName}`, setter);

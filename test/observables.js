@@ -1416,7 +1416,6 @@ test('unoptimizable subscriptions are diffed correctly', t => {
 
 })
 
-// TODO: revisit this test after estabilishing desired behaviour
 test('atom events #427', t => {
 	var start = 0;
 	var stop = 0;

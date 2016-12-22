@@ -262,7 +262,6 @@ function order_system_helper(t, usebatch, keepObserving) {
         return sum;
     });
 
-	// TODO: use extendObservable!
     function OrderLine(order, price, amount) {
         this.price = observable(price);
         this.amount = observable(amount);
