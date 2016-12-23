@@ -33,3 +33,4 @@
 * [Github Note Taker in MobX](https://github.com/eswat2/egghead-mobx)
 * SoundCloud client, in MobX and React: [React-MobX-SoundCloud](https://github.com/rwieruch/react-mobx-soundcloud)
 * Lightweight support service via ReactJS, Mobx, Grape (ruby) and Mongodb: [support-service](https://github.com/ifokeev/support-service)
+* [A simple Tetris using React + MobX](https://github.com/1984weed/mobx-react-tetris) 
