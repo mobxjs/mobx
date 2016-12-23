@@ -2,7 +2,11 @@ import {IDerivation} from "./derivation";
 import {Reaction} from "./reaction";
 import {IObservable} from "./observable";
 
-declare const global: any;
+declare let global: any;
+if (typeof global === "undefined" && typeof window !== "undefined")
+	global = window;
+
+
 
 /**
  * These values will persist if global state is reset
