@@ -119,15 +119,16 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	derivation.runId = ++globalState.runId;
 	const prevTracking = globalState.trackingDerivation;
 	globalState.trackingDerivation = derivation;
-	let hasException = true;
+	let hasException = false;
 	let result: T;
 	try {
 		result = f.call(derivation);
-		hasException = false;
+	} catch(e){
+		hasException = true;
+		handleExceptionInDerivation(derivation, e);
+		throw e;
 	} finally {
-		if (hasException) {
-			handleExceptionInDerivation(derivation);
-		} else {
+		if (!hasException) {
 			globalState.trackingDerivation = prevTracking;
 			bindDependencies(derivation);
 		}
@@ -135,7 +136,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	return result;
 }
 
-export function handleExceptionInDerivation(derivation: IDerivation) {
+export function handleExceptionInDerivation(derivation: IDerivation, cause?:Error) {
 	const message = (
 		`[mobx] An uncaught exception occurred while calculating your computed value, autorun or transformer. Or inside the render() method of an observer based React component. ` +
 		`These functions should never throw exceptions as MobX will not always be able to recover from them. ` +
@@ -145,7 +146,8 @@ export function handleExceptionInDerivation(derivation: IDerivation) {
 	if (isSpyEnabled()) {
 		spyReport({
 			type: "error",
-			message
+			message,
+			cause
 		});
 	}
 	console.warn(message); // In next major, maybe don't emit this message at all?
