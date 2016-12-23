@@ -115,15 +115,15 @@ test('autorunAsync passes Reaction as an argument to view function', function(t)
 		if (a.get() === 'pleaseDispose') r.dispose();
 	}, 10);
 
-	setTimeout(() => a.set(2), 25);
-	setTimeout(() => a.set('pleaseDispose'), 40);
-	setTimeout(() => a.set(3), 55);
-	setTimeout(() => a.set(4), 70);
+	setTimeout(() => a.set(2), 250);
+	setTimeout(() => a.set('pleaseDispose'), 400);
+	setTimeout(() => a.set(3), 550);
+	setTimeout(() => a.set(4), 700);
 
 	setTimeout(function() {
 		t.equal(autoRunsCalled, 3);
 		t.end();
-	}, 100);
+	}, 1000);
 });
 
 test('autorunAsync warns when passed an action', function(t) {
