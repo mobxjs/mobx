@@ -52,10 +52,19 @@ Using `computed` to create boxed observables has been simplified, and `computed`
 * `computed(expr, setter)`
 * `computed(expr, options)`, where options is an object that can specify one or more of the following fields: `name`, `setter`, `compareStructural` or `context` (the "this").
 
+### Bound actions
+
+[#699](https://github.com/mobxjs/mobx/issues/699)
+
+`action.bound` / `@action.bound`
+
+doesn't support name decorators like `@action`, the name is always the targeted key
+
 ### Other changes
 
 * It is now possible to pass ES6 Maps to `observable` / observable maps. The map will be converted to an observable map (if keys are string like)
 * Made `action` more debug friendly, it should now be easier to step through
+* ObservableMap now has an additional method, `.replace(data)`, which is a combination of `clear()` and `merge(data)`.
 
 # 2.7.0
 

@@ -804,3 +804,72 @@ test('issue #701', t => {
 
 	t.end()
 })
+
+
+test("@observable.ref (Babel)", t => {
+	class A {
+		@observable.ref ref = { a: 3}
+	}
+
+	const a = new A();
+	t.equal(a.ref.a, 3);
+	t.equal(mobx.isObservable(a.ref), false);
+	t.equal(mobx.isObservable(a, "ref"), true);
+
+	t.end();
+})
+
+test("@observable.shallow (Babel)", t => {
+	class A {
+		@observable.shallow arr = [{ todo: 1 }]
+	}
+
+	const a = new A();
+	const todo2 = { todo: 2 };
+	a.arr.push(todo2)
+	t.equal(mobx.isObservable(a.arr), true);
+	t.equal(mobx.isObservable(a, "arr"), true);
+	t.equal(mobx.isObservable(a.arr[0]), false);
+	t.equal(mobx.isObservable(a.arr[1]), false);
+	t.ok(a.arr[1] === todo2)
+
+	t.end();
+})
+
+
+test("@observable.deep (Babel)", t => {
+	class A {
+		@observable.deep arr = [{ todo: 1 }]
+	}
+
+	const a = new A();
+	const todo2 = { todo: 2 };
+	a.arr.push(todo2)
+
+	t.equal(mobx.isObservable(a.arr), true);
+	t.equal(mobx.isObservable(a, "arr"), true);
+	t.equal(mobx.isObservable(a.arr[0]), true);
+	t.equal(mobx.isObservable(a.arr[1]), true);
+	t.ok(a.arr[1] !== todo2)
+	t.equal(isObservable(todo2), false);
+
+	t.end();
+})
+
+test("action.bound binds (Babel)", t=> {
+	class A {
+		@observable x = 0;
+		@action.bound
+		inc(value: number) {
+			this.x += value;
+		}
+	}
+
+	const a = new A();
+	const runner = a.inc;
+	runner(2);
+
+	t.equal(a.x, 2);
+
+	t.end();
+})

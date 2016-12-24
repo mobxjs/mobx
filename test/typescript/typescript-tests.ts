@@ -1076,3 +1076,21 @@ test("@observable.deep (TS)", t => {
 
 	t.end();
 })
+
+test("action.bound binds (TS)", t=> {
+	class A {
+		@observable x = 0;
+		@action.bound
+		inc(value: number) {
+			this.x += value;
+		}
+	}
+
+	const a = new A();
+	const runner = a.inc;
+	runner(2);
+
+	t.equal(a.x, 2);
+
+	t.end();
+})

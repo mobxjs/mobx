@@ -370,3 +370,37 @@ test('computed values and actions', t => {
 
 	t.end()
 })
+
+test('bound actions bind', t => {
+	var called = 0;
+	var x = mobx.observable({
+		y: 0,
+		z: mobx.action.bound(function(v) {
+			this.y += v;
+			this.y += v;
+		}),
+
+		get yValue() {
+			called++;
+			return this.y;
+		}
+	})
+
+	var d = mobx.autorun(() => {
+		x.yValue;
+	})
+	var events = [];
+	var d2 = mobx.spy(e => events.push(e));
+
+	var runner = x.z;
+	runner(3);
+	t.equal(x.yValue, 6);
+	t.equal(called, 2);
+
+	t.deepEqual(events.filter(e => e.type === "action").map(e => e.name), ["z"])
+	t.deepEqual(Object.keys(x), ["y"]);
+
+	d();
+	d2();
+	t.end();
+})
