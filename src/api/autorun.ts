@@ -216,7 +216,7 @@ export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg:
 		});
 		if (firstTime && opts.fireImmediately!)
 			effect(nextValue, r);
-		if (!firstTime && changed === true)
+		if (!firstTime && (changed as boolean) === true)
 			effect(nextValue, r);
 		if (firstTime)
 			firstTime = false;

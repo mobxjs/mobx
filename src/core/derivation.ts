@@ -123,6 +123,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	try {
 		result = f.call(derivation);
 		hasException = false;
+		return result;
 	} finally {
 		if (hasException) {
 			handleExceptionInDerivation(derivation);
@@ -131,7 +132,6 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 			bindDependencies(derivation);
 		}
 	}
-	return result;
 }
 
 export function handleExceptionInDerivation(derivation: IDerivation) {

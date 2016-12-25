@@ -988,13 +988,18 @@ test("705 - setter undoing caching (typescript)", t => {
 	class Person {
 		@observable name: string;
 		@observable title: string;
-		set fullName(val) {
-			// Noop
-		}
+
+		// Typescript bug: if fullName is before the getter, the property is defined twice / incorrectly, see #705
+		// set fullName(val) {
+		// 	// Noop
+		// }
 		@computed get fullName() {
-			debugger;
 			recomputes++;
 			return this.title+" "+this.name;
+		}
+		// Should also be possible to define the setter _before_ the fullname
+		set fullName(val) {
+			// Noop
 		}
 	}
 
