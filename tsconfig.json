@@ -6,6 +6,7 @@
         "sourceMap": false,
         "declaration": true,
         "module": "commonjs",
+        "experimentalDecorators": true,
         "removeComments": false
     },
     "exclude": [
