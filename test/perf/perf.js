@@ -267,7 +267,7 @@ function order_system_helper(t, usebatch, keepObserving) {
         this.amount = observable(amount);
         this.total = computed(function() {
             return order.vat.get() * this.price.get() * this.amount.get();
-        }, this);
+        }, { context: this });
     }
 
     function Order(includeVat) {
@@ -278,13 +278,13 @@ function order_system_helper(t, usebatch, keepObserving) {
             if (this.includeVat.get())
             	return vat.get();
             return 1;
-        }, this);
+        }, { context: this });
 
         this.total = computed(function() {
             return this.lines.reduce(function(acc, order) {
                 return acc + order.total.get();
             }, 0);
-        }, this);
+        }, { context: this });
     }
 
     var disp;
