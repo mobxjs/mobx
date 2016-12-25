@@ -1,8 +1,7 @@
+import {getGlobal} from "../utils/utils";
 import {IDerivation} from "./derivation";
 import {Reaction} from "./reaction";
 import {IObservable} from "./observable";
-
-declare const global: any;
 
 /**
  * These values will persist if global state is reset
@@ -86,6 +85,7 @@ export class MobXGlobals {
 export let globalState: MobXGlobals = new MobXGlobals();
 
 export function shareGlobalState() {
+	const global = getGlobal();
 	const ownState = globalState;
 
 	/**

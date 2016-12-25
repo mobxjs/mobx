@@ -1,7 +1,10 @@
-export const GLOBAL: any = function() { return this; }();
-
 export const EMPTY_ARRAY = [];
 Object.freeze(EMPTY_ARRAY);
+
+declare var global;
+export function getGlobal() {
+	return global;
+}
 
 export interface Lambda {
 	(): void;
@@ -196,7 +199,7 @@ export function isArrayLike(x: any): boolean {
 }
 
 export function isES6Map(thing): boolean {
-	if (thing instanceof GLOBAL.Map)
+	if (thing instanceof getGlobal().Map)
 		return true;
 	return false;
 }
