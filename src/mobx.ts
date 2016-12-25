@@ -46,7 +46,7 @@ export { extendObservable, extendShallowObservable            } from "./api/exte
 export { observe                                              } from "./api/observe";
 export { intercept                                            } from "./api/intercept";
 export { autorun, autorunAsync, when, reaction, IReactionOptions  } from "./api/autorun";
-export { action, isAction, runInAction                        } from "./api/action";
+export { action, isAction, runInAction, IActionFactory        } from "./api/action";
 
 export { expr                                                 } from "./api/expr";
 export { toJS                                                 } from "./api/tojs";

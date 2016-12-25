@@ -72,7 +72,7 @@ const boundActionDecorator = createClassPropertyDecorator(
 	false
 );
 
-export const action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): any {
+export var action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): any {
 	if (arguments.length === 1 && typeof arg1 === "function")
 		return createAction(arg1.name || "<unnamed action>", arg1);
 	if (arguments.length === 2  && typeof arg2 === "function")
