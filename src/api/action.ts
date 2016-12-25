@@ -58,8 +58,7 @@ const actionFieldDecorator = createClassPropertyDecorator(
 );
 
 const boundActionDecorator = createClassPropertyDecorator(
-	function (target, key, value, args, originalDescriptor) {
-		const actionName = (args && args.length === 1) ? args[0] : key;
+	function (target, key, value) {
 		defineBoundAction(target, key, value);
 	},
 	function (key) {
@@ -131,7 +130,6 @@ export function defineBoundAction(target: any, propertyName: string, fn: Functio
 	const res = function () {
 		return executeAction(propertyName, fn, target, arguments);
 	};
-	(res as any).name = propertyName;
 	(res as any).isMobxAction = true;
 	addHiddenProp(target, propertyName, res);
 }
