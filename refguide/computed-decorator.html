@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.3" data-basepath=".." data-revision="Mon Nov 21 2016 20:51:16 GMT+0100 (CET)">
+    <div class="book" data-level="2.3" data-basepath=".." data-revision="Sun Dec 25 2016 10:20:58 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -936,11 +936,22 @@ but they can be used as &apos;inverse&apos; of the derivation. For example:</p>
     }
 });
 </code></pre>
+<p>This also works:</p>
+<pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span> </span>{
+    @observable length: <span class="hljs-number">2</span>,
+    @computed get squared() {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.length * <span class="hljs-keyword">this</span>.length;
+    },
+    set squared(value) { <span class="hljs-comment">//this is automatically an action, no annotation necessary</span>
+        <span class="hljs-keyword">this</span>.length = <span class="hljs-built_in">Math</span>.sqrt(value);
+    }
+}
+</code></pre>
 <p><em>Note: setters require MobX 2.5.1 or higher</em></p>
 <h1 id="-computed-expression"><code>computed(expression)</code></h1>
 <p><code>computed</code> can also be invoked directly as function.
 Just like <code>observable(primitive value)</code> it will create a stand-alone observable.
-Use <code>.get()</code> on the returned object to get the current value of the computation, or <code>.observe(callback)</code> to observe it&apos;s changes.
+Use <code>.get()</code> on the returned object to get the current value of the computation, or <code>.observe(callback)</code> to observe its changes.
 This form of <code>computed</code> is not used very often, but in some cases where you need to pass a &quot;boxed&quot; computed value around it might prove useful.</p>
 <p>Example:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, computed} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;

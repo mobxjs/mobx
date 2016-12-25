@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="8.8" data-basepath=".." data-revision="Mon Nov 21 2016 20:51:16 GMT+0100 (CET)">
+    <div class="book" data-level="8.8" data-basepath=".." data-revision="Sun Dec 25 2016 10:20:58 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -901,7 +901,7 @@ Therefore it should do one of the following things:</p>
 <li>Return <code>null</code>, this indicates that the change can be ignored and shouldn&apos;t be applied. This is a powerful concept to make your objects for example temporarily immutable.</li>
 <li>Throw an exception, for example if some invariant isn&apos;t met.</li>
 </ol>
-<p>The function returns a <code>disposer</code> function that can be used to cancel the interceptor.
+<p>The function returns a <code>disposer</code> function that can be used to cancel the interceptor when invoked.
 It is possible to register multiple interceptors to the same observable.
 They will be chained in registration order.
 If one of the interceptors returns <code>null</code> or throw an exception, the other interceptors won&apos;t be evaluated anymore.
@@ -911,7 +911,7 @@ In that case the parent object interceptors are run before the property intercep
   backgroundColor: <span class="hljs-string">&quot;#ffffff&quot;</span>
 })
 
-intercept(theme, <span class="hljs-string">&quot;backgroundColor&quot;</span>, change =&gt; {
+<span class="hljs-keyword">const</span> disposer = intercept(theme, <span class="hljs-string">&quot;backgroundColor&quot;</span>, change =&gt; {
   <span class="hljs-keyword">if</span> (!change.newValue) {
     <span class="hljs-comment">// ignore attempts to unset the background color</span>
     <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;   
@@ -925,6 +925,7 @@ intercept(theme, <span class="hljs-string">&quot;backgroundColor&quot;</span>, c
       <span class="hljs-comment">// this must be a properly formatted color code!</span>
       <span class="hljs-keyword">return</span> change;
   }
+  <span class="hljs-keyword">if</span> (change.newValue.length &gt; <span class="hljs-number">10</span>) disposer(); <span class="hljs-comment">// stop intercepting future changes</span>
   <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">&quot;This doesn&apos;t like a color at all: &quot;</span> + change.newValue);
 })
 </code></pre>
