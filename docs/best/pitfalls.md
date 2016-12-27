@@ -20,8 +20,7 @@ MobX observable _objects_ do not detect or react to property assignments that we
 So MobX observable objects act as records with predefined keys.
 You can use `extendObservable(target, props)` to introduce new observable properties to an object.
 However object iterators like `for .. in` or `Object.keys()` won't react to this automatically.
-If you need a dynamically keyed object, for example to store users by id, create observable _map_s using `asMap`.
-More info on [asMap](https://github.com/mobxjs/mobx/issues/219#issuecomment-220224813).
+If you need a dynamically keyed object, for example to store users by id, create observable _map_s using [`observable.map`](../refguide/map.md).
 For more info see [what will MobX react to?](react.md).
 
 ### Use `@observer` on all components that render `@observable`'s.

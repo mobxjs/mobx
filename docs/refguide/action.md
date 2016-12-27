@@ -3,10 +3,12 @@
 Usage:
 * `action(fn)`
 * `action(name, fn)`
-* `@action classMethod`
-* `@action(name) classMethod`
+* `@action classMethod() {}`
+* `@action(name) classMethod () {}`
 * `@action boundClassMethod = (args) => { body }`
 * `@action(name) boundClassMethod = (args) => { body }`
+* `@action.bound classMethod() {}`
+* `@action.bound(function() {})
 
 Any application has actions. Actions are anything that modify the state.
 With MobX you can make it explicit in your code where your actions live by marking them.
@@ -68,3 +70,39 @@ Example:
 The usage of `runInAction` is: `runInAction(name?, fn, scope?)`.
 
 If you use babel, this plugin could help you to handle your async actions: [mobx-deep-action](https://github.com/mobxjs/babel-plugin-mobx-deep-action).
+
+## Bound actions
+
+The `action` decorator / function follows the normal rules for binding in javascript.
+However, Mobx 3 introduces `action.bound` to automatically bind actions to the targeted object.
+
+Example:
+
+```javascript
+class Ticker {
+	@observable this.tick = 0
+
+	@action.bound
+	increment() {
+		this.tick++ // 'this' will always be correct
+	}
+}
+
+const ticker = new Ticker()
+setInterval(ticker.increment, 1000)
+```
+
+Or
+
+```javascript
+const ticker = observable({
+	tick: 1,
+	increment: action.bound(function() {
+		this.tick++ // bound 'this'
+	})
+})
+
+setInterval(ticker.increment, 1000)
+```
+
+_Note: don't use *action.bind* with arrow functions; arrow functions are already bound and cannot be rebound._

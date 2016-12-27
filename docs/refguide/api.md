@@ -1,46 +1,129 @@
 # MobX Api Reference
 
+Applies to MobX 3 and higher. For MobX 2, the old documentation is still available on [githib](https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md)
+
 # Core API
 
 _The most important MobX api's. Understanding `observable`, `computed`, `reactions` and `actions` is enough to master MobX and use it in your applications!_
 
 ## Creating observables
 
-### `observable`
+
+### `observable(value)`
 Usage:
 * `observable(value)`
 * `@observable classProperty = value`
 
 Observable values can be JS primitives, references, plain objects, class instances, arrays and maps.
+`observable(value)` is a convenience overload, that always tries to create the best matching observable types.
+You can also directly create the desired observable type, see below.
+
 The following conversion rules are applied, but can be fine-tuned by using *modifiers*. See below.
 
-1. If *value* is wrapped in the *modifier* `asMap`: a new [Observable Map](map.md) will be returned. Observable maps are very useful if you don't want to react just to the change of a specific entry, but also to the addition or removal of entries.
+1. If *value* is an wrapped is an instance of an [ES6 Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map): a new [Observable Map](map.md) will be returned. Observable maps are very useful if you don't want to react just to the change of a specific entry, but also to the addition or removal of entries.
 1. If *value* is an array, a new [Observable Array](array.md) will be returned.
-1. If *value* is an object *without* prototype, all its current properties will be made observable. See [Observable Object](object.md)
+1. If *value* is an object *without* prototype, the object will be cloned and all its current properties will be made observable. See [Observable Object](object.md)
 1. If *value* is an object *with* a prototype, a JavaScript primitive or function, a [Boxed Observable](boxed.md) will be returned. MobX will not make objects with a prototype automatically observable; as that is the responsibility of it's constructor function. Use `extendObservable` in the constructor, or `@observable` in it's class definition instead.
 
 These rules might seem complicated at first sight, but you will notice that in practice they are very intuitive to work with.
 Some notes:
-* To create dynamically keyed objects use the `asMap` modifier! Only initially existing properties on an object will be made observable, although new ones can be added using `extendObservable`.
+* To create dynamically keyed objects always use maps! Only initially existing properties on an object will be made observable, although new ones can be added using `extendObservable`.
 * To use the `@observable` decorator, make sure that [decorators are enabled](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) in your transpiler (babel or typescript).
-* By default making a data structure observable is *infective*; that means that `observable` is applied automatically to any value that is contained by the data structure, or will be contained by the data structure in the future. This behavior can be changed by using *modifiers*.
+* By default making a data structure observable is *infective*; that means that `observable` is applied automatically to any value that is contained by the data structure, or will be contained by the data structure in the future. This behavior can be changed by using *modifiers* or *shallow*.
 
 [&laquo;`observable`&raquo;](observable.md)  &mdash;  [&laquo;`@observable`&raquo;](observable-decorator.md)
 
-### `extendObservable`
-Usage: `extendObservable(target, propertyMap)`. For each key/value pair in `propertyMap` a (new) observable property will be introduced on the target object.
+### `@observable property =  value`
+
+`observable` can also be used as property decorator. It requires [decorators to be enabled](../best/decorators.md) and is syntactic
+sugar for `extendObservable(this, { property: value })`.
+
+[&laquo;`details`&raquo;](observable-decorator.md)
+
+### `observable.box(value)` & `observable.shallowBox(value)`
+
+Creates an observable _box_ that stores an observable reference to a value. Use `get()` to get the current value of the box, and `set()` to update it.
+This is the foundation on which all other observables are built, but in practice you will use it rarely.
+Normal boxes will automatically try to turn any new value into an observable if it isn't already. Use `shallowBox` to disable this behavior.
+
+[&laquo;`details`&raquo;](boxed.md)
+
+### `observable.object(value)` & `observable.shallowObject(value)`
+
+Creates a clone of the provided object and makes all it's properties observable.
+By default any values in those properties will be made observable as well, but when using `shallowObject` only the properties will be made into observable
+references, but the values will be untouched. (This holds also for any values assigned in the future)
+
+[&laquo;`details`&raquo;](object.md)
+
+### `observable.array(value)` & `observable.shallowArray(value)`
+
+Creates a new observable array based on the provided value. Use `shallowArray` if the values in the array should not be turned into observables.
+
+[&laquo;`details`&raquo;](array.md)
+
+### `observable.map(value)` & `observable.shallowMap(value)`
+
+Creates a new observable map based on the provided value. Use `shallowMap` if the values in the array should not be turned into observables.
+Use `map` whenever you want to create a dynamically keyed collections and the addition / removal of keys needs to be observed.
+Note that only string keys are supported.
+
+[&laquo;`details`&raquo;](map.md)
+
+### `extendObservable` & `extendShallowObservable`
+Usage: `extendObservable(target, ...propertyMaps)`. For each key/value pair in each `propertyMap` a (new) observable property will be introduced on the target object.
 This can be used in constructor functions to introduce observable properties without using decorators.
-If a value of the `propertyMap` is an argumentless function, a *computed* property will be introduced.
+If a value of the `propertyMap` is a getter function, a *computed* property will be introduced.
+
+Use `extendShallowObservable` if the new properties should not be infective (that is; newly assigned values should not be turned into observables automatically).
+Note that `extendObservable` enhances existing objects, unlike `observable.object` which creates a new object.
+
 [&laquo;details&raquo;](extend-observable.md)
+
+### Modifiers
+
+Modifiers can be used decorator or in combination with `extendObservable` and `observable.object` to change the autoconversion rules for specific properties.
+
+The following modifiers are available:
+
+* `observable.deep`: This is the default modifier, used by any observable. It converts any assigned, non-primitive value into an observable if it isn't one yet.
+* `observable.ref`: Disables automatic observable conversion, just creates an observable reference instead.
+* `observable.shallow`: Can only used in combination with collections. Turns any assigned collection into an collection, which is shallowly observable (instead of deep). In other words; the values inside the collection won't become observables automatically.
+* `computed`: Creates a derived property, see [`computed`](computed-decorator.md)
+* `action`: Creates an action, see [`action`](action.md)
+
+Modifiers can be used as decorator:
+
+```javascript
+class TaskStore {
+    @observable.shallow tasks = []
+}
+```
+
+Or as property modifier in combination with `observable.object` / `observable.extendObservable`.
+Note that modifiers always 'stick' to the property. So they will remain in effect even if a new value is assigned.
+
+```javascript
+const taskStore = observable({
+    tasks: observable.shallow([])
+})
+```
+
+[&laquo;details&raquo;](modifiers.md)
+
 
 ## Computed values
 
 Usage:
 * `computed(() => expression)`
+* `computed(() => expression, (newValue) => void)`
+* `computed(() => expression, options)`
 * `@computed get classProperty() { return expression; }`
+* `@computed.struct get classProperty() { return expression; }`
 
 Creates a computed property. The `expression` should not have side effects but return a value.
 The expression will automatically be re-evaluated if any observables it uses changes, but only if it is in use by some *reaction*.
+
 [&laquo;details&raquo;](computed-decorator.md)
 
 ## Actions
@@ -64,7 +147,8 @@ Usage:
 
 For one-time-actions `runInAction(name?, fn, scope?)` can be used, which is sugar for `action(name, fn, scope)()`.
 
-## Reactions
+## Reactions & Derivations
+
 *Computed values* are **values** that react automatically to state changes.
 *Reactions* are **side effects** that react automatically to state changes.
 Reactions _can_ be used to ensure that a certain side effect (mainly I/O) is automatically executed when relevant state changes, like logging, network requests etc.
@@ -105,16 +189,11 @@ It takes two function, the first one is tracked and returns data that is used as
 Unlike `autorun` the side effect won't be run initially, and any observables that are accessed while executing the side effect will not be tracked.
 The side effect can be debounced, just like `autorunAsync`. [&laquo;details&raquo;](reaction.md)
 
-## Modifiers for `observable`
-
-By default `observable` is applied recursively and to values that are assigned in the future as well.
-Modifiers can be used to influence how `observable` treats specific values.
-* `asMap`: This is the most important modifier. Instead of creating an object with observable properties, an *Observable Map* is created instead. The main difference with observable objects is that the addition and removal of properties can be easily observed. Use `asMap` if you want a map like data structure where the keys will change over time.
-* `asFlat`: Will not apply `observable` recursively. The passed object / collection itself will be observable, but the values in it won't. This disables the possibility to deeply observe objects.
-* `asReference`: Use the passed in value verbatim, just create an observable reference to the object.
-* `asStructure`: When new values are assigned, ignore the new value if it structurally equal to the previous value.
-
-[&laquo;details&raquo;](modifiers.md)
+### `expr`
+Usage: `expr(() => someExpression)`. Just a shorthand for `computed(() => someExpression).get()`.
+`expr` is useful in some rare cases to optimize another computed function or reaction.
+In general it is simpler and better to just split the function in multiple smaller computed's to achieve the same effect.
+[&laquo;details&raquo;](expr.md)
 
 ------
 
@@ -280,21 +359,6 @@ Usage: `resetGlobalState()`.
 Resets MobX internal global state. MobX by defaults fails fast if an exception occurs inside a computation or reaction and refuses to run them again.
 This function resets MobX to the zero state. Existing `spy` listeners and the current value of strictMode will be preserved though.
 
-
-# Functions that might get deprecated
-
-### `map`
-*Will probably by deprecated, use `observable(asMap())` instead*. Usage: `map()`, `map(keyValueObject)`, `map(entries)`.
-Returns an observable, largely ES6 compliant [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) data structure.
-This is useful if you want to store data based on string keys.
-For the full api of the returned `ObservableMap` see *Observable maps*.
-[&laquo;details&raquo;](map.md)
-
-### `expr`
-Usage: `expr(() => someExpression)`. Just a shorthand for `computed(() => someExpression).get()`.
-`expr` is useful in some rare cases to optimize another computed function or reaction.
-In general it is simpler and better to just split the function in multiple smaller computed's to achieve the same effect.
-[&laquo;details&raquo;](expr.md)
 
 
 
