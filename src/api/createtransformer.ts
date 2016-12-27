@@ -5,7 +5,7 @@ import {globalState} from "../core/globalstate";
 export type ITransformer<A, B> = (object: A) => B;
 
 export function createTransformer<A, B>(transformer: ITransformer<A, B>, onCleanup?: (resultObject: B | undefined, sourceObject?: A) => void): ITransformer<A, B> {
-	invariant(typeof transformer === "function" && transformer.length === 1, "createTransformer expects a function that accepts one argument");
+	invariant(typeof transformer === "function" && transformer.length < 2, "createTransformer expects a function that accepts one argument");
 
 	// Memoizes: object id -> reactive view that applies transformer to the object
 	let objectCache: {[id: number]: ComputedValue<B>} = {};

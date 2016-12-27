@@ -166,6 +166,7 @@ See [#640](https://github.com/mobxjs/mobx/issues/640)
 * Passing a function to `observable` will now create a boxed observable refering to that function
 * Deprecated `whyRun` (as it seems hardly used, please let us know if it should stay)
 * Fixed #603: exceptions in transaction breaks future reactions
+* Fixed #698: createTransformer should support default arguments
 * The following deprecated methods have been removed:
   * `autorunUntil`
   * `trackTransitions`
