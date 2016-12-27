@@ -51,7 +51,7 @@
     "browserify": "^12.0.1",
     "coveralls": "^2.11.4",
     "faucet": "0.0.1",
-    "flow-bin": "^0.36.0",
+    "flow-bin": "0.36.0",
     "istanbul": "^0.3.21",
     "iterall": "^1.0.2",
     "lodash.intersection": "^3.2.0",

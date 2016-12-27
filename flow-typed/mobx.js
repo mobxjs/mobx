@@ -50,7 +50,7 @@ declare module 'mobx' {
   	forEach(callbackfn: (value: V, index: K, map: IMap<K, V>) => void, thisArg?: any): void;
   	get(key: K): V | any;
   	has(key: K): boolean;
-  	set(key: K, value?: V): this;
+  	set(key: K, value?: V): any;
     size: number;
   }
 
