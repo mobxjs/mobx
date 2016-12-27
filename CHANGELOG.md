@@ -44,6 +44,36 @@ Previously that could be written as `@observable x = asReference(value)`.
 This was not for a technical reason, but they just seemed hardly used.
 Structural comparision for computed properties and reactions is still possible.
 Feel free to file an issue, including use case, to re-introduce this feature if you think you really need it.
+However, we noticed that in practice people rarely use it. And in cases where it is used `reference` / `shallow` is often a better fit (when using immutable data for example).
+
+### Modifiers
+
+Modifiers can be used in combination `@observable`, `extendObservable` and `observable.object` to change the autoconversion rules of specific properties.
+
+The following modifiers are available:
+
+* `observable.deep`: This is the default modifier, used by any observable. It converts any assigned, non-primitive value into an observable value if it isn't one yet.
+* `observable.ref`: Disables automatic observable conversion, just creates an observable reference instead.
+* `observable.shallow`: Can only used in combination with collections. Turns any assigned collection into an collection, which is shallowly observable (instead of deep)
+
+Modifiers can be used as decorator:
+
+```javascript
+class TaskStore {
+    @observable.shallow tasks = []
+}
+```
+
+Or as property modifier in combination with `observable.object` / `observable.extendObservable`.
+Note that modifiers always 'stick' to the property. So they will remain in effect even if a new value is assigned.
+
+```javascript
+const taskStore = observable({
+    tasks: observable.shallow([])
+})
+```
+
+See [modifiers](http://mobxjs.github.io/mobx/refguide/modifiers.html)
 
 ### `computed` api has been simplified
 
@@ -62,9 +92,15 @@ doesn't support name decorators like `@action`, the name is always the targeted 
 
 ### Other changes
 
+* Flow typings have been added by [A-gambit](https://github.com/A-gambit)
 * It is now possible to pass ES6 Maps to `observable` / observable maps. The map will be converted to an observable map (if keys are string like)
 * Made `action` more debug friendly, it should now be easier to step through
 * ObservableMap now has an additional method, `.replace(data)`, which is a combination of `clear()` and `merge(data)`.
+
+* Some already deprecated methods like `toJSlegacy`, `trackTransaction`, `autorunUntil`, `fastArray`, `toJSON` and `SimpleEventEmitter` have been removed from the api
+* `observe` and `intercept` no longer try to convert their target into observables if they aren't yet
+* Deprecated `whyRun`, as it seems barely used. If it really helped you out, just let us know and we will keep it!
+* Upgraded to typescript 2
 
 # 2.7.0
 
@@ -188,7 +224,7 @@ See [#640](https://github.com/mobxjs/mobx/issues/640)
   * `SimpleEventEmitter`
   * `ObservableMap.toJs` (use `toJS`)
   * invoking `observe` and `inject` with plain javascript objects
-=======
+
 # 2.6.5
 
 * Added `move` operation to observable array, see [#697](https://github.com/mobxjs/mobx/pull/697)
@@ -198,7 +234,6 @@ See [#640](https://github.com/mobxjs/mobx/issues/640)
 * Fixed potential clean up issue if an exception was thrown from an intercept handler
 * Improved typings of `asStructure` (by @nidu, see #687)
 * Added support for `computed(asStructure(() => expr))` (by @yotambarzilay, see #685)
->>>>>>> master
 
 # 2.6.3
 

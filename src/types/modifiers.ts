@@ -46,20 +46,16 @@ export function shallowEnhancer(v, _, name): any {
 
 	if (v === undefined || v === null)
 		return v;
+	if (isObservableObject(v) || isObservableArray(v) || isObservableMap(v))
+		return v;
 	if (Array.isArray(v))
 		return observable.shallowArray(v, name);
 	if (isPlainObject(v))
 		return observable.shallowObject(v, name);
 	if (isES6Map(v))
 		return observable.shallowMap(v, name);
-	if (isObservableObject(v))
-		return v;
-	if (isObservableArray(v))
-		return v;
-	if (isObservableMap(v))
-		return v;
 
-	return fail("The shallow modifier / decorator can only used in combination with arrays and objects");
+	return fail("The shallow modifier / decorator can only used in combination with arrays, objects and maps");
 }
 
 export function referenceEnhancer(newValue) {

@@ -1,4 +1,4 @@
-import {invariant, isES6Map} from "../utils/utils";
+import {invariant} from "../utils/utils";
 import {isModifierDescriptor, IModifierDescriptor, deepEnhancer, referenceEnhancer, shallowEnhancer, createModifierDescriptor} from "../types/modifiers";
 import {IObservableValue, ObservableValue} from "../types/observablevalue";
 import {IObservableArray, ObservableArray} from "../types/observablearray";
@@ -16,7 +16,7 @@ const refObservableDecorator = createDecoratorForEnhancer(referenceEnhancer);
  * Turns an object, array or function into a reactive structure.
  * @param value the value which should become observable.
  */
-function deepObservable(v: any = undefined) {
+function createObservable(v: any = undefined) {
 	// @observable someProp;
 	if (typeof arguments[1] === "string")
 		return deepObservableDecorator.apply(null, arguments);
@@ -99,6 +99,9 @@ export class IObservableFactories {
 	}
 
 
+	/**
+	 * Decorator that creates an observable that only observes the references, but doesn't try to turn the assigned value into an observable.ts.
+	 */
 	ref(target: Object, property: string, descriptor?: PropertyDescriptor): any;
 	ref<T>(initialValue: T): T;
 	ref() {
@@ -112,6 +115,9 @@ export class IObservableFactories {
 	}
 
 
+	/**
+	 * Decorator that creates an observable converts it's value (objects, maps or arrays) into a shallow observable structure
+	 */
 	shallow(target: Object, property: string, descriptor?: PropertyDescriptor): any;
 	shallow<T>(initialValues: T[]): IObservableArray<T>;
 	shallow<T>(initialValues: IMap<string | number | boolean, T>): ObservableMap<T>;
@@ -141,7 +147,7 @@ export class IObservableFactories {
 	}
 }
 
-export var observable: IObservableFactory & IObservableFactories = deepObservable as any;
+export var observable: IObservableFactory & IObservableFactories = createObservable as any;
 
 // weird trick to keep our typings nicely with our funcs, and still extend the observable function
 Object.keys(IObservableFactories.prototype).forEach(key => observable[key] = IObservableFactories.prototype[key]);
