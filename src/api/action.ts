@@ -30,12 +30,12 @@ export interface IActionFactory {
 	(target: Object, propertyKey: string, descriptor?: PropertyDescriptor): void;
 
 	// .bound
-	<A1, R, T extends (a1: A1) => R>(fn: T): T;
-	<A1, A2, R, T extends (a1: A1, a2: A2) => R>(fn: T): T;
-	<A1, A2, A3, R, T extends (a1: A1, a2: A2, a3: A3) => R>(fn: T): T;
-	<A1, A2, A3, A4, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4) => R>(fn: T): T;
-	<A1, A2, A3, A4, A5, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => R>(fn: T): T;
-	<A1, A2, A3, A4, A5, A6, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4, a6: A6) => R>(fn: T): T;
+	bound<A1, R, T extends (a1: A1) => R>(fn: T): T;
+	bound<A1, A2, R, T extends (a1: A1, a2: A2) => R>(fn: T): T;
+	bound<A1, A2, A3, R, T extends (a1: A1, a2: A2, a3: A3) => R>(fn: T): T;
+	bound<A1, A2, A3, A4, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4) => R>(fn: T): T;
+	bound<A1, A2, A3, A4, A5, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => R>(fn: T): T;
+	bound<A1, A2, A3, A4, A5, A6, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4, a6: A6) => R>(fn: T): T;
 
 	// .bound decorator
 	bound(target: Object, propertyKey: string, descriptor?: PropertyDescriptor): void;
