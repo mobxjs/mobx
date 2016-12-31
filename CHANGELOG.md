@@ -105,6 +105,16 @@ Using `computed` to create boxed observables has been simplified, and `computed`
 * `computed(expr, setter)`
 * `computed(expr, options)`, where options is an object that can specify one or more of the following fields: `name`, `setter`, `compareStructural` or `context` (the "this").
 
+### `reaction` api has been simplified
+
+The signature of `reaction` is now `reaction(dataFunc, effectFunc, options?)`, where the following options are accepted:
+
+* `context`: The `this` to be used in the functions
+* `fireImmediately`
+* `delay`: Number in milliseconds that can be used to debounce the effect function.
+* `compareStructural`: `false` by default. If `true`, the return value of the *data* function is structurally compared to it's previous return value, and the *effect* function will only be invoked if there is a structural change in the output.
+* `name`: String
+
 ### Bound actions
 
 It is now possible to create actions and bind them in one go using `action.bound`. See [#699](https://github.com/mobxjs/mobx/issues/699).
