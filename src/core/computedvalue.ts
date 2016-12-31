@@ -75,14 +75,12 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	};
 
 	peekUntracked() {
-		let hasError = true;
 		try {
 			const res = this.peek();
-			hasError = false;
 			return res;
-		} finally {
-			if (hasError)
-				handleExceptionInDerivation(this);
+		} catch(e) {
+			handleExceptionInDerivation(this, e);
+			throw e;
 		}
 
 	}
