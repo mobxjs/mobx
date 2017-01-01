@@ -114,10 +114,6 @@ export class Reaction implements IDerivation, IReactionPublic {
 
 	reportExceptionInDerivation(derivation: IDerivation, cause: Error) {
 		const message = `[mobx] Detected an uncaught exception that was thrown by computed value, reaction or observer '${derivation}`;
-		// console.error(cause);
-		// if (cause.stack)
-		// 	console.error(cause.stack);
-		// console.error(message);
 		if (isSpyEnabled()) {
 			spyReport({
 				type: "error",
@@ -125,11 +121,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 				cause
 			});
 		}
-		// TODO: instead of immediate, rethrow add end of run reactions
-		setImmediate(() => {
-			console.warn("Rethrowing earlier caught exception:");
-			throw cause;
-		});
+		globalState.pendingExceptions.push({ derivation, cause });
 	}
 
 	dispose() {
@@ -184,6 +176,16 @@ export function runReactions() {
 	if (globalState.isRunningReactions === true || globalState.inTransaction > 0)
 		return;
 	reactionScheduler(runReactionsHelper);
+}
+
+export function throwPendingExceptions() {
+	const exceptions = globalState.pendingExceptions.splice(0);
+	if (exceptions.length > 0) {
+		// setImmediate(() => { // somehow leverage use HostReportErrors?
+			// console.warn(`[mobx] ${exceptions.length} exception(s) were thrown by reactions. Rethrown the first failed exception threwn by ${exceptions[0].derivation}`);
+			// throw exceptions[0].cause;
+		// });
+	}
 }
 
 function runReactionsHelper() {

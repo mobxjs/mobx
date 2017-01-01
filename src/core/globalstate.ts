@@ -1,5 +1,5 @@
 import {getGlobal} from "../utils/utils";
-import {IDerivation} from "./derivation";
+import {IDerivation, CaughtException} from "./derivation";
 import {Reaction} from "./reaction";
 import {IObservable} from "./observable";
 
@@ -59,6 +59,12 @@ export class MobXGlobals {
 	 * List of scheduled, not yet executed, reactions.
 	 */
 	pendingReactions: Reaction[] = [];
+
+	/**
+	 * This exceptions where caught when runinng a reaction, and will be thrown at the next safe
+	 * opportunity, that is, at the end of the reaction scheduler
+	 */
+	pendingExceptions: { derivation: IDerivation, cause: any }[] = [];
 
 	/**
 	 * Is it allowed to change observables at this point?
