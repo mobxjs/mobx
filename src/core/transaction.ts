@@ -1,40 +1,40 @@
 import {globalState} from "./globalstate";
 import {runReactions} from "./reaction";
 import {startBatch, endBatch} from "./observable";
-import {isSpyEnabled, spyReportStart, spyReportEnd} from "./spy";
+import {deprecated} from "../utils/utils";
 
 /**
+ * @deprecated
  * During a transaction no views are updated until the end of the transaction.
  * The transaction will be run synchronously nonetheless.
+ *
+ * Deprecated to simplify api; transactions offer no real benefit above actions.
+ *
  * @param action a function that updates some reactive state
  * @returns any value that was returned by the 'action' parameter.
  */
-export function transaction<T>(action: () => T, thisArg = undefined, report = true): T {
-	transactionStart(((action as any).name) || "anonymous transaction", thisArg, report);
+export function transaction<T>(action: () => T, thisArg = undefined): T {
+	deprecated("Using `transaction` is deprecated, use `runInAction` or `(@)action` instead.");
+	return runInTransaction.apply(undefined, arguments);
+}
+
+export function runInTransaction<T>(action: () => T, thisArg = undefined): T {
+	transactionStart();
 	try {
 		return action.call(thisArg);
 	} finally {
-		transactionEnd(report);
+		transactionEnd();
 	}
 }
 
-export function transactionStart<T>(name: string, thisArg, report: boolean) {
+export function transactionStart<T>() {
 	startBatch();
 	globalState.inTransaction += 1;
-	if (report && isSpyEnabled()) {
-		spyReportStart({
-			type: "transaction",
-			target: thisArg,
-			name: name
-		});
-	}
 }
 
-export function transactionEnd<T>(report: boolean) {
+export function transactionEnd<T>() {
 	if (--globalState.inTransaction === 0) {
 		runReactions();
 	}
-	if (report && isSpyEnabled())
-		spyReportEnd();
 	endBatch();
 }

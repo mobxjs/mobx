@@ -55,7 +55,7 @@ function startAction(actionName: string, fn: Function, scope: any, args?: IArgum
 		});
 	}
 	const prevDerivation = untrackedStart();
-	transactionStart(actionName, scope, false);
+	transactionStart();
 	const prevAllowStateChanges = allowStateChangesStart(true);
 	return {
 		prevDerivation,
@@ -67,7 +67,7 @@ function startAction(actionName: string, fn: Function, scope: any, args?: IArgum
 
 function endAction(runInfo: IActionRunInfo) {
 	allowStateChangesEnd(runInfo.prevAllowStateChanges);
-	transactionEnd(false);
+	transactionEnd();
 	untrackedEnd(runInfo.prevDerivation);
 	if (runInfo.notifySpy)
 		spyReportEnd({ time: Date.now() - runInfo.startTime });

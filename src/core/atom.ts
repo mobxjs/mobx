@@ -37,9 +37,9 @@ export class BaseAtom implements IAtom {
 	 * Invoke this method _after_ this method has changed to signal mobx that all its observers should invalidate.
 	 */
 	public reportChanged() {
-		transactionStart("propagatingAtomChange", undefined, false);
+		transactionStart();
 		propagateChanged(this);
-		transactionEnd(false);
+		transactionEnd();
 	}
 
 	toString() {
