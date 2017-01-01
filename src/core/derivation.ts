@@ -43,7 +43,12 @@ export interface IDerivation extends IDepTreeNode {
 	unboundDepsCount: number;
 	__mapid: string;
 	onBecomeStale();
-	recoverFromError();
+}
+
+export class CaughtException {
+	constructor(public cause: any) {
+		// Empty
+	}
 }
 
 /**
@@ -61,32 +66,27 @@ export function shouldCompute(derivation: IDerivation): boolean {
 		case IDerivationState.UP_TO_DATE: return false;
 		case IDerivationState.NOT_TRACKING: case IDerivationState.STALE: return true;
 		case IDerivationState.POSSIBLY_STALE: {
-			let hasError = true;
 			const prevUntracked = untrackedStart(); // no need for those computeds to be reported, they will be picked up in trackDerivedFunction.
-			try {
-				const obs = derivation.observing, l = obs.length;
-				for (let i = 0; i < l; i++) {
-					const obj = obs[i];
-					if (isComputedValue(obj)) {
+			const obs = derivation.observing, l = obs.length;
+			for (let i = 0; i < l; i++) {
+				const obj = obs[i];
+				if (isComputedValue(obj)) {
+					try {
 						obj.get();
-						// if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
-						// and `derivation` is an observer of `obj`
-						if ((derivation as any).dependenciesState === IDerivationState.STALE) {
-							hasError = false;
-							untrackedEnd(prevUntracked);
-							return true;
-						}
+					} catch (e) {
+						// we are not interested in the value *or* exception at this moment
+					}
+					// if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
+					// and `derivation` is an observer of `obj`
+					if ((derivation as any).dependenciesState === IDerivationState.STALE) {
+						untrackedEnd(prevUntracked);
+						return true;
 					}
 				}
-				hasError = false;
-				changeDependenciesStateTo0(derivation);
-				untrackedEnd(prevUntracked);
-				return false;
-			} finally {
-				if (hasError) {
-					changeDependenciesStateTo0(derivation);
-				}
 			}
+			changeDependenciesStateTo0(derivation);
+			untrackedEnd(prevUntracked);
+			return false;
 		}
 	}
 }
@@ -118,29 +118,16 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	derivation.runId = ++globalState.runId;
 	const prevTracking = globalState.trackingDerivation;
 	globalState.trackingDerivation = derivation;
-	let result: T;
 	try {
-		result = f.call(derivation);
+		const result = f.call(derivation);
 		globalState.trackingDerivation = prevTracking;
 		bindDependencies(derivation);
 		return result;
 	} catch (e){
-		handleExceptionInDerivation(derivation, e);
 		derivation.newObserving = derivation.observing; // after exception reset observing
+		derivation.unboundDepsCount = derivation.observing.length;
 		bindDependencies(derivation);
-		return e;
-	}
-}
-
-export function handleExceptionInDerivation(derivation: IDerivation, cause?: Error) {
-	const message = `[mobx] Detected an uncaught exception that was thrown by computed value, reaction or observer '${derivation}`;
-	console.error(message, cause);
-	if (isSpyEnabled()) {
-		spyReport({
-			type: "error",
-			message,
-			cause
-		});
+		return new CaughtException(e);
 	}
 }
 

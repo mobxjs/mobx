@@ -1,5 +1,5 @@
 import {IObservable, reportObserved, propagateMaybeChanged, propagateChangeConfirmed, startBatch, endBatch, getObservers} from "./observable";
-import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, untrackedStart, untrackedEnd, shouldCompute, handleExceptionInDerivation} from "./derivation";
+import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, untrackedStart, untrackedEnd, shouldCompute, CaughtException} from "./derivation";
 import {globalState} from "./globalstate";
 import {allowStateChangesStart, allowStateChangesEnd, createAction} from "./action";
 import {createInstanceofPredicate, getNextId, valueDidChange, invariant, Lambda, unique, joinStrings} from "../utils/utils";
@@ -74,17 +74,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		return res;
 	};
 
-	peekUntracked() {
-		try {
-			const res = this.peek();
-			return res;
-		} catch(e) {
-			handleExceptionInDerivation(this, e);
-			throw e;
-		}
-
-	}
-
 	onBecomeStale() {
 		propagateMaybeChanged(this);
 	}
@@ -102,29 +91,24 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	public get(): T {
 		invariant(!this.isComputing, `Cycle detected in computation ${this.name}`, this.derivation);
 		startBatch();
-		if (globalState.inBatch === 1) { // just for small optimization, can be droped for simplicity
+		if (globalState.inBatch === 1) {
+			// just for small optimization, can be droped for simplicity
 			// computed called outside of any mobx stuff. batch observing shuold be enough, don't need tracking
 			// because it will never be called again inside this batch
 			if (shouldCompute(this))
-				this.value = this.peekUntracked();
+				this.value = this.peek();
 		} else {
-
 			reportObserved(this);
 			if (shouldCompute(this))
 				if (this.trackAndCompute())
 					propagateChangeConfirmed(this);
-
 		}
 		const result = this.value!;
 		endBatch();
 
+		if (result instanceof CaughtException)
+			throw result.cause;
 		return result;
-	}
-
-	public recoverFromError() {
-		// this.derivation.call(this.scope) in peek returned error, let's run all cleanups, that would be run
-		// note that resetGlobalState will run afterwards
-		this.isComputing = false;
 	}
 
 	public set(value: T) {

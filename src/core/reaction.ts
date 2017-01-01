@@ -1,4 +1,4 @@
-import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, shouldCompute} from "./derivation";
+import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, shouldCompute, CaughtException} from "./derivation";
 import {IObservable} from "./observable";
 import {globalState, resetGlobalState} from "./globalstate";
 import {createInstanceofPredicate, getNextId, Lambda, unique, joinStrings} from "../utils/utils";
@@ -95,13 +95,15 @@ export class Reaction implements IDerivation, IReactionPublic {
 			});
 		}
 		this._isRunning = true;
-		trackDerivedFunction(this, fn);
+		const result = trackDerivedFunction(this, fn);
 		this._isRunning = false;
 		this._isTrackPending = false;
 		if (this.isDisposed) {
 			// disposed during last run. Clean up everything that was bound after the dispose call.
 			clearObserving(this);
 		}
+		if (result instanceof CaughtException)
+			this.reportExceptionInDerivation(this, result.cause);
 		if (notify) {
 			spyReportEnd({
 				time: Date.now() - startTime
@@ -110,9 +112,19 @@ export class Reaction implements IDerivation, IReactionPublic {
 		endBatch();
 	}
 
-	recoverFromError() {
-		this._isRunning = false;
-		this._isTrackPending = false;
+	reportExceptionInDerivation(derivation: IDerivation, cause: Error) {
+		const message = `[mobx] Detected an uncaught exception that was thrown by computed value, reaction or observer '${derivation}`;
+		console.error(cause);
+		if (cause.stack)
+			console.error(cause.stack);
+		console.error(message);
+		if (isSpyEnabled()) {
+			spyReport({
+				type: "error",
+				message,
+				cause
+			});
+		}
 	}
 
 	dispose() {
