@@ -50,7 +50,7 @@ function startAction(actionName: string, fn: Function, scope: any, args?: IArgum
 			type: "action",
 			name: actionName,
 			fn,
-			target: scope,
+			object: scope,
 			arguments: flattendArgs
 		});
 	}

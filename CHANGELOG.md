@@ -178,6 +178,7 @@ See [#640](https://github.com/mobxjs/mobx/issues/640)
 * Fixed #603: exceptions in transaction breaks future reactions
 * Fixed #698: createTransformer should support default arguments
 * Transactions are no longer reported grouped in spy events. If you want to group events, use actions instead.
+* Normalized `spy` events further. Computed values and actions now report `object` instead of `target` for the scope they have been applied to.
 * The following deprecated methods have been removed:
   * `autorunUntil`
   * `trackTransitions`

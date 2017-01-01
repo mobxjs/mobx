@@ -146,10 +146,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	private trackAndCompute(): boolean {
 		if (isSpyEnabled()) {
 			spyReport({
-				object: this,
+				object: this.scope,
 				type: "compute",
-				fn: this.derivation,
-				target: this.scope
+				fn: this.derivation
 			});
 		}
 		const oldValue = this.value;

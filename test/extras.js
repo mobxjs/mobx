@@ -151,7 +151,7 @@ test('spy 1', function(t) {
     a.set(5);
     t.deepEqual(stripTrackerOutput(lines), [
 		{ newValue: 4, oldValue: 3, spyReportStart: true, type: 'update' },
-		{ target: undefined, type: 'compute' },
+		{ type: 'compute' },
 		{ spyReportStart: true, type: 'reaction' },
 		{ spyReportEnd: true },
 		{ spyReportEnd: true }

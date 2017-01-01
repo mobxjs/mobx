@@ -217,11 +217,11 @@ test("action decorator (babel)", function(t) {
 	t.equal(store1.add(1, 1), 4);
 
 	t.deepEqual(normalizeSpyEvents(events),	[
-		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, target: store2, type: "action" },
+		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, object: store2, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 1, 1 ], name: "add", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 1, 1 ], name: "add", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true }
 	]);
 
@@ -250,11 +250,11 @@ test("custom action decorator (babel)", function(t) {
 	t.equal(store1.add(1, 1), 4);
 
 	t.deepEqual(normalizeSpyEvents(events),	[
-		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, target: store2, type: "action" },
+		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, object: store2, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 1, 1 ], name: "zoem zoem", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 1, 1 ], name: "zoem zoem", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true },
 	]);
 
@@ -286,11 +286,11 @@ test("action decorator on field (babel)", function(t) {
 	t.equal(store1.add(2, 2), 8);
 
 	t.deepEqual(normalizeSpyEvents(events),	[
-		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 5, 4 ], name: "add", spyReportStart: true, target: store2, type: "action" },
+		{ arguments: [ 5, 4 ], name: "add", spyReportStart: true, object: store2, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 2, 2 ], name: "add", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 2, 2 ], name: "add", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true }
 	]);
 
@@ -321,11 +321,11 @@ test("custom action decorator on field (babel)", function(t) {
 	t.equal(store1.add(2, 2), 8);
 
 	t.deepEqual(normalizeSpyEvents(events),	[
-		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 5, 4 ], name: "zoem zoem", spyReportStart: true, target: store2, type: "action" },
+		{ arguments: [ 5, 4 ], name: "zoem zoem", spyReportStart: true, object: store2, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 2, 2 ], name: "zoem zoem", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 2, 2 ], name: "zoem zoem", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true }
 	]);
 
