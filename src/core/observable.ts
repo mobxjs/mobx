@@ -1,6 +1,7 @@
 import {IDerivation, IDerivationState} from "./derivation";
 import {globalState} from "./globalstate";
 import {invariant} from "../utils/utils";
+import {runReactions} from "./reaction";
 
 export interface IDepTreeNode {
 	name: string;
@@ -113,7 +114,8 @@ export function startBatch() {
 }
 
 export function endBatch() {
-	if (globalState.inBatch === 1) {
+	if (--globalState.inBatch === 0) {
+		runReactions();
 		// the batch is actually about to finish, all unobserving should happen here.
 		const list = globalState.pendingUnobservations;
 		for (let i = 0; i < list.length; i++) {
@@ -126,7 +128,6 @@ export function endBatch() {
 		}
 		globalState.pendingUnobservations = [];
 	}
-	globalState.inBatch--;
 }
 
 export function reportObserved(observable: IObservable) {

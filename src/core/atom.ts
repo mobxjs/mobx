@@ -37,9 +37,9 @@ export class BaseAtom implements IAtom {
 	 * Invoke this method _after_ this method has changed to signal mobx that all its observers should invalidate.
 	 */
 	public reportChanged() {
-		transactionStart();
+		startBatch();
 		propagateChanged(this);
-		transactionEnd();
+		endBatch();
 	}
 
 	toString() {
@@ -85,7 +85,6 @@ export class Atom extends BaseAtom implements IAtom {
 import {globalState} from "./globalstate";
 import {IObservable, propagateChanged, reportObserved, startBatch, endBatch} from "./observable";
 import {IDerivationState} from "./derivation";
-import {transactionStart, transactionEnd} from "../core/transaction";
-import {createInstanceofPredicate, noop, getNextId, isObject} from "../utils/utils";
+import {createInstanceofPredicate, noop, getNextId} from "../utils/utils";
 
 export const isAtom = createInstanceofPredicate("Atom", BaseAtom);

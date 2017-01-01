@@ -164,7 +164,7 @@ let reactionScheduler: (fn: () => void) => void = f => f();
 
 export function runReactions() {
 	// invariant(globalState.inBatch > 0, "INTERNAL ERROR runReactions should be called only inside batch");
-	if (globalState.isRunningReactions === true || globalState.inTransaction > 0)
+	if (globalState.isRunningReactions === true || globalState.inBatch > 0)
 		return;
 	reactionScheduler(runReactionsHelper);
 }

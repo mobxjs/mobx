@@ -32,11 +32,6 @@ export class MobXGlobals {
 	mobxGuid = 0;
 
 	/**
-	 * Are we in a transaction block? (and how many of them)
-	 */
-	inTransaction = 0;
-
-	/**
 	 * Are we currently running reactions?
 	 * Reactions are run after derivations using a trampoline.
 	 */

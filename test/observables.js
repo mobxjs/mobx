@@ -1649,7 +1649,6 @@ test('603 - transaction should not kill reactions', t => {
 	t.equal(d.$mobx.observing.length, 1)
 	const g = m.extras.getGlobalState()
 	t.deepEqual(g.inBatch, 0)
-	t.deepEqual(g.inTransaction, 0)
 	t.deepEqual(g.pendingReactions.length, 0)
 	t.deepEqual(g.pendingUnobservations.length, 0)
 	t.deepEqual(g.trackingDerivation, null)

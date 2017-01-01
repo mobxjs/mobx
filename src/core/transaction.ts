@@ -1,5 +1,3 @@
-import {globalState} from "./globalstate";
-import {runReactions} from "./reaction";
 import {startBatch, endBatch} from "./observable";
 import {deprecated} from "../utils/utils";
 
@@ -19,22 +17,10 @@ export function transaction<T>(action: () => T, thisArg = undefined): T {
 }
 
 export function runInTransaction<T>(action: () => T, thisArg = undefined): T {
-	transactionStart();
+	startBatch();
 	try {
 		return action.call(thisArg);
 	} finally {
-		transactionEnd();
+		endBatch();
 	}
-}
-
-export function transactionStart<T>() {
-	startBatch();
-	globalState.inTransaction += 1;
-}
-
-export function transactionEnd<T>() {
-	if (--globalState.inTransaction === 0) {
-		runReactions();
-	}
-	endBatch();
 }
