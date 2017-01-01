@@ -114,10 +114,10 @@ export class Reaction implements IDerivation, IReactionPublic {
 
 	reportExceptionInDerivation(derivation: IDerivation, cause: Error) {
 		const message = `[mobx] Detected an uncaught exception that was thrown by computed value, reaction or observer '${derivation}`;
-		console.error(cause);
-		if (cause.stack)
-			console.error(cause.stack);
-		console.error(message);
+		// console.error(cause);
+		// if (cause.stack)
+		// 	console.error(cause.stack);
+		// console.error(message);
 		if (isSpyEnabled()) {
 			spyReport({
 				type: "error",
@@ -125,6 +125,11 @@ export class Reaction implements IDerivation, IReactionPublic {
 				cause
 			});
 		}
+		// TODO: instead of immediate, rethrow add end of run reactions
+		setImmediate(() => {
+			console.warn("Rethrowing earlier caught exception:");
+			throw cause;
+		});
 	}
 
 	dispose() {
