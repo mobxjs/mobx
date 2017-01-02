@@ -1,9 +1,8 @@
 import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, shouldCompute} from "./derivation";
-import {IObservable} from "./observable";
+import {IObservable, startBatch, endBatch} from "./observable";
 import {globalState, resetGlobalState} from "./globalstate";
 import {createInstanceofPredicate, getNextId, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
-import {startBatch, endBatch} from "./observable";
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations
@@ -66,6 +65,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 	 */
 	runReaction() {
 		if (!this.isDisposed) {
+			startBatch();
 			this._isScheduled = false;
 			if (shouldCompute(this)) {
 				this._isTrackPending = true;
@@ -79,6 +79,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 					});
 				}
 			}
+			endBatch();
 		}
 	}
 

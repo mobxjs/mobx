@@ -154,7 +154,6 @@ test("spy error", t => {
 	t.deepEqual(events, [
 		{ name: 'x', newValue: 3, object: { x: 3 }, oldValue: 2, spyReportStart: true, type: 'update' },
 		{ spyReportEnd: true },
-		{ object: { x: 3 }, type: 'compute' },
 		{ message: '[mobx] An uncaught exception occurred while calculating your computed value, autorun or transformer. Or inside the render() method of an observer based React component. These functions should never throw exceptions as MobX will not always be able to recover from them. Please fix the error reported after this message or enable \'Pause on (caught) exceptions\' in your debugger to find the root cause. In: \'ObservableObject@1.y\'. For more details see https://github.com/mobxjs/mobx/issues/462', type: 'error' }
 	]);
 
