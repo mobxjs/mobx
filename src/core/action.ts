@@ -17,7 +17,7 @@ export function createAction(actionName: string, fn: Function): Function {
 	return res;
 }
 
-export function executeAction(actionName: string, fn: Function, scope: any, args?: IArguments) {
+export function executeAction(actionName: string, fn: Function, scope?: any, args?: IArguments) {
 	const runInfo = startAction(actionName, fn, scope, args);
 	try {
 		return fn.apply(scope, args);

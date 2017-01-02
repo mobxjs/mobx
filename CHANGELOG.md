@@ -169,7 +169,7 @@ See [#640](https://github.com/mobxjs/mobx/issues/640)
 
 ### Other changes
 
-* Using transaction is now deprecated, use `action` or `runInAction` instead.
+* Using transaction is now deprecated, use `action` or `runInAction` instead. Transactions now will enter an `untracked` block as well, just as actions, which removes the conceptual difference.
 * Upgraded to typescript 2
 * It is now possible to pass ES6 Maps to `observable` / observable maps. The map will be converted to an observable map (if keys are string like)
 * Made `action` more debug friendly, it should now be easier to step through

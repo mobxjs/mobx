@@ -229,10 +229,11 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 
 	/** Merge another object into this object, returns this. */
 	merge(other: ObservableMap<V> | IKeyValueMap<V> | any): ObservableMap<V> {
+		if (isObservableMap(other)) {
+			other = other.toJS();
+		}
 		runInTransaction(() => {
-			if (isObservableMap(other))
-				other.keys().forEach(key => this.set(key, (other as ObservableMap<V>).get(key)!));
-			else if (isPlainObject(other))
+			if (isPlainObject(other))
 				Object.keys(other).forEach(key => this.set(key, other[key]));
 			else if (Array.isArray(other))
 				other.forEach(([key, value]) => this.set(key, value));

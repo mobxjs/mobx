@@ -17,7 +17,7 @@ export class MobXGlobals {
 	version = 4;
 
 	/**
-	 * Stack of currently running derivations
+	 * Currently running derivation
 	 */
 	trackingDerivation: IDerivation | null = null;
 

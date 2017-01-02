@@ -137,14 +137,14 @@ test('emulate rendering', function(t) {
 
 
 test('efficient selection', function(t) {
-    
+
     function Item(value) {
         m.extendObservable(this, {
             selected: false,
             value: value
         });
     }
-    
+
     function Store() {
         this.prevSelection = null;
         m.extendObservable(this, {
@@ -156,18 +156,16 @@ test('efficient selection', function(t) {
             ]
         });
         m.autorun(function() {
-            m.transaction(function() {
-                if (this.previousSelection === this.selection)
-                    return true; // converging condition
-                if (this.previousSelection)
-                    this.previousSelection.selected = false;
-                if (this.selection)
-                    this.selection.selected = true;
-                this.previousSelection = this.selection;
-            }, this);
+			if (this.previousSelection === this.selection)
+				return true; // converging condition
+			if (this.previousSelection)
+				this.previousSelection.selected = false;
+			if (this.selection)
+				this.selection.selected = true;
+			this.previousSelection = this.selection;
         }, this);
     }
-    
+
     var store = new Store();
 
     t.equal(store.selection, null);
@@ -186,6 +184,6 @@ test('efficient selection', function(t) {
     store.selection = null;
     t.equal(store.items.filter(function (i) { return i.selected }).length, 0);
     t.equal(store.selection, null);
-    
+
     t.end();
 });
