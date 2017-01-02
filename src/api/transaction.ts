@@ -1,6 +1,5 @@
-import {startBatch, endBatch} from "./observable";
 import {deprecated} from "../utils/utils";
-import {untrackedStart, untrackedEnd} from "./derivation";
+import {executeAction} from "../core/action";
 
 /**
  * @deprecated
@@ -18,13 +17,5 @@ export function transaction<T>(action: () => T, thisArg = undefined): T {
 }
 
 export function runInTransaction<T>(action: () => T, thisArg = undefined): T {
-	// TODO: use execute action!
-	startBatch();
-	const prev = untrackedStart();
-	try {
-		return action.call(thisArg);
-	} finally {
-		untrackedEnd(prev);
-		endBatch();
-	}
+	return executeAction("", action);
 }

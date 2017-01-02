@@ -38,7 +38,7 @@ function startAction(actionName: string, fn: Function, scope: any, args?: IArgum
 		// actions should not be called from computeds. check only works if the computed is actively observed, but that is fine enough as heuristic
 	invariant(!isComputedValue(globalState.trackingDerivation), "Computed values or transformers should not invoke actions or trigger other side effects");
 
-	const notifySpy = isSpyEnabled();
+	const notifySpy = isSpyEnabled() && !!actionName;
 	let startTime: number = 0;
 	if (notifySpy) {
 		startTime = Date.now();

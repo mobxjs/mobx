@@ -25,7 +25,6 @@ export { Reaction, IReactionPublic                            } from "./core/rea
 export { IDerivation, untracked, IDerivationState             } from "./core/derivation";
 export { useStrict, isStrictModeEnabled                       } from "./core/action";
 export { spy                                                  } from "./core/spy";
-export { transaction                                          } from "./core/transaction";
 export { IComputedValue                                       } from "./core/computedvalue";
 
 export { asReference, asFlat, asStructure, asMap              } from "./types/modifiers-old";
@@ -38,6 +37,7 @@ export { /* 3.0: IValueDidChange, */ IValueWillChange, IObservableValue } from "
 export { IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, isObservableArray } from "./types/observablearray";
 export { IKeyValueMap, ObservableMap, IMapEntries, IMapEntry, IMapWillChange, IMapChange, isObservableMap, map, IObservableMapInitialValues, IMap } from "./types/observablemap"
 
+export { transaction                                          } from "./api/transaction";
 export { observable, IObservableFactory, IObservableFactories } from "./api/observable";
 export { computed, IComputed, IComputedValueOptions           } from "./api/computed";
 export { isObservable                                         } from "./api/isobservable";

@@ -184,6 +184,7 @@ test('should not be possible to invoke action in a computed block', t => {
 	t.throws(() => {
 		mobx.autorun(() => c.get());
 	}, /Computed values or transformers should not invoke actions or trigger other side effects/, 'expected throw');
+	mobx.extras.resetGlobalState();
 	t.end();
 });
 
