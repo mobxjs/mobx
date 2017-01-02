@@ -10,7 +10,6 @@ function log(msg: string): string {
 }
 
 export function whyRun(thing?: any, prop?: string) {
-	deprecated("The `whyRun` function seems barely used and will be removed in the next major. If it is useful to you, please open an issue.");
 	switch (arguments.length) {
 		case 0:
 			thing = globalState.trackingDerivation;

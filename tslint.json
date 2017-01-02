@@ -24,8 +24,7 @@
         "no-unreachable": true,
         "no-unused-expression": true,
         "no_unused-variable": [
-            true,
-            "check-parameters"
+            true
         ],
         "no-use-before-declare": false,
         "no-var-keyword": true,

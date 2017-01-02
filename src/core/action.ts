@@ -1,7 +1,7 @@
 import {IDerivation} from "../core/derivation";
-import {transactionStart, transactionEnd} from "../core/transaction";
 import {invariant} from "../utils/utils";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
+import {startBatch, endBatch} from "../core/observable";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {isComputedValue} from "../core/computedvalue";
 import {globalState} from "../core/globalstate";
@@ -17,7 +17,7 @@ export function createAction(actionName: string, fn: Function): Function {
 	return res;
 }
 
-export function executeAction(actionName: string, fn: Function, scope: any, args?: IArguments) {
+export function executeAction(actionName: string, fn: Function, scope?: any, args?: IArguments) {
 	const runInfo = startAction(actionName, fn, scope, args);
 	try {
 		return fn.apply(scope, args);
@@ -50,12 +50,12 @@ function startAction(actionName: string, fn: Function, scope: any, args?: IArgum
 			type: "action",
 			name: actionName,
 			fn,
-			target: scope,
+			object: scope,
 			arguments: flattendArgs
 		});
 	}
 	const prevDerivation = untrackedStart();
-	transactionStart(actionName, scope, false);
+	startBatch();
 	const prevAllowStateChanges = allowStateChangesStart(true);
 	return {
 		prevDerivation,
@@ -67,7 +67,7 @@ function startAction(actionName: string, fn: Function, scope: any, args?: IArgum
 
 function endAction(runInfo: IActionRunInfo) {
 	allowStateChangesEnd(runInfo.prevAllowStateChanges);
-	transactionEnd(false);
+	endBatch();
 	untrackedEnd(runInfo.prevDerivation);
 	if (runInfo.notifySpy)
 		spyReportEnd({ time: Date.now() - runInfo.startTime });

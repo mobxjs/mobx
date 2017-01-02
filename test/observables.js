@@ -932,16 +932,14 @@ test('issue 50', function(t) {
         t.deepEqual(stripSpyOutput(events), [
 			'auto',
 			'calc c',
-			{ name: 'anonymous transaction', spyReportStart: true, target: undefined, type: 'transaction' },
 			'transstart',
 			{ name: 'a', newValue: false, oldValue: true, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
 			{ name: 'b', newValue: true, oldValue: false, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
 			'transpreend',
 			{ spyReportStart: true, type: 'reaction' },
 			'auto',
-      { target: { a: false, b: true }, type: 'compute' },
+      { type: 'compute' },
       'calc c',
-			{ spyReportEnd: true },
 			{ spyReportEnd: true },
 			'transpostend'
         ]);
@@ -986,14 +984,12 @@ test('verify transaction events', function(t) {
 	t.deepEqual(stripSpyOutput(events), [
 		'auto',
 		'calc c',
-		{ name: 'anonymous transaction', spyReportStart: true, target: undefined, type: 'transaction' },
 		'transstart',
 		{ name: 'b', newValue: 2, oldValue: 1, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
-		'transpreend', { target: { b: 2 }, type: 'compute' },
+		'transpreend', { type: 'compute' },
 		'calc c',
 		{ spyReportStart: true, type: 'reaction' },
 		'auto',
-		{ spyReportEnd: true },
 		{ spyReportEnd: true },
 		'transpostend'
     ]);
@@ -1073,23 +1069,19 @@ test('delay autorun until end of transaction', function(t) {
     events.push("post trans3");
 
     t.deepEqual(stripSpyOutput(events), [
-		{ name: 'anonymous transaction', spyReportStart: true, target: undefined, type: 'transaction' },
-			{ name: 'anonymous transaction', spyReportStart: true, target: undefined, type: 'transaction' },
-				{ name: 'a', newValue: 3, oldValue: 2, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
-				{ name: 'a', newValue: 4, oldValue: 3, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
-				'end1',
-			{ spyReportEnd: true },
-			{ name: 'a', newValue: 5, oldValue: 4, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
-			'end2',
-			{ spyReportStart: true, type: 'reaction' },
-				'auto',
-				{ target: { a: 3 }, type: 'compute' },
-				'calc y',
-			{ spyReportEnd: true },
+		{ name: 'a', newValue: 3, oldValue: 2, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
+		{ name: 'a', newValue: 4, oldValue: 3, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
+		'end1',
+		{ name: 'a', newValue: 5, oldValue: 4, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
+		'end2',
+		{ spyReportStart: true, type: 'reaction' },
+			'auto',
+			{ type: 'compute' },
+			'calc y',
 		{ spyReportEnd: true },
 		'post trans1',
 		{ name: 'a', newValue: 6, oldValue: 5, spyReportStart: true, type: 'update' },
-			{ target: { a: 3 }, type: 'compute' },
+			{ type: 'compute' },
 			'calc y',
 			{ spyReportStart: true, type: 'reaction' },
 				'auto',
@@ -1134,7 +1126,8 @@ test('prematurely end autorun', function(t) {
     t.end();
 });
 
-test('issue 65; transaction causing transaction', function(t) {
+test.skip('issue 65; transaction causing transaction', function(t) {
+	// MWE: disabled, bad test; depends on transaction being tracked, transaction should not be used in computed!
     var x = mobx.observable({
         a: 3,
         get b() {
@@ -1657,7 +1650,6 @@ test('603 - transaction should not kill reactions', t => {
 	t.equal(d.$mobx.observing.length, 1)
 	const g = m.extras.getGlobalState()
 	t.deepEqual(g.inBatch, 0)
-	t.deepEqual(g.inTransaction, 0)
 	t.deepEqual(g.pendingReactions.length, 0)
 	t.deepEqual(g.pendingUnobservations.length, 0)
 	t.deepEqual(g.trackingDerivation, null)

@@ -106,26 +106,24 @@ const doStuffEvents = [
 	{ name: 'i', newValue: 6, oldValue: 5, spyReportStart: true, type: 'update' },
 	{ spyReportEnd: true },
 	{ spyReportStart: true, type: 'reaction' },
-	{ target: undefined, type: 'compute' },
+	{ type: 'compute' },
 	{ spyReportEnd: true },
 	{ newValue: 4, oldValue: 3, spyReportStart: true, type: 'update' },
-	{ target: undefined, type: 'compute' },
+	{ type: 'compute' },
 	{ spyReportStart: true, type: 'reaction' },
 	{ spyReportEnd: true },
 	{ spyReportEnd: true },
-	{ name: 'myTransaction', spyReportStart: true, target: undefined, type: 'transaction' },
 	{ newValue: 5, oldValue: 4, spyReportStart: true, type: 'update' },
 	{ spyReportEnd: true },
 	{ newValue: 6, oldValue: 5, spyReportStart: true, type: 'update' },
 	{ spyReportEnd: true },
-	{ target: undefined, type: 'compute' },
+	{ type: 'compute' },
 	{ spyReportStart: true, type: 'reaction' },
 	{ spyReportEnd: true },
-	{ spyReportEnd: true },
-	{ name: 'myTestAction', spyReportStart: true, arguments: [7], type: 'action', target: {} },
+	{ name: 'myTestAction', spyReportStart: true, arguments: [7], type: 'action' },
 	{ newValue: 7, oldValue: 6, spyReportStart: true, type: 'update' },
 	{ spyReportEnd: true },
-	{ target: undefined, type: 'compute' },
+	{ type: 'compute' },
 	{ spyReportStart: true, type: 'reaction' },
 	{ spyReportEnd: true },
 	{ spyReportEnd: true }
@@ -152,6 +150,7 @@ test("spy error", t => {
 		a.y;
 	}, /Oops/);
 
+	events.forEach(x => delete x.fn)
 	t.deepEqual(events, [
 		{ name: 'x', newValue: 3, object: { x: 3 }, oldValue: 2, spyReportStart: true, type: 'update' },
 		{ spyReportEnd: true },

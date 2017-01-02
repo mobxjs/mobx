@@ -14,10 +14,10 @@ export class MobXGlobals {
 	 * MobX compatiblity with other versions loaded in memory as long as this version matches.
 	 * It indicates that the global state still stores similar information
 	 */
-	version = 4;
+	version = 5;
 
 	/**
-	 * Stack of currently running derivations
+	 * Currently running derivation
 	 */
 	trackingDerivation: IDerivation | null = null;
 
@@ -30,17 +30,6 @@ export class MobXGlobals {
 	 * 'guid' for general purpose. Will be persisted amongst resets.
 	 */
 	mobxGuid = 0;
-
-	/**
-	 * Are we in a transaction block? (and how many of them)
-	 */
-	inTransaction = 0;
-
-	/**
-	 * Are we currently running reactions?
-	 * Reactions are run after derivations using a trampoline.
-	 */
-	isRunningReactions = false;
 
 	/**
 	 * Are we in a batch block? (and how many of them)

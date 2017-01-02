@@ -1,5 +1,5 @@
 import {IEnhancer, deepEnhancer} from "./modifiers";
-import {transaction} from "../core/transaction";
+import {runInTransaction} from "../core/transaction";
 import {untracked} from "../core/derivation";
 import {allowStateChanges} from "../core/action";
 import {IObservableArray, ObservableArray} from "./observablearray";
@@ -130,13 +130,13 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 
 			if (notifySpy)
 				spyReportStart(change);
-			transaction(() => {
+			runInTransaction(() => {
 				this._keys.remove(key);
 				this._updateHasMapEntry(key, false);
 				const observable = this._data[key]!;
 				observable.setNewValue(undefined as any);
 				this._data[key] = undefined as any;
-			}, undefined, false);
+			});
 			if (notify)
 				notifyListeners(this, change);
 			if (notifySpy)
@@ -181,12 +181,12 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	}
 
 	private _addValue(name: string, newValue: V | undefined) {
-		transaction(() => {
+		runInTransaction(() => {
 			const observable = this._data[name] = new ObservableValue(newValue, this.enhancer, `${this.name}.${name}`, false);
 			newValue = (observable as any).value; // value might have been changed
 			this._updateHasMapEntry(name, true);
 			this._keys.push(name);
-		}, undefined, false);
+		});
 
 		const notifySpy = isSpyEnabled();
 		const notify = hasListeners(this);
@@ -229,10 +229,11 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 
 	/** Merge another object into this object, returns this. */
 	merge(other: ObservableMap<V> | IKeyValueMap<V> | any): ObservableMap<V> {
-		transaction(() => {
-			if (isObservableMap(other))
-				other.keys().forEach(key => this.set(key, (other as ObservableMap<V>).get(key)!));
-			else if (isPlainObject(other))
+		if (isObservableMap(other)) {
+			other = other.toJS();
+		}
+		runInTransaction(() => {
+			if (isPlainObject(other))
 				Object.keys(other).forEach(key => this.set(key, other[key]));
 			else if (Array.isArray(other))
 				other.forEach(([key, value]) => this.set(key, value));
@@ -240,20 +241,20 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 				other.forEach((value, key) => this.set(key, value));
 			else if (other !== null && other !== undefined)
 				fail("Cannot initialize map from " + other);
-		}, undefined, false);
+		});
 		return this;
 	}
 
 	clear() {
-		transaction(() => {
+		runInTransaction(() => {
 			untracked(() => {
 				this.keys().forEach(this.delete, this);
 			});
-		}, undefined, false);
+		});
 	}
 
 	replace(values: ObservableMap<V> | IKeyValueMap<V> | any): ObservableMap<V> {
-		transaction(() => {
+		runInTransaction(() => {
 			this.clear();
 			this.merge(values);
 		});

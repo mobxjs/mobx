@@ -1,7 +1,7 @@
 import {IDerivation, IDerivationState} from "./derivation";
 import {globalState} from "./globalstate";
 import {invariant} from "../utils/utils";
-import {throwPendingExceptions} from "./reaction";
+import {throwPendingExceptions, runReactions} from "./reaction";
 
 export interface IDepTreeNode {
 	name: string;
@@ -105,7 +105,7 @@ export function queueForUnobservation(observable: IObservable) {
 }
 
 /**
- * Batch is a pseudotransaction, just for purposes of memoizing ComputedValues when nothing else does.
+ * Batch starts a transaction, at least for purposes of memoizing ComputedValues when nothing else does.
  * During a batch `onBecomeUnobserved` will be called at most once per observable.
  * Avoids unnecessary recalculations.
  */
@@ -114,7 +114,8 @@ export function startBatch() {
 }
 
 export function endBatch() {
-	if (globalState.inBatch === 1) {
+	if (--globalState.inBatch === 0) {
+		runReactions();
 		// the batch is actually about to finish, all unobserving should happen here.
 		const list = globalState.pendingUnobservations;
 		for (let i = 0; i < list.length; i++) {
@@ -128,7 +129,6 @@ export function endBatch() {
 		globalState.pendingUnobservations = [];
 		throwPendingExceptions();
 	}
-	globalState.inBatch--;
 }
 
 export function reportObserved(observable: IObservable) {

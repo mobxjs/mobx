@@ -44,3 +44,44 @@ test('autorun warns when passed an action', function(t) {
 	t.throws(() => m.autorun(action), /attempted to pass an action to autorun/);
 	t.end();
 });
+
+test('autorun batches automatically', function(t) {
+	var runs = 0;
+	var a1runs = 0;
+	var a2runs = 0;
+
+	var x = m.observable({
+		a: 1,
+		b: 1,
+		c: 1,
+		get d() {
+			runs++
+			return this.c + this.b
+		}
+	})
+
+	var d1 = m.autorun(() => {
+		a1runs++
+		x.d; // read
+	})
+
+	var d2 = m.autorun(() => {
+		a2runs++
+		x.b = x.a
+		x.c = x.a
+	})
+
+	t.equal(a1runs, 1)
+	t.equal(a2runs, 1)
+	t.equal(runs, 1)
+
+	x.a = 17
+
+	t.equal(a1runs, 2)
+	t.equal(a2runs, 2)
+	t.equal(runs, 2)
+
+	d1()
+	d2()
+	t.end();
+})

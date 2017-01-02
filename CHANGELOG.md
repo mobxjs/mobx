@@ -179,14 +179,16 @@ See [#640](https://github.com/mobxjs/mobx/issues/640)
 
 ### Other changes
 
+* Using transaction is now deprecated, use `action` or `runInAction` instead. Transactions now will enter an `untracked` block as well, just as actions, which removes the conceptual difference.
 * Upgraded to typescript 2
 * It is now possible to pass ES6 Maps to `observable` / observable maps. The map will be converted to an observable map (if keys are string like)
 * Made `action` more debug friendly, it should now be easier to step through
 * ObservableMap now has an additional method, `.replace(data)`, which is a combination of `clear()` and `merge(data)`.
 * Passing a function to `observable` will now create a boxed observable refering to that function
-* Deprecated `whyRun` (as it seems hardly used, please let us know if it should stay)
 * Fixed #603: exceptions in transaction breaks future reactions
 * Fixed #698: createTransformer should support default arguments
+* Transactions are no longer reported grouped in spy events. If you want to group events, use actions instead.
+* Normalized `spy` events further. Computed values and actions now report `object` instead of `target` for the scope they have been applied to.
 * The following deprecated methods have been removed:
   * `autorunUntil`
   * `trackTransitions`
