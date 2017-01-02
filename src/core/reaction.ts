@@ -162,33 +162,37 @@ WhyRun? reaction '${this.name}':
 const MAX_REACTION_ITERATIONS = 100;
 
 let reactionScheduler: (fn: () => void) => void = f => f();
+let isRunningReactions = false;
 
 export function runReactions() {
-	// invariant(globalState.inBatch > 0, "INTERNAL ERROR runReactions should be called only inside batch");
-	if (globalState.isRunningReactions === true || globalState.inBatch > 0)
+	// Trampoling, if runReactions are already running, new reactions will be picked up
+	if (globalState.inBatch > 0 || isRunningReactions)
 		return;
 	reactionScheduler(runReactionsHelper);
 }
 
 function runReactionsHelper() {
-	globalState.isRunningReactions = true;
-	const allReactions = globalState.pendingReactions;
-	let iterations = 0;
+	isRunningReactions = true;
+	try {
+		const allReactions = globalState.pendingReactions;
+		let iterations = 0;
 
-	// While running reactions, new reactions might be triggered.
-	// Hence we work with two variables and check whether
-	// we converge to no remaining reactions after a while.
-	while (allReactions.length > 0) {
-		if (++iterations === MAX_REACTION_ITERATIONS) {
-			resetGlobalState();
-			throw new Error(`Reaction doesn't converge to a stable state after ${MAX_REACTION_ITERATIONS} iterations.`
-				+ ` Probably there is a cycle in the reactive function: ${allReactions[0]}`);
+		// While running reactions, new reactions might be triggered.
+		// Hence we work with two variables and check whether
+		// we converge to no remaining reactions after a while.
+		while (allReactions.length > 0) {
+			if (++iterations === MAX_REACTION_ITERATIONS) {
+				resetGlobalState();
+				throw new Error(`Reaction doesn't converge to a stable state after ${MAX_REACTION_ITERATIONS} iterations.`
+					+ ` Probably there is a cycle in the reactive function: ${allReactions[0]}`);
+			}
+			let remainingReactions = allReactions.splice(0);
+			for (let i = 0, l = remainingReactions.length; i < l; i++)
+				remainingReactions[i].runReaction();
 		}
-		let remainingReactions = allReactions.splice(0);
-		for (let i = 0, l = remainingReactions.length; i < l; i++)
-			remainingReactions[i].runReaction();
+	} finally {
+		isRunningReactions = false;
 	}
-	globalState.isRunningReactions = false;
 }
 
 export const isReaction = createInstanceofPredicate("Reaction", Reaction);

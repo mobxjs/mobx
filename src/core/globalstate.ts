@@ -32,12 +32,6 @@ export class MobXGlobals {
 	mobxGuid = 0;
 
 	/**
-	 * Are we currently running reactions?
-	 * Reactions are run after derivations using a trampoline.
-	 */
-	isRunningReactions = false;
-
-	/**
 	 * Are we in a batch block? (and how many of them)
 	 */
 	inBatch: number = 0;

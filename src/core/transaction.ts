@@ -18,6 +18,7 @@ export function transaction<T>(action: () => T, thisArg = undefined): T {
 }
 
 export function runInTransaction<T>(action: () => T, thisArg = undefined): T {
+	// TODO: use execute action!
 	startBatch();
 	const prev = untrackedStart();
 	try {

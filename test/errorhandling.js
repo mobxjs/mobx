@@ -31,7 +31,6 @@ function buffer() {
 function checkGlobalState(t) {
 	const gs = mobx.extras.getGlobalState();
 	t.equal(gs.trackingDerivation, null)
-	t.equal(gs.isRunningReactions, false)
 	t.equal(gs.inBatch, 0)
 	t.equal(gs.allowStateChanges, !gs.strictMode)
 	t.equal(gs.pendingUnobservations.length, 0)
