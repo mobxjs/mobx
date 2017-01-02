@@ -1,5 +1,4 @@
 import {IEnhancer, deepEnhancer} from "./modifiers";
-import {runInTransaction} from "../core/transaction";
 import {untracked} from "../core/derivation";
 import {allowStateChanges} from "../core/action";
 import {IObservableArray, ObservableArray} from "./observablearray";
@@ -10,6 +9,7 @@ import {IListenable, registerListener, hasListeners, notifyListeners} from "./li
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {arrayAsIterator, declareIterator, Iterator} from "../utils/iterable";
 import {observable} from "../api/observable";
+import {runInTransaction} from "../api/transaction";
 import {referenceEnhancer} from "./modifiers";
 
 /**
