@@ -50,9 +50,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 		if (!this._isScheduled) {
 			this._isScheduled = true;
 			globalState.pendingReactions.push(this);
-			startBatch();
 			runReactions();
-			endBatch();
 		}
 	}
 

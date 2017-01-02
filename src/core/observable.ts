@@ -105,7 +105,7 @@ export function queueForUnobservation(observable: IObservable) {
 }
 
 /**
- * Batch is a pseudotransaction, just for purposes of memoizing ComputedValues when nothing else does.
+ * Batch starts a transaction, at least for purposes of memoizing ComputedValues when nothing else does.
  * During a batch `onBecomeUnobserved` will be called at most once per observable.
  * Avoids unnecessary recalculations.
  */

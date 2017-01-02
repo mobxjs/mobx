@@ -14,7 +14,7 @@ export class MobXGlobals {
 	 * MobX compatiblity with other versions loaded in memory as long as this version matches.
 	 * It indicates that the global state still stores similar information
 	 */
-	version = 4;
+	version = 5;
 
 	/**
 	 * Currently running derivation
