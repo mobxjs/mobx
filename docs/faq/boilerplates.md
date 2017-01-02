@@ -8,7 +8,7 @@
 * [generator-mobx-react](https://www.npmjs.com/package/generator-mobx-react) Yeoman MobX, React, Webpack, Babel / Typescript project generator
 * [mobx-starter](https://github.com/nightwolfz/mobx-starter): Starting base for an mobx react project with optional isomorphism. MongoDB auth & sessions, hot reload, react-router
 * [React, React-Router 4, MobX and Webpack 2-boilerplate with async routes](https://github.com/mhaagens/react-mobx-react-router4-boilerplate)
-* [react-mobx-typescript-boilerplate](https://github.com/rokoroku/react-mobx-typescript-boilerplate) A minimum frontend boilerplate including TodoMVC example
+* [react-mobx-typescript-boilerplate](https://github.com/rokoroku/react-mobx-typescript-boilerplate) A boilerplate with Webpack 2 and Typescript 2, including TodoMVC example
 * [rfx-stack](https://github.com/foxhound87/rfx-stack) RFX Stack - Universal App featuring: React + Feathers + MobX
 * MobX, TypeScript, React, React Router, Server Side Rendering and Webpack: https://github.com/contacts-mvc/mobx-react-typescript
 * [reaxor](https://github.com/KadoBOT/reaxor) Boilerplate for better state management, styling, testing and cleaner code
