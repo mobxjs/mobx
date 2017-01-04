@@ -1,21 +1,12 @@
-var testBase = require('tape');
+var test = require('tape');
 var mobx = require('..');
 var m = mobx;
+var utils = require('./utils/test-utils');
 
 var observable = mobx.observable;
 var computed = mobx.computed;
 
 var voidObserver = function(){};
-
-function test(name, func) {
-    testBase(name, function(t) {
-        try {
-            func(t);
-        } finally {
-            mobx._.resetGlobalState();
-        }
-    });
-}
 
 function buffer() {
     var b = [];
@@ -30,6 +21,7 @@ function buffer() {
 
 function checkGlobalState(t) {
 	const gs = mobx.extras.getGlobalState();
+	t.equal(gs.isRunningReactions, false)
 	t.equal(gs.trackingDerivation, null)
 	t.equal(gs.inBatch, 0)
 	t.equal(gs.allowStateChanges, !gs.strictMode)
@@ -68,7 +60,7 @@ test('exceptions in computed values can be recovered from', t => {
 	t.end()
 })
 
-test('exception when starting autorun cannot be recovered from', t => {
+test('exception when starting autorun can be recovered from', t => {
 	var b = undefined
 	var a = observable({
 		x: 2,
@@ -79,15 +71,15 @@ test('exception when starting autorun cannot be recovered from', t => {
 		}
 	})
 
-	t.throws(() => {
+	utils.consoleError(t, () => {
 		mobx.autorun(() => { b = a.y })
 	}, /Uhoh/)
 	t.equal(b, undefined)
 	checkGlobalState(t)
 	a.x = 3
-	t.equal(b, undefined) // tracking never started..
+	t.equal(b, 6)
 	checkGlobalState(t)
-	t.equal(mobx.extras.getAtom(a, "y").observers.length, 0)
+	t.equal(mobx.extras.getAtom(a, "y").observers.length, 1)
 	t.end()
 })
 
@@ -107,10 +99,14 @@ test('exception in autorun can be recovered from', t => {
 	t.equal(b, 2)
 	t.equal(mobx.extras.getAtom(a, "y").observers.length, 1)
 
-	t.throws(() => {
+	utils.consoleError(t, () => {
 		a.x = 2
 	}, /Uhoh/)
-	t.equal(a.y, 2) // old cached value!
+
+	// exception is also rethrown to each consumer
+	t.throws(() => {
+		t.equal(a.y, 2) // old cached value!
+	}, /Uhoh/)
 	t.equal(mobx.extras.getAtom(a, "y").observers.length, 1)
 
 	t.equal(b, 2)
@@ -140,7 +136,7 @@ test('multiple autoruns with exceptions are handled correctly', t => {
 	t.deepEqual(values, ["a1", "b1", "c1"])
 	values.splice(0)
 
-	t.throws(() => a.set(2), /Uhoh/)
+	utils.consoleError(t,() => a.set(2), /Uhoh/)
 	checkGlobalState(t)
 
 	t.deepEqual(values.sort(), ["a2", "c2"]) // order is irrelevant
@@ -249,10 +245,10 @@ test('throw error if modification loop', function(t) {
 })
 
 test('cycle1', function(t) {
-    t.throws(() => {
-        var p = computed(function() { return p() * 2; }); // thats a cycle!
+	var p = computed(function() { return p.get() * 2; }); // thats a cycle!
+    utils.consoleError(t, () => {
         p.observe(voidObserver, true);
-    }, "Found cyclic dependency");
+    }, /Cycle detected/);
 	checkGlobalState(t);
     t.end();
 })
@@ -276,7 +272,7 @@ test('cycle3', function(t) {
     t.end();
 })
 
-test('cycle3', function(t) {
+test('cycle4', function(t) {
     var z = observable(true);
     var a = computed(function() { return z.get() ? 1 : b.get() * 2; });
     var b = computed(function() { return a.get() * 2; });
@@ -284,9 +280,9 @@ test('cycle3', function(t) {
     m.observe(b, voidObserver);
     t.equal(1, a.get());
 
-    t.throws(() => {
+    utils.consoleError(t, () => {
         z.set(false); // introduces a cycle!
-    }, "Found cyclic dependency");
+    }, /Cycle detected/);
 	checkGlobalState(t);
     t.end();
 });
@@ -396,9 +392,9 @@ test('error handling assistence ', function(t) {
         }
 
         t.deepEqual(values, [6, 4, 14, 8]);
-        t.equal(errors.length, 0);
-		t.equal(warns.length, 0); // since mobx 3 no warnings are printed anymore
-        t.equal(thrown.length, 2);
+        t.equal(errors.length, 2);
+		t.equal(warns.length, 0);
+        t.equal(thrown.length, 0); // Mobx doesn't propagate throws from reactions
 
         console.error = baseError;
 		console.warn = baseWarn;
@@ -485,7 +481,9 @@ test('peeking inside erroring computed value doesn\'t bork (global) state', t =>
 	t.equal(b.diffValue, 0)
 	t.equal(b.lowestObserverState, 0)
 	t.equal(b.unboundDepsCount, 0)
-	t.equal(b.value, undefined)
+	t.throws(() => {
+		b.get();
+	}, /chocolademelk/)
 	t.equal(b.isComputing, false)
 
 	checkGlobalState(t)
@@ -543,7 +541,9 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 
 	test("it should not break internal consistency when exception occurred", t => {
 		// Trigger exception
-		t.throws(() => { a.set(2) }, /chocolademelk/)
+		utils.consoleError(t, () => {
+			a.set(2)
+		}, /chocolademelk/)
 		t.equal(r, 2)
 
 		t.equal(a.isPendingUnobservation, true) // true is a default for optimization
@@ -560,9 +560,9 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 		t.equal(b.observers.length, 1)
 		t.equal(b.diffValue, 0)
 		t.equal(b.lowestObserverState, 0)
-		t.equal(b.unboundDepsCount, 0)
-		t.equal(b.value, 1, "value should be 1")
+		t.equal(b.unboundDepsCount, 1)
 		t.equal(b.isComputing, false)
+		t.throws(() => b.get(), /chocolademelk/)
 
 		t.equal(c.dependenciesState, 0)
 		t.equal(c.observing.length, 1)

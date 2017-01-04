@@ -1,7 +1,6 @@
-import {IObservable, IDepTreeNode, addObserver, removeObserver, endBatch} from "./observable";
-import {globalState, resetGlobalState} from "./globalstate";
+import {IObservable, IDepTreeNode, addObserver, removeObserver} from "./observable";
+import {globalState} from "./globalstate";
 import {invariant} from "../utils/utils";
-import {isSpyEnabled, spyReport} from "./spy";
 import {isComputedValue} from "./computedvalue";
 
 export enum IDerivationState {
@@ -51,6 +50,10 @@ export class CaughtException {
 	}
 }
 
+export function isCaughtException(e): e is CaughtException {
+	return e instanceof CaughtException;
+}
+
 /**
  * Finds out wether any dependency of derivation actually changed
  * If dependenciesState is 1 it will recalculate dependencies,
@@ -74,7 +77,9 @@ export function shouldCompute(derivation: IDerivation): boolean {
 					try {
 						obj.get();
 					} catch (e) {
-						// we are not interested in the value *or* exception at this moment
+						// we are not interested in the value *or* exception at this moment, but if there is one, notify all
+						untrackedEnd(prevUntracked);
+						return true;
 					}
 					// if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
 					// and `derivation` is an observer of `obj`
@@ -118,17 +123,15 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	derivation.runId = ++globalState.runId;
 	const prevTracking = globalState.trackingDerivation;
 	globalState.trackingDerivation = derivation;
+	let result;
 	try {
-		const result = f.call(derivation);
-		globalState.trackingDerivation = prevTracking;
-		bindDependencies(derivation);
-		return result;
-	} catch (e){
-		derivation.newObserving = derivation.observing; // after exception reset observing
-		derivation.unboundDepsCount = derivation.observing.length;
-		bindDependencies(derivation);
-		return new CaughtException(e);
+		result = f.call(derivation);
+	} catch (e) {
+		result = new CaughtException(e);
 	}
+	globalState.trackingDerivation = prevTracking;
+	bindDependencies(derivation);
+	return result;
 }
 
 /**

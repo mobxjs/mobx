@@ -137,26 +137,36 @@ test("spy error", t => {
 		get y() {
 			if (this.x === 3)
 				throw "Oops";
-			return this.x = 2;
+			return this.x * 2;
 		}
 	})
 
 	var events = [];
 	var stop = mobx.spy(c => events.push(c));
 
-	a.x = 3;
-	t.throws(() => {
-		a.x = 3;
-		a.y;
-	}, /Oops/);
+	var d = mobx.autorun("autorun", () => a.y)
 
-	events.forEach(x => delete x.fn)
+	a.x = 3;
+
+	events.forEach(x => {
+		delete x.fn
+		delete x.object
+		delete x.time
+	})
+
 	t.deepEqual(events, [
-		{ name: 'x', newValue: 3, object: { x: 3 }, oldValue: 2, spyReportStart: true, type: 'update' },
+		{ spyReportStart: true, type: 'reaction' },
+			{ type: 'compute' },
 		{ spyReportEnd: true },
-		{ message: '[mobx] An uncaught exception occurred while calculating your computed value, autorun or transformer. Or inside the render() method of an observer based React component. These functions should never throw exceptions as MobX will not always be able to recover from them. Please fix the error reported after this message or enable \'Pause on (caught) exceptions\' in your debugger to find the root cause. In: \'ObservableObject@1.y\'. For more details see https://github.com/mobxjs/mobx/issues/462', type: 'error' }
+		{ name: 'x', newValue: 3, oldValue: 2, spyReportStart: true, type: 'update' },
+			{ type: 'compute' },
+			{ spyReportStart: true, type: 'reaction' },
+				{ cause: 'Oops', message: '[mobx] Catched uncaught exception that was thrown by a reaction or observer component, in: \'Reaction[autorun]', type: 'error' },
+			{ spyReportEnd: true },
+		{ spyReportEnd: true }
 	]);
 
+	d();
 	stop();
 	t.end();
 })

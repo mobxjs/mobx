@@ -1,5 +1,5 @@
 import {IObservable, reportObserved, propagateMaybeChanged, propagateChangeConfirmed, startBatch, endBatch, getObservers} from "./observable";
-import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, untrackedStart, untrackedEnd, shouldCompute, CaughtException} from "./derivation";
+import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, untrackedStart, untrackedEnd, shouldCompute, CaughtException, isCaughtException} from "./derivation";
 import {globalState} from "./globalstate";
 import {allowStateChangesStart, allowStateChangesEnd, createAction} from "./action";
 import {createInstanceofPredicate, getNextId, valueDidChange, invariant, Lambda, unique, joinStrings} from "../utils/utils";
@@ -43,7 +43,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	lowestObserverState = IDerivationState.UP_TO_DATE;
 	unboundDepsCount = 0;
 	__mapid = "#" + getNextId();
-	protected value: T | undefined = undefined;
+	protected value: T | undefined | CaughtException = undefined;
 	name: string;
 	isComputing: boolean = false; // to check for cycles
 	isRunningSetter: boolean = false;
@@ -65,10 +65,22 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 			this.setter = createAction(name + "-setter", setter) as any;
 	}
 
-	peek() {
+	public peek(): T {
+		const res = this.deriveValue();
+		if (isCaughtException(res))
+			throw res.cause;
+		return res;
+	}
+
+	deriveValue() {
 		this.isComputing = true;
 		const prevAllowStateChanges = allowStateChangesStart(false);
-		const res = this.derivation.call(this.scope);
+		let res: T | CaughtException;
+		try { // TODO: double try / catch! here and in derivation.derive (called trough compute & track)
+			res = this.derivation.call(this.scope);
+		} catch (e) {
+			res = new CaughtException(e);
+		}
 		allowStateChangesEnd(prevAllowStateChanges);
 		this.isComputing = false;
 		return res;
@@ -96,7 +108,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 			// because it will never be called again inside this batch
 			startBatch();
 			if (shouldCompute(this))
-				this.value = this.peek();
+				this.value = this.deriveValue();
 			endBatch();
 		} else {
 			reportObserved(this);
@@ -106,7 +118,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		}
 		const result = this.value!;
 
-		if (result instanceof CaughtException)
+		if (isCaughtException(result))
 			throw result.cause;
 		return result;
 	}
@@ -134,8 +146,8 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 			});
 		}
 		const oldValue = this.value;
-		const newValue = this.value = trackDerivedFunction(this, this.peek);
-		return valueDidChange(this.compareStructural, newValue, oldValue);
+		const newValue = this.value = trackDerivedFunction(this, this.deriveValue);
+		return isCaughtException(newValue) || valueDidChange(this.compareStructural, newValue, oldValue);
 	}
 
 	observe(listener: (newValue: T, oldValue: T | undefined) => void, fireImmediately?: boolean): Lambda {

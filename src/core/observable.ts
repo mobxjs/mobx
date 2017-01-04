@@ -1,7 +1,7 @@
 import {IDerivation, IDerivationState} from "./derivation";
 import {globalState} from "./globalstate";
 import {invariant} from "../utils/utils";
-import {throwPendingExceptions, runReactions} from "./reaction";
+import {runReactions} from "./reaction";
 
 export interface IDepTreeNode {
 	name: string;
@@ -127,7 +127,6 @@ export function endBatch() {
 			}
 		}
 		globalState.pendingUnobservations = [];
-		throwPendingExceptions();
 	}
 }
 

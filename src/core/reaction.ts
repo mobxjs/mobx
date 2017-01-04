@@ -1,4 +1,4 @@
-import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, shouldCompute, CaughtException} from "./derivation";
+import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, shouldCompute, isCaughtException} from "./derivation";
 import {IObservable, startBatch, endBatch} from "./observable";
 import {globalState, resetGlobalState} from "./globalstate";
 import {createInstanceofPredicate, getNextId, Lambda, unique, joinStrings} from "../utils/utils";
@@ -101,7 +101,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 			// disposed during last run. Clean up everything that was bound after the dispose call.
 			clearObserving(this);
 		}
-		if (result instanceof CaughtException)
+		if (isCaughtException(result))
 			this.reportExceptionInDerivation(this, result.cause);
 		if (notify) {
 			spyReportEnd({
@@ -112,7 +112,8 @@ export class Reaction implements IDerivation, IReactionPublic {
 	}
 
 	reportExceptionInDerivation(derivation: IDerivation, cause: Error) {
-		const message = `[mobx] Detected an uncaught exception that was thrown by computed value, reaction or observer '${derivation}`;
+		const message = `[mobx] Catched uncaught exception that was thrown by a reaction or observer component, in: '${derivation}`;
+		console.error(message, cause);
 		if (isSpyEnabled()) {
 			spyReport({
 				type: "error",
@@ -120,7 +121,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 				cause
 			});
 		}
-		globalState.pendingExceptions.push({ derivation, cause });
+		// TODO: introduce global handler
 	}
 
 	dispose() {
@@ -169,47 +170,33 @@ WhyRun? reaction '${this.name}':
 const MAX_REACTION_ITERATIONS = 100;
 
 let reactionScheduler: (fn: () => void) => void = f => f();
-let isRunningReactions = false;
 
 export function runReactions() {
 	// Trampoling, if runReactions are already running, new reactions will be picked up
-	if (globalState.inBatch > 0 || isRunningReactions)
+	if (globalState.inBatch > 0 || globalState.isRunningReactions)
 		return;
 	reactionScheduler(runReactionsHelper);
 }
 
-export function throwPendingExceptions() {
-	const exceptions = globalState.pendingExceptions.splice(0);
-	if (exceptions.length > 0) {
-		// setImmediate(() => { // somehow leverage use HostReportErrors?
-			// console.warn(`[mobx] ${exceptions.length} exception(s) were thrown by reactions. Rethrown the first failed exception threwn by ${exceptions[0].derivation}`);
-			// throw exceptions[0].cause;
-		// });
-	}
-}
-
 function runReactionsHelper() {
-	isRunningReactions = true;
-	try {
-		const allReactions = globalState.pendingReactions;
-		let iterations = 0;
+	globalState.isRunningReactions = true;
+	const allReactions = globalState.pendingReactions;
+	let iterations = 0;
 
-		// While running reactions, new reactions might be triggered.
-		// Hence we work with two variables and check whether
-		// we converge to no remaining reactions after a while.
-		while (allReactions.length > 0) {
-			if (++iterations === MAX_REACTION_ITERATIONS) {
-				resetGlobalState();
-				throw new Error(`Reaction doesn't converge to a stable state after ${MAX_REACTION_ITERATIONS} iterations.`
-					+ ` Probably there is a cycle in the reactive function: ${allReactions[0]}`);
-			}
-			let remainingReactions = allReactions.splice(0);
-			for (let i = 0, l = remainingReactions.length; i < l; i++)
-				remainingReactions[i].runReaction();
+	// While running reactions, new reactions might be triggered.
+	// Hence we work with two variables and check whether
+	// we converge to no remaining reactions after a while.
+	while (allReactions.length > 0) {
+		if (++iterations === MAX_REACTION_ITERATIONS) {
+			resetGlobalState();
+			throw new Error(`Reaction doesn't converge to a stable state after ${MAX_REACTION_ITERATIONS} iterations.`
+				+ ` Probably there is a cycle in the reactive function: ${allReactions[0]}`);
 		}
-	} finally {
-		isRunningReactions = false;
+		let remainingReactions = allReactions.splice(0);
+		for (let i = 0, l = remainingReactions.length; i < l; i++)
+			remainingReactions[i].runReaction();
 	}
+	globalState.isRunningReactions = false;
 }
 
 export const isReaction = createInstanceofPredicate("Reaction", Reaction);

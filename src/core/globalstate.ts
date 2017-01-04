@@ -50,10 +50,9 @@ export class MobXGlobals {
 	pendingReactions: Reaction[] = [];
 
 	/**
-	 * This exceptions where caught when runinng a reaction, and will be thrown at the next safe
-	 * opportunity, that is, at the end of the reaction scheduler
+	 * Are we currently processing reactions?
 	 */
-	pendingExceptions: { derivation: IDerivation, cause: any }[] = [];
+	isRunningReactions = false;
 
 	/**
 	 * Is it allowed to change observables at this point?

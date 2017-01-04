@@ -24,7 +24,7 @@ export function createTransformer<A, B>(transformer: ITransformer<A, B>, onClean
 			super.onBecomeUnobserved();
 			delete objectCache[this.sourceIdentifier];
 			if (onCleanup)
-				onCleanup(lastValue, this.sourceObject);
+				onCleanup(lastValue as any, this.sourceObject);
 		}
 	}
 
