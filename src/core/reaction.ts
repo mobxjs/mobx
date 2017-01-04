@@ -111,16 +111,42 @@ export class Reaction implements IDerivation, IReactionPublic {
 		endBatch();
 	}
 
-	reportExceptionInDerivation(derivation: IDerivation, cause: Error) {
+	reportExceptionInDerivation(derivation: IDerivation, error: any) {
 		const message = `[mobx] Catched uncaught exception that was thrown by a reaction or observer component, in: '${derivation}`;
-		console.error(message, cause);
+		const messageToUser = `
+		Hi there! I'm sorry you have just run into an exception.
+
+		If your debugger ends up here, know that some reaction (like the render() of an observer component, autorun or reaction)
+		threw an exception and that mobx catched it, too avoid that it brings the rest of your application down.
+
+		The original cause of the exception (the code that caused this reaction to run (again)), is still in the stack.
+
+		However, more interesting is the actual stack trace of the error itself.
+		Hopefully the error is an instanceof Error, because in that case you can inspect the original stack of the error from where it was thrown.
+		See \`error.stack\` property, or press the very subtle "(...)" link you see near the console.error message that probably brought you here.
+		That stack is more interesting than the stack of this console.error itself.
+
+		If the exception you see is an exception you created yourself, make sure to use \`throw new Error("Oops")\` instead of \`throw "Oops"\`,
+		because the javascript environment will only preserve the original stack trace in the first form.
+
+		You can also make sure the debugger pauses the next time this very same exception is thrown by enabling "Pause on caught exception".
+		(Note that it might pause on many other, unrelated exception as well).
+
+		If that all doesn't help you out, feel free to open an issue https://github.com/mobxjs/mobx/issues!
+		`;
+
+		console.error(message || messageToUser /* latter will not be true, make sure uglify doesn't remove */, error);
+			/** If debugging brough you here, please, read the above message :-). Tnx! */
+
 		if (isSpyEnabled()) {
 			spyReport({
 				type: "error",
 				message,
-				cause
+				error,
+				object: derivation
 			});
 		}
+		// TODO: introduce per reaction handler
 		// TODO: introduce global handler
 	}
 
