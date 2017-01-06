@@ -9,7 +9,6 @@ test('correct api should be exposed', function(t) {
 		'IObservableFactories',
 		'ObservableMap',
 		'Reaction',
-		'_',
 		'action',
 		'asFlat',
 		'asMap',
@@ -50,16 +49,9 @@ test('correct api should be exposed', function(t) {
 		return mobx[key] == undefined;
 	}).length, 0);
 
-	t.deepEquals(Object.keys(mobx._).sort(), [
-		'getAdministration',
-		'resetGlobalState'
-	]);
-	t.equals(Object.keys(mobx._).filter(function(key) {
-		return mobx._[key] == undefined;
-	}).length, 0);
-
 	t.deepEquals(Object.keys(mobx.extras).sort(), [
 			'allowStateChanges',
+			'getAdministration',
 			'getAtom',
 			'getDebugName',
 			'getDependencyTree',

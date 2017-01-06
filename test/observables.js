@@ -896,7 +896,7 @@ function stripSpyOutput(events) {
 }
 
 test('issue 50', function(t) {
-    m._.resetGlobalState();
+    m.extras.resetGlobalState();
     mobx.extras.getGlobalState().mobxGuid = 0;
     var x = observable({
         a: true,
@@ -952,7 +952,7 @@ test('issue 50', function(t) {
 });
 
 test('verify transaction events', function(t) {
-    m._.resetGlobalState();
+    m.extras.resetGlobalState();
     mobx.extras.getGlobalState().mobxGuid = 0;
 
     var x = observable({
@@ -1023,7 +1023,7 @@ test("verify array in transaction", function(t) {
 })
 
 test('delay autorun until end of transaction', function(t) {
-    m._.resetGlobalState();
+    m.extras.resetGlobalState();
     mobx.extras.getGlobalState().mobxGuid = 0;
     var events = [];
     var x = observable({

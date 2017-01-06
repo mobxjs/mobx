@@ -3,7 +3,7 @@ var mobx = require('..');
 var m = mobx;
 
 test('treeD', function(t) {
-    m._.resetGlobalState();
+    m.extras.resetGlobalState();
     mobx.extras.getGlobalState().mobxGuid = 0;
     var a = m.observable(3);
     var aName = 'ObservableValue@1';
@@ -71,7 +71,7 @@ test('treeD', function(t) {
 })
 
 test('names', function(t) {
-    m._.resetGlobalState();
+    m.extras.resetGlobalState();
     mobx.extras.getGlobalState().mobxGuid = 0;
 
     var struct = {
@@ -136,7 +136,7 @@ function stripTrackerOutput(output) {
 }
 
 test('spy 1', function(t) {
-    m._.resetGlobalState();
+    m.extras.resetGlobalState();
     var lines = [];
 
     var a = m.observable(3);
@@ -299,7 +299,7 @@ test('get administration', function(t) {
 	var g = new Clazz();
 
 	function adm(thing, prop) {
-		return mobx._.getAdministration(thing, prop).constructor.name;
+		return mobx.extras.getAdministration(thing, prop).constructor.name;
 	}
 
 	var ovClassName = mobx.observable(3).constructor.name;

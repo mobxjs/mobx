@@ -68,7 +68,7 @@ test('isObservable', function(t) {
 })
 
 test('observable1', function(t) {
-    m._.resetGlobalState();
+    m.extras.resetGlobalState();
 
     // recursive structure
     var x = m.observable({

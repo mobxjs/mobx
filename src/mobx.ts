@@ -73,6 +73,7 @@ export const extras = {
 	getAtom,
 	getDebugName,
 	getDependencyTree,
+	getAdministration,
 	getGlobalState,
 	getObserverTree,
 	isComputingDerivation,
@@ -83,12 +84,6 @@ export const extras = {
 	spyReportEnd,
 	spyReportStart,
 	setReactionScheduler
-};
-
-// Experimental or internal api's (exposed for testing for example)
-export const _ = {
-	getAdministration,
-	resetGlobalState
 };
 
 declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: ((any) => void)};
