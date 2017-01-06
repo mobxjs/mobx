@@ -670,7 +670,7 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 		t.end()
 	})
 
-	test.skip("it should be possible to handle exceptions in reaction", t => {
+	test("it should be possible to handle exceptions in reaction", t => {
 
 		const a = mobx.observable(1)
 		const d = mobx.autorun(function() {
@@ -686,7 +686,7 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 		t.deepEqual(errors, [2, 3])
 		d()
 
-		checkGlobalState()
+		checkGlobalState(t)
 		t.end()
 	})
 

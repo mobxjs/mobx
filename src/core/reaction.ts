@@ -1,7 +1,7 @@
 import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, shouldCompute, isCaughtException} from "./derivation";
 import {IObservable, startBatch, endBatch} from "./observable";
-import {globalState, resetGlobalState} from "./globalstate";
-import {createInstanceofPredicate, getNextId, Lambda, unique, joinStrings} from "../utils/utils";
+import {globalState} from "./globalstate";
+import {createInstanceofPredicate, getNextId, invariant, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
 
 /**
@@ -24,7 +24,13 @@ import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
  */
 
 export interface IReactionPublic {
-	dispose: () => void;
+	dispose: IReactionDisposer;
+}
+
+export interface IReactionDisposer {
+	(): void;
+	$mobx?: Reaction;
+	onError?(handler: (error: any, derivation: IDerivation) => void);
 }
 
 export class Reaction implements IDerivation, IReactionPublic {
@@ -39,6 +45,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 	_isScheduled = false;
 	_isTrackPending = false;
 	_isRunning = false;
+	errorHandler: (error: any, derivation: IDerivation) => void;
 
 	constructor(public name: string = "Reaction@" + getNextId(), private onInvalidate: () => void) { }
 
@@ -112,6 +119,11 @@ export class Reaction implements IDerivation, IReactionPublic {
 	}
 
 	reportExceptionInDerivation(error: any) {
+		if (this.errorHandler) {
+			this.errorHandler(error, this);
+			return;
+		}
+
 		const message = `[mobx] Catched uncaught exception that was thrown by a reaction or observer component, in: '${this}`;
 		const messageToUser = `
 		Hi there! I'm sorry you have just run into an exception.
@@ -159,9 +171,10 @@ export class Reaction implements IDerivation, IReactionPublic {
 		}
 	}
 
-	getDisposer(): Lambda & { $mosbservable: Reaction } {
+	getDisposer(): IReactionDisposer {
 		const r = this.dispose.bind(this);
 		r.$mobx = this;
+		r.onError = registerErrorHandler;
 		return r;
 	}
 
@@ -184,6 +197,12 @@ WhyRun? reaction '${this.name}':
 `
 		);
 	}
+}
+
+function registerErrorHandler(handler) {
+	invariant(this && this.$mobx && isReaction(this.$mobx), "Invalid `this`");
+	invariant(!this.$mobx.errorHandler, "Only one onErrorHandler can be registered");
+	this.$mobx.errorHandler = handler;
 }
 
 /**
