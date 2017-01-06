@@ -114,7 +114,7 @@ export function checkIfStateModificationsAreAllowed() {
  * The tracking information is stored on the `derivation` object and the derivation is registered
  * as observer of any of the accessed observables.
  */
-export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
+export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, context) {
 	// pre allocate array allocation + room for variation in deps
 	// array will be trimmed by bindDependencies
 	changeDependenciesStateTo0(derivation);
@@ -125,7 +125,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	globalState.trackingDerivation = derivation;
 	let result;
 	try {
-		result = f.call(derivation);
+		result = f.call(context);
 	} catch (e) {
 		result = new CaughtException(e);
 	}

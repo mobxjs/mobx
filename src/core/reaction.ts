@@ -94,7 +94,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 			});
 		}
 		this._isRunning = true;
-		const result = trackDerivedFunction(this, fn);
+		const result = trackDerivedFunction(this, fn, undefined);
 		this._isRunning = false;
 		this._isTrackPending = false;
 		if (this.isDisposed) {

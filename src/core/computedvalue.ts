@@ -65,27 +65,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 			this.setter = createAction(name + "-setter", setter) as any;
 	}
 
-	public peek(): T {
-		const res = this.deriveValue();
-		if (isCaughtException(res))
-			throw res.cause;
-		return res;
-	}
-
-	deriveValue() {
-		this.isComputing = true;
-		const prevAllowStateChanges = allowStateChangesStart(false);
-		let res: T | CaughtException;
-		try { // TODO: double try / catch! here and in derivation.derive (called trough compute & track)
-			res = this.derivation.call(this.scope);
-		} catch (e) {
-			res = new CaughtException(e);
-		}
-		allowStateChangesEnd(prevAllowStateChanges);
-		this.isComputing = false;
-		return res;
-	};
-
 	onBecomeStale() {
 		propagateMaybeChanged(this);
 	}
@@ -108,7 +87,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 			// because it will never be called again inside this batch
 			startBatch();
 			if (shouldCompute(this))
-				this.value = this.deriveValue();
+				this.value = this.computeValue(false);
 			endBatch();
 		} else {
 			reportObserved(this);
@@ -121,6 +100,13 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		if (isCaughtException(result))
 			throw result.cause;
 		return result;
+	}
+
+	public peek(): T {
+		const res = this.computeValue(false);
+		if (isCaughtException(res))
+			throw res.cause;
+		return res;
 	}
 
 	public set(value: T) {
@@ -146,9 +132,27 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 			});
 		}
 		const oldValue = this.value;
-		const newValue = this.value = trackDerivedFunction(this, this.deriveValue);
+		const newValue = this.value = this.computeValue(true);
 		return isCaughtException(newValue) || valueDidChange(this.compareStructural, newValue, oldValue);
 	}
+
+	computeValue(track: boolean) {
+		this.isComputing = true;
+		const prevAllowStateChanges = allowStateChangesStart(false);
+		let res: T | CaughtException;
+		if (track) {
+			res = trackDerivedFunction(this, this.derivation, this.scope);
+		} else {
+			try {
+				res = this.derivation.call(this.scope);
+			} catch (e) {
+				res = new CaughtException(e);
+			}
+		}
+		allowStateChangesEnd(prevAllowStateChanges);
+		this.isComputing = false;
+		return res;
+	};
 
 	observe(listener: (newValue: T, oldValue: T | undefined) => void, fireImmediately?: boolean): Lambda {
 		let firstTime = true;
