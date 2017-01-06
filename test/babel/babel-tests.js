@@ -94,8 +94,8 @@ test('decorators', function(t) {
 
 	var events = [];
 	var d1 = observe(o, (ev) => events.push(ev.name, ev.oldValue));
-	var d2 = observe(o, 'price', (newValue, oldValue) => events.push(newValue, oldValue));
-	var d3 = observe(o, 'total', (newValue, oldValue) => events.push(newValue, oldValue));
+	var d2 = observe(o, 'price', (ev) => events.push(ev.newValue, ev.oldValue));
+	var d3 = observe(o, 'total', (ev) => events.push(ev.newValue, ev.oldValue));
 
 	o.price = 4;
 

@@ -11,8 +11,8 @@ var voidObserver = function(){};
 
 function buffer() {
     var b = [];
-    var res = function(newValue) {
-        b.push(newValue);
+    var res = function(x) {
+        b.push(x.newValue);
     };
     res.toArray = function() {
         return b;
@@ -746,7 +746,7 @@ test('nested observable2', function(t) {
     });
 
     var b = [];
-    var sub = m.observe(total, function(x) { b.push(x); }, true);
+    var sub = m.observe(total, function(x) { b.push(x.newValue); }, true);
 
     price.set(150);
     factor.set(7); // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
@@ -777,7 +777,7 @@ test('expr', function(t) {
     });
 
     var b = [];
-    var sub = m.observe(total, function(x) { b.push(x); }, true);
+    var sub = m.observe(total, function(x) { b.push(x.newValue); }, true);
 
     price.set(150);
     factor.set(7); // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
@@ -870,7 +870,7 @@ test('expr2', function(t) {
     });
 
     var b = [];
-    var sub = m.observe(total, function(x) { b.push(x); }, true);
+    var sub = m.observe(total, function(x) { b.push(x.newValue); }, true);
 
     price.set(150);
     factor.set(7); // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation

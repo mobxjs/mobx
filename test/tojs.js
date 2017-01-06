@@ -72,8 +72,8 @@ test('json2', function(t) {
     var ab = [];
     var tb = [];
 
-    m.observe(analyze, function(d) { ab.push(d); }, true);
-    m.observe(alltags, function(d) { tb.push(d); }, true);
+    m.observe(analyze, function(d) { ab.push(d.newValue); }, true);
+    m.observe(alltags, function(d) { tb.push(d.newValue); }, true);
 
     o.todos[0].details.url = "boe";
     o.todos[1].details.url = "ba";

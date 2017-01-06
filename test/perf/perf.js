@@ -132,8 +132,8 @@ test('lots of unused computables', function(t) {
     });
 
     var sum = 0;
-    var subscription = mobx.observe(b, function(newValue) {
-        sum = newValue;
+    var subscription = mobx.observe(b, function(e) {
+        sum = e.newValue;
     }, true);
 
     t.equal(sum, 49995000);

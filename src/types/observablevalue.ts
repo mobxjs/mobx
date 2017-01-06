@@ -12,6 +12,10 @@ export interface IValueWillChange<T> {
 	newValue: T;
 }
 
+export interface IValueDidChange<T> extends IValueWillChange<T> {
+	oldValue: T | undefined;
+}
+
 export type IUNCHANGED = {};
 
 export const UNCHANGED: IUNCHANGED = {};
@@ -20,7 +24,7 @@ export interface IObservableValue<T> {
 	get(): T;
 	set(value: T): void;
 	intercept(handler: IInterceptor<IValueWillChange<T>>): Lambda;
-	observe(listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
+	observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda;
 }
 
 export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable {
@@ -76,8 +80,14 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 		const oldValue = this.value;
 		this.value = newValue;
 		this.reportChanged();
-		if (hasListeners(this))
-			notifyListeners(this, [newValue, oldValue]); // in 3.0, use an object instead!
+		if (hasListeners(this)) {
+			notifyListeners(this, {
+				type: "update",
+				object: this,
+				newValue,
+				oldValue
+			});
+		}
 	}
 
 	public get(): T {
@@ -89,9 +99,14 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 		return registerInterceptor(this, handler);
 	}
 
-	public observe(listener: (newValue: T, oldValue: T | undefined) => void, fireImmediately?: boolean): Lambda {
+	public observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {
 		if (fireImmediately)
-			listener(this.value, undefined);
+			listener({
+				object: this,
+				type: "update",
+				newValue: this.value,
+				oldValue: undefined
+			});
 		return registerListener(this, listener);
 	}
 

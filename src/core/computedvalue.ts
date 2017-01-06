@@ -5,11 +5,12 @@ import {allowStateChangesStart, allowStateChangesEnd, createAction} from "./acti
 import {createInstanceofPredicate, getNextId, valueDidChange, invariant, Lambda, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "../core/spy";
 import {autorun} from "../api/autorun";
+import {IValueDidChange} from "../types/observablevalue";
 
 export interface IComputedValue<T> {
 	get(): T;
 	set(value: T): void;
-	observe(listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
+	observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda;
 }
 
 /**
@@ -157,14 +158,19 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		return valueDidChange(this.compareStructural, newValue, oldValue);
 	}
 
-	observe(listener: (newValue: T, oldValue: T | undefined) => void, fireImmediately?: boolean): Lambda {
+	observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {
 		let firstTime = true;
 		let prevValue: T | undefined = undefined;
 		return autorun(() => {
 			let newValue = this.get();
 			if (!firstTime || fireImmediately) {
 				const prevU = untrackedStart();
-				listener(newValue, prevValue);
+				listener({
+					type: "update",
+					object: this,
+					newValue,
+					oldValue: prevValue
+				});
 				untrackedEnd(prevU);
 			}
 			firstTime = false;

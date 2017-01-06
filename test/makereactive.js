@@ -8,8 +8,8 @@ var voidObserver = function(){};
 
 function buffer() {
     var b = [];
-    var res = function(newValue) {
-        b.push(newValue);
+    var res = function(x) {
+        b.push(x);
     };
     res.toArray = function() {
         return b;
@@ -161,7 +161,7 @@ test('observable4', function(t) {
     var b = buffer();
     m.observe(m.computed(function() {
         return x.map(function(d) { return d.x });
-    }), b, true);
+	}), x => b(x.newValue), true);
 
     x[0].x = 3;
     x.shift();
@@ -177,7 +177,7 @@ test('observable4', function(t) {
     var b2 = buffer();
     m.observe(m.computed(function() {
         return x2.map(function(d) { return d.x });
-    }), b2, true);
+    }), x => b2(x.newValue), true);
 
     x2[0].x = 3;
     x2.shift();
