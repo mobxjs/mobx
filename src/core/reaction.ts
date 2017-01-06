@@ -102,7 +102,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 			clearObserving(this);
 		}
 		if (isCaughtException(result))
-			this.reportExceptionInDerivation(this, result.cause);
+			this.reportExceptionInDerivation(result.cause);
 		if (notify) {
 			spyReportEnd({
 				time: Date.now() - startTime
@@ -111,8 +111,8 @@ export class Reaction implements IDerivation, IReactionPublic {
 		endBatch();
 	}
 
-	reportExceptionInDerivation(derivation: IDerivation, error: any) {
-		const message = `[mobx] Catched uncaught exception that was thrown by a reaction or observer component, in: '${derivation}`;
+	reportExceptionInDerivation(error: any) {
+		const message = `[mobx] Catched uncaught exception that was thrown by a reaction or observer component, in: '${this}`;
 		const messageToUser = `
 		Hi there! I'm sorry you have just run into an exception.
 
@@ -143,11 +143,9 @@ export class Reaction implements IDerivation, IReactionPublic {
 				type: "error",
 				message,
 				error,
-				object: derivation
+				object: this
 			});
 		}
-		// TODO: introduce per reaction handler
-		// TODO: introduce global handler
 	}
 
 	dispose() {
@@ -214,8 +212,8 @@ function runReactionsHelper() {
 	// we converge to no remaining reactions after a while.
 	while (allReactions.length > 0) {
 		if (++iterations === MAX_REACTION_ITERATIONS) {
-			resetGlobalState();
-			throw new Error(`Reaction doesn't converge to a stable state after ${MAX_REACTION_ITERATIONS} iterations.`
+			allReactions.splice(0); // clear reactions
+			console.error(`Reaction doesn't converge to a stable state after ${MAX_REACTION_ITERATIONS} iterations.`
 				+ ` Probably there is a cycle in the reactive function: ${allReactions[0]}`);
 		}
 		let remainingReactions = allReactions.splice(0);

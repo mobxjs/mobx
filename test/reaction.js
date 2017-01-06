@@ -255,22 +255,3 @@ test("#278 do not rerun if expr output doesn't change structurally", t => {
 	]);
 	t.end();
 })
-
-test("throws when the max iterations over reactions are done", t => {
-	var foo = mobx.observable({
-		a: 1,
-	});
-
-	mobx.autorun("bar", () => {
-		var x = foo.a;
-		foo.a = Math.random();
-	});
-
-	 t.throws(
-		() => foo.a++,
-		new RegExp("Reaction doesn't converge to a stable state after 100 iterations\\. "
-			+ "Probably there is a cycle in the reactive function: Reaction\\[bar\\]")
-	);
-	mobx.extras.resetGlobalState();
-	t.end();
-})

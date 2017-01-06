@@ -237,9 +237,9 @@ test('throw error if modification loop', function(t) {
     var dis = m.autorun(function() {
         x.set(x.get() + 1); // is allowed to throw, but doesn't as the observables aren't bound yet during first execution
     });
-    t.throws(() => {
+    utils.consoleError(t, () => {
         x.set(5);
-    }, "Reaction doesn't converge to a stable state")
+    }, /Reaction doesn't converge to a stable state/)
 	checkGlobalState(t);
     t.end();
 })
@@ -286,6 +286,24 @@ test('cycle4', function(t) {
 	checkGlobalState(t);
     t.end();
 });
+
+test("throws when the max iterations over reactions are done", t => {
+	var foo = mobx.observable({
+		a: 1,
+	});
+
+	mobx.autorun("bar", () => {
+		var x = foo.a;
+		foo.a = Math.random();
+	});
+
+	utils.consoleError(t,
+		() => foo.a++,
+		/Reaction doesn't converge to a stable state after 100 iterations/
+	);
+	mobx.extras.resetGlobalState();
+	t.end();
+})
 
 test('issue 86, converging cycles', function(t) {
     function findIndex(arr, predicate) {
@@ -649,6 +667,50 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 		t.equal(b.get(), 3)
 
 		checkGlobalState(t)
+		t.end()
+	})
+
+	test.skip("it should be possible to handle exceptions in reaction", t => {
+
+		const a = mobx.observable(1)
+		const d = mobx.autorun(function() {
+			throw a.get()
+		})
+
+		const errors = []
+		d.onError(e => errors.push(e))
+
+		a.set(2)
+		a.set(3)
+
+		t.deepEqual(errors, [2, 3])
+		d()
+
+		checkGlobalState()
+		t.end()
+	})
+
+
+	test.skip("it should be possible to handle global errors in reactions", t => {
+
+		const a = mobx.observable(1)
+		const errors = []
+		const d2 = mobx.extras.onError (e => errors.push(e))
+
+		const d = mobx.autorun(function() {
+			throw a.get()
+		})
+
+		a.set(2)
+		a.set(3)
+
+		d2()
+		a.set(4)
+
+		t.deepEqual(errors, [2, 3])
+		d()
+
+		checkGlobalState()
 		t.end()
 	})
 
