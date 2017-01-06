@@ -158,6 +158,8 @@ export class Reaction implements IDerivation, IReactionPublic {
 				object: this
 			});
 		}
+
+		globalState.globalReactionErrorHandlers.forEach(f => f(error, this));
 	}
 
 	dispose() {
@@ -203,6 +205,15 @@ function registerErrorHandler(handler) {
 	invariant(this && this.$mobx && isReaction(this.$mobx), "Invalid `this`");
 	invariant(!this.$mobx.errorHandler, "Only one onErrorHandler can be registered");
 	this.$mobx.errorHandler = handler;
+}
+
+export function onReactionError(handler: (error: any, derivation: IDerivation) => void): () => void {
+	globalState.globalReactionErrorHandlers.push(handler);
+	return () => {
+		const idx = globalState.globalReactionErrorHandlers.indexOf(handler);
+		if (idx >= 0)
+			globalState.globalReactionErrorHandlers.splice(idx, 1);
+	};
 }
 
 /**

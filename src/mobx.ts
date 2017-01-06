@@ -58,7 +58,7 @@ export { Iterator                                             } from "./utils/it
 export { IObserverTree, IDependencyTree                       } from "./api/extras";
 
 import { resetGlobalState, shareGlobalState, getGlobalState } from "./core/globalstate";
-
+import { IDerivation } from "./core/derivation";
 import { IDepTreeNode } from "./core/observable";
 import { IObserverTree, IDependencyTree, getDependencyTree, getObserverTree } from "./api/extras";
 import { getDebugName, getAtom, getAdministration } from "./types/type-utils";
@@ -66,7 +66,7 @@ import { allowStateChanges } from "./core/action";
 import { spyReport, spyReportEnd, spyReportStart, isSpyEnabled } from "./core/spy";
 import { Lambda } from "./utils/utils";
 import { isComputingDerivation } from "./core/derivation";
-import { setReactionScheduler } from "./core/reaction";
+import { setReactionScheduler, onReactionError } from "./core/reaction";
 
 export const extras = {
 	allowStateChanges,
@@ -78,6 +78,7 @@ export const extras = {
 	getObserverTree,
 	isComputingDerivation,
 	isSpyEnabled,
+	onReactionError,
 	resetGlobalState,
 	shareGlobalState,
 	spyReport,

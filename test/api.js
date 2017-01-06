@@ -59,6 +59,7 @@ test('correct api should be exposed', function(t) {
 			'getObserverTree',
 			'isComputingDerivation',
 			'isSpyEnabled',
+			'onReactionError',
 			'resetGlobalState',
 			'setReactionScheduler',
 			'shareGlobalState',

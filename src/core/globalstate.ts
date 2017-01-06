@@ -74,6 +74,11 @@ export class MobXGlobals {
 	 * Spy callbacks
 	 */
 	spyListeners: {(change: any): void}[] = [];
+
+	/**
+	 * Globally attached error handlers that react specifically to errors in reactions
+	 */
+	globalReactionErrorHandlers: ((error: any, derivation: IDerivation) => void)[] = [];
 }
 
 export let globalState: MobXGlobals = new MobXGlobals();
