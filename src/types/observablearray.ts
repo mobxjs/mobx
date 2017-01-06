@@ -256,7 +256,7 @@ export class ObservableArray<T> extends StubArray {
 
 	concat(...arrays: T[][]): T[] {
 		this.$mobx.atom.reportObserved();
-		return Array.prototype.concat.apply((this as any).slice(), arrays.map(a => isObservableArray(a) ? a.slice() : a));
+		return Array.prototype.concat.apply((this as any).peek(), arrays.map(a => isObservableArray(a) ? a.peek() : a));
 	}
 
 	replace(newItems: T[]) {
