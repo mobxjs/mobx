@@ -134,22 +134,17 @@ const ticker = new Ticker()
 setInterval(ticker.increment, 1000)
 ```
 
-### MobX will no longer share global state by default
+### Improve error handling
 
-For historical reasons (at Mendix), MobX had a feature that it would warn if different versions of the MobX package are being loaded into the same javascript runtime multiple times.
-This is because multiple instances by default try to share their state.
-This allows reactions from one package to react to observables created by another package,
-even when both packages where shipped with their own (embedded) version of MobX (!).
+Error handling in MobX has been made more consistent. In MobX 2 there was a best-effort recovery attempt if a derivation throws, but MobX 3 introduced
+more consistent behavior:
 
-Obviously this is a nasty default as it breaks package isolation and might actually start to throw errors unintentionally when MobX is loaded multiple times in the same runtime by completely unrelated packages.
-So this sharing behavior is now by default turned off.
-Sharing MobX should be achieved by means of proper bundling, de-duplication of packages or using peer dependencies / externals if needed.
-This is similar to packages like React, which will also bail out if you try to load it multiple times.
+* Computed values that throw, store the exception and throw it to the next consumer(s). They keep tracking their data, so they are able to recover from exceptions in next re-runs.
+* Reactions (like `autorun`, `when`, `reaction`, `render()`  of `observer` components) will always catch their exceptions, and just log the error. They will keep tracking their data, so they are able to recover in next re-runs.
+* The disposer of a reaction exposes an `onError(handler)` method, which makes it possible to attach custom error handling logic to an reaction (that overrides the default logging behavior).
+* `extras.onReactionError(handler)` can be used to register a global onError handler for reactions (will fire after spy "error" event). This can be useful in tests etc.
 
-If you still want to use the old behavior, this can be achieved by running `mobx.extras.shareGlobalState()` on _all_ packages that want to share state with each other.
-Since this behavior is probably not used outside Mendix, it has been deprecated immediately, so if you rely on this feature, please report in #621, so that it can be undeprecated if there is no more elegant solution.
-
-See [#621](https://github.com/mobxjs/mobx/issues/621)
+See [#731](https://github.com/mobxjs/mobx/issues/731)
 
 ### Flow-Types Support 🎉🎉🎉
 
@@ -167,8 +162,26 @@ const sum: IComputedValue<number> = computed(() => {
 
 See [#640](https://github.com/mobxjs/mobx/issues/640)
 
+### MobX will no longer share global state by default
+
+For historical reasons (at Mendix), MobX had a feature that it would warn if different versions of the MobX package are being loaded into the same javascript runtime multiple times.
+This is because multiple instances by default try to share their state.
+This allows reactions from one package to react to observables created by another package,
+even when both packages where shipped with their own (embedded) version of MobX (!).
+
+Obviously this is a nasty default as it breaks package isolation and might actually start to throw errors unintentionally when MobX is loaded multiple times in the same runtime by completely unrelated packages.
+So this sharing behavior is now by default turned off.
+Sharing MobX should be achieved by means of proper bundling, de-duplication of packages or using peer dependencies / externals if needed.
+This is similar to packages like React, which will also bail out if you try to load it multiple times.
+
+If you still want to use the old behavior, this can be achieved by running `mobx.extras.shareGlobalState()` on _all_ packages that want to share state with each other.
+Since this behavior is probably not used outside Mendix, it has been deprecated immediately, so if you rely on this feature, please report in #621, so that it can be undeprecated if there is no more elegant solution.
+
+See [#621](https://github.com/mobxjs/mobx/issues/621)
+
 ### Other changes
 
+* **Breaking change:** The arguments to `observe` listeners for computed and boxed observables have changed and are now consistent with the other api's. Instead of invoking the callback with `(newValue: T, oldValue: T)` they are now invoked with a single change object: `(change: {newValue: T, oldValue: T, object, type: "update"})`
 * Using transaction is now deprecated, use `action` or `runInAction` instead. Transactions now will enter an `untracked` block as well, just as actions, which removes the conceptual difference.
 * Upgraded to typescript 2
 * It is now possible to pass ES6 Maps to `observable` / observable maps. The map will be converted to an observable map (if keys are string like)
