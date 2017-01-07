@@ -123,7 +123,7 @@ var upperCaseName = computed(() =>
 	name.get().toUpperCase()
 );
 
-var disposer = upperCaseName.observe(name => console.log(name));
+var disposer = upperCaseName.observe(change => console.log(change.newValue));
 
 name.set("Dave");
 // prints: 'DAVE'
@@ -141,3 +141,30 @@ When using `computed` as modifier or as box, it accepts a second options argumen
 ## `@computed.struct` for structural comparison
 
 The `@computed` decorator does not take arguments. If you want to to create a computed property which does structural comparison, use `@computed.struct`.
+
+## Note on error handling
+
+If a computed value throws an exception during it's computation, this exception will be catched and rethrown any time it's value is read.
+It is strongly recommended to always throw `Error`'s, so that the original stack trace is preserved. E.g.: `throw new Error("Uhoh")` instead of `throw "Uhoh"`.
+Throwing exceptions doesn't break tracking, so it is possible for computed values to recover from exceptions.
+
+Example:
+
+```javascript
+const x = observable(3)
+const y = observable(1)
+const divided = computed(() => {
+    if (y.get() === 0)
+        throw new Error("Division by zero")
+    return x.get() / y.get()
+})
+
+divided.get() // returns 3
+
+y.set(0) // OK
+divided.get() // Throws: Division by zero
+divided.get() // Throws: Division by zero
+
+y.set(2)
+divided.get() // Recovered; Returns 1.5
+```

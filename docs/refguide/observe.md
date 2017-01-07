@@ -85,8 +85,8 @@ disposer();
 // Ignore any future updates
 
 // observe a single field
-const disposer2 = observe(person, "lastName", (newValue, oldValue) => {
-	console.log("LastName changed to ", newValue);
+const disposer2 = observe(person, "lastName", (change) => {
+	console.log("LastName changed to ", change.newValue);
 });
 ```
 Related blog: [Object.observe is dead. Long live mobx.observe](https://medium.com/@mweststrate/object-observe-is-dead-long-live-mobservable-observe-ad96930140c5)
@@ -103,7 +103,7 @@ These are the additional fields that are available per type:
 | -- | --- | ---| --| --| -- |
 | Object | add | name | name of the property being added | √ | |
 | | | newValue | the new value being assigned | √ | √ |
-| | update* | name | name of the property being updated | √ |  |
+| | update\* | name | name of the property being updated | √ |  |
 | | | newValue | the new value being assigned | √ | √ |
 | | | oldValue | the value that is replaced |  |  |
 | Array | splice | index | starting index of the splice. Splices are also fired by `push`, `unshift`, `replace` etc. | √ | |
@@ -121,12 +121,8 @@ These are the additional fields that are available per type:
 | | | oldValue | the value that has been replaced | | |
 | | delete | name | the name of the entry that is being removed | √ | |
 | | | oldValue | the value of the entry that was removed | | |
-| Boxed observable | create | newValue | the value that was assigned during creation. Only observable by `spy` | | |
-| | update | newValue | the new value being assigned (only available in `intercept` and `spy`) | √ | √ |
-| | | oldValue | .. the old value. Only available in `spy` | | |
-| | (observe callback) | newValue | first param of the `observe` callback | | |
-| | (observe callback) | oldValue |  second param of the `observe` callback previous value | | |
-| Computed observable | (observe callback) | newValue | first param of the `observe` callback | | |
-| | (observe callback) | oldValue | second param of the `observe` callback | | | |
+| Boxed & computed observables | create | newValue | the value that was assigned during creation. Only available as `spy` event for boxed observables | | |
+| | update | newValue | the new value being assigned | √ | √ |
+| | | oldValue | the previous value of the observable | | |
 
-_* Note that object `update` events won't fire for updated computated values (as those aren't mutations). But it is possible to observe them by explicitly subscribing to the specific property using `observe(object, 'computedPropertyName', listener)`.
+_\* Note that object `update` events won't fire for updated computated values (as those aren't mutations). But it is possible to observe them by explicitly subscribing to the specific property using `observe(object, 'computedPropertyName', listener)`._

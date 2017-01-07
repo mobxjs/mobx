@@ -195,6 +195,13 @@ Usage: `expr(() => someExpression)`. Just a shorthand for `computed(() => someEx
 In general it is simpler and better to just split the function in multiple smaller computed's to achieve the same effect.
 [&laquo;details&raquo;](expr.md)
 
+### `onReactionError`
+
+Usage: `extras.onReactionError(handler: (error: any, derivation) => void)`
+
+This method attaches a global error listener, which is invoked for every error that is thrown from a _reaction_.
+This can be used for monitoring or test purposes.
+
 ------
 
 # Utilities

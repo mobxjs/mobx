@@ -18,7 +18,7 @@ So the signature of object returned by `observable.box(scalar)` is:
 * `.get()` Returns the current value.
 * `.set(value)` Replaces the currently stored value. Notifies all observers.
 * `intercept(interceptor)`. Can be used to intercept changes before they are applied. See [observe & intercept](observe.md)
-* `.observe(callback: (newValue, previousValue) => void, fireImmediately = false): disposerFunction`. Registers an observer function that will fire each time the stored value is replaced. Returns a function to cancel the observer. See [observe & intercept](observe.md)
+* `.observe(callback: (change) => void, fireImmediately = false): disposerFunction`. Registers an observer function that will fire each time the stored value is replaced. Returns a function to cancel the observer. See [observe & intercept](observe.md). The `change` parameter is an object containing both the `newValue` and `oldValue` of the observable.
 
 ### `observable.shallowBox(value)`
 
@@ -39,8 +39,8 @@ const cityName = observable("Vienna");
 console.log(cityName.get());
 // prints 'Vienna'
 
-cityName.observe(function(newCity, oldCity) {
-	console.log(oldCity, "->", newCity);
+cityName.observe(function(change) {
+	console.log(change.oldValue, "->", change.newValue);
 });
 
 cityName.set("Amsterdam");
