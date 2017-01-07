@@ -203,6 +203,7 @@ See [#621](https://github.com/mobxjs/mobx/issues/621)
 * Transactions are no longer reported grouped in spy events. If you want to group events, use actions instead.
 * Normalized `spy` events further. Computed values and actions now report `object` instead of `target` for the scope they have been applied to.
 * The following deprecated methods have been removed:
+  * `transaction`
   * `autorunUntil`
   * `trackTransitions`
   * `fastArray`

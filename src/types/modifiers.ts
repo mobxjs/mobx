@@ -58,7 +58,7 @@ export function shallowEnhancer(v, _, name): any {
 	return fail("The shallow modifier / decorator can only used in combination with arrays, objects and maps");
 }
 
-export function referenceEnhancer(newValue) {
+export function referenceEnhancer(newValue?) {
 	// never turn into an observable
 	return newValue;
 }
