@@ -146,6 +146,16 @@ more consistent behavior:
 
 See [#731](https://github.com/mobxjs/mobx/issues/731)
 
+### Removed error handling, improved error recovery
+
+MobX always printed a warning when an exception was thrown from a computed value, reaction or react component: `[mobx] An uncaught exception occurred while calculating....`.
+This warning was often confusing for people because they either had the impression that this was a mobx exception, while it actually is just informing about an exception that happened in userland code.
+And sometimes, the actual exception was silently caught somewhere else.
+MobX now does not print any warnings anymore, and just makes sure it's internal state is still stable.
+Not throwing or handling an exception is now entirely the responsibility of the user.
+
+Throwing an exception doesn't revert the causing mutation, but it does reset tracking information, which makes it possible to recover from exceptions by changing the state in such a way that a next run of the derivation doesn't throw.
+
 ### Flow-Types Support 🎉🎉🎉
 
 Flow typings have been added by [A-gambit](https://github.com/A-gambit).

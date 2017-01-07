@@ -21,7 +21,7 @@ registerGlobals();
 
 export { IAtom, Atom, BaseAtom                                } from "./core/atom";
 export { IObservable, IDepTreeNode                            } from "./core/observable";
-export { Reaction, IReactionPublic                            } from "./core/reaction";
+export { Reaction, IReactionPublic, IReactionDisposer         } from "./core/reaction";
 export { IDerivation, untracked, IDerivationState             } from "./core/derivation";
 export { useStrict, isStrictModeEnabled                       } from "./core/action";
 export { spy                                                  } from "./core/spy";
@@ -58,7 +58,7 @@ export { Iterator                                             } from "./utils/it
 export { IObserverTree, IDependencyTree                       } from "./api/extras";
 
 import { resetGlobalState, shareGlobalState, getGlobalState } from "./core/globalstate";
-
+import { IDerivation } from "./core/derivation";
 import { IDepTreeNode } from "./core/observable";
 import { IObserverTree, IDependencyTree, getDependencyTree, getObserverTree } from "./api/extras";
 import { getDebugName, getAtom, getAdministration } from "./types/type-utils";
@@ -66,29 +66,25 @@ import { allowStateChanges } from "./core/action";
 import { spyReport, spyReportEnd, spyReportStart, isSpyEnabled } from "./core/spy";
 import { Lambda } from "./utils/utils";
 import { isComputingDerivation } from "./core/derivation";
-import { setReactionScheduler } from "./core/reaction";
+import { setReactionScheduler, onReactionError } from "./core/reaction";
 
 export const extras = {
 	allowStateChanges,
 	getAtom,
 	getDebugName,
 	getDependencyTree,
+	getAdministration,
 	getGlobalState,
 	getObserverTree,
 	isComputingDerivation,
 	isSpyEnabled,
+	onReactionError,
 	resetGlobalState,
 	shareGlobalState,
 	spyReport,
 	spyReportEnd,
 	spyReportStart,
 	setReactionScheduler
-};
-
-// Experimental or internal api's (exposed for testing for example)
-export const _ = {
-	getAdministration,
-	resetGlobalState
 };
 
 declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: ((any) => void)};

@@ -1,7 +1,6 @@
-import {IObservable, IDepTreeNode, addObserver, removeObserver, endBatch} from "./observable";
-import {globalState, resetGlobalState} from "./globalstate";
+import {IObservable, IDepTreeNode, addObserver, removeObserver} from "./observable";
+import {globalState} from "./globalstate";
 import {invariant} from "../utils/utils";
-import {isSpyEnabled, spyReport} from "./spy";
 import {isComputedValue} from "./computedvalue";
 
 export enum IDerivationState {
@@ -43,7 +42,16 @@ export interface IDerivation extends IDepTreeNode {
 	unboundDepsCount: number;
 	__mapid: string;
 	onBecomeStale();
-	recoverFromError();
+}
+
+export class CaughtException {
+	constructor(public cause: any) {
+		// Empty
+	}
+}
+
+export function isCaughtException(e): e is CaughtException {
+	return e instanceof CaughtException;
 }
 
 /**
@@ -61,32 +69,29 @@ export function shouldCompute(derivation: IDerivation): boolean {
 		case IDerivationState.UP_TO_DATE: return false;
 		case IDerivationState.NOT_TRACKING: case IDerivationState.STALE: return true;
 		case IDerivationState.POSSIBLY_STALE: {
-			let hasError = true;
 			const prevUntracked = untrackedStart(); // no need for those computeds to be reported, they will be picked up in trackDerivedFunction.
-			try {
-				const obs = derivation.observing, l = obs.length;
-				for (let i = 0; i < l; i++) {
-					const obj = obs[i];
-					if (isComputedValue(obj)) {
+			const obs = derivation.observing, l = obs.length;
+			for (let i = 0; i < l; i++) {
+				const obj = obs[i];
+				if (isComputedValue(obj)) {
+					try {
 						obj.get();
-						// if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
-						// and `derivation` is an observer of `obj`
-						if ((derivation as any).dependenciesState === IDerivationState.STALE) {
-							hasError = false;
-							untrackedEnd(prevUntracked);
-							return true;
-						}
+					} catch (e) {
+						// we are not interested in the value *or* exception at this moment, but if there is one, notify all
+						untrackedEnd(prevUntracked);
+						return true;
+					}
+					// if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
+					// and `derivation` is an observer of `obj`
+					if ((derivation as any).dependenciesState === IDerivationState.STALE) {
+						untrackedEnd(prevUntracked);
+						return true;
 					}
 				}
-				hasError = false;
-				changeDependenciesStateTo0(derivation);
-				untrackedEnd(prevUntracked);
-				return false;
-			} finally {
-				if (hasError) {
-					changeDependenciesStateTo0(derivation);
-				}
 			}
+			changeDependenciesStateTo0(derivation);
+			untrackedEnd(prevUntracked);
+			return false;
 		}
 	}
 }
@@ -109,7 +114,7 @@ export function checkIfStateModificationsAreAllowed() {
  * The tracking information is stored on the `derivation` object and the derivation is registered
  * as observer of any of the accessed observables.
  */
-export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
+export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, context) {
 	// pre allocate array allocation + room for variation in deps
 	// array will be trimmed by bindDependencies
 	changeDependenciesStateTo0(derivation);
@@ -118,47 +123,15 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	derivation.runId = ++globalState.runId;
 	const prevTracking = globalState.trackingDerivation;
 	globalState.trackingDerivation = derivation;
-	let hasException = true;
-	let result: T;
+	let result;
 	try {
-		result = f.call(derivation);
-		hasException = false;
-		return result;
-	} finally {
-		if (hasException) {
-			handleExceptionInDerivation(derivation);
-		} else {
-			globalState.trackingDerivation = prevTracking;
-			bindDependencies(derivation);
-		}
+		result = f.call(context);
+	} catch (e) {
+		result = new CaughtException(e);
 	}
-}
-
-export function handleExceptionInDerivation(derivation: IDerivation) {
-	const message = (
-		`[mobx] An uncaught exception occurred while calculating your computed value, autorun or transformer. Or inside the render() method of an observer based React component. ` +
-		`These functions should never throw exceptions as MobX will not always be able to recover from them. ` +
-		`Please fix the error reported after this message or enable 'Pause on (caught) exceptions' in your debugger to find the root cause. In: '${derivation.name}'. ` +
-		`For more details see https://github.com/mobxjs/mobx/issues/462`
-	);
-	if (isSpyEnabled()) {
-		spyReport({
-			type: "error",
-			message
-		});
-	}
-	console.warn(message); // In next major, maybe don't emit this message at all?
-	// Poor mans recovery attempt
-	// Assumption here is that this is the only exception handler in MobX.
-	// So functions higher up in the stack (like transanction) won't be modifying the globalState anymore after this call.
-	// (Except for other trackDerivedFunction calls of course, but that is just)
-	changeDependenciesStateTo0(derivation);
-	derivation.newObserving = null;
-	derivation.unboundDepsCount = 0;
-	derivation.recoverFromError();
-	// close current batch, make sure pending unobservations are executed
-	endBatch();
-	resetGlobalState();
+	globalState.trackingDerivation = prevTracking;
+	bindDependencies(derivation);
+	return result;
 }
 
 /**

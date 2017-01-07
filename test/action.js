@@ -2,6 +2,7 @@
 
 var test = require('tape');
 var mobx = require('../');
+var utils = require('./utils/test-utils');
 
 test('action should wrap in transaction', t => {
 	var values = [];
@@ -181,7 +182,7 @@ test('should not be possible to invoke action in a computed block', t => {
 		return a.get();
 	});
 
-	t.throws(() => {
+	utils.consoleError(t, () => {
 		mobx.autorun(() => c.get());
 	}, /Computed values or transformers should not invoke actions or trigger other side effects/, 'expected throw');
 	mobx.extras.resetGlobalState();

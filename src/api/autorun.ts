@@ -1,6 +1,6 @@
 import {Lambda, getNextId, invariant, valueDidChange, fail} from "../utils/utils";
 import {isModifierDescriptor} from "../types/modifiers";
-import {Reaction, IReactionPublic} from "../core/reaction";
+import {Reaction, IReactionPublic, IReactionDisposer} from "../core/reaction";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
 import {action, isAction} from "../api/action";
 
@@ -11,7 +11,7 @@ import {action, isAction} from "../api/action";
  * @param scope (optional)
  * @returns disposer function, which can be used to stop the view from being updated in the future.
  */
-export function autorun(view: (r: IReactionPublic) => void, scope?: any): Lambda;
+export function autorun(view: (r: IReactionPublic) => void, scope?: any): IReactionDisposer;
 
 /**
  * Creates a named reactive view and keeps it alive, so that the view is always
@@ -21,7 +21,7 @@ export function autorun(view: (r: IReactionPublic) => void, scope?: any): Lambda
  * @param scope (optional)
  * @returns disposer function, which can be used to stop the view from being updated in the future.
  */
-export function autorun(name: string, view: (r: IReactionPublic) => void, scope?: any): Lambda;
+export function autorun(name: string, view: (r: IReactionPublic) => void, scope?: any): IReactionDisposer;
 export function autorun(arg1: any, arg2: any, arg3?: any) {
 	let name: string,
 		view: (r: IReactionPublic) => void,
@@ -67,7 +67,7 @@ export function autorun(arg1: any, arg2: any, arg3?: any) {
  * @param scope (optional)
  * @returns disposer function to prematurely end the observer.
  */
-export function when(name: string, predicate: () => boolean, effect: Lambda, scope?: any): Lambda;
+export function when(name: string, predicate: () => boolean, effect: Lambda, scope?: any): IReactionDisposer;
 
 /**
  * Similar to 'observer', observes the given predicate until it returns true.
@@ -104,8 +104,8 @@ export function when(arg1: any, arg2: any, arg3?: any, arg4?: any) {
 	return disposer;
 }
 
-export function autorunAsync(name: string, func: (r: IReactionPublic) => void, delay?: number, scope?: any): Lambda;
-export function autorunAsync(func: (r: IReactionPublic) => void, delay?: number, scope?: any): Lambda;
+export function autorunAsync(name: string, func: (r: IReactionPublic) => void, delay?: number, scope?: any): IReactionDisposer;
+export function autorunAsync(func: (r: IReactionPublic) => void, delay?: number, scope?: any): IReactionDisposer;
 export function autorunAsync(arg1: any, arg2: any, arg3?: any, arg4?: any) {
 	let name: string, func: (r: IReactionPublic) => void, delay: number, scope: any;
 	if (typeof arg1 === "string") {
@@ -163,8 +163,8 @@ export interface IReactionOptions {
  * or
  * autorun(() => action(effect)(expr));
  */
-export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg: T, r: IReactionPublic) => void, opts?: IReactionOptions): Lambda;
-export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately?: boolean): Lambda;
+export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg: T, r: IReactionPublic) => void, opts?: IReactionOptions): IReactionDisposer;
+export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately?: boolean): IReactionDisposer;
 export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg: T, r: IReactionPublic) => void, arg3: any) {
 	if (arguments.length > 3) {
 		fail("reaction only accepts 2 or 3 arguments. If migrating from MobX 2, please provide an options object");

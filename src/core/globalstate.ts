@@ -1,5 +1,5 @@
 import {getGlobal} from "../utils/utils";
-import {IDerivation} from "./derivation";
+import {IDerivation, CaughtException} from "./derivation";
 import {Reaction} from "./reaction";
 import {IObservable} from "./observable";
 
@@ -50,6 +50,11 @@ export class MobXGlobals {
 	pendingReactions: Reaction[] = [];
 
 	/**
+	 * Are we currently processing reactions?
+	 */
+	isRunningReactions = false;
+
+	/**
 	 * Is it allowed to change observables at this point?
 	 * In general, MobX doesn't allow that when running computations and React.render.
 	 * To ensure that those functions stay pure.
@@ -69,6 +74,11 @@ export class MobXGlobals {
 	 * Spy callbacks
 	 */
 	spyListeners: {(change: any): void}[] = [];
+
+	/**
+	 * Globally attached error handlers that react specifically to errors in reactions
+	 */
+	globalReactionErrorHandlers: ((error: any, derivation: IDerivation) => void)[] = [];
 }
 
 export let globalState: MobXGlobals = new MobXGlobals();

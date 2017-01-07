@@ -1,21 +1,12 @@
-var testBase = require('tape');
+var test = require('tape');
 var mobx = require('..');
 var m = mobx;
+var utils = require('./utils/test-utils');
 
 var observable = mobx.observable;
 var computed = mobx.computed;
 
 var voidObserver = function(){};
-
-function test(name, func) {
-    testBase(name, function(t) {
-        try {
-            func(t);
-        } finally {
-            mobx._.resetGlobalState();
-        }
-    });
-}
 
 function buffer() {
     var b = [];
@@ -30,6 +21,7 @@ function buffer() {
 
 function checkGlobalState(t) {
 	const gs = mobx.extras.getGlobalState();
+	t.equal(gs.isRunningReactions, false)
 	t.equal(gs.trackingDerivation, null)
 	t.equal(gs.inBatch, 0)
 	t.equal(gs.allowStateChanges, !gs.strictMode)
@@ -43,6 +35,119 @@ test('exception1', function(t) {
     t.throws(() => a(), "hoi");
 	checkGlobalState(t);
     t.end();
+})
+
+test('exceptions in computed values can be recovered from', t => {
+	var a = observable({
+		x: 1,
+		get y() {
+			if (this.x === 2)
+				throw "Uhoh"
+			return this.x * 2
+		}
+	})
+
+	t.equal(a.y, 2)
+	a.x = 2
+
+	t.throws(() => a.y, /Uhoh/)
+
+	checkGlobalState(t)
+
+	a.x = 3
+	t.equal(a.y, 6)
+	checkGlobalState(t)
+	t.end()
+})
+
+test('exception when starting autorun can be recovered from', t => {
+	var b = undefined
+	var a = observable({
+		x: 2,
+		get y() {
+			if (this.x === 2)
+				throw "Uhoh"
+			return this.x * 2
+		}
+	})
+
+	utils.consoleError(t, () => {
+		mobx.autorun(() => { b = a.y })
+	}, /Uhoh/)
+	t.equal(b, undefined)
+	checkGlobalState(t)
+	a.x = 3
+	t.equal(b, 6)
+	checkGlobalState(t)
+	t.equal(mobx.extras.getAtom(a, "y").observers.length, 1)
+	t.end()
+})
+
+test('exception in autorun can be recovered from', t => {
+	var b = undefined
+	var a = observable({
+		x: 1,
+		get y() {
+			if (this.x === 2)
+				throw "Uhoh"
+			return this.x * 2
+		}
+	})
+
+	var d = mobx.autorun(() => { b = a.y })
+	t.equal(a.y, 2)
+	t.equal(b, 2)
+	t.equal(mobx.extras.getAtom(a, "y").observers.length, 1)
+
+	utils.consoleError(t, () => {
+		a.x = 2
+	}, /Uhoh/)
+
+	// exception is also rethrown to each consumer
+	t.throws(() => {
+		t.equal(a.y, 2) // old cached value!
+	}, /Uhoh/)
+	t.equal(mobx.extras.getAtom(a, "y").observers.length, 1)
+
+	t.equal(b, 2)
+	checkGlobalState(t)
+
+	a.x = 3
+	t.equal(a.y, 6)
+	t.equal(b, 6)
+	checkGlobalState(t)
+	t.equal(mobx.extras.getAtom(a, "y").observers.length, 1)
+	d()
+	t.equal(mobx.extras.getAtom(a, "y").observers.length, 0)
+	t.end()
+})
+
+test('multiple autoruns with exceptions are handled correctly', t => {
+	var a = mobx.observable(1)
+	var values = []
+	var d1 = mobx.autorun(() => values.push("a" + a.get()))
+	var d2 = mobx.autorun(() => {
+		if (a.get() === 2)
+			throw /Uhoh/
+		values.push("b" + a.get())
+	})
+	var d3 = mobx.autorun(() => values.push("c" + a.get()))
+
+	t.deepEqual(values, ["a1", "b1", "c1"])
+	values.splice(0)
+
+	utils.consoleError(t,() => a.set(2), /Uhoh/)
+	checkGlobalState(t)
+
+	t.deepEqual(values.sort(), ["a2", "c2"]) // order is irrelevant
+	values.splice(0)
+
+	a.set(3)
+	t.deepEqual(values.sort(), ["a3", "b3", "c3"]) // order is irrelevant
+
+	checkGlobalState(t)
+	d1(); d2(); d3()
+	t.end()
 })
 
 test('deny state changes in views', function(t) {
@@ -132,18 +237,18 @@ test('throw error if modification loop', function(t) {
     var dis = m.autorun(function() {
         x.set(x.get() + 1); // is allowed to throw, but doesn't as the observables aren't bound yet during first execution
     });
-    t.throws(() => {
+    utils.consoleError(t, () => {
         x.set(5);
-    }, "Reaction doesn't converge to a stable state")
+    }, /Reaction doesn't converge to a stable state/)
 	checkGlobalState(t);
     t.end();
 })
 
 test('cycle1', function(t) {
-    t.throws(() => {
-        var p = computed(function() { return p() * 2; }); // thats a cycle!
+	var p = computed(function() { return p.get() * 2; }); // thats a cycle!
+    utils.consoleError(t, () => {
         p.observe(voidObserver, true);
-    }, "Found cyclic dependency");
+    }, /Cycle detected/);
 	checkGlobalState(t);
     t.end();
 })
@@ -167,7 +272,7 @@ test('cycle3', function(t) {
     t.end();
 })
 
-test('cycle3', function(t) {
+test('cycle4', function(t) {
     var z = observable(true);
     var a = computed(function() { return z.get() ? 1 : b.get() * 2; });
     var b = computed(function() { return a.get() * 2; });
@@ -175,12 +280,30 @@ test('cycle3', function(t) {
     m.observe(b, voidObserver);
     t.equal(1, a.get());
 
-    t.throws(() => {
+    utils.consoleError(t, () => {
         z.set(false); // introduces a cycle!
-    }, "Found cyclic dependency");
+    }, /Cycle detected/);
 	checkGlobalState(t);
     t.end();
 });
+
+test("throws when the max iterations over reactions are done", t => {
+	var foo = mobx.observable({
+		a: 1,
+	});
+
+	mobx.autorun("bar", () => {
+		var x = foo.a;
+		foo.a = Math.random();
+	});
+
+	utils.consoleError(t,
+		() => foo.a++,
+		/Reaction doesn't converge to a stable state after 100 iterations/
+	);
+	mobx.extras.resetGlobalState();
+	t.end();
+})
 
 test('issue 86, converging cycles', function(t) {
     function findIndex(arr, predicate) {
@@ -287,9 +410,9 @@ test('error handling assistence ', function(t) {
         }
 
         t.deepEqual(values, [6, 4, 14, 8]);
-        t.equal(errors.length, 0);
-		t.equal(warns.length, 2);
-        t.equal(thrown.length, 2);
+        t.equal(errors.length, 2);
+		t.equal(warns.length, 0);
+        t.equal(thrown.length, 0); // Mobx doesn't propagate throws from reactions
 
         console.error = baseError;
 		console.warn = baseWarn;
@@ -376,7 +499,9 @@ test('peeking inside erroring computed value doesn\'t bork (global) state', t =>
 	t.equal(b.diffValue, 0)
 	t.equal(b.lowestObserverState, 0)
 	t.equal(b.unboundDepsCount, 0)
-	t.equal(b.value, undefined)
+	t.throws(() => {
+		b.get();
+	}, /chocolademelk/)
 	t.equal(b.isComputing, false)
 
 	checkGlobalState(t)
@@ -434,7 +559,9 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 
 	test("it should not break internal consistency when exception occurred", t => {
 		// Trigger exception
-		t.throws(() => { a.set(2) }, /chocolademelk/)
+		utils.consoleError(t, () => {
+			a.set(2)
+		}, /chocolademelk/)
 		t.equal(r, 2)
 
 		t.equal(a.isPendingUnobservation, true) // true is a default for optimization
@@ -451,9 +578,9 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 		t.equal(b.observers.length, 1)
 		t.equal(b.diffValue, 0)
 		t.equal(b.lowestObserverState, 0)
-		t.equal(b.unboundDepsCount, 0)
-		t.equal(b.value, 1, "value should be 1")
+		t.equal(b.unboundDepsCount, 1)
 		t.equal(b.isComputing, false)
+		t.throws(() => b.get(), /chocolademelk/)
 
 		t.equal(c.dependenciesState, 0)
 		t.equal(c.observing.length, 1)
@@ -538,6 +665,50 @@ test('peeking inside autorun doesn\'t bork (global) state', t => {
 		t.equal(c._isRunning, false)
 
 		t.equal(b.get(), 3)
+
+		checkGlobalState(t)
+		t.end()
+	})
+
+	test("it should be possible to handle exceptions in reaction", t => {
+
+		const a = mobx.observable(1)
+		const d = mobx.autorun(function() {
+			throw a.get()
+		})
+
+		const errors = []
+		d.onError(e => errors.push(e))
+
+		a.set(2)
+		a.set(3)
+
+		t.deepEqual(errors, [2, 3])
+		d()
+
+		checkGlobalState(t)
+		t.end()
+	})
+
+
+	test("it should be possible to handle global errors in reactions", t => {
+
+		const a = mobx.observable(1)
+		const errors = []
+		const d2 = mobx.extras.onReactionError(e => errors.push(e))
+
+		const d = mobx.autorun(function() {
+			throw a.get()
+		})
+
+		a.set(2)
+		a.set(3)
+
+		d2()
+		a.set(4)
+
+		t.deepEqual(errors, [1, 2, 3])
+		d()
 
 		checkGlobalState(t)
 		t.end()
