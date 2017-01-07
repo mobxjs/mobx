@@ -4,7 +4,7 @@ The changelog of MobX 3 might look quite overwhelming, but migrating to MobX 3 s
 The api has now become more layered, and the api is more uniform and modifiers are cleaned up.
 In practice, you should check your usage of modifiers (`asFlat`, `asMap` etc.). Besides that the migration should be pretty painless.
 Please report if this isn't the case!
-Note that no chagnes to the runtime algorithm where made, almost all changes evolve in making the creation of observables more uniform, and removing deprecated stuff.
+Note that no changes to the runtime algorithm where made, almost all changes evolve in making the creation of observables more uniform, and removing deprecated stuff.
 
 ## `observable` api has been redesigned
 
@@ -23,7 +23,7 @@ However, this behavior has changed for a few reasons
 2.  It resulted in unnecessary and confusing side effects. If you passed an object you received from some api to a function that added it, for example, to an observable collection. Suddenly your object would be modified as side effect of passing it down to that function. This was often confusing for beginners and could lead to subtle bugs.
 3.  If MobX in the future uses Proxies behind the scenes, this would need to change as well
 
-If you want, you can still enhance existing plainObjects, but simply using `extendObserable(data, data)`. This was actually the old implementation, which has now changed to `extendObservable({}, data)`.
+If you want, you can still enhance existing plainObjects, but simply using `extendObservable(data, data)`. This was actually the old implementation, which has now changed to `extendObservable({}, data)`.
 
 As always, it is best practice not to have transportation objects etc lingering around; there should be only one source of truth, and that is the data that is in your observable state.
 If you already adhered to this rule, this change won't impact you.
