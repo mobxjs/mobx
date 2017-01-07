@@ -164,7 +164,6 @@ import {observer} from "mobx-react";
 
 * `componentWillReact` doesn't take arguments
 * `componentWillReact` won't fire before the initial render (use `componentWillMount` instead)
-* `componentWillReact` won't fire when receiving new props or after `setState` calls (use `componentWillUpdate` instead)
 
 ## Optimizing components
 
