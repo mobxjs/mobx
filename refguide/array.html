@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="3.2" data-basepath=".." data-revision="Sun Dec 25 2016 10:20:58 GMT+0100 (CET)">
+    <div class="book" data-level="3.2" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -883,7 +883,7 @@
                     <section class="normal" id="section-">
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/array.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h2 id="observable-arrays">Observable Arrays</h2>
-<p>Similar to objects, arrays can be made observable using <code>observable</code>.
+<p>Similar to objects, arrays can be made observable using <code>observable.array(values?)</code> or by passing an array to <code>observable</code>.
 This works recursively as well, so all (future) values of the array will also be observable.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, autorun} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
 
@@ -910,8 +910,7 @@ todos[<span class="hljs-number">2</span>] = { title: <span class="hljs-string">&
 todos.shift();
 <span class="hljs-comment">// Prints: &apos;Remaining: Make coffee, Take a nap&apos;</span>
 </code></pre>
-<p>Due to limitations of native arrays in ES5 (<code>array.observe</code> is only available in ES7, and arrays cannot be extend),
-<code>observable</code> will instrument a clone of the provided array instead of the original one.
+<p>Due to limitations of native arrays in ES5 <code>observable.array</code> will create a faux-array (array-like object) instead of a real array.
 In practice, these arrays work just as fine as native arrays and all native methods are supported, including index assignments, up-to and including the length of the array.</p>
 <p>Bear in mind however that <code>Array.isArray(observable([]))</code> will yield <code>false</code>, so whenever you need to pass an observable array to an external library,
 it is a good idea to <em>create a shallow copy before passing it to other libraries or built-in functions</em> (which is good practice anyway) by using <code>array.slice()</code>.
@@ -919,16 +918,21 @@ In other words, <code>Array.isArray(observable([]).slice())</code> will yield <c
 <p>Unlike the built-in implementation of the functions <code>sort</code> and <code>reverse</code>, observableArray.sort and reverse  will not change the array in-place, but only will return a sorted / reversed copy.</p>
 <p>Besides all built-in functions, the following goodies are available as well on observable arrays:</p>
 <ul>
-<li><code>intercept(interceptor)</code>. Can be used to intercept any change before it is applied to the array. See <a href="observe.html">observe &amp; intercept</a> </li>
+<li><code>intercept(interceptor)</code>. Can be used to intercept any change before it is applied to the array. See <a href="observe.html">observe &amp; intercept</a></li>
 <li><code>observe(listener, fireImmediately? = false)</code> Listen to changes in this array. The callback will receive arguments that express an array splice or array change, conforming to <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe" target="_blank">ES7 proposal</a>. It returns a disposer function to stop the listener.</li>
 <li><code>clear()</code> Remove all current entries from the array.</li>
 <li><code>replace(newItems)</code> Replaces all existing entries in the array with new ones.</li>
 <li><code>find(predicate: (item, index, array) =&gt; boolean, thisArg?, fromIndex?)</code> Basically the same as the ES7 <code>Array.find</code> proposal, except for the additional <code>fromIndex</code> parameter.</li>
 <li><code>remove(value)</code> Remove a single item by value from the array. Returns <code>true</code> if the item was found and removed.</li>
-<li><code>peek()</code> Returns an array with all the values which can safely be passed to other libraries, similar to <code>slice()</code>.
-In contrast to <code>slice</code>, <code>peek</code> doesn&apos;t create a defensive copy. Use this in performance critical applications if you know for sure that you use the array in a read-only manner.
-In performance critical sections it is recommended to use a flat observable array as well.</li>
+<li><code>peek()</code> Returns an array with all the values which can safely be passed to other libraries, similar to <code>slice()</code>.</li>
 </ul>
+<p>In contrast to <code>slice</code>, <code>peek</code> doesn&apos;t create a defensive copy. Use this in performance critical applications if you know for sure that you use the array in a read-only manner.
+In performance critical sections it is recommended to use a flat observable array as well.</p>
+<h2 id="-observable-shallowarray-values"><code>observable.shallowArray(values)</code></h2>
+<p>Any values assigned to an observable array will be default passed through <a href="observable.html"><code>observable</code></a> to make them observable.
+Create a shallow array to disable this behavior and store are values as-is. See also <a href="modifiers.html">modifiers</a> for more details on this mechanism.</p>
+<h2 id="name-argument">Name argument</h2>
+<p>Both <code>observable.array</code> and <code>observable.shallowArray</code> take a second parameter which is used as debug name in for example <code>spy</code> or the MobX dev tools.</p>
 
                     
                     </section>

@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="7.1" data-basepath=".." data-revision="Sun Dec 25 2016 10:20:58 GMT+0100 (CET)">
+    <div class="book" data-level="7.1" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -897,8 +897,7 @@ You can use <code>isObservableArray(observable)</code> to check whether somethin
 So MobX observable objects act as records with predefined keys.
 You can use <code>extendObservable(target, props)</code> to introduce new observable properties to an object.
 However object iterators like <code>for .. in</code> or <code>Object.keys()</code> won&apos;t react to this automatically.
-If you need a dynamically keyed object, for example to store users by id, create observable _map_s using <code>asMap</code>.
-More info on <a href="https://github.com/mobxjs/mobx/issues/219#issuecomment-220224813" target="_blank">asMap</a>.
+If you need a dynamically keyed object, for example to store users by id, create observable _map_s using <a href="../refguide/map.html"><code>observable.map</code></a>.
 For more info see <a href="react.html">what will MobX react to?</a>.</p>
 <h3 id="use-observer-on-all-components-that-render-observable-s">Use <code>@observer</code> on all components that render <code>@observable</code>&apos;s.</h3>
 <p><code>@observer</code> only enhances the component you are decorating, not the components used inside it.

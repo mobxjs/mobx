@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.4" data-basepath=".." data-revision="Sun Dec 25 2016 10:20:58 GMT+0100 (CET)">
+    <div class="book" data-level="2.4" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -905,6 +905,31 @@ disposer();
 numbers.push(<span class="hljs-number">5</span>);
 <span class="hljs-comment">// won&apos;t print anything, nor is `sum` re-evaluated</span>
 </code></pre>
+<h2 id="error-handling">Error handling</h2>
+<p>Exceptions thrown in autorun and all other types reactions are catched and logged to the console, but not propagated back to the original causing code.
+This is to make sure that a reaction in one exception does not prevent the scheduled execution of other, possibly unrelated, reactions.
+This also allows reactions to recover from exceptions; throwing an exception does not break the tracking done by MobX,
+so as subsequent run of a reaction might complete normally again if the cause for the exception is removed.</p>
+<p>It is possible to override the default logging behavior of Reactions by calling the <code>onError</code> handler on the disposer of the reaction.
+Example:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> age = observable(<span class="hljs-number">10</span>)
+<span class="hljs-keyword">const</span> dispose = autorun(() =&gt; {
+    <span class="hljs-keyword">if</span> (age.get() &lt; <span class="hljs-number">0</span>)
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">&quot;Age should not be negative&quot;</span>)
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Age&quot;</span>, age.get())
+})
+
+age.set(<span class="hljs-number">18</span>)  <span class="hljs-comment">// Logs: Age 18</span>
+age.set(-<span class="hljs-number">10</span>) <span class="hljs-comment">// Logs &quot;Error in reaction .... Age should not be negative</span>
+age.set(<span class="hljs-number">5</span>)   <span class="hljs-comment">// Recovered, logs Age 5</span>
+
+dispose.onError(e =&gt; {
+    <span class="hljs-built_in">window</span>.alert(<span class="hljs-string">&quot;Please enter a valid age&quot;</span>)
+})
+
+age.set(-<span class="hljs-number">5</span>)  <span class="hljs-comment">// Shows alert bolx</span>
+</code></pre>
+<p>A global onError handler can be set as well through <code>extras.onReactionError(handler)</code>. This can be useful in tests or for monitoring.</p>
 
                     
                     </section>

@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="8.5" data-basepath=".." data-revision="Sun Dec 25 2016 10:20:58 GMT+0100 (CET)">
+    <div class="book" data-level="8.5" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -885,7 +885,6 @@
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/extend-observable.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="extendobservable">extendObservable</h1>
 <p>Quite similar to <code>Object.assign</code>, <code>extendObservable</code> takes two or more arguments, a <code>target</code> object and one or more <code>properties</code> maps.
 It adds all key-value pairs from the properties to the <code>target</code> as observable properties.</p>
-<p>If an argumentless function is passed as value of a property, <code>extendObservable</code> will introduce a <a href="computed-decorator.html"><code>computed</code></a> property instead of an observable property.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> Person = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">firstName, lastName</span>) </span>{
     <span class="hljs-comment">// initialize observable properties on a new instance</span>
     extendObservable(<span class="hljs-keyword">this</span>, {
@@ -901,7 +900,47 @@ extendObservable(matthew, {
     age: <span class="hljs-number">353</span>
 });
 </code></pre>
-<p>(N.b:  <code>observable(object)</code> is actually an alias for <code>extendObservable(object, object)</code>)</p>
+<p>N.b:  <code>observable.object(object)</code> is actually an alias for <code>extendObservable({}, object)</code>.</p>
+<p>Note that the property maps are not always copied literally onto the target, but they are considered property descriptor.
+Most values are copied as-is, but values wrapped in a modifier as treated specially. And so are properties that have a getter.</p>
+<h2 id="modifiers">Modifiers</h2>
+<p><a href="modifiers.html">Modifiers</a> can be used to define special behavior for certain properties.
+For example <code>observable.ref</code> creates an observable reference which doesn&apos;t automatically convert it&apos;s values into observables, and <code>computed</code> introduces a derived property:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> Person = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">firstName, lastName</span>) </span>{
+    <span class="hljs-comment">// initialize observable properties on a new instance</span>
+    extendObservable(<span class="hljs-keyword">this</span>, {
+        firstName: observable.ref(firstName),
+        lastName: observable.ref(lastName),
+        fullName: computed(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.firstName + <span class="hljs-string">&quot; &quot;</span> + <span class="hljs-keyword">this</span>.lastName
+        })
+    });
+}
+</code></pre>
+<p>An overview of all available modifiers can be found in the <a href="modifiers.html">modifiers</a> section.</p>
+<h2 id="computed-properties">Computed properties</h2>
+<p>Computed properties can also be written by using a <em>getter</em> function. Optionally accompanied with a setter:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> Person = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">firstName, lastName</span>) </span>{
+    <span class="hljs-comment">// initialize observable properties on a new instance</span>
+    extendObservable(<span class="hljs-keyword">this</span>, {
+        firstName: firstName,
+        lastName: lastName,
+        get fullName() {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.firstName + <span class="hljs-string">&quot; &quot;</span> + <span class="hljs-keyword">this</span>.lastName
+        },
+        set fullName(newValue) {
+            <span class="hljs-keyword">var</span> parts = newValue.split(<span class="hljs-string">&quot; &quot;</span>)
+            <span class="hljs-keyword">this</span>.firstName = parts[<span class="hljs-number">0</span>]
+            <span class="hljs-keyword">this</span>.lastName = parts[<span class="hljs-number">1</span>]
+        }
+    });
+}
+</code></pre>
+<p><em>Note: getter / setter is valid ES5 syntax and doesn&apos;t require a transpiler!</em></p>
+<h2 id="-extendshallowobservable"><code>extendShallowObservable</code></h2>
+<p><code>extendShallowObservable</code> is like <code>extendObservable</code>, except that by default the properties will by default <em>not</em> automatically convert their values into observables.
+So it is similar to calling <code>extendObservable</code> with <code>observable.ref</code> modifier for each property.
+Note that <code>observable.deep</code> can be used to get the automatic conversion back for a specific property.</p>
 
                     
                     </section>

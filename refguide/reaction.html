@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="8.9" data-basepath=".." data-revision="Sun Dec 25 2016 10:20:58 GMT+0100 (CET)">
+    <div class="book" data-level="8.9" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -883,18 +883,27 @@
                     <section class="normal" id="section-">
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/reaction.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="reaction">Reaction</h1>
-<p>Usage: <code>reaction(() =&gt; data, data =&gt; { sideEffect }, fireImmediately = false, delay = 0)</code>.</p>
+<p>Usage: <code>reaction(() =&gt; data, data =&gt; { sideEffect }, options?)</code>.</p>
 <p>A variation on <code>autorun</code> that gives more fine grained control on which observables will be tracked.
-It takes two functions, the first one is tracked and returns data that is used as input for the second one, the side effect.
+It takes two functions, the first one (the <em>data</em> function) is tracked and returns data that is used as input for the second one, the <em>effect</em> function.
 Unlike <code>autorun</code> the side effect won&apos;t be run directly when created, but only after the data expression returns a new value for the first time.
-Any observables that are accessed while executing the side effect will not be tracked.
-The side effect can be debounced, just like <code>autorunAsync</code>.
+Any observables that are accessed while executing the side effect will not be tracked.</p>
+<p>The side effect can be debounced, just like <code>autorunAsync</code>.
 <code>reaction</code> returns a disposer function.
-If a string is passed as first argument to <code>reaction</code>, it will be used as debug name.
-The functions passed to <code>when</code> will receive one argument when invoked, the current reaction, which can be used to dispose the when during execution.</p>
+The functions passed to <code>reaction</code> will receive one argument when invoked, the current reaction, which can be used to dispose the when during execution.</p>
 <p>It is important to notice that the side effect will <em>only</em> react to data that was <em>accessed</em> in the data expression, which might be less then the data that is actually used in the effect.
-Also, the side effect will only be triggered when the data returned by the expression has changed (the <code>asStructure</code> modifier can be used to enforce deep comparison).
+Also, the side effect will only be triggered when the data returned by the expression has changed.
 In other words: reaction requires you to produce the things you need in your side effect.</p>
+<h2 id="options">Options</h2>
+<p>Reaction accepts as third argument an options object with the following optional options:</p>
+<ul>
+<li><code>context</code>: The <code>this</code> to be used in the functions passed to <code>reaction</code>. By default undefined (use arrow functions instead!)</li>
+<li><code>fireImmediately</code>: Boolean that indicates that the effect function should immediately be triggered after the first run of the data function. <code>false</code> by default. If a boolean is passed as third argument to <code>reaction</code>, it will be interpreted as the <code>fireImmediately</code> option.</li>
+<li><code>delay</code>: Number in milliseconds that can be used to debounce the effect function. If zero (the default), no debouncing will happen.</li>
+<li><code>compareStructural</code>: <code>false</code> by default. If <code>true</code>, the return value of the <em>data</em> function is structurally compared to it&apos;s previous return value, and the <em>effect</em> function will only be invoked if there is a structural change in the output.</li>
+<li><code>name</code>: String that is used as name for this reaction in for example <a href="spy.html"><code>spy</code></a> events.</li>
+</ul>
+<h2 id="example">Example</h2>
 <p>In the following example both <code>reaction1</code>, <code>reaction2</code> and <code>autorun1</code> will react to the addition, removal or replacement of todo&apos;s in the <code>todos</code> array.
 But only <code>reaction2</code> and <code>autorun</code> will react to the change of a <code>title</code> in one of the todo items, because <code>title</code> is used in the data expression of reaction 2, while it isn&apos;t in the data expression of reaction 1.
 <code>autorun</code> tracks the complete side effect, hence it will always trigger correctly, but is also more suspectible to accidentally accessing unrelevant data.

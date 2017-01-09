@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="3.4" data-basepath=".." data-revision="Sun Dec 25 2016 10:20:58 GMT+0100 (CET)">
+    <div class="book" data-level="3.4" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -888,17 +888,23 @@ Usually that is fine, as MobX usually can just make the <em>property</em> that c
 See also <a href="object.html">observable objects</a>.
 In rare cases it can be convenient to have an observable &quot;primitive&quot; that is not owned by an object.
 For these cases it is possible to create an observable box that manages such a primitive.</p>
-<p>So <code>observable</code> accepts scalar values as well and returns an object with a getter / setter function that holds this value.
-Furthermore you can register a callback using its <code>.observe</code> method to listen to changes on the stored value.
-But in most cases it is better to use <a href="autorun.html"><code>mobx.autorun</code></a> instead.</p>
-<p>So the signature of object returned by <code>observable(scalar)</code> is:</p>
+<h3 id="-observable-box-value"><code>observable.box(value)</code></h3>
+<p>So <code>observable.box(value)</code> accepts any value and stores it inside a box.
+The current value can be accessed through <code>.get()</code> and updated using <code>.set(newValue)</code>.</p>
+<p>Furthermore you can register a callback using its <code>.observe</code> method to listen to changes on the stored value.
+But since MobX tracks changes to boxes automatically, in most cases it is better to use a reaction like <a href="autorun.html"><code>mobx.autorun</code></a> instead.</p>
+<p>So the signature of object returned by <code>observable.box(scalar)</code> is:</p>
 <ul>
 <li><code>.get()</code> Returns the current value.</li>
 <li><code>.set(value)</code> Replaces the currently stored value. Notifies all observers.</li>
 <li><code>intercept(interceptor)</code>. Can be used to intercept changes before they are applied. See <a href="observe.html">observe &amp; intercept</a></li>
-<li><code>.observe(callback: (newValue, previousValue) =&gt; void, fireImmediately = false): disposerFunction</code>. Registers an observer function that will fire each time the stored value is replaced. Returns a function to cancel the observer. See <a href="observe.html">observe &amp; intercept</a></li>
+<li><code>.observe(callback: (change) =&gt; void, fireImmediately = false): disposerFunction</code>. Registers an observer function that will fire each time the stored value is replaced. Returns a function to cancel the observer. See <a href="observe.html">observe &amp; intercept</a>. The <code>change</code> parameter is an object containing both the <code>newValue</code> and <code>oldValue</code> of the observable.</li>
 </ul>
-<p>Example:</p>
+<h3 id="-observable-shallowbox-value"><code>observable.shallowBox(value)</code></h3>
+<p><code>shallowBox</code> creates a box based on the <a href="modifiers.html"><code>ref</code></a> modifier. This means that any (future) value of box wouldn&apos;t be converted into an observable automatically.</p>
+<h3 id="-observable-primitivevalue"><code>observable(primitiveValue)</code></h3>
+<p>When using the generic <code>observable(value)</code> method, MobX will create an observable box for any value that could not be turned into an observable automatically..</p>
+<h3 id="example">Example</h3>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
 
 <span class="hljs-keyword">const</span> cityName = observable(<span class="hljs-string">&quot;Vienna&quot;</span>);
@@ -906,8 +912,8 @@ But in most cases it is better to use <a href="autorun.html"><code>mobx.autorun<
 <span class="hljs-built_in">console</span>.log(cityName.get());
 <span class="hljs-comment">// prints &apos;Vienna&apos;</span>
 
-cityName.observe(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">newCity, oldCity</span>) </span>{
-    <span class="hljs-built_in">console</span>.log(oldCity, <span class="hljs-string">&quot;-&gt;&quot;</span>, newCity);
+cityName.observe(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">change</span>) </span>{
+    <span class="hljs-built_in">console</span>.log(change.oldValue, <span class="hljs-string">&quot;-&gt;&quot;</span>, change.newValue);
 });
 
 cityName.set(<span class="hljs-string">&quot;Amsterdam&quot;</span>);
@@ -944,7 +950,8 @@ cityName[<span class="hljs-number">1</span>] = <span class="hljs-string">&quot;C
 cityName.splice(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>);
 <span class="hljs-comment">// prints &apos;Amsterdam removed&apos;</span>
 </code></pre>
-<p>Similar to <code>observable</code>, <code>computed(function)</code> creates a boxed computed value. See <a href="http://mobxjs.github.io/mobx/refguide/computed-decorator.html" target="_blank"><code>computed</code></a></p>
+<h2 id="name-argument">Name argument</h2>
+<p>Both <code>observable.box</code> and <code>observable.shallowBox</code> take a second parameter which is used as debug name in for example <code>spy</code> or the MobX dev tools.</p>
 
                     
                     </section>
