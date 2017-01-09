@@ -1,6 +1,6 @@
 # MobX Api Reference
 
-Applies to MobX 3 and higher. For MobX 2, the old documentation is still available on [githib](https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md)
+Applies to MobX 3 and higher. For MobX 2, the old documentation is still available on [github](https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md)
 
 # Core API
 
@@ -333,6 +333,7 @@ _The following methods are all used internally by MobX, and might come in handy 
 
 ### `transaction`
 Usage: `transaction(() => { block })`.
+Deprecated, use actions or `runInAction` instead.
 Low-level api that can be used to batch state changes.
 State changes made inside the block won't cause any computations or reactions to run until the end of the block is reached.
 Nonetheless inspecting a computed value inside a transaction block will still return a consistent value.
