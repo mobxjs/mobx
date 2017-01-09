@@ -64,6 +64,7 @@
 * [Building a React & MobX application with MVVM](https://medium.com/@MattiaManzati/building-a-react-mobx-application-with-mvvm-ec0b3e3c8786#.de5tzghcx)
 * [Videolog: integrate MobX with Firebase](https://www.youtube.com/watch?v=MMQH9vxbzRw&feature=youtu.be&a)
 * [React form validation with MobX](https://medium.com/@KozhukharenkoN/react-form-validation-with-mobx-8ce00233ae27#.d8biky8cv)
+* [MobX Recipes - A collection of lessons learned and useful patterns using MobX](https://alexhisen.gitbooks.io/mobx-recipes/content/)
 
 ## Testimonials
 
