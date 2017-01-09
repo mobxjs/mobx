@@ -56,6 +56,7 @@ export interface IObservableFactory {
 	(): IObservableValue<any>;
 	<T>(value: IMap<string | number | boolean, T>): ObservableMap<T>;
 	<T extends Object>(value: T): T & IObservableObject;
+	<T>(value: T): IObservableValue<T>;
 }
 
 export class IObservableFactories {
