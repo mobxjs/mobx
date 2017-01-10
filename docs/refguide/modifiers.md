@@ -31,7 +31,7 @@ For example:
 class Message {
     @observable message = "Hello world"
 
-    // ficitonal example, if author is immutable, we just need to store a reference and shouldn't turn it into an mutable, observable object
+    // fictional example, if author is immutable, we just need to store a reference and shouldn't turn it into a mutable, observable object
     @observable.ref author = null
 }
 ```
