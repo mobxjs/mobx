@@ -22,7 +22,7 @@ function createObservable(v: any = undefined) {
 		return deepObservableDecorator.apply(null, arguments);
 
 	invariant(arguments.length <= 1, "observable expects zero or one arguments");
-	invariant(!isModifierDescriptor(v), "modifiers can only be used for induvidual object properties");
+	invariant(!isModifierDescriptor(v), "modifiers can only be used for individual object properties");
 
 	// it is an observable already, done
 	if (isObservable(v))
