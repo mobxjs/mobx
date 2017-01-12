@@ -12,13 +12,12 @@ For example imperative side effects like logging, making network requests etc.
 
 Computed values are automatically derived from your state if any value that affects them changes.
 Computed values can be optimized away in many cases by MobX as they are assumed to be pure.
-For example, a computed property won't re-run if none of the data used in the previous computation did change.
+For example, a computed property won't re-run if none of the data used in the previous computation changed.
 Nor will a computed property re-run if is not in use by some other computed property or reaction.
 In such cases it will be suspended.
 
-This automatic suspension is very convenient; it means that a computed value that is not observed anymore (for example because the UI in which it was used has disappeared)
-can automatically be garbabged collected by MobX, and unlike `autorun`'s you don't have to dispose them yourself.
-This sometimes confuses people new to MobX; if you create a computed property but don't use it anywhere in a reaction, it will not cache it's value and recompute more often than seems necesarray.
+This automatic suspension is very convenient. If a computed value is no longer observed, for example the UI in which it was used no longer exists, MobX can automatically garbage collect it. This differs from `autorun`'s values where you must dispose of them yourself.
+It sometimes confuses people new to MobX, that if you create a computed property but don't use it anywhere in a reaction, it will not cache it's value and recompute more often than seems necessary.
 However, in real life situations this by far the best default, and you can always forcefully keep a computed value awake if you need to by using either [`observe`](observe.md) or [`keepAlive`](https://github.com/mobxjs/mobx-utils#keepalive).
 
 Note that `computed` properties are not enumerable. Nor can they be overwritten in an inheritance chain.
@@ -46,7 +45,7 @@ class OrderLine {
 
 ## `computed` modifier
 
-If your environment doesn't support decorators, use the `computed(expression)` modifier incombination with `extendObservable` / `observable` to introduce new computed properties.
+If your environment doesn't support decorators, use the `computed(expression)` modifier in combination with `extendObservable` / `observable` to introduce new computed properties.
 
 `@computed get propertyName() { }` is basically sugar for [`extendObservable(this, { propertyName: get func() { } })`](extend-observable.md) in the constructor call.
 
@@ -109,7 +108,7 @@ _Note: setters require MobX 2.5.1 or higher_
 ## `computed(expression)` as function
 
 `computed` can also be invoked directly as function.
-Just like `observable.box(primitive value)` it will create a stand-alone observable.
+Just like `observable.box(primitive value)` creates a stand-alone observable.
 Use `.get()` on the returned object to get the current value of the computation, or `.observe(callback)` to observe its changes.
 This form of `computed` is not used very often, but in some cases where you need to pass a "boxed" computed value around it might prove useful.
 
@@ -136,7 +135,7 @@ When using `computed` as modifier or as box, it accepts a second options argumen
 * `name`: String, the debug name used in spy and the MobX devtools
 * `context`: The `this` that should be used in the provided expression
 * `setter`: The setter function to be used. Without setter it is not possible to assign new values to a computed value. If the second argument passed to `computed` is a function, this is assumed to be a setter.
-* `compareStructural`: By default `false`. If this value, the output of the expression is structurally compared with the previous value before any observer is notified about a change. This makes sure that observers of the computation don't re-evaluate if new structures are returned that are structurally equal to the original ones. This is very useful when working with point, vector or color structures for example.
+* `compareStructural`: By default `false`. When true, the output of the expression is structurally compared with the previous value before any observer is notified about a change. This makes sure that observers of the computation don't re-evaluate if new structures are returned that are structurally equal to the original ones. This is very useful when working with point, vector or color structures for example.
 
 ## `@computed.struct` for structural comparison
 
