@@ -380,11 +380,13 @@ export class ObservableArray<T> extends StubArray {
 	}
 
 	toString(): string {
-		return "[mobx.array] " + Array.prototype.toString.apply(this.$mobx.values, arguments);
+		this.$mobx.atom.reportObserved();
+		return Array.prototype.toString.apply(this.$mobx.values, arguments);
 	}
 
 	toLocaleString(): string {
-		return "[mobx.array] " + Array.prototype.toLocaleString.apply(this.$mobx.values, arguments);
+		this.$mobx.atom.reportObserved();
+		return Array.prototype.toLocaleString.apply(this.$mobx.values, arguments);
 	}
 }
 
