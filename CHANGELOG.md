@@ -105,6 +105,11 @@ Using `computed` to create boxed observables has been simplified, and `computed`
 * `computed(expr, setter)`
 * `computed(expr, options)`, where options is an object that can specify one or more of the following fields: `name`, `setter`, `compareStructural` or `context` (the "this").
 
+Computed can also be used as a decorator:
+
+* `@computed` 
+* `@computed.struct` when you want to compareStructural (previously was `@computed({asStructure: true})`)
+
 ### `reaction` api has been simplified
 
 The signature of `reaction` is now `reaction(dataFunc, effectFunc, options?)`, where the following options are accepted:
