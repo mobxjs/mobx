@@ -122,7 +122,7 @@ This means that now the following is possible:
 
 ```javascript
 class Ticker {
-	@observable this.tick = 0
+	@observable tick = 0
 
 	@action.bound
 	increment() {
