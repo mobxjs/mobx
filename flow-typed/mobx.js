@@ -330,7 +330,7 @@ declare module 'mobx' {
     object: any, property: string, listener: (newValue: any, oldValue?: any) => void, fireImmediately?: boolean
   ): Lambda
 
-  declare function toJS(source: any, detectCycles: boolean, ___alreadySeen: [any, any][]): any
+  declare function toJS(source: any, detectCycles?: boolean, ___alreadySeen?: [any, any][]): any
   declare function toJSlegacy(source: any, detectCycles?: boolean, ___alreadySeen?: [any, any][]): any
   declare function whyRun(thing?: any, prop?: string): string
   declare function useStrict(strict: boolean): any
