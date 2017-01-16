@@ -1,3 +1,8 @@
+# 3.0.1
+
+* `toString()` of observable arrays now behaves like normal arrays (by @capaj, see #759)
+* Improved flow types of `toJS`by @jamsea (#758)
+
 # 3.0.0
 
 The changelog of MobX 3 might look quite overwhelming, but migrating to MobX 3 should be pretty straight forward nonetheless.
@@ -107,7 +112,7 @@ Using `computed` to create boxed observables has been simplified, and `computed`
 
 Computed can also be used as a decorator:
 
-* `@computed` 
+* `@computed`
 * `@computed.struct` when you want to compareStructural (previously was `@computed({asStructure: true})`)
 
 ### `reaction` api has been simplified
