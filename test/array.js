@@ -273,6 +273,43 @@ test('is array', function(t) {
     t.end();
 })
 
+test('stringifies same as ecma array', function(t) {
+    const x = mobx.observable([]);
+    t.equal(x instanceof Array, true);
+
+    // would be cool if these two would return true...
+	t.equal(x.toString(), "");
+	t.equal(x.toLocaleString(), "");
+	x.push(1, 2)
+	t.equal(x.toString(), "1,2");
+	t.equal(x.toLocaleString(), "1,2");
+    t.end();
+})
+
+test("observes when stringified", function (t) {
+	const x = mobx.observable([]);
+	let c = 0;
+	mobx.autorun(function() {
+        x.toString();
+		c++;
+    });
+	x.push(1);
+	t.equal(c, 2);
+	t.end();
+})
+
+test("observes when stringified to locale", function (t) {
+	const x = mobx.observable([]);
+	let c = 0;
+	mobx.autorun(function() {
+        x.toLocaleString();
+		c++;
+    });
+	x.push(1);
+	t.equal(c, 2);
+	t.end();
+})
+
 test('peek', function(t) {
     var x = mobx.observable([1, 2, 3]);
     t.deepEqual(x.peek(), [1, 2, 3]);
