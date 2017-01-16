@@ -614,3 +614,29 @@ test("shallow array", t => {
 
 	t.end();
 })
+
+test("761 - deeply nested modifiers work", t=> {
+	var a = {}
+	mobx.extendObservable(a, {
+		someKey: {
+			someNestedKey: mobx.observable.ref([])
+		}
+	})
+
+	t.equal(mobx.isObservable(a), true)
+	t.equal(mobx.isObservable(a, "someKey"), true)
+	t.equal(mobx.isObservable(a.someKey), true)
+	t.equal(mobx.isObservable(a.someKey, "someNestedKey"), true)
+	t.equal(mobx.isObservable(a.someKey.someNestedKey), false)
+	t.equal(Array.isArray(a.someKey.someNestedKey), true)
+
+	Object.assign(a, { someKey: { someNestedKey: [1, 2, 3 ]}})
+	t.equal(mobx.isObservable(a), true)
+	t.equal(mobx.isObservable(a, "someKey"), true)
+	t.equal(mobx.isObservable(a.someKey), true)
+	t.equal(mobx.isObservable(a.someKey, "someNestedKey"), true)
+	t.equal(mobx.isObservable(a.someKey.someNestedKey), true) // Too bad: no deep merge with Object.assign! someKey object gets replaced in its entirity
+	t.equal(Array.isArray(a.someKey.someNestedKey), false)
+
+	t.end()
+})
