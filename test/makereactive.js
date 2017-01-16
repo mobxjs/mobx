@@ -286,10 +286,10 @@ test('flat object', function(t) {
     t.end();
 })
 
-test.skip('as structure', function(t) {
+test('as structure', function(t) {
 
     var x = m.observable({
-        x: m.observable.structure(null)
+        x: m.observable.structurallyCompare(null)
     });
 
     var changed = 0;
@@ -350,6 +350,7 @@ test.skip('as structure', function(t) {
     };
     c();
     x.x.y.y = 3;
+	console.log("test")
     nc();
     x.x.y = { y: 3 };
     nc();
@@ -374,7 +375,6 @@ test.skip('as structure', function(t) {
     nc();
     x.x[1] = 2;
     nc();
-	console.log("test")
     x.x[0] = 0;
     c();
     x.x[1] = {

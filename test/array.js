@@ -1,3 +1,4 @@
+"use strict"
 var test = require('tape');
 var mobx = require('..');
 var observable = mobx.observable;

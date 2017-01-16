@@ -170,6 +170,12 @@ export function deepEquals(a, b) {
 	} else if (typeof a === "object" && typeof b === "object") {
 		if (a === null || b === null)
 			return false;
+		if (isMapLike(a) && isMapLike(b)) {
+			if (a.size !== b.size)
+				return false;
+			// Freaking inefficient.... Create PR if you run into this :) Much appreciated!
+			return deepEquals(observable.shallowMap(a).entries(), observable.shallowMap(b).entries());
+		}
 		if (getEnumerableKeys(a).length !== getEnumerableKeys(b).length)
 			return false;
 		for (let prop in a) {
@@ -198,6 +204,10 @@ export function isArrayLike(x: any): boolean {
 	return Array.isArray(x) || isObservableArray(x);
 }
 
+export function isMapLike(x: any): boolean {
+	return isES6Map(x) || isObservableMap(x)
+}
+
 export function isES6Map(thing): boolean {
 	if (thing instanceof getGlobal().Map)
 		return true;
@@ -206,3 +216,5 @@ export function isES6Map(thing): boolean {
 
 import {globalState} from "../core/globalstate";
 import {isObservableArray} from "../types/observablearray";
+import {isObservableMap} from "../types/observablemap";
+import {observable} from "../api/observable";

@@ -64,12 +64,13 @@ import { IObserverTree, IDependencyTree, getDependencyTree, getObserverTree } fr
 import { getDebugName, getAtom, getAdministration } from "./types/type-utils";
 import { allowStateChanges } from "./core/action";
 import { spyReport, spyReportEnd, spyReportStart, isSpyEnabled } from "./core/spy";
-import { Lambda } from "./utils/utils";
+import { Lambda, deepEquals } from "./utils/utils";
 import { isComputingDerivation } from "./core/derivation";
 import { setReactionScheduler, onReactionError } from "./core/reaction";
 
 export const extras = {
 	allowStateChanges,
+	deepEquals,
 	getAtom,
 	getDebugName,
 	getDependencyTree,

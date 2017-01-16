@@ -63,9 +63,35 @@ export function referenceEnhancer(newValue?) {
 	return newValue;
 }
 
+export function structurallyCompareEnhancer(v, oldValue, name): any {
+	// don't confuse structurally compare enhancer with ref enhancer! The latter is probably
+	// more suited for immutable objects
+	if (deepEquals(v, oldValue))
+		return oldValue;
+
+	// it is an observable already, done
+	if (isObservable(v))
+		return v;
+
+	// something that can be converted and mutated?
+	if (Array.isArray(v))
+		return new ObservableArray(v, structurallyCompareEnhancer, name)
+	if (isES6Map(v))
+		return new ObservableMap(v, structurallyCompareEnhancer, name)
+	if (isPlainObject(v)) {
+		const res = {};
+		asObservableObject(res, name);
+		extendObservableHelper(res, structurallyCompareEnhancer, [v]);
+		return res;
+	}
+
+	return v;
+}
+
 import { isObservable } from "../api/isobservable";
 import { observable } from "../api/observable";
-import { fail, isPlainObject, invariant, isES6Map } from "../utils/utils";
-import { isObservableObject } from "./observableobject";
-import { isObservableArray } from "./observablearray";
-import { isObservableMap } from "./observablemap";
+import { extendObservableHelper } from "../api/extendobservable";
+import { fail, isPlainObject, invariant, isES6Map, deepEquals } from "../utils/utils";
+import { isObservableObject, asObservableObject } from "./observableobject";
+import { isObservableArray, ObservableArray } from "./observablearray";
+import { isObservableMap, ObservableMap } from "./observablemap";

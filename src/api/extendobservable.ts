@@ -12,7 +12,7 @@ export function extendShallowObservable<A extends Object, B extends Object>(targ
 	return extendObservableHelper(target, referenceEnhancer, properties) as any;
 }
 
-function extendObservableHelper(target: Object, defaultEnhancer: IEnhancer<any>, properties: Object[]): Object {
+export function extendObservableHelper(target: Object, defaultEnhancer: IEnhancer<any>, properties: Object[]): Object {
 	invariant(arguments.length >= 2, "extendObservable expected 2 or more arguments");
 	invariant(typeof target === "object", "extendObservable expects an object as first argument");
 	invariant(!(isObservableMap(target)), "extendObservable should not be used on maps, use map.merge instead");

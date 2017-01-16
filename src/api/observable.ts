@@ -1,5 +1,5 @@
 import {invariant} from "../utils/utils";
-import {isModifierDescriptor, IModifierDescriptor, deepEnhancer, referenceEnhancer, shallowEnhancer, createModifierDescriptor} from "../types/modifiers";
+import {isModifierDescriptor, IModifierDescriptor, deepEnhancer, referenceEnhancer, shallowEnhancer, structurallyCompareEnhancer, createModifierDescriptor} from "../types/modifiers";
 import {IObservableValue, ObservableValue} from "../types/observablevalue";
 import {IObservableArray, ObservableArray} from "../types/observablearray";
 import {createDecoratorForEnhancer} from "./observabledecorator";
@@ -11,6 +11,7 @@ import {IObservableMapInitialValues, ObservableMap, IMap} from "../types/observa
 const deepObservableDecorator = createDecoratorForEnhancer(deepEnhancer);
 const shallowObservableDecorator = createDecoratorForEnhancer(shallowEnhancer);
 const refObservableDecorator = createDecoratorForEnhancer(referenceEnhancer);
+const structuralObservableDecorator = createDecoratorForEnhancer(structurallyCompareEnhancer);
 
 /**
  * Turns an object, array or function into a reactive structure.
@@ -144,6 +145,20 @@ export class IObservableFactories {
 			return createModifierDescriptor(deepEnhancer, arguments[0]) as any;
 		} else {
 			return deepObservableDecorator.apply(null, arguments);
+		}
+	}
+
+	structurallyCompare(target: Object, property: string, descriptor?: PropertyDescriptor): any;
+	structurallyCompare<T>(initialValues: T[]): IObservableArray<T>;
+	structurallyCompare<T>(initialValues: IMap<string | number | boolean, T>): ObservableMap<T>;
+	structurallyCompare<T>(initialValue: T): T;
+	structurallyCompare() {
+		if (arguments.length < 2) {
+			// although ref creates actually a modifier descriptor, the type of the resultig properties
+			// of the object is `T` in the end, when the descriptors are interpreted
+			return createModifierDescriptor(structurallyCompareEnhancer, arguments[0]) as any;
+		} else {
+			return structuralObservableDecorator.apply(null, arguments);
 		}
 	}
 }
