@@ -302,6 +302,7 @@ declare module 'mobx' {
 
   declare function action(targetOrName: any, propertyKeyOrFuc?: any, descriptor?: PropertyDescriptor): any;
   declare function runInAction<T>(name: string, block: () => T, scope?: any): T;
+  declare function runInAction<T>(block: () => T, scope?: any): T;
   declare function isAction(thing: any): boolean;
   declare function autorun(nameOrFunction: string | (r: IReactionPublic) => void, viewOrScope?: any, scope?: any): any;
   declare function when(predicate: () => boolean, effect: Lambda, scope?: any): any
