@@ -1661,3 +1661,18 @@ test('603 - transaction should not kill reactions', t => {
 	t.end()
 
 })
+
+test('#561 test toPrimitive() of observable objects', function(t) {
+    var x = observable(3);
+
+    t.equal(x.valueOf(), 3);
+    t.equal(x[Symbol.toPrimitive](), 3);
+    
+    t.equal(+x, 3);
+    t.equal(++x, 4);
+
+    var y = observable(3);
+
+    t.equal(y + 7, 10);
+    t.end()
+})

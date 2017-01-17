@@ -27,6 +27,8 @@ export interface IObservableValue<T> {
 	observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda;
 }
 
+declare var Symbol;
+
 export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable {
 	hasUnreportedChange = false;
 	interceptors;
@@ -40,6 +42,14 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 			// only notify spy if this is a stand-alone observable
 			spyReport({ type: "create", object: this, newValue: this.value });
 		}
+
+		if (typeof Symbol !== undefined) {
+			this[Symbol.toPrimitive] = this.valueOf;
+		}
+	}
+
+	public valueOf(): T {
+    	return this.get()
 	}
 
 	public set(newValue: T) {
