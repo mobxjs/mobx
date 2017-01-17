@@ -583,6 +583,24 @@ test("boxed value json", t => {
 	t.end();
 })
 
+
+test("proxied value json", t => {
+	const log = [];
+	const todos = mobx.observable.dynamic({
+		"a23bf": { completed: false}
+	});
+
+	autorun(() => log.push(Object.keys(todos)));
+	t.equal(log.length, 1);
+	t.equal(log[0], ["a23bf"]);
+
+	todos["a8235"] = { completed: true};
+
+	t.equal(log.length, 2);
+	t.equal(log[1], ["a23bf", "a8235"]);
+});
+
+
 test("computed value scope", t => {
 	var a = mobx.observable({
 		x: 1,
