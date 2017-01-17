@@ -511,11 +511,13 @@ function createArraySetter(index: number) {
 function createArrayGetter(index: number) {
 	return function () {
 		const impl = <ObservableArrayAdministration<any>> this.$mobx;
-		if (impl && index < impl.values.length) {
-			impl.atom.reportObserved();
-			return impl.values[index];
+		if (impl) {
+			if (index < impl.values.length) {
+				impl.atom.reportObserved();
+				return impl.values[index];
+			}
+			console.warn(`[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${impl.values.length}). Please check length first. Out of bound indices will not be tracked by MobX`);
 		}
-		console.warn(`[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${impl.values.length}). Please check length first. Out of bound indices will not be tracked by MobX`);
 		return undefined;
 	};
 }
