@@ -28,7 +28,7 @@ Most values are copied as-is, but values wrapped in a modifier as treated specia
 ## Modifiers
 
 [Modifiers](modifiers.md) can be used to define special behavior for certain properties.
-For example `observable.ref` creates an observable reference which doesn't automatically convert it's values into observables, and `computed` introduces a derived property:
+For example `observable.ref` creates an observable reference which doesn't automatically convert its values into observables, and `computed` introduces a derived property:
 
 ```javascript
 var Person = function(firstName, lastName) {

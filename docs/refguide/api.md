@@ -23,7 +23,7 @@ The following conversion rules are applied, but can be fine-tuned by using *modi
 1. If *value* is an wrapped is an instance of an [ES6 Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map): a new [Observable Map](map.md) will be returned. Observable maps are very useful if you don't want to react just to the change of a specific entry, but also to the addition or removal of entries.
 1. If *value* is an array, a new [Observable Array](array.md) will be returned.
 1. If *value* is an object *without* prototype, the object will be cloned and all its current properties will be made observable. See [Observable Object](object.md)
-1. If *value* is an object *with* a prototype, a JavaScript primitive or function, a [Boxed Observable](boxed.md) will be returned. MobX will not make objects with a prototype automatically observable; as that is the responsibility of it's constructor function. Use `extendObservable` in the constructor, or `@observable` in it's class definition instead.
+1. If *value* is an object *with* a prototype, a JavaScript primitive or function, a [Boxed Observable](boxed.md) will be returned. MobX will not make objects with a prototype automatically observable; as that is the responsibility of its constructor function. Use `extendObservable` in the constructor, or `@observable` in its class definition instead.
 
 These rules might seem complicated at first sight, but you will notice that in practice they are very intuitive to work with.
 Some notes:
@@ -50,7 +50,7 @@ Normal boxes will automatically try to turn any new value into an observable if 
 
 ### `observable.object(value)` & `observable.shallowObject(value)`
 
-Creates a clone of the provided object and makes all it's properties observable.
+Creates a clone of the provided object and makes all its properties observable.
 By default any values in those properties will be made observable as well, but when using `shallowObject` only the properties will be made into observable
 references, but the values will be untouched. (This holds also for any values assigned in the future)
 
@@ -366,8 +366,3 @@ Used internally by `action` to allow changes, and by `computed` and `observer` t
 Usage: `resetGlobalState()`.
 Resets MobX internal global state. MobX by defaults fails fast if an exception occurs inside a computation or reaction and refuses to run them again.
 This function resets MobX to the zero state. Existing `spy` listeners and the current value of strictMode will be preserved though.
-
-
-
-
-

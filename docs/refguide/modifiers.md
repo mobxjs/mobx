@@ -24,7 +24,7 @@ Typical cases are immutable objects, or objects that are not managed by you but 
 Examples are JSX elements, DOM elements, native objects like History, window or etc.
 To those kind of objects, you just want to store a reference without turning them into an observable.
 
-For these situations there is the `ref` modifier. It makes sure that an observable property is created, which only tracks the reference but doesn't try to convert it's value.
+For these situations there is the `ref` modifier. It makes sure that an observable property is created, which only tracks the reference but doesn't try to convert its value.
 For example:
 
 ```javascript
@@ -52,7 +52,7 @@ Note that an observable, boxed reference can be created by using `const box = ob
 ## Shallow observability
 
 The `observable.shallow` modifier applies observability 'one-level-deep'. You need those if you want to create a _collection_ of observable references.
-If a new collection is assigned to a property with this modifier, it will be made observable, but it's values will be left as is, so unlike `deep`, it won't recurse.
+If a new collection is assigned to a property with this modifier, it will be made observable, but its values will be left as is, so unlike `deep`, it won't recurse.
 Example:
 
 ```javascript

@@ -221,7 +221,7 @@ How that works? See this [in-depth explanation of MobX](https://medium.com/@mwes
 
 ### Easy interoperability
 
-MobX works plain javascript structures. Due to its unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific library flavors.
+MobX works with plain javascript structures. Due to its unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific library flavors.
 
 So you can simply keep using your existing router, data fetching and utility libraries like `react-router`, `director`, `superagent`, `lodash` etc.
 

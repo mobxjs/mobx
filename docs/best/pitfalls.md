@@ -121,7 +121,7 @@ See also: http://mobxjs.github.io/mobx/best/stateless-HMR.html or [#141](https:/
 #### The propType of an observable array is object
 
 Observable arrays are actually objects, so they comply to `propTypes.object` instead of `array`.
-`mobx-react` provides it's explicit `PropTypes` for observable data structures.
+`mobx-react` provides its explicit `PropTypes` for observable data structures.
 
 #### Rendering ListViews in React Native
 
