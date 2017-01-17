@@ -1,4 +1,4 @@
-import {invariant} from "../utils/utils";
+import {invariant, fail} from "../utils/utils";
 import {isModifierDescriptor, IModifierDescriptor, deepEnhancer, referenceEnhancer, shallowEnhancer, createModifierDescriptor} from "../types/modifiers";
 import {IObservableValue, ObservableValue} from "../types/observablevalue";
 import {IObservableArray, ObservableArray} from "../types/observablearray";
@@ -61,29 +61,44 @@ export interface IObservableFactory {
 
 export class IObservableFactories {
 	box<T>(value?: T, name?: string): IObservableValue<T> {
+		if (arguments.length > 2)
+			incorrectlyUsedAsDecorator("box");
 		return new ObservableValue(value, deepEnhancer, name);
 	}
 
 	shallowBox<T>(value?: T, name?: string): IObservableValue<T> {
+		if (arguments.length > 2)
+			incorrectlyUsedAsDecorator("shallowBox");
 		return new ObservableValue(value, referenceEnhancer, name);
 	}
 
 	array<T>(initialValues?: T[], name?: string): IObservableArray<T> {
+		if (arguments.length > 2)
+			incorrectlyUsedAsDecorator("array");
 		return new ObservableArray(initialValues, deepEnhancer, name) as any;
 	}
 
 	shallowArray<T>(initialValues?: T[], name?: string): IObservableArray<T> {
+		if (arguments.length > 2)
+			incorrectlyUsedAsDecorator("shallowArray");
 		return new ObservableArray(initialValues, referenceEnhancer, name) as any;
 	}
+
 	map<T>(initialValues?: IObservableMapInitialValues<T>, name?: string): ObservableMap<T> {
+		if (arguments.length > 2)
+			incorrectlyUsedAsDecorator("map");
 		return new ObservableMap(initialValues, deepEnhancer, name);
 	}
 
 	shallowMap<T>(initialValues?: IObservableMapInitialValues<T>, name?: string): ObservableMap<T> {
+		if (arguments.length > 2)
+			incorrectlyUsedAsDecorator("shallowMap");
 		return new ObservableMap(initialValues, referenceEnhancer, name);
 	}
 
 	object<T>(props: T, name?: string): T & IObservableObject {
+		if (arguments.length > 2)
+			incorrectlyUsedAsDecorator("object");
 		const res = {};
 		// convert to observable object
 		asObservableObject(res, name);
@@ -93,6 +108,8 @@ export class IObservableFactories {
 	}
 
 	shallowObject<T>(props: T, name?: string): T & IObservableObject {
+		if (arguments.length > 2)
+			incorrectlyUsedAsDecorator("shallowObject");
 		const res = {};
 		asObservableObject(res, name);
 		extendShallowObservable(res, props);
@@ -152,3 +169,7 @@ export var observable: IObservableFactory & IObservableFactories = createObserva
 
 // weird trick to keep our typings nicely with our funcs, and still extend the observable function
 Object.keys(IObservableFactories.prototype).forEach(key => observable[key] = IObservableFactories.prototype[key]);
+
+function incorrectlyUsedAsDecorator(methodName) {
+	fail(`Expected one or two arguments to observable.${methodName}. Did you accidentally try to use observable.${methodName} as decorator?`);
+}
