@@ -17,7 +17,7 @@ export interface IComputedValue<T> {
  * A node in the state dependency root that observes other nodes, and can be observed itself.
  *
  * ComputedValue will remember result of the computation for duration of a batch, or being observed
- * During this time it will recompute only when one of it's direct dependencies changed,
+ * During this time it will recompute only when one of its direct dependencies changed,
  * but only when it is being accessed with `ComputedValue.get()`.
  *
  * Implementation description:
@@ -78,7 +78,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
 	/**
 	 * Returns the current value of this computed value.
-	 * Will evaluate it's computation first if needed.
+	 * Will evaluate its computation first if needed.
 	 */
 	public get(): T {
 		invariant(!this.isComputing, `Cycle detected in computation ${this.name}`, this.derivation);
