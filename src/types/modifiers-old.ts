@@ -1,6 +1,6 @@
 import {observable} from "../api/observable";
 import {ObservableMap, IMapEntries, IKeyValueMap} from "../types/observablemap";
-import {fail, deprecated} from "../utils/utils";
+import {deprecated} from "../utils/utils";
 
 export function asReference<T>(value: T): T {
 	deprecated("asReference is deprecated, use modifiers.ref instead");
@@ -8,7 +8,8 @@ export function asReference<T>(value: T): T {
 }
 
 export function asStructure<T>(value: T): T {
-	return fail("asStructure is deprecated. Use computed.struct or reaction options instead.");
+	deprecated("asStructure is deprecated. Use computed.struct or reaction options instead.");
+	return observable.structurallyCompare(value);
 }
 
 export function asFlat<T>(value: T): T {
