@@ -22,7 +22,7 @@ Reaction accepts as third argument an options object with the following optional
 * `context`: The `this` to be used in the functions passed to `reaction`. By default undefined (use arrow functions instead!)
 * `fireImmediately`: Boolean that indicates that the effect function should immediately be triggered after the first run of the data function. `false` by default. If a boolean is passed as third argument to `reaction`, it will be interpreted as the `fireImmediately` option.
 * `delay`: Number in milliseconds that can be used to debounce the effect function. If zero (the default), no debouncing will happen.
-* `compareStructural`: `false` by default. If `true`, the return value of the *data* function is structurally compared to it's previous return value, and the *effect* function will only be invoked if there is a structural change in the output.
+* `compareStructural`: `false` by default. If `true`, the return value of the *data* function is structurally compared to its previous return value, and the *effect* function will only be invoked if there is a structural change in the output.
 * `name`: String that is used as name for this reaction in for example [`spy`](spy.md) events.
 
 ## Example
@@ -56,7 +56,7 @@ const reaction2 = reaction(
     titles => console.log("reaction 2:", titles.join(", "))
 );
 
-// autorun reacts to just everything that is used in it's function
+// autorun reacts to just everything that is used in its function
 const autorun1 = autorun(
     () => console.log("autorun 1:", todos.map(todo => todo.title).join(", "))
 );

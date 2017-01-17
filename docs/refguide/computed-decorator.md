@@ -17,7 +17,7 @@ Nor will a computed property re-run if is not in use by some other computed prop
 In such cases it will be suspended.
 
 This automatic suspension is very convenient. If a computed value is no longer observed, for example the UI in which it was used no longer exists, MobX can automatically garbage collect it. This differs from `autorun`'s values where you must dispose of them yourself.
-It sometimes confuses people new to MobX, that if you create a computed property but don't use it anywhere in a reaction, it will not cache it's value and recompute more often than seems necessary.
+It sometimes confuses people new to MobX, that if you create a computed property but don't use it anywhere in a reaction, it will not cache its value and recompute more often than seems necessary.
 However, in real life situations this by far the best default, and you can always forcefully keep a computed value awake if you need to by using either [`observe`](observe.md) or [`keepAlive`](https://github.com/mobxjs/mobx-utils#keepalive).
 
 Note that `computed` properties are not enumerable. Nor can they be overwritten in an inheritance chain.
@@ -143,7 +143,7 @@ The `@computed` decorator does not take arguments. If you want to to create a co
 
 ## Note on error handling
 
-If a computed value throws an exception during it's computation, this exception will be catched and rethrown any time it's value is read.
+If a computed value throws an exception during its computation, this exception will be catched and rethrown any time its value is read.
 It is strongly recommended to always throw `Error`'s, so that the original stack trace is preserved. E.g.: `throw new Error("Uhoh")` instead of `throw "Uhoh"`.
 Throwing exceptions doesn't break tracking, so it is possible for computed values to recover from exceptions.
 

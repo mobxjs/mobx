@@ -269,7 +269,7 @@ message.title = "Bar"
 
 At first glance everything might seem ok here, except that the `<div>` is actually not rendered by `MyComponent` (which has a tracked rendering), but by `SomeContainer`.
 So to make sure that the title of `SomeContainer` correctly reacts to a new `message.title`, `SomeContainer` should be an `observer` as well.
-If `SomeContainer` comes from an external lib, you can also fix this by wrapping the `div` in it's own stateless `observer` based component, and instantiating that one in the callback:
+If `SomeContainer` comes from an external lib, you can also fix this by wrapping the `div` in its own stateless `observer` based component, and instantiating that one in the callback:
 
 ```javascript
 const MyComponent = observer(({ message }) =>
