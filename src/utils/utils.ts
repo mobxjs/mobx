@@ -6,10 +6,7 @@ export function getGlobal() {
 	return global;
 }
 
-export interface Lambda {
-	(): void;
-	name?: string;
-}
+export type Lambda = Function;
 
 export function getNextId() {
 	return ++globalState.mobxGuid;

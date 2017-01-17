@@ -585,19 +585,33 @@ test("boxed value json", t => {
 
 
 test("proxied value json", t => {
-	const log = [];
-	const todos = mobx.observable.dynamic({
-		"a23bf": { completed: false}
-	});
+	try {
+		const log = [];
+		const todos = mobx.observable.dynamic({
+			"a23bf": {completed: false}
+		});
 
-	autorun(() => log.push(Object.keys(todos)));
-	t.equal(log.length, 1);
-	t.equal(log[0], ["a23bf"]);
+		const cleanup = mobx.autorun(() => {
+			try {
+				log.push(Object.keys(todos));
+			} catch(e){
+				t.error('error in autorun', e);
+			}
+		});
 
-	todos["a8235"] = { completed: true};
+		t.equal(log.length, 1);
+		t.equal(log[0][0], "a23bf");
 
-	t.equal(log.length, 2);
-	t.equal(log[1], ["a23bf", "a8235"]);
+		todos["a8235"] = {completed: true};
+
+		t.equal(log.length, 2);
+		t.equal(log[1][0], "a23bf");
+		t.equal(log[1][1], "a8235");
+		cleanup();
+	} catch(e){
+		t.error('error in test', e);
+	}
+	t.end();
 });
 
 

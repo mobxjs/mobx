@@ -116,6 +116,40 @@ export class IObservableFactories {
 		return res as any;
 	}
 
+	dynamic<T>(props: T, name?: string): T & IObservableObject {
+		if (arguments.length > 2)
+			incorrectlyUsedAsDecorator("object");
+		const res = new ObservableMap(props, referenceEnhancer, name);
+
+		// convert to observable object
+
+		asObservableObject(res, name);
+
+		const result = new Proxy(res, {
+			get(target, property:string, receiver){
+				if (property === '$mobx'){
+					return target[property];
+				}
+				return target.get(property);
+			},
+			set(target, property:string, value, receiver){
+				if (property === '$mobx'){
+					return false;
+				}
+				target.set(property, value);
+				return true;
+			},
+			ownKeys: function(target) {
+				return target.keys();
+			},
+			getOwnPropertyDescriptor: function(target, property:string) {
+				return {enumerable: target.has(property), configurable:true};
+			}
+		});
+
+		return result as any;
+	}
+
 
 	/**
 	 * Decorator that creates an observable that only observes the references, but doesn't try to turn the assigned value into an observable.ts.
