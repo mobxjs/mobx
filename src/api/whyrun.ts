@@ -14,7 +14,7 @@ export function whyRun(thing?: any, prop?: string) {
 		case 0:
 			thing = globalState.trackingDerivation;
 			if (!thing)
-				return log("whyRun() can only be used if a derivation is active, or by passing an computed value / reaction explicitly. If you invoked whyRun from inside a computation; the computation is currently suspended but re-evaluating because somebody requested it's value.");
+				return log("whyRun() can only be used if a derivation is active, or by passing an computed value / reaction explicitly. If you invoked whyRun from inside a computation; the computation is currently suspended but re-evaluating because somebody requested its value.");
 			break;
 		case 2:
 			thing = getAtom(thing, prop);

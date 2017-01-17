@@ -62,9 +62,9 @@ So for example, `observable.shallowArray([todo1, todo2])` will create an observa
 
 ### Shallow properties
 
-The `@observable` decorator can still be used to introduce observable properties. And like in MobX 2, it will automatically convert it's values.
+The `@observable` decorator can still be used to introduce observable properties. And like in MobX 2, it will automatically convert its values.
 
-However, sometimes you want to create an observable property that does not convert it's _value_ into an observable automatically.
+However, sometimes you want to create an observable property that does not convert its _value_ into an observable automatically.
 Previously that could be written as `@observable x = asReference(value)`.
 
 ### Structurally comparison of observables have been removed
@@ -122,7 +122,7 @@ The signature of `reaction` is now `reaction(dataFunc, effectFunc, options?)`, w
 * `context`: The `this` to be used in the functions
 * `fireImmediately`
 * `delay`: Number in milliseconds that can be used to debounce the effect function.
-* `compareStructural`: `false` by default. If `true`, the return value of the *data* function is structurally compared to it's previous return value, and the *effect* function will only be invoked if there is a structural change in the output.
+* `compareStructural`: `false` by default. If `true`, the return value of the *data* function is structurally compared to its previous return value, and the *effect* function will only be invoked if there is a structural change in the output.
 * `name`: String
 
 ### Bound actions
@@ -161,7 +161,7 @@ See [#731](https://github.com/mobxjs/mobx/issues/731)
 MobX always printed a warning when an exception was thrown from a computed value, reaction or react component: `[mobx] An uncaught exception occurred while calculating....`.
 This warning was often confusing for people because they either had the impression that this was a mobx exception, while it actually is just informing about an exception that happened in userland code.
 And sometimes, the actual exception was silently caught somewhere else.
-MobX now does not print any warnings anymore, and just makes sure it's internal state is still stable.
+MobX now does not print any warnings anymore, and just makes sure its internal state is still stable.
 Not throwing or handling an exception is now entirely the responsibility of the user.
 
 Throwing an exception doesn't revert the causing mutation, but it does reset tracking information, which makes it possible to recover from exceptions by changing the state in such a way that a next run of the derivation doesn't throw.
@@ -201,7 +201,7 @@ See [#621](https://github.com/mobxjs/mobx/issues/621)
 
 ### Other changes
 
-* **Breaking change:** The arguments to `observe` listeners for computed and boxed observables have changed and are now consistent with the other api's. Instead of invoking the callback with `(newValue: T, oldValue: T)` they are now invoked with a single change object: `(change: {newValue: T, oldValue: T, object, type: "update"})`
+* **Breaking change:** The arguments to `observe` listeners for computed and boxed observables have changed and are now consistent with the other apis. Instead of invoking the callback with `(newValue: T, oldValue: T)` they are now invoked with a single change object: `(change: {newValue: T, oldValue: T, object, type: "update"})`
 * Using transaction is now deprecated, use `action` or `runInAction` instead. Transactions now will enter an `untracked` block as well, just as actions, which removes the conceptual difference.
 * Upgraded to typescript 2
 * It is now possible to pass ES6 Maps to `observable` / observable maps. The map will be converted to an observable map (if keys are string like)
@@ -271,7 +271,7 @@ automatically into computed values; they will be treated the same as function wi
 An observable _reference_ to the function will be made and the function itself will be preserved.
 See for more details [#532](https://github.com/mobxjs/mobx/issues/532)
 
-N.B. If you want to introduce actions on an observable that modify it's state, using `action` is still the recommended approach:
+N.B. If you want to introduce actions on an observable that modify its state, using `action` is still the recommended approach:
 
 ```javascript
 observable({
@@ -495,7 +495,7 @@ This feature can probably be improved based on your feedback, so feel free to fi
 * Fixed #285: class instances are now also supported by `toJS`. Also members defined on prototypes which are enumerable are converted.
 * Map keys are now always coerced to strings. Fixes #308
 * `when`, `autorun` and `autorunAsync` now accept custom debug names (see #293, by @jamiewinder)
-* Fixed #286: autorun's no longer stop working if an action throws an exception
+* Fixed #286: autoruns no longer stop working if an action throws an exception
 * Implemented `runInAction`, can be used to create on the fly actions (especially useful in combination with `async/await`, see #299
 * Improved performance and reduced mem usage of decorators signficantly (by defining the properties on the prototype if possible), and removed subtle differences between the implementation and behavior in babel and typescript.
 * Updated logo as per #244. Tnx @osenvosem!
@@ -560,7 +560,7 @@ Introduced:
 
 # 2.1.1
 
-* Fixed issue where `autorun`'s created inside `autorun`'s were not always kicked off. (`mobx-react`'s `observer` was not affected). Please upgrade if you often use autorun.
+* Fixed issue where `autorun`s created inside `autorun`s were not always kicked off. (`mobx-react`'s `observer` was not affected). Please upgrade if you often use autorun.
 * Fixed typings of `mobx.map`, a list of entries is also acceptable.
 * (Experimental) Improved error recovery a bit further
 
@@ -604,7 +604,7 @@ The new name is shorter and funnier and it has the right emphasis: MobX is about
 Not about observability of data structures, which is just a technical necessity.
 MobX now has its own [mobxjs](https://github.com/mobxjs) organization on GitHub. Just report an issue if you want to join.
 
-All MobX 2.0 two compatible packages and repo's have been renamed. So `mobx-react`, `mobx-react-devtools` etc.
+All MobX 2.0 two compatible packages and repos have been renamed. So `mobx-react`, `mobx-react-devtools` etc.
 For the 1.0 versions, use the old `mobservable` based names.
 
 ## Migrating from Mobservable 1.x to MobX 2.0
@@ -614,7 +614,7 @@ However there are some conceptual changes which justifies a Major version bump a
 Besides that, MobX is just a large collection of minor improvements over Mobservable.
 Make sure to remove your old `mobservable` dependencies when installing the new `mobx` dependencies!
 
-## `autorun`'s are now allowed to cause cycles!
+## `autorun`s are now allowed to cause cycles!
 `autorun` is now allowed to have cycles. In Mobservable 1 an exception was thrown as soon as an autorun modified a variable which it was reading as well.
 In MobX 2 these situations are now allowed and the autorun will trigger itself to be fired again immediately after the current execution.
 This is fine as long as the autorun terminates within a reasonable amount of iterations (100).
@@ -774,7 +774,7 @@ Fix incompatibility issue with systemjs bundler (see PR 52)
 
 # 1.0.1
 
-* Stricter argument checking for several api's.
+* Stricter argument checking for several apis.
 
 # 1.0
 
