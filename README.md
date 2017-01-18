@@ -282,6 +282,13 @@ And finally kudos for all the people that believed in, tried, validated and even
 
 > Note: Before testing, make sure to run `npm run small-build`.
 
+## Flow support
+MobX ships with flow typings. To use them in your project, add this to the `[libs]` section of your `.flowconfig`:
+```
+[libs]
+node_modules/mobx/lib/mobx.js.flow
+```
+
 ## Bower support
 
 Bower support is available through the infamous unpkg.com:
