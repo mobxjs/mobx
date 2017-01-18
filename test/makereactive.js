@@ -583,36 +583,42 @@ test("boxed value json", t => {
 	t.end();
 })
 
-
 test("proxied value json", t => {
-	try {
-		const log = [];
-		const todos = mobx.observable.dynamic({
+	if(typeof Proxy === 'function') {
+		try {
+			const log = [];
+			const todos = mobx.observable.dynamic({
+				"a23bf": {completed: false}
+			});
+
+			const cleanup = mobx.autorun(() => {
+				try {
+					log.push(Object.keys(todos));
+				} catch (e) {
+					t.error('error in autorun', e);
+				}
+			});
+
+			t.equal(log.length, 1);
+			t.equal(log[0][0], "a23bf");
+
+			todos["a8235"] = {completed: true};
+
+			t.equal(log.length, 2);
+			t.equal(log[1][0], "a23bf");
+			t.equal(log[1][1], "a8235");
+			cleanup();
+		} catch (e) {
+			t.error('error in test', e);
+		}
+	} else {
+		t.throws(() => mobx.observable.dynamic({
 			"a23bf": {completed: false}
-		});
-
-		const cleanup = mobx.autorun(() => {
-			try {
-				log.push(Object.keys(todos));
-			} catch(e){
-				t.error('error in autorun', e);
-			}
-		});
-
-		t.equal(log.length, 1);
-		t.equal(log[0][0], "a23bf");
-
-		todos["a8235"] = {completed: true};
-
-		t.equal(log.length, 2);
-		t.equal(log[1][0], "a23bf");
-		t.equal(log[1][1], "a8235");
-		cleanup();
-	} catch(e){
-		t.error('error in test', e);
+		}))
 	}
 	t.end();
 });
+
 
 
 test("computed value scope", t => {

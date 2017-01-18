@@ -119,6 +119,7 @@ export class IObservableFactories {
 	dynamic<T>(props: T, name?: string): T & IObservableObject {
 		if (arguments.length > 2)
 			incorrectlyUsedAsDecorator("object");
+		invariant(typeof Proxy === 'function', "dynamic objects are not supported in this environment");
 		const internalMap = new ObservableMap(props, referenceEnhancer, name);
 		const result = new Proxy(internalMap, {
 			get(target, property:string, receiver){
@@ -129,8 +130,7 @@ export class IObservableFactories {
 			},
 			set(target, property:string, value, receiver){
 				if (property === '$mobx'){
-					return false;
-				}
+					return false;}
 				target.set(property, value);
 				return true;
 			},
