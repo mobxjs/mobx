@@ -8,7 +8,7 @@ Usage:
 * `@action boundClassMethod = (args) => { body }`
 * `@action(name) boundClassMethod = (args) => { body }`
 * `@action.bound classMethod() {}`
-* `@action.bound(function() {})
+* `@action.bound(function() {})`
 
 Any application has actions. Actions are anything that modify the state.
 With MobX you can make it explicit in your code where your actions live by marking them.
