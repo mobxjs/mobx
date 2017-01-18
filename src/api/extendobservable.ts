@@ -3,6 +3,8 @@ import {asObservableObject, defineObservablePropertyFromDescriptor} from "../typ
 import {isObservable} from "../api/isobservable";
 import {invariant, isPropertyConfigurable, hasOwnProperty} from "../utils/utils";
 import {deepEnhancer, referenceEnhancer, IEnhancer} from "../types/modifiers";
+import {message} from "../utils/messages";
+
 
 export function extendObservable<A extends Object, B extends Object>(target: A, ...properties: B[]): A & B {
 	return extendObservableHelper(target, deepEnhancer, properties) as any;
@@ -13,13 +15,13 @@ export function extendShallowObservable<A extends Object, B extends Object>(targ
 }
 
 function extendObservableHelper(target: Object, defaultEnhancer: IEnhancer<any>, properties: Object[]): Object {
-	invariant(arguments.length >= 2, "extendObservable expected 2 or more arguments");
-	invariant(typeof target === "object", "extendObservable expects an object as first argument");
-	invariant(!(isObservableMap(target)), "extendObservable should not be used on maps, use map.merge instead");
+	invariant(arguments.length >= 2, message("m014"));
+	invariant(typeof target === "object", message("m015"));
+	invariant(!(isObservableMap(target)), message("m016"));
 
 	properties.forEach(propSet => {
-		invariant(typeof propSet === "object", "all arguments of extendObservable should be objects");
-		invariant(!isObservable(propSet), "extending an object with another observable (object) is not supported. Please construct an explicit propertymap, using `toJS` if need. See issue #540");
+		invariant(typeof propSet === "object", message("m017"));
+		invariant(!isObservable(propSet), message("m018"));
 	});
 
 	const adm = asObservableObject(target);

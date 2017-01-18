@@ -7,6 +7,8 @@ import {IListenable, registerListener, hasListeners, notifyListeners} from "./li
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {IEnhancer, isModifierDescriptor, IModifierDescriptor} from "../types/modifiers";
 import {isAction, defineBoundAction} from "../api/action";
+import {message} from "../utils/messages";
+
 
 
 export interface IObservableObject {
@@ -59,7 +61,7 @@ export function asObservableObject(target, name?: string): ObservableObjectAdmin
 	if (isObservableObject(target))
 		return (target as any).$mobx;
 
-	invariant(Object.isExtensible(target), "Cannot make the designated object observable; it is not extensible");
+	invariant(Object.isExtensible(target), message("m035"));
 	if (!isPlainObject(target))
 		name = (target.constructor.name || "ObservableObject") + "@" + getNextId();
 	if (!name)

@@ -3,6 +3,7 @@ import {isModifierDescriptor} from "../types/modifiers";
 import {Reaction, IReactionPublic, IReactionDisposer} from "../core/reaction";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
 import {action, isAction} from "../api/action";
+import {message} from "../utils/messages";
 
 /**
  * Creates a reactive view and keeps it alive, so that the view is always
@@ -37,10 +38,10 @@ export function autorun(arg1: any, arg2: any, arg3?: any) {
 		scope = arg2;
 	}
 
-	invariant(typeof view === "function", "autorun expects a function");
+	invariant(typeof view === "function", message("m004"));
 	invariant(
 		isAction(view) === false,
-		"Warning: attempted to pass an action to autorun. Actions are untracked and will not trigger on state changes. Use `reaction` or wrap only your state modification code in an action."
+		message("m005")
 	);
 	if (scope)
 		view = view.bind(scope);
@@ -121,7 +122,7 @@ export function autorunAsync(arg1: any, arg2: any, arg3?: any, arg4?: any) {
 	}
 	invariant(
 		isAction(func) === false,
-		"Warning: attempted to pass an action to autorunAsync. Actions are untracked and will not trigger on state changes. Use `reaction` or wrap only your state modification code in an action."
+		message("m006")
 	);
 	if (delay === void 0)
 		delay = 1;
@@ -167,10 +168,10 @@ export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg:
 export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately?: boolean): IReactionDisposer;
 export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg: T, r: IReactionPublic) => void, arg3: any) {
 	if (arguments.length > 3) {
-		fail("reaction only accepts 2 or 3 arguments. If migrating from MobX 2, please provide an options object");
+		fail(message("m007"));
 	}
 	if (isModifierDescriptor(expression)) {
-		fail("wrapping reaction expression in `asReference` is no longer supported, use options object instead");
+		fail(message("m008"));
 	}
 
 	let opts: IReactionOptions;

@@ -2,7 +2,7 @@ import {asObservableObject, defineComputedProperty} from "../types/observableobj
 import {invariant} from "../utils/utils";
 import {createClassPropertyDecorator} from "../utils/decorators";
 import {ComputedValue, IComputedValue} from "../core/computedvalue";
-
+import {message} from "../utils/messages";
 
 export interface IComputedValueOptions<T> {
 	compareStructural?: boolean;
@@ -22,8 +22,8 @@ export interface IComputed {
 function createComputedDecorator(compareStructural) {
 	return createClassPropertyDecorator(
 		(target, name, _, __, originalDescriptor) => {
-			invariant(typeof originalDescriptor !== "undefined", "@computed can only be used on getter functions, like: '@computed get myProps() { return ...; }'. It looks like it was used on a property.");
-			invariant(typeof originalDescriptor.get === "function", "@computed can only be used on getter functions, like: '@computed get myProps() { return ...; }'");
+			invariant(typeof originalDescriptor !== "undefined", message("m009"));
+			invariant(typeof originalDescriptor.get === "function", message("m010"));
 
 			const adm = asObservableObject(target, "");
 			defineComputedProperty(adm, name, originalDescriptor.get, originalDescriptor.set, compareStructural, false);
@@ -54,8 +54,8 @@ export var computed: IComputed = (
 		if (typeof arg2 === "string") {
 			return computedDecorator.apply(null, arguments);
 		}
-		invariant(typeof arg1 === "function", "First argument to `computed` should be an expression. If using computed as decorator, don't pass it arguments");
-		invariant(arguments.length < 3, "computed takes one or two arguments if used as function");
+		invariant(typeof arg1 === "function", message("m011"));
+		invariant(arguments.length < 3, message("m012"));
 		const opts: IComputedValueOptions<any> = typeof arg2 === "object" ? arg2 : {};
 		opts.setter = typeof arg2 === "function" ? arg2 : opts.setter;
 		return new ComputedValue(arg1, opts.context, opts.compareStructural || false, opts.name || arg1.name || "", opts.setter);

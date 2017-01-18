@@ -3,6 +3,8 @@ import {IObservable, startBatch, endBatch} from "./observable";
 import {globalState} from "./globalstate";
 import {createInstanceofPredicate, getNextId, invariant, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
+import {message} from "../utils/messages";
+
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations
@@ -124,36 +126,21 @@ export class Reaction implements IDerivation, IReactionPublic {
 			return;
 		}
 
-		const message = `[mobx] Catched uncaught exception that was thrown by a reaction or observer component, in: '${this}`;
+		const messageToConsole = `[mobx] Catched uncaught exception that was thrown by a reaction or observer component, in: '${this}`;
 		const messageToUser = `
 		Hi there! I'm sorry you have just run into an exception.
 
 		If your debugger ends up here, know that some reaction (like the render() of an observer component, autorun or reaction)
-		threw an exception and that mobx catched it, too avoid that it brings the rest of your application down.
+		threw an exception and that mobx caught it, to avoid that it brings the rest of your application down.
+		` + message("m037");
 
-		The original cause of the exception (the code that caused this reaction to run (again)), is still in the stack.
-
-		However, more interesting is the actual stack trace of the error itself.
-		Hopefully the error is an instanceof Error, because in that case you can inspect the original stack of the error from where it was thrown.
-		See \`error.stack\` property, or press the very subtle "(...)" link you see near the console.error message that probably brought you here.
-		That stack is more interesting than the stack of this console.error itself.
-
-		If the exception you see is an exception you created yourself, make sure to use \`throw new Error("Oops")\` instead of \`throw "Oops"\`,
-		because the javascript environment will only preserve the original stack trace in the first form.
-
-		You can also make sure the debugger pauses the next time this very same exception is thrown by enabling "Pause on caught exception".
-		(Note that it might pause on many other, unrelated exception as well).
-
-		If that all doesn't help you out, feel free to open an issue https://github.com/mobxjs/mobx/issues!
-		`;
-
-		console.error(message || messageToUser /* latter will not be true, make sure uglify doesn't remove */, error);
+		console.error(messageToConsole || messageToUser /* latter will not be true, make sure uglify doesn't remove */, error);
 			/** If debugging brough you here, please, read the above message :-). Tnx! */
 
 		if (isSpyEnabled()) {
 			spyReport({
 				type: "error",
-				message,
+				messageToConsole,
 				error,
 				object: this
 			});
@@ -193,9 +180,7 @@ WhyRun? reaction '${this.name}':
  * This reaction will re-run if any of the following observables changes:
     ${joinStrings(observing)}
     ${(this._isRunning) ? " (... or any observable accessed during the remainder of the current run)" : ""}
-	Missing items in this list?
-	  1. Check whether all used values are properly marked as observable (use isObservable to verify)
-	  2. Make sure you didn't dereference values too early. MobX observes props, not primitives. E.g: use 'person.name' instead of 'name' in your computation.
+	${message("m038")}
 `
 		);
 	}

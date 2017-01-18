@@ -1,5 +1,7 @@
 import {deprecated} from "../utils/utils";
 import {executeAction} from "../core/action";
+import {message} from "../utils/messages";
+
 
 /**
  * @deprecated
@@ -12,7 +14,7 @@ import {executeAction} from "../core/action";
  * @returns any value that was returned by the 'action' parameter.
  */
 export function transaction<T>(action: () => T, thisArg = undefined): T {
-	deprecated("Using `transaction` is deprecated, use `runInAction` or `(@)action` instead.");
+	deprecated(message("m023"));
 	return runInTransaction.apply(undefined, arguments);
 }
 
