@@ -199,7 +199,7 @@ export function isArrayLike(x: any): boolean {
 }
 
 export function isES6Map(thing): boolean {
-	if (thing instanceof getGlobal().Map)
+	if (getGlobal().Map !== undefined && thing instanceof getGlobal().Map)
 		return true;
 	return false;
 }
