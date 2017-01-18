@@ -163,7 +163,7 @@ export class IObservableFactories {
 
 
 	/**
-	 * Decorator that creates an observable converts it's value (objects, maps or arrays) into a shallow observable structure
+	 * Decorator that creates an observable converts its value (objects, maps or arrays) into a shallow observable structure
 	 */
 	shallow(target: Object, property: string, descriptor?: PropertyDescriptor): any;
 	shallow<T>(initialValues: T[]): IObservableArray<T>;

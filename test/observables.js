@@ -1661,3 +1661,20 @@ test('603 - transaction should not kill reactions', t => {
 	t.end()
 
 })
+
+test('observables should not fail when ES6 Map is missing', t => {
+    const globalMapFunction = global.Map;
+    global.Map = undefined;
+    t.equal(global.Map, undefined);
+    try {
+        var a = observable([1,2,3]); //trigger isES6Map in utils
+    }
+    catch (e) {
+        t.fail('Should not fail when Map is missing');
+    }
+
+    t.equal(m.isObservable(a), true);
+
+    global.Map = globalMapFunction;
+    t.end();
+})
