@@ -119,13 +119,8 @@ export class IObservableFactories {
 	dynamic<T>(props: T, name?: string): T & IObservableObject {
 		if (arguments.length > 2)
 			incorrectlyUsedAsDecorator("object");
-		const res = new ObservableMap(props, referenceEnhancer, name);
-
-		// convert to observable object
-
-		asObservableObject(res, name);
-
-		const result = new Proxy(res, {
+		const internalMap = new ObservableMap(props, referenceEnhancer, name);
+		const result = new Proxy(internalMap, {
 			get(target, property:string, receiver){
 				if (property === '$mobx'){
 					return target[property];
