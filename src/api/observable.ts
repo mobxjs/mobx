@@ -1,5 +1,5 @@
 import {invariant} from "../utils/utils";
-import {isModifierDescriptor, IModifierDescriptor, deepEnhancer, referenceEnhancer, shallowEnhancer, deepStructurallyCompareEnhancer, refStructurallyCompareEnhancer, createModifierDescriptor} from "../types/modifiers";
+import {isModifierDescriptor, IModifierDescriptor, deepEnhancer, referenceEnhancer, shallowEnhancer, deepStructEnhancer, refStructEnhancer, createModifierDescriptor} from "../types/modifiers";
 import {IObservableValue, ObservableValue} from "../types/observablevalue";
 import {IObservableArray, ObservableArray} from "../types/observablearray";
 import {createDecoratorForEnhancer} from "./observabledecorator";
@@ -8,11 +8,11 @@ import {IObservableObject, asObservableObject} from "../types/observableobject";
 import {extendObservable, extendShallowObservable} from "../api/extendobservable";
 import {IObservableMapInitialValues, ObservableMap, IMap} from "../types/observablemap";
 
-const deepObservableDecorator = createDecoratorForEnhancer(deepEnhancer);
-const shallowObservableDecorator = createDecoratorForEnhancer(shallowEnhancer);
-const refObservableDecorator = createDecoratorForEnhancer(referenceEnhancer);
-const deepStructuralObservableDecorator = createDecoratorForEnhancer(deepStructurallyCompareEnhancer);
-const refStructuralObservableDecorator = createDecoratorForEnhancer(refStructurallyCompareEnhancer);
+const deepDecorator = createDecoratorForEnhancer(deepEnhancer);
+const shallowDecorator = createDecoratorForEnhancer(shallowEnhancer);
+const refDecorator = createDecoratorForEnhancer(referenceEnhancer);
+const deepStructDecorator = createDecoratorForEnhancer(deepStructEnhancer);
+const refStructDecorator = createDecoratorForEnhancer(refStructEnhancer);
 
 /**
  * Turns an object, array or function into a reactive structure.
@@ -21,7 +21,7 @@ const refStructuralObservableDecorator = createDecoratorForEnhancer(refStructura
 function createObservable(v: any = undefined) {
 	// @observable someProp;
 	if (typeof arguments[1] === "string")
-		return deepObservableDecorator.apply(null, arguments);
+		return deepDecorator.apply(null, arguments);
 
 	invariant(arguments.length <= 1, "observable expects zero or one arguments");
 	invariant(!isModifierDescriptor(v), "modifiers can only be used for individual object properties");
@@ -113,7 +113,7 @@ export class IObservableFactories {
 			// of the object is `T` in the end, when the descriptors are interpreted
 			return createModifierDescriptor(referenceEnhancer, arguments[0]) as any;
 		} else {
-			return refObservableDecorator.apply(null, arguments);
+			return refDecorator.apply(null, arguments);
 		}
 	}
 
@@ -131,7 +131,7 @@ export class IObservableFactories {
 			// of the object is `T` in the end, when the descriptors are interpreted
 			return createModifierDescriptor(shallowEnhancer, arguments[0]) as any;
 		} else {
-			return shallowObservableDecorator.apply(null, arguments);
+			return shallowDecorator.apply(null, arguments);
 		}
 	}
 
@@ -145,42 +145,42 @@ export class IObservableFactories {
 			// of the object is `T` in the end, when the descriptors are interpreted
 			return createModifierDescriptor(deepEnhancer, arguments[0]) as any;
 		} else {
-			return deepObservableDecorator.apply(null, arguments);
+			return deepDecorator.apply(null, arguments);
 		}
 	}
 
-	structurallyCompare(target: Object, property: string, descriptor?: PropertyDescriptor): any;
-	structurallyCompare<T>(initialValues: T[]): IObservableArray<T>;
-	structurallyCompare<T>(initialValues: IMap<string | number | boolean, T>): ObservableMap<T>;
-	structurallyCompare<T>(initialValue: T): T;
-	structurallyCompare() {
+	struct(target: Object, property: string, descriptor?: PropertyDescriptor): any;
+	struct<T>(initialValues: T[]): IObservableArray<T>;
+	struct<T>(initialValues: IMap<string | number | boolean, T>): ObservableMap<T>;
+	struct<T>(initialValue: T): T;
+	struct() {
 		if (arguments.length < 2) {
 			// although ref creates actually a modifier descriptor, the type of the resultig properties
 			// of the object is `T` in the end, when the descriptors are interpreted
-			return createModifierDescriptor(deepStructurallyCompareEnhancer, arguments[0]) as any;
+			return createModifierDescriptor(deepStructEnhancer, arguments[0]) as any;
 		} else {
-			return deepStructuralObservableDecorator.apply(null, arguments);
+			return deepStructDecorator.apply(null, arguments);
 		}
 	}
 }
 
 export var observable: IObservableFactory & IObservableFactories & {
 	deep: {
-		structurallyCompare<T>(initialValue?: T): T
+		struct<T>(initialValue?: T): T
 	},
 	ref: {
-		structurallyCompare<T>(initialValue?: T): T
+		struct<T>(initialValue?: T): T
 	}
 } = createObservable as any;
 
 // weird trick to keep our typings nicely with our funcs, and still extend the observable function
 Object.keys(IObservableFactories.prototype).forEach(key => observable[key] = IObservableFactories.prototype[key]);
 
-observable.deep.structurallyCompare = observable.structurallyCompare;
-observable.ref.structurallyCompare = function() {
+observable.deep.struct = observable.struct;
+observable.ref.struct = function() {
 	if (arguments.length < 2) {
-		return createModifierDescriptor(refStructurallyCompareEnhancer, arguments[0]) as any;
+		return createModifierDescriptor(refStructEnhancer, arguments[0]) as any;
 	} else {
-		return refStructuralObservableDecorator.apply(null, arguments);
+		return refStructDecorator.apply(null, arguments);
 	}
 };

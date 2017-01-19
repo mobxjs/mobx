@@ -63,7 +63,7 @@ export function referenceEnhancer(newValue?) {
 	return newValue;
 }
 
-export function deepStructurallyCompareEnhancer(v, oldValue, name): any {
+export function deepStructEnhancer(v, oldValue, name): any {
 	// don't confuse structurally compare enhancer with ref enhancer! The latter is probably
 	// more suited for immutable objects
 	if (deepEquals(v, oldValue))
@@ -75,20 +75,20 @@ export function deepStructurallyCompareEnhancer(v, oldValue, name): any {
 
 	// something that can be converted and mutated?
 	if (Array.isArray(v))
-		return new ObservableArray(v, deepStructurallyCompareEnhancer, name);
+		return new ObservableArray(v, deepStructEnhancer, name);
 	if (isES6Map(v))
-		return new ObservableMap(v, deepStructurallyCompareEnhancer, name);
+		return new ObservableMap(v, deepStructEnhancer, name);
 	if (isPlainObject(v)) {
 		const res = {};
 		asObservableObject(res, name);
-		extendObservableHelper(res, deepStructurallyCompareEnhancer, [v]);
+		extendObservableHelper(res, deepStructEnhancer, [v]);
 		return res;
 	}
 
 	return v;
 }
 
-export function refStructurallyCompareEnhancer(v, oldValue, name): any {
+export function refStructEnhancer(v, oldValue, name): any {
 	if (deepEquals(v, oldValue))
 		return oldValue;
 	return v;

@@ -289,7 +289,7 @@ test('flat object', function(t) {
 test('as structure', function(t) {
 
     var x = m.observable({
-        x: m.observable.structurallyCompare(null)
+        x: m.observable.struct(null)
     });
 
     var changed = 0;
@@ -613,7 +613,7 @@ test("shallow array", t => {
 
 test("compare structurally, deep", t => {
 	var a = mobx.observable.object({
-		x: mobx.observable.deep.structurallyCompare()
+		x: mobx.observable.deep.struct()
 	})
 
 	var changed = 0
@@ -642,7 +642,7 @@ test("compare structurally, deep", t => {
 
 test("compare structurally, ref", t => {
 	var a = mobx.observable.object({
-		x: mobx.observable.ref.structurallyCompare()
+		x: mobx.observable.ref.struct()
 	})
 
 	var changed = 0
