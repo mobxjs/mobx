@@ -66,7 +66,7 @@ export function referenceEnhancer(newValue?) {
 export function deepStructEnhancer(v, oldValue, name): any {
 	// don't confuse structurally compare enhancer with ref enhancer! The latter is probably
 	// more suited for immutable objects
-	if (deepEquals(v, oldValue))
+	if (deepEqual(v, oldValue))
 		return oldValue;
 
 	// it is an observable already, done
@@ -89,7 +89,7 @@ export function deepStructEnhancer(v, oldValue, name): any {
 }
 
 export function refStructEnhancer(v, oldValue, name): any {
-	if (deepEquals(v, oldValue))
+	if (deepEqual(v, oldValue))
 		return oldValue;
 	return v;
 }
@@ -97,7 +97,7 @@ export function refStructEnhancer(v, oldValue, name): any {
 import { isObservable } from "../api/isobservable";
 import { observable } from "../api/observable";
 import { extendObservableHelper } from "../api/extendobservable";
-import { fail, isPlainObject, invariant, isES6Map, deepEquals } from "../utils/utils";
+import { fail, isPlainObject, invariant, isES6Map, deepEqual } from "../utils/utils";
 import { isObservableObject, asObservableObject } from "./observableobject";
 import { isObservableArray, ObservableArray } from "./observablearray";
 import { isObservableMap, ObservableMap } from "./observablemap";

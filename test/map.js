@@ -480,3 +480,26 @@ test('support for ES6 Map', t => {
 
 	t.end();
 })
+
+test('deepEqual map', t => {
+	var x = new Map()
+	x.set("x", 3)
+	x.set("y", { z: 2 })
+
+	var x2 = mobx.observable.map();
+	x2.set("x", 3)
+	x2.set("y", { z: 3 })
+
+	t.equals(mobx.extras.deepEqual(x, x2), false)
+	x2.get("y").z = 2
+	t.equals(mobx.extras.deepEqual(x, x2), true)
+
+	x2.set("z", 1)
+	t.equals(mobx.extras.deepEqual(x, x2), false)
+	x2.delete("z")
+	t.equals(mobx.extras.deepEqual(x, x2), true)
+	x2.delete("y")
+	t.equals(mobx.extras.deepEqual(x, x2), false)
+
+	t.end();
+})
