@@ -6,6 +6,7 @@ import {getMessage} from "../utils/messages";
 
 export interface IComputedValueOptions<T> {
 	compareStructural?: boolean;
+	struct?: boolean;
 	name?: string;
 	setter?: (value: T) => void;
 	context?: any;
@@ -58,7 +59,7 @@ export var computed: IComputed = (
 		invariant(arguments.length < 3, getMessage("m012"));
 		const opts: IComputedValueOptions<any> = typeof arg2 === "object" ? arg2 : {};
 		opts.setter = typeof arg2 === "function" ? arg2 : opts.setter;
-		return new ComputedValue(arg1, opts.context, opts.compareStructural || false, opts.name || arg1.name || "", opts.setter);
+		return new ComputedValue(arg1, opts.context, opts.compareStructural || opts.struct || false, opts.name || arg1.name || "", opts.setter);
 	}
 ) as any;
 

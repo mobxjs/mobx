@@ -228,7 +228,7 @@ How that works? See this [in-depth explanation of MobX](https://medium.com/@mwes
 
 ### Easy interoperability
 
-MobX works with plain javascript structures. Due to it's unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific library flavors.
+MobX works with plain javascript structures. Due to its unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific library flavors.
 
 So you can simply keep using your existing router, data fetching, and utility libraries like `react-router`, `director`, `superagent`, `lodash` etc.
 
@@ -252,7 +252,7 @@ MobX is inspired by reactive programming principles as found in spreadsheets. It
 
 A ton of credits for [Mendix](https://github.com/mendix), for providing the flexibility and support to maintain MobX and the chance to proof the philosophy of MobX in a real, complex, performance critical applications.
 
-And finally kudo's for all the people that believed in, tried, validated and even [sponsored](https://github.com/mobxjs/mobx/blob/master/sponsors.md) MobX.
+And finally kudos for all the people that believed in, tried, validated and even [sponsored](https://github.com/mobxjs/mobx/blob/master/sponsors.md) MobX.
 
 ## Further resources and documentation
 
@@ -279,6 +279,15 @@ And finally kudo's for all the people that believed in, tried, validated and eve
 
 * Feel free to send small pull requests. Please discuss new features or big changes in a GitHub issue first.
 * Use `npm test` to run the basic test suite, `npm run coverage` for the test suite with coverage and `npm run perf` for the performance tests.
+
+> Note: Before testing, make sure to run `npm run small-build`.
+
+## Flow support
+MobX ships with flow typings. To use them in your project, add this to the `[libs]` section of your `.flowconfig`:
+```
+[libs]
+node_modules/mobx/lib/mobx.js.flow
+```
 
 ## Bower support
 

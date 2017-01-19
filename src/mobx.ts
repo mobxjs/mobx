@@ -35,7 +35,7 @@ export { IObjectWillChange, IObjectChange, IObservableObject, isObservableObject
 
 export { IValueDidChange, IValueWillChange, IObservableValue } from "./types/observablevalue";
 export { IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, isObservableArray } from "./types/observablearray";
-export { IKeyValueMap, ObservableMap, IMapEntries, IMapEntry, IMapWillChange, IMapChange, isObservableMap, map, IObservableMapInitialValues, IMap } from "./types/observablemap"
+export { IKeyValueMap, ObservableMap, IMapEntries, IMapEntry, IMapWillChange, IMapChange, isObservableMap, map, IObservableMapInitialValues, IMap } from "./types/observablemap";
 
 export { transaction                                          } from "./api/transaction";
 export { observable, IObservableFactory, IObservableFactories } from "./api/observable";
@@ -64,12 +64,13 @@ import { IObserverTree, IDependencyTree, getDependencyTree, getObserverTree } fr
 import { getDebugName, getAtom, getAdministration } from "./types/type-utils";
 import { allowStateChanges } from "./core/action";
 import { spyReport, spyReportEnd, spyReportStart, isSpyEnabled } from "./core/spy";
-import { Lambda } from "./utils/utils";
+import { Lambda, deepEqual } from "./utils/utils";
 import { isComputingDerivation } from "./core/derivation";
 import { setReactionScheduler, onReactionError } from "./core/reaction";
 
 export const extras = {
 	allowStateChanges,
+	deepEqual,
 	getAtom,
 	getDebugName,
 	getDependencyTree,

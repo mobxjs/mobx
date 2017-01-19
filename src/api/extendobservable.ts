@@ -14,7 +14,7 @@ export function extendShallowObservable<A extends Object, B extends Object>(targ
 	return extendObservableHelper(target, referenceEnhancer, properties) as any;
 }
 
-function extendObservableHelper(target: Object, defaultEnhancer: IEnhancer<any>, properties: Object[]): Object {
+export function extendObservableHelper(target: Object, defaultEnhancer: IEnhancer<any>, properties: Object[]): Object {
 	invariant(arguments.length >= 2, getMessage("m014"));
 	invariant(typeof target === "object", getMessage("m015"));
 	invariant(!(isObservableMap(target)), getMessage("m016"));

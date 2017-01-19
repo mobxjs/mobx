@@ -154,6 +154,8 @@ export interface IReactionOptions {
 	fireImmediately?: boolean;
 	delay?: number;
 	compareStructural?: boolean;
+	/** alias for compareStructural */
+	struct?: boolean;
 	name?: string;
 }
 
@@ -184,7 +186,7 @@ export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg:
 	opts.name = opts.name || (expression as any).name || (effect as any).name || ("Reaction@" + getNextId());
 	opts.fireImmediately = arg3 === true || opts.fireImmediately === true;
 	opts.delay = opts.delay || 0;
-	opts.compareStructural = opts.compareStructural || false;
+	opts.compareStructural = opts.compareStructural || opts.struct || false;
 	effect = action(opts.name!, opts.context ? effect.bind(opts.context) : effect);
 	if (opts.context) {
 		expression = expression.bind(opts.context);

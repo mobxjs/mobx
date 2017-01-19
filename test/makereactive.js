@@ -286,10 +286,10 @@ test('flat object', function(t) {
     t.end();
 })
 
-test.skip('as structure', function(t) {
+test('as structure', function(t) {
 
     var x = m.observable({
-        x: m.observable.structure(null)
+        x: m.observable.struct(null)
     });
 
     var changed = 0;
@@ -350,6 +350,7 @@ test.skip('as structure', function(t) {
     };
     c();
     x.x.y.y = 3;
+	console.log("test")
     nc();
     x.x.y = { y: 3 };
     nc();
@@ -374,7 +375,6 @@ test.skip('as structure', function(t) {
     nc();
     x.x[1] = 2;
     nc();
-	console.log("test")
     x.x[0] = 0;
     c();
     x.x[1] = {
@@ -496,10 +496,6 @@ test('exceptions', function(t) {
     });
 
     t.throws(function() {
-        x.y = m.asStructure(3)
-    });
-
-    t.throws(function() {
         x.z = m.asReference(3)
     });
 
@@ -578,7 +574,7 @@ test("boxed value json", t => {
 	t.deepEqual(a.get().x, 1);
 	a.set(3);
 	t.deepEqual(a.get(), 3);
-	t.equal("" + a, 'ObservableValue@3[3]');
+	t.equal("" + a, '3');
 	t.equal(a.toJSON(), 3);
 	t.end();
 })
@@ -638,5 +634,62 @@ test("761 - deeply nested modifiers work", t=> {
 	t.equal(mobx.isObservable(a.someKey.someNestedKey), true) // Too bad: no deep merge with Object.assign! someKey object gets replaced in its entirity
 	t.equal(Array.isArray(a.someKey.someNestedKey), false)
 
+	t.end();
+});
+
+test("compare structurally, deep", t => {
+	var a = mobx.observable.object({
+		x: mobx.observable.deep.struct()
+	})
+
+	var changed = 0
+	var d = mobx.autorun(() => {
+		mobx.toJS(a)
+		changed++
+	})
+
+	t.equal(changed, 1)
+	a.x = { y: 2 }
+	t.equal(changed, 2)
+	a.x.y = 3
+	t.equal(changed, 3, "reacted to deep observability")
+
+	a.x = { y: 3 }
+	t.equal(changed, 3, "did not react; structurally the same")
+
+	a.x.y = { a: 1 }
+	t.equal(changed, 4, "did react")
+	a.x.y = { a: 1 }
+	t.equal(changed, 4, "did not react; structurally comparison was infective")
+
+	d()
+	t.end()
+})
+
+test("compare structurally, ref", t => {
+	var a = mobx.observable.object({
+		x: mobx.observable.ref.struct()
+	})
+
+	var changed = 0
+	var d = mobx.autorun(() => {
+		mobx.toJS(a)
+		changed++
+	})
+
+	t.equal(changed, 1)
+	a.x = { y: 2 }
+	t.equal(changed, 2)
+	a.x.y = 3
+	t.equal(mobx.isObservable(a.x), false)
+	t.equal(changed, 2, "didn't react, not observed")
+
+	a.x = { y: 3 }
+	t.equal(changed, 2, "did not react; structurally the same")
+
+	a.x = { y: 4 }
+	t.equal(changed, 3, "did react; ref change")
+
+	d()
 	t.end()
 })

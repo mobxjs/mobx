@@ -165,7 +165,7 @@ function invariantLOS(observable: IObservable, msg) {
  * Also most basic use cases shuold be ok
  */
 
-// Called by Atom when it's value changes
+// Called by Atom when its value changes
 export function propagateChanged(observable: IObservable) {
 	// invariantLOS(observable, "changed start");
 	if (observable.lowestObserverState === IDerivationState.STALE) return;
@@ -182,7 +182,7 @@ export function propagateChanged(observable: IObservable) {
 	// invariantLOS(observable, "changed end");
 }
 
-// Called by ComputedValue when it recalculate and it's value changed
+// Called by ComputedValue when it recalculate and its value changed
 export function propagateChangeConfirmed(observable: IObservable) {
 	// invariantLOS(observable, "confirmed start");
 	if (observable.lowestObserverState === IDerivationState.STALE) return;
@@ -200,7 +200,7 @@ export function propagateChangeConfirmed(observable: IObservable) {
 	// invariantLOS(observable, "confirmed end");
 }
 
-// Used by computed when it's dependency changed, but we don't wan't to immidiately recompute.
+// Used by computed when its dependency changed, but we don't wan't to immidiately recompute.
 export function propagateMaybeChanged(observable: IObservable) {
 	// invariantLOS(observable, "maybe start");
 	if (observable.lowestObserverState !== IDerivationState.UP_TO_DATE) return;
