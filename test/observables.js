@@ -1662,6 +1662,21 @@ test('603 - transaction should not kill reactions', t => {
 
 })
 
+test('#561 test toPrimitive() of observable objects', function(t) {
+    var x = observable(3);
+
+    t.equal(x.valueOf(), 3);
+    t.equal(x[Symbol.toPrimitive](), 3);
+
+    t.equal(+x, 3);
+    t.equal(++x, 4);
+
+    var y = observable(3);
+
+    t.equal(y + 7, 10);
+    t.end()
+});
+
 test('observables should not fail when ES6 Map is missing', t => {
     const globalMapFunction = global.Map;
     global.Map = undefined;
