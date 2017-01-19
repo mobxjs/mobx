@@ -1,6 +1,10 @@
 # 3.0.2
 
-Re-introduced structural comparison. Seems we couldn't part from it yet :). So the following things have been added:
+* Fixed issue where MobX failed on environments where `Map` is not defined, #779 by @dirtyrolf
+* MobX can now be compiled on windows as well! #772 by @madarauchiha
+* Added documentation on how Flow typings can be used, #766 by @wietsevenema
+
+Re-introduced _structural comparison_. Seems we couldn't part from it yet :). So the following things have been added:
 
 * `struct` option to `reaction` (alias for `compareStructural`, to get more consistency in naming)
 * `observable.struct`, as alias for `observable.deep.struct`
