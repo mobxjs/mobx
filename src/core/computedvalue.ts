@@ -2,7 +2,7 @@ import {IObservable, reportObserved, propagateMaybeChanged, propagateChangeConfi
 import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, untrackedStart, untrackedEnd, shouldCompute, CaughtException, isCaughtException} from "./derivation";
 import {globalState} from "./globalstate";
 import {allowStateChangesStart, allowStateChangesEnd, createAction} from "./action";
-import {createInstanceofPredicate, getNextId, valueDidChange, invariant, Lambda, unique, joinStrings} from "../utils/utils";
+import {createInstanceofPredicate, getNextId, valueDidChange, invariant, Lambda, unique, joinStrings, primitiveSymbol, toPrimitive} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "../core/spy";
 import {autorun} from "../api/autorun";
 import {IValueDidChange} from "../types/observablevalue";
@@ -183,6 +183,10 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		return `${this.name}[${this.derivation.toString()}]`;
 	}
 
+	valueOf(): T {
+		return toPrimitive(this.get());
+	};
+
 	whyRun() {
 		const isTracking = Boolean(globalState.trackingDerivation);
 		const observing = unique(this.isComputing ? this.newObserving! : this.observing).map((dep: any) => dep.name);
@@ -212,5 +216,7 @@ WhyRun? computation '${this.name}':
 		);
 	}
 }
+
+ComputedValue.prototype[primitiveSymbol()] = ComputedValue.prototype.valueOf;
 
 export const isComputedValue = createInstanceofPredicate("ComputedValue", ComputedValue);

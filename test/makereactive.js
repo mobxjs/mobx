@@ -574,7 +574,7 @@ test("boxed value json", t => {
 	t.deepEqual(a.get().x, 1);
 	a.set(3);
 	t.deepEqual(a.get(), 3);
-	t.equal("" + a, 'ObservableValue@3[3]');
+	t.equal("" + a, '3');
 	t.equal(a.toJSON(), 3);
 	t.end();
 })

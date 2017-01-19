@@ -1,8 +1,9 @@
 # 3.0.2
 
 * Fixed issue where MobX failed on environments where `Map` is not defined, #779 by @dirtyrolf
-* MobX can now be compiled on windows as well! #772 by @madarauchiha
+* MobX can now be compiled on windows as well! #772 by @madarauchiha #GoodnessSquad
 * Added documentation on how Flow typings can be used, #766 by @wietsevenema
+* Added support for `Symbol.toPrimitive()` and `valueOf()`, see #773 by @eladnava #GoodnessSquad
 
 Re-introduced _structural comparison_. Seems we couldn't part from it yet :). So the following things have been added:
 
