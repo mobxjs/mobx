@@ -51,6 +51,7 @@ test('correct api should be exposed', function(t) {
 
 	t.deepEquals(Object.keys(mobx.extras).sort(), [
 			'allowStateChanges',
+			'deepEqual',
 			'getAdministration',
 			'getAtom',
 			'getDebugName',

@@ -68,7 +68,7 @@ test('computed with asStructure modifier', function(t) {
             return {
               sum: x1.get() + x2.get()
             }
-        }, { compareStructural: true });
+        }, { struct: true });
         var b = buffer();
         m.observe(y, b, true);
 
