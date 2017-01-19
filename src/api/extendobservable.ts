@@ -3,7 +3,7 @@ import {asObservableObject, defineObservablePropertyFromDescriptor} from "../typ
 import {isObservable} from "../api/isobservable";
 import {invariant, isPropertyConfigurable, hasOwnProperty} from "../utils/utils";
 import {deepEnhancer, referenceEnhancer, IEnhancer} from "../types/modifiers";
-import {message} from "../utils/messages";
+import {getMessage} from "../utils/messages";
 
 
 export function extendObservable<A extends Object, B extends Object>(target: A, ...properties: B[]): A & B {
@@ -15,13 +15,13 @@ export function extendShallowObservable<A extends Object, B extends Object>(targ
 }
 
 function extendObservableHelper(target: Object, defaultEnhancer: IEnhancer<any>, properties: Object[]): Object {
-	invariant(arguments.length >= 2, message("m014"));
-	invariant(typeof target === "object", message("m015"));
-	invariant(!(isObservableMap(target)), message("m016"));
+	invariant(arguments.length >= 2, getMessage("m014"));
+	invariant(typeof target === "object", getMessage("m015"));
+	invariant(!(isObservableMap(target)), getMessage("m016"));
 
 	properties.forEach(propSet => {
-		invariant(typeof propSet === "object", message("m017"));
-		invariant(!isObservable(propSet), message("m018"));
+		invariant(typeof propSet === "object", getMessage("m017"));
+		invariant(!isObservable(propSet), getMessage("m018"));
 	});
 
 	const adm = asObservableObject(target);

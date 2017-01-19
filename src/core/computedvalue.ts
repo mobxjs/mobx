@@ -6,7 +6,7 @@ import {createInstanceofPredicate, getNextId, valueDidChange, invariant, Lambda,
 import {isSpyEnabled, spyReport} from "../core/spy";
 import {autorun} from "../api/autorun";
 import {IValueDidChange} from "../types/observablevalue";
-import {message} from "../utils/messages";
+import {getMessage} from "../utils/messages";
 
 
 export interface IComputedValue<T> {
@@ -73,7 +73,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	}
 
 	onBecomeUnobserved() {
-		invariant(this.dependenciesState !== IDerivationState.NOT_TRACKING, message("m029"));
+		invariant(this.dependenciesState !== IDerivationState.NOT_TRACKING, getMessage("m029"));
 		clearObserving(this);
 		this.value = undefined;
 	}
@@ -193,11 +193,11 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 WhyRun? computation '${this.name}':
  * Running because: ${isTracking ? "[active] the value of this computation is needed by a reaction" : this.isComputing ? "[get] The value of this computed was requested outside a reaction" : "[idle] not running at the moment"}
 ` +
-(this.dependenciesState === IDerivationState.NOT_TRACKING ? message("m032")  :
+(this.dependenciesState === IDerivationState.NOT_TRACKING ? getMessage("m032")  :
 ` * This computation will re-run if any of the following observables changes:
     ${joinStrings(observing)}
     ${(this.isComputing && isTracking) ? " (... or any observable accessed during the remainder of the current run)" : ""}
-	${message("m038")} 
+	${getMessage("m038")} 
 
   * If the outcome of this computation changes, the following observers will be re-run:
     ${joinStrings(observers)}

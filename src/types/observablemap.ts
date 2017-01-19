@@ -11,7 +11,7 @@ import {arrayAsIterator, declareIterator, Iterator} from "../utils/iterable";
 import {observable} from "../api/observable";
 import {runInTransaction} from "../api/transaction";
 import {referenceEnhancer} from "./modifiers";
-import {message} from "../utils/messages";
+import {getMessage} from "../utils/messages";
 
 
 /**
@@ -305,7 +305,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	 * for callback details
 	 */
 	observe(listener: (changes: IMapChange<V>) => void, fireImmediately?: boolean): Lambda {
-		invariant(fireImmediately !== true, message("m033"));
+		invariant(fireImmediately !== true, getMessage("m033"));
 		return registerListener(this, listener);
 	}
 

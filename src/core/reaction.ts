@@ -3,7 +3,7 @@ import {IObservable, startBatch, endBatch} from "./observable";
 import {globalState} from "./globalstate";
 import {createInstanceofPredicate, getNextId, invariant, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
-import {message} from "../utils/messages";
+import {getMessage} from "../utils/messages";
 
 
 /**
@@ -126,21 +126,16 @@ export class Reaction implements IDerivation, IReactionPublic {
 			return;
 		}
 
-		const messageToConsole = `[mobx] Catched uncaught exception that was thrown by a reaction or observer component, in: '${this}`;
-		const messageToUser = `
-		Hi there! I'm sorry you have just run into an exception.
+		const message = `[mobx] Catched uncaught exception that was thrown by a reaction or observer component, in: '${this}`;
+		const messageToUser = getMessage("m037");
 
-		If your debugger ends up here, know that some reaction (like the render() of an observer component, autorun or reaction)
-		threw an exception and that mobx caught it, to avoid that it brings the rest of your application down.
-		` + message("m037");
-
-		console.error(messageToConsole || messageToUser /* latter will not be true, make sure uglify doesn't remove */, error);
+		console.error(message || messageToUser /* latter will not be true, make sure uglify doesn't remove */, error);
 			/** If debugging brough you here, please, read the above message :-). Tnx! */
 
 		if (isSpyEnabled()) {
 			spyReport({
 				type: "error",
-				messageToConsole,
+				message,
 				error,
 				object: this
 			});
@@ -180,7 +175,7 @@ WhyRun? reaction '${this.name}':
  * This reaction will re-run if any of the following observables changes:
     ${joinStrings(observing)}
     ${(this._isRunning) ? " (... or any observable accessed during the remainder of the current run)" : ""}
-	${message("m038")}
+	${getMessage("m038")}
 `
 		);
 	}

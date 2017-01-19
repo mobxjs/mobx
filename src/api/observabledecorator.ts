@@ -3,7 +3,7 @@ import {asObservableObject, defineObservableProperty, setPropertyValue} from "..
 import {invariant, assertPropertyConfigurable} from "../utils/utils";
 import {createClassPropertyDecorator} from "../utils/decorators";
 import {IEnhancer} from "../types/modifiers";
-import {message} from "../utils/messages";
+import {getMessage} from "../utils/messages";
 
 
 export function createDecoratorForEnhancer(enhancer: IEnhancer<any>) {
@@ -11,7 +11,7 @@ export function createDecoratorForEnhancer(enhancer: IEnhancer<any>) {
 	return createClassPropertyDecorator(
 		(target, name, baseValue, _, baseDescriptor) => {
 			assertPropertyConfigurable(target, name);
-			invariant(!baseDescriptor || !baseDescriptor.get, message("m022"));
+			invariant(!baseDescriptor || !baseDescriptor.get, getMessage("m022"));
 
 			// might happen lazily (on first read), so temporarily allow state changes..
 			const prevA = allowStateChangesStart(true);

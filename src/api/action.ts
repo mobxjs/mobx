@@ -1,7 +1,7 @@
 import {invariant, addHiddenProp} from "../utils/utils";
 import {createClassPropertyDecorator} from "../utils/decorators";
 import {createAction, executeAction} from "../core/action";
-import {message} from "../utils/messages";
+import {getMessage} from "../utils/messages";
 
 
 export interface IActionFactory {
@@ -53,7 +53,7 @@ const actionFieldDecorator = createClassPropertyDecorator(
 		return this[key];
 	},
 	function () {
-		invariant(false, message("m001"));
+		invariant(false, getMessage("m001"));
 	},
 	false,
 	true
@@ -67,7 +67,7 @@ const boundActionDecorator = createClassPropertyDecorator(
 		return this[key];
 	},
 	function () {
-		invariant(false, message("m001"));
+		invariant(false, getMessage("m001"));
 	},
 	false,
 	false
@@ -117,8 +117,8 @@ export function runInAction<T>(arg1, arg2?, arg3?) {
 	const fn = typeof arg1 === "function" ? arg1 : arg2;
 	const scope = typeof arg1 === "function" ? arg2 : arg3;
 
-	invariant(typeof fn === "function", message("m002"));
-	invariant(fn.length === 0, message("m003"));
+	invariant(typeof fn === "function", getMessage("m002"));
+	invariant(fn.length === 0, getMessage("m003"));
 	invariant(typeof actionName === "string" && actionName.length > 0, `actions should have valid names, got: '${actionName}'`);
 
 	return executeAction(actionName, fn, scope, undefined);

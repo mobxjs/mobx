@@ -7,7 +7,7 @@ import {IListenable, registerListener, hasListeners, notifyListeners} from "./li
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {IEnhancer, isModifierDescriptor, IModifierDescriptor} from "../types/modifiers";
 import {isAction, defineBoundAction} from "../api/action";
-import {message} from "../utils/messages";
+import {getMessage} from "../utils/messages";
 
 
 
@@ -61,7 +61,7 @@ export function asObservableObject(target, name?: string): ObservableObjectAdmin
 	if (isObservableObject(target))
 		return (target as any).$mobx;
 
-	invariant(Object.isExtensible(target), message("m035"));
+	invariant(Object.isExtensible(target), getMessage("m035"));
 	if (!isPlainObject(target))
 		name = (target.constructor.name || "ObservableObject") + "@" + getNextId();
 	if (!name)

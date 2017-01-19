@@ -1,6 +1,6 @@
 import {computed} from "../api/computed";
 import {isComputingDerivation} from "../core/derivation";
-import {message} from "../utils/messages";
+import {getMessage} from "../utils/messages";
 
 /**
 	* expr can be used to create temporarily views inside views.
@@ -18,7 +18,7 @@ import {message} from "../utils/messages";
 	*/
 export function expr<T>(expr: () => T, scope?): T {
 	if (!isComputingDerivation())
-		console.warn(message("m013"));
+		console.warn(getMessage("m013"));
 	// optimization: would be more efficient if the expr itself wouldn't be evaluated first on the next change, but just a 'changed' signal would be fired
 	return computed(expr, { context: scope }).get();
 }

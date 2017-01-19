@@ -3,7 +3,7 @@ import {isModifierDescriptor} from "../types/modifiers";
 import {Reaction, IReactionPublic, IReactionDisposer} from "../core/reaction";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
 import {action, isAction} from "../api/action";
-import {message} from "../utils/messages";
+import {getMessage} from "../utils/messages";
 
 /**
  * Creates a reactive view and keeps it alive, so that the view is always
@@ -38,10 +38,10 @@ export function autorun(arg1: any, arg2: any, arg3?: any) {
 		scope = arg2;
 	}
 
-	invariant(typeof view === "function", message("m004"));
+	invariant(typeof view === "function", getMessage("m004"));
 	invariant(
 		isAction(view) === false,
-		message("m005")
+		getMessage("m005")
 	);
 	if (scope)
 		view = view.bind(scope);
@@ -122,7 +122,7 @@ export function autorunAsync(arg1: any, arg2: any, arg3?: any, arg4?: any) {
 	}
 	invariant(
 		isAction(func) === false,
-		message("m006")
+		getMessage("m006")
 	);
 	if (delay === void 0)
 		delay = 1;
@@ -168,10 +168,10 @@ export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg:
 export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately?: boolean): IReactionDisposer;
 export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg: T, r: IReactionPublic) => void, arg3: any) {
 	if (arguments.length > 3) {
-		fail(message("m007"));
+		fail(getMessage("m007"));
 	}
 	if (isModifierDescriptor(expression)) {
-		fail(message("m008"));
+		fail(getMessage("m008"));
 	}
 
 	let opts: IReactionOptions;

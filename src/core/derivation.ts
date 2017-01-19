@@ -2,7 +2,7 @@ import {IObservable, IDepTreeNode, addObserver, removeObserver} from "./observab
 import {globalState} from "./globalstate";
 import {invariant} from "../utils/utils";
 import {isComputedValue} from "./computedvalue";
-import {message} from "../utils/messages";
+import {getMessage} from "../utils/messages";
 
 
 export enum IDerivationState {
@@ -105,8 +105,8 @@ export function isComputingDerivation() {
 export function checkIfStateModificationsAreAllowed() {
 	if (!globalState.allowStateChanges) {
 		invariant(false, globalState.strictMode
-			? message("m030")
-			:message("m031")
+			? getMessage("m030")
+			:getMessage("m031")
 		);
 	}
 }

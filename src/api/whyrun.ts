@@ -3,7 +3,7 @@ import {isComputedValue} from "../core/computedvalue";
 import {isReaction} from "../core/reaction";
 import {getAtom} from "../types/type-utils";
 import {fail, deprecated} from "../utils/utils";
-import {message} from "../utils/messages";
+import {getMessage} from "../utils/messages";
 
 function log(msg: string): string {
 	console.log(msg);
@@ -15,7 +15,7 @@ export function whyRun(thing?: any, prop?: string) {
 		case 0:
 			thing = globalState.trackingDerivation;
 			if (!thing)
-				return log(message("m024"));
+				return log(getMessage("m024"));
 			break;
 		case 2:
 			thing = getAtom(thing, prop);
@@ -26,5 +26,5 @@ export function whyRun(thing?: any, prop?: string) {
 		return log(thing.whyRun());
 	else if (isReaction(thing))
 		return log(thing.whyRun());
-	return fail(message("m025"));
+	return fail(getMessage("m025"));
 }

@@ -4,7 +4,7 @@ import {isObservableObject, ObservableObjectAdministration} from "../types/obser
 import {isAtom} from "../core/atom";
 import {isComputedValue} from "../core/computedvalue";
 import {isReaction} from "../core/reaction";
-import {message} from "../utils/messages";
+import {getMessage} from "../utils/messages";
 
 /**
 	* Returns true if the provided value is reactive.
@@ -16,7 +16,7 @@ export function isObservable(value, property?: string): boolean {
 		return false;
 	if (property !== undefined) {
 		if (isObservableArray(value) || isObservableMap(value))
-			throw new Error(message("m019"));
+			throw new Error(getMessage("m019"));
 		else if (isObservableObject(value)) {
 			const o = <ObservableObjectAdministration> (value as any).$mobx;
 			return o.values && !!o.values[property];
