@@ -1,3 +1,13 @@
+# 3.0.2
+
+Re-introduced structural comparison. Seems we couldn't part from it yet :). So the following things have been added:
+
+* `struct` option to `reaction` (alias for `compareStructural`, to get more consistency in naming)
+* `observable.struct`, as alias for `observable.deep.struct`
+* `observable.deep.struct`: Only stores a new value and notify observers if the new value is not structurally the same as the previous value. Beware of cycles! Converts new values automatically to observables (like `observable.deep`)
+* `observable.ref.struct`: Only stores a new value and notify observers if the new value is not structurally the same as the previous value. Beware of cycles! Doesn't convert the new value into observables.
+* `extras.deepEquals`: Check if two data structures are deeply equal. supports observable and non observable data structures.
+
 # 3.0.0
 
 The changelog of MobX 3 might look quite overwhelming, but migrating to MobX 3 should be pretty straight forward nonetheless.
@@ -107,7 +117,7 @@ Using `computed` to create boxed observables has been simplified, and `computed`
 
 Computed can also be used as a decorator:
 
-* `@computed` 
+* `@computed`
 * `@computed.struct` when you want to compareStructural (previously was `@computed({asStructure: true})`)
 
 ### `reaction` api has been simplified

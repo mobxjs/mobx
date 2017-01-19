@@ -1,5 +1,5 @@
 import {invariant} from "../utils/utils";
-import {isModifierDescriptor, IModifierDescriptor, deepEnhancer, referenceEnhancer, shallowEnhancer, structurallyCompareEnhancer, createModifierDescriptor} from "../types/modifiers";
+import {isModifierDescriptor, IModifierDescriptor, deepEnhancer, referenceEnhancer, shallowEnhancer, deepStructurallyCompareEnhancer, refStructurallyCompareEnhancer, createModifierDescriptor} from "../types/modifiers";
 import {IObservableValue, ObservableValue} from "../types/observablevalue";
 import {IObservableArray, ObservableArray} from "../types/observablearray";
 import {createDecoratorForEnhancer} from "./observabledecorator";
@@ -11,7 +11,8 @@ import {IObservableMapInitialValues, ObservableMap, IMap} from "../types/observa
 const deepObservableDecorator = createDecoratorForEnhancer(deepEnhancer);
 const shallowObservableDecorator = createDecoratorForEnhancer(shallowEnhancer);
 const refObservableDecorator = createDecoratorForEnhancer(referenceEnhancer);
-const structuralObservableDecorator = createDecoratorForEnhancer(structurallyCompareEnhancer);
+const deepStructuralObservableDecorator = createDecoratorForEnhancer(deepStructurallyCompareEnhancer);
+const refStructuralObservableDecorator = createDecoratorForEnhancer(refStructurallyCompareEnhancer);
 
 /**
  * Turns an object, array or function into a reactive structure.
@@ -156,14 +157,30 @@ export class IObservableFactories {
 		if (arguments.length < 2) {
 			// although ref creates actually a modifier descriptor, the type of the resultig properties
 			// of the object is `T` in the end, when the descriptors are interpreted
-			return createModifierDescriptor(structurallyCompareEnhancer, arguments[0]) as any;
+			return createModifierDescriptor(deepStructurallyCompareEnhancer, arguments[0]) as any;
 		} else {
-			return structuralObservableDecorator.apply(null, arguments);
+			return deepStructuralObservableDecorator.apply(null, arguments);
 		}
 	}
 }
 
-export var observable: IObservableFactory & IObservableFactories = createObservable as any;
+export var observable: IObservableFactory & IObservableFactories & {
+	deep: {
+		structurallyCompare<T>(initialValue?: T): T
+	},
+	ref: {
+		structurallyCompare<T>(initialValue?: T): T
+	}
+} = createObservable as any;
 
 // weird trick to keep our typings nicely with our funcs, and still extend the observable function
 Object.keys(IObservableFactories.prototype).forEach(key => observable[key] = IObservableFactories.prototype[key]);
+
+observable.deep.structurallyCompare = observable.structurallyCompare;
+observable.ref.structurallyCompare = function() {
+	if (arguments.length < 2) {
+		return createModifierDescriptor(refStructurallyCompareEnhancer, arguments[0]) as any;
+	} else {
+		return refStructuralObservableDecorator.apply(null, arguments);
+	}
+};

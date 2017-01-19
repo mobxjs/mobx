@@ -496,10 +496,6 @@ test('exceptions', function(t) {
     });
 
     t.throws(function() {
-        x.y = m.asStructure(3)
-    });
-
-    t.throws(function() {
         x.z = m.asReference(3)
     });
 
@@ -613,4 +609,61 @@ test("shallow array", t => {
 	t.equal(mobx.isObservable(a[3]), true);
 
 	t.end();
+})
+
+test("compare structurally, deep", t => {
+	var a = mobx.observable.object({
+		x: mobx.observable.deep.structurallyCompare()
+	})
+
+	var changed = 0
+	var d = mobx.autorun(() => {
+		mobx.toJS(a)
+		changed++
+	})
+
+	t.equal(changed, 1)
+	a.x = { y: 2 }
+	t.equal(changed, 2)
+	a.x.y = 3
+	t.equal(changed, 3, "reacted to deep observability")
+
+	a.x = { y: 3 }
+	t.equal(changed, 3, "did not react; structurally the same")
+
+	a.x.y = { a: 1 }
+	t.equal(changed, 4, "did react")
+	a.x.y = { a: 1 }
+	t.equal(changed, 4, "did not react; structurally comparison was infective")
+
+	d()
+	t.end()
+})
+
+test("compare structurally, ref", t => {
+	var a = mobx.observable.object({
+		x: mobx.observable.ref.structurallyCompare()
+	})
+
+	var changed = 0
+	var d = mobx.autorun(() => {
+		mobx.toJS(a)
+		changed++
+	})
+
+	t.equal(changed, 1)
+	a.x = { y: 2 }
+	t.equal(changed, 2)
+	a.x.y = 3
+	t.equal(mobx.isObservable(a.x), false)
+	t.equal(changed, 2, "didn't react, not observed")
+
+	a.x = { y: 3 }
+	t.equal(changed, 2, "did not react; structurally the same")
+
+	a.x = { y: 4 }
+	t.equal(changed, 3, "did react; ref change")
+
+	d()
+	t.end()
 })
