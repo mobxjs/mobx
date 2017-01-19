@@ -55,6 +55,7 @@
     "istanbul": "^0.3.21",
     "iterall": "^1.0.2",
     "lodash.intersection": "^3.2.0",
+    "ncp": "^2.0.0",
     "rimraf": "^2.5.4",
     "tape": "^4.2.2",
     "tape-run": "^2.1.0",
