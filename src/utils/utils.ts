@@ -227,6 +227,16 @@ export function isES6Map(thing): boolean {
 	return false;
 }
 
+declare var Symbol;
+
+export function primitiveSymbol() {
+	return (typeof Symbol === "function" && Symbol.toPrimitive) || "@@toPrimitive";
+}
+
+export function toPrimitive(value) {
+	return value === null ? null : typeof value === "object" ? ("" + value) : value;
+}
+
 import {globalState} from "../core/globalstate";
 import {isObservableArray} from "../types/observablearray";
 import {isObservableMap} from "../types/observablemap";

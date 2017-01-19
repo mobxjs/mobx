@@ -1663,17 +1663,37 @@ test('603 - transaction should not kill reactions', t => {
 })
 
 test('#561 test toPrimitive() of observable objects', function(t) {
-    var x = observable(3);
+	if (typeof Symbol !== "undefined" && Symbol.toPrimitive) {
+		var x = observable(3);
 
-    t.equal(x.valueOf(), 3);
-    t.equal(x[Symbol.toPrimitive](), 3);
+		t.equal(x.valueOf(), 3);
+		t.equal(x[Symbol.toPrimitive](), 3);
 
-    t.equal(+x, 3);
-    t.equal(++x, 4);
+		t.equal(+x, 3);
+		t.equal(++x, 4);
 
-    var y = observable(3);
+		var y = observable(3);
 
-    t.equal(y + 7, 10);
+		t.equal(y + 7, 10);
+
+		var z = computed(() => ({ a: 3 }));
+		t.equal(3 + z, "3[object Object]");
+	} else {
+		var x = observable(3);
+
+		t.equal(x.valueOf(), 3);
+		t.equal(x["@@toPrimitive"](), 3);
+
+		t.equal(+x, 3);
+		t.equal(++x, 4);
+
+		var y = observable(3);
+
+		t.equal(y + 7, 10);
+
+		var z = computed(() => ({ a: 3 }));
+		t.equal("3" + (z["@@toPrimitive"]()), "3[object Object]");
+	}
     t.end()
 });
 

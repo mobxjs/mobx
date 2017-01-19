@@ -1,6 +1,6 @@
 import {BaseAtom} from "../core/atom";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
-import {Lambda, getNextId, createInstanceofPredicate} from "../utils/utils";
+import {Lambda, getNextId, createInstanceofPredicate, primitiveSymbol, toPrimitive} from "../utils/utils";
 import {hasInterceptors, IInterceptable, IInterceptor, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd, spyReport} from "../core/spy";
@@ -42,14 +42,6 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 			// only notify spy if this is a stand-alone observable
 			spyReport({ type: "create", object: this, newValue: this.value });
 		}
-
-		if (typeof Symbol !== undefined) {
-			this[Symbol.toPrimitive] = this.valueOf;
-		}
-	}
-
-	public valueOf(): T {
-    	return this.get()
 	}
 
 	public set(newValue: T) {
@@ -127,6 +119,12 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 	toString() {
 		return `${this.name}[${this.value}]`;
 	}
+
+	valueOf(): T {
+		return toPrimitive(this.get());
+	}
 }
+
+ObservableValue.prototype[primitiveSymbol()] = ObservableValue.prototype.valueOf;
 
 export const isObservableValue = createInstanceofPredicate("ObservableValue", ObservableValue);
