@@ -22,7 +22,7 @@ const messages = {
 "m021" : "observable expects zero or one arguments" ,
 "m022" : "@observable can not be used on getters, use @computed instead" ,
 "m023" : "Using `transaction` is deprecated, use `runInAction` or `(@)action` instead." ,
-"m024" : "whyRun() can only be used if a derivation is active, or by passing an computed value / reaction explicitly. If you invoked whyRun from inside a computation; the computation is currently suspended but re-evaluating because somebody requested it's value." ,
+"m024" : "whyRun() can only be used if a derivation is active, or by passing an computed value / reaction explicitly. If you invoked whyRun from inside a computation; the computation is currently suspended but re-evaluating because somebody requested its value." ,
 "m025" : "whyRun can only be used on reactions and computed values" ,
 "m026" : "`action` can only be invoked on functions" ,
 "m027" : "Computed values or transformers should not invoke actions or trigger other side effects" ,
