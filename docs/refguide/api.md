@@ -152,7 +152,7 @@ For one-time-actions `runInAction(name?, fn, scope?)` can be used, which is suga
 *Computed values* are **values** that react automatically to state changes.
 *Reactions* are **side effects** that react automatically to state changes.
 Reactions _can_ be used to ensure that a certain side effect (mainly I/O) is automatically executed when relevant state changes, like logging, network requests etc.
-The most commonly used reaction is the `observer` decorator for React components (see above).
+The most commonly used reaction is the `observer` decorator for React components (see below).
 
 ### `observer`
 Can be used as higher order component around a React component.
