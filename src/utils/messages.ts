@@ -40,6 +40,6 @@ const messages = {
 
 }
 
-export function getMessage(id) {
+export function getMessage(id : string) {
 	return messages[id];
 };
