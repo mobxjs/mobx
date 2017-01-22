@@ -46,7 +46,7 @@ class OrderLine {
 
 ## `computed` modifier
 
-If your environment doesn't support decorators, use the `computed(expression)` modifier incombination with `extendObservable` / `observable` to introduce new computed properties.
+If your environment doesn't support decorators, use the `computed(expression)` modifier in combination with `extendObservable` / `observable` to introduce new computed properties.
 
 `@computed get propertyName() { }` is basically sugar for [`extendObservable(this, { propertyName: get func() { } })`](extend-observable.md) in the constructor call.
 
