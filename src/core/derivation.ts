@@ -106,7 +106,7 @@ export function checkIfStateModificationsAreAllowed() {
 	if (!globalState.allowStateChanges) {
 		invariant(false, globalState.strictMode
 			? getMessage("m030")
-			:getMessage("m031")
+			: getMessage("m031")
 		);
 	}
 }
