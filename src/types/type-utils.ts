@@ -18,7 +18,7 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
 			const anyThing = thing as any;
 			if (property === undefined)
 				return getAtom(anyThing._keys);
-			const observable = anyThing._data[property] || anyThing._hasMap[property];
+			const observable = anyThing._data.get(property) || anyThing._hasMap.get(property);
 			invariant(!!observable, `the entry '${property}' does not exist in the observable map '${getDebugName(thing)}'`);
 			return observable;
 		}

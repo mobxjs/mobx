@@ -8,8 +8,8 @@ import {getAdministration} from "../types/type-utils";
 
 export function intercept<T>(value: IObservableValue<T>, handler: IInterceptor<IValueWillChange<T>>): Lambda;
 export function intercept<T>(observableArray: IObservableArray<T>, handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>): Lambda;
-export function intercept<T>(observableMap: ObservableMap<T>, handler: IInterceptor<IMapWillChange<T>>): Lambda;
-export function intercept<T>(observableMap: ObservableMap<T>, property: string, handler: IInterceptor<IValueWillChange<T>>): Lambda;
+export function intercept<K, T>(observableMap: ObservableMap<K, T>, handler: IInterceptor<IMapWillChange<K, T>>): Lambda;
+export function intercept<K, T>(observableMap: ObservableMap<K, T>, property: string, handler: IInterceptor<IValueWillChange<T>>): Lambda;
 export function intercept(object: Object, handler: IInterceptor<IObjectWillChange>): Lambda;
 export function intercept(object: Object, property: string, handler: IInterceptor<IValueWillChange<any>>): Lambda;
 export function intercept(thing, propOrHandler?, handler?): Lambda {
