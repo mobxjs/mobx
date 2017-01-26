@@ -283,19 +283,18 @@ test('issue 100', function(t) {
 	t.end();
 });
 
-// FIXME: WTF
-test.skip('issue 119 - unobserve before delete', function(t) {
+test('issue 119 - unobserve before delete', function(t) {
 	var propValues = [];
 	var myObservable = mobx.observable({
 		myMap: map()
 	});
 	myObservable.myMap.set('myId', {
 		myProp: 'myPropValue',
-		myCalculatedProp: function() {
+		myCalculatedProp: mobx.computed(function() {
 			if (myObservable.myMap.has('myId'))
 				return myObservable.myMap.get('myId').myProp + ' calculated';
 			return undefined;
-		}
+		})
 	});
 	// the error only happens if the value is observed
 	mobx.autorun(function() {
@@ -347,19 +346,18 @@ test('map modifier', t => {
 	t.end();
 });
 
-// FIXME: Why is it failing?
-test.skip('map modifier with modifier', t => {
-	var x = mobx.observable(mobx.asMap({ a: { c: 3 } }));
+test('map modifier with modifier', t => {
+	var x = mobx.observable.map({ a: { c: 3 } });
 	t.equal(mobx.isObservableObject(x.get("a")), true);
 	x.set("b", { d: 4 });
 	t.equal(mobx.isObservableObject(x.get("b")), true);
 
-	x = mobx.observable(mobx.asMap({ a: { c: 3 } }, mobx.asFlat));
+	x = mobx.observable.shallowMap({ a: { c: 3 } });
 	t.equal(mobx.isObservableObject(x.get("a")), false);
 	x.set("b", { d: 4 });
 	t.equal(mobx.isObservableObject(x.get("b")), false);
 
-	x = mobx.observable({ a: mobx.asMap({ b: {} }, mobx.asFlat)});
+	x = mobx.observable({ a: mobx.observable.shallowMap({ b: {} })});
 	t.equal(mobx.isObservableObject(x), true);
 	t.equal(mobx.isObservableMap(x.a), true);
 	t.equal(mobx.isObservableObject(x.a.get("b")), false);
