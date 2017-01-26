@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
+    <div class="book" data-level="2" data-basepath=".." data-revision="Thu Jan 26 2017 14:35:40 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -901,7 +901,7 @@ You can also directly create the desired observable type, see below.</p>
 <li>If <em>value</em> is an wrapped is an instance of an <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" target="_blank">ES6 Map</a>: a new <a href="map.html">Observable Map</a> will be returned. Observable maps are very useful if you don&apos;t want to react just to the change of a specific entry, but also to the addition or removal of entries.</li>
 <li>If <em>value</em> is an array, a new <a href="array.html">Observable Array</a> will be returned.</li>
 <li>If <em>value</em> is an object <em>without</em> prototype, the object will be cloned and all its current properties will be made observable. See <a href="object.html">Observable Object</a></li>
-<li>If <em>value</em> is an object <em>with</em> a prototype, a JavaScript primitive or function, a <a href="boxed.html">Boxed Observable</a> will be returned. MobX will not make objects with a prototype automatically observable; as that is the responsibility of it&apos;s constructor function. Use <code>extendObservable</code> in the constructor, or <code>@observable</code> in it&apos;s class definition instead.</li>
+<li>If <em>value</em> is an object <em>with</em> a prototype, a JavaScript primitive or function, a <a href="boxed.html">Boxed Observable</a> will be returned. MobX will not make objects with a prototype automatically observable; as that is the responsibility of its constructor function. Use <code>extendObservable</code> in the constructor, or <code>@observable</code> in its class definition instead.</li>
 </ol>
 <p>These rules might seem complicated at first sight, but you will notice that in practice they are very intuitive to work with.
 Some notes:</p>
@@ -921,7 +921,7 @@ This is the foundation on which all other observables are built, but in practice
 Normal boxes will automatically try to turn any new value into an observable if it isn&apos;t already. Use <code>shallowBox</code> to disable this behavior.</p>
 <p><a href="boxed.html">&#xAB;<code>details</code>&#xBB;</a></p>
 <h3 id="-observable-object-value-observable-shallowobject-value"><code>observable.object(value)</code> &amp; <code>observable.shallowObject(value)</code></h3>
-<p>Creates a clone of the provided object and makes all it&apos;s properties observable.
+<p>Creates a clone of the provided object and makes all its properties observable.
 By default any values in those properties will be made observable as well, but when using <code>shallowObject</code> only the properties will be made into observable
 references, but the values will be untouched. (This holds also for any values assigned in the future)</p>
 <p><a href="object.html">&#xAB;<code>details</code>&#xBB;</a></p>
@@ -996,7 +996,7 @@ Note: using <code>action</code> is mandatory when <em>strict mode</em> is enable
 <p><em>Computed values</em> are <strong>values</strong> that react automatically to state changes.
 <em>Reactions</em> are <strong>side effects</strong> that react automatically to state changes.
 Reactions <em>can</em> be used to ensure that a certain side effect (mainly I/O) is automatically executed when relevant state changes, like logging, network requests etc.
-The most commonly used reaction is the <code>observer</code> decorator for React components (see above).</p>
+The most commonly used reaction is the <code>observer</code> decorator for React components (see below).</p>
 <h3 id="-observer"><code>observer</code></h3>
 <p>Can be used as higher order component around a React component.
 The component will then automatically re-render if any of the observables used in the <code>render</code> function of the component has changed.

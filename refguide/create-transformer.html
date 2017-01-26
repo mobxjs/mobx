@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="8.3" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
+    <div class="book" data-level="8.3" data-basepath=".." data-revision="Thu Jan 26 2017 14:35:40 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -887,7 +887,7 @@
 <p><code>createTransformer</code> turns a function (that should transform one value into another value) into a reactive and memoizing function.
 In other words, if the <code>transformation</code> function computes B given a specific A, the same B will be returned for all other future invocations of the transformation with the same A.
 However, if A changes, the transformation will be re-applied so that B is updated accordingly.
-And last but not least, if nobody is using the transformation of a specific A anymore, it&apos;s entry will be removed from the memoization table.</p>
+And last but not least, if nobody is using the transformation of a specific A anymore, its entry will be removed from the memoization table.</p>
 <p>With <code>createTransformer</code> it is very easy to transform a complete data graph into another data graph.
 Transformation functions can be composed so that you can build a tree using lots of small transformations.
 The resulting data graph will never be stale, it will be kept in sync with the source by applying small patches to the result graph.
@@ -963,7 +963,7 @@ the <code>DisplayFolder</code> objects track the associated <code>Folder</code> 
 <p>In the following example all mutations to the <code>state</code> graph will be processed automatically.
 Some examples:</p>
 <ol>
-<li>Changing the name of a folder will update it&apos;s own <code>path</code> property and the <code>path</code> property of all its descendants.</li>
+<li>Changing the name of a folder will update its own <code>path</code> property and the <code>path</code> property of all its descendants.</li>
 <li>Collapsing a folder will remove all descendant <code>DisplayFolders</code> from the tree.</li>
 <li>Expanding a folder will restore them again.</li>
 <li>Setting a search filter will remove all nodes that do not match the filter, unless they have a descendant that matches the filter.</li>

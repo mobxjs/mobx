@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="8.9" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
+    <div class="book" data-level="8.9" data-basepath=".." data-revision="Thu Jan 26 2017 14:35:40 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -900,7 +900,7 @@ In other words: reaction requires you to produce the things you need in your sid
 <li><code>context</code>: The <code>this</code> to be used in the functions passed to <code>reaction</code>. By default undefined (use arrow functions instead!)</li>
 <li><code>fireImmediately</code>: Boolean that indicates that the effect function should immediately be triggered after the first run of the data function. <code>false</code> by default. If a boolean is passed as third argument to <code>reaction</code>, it will be interpreted as the <code>fireImmediately</code> option.</li>
 <li><code>delay</code>: Number in milliseconds that can be used to debounce the effect function. If zero (the default), no debouncing will happen.</li>
-<li><code>compareStructural</code>: <code>false</code> by default. If <code>true</code>, the return value of the <em>data</em> function is structurally compared to it&apos;s previous return value, and the <em>effect</em> function will only be invoked if there is a structural change in the output.</li>
+<li><code>compareStructural</code>: <code>false</code> by default. If <code>true</code>, the return value of the <em>data</em> function is structurally compared to its previous return value, and the <em>effect</em> function will only be invoked if there is a structural change in the output.</li>
 <li><code>name</code>: String that is used as name for this reaction in for example <a href="spy.html"><code>spy</code></a> events.</li>
 </ul>
 <h2 id="example">Example</h2>
@@ -931,7 +931,7 @@ See also <a href="../best/react">what will MobX React to?</a>.</p>
     titles =&gt; <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;reaction 2:&quot;</span>, titles.join(<span class="hljs-string">&quot;, &quot;</span>))
 );
 
-<span class="hljs-comment">// autorun reacts to just everything that is used in it&apos;s function</span>
+<span class="hljs-comment">// autorun reacts to just everything that is used in its function</span>
 <span class="hljs-keyword">const</span> autorun1 = autorun(
     () =&gt; <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;autorun 1:&quot;</span>, todos.map(todo =&gt; todo.title).join(<span class="hljs-string">&quot;, &quot;</span>))
 );

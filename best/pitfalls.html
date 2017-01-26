@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="7.1" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
+    <div class="book" data-level="7.1" data-basepath=".." data-revision="Thu Jan 26 2017 14:35:40 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -918,7 +918,7 @@ Computed values will only track their dependencies if they are observed.
 This allows MobX to automatically suspend computations that are not actively in use.
 See this <a href="https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254" target="_blank">blog</a> or <a href="https://github.com/mobxjs/mobx/issues/356" target="_blank">issue #356</a> for an explanation.
 So if you fiddle arounds, computed properties might not seem efficient. But when applied in a project that uses <code>observer</code>, <code>autorun</code> etc, they become very efficient.</p>
-<p><em>N.B. in a next version of MobX computeds will automatically be kept alive during transactions as well, see PR: #452</em></p>
+<p>MobX computeds will automatically be kept alive during transactions as well, see PRs: <a href="https://github.com/mobxjs/mobx/pull/452" target="_blank">#452</a> and <a href="https://github.com/mobxjs/mobx/pull/489" target="_blank">#489</a></p>
 <h4 id="always-dispose-reactions">Always dispose reactions</h4>
 <p>all forms of <code>autorun</code>, <code>observe</code> and <code>intercept</code> will only be garbage collected if all objects they observe are garbage collection themselves.
 So it is recommend to use the disposer function that is returned from these methods to stop them when you no longer need them.
@@ -973,7 +973,7 @@ const _MyComponent = observer((props =&gt; <span class="hljs-tag">&lt;<span clas
 <p>See also: <a href="http://mobxjs.github.io/mobx/best/stateless-HMR.html" target="_blank">http://mobxjs.github.io/mobx/best/stateless-HMR.html</a> or <a href="https://github.com/mobxjs/mobx/issues/141#issuecomment-228457886" target="_blank">#141</a>.</p>
 <h4 id="the-proptype-of-an-observable-array-is-object">The propType of an observable array is object</h4>
 <p>Observable arrays are actually objects, so they comply to <code>propTypes.object</code> instead of <code>array</code>.
-<code>mobx-react</code> provides it&apos;s explicit <code>PropTypes</code> for observable data structures.</p>
+<code>mobx-react</code> provides its explicit <code>PropTypes</code> for observable data structures.</p>
 <h4 id="rendering-listviews-in-react-native">Rendering ListViews in React Native</h4>
 <p><code>ListView.DataSource</code> in React Native expects real arrays. Observable arrays are actually objects, make sure to <code>.slice()</code> them first before passing to list views. Furthermore, <code>ListView.DataSource</code> itself can be moved to the store and have it automatically updated with a <code>@computed</code>, this step can also be done on the component level.</p>
 <pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ListStore</span> </span>{

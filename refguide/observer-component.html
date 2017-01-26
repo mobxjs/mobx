@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.5" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
+    <div class="book" data-level="2.5" data-basepath=".." data-revision="Thu Jan 26 2017 14:35:40 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -1013,7 +1013,7 @@ data it observes has changed. This makes it easy to trace renders back to the ac
 <ul>
 <li><code>componentWillReact</code> doesn&apos;t take arguments</li>
 <li><code>componentWillReact</code> won&apos;t fire before the initial render (use <code>componentWillMount</code> instead)</li>
-<li><code>componentWillReact</code> won&apos;t fire when receiving new props or after <code>setState</code> calls (use <code>componentWillUpdate</code> instead)</li>
+<li><code>componentWillReact</code> for mobx-react@4+, the hook will fire when receiving new props and after <code>setState</code> calls</li>
 </ul>
 <h2 id="optimizing-components">Optimizing components</h2>
 <p>See the relevant <a href="../best/react-performance.html">section</a>.</p>

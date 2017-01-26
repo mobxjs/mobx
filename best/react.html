@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="4" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
+    <div class="book" data-level="4" data-basepath=".." data-revision="Thu Jan 26 2017 14:35:40 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -1077,7 +1077,7 @@ message.title = <span class="hljs-string">&quot;Bar&quot;</span>
 </code></pre>
 <p>At first glance everything might seem ok here, except that the <code>&lt;div&gt;</code> is actually not rendered by <code>MyComponent</code> (which has a tracked rendering), but by <code>SomeContainer</code>.
 So to make sure that the title of <code>SomeContainer</code> correctly reacts to a new <code>message.title</code>, <code>SomeContainer</code> should be an <code>observer</code> as well.
-If <code>SomeContainer</code> comes from an external lib, you can also fix this by wrapping the <code>div</code> in it&apos;s own stateless <code>observer</code> based component, and instantiating that one in the callback:</p>
+If <code>SomeContainer</code> comes from an external lib, you can also fix this by wrapping the <code>div</code> in its own stateless <code>observer</code> based component, and instantiating that one in the callback:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> MyComponent = observer(({ message }) =&gt;
     <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">SomeContainer</span>
         <span class="hljs-attribute">title</span> = {() =&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-title">TitleRenderer</span> <span class="hljs-attribute">message</span>=<span class="hljs-value">{message}</span> /&gt;</span>}

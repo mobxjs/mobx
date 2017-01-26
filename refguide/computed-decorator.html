@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.3" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
+    <div class="book" data-level="2.3" data-basepath=".." data-revision="Thu Jan 26 2017 14:35:40 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -893,12 +893,11 @@ but use <code>@computed</code> if you want to reactively produce a <em>value</em
 For example imperative side effects like logging, making network requests etc.</p>
 <p>Computed values are automatically derived from your state if any value that affects them changes.
 Computed values can be optimized away in many cases by MobX as they are assumed to be pure.
-For example, a computed property won&apos;t re-run if none of the data used in the previous computation did change.
+For example, a computed property won&apos;t re-run if none of the data used in the previous computation changed.
 Nor will a computed property re-run if is not in use by some other computed property or reaction.
 In such cases it will be suspended.</p>
-<p>This automatic suspension is very convenient; it means that a computed value that is not observed anymore (for example because the UI in which it was used has disappeared)
-can automatically be garbabged collected by MobX, and unlike <code>autorun</code>&apos;s you don&apos;t have to dispose them yourself.
-This sometimes confuses people new to MobX; if you create a computed property but don&apos;t use it anywhere in a reaction, it will not cache it&apos;s value and recompute more often than seems necesarray.
+<p>This automatic suspension is very convenient. If a computed value is no longer observed, for example the UI in which it was used no longer exists, MobX can automatically garbage collect it. This differs from <code>autorun</code>&apos;s values where you must dispose of them yourself.
+It sometimes confuses people new to MobX, that if you create a computed property but don&apos;t use it anywhere in a reaction, it will not cache its value and recompute more often than seems necessary.
 However, in real life situations this by far the best default, and you can always forcefully keep a computed value awake if you need to by using either <a href="observe.html"><code>observe</code></a> or <a href="https://github.com/mobxjs/mobx-utils#keepalive" target="_blank"><code>keepAlive</code></a>.</p>
 <p>Note that <code>computed</code> properties are not enumerable. Nor can they be overwritten in an inheritance chain.</p>
 <h2 id="-computed"><code>@computed</code></h2>
@@ -919,7 +918,7 @@ However, in real life situations this by far the best default, and you can alway
 }
 </code></pre>
 <h2 id="-computed-modifier"><code>computed</code> modifier</h2>
-<p>If your environment doesn&apos;t support decorators, use the <code>computed(expression)</code> modifier incombination with <code>extendObservable</code> / <code>observable</code> to introduce new computed properties.</p>
+<p>If your environment doesn&apos;t support decorators, use the <code>computed(expression)</code> modifier in combination with <code>extendObservable</code> / <code>observable</code> to introduce new computed properties.</p>
 <p><code>@computed get propertyName() { }</code> is basically sugar for <a href="extend-observable.html"><code>extendObservable(this, { propertyName: get func() { } })</code></a> in the constructor call.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {extendObservable, computed} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
 
@@ -968,7 +967,7 @@ but they can be used as &apos;inverse&apos; of the derivation. For example:</p>
 <p><em>Note: setters require MobX 2.5.1 or higher</em></p>
 <h2 id="-computed-expression-as-function"><code>computed(expression)</code> as function</h2>
 <p><code>computed</code> can also be invoked directly as function.
-Just like <code>observable.box(primitive value)</code> it will create a stand-alone observable.
+Just like <code>observable.box(primitive value)</code> creates a stand-alone observable.
 Use <code>.get()</code> on the returned object to get the current value of the computation, or <code>.observe(callback)</code> to observe its changes.
 This form of <code>computed</code> is not used very often, but in some cases where you need to pass a &quot;boxed&quot; computed value around it might prove useful.</p>
 <p>Example:</p>
@@ -990,12 +989,12 @@ name.set(<span class="hljs-string">&quot;Dave&quot;</span>);
 <li><code>name</code>: String, the debug name used in spy and the MobX devtools</li>
 <li><code>context</code>: The <code>this</code> that should be used in the provided expression</li>
 <li><code>setter</code>: The setter function to be used. Without setter it is not possible to assign new values to a computed value. If the second argument passed to <code>computed</code> is a function, this is assumed to be a setter.</li>
-<li><code>compareStructural</code>: By default <code>false</code>. If this value, the output of the expression is structurally compared with the previous value before any observer is notified about a change. This makes sure that observers of the computation don&apos;t re-evaluate if new structures are returned that are structurally equal to the original ones. This is very useful when working with point, vector or color structures for example.</li>
+<li><code>compareStructural</code>: By default <code>false</code>. When true, the output of the expression is structurally compared with the previous value before any observer is notified about a change. This makes sure that observers of the computation don&apos;t re-evaluate if new structures are returned that are structurally equal to the original ones. This is very useful when working with point, vector or color structures for example.</li>
 </ul>
 <h2 id="-computed-struct-for-structural-comparison"><code>@computed.struct</code> for structural comparison</h2>
 <p>The <code>@computed</code> decorator does not take arguments. If you want to to create a computed property which does structural comparison, use <code>@computed.struct</code>.</p>
 <h2 id="note-on-error-handling">Note on error handling</h2>
-<p>If a computed value throws an exception during it&apos;s computation, this exception will be catched and rethrown any time it&apos;s value is read.
+<p>If a computed value throws an exception during its computation, this exception will be catched and rethrown any time its value is read.
 It is strongly recommended to always throw <code>Error</code>&apos;s, so that the original stack trace is preserved. E.g.: <code>throw new Error(&quot;Uhoh&quot;)</code> instead of <code>throw &quot;Uhoh&quot;</code>.
 Throwing exceptions doesn&apos;t break tracking, so it is possible for computed values to recover from exceptions.</p>
 <p>Example:</p>

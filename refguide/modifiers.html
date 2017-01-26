@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="8.7" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
+    <div class="book" data-level="8.7" data-basepath=".." data-revision="Thu Jan 26 2017 14:35:40 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -902,12 +902,12 @@ effort is required to make objects deep observable.</p>
 Typical cases are immutable objects, or objects that are not managed by you but by an external library.
 Examples are JSX elements, DOM elements, native objects like History, window or etc.
 To those kind of objects, you just want to store a reference without turning them into an observable.</p>
-<p>For these situations there is the <code>ref</code> modifier. It makes sure that an observable property is created, which only tracks the reference but doesn&apos;t try to convert it&apos;s value.
+<p>For these situations there is the <code>ref</code> modifier. It makes sure that an observable property is created, which only tracks the reference but doesn&apos;t try to convert its value.
 For example:</p>
 <pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Message</span> </span>{
     @observable message = <span class="hljs-string">&quot;Hello world&quot;</span>
 
-    <span class="hljs-comment">// ficitonal example, if author is immutable, we just need to store a reference and shouldn&apos;t turn it into an mutable, observable object</span>
+    <span class="hljs-comment">// fictional example, if author is immutable, we just need to store a reference and shouldn&apos;t turn it into a mutable, observable object</span>
     @observable.ref author = <span class="hljs-literal">null</span>
 }
 </code></pre>
@@ -922,7 +922,7 @@ For example:</p>
 <p>Note that an observable, boxed reference can be created by using <code>const box = observable.shallowBox(value)</code></p>
 <h2 id="shallow-observability">Shallow observability</h2>
 <p>The <code>observable.shallow</code> modifier applies observability &apos;one-level-deep&apos;. You need those if you want to create a <em>collection</em> of observable references.
-If a new collection is assigned to a property with this modifier, it will be made observable, but it&apos;s values will be left as is, so unlike <code>deep</code>, it won&apos;t recurse.
+If a new collection is assigned to a property with this modifier, it will be made observable, but its values will be left as is, so unlike <code>deep</code>, it won&apos;t recurse.
 Example:</p>
 <pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AuthorStore</span> </span>{
     @observable.shallow authors = []
