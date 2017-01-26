@@ -5,6 +5,7 @@ import {startBatch, endBatch} from "../core/observable";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {isComputedValue} from "../core/computedvalue";
 import {globalState} from "../core/globalstate";
+import {getMessage} from "../utils/messages";
 
 export interface IAction{
 	originalFn: Function
@@ -12,7 +13,7 @@ export interface IAction{
 }
 
 export function createAction(actionName: string, fn: Function): Function & IAction {
-	invariant(typeof fn === "function", "`action` can only be invoked on functions");
+	invariant(typeof fn === "function", getMessage("m026"));
 	invariant(typeof actionName === "string" && actionName.length > 0, `actions should have valid names, got: '${actionName}'`);
 	const res = function () {
 		return executeAction(actionName, fn, this, arguments);
@@ -41,7 +42,7 @@ interface IActionRunInfo {
 
 function startAction(actionName: string, fn: Function, scope: any, args?: IArguments): IActionRunInfo {
 		// actions should not be called from computeds. check only works if the computed is actively observed, but that is fine enough as heuristic
-	invariant(!isComputedValue(globalState.trackingDerivation), "Computed values or transformers should not invoke actions or trigger other side effects");
+	invariant(!isComputedValue(globalState.trackingDerivation), getMessage("m027"));
 
 	const notifySpy = isSpyEnabled() && !!actionName;
 	let startTime: number = 0;
@@ -79,7 +80,7 @@ function endAction(runInfo: IActionRunInfo) {
 }
 
 export function useStrict(strict: boolean): any {
-	invariant(globalState.trackingDerivation === null, "It is not allowed to set `useStrict` when a derivation is running");
+	invariant(globalState.trackingDerivation === null, getMessage("m028"));
 	globalState.strictMode = strict;
 	globalState.allowStateChanges = !strict;
 }
