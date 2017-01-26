@@ -1,3 +1,7 @@
+# 3.0.3
+
+* Fixed #798: MobX will not throw when invoking an action for computed properties. This is still an anti pattern in general, but caused to often issues when creating new objects in a computed property (often, but not always anti pattern as well) that made use of it's own internal actions
+
 # 3.0.2
 
 * Fixed issue where MobX failed on environments where `Map` is not defined, #779 by @dirtyrolf

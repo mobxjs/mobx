@@ -172,7 +172,8 @@ test('should be possible to create autorun in ation', t => {
 	t.end();
 })
 
-test('should not be possible to invoke action in a computed block', t => {
+test.skip('should not be possible to invoke action in a computed block', t => {
+	// Disabled as of #798
 	var a = mobx.observable(2);
 
 	var noopAction = mobx.action(() => {});

@@ -25,7 +25,6 @@ const messages = {
 "m024" : "whyRun() can only be used if a derivation is active, or by passing an computed value / reaction explicitly. If you invoked whyRun from inside a computation; the computation is currently suspended but re-evaluating because somebody requested its value." ,
 "m025" : "whyRun can only be used on reactions and computed values" ,
 "m026" : "`action` can only be invoked on functions" ,
-"m027" : "Computed values or transformers should not invoke actions or trigger other side effects" ,
 "m028" : "It is not allowed to set `useStrict` when a derivation is running" ,
 "m029" : "INTERNAL ERROR only onBecomeUnobserved shouldn't be called twice in a row" ,
 "m030" : "It is not allowed to create or change state outside an `action` when MobX is in strict mode. Wrap the current method in `action` if this state change is intended" ,
@@ -61,6 +60,6 @@ If that all doesn't help you out, feel free to open an issue https://github.com/
 `
 };
 
-export function getMessage(id: string) {
+export function getMessage(id: string): string {
 	return messages[id];
 }
