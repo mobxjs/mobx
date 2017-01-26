@@ -35,10 +35,32 @@ const messages = {
 "m034" : "`mobx.map` is deprecated, use `new ObservableMap` or `mobx.observable.map` instead" ,
 "m035" : "Cannot make the designated object observable; it is not extensible" ,
 "m036" : "It is not possible to get index atoms from arrays" ,
-"m037" : "\nHi there! I'm sorry you have just run into an exception.\n\nIf your debugger ends up here, know that some reaction (like the render() of an observer component, autorun or reaction)\nthrew an exception and that mobx caught it, to avoid that it brings the rest of your application down.\nThe original cause of the exception (the code that caused this reaction to run (again)), is still in the stack.\n\n		However, more interesting is the actual stack trace of the error itself.\n		Hopefully the error is an instanceof Error, because in that case you can inspect the original stack of the error from where it was thrown.\n		See \`error.stack\` property, or press the very subtle \"(...)\" link you see near the console.error message that probably brought you here.\n		That stack is more interesting than the stack of this console.error itself.\n\n		If the exception you see is an exception you created yourself, make sure to use \`throw new Error(\"Oops\")\` instead of \`throw \"Oops\"\`,\n		because the javascript environment will only preserve the original stack trace in the first form.\n\n		You can also make sure the debugger pauses the next time this very same exception is thrown by enabling \"Pause on caught exception\".\n		(Note that it might pause on many other, unrelated exception as well).\n\n		If that all doesn't help you out, feel free to open an issue https://github.com/mobxjs/mobx/issues!\n",
-"m038" : "Missing items in this list?\n	  1. Check whether all used values are properly marked as observable (use isObservable to verify)\n	  2. Make sure you didn't dereference values too early. MobX observes props, not primitives. E.g: use 'person.name' instead of 'name' in your computation.",
-}
+"m037" :
+`Hi there! I'm sorry you have just run into an exception.
+If your debugger ends up here, know that some reaction (like the render() of an observer component, autorun or reaction)
+threw an exception and that mobx caught it, to avoid that it brings the rest of your application down.
+The original cause of the exception (the code that caused this reaction to run (again)), is still in the stack.
 
-export function getMessage(id : string) {
-	return messages[id];
+However, more interesting is the actual stack trace of the error itself.
+Hopefully the error is an instanceof Error, because in that case you can inspect the original stack of the error from where it was thrown.
+See \`error.stack\` property, or press the very subtle "(...)" link you see near the console.error message that probably brought you here.
+That stack is more interesting than the stack of this console.error itself.
+
+If the exception you see is an exception you created yourself, make sure to use \`throw new Error("Oops")\` instead of \`throw "Oops"\`,
+because the javascript environment will only preserve the original stack trace in the first form.
+
+You can also make sure the debugger pauses the next time this very same exception is thrown by enabling "Pause on caught exception".
+(Note that it might pause on many other, unrelated exception as well).
+
+If that all doesn't help you out, feel free to open an issue https://github.com/mobxjs/mobx/issues!
+`,
+"m038" :
+`Missing items in this list?
+    1. Check whether all used values are properly marked as observable (use isObservable to verify)
+    2. Make sure you didn't dereference values too early. MobX observes props, not primitives. E.g: use 'person.name' instead of 'name' in your computation.
+`
 };
+
+export function getMessage(id: string) {
+	return messages[id];
+}

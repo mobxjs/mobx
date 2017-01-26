@@ -126,7 +126,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 			return;
 		}
 
-		const message = `[mobx] Catched uncaught exception that was thrown by a reaction or observer component, in: '${this}`;
+		const message = `[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: '${this}`;
 		const messageToUser = getMessage("m037");
 
 		console.error(message || messageToUser /* latter will not be true, make sure uglify doesn't remove */, error);
