@@ -141,6 +141,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
 	computeValue(track: boolean) {
 		this.isComputing = true;
+		globalState.computationDepth++;
 		const prevAllowStateChanges = allowStateChangesStart(false);
 		let res: T | CaughtException;
 		if (track) {
@@ -153,6 +154,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 			}
 		}
 		allowStateChangesEnd(prevAllowStateChanges);
+		globalState.computationDepth--;
 		this.isComputing = false;
 		return res;
 	};
@@ -201,7 +203,7 @@ WhyRun? computation '${this.name}':
 ` * This computation will re-run if any of the following observables changes:
     ${joinStrings(observing)}
     ${(this.isComputing && isTracking) ? " (... or any observable accessed during the remainder of the current run)" : ""}
-	${getMessage("m038")} 
+	${getMessage("m038")}
 
   * If the outcome of this computation changes, the following observers will be re-run:
     ${joinStrings(observers)}

@@ -172,21 +172,49 @@ test('should be possible to create autorun in ation', t => {
 	t.end();
 })
 
-test.skip('should not be possible to invoke action in a computed block', t => {
-	// Disabled as of #798
+test('should be possible to change unobserved state in an action called from computed', t => {
 	var a = mobx.observable(2);
 
-	var noopAction = mobx.action(() => {});
-
-	var c = mobx.computed(() => {
-		noopAction();
-		return a.get();
+	var testAction = mobx.action(() => {
+		a.set(3)
 	});
 
-	utils.consoleError(t, () => {
-		mobx.autorun(() => c.get());
-	}, /Computed values or transformers should not invoke actions or trigger other side effects/, 'expected throw');
+	var c = mobx.computed(() => {
+		testAction();
+	});
+
+	t.plan(1)
+	mobx.autorun(() => {
+		t.doesNotThrow(() => {
+			c.get()
+		})
+	});
+
 	mobx.extras.resetGlobalState();
+	t.end();
+});
+
+test('should not be possible to change observed state in an action called from computed', t => {
+	var a = mobx.observable(2);
+	var d = mobx.autorun(() => {
+		a.get()
+	})
+
+	var testAction = mobx.action(() => {
+		a.set(3)
+	});
+
+	var c = mobx.computed(() => {
+		testAction();
+		return a.get()
+	});
+
+	t.throws(() => {
+		c.get()
+	}, /Computed values are not allowed to not cause side effects by changing observables that are already being observed/)
+
+	mobx.extras.resetGlobalState();
+	d();
 	t.end();
 });
 

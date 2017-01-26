@@ -1,6 +1,6 @@
 import {IObservable, IDepTreeNode, addObserver, removeObserver} from "./observable";
 import {globalState} from "./globalstate";
-import {invariant} from "../utils/utils";
+import {fail} from "../utils/utils";
 import {isComputedValue} from "./computedvalue";
 import {getMessage} from "../utils/messages";
 
@@ -102,12 +102,18 @@ export function isComputingDerivation() {
 	return globalState.trackingDerivation !== null; // filter out actions inside computations
 }
 
-export function checkIfStateModificationsAreAllowed() {
-	if (!globalState.allowStateChanges) {
-		invariant(false, globalState.strictMode
-			? getMessage("m030")
-			: getMessage("m031")
-		);
+export function checkIfStateModificationsAreAllowed(atom: IObservable) {
+	if (globalState.allowStateChanges === false) {
+		if (globalState.strictMode)
+			fail(getMessage("m030") + atom.name);
+		else
+			fail(getMessage("m031") + atom.name);
+	} else {
+		// Observed observables should not be modified during a computation,
+		// even not from inside an action!
+		if (globalState.computationDepth > 0 && atom.observers.length > 0) {
+			fail(getMessage("m027") + atom.name);
+		}
 	}
 }
 
