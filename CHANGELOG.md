@@ -4,6 +4,7 @@
 * MobX can now be compiled on windows as well! #772 by @madarauchiha #GoodnessSquad
 * Added documentation on how Flow typings can be used, #766 by @wietsevenema
 * Added support for `Symbol.toPrimitive()` and `valueOf()`, see #773 by @eladnava #GoodnessSquad
+* Supressed an exception that was thrown when using the Chrome Developer tools to inspect arrays, see #752
 
 Re-introduced _structural comparison_. Seems we couldn't part from it yet :). So the following things have been added:
 

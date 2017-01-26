@@ -7,8 +7,12 @@ import {isComputedValue} from "../core/computedvalue";
 import {globalState} from "../core/globalstate";
 import {getMessage} from "../utils/messages";
 
+export interface IAction{
+	originalFn: Function
+	isMobxAction: boolean
+}
 
-export function createAction(actionName: string, fn: Function): Function {
+export function createAction(actionName: string, fn: Function): Function & IAction {
 	invariant(typeof fn === "function", getMessage("m026"));
 	invariant(typeof actionName === "string" && actionName.length > 0, `actions should have valid names, got: '${actionName}'`);
 	const res = function () {
@@ -16,7 +20,7 @@ export function createAction(actionName: string, fn: Function): Function {
 	};
 	(res as any).originalFn = fn;
 	(res as any).isMobxAction = true;
-	return res;
+	return res as any;
 }
 
 export function executeAction(actionName: string, fn: Function, scope?: any, args?: IArguments) {
