@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.3" data-basepath=".." data-revision="Tue Nov 01 2016 21:45:36 GMT+0100 (CET)">
+    <div class="book" data-level="2.3" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -882,15 +882,27 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/computed-decorator.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="-computed">@computed</h1>
-<p>Decorator that can be used on ES6 or TypeScript derivable class properties to make them observable.
-The <code>@computed</code> can only be used on <code>get</code> functions for instance properties.</p>
-<p>Use <code>@computed</code> if you have a value that can be derived in a pure manner from other observables.</p>
-<p>Don&apos;t confuse <code>@computed</code> with <code>autorun</code>. They are both reactively invoked expressions,
-but use <code>@computed</code> if you want to reactively produce a new value that can be used by other observers and
-<code>autorun</code> if you don&apos;t want to produce a new value but rather invoke some imperative code like logging, network requests etc.</p>
-<p>Computed properties can be optimized away in many cases by MobX as they are assumed to be pure.
-So they will not be invoked when their input parameters didn&apos;t modifiy or if they are not observed by some other computed value or autorun.</p>
+                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/computed-decorator.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="-computed">(@)computed</h1>
+<p>Computed values are values that can be derived from the existing state or other computed values.
+Conceptually, they are very similar to formulas in spreadsheets.
+Computed values can&apos;t be underestimated, as they help you to make your actual modifyable state as small as possible.
+Besides that they are higly optimized, so use them whereever possible.</p>
+<p>Don&apos;t confuse <code>computed</code> with <code>autorun</code>. They are both reactively invoked expressions,
+but use <code>@computed</code> if you want to reactively produce a <em>value</em> that can be used by other observers and
+<code>autorun</code> if you don&apos;t want to produce a new value but rather want ot achieve an <em>effect</em>.
+For example imperative side effects like logging, making network requests etc.</p>
+<p>Computed values are automatically derived from your state if any value that affects them changes.
+Computed values can be optimized away in many cases by MobX as they are assumed to be pure.
+For example, a computed property won&apos;t re-run if none of the data used in the previous computation did change.
+Nor will a computed property re-run if is not in use by some other computed property or reaction.
+In such cases it will be suspended.</p>
+<p>This automatic suspension is very convenient; it means that a computed value that is not observed anymore (for example because the UI in which it was used has disappeared)
+can automatically be garbabged collected by MobX, and unlike <code>autorun</code>&apos;s you don&apos;t have to dispose them yourself.
+This sometimes confuses people new to MobX; if you create a computed property but don&apos;t use it anywhere in a reaction, it will not cache it&apos;s value and recompute more often than seems necesarray.
+However, in real life situations this by far the best default, and you can always forcefully keep a computed value awake if you need to by using either <a href="observe.html"><code>observe</code></a> or <a href="https://github.com/mobxjs/mobx-utils#keepalive" target="_blank"><code>keepAlive</code></a>.</p>
+<p>Note that <code>computed</code> properties are not enumerable. Nor can they be overwritten in an inheritance chain.</p>
+<h2 id="-computed"><code>@computed</code></h2>
+<p>If you have <a href="../best/decorators.html">decorators enabled</a> you can use the <code>@computed</code> decorator on any getter of a class property to declaratively created computed properties.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, computed} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OrderLine</span> </span>{
@@ -906,24 +918,29 @@ So they will not be invoked when their input parameters didn&apos;t modifiy or i
     }
 }
 </code></pre>
-<p>If your environment doesn&apos;t support decorators or field initializers,
-<code>@computed get funcName() { }</code> is sugar for <a href="extend-observable.html"><code>extendObservable(this, { funcName: func })</code></a></p>
-<p><code>@computed</code> can be parameterized. <code>@computed({asStructure: true})</code> makes sure that the result of a derivation is compared structurally instead of referentially with its preview value. This makes sure that observers of the computation don&apos;t re-evaluate if new structures are returned that are structurally equal to the original ones. This is very useful when working with point, vector or color structures for example. It behaves the same as the <code>asStructure</code> modifier for observable values.</p>
-<p><code>@computed</code> properties are not enumerable. Nor can they be overwritten in an inheritance chain.</p>
-<h1 id="creating-computed-values-with-observable-or-extendobservable">Creating computed values with <code>observable</code> or <code>extendObservable</code>.</h1>
-<p>The functions <code>observable(object)</code> or <code>extendObservable(target, properties)</code> can be used to introduce computed properties as well,
-as alternative to using the decorator. For this ES5 getters can be used, so the above example can also be written as:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> orderLine = observable({
-    price: <span class="hljs-number">0</span>,
-    amount: <span class="hljs-number">1</span>,
-    get total() {
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.price * <span class="hljs-keyword">this</span>.amount
+<h2 id="-computed-modifier"><code>computed</code> modifier</h2>
+<p>If your environment doesn&apos;t support decorators, use the <code>computed(expression)</code> modifier incombination with <code>extendObservable</code> / <code>observable</code> to introduce new computed properties.</p>
+<p><code>@computed get propertyName() { }</code> is basically sugar for <a href="extend-observable.html"><code>extendObservable(this, { propertyName: get func() { } })</code></a> in the constructor call.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {extendObservable, computed} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OrderLine</span> </span>{
+    constructor(price) {
+        extendObservable(<span class="hljs-keyword">this</span>, {
+            price: price,
+            amount: <span class="hljs-number">1</span>,
+            <span class="hljs-comment">// valid:</span>
+            get total() {
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.price * <span class="hljs-keyword">this</span>.amount
+            },
+            <span class="hljs-comment">// also valid:</span>
+            total: computed(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.price * <span class="hljs-keyword">this</span>.amount
+            })
+        })
     }
-});
+}
 </code></pre>
-<p><em>Note: The support for getters was introduced in MobX 2.5.1. MobX will automatically convert any argumentless function that is passed as property value to <code>observable</code> / <code>extendObservable</code> to a computed property as well,
-but that form will disappear in the next major version</em>.</p>
-<h1 id="setters-for-computed-values">Setters for computed values</h1>
+<h2 id="setters-for-computed-values">Setters for computed values</h2>
 <p>It is possible to define a setter for computed values as well. Note that these setters cannot be used to alter the value of the computed property directly,
 but they can be used as &apos;inverse&apos; of the derivation. For example:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> box = observable({
@@ -936,11 +953,23 @@ but they can be used as &apos;inverse&apos; of the derivation. For example:</p>
     }
 });
 </code></pre>
+<p>And similarly</p>
+<pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span> </span>{
+    @observable length: <span class="hljs-number">2</span>,
+    @computed get squared() {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.length * <span class="hljs-keyword">this</span>.length;
+    }
+    set squared(value) { <span class="hljs-comment">//this is automatically an action, no annotation necessary</span>
+        <span class="hljs-keyword">this</span>.length = <span class="hljs-built_in">Math</span>.sqrt(value);
+    }
+}
+</code></pre>
+<p><em>Note: always define the setter <em>after</em> the getter, some TypeScript versions are known to declare two properties with the same name otherwise.</em></p>
 <p><em>Note: setters require MobX 2.5.1 or higher</em></p>
-<h1 id="-computed-expression"><code>computed(expression)</code></h1>
+<h2 id="-computed-expression-as-function"><code>computed(expression)</code> as function</h2>
 <p><code>computed</code> can also be invoked directly as function.
-Just like <code>observable(primitive value)</code> it will create a stand-alone observable.
-Use <code>.get()</code> on the returned object to get the current value of the computation, or <code>.observe(callback)</code> to observe it&apos;s changes.
+Just like <code>observable.box(primitive value)</code> it will create a stand-alone observable.
+Use <code>.get()</code> on the returned object to get the current value of the computation, or <code>.observe(callback)</code> to observe its changes.
 This form of <code>computed</code> is not used very often, but in some cases where you need to pass a &quot;boxed&quot; computed value around it might prove useful.</p>
 <p>Example:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, computed} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
@@ -950,10 +979,42 @@ This form of <code>computed</code> is not used very often, but in some cases whe
     name.get().toUpperCase()
 );
 
-<span class="hljs-keyword">var</span> disposer = upperCaseName.observe(name =&gt; <span class="hljs-built_in">console</span>.log(name));
+<span class="hljs-keyword">var</span> disposer = upperCaseName.observe(change =&gt; <span class="hljs-built_in">console</span>.log(change.newValue));
 
 name.set(<span class="hljs-string">&quot;Dave&quot;</span>);
 <span class="hljs-comment">// prints: &apos;DAVE&apos;</span>
+</code></pre>
+<h2 id="options-for-computed">Options for <code>computed</code></h2>
+<p>When using <code>computed</code> as modifier or as box, it accepts a second options argument with the following optional arguments:</p>
+<ul>
+<li><code>name</code>: String, the debug name used in spy and the MobX devtools</li>
+<li><code>context</code>: The <code>this</code> that should be used in the provided expression</li>
+<li><code>setter</code>: The setter function to be used. Without setter it is not possible to assign new values to a computed value. If the second argument passed to <code>computed</code> is a function, this is assumed to be a setter.</li>
+<li><code>compareStructural</code>: By default <code>false</code>. If this value, the output of the expression is structurally compared with the previous value before any observer is notified about a change. This makes sure that observers of the computation don&apos;t re-evaluate if new structures are returned that are structurally equal to the original ones. This is very useful when working with point, vector or color structures for example.</li>
+</ul>
+<h2 id="-computed-struct-for-structural-comparison"><code>@computed.struct</code> for structural comparison</h2>
+<p>The <code>@computed</code> decorator does not take arguments. If you want to to create a computed property which does structural comparison, use <code>@computed.struct</code>.</p>
+<h2 id="note-on-error-handling">Note on error handling</h2>
+<p>If a computed value throws an exception during it&apos;s computation, this exception will be catched and rethrown any time it&apos;s value is read.
+It is strongly recommended to always throw <code>Error</code>&apos;s, so that the original stack trace is preserved. E.g.: <code>throw new Error(&quot;Uhoh&quot;)</code> instead of <code>throw &quot;Uhoh&quot;</code>.
+Throwing exceptions doesn&apos;t break tracking, so it is possible for computed values to recover from exceptions.</p>
+<p>Example:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> x = observable(<span class="hljs-number">3</span>)
+<span class="hljs-keyword">const</span> y = observable(<span class="hljs-number">1</span>)
+<span class="hljs-keyword">const</span> divided = computed(() =&gt; {
+    <span class="hljs-keyword">if</span> (y.get() === <span class="hljs-number">0</span>)
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">&quot;Division by zero&quot;</span>)
+    <span class="hljs-keyword">return</span> x.get() / y.get()
+})
+
+divided.get() <span class="hljs-comment">// returns 3</span>
+
+y.set(<span class="hljs-number">0</span>) <span class="hljs-comment">// OK</span>
+divided.get() <span class="hljs-comment">// Throws: Division by zero</span>
+divided.get() <span class="hljs-comment">// Throws: Division by zero</span>
+
+y.set(<span class="hljs-number">2</span>)
+divided.get() <span class="hljs-comment">// Recovered; Returns 1.5</span>
 </code></pre>
 
                     

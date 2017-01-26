@@ -1,132 +1,115 @@
 # Modifiers for observable
 
-By default, `observable` recursively makes all the values of _plain_ objects and arrays recursively observable.
-Besides that, it automatically converts functions without arguments into reactive views or derived properties.
-For all other types of values just a reference is stored.
-In general, this should just do what you need, but if you want you can override the default behavior using _modifiers_.
-Note that modifiers are 'sticky', they are interpreted as being annotations.
-They do not only apply to the current value, but also to all values that are assigned in the future to the same attribute.
+Modifiers can be used decorator or in combination with `extendObservable` and `observable.object` to change the autoconversion rules for specific properties.
 
-Note that the attributes class instances (all objects that have a prototype) will not be made observable automatically by `observable`.
-It is considered to be the responsibility of the class definition / constructor function to mark the necessary attributes of a class instance observable / computed.
+* `observable.deep`: This is the default modifier, used by any observable. It converts any assigned, non-primitive value into an observable value if it isn't one yet.
+* `observable.ref`: Disables automatic observable conversion, just creates an observable reference instead.
+* `observable.shallow`: Can only used in combination with collections. Turns any assigned collection into an collection, which is shallowly observable (instead of deep)
+* `computed`: Creates a derived property, see [`computed`](computed-decorator.md)
+* `action`: Creates an action, see [`action`](action.md)
 
-## computed
+## Deep observability
 
-Introduces a computed property, see [`computed`](http://mobxjs.github.io/mobx/refguide/computed-decorator.html)
+When MobX creates an observable object, (using `observable`, `observable.object`, or `extendObservable`), it introduces observable properties which
+by default use the `deep` modifier. The deep modifier basically recursively calls `observable(newValue)` for any newly assigned value.
+Which in turns uses the `deep` modifier... you get the idea.
 
-## action
+This is a very convenient default. Without any additional effort all values assigned to an observable will themselves be made observable too (unless they already are), so no additional
+effort is required to make objects deep observable.
 
-Marks a function as action, see [`action`](http://mobxjs.github.io/mobx/refguide/action.html)
+## Reference observability
 
-## asMap
+In some cases however, objects don't need to be converted into observables.
+Typical cases are immutable objects, or objects that are not managed by you but by an external library.
+Examples are JSX elements, DOM elements, native objects like History, window or etc.
+To those kind of objects, you just want to store a reference without turning them into an observable.
 
-Creates a new Observable Map instead of an Observable Object. See [`asMap`](map.md)
-
-## asReference
-
-The most common modifier is `asReference`.
-If this modifier is used, `observable` will not attempt to make the value observable.
-Use this for example if you want to store a reference to a function, instead of creating a view based on that function.
-You can also use it to prevent that plain objects or arrays are made observable automatically.
+For these situations there is the `ref` modifier. It makes sure that an observable property is created, which only tracks the reference but doesn't try to convert its value.
+For example:
 
 ```javascript
+class Message {
+    @observable message = "Hello world"
 
-var test = observable({
-	x : 3,
-	doubler: function() {
-		return this.x*2;
-	},
-	someFunc: asReference(function() {
-		return this.x;
-	})
-});
+    // fictional example, if author is immutable, we just need to store a reference and shouldn't turn it into a mutable, observable object
+    @observable.ref author = null
+}
+```
 
-console.log(test.doubler); // === 6
-console.log(test.someFunc); // still a function
+Or with just ES5 syntax:
+
+```javascript
+function Message() {
+    extendObservable({
+        message: "Hello world",
+        author: observable.ref(null)
+    })
+}
+```
+
+Note that an observable, boxed reference can be created by using `const box = observable.shallowBox(value)`
+
+## Shallow observability
+
+The `observable.shallow` modifier applies observability 'one-level-deep'. You need those if you want to create a _collection_ of observable references.
+If a new collection is assigned to a property with this modifier, it will be made observable, but its values will be left as is, so unlike `deep`, it won't recurse.
+Example:
+
+```javascript
+class AuthorStore {
+    @observable.shallow authors = []
+}
+```
+In the above example an assignment of a plain array with authors to the `authors` will update the authors with an observable array, containing the original, non-observable authors.
+
+Note that the following methods can be used to create shallow collections manually: `observable.shallowObject`, `observable.shallowArray`, `observable.shallowMap` and `extendShallowObservable`.
+
+## Action & Computed
+
+`action`, `action.bound`, `computed` and `computed.struct` can be used as modifiers as well.
+See [`computed`](computed-decorator.md) respectively [`action`](action.md).
+
+```javascript
+const taskStore = observable({
+    tasks: observable.shallow([]),
+    taskCount: computed(function() {
+        return this.tasks.length
+    }),
+    clearTasks: action.bound(function() {
+        this.tasks.clear()
+    })
+})
 ```
 
 ## asStructure
 
-Can be used on non-cyclic, plain JavaScript values.
-Instead of comparing old values with new values based on whether the reference has changed, values are compared using deep equality before notifying any observers.
-This is useful if you are working with 'struct' like objects like colors or coordinates and each time return fresh objects with possibly the same values.
-`asStructure` can be used on reactive functions, plain objects and arrays.
+MobX 2 had the `asStructure` modifier, which in practice was rarely used, or only used in cases where it is used `reference` / `shallow` is often a better fit (when using immutable data for example).
+Structural comparision for computed properties and reactions is still possible.
+
+## Effect of modifiers
 
 ```javascript
-var ViewPort = mobxReact.observer(React.createClass({
-    displayName: 'ViewPort',
+class Store {
+    @observable/*.deep*/ collection1 = []
 
-    componentWillMount: function() {
-        mobx.extendObservable(this, {
-            screenSize: {
-                width: 0,
-                height: 0
-            },
-            minSize: {
-                width: 400,
-                height: 300
-            },
-            viewPortSize: mobx.asStructure(function() {
-                return {
-                    width: Math.max(this.screenSize.width, this.minSize.width),
-                    height: Math.max(this.screenSize.height, this.minSize.height)
-                }
-            }
-        });
+    @observable.ref collection2 = []
 
-        window.onresize = function() {
-            mobx.transaction(function() {
-                this.screenSize.width = window.innerWidth;
-                this.screenSize.height = window.innerHeight;
-            });
-        }.bind(this);
-    },
-
-    render: function() {
-        return (
-            <div style={{
-                width: this.viewPortSize.width,
-                height: this.viewPortSize.height
-            }}>
-                test
-            </div>
-        );
-    }
-}));
-```
-
-In the above example, the computed method `viewPortSize` returns a fresh object on each re-computation.
-So MobX considers it to have changed always. This means that each `resize` event of the browser will trigger a re-render of the
-`ViewPort` component.
-
-However, if the window size is smaller that the `minSize`, the resize doesn't need to influence the rendering anymore, as the computed
-will return the same dimensions after each run. `asStructure` signals to MobX that observers of this computation should only be triggered
-if the value returned by the computed has _structurally_ changed (by default strict equality is used to determine whether observers need to be notified).
-This means that a new object that is returned from `viewPortSize` won't trigger a `render` if its contents are (structurally) the same as the previous value.
-
-To use the `asStructure` modifier in combination with the `@computed` decorator, use the following:
-
-```javascript
-@computed({ asStructure: true }) get viewPortSize() {
-    return {
-        width: Math.max(this.screenSize.width, this.minSize.width),
-        height: Math.max(this.screenSize.height, this.minSize.height)
-    }
+    @observable.shallow collection3 = []
 }
+
+const todos = [{ test: "value" }]
+const store = new Store()
+
+store.collection1 = todos;
+store.collection2 = todos;
+store.collection3 = todos;
 ```
 
-## asFlat
+After these assignments:
 
-Similar to `asReference`, except that `asFlat` does not prevent its value from becoming observable, but only the children of the value.
-It can be used for example to create an observable array or object that should not automatically make its children observable.
-
-```javascript
-var todos = observable(asFlat([{
-	title: "make coffee",
-	completed: false
-}]));
-
-isObservable(todos); // true
-isObservable(todos[0]); // false
-isObservable(todos[0], "title"); // false
-```
+1. `collection1 === todos` is false; the contents of todos will be cloned into a new observable array
+2. `collection1[0] === todos[0]` is false; the first todo was a plain object and hence it was cloned into an observable object which is stored in the array
+3. `collection2 === todos` is true; the `todos` are kept as is, and are non-observable. Only the `collection2` property itself is observable.
+4. `collection2[0] === todos[0]` is true; because of 3.
+5. `collection3 === todos` is false; collection 3 is a new observable array
+6. `collection3[0] === todos[0]` is true; the value of `collection3` was only shallowly turned into an observable, but the contents of the array is left as is.

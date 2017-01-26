@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="4" data-basepath=".." data-revision="Tue Nov 01 2016 21:45:36 GMT+0100 (CET)">
+    <div class="book" data-level="4" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -891,7 +891,7 @@ At that point it is invaluable to understand how MobX determines what to react t
 <p>MobX reacts to any <em>existing</em> <strong>observable</strong> <em>property</em> that is read during the execution of a tracked function.</p>
 </blockquote>
 <ul>
-<li><em>&quot;reading&quot;</em> is &quot;dotting into&quot; an observable property, also called dereferencing.</li>
+<li><em>&quot;reading&quot;</em> is dereferencing an object&apos;s property, which can be done through &quot;dotting into&quot; it (eg. <code>user.name</code>) or using the bracket notation (eg. <code>user[&apos;name&apos;]</code>).</li>
 <li><em>&quot;trackable functions&quot;</em> are the expression of <code>computed</code>, the <code>render()</code> method of an observer component, and the functions that are passed as the first param to <code>when</code>, <code>reaction</code> and <code>autorun</code>.</li>
 <li><em>&quot;during&quot;</em> means that only those observables that are being read while the function is executing are tracked. It doesn&apos;t matter whether these values are used directly or indirectly by the tracked function.</li>
 </ul>

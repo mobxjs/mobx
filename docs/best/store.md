@@ -234,7 +234,7 @@ export class Todo {
                     this.store.transportLayer.saveTodo(json);
                 }
             }
-        });
+        );
     }
 
     /**

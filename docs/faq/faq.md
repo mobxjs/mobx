@@ -5,7 +5,7 @@
 MobX runs on any ES5 environment. That means that Node.js, Rhino and all browsers except for IE8 are supported. See [caniuse.com](http://caniuse.com/#feat=es5)
 
 ##### Can MobX be combined with RxJS?
-Yes, see the [rx-mobx](https://www.npmjs.com/package/rx-mobx) interoperability package.
+Yes, you can use [toStream and fromStream from mobx-utils](https://github.com/mobxjs/mobx-utils#tostream) to use RXJS and other TC 39 compatible observables with mobx.
 
 ##### When to use RxJS instead of MobX?
 For anything that involves explictly working with the concept of time,

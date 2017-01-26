@@ -11,6 +11,11 @@ todo.task = "make coffee";
 
 That is enough to create a todo, submit it to the server and update our user interface accordingly.
 
+## When to use actions?
+
+Actions should only be used on functions that _modify_ state.
+Functions that just perform look-ups, filters etc should _not_ be marked as actions; to allow MobX to track their invocations.
+
 ## Asynchronous actions
 
 Writing asynchronous actions is pretty simple as well.

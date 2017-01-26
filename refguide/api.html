@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2" data-basepath=".." data-revision="Tue Nov 01 2016 21:45:36 GMT+0100 (CET)">
+    <div class="book" data-level="2" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -883,45 +883,97 @@
                     <section class="normal" id="section-">
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/api.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="mobx-api-reference">MobX Api Reference</h1>
+<p>Applies to MobX 3 and higher. For MobX 2, the old documentation is still available on <a href="https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md" target="_blank">github</a></p>
 <h1 id="core-api">Core API</h1>
 <p><em>The most important MobX api&apos;s. Understanding <code>observable</code>, <code>computed</code>, <code>reactions</code> and <code>actions</code> is enough to master MobX and use it in your applications!</em></p>
 <h2 id="creating-observables">Creating observables</h2>
-<h3 id="-observable"><code>observable</code></h3>
+<h3 id="-observable-value"><code>observable(value)</code></h3>
 <p>Usage:</p>
 <ul>
 <li><code>observable(value)</code></li>
 <li><code>@observable classProperty = value</code></li>
 </ul>
 <p>Observable values can be JS primitives, references, plain objects, class instances, arrays and maps.
-The following conversion rules are applied, but can be fine-tuned by using <em>modifiers</em>. See below.</p>
+<code>observable(value)</code> is a convenience overload, that always tries to create the best matching observable types.
+You can also directly create the desired observable type, see below.</p>
+<p>The following conversion rules are applied, but can be fine-tuned by using <em>modifiers</em>. See below.</p>
 <ol>
-<li>If <em>value</em> is wrapped in the <em>modifier</em> <code>asMap</code>: a new <a href="map.html">Observable Map</a> will be returned. Observable maps are very useful if you don&apos;t want to react just to the change of a specific entry, but also to the addition or removal of entries.</li>
+<li>If <em>value</em> is an wrapped is an instance of an <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" target="_blank">ES6 Map</a>: a new <a href="map.html">Observable Map</a> will be returned. Observable maps are very useful if you don&apos;t want to react just to the change of a specific entry, but also to the addition or removal of entries.</li>
 <li>If <em>value</em> is an array, a new <a href="array.html">Observable Array</a> will be returned.</li>
-<li>If <em>value</em> is an object <em>without</em> prototype, all its current properties will be made observable. See <a href="object.html">Observable Object</a></li>
+<li>If <em>value</em> is an object <em>without</em> prototype, the object will be cloned and all its current properties will be made observable. See <a href="object.html">Observable Object</a></li>
 <li>If <em>value</em> is an object <em>with</em> a prototype, a JavaScript primitive or function, a <a href="boxed.html">Boxed Observable</a> will be returned. MobX will not make objects with a prototype automatically observable; as that is the responsibility of it&apos;s constructor function. Use <code>extendObservable</code> in the constructor, or <code>@observable</code> in it&apos;s class definition instead.</li>
 </ol>
 <p>These rules might seem complicated at first sight, but you will notice that in practice they are very intuitive to work with.
 Some notes:</p>
 <ul>
-<li>To create dynamically keyed objects use the <code>asMap</code> modifier! Only initially existing properties on an object will be made observable, although new ones can be added using <code>extendObservable</code>.</li>
+<li>To create dynamically keyed objects always use maps! Only initially existing properties on an object will be made observable, although new ones can be added using <code>extendObservable</code>.</li>
 <li>To use the <code>@observable</code> decorator, make sure that <a href="http://mobxjs.github.io/mobx/refguide/observable-decorator.html" target="_blank">decorators are enabled</a> in your transpiler (babel or typescript).</li>
-<li>By default making a data structure observable is <em>infective</em>; that means that <code>observable</code> is applied automatically to any value that is contained by the data structure, or will be contained by the data structure in the future. This behavior can be changed by using <em>modifiers</em>.</li>
+<li>By default making a data structure observable is <em>infective</em>; that means that <code>observable</code> is applied automatically to any value that is contained by the data structure, or will be contained by the data structure in the future. This behavior can be changed by using <em>modifiers</em> or <em>shallow</em>.</li>
 </ul>
 <p><a href="observable.html">&#xAB;<code>observable</code>&#xBB;</a>  &#x2014;  <a href="observable-decorator.html">&#xAB;<code>@observable</code>&#xBB;</a></p>
-<h3 id="-extendobservable"><code>extendObservable</code></h3>
-<p>Usage: <code>extendObservable(target, propertyMap)</code>. For each key/value pair in <code>propertyMap</code> a (new) observable property will be introduced on the target object.
+<h3 id="-observable-property-value"><code>@observable property =  value</code></h3>
+<p><code>observable</code> can also be used as property decorator. It requires <a href="../best/decorators.html">decorators to be enabled</a> and is syntactic
+sugar for <code>extendObservable(this, { property: value })</code>.</p>
+<p><a href="observable-decorator.html">&#xAB;<code>details</code>&#xBB;</a></p>
+<h3 id="-observable-box-value-observable-shallowbox-value"><code>observable.box(value)</code> &amp; <code>observable.shallowBox(value)</code></h3>
+<p>Creates an observable <em>box</em> that stores an observable reference to a value. Use <code>get()</code> to get the current value of the box, and <code>set()</code> to update it.
+This is the foundation on which all other observables are built, but in practice you will use it rarely.
+Normal boxes will automatically try to turn any new value into an observable if it isn&apos;t already. Use <code>shallowBox</code> to disable this behavior.</p>
+<p><a href="boxed.html">&#xAB;<code>details</code>&#xBB;</a></p>
+<h3 id="-observable-object-value-observable-shallowobject-value"><code>observable.object(value)</code> &amp; <code>observable.shallowObject(value)</code></h3>
+<p>Creates a clone of the provided object and makes all it&apos;s properties observable.
+By default any values in those properties will be made observable as well, but when using <code>shallowObject</code> only the properties will be made into observable
+references, but the values will be untouched. (This holds also for any values assigned in the future)</p>
+<p><a href="object.html">&#xAB;<code>details</code>&#xBB;</a></p>
+<h3 id="-observable-array-value-observable-shallowarray-value"><code>observable.array(value)</code> &amp; <code>observable.shallowArray(value)</code></h3>
+<p>Creates a new observable array based on the provided value. Use <code>shallowArray</code> if the values in the array should not be turned into observables.</p>
+<p><a href="array.html">&#xAB;<code>details</code>&#xBB;</a></p>
+<h3 id="-observable-map-value-observable-shallowmap-value"><code>observable.map(value)</code> &amp; <code>observable.shallowMap(value)</code></h3>
+<p>Creates a new observable map based on the provided value. Use <code>shallowMap</code> if the values in the array should not be turned into observables.
+Use <code>map</code> whenever you want to create a dynamically keyed collections and the addition / removal of keys needs to be observed.
+Note that only string keys are supported.</p>
+<p><a href="map.html">&#xAB;<code>details</code>&#xBB;</a></p>
+<h3 id="-extendobservable-extendshallowobservable"><code>extendObservable</code> &amp; <code>extendShallowObservable</code></h3>
+<p>Usage: <code>extendObservable(target, ...propertyMaps)</code>. For each key/value pair in each <code>propertyMap</code> a (new) observable property will be introduced on the target object.
 This can be used in constructor functions to introduce observable properties without using decorators.
-If a value of the <code>propertyMap</code> is an argumentless function, a <em>computed</em> property will be introduced.
-<a href="extend-observable.html">&#xAB;details&#xBB;</a></p>
+If a value of the <code>propertyMap</code> is a getter function, a <em>computed</em> property will be introduced.</p>
+<p>Use <code>extendShallowObservable</code> if the new properties should not be infective (that is; newly assigned values should not be turned into observables automatically).
+Note that <code>extendObservable</code> enhances existing objects, unlike <code>observable.object</code> which creates a new object.</p>
+<p><a href="extend-observable.html">&#xAB;details&#xBB;</a></p>
+<h3 id="modifiers">Modifiers</h3>
+<p>Modifiers can be used decorator or in combination with <code>extendObservable</code> and <code>observable.object</code> to change the autoconversion rules for specific properties.</p>
+<p>The following modifiers are available:</p>
+<ul>
+<li><code>observable.deep</code>: This is the default modifier, used by any observable. It converts any assigned, non-primitive value into an observable if it isn&apos;t one yet.</li>
+<li><code>observable.ref</code>: Disables automatic observable conversion, just creates an observable reference instead.</li>
+<li><code>observable.shallow</code>: Can only used in combination with collections. Turns any assigned collection into an collection, which is shallowly observable (instead of deep). In other words; the values inside the collection won&apos;t become observables automatically.</li>
+<li><code>computed</code>: Creates a derived property, see <a href="computed-decorator.html"><code>computed</code></a></li>
+<li><code>action</code>: Creates an action, see <a href="action.html"><code>action</code></a></li>
+</ul>
+<p>Modifiers can be used as decorator:</p>
+<pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TaskStore</span> </span>{
+    @observable.shallow tasks = []
+}
+</code></pre>
+<p>Or as property modifier in combination with <code>observable.object</code> / <code>observable.extendObservable</code>.
+Note that modifiers always &apos;stick&apos; to the property. So they will remain in effect even if a new value is assigned.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> taskStore = observable({
+    tasks: observable.shallow([])
+})
+</code></pre>
+<p><a href="modifiers.html">&#xAB;details&#xBB;</a></p>
 <h2 id="computed-values">Computed values</h2>
 <p>Usage:</p>
 <ul>
 <li><code>computed(() =&gt; expression)</code></li>
+<li><code>computed(() =&gt; expression, (newValue) =&gt; void)</code></li>
+<li><code>computed(() =&gt; expression, options)</code></li>
 <li><code>@computed get classProperty() { return expression; }</code></li>
+<li><code>@computed.struct get classProperty() { return expression; }</code></li>
 </ul>
 <p>Creates a computed property. The <code>expression</code> should not have side effects but return a value.
-The expression will automatically be re-evaluated if any observables it uses changes, but only if it is in use by some <em>reaction</em>.
-<a href="computed-decorator.html">&#xAB;details&#xBB;</a></p>
+The expression will automatically be re-evaluated if any observables it uses changes, but only if it is in use by some <em>reaction</em>.</p>
+<p><a href="computed-decorator.html">&#xAB;details&#xBB;</a></p>
 <h2 id="actions">Actions</h2>
 <p>Any application has actions. Actions are anything that modify the state.</p>
 <p>With MobX you can make it explicit in your code where your actions live by marking them.
@@ -940,7 +992,7 @@ Note: using <code>action</code> is mandatory when <em>strict mode</em> is enable
 <li><code>@action(name) boundClassMethod = (args) =&gt; { body }</code></li>
 </ul>
 <p>For one-time-actions <code>runInAction(name?, fn, scope?)</code> can be used, which is sugar for <code>action(name, fn, scope)()</code>.</p>
-<h2 id="reactions">Reactions</h2>
+<h2 id="reactions-derivations">Reactions &amp; Derivations</h2>
 <p><em>Computed values</em> are <strong>values</strong> that react automatically to state changes.
 <em>Reactions</em> are <strong>side effects</strong> that react automatically to state changes.
 Reactions <em>can</em> be used to ensure that a certain side effect (mainly I/O) is automatically executed when relevant state changes, like logging, network requests etc.
@@ -975,16 +1027,15 @@ A variation on <code>autorun</code> that gives more fine-grained control on whic
 It takes two function, the first one is tracked and returns data that is used as input for the second one, the side effect.
 Unlike <code>autorun</code> the side effect won&apos;t be run initially, and any observables that are accessed while executing the side effect will not be tracked.
 The side effect can be debounced, just like <code>autorunAsync</code>. <a href="reaction.html">&#xAB;details&#xBB;</a></p>
-<h2 id="modifiers-for-observable">Modifiers for <code>observable</code></h2>
-<p>By default <code>observable</code> is applied recursively and to values that are assigned in the future as well.
-Modifiers can be used to influence how <code>observable</code> treats specific values.</p>
-<ul>
-<li><code>asMap</code>: This is the most important modifier. Instead of creating an object with observable properties, an <em>Observable Map</em> is created instead. The main difference with observable objects is that the addition and removal of properties can be easily observed. Use <code>asMap</code> if you want a map like data structure where the keys will change over time.</li>
-<li><code>asFlat</code>: Will not apply <code>observable</code> recursively. The passed object / collection itself will be observable, but the values in it won&apos;t. This disables the possibility to deeply observe objects.</li>
-<li><code>asReference</code>: Use the passed in value verbatim, just create an observable reference to the object.</li>
-<li><code>asStructure</code>: When new values are assigned, ignore the new value if it structurally equal to the previous value.</li>
-</ul>
-<p><a href="modifiers.html">&#xAB;details&#xBB;</a></p>
+<h3 id="-expr"><code>expr</code></h3>
+<p>Usage: <code>expr(() =&gt; someExpression)</code>. Just a shorthand for <code>computed(() =&gt; someExpression).get()</code>.
+<code>expr</code> is useful in some rare cases to optimize another computed function or reaction.
+In general it is simpler and better to just split the function in multiple smaller computed&apos;s to achieve the same effect.
+<a href="expr.html">&#xAB;details&#xBB;</a></p>
+<h3 id="-onreactionerror"><code>onReactionError</code></h3>
+<p>Usage: <code>extras.onReactionError(handler: (error: any, derivation) =&gt; void)</code></p>
+<p>This method attaches a global error listener, which is invoked for every error that is thrown from a <em>reaction</em>.
+This can be used for monitoring or test purposes.</p>
 <hr>
 <h1 id="utilities">Utilities</h1>
 <p><em>Here are some utilities that might make working with observable objects or computed values more convenient.
@@ -1084,6 +1135,7 @@ Returns a tree structure with all reactions / computations that are observing th
 <p><em>The following methods are all used internally by MobX, and might come in handy in rare cases. But usually MobX offers more declarative alternatives to tackle the same problem. They might come in handy though if you try to extend MobX</em></p>
 <h3 id="-transaction"><code>transaction</code></h3>
 <p>Usage: <code>transaction(() =&gt; { block })</code>.
+Deprecated, use actions or <code>runInAction</code> instead.
 Low-level api that can be used to batch state changes.
 State changes made inside the block won&apos;t cause any computations or reactions to run until the end of the block is reached.
 Nonetheless inspecting a computed value inside a transaction block will still return a consistent value.
@@ -1111,18 +1163,6 @@ Used internally by <code>action</code> to allow changes, and by <code>computed</
 <p>Usage: <code>resetGlobalState()</code>.
 Resets MobX internal global state. MobX by defaults fails fast if an exception occurs inside a computation or reaction and refuses to run them again.
 This function resets MobX to the zero state. Existing <code>spy</code> listeners and the current value of strictMode will be preserved though.</p>
-<h1 id="functions-that-might-get-deprecated">Functions that might get deprecated</h1>
-<h3 id="-map"><code>map</code></h3>
-<p><em>Will probably by deprecated, use <code>observable(asMap())</code> instead</em>. Usage: <code>map()</code>, <code>map(keyValueObject)</code>, <code>map(entries)</code>.
-Returns an observable, largely ES6 compliant <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" target="_blank">Map</a> data structure.
-This is useful if you want to store data based on string keys.
-For the full api of the returned <code>ObservableMap</code> see <em>Observable maps</em>.
-<a href="map.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-expr"><code>expr</code></h3>
-<p>Usage: <code>expr(() =&gt; someExpression)</code>. Just a shorthand for <code>computed(() =&gt; someExpression).get()</code>.
-<code>expr</code> is useful in some rare cases to optimize another computed function or reaction.
-In general it is simpler and better to just split the function in multiple smaller computed&apos;s to achieve the same effect.
-<a href="expr.html">&#xAB;details&#xBB;</a></p>
 
                     
                     </section>

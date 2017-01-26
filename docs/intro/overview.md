@@ -70,6 +70,8 @@ setInterval(action(function tick() {
 }), 1000);
 ```
 
-The `action` wrapper is only needed when using MobX in strict mode (by default off), but will help you to better structure applications and expresses the intention of a function to modify state.
+The `action` wrapper is only needed when using MobX in strict mode (by default off).
+It is recommended to use action though as it will help you to better structure applications and expresses the intention of a function to modify state.
+Also it automatically applies transactions for optimal performance.
 
 Feel free to try this example on [JSFiddle](http://jsfiddle.net/mweststrate/wgbe4guu/) or by cloning the [MobX boilerplate project](https://github.com/mobxjs/mobx-react-boilerplate)

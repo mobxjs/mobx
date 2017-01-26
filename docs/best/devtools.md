@@ -10,8 +10,17 @@ Install:
 
 `npm install mobx-react-devtools`
 
-To enable devtools, require the devtools somewhere in your code-base.
+To enable devtools, import and render the devtools somewhere in your code-base.
 
-`require('mobx-react-devtools')`
+```JS
+import DevTools from 'mobx-react-devtools'
+
+const App = () => (
+  <div>
+    ...
+    <DevTools />
+  </div>
+)
+```
 
 For more details check the [mobx-react-devtools](https://github.com/mobxjs/mobx-react-devtools) repository.

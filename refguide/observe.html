@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="8.8" data-basepath=".." data-revision="Tue Nov 01 2016 21:45:36 GMT+0100 (CET)">
+    <div class="book" data-level="8.8" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -896,35 +896,36 @@
 <p>The <code>intercept</code> should tell MobX what needs to happen with the current change.
 Therefore it should do one of the following things:</p>
 <ol>
-<li>Return the received <code>change</code> object as-is from the function, in wich case the mutation will be applied.   </li>
+<li>Return the received <code>change</code> object as-is from the function, in wich case the mutation will be applied.</li>
 <li>Modify the <code>change</code> object and return it, for example to normalize the data. Not all fields are modifiable, see below.</li>
 <li>Return <code>null</code>, this indicates that the change can be ignored and shouldn&apos;t be applied. This is a powerful concept to make your objects for example temporarily immutable.</li>
 <li>Throw an exception, for example if some invariant isn&apos;t met.</li>
 </ol>
-<p>The function returns a <code>disposer</code> function that can be used to cancel the interceptor.
+<p>The function returns a <code>disposer</code> function that can be used to cancel the interceptor when invoked.
 It is possible to register multiple interceptors to the same observable.
 They will be chained in registration order.
 If one of the interceptors returns <code>null</code> or throw an exception, the other interceptors won&apos;t be evaluated anymore.
 It is also possible to register an interceptor both on a parent object and on an individual property.
-In that case the parent object interceptors are run before the property interceptors. </p>
+In that case the parent object interceptors are run before the property interceptors.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> theme = observable({
   backgroundColor: <span class="hljs-string">&quot;#ffffff&quot;</span>
 })
 
-intercept(theme, <span class="hljs-string">&quot;backgroundColor&quot;</span>, change =&gt; {
+<span class="hljs-keyword">const</span> disposer = intercept(theme, <span class="hljs-string">&quot;backgroundColor&quot;</span>, change =&gt; {
   <span class="hljs-keyword">if</span> (!change.newValue) {
     <span class="hljs-comment">// ignore attempts to unset the background color</span>
-    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;   
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
   }
   <span class="hljs-keyword">if</span> (change.newValue.length === <span class="hljs-number">6</span>) {
     <span class="hljs-comment">// correct missing &apos;#&apos; prefix</span>
     change.newValue = <span class="hljs-string">&apos;#&apos;</span> + change.newValue;
-    <span class="hljs-keyword">return</span> change;   
+    <span class="hljs-keyword">return</span> change;
   }
   <span class="hljs-keyword">if</span> (change.newValue.length === <span class="hljs-number">7</span>) {
       <span class="hljs-comment">// this must be a properly formatted color code!</span>
       <span class="hljs-keyword">return</span> change;
   }
+  <span class="hljs-keyword">if</span> (change.newValue.length &gt; <span class="hljs-number">10</span>) disposer(); <span class="hljs-comment">// stop intercepting future changes</span>
   <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">&quot;This doesn&apos;t like a color at all: &quot;</span> + change.newValue);
 })
 </code></pre>
@@ -933,13 +934,14 @@ intercept(theme, <span class="hljs-string">&quot;backgroundColor&quot;</span>, c
 <ul>
 <li><code>target</code>: the observable to observe</li>
 <li><code>propertyName</code>: optional parameter to specify a specific property to observe. Note that <code>observe(user.name, listener)</code> is fundamentally different from <code>observe(user, &quot;name&quot;, listener)</code>. The first observes the <em>current</em> <code>value</code> inside <code>user.name</code> (which might not be an observable at all), the latter observes the <code>name</code> <em>property</em> of <code>user</code>.</li>
-<li><code>listener</code>: callback that will be invoked for <em>each</em> change that is made to the observable. Receives a single change object describing the mutation, except for boxed observables, which will invoke the <code>listener</code> two parameters: <code>newValue, oldValue</code>. </li>
+<li><code>listener</code>: callback that will be invoked for <em>each</em> change that is made to the observable. Receives a single change object describing the mutation, except for boxed observables, which will invoke the <code>listener</code> two parameters: <code>newValue, oldValue</code>.</li>
 <li><code>invokeImmediately</code>: by default false. Set it to true if you want <code>observe</code> to invoke <code>listener</code> directly with the state of the observable (instead of waiting for the first change). Not supported (yet) by all kinds of observables.</li>
 </ul>
 <p>The function returns a <code>disposer</code> function that can be used to cancel the observer.
 Note that <code>transaction</code> does not affect the working of the <code>observe</code> method(s).
 This means that even inside a transaction <code>observe</code> will fire its listeners for each mutation.
 Hence <code>autorun</code> is usually a more powerful and declarative alternative to <code>observe</code>.</p>
+<p><em><code>observe</code> reacts to <em>mutations</em>, when they are being made, while reactions like <code>autorun</code> or <code>reaction</code> react to <em>new values</em> when they become available. In many cases the latter is sufficient</em></p>
 <p>Example:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, observe} <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;mobx&apos;</span>;
 
@@ -959,8 +961,8 @@ disposer();
 <span class="hljs-comment">// Ignore any future updates</span>
 
 <span class="hljs-comment">// observe a single field</span>
-<span class="hljs-keyword">const</span> disposer2 = observe(person, <span class="hljs-string">&quot;lastName&quot;</span>, (newValue, oldValue) =&gt; {
-    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;LastName changed to &quot;</span>, newValue);
+<span class="hljs-keyword">const</span> disposer2 = observe(person, <span class="hljs-string">&quot;lastName&quot;</span>, (change) =&gt; {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;LastName changed to &quot;</span>, change.newValue);
 });
 </code></pre>
 <p>Related blog: <a href="https://medium.com/@mweststrate/object-observe-is-dead-long-live-mobservable-observe-ad96930140c5" target="_blank">Object.observe is dead. Long live mobx.observe</a></p>
@@ -1001,7 +1003,7 @@ disposer();
 </tr>
 <tr>
 <td></td>
-<td>update</td>
+<td>update*</td>
 <td>name</td>
 <td>name of the property being updated</td>
 <td>&#x221A;</td>
@@ -1144,10 +1146,10 @@ disposer();
 <td></td>
 </tr>
 <tr>
-<td>Boxed observable</td>
+<td>Boxed &amp; computed observables</td>
 <td>create</td>
 <td>newValue</td>
-<td>the value that was assigned during creation. Only observable by <code>spy</code></td>
+<td>the value that was assigned during creation. Only available as <code>spy</code> event for boxed observables</td>
 <td></td>
 <td></td>
 </tr>
@@ -1155,7 +1157,7 @@ disposer();
 <td></td>
 <td>update</td>
 <td>newValue</td>
-<td>the new value being assigned (only available in <code>intercept</code> and <code>spy</code>)</td>
+<td>the new value being assigned</td>
 <td>&#x221A;</td>
 <td>&#x221A;</td>
 </tr>
@@ -1163,44 +1165,12 @@ disposer();
 <td></td>
 <td></td>
 <td>oldValue</td>
-<td>.. the old value. Only available in <code>spy</code></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>(observe callback)</td>
-<td>newValue</td>
-<td>first param of the <code>observe</code> callback</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>(observe callback)</td>
-<td>oldValue</td>
-<td>second param of the <code>observe</code> callback previous value</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>Computed observable</td>
-<td>(observe callback)</td>
-<td>newValue</td>
-<td>first param of the <code>observe</code> callback</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>(observe callback)</td>
-<td>oldValue</td>
-<td>second param of the <code>observe</code> callback</td>
-<td></td>
+<td>the previous value of the observable</td>
 <td></td>
 </tr>
 </tbody>
 </table>
+<p><em>* Note that object <code>update</code> events won&apos;t fire for updated computated values (as those aren&apos;t mutations). But it is possible to observe them by explicitly subscribing to the specific property using <code>observe(object, &apos;computedPropertyName&apos;, listener)</code>.</em></p>
 
                     
                     </section>

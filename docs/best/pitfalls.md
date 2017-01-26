@@ -2,6 +2,10 @@
 
 Stuck with MobX? This section contains a list of common issues people new to MobX might run into.
 
+#### Issues with decorators?
+
+For setup tips and limitations on decorators, check the [decorators](decorators.md) page
+
 #### `Array.isArray(observable([1,2,3])) === false`
 
 In ES5 there is no way to reliably inherit from arrays, and hence observable arrays inherit from objects.
@@ -16,8 +20,7 @@ MobX observable _objects_ do not detect or react to property assignments that we
 So MobX observable objects act as records with predefined keys.
 You can use `extendObservable(target, props)` to introduce new observable properties to an object.
 However object iterators like `for .. in` or `Object.keys()` won't react to this automatically.
-If you need a dynamically keyed object, for example to store users by id, create observable _map_s using `asMap`.
-More info on [asMap](https://github.com/mobxjs/mobx/issues/219#issuecomment-220224813).
+If you need a dynamically keyed object, for example to store users by id, create observable _map_s using [`observable.map`](../refguide/map.md).
 For more info see [what will MobX react to?](react.md).
 
 ### Use `@observer` on all components that render `@observable`'s.
@@ -48,7 +51,7 @@ This allows MobX to automatically suspend computations that are not actively in 
 See this [blog](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254) or [issue #356](https://github.com/mobxjs/mobx/issues/356) for an explanation.
 So if you fiddle arounds, computed properties might not seem efficient. But when applied in a project that uses `observer`, `autorun` etc, they become very efficient.
 
-_N.B. in a next version of MobX computeds will automatically be kept alive during transactions as well, see PR: #452_
+MobX computeds will automatically be kept alive during transactions as well, see PRs: [#452](https://github.com/mobxjs/mobx/pull/452) and [#489](https://github.com/mobxjs/mobx/pull/489)
 
 #### Always dispose reactions
 
@@ -118,7 +121,7 @@ See also: http://mobxjs.github.io/mobx/best/stateless-HMR.html or [#141](https:/
 #### The propType of an observable array is object
 
 Observable arrays are actually objects, so they comply to `propTypes.object` instead of `array`.
-`mobx-react` provides it's explicit `PropTypes` for observable data structures.
+`mobx-react` provides its explicit `PropTypes` for observable data structures.
 
 #### Rendering ListViews in React Native
 

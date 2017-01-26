@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="7.3" data-basepath=".." data-revision="Tue Nov 01 2016 21:45:36 GMT+0100 (CET)">
+    <div class="book" data-level="7.3" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -890,6 +890,9 @@ Based on the store we have created in the previous section, actions become as si
 todo.task = <span class="hljs-string">&quot;make coffee&quot;</span>;
 </code></pre>
 <p>That is enough to create a todo, submit it to the server and update our user interface accordingly.</p>
+<h2 id="when-to-use-actions">When to use actions?</h2>
+<p>Actions should only be used on functions that <em>modify</em> state.
+Functions that just perform look-ups, filters etc should <em>not</em> be marked as actions; to allow MobX to track their invocations.</p>
 <h2 id="asynchronous-actions">Asynchronous actions</h2>
 <p>Writing asynchronous actions is pretty simple as well.
 You can use observable data structures as a promise.

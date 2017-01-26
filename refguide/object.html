@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="3.1" data-basepath=".." data-revision="Tue Nov 01 2016 21:45:36 GMT+0100 (CET)">
+    <div class="book" data-level="3.1" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -883,8 +883,8 @@
                     <section class="normal" id="section-">
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/object.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h2 id="observable-objects">Observable Objects</h2>
-<p>If a plain JavaScript object is passed to <code>observable</code> all properties inside that object will be made observable.
-(A plain object is an object that wasn&apos;t created using a constructor function)
+<p>If a plain JavaScript object is passed to <code>observable</code> all properties inside will be copied into a clone and made observable.
+(A plain object is an object that wasn&apos;t created using a constructor function / but has <code>Object</code> as it&apos;s prototype, or no prototype at all.)
 <code>observable</code> is by default applied recursively, so if one of the encoutered values is an object or array, that value will be passed through <code>observable</code> as well.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, autorun, action} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
 
@@ -893,10 +893,12 @@
     name: <span class="hljs-string">&quot;John&quot;</span>,
     age: <span class="hljs-number">42</span>,
     showAge: <span class="hljs-literal">false</span>,
+
     <span class="hljs-comment">// computed property:</span>
     get labelText() {
         <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.showAge ? <span class="hljs-string">`<span class="hljs-subst">${this.name}</span> (age: <span class="hljs-subst">${this.age}</span>)`</span> : <span class="hljs-keyword">this</span>.name;
     },
+
     <span class="hljs-comment">// action:</span>
     setAge: action(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
         <span class="hljs-keyword">this</span>.age = <span class="hljs-number">21</span>;
@@ -920,10 +922,16 @@ Properties that are added to the object at a later time won&apos;t become observ
 <li>Only plain objects will be made observable. For non-plain objects it is considered the responsibility of the constructor to initialize the observable properties.
 Either use the <a href="observable.html"><code>@observable</code></a> annotation or the <a href="extend-observable.html"><code>extendObservable</code></a> function.</li>
 <li>Property getters will be automatically turned into derived properties, just like <a href="computed-decorator"><code>@computed</code></a> would do.</li>
-<li><em>Deprecated</em> Argumentless functions will be automatically turned into derived properties, just like <a href="computed-decorator"><code>@computed</code></a> would do.</li>
 <li><code>observable</code> is applied recursively to a whole object graph automatically. Both on instantiation and to any new values that will be assigned to observable properties in the future. Observable will not recurse into non-plain objects.</li>
 <li>These defaults are fine in 95% of the cases, but for more fine-grained on how and which properties should be made observable, see the <a href="modifiers.html">modifiers</a> section.</li>
 </ul>
+<h1 id="-observable-object-props-observable-shallowobject-props"><code>observable.object(props)</code> &amp; <code>observable.shallowObject(props)</code></h1>
+<p><code>observable(object)</code> is just a shorthand for <code>observable.object(props)</code>.
+All properties are by default made deep observable.
+<a href="modifiers.html">modifiers</a> can be used to override this behavior for individual properties.
+<code>shallowObject(props)</code> can be used to make the properties only shallow observables. That is, the reference to the value is observabled, but the value itself won&apos;t be made observable automatically.</p>
+<h2 id="name-argument">Name argument</h2>
+<p>Both <code>observable.object</code> and <code>observable.shallowObject</code> take a second parameter which is used as debug name in for example <code>spy</code> or the MobX dev tools.</p>
 
                     
                     </section>

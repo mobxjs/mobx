@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="3.3" data-basepath=".." data-revision="Tue Nov 01 2016 21:45:36 GMT+0100 (CET)">
+    <div class="book" data-level="3.3" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -883,17 +883,17 @@
                     <section class="normal" id="section-">
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/map.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="observable-maps">Observable Maps</h1>
-<p><code>observable(asMap(values?, modifier?))</code> (and <code>map(values?, modifier?)</code>) creates a dynamic keyed observable map.
+<h2 id="-observable-map-values"><code>observable.map(values)</code></h2>
+<p><code>observable.map(values?)</code> creates a dynamic keyed observable map.
 Observable maps are very useful if you don&apos;t want to react just to the change of a specific entry, but also to the addition or removal of entries.
-Optionally takes an object or entries array with initial values.
-Unlike ES6 maps, only strings are accepted as keys.
-The modifier param can be one of the MobX <a href="modifiers.html">modifiers</a>, such as <code>asReference</code>.</p>
+Optionally takes an object, entries array or string keyed <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" target="_blank">ES6 map</a> with initial values.
+Unlike ES6 maps, only strings are accepted as keys.</p>
 <p>The following methods are exposed according to the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" target="_blank">ES6 Map spec</a>:</p>
 <ul>
 <li><code>has(key)</code> Returns whether this map has an entry the provided key. Note that the presence of a key is an observable fact in itself.</li>
 <li><code>set(key, value)</code>. Sets the given <code>key</code> to <code>value</code>. The provided key will be added to the map if it didn&apos;t exist yet.</li>
 <li><code>delete(key)</code>. Deletes the given key and its value from the map.</li>
-<li><code>get(key)</code>. Returns the value at the given key (or <code>undefined</code>). Make sure that you guard <code>get</code> calls with <code>has</code>.</li>
+<li><code>get(key)</code>. Returns the value at the given key (or <code>undefined</code>).</li>
 <li><code>keys()</code>. Returns all keys present in this map. The insertion order is preserved.</li>
 <li><code>values()</code>. Returns all values present in this map. Insertion order is preserved.</li>
 <li><code>entries()</code>. Returns an (insertion ordered) array that for each key/value pair in the map contains an array <code>[key, value]</code>.</li>
@@ -905,11 +905,17 @@ The modifier param can be one of the MobX <a href="modifiers.html">modifiers</a>
 <ul>
 <li><p><code>toJS()</code>. Returns a shallow plain object representation of this map. (For a deep copy use <code>mobx.toJS(map)</code>).</p>
 </li>
-<li><p><code>intercept(interceptor)</code>. Registers an interceptor that will be triggered before any changes are applied to the map. See <a href="observe.html">observe &amp; intercept</a>. </p>
+<li><p><code>intercept(interceptor)</code>. Registers an interceptor that will be triggered before any changes are applied to the map. See <a href="observe.html">observe &amp; intercept</a>.</p>
 </li>
 <li><code>observe(listener, fireImmediately?)</code>. Registers a listener that fires upon each change in this map, similarly to the events that are emitted for <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe" target="_blank">Object.observe</a>. See <a href="observe.html">observe &amp; intercept</a> for more details.</li>
-<li><code>merge(object | map)</code>. Copies all entries from the provided object into this map.</li>
+<li><code>merge(values)</code>. Copies all entries from the provided object into this map. <code>values</code> can be a plain object, array of entries or string-keyed ES6 Map.</li>
+<li><code>replace(values)</code>. Replaces the entire contents of this map with the provided values. Short hand for <code>.clear().merge(values)</code></li>
 </ul>
+<h2 id="-observable-shallowmap-values"><code>observable.shallowMap(values)</code></h2>
+<p>Any values assigned to an observable map will be default passed through <a href="observable.html"><code>observable</code></a> to make them observable.
+Create a shallow map to disable this behavior and store are values as-is. See also <a href="modifiers.html">modifiers</a> for more details on this mechanism.</p>
+<h2 id="name-argument">Name argument</h2>
+<p>Both <code>observable.map</code> and <code>observable.shallowMap</code> take a second parameter which is used as debug name in for example <code>spy</code> or the MobX dev tools.</p>
 
                     
                     </section>

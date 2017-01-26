@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="1.1" data-basepath=".." data-revision="Tue Nov 01 2016 21:45:36 GMT+0100 (CET)">
+    <div class="book" data-level="1.1" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -937,7 +937,9 @@ setInterval(action(<span class="hljs-function"><span class="hljs-keyword">functi
     appState.timer += <span class="hljs-number">1</span>;
 }), <span class="hljs-number">1000</span>);
 </code></pre>
-<p>The <code>action</code> wrapper is only needed when using MobX in strict mode (by default off), but will help you to better structure applications and expresses the intention of a function to modify state.</p>
+<p>The <code>action</code> wrapper is only needed when using MobX in strict mode (by default off).
+It is recommended to use action though as it will help you to better structure applications and expresses the intention of a function to modify state.
+Also it automatically applies transactions for optimal performance.</p>
 <p>Feel free to try this example on <a href="http://jsfiddle.net/mweststrate/wgbe4guu/" target="_blank">JSFiddle</a> or by cloning the <a href="https://github.com/mobxjs/mobx-react-boilerplate" target="_blank">MobX boilerplate project</a></p>
 
                     

@@ -30,5 +30,3 @@ class MyResource {
 }
 
 ```
-
-_In MobX 1.0 this method was called `autorunUntil`._

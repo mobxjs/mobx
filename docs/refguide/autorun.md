@@ -27,3 +27,33 @@ numbers.push(5);
 // won't print anything, nor is `sum` re-evaluated
 ```
 
+## Error handling
+
+Exceptions thrown in autorun and all other types reactions are catched and logged to the console, but not propagated back to the original causing code.
+This is to make sure that a reaction in one exception does not prevent the scheduled execution of other, possibly unrelated, reactions.
+This also allows reactions to recover from exceptions; throwing an exception does not break the tracking done by MobX,
+so as subsequent run of a reaction might complete normally again if the cause for the exception is removed.
+
+It is possible to override the default logging behavior of Reactions by calling the `onError` handler on the disposer of the reaction.
+Example:
+
+```javascript
+const age = observable(10)
+const dispose = autorun(() => {
+    if (age.get() < 0)
+        throw new Error("Age should not be negative")
+    console.log("Age", age.get())
+})
+
+age.set(18)  // Logs: Age 18
+age.set(-10) // Logs "Error in reaction .... Age should not be negative
+age.set(5)   // Recovered, logs Age 5
+
+dispose.onError(e => {
+    window.alert("Please enter a valid age")
+})
+
+age.set(-5)  // Shows alert bolx
+```
+
+A global onError handler can be set as well through `extras.onReactionError(handler)`. This can be useful in tests or for monitoring.

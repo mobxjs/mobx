@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="8.7" data-basepath=".." data-revision="Tue Nov 01 2016 21:45:36 GMT+0100 (CET)">
+    <div class="book" data-level="8.7" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -883,112 +883,94 @@
                     <section class="normal" id="section-">
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/modifiers.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="modifiers-for-observable">Modifiers for observable</h1>
-<p>By default, <code>observable</code> recursively makes all the values of <em>plain</em> objects and arrays recursively observable.
-Besides that, it automatically converts functions without arguments into reactive views or derived properties.
-For all other types of values just a reference is stored.
-In general, this should just do what you need, but if you want you can override the default behavior using <em>modifiers</em>.
-Note that modifiers are &apos;sticky&apos;, they are interpreted as being annotations.
-They do not only apply to the current value, but also to all values that are assigned in the future to the same attribute.</p>
-<p>Note that the attributes class instances (all objects that have a prototype) will not be made observable automatically by <code>observable</code>.
-It is considered to be the responsibility of the class definition / constructor function to mark the necessary attributes of a class instance observable / computed.</p>
-<h2 id="computed">computed</h2>
-<p>Introduces a computed property, see <a href="http://mobxjs.github.io/mobx/refguide/computed-decorator.html" target="_blank"><code>computed</code></a></p>
-<h2 id="action">action</h2>
-<p>Marks a function as action, see <a href="http://mobxjs.github.io/mobx/refguide/action.html" target="_blank"><code>action</code></a></p>
-<h2 id="asmap">asMap</h2>
-<p>Creates a new Observable Map instead of an Observable Object. See <a href="map.html"><code>asMap</code></a></p>
-<h2 id="asreference">asReference</h2>
-<p>The most common modifier is <code>asReference</code>.
-If this modifier is used, <code>observable</code> will not attempt to make the value observable.
-Use this for example if you want to store a reference to a function, instead of creating a view based on that function.
-You can also use it to prevent that plain objects or arrays are made observable automatically.</p>
-<pre><code class="lang-javascript">
-<span class="hljs-keyword">var</span> test = observable({
-    x : <span class="hljs-number">3</span>,
-    doubler: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.x*<span class="hljs-number">2</span>;
-    },
-    someFunc: asReference(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.x;
-    })
-});
+<p>Modifiers can be used decorator or in combination with <code>extendObservable</code> and <code>observable.object</code> to change the autoconversion rules for specific properties.</p>
+<ul>
+<li><code>observable.deep</code>: This is the default modifier, used by any observable. It converts any assigned, non-primitive value into an observable value if it isn&apos;t one yet.</li>
+<li><code>observable.ref</code>: Disables automatic observable conversion, just creates an observable reference instead.</li>
+<li><code>observable.shallow</code>: Can only used in combination with collections. Turns any assigned collection into an collection, which is shallowly observable (instead of deep)</li>
+<li><code>computed</code>: Creates a derived property, see <a href="computed-decorator.html"><code>computed</code></a></li>
+<li><code>action</code>: Creates an action, see <a href="action.html"><code>action</code></a></li>
+</ul>
+<h2 id="deep-observability">Deep observability</h2>
+<p>When MobX creates an observable object, (using <code>observable</code>, <code>observable.object</code>, or <code>extendObservable</code>), it introduces observable properties which
+by default use the <code>deep</code> modifier. The deep modifier basically recursively calls <code>observable(newValue)</code> for any newly assigned value.
+Which in turns uses the <code>deep</code> modifier... you get the idea.</p>
+<p>This is a very convenient default. Without any additional effort all values assigned to an observable will themselves be made observable too (unless they already are), so no additional
+effort is required to make objects deep observable.</p>
+<h2 id="reference-observability">Reference observability</h2>
+<p>In some cases however, objects don&apos;t need to be converted into observables.
+Typical cases are immutable objects, or objects that are not managed by you but by an external library.
+Examples are JSX elements, DOM elements, native objects like History, window or etc.
+To those kind of objects, you just want to store a reference without turning them into an observable.</p>
+<p>For these situations there is the <code>ref</code> modifier. It makes sure that an observable property is created, which only tracks the reference but doesn&apos;t try to convert it&apos;s value.
+For example:</p>
+<pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Message</span> </span>{
+    @observable message = <span class="hljs-string">&quot;Hello world&quot;</span>
 
-<span class="hljs-built_in">console</span>.log(test.doubler); <span class="hljs-comment">// === 6</span>
-<span class="hljs-built_in">console</span>.log(test.someFunc); <span class="hljs-comment">// still a function</span>
-</code></pre>
-<h2 id="asstructure">asStructure</h2>
-<p>Can be used on non-cyclic, plain JavaScript values.
-Instead of comparing old values with new values based on whether the reference has changed, values are compared using deep equality before notifying any observers.
-This is useful if you are working with &apos;struct&apos; like objects like colors or coordinates and each time return fresh objects with possibly the same values.
-<code>asStructure</code> can be used on reactive functions, plain objects and arrays.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> ViewPort = mobxReact.observer(React.createClass({
-    displayName: <span class="hljs-string">&apos;ViewPort&apos;</span>,
-
-    componentWillMount: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-        mobx.extendObservable(<span class="hljs-keyword">this</span>, {
-            screenSize: {
-                width: <span class="hljs-number">0</span>,
-                height: <span class="hljs-number">0</span>
-            },
-            minSize: {
-                width: <span class="hljs-number">400</span>,
-                height: <span class="hljs-number">300</span>
-            },
-            viewPortSize: mobx.asStructure(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-                <span class="hljs-keyword">return</span> {
-                    width: <span class="hljs-built_in">Math</span>.max(<span class="hljs-keyword">this</span>.screenSize.width, <span class="hljs-keyword">this</span>.minSize.width),
-                    height: <span class="hljs-built_in">Math</span>.max(<span class="hljs-keyword">this</span>.screenSize.height, <span class="hljs-keyword">this</span>.minSize.height)
-                }
-            }
-        });
-
-        <span class="hljs-built_in">window</span>.onresize = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-            mobx.transaction(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-                <span class="hljs-keyword">this</span>.screenSize.width = <span class="hljs-built_in">window</span>.innerWidth;
-                <span class="hljs-keyword">this</span>.screenSize.height = <span class="hljs-built_in">window</span>.innerHeight;
-            });
-        }.bind(<span class="hljs-keyword">this</span>);
-    },
-
-    render: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-        <span class="hljs-keyword">return</span> (
-            <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">style</span>=<span class="hljs-value">{{</span>
-                <span class="hljs-attribute">width:</span> <span class="hljs-attribute">this.viewPortSize.width</span>,
-                <span class="hljs-attribute">height:</span> <span class="hljs-attribute">this.viewPortSize.height</span>
-            }}&gt;</span>
-                test
-            <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
-        )</span>;
-    }
-}));
-</code></pre>
-<p>In the above example, the computed method <code>viewPortSize</code> returns a fresh object on each re-computation.
-So MobX considers it to have changed always. This means that each <code>resize</code> event of the browser will trigger a re-render of the
-<code>ViewPort</code> component.</p>
-<p>However, if the window size is smaller that the <code>minSize</code>, the resize doesn&apos;t need to influence the rendering anymore, as the computed
-will return the same dimensions after each run. <code>asStructure</code> signals to MobX that observers of this computation should only be triggered
-if the value returned by the computed has <em>structurally</em> changed (by default strict equality is used to determine whether observers need to be notified).
-This means that a new object that is returned from <code>viewPortSize</code> won&apos;t trigger a <code>render</code> if its contents are (structurally) the same as the previous value.</p>
-<p>To use the <code>asStructure</code> modifier in combination with the <code>@computed</code> decorator, use the following:</p>
-<pre><code class="lang-javascript">@computed({ asStructure: <span class="hljs-literal">true</span> }) get viewPortSize() {
-    <span class="hljs-keyword">return</span> {
-        width: <span class="hljs-built_in">Math</span>.max(<span class="hljs-keyword">this</span>.screenSize.width, <span class="hljs-keyword">this</span>.minSize.width),
-        height: <span class="hljs-built_in">Math</span>.max(<span class="hljs-keyword">this</span>.screenSize.height, <span class="hljs-keyword">this</span>.minSize.height)
-    }
+    <span class="hljs-comment">// ficitonal example, if author is immutable, we just need to store a reference and shouldn&apos;t turn it into an mutable, observable object</span>
+    @observable.ref author = <span class="hljs-literal">null</span>
 }
 </code></pre>
-<h2 id="asflat">asFlat</h2>
-<p>Similar to <code>asReference</code>, except that <code>asFlat</code> does not prevent its value from becoming observable, but only the children of the value.
-It can be used for example to create an observable array or object that should not automatically make its children observable.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> todos = observable(asFlat([{
-    title: <span class="hljs-string">&quot;make coffee&quot;</span>,
-    completed: <span class="hljs-literal">false</span>
-}]));
-
-isObservable(todos); <span class="hljs-comment">// true</span>
-isObservable(todos[<span class="hljs-number">0</span>]); <span class="hljs-comment">// false</span>
-isObservable(todos[<span class="hljs-number">0</span>], <span class="hljs-string">&quot;title&quot;</span>); <span class="hljs-comment">// false</span>
+<p>Or with just ES5 syntax:</p>
+<pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Message</span>(<span class="hljs-params"></span>) </span>{
+    extendObservable({
+        message: <span class="hljs-string">&quot;Hello world&quot;</span>,
+        author: observable.ref(<span class="hljs-literal">null</span>)
+    })
+}
 </code></pre>
+<p>Note that an observable, boxed reference can be created by using <code>const box = observable.shallowBox(value)</code></p>
+<h2 id="shallow-observability">Shallow observability</h2>
+<p>The <code>observable.shallow</code> modifier applies observability &apos;one-level-deep&apos;. You need those if you want to create a <em>collection</em> of observable references.
+If a new collection is assigned to a property with this modifier, it will be made observable, but it&apos;s values will be left as is, so unlike <code>deep</code>, it won&apos;t recurse.
+Example:</p>
+<pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AuthorStore</span> </span>{
+    @observable.shallow authors = []
+}
+</code></pre>
+<p>In the above example an assignment of a plain array with authors to the <code>authors</code> will update the authors with an observable array, containing the original, non-observable authors.</p>
+<p>Note that the following methods can be used to create shallow collections manually: <code>observable.shallowObject</code>, <code>observable.shallowArray</code>, <code>observable.shallowMap</code> and <code>extendShallowObservable</code>.</p>
+<h2 id="action-computed">Action &amp; Computed</h2>
+<p><code>action</code>, <code>action.bound</code>, <code>computed</code> and <code>computed.struct</code> can be used as modifiers as well.
+See <a href="computed-decorator.html"><code>computed</code></a> respectively <a href="action.html"><code>action</code></a>.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> taskStore = observable({
+    tasks: observable.shallow([]),
+    taskCount: computed(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.tasks.length
+    }),
+    clearTasks: action.bound(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">this</span>.tasks.clear()
+    })
+})
+</code></pre>
+<h2 id="asstructure">asStructure</h2>
+<p>MobX 2 had the <code>asStructure</code> modifier, which in practice was rarely used, or only used in cases where it is used <code>reference</code> / <code>shallow</code> is often a better fit (when using immutable data for example).
+Structural comparision for computed properties and reactions is still possible.</p>
+<h2 id="effect-of-modifiers">Effect of modifiers</h2>
+<pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
+    @observable<span class="hljs-comment">/*.deep*/</span> collection1 = []
+
+    @observable.ref collection2 = []
+
+    @observable.shallow collection3 = []
+}
+
+<span class="hljs-keyword">const</span> todos = [{ test: <span class="hljs-string">&quot;value&quot;</span> }]
+<span class="hljs-keyword">const</span> store = <span class="hljs-keyword">new</span> Store()
+
+store.collection1 = todos;
+store.collection2 = todos;
+store.collection3 = todos;
+</code></pre>
+<p>After these assignments:</p>
+<ol>
+<li><code>collection1 === todos</code> is false; the contents of todos will be cloned into a new observable array</li>
+<li><code>collection1[0] === todos[0]</code> is false; the first todo was a plain object and hence it was cloned into an observable object which is stored in the array</li>
+<li><code>collection2 === todos</code> is true; the <code>todos</code> are kept as is, and are non-observable. Only the <code>collection2</code> property itself is observable.</li>
+<li><code>collection2[0] === todos[0]</code> is true; because of 3.</li>
+<li><code>collection3 === todos</code> is false; collection 3 is a new observable array</li>
+<li><code>collection3[0] === todos[0]</code> is true; the value of <code>collection3</code> was only shallowly turned into an observable, but the contents of the array is left as is.</li>
+</ol>
 
                     
                     </section>

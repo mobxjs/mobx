@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="7.1" data-basepath=".." data-revision="Tue Nov 01 2016 21:45:36 GMT+0100 (CET)">
+    <div class="book" data-level="7.1" data-basepath=".." data-revision="Mon Jan 09 2017 17:58:08 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -884,6 +884,8 @@
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/pitfalls.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="common-pitfalls-best-practices">Common pitfalls &amp; best practices</h1>
 <p>Stuck with MobX? This section contains a list of common issues people new to MobX might run into.</p>
+<h4 id="issues-with-decorators">Issues with decorators?</h4>
+<p>For setup tips and limitations on decorators, check the <a href="decorators.html">decorators</a> page</p>
 <h4 id="-array-isarray-observable-1-2-3-false"><code>Array.isArray(observable([1,2,3])) === false</code></h4>
 <p>In ES5 there is no way to reliably inherit from arrays, and hence observable arrays inherit from objects.
 This means that regularly libraries are not able to recognize observable arrays as normal arrays (like lodash, or built-in operations like <code>Array.concat</code>).
@@ -895,8 +897,7 @@ You can use <code>isObservableArray(observable)</code> to check whether somethin
 So MobX observable objects act as records with predefined keys.
 You can use <code>extendObservable(target, props)</code> to introduce new observable properties to an object.
 However object iterators like <code>for .. in</code> or <code>Object.keys()</code> won&apos;t react to this automatically.
-If you need a dynamically keyed object, for example to store users by id, create observable _map_s using <code>asMap</code>.
-More info on <a href="https://github.com/mobxjs/mobx/issues/219#issuecomment-220224813" target="_blank">asMap</a>.
+If you need a dynamically keyed object, for example to store users by id, create observable _map_s using <a href="../refguide/map.html"><code>observable.map</code></a>.
 For more info see <a href="react.html">what will MobX react to?</a>.</p>
 <h3 id="use-observer-on-all-components-that-render-observable-s">Use <code>@observer</code> on all components that render <code>@observable</code>&apos;s.</h3>
 <p><code>@observer</code> only enhances the component you are decorating, not the components used inside it.

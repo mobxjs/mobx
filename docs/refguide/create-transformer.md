@@ -5,7 +5,7 @@
 `createTransformer` turns a function (that should transform one value into another value) into a reactive and memoizing function.
 In other words, if the `transformation` function computes B given a specific A, the same B will be returned for all other future invocations of the transformation with the same A.
 However, if A changes, the transformation will be re-applied so that B is updated accordingly.
-And last but not least, if nobody is using the transformation of a specific A anymore, it's entry will be removed from the memoization table.
+And last but not least, if nobody is using the transformation of a specific A anymore, its entry will be removed from the memoization table.
 
 With `createTransformer` it is very easy to transform a complete data graph into another data graph.
 Transformation functions can be composed so that you can build a tree using lots of small transformations.
@@ -94,7 +94,7 @@ the `DisplayFolder` objects track the associated `Folder` objects themselves.
 
 In the following example all mutations to the `state` graph will be processed automatically.
 Some examples:
-1. Changing the name of a folder will update it's own `path` property and the `path` property of all its descendants.
+1. Changing the name of a folder will update its own `path` property and the `path` property of all its descendants.
 2. Collapsing a folder will remove all descendant `DisplayFolders` from the tree.
 3. Expanding a folder will restore them again.
 4. Setting a search filter will remove all nodes that do not match the filter, unless they have a descendant that matches the filter.
