@@ -8,33 +8,36 @@ test('map crud', function(t) {
 	mobx.extras.getGlobalState().mobxGuid = 0; // hmm dangerous reset?
 
 	var events = [];
-	var m = map({ '1': 1 });
+	var m = map({ '1': 'a' });
 	m.observe(function(changes) {
 		events.push(changes);
 	});
 
 	t.equal(m.has("1"), true);
 	t.equal(m.has(1), false);
-	t.equal(m.get("1"), 1);
+	t.equal(m.get("1"), 'a');
 	t.equal(m.get("b"), undefined);
 	t.equal(m.size, 1);
 
-	m.set("1", 2);
+	m.set("1", 'aa');
+	m.set(1, 'b');
 	t.equal(m.has("1"), true);
-	t.equal(m.get("1"), 2);
+	t.equal(m.get("1"), 'aa');
+	t.equal(m.get(1), 'b');
 
-	var k = ['me array'];
-	m.set(k, 3);
+	var k = ['arr'];
+	m.set(k, 'arrVal');
 	t.equal(m.has(k), true);
-	t.equal(m.get(k), 3);
+	t.equal(m.get(k), 'arrVal');
   
-	t.deepEqual(m.keys(), ["1", k]);
-	t.deepEqual(m.values(), [2, 3]);
-	t.deepEqual(m.entries(), [["1", 2], [k, 3]]);
-	t.deepEqual(m.toJS(), { '1': 2, 'me array': 3 });
-	t.deepEqual(JSON.stringify(m), '{"1":2,"me array":3}');
-	t.deepEqual(m.toString(), "ObservableMap@1[{ 1: 2, me array: 3 }]");
-	t.equal(m.size, 2);
+	t.deepEqual(m.keys(), ["1", 1, k]);
+	t.deepEqual(m.values(), ['aa', 'b', 'arrVal']);
+	t.deepEqual(m.entries(), [["1", 'aa'], [1, 'b'], [k, 'arrVal']]);
+	t.deepEqual(m.toJS(), new Map([['1', 'b'], [k, 'arrVal']]));
+	t.deepEqual(m.toPOJO(), { '1': 'b', 'arr': 'arrVal' });
+	t.deepEqual(JSON.stringify(m), '{"1":"b","arr":"arrVal"}');
+	t.deepEqual(m.toString(), "ObservableMap@1[{ 1: aa, 1: b, arr: arrVal }]");
+	t.equal(m.size, 3);
 
 	m.clear();
 	t.deepEqual(m.keys(), []);
@@ -43,10 +46,10 @@ test('map crud', function(t) {
 	t.deepEqual(m.toString(), "ObservableMap@1[{  }]");
 	t.equal(m.size, 0);
 
-	t.equal(m.has("a"), false);
-	t.equal(m.has("b"), false);
-	t.equal(m.get("a"), undefined);
-	t.equal(m.get("b"), undefined);
+	t.equal(m.has("1"), false);
+	t.equal(m.has("2"), false);
+	t.equal(m.get("1"), undefined);
+	t.equal(m.get("2"), undefined);
 
 	function removeObjectProp(item) {
 		delete item.object;
@@ -55,27 +58,34 @@ test('map crud', function(t) {
 	t.deepEqual(events.map(removeObjectProp),
 		[ { type: 'update',
 			name: '1',
-			oldValue: 1,
-			newValue: 2 },
+			oldValue: 'a',
+			newValue: 'aa' },
 		{ type: 'add',
-			name: 'me array',
-			newValue: 3 },
+			name: '1',
+			newValue: 'b' },
+		{ type: 'add',
+			name: 'arr',
+			newValue: 'arrVal' },
 		{ type: 'delete',
 			name: '1',
-			oldValue: 2 },
+			oldValue: 'aa' },
 		{ type: 'delete',
-			name: 'me array',
-			oldValue: 3 }
+			name: '1',
+			oldValue: 'b' },
+		{ type: 'delete',
+			name: 'arr',
+			oldValue: 'arrVal' }
 		]
 	);
 	t.end();
 })
 
 test('map merge', function(t) {
-	var a = map({a: 1, b: 2, c: 2});
+	var a = map({'0': 0, a: 1, b: 2, c: 2});
 	var b = map({c: 3, d: 4});
-	a.merge(b);
-	t.deepEqual(a.toJS(), { a: 1, b: 2, c: 3, d: 4 });
+	var c = map(new Map([[0, 4], ['d', 5]]));
+	a.merge(b).merge(c);
+	t.deepEqual(a.toJS(), new Map([['0', 0], ['a', 1], ['b', 2], ['c', 3], [0, 4], ['d', 5]]));
 
 	t.end();
 })
@@ -132,7 +142,7 @@ test('observe value', function(t) {
 
 test('initialize with entries', function(t) {
 	var a = map([["a", 1], ["b", 2]]);
-	t.deepEqual(a.toJS(), { a: 1, b: 2});
+	t.deepEqual(a.toJS(), new Map([["a", 1], ["b", 2]]));
 	t.end();
 })
 
@@ -145,9 +155,9 @@ test('initialize with empty value', function(t) {
 	b.set('0', 0);
 	c.set('0', 0);
 
-	t.deepEqual(a.toJS(), { '0': 0 });
-	t.deepEqual(b.toJS(), { '0': 0 });
-	t.deepEqual(c.toJS(), { '0': 0 });
+	t.deepEqual(a.toJS(), new Map([['0', 0]]));
+	t.deepEqual(b.toJS(), new Map([['0', 0]]));
+	t.deepEqual(c.toJS(), new Map([['0', 0]]));
 
 	t.end();
 })
@@ -273,6 +283,19 @@ test('strict', function(t) {
 	t.end();
 })
 
+test('NaN as map key', function(t) {
+	var a = map(new Map([[NaN, 0]]));
+
+	t.equal(a.has(NaN), true);
+	t.equal(a.get(NaN), 0);
+	a.set(NaN, 1);
+	a.merge(map(new Map([[NaN, 2]])));
+	t.equal(a.get(NaN), 2);
+	t.equal(a.size, 1);
+
+	t.end();
+})
+
 test('issue 100', function(t) {
 	var that = {};
 	mobx.extendObservable(that, {
@@ -308,18 +331,6 @@ test('issue 119 - unobserve before delete', function(t) {
 	t.deepEqual(propValues, ['myPropValue calculated']);
 	t.end();
 })
-
-// test('issue 116 - has should not throw on invalid keys', function(t) {
-// 	var x = map();
-// 	t.equal(x.has(undefined), false);
-// 	t.equal(x.has({}), false);
-// 	t.equal(x.get({}), undefined);
-// 	t.equal(x.get(undefined), undefined);
-// 	t.throws(function() {
-// 		x.set({});
-// 	});
-// 	t.end();
-// });
 
 test('map modifier', t => {
 	var x = mobx.observable(mobx.asMap({ a: 1 }));
@@ -407,28 +418,6 @@ test('256, map.merge should be not be tracked for target', t => {
 	d();
 	t.end();
 })
-
-// test('308, map keys should be coerced to strings correctly', t => {
-// 	var m = mobx.map()
-// 	m.set(1, true) // => "[mobx.map { 1: true }]"
-// 	m.delete(1) // => "[mobx.map { }]"
-// 	t.deepEqual(m.keys(), [])
-//
-// 	m.set(1, true) // => "[mobx.map { 1: true }]"
-// 	m.delete('1') // => "[mobx.map { 1: undefined }]"
-// 	t.deepEqual(m.keys(), [])
-//
-// 	m.set(1, true) // => "[mobx.map { 1: true, 1: true }]"
-// 	m.delete('1') // => "[mobx.map { 1: undefined, 1: undefined }]"
-// 	t.deepEqual(m.keys(), [])
-//
-// 	m.set(true, true)
-// 	t.equal(m.get("true"), true)
-// 	m.delete(true)
-// 	t.deepEqual(m.keys(), [])
-//
-// 	t.end()
-// }end)
 
 test('map should support iterall / iterable ', t => {
 	var a = mobx.map({ a: 1, b: 2 })

@@ -1,24 +1,3 @@
-interface Map<K, V> {
-	clear(): void;
-	delete(key: K): boolean;
-	entries(): [[K, V]];
-	forEach(callbackfn: (value: V, index: K, map: Map<K, V>) => void, thisArg?: any): void;
-	get(key: K): V;
-	has(key: K): boolean;
-	keys(): [K];
-	set(key: K, value?: V): Map<K, V>;
-	size: number;
-	values(): [V];
-}
-
-interface MapConstructor {
-	new (): Map<any, any>;
-	new <K, V>(): Map<K, V>;
-	prototype: Map<any, any>;
-}
-declare var Map: MapConstructor;
-
-
 import {IEnhancer, deepEnhancer} from "./modifiers";
 import {untracked} from "../core/derivation";
 import {allowStateChanges} from "../core/action";
@@ -48,6 +27,14 @@ export interface IMap<K, V> {
 	readonly size: number;
 }
 
+interface IMapConstructor {
+	new (): IMap<any, any>;
+	new <K, V>(entries?: [K, V][]): IMap<K, V>;
+	readonly prototype: IMap<any, any>;
+}
+
+declare var Map: IMapConstructor;
+
 
 export interface IKeyValueMap<V> {
 	[key: string]: V;
@@ -76,15 +63,23 @@ const ObservableMapMarker = {};
 
 export type IObservableMapInitialValues<K, V> = IMapEntries<K, V> | IKeyValueMap<V> | IMap<K, V>;
 
+
+
+
 export class ObservableMap<K, V> implements IInterceptable<IMapWillChange<K, V>>, IListenable, IMap<K, V> {
 	$mobx = ObservableMapMarker;
-	private _data: Map<K, ObservableValue<V>> = new Map();
-	private _hasMap: Map<K, ObservableValue<boolean>> = new Map(); // hasMap, not hashMap >-).
+	private _data: IMap<K, ObservableValue<V>>;
+	private _hasMap: IMap<K, ObservableValue<boolean>>; // hasMap, not hashMap >-).
 	private _keys: IObservableArray<K> = <any> new ObservableArray(undefined, referenceEnhancer, `${this.name}.keys()`, true);
 	interceptors = null;
 	changeListeners = null;
 
 	constructor(initialData?: IObservableMapInitialValues<K, V>, public enhancer: IEnhancer<V> = deepEnhancer, public name = "ObservableMap@" + getNextId()) {
+		if (typeof Map !== 'function') {
+			throw new Error('mobx.map requires Map polyfill for the current browser. Check babel-polyfill or core-js/es6/map.js');
+		}
+		this._data = new Map();
+		this._hasMap = new Map();
 		allowStateChanges(true, () => {
 			this.merge(initialData);
 		});
@@ -95,15 +90,12 @@ export class ObservableMap<K, V> implements IInterceptable<IMapWillChange<K, V>>
 	}
 
 	has(key: K): boolean {
-		if (!this.isValidKey(key))
-			return false;
 		if (this._hasMap.has(key))
-			return this._hasMap.get(key).get();
+			return this._hasMap.get(key)!.get();
 		return this._updateHasMapEntry(key, false).get();
 	}
 
 	set(key: K, value: V) {
-		this.assertValidKey(key);
 		const hasKey = this._has(key);
 		if (hasInterceptors(this)) {
 			const change = interceptChange<IMapWillChange<K, V>>(this, {
@@ -125,7 +117,6 @@ export class ObservableMap<K, V> implements IInterceptable<IMapWillChange<K, V>>
 	}
 
 	delete(key: K): boolean {
-		this.assertValidKey(key);
 		if (hasInterceptors(this)) {
 			const change = interceptChange<IMapWillChange<K, V>>(this, {
 				type: "delete",
@@ -151,7 +142,7 @@ export class ObservableMap<K, V> implements IInterceptable<IMapWillChange<K, V>>
 			runInTransaction(() => {
 				this._keys.remove(key);
 				this._updateHasMapEntry(key, false);
-				const observable = this._data.get(key);
+				const observable = this._data.get(key)!;
 				observable.setNewValue(undefined as any);
 				this._data.delete(key);
 			});
@@ -177,7 +168,7 @@ export class ObservableMap<K, V> implements IInterceptable<IMapWillChange<K, V>>
 	}
 
 	private _updateValue(name: K, newValue: V | undefined) {
-		const observable = this._data.get(name);
+		const observable = this._data.get(name)!;
 		newValue = (observable as any).prepareNewValue(newValue) as V;
 		if (newValue !== UNCHANGED) {
 			const notifySpy = isSpyEnabled();
@@ -228,7 +219,7 @@ export class ObservableMap<K, V> implements IInterceptable<IMapWillChange<K, V>>
 
 	get(key: K): V | undefined {
 		if (this.has(key))
-			return this._data.get(key).get();
+			return this._data.get(key)!.get();
 		return undefined;
 	}
 
@@ -288,32 +279,29 @@ export class ObservableMap<K, V> implements IInterceptable<IMapWillChange<K, V>>
 	}
 
 	/**
-	 * Returns a shallow non observable object clone of this map.
-	 * Note that the values migth still be observable. For a deep clone use mobx.toJS.
+	 * Returns a plain object that represents this map.
+	 * Note that all the keys being stringified.
+	 * If there are duplicating keys after converting them to strings, behaviour is undetermined.
 	 */
-	toJS(): IKeyValueMap<V> {
+	toPOJO(): IKeyValueMap<V> {
 		const res: IKeyValueMap<V> = {};
 		this.keys().forEach(key => res["" + key] = this.get(key)!);
 		return res;
 	}
 
+	/**
+	 * Returns a shallow non observable object clone of this map.
+	 * Note that the values migth still be observable. For a deep clone use mobx.toJS.
+	 */
+	toJS(): IMap<K, V> {
+		const res: IMap<K, V> = new Map();
+		this.keys().forEach(key => res.set(key, this.get(key)));
+		return res;
+	}
+
 	toJSON(): IKeyValueMap<V> {
 		// Used by JSON.stringify
-		return this.toJS();
-	}
-
-	private isValidKey(key: K) {
-		return true;
-		// if (key === null || key === undefined)
-		// 	return false;
-		// if (typeof key === "string" || typeof key === "number" || typeof key === "boolean")
-		// 	return true;
-		// return false;
-	}
-
-	private assertValidKey(key: K) {
-		// if (!this.isValidKey(key))
-		// 	throw new Error(`[mobx.map] Invalid key: '${key}', only strings, numbers and booleans are accepted as key in observable maps.`);
+		return this.toPOJO();
 	}
 
 	toString(): string {
