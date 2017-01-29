@@ -95,6 +95,9 @@ export function objectAssign() {
 }
 
 export function valueDidChange(compareStructural: boolean, oldValue, newValue): boolean {
+	if (typeof oldValue === 'number' && isNaN(oldValue)) {
+		return typeof newValue !== 'number' || !isNaN(newValue);
+	}
 	return compareStructural
 		? !deepEqual(oldValue, newValue)
 		: oldValue !== newValue;

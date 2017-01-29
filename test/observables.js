@@ -1126,6 +1126,23 @@ test('prematurely end autorun', function(t) {
     t.end();
 });
 
+test('computed values believe NaN === NaN', function(t) {
+	var a = observable(2);
+	var b = observable(3);
+	var c = computed(function() { return String(a.get() * b.get()) });
+	var buf = buffer();
+	m.observe(c, buf);
+
+	a.set(NaN);
+	b.set(NaN);
+	a.set(NaN);
+	a.set(2);
+	b.set(3);
+
+	t.deepEqual(buf.toArray(), ['NaN', '6']);
+	t.end();
+})
+
 test.skip('issue 65; transaction causing transaction', function(t) {
 	// MWE: disabled, bad test; depends on transaction being tracked, transaction should not be used in computed!
     var x = mobx.observable({

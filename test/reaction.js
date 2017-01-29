@@ -255,3 +255,32 @@ test("#278 do not rerun if expr output doesn't change structurally", t => {
 	]);
 	t.end();
 })
+
+test("do not rerun if prev & next expr output is NaN", t => {
+	var v = mobx.observable('a');
+	var values = [];
+	var valuesS = [];
+
+	var d = reaction(
+		() => v.get(),
+		newValue => { values.push(String(newValue)); },
+		{ fireImmediately: true, }
+	);
+	var dd = reaction(
+		() => v.get(),
+		newValue => { valuesS.push(String(newValue)); },
+		{ fireImmediately: true, compareStructural: true }
+	);
+
+	v.set(NaN);
+	v.set(NaN);
+	v.set(NaN);
+	v.set('b');
+
+	d();
+	dd();
+
+	t.deepEqual(values, [ 'a', 'NaN', 'b']);
+	t.deepEqual(valuesS, [ 'a', 'NaN', 'b']);
+	t.end();
+})
