@@ -137,3 +137,24 @@ test('can create objects in strict mode with action', t => {
 	mobx.useStrict(false);
 	t.end();
 })
+
+test('strict mode checks', function(t) {
+    var x = mobx.observable(3);
+
+    mobx.extras.allowStateChanges(false, function() {
+        x.get();
+    });
+
+    mobx.extras.allowStateChanges(true, function() {
+        x.set(7);
+    });
+
+    t.throws(function() {
+        mobx.extras.allowStateChanges(false, function() {
+            x.set(4);
+        });
+    });
+
+	mobx.extras.resetGlobalState();
+    t.end();
+});
