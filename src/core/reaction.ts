@@ -222,9 +222,9 @@ function runReactionsHelper() {
 	// we converge to no remaining reactions after a while.
 	while (allReactions.length > 0) {
 		if (++iterations === MAX_REACTION_ITERATIONS) {
-			allReactions.splice(0); // clear reactions
 			console.error(`Reaction doesn't converge to a stable state after ${MAX_REACTION_ITERATIONS} iterations.`
 				+ ` Probably there is a cycle in the reactive function: ${allReactions[0]}`);
+			allReactions.splice(0); // clear reactions
 		}
 		let remainingReactions = allReactions.splice(0);
 		for (let i = 0, l = remainingReactions.length; i < l; i++)
