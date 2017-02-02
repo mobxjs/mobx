@@ -206,7 +206,7 @@ const MAX_REACTION_ITERATIONS = 100;
 let reactionScheduler: (fn: () => void) => void = f => f();
 
 export function runReactions() {
-	// Trampoling, if runReactions are already running, new reactions will be picked up
+	// Trampolining, if runReactions are already running, new reactions will be picked up
 	if (globalState.inBatch > 0 || globalState.isRunningReactions)
 		return;
 	reactionScheduler(runReactionsHelper);
