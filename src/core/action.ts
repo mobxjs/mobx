@@ -40,9 +40,6 @@ interface IActionRunInfo {
 }
 
 function startAction(actionName: string, fn: Function, scope: any, args?: IArguments): IActionRunInfo {
-	// actions should not be called from computeds. check only works if the computed is actively observed, but that is fine enough as heuristic
-	// however, this is mainly a best practice / anti-pattern, see #798, for example.
-	// 26-1-17, Disabling the message for now (MobX > 3.0.2)
 	const notifySpy = isSpyEnabled() && !!actionName;
 	let startTime: number = 0;
 	if (notifySpy) {
