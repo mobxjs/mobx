@@ -1,8 +1,27 @@
-# 3.0.3
+# 3.1.0
 
-Fixed #798: MobX will not throw when invoking an action during the evaluation of a computed property.
-This is still an anti pattern in general, but caused to often issues when creating new objects in a computed property (often, but not always anti pattern as well) that made use of it's own internal actions.
-MobX will however still throw if an attempt to change an observable that is already being observed is being changed.
+** Improved strict mode **
+
+Strict mode has been relaxed a bit in this release. Also computed values can now better handle creating new observables (in an action if needed). The semantics are now as follows:
+
+* In strict mode, it is not allowed to modify state that is already being _observed_ by some reaction.
+* It is allowed to create and modify observable values in computed blocks, as long as they are not _observed_ yet.
+
+In order words: Observables that are not in use anywhere yet, are not protected by MobX strict mode.
+This is fine as the main goal of strict mode is to avoid kicking of reactions at undesired places.
+Also strict mode enforces batched mutations of observables (through action).
+However, for unobserved observables this is not relevant; they won't kick of reactions at all.
+
+This fixes some uses cases where one now have to jump through hoops like:
+* Creating observables in computed properties was fine already, but threw if this was done with the aid of an action. See issue [#798](https://github.com/mobxjs/mobx/issues/798).
+* In strict mode, it was not possible to _update_ observable values without wrapping the code in `runInAction` or `action`. See issue [#563](https://github.com/mobxjs/mobx/issues/563)
+
+Note that the following constructions are still anti patterns, although MobX won't throw anymore on them:
+* Changing unobserved, but not just created observables in a computed value
+* Invoke actions in computed values. Use reactions like `autorun` or `reaction` instead.
+
+Note that observables that are not in use by a reaction, but that have `.observe` listeners attached, do *not* count towards being observed.
+Observe and intercept callbacks are concepts that do not relate to strict mode, actions or transactions.
 
 # 3.0.2
 
