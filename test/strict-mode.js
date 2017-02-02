@@ -1,7 +1,7 @@
 var test = require('tape');
 var mobx = require('../');
 
-var strictError = /Since strict-mode is enabled, changing observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: /;
+var strictError = /Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: /;
 
 test('strict mode should not allow changes outside action', t => {
 	var a = mobx.observable(2);
@@ -189,7 +189,7 @@ test('strict mode checks', function(t) {
         mobx.extras.allowStateChanges(false, function() {
             x.set(4);
         });
-    });
+    }, /Side effects like changing state are not allowed at this point/);
 
 	mobx.extras.resetGlobalState();
 	d()

@@ -89,9 +89,18 @@ export function isStrictModeEnabled(): boolean {
 }
 
 export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T): T {
+	// TODO: deprecate / refactor this function in next major
+	// Currently only used by `@observer`
+	// Proposed change: remove first param, rename to `forbidStateChanges`,
+	// require error callback instead of the hardcoded error message now used
+	// Use `inAction` instead of allowStateChanges in derivation.ts to check strictMode
 	const prev = allowStateChangesStart(allowStateChanges);
-	const res = func();
-	allowStateChangesEnd(prev);
+	let res;
+	try {
+		res = func();
+	} finally {
+		allowStateChangesEnd(prev);
+	}
 	return res;
 }
 

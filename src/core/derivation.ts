@@ -109,7 +109,7 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
 		fail(getMessage("m031") + atom.name);
 	// Should not be possible to change observed state outside strict mode, except during initialization, see #563
 	if (!globalState.allowStateChanges && atom.observers.length > 0)
-		fail(getMessage(globalState.strictMode ? "m030" : "m030") + atom.name);
+		fail(getMessage(globalState.strictMode ? "m030a" : "m030b") + atom.name);
 }
 
 /**
