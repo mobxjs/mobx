@@ -1,4 +1,5 @@
 import {IObservable, IDepTreeNode, addObserver, removeObserver} from "./observable";
+import {IAtom} from "./atom";
 import {globalState} from "./globalstate";
 import {fail} from "../utils/utils";
 import {isComputedValue} from "./computedvalue";
@@ -102,19 +103,14 @@ export function isComputingDerivation() {
 	return globalState.trackingDerivation !== null; // filter out actions inside computations
 }
 
-export function checkIfStateModificationsAreAllowed(atom: IObservable) {
-	if (globalState.allowStateChanges === false) {
-		if (globalState.strictMode)
-			fail(getMessage("m030") + atom.name);
-		else
-			fail(getMessage("m031") + atom.name);
-	} else {
-		// Observed observables should not be modified during a computation,
-		// even not from inside an action!
-		if (globalState.computationDepth > 0 && atom.observers.length > 0) {
-			fail(getMessage("m027") + atom.name);
-		}
-	}
+export function checkIfStateModificationsAreAllowed(atom: IAtom) {
+	// TODO: move to messages.ts
+	// Should never be possible to change an observed observable from inside computed, see #798
+	if (globalState.computationDepth > 0 && atom.observers.length > 0)
+		fail(getMessage("m031") + atom.name);
+	// Should not be possible to change observed state outside strict mode, except during initialization, see #563
+	if (!globalState.allowStateChanges && globalState.strictMode && atom.observers.length > 0)
+		fail(getMessage("m030") + atom.name);
 }
 
 /**
