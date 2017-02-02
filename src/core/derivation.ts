@@ -104,13 +104,12 @@ export function isComputingDerivation() {
 }
 
 export function checkIfStateModificationsAreAllowed(atom: IAtom) {
-	// TODO: move to messages.ts
 	// Should never be possible to change an observed observable from inside computed, see #798
 	if (globalState.computationDepth > 0 && atom.observers.length > 0)
 		fail(getMessage("m031") + atom.name);
 	// Should not be possible to change observed state outside strict mode, except during initialization, see #563
-	if (!globalState.allowStateChanges && globalState.strictMode && atom.observers.length > 0)
-		fail(getMessage("m030") + atom.name);
+	if (!globalState.allowStateChanges && atom.observers.length > 0)
+		fail(getMessage(globalState.strictMode ? "m030" : "m030") + atom.name);
 }
 
 /**

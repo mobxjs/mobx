@@ -175,7 +175,7 @@ test('can create objects in strict mode with action', t => {
 
 test('strict mode checks', function(t) {
     var x = mobx.observable(3);
-	var d = x.observe(function() {})
+	var d = mobx.autorun(() => x.get())
 
     mobx.extras.allowStateChanges(false, function() {
         x.get();
