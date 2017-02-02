@@ -518,11 +518,20 @@ test('798, cannot return observable map from computed prop', t => {
 
 	form = function (settings) {
 		var form = mobx.observable({
-			reactPropsMap: mobx.observable.map(),
+			reactPropsMap: mobx.observable.map({
+				onSubmit: function () {
+					console.log('onSubmit init!');
+				}
+			}),
 			model: {
 				value: 'TEST'
 			}
 		});
+
+		form.reactPropsMap.set('onSubmit', function () {
+			console.log('onSubmit overwritten!');
+		});
+
 		return form;
 	};
 
