@@ -12,7 +12,7 @@ export function observe<T>(observableArray: IObservableArray<T>, listener: (chan
 export function observe<T>(observableMap: ObservableMap<T>, listener: (change: IMapChange<T>) => void, fireImmediately?: boolean): Lambda;
 export function observe<T>(observableMap: ObservableMap<T>, property: string, listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda;
 export function observe(object: Object, listener: (change: IObjectChange) => void, fireImmediately?: boolean): Lambda;
-export function observe(object: Object, property: string, listener: (change: IValueDidChange<any>) => void, fireImmediately?: boolean): Lambda;
+export function observe<T, K extends keyof T>(object: T, property: K, listener: (change: IValueDidChange<T[K]>) => void, fireImmediately?: boolean): Lambda;
 export function observe(thing, propOrCb?, cbOrFire?, fireImmediately?): Lambda {
 	if (typeof cbOrFire === "function")
 		return observeObservableProperty(thing, propOrCb, cbOrFire, fireImmediately);
