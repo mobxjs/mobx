@@ -63,7 +63,7 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 	}
 
 	private prepareNewValue(newValue): T | IUNCHANGED {
-		checkIfStateModificationsAreAllowed();
+		checkIfStateModificationsAreAllowed(this);
 		if (hasInterceptors(this)) {
 			const change = interceptChange<IValueWillChange<T>>(this, { object: this, type: "update", newValue });
 			if (!change)

@@ -25,11 +25,11 @@ const messages = {
 "m024" : "whyRun() can only be used if a derivation is active, or by passing an computed value / reaction explicitly. If you invoked whyRun from inside a computation; the computation is currently suspended but re-evaluating because somebody requested its value." ,
 "m025" : "whyRun can only be used on reactions and computed values" ,
 "m026" : "`action` can only be invoked on functions" ,
-"m027" : "Computed values or transformers should not invoke actions or trigger other side effects" ,
 "m028" : "It is not allowed to set `useStrict` when a derivation is running" ,
 "m029" : "INTERNAL ERROR only onBecomeUnobserved shouldn't be called twice in a row" ,
-"m030" : "It is not allowed to create or change state outside an `action` when MobX is in strict mode. Wrap the current method in `action` if this state change is intended" ,
-"m031" : "It is not allowed to change the state when a computed value or transformer is being evaluated. Use 'autorun' to create reactive functions with side-effects." ,
+"m030a" : "Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: " ,
+"m030b" : "Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, the render function of a React component? Tried to modify: " ,
+"m031" : "Computed values are not allowed to not cause side effects by changing observables that are already being observed. Tried to modify: ",
 "m032" : "* This computation is suspended (not in use by any reaction) and won't run automatically.\n	Didn't expect this computation to be suspended at this point?\n	  1. Make sure this computation is used by a reaction (reaction, autorun, observer).\n	  2. Check whether you are using this computation synchronously (in the same stack as they reaction that needs it).",
 "m033" : "`observe` doesn't support the fire immediately property for observable maps." ,
 "m034" : "`mobx.map` is deprecated, use `new ObservableMap` or `mobx.observable.map` instead" ,
@@ -61,6 +61,6 @@ If that all doesn't help you out, feel free to open an issue https://github.com/
 `
 };
 
-export function getMessage(id: string) {
+export function getMessage(id: string): string {
 	return messages[id];
 }

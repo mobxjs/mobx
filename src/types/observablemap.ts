@@ -1,6 +1,5 @@
 import {IEnhancer, deepEnhancer} from "./modifiers";
 import {untracked} from "../core/derivation";
-import {allowStateChanges} from "../core/action";
 import {IObservableArray, ObservableArray} from "./observablearray";
 import {ObservableValue, UNCHANGED} from "./observablevalue";
 import {createInstanceofPredicate, isPlainObject, getNextId, Lambda, invariant, deprecated, isES6Map, fail} from "../utils/utils";
@@ -66,9 +65,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	changeListeners = null;
 
 	constructor(initialData?: IObservableMapInitialValues<V>, public enhancer: IEnhancer<V> = deepEnhancer, public name = "ObservableMap@" + getNextId()) {
-		allowStateChanges(true, () => {
-			this.merge(initialData);
-		});
+		this.merge(initialData);
 	}
 
 	private _has(key: string): boolean {

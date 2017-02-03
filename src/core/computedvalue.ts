@@ -1,7 +1,7 @@
 import {IObservable, reportObserved, propagateMaybeChanged, propagateChangeConfirmed, startBatch, endBatch, getObservers} from "./observable";
 import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, untrackedStart, untrackedEnd, shouldCompute, CaughtException, isCaughtException} from "./derivation";
 import {globalState} from "./globalstate";
-import {allowStateChangesStart, allowStateChangesEnd, createAction} from "./action";
+import {createAction} from "./action";
 import {createInstanceofPredicate, getNextId, valueDidChange, invariant, Lambda, unique, joinStrings, primitiveSymbol, toPrimitive} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "../core/spy";
 import {autorun} from "../api/autorun";
@@ -141,7 +141,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
 	computeValue(track: boolean) {
 		this.isComputing = true;
-		const prevAllowStateChanges = allowStateChangesStart(false);
+		globalState.computationDepth++;
 		let res: T | CaughtException;
 		if (track) {
 			res = trackDerivedFunction(this, this.derivation, this.scope);
@@ -152,7 +152,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 				res = new CaughtException(e);
 			}
 		}
-		allowStateChangesEnd(prevAllowStateChanges);
+		globalState.computationDepth--;
 		this.isComputing = false;
 		return res;
 	};
@@ -201,7 +201,7 @@ WhyRun? computation '${this.name}':
 ` * This computation will re-run if any of the following observables changes:
     ${joinStrings(observing)}
     ${(this.isComputing && isTracking) ? " (... or any observable accessed during the remainder of the current run)" : ""}
-	${getMessage("m038")} 
+	${getMessage("m038")}
 
   * If the outcome of this computation changes, the following observers will be re-run:
     ${joinStrings(observers)}

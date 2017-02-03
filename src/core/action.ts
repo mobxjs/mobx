@@ -3,7 +3,6 @@ import {invariant} from "../utils/utils";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
 import {startBatch, endBatch} from "../core/observable";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
-import {isComputedValue} from "../core/computedvalue";
 import {globalState} from "../core/globalstate";
 import {getMessage} from "../utils/messages";
 
@@ -41,9 +40,6 @@ interface IActionRunInfo {
 }
 
 function startAction(actionName: string, fn: Function, scope: any, args?: IArguments): IActionRunInfo {
-		// actions should not be called from computeds. check only works if the computed is actively observed, but that is fine enough as heuristic
-	invariant(!isComputedValue(globalState.trackingDerivation), getMessage("m027"));
-
 	const notifySpy = isSpyEnabled() && !!actionName;
 	let startTime: number = 0;
 	if (notifySpy) {
@@ -90,9 +86,18 @@ export function isStrictModeEnabled(): boolean {
 }
 
 export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T): T {
+	// TODO: deprecate / refactor this function in next major
+	// Currently only used by `@observer`
+	// Proposed change: remove first param, rename to `forbidStateChanges`,
+	// require error callback instead of the hardcoded error message now used
+	// Use `inAction` instead of allowStateChanges in derivation.ts to check strictMode
 	const prev = allowStateChangesStart(allowStateChanges);
-	const res = func();
-	allowStateChangesEnd(prev);
+	let res;
+	try {
+		res = func();
+	} finally {
+		allowStateChangesEnd(prev);
+	}
 	return res;
 }
 

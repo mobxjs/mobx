@@ -134,7 +134,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 	}
 
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[] {
-		checkIfStateModificationsAreAllowed();
+		checkIfStateModificationsAreAllowed(this.atom);
 		const length = this.values.length;
 
 		if (index === undefined)
@@ -481,7 +481,7 @@ function createArraySetter(index: number) {
 		const values = adm.values;
 		if (index < values.length) {
 			// update at index in range
-			checkIfStateModificationsAreAllowed();
+			checkIfStateModificationsAreAllowed(adm.atom);
 			const oldValue = values[index];
 			if (hasInterceptors(adm)) {
 				const change = interceptChange<IArrayWillChange<T>>(adm as any, {

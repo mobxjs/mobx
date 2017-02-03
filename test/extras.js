@@ -160,27 +160,6 @@ test('spy 1', function(t) {
     t.end();
 })
 
-test('strict mode checks', function(t) {
-    var x = mobx.observable(3);
-
-    mobx.extras.allowStateChanges(false, function() {
-        x.get();
-    });
-
-    mobx.extras.allowStateChanges(true, function() {
-        x.set(7);
-    });
-
-    t.throws(function() {
-        mobx.extras.allowStateChanges(false, function() {
-            x.set(4);
-        });
-    });
-
-	mobx.extras.resetGlobalState();
-    t.end();
-});
-
 test('get atom', function(t) {
 	mobx.extras.resetGlobalState();
 	mobx.extras.getGlobalState().mobxGuid = 0; // hmm dangerous reset?
