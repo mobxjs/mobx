@@ -1,6 +1,6 @@
 import {IObservableArray, IArrayChange, IArraySplice} from "../types/observablearray";
 import {ObservableMap, IMapChange} from "../types/observablemap";
-import {IObjectChange} from "../types/observableobject";
+import {IObjectDidChange} from "../types/observableobject";
 import {IComputedValue} from "../core/computedvalue";
 
 import {IObservableValue, IValueDidChange} from "../types/observablevalue";
@@ -11,7 +11,7 @@ export function observe<T>(value: IObservableValue<T> | IComputedValue<T>, liste
 export function observe<T>(observableArray: IObservableArray<T>, listener: (change: IArrayChange<T> | IArraySplice<T>) => void, fireImmediately?: boolean): Lambda;
 export function observe<T>(observableMap: ObservableMap<T>, listener: (change: IMapChange<T>) => void, fireImmediately?: boolean): Lambda;
 export function observe<T>(observableMap: ObservableMap<T>, property: string, listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda;
-export function observe(object: Object, listener: (change: IObjectChange) => void, fireImmediately?: boolean): Lambda;
+export function observe<T>(object: T, listener: (change: IObjectDidChange<T, keyof T>) => void, fireImmediately?: boolean): Lambda;
 export function observe(object: Object, property: string, listener: (change: IValueDidChange<any>) => void, fireImmediately?: boolean): Lambda;
 export function observe(thing, propOrCb?, cbOrFire?, fireImmediately?): Lambda {
 	if (typeof cbOrFire === "function")
