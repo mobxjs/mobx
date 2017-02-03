@@ -23,6 +23,12 @@ Note that the following constructions are still anti patterns, although MobX won
 Note that observables that are not in use by a reaction, but that have `.observe` listeners attached, do *not* count towards being observed.
 Observe and intercept callbacks are concepts that do not relate to strict mode, actions or transactions.
 
+** Other changes
+
+* Reactions and observable values now consider `NaN === NaN`, See #805 by @andykog
+* Merged #783: extract error messages to seperate file, so that they can be optimized in production builds (not yet done), by @reisel, #GoodnessSquad
+* Improved typings of actions, see #796 by @mattiamanzati
+
 # 3.0.2
 
 * Fixed issue where MobX failed on environments where `Map` is not defined, #779 by @dirtyrolf
