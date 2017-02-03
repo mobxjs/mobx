@@ -1,6 +1,6 @@
 # 3.1.0
 
-** Improved strict mode **
+### Improved strict mode
 
 Strict mode has been relaxed a bit in this release. Also computed values can now better handle creating new observables (in an action if needed). The semantics are now as follows:
 
@@ -23,7 +23,7 @@ Note that the following constructions are still anti patterns, although MobX won
 Note that observables that are not in use by a reaction, but that have `.observe` listeners attached, do *not* count towards being observed.
 Observe and intercept callbacks are concepts that do not relate to strict mode, actions or transactions.
 
-** Other changes
+### Other changes
 
 * Reactions and observable values now consider `NaN === NaN`, See #805 by @andykog
 * Merged #783: extract error messages to seperate file, so that they can be optimized in production builds (not yet done), by @reisel, #GoodnessSquad
