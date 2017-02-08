@@ -53,7 +53,7 @@ dispose.onError(e => {
     window.alert("Please enter a valid age")
 })
 
-age.set(-5)  // Shows alert bolx
+age.set(-5)  // Shows alert box
 ```
 
 A global onError handler can be set as well through `extras.onReactionError(handler)`. This can be useful in tests or for monitoring.
