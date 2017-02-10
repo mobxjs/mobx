@@ -2,8 +2,8 @@
 
 Computed values are values that can be derived from the existing state or other computed values.
 Conceptually, they are very similar to formulas in spreadsheets.
-Computed values can't be underestimated, as they help you to make your actual modifyable state as small as possible.
-Besides that they are higly optimized, so use them whereever possible.
+Computed values can't be underestimated, as they help you to make your actual modifiable state as small as possible.
+Besides that they are highly optimized, so use them wherever possible.
 
 Don't confuse `computed` with `autorun`. They are both reactively invoked expressions,
 but use `@computed` if you want to reactively produce a *value* that can be used by other observers and
