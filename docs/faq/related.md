@@ -11,6 +11,7 @@
 * [ng2-mobx](https://github.com/500tech/ng2-mobx)
 
 * Staff pick: [mobx-react-form](https://foxhound87.github.io/mobx-react-form/docs/devtools.html) Build forms and validate them using json-schema rules
+* [mobx-form-store](https://github.com/alexhisen/mobx-form-store) + [mobx-schema-form](https://github.com/alexhisen/mobx-schema-form) Loosely-coupled components for managing, rendering and validating forms in MobX-based apps
 * [mobx-forms](https://github.com/oreqizer/mobx-forms) A simple form manager for React and Mobx, heavily inspired by redux-forms
 * [mobx-form](https://github.com/royriojas/mobx-form) Declaratively build forms using MobX
 * [mobx-input](https://github.com/tomaash/mobx-input) Form validation for MobX and react-bootstrap.
