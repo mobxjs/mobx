@@ -28,3 +28,5 @@
 * [react-router-intl-routing](https://github.com/jamiehill/react-router-intl-routing) React Router 4 and React-Intl translated routes glued together with Mobx
 * [spfx-react-mobx-webpart-starter](https://github.com/kmees/spfx-react-mobx-webpart-starter) A react & mobx powered spfx webpart
 * [rn_mobx_temmplate](https://github.com/hiaw/rn_mobx_template) React Native with MobX template
+* [ng-mobx](https://github.com/500tech/ng-mobx) MobX connector for AngularJS (aka Angular 1.x)
+* [ng2-mobx](https://github.com/500tech/ng2-mobx) MobX connector for Angular (aka Angular 2+)
