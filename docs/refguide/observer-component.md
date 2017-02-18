@@ -183,6 +183,7 @@ See the [DevTools](../best/devtools.md) section.
 * `@observer` implements `shouldComponentUpdate` in the same way as `PureRenderMixin` so that children are not re-rendered unnecessary.
 * Reactive components sideways load data; parent components won't re-render unnecessarily even when child components will.
 * `@observer` does not depend on React's context system.
+* In mobx-react@4+, the props object and the state object of an observer component are automatically made observable to make it easier to create @computed properties that derive from props inside such a component. If you have a reaction (i.e. `autorun`) inside your `@observer` component that must _not_ be re-evaluated when the specific props it uses don't change, be sure to derefence those specific props for use inside your reaction (i.e. `const myProp = props.myProp`). Otherwise, if you reference `props.myProp` inside the reaction, then a change in _any_ of the props will cause the reaction to be re-evaluated. For a typical use case with React-Router, see [this article](https://alexhisen.gitbooks.io/mobx-recipes/content/observable-based-routing.html).
 
 ## Enabling ES6 decorators in your transpiler
 
