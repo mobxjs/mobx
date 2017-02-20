@@ -8,8 +8,8 @@ This offers fine-grained control on which parts of your object become observable
 import {observable} from "mobx";
 
 class OrderLine {
-    @observable price:number = 0;
-    @observable amount:number = 1;
+    @observable price = 0;
+    @observable amount = 1;
 
     constructor(price) {
         this.price = price;
