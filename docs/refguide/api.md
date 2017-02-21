@@ -20,7 +20,7 @@ You can also directly create the desired observable type, see below.
 
 The following conversion rules are applied, but can be fine-tuned by using *modifiers*. See below.
 
-1. If *value* is an wrapped is an instance of an [ES6 Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map): a new [Observable Map](map.md) will be returned. Observable maps are very useful if you don't want to react just to the change of a specific entry, but also to the addition or removal of entries.
+1. If *value* is an instance of an [ES6 Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map): a new [Observable Map](map.md) will be returned. Observable maps are very useful if you don't want to react just to the change of a specific entry, but also to the addition or removal of entries.
 1. If *value* is an array, a new [Observable Array](array.md) will be returned.
 1. If *value* is an object *without* prototype, the object will be cloned and all its current properties will be made observable. See [Observable Object](object.md)
 1. If *value* is an object *with* a prototype, a JavaScript primitive or function, a [Boxed Observable](boxed.md) will be returned. MobX will not make objects with a prototype automatically observable; as that is the responsibility of its constructor function. Use `extendObservable` in the constructor, or `@observable` in its class definition instead.
