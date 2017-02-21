@@ -30,8 +30,8 @@ If you have [decorators enabled](../best/decorators.md) you can use the `@comput
 import {observable, computed} from "mobx";
 
 class OrderLine {
-    @observable price:number = 0;
-    @observable amount:number = 1;
+    @observable price = 0;
+    @observable amount = 1;
 
     constructor(price) {
         this.price = price;
