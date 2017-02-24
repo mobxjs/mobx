@@ -11,4 +11,4 @@ PR checklist:
 
 Feel free to ask help with any of these boxes!
 
-The above process doesnt apply to doc updates etc.
+The above process doesn't apply to doc updates etc.
