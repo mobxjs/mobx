@@ -28,7 +28,7 @@ For more info see [what will MobX react to?](react.md).
 `@observer` only enhances the component you are decorating, not the components used inside it.
 So usually all your components should be decorated. Don't worry, this is not inefficient, in contrast, more `observer` components make rendering more efficient.
 
-### Dereference values as lately as possible
+### Dereference values as late as possible
 
 MobX can do a lot, but it cannot make primitive values observable (although it can wrap them in an object see [boxed observables](../refguide/boxed.md)).
 So it is not the _values_ that are observable, but the _properties_ of an object. This means that `@observer` actually reacts to the fact that you dereference a value.

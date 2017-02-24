@@ -928,7 +928,7 @@ It is therefore recommended to have components that just map over a collection a
 <h2 id="don-t-use-array-indexes-as-keys">Don&apos;t use array indexes as keys</h2>
 <p>Don&apos;t use array indexes or any value that might change in the future as key. Generate id&apos;s for your objects if needed.
 See also this <a href="https://medium.com/@robinpokorny/index-as-a-key-is-an-anti-pattern-e0349aece318" target="_blank">blog</a>.</p>
-<h2 id="dereference-values-lately">Dereference values lately</h2>
+<h2 id="dereference-values-late">Dereference values late</h2>
 <p>When using <code>mobx-react</code> it is recommended to dereference values as late as possible.
 This is because MobX will re-render components that dereference observable values automatically.
 If this happens deeper in your component tree, less components have to re-render.</p>
