@@ -23,7 +23,7 @@ However object iterators like `for .. in` or `Object.keys()` won't react to this
 If you need a dynamically keyed object, for example to store users by id, create observable _map_s using [`observable.map`](../refguide/map.md).
 For more info see [what will MobX react to?](react.md).
 
-### Use `@observer` on all components that render `@observable`'s.
+### Use `@observer` on all components that render `@observable`s.
 
 `@observer` only enhances the component you are decorating, not the components used inside it.
 So usually all your components should be decorated. Don't worry, this is not inefficient, in contrast, more `observer` components make rendering more efficient.
