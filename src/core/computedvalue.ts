@@ -59,7 +59,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	 *
 	 * The `compareStructural` property indicates whether the return values should be compared structurally.
 	 * Normally, a computed value will not notify an upstream observer if a newly produced value is strictly equal to the previously produced value.
-	 * However, enabling compareStructural can be convienent if you always produce an new aggregated object and don't want to notify observers if it is structurally the same.
+	 * However, enabling compareStructural can be convenient if you always produce an new aggregated object and don't want to notify observers if it is structurally the same.
 	 * This is useful for working with vectors, mouse coordinates etc.
 	 */
 	constructor(public derivation: () => T, public scope: Object | undefined, private compareStructural: boolean, name: string, setter?: (v: T) => void) {

@@ -71,7 +71,7 @@ export class Atom extends BaseAtom implements IAtom {
 
 		endBatch();
 		return !!globalState.trackingDerivation;
-		// return doesn't really give usefull info, because it can be as well calling computed which calls atom (no reactions)
+		// return doesn't really give useful info, because it can be as well calling computed which calls atom (no reactions)
 		// also it could not trigger when calculating reaction dependent on Atom because Atom's value was cached by computed called by given reaction.
 	}
 

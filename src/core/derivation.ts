@@ -139,7 +139,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, con
 }
 
 /**
- * diffs newObserving with obsering.
+ * diffs newObserving with observing.
  * update observing to be newObserving with unique observables
  * notify observers that become observed/unobserved
  */
