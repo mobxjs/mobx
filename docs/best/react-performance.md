@@ -59,7 +59,7 @@ Good:
 Don't use array indexes or any value that might change in the future as key. Generate id's for your objects if needed.
 See also this [blog](https://medium.com/@robinpokorny/index-as-a-key-is-an-anti-pattern-e0349aece318).
 
-## Dereference values lately
+## Dereference values late
 
 When using `mobx-react` it is recommended to dereference values as late as possible.
 This is because MobX will re-render components that dereference observable values automatically.

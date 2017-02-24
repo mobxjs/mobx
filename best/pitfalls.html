@@ -902,7 +902,7 @@ For more info see <a href="react.html">what will MobX react to?</a>.</p>
 <h3 id="use-observer-on-all-components-that-render-observable-s">Use <code>@observer</code> on all components that render <code>@observable</code>&apos;s.</h3>
 <p><code>@observer</code> only enhances the component you are decorating, not the components used inside it.
 So usually all your components should be decorated. Don&apos;t worry, this is not inefficient, in contrast, more <code>observer</code> components make rendering more efficient.</p>
-<h3 id="dereference-values-as-lately-as-possible">Dereference values as lately as possible</h3>
+<h3 id="dereference-values-as-late-as-possible">Dereference values as late as possible</h3>
 <p>MobX can do a lot, but it cannot make primitive values observable (although it can wrap them in an object see <a href="../refguide/boxed.html">boxed observables</a>).
 So it is not the <em>values</em> that are observable, but the <em>properties</em> of an object. This means that <code>@observer</code> actually reacts to the fact that you dereference a value.
 So in our above example, the <code>Timer</code> component would <strong>not</strong> react if it was initialized as follows:</p>
