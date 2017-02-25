@@ -66,7 +66,7 @@ class Todo {
 ```
 
 Using `observable` is like turning a property of an object into a spreadsheet cell.
-But unlike spreadsheets, these values cannot just be primitive values, but also references, objects and arrays.
+But unlike spreadsheets, these values can be not only primitive values, but also references, objects and arrays.
 You can even [define your own](http://mobxjs.github.io/mobx/refguide/extending.html) observable data sources.
 
 ### Intermezzo: Using MobX in ES5, ES6 and ES.next environments
