@@ -5,7 +5,7 @@ PR checklist:
 
 * [ ] Added unit tests
 * [ ] Updated changelog
-* [ ] Updated docs (either in the description of this PR as markdown, or as seperate PR on the `gh-pages` branch. Please refer to this PR). For new functionality, at least [API.md](https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/api.md) should be updated
+* [ ] Updated docs (either in the description of this PR as markdown, or as separate PR on the `gh-pages` branch. Please refer to this PR). For new functionality, at least [API.md](https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/api.md) should be updated
 * [ ] Added typescript typings
 * [ ] Verified that there is no significant performance drop (`npm run perf`)
 
