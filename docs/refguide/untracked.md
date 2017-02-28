@@ -1,7 +1,7 @@
 # Untracked
 
 Untracked allows you to run a piece of code without establishing observers.
-Like `transaction`, `untracked` is automatically applied by `(@)action`, so usually it makes more sense to use actions then `untracked` directly.
+Like `transaction`, `untracked` is automatically applied by `(@)action`, so usually it makes more sense to use actions than to use `untracked` directly.
 Example:
 
 ```javascript
