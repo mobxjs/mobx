@@ -268,8 +268,7 @@ test('is array', function(t) {
     var x = mobx.observable([]);
     t.equal(x instanceof Array, true);
 
-    // would be cool if these two would return true...
-    t.equal(typeof x === "array", false);
+    // would be cool if this would return true...
     t.equal(Array.isArray(x), false);
     t.end();
 })
