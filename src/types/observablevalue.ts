@@ -127,4 +127,4 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 
 ObservableValue.prototype[primitiveSymbol()] = ObservableValue.prototype.valueOf;
 
-export const isObservableValue = createInstanceofPredicate("ObservableValue", ObservableValue);
+export var isObservableValue = createInstanceofPredicate("ObservableValue", ObservableValue) as (x: any) => x is IObservableValue<any>;
