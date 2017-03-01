@@ -43,4 +43,12 @@ fs.writeFileSync('.build/mobx.ts', allContents, { encoding: 'utf8', flag: 'a' })
     `ncp flow-typed/mobx.js lib/mobx.js.flow`
 ]
     .map(cmd => `${__dirname}/../node_modules/.bin/${cmd}`)
-    .map(cmd => exec(cmd))
+    .map(cmd => {
+		try {
+			exec(cmd);
+		} catch (e) {
+			console.log(e.stdout.toString());
+			console.error(e.stderr.toString());
+			process.exit(1);
+		}
+	})
