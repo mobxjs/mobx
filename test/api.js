@@ -25,6 +25,7 @@ test('correct api should be exposed', function(t) {
 		'intercept',
 		'isAction',
 		'isArrayLike',
+		'isBoxedObservable',
 		'isComputed',
 		'isModifierDescriptor',
 		'isObservable',

@@ -1,3 +1,7 @@
+# 3.1.1
+
+* Introduced `isBoxedObservable(value)`, fixes #804
+
 # 3.1.0
 
 ### Improved strict mode
