@@ -161,35 +161,33 @@ const observablePropertyConfigs = {};
 const computedPropertyConfigs = {};
 
 export function generateObservablePropConfig(propName) {
-	const config = observablePropertyConfigs[propName];
-	if (config)
-		return config;
-	return observablePropertyConfigs[propName] = {
-		configurable: true,
-		enumerable: true,
-		get: function() {
-			return this.$mobx.values[propName].get();
-		},
-		set: function(v) {
-			setPropertyValue(this, propName, v);
+	return observablePropertyConfigs[propName] || (
+		observablePropertyConfigs[propName] = {
+			configurable: true,
+			enumerable: true,
+			get: function() {
+				return this.$mobx.values[propName].get();
+			},
+			set: function(v) {
+				setPropertyValue(this, propName, v);
+			}
 		}
-	};
+	);
 }
 
 export function generateComputedPropConfig(propName) {
-	const config = computedPropertyConfigs[propName];
-	if (config)
-		return config;
-	return computedPropertyConfigs[propName] = {
-		configurable: true,
-		enumerable: false,
-		get: function() {
-			return this.$mobx.values[propName].get();
-		},
-		set: function(v) {
-			return this.$mobx.values[propName].set(v);
+	return computedPropertyConfigs[propName] || (
+		computedPropertyConfigs[propName] = {
+			configurable: true,
+			enumerable: false,
+			get: function() {
+				return this.$mobx.values[propName].get();
+			},
+			set: function(v) {
+				return this.$mobx.values[propName].set(v);
+			}
 		}
-	};
+	);
 }
 
 export function setPropertyValue(instance, name: string, newValue) {
