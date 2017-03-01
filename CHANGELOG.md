@@ -1,5 +1,9 @@
 # 3.1.1
 
+* Fixed incompatiblity issue with `mobx-react@4.1.0`
+
+# 3.1.1 (unpublished)
+
 * Introduced `isBoxedObservable(value)`, fixes #804
 
 # 3.1.0
