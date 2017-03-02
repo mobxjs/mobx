@@ -30,7 +30,7 @@ Back to the spreadsheet analogy, formulas are derivations that *compute* a value
 
 ### 3. Actions
 
-An _action_ is any piece of code that changes the _state_. User events, backend data pushes, scheduled events etc.
+An _action_ is any piece of code that changes the _state_. User events, backend data pushes, scheduled events, etc.
 An action is like a user that enters a new value in a spreadsheet cell.
 
 Actions can be defined explicitly in MobX to help you to structure code more clearly.
@@ -38,13 +38,13 @@ If MobX is used in *strict mode*, MobX will enforce that no state can be modifie
 
 ## Principles
 
-MobX supports an uni-directional data flow where _actions_ changes the _state_, which in turn updates all affected _views_.
+MobX supports a uni-directional data flow where _actions_ change the _state_, which in turn updates all affected _views_.
 
 ![Action, State, View](../images/action-state-view.png)
 
 All _Derivations_ are updated **automatically** and **atomically** when the _state_ changes. As a result it is never possible to observe intermediate values.
 
-All _Derivations_ are updated **synchronously** by default. This means that for example _actions_ can safely inspect a computed value directly after altering the _state_.
+All _Derivations_ are updated **synchronously** by default. This means that, for example, _actions_ can safely inspect a computed value directly after altering the _state_.
 
 _Computed values_ are updated **lazily**. Any computed value that is not actively in use will not be updated until it is needed for a side effect (I/O).
 If a view is no longer in use it will be garbage collected automatically.
