@@ -82,7 +82,7 @@ export var action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): 
 		return namedActionDecorator(arg1);
 
     const targetName = arg1.constructor.name;
-    name = targetName ? targetName + '.' + arg2 : arg2;
+    arg2 = targetName ? targetName + '.' + arg2 : arg2;
     return namedActionDecorator(name).apply(null, arguments);
 } as any;
 
