@@ -81,7 +81,9 @@ export var action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): 
 	if (arguments.length === 1 && typeof arg1 === "string")
 		return namedActionDecorator(arg1);
 
-	return namedActionDecorator(arg2).apply(null, arguments);
+    const targetName = arg1.constructor.name;
+    name = targetName ? targetName + '.' + arg2 : arg2;
+    return namedActionDecorator(name).apply(null, arguments);
 } as any;
 
 action.bound = function boundAction(arg1, arg2?, arg3?) {
