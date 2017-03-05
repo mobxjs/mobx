@@ -54,7 +54,7 @@ test('test1', function(t) {
     t.equal(sum.get(), 2);
     t.deepEqual(a.slice(), [2])
 
-    a.splice(0,0,4,3);
+	a.spliceWithArray(0,0, [4,3]);
     t.equal(sum.get(), 9);
     t.deepEqual(a.slice(), [4,3,2]);
 

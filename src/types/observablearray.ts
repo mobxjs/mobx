@@ -308,6 +308,11 @@ export class ObservableArray<T> extends StubArray {
 		return this.$mobx.spliceWithArray(index, deleteCount, newItems);
 	}
 
+	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[] {
+		return this.$mobx.spliceWithArray(index, deleteCount, newItems);
+	}
+
+
 	push(...items: T[]): number {
 		const adm = this.$mobx;
 		adm.spliceWithArray(adm.values.length, 0, items);
@@ -409,6 +414,7 @@ makeNonEnumerable(ObservableArray.prototype, [
 	"peek",
 	"find",
 	"splice",
+	"spliceWithArray",
 	"push",
 	"pop",
 	"shift",
