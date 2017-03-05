@@ -452,3 +452,18 @@ test("accessing out of bound values throws", t => {
 	console.warn = baseWarn;
 	t.end();
 })
+
+test("replace can handle large arrays", t => {
+	const a = mobx.observable([])
+	const b = []
+	b.length = 1000*1000
+	t.doesNotThrow(() => {
+		a.replace(b)
+	})
+
+	t.doesNotThrow(() => {
+		a.spliceWithArray(0, 0, b)
+	})
+
+	t.end()
+})

@@ -1,3 +1,8 @@
+# 3.1.2
+
+* Make sure that `ObservableArray.replace` can handle large arrays by not using splats internally. (See e.g. #859)
+* Exposed `ObservableArray.spliceWithArray`, that unlike a normal splice, doesn't use a variadic argument list so that it is possible to splice in new arrays that are larger then allowed by the callstack.
+
 # 3.1.1
 
 * Fixed incompatiblity issue with `mobx-react@4.1.0`
