@@ -1,3 +1,7 @@
+# Next
+
+* Make items added to deeply observable Map observables as well. (fixes #869)
+
 # 3.1.3
 
 * Make sure that `ObservableArray.replace` can handle large arrays by not using splats internally. (See e.g. #859)
