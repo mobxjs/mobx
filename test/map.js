@@ -1,3 +1,5 @@
+"use strict"
+
 var test = require('tape');
 var mobx = require('..');
 var map = mobx.map;
@@ -516,7 +518,7 @@ test('798, cannot return observable map from computed prop', t => {
 	// MWE: this is an anti pattern, yet should be possible in certain cases nonetheless..?
 	// https://jsfiddle.net/7e6Ltscr/
 
-	form = function (settings) {
+	const form = function (settings) {
 		var form = mobx.observable({
 			reactPropsMap: mobx.observable.map({
 				onSubmit: function () {
@@ -535,7 +537,7 @@ test('798, cannot return observable map from computed prop', t => {
 		return form;
 	};
 
-	customerSearchStore = function () {
+	const customerSearchStore = function () {
 
 		var customerSearchStore = mobx.observable({
 			customerType: 'RUBY',
