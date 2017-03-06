@@ -35,7 +35,7 @@ export function deepEnhancer(v, _, name) {
 	if (isPlainObject(v))
 		return observable.object(v, name);
 	if (isES6Map(v))
-		return observable.shallowMap(v, name);
+		return observable.map(v, name);
 
 	return v;
 }

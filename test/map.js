@@ -556,3 +556,48 @@ test('798, cannot return observable map from computed prop', t => {
 
 	t.end()
 })
+
+test('869, deeply observable map should make added items observables as well', t => {
+  var store = {
+    map_deep1: mobx.observable(new Map()),
+    map_deep2: mobx.observable.map(),
+  };
+
+  t.ok(mobx.isObservable(store.map_deep1), 'should make map Observable');
+  t.ok(mobx.isObservableMap(store.map_deep1), 'should make map ObservableMap');
+  t.ok(mobx.isObservable(store.map_deep2), 'should make map Observable');
+  t.ok(mobx.isObservableMap(store.map_deep2), 'should make map ObservableMap');
+
+  store.map_deep2.set('a', []);
+  t.ok(mobx.isObservable(store.map_deep2.get('a')), 'should make added items observables');
+
+  store.map_deep1.set('a', []);
+  t.ok(mobx.isObservable(store.map_deep1.get('a')), 'should make added items observables');
+
+  t.end();
+});
+
+test('using deep map', t => {
+  var store = {
+    map_deep: mobx.observable(new Map()),
+  };
+
+  // Creating autorun triggers one observation, hence -1
+  let observed = -1;
+  mobx.autorun(function () {
+    // Use the map, to observe all changes
+    var _ = mobx.toJS(store.map_deep);
+    observed++;
+  });
+
+  store.map_deep.set('shoes', []);
+  t.equal(observed, 1, 'should observe new item added');
+
+  store.map_deep.get('shoes').push({ color: 'black' });
+  t.equal(observed, 2, 'should observe item mutated');
+
+  store.map_deep.get('shoes')[0].color = 'red';
+  t.equal(observed, 3, 'should observe nested item mutated');
+
+  t.end();
+});
