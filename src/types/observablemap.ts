@@ -37,19 +37,34 @@ export type IMapEntry<V> = [string, V];
 export type IMapEntries<V> = IMapEntry<V>[];
 
 // In 3.0, change to IObjectMapChange
-export interface IMapChange<T> {
+export type IMapChange<T> = IMapChangeUpdate<T> | IMapChangeAdd<T> | IMapChangeDelete<T>;
+
+export interface IMapChangeBase<T> {
 	object: ObservableMap<T>;
-	type: "update" | "add" | "delete";
 	name: string;
-	newValue?: any;
-	oldValue?: any;
+}
+
+export interface IMapChangeUpdate<T> extends IMapChangeBase<T> {
+	type: "update";
+	newValue: T;
+	oldValue: T;
+}
+
+export interface IMapChangeAdd<T> extends IMapChangeBase<T> {
+	type: "add";
+	newValue: T;
+}
+
+export interface IMapChangeDelete<T>  extends IMapChangeBase<T> {
+	type: "delete";
+	oldValue: T;
 }
 
 export interface IMapWillChange<T> {
 	object: ObservableMap<T>;
 	type: "update" | "add" | "delete";
 	name: string;
-	newValue?: any;
+	newValue?: T;
 }
 
 const ObservableMapMarker = {};
