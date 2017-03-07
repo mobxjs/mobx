@@ -1,6 +1,6 @@
-# Next
+# 3.1.4
 
-* Make items added to deeply observable Map observables as well. (fixes #869)
+* Observable maps initialized from ES6 didn't deeply convert their values to observables. (fixes #869,by @ggarek)
 
 # 3.1.3
 
