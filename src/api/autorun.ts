@@ -197,7 +197,7 @@ export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg:
 	let nextValue: T;
 
 	const r = new Reaction(opts.name, () => {
-		if ((opts.delay as any) < 1) {
+		if (firstTime || (opts.delay as any) < 1) {
 			reactionRunner();
 		} else if (!isScheduled) {
 			isScheduled = true;
