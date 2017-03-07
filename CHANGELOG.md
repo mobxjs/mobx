@@ -1,3 +1,8 @@
+# 3.1.5
+
+* Improved typings of map changes, see #847, by @hediet
+* Fixed issue with `reaction` if `fireImmediately` was combined with `delay` option, see #837, by @SaboteurSpk
+
 # 3.1.4
 
 * Observable maps initialized from ES6 didn't deeply convert their values to observables. (fixes #869,by @ggarek)
