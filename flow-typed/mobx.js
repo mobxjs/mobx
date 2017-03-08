@@ -142,7 +142,8 @@ declare module 'mobx' {
     observe(
       listener: (changeData: IArrayChange<T> | IArraySplice<T>) => void, fireImmediately?: boolean
     ): Lambda;
-    intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda;
+    intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda;
+    intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda; // TODO: remove in 4.0
     clear(): T[];
     peek(): T[];
     replace(newItems: T[]): T[];
