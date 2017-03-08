@@ -1,3 +1,6 @@
+# 3.1.6
+ * Expose ES2015 modules to be used with advanced bundlers.
+
 # 3.1.5
 
 * Improved typings of map changes, see #847, by @hediet
