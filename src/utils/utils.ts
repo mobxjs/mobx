@@ -49,7 +49,7 @@ export function once(func: Lambda): Lambda {
 		if (invoked)
 			return;
 		invoked = true;
-		return func.apply(this, arguments);
+		return (func as any).apply(this, arguments);
 	};
 }
 
