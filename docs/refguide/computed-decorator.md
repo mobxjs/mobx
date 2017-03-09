@@ -143,7 +143,7 @@ The `@computed` decorator does not take arguments. If you want to to create a co
 
 ## Note on error handling
 
-If a computed value throws an exception during its computation, this exception will be catched and rethrown any time its value is read.
+If a computed value throws an exception during its computation, this exception will be caught and rethrown any time its value is read.
 It is strongly recommended to always throw `Error`'s, so that the original stack trace is preserved. E.g.: `throw new Error("Uhoh")` instead of `throw "Uhoh"`.
 Throwing exceptions doesn't break tracking, so it is possible for computed values to recover from exceptions.
 
