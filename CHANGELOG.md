@@ -2,6 +2,7 @@
 
 * Expose ES2015 modules to be used with advanced bundlers, by @mohsen1, fixes #868
 * Improved typings of `IObservableArray.intercept`: remove superflous type parameter, by @bvanreeven
+* Improved typings of map changes, by @hediet
 
 # 3.1.5
 
