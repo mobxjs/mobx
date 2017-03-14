@@ -1,4 +1,8 @@
-# 3.1.6
+# 3.1.7
+
+* Reverted ES2015 module changes, as they broke with webpack 2 (will be re-released later)
+
+# 3.1.6 (Unpublished)
 
 * Expose ES2015 modules to be used with advanced bundlers, by @mohsen1, fixes #868
 * Improved typings of `IObservableArray.intercept`: remove superflous type parameter, by @bvanreeven
