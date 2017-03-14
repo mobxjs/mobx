@@ -1,8 +1,11 @@
 {
   "name": "mobx",
-  "version": "3.1.5",
+  "version": "3.1.6",
   "description": "Simple, scalable state management.",
   "main": "lib/mobx.js",
+  "module": "lib/es2015/mobx.js",
+  "jsnext:main": "lib/es2015/mobx.js",
+  "umd:main": "lib/mobx.umd.js",
   "typings": "lib/mobx.d.ts",
   "scripts": {
     "test": "npm run quick-build && npm run tape",

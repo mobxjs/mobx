@@ -98,7 +98,7 @@ export function when(arg1: any, arg2: any, arg3?: any, arg4?: any) {
 		if (predicate.call(scope)) {
 			r.dispose();
 			const prevUntracked = untrackedStart();
-			effect.call(scope);
+			(effect as any).call(scope);
 			untrackedEnd(prevUntracked);
 		}
 	});
