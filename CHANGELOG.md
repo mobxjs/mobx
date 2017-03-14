@@ -1,3 +1,7 @@
+# 3.1.6
+
+* Improved typings of `IObservableArray.intercept`: remove superflous type parameter, by @bvanreeven
+
 # 3.1.5
 
 * Improved typings of map changes, see #847, by @hediet
