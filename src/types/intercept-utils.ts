@@ -22,7 +22,7 @@ export function registerInterceptor<T>(interceptable: IInterceptable<T>, handler
 	});
 }
 
-export function interceptChange<T>(interceptable: IInterceptable<T>, change: T): T {
+export function interceptChange<T>(interceptable: IInterceptable<T | null>, change: T | null): T | null {
 	const prevU = untrackedStart();
 	try {
 		const interceptors = interceptable.interceptors;
