@@ -603,3 +603,20 @@ test('using deep map', t => {
 
   t.end();
 });
+
+test("issue 893", t => {
+  const m = mobx.observable.map();
+  const keys = ['constructor', 'toString', 'assertValidKey', 'isValidKey', 'toJSON', 'toJS']
+  for (let key of keys) {
+	  t.equal(m.get(key), undefined);
+  }
+  t.end();
+});
+
+test("work with 'toString' key", t => {
+	const m = mobx.observable.map();
+	t.equal(m.get('toString'), undefined);
+	m.set('toString', 'test');
+	t.equal(m.get('toString'), 'test');
+	t.end();
+});
