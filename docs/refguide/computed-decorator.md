@@ -7,7 +7,7 @@ Besides that they are highly optimized, so use them wherever possible.
 
 Don't confuse `computed` with `autorun`. They are both reactively invoked expressions,
 but use `@computed` if you want to reactively produce a *value* that can be used by other observers and
-`autorun` if you don't want to produce a new value but rather want ot achieve an *effect*.
+`autorun` if you don't want to produce a new value but rather want to achieve an *effect*.
 For example imperative side effects like logging, making network requests etc.
 
 Computed values are automatically derived from your state if any value that affects them changes.
