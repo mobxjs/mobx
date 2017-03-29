@@ -241,6 +241,6 @@ export function toPrimitive(value) {
 }
 
 import {globalState} from "../core/globalstate";
-import {isObservableArray} from "../types/observablearray";
+import {IObservableArray, isObservableArray} from "../types/observablearray";
 import {isObservableMap} from "../types/observablemap";
 import {observable} from "../api/observable";
