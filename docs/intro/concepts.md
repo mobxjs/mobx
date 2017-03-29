@@ -16,7 +16,7 @@ _Anything_ that can be derived from the _state_ without any further interaction 
 Derivations exist in many forms:
 
 * The _user interface_.
-* _Derived data_, such as the amount of todos left.
+* _Derived data_, such as the number of todos left.
 * _Backend integrations_ like sending changes to the server.
 
 MobX distinguishes two kind of derivations:
