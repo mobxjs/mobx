@@ -298,7 +298,7 @@ A common mistake is to store local variables that dereference observables, and t
     }
 
     render() {
-        return <div>{author.name}</div>
+        return <div>{this.author.name}</div>
     }
 }
 ```
