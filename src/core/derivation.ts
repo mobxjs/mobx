@@ -148,6 +148,7 @@ function bindDependencies(derivation: IDerivation) {
 
 	const prevObserving = derivation.observing;
 	const observing = derivation.observing = derivation.newObserving!;
+	let lowestNewObservingDerivationState = IDerivationState.UP_TO_DATE;
 
 	derivation.newObserving = null; // newObserving shouldn't be needed outside tracking
 
@@ -161,6 +162,9 @@ function bindDependencies(derivation: IDerivation) {
 			dep.diffValue = 1;
 			if (i0 !== i) observing[i0] = dep;
 			i0++;
+		}
+		if (dep['dependenciesState'] > lowestNewObservingDerivationState) {
+			lowestNewObservingDerivationState = dep['dependenciesState'];
 		}
 	}
 	observing.length = i0;
@@ -186,6 +190,13 @@ function bindDependencies(derivation: IDerivation) {
 			dep.diffValue = 0;
 			addObserver(dep, derivation);
 		}
+	}
+
+	// Some new observed derivations might become stale during this derivation computation
+	// so say had no chance to propagate staleness (#916)
+	if (lowestNewObservingDerivationState !== IDerivationState.UP_TO_DATE) {
+		derivation.dependenciesState = lowestNewObservingDerivationState;
+		derivation.onBecomeStale();
 	}
 }
 
