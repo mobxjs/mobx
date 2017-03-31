@@ -19,6 +19,10 @@ _Simple, scalable state management_
 - https://unpkg.com/mobx/lib/mobx.umd.js
 - https://cdnjs.com/libraries/mobx
 
+## Translations
+
+* [中文](https://github.com/SangKa/mobx-docs-cn)
+
 ## Getting started
 
 * [Ten minute, interactive MobX + React tutorial](https://mobxjs.github.io/mobx/getting-started.html)
