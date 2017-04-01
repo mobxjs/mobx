@@ -1,7 +1,10 @@
 import {IObservable, IDepTreeNode, addObserver, removeObserver} from "./observable";
+import {IAtom} from "./atom";
 import {globalState} from "./globalstate";
-import {invariant} from "../utils/utils";
+import {fail} from "../utils/utils";
 import {isComputedValue} from "./computedvalue";
+import {getMessage} from "../utils/messages";
+
 
 export enum IDerivationState {
 	// before being run or (outside batch and not being observed)
@@ -100,13 +103,14 @@ export function isComputingDerivation() {
 	return globalState.trackingDerivation !== null; // filter out actions inside computations
 }
 
-export function checkIfStateModificationsAreAllowed() {
-	if (!globalState.allowStateChanges) {
-		invariant(false, globalState.strictMode
-			? "It is not allowed to create or change state outside an `action` when MobX is in strict mode. Wrap the current method in `action` if this state change is intended"
-			: "It is not allowed to change the state when a computed value or transformer is being evaluated. Use 'autorun' to create reactive functions with side-effects."
-		);
-	}
+export function checkIfStateModificationsAreAllowed(atom: IAtom) {
+	const hasObservers = atom.observers.length > 0;
+	// Should never be possible to change an observed observable from inside computed, see #798
+	if (globalState.computationDepth > 0 && hasObservers)
+		fail(getMessage("m031") + atom.name);
+	// Should not be possible to change observed state outside strict mode, except during initialization, see #563
+	if (!globalState.allowStateChanges && hasObservers)
+		fail(getMessage(globalState.strictMode ? "m030a" : "m030b") + atom.name);
 }
 
 /**
@@ -135,7 +139,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, con
 }
 
 /**
- * diffs newObserving with obsering.
+ * diffs newObserving with observing.
  * update observing to be newObserving with unique observables
  * notify observers that become observed/unobserved
  */

@@ -142,7 +142,8 @@ declare module 'mobx' {
     observe(
       listener: (changeData: IArrayChange<T> | IArraySplice<T>) => void, fireImmediately?: boolean
     ): Lambda;
-    intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda;
+    intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda;
+    intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda; // TODO: remove in 4.0
     clear(): T[];
     peek(): T[];
     replace(newItems: T[]): T[];
@@ -301,6 +302,8 @@ declare module 'mobx' {
   declare function extendShallowObservable(target: any): any;
 
   declare function action(targetOrName: any, propertyKeyOrFuc?: any, descriptor?: PropertyDescriptor): any;
+  declare function action<T>(name: string, func: T): T;
+  declare function action<T>(func: T): T;
   declare function runInAction<T>(name: string, block: () => T, scope?: any): T;
   declare function runInAction<T>(block: () => T, scope?: any): T;
   declare function isAction(thing: any): boolean;

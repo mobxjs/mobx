@@ -1,3 +1,66 @@
+# 3.1.7
+
+* Reverted ES2015 module changes, as they broke with webpack 2 (will be re-released later)
+
+# 3.1.6 (Unpublished)
+
+* Expose ES2015 modules to be used with advanced bundlers, by @mohsen1, fixes #868
+* Improved typings of `IObservableArray.intercept`: remove superflous type parameter, by @bvanreeven
+* Improved typings of map changes, by @hediet
+
+# 3.1.5
+
+* Improved typings of map changes, see #847, by @hediet
+* Fixed issue with `reaction` if `fireImmediately` was combined with `delay` option, see #837, by @SaboteurSpk
+
+# 3.1.4
+
+* Observable maps initialized from ES6 didn't deeply convert their values to observables. (fixes #869,by @ggarek)
+
+# 3.1.3
+
+* Make sure that `ObservableArray.replace` can handle large arrays by not using splats internally. (See e.g. #859)
+* Exposed `ObservableArray.spliceWithArray`, that unlike a normal splice, doesn't use a variadic argument list so that it is possible to splice in new arrays that are larger then allowed by the callstack.
+
+# 3.1.2
+
+* Fixed incompatiblity issue with `mobx-react@4.1.0`
+
+# 3.1.1 (unpublished)
+
+* Introduced `isBoxedObservable(value)`, fixes #804
+
+# 3.1.0
+
+### Improved strict mode
+
+Strict mode has been relaxed a bit in this release. Also computed values can now better handle creating new observables (in an action if needed). The semantics are now as follows:
+
+* In strict mode, it is not allowed to modify state that is already being _observed_ by some reaction.
+* It is allowed to create and modify observable values in computed blocks, as long as they are not _observed_ yet.
+
+In order words: Observables that are not in use anywhere yet, are not protected by MobX strict mode.
+This is fine as the main goal of strict mode is to avoid kicking of reactions at undesired places.
+Also strict mode enforces batched mutations of observables (through action).
+However, for unobserved observables this is not relevant; they won't kick of reactions at all.
+
+This fixes some uses cases where one now have to jump through hoops like:
+* Creating observables in computed properties was fine already, but threw if this was done with the aid of an action. See issue [#798](https://github.com/mobxjs/mobx/issues/798).
+* In strict mode, it was not possible to _update_ observable values without wrapping the code in `runInAction` or `action`. See issue [#563](https://github.com/mobxjs/mobx/issues/563)
+
+Note that the following constructions are still anti patterns, although MobX won't throw anymore on them:
+* Changing unobserved, but not just created observables in a computed value
+* Invoke actions in computed values. Use reactions like `autorun` or `reaction` instead.
+
+Note that observables that are not in use by a reaction, but that have `.observe` listeners attached, do *not* count towards being observed.
+Observe and intercept callbacks are concepts that do not relate to strict mode, actions or transactions.
+
+### Other changes
+
+* Reactions and observable values now consider `NaN === NaN`, See #805 by @andykog
+* Merged #783: extract error messages to seperate file, so that they can be optimized in production builds (not yet done), by @reisel, #GoodnessSquad
+* Improved typings of actions, see #796 by @mattiamanzati
+
 # 3.0.2
 
 * Fixed issue where MobX failed on environments where `Map` is not defined, #779 by @dirtyrolf

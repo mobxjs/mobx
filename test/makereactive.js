@@ -67,6 +67,16 @@ test('isObservable', function(t) {
     t.end();
 })
 
+test('isBoxedObservable', function(t) {
+	t.equal(m.isBoxedObservable(m.observable({})), false);
+	t.equal(m.isBoxedObservable(m.computed(() => 3)), false);
+	t.equal(m.isBoxedObservable(m.observable(3)), true);
+	t.equal(m.isBoxedObservable(m.observable.box(3)), true);
+	t.equal(m.isBoxedObservable(m.observable.box({})), true);
+	t.equal(m.isBoxedObservable(m.observable.shallowBox({})), true);
+	t.end()
+})
+
 test('observable1', function(t) {
     m.extras.resetGlobalState();
 

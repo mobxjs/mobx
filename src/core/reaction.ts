@@ -3,6 +3,8 @@ import {IObservable, startBatch, endBatch} from "./observable";
 import {globalState} from "./globalstate";
 import {createInstanceofPredicate, getNextId, invariant, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
+import {getMessage} from "../utils/messages";
+
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations
@@ -124,28 +126,8 @@ export class Reaction implements IDerivation, IReactionPublic {
 			return;
 		}
 
-		const message = `[mobx] Catched uncaught exception that was thrown by a reaction or observer component, in: '${this}`;
-		const messageToUser = `
-		Hi there! I'm sorry you have just run into an exception.
-
-		If your debugger ends up here, know that some reaction (like the render() of an observer component, autorun or reaction)
-		threw an exception and that mobx catched it, too avoid that it brings the rest of your application down.
-
-		The original cause of the exception (the code that caused this reaction to run (again)), is still in the stack.
-
-		However, more interesting is the actual stack trace of the error itself.
-		Hopefully the error is an instanceof Error, because in that case you can inspect the original stack of the error from where it was thrown.
-		See \`error.stack\` property, or press the very subtle "(...)" link you see near the console.error message that probably brought you here.
-		That stack is more interesting than the stack of this console.error itself.
-
-		If the exception you see is an exception you created yourself, make sure to use \`throw new Error("Oops")\` instead of \`throw "Oops"\`,
-		because the javascript environment will only preserve the original stack trace in the first form.
-
-		You can also make sure the debugger pauses the next time this very same exception is thrown by enabling "Pause on caught exception".
-		(Note that it might pause on many other, unrelated exception as well).
-
-		If that all doesn't help you out, feel free to open an issue https://github.com/mobxjs/mobx/issues!
-		`;
+		const message = `[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: '${this}`;
+		const messageToUser = getMessage("m037");
 
 		console.error(message || messageToUser /* latter will not be true, make sure uglify doesn't remove */, error);
 			/** If debugging brough you here, please, read the above message :-). Tnx! */
@@ -193,9 +175,7 @@ WhyRun? reaction '${this.name}':
  * This reaction will re-run if any of the following observables changes:
     ${joinStrings(observing)}
     ${(this._isRunning) ? " (... or any observable accessed during the remainder of the current run)" : ""}
-	Missing items in this list?
-	  1. Check whether all used values are properly marked as observable (use isObservable to verify)
-	  2. Make sure you didn't dereference values too early. MobX observes props, not primitives. E.g: use 'person.name' instead of 'name' in your computation.
+	${getMessage("m038")}
 `
 		);
 	}
@@ -226,7 +206,7 @@ const MAX_REACTION_ITERATIONS = 100;
 let reactionScheduler: (fn: () => void) => void = f => f();
 
 export function runReactions() {
-	// Trampoling, if runReactions are already running, new reactions will be picked up
+	// Trampolining, if runReactions are already running, new reactions will be picked up
 	if (globalState.inBatch > 0 || globalState.isRunningReactions)
 		return;
 	reactionScheduler(runReactionsHelper);
@@ -242,9 +222,9 @@ function runReactionsHelper() {
 	// we converge to no remaining reactions after a while.
 	while (allReactions.length > 0) {
 		if (++iterations === MAX_REACTION_ITERATIONS) {
-			allReactions.splice(0); // clear reactions
 			console.error(`Reaction doesn't converge to a stable state after ${MAX_REACTION_ITERATIONS} iterations.`
 				+ ` Probably there is a cycle in the reactive function: ${allReactions[0]}`);
+			allReactions.splice(0); // clear reactions
 		}
 		let remainingReactions = allReactions.splice(0);
 		for (let i = 0, l = remainingReactions.length; i < l; i++)

@@ -23,7 +23,7 @@ export { IAtom, Atom, BaseAtom                                } from "./core/ato
 export { IObservable, IDepTreeNode                            } from "./core/observable";
 export { Reaction, IReactionPublic, IReactionDisposer         } from "./core/reaction";
 export { IDerivation, untracked, IDerivationState             } from "./core/derivation";
-export { useStrict, isStrictModeEnabled                       } from "./core/action";
+export { useStrict, isStrictModeEnabled, IAction              } from "./core/action";
 export { spy                                                  } from "./core/spy";
 export { IComputedValue                                       } from "./core/computedvalue";
 
@@ -33,9 +33,9 @@ export { IInterceptable, IInterceptor                         } from "./types/in
 export { IListenable                                          } from "./types/listen-utils";
 export { IObjectWillChange, IObjectChange, IObservableObject, isObservableObject } from "./types/observableobject";
 
-export { IValueDidChange, IValueWillChange, IObservableValue } from "./types/observablevalue";
+export { IValueDidChange, IValueWillChange, IObservableValue, isObservableValue as isBoxedObservable } from "./types/observablevalue";
 export { IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, isObservableArray } from "./types/observablearray";
-export { IKeyValueMap, ObservableMap, IMapEntries, IMapEntry, IMapWillChange, IMapChange, isObservableMap, map, IObservableMapInitialValues, IMap } from "./types/observablemap";
+export { IKeyValueMap, ObservableMap, IMapEntries, IMapEntry, IMapWillChange, IMapChange, IMapChangeUpdate, IMapChangeAdd, IMapChangeBase, IMapChangeDelete, isObservableMap, map, IObservableMapInitialValues, IMap } from "./types/observablemap";
 
 export { transaction                                          } from "./api/transaction";
 export { observable, IObservableFactory, IObservableFactories } from "./api/observable";
@@ -93,3 +93,6 @@ declare var module: { exports: any };
 if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
 	__MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx(module.exports)
 }
+
+// TODO: remove in 4.0, temporarily incompatibility fix for mobx-react@4.1.0 which accidentally uses default exports
+module.exports.default = module.exports;

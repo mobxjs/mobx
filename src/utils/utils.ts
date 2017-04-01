@@ -49,7 +49,7 @@ export function once(func: Lambda): Lambda {
 		if (invoked)
 			return;
 		invoked = true;
-		return func.apply(this, arguments);
+		return (func as any).apply(this, arguments);
 	};
 }
 
@@ -95,6 +95,9 @@ export function objectAssign() {
 }
 
 export function valueDidChange(compareStructural: boolean, oldValue, newValue): boolean {
+	if (typeof oldValue === 'number' && isNaN(oldValue)) {
+		return typeof newValue !== 'number' || !isNaN(newValue);
+	}
 	return compareStructural
 		? !deepEqual(oldValue, newValue)
 		: oldValue !== newValue;

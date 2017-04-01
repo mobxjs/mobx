@@ -22,6 +22,11 @@ export class MobXGlobals {
 	trackingDerivation: IDerivation | null = null;
 
 	/**
+	 * Are we running a computation currently? (not a reaction)
+	 */
+	computationDepth = 0;
+
+	/**
 	 * Each time a derivation is tracked, it is assigned a unique run-id
 	 */
 	runId = 0;

@@ -161,7 +161,7 @@ test("spy error", t => {
 		{ name: 'x', newValue: 3, oldValue: 2, spyReportStart: true, type: 'update' },
 			{ type: 'compute' },
 			{ spyReportStart: true, type: 'reaction' },
-				{ error: 'Oops', message: '[mobx] Catched uncaught exception that was thrown by a reaction or observer component, in: \'Reaction[autorun]', type: 'error' },
+				{ error: 'Oops', message: '[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: \'Reaction[autorun]', type: 'error' },
 			{ spyReportEnd: true },
 		{ spyReportEnd: true }
 	]);

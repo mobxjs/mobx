@@ -1,8 +1,8 @@
 import {
     observable, computed, transaction, autorun, extendObservable, action,
-	isObservableObject, observe, isObservable, spy, isAction,
-    default as mobx
+	isObservableObject, observe, isObservable, spy, isAction, useStrict
 } from "../";
+import * as mobx from "../"
 
 var test = require('tape')
 
@@ -334,13 +334,13 @@ test("custom action decorator on field (babel)", function(t) {
 });
 
 test("267 (babel) should be possible to declare properties observable outside strict mode", t => {
-	mobx.useStrict(true);
+	useStrict(true);
 
 	class Store {
 		@observable timer;
 	}
 
-	mobx.useStrict(false);
+	useStrict(false);
 	t.end();
 })
 

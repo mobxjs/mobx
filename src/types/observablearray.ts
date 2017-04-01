@@ -7,6 +7,8 @@ import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {arrayAsIterator, declareIterator} from "../utils/iterable";
 import {IEnhancer} from "../types/modifiers";
 
+const MAX_SPLICE_SIZE = 10000; // See e.g. https://github.com/mobxjs/mobx/issues/859
+
 // Detects bug in safari 9.1.1 (or iOS 9 safari mobile). See #364
 const safariPrototypeSetterInheritanceBug = (() => {
 	let v = false;
@@ -19,7 +21,8 @@ const safariPrototypeSetterInheritanceBug = (() => {
 export interface IObservableArray<T> extends Array<T> {
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[];
 	observe(listener: (changeData: IArrayChange<T>|IArraySplice<T>) => void, fireImmediately?: boolean): Lambda;
-	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda;
+	intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda;
+	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda; // TODO: remove in 4.0
 	clear(): T[];
 	peek(): T[];
 	replace(newItems: T[]): T[];
@@ -88,7 +91,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 		this.enhancer = (newV, oldV) => enhancer(newV, oldV, name + "[..]");
 	}
 
-	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
+	intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
 		return registerInterceptor<IArrayChange<T>|IArraySplice<T>>(this, handler);
 	}
 
@@ -118,8 +121,12 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 		let currentLength = this.values.length;
 		if (newLength === currentLength)
 			return;
-		else if (newLength > currentLength)
-			this.spliceWithArray(currentLength, 0, new Array(newLength - currentLength));
+		else if (newLength > currentLength) {
+			const newItems = new Array(newLength - currentLength);
+			for (let i = 0; i < newLength - currentLength; i++)
+				newItems[i] = undefined; // No Array.fill everywhere...
+			this.spliceWithArray(currentLength, 0, newItems);
+		}
 		else
 			this.spliceWithArray(newLength, currentLength - newLength);
 	}
@@ -134,7 +141,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 	}
 
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[] {
-		checkIfStateModificationsAreAllowed();
+		checkIfStateModificationsAreAllowed(this.atom);
 		const length = this.values.length;
 
 		if (index === undefined)
@@ -171,11 +178,21 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 		newItems = <T[]> newItems.map(v => this.enhancer(v, undefined));
 		const lengthDelta = newItems.length - deleteCount;
 		this.updateArrayLength(length, lengthDelta); // create or remove new entries
-		const res: T[] = this.values.splice(index, deleteCount, ...newItems); // FIXME: splat might exceed callstack size!
+		const res = this.spliceItemsIntoValues(index, deleteCount, newItems);
 
 		if (deleteCount !== 0 || newItems.length !== 0)
 			this.notifyArraySplice(index, newItems, res);
 		return res;
+	}
+
+	spliceItemsIntoValues(index, deleteCount, newItems: T[]): T[] {
+		if (newItems.length < MAX_SPLICE_SIZE) {
+			return this.values.splice(index, deleteCount, ...newItems);
+		} else {
+			const res = this.values.slice(index, index + deleteCount)
+			this.values = this.values.slice(0, index).concat(newItems, this.values.slice(index + deleteCount ))
+			return res;
+		}
 	}
 
 	notifyArrayChildUpdate<T>(index: number, newValue: T, oldValue: T) {
@@ -242,7 +259,7 @@ export class ObservableArray<T> extends StubArray {
 		}
 	}
 
-	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
+	intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
 		return this.$mobx.intercept(handler);
 	}
 
@@ -307,6 +324,11 @@ export class ObservableArray<T> extends StubArray {
 		}
 		return this.$mobx.spliceWithArray(index, deleteCount, newItems);
 	}
+
+	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[] {
+		return this.$mobx.spliceWithArray(index, deleteCount, newItems);
+	}
+
 
 	push(...items: T[]): number {
 		const adm = this.$mobx;
@@ -409,6 +431,7 @@ makeNonEnumerable(ObservableArray.prototype, [
 	"peek",
 	"find",
 	"splice",
+	"spliceWithArray",
 	"push",
 	"pop",
 	"shift",
@@ -481,7 +504,7 @@ function createArraySetter(index: number) {
 		const values = adm.values;
 		if (index < values.length) {
 			// update at index in range
-			checkIfStateModificationsAreAllowed();
+			checkIfStateModificationsAreAllowed(adm.atom);
 			const oldValue = values[index];
 			if (hasInterceptors(adm)) {
 				const change = interceptChange<IArrayWillChange<T>>(adm as any, {

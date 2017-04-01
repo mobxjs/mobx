@@ -1,6 +1,7 @@
 const test = require("tape")
-const mobx1 = require("../")
-const mobx2 = require("../lib/mobx.umd.min.js")
+const mobx1 = require("../../")
+/* istanbul ignore next */
+const mobx2 = require("../../lib/mobx.umd.min.js")
 
 test("two versions should not work together if state is not shared", (t) => {
 	const a = mobx1.observable({

@@ -1,6 +1,5 @@
 import {IEnhancer, deepEnhancer} from "./modifiers";
 import {untracked} from "../core/derivation";
-import {allowStateChanges} from "../core/action";
 import {IObservableArray, ObservableArray} from "./observablearray";
 import {ObservableValue, UNCHANGED} from "./observablevalue";
 import {createInstanceofPredicate, isPlainObject, getNextId, Lambda, invariant, deprecated, isES6Map, fail} from "../utils/utils";
@@ -11,6 +10,8 @@ import {arrayAsIterator, declareIterator, Iterator} from "../utils/iterable";
 import {observable} from "../api/observable";
 import {runInTransaction} from "../api/transaction";
 import {referenceEnhancer} from "./modifiers";
+import {getMessage} from "../utils/messages";
+
 
 /**
  * Map as defined by Typescript's lib.es2015.collection.d.ts
@@ -44,19 +45,34 @@ export type IMapEntry<K, V> = [K, V];
 export type IMapEntries<K, V> = IMapEntry<K, V>[];
 
 // In 3.0, change to IObjectMapChange
-export interface IMapChange<K, T> {
+export type IMapChange<K, T> = IMapChangeUpdate<K, T> | IMapChangeAdd<K, T> | IMapChangeDelete<K, T>;
+
+export interface IMapChangeBase<K, T> {
 	object: ObservableMap<K, T>;
-	type: "update" | "add" | "delete";
 	name: string;
-	newValue?: any;
-	oldValue?: any;
+}
+
+export interface IMapChangeUpdate<K, T> extends IMapChangeBase<K, T> {
+	type: "update";
+	newValue: T;
+	oldValue: T;
+}
+
+export interface IMapChangeAdd<K, T> extends IMapChangeBase<K, T> {
+	type: "add";
+	newValue: T;
+}
+
+export interface IMapChangeDelete<K, T>  extends IMapChangeBase<K, T> {
+	type: "delete";
+	oldValue: T;
 }
 
 export interface IMapWillChange<K, T> {
 	object: ObservableMap<K, T>;
 	type: "update" | "add" | "delete";
 	name: string;
-	newValue?: any;
+	newValue?: T;
 }
 
 const ObservableMapMarker = {};
@@ -80,9 +96,7 @@ export class ObservableMap<K, V> implements IInterceptable<IMapWillChange<K, V>>
 		}
 		this._data = new Map();
 		this._hasMap = new Map();
-		allowStateChanges(true, () => {
-			this.merge(initialData);
-		});
+		this.merge(initialData);
 	}
 
 	private _has(key: K): boolean {
@@ -106,7 +120,7 @@ export class ObservableMap<K, V> implements IInterceptable<IMapWillChange<K, V>>
 			});
 			if (!change)
 				return this;
-			value = change.newValue;
+			value = change.newValue!;
 		}
 		if (hasKey) {
 			this._updateValue(key, value);
@@ -314,7 +328,7 @@ export class ObservableMap<K, V> implements IInterceptable<IMapWillChange<K, V>>
 	 * for callback details
 	 */
 	observe(listener: (changes: IMapChange<K, V>) => void, fireImmediately?: boolean): Lambda {
-		invariant(fireImmediately !== true, "`observe` doesn't support the fire immediately property for observable maps.");
+		invariant(fireImmediately !== true, getMessage("m033"));
 		return registerListener(this, listener);
 	}
 

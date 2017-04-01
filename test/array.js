@@ -54,7 +54,7 @@ test('test1', function(t) {
     t.equal(sum.get(), 2);
     t.deepEqual(a.slice(), [2])
 
-    a.splice(0,0,4,3);
+	a.spliceWithArray(0,0, [4,3]);
     t.equal(sum.get(), 9);
     t.deepEqual(a.slice(), [4,3,2]);
 
@@ -268,8 +268,7 @@ test('is array', function(t) {
     var x = mobx.observable([]);
     t.equal(x instanceof Array, true);
 
-    // would be cool if these two would return true...
-    t.equal(typeof x === "array", false);
+    // would be cool if this would return true...
     t.equal(Array.isArray(x), false);
     t.end();
 })
@@ -452,4 +451,19 @@ test("accessing out of bound values throws", t => {
 
 	console.warn = baseWarn;
 	t.end();
+})
+
+test("replace can handle large arrays", t => {
+	const a = mobx.observable([])
+	const b = []
+	b.length = 1000*1000
+	t.doesNotThrow(() => {
+		a.replace(b)
+	})
+
+	t.doesNotThrow(() => {
+		a.spliceWithArray(0, 0, b)
+	})
+
+	t.end()
 })
