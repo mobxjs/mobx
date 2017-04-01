@@ -7,6 +7,7 @@ notes.md
 lib
 test/babel-tests.js
 test/typescript/typescript-tests.js
+test/perf/perf.txt
 .vscode
 dist/
 .build/
