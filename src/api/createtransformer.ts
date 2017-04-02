@@ -45,8 +45,10 @@ export function createTransformer<A, B>(transformer: ITransformer<A, B>, onClean
 }
 
 function getMemoizationId(object) {
+	if(typeof object === 'string' || typeof object === 'number')
+		return object
 	if (object === null  || typeof object !== "object")
-		throw new Error("[mobx] transform expected some kind of object, got: " + object);
+		throw new Error("[mobx] transform expected some kind of object or primitive value, got: " + object);
 	let tid = object.$transformId;
 	if (tid === undefined) {
 		tid = getNextId();
