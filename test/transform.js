@@ -1018,10 +1018,6 @@ test('transform with primitive key', function(t) {
 		});
 	}
 
-	var _state = m.createTransformer( function(key) {
-		return m.observable([]);
-	});
-
 	var observableBobs = m.observable([]);
 	var bobs = [];
 
@@ -1035,7 +1031,6 @@ test('transform with primitive key', function(t) {
 		});
 	});
 
-	var b = m.observable({name: 'Bob1'});
 	observableBobs.push('Bob1');
 	observableBobs.push('Bob1');
 	t.equal(bobs[0].name, bobs[1].name);
@@ -1043,6 +1038,16 @@ test('transform with primitive key', function(t) {
 	observableBobs.clear();
 	observableBobs.push('Bob1');
 	observableBobs.push('Bob2');
+	t.notEqual(bobs[0].name, bobs[1].name);
+
+	observableBobs.clear();
+	observableBobs.push(1);
+	observableBobs.push(1);
+	t.equal(bobs[0].name, bobs[1].name);
+
+	observableBobs.clear();
+	observableBobs.push(1);
+	observableBobs.push(2);
 	t.notEqual(bobs[0].name, bobs[1].name);
 
 	t.end();
