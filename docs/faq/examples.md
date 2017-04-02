@@ -15,7 +15,7 @@
 * [TodoMVC application, including Server Side Rendering](https://github.com/mobxjs/mobx-react-todomvc)
 * [Contact list application (simple data fetching, routing, complex components, material UI)](https://github.com/mobxjs/mobx-contacts-list)
 * [Logpipe](https://github.com/jeffijoe/logpipe-server), a dev-logging app using MobX with Socket.IO for **real-time updates**
-* [Example with Server Side Rendering, react-router](https://github.com/kuuup/mobx-ssr-example)
+* [Example with Server Side Rendering](https://github.com/kuuup/mobx-ssr-example)
 * [Server Side Api Mocking made easy with UI](https://github.com/Raathigesh/Atmo)
 * Accounting System built in ASP.NET MVC, ReactJS, MobX [Demo](http://www.accountgo.ph/) [Source](https://github.com/AccountGo/accountgo)
 * [Easy MobX example with React, MobX, Cosmic JS, shorti](https://github.com/tonyspiro/easy-mobx-example)
