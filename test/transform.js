@@ -1004,3 +1004,47 @@ test('transform tree (dynamic tags - peek / rebuild)', function(t) {
 
 	t.end();
 });
+
+// https://github.com/mobxjs/mobx/issues/886
+test('transform with primitive key', function(t) {
+	m.extras.resetGlobalState();
+
+	function Bob() {
+		this.num = Math.floor(Math.random() * 1000);
+		m.extendObservable(this, {
+			get name() {
+				return 'Bob' + this.num;
+			}
+		});
+	}
+
+	var _state = m.createTransformer( function(key) {
+		return m.observable([]);
+	});
+
+	var observableBobs = m.observable([]);
+	var bobs = [];
+
+	var bobFactory = m.createTransformer(function(key) {
+		return new Bob();
+	});
+
+	m.autorun(function() {
+		bobs = observableBobs.map(function(bob) {
+			return bobFactory(bob);
+		});
+	});
+
+	var b = m.observable({name: 'Bob1'});
+	observableBobs.push('Bob1');
+	observableBobs.push('Bob1');
+	t.equal(bobs[0].name, bobs[1].name);
+
+	observableBobs.clear();
+	observableBobs.push('Bob1');
+	observableBobs.push('Bob2');
+	t.notEqual(bobs[0].name, bobs[1].name);
+
+	t.end();
+});
+
