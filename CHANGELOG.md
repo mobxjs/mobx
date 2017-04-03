@@ -5,6 +5,7 @@
 # 3.1.8
 
 * Fixed edge case where `autorun` was not triggered again if a computed value was invalidated by the reaction itself, see [#916](https://github.com/mobxjs/mobx/issues/916), by @andykog
+* Added support for primtive keys in `createTransformer`, See #920 by @dnakov
 * Improved typings of `isArrayLike`, see #904, by @mohsen1
 
 # 3.1.7
