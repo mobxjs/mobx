@@ -63,6 +63,7 @@ test('correct api should be exposed', function(t) {
 			'isComputingDerivation',
 			'isSpyEnabled',
 			'onReactionError',
+			'reserveArrayBuffer',
 			'resetGlobalState',
 			'setReactionScheduler',
 			'shareGlobalState',

@@ -1,3 +1,7 @@
+# 3.1.9
+
+* Introduced explicit `.get(index)` and `.set(index, value)` methods on observable arrays, for issues that have trouble handling many property descriptors on objects. See also #574
+
 # 3.1.8
 
 * Fixed edge case where `autorun` was not triggered again if a computed value was invalidated by the reaction itself, see [#916](https://github.com/mobxjs/mobx/issues/916), by @andykog
