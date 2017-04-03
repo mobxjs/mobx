@@ -1,3 +1,7 @@
+# 3.1.8
+
+* Fixed edge case where `autorun` was not triggered again if a computed value was invalidated by the reaction itself, see [#916](https://github.com/mobxjs/mobx/issues/916)
+
 # 3.1.7
 
 * Reverted ES2015 module changes, as they broke with webpack 2 (will be re-released later)
