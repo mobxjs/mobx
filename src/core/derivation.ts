@@ -163,8 +163,11 @@ function bindDependencies(derivation: IDerivation) {
 			if (i0 !== i) observing[i0] = dep;
 			i0++;
 		}
-		if (dep['dependenciesState'] > lowestNewObservingDerivationState) {
-			lowestNewObservingDerivationState = dep['dependenciesState'];
+
+		// Upcast is 'safe' here, because if dep is IObservable, `dependenciesState` will be undefined,
+		// not hitting the condition
+		if ((dep as any as IDerivation).dependenciesState > lowestNewObservingDerivationState) {
+			lowestNewObservingDerivationState = (dep as any as IDerivation).dependenciesState;
 		}
 	}
 	observing.length = i0;
