@@ -11,10 +11,6 @@ class OrderLine {
     @observable price = 0;
     @observable amount = 1;
 
-    constructor(price) {
-        this.price = price;
-    }
-
     @computed get total() {
         return this.price * this.amount;
     }
@@ -24,13 +20,16 @@ class OrderLine {
 If your environment doesn't support decorators or field initializers,
 `@observable key = value;` is sugar for [`extendObservable(this, { key: value })`](extend-observable.md)
 
-Enumerability: properties decorator with `@observable` are enumerable, but defined on the class prototype and not on the class instances.
+Note: all the properties are being defined lazily as soon as any of them is accessed. Before that they are only defined on the class prototype  
+
 In other words:
 
 ```javascript
 const line = new OrderLine();
 console.log("price" in line); // true
 console.log(line.hasOwnProperty("price")); // false, the price _property_ is defined on the class, although the value will be stored per instance.
+line.amount = 2;
+console.log(line.hasOwnProperty("price")); // true, now all the properties are defined on the instance 
 ```
 
 The `@observable` decorator can be combined with modifiers like `asStructure`:
