@@ -21,7 +21,7 @@ _Simple, scalable state management_
 
 ## Translations
 
-* [中文](https://github.com/SangKa/mobx-docs-cn)
+* [中文](http://cn.mobx.js.org)
 
 ## Getting started
 
