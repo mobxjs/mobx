@@ -106,4 +106,4 @@ const ticker = observable({
 setInterval(ticker.increment, 1000)
 ```
 
-_Note: don't use *action.bind* with arrow functions; arrow functions are already bound and cannot be rebound._
+_Note: don't use *action.bound* with arrow functions; arrow functions are already bound and cannot be rebound._
