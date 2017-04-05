@@ -304,7 +304,7 @@ declare module 'mobx' {
   declare function runInAction<T>(name: string, block: () => T, scope?: any): T;
   declare function isAction(thing: any): boolean;
   declare function autorun(nameOrFunction: string | (r: IReactionPublic) => void, viewOrScope?: any, scope?: any): any;
-  declare function when(nameOrPredicate: string | () => boolean, effect: Lambda, scope?: any): any
+  declare function when(nameOrFunction: string | () => boolean, effect: Lambda, scope?: any): any
   declare function autorunAsync(func: (r: IReactionPublic) => void, delay?: number, scope?: any): any
   declare function reaction<T>(
     expression: (r: IReactionPublic) => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately?: boolean, delay?: number, scope?: any
