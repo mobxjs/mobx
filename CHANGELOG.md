@@ -1,3 +1,7 @@
+# 3.1.10
+
+* Fixed typings of `action.bound`, see #803
+
 # 3.1.9
 
 * Introduced explicit `.get(index)` and `.set(index, value)` methods on observable arrays, for issues that have trouble handling many property descriptors on objects. See also #734

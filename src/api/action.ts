@@ -38,6 +38,10 @@ export interface IActionFactory {
 	bound<A1, A2, A3, A4, A5, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => R>(fn: T): T & IAction;
 	bound<A1, A2, A3, A4, A5, A6, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4, a6: A6) => R>(fn: T): T & IAction;
 
+	// generic forms
+	bound<T extends Function>(fn: T): T & IAction;
+	bound<T extends Function>(name: string, fn: T): T & IAction;
+
 	// .bound decorator
 	bound(target: Object, propertyKey: string, descriptor?: PropertyDescriptor): void;
 }
