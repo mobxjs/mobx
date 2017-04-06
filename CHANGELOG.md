@@ -1,6 +1,7 @@
 # 3.1.9
 
 * Introduced explicit `.get(index)` and `.set(index, value)` methods on observable arrays, for issues that have trouble handling many property descriptors on objects. See also #574
+* Made sure it is safe to call `onBecomeObserved` twice in row, fixes #874, #898
 
 # 3.1.8
 

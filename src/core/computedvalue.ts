@@ -73,7 +73,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	}
 
 	onBecomeUnobserved() {
-		invariant(this.dependenciesState !== IDerivationState.NOT_TRACKING, getMessage("m029"));
 		clearObserving(this);
 		this.value = undefined;
 	}

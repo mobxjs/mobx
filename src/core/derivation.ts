@@ -206,12 +206,12 @@ function bindDependencies(derivation: IDerivation) {
 export function clearObserving(derivation: IDerivation) {
 	// invariant(globalState.inBatch > 0, "INTERNAL ERROR clearObserving should be called only inside batch");
 	const obs = derivation.observing;
+	derivation.observing = [];
 	let i = obs.length;
 	while (i--)
 		removeObserver(obs[i], derivation);
 
 	derivation.dependenciesState = IDerivationState.NOT_TRACKING;
-	obs.length = 0;
 }
 
 export function untracked<T>(action: () => T): T {
