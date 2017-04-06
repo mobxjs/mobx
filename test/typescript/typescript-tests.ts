@@ -1099,3 +1099,23 @@ test("action.bound binds (TS)", t=> {
 
 	t.end();
 })
+
+test("803 - action.bound and action preserve type info", t => {
+	function thingThatAcceptsCallback(cb: (elem: { x: boolean }) => void) {
+
+	}
+
+	thingThatAcceptsCallback((elem) => {
+		console.log(elem.x) // x is boolean
+	})
+
+	thingThatAcceptsCallback(action((elem: any) => { // TODO: ideally, type of action would be inferred!
+		console.log(elem.x) // x is boolean
+	}))
+
+	const bound = action.bound(() => {
+		return { x: "3"} as Object
+	}) as () => void
+
+	const bound2 = action.bound(function () {}) as (() => void)
+})

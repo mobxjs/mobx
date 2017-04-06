@@ -1,6 +1,12 @@
+# 3.1.10
+
+* Fixed typings of `action.bound`, see #803
+
 # 3.1.9
 
-* Introduced explicit `.get(index)` and `.set(index, value)` methods on observable arrays, for issues that have trouble handling many property descriptors on objects. See also #574
+* Introduced explicit `.get(index)` and `.set(index, value)` methods on observable arrays, for issues that have trouble handling many property descriptors on objects. See also #734
+* Made sure it is safe to call `onBecomeObserved` twice in row, fixes #874, #898
+* Fixed typings of `IReactionDisposer`
 
 # 3.1.8
 
