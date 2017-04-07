@@ -1118,4 +1118,5 @@ test("803 - action.bound and action preserve type info", t => {
 	}) as () => void
 
 	const bound2 = action.bound(function () {}) as (() => void)
+	t.end()
 })
