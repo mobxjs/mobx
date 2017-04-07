@@ -27,6 +27,7 @@
 * [How to decouple state and UI (a.k.a. you don’t need componentWillMount) - data fetching, authentication, routing and testing](https://medium.com/@mweststrate/how-to-decouple-state-and-ui-a-k-a-you-dont-need-componentwillmount-cc90b787aa37#.7zvpxt746)
 * [Getting Started ReactJS with MobX](https://codequs.com/p/HyTu8aIK/getting-started-reactjs-with-mobx/)
 * [Redux vs. MobX by example — Part II: The Simplicity of MobX & Conclusion](https://hashnode.com/post/redux-vs-mobx-by-example-part-ii-the-simplicity-of-mobx-and-conclusion-citpp2tbu003za853ua1tx228) - A two part tutorial, comparing Redux and MobX, by implementing them in a simple ES6 + React todo app.
+* [Using Mobx + Firebase to build a Twitter Clone](https://appendto.com/2017/03/mobx-firebase-create-a-twitter-clone-with-simple-state-management-database/) - Tutorial shows how to build a simple Twitter clone with syncing to Firebase. Useful for working with Mobx + Firebase.
 
 ## Articles / blogs explaining the inner working of MobX:
 
