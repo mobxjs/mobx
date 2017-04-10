@@ -343,7 +343,7 @@ It is recommended to use `action` instead, which uses `transaction` internally.
 ### `untracked`
 Usage: `untracked(() => { block })`.
 Low-level api that might be useful inside reactions and computations.
-Any observables accessed in the `block` won't cause the reaction / compuations to be recomputed automatically.
+Any observables accessed in the `block` won't cause the reaction / computations to be recomputed automatically.
 However it is recommended to use `action` instead, which uses `untracked` internally.
 [&laquo;details&raquo;](untracked.md)
 
