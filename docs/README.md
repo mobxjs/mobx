@@ -12,6 +12,10 @@ _Simple, scalable state management_
 * Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`. To enable ESNext decorators (optional), see below.
 * CDN: https://unpkg.com/mobx/lib/mobx.umd.js
 
+## Translations
+
+* [中文](http://cn.mobx.js.org)
+
 ## Getting started
 
 * [Ten minute, interactive MobX + React tutorial](https://mobxjs.github.io/mobx/getting-started.html)
