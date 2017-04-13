@@ -65,11 +65,13 @@ test('correct api should be exposed', function(t) {
 			'onReactionError',
 			'reserveArrayBuffer',
 			'resetGlobalState',
+      'resume',
 			'setReactionScheduler',
 			'shareGlobalState',
 			'spyReport',
 			'spyReportEnd',
-			'spyReportStart'
+		  'spyReportStart',
+      'suspend'
 	]);
 	t.equals(Object.keys(mobx.extras).filter(function(key) {
 		return mobx.extras[key] == undefined;

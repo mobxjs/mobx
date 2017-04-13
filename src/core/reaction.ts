@@ -212,7 +212,20 @@ export function runReactions() {
 	reactionScheduler(runReactionsHelper);
 }
 
+export function suspend() {
+  globalState.isSuspended = true;
+}
+
+export function resume() {
+  globalState.isSuspended = false;
+  runReactions();
+}
+
 function runReactionsHelper() {
+  if (globalState.isSuspended) {
+      return;
+  }
+
 	globalState.isRunningReactions = true;
 	const allReactions = globalState.pendingReactions;
 	let iterations = 0;
