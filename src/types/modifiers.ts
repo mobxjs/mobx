@@ -1,137 +1,103 @@
-import {isPlainObject, invariant, isObject} from "../utils/utils";
-import {isObservable} from "../api/isobservable";
-import {extendObservableHelper} from "../api/extendobservable";
-import {createObservableArray} from "../types/observablearray";
-import {map, ObservableMap, IMapEntries, IKeyValueMap} from "../types/observablemap";
-
-export enum ValueMode {
-	Recursive, // If the value is an plain object, it will be made reactive, and so will all its future children.
-	Reference, // Treat this value always as a reference, without any further processing.
-	Structure, // Similar to recursive. However, this structure can only exist of plain arrays and objects.
-				// No observers will be triggered if a new value is assigned (to a part of the tree) that deeply equals the old value.
-	Flat       // If the value is an plain object, it will be made reactive, and so will all its future children.
+export interface IEnhancer<T> {
+	(newValue: T, oldValue: T | undefined, name: string): T;
 }
 
-export interface IModifierWrapper {
-	mobxModifier: ValueMode;
-	value: any;
+export interface IModifierDescriptor<T> {
+	isMobxModifierDescriptor: boolean;
+	initialValue: T | undefined;
+	enhancer: IEnhancer<T>;
 }
 
-function withModifier(modifier: ValueMode, value: any): IModifierWrapper {
-	assertUnwrapped(value, "Modifiers are not allowed to be nested");
+export function isModifierDescriptor(thing): thing is IModifierDescriptor<any> {
+	return typeof thing === "object" && thing !== null && thing.isMobxModifierDescriptor === true;
+}
+
+export function createModifierDescriptor<T>(enhancer: IEnhancer<T>, initialValue: T): IModifierDescriptor<T> {
+	invariant(!isModifierDescriptor(initialValue), "Modifiers cannot be nested");
 	return {
-		mobxModifier: modifier,
-		value
+		isMobxModifierDescriptor: true,
+		initialValue,
+		enhancer
 	};
 }
 
-export function getModifier(value: any): ValueMode {
-	if (value) { // works for both objects and functions
-		return (value.mobxModifier as ValueMode) || null;
-	}
-	return null;
+export function deepEnhancer(v, _, name) {
+	if (isModifierDescriptor(v))
+		fail("You tried to assign a modifier wrapped value to a collection, please define modifiers when creating the collection, not when modifying it");
+
+	// it is an observable already, done
+	if (isObservable(v))
+		return v;
+
+	// something that can be converted and mutated?
+	if (Array.isArray(v))
+		return observable.array(v, name);
+	if (isPlainObject(v))
+		return observable.object(v, name);
+	if (isES6Map(v))
+		return observable.map(v, name);
+
+	return v;
 }
 
+export function shallowEnhancer(v, _, name): any {
+	if (isModifierDescriptor(v))
+		fail("You tried to assign a modifier wrapped value to a collection, please define modifiers when creating the collection, not when modifying it");
 
-/**
-	* Can be used in combination with makeReactive / extendReactive.
-	* Enforces that a reference to 'value' is stored as property,
-	* but that 'value' itself is not turned into something reactive.
-	* Future assignments to the same property will inherit this behavior.
-	* @param value initial value of the reactive property that is being defined.
-	*/
-export function asReference<T>(value: T): T {
-	// unsound typecast, but in combination with makeReactive, the end result should be of the correct type this way
-	// e.g: makeReactive({ x : asReference(number)}) -> { x : number }
-	return withModifier(ValueMode.Reference, value) as any as T;
-}
-(asReference as any).mobxModifier = ValueMode.Reference;
+	if (v === undefined || v === null)
+		return v;
+	if (isObservableObject(v) || isObservableArray(v) || isObservableMap(v))
+		return v;
+	if (Array.isArray(v))
+		return observable.shallowArray(v, name);
+	if (isPlainObject(v))
+		return observable.shallowObject(v, name);
+	if (isES6Map(v))
+		return observable.shallowMap(v, name);
 
-/**
-	* Can be used in combination with makeReactive / extendReactive.
-	* Enforces that values that are deeply equalled identical to the previous are considered to unchanged.
-	* (the default equality used by mobx is reference equality).
-	* Values that are still reference equal, but not deep equal, are considered to be changed.
-	* asStructure can only be used incombinations with arrays or objects.
-	* It does not support cyclic structures.
-	* Future assignments to the same property will inherit this behavior.
-	* @param value initial value of the reactive property that is being defined.
-	*/
-export function asStructure<T>(value: () => T): () => T;
-export function asStructure<T>(value: T): T;
-export function asStructure<T>(value) {
-	return withModifier(ValueMode.Structure, value) as any as T;
-}
-(asStructure as any).mobxModifier = ValueMode.Structure;
-
-/**
-	* Can be used in combination with makeReactive / extendReactive.
-	* The value will be made reactive, but, if the value is an object or array,
-	* children will not automatically be made reactive as well.
-	*/
-export function asFlat<T>(value: T): T {
-	return withModifier(ValueMode.Flat, value) as any as T;
-}
-(asFlat as any).mobxModifier = ValueMode.Flat;
-
-export function asMap(): ObservableMap<any>;
-export function asMap<T>(): ObservableMap<T>;
-export function asMap<T>(entries: IMapEntries<T>, modifierFunc?: Function): ObservableMap<T>;
-export function asMap<T>(data: IKeyValueMap<T>, modifierFunc?: Function): ObservableMap<T>;
-export function asMap(data?, modifierFunc?): ObservableMap<any> {
-	return map(data, modifierFunc);
+	return fail("The shallow modifier / decorator can only used in combination with arrays, objects and maps");
 }
 
-export function getValueModeFromValue(value: any, defaultMode: ValueMode): [ValueMode, any] {
-	const mode = getModifier(value);
-	if (mode)
-		return [mode, value.value];
-	return [defaultMode, value];
+export function referenceEnhancer(newValue?) {
+	// never turn into an observable
+	return newValue;
 }
 
-export function getValueModeFromModifierFunc(func?: Function): ValueMode {
-	if (func === undefined)
-		return ValueMode.Recursive;
-	const mod = getModifier(func);
-	invariant(mod !== null, "Cannot determine value mode from function. Please pass in one of these: mobx.asReference, mobx.asStructure or mobx.asFlat, got: " + func);
-	return mod;
-}
+export function deepStructEnhancer(v, oldValue, name): any {
+	// don't confuse structurally compare enhancer with ref enhancer! The latter is probably
+	// more suited for immutable objects
+	if (deepEqual(v, oldValue))
+		return oldValue;
 
-export function isModifierWrapper(value: any): value is IModifierWrapper {
-   return (<IModifierWrapper>value).mobxModifier !== undefined;
-}
+	// it is an observable already, done
+	if (isObservable(v))
+		return v;
 
-export function makeChildObservable(value, parentMode: ValueMode, name?: string) {
-	let childMode: ValueMode;
-	if (isObservable(value))
-		return value;
-
-	switch (parentMode) {
-		case ValueMode.Reference:
-			return value;
-		case ValueMode.Flat:
-			assertUnwrapped(value, "Items inside 'asFlat' cannot have modifiers");
-			childMode = ValueMode.Reference;
-			break;
-		case ValueMode.Structure:
-			assertUnwrapped(value, "Items inside 'asStructure' cannot have modifiers");
-			childMode = ValueMode.Structure;
-			break;
-		case ValueMode.Recursive:
-			[childMode, value] = getValueModeFromValue(value, ValueMode.Recursive);
-			break;
-		default:
-			invariant(false, "Illegal State");
+	// something that can be converted and mutated?
+	if (Array.isArray(v))
+		return new ObservableArray(v, deepStructEnhancer, name);
+	if (isES6Map(v))
+		return new ObservableMap(v, deepStructEnhancer, name);
+	if (isPlainObject(v)) {
+		const res = {};
+		asObservableObject(res, name);
+		extendObservableHelper(res, deepStructEnhancer, [v]);
+		return res;
 	}
 
-	if (Array.isArray(value))
-		return createObservableArray(value as any[], childMode, name);
-	if (isPlainObject(value) && Object.isExtensible(value))
-		return extendObservableHelper(value, value, childMode, name);
-	return value;
+	return v;
 }
 
-export function assertUnwrapped(value, message) {
-	if (getModifier(value) !== null)
-		throw new Error(`[mobx] asStructure / asReference / asFlat cannot be used here. ${message}`);
+export function refStructEnhancer(v, oldValue, name): any {
+	if (deepEqual(v, oldValue))
+		return oldValue;
+	return v;
 }
+
+import { isObservable } from "../api/isobservable";
+import { observable } from "../api/observable";
+import { extendObservableHelper } from "../api/extendobservable";
+import { fail, isPlainObject, invariant, isES6Map, deepEqual } from "../utils/utils";
+import { isObservableObject, asObservableObject } from "./observableobject";
+import { isObservableArray, ObservableArray } from "./observablearray";
+import { isObservableMap, ObservableMap } from "./observablemap";

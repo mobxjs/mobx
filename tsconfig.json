@@ -1,12 +1,20 @@
 {
-    "version": "1.7.5",
+    "version": "2.0.10",
     "compilerOptions": {
         "target": "es5",
         "outDir": "lib",
         "sourceMap": false,
         "declaration": true,
         "module": "commonjs",
-        "removeComments": false
+        "removeComments": false,
+		"strictNullChecks": true,
+		"noImplicitReturns": true,
+		"noImplicitUseStrict": true,
+		"noImplicitAny": false,
+		"lib": [
+			"es5",
+			"dom"
+		]
     },
     "exclude": [
         "node_modules",

@@ -1,22 +1,25 @@
 import {IObservable, reportObserved, propagateMaybeChanged, propagateChangeConfirmed, startBatch, endBatch, getObservers} from "./observable";
-import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, untrackedStart, untrackedEnd, shouldCompute, handleExceptionInDerivation} from "./derivation";
+import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, untrackedStart, untrackedEnd, shouldCompute, CaughtException, isCaughtException} from "./derivation";
 import {globalState} from "./globalstate";
-import {allowStateChangesStart, allowStateChangesEnd, createAction} from "./action";
-import {createInstanceofPredicate, getNextId, valueDidChange, invariant, Lambda, unique, joinStrings} from "../utils/utils";
+import {createAction} from "./action";
+import {createInstanceofPredicate, getNextId, valueDidChange, invariant, Lambda, unique, joinStrings, primitiveSymbol, toPrimitive} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "../core/spy";
 import {autorun} from "../api/autorun";
+import {IValueDidChange} from "../types/observablevalue";
+import {getMessage} from "../utils/messages";
+
 
 export interface IComputedValue<T> {
 	get(): T;
 	set(value: T): void;
-	observe(listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
+	observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda;
 }
 
 /**
  * A node in the state dependency root that observes other nodes, and can be observed itself.
  *
  * ComputedValue will remember result of the computation for duration of a batch, or being observed
- * During this time it will recompute only when one of it's direct dependencies changed,
+ * During this time it will recompute only when one of its direct dependencies changed,
  * but only when it is being accessed with `ComputedValue.get()`.
  *
  * Implementation description:
@@ -43,10 +46,10 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	lowestObserverState = IDerivationState.UP_TO_DATE;
 	unboundDepsCount = 0;
 	__mapid = "#" + getNextId();
-	protected value: T = undefined;
+	protected value: T | undefined | CaughtException = undefined;
 	name: string;
 	isComputing: boolean = false; // to check for cycles
-	isRunningSetter: boolean = false; // TODO optimize, see: https://reaktor.com/blog/javascript-performance-fundamentals-make-bluebird-fast/
+	isRunningSetter: boolean = false;
 	setter: (value: T) => void;
 
 	/**
@@ -56,35 +59,13 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	 *
 	 * The `compareStructural` property indicates whether the return values should be compared structurally.
 	 * Normally, a computed value will not notify an upstream observer if a newly produced value is strictly equal to the previously produced value.
-	 * However, enabling compareStructural can be convienent if you always produce an new aggregated object and don't want to notify observers if it is structurally the same.
+	 * However, enabling compareStructural can be convenient if you always produce an new aggregated object and don't want to notify observers if it is structurally the same.
 	 * This is useful for working with vectors, mouse coordinates etc.
 	 */
-	constructor(public derivation: () => T, private scope: Object, private compareStructural: boolean, name: string, setter: (v: T) => void) {
+	constructor(public derivation: () => T, public scope: Object | undefined, private compareStructural: boolean, name: string, setter?: (v: T) => void) {
 		this.name  = name || "ComputedValue@" + getNextId();
 		if (setter)
 			this.setter = createAction(name + "-setter", setter) as any;
-	}
-
-	peek() {
-		this.isComputing = true;
-		const prevAllowStateChanges = allowStateChangesStart(false);
-		const res = this.derivation.call(this.scope);
-		allowStateChangesEnd(prevAllowStateChanges);
-		this.isComputing = false;
-		return res;
-	};
-
-	peekUntracked() {
-		let hasError = true;
-		try {
-			const res = this.peek();
-			hasError = false;
-			return res;
-		} finally {
-			if (hasError)
-				handleExceptionInDerivation(this);
-		}
-
 	}
 
 	onBecomeStale() {
@@ -92,41 +73,42 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	}
 
 	onBecomeUnobserved() {
-		invariant(this.dependenciesState !== IDerivationState.NOT_TRACKING, "INTERNAL ERROR only onBecomeUnobserved shouldn't be called twice in a row");
 		clearObserving(this);
 		this.value = undefined;
 	}
 
 	/**
 	 * Returns the current value of this computed value.
-	 * Will evaluate it's computation first if needed.
+	 * Will evaluate its computation first if needed.
 	 */
 	public get(): T {
 		invariant(!this.isComputing, `Cycle detected in computation ${this.name}`, this.derivation);
-		startBatch();
-		if (globalState.inBatch === 1) { // just for small optimization, can be droped for simplicity
+		if (globalState.inBatch === 0) {
+			// just for small optimization, can be droped for simplicity
 			// computed called outside of any mobx stuff. batch observing shuold be enough, don't need tracking
 			// because it will never be called again inside this batch
+			startBatch();
 			if (shouldCompute(this))
-				this.value = this.peekUntracked();
+				this.value = this.computeValue(false);
+			endBatch();
 		} else {
-
 			reportObserved(this);
 			if (shouldCompute(this))
 				if (this.trackAndCompute())
 					propagateChangeConfirmed(this);
-
 		}
-		const result = this.value;
-		endBatch();
+		const result = this.value!;
 
+		if (isCaughtException(result))
+			throw result.cause;
 		return result;
 	}
 
-	public recoverFromError() {
-		// this.derivation.call(this.scope) in peek returned error, let's run all cleanups, that would be run
-		// note that resetGlobalState will run afterwards
-		this.isComputing = false;
+	public peek(): T {
+		const res = this.computeValue(false);
+		if (isCaughtException(res))
+			throw res.cause;
+		return res;
 	}
 
 	public set(value: T) {
@@ -146,25 +128,47 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	private trackAndCompute(): boolean {
 		if (isSpyEnabled()) {
 			spyReport({
-				object: this,
+				object: this.scope,
 				type: "compute",
-				fn: this.derivation,
-				target: this.scope
+				fn: this.derivation
 			});
 		}
 		const oldValue = this.value;
-		const newValue = this.value = trackDerivedFunction(this, this.peek);
-		return valueDidChange(this.compareStructural, newValue, oldValue);
+		const newValue = this.value = this.computeValue(true);
+		return isCaughtException(newValue) || valueDidChange(this.compareStructural, newValue, oldValue);
 	}
 
-	observe(listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda {
+	computeValue(track: boolean) {
+		this.isComputing = true;
+		globalState.computationDepth++;
+		let res: T | CaughtException;
+		if (track) {
+			res = trackDerivedFunction(this, this.derivation, this.scope);
+		} else {
+			try {
+				res = this.derivation.call(this.scope);
+			} catch (e) {
+				res = new CaughtException(e);
+			}
+		}
+		globalState.computationDepth--;
+		this.isComputing = false;
+		return res;
+	};
+
+	observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {
 		let firstTime = true;
-		let prevValue = undefined;
+		let prevValue: T | undefined = undefined;
 		return autorun(() => {
 			let newValue = this.get();
 			if (!firstTime || fireImmediately) {
 				const prevU = untrackedStart();
-				listener(newValue, prevValue);
+				listener({
+					type: "update",
+					object: this,
+					newValue,
+					oldValue: prevValue
+				});
 				untrackedEnd(prevU);
 			}
 			firstTime = false;
@@ -180,30 +184,24 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		return `${this.name}[${this.derivation.toString()}]`;
 	}
 
+	valueOf(): T {
+		return toPrimitive(this.get());
+	};
+
 	whyRun() {
 		const isTracking = Boolean(globalState.trackingDerivation);
-		const observing = unique(this.isComputing ? this.newObserving : this.observing).map((dep: any) => dep.name);
+		const observing = unique(this.isComputing ? this.newObserving! : this.observing).map((dep: any) => dep.name);
 		const observers = unique(getObservers(this).map(dep => dep.name));
-// TODO: use issue
-// TOOD; expand wiht more states
 		return (`
 WhyRun? computation '${this.name}':
  * Running because: ${isTracking ? "[active] the value of this computation is needed by a reaction" : this.isComputing ? "[get] The value of this computed was requested outside a reaction" : "[idle] not running at the moment"}
 ` +
-(this.dependenciesState === IDerivationState.NOT_TRACKING
-?
-` * This computation is suspended (not in use by any reaction) and won't run automatically.
-	Didn't expect this computation to be suspended at this point?
-	  1. Make sure this computation is used by a reaction (reaction, autorun, observer).
-	  2. Check whether you are using this computation synchronously (in the same stack as they reaction that needs it).
-`
-:
+(this.dependenciesState === IDerivationState.NOT_TRACKING ? getMessage("m032")  :
 ` * This computation will re-run if any of the following observables changes:
     ${joinStrings(observing)}
     ${(this.isComputing && isTracking) ? " (... or any observable accessed during the remainder of the current run)" : ""}
-	Missing items in this list?
-	  1. Check whether all used values are properly marked as observable (use isObservable to verify)
-	  2. Make sure you didn't dereference values too early. MobX observes props, not primitives. E.g: use 'person.name' instead of 'name' in your computation.
+	${getMessage("m038")}
+
   * If the outcome of this computation changes, the following observers will be re-run:
     ${joinStrings(observers)}
 `
@@ -211,5 +209,7 @@ WhyRun? computation '${this.name}':
 		);
 	}
 }
+
+ComputedValue.prototype[primitiveSymbol()] = ComputedValue.prototype.valueOf;
 
 export const isComputedValue = createInstanceofPredicate("ComputedValue", ComputedValue);

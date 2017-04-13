@@ -67,9 +67,11 @@ test('effect debounce is honored', t => {
 		return a.get()
 	}, newValue => {
 		values.push(newValue);
-	}, false, 100)
+	}, {
+		delay: 100
+	})
 
-	setTimeout(() => a.set(2), 30); // should not become visible nor evaluate expr; first is skipped
+	setTimeout(() => a.set(2), 30);
 	setTimeout(() => a.set(3), 150); // should not be visible, combined with the next
 	setTimeout(() => a.set(4), 160);
 	setTimeout(() => a.set(5), 300);
@@ -77,8 +79,8 @@ test('effect debounce is honored', t => {
 	setTimeout(() => a.set(6), 700);
 
 	setTimeout(() => {
-		t.deepEqual(values, [4, 5])
-		t.equal(exprCount, 3)
+		t.deepEqual(values, [2, 4, 5])
+		t.equal(exprCount, 4)
 	}, 900)
 })
 
@@ -94,7 +96,10 @@ test('effect debounce + fire immediately is honored', t => {
 		return a.get()
 	}, newValue => {
 		values.push(newValue);
-	}, true, 100)
+	}, {
+		fireImmediately: true,
+		delay: 100
+	})
 
 	setTimeout(() => a.set(3), 150);
 	setTimeout(() => a.set(4), 300);
@@ -215,20 +220,25 @@ test("#278 do not rerun if expr output doesn't change structurally", t => {
 	var users = mobx.observable([
 		{
 			name: "jan",
-			uppername: function() { return this.name.toUpperCase() }
+			get uppername() { return this.name.toUpperCase() }
 		},
 		{
 			name: "piet",
-			uppername: function() { return this.name.toUpperCase() }
+			get uppername() { return this.name.toUpperCase() }
 		}
 	]);
 	var values = [];
 
-	var d = reaction(mobx.asStructure(
-		() => users.map(user => user.uppername)
-	), newValue => {
-		values.push(newValue);
-	}, true)
+	var d = reaction(
+		() => users.map(user => user.uppername),
+		newValue => {
+			values.push(newValue);
+		},
+		{
+			fireImmediately: true,
+			compareStructural: true
+		}
+	)
 
 	users[0].name = "john";
 	users[0].name = "JoHn";
@@ -246,21 +256,31 @@ test("#278 do not rerun if expr output doesn't change structurally", t => {
 	t.end();
 })
 
-test("throws when the max iterations over reactions are done", t => {
-	var foo = mobx.observable({
-		a: 1,
-	});
+test("do not rerun if prev & next expr output is NaN", t => {
+	var v = mobx.observable('a');
+	var values = [];
+	var valuesS = [];
 
-	mobx.autorun("bar", () => {
-		var x = foo.a;
-		foo.a = Math.random();
-	});
-
-	 t.throws(
-		() => foo.a++,
-		new RegExp("Reaction doesn't converge to a stable state after 100 iterations\\. "
-			+ "Probably there is a cycle in the reactive function: Reaction\\[bar\\]")
+	var d = reaction(
+		() => v.get(),
+		newValue => { values.push(String(newValue)); },
+		{ fireImmediately: true, }
 	);
-	mobx.extras.resetGlobalState();
+	var dd = reaction(
+		() => v.get(),
+		newValue => { valuesS.push(String(newValue)); },
+		{ fireImmediately: true, compareStructural: true }
+	);
+
+	v.set(NaN);
+	v.set(NaN);
+	v.set(NaN);
+	v.set('b');
+
+	d();
+	dd();
+
+	t.deepEqual(values, [ 'a', 'NaN', 'b']);
+	t.deepEqual(valuesS, [ 'a', 'NaN', 'b']);
 	t.end();
 })

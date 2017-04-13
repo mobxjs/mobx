@@ -4,14 +4,15 @@ var test = require('tape');
 var mobx = require('..');
 var m = mobx;
 var observable = mobx.observable;
+var computed = mobx.computed;
 var transaction = mobx.transaction;
 
 var voidObserver = function(){};
 
 function buffer() {
     var b = [];
-    var res = function(newValue) {
-        b.push(newValue);
+    var res = function(x) {
+        b.push(x.newValue);
     };
     res.toArray = function() {
         return b;
@@ -43,8 +44,8 @@ test('basic', function(t) {
 
 test('basic2', function(t) {
     var x = observable(3);
-    var z = observable(function () { return x.get() * 2});
-    var y = observable(function () { return x.get() * 3});
+    var z = computed(function () { return x.get() * 2});
+    var y = computed(function () { return x.get() * 3});
 
     m.observe(z, voidObserver);
 
@@ -63,11 +64,11 @@ test('computed with asStructure modifier', function(t) {
     try {
         var x1 = observable(3);
         var x2 = observable(5);
-        var y = m.computed(m.asStructure(function() {
+        var y = m.computed(function() {
             return {
               sum: x1.get() + x2.get()
             }
-        }));
+        }, { struct: true });
         var b = buffer();
         m.observe(y, b, true);
 
@@ -119,7 +120,7 @@ test('dynamic', function(t) {
 test('dynamic2', function(t) {
     try {
         var x = observable(3);
-        var y = observable(function() {
+        var y = computed(function() {
             return x.get() * x.get();
         });
 
@@ -150,7 +151,7 @@ test('readme1', function(t) {
         order.price = observable(10);
         // Prints: New price: 24
         //in TS, just: value(() => this.price() * (1+vat()))
-        order.priceWithVat = observable(function() {
+        order.priceWithVat = computed(function() {
             return order.price.get() * (1 + vat.get());
         });
 
@@ -171,8 +172,8 @@ test('readme1', function(t) {
 test('batch', function(t) {
     var a = observable(2);
     var b = observable(3);
-    var c = observable(function() { return a.get() * b.get() });
-    var d = observable(function() { return c.get() * b.get() });
+    var c = computed(function() { return a.get() * b.get() });
+    var d = computed(function() { return c.get() * b.get() });
     var buf = buffer();
     m.observe(d, buf);
 
@@ -198,7 +199,7 @@ test('batch', function(t) {
 test('transaction with inspection', function(t) {
     var a = observable(2);
     var calcs = 0;
-    var b = observable(function() {
+    var b = computed(function() {
         calcs++;
         return a.get() * 2;
     });
@@ -259,9 +260,9 @@ test('scope', function(t) {
     var Order = function() {
         this.price = observable(20);
         this.amount = observable(2);
-        this.total = observable(function() {
+        this.total = computed(function() {
             return (1+vat.get()) * this.price.get() * this.amount.get();
-        }, this);
+        }, { context: this });
     };
 
     var order = new Order();
@@ -280,7 +281,7 @@ test('props1', function(t) {
         mobx.extendObservable(this, {
             'price' : 20,
             'amount' : 2,
-            'total': function() {
+            get total() {
                 return (1+vat.get()) * this.price * this.amount; // price and amount are now properties!
             }
         });
@@ -311,7 +312,7 @@ test('props2', function(t) {
         mobx.extendObservable(this, {
             price: 20,
             amount: 2,
-            total: function() {
+            get total() {
                 return (1+vat.get()) * this.price * this.amount; // price and amount are now properties!
             }
         });
@@ -330,9 +331,9 @@ test('props3', function(t) {
     var Order = function() {
         this.price = 20;
         this.amount = 2;
-        this.total = function() {
+        this.total = mobx.computed(function() {
             return (1+vat.get()) * this.price * this.amount; // price and amount are now properties!
-        };
+        });
         mobx.extendObservable(this, this);
     };
 
@@ -348,7 +349,7 @@ test('props4', function(t) {
     function Bzz() {
         mobx.extendObservable(this, {
             fluff: [1,2],
-            sum: function() {
+            get sum() {
                 return this.fluff.reduce(function(a,b) {
                     return a + b;
                 }, 0);
@@ -394,9 +395,9 @@ test('extend observable multiple prop maps', function(t) {
 test('object enumerable props', function(t) {
     var x = mobx.observable({
         a: 3,
-        b: function() {
+        b: mobx.computed(function() {
             return 2 * this.a;
-        }
+        })
     });
     mobx.extendObservable(x, { c: 4 });
     var ar = [];
@@ -413,7 +414,7 @@ test('observe property', function(t) {
     var Wrapper = function (chocolateBar) {
         mobx.extendObservable(this, {
             chocolateBar: chocolateBar,
-            calories: function () {
+            get calories () {
                 return this.chocolateBar.calories;
             }
         });
@@ -453,7 +454,7 @@ test('observe object', function(t) {
     var events = [];
     var a = observable({
         a: 1,
-        da: function() { return this.a * 2 }
+        get da() { return this.a * 2 }
     });
     var stop = m.observe(a, function(change) {
         events.push(change);
@@ -502,39 +503,29 @@ test('observe object', function(t) {
 
 test('mobx.observe', function(t) {
     var events = [];
-    var po = { a: 1 };
     var o = observable({ b: 2 });
     var ar = observable([ 3 ]);
     var map = mobx.map({ });
 
     var push = function(event) { events.push(event); };
 
-    var stop1 = mobx.observe(po, push);
     var stop2 = mobx.observe(o, push);
     var stop3 = mobx.observe(ar, push);
     var stop4 = mobx.observe(map, push);
 
-    po.a = 4;
     o.b = 5;
     ar[0] = 6;
     map.set("d", 7);
 
-    stop1();
     stop2();
     stop3();
     stop4();
 
-    po.a = 8;
     o.b = 9;
     ar[0] = 10;
     map.set("d", 11);
 
     t.deepEqual(events, [
-        { type: 'update',
-            object: po,
-            name: 'a',
-			newValue: 4,
-            oldValue: 1 },
         { type: 'update',
             object: o,
             name: 'b',
@@ -558,11 +549,11 @@ test('change count optimization', function(t) {
     var bCalcs = 0;
     var cCalcs = 0;
     var a = observable(3);
-    var b = observable(function() {
+    var b = computed(function() {
         bCalcs += 1;
         return 4 + a.get() - a.get();
     });
-    var c = observable(function() {
+    var c = computed(function() {
         cCalcs += 1;
         return b.get();
     });
@@ -589,7 +580,7 @@ test('observables removed', function(t) {
     var calcs = 0;
     var a = observable(1);
     var b = observable(2);
-    var c = observable(function() {
+    var c = computed(function() {
         calcs ++;
         if (a.get() === 1)
         return b.get() * a.get() * b.get();
@@ -624,12 +615,12 @@ test('lazy evaluation', function (t) {
     var observerChanges = 0;
 
     var a = observable(1);
-    var b = observable(function() {
+    var b = computed(function() {
         bCalcs += 1;
         return a.get() +1;
     });
 
-    var c = observable(function() {
+    var c = computed(function() {
         cCalcs += 1;
         return b.get() +1;
     });
@@ -652,7 +643,7 @@ test('lazy evaluation', function (t) {
     t.equal(bCalcs,3);
     t.equal(cCalcs,3);
 
-    var d = observable(function() {
+    var d = computed(function() {
         dCalcs += 1;
         return b.get() * 2;
     });
@@ -696,12 +687,12 @@ test('multiple view dependencies', function(t) {
     var bCalcs = 0;
     var dCalcs = 0;
     var a = observable(1);
-    var b = observable(function() {
+    var b = computed(function() {
         bCalcs++;
         return 2 * a.get();
     });
     var c = observable(2);
-    var d = observable(function() {
+    var d = computed(function() {
         dCalcs++;
         return 3 * c.get();
     });
@@ -746,16 +737,16 @@ test('nested observable2', function(t) {
     var totalCalcs = 0;
     var innerCalcs = 0;
 
-    var total = observable(function() {
+    var total = computed(function() {
         totalCalcs += 1; // outer observable shouldn't recalc if inner observable didn't publish a real change
-        return price.get() * observable(function() {
+        return price.get() * computed(function() {
             innerCalcs += 1;
             return factor.get() % 2 === 0 ? 1 : 3;
         }).get();
     });
 
     var b = [];
-    var sub = m.observe(total, function(x) { b.push(x); }, true);
+    var sub = m.observe(total, function(x) { b.push(x.newValue); }, true);
 
     price.set(150);
     factor.set(7); // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
@@ -777,7 +768,7 @@ test('expr', function(t) {
     var totalCalcs = 0;
     var innerCalcs = 0;
 
-    var total = observable(function() {
+    var total = computed(function() {
         totalCalcs += 1; // outer observable shouldn't recalc if inner observable didn't publish a real change
         return price.get() * mobx.expr(function() {
             innerCalcs += 1;
@@ -786,7 +777,7 @@ test('expr', function(t) {
     });
 
     var b = [];
-    var sub = m.observe(total, function(x) { b.push(x); }, true);
+    var sub = m.observe(total, function(x) { b.push(x.newValue); }, true);
 
     price.set(150);
     factor.set(7); // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
@@ -804,7 +795,7 @@ test('expr', function(t) {
 
 test('observe', function(t) {
     var x = observable(3);
-    var x2 = observable(function() { return x.get() * 2; });
+    var x2 = computed(function() { return x.get() * 2; });
     var b = [];
 
     var cancel = mobx.autorun(function() {
@@ -825,7 +816,7 @@ test('when', function(t) {
     var x = observable(3);
 
     var called = 0;
-    mobx.autorunUntil(function() {
+    mobx.when(function() {
         return (x.get() === 4);
     }, function() {
         called += 1;
@@ -870,7 +861,7 @@ test('expr2', function(t) {
     var totalCalcs = 0;
     var innerCalcs = 0;
 
-    var total = observable(function() {
+    var total = computed(function() {
         totalCalcs += 1; // outer observable shouldn't recalc if inner observable didn't publish a real change
         return price.get() * mobx.expr(function() {
             innerCalcs += 1;
@@ -879,7 +870,7 @@ test('expr2', function(t) {
     });
 
     var b = [];
-    var sub = m.observe(total, function(x) { b.push(x); }, true);
+    var sub = m.observe(total, function(x) { b.push(x.newValue); }, true);
 
     price.set(150);
     factor.set(7); // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
@@ -905,12 +896,12 @@ function stripSpyOutput(events) {
 }
 
 test('issue 50', function(t) {
-    m._.resetGlobalState();
-    global.__mobxGlobal.mobxGuid = 0;
+    m.extras.resetGlobalState();
+    mobx.extras.getGlobalState().mobxGuid = 0;
     var x = observable({
         a: true,
         b: false,
-        c: function() {
+        get c() {
             events.push("calc c");
             return this.b;
         }
@@ -941,16 +932,14 @@ test('issue 50', function(t) {
         t.deepEqual(stripSpyOutput(events), [
 			'auto',
 			'calc c',
-			{ name: 'anonymous transaction', spyReportStart: true, target: undefined, type: 'transaction' },
 			'transstart',
 			{ name: 'a', newValue: false, oldValue: true, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
 			{ name: 'b', newValue: true, oldValue: false, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
 			'transpreend',
 			{ spyReportStart: true, type: 'reaction' },
 			'auto',
-      { target: { a: false, b: true }, type: 'compute' },
+      { type: 'compute' },
       'calc c',
-			{ spyReportEnd: true },
 			{ spyReportEnd: true },
 			'transpostend'
         ]);
@@ -963,12 +952,12 @@ test('issue 50', function(t) {
 });
 
 test('verify transaction events', function(t) {
-    m._.resetGlobalState();
-    global.__mobxGlobal.mobxGuid = 0;
+    m.extras.resetGlobalState();
+    mobx.extras.getGlobalState().mobxGuid = 0;
 
     var x = observable({
         b: 1,
-        c: function() {
+        get c() {
             events.push("calc c");
             return this.b;
         }
@@ -995,14 +984,12 @@ test('verify transaction events', function(t) {
 	t.deepEqual(stripSpyOutput(events), [
 		'auto',
 		'calc c',
-		{ name: 'anonymous transaction', spyReportStart: true, target: undefined, type: 'transaction' },
 		'transstart',
 		{ name: 'b', newValue: 2, oldValue: 1, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
-		'transpreend', { target: { b: 2 }, type: 'compute' },
+		'transpreend', { type: 'compute' },
 		'calc c',
 		{ spyReportStart: true, type: 'reaction' },
 		'auto',
-		{ spyReportEnd: true },
 		{ spyReportEnd: true },
 		'transpostend'
     ]);
@@ -1036,12 +1023,12 @@ test("verify array in transaction", function(t) {
 })
 
 test('delay autorun until end of transaction', function(t) {
-    m._.resetGlobalState();
-    global.__mobxGlobal.mobxGuid = 0;
+    m.extras.resetGlobalState();
+    mobx.extras.getGlobalState().mobxGuid = 0;
     var events = [];
     var x = observable({
         a: 2,
-        b: function() {
+        get b() {
             events.push("calc y");
             return this.a;
         }
@@ -1082,23 +1069,19 @@ test('delay autorun until end of transaction', function(t) {
     events.push("post trans3");
 
     t.deepEqual(stripSpyOutput(events), [
-		{ name: 'anonymous transaction', spyReportStart: true, target: undefined, type: 'transaction' },
-			{ name: 'anonymous transaction', spyReportStart: true, target: undefined, type: 'transaction' },
-				{ name: 'a', newValue: 3, oldValue: 2, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
-				{ name: 'a', newValue: 4, oldValue: 3, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
-				'end1',
-			{ spyReportEnd: true },
-			{ name: 'a', newValue: 5, oldValue: 4, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
-			'end2',
-			{ spyReportStart: true, type: 'reaction' },
-				'auto',
-				{ target: { a: 3 }, type: 'compute' },
-				'calc y',
-			{ spyReportEnd: true },
+		{ name: 'a', newValue: 3, oldValue: 2, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
+		{ name: 'a', newValue: 4, oldValue: 3, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
+		'end1',
+		{ name: 'a', newValue: 5, oldValue: 4, spyReportStart: true, type: 'update' }, { spyReportEnd: true },
+		'end2',
+		{ spyReportStart: true, type: 'reaction' },
+			'auto',
+			{ type: 'compute' },
+			'calc y',
 		{ spyReportEnd: true },
 		'post trans1',
 		{ name: 'a', newValue: 6, oldValue: 5, spyReportStart: true, type: 'update' },
-			{ target: { a: 3 }, type: 'compute' },
+			{ type: 'compute' },
 			'calc y',
 			{ spyReportStart: true, type: 'reaction' },
 				'auto',
@@ -1143,10 +1126,28 @@ test('prematurely end autorun', function(t) {
     t.end();
 });
 
-test('issue 65; transaction causing transaction', function(t) {
+test('computed values believe NaN === NaN', function(t) {
+	var a = observable(2);
+	var b = observable(3);
+	var c = computed(function() { return String(a.get() * b.get()) });
+	var buf = buffer();
+	m.observe(c, buf);
+
+	a.set(NaN);
+	b.set(NaN);
+	a.set(NaN);
+	a.set(2);
+	b.set(3);
+
+	t.deepEqual(buf.toArray(), ['NaN', '6']);
+	t.end();
+})
+
+test.skip('issue 65; transaction causing transaction', function(t) {
+	// MWE: disabled, bad test; depends on transaction being tracked, transaction should not be used in computed!
     var x = mobx.observable({
         a: 3,
-        b: function() {
+        get b() {
             return mobx.transaction(function() {
                 return this.a * 2;
             }, this);
@@ -1174,15 +1175,15 @@ test('issue 71, transacting running transformation', function(t) {
     function Thing(value) {
         mobx.extendObservable(this, {
             value: value,
-            pos: function() {
+            get pos() {
                 return state.things.indexOf(this);
             },
-            isVisible: function() {
+            get isVisible() {
                 return this.pos !== -1;
             }
         });
 
-        mobx.autorunUntil(function() {
+        mobx.when(function() {
             return this.isVisible;
         }, function() {
             if (this.pos < 4)
@@ -1221,7 +1222,7 @@ test('eval in transaction', function(t) {
     var bCalcs = 0;
     var x = mobx.observable({
         a: 1,
-        b: function() {
+        get b() {
             bCalcs++;
             return this.a * 2;
         }
@@ -1425,7 +1426,6 @@ test('unoptimizable subscriptions are diffed correctly', t => {
 
 })
 
-// TODO: revisit this test after estabilishing desired behaviour
 test('atom events #427', t => {
 	var start = 0;
 	var stop = 0;
@@ -1665,11 +1665,11 @@ test('603 - transaction should not kill reactions', t => {
 
 	t.equal(a.observers.length, 1)
 	t.equal(d.$mobx.observing.length, 1)
-	t.deepEqual(__mobxGlobal.inBatch, 0)
-	t.deepEqual(__mobxGlobal.inTransaction, 0)
-	t.deepEqual(__mobxGlobal.pendingReactions.length, 0)
-	t.deepEqual(__mobxGlobal.pendingUnobservations.length, 0)
-	t.deepEqual(__mobxGlobal.trackingDerivation, null)
+	const g = m.extras.getGlobalState()
+	t.deepEqual(g.inBatch, 0)
+	t.deepEqual(g.pendingReactions.length, 0)
+	t.deepEqual(g.pendingUnobservations.length, 0)
+	t.deepEqual(g.trackingDerivation, null)
 
 	t.equal(b, 2)
 	a.set(3)
@@ -1677,4 +1677,56 @@ test('603 - transaction should not kill reactions', t => {
 
 	t.end()
 
+})
+
+test('#561 test toPrimitive() of observable objects', function(t) {
+	if (typeof Symbol !== "undefined" && Symbol.toPrimitive) {
+		var x = observable(3);
+
+		t.equal(x.valueOf(), 3);
+		t.equal(x[Symbol.toPrimitive](), 3);
+
+		t.equal(+x, 3);
+		t.equal(++x, 4);
+
+		var y = observable(3);
+
+		t.equal(y + 7, 10);
+
+		var z = computed(() => ({ a: 3 }));
+		t.equal(3 + z, "3[object Object]");
+	} else {
+		var x = observable(3);
+
+		t.equal(x.valueOf(), 3);
+		t.equal(x["@@toPrimitive"](), 3);
+
+		t.equal(+x, 3);
+		t.equal(++x, 4);
+
+		var y = observable(3);
+
+		t.equal(y + 7, 10);
+
+		var z = computed(() => ({ a: 3 }));
+		t.equal("3" + (z["@@toPrimitive"]()), "3[object Object]");
+	}
+    t.end()
+});
+
+test('observables should not fail when ES6 Map is missing', t => {
+    const globalMapFunction = global.Map;
+    global.Map = undefined;
+    t.equal(global.Map, undefined);
+    try {
+        var a = observable([1,2,3]); //trigger isES6Map in utils
+    }
+    catch (e) {
+        t.fail('Should not fail when Map is missing');
+    }
+
+    t.equal(m.isObservable(a), true);
+
+    global.Map = globalMapFunction;
+    t.end();
 })

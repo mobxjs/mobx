@@ -88,9 +88,9 @@ test('intercept array', t => {
 });
 
 test('intercept object', t => {
-	var a = {
+	var a = m.observable({
 		b: 3
-	}
+	})
 
 	// bit magical, but intercept makes a observable, to be consistent with observe.
 	// deprecated immediately :)

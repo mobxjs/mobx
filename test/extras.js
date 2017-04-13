@@ -3,8 +3,8 @@ var mobx = require('..');
 var m = mobx;
 
 test('treeD', function(t) {
-    m._.resetGlobalState();
-    global.__mobxGlobal.mobxGuid = 0;
+    m.extras.resetGlobalState();
+    mobx.extras.getGlobalState().mobxGuid = 0;
     var a = m.observable(3);
     var aName = 'ObservableValue@1';
 
@@ -14,7 +14,7 @@ test('treeD', function(t) {
     });
 
 
-    var b = m.observable(() => a.get() * a.get());
+    var b = m.computed(() => a.get() * a.get());
     var bName = 'ComputedValue@3';
     t.deepEqual(dtree(b), {
         name: bName
@@ -71,8 +71,8 @@ test('treeD', function(t) {
 })
 
 test('names', function(t) {
-    m._.resetGlobalState();
-    global.__mobxGlobal.mobxGuid = 0;
+    m.extras.resetGlobalState();
+    mobx.extras.getGlobalState().mobxGuid = 0;
 
     var struct = {
         x: 'ObservableValue@1',
@@ -107,9 +107,9 @@ test('names', function(t) {
     t.equal(m.autorun(function namedFunction() {
     }).$mobx.name, "namedFunction");
 
-    t.ok(m.observable(function() {}));
+    t.ok(m.computed(function() {}));
 
-    t.equal(m.observable(function namedFunction() {}).name, "namedFunction");
+    t.equal(m.computed(function namedFunction() {}).name, "namedFunction");
 
 	function Task() {
 		m.extendObservable(this, {
@@ -135,38 +135,12 @@ function stripTrackerOutput(output) {
     });
 }
 
-
-test('transition tracker 1', function(t) {
-    m._.resetGlobalState();
+test('spy 1', function(t) {
+    m.extras.resetGlobalState();
     var lines = [];
 
     var a = m.observable(3);
-    var b = m.observable(function() { return a.get() * 2 });
-    var c = m.autorun(function() { b.get(); });
-    var stop = m.extras.trackTransitions(false, function(line) {
-        lines.push(line);
-    });
-
-    a.set(4);
-    stop();
-    a.set(5);
-    t.deepEqual(stripTrackerOutput(lines), [
-		{ newValue: 4, oldValue: 3, spyReportStart: true, type: 'update' },
-		{ target: undefined, type: 'compute' },
-		{ spyReportStart: true, type: 'reaction' },
-		{ spyReportEnd: true },
-		{ spyReportEnd: true }
-	]);
-
-    t.end();
-})
-
-test('transition tracker 2', function(t) {
-    m._.resetGlobalState();
-    var lines = [];
-
-    var a = m.observable(3);
-    var b = m.observable(function() { return a.get() * 2 });
+    var b = m.computed(function() { return a.get() * 2 });
     var c = m.autorun(function() { b.get(); });
     var stop = m.spy(function(line) {
         lines.push(line);
@@ -177,7 +151,7 @@ test('transition tracker 2', function(t) {
     a.set(5);
     t.deepEqual(stripTrackerOutput(lines), [
 		{ newValue: 4, oldValue: 3, spyReportStart: true, type: 'update' },
-		{ target: undefined, type: 'compute' },
+		{ type: 'compute' },
 		{ spyReportStart: true, type: 'reaction' },
 		{ spyReportEnd: true },
 		{ spyReportEnd: true }
@@ -186,30 +160,9 @@ test('transition tracker 2', function(t) {
     t.end();
 })
 
-test('strict mode checks', function(t) {
-    var x = mobx.observable(3);
-
-    mobx.extras.allowStateChanges(false, function() {
-        x.get();
-    });
-
-    mobx.extras.allowStateChanges(true, function() {
-        x.set(7);
-    });
-
-    t.throws(function() {
-        mobx.extras.allowStateChanges(false, function() {
-            x.set(4);
-        });
-    });
-
-	mobx.extras.resetGlobalState();
-    t.end();
-});
-
 test('get atom', function(t) {
 	mobx.extras.resetGlobalState();
-	global.__mobxGlobal.mobxGuid = 0; // hmm dangerous reset?
+	mobx.extras.getGlobalState().mobxGuid = 0; // hmm dangerous reset?
 
 	function Clazz () {
 		mobx.extendObservable(this, {
@@ -259,7 +212,7 @@ test('get atom', function(t) {
 
 test('get debug name', function(t) {
 	mobx.extras.resetGlobalState();
-	global.__mobxGlobal.mobxGuid = 0; // hmm dangerous reset?
+	mobx.extras.getGlobalState().mobxGuid = 0; // hmm dangerous reset?
 
 	function Clazz () {
 		mobx.extendObservable(this, {
@@ -282,7 +235,7 @@ test('get debug name', function(t) {
 
 	t.equal(name(a), "ObservableValue@1");
 
-	t.equal(name(b, "a"), "ObservableObject@2.a"); // TODO: remove @3..! (also in the other tests)
+	t.equal(name(b, "a"), "ObservableObject@2.a");
 	t.throws(() => name(b, "b"), /no observable property 'b' found on the observable object 'ObservableObject@2'/, "expected throw");
 
 	t.equal(name(c), "ObservableMap@3"); // returns ke, "bla"ys
@@ -308,7 +261,7 @@ test('get debug name', function(t) {
 
 test('get administration', function(t) {
 	mobx.extras.resetGlobalState();
-	global.__mobxGlobal.mobxGuid = 0; // hmm dangerous reset?
+	mobx.extras.getGlobalState().mobxGuid = 0; // hmm dangerous reset?
 
 	function Clazz () {
 		mobx.extendObservable(this, {
@@ -325,7 +278,7 @@ test('get administration', function(t) {
 	var g = new Clazz();
 
 	function adm(thing, prop) {
-		return mobx._.getAdministration(thing, prop).constructor.name;
+		return mobx.extras.getAdministration(thing, prop).constructor.name;
 	}
 
 	var ovClassName = mobx.observable(3).constructor.name;

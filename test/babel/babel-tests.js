@@ -1,8 +1,8 @@
 import {
-    observable, computed, transaction, asStructure, autorun, extendObservable, action,
-	isObservableObject, observe, isObservable, spy, isAction,
-    default as mobx
+    observable, computed, transaction, autorun, extendObservable, action,
+	isObservableObject, observe, isObservable, spy, isAction, useStrict
 } from "../";
+import * as mobx from "../"
 
 var test = require('tape')
 
@@ -47,7 +47,7 @@ test('babel: parameterized computed decorator', (t) => {
 	class TestClass {
 		@observable x = 3;
 		@observable y = 3;
-		@computed({ asStructure: true }) get boxedSum() {
+		@computed.struct get boxedSum() {
 			return { sum: Math.round(this.x) + Math.round(this.y) };
 		}
 	}
@@ -79,7 +79,6 @@ class Order {
     @observable amount = 2;
     @observable orders = [];
     @observable aFunction = function(a) { };
-    @observable someStruct = asStructure({ x: 1, y: 2});
 
     @computed get total() {
         return this.amount * this.price * (1 + this.orders.length);
@@ -90,13 +89,13 @@ test('decorators', function(t) {
 	var o = new Order();
 	t.equal(isObservableObject(o), true);
 	t.equal(isObservable(o, 'amount'), true);
-	t.equal(o.total, 6); // TODO: remove hmm this is required to initialize the props which are made reactive lazily..
+	t.equal(o.total, 6); // .... this is required to initialize the props which are made reactive lazily...
 	t.equal(isObservable(o, 'total'), true);
 
 	var events = [];
 	var d1 = observe(o, (ev) => events.push(ev.name, ev.oldValue));
-	var d2 = observe(o, 'price', (newValue, oldValue) => events.push(newValue, oldValue));
-	var d3 = observe(o, 'total', (newValue, oldValue) => events.push(newValue, oldValue));
+	var d2 = observe(o, 'price', (ev) => events.push(ev.newValue, ev.oldValue));
+	var d3 = observe(o, 'total', (ev) => events.push(ev.newValue, ev.oldValue));
 
 	o.price = 4;
 
@@ -143,6 +142,52 @@ test('issue 191 - shared initializers (babel)', function(t) {
 	t.end();
 })
 
+test("705 - setter undoing caching (babel)", t => {
+	let recomputes = 0;
+	let autoruns = 0;
+
+	class Person {
+		@observable name: string;
+		@observable title: string;
+		set fullName(val) {
+			// Noop
+		}
+		@computed get fullName() {
+			debugger;
+			recomputes++;
+			return this.title+" "+this.name;
+		}
+	}
+
+	let p1 = new Person();
+	p1.name="Tom Tank";
+	p1.title="Mr.";
+
+	t.equal(recomputes, 0);
+	t.equal(autoruns, 0);
+
+	const d1 = autorun(()=> {
+		autoruns++;
+		p1.fullName;
+	})
+
+	const d2 = autorun(()=> {
+		autoruns++;
+		p1.fullName;
+	})
+
+	t.equal(recomputes, 1);
+	t.equal(autoruns, 2);
+
+	p1.title="Master";
+	t.equal(recomputes, 2);
+	t.equal(autoruns, 4);
+
+	d1();
+	d2();
+	t.end();
+})
+
 function normalizeSpyEvents(events) {
 	events.forEach(ev => {
 		delete ev.fn;
@@ -172,11 +217,11 @@ test("action decorator (babel)", function(t) {
 	t.equal(store1.add(1, 1), 4);
 
 	t.deepEqual(normalizeSpyEvents(events),	[
-		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, target: store2, type: "action" },
+		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, object: store2, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 1, 1 ], name: "add", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 1, 1 ], name: "add", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true }
 	]);
 
@@ -205,11 +250,11 @@ test("custom action decorator (babel)", function(t) {
 	t.equal(store1.add(1, 1), 4);
 
 	t.deepEqual(normalizeSpyEvents(events),	[
-		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, target: store2, type: "action" },
+		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, object: store2, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 1, 1 ], name: "zoem zoem", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 1, 1 ], name: "zoem zoem", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true },
 	]);
 
@@ -241,11 +286,11 @@ test("action decorator on field (babel)", function(t) {
 	t.equal(store1.add(2, 2), 8);
 
 	t.deepEqual(normalizeSpyEvents(events),	[
-		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 5, 4 ], name: "add", spyReportStart: true, target: store2, type: "action" },
+		{ arguments: [ 5, 4 ], name: "add", spyReportStart: true, object: store2, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 2, 2 ], name: "add", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 2, 2 ], name: "add", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true }
 	]);
 
@@ -276,11 +321,11 @@ test("custom action decorator on field (babel)", function(t) {
 	t.equal(store1.add(2, 2), 8);
 
 	t.deepEqual(normalizeSpyEvents(events),	[
-		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 5, 4 ], name: "zoem zoem", spyReportStart: true, target: store2, type: "action" },
+		{ arguments: [ 5, 4 ], name: "zoem zoem", spyReportStart: true, object: store2, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 2, 2 ], name: "zoem zoem", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 2, 2 ], name: "zoem zoem", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true }
 	]);
 
@@ -289,13 +334,13 @@ test("custom action decorator on field (babel)", function(t) {
 });
 
 test("267 (babel) should be possible to declare properties observable outside strict mode", t => {
-	mobx.useStrict(true);
+	useStrict(true);
 
 	class Store {
 		@observable timer;
 	}
 
-	mobx.useStrict(false);
+	useStrict(false);
 	t.end();
 })
 
@@ -758,4 +803,73 @@ test('issue #701', t => {
 	t.equal(mobx.isObservableObject(model), true);
 
 	t.end()
+})
+
+
+test("@observable.ref (Babel)", t => {
+	class A {
+		@observable.ref ref = { a: 3}
+	}
+
+	const a = new A();
+	t.equal(a.ref.a, 3);
+	t.equal(mobx.isObservable(a.ref), false);
+	t.equal(mobx.isObservable(a, "ref"), true);
+
+	t.end();
+})
+
+test("@observable.shallow (Babel)", t => {
+	class A {
+		@observable.shallow arr = [{ todo: 1 }]
+	}
+
+	const a = new A();
+	const todo2 = { todo: 2 };
+	a.arr.push(todo2)
+	t.equal(mobx.isObservable(a.arr), true);
+	t.equal(mobx.isObservable(a, "arr"), true);
+	t.equal(mobx.isObservable(a.arr[0]), false);
+	t.equal(mobx.isObservable(a.arr[1]), false);
+	t.ok(a.arr[1] === todo2)
+
+	t.end();
+})
+
+
+test("@observable.deep (Babel)", t => {
+	class A {
+		@observable.deep arr = [{ todo: 1 }]
+	}
+
+	const a = new A();
+	const todo2 = { todo: 2 };
+	a.arr.push(todo2)
+
+	t.equal(mobx.isObservable(a.arr), true);
+	t.equal(mobx.isObservable(a, "arr"), true);
+	t.equal(mobx.isObservable(a.arr[0]), true);
+	t.equal(mobx.isObservable(a.arr[1]), true);
+	t.ok(a.arr[1] !== todo2)
+	t.equal(isObservable(todo2), false);
+
+	t.end();
+})
+
+test("action.bound binds (Babel)", t=> {
+	class A {
+		@observable x = 0;
+		@action.bound
+		inc(value: number) {
+			this.x += value;
+		}
+	}
+
+	const a = new A();
+	const runner = a.inc;
+	runner(2);
+
+	t.equal(a.x, 2);
+
+	t.end();
 })

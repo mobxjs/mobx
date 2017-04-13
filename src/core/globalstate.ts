@@ -1,8 +1,7 @@
-import {IDerivation} from "./derivation";
+import {getGlobal} from "../utils/utils";
+import {IDerivation, CaughtException} from "./derivation";
 import {Reaction} from "./reaction";
 import {IObservable} from "./observable";
-
-declare const global: any;
 
 /**
  * These values will persist if global state is reset
@@ -15,12 +14,17 @@ export class MobXGlobals {
 	 * MobX compatiblity with other versions loaded in memory as long as this version matches.
 	 * It indicates that the global state still stores similar information
 	 */
-	version = 4;
+	version = 5;
 
 	/**
-	 * Stack of currently running derivations
+	 * Currently running derivation
 	 */
-	trackingDerivation: IDerivation = null;
+	trackingDerivation: IDerivation | null = null;
+
+	/**
+	 * Are we running a computation currently? (not a reaction)
+	 */
+	computationDepth = 0;
 
 	/**
 	 * Each time a derivation is tracked, it is assigned a unique run-id
@@ -31,17 +35,6 @@ export class MobXGlobals {
 	 * 'guid' for general purpose. Will be persisted amongst resets.
 	 */
 	mobxGuid = 0;
-
-	/**
-	 * Are we in a transaction block? (and how many of them)
-	 */
-	inTransaction = 0;
-
-	/**
-	 * Are we currently running reactions?
-	 * Reactions are run after derivations using a trampoline.
-	 */
-	isRunningReactions = false;
 
 	/**
 	 * Are we in a batch block? (and how many of them)
@@ -60,6 +53,11 @@ export class MobXGlobals {
 	 * List of scheduled, not yet executed, reactions.
 	 */
 	pendingReactions: Reaction[] = [];
+
+	/**
+	 * Are we currently processing reactions?
+	 */
+	isRunningReactions = false;
 
 	/**
 	 * Is it allowed to change observables at this point?
@@ -81,21 +79,35 @@ export class MobXGlobals {
 	 * Spy callbacks
 	 */
 	spyListeners: {(change: any): void}[] = [];
+
+	/**
+	 * Globally attached error handlers that react specifically to errors in reactions
+	 */
+	globalReactionErrorHandlers: ((error: any, derivation: IDerivation) => void)[] = [];
 }
 
-export const globalState: MobXGlobals = (() => {
-	const res = new MobXGlobals();
+export let globalState: MobXGlobals = new MobXGlobals();
+
+export function shareGlobalState() {
+	const global = getGlobal();
+	const ownState = globalState;
+
 	/**
 	 * Backward compatibility check
 	 */
 	if (global.__mobservableTrackingStack || global.__mobservableViewStack)
 		throw new Error("[mobx] An incompatible version of mobservable is already loaded.");
-	if (global.__mobxGlobal && global.__mobxGlobal.version !== res.version)
+	if (global.__mobxGlobal && global.__mobxGlobal.version !== ownState.version)
 		throw new Error("[mobx] An incompatible version of mobx is already loaded.");
 	if (global.__mobxGlobal)
-		return global.__mobxGlobal;
-	return global.__mobxGlobal = res;
-})();
+		globalState = global.__mobxGlobal;
+	else
+		global.__mobxGlobal = ownState;
+}
+
+export function getGlobalState(): any {
+	return globalState;
+}
 
 export function registerGlobals() {
 	// no-op to make explicit why this file is loaded

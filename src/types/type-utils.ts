@@ -1,5 +1,5 @@
 import {IDepTreeNode} from "../core/observable";
-import {invariant} from "../utils/utils";
+import {invariant, fail} from "../utils/utils";
 import {runLazyInitializers} from "../utils/decorators";
 import {isAtom} from "../core/atom";
 import {isComputedValue} from "../core/computedvalue";
@@ -7,25 +7,29 @@ import {isReaction} from "../core/reaction";
 import {isObservableArray} from "../types/observablearray";
 import {isObservableMap} from "../types/observablemap";
 import {isObservableObject} from "../types/observableobject";
+import {getMessage} from "../utils/messages";
+
 
 export function getAtom(thing: any, property?: string): IDepTreeNode {
 	if (typeof thing === "object" && thing !== null) {
 		if (isObservableArray(thing)) {
-			invariant(property === undefined, "It is not possible to get index atoms from arrays");
-			return thing.$mobx.atom;
+			invariant(property === undefined, getMessage("m036"));
+			return (thing as any).$mobx.atom;
 		}
 		if (isObservableMap(thing)) {
+			const anyThing = thing as any;
 			if (property === undefined)
-				return getAtom(thing._keys);
-			const observable = thing._data[property] || thing._hasMap[property];
+				return getAtom(anyThing._keys);
+			const observable = anyThing._data[property] || anyThing._hasMap[property];
 			invariant(!!observable, `the entry '${property}' does not exist in the observable map '${getDebugName(thing)}'`);
 			return observable;
 		}
 		// Initializers run lazily when transpiling to babel, so make sure they are run...
 		runLazyInitializers(thing);
 		if (isObservableObject(thing)) {
-			invariant(!!property, `please specify a property`);
-			const observable = thing.$mobx.values[property];
+			if (!property)
+				return fail(`please specify a property`);
+			const observable = (thing as any).$mobx.values[property];
 			invariant(!!observable, `no observable property '${property}' found on the observable object '${getDebugName(thing)}'`);
 			return observable;
 		}
@@ -38,7 +42,7 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
 			return thing.$mobx;
 		}
 	}
-	invariant(false, "Cannot obtain atom from " + thing);
+	return fail("Cannot obtain atom from " + thing);
 }
 
 export function getAdministration(thing: any, property?: string) {

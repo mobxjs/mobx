@@ -1,11 +1,9 @@
 import {IInterceptor} from "../types/intercept-utils";
 import {IObservableArray, IArrayWillChange, IArrayWillSplice} from "../types/observablearray";
 import {ObservableMap, IMapWillChange} from "../types/observablemap";
-import {IObjectWillChange, isObservableObject} from "../types/observableobject";
-import {observable} from "./observable";
+import {IObjectWillChange} from "../types/observableobject";
 import {IValueWillChange, IObservableValue} from "../types/observablevalue";
-import {Lambda, isPlainObject, deprecated} from "../utils/utils";
-import {extendObservable} from "./extendobservable";
+import {Lambda} from "../utils/utils";
 import {getAdministration} from "../types/type-utils";
 
 export function intercept<T>(value: IObservableValue<T>, handler: IInterceptor<IValueWillChange<T>>): Lambda;
@@ -22,20 +20,9 @@ export function intercept(thing, propOrHandler?, handler?): Lambda {
 }
 
 function interceptInterceptable(thing, handler) {
-	if (isPlainObject(thing) && !isObservableObject(thing)) {
-		deprecated("Passing plain objects to intercept / observe is deprecated and will be removed in 3.0");
-		return getAdministration(observable(thing) as any).intercept(handler);
-	}
 	return getAdministration(thing).intercept(handler);
 }
 
 function interceptProperty(thing, property, handler) {
-	if (isPlainObject(thing) && !isObservableObject(thing)) {
-		deprecated("Passing plain objects to intercept / observe is deprecated and will be removed in 3.0");
-		extendObservable(thing, {
-			property: thing[property]
-		});
-		return interceptProperty(thing, property, handler);
-	}
 	return getAdministration(thing, property).intercept(handler);
 }

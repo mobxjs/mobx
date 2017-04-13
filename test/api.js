@@ -6,11 +6,9 @@ test('correct api should be exposed', function(t) {
 		'Atom',
 		'BaseAtom', // TODO: remove somehow
 		'IDerivationState',
+		'IObservableFactories',
 		'ObservableMap',
 		'Reaction',
-		'SimpleEventEmitter',
-		'ValueMode',
-		'_',
 		'action',
 		'asFlat',
 		'asMap',
@@ -18,17 +16,19 @@ test('correct api should be exposed', function(t) {
 		'asStructure',
 		'autorun',
 		'autorunAsync',
-		'autorunUntil',
 		'computed',
 		'createTransformer',
+		'default',
 		'expr',
 		'extendObservable',
+		'extendShallowObservable',
 		'extras',
-		'fastArray',
 		'intercept',
 		'isAction',
 		'isArrayLike',
+		'isBoxedObservable',
 		'isComputed',
+		'isModifierDescriptor',
 		'isObservable',
 		'isObservableArray',
 		'isObservableMap',
@@ -41,8 +41,6 @@ test('correct api should be exposed', function(t) {
 		'runInAction',
 		'spy',
 		'toJS',
-		'toJSlegacy',
-		'toJSON',
 		'transaction',
 		'untracked',
 		'useStrict',
@@ -53,28 +51,25 @@ test('correct api should be exposed', function(t) {
 		return mobx[key] == undefined;
 	}).length, 0);
 
-	t.deepEquals(Object.keys(mobx._).sort(), [
-		'getAdministration',
-		'resetGlobalState'
-	]);
-	t.equals(Object.keys(mobx._).filter(function(key) {
-		return mobx._[key] == undefined;
-	}).length, 0);
-
 	t.deepEquals(Object.keys(mobx.extras).sort(), [
 			'allowStateChanges',
+			'deepEqual',
+			'getAdministration',
 			'getAtom',
 			'getDebugName',
 			'getDependencyTree',
+			'getGlobalState',
 			'getObserverTree',
 			'isComputingDerivation',
 			'isSpyEnabled',
+			'onReactionError',
+			'reserveArrayBuffer',
 			'resetGlobalState',
 			'setReactionScheduler',
+			'shareGlobalState',
 			'spyReport',
 			'spyReportEnd',
-			'spyReportStart',
-			'trackTransitions'
+			'spyReportStart'
 	]);
 	t.equals(Object.keys(mobx.extras).filter(function(key) {
 		return mobx.extras[key] == undefined;

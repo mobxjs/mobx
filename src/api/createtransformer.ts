@@ -4,8 +4,8 @@ import {globalState} from "../core/globalstate";
 
 export type ITransformer<A, B> = (object: A) => B;
 
-export function createTransformer<A, B>(transformer: ITransformer<A, B>, onCleanup?: (resultObject: B, sourceObject?: A) => void): ITransformer<A, B> {
-	invariant(typeof transformer === "function" && transformer.length === 1, "createTransformer expects a function that accepts one argument");
+export function createTransformer<A, B>(transformer: ITransformer<A, B>, onCleanup?: (resultObject: B | undefined, sourceObject?: A) => void): ITransformer<A, B> {
+	invariant(typeof transformer === "function" && transformer.length < 2, "createTransformer expects a function that accepts one argument");
 
 	// Memoizes: object id -> reactive view that applies transformer to the object
 	let objectCache: {[id: number]: ComputedValue<B>} = {};
@@ -17,14 +17,14 @@ export function createTransformer<A, B>(transformer: ITransformer<A, B>, onClean
 	// Local transformer class specifically for this transformer
 	class Transformer extends ComputedValue<B> {
 		constructor(private sourceIdentifier: string, private sourceObject: A) {
-			super(() => transformer(sourceObject), null, false, `Transformer-${(<any>transformer).name}-${sourceIdentifier}`, undefined);
+			super(() => transformer(sourceObject), undefined, false, `Transformer-${(<any>transformer).name}-${sourceIdentifier}`, undefined);
 		}
 		onBecomeUnobserved() {
 			const lastValue = this.value;
 			super.onBecomeUnobserved();
 			delete objectCache[this.sourceIdentifier];
 			if (onCleanup)
-				onCleanup(lastValue, this.sourceObject);
+				onCleanup(lastValue as any, this.sourceObject);
 		}
 	}
 
@@ -45,8 +45,10 @@ export function createTransformer<A, B>(transformer: ITransformer<A, B>, onClean
 }
 
 function getMemoizationId(object) {
+	if(typeof object === 'string' || typeof object === 'number')
+		return object
 	if (object === null  || typeof object !== "object")
-		throw new Error("[mobx] transform expected some kind of object, got: " + object);
+		throw new Error("[mobx] transform expected some kind of object or primitive value, got: " + object);
 	let tid = object.$transformId;
 	if (tid === undefined) {
 		tid = getNextId();

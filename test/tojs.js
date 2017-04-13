@@ -56,14 +56,14 @@ test('json2', function(t) {
 
     t.deepEqual(mobx.toJS(o), source);
 
-    var analyze = observable(function() {
+    var analyze = mobx.computed(function() {
         return [
             o.todos.length,
             o.todos[1].details.url
         ]
     });
 
-    var alltags = observable(function() {
+    var alltags = mobx.computed(function() {
         return o.todos.map(function(todo) {
             return todo.tags.join(",");
         }).join(",");
@@ -72,8 +72,8 @@ test('json2', function(t) {
     var ab = [];
     var tb = [];
 
-    m.observe(analyze, function(d) { ab.push(d); }, true);
-    m.observe(alltags, function(d) { tb.push(d); }, true);
+    m.observe(analyze, function(d) { ab.push(d.newValue); }, true);
+    m.observe(alltags, function(d) { tb.push(d.newValue); }, true);
 
     o.todos[0].details.url = "boe";
     o.todos[1].details.url = "ba";
@@ -113,7 +113,7 @@ test('json2', function(t) {
         tags: ["x"]
     }));
 
-    t.deepEqual(mobx.toJSON(o), {
+    t.deepEqual(mobx.toJS(o), {
         "todos": [
             {
                 "title": "write blog",
@@ -186,7 +186,7 @@ test('json2', function(t) {
 
     o.todos[1].details = mobx.observable({ url: "google" });
     o.todos[1].tags = ["foo", "bar"];
-    t.deepEqual(mobx.toJSON(o, false), {
+    t.deepEqual(mobx.toJS(o, false), {
          "todos": [
             {
                 "title": "write blog",
@@ -213,7 +213,7 @@ test('json2', function(t) {
             }
         ]
     });
-    t.deepEqual(mobx.toJSON(o, true), mobx.toJSON(o, false));
+    t.deepEqual(mobx.toJS(o, true), mobx.toJS(o, false));
     t.deepEqual(ab, [[3, "google"]]);
     t.deepEqual(tb, ["reactjs,frp,foo,bar,x"]);
 
@@ -245,7 +245,7 @@ test('json cycles', function(t) {
     a.d.set("d", a.d);
     a.d.set("c", a.c);
 
-    var cloneA = mobx.toJSON(a, true);
+    var cloneA = mobx.toJS(a, true);
     var cloneC = cloneA.c;
     var cloneD = cloneA.d;
 
@@ -267,7 +267,7 @@ test('#285 class instances with toJS', t => {
 		mobx.extendObservable(this, {
 			lastName: "weststrate",
 			tags: ["user", "mobx-member"],
-			fullName: function() {
+			get fullName() {
 				return this.firstName + this.lastName
 			}
 		})
@@ -318,8 +318,16 @@ test("verify #566 solution", t => {
 	t.ok(mobx.toJS(c).b !== b) // false, cloned
 	t.ok(mobx.toJS(c).b.x === b.x) // true, both 3
 
-	t.ok(mobx.toJSlegacy(c).a !== a) // false, cloned as well
-	t.ok(mobx.toJSlegacy(c).b !== b) // false, cloned
-	t.ok(mobx.toJSlegacy(c).b.x === b.x) // true, both 3
 	t.end()
+})
+
+test("verify already seen", t => {
+	const a = mobx.observable({ x: null, y: 3 })
+	a.x = a;
+
+	const res = mobx.toJS(a);
+	t.equal(res.y, 3);
+	t.ok(res.x === res)
+	t.notOk(res.x === a);
+	t.end();
 })

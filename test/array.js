@@ -1,3 +1,4 @@
+"use strict"
 var test = require('tape');
 var mobx = require('..');
 var observable = mobx.observable;
@@ -28,7 +29,7 @@ test('test1', function(t) {
     t.equal(a.length, 2);
     t.deepEqual(a.slice(), [1,2]);
 
-    var sum = observable(function() {
+    var sum = mobx.computed(function() {
         return -1 + a.reduce(function(a,b) {
             return a + b;
         }, 1);
@@ -53,7 +54,7 @@ test('test1', function(t) {
     t.equal(sum.get(), 2);
     t.deepEqual(a.slice(), [2])
 
-    a.splice(0,0,4,3);
+	a.spliceWithArray(0,0, [4,3]);
     t.equal(sum.get(), 9);
     t.deepEqual(a.slice(), [4,3,2]);
 
@@ -85,6 +86,10 @@ test('test1', function(t) {
     t.deepEqual(a.slice(), [3,1,2]);
 
 	t.equal(JSON.stringify(a), "[3,1,2]");
+
+	t.equal(a.get(1), 1);
+	a.set(2, 4);
+	t.equal(a.get(2), 4);
 
 //	t.deepEqual(Object.keys(a), ['0', '1', '2']); // ideally....
 	t.deepEqual(Object.keys(a), []);
@@ -243,7 +248,7 @@ test('array modification functions', function(t) {
 
 test('array modifications', function(t) {
 
-    var a2 = mobx.fastArray([]);
+    var a2 = mobx.observable([]);
     var inputs = [undefined, -10, -4, -3, -1, 0, 1, 3, 4, 10];
     var arrays = [[], [1], [1,2,3,4], [1,2,3,4,5,6,7,8,9,10,11],[1,undefined],[undefined]]
     for (var i = 0; i < inputs.length; i++)
@@ -263,25 +268,50 @@ test('array modifications', function(t) {
     t.end();
 })
 
-test('new fast array values won\'t be observable', function(t) {
-   // See: https://mobxjs.github.io/mobx/refguide/fast-array.html#comment-2486090381
-    var booksA = mobx.fastArray([]);
-    var rowling = { name: 'J.K.Rowling', birth: 1965 };
-    booksA.push(rowling)
-    t.equal(mobx.isObservable(booksA[0], "name"), false);
-    var removed = booksA.splice(0, 1);
-    t.equal(mobx.isObservable(removed[0], "name"), false);
-    t.end();
-});
-
 test('is array', function(t) {
     var x = mobx.observable([]);
     t.equal(x instanceof Array, true);
 
-    // would be cool if these two would return true...
-    t.equal(typeof x === "array", false);
+    // would be cool if this would return true...
     t.equal(Array.isArray(x), false);
     t.end();
+})
+
+test('stringifies same as ecma array', function(t) {
+    const x = mobx.observable([]);
+    t.equal(x instanceof Array, true);
+
+    // would be cool if these two would return true...
+	t.equal(x.toString(), "");
+	t.equal(x.toLocaleString(), "");
+	x.push(1, 2)
+	t.equal(x.toString(), "1,2");
+	t.equal(x.toLocaleString(), "1,2");
+    t.end();
+})
+
+test("observes when stringified", function (t) {
+	const x = mobx.observable([]);
+	let c = 0;
+	mobx.autorun(function() {
+        x.toString();
+		c++;
+    });
+	x.push(1);
+	t.equal(c, 2);
+	t.end();
+})
+
+test("observes when stringified to locale", function (t) {
+	const x = mobx.observable([]);
+	let c = 0;
+	mobx.autorun(function() {
+        x.toLocaleString();
+		c++;
+    });
+	x.push(1);
+	t.equal(c, 2);
+	t.end();
 })
 
 test('peek', function(t) {
@@ -298,7 +328,7 @@ test('peek', function(t) {
 
 test('react to sort changes', function(t) {
     var x = mobx.observable([4, 2, 3]);
-    var sortedX = mobx.observable(function() {
+    var sortedX = mobx.computed(function() {
         return x.sort();
     });
     var sorted;
@@ -408,3 +438,36 @@ test('.move works correctly', t => {
 	t.end();
 });
 
+test("accessing out of bound values throws", t => {
+	const a = mobx.observable([]);
+
+	var warns = 0;
+	const baseWarn = console.warn;
+	console.warn = () => { warns++ }
+
+	a[0]; // out of bounds
+	a[1]; // out of bounds
+
+	t.equal(warns, 2);
+
+	t.doesNotThrow(() => a[0] = 3);
+	t.throws(() => a[2] = 4);
+
+	console.warn = baseWarn;
+	t.end();
+})
+
+test("replace can handle large arrays", t => {
+	const a = mobx.observable([])
+	const b = []
+	b.length = 1000*1000
+	t.doesNotThrow(() => {
+		a.replace(b)
+	})
+
+	t.doesNotThrow(() => {
+		a.spliceWithArray(0, 0, b)
+	})
+
+	t.end()
+})

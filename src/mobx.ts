@@ -21,77 +21,80 @@ registerGlobals();
 
 export { IAtom, Atom, BaseAtom                                } from "./core/atom";
 export { IObservable, IDepTreeNode                            } from "./core/observable";
-export { Reaction, IReactionPublic                            } from "./core/reaction";
+export { Reaction, IReactionPublic, IReactionDisposer         } from "./core/reaction";
 export { IDerivation, untracked, IDerivationState             } from "./core/derivation";
-export { useStrict, isStrictModeEnabled                       } from "./core/action";
+export { useStrict, isStrictModeEnabled, IAction              } from "./core/action";
 export { spy                                                  } from "./core/spy";
-export { transaction                                          } from "./core/transaction";
 export { IComputedValue                                       } from "./core/computedvalue";
 
-export { asReference, asFlat, asStructure, asMap, IModifierWrapper, ValueMode } from "./types/modifiers";
+export { asReference, asFlat, asStructure, asMap              } from "./types/modifiers-old";
+export { IModifierDescriptor, IEnhancer, isModifierDescriptor } from "./types/modifiers";
 export { IInterceptable, IInterceptor                         } from "./types/intercept-utils";
 export { IListenable                                          } from "./types/listen-utils";
 export { IObjectWillChange, IObjectChange, IObservableObject, isObservableObject } from "./types/observableobject";
-export { /* 3.0: IValueDidChange, */ IValueWillChange, IObservableValue } from "./types/observablevalue";
 
-export { IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, isObservableArray, fastArray } from "./types/observablearray";
-export { IKeyValueMap, ObservableMap, IMapEntries, IMapEntry, IMapWillChange, IMapChange, isObservableMap, map } from "./types/observablemap"
+export { IValueDidChange, IValueWillChange, IObservableValue, isObservableValue as isBoxedObservable } from "./types/observablevalue";
+export { IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, isObservableArray } from "./types/observablearray";
+export { IKeyValueMap, ObservableMap, IMapEntries, IMapEntry, IMapWillChange, IMapChange, IMapChangeUpdate, IMapChangeAdd, IMapChangeBase, IMapChangeDelete, isObservableMap, map, IObservableMapInitialValues, IMap } from "./types/observablemap";
 
-export { observable                                           } from "./api/observable";
-export { computed, IComputedValueOptions                      } from "./api/computeddecorator";
+export { transaction                                          } from "./api/transaction";
+export { observable, IObservableFactory, IObservableFactories } from "./api/observable";
+export { computed, IComputed, IComputedValueOptions           } from "./api/computed";
 export { isObservable                                         } from "./api/isobservable";
 export { isComputed                                           } from "./api/iscomputed";
-export { extendObservable                                     } from "./api/extendobservable";
+export { extendObservable, extendShallowObservable            } from "./api/extendobservable";
 export { observe                                              } from "./api/observe";
 export { intercept                                            } from "./api/intercept";
-export { autorun, autorunAsync, autorunUntil, when, reaction  } from "./api/autorun";
-export { action, isAction, runInAction                        } from "./api/action";
+export { autorun, autorunAsync, when, reaction, IReactionOptions  } from "./api/autorun";
+export { action, isAction, runInAction, IActionFactory        } from "./api/action";
 
 export { expr                                                 } from "./api/expr";
-export { toJSON, toJS, toJSlegacy                             } from "./api/tojs";
+export { toJS                                                 } from "./api/tojs";
 export { ITransformer, createTransformer                      } from "./api/createtransformer";
 export { whyRun                                               } from "./api/whyrun";
 
 export { Lambda, isArrayLike                                  } from "./utils/utils";
 export { Iterator                                             } from "./utils/iterable";
-export { SimpleEventEmitter, ISimpleEventListener             } from "./utils/simpleeventemitter";
 export { IObserverTree, IDependencyTree                       } from "./api/extras";
 
-import { resetGlobalState } from "./core/globalstate";
-
+import { resetGlobalState, shareGlobalState, getGlobalState } from "./core/globalstate";
+import { IDerivation } from "./core/derivation";
 import { IDepTreeNode } from "./core/observable";
 import { IObserverTree, IDependencyTree, getDependencyTree, getObserverTree } from "./api/extras";
 import { getDebugName, getAtom, getAdministration } from "./types/type-utils";
 import { allowStateChanges } from "./core/action";
-import { trackTransitions, spyReport, spyReportEnd, spyReportStart, isSpyEnabled } from "./core/spy";
-import { Lambda } from "./utils/utils";
+import { spyReport, spyReportEnd, spyReportStart, isSpyEnabled } from "./core/spy";
+import { Lambda, deepEqual } from "./utils/utils";
 import { isComputingDerivation } from "./core/derivation";
-import { setReactionScheduler } from "./core/reaction";
+import { setReactionScheduler, onReactionError } from "./core/reaction";
+import { reserveArrayBuffer } from "./types/observablearray";
 
 export const extras = {
 	allowStateChanges,
+	deepEqual,
 	getAtom,
 	getDebugName,
 	getDependencyTree,
+	getAdministration,
+	getGlobalState,
 	getObserverTree,
 	isComputingDerivation,
 	isSpyEnabled,
+	onReactionError,
+	reserveArrayBuffer, // See #734
 	resetGlobalState,
+	shareGlobalState,
 	spyReport,
 	spyReportEnd,
 	spyReportStart,
-	trackTransitions,
 	setReactionScheduler
-};
-
-// Experimental or internal api's (exposed for testing for example)
-export const _ = {
-	getAdministration,
-	resetGlobalState
 };
 
 declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: ((any) => void)};
 declare var module: { exports: any };
-if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === 'object') {
+if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
 	__MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx(module.exports)
 }
+
+// TODO: remove in 4.0, temporarily incompatibility fix for mobx-react@4.1.0 which accidentally uses default exports
+module.exports.default = module.exports;

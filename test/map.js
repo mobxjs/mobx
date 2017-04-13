@@ -1,15 +1,17 @@
+"use strict"
+
 var test = require('tape');
 var mobx = require('..');
 var map = mobx.map;
 var autorun = mobx.autorun;
 var iterall = require('iterall');
 
-test('map crud', function(t) {
-	global.__mobxGlobal.mobxGuid = 0; // hmm dangerous reset?
+test('map crud', function (t) {
+	mobx.extras.getGlobalState().mobxGuid = 0; // hmm dangerous reset?
 
 	var events = [];
-	var m = map({ a: 1});
-	m.observe(function(changes) {
+	var m = map({ a: 1 });
+	m.observe(function (changes) {
 		events.push(changes);
 	});
 
@@ -30,7 +32,7 @@ test('map crud', function(t) {
 	t.deepEqual(m.keys(), ["a", "b"]);
 	t.deepEqual(m.values(), [2, 3]);
 	t.deepEqual(m.entries(), [["a", 2], ["b", 3]]);
-	t.deepEqual(m.toJs(), { a: 2, b: 3});
+	t.deepEqual(m.toJS(), { a: 2, b: 3 });
 	t.deepEqual(JSON.stringify(m), '{"a":2,"b":3}');
 	t.deepEqual(m.toString(), "ObservableMap@1[{ a: 2, b: 3 }]");
 	t.equal(m.size, 2);
@@ -38,7 +40,7 @@ test('map crud', function(t) {
 	m.clear();
 	t.deepEqual(m.keys(), []);
 	t.deepEqual(m.values(), []);
-	t.deepEqual(m.toJs(), { });
+	t.deepEqual(m.toJS(), {});
 	t.deepEqual(m.toString(), "ObservableMap@1[{  }]");
 	t.equal(m.size, 0);
 
@@ -52,34 +54,42 @@ test('map crud', function(t) {
 		return item;
 	};
 	t.deepEqual(events.map(removeObjectProp),
-		[ { type: 'update',
+		[{
+			type: 'update',
 			name: 'a',
 			oldValue: 1,
-			newValue: 2 },
-		{ type: 'add',
+			newValue: 2
+		},
+		{
+			type: 'add',
 			name: 'b',
-			newValue: 3 },
-		{ type: 'delete',
+			newValue: 3
+		},
+		{
+			type: 'delete',
 			name: 'a',
-			oldValue: 2 },
-		{ type: 'delete',
+			oldValue: 2
+		},
+		{
+			type: 'delete',
 			name: 'b',
-			oldValue: 3 }
+			oldValue: 3
+		}
 		]
 	);
 	t.end();
 })
 
-test('map merge', function(t) {
-	var a = map({a: 1, b: 2, c: 2});
-	var b = map({c: 3, d: 4});
+test('map merge', function (t) {
+	var a = map({ a: 1, b: 2, c: 2 });
+	var b = map({ c: 3, d: 4 });
 	a.merge(b);
-	t.deepEqual(a.toJs(), { a: 1, b: 2, c: 3, d: 4 });
+	t.deepEqual(a.toJS(), { a: 1, b: 2, c: 3, d: 4 });
 
 	t.end();
 })
 
-test('observe value', function(t) {
+test('observe value', function (t) {
 	var a = map();
 	var hasX = false;
 	var valueX = undefined;
@@ -89,11 +99,11 @@ test('observe value', function(t) {
 		hasX = a.has("x");
 	});
 
-	autorun(function() {
+	autorun(function () {
 		valueX = a.get("x");
 	});
 
-	autorun(function() {
+	autorun(function () {
 		valueY = a.get("y");
 	});
 
@@ -117,21 +127,25 @@ test('observe value', function(t) {
 	t.equal(valueX, 5);
 
 	t.equal(valueY, undefined);
-	a.merge({y : 'hi'});
+	a.merge({ y: 'hi' });
 	t.equal(valueY, 'hi');
-	a.merge({y: 'hello'});
+	a.merge({ y: 'hello' });
 	t.equal(valueY, 'hello');
 
+	a.replace({ y: "stuff", z: "zoef" });
+	t.equal(valueY, "stuff");
+	t.deepEqual(a.keys(), ["y", "z"])
+
 	t.end();
 })
 
-test('initialize with entries', function(t) {
+test('initialize with entries', function (t) {
 	var a = map([["a", 1], ["b", 2]]);
-	t.deepEqual(a.toJs(), { a: 1, b: 2});
+	t.deepEqual(a.toJS(), { a: 1, b: 2 });
 	t.end();
 })
 
-test('initialize with empty value', function(t) {
+test('initialize with empty value', function (t) {
 	var a = map();
 	var b = map({});
 	var c = map([]);
@@ -140,24 +154,24 @@ test('initialize with empty value', function(t) {
 	b.set('0', 0);
 	c.set('0', 0);
 
-	t.deepEqual(a.toJs(), { '0': 0 });
-	t.deepEqual(b.toJs(), { '0': 0 });
-	t.deepEqual(c.toJs(), { '0': 0 });
+	t.deepEqual(a.toJS(), { '0': 0 });
+	t.deepEqual(b.toJS(), { '0': 0 });
+	t.deepEqual(c.toJS(), { '0': 0 });
 
 	t.end();
 })
 
-test('observe collections', function(t) {
+test('observe collections', function (t) {
 	var x = map();
 	var keys, values, entries;
 
-	autorun(function() {
+	autorun(function () {
 		keys = x.keys();
 	});
-	autorun(function() {
+	autorun(function () {
 		values = x.values();
 	});
-	autorun(function() {
+	autorun(function () {
 		entries = x.entries();
 	});
 
@@ -180,12 +194,12 @@ test('observe collections', function(t) {
 	t.deepEqual(entries, [["a", 2]]);
 
 	x.set("b", 3);
-	t.deepEqual(keys, ["a","b"]);
+	t.deepEqual(keys, ["a", "b"]);
 	t.deepEqual(values, [2, 3]);
 	t.deepEqual(entries, [["a", 2], ["b", 3]]);
 
 	x.has("c");
-	t.deepEqual(keys, ["a","b"]);
+	t.deepEqual(keys, ["a", "b"]);
 	t.deepEqual(values, [2, 3]);
 	t.deepEqual(entries, [["a", 2], ["b", 3]]);
 
@@ -197,13 +211,13 @@ test('observe collections', function(t) {
 	t.end();
 })
 
-test('asStructure', function(t) {
-	var x = map({}, mobx.asStructure);
+test.skip('asStructure', function (t) {
+	var x = mobx.observable.structureMap({});
 	var triggerCount = 0;
 	var value = null;
 
-	x.set("a", { b : { c: 1 } } );
-	autorun(function() {
+	x.set("a", { b: { c: 1 } });
+	autorun(function () {
 		triggerCount += 1;
 		value = x.get("a").b.c;
 	});
@@ -225,11 +239,11 @@ test('asStructure', function(t) {
 	t.end();
 })
 
-test('cleanup', function(t) {
-	var x = map({a: 1});
+test('cleanup', function (t) {
+	var x = map({ a: 1 });
 
 	var aValue;
-	var disposer = autorun(function() {
+	var disposer = autorun(function () {
 		aValue = x.get("a");
 	});
 
@@ -260,15 +274,15 @@ test('cleanup', function(t) {
 	t.end();
 })
 
-test('strict', function(t) {
+test('strict', function (t) {
 	var x = map();
-	autorun(function() {
+	autorun(function () {
 		x.get("y"); // should not throw
 	});
 	t.end();
 })
 
-test('issue 100', function(t) {
+test('issue 100', function (t) {
 	var that = {};
 	mobx.extendObservable(that, {
 		myMap: map()
@@ -278,25 +292,25 @@ test('issue 100', function(t) {
 	t.end();
 });
 
-test('issue 119 - unobserve before delete', function(t) {
+test('issue 119 - unobserve before delete', function (t) {
 	var propValues = [];
 	var myObservable = mobx.observable({
 		myMap: map()
 	});
 	myObservable.myMap.set('myId', {
 		myProp: 'myPropValue',
-		myCalculatedProp: function() {
+		myCalculatedProp: mobx.computed(function () {
 			if (myObservable.myMap.has('myId'))
 				return myObservable.myMap.get('myId').myProp + ' calculated';
 			return undefined;
-		}
+		})
 	});
 	// the error only happens if the value is observed
-	mobx.autorun(function() {
-    	myObservable.myMap.values().forEach(function(value) {
+	mobx.autorun(function () {
+		myObservable.myMap.values().forEach(function (value) {
 			console.log('x');
-        	propValues.push(value.myCalculatedProp);
-    	});
+			propValues.push(value.myCalculatedProp);
+		});
 	});
 	myObservable.myMap.delete('myId');
 
@@ -304,35 +318,35 @@ test('issue 119 - unobserve before delete', function(t) {
 	t.end();
 })
 
-test('issue 116 - has should not throw on invalid keys', function(t) {
+test('issue 116 - has should not throw on invalid keys', function (t) {
 	var x = map();
 	t.equal(x.has(undefined), false);
 	t.equal(x.has({}), false);
 	t.equal(x.get({}), undefined);
 	t.equal(x.get(undefined), undefined);
-	t.throws(function() {
+	t.throws(function () {
 		x.set({});
 	});
 	t.end();
 });
 
 test('map modifier', t => {
-	var x = mobx.observable(mobx.asMap({ a: 1 }));
+	var x = mobx.observable.map({ a: 1 });
 	t.equal(x instanceof mobx.ObservableMap, true);
 	t.equal(mobx.isObservableMap(x), true);
 	t.equal(x.get("a"), 1);
 	x.set("b", {});
 	t.equal(mobx.isObservableObject(x.get("b")), true);
 
-	x = mobx.observable(mobx.asMap([["a", 1]]));
+	x = mobx.observable.map([["a", 1]]);
 	t.equal(x instanceof mobx.ObservableMap, true);
 	t.equal(x.get("a"), 1);
 
-	x = mobx.observable(mobx.asMap());
+	x = mobx.observable.map();
 	t.equal(x instanceof mobx.ObservableMap, true);
 	t.deepEqual(x.keys(), []);
 
-	x = mobx.observable({ a: mobx.asMap({ b: { c: 3 } })});
+	x = mobx.observable({ a: mobx.observable.map({ b: { c: 3 } }) });
 	t.equal(mobx.isObservableObject(x), true);
 	t.equal(mobx.isObservableObject(x.a), false);
 	t.equal(mobx.isObservableMap(x.a), true);
@@ -342,30 +356,28 @@ test('map modifier', t => {
 });
 
 test('map modifier with modifier', t => {
-	var x = mobx.observable(mobx.asMap({ a: { c: 3 } }));
+	var x = mobx.observable.map({ a: { c: 3 } });
 	t.equal(mobx.isObservableObject(x.get("a")), true);
 	x.set("b", { d: 4 });
 	t.equal(mobx.isObservableObject(x.get("b")), true);
 
-	x = mobx.observable(mobx.asMap({ a: { c: 3 } }, mobx.asFlat));
+	x = mobx.observable.shallowMap({ a: { c: 3 } });
 	t.equal(mobx.isObservableObject(x.get("a")), false);
 	x.set("b", { d: 4 });
 	t.equal(mobx.isObservableObject(x.get("b")), false);
 
-	x = mobx.observable({ a: mobx.asMap({ b: {} }, mobx.asFlat)});
+	x = mobx.observable({ a: mobx.observable.shallowMap({ b: {} }) });
 	t.equal(mobx.isObservableObject(x), true);
 	t.equal(mobx.isObservableMap(x.a), true);
 	t.equal(mobx.isObservableObject(x.a.get("b")), false);
-	x.a.set("e", { });
+	x.a.set("e", {});
 	t.equal(mobx.isObservableObject(x.a.get("e")), false);
 
 	t.end();
 });
 
-// TODO: test, asMap should be sticky?
-
 test('256, map.clear should not be tracked', t => {
-	var x = mobx.observable(mobx.asMap({ a: 3 }));
+	var x = new mobx.ObservableMap({ a: 3 });
 	var c = 0;
 	var d = mobx.autorun(() => { c++; x.clear() });
 
@@ -379,8 +391,8 @@ test('256, map.clear should not be tracked', t => {
 
 
 test('256, map.merge should be not be tracked for target', t => {
-	var x = mobx.observable(mobx.asMap({ a: 3 }));
-	var y = mobx.observable(mobx.asMap({ b: 3 }));
+	var x = mobx.observable.map({ a: 3 });
+	var y = mobx.observable.map({ b: 3 });
 	var c = 0;
 
 	var d = mobx.autorun(() => {
@@ -455,3 +467,156 @@ test('map should support iterall / iterable ', t => {
 
 	t.end()
 })
+
+test('support for ES6 Map', t => {
+	var x = new Map()
+	x.set("x", 3)
+	x.set("y", 2)
+
+	var m = mobx.observable(x);
+	t.equal(mobx.isObservableMap(m), true);
+	t.deepEqual(m.entries(), [["x", 3], ["y", 2]]);
+
+	var x2 = new Map()
+	x2.set("y", 4)
+	x2.set("z", 5)
+	m.merge(x2);
+	t.deepEqual(m.get("z"), 5)
+
+	var x3 = new Map()
+	x3.set({ y: 2 }, { z: 4 })
+
+	t.throws(() => mobx.observable.shallowMap(x3), /only strings, numbers and booleans are accepted as key in observable maps/)
+
+	t.end();
+})
+
+test('deepEqual map', t => {
+	var x = new Map()
+	x.set("x", 3)
+	x.set("y", { z: 2 })
+
+	var x2 = mobx.observable.map();
+	x2.set("x", 3)
+	x2.set("y", { z: 3 })
+
+	t.equals(mobx.extras.deepEqual(x, x2), false)
+	x2.get("y").z = 2
+	t.equals(mobx.extras.deepEqual(x, x2), true)
+
+	x2.set("z", 1)
+	t.equals(mobx.extras.deepEqual(x, x2), false)
+	x2.delete("z")
+	t.equals(mobx.extras.deepEqual(x, x2), true)
+	x2.delete("y")
+	t.equals(mobx.extras.deepEqual(x, x2), false)
+
+	t.end();
+})
+
+test('798, cannot return observable map from computed prop', t => {
+	// MWE: this is an anti pattern, yet should be possible in certain cases nonetheless..?
+	// https://jsfiddle.net/7e6Ltscr/
+
+	const form = function (settings) {
+		var form = mobx.observable({
+			reactPropsMap: mobx.observable.map({
+				onSubmit: function () {
+					console.log('onSubmit init!');
+				}
+			}),
+			model: {
+				value: 'TEST'
+			}
+		});
+
+		form.reactPropsMap.set('onSubmit', function () {
+			console.log('onSubmit overwritten!');
+		});
+
+		return form;
+	};
+
+	const customerSearchStore = function () {
+
+		var customerSearchStore = mobx.observable({
+			customerType: 'RUBY',
+			searchTypeFormStore: mobx.computed(function () {
+				return form(customerSearchStore.customerType);
+			}),
+			customerSearchType: mobx.computed(function () {
+				return form(customerSearchStore.searchTypeFormStore.model.value);
+			})
+		});
+		return customerSearchStore;
+	};
+	var cs = customerSearchStore();
+
+	t.doesNotThrow(() => {
+		console.log(cs.customerSearchType);
+	})
+
+	t.end()
+})
+
+test('869, deeply observable map should make added items observables as well', t => {
+  var store = {
+    map_deep1: mobx.observable(new Map()),
+    map_deep2: mobx.observable.map(),
+  };
+
+  t.ok(mobx.isObservable(store.map_deep1), 'should make map Observable');
+  t.ok(mobx.isObservableMap(store.map_deep1), 'should make map ObservableMap');
+  t.ok(mobx.isObservable(store.map_deep2), 'should make map Observable');
+  t.ok(mobx.isObservableMap(store.map_deep2), 'should make map ObservableMap');
+
+  store.map_deep2.set('a', []);
+  t.ok(mobx.isObservable(store.map_deep2.get('a')), 'should make added items observables');
+
+  store.map_deep1.set('a', []);
+  t.ok(mobx.isObservable(store.map_deep1.get('a')), 'should make added items observables');
+
+  t.end();
+});
+
+test('using deep map', t => {
+  var store = {
+    map_deep: mobx.observable(new Map()),
+  };
+
+  // Creating autorun triggers one observation, hence -1
+  let observed = -1;
+  mobx.autorun(function () {
+    // Use the map, to observe all changes
+    var _ = mobx.toJS(store.map_deep);
+    observed++;
+  });
+
+  store.map_deep.set('shoes', []);
+  t.equal(observed, 1, 'should observe new item added');
+
+  store.map_deep.get('shoes').push({ color: 'black' });
+  t.equal(observed, 2, 'should observe item mutated');
+
+  store.map_deep.get('shoes')[0].color = 'red';
+  t.equal(observed, 3, 'should observe nested item mutated');
+
+  t.end();
+});
+
+test("issue 893", t => {
+  const m = mobx.observable.map();
+  const keys = ['constructor', 'toString', 'assertValidKey', 'isValidKey', 'toJSON', 'toJS']
+  for (let key of keys) {
+	  t.equal(m.get(key), undefined);
+  }
+  t.end();
+});
+
+test("work with 'toString' key", t => {
+	const m = mobx.observable.map();
+	t.equal(m.get('toString'), undefined);
+	m.set('toString', 'test');
+	t.equal(m.get('toString'), 'test');
+	t.end();
+});

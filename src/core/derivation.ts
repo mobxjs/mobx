@@ -1,8 +1,10 @@
-import {IObservable, IDepTreeNode, addObserver, removeObserver, endBatch} from "./observable";
-import {globalState, resetGlobalState} from "./globalstate";
-import {invariant} from "../utils/utils";
-import {isSpyEnabled, spyReport} from "./spy";
+import {IObservable, IDepTreeNode, addObserver, removeObserver} from "./observable";
+import {IAtom} from "./atom";
+import {globalState} from "./globalstate";
+import {fail} from "../utils/utils";
 import {isComputedValue} from "./computedvalue";
+import {getMessage} from "../utils/messages";
+
 
 export enum IDerivationState {
 	// before being run or (outside batch and not being observed)
@@ -27,11 +29,10 @@ export enum IDerivationState {
 /**
  * A derivation is everything that can be derived from the state (all the atoms) in a pure manner.
  * See https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.xvbh6qd74
- * TODO: the one above is outdated, new one?
  */
 export interface IDerivation extends IDepTreeNode {
 	observing: IObservable[];
-	newObserving: IObservable[];
+	newObserving: null | IObservable[];
 	dependenciesState: IDerivationState;
 	/**
 	 * Id of the current run of a derivation. Each time the derivation is tracked
@@ -44,7 +45,16 @@ export interface IDerivation extends IDepTreeNode {
 	unboundDepsCount: number;
 	__mapid: string;
 	onBecomeStale();
-	recoverFromError(); // TODO: revisit implementation of error handling
+}
+
+export class CaughtException {
+	constructor(public cause: any) {
+		// Empty
+	}
+}
+
+export function isCaughtException(e): e is CaughtException {
+	return e instanceof CaughtException;
 }
 
 /**
@@ -62,32 +72,29 @@ export function shouldCompute(derivation: IDerivation): boolean {
 		case IDerivationState.UP_TO_DATE: return false;
 		case IDerivationState.NOT_TRACKING: case IDerivationState.STALE: return true;
 		case IDerivationState.POSSIBLY_STALE: {
-			let hasError = true;
 			const prevUntracked = untrackedStart(); // no need for those computeds to be reported, they will be picked up in trackDerivedFunction.
-			try {
-				const obs = derivation.observing, l = obs.length;
-				for (let i = 0; i < l; i++) {
-					const obj = obs[i];
-					if (isComputedValue(obj)) {
+			const obs = derivation.observing, l = obs.length;
+			for (let i = 0; i < l; i++) {
+				const obj = obs[i];
+				if (isComputedValue(obj)) {
+					try {
 						obj.get();
-						// if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
-						// and `derivation` is an observer of `obj`
-						if (derivation.dependenciesState === IDerivationState.STALE) {
-							hasError = false;
-							untrackedEnd(prevUntracked);
-							return true;
-						}
+					} catch (e) {
+						// we are not interested in the value *or* exception at this moment, but if there is one, notify all
+						untrackedEnd(prevUntracked);
+						return true;
+					}
+					// if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
+					// and `derivation` is an observer of `obj`
+					if ((derivation as any).dependenciesState === IDerivationState.STALE) {
+						untrackedEnd(prevUntracked);
+						return true;
 					}
 				}
-				hasError = false;
-				changeDependenciesStateTo0(derivation);
-				untrackedEnd(prevUntracked);
-				return false;
-			} finally {
-				if (hasError) {
-					changeDependenciesStateTo0(derivation);
-				}
 			}
+			changeDependenciesStateTo0(derivation);
+			untrackedEnd(prevUntracked);
+			return false;
 		}
 	}
 }
@@ -96,13 +103,14 @@ export function isComputingDerivation() {
 	return globalState.trackingDerivation !== null; // filter out actions inside computations
 }
 
-export function checkIfStateModificationsAreAllowed() {
-	if (!globalState.allowStateChanges) {
-		invariant(false, globalState.strictMode
-			? "It is not allowed to create or change state outside an `action` when MobX is in strict mode. Wrap the current method in `action` if this state change is intended"
-			: "It is not allowed to change the state when a computed value or transformer is being evaluated. Use 'autorun' to create reactive functions with side-effects."
-		);
-	}
+export function checkIfStateModificationsAreAllowed(atom: IAtom) {
+	const hasObservers = atom.observers.length > 0;
+	// Should never be possible to change an observed observable from inside computed, see #798
+	if (globalState.computationDepth > 0 && hasObservers)
+		fail(getMessage("m031") + atom.name);
+	// Should not be possible to change observed state outside strict mode, except during initialization, see #563
+	if (!globalState.allowStateChanges && hasObservers)
+		fail(getMessage(globalState.strictMode ? "m030a" : "m030b") + atom.name);
 }
 
 /**
@@ -110,7 +118,7 @@ export function checkIfStateModificationsAreAllowed() {
  * The tracking information is stored on the `derivation` object and the derivation is registered
  * as observer of any of the accessed observables.
  */
-export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
+export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, context) {
 	// pre allocate array allocation + room for variation in deps
 	// array will be trimmed by bindDependencies
 	changeDependenciesStateTo0(derivation);
@@ -119,51 +127,19 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T) {
 	derivation.runId = ++globalState.runId;
 	const prevTracking = globalState.trackingDerivation;
 	globalState.trackingDerivation = derivation;
-	let hasException = true;
-	let result: T;
+	let result;
 	try {
-		result = f.call(derivation);
-		hasException = false;
-	} finally {
-		if (hasException) {
-			handleExceptionInDerivation(derivation);
-		} else {
-			globalState.trackingDerivation = prevTracking;
-			bindDependencies(derivation);
-		}
+		result = f.call(context);
+	} catch (e) {
+		result = new CaughtException(e);
 	}
+	globalState.trackingDerivation = prevTracking;
+	bindDependencies(derivation);
 	return result;
 }
 
-export function handleExceptionInDerivation(derivation: IDerivation) {
-	const message = (
-		`[mobx] An uncaught exception occurred while calculating your computed value, autorun or transformer. Or inside the render() method of an observer based React component. ` +
-		`These functions should never throw exceptions as MobX will not always be able to recover from them. ` +
-		`Please fix the error reported after this message or enable 'Pause on (caught) exceptions' in your debugger to find the root cause. In: '${derivation.name}'. ` +
-		`For more details see https://github.com/mobxjs/mobx/issues/462`
-	);
-	if (isSpyEnabled()) {
-		spyReport({
-			type: "error",
-			message
-		});
-	}
-	console.warn(message); // In next major, maybe don't emit this message at all?
-	// Poor mans recovery attempt
-	// Assumption here is that this is the only exception handler in MobX.
-	// So functions higher up in the stack (like transanction) won't be modifying the globalState anymore after this call.
-	// (Except for other trackDerivedFunction calls of course, but that is just)
-	changeDependenciesStateTo0(derivation);
-	derivation.newObserving = null;
-	derivation.unboundDepsCount = 0;
-	derivation.recoverFromError();
-	// close current batch, make sure pending unobservations are executed
-	endBatch();
-	resetGlobalState();
-}
-
 /**
- * diffs newObserving with obsering.
+ * diffs newObserving with observing.
  * update observing to be newObserving with unique observables
  * notify observers that become observed/unobserved
  */
@@ -171,7 +147,8 @@ function bindDependencies(derivation: IDerivation) {
 	// invariant(derivation.dependenciesState !== IDerivationState.NOT_TRACKING, "INTERNAL ERROR bindDependencies expects derivation.dependenciesState !== -1");
 
 	const prevObserving = derivation.observing;
-	const observing = derivation.observing = derivation.newObserving;
+	const observing = derivation.observing = derivation.newObserving!;
+	let lowestNewObservingDerivationState = IDerivationState.UP_TO_DATE;
 
 	derivation.newObserving = null; // newObserving shouldn't be needed outside tracking
 
@@ -185,6 +162,12 @@ function bindDependencies(derivation: IDerivation) {
 			dep.diffValue = 1;
 			if (i0 !== i) observing[i0] = dep;
 			i0++;
+		}
+
+		// Upcast is 'safe' here, because if dep is IObservable, `dependenciesState` will be undefined,
+		// not hitting the condition
+		if ((dep as any as IDerivation).dependenciesState > lowestNewObservingDerivationState) {
+			lowestNewObservingDerivationState = (dep as any as IDerivation).dependenciesState;
 		}
 	}
 	observing.length = i0;
@@ -211,17 +194,24 @@ function bindDependencies(derivation: IDerivation) {
 			addObserver(dep, derivation);
 		}
 	}
+
+	// Some new observed derivations might become stale during this derivation computation
+	// so say had no chance to propagate staleness (#916)
+	if (lowestNewObservingDerivationState !== IDerivationState.UP_TO_DATE) {
+		derivation.dependenciesState = lowestNewObservingDerivationState;
+		derivation.onBecomeStale();
+	}
 }
 
 export function clearObserving(derivation: IDerivation) {
 	// invariant(globalState.inBatch > 0, "INTERNAL ERROR clearObserving should be called only inside batch");
 	const obs = derivation.observing;
+	derivation.observing = [];
 	let i = obs.length;
 	while (i--)
 		removeObserver(obs[i], derivation);
 
 	derivation.dependenciesState = IDerivationState.NOT_TRACKING;
-	obs.length = 0;
 }
 
 export function untracked<T>(action: () => T): T {
@@ -231,13 +221,13 @@ export function untracked<T>(action: () => T): T {
 	return res;
 }
 
-export function untrackedStart(): IDerivation {
+export function untrackedStart(): IDerivation | null {
 	const prev = globalState.trackingDerivation;
 	globalState.trackingDerivation = null;
 	return prev;
 }
 
-export function untrackedEnd(prev: IDerivation) {
+export function untrackedEnd(prev: IDerivation | null) {
 	globalState.trackingDerivation = prev;
 }
 

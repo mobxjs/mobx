@@ -1,11 +1,13 @@
-import {isObject, createInstanceofPredicate, getNextId, deepEquals, makeNonEnumerable, Lambda, deprecated, EMPTY_ARRAY, addHiddenFinalProp, addHiddenProp, invariant} from "../utils/utils";
+import {isObject, createInstanceofPredicate, getNextId, makeNonEnumerable, Lambda, EMPTY_ARRAY, addHiddenFinalProp, addHiddenProp, invariant} from "../utils/utils";
 import {BaseAtom} from "../core/atom";
-import {ValueMode, assertUnwrapped, makeChildObservable} from "./modifiers";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {arrayAsIterator, declareIterator} from "../utils/iterable";
+import {IEnhancer} from "../types/modifiers";
+
+const MAX_SPLICE_SIZE = 10000; // See e.g. https://github.com/mobxjs/mobx/issues/859
 
 // Detects bug in safari 9.1.1 (or iOS 9 safari mobile). See #364
 const safariPrototypeSetterInheritanceBug = (() => {
@@ -19,7 +21,8 @@ const safariPrototypeSetterInheritanceBug = (() => {
 export interface IObservableArray<T> extends Array<T> {
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[];
 	observe(listener: (changeData: IArrayChange<T>|IArraySplice<T>) => void, fireImmediately?: boolean): Lambda;
-	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda;
+	intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda;
+	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda; // TODO: remove in 4.0
 	clear(): T[];
 	peek(): T[];
 	replace(newItems: T[]): T[];
@@ -81,20 +84,14 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 	lastKnownLength: number = 0;
 	interceptors = null;
 	changeListeners = null;
+	enhancer: (newV: T, oldV: T | undefined) => T;
 
-	constructor(name, public mode: ValueMode, public array: IObservableArray<T>, public owned: boolean) {
+	constructor(name, enhancer: IEnhancer<T>, public array: IObservableArray<T>, public owned: boolean) {
 		this.atom = new BaseAtom(name || ("ObservableArray@" + getNextId()));
+		this.enhancer = (newV, oldV) => enhancer(newV, oldV, name + "[..]");
 	}
 
-	makeReactiveArrayItem(value) {
-		// this = IObservableArrayAdministration, bound during construction
-		assertUnwrapped(value, "Array values cannot have modifiers");
-		if (this.mode === ValueMode.Flat || this.mode === ValueMode.Reference)
-			return value;
-		return makeChildObservable(value, this.mode, `${this.atom.name}[..]`);
-	}
-
-	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
+	intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
 		return registerInterceptor<IArrayChange<T>|IArraySplice<T>>(this, handler);
 	}
 
@@ -118,14 +115,18 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 		return this.values.length;
 	}
 
-	setArrayLength(newLength: number): number {
+	setArrayLength(newLength: number) {
 		if (typeof newLength !== "number" || newLength < 0)
 			throw new Error("[mobx.array] Out of range: " + newLength);
 		let currentLength = this.values.length;
 		if (newLength === currentLength)
 			return;
-		else if (newLength > currentLength)
-			this.spliceWithArray(currentLength, 0, new Array(newLength - currentLength));
+		else if (newLength > currentLength) {
+			const newItems = new Array(newLength - currentLength);
+			for (let i = 0; i < newLength - currentLength; i++)
+				newItems[i] = undefined; // No Array.fill everywhere...
+			this.spliceWithArray(currentLength, 0, newItems);
+		}
 		else
 			this.spliceWithArray(newLength, currentLength - newLength);
 	}
@@ -140,7 +141,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 	}
 
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[] {
-		checkIfStateModificationsAreAllowed();
+		checkIfStateModificationsAreAllowed(this.atom);
 		const length = this.values.length;
 
 		if (index === undefined)
@@ -174,14 +175,24 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 			newItems = change.added;
 		}
 
-		newItems = <T[]> newItems.map(this.makeReactiveArrayItem, this);
+		newItems = <T[]> newItems.map(v => this.enhancer(v, undefined));
 		const lengthDelta = newItems.length - deleteCount;
 		this.updateArrayLength(length, lengthDelta); // create or remove new entries
-		const res: T[] = this.values.splice(index, deleteCount, ...newItems); // FIXME: splat might exceed callstack size!
+		const res = this.spliceItemsIntoValues(index, deleteCount, newItems);
 
 		if (deleteCount !== 0 || newItems.length !== 0)
 			this.notifyArraySplice(index, newItems, res);
 		return res;
+	}
+
+	spliceItemsIntoValues(index, deleteCount, newItems: T[]): T[] {
+		if (newItems.length < MAX_SPLICE_SIZE) {
+			return this.values.splice(index, deleteCount, ...newItems);
+		} else {
+			const res = this.values.slice(index, index + deleteCount)
+			this.values = this.values.slice(0, index).concat(newItems, this.values.slice(index + deleteCount ))
+			return res;
+		}
 	}
 
 	notifyArrayChildUpdate<T>(index: number, newValue: T, oldValue: T) {
@@ -227,15 +238,15 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 export class ObservableArray<T> extends StubArray {
 	private $mobx: ObservableArrayAdministration<T>;
 
-	constructor(initialValues: T[], mode: ValueMode, name: string, owned = false) {
+	constructor(initialValues: T[] | undefined, enhancer: IEnhancer<T>, name = "ObservableArray@" + getNextId(), owned = false) {
 		super();
 
-		const adm = new ObservableArrayAdministration<T>(name, mode, this as any, owned);
+		const adm = new ObservableArrayAdministration<T>(name, enhancer, this as any, owned);
 		addHiddenFinalProp(this, "$mobx", adm);
 
 		if (initialValues && initialValues.length) {
 			adm.updateArrayLength(0, initialValues.length);
-			adm.values = initialValues.map(adm.makeReactiveArrayItem, adm);
+			adm.values = initialValues.map(v => enhancer(v, undefined, name + "[..]"));
 			adm.notifyArraySplice(0, adm.values.slice(), EMPTY_ARRAY);
 		} else {
 			adm.values = [];
@@ -248,7 +259,7 @@ export class ObservableArray<T> extends StubArray {
 		}
 	}
 
-	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
+	intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
 		return this.$mobx.intercept(handler);
 	}
 
@@ -262,7 +273,7 @@ export class ObservableArray<T> extends StubArray {
 
 	concat(...arrays: T[][]): T[] {
 		this.$mobx.atom.reportObserved();
-		return Array.prototype.concat.apply((this as any).slice(), arrays.map(a => isObservableArray(a) ? a.slice() : a));
+		return Array.prototype.concat.apply((this as any).peek(), arrays.map(a => isObservableArray(a) ? a.peek() : a));
 	}
 
 	replace(newItems: T[]) {
@@ -287,7 +298,7 @@ export class ObservableArray<T> extends StubArray {
 	}
 
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
-	find(predicate: (item: T, index: number, array: ObservableArray<T>) => boolean, thisArg?, fromIndex = 0): T {
+	find(predicate: (item: T, index: number, array: ObservableArray<T>) => boolean, thisArg?, fromIndex = 0): T | undefined {
 		this.$mobx.atom.reportObserved();
 		const items = this.$mobx.values, l = items.length;
 		for (let i = fromIndex; i < l; i++)
@@ -314,17 +325,22 @@ export class ObservableArray<T> extends StubArray {
 		return this.$mobx.spliceWithArray(index, deleteCount, newItems);
 	}
 
+	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[] {
+		return this.$mobx.spliceWithArray(index, deleteCount, newItems);
+	}
+
+
 	push(...items: T[]): number {
 		const adm = this.$mobx;
 		adm.spliceWithArray(adm.values.length, 0, items);
 		return adm.values.length;
 	}
 
-	pop(): T {
+	pop(): T | undefined {
 		return this.splice(Math.max(this.$mobx.values.length - 1, 0), 1)[0];
 	}
 
-	shift(): T {
+	shift(): T | undefined {
 		return this.splice(0, 1)[0];
 	}
 
@@ -386,12 +402,61 @@ export class ObservableArray<T> extends StubArray {
 	}
 
 	toString(): string {
-		return "[mobx.array] " + Array.prototype.toString.apply(this.$mobx.values, arguments);
+		this.$mobx.atom.reportObserved();
+		return Array.prototype.toString.apply(this.$mobx.values, arguments);
 	}
 
 	toLocaleString(): string {
-		return "[mobx.array] " + Array.prototype.toLocaleString.apply(this.$mobx.values, arguments);
+		this.$mobx.atom.reportObserved();
+		return Array.prototype.toLocaleString.apply(this.$mobx.values, arguments);
 	}
+
+	// See #734, in case property accessors are unreliable...
+	get(index: number): T | undefined {
+		const impl = <ObservableArrayAdministration<any>> this.$mobx;
+		if (impl) {
+			if (index < impl.values.length) {
+				impl.atom.reportObserved();
+				return impl.values[index];
+			}
+			console.warn(`[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${impl.values.length}). Please check length first. Out of bound indices will not be tracked by MobX`);
+		}
+		return undefined;
+	}
+
+	// See #734, in case property accessors are unreliable...
+	set(index: number, newValue: T) {
+		const adm = <ObservableArrayAdministration<T>> this.$mobx;
+		const values = adm.values;
+		if (index < values.length) {
+			// update at index in range
+			checkIfStateModificationsAreAllowed(adm.atom);
+			const oldValue = values[index];
+			if (hasInterceptors(adm)) {
+				const change = interceptChange<IArrayWillChange<T>>(adm as any, {
+					type: "update",
+					object: this as any,
+					index, newValue
+				});
+				if (!change)
+					return;
+				newValue = change.newValue;
+			}
+			newValue = adm.enhancer(newValue, oldValue);
+			const changed = newValue !== oldValue;
+			if (changed) {
+				values[index] = newValue;
+				adm.notifyArrayChildUpdate(index, newValue, oldValue);
+			}
+		} else if (index === values.length) {
+			// add a new item
+			adm.spliceWithArray(index, 0, [newValue]);
+		} else {
+			// out of bounds
+			throw new Error(`[mobx.array] Index out of bounds, ${index} is larger than ${values.length}`);
+		}
+	}
+
 }
 
 declareIterator(ObservableArray.prototype, function() {
@@ -407,14 +472,17 @@ makeNonEnumerable(ObservableArray.prototype, [
 	"observe",
 	"clear",
 	"concat",
+	"get",
 	"replace",
 	"toJS",
 	"toJSON",
 	"peek",
 	"find",
 	"splice",
+	"spliceWithArray",
 	"push",
 	"pop",
+	"set",
 	"shift",
 	"unshift",
 	"reverse",
@@ -462,85 +530,33 @@ Object.defineProperty(ObservableArray.prototype, "length", {
 });
 
 // See #364
-const ENTRY_0 = {
-	configurable: true,
-	enumerable: false,
-	set: createArraySetter(0),
-	get: createArrayGetter(0)
-};
+const ENTRY_0 = createArrayEntryDescriptor(0);
+
+function createArrayEntryDescriptor(index: number) {
+	return {
+		enumerable: false,
+		configurable: false,
+		get: function() {
+			// TODO: Check `this`?, see #752?
+			return this.get(index);
+		},
+		set: function(value) {
+			this.set(index, value);
+		}
+	};
+}
 
 function createArrayBufferItem(index: number) {
-	const set = createArraySetter(index);
-	const get = createArrayGetter(index);
-	Object.defineProperty(ObservableArray.prototype, "" + index, {
-		enumerable: false,
-		configurable: true,
-		set, get
-	});
+	Object.defineProperty(ObservableArray.prototype, "" + index, createArrayEntryDescriptor(index));
 }
 
-function createArraySetter(index: number) {
-	return function<T>(newValue: T) {
-		const adm = <ObservableArrayAdministration<T>> this.$mobx;
-		const values = adm.values;
-		assertUnwrapped(newValue, "Modifiers cannot be used on array values. For non-reactive array values use makeReactive(asFlat(array)).");
-		if (index < values.length) {
-			// update at index in range
-			checkIfStateModificationsAreAllowed();
-			const oldValue = values[index];
-			if (hasInterceptors(adm)) {
-				const change = interceptChange<IArrayWillChange<T>>(adm as any, {
-					type: "update",
-					object: adm.array,
-					index, newValue
-				});
-				if (!change)
-					return;
-				newValue = change.newValue;
-			}
-			newValue = adm.makeReactiveArrayItem(newValue);
-			const changed = (adm.mode === ValueMode.Structure) ? !deepEquals(oldValue, newValue) : oldValue !== newValue;
-			if (changed) {
-				values[index] = newValue;
-				adm.notifyArrayChildUpdate(index, newValue, oldValue);
-			}
-		} else if (index === values.length) {
-			// add a new item
-			adm.spliceWithArray(index, 0, [newValue]);
-		} else
-			// out of bounds
-			throw new Error(`[mobx.array] Index out of bounds, ${index} is larger than ${values.length}`);
-	};
-}
-
-function createArrayGetter(index: number) {
-	return function () {
-		const impl = <ObservableArrayAdministration<any>> this.$mobx;
-		if (impl && index < impl.values.length) {
-			impl.atom.reportObserved();
-			return impl.values[index];
-		}
-		console.warn(`[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${impl.values.length}). Please check length first. Out of bound indices will not be tracked by MobX`);
-		return undefined;
-	};
-}
-
-function reserveArrayBuffer(max: number) {
+export function reserveArrayBuffer(max: number) {
 	for (let index = OBSERVABLE_ARRAY_BUFFER_SIZE; index < max; index++)
 		createArrayBufferItem(index);
 	OBSERVABLE_ARRAY_BUFFER_SIZE = max;
 }
 
 reserveArrayBuffer(1000);
-
-export function createObservableArray<T>(initialValues: T[], mode: ValueMode, name: string): IObservableArray<T> {
-	return <IObservableArray<T>><any> new ObservableArray(initialValues, mode, name);
-}
-
-export function fastArray<V>(initialValues?: V[]): IObservableArray<V> {
-	deprecated("fastArray is deprecated. Please use `observable(asFlat([]))`");
-	return createObservableArray(initialValues, ValueMode.Flat, null);
-}
 
 const isObservableArrayAdministration = createInstanceofPredicate("ObservableArrayAdministration", ObservableArrayAdministration);
 

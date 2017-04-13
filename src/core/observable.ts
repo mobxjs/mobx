@@ -1,6 +1,7 @@
 import {IDerivation, IDerivationState} from "./derivation";
 import {globalState} from "./globalstate";
 import {invariant} from "../utils/utils";
+import {runReactions} from "./reaction";
 
 export interface IDepTreeNode {
 	name: string;
@@ -19,7 +20,7 @@ export interface IObservable extends IDepTreeNode {
 	lowestObserverState: IDerivationState; // Used to avoid redundant propagations
 	isPendingUnobservation: boolean; // Used to push itself to global.pendingUnobservations at most once per batch.
 
-	observers: IDerivation[]; // mantain _observers in raw array for for way faster iterating in propagation.
+	observers: IDerivation[]; // maintain _observers in raw array for for way faster iterating in propagation.
 	observersIndexes: {}; // map derivation.__mapid to _observers.indexOf(derivation) (see removeObserver)
 
 	onBecomeUnobserved();
@@ -78,7 +79,7 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 		// deleting from _observersIndexes is straight forward, to delete from _observers, let's swap `node` with last element
 		const list = observable.observers;
 		const map = observable.observersIndexes;
-		const filler = list.pop(); // get last element, which should fill the place of `node`, so the array doesnt have holes
+		const filler = list.pop()!; // get last element, which should fill the place of `node`, so the array doesnt have holes
 		if (filler !== node) { // otherwise node was the last element, which already got removed from array
 			const index = map[node.__mapid] || 0; // getting index of `node`. this is the only place we actually use map.
 			if (index) { // map store all indexes but 0, see comment in `addObserver`
@@ -104,7 +105,7 @@ export function queueForUnobservation(observable: IObservable) {
 }
 
 /**
- * Batch is a pseudotransaction, just for purposes of memoizing ComputedValues when nothing else does.
+ * Batch starts a transaction, at least for purposes of memoizing ComputedValues when nothing else does.
  * During a batch `onBecomeUnobserved` will be called at most once per observable.
  * Avoids unnecessary recalculations.
  */
@@ -113,7 +114,8 @@ export function startBatch() {
 }
 
 export function endBatch() {
-	if (globalState.inBatch === 1) {
+	if (--globalState.inBatch === 0) {
+		runReactions();
 		// the batch is actually about to finish, all unobserving should happen here.
 		const list = globalState.pendingUnobservations;
 		for (let i = 0; i < list.length; i++) {
@@ -126,7 +128,6 @@ export function endBatch() {
 		}
 		globalState.pendingUnobservations = [];
 	}
-	globalState.inBatch--;
 }
 
 export function reportObserved(observable: IObservable) {
@@ -139,7 +140,7 @@ export function reportObserved(observable: IObservable) {
 		 */
 		if (derivation.runId !== observable.lastAccessedBy) {
 			observable.lastAccessedBy = derivation.runId;
-			derivation.newObserving[derivation.unboundDepsCount++] = observable;
+			derivation.newObserving![derivation.unboundDepsCount++] = observable;
 		}
 	} else if (observable.observers.length === 0) {
 		queueForUnobservation(observable);
@@ -159,13 +160,12 @@ function invariantLOS(observable: IObservable, msg) {
 /**
  * NOTE: current propagation mechanism will in case of self reruning autoruns behave unexpectedly
  * It will propagate changes to observers from previous run
- * It's hard or maybe inpossible (with reasonable perf) to get it right with current approach
- * Hopefully self reruning autoruns aren't a feature people shuold depend on
- * Also most basic use cases shuold be ok
- * TODO: create description of autorun behaviour or change this behaviour?
+ * It's hard or maybe impossible (with reasonable perf) to get it right with current approach
+ * Hopefully self reruning autoruns aren't a feature people should depend on
+ * Also most basic use cases should be ok
  */
 
-// Called by Atom when it's value changes
+// Called by Atom when its value changes
 export function propagateChanged(observable: IObservable) {
 	// invariantLOS(observable, "changed start");
 	if (observable.lowestObserverState === IDerivationState.STALE) return;
@@ -182,7 +182,7 @@ export function propagateChanged(observable: IObservable) {
 	// invariantLOS(observable, "changed end");
 }
 
-// Called by ComputedValue when it recalculate and it's value changed
+// Called by ComputedValue when it recalculate and its value changed
 export function propagateChangeConfirmed(observable: IObservable) {
 	// invariantLOS(observable, "confirmed start");
 	if (observable.lowestObserverState === IDerivationState.STALE) return;
@@ -200,7 +200,7 @@ export function propagateChangeConfirmed(observable: IObservable) {
 	// invariantLOS(observable, "confirmed end");
 }
 
-// Used by computed when it's dependency changed, but we don't wan't to immidiately recompute.
+// Used by computed when its dependency changed, but we don't wan't to immediately recompute.
 export function propagateMaybeChanged(observable: IObservable) {
 	// invariantLOS(observable, "maybe start");
 	if (observable.lowestObserverState !== IDerivationState.UP_TO_DATE) return;

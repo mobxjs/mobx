@@ -1,19 +1,20 @@
+"use strict"
 var test = require('tape');
 var mobx = require('..');
 
 test('spy output', t => {
 	var events = [];
-	
+
 	var stop = mobx.spy(c => events.push(c));
-	
+
 	doStuff();
-	
+
 	stop();
-	
-	doStuff();	
+
+	doStuff();
 
 	events.forEach(ev => { delete ev.object; delete ev.fn; delete ev.time; });
-	
+
 	t.equal(events.length, doStuffEvents.length, "amount of events doesn't match");
 	//t.deepEqual(events, doStuffEvents);
 
@@ -35,7 +36,7 @@ test('spy output', t => {
 function doStuff() {
 	var a = mobx.observable(2);
 	a.set(3);
-	
+
 	var b = mobx.observable({
 		c: 4
 	});
@@ -47,27 +48,27 @@ function doStuff() {
 	e.push(3, 4);
 	e.shift();
 	e[2] = 5;
-	
+
 	var f = mobx.map({ g: 1 });
 	f.delete("h");
 	f.delete("g");
 	f.set("i", 5);
 	f.set("i", 6);
-	
+
 	var j = mobx.computed(() => a.get() * 2);
-	
+
 	var stop = mobx.autorun(() => { j.get() });
-	
+
 	a.set(4);
-	
+
 	mobx.transaction(function myTransaction() {
 		a.set(5);
 		a.set(6);
 	});
-	
+
 	mobx.action("myTestAction", (newValue) => {
 		a.set(newValue)
-	})(7);
+	}).call({}, 7);
 }
 
 
@@ -105,27 +106,67 @@ const doStuffEvents = [
 	{ name: 'i', newValue: 6, oldValue: 5, spyReportStart: true, type: 'update' },
 	{ spyReportEnd: true },
 	{ spyReportStart: true, type: 'reaction' },
-	{ target: undefined, type: 'compute' },
+	{ type: 'compute' },
 	{ spyReportEnd: true },
 	{ newValue: 4, oldValue: 3, spyReportStart: true, type: 'update' },
-	{ target: undefined, type: 'compute' },
+	{ type: 'compute' },
 	{ spyReportStart: true, type: 'reaction' },
 	{ spyReportEnd: true },
 	{ spyReportEnd: true },
-	{ name: 'myTransaction', spyReportStart: true, target: undefined, type: 'transaction' },
 	{ newValue: 5, oldValue: 4, spyReportStart: true, type: 'update' },
 	{ spyReportEnd: true },
 	{ newValue: 6, oldValue: 5, spyReportStart: true, type: 'update' },
 	{ spyReportEnd: true },
-	{ target: undefined, type: 'compute' },
+	{ type: 'compute' },
 	{ spyReportStart: true, type: 'reaction' },
 	{ spyReportEnd: true },
-	{ spyReportEnd: true },
-	{ name: 'myTestAction', spyReportStart: true, arguments: [7], type: 'action', target: undefined },
+	{ name: 'myTestAction', spyReportStart: true, arguments: [7], type: 'action' },
 	{ newValue: 7, oldValue: 6, spyReportStart: true, type: 'update' },
 	{ spyReportEnd: true },
-	{ target: undefined, type: 'compute' },
+	{ type: 'compute' },
 	{ spyReportStart: true, type: 'reaction' },
 	{ spyReportEnd: true },
 	{ spyReportEnd: true }
 ]
+
+test("spy error", t => {
+	mobx.extras.getGlobalState().mobxGuid = 0;
+
+	const a = mobx.observable({
+		x: 2,
+		get y() {
+			if (this.x === 3)
+				throw "Oops";
+			return this.x * 2;
+		}
+	})
+
+	var events = [];
+	var stop = mobx.spy(c => events.push(c));
+
+	var d = mobx.autorun("autorun", () => a.y)
+
+	a.x = 3;
+
+	events.forEach(x => {
+		delete x.fn
+		delete x.object
+		delete x.time
+	})
+
+	t.deepEqual(events, [
+		{ spyReportStart: true, type: 'reaction' },
+			{ type: 'compute' },
+		{ spyReportEnd: true },
+		{ name: 'x', newValue: 3, oldValue: 2, spyReportStart: true, type: 'update' },
+			{ type: 'compute' },
+			{ spyReportStart: true, type: 'reaction' },
+				{ error: 'Oops', message: '[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: \'Reaction[autorun]', type: 'error' },
+			{ spyReportEnd: true },
+		{ spyReportEnd: true }
+	]);
+
+	d();
+	stop();
+	t.end();
+})

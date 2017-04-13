@@ -1,10 +1,10 @@
 import {Lambda, once, invariant} from "../utils/utils";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
 
-export type IInterceptor<T> = (change: T) => T;
+export type IInterceptor<T> = (change: T) => T | null;
 
 export interface IInterceptable<T> {
-	interceptors: IInterceptor<T>[];
+	interceptors: IInterceptor<T>[] | null;
 	intercept(handler: IInterceptor<T>): Lambda;
 }
 
@@ -22,11 +22,11 @@ export function registerInterceptor<T>(interceptable: IInterceptable<T>, handler
 	});
 }
 
-export function interceptChange<T>(interceptable: IInterceptable<T>, change: T): T {
+export function interceptChange<T>(interceptable: IInterceptable<T | null>, change: T | null): T | null {
 	const prevU = untrackedStart();
 	try {
 		const interceptors = interceptable.interceptors;
-		for (let i = 0, l = interceptors.length; i < l; i++) {
+		if (interceptors) for (let i = 0, l = interceptors.length; i < l; i++) {
 			change = interceptors[i](change);
 			invariant(!change || (change as any).type, "Intercept handlers should return nothing or a change object");
 			if (!change)

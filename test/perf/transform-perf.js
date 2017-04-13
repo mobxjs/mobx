@@ -162,7 +162,7 @@ test('reactive folder tree', function(t) {
 		this.parent = parent;
 		m.extendObservable(this, {
 			name: "" + name,
-			children: m.fastArray(),
+			children: m.observable([]),
 		});
 	}
 
@@ -171,20 +171,20 @@ test('reactive folder tree', function(t) {
 		this.folder = folder;
 		m.extendObservable(this, {
 			collapsed: false,
-			name: function() {
+			get name() {
 				return this.folder.name;
 			},
-			isVisible: function() {
+			get isVisible() {
 				return !this.state.filter || this.name.indexOf(this.state.filter) !== -1 || this.children.some(child => child.isVisible);
 			},
-			children: function() {
+			get children() {
 				if (this.collapsed)
 					return [];
 				return this.folder.children.map(transformFolder).filter(function(child) {
 					return child.isVisible;
 				})
 			},
-			path: function() {
+			get path() {
 				return this.folder.parent === null ? this.name : transformFolder(this.folder.parent).path + "/" + this.name;
 			}
 		});
@@ -287,7 +287,7 @@ function serializationTester(t, transformerFactory) {
 		});
 	}
 
-	var boxes = m.fastArray();
+	var boxes = m.observable([]);
 	var states = [];
 
 	var serializeBox = transformerFactory(box => {

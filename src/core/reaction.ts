@@ -1,8 +1,10 @@
-import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, shouldCompute} from "./derivation";
-import {globalState, resetGlobalState} from "./globalstate";
-import {createInstanceofPredicate, getNextId, Lambda, unique, joinStrings} from "../utils/utils";
+import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, shouldCompute, isCaughtException} from "./derivation";
+import {IObservable, startBatch, endBatch} from "./observable";
+import {globalState} from "./globalstate";
+import {createInstanceofPredicate, getNextId, invariant, unique, joinStrings} from "../utils/utils";
 import {isSpyEnabled, spyReport, spyReportStart, spyReportEnd} from "./spy";
-import {startBatch, endBatch} from "./observable";
+import {getMessage} from "../utils/messages";
+
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations
@@ -24,12 +26,18 @@ import {startBatch, endBatch} from "./observable";
  */
 
 export interface IReactionPublic {
-	dispose: () => void;
+	dispose(): void;
+}
+
+export interface IReactionDisposer {
+	(): void;
+	$mobx: Reaction;
+	onError(handler: (error: any, derivation: IDerivation) => void);
 }
 
 export class Reaction implements IDerivation, IReactionPublic {
-	observing = []; // nodes we are looking at. Our value depends on these nodes
-	newObserving = [];
+	observing: IObservable[] = []; // nodes we are looking at. Our value depends on these nodes
+	newObserving: IObservable[] = [];
 	dependenciesState = IDerivationState.NOT_TRACKING;
 	diffValue = 0;
 	runId = 0;
@@ -39,6 +47,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 	_isScheduled = false;
 	_isTrackPending = false;
 	_isRunning = false;
+	errorHandler: (error: any, derivation: IDerivation) => void;
 
 	constructor(public name: string = "Reaction@" + getNextId(), private onInvalidate: () => void) { }
 
@@ -50,9 +59,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 		if (!this._isScheduled) {
 			this._isScheduled = true;
 			globalState.pendingReactions.push(this);
-			startBatch();
 			runReactions();
-			endBatch();
 		}
 	}
 
@@ -65,6 +72,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 	 */
 	runReaction() {
 		if (!this.isDisposed) {
+			startBatch();
 			this._isScheduled = false;
 			if (shouldCompute(this)) {
 				this._isTrackPending = true;
@@ -78,6 +86,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 					});
 				}
 			}
+			endBatch();
 		}
 	}
 
@@ -94,13 +103,15 @@ export class Reaction implements IDerivation, IReactionPublic {
 			});
 		}
 		this._isRunning = true;
-		trackDerivedFunction(this, fn);
+		const result = trackDerivedFunction(this, fn, undefined);
 		this._isRunning = false;
 		this._isTrackPending = false;
 		if (this.isDisposed) {
 			// disposed during last run. Clean up everything that was bound after the dispose call.
 			clearObserving(this);
 		}
+		if (isCaughtException(result))
+			this.reportExceptionInDerivation(result.cause);
 		if (notify) {
 			spyReportEnd({
 				time: Date.now() - startTime
@@ -109,9 +120,28 @@ export class Reaction implements IDerivation, IReactionPublic {
 		endBatch();
 	}
 
-	recoverFromError() {
-		this._isRunning = false;
-		this._isTrackPending = false;
+	reportExceptionInDerivation(error: any) {
+		if (this.errorHandler) {
+			this.errorHandler(error, this);
+			return;
+		}
+
+		const message = `[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: '${this}`;
+		const messageToUser = getMessage("m037");
+
+		console.error(message || messageToUser /* latter will not be true, make sure uglify doesn't remove */, error);
+			/** If debugging brough you here, please, read the above message :-). Tnx! */
+
+		if (isSpyEnabled()) {
+			spyReport({
+				type: "error",
+				message,
+				error,
+				object: this
+			});
+		}
+
+		globalState.globalReactionErrorHandlers.forEach(f => f(error, this));
 	}
 
 	dispose() {
@@ -125,9 +155,10 @@ export class Reaction implements IDerivation, IReactionPublic {
 		}
 	}
 
-	getDisposer(): Lambda & { $mosbservable: Reaction } {
+	getDisposer(): IReactionDisposer {
 		const r = this.dispose.bind(this);
 		r.$mobx = this;
+		r.onError = registerErrorHandler;
 		return r;
 	}
 
@@ -144,12 +175,25 @@ WhyRun? reaction '${this.name}':
  * This reaction will re-run if any of the following observables changes:
     ${joinStrings(observing)}
     ${(this._isRunning) ? " (... or any observable accessed during the remainder of the current run)" : ""}
-	Missing items in this list?
-	  1. Check whether all used values are properly marked as observable (use isObservable to verify)
-	  2. Make sure you didn't dereference values too early. MobX observes props, not primitives. E.g: use 'person.name' instead of 'name' in your computation.
+	${getMessage("m038")}
 `
 		);
 	}
+}
+
+function registerErrorHandler(handler) {
+	invariant(this && this.$mobx && isReaction(this.$mobx), "Invalid `this`");
+	invariant(!this.$mobx.errorHandler, "Only one onErrorHandler can be registered");
+	this.$mobx.errorHandler = handler;
+}
+
+export function onReactionError(handler: (error: any, derivation: IDerivation) => void): () => void {
+	globalState.globalReactionErrorHandlers.push(handler);
+	return () => {
+		const idx = globalState.globalReactionErrorHandlers.indexOf(handler);
+		if (idx >= 0)
+			globalState.globalReactionErrorHandlers.splice(idx, 1);
+	};
 }
 
 /**
@@ -162,8 +206,8 @@ const MAX_REACTION_ITERATIONS = 100;
 let reactionScheduler: (fn: () => void) => void = f => f();
 
 export function runReactions() {
-	// invariant(globalState.inBatch > 0, "INTERNAL ERROR runReactions should be called only inside batch");
-	if (globalState.isRunningReactions === true || globalState.inTransaction > 0)
+	// Trampolining, if runReactions are already running, new reactions will be picked up
+	if (globalState.inBatch > 0 || globalState.isRunningReactions)
 		return;
 	reactionScheduler(runReactionsHelper);
 }
@@ -178,9 +222,9 @@ function runReactionsHelper() {
 	// we converge to no remaining reactions after a while.
 	while (allReactions.length > 0) {
 		if (++iterations === MAX_REACTION_ITERATIONS) {
-			resetGlobalState();
-			throw new Error(`Reaction doesn't converge to a stable state after ${MAX_REACTION_ITERATIONS} iterations.`
+			console.error(`Reaction doesn't converge to a stable state after ${MAX_REACTION_ITERATIONS} iterations.`
 				+ ` Probably there is a cycle in the reactive function: ${allReactions[0]}`);
+			allReactions.splice(0); // clear reactions
 		}
 		let remainingReactions = allReactions.splice(0);
 		for (let i = 0, l = remainingReactions.length; i < l; i++)

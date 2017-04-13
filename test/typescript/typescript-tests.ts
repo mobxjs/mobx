@@ -1,12 +1,12 @@
 /// <reference path='require.d.ts' />
 /// <reference path='tape.d.ts' />
 import {
-    observe, computed, observable, asStructure, autorun, autorunAsync, extendObservable, action,
+    observe, computed, observable, autorun, autorunAsync, extendObservable, action,
     IObservableObject, IObservableArray, IArrayChange, IArraySplice, IObservableValue, isObservable, isObservableObject,
     extras, Atom, transaction, IObjectChange, spy, useStrict, isAction
-} from "../lib/mobx";
+} from "../../lib/mobx";
 import * as test from 'tape';
-import * as mobx from "../lib/mobx";
+import * as mobx from "../../lib/mobx";
 
 var v = observable(3);
 observe(v, () => {});
@@ -20,7 +20,6 @@ class Order {
     @observable amount:number = 2;
     @observable orders:string[] = [];
     @observable aFunction = testFunction;
-    @observable someStruct = asStructure({ x: 1, y: 2});
 
     @computed get total() {
         return this.amount * this.price * (1 + this.orders.length);
@@ -39,8 +38,8 @@ test('decorators', function(t) {
 
 	var events: any[] = [];
 	var d1 = observe(o, (ev: IObjectChange) => events.push(ev.name, ev.oldValue));
-	var d2 = observe(o, 'price', (newValue, oldValue) => events.push(newValue, oldValue));
-	var d3 = observe(o, 'total', (newValue, oldValue) => events.push(newValue, oldValue));
+	var d2 = observe(o, 'price', (ev) => events.push(ev.newValue, ev.oldValue));
+	var d3 = observe(o, 'total', (ev) => events.push(ev.newValue, ev.oldValue));
 
 	o.price = 4;
 
@@ -64,7 +63,7 @@ test('decorators', function(t) {
 
 test('observable', function(t) {
     var a = observable(3);
-    var b = observable(() => a.get() * 2);
+    var b = computed(() => a.get() * 2);
     t.equal(b.get(), 6);
     t.end();
 })
@@ -100,28 +99,6 @@ test('annotations', function(t) {
     order1.aFunction = x;
     t.equal(order1.aFunction, x);
 
-    var coords:{x:number, y:number} = null;
-    var coordsCalcs = 0;
-    var disposer2 = autorun(() => {
-        coordsCalcs++;
-        coords = { x : order1.someStruct.x, y: order1.someStruct.y };
-    });
-    t.equal(coordsCalcs, 1);
-    t.deepEqual(coords, { x: 1, y: 2});
-
-    order1.someStruct.x = 1;
-    order1.someStruct = { x: 1, y: 2};
-    t.equal(coordsCalcs, 1);
-    t.deepEqual(coords, { x: 1, y: 2});
-
-    order1.someStruct.x = 2;
-    t.deepEqual(coords, { x: 2, y: 2 });
-    t.equal(coordsCalcs, 2);
-
-    order1.someStruct = { x: 3, y: 3 };
-    t.equal(coordsCalcs, 3);
-    t.deepEqual(coords, { x: 3, y: 3 });
-
     t.end();
 })
 
@@ -129,7 +106,9 @@ test('scope', function(t) {
     var x = observable({
         y: 3,
         // this wo't work here.
-        z: () => 2 * x.y
+        get z () {
+			return 2 * this.y
+		}
     });
 
     t.equal(x.z, 6);
@@ -145,7 +124,7 @@ test('scope', function(t) {
         extendObservable(this, {
             y: 3,
             // this will work here
-            z: () => 2 * this.y
+            z: computed(() => 2 * this.y)
         });
     }
 
@@ -254,7 +233,7 @@ test('computed setter should succeed', function(t) {
 
 test('atom clock example', function(t) {
 	let ticks = 0;
-	const time_factor = 50; // speed up / slow down tests
+	const time_factor = 500; // speed up / slow down tests
 
 	class Clock {
 		atom: Atom;
@@ -328,7 +307,7 @@ test('typescript: parameterized computed decorator', (t) => {
 	class TestClass {
 		@observable x = 3;
 		@observable y = 3;
-		@computed({ asStructure: true }) get boxedSum() {
+		@computed.struct get boxedSum() {
 			return { sum: Math.round(this.x) + Math.round(this.y) };
 		}
 	}
@@ -457,11 +436,11 @@ test("action decorator (typescript)", function(t) {
 	t.equal(store1.add(1, 1), 4);
 
 	t.deepEqual(normalizeSpyEvents(events),	[
-		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 2, 2 ], name: "add", spyReportStart: true, target: store2, type: "action" },
+		{ arguments: [ 2, 2 ], name: "add", spyReportStart: true, object: store2, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 1, 1 ], name: "add", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 1, 1 ], name: "add", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true }
 	]);
 
@@ -488,11 +467,11 @@ test("custom action decorator (typescript)", function(t) {
 	t.equal(store1.add(1, 1), 4);
 
 	t.deepEqual(normalizeSpyEvents(events),	[
-		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 2, 2 ], name: "zoem zoem", spyReportStart: true, target: store2, type: "action" },
+		{ arguments: [ 2, 2 ], name: "zoem zoem", spyReportStart: true, object: store2, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 1, 1 ], name: "zoem zoem", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 1, 1 ], name: "zoem zoem", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true }
 	]);
 
@@ -520,11 +499,11 @@ test("action decorator on field (typescript)", function(t) {
 	t.equal(store1.add(2, 2), 8);
 
 	t.deepEqual(normalizeSpyEvents(events),	[
-		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 3, 4 ], name: "add", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 4, 5 ], name: "add", spyReportStart: true, target: store2, type: "action" },
+		{ arguments: [ 4, 5 ], name: "add", spyReportStart: true, object: store2, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 2, 2 ], name: "add", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 2, 2 ], name: "add", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true }
 	]);
 
@@ -552,11 +531,11 @@ test("custom action decorator on field (typescript)", function(t) {
 	t.equal(store1.add(2, 2), 8);
 
 	t.deepEqual(normalizeSpyEvents(events),	[
-		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 3, 4 ], name: "zoem zoem", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 4, 5 ], name: "zoem zoem", spyReportStart: true, target: store2, type: "action" },
+		{ arguments: [ 4, 5 ], name: "zoem zoem", spyReportStart: true, object: store2, type: "action" },
 		{ spyReportEnd: true },
-		{ arguments: [ 2, 2 ], name: "zoem zoem", spyReportStart: true, target: store1, type: "action" },
+		{ arguments: [ 2, 2 ], name: "zoem zoem", spyReportStart: true, object: store1, type: "action" },
 		{ spyReportEnd: true }
 	]);
 
@@ -768,7 +747,7 @@ test("enumerability", t => {
 	t.equal(a.hasOwnProperty("a"), true);
 	t.equal(a.hasOwnProperty("b"), false);
 	t.equal(a.hasOwnProperty("m"), false);
-	t.equal(a.hasOwnProperty("m2"), true); // false would be ok as well
+	t.equal(a.hasOwnProperty("m2"), true);
 
 	t.equal(mobx.isAction(a.m), true);
 	t.equal(mobx.isAction(a.m2), true);
@@ -1001,3 +980,143 @@ test("484 - isObservableObject type guard includes type IObservableObject", t =>
 	}
 	t.end();
 });
+
+test("705 - setter undoing caching (typescript)", t => {
+	let recomputes = 0;
+	let autoruns = 0;
+
+	class Person {
+		@observable name: string;
+		@observable title: string;
+
+		// Typescript bug: if fullName is before the getter, the property is defined twice / incorrectly, see #705
+		// set fullName(val) {
+		// 	// Noop
+		// }
+		@computed get fullName() {
+			recomputes++;
+			return this.title+" "+this.name;
+		}
+		// Should also be possible to define the setter _before_ the fullname
+		set fullName(val) {
+			// Noop
+		}
+	}
+
+	let p1 = new Person();
+	p1.name="Tom Tank";
+	p1.title="Mr.";
+
+	t.equal(recomputes, 0);
+	t.equal(autoruns, 0);
+
+	const d1 = autorun(()=> {
+		autoruns++;
+		p1.fullName;
+	})
+
+	const d2 = autorun(()=> {
+		autoruns++;
+		p1.fullName;
+	})
+
+	t.equal(recomputes, 1);
+	t.equal(autoruns, 2);
+
+	p1.title="Master";
+	t.equal(recomputes, 2);
+	t.equal(autoruns, 4);
+
+	d1();
+	d2();
+	t.end();
+})
+
+test("@observable.ref (TS)", t => {
+	class A {
+		@observable.ref ref = { a: 3}
+	}
+
+	const a = new A();
+	t.equal(a.ref.a, 3);
+	t.equal(mobx.isObservable(a.ref), false);
+	t.equal(mobx.isObservable(a, "ref"), true);
+
+	t.end();
+})
+
+test("@observable.shallow (TS)", t => {
+	class A {
+		@observable.shallow arr = [{ todo: 1 }]
+	}
+
+	const a = new A();
+	const todo2 = { todo: 2 };
+	a.arr.push(todo2)
+	t.equal(mobx.isObservable(a.arr), true);
+	t.equal(mobx.isObservable(a, "arr"), true);
+	t.equal(mobx.isObservable(a.arr[0]), false);
+	t.equal(mobx.isObservable(a.arr[1]), false);
+	t.ok(a.arr[1] === todo2)
+
+	t.end();
+})
+
+
+test("@observable.deep (TS)", t => {
+	class A {
+		@observable.deep arr = [{ todo: 1 }]
+	}
+
+	const a = new A();
+	const todo2 = { todo: 2 };
+	a.arr.push(todo2)
+
+	t.equal(mobx.isObservable(a.arr), true);
+	t.equal(mobx.isObservable(a, "arr"), true);
+	t.equal(mobx.isObservable(a.arr[0]), true);
+	t.equal(mobx.isObservable(a.arr[1]), true);
+	t.ok(a.arr[1] !== todo2)
+	t.equal(isObservable(todo2), false);
+
+	t.end();
+})
+
+test("action.bound binds (TS)", t=> {
+	class A {
+		@observable x = 0;
+		@action.bound
+		inc(value: number) {
+			this.x += value;
+		}
+	}
+
+	const a = new A();
+	const runner = a.inc;
+	runner(2);
+
+	t.equal(a.x, 2);
+
+	t.end();
+})
+
+test("803 - action.bound and action preserve type info", t => {
+	function thingThatAcceptsCallback(cb: (elem: { x: boolean }) => void) {
+
+	}
+
+	thingThatAcceptsCallback((elem) => {
+		console.log(elem.x) // x is boolean
+	})
+
+	thingThatAcceptsCallback(action((elem: any) => { // TODO: ideally, type of action would be inferred!
+		console.log(elem.x) // x is boolean
+	}))
+
+	const bound = action.bound(() => {
+		return { x: "3"} as Object
+	}) as () => void
+
+	const bound2 = action.bound(function () {}) as (() => void)
+	t.end()
+})

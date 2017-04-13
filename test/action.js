@@ -2,6 +2,7 @@
 
 var test = require('tape');
 var mobx = require('../');
+var utils = require('./utils/test-utils');
 
 test('action should wrap in transaction', t => {
 	var values = [];
@@ -171,19 +172,49 @@ test('should be possible to create autorun in ation', t => {
 	t.end();
 })
 
-test('should not be possible to invoke action in a computed block', t => {
+test('should be possible to change unobserved state in an action called from computed', t => {
 	var a = mobx.observable(2);
 
-	var noopAction = mobx.action(() => {});
+	var testAction = mobx.action(() => {
+		a.set(3)
+	});
 
 	var c = mobx.computed(() => {
-		noopAction();
-		return a.get();
+		testAction();
+	});
+
+	t.plan(1)
+	mobx.autorun(() => {
+		t.doesNotThrow(() => {
+			c.get()
+		})
+	});
+
+	mobx.extras.resetGlobalState();
+	t.end();
+});
+
+test('should not be possible to change observed state in an action called from computed', t => {
+	var a = mobx.observable(2);
+	var d = mobx.autorun(() => {
+		a.get()
+	})
+
+	var testAction = mobx.action(() => {
+		a.set(3)
+	});
+
+	var c = mobx.computed(() => {
+		testAction();
+		return a.get()
 	});
 
 	t.throws(() => {
-		mobx.autorun(() => c.get());
-	}, /Computed values or transformers should not invoke actions or trigger other side effects/, 'expected throw');
+		c.get()
+	}, /Computed values are not allowed to not cause side effects by changing observables that are already being observed/)
+
+	mobx.extras.resetGlobalState();
+	d();
 	t.end();
 });
 
@@ -369,4 +400,38 @@ test('computed values and actions', t => {
 	t.equal(calls, 3)
 
 	t.end()
+})
+
+test('bound actions bind', t => {
+	var called = 0;
+	var x = mobx.observable({
+		y: 0,
+		z: mobx.action.bound(function(v) {
+			this.y += v;
+			this.y += v;
+		}),
+
+		get yValue() {
+			called++;
+			return this.y;
+		}
+	})
+
+	var d = mobx.autorun(() => {
+		x.yValue;
+	})
+	var events = [];
+	var d2 = mobx.spy(e => events.push(e));
+
+	var runner = x.z;
+	runner(3);
+	t.equal(x.yValue, 6);
+	t.equal(called, 2);
+
+	t.deepEqual(events.filter(e => e.type === "action").map(e => e.name), ["z"])
+	t.deepEqual(Object.keys(x), ["y"]);
+
+	d();
+	d2();
+	t.end();
 })

@@ -2,7 +2,7 @@ import {Lambda, once} from "../utils/utils";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
 
 export interface IListenable {
-	changeListeners: Function[];
+	changeListeners: Function[] | null;
 	observe(handler: (change: any, oldValue?: any) => void, fireImmediately?: boolean): Lambda;
 }
 
@@ -20,19 +20,14 @@ export function registerListener<T>(listenable: IListenable, handler: Function):
 	});
 }
 
-export function notifyListeners<T>(listenable: IListenable, change: T | T[]) {
+export function notifyListeners<T>(listenable: IListenable, change: T) {
 	const prevU = untrackedStart();
 	let listeners = listenable.changeListeners;
 	if (!listeners)
 		return;
 	listeners = listeners.slice();
 	for (let i = 0, l = listeners.length; i < l; i++) {
-		if (Array.isArray(change)) {
-			listeners[i].apply(null, change);
-		}
-		else {
-			listeners[i](change);
-		}
+		listeners[i](change);
 	}
 	untrackedEnd(prevU);
 }
