@@ -46,6 +46,7 @@ Besides all built-in functions, the following goodies are available as well on o
 * `clear()` Remove all current entries from the array.
 * `replace(newItems)` Replaces all existing entries in the array with new ones.
 * `find(predicate: (item, index, array) => boolean, thisArg?, fromIndex?)` Basically the same as the ES7 `Array.find` proposal, except for the additional `fromIndex` parameter.
+* `findIndex(predicate: (item, index, array) => boolean, thisArg?, fromIndex?)` Basically the same as the ES7 `Array.findIndex` proposal, except for the additional `fromIndex` parameter.
 * `remove(value)` Remove a single item by value from the array. Returns `true` if the item was found and removed.
 * `peek()` Returns an array with all the values which can safely be passed to other libraries, similar to `slice()`.
 
