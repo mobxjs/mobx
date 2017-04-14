@@ -121,7 +121,7 @@ test('array should support iterall / iterable ', t => {
 	t.end()
 })
 
-test('find and remove', function(t) {
+test('find(findIndex) and remove', function(t) {
     var a = mobx.observable([10,20,20]);
     var idx = -1;
     function predicate(item, index) {
@@ -134,21 +134,27 @@ test('find and remove', function(t) {
 
     t.equal(a.find(predicate), 20);
     t.equal(idx, 1);
+    t.equal(a.findIndex(predicate), 1);
     t.equal(a.find(predicate, null, 1), 20);
     t.equal(idx, 1);
+    t.equal(a.findIndex(predicate, null, 1), 1);
     t.equal(a.find(predicate, null, 2), 20);
     t.equal(idx, 2);
+    t.equal(a.findIndex(predicate, null, 2), 2);
     idx = -1;
     t.equal(a.find(predicate, null, 3), undefined);
     t.equal(idx, -1);
+    t.equal(a.findIndex(predicate, null, 3), -1);
 
     t.equal(a.remove(20), true);
     t.equal(a.find(predicate), 20);
     t.equal(idx, 1);
+    t.equal(a.findIndex(predicate), 1);
     idx = -1;
     t.equal(a.remove(20), true);
     t.equal(a.find(predicate), undefined);
     t.equal(idx, -1);
+    t.equal(a.findIndex(predicate), -1);
 
     t.equal(a.remove(20), false);
 

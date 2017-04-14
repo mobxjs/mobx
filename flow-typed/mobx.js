@@ -150,6 +150,9 @@ declare module 'mobx' {
     find(
       predicate: (item: T, index: number, array: Array<T>) => boolean, thisArg?: any, fromIndex?: number
     ): T | any;
+    findIndex(
+      predicate: (item: T, index: number, array: Array<T>) => boolean, thisArg?: any, fromIndex?: number
+    ): number;
     remove(value: T): boolean;
   }
 
