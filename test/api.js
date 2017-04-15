@@ -6,7 +6,6 @@ test('correct api should be exposed', function(t) {
 		'Atom',
 		'BaseAtom', // TODO: remove somehow
 		'IDerivationState',
-		'IEqualsComparer',
 		'IObservableFactories',
 		'ObservableMap',
 		'Reaction',
