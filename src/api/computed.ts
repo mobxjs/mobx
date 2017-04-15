@@ -19,6 +19,7 @@ export interface IComputed {
 	<T>(func: () => T, options: IComputedValueOptions<T>): IComputedValue<T>;
 	(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void;
 	struct(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void;
+	equals(equals: IEqualsComparer<any>): PropertyDecorator;
 }
 
 function createComputedDecorator(equals: IEqualsComparer<any>) {
@@ -67,3 +68,4 @@ export var computed: IComputed = (
 ) as any;
 
 computed.struct = computedStructDecorator;
+computed.equals = createComputedDecorator;
