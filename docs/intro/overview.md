@@ -42,7 +42,7 @@ class TimerView extends React.Component {
     }
 };
 
-React.render(<TimerView appState={appState} />, document.body);
+ReactDOM.render(<TimerView appState={appState} />, document.body);
 ```
 
 (For the implementation of `resetTimer` function see the next section)
