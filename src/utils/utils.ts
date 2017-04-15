@@ -94,7 +94,7 @@ export function objectAssign() {
 	return res;
 }
 
-export function valueDidChange(oldValue: any, newValue: any, equals: EqualsComparer<any>): boolean {
+export function valueDidChange(oldValue: any, newValue: any, equals: IEqualsComparer<any>): boolean {
 	return !equals(oldValue, newValue);
 }
 
@@ -237,6 +237,6 @@ export function toPrimitive(value) {
 
 import {globalState} from "../core/globalstate";
 import {IObservableArray, isObservableArray} from "../types/observablearray";
-import {EqualsComparer} from "../types/comparer";
+import {IEqualsComparer, defaultComparer} from "../types/comparer";
 import {isObservableMap} from "../types/observablemap";
 import {observable} from "../api/observable";

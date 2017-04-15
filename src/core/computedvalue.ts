@@ -5,7 +5,7 @@ import {createAction} from "./action";
 import {createInstanceofPredicate, getNextId, valueDidChange, invariant, Lambda, unique, joinStrings, primitiveSymbol, toPrimitive} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "../core/spy";
 import {autorun} from "../api/autorun";
-import {EqualsComparer} from "../types/comparer";
+import {IEqualsComparer} from "../types/comparer";
 import {IValueDidChange} from "../types/observablevalue";
 import {getMessage} from "../utils/messages";
 
@@ -64,7 +64,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	 * However, enabling compareStructural can be convenient if you always produce an new aggregated object and don't want to notify observers if it is structurally the same.
 	 * This is useful for working with vectors, mouse coordinates etc.
 	 */
-	constructor(public derivation: () => T, public scope: Object | undefined, private equals: EqualsComparer<any>, name: string, setter?: (v: T) => void) {
+	constructor(public derivation: () => T, public scope: Object | undefined, private equals: IEqualsComparer<any>, name: string, setter?: (v: T) => void) {
 		this.name  = name || "ComputedValue@" + getNextId();
 		if (setter)
 			this.setter = createAction(name + "-setter", setter) as any;

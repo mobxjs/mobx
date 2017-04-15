@@ -1,4 +1,4 @@
-import {EqualsComparer, defaultComparer, structuralComparer} from "../types/comparer";
+import {IEqualsComparer, defaultComparer, structuralComparer} from "../types/comparer";
 import {asObservableObject, defineComputedProperty} from "../types/observableobject";
 import {invariant} from "../utils/utils";
 import {createClassPropertyDecorator} from "../utils/decorators";
@@ -8,7 +8,7 @@ import {getMessage} from "../utils/messages";
 export interface IComputedValueOptions<T> {
 	compareStructural?: boolean;
 	struct?: boolean;
-	equals?: EqualsComparer<T>;
+	equals?: IEqualsComparer<T>;
 	name?: string;
 	setter?: (value: T) => void;
 	context?: any;
@@ -21,15 +21,16 @@ export interface IComputed {
 	struct(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void;
 }
 
-
-function createComputedDecorator(compareStructural) {
+function createComputedDecorator(struct: boolean) {
 	return createClassPropertyDecorator(
 		(target, name, _, __, originalDescriptor) => {
 			invariant(typeof originalDescriptor !== "undefined", getMessage("m009"));
 			invariant(typeof originalDescriptor.get === "function", getMessage("m010"));
 
+			const equals = struct ? structuralComparer : defaultComparer;
+
 			const adm = asObservableObject(target, "");
-			defineComputedProperty(adm, name, originalDescriptor.get, originalDescriptor.set, compareStructural, false);
+			defineComputedProperty(adm, name, originalDescriptor.get, originalDescriptor.set, equals, false);
 		},
 		function (name) {
 			const observable = this.$mobx.values[name];

@@ -19,6 +19,7 @@
 import {registerGlobals} from "./core/globalstate";
 registerGlobals();
 
+export { IEqualsComparer, defaultComparer, structuralComparer } from "./types/comparer";
 export { IAtom, Atom, BaseAtom                                } from "./core/atom";
 export { IObservable, IDepTreeNode                            } from "./core/observable";
 export { Reaction, IReactionPublic, IReactionDisposer         } from "./core/reaction";
@@ -56,8 +57,6 @@ export { whyRun                                               } from "./api/whyr
 export { Lambda, isArrayLike                                  } from "./utils/utils";
 export { Iterator                                             } from "./utils/iterable";
 export { IObserverTree, IDependencyTree                       } from "./api/extras";
-
-export { EqualsComparer 									  } from "./types/comparer";
 
 import { resetGlobalState, shareGlobalState, getGlobalState } from "./core/globalstate";
 import { IDerivation } from "./core/derivation";

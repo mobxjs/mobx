@@ -5,7 +5,7 @@ import {runLazyInitializers} from "../utils/decorators";
 import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
-import {EqualsComparer, defaultComparer} from "../types/comparer";
+import {IEqualsComparer, defaultComparer} from "../types/comparer";
 import {IEnhancer, isModifierDescriptor, IModifierDescriptor} from "../types/modifiers";
 import {isAction, defineBoundAction} from "../api/action";
 import {getMessage} from "../utils/messages";
@@ -136,7 +136,7 @@ export function defineComputedProperty(
 	propName: string,
 	getter,
 	setter,
-	equals: EqualsComparer<any>,
+	equals: IEqualsComparer<any>,
 	asInstanceProperty: boolean
 ) {
 	if (asInstanceProperty)

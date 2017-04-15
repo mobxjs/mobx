@@ -6,6 +6,7 @@ test('correct api should be exposed', function(t) {
 		'Atom',
 		'BaseAtom', // TODO: remove somehow
 		'IDerivationState',
+		'IEqualsComparer',
 		'IObservableFactories',
 		'ObservableMap',
 		'Reaction',
@@ -19,6 +20,7 @@ test('correct api should be exposed', function(t) {
 		'computed',
 		'createTransformer',
 		'default',
+		'defaultComparer',
 		'expr',
 		'extendObservable',
 		'extendShallowObservable',
@@ -40,6 +42,7 @@ test('correct api should be exposed', function(t) {
 		'reaction',
 		'runInAction',
 		'spy',
+		'structuralComparer',
 		'toJS',
 		'transaction',
 		'untracked',
