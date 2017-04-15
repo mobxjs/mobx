@@ -1120,3 +1120,86 @@ test("803 - action.bound and action preserve type info", t => {
 	const bound2 = action.bound(function () {}) as (() => void)
 	t.end()
 })
+
+test("@computed.equals (TS)", t => {
+	const sameTime = (a: Time, b: Time) => {
+		return (a != null && b != null)
+			? a.hour === b.hour && a.minute === b.minute
+			: a === b;
+	}
+	class Time {
+		constructor(hour: number, minute: number) {
+			this.hour = hour;
+			this.minute = minute;
+		}
+
+		@observable public hour: number;
+		@observable public minute: number;
+
+		@computed.equals(sameTime) public get time() {
+			return { hour: this.hour, minute: this.minute };
+		}
+	}
+	const time = new Time(9, 0);
+
+	const changes: Array<{ hour: number, minute: number }> = [];
+	const disposeAutorun = autorun(() => changes.push(time.time));
+
+	t.deepEqual(changes, [ { hour: 9, minute: 0 }]);
+	time.hour = 9;
+	t.deepEqual(changes, [ { hour: 9, minute: 0 }]);
+	time.minute = 0;
+	t.deepEqual(changes, [ { hour: 9, minute: 0 }]);
+	time.hour = 10;
+	t.deepEqual(changes, [ { hour: 9, minute: 0 }, { hour: 10, minute: 0 }]);
+	time.minute = 30;
+	t.deepEqual(changes, [ { hour: 9, minute: 0 }, { hour: 10, minute: 0 }, { hour: 10, minute: 30 }]);
+
+	disposeAutorun();
+
+	t.end();
+});
+
+
+test("computed equals comparer", t => {
+	const comparisons: Array<{ from: string, to: string }> = [];
+	const comparer = (from: string, to: string) => {
+		comparisons.push({ from, to });
+		return from === to;
+	};
+
+	const left = observable("A");
+	const right = observable("B");
+	const combinedToLowerCase = computed(
+		() => left.get().toLowerCase() + right.get().toLowerCase(),
+		{ equals: comparer }
+	);
+
+	const values: Array<string> = [];
+	const disposeAutorun = autorun(() => values.push(combinedToLowerCase.get()));
+
+	// No comparison should be made on the first value
+	t.deepEqual(comparisons, []);
+
+	// First change will cause a comparison
+	left.set("C");
+	t.deepEqual(comparisons, [{ from: "ab", to: "cb" }]);
+
+	// Transition *to* CaughtException in the computed won't cause a comparison
+	left.set(null);
+	t.deepEqual(comparisons, [{ from: "ab", to: "cb" }]);
+
+	// Transition *from* CaughtException in the computed won't cause a comparison
+	left.set("D");
+	t.deepEqual(comparisons, [{ from: "ab", to: "cb" }]);
+
+	// Another value change will cause a comparison
+	right.set("E");
+	t.deepEqual(comparisons, [{ from: "ab", to: "cb" }, { from: "db", to: "de" }]);
+
+	t.deepEqual(values, ["ab", "cb", "db", "de"]);
+
+	disposeAutorun();
+
+	t.end();
+});

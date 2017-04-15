@@ -47,7 +47,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	lowestObserverState = IDerivationState.UP_TO_DATE;
 	unboundDepsCount = 0;
 	__mapid = "#" + getNextId();
-	protected value: T | undefined | CaughtException = undefined;
+	protected value: T | undefined | CaughtException = new CaughtException(null);
 	name: string;
 	isComputing: boolean = false; // to check for cycles
 	isRunningSetter: boolean = false;
@@ -138,7 +138,11 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		}
 		const oldValue = this.value;
 		const newValue = this.value = this.computeValue(true);
-		return isCaughtException(newValue) || !this.equals(newValue, oldValue);
+		return (
+			isCaughtException(oldValue) ||
+			isCaughtException(newValue) ||
+			!this.equals(oldValue, newValue)
+		);
 	}
 
 	computeValue(track: boolean) {

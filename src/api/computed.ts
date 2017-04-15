@@ -62,7 +62,7 @@ export var computed: IComputed = (
 		const opts: IComputedValueOptions<any> = typeof arg2 === "object" ? arg2 : {};
 		opts.setter = typeof arg2 === "function" ? arg2 : opts.setter;
 
-		const equals = opts.equals || (opts.compareStructural || opts.struct) ? structuralComparer : defaultComparer;
+		const equals = opts.equals ? opts.equals : (opts.compareStructural || opts.struct) ? structuralComparer : defaultComparer;
 		return new ComputedValue(arg1, opts.context, equals, opts.name || arg1.name || "", opts.setter);
 	}
 ) as any;
