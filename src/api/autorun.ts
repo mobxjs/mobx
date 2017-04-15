@@ -1,4 +1,4 @@
-import {Lambda, getNextId, invariant, valueDidChange, fail} from "../utils/utils";
+import {Lambda, getNextId, invariant, fail} from "../utils/utils";
 import {isModifierDescriptor} from "../types/modifiers";
 import {Reaction, IReactionPublic, IReactionDisposer} from "../core/reaction";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
@@ -217,7 +217,7 @@ export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg:
 		let changed = false;
 		r.track(() => {
 			const v = expression(r);
-			changed = valueDidChange(nextValue, v, equals);
+			changed = !equals(nextValue, v);
 			nextValue = v;
 		});
 		if (firstTime && opts.fireImmediately!)

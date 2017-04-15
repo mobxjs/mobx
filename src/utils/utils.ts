@@ -94,10 +94,6 @@ export function objectAssign() {
 	return res;
 }
 
-export function valueDidChange(oldValue: any, newValue: any, equals: IEqualsComparer<any>): boolean {
-	return !equals(oldValue, newValue);
-}
-
 const prototypeHasOwnProperty = Object.prototype.hasOwnProperty;
 export function hasOwnProperty(object: Object, propName: string) {
 	return prototypeHasOwnProperty.call(object, propName);

@@ -16,6 +16,7 @@
  *
  */
 
+import { IEqualsComparer, defaultComparer, structuralComparer } from "./types/comparer";
 import {registerGlobals} from "./core/globalstate";
 registerGlobals();
 

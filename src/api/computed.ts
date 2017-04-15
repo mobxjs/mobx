@@ -21,13 +21,11 @@ export interface IComputed {
 	struct(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void;
 }
 
-function createComputedDecorator(struct: boolean) {
+function createComputedDecorator(equals: IEqualsComparer<any>) {
 	return createClassPropertyDecorator(
 		(target, name, _, __, originalDescriptor) => {
 			invariant(typeof originalDescriptor !== "undefined", getMessage("m009"));
 			invariant(typeof originalDescriptor.get === "function", getMessage("m010"));
-
-			const equals = struct ? structuralComparer : defaultComparer;
 
 			const adm = asObservableObject(target, "");
 			defineComputedProperty(adm, name, originalDescriptor.get, originalDescriptor.set, equals, false);
@@ -46,8 +44,8 @@ function createComputedDecorator(struct: boolean) {
 	);
 }
 
-const computedDecorator = createComputedDecorator(false);
-const computedStructDecorator = createComputedDecorator(true);
+const computedDecorator = createComputedDecorator(defaultComparer);
+const computedStructDecorator = createComputedDecorator(structuralComparer);
 
 /**
  * Decorator for class properties: @computed get value() { return expr; }.
