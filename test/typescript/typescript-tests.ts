@@ -1161,7 +1161,7 @@ test("@computed.equals (TS)", t => {
 });
 
 
-test("computed equals comparer", t => {
+test("computed equals function only invoked when necessary", t => {
 	const comparisons: Array<{ from: string, to: string }> = [];
 	const comparer = (from: string, to: string) => {
 		comparisons.push({ from, to });
@@ -1189,15 +1189,20 @@ test("computed equals comparer", t => {
 	left.set(null);
 	t.deepEqual(comparisons, [{ from: "ab", to: "cb" }]);
 
+	// Transition *between* CaughtException-s in the computed won't cause a comparison
+	right.set(null);
+	t.deepEqual(comparisons, [{ from: "ab", to: "cb" }]);
+
 	// Transition *from* CaughtException in the computed won't cause a comparison
 	left.set("D");
+	right.set("E");
 	t.deepEqual(comparisons, [{ from: "ab", to: "cb" }]);
 
 	// Another value change will cause a comparison
-	right.set("E");
-	t.deepEqual(comparisons, [{ from: "ab", to: "cb" }, { from: "db", to: "de" }]);
+	right.set("F");
+	t.deepEqual(comparisons, [{ from: "ab", to: "cb" }, { from: "de", to: "df" }]);
 
-	t.deepEqual(values, ["ab", "cb", "db", "de"]);
+	t.deepEqual(values, ["ab", "cb", "de", "df"]);
 
 	disposeAutorun();
 
