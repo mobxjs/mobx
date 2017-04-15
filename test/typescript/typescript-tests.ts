@@ -1122,11 +1122,7 @@ test("803 - action.bound and action preserve type info", t => {
 })
 
 test("@computed.equals (TS)", t => {
-	const sameTime = (a: Time, b: Time) => {
-		return (a != null && b != null)
-			? a.hour === b.hour && a.minute === b.minute
-			: a === b;
-	}
+	const sameTime = (from: Time, to: Time) => from.hour === to.hour && from.minute === to.minute;
 	class Time {
 		constructor(hour: number, minute: number) {
 			this.hour = hour;

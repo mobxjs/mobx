@@ -875,11 +875,7 @@ test("action.bound binds (Babel)", t=> {
 })
 
 test("@computed.equals (Babel)", t => {
-	const sameTime = (a, b) => {
-		return (a != null && b != null)
-			? a.hour === b.hour && a.minute === b.minute
-			: a === b;
-	}
+	const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute;
 	class Time {
 		constructor(hour, minute) {
 			this.hour = hour;
