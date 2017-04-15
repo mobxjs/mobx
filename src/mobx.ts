@@ -57,6 +57,8 @@ export { Lambda, isArrayLike                                  } from "./utils/ut
 export { Iterator                                             } from "./utils/iterable";
 export { IObserverTree, IDependencyTree                       } from "./api/extras";
 
+export { EqualsComparer 									  } from "./types/comparer";
+
 import { resetGlobalState, shareGlobalState, getGlobalState } from "./core/globalstate";
 import { IDerivation } from "./core/derivation";
 import { IDepTreeNode } from "./core/observable";

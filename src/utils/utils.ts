@@ -94,13 +94,8 @@ export function objectAssign() {
 	return res;
 }
 
-export function valueDidChange(compareStructural: boolean, oldValue, newValue): boolean {
-	if (typeof oldValue === 'number' && isNaN(oldValue)) {
-		return typeof newValue !== 'number' || !isNaN(newValue);
-	}
-	return compareStructural
-		? !deepEqual(oldValue, newValue)
-		: oldValue !== newValue;
+export function valueDidChange(oldValue: any, newValue: any, equals: EqualsComparer<any>): boolean {
+	return !equals(oldValue, newValue);
 }
 
 const prototypeHasOwnProperty = Object.prototype.hasOwnProperty;
@@ -242,5 +237,6 @@ export function toPrimitive(value) {
 
 import {globalState} from "../core/globalstate";
 import {IObservableArray, isObservableArray} from "../types/observablearray";
+import {EqualsComparer} from "../types/comparer";
 import {isObservableMap} from "../types/observablemap";
 import {observable} from "../api/observable";

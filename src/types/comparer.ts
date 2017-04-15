@@ -1,6 +1,6 @@
 import { deepEqual } from '../utils/utils';
 
-export type EqualityComparer<T> = (a: T, b: T) => boolean;
+export type EqualsComparer<T> = (a: T, b: T) => boolean;
 
 export const equalityComparer = (a: any, b: any) => a == b;
 export const identityComparer = (a: any, b: any) => a === b;

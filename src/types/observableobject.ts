@@ -5,6 +5,7 @@ import {runLazyInitializers} from "../utils/decorators";
 import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
+import {EqualsComparer, defaultComparer} from "../types/comparer";
 import {IEnhancer, isModifierDescriptor, IModifierDescriptor} from "../types/modifiers";
 import {isAction, defineBoundAction} from "../api/action";
 import {getMessage} from "../utils/messages";
@@ -100,7 +101,7 @@ export function defineObservablePropertyFromDescriptor(adm: ObservableObjectAdmi
 		}
 	} else {
 		// get x() { return 3 } set x(v) { }
-		defineComputedProperty(adm, propName, descriptor.get, descriptor.set, false, true);
+		defineComputedProperty(adm, propName, descriptor.get, descriptor.set, defaultComparer, true);
 	}
 }
 
@@ -135,13 +136,13 @@ export function defineComputedProperty(
 	propName: string,
 	getter,
 	setter,
-	compareStructural: boolean,
+	equals: EqualsComparer<any>,
 	asInstanceProperty: boolean
 ) {
 	if (asInstanceProperty)
 		assertPropertyConfigurable(adm.target, propName);
 
-	adm.values[propName] = new ComputedValue(getter, adm.target, compareStructural, `${adm.name}.${propName}`, setter);
+	adm.values[propName] = new ComputedValue(getter, adm.target, equals, `${adm.name}.${propName}`, setter);
 	if (asInstanceProperty) {
 		Object.defineProperty(adm.target, propName, generateComputedPropConfig(propName));
 	}

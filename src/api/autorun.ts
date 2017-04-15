@@ -3,6 +3,7 @@ import {isModifierDescriptor} from "../types/modifiers";
 import {Reaction, IReactionPublic, IReactionDisposer} from "../core/reaction";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
 import {action, isAction} from "../api/action";
+import {EqualsComparer, defaultComparer, structuralComparer} from "../types/comparer";
 import {getMessage} from "../utils/messages";
 
 /**
@@ -156,6 +157,7 @@ export interface IReactionOptions {
 	compareStructural?: boolean;
 	/** alias for compareStructural */
 	struct?: boolean;
+	equals?: EqualsComparer<any>;
 	name?: string;
 }
 
@@ -196,6 +198,8 @@ export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg:
 	let isScheduled = false;
 	let nextValue: T;
 
+	const equals = opts.equals || (opts.compareStructural || opts.struct) ? structuralComparer : defaultComparer;
+
 	const r = new Reaction(opts.name, () => {
 		if (firstTime || (opts.delay as any) < 1) {
 			reactionRunner();
@@ -214,7 +218,7 @@ export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg:
 		let changed = false;
 		r.track(() => {
 			const v = expression(r);
-			changed = valueDidChange(opts.compareStructural!, nextValue, v);
+			changed = valueDidChange(nextValue, v, equals);
 			nextValue = v;
 		});
 		if (firstTime && opts.fireImmediately!)
