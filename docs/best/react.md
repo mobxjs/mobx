@@ -318,7 +318,7 @@ This can simply be solved by doing the dereferencing inside `render()`, or by in
 
 ## How multiple components will render
 
-Suppose that we use the following components are used to render our above `message` object.
+Suppose that the following components are used to render our above `message` object.
 
 ```javascript
 const Message = observer(({ message }) =>
