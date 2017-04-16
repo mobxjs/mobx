@@ -55,7 +55,7 @@ MobX computeds will automatically be kept alive during transactions as well, see
 
 #### Always dispose reactions
 
-all forms of `autorun`, `observe` and `intercept` will only be garbage collected if all objects they observe are garbage collection themselves.
+All forms of `autorun`, `observe` and `intercept` will only be garbage collected if all objects they observe are garbage collected themselves.
 So it is recommend to use the disposer function that is returned from these methods to stop them when you no longer need them.
 Usually for `observe` and `intercept` it is not strictly necessary to dispose them if when targed `this`.
 For reactions like `autorun` it is more tricky, as they might observe many different observables, and as long as one of them is still in scope,
