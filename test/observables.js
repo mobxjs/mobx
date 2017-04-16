@@ -1733,7 +1733,7 @@ test('observables should not fail when ES6 Map is missing', t => {
 
 test("computed equals function only invoked when necessary", t => {
 	const comparisons = [];
-	const comparer = (from, to) => {
+	const loggingComparer = (from, to) => {
 		comparisons.push({ from, to });
 		return from === to;
 	};
@@ -1742,7 +1742,7 @@ test("computed equals function only invoked when necessary", t => {
 	const right = mobx.observable("B");
 	const combinedToLowerCase = mobx.computed(
 		() => left.get().toLowerCase() + right.get().toLowerCase(),
-		{ equals: comparer }
+		{ equals: loggingComparer }
 	);
 
 	const values = [];

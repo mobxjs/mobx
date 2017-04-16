@@ -305,3 +305,52 @@ test("reaction uses equals", t => {
 
 	t.end();
 });
+
+
+test("reaction equals function only invoked when necessary", t => {
+	const comparisons = [];
+	const loggingComparer = (from, to) => {
+		comparisons.push({ from, to });
+		return from === to;
+	};
+
+	const left = mobx.observable("A");
+	const right = mobx.observable("B");
+
+	const values = [];
+	const disposeReaction = mobx.reaction(
+		() => left.get().toLowerCase() + right.get().toLowerCase(),
+		(value) => values.push(value),
+		{ equals: loggingComparer, fireImmediately: true }
+	);
+
+	// No comparison should be made on the first value
+	t.deepEqual(comparisons, []);
+
+	// First change will cause a comparison
+	left.set("C");
+	t.deepEqual(comparisons, [{ from: "ab", to: "cb" }]);
+
+	// Exception in the reaction expression won't cause a comparison
+	left.set(null);
+	t.deepEqual(comparisons, [{ from: "ab", to: "cb" }]);
+
+	// Another exception in the reaction expression won't cause a comparison
+	right.set(null);
+	t.deepEqual(comparisons, [{ from: "ab", to: "cb" }]);
+
+	// Transition from exception in the expression will cause a comparison with the last valid value
+	left.set("D");
+	right.set("E");
+	t.deepEqual(comparisons, [{ from: "ab", to: "cb" }, { from: 'cb', to: 'de' }]);
+
+	// Another value change will cause a comparison
+	right.set("F");
+	t.deepEqual(comparisons, [{ from: "ab", to: "cb" }, { from: 'cb', to: 'de' }, { from: "de", to: "df" }]);
+
+	t.deepEqual(values, ["ab", "cb", "de", "df"]);
+
+	disposeReaction();
+
+	t.end();
+});
