@@ -284,3 +284,24 @@ test("do not rerun if prev & next expr output is NaN", t => {
 	t.deepEqual(valuesS, [ 'a', 'NaN', 'b']);
 	t.end();
 })
+
+test("reaction uses equals", t => {
+	const o = mobx.observable("a");
+	const values = [];
+	const disposeReaction = mobx.reaction(
+		() => o.get(),
+		(value) => values.push(value.toLowerCase()),
+		{ equals: (from, to) => from.toUpperCase() === to.toUpperCase(), fireImmediately: true }
+	);
+	t.deepEqual(values, ["a"]);
+	o.set("A");
+	t.deepEqual(values, ["a"]);
+	o.set("B");
+	t.deepEqual(values, ["a", "b"]);
+	o.set("A");
+	t.deepEqual(values, ["a", "b", "a"]);
+
+	disposeReaction();
+
+	t.end();
+});

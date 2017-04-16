@@ -1730,3 +1730,51 @@ test('observables should not fail when ES6 Map is missing', t => {
     global.Map = globalMapFunction;
     t.end();
 })
+
+test("computed equals function only invoked when necessary", t => {
+	const comparisons = [];
+	const comparer = (from, to) => {
+		comparisons.push({ from, to });
+		return from === to;
+	};
+
+	const left = mobx.observable("A");
+	const right = mobx.observable("B");
+	const combinedToLowerCase = mobx.computed(
+		() => left.get().toLowerCase() + right.get().toLowerCase(),
+		{ equals: comparer }
+	);
+
+	const values = [];
+	const disposeAutorun = mobx.autorun(() => values.push(combinedToLowerCase.get()));
+
+	// No comparison should be made on the first value
+	t.deepEqual(comparisons, []);
+
+	// First change will cause a comparison
+	left.set("C");
+	t.deepEqual(comparisons, [{ from: "ab", to: "cb" }]);
+
+	// Transition *to* CaughtException in the computed won't cause a comparison
+	left.set(null);
+	t.deepEqual(comparisons, [{ from: "ab", to: "cb" }]);
+
+	// Transition *between* CaughtException-s in the computed won't cause a comparison
+	right.set(null);
+	t.deepEqual(comparisons, [{ from: "ab", to: "cb" }]);
+
+	// Transition *from* CaughtException in the computed won't cause a comparison
+	left.set("D");
+	right.set("E");
+	t.deepEqual(comparisons, [{ from: "ab", to: "cb" }]);
+
+	// Another value change will cause a comparison
+	right.set("F");
+	t.deepEqual(comparisons, [{ from: "ab", to: "cb" }, { from: "de", to: "df" }]);
+
+	t.deepEqual(values, ["ab", "cb", "de", "df"]);
+
+	disposeAutorun();
+
+	t.end();
+});

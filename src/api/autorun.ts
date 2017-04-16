@@ -196,9 +196,9 @@ export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg:
 
 	let firstTime = true;
 	let isScheduled = false;
-	let nextValue: T;
+	let value: T;
 
-	const equals = opts.equals || (opts.compareStructural || opts.struct) ? structuralComparer : defaultComparer;
+	const equals = opts.equals ? opts.equals : (opts.compareStructural || opts.struct) ? structuralComparer : defaultComparer;
 	const r = new Reaction(opts.name, () => {
 		if (firstTime || (opts.delay as any) < 1) {
 			reactionRunner();
@@ -216,14 +216,14 @@ export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg:
 			return;
 		let changed = false;
 		r.track(() => {
-			const v = expression(r);
-			changed = !equals(nextValue, v);
-			nextValue = v;
+			const nextValue = expression(r);
+			changed = firstTime || !equals(value, nextValue);
+			value = nextValue;
 		});
 		if (firstTime && opts.fireImmediately!)
-			effect(nextValue, r);
+			effect(value, r);
 		if (!firstTime && (changed as boolean) === true)
-			effect(nextValue, r);
+			effect(value, r);
 		if (firstTime)
 			firstTime = false;
 	}
