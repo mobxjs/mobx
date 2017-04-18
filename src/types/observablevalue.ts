@@ -1,6 +1,6 @@
 import {BaseAtom} from "../core/atom";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
-import {Lambda, getNextId, createInstanceofPredicate} from "../utils/utils";
+import {Lambda, getNextId, createInstanceofPredicate, primitiveSymbol, toPrimitive} from "../utils/utils";
 import {hasInterceptors, IInterceptable, IInterceptor, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd, spyReport} from "../core/spy";
@@ -26,6 +26,8 @@ export interface IObservableValue<T> {
 	intercept(handler: IInterceptor<IValueWillChange<T>>): Lambda;
 	observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda;
 }
+
+declare var Symbol;
 
 export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable {
 	hasUnreportedChange = false;
@@ -61,7 +63,7 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 	}
 
 	private prepareNewValue(newValue): T | IUNCHANGED {
-		checkIfStateModificationsAreAllowed();
+		checkIfStateModificationsAreAllowed(this);
 		if (hasInterceptors(this)) {
 			const change = interceptChange<IValueWillChange<T>>(this, { object: this, type: "update", newValue });
 			if (!change)
@@ -117,6 +119,12 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 	toString() {
 		return `${this.name}[${this.value}]`;
 	}
+
+	valueOf(): T {
+		return toPrimitive(this.get());
+	}
 }
 
-export const isObservableValue = createInstanceofPredicate("ObservableValue", ObservableValue);
+ObservableValue.prototype[primitiveSymbol()] = ObservableValue.prototype.valueOf;
+
+export var isObservableValue = createInstanceofPredicate("ObservableValue", ObservableValue) as (x: any) => x is IObservableValue<any>;

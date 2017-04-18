@@ -18,6 +18,7 @@ test('correct api should be exposed', function(t) {
 		'autorunAsync',
 		'computed',
 		'createTransformer',
+		'default',
 		'expr',
 		'extendObservable',
 		'extendShallowObservable',
@@ -25,6 +26,7 @@ test('correct api should be exposed', function(t) {
 		'intercept',
 		'isAction',
 		'isArrayLike',
+		'isBoxedObservable',
 		'isComputed',
 		'isModifierDescriptor',
 		'isObservable',
@@ -51,6 +53,7 @@ test('correct api should be exposed', function(t) {
 
 	t.deepEquals(Object.keys(mobx.extras).sort(), [
 			'allowStateChanges',
+			'deepEqual',
 			'getAdministration',
 			'getAtom',
 			'getDebugName',
@@ -60,6 +63,7 @@ test('correct api should be exposed', function(t) {
 			'isComputingDerivation',
 			'isSpyEnabled',
 			'onReactionError',
+			'reserveArrayBuffer',
 			'resetGlobalState',
 			'setReactionScheduler',
 			'shareGlobalState',

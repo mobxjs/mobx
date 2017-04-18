@@ -68,7 +68,7 @@ test('computed with asStructure modifier', function(t) {
             return {
               sum: x1.get() + x2.get()
             }
-        }, { compareStructural: true });
+        }, { struct: true });
         var b = buffer();
         m.observe(y, b, true);
 
@@ -1126,6 +1126,23 @@ test('prematurely end autorun', function(t) {
     t.end();
 });
 
+test('computed values believe NaN === NaN', function(t) {
+	var a = observable(2);
+	var b = observable(3);
+	var c = computed(function() { return String(a.get() * b.get()) });
+	var buf = buffer();
+	m.observe(c, buf);
+
+	a.set(NaN);
+	b.set(NaN);
+	a.set(NaN);
+	a.set(2);
+	b.set(3);
+
+	t.deepEqual(buf.toArray(), ['NaN', '6']);
+	t.end();
+})
+
 test.skip('issue 65; transaction causing transaction', function(t) {
 	// MWE: disabled, bad test; depends on transaction being tracked, transaction should not be used in computed!
     var x = mobx.observable({
@@ -1660,4 +1677,56 @@ test('603 - transaction should not kill reactions', t => {
 
 	t.end()
 
+})
+
+test('#561 test toPrimitive() of observable objects', function(t) {
+	if (typeof Symbol !== "undefined" && Symbol.toPrimitive) {
+		var x = observable(3);
+
+		t.equal(x.valueOf(), 3);
+		t.equal(x[Symbol.toPrimitive](), 3);
+
+		t.equal(+x, 3);
+		t.equal(++x, 4);
+
+		var y = observable(3);
+
+		t.equal(y + 7, 10);
+
+		var z = computed(() => ({ a: 3 }));
+		t.equal(3 + z, "3[object Object]");
+	} else {
+		var x = observable(3);
+
+		t.equal(x.valueOf(), 3);
+		t.equal(x["@@toPrimitive"](), 3);
+
+		t.equal(+x, 3);
+		t.equal(++x, 4);
+
+		var y = observable(3);
+
+		t.equal(y + 7, 10);
+
+		var z = computed(() => ({ a: 3 }));
+		t.equal("3" + (z["@@toPrimitive"]()), "3[object Object]");
+	}
+    t.end()
+});
+
+test('observables should not fail when ES6 Map is missing', t => {
+    const globalMapFunction = global.Map;
+    global.Map = undefined;
+    t.equal(global.Map, undefined);
+    try {
+        var a = observable([1,2,3]); //trigger isES6Map in utils
+    }
+    catch (e) {
+        t.fail('Should not fail when Map is missing');
+    }
+
+    t.equal(m.isObservable(a), true);
+
+    global.Map = globalMapFunction;
+    t.end();
 })

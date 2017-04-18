@@ -1,7 +1,10 @@
 import {IObservable, IDepTreeNode, addObserver, removeObserver} from "./observable";
+import {IAtom} from "./atom";
 import {globalState} from "./globalstate";
-import {invariant} from "../utils/utils";
+import {fail} from "../utils/utils";
 import {isComputedValue} from "./computedvalue";
+import {getMessage} from "../utils/messages";
+
 
 export enum IDerivationState {
 	// before being run or (outside batch and not being observed)
@@ -100,13 +103,14 @@ export function isComputingDerivation() {
 	return globalState.trackingDerivation !== null; // filter out actions inside computations
 }
 
-export function checkIfStateModificationsAreAllowed() {
-	if (!globalState.allowStateChanges) {
-		invariant(false, globalState.strictMode
-			? "It is not allowed to create or change state outside an `action` when MobX is in strict mode. Wrap the current method in `action` if this state change is intended"
-			: "It is not allowed to change the state when a computed value or transformer is being evaluated. Use 'autorun' to create reactive functions with side-effects."
-		);
-	}
+export function checkIfStateModificationsAreAllowed(atom: IAtom) {
+	const hasObservers = atom.observers.length > 0;
+	// Should never be possible to change an observed observable from inside computed, see #798
+	if (globalState.computationDepth > 0 && hasObservers)
+		fail(getMessage("m031") + atom.name);
+	// Should not be possible to change observed state outside strict mode, except during initialization, see #563
+	if (!globalState.allowStateChanges && hasObservers)
+		fail(getMessage(globalState.strictMode ? "m030a" : "m030b") + atom.name);
 }
 
 /**
@@ -135,7 +139,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, con
 }
 
 /**
- * diffs newObserving with obsering.
+ * diffs newObserving with observing.
  * update observing to be newObserving with unique observables
  * notify observers that become observed/unobserved
  */
@@ -144,6 +148,7 @@ function bindDependencies(derivation: IDerivation) {
 
 	const prevObserving = derivation.observing;
 	const observing = derivation.observing = derivation.newObserving!;
+	let lowestNewObservingDerivationState = IDerivationState.UP_TO_DATE;
 
 	derivation.newObserving = null; // newObserving shouldn't be needed outside tracking
 
@@ -157,6 +162,12 @@ function bindDependencies(derivation: IDerivation) {
 			dep.diffValue = 1;
 			if (i0 !== i) observing[i0] = dep;
 			i0++;
+		}
+
+		// Upcast is 'safe' here, because if dep is IObservable, `dependenciesState` will be undefined,
+		// not hitting the condition
+		if ((dep as any as IDerivation).dependenciesState > lowestNewObservingDerivationState) {
+			lowestNewObservingDerivationState = (dep as any as IDerivation).dependenciesState;
 		}
 	}
 	observing.length = i0;
@@ -183,17 +194,24 @@ function bindDependencies(derivation: IDerivation) {
 			addObserver(dep, derivation);
 		}
 	}
+
+	// Some new observed derivations might become stale during this derivation computation
+	// so say had no chance to propagate staleness (#916)
+	if (lowestNewObservingDerivationState !== IDerivationState.UP_TO_DATE) {
+		derivation.dependenciesState = lowestNewObservingDerivationState;
+		derivation.onBecomeStale();
+	}
 }
 
 export function clearObserving(derivation: IDerivation) {
 	// invariant(globalState.inBatch > 0, "INTERNAL ERROR clearObserving should be called only inside batch");
 	const obs = derivation.observing;
+	derivation.observing = [];
 	let i = obs.length;
 	while (i--)
 		removeObserver(obs[i], derivation);
 
 	derivation.dependenciesState = IDerivationState.NOT_TRACKING;
-	obs.length = 0;
 }
 
 export function untracked<T>(action: () => T): T {

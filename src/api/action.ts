@@ -1,27 +1,28 @@
 import {invariant, addHiddenProp} from "../utils/utils";
 import {createClassPropertyDecorator} from "../utils/decorators";
-import {createAction, executeAction} from "../core/action";
+import {createAction, executeAction, IAction} from "../core/action";
+import {getMessage} from "../utils/messages";
 
 export interface IActionFactory {
 	// nameless actions
-	<A1, R, T extends (a1: A1) => R>(fn: T): T;
-	<A1, A2, R, T extends (a1: A1, a2: A2) => R>(fn: T): T;
-	<A1, A2, A3, R, T extends (a1: A1, a2: A2, a3: A3) => R>(fn: T): T;
-	<A1, A2, A3, A4, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4) => R>(fn: T): T;
-	<A1, A2, A3, A4, A5, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => R>(fn: T): T;
-	<A1, A2, A3, A4, A5, A6, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4, a6: A6) => R>(fn: T): T;
+	<A1, R, T extends (a1: A1) => R>(fn: T): T & IAction;
+	<A1, A2, R, T extends (a1: A1, a2: A2) => R>(fn: T): T & IAction;
+	<A1, A2, A3, R, T extends (a1: A1, a2: A2, a3: A3) => R>(fn: T): T & IAction;
+	<A1, A2, A3, A4, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4) => R>(fn: T): T & IAction;
+	<A1, A2, A3, A4, A5, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => R>(fn: T): T & IAction;
+	<A1, A2, A3, A4, A5, A6, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4, a6: A6) => R>(fn: T): T & IAction;
 
 	// named actions
-	<A1, R, T extends (a1: A1) => R>(name: string, fn: T): T;
-	<A1, A2, R, T extends (a1: A1, a2: A2) => R>(name: string, fn: T): T;
-	<A1, A2, A3, R, T extends (a1: A1, a2: A2, a3: A3) => R>(name: string, fn: T): T;
-	<A1, A2, A3, A4, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4) => R>(name: string, fn: T): T;
-	<A1, A2, A3, A4, A5, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => R>(name: string, fn: T): T;
-	<A1, A2, A3, A4, A5, A6, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4, a6: A6) => R>(name: string, fn: T): T;
+	<A1, R, T extends (a1: A1) => R>(name: string, fn: T): T & IAction;
+	<A1, A2, R, T extends (a1: A1, a2: A2) => R>(name: string, fn: T): T & IAction;
+	<A1, A2, A3, R, T extends (a1: A1, a2: A2, a3: A3) => R>(name: string, fn: T): T & IAction;
+	<A1, A2, A3, A4, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4) => R>(name: string, fn: T): T & IAction;
+	<A1, A2, A3, A4, A5, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => R>(name: string, fn: T): T & IAction;
+	<A1, A2, A3, A4, A5, A6, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4, a6: A6) => R>(name: string, fn: T): T & IAction;
 
 	// generic forms
-	<T extends Function>(fn: T): T;
-	<T extends Function>(name: string, fn: T): T;
+	<T extends Function>(fn: T): T & IAction;
+	<T extends Function>(name: string, fn: T): T & IAction;
 
 	// named decorator
 	(customName: string): (target: Object, key: string, baseDescriptor?: PropertyDescriptor) => void;
@@ -30,12 +31,16 @@ export interface IActionFactory {
 	(target: Object, propertyKey: string, descriptor?: PropertyDescriptor): void;
 
 	// .bound
-	bound<A1, R, T extends (a1: A1) => R>(fn: T): T;
-	bound<A1, A2, R, T extends (a1: A1, a2: A2) => R>(fn: T): T;
-	bound<A1, A2, A3, R, T extends (a1: A1, a2: A2, a3: A3) => R>(fn: T): T;
-	bound<A1, A2, A3, A4, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4) => R>(fn: T): T;
-	bound<A1, A2, A3, A4, A5, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => R>(fn: T): T;
-	bound<A1, A2, A3, A4, A5, A6, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4, a6: A6) => R>(fn: T): T;
+	bound<A1, R, T extends (a1: A1) => R>(fn: T): T & IAction;
+	bound<A1, A2, R, T extends (a1: A1, a2: A2) => R>(fn: T): T & IAction;
+	bound<A1, A2, A3, R, T extends (a1: A1, a2: A2, a3: A3) => R>(fn: T): T & IAction;
+	bound<A1, A2, A3, A4, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4) => R>(fn: T): T & IAction;
+	bound<A1, A2, A3, A4, A5, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => R>(fn: T): T & IAction;
+	bound<A1, A2, A3, A4, A5, A6, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4, a6: A6) => R>(fn: T): T & IAction;
+
+	// generic forms
+	bound<T extends Function>(fn: T): T & IAction;
+	bound<T extends Function>(name: string, fn: T): T & IAction;
 
 	// .bound decorator
 	bound(target: Object, propertyKey: string, descriptor?: PropertyDescriptor): void;
@@ -51,7 +56,7 @@ const actionFieldDecorator = createClassPropertyDecorator(
 		return this[key];
 	},
 	function () {
-		invariant(false, "It is not allowed to assign new values to @action fields");
+		invariant(false, getMessage("m001"));
 	},
 	false,
 	true
@@ -65,7 +70,7 @@ const boundActionDecorator = createClassPropertyDecorator(
 		return this[key];
 	},
 	function () {
-		invariant(false, "It is not allowed to assign new values to @action fields");
+		invariant(false, getMessage("m001"));
 	},
 	false,
 	false
@@ -115,8 +120,8 @@ export function runInAction<T>(arg1, arg2?, arg3?) {
 	const fn = typeof arg1 === "function" ? arg1 : arg2;
 	const scope = typeof arg1 === "function" ? arg2 : arg3;
 
-	invariant(typeof fn === "function", "`runInAction` expects a function");
-	invariant(fn.length === 0, "`runInAction` expects a function without arguments");
+	invariant(typeof fn === "function", getMessage("m002"));
+	invariant(fn.length === 0, getMessage("m003"));
 	invariant(typeof actionName === "string" && actionName.length > 0, `actions should have valid names, got: '${actionName}'`);
 
 	return executeAction(actionName, fn, scope, undefined);

@@ -1,4 +1,5 @@
 <img src="docs/mobx.png" alt="logo" height="120" align="right" />
+
 # MobX
 
 _Simple, scalable state management_
@@ -17,6 +18,10 @@ _Simple, scalable state management_
 * CDN:
 - https://unpkg.com/mobx/lib/mobx.umd.js
 - https://cdnjs.com/libraries/mobx
+
+## Translations
+
+* [中文](http://cn.mobx.js.org)
 
 ## Getting started
 
@@ -66,7 +71,7 @@ class Todo {
 ```
 
 Using `observable` is like turning a property of an object into a spreadsheet cell.
-But unlike spreadsheets, these values cannot just be primitive values, but also references, objects and arrays.
+But unlike spreadsheets, these values can be not only primitive values, but also references, objects and arrays.
 You can even [define your own](http://mobxjs.github.io/mobx/refguide/extending.html) observable data sources.
 
 ### Intermezzo: Using MobX in ES5, ES6 and ES.next environments
@@ -228,7 +233,7 @@ How that works? See this [in-depth explanation of MobX](https://medium.com/@mwes
 
 ### Easy interoperability
 
-MobX works with plain javascript structures. Due to it's unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific library flavors.
+MobX works with plain javascript structures. Due to its unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific library flavors.
 
 So you can simply keep using your existing router, data fetching, and utility libraries like `react-router`, `director`, `superagent`, `lodash` etc.
 
@@ -252,7 +257,7 @@ MobX is inspired by reactive programming principles as found in spreadsheets. It
 
 A ton of credits for [Mendix](https://github.com/mendix), for providing the flexibility and support to maintain MobX and the chance to proof the philosophy of MobX in a real, complex, performance critical applications.
 
-And finally kudo's for all the people that believed in, tried, validated and even [sponsored](https://github.com/mobxjs/mobx/blob/master/sponsors.md) MobX.
+And finally kudos for all the people that believed in, tried, validated and even [sponsored](https://github.com/mobxjs/mobx/blob/master/sponsors.md) MobX.
 
 ## Further resources and documentation
 
@@ -279,6 +284,15 @@ And finally kudo's for all the people that believed in, tried, validated and eve
 
 * Feel free to send small pull requests. Please discuss new features or big changes in a GitHub issue first.
 * Use `npm test` to run the basic test suite, `npm run coverage` for the test suite with coverage and `npm run perf` for the performance tests.
+
+> Note: Before testing, make sure to run `npm run small-build`.
+
+## Flow support
+MobX ships with flow typings. To use them in your project, add this to the `[libs]` section of your `.flowconfig`:
+```
+[libs]
+node_modules/mobx/lib/mobx.js.flow
+```
 
 ## Bower support
 

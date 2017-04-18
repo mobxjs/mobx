@@ -142,13 +142,17 @@ declare module 'mobx' {
     observe(
       listener: (changeData: IArrayChange<T> | IArraySplice<T>) => void, fireImmediately?: boolean
     ): Lambda;
-    intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda;
+    intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda;
+    intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda; // TODO: remove in 4.0
     clear(): T[];
     peek(): T[];
     replace(newItems: T[]): T[];
     find(
       predicate: (item: T, index: number, array: Array<T>) => boolean, thisArg?: any, fromIndex?: number
     ): T | any;
+    findIndex(
+      predicate: (item: T, index: number, array: Array<T>) => boolean, thisArg?: any, fromIndex?: number
+    ): number;
     remove(value: T): boolean;
   }
 
@@ -301,11 +305,14 @@ declare module 'mobx' {
   declare function extendShallowObservable(target: any): any;
 
   declare function action(targetOrName: any, propertyKeyOrFuc?: any, descriptor?: PropertyDescriptor): any;
+  declare function action<T>(name: string, func: T): T;
+  declare function action<T>(func: T): T;
   declare function runInAction<T>(name: string, block: () => T, scope?: any): T;
+  declare function runInAction<T>(block: () => T, scope?: any): T;
   declare function isAction(thing: any): boolean;
   declare function autorun(nameOrFunction: string | (r: IReactionPublic) => void, viewOrScope?: any, scope?: any): any;
   declare function when(nameOrFunction: string | () => boolean, effect: Lambda, scope?: any): any
-  declare function autorunAsync(func: (r: IReactionPublic) => void, delay?: number, scope?: any): any
+  declare function autorunAsync(func: (r: IReactionPublic) => any, delay?: number, scope?: any): any
   declare function reaction<T>(
     expression: (r: IReactionPublic) => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately?: boolean, delay?: number, scope?: any
   ): any
@@ -330,7 +337,7 @@ declare module 'mobx' {
     object: any, property: string, listener: (newValue: any, oldValue?: any) => void, fireImmediately?: boolean
   ): Lambda
 
-  declare function toJS(source: any, detectCycles: boolean, ___alreadySeen: [any, any][]): any
+  declare function toJS(source: any, detectCycles?: boolean, ___alreadySeen?: [any, any][]): any
   declare function toJSlegacy(source: any, detectCycles?: boolean, ___alreadySeen?: [any, any][]): any
   declare function whyRun(thing?: any, prop?: string): string
   declare function useStrict(strict: boolean): any

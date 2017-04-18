@@ -85,3 +85,20 @@ test('autorun batches automatically', function(t) {
 	d2()
 	t.end();
 })
+
+
+test('autorun tracks invalidation of unbound dependencies', function(t) {
+	var a = m.observable(0);
+	var b = m.observable(0);
+	var c = m.computed(() => a.get() + b.get());
+	var values = [];
+
+	m.autorun(() => {
+		values.push(c.get());
+		b.set(100);
+	});
+
+	a.set(1);
+	t.deepEqual(values, [0, 100, 101]);
+	t.end();
+})

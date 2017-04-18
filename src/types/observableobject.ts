@@ -7,6 +7,8 @@ import {IListenable, registerListener, hasListeners, notifyListeners} from "./li
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {IEnhancer, isModifierDescriptor, IModifierDescriptor} from "../types/modifiers";
 import {isAction, defineBoundAction} from "../api/action";
+import {getMessage} from "../utils/messages";
+
 
 
 export interface IObservableObject {
@@ -59,7 +61,7 @@ export function asObservableObject(target, name?: string): ObservableObjectAdmin
 	if (isObservableObject(target))
 		return (target as any).$mobx;
 
-	invariant(Object.isExtensible(target), "Cannot make the designated object observable; it is not extensible");
+	invariant(Object.isExtensible(target), getMessage("m035"));
 	if (!isPlainObject(target))
 		name = (target.constructor.name || "ObservableObject") + "@" + getNextId();
 	if (!name)
@@ -159,35 +161,33 @@ const observablePropertyConfigs = {};
 const computedPropertyConfigs = {};
 
 export function generateObservablePropConfig(propName) {
-	const config = observablePropertyConfigs[propName];
-	if (config)
-		return config;
-	return observablePropertyConfigs[propName] = {
-		configurable: true,
-		enumerable: true,
-		get: function() {
-			return this.$mobx.values[propName].get();
-		},
-		set: function(v) {
-			setPropertyValue(this, propName, v);
+	return observablePropertyConfigs[propName] || (
+		observablePropertyConfigs[propName] = {
+			configurable: true,
+			enumerable: true,
+			get: function() {
+				return this.$mobx.values[propName].get();
+			},
+			set: function(v) {
+				setPropertyValue(this, propName, v);
+			}
 		}
-	};
+	);
 }
 
 export function generateComputedPropConfig(propName) {
-	const config = computedPropertyConfigs[propName];
-	if (config)
-		return config;
-	return computedPropertyConfigs[propName] = {
-		configurable: true,
-		enumerable: false,
-		get: function() {
-			return this.$mobx.values[propName].get();
-		},
-		set: function(v) {
-			return this.$mobx.values[propName].set(v);
+	return computedPropertyConfigs[propName] || (
+		computedPropertyConfigs[propName] = {
+			configurable: true,
+			enumerable: false,
+			get: function() {
+				return this.$mobx.values[propName].get();
+			},
+			set: function(v) {
+				return this.$mobx.values[propName].set(v);
+			}
 		}
-	};
+	);
 }
 
 export function setPropertyValue(instance, name: string, newValue) {

@@ -71,7 +71,7 @@ test('effect debounce is honored', t => {
 		delay: 100
 	})
 
-	setTimeout(() => a.set(2), 30); // should not become visible nor evaluate expr; first is skipped
+	setTimeout(() => a.set(2), 30);
 	setTimeout(() => a.set(3), 150); // should not be visible, combined with the next
 	setTimeout(() => a.set(4), 160);
 	setTimeout(() => a.set(5), 300);
@@ -79,8 +79,8 @@ test('effect debounce is honored', t => {
 	setTimeout(() => a.set(6), 700);
 
 	setTimeout(() => {
-		t.deepEqual(values, [4, 5])
-		t.equal(exprCount, 3)
+		t.deepEqual(values, [2, 4, 5])
+		t.equal(exprCount, 4)
 	}, 900)
 })
 
@@ -253,5 +253,34 @@ test("#278 do not rerun if expr output doesn't change structurally", t => {
 		["JOHN", "PIET"],
 		["JOHN", "JOHAN"]
 	]);
+	t.end();
+})
+
+test("do not rerun if prev & next expr output is NaN", t => {
+	var v = mobx.observable('a');
+	var values = [];
+	var valuesS = [];
+
+	var d = reaction(
+		() => v.get(),
+		newValue => { values.push(String(newValue)); },
+		{ fireImmediately: true, }
+	);
+	var dd = reaction(
+		() => v.get(),
+		newValue => { valuesS.push(String(newValue)); },
+		{ fireImmediately: true, compareStructural: true }
+	);
+
+	v.set(NaN);
+	v.set(NaN);
+	v.set(NaN);
+	v.set('b');
+
+	d();
+	dd();
+
+	t.deepEqual(values, [ 'a', 'NaN', 'b']);
+	t.deepEqual(valuesS, [ 'a', 'NaN', 'b']);
 	t.end();
 })

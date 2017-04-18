@@ -20,7 +20,7 @@ export interface IObservable extends IDepTreeNode {
 	lowestObserverState: IDerivationState; // Used to avoid redundant propagations
 	isPendingUnobservation: boolean; // Used to push itself to global.pendingUnobservations at most once per batch.
 
-	observers: IDerivation[]; // mantain _observers in raw array for for way faster iterating in propagation.
+	observers: IDerivation[]; // maintain _observers in raw array for for way faster iterating in propagation.
 	observersIndexes: {}; // map derivation.__mapid to _observers.indexOf(derivation) (see removeObserver)
 
 	onBecomeUnobserved();
@@ -160,12 +160,12 @@ function invariantLOS(observable: IObservable, msg) {
 /**
  * NOTE: current propagation mechanism will in case of self reruning autoruns behave unexpectedly
  * It will propagate changes to observers from previous run
- * It's hard or maybe inpossible (with reasonable perf) to get it right with current approach
- * Hopefully self reruning autoruns aren't a feature people shuold depend on
- * Also most basic use cases shuold be ok
+ * It's hard or maybe impossible (with reasonable perf) to get it right with current approach
+ * Hopefully self reruning autoruns aren't a feature people should depend on
+ * Also most basic use cases should be ok
  */
 
-// Called by Atom when it's value changes
+// Called by Atom when its value changes
 export function propagateChanged(observable: IObservable) {
 	// invariantLOS(observable, "changed start");
 	if (observable.lowestObserverState === IDerivationState.STALE) return;
@@ -182,7 +182,7 @@ export function propagateChanged(observable: IObservable) {
 	// invariantLOS(observable, "changed end");
 }
 
-// Called by ComputedValue when it recalculate and it's value changed
+// Called by ComputedValue when it recalculate and its value changed
 export function propagateChangeConfirmed(observable: IObservable) {
 	// invariantLOS(observable, "confirmed start");
 	if (observable.lowestObserverState === IDerivationState.STALE) return;
@@ -200,7 +200,7 @@ export function propagateChangeConfirmed(observable: IObservable) {
 	// invariantLOS(observable, "confirmed end");
 }
 
-// Used by computed when it's dependency changed, but we don't wan't to immidiately recompute.
+// Used by computed when its dependency changed, but we don't wan't to immediately recompute.
 export function propagateMaybeChanged(observable: IObservable) {
 	// invariantLOS(observable, "maybe start");
 	if (observable.lowestObserverState !== IDerivationState.UP_TO_DATE) return;

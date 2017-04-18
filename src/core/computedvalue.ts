@@ -1,11 +1,13 @@
 import {IObservable, reportObserved, propagateMaybeChanged, propagateChangeConfirmed, startBatch, endBatch, getObservers} from "./observable";
 import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, untrackedStart, untrackedEnd, shouldCompute, CaughtException, isCaughtException} from "./derivation";
 import {globalState} from "./globalstate";
-import {allowStateChangesStart, allowStateChangesEnd, createAction} from "./action";
-import {createInstanceofPredicate, getNextId, valueDidChange, invariant, Lambda, unique, joinStrings} from "../utils/utils";
+import {createAction} from "./action";
+import {createInstanceofPredicate, getNextId, valueDidChange, invariant, Lambda, unique, joinStrings, primitiveSymbol, toPrimitive} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "../core/spy";
 import {autorun} from "../api/autorun";
 import {IValueDidChange} from "../types/observablevalue";
+import {getMessage} from "../utils/messages";
+
 
 export interface IComputedValue<T> {
 	get(): T;
@@ -17,7 +19,7 @@ export interface IComputedValue<T> {
  * A node in the state dependency root that observes other nodes, and can be observed itself.
  *
  * ComputedValue will remember result of the computation for duration of a batch, or being observed
- * During this time it will recompute only when one of it's direct dependencies changed,
+ * During this time it will recompute only when one of its direct dependencies changed,
  * but only when it is being accessed with `ComputedValue.get()`.
  *
  * Implementation description:
@@ -57,7 +59,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	 *
 	 * The `compareStructural` property indicates whether the return values should be compared structurally.
 	 * Normally, a computed value will not notify an upstream observer if a newly produced value is strictly equal to the previously produced value.
-	 * However, enabling compareStructural can be convienent if you always produce an new aggregated object and don't want to notify observers if it is structurally the same.
+	 * However, enabling compareStructural can be convenient if you always produce an new aggregated object and don't want to notify observers if it is structurally the same.
 	 * This is useful for working with vectors, mouse coordinates etc.
 	 */
 	constructor(public derivation: () => T, public scope: Object | undefined, private compareStructural: boolean, name: string, setter?: (v: T) => void) {
@@ -71,14 +73,13 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	}
 
 	onBecomeUnobserved() {
-		invariant(this.dependenciesState !== IDerivationState.NOT_TRACKING, "INTERNAL ERROR only onBecomeUnobserved shouldn't be called twice in a row");
 		clearObserving(this);
 		this.value = undefined;
 	}
 
 	/**
 	 * Returns the current value of this computed value.
-	 * Will evaluate it's computation first if needed.
+	 * Will evaluate its computation first if needed.
 	 */
 	public get(): T {
 		invariant(!this.isComputing, `Cycle detected in computation ${this.name}`, this.derivation);
@@ -139,7 +140,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
 	computeValue(track: boolean) {
 		this.isComputing = true;
-		const prevAllowStateChanges = allowStateChangesStart(false);
+		globalState.computationDepth++;
 		let res: T | CaughtException;
 		if (track) {
 			res = trackDerivedFunction(this, this.derivation, this.scope);
@@ -150,7 +151,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 				res = new CaughtException(e);
 			}
 		}
-		allowStateChangesEnd(prevAllowStateChanges);
+		globalState.computationDepth--;
 		this.isComputing = false;
 		return res;
 	};
@@ -183,6 +184,10 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 		return `${this.name}[${this.derivation.toString()}]`;
 	}
 
+	valueOf(): T {
+		return toPrimitive(this.get());
+	};
+
 	whyRun() {
 		const isTracking = Boolean(globalState.trackingDerivation);
 		const observing = unique(this.isComputing ? this.newObserving! : this.observing).map((dep: any) => dep.name);
@@ -191,20 +196,12 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 WhyRun? computation '${this.name}':
  * Running because: ${isTracking ? "[active] the value of this computation is needed by a reaction" : this.isComputing ? "[get] The value of this computed was requested outside a reaction" : "[idle] not running at the moment"}
 ` +
-(this.dependenciesState === IDerivationState.NOT_TRACKING
-?
-` * This computation is suspended (not in use by any reaction) and won't run automatically.
-	Didn't expect this computation to be suspended at this point?
-	  1. Make sure this computation is used by a reaction (reaction, autorun, observer).
-	  2. Check whether you are using this computation synchronously (in the same stack as they reaction that needs it).
-`
-:
+(this.dependenciesState === IDerivationState.NOT_TRACKING ? getMessage("m032")  :
 ` * This computation will re-run if any of the following observables changes:
     ${joinStrings(observing)}
     ${(this.isComputing && isTracking) ? " (... or any observable accessed during the remainder of the current run)" : ""}
-	Missing items in this list?
-	  1. Check whether all used values are properly marked as observable (use isObservable to verify)
-	  2. Make sure you didn't dereference values too early. MobX observes props, not primitives. E.g: use 'person.name' instead of 'name' in your computation.
+	${getMessage("m038")}
+
   * If the outcome of this computation changes, the following observers will be re-run:
     ${joinStrings(observers)}
 `
@@ -212,5 +209,7 @@ WhyRun? computation '${this.name}':
 		);
 	}
 }
+
+ComputedValue.prototype[primitiveSymbol()] = ComputedValue.prototype.valueOf;
 
 export const isComputedValue = createInstanceofPredicate("ComputedValue", ComputedValue);

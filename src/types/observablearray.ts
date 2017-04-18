@@ -7,6 +7,8 @@ import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {arrayAsIterator, declareIterator} from "../utils/iterable";
 import {IEnhancer} from "../types/modifiers";
 
+const MAX_SPLICE_SIZE = 10000; // See e.g. https://github.com/mobxjs/mobx/issues/859
+
 // Detects bug in safari 9.1.1 (or iOS 9 safari mobile). See #364
 const safariPrototypeSetterInheritanceBug = (() => {
 	let v = false;
@@ -19,11 +21,13 @@ const safariPrototypeSetterInheritanceBug = (() => {
 export interface IObservableArray<T> extends Array<T> {
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[];
 	observe(listener: (changeData: IArrayChange<T>|IArraySplice<T>) => void, fireImmediately?: boolean): Lambda;
-	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda;
+	intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda;
+	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda; // TODO: remove in 4.0
 	clear(): T[];
 	peek(): T[];
 	replace(newItems: T[]): T[];
 	find(predicate: (item: T, index: number, array: IObservableArray<T>) => boolean, thisArg?: any, fromIndex?: number): T;
+	findIndex(predicate: (item: T, index: number, array: IObservableArray<T>) => boolean, thisArg?: any, fromIndex?: number): number;
 	remove(value: T): boolean;
 	move(fromIndex: number, toIndex: number): void;
 }
@@ -88,7 +92,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 		this.enhancer = (newV, oldV) => enhancer(newV, oldV, name + "[..]");
 	}
 
-	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
+	intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
 		return registerInterceptor<IArrayChange<T>|IArraySplice<T>>(this, handler);
 	}
 
@@ -118,8 +122,12 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 		let currentLength = this.values.length;
 		if (newLength === currentLength)
 			return;
-		else if (newLength > currentLength)
-			this.spliceWithArray(currentLength, 0, new Array(newLength - currentLength));
+		else if (newLength > currentLength) {
+			const newItems = new Array(newLength - currentLength);
+			for (let i = 0; i < newLength - currentLength; i++)
+				newItems[i] = undefined; // No Array.fill everywhere...
+			this.spliceWithArray(currentLength, 0, newItems);
+		}
 		else
 			this.spliceWithArray(newLength, currentLength - newLength);
 	}
@@ -134,7 +142,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 	}
 
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[] {
-		checkIfStateModificationsAreAllowed();
+		checkIfStateModificationsAreAllowed(this.atom);
 		const length = this.values.length;
 
 		if (index === undefined)
@@ -171,11 +179,21 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 		newItems = <T[]> newItems.map(v => this.enhancer(v, undefined));
 		const lengthDelta = newItems.length - deleteCount;
 		this.updateArrayLength(length, lengthDelta); // create or remove new entries
-		const res: T[] = this.values.splice(index, deleteCount, ...newItems); // FIXME: splat might exceed callstack size!
+		const res = this.spliceItemsIntoValues(index, deleteCount, newItems);
 
 		if (deleteCount !== 0 || newItems.length !== 0)
 			this.notifyArraySplice(index, newItems, res);
 		return res;
+	}
+
+	spliceItemsIntoValues(index, deleteCount, newItems: T[]): T[] {
+		if (newItems.length < MAX_SPLICE_SIZE) {
+			return this.values.splice(index, deleteCount, ...newItems);
+		} else {
+			const res = this.values.slice(index, index + deleteCount)
+			this.values = this.values.slice(0, index).concat(newItems, this.values.slice(index + deleteCount ))
+			return res;
+		}
 	}
 
 	notifyArrayChildUpdate<T>(index: number, newValue: T, oldValue: T) {
@@ -242,7 +260,7 @@ export class ObservableArray<T> extends StubArray {
 		}
 	}
 
-	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
+	intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
 		return this.$mobx.intercept(handler);
 	}
 
@@ -282,12 +300,18 @@ export class ObservableArray<T> extends StubArray {
 
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
 	find(predicate: (item: T, index: number, array: ObservableArray<T>) => boolean, thisArg?, fromIndex = 0): T | undefined {
+		const idx = this.findIndex.apply(this, arguments);
+		return idx === -1 ? undefined : this.$mobx.values[idx];
+	}
+
+	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex
+	findIndex(predicate: (item: T, index: number, array: ObservableArray<T>) => boolean, thisArg?, fromIndex = 0): number {
 		this.$mobx.atom.reportObserved();
 		const items = this.$mobx.values, l = items.length;
 		for (let i = fromIndex; i < l; i++)
 			if (predicate.call(thisArg, items[i], i, this))
-				return items[i];
-		return undefined;
+				return i;
+		return -1;
 	}
 
 	/*
@@ -307,6 +331,11 @@ export class ObservableArray<T> extends StubArray {
 		}
 		return this.$mobx.spliceWithArray(index, deleteCount, newItems);
 	}
+
+	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[] {
+		return this.$mobx.spliceWithArray(index, deleteCount, newItems);
+	}
+
 
 	push(...items: T[]): number {
 		const adm = this.$mobx;
@@ -380,12 +409,61 @@ export class ObservableArray<T> extends StubArray {
 	}
 
 	toString(): string {
-		return "[mobx.array] " + Array.prototype.toString.apply(this.$mobx.values, arguments);
+		this.$mobx.atom.reportObserved();
+		return Array.prototype.toString.apply(this.$mobx.values, arguments);
 	}
 
 	toLocaleString(): string {
-		return "[mobx.array] " + Array.prototype.toLocaleString.apply(this.$mobx.values, arguments);
+		this.$mobx.atom.reportObserved();
+		return Array.prototype.toLocaleString.apply(this.$mobx.values, arguments);
 	}
+
+	// See #734, in case property accessors are unreliable...
+	get(index: number): T | undefined {
+		const impl = <ObservableArrayAdministration<any>> this.$mobx;
+		if (impl) {
+			if (index < impl.values.length) {
+				impl.atom.reportObserved();
+				return impl.values[index];
+			}
+			console.warn(`[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${impl.values.length}). Please check length first. Out of bound indices will not be tracked by MobX`);
+		}
+		return undefined;
+	}
+
+	// See #734, in case property accessors are unreliable...
+	set(index: number, newValue: T) {
+		const adm = <ObservableArrayAdministration<T>> this.$mobx;
+		const values = adm.values;
+		if (index < values.length) {
+			// update at index in range
+			checkIfStateModificationsAreAllowed(adm.atom);
+			const oldValue = values[index];
+			if (hasInterceptors(adm)) {
+				const change = interceptChange<IArrayWillChange<T>>(adm as any, {
+					type: "update",
+					object: this as any,
+					index, newValue
+				});
+				if (!change)
+					return;
+				newValue = change.newValue;
+			}
+			newValue = adm.enhancer(newValue, oldValue);
+			const changed = newValue !== oldValue;
+			if (changed) {
+				values[index] = newValue;
+				adm.notifyArrayChildUpdate(index, newValue, oldValue);
+			}
+		} else if (index === values.length) {
+			// add a new item
+			adm.spliceWithArray(index, 0, [newValue]);
+		} else {
+			// out of bounds
+			throw new Error(`[mobx.array] Index out of bounds, ${index} is larger than ${values.length}`);
+		}
+	}
+
 }
 
 declareIterator(ObservableArray.prototype, function() {
@@ -401,14 +479,18 @@ makeNonEnumerable(ObservableArray.prototype, [
 	"observe",
 	"clear",
 	"concat",
+	"get",
 	"replace",
 	"toJS",
 	"toJSON",
 	"peek",
 	"find",
+	"findIndex",
 	"splice",
+	"spliceWithArray",
 	"push",
 	"pop",
+	"set",
 	"shift",
 	"unshift",
 	"reverse",
@@ -456,69 +538,27 @@ Object.defineProperty(ObservableArray.prototype, "length", {
 });
 
 // See #364
-const ENTRY_0 = {
-	configurable: true,
-	enumerable: false,
-	set: createArraySetter(0),
-	get: createArrayGetter(0)
-};
+const ENTRY_0 = createArrayEntryDescriptor(0);
+
+function createArrayEntryDescriptor(index: number) {
+	return {
+		enumerable: false,
+		configurable: false,
+		get: function() {
+			// TODO: Check `this`?, see #752?
+			return this.get(index);
+		},
+		set: function(value) {
+			this.set(index, value);
+		}
+	};
+}
 
 function createArrayBufferItem(index: number) {
-	const set = createArraySetter(index);
-	const get = createArrayGetter(index);
-	Object.defineProperty(ObservableArray.prototype, "" + index, {
-		enumerable: false,
-		configurable: true,
-		set, get
-	});
+	Object.defineProperty(ObservableArray.prototype, "" + index, createArrayEntryDescriptor(index));
 }
 
-function createArraySetter(index: number) {
-	return function<T>(newValue: T) {
-		const adm = <ObservableArrayAdministration<T>> this.$mobx;
-		const values = adm.values;
-		if (index < values.length) {
-			// update at index in range
-			checkIfStateModificationsAreAllowed();
-			const oldValue = values[index];
-			if (hasInterceptors(adm)) {
-				const change = interceptChange<IArrayWillChange<T>>(adm as any, {
-					type: "update",
-					object: adm.array,
-					index, newValue
-				});
-				if (!change)
-					return;
-				newValue = change.newValue;
-			}
-			newValue = adm.enhancer(newValue, oldValue);
-			const changed = newValue !== oldValue;
-			if (changed) {
-				values[index] = newValue;
-				adm.notifyArrayChildUpdate(index, newValue, oldValue);
-			}
-		} else if (index === values.length) {
-			// add a new item
-			adm.spliceWithArray(index, 0, [newValue]);
-		} else
-			// out of bounds
-			throw new Error(`[mobx.array] Index out of bounds, ${index} is larger than ${values.length}`);
-	};
-}
-
-function createArrayGetter(index: number) {
-	return function () {
-		const impl = <ObservableArrayAdministration<any>> this.$mobx;
-		if (impl && index < impl.values.length) {
-			impl.atom.reportObserved();
-			return impl.values[index];
-		}
-		console.warn(`[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${impl.values.length}). Please check length first. Out of bound indices will not be tracked by MobX`);
-		return undefined;
-	};
-}
-
-function reserveArrayBuffer(max: number) {
+export function reserveArrayBuffer(max: number) {
 	for (let index = OBSERVABLE_ARRAY_BUFFER_SIZE; index < max; index++)
 		createArrayBufferItem(index);
 	OBSERVABLE_ARRAY_BUFFER_SIZE = max;

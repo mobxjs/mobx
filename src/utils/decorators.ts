@@ -28,7 +28,7 @@ export function createClassPropertyDecorator(
 	 */
 	allowCustomArguments: boolean
 ): any {
-	function classPropertyDecorator(target: any, key: string, descriptor, customArgs?: IArguments, argLen?: number) {
+	function classPropertyDecorator(target: any, key: string, descriptor, customArgs?: IArguments, argLen: number = 0) {
 		invariant(allowCustomArguments || quacksLikeADecorator(arguments), "This function is a decorator, but it wasn't invoked like a decorator");
 		if (!descriptor) {
 			// typescript (except for getter / setters)

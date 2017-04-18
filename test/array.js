@@ -1,3 +1,4 @@
+"use strict"
 var test = require('tape');
 var mobx = require('..');
 var observable = mobx.observable;
@@ -53,7 +54,7 @@ test('test1', function(t) {
     t.equal(sum.get(), 2);
     t.deepEqual(a.slice(), [2])
 
-    a.splice(0,0,4,3);
+	a.spliceWithArray(0,0, [4,3]);
     t.equal(sum.get(), 9);
     t.deepEqual(a.slice(), [4,3,2]);
 
@@ -86,6 +87,10 @@ test('test1', function(t) {
 
 	t.equal(JSON.stringify(a), "[3,1,2]");
 
+	t.equal(a.get(1), 1);
+	a.set(2, 4);
+	t.equal(a.get(2), 4);
+
 //	t.deepEqual(Object.keys(a), ['0', '1', '2']); // ideally....
 	t.deepEqual(Object.keys(a), []);
 
@@ -116,7 +121,7 @@ test('array should support iterall / iterable ', t => {
 	t.end()
 })
 
-test('find and remove', function(t) {
+test('find(findIndex) and remove', function(t) {
     var a = mobx.observable([10,20,20]);
     var idx = -1;
     function predicate(item, index) {
@@ -129,21 +134,27 @@ test('find and remove', function(t) {
 
     t.equal(a.find(predicate), 20);
     t.equal(idx, 1);
+    t.equal(a.findIndex(predicate), 1);
     t.equal(a.find(predicate, null, 1), 20);
     t.equal(idx, 1);
+    t.equal(a.findIndex(predicate, null, 1), 1);
     t.equal(a.find(predicate, null, 2), 20);
     t.equal(idx, 2);
+    t.equal(a.findIndex(predicate, null, 2), 2);
     idx = -1;
     t.equal(a.find(predicate, null, 3), undefined);
     t.equal(idx, -1);
+    t.equal(a.findIndex(predicate, null, 3), -1);
 
     t.equal(a.remove(20), true);
     t.equal(a.find(predicate), 20);
     t.equal(idx, 1);
+    t.equal(a.findIndex(predicate), 1);
     idx = -1;
     t.equal(a.remove(20), true);
     t.equal(a.find(predicate), undefined);
     t.equal(idx, -1);
+    t.equal(a.findIndex(predicate), -1);
 
     t.equal(a.remove(20), false);
 
@@ -267,10 +278,46 @@ test('is array', function(t) {
     var x = mobx.observable([]);
     t.equal(x instanceof Array, true);
 
-    // would be cool if these two would return true...
-    t.equal(typeof x === "array", false);
+    // would be cool if this would return true...
     t.equal(Array.isArray(x), false);
     t.end();
+})
+
+test('stringifies same as ecma array', function(t) {
+    const x = mobx.observable([]);
+    t.equal(x instanceof Array, true);
+
+    // would be cool if these two would return true...
+	t.equal(x.toString(), "");
+	t.equal(x.toLocaleString(), "");
+	x.push(1, 2)
+	t.equal(x.toString(), "1,2");
+	t.equal(x.toLocaleString(), "1,2");
+    t.end();
+})
+
+test("observes when stringified", function (t) {
+	const x = mobx.observable([]);
+	let c = 0;
+	mobx.autorun(function() {
+        x.toString();
+		c++;
+    });
+	x.push(1);
+	t.equal(c, 2);
+	t.end();
+})
+
+test("observes when stringified to locale", function (t) {
+	const x = mobx.observable([]);
+	let c = 0;
+	mobx.autorun(function() {
+        x.toLocaleString();
+		c++;
+    });
+	x.push(1);
+	t.equal(c, 2);
+	t.end();
 })
 
 test('peek', function(t) {
@@ -414,4 +461,19 @@ test("accessing out of bound values throws", t => {
 
 	console.warn = baseWarn;
 	t.end();
+})
+
+test("replace can handle large arrays", t => {
+	const a = mobx.observable([])
+	const b = []
+	b.length = 1000*1000
+	t.doesNotThrow(() => {
+		a.replace(b)
+	})
+
+	t.doesNotThrow(() => {
+		a.spliceWithArray(0, 0, b)
+	})
+
+	t.end()
 })
