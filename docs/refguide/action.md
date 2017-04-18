@@ -75,7 +75,7 @@ If you use babel, this plugin could help you to handle your async actions: [mobx
 
 The `action` decorator / function follows the normal rules for binding in javascript.
 However, Mobx 3 introduces `action.bound` to automatically bind actions to the targeted object.
-Note that `(@)action.bound` does, unlike `action`, not take a name parameter, the name will always be based on the property the action is bound to.
+Note that unlike `action`, `(@)action.bound` does not take a name parameter, so the name will always be based on the property name to which the action is bound.
 
 Example:
 
