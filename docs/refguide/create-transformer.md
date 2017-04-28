@@ -103,6 +103,8 @@ Some examples:
 
 
 ```javascript
+var m = require('mobx')
+	
 function Folder(parent, name) {
 	this.parent = parent;
 	m.extendObservable(this, {
@@ -155,17 +157,11 @@ var stringTransformer = m.createTransformer(function (displayFolder) {
 		}).map(stringTransformer).join('');
 });
 
-m.autorun(function() {
-    state.displayRoot = transformFolder(state.root);
-    state.text = stringTransformer(state.displayRoot)
-    console.log(state.text)
-});
-
 function createFolders(parent, recursion) {
 	if (recursion === 0)
 		return;
 	for (var i = 0; i < 3; i++) {
-		var folder = new Folder(parent, i);
+		var folder = new Folder(parent, i + '');
 		parent.children.push(folder);
 		createFolders(folder, recursion - 1);
 	}
@@ -173,8 +169,14 @@ function createFolders(parent, recursion) {
 
 createFolders(state.root, 2); // 3^2
 
+m.autorun(function() {
+    state.displayRoot = transformFolder(state.root);
+    state.text = stringTransformer(state.displayRoot)
+    console.log(state.text)
+});
+
 state.root.name = 'wow'; // change folder name
-state.displayRoot.children[9].collapsed = true; // collapse folder
+state.displayRoot.children[1].collapsed = true; // collapse folder
 state.filter = "2"; // search
 state.filter = null; // unsearch
 ```
