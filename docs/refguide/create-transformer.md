@@ -107,7 +107,7 @@ function Folder(parent, name) {
 	this.parent = parent;
 	m.extendObservable(this, {
 		name: name,
-		children: m.asFlat([]),
+		children: m.observable.shallow([]),
 	});
 }
 
@@ -116,22 +116,22 @@ function DisplayFolder(folder, state) {
 	this.folder = folder;
 	m.extendObservable(this, {
 		collapsed: false,
-		name: function() {
+		name: m.computed(function() {
 			return this.folder.name;
-		},
-		isVisible: function() {
+		}),
+		isVisible: m.computed(function() {
 			return !this.state.filter || this.name.indexOf(this.state.filter) !== -1 || this.children.some(child => child.isVisible);
-		},
-		children: function() {
+		}),
+		children: m.computed(function() {
 			if (this.collapsed)
 				return [];
 			return this.folder.children.map(transformFolder).filter(function(child) {
 				return child.isVisible;
 			})
-		},
-		path: function() {
+		}),
+		path: n.computed(function() {
 			return this.folder.parent === null ? this.name : transformFolder(this.folder.parent).path + "/" + this.name;
-		}
+		})
 	});
 }
 
