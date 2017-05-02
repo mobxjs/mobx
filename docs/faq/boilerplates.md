@@ -5,7 +5,7 @@
 * [MobX + React JSFiddle](https://jsfiddle.net/mweststrate/wgbe4guu/)
 * [MobX + React JSFiddle with just ES5](https://jsfiddle.net/rubyred/55oc981v/)
 * [custom-react-scripts](https://www.npmjs.com/package/custom-react-scripts) for [create-react-app](https://github.com/facebookincubator/create-react-app) that enables using decorators; add `REACT_APP_DECORATORS=true` to `.env` to enable decorators.
-[React + React Router 4 + MobX + i18n](https://github.com/alexvcasillas/react-mobx-router) React Create App with React Router and MobX and Internationalization
+* [React + React Router 4 + MobX + i18n](https://github.com/alexvcasillas/react-mobx-router) React Create App with React Router and MobX and Internationalization
 * [generator-mobx-react](https://www.npmjs.com/package/generator-mobx-react) Yeoman MobX, React, Webpack, Babel / Typescript project generator
 * [mobx-starter](https://github.com/nightwolfz/mobx-starter): Starting base for an mobx react project with optional isomorphism. MongoDB auth & sessions, hot reload, react-router
 * [React, React-Router 4, MobX and Webpack 2-boilerplate with async routes](https://github.com/mhaagens/react-mobx-react-router4-boilerplate)
