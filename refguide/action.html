@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.6" data-basepath=".." data-revision="Thu Jan 26 2017 14:35:40 GMT+0100 (CET)">
+    <div class="book" data-level="2.6" data-basepath=".." data-revision="Mon May 08 2017 09:31:16 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -944,7 +944,7 @@ In this situation <code>runInAction</code> can come in handy, wrap this around t
 <h2 id="bound-actions">Bound actions</h2>
 <p>The <code>action</code> decorator / function follows the normal rules for binding in javascript.
 However, Mobx 3 introduces <code>action.bound</code> to automatically bind actions to the targeted object.
-Note that <code>(@)action.bound</code> does, unlike <code>action</code>, not take a name parameter, the name will always be based on the property the action is bound to.</p>
+Note that unlike <code>action</code>, <code>(@)action.bound</code> does not take a name parameter, so the name will always be based on the property name to which the action is bound.</p>
 <p>Example:</p>
 <pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Ticker</span> </span>{
     @observable <span class="hljs-keyword">this</span>.tick = <span class="hljs-number">0</span>
@@ -968,7 +968,7 @@ setInterval(ticker.increment, <span class="hljs-number">1000</span>)
 
 setInterval(ticker.increment, <span class="hljs-number">1000</span>)
 </code></pre>
-<p><em>Note: don&apos;t use <em>action.bind</em> with arrow functions; arrow functions are already bound and cannot be rebound.</em></p>
+<p><em>Note: don&apos;t use <em>action.bound</em> with arrow functions; arrow functions are already bound and cannot be rebound.</em></p>
 
                     
                     </section>

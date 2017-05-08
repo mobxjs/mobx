@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="7.1" data-basepath=".." data-revision="Thu Jan 26 2017 14:35:40 GMT+0100 (CET)">
+    <div class="book" data-level="7.1" data-basepath=".." data-revision="Mon May 08 2017 09:31:16 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -899,7 +899,7 @@ You can use <code>extendObservable(target, props)</code> to introduce new observ
 However object iterators like <code>for .. in</code> or <code>Object.keys()</code> won&apos;t react to this automatically.
 If you need a dynamically keyed object, for example to store users by id, create observable _map_s using <a href="../refguide/map.html"><code>observable.map</code></a>.
 For more info see <a href="react.html">what will MobX react to?</a>.</p>
-<h3 id="use-observer-on-all-components-that-render-observable-s">Use <code>@observer</code> on all components that render <code>@observable</code>&apos;s.</h3>
+<h3 id="use-observer-on-all-components-that-render-observable-s">Use <code>@observer</code> on all components that render <code>@observable</code>s.</h3>
 <p><code>@observer</code> only enhances the component you are decorating, not the components used inside it.
 So usually all your components should be decorated. Don&apos;t worry, this is not inefficient, in contrast, more <code>observer</code> components make rendering more efficient.</p>
 <h3 id="dereference-values-as-late-as-possible">Dereference values as late as possible</h3>
@@ -920,7 +920,7 @@ See this <a href="https://medium.com/@mweststrate/becoming-fully-reactive-an-in-
 So if you fiddle arounds, computed properties might not seem efficient. But when applied in a project that uses <code>observer</code>, <code>autorun</code> etc, they become very efficient.</p>
 <p>MobX computeds will automatically be kept alive during transactions as well, see PRs: <a href="https://github.com/mobxjs/mobx/pull/452" target="_blank">#452</a> and <a href="https://github.com/mobxjs/mobx/pull/489" target="_blank">#489</a></p>
 <h4 id="always-dispose-reactions">Always dispose reactions</h4>
-<p>all forms of <code>autorun</code>, <code>observe</code> and <code>intercept</code> will only be garbage collected if all objects they observe are garbage collection themselves.
+<p>All forms of <code>autorun</code>, <code>observe</code> and <code>intercept</code> will only be garbage collected if all objects they observe are garbage collected themselves.
 So it is recommend to use the disposer function that is returned from these methods to stop them when you no longer need them.
 Usually for <code>observe</code> and <code>intercept</code> it is not strictly necessary to dispose them if when targed <code>this</code>.
 For reactions like <code>autorun</code> it is more tricky, as they might observe many different observables, and as long as one of them is still in scope,

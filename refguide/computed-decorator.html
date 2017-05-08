@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.3" data-basepath=".." data-revision="Thu Jan 26 2017 14:35:40 GMT+0100 (CET)">
+    <div class="book" data-level="2.3" data-basepath=".." data-revision="Mon May 08 2017 09:31:16 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -885,11 +885,11 @@
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/computed-decorator.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="-computed">(@)computed</h1>
 <p>Computed values are values that can be derived from the existing state or other computed values.
 Conceptually, they are very similar to formulas in spreadsheets.
-Computed values can&apos;t be underestimated, as they help you to make your actual modifyable state as small as possible.
-Besides that they are higly optimized, so use them whereever possible.</p>
+Computed values can&apos;t be underestimated, as they help you to make your actual modifiable state as small as possible.
+Besides that they are highly optimized, so use them wherever possible.</p>
 <p>Don&apos;t confuse <code>computed</code> with <code>autorun</code>. They are both reactively invoked expressions,
 but use <code>@computed</code> if you want to reactively produce a <em>value</em> that can be used by other observers and
-<code>autorun</code> if you don&apos;t want to produce a new value but rather want ot achieve an <em>effect</em>.
+<code>autorun</code> if you don&apos;t want to produce a new value but rather want to achieve an <em>effect</em>.
 For example imperative side effects like logging, making network requests etc.</p>
 <p>Computed values are automatically derived from your state if any value that affects them changes.
 Computed values can be optimized away in many cases by MobX as they are assumed to be pure.
@@ -905,8 +905,8 @@ However, in real life situations this by far the best default, and you can alway
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, computed} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OrderLine</span> </span>{
-    @observable price:number = <span class="hljs-number">0</span>;
-    @observable amount:number = <span class="hljs-number">1</span>;
+    @observable price = <span class="hljs-number">0</span>;
+    @observable amount = <span class="hljs-number">1</span>;
 
     constructor(price) {
         <span class="hljs-keyword">this</span>.price = price;
@@ -954,7 +954,7 @@ but they can be used as &apos;inverse&apos; of the derivation. For example:</p>
 </code></pre>
 <p>And similarly</p>
 <pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span> </span>{
-    @observable length: <span class="hljs-number">2</span>,
+    @observable length = <span class="hljs-number">2</span>;
     @computed get squared() {
         <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.length * <span class="hljs-keyword">this</span>.length;
     }
@@ -994,7 +994,7 @@ name.set(<span class="hljs-string">&quot;Dave&quot;</span>);
 <h2 id="-computed-struct-for-structural-comparison"><code>@computed.struct</code> for structural comparison</h2>
 <p>The <code>@computed</code> decorator does not take arguments. If you want to to create a computed property which does structural comparison, use <code>@computed.struct</code>.</p>
 <h2 id="note-on-error-handling">Note on error handling</h2>
-<p>If a computed value throws an exception during its computation, this exception will be catched and rethrown any time its value is read.
+<p>If a computed value throws an exception during its computation, this exception will be caught and rethrown any time its value is read.
 It is strongly recommended to always throw <code>Error</code>&apos;s, so that the original stack trace is preserved. E.g.: <code>throw new Error(&quot;Uhoh&quot;)</code> instead of <code>throw &quot;Uhoh&quot;</code>.
 Throwing exceptions doesn&apos;t break tracking, so it is possible for computed values to recover from exceptions.</p>
 <p>Example:</p>

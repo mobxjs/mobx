@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.5" data-basepath=".." data-revision="Thu Jan 26 2017 14:35:40 GMT+0100 (CET)">
+    <div class="book" data-level="2.5" data-basepath=".." data-revision="Mon May 08 2017 09:31:16 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -1028,6 +1028,7 @@ See the <a href="../best/devtools.html">DevTools</a> section.</p>
 <li><code>@observer</code> implements <code>shouldComponentUpdate</code> in the same way as <code>PureRenderMixin</code> so that children are not re-rendered unnecessary.</li>
 <li>Reactive components sideways load data; parent components won&apos;t re-render unnecessarily even when child components will.</li>
 <li><code>@observer</code> does not depend on React&apos;s context system.</li>
+<li>In mobx-react@4+, the props object and the state object of an observer component are automatically made observable to make it easier to create @computed properties that derive from props inside such a component. If you have a reaction (i.e. <code>autorun</code>) inside your <code>@observer</code> component that must <em>not</em> be re-evaluated when the specific props it uses don&apos;t change, be sure to derefence those specific props for use inside your reaction (i.e. <code>const myProp = props.myProp</code>). Otherwise, if you reference <code>props.myProp</code> inside the reaction, then a change in <em>any</em> of the props will cause the reaction to be re-evaluated. For a typical use case with React-Router, see <a href="https://alexhisen.gitbooks.io/mobx-recipes/content/observable-based-routing.html" target="_blank">this article</a>.</li>
 </ul>
 <h2 id="enabling-es6-decorators-in-your-transpiler">Enabling ES6 decorators in your transpiler</h2>
 <p>Decorators are not supported by default when using TypeScript or Babel pending a definitive definition in the ES standard.</p>

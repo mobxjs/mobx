@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.2" data-basepath=".." data-revision="Thu Jan 26 2017 14:35:40 GMT+0100 (CET)">
+    <div class="book" data-level="2.2" data-basepath=".." data-revision="Mon May 08 2017 09:31:16 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -889,12 +889,8 @@ This offers fine-grained control on which parts of your object become observable
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OrderLine</span> </span>{
-    @observable price:number = <span class="hljs-number">0</span>;
-    @observable amount:number = <span class="hljs-number">1</span>;
-
-    constructor(price) {
-        <span class="hljs-keyword">this</span>.price = price;
-    }
+    @observable price = <span class="hljs-number">0</span>;
+    @observable amount = <span class="hljs-number">1</span>;
 
     @computed get total() {
         <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.price * <span class="hljs-keyword">this</span>.amount;
@@ -903,11 +899,13 @@ This offers fine-grained control on which parts of your object become observable
 </code></pre>
 <p>If your environment doesn&apos;t support decorators or field initializers,
 <code>@observable key = value;</code> is sugar for <a href="extend-observable.html"><code>extendObservable(this, { key: value })</code></a></p>
-<p>Enumerability: properties decorator with <code>@observable</code> are enumerable, but defined on the class prototype and not on the class instances.
-In other words:</p>
+<p>Note: all the properties are being defined lazily as soon as any of them is accessed. Before that they are only defined on the class prototype  </p>
+<p>In other words:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> line = <span class="hljs-keyword">new</span> OrderLine();
 <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;price&quot;</span> <span class="hljs-keyword">in</span> line); <span class="hljs-comment">// true</span>
 <span class="hljs-built_in">console</span>.log(line.hasOwnProperty(<span class="hljs-string">&quot;price&quot;</span>)); <span class="hljs-comment">// false, the price _property_ is defined on the class, although the value will be stored per instance.</span>
+line.amount = <span class="hljs-number">2</span>;
+<span class="hljs-built_in">console</span>.log(line.hasOwnProperty(<span class="hljs-string">&quot;price&quot;</span>)); <span class="hljs-comment">// true, now all the properties are defined on the instance</span>
 </code></pre>
 <p>The <code>@observable</code> decorator can be combined with modifiers like <code>asStructure</code>:</p>
 <pre><code class="lang-javascript">@observable position = asStructure({ x: <span class="hljs-number">0</span>, y: <span class="hljs-number">0</span>})

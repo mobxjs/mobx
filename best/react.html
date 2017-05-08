@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="4" data-basepath=".." data-revision="Thu Jan 26 2017 14:35:40 GMT+0100 (CET)">
+    <div class="book" data-level="4" data-basepath=".." data-revision="Mon May 08 2017 09:31:16 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -1100,7 +1100,7 @@ message.title = &quot;Bar&quot;
     }
 
     render() {
-        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>{author.name}<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
+        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>{this.author.name}<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
     }
 }
 </span></code></pre>
@@ -1115,7 +1115,7 @@ This can simply be solved by doing the dereferencing inside <code>render()</code
 <span class="hljs-comment">// ...</span>
 </code></pre>
 <h2 id="how-multiple-components-will-render">How multiple components will render</h2>
-<p>Suppose that we use the following components are used to render our above <code>message</code> object.</p>
+<p>Suppose that the following components are used to render our above <code>message</code> object.</p>
 <pre><code class="lang-javascript">const Message = observer(({ message }) =&gt;
     &lt;div&gt;
         {message.title}

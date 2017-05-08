@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="8.3" data-basepath=".." data-revision="Thu Jan 26 2017 14:35:40 GMT+0100 (CET)">
+    <div class="book" data-level="8.3" data-basepath=".." data-revision="Mon May 08 2017 09:31:16 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -969,11 +969,13 @@ Some examples:</p>
 <li>Setting a search filter will remove all nodes that do not match the filter, unless they have a descendant that matches the filter.</li>
 <li>Etc.</li>
 </ol>
-<pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Folder</span>(<span class="hljs-params">parent, name</span>) </span>{
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> m = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;mobx&apos;</span>)
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Folder</span>(<span class="hljs-params">parent, name</span>) </span>{
     <span class="hljs-keyword">this</span>.parent = parent;
     m.extendObservable(<span class="hljs-keyword">this</span>, {
         name: name,
-        children: m.asFlat([]),
+        children: m.observable.shallow([]),
     });
 }
 
@@ -982,22 +984,22 @@ Some examples:</p>
     <span class="hljs-keyword">this</span>.folder = folder;
     m.extendObservable(<span class="hljs-keyword">this</span>, {
         collapsed: <span class="hljs-literal">false</span>,
-        name: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        get name() {
             <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.folder.name;
         },
-        isVisible: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        get isVisible() {
             <span class="hljs-keyword">return</span> !<span class="hljs-keyword">this</span>.state.filter || <span class="hljs-keyword">this</span>.name.indexOf(<span class="hljs-keyword">this</span>.state.filter) !== -<span class="hljs-number">1</span> || <span class="hljs-keyword">this</span>.children.some(child =&gt; child.isVisible);
         },
-        children: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        get children() {
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.collapsed)
                 <span class="hljs-keyword">return</span> [];
             <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.folder.children.map(transformFolder).filter(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">child</span>) </span>{
                 <span class="hljs-keyword">return</span> child.isVisible;
             })
         },
-        path: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        get path() {
             <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.folder.parent === <span class="hljs-literal">null</span> ? <span class="hljs-keyword">this</span>.name : transformFolder(<span class="hljs-keyword">this</span>.folder.parent).path + <span class="hljs-string">&quot;/&quot;</span> + <span class="hljs-keyword">this</span>.name;
-        }
+        })
     });
 }
 
@@ -1011,9 +1013,38 @@ Some examples:</p>
     <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> DisplayFolder(folder, state);
 });
 
+
+<span class="hljs-comment">// returns list of strings per folder</span>
+<span class="hljs-keyword">var</span> stringTransformer = m.createTransformer(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">displayFolder</span>) </span>{
+    <span class="hljs-keyword">var</span> path = displayFolder.path;
+    <span class="hljs-keyword">return</span> path + <span class="hljs-string">&quot;\n&quot;</span> +
+        displayFolder.children.filter(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">child</span>) </span>{
+            <span class="hljs-keyword">return</span> child.isVisible;
+        }).map(stringTransformer).join(<span class="hljs-string">&apos;&apos;</span>);
+});
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createFolders</span>(<span class="hljs-params">parent, recursion</span>) </span>{
+    <span class="hljs-keyword">if</span> (recursion === <span class="hljs-number">0</span>)
+        <span class="hljs-keyword">return</span>;
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">3</span>; i++) {
+        <span class="hljs-keyword">var</span> folder = <span class="hljs-keyword">new</span> Folder(parent, i + <span class="hljs-string">&apos;&apos;</span>);
+        parent.children.push(folder);
+        createFolders(folder, recursion - <span class="hljs-number">1</span>);
+    }
+}
+
+createFolders(state.root, <span class="hljs-number">2</span>); <span class="hljs-comment">// 3^2</span>
+
 m.autorun(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
     state.displayRoot = transformFolder(state.root);
+    state.text = stringTransformer(state.displayRoot)
+    <span class="hljs-built_in">console</span>.log(state.text)
 });
+
+state.root.name = <span class="hljs-string">&apos;wow&apos;</span>; <span class="hljs-comment">// change folder name</span>
+state.displayRoot.children[<span class="hljs-number">1</span>].collapsed = <span class="hljs-literal">true</span>; <span class="hljs-comment">// collapse folder</span>
+state.filter = <span class="hljs-string">&quot;2&quot;</span>; <span class="hljs-comment">// search</span>
+state.filter = <span class="hljs-literal">null</span>; <span class="hljs-comment">// unsearch</span>
 </code></pre>
 
                     

@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2" data-basepath=".." data-revision="Thu Jan 26 2017 14:35:40 GMT+0100 (CET)">
+    <div class="book" data-level="2" data-basepath=".." data-revision="Mon May 08 2017 09:31:16 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -883,7 +883,7 @@
                     <section class="normal" id="section-">
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/api.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="mobx-api-reference">MobX Api Reference</h1>
-<p>Applies to MobX 3 and higher. For MobX 2, the old documentation is still available on <a href="https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md" target="_blank">github</a></p>
+<p>Applies to MobX 3 and higher. For MobX 2, the old documentation is still available on <a href="https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md" target="_blank">github</a>.</p>
 <h1 id="core-api">Core API</h1>
 <p><em>The most important MobX api&apos;s. Understanding <code>observable</code>, <code>computed</code>, <code>reactions</code> and <code>actions</code> is enough to master MobX and use it in your applications!</em></p>
 <h2 id="creating-observables">Creating observables</h2>
@@ -898,7 +898,7 @@
 You can also directly create the desired observable type, see below.</p>
 <p>The following conversion rules are applied, but can be fine-tuned by using <em>modifiers</em>. See below.</p>
 <ol>
-<li>If <em>value</em> is an wrapped is an instance of an <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" target="_blank">ES6 Map</a>: a new <a href="map.html">Observable Map</a> will be returned. Observable maps are very useful if you don&apos;t want to react just to the change of a specific entry, but also to the addition or removal of entries.</li>
+<li>If <em>value</em> is an instance of an <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" target="_blank">ES6 Map</a>: a new <a href="map.html">Observable Map</a> will be returned. Observable maps are very useful if you don&apos;t want to react just to the change of a specific entry, but also to the addition or removal of entries.</li>
 <li>If <em>value</em> is an array, a new <a href="array.html">Observable Array</a> will be returned.</li>
 <li>If <em>value</em> is an object <em>without</em> prototype, the object will be cloned and all its current properties will be made observable. See <a href="object.html">Observable Object</a></li>
 <li>If <em>value</em> is an object <em>with</em> a prototype, a JavaScript primitive or function, a <a href="boxed.html">Boxed Observable</a> will be returned. MobX will not make objects with a prototype automatically observable; as that is the responsibility of its constructor function. Use <code>extendObservable</code> in the constructor, or <code>@observable</code> in its class definition instead.</li>
@@ -1055,8 +1055,8 @@ More, less trivial utilities can be found in the * <a href="https://github.com/m
 <h3 id="-isobservable"><code>isObservable</code></h3>
 <p>Usage: <code>isObservable(thing, property?)</code>. Returns true if the given thing, or the <code>property</code> of the given thing is observable.
 Works for all observables, computed values and disposer functions of reactions. <a href="is-observable">&#xAB;details&#xBB;</a></p>
-<h3 id="-isobservableobject-array-map"><code>isObservableObject|Array|Map</code></h3>
-<p>Usage: <code>isObservableObject(thing)</code>, <code>isObservableArray(thing)</code>, <code>isObservableMap(thing)</code>. Returns <code>true</code> if.., well, do the math.</p>
+<h3 id="-isobservableobject-array-map-and-isboxedobservable"><code>isObservableObject|Array|Map</code> and <code>isBoxedObservable</code></h3>
+<p>Usage: <code>isObservableObject(thing)</code>, <code>isObservableArray(thing)</code>, <code>isObservableMap(thing)</code>, <code>isBoxedObservable(thing)</code>. Returns <code>true</code> if.., well, do the math.</p>
 <h3 id="-isarraylike"><code>isArrayLike</code></h3>
 <p>Usage: <code>isArrayLike(thing)</code>. Returns <code>true</code> if the given thing is either a true JS-array or an observable (MobX-)array.
 This is intended as convenience/shorthand.
@@ -1144,7 +1144,7 @@ It is recommended to use <code>action</code> instead, which uses <code>transacti
 <h3 id="-untracked"><code>untracked</code></h3>
 <p>Usage: <code>untracked(() =&gt; { block })</code>.
 Low-level api that might be useful inside reactions and computations.
-Any observables accessed in the <code>block</code> won&apos;t cause the reaction / compuations to be recomputed automatically.
+Any observables accessed in the <code>block</code> won&apos;t cause the reaction / computations to be recomputed automatically.
 However it is recommended to use <code>action</code> instead, which uses <code>untracked</code> internally.
 <a href="untracked.html">&#xAB;details&#xBB;</a></p>
 <h3 id="-atom"><code>Atom</code></h3>

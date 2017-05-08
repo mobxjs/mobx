@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="8.2" data-basepath=".." data-revision="Thu Jan 26 2017 14:35:40 GMT+0100 (CET)">
+    <div class="book" data-level="8.2" data-basepath=".." data-revision="Mon May 08 2017 09:31:16 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -914,16 +914,16 @@ This clock will only actually tick if it is observed by someone.</p>
 
     getTime() {
         <span class="hljs-comment">// let MobX know this observable data source has been used</span>
-        <span class="hljs-comment">// reportObserved will return true if the atom is currenlty being observed</span>
+        <span class="hljs-comment">// reportObserved will return true if the atom is currently being observed</span>
         <span class="hljs-comment">// by some reaction.</span>
-        <span class="hljs-comment">// reportObserved will alos trigger the onBecomeObserved event handler (startTicking) if needed</span>
+        <span class="hljs-comment">// reportObserved will also trigger the onBecomeObserved event handler (startTicking) if needed</span>
         <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.atom.reportObserved()) {
             <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.currentDateTime;
         } <span class="hljs-keyword">else</span> {
             <span class="hljs-comment">// apparantly getTime was called but not while a reaction is running.</span>
             <span class="hljs-comment">// So, nobody depends on this value, hence the onBecomeObserved handler (startTicking) won&apos;t be fired</span>
-            <span class="hljs-comment">// Depending on the nature</span>
-            <span class="hljs-comment">// of your atom it might behave differently in such circumstances</span>
+            <span class="hljs-comment">// Depending on the nature of your atom </span>
+            <span class="hljs-comment">// it might behave differently in such circumstances</span>
             <span class="hljs-comment">// (like throwing an error, returning a default value etc)</span>
             <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>();
         }
