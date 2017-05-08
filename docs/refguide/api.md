@@ -228,8 +228,8 @@ Usage: `toJS(observableDataStructure)`. Converts observable data structures back
 Usage: `isObservable(thing, property?)`. Returns true if the given thing, or the `property` of the given thing is observable.
 Works for all observables, computed values and disposer functions of reactions. [&laquo;details&raquo;](is-observable)
 
-### `isObservableObject|Array|Map`
-Usage: `isObservableObject(thing)`, `isObservableArray(thing)`, `isObservableMap(thing)`. Returns `true` if.., well, do the math.
+### `isObservableObject|Array|Map` and `isBoxedObservable`
+Usage: `isObservableObject(thing)`, `isObservableArray(thing)`, `isObservableMap(thing)`, `isBoxedObservable(thing)`. Returns `true` if.., well, do the math.
 
 ### `isArrayLike`
 Usage: `isArrayLike(thing)`. Returns `true` if the given thing is either a true JS-array or an observable (MobX-)array.

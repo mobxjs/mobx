@@ -28,3 +28,14 @@ Returns true if the given object is an array that was made observable using `mob
 # isObservableObject
 
 Returns true if the given object is an object that was made observable using `mobx.observable(object)`.
+
+# isBoxedObservable
+
+Takes an object, returns true if the provided object is a boxed observable. N.b. does not return true for boxed computed values.
+
+# isComputed
+
+Accepts an `object` and optional `propertyName` argument. Returns `true` if either:
+
+* The `object` passed in is an boxed computed property
+* If the property with name `propertyName` of `object` is a computed property.
