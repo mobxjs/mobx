@@ -36,16 +36,16 @@ class Clock {
 
 	getTime() {
 		// let MobX know this observable data source has been used
-        // reportObserved will return true if the atom is currenlty being observed
+        // reportObserved will return true if the atom is currently being observed
         // by some reaction.
-        // reportObserved will alos trigger the onBecomeObserved event handler (startTicking) if needed
+        // reportObserved will also trigger the onBecomeObserved event handler (startTicking) if needed
 		if (this.atom.reportObserved()) {
             return this.currentDateTime;
         } else {
             // apparantly getTime was called but not while a reaction is running.
             // So, nobody depends on this value, hence the onBecomeObserved handler (startTicking) won't be fired
-            // Depending on the nature
-            // of your atom it might behave differently in such circumstances
+            // Depending on the nature of your atom 
+            // it might behave differently in such circumstances
             // (like throwing an error, returning a default value etc)
 		    return new Date();
         }

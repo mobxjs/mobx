@@ -133,7 +133,7 @@ function DisplayFolder(folder, state) {
 		},
 		get path() {
 			return this.folder.parent === null ? this.name : transformFolder(this.folder.parent).path + "/" + this.name;
-		}
+		})
 	});
 }
 
