@@ -22,7 +22,7 @@
 * [How to Test React and MobX with Jest](https://semaphoreci.com/community/tutorials/how-to-test-react-and-mobx-with-jest?utm_content=buffer15b42&utm_medium=social&utm_source=twitter.com&utm_campaign=buffer)
 * [Real time Chat App with OnsenUI, Horizon and MobX](http://tutorials.pluralsight.com/html-css/real-time-chat-app-with-onsenui-and-horizon?hearted=1)
 * [React Native With MobX - Getting Started](https://medium.com/@dabit3/react-native-with-mobx-getting-started-ba7e18d8ff44#.uge82y49s)
-* [MobX React: Simplified State Management in React](http://www.robinwieruch.de/mobx-react/?utm_content=bufferd1bb1&utm_medium=social&utm_source=twitter.com&utm_campaign=buffer). Tutorial on converting the SoundCloud client from React+Redux to React+MobX.
+* [From Redux to MobX Refactor in a SoundCloud Client](http://www.robinwieruch.de/mobx-react/): How to convert the SoundCloud Client from React+Redux to React+MobX.
 * [Introducing serializr: serializing and deserializing object graphs with ease](https://medium.com/@mweststrate/introducing-serializr-serializing-and-deserializing-object-graphs-with-ease-8833c3fcea02#.lghi3ybjm)
 * [How to decouple state and UI (a.k.a. you don’t need componentWillMount) - data fetching, authentication, routing and testing](https://medium.com/@mweststrate/how-to-decouple-state-and-ui-a-k-a-you-dont-need-componentwillmount-cc90b787aa37#.7zvpxt746)
 * [Getting Started ReactJS with MobX](https://codequs.com/p/HyTu8aIK/getting-started-reactjs-with-mobx/)
@@ -37,6 +37,7 @@
 ## Blogs
 
 * [Why we chose MobX over Redux for Spectacle Editor](http://formidable.com/blog/2016/06/02/why-we-chose-mobx-over-redux-for-spectacle-editor/)
+* [Redux or MobX: An attempt to dissolve the Confusion](https://www.robinwieruch.de/redux-mobx-confusion/)
 * [Optimising React rendering - tips to optimise rendering of a set of elements in React](https://medium.com/@lavrton/how-to-optimise-rendering-of-a-set-of-elements-in-react-ad01f5b161ae#.ijw98ktg5)
 * [A MobX introduction and case study](https://blog.wearewizards.io/a-mobx-introduction-and-case-study)
 * [How to Manage Your JavaScript Application State with MobX](https://www.sitepoint.com/manage-javascript-application-state-mobx/)
