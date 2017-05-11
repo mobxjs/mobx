@@ -2,7 +2,7 @@
 
 * [Spectacle editor: Official editor for building presentations using the Spectacle library](https://github.com/FormidableLabs/spectacle-editor)
 * [React-Game-Kit](https://github.com/FormidableLabs/react-game-kit)
-* [SoundCloud Client in React + MobX](https://github.com/rwieruch/favesound-mobx)
+* SoundCloud Client in React + MobX: [Source](https://github.com/rwieruch/favesound-mobx) and [Live](http://www.favesound.de/)
 * [DWatch - docker container manager, Electron, typescript, inversifyJS](https://github.com/Mercateo/dwatch)
 * Kratelabs interactive map / map order service [Demo](https://kratelabs.addxy.com/#/) [Source](https://github.com/KrateLabs/KrateLabs-App)
 * [Google Play Music Desktop Remote](https://github.com/GPMDP/google-play-music-desktop-remote) A React-Native app for remote controlling Google Play Music Desktop: MobX + WebSocket.
