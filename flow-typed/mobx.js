@@ -290,6 +290,7 @@ declare module 'mobx' {
     ): void;
     merge(other: ObservableMap<V> | IKeyValueMap<V>): ObservableMap<V>;
     clear(): void;
+    replace(other: ObservableMap<V> | IKeyValueMap<V>): ObservableMap<V>;
     size: number;
     toJS(): IKeyValueMap<V>;
     toJs(): IKeyValueMap<V>;
