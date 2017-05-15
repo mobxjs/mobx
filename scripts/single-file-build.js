@@ -46,8 +46,7 @@ fs.writeFileSync('.build/mobx.ts', allContents, { encoding: 'utf8', flag: 'a' })
     .map(cmd => `${__dirname.replace(/ /g, '\\ ')}/../node_modules/.bin/${cmd}`)
     .map(cmd => {
 		try {
-      console.log(cmd);
-      exec(cmd);
+      		exec(cmd);
 		} catch (e) {
 			console.log(e.stdout.toString());
 			console.error(e.stderr.toString());
