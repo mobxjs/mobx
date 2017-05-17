@@ -39,6 +39,6 @@
 
 # Code example projects on codesandbox.io
 
-* [![Edit Simple MobX TodoList](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/2vmzpM0wK)
-* [![Edit Functional MobX TodoList](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/3lLYYA1jn)
+* Simple MobX TodoList [![Edit Simple MobX TodoList](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/2vmzpM0wK)
+* Functional MobX TodoList [![Edit Functional MobX TodoList](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/3lLYYA1jn)
 
