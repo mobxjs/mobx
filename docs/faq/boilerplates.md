@@ -31,3 +31,4 @@
 * [rn_mobx_temmplate](https://github.com/hiaw/rn_mobx_template) React Native with MobX template
 * [ng-mobx](https://github.com/500tech/ng-mobx) MobX connector for AngularJS (aka Angular 1.x)
 * [ng2-mobx](https://github.com/500tech/ng2-mobx) MobX connector for Angular (aka Angular 2+)
+* [starhack.it](http://www.starhack.it) A full stack starter kit
