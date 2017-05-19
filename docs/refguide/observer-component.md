@@ -54,7 +54,7 @@ import {observer} from "mobx-react";
 
 const Timer = observer(({ timerData }) =>
 	<span>Seconds passed: { timerData.secondsPassed } </span>
-);
+));
 ```
 
 ## Observable local component state
