@@ -26,13 +26,13 @@ import {getMessage} from "../utils/messages";
  */
 
 export interface IReactionPublic {
-	dispose: IReactionDisposer;
+	dispose(): void;
 }
 
 export interface IReactionDisposer {
 	(): void;
-	$mobx?: Reaction;
-	onError?(handler: (error: any, derivation: IDerivation) => void);
+	$mobx: Reaction;
+	onError(handler: (error: any, derivation: IDerivation) => void);
 }
 
 export class Reaction implements IDerivation, IReactionPublic {

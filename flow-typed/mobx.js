@@ -150,6 +150,9 @@ declare module 'mobx' {
     find(
       predicate: (item: T, index: number, array: Array<T>) => boolean, thisArg?: any, fromIndex?: number
     ): T | any;
+    findIndex(
+      predicate: (item: T, index: number, array: Array<T>) => boolean, thisArg?: any, fromIndex?: number
+    ): number;
     remove(value: T): boolean;
   }
 
@@ -290,6 +293,7 @@ declare module 'mobx' {
     ): void;
     merge(other: ObservableMap<V> | IKeyValueMap<V>): ObservableMap<V>;
     clear(): void;
+    replace(other: ObservableMap<V> | IKeyValueMap<V>): ObservableMap<V>;
     size: number;
     toJS(): IKeyValueMap<V>;
     toJs(): IKeyValueMap<V>;
@@ -307,9 +311,10 @@ declare module 'mobx' {
   declare function runInAction<T>(name: string, block: () => T, scope?: any): T;
   declare function runInAction<T>(block: () => T, scope?: any): T;
   declare function isAction(thing: any): boolean;
-  declare function autorun(nameOrFunction: string | (r: IReactionPublic) => void, viewOrScope?: any, scope?: any): any;
-  declare function when(predicate: () => boolean, effect: Lambda, scope?: any): any
-  declare function autorunAsync(func: (r: IReactionPublic) => void, delay?: number, scope?: any): any
+  declare function autorun(nameOrFunction: string | (r: IReactionPublic) => any, viewOrScope?: any, scope?: any): any;
+  declare function when(name: string, cond:() => boolean, effect: Lambda, scope?: any): any
+  declare function when(cond:() => boolean, effect: Lambda, scope?: any): any
+  declare function autorunAsync(func: (r: IReactionPublic) => any, delay?: number, scope?: any): any
   declare function reaction<T>(
     expression: (r: IReactionPublic) => T, effect: (arg: T, r: IReactionPublic) => void, fireImmediately?: boolean, delay?: number, scope?: any
   ): any

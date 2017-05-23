@@ -73,8 +73,8 @@ export type IObservableMapInitialValues<V> = IMapEntries<V> | IKeyValueMap<V> | 
 
 export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, IListenable, IMap<string, V> {
 	$mobx = ObservableMapMarker;
-	private _data: { [key: string]: ObservableValue<V | undefined> } = {};
-	private _hasMap: { [key: string]: ObservableValue<boolean> } = {}; // hasMap, not hashMap >-).
+	private _data: { [key: string]: ObservableValue<V | undefined> } = Object.create(null);
+	private _hasMap: { [key: string]: ObservableValue<boolean> } = Object.create(null); // hasMap, not hashMap >-).
 	private _keys: IObservableArray<string> = <any> new ObservableArray(undefined, referenceEnhancer, `${this.name}.keys()`, true);
 	interceptors = null;
 	changeListeners = null;

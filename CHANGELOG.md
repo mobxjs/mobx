@@ -1,3 +1,19 @@
+# 3.1.10
+
+* Fixed typings of `action.bound`, see #803
+
+# 3.1.9
+
+* Introduced explicit `.get(index)` and `.set(index, value)` methods on observable arrays, for issues that have trouble handling many property descriptors on objects. See also #734
+* Made sure it is safe to call `onBecomeObserved` twice in row, fixes #874, #898
+* Fixed typings of `IReactionDisposer`
+
+# 3.1.8
+
+* Fixed edge case where `autorun` was not triggered again if a computed value was invalidated by the reaction itself, see [#916](https://github.com/mobxjs/mobx/issues/916), by @andykog
+* Added support for primtive keys in `createTransformer`, See #920 by @dnakov
+* Improved typings of `isArrayLike`, see #904, by @mohsen1
+
 # 3.1.7
 
 * Reverted ES2015 module changes, as they broke with webpack 2 (will be re-released later)

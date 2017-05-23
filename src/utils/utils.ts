@@ -216,7 +216,7 @@ export function createInstanceofPredicate<T>(name: string, clazz: new (...args: 
 /**
  * Returns whether the argument is an array, disregarding observability.
  */
-export function isArrayLike(x: any): boolean {
+export function isArrayLike(x: any): x is Array<any> | IObservableArray<any> {
 	return Array.isArray(x) || isObservableArray(x);
 }
 
@@ -241,6 +241,6 @@ export function toPrimitive(value) {
 }
 
 import {globalState} from "../core/globalstate";
-import {isObservableArray} from "../types/observablearray";
+import {IObservableArray, isObservableArray} from "../types/observablearray";
 import {isObservableMap} from "../types/observablemap";
 import {observable} from "../api/observable";

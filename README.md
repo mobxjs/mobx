@@ -1,4 +1,5 @@
 <img src="docs/mobx.png" alt="logo" height="120" align="right" />
+
 # MobX
 
 _Simple, scalable state management_
@@ -17,6 +18,10 @@ _Simple, scalable state management_
 * CDN:
 - https://unpkg.com/mobx/lib/mobx.umd.js
 - https://cdnjs.com/libraries/mobx
+
+## Translations
+
+* [中文](http://cn.mobx.js.org)
 
 ## Getting started
 

@@ -27,6 +27,7 @@ export interface IObservableArray<T> extends Array<T> {
 	peek(): T[];
 	replace(newItems: T[]): T[];
 	find(predicate: (item: T, index: number, array: IObservableArray<T>) => boolean, thisArg?: any, fromIndex?: number): T;
+	findIndex(predicate: (item: T, index: number, array: IObservableArray<T>) => boolean, thisArg?: any, fromIndex?: number): number;
 	remove(value: T): boolean;
 	move(fromIndex: number, toIndex: number): void;
 }
@@ -299,12 +300,18 @@ export class ObservableArray<T> extends StubArray {
 
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
 	find(predicate: (item: T, index: number, array: ObservableArray<T>) => boolean, thisArg?, fromIndex = 0): T | undefined {
+		const idx = this.findIndex.apply(this, arguments);
+		return idx === -1 ? undefined : this.$mobx.values[idx];
+	}
+
+	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex
+	findIndex(predicate: (item: T, index: number, array: ObservableArray<T>) => boolean, thisArg?, fromIndex = 0): number {
 		this.$mobx.atom.reportObserved();
 		const items = this.$mobx.values, l = items.length;
 		for (let i = fromIndex; i < l; i++)
 			if (predicate.call(thisArg, items[i], i, this))
-				return items[i];
-		return undefined;
+				return i;
+		return -1;
 	}
 
 	/*
@@ -410,6 +417,53 @@ export class ObservableArray<T> extends StubArray {
 		this.$mobx.atom.reportObserved();
 		return Array.prototype.toLocaleString.apply(this.$mobx.values, arguments);
 	}
+
+	// See #734, in case property accessors are unreliable...
+	get(index: number): T | undefined {
+		const impl = <ObservableArrayAdministration<any>> this.$mobx;
+		if (impl) {
+			if (index < impl.values.length) {
+				impl.atom.reportObserved();
+				return impl.values[index];
+			}
+			console.warn(`[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${impl.values.length}). Please check length first. Out of bound indices will not be tracked by MobX`);
+		}
+		return undefined;
+	}
+
+	// See #734, in case property accessors are unreliable...
+	set(index: number, newValue: T) {
+		const adm = <ObservableArrayAdministration<T>> this.$mobx;
+		const values = adm.values;
+		if (index < values.length) {
+			// update at index in range
+			checkIfStateModificationsAreAllowed(adm.atom);
+			const oldValue = values[index];
+			if (hasInterceptors(adm)) {
+				const change = interceptChange<IArrayWillChange<T>>(adm as any, {
+					type: "update",
+					object: this as any,
+					index, newValue
+				});
+				if (!change)
+					return;
+				newValue = change.newValue;
+			}
+			newValue = adm.enhancer(newValue, oldValue);
+			const changed = newValue !== oldValue;
+			if (changed) {
+				values[index] = newValue;
+				adm.notifyArrayChildUpdate(index, newValue, oldValue);
+			}
+		} else if (index === values.length) {
+			// add a new item
+			adm.spliceWithArray(index, 0, [newValue]);
+		} else {
+			// out of bounds
+			throw new Error(`[mobx.array] Index out of bounds, ${index} is larger than ${values.length}`);
+		}
+	}
+
 }
 
 declareIterator(ObservableArray.prototype, function() {
@@ -425,15 +479,18 @@ makeNonEnumerable(ObservableArray.prototype, [
 	"observe",
 	"clear",
 	"concat",
+	"get",
 	"replace",
 	"toJS",
 	"toJSON",
 	"peek",
 	"find",
+	"findIndex",
 	"splice",
 	"spliceWithArray",
 	"push",
 	"pop",
+	"set",
 	"shift",
 	"unshift",
 	"reverse",
@@ -481,71 +538,27 @@ Object.defineProperty(ObservableArray.prototype, "length", {
 });
 
 // See #364
-const ENTRY_0 = {
-	configurable: true,
-	enumerable: false,
-	set: createArraySetter(0),
-	get: createArrayGetter(0)
-};
+const ENTRY_0 = createArrayEntryDescriptor(0);
+
+function createArrayEntryDescriptor(index: number) {
+	return {
+		enumerable: false,
+		configurable: false,
+		get: function() {
+			// TODO: Check `this`?, see #752?
+			return this.get(index);
+		},
+		set: function(value) {
+			this.set(index, value);
+		}
+	};
+}
 
 function createArrayBufferItem(index: number) {
-	const set = createArraySetter(index);
-	const get = createArrayGetter(index);
-	Object.defineProperty(ObservableArray.prototype, "" + index, {
-		enumerable: false,
-		configurable: true,
-		set, get
-	});
+	Object.defineProperty(ObservableArray.prototype, "" + index, createArrayEntryDescriptor(index));
 }
 
-function createArraySetter(index: number) {
-	return function<T>(newValue: T) {
-		const adm = <ObservableArrayAdministration<T>> this.$mobx;
-		const values = adm.values;
-		if (index < values.length) {
-			// update at index in range
-			checkIfStateModificationsAreAllowed(adm.atom);
-			const oldValue = values[index];
-			if (hasInterceptors(adm)) {
-				const change = interceptChange<IArrayWillChange<T>>(adm as any, {
-					type: "update",
-					object: adm.array,
-					index, newValue
-				});
-				if (!change)
-					return;
-				newValue = change.newValue;
-			}
-			newValue = adm.enhancer(newValue, oldValue);
-			const changed = newValue !== oldValue;
-			if (changed) {
-				values[index] = newValue;
-				adm.notifyArrayChildUpdate(index, newValue, oldValue);
-			}
-		} else if (index === values.length) {
-			// add a new item
-			adm.spliceWithArray(index, 0, [newValue]);
-		} else
-			// out of bounds
-			throw new Error(`[mobx.array] Index out of bounds, ${index} is larger than ${values.length}`);
-	};
-}
-
-function createArrayGetter(index: number) {
-	return function () {
-		const impl = <ObservableArrayAdministration<any>> this.$mobx;
-		if (impl) {
-			if (index < impl.values.length) {
-				impl.atom.reportObserved();
-				return impl.values[index];
-			}
-			console.warn(`[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${impl.values.length}). Please check length first. Out of bound indices will not be tracked by MobX`);
-		}
-		return undefined;
-	};
-}
-
-function reserveArrayBuffer(max: number) {
+export function reserveArrayBuffer(max: number) {
 	for (let index = OBSERVABLE_ARRAY_BUFFER_SIZE; index < max; index++)
 		createArrayBufferItem(index);
 	OBSERVABLE_ARRAY_BUFFER_SIZE = max;
