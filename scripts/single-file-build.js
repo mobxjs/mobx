@@ -18,7 +18,7 @@ const exportsConfig = fs.readFileSync('src/mobx.ts', 'utf8')
 
 fs.writeFileSync('.build/mobx.ts', exportsConfig, { encoding: 'utf8', flag: 'a' });
 
-const files = glob('src/{core,types,api,utils}/*.ts');
+const files = glob('src/{core,types,api,utils,interceptables}/*.ts');
 
 const allContents =
     files.map(file => {
