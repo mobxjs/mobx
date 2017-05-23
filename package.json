@@ -1,6 +1,6 @@
 {
   "name": "mobx",
-  "version": "3.1.9",
+  "version": "3.1.10",
   "description": "Simple, scalable state management.",
   "main": "lib/mobx.js",
   "umd:main": "lib/mobx.umd.js",
@@ -57,6 +57,7 @@
     "iterall": "^1.0.2",
     "lodash.intersection": "^3.2.0",
     "ncp": "^2.0.0",
+    "nscript": "^0.1.10",
     "rimraf": "^2.5.4",
     "tape": "^4.2.2",
     "tape-run": "^2.1.0",

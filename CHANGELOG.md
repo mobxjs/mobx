@@ -1,5 +1,9 @@
 # 3.1.10
 
+* Fixed flow typings for `when`, by @jamsea
+* Add flow typings for `map.replace`, by @leader22
+* Added `observableArray.findIndex`, by @leader22
+* Improved typings of `autorun` / `autorunAsync` to better support async / await, by @capaj
 * Fixed typings of `action.bound`, see #803
 
 # 3.1.9
