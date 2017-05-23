@@ -58,6 +58,7 @@ Boilerplate projects, example projects with sources, Libraries.
 * [mobx-autorun-async-immediate](https://github.com/dettier/mobx-autorun-async-immediate) Mobx debounced autorun function with immediate synchronous first call
 * [Smalldots MobX Store](https://github.com/smalldots/mobx-store) Store API for MobX
 * [mobx-roof](https://github.com/mobx-roof/mobx-roof) Simple, React MVVM framework based on mobx
+* [mobx-react-intl](https://github.com/Sqooba/mobx-react-intl) react-intl provider and store for mobx
 
 
 ## ... More
