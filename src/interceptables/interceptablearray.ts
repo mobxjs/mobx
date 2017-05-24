@@ -324,6 +324,7 @@ function createArrayEntryDescriptor(index: number) {
 			return this.get(index);
 		},
 		set: function(value) {
+			debugger;
 			this.set(index, value);
 		}
 	};
@@ -335,11 +336,12 @@ function createArrayBufferItem(index: number) {
 }
 
 export function reserveArrayBuffer(max: number) {
+	const WIGGLE_ROOM = 1000;
 	if (max > INTERCEPTABLE_ARRAY_BUFFER_SIZE) {
-		for (let index = INTERCEPTABLE_ARRAY_BUFFER_SIZE; index < max; index++)
+		for (let index = INTERCEPTABLE_ARRAY_BUFFER_SIZE; index < max + WIGGLE_ROOM; index++)
 			createArrayBufferItem(index);
-		INTERCEPTABLE_ARRAY_BUFFER_SIZE = max;
+		INTERCEPTABLE_ARRAY_BUFFER_SIZE = max + WIGGLE_ROOM;
 	}
 }
 
-reserveArrayBuffer(100);
+reserveArrayBuffer(1000);

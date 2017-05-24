@@ -13,7 +13,7 @@
     "_prepublish": "npm run small-build",
     "quick-build": "tsc --pretty",
     "small-build": "node scripts/single-file-build.js",
-    "test-browser": "npm run small-build && ( browserify test/*.js -o test/browser/bundle.js ) && gnome-open test/browser/index.html",
+    "test-browser-manual": "npm run small-build && ( browserify test/*.js -o test/browser/bundle.js ) && gnome-open test/browser/index.html",
     "test-browser-electron": "npm run small-build && ( browserify test/*.js | tape-run | faucet )",
     "test-browser-chrome": "npm run small-build && ( browserify test/*.js | tape-run --browser chrome | faucet )",
     "test-browser-safari": "npm run small-build && ( browserify test/*.js -t [ babelify --presets [ es2015 ] ] | tape-run --browser safari | faucet )",

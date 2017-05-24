@@ -350,16 +350,17 @@ test('react to sort changes', function(t) {
     t.end();
 })
 
-test.only('autoextend buffer length', function(t) {
+test('autoextend buffer length', function(t) {
 	var ar = observable(new Array(1000));
 	var changesCount = 0;
 	ar.observe(changes => ++changesCount);
 
-	debugger;
+	t.is(ar.length, 1000)
 	ar[ar.length] = 0;
-	// ar.push(0);
+	ar[1001] = 2;
+	ar.push(0);
 
-	t.equal(changesCount, 2);
+	t.equal(changesCount, 3);
 
 	t.end();
 })
