@@ -160,6 +160,11 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 }
 
 export class ObservableArray<T> extends createInterceptableArrayClass(
+	function length() {
+		const impl = this.$mobx;
+		impl.atom.reportObserved();
+		return impl.values.length;
+	},
 	function values(this: ObservableArray<T>): T[] {
 		const impl = this.$mobx;
 		impl.atom.reportObserved();

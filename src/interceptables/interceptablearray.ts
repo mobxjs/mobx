@@ -33,6 +33,7 @@ export class StubArray {
 StubArray.prototype = [];
 
 export function createInterceptableArrayClass<T>(
+	getLength: () => number,
 	getValues: () => T[],
 	spliceWithArray:(index: number, deleteCount: number, newItems: T[]) => T[],
 	get:(index: number) => T,
@@ -49,7 +50,8 @@ export function createInterceptableArrayClass<T>(
 		}
 
 		get length(): number {
-			return this.peek().length;
+			// defined below:
+			throw "Illegal state"
 		}
 
 		set length(newLength: number) {
@@ -95,7 +97,8 @@ export function createInterceptableArrayClass<T>(
 		}
 
 		peek(): T[] {
-			return getValues.call(this);
+			// defined below
+			throw "Illegal state";
 		}
 
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
@@ -247,6 +250,13 @@ export function createInterceptableArrayClass<T>(
 			}
 		}
 	}
+
+	clz.prototype.peek = getValues;
+	Object.defineProperty(clz.prototype, "length", {
+		enumerable: false, configurable: false,
+		get: getLength,
+		set: Object.getOwnPropertyDescriptor(clz.prototype, "length").set
+	});
 
 	declareIterator(clz.prototype, function() {
 		return arrayAsIterator(this.slice());
