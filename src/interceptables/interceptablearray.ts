@@ -33,6 +33,7 @@ export class StubArray {
 StubArray.prototype = [];
 
 export function createInterceptableArrayClass<T>(
+	// Optimization: don't access any of these methods through closure, but store them on prototype
 	getLength: () => number,
 	getValues: () => T[],
 	spliceWithArray:(index: number, deleteCount: number, newItems: T[]) => T[],
