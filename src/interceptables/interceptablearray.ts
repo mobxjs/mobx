@@ -1,3 +1,9 @@
+/**
+ * This class exists to make the notion of a FauxArray reusable in other libraries. Currently reused in MST,
+ * But could also be very used to create derivable, read only arrays.
+ *
+ * Should probably end up in it's own library
+ */
 import {makeNonEnumerable, EMPTY_ARRAY, addHiddenProp, invariant} from "../utils/utils";
 import {arrayAsIterator, declareIterator} from "../utils/iterable";
 
@@ -34,11 +40,14 @@ StubArray.prototype = [];
 
 export function createInterceptableArrayClass<T>(
 	// Optimization: don't access any of these methods through closure, but store them on prototype
-	getLength: () => number,
-	getValues: () => T[],
-	spliceWithArray:(index: number, deleteCount: number, newItems: T[]) => T[],
-	get:(index: number) => T,
-	set:(index: number, value: T) => void,
+	onGetLength: () => number,
+	onGetValues: () => T[],
+	onSplice:(index: number, deleteCount: number, newItems: T[]) => T[],
+	onGet:(index: number) => T,
+	onSet:(index: number, value: T) => void,
+	// kinda ugly, this one is used when values or length are needed for internal purposes (like infering arguments)
+	// and no side effects (reportObserved) should be triggered. Untracked blocks / actions would be needed otherwise...
+	getInternalLength: () => number
 ): new (...args:any[]) => IInterceptableArray<T> {
 	const clz = class InterceptableArray<T> extends StubArray /*implements IInterceptableArray<T>*/ {
 		constructor () {
@@ -59,7 +68,7 @@ export function createInterceptableArrayClass<T>(
 			if (typeof newLength !== "number" || newLength < 0)
 				throw new Error("[mobx.array] Out of range: " + newLength);
 			reserveArrayBuffer(newLength);
-			let currentLength = this.length;
+			let currentLength = getInternalLength.call(this);
 			if (newLength === currentLength)
 				return;
 			else if (newLength > currentLength) {
@@ -81,7 +90,7 @@ export function createInterceptableArrayClass<T>(
 		}
 
 		replace(newItems: T[]) {
-			return spliceWithArray.call(this, 0, this.length, newItems);
+			return onSplice.call(this, 0, getInternalLength.call(this), newItems);
 		}
 
 		/**
@@ -105,7 +114,7 @@ export function createInterceptableArrayClass<T>(
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
 		find(predicate: (item: T, index: number, array: this) => boolean, thisArg?, fromIndex = 0): T | undefined {
 			const idx = this.findIndex.apply(this, arguments);
-			return idx === -1 ? undefined : get.call(this, idx)
+			return idx === -1 ? undefined : this.get(idx)
 		}
 
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex
@@ -136,7 +145,7 @@ export function createInterceptableArrayClass<T>(
 		}
 
 		spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[] {
-			const currentLength = this.length;
+			const currentLength = getInternalLength.call(this);
 			if (index === undefined)
 				index = 0;
 			else if (index > currentLength)
@@ -155,16 +164,16 @@ export function createInterceptableArrayClass<T>(
 				newItems = [];
 
 			reserveArrayBuffer(currentLength + newItems.length - deleteCount);
-			return spliceWithArray.call(this, index, deleteCount, newItems);
+			return onSplice.call(this, index, deleteCount, newItems);
 		}
 
 		push(...items: T[]): number {
-			spliceWithArray.call(this, this.length, 0, items);
-			return this.length;
+			onSplice.call(this, getInternalLength.call(this), 0, items);
+			return getInternalLength.call(this);
 		}
 
 		pop(): T | undefined {
-			return this.splice(Math.max(this.length - 1, 0), 1)[0];
+			return this.splice(Math.max(getInternalLength.call(this) - 1, 0), 1)[0];
 		}
 
 		shift(): T | undefined {
@@ -173,7 +182,7 @@ export function createInterceptableArrayClass<T>(
 
 		unshift(...items: T[]): number {
 			this.spliceWithArray(0, 0, items);
-			return this.length;
+			return getInternalLength.call(this);
 		}
 
 		reverse(): T[] {
@@ -200,37 +209,12 @@ export function createInterceptableArrayClass<T>(
 			return false;
 		}
 
-		move(fromIndex: number, toIndex: number): void {
-			function checkIndex(index: number) {
-				if (index < 0) {
-					throw new Error(`[mobx.array] Index out of bounds: ${index} is negative`);
-				}
-				const length = this.$mobx.values.length;
-				if (index >= length) {
-					throw new Error(`[mobx.array] Index out of bounds: ${index} is not smaller than ${length}`);
-				}
-			}
-			checkIndex.call(this, fromIndex);
-			checkIndex.call(this, toIndex);
-			if (fromIndex === toIndex) {
-				return;
-			}
-			const oldItems = this.peek();
-			let newItems: T[];
-			if (fromIndex < toIndex) {
-				newItems = [...oldItems.slice(0, fromIndex), ...oldItems.slice(fromIndex + 1, toIndex + 1), oldItems[fromIndex], ...oldItems.slice(toIndex + 1)];
-			} else {	// toIndex < fromIndex
-				newItems = [...oldItems.slice(0, toIndex), oldItems[fromIndex], ...oldItems.slice(toIndex, fromIndex), ...oldItems.slice(fromIndex + 1)];
-			}
-			this.replace(newItems);
-		}
-
 		// See #734, in case property accessors are unreliable...
 		get(index: number): T | undefined {
 			if (!(this instanceof StubArray))
 				return undefined; // happens sometimes when using debuggers..., getter being invoked with incorrect this
 			if (index < this.length) {
-				return get.call(this, index);
+				return onGet.call(this, index);
 			}
 			console.warn(`[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${this.length}). Please check length first. Out of bound indices will not be tracked by MobX`);
 			return undefined;
@@ -238,10 +222,10 @@ export function createInterceptableArrayClass<T>(
 
 		// See #734, in case property accessors are unreliable...
 		set(index: number, newValue: T) {
-			const currentLength =  this.length
+			const currentLength = getInternalLength.call(this)
 			if (index < currentLength) {
 				// update at index in range
-				set.call(this, index, newValue);
+				onSet.call(this, index, newValue);
 			} else if (index === currentLength) {
 				// add a new item
 				this.spliceWithArray(index, 0, [newValue]);
@@ -252,10 +236,10 @@ export function createInterceptableArrayClass<T>(
 		}
 	}
 
-	clz.prototype.peek = getValues;
+	clz.prototype.peek = onGetValues;
 	Object.defineProperty(clz.prototype, "length", {
 		enumerable: false, configurable: false,
-		get: getLength,
+		get: onGetLength,
 		set: Object.getOwnPropertyDescriptor(clz.prototype, "length").set
 	});
 
@@ -315,7 +299,6 @@ export function createInterceptableArrayClass<T>(
 		"reverse",
 		"sort",
 		"remove",
-		"move",
 		"toString",
 		"toLocaleString"
 	]);

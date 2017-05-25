@@ -165,22 +165,22 @@ export class ObservableArray<T> extends createInterceptableArrayClass(
 		impl.atom.reportObserved();
 		return impl.values.length;
 	},
-	function values(this: ObservableArray<T>): T[] {
-		const impl = this.$mobx;
-		impl.atom.reportObserved();
-		return impl.values;
+	function values(): T[] {
+		const adm = this.$mobx as ObservableArrayAdministration<any>;
+		adm.atom.reportObserved();
+		return adm.values;
 	},
-	function spliceWithArray(this: ObservableArray<T>, index: number, deleteCount: number, newItems: T[]): T[] {
+	function spliceWithArray(index: number, deleteCount: number, newItems: T[]): T[] {
 		return this.$mobx.spliceWithArray(index, deleteCount, newItems)
 	},
-	function get(this: ObservableArray<T>, index: number): T {
+	function get(index: number): T {
 		// range checks are preformed by interceptable array
-		const impl = <ObservableArrayAdministration<any>> this.$mobx;
-		impl.atom.reportObserved();
-		return impl.values[index];
+		const adm = this.$mobx as ObservableArrayAdministration<any>;
+		adm.atom.reportObserved();
+		return adm.values[index];
 	},
-	function set(this: ObservableArray<T>, index: number, newValue: T): void {
-		const adm = <ObservableArrayAdministration<T>> this.$mobx;
+	function set(index: number, newValue: T): void {
+		const adm = this.$mobx as ObservableArrayAdministration<any>;
 		const values = adm.values;
 		// range checks are preformed by interceptable array
 		checkIfStateModificationsAreAllowed(adm.atom);
@@ -201,6 +201,9 @@ export class ObservableArray<T> extends createInterceptableArrayClass(
 			values[index] = newValue;
 			adm.notifyArrayChildUpdate(index, newValue, oldValue);
 		}
+	},
+	function getInternalLength() {
+		return this.$mobx.values.length
 	}
 ) {
 	private $mobx: ObservableArrayAdministration<T>;
@@ -228,11 +231,37 @@ export class ObservableArray<T> extends createInterceptableArrayClass(
 	observe(listener: (changeData: IArrayChange<T>|IArraySplice<T>) => void, fireImmediately = false): Lambda {
 		return this.$mobx.observe(listener, fireImmediately);
 	}
+
+	move(fromIndex: number, toIndex: number): void {
+		const oldItems = this.$mobx.values;
+		const length = oldItems.length;
+		function checkIndex(index: number) {
+			if (index < 0) {
+				throw new Error(`[mobx.array] Index out of bounds: ${index} is negative`);
+			}
+			if (index >= length) {
+				throw new Error(`[mobx.array] Index out of bounds: ${index} is not smaller than ${length}`);
+			}
+		}
+		checkIndex.call(this, fromIndex);
+		checkIndex.call(this, toIndex);
+		if (fromIndex === toIndex) {
+			return;
+		}
+		let newItems: T[];
+		if (fromIndex < toIndex) {
+			newItems = [...oldItems.slice(0, fromIndex), ...oldItems.slice(fromIndex + 1, toIndex + 1), oldItems[fromIndex], ...oldItems.slice(toIndex + 1)];
+		} else {	// toIndex < fromIndex
+			newItems = [...oldItems.slice(0, toIndex), oldItems[fromIndex], ...oldItems.slice(toIndex, fromIndex), ...oldItems.slice(fromIndex + 1)];
+		}
+		(this as any).replace(newItems);
+	}
 }
 
 makeNonEnumerable(ObservableArray.prototype, [
 	"constructor",
 	"intercept",
+	"move",
 	"observe"
 ]);
 
