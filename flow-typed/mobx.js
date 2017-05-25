@@ -1,5 +1,5 @@
 declare module 'mobx' {
-  declare type extras = {
+  declare type Extras = {
     allowStateChanges: <T>(allowStateChanges: boolean, func: () => T) => T,
     getAtom: (thing: any, property?: string) => IDepTreeNode,
     getDebugName: (thing: any, property?: string) => string,
@@ -14,7 +14,10 @@ declare module 'mobx' {
     spyReportEnd: (change?: any) => void,
     spyReportStart: (event: any) => void,
     setReactionScheduler: (fn: (f: () => void) => void) => void,
+	onReactionError: (error: Error) => void,
   };
+	
+  declare var extras: Extras;
 
   declare type IObservableMapInitialValues<V> =
     | IMapEntries<V>
