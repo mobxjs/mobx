@@ -18,20 +18,22 @@ const exportsConfig = fs.readFileSync('src/mobx.ts', 'utf8')
 
 fs.writeFileSync('.build/mobx.ts', exportsConfig, { encoding: 'utf8', flag: 'a' });
 
-const files = glob('src/{core,types,api,utils,interceptables}/*.ts');
+const dirs = ["utils", "core", "types", "api"];
 
 const allContents =
-    files.map(file => {
-        const contents = fs.readFileSync(file, 'utf8')
-        const lines = contents.split('\n');
+	dirs.map(dir => {
+		return glob('src/' + dir + '/*.ts').map(file => {
+			const contents = fs.readFileSync(file, 'utf8')
+			const lines = contents.split('\n');
 
-        const filtered = lines
-            .filter(line => !line.startsWith('import'))
-            .map(line => line.replace(/export /, ''))
-            .join('\n');
+			const filtered = lines
+				.filter(line => !line.startsWith('import'))
+				.map(line => line.replace(/export /, ''))
+				.join('\n');
 
-        return `/* file: ${file} */\n${filtered}`;
-    }).join('\n');
+			return `/* file: ${file} */\n${filtered}`;
+		}).join('\n');
+	}).join("\n");
 
 fs.writeFileSync('.build/mobx.ts', allContents, { encoding: 'utf8', flag: 'a' });
 

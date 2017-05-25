@@ -16,7 +16,7 @@ const safariPrototypeSetterInheritanceBug = (() => {
 	return v === false;
 })();
 
-export interface IInterceptableArray<T> extends Array<T> {
+export interface IFauxArray<T> extends Array<T> {
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[];
 	clear(): T[];
 	peek(): T[];
@@ -38,7 +38,7 @@ export class StubArray {
 }
 StubArray.prototype = [];
 
-export function createInterceptableArrayClass<T>(
+export function createFauxArrayBasedClass<T>(
 	// Optimization: don't access any of these methods through closure, but store them on prototype
 	onGetLength: () => number,
 	onGetValues: () => T[],
@@ -48,8 +48,8 @@ export function createInterceptableArrayClass<T>(
 	// kinda ugly, this one is used when values or length are needed for internal purposes (like infering arguments)
 	// and no side effects (reportObserved) should be triggered. Untracked blocks / actions would be needed otherwise...
 	getInternalLength: () => number
-): new (...args:any[]) => IInterceptableArray<T> {
-	const clz = class InterceptableArray<T> extends StubArray /*implements IInterceptableArray<T>*/ {
+): new (...args:any[]) => IFauxArray<T> {
+	const clz = class FauxArray<T> extends StubArray /*implements IInterceptableArray<T>*/ {
 		constructor () {
 			super();
 			if (safariPrototypeSetterInheritanceBug) {

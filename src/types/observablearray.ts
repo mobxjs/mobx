@@ -1,5 +1,5 @@
 import {isObject, createInstanceofPredicate, getNextId, makeNonEnumerable, Lambda, EMPTY_ARRAY, addHiddenFinalProp, addHiddenProp, invariant} from "../utils/utils";
-import {createInterceptableArrayClass, reserveArrayBuffer, IInterceptableArray} from "../interceptables/interceptablearray";
+import {createFauxArrayBasedClass, reserveArrayBuffer, IFauxArray} from "../utils/fauxarray";
 import {BaseAtom} from "../core/atom";
 import {checkIfStateModificationsAreAllowed} from "../core/derivation";
 import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, interceptChange} from "./intercept-utils";
@@ -10,7 +10,7 @@ import {IEnhancer} from "../types/modifiers";
 
 const MAX_SPLICE_SIZE = 10000; // See e.g. https://github.com/mobxjs/mobx/issues/859
 
-export interface IObservableArray<T> extends IInterceptableArray<T> {
+export interface IObservableArray<T> extends IFauxArray<T> {
 	observe(listener: (changeData: IArrayChange<T>|IArraySplice<T>) => void, fireImmediately?: boolean): Lambda;
 	intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda;
 	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda; // TODO: remove in 4.0
@@ -159,7 +159,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 	}
 }
 
-export class ObservableArray<T> extends createInterceptableArrayClass(
+export class ObservableArray<T> extends createFauxArrayBasedClass(
 	function length() {
 		const impl = this.$mobx;
 		impl.atom.reportObserved();
