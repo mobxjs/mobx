@@ -48,7 +48,7 @@ export function createFauxArrayBasedClass<T>(
 	// kinda ugly, this one is used when values or length are needed for internal purposes (like infering arguments)
 	// and no side effects (reportObserved) should be triggered. Untracked blocks / actions would be needed otherwise...
 	getInternalLength: () => number
-): new (...args:any[]) => IFauxArray<T> {
+): new (...args:any[]) => any /* actually: IFauxArray<T>, but TS generates the wrong typings... */ {
 	const clz = class FauxArray<T> extends StubArray /*implements IInterceptableArray<T>*/ {
 		constructor () {
 			super();
