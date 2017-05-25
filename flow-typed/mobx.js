@@ -433,7 +433,7 @@ declare module 'mobx' {
     fireImmediately?: boolean,
   ): Lambda;
   declare function observe(
-    object: Object,
+    object: any,
     listener: (change: IObjectChange) => void,
     fireImmediately?: boolean,
   ): Lambda;
