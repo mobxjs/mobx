@@ -12,7 +12,8 @@
 		"noImplicitUseStrict": true,
 		"noImplicitAny": false,
 		"lib": [
-			"es5",
+			"ES2015.Proxy",
+			"es6",
 			"dom"
 		]
     },
