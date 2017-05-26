@@ -86,10 +86,23 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 	interceptors = null;
 	changeListeners = null;
 	enhancer: (newV: T, oldV: T | undefined) => T;
+	dehancer: any // TODO: give a nice name and api
 
 	constructor(name, enhancer: IEnhancer<T>, public array: IObservableArray<T>, public owned: boolean) {
 		this.atom = new BaseAtom(name || ("ObservableArray@" + getNextId()));
 		this.enhancer = (newV, oldV) => enhancer(newV, oldV, name + "[..]");
+	}
+
+	dehanceValue(value: T): T {
+		if (this.dehancer !== undefined)
+			return this.dehancer(value);
+		return value;
+	}
+
+	dehanceValues(values: T[]): T[] {
+		if (this.dehancer !== undefined)
+			return values.map(this.dehancer) as any;
+		return values;
 	}
 
 	intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
@@ -179,10 +192,10 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 		newItems = <T[]> newItems.map(v => this.enhancer(v, undefined));
 		const lengthDelta = newItems.length - deleteCount;
 		this.updateArrayLength(length, lengthDelta); // create or remove new entries
-		const res = this.spliceItemsIntoValues(index, deleteCount, newItems);
+		const res = this.dehanceValues(this.spliceItemsIntoValues(index, deleteCount, newItems));
 
 		if (deleteCount !== 0 || newItems.length !== 0)
-			this.notifyArraySplice(index, newItems, res);
+			this.notifyArraySplice(index, this.dehanceValues(newItems), res);
 		return res;
 	}
 
@@ -239,10 +252,10 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 export class ObservableArray<T> extends StubArray {
 	private $mobx: ObservableArrayAdministration<T>;
 
-	constructor(initialValues: T[] | undefined, enhancer: IEnhancer<T>, name = "ObservableArray@" + getNextId(), owned = false) {
+	constructor(initialValues: T[] | undefined, enhancer: IEnhancer<T>, dehancer, name = "ObservableArray@" + getNextId(), owned = false) {
 		super();
 
-		const adm = new ObservableArrayAdministration<T>(name, enhancer, this as any, owned);
+		const adm = new ObservableArrayAdministration<T>(name, enhancer, dehancer, this as any, owned);
 		addHiddenFinalProp(this, "$mobx", adm);
 
 		if (initialValues && initialValues.length) {
@@ -292,13 +305,13 @@ export class ObservableArray<T> extends StubArray {
 
 	peek(): T[] {
 		this.$mobx.atom.reportObserved();
-		return this.$mobx.values;
+		return this.$mobx.dehanceValues(this.$mobx.values);
 	}
 
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
 	find(predicate: (item: T, index: number, array: ObservableArray<T>) => boolean, thisArg?, fromIndex = 0): T | undefined {
 		const idx = this.findIndex.apply(this, arguments);
-		return idx === -1 ? undefined : this.$mobx.values[idx];
+		return idx === -1 ? undefined : this.$mobx.dehanceValue(this.$mobx.values[idx]);
 	}
 
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex
@@ -408,7 +421,7 @@ export class ObservableArray<T> extends StubArray {
 		if (impl) {
 			if (index < impl.values.length) {
 				impl.atom.reportObserved();
-				return impl.values[index];
+				return impl.dehanceValue(impl.values[index]);
 			}
 			console.warn(`[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${impl.values.length}). Please check length first. Out of bound indices will not be tracked by MobX`);
 		}
@@ -437,7 +450,7 @@ export class ObservableArray<T> extends StubArray {
 			const changed = newValue !== oldValue;
 			if (changed) {
 				values[index] = newValue;
-				adm.notifyArrayChildUpdate(index, newValue, oldValue);
+				adm.notifyArrayChildUpdate(index, adm.dehanceValue(newValue), adm.dehanceValue(oldValue));
 			}
 		} else if (index === values.length) {
 			// add a new item
