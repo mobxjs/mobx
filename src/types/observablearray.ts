@@ -252,10 +252,10 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 export class ObservableArray<T> extends StubArray {
 	private $mobx: ObservableArrayAdministration<T>;
 
-	constructor(initialValues: T[] | undefined, enhancer: IEnhancer<T>, dehancer, name = "ObservableArray@" + getNextId(), owned = false) {
+	constructor(initialValues: T[] | undefined, enhancer: IEnhancer<T>, name = "ObservableArray@" + getNextId(), owned = false) {
 		super();
 
-		const adm = new ObservableArrayAdministration<T>(name, enhancer, dehancer, this as any, owned);
+		const adm = new ObservableArrayAdministration<T>(name, enhancer, this as any, owned);
 		addHiddenFinalProp(this, "$mobx", adm);
 
 		if (initialValues && initialValues.length) {
