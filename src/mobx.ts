@@ -33,6 +33,7 @@ export { IInterceptable, IInterceptor                         } from "./types/in
 export { IListenable                                          } from "./types/listen-utils";
 export { IObjectWillChange, IObjectChange, IObservableObject, isObservableObject } from "./types/observableobject";
 
+export { IFauxArray                                           } from "./utils/fauxarray";
 export { IValueDidChange, IValueWillChange, IObservableValue, isObservableValue as isBoxedObservable } from "./types/observablevalue";
 export { IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, isObservableArray } from "./types/observablearray";
 export { IKeyValueMap, ObservableMap, IMapEntries, IMapEntry, IMapWillChange, IMapChange, IMapChangeUpdate, IMapChangeAdd, IMapChangeBase, IMapChangeDelete, isObservableMap, map, IObservableMapInitialValues, IMap } from "./types/observablemap";
@@ -67,10 +68,11 @@ import { spyReport, spyReportEnd, spyReportStart, isSpyEnabled } from "./core/sp
 import { Lambda, deepEqual } from "./utils/utils";
 import { isComputingDerivation } from "./core/derivation";
 import { setReactionScheduler, onReactionError } from "./core/reaction";
-import { reserveArrayBuffer } from "./types/observablearray";
+import { reserveArrayBuffer, createFauxArrayBasedClass, IFauxArray } from "./utils/fauxarray";
 
 export const extras = {
 	allowStateChanges,
+	createFauxArrayBasedClass,
 	deepEqual,
 	getAtom,
 	getDebugName,

@@ -13,3 +13,4 @@ dist/
 .build/
 yarn.lock
 .idea
+test/browser/bundle.js

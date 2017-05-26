@@ -1,4 +1,3 @@
-/// <reference path='require.d.ts' />
 /// <reference path='tape.d.ts' />
 import {
     observe, computed, observable, autorun, autorunAsync, extendObservable, action,
@@ -237,7 +236,7 @@ test('atom clock example', function(t) {
 
 	class Clock {
 		atom: Atom;
-		intervalHandler: number = null;
+		intervalHandler: any = null;
 		currentDateTime: string;
 
 		constructor() {

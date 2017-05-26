@@ -325,10 +325,6 @@ test('peek', function(t) {
     t.deepEqual(x.peek(), [1, 2, 3]);
     t.equal(x.$mobx.values, x.peek());
 
-    x.peek().push(4); //noooo!
-    t.throws(function() {
-        x.push(5); // detect alien change
-    }, "modification exception");
     t.end();
 })
 
@@ -359,10 +355,12 @@ test('autoextend buffer length', function(t) {
 	var changesCount = 0;
 	ar.observe(changes => ++changesCount);
 
+	t.is(ar.length, 1000)
 	ar[ar.length] = 0;
+	ar[1001] = 2;
 	ar.push(0);
 
-	t.equal(changesCount, 2);
+	t.equal(changesCount, 3);
 
 	t.end();
 })

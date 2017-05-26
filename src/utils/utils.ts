@@ -110,7 +110,11 @@ export function hasOwnProperty(object: Object, propName: string) {
 
 export function makeNonEnumerable(object: any, propNames: string[]) {
 	for (let i = 0; i < propNames.length; i++) {
-		addHiddenProp(object, propNames[i], object[propNames[i]]);
+		const descriptor = Object.getOwnPropertyDescriptor(object, propNames[i]);
+		if (!descriptor)
+			throw new Error("Property not defined: " + propNames[i]);
+		descriptor.enumerable = false;
+		Object.defineProperty(object, propNames[i], descriptor);
 	}
 }
 
