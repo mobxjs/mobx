@@ -78,6 +78,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	private _keys: IObservableArray<string> = <any> new ObservableArray(undefined, referenceEnhancer, `${this.name}.keys()`, true);
 	interceptors = null;
 	changeListeners = null;
+	dehancer: any = undefined; // TODO: improve name, type, api..
 
 	constructor(initialData?: IObservableMapInitialValues<V>, public enhancer: IEnhancer<V> = deepEnhancer, public name = "ObservableMap@" + getNextId()) {
 		this.merge(initialData);
@@ -138,7 +139,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 			const change = notify || notifySpy ? <IMapChange<V>>{
 					type: "delete",
 					object: this,
-					oldValue: (<any>this._data[key]).value,
+					oldValue: this.dehanceValue((<any>this._data[key]).value),
 					name: key
 				} : null;
 
@@ -180,8 +181,9 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 			const change = notify || notifySpy ? <IMapChange<V>>{
 					type: "update",
 					object: this,
-					oldValue: (observable as any).value,
-					name, newValue
+					oldValue: this.dehanceValue((observable as any).value),
+					name,
+					newValue: this.dehanceValue(newValue)
 				} : null;
 
 			if (notifySpy)
@@ -207,7 +209,8 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		const change = notify || notifySpy ? <IMapChange<V>>{
 				type: "add",
 				object: this,
-				name, newValue
+				name,
+				newValue: this.dehanceValue(newValue)
 			} : null;
 
 		if (notifySpy)
@@ -221,8 +224,15 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	get(key: string): V | undefined {
 		key = "" + key;
 		if (this.has(key))
-			return this._data[key]!.get();
+			return this.dehanceValue(this._data[key]!.get());
 		return undefined;
+	}
+
+	private dehanceValue<X extends V | undefined>(value: X): X {
+		if (this.dehancer !== undefined) {
+			return this.dehancer(value);
+		}
+		return value;
 	}
 
 	keys(): string[] & Iterator<string> {
