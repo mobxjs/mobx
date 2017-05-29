@@ -42,6 +42,7 @@
   ],
   "homepage": "https://mobxjs.github.io/mobx",
   "devDependencies": {
+    "@types/node": "^7.0.22",
     "babel-cli": "^6.4.5",
     "babel-core": "^6.4.5",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
