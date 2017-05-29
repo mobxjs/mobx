@@ -7,14 +7,16 @@
         "declaration": true,
         "module": "commonjs",
         "removeComments": false,
-		"strictNullChecks": true,
-		"noImplicitReturns": true,
-		"noImplicitUseStrict": true,
-		"noImplicitAny": false,
-		"lib": [
-			"es5",
-			"dom"
-		]
+        "strictNullChecks": true,
+        "noImplicitReturns": true,
+        "noImplicitUseStrict": true,
+        "noImplicitAny": false,
+        "moduleResolution": "node",
+        "lib": [
+            "es5",
+            "dom",
+			"es6"
+        ]
     },
     "exclude": [
         "node_modules",
