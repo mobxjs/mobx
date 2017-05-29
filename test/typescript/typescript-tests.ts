@@ -1,4 +1,3 @@
-/// <reference path='require.d.ts' />
 /// <reference path='tape.d.ts' />
 import {
     observe, computed, observable, autorun, autorunAsync, extendObservable, action,
@@ -271,7 +270,11 @@ test('atom clock example', function(t) {
 		startTicking() {
 			console.log("start ticking");
 			this.tick();
-			this.intervalHandler = setInterval(() => this.tick(), 1 * time_factor);
+			// This `as any` cast is required for typescript
+			// to resolve the correct overload of setInterval
+			// since the version in @types/node has a different
+			// return type than the one in the typescript's `dom` lib
+			this.intervalHandler = setInterval(() => this.tick(), (1 * time_factor) as any);
 		}
 
 		stopTicking() {
