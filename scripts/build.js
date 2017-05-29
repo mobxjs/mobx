@@ -22,23 +22,21 @@ try {
 	fs.mkdirSync('lib');
 } catch (_) { }
 
-async function generateBundledModule() {
+function generateBundledModule() {
 	console.log('Generating lib/mobx.js bundle.');
-	const bundle = await rollup.rollup({
+	return rollup.rollup({
 		entry: 'src/mobx.ts',
 		plugins: [
 			typescript(),
 			progress(),
 			filesize()
 		]
-	});
-
-	await bundle.write({
+	}).then(bundle => bundle.write({
 		dest: 'lib/mobx.js',
 		format: 'cjs',
 		banner: '/** MobX - (c) Michel Weststrate 2015, 2016 - MIT Licensed */',
 		exports: 'named',
-	});
+	}));
 }
 
 function generateUmd() {
@@ -61,11 +59,12 @@ function copyFlowDefinitions() {
 	exec(`${binFolder}/ncp flow-typed/mobx.js lib/mobx.js.flow`);
 }
 
-async function build() {
-	await generateBundledModule();
-	generateUmd();
-	generateMinified();
-	copyFlowDefinitions();
+function build() {
+	return generateBundledModule().then(() => {
+		generateUmd();
+		generateMinified();
+		copyFlowDefinitions();
+	});
 }
 
 build().catch(e => {
