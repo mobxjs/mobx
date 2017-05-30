@@ -1,14 +1,7 @@
-const typescript = require('rollup-plugin-typescript2');
-const progress = require('rollup-plugin-progress');
-const filesize = require('rollup-plugin-filesize');
-
 const rollup = require('rollup');
-const babel = require('babel-core');
-
-const rmdir = require('rimraf').sync;
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
-
+const ts = require('typescript');
 const exec = require('child_process').execSync;
 
 // make sure we're in the right folder
@@ -16,20 +9,47 @@ process.chdir(path.resolve(__dirname, '..'));
 
 const binFolder = path.resolve('node_modules/.bin/');
 
-rmdir('lib');
+fs.removeSync('lib');
+fs.removeSync('.build');
 
-try {
-	fs.mkdirSync('lib');
-} catch (_) { }
+function runTypeScriptBuild() {
+	console.log('Running typescript build.');
+	const tsConfig = path.resolve('tsconfig.json');
+	const json = ts.parseConfigFileTextToJson(
+		tsConfig,
+		ts.sys.readFile(tsConfig),
+		true
+	);
+
+	const { options } = ts.parseJsonConfigFileContent(json.config, ts.sys, path.dirname(tsConfig));
+
+	options.module = ts.ModuleKind.ES2015;
+	options.outDir = path.resolve('.', '.build');
+	options.declarationDir = path.resolve('.', 'lib');
+	options.importHelpers = true;
+	options.noEmitHelpers = true;
+
+	const rootFile = path.resolve('src', 'mobx.ts');
+	const host = ts.createCompilerHost(options, true);
+	const prog = ts.createProgram([rootFile], options, host);
+	const result = prog.emit();
+	if (result.emitSkipped) {
+		const message = result.diagnostics.map(d =>
+			`${ts.DiagnosticCategory[d.category]} ${d.code} (${d.file}:${d.start}): ${d.messageText}`
+		).join('\n');
+
+		throw new Error(`Failed to compile typescript:\n\n${message}`);
+	}
+}
 
 function generateBundledModule() {
 	console.log('Generating lib/mobx.js bundle.');
 	return rollup.rollup({
-		entry: 'src/mobx.ts',
+		entry: '.build/mobx.js',
 		plugins: [
-			typescript(),
-			progress(),
-			filesize()
+			require('rollup-plugin-node-resolve')(),
+			require('rollup-plugin-progress')(),
+			require('rollup-plugin-filesize')()
 		]
 	}).then(bundle => bundle.write({
 		dest: 'lib/mobx.js',
@@ -60,6 +80,7 @@ function copyFlowDefinitions() {
 }
 
 function build() {
+	runTypeScriptBuild();
 	return generateBundledModule().then(() => {
 		generateUmd();
 		generateMinified();
