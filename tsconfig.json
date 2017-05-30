@@ -14,7 +14,8 @@
         "moduleResolution": "node",
         "lib": [
             "es5",
-            "dom"
+            "dom",
+            "es2015.promise"
         ]
     },
     "exclude": [
