@@ -192,11 +192,11 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 		newItems = <T[]> newItems.map(v => this.enhancer(v, undefined));
 		const lengthDelta = newItems.length - deleteCount;
 		this.updateArrayLength(length, lengthDelta); // create or remove new entries
-		const res = this.dehanceValues(this.spliceItemsIntoValues(index, deleteCount, newItems));
+		const res = this.spliceItemsIntoValues(index, deleteCount, newItems);
 
 		if (deleteCount !== 0 || newItems.length !== 0)
-			this.notifyArraySplice(index, this.dehanceValues(newItems), res);
-		return res;
+			this.notifyArraySplice(index, newItems, res);
+		return this.dehanceValues(res);
 	}
 
 	spliceItemsIntoValues(index, deleteCount, newItems: T[]): T[] {
@@ -450,7 +450,7 @@ export class ObservableArray<T> extends StubArray {
 			const changed = newValue !== oldValue;
 			if (changed) {
 				values[index] = newValue;
-				adm.notifyArrayChildUpdate(index, adm.dehanceValue(newValue), adm.dehanceValue(oldValue));
+				adm.notifyArrayChildUpdate(index, newValue, oldValue);
 			}
 		} else if (index === values.length) {
 			// add a new item

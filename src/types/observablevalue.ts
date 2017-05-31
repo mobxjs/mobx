@@ -34,6 +34,7 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 	interceptors;
 	changeListeners;
 	protected value;
+	dehancer: any = undefined; // TODO: type, api, and such
 
 	constructor(value: T, protected enhancer: IEnhancer<T>, name = "ObservableValue@" + getNextId(), notifySpy = true) {
 		super(name);
@@ -42,6 +43,12 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 			// only notify spy if this is a stand-alone observable
 			spyReport({ type: "create", object: this, newValue: this.value });
 		}
+	}
+
+	private dehanceValue(value: T): T {
+		if (this.dehancer !== undefined)
+			return this.dehancer(value);
+		return value;
 	}
 
 	public set(newValue: T) {
@@ -86,15 +93,14 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 			notifyListeners(this, {
 				type: "update",
 				object: this,
-				newValue,
-				oldValue
+				newValue, oldValue
 			});
 		}
 	}
 
 	public get(): T {
 		this.reportObserved();
-		return this.value;
+		return this.dehanceValue(this.value);
 	}
 
 	public intercept(handler: IInterceptor<IValueWillChange<T>>): Lambda {

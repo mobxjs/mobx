@@ -139,7 +139,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 			const change = notify || notifySpy ? <IMapChange<V>>{
 					type: "delete",
 					object: this,
-					oldValue: this.dehanceValue((<any>this._data[key]).value),
+					oldValue: (<any>this._data[key]).value,
 					name: key
 				} : null;
 
@@ -181,9 +181,8 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 			const change = notify || notifySpy ? <IMapChange<V>>{
 					type: "update",
 					object: this,
-					oldValue: this.dehanceValue((observable as any).value),
-					name,
-					newValue: this.dehanceValue(newValue)
+					oldValue: (observable as any).value,
+					name, newValue
 				} : null;
 
 			if (notifySpy)
@@ -210,7 +209,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 				type: "add",
 				object: this,
 				name,
-				newValue: this.dehanceValue(newValue)
+				newValue
 			} : null;
 
 		if (notifySpy)
@@ -225,7 +224,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		key = "" + key;
 		if (this.has(key))
 			return this.dehanceValue(this._data[key]!.get());
-		return undefined;
+		return this.dehanceValue(undefined);
 	}
 
 	private dehanceValue<X extends V | undefined>(value: X): X {
