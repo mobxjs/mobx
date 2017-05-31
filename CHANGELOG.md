@@ -1,3 +1,7 @@
+# 3.1.11
+
+* Using rollup as bundler, instead of custom hacked build scripts, by @rossipedia, see #1023
+
 # 3.1.10
 
 * Fixed flow typings for `when`, by @jamsea
