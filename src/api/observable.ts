@@ -183,7 +183,7 @@ export class IObservableFactories {
 	}
 }
 
-export var observable: IObservableFactory & IObservableFactories & {
+export const observable: IObservableFactory & IObservableFactories & {
 	deep: {
 		struct<T>(initialValue?: T): T
 	},
