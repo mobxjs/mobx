@@ -193,7 +193,10 @@ export const observable: IObservableFactory & IObservableFactories & {
 } = createObservable as any;
 
 // weird trick to keep our typings nicely with our funcs, and still extend the observable function
-Object.keys(IObservableFactories.prototype).forEach(key => observable[key] = IObservableFactories.prototype[key]);
+// ES6 class methods aren't enumerable, can't use Object.keys
+Object.getOwnPropertyNames(IObservableFactories.prototype)
+	.filter(name => name !== "constructor")
+	.forEach(name => observable[name] = IObservableFactories.prototype[name]);
 
 observable.deep.struct = observable.struct;
 observable.ref.struct = function() {
