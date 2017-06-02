@@ -77,7 +77,11 @@ let OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
 // Typescript workaround to make sure ObservableArray extends Array
 export class StubArray {
 }
-StubArray.prototype = [];
+const setProto: (o, p) => void = typeof Object["setPrototypeOf"] !== "undefined"
+	? Object["setPrototypeOf"]
+	: (obj, proto) => obj.__proto__ = proto
+	;
+setProto(StubArray.prototype, Array.prototype);
 
 class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChange<T> | IArrayWillSplice<T>>, IListenable {
 	atom: BaseAtom;
