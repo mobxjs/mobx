@@ -75,13 +75,19 @@ export interface IArrayWillSplice<T> {
 let OBSERVABLE_ARRAY_BUFFER_SIZE = 0;
 
 // Typescript workaround to make sure ObservableArray extends Array
-export class StubArray {
+export class StubArray { }
+function inherit(ctor, proto) {
+	if (typeof Object["setPrototypeOf"] !== "undefined") {
+		Object["setPrototypeOf"](ctor.prototype, proto);
+	} else if (typeof ctor.prototype.__proto__ !== "undefined") {
+		ctor.prototype.__proto__ = proto;
+	} else {
+		ctor["prototype"] = proto;
+	}
 }
-const setProto: (o, p) => void = typeof Object["setPrototypeOf"] !== "undefined"
-	? Object["setPrototypeOf"]
-	: (obj, proto) => obj.__proto__ = proto
-	;
-setProto(StubArray.prototype, Array.prototype);
+inherit(StubArray, Array.prototype);
+
+
 
 class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChange<T> | IArrayWillSplice<T>>, IListenable {
 	atom: BaseAtom;
