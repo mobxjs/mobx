@@ -4,6 +4,7 @@
   "description": "Simple, scalable state management.",
   "main": "lib/mobx.js",
   "umd:main": "lib/mobx.umd.js",
+  "module": "lib/mobx.module.js",
   "typings": "lib/mobx.d.ts",
   "scripts": {
     "test": "npm run quick-build && npm run tape",
