@@ -110,7 +110,7 @@ These are the additional fields that are available per type:
 | | | removedCount | amount of items being removed | √ | √ |
 | | | added | array with items being added | √ | √ |
 | | | removed | array with items that where removed | | |
-| | | addCount | amount of items that where added | | |
+| | | addedCount | amount of items that where added | | |
 | | update | index | index of the single entry that is being updated | √ | |
 | | | newValue | the newValue that is / will be assigned | √ | √ |
 | | | oldValue | the old value that was replaced | | |
