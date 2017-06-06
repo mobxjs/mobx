@@ -59,6 +59,11 @@ export class MobXGlobals {
 	 */
 	isRunningReactions = false;
 
+  /**
+   * Are reactions currently suspened from execution?
+   */
+  isSuspended = false;
+
 	/**
 	 * Is it allowed to change observables at this point?
 	 * In general, MobX doesn't allow that when running computations and React.render.

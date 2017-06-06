@@ -71,7 +71,7 @@ import { allowStateChanges } from "./core/action";
 import { spyReport, spyReportEnd, spyReportStart, isSpyEnabled } from "./core/spy";
 import { Lambda, deepEqual } from "./utils/utils";
 import { isComputingDerivation } from "./core/derivation";
-import { setReactionScheduler, onReactionError } from "./core/reaction";
+import { setReactionScheduler, onReactionError, resume, suspend } from "./core/reaction";
 import { reserveArrayBuffer } from "./types/observablearray";
 import {registerGlobals} from "./core/globalstate";
 
@@ -93,11 +93,13 @@ export const extras = {
 	onReactionError,
 	reserveArrayBuffer, // See #734
 	resetGlobalState,
+  resume,
 	shareGlobalState,
 	spyReport,
 	spyReportEnd,
 	spyReportStart,
-	setReactionScheduler
+  setReactionScheduler,
+  suspend
 };
 
 declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: ((any) => void)};

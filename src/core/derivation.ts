@@ -1,7 +1,8 @@
 import {IObservable, IDepTreeNode, addObserver, removeObserver} from "./observable";
 import {IAtom} from "./atom";
 import {globalState} from "./globalstate";
-import {fail} from "../utils/utils";
+import {fail, getGlobal} from "../utils/utils";
+
 import {isComputedValue} from "./computedvalue";
 import {getMessage} from "../utils/messages";
 
@@ -50,6 +51,10 @@ export interface IDerivation extends IDepTreeNode {
 export class CaughtException {
 	constructor(public cause: any) {
 		// Empty
+		const global = getGlobal();
+		if (typeof global.handleCaughtException === "function") {
+			global.handleCaughtException(cause);
+		}
 	}
 }
 
