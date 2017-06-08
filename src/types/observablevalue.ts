@@ -34,7 +34,7 @@ export class ObservableValue<T> extends BaseAtom implements IObservableValue<T>,
 	interceptors;
 	changeListeners;
 	protected value;
-	dehancer: any = undefined; // TODO: type, api, and such
+	dehancer: any = undefined;
 
 	constructor(value: T, protected enhancer: IEnhancer<T>, name = "ObservableValue@" + getNextId(), notifySpy = true) {
 		super(name);

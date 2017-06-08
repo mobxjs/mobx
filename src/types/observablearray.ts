@@ -96,7 +96,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 	interceptors = null;
 	changeListeners = null;
 	enhancer: (newV: T, oldV: T | undefined) => T;
-	dehancer: any // TODO: give a nice name and api
+	dehancer: any
 
 	constructor(name, enhancer: IEnhancer<T>, public array: IObservableArray<T>, public owned: boolean) {
 		this.atom = new BaseAtom(name || ("ObservableArray@" + getNextId()));
