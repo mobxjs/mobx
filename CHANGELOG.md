@@ -1,6 +1,10 @@
-# 3.1.11
+# 3.1.12
 
 * Introduced experimental feature `extras.interceptReads(observable: ObservableMap | ObservableArray | ObservableObject | ObservableBox, property?: string, handler: value => value): Disposer` that can be used to intercept _reads_ from observable objects, to transform values on the fly when a value is read. One can achieve similar things with this as with proxying reads.
+
+# 3.1.11
+
+* Using rollup as bundler, instead of custom hacked build scripts, by @rossipedia, see #1023
 
 # 3.1.10
 

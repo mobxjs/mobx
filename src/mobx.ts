@@ -16,13 +16,18 @@
  *
  */
 
-import {registerGlobals} from "./core/globalstate";
-registerGlobals();
 
-export { IAtom, Atom, BaseAtom                                } from "./core/atom";
 export { IObservable, IDepTreeNode                            } from "./core/observable";
 export { Reaction, IReactionPublic, IReactionDisposer         } from "./core/reaction";
 export { IDerivation, untracked, IDerivationState             } from "./core/derivation";
+
+// NOTE: For some reason, rollup's dependency tracker gets confused
+// if this line is above the previous 3, and will produce out of order
+// class definitions where BaseAtom is undefined, causing an error.
+// It's not ideal, but for now we can just make sure this line comes after
+// the ones above
+export { IAtom, Atom, BaseAtom                                } from "./core/atom";
+
 export { useStrict, isStrictModeEnabled, IAction              } from "./core/action";
 export { spy                                                  } from "./core/spy";
 export { IComputedValue                                       } from "./core/computedvalue";
@@ -71,6 +76,11 @@ import { reserveArrayBuffer, IObservableArray } from "./types/observablearray";
 import { interceptReads } from "./api/intercept-read";
 import { ObservableMap } from './types/observablemap';
 import { IObservableValue } from './types/observablevalue';
+import {registerGlobals} from "./core/globalstate";
+
+// This line should come after all the imports as well, for the same reason
+// as noted above. I will file a bug with rollupjs - @rossipedia
+registerGlobals();
 
 export const extras = {
 	allowStateChanges,
@@ -96,9 +106,11 @@ export const extras = {
 
 declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: ((any) => void)};
 declare var module: { exports: any };
+declare var exports: any;
+
 if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
-	__MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx(module.exports)
+	__MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx(exports)
 }
 
 // TODO: remove in 4.0, temporarily incompatibility fix for mobx-react@4.1.0 which accidentally uses default exports
-module.exports.default = module.exports;
+export default exports;

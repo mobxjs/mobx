@@ -1,4 +1,3 @@
-/// <reference path='require.d.ts' />
 /// <reference path='tape.d.ts' />
 import {
     observe, computed, observable, autorun, autorunAsync, extendObservable, action,
@@ -14,6 +13,8 @@ observe(v, () => {});
 var a = observable([1,2,3]);
 
 var testFunction = function(a:any) {};
+
+
 
 class Order {
     @observable price:number = 3;
@@ -271,7 +272,10 @@ test('atom clock example', function(t) {
 		startTicking() {
 			console.log("start ticking");
 			this.tick();
-			this.intervalHandler = setInterval(() => this.tick(), 1 * time_factor);
+			// The cast to any here is to force TypeScript to select the correct
+			// overload of setInterval: the one that returns number, as opposed
+			// to the one defined in @types/node
+			this.intervalHandler = setInterval(() => this.tick(), (1 * time_factor) as any);
 		}
 
 		stopTicking() {
