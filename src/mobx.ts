@@ -72,7 +72,10 @@ import { spyReport, spyReportEnd, spyReportStart, isSpyEnabled } from "./core/sp
 import { Lambda, deepEqual } from "./utils/utils";
 import { isComputingDerivation } from "./core/derivation";
 import { setReactionScheduler, onReactionError } from "./core/reaction";
-import { reserveArrayBuffer } from "./types/observablearray";
+import { reserveArrayBuffer, IObservableArray } from "./types/observablearray";
+import { interceptReads } from "./api/intercept-read";
+import { ObservableMap } from './types/observablemap';
+import { IObservableValue } from './types/observablevalue';
 import {registerGlobals} from "./core/globalstate";
 
 // This line should come after all the imports as well, for the same reason
@@ -88,6 +91,7 @@ export const extras = {
 	getAdministration,
 	getGlobalState,
 	getObserverTree,
+	interceptReads,
 	isComputingDerivation,
 	isSpyEnabled,
 	onReactionError,

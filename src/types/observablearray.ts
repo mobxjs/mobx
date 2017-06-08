@@ -91,15 +91,28 @@ inherit(StubArray, Array.prototype);
 
 class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChange<T> | IArrayWillSplice<T>>, IListenable {
 	atom: BaseAtom;
-	values: T[];
+	values: T[] = [];
 	lastKnownLength: number = 0;
 	interceptors = null;
 	changeListeners = null;
 	enhancer: (newV: T, oldV: T | undefined) => T;
+	dehancer: any
 
 	constructor(name, enhancer: IEnhancer<T>, public array: IObservableArray<T>, public owned: boolean) {
 		this.atom = new BaseAtom(name || ("ObservableArray@" + getNextId()));
 		this.enhancer = (newV, oldV) => enhancer(newV, oldV, name + "[..]");
+	}
+
+	dehanceValue(value: T): T {
+		if (this.dehancer !== undefined)
+			return this.dehancer(value);
+		return value;
+	}
+
+	dehanceValues(values: T[]): T[] {
+		if (this.dehancer !== undefined)
+			return values.map(this.dehancer) as any;
+		return values;
 	}
 
 	intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
@@ -193,7 +206,7 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 
 		if (deleteCount !== 0 || newItems.length !== 0)
 			this.notifyArraySplice(index, newItems, res);
-		return res;
+		return this.dehanceValues(res);
 	}
 
 	spliceItemsIntoValues(index, deleteCount, newItems: T[]): T[] {
@@ -256,11 +269,7 @@ export class ObservableArray<T> extends StubArray {
 		addHiddenFinalProp(this, "$mobx", adm);
 
 		if (initialValues && initialValues.length) {
-			adm.updateArrayLength(0, initialValues.length);
-			adm.values = initialValues.map(v => enhancer(v, undefined, name + "[..]"));
-			adm.notifyArraySplice(0, adm.values.slice(), EMPTY_ARRAY);
-		} else {
-			adm.values = [];
+			this.spliceWithArray(0, 0, initialValues)
 		}
 
 		if (safariPrototypeSetterInheritanceBug) {
@@ -305,19 +314,19 @@ export class ObservableArray<T> extends StubArray {
 	}
 
 	peek(): T[] {
-		return this.$mobx.values;
+		this.$mobx.atom.reportObserved();
+		return this.$mobx.dehanceValues(this.$mobx.values);
 	}
 
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
 	find(predicate: (item: T, index: number, array: ObservableArray<T>) => boolean, thisArg?, fromIndex = 0): T | undefined {
 		const idx = this.findIndex.apply(this, arguments);
-		return idx === -1 ? undefined : this.$mobx.values[idx];
+		return idx === -1 ? undefined : this.get(idx);
 	}
 
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex
 	findIndex(predicate: (item: T, index: number, array: ObservableArray<T>) => boolean, thisArg?, fromIndex = 0): number {
-		this.$mobx.atom.reportObserved();
-		const items = this.$mobx.values, l = items.length;
+		const items = this.peek(), l = items.length;
 		for (let i = fromIndex; i < l; i++)
 			if (predicate.call(thisArg, items[i], i, this))
 				return i;
@@ -368,7 +377,6 @@ export class ObservableArray<T> extends StubArray {
 	}
 
 	reverse(): T[] {
-		this.$mobx.atom.reportObserved();
 		// reverse by default mutates in place before returning the result
 		// which makes it both a 'derivation' and a 'mutation'.
 		// so we deviate from the default and just make it an dervitation
@@ -377,7 +385,6 @@ export class ObservableArray<T> extends StubArray {
 	}
 
 	sort(compareFn?: (a: T, b: T) => number): T[] {
-		this.$mobx.atom.reportObserved();
 		// sort by default mutates in place before returning the result
 		// which goes against all good practices. Let's not change the array in place!
 		const clone = (<any>this).slice();
@@ -418,23 +425,13 @@ export class ObservableArray<T> extends StubArray {
 		this.replace(newItems);
 	}
 
-	toString(): string {
-		this.$mobx.atom.reportObserved();
-		return Array.prototype.toString.apply(this.$mobx.values, arguments);
-	}
-
-	toLocaleString(): string {
-		this.$mobx.atom.reportObserved();
-		return Array.prototype.toLocaleString.apply(this.$mobx.values, arguments);
-	}
-
 	// See #734, in case property accessors are unreliable...
 	get(index: number): T | undefined {
 		const impl = <ObservableArrayAdministration<any>> this.$mobx;
 		if (impl) {
 			if (index < impl.values.length) {
 				impl.atom.reportObserved();
-				return impl.values[index];
+				return impl.dehanceValue(impl.values[index]);
 			}
 			console.warn(`[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${impl.values.length}). Please check length first. Out of bound indices will not be tracked by MobX`);
 		}
@@ -480,6 +477,44 @@ declareIterator(ObservableArray.prototype, function() {
 	return arrayAsIterator(this.slice());
 });
 
+Object.defineProperty(ObservableArray.prototype, "length", {
+	enumerable: false,
+	configurable: true,
+	get: function(): number {
+		return this.$mobx.getArrayLength();
+	},
+	set: function(newLength: number) {
+		this.$mobx.setArrayLength(newLength);
+	}
+});
+
+
+/**
+ * Wrap function from prototype
+ */
+[
+	"every",
+	"filter",
+	"forEach",
+	"indexOf",
+	"join",
+	"lastIndexOf",
+	"map",
+	"reduce",
+	"reduceRight",
+	"slice",
+	"some",
+	"toString",
+	"toLocaleString"
+].forEach(funcName => {
+	const baseFunc = Array.prototype[funcName];
+	invariant(typeof baseFunc === "function", `Base function not defined on Array prototype: '${funcName}'`);
+	addHiddenProp(ObservableArray.prototype, funcName, function() {
+		return baseFunc.apply(this.peek(), arguments);
+	});
+});
+
+
 /**
  * We don't want those to show up in `for (const key in ar)` ...
  */
@@ -510,42 +545,6 @@ makeNonEnumerable(ObservableArray.prototype, [
 	"toString",
 	"toLocaleString"
 ]);
-
-Object.defineProperty(ObservableArray.prototype, "length", {
-	enumerable: false,
-	configurable: true,
-	get: function(): number {
-		return this.$mobx.getArrayLength();
-	},
-	set: function(newLength: number) {
-		this.$mobx.setArrayLength(newLength);
-	}
-});
-
-
-/**
- * Wrap function from prototype
- */
-[
-	"every",
-	"filter",
-	"forEach",
-	"indexOf",
-	"join",
-	"lastIndexOf",
-	"map",
-	"reduce",
-	"reduceRight",
-	"slice",
-	"some"
-].forEach(funcName => {
-	const baseFunc = Array.prototype[funcName];
-	invariant(typeof baseFunc === "function", `Base function not defined on Array prototype: '${funcName}'`);
-	addHiddenProp(ObservableArray.prototype, funcName, function() {
-		this.$mobx.atom.reportObserved();
-		return baseFunc.apply(this.$mobx.values, arguments);
-	});
-});
 
 // See #364
 const ENTRY_0 = createArrayEntryDescriptor(0);
