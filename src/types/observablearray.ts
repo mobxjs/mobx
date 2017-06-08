@@ -311,7 +311,7 @@ export class ObservableArray<T> extends StubArray {
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
 	find(predicate: (item: T, index: number, array: ObservableArray<T>) => boolean, thisArg?, fromIndex = 0): T | undefined {
 		const idx = this.findIndex.apply(this, arguments);
-		return idx === -1 ? undefined : this.$mobx.dehanceValue(this.$mobx.values[idx]);
+		return idx === -1 ? undefined : this.get(idx);
 	}
 
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex

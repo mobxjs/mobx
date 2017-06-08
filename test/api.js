@@ -60,6 +60,7 @@ test('correct api should be exposed', function(t) {
 			'getDependencyTree',
 			'getGlobalState',
 			'getObserverTree',
+			'interceptReads',
 			'isComputingDerivation',
 			'isSpyEnabled',
 			'onReactionError',

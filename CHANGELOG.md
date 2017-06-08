@@ -1,3 +1,7 @@
+# 3.1.11
+
+* Introduced experimental feature `extras.interceptReads(observable: ObservableMap | ObservableArray | ObservableObject | ObservableBox, property?: string, handler: value => value): Disposer` that can be used to intercept _reads_ from observable objects, to transform values on the fly when a value is read. One can achieve similar things with this as with proxying reads.
+
 # 3.1.10
 
 * Fixed flow typings for `when`, by @jamsea
