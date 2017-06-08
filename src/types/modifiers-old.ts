@@ -17,11 +17,12 @@ export function asFlat<T>(value: T): T {
 	return observable.shallow(value);
 }
 
-export function asMap(): ObservableMap<any>;
-export function asMap<T>(): ObservableMap<T>;
-export function asMap<T>(entries: IMapEntries<T>): ObservableMap<T>;
-export function asMap<T>(data: IKeyValueMap<T>): ObservableMap<T>;
-export function asMap(data?): ObservableMap<any> {
+export function asMap(): ObservableMap<any, any>;
+export function asMap<K, T>(): ObservableMap<K, T>;
+export function asMap<K, T>(entries: IMapEntries<K, T>): ObservableMap<K, T>;
+// FIXME
+export function asMap<K, T>(data: IKeyValueMap<T>): ObservableMap<K, T>;
+export function asMap(data?): ObservableMap<any, any> {
 	deprecated("asMap is deprecated, use observable.map or observable.shallowMap instead");
 	return observable.map(data || {});
 }

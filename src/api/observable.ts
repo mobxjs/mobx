@@ -58,7 +58,7 @@ export interface IObservableFactory {
 	<T>(value: null | undefined): IObservableValue<T>;
 	(value: null | undefined): IObservableValue<any>;
 	(): IObservableValue<any>;
-	<T>(value: IMap<string | number | boolean, T>): ObservableMap<T>;
+	<K, T>(value: IMap<K, T>): ObservableMap<K, T>;
 	<T extends Object>(value: T): T & IObservableObject;
 	<T>(value: T): IObservableValue<T>;
 }
@@ -88,16 +88,16 @@ export class IObservableFactories {
 		return new ObservableArray(initialValues, referenceEnhancer, name) as any;
 	}
 
-	map<T>(initialValues?: IObservableMapInitialValues<T>, name?: string): ObservableMap<T> {
+	map<K, T>(initialValues?: IObservableMapInitialValues<K, T>, name?: string): ObservableMap<K, T> {
 		if (arguments.length > 2)
 			incorrectlyUsedAsDecorator("map");
-		return new ObservableMap(initialValues, deepEnhancer, name);
+		return new ObservableMap<K, T>(initialValues, deepEnhancer, name);
 	}
 
-	shallowMap<T>(initialValues?: IObservableMapInitialValues<T>, name?: string): ObservableMap<T> {
+	shallowMap<K, T>(initialValues?: IObservableMapInitialValues<K, T>, name?: string): ObservableMap<K, T> {
 		if (arguments.length > 2)
 			incorrectlyUsedAsDecorator("shallowMap");
-		return new ObservableMap(initialValues, referenceEnhancer, name);
+		return new ObservableMap<K, T>(initialValues, referenceEnhancer, name);
 	}
 
 	object<T>(props: T, name?: string): T & IObservableObject {
@@ -142,7 +142,7 @@ export class IObservableFactories {
 	 */
 	shallow(target: Object, property: string, descriptor?: PropertyDescriptor): any;
 	shallow<T>(initialValues: T[]): IObservableArray<T>;
-	shallow<T>(initialValues: IMap<string | number | boolean, T>): ObservableMap<T>;
+	shallow<K, T>(initialValues: IMap<K, T>): ObservableMap<K, T>;
 	shallow<T extends Object>(value: T): T;
 	shallow() {
 		if (arguments.length < 2) {
@@ -156,7 +156,7 @@ export class IObservableFactories {
 
 	deep(target: Object, property: string, descriptor?: PropertyDescriptor): any;
 	deep<T>(initialValues: T[]): IObservableArray<T>;
-	deep<T>(initialValues: IMap<string | number | boolean, T>): ObservableMap<T>;
+	deep<K, T>(initialValues: IMap<K, T>): ObservableMap<K, T>;
 	deep<T>(initialValue: T): T;
 	deep() {
 		if (arguments.length < 2) {
@@ -170,7 +170,7 @@ export class IObservableFactories {
 
 	struct(target: Object, property: string, descriptor?: PropertyDescriptor): any;
 	struct<T>(initialValues: T[]): IObservableArray<T>;
-	struct<T>(initialValues: IMap<string | number | boolean, T>): ObservableMap<T>;
+	struct<K, T>(initialValues: IMap<K, T>): ObservableMap<K, T>;
 	struct<T>(initialValue: T): T;
 	struct() {
 		if (arguments.length < 2) {

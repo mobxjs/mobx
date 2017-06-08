@@ -490,6 +490,68 @@ test('computed temporary memoization', t => {
   t.end()
 })
 
+test('Map: initializing', function (t) {
+  gc();
+  var iterationsCount = 100000;
+  var map;
+  var i;
+
+  var start = Date.now();
+  for(i = 0; i < iterationsCount; i++) {
+    map = mobx.map()
+  }
+  var end = Date.now();
+  log("Initilizing " + iterationsCount + " maps: " + (end - start) + " ms.");
+  t.end();
+});
+
+test('Map: looking up properties', function (t) {
+  gc();
+  var iterationsCount = 1000;
+  var propertiesCount = 100;
+  var map = mobx.map();
+  var i;
+  var p;
+
+  for (p = 0; p < propertiesCount; p++) {
+    map.set("" + p, p);
+  }
+
+  var start = Date.now();
+  for(i = 0; i < iterationsCount; i++) {
+    for (p = 0; p < propertiesCount; p++) {
+      map.get("" + p);
+    }
+  }
+  var end = Date.now();
+
+  log("Looking up " + propertiesCount + " map properties " + iterationsCount + " times: " + (end - start) + " ms.");
+  t.end();
+});
+
+test('Map: setting and deleting properties', function (t) {
+  gc();
+  var iterationsCount = 1000;
+  var propertiesCount = 100;
+  var map = mobx.map();
+  var i;
+  var p;
+
+  var start = Date.now();
+  for(i = 0; i < iterationsCount; i++) {
+    for (p = 0; p < propertiesCount; p++) {
+      map.set("" + p, i);
+    }
+    for (p = 0; p < propertiesCount; p++) {
+      map.delete("" + p, i);
+    }
+  }
+  var end = Date.now();
+
+  log("Setting and deleting " + propertiesCount + " map properties " + iterationsCount + " times: " + (end - start) + " ms.");
+  t.end();
+});
+
 function now() {
     return + new Date();
 }
