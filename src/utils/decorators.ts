@@ -56,6 +56,10 @@ export function createClassPropertyDecorator(
 			}
 			return newDescriptor;
 		} else {
+			if (typeof descriptor.get === "function") {
+				throw new Error("[mobx] action is not expected to be used with getters");
+			}
+
 			// babel and typescript getter / setter props
 			if (!hasOwnProperty(target, "__mobxLazyInitializers")) {
 				addHiddenProp(target, "__mobxLazyInitializers",
