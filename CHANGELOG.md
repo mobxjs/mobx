@@ -1,3 +1,7 @@
+# 3.1.13
+
+* Fixed build issue with webpack 2, see #1040
+
 # 3.1.12
 
 * Added support for ES modules. See #1027 by @rossipedia
