@@ -1,6 +1,8 @@
 # 3.1.12
 
-* Introduced experimental feature `extras.interceptReads(observable: ObservableMap | ObservableArray | ObservableObject | ObservableBox, property?: string, handler: value => value): Disposer` that can be used to intercept _reads_ from observable objects, to transform values on the fly when a value is read. One can achieve similar things with this as with proxying reads.
+* Added support for ES modules. See #1027 by @rossipedia
+* Improved flow typings. See #1019 by @fb55
+* Introduced experimental feature `extras.interceptReads(observable: ObservableMap | ObservableArray | ObservableObject | ObservableBox, property?: string, handler: value => value): Disposer` that can be used to intercept _reads_ from observable objects, to transform values on the fly when a value is read. One can achieve similar things with this as with proxying reads. See #1036
 
 # 3.1.11
 
