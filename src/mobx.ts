@@ -108,9 +108,17 @@ declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: ((any) => void)};
 declare var module: { exports: any };
 declare var exports: any;
 
+const _exports = (
+	typeof exports !== 'undefined'
+		? exports
+		: typeof module !== 'undefined' && typeof module.exports !== 'undefined'
+			? module.exports
+			: {} /* what to do here, throw? */
+);
+
 if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
-	__MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx(exports)
+	__MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx(_exports)
 }
 
 // TODO: remove in 4.0, temporarily incompatibility fix for mobx-react@4.1.0 which accidentally uses default exports
-export default exports;
+_exports['default'] = _exports;
