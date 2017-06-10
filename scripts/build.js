@@ -96,7 +96,7 @@ function copyFlowDefinitions() {
 
 function build() {
 	runTypeScriptBuild(".build.cjs", ts.ScriptTarget.ES5, true);
-	runTypeScriptBuild(".build.es", ts.ScriptTarget.ES2015, false);
+	runTypeScriptBuild(".build.es", ts.ScriptTarget.ES5, false);
 	return Promise.all([
 
 		generateBundledModule(

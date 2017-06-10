@@ -1,8 +1,8 @@
-# 3.1.13
+# 3.1.13 (Unpublished: Uglify chokes on it in CRA)
 
 * Fixed build issue with webpack 2, see #1040
 
-# 3.1.12
+# 3.1.12 (Unpublished: wasn't being bundled correctly by all bundlers)
 
 * Added support for ES modules. See #1027 by @rossipedia
 * Improved flow typings. See #1019 by @fb55
