@@ -1,3 +1,7 @@
+# 3.1.14
+
+* Fixed 3.1.12 / 3.1.13 module packing. See #1039; `module` target is now transpiled to ES5 as well
+
 # 3.1.13 (Unpublished: Uglify chokes on it in CRA)
 
 * Fixed build issue with webpack 2, see #1040
