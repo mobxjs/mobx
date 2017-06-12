@@ -116,8 +116,9 @@ const _exports = (
 			: {} /* what to do here, throw? */
 );
 
+import { spy  } from "./core/spy";
 if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
-	__MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx(_exports)
+	__MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx({ spy, extras })
 }
 
 // TODO: remove in 4.0, temporarily incompatibility fix for mobx-react@4.1.0 which accidentally uses default exports
