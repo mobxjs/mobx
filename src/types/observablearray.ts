@@ -392,7 +392,7 @@ export class ObservableArray<T> extends StubArray {
 	}
 
 	remove(value: T): boolean {
-		const idx = this.$mobx.values.indexOf(value);
+		const idx = this.$mobx.dehanceValues(this.$mobx.values).indexOf(value);
 		if (idx > -1) {
 			this.splice(idx, 1);
 			return true;

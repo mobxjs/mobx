@@ -1,3 +1,7 @@
+# 3.1.15
+
+* Fixed issue where `array.remove` did not work correctly in combination with `extras.interceptReads`
+
 # 3.1.14
 
 * Fixed 3.1.12 / 3.1.13 module packing. See #1039; `module` target is now transpiled to ES5 as well
