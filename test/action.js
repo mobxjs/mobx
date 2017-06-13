@@ -211,7 +211,7 @@ test('should not be possible to change observed state in an action called from c
 
 	t.throws(() => {
 		c.get()
-	}, /Computed values are not allowed to not cause side effects by changing observables that are already being observed/)
+	}, /Computed values are not allowed to cause side effects by changing observables that are already being observed/)
 
 	mobx.extras.resetGlobalState();
 	d();
