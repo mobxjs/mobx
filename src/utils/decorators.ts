@@ -1,7 +1,7 @@
 import {invariant, addHiddenProp, hasOwnProperty} from "./utils";
 
 /**
- * Construcs a decorator, that normalizes the differences between
+ * Constructs a decorator, that normalizes the differences between
  * TypeScript and Babel. Mainly caused by the fact that legacy-decorator cannot assign
  * values during instance creation to properties that have a getter setter.
  *
