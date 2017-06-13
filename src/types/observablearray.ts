@@ -27,6 +27,7 @@ export interface IObservableArray<T> extends Array<T> {
 	peek(): T[];
 	replace(newItems: T[]): T[];
 	find(predicate: (item: T, index: number, array: IObservableArray<T>) => boolean, thisArg?: any, fromIndex?: number): T;
+	findIndex(predicate: (item: T, index: number, array: IObservableArray<T>) => boolean, thisArg?: any, fromIndex?: number): number;
 	remove(value: T): boolean;
 	move(fromIndex: number, toIndex: number): void;
 }
@@ -299,12 +300,18 @@ export class ObservableArray<T> extends StubArray {
 
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
 	find(predicate: (item: T, index: number, array: ObservableArray<T>) => boolean, thisArg?, fromIndex = 0): T | undefined {
+		const idx = this.findIndex.apply(this, arguments);
+		return idx === -1 ? undefined : this.$mobx.values[idx];
+	}
+
+	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex
+	findIndex(predicate: (item: T, index: number, array: ObservableArray<T>) => boolean, thisArg?, fromIndex = 0): number {
 		this.$mobx.atom.reportObserved();
 		const items = this.$mobx.values, l = items.length;
 		for (let i = fromIndex; i < l; i++)
 			if (predicate.call(thisArg, items[i], i, this))
-				return items[i];
-		return undefined;
+				return i;
+		return -1;
 	}
 
 	/*
@@ -478,6 +485,7 @@ makeNonEnumerable(ObservableArray.prototype, [
 	"toJSON",
 	"peek",
 	"find",
+	"findIndex",
 	"splice",
 	"spliceWithArray",
 	"push",

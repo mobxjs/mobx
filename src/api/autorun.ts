@@ -13,7 +13,7 @@ import {getMessage} from "../utils/messages";
  * @param scope (optional)
  * @returns disposer function, which can be used to stop the view from being updated in the future.
  */
-export function autorun(view: (r: IReactionPublic) => void, scope?: any): IReactionDisposer;
+export function autorun(view: (r: IReactionPublic) => any, scope?: any): IReactionDisposer;
 
 /**
  * Creates a named reactive view and keeps it alive, so that the view is always
@@ -23,10 +23,10 @@ export function autorun(view: (r: IReactionPublic) => void, scope?: any): IReact
  * @param scope (optional)
  * @returns disposer function, which can be used to stop the view from being updated in the future.
  */
-export function autorun(name: string, view: (r: IReactionPublic) => void, scope?: any): IReactionDisposer;
+export function autorun(name: string, view: (r: IReactionPublic) => any, scope?: any): IReactionDisposer;
 export function autorun(arg1: any, arg2: any, arg3?: any) {
 	let name: string,
-		view: (r: IReactionPublic) => void,
+		view: (r: IReactionPublic) => any,
 		scope: any;
 
 	if (typeof arg1 === "string") {
@@ -106,10 +106,10 @@ export function when(arg1: any, arg2: any, arg3?: any, arg4?: any) {
 	return disposer;
 }
 
-export function autorunAsync(name: string, func: (r: IReactionPublic) => void, delay?: number, scope?: any): IReactionDisposer;
-export function autorunAsync(func: (r: IReactionPublic) => void, delay?: number, scope?: any): IReactionDisposer;
+export function autorunAsync(name: string, func: (r: IReactionPublic) => any, delay?: number, scope?: any): IReactionDisposer;
+export function autorunAsync(func: (r: IReactionPublic) => any, delay?: number, scope?: any): IReactionDisposer;
 export function autorunAsync(arg1: any, arg2: any, arg3?: any, arg4?: any) {
-	let name: string, func: (r: IReactionPublic) => void, delay: number, scope: any;
+	let name: string, func: (r: IReactionPublic) => any, delay: number, scope: any;
 	if (typeof arg1 === "string") {
 		name = arg1;
 		func = arg2;
