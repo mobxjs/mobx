@@ -13,3 +13,4 @@ dist/
 .build*/
 yarn.lock
 .idea
+.wp-build*/
