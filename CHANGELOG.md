@@ -1,3 +1,8 @@
+# 3.1.16
+
+* Restored `default` export (and added warning), which broke code that was importing mobx like `import mobx from "mobx"`. Use `import * as mobx from "mobx"` or use named importes instead. By @andykog, see #1043, #1050
+* Fixed several typos in exceptions and documentation
+
 # 3.1.15
 
 * Fixed issue where `array.remove` did not work correctly in combination with `extras.interceptReads`
