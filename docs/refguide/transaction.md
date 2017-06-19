@@ -1,6 +1,6 @@
 # Transaction
 
-_Transaction has been deprecated in favor of *action* or *runInAction*_
+![#f03c15](https://placehold.it/15/f03c15/000000?text=+) _Transaction has been deprecated in favor of *action* or *runInAction*_
 
 `transaction(worker: () => void)` can be used to batch a bunch of updates without notifying any observers until the end of the transaction.
 `transaction` takes a single, parameterless `worker` function as argument and runs it.
