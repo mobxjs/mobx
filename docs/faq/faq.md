@@ -50,3 +50,7 @@ Yes, see [createTransformer](http://mobxjs.github.io/mobx/refguide/create-transf
 
 Sure, join the reactiflux channel or checkout the code. Or, submit an issue to motivate me to make some nice drawings :).
 And look at this [Medium article](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254).
+
+##### Where can I find more MobX resources?
+
+We've compiled a large list of helpful resources of all types in the [official awesome list](https://github.com/mobxjs/awesome-mobx#awesome-mobx). If you feel it's missing something, please open an [issue](https://github.com/mobxjs/awesome-mobx/issues/new) or [pull request](https://github.com/mobxjs/awesome-mobx/compare) to describe what you're looking for or share your added links :).
