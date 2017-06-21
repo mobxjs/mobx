@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.1" data-basepath=".." data-revision="Tue May 23 2017 21:34:33 GMT+0200 (CEST)">
+    <div class="book" data-level="2.1" data-basepath=".." data-revision="Wed Jun 21 2017 09:35:51 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -891,7 +891,7 @@
 <p>Observable values can be JS primitives, references, plain objects, class instances, arrays and maps.
 The following conversion rules are applied, but can be fine-tuned by using <em>modifiers</em>. See below.</p>
 <ol>
-<li>If <em>value</em> is wrapped in the <em>modifier</em> <code>asMap</code>: a new <a href="map.html">Observable Map</a> will be returned. Observable maps are very useful if you don&apos;t want to react just to the change of a specific entry, but also to the addition or removal of entries.</li>
+<li>If <em>value</em> is an ES6 <code>Map</code>: a new <a href="map.html">Observable Map</a> will be returned. Observable maps are very useful if you don&apos;t want to react just to the change of a specific entry, but also to the addition or removal of entries.</li>
 <li>If <em>value</em> is an array, a new <a href="array.html">Observable Array</a> will be returned.</li>
 <li>If <em>value</em> is an object <em>without</em> prototype, all its current properties will be made observable. See <a href="object.html">Observable Object</a></li>
 <li>If <em>value</em> is an object <em>with</em> a prototype, a JavaScript primitive or function, a <a href="boxed.html">Boxed Observable</a> will be returned. MobX will not make objects with a prototype automatically observable; as that is the responsibility of its constructor function. Use <code>extendObservable</code> in the constructor, or <code>@observable</code> in its class definition instead.</li>
@@ -899,12 +899,12 @@ The following conversion rules are applied, but can be fine-tuned by using <em>m
 <p>These rules might seem complicated at first sight, but you will notice that in practice they are very intuitive to work with.
 Some notes:</p>
 <ul>
-<li>To create dynamically keyed objects use the <code>asMap</code> modifier! Only initially existing properties on an object will be made observable, although new ones can be added using <code>extendObservable</code>.</li>
-<li>To use the <code>@observable</code> decorator, make sure that <a href="http://mobxjs.github.io/mobx/refguide/observable-decorator.html" target="_blank">decorators are enabled</a> in your transpiler (babel or typescript).</li>
+<li>To create <strong>dynamically keyed objects</strong> use an <a href="map.html">Observable Map</a>! Only initially existing properties on an object will be made observable, although new ones can be added using <code>extendObservable</code>.</li>
+<li>To use the <code>@observable</code> decorator, make sure that <a href="observable-decorator.html">decorators are enabled</a> in your transpiler (babel or typescript).</li>
 <li>By default, making a data structure observable is <em>infective</em>; that means that <code>observable</code> is applied automatically to any value that is contained by the data structure, or will be contained by the data structure in the future. This behavior can be changed by using <em>modifiers</em>.</li>
 </ul>
 <p>Some examples:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> map = observable(asMap({ key: <span class="hljs-string">&quot;value&quot;</span>}));
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> map = observable.map({ key: <span class="hljs-string">&quot;value&quot;</span>});
 map.set(<span class="hljs-string">&quot;key&quot;</span>, <span class="hljs-string">&quot;new value&quot;</span>);
 
 <span class="hljs-keyword">const</span> list = observable([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">4</span>]);
