@@ -7,7 +7,7 @@ Observable maps are very useful if you don't want to react just to the change of
 Optionally takes an object, entries array or string keyed [ES6 map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) with initial values.
 Unlike ES6 maps, only strings are accepted as keys.
 
-Using ES6 Map constructor you can initialize observable map using observable(new Map()) or for class properties using the decorator @observable map = new Map().
+Using ES6 Map constructor you can initialize observable map using `observable(new Map())` or for class properties using the decorator `@observable map = new Map()`.
 
 The following methods are exposed according to the [ES6 Map spec](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map):
 
