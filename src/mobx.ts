@@ -94,7 +94,7 @@ export const extras = {
 declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: ((any) => void)};
 declare var module: { exports: any };
 if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
-	__MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx(module.exports);
+	__MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx(module.exports)
 }
 
 // TODO: remove in 4.0, temporarily incompatibility fix for mobx-react@4.1.0 which accidentally uses default exports
