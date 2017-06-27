@@ -10,6 +10,7 @@ test/typescript/typescript-tests.js
 test/perf/perf.txt
 .vscode
 dist/
-.build/
+.build*/
 yarn.lock
 .idea
+.wp-build*/

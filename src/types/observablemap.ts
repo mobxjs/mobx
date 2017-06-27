@@ -78,6 +78,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	private _keys: IObservableArray<string> = <any> new ObservableArray(undefined, referenceEnhancer, `${this.name}.keys()`, true);
 	interceptors = null;
 	changeListeners = null;
+	dehancer: any = undefined;
 
 	constructor(initialData?: IObservableMapInitialValues<V>, public enhancer: IEnhancer<V> = deepEnhancer, public name = "ObservableMap@" + getNextId()) {
 		this.merge(initialData);
@@ -207,7 +208,8 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 		const change = notify || notifySpy ? <IMapChange<V>>{
 				type: "add",
 				object: this,
-				name, newValue
+				name,
+				newValue
 			} : null;
 
 		if (notifySpy)
@@ -221,8 +223,15 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 	get(key: string): V | undefined {
 		key = "" + key;
 		if (this.has(key))
-			return this._data[key]!.get();
-		return undefined;
+			return this.dehanceValue(this._data[key]!.get());
+		return this.dehanceValue(undefined);
+	}
+
+	private dehanceValue<X extends V | undefined>(value: X): X {
+		if (this.dehancer !== undefined) {
+			return this.dehancer(value);
+		}
+		return value;
 	}
 
 	keys(): string[] & Iterator<string> {

@@ -1,5 +1,36 @@
+# 3.1.16
+
+* Restored `default` export (and added warning), which broke code that was importing mobx like `import mobx from "mobx"`. Use `import * as mobx from "mobx"` or use named importes instead. By @andykog, see #1043, #1050
+* Fixed several typos in exceptions and documentation
+
+# 3.1.15
+
+* Fixed issue where `array.remove` did not work correctly in combination with `extras.interceptReads`
+
+# 3.1.14
+
+* Fixed 3.1.12 / 3.1.13 module packing. See #1039; `module` target is now transpiled to ES5 as well
+
+# 3.1.13 (Unpublished: Uglify chokes on it in CRA)
+
+* Fixed build issue with webpack 2, see #1040
+
+# 3.1.12 (Unpublished: wasn't being bundled correctly by all bundlers)
+
+* Added support for ES modules. See #1027 by @rossipedia
+* Improved flow typings. See #1019 by @fb55
+* Introduced experimental feature `extras.interceptReads(observable: ObservableMap | ObservableArray | ObservableObject | ObservableBox, property?: string, handler: value => value): Disposer` that can be used to intercept _reads_ from observable objects, to transform values on the fly when a value is read. One can achieve similar things with this as with proxying reads. See #1036
+
+# 3.1.11
+
+* Using rollup as bundler, instead of custom hacked build scripts, by @rossipedia, see #1023
+
 # 3.1.10
 
+* Fixed flow typings for `when`, by @jamsea
+* Add flow typings for `map.replace`, by @leader22
+* Added `observableArray.findIndex`, by @leader22
+* Improved typings of `autorun` / `autorunAsync` to better support async / await, by @capaj
 * Fixed typings of `action.bound`, see #803
 
 # 3.1.9

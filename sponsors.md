@@ -23,3 +23,5 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Rafal Filipek
 * Graham Kaemmer
 * Andrei Zvonimir Crnković
+* Rob Searle
+* Thibault Maekelbergh
