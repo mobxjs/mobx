@@ -1,6 +1,6 @@
 import {ComputedValue} from "../core/computedvalue";
 import {globalState} from "../core/globalstate";
-import {defaultComparer} from "../types/comparer";
+import {comparer} from "../types/comparer";
 import {invariant, getNextId, addHiddenProp} from "../utils/utils";
 
 export type ITransformer<A, B> = (object: A) => B;
@@ -18,7 +18,7 @@ export function createTransformer<A, B>(transformer: ITransformer<A, B>, onClean
 	// Local transformer class specifically for this transformer
 	class Transformer extends ComputedValue<B> {
 		constructor(private sourceIdentifier: string, private sourceObject: A) {
-			super(() => transformer(sourceObject), undefined, defaultComparer, `Transformer-${(<any>transformer).name}-${sourceIdentifier}`, undefined);
+			super(() => transformer(sourceObject), undefined, comparer.default, `Transformer-${(<any>transformer).name}-${sourceIdentifier}`, undefined);
 		}
 		onBecomeUnobserved() {
 			const lastValue = this.value;

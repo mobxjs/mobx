@@ -233,6 +233,5 @@ export function toPrimitive(value) {
 
 import {globalState} from "../core/globalstate";
 import {IObservableArray, isObservableArray} from "../types/observablearray";
-import {IEqualsComparer, defaultComparer} from "../types/comparer";
 import {isObservableMap} from "../types/observablemap";
 import {observable} from "../api/observable";

@@ -1,4 +1,4 @@
-import {IEqualsComparer, defaultComparer, structuralComparer} from "../types/comparer";
+import {IEqualsComparer, comparer} from "../types/comparer";
 import {asObservableObject, defineComputedProperty} from "../types/observableobject";
 import {invariant} from "../utils/utils";
 import {createClassPropertyDecorator} from "../utils/decorators";
@@ -45,8 +45,8 @@ function createComputedDecorator(equals: IEqualsComparer<any>) {
 	);
 }
 
-const computedDecorator = createComputedDecorator(defaultComparer);
-const computedStructDecorator = createComputedDecorator(structuralComparer);
+const computedDecorator = createComputedDecorator(comparer.default);
+const computedStructDecorator = createComputedDecorator(comparer.structural);
 
 /**
  * Decorator for class properties: @computed get value() { return expr; }.
@@ -62,7 +62,12 @@ export var computed: IComputed = (
 		const opts: IComputedValueOptions<any> = typeof arg2 === "object" ? arg2 : {};
 		opts.setter = typeof arg2 === "function" ? arg2 : opts.setter;
 
-		const equals = opts.equals ? opts.equals : (opts.compareStructural || opts.struct) ? structuralComparer : defaultComparer;
+		const equals = opts.equals
+			? opts.equals
+			: (opts.compareStructural || opts.struct)
+				? comparer.structural
+				: comparer.default;
+
 		return new ComputedValue(arg1, opts.context, equals, opts.name || arg1.name || "", opts.setter);
 	}
 ) as any;

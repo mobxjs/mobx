@@ -5,11 +5,10 @@ import {runLazyInitializers} from "../utils/decorators";
 import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
-import {IEqualsComparer, defaultComparer} from "../types/comparer";
+import {IEqualsComparer, comparer} from "../types/comparer";
 import {IEnhancer, isModifierDescriptor, IModifierDescriptor} from "../types/modifiers";
 import {isAction, defineBoundAction} from "../api/action";
 import {getMessage} from "../utils/messages";
-
 
 
 export interface IObservableObject {
@@ -101,7 +100,7 @@ export function defineObservablePropertyFromDescriptor(adm: ObservableObjectAdmi
 		}
 	} else {
 		// get x() { return 3 } set x(v) { }
-		defineComputedProperty(adm, propName, descriptor.get, descriptor.set, defaultComparer, true);
+		defineComputedProperty(adm, propName, descriptor.get, descriptor.set, comparer.default, true);
 	}
 }
 
