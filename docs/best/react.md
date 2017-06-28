@@ -209,9 +209,9 @@ If the two statements are swapped, or if any other observable causes the `autoru
 #### Correct: using not yet existing map entries
 
 ```javascript
-const twitterUrls = observable(asMap({
+const twitterUrls = observable.map({
     "John": "twitter.com/johnny"
-}))
+})
 
 autorun(() => {
     console.log(twitterUrls.get("Sara"))
