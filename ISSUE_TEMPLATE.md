@@ -1,11 +1,13 @@
 Welcome to MobX. Please provide as much relevant information as possible!
 
+If at all possible, provide a **minimal** sample reproduction. **Create a minimal reproduction based on this [codesandbox](https://codesandbox.io/s/2vmzpM0wK)**
+
 I have a:
 
 1. [ ] Question: Feel free to just state your question. For a quick answer, there are usually people online at our [Gitter](https://gitter.im/mobxjs/mobx) channel
 2. [ ] Issue:
   * [ ] **Provide error messages including stacktrace**
-  * [ ] Provide a **minimal** sample reproduction. **create a reproduction based on this [codesandbox](https://codesandbox.io/s/2vmzpM0wK)** 
+  * [ ] Provide a **minimal** sample reproduction. **Create a reproduction based on this [codesandbox](https://codesandbox.io/s/2vmzpM0wK)** 
   * [ ] Did you check this issue wasn't filed before?
   * [ ] Elaborate on your issue. What behavior did you expect?
   * [ ] State the versions of MobX and relevant libraries. Which browser / node / ... version?
