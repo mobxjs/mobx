@@ -16,7 +16,7 @@ If you want to use decorators follow the following steps.
 
 **TypeScript**
 
-Enable the compiler option `experimentalDecorators` in `tsconfig.json` or pass it as flag `--experimentalDecorators` to the compiler.
+Enable the compiler option `experimentalDecorators` in `tsconfig.json` or pass it as flag `--experimentalDecorators` to the compiler. You must target `es5`+ (es5, es6, ...) with `target` option or by `--target` flag.
 
 **Babel:**
 
@@ -44,6 +44,7 @@ When using react native, the following preset can be used instead of `transform-
 
 ## Limitations on decorators
 
+* typescript target must be es5 minimum
 * reflect-metadata https://github.com/mobxjs/mobx/issues/534
 * decorators are not supported out of the box in `create-react-app`. To fix this, you can either eject, or use [custom-react-scripts](https://www.npmjs.com/package/custom-react-scripts) for `create-react-app` ([blog](https://medium.com/@kitze/configure-create-react-app-without-ejecting-d8450e96196a#.n6xx12p5c))
 * ~~decorators are currently not yet support in Next.JS [issue](https://github.com/zeit/next.js/issues/26)~~ Decorators are now supported in Next.JS. Example: https://github.com/zeit/next.js/tree/master/examples/with-mobx
