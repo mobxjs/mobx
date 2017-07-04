@@ -1124,3 +1124,13 @@ test("803 - action.bound and action preserve type info", t => {
 	const bound2 = action.bound(function () {}) as (() => void)
 	t.end()
 })
+
+test("1072 - @observable without initial value and observe before first access", t => {
+	class User {
+		@observable loginCount: number;
+	}
+
+	const user = new User();
+	observe(user, 'loginCount', () => {});
+	t.end()
+})
