@@ -27,7 +27,7 @@
     "build-babel-tests": "babel test/babel/babel-tests.js -o test/babel-tests.js",
     "use-minified": "cp lib/mobx.min.js lib/mobx.js",
     "lint": "tslint -c tslint.json src/*.ts src/types/*.ts src/api/*.ts src/core/*.ts src/utils/*.ts",
-    "size": "size-limit 19KB lib/mobx.js"
+    "size": "size-limit 20KB lib/mobx.js"
   },
   "repository": {
     "type": "git",
