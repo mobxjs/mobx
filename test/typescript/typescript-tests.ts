@@ -1,7 +1,8 @@
 /// <reference path='tape.d.ts' />
 import {
     observe, computed, observable, autorun, autorunAsync, extendObservable, action,
-    IObservableObject, IObservableArray, IArrayChange, IArraySplice, IObservableValue, isObservable, isObservableObject,
+    IObservableObject, IObservableArray, IArrayChange, IArraySplice, IArrayWillChange, IArrayWillSplice,
+    IObservableValue, isObservable, isObservableObject,
     extras, Atom, transaction, IObjectChange, spy, useStrict, isAction
 } from "../../lib/mobx";
 import * as test from 'tape';
@@ -139,11 +140,17 @@ test('scope', function(t) {
 
 test('typing', function(t) {
     var ar:IObservableArray<number> = observable([1,2]);
+    ar.intercept((c:IArrayWillChange<number>|IArrayWillSplice<number>) => {
+        console.log(c.type);
+    });
     ar.observe((d:IArrayChange<number>|IArraySplice<number>) => {
         console.log(d.type);
     });
 
     var ar2:IObservableArray<number> = observable([1,2]);
+    ar2.intercept((c:IArrayWillChange<number>|IArrayWillSplice<number>) => {
+        console.log(c.type);
+    });
     ar2.observe((d:IArrayChange<number>|IArraySplice<number>) => {
         console.log(d.type);
     });
