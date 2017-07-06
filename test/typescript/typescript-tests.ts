@@ -142,6 +142,7 @@ test('typing', function(t) {
     var ar:IObservableArray<number> = observable([1,2]);
     ar.intercept((c:IArrayWillChange<number>|IArrayWillSplice<number>) => {
         console.log(c.type);
+		return null;
     });
     ar.observe((d:IArrayChange<number>|IArraySplice<number>) => {
         console.log(d.type);
@@ -150,6 +151,7 @@ test('typing', function(t) {
     var ar2:IObservableArray<number> = observable([1,2]);
     ar2.intercept((c:IArrayWillChange<number>|IArrayWillSplice<number>) => {
         console.log(c.type);
+		return null;
     });
     ar2.observe((d:IArrayChange<number>|IArraySplice<number>) => {
         console.log(d.type);
