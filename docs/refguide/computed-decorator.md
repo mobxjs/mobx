@@ -142,6 +142,10 @@ When using `computed` as modifier or as box, it accepts a second options argumen
 
 The `@computed` decorator does not take arguments. If you want to to create a computed property which does structural comparison, use `@computed.struct`.
 
+## `@computed.equals` for custom comparison
+
+If you want to to create a computed property which does custom comparison, use `@computed.equals`.
+
 ## Note on error handling
 
 If a computed value throws an exception during its computation, this exception will be caught and rethrown any time its value is read.
