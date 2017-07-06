@@ -144,7 +144,14 @@ The `@computed` decorator does not take arguments. If you want to to create a co
 
 ## `@computed.equals` for custom comparison
 
-If you want to to create a computed property which does custom comparison, use `@computed.equals`.
+If you want to to create a computed property which does custom comparison, use `@computed.equals(comparer)`.
+
+## Built-in comparers
+
+MobX provides three built-in `comparer`s which should cover most needs:
+- `comparer.identity`: Uses the identity (`===`) operator to determine if two values are the same.
+- `comparer.default`: The same as `comparer.identity`, but also considers `NaN` to be equal to `NaN`.
+- `comparer.structural`: Performs deep structural comparison to determine if two values are the same.
 
 ## Note on error handling
 
