@@ -66,6 +66,7 @@ test('correct api should be exposed', function(t) {
 			'onReactionError',
 			'reserveArrayBuffer',
 			'resetGlobalState',
+			'runInSandbox',
 			'setReactionScheduler',
 			'shareGlobalState',
 			'spyReport',
