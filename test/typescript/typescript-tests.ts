@@ -1,7 +1,8 @@
 /// <reference path='tape.d.ts' />
 import {
     observe, computed, observable, autorun, autorunAsync, extendObservable, action,
-    IObservableObject, IObservableArray, IArrayChange, IArraySplice, IObservableValue, isObservable, isObservableObject,
+    IObservableObject, IObservableArray, IArrayChange, IArraySplice, IArrayWillChange, IArrayWillSplice,
+    IObservableValue, isObservable, isObservableObject,
     extras, Atom, transaction, IObjectChange, spy, useStrict, isAction
 } from "../../lib/mobx";
 import * as test from 'tape';
@@ -139,11 +140,19 @@ test('scope', function(t) {
 
 test('typing', function(t) {
     var ar:IObservableArray<number> = observable([1,2]);
+    ar.intercept((c:IArrayWillChange<number>|IArrayWillSplice<number>) => {
+        console.log(c.type);
+		return null;
+    });
     ar.observe((d:IArrayChange<number>|IArraySplice<number>) => {
         console.log(d.type);
     });
 
     var ar2:IObservableArray<number> = observable([1,2]);
+    ar2.intercept((c:IArrayWillChange<number>|IArrayWillSplice<number>) => {
+        console.log(c.type);
+		return null;
+    });
     ar2.observe((d:IArrayChange<number>|IArraySplice<number>) => {
         console.log(d.type);
     });
@@ -1198,3 +1207,13 @@ test("computed comparer works with extendObservable (TS)", t => {
 
 	t.end();
 });
+
+test("1072 - @observable without initial value and observe before first access", t => {
+	class User {
+		@observable loginCount: number;
+	}
+
+	const user = new User();
+	observe(user, 'loginCount', () => {});
+	t.end()
+})

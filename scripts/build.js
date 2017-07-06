@@ -55,7 +55,6 @@ function runTypeScriptBuild(outDir, target, declarations) {
 
 const rollupPlugins = [
 	require("rollup-plugin-node-resolve")(),
-	require("rollup-plugin-progress")(),
 	require("rollup-plugin-filesize")()
 ];
 

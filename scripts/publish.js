@@ -4,11 +4,7 @@
 /* Run this file from the root of the repository */
 module.exports = function(shell, npm, git) {
 	// build
-
-	// FIXME: rollup dies when not spawning from terminal...
-	// npm("run", "small-build")
-	if (shell.prompt("Please run 'npm run small-build' first. Done?", "Y") !== "Y")
-		shell.exit(1)
+	npm("run", "small-build")
 
     var pkg = JSON.parse(shell.read('package.json'));
 

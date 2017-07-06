@@ -21,7 +21,8 @@ const safariPrototypeSetterInheritanceBug = (() => {
 export interface IObservableArray<T> extends Array<T> {
 	spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[];
 	observe(listener: (changeData: IArrayChange<T>|IArraySplice<T>) => void, fireImmediately?: boolean): Lambda;
-	intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda;
+	intercept(handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>): Lambda;
+	intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda; // TODO: remove in 4.0
 	intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda; // TODO: remove in 4.0
 	clear(): T[];
 	peek(): T[];
@@ -115,8 +116,8 @@ class ObservableArrayAdministration<T> implements IInterceptable<IArrayWillChang
 		return values;
 	}
 
-	intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
-		return registerInterceptor<IArrayChange<T>|IArraySplice<T>>(this, handler);
+	intercept(handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>): Lambda {
+		return registerInterceptor<IArrayWillChange<T>|IArrayWillSplice<T>>(this, handler);
 	}
 
 	observe(listener: (changeData: IArrayChange<T>|IArraySplice<T>) => void, fireImmediately = false): Lambda {
@@ -279,7 +280,7 @@ export class ObservableArray<T> extends StubArray {
 		}
 	}
 
-	intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda {
+	intercept(handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>): Lambda {
 		return this.$mobx.intercept(handler);
 	}
 

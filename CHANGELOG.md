@@ -1,3 +1,8 @@
+# 3.1.17
+
+* Improved typings of `IObservableArray.intercept`: use more restrictive types for `change` parameter of `handler`, by @bvanreeven
+* Fixed [#1072](https://github.com/mobxjs/mobx/issues/1072), fields without a default value could not be observed yet when using TypeScript
+
 # 3.1.16
 
 * Restored `default` export (and added warning), which broke code that was importing mobx like `import mobx from "mobx"`. Use `import * as mobx from "mobx"` or use named importes instead. By @andykog, see #1043, #1050

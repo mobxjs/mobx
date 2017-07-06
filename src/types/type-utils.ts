@@ -26,6 +26,8 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
 		}
 		// Initializers run lazily when transpiling to babel, so make sure they are run...
 		runLazyInitializers(thing);
+		if (property && !thing.$mobx)
+			thing[property]; // See #1072 // TODO: remove in 4.0
 		if (isObservableObject(thing)) {
 			if (!property)
 				return fail(`please specify a property`);
