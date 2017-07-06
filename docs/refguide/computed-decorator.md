@@ -135,7 +135,8 @@ When using `computed` as modifier or as box, it accepts a second options argumen
 * `name`: String, the debug name used in spy and the MobX devtools
 * `context`: The `this` that should be used in the provided expression
 * `setter`: The setter function to be used. Without setter it is not possible to assign new values to a computed value. If the second argument passed to `computed` is a function, this is assumed to be a setter.
-* `compareStructural`: By default `false`. When true, the output of the expression is structurally compared with the previous value before any observer is notified about a change. This makes sure that observers of the computation don't re-evaluate if new structures are returned that are structurally equal to the original ones. This is very useful when working with point, vector or color structures for example.
+* `compareStructural`: By default `false`. When true, the output of the expression is structurally compared with the previous value before any observer is notified about a change. This makes sure that observers of the computation don't re-evaluate if new structures are returned that are structurally equal to the original ones. This is very useful when working with point, vector or color structures for example. The same behaviour can be achieved by specifying the `equals` option with `comparer.structural`.
+* `equals`: By default `comparer.default`. This acts as a comparison function for comparing the previous value with the next value. If this function considers the previous and next values to be equal, then observers will not be re-evaluated. This is useful when working with structural data, and types from other libraries. For example, a computed [moment](https://momentjs.com/) instance could use `(a, b) => a.isSame(b)`. If specified, this will override `compareStructural`.
 
 ## `@computed.struct` for structural comparison
 
