@@ -62,8 +62,8 @@ test('correct api should be exposed', function(t) {
 			'getObserverTree',
 			'interceptReads',
 			'isComputingDerivation',
-			'isolateGlobalState',
 			'isSpyEnabled',
+			'isolateGlobalState',
 			'onReactionError',
 			'reserveArrayBuffer',
 			'resetGlobalState',
@@ -72,7 +72,7 @@ test('correct api should be exposed', function(t) {
 			'spyReport',
 			'spyReportEnd',
 			'spyReportStart'
-	]);
+	].sort());
 	t.equals(Object.keys(mobx.extras).filter(function(key) {
 		return mobx.extras[key] == undefined;
 	}).length, 0);
