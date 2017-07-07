@@ -1,4 +1,4 @@
-import {getGlobal} from "../utils/utils";
+import {getGlobal, deprecated} from "../utils/utils";
 import {IDerivation, CaughtException} from "./derivation";
 import {Reaction} from "./reaction";
 import {IObservable} from "./observable";
@@ -88,7 +88,34 @@ export class MobXGlobals {
 
 export let globalState: MobXGlobals = new MobXGlobals();
 
+let shareGlobalStateCalled = false;
+let runInIsolationCalled = false;
+let warnedAboutMultipleInstances = false;
+
+{
+	const global = getGlobal();
+	if (!global.__mobxInstanceCount) {
+		global.__mobxInstanceCount = 1;
+	} else {
+		global.__mobxInstanceCount++;
+		setTimeout(() => {
+			if (!shareGlobalStateCalled && !runInIsolationCalled && !warnedAboutMultipleInstances ) {
+				warnedAboutMultipleInstances = true;
+				console.warn("[mobx] Warning: there are multiple mobx instances active. This might lead to unexpected results. See https://github.com/mobxjs/mobx/issues/1082 for details.")
+			}
+		})
+	}
+}
+
+export function isolateGlobalState() {
+	runInIsolationCalled = true;
+	getGlobal().__mobxInstanceCount--;
+}
+
 export function shareGlobalState() {
+	// TODO: remove in 4.0; just use peer dependencies instead.
+	deprecated("Using `shareGlobalState` is not recommended, use peer dependencies instead. See https://github.com/mobxjs/mobx/issues/1082 for details.")
+	shareGlobalStateCalled = true;
 	const global = getGlobal();
 	const ownState = globalState;
 
