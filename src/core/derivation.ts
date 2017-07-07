@@ -58,7 +58,7 @@ export function isCaughtException(e): e is CaughtException {
 }
 
 /**
- * Finds out wether any dependency of derivation actually changed
+ * Finds out whether any dependency of derivation actually changed
  * If dependenciesState is 1 it will recalculate dependencies,
  * if any dependency changed it will propagate it by changing dependenciesState to 2.
  *
