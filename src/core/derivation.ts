@@ -65,7 +65,7 @@ export function isCaughtException(e): e is CaughtException {
  * By iterating over dependencies in the same order they were reported and stopping on first change
  * all recalculations are called only for ComputedValues that will be tracked anyway by derivation.
  * That is because we assume that if first x dependencies of derivation doesn't change
- * than derivation shuold run the same way up until accessing x-th dependency.
+ * than derivation should run the same way up until accessing x-th dependency.
  */
 export function shouldCompute(derivation: IDerivation): boolean {
 	switch (derivation.dependenciesState) {
