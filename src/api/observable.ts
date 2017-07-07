@@ -5,7 +5,7 @@ import {IObservableArray, ObservableArray} from "../types/observablearray";
 import {createDecoratorForEnhancer} from "./observabledecorator";
 import {isObservable} from "./isobservable";
 import {IObservableObject, asObservableObject} from "../types/observableobject";
-import {extendObservable, extendShallowObservable} from "../api/extendobservable";
+import {extendObservable, extendShallowObservable} from "./extendobservable";
 import {IObservableMapInitialValues, ObservableMap, IMap} from "../types/observablemap";
 import {getMessage} from "../utils/messages";
 

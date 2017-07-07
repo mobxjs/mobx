@@ -1,9 +1,9 @@
-import {IDerivation} from "../core/derivation";
+import {IDerivation} from "./derivation";
 import {invariant} from "../utils/utils";
-import {untrackedStart, untrackedEnd} from "../core/derivation";
-import {startBatch, endBatch} from "../core/observable";
-import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
-import {globalState} from "../core/globalstate";
+import {untrackedStart, untrackedEnd} from "./derivation";
+import {startBatch, endBatch} from "./observable";
+import {isSpyEnabled, spyReportStart, spyReportEnd} from "./spy";
+import {globalState} from "./globalstate";
 import {getMessage} from "../utils/messages";
 
 export interface IAction{

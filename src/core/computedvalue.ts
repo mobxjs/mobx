@@ -3,7 +3,7 @@ import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, unt
 import {globalState} from "./globalstate";
 import {createAction} from "./action";
 import {createInstanceofPredicate, getNextId, valueDidChange, invariant, Lambda, unique, joinStrings, primitiveSymbol, toPrimitive} from "../utils/utils";
-import {isSpyEnabled, spyReport} from "../core/spy";
+import {isSpyEnabled, spyReport} from "./spy";
 import {autorun} from "../api/autorun";
 import {IValueDidChange} from "../types/observablevalue";
 import {getMessage} from "../utils/messages";
