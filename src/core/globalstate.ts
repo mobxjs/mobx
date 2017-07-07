@@ -89,8 +89,8 @@ export class MobXGlobals {
 export let globalState: MobXGlobals = new MobXGlobals();
 
 let shareGlobalStateCalled = false;
+let runInIsolationCalled = false;
 let warnedAboutMultipleInstances = false;
-let _runInSandbox = false;
 
 {
 	const global = getGlobal();
@@ -99,16 +99,16 @@ let _runInSandbox = false;
 	} else {
 		global.__mobxInstanceCount++;
 		setTimeout(() => {
-			if (!shareGlobalStateCalled && !warnedAboutMultipleInstances && !_runInSandbox) {
+			if (!shareGlobalStateCalled && !runInIsolationCalled && !warnedAboutMultipleInstances ) {
 				warnedAboutMultipleInstances = true;
-				console.warn("[mobx] Warning: there are multiple mobx active instances active. This might lead to unexpected results. See https://github.com/mobxjs/mobx/issues/1082 for details.")
+				console.warn("[mobx] Warning: there are multiple mobx instances active. This might lead to unexpected results. See https://github.com/mobxjs/mobx/issues/1082 for details.")
 			}
 		})
 	}
 }
 
-export function runInSandbox() {
-	_runInSandbox = true;
+export function isolateGlobalState() {
+	runInIsolationCalled = true;
 	getGlobal().__mobxInstanceCount--;
 }
 
