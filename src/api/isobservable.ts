@@ -9,7 +9,7 @@ import {getMessage} from "../utils/messages";
 /**
 	* Returns true if the provided value is reactive.
 	* @param value object, function or array
-	* @param propertyName if propertyName is specified, checkes whether value.propertyName is reactive.
+	* @param property if property is specified, checks whether value.property is reactive.
 	*/
 export function isObservable(value, property?: string): boolean {
 	if (value === null || value === undefined)
