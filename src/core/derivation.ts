@@ -62,7 +62,7 @@ export function isCaughtException(e): e is CaughtException {
  * If dependenciesState is 1 it will recalculate dependencies,
  * if any dependency changed it will propagate it by changing dependenciesState to 2.
  *
- * By iterating over dependencies in the same order they were reported and stoping on first change
+ * By iterating over dependencies in the same order they were reported and stopping on first change
  * all recalculations are called only for ComputedValues that will be tracked anyway by derivation.
  * That is because we assume that if first x dependencies of derivation doesn't change
  * than derivation shuold run the same way up until accessing x-th dependency.
