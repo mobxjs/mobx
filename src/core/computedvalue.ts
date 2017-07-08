@@ -84,7 +84,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	public get(): T {
 		invariant(!this.isComputing, `Cycle detected in computation ${this.name}`, this.derivation);
 		if (globalState.inBatch === 0) {
-			// just for small optimization, can be droped for simplicity
+			// just for small optimization, can be dropped for simplicity
 			// computed called outside of any mobx stuff. batch observing shuold be enough, don't need tracking
 			// because it will never be called again inside this batch
 			startBatch();
