@@ -44,15 +44,29 @@ export function createTransformer<A, B>(transformer: ITransformer<A, B>, onClean
 	};
 }
 
-function getMemoizationId(object) {
-	if(typeof object === 'string' || typeof object === 'number')
-		return object
-	if (object === null  || typeof object !== "object")
-		throw new Error("[mobx] transform expected some kind of object or primitive value, got: " + object);
-	let tid = object.$transformId;
-	if (tid === undefined) {
-		tid = getNextId();
-		addHiddenProp(object, "$transformId", tid);
-	}
-	return tid;
+function getMemoizationId(object): string {
+	switch (typeof object) {
+		case "symbol": throw new Error("Symbols are not supported as createTransformer arguments.");
+		case "undefined": return "undefined";
+
+        case "string":
+        case "number":
+        case "boolean":
+		{
+            // The type is added such that f("1") !== f(1)
+            return `${typeof object}:${object.toString()}`;
+		}
+
+        default: {
+            if (object === null) return "null";
+
+			let tid = object.$transformId;
+			if (tid === undefined) {
+				tid = getNextId();
+				addHiddenProp(object, "$transformId", tid);
+			}
+
+            return tid.toString();
+        }
+    }
 }
