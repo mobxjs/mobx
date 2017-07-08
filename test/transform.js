@@ -1234,3 +1234,69 @@ test('transform with Symbol key', function(t) {
 
 	t.end();
 });
+
+test('transform with zero keys', function(t) {
+	m.extras.resetGlobalState();
+
+	var observableObjs = m.observable.shallowArray();
+	var objs = [];
+
+	var factory = m.createTransformer(function() {
+		return {};
+	});
+
+	m.autorun(function() {
+		objs = observableObjs.map(function(obj) {
+			return factory();
+		});
+	});
+
+	observableObjs.push(undefined);
+	observableObjs.push(undefined);
+	t.equal(objs[0], objs[1]);
+
+	t.end();
+});
+
+test('transform with two keys', function(t) {
+	m.extras.resetGlobalState();
+
+	var observableObjs = m.observable.shallowArray();
+	var objs = [];
+
+	var factory = m.createTransformer(function(a, b) {
+		return `${a}, ${b}`;
+	});
+
+	m.autorun(function() {
+		objs = observableObjs.map(function(pair) {
+			return factory(pair[0], pair[1]);
+		});
+	});
+
+	observableObjs.push([1, 1]);
+	observableObjs.push([1, 1]);
+	t.equal(objs[0], objs[1]);
+
+	observableObjs.clear();
+	observableObjs.push([1, 1]);
+	observableObjs.push([0, 0]);
+	t.notEqual(objs[0], objs[1]);
+
+	observableObjs.clear();
+	observableObjs.push([1, 1]);
+	observableObjs.push([1, 0]);
+	t.notEqual(objs[0], objs[1]);
+
+	observableObjs.clear();
+	observableObjs.push([1, 1]);
+	observableObjs.push([0, 1]);
+	t.notEqual(objs[0], objs[1]);
+
+	observableObjs.clear();
+	observableObjs.push([1]);
+	observableObjs.push([1, 1]);
+	t.notEqual(objs[0], objs[1]);
+
+	t.end();
+});
