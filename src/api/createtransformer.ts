@@ -81,6 +81,8 @@ function getObjectMemoizationId(symbolCache: {}, object): string {
 
 			let tid = object.$transformId as number;
 			if (tid === undefined) {
+				if (!Object.isExtensible(object)) throw new Error("Transformed objects must be extensible.");
+
 				tid = getNextId();
 				addHiddenProp(object, "$transformId", tid);
 			}
