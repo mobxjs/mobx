@@ -1053,3 +1053,184 @@ test('transform with primitive key', function(t) {
 	t.end();
 });
 
+test('transform with object key as reference', function(t) {
+	m.extras.resetGlobalState();
+
+	var observableObjs = m.observable.shallowArray();
+	var objs = [];
+
+	var factory = m.createTransformer(function(key) {
+		return {};
+	});
+
+	m.autorun(function() {
+		objs = observableObjs.map(function(obj) {
+			return factory(obj);
+		});
+	});
+
+	const obj1 = {};
+	const obj2 = {};
+
+	observableObjs.push(obj1);
+	observableObjs.push(obj1);
+	t.equal(objs[0], objs[1]);
+	
+	observableObjs.clear();
+	observableObjs.push(obj1);
+	observableObjs.push(obj2);
+	t.notEqual(objs[0], objs[1]);
+
+	t.end();
+});
+
+test('transform with array key as reference', function(t) {
+	m.extras.resetGlobalState();
+
+	var observableObjs = m.observable.shallowArray();
+	var objs = [];
+
+	var factory = m.createTransformer(function(key) {
+		return {};
+	});
+
+	m.autorun(function() {
+		objs = observableObjs.map(function(obj) {
+			return factory(obj);
+		});
+	});
+
+	const obj1 = [];
+	const obj2 = [];
+
+	observableObjs.push(obj1);
+	observableObjs.push(obj1);
+	t.equal(objs[0], objs[1]);
+	
+	observableObjs.clear();
+	observableObjs.push(obj1);
+	observableObjs.push(obj2);
+	t.notEqual(objs[0], objs[1]);
+
+	t.end();
+});
+
+test('transform with null key', function(t) {
+	m.extras.resetGlobalState();
+
+	var observableObjs = m.observable.shallowArray();
+	var objs = [];
+
+	var factory = m.createTransformer(function(key) {
+		return {};
+	});
+
+	m.autorun(function() {
+		objs = observableObjs.map(function(obj) {
+			return factory(obj);
+		});
+	});
+
+	observableObjs.push(null);
+	observableObjs.push(null);
+	t.equal(objs[0], objs[1]);
+
+	observableObjs.clear();
+	observableObjs.push(null);
+	observableObjs.push("null");
+	t.notEqual(objs[0], objs[1]);
+
+	t.end();
+});
+
+test('transform with undefined key', function(t) {
+	m.extras.resetGlobalState();
+
+	var observableObjs = m.observable.shallowArray();
+	var objs = [];
+
+	var factory = m.createTransformer(function(key) {
+		return {};
+	});
+
+	m.autorun(function() {
+		objs = observableObjs.map(function(obj) {
+			return factory(obj);
+		});
+	});
+
+	observableObjs.push(undefined);
+	observableObjs.push(undefined);
+	t.equal(objs[0], objs[1]);
+
+	observableObjs.clear();
+	observableObjs.push(undefined);
+	observableObjs.push("undefined");
+	t.notEqual(objs[0], objs[1]);
+
+	t.end();
+});
+
+test('transform with boolean key', function(t) {
+	m.extras.resetGlobalState();
+
+	var observableObjs = m.observable.shallowArray();
+	var objs = [];
+
+	var factory = m.createTransformer(function(key) {
+		return {};
+	});
+
+	m.autorun(function() {
+		objs = observableObjs.map(function(obj) {
+			return factory(obj);
+		});
+	});
+
+	observableObjs.push(true);
+	observableObjs.push(true);
+	t.equal(objs[0], objs[1]);
+	
+	observableObjs.clear();
+	observableObjs.push(true);
+	observableObjs.push(false);
+	t.notEqual(objs[0], objs[1]);
+
+	observableObjs.clear();
+	observableObjs.push(true);
+	observableObjs.push("true");
+	t.notEqual(objs[0], objs[1]);
+
+	t.end();
+});
+
+test('transform with Symbol key', function(t) {
+	m.extras.resetGlobalState();
+
+	var observableObjs = m.observable.shallowArray();
+	var objs = [];
+
+	var factory = m.createTransformer(function(key) {
+		return {};
+	});
+
+	m.autorun(function() {
+		objs = observableObjs.map(function(obj) {
+			return factory(obj);
+		});
+	});
+
+	const symbol1 = Symbol();
+	const symbol2 = Symbol();
+
+	observableObjs.push(symbol1);
+	observableObjs.push(symbol1);
+	t.equal(objs[0], objs[1]);
+	
+	observableObjs.clear();
+	observableObjs.push(symbol1);
+	observableObjs.push(symbol2);
+	t.notEqual(objs[0], objs[1]);
+
+	t.end();
+});
