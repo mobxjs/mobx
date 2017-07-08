@@ -8,56 +8,64 @@ export function createTransformer<A, B>(transformer: ITransformer<A, B>, onClean
 	invariant(typeof transformer === "function" && transformer.length < 2, "createTransformer expects a function that accepts one argument");
 
 	// Memoizes: object id -> reactive view that applies transformer to the object
-	let objectCache: {[id: number]: ComputedValue<B>} = {};
+	let objectCache: {[key: string]: ComputedValue<B>} = {};
+	let symbolCache: {} = {};
 
 	// If the resetId changes, we will clear the object cache, see #163
 	// This construction is used to avoid leaking refs to the objectCache directly
 	let resetId = globalState.resetId;
 
-	// Local transformer class specifically for this transformer
-	class Transformer extends ComputedValue<B> {
-		constructor(private sourceIdentifier: string, private sourceObject: A) {
-			super(() => transformer(sourceObject), undefined, false, `Transformer-${(<any>transformer).name}-${sourceIdentifier}`, undefined);
-		}
-		onBecomeUnobserved() {
-			const lastValue = this.value;
-			super.onBecomeUnobserved();
-			delete objectCache[this.sourceIdentifier];
-			if (onCleanup)
-				onCleanup(lastValue as any, this.sourceObject);
-		}
-	}
-
 	return (object: A) => {
 		if (resetId !== globalState.resetId) {
 			objectCache = {};
+			symbolCache = {};
 			resetId = globalState.resetId;
 		}
 
-		const identifier = getMemoizationId(object);
+		const identifier = getMemoizationId(symbolCache, object);
 		let reactiveTransformer = objectCache[identifier];
 		if (reactiveTransformer)
 			return reactiveTransformer.get();
+
 		// Not in cache; create a reactive view
-		reactiveTransformer = objectCache[identifier] = new Transformer(identifier, object);
+		objectCache[identifier] = new selfCleaningValue(() => transformer(object), lastValue => {
+			delete objectCache[identifier];
+			if (onCleanup) onCleanup(lastValue, object);
+		});
+		reactiveTransformer = objectCache[identifier];
+
 		return reactiveTransformer.get();
 	};
 }
 
-function getMemoizationId(...objects: any[]): string {
-	// Get a key for each arg
-    const keys = objects.map(getObjectMemoizationId);
+// Calls onCleanup from onBecomeUnobserved
+// Used to power the main transform cache and the symbol id cache 
+class selfCleaningValue<T> extends ComputedValue<T> {
+	constructor(
+		private f: () => T,
+		private onCleanup?: (lastValue: T) => void
+	) {
+		super(f, undefined, false, "");
+	}
 
-    // Get the lengths of each key
+	onBecomeUnobserved() {
+		const lastValue = this.value;
+		super.onBecomeUnobserved();
+		if (this.onCleanup)
+			this.onCleanup(lastValue as T);
+	}
+}
+
+function getMemoizationId(symbolCache: {}, ...objects: any[]): string {
+	// The key lengths are added to the front so that f("a", "b") !== f("ab")
+	const keys = objects.map(obj => getObjectMemoizationId(symbolCache, obj));
     const keyLengths = keys.map(key => key.length);
-
-    // The key lengths are added to the front so that f("a", "b") !== f("ab")
     return `${keyLengths.join(",")}:${keys.join("")}`;
 }
 
-function getObjectMemoizationId(object): string {
+function getObjectMemoizationId(symbolCache: {}, object): string {
 	switch (typeof object) {
-		case "symbol": throw new Error("Symbols are not supported as createTransformer arguments.");
+		case "symbol": return getSymbolId(object, symbolCache);
 		case "undefined": return "undefined";
 
         case "string":
@@ -80,4 +88,19 @@ function getObjectMemoizationId(object): string {
             return tid.toString();
         }
     }
+}
+
+
+// // The libs don't contain Symbol, so we're stuck using any here
+function getSymbolId(symbol: any, symbolCache: {}) {
+	let cachedSymbolValue = symbolCache[symbol] as selfCleaningValue<string>;
+
+	if (!cachedSymbolValue) {
+		const key = getNextId().toString();
+		cachedSymbolValue = symbolCache[symbol] = new selfCleaningValue(() => key, () => {
+			delete symbolCache[symbol];
+		});
+	}
+
+	return cachedSymbolValue.get();
 }
