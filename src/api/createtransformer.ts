@@ -44,7 +44,18 @@ export function createTransformer<A, B>(transformer: ITransformer<A, B>, onClean
 	};
 }
 
-function getMemoizationId(object): string {
+function getMemoizationId(...objects: any[]): string {
+	// Get a key for each arg
+    const keys = objects.map(getObjectMemoizationId);
+
+    // Get the lengths of each key
+    const keyLengths = keys.map(key => key.length);
+
+    // The key lengths are added to the front so that f("a", "b") !== f("ab")
+    return `${keyLengths.join(",")}:${keys.join("")}`;
+}
+
+function getObjectMemoizationId(object): string {
 	switch (typeof object) {
 		case "symbol": throw new Error("Symbols are not supported as createTransformer arguments.");
 		case "undefined": return "undefined";
@@ -60,7 +71,7 @@ function getMemoizationId(object): string {
         default: {
             if (object === null) return "null";
 
-			let tid = object.$transformId;
+			let tid = object.$transformId as number;
 			if (tid === undefined) {
 				tid = getNextId();
 				addHiddenProp(object, "$transformId", tid);
