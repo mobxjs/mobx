@@ -19,7 +19,7 @@ export function createTransformer<F extends (...args: any[]) => R, R>(transforme
 	// This construction is used to avoid leaking refs to the objectCache directly
 	let resetId = globalState.resetId;
 
-	return ((...objects: any[]) => {
+	return (function (...objects: any[]) {
 		// Limit the length to that of the transformer
 		// Without this, use in functions like .map() break because of extra unwanted arguments
 		objects = objects.slice(0, transformer.length);
@@ -36,7 +36,7 @@ export function createTransformer<F extends (...args: any[]) => R, R>(transforme
 			return reactiveTransformer.get();
 
 		// Not in cache; create a reactive view
-		objectCache[identifier] = new cleanupValue(() => transformer(...objects), lastValue => {
+		objectCache[identifier] = new cleanupValue(() => transformer.apply(this, objects), lastValue => {
 			delete objectCache[identifier];
 			if (onCleanup) onCleanup(lastValue, ...objects);
 		});
