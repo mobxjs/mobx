@@ -1300,3 +1300,79 @@ test('transform with two keys', function(t) {
 
 	t.end();
 });
+
+test('transform class method and maintain this value', function(t) {
+	m.extras.resetGlobalState();
+
+	var observableObjs = m.observable.shallowArray();
+	var objs = [];
+
+	class Multiplier {
+		constructor(multiple) {
+			this.multiple = multiple;
+			this.multiply = m.createTransformer(this.multiply);
+		}
+
+		multiply(n) {
+			return [n * this.multiple];
+		}
+	}
+
+	const multiplier = new Multiplier(10);
+
+	m.autorun(function() {
+		objs = observableObjs.map(function(n) {
+			return multiplier.multiply(n);
+		});
+	});
+
+	observableObjs.push(10);
+	observableObjs.push(10);
+	t.equal(objs[0][0], 100);
+	t.equal(objs[0], objs[1]);
+
+	t.end();
+});
+
+test('transform base class method and work with different this values', function(t) {
+	m.extras.resetGlobalState();
+
+	var observableObjs = m.observable.shallowArray();
+	var objs = [];
+
+	class Multiplier {
+		constructor(multiple) {
+			this.multiple = multiple;
+		}
+
+		multiply(n) {
+			return n * this.multiple;
+		}
+	}
+	Multiplier.prototype.multiply = m.createTransformer(Multiplier.prototype.multiply);
+
+	class Doubler extends Multiplier {
+		constructor() {
+			super(2);
+		}
+	}
+
+	class Tripler extends Multiplier {
+		constructor() {
+			super(3);
+		}
+	}
+
+	m.autorun(function() {
+		objs = observableObjs.map(function(multiplier) {
+			return multiplier.multiply(10);
+		});
+	});
+
+	observableObjs.push(new Doubler());
+	observableObjs.push(new Tripler());
+	t.equal(objs[0], 20);
+	t.equal(objs[1], 30);
+
+	t.end();
+});
