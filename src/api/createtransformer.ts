@@ -22,7 +22,8 @@ export function createTransformer<F extends (...args: any[]) => R, R>(transforme
 	return (function (...objects: any[]) {
 		// Limit the length to that of the transformer
 		// Without this, use in functions like .map() break because of extra unwanted arguments
-		objects = objects.slice(0, transformer.length);
+		// this is added at the start so that createTransformer can be run on prototypes
+		const memoizeObjects = [this, ...objects.slice(0, transformer.length)];
 
 		if (resetId !== globalState.resetId) {
 			objectCache = {};
@@ -30,7 +31,7 @@ export function createTransformer<F extends (...args: any[]) => R, R>(transforme
 			resetId = globalState.resetId;
 		}
 
-		const identifier = getMemoizationId(symbolCache, objects);
+		const identifier = getMemoizationId(symbolCache, memoizeObjects);
 		let reactiveTransformer = objectCache[identifier];
 		if (reactiveTransformer)
 			return reactiveTransformer.get();
