@@ -1448,3 +1448,13 @@ test('transform class constructor', function(t) {
 
 	t.end();
 });
+
+test('maintain function arity', function(t) {
+	m.extras.resetGlobalState();
+
+	t.equal(m.createTransformer(() => {}).length, 0);
+	t.equal(m.createTransformer((a) => {}).length, 1);
+	t.equal(m.createTransformer((a, b) => {}).length, 2);
+
+	t.end();
+});
