@@ -5,6 +5,7 @@ import {globalState} from "../core/globalstate";
 export type ITransformer<A, B> = (object: A) => B;
 
 // Doesn't currently support the onCleanup for multiple arguments because I don't know how to type it
+export function createTransformer<F extends new (...args: any[]) => R, R>(transformer: F): F
 export function createTransformer<F extends (...args: any[]) => R, R>(transformer: F): F
 export function createTransformer<T, R>(transformer: ITransformer<T, R>, onCleanup: (resultObject: R | undefined, sourceObject?: T) => void): ITransformer<T, R>
 export function createTransformer<F extends (...args: any[]) => R, R>(transformer: F, onCleanup?: (resultObject: R, ...sourceObjects: any[]) => void): F {
@@ -19,11 +20,17 @@ export function createTransformer<F extends (...args: any[]) => R, R>(transforme
 	// This construction is used to avoid leaking refs to the objectCache directly
 	let resetId = globalState.resetId;
 
-	return (function (...objects: any[]) {
+	return (function transformedWrapper (...objects: any[]) {
+		// Poor man's new.target check
+		const constructorCall = this instanceof transformedWrapper && !this.$constructed;
+		if (constructorCall) addHiddenProp(this, "$constructed", true);
+
 		// Limit the length to that of the transformer
 		// Without this, use in functions like .map() break because of extra unwanted arguments
-		// this is added at the start so that createTransformer can be run on prototypes
-		const memoizeObjects = [this, ...objects.slice(0, transformer.length)];
+		// this is added (when not constructed) so that createTransformer can be run on prototypes
+		const memoizeObjects = constructorCall
+			? objects.slice(0, transformer.length)
+			: [this, ...objects.slice(0, transformer.length)]
 
 		if (resetId !== globalState.resetId) {
 			objectCache = {};
@@ -37,10 +44,19 @@ export function createTransformer<F extends (...args: any[]) => R, R>(transforme
 			return reactiveTransformer.get();
 
 		// Not in cache; create a reactive view
-		objectCache[identifier] = new cleanupValue(() => transformer.apply(this, objects), lastValue => {
-			delete objectCache[identifier];
-			if (onCleanup) onCleanup(lastValue, ...objects);
-		});
+		objectCache[identifier] = new cleanupComputedValue(
+			() => {
+				// Calls the transformer function
+				return constructorCall
+					? new (transformer as any)(...objects)
+					: transformer.apply(this, objects);
+			},
+			lastValue => {
+				// Removes values from the cache when no longer needed
+				delete objectCache[identifier];
+				if (onCleanup) onCleanup(lastValue, ...objects);
+			});
+
 		reactiveTransformer = objectCache[identifier];
 
 		return reactiveTransformer.get();
@@ -49,7 +65,7 @@ export function createTransformer<F extends (...args: any[]) => R, R>(transforme
 
 // Calls onCleanup from onBecomeUnobserved
 // Used to power the main transform cache and the symbol id cache 
-class cleanupValue<T> extends ComputedValue<T> {
+class cleanupComputedValue<T> extends ComputedValue<T> {
 	constructor(
 		private f: () => T,
 		private onCleanup?: (lastValue: T) => void
@@ -103,11 +119,11 @@ function getObjectMemoizationId(symbolCache: {}, object): string {
 
 // The libs don't contain Symbol, so we're stuck using any here
 function getSymbolId(symbol: any, symbolCache: {}) {
-	let cachedSymbolValue = symbolCache[symbol] as cleanupValue<string>;
+	let cachedSymbolValue = symbolCache[symbol] as cleanupComputedValue<string>;
 
 	if (!cachedSymbolValue) {
 		const key = getNextId().toString();
-		cachedSymbolValue = symbolCache[symbol] = new cleanupValue(() => key, () => {
+		cachedSymbolValue = symbolCache[symbol] = new cleanupComputedValue(() => key, () => {
 			delete symbolCache[symbol];
 		});
 	}
