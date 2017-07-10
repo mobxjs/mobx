@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="3.3" data-basepath=".." data-revision="Wed Jun 21 2017 09:35:51 GMT+0200 (CEST)">
+    <div class="book" data-level="3.3" data-basepath=".." data-revision="Mon Jul 10 2017 21:26:48 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -888,6 +888,7 @@
 Observable maps are very useful if you don&apos;t want to react just to the change of a specific entry, but also to the addition or removal of entries.
 Optionally takes an object, entries array or string keyed <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" target="_blank">ES6 map</a> with initial values.
 Unlike ES6 maps, only strings are accepted as keys.</p>
+<p>Using ES6 Map constructor you can initialize observable map using <code>observable(new Map())</code> or for class properties using the decorator <code>@observable map = new Map()</code>.</p>
 <p>The following methods are exposed according to the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" target="_blank">ES6 Map spec</a>:</p>
 <ul>
 <li><code>has(key)</code> Returns whether this map has an entry the provided key. Note that the presence of a key is an observable fact in itself.</li>

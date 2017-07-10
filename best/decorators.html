@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="5" data-basepath=".." data-revision="Wed Jun 21 2017 09:35:51 GMT+0200 (CEST)">
+    <div class="book" data-level="5" data-basepath=".." data-revision="Mon Jul 10 2017 21:26:48 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -897,7 +897,7 @@
 <h2 id="enabling-decorators">Enabling decorators</h2>
 <p>If you want to use decorators follow the following steps.</p>
 <p><strong>TypeScript</strong></p>
-<p>Enable the compiler option <code>experimentalDecorators</code> in <code>tsconfig.json</code> or pass it as flag <code>--experimentalDecorators</code> to the compiler.</p>
+<p>Enable the compiler option <code>experimentalDecorators</code> in <code>tsconfig.json</code> or pass it as flag <code>--experimentalDecorators</code> to the compiler. You must target <code>es5</code>+ (es5, es6, ...) with <code>target</code> option or by <code>--target</code> flag.</p>
 <p><strong>Babel:</strong></p>
 <p>Install support for decorators: <code>npm i --save-dev babel-plugin-transform-decorators-legacy</code>. And enable it in your <code>.babelrc</code> file:</p>
 <pre><code>{
@@ -915,6 +915,7 @@ Having issues with the babel setup? Check this <a href="https://github.com/mobxj
 }
 </code></pre><h2 id="limitations-on-decorators">Limitations on decorators</h2>
 <ul>
+<li>typescript target must be es5 minimum</li>
 <li>reflect-metadata <a href="https://github.com/mobxjs/mobx/issues/534" target="_blank">https://github.com/mobxjs/mobx/issues/534</a></li>
 <li>decorators are not supported out of the box in <code>create-react-app</code>. To fix this, you can either eject, or use <a href="https://www.npmjs.com/package/custom-react-scripts" target="_blank">custom-react-scripts</a> for <code>create-react-app</code> (<a href="https://medium.com/@kitze/configure-create-react-app-without-ejecting-d8450e96196a#.n6xx12p5c" target="_blank">blog</a>)</li>
 <li><del>decorators are currently not yet support in Next.JS <a href="https://github.com/zeit/next.js/issues/26" target="_blank">issue</a></del> Decorators are now supported in Next.JS. Example: <a href="https://github.com/zeit/next.js/tree/master/examples/with-mobx" target="_blank">https://github.com/zeit/next.js/tree/master/examples/with-mobx</a></li>

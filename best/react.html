@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="4" data-basepath=".." data-revision="Wed Jun 21 2017 09:35:51 GMT+0200 (CEST)">
+    <div class="book" data-level="4" data-basepath=".." data-revision="Mon Jul 10 2017 21:26:48 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -1029,9 +1029,9 @@ extendObservable(message, {
 <p>This will <strong>not</strong> react. MobX will not react to observable properties that did not exist when tracking started.
 If the two statements are swapped, or if any other observable causes the <code>autorun</code> to re-run, the <code>autorun</code> will start tracking the <code>postDate</code> as well.</p>
 <h4 id="correct-using-not-yet-existing-map-entries">Correct: using not yet existing map entries</h4>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> twitterUrls = observable(asMap({
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> twitterUrls = observable.map({
     <span class="hljs-string">&quot;John&quot;</span>: <span class="hljs-string">&quot;twitter.com/johnny&quot;</span>
-}))
+})
 
 autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(twitterUrls.get(<span class="hljs-string">&quot;Sara&quot;</span>))
