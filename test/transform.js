@@ -1334,6 +1334,40 @@ test('transform class method and maintain this value', function(t) {
 	t.end();
 });
 
+test('transform static class method', function(t) {
+	m.extras.resetGlobalState();
+
+	var observableObjs = m.observable.shallowArray();
+	var objs = [];
+
+	class Doubler {
+		static double(n) {
+			return [n * 2];
+		}
+	}
+	Doubler.double = m.createTransformer(Doubler.double);
+
+	m.autorun(function() {
+		objs = observableObjs.map(function(n) {
+			return Doubler.double(n);
+		});
+	});
+
+	observableObjs.push(10);
+	observableObjs.push(10);
+	t.equal(objs[0][0], 20);
+	t.equal(objs[0], objs[1]);
+
+	observableObjs.clear();
+	observableObjs.push(5);
+	observableObjs.push(10);
+	t.equal(objs[0][0], 10);
+	t.equal(objs[1][0], 20);
+	t.notEqual(objs[0], objs[1]);
+
+	t.end();
+});
+
 test('transform base class method and work with different this values', function(t) {
 	m.extras.resetGlobalState();
 
