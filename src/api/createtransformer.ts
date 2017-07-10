@@ -38,7 +38,7 @@ export function createTransformer<F extends (...args: any[]) => R, R>(transforme
 	// This construction is used to avoid leaking refs to the objectCache directly
 	let resetId = globalState.resetId;
 
-	return (function transformedWrapper (...objects: any[]) {
+	function transformedWrapper (...objects: any[]) {
 		// Poor man's new.target check
 		const constructorCall = this instanceof transformedWrapper && !this.$constructed;
 		if (constructorCall) addHiddenProp(this, "$constructed", true);
@@ -78,7 +78,12 @@ export function createTransformer<F extends (...args: any[]) => R, R>(transforme
 		reactiveTransformer = objectCache[identifier];
 
 		return reactiveTransformer.get();
-	}) as F;
+	}
+
+	// Give the returned function the same arity as the input
+	Object.defineProperty(transformedWrapper, "length", {value: transformer.length});
+	
+	return transformedWrapper as F;
 }
 
 // Calls onCleanup from onBecomeUnobserved
