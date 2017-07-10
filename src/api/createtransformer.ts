@@ -4,6 +4,24 @@ import {globalState} from "../core/globalstate";
 
 export type ITransformer<A, B> = (object: A) => B;
 
+// Method decorator
+export function transformer<F extends (...args: any[]) => R, R>(transformer: F): F
+export function transformer<T>(object: T, name: keyof T, descriptor?: PropertyDescriptor): void;
+export function transformer() {
+	switch(arguments.length) {
+		case 1: return createTransformer(arguments[0]);
+		case 3: {
+			const object = arguments[0] as {};
+			const name = arguments[1] as string;
+			const descriptor = arguments[2] as PropertyDescriptor;
+
+			descriptor.value = createTransformer(descriptor.value);
+
+			return descriptor;
+		}
+	}
+}
+
 // Doesn't currently support the onCleanup for multiple arguments because I don't know how to type it
 export function createTransformer<F extends new (...args: any[]) => R, R>(transformer: F): F
 export function createTransformer<F extends (...args: any[]) => R, R>(transformer: F): F
