@@ -1376,3 +1376,41 @@ test('transform base class method and work with different this values', function
 
 	t.end();
 });
+
+test('transform class constructor', function(t) {
+	m.extras.resetGlobalState();
+
+	var observableObjs = m.observable.shallowArray();
+	var objs = [];
+
+	class Person {
+		constructor(name) {
+			this.name = name;
+		}
+	}
+
+	const transformedPersonConstructor = m.createTransformer(Person);
+
+	m.autorun(function() {
+		objs = observableObjs.map(function(name) {
+			return new transformedPersonConstructor(name);
+		});
+	});
+
+	observableObjs.push("Jeremy");
+	observableObjs.push("Jeremy");
+	t.equal(objs[0], objs[1]);
+	t.equal(objs[0].name, "Jeremy");
+	t.equal(objs[0] instanceof Person, true);
+
+	observableObjs.clear();
+	observableObjs.push("Jeremy");
+	observableObjs.push("Theresa");
+	t.notEqual(objs[0], objs[1]);
+	t.equal(objs[0].name, "Jeremy");
+	t.equal(objs[1].name, "Theresa");
+	t.equal(objs[0] instanceof Person, true);
+	t.equal(objs[1] instanceof Person, true);
+
+	t.end();
+});
