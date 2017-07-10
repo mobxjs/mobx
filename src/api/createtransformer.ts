@@ -30,9 +30,9 @@ export function createTransformer<F extends (...args: any[]) => R, R>(transforme
 	invariant(typeof transformer === "function", "createTransformer expects a function");
 
 	// Memoizes: object id -> reactive view that applies transformer to the object
-	let objectCache: {[key: string]: ComputedValue<R>} = {};
+	let objectCache: {[key: string]: ComputedValue<R>} = Object.create(null);
 	// Caches symbol -> string key
-	let symbolCache: {} = {};
+	let symbolCache: {} = Object.create(null);
 
 	// If the resetId changes, we will clear the object cache, see #163
 	// This construction is used to avoid leaking refs to the objectCache directly
