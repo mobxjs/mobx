@@ -42,6 +42,7 @@ test('correct api should be exposed', function(t) {
 		'spy',
 		'toJS',
 		'transaction',
+		'transformer',
 		'untracked',
 		'useStrict',
 		'when',

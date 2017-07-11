@@ -1,6 +1,6 @@
 /// <reference path='tape.d.ts' />
 import {
-    observe, computed, observable, autorun, autorunAsync, extendObservable, action,
+    observe, computed, observable, autorun, autorunAsync, extendObservable, action, transformer,
     IObservableObject, IObservableArray, IArrayChange, IArraySplice, IArrayWillChange, IArrayWillSplice,
     IObservableValue, isObservable, isObservableObject,
     extras, Atom, transaction, IObjectChange, spy, useStrict, isAction
@@ -1143,3 +1143,67 @@ test("1072 - @observable without initial value and observe before first access",
 	observe(user, 'loginCount', () => {});
 	t.end()
 })
+
+test('@transformer on class method', (t) => {
+	extras.resetGlobalState();
+
+	var observableObjs = observable.shallowArray();
+	var objs = new Array<number[]>();
+
+	class Multiplier {
+		constructor(private multiple: number) {
+		}
+
+		@transformer multiply(n: number) {
+			return [n * this.multiple];
+		}
+	}
+
+	const multiplier = new Multiplier(10);
+
+	autorun(function() {
+		objs = observableObjs.map(function(n: number) {
+			return multiplier.multiply(n);
+		});
+	});
+
+	observableObjs.push(10);
+	observableObjs.push(10);
+	t.equal(objs[0][0], 100);
+	t.equal(objs[0], objs[1]);
+
+	t.end();
+});
+
+test('@transformer on static class method', (t) => {
+	extras.resetGlobalState();
+
+	var observableObjs = observable.shallowArray();
+	var objs = new Array<number[]>();
+
+	class Doubler {
+		@transformer static double(n: number) {
+			return [n * 2];
+		}
+	}
+
+	autorun(function() {
+		objs = observableObjs.map(function(n: number) {
+			return Doubler.double(n);
+		});
+	});
+
+	observableObjs.push(10);
+	observableObjs.push(10);
+	t.equal(objs[0][0], 20);
+	t.equal(objs[0], objs[1]);
+
+	observableObjs.clear();
+	observableObjs.push(5);
+	observableObjs.push(10);
+	t.equal(objs[0][0], 10);
+	t.equal(objs[1][0], 20);
+	t.notEqual(objs[0], objs[1]);
+
+	t.end();
+});
