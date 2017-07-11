@@ -1,3 +1,7 @@
+# 3.2.1
+
+* Introduced customizable value comperators to reactions and computed values. `reaction` and `computed` now support an additional option, `equals`, which takes a comparision function. See [#951](https://github.com/mobxjs/mobx/pull/951/) by @jamiewinder. Fixes #802 and #943. See the updated [`computed` docs](https://mobx.js.org/refguide/computed-decorator.html) for more details.
+
 # 3.2.0
 
 * MobX will warn again when there are multiple instances of MobX loaded, as this lead to often to confusing bugs if the project setup was not properly. The signal mobx that multiple instances are loaded on purpose, use `mobx.extras.runInSandbox`. See [#1082](https://github.com/mobxjs/mobx/issues/1082) for details.
