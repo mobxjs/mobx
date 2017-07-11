@@ -1,5 +1,5 @@
 import {observable} from "../api/observable";
-import {ObservableMap, IMapEntries, IKeyValueMap} from "../types/observablemap";
+import {ObservableMap, IMapEntries, IKeyValueMap} from "./observablemap";
 import {deprecated} from "../utils/utils";
 
 export function asReference<T>(value: T): T {

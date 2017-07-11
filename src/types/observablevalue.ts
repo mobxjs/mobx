@@ -4,7 +4,7 @@ import {Lambda, getNextId, createInstanceofPredicate, primitiveSymbol, toPrimiti
 import {hasInterceptors, IInterceptable, IInterceptor, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd, spyReport} from "../core/spy";
-import {IEnhancer} from "../types/modifiers";
+import {IEnhancer} from "./modifiers";
 
 export interface IValueWillChange<T> {
 	object: any;

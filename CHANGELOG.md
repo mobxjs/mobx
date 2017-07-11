@@ -1,3 +1,7 @@
+# 3.2.0
+
+* MobX will warn again when there are multiple instances of MobX loaded, as this lead to often to confusing bugs if the project setup was not properly. The signal mobx that multiple instances are loaded on purpose, use `mobx.extras.runInSandbox`. See [#1082](https://github.com/mobxjs/mobx/issues/1082) for details.
+
 # 3.1.17
 
 * Improved typings of `IObservableArray.intercept`: use more restrictive types for `change` parameter of `handler`, by @bvanreeven

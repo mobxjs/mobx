@@ -11,7 +11,7 @@ export interface IDepTreeNode {
 export interface IObservable extends IDepTreeNode {
 	diffValue: number;
 	/**
-	 * Id of the derivation *run* that last accesed this observable.
+	 * Id of the derivation *run* that last accessed this observable.
 	 * If this id equals the *run* id of the current derivation,
 	 * the dependency is already established
 	 */

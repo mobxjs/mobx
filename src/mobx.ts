@@ -63,7 +63,7 @@ export { Lambda, isArrayLike                                  } from "./utils/ut
 export { Iterator                                             } from "./utils/iterable";
 export { IObserverTree, IDependencyTree                       } from "./api/extras";
 
-import { resetGlobalState, shareGlobalState, getGlobalState } from "./core/globalstate";
+import { resetGlobalState, shareGlobalState, getGlobalState, isolateGlobalState } from "./core/globalstate";
 import { IDerivation } from "./core/derivation";
 import { IDepTreeNode } from "./core/observable";
 import { IObserverTree, IDependencyTree, getDependencyTree, getObserverTree } from "./api/extras";
@@ -98,6 +98,7 @@ export const extras = {
 	onReactionError,
 	reserveArrayBuffer, // See #734
 	resetGlobalState,
+	isolateGlobalState,
 	shareGlobalState,
 	spyReport,
 	spyReportEnd,

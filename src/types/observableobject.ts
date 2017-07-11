@@ -5,8 +5,8 @@ import {runLazyInitializers} from "../utils/decorators";
 import {hasInterceptors, IInterceptable, registerInterceptor, interceptChange} from "./intercept-utils";
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
-import {IEqualsComparer, comparer} from "../types/comparer";
-import {IEnhancer, isModifierDescriptor, IModifierDescriptor} from "../types/modifiers";
+import {IEqualsComparer, comparer} from "./comparer";
+import {IEnhancer, isModifierDescriptor, IModifierDescriptor} from "./modifiers";
 import {isAction, defineBoundAction} from "../api/action";
 import {getMessage} from "../utils/messages";
 

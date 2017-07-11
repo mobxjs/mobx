@@ -130,7 +130,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 		const messageToUser = getMessage("m037");
 
 		console.error(message || messageToUser /* latter will not be true, make sure uglify doesn't remove */, error);
-			/** If debugging brough you here, please, read the above message :-). Tnx! */
+			/** If debugging brought you here, please, read the above message :-). Tnx! */
 
 		if (isSpyEnabled()) {
 			spyReport({
