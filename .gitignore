@@ -11,6 +11,5 @@ test/perf/perf.txt
 .vscode
 dist/
 .build*/
-yarn.lock
 .idea
 .wp-build*/
