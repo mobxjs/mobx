@@ -4,9 +4,9 @@ import {runLazyInitializers} from "../utils/decorators";
 import {isAtom} from "../core/atom";
 import {isComputedValue} from "../core/computedvalue";
 import {isReaction} from "../core/reaction";
-import {isObservableArray} from "../types/observablearray";
-import {isObservableMap} from "../types/observablemap";
-import {isObservableObject} from "../types/observableobject";
+import {isObservableArray} from "./observablearray";
+import {isObservableMap} from "./observablemap";
+import {isObservableObject} from "./observableobject";
 import {getMessage} from "../utils/messages";
 
 

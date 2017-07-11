@@ -1,6 +1,6 @@
 import {isObservableMap} from "../types/observablemap";
 import {asObservableObject, defineObservablePropertyFromDescriptor} from "../types/observableobject";
-import {isObservable} from "../api/isobservable";
+import {isObservable} from "./isobservable";
 import {invariant, isPropertyConfigurable, hasOwnProperty} from "../utils/utils";
 import {deepEnhancer, referenceEnhancer, IEnhancer} from "../types/modifiers";
 import {getMessage} from "../utils/messages";

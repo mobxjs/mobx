@@ -154,8 +154,8 @@ function bindDependencies(derivation: IDerivation) {
 	derivation.newObserving = null; // newObserving shouldn't be needed outside tracking
 
 	// Go through all new observables and check diffValue: (this list can contain duplicates):
-	//   0: first occurence, change to 1 and keep it
-	//   1: extra occurence, drop it
+	//   0: first occurrence, change to 1 and keep it
+	//   1: extra occurrence, drop it
 	let i0 = 0, l = derivation.unboundDepsCount;
 	for (let i = 0; i < l; i++) {
 		const dep = observing[i];

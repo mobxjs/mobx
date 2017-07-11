@@ -1,4 +1,4 @@
-import {computed} from "../api/computed";
+import {computed} from "./computed";
 import {isComputingDerivation} from "../core/derivation";
 import {getMessage} from "../utils/messages";
 

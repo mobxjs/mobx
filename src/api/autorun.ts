@@ -2,7 +2,7 @@ import {Lambda, getNextId, invariant, valueDidChange, fail} from "../utils/utils
 import {isModifierDescriptor} from "../types/modifiers";
 import {Reaction, IReactionPublic, IReactionDisposer} from "../core/reaction";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
-import {action, isAction} from "../api/action";
+import {action, isAction} from "./action";
 import {getMessage} from "../utils/messages";
 
 /**

@@ -1,5 +1,5 @@
 import {getGlobal, deprecated} from "../utils/utils";
-import {IDerivation, CaughtException} from "./derivation";
+import {IDerivation} from "./derivation";
 import {Reaction} from "./reaction";
 import {IObservable} from "./observable";
 

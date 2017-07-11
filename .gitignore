@@ -13,3 +13,6 @@ dist/
 .build*/
 .idea
 .wp-build*/
+*.iml
+*.ipr
+*.iws

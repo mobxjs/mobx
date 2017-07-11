@@ -5,7 +5,7 @@ import {IObservableArray, ObservableArray} from "../types/observablearray";
 import {createDecoratorForEnhancer} from "./observabledecorator";
 import {isObservable} from "./isobservable";
 import {IObservableObject, asObservableObject} from "../types/observableobject";
-import {extendObservable, extendShallowObservable} from "../api/extendobservable";
+import {extendObservable, extendShallowObservable} from "./extendobservable";
 import {IObservableMapInitialValues, ObservableMap, IMap} from "../types/observablemap";
 import {getMessage} from "../utils/messages";
 
@@ -18,7 +18,7 @@ const refStructDecorator = createDecoratorForEnhancer(refStructEnhancer);
 
 /**
  * Turns an object, array or function into a reactive structure.
- * @param value the value which should become observable.
+ * @param v the value which should become observable.
  */
 function createObservable(v: any = undefined) {
 	// @observable someProp;
