@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2" data-basepath=".." data-revision="Mon Jul 10 2017 21:26:48 GMT+0200 (CEST)">
+    <div class="book" data-level="2" data-basepath=".." data-revision="Tue Jul 11 2017 13:14:09 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -970,9 +970,11 @@ Note that modifiers always &apos;stick&apos; to the property. So they will remai
 <li><code>computed(() =&gt; expression, options)</code></li>
 <li><code>@computed get classProperty() { return expression; }</code></li>
 <li><code>@computed.struct get classProperty() { return expression; }</code></li>
+<li><code>@computed.equals(comparisonMethod) get classProperty() { return expression; }</code></li>
 </ul>
 <p>Creates a computed property. The <code>expression</code> should not have side effects but return a value.
 The expression will automatically be re-evaluated if any observables it uses changes, but only if it is in use by some <em>reaction</em>.</p>
+<p>Comparison method can be used to override the default detection on when something is changed and should be of value <code>(value, value) =&gt; boolean</code>. Built-in comparers are: <code>comparer.identity</code>, <code>comparar.default</code>, <code>comparer.structural</code></p>
 <p><a href="computed-decorator.html">&#xAB;details&#xBB;</a></p>
 <h2 id="actions">Actions</h2>
 <p>Any application has actions. Actions are anything that modify the state.</p>

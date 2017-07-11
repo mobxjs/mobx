@@ -120,9 +120,13 @@ Usage:
 * `computed(() => expression, options)`
 * `@computed get classProperty() { return expression; }`
 * `@computed.struct get classProperty() { return expression; }`
+* `@computed.equals(comparisonMethod) get classProperty() { return expression; }`
+
 
 Creates a computed property. The `expression` should not have side effects but return a value.
 The expression will automatically be re-evaluated if any observables it uses changes, but only if it is in use by some *reaction*.
+
+Comparison method can be used to override the default detection on when something is changed and should be of value `(value, value) => boolean`. Built-in comparers are: `comparer.identity`, `comparar.default`, `comparer.structural`
 
 [&laquo;details&raquo;](computed-decorator.md)
 
