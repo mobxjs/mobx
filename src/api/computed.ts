@@ -6,8 +6,8 @@ import {ComputedValue, IComputedValue} from "../core/computedvalue";
 import {getMessage} from "../utils/messages";
 
 export interface IComputedValueOptions<T> {
-	compareStructural?: boolean;
-	struct?: boolean;
+	compareStructural?: boolean; // TODO: remove in 4.0 in favor of equals
+	struct?: boolean; // TODO: remove in 4.0 in favor of equals
 	equals?: IEqualsComparer<T>;
 	name?: string;
 	setter?: (value: T) => void;

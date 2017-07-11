@@ -2,7 +2,7 @@ import {IObservable, reportObserved, propagateMaybeChanged, propagateChangeConfi
 import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, untrackedStart, untrackedEnd, shouldCompute, CaughtException, isCaughtException} from "./derivation";
 import {globalState} from "./globalstate";
 import {createAction} from "./action";
-import {createInstanceofPredicate, getNextId, valueDidChange, invariant, Lambda, unique, joinStrings, primitiveSymbol, toPrimitive} from "../utils/utils";
+import {createInstanceofPredicate, getNextId, invariant, Lambda, unique, joinStrings, primitiveSymbol, toPrimitive} from "../utils/utils";
 import {isSpyEnabled, spyReport} from "./spy";
 import {autorun} from "../api/autorun";
 import {IEqualsComparer} from "../types/comparer";

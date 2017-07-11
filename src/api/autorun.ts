@@ -154,9 +154,9 @@ export interface IReactionOptions {
 	context?: any;
 	fireImmediately?: boolean;
 	delay?: number;
-	compareStructural?: boolean;
+	compareStructural?: boolean; // TODO: remove in 4.0 in favor of equals
 	/** alias for compareStructural */
-	struct?: boolean;
+	struct?: boolean; // TODO: remove in 4.0 in favor of equals
 	equals?: IEqualsComparer<any>;
 	name?: string;
 }
