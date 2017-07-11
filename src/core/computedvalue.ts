@@ -3,7 +3,7 @@ import {IDerivation, IDerivationState, trackDerivedFunction, clearObserving, unt
 import {globalState} from "./globalstate";
 import {createAction} from "./action";
 import {createInstanceofPredicate, getNextId, valueDidChange, invariant, Lambda, unique, joinStrings, primitiveSymbol, toPrimitive} from "../utils/utils";
-import {isSpyEnabled, spyReport} from "../core/spy";
+import {isSpyEnabled, spyReport} from "./spy";
 import {autorun} from "../api/autorun";
 import {IValueDidChange} from "../types/observablevalue";
 import {getMessage} from "../utils/messages";
@@ -84,9 +84,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 	public get(): T {
 		invariant(!this.isComputing, `Cycle detected in computation ${this.name}`, this.derivation);
 		if (globalState.inBatch === 0) {
-			// just for small optimization, can be droped for simplicity
-			// computed called outside of any mobx stuff. batch observing shuold be enough, don't need tracking
-			// because it will never be called again inside this batch
+			// This is an minor optimization which could be omitted to simplify the code
+			// The computedValue is accessed outside of any mobx stuff. Batch observing should be enough and don't need
+			// tracking as it will never be called again inside this batch.
 			startBatch();
 			if (shouldCompute(this))
 				this.value = this.computeValue(false);
