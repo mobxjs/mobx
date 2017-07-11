@@ -94,15 +94,6 @@ export function objectAssign() {
 	return res;
 }
 
-export function valueDidChange(compareStructural: boolean, oldValue, newValue): boolean {
-	if (typeof oldValue === 'number' && isNaN(oldValue)) {
-		return typeof newValue !== 'number' || !isNaN(newValue);
-	}
-	return compareStructural
-		? !deepEqual(oldValue, newValue)
-		: oldValue !== newValue;
-}
-
 const prototypeHasOwnProperty = Object.prototype.hasOwnProperty;
 export function hasOwnProperty(object: Object, propName: string) {
 	return prototypeHasOwnProperty.call(object, propName);
