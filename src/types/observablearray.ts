@@ -5,7 +5,7 @@ import {IInterceptable, IInterceptor, hasInterceptors, registerInterceptor, inte
 import {IListenable, registerListener, hasListeners, notifyListeners} from "./listen-utils";
 import {isSpyEnabled, spyReportStart, spyReportEnd} from "../core/spy";
 import {arrayAsIterator, declareIterator} from "../utils/iterable";
-import {IEnhancer} from "../types/modifiers";
+import {IEnhancer} from "./modifiers";
 
 const MAX_SPLICE_SIZE = 10000; // See e.g. https://github.com/mobxjs/mobx/issues/859
 

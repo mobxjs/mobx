@@ -1134,6 +1134,80 @@ test("803 - action.bound and action preserve type info", t => {
 	t.end()
 })
 
+test("@computed.equals (TS)", t => {
+	const sameTime = (from: Time, to: Time) => from.hour === to.hour && from.minute === to.minute;
+	class Time {
+		constructor(hour: number, minute: number) {
+			this.hour = hour;
+			this.minute = minute;
+		}
+
+		@observable public hour: number;
+		@observable public minute: number;
+
+		@computed.equals(sameTime) public get time() {
+			return { hour: this.hour, minute: this.minute };
+		}
+	}
+	const time = new Time(9, 0);
+
+	const changes: Array<{ hour: number, minute: number }> = [];
+	const disposeAutorun = autorun(() => changes.push(time.time));
+
+	t.deepEqual(changes, [ { hour: 9, minute: 0 }]);
+	time.hour = 9;
+	t.deepEqual(changes, [ { hour: 9, minute: 0 }]);
+	time.minute = 0;
+	t.deepEqual(changes, [ { hour: 9, minute: 0 }]);
+	time.hour = 10;
+	t.deepEqual(changes, [ { hour: 9, minute: 0 }, { hour: 10, minute: 0 }]);
+	time.minute = 30;
+	t.deepEqual(changes, [ { hour: 9, minute: 0 }, { hour: 10, minute: 0 }, { hour: 10, minute: 30 }]);
+
+	disposeAutorun();
+
+	t.end();
+});
+
+test("computed comparer works with extendObservable (TS)", t => {
+	const sameTime = (from: Time, to: Time) => from.hour === to.hour && from.minute === to.minute;
+	class Time {
+		constructor(hour: number, minute: number) {
+			this.hour = hour;
+			this.minute = minute;
+			extendObservable(this, {
+				hour,
+				minute,
+				time: computed(() => {
+					return { hour: this.hour, minute: this.minute };
+				}, { equals: sameTime })
+			})
+		}
+
+		public hour: number;
+		public minute: number;
+		public time: { hour: number, minute: number };
+	}
+	const time = new Time(9, 0);
+
+	const changes: Array<{ hour: number, minute: number }> = [];
+	const disposeAutorun = autorun(() => changes.push(time.time));
+
+	t.deepEqual(changes, [ { hour: 9, minute: 0 }]);
+	time.hour = 9;
+	t.deepEqual(changes, [ { hour: 9, minute: 0 }]);
+	time.minute = 0;
+	t.deepEqual(changes, [ { hour: 9, minute: 0 }]);
+	time.hour = 10;
+	t.deepEqual(changes, [ { hour: 9, minute: 0 }, { hour: 10, minute: 0 }]);
+	time.minute = 30;
+	t.deepEqual(changes, [ { hour: 9, minute: 0 }, { hour: 10, minute: 0 }, { hour: 10, minute: 30 }]);
+
+	disposeAutorun();
+
+	t.end();
+});
+
 test("1072 - @observable without initial value and observe before first access", t => {
 	class User {
 		@observable loginCount: number;

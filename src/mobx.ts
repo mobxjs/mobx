@@ -32,6 +32,7 @@ export { useStrict, isStrictModeEnabled, IAction              } from "./core/act
 export { spy                                                  } from "./core/spy";
 export { IComputedValue                                       } from "./core/computedvalue";
 
+export { IEqualsComparer, comparer 							  } from "./types/comparer";
 export { asReference, asFlat, asStructure, asMap              } from "./types/modifiers-old";
 export { IModifierDescriptor, IEnhancer, isModifierDescriptor } from "./types/modifiers";
 export { IInterceptable, IInterceptor                         } from "./types/intercept-utils";
@@ -74,8 +75,8 @@ import { isComputingDerivation } from "./core/derivation";
 import { setReactionScheduler, onReactionError } from "./core/reaction";
 import { reserveArrayBuffer, IObservableArray } from "./types/observablearray";
 import { interceptReads } from "./api/intercept-read";
-import { ObservableMap } from './types/observablemap';
-import { IObservableValue } from './types/observablevalue';
+import { ObservableMap } from "./types/observablemap";
+import { IObservableValue } from "./types/observablevalue";
 import {registerGlobals} from "./core/globalstate";
 
 // This line should come after all the imports as well, for the same reason
@@ -115,6 +116,7 @@ import { IAtom, Atom, BaseAtom                                } from "./core/ato
 import { useStrict, isStrictModeEnabled, IAction              } from "./core/action";
 import { spy                                                  } from "./core/spy";
 import { IComputedValue                                       } from "./core/computedvalue";
+import { IEqualsComparer, comparer 							  } from "./types/comparer";
 import { asReference, asFlat, asStructure, asMap              } from "./types/modifiers-old";
 import { IModifierDescriptor, IEnhancer, isModifierDescriptor } from "./types/modifiers";
 import { IInterceptable, IInterceptor                         } from "./types/intercept-utils";
@@ -146,6 +148,7 @@ const everything = {
 	Atom, BaseAtom,
 	useStrict, isStrictModeEnabled,
 	spy,
+	comparer,
 	asReference, asFlat, asStructure, asMap,
 	isModifierDescriptor,
 	isObservableObject,

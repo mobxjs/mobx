@@ -17,6 +17,7 @@ test('correct api should be exposed', function(t) {
 		'autorun',
 		'autorunAsync',
 		'computed',
+		'comparer',
 		'createTransformer',
 		'default',
 		'expr',
