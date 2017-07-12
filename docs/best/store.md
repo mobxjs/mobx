@@ -4,6 +4,8 @@ This section contains some best practices we discovered at Mendix while working 
 This section is opinionated and you are in no way forced to apply these practices.
 There are many ways of working with MobX and React, and this is just one of them.
 
+This section focuses on an unobtrusive way of working with MobX, which works well in existing code bases, or with classic MVC patterns. An alternative, more opionated way of organizing stores is using [mobx-state-tree](https://github.com/mobxjs/mobx-state-tree), which ships with cool features as structurally shared snapshots, action middlewares, JSON patch support etc out of the box.
+
 # Stores
 
 Let's start with _stores_.
@@ -272,3 +274,45 @@ export class Todo {
     }
 }
 ```
+
+# Combining multiple stores
+
+An often asked question is; how to combine multiple stores without using singletons. How will they know about each other?
+
+An effective pattern to use this is to create a `RootStore` that instantates all stores, and share references. The advantage of this pattern is:
+
+1. Simple to set up
+2. Supports strong typing well
+3. Makes complex unit tests easy as you just have to instantiate a root store.
+
+Example:
+
+```javascript
+class RootStore {
+  constructor() {
+    this.userStore = new UserStore(this)
+    this.storeB = new StoreB(this)
+  }
+}
+
+class UserStore {
+  constructor(rootStore) {
+    this.rootStore = rootStore
+  }
+
+  getTodos(user) {
+    // access todoStore through the root store
+    return this.rootStore.todoStore.todos.filter(todo => todo.author === user)
+  }
+}
+
+class TodoStore {
+  @observable todos = []
+  
+  constructor(rootStore) {
+    this.rootStore = rootStore
+  }
+}
+```
+
+When using React, this root store is typically inserted into the component tree by using `<Provider rootStore={new RootStore()}><App /></Provider>`
