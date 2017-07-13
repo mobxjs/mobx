@@ -29,7 +29,7 @@ numbers.push(5);
 
 ## Error handling
 
-Exceptions thrown in autorun and all other types reactions are catched and logged to the console, but not propagated back to the original causing code.
+Exceptions thrown in autorun and all other types reactions are caught and logged to the console, but not propagated back to the original causing code.
 This is to make sure that a reaction in one exception does not prevent the scheduled execution of other, possibly unrelated, reactions.
 This also allows reactions to recover from exceptions; throwing an exception does not break the tracking done by MobX,
 so as subsequent run of a reaction might complete normally again if the cause for the exception is removed.
