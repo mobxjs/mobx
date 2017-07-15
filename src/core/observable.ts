@@ -98,7 +98,7 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 export function queueForUnobservation(observable: IObservable) {
 	if (!observable.isPendingUnobservation) {
 		// invariant(globalState.inBatch > 0, "INTERNAL ERROR, remove should be called only inside batch");
-		// invariant(observable._observers.length === 0, "INTERNAL ERROR, shuold only queue for unobservation unobserved observables");
+		// invariant(observable._observers.length === 0, "INTERNAL ERROR, should only queue for unobservation unobserved observables");
 		observable.isPendingUnobservation = true;
 		globalState.pendingUnobservations.push(observable);
 	}
