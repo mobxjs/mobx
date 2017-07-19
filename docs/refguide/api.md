@@ -82,7 +82,7 @@ Note that `extendObservable` enhances existing objects, unlike `observable.objec
 
 ### Modifiers
 
-Modifiers can be used decorator or in combination with `extendObservable` and `observable.object` to change the autoconversion rules for specific properties.
+Modifiers can be used as decorators or in combination with `extendObservable` and `observable.object` to change the autoconversion rules for specific properties.
 
 The following modifiers are available:
 
@@ -92,7 +92,7 @@ The following modifiers are available:
 * `computed`: Creates a derived property, see [`computed`](computed-decorator.md)
 * `action`: Creates an action, see [`action`](action.md)
 
-Modifiers can be used as decorator:
+Modifiers can be used as decorators:
 
 ```javascript
 class TaskStore {
@@ -100,7 +100,7 @@ class TaskStore {
 }
 ```
 
-Or as property modifier in combination with `observable.object` / `observable.extendObservable`.
+Or as property modifiers in combination with `observable.object` / `observable.extendObservable`.
 Note that modifiers always 'stick' to the property. So they will remain in effect even if a new value is assigned.
 
 ```javascript
