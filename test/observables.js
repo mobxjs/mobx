@@ -1778,3 +1778,29 @@ test("computed equals function only invoked when necessary", t => {
 
 	t.end();
 });
+
+test('Issue 1092 - extendsObservable should not go through the prototype chain', t => {
+  t.plan(1);
+
+  // The parent is an observable
+  const parent = {};
+  mobx.extendObservable(parent, {});
+
+  // Child1 "inherit" from the parent
+  // and has an observable attribute
+  var child1 = Object.create(parent);
+  mobx.extendObservable(child1, {
+      attribute: 7
+  });
+
+  // Child2 also "inherit" from the parent
+  // But does not have any observable attribute
+  const child2 = Object.create(parent);
+
+  // The second child should not be aware of the attribute of his
+  // sibling child1
+  t.equals(typeof child2.attribute, 'undefined');
+
+  t.end();
+});
+
