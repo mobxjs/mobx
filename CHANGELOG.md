@@ -1,3 +1,7 @@
+# 3.2.2
+
+* Fixes a bug (or a known limitation) described in #1092. It is now possible to have different observable administration on different levels of the prototype chain.
+
 # 3.2.1
 
 * Introduced customizable value comperators to reactions and computed values. `reaction` and `computed` now support an additional option, `equals`, which takes a comparision function. See [#951](https://github.com/mobxjs/mobx/pull/951/) by @jamiewinder. Fixes #802 and #943. See the updated [`computed` docs](https://mobx.js.org/refguide/computed-decorator.html) for more details.
