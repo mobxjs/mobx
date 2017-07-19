@@ -21,8 +21,8 @@ export enum IDerivationState {
 	// having this state is second big optimization:
 	// don't have to recompute on every dependency change, but only when it's needed
 	POSSIBLY_STALE = 1,
-	// shallow dependency changed
-	// will need to recompute when it's needed
+	// A shallow dependency has changed since last computation and the derivation
+	// will need to recompute when it's needed next.
 	STALE = 2
 }
 
