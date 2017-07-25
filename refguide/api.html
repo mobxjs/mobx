@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2" data-basepath=".." data-revision="Tue Jul 11 2017 13:14:09 GMT+0200 (CEST)">
+    <div class="book" data-level="2" data-basepath=".." data-revision="Tue Jul 25 2017 10:56:00 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -941,7 +941,7 @@ If a value of the <code>propertyMap</code> is a getter function, a <em>computed<
 Note that <code>extendObservable</code> enhances existing objects, unlike <code>observable.object</code> which creates a new object.</p>
 <p><a href="extend-observable.html">&#xAB;details&#xBB;</a></p>
 <h3 id="modifiers">Modifiers</h3>
-<p>Modifiers can be used decorator or in combination with <code>extendObservable</code> and <code>observable.object</code> to change the autoconversion rules for specific properties.</p>
+<p>Modifiers can be used as decorators or in combination with <code>extendObservable</code> and <code>observable.object</code> to change the autoconversion rules for specific properties.</p>
 <p>The following modifiers are available:</p>
 <ul>
 <li><code>observable.deep</code>: This is the default modifier, used by any observable. It converts any assigned, non-primitive value into an observable if it isn&apos;t one yet.</li>
@@ -950,12 +950,12 @@ Note that <code>extendObservable</code> enhances existing objects, unlike <code>
 <li><code>computed</code>: Creates a derived property, see <a href="computed-decorator.html"><code>computed</code></a></li>
 <li><code>action</code>: Creates an action, see <a href="action.html"><code>action</code></a></li>
 </ul>
-<p>Modifiers can be used as decorator:</p>
+<p>Modifiers can be used as decorators:</p>
 <pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TaskStore</span> </span>{
     @observable.shallow tasks = []
 }
 </code></pre>
-<p>Or as property modifier in combination with <code>observable.object</code> / <code>observable.extendObservable</code>.
+<p>Or as property modifiers in combination with <code>observable.object</code> / <code>observable.extendObservable</code>.
 Note that modifiers always &apos;stick&apos; to the property. So they will remain in effect even if a new value is assigned.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> taskStore = observable({
     tasks: observable.shallow([])

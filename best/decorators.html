@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="5" data-basepath=".." data-revision="Tue Jul 11 2017 13:14:09 GMT+0200 (CEST)">
+    <div class="book" data-level="5" data-basepath=".." data-revision="Tue Jul 25 2017 10:56:00 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -929,7 +929,7 @@ The following example introduces observable properties, a computed property and 
         start: <span class="hljs-built_in">Date</span>.now(),
         current: <span class="hljs-built_in">Date</span>.now(),
         get elapsedTime() {
-            <span class="hljs-keyword">return</span> (<span class="hljs-keyword">this</span>.current - <span class="hljs-keyword">this</span>.start) + <span class="hljs-string">&quot;seconds&quot;</span>
+            <span class="hljs-keyword">return</span> (<span class="hljs-keyword">this</span>.current - <span class="hljs-keyword">this</span>.start) + <span class="hljs-string">&quot;milliseconds&quot;</span>
         },
         tick: action(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
               <span class="hljs-keyword">this</span>.current = <span class="hljs-built_in">Date</span>.now()
@@ -954,7 +954,7 @@ When using decorators, observables, computed values and actions can be simply in
     @observable current = <span class="hljs-built_in">Date</span>.now();
 
     @computed get elapsedTime() {
-        <span class="hljs-keyword">return</span> (<span class="hljs-keyword">this</span>.current - <span class="hljs-keyword">this</span>.start) + <span class="hljs-string">&quot;seconds&quot;</span>
+        <span class="hljs-keyword">return</span> (<span class="hljs-keyword">this</span>.current - <span class="hljs-keyword">this</span>.start) + <span class="hljs-string">&quot;milliseconds&quot;</span>
     }
 
     @action tick() {

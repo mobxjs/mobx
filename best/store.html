@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="7.2" data-basepath=".." data-revision="Tue Jul 11 2017 13:14:09 GMT+0200 (CEST)">
+    <div class="book" data-level="7.2" data-basepath=".." data-revision="Tue Jul 25 2017 10:56:00 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -886,6 +886,7 @@
 <p>This section contains some best practices we discovered at Mendix while working with MobX.
 This section is opinionated and you are in no way forced to apply these practices.
 There are many ways of working with MobX and React, and this is just one of them.</p>
+<p>This section focuses on an unobtrusive way of working with MobX, which works well in existing code bases, or with classic MVC patterns. An alternative, more opionated way of organizing stores is using <a href="https://github.com/mobxjs/mobx-state-tree" target="_blank">mobx-state-tree</a>, which ships with cool features as structurally shared snapshots, action middlewares, JSON patch support etc out of the box.</p>
 <h1 id="stores">Stores</h1>
 <p>Let&apos;s start with <em>stores</em>.
 In the next sections we will discuss <em>actions</em> and React <em>components</em> as well.
@@ -1144,6 +1145,42 @@ Especially in large applications this is important.</li>
     }
 }
 </code></pre>
+<h1 id="combining-multiple-stores">Combining multiple stores</h1>
+<p>An often asked question is; how to combine multiple stores without using singletons. How will they know about each other?</p>
+<p>An effective pattern to use this is to create a <code>RootStore</code> that instantates all stores, and share references. The advantage of this pattern is:</p>
+<ol>
+<li>Simple to set up</li>
+<li>Supports strong typing well</li>
+<li>Makes complex unit tests easy as you just have to instantiate a root store.</li>
+</ol>
+<p>Example:</p>
+<pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RootStore</span> </span>{
+  constructor() {
+    <span class="hljs-keyword">this</span>.userStore = <span class="hljs-keyword">new</span> UserStore(<span class="hljs-keyword">this</span>)
+    <span class="hljs-keyword">this</span>.storeB = <span class="hljs-keyword">new</span> StoreB(<span class="hljs-keyword">this</span>)
+  }
+}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserStore</span> </span>{
+  constructor(rootStore) {
+    <span class="hljs-keyword">this</span>.rootStore = rootStore
+  }
+
+  getTodos(user) {
+    <span class="hljs-comment">// access todoStore through the root store</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.rootStore.todoStore.todos.filter(todo =&gt; todo.author === user)
+  }
+}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoStore</span> </span>{
+  @observable todos = []
+
+  constructor(rootStore) {
+    <span class="hljs-keyword">this</span>.rootStore = rootStore
+  }
+}
+</code></pre>
+<p>When using React, this root store is typically inserted into the component tree by using <code>&lt;Provider rootStore={new RootStore()}&gt;&lt;App /&gt;&lt;/Provider&gt;</code></p>
 
                     
                     </section>

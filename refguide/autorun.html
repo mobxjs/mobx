@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.4" data-basepath=".." data-revision="Tue Jul 11 2017 13:14:09 GMT+0200 (CEST)">
+    <div class="book" data-level="2.4" data-basepath=".." data-revision="Tue Jul 25 2017 10:56:00 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -906,7 +906,7 @@ numbers.push(<span class="hljs-number">5</span>);
 <span class="hljs-comment">// won&apos;t print anything, nor is `sum` re-evaluated</span>
 </code></pre>
 <h2 id="error-handling">Error handling</h2>
-<p>Exceptions thrown in autorun and all other types reactions are catched and logged to the console, but not propagated back to the original causing code.
+<p>Exceptions thrown in autorun and all other types reactions are caught and logged to the console, but not propagated back to the original causing code.
 This is to make sure that a reaction in one exception does not prevent the scheduled execution of other, possibly unrelated, reactions.
 This also allows reactions to recover from exceptions; throwing an exception does not break the tracking done by MobX,
 so as subsequent run of a reaction might complete normally again if the cause for the exception is removed.</p>
