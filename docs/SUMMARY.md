@@ -27,7 +27,7 @@
 * Tips & Tricks
   * [Common Pitfalls & Best Practices](best/pitfalls.md)
   * [Defining data stores](best/store.md)
-  * [Writing (async) actions](best/actions.md)
+  * [Writing async actions](best/actions.md)
   * [Optimizing React components](best/react-performance.md)
   * [DevTools](best/devtools.md)
   * [ES5 / ES6 / TypeScript syntax](best/syntax.md)
