@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.6" data-basepath=".." data-revision="Tue Jul 25 2017 10:56:00 GMT+0200 (CEST)">
+    <div class="book" data-level="2.6" data-basepath=".." data-revision="Tue Jul 25 2017 11:20:04 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -467,7 +467,7 @@
                         
                             <b>7.3.</b>
                         
-                        Writing (async) actions
+                        Writing async actions
                     </a>
             
             
@@ -896,11 +896,15 @@
 </ul>
 <p>Any application has actions. Actions are anything that modify the state.
 With MobX you can make it explicit in your code where your actions live by marking them.
-Actions help you to structure your code better.
-It takes a function and returns it after wrapping it with <code>untracked</code>, <code>transaction</code> and <code>allowStateChanges</code>.
-It is advised to use them on any function that modifies observables or has side effects.
-<code>action</code> also provides useful debugging information in combination with the devtools.
-Using the <code>@action</code> decorator with <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-11.1.5" target="_blank">ES 5.1 setters</a> (i.e. <code>@action set propertyName</code>) is not supported, however setters of <a href="https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/computed-decorator.md#setters-for-computed-values" target="_blank">computed properties are automatically actions</a>.</p>
+Actions help you to structure your code better.</p>
+<p>It takes a function and returns a function with the same signuature.
+But wrapped with <code>transaction</code>, <code>untracked</code> and <code>allowStateChanges</code>.
+Especially the fact that <code>transaction</code> is applied automatically yields great performance benefits;
+actions will batch mutations and only notify computed values and reactions after the (outer most) action has finished.
+This makes sure intermediate or incomplete values produced during an action are not visible to the rest of the application until the action has finished.</p>
+<p>It is advised to use <code>(@)action</code> on any function that modifies observables or has side effects.
+<code>action</code> also provides useful debugging information in combination with the devtools.</p>
+<p>Using the <code>@action</code> decorator with <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-11.1.5" target="_blank">ES 5.1 setters</a> (i.e. <code>@action set propertyName</code>) is not supported, however setters of <a href="https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/computed-decorator.md#setters-for-computed-values" target="_blank">computed properties are automatically actions</a>.</p>
 <p>Note: using <code>action</code> is mandatory when <em>strict mode</em> is enabled, see <a href="https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/api.md#usestrict" target="_blank"><code>useStrict</code></a>.</p>
 <p>For an extensive introduction to <code>action</code> see also the <a href="https://medium.com/p/45cdc73c7c8d/" target="_blank">MobX 2.2 release notes</a>.</p>
 <p>Two example actions from the <code>contact-list</code> project:</p>
@@ -910,6 +914,7 @@ Using the <code>@action</code> decorator with <a href="http://www.ecma-internati
             .get(<span class="hljs-string">&apos;https://randomuser.me/api/&apos;</span>)
             .set(<span class="hljs-string">&apos;Accept&apos;</span>, <span class="hljs-string">&apos;application/json&apos;</span>)
             .end(action(<span class="hljs-string">&quot;createRandomContact-callback&quot;</span>, (error, results) =&gt; {
+                <span class="hljs-comment">// ^ Note: asynchronous callbacks are separate actions!</span>
                 <span class="hljs-keyword">if</span> (error)
                     <span class="hljs-built_in">console</span>.error(error);
                 <span class="hljs-keyword">else</span> {
@@ -922,6 +927,13 @@ Using the <code>@action</code> decorator with <a href="http://www.ecma-internati
             }));
     }
 </code></pre>
+<h2 id="when-to-use-actions">When to use actions?</h2>
+<p>Actions should only, and always, be used on functions that <em>modify</em> state.
+Functions that just perform look-ups, filters etc should <em>not</em> be marked as actions; to allow MobX to track their invocations.</p>
+<p>Note in the above example that writing asynchronous actions is as straight forward as marking all the callbacks as <code>action</code> as well.
+Beyond that there is nothing special about asynchronous processes in MobX; an asynchronous update is just a synchronous action call in some future.</p>
+<p><a href="https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/api.md#usestrict" target="_blank"><em>Strict mode</em></a> enforces that all state modifications are done by an action. This is a useful best practice in larger, long term code bases. Simply call <code>mobx.useStrict(true)</code> when your application is initialized, and MobX will throw anytime you (accidentally) try to modify state without using an action.</p>
+<p>The <a href="https://mobx.js.org/best/actions.html" target="_blank">Writing async actions</a> section provides several syntactical recipes on how to organize asynchronous actions, in combination with promises, async / await, generators etc. Read it for inspiration!</p>
 <h2 id="bound-actions">Bound actions</h2>
 <p>The <code>action</code> decorator / function follows the normal rules for binding in javascript.
 However, Mobx 3 introduces <code>action.bound</code> to automatically bind actions to the targeted object.
@@ -950,185 +962,8 @@ setInterval(ticker.increment, <span class="hljs-number">1000</span>)
 setInterval(ticker.increment, <span class="hljs-number">1000</span>)
 </code></pre>
 <p><em>Note: don&apos;t use <em>action.bound</em> with arrow functions; arrow functions are already bound and cannot be rebound.</em></p>
-<h2 id="creating-asynchronous-actions">Creating asynchronous actions</h2>
-<p><code>action</code> only affects the currently running function, not functions that are scheduled (but not invoked) by the current function!
-This means that if you have a <code>setTimeout</code>, promise<code>.then</code> or <code>async</code> construction, and in that callback some more state is changed, those callbacks should be wrapped in <code>action</code> as well! There are several ways to create asynchronous actions. No approach is strictly better then the other, but this section just list different approaches you can take to writing asynchronous code.
-Let&apos;s start with a basic example:</p>
-<h3 id="promises">Promises</h3>
-<pre><code class="lang-javascript">mobx.useStrict(<span class="hljs-literal">true</span>) <span class="hljs-comment">// don&apos;t allow state modifications outside actions</span>
-
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
-    @observable githubProjects = []
-    @state = <span class="hljs-string">&quot;pending&quot;</span> <span class="hljs-comment">// &quot;pending&quot; / &quot;done&quot; / &quot;error&quot;</span>
-
-    @action
-    fetchProjects() {
-        <span class="hljs-keyword">this</span>.githubProjects = []
-        <span class="hljs-keyword">this</span>.state = <span class="hljs-string">&quot;pending&quot;</span>
-        fetchGithubProjectsSomehow().then(
-            projects =&gt; {
-                <span class="hljs-keyword">const</span> filteredProjects = somePreprocessing(projects)
-                <span class="hljs-keyword">this</span>.githubProjects = filteredProjects
-                <span class="hljs-keyword">this</span>.state = <span class="hljs-string">&quot;done&quot;</span>
-            },
-            error =&gt; {
-                <span class="hljs-keyword">this</span>.state = <span class="hljs-string">&quot;error&quot;</span>
-            }
-        )
-    }
-}
-</code></pre>
-<p>The above example would throw exceptions, as the callbacks passed to the <code>fethGithubProjectsSomehow</code> promise are not part of the <code>fetchProjects</code> action, as actions only apply to the current stack.</p>
-<p>A first simple fix is to extract the callbacks to actions. (Note that binding is important here to get a correct <code>this</code>):</p>
-<pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
-    @observable githubProjects = []
-    @state = <span class="hljs-string">&quot;pending&quot;</span> <span class="hljs-comment">// &quot;pending&quot; / &quot;done&quot; / &quot;error&quot;</span>
-
-    @action
-    fetchProjects() {
-        <span class="hljs-keyword">this</span>.githubProjects = []
-        <span class="hljs-keyword">this</span>.state = <span class="hljs-string">&quot;pending&quot;</span>
-        fetchGithubProjectsSomehow().then(fetchProjectsSuccess, fetchProjectsError)
-    }
-
-    @action.bound <span class="hljs-comment">// callback action</span>
-    fetchProjectsSuccess(projects) {
-        <span class="hljs-keyword">const</span> filteredProjects = somePreprocessing(projects)
-        <span class="hljs-keyword">this</span>.githubProjects = filteredProjects
-        <span class="hljs-keyword">this</span>.state = <span class="hljs-string">&quot;done&quot;</span>
-    }
-
-    @action.bound <span class="hljs-comment">// callback action</span>
-    fetchProjectsError(error) {
-        <span class="hljs-keyword">this</span>.state = <span class="hljs-string">&quot;error&quot;</span>
-    }
-}
-</code></pre>
-<p>Although this is clean and explicit, it might get a bit verbose with complex async flows. Alternative, you can wrap the promise callbacks with the <code>action</code> keyword. It is recommended but not mandatory to give them a name as well:</p>
-<pre><code class="lang-javascript">mobx.useStrict(<span class="hljs-literal">true</span>) <span class="hljs-comment">// don&apos;t allow state modifications outside actions</span>
-
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
-    @observable githubProjects = []
-    @state = <span class="hljs-string">&quot;pending&quot;</span> <span class="hljs-comment">// &quot;pending&quot; / &quot;done&quot; / &quot;error&quot;</span>
-
-    @action
-    fetchProjects() {
-        <span class="hljs-keyword">this</span>.githubProjects = []
-        <span class="hljs-keyword">this</span>.state = <span class="hljs-string">&quot;pending&quot;</span>
-        fetchGithubProjectsSomehow().then(
-            <span class="hljs-comment">// inline created action</span>
-            action(<span class="hljs-string">&quot;fetchSuccess&quot;</span>, projects =&gt; {
-                <span class="hljs-keyword">const</span> filteredProjects = somePreprocessing(projects)
-                <span class="hljs-keyword">this</span>.githubProjects = filteredProjects
-                <span class="hljs-keyword">this</span>.state = <span class="hljs-string">&quot;done&quot;</span>
-            }),
-            <span class="hljs-comment">// inline created action</span>
-            action(<span class="hljs-string">&quot;fetchError&quot;</span>, error =&gt; {
-                <span class="hljs-keyword">this</span>.state = <span class="hljs-string">&quot;error&quot;</span>
-            })
-        )
-    }
-}
-</code></pre>
-<h3 id="the-runinaction-utility">The <code>runInAction</code> utility</h3>
-<p>A downside of inline actions is that TypeScript does not apply type inference on them, so you would have type all your callbacks.
-Instead of creating an action for the entire callback, you can also run only the state modifying part of the callback in an action.
-The advantage of this pattern is that it encourages you to not litter the place with <code>action</code>, but rather put all the state modifications as much as possible at the end of the whole process:</p>
-<pre><code class="lang-javascript">mobx.useStrict(<span class="hljs-literal">true</span>) <span class="hljs-comment">// don&apos;t allow state modifications outside actions</span>
-
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
-    @observable githubProjects = []
-    @state = <span class="hljs-string">&quot;pending&quot;</span> <span class="hljs-comment">// &quot;pending&quot; / &quot;done&quot; / &quot;error&quot;</span>
-
-    @action
-    fetchProjects() {
-        <span class="hljs-keyword">this</span>.githubProjects = []
-        <span class="hljs-keyword">this</span>.state = <span class="hljs-string">&quot;pending&quot;</span>
-        fetchGithubProjectsSomehow().then(
-            projects =&gt; {
-                <span class="hljs-keyword">const</span> filteredProjects = somePreprocessing(projects)
-                <span class="hljs-comment">// put the &apos;final&apos; modification in an anonymous action</span>
-                runInAction(() =&gt; {
-                    <span class="hljs-keyword">this</span>.githubProjects = filteredProjects
-                    <span class="hljs-keyword">this</span>.state = <span class="hljs-string">&quot;done&quot;</span>
-                })
-            },
-            error =&gt; {
-                <span class="hljs-comment">// the alternative ending of this process:...</span>
-                runInAction(() =&gt; {
-                    <span class="hljs-keyword">this</span>.state = <span class="hljs-string">&quot;error&quot;</span>
-                })
-            }
-        )
-    }
-}
-</code></pre>
-<p>Note that <code>runInAction</code>&apos;s can also be given a name as first argument. <code>runInAction(f)</code> is in fact just sugar for <code>action(f)()</code></p>
-<h3 id="async-await">async / await</h3>
-<p>Async / await based functions can confusing initially when starting with actions.
-Because lexically they appear to synchronous functions, it gives the impression that <code>@action</code> applies to the entire function.
-Which is of course not the case, as async / await is just syntactic sugar around a promise based process.
-As a result, <code>@action</code> only applies to the code block until the first <code>await</code>.
-And after each <code>await</code> a new asynchronous function is started, so after each <code>await</code>, state modifying code should be wrapped as action.
-This is where <code>runInAction</code> comes in handy again:</p>
-<pre><code class="lang-javascript">mobx.useStrict(<span class="hljs-literal">true</span>) <span class="hljs-comment">// don&apos;t allow state modifications outside actions</span>
-
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
-    @observable githubProjects = []
-    @state = <span class="hljs-string">&quot;pending&quot;</span> <span class="hljs-comment">// &quot;pending&quot; / &quot;done&quot; / &quot;error&quot;</span>
-
-    @action
-    <span class="hljs-keyword">async</span> fetchProjects() {
-        <span class="hljs-keyword">this</span>.githubProjects = []
-        <span class="hljs-keyword">this</span>.state = <span class="hljs-string">&quot;pending&quot;</span>
-        <span class="hljs-keyword">try</span> {
-            <span class="hljs-keyword">const</span> projects = <span class="hljs-keyword">await</span> fetchGithubProjectsSomehow()
-            <span class="hljs-keyword">const</span> filteredProjects = somePreprocessing(projects)
-            <span class="hljs-comment">// after await, modifying state again, needs an actions:</span>
-            runInAction(() =&gt; {
-                <span class="hljs-keyword">this</span>.state = <span class="hljs-string">&quot;done&quot;</span>
-                <span class="hljs-keyword">this</span>.githubProjects = filteredProjects
-            })
-        } <span class="hljs-keyword">catch</span> (error) {
-            runInAction(() =&gt; {
-                <span class="hljs-keyword">this</span>.state = <span class="hljs-string">&quot;error&quot;</span>
-            })
-        }
-    }
-}
-</code></pre>
-<h3 id="babel-plugin-mobx-deep-action">babel-plugin-mobx-deep-action</h3>
-<p>If you use babel, there is a plugin that scans for <code>@action</code> methods and automatically wraps all callbacks and await statements properly in actions during transpilation: <a href="https://github.com/mobxjs/babel-plugin-mobx-deep-action" target="_blank">mobx-deep-action</a>.</p>
-<h3 id="generators-asyncaction">Generators &amp; asyncAction</h3>
-<p>Finally there is the <code>asyncAction</code> utility in the <a href="https://github.com/mobxjs/mobx-utils" target="_blank"><code>mobx-utils</code> package</a> that uses generators behind the scenes to automatically wrap yielded promises in actions. The advantage of this is that it is syntactically very close to async / await (with different keywords), and no manually action wrapping is needed for async parts, resulting in very clean code.
-Just make sure every <code>yield</code> returns a promise.</p>
-<p><code>asyncAction</code> can be used as decorator and as function (just like <code>@action</code>).
-<code>asyncAction</code> integrates neatly with MobX development tools, so that it is easy to trace the process of the async function.
-For more details see the docs of <a href="https://github.com/mobxjs/mobx-utils#asyncaction" target="_blank">asyncAction</a>.</p>
-<pre><code class="lang-javascript">import {asyncAction} from &quot;mobx-utils&quot;
-
-mobx.useStrict(true) // don&apos;t allow state modifications outside actions
-
-class Store {
-    @observable githubProjects = []
-    @state = &quot;pending&quot; // &quot;pending&quot; / &quot;done&quot; / &quot;error&quot;
-
-    @asyncAction
-    *fetchProjects() { // &lt;- note the star, this a generator function!
-        this.githubProjects = []
-        this.state = &quot;pending&quot;
-        try {
-            const projects = yield fetchGithubProjectsSomehow() // yield instead of await
-            const filteredProjects = somePreprocessing(projects)
-            // the asynchronous blocks will automatically be wrapped actions
-            this.state = &quot;done&quot;
-            this.githubProjects = filteredProjects
-        } catch (error) {
-            this.state = &quot;error&quot;
-        }
-    }
-}
-</code></pre>
+<h2 id="-runinaction-name-thunk"><code>runInAction(name?, thunk)</code></h2>
+<p><code>runInAction</code> is a simple utility that takes an code block and executes in an (anonymous) action. This is useful to create and execute actions on the fly, for example inside an asynchronous process. <code>runInAction(f)</code> is sugar for <code>action(f)()</code></p>
 
                     
                     </section>
