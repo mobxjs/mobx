@@ -148,8 +148,9 @@ export class Reaction implements IDerivation, IReactionPublic {
 		if (!this.isDisposed) {
 			this.isDisposed = true;
 			if (!this._isRunning) {
+				// if disposed while running, clean up later. Maybe not optimal, but rare case
 				startBatch();
-				clearObserving(this); // if disposed while running, clean up later. Maybe not optimal, but rare case
+				clearObserving(this);
 				endBatch();
 			}
 		}

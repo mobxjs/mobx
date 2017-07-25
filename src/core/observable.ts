@@ -43,7 +43,7 @@ function invariantObservers(observable: IObservable) {
 		if (i) {
 			invariant(map[id] === i, "INTERNAL ERROR maps derivation.__mapid to index in list"); // for performance
 		} else {
-			invariant(!(id in map), "INTERNAL ERROR observer on index 0 shouldnt be held in map."); // for performance
+			invariant(!(id in map), "INTERNAL ERROR observer on index 0 shouldn't be held in map."); // for performance
 		}
 	}
 	invariant(list.length === 0 || Object.keys(map).length === list.length - 1, "INTERNAL ERROR there is no junk in map");
@@ -62,7 +62,7 @@ export function addObserver(observable: IObservable, node: IDerivation) {
 	if (observable.lowestObserverState > node.dependenciesState) observable.lowestObserverState = node.dependenciesState;
 
 	// invariantObservers(observable);
-	// invariant(observable._observers.indexOf(node) !== -1, "INTERNAL ERROR didnt add node");
+	// invariant(observable._observers.indexOf(node) !== -1, "INTERNAL ERROR didn't add node");
 }
 
 export function removeObserver(observable: IObservable, node: IDerivation) {
@@ -79,7 +79,7 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 		// deleting from _observersIndexes is straight forward, to delete from _observers, let's swap `node` with last element
 		const list = observable.observers;
 		const map = observable.observersIndexes;
-		const filler = list.pop()!; // get last element, which should fill the place of `node`, so the array doesnt have holes
+		const filler = list.pop()!; // get last element, which should fill the place of `node`, so the array doesn't have holes
 		if (filler !== node) { // otherwise node was the last element, which already got removed from array
 			const index = map[node.__mapid] || 0; // getting index of `node`. this is the only place we actually use map.
 			if (index) { // map store all indexes but 0, see comment in `addObserver`
@@ -98,7 +98,7 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 export function queueForUnobservation(observable: IObservable) {
 	if (!observable.isPendingUnobservation) {
 		// invariant(globalState.inBatch > 0, "INTERNAL ERROR, remove should be called only inside batch");
-		// invariant(observable._observers.length === 0, "INTERNAL ERROR, shuold only queue for unobservation unobserved observables");
+		// invariant(observable._observers.length === 0, "INTERNAL ERROR, should only queue for unobservation unobserved observables");
 		observable.isPendingUnobservation = true;
 		globalState.pendingUnobservations.push(observable);
 	}
