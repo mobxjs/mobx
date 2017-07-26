@@ -3,7 +3,7 @@ Object.freeze(EMPTY_ARRAY);
 
 declare var global;
 export function getGlobal() {
-	return global;
+	return typeof window !== 'undefined' ? window : global;
 }
 
 export interface Lambda {
