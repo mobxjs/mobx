@@ -459,7 +459,7 @@ declare module 'mobx' {
     ___alreadySeen?: [any, any][],
   ): any;
   declare function whyRun(thing?: any, prop?: string): string;
-  declare function useStrict(strict: boolean): any;
+  declare function useStrict(strict: boolean): void;
 
   declare function isStrictModeEnabled(): boolean;
   declare function untracked<T>(action: () => T): T;
