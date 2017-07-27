@@ -58,7 +58,7 @@ export interface IIsObservableObject {
 }
 
 export function asObservableObject(target, name?: string): ObservableObjectAdministration {
-	if (isObservableObject(target))
+	if (isObservableObject(target) && target.hasOwnProperty('$mobx'))
 		return (target as any).$mobx;
 
 	invariant(Object.isExtensible(target), getMessage("m035"));

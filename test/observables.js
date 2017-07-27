@@ -1778,3 +1778,63 @@ test("computed equals function only invoked when necessary", t => {
 
 	t.end();
 });
+
+test('Issue 1092 - Should not access attributes of siblings in the prot. chain', t => {
+  t.plan(2);
+
+  // The parent is an observable
+  // and has an attribute
+  const parent = {};
+  mobx.extendObservable(parent, {
+    staticObservable: 11
+  });
+
+  // Child1 "inherit" from the parent
+  // and has an observable attribute
+  const child1 = Object.create(parent);
+  mobx.extendObservable(child1, {
+      attribute: 7
+  });
+
+  // Child2 also "inherit" from the parent
+  // But does not have any observable attribute
+  const child2 = Object.create(parent);
+
+  // The second child should not be aware of the attribute of his
+  // sibling child1
+  t.equals(typeof child2.attribute, 'undefined',
+    'We should not access attributes of siblings');
+
+  // We still should be able to read the value from the parent
+  t.equals(child2.staticObservable, 11,
+    'We should be able to read attributes from parents');
+
+  t.end();
+});
+
+test('Issue 1092 - We should be able to define observable on all siblings', t => {
+  t.plan(1);
+
+  // The parent is an observable
+  const parent = {};
+  mobx.extendObservable(parent, {});
+
+  // Child1 "inherit" from the parent
+  // and has an observable attribute
+  const child1 = Object.create(parent);
+  mobx.extendObservable(child1, {
+      attribute: 7
+  });
+
+  // Child2 also "inherit" from the parent
+  // But does not have any observable attribute
+  const child2 = Object.create(parent);
+  t.doesNotThrow(() => {
+    mobx.extendObservable(child2, {
+      attribute: 8
+    })
+  }, 'The attribute should not collide between the two siblings');
+
+  t.end();
+});
+
