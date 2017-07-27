@@ -56,7 +56,7 @@ In performance critical sections it is recommended to use a flat observable arra
 ## `observable.shallowArray(values)`
 
 Any values assigned to an observable array will be default passed through [`observable`](observable.md) to make them observable.
-Create a shallow array to disable this behavior and store are values as-is. See also [modifiers](modifiers.md) for more details on this mechanism.
+Create a shallow array to disable this behavior and store a values as-is. See also [modifiers](modifiers.md) for more details on this mechanism.
 
 ## Name argument
 
