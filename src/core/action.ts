@@ -75,7 +75,7 @@ function endAction(runInfo: IActionRunInfo) {
 		spyReportEnd({ time: Date.now() - runInfo.startTime });
 }
 
-export function useStrict(strict: boolean): any {
+export function useStrict(strict: boolean): void {
 	invariant(globalState.trackingDerivation === null, getMessage("m028"));
 	globalState.strictMode = strict;
 	globalState.allowStateChanges = !strict;

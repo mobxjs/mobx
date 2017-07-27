@@ -2,7 +2,7 @@ import {Lambda, getNextId, invariant, fail} from "../utils/utils";
 import {isModifierDescriptor} from "../types/modifiers";
 import {Reaction, IReactionPublic, IReactionDisposer} from "../core/reaction";
 import {untrackedStart, untrackedEnd} from "../core/derivation";
-import {action, isAction} from "./action";
+import {action, isAction, runInAction} from "./action";
 import {IEqualsComparer, comparer} from "../types/comparer";
 import {getMessage} from "../utils/messages";
 
@@ -189,6 +189,7 @@ export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg:
 	opts.fireImmediately = arg3 === true || opts.fireImmediately === true;
 	opts.delay = opts.delay || 0;
 	opts.compareStructural = opts.compareStructural || opts.struct || false;
+	// TODO: creates ugly spy events, use `effect = (r) => runInAction(opts.name, () => effect(r))` instead
 	effect = action(opts.name!, opts.context ? effect.bind(opts.context) : effect);
 	if (opts.context) {
 		expression = expression.bind(opts.context);
@@ -232,7 +233,6 @@ export function reaction<T>(expression: (r: IReactionPublic) => T, effect: (arg:
 		if (firstTime)
 			firstTime = false;
 	}
-
 
 	r.schedule();
 	return r.getDisposer();
