@@ -131,7 +131,7 @@ Note that `runInAction`'s can also be given a name as first argument. `runInActi
 
 ### async / await
 
-Async / await based functions can confusing initially when starting with actions.
+Async / await based functions can initially seem confusing when starting with actions.
 Because lexically they appear to synchronous functions, it gives the impression that `@action` applies to the entire function.
 Which is of course not the case, as async / await is just syntactic sugar around a promise based process.
 As a result, `@action` only applies to the code block until the first `await`.
