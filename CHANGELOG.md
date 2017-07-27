@@ -1,6 +1,8 @@
 # 3.2.2
 
-* Fixes a bug (or a known limitation) described in #1092. It is now possible to have different observable administration on different levels of the prototype chain.
+* Fixes a bug (or a known limitation) described in [#1092](https://github.com/mobxjs/mobx/issue/1092/). It is now possible to have different observable administration on different levels of the prototype chain. By @guillaumeleclerc
+* Fixed a build issue when using mobx in a project that was using rollup, fixes [#1099](https://github.com/mobxjs/mobx/issue/1099/) by @rossipedia
+* Fixed typings of `useStrict`, by @rickbeerendonk
 
 # 3.2.1
 
