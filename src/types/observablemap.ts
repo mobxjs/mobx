@@ -290,7 +290,7 @@ export class ObservableMap<V> implements IInterceptable<IMapWillChange<V>>, ILis
 
 	/**
 	 * Returns a shallow non observable object clone of this map.
-	 * Note that the values migth still be observable. For a deep clone use mobx.toJS.
+	 * Note that the values might still be observable. For a deep clone use mobx.toJS.
 	 */
 	toJS(): IKeyValueMap<V> {
 		const res: IKeyValueMap<V> = {};
