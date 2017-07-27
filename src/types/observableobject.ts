@@ -15,7 +15,14 @@ export interface IObservableObject {
 	"observable-object": IObservableObject;
 }
 
-// In 3.0, change to IObjectDidChange
+export interface IObjectDidChange<T, K extends keyof T> {
+	name: K;
+	object: T;
+	type: "update" | "add";
+	oldValue?: T[K];
+	newValue: T[K];
+}
+
 export interface IObjectChange {
 	name: string;
 	object: any;
