@@ -1,143 +1,145 @@
-import {getGlobal, deprecated} from "../utils/utils";
-import {IDerivation} from "./derivation";
-import {Reaction} from "./reaction";
-import {IObservable} from "./observable";
+import { getGlobal, deprecated } from "../utils/utils"
+import { IDerivation } from "./derivation"
+import { Reaction } from "./reaction"
+import { IObservable } from "./observable"
 
 /**
  * These values will persist if global state is reset
  */
-const persistentKeys = ["mobxGuid", "resetId", "spyListeners", "strictMode", "runId"];
+const persistentKeys = ["mobxGuid", "resetId", "spyListeners", "strictMode", "runId"]
 
 export class MobXGlobals {
-	/**
+    /**
 	 * MobXGlobals version.
 	 * MobX compatiblity with other versions loaded in memory as long as this version matches.
 	 * It indicates that the global state still stores similar information
 	 */
-	version = 5;
+    version = 5
 
-	/**
+    /**
 	 * Currently running derivation
 	 */
-	trackingDerivation: IDerivation | null = null;
+    trackingDerivation: IDerivation | null = null
 
-	/**
+    /**
 	 * Are we running a computation currently? (not a reaction)
 	 */
-	computationDepth = 0;
+    computationDepth = 0
 
-	/**
+    /**
 	 * Each time a derivation is tracked, it is assigned a unique run-id
 	 */
-	runId = 0;
+    runId = 0
 
-	/**
+    /**
 	 * 'guid' for general purpose. Will be persisted amongst resets.
 	 */
-	mobxGuid = 0;
+    mobxGuid = 0
 
-	/**
+    /**
 	 * Are we in a batch block? (and how many of them)
 	 */
-	inBatch: number = 0;
+    inBatch: number = 0
 
-	/**
+    /**
 	 * Observables that don't have observers anymore, and are about to be
 	 * suspended, unless somebody else accesses it in the same batch
 	 *
 	 * @type {IObservable[]}
 	 */
-	pendingUnobservations: IObservable[] = [];
+    pendingUnobservations: IObservable[] = []
 
-	/**
+    /**
 	 * List of scheduled, not yet executed, reactions.
 	 */
-	pendingReactions: Reaction[] = [];
+    pendingReactions: Reaction[] = []
 
-	/**
+    /**
 	 * Are we currently processing reactions?
 	 */
-	isRunningReactions = false;
+    isRunningReactions = false
 
-	/**
+    /**
 	 * Is it allowed to change observables at this point?
 	 * In general, MobX doesn't allow that when running computations and React.render.
 	 * To ensure that those functions stay pure.
 	 */
-	allowStateChanges = true;
-	/**
+    allowStateChanges = true
+    /**
 	 * If strict mode is enabled, state changes are by default not allowed
 	 */
-	strictMode = false;
+    strictMode = false
 
-	/**
+    /**
 	 * Used by createTransformer to detect that the global state has been reset.
 	 */
-	resetId = 0;
+    resetId = 0
 
-	/**
+    /**
 	 * Spy callbacks
 	 */
-	spyListeners: {(change: any): void}[] = [];
+    spyListeners: { (change: any): void }[] = []
 
-	/**
+    /**
 	 * Globally attached error handlers that react specifically to errors in reactions
 	 */
-	globalReactionErrorHandlers: ((error: any, derivation: IDerivation) => void)[] = [];
+    globalReactionErrorHandlers: ((error: any, derivation: IDerivation) => void)[] = []
 }
 
-export let globalState: MobXGlobals = new MobXGlobals();
+export let globalState: MobXGlobals = new MobXGlobals()
 
-let shareGlobalStateCalled = false;
-let runInIsolationCalled = false;
-let warnedAboutMultipleInstances = false;
+let shareGlobalStateCalled = false
+let runInIsolationCalled = false
+let warnedAboutMultipleInstances = false
 
 {
-	const global = getGlobal();
-	if (!global.__mobxInstanceCount) {
-		global.__mobxInstanceCount = 1;
-	} else {
-		global.__mobxInstanceCount++;
-		setTimeout(() => {
-			if (!shareGlobalStateCalled && !runInIsolationCalled && !warnedAboutMultipleInstances ) {
-				warnedAboutMultipleInstances = true;
-				console.warn("[mobx] Warning: there are multiple mobx instances active. This might lead to unexpected results. See https://github.com/mobxjs/mobx/issues/1082 for details.")
-			}
-		})
-	}
+    const global = getGlobal()
+    if (!global.__mobxInstanceCount) {
+        global.__mobxInstanceCount = 1
+    } else {
+        global.__mobxInstanceCount++
+        setTimeout(() => {
+            if (!shareGlobalStateCalled && !runInIsolationCalled && !warnedAboutMultipleInstances) {
+                warnedAboutMultipleInstances = true
+                console.warn(
+                    "[mobx] Warning: there are multiple mobx instances active. This might lead to unexpected results. See https://github.com/mobxjs/mobx/issues/1082 for details."
+                )
+            }
+        })
+    }
 }
 
 export function isolateGlobalState() {
-	runInIsolationCalled = true;
-	getGlobal().__mobxInstanceCount--;
+    runInIsolationCalled = true
+    getGlobal().__mobxInstanceCount--
 }
 
 export function shareGlobalState() {
-	// TODO: remove in 4.0; just use peer dependencies instead.
-	deprecated("Using `shareGlobalState` is not recommended, use peer dependencies instead. See https://github.com/mobxjs/mobx/issues/1082 for details.")
-	shareGlobalStateCalled = true;
-	const global = getGlobal();
-	const ownState = globalState;
+    // TODO: remove in 4.0; just use peer dependencies instead.
+    deprecated(
+        "Using `shareGlobalState` is not recommended, use peer dependencies instead. See https://github.com/mobxjs/mobx/issues/1082 for details."
+    )
+    shareGlobalStateCalled = true
+    const global = getGlobal()
+    const ownState = globalState
 
-	/**
+    /**
 	 * Backward compatibility check
 	 */
-	if (global.__mobservableTrackingStack || global.__mobservableViewStack)
-		throw new Error("[mobx] An incompatible version of mobservable is already loaded.");
-	if (global.__mobxGlobal && global.__mobxGlobal.version !== ownState.version)
-		throw new Error("[mobx] An incompatible version of mobx is already loaded.");
-	if (global.__mobxGlobal)
-		globalState = global.__mobxGlobal;
-	else
-		global.__mobxGlobal = ownState;
+    if (global.__mobservableTrackingStack || global.__mobservableViewStack)
+        throw new Error("[mobx] An incompatible version of mobservable is already loaded.")
+    if (global.__mobxGlobal && global.__mobxGlobal.version !== ownState.version)
+        throw new Error("[mobx] An incompatible version of mobx is already loaded.")
+    if (global.__mobxGlobal) globalState = global.__mobxGlobal
+    else global.__mobxGlobal = ownState
 }
 
 export function getGlobalState(): any {
-	return globalState;
+    return globalState
 }
 
 export function registerGlobals() {
-	// no-op to make explicit why this file is loaded
+    // no-op to make explicit why this file is loaded
 }
 
 /**
@@ -145,10 +147,9 @@ export function registerGlobals() {
  * but can be used to get back at a stable state after throwing errors
  */
 export function resetGlobalState() {
-	globalState.resetId++;
-	const defaultGlobals = new MobXGlobals();
-	for (let key in defaultGlobals)
-		if (persistentKeys.indexOf(key) === -1)
-			globalState[key] = defaultGlobals[key];
-	globalState.allowStateChanges = !globalState.strictMode;
+    globalState.resetId++
+    const defaultGlobals = new MobXGlobals()
+    for (let key in defaultGlobals)
+        if (persistentKeys.indexOf(key) === -1) globalState[key] = defaultGlobals[key]
+    globalState.allowStateChanges = !globalState.strictMode
 }
