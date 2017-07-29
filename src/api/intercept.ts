@@ -11,7 +11,7 @@ export function intercept<T>(observableArray: IObservableArray<T>, handler: IInt
 export function intercept<T>(observableMap: ObservableMap<T>, handler: IInterceptor<IMapWillChange<T>>): Lambda;
 export function intercept<T>(observableMap: ObservableMap<T>, property: string, handler: IInterceptor<IValueWillChange<T>>): Lambda;
 export function intercept(object: Object, handler: IInterceptor<IObjectWillChange>): Lambda;
-export function intercept(object: Object, property: string, handler: IInterceptor<IValueWillChange<any>>): Lambda;
+export function intercept<T extends Object, K extends keyof T>(object: T, property: K, handler: IInterceptor<IValueWillChange<any>>): Lambda;
 export function intercept(thing, propOrHandler?, handler?): Lambda {
 	if (typeof handler === "function")
 		return interceptProperty(thing, propOrHandler, handler);
