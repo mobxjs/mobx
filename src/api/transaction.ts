@@ -1,7 +1,6 @@
-import {deprecated} from "../utils/utils";
-import {executeAction} from "../core/action";
-import {getMessage} from "../utils/messages";
-
+import { deprecated } from "../utils/utils"
+import { executeAction } from "../core/action"
+import { getMessage } from "../utils/messages"
 
 /**
  * @deprecated
@@ -14,10 +13,10 @@ import {getMessage} from "../utils/messages";
  * @returns any value that was returned by the 'action' parameter.
  */
 export function transaction<T>(action: () => T, thisArg = undefined): T {
-	deprecated(getMessage("m023"));
-	return runInTransaction.apply(undefined, arguments);
+    deprecated(getMessage("m023"))
+    return runInTransaction.apply(undefined, arguments)
 }
 
 export function runInTransaction<T>(action: () => T, thisArg = undefined): T {
-	return executeAction("", action);
+    return executeAction("", action)
 }
