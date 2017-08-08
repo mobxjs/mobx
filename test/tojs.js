@@ -1,14 +1,13 @@
 "use strict"
 
-var test = require('tape');
-var mobx = require('..');
-var m = mobx;
-var observable = mobx.observable;
-var transaction = mobx.transaction;
+var test = require("tape")
+var mobx = require("..")
+var m = mobx
+var observable = mobx.observable
+var transaction = mobx.transaction
 
-
-test('json1', function(t) {
-	mobx.extras.resetGlobalState()
+test("json1", function(t) {
+    mobx.extras.resetGlobalState()
 
     var todos = observable([
         {
@@ -17,27 +16,31 @@ test('json1', function(t) {
         {
             title: "improve coverge"
         }
-    ]);
+    ])
 
-    var output;
+    var output
     mobx.autorun(function() {
-        output = todos.map(function(todo) { return todo.title; }).join(", ");
-    });
+        output = todos
+            .map(function(todo) {
+                return todo.title
+            })
+            .join(", ")
+    })
 
-    todos[1].title = "improve coverage"; // prints: write blog, improve coverage
-    t.equal(output, "write blog, improve coverage");
-    todos.push({ title: "take a nap" }); // prints: write blog, improve coverage, take a nap
-    t.equal(output, "write blog, improve coverage, take a nap");
+    todos[1].title = "improve coverage" // prints: write blog, improve coverage
+    t.equal(output, "write blog, improve coverage")
+    todos.push({ title: "take a nap" }) // prints: write blog, improve coverage, take a nap
+    t.equal(output, "write blog, improve coverage, take a nap")
 
-    t.end();
+    t.end()
 })
 
-test('json2', function(t) {
+test("json2", function(t) {
     var source = {
         todos: [
             {
                 title: "write blog",
-                tags: ["react","frp"],
+                tags: ["react", "frp"],
                 details: {
                     url: "somewhere"
                 }
@@ -50,88 +53,91 @@ test('json2', function(t) {
                 }
             }
         ]
-    };
+    }
 
-    var o = mobx.observable(JSON.parse(JSON.stringify(source)));
+    var o = mobx.observable(JSON.parse(JSON.stringify(source)))
 
-    t.deepEqual(mobx.toJS(o), source);
+    t.deepEqual(mobx.toJS(o), source)
 
     var analyze = mobx.computed(function() {
-        return [
-            o.todos.length,
-            o.todos[1].details.url
-        ]
-    });
+        return [o.todos.length, o.todos[1].details.url]
+    })
 
     var alltags = mobx.computed(function() {
-        return o.todos.map(function(todo) {
-            return todo.tags.join(",");
-        }).join(",");
-    });
+        return o.todos
+            .map(function(todo) {
+                return todo.tags.join(",")
+            })
+            .join(",")
+    })
 
-    var ab = [];
-    var tb = [];
+    var ab = []
+    var tb = []
 
-    m.observe(analyze, function(d) { ab.push(d.newValue); }, true);
-    m.observe(alltags, function(d) { tb.push(d.newValue); }, true);
+    m.observe(
+        analyze,
+        function(d) {
+            ab.push(d.newValue)
+        },
+        true
+    )
+    m.observe(
+        alltags,
+        function(d) {
+            tb.push(d.newValue)
+        },
+        true
+    )
 
-    o.todos[0].details.url = "boe";
-    o.todos[1].details.url = "ba";
-    o.todos[0].tags[0] = "reactjs";
-    o.todos[1].tags.push("pff");
+    o.todos[0].details.url = "boe"
+    o.todos[1].details.url = "ba"
+    o.todos[0].tags[0] = "reactjs"
+    o.todos[1].tags.push("pff")
 
     t.deepEqual(mobx.toJS(o), {
-        "todos": [
+        todos: [
             {
-                "title": "write blog",
-                "tags": [
-                    "reactjs",
-                    "frp"
-                ],
-                "details": {
-                    "url": "boe"
+                title: "write blog",
+                tags: ["reactjs", "frp"],
+                details: {
+                    url: "boe"
                 }
             },
             {
-                "title": "do the dishes",
-                "tags": [
-                    "mweh", "pff"
-                ],
-                "details": {
-                    "url": "ba"
+                title: "do the dishes",
+                tags: ["mweh", "pff"],
+                details: {
+                    url: "ba"
                 }
             }
         ]
-    });
-    t.deepEqual(ab, [ [ 2, 'here' ], [ 2, 'ba' ] ]);
-    t.deepEqual(tb,  [ 'react,frp,mweh', 'reactjs,frp,mweh', 'reactjs,frp,mweh,pff' ]);
-    ab = [];
-    tb = [];
+    })
+    t.deepEqual(ab, [[2, "here"], [2, "ba"]])
+    t.deepEqual(tb, ["react,frp,mweh", "reactjs,frp,mweh", "reactjs,frp,mweh,pff"])
+    ab = []
+    tb = []
 
-    o.todos.push(mobx.observable({
-        title: "test",
-        tags: ["x"]
-    }));
+    o.todos.push(
+        mobx.observable({
+            title: "test",
+            tags: ["x"]
+        })
+    )
 
     t.deepEqual(mobx.toJS(o), {
-        "todos": [
+        todos: [
             {
-                "title": "write blog",
-                "tags": [
-                    "reactjs",
-                    "frp"
-                ],
-                "details": {
-                    "url": "boe"
+                title: "write blog",
+                tags: ["reactjs", "frp"],
+                details: {
+                    url: "boe"
                 }
             },
             {
-                "title": "do the dishes",
-                "tags": [
-                    "mweh", "pff"
-                ],
-                "details": {
-                    "url": "ba"
+                title: "do the dishes",
+                tags: ["mweh", "pff"],
+                details: {
+                    url: "ba"
                 }
             },
             {
@@ -139,11 +145,11 @@ test('json2', function(t) {
                 tags: ["x"]
             }
         ]
-    });
-    t.deepEqual(ab, [[3, "ba"]]);
-    t.deepEqual(tb, ["reactjs,frp,mweh,pff,x"]);
-    ab = [];
-    tb = [];
+    })
+    t.deepEqual(ab, [[3, "ba"]])
+    t.deepEqual(tb, ["reactjs,frp,mweh,pff,x"])
+    ab = []
+    tb = []
 
     o.todos[1] = mobx.observable({
         title: "clean the attic",
@@ -151,26 +157,21 @@ test('json2', function(t) {
         details: {
             url: "booking.com"
         }
-    });
+    })
     t.deepEqual(JSON.parse(JSON.stringify(o)), {
-        "todos": [
+        todos: [
             {
-                "title": "write blog",
-                "tags": [
-                    "reactjs",
-                    "frp"
-                ],
-                "details": {
-                    "url": "boe"
+                title: "write blog",
+                tags: ["reactjs", "frp"],
+                details: {
+                    url: "boe"
                 }
             },
             {
-                "title": "clean the attic",
-                "tags": [
-                    "needs sabbatical"
-                ],
-                "details": {
-                    "url": "booking.com"
+                title: "clean the attic",
+                tags: ["needs sabbatical"],
+                details: {
+                    url: "booking.com"
                 }
             },
             {
@@ -178,33 +179,28 @@ test('json2', function(t) {
                 tags: ["x"]
             }
         ]
-    });
-    t.deepEqual(ab, [[3, "booking.com"]]);
-    t.deepEqual(tb, ["reactjs,frp,needs sabbatical,x"]);
-    ab = [];
-    tb = [];
+    })
+    t.deepEqual(ab, [[3, "booking.com"]])
+    t.deepEqual(tb, ["reactjs,frp,needs sabbatical,x"])
+    ab = []
+    tb = []
 
-    o.todos[1].details = mobx.observable({ url: "google" });
-    o.todos[1].tags = ["foo", "bar"];
+    o.todos[1].details = mobx.observable({ url: "google" })
+    o.todos[1].tags = ["foo", "bar"]
     t.deepEqual(mobx.toJS(o, false), {
-         "todos": [
+        todos: [
             {
-                "title": "write blog",
-                "tags": [
-                    "reactjs",
-                    "frp"
-                ],
-                "details": {
-                    "url": "boe"
+                title: "write blog",
+                tags: ["reactjs", "frp"],
+                details: {
+                    url: "boe"
                 }
             },
             {
-                "title": "clean the attic",
-                "tags": [
-                    "foo", "bar"
-                ],
-                "details": {
-                    "url": "google"
+                title: "clean the attic",
+                tags: ["foo", "bar"],
+                details: {
+                    url: "google"
                 }
             },
             {
@@ -212,122 +208,122 @@ test('json2', function(t) {
                 tags: ["x"]
             }
         ]
-    });
-    t.deepEqual(mobx.toJS(o, true), mobx.toJS(o, false));
-    t.deepEqual(ab, [[3, "google"]]);
-    t.deepEqual(tb, ["reactjs,frp,foo,bar,x"]);
+    })
+    t.deepEqual(mobx.toJS(o, true), mobx.toJS(o, false))
+    t.deepEqual(ab, [[3, "google"]])
+    t.deepEqual(tb, ["reactjs,frp,foo,bar,x"])
 
-    t.end();
+    t.end()
 })
 
-test('toJS handles dates', t => {
-	var a = observable({
-		d: new Date()
-	});
+test("toJS handles dates", t => {
+    var a = observable({
+        d: new Date()
+    })
 
-	var b = mobx.toJS(a);
-	t.equal(b.d instanceof Date, true)
-	t.equal(a.d === b.d, true)
-	t.end()
+    var b = mobx.toJS(a)
+    t.equal(b.d instanceof Date, true)
+    t.equal(a.d === b.d, true)
+    t.end()
 })
 
-test('json cycles', function(t) {
+test("json cycles", function(t) {
     var a = observable({
         b: 1,
         c: [2],
         d: mobx.map(),
         e: a
-    });
+    })
 
-    a.e = a;
-    a.c.push(a, a.d);
-    a.d.set("f", a);
-    a.d.set("d", a.d);
-    a.d.set("c", a.c);
+    a.e = a
+    a.c.push(a, a.d)
+    a.d.set("f", a)
+    a.d.set("d", a.d)
+    a.d.set("c", a.c)
 
-    var cloneA = mobx.toJS(a, true);
-    var cloneC = cloneA.c;
-    var cloneD = cloneA.d;
+    var cloneA = mobx.toJS(a, true)
+    var cloneC = cloneA.c
+    var cloneD = cloneA.d
 
-    t.equal(cloneA.b, 1);
-    t.equal(cloneA.c[0], 2);
-    t.equal(cloneA.c[1], cloneA);
-    t.equal(cloneA.c[2], cloneD);
-    t.equal(cloneD.f, cloneA);
-    t.equal(cloneD.d, cloneD);
-    t.equal(cloneD.c, cloneC);
-    t.equal(cloneA.e, cloneA);
+    t.equal(cloneA.b, 1)
+    t.equal(cloneA.c[0], 2)
+    t.equal(cloneA.c[1], cloneA)
+    t.equal(cloneA.c[2], cloneD)
+    t.equal(cloneD.f, cloneA)
+    t.equal(cloneD.d, cloneD)
+    t.equal(cloneD.c, cloneC)
+    t.equal(cloneA.e, cloneA)
 
-    t.end();
+    t.end()
 })
 
-test('#285 class instances with toJS', t => {
-	function Person() {
-		this.firstName = "michel";
-		mobx.extendObservable(this, {
-			lastName: "weststrate",
-			tags: ["user", "mobx-member"],
-			get fullName() {
-				return this.firstName + this.lastName
-			}
-		})
-	}
+test("#285 class instances with toJS", t => {
+    function Person() {
+        this.firstName = "michel"
+        mobx.extendObservable(this, {
+            lastName: "weststrate",
+            tags: ["user", "mobx-member"],
+            get fullName() {
+                return this.firstName + this.lastName
+            }
+        })
+    }
 
-	const p1 = new Person();
-	// check before lazy initialization
-	t.deepEqual(mobx.toJS(p1), {
-		firstName: "michel",
-		lastName: "weststrate",
-		tags: ["user", "mobx-member"]
-	});
+    const p1 = new Person()
+    // check before lazy initialization
+    t.deepEqual(mobx.toJS(p1), {
+        firstName: "michel",
+        lastName: "weststrate",
+        tags: ["user", "mobx-member"]
+    })
 
-	// check after lazy initialization
-	t.deepEqual(mobx.toJS(p1), {
-		firstName: "michel",
-		lastName: "weststrate",
-		tags: ["user", "mobx-member"]
-	});
+    // check after lazy initialization
+    t.deepEqual(mobx.toJS(p1), {
+        firstName: "michel",
+        lastName: "weststrate",
+        tags: ["user", "mobx-member"]
+    })
 
-	t.end()
+    t.end()
 })
 
-test('#285 non-mobx class instances with toJS', t => {
-	const nameObservable = mobx.observable("weststrate");
-	function Person() {
-		this.firstName = "michel";
-		this.lastName = nameObservable;
-	}
+test("#285 non-mobx class instances with toJS", t => {
+    const nameObservable = mobx.observable("weststrate")
+    function Person() {
+        this.firstName = "michel"
+        this.lastName = nameObservable
+    }
 
-	const p1 = new Person();
-	// check before lazy initialization
-	t.deepEqual(mobx.toJS(p1), {
-		firstName: "michel",
-		lastName: nameObservable // toJS doesn't recurse into non observable objects!
-	});
+    const p1 = new Person()
+    // check before lazy initialization
+    t.deepEqual(mobx.toJS(p1), {
+        firstName: "michel",
+        lastName: nameObservable // toJS doesn't recurse into non observable objects!
+    })
 
-	t.end()
+    t.end()
 })
 
 test("verify #566 solution", t => {
-	function MyClass() {}
-	const a = new MyClass()
-	const b = mobx.observable({ x: 3 })
-	const c = mobx.observable({ a: a, b: b })
+    function MyClass() {}
+    const a = new MyClass()
+    const b = mobx.observable({ x: 3 })
+    const c = mobx.observable({ a: a, b: b })
 
-	t.ok(mobx.toJS(c).a === a) // true
-	t.ok(mobx.toJS(c).b !== b) // false, cloned
-	t.ok(mobx.toJS(c).b.x === b.x) // true, both 3
+    t.ok(mobx.toJS(c).a === a) // true
+    t.ok(mobx.toJS(c).b !== b) // false, cloned
+    t.ok(mobx.toJS(c).b.x === b.x) // true, both 3
 
-	t.end()
+    t.end()
 })
 
 test("verify already seen", t => {
-	const a = mobx.observable({ x: null, y: 3 })
-	a.x = a;
+    const a = mobx.observable({ x: null, y: 3 })
+    a.x = a
 
-	const res = mobx.toJS(a);
-	t.equal(res.y, 3);
-	t.ok(res.x === res)
-	t.notOk(res.x === a);
-	t.end();
+    const res = mobx.toJS(a)
+    t.equal(res.y, 3)
+    t.ok(res.x === res)
+    t.notOk(res.x === a)
+    t.end()
 })
