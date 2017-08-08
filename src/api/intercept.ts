@@ -24,9 +24,9 @@ export function intercept<T>(
     handler: IInterceptor<IValueWillChange<T>>
 ): Lambda
 export function intercept(object: Object, handler: IInterceptor<IObjectWillChange>): Lambda
-export function intercept(
-    object: Object,
-    property: string,
+export function intercept<T extends Object, K extends keyof T>(
+    object: T,
+    property: K,
     handler: IInterceptor<IValueWillChange<any>>
 ): Lambda
 export function intercept(thing, propOrHandler?, handler?): Lambda {
