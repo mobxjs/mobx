@@ -2,7 +2,7 @@
 
 `createTransformer<A, B>(transformation: (value: A) => B, onCleanup?: (result: B, value?: A) => void): (value: A) => B`
 
-`createTransformer` turns a function (that should transform one value into another value) into a reactive and memoizing function.
+`createTransformer` turns a function (that should transform observable value `A` into another value `B`) into a reactive and memoizing function.
 In other words, if the `transformation` function computes B given a specific A, the same B will be returned for all other future invocations of the transformation with the same A.
 However, if A changes, the transformation will be re-applied so that B is updated accordingly.
 And last but not least, if nobody is using the transformation of a specific A anymore, its entry will be removed from the memoization table.
