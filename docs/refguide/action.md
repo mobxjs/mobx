@@ -1,4 +1,4 @@
-#action
+# action
 
 Usage:
 * `action(fn)`
