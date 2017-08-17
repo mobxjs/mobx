@@ -143,7 +143,7 @@ mobx.useStrict(true) // don't allow state modifications outside actions
 
 class Store {
 	@observable githubProjects = []
-	@state = "pending" // "pending" / "done" / "error"
+	@observable state = "pending" // "pending" / "done" / "error"
 
 	@action
 	async fetchProjects() {
