@@ -45,7 +45,9 @@ export interface IComputedValue<T> {
 /**
  * A node in the state dependency root that observes other nodes, and can be observed itself.
  *
- * ComputedValue will remember result of the computation for duration of a batch, or being observed
+ * ComputedValue will remember the result of the computation for the duration of the batch, or
+ * while being observed.
+ *
  * During this time it will recompute only when one of its direct dependencies changed,
  * but only when it is being accessed with `ComputedValue.get()`.
  *
