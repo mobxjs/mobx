@@ -120,6 +120,9 @@ function namedActionDecorator(name: string) {
             descriptor.configurable = true
             return descriptor
         }
+        if (descriptor !== undefined && descriptor.get !== undefined) {
+            throw new Error("[mobx] action is not expected to be used with getters");
+        }
         // bound instance methods
         return actionFieldDecorator(name).apply(this, arguments)
     }
