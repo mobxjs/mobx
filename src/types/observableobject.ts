@@ -93,7 +93,7 @@ export function defineObservablePropertyFromDescriptor(
     descriptor: PropertyDescriptor,
     defaultEnhancer: IEnhancer<any>
 ) {
-    if (adm.values[propName]) {
+    if (adm.values[propName] && !isComputedValue(adm.values[propName])) {
         // already observable property
         invariant(
             "value" in descriptor,
