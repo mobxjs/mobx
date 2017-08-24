@@ -63,8 +63,8 @@ class Todo {
 }
 ```
 
-Using `observable` is like turning the properties of an object into a spreadsheet cells.
-But unlike spreadsheets, these values can be not only primitive values, but also references, objects and arrays.
+Using `observable` is like turning the properties of an object into spreadsheet cells.
+But unlike spreadsheets, these values can not only be primitive values, but also references, objects and arrays.
 You can even [define your own](http://mobxjs.github.io/mobx/refguide/extending.html) observable data sources.
 
 ### Intermezzo: Using MobX in ES5, ES6 and ES.next environments
@@ -88,7 +88,7 @@ function Todo() {
 
 ### Computed values
 
-With MobX you can define values that will be derived automatically when relevant data is modified.
+With MobX, you can define values that will be derived automatically when relevant data is modified.
 By using the [`@computed`](http://mobxjs.github.io/mobx/refguide/computed-decorator.html) decorator or by using getter / setter functions when using `(extend)Observable`.
 
 ```javascript
@@ -145,7 +145,7 @@ ReactDOM.render(<TodoListView todoList={store} />, document.getElementById('moun
 ```
 
 `observer` turns React (function) components into derivations of the data they render.
-When using MobX there are no smart or dumb components.
+When using MobX, there are no smart or dumb components.
 All components render smartly but are defined in a dumb manner. MobX will simply make sure the components are always re-rendered whenever needed, but also no more than that. So the `onClick` handler in the above example will force the proper `TodoView` to render, and it will cause the `TodoListView` to render if the number of unfinished tasks has changed.
 However, if you would remove the `Tasks left` line (or put it into a separate component), the `TodoListView` will no longer re-render when ticking a box. You can verify this yourself by changing the [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/).
 
