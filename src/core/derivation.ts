@@ -199,8 +199,8 @@ function bindDependencies(derivation: IDerivation) {
         }
     }
 
-    // Some new observed derivations might become stale during this derivation computation
-    // so say had no chance to propagate staleness (#916)
+    // Some new observed derivations may become stale during this derivation computation
+    // so they have had no chance to propagate staleness (#916)
     if (lowestNewObservingDerivationState !== IDerivationState.UP_TO_DATE) {
         derivation.dependenciesState = lowestNewObservingDerivationState
         derivation.onBecomeStale()
