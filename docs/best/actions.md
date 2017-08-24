@@ -11,7 +11,7 @@ mobx.useStrict(true) // don't allow state modifications outside actions
 
 class Store {
 	@observable githubProjects = []
-	@state = "pending" // "pending" / "done" / "error"
+	@observable state = "pending" // "pending" / "done" / "error"
 
 	@action
 	fetchProjects() {
@@ -38,7 +38,7 @@ A first simple fix is to extract the callbacks to actions. (Note that binding is
 ```javascript
 class Store {
 	@observable githubProjects = []
-	@state = "pending" // "pending" / "done" / "error"
+	@observable state = "pending" // "pending" / "done" / "error"
 
 	@action
 	fetchProjects() {
@@ -68,7 +68,7 @@ mobx.useStrict(true) // don't allow state modifications outside actions
 
 class Store {
 	@observable githubProjects = []
-	@state = "pending" // "pending" / "done" / "error"
+	@observable state = "pending" // "pending" / "done" / "error"
 
 	@action
 	fetchProjects() {
@@ -101,7 +101,7 @@ mobx.useStrict(true) // don't allow state modifications outside actions
 
 class Store {
 	@observable githubProjects = []
-	@state = "pending" // "pending" / "done" / "error"
+	@observable state = "pending" // "pending" / "done" / "error"
 
 	@action
 	fetchProjects() {
@@ -186,7 +186,7 @@ mobx.useStrict(true) // don't allow state modifications outside actions
 
 class Store {
 	@observable githubProjects = []
-	@state = "pending" // "pending" / "done" / "error"
+	@observable state = "pending" // "pending" / "done" / "error"
 
 	@asyncAction
 	*fetchProjects() { // <- note the star, this a generator function!
