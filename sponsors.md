@@ -28,3 +28,5 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Matthieu Dumont
 * Wilson Lee
 * Jorge Luis Acosta
+* Greg Zapp
+* Code Hat Programming Inc.
