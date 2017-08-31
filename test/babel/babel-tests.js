@@ -56,6 +56,17 @@ test("babel", function(t) {
     t.end()
 })
 
+test("should not be possible to use @action with getters", t => {
+    t.throws(() => {
+        class A {
+            @action get Test() { }
+        }
+    }, new Error('[mobx] action is not expected to be used with getters'))
+
+    mobx.extras.resetGlobalState()
+    t.end()
+})
+
 test("babel: parameterized computed decorator", t => {
     class TestClass {
         @observable x = 3
