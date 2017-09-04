@@ -19,7 +19,7 @@ setInterval(() => {
 	render() {
 		return (<span>Seconds passed: { this.props.timerData.secondsPassed } </span> )
 	}
-});
+};
 
 React.render(<Timer timerData={timerData} />, document.body);
 ```
