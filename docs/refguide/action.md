@@ -14,7 +14,7 @@ Any application has actions. Actions are anything that modify the state.
 With MobX you can make it explicit in your code where your actions live by marking them.
 Actions help you to structure your code better.
 
-It takes a function and returns a function with the same signuature.
+It takes a function and returns a function with the same signature.
 But wrapped with `transaction`, `untracked` and `allowStateChanges`.
 Especially the fact that `transaction` is applied automatically yields great performance benefits;
 actions will batch mutations and only notify computed values and reactions after the (outer most) action has finished.
