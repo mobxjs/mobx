@@ -13,12 +13,12 @@ import { invariant, addHiddenProp, hasOwnProperty } from "./utils"
  */
 export function createClassPropertyDecorator(
     /**
-	 * This function is invoked once, when the property is added to a new instance.
-	 * When this happens is not strictly determined due to differences in TS and Babel:
-	 * Typescript: Usually when constructing the new instance
-	 * Babel, sometimes Typescript: during the first get / set
-	 * Both: when calling `runLazyInitializers(instance)`
-	 */
+     * This function is invoked once, when the property is added to a new instance.
+     * When this happens is not strictly determined due to differences in TS and Babel:
+     * Typescript: Usually when constructing the new instance
+     * Babel, sometimes Typescript: during the first get / set
+     * Both: when calling `runLazyInitializers(instance)`
+     */
     onInitialize: (
         target,
         property,
@@ -30,8 +30,8 @@ export function createClassPropertyDecorator(
     set: (name, newValue) => void,
     enumerable: boolean,
     /**
-	 * Can this decorator invoked with arguments? e.g. @decorator(args)
-	 */
+     * Can this decorator invoked with arguments? e.g. @decorator(args)
+     */
     allowCustomArguments: boolean
 ): any {
     function classPropertyDecorator(

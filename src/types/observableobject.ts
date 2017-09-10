@@ -53,10 +53,10 @@ export class ObservableObjectAdministration
     constructor(public target: any, public name: string) {}
 
     /**
-		* Observes this object. Triggers for the events 'add', 'update' and 'delete'.
-		* See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
-		* for callback details
-		*/
+     * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
+     * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
+     * for callback details
+     */
     observe(callback: (changes: IObjectChange) => void, fireImmediately?: boolean): Lambda {
         invariant(
             fireImmediately !== true,

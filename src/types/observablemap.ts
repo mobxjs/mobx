@@ -315,9 +315,9 @@ export class ObservableMap<V>
     }
 
     /**
-	 * Returns a shallow non observable object clone of this map.
-	 * Note that the values might still be observable. For a deep clone use mobx.toJS.
-	 */
+     * Returns a shallow non observable object clone of this map.
+     * Note that the values might still be observable. For a deep clone use mobx.toJS.
+     */
     toJS(): IKeyValueMap<V> {
         const res: IKeyValueMap<V> = {}
         this.keys().forEach(key => (res[key] = this.get(key)!))
@@ -353,10 +353,10 @@ export class ObservableMap<V>
     }
 
     /**
-	 * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
-	 * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
-	 * for callback details
-	 */
+     * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
+     * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
+     * for callback details
+     */
     observe(listener: (changes: IMapChange<V>) => void, fireImmediately?: boolean): Lambda {
         invariant(fireImmediately !== true, getMessage("m033"))
         return registerListener(this, listener)

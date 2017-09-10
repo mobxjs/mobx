@@ -83,8 +83,8 @@ export class Reaction implements IDerivation, IReactionPublic {
     }
 
     /**
-	 * internal, use schedule() if you intend to kick off a reaction
-	 */
+     * internal, use schedule() if you intend to kick off a reaction
+     */
     runReaction() {
         if (!this.isDisposed) {
             startBatch()

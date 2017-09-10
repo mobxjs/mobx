@@ -11,10 +11,10 @@ export interface IDepTreeNode {
 export interface IObservable extends IDepTreeNode {
     diffValue: number
     /**
-	 * Id of the derivation *run* that last accessed this observable.
-	 * If this id equals the *run* id of the current derivation,
-	 * the dependency is already established
-	 */
+     * Id of the derivation *run* that last accessed this observable.
+     * If this id equals the *run* id of the current derivation,
+     * the dependency is already established
+     */
     lastAccessedBy: number
 
     lowestObserverState: IDerivationState // Used to avoid redundant propagations
@@ -141,10 +141,10 @@ export function reportObserved(observable: IObservable) {
     const derivation = globalState.trackingDerivation
     if (derivation !== null) {
         /**
-		 * Simple optimization, give each derivation run an unique id (runId)
-		 * Check if last time this observable was accessed the same runId is used
-		 * if this is the case, the relation is already known
-		 */
+         * Simple optimization, give each derivation run an unique id (runId)
+         * Check if last time this observable was accessed the same runId is used
+         * if this is the case, the relation is already known
+         */
         if (derivation.runId !== observable.lastAccessedBy) {
             observable.lastAccessedBy = derivation.runId
             derivation.newObserving![derivation.unboundDepsCount++] = observable

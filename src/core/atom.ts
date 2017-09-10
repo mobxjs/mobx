@@ -15,9 +15,9 @@ export class BaseAtom implements IAtom {
     lastAccessedBy = 0
     lowestObserverState = IDerivationState.NOT_TRACKING
     /**
-	 * Create a new atom. For debugging purposes it is recommended to give it a name.
-	 * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
-	 */
+     * Create a new atom. For debugging purposes it is recommended to give it a name.
+     * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
+     */
     constructor(public name = "Atom@" + getNextId()) {}
 
     public onBecomeUnobserved() {
@@ -25,15 +25,15 @@ export class BaseAtom implements IAtom {
     }
 
     /**
-	 * Invoke this method to notify mobx that your atom has been used somehow.
-	 */
+     * Invoke this method to notify mobx that your atom has been used somehow.
+     */
     public reportObserved() {
         reportObserved(this)
     }
 
     /**
-	 * Invoke this method _after_ this method has changed to signal mobx that all its observers should invalidate.
-	 */
+     * Invoke this method _after_ this method has changed to signal mobx that all its observers should invalidate.
+     */
     public reportChanged() {
         startBatch()
         propagateChanged(this)
@@ -50,9 +50,9 @@ export class Atom extends BaseAtom implements IAtom {
     public isBeingTracked = false
 
     /**
-	 * Create a new atom. For debugging purposes it is recommended to give it a name.
-	 * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
-	 */
+     * Create a new atom. For debugging purposes it is recommended to give it a name.
+     * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
+     */
     constructor(
         public name = "Atom@" + getNextId(),
         public onBecomeObservedHandler: () => void = noop,
