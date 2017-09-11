@@ -119,6 +119,29 @@ function inherit(ctor, proto) {
 }
 inherit(StubArray, Array.prototype)
 
+// Weex freeze Array.prototype
+// https://github.com/alibaba/weex/pull/1529
+;[
+	"constructor",
+    "push",
+    "shift",
+    "concat",
+    "pop",
+    "unshift",
+    "replace",
+	"find",
+	"findIndex",
+	"splice",
+	"reverse",
+	"sort"
+].forEach(function (key) {
+    Object.defineProperty(StubArray.prototype, key, {
+        configurable: true,
+        writable: true,
+        value: Array.prototype[key]
+    })
+})
+
 class ObservableArrayAdministration<T>
     implements IInterceptable<IArrayWillChange<T> | IArrayWillSplice<T>>, IListenable {
     atom: BaseAtom
