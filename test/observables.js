@@ -1944,7 +1944,7 @@ test("Issue 1092 - We should be able to define observable on all siblings", t =>
 })
 
 test("Issue 1121 - It should be possible to redefine a computed property", t => {
-    t.plan(3)
+    t.plan(4)
 
     const a = observable({
         width: 10,
@@ -1967,6 +1967,7 @@ test("Issue 1121 - It should be possible to redefine a computed property", t => 
 
     t.equal(observeCalls, 1)
     t.equal(reactionCalls, 1)
+    t.equal(a.surface, 22)
 
     t.end()
 })
