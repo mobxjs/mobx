@@ -6,7 +6,7 @@ Just like `autorun` except that the action won't be invoked synchronously but as
 The `action` will be run and observed.
 However, instead of running the action immediately when the values it observes have changed, the `minimumDelay` will be awaited before re-execution the `action` again.
 
-If observed values are changed multiple times while waiting, the action is still triggered only once, so in a sense it achieves a similar effect than a transaction.
+If observed values are changed multiple times while waiting, the action is only triggered once, so in a sense it achieves a similar effect as a transaction.
 This might be useful for stuff that is expensive and doesn't need to happen synchronously; such as debouncing server communication.
 
 If a scope is given, the action will be bound to this scope object.
