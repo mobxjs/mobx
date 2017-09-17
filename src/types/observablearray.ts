@@ -346,9 +346,9 @@ export class ObservableArray<T> extends StubArray {
     }
 
     /**
-	 * Converts this array back to a (shallow) javascript structure.
-	 * For a deep clone use mobx.toJS
-	 */
+     * Converts this array back to a (shallow) javascript structure.
+     * For a deep clone use mobx.toJS
+     */
     toJS(): T[] {
         return (this as any).slice()
     }
@@ -386,11 +386,11 @@ export class ObservableArray<T> extends StubArray {
     }
 
     /*
-		functions that do alter the internal structure of the array, (based on lib.es6.d.ts)
-		since these functions alter the inner structure of the array, the have side effects.
-		Because the have side effects, they should not be used in computed function,
-		and for that reason the do not call dependencyState.notifyObserved
-		*/
+     * functions that do alter the internal structure of the array, (based on lib.es6.d.ts)
+     * since these functions alter the inner structure of the array, the have side effects.
+     * Because the have side effects, they should not be used in computed function,
+     * and for that reason the do not call dependencyState.notifyObserved
+     */
     splice(index: number, deleteCount?: number, ...newItems: T[]): T[] {
         switch (arguments.length) {
             case 0:

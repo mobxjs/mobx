@@ -5,8 +5,8 @@ import { isObservableValue } from "../types/observablevalue"
 import { isObservable } from "./isobservable"
 
 /**
-	* Basically, a deep clone, so that no reactive property will exist anymore.
-	*/
+ * Basically, a deep clone, so that no reactive property will exist anymore.
+ */
 export function toJS<T>(source: T, detectCycles?: boolean): T
 export function toJS(source: any, detectCycles?: boolean): any
 export function toJS(source, detectCycles: boolean, __alreadySeen: [any, any][]) // internal overload
