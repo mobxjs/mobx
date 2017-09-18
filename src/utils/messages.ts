@@ -30,7 +30,6 @@ const messages = {
     m020: "modifiers can only be used for individual object properties",
     m021: "observable expects zero or one arguments",
     m022: "@observable can not be used on getters, use @computed instead",
-    m023: "Using `transaction` is deprecated, use `runInAction` or `(@)action` instead.",
     m024:
         "whyRun() can only be used if a derivation is active, or by passing an computed value / reaction explicitly. If you invoked whyRun from inside a computation; the computation is currently suspended but re-evaluating because somebody requested its value.",
     m025: "whyRun can only be used on reactions and computed values",
