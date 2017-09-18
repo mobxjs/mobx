@@ -1942,3 +1942,32 @@ test("Issue 1092 - We should be able to define observable on all siblings", t =>
 
     t.end()
 })
+
+test("Issue 1121 - It should be possible to redefine a computed property", t => {
+    t.plan(4)
+
+    const a = observable({
+        width: 10,
+        get surface() { return this.width }
+    })
+
+    let observeCalls = 0
+    let reactionCalls = 0
+
+    mobx.observe(a, "surface", v => observeCalls++)
+    mobx.reaction(() => a.surface, v => reactionCalls++)
+
+    t.doesNotThrow(() => {
+        mobx.extendObservable(a, {
+            get surface() { return this.width * 2 }
+        })
+    }, "It should be possible to redefine a computed property")
+
+    a.width = 11
+
+    t.equal(observeCalls, 1)
+    t.equal(reactionCalls, 1)
+    t.equal(a.surface, 22)
+
+    t.end()
+})
