@@ -1,7 +1,6 @@
 # 3.3.0
 
 * Undeprecated `transaction`, see [#1139](https://github.com/mobxjs/mobx/issues/1139)
-* Use `.mjs` extension for module build [1131](https://github.com/mobxjs/mobx/issues/1131)
 * Fixed typings of reaction [#1136](https://github.com/mobxjs/mobx/issues/1136)
 * It is now possible to re-define a computed property [#1121](https://github.com/mobxjs/mobx/issues/1121)
 * Print an helpful error message when using `@action` on a getter [#971](https://github.com/mobxjs/mobx/issues/971)
