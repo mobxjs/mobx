@@ -1,3 +1,8 @@
+# Next
+
+* Fix bug allowing maps to be modified outside actions when using strict mode, fixes [#940](https://github.com/mobxjs/mobx/issues/940)
+* Fixed [#1139](https://github.com/mobxjs/mobx/issues/1139) properly
+
 # 3.3.0
 
 * Undeprecated `transaction`, see [#1139](https://github.com/mobxjs/mobx/issues/1139)

@@ -23,7 +23,7 @@ import { IListenable, registerListener, hasListeners, notifyListeners } from "./
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
 import { arrayAsIterator, declareIterator, Iterator } from "../utils/iterable"
 import { observable } from "../api/observable"
-import { runInTransaction } from "../api/transaction"
+import { transaction } from "../api/transaction"
 import { referenceEnhancer } from "./modifiers"
 import { getMessage } from "../utils/messages"
 
@@ -166,7 +166,7 @@ export class ObservableMap<V>
                     : null
 
             if (notifySpy) spyReportStart(change)
-            runInTransaction(() => {
+            transaction(() => {
                 this._keys.remove(key)
                 this._updateHasMapEntry(key, false)
                 const observable = this._data[key]!
@@ -221,7 +221,7 @@ export class ObservableMap<V>
     }
 
     private _addValue(name: string, newValue: V | undefined) {
-        runInTransaction(() => {
+        transaction(() => {
             const observable = (this._data[name] = new ObservableValue(
                 newValue,
                 this.enhancer,
@@ -284,7 +284,7 @@ export class ObservableMap<V>
         if (isObservableMap(other)) {
             other = other.toJS()
         }
-        runInTransaction(() => {
+        transaction(() => {
             if (isPlainObject(other)) Object.keys(other).forEach(key => this.set(key, other[key]))
             else if (Array.isArray(other)) other.forEach(([key, value]) => this.set(key, value))
             else if (isES6Map(other)) other.forEach((value, key) => this.set(key, value))
@@ -295,7 +295,7 @@ export class ObservableMap<V>
     }
 
     clear() {
-        runInTransaction(() => {
+        transaction(() => {
             untracked(() => {
                 this.keys().forEach(this.delete, this)
             })
@@ -303,7 +303,7 @@ export class ObservableMap<V>
     }
 
     replace(values: ObservableMap<V> | IKeyValueMap<V> | any): ObservableMap<V> {
-        runInTransaction(() => {
+        transaction(() => {
             this.clear()
             this.merge(values)
         })

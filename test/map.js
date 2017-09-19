@@ -616,3 +616,19 @@ test("work with 'toString' key", t => {
     t.equal(m.get("toString"), "test")
     t.end()
 })
+
+test("issue 940, should not be possible to change maps outside strict mode", t => {
+	mobx.useStrict(true)
+
+	const m = mobx.observable.map()
+	const d = mobx.autorun(() => m.values())
+
+	t.throws(() => {
+		m.set("x", 1)
+	}, /Since strict-mode is enabled/)
+
+	d();
+
+	mobx.useStrict(false)
+	t.end()
+})
