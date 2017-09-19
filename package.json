@@ -5,6 +5,8 @@
   "main": "lib/mobx.js",
   "umd:main": "lib/mobx.umd.js",
   "module": "lib/mobx.module.js",
+  "jsnext:main": "lib/mobx.module.js",
+  "react-native": "lib/mobx.module.js",
   "typings": "lib/mobx.d.ts",
   "scripts": {
     "prettier": "prettier --write --print-width 100 --tab-width 4 --no-semi \"**/*.js\" \"**/*.jsx\" \"**/*.tsx\" \"**/*.ts\"",
