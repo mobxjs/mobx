@@ -2,6 +2,22 @@
 
 Stuck with MobX? This section contains a list of common issues people new to MobX might run into.
 
+#### Importing from wrong location
+
+Because MobX ships with typescript typings out of the box, some import autocompleting tools (at least in VSCode) have the habit of auto completing with a wrong import, like
+
+```javascript
+// wrong
+import { observable } from "mobx/lib/mobx"
+```
+
+This is incorrect but will not always lead immediately lead to runtime errors. So be aware. The only correct way of importing anything from the `mobx` package is:
+
+```javascript
+// correct
+import { observable } from "mobx"
+```
+
 #### Issues with decorators?
 
 For setup tips and limitations on decorators, check the [decorators](decorators.md) page
@@ -27,6 +43,55 @@ For more info see [what will MobX react to?](react.md).
 
 `@observer` only enhances the component you are decorating, not the components used inside it.
 So usually all your components should be decorated. Don't worry, this is not inefficient, in contrast, more `observer` components make rendering more efficient.
+
+### Don't copy observables properties and store them locally
+
+Observer components only track data that is accessed _during_ the render method. A common mistake is that data plucked of from an observable property and stored will for that reason not be tracked:
+
+```
+class User {
+  @observable name
+}
+
+class Profile extends React.Component {
+  name
+
+  componentWillMount() {
+    // Wrong
+    // This dereferences user.name and just copies the value once! Future updates will not be tracked, as lifecycle hooks are not reactive
+    // assignments like these create redundant data
+    this.name = this.props.user.name
+  }
+
+  render() {
+    return <div>{this.name}</div>
+  }
+}
+```
+
+The correct approach is either by not storing the values of observables locally (obviously, the above example is simple but contrived), or by defining them as computed property:
+
+```
+class User {
+  @observable name
+}
+
+class Profile extends React.Component {
+  @computed get name() {
+    // correct; computed property will track the `user.name` property
+    return this.props.user.name
+  }
+
+  render() {
+    return <div>{this.name}</div>
+  }
+}
+```
+
+### Render callbacks are *not* part of the render method
+
+Because `observer` only applies to exactly the `render` function of the current component; passing a render callback or component to a child component doesn't become reactive automatically.
+For more details, see the [what will Mobx react to](https://github.com/mobxjs/mobx/blob/gh-pages/docs/best/react.md#mobx-only-tracks-data-accessed-for-observer-components-if-they-are-directly-accessed-by-render) guide.
 
 ### Dereference values as late as possible
 

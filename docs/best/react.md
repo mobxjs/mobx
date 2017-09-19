@@ -255,7 +255,13 @@ message.likes.push("Jennifer");
 
 This will **not** react, during the execution of the `autorun` no observables where accessed, only during the `setTimeout`.
 In general this is quite obvious and rarely causes issues.
-The notable caveat here is passing renderable callbacks to React components, take for example the following example:
+
+## MobX only tracks data accessed for `observer` components if they are directly accessed by `render`
+
+A common mistake made with `observer` is that it doesnt track data that syntactically seems parent of the `observer` component,
+but in practice is actually rendered out by a different component. This often happens when render callbacks of components are passed in first class to another component.
+
+Take for example the following contrived example:
 
 ```javascript
 const MyComponent = observer(({ message }) =>
@@ -269,7 +275,8 @@ message.title = "Bar"
 
 At first glance everything might seem ok here, except that the `<div>` is actually not rendered by `MyComponent` (which has a tracked rendering), but by `SomeContainer`.
 So to make sure that the title of `SomeContainer` correctly reacts to a new `message.title`, `SomeContainer` should be an `observer` as well.
-If `SomeContainer` comes from an external lib, you can also fix this by wrapping the `div` in its own stateless `observer` based component, and instantiating that one in the callback:
+
+If `SomeContainer` comes from an external lib, this is often not under your own control. In that case you can address this by either wrapping the `div` in its own stateless `observer` based component, or by leveraging the `<Observer>` component:
 
 ```javascript
 const MyComponent = observer(({ message }) =>
@@ -281,6 +288,21 @@ const MyComponent = observer(({ message }) =>
 const TitleRenderer = observer(({ message }) =>
     <div>{message.title}</div>}
 )
+
+message.title = "Bar"
+```
+
+Alternatively, to avoid creating additional components, it is also possible to use the mobx-react built-in `Observer` component, which takes no arguments, and a single render function as children:
+
+```javascript
+const MyComponent = ({ message }) =>
+    <SomeContainer
+        title = {() =>
+            <Observer>
+                {() => <div>{message.title}</div>}
+            </Observer>
+        }
+    />
 
 message.title = "Bar"
 ```

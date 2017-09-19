@@ -1,6 +1,6 @@
 # Transaction
 
-_Transaction has been deprecated in favor of [*action*](https://mobx.js.org/refguide/action.html) or [*runInAction*](https://mobx.js.org/refguide/action.html#-runinaction-name-thunk)_
+_Transaction is a low-level api, in most cases *action* or *runInAction* are a better alternative_
 
 `transaction(worker: () => void)` can be used to batch a bunch of updates without notifying any observers until the end of the transaction.
 `transaction` takes a single, parameterless `worker` function as argument and runs it.
