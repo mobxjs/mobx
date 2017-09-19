@@ -153,28 +153,29 @@ function bindDependencies(derivation: IDerivation) {
     const observing = (derivation.observing = derivation.newObserving!)
     let lowestNewObservingDerivationState = IDerivationState.UP_TO_DATE
 
-    derivation.newObserving = null // newObserving shouldn't be needed outside tracking
 
     // Go through all new observables and check diffValue: (this list can contain duplicates):
     //   0: first occurrence, change to 1 and keep it
     //   1: extra occurrence, drop it
     let i0 = 0,
-        l = derivation.unboundDepsCount
+	l = derivation.unboundDepsCount
     for (let i = 0; i < l; i++) {
-        const dep = observing[i]
+		const dep = observing[i]
         if (dep.diffValue === 0) {
-            dep.diffValue = 1
+			dep.diffValue = 1
             if (i0 !== i) observing[i0] = dep
-            i0++
+				i0++
         }
 
         // Upcast is 'safe' here, because if dep is IObservable, `dependenciesState` will be undefined,
         // not hitting the condition
         if (((dep as any) as IDerivation).dependenciesState > lowestNewObservingDerivationState) {
-            lowestNewObservingDerivationState = ((dep as any) as IDerivation).dependenciesState
+			lowestNewObservingDerivationState = ((dep as any) as IDerivation).dependenciesState
         }
     }
     observing.length = i0
+
+	derivation.newObserving = null // newObserving shouldn't be needed outside tracking (statement moved down to work around FF bug, see #614)
 
     // Go through all old observables and check diffValue: (it is unique after last bindDependencies)
     //   0: it's not in new observables, unobserve it
