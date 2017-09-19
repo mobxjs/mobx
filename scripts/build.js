@@ -100,7 +100,7 @@ function build() {
 
         generateBundledModule(
             path.resolve(".build.es", "mobx.js"),
-            path.resolve("lib", "mobx.mjs"),
+            path.resolve("lib", "mobx.module.js"),
             "es"
         )
     ]).then(() => {
