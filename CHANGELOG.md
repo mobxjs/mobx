@@ -6,6 +6,9 @@
 * Print an helpful error message when using `@action` on a getter [#971](https://github.com/mobxjs/mobx/issues/971)
 * Improved typings of intercept [#1119](https://github.com/mobxjs/mobx/issues/1119)
 * Made code base Prettier [#1103](https://github.com/mobxjs/mobx/issues/1103)
+* react-native will now by default use the es module build as well.
+* Added support for Weex, see [#1163](https://github.com/mobxjs/mobx/pull/1163/)
+* Added workaround for Firefox issue causing MobX to crash, see [#614](https://github.com/mobxjs/mobx/issues/614)
 
 # 3.2.2
 
