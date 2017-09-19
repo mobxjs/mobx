@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="7.3" data-basepath=".." data-revision="Tue Jul 25 2017 11:20:04 GMT+0200 (CEST)">
+    <div class="book" data-level="7.3" data-basepath=".." data-revision="Tue Sep 19 2017 09:20:25 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -891,7 +891,7 @@ Let&apos;s start with a basic example:</p>
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
     @observable githubProjects = []
-    @state = <span class="hljs-string">&quot;pending&quot;</span> <span class="hljs-comment">// &quot;pending&quot; / &quot;done&quot; / &quot;error&quot;</span>
+    @observable state = <span class="hljs-string">&quot;pending&quot;</span> <span class="hljs-comment">// &quot;pending&quot; / &quot;done&quot; / &quot;error&quot;</span>
 
     @action
     fetchProjects() {
@@ -914,13 +914,13 @@ Let&apos;s start with a basic example:</p>
 <p>A first simple fix is to extract the callbacks to actions. (Note that binding is important here to get a correct <code>this</code>!):</p>
 <pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
     @observable githubProjects = []
-    @state = <span class="hljs-string">&quot;pending&quot;</span> <span class="hljs-comment">// &quot;pending&quot; / &quot;done&quot; / &quot;error&quot;</span>
+    @observable state = <span class="hljs-string">&quot;pending&quot;</span> <span class="hljs-comment">// &quot;pending&quot; / &quot;done&quot; / &quot;error&quot;</span>
 
     @action
     fetchProjects() {
         <span class="hljs-keyword">this</span>.githubProjects = []
         <span class="hljs-keyword">this</span>.state = <span class="hljs-string">&quot;pending&quot;</span>
-        fetchGithubProjectsSomehow().then(fetchProjectsSuccess, fetchProjectsError)
+        fetchGithubProjectsSomehow().then(<span class="hljs-keyword">this</span>.fetchProjectsSuccess, <span class="hljs-keyword">this</span>.fetchProjectsError)
     }
 
     @action.bound <span class="hljs-comment">// callback action</span>
@@ -941,7 +941,7 @@ Let&apos;s start with a basic example:</p>
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
     @observable githubProjects = []
-    @state = <span class="hljs-string">&quot;pending&quot;</span> <span class="hljs-comment">// &quot;pending&quot; / &quot;done&quot; / &quot;error&quot;</span>
+    @observable state = <span class="hljs-string">&quot;pending&quot;</span> <span class="hljs-comment">// &quot;pending&quot; / &quot;done&quot; / &quot;error&quot;</span>
 
     @action
     fetchProjects() {
@@ -970,7 +970,7 @@ The advantage of this pattern is that it encourages you to not litter the place 
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
     @observable githubProjects = []
-    @state = <span class="hljs-string">&quot;pending&quot;</span> <span class="hljs-comment">// &quot;pending&quot; / &quot;done&quot; / &quot;error&quot;</span>
+    @observable state = <span class="hljs-string">&quot;pending&quot;</span> <span class="hljs-comment">// &quot;pending&quot; / &quot;done&quot; / &quot;error&quot;</span>
 
     @action
     fetchProjects() {
@@ -997,7 +997,7 @@ The advantage of this pattern is that it encourages you to not litter the place 
 </code></pre>
 <p>Note that <code>runInAction</code>&apos;s can also be given a name as first argument. <code>runInAction(f)</code> is in fact just sugar for <code>action(f)()</code></p>
 <h3 id="async-await">async / await</h3>
-<p>Async / await based functions can confusing initially when starting with actions.
+<p>Async / await based functions can initially seem confusing when starting with actions.
 Because lexically they appear to synchronous functions, it gives the impression that <code>@action</code> applies to the entire function.
 Which is of course not the case, as async / await is just syntactic sugar around a promise based process.
 As a result, <code>@action</code> only applies to the code block until the first <code>await</code>.
@@ -1007,7 +1007,7 @@ This is where <code>runInAction</code> comes in handy again:</p>
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
     @observable githubProjects = []
-    @state = <span class="hljs-string">&quot;pending&quot;</span> <span class="hljs-comment">// &quot;pending&quot; / &quot;done&quot; / &quot;error&quot;</span>
+    @observable state = <span class="hljs-string">&quot;pending&quot;</span> <span class="hljs-comment">// &quot;pending&quot; / &quot;done&quot; / &quot;error&quot;</span>
 
     @action
     <span class="hljs-keyword">async</span> fetchProjects() {
@@ -1043,7 +1043,7 @@ mobx.useStrict(true) // don&apos;t allow state modifications outside actions
 
 class Store {
     @observable githubProjects = []
-    @state = &quot;pending&quot; // &quot;pending&quot; / &quot;done&quot; / &quot;error&quot;
+    @observable state = &quot;pending&quot; // &quot;pending&quot; / &quot;done&quot; / &quot;error&quot;
 
     @asyncAction
     *fetchProjects() { // &lt;- note the star, this a generator function!

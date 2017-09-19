@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="8.1" data-basepath=".." data-revision="Tue Jul 25 2017 11:20:04 GMT+0200 (CEST)">
+    <div class="book" data-level="8.1" data-basepath=".." data-revision="Tue Sep 19 2017 09:20:25 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -887,7 +887,7 @@
 <p>Just like <code>autorun</code> except that the action won&apos;t be invoked synchronously but asynchronously after the minimum amount of milliseconds has passed.
 The <code>action</code> will be run and observed.
 However, instead of running the action immediately when the values it observes have changed, the <code>minimumDelay</code> will be awaited before re-execution the <code>action</code> again.</p>
-<p>If observed values are changed multiple times while waiting, the action is still triggered only once, so in a sense it achieves a similar effect than a transaction.
+<p>If observed values are changed multiple times while waiting, the action is only triggered once, so in a sense it achieves a similar effect as a transaction.
 This might be useful for stuff that is expensive and doesn&apos;t need to happen synchronously; such as debouncing server communication.</p>
 <p>If a scope is given, the action will be bound to this scope object.</p>
 <p><code>autorunAsync(debugName: string, action: () =&gt; void, minimumDelay?: number, scope?)</code></p>

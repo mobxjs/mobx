@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="8.3" data-basepath=".." data-revision="Tue Jul 25 2017 11:20:04 GMT+0200 (CEST)">
+    <div class="book" data-level="8.3" data-basepath=".." data-revision="Tue Sep 19 2017 09:20:25 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -884,7 +884,7 @@
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/create-transformer.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="createtransformer">createTransformer</h1>
 <p><code>createTransformer&lt;A, B&gt;(transformation: (value: A) =&gt; B, onCleanup?: (result: B, value?: A) =&gt; void): (value: A) =&gt; B</code></p>
-<p><code>createTransformer</code> turns a function (that should transform one value into another value) into a reactive and memoizing function.
+<p><code>createTransformer</code> turns a function (that should transform value <code>A</code> into another value <code>B</code>) into a reactive and memoizing function.
 In other words, if the <code>transformation</code> function computes B given a specific A, the same B will be returned for all other future invocations of the transformation with the same A.
 However, if A changes, the transformation will be re-applied so that B is updated accordingly.
 And last but not least, if nobody is using the transformation of a specific A anymore, its entry will be removed from the memoization table.</p>

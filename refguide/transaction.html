@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="8.12" data-basepath=".." data-revision="Tue Jul 25 2017 11:20:04 GMT+0200 (CEST)">
+    <div class="book" data-level="8.12" data-basepath=".." data-revision="Tue Sep 19 2017 09:20:25 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -883,7 +883,7 @@
                     <section class="normal" id="section-">
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/transaction.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="transaction">Transaction</h1>
-<p><em>Transaction has been deprecated in favor of <em>action</em> or <em>runInAction</em></em></p>
+<p><em>Transaction is a low-level api, in most cases <em>action</em> or <em>runInAction</em> are a better alternative</em></p>
 <p><code>transaction(worker: () =&gt; void)</code> can be used to batch a bunch of updates without notifying any observers until the end of the transaction.
 <code>transaction</code> takes a single, parameterless <code>worker</code> function as argument and runs it.
 No observers are notified until this function has completed.

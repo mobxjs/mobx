@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.5" data-basepath=".." data-revision="Tue Jul 25 2017 11:20:04 GMT+0200 (CEST)">
+    <div class="book" data-level="2.5" data-basepath=".." data-revision="Tue Sep 19 2017 09:20:25 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -900,7 +900,7 @@ setInterval(() =&gt; {
     render() {
         <span class="hljs-keyword">return</span> (<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">span</span>&gt;</span>Seconds passed: { this.props.timerData.secondsPassed } <span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span> )</span>
     }
-});
+};
 
 React.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">Timer</span> <span class="hljs-attribute">timerData</span>=<span class="hljs-value">{timerData}</span> /&gt;</span>, document.body);
 </span></code></pre>
@@ -929,8 +929,8 @@ so we need to access it <em>in</em> the component. Or in other words: values nee
 <h2 id="observable-local-component-state">Observable local component state</h2>
 <p>Just like normal classes, you can introduce observable properties on a component by using the <code>@observable</code> decorator.
 This means that you can have local state in components that doesn&apos;t need to be manged by React&apos;s verbose and imperative <code>setState</code> mechanism, but is as powerful.
-The reactive state will be picked up by <code>render</code> but will not explicitly invoke other React lifecycle methods like <code>componentShouldUpdate</code> or <code>componentWillUpdate</code>.
-If you need those, just use the normal React <code>state</code> based APIs.</p>
+The reactive state will be picked up by <code>render</code> but will not explicitly invoke other React lifecycle methods except <code>componentWillUpdate</code> and <code>componentDidUpdate</code>.
+If you need other React lifecycle methods, just use the normal React <code>state</code> based APIs.</p>
 <p>The example above could also have been written as:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>
 <span class="hljs-keyword">import</span> {observable} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>

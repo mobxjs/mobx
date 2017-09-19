@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="4" data-basepath=".." data-revision="Tue Jul 25 2017 11:20:04 GMT+0200 (CEST)">
+    <div class="book" data-level="4" data-basepath=".." data-revision="Tue Sep 19 2017 09:20:25 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -1065,8 +1065,11 @@ because it happens <em>during</em> the execution of the autorun.</p>
 message.likes.push(<span class="hljs-string">&quot;Jennifer&quot;</span>);
 </code></pre>
 <p>This will <strong>not</strong> react, during the execution of the <code>autorun</code> no observables where accessed, only during the <code>setTimeout</code>.
-In general this is quite obvious and rarely causes issues.
-The notable caveat here is passing renderable callbacks to React components, take for example the following example:</p>
+In general this is quite obvious and rarely causes issues.</p>
+<h2 id="mobx-only-tracks-data-accessed-for-observer-components-if-they-are-directly-accessed-by-render">MobX only tracks data accessed for <code>observer</code> components if they are directly accessed by <code>render</code></h2>
+<p>A common mistake made with <code>observer</code> is that it doesnt track data that syntactically seems parent of the <code>observer</code> component,
+but in practice is actually rendered out by a different component. This often happens when render callbacks of components are passed in first class to another component.</p>
+<p>Take for example the following contrived example:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> MyComponent = observer(({ message }) =&gt;
     <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">SomeContainer</span>
         <span class="hljs-attribute">title</span> = {() =&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>{message.title}<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>}
@@ -1076,8 +1079,8 @@ The notable caveat here is passing renderable callbacks to React components, tak
 message.title = <span class="hljs-string">&quot;Bar&quot;</span>
 </code></pre>
 <p>At first glance everything might seem ok here, except that the <code>&lt;div&gt;</code> is actually not rendered by <code>MyComponent</code> (which has a tracked rendering), but by <code>SomeContainer</code>.
-So to make sure that the title of <code>SomeContainer</code> correctly reacts to a new <code>message.title</code>, <code>SomeContainer</code> should be an <code>observer</code> as well.
-If <code>SomeContainer</code> comes from an external lib, you can also fix this by wrapping the <code>div</code> in its own stateless <code>observer</code> based component, and instantiating that one in the callback:</p>
+So to make sure that the title of <code>SomeContainer</code> correctly reacts to a new <code>message.title</code>, <code>SomeContainer</code> should be an <code>observer</code> as well.</p>
+<p>If <code>SomeContainer</code> comes from an external lib, this is often not under your own control. In that case you can address this by either wrapping the <code>div</code> in its own stateless <code>observer</code> based component, or by leveraging the <code>&lt;Observer&gt;</code> component:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> MyComponent = observer(({ message }) =&gt;
     <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">SomeContainer</span>
         <span class="hljs-attribute">title</span> = {() =&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-title">TitleRenderer</span> <span class="hljs-attribute">message</span>=<span class="hljs-value">{message}</span> /&gt;</span>}
@@ -1087,6 +1090,18 @@ If <code>SomeContainer</code> comes from an external lib, you can also fix this 
 <span class="hljs-keyword">const</span> TitleRenderer = observer(({ message }) =&gt;
     <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>{message.title}<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>}
 )
+
+message.title = &quot;Bar&quot;
+</span></code></pre>
+<p>Alternatively, to avoid creating additional components, it is also possible to use the mobx-react built-in <code>Observer</code> component, which takes no arguments, and a single render function as children:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> MyComponent = ({ message }) =&gt;
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">SomeContainer</span>
+        <span class="hljs-attribute">title</span> = {() =&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-title">Observer</span>&gt;</span>
+                {() =&gt; <span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>{message.title}<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>}
+            <span class="hljs-tag">&lt;/<span class="hljs-title">Observer</span>&gt;</span>
+        }
+    /&gt;
 
 message.title = &quot;Bar&quot;
 </span></code></pre>
