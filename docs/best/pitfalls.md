@@ -108,7 +108,7 @@ That number won't change anymore in the future, so `Timer` will never update. It
 so we need to access it *in* the component. Or in other words: always try to pass the owning object of an observable property.
 For more info see [what will MobX react to?](react.md).
 
-#### Computed values run more often then expected
+#### Computed values run more often than expected
 
 If a computed property is *not* in use by some reaction (`autorun`, `observer` etc), computed expressions will be evaluated lazily; each time their value is requested (so they just act as normal property).
 Computed values will only track their dependencies if they are observed.
