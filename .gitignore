@@ -5,3 +5,4 @@ refguide/*.md
 *.iml
 *.ipr
 *.iws
+/.idea
