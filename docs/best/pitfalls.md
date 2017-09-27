@@ -11,7 +11,7 @@ Because MobX ships with typescript typings out of the box, some import autocompl
 import { observable } from "mobx/lib/mobx"
 ```
 
-This is incorrect but will not always lead immediately lead to runtime errors. So be aware. The only correct way of importing anything from the `mobx` package is:
+This is incorrect but will not always immediately lead to runtime errors. So be aware. The only correct way of importing anything from the `mobx` package is:
 
 ```javascript
 // correct
