@@ -19,8 +19,8 @@ var person = observable({
 	},
 
     // action:
-    setAge: action(function() {
-        this.age = 21;
+    setAge: action(function(age) {
+        this.age = age;
     })
 });
 
