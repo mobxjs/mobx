@@ -1943,6 +1943,12 @@ test("Issue 1092 - We should be able to define observable on all siblings", t =>
     t.end()
 })
 
+test("Issue 1120 - isComputed should return false for a non existing property", t => {
+    t.equal(mobx.isComputed({}, "x"), false)
+    t.equal(mobx.isComputed(observable({}), "x"), false)
+    t.end()
+})
+
 test("Issue 1121 - It should be possible to redefine a computed property", t => {
     t.plan(4)
 
