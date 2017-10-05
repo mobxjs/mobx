@@ -1,7 +1,8 @@
-# Next
+# 3.3.1
 
 * Fix bug allowing maps to be modified outside actions when using strict mode, fixes [#940](https://github.com/mobxjs/mobx/issues/940)
-* Fixed [#1139](https://github.com/mobxjs/mobx/issues/1139) properly
+* Fixed [#1139](https://github.com/mobxjs/mobx/issues/1139) properly: `transaction` is no longer deprecated and doesn't disable tracking properties anymore
+* Fixed [#1120](https://github.com/mobxjs/mobx/issues/1139): `isComputed` should return false for non-existing properties
 
 # 3.3.0
 
