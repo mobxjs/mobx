@@ -14,7 +14,7 @@ declare module "mobx" {
         spyReportEnd: (change?: any) => void,
         spyReportStart: (event: any) => void,
         setReactionScheduler: (fn: (f: () => void) => void) => void,
-        onReactionError: ((error: Error) => void) => void
+        onReactionError: (func: (error: Error) => void) => void
     }
 
     declare var extras: Extras
