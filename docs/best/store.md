@@ -42,11 +42,8 @@ It might very well be that these pieces of information start as internal state o
 But after a while you discover that you need this information somewhere else in your application.
 Instead of pushing state in such a case upwards in the component tree, like you would do in plain React apps, you just move that state to the _ui-state-store_.
 
-Make sure this state is a singleton.
 For isomorphic applications you might also want to provide a stub implementation of this store with sane defaults so that all components render as expected.
-You might distribute the _ui-state-store_ through your application by passing it as a property through your component tree.
-You can also pass this store by using context or make it globally available as a module.
-For testing purposes, I recommend to just pass it through the component tree.
+You might distribute the _ui-state-store_ through your application by passing it as a property through your component tree or using `Provider` and `inject` from the `mobx-react` package.
 
 Example of a store (using ES6 syntax):
 
@@ -54,7 +51,7 @@ Example of a store (using ES6 syntax):
 import {observable, computed, asStructure} from 'mobx';
 import jquery from 'jquery';
 
-class UiState {
+export class UiState {
     @observable language = "en_US";
     @observable pendingRequestCount = 0;
 
@@ -75,9 +72,6 @@ class UiState {
         return this.pendingRequestCount === 0
     }
 }
-
-singleton = new UiState();
-export default singleton;
 ```
 
 ## Domain Stores
