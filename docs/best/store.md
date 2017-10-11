@@ -271,12 +271,12 @@ export class Todo {
 
 # Combining multiple stores
 
-An often asked question is; how to combine multiple stores without using singletons. How will they know about each other?
+An often asked question is how to combine multiple stores without using singletons. How will they know about each other?
 
-An effective pattern to use this is to create a `RootStore` that instantates all stores, and share references. The advantage of this pattern is:
+An effective pattern to use this is to create a `RootStore` that instantiates all stores, and share references. The advantage of this pattern is:
 
-1. Simple to set up
-2. Supports strong typing well
+1. Simple to set up;
+2. Supports strong typing well;
 3. Makes complex unit tests easy as you just have to instantiate a root store.
 
 Example:
