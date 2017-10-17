@@ -18,7 +18,7 @@ In such cases it will be suspended.
 
 This automatic suspension is very convenient. If a computed value is no longer observed, for example the UI in which it was used no longer exists, MobX can automatically garbage collect it. This differs from `autorun`'s values where you must dispose of them yourself.
 It sometimes confuses people new to MobX, that if you create a computed property but don't use it anywhere in a reaction, it will not cache its value and recompute more often than seems necessary.
-However, in real life situations this by far the best default, and you can always forcefully keep a computed value awake if you need to by using either [`observe`](observe.md) or [`keepAlive`](https://github.com/mobxjs/mobx-utils#keepalive).
+However, in real life situations this is by far the best default, and you can always forcefully keep a computed value awake if you need to, by using either [`observe`](observe.md) or [`keepAlive`](https://github.com/mobxjs/mobx-utils#keepalive).
 
 Note that `computed` properties are not enumerable. Nor can they be overwritten in an inheritance chain.
 

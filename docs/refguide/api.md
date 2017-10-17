@@ -22,7 +22,7 @@ The following conversion rules are applied, but can be fine-tuned by using *modi
 
 1. If *value* is an instance of an [ES6 Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map): a new [Observable Map](map.md) will be returned. Observable maps are very useful if you don't want to react just to the change of a specific entry, but also to the addition or removal of entries.
 1. If *value* is an array, a new [Observable Array](array.md) will be returned.
-1. If *value* is an object *without* prototype, the object will be cloned and all its current properties will be made observable. See [Observable Object](object.md)
+1. If *value* is an object *without* prototype or its prototype is `Object.prototype`, the object will be cloned and all its current properties will be made observable. See [Observable Object](object.md)
 1. If *value* is an object *with* a prototype, a JavaScript primitive or function, a [Boxed Observable](boxed.md) will be returned. MobX will not make objects with a prototype automatically observable; as that is the responsibility of its constructor function. Use `extendObservable` in the constructor, or `@observable` in its class definition instead.
 
 These rules might seem complicated at first sight, but you will notice that in practice they are very intuitive to work with.
@@ -64,7 +64,7 @@ Creates a new observable array based on the provided value. Use `shallowArray` i
 
 ### `observable.map(value)` & `observable.shallowMap(value)`
 
-Creates a new observable map based on the provided value. Use `shallowMap` if the values in the array should not be turned into observables.
+Creates a new observable map based on the provided value. Use `shallowMap` if the values in the map should not be turned into observables.
 Use `map` whenever you want to create a dynamically keyed collections and the addition / removal of keys needs to be observed.
 Note that only string keys are supported.
 
@@ -88,7 +88,7 @@ The following modifiers are available:
 
 * `observable.deep`: This is the default modifier, used by any observable. It converts any assigned, non-primitive value into an observable if it isn't one yet.
 * `observable.ref`: Disables automatic observable conversion, just creates an observable reference instead.
-* `observable.shallow`: Can only used in combination with collections. Turns any assigned collection into an collection, which is shallowly observable (instead of deep). In other words; the values inside the collection won't become observables automatically.
+* `observable.shallow`: Can only be used in combination with collections. Turns any assigned collection into an collection, which is shallowly observable (instead of deep). In other words; the values inside the collection won't become observables automatically.
 * `computed`: Creates a derived property, see [`computed`](computed-decorator.md)
 * `action`: Creates an action, see [`action`](action.md)
 
@@ -244,7 +244,7 @@ Note that observable arrays can be `.slice()`d to turn them into true JS-arrays.
 Usage: `isAction(func)`. Returns true if the given function is wrapped / decorated with `action`.
 
 ### `isComputed`
-Usage: `isComputed(thing, property?)`. Returns true if the giving thing is a boxed computed value, or if the designated property is a computed value.
+Usage: `isComputed(thing, property?)`. Returns true if the given thing is a boxed computed value, or if the designated property is a computed value.
 
 ### `createTransformer`
 Usage: `createTransformer(transformation: A => B, onCleanup?): A = B`.
