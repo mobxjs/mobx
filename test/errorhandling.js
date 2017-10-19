@@ -682,7 +682,7 @@ test("peeking inside autorun doesn't bork (global) state", t => {
         t.equal(b.diffValue, 0)
         t.equal(b.lowestObserverState, 0)
         t.equal(b.unboundDepsCount, 1)
-        t.equal(b.value, undefined)
+        t.notEqual(b.value, 3)
         t.equal(b.isComputing, false)
 
         t.equal(c.dependenciesState, -1)

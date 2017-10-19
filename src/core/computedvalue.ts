@@ -110,7 +110,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
     onBecomeUnobserved() {
         clearObserving(this)
-        this.value = undefined
+        this.value = new CaughtException(null)
     }
 
     /**
