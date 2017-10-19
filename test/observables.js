@@ -1881,7 +1881,7 @@ test("computed equals function only invoked when necessary", t => {
 
     // Becoming unobserved, then observed won't cause a comparison
     disposeAutorun()
-    disposeAutorun = mobx.autorun(() => values.push(combinedToLowerCase.get()));
+    disposeAutorun = mobx.autorun(() => values.push(combinedToLowerCase.get()))
     t.deepEqual(comparisons, [{ from: "ab", to: "cb" }, { from: "de", to: "df" }])
 
     t.deepEqual(values, ["ab", "cb", "de", "df", "df"])
