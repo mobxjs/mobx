@@ -11,11 +11,11 @@ Using ES6 Map constructor you can initialize observable map using `observable(ne
 
 The following methods are exposed according to the [ES6 Map spec](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map):
 
-* `has(key)` Returns whether this map has an entry the provided key. Note that the presence of a key is an observable fact in itself.
+* `has(key)` Returns whether this map has an entry with the provided key. Note that the presence of a key is an observable fact in itself.
 * `set(key, value)`. Sets the given `key` to `value`. The provided key will be added to the map if it didn't exist yet.
 * `delete(key)`. Deletes the given key and its value from the map.
 * `get(key)`. Returns the value at the given key (or `undefined`).
-* `keys()`. Returns all keys present in this map. The insertion order is preserved.
+* `keys()`. Returns all keys present in this map. Insertion order is preserved.
 * `values()`. Returns all values present in this map. Insertion order is preserved.
 * `entries()`. Returns an (insertion ordered) array that for each key/value pair in the map contains an array `[key, value]`.
 * `forEach(callback:(value, key, map) => void, thisArg?)`. Invokes the given callback for each key / value pair in the map.
