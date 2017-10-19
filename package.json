@@ -9,8 +9,9 @@
   "react-native": "lib/mobx.module.js",
   "typings": "lib/mobx.d.ts",
   "scripts": {
+    "browserify:umd": "browserify -s mobx -e lib/mobx.js -o lib/mobx.umd.js",
     "prettier": "prettier --write --print-width 100 --tab-width 4 --no-semi \"**/*.js\" \"**/*.jsx\" \"**/*.tsx\" \"**/*.ts\"",
-    "test": "npm run quick-build && npm run tape",
+    "test": "npm run quick-build && npm run browserify:umd && npm run tape",
     "full-test": "npm run small-build && npm run build-tests && npm run use-minified && npm run tape && node --expose-gc test/perf/index.js && npm run test-flow && node test/mixed-versions/mixed-versions.js && npm run test-webpack",
     "tape": "tape test/*.js test/typescript/typescript-tests.js | faucet",
     "perf": "npm run small-build && PERSIST=true time node --expose-gc test/perf/index.js",
