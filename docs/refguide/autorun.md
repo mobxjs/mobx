@@ -1,7 +1,7 @@
 # Autorun
 
 `mobx.autorun` can be used in those cases where you want to create a reactive function that will never have observers itself.
-This is usually the case when you need to bridge from reactive to imperative code, for example for logging, persistence or UI-updating code.
+This is usually the case when you need to bridge from reactive to imperative code, for example for logging, persistence, or UI-updating code.
 When `autorun` is used, the provided function will always be triggered once immediately and then again each time one of its dependencies changes.
 In contrast, `computed(function)` creates functions that only re-evaluate if it has
 observers on its own, otherwise its value is considered to be irrelevant.
