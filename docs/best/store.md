@@ -32,7 +32,7 @@ Things you will typically find in UI stores:
   * Accessibility information
   * Current language
   * Currently active theme
-* User interface state as soon as it effects multiple, further unrelated components:
+* User interface state as soon as it affects multiple, further unrelated components:
   * Current selection
   * Visibility of toolbars, etc.
   * State of a wizard
@@ -83,14 +83,14 @@ Your application will most probably have at least one domain store.
 
 A single domain store should be responsible for a single concept in your application.
 However a single concept might take the form of multiple subtypes and it is often a (cyclic) tree structure.
-For example: one domain store for your products, and one for our orders and orderlines.
+For example: one domain store for your products, and one for your orders and orderlines.
 As a rule of thumb: if the nature of the relationship between two items is containment, they should typically be in the same store.
 So a store just manages _domain objects_.
 
-These are the responsibility of a store:
+These are the responsibilities of a store:
 * Instantiate domain objects. Make sure domain objects know the store they belong to.
 * Make sure there is only one instance of each of your domain objects.
-The same user, order or todo should not be twice in your memory.
+The same user, order or todo should not be stored twice in memory.
 This way you can safely use references and also be sure you are looking at the latest instance, without ever having to resolve a reference.
 This is fast, straightforward and convenient when debugging.
 * Provide backend integration. Store data when needed.
@@ -273,10 +273,10 @@ export class Todo {
 
 An often asked question is how to combine multiple stores without using singletons. How will they know about each other?
 
-An effective pattern to use this is to create a `RootStore` that instantiates all stores, and share references. The advantage of this pattern is:
+An effective pattern is to create a `RootStore` that instantiates all stores, and share references. The advantage of this pattern is:
 
-1. Simple to set up;
-2. Supports strong typing well;
+1. Simple to set up.
+2. Supports strong typing well.
 3. Makes complex unit tests easy as you just have to instantiate a root store.
 
 Example:
