@@ -14,8 +14,7 @@ Any application has actions. Actions are anything that modify the state.
 With MobX you can make it explicit in your code where your actions live by marking them.
 Actions help you to structure your code better.
 
-It takes a function and returns a function with the same signature.
-But wrapped with `transaction`, `untracked` and `allowStateChanges`.
+It takes a function and returns a function with the same signature, but wrapped with `transaction`, `untracked`, and `allowStateChanges`.
 Especially the fact that `transaction` is applied automatically yields great performance benefits;
 actions will batch mutations and only notify computed values and reactions after the (outer most) action has finished.
 This makes sure intermediate or incomplete values produced during an action are not visible to the rest of the application until the action has finished.
@@ -23,7 +22,7 @@ This makes sure intermediate or incomplete values produced during an action are 
 It is advised to use `(@)action` on any function that modifies observables or has side effects.
 `action` also provides useful debugging information in combination with the devtools.
 
-Using the `@action` decorator with [ES 5.1 setters](http://www.ecma-international.org/ecma-262/5.1/#sec-11.1.5) (i.e. `@action set propertyName`) is not supported, however setters of [computed properties are automatically actions](https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/computed-decorator.md#setters-for-computed-values).
+Using the `@action` decorator with [ES 5.1 setters](http://www.ecma-international.org/ecma-262/5.1/#sec-11.1.5) (i.e. `@action set propertyName`) is not supported; however, setters of [computed properties are automatically actions](https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/computed-decorator.md#setters-for-computed-values).
 
 Note: using `action` is mandatory when *strict mode* is enabled, see [`useStrict`](https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/api.md#usestrict).
 
