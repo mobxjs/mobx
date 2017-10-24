@@ -1,11 +1,11 @@
 # @observable
 
 Decorator that can be used on ES7- or TypeScript class properties to make them observable.
-The @observable can be used on instance fields and property getters.
+The `@observable` can be used on instance fields and property getters.
 This offers fine-grained control on which parts of your object become observable.
 
 ```javascript
-import {observable} from "mobx";
+import { observable, computed } from "mobx";
 
 class OrderLine {
     @observable price = 0;
