@@ -4,7 +4,7 @@ This section contains some best practices we discovered at Mendix while working 
 This section is opinionated and you are in no way forced to apply these practices.
 There are many ways of working with MobX and React, and this is just one of them.
 
-This section focuses on an unobtrusive way of working with MobX, which works well in existing code bases, or with classic MVC patterns. An alternative, more opionated way of organizing stores is using [mobx-state-tree](https://github.com/mobxjs/mobx-state-tree), which ships with cool features as structurally shared snapshots, action middlewares, JSON patch support etc out of the box.
+This section focuses on an unobtrusive way of working with MobX, which works well in existing code bases, or with classic MVC patterns. An alternative, more opinionated way of organizing stores is using [mobx-state-tree](https://github.com/mobxjs/mobx-state-tree), which ships with cool features as structurally shared snapshots, action middlewares, JSON patch support etc out of the box.
 
 # Stores
 
