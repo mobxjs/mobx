@@ -46,7 +46,7 @@ export function extendObservableHelper(
                 definedProps[key] = true
                 if ((target as any) === propSet && !isPropertyConfigurable(target, key)) continue // see #111, skip non-configurable or non-writable props for `observable(object)`.
                 const descriptor = Object.getOwnPropertyDescriptor(propSet, key)
-                defineObservablePropertyFromDescriptor(adm, key, descriptor, defaultEnhancer)
+                defineObservablePropertyFromDescriptor(adm, key, descriptor!, defaultEnhancer)
             }
     }
     return target
