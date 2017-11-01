@@ -1853,7 +1853,7 @@ test("computed equals function only invoked when necessary", t => {
     )
 
     const values = []
-    const disposeAutorun = mobx.autorun(() => values.push(combinedToLowerCase.get()))
+    let disposeAutorun = mobx.autorun(() => values.push(combinedToLowerCase.get()))
 
     // No comparison should be made on the first value
     t.deepEqual(comparisons, [])
@@ -1879,7 +1879,12 @@ test("computed equals function only invoked when necessary", t => {
     right.set("F")
     t.deepEqual(comparisons, [{ from: "ab", to: "cb" }, { from: "de", to: "df" }])
 
-    t.deepEqual(values, ["ab", "cb", "de", "df"])
+    // Becoming unobserved, then observed won't cause a comparison
+    disposeAutorun()
+    disposeAutorun = mobx.autorun(() => values.push(combinedToLowerCase.get()))
+    t.deepEqual(comparisons, [{ from: "ab", to: "cb" }, { from: "de", to: "df" }])
+
+    t.deepEqual(values, ["ab", "cb", "de", "df", "df"])
 
     disposeAutorun()
 
