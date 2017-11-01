@@ -110,7 +110,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
     onBecomeUnobserved() {
         clearObserving(this)
-        this.value = new CaughtException(null)
+        this.value = undefined;
     }
 
     /**
@@ -172,8 +172,10 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             })
         }
         const oldValue = this.value
+        const wasSuspended = /* see #1208 */ this.dependenciesState === IDerivationState.NOT_TRACKING;
         const newValue = (this.value = this.computeValue(true))
         return (
+            wasSuspended ||
             isCaughtException(oldValue) ||
             isCaughtException(newValue) ||
             !this.equals(oldValue, newValue)
@@ -252,7 +254,7 @@ WhyRun? computation '${this.name}':
     ${this.isComputing && isTracking
         ? " (... or any observable accessed during the remainder of the current run)"
         : ""}
-	${getMessage("m038")}
+    ${getMessage("m038")}
 
   * If the outcome of this computation changes, the following observers will be re-run:
     ${joinStrings(observers)}
