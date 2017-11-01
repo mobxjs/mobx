@@ -1,3 +1,7 @@
+# Next
+
+* Fix bug where custom comparers could be invoked with `undefined` values. Fixes #1208. Thanks @chrisdoble!
+
 # 3.3.1
 
 * Fix bug allowing maps to be modified outside actions when using strict mode, fixes [#940](https://github.com/mobxjs/mobx/issues/940)
