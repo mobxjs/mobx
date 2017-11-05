@@ -1,6 +1,7 @@
 # Next
 
 * Fix bug where custom comparers could be invoked with `undefined` values. Fixes #1208. Thanks @chrisdoble!
+* Make typings for observable stricter.
 
 # 3.3.1
 

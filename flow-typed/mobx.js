@@ -245,8 +245,34 @@ declare module "mobx" {
         observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
     }
 
+    declare interface IEnhancer<T> {
+        (newValue: T, oldValue: T | void, name: string): T,
+    }
+
+    declare interface IModifierDescriptor<T> {
+        isMobxModifierDescriptor: boolean,
+        initialValue: T | void,
+        enhancer: IEnhancer<T>,
+    }
+
     declare interface IObservableFactory {
-        (value: any, key?: string, baseDescriptor?: PropertyDescriptor): any
+        // observable overloads
+        <T>(wrapped: IModifierDescriptor<T>): T,
+        (target: Object, key: string, baseDescriptor?: PropertyDescriptor): any,
+        <T>(value: Array<T>): IObservableArray<T>,
+        (value: string): IObservableValue<string>,
+        (value: boolean): IObservableValue<boolean>,
+        (value: number): IObservableValue<number>,
+        (value: Date): IObservableValue<Date>,
+        (value: RegExp): IObservableValue<RegExp>,
+        (value: Function): IObservableValue<Function>,
+        <T>(value: null | void): IObservableValue<T>,
+        (value: null | void): IObservableValue<any>,
+        (): IObservableValue<any>,
+        <T>(value: IMap<string | number | boolean, T>): ObservableMap<T>,
+        <T: Object>(value: T): T,
+        <T>(value: T): IObservableValue<T>,
+        <T>(): IObservableValue<T>,
     }
 
     declare class IObservableFactories {
@@ -362,7 +388,16 @@ declare module "mobx" {
 
     declare function isObservable(value: any, property?: string): boolean
 
-    declare function observable<T>(value: T): any
+    declare var observable:
+        IObservableFactory &
+        IObservableFactories & {
+            deep: {
+                struct<T>(initialValue?: T): T
+            },
+            ref: {
+                struct<T>(initialValue?: T): T
+            }
+    }
 
     declare function observe<T>(
         value: IObservableValue<T> | IComputedValue<T>,
