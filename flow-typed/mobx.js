@@ -1,3 +1,4 @@
+// @flow
 declare module "mobx" {
     declare type Extras = {
         allowStateChanges: <T>(allowStateChanges: boolean, func: () => T) => T,
