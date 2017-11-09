@@ -71,6 +71,6 @@ _Note: getter / setter is valid ES5 syntax and doesn't require a transpiler!_
 
 ## `extendShallowObservable`
 
-`extendShallowObservable` is like `extendObservable`, except that by default the properties will by default *not* automatically convert their values into observables.
+`extendShallowObservable` is like `extendObservable`, except that by default the properties will *not* automatically convert their values into observables.
 So it is similar to calling `extendObservable` with `observable.ref` modifier for each property.
 Note that `observable.deep` can be used to get the automatic conversion back for a specific property.
