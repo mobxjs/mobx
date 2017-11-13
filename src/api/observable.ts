@@ -192,6 +192,11 @@ export const observable: IObservableFactory &
 // ES6 class methods aren't enumerable, can't use Object.keys
 Object.getOwnPropertyNames(IObservableFactories.prototype)
     .filter(name => name !== "constructor")
+    .filter(name => {
+        // ensure property is writable if it exists on 'observable'
+        const property = Object.getOwnPropertyDescriptor(observable, name)
+        return !property || property.writable
+    })
     .forEach(name => (observable[name] = IObservableFactories.prototype[name]))
 
 observable.deep.struct = observable.struct
