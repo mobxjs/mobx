@@ -43,7 +43,7 @@ so we need to access it *in* the component. Or in other words: values need to be
 
 ## ES5 support
 
-In ES5 environments, observer components can be simple declared using `observer(React.createClass({ ... `. See also the [syntax guide](../best/syntax.md)
+In ES5 environments, observer components can be simple declared using `observer(React.createClass({ ...`. See also the [syntax guide](../best/syntax.md)
 
 ## Stateless function components
 
@@ -93,7 +93,7 @@ For more advantages of using observable local component state, see [3 reasons wh
 
 The `mobx-react` package also provides the `Provider` component that can be used to pass down stores using React's context mechanism.
 To connect to those stores, pass an array of store names to `observer`, which will make the stores available as props.
-This is supported when using the decorator (`@observer(["store"]) class ...`, or the function `observer(["store"], React.createClass({ ...``.
+This is supported when using the decorator (`@observer(["store"]) class ...`, or the function `observer(["store"], React.createClass({ ...`.
 
 Example:
 
