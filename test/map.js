@@ -663,6 +663,14 @@ test("issue 1243, .replace should not trigger change on unchanged values", t => 
 	m.replace({ b: 2 })
 	t.equal(recomputeCount, 3)
 
+	m.replace([['a', 1]])
+	t.equal(recomputeCount, 4)
+
+	const nativeMap = new Map()
+	nativeMap.set('a', 2)
+	m.replace(nativeMap)
+	t.equal(recomputeCount, 5)
+
     d()
     t.end()
 })

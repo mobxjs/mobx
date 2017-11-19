@@ -207,11 +207,11 @@ export function isES6Map(thing): boolean {
     return false
 }
 
-export function getMapKeys<V>(map: ObservableMap<V> | IKeyValueMap<V> | any): string[] {
+export function getMapLikeKeys<V>(map: ObservableMap<V> | IKeyValueMap<V> | any): string[] {
 	let keys;
 	if (isPlainObject(map)) keys = Object.keys(map)
 	else if (Array.isArray(map)) keys = map.map(([key]) => key)
-	else if (isES6Map(map)) keys = [...map.keys()]
+	else if (isES6Map(map)) keys = (Array as any).from(map.keys())
 	return keys;
 }
 
