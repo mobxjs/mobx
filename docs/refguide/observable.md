@@ -1,8 +1,11 @@
 # observable
 
-Usage: 
+<a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/javascript-sync-the-ui-with-the-app-state-using-mobx-observable-and-observer-in-react">Egghead.io lesson 1: observable & observer</a>
+<a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px"  href="https://egghead.io/lessons/react-use-observable-objects-arrays-and-maps-to-store-state-in-mobx">Egghead.io lesson 4: observable objects & maps</a>
+
+Usage:
 * `observable(value)`
-* `@observable classProperty = value` 
+* `@observable classProperty = value`
 
 Observable values can be JS primitives, references, plain objects, class instances, arrays and maps.
 The following conversion rules are applied, but can be fine-tuned by using *modifiers*. See below.

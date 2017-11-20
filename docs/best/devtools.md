@@ -1,5 +1,8 @@
 # MobX + React DevTools
 
+<a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx">Egghead.io lesson 2: devtools</a>
+
+
 MobX ships with DevTools that can be used to track the rendering behavior and data depenencies of your app.
 
 ![devtools](../images/devtools.gif)

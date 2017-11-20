@@ -1,5 +1,7 @@
 # @observer
 
+<a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx">Egghead.io lesson 1: observable & observer</a>
+
 The `observer` function / decorator can be used to turn ReactJS components into reactive components.
 It wraps the component's render function in `mobx.autorun` to make sure that any data that is used during the rendering of a component forces a re-rendering upon change.
 It is available through the separate `mobx-react` package.
@@ -89,11 +91,15 @@ React.render(<Timer />, document.body)
 
 For more advantages of using observable local component state, see [3 reasons why I stopped using `setState`](https://medium.com/@mweststrate/3-reasons-why-i-stopped-using-react-setstate-ab73fc67a42e).
 
-## Connect `observer` to stores
+## Connect components to provided stores using `inject`
+
+<a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-connect-mobx-observer-components-to-the-store-with-the-react-provider">Egghead.io lesson 8: inject stores with Provider</a>
 
 The `mobx-react` package also provides the `Provider` component that can be used to pass down stores using React's context mechanism.
-To connect to those stores, pass an array of store names to `observer`, which will make the stores available as props.
-This is supported when using the decorator (`@observer(["store"]) class ...`, or the function `observer(["store"], React.createClass({ ...`.
+To connect to those stores, pass an list of store names to `inject`, which will make the stores available as props.
+
+_ N.B. the syntax to inject stores has changed since mobx-react 4, always use `inject(stores)(component)` or `@inject(stores) class Component...`.
+Passing store names directly to `observer is deprecated._
 
 Example:
 
@@ -108,14 +114,14 @@ const App = () =>
      <app stuff... />
   </Provider>;
 
-const Button = observer(["colors"], ({ colors, label, onClick }) =>
+const Button = inject("colors")(observer(({ colors, label, onClick }) =>
   <button style={{
       color: colors.foreground,
       backgroundColor: colors.background
     }}
     onClick={onClick}
   >{label}<button>
-);
+));
 
 // later..
 colors.foreground = 'blue';

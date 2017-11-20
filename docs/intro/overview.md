@@ -1,5 +1,7 @@
 # The gist of MobX
 
+<a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx">Egghead.io lesson 1: observable & observer</a>
+
 So far it all might sound a bit fancy, but making an app reactive using MobX boils down to just these three steps:
 
 ## 1. Define your state and make it observable
