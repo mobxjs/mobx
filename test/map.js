@@ -671,6 +671,10 @@ test("issue 1243, .replace should not trigger change on unchanged values", t => 
 	m.replace(nativeMap)
 	t.equal(recomputeCount, 5)
 
+	t.throws(() => {
+		m.replace('not-an-object')
+    })
+
     d()
     t.end()
 })
