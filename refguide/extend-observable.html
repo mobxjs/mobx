@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="8.5" data-basepath=".." data-revision="Tue Sep 19 2017 09:20:25 GMT+0200 (CEST)">
+    <div class="book" data-level="8.5" data-basepath=".." data-revision="Mon Nov 20 2017 10:34:48 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -884,7 +884,7 @@
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/extend-observable.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="extendobservable">extendObservable</h1>
 <p>Quite similar to <code>Object.assign</code>, <code>extendObservable</code> takes two or more arguments, a <code>target</code> object and one or more <code>properties</code> maps.
-It adds all key-value pairs from the properties to the <code>target</code> as observable properties.</p>
+It adds all key-value pairs from the properties to the <code>target</code> as observable properties and returns the <code>target</code> object.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> Person = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">firstName, lastName</span>) </span>{
     <span class="hljs-comment">// initialize observable properties on a new instance</span>
     extendObservable(<span class="hljs-keyword">this</span>, {
@@ -938,7 +938,7 @@ For example <code>observable.ref</code> creates an observable reference which do
 </code></pre>
 <p><em>Note: getter / setter is valid ES5 syntax and doesn&apos;t require a transpiler!</em></p>
 <h2 id="-extendshallowobservable"><code>extendShallowObservable</code></h2>
-<p><code>extendShallowObservable</code> is like <code>extendObservable</code>, except that by default the properties will by default <em>not</em> automatically convert their values into observables.
+<p><code>extendShallowObservable</code> is like <code>extendObservable</code>, except that by default the properties will <em>not</em> automatically convert their values into observables.
 So it is similar to calling <code>extendObservable</code> with <code>observable.ref</code> modifier for each property.
 Note that <code>observable.deep</code> can be used to get the automatic conversion back for a specific property.</p>
 

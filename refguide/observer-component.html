@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.5" data-basepath=".." data-revision="Tue Sep 19 2017 09:20:25 GMT+0200 (CEST)">
+    <div class="book" data-level="2.5" data-basepath=".." data-revision="Mon Nov 20 2017 10:34:48 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -883,6 +883,7 @@
                     <section class="normal" id="section-">
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/observer-component.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="-observer">@observer</h1>
+<p><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx" target="_blank">Egghead.io lesson 1: observable &amp; observer</a></p>
 <p>The <code>observer</code> function / decorator can be used to turn ReactJS components into reactive components.
 It wraps the component&apos;s render function in <code>mobx.autorun</code> to make sure that any data that is used during the rendering of a component forces a re-rendering upon change.
 It is available through the separate <code>mobx-react</code> package.</p>
@@ -952,10 +953,12 @@ If you need other React lifecycle methods, just use the normal React <code>state
 React.render(&lt;Timer /&gt;, document.body)
 </code></pre>
 <p>For more advantages of using observable local component state, see <a href="https://medium.com/@mweststrate/3-reasons-why-i-stopped-using-react-setstate-ab73fc67a42e" target="_blank">3 reasons why I stopped using <code>setState</code></a>.</p>
-<h2 id="connect-observer-to-stores">Connect <code>observer</code> to stores</h2>
+<h2 id="connect-components-to-provided-stores-using-inject">Connect components to provided stores using <code>inject</code></h2>
+<p><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-connect-mobx-observer-components-to-the-store-with-the-react-provider" target="_blank">Egghead.io lesson 8: inject stores with Provider</a></p>
 <p>The <code>mobx-react</code> package also provides the <code>Provider</code> component that can be used to pass down stores using React&apos;s context mechanism.
-To connect to those stores, pass an array of store names to <code>observer</code>, which will make the stores available as props.
-This is supported when using the decorator (<code>@observer([&quot;store&quot;]) class ...</code>, or the function `observer([&quot;store&quot;], React.createClass({ ...``.</p>
+To connect to those stores, pass an list of store names to <code>inject</code>, which will make the stores available as props.</p>
+<p><em> N.B. the syntax to inject stores has changed since mobx-react 4, always use <code>inject(stores)(component)</code> or <code>@inject(stores) class Component...</code>.
+Passing store names directly to `observer is deprecated.</em></p>
 <p>Example:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> colors = observable({
    foreground: <span class="hljs-string">&apos;#000&apos;</span>,
@@ -967,14 +970,14 @@ This is supported when using the decorator (<code>@observer([&quot;store&quot;])
      <span class="hljs-tag">&lt;<span class="hljs-title">app</span> <span class="hljs-attribute">stuff...</span> /&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-title">Provider</span>&gt;</span>;</span>
 
-<span class="hljs-keyword">const</span> Button = observer([<span class="hljs-string">&quot;colors&quot;</span>], ({ colors, label, onClick }) =&gt;
+<span class="hljs-keyword">const</span> Button = inject(<span class="hljs-string">&quot;colors&quot;</span>)(observer(({ colors, label, onClick }) =&gt;
   <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">style</span>=<span class="hljs-value">{{</span>
       <span class="hljs-attribute">color:</span> <span class="hljs-attribute">colors.foreground</span>,
       <span class="hljs-attribute">backgroundColor:</span> <span class="hljs-attribute">colors.background</span>
     }}
     <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{onClick}</span>
   &gt;</span>{label}<span class="hljs-tag">&lt;<span class="hljs-title">button</span>&gt;</span>
-)</span>;
+)</span>);
 
 <span class="hljs-comment">// later..</span>
 colors.foreground = <span class="hljs-string">&apos;blue&apos;</span>;

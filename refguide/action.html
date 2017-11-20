@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.6" data-basepath=".." data-revision="Tue Sep 19 2017 09:20:25 GMT+0200 (CEST)">
+    <div class="book" data-level="2.6" data-basepath=".." data-revision="Mon Nov 20 2017 10:34:48 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -883,6 +883,7 @@
                     <section class="normal" id="section-">
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/action.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="action">action</h1>
+<p><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-use-mobx-actions-to-change-and-guard-state" target="_blank">Egghead.io lesson 5: actions</a></p>
 <p>Usage:</p>
 <ul>
 <li><code>action(fn)</code></li>
@@ -897,14 +898,13 @@
 <p>Any application has actions. Actions are anything that modify the state.
 With MobX you can make it explicit in your code where your actions live by marking them.
 Actions help you to structure your code better.</p>
-<p>It takes a function and returns a function with the same signature.
-But wrapped with <code>transaction</code>, <code>untracked</code> and <code>allowStateChanges</code>.
+<p>It takes a function and returns a function with the same signature, but wrapped with <code>transaction</code>, <code>untracked</code>, and <code>allowStateChanges</code>.
 Especially the fact that <code>transaction</code> is applied automatically yields great performance benefits;
 actions will batch mutations and only notify computed values and reactions after the (outer most) action has finished.
 This makes sure intermediate or incomplete values produced during an action are not visible to the rest of the application until the action has finished.</p>
 <p>It is advised to use <code>(@)action</code> on any function that modifies observables or has side effects.
 <code>action</code> also provides useful debugging information in combination with the devtools.</p>
-<p>Using the <code>@action</code> decorator with <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-11.1.5" target="_blank">ES 5.1 setters</a> (i.e. <code>@action set propertyName</code>) is not supported, however setters of <a href="https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/computed-decorator.md#setters-for-computed-values" target="_blank">computed properties are automatically actions</a>.</p>
+<p>Using the <code>@action</code> decorator with <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-11.1.5" target="_blank">ES 5.1 setters</a> (i.e. <code>@action set propertyName</code>) is not supported; however, setters of <a href="https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/computed-decorator.md#setters-for-computed-values" target="_blank">computed properties are automatically actions</a>.</p>
 <p>Note: using <code>action</code> is mandatory when <em>strict mode</em> is enabled, see <a href="https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/api.md#usestrict" target="_blank"><code>useStrict</code></a>.</p>
 <p>For an extensive introduction to <code>action</code> see also the <a href="https://medium.com/p/45cdc73c7c8d/" target="_blank">MobX 2.2 release notes</a>.</p>
 <p>Two example actions from the <code>contact-list</code> project:</p>

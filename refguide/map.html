@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="3.3" data-basepath=".." data-revision="Tue Sep 19 2017 09:20:25 GMT+0200 (CEST)">
+    <div class="book" data-level="3.3" data-basepath=".." data-revision="Mon Nov 20 2017 10:34:48 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -891,11 +891,11 @@ Unlike ES6 maps, only strings are accepted as keys.</p>
 <p>Using ES6 Map constructor you can initialize observable map using <code>observable(new Map())</code> or for class properties using the decorator <code>@observable map = new Map()</code>.</p>
 <p>The following methods are exposed according to the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" target="_blank">ES6 Map spec</a>:</p>
 <ul>
-<li><code>has(key)</code> Returns whether this map has an entry the provided key. Note that the presence of a key is an observable fact in itself.</li>
+<li><code>has(key)</code> Returns whether this map has an entry with the provided key. Note that the presence of a key is an observable fact in itself.</li>
 <li><code>set(key, value)</code>. Sets the given <code>key</code> to <code>value</code>. The provided key will be added to the map if it didn&apos;t exist yet.</li>
 <li><code>delete(key)</code>. Deletes the given key and its value from the map.</li>
 <li><code>get(key)</code>. Returns the value at the given key (or <code>undefined</code>).</li>
-<li><code>keys()</code>. Returns all keys present in this map. The insertion order is preserved.</li>
+<li><code>keys()</code>. Returns all keys present in this map. Insertion order is preserved.</li>
 <li><code>values()</code>. Returns all values present in this map. Insertion order is preserved.</li>
 <li><code>entries()</code>. Returns an (insertion ordered) array that for each key/value pair in the map contains an array <code>[key, value]</code>.</li>
 <li><code>forEach(callback:(value, key, map) =&gt; void, thisArg?)</code>. Invokes the given callback for each key / value pair in the map.</li>

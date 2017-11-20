@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.2" data-basepath=".." data-revision="Tue Sep 19 2017 09:20:25 GMT+0200 (CEST)">
+    <div class="book" data-level="2.2" data-basepath=".." data-revision="Mon Nov 20 2017 10:34:48 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -883,10 +883,12 @@
                     <section class="normal" id="section-">
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/observable-decorator.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="-observable">@observable</h1>
+<p><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/javascript-sync-the-ui-with-the-app-state-using-mobx-observable-and-observer-in-react" target="_blank">Egghead.io lesson 1: observable &amp; observer&lt;/a&gt;
+<a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-use-observable-objects-arrays-and-maps-to-store-state-in-mobx" target="_blank">Egghead.io lesson 4: observable objects &amp; maps</a></a></p>
 <p>Decorator that can be used on ES7- or TypeScript class properties to make them observable.
-The @observable can be used on instance fields and property getters.
+The <code>@observable</code> can be used on instance fields and property getters.
 This offers fine-grained control on which parts of your object become observable.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> { observable, computed } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OrderLine</span> </span>{
     @observable price = <span class="hljs-number">0</span>;
@@ -899,7 +901,7 @@ This offers fine-grained control on which parts of your object become observable
 </code></pre>
 <p>If your environment doesn&apos;t support decorators or field initializers,
 <code>@observable key = value;</code> is sugar for <a href="extend-observable.html"><code>extendObservable(this, { key: value })</code></a></p>
-<p>Note: all the properties are being defined lazily as soon as any of them is accessed. Before that they are only defined on the class prototype  </p>
+<p>Note: all the properties are being defined lazily as soon as any of them is accessed. Before that they are only defined on the class prototype</p>
 <p>In other words:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> line = <span class="hljs-keyword">new</span> OrderLine();
 <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;price&quot;</span> <span class="hljs-keyword">in</span> line); <span class="hljs-comment">// true</span>

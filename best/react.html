@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="4" data-basepath=".." data-revision="Tue Sep 19 2017 09:20:25 GMT+0200 (CEST)">
+    <div class="book" data-level="4" data-basepath=".." data-revision="Mon Nov 20 2017 10:34:48 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -971,6 +971,36 @@ message.author = { name: <span class="hljs-string">&quot;John&quot;</span> };
 </code></pre>
 <p>The first change will be picked up, <code>message.author</code> and <code>author</code> are the same object, and the <code>.name</code> property is dereferenced in the autorun.
 However the second change will <strong>not</strong> be picked up, the <code>message.author</code> relation is not tracked by the <code>autorun</code>. Autorun is still using the &quot;old&quot; <code>author</code>.</p>
+<h4 id="common-pitfal-console-log">Common pitfal: console.log</h4>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> message = observable({ title: <span class="hljs-string">&quot;hello&quot;</span> })
+
+autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(message)
+})
+
+<span class="hljs-comment">// Won&apos;t trigger a re-run</span>
+message.title = <span class="hljs-string">&quot;Hello world&quot;</span>
+</code></pre>
+<p>In the above example, the updated message title won&apos;t be printed, because it is not used inside the autorun.
+The autorun only depends on <code>message</code>, which is not an observable, but a constant. In other words, as far as MobX is concerned, <code>title</code> is not used in- and hence not relevant for the <code>autorun</code></p>
+<p>The fact that <code>console.log</code> will print the message title is misleading here; <code>console.log</code> is an asynchronous api that only will format it&apos;s parameters later in time, for which reason the autorun won&apos;t be tracking what data the console.log is accessing. For that reason make sure to always pass immutable data or defensive copies to <code>console.log</code>.</p>
+<p>The following solutions however, will all react to <code>message.title</code>:</p>
+<pre><code class="lang-javascript">autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(message.title) <span class="hljs-comment">// clearly, the `.title` observable is used</span>
+})
+
+autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(mobx.toJS(message)) <span class="hljs-comment">// toJS creates a deep clone, and thus will read the message</span>
+})
+
+autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log({...message}) <span class="hljs-comment">// creates a shallow clone, also using `.title` in the process</span>
+})
+
+autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(message)) <span class="hljs-comment">// also reads the entire structure</span>
+})
+</code></pre>
 <h4 id="correct-access-array-properties-in-tracked-function">Correct: access array properties in tracked function</h4>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(message.likes.length);

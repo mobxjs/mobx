@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2" data-basepath=".." data-revision="Tue Sep 19 2017 09:20:25 GMT+0200 (CEST)">
+    <div class="book" data-level="2" data-basepath=".." data-revision="Mon Nov 20 2017 10:34:48 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -900,7 +900,7 @@ You can also directly create the desired observable type, see below.</p>
 <ol>
 <li>If <em>value</em> is an instance of an <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" target="_blank">ES6 Map</a>: a new <a href="map.html">Observable Map</a> will be returned. Observable maps are very useful if you don&apos;t want to react just to the change of a specific entry, but also to the addition or removal of entries.</li>
 <li>If <em>value</em> is an array, a new <a href="array.html">Observable Array</a> will be returned.</li>
-<li>If <em>value</em> is an object <em>without</em> prototype, the object will be cloned and all its current properties will be made observable. See <a href="object.html">Observable Object</a></li>
+<li>If <em>value</em> is an object <em>without</em> prototype or its prototype is <code>Object.prototype</code>, the object will be cloned and all its current properties will be made observable. See <a href="object.html">Observable Object</a></li>
 <li>If <em>value</em> is an object <em>with</em> a prototype, a JavaScript primitive or function, a <a href="boxed.html">Boxed Observable</a> will be returned. MobX will not make objects with a prototype automatically observable; as that is the responsibility of its constructor function. Use <code>extendObservable</code> in the constructor, or <code>@observable</code> in its class definition instead.</li>
 </ol>
 <p>These rules might seem complicated at first sight, but you will notice that in practice they are very intuitive to work with.
@@ -929,7 +929,7 @@ references, but the values will be untouched. (This holds also for any values as
 <p>Creates a new observable array based on the provided value. Use <code>shallowArray</code> if the values in the array should not be turned into observables.</p>
 <p><a href="array.html">&#xAB;<code>details</code>&#xBB;</a></p>
 <h3 id="-observable-map-value-observable-shallowmap-value"><code>observable.map(value)</code> &amp; <code>observable.shallowMap(value)</code></h3>
-<p>Creates a new observable map based on the provided value. Use <code>shallowMap</code> if the values in the array should not be turned into observables.
+<p>Creates a new observable map based on the provided value. Use <code>shallowMap</code> if the values in the map should not be turned into observables.
 Use <code>map</code> whenever you want to create a dynamically keyed collections and the addition / removal of keys needs to be observed.
 Note that only string keys are supported.</p>
 <p><a href="map.html">&#xAB;<code>details</code>&#xBB;</a></p>
@@ -946,7 +946,7 @@ Note that <code>extendObservable</code> enhances existing objects, unlike <code>
 <ul>
 <li><code>observable.deep</code>: This is the default modifier, used by any observable. It converts any assigned, non-primitive value into an observable if it isn&apos;t one yet.</li>
 <li><code>observable.ref</code>: Disables automatic observable conversion, just creates an observable reference instead.</li>
-<li><code>observable.shallow</code>: Can only used in combination with collections. Turns any assigned collection into an collection, which is shallowly observable (instead of deep). In other words; the values inside the collection won&apos;t become observables automatically.</li>
+<li><code>observable.shallow</code>: Can only be used in combination with collections. Turns any assigned collection into an collection, which is shallowly observable (instead of deep). In other words; the values inside the collection won&apos;t become observables automatically.</li>
 <li><code>computed</code>: Creates a derived property, see <a href="computed-decorator.html"><code>computed</code></a></li>
 <li><code>action</code>: Creates an action, see <a href="action.html"><code>action</code></a></li>
 </ul>
@@ -1066,7 +1066,7 @@ Note that observable arrays can be <code>.slice()</code>d to turn them into true
 <h3 id="-isaction"><code>isAction</code></h3>
 <p>Usage: <code>isAction(func)</code>. Returns true if the given function is wrapped / decorated with <code>action</code>.</p>
 <h3 id="-iscomputed"><code>isComputed</code></h3>
-<p>Usage: <code>isComputed(thing, property?)</code>. Returns true if the giving thing is a boxed computed value, or if the designated property is a computed value.</p>
+<p>Usage: <code>isComputed(thing, property?)</code>. Returns true if the given thing is a boxed computed value, or if the designated property is a computed value.</p>
 <h3 id="-createtransformer"><code>createTransformer</code></h3>
 <p>Usage: <code>createTransformer(transformation: A =&gt; B, onCleanup?): A = B</code>.
 Can be used to make functions that transforms one value into another value reactive and memoized.

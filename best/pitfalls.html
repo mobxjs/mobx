@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="7.1" data-basepath=".." data-revision="Tue Sep 19 2017 09:20:25 GMT+0200 (CEST)">
+    <div class="book" data-level="7.1" data-basepath=".." data-revision="Mon Nov 20 2017 10:34:48 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -889,7 +889,7 @@
 <pre><code class="lang-javascript"><span class="hljs-comment">// wrong</span>
 <span class="hljs-keyword">import</span> { observable } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx/lib/mobx&quot;</span>
 </code></pre>
-<p>This is incorrect but will not always lead immediately lead to runtime errors. So be aware. The only correct way of importing anything from the <code>mobx</code> package is:</p>
+<p>This is incorrect but will not always immediately lead to runtime errors. So be aware. The only correct way of importing anything from the <code>mobx</code> package is:</p>
 <pre><code class="lang-javascript"><span class="hljs-comment">// correct</span>
 <span class="hljs-keyword">import</span> { observable } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>
 </code></pre>
@@ -959,7 +959,7 @@ So in our above example, the <code>Timer</code> component would <strong>not</str
 That number won&apos;t change anymore in the future, so <code>Timer</code> will never update. It is the property <code>secondsPassed</code> that will change in the future,
 so we need to access it <em>in</em> the component. Or in other words: always try to pass the owning object of an observable property.
 For more info see <a href="react.html">what will MobX react to?</a>.</p>
-<h4 id="computed-values-run-more-often-then-expected">Computed values run more often then expected</h4>
+<h4 id="computed-values-run-more-often-than-expected">Computed values run more often than expected</h4>
 <p>If a computed property is <em>not</em> in use by some reaction (<code>autorun</code>, <code>observer</code> etc), computed expressions will be evaluated lazily; each time their value is requested (so they just act as normal property).
 Computed values will only track their dependencies if they are observed.
 This allows MobX to automatically suspend computations that are not actively in use.

@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="2.4" data-basepath=".." data-revision="Tue Sep 19 2017 09:20:25 GMT+0200 (CEST)">
+    <div class="book" data-level="2.4" data-basepath=".." data-revision="Mon Nov 20 2017 10:34:48 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -883,8 +883,9 @@
                     <section class="normal" id="section-">
                     
                         <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/autorun.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="autorun">Autorun</h1>
+<p><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-write-custom-mobx-reactions-with-when-and-autorun" target="_blank">Egghead.io lesson 9: custom reactions</a></p>
 <p><code>mobx.autorun</code> can be used in those cases where you want to create a reactive function that will never have observers itself.
-This is usually the case when you need to bridge from reactive to imperative code, for example for logging, persistence or UI-updating code.
+This is usually the case when you need to bridge from reactive to imperative code, for example for logging, persistence, or UI-updating code.
 When <code>autorun</code> is used, the provided function will always be triggered once immediately and then again each time one of its dependencies changes.
 In contrast, <code>computed(function)</code> creates functions that only re-evaluate if it has
 observers on its own, otherwise its value is considered to be irrelevant.

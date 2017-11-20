@@ -44,7 +44,7 @@
     <body>
         
         
-    <div class="book" data-level="7.2" data-basepath=".." data-revision="Tue Sep 19 2017 09:20:25 GMT+0200 (CEST)">
+    <div class="book" data-level="7.2" data-basepath=".." data-revision="Mon Nov 20 2017 10:34:48 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -886,7 +886,7 @@
 <p>This section contains some best practices we discovered at Mendix while working with MobX.
 This section is opinionated and you are in no way forced to apply these practices.
 There are many ways of working with MobX and React, and this is just one of them.</p>
-<p>This section focuses on an unobtrusive way of working with MobX, which works well in existing code bases, or with classic MVC patterns. An alternative, more opionated way of organizing stores is using <a href="https://github.com/mobxjs/mobx-state-tree" target="_blank">mobx-state-tree</a>, which ships with cool features as structurally shared snapshots, action middlewares, JSON patch support etc out of the box.</p>
+<p>This section focuses on an unobtrusive way of working with MobX, which works well in existing code bases, or with classic MVC patterns. An alternative, more opinionated way of organizing stores is using <a href="https://github.com/mobxjs/mobx-state-tree" target="_blank">mobx-state-tree</a>, which ships with cool features as structurally shared snapshots, action middlewares, JSON patch support etc out of the box.</p>
 <h1 id="stores">Stores</h1>
 <p>Let&apos;s start with <em>stores</em>.
 In the next sections we will discuss <em>actions</em> and React <em>components</em> as well.
@@ -912,7 +912,7 @@ This is ideal as most applications will change the UI state often during the dev
 <li>Currently active theme</li>
 </ul>
 </li>
-<li>User interface state as soon as it effects multiple, further unrelated components:<ul>
+<li>User interface state as soon as it affects multiple, further unrelated components:<ul>
 <li>Current selection</li>
 <li>Visibility of toolbars, etc.</li>
 <li>State of a wizard</li>
@@ -923,16 +923,13 @@ This is ideal as most applications will change the UI state often during the dev
 <p>It might very well be that these pieces of information start as internal state of a specific component (for example the visibility of a toolbar).
 But after a while you discover that you need this information somewhere else in your application.
 Instead of pushing state in such a case upwards in the component tree, like you would do in plain React apps, you just move that state to the <em>ui-state-store</em>.</p>
-<p>Make sure this state is a singleton.
-For isomorphic applications you might also want to provide a stub implementation of this store with sane defaults so that all components render as expected.
-You might distribute the <em>ui-state-store</em> through your application by passing it as a property through your component tree.
-You can also pass this store by using context or make it globally available as a module.
-For testing purposes, I recommend to just pass it through the component tree.</p>
+<p>For isomorphic applications you might also want to provide a stub implementation of this store with sane defaults so that all components render as expected.
+You might distribute the <em>ui-state-store</em> through your application by passing it as a property through your component tree or using <code>Provider</code> and <code>inject</code> from the <code>mobx-react</code> package.</p>
 <p>Example of a store (using ES6 syntax):</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, computed, asStructure} <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;mobx&apos;</span>;
 <span class="hljs-keyword">import</span> jquery <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;jquery&apos;</span>;
 
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UiState</span> </span>{
+<span class="hljs-keyword">export</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UiState</span> </span>{
     @observable language = <span class="hljs-string">&quot;en_US&quot;</span>;
     @observable pendingRequestCount = <span class="hljs-number">0</span>;
 
@@ -953,9 +950,6 @@ For testing purposes, I recommend to just pass it through the component tree.</p
         <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.pendingRequestCount === <span class="hljs-number">0</span>
     }
 }
-
-singleton = <span class="hljs-keyword">new</span> UiState();
-<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> singleton;
 </code></pre>
 <h2 id="domain-stores">Domain Stores</h2>
 <p>Your application will contain one or multiple <em>domain</em> stores.
@@ -964,14 +958,14 @@ Todo items, users, books, movies, orders, you name it.
 Your application will most probably have at least one domain store.</p>
 <p>A single domain store should be responsible for a single concept in your application.
 However a single concept might take the form of multiple subtypes and it is often a (cyclic) tree structure.
-For example: one domain store for your products, and one for our orders and orderlines.
+For example: one domain store for your products, and one for your orders and orderlines.
 As a rule of thumb: if the nature of the relationship between two items is containment, they should typically be in the same store.
 So a store just manages <em>domain objects</em>.</p>
-<p>These are the responsibility of a store:</p>
+<p>These are the responsibilities of a store:</p>
 <ul>
 <li>Instantiate domain objects. Make sure domain objects know the store they belong to.</li>
 <li>Make sure there is only one instance of each of your domain objects.
-The same user, order or todo should not be twice in your memory.
+The same user, order or todo should not be stored twice in memory.
 This way you can safely use references and also be sure you are looking at the latest instance, without ever having to resolve a reference.
 This is fast, straightforward and convenient when debugging.</li>
 <li>Provide backend integration. Store data when needed.</li>
@@ -1146,11 +1140,11 @@ Especially in large applications this is important.</li>
 }
 </code></pre>
 <h1 id="combining-multiple-stores">Combining multiple stores</h1>
-<p>An often asked question is; how to combine multiple stores without using singletons. How will they know about each other?</p>
-<p>An effective pattern to use this is to create a <code>RootStore</code> that instantates all stores, and share references. The advantage of this pattern is:</p>
+<p>An often asked question is how to combine multiple stores without using singletons. How will they know about each other?</p>
+<p>An effective pattern is to create a <code>RootStore</code> that instantiates all stores, and share references. The advantage of this pattern is:</p>
 <ol>
-<li>Simple to set up</li>
-<li>Supports strong typing well</li>
+<li>Simple to set up.</li>
+<li>Supports strong typing well.</li>
 <li>Makes complex unit tests easy as you just have to instantiate a root store.</li>
 </ol>
 <p>Example:</p>
