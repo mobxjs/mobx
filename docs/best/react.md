@@ -119,6 +119,44 @@ message.author = { name: "John" };
 The first change will be picked up, `message.author` and `author` are the same object, and the `.name` property is dereferenced in the autorun.
 However the second change will **not** be picked up, the `message.author` relation is not tracked by the `autorun`. Autorun is still using the "old" `author`.
 
+#### Common pitfal: console.log
+
+```javascript
+const message = observable({ title: "hello" })
+
+autorun(() => {
+    console.log(message)
+})
+
+// Won't trigger a re-run
+message.title = "Hello world"
+```
+
+In the above example, the updated message title won't be printed, because it is not used inside the autorun.
+The autorun only depends on `message`, which is not an observable, but a constant. In other words, as far as MobX is concerned, `title` is not used in- and hence not relevant for the `autorun`
+
+The fact that `console.log` will print the message title is misleading here; `console.log` is an asynchronous api that only will format it's parameters later in time, for which reason the autorun won't be tracking what data the console.log is accessing. For that reason make sure to always pass immutable data or defensive copies to `console.log`.
+
+The following solutions however, will all react to `message.title`:
+
+```javascript
+autorun(() => {
+    console.log(message.title) // clearly, the `.title` observable is used
+})
+
+autorun(() => {
+    console.log(mobx.toJS(message)) // toJS creates a deep clone, and thus will read the message
+})
+
+autorun(() => {
+    console.log({...message}) // creates a shallow clone, also using `.title` in the process
+})
+
+autorun(() => {
+    console.log(JSON.stringify(message)) // also reads the entire structure
+})
+```
+
 #### Correct: access array properties in tracked function
 
 
