@@ -26,10 +26,10 @@ _Simple, scalable state management_
 
 ## Getting started
 
+* <a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx">Egghead.io course</a>
 * [Ten minute, interactive MobX + React tutorial](https://mobxjs.github.io/mobx/getting-started.html)
 * [Official MobX 3 documentation and API overview](https://mobxjs.github.io/mobx/refguide/api.html) ([MobX 2](https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md))
 * Videos:
-  * [Egghead.io course: Manage Complex State in React Apps with MobX](https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx) - 30m.
   * [ReactNext 2016: Real World MobX](https://www.youtube.com/watch?v=Aws40KOx90U) - 40m [slides](https://docs.google.com/presentation/d/1DrI6Hc2xIPTLBkfNH8YczOcPXQTOaCIcDESdyVfG_bE/edit?usp=sharing)
   * [Practical React with MobX](https://www.youtube.com/watch?v=XGwuM_u7UeQ). In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth (ES5 only) - 42m.
   * LearnCode.academy MobX tutorial [Part I: MobX + React is AWESOME (7m)](https://www.youtube.com/watch?v=_q50BXqkAfI) [Part II: Computed Values and Nested/Referenced Observables (12m.)](https://www.youtube.com/watch?v=nYvNqKrl69s)
@@ -59,6 +59,8 @@ Both React and MobX provide very optimal and unique solutions to common problems
 MobX has only a few core concepts. The following snippets can be tried online using [JSFiddle](https://jsfiddle.net/mweststrate/f0dptdau/2/) (or [without ES6 and JSX](https://jsfiddle.net/rubyred/55oc981v/)).
 
 ### Observable state
+
+<a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/javascript-sync-the-ui-with-the-app-state-using-mobx-observable-and-observer-in-react">Egghead.io lesson 1: observable & observer</a>
 
 MobX adds observable capabilities to existing data structures like objects, arrays and class instances.
 This can simply be done by annotating your class properties with the [@observable](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) decorator (ES.Next).
@@ -96,6 +98,8 @@ function Todo() {
 
 ### Computed values
 
+<a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/javascript-derive-computed-values-and-manage-side-effects-with-mobx-reactions">Egghead.io lesson 3: computed values</a>
+
 With MobX you can define values that will be derived automatically when relevant data is modified.
 By using the [`@computed`](http://mobxjs.github.io/mobx/refguide/computed-decorator.html) decorator or by using getter / setter functions when using `(extend)Observable`.
 
@@ -113,10 +117,15 @@ Computations like these resemble formulas in spreadsheet programs like MS Excel.
 
 ### Reactions
 
+<a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-write-custom-mobx-reactions-with-when-and-autorun">Egghead.io lesson 9: custom reactions</a>
+
 Reactions are similar to a computed value, but instead of producing a new value, a reaction produces a side effect for things like printing to the console, making network requests, incrementally updating the React component tree to patch the DOM, etc.
 In short, reactions bridge [reactive](https://en.wikipedia.org/wiki/Reactive_programming) and [imperative](https://en.wikipedia.org/wiki/Imperative_programming) programming.
 
 #### React components
+
+<a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx">Egghead.io lesson 1: observable & observer</a>
+
 If you are using React, you can turn your (stateless function) components into reactive components by simply adding the [`observer`](http://mobxjs.github.io/mobx/refguide/observer-component.html) function / decorator from the `mobx-react` package onto them.
 
 ```javascript
@@ -178,6 +187,8 @@ _MobX reacts to any existing observable property that is read during the executi
 For an in-depth explanation about how MobX determines to which observables needs to be reacted, check [understanding what MobX reacts to](https://github.com/mobxjs/mobx/blob/gh-pages/docs/best/react.md).
 
 ### Actions
+
+<a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-use-mobx-actions-to-change-and-guard-state">Egghead.io lesson 5: actions</a>
 
 Unlike many flux frameworks, MobX is unopinionated about how user events should be handled.
 
@@ -270,6 +281,8 @@ And finally kudos for all the people that believed in, tried, validated and even
 
 
 ## What others are saying...
+
+> Guise, #mobx isn't pubsub, or your grandpa's observer pattern. Nay, it is a carefully orchestrated observable dimensional portal fueled by the power cosmic. It doesn't do change detection, it's actually a level 20 psionic with soul knife, slashing your viewmodel into submission.
 
 > After using #mobx for lone projects for a few weeks, it feels awesome to introduce it to the team. Time: 1/2, Fun: 2X
 
