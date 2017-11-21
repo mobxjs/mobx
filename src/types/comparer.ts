@@ -1,4 +1,4 @@
-import { deepEqual, areBothNan } from "../utils/utils"
+import { deepEqual, areBothNaN } from "../utils/utils"
 
 export interface IEqualsComparer<T> {
     (a: T, b: T): boolean
@@ -13,7 +13,7 @@ function structuralComparer(a: any, b: any): boolean {
 }
 
 function defaultComparer(a: any, b: any): boolean {
-    return areBothNan(a,b) || identityComparer(a, b)
+    return areBothNaN(a,b) || identityComparer(a, b)
 }
 
 export const comparer = {
