@@ -1223,6 +1223,31 @@ test("computed values believe NaN === NaN", function(t) {
     t.end()
 })
 
+test("computed values believe deep NaN === deep NaN when using compareStructural", function(t) {
+    var a = observable({ b: { a: 1 } })
+    var c = computed(function() {
+        return a.b
+    }, {compareStructural: true})
+
+    var buf = new buffer()
+    c.observe((newValue) => { 
+        buf(newValue)
+    });
+
+    a.b = { a: NaN }
+    a.b = { a: NaN }
+    a.b = { a: NaN }
+    a.b = { a: 2 }
+    a.b = { a: NaN }
+
+    var bufArray = buf.toArray()
+    t.equal(isNaN(bufArray[0].b), true)
+    t.deepEqual(bufArray[1], { a: 2 })
+    t.deepEqual(isNaN(bufArray[2].b), true)  
+    t.equal(bufArray.length, 3)
+    t.end()
+})
+
 test.skip("issue 65; transaction causing transaction", function(t) {
     // MWE: disabled, bad test; depends on transaction being tracked, transaction should not be used in computed!
     var x = mobx.observable({
