@@ -1,4 +1,12 @@
+const fs = require("fs")
+const child_process =  require("child_process")
 const test = require("tape")
+
+if (!fs.existsSync(__dirname + "/../../lib/mobx.umd.min.js")) {
+	// make sure the minified build exists
+	child_process.execSync("npm run small-build", { stdio: 'inherit' })
+}
+
 const mobx1 = require("../../")
 /* istanbul ignore next */
 const mobx2 = require("../../lib/mobx.umd.min.js")
