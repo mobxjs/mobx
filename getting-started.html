@@ -161,6 +161,8 @@ console.log(todoStore.report());
                             object:
                         </p>
                         <textarea spellcheck="false" class="prettyprint" id="code3" rows="8">
+import mobx, { observable, computed } from 'mobx'
+
 class ObservableTodoStore {
 	@observable todos = [];
     @observable pendingRequests = 0;
@@ -254,6 +256,27 @@ observableTodoStore.todos[0].task = "grok MobX tutorial";
                             each time a component is rendered.
                         </p>
                         <textarea spellcheck="false" class="" id="react1" rows="44">
+import { observer } from 'mobx-react'
+
+class RenderCounter extends React.Component {
+  state: { count: number }
+
+  constructor(props) {
+    super(props)
+    this.state = { count: 1 }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({ count: ++this.state.count })
+  }
+
+  render() {
+    let className = `render-counter ${this.state.count % 2 ? 'odd' : 'event'}`
+    return <div className={className}>{this.state.count}</div>
+  }
+}
+
+
 @observer
 class TodoList extends React.Component {
   render() {
