@@ -1,6 +1,7 @@
 # Next
 
 * Fix bug where custom comparers could be invoked with `undefined` values. Fixes #1208. Thanks @chrisdoble!
+* Make typings for observable stricter when using flow.
 * Fix a bug where `map.replace` would trigger reactions for unchanged values, fixes [#1243](https://github.com/mobxjs/mobx/issues/1243)
 
 # 3.3.1
