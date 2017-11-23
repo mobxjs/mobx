@@ -632,3 +632,49 @@ test("issue 940, should not be possible to change maps outside strict mode", t =
 	mobx.useStrict(false)
 	t.end()
 })
+
+test("issue 1243, .replace should not trigger change on unchanged values", t => {
+    const m = mobx.observable.map({ a: 1, b: 2, c: 3 })
+
+    let recomputeCount = 0
+    let visitedComputed = false
+    const computedValue = mobx.computed(() => {
+        recomputeCount++
+        return m.get('a')
+    })
+
+    const d = mobx.autorun(() => {
+        computedValue.get()
+    })
+
+    // recompute should happen once by now, due to the autorun
+    t.equal(recomputeCount, 1)
+
+    // a hasn't changed, recompute should not happen
+    m.replace({ a: 1, d: 5 })
+
+    t.equal(recomputeCount, 1)
+
+    // this should cause a recompute
+    m.replace({ a: 2 })
+    t.equal(recomputeCount, 2)
+
+    // this should remove key a and cause a recompute
+    m.replace({ b: 2 })
+    t.equal(recomputeCount, 3)
+
+    m.replace([['a', 1]])
+    t.equal(recomputeCount, 4)
+
+    const nativeMap = new Map()
+    nativeMap.set('a', 2)
+    m.replace(nativeMap)
+    t.equal(recomputeCount, 5)
+
+    t.throws(() => {
+        m.replace('not-an-object')
+    })
+
+    d()
+    t.end()
+})
