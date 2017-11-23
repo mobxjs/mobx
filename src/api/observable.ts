@@ -68,69 +68,21 @@ export interface IObservableFactory {
     <T>(value: T): IObservableValue<T>
 }
 
-export class IObservableFactories {
-    box<T>(value?: T, name?: string): IObservableValue<T> {
-        if (arguments.length > 2) incorrectlyUsedAsDecorator("box")
-        return new ObservableValue(value, deepEnhancer, name)
-    }
-
-    shallowBox<T>(value?: T, name?: string): IObservableValue<T> {
-        if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowBox")
-        return new ObservableValue(value, referenceEnhancer, name)
-    }
-
-    array<T>(initialValues?: T[], name?: string): IObservableArray<T> {
-        if (arguments.length > 2) incorrectlyUsedAsDecorator("array")
-        return new ObservableArray(initialValues, deepEnhancer, name) as any
-    }
-
-    shallowArray<T>(initialValues?: T[], name?: string): IObservableArray<T> {
-        if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowArray")
-        return new ObservableArray(initialValues, referenceEnhancer, name) as any
-    }
-
-    map<T>(initialValues?: IObservableMapInitialValues<T>, name?: string): ObservableMap<T> {
-        if (arguments.length > 2) incorrectlyUsedAsDecorator("map")
-        return new ObservableMap(initialValues, deepEnhancer, name)
-    }
-
-    shallowMap<T>(initialValues?: IObservableMapInitialValues<T>, name?: string): ObservableMap<T> {
-        if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowMap")
-        return new ObservableMap(initialValues, referenceEnhancer, name)
-    }
-
-    object<T>(props: T, name?: string): T & IObservableObject {
-        if (arguments.length > 2) incorrectlyUsedAsDecorator("object")
-        const res = {}
-        // convert to observable object
-        asObservableObject(res, name)
-        // add properties
-        extendObservable(res, props)
-        return res as any
-    }
-
-    shallowObject<T>(props: T, name?: string): T & IObservableObject {
-        if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowObject")
-        const res = {}
-        asObservableObject(res, name)
-        extendShallowObservable(res, props)
-        return res as any
-    }
+export interface IObservableFactories {
+    box<T>(value?: T, name?: string): IObservableValue<T>
+    shallowBox<T>(value?: T, name?: string): IObservableValue<T>
+    array<T>(initialValues?: T[], name?: string): IObservableArray<T>
+    shallowArray<T>(initialValues?: T[], name?: string): IObservableArray<T>
+    map<T>(initialValues?: IObservableMapInitialValues<T>, name?: string): ObservableMap<T>
+    shallowMap<T>(initialValues?: IObservableMapInitialValues<T>, name?: string): ObservableMap<T>
+    object<T>(props: T, name?: string): T & IObservableObject
+    shallowObject<T>(props: T, name?: string): T & IObservableObject
 
     /**
      * Decorator that creates an observable that only observes the references, but doesn't try to turn the assigned value into an observable.ts.
      */
     ref(target: Object, property: string, descriptor?: PropertyDescriptor): any
-    ref<T>(initialValue: T): T
-    ref() {
-        if (arguments.length < 2) {
-            // although ref creates actually a modifier descriptor, the type of the resultig properties
-            // of the object is `T` in the end, when the descriptors are interpreted
-            return createModifierDescriptor(referenceEnhancer, arguments[0]) as any
-        } else {
-            return refDecorator.apply(null, arguments)
-        }
-    }
+    ref<T>(initialValue: T): T;
 
     /**
      * Decorator that creates an observable converts its value (objects, maps or arrays) into a shallow observable structure
@@ -139,6 +91,68 @@ export class IObservableFactories {
     shallow<T>(initialValues: T[]): IObservableArray<T>
     shallow<T>(initialValues: IMap<string | number | boolean, T>): ObservableMap<T>
     shallow<T extends Object>(value: T): T
+
+    deep(target: Object, property: string, descriptor?: PropertyDescriptor): any
+    deep<T>(initialValues: T[]): IObservableArray<T>
+    deep<T>(initialValues: IMap<string | number | boolean, T>): ObservableMap<T>
+    deep<T>(initialValue: T): T
+
+    struct(target: Object, property: string, descriptor?: PropertyDescriptor): any
+    struct<T>(initialValues: T[]): IObservableArray<T>
+    struct<T>(initialValues: IMap<string | number | boolean, T>): ObservableMap<T>
+    struct<T>(initialValue: T): T
+}
+
+const observableFactories: IObservableFactories = {
+    box<T>(value?: T, name?: string): IObservableValue<T> {
+        if (arguments.length > 2) incorrectlyUsedAsDecorator("box")
+        return new ObservableValue(value, deepEnhancer, name)
+    },
+    shallowBox<T>(value?: T, name?: string): IObservableValue<T> {
+        if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowBox")
+        return new ObservableValue(value, referenceEnhancer, name)
+    },
+    array<T>(initialValues?: T[], name?: string): IObservableArray<T> {
+        if (arguments.length > 2) incorrectlyUsedAsDecorator("array")
+        return new ObservableArray(initialValues, deepEnhancer, name) as any
+    },
+    shallowArray<T>(initialValues?: T[], name?: string): IObservableArray<T> {
+        if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowArray")
+        return new ObservableArray(initialValues, referenceEnhancer, name) as any
+    },
+    map<T>(initialValues?: IObservableMapInitialValues<T>, name?: string): ObservableMap<T> {
+        if (arguments.length > 2) incorrectlyUsedAsDecorator("map")
+        return new ObservableMap(initialValues, deepEnhancer, name)
+    },
+    shallowMap<T>(initialValues?: IObservableMapInitialValues<T>, name?: string): ObservableMap<T> {
+        if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowMap")
+        return new ObservableMap(initialValues, referenceEnhancer, name)
+    },
+    object<T>(props: T, name?: string): T & IObservableObject {
+        if (arguments.length > 2) incorrectlyUsedAsDecorator("object")
+        const res = {}
+        // convert to observable object
+        asObservableObject(res, name)
+        // add properties
+        extendObservable(res, props)
+        return res as any
+    },
+    shallowObject<T>(props: T, name?: string): T & IObservableObject {
+        if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowObject")
+        const res = {}
+        asObservableObject(res, name)
+        extendShallowObservable(res, props)
+        return res as any
+    },
+    ref() {
+        if (arguments.length < 2) {
+            // although ref creates actually a modifier descriptor, the type of the resultig properties
+            // of the object is `T` in the end, when the descriptors are interpreted
+            return createModifierDescriptor(referenceEnhancer, arguments[0]) as any
+        } else {
+            return refDecorator.apply(null, arguments)
+        }
+    },
     shallow() {
         if (arguments.length < 2) {
             // although ref creates actually a modifier descriptor, the type of the resultig properties
@@ -147,12 +161,7 @@ export class IObservableFactories {
         } else {
             return shallowDecorator.apply(null, arguments)
         }
-    }
-
-    deep(target: Object, property: string, descriptor?: PropertyDescriptor): any
-    deep<T>(initialValues: T[]): IObservableArray<T>
-    deep<T>(initialValues: IMap<string | number | boolean, T>): ObservableMap<T>
-    deep<T>(initialValue: T): T
+    },
     deep() {
         if (arguments.length < 2) {
             // although ref creates actually a modifier descriptor, the type of the resultig properties
@@ -161,12 +170,7 @@ export class IObservableFactories {
         } else {
             return deepDecorator.apply(null, arguments)
         }
-    }
-
-    struct(target: Object, property: string, descriptor?: PropertyDescriptor): any
-    struct<T>(initialValues: T[]): IObservableArray<T>
-    struct<T>(initialValues: IMap<string | number | boolean, T>): ObservableMap<T>
-    struct<T>(initialValue: T): T
+    },
     struct() {
         if (arguments.length < 2) {
             // although ref creates actually a modifier descriptor, the type of the resultig properties
@@ -189,10 +193,7 @@ export const observable: IObservableFactory &
     } = createObservable as any
 
 // weird trick to keep our typings nicely with our funcs, and still extend the observable function
-// ES6 class methods aren't enumerable, can't use Object.keys
-Object.getOwnPropertyNames(IObservableFactories.prototype)
-    .filter(name => name !== "constructor")
-    .forEach(name => (observable[name] = IObservableFactories.prototype[name]))
+Object.keys(observableFactories).forEach(name => (observable[name] = observableFactories[name]))
 
 observable.deep.struct = observable.struct
 observable.ref.struct = function() {
