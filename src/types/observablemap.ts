@@ -10,6 +10,7 @@ import {
     invariant,
     deprecated,
     isES6Map,
+    getMapLikeKeys,
     fail
 } from "../utils/utils"
 import {
@@ -304,7 +305,15 @@ export class ObservableMap<V>
 
     replace(values: ObservableMap<V> | IKeyValueMap<V> | any): ObservableMap<V> {
         transaction(() => {
-            this.clear()
+            // grab all the keys that are present in the new map but not present in the current map
+            // and delete them from the map, then merge the new map
+            // this will cause reactions only on changed values
+            const newKeys = getMapLikeKeys(values)
+            const oldKeys = this.keys()
+            const missingKeys = oldKeys.filter(k => newKeys.indexOf(k) === -1)
+
+            missingKeys.forEach(k => this.delete(k))
+
             this.merge(values)
         })
         return this

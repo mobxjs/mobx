@@ -145,6 +145,7 @@ export function getEnumerableKeys(obj) {
 export function deepEqual(a, b) {
     if (a === null && b === null) return true
     if (a === undefined && b === undefined) return true
+    if (areBothNaN(a, b)) return true    
     if (typeof a !== "object") return a === b
     const aIsArray = isArrayLike(a)
     const aIsMap = isMapLike(a)
@@ -191,6 +192,10 @@ export function createInstanceofPredicate<T>(
     } as any
 }
 
+export function areBothNaN(a: any, b: any): boolean {
+    return (typeof a === "number" && typeof b === "number" && isNaN(a) && isNaN(b));
+}
+
 /**
  * Returns whether the argument is an array, disregarding observability.
  */
@@ -207,6 +212,15 @@ export function isES6Map(thing): boolean {
     return false
 }
 
+export function getMapLikeKeys<V>(map: ObservableMap<V> | IKeyValueMap<V> | any): string[] {
+	let keys;
+	if (isPlainObject(map)) keys = Object.keys(map)
+	else if (Array.isArray(map)) keys = map.map(([key]) => key)
+	else if (isES6Map(map)) keys = (Array as any).from(map.keys())
+	else fail("Cannot get keys from " + map)
+	return keys;
+}
+
 declare var Symbol
 
 export function primitiveSymbol() {
@@ -219,5 +233,5 @@ export function toPrimitive(value) {
 
 import { globalState } from "../core/globalstate"
 import { IObservableArray, isObservableArray } from "../types/observablearray"
-import { isObservableMap } from "../types/observablemap"
+import { isObservableMap, ObservableMap, IKeyValueMap } from "../types/observablemap"
 import { observable } from "../api/observable"
