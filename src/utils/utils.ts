@@ -145,6 +145,7 @@ export function getEnumerableKeys(obj) {
 export function deepEqual(a, b) {
     if (a === null && b === null) return true
     if (a === undefined && b === undefined) return true
+    if (areBothNaN(a, b)) return true    
     if (typeof a !== "object") return a === b
     const aIsArray = isArrayLike(a)
     const aIsMap = isMapLike(a)
@@ -189,6 +190,10 @@ export function createInstanceofPredicate<T>(
     return function(x) {
         return isObject(x) && x[propName] === true
     } as any
+}
+
+export function areBothNaN(a: any, b: any): boolean {
+    return (typeof a === "number" && typeof b === "number" && isNaN(a) && isNaN(b));
 }
 
 /**
