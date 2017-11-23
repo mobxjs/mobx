@@ -299,8 +299,6 @@ And finally kudos for all the people that believed in, tried, validated and even
 * Feel free to send small pull requests. Please discuss new features or big changes in a GitHub issue first.
 * Use `npm test` to run the basic test suite, `npm run coverage` for the test suite with coverage and `npm run perf` for the performance tests.
 
-> Note: Before testing, make sure to run `npm run small-build`.
-
 ## Flow support
 MobX ships with flow typings. To use them in your project, add this to the `[libs]` section of your `.flowconfig`:
 ```
