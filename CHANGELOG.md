@@ -1,8 +1,9 @@
-# Next
+# 3.3.2
 
-* Fix bug where custom comparers could be invoked with `undefined` values. Fixes #1208. Thanks @chrisdoble!
-* Make typings for observable stricter when using flow.
+* Fix bug where custom comparers could be invoked with `undefined` values. Fixes [#1208](https://github.com/mobxjs/mobx/issues/1208)
+* Make typings for observable stricter when using flow [#1194](https://github.com/mobxjs/mobx/issues/1194), [#1231](https://github.com/mobxjs/mobx/issues/1231)
 * Fix a bug where `map.replace` would trigger reactions for unchanged values, fixes [#1243](https://github.com/mobxjs/mobx/issues/1243)
+* Fixed issue where `NaN` was considered unequal to `NaN` when a deep compare was made [#1249](https://github.com/mobxjs/mobx/issues/1249)
 
 # 3.3.1
 
