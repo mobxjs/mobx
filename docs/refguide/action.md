@@ -76,7 +76,7 @@ Example:
 
 ```javascript
 class Ticker {
-	@observable this.tick = 0
+	@observable tick = 0
 
 	@action.bound
 	increment() {
