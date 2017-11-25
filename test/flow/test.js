@@ -1,7 +1,7 @@
 //@flow
 
-import type { IObservableValue, IObservableArray, IComputedValue } from "mobx"
-import mobx from "mobx"
+import type { IObservableValue, IObservableArray, IComputedValue } from "../../lib/mobx.js"
+import * as mobx from "../../lib/mobx.js"
 
 const action = mobx.action(() => console.log(1))
 // $ExpectError
