@@ -21,5 +21,18 @@ const sum: IComputedValue<number> = mobx.computed(() => {
     }, 0)
 })
 
+const observableObject = mobx.observable({
+  a: true
+})
+// $ExpectError
+observableObject.a = 12
+// $ExpectError
+observableObject.b = 12
+observableObject.a = false
+
+const extendedObservableObject = mobx.extendObservable(mobx.observable({}), { a: true })
+// $ExpectError
+const x: string = extendedObservableObject.a
+
 const disposer = mobx.autorun(() => console.log(sum.get()))
 disposer()
