@@ -1,3 +1,7 @@
+# Next
+
+* Added `ObservableArray.removeAll`, [#1248](https://github.com/mobxjs/mobx/issues/1248)
+
 # 3.3.2
 
 * Fix bug where custom comparers could be invoked with `undefined` values. Fixes [#1208](https://github.com/mobxjs/mobx/issues/1208)
