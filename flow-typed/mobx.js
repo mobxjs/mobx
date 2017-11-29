@@ -20,7 +20,7 @@ export type Extras = {
 
 declare export var extras: Extras
 
-export type IObservableMapInitialValues<V> = IMapEntries<V> | IKeyValueMap<V> | IMap<string, V>
+export type IObservableMapInitialValues<V> = IMapEntries<V> | KeyValueMap<V> | IMap<string, V>
 
 export interface IReactionOptions {
     context?: any,
@@ -193,7 +193,7 @@ export interface IArrayWillSplice<T> {
     removedCount: number
 }
 
-export interface IKeyValueMap<V> {
+export type KeyValueMap<V> = {
     [key: string]: V
 }
 
@@ -315,7 +315,7 @@ declare export class ObservableMap<V> {
     name: string,
     interceptors: any,
     changeListeners: any,
-    constructor(initialData?: IMapEntries<V> | IKeyValueMap<V>, valueModeFunc?: Function): this,
+    constructor(initialData?: IMapEntries<V> | KeyValueMap<V>, valueModeFunc?: Function): this,
     has(key: string): boolean,
     set(key: string, value: V): void,
     delete(key: string): boolean,
@@ -324,16 +324,16 @@ declare export class ObservableMap<V> {
     values(): V[] & Iterator<V>,
     entries(): IMapEntries<V> & Iterator<IMapEntry<V>>,
     forEach(
-        callback: (value: V, key: string, object: IKeyValueMap<V>) => void,
+        callback: (value: V, key: string, object: KeyValueMap<V>) => void,
         thisArg?: any
     ): void,
-    merge(other: ObservableMap<V> | IKeyValueMap<V>): ObservableMap<V>,
+    merge(other: ObservableMap<V> | KeyValueMap<V>): ObservableMap<V>,
     clear(): void,
-    replace(other: ObservableMap<V> | IKeyValueMap<V>): ObservableMap<V>,
+    replace(other: ObservableMap<V> | KeyValueMap<V>): ObservableMap<V>,
     size: number,
-    toJS(): IKeyValueMap<V>,
-    toJs(): IKeyValueMap<V>,
-    toJSON(): IKeyValueMap<V>,
+    toJS(): KeyValueMap<V>,
+    toJs(): KeyValueMap<V>,
+    toJSON(): KeyValueMap<V>,
     toString(): string,
     observe(listener: (changes: IMapChange<V>) => void, fireImmediately?: boolean): Lambda,
     intercept(handler: IInterceptor<IMapWillChange<V>>): Lambda
@@ -452,11 +452,11 @@ declare export function transaction<T>(action: () => T, thisArg?: any, report?: 
 declare export function asReference<T>(value: T): T
 declare export function asStructure<T>(value: T): T
 declare export function asFlat<T>(value: T): T
-declare export function asMap<T>(data: IKeyValueMap<T>, modifierFunc?: Function): ObservableMap<T>
+declare export function asMap<T>(data: KeyValueMap<T>, modifierFunc?: Function): ObservableMap<T>
 declare export function isObservableArray(thing: any): boolean
 
 declare export function map<V>(
-    initialValues?: IMapEntries<V> | IKeyValueMap<V>,
+    initialValues?: IMapEntries<V> | KeyValueMap<V>,
     valueModifier?: Function
 ): ObservableMap<V>
 
