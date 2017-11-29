@@ -58,7 +58,7 @@ export interface IMap<K, V> {
     size: number
 }
 
-export type isObservableMap = (x: any) => boolean
+declare export function isObservableMap (x: any): boolean
 
 declare type ISimpleEventListener = {
     (): void
