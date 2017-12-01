@@ -269,18 +269,18 @@ test("array modification functions", function(t) {
 })
 
 test("array modification .removeAll", function(t) {
-    var array = [];
-    for(var i = 0; i < 100; i++) array.push(i);
+    var array = []
+    for(var i = 0; i < 100; i++) array.push(i)
     var predicates = [
         function (x) {return x % 2 == 0 },
         function (x) { return x > 20 },
         function (x) { return x == 3}
     ]
     predicates.forEach(function(predicate) {
-        var a = array.filter(predicate)
-        var b = mobx.observable(a)
-        b.removeAll(predicate)
-        t.deepEqual(a, b.slice())
+        var filteredArray = array.filter(predicate)
+        var observableArray = mobx.observable(array)
+        observableArray.removeAll(predicate)
+        t.deepEqual(filteredArray, observableArray.slice())
     })
     t.end()
 })
