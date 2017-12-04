@@ -96,7 +96,7 @@ For more advantages of using observable local component state, see [3 reasons wh
 <a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-connect-mobx-observer-components-to-the-store-with-the-react-provider">Egghead.io lesson 8: inject stores with Provider</a>
 
 The `mobx-react` package also provides the `Provider` component that can be used to pass down stores using React's context mechanism.
-To connect to those stores, pass an list of store names to `inject`, which will make the stores available as props.
+To connect to those stores, pass a list of store names to `inject`, which will make the stores available as props.
 
 _ N.B. the syntax to inject stores has changed since mobx-react 4, always use `inject(stores)(component)` or `@inject(stores) class Component...`.
 Passing store names directly to `observer is deprecated._
