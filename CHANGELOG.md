@@ -1,3 +1,6 @@
+# 3.5.0
+* Added extras.disableErrorBoundaries()
+
 # 3.4.0
 
 * Improve Flow support support by exposing typings regularly. Flow will automatically include them now. In your `.flowconfig` will have to remove the import in the `[libs]` section (as it's done [here](https://github.com/mobxjs/mobx/pull/1254#issuecomment-348926416)). Fixes [#1232](https://github.com/mobxjs/mobx/issues/1232).
