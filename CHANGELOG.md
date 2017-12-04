@@ -1,6 +1,7 @@
 # 3.3.3
 
 * Fixed regression bug where observable map contents could not be replaced using another observable map [#1258](https://github.com/mobxjs/mobx/issues/1258)
+* Fixed weird exception abot not being able to read `length` property of a function, see[#1238](https://github.com/mobxjs/mobx/issues/1238) through [#1257](https://github.com/mobxjs/mobx/issues/1238) by @dannsam
 
 # 3.3.2
 
