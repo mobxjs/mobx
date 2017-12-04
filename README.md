@@ -300,11 +300,7 @@ And finally kudos for all the people that believed in, tried, validated and even
 * Use `npm test` to run the basic test suite, `npm run coverage` for the test suite with coverage and `npm run perf` for the performance tests.
 
 ## Flow support
-MobX ships with flow typings. To use them in your project, add this to the `[libs]` section of your `.flowconfig`:
-```
-[libs]
-node_modules/mobx/lib/mobx.js.flow
-```
+MobX ships with flow typings. Flow will automatically include them. Though you cannot ignore `node_modules` in your `.flowconfig` and a you **cannot** import it explicitly in the `[libs]` section.
 
 ## Bower support
 

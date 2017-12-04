@@ -1,7 +1,7 @@
 //@flow
 
-import type { IObservableValue, IObservableArray, IComputedValue } from "mobx"
-import mobx from "mobx"
+import type { IObservableValue, IObservableArray, IComputedValue } from "../../lib/mobx.js"
+import * as mobx from "../../lib/mobx.js"
 
 const action = mobx.action(() => console.log(1))
 // $ExpectError
@@ -21,5 +21,26 @@ const sum: IComputedValue<number> = mobx.computed(() => {
     }, 0)
 })
 
+const observableObject = mobx.observable({
+  a: true
+})
+// $ExpectError
+observableObject.a = 12
+// $ExpectError
+observableObject.b = 12
+observableObject.a = false
+
+const extendedObservableObject = mobx.extendObservable(mobx.observable({}), { a: true })
+// $ExpectError
+const x: string = extendedObservableObject.a
+
 const disposer = mobx.autorun(() => console.log(sum.get()))
 disposer()
+
+const arr: IObservableArray<number> = observable([])
+const object = observable.map({
+  nestedValue: arr,
+})
+
+object.get('nestedValue').push(1)
+const y: number = object.get('nestedValue')[0]

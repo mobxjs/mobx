@@ -1,3 +1,7 @@
+# 3.4.0
+
+* Improve Flow support support by exposing typings regularly. Flow will automatically include them now. In your `.flowconfig` will have to remove the import in the `[libs]` section (as it's done [here](https://github.com/mobxjs/mobx/pull/1254#issuecomment-348926416)). Fixes [#1232](https://github.com/mobxjs/mobx/issues/1232).
+
 # 3.3.3
 
 * Fixed regression bug where observable map contents could not be replaced using another observable map [#1258](https://github.com/mobxjs/mobx/issues/1258)
