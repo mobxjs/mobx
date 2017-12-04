@@ -146,7 +146,7 @@ export function getEnumerableKeys(obj) {
 export function deepEqual(a, b) {
     if (a === null && b === null) return true
     if (a === undefined && b === undefined) return true
-    if (areBothNaN(a, b)) return true    
+    if (areBothNaN(a, b)) return true
     if (typeof a !== "object") return a === b
     const aIsArray = isArrayLike(a)
     const aIsMap = isMapLike(a)
@@ -217,7 +217,7 @@ export function getMapLikeKeys<V>(map: ObservableMap<V> | IKeyValueMap<V> | any)
 	let keys;
 	if (isPlainObject(map)) keys = Object.keys(map)
 	else if (Array.isArray(map)) keys = map.map(([key]) => key)
-	else if (isES6Map(map)) keys = (Array as any).from(map.keys())
+	else if (isMapLike(map)) keys = (Array as any).from(map.keys())
 	else fail("Cannot get keys from " + map)
 	return keys;
 }

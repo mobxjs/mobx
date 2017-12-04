@@ -678,3 +678,10 @@ test("issue 1243, .replace should not trigger change on unchanged values", t => 
     d()
     t.end()
 })
+
+test("#1258 cannot replace maps anymore", t => {
+	const items = mobx.observable.map()
+	items.replace(mobx.observable.map())
+
+	t.end()
+})

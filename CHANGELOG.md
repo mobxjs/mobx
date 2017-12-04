@@ -1,3 +1,7 @@
+# 3.3.3
+
+* Fixed regression bug where observable map contents could not be replaced using another observable map [#1258](https://github.com/mobxjs/mobx/issues/1258)
+
 # 3.3.2
 
 * Fix bug where custom comparers could be invoked with `undefined` values. Fixes [#1208](https://github.com/mobxjs/mobx/issues/1208)
