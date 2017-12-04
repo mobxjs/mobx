@@ -156,7 +156,10 @@ declare module "mobx" {
             thisArg?: any,
             fromIndex?: number
         ): number,
-        remove(value: T): boolean
+        remove(value: T): boolean,
+        removeAll(
+            predicate: (item: T, index: number, array: Array<T>) => boolean
+        ): void
     }
 
     declare interface IArrayChange<T> {

@@ -61,6 +61,9 @@ export interface IObservableArray<T> extends Array<T> {
         fromIndex?: number
     ): number
     remove(value: T): boolean
+    removeAll(
+        predicate: (item: T, index:number, array: T[])=> boolean
+    ): void
     move(fromIndex: number, toIndex: number): void
 }
 
@@ -477,6 +480,12 @@ export class ObservableArray<T> extends StubArray {
         return false
     }
 
+    removeAll( 
+        predicate: (item: T, index: number, array: T[]) => boolean
+    ): void {
+        this.replace(this.$mobx.values.filter(predicate))
+    }
+
     move(fromIndex: number, toIndex: number): void {
         function checkIndex(index: number) {
             if (index < 0) {
@@ -637,6 +646,7 @@ makeNonEnumerable(ObservableArray.prototype, [
     "reverse",
     "sort",
     "remove",
+    "removeAll",
     "move",
     "toString",
     "toLocaleString"
