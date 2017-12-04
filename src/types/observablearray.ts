@@ -483,7 +483,8 @@ export class ObservableArray<T> extends StubArray {
     removeAll( 
         predicate: (item: T, index: number, array: T[]) => boolean
     ): void {
-        this.replace(this.$mobx.values.filter(predicate))
+        const invertedPerdicate = (item:T, index:number, array:T[]) => !predicate(item,index,array)
+        this.replace(this.$mobx.values.filter(invertedPerdicate))
     }
 
     move(fromIndex: number, toIndex: number): void {

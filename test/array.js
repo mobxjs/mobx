@@ -277,7 +277,7 @@ test("array modification .removeAll", function(t) {
         function (x) { return x == 3}
     ]
     predicates.forEach(function(predicate) {
-        var filteredArray = array.filter(predicate)
+        var filteredArray = array.filter((x)=> !predicate(x))
         var observableArray = mobx.observable(array)
         observableArray.removeAll(predicate)
         t.deepEqual(filteredArray, observableArray.slice())
