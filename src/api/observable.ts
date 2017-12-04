@@ -180,7 +180,7 @@ const observableFactories: IObservableFactories = {
             return deepStructDecorator.apply(null, arguments)
         }
     }
-}
+} as any
 
 export const observable: IObservableFactory &
     IObservableFactories & {
