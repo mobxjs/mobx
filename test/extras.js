@@ -350,3 +350,53 @@ test("get administration", function(t) {
     f()
     t.end()
 })
+
+test("onBecome(Un)Observed", t => {
+	const x = mobx.observable({
+		a: 3,
+		get b() {
+			return this.a * 2
+		}
+	})
+	const events = []
+
+	const d1 = mobx.extras.onBecomeObserved(x, "a", () => {
+		events.push("a observed")
+	})
+	const d2 = mobx.extras.onBecomeUnObserved(x, "a", () => {
+		events.push("a observed")
+	})
+	const d3 = mobx.extras.onBecomeObserved(x, "b", () => {
+		events.push("b observed")
+	})
+	const d4 = mobx.extras.onBecomeUnobserved(x, "b", () => {
+		events.push("b observed")
+	})
+
+	x.b
+	x.a = 4
+
+	t.equals(events.length, 0) // nothing happened yet
+
+	const d5 = reaction(() => x.b, () => {})
+	t.equals(events.length, 2)
+	t.deepEquals(events, ["stuff"])
+
+	const d6 = reaction(() => x.b, () => {})
+	t.equals(events.length, 2)
+
+	d5()
+	t.equals(events.length, 2)
+	d6()
+	t.equals(events.length, 4)
+
+	d1()
+	d2()
+	d3()
+	d4()
+	const d7 = reaction(() => x.b, () => {})
+	d7()
+	t.equals(events.length, 4)
+
+	t.end()
+})
