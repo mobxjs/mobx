@@ -56,7 +56,7 @@ Both React and MobX provide very optimal and unique solutions to common problems
 
 ## Core concepts
 
-MobX has only a few core concepts. The following snippets can be tried online using [JSFiddle](https://jsfiddle.net/mweststrate/f0dptdau/2/) (or [without ES6 and JSX](https://jsfiddle.net/rubyred/55oc981v/)).
+MobX has only a few core concepts. The following snippets can be tried online using [codesandbox example](https://codesandbox.io/s/v3v0my2370).
 
 ### Observable state
 
