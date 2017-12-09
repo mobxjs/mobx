@@ -7,7 +7,7 @@ I have a:
 1. [ ] Question: Feel free to just state your question. For a quick answer, there are usually people online at our [Gitter](https://gitter.im/mobxjs/mobx) channel
 2. [ ] Issue:
   * [ ] **Provide error messages including stacktrace**
-  * [ ] Provide a **minimal** sample reproduction. **Create a reproduction based on this [jsfiddle](https://jsfiddle.net/mweststrate/f0dptdau/2/)**
+  * [ ] Provide a **minimal** sample reproduction. **Create a reproduction based on this [sandbox](https://codesandbox.io/s/v3v0my2370)**
   * [ ] Did you check this issue wasn't filed before?
   * [ ] Elaborate on your issue. What behavior did you expect?
   * [ ] State the versions of MobX and relevant libraries. Which browser / node / ... version?
