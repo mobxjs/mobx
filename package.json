@@ -47,7 +47,7 @@
     "LICENSE",
     "bower.json"
   ],
-  "homepage": "https://mobxjs.github.io/mobx",
+  "homepage": "https://mobx.js.org/",
   "devDependencies": {
     "@types/node": "^7.0.22",
     "babel-cli": "^6.4.5",
