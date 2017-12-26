@@ -99,7 +99,7 @@ The `mobx-react` package also provides the `Provider` component that can be used
 To connect to those stores, pass a list of store names to `inject`, which will make the stores available as props.
 
 _ N.B. the syntax to inject stores has changed since mobx-react 4, always use `inject(stores)(component)` or `@inject(stores) class Component...`.
-Passing store names directly to `observer is deprecated._
+Passing store names directly to `observer` is deprecated._
 
 Example:
 
