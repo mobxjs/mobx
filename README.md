@@ -11,7 +11,7 @@ _Simple, scalable state management_
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://mobxjs.github.io/mobx/donate.html)
 [![OpenCollective](https://opencollective.com/mobx/backers/badge.svg)](#backers)
 [![OpenCollective](https://opencollective.com/mobx/sponsors/badge.svg)](#sponsors)
-[![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
 ![npm install mobx](https://nodei.co/npm/mobx.png?downloadRank=true&downloads=true)
 
