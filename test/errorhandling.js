@@ -1,4 +1,3 @@
-var test = require("tape")
 var mobx = require("..")
 var m = mobx
 var utils = require("./utils/test-utils")
@@ -21,23 +20,22 @@ function buffer() {
 
 function checkGlobalState(t) {
     const gs = mobx.extras.getGlobalState()
-    t.equal(gs.isRunningReactions, false)
-    t.equal(gs.trackingDerivation, null)
-    t.equal(gs.inBatch, 0)
-    t.equal(gs.allowStateChanges, !gs.strictMode)
-    t.equal(gs.pendingUnobservations.length, 0)
+    expect(gs.isRunningReactions).toBe(false)
+    expect(gs.trackingDerivation).toBe(null)
+    expect(gs.inBatch).toBe(0)
+    expect(gs.allowStateChanges).toBe(!gs.strictMode)
+    expect(gs.pendingUnobservations.length).toBe(0)
 }
 
-test("exception1", function(t) {
+test("exception1", function() {
     var a = computed(function() {
         throw "hoi"
     })
-    t.throws(() => a(), "hoi")
+    expect(() => a()).toThrow()
     checkGlobalState(t)
-    t.end()
 })
 
-test("exceptions in computed values can be recovered from", t => {
+test("exceptions in computed values can be recovered from", () => {
     var a = observable({
         x: 1,
         get y() {
@@ -46,20 +44,19 @@ test("exceptions in computed values can be recovered from", t => {
         }
     })
 
-    t.equal(a.y, 2)
+    expect(a.y).toBe(2)
     a.x = 2
 
-    t.throws(() => a.y, /Uhoh/)
+    expect(() => a.y).toThrowError(/Uhoh/)
 
     checkGlobalState(t)
 
     a.x = 3
-    t.equal(a.y, 6)
+    expect(a.y).toBe(6)
     checkGlobalState(t)
-    t.end()
 })
 
-test("exception when starting autorun can be recovered from", t => {
+test("exception when starting autorun can be recovered from", () => {
     var b = undefined
     var a = observable({
         x: 2,
@@ -78,16 +75,15 @@ test("exception when starting autorun can be recovered from", t => {
         },
         /Uhoh/
     )
-    t.equal(b, undefined)
+    expect(b).toBe(undefined)
     checkGlobalState(t)
     a.x = 3
-    t.equal(b, 6)
+    expect(b).toBe(6)
     checkGlobalState(t)
-    t.equal(mobx.extras.getAtom(a, "y").observers.length, 1)
-    t.end()
+    expect(mobx.extras.getAtom(a, "y").observers.length).toBe(1)
 })
 
-test("exception in autorun can be recovered from", t => {
+test("exception in autorun can be recovered from", () => {
     var b = undefined
     var a = observable({
         x: 1,
@@ -100,9 +96,9 @@ test("exception in autorun can be recovered from", t => {
     var d = mobx.autorun(() => {
         b = a.y
     })
-    t.equal(a.y, 2)
-    t.equal(b, 2)
-    t.equal(mobx.extras.getAtom(a, "y").observers.length, 1)
+    expect(a.y).toBe(2)
+    expect(b).toBe(2)
+    expect(mobx.extras.getAtom(a, "y").observers.length).toBe(1)
 
     utils.consoleError(
         t,
@@ -113,25 +109,24 @@ test("exception in autorun can be recovered from", t => {
     )
 
     // exception is also rethrown to each consumer
-    t.throws(() => {
-        t.equal(a.y, 2) // old cached value!
-    }, /Uhoh/)
-    t.equal(mobx.extras.getAtom(a, "y").observers.length, 1)
+    expect(() => {
+        expect(a.y).toBe(2) // old cached value!
+    }).toThrowError(/Uhoh/)
+    expect(mobx.extras.getAtom(a, "y").observers.length).toBe(1)
 
-    t.equal(b, 2)
+    expect(b).toBe(2)
     checkGlobalState(t)
 
     a.x = 3
-    t.equal(a.y, 6)
-    t.equal(b, 6)
+    expect(a.y).toBe(6)
+    expect(b).toBe(6)
     checkGlobalState(t)
-    t.equal(mobx.extras.getAtom(a, "y").observers.length, 1)
+    expect(mobx.extras.getAtom(a, "y").observers.length).toBe(1)
     d()
-    t.equal(mobx.extras.getAtom(a, "y").observers.length, 0)
-    t.end()
+    expect(mobx.extras.getAtom(a, "y").observers.length).toBe(0)
 })
 
-test("multiple autoruns with exceptions are handled correctly", t => {
+test("multiple autoruns with exceptions are handled correctly", () => {
     var a = mobx.observable(1)
     var values = []
     var d1 = mobx.autorun(() => values.push("a" + a.get()))
@@ -141,26 +136,25 @@ test("multiple autoruns with exceptions are handled correctly", t => {
     })
     var d3 = mobx.autorun(() => values.push("c" + a.get()))
 
-    t.deepEqual(values, ["a1", "b1", "c1"])
+    expect(values).toEqual(["a1", "b1", "c1"])
     values.splice(0)
 
     utils.consoleError(t, () => a.set(2), /Uhoh/)
     checkGlobalState(t)
 
-    t.deepEqual(values.sort(), ["a2", "c2"]) // order is irrelevant
+    expect(values.sort()).toEqual(["a2", "c2"]) // order is irrelevant
     values.splice(0)
 
     a.set(3)
-    t.deepEqual(values.sort(), ["a3", "b3", "c3"]) // order is irrelevant
+    expect(values.sort()).toEqual(["a3", "b3", "c3"]) // order is irrelevant
 
     checkGlobalState(t)
     d1()
     d2()
     d3()
-    t.end()
 })
 
-test("deny state changes in views", function(t) {
+test("deny state changes in views", function() {
     var x = observable(3)
     var z = observable(5)
     var y = computed(function() {
@@ -168,15 +162,14 @@ test("deny state changes in views", function(t) {
         return x() * x()
     })
 
-    t.throws(() => {
+    expect(() => {
         y()
-    }, "It is not allowed to change the state during the computation of a reactive view")
+    }).toThrow()
 
     checkGlobalState(t)
-    t.end()
 })
 
-test("allow state changes in autorun", function(t) {
+test("allow state changes in autorun", function() {
     var x = observable(3)
     var z = observable(3)
 
@@ -184,20 +177,19 @@ test("allow state changes in autorun", function(t) {
         if (x.get() !== 3) z.set(x.get())
     })
 
-    t.equal(x.get(), 3)
-    t.equal(z.get(), 3)
+    expect(x.get()).toBe(3)
+    expect(z.get()).toBe(3)
 
     x.set(5) // autorunneres are allowed to change state
 
-    t.equal(x.get(), 5)
-    t.equal(z.get(), 5)
+    expect(x.get()).toBe(5)
+    expect(z.get()).toBe(5)
 
-    t.equal(mobx.extras.isComputingDerivation(), false)
+    expect(mobx.extras.isComputingDerivation()).toBe(false)
     checkGlobalState(t)
-    t.end()
 })
 
-test("deny array change in view", function(t) {
+test("deny array change in view", function(done) {
     try {
         var x = observable(3)
         var z = observable([])
@@ -206,21 +198,21 @@ test("deny array change in view", function(t) {
             return x() * x()
         })
 
-        t.throws(function() {
-            t.equal(9, y())
-        }, "It is not allowed to change the state during the computation of a reactive derivation")
+        expect(function() {
+            y();
+        }).toThrow()
 
-        t.deepEqual(z.slice(), [])
-        t.equal(mobx.extras.isComputingDerivation(), false)
+        expect(z.slice()).toEqual([])
+        expect(mobx.extras.isComputingDerivation()).toBe(false)
 
         checkGlobalState(t)
-        t.end()
+        done()
     } catch (e) {
         console.log(e.stack)
     }
 })
 
-test("allow array change in autorun", function(t) {
+test("allow array change in autorun", function() {
     var x = observable(3)
     var z = observable([])
     var y = m.autorun(function() {
@@ -229,16 +221,15 @@ test("allow array change in autorun", function(t) {
 
     x.set(5)
     x.set(6)
-    t.deepEqual(z.slice(), [5, 6])
+    expect(z.slice()).toEqual([5, 6])
     x.set(2)
-    t.deepEqual(z.slice(), [5, 6])
+    expect(z.slice()).toEqual([5, 6])
 
-    t.equal(mobx.extras.isComputingDerivation(), false)
+    expect(mobx.extras.isComputingDerivation()).toBe(false)
     checkGlobalState(t)
-    t.end()
 })
 
-test("throw error if modification loop", function(t) {
+test("throw error if modification loop", function() {
     var x = observable(3)
     var dis = m.autorun(function() {
         x.set(x.get() + 1) // is allowed to throw, but doesn't as the observables aren't bound yet during first execution
@@ -251,10 +242,9 @@ test("throw error if modification loop", function(t) {
         /Reaction doesn't converge to a stable state/
     )
     checkGlobalState(t)
-    t.end()
 })
 
-test("cycle1", function(t) {
+test("cycle1", function() {
     var p = computed(function() {
         return p.get() * 2
     }) // thats a cycle!
@@ -266,35 +256,32 @@ test("cycle1", function(t) {
         /Cycle detected/
     )
     checkGlobalState(t)
-    t.end()
 })
 
-test("cycle2", function(t) {
+test("cycle2", function() {
     var a = computed(function() {
         return b.get() * 2
     })
     var b = computed(function() {
         return a.get() * 2
     })
-    t.throws(() => {
+    expect(() => {
         b.get()
-    }, "Found cyclic dependency")
+    }).toThrow()
     checkGlobalState(t)
-    t.end()
 })
 
-test("cycle3", function(t) {
+test("cycle3", function() {
     var p = computed(function() {
         return p.get() * 2
     })
-    t.throws(() => {
+    expect(() => {
         p.get()
-    }, "Found cyclic dependency")
+    }).toThrow()
     checkGlobalState(t)
-    t.end()
 })
 
-test("cycle4", function(t) {
+test("cycle4", function() {
     var z = observable(true)
     var a = computed(function() {
         return z.get() ? 1 : b.get() * 2
@@ -304,7 +291,7 @@ test("cycle4", function(t) {
     })
 
     m.observe(b, voidObserver)
-    t.equal(1, a.get())
+    expect(1).toBe(a.get())
 
     utils.consoleError(
         t,
@@ -314,10 +301,9 @@ test("cycle4", function(t) {
         /Cycle detected/
     )
     checkGlobalState(t)
-    t.end()
 })
 
-test("throws when the max iterations over reactions are done", t => {
+test("throws when the max iterations over reactions are done", () => {
     var foo = mobx.observable({
         a: 1
     })
@@ -333,10 +319,9 @@ test("throws when the max iterations over reactions are done", t => {
         /Reaction doesn't converge to a stable state after 100 iterations/
     )
     mobx.extras.resetGlobalState()
-    t.end()
 })
 
-test("issue 86, converging cycles", function(t) {
+test("issue 86, converging cycles", function() {
     function findIndex(arr, predicate) {
         for (var i = 0, l = arr.length; i < l; i++) if (predicate(arr[i]) === true) return i
         return -1
@@ -356,18 +341,17 @@ test("issue 86, converging cycles", function(t) {
         state.someArray.remove(state.someArray[i])
     })
 
-    t.equal(state.someArray.length, 1) // should be 1, which prints fine
-    t.equal(calcs, 1)
+    expect(state.someArray.length).toBe(1) // should be 1, which prints fine
+    expect(calcs).toBe(1)
     deleteThisId.set(2) // should delete item 2, but it errors on cycle
 
-    t.equal(console.log(state.someArray.length, 0)) // should be 0, which never prints
-    t.equal(calcs, 3)
+    expect(state.someArray.length).toBe(0) // should be 0, which never prints
+    expect(calcs).toBe(3)
 
     checkGlobalState(t)
-    t.end()
 })
 
-test("slow converging cycle", function(t) {
+test("slow converging cycle", function() {
     var x = mobx.observable(1)
     var res = -1
     mobx.autorun(() => {
@@ -380,18 +364,17 @@ test("slow converging cycle", function(t) {
     // is there a practical use case where such a pattern would be expected?
     // maybe we need to immediately register observers on the observable? but that would be slow....
     // or detect cycles and re-run the autorun in that case once?
-    t.equal(x.get(), 2)
-    t.equal(res, -1)
+    expect(x.get()).toBe(2)
+    expect(res).toBe(-1)
 
     x.set(7)
-    t.equal(x.get(), 100)
-    t.equal(res, 100)
+    expect(x.get()).toBe(100)
+    expect(res).toBe(100)
 
     checkGlobalState(t)
-    t.end()
 })
 
-test("error handling assistence ", function(t) {
+test("error handling assistence ", function(done) {
     var baseError = console.error
     var baseWarn = console.warn
     var errors = [] // logged errors
@@ -435,20 +418,20 @@ test("error handling assistence ", function(t) {
             thrown.push(e)
         }
 
-        t.deepEqual(values, [6, 4, 14, 8])
-        t.equal(errors.length, 2)
-        t.equal(warns.length, 0)
-        t.equal(thrown.length, 0) // Mobx doesn't propagate throws from reactions
+        expect(values).toEqual([6, 4, 14, 8])
+        expect(errors.length).toBe(2)
+        expect(warns.length).toBe(0)
+        expect(thrown.length).toBe(0) // Mobx doesn't propagate throws from reactions
 
         console.error = baseError
         console.warn = baseWarn
 
         checkGlobalState(t)
-        t.end()
+        done()
     }, 10)
 })
 
-test("236 - cycles", t => {
+test("236 - cycles", () => {
     var Parent = function() {
         m.extendObservable(this, {
             children: [],
@@ -494,51 +477,48 @@ test("236 - cycles", t => {
         msg.push("total0:", parent.total0, "total1:", parent.total1)
     })
     // So far, so good: total0: 9 total1: 0
-    t.deepEqual(msg, ["total0:", 9, "total1:", 0])
+    expect(msg).toEqual(["total0:", 9, "total1:", 0])
     parent.children[0].kind = 1
-    t.deepEqual(msg, ["total0:", 9, "total1:", 0, "total0:", 6, "total1:", 12])
+    expect(msg).toEqual(["total0:", 9, "total1:", 0, "total0:", 6, "total1:", 12])
 
     checkGlobalState(t)
-    t.end()
 })
 
-test("peeking inside erroring computed value doesn't bork (global) state", t => {
+test("peeking inside erroring computed value doesn't bork (global) state", () => {
     const a = mobx.observable(1)
     const b = mobx.computed(() => {
         a.get()
         throw "chocolademelk"
     })
 
-    t.throws(() => {
+    expect(() => {
         b.get()
-    }, /chocolademelk/)
+    }).toThrowError(/chocolademelk/)
 
-    t.equal(a.isPendingUnobservation, true) // true is a default for optimization
-    t.equal(a.observers.length, 0)
-    t.equal(a.diffValue, 0)
-    t.equal(a.lowestObserverState, -1)
-    t.equal(a.hasUnreportedChange, false)
-    t.equal(a.value, 1)
+    expect(a.isPendingUnobservation).toBe(true) // true is a default for optimization
+    expect(a.observers.length).toBe(0)
+    expect(a.diffValue).toBe(0)
+    expect(a.lowestObserverState).toBe(-1)
+    expect(a.hasUnreportedChange).toBe(false)
+    expect(a.value).toBe(1)
 
     // t.equal(b.dependenciesState, 0) // TODO: re-enable
-    t.equal(b.observing.length, 0)
-    t.equal(b.newObserving, null)
-    t.equal(b.isPendingUnobservation, false)
-    t.equal(b.observers.length, 0)
-    t.equal(b.diffValue, 0)
-    t.equal(b.lowestObserverState, 0)
-    t.equal(b.unboundDepsCount, 0)
-    t.throws(() => {
+    expect(b.observing.length).toBe(0)
+    expect(b.newObserving).toBe(null)
+    expect(b.isPendingUnobservation).toBe(false)
+    expect(b.observers.length).toBe(0)
+    expect(b.diffValue).toBe(0)
+    expect(b.lowestObserverState).toBe(0)
+    expect(b.unboundDepsCount).toBe(0)
+    expect(() => {
         b.get()
-    }, /chocolademelk/)
-    t.equal(b.isComputing, false)
+    }).toThrowError(/chocolademelk/)
+    expect(b.isComputing).toBe(false)
 
     checkGlobalState(t)
-
-    t.end()
 })
 
-test("peeking inside autorun doesn't bork (global) state", t => {
+test("peeking inside autorun doesn't bork (global) state", () => {
     var r = -1
     const a = mobx.observable(1)
     const b = mobx.computed(() => {
@@ -549,42 +529,41 @@ test("peeking inside autorun doesn't bork (global) state", t => {
     const d = mobx.autorun(() => b.get())
     const c = d.$mobx
 
-    t.equal(b.get(), 1)
-    t.equal(r, 1)
+    expect(b.get()).toBe(1)
+    expect(r).toBe(1)
 
-    test("it should update correctly initially", t => {
-        t.equal(a.isPendingUnobservation, true) // true is a default for optimization
-        t.equal(a.observers.length, 1)
-        t.equal(a.diffValue, 0)
-        t.equal(a.lowestObserverState, -1)
-        t.equal(a.hasUnreportedChange, false)
-        t.equal(a.value, 1)
+    test("it should update correctly initially", () => {
+        expect(a.isPendingUnobservation).toBe(true) // true is a default for optimization
+        expect(a.observers.length).toBe(1)
+        expect(a.diffValue).toBe(0)
+        expect(a.lowestObserverState).toBe(-1)
+        expect(a.hasUnreportedChange).toBe(false)
+        expect(a.value).toBe(1)
 
-        t.equal(b.dependenciesState, 0)
-        t.equal(b.observing.length, 1)
-        t.equal(b.newObserving, null)
-        t.equal(b.isPendingUnobservation, false)
-        t.equal(b.observers.length, 1)
-        t.equal(b.diffValue, 0)
-        t.equal(b.lowestObserverState, 0)
-        t.equal(b.unboundDepsCount, 1) // value is always the last bound amount of observers
-        t.equal(b.value, 1, "value should be 1")
-        t.equal(b.isComputing, false)
+        expect(b.dependenciesState).toBe(0)
+        expect(b.observing.length).toBe(1)
+        expect(b.newObserving).toBe(null)
+        expect(b.isPendingUnobservation).toBe(false)
+        expect(b.observers.length).toBe(1)
+        expect(b.diffValue).toBe(0)
+        expect(b.lowestObserverState).toBe(0)
+        expect(b.unboundDepsCount).toBe(1) // value is always the last bound amount of observers
+        expect(b.value).toBe(1)
+        expect(b.isComputing).toBe(false)
 
-        t.equal(c.dependenciesState, 0)
-        t.equal(c.observing.length, 1)
-        t.equal(c.newObserving, null)
-        t.equal(c.diffValue, 0)
-        t.equal(c.unboundDepsCount, 1)
-        t.equal(c.isDisposed, false)
-        t.equal(c._isScheduled, false)
-        t.equal(c._isTrackPending, false)
-        t.equal(c._isRunning, false)
+        expect(c.dependenciesState).toBe(0)
+        expect(c.observing.length).toBe(1)
+        expect(c.newObserving).toBe(null)
+        expect(c.diffValue).toBe(0)
+        expect(c.unboundDepsCount).toBe(1)
+        expect(c.isDisposed).toBe(false)
+        expect(c._isScheduled).toBe(false)
+        expect(c._isTrackPending).toBe(false)
+        expect(c._isRunning).toBe(false)
         checkGlobalState(t)
-        t.end()
     })
 
-    test("it should not break internal consistency when exception occurred", t => {
+    test("it should not break internal consistency when exception occurred", () => {
         // Trigger exception
         utils.consoleError(
             t,
@@ -593,115 +572,112 @@ test("peeking inside autorun doesn't bork (global) state", t => {
             },
             /chocolademelk/
         )
-        t.equal(r, 2)
+        expect(r).toBe(2)
 
-        t.equal(a.isPendingUnobservation, true) // true is a default for optimization
-        t.equal(a.observers.length, 1)
-        t.equal(a.diffValue, 0)
-        t.equal(a.lowestObserverState, 0)
-        t.equal(a.hasUnreportedChange, false)
-        t.equal(a.value, 2)
+        expect(a.isPendingUnobservation).toBe(true) // true is a default for optimization
+        expect(a.observers.length).toBe(1)
+        expect(a.diffValue).toBe(0)
+        expect(a.lowestObserverState).toBe(0)
+        expect(a.hasUnreportedChange).toBe(false)
+        expect(a.value).toBe(2)
 
-        t.equal(b.dependenciesState, 0) // up to date (for what it's worth)
-        t.equal(b.observing.length, 1)
-        t.equal(b.newObserving, null)
-        t.equal(b.isPendingUnobservation, false)
-        t.equal(b.observers.length, 1)
-        t.equal(b.diffValue, 0)
-        t.equal(b.lowestObserverState, 0)
-        t.equal(b.unboundDepsCount, 1)
-        t.equal(b.isComputing, false)
-        t.throws(() => b.get(), /chocolademelk/)
+        expect(b.dependenciesState).toBe(0) // up to date (for what it's worth)
+        expect(b.observing.length).toBe(1)
+        expect(b.newObserving).toBe(null)
+        expect(b.isPendingUnobservation).toBe(false)
+        expect(b.observers.length).toBe(1)
+        expect(b.diffValue).toBe(0)
+        expect(b.lowestObserverState).toBe(0)
+        expect(b.unboundDepsCount).toBe(1)
+        expect(b.isComputing).toBe(false)
+        expect(() => b.get()).toThrowError(/chocolademelk/)
 
-        t.equal(c.dependenciesState, 0)
-        t.equal(c.observing.length, 1)
-        t.equal(c.newObserving, null)
-        t.equal(c.diffValue, 0)
-        t.equal(c.unboundDepsCount, 1)
-        t.equal(c.isDisposed, false)
-        t.equal(c._isScheduled, false)
-        t.equal(c._isTrackPending, false)
-        t.equal(c._isRunning, false)
+        expect(c.dependenciesState).toBe(0)
+        expect(c.observing.length).toBe(1)
+        expect(c.newObserving).toBe(null)
+        expect(c.diffValue).toBe(0)
+        expect(c.unboundDepsCount).toBe(1)
+        expect(c.isDisposed).toBe(false)
+        expect(c._isScheduled).toBe(false)
+        expect(c._isTrackPending).toBe(false)
+        expect(c._isRunning).toBe(false)
         checkGlobalState(t)
-        t.end()
     })
 
     // Trigger a new change, will this recover?
     // is this actually a supported case or should we just give up?
-    test("it should recover from errors", t => {
+    test("it should recover from errors", () => {
         a.set(3)
-        t.equal(r, 3, "recovered from error")
+        expect(r).toBe(3)
 
-        t.equal(a.isPendingUnobservation, true) // true is a default for optimization
-        t.equal(a.observers.length, 1)
-        t.equal(a.diffValue, 0)
-        t.equal(a.lowestObserverState, 0)
-        t.equal(a.hasUnreportedChange, false)
-        t.equal(a.value, 3)
+        expect(a.isPendingUnobservation).toBe(true) // true is a default for optimization
+        expect(a.observers.length).toBe(1)
+        expect(a.diffValue).toBe(0)
+        expect(a.lowestObserverState).toBe(0)
+        expect(a.hasUnreportedChange).toBe(false)
+        expect(a.value).toBe(3)
 
-        t.equal(b.dependenciesState, 0) // up to date
-        t.equal(b.observing.length, 1)
-        t.equal(b.newObserving, null)
-        t.equal(b.isPendingUnobservation, false)
-        t.equal(b.observers.length, 1)
-        t.equal(b.diffValue, 0)
-        t.equal(b.lowestObserverState, 0)
-        t.equal(b.unboundDepsCount, 1)
-        t.equal(b.value, 3, "value should be 3")
-        t.equal(b.isComputing, false)
+        expect(b.dependenciesState).toBe(0) // up to date
+        expect(b.observing.length).toBe(1)
+        expect(b.newObserving).toBe(null)
+        expect(b.isPendingUnobservation).toBe(false)
+        expect(b.observers.length).toBe(1)
+        expect(b.diffValue).toBe(0)
+        expect(b.lowestObserverState).toBe(0)
+        expect(b.unboundDepsCount).toBe(1)
+        expect(b.value).toBe(3)
+        expect(b.isComputing).toBe(false)
 
-        t.equal(c.dependenciesState, 0)
-        t.equal(c.observing.length, 1)
-        t.equal(c.newObserving, null)
-        t.equal(c.diffValue, 0)
-        t.equal(c.unboundDepsCount, 1)
-        t.equal(c.isDisposed, false)
-        t.equal(c._isScheduled, false)
-        t.equal(c._isTrackPending, false)
-        t.equal(c._isRunning, false)
+        expect(c.dependenciesState).toBe(0)
+        expect(c.observing.length).toBe(1)
+        expect(c.newObserving).toBe(null)
+        expect(c.diffValue).toBe(0)
+        expect(c.unboundDepsCount).toBe(1)
+        expect(c.isDisposed).toBe(false)
+        expect(c._isScheduled).toBe(false)
+        expect(c._isTrackPending).toBe(false)
+        expect(c._isRunning).toBe(false)
 
         checkGlobalState(t)
-        t.end()
     })
 
-    test("it should clean up correctly", t => {
+    test("it should clean up correctly", () => {
         d()
 
-        t.equal(a.isPendingUnobservation, true) // true is a default for optimization
-        t.equal(a.observers.length, 0)
-        t.equal(a.diffValue, 0)
-        t.equal(a.lowestObserverState, 0)
-        t.equal(a.hasUnreportedChange, false)
-        t.equal(a.value, 3)
+        expect(a.isPendingUnobservation).toBe(true) // true is a default for optimization
+        expect(a.observers.length).toBe(0)
+        expect(a.diffValue).toBe(0)
+        expect(a.lowestObserverState).toBe(0)
+        expect(a.hasUnreportedChange).toBe(false)
+        expect(a.value).toBe(3)
 
-        t.equal(b.dependenciesState, -1) // not tracking
-        t.equal(b.observing.length, 0)
-        t.equal(b.newObserving, null)
-        t.equal(b.isPendingUnobservation, false)
-        t.equal(b.observers.length, 0)
-        t.equal(b.diffValue, 0)
-        t.equal(b.lowestObserverState, 0)
-        t.equal(b.unboundDepsCount, 1)
-        t.notEqual(b.value, 3)
-        t.equal(b.isComputing, false)
+        expect(b.dependenciesState).toBe(-1) // not tracking
+        expect(b.observing.length).toBe(0)
+        expect(b.newObserving).toBe(null)
+        expect(b.isPendingUnobservation).toBe(false)
+        expect(b.observers.length).toBe(0)
+        expect(b.diffValue).toBe(0)
+        expect(b.lowestObserverState).toBe(0)
+        expect(b.unboundDepsCount).toBe(1)
+        expect(b.value).not.toBe(3)
+        expect(b.isComputing).toBe(false)
 
-        t.equal(c.dependenciesState, -1)
-        t.equal(c.observing.length, 0)
-        t.equal(c.newObserving, null)
-        t.equal(c.diffValue, 0)
-        t.equal(c.unboundDepsCount, 1)
-        t.equal(c.isDisposed, true)
-        t.equal(c._isScheduled, false)
-        t.equal(c._isTrackPending, false)
-        t.equal(c._isRunning, false)
+        expect(c.dependenciesState).toBe(-1)
+        expect(c.observing.length).toBe(0)
+        expect(c.newObserving).toBe(null)
+        expect(c.diffValue).toBe(0)
+        expect(c.unboundDepsCount).toBe(1)
+        expect(c.isDisposed).toBe(true)
+        expect(c._isScheduled).toBe(false)
+        expect(c._isTrackPending).toBe(false)
+        expect(c._isRunning).toBe(false)
 
-        t.equal(b.get(), 3)
+        expect(b.get()).toBe(3)
 
         checkGlobalState(t)
-        t.end()
     })
 
-    test("it should be possible to handle exceptions in reaction", t => {
+    test("it should be possible to handle exceptions in reaction", () => {
         const a = mobx.observable(1)
         const d = mobx.autorun(function() {
             throw a.get()
@@ -713,14 +689,13 @@ test("peeking inside autorun doesn't bork (global) state", t => {
         a.set(2)
         a.set(3)
 
-        t.deepEqual(errors, [2, 3])
+        expect(errors).toEqual([2, 3])
         d()
 
         checkGlobalState(t)
-        t.end()
     })
 
-    test("it should be possible to handle global errors in reactions", t => {
+    test("it should be possible to handle global errors in reactions", () => {
         const a = mobx.observable(1)
         const errors = []
         const d2 = mobx.extras.onReactionError(e => errors.push(e))
@@ -735,12 +710,9 @@ test("peeking inside autorun doesn't bork (global) state", t => {
         d2()
         a.set(4)
 
-        t.deepEqual(errors, [1, 2, 3])
+        expect(errors).toEqual([1, 2, 3])
         d()
 
         checkGlobalState(t)
-        t.end()
     })
-
-    t.end()
 })
