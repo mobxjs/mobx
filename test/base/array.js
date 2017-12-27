@@ -15,6 +15,7 @@ function buffer() {
 }
 
 test("test1", function() {
+    debugger;
     var a = observable([])
     expect(a.length).toBe(0)
     expect(Object.keys(a)).toEqual([])
