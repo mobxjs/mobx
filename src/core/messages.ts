@@ -70,7 +70,8 @@ If that all doesn't help you out, feel free to open an issue https://github.com/
     m038: `Missing items in this list?
     1. Check whether all used values are properly marked as observable (use isObservable to verify)
     2. Make sure you didn't dereference values too early. MobX observes props, not primitives. E.g: use 'person.name' instead of 'name' in your computation.
-`
+`,
+    m039: `The options 'struct' and 'compareStructural' are no longer supported for reactions`
 }
 
 export function getMessage(id: string): string {

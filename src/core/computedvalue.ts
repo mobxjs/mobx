@@ -18,7 +18,7 @@ import {
     CaughtException,
     isCaughtException
 } from "./derivation"
-import { globalState } from "./globalstate"
+import { MobxState } from "./mobxstate"
 import { createAction } from "./action"
 import {
     createInstanceofPredicate,
@@ -31,10 +31,10 @@ import {
     toPrimitive
 } from "../utils/utils"
 import { isSpyEnabled, spyReport } from "./spy"
-import { autorun } from "../api/autorun"
-import { IEqualsComparer } from "../types/comparer"
+import { autorun } from "./autorun"
+import { IEqualsComparer } from "./comparer"
 import { IValueDidChange } from "../types/observablevalue"
-import { getMessage } from "../utils/messages"
+import { getMessage } from "./messages"
 
 export interface IComputedValue<T> {
     get(): T
@@ -94,14 +94,15 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * This is useful for working with vectors, mouse coordinates etc.
      */
     constructor(
+        readonly context: MobxState,
         public derivation: () => T,
-        public scope: Object | undefined,
+        public thisArg: Object | undefined,
         private equals: IEqualsComparer<any>,
         name: string,
         setter?: (v: T) => void
     ) {
         this.name = name || "ComputedValue@" + getNextId()
-        if (setter) this.setter = createAction(name + "-setter", setter) as any
+        if (setter) this.setter = createAction(context, name + "-setter", setter) as any
     }
 
     onBecomeStale() {
@@ -119,13 +120,13 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      */
     public get(): T {
         invariant(!this.isComputing, `Cycle detected in computation ${this.name}`, this.derivation)
-        if (globalState.inBatch === 0) {
+        if (this.context.inBatch === 0) {
             // This is an minor optimization which could be omitted to simplify the code
             // The computedValue is accessed outside of any mobx stuff. Batch observing should be enough and don't need
             // tracking as it will never be called again inside this batch.
-            startBatch()
+            startBatch(this.context)
             if (shouldCompute(this)) this.value = this.computeValue(false)
-            endBatch()
+            endBatch(this.context)
         } else {
             reportObserved(this)
             if (shouldCompute(this)) if (this.trackAndCompute()) propagateChangeConfirmed(this)
@@ -151,7 +152,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             )
             this.isRunningSetter = true
             try {
-                this.setter.call(this.scope, value)
+                this.setter.call(this.thisArg, value)
             } finally {
                 this.isRunningSetter = false
             }
@@ -164,9 +165,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     }
 
     private trackAndCompute(): boolean {
-        if (isSpyEnabled()) {
-            spyReport({
-                object: this.scope,
+        if (isSpyEnabled(this.context)) {
+            spyReport(this.context, {
+                object: this.thisArg,
                 type: "compute",
                 fn: this.derivation
             })
@@ -184,18 +185,18 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
     computeValue(track: boolean) {
         this.isComputing = true
-        globalState.computationDepth++
+        this.context.computationDepth++
         let res: T | CaughtException
         if (track) {
-            res = trackDerivedFunction(this, this.derivation, this.scope)
+            res = trackDerivedFunction(this, this.derivation, this.thisArg)
         } else {
             try {
-                res = this.derivation.call(this.scope)
+                res = this.derivation.call(this.thisArg)
             } catch (e) {
                 res = new CaughtException(e)
             }
         }
-        globalState.computationDepth--
+        this.context.computationDepth--
         this.isComputing = false
         return res
     }
@@ -203,17 +204,17 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {
         let firstTime = true
         let prevValue: T | undefined = undefined
-        return autorun(() => {
+        return autorun(this.context, "observe_" + this.name, () => {
             let newValue = this.get()
             if (!firstTime || fireImmediately) {
-                const prevU = untrackedStart()
+                const prevU = untrackedStart(this.context)
                 listener({
                     type: "update",
                     object: this,
                     newValue,
                     oldValue: prevValue
                 })
-                untrackedEnd(prevU)
+                untrackedEnd(this.context, prevU)
             }
             firstTime = false
             prevValue = newValue
@@ -233,7 +234,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     }
 
     whyRun() {
-        const isTracking = Boolean(globalState.trackingDerivation)
+        const isTracking = Boolean(this.context.trackingDerivation)
         const observing = unique(this.isComputing ? this.newObserving! : this.observing).map(
             (dep: any) => dep.name
         )

@@ -7,7 +7,7 @@ import {
     isCaughtException
 } from "./derivation"
 import { IObservable, startBatch, endBatch } from "./observable"
-import { globalState } from "./globalstate"
+import { MobxState } from "./mobxstate"
 import {
     createInstanceofPredicate,
     getNextId,
@@ -62,6 +62,7 @@ export class Reaction implements IDerivation, IReactionPublic {
     errorHandler: (error: any, derivation: IDerivation) => void
 
     constructor(
+        readonly context: MobxState,
         public name: string = "Reaction@" + getNextId(),
         private onInvalidate: () => void
     ) {}
@@ -73,8 +74,8 @@ export class Reaction implements IDerivation, IReactionPublic {
     schedule() {
         if (!this._isScheduled) {
             this._isScheduled = true
-            globalState.pendingReactions.push(this)
-            runReactions()
+            this.context.pendingReactions.push(this)
+            runReactions(this.context)
         }
     }
 
@@ -87,31 +88,32 @@ export class Reaction implements IDerivation, IReactionPublic {
      */
     runReaction() {
         if (!this.isDisposed) {
-            startBatch()
+            startBatch(this.context)
             this._isScheduled = false
             if (shouldCompute(this)) {
                 this._isTrackPending = true
 
                 this.onInvalidate()
-                if (this._isTrackPending && isSpyEnabled()) {
+                if (this._isTrackPending && isSpyEnabled(this.context)) {
                     // onInvalidate didn't trigger track right away..
-                    spyReport({
+                    spyReport(this.context, {
                         object: this,
                         type: "scheduled-reaction"
                     })
                 }
             }
-            endBatch()
+            endBatch(this.context)
         }
     }
 
     track(fn: () => void) {
-        startBatch()
-        const notify = isSpyEnabled()
+        const { context } = this;
+        startBatch(context)
+        const notify = isSpyEnabled(context)
         let startTime
         if (notify) {
             startTime = Date.now()
-            spyReportStart({
+            spyReportStart(context, {
                 object: this,
                 type: "reaction",
                 fn
@@ -127,11 +129,11 @@ export class Reaction implements IDerivation, IReactionPublic {
         }
         if (isCaughtException(result)) this.reportExceptionInDerivation(result.cause)
         if (notify) {
-            spyReportEnd({
+            spyReportEnd(context, {
                 time: Date.now() - startTime
             })
         }
-        endBatch()
+        endBatch(context)
     }
 
     reportExceptionInDerivation(error: any) {
@@ -149,8 +151,8 @@ export class Reaction implements IDerivation, IReactionPublic {
         )
         /** If debugging brought you here, please, read the above message :-). Tnx! */
 
-        if (isSpyEnabled()) {
-            spyReport({
+        if (isSpyEnabled(this.context)) {
+            spyReport(this.context, {
                 type: "error",
                 message,
                 error,
@@ -158,7 +160,7 @@ export class Reaction implements IDerivation, IReactionPublic {
             })
         }
 
-        globalState.globalReactionErrorHandlers.forEach(f => f(error, this))
+        this.context.globalReactionErrorHandlers.forEach(f => f(error, this))
     }
 
     dispose() {
@@ -166,9 +168,9 @@ export class Reaction implements IDerivation, IReactionPublic {
             this.isDisposed = true
             if (!this._isRunning) {
                 // if disposed while running, clean up later. Maybe not optimal, but rare case
-                startBatch()
+                startBatch(this.context)
                 clearObserving(this)
-                endBatch()
+                endBatch(this.context)
             }
         }
     }
@@ -211,12 +213,13 @@ function registerErrorHandler(handler) {
 }
 
 export function onReactionError(
+    context: MobxState,
     handler: (error: any, derivation: IDerivation) => void
 ): () => void {
-    globalState.globalReactionErrorHandlers.push(handler)
+    context.globalReactionErrorHandlers.push(handler)
     return () => {
-        const idx = globalState.globalReactionErrorHandlers.indexOf(handler)
-        if (idx >= 0) globalState.globalReactionErrorHandlers.splice(idx, 1)
+        const idx = context.globalReactionErrorHandlers.indexOf(handler)
+        if (idx >= 0) context.globalReactionErrorHandlers.splice(idx, 1)
     }
 }
 
@@ -229,15 +232,16 @@ const MAX_REACTION_ITERATIONS = 100
 
 let reactionScheduler: (fn: () => void) => void = f => f()
 
-export function runReactions() {
+export function runReactions(context: MobxState) {
     // Trampolining, if runReactions are already running, new reactions will be picked up
-    if (globalState.inBatch > 0 || globalState.isRunningReactions) return
-    reactionScheduler(runReactionsHelper)
+    if (context.inBatch > 0 || context.isRunningReactions) return
+    // TODO: fix `bind` by moving reaction scheduler to mobxState
+    reactionScheduler(runReactionsHelper.bind(null, context))
 }
 
-function runReactionsHelper() {
-    globalState.isRunningReactions = true
-    const allReactions = globalState.pendingReactions
+function runReactionsHelper(context: MobxState) {
+    context.isRunningReactions = true
+    const allReactions = context.pendingReactions
     let iterations = 0
 
     // While running reactions, new reactions might be triggered.
@@ -255,7 +259,7 @@ function runReactionsHelper() {
         for (let i = 0, l = remainingReactions.length; i < l; i++)
             remainingReactions[i].runReaction()
     }
-    globalState.isRunningReactions = false
+    context.isRunningReactions = false
 }
 
 export const isReaction = createInstanceofPredicate("Reaction", Reaction)

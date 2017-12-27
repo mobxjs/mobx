@@ -1,12 +1,11 @@
-import { BaseAtom } from "../core/atom"
-import { checkIfStateModificationsAreAllowed } from "../core/derivation"
+import { BaseAtom } from "./atom"
+import { checkIfStateModificationsAreAllowed } from "./derivation"
 import {
     Lambda,
-    getNextId,
     createInstanceofPredicate,
     primitiveSymbol,
     toPrimitive
-} from "../utils/utils"
+} from "./utils"
 import {
     hasInterceptors,
     IInterceptable,
@@ -16,7 +15,7 @@ import {
 } from "./intercept-utils"
 import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
 import { isSpyEnabled, spyReportStart, spyReportEnd, spyReport } from "../core/spy"
-import { IEnhancer } from "./modifiers"
+import { MobxState } from "./mobxstate";
 
 export interface IValueWillChange<T> {
     object: any
@@ -50,16 +49,17 @@ export class ObservableValue<T> extends BaseAtom
     dehancer: any = undefined
 
     constructor(
+        context: MobxState,
         value: T,
-        protected enhancer: IEnhancer<T>,
-        name = "ObservableValue@" + getNextId(),
+        protected enhancer: (newValue: T, oldValue: T | undefined, name: string) => T,
+        name = "ObservableValue@" + context.nextId(),
         notifySpy = true
     ) {
-        super(name)
+        super(context, name)
         this.value = enhancer(value, undefined, name)
-        if (notifySpy && isSpyEnabled()) {
+        if (notifySpy && isSpyEnabled(context)) {
             // only notify spy if this is a stand-alone observable
-            spyReport({ type: "create", object: this, newValue: this.value })
+            spyReport(context, { type: "create", object: this, newValue: this.value })
         }
     }
 
@@ -72,9 +72,9 @@ export class ObservableValue<T> extends BaseAtom
         const oldValue = this.value
         newValue = this.prepareNewValue(newValue) as any
         if (newValue !== UNCHANGED) {
-            const notifySpy = isSpyEnabled()
+            const notifySpy = isSpyEnabled(this.context)
             if (notifySpy) {
-                spyReportStart({
+                spyReportStart(this.context, {
                     type: "update",
                     object: this,
                     newValue,
@@ -82,14 +82,14 @@ export class ObservableValue<T> extends BaseAtom
                 })
             }
             this.setNewValue(newValue)
-            if (notifySpy) spyReportEnd()
+            if (notifySpy) spyReportEnd(this.context)
         }
     }
 
     private prepareNewValue(newValue): T | IUNCHANGED {
         checkIfStateModificationsAreAllowed(this)
         if (hasInterceptors(this)) {
-            const change = interceptChange<IValueWillChange<T>>(this, {
+            const change = interceptChange<IValueWillChange<T>>(this.context, this, {
                 object: this,
                 type: "update",
                 newValue
@@ -107,7 +107,7 @@ export class ObservableValue<T> extends BaseAtom
         this.value = newValue
         this.reportChanged()
         if (hasListeners(this)) {
-            notifyListeners(this, {
+            notifyListeners(this.context, this, {
                 type: "update",
                 object: this,
                 newValue,

@@ -1,5 +1,6 @@
 import { startBatch, endBatch } from '../core/observable';
 import { executeAction } from "../core/action"
+import { MobxState } from "./mobxstate";
 
 /**
  * During a transaction no views are updated until the end of the transaction.
@@ -8,11 +9,11 @@ import { executeAction } from "../core/action"
  * @param action a function that updates some reactive state
  * @returns any value that was returned by the 'action' parameter.
  */
-export function transaction<T>(action: () => T, thisArg = undefined): T {
-	startBatch()
+export function transaction<T>(context: MobxState, action: () => T): T {
+	startBatch(context)
 	try {
-		return action.apply(thisArg)
+		return action()
 	} finally {
-		endBatch();
+		endBatch(context)
 	}
 }

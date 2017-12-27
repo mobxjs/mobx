@@ -1,5 +1,6 @@
-import { Lambda, once, invariant } from "../utils/utils"
-import { untrackedStart, untrackedEnd } from "../core/derivation"
+import { Lambda, once, invariant } from "./utils"
+import { untrackedStart, untrackedEnd } from "./derivation"
+import { MobxState } from "./mobxstate";
 
 export type IInterceptor<T> = (change: T) => T | null
 
@@ -25,10 +26,11 @@ export function registerInterceptor<T>(
 }
 
 export function interceptChange<T>(
+    context: MobxState,
     interceptable: IInterceptable<T | null>,
     change: T | null
 ): T | null {
-    const prevU = untrackedStart()
+    const prevU = untrackedStart(context)
     try {
         const interceptors = interceptable.interceptors
         if (interceptors)
@@ -42,6 +44,6 @@ export function interceptChange<T>(
             }
         return change
     } finally {
-        untrackedEnd(prevU)
+        untrackedEnd(context, prevU)
     }
 }

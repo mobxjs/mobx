@@ -128,27 +128,6 @@ function namedActionDecorator(name: string) {
     }
 }
 
-export function runInAction<T>(block: () => T, scope?: any): T
-export function runInAction<T>(name: string, block: () => T, scope?: any): T
-export function runInAction<T>(arg1, arg2?, arg3?) {
-    const actionName = typeof arg1 === "string" ? arg1 : arg1.name || "<unnamed action>"
-    const fn = typeof arg1 === "function" ? arg1 : arg2
-    const scope = typeof arg1 === "function" ? arg2 : arg3
-
-    invariant(typeof fn === "function", getMessage("m002"))
-    invariant(fn.length === 0, getMessage("m003"))
-    invariant(
-        typeof actionName === "string" && actionName.length > 0,
-        `actions should have valid names, got: '${actionName}'`
-    )
-
-    return executeAction(actionName, fn, scope, undefined)
-}
-
-export function isAction(thing: any) {
-    return typeof thing === "function" && thing.isMobxAction === true
-}
-
 export function defineBoundAction(target: any, propertyName: string, fn: Function) {
     const res = function() {
         return executeAction(propertyName, fn, target, arguments)

@@ -18,7 +18,7 @@ export class BaseAtom implements IAtom {
      * Create a new atom. For debugging purposes it is recommended to give it a name.
      * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
      */
-    constructor(public name = "Atom@" + getNextId()) {}
+    constructor(readonly context: MobxState, public readonly name = "Atom@" + (context.nextId())) {}
 
     public onBecomeUnobserved() {
         // noop
@@ -35,9 +35,9 @@ export class BaseAtom implements IAtom {
      * Invoke this method _after_ this method has changed to signal mobx that all its observers should invalidate.
      */
     public reportChanged() {
-        startBatch()
+        startBatch(this.context)
         propagateChanged(this)
-        endBatch()
+        endBatch(this.context)
     }
 
     toString() {
@@ -54,15 +54,16 @@ export class Atom extends BaseAtom implements IAtom {
      * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
      */
     constructor(
-        public name = "Atom@" + getNextId(),
+        context: MobxState,
+        public name = "Atom@" + (context.nextId()),
         public onBecomeObservedHandler: () => void = noop,
         public onBecomeUnobservedHandler: () => void = noop
     ) {
-        super(name)
+        super(context, name)
     }
 
     public reportObserved(): boolean {
-        startBatch()
+        startBatch(this.context)
 
         super.reportObserved()
 
@@ -71,8 +72,8 @@ export class Atom extends BaseAtom implements IAtom {
             this.onBecomeObservedHandler()
         }
 
-        endBatch()
-        return !!globalState.trackingDerivation
+        endBatch(this.context)
+        return !!this.context.trackingDerivation
         // return doesn't really give useful info, because it can be as well calling computed which calls atom (no reactions)
         // also it could not trigger when calculating reaction dependent on Atom because Atom's value was cached by computed called by given reaction.
     }
@@ -83,9 +84,9 @@ export class Atom extends BaseAtom implements IAtom {
     }
 }
 
-import { globalState } from "./globalstate"
+import { MobxState } from "./mobxstate"
 import { IObservable, propagateChanged, reportObserved, startBatch, endBatch } from "./observable"
 import { IDerivationState } from "./derivation"
-import { createInstanceofPredicate, noop, getNextId } from "../utils/utils"
+import { noop, createInstanceofPredicate } from "./utils"
 
 export const isAtom = createInstanceofPredicate("Atom", BaseAtom)

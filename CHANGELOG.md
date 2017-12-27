@@ -1,3 +1,8 @@
+# Next
+
+* Breaking: `scope` has been dropped as optional argument for most public api's, like `autorun`, `when` etc..
+* Breaking, the options `context` , `compareStructural` and `struct` have been dropped from the `reaction` api. use the `equals` option instead.
+
 # 3.4.1
 
 * Republished 3.4.0, because the package update doesn't seem to distibute consistently through yarn / npm

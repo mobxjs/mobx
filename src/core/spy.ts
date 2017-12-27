@@ -1,32 +1,33 @@
-import { globalState } from "./globalstate"
-import { objectAssign, once, Lambda } from "../utils/utils"
+import { MobxState } from "./mobxstate"
+import { objectAssign, once, Lambda } from "./utils"
 
-export function isSpyEnabled() {
-    return !!globalState.spyListeners.length
+// TODO: store on mobxstate?
+export function isSpyEnabled(context: MobxState) {
+    return !!context.spyListeners.length
 }
 
-export function spyReport(event) {
-    if (!globalState.spyListeners.length) return
-    const listeners = globalState.spyListeners
+export function spyReport(context: MobxState, event) {
+    if (!context.spyListeners.length) return
+    const listeners = context.spyListeners
     for (let i = 0, l = listeners.length; i < l; i++) listeners[i](event)
 }
 
-export function spyReportStart(event) {
+export function spyReportStart(context: MobxState, event) {
     const change = objectAssign({}, event, { spyReportStart: true })
-    spyReport(change)
+    spyReport(context, change)
 }
 
 const END_EVENT = { spyReportEnd: true }
 
-export function spyReportEnd(change?) {
-    if (change) spyReport(objectAssign({}, change, END_EVENT))
-    else spyReport(END_EVENT)
+export function spyReportEnd(context: MobxState, change?) {
+    if (change) spyReport(context, objectAssign({}, change, END_EVENT))
+    else spyReport(context, END_EVENT)
 }
 
-export function spy(listener: (change: any) => void): Lambda {
-    globalState.spyListeners.push(listener)
+export function spy(context: MobxState, listener: (change: any) => void): Lambda {
+    context.spyListeners.push(listener)
     return once(() => {
-        const idx = globalState.spyListeners.indexOf(listener)
-        if (idx !== -1) globalState.spyListeners.splice(idx, 1)
+        const idx = context.spyListeners.indexOf(listener)
+        if (idx !== -1) context.spyListeners.splice(idx, 1)
     })
 }

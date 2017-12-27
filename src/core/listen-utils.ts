@@ -1,5 +1,6 @@
-import { Lambda, once } from "../utils/utils"
-import { untrackedStart, untrackedEnd } from "../core/derivation"
+import { Lambda, once } from "./utils"
+import { untrackedStart, untrackedEnd } from "./derivation"
+import { MobxState } from "./mobxstate";
 
 export interface IListenable {
     changeListeners: Function[] | null
@@ -19,13 +20,13 @@ export function registerListener<T>(listenable: IListenable, handler: Function):
     })
 }
 
-export function notifyListeners<T>(listenable: IListenable, change: T) {
-    const prevU = untrackedStart()
+export function notifyListeners<T>(context: MobxState, listenable: IListenable, change: T) {
+    const prevU = untrackedStart(context)
     let listeners = listenable.changeListeners
     if (!listeners) return
     listeners = listeners.slice()
     for (let i = 0, l = listeners.length; i < l; i++) {
         listeners[i](change)
     }
-    untrackedEnd(prevU)
+    untrackedEnd(context, prevU)
 }

@@ -3,7 +3,7 @@ import { invariant } from "../utils/utils"
 import { untrackedStart, untrackedEnd } from "./derivation"
 import { startBatch, endBatch } from "./observable"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "./spy"
-import { globalState } from "./globalstate"
+import { MobxState } from "./mobxstate"
 import { getMessage } from "../utils/messages"
 
 export interface IAction {
@@ -11,26 +11,38 @@ export interface IAction {
     isMobxAction: boolean
 }
 
-export function createAction(actionName: string, fn: Function): Function & IAction {
+export function createAction(context: MobxState, actionName: string, fn: Function): Function & IAction {
     invariant(typeof fn === "function", getMessage("m026"))
     invariant(
         typeof actionName === "string" && actionName.length > 0,
         `actions should have valid names, got: '${actionName}'`
     )
     const res = function() {
-        return executeAction(actionName, fn, this, arguments)
+        return executeAction(context, actionName, fn, this, arguments)
     }
     ;(res as any).originalFn = fn
     ;(res as any).isMobxAction = true
     return res as any
 }
 
-export function executeAction(actionName: string, fn: Function, scope?: any, args?: IArguments) {
-    const runInfo = startAction(actionName, fn, scope, args)
+
+export function runInAction<T>(context: MobxState, name: string, fn: () => T): T {
+    invariant(typeof fn === "function", getMessage("m002"))
+    invariant(fn.length === 0, getMessage("m003"))
+
+    return executeAction(context, name, fn)
+}
+
+export function isAction(thing: any) {
+    return typeof thing === "function" && thing.isMobxAction === true
+}
+
+export function executeAction(context: MobxState, actionName: string, fn: Function, thisArg?: any, args?: IArguments) {
+    const runInfo = startAction(context, actionName, fn, thisArg, args)
     try {
-        return fn.apply(scope, args)
+        return fn.apply(thisArg, args)
     } finally {
-        endAction(runInfo)
+        endAction(context, runInfo)
     }
 }
 
@@ -42,19 +54,20 @@ interface IActionRunInfo {
 }
 
 function startAction(
+    context: MobxState,
     actionName: string,
     fn: Function,
     scope: any,
     args?: IArguments
 ): IActionRunInfo {
-    const notifySpy = isSpyEnabled() && !!actionName
+    const notifySpy = isSpyEnabled(context) && !!actionName
     let startTime: number = 0
     if (notifySpy) {
         startTime = Date.now()
         const l = (args && args.length) || 0
         const flattendArgs = new Array(l)
         if (l > 0) for (let i = 0; i < l; i++) flattendArgs[i] = args![i]
-        spyReportStart({
+        spyReportStart(context, {
             type: "action",
             name: actionName,
             fn,
@@ -62,9 +75,9 @@ function startAction(
             arguments: flattendArgs
         })
     }
-    const prevDerivation = untrackedStart()
-    startBatch()
-    const prevAllowStateChanges = allowStateChangesStart(true)
+    const prevDerivation = untrackedStart(context)
+    startBatch(context)
+    const prevAllowStateChanges = allowStateChangesStart(context, true)
     return {
         prevDerivation,
         prevAllowStateChanges,
@@ -73,45 +86,45 @@ function startAction(
     }
 }
 
-function endAction(runInfo: IActionRunInfo) {
-    allowStateChangesEnd(runInfo.prevAllowStateChanges)
-    endBatch()
-    untrackedEnd(runInfo.prevDerivation)
+function endAction(context: MobxState, runInfo: IActionRunInfo) {
+    allowStateChangesEnd(context, runInfo.prevAllowStateChanges)
+    endBatch(context)
+    untrackedEnd(context, runInfo.prevDerivation)
     if (runInfo.notifySpy) spyReportEnd({ time: Date.now() - runInfo.startTime })
 }
 
-export function useStrict(strict: boolean): void {
-    invariant(globalState.trackingDerivation === null, getMessage("m028"))
-    globalState.strictMode = strict
-    globalState.allowStateChanges = !strict
+export function useStrict(context: MobxState, strict: boolean): void {
+    invariant(context.trackingDerivation === null, getMessage("m028"))
+    context.strictMode = strict
+    context.allowStateChanges = !strict
 }
 
-export function isStrictModeEnabled(): boolean {
-    return globalState.strictMode
+export function isStrictModeEnabled(context: MobxState): boolean {
+    return context.strictMode
 }
 
-export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T): T {
+export function allowStateChanges<T>(context: MobxState, allowStateChanges: boolean, func: () => T): T {
     // TODO: deprecate / refactor this function in next major
     // Currently only used by `@observer`
     // Proposed change: remove first param, rename to `forbidStateChanges`,
     // require error callback instead of the hardcoded error message now used
     // Use `inAction` instead of allowStateChanges in derivation.ts to check strictMode
-    const prev = allowStateChangesStart(allowStateChanges)
+    const prev = allowStateChangesStart(context, allowStateChanges)
     let res
     try {
         res = func()
     } finally {
-        allowStateChangesEnd(prev)
+        allowStateChangesEnd(context, prev)
     }
     return res
 }
 
-export function allowStateChangesStart(allowStateChanges: boolean) {
-    const prev = globalState.allowStateChanges
-    globalState.allowStateChanges = allowStateChanges
+export function allowStateChangesStart(context: MobxState, allowStateChanges: boolean) {
+    const prev = context.allowStateChanges
+    context.allowStateChanges = allowStateChanges
     return prev
 }
 
-export function allowStateChangesEnd(prev: boolean) {
-    globalState.allowStateChanges = prev
+export function allowStateChangesEnd(context: MobxState, prev: boolean) {
+    context.allowStateChanges = prev
 }

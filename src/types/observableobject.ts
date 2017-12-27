@@ -197,7 +197,7 @@ export function defineComputedPropertyFromComputedValue(
 ) {
     let name = `${adm.name}.${propName}`
     computedValue.name = name
-    if (!computedValue.scope) computedValue.scope = adm.target
+    if (!computedValue.thisArg) computedValue.thisArg = adm.target
 
     adm.values[propName] = computedValue
     Object.defineProperty(adm.target, propName, generateComputedPropConfig(propName))

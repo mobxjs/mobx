@@ -1,9 +1,9 @@
 import { IObservable, IDepTreeNode, addObserver, removeObserver } from "./observable"
 import { IAtom } from "./atom"
-import { globalState } from "./globalstate"
 import { fail } from "../utils/utils"
 import { isComputedValue } from "./computedvalue"
 import { getMessage } from "../utils/messages"
+import { MobxState } from "./mobxstate";
 
 export enum IDerivationState {
     // before being run or (outside batch and not being observed)
@@ -30,6 +30,7 @@ export enum IDerivationState {
  * See https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.xvbh6qd74
  */
 export interface IDerivation extends IDepTreeNode {
+    context: MobxState
     observing: IObservable[]
     newObserving: null | IObservable[]
     dependenciesState: IDerivationState
@@ -70,12 +71,13 @@ export function isCaughtException(e): e is CaughtException {
 export function shouldCompute(derivation: IDerivation): boolean {
     switch (derivation.dependenciesState) {
         case IDerivationState.UP_TO_DATE:
-            return false
+        return false
         case IDerivationState.NOT_TRACKING:
         case IDerivationState.STALE:
-            return true
+        return true
         case IDerivationState.POSSIBLY_STALE: {
-            const prevUntracked = untrackedStart() // no need for those computeds to be reported, they will be picked up in trackDerivedFunction.
+            const context = derivation.context;
+            const prevUntracked = untrackedStart(context) // no need for those computeds to be reported, they will be picked up in trackDerivedFunction.
             const obs = derivation.observing,
                 l = obs.length
             for (let i = 0; i < l; i++) {
@@ -85,35 +87,36 @@ export function shouldCompute(derivation: IDerivation): boolean {
                         obj.get()
                     } catch (e) {
                         // we are not interested in the value *or* exception at this moment, but if there is one, notify all
-                        untrackedEnd(prevUntracked)
+                        untrackedEnd(context, prevUntracked)
                         return true
                     }
                     // if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
                     // and `derivation` is an observer of `obj`
                     if ((derivation as any).dependenciesState === IDerivationState.STALE) {
-                        untrackedEnd(prevUntracked)
+                        untrackedEnd(context, prevUntracked)
                         return true
                     }
                 }
             }
             changeDependenciesStateTo0(derivation)
-            untrackedEnd(prevUntracked)
+            untrackedEnd(context, prevUntracked)
             return false
         }
     }
 }
 
-export function isComputingDerivation() {
-    return globalState.trackingDerivation !== null // filter out actions inside computations
+export function isComputingDerivation(context: MobxState) {
+    return context.trackingDerivation !== null // filter out actions inside computations
 }
 
 export function checkIfStateModificationsAreAllowed(atom: IAtom) {
     const hasObservers = atom.observers.length > 0
+    const context = atom.context;
     // Should never be possible to change an observed observable from inside computed, see #798
-    if (globalState.computationDepth > 0 && hasObservers) fail(getMessage("m031") + atom.name)
+    if (context.computationDepth > 0 && hasObservers) fail(getMessage("m031") + atom.name)
     // Should not be possible to change observed state outside strict mode, except during initialization, see #563
-    if (!globalState.allowStateChanges && hasObservers)
-        fail(getMessage(globalState.strictMode ? "m030a" : "m030b") + atom.name)
+    if (!context.allowStateChanges && hasObservers)
+        fail(getMessage(context.strictMode ? "m030a" : "m030b") + atom.name)
 }
 
 /**
@@ -121,22 +124,23 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
  * The tracking information is stored on the `derivation` object and the derivation is registered
  * as observer of any of the accessed observables.
  */
-export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, context) {
+export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, thisArg: any) {
     // pre allocate array allocation + room for variation in deps
     // array will be trimmed by bindDependencies
+    const { context } = derivation;
     changeDependenciesStateTo0(derivation)
     derivation.newObserving = new Array(derivation.observing.length + 100)
     derivation.unboundDepsCount = 0
-    derivation.runId = ++globalState.runId
-    const prevTracking = globalState.trackingDerivation
-    globalState.trackingDerivation = derivation
+    derivation.runId = ++context.runId
+    const prevTracking = context.trackingDerivation
+    context.trackingDerivation = derivation
     let result
     try {
-        result = f.call(context)
+        result = f.call(thisArg)
     } catch (e) {
         result = new CaughtException(e)
     }
-    globalState.trackingDerivation = prevTracking
+    context.trackingDerivation = prevTracking
     bindDependencies(derivation)
     return result
 }
@@ -209,7 +213,7 @@ function bindDependencies(derivation: IDerivation) {
 }
 
 export function clearObserving(derivation: IDerivation) {
-    // invariant(globalState.inBatch > 0, "INTERNAL ERROR clearObserving should be called only inside batch");
+    // invariant(context.inBatch > 0, "INTERNAL ERROR clearObserving should be called only inside batch");
     const obs = derivation.observing
     derivation.observing = []
     let i = obs.length
@@ -218,21 +222,23 @@ export function clearObserving(derivation: IDerivation) {
     derivation.dependenciesState = IDerivationState.NOT_TRACKING
 }
 
-export function untracked<T>(action: () => T): T {
-    const prev = untrackedStart()
-    const res = action()
-    untrackedEnd(prev)
-    return res
+export function untracked<T>(context: MobxState, action: () => T): T {
+    const prev = untrackedStart(context)
+    try {
+        return action()
+    } finally {
+        untrackedEnd(context, prev)
+    }
 }
 
-export function untrackedStart(): IDerivation | null {
-    const prev = globalState.trackingDerivation
-    globalState.trackingDerivation = null
+export function untrackedStart(context: MobxState): IDerivation | null {
+    const prev = context.trackingDerivation
+    context.trackingDerivation = null
     return prev
 }
 
-export function untrackedEnd(prev: IDerivation | null) {
-    globalState.trackingDerivation = prev
+export function untrackedEnd(context: MobxState, prev: IDerivation | null) {
+    context.trackingDerivation = prev
 }
 
 /**

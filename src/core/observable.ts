@@ -1,5 +1,5 @@
 import { IDerivation, IDerivationState } from "./derivation"
-import { globalState } from "./globalstate"
+import { MobxState } from "./mobxstate"
 import { invariant } from "../utils/utils"
 import { runReactions } from "./reaction"
 
@@ -9,6 +9,7 @@ export interface IDepTreeNode {
 }
 
 export interface IObservable extends IDepTreeNode {
+    context: MobxState,
     diffValue: number
     /**
      * Id of the derivation *run* that last accessed this observable.
@@ -71,7 +72,7 @@ export function addObserver(observable: IObservable, node: IDerivation) {
 }
 
 export function removeObserver(observable: IObservable, node: IDerivation) {
-    // invariant(globalState.inBatch > 0, "INTERNAL ERROR, remove should be called only inside batch");
+    // invariant(context.inBatch > 0, "INTERNAL ERROR, remove should be called only inside batch");
     // invariant(observable._observers.indexOf(node) !== -1, "INTERNAL ERROR remove already removed node");
     // invariantObservers(observable);
 
@@ -104,10 +105,10 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 
 export function queueForUnobservation(observable: IObservable) {
     if (!observable.isPendingUnobservation) {
-        // invariant(globalState.inBatch > 0, "INTERNAL ERROR, remove should be called only inside batch");
+        // invariant(context.inBatch > 0, "INTERNAL ERROR, remove should be called only inside batch");
         // invariant(observable._observers.length === 0, "INTERNAL ERROR, should only queue for unobservation unobserved observables");
         observable.isPendingUnobservation = true
-        globalState.pendingUnobservations.push(observable)
+        observable.context.pendingUnobservations.push(observable)
     }
 }
 
@@ -116,15 +117,15 @@ export function queueForUnobservation(observable: IObservable) {
  * During a batch `onBecomeUnobserved` will be called at most once per observable.
  * Avoids unnecessary recalculations.
  */
-export function startBatch() {
-    globalState.inBatch++
+export function startBatch(context: MobxState) {
+    context.inBatch++
 }
 
-export function endBatch() {
-    if (--globalState.inBatch === 0) {
+export function endBatch(context: MobxState) {
+    if (--context.inBatch === 0) {
         runReactions()
         // the batch is actually about to finish, all unobserving should happen here.
-        const list = globalState.pendingUnobservations
+        const list = context.pendingUnobservations
         for (let i = 0; i < list.length; i++) {
             const observable = list[i]
             observable.isPendingUnobservation = false
@@ -133,12 +134,12 @@ export function endBatch() {
                 // NOTE: onBecomeUnobserved might push to `pendingUnobservations`
             }
         }
-        globalState.pendingUnobservations = []
+        context.pendingUnobservations = []
     }
 }
 
 export function reportObserved(observable: IObservable) {
-    const derivation = globalState.trackingDerivation
+    const derivation = observable.context.trackingDerivation
     if (derivation !== null) {
         /**
          * Simple optimization, give each derivation run an unique id (runId)

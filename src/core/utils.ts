@@ -3,6 +3,9 @@
 export const EMPTY_ARRAY = []
 Object.freeze(EMPTY_ARRAY)
 
+export const EMPTY_OBJECT = Object.create(null);
+Object.freeze(EMPTY_OBJECT);
+
 declare var global
 export function getGlobal() {
     return typeof window !== "undefined" ? window : global
@@ -11,10 +14,6 @@ export function getGlobal() {
 export interface Lambda {
     (): void
     name?: string
-}
-
-export function getNextId() {
-    return ++globalState.mobxGuid
 }
 
 export function fail(message: string, thing?): never {
@@ -199,29 +198,9 @@ export function areBothNaN(a: any, b: any): boolean {
     return (typeof a === "number" && typeof b === "number" && isNaN(a) && isNaN(b));
 }
 
-/**
- * Returns whether the argument is an array, disregarding observability.
- */
-export function isArrayLike(x: any): x is Array<any> | IObservableArray<any> {
-    return Array.isArray(x) || isObservableArray(x)
-}
-
-export function isMapLike(x: any): boolean {
-    return isES6Map(x) || isObservableMap(x)
-}
-
 export function isES6Map(thing): boolean {
     if (getGlobal().Map !== undefined && thing instanceof getGlobal().Map) return true
     return false
-}
-
-export function getMapLikeKeys<V>(map: ObservableMap<V> | IKeyValueMap<V> | any): string[] {
-	let keys;
-	if (isPlainObject(map)) keys = Object.keys(map)
-	else if (Array.isArray(map)) keys = map.map(([key]) => key)
-	else if (isMapLike(map)) keys = (Array as any).from(map.keys())
-	else fail("Cannot get keys from " + map)
-	return keys;
 }
 
 declare var Symbol
@@ -233,8 +212,3 @@ export function primitiveSymbol() {
 export function toPrimitive(value) {
     return value === null ? null : typeof value === "object" ? "" + value : value
 }
-
-import { globalState } from "../core/globalstate"
-import { IObservableArray, isObservableArray } from "../types/observablearray"
-import { isObservableMap, ObservableMap, IKeyValueMap } from "../types/observablemap"
-import { observable } from "../api/observable"
