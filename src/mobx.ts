@@ -98,7 +98,9 @@ import {
     resetGlobalState,
     shareGlobalState,
     getGlobalState,
-    isolateGlobalState
+    isolateGlobalState,
+    disableErrorBoundaries,
+    enableErrorBoundaries
 } from "./core/globalstate"
 import { IDerivation } from "./core/derivation"
 import { IDepTreeNode } from "./core/observable"
@@ -139,7 +141,9 @@ export const extras = {
     spyReport,
     spyReportEnd,
     spyReportStart,
-    setReactionScheduler
+    setReactionScheduler,
+    disableErrorBoundaries,
+    enableErrorBoundaries,
 }
 
 // Deprecated default export (will be removed in 4.0)
