@@ -236,7 +236,7 @@ export interface IValueWillChange<T> {
 }
 
 export interface IValueDidChange<T> extends IValueWillChange<T> {
-    oldValue: T | typeof undefined
+    oldValue: ?T
 }
 
 export interface IObservableValue<T> {
@@ -270,7 +270,7 @@ export interface IObservableFactory {
     (value: null | void): IObservableValue<any>,
     (): IObservableValue<any>,
     <T>(value: IMap<string | number | boolean, T>): ObservableMap<T>,
-    <T>(IModifierDescriptor<T>): T,
+    <T>(value: IModifierDescriptor<T>): T,
     <T: Object>(value: T): T,
     <T>(value: T): IObservableValue<T>,
     <T>(): IObservableValue<T>,
