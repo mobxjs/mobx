@@ -1,4 +1,4 @@
-var m = require("..")
+var m = require("../../")
 var intercept = m.intercept
 
 test("intercept observable value", () => {

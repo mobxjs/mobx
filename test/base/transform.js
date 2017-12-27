@@ -1,4 +1,4 @@
-var m = require("../")
+var m = require("../../")
 var TransformUtils = require("./utils/transform")
 
 test("transform1", function() {

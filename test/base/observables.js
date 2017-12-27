@@ -1,6 +1,6 @@
 "use strict"
 
-var mobx = require("..")
+var mobx = require("../../")
 var m = mobx
 var observable = mobx.observable
 var computed = mobx.computed
@@ -1182,7 +1182,7 @@ test("computed values believe deep NaN === deep NaN when using compareStructural
     }, {compareStructural: true})
 
     var buf = new buffer()
-    c.observe((newValue) => { 
+    c.observe((newValue) => {
         buf(newValue)
     });
 

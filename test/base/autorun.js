@@ -1,4 +1,4 @@
-var m = require("..")
+var m = require("../../")
 
 test("autorun passes Reaction as an argument to view function", function() {
     var a = m.observable(1)

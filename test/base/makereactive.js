@@ -1,4 +1,4 @@
-var mobx = require("..")
+var mobx = require("../../")
 var m = mobx
 var o = mobx.observable
 

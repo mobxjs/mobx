@@ -1,6 +1,6 @@
 "use strict"
 
-var mobx = require("..")
+var mobx = require("../../")
 var map = mobx.map
 var autorun = mobx.autorun
 var iterall = require("iterall")

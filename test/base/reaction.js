@@ -1,4 +1,4 @@
-var mobx = require("..")
+var mobx = require("../../")
 var reaction = mobx.reaction
 
 test("basic", () => {

@@ -1,4 +1,4 @@
-var mobx = require("../")
+var mobx = require("../../")
 
 test("correct api should be exposed", function() {
     expect(Object.keys(mobx).sort()).toEqual([

@@ -1,6 +1,6 @@
 "use strict"
 
-const mobx = require("../")
+const mobx = require("../../")
 const noop = () => {}
 
 test("whyrun", () => {

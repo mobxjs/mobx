@@ -1,4 +1,4 @@
-var m = require("..")
+var m = require("../../")
 
 test("observe object and map properties", function() {
     var map = m.map({ a: 1 })

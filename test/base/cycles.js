@@ -1,4 +1,4 @@
-var m = require("../")
+var m = require("../../")
 
 test("cascading active state (form 1)", function() {
     var Store = function() {

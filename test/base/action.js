@@ -1,7 +1,7 @@
 "use strict"
 
-var mobx = require("../")
-var utils = require("./utils/test-utils")
+var mobx = require("../../")
+var utils = require("../utils/test-utils")
 
 test("action should wrap in transaction", () => {
     var values = []

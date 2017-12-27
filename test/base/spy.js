@@ -1,5 +1,5 @@
 "use strict"
-var mobx = require("..")
+var mobx = require("../../")
 
 test("spy output", () => {
     var events = []

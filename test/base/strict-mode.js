@@ -1,4 +1,4 @@
-var mobx = require("../")
+var mobx = require("../../")
 
 var strictError = /Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: /
 

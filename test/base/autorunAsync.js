@@ -1,4 +1,4 @@
-var m = require("..")
+var m = require("../../")
 
 test("autorun 1", function(done) {
     var _fired = 0

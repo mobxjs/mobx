@@ -1,5 +1,5 @@
 "use strict"
-var mobx = require("..")
+var mobx = require("../../")
 var observable = mobx.observable
 var iterall = require("iterall")
 

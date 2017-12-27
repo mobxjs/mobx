@@ -1,6 +1,6 @@
 "use strict"
 
-var mobx = require("..")
+var mobx = require("../../")
 var m = mobx
 var observable = mobx.observable
 var transaction = mobx.transaction

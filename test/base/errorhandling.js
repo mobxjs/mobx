@@ -1,6 +1,6 @@
-var mobx = require("..")
+var mobx = require("../../")
 var m = mobx
-var utils = require("./utils/test-utils")
+var utils = require("../utils/test-utils")
 
 var observable = mobx.observable
 var computed = mobx.computed
