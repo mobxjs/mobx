@@ -6,7 +6,7 @@ test("autorun 1", function(done) {
     var _cCalcs = 0
     var to = setTimeout
 
-    function expect(fired, cCalcs, result) {
+    function check(fired, cCalcs, result) {
         expect(_fired).toBe(fired)
         expect(_cCalcs).toBe(cCalcs)
         if (fired) expect(_result).toBe(result)
@@ -27,46 +27,46 @@ test("autorun 1", function(done) {
     }
     var disp = m.autorunAsync(autorun, 20)
 
-    expect(0, 0, null)
+    check(0, 0, null)
     disp()
     to(function() {
-        expect(0, 0, null)
+        check(0, 0, null)
         disp = m.autorunAsync(autorun, 20)
 
         to(function() {
-            expect(1, 1, 12)
+            check(1, 1, 12)
             a.set(4)
             b.set(5)
             a.set(6)
-            expect(0, 0, null) // a change triggered async rerun, compute will trigger after 20ms of async timeout
+            check(0, 0, null) // a change triggered async rerun, compute will trigger after 20ms of async timeout
             to(function() {
-                expect(1, 1, 180)
+                check(1, 1, 180)
                 d.set(2)
 
                 to(function() {
-                    expect(1, 0, 180)
+                    check(1, 0, 180)
 
                     d.set(-2)
                     to(function() {
-                        expect(1, 0, -2)
+                        check(1, 0, -2)
 
                         a.set(7)
                         to(function() {
-                            expect(0, 0, 0) // change a has no effect
+                            check(0, 0, 0) // change a has no effect
 
                             a.set(4)
                             b.set(2)
                             d.set(2)
 
                             to(function() {
-                                expect(1, 1, 32)
+                                check(1, 1, 32)
 
                                 disp()
                                 a.set(1)
                                 b.set(2)
                                 d.set(4)
                                 to(function() {
-                                    expect(0, 0, 0)
+                                    check(0, 0, 0)
                                     done()
                                 }, 30)
                             }, 30)

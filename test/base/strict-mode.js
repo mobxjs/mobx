@@ -9,7 +9,7 @@ test("strict mode should not allow changes outside action", () => {
     expect(mobx.isStrictModeEnabled()).toBe(true)
 
     // allowed, a is not observed
-    expect(() => a.set(3)).toThrowError(strictError)
+    a.set(3)
 
     var d = mobx.autorun(() => a.get())
     // not-allowed, a is observed

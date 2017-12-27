@@ -1,5 +1,5 @@
 var m = require("../../")
-var TransformUtils = require("./utils/transform")
+var TransformUtils = require("../utils/transform")
 
 test("transform1", function() {
     m.extras.resetGlobalState()

@@ -65,65 +65,70 @@ test("effect is untracked", () => {
 test("effect debounce is honored", () => {
     expect.assertions(2)
 
-    var a = mobx.observable(1)
-    var values = []
-    var exprCount = 0
+    return new Promise((resolve, reject) => {
+        var a = mobx.observable(1)
+        var values = []
+        var exprCount = 0
 
-    var d = reaction(
-        () => {
-            exprCount++
-            return a.get()
-        },
-        newValue => {
-            values.push(newValue)
-        },
-        {
-            delay: 100
-        }
-    )
+        var d = reaction(
+            () => {
+                exprCount++
+                return a.get()
+            },
+            newValue => {
+                values.push(newValue)
+            },
+            {
+                delay: 100
+            }
+        )
 
-    setTimeout(() => a.set(2), 30)
-    setTimeout(() => a.set(3), 150) // should not be visible, combined with the next
-    setTimeout(() => a.set(4), 160)
-    setTimeout(() => a.set(5), 300)
-    setTimeout(() => d(), 500)
-    setTimeout(() => a.set(6), 700)
+        setTimeout(() => a.set(2), 30)
+        setTimeout(() => a.set(3), 150) // should not be visible, combined with the next
+        setTimeout(() => a.set(4), 160)
+        setTimeout(() => a.set(5), 300)
+        setTimeout(() => d(), 500)
+        setTimeout(() => a.set(6), 700)
 
-    setTimeout(() => {
-        expect(values).toEqual([2, 4, 5])
-        expect(exprCount).toBe(4)
-    }, 900)
+        setTimeout(() => {
+            expect(values).toEqual([2, 4, 5])
+            expect(exprCount).toBe(4)
+            resolve();
+        }, 900)
+    })
 })
 
 test("effect debounce + fire immediately is honored", () => {
     expect.assertions(2)
+    return new Promise((resolve, reject) => {
+        var a = mobx.observable(1)
+        var values = []
+        var exprCount = 0
 
-    var a = mobx.observable(1)
-    var values = []
-    var exprCount = 0
+        var d = reaction(
+            () => {
+                exprCount++
+                return a.get()
+            },
+            newValue => {
+                values.push(newValue)
+            },
+            {
+                fireImmediately: true,
+                delay: 100
+            }
+        )
 
-    var d = reaction(
-        () => {
-            exprCount++
-            return a.get()
-        },
-        newValue => {
-            values.push(newValue)
-        },
-        {
-            fireImmediately: true,
-            delay: 100
-        }
-    )
+        setTimeout(() => a.set(3), 150)
+        setTimeout(() => a.set(4), 300)
 
-    setTimeout(() => a.set(3), 150)
-    setTimeout(() => a.set(4), 300)
-
-    setTimeout(() => {
-        d()
-        expect(values).toEqual([1, 3, 4])
-        expect(exprCount).toBe(3)
-    }, 500)
+        setTimeout(() => {
+            d()
+            expect(values).toEqual([1, 3, 4])
+            expect(exprCount).toBe(3)
+            resolve();
+        }, 500)
+    });
 })
 
 test("passes Reaction as an argument to expression function", () => {
@@ -354,6 +359,7 @@ test("reaction equals function only invoked when necessary", () => {
 
     const values = []
     const disposeReaction = mobx.reaction(
+        // Note: exceptions thrown here are intentional!
         () => left.get().toLowerCase() + right.get().toLowerCase(),
         value => values.push(value),
         { equals: loggingComparer, fireImmediately: true }

@@ -18,7 +18,7 @@ function buffer() {
     return res
 }
 
-function checkGlobalState(t) {
+function checkGlobalState() {
     const gs = mobx.extras.getGlobalState()
     expect(gs.isRunningReactions).toBe(false)
     expect(gs.trackingDerivation).toBe(null)
@@ -32,7 +32,7 @@ test("exception1", function() {
         throw "hoi"
     })
     expect(() => a()).toThrow()
-    checkGlobalState(t)
+    checkGlobalState()
 })
 
 test("exceptions in computed values can be recovered from", () => {
@@ -49,11 +49,11 @@ test("exceptions in computed values can be recovered from", () => {
 
     expect(() => a.y).toThrowError(/Uhoh/)
 
-    checkGlobalState(t)
+    checkGlobalState()
 
     a.x = 3
     expect(a.y).toBe(6)
-    checkGlobalState(t)
+    checkGlobalState()
 })
 
 test("exception when starting autorun can be recovered from", () => {
@@ -67,7 +67,6 @@ test("exception when starting autorun can be recovered from", () => {
     })
 
     utils.consoleError(
-        t,
         () => {
             mobx.autorun(() => {
                 b = a.y
@@ -76,10 +75,10 @@ test("exception when starting autorun can be recovered from", () => {
         /Uhoh/
     )
     expect(b).toBe(undefined)
-    checkGlobalState(t)
+    checkGlobalState()
     a.x = 3
     expect(b).toBe(6)
-    checkGlobalState(t)
+    checkGlobalState()
     expect(mobx.extras.getAtom(a, "y").observers.length).toBe(1)
 })
 
@@ -101,7 +100,6 @@ test("exception in autorun can be recovered from", () => {
     expect(mobx.extras.getAtom(a, "y").observers.length).toBe(1)
 
     utils.consoleError(
-        t,
         () => {
             a.x = 2
         },
@@ -115,12 +113,12 @@ test("exception in autorun can be recovered from", () => {
     expect(mobx.extras.getAtom(a, "y").observers.length).toBe(1)
 
     expect(b).toBe(2)
-    checkGlobalState(t)
+    checkGlobalState()
 
     a.x = 3
     expect(a.y).toBe(6)
     expect(b).toBe(6)
-    checkGlobalState(t)
+    checkGlobalState()
     expect(mobx.extras.getAtom(a, "y").observers.length).toBe(1)
     d()
     expect(mobx.extras.getAtom(a, "y").observers.length).toBe(0)
@@ -139,8 +137,8 @@ test("multiple autoruns with exceptions are handled correctly", () => {
     expect(values).toEqual(["a1", "b1", "c1"])
     values.splice(0)
 
-    utils.consoleError(t, () => a.set(2), /Uhoh/)
-    checkGlobalState(t)
+    utils.consoleError(() => a.set(2), /Uhoh/)
+    checkGlobalState()
 
     expect(values.sort()).toEqual(["a2", "c2"]) // order is irrelevant
     values.splice(0)
@@ -148,7 +146,7 @@ test("multiple autoruns with exceptions are handled correctly", () => {
     a.set(3)
     expect(values.sort()).toEqual(["a3", "b3", "c3"]) // order is irrelevant
 
-    checkGlobalState(t)
+    checkGlobalState()
     d1()
     d2()
     d3()
@@ -166,7 +164,7 @@ test("deny state changes in views", function() {
         y()
     }).toThrow()
 
-    checkGlobalState(t)
+    checkGlobalState()
 })
 
 test("allow state changes in autorun", function() {
@@ -186,7 +184,7 @@ test("allow state changes in autorun", function() {
     expect(z.get()).toBe(5)
 
     expect(mobx.extras.isComputingDerivation()).toBe(false)
-    checkGlobalState(t)
+    checkGlobalState()
 })
 
 test("deny array change in view", function(done) {
@@ -205,7 +203,7 @@ test("deny array change in view", function(done) {
         expect(z.slice()).toEqual([])
         expect(mobx.extras.isComputingDerivation()).toBe(false)
 
-        checkGlobalState(t)
+        checkGlobalState()
         done()
     } catch (e) {
         console.log(e.stack)
@@ -226,7 +224,7 @@ test("allow array change in autorun", function() {
     expect(z.slice()).toEqual([5, 6])
 
     expect(mobx.extras.isComputingDerivation()).toBe(false)
-    checkGlobalState(t)
+    checkGlobalState()
 })
 
 test("throw error if modification loop", function() {
@@ -235,13 +233,12 @@ test("throw error if modification loop", function() {
         x.set(x.get() + 1) // is allowed to throw, but doesn't as the observables aren't bound yet during first execution
     })
     utils.consoleError(
-        t,
         () => {
             x.set(5)
         },
         /Reaction doesn't converge to a stable state/
     )
-    checkGlobalState(t)
+    checkGlobalState()
 })
 
 test("cycle1", function() {
@@ -249,13 +246,12 @@ test("cycle1", function() {
         return p.get() * 2
     }) // thats a cycle!
     utils.consoleError(
-        t,
         () => {
             p.observe(voidObserver, true)
         },
         /Cycle detected/
     )
-    checkGlobalState(t)
+    checkGlobalState()
 })
 
 test("cycle2", function() {
@@ -268,7 +264,7 @@ test("cycle2", function() {
     expect(() => {
         b.get()
     }).toThrow()
-    checkGlobalState(t)
+    checkGlobalState()
 })
 
 test("cycle3", function() {
@@ -278,7 +274,7 @@ test("cycle3", function() {
     expect(() => {
         p.get()
     }).toThrow()
-    checkGlobalState(t)
+    checkGlobalState()
 })
 
 test("cycle4", function() {
@@ -294,13 +290,12 @@ test("cycle4", function() {
     expect(1).toBe(a.get())
 
     utils.consoleError(
-        t,
         () => {
             z.set(false) // introduces a cycle!
         },
         /Cycle detected/
     )
-    checkGlobalState(t)
+    checkGlobalState()
 })
 
 test("throws when the max iterations over reactions are done", () => {
@@ -314,7 +309,6 @@ test("throws when the max iterations over reactions are done", () => {
     })
 
     utils.consoleError(
-        t,
         () => foo.a++,
         /Reaction doesn't converge to a stable state after 100 iterations/
     )
@@ -348,7 +342,7 @@ test("issue 86, converging cycles", function() {
     expect(state.someArray.length).toBe(0) // should be 0, which never prints
     expect(calcs).toBe(3)
 
-    checkGlobalState(t)
+    checkGlobalState()
 })
 
 test("slow converging cycle", function() {
@@ -371,7 +365,7 @@ test("slow converging cycle", function() {
     expect(x.get()).toBe(100)
     expect(res).toBe(100)
 
-    checkGlobalState(t)
+    checkGlobalState()
 })
 
 test("error handling assistence ", function(done) {
@@ -426,7 +420,7 @@ test("error handling assistence ", function(done) {
         console.error = baseError
         console.warn = baseWarn
 
-        checkGlobalState(t)
+        checkGlobalState()
         done()
     }, 10)
 })
@@ -481,7 +475,7 @@ test("236 - cycles", () => {
     parent.children[0].kind = 1
     expect(msg).toEqual(["total0:", 9, "total1:", 0, "total0:", 6, "total1:", 12])
 
-    checkGlobalState(t)
+    checkGlobalState()
 })
 
 test("peeking inside erroring computed value doesn't bork (global) state", () => {
@@ -515,10 +509,10 @@ test("peeking inside erroring computed value doesn't bork (global) state", () =>
     }).toThrowError(/chocolademelk/)
     expect(b.isComputing).toBe(false)
 
-    checkGlobalState(t)
+    checkGlobalState()
 })
 
-test("peeking inside autorun doesn't bork (global) state", () => {
+describe("peeking inside autorun doesn't bork (global) state", () => {
     var r = -1
     const a = mobx.observable(1)
     const b = mobx.computed(() => {
@@ -560,13 +554,12 @@ test("peeking inside autorun doesn't bork (global) state", () => {
         expect(c._isScheduled).toBe(false)
         expect(c._isTrackPending).toBe(false)
         expect(c._isRunning).toBe(false)
-        checkGlobalState(t)
+        checkGlobalState()
     })
 
     test("it should not break internal consistency when exception occurred", () => {
         // Trigger exception
         utils.consoleError(
-            t,
             () => {
                 a.set(2)
             },
@@ -601,7 +594,7 @@ test("peeking inside autorun doesn't bork (global) state", () => {
         expect(c._isScheduled).toBe(false)
         expect(c._isTrackPending).toBe(false)
         expect(c._isRunning).toBe(false)
-        checkGlobalState(t)
+        checkGlobalState()
     })
 
     // Trigger a new change, will this recover?
@@ -638,7 +631,7 @@ test("peeking inside autorun doesn't bork (global) state", () => {
         expect(c._isTrackPending).toBe(false)
         expect(c._isRunning).toBe(false)
 
-        checkGlobalState(t)
+        checkGlobalState()
     })
 
     test("it should clean up correctly", () => {
@@ -674,7 +667,7 @@ test("peeking inside autorun doesn't bork (global) state", () => {
 
         expect(b.get()).toBe(3)
 
-        checkGlobalState(t)
+        checkGlobalState()
     })
 
     test("it should be possible to handle exceptions in reaction", () => {
@@ -692,7 +685,7 @@ test("peeking inside autorun doesn't bork (global) state", () => {
         expect(errors).toEqual([2, 3])
         d()
 
-        checkGlobalState(t)
+        checkGlobalState()
     })
 
     test("it should be possible to handle global errors in reactions", () => {
@@ -713,6 +706,6 @@ test("peeking inside autorun doesn't bork (global) state", () => {
         expect(errors).toEqual([1, 2, 3])
         d()
 
-        checkGlobalState(t)
+        checkGlobalState()
     })
 })
