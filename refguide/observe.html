@@ -25,6 +25,10 @@
         
     
         
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-anchors/plugin.css">
+        
+    
+        
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
@@ -44,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="8.8" data-basepath=".." data-revision="Mon Nov 20 2017 11:17:11 GMT+0100 (CET)">
+    <div class="book" data-level="8.8" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -882,11 +886,11 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/observe.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="intercept-observe">Intercept &amp; Observe</h1>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/observe.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="intercept-observe"><a name="intercept-observe" class="plugin-anchor" href="#intercept-observe"><span class="fa fa-link"></span></a>Intercept &amp; Observe</h1>
 <p><code>observe</code> and <code>intercept</code> can be used to monitor the changes of a single observable (they <strong><em>don&apos;t</em></strong> track nested observables).
 <code>intercept</code> can be used to detect and modify mutations before they are applied to the observable.
 <code>observe</code> allows you to intercept changes after they have been made.</p>
-<h2 id="intercept">Intercept</h2>
+<h2 id="intercept"><a name="intercept" class="plugin-anchor" href="#intercept"><span class="fa fa-link"></span></a>Intercept</h2>
 <p>Usage: <code>intercept(target, propertyName?, interceptor)</code></p>
 <ul>
 <li><code>target</code>: the observable to guard</li>
@@ -929,7 +933,7 @@ In that case the parent object interceptors are run before the property intercep
   <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">&quot;This doesn&apos;t like a color at all: &quot;</span> + change.newValue);
 })
 </code></pre>
-<h2 id="observe">Observe</h2>
+<h2 id="observe"><a name="observe" class="plugin-anchor" href="#observe"><span class="fa fa-link"></span></a>Observe</h2>
 <p>Usage: <code>observe(target, propertyName?, listener, invokeImmediately?)</code></p>
 <ul>
 <li><code>target</code>: the observable to observe</li>
@@ -966,7 +970,7 @@ disposer();
 });
 </code></pre>
 <p>Related blog: <a href="https://medium.com/@mweststrate/object-observe-is-dead-long-live-mobservable-observe-ad96930140c5" target="_blank">Object.observe is dead. Long live mobx.observe</a></p>
-<h2 id="event-overview">Event overview</h2>
+<h2 id="event-overview"><a name="event-overview" class="plugin-anchor" href="#event-overview"><span class="fa fa-link"></span></a>Event overview</h2>
 <p>The callbacks of <code>intercept</code> and <code>observe</code> will receive an event object which has at least the following properties:</p>
 <ul>
 <li><code>object</code>: the observable triggering the event</li>
@@ -1171,7 +1175,7 @@ disposer();
 </tbody>
 </table>
 <p><em>* Note that object <code>update</code> events won&apos;t fire for updated computated values (as those aren&apos;t mutations). But it is possible to observe them by explicitly subscribing to the specific property using <code>observe(object, &apos;computedPropertyName&apos;, listener)</code>.</em></p>
-
+</body></html>
                     
                     </section>
                 

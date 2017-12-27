@@ -25,6 +25,10 @@
         
     
         
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-anchors/plugin.css">
+        
+    
+        
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
@@ -44,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="1.1" data-basepath=".." data-revision="Mon Nov 20 2017 11:17:11 GMT+0100 (CET)">
+    <div class="book" data-level="1.1" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -882,10 +886,10 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/intro/overview.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="the-gist-of-mobx">The gist of MobX</h1>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/intro/overview.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="the-gist-of-mobx"><a name="the-gist-of-mobx" class="plugin-anchor" href="#the-gist-of-mobx"><span class="fa fa-link"></span></a>The gist of MobX</h1>
 <p><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx" target="_blank">Egghead.io lesson 1: observable &amp; observer</a></p>
 <p>So far it all might sound a bit fancy, but making an app reactive using MobX boils down to just these three steps:</p>
-<h2 id="1-define-your-state-and-make-it-observable">1. Define your state and make it observable</h2>
+<h2 id="1-define-your-state-and-make-it-observable"><a name="1-define-your-state-and-make-it-observable" class="plugin-anchor" href="#1-define-your-state-and-make-it-observable"><span class="fa fa-link"></span></a>1. Define your state and make it observable</h2>
 <p>Store state in any data structure you like; objects, array, classes.
 Cyclic data structures, references, it doesn&apos;t matter.
 Just make sure that all properties that you want to change over time are marked by <code>mobx</code> to make them observable.</p>
@@ -895,7 +899,7 @@ Just make sure that all properties that you want to change over time are marked 
     timer: <span class="hljs-number">0</span>
 });
 </code></pre>
-<h2 id="2-create-a-view-that-responds-to-changes-in-the-state">2. Create a view that responds to changes in the State</h2>
+<h2 id="2-create-a-view-that-responds-to-changes-in-the-state"><a name="2-create-a-view-that-responds-to-changes-in-the-state" class="plugin-anchor" href="#2-create-a-view-that-responds-to-changes-in-the-state"><span class="fa fa-link"></span></a>2. Create a view that responds to changes in the State</h2>
 <p>We didn&apos;t make our <code>appState</code> observable for nothing;
 you can now create views that automatically update whenever relevant data in the <code>appState</code> changes.
 MobX will find the minimal way to update your views.
@@ -920,7 +924,7 @@ But here is an (ES6) example of a view in the form of a React component.</p>
 ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">TimerView</span> <span class="hljs-attribute">appState</span>=<span class="hljs-value">{appState}</span> /&gt;</span>, document.body);
 </span></code></pre>
 <p>(For the implementation of <code>resetTimer</code> function see the next section)</p>
-<h2 id="3-modify-the-state">3. Modify the State</h2>
+<h2 id="3-modify-the-state"><a name="3-modify-the-state" class="plugin-anchor" href="#3-modify-the-state"><span class="fa fa-link"></span></a>3. Modify the State</h2>
 <p>The third thing to do is to modify the state.
 That is what your app is all about after all.
 Unlike many other frameworks, MobX doesn&apos;t dictate how you do this.
@@ -942,7 +946,7 @@ setInterval(action(<span class="hljs-function"><span class="hljs-keyword">functi
 It is recommended to use action though as it will help you to better structure applications and expresses the intention of a function to modify state.
 Also it automatically applies transactions for optimal performance.</p>
 <p>Feel free to try this example on <a href="http://jsfiddle.net/mweststrate/wgbe4guu/" target="_blank">JSFiddle</a> or by cloning the <a href="https://github.com/mobxjs/mobx-react-boilerplate" target="_blank">MobX boilerplate project</a></p>
-
+</body></html>
                     
                     </section>
                 

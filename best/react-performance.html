@@ -25,6 +25,10 @@
         
     
         
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-anchors/plugin.css">
+        
+    
+        
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
@@ -44,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="7.4" data-basepath=".." data-revision="Mon Nov 20 2017 11:17:11 GMT+0100 (CET)">
+    <div class="book" data-level="7.4" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -882,12 +886,12 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/react-performance.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="optimizing-rendering-react-components">Optimizing rendering React components</h1>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/react-performance.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="optimizing-rendering-react-components"><a name="optimizing-rendering-react-components" class="plugin-anchor" href="#optimizing-rendering-react-components"><span class="fa fa-link"></span></a>Optimizing rendering React components</h1>
 <p>MobX is very fast, <a href="https://twitter.com/mweststrate/status/718444275239882753" target="_blank">often even faster than Redux</a>. But here are some tips to get most out of React and MobX. Note that most tips apply to React in general and are not specific for MobX.</p>
-<h2 id="use-many-small-components">Use many small components</h2>
+<h2 id="use-many-small-components"><a name="use-many-small-components" class="plugin-anchor" href="#use-many-small-components"><span class="fa fa-link"></span></a>Use many small components</h2>
 <p><code>@observer</code> components will track all values they use and re-render if any of them changes.
 So the smaller your components are, the smaller the change they have to re-render; it means that more parts of your user interface have the possibility to render independently of each other.</p>
-<h2 id="render-lists-in-dedicated-components">Render lists in dedicated components</h2>
+<h2 id="render-lists-in-dedicated-components"><a name="render-lists-in-dedicated-components" class="plugin-anchor" href="#render-lists-in-dedicated-components"><span class="fa fa-link"></span></a>Render lists in dedicated components</h2>
 <p>This is especially true when rendering big collections.
 React is notoriously bad at rendering large collections as the reconciler has to evaluate the components produced by a collection on each collection change.
 It is therefore recommended to have components that just map over a collection and render it, and render nothing else:</p>
@@ -925,10 +929,10 @@ It is therefore recommended to have components that just map over a collection a
     }
 }
 </code></pre>
-<h2 id="don-t-use-array-indexes-as-keys">Don&apos;t use array indexes as keys</h2>
+<h2 id="don-t-use-array-indexes-as-keys"><a name="don-t-use-array-indexes-as-keys" class="plugin-anchor" href="#don-t-use-array-indexes-as-keys"><span class="fa fa-link"></span></a>Don&apos;t use array indexes as keys</h2>
 <p>Don&apos;t use array indexes or any value that might change in the future as key. Generate id&apos;s for your objects if needed.
 See also this <a href="https://medium.com/@robinpokorny/index-as-a-key-is-an-anti-pattern-e0349aece318" target="_blank">blog</a>.</p>
-<h2 id="dereference-values-late">Dereference values late</h2>
+<h2 id="dereference-values-late"><a name="dereference-values-late" class="plugin-anchor" href="#dereference-values-late"><span class="fa fa-link"></span></a>Dereference values late</h2>
 <p>When using <code>mobx-react</code> it is recommended to dereference values as late as possible.
 This is because MobX will re-render components that dereference observable values automatically.
 If this happens deeper in your component tree, less components have to re-render.</p>
@@ -941,7 +945,7 @@ But a change in the <code>name</code> property will, in the first case, trigger 
 However, it is more important for your components to have a comprehensible API than applying this optimization.
 To have the best of both worlds, consider making smaller components:</p>
 <p><code>const PersonNameDisplayer = observer(({ props }) =&gt; &lt;DisplayName name={props.person.name} /&gt;)</code></p>
-<h2 id="bind-functions-early">Bind functions early</h2>
+<h2 id="bind-functions-early"><a name="bind-functions-early" class="plugin-anchor" href="#bind-functions-early"><span class="fa fa-link"></span></a>Bind functions early</h2>
 <p>This tip applies to React in general and libraries using <code>PureRenderMixin</code> especially, try to avoid creating new closures in render methods.</p>
 <p>See also these resources:</p>
 <ul>
@@ -963,7 +967,7 @@ handleClick = () =&gt; {
 }
 </span></code></pre>
 <p>The bad example will always yield the <code>shouldComponent</code> of <code>PureRenderMixin</code> used in <code>MyWidget</code> to always yield false as you pass a new function each time the parent is re-rendered.</p>
-
+</body></html>
                     
                     </section>
                 

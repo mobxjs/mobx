@@ -25,6 +25,10 @@
         
     
         
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-anchors/plugin.css">
+        
+    
+        
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
@@ -44,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="8.3" data-basepath=".." data-revision="Mon Nov 20 2017 11:17:11 GMT+0100 (CET)">
+    <div class="book" data-level="8.3" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -882,7 +886,7 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/create-transformer.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="createtransformer">createTransformer</h1>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/create-transformer.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="createtransformer"><a name="createtransformer" class="plugin-anchor" href="#createtransformer"><span class="fa fa-link"></span></a>createTransformer</h1>
 <p><code>createTransformer&lt;A, B&gt;(transformation: (value: A) =&gt; B, onCleanup?: (result: B, value?: A) =&gt; void): (value: A) =&gt; B</code></p>
 <p><code>createTransformer</code> turns a function (that should transform value <code>A</code> into another value <code>B</code>) into a reactive and memoizing function.
 In other words, if the <code>transformation</code> function computes B given a specific A, the same B will be returned for all other future invocations of the transformation with the same A.
@@ -897,7 +901,7 @@ This can be used to dispose resources attached to the result object if needed.</
 <p>Always use transformations inside a reaction like <code>@observer</code> or <code>autorun</code>.
 Transformations will, like any other computed value, fall back to lazy evaluation if not observed by something, which sort of defeats their purpose.</p>
 <p>This all might still be a bit vague, so here are two examples that explain this whole idea of transforming one data structure into another by using small, reactive functions:</p>
-<h2 id="tracking-mutable-state-using-immutable-shared-data-structures">Tracking mutable state using immutable, shared data structures.</h2>
+<h2 id="tracking-mutable-state-using-immutable-shared-data-structures"><a name="tracking-mutable-state-using-immutable-shared-data-structures" class="plugin-anchor" href="#tracking-mutable-state-using-immutable-shared-data-structures"><span class="fa fa-link"></span></a>Tracking mutable state using immutable, shared data structures.</h2>
 <p>This example is taken from the <a href="https://github.com/mobxjs/mobx-reactive2015-demo" target="_blank">Reactive2015 conference demo</a>:</p>
 <pre><code class="lang-javascript"><span class="hljs-comment">/*
     The store that holds our domain: boxes and arrows
@@ -952,7 +956,7 @@ This signals the memoization table that the entry can be removed so that it is r
 <p>So effectively we have achieved state tracking using immutable, shared datas structures here.
 All boxes and arrows are mapped and reduced into single state tree.
 Each change will result in a new entry in the <code>states</code> array, but the different entries will share almost all of their box and arrow representations.</p>
-<h2 id="transforming-a-datagraph-into-another-reactive-data-graph">Transforming a datagraph into another reactive data graph</h2>
+<h2 id="transforming-a-datagraph-into-another-reactive-data-graph"><a name="transforming-a-datagraph-into-another-reactive-data-graph" class="plugin-anchor" href="#transforming-a-datagraph-into-another-reactive-data-graph"><span class="fa fa-link"></span></a>Transforming a datagraph into another reactive data graph</h2>
 <p>Instead of returning plain values from a transformation function, it is also possible to return observable objects.
 This can be used to transform an observable data graph into a another observable data graph, which can be used to transform... you get the idea.</p>
 <p>Here is a small example that encodes a reactive file explorer that will update its representation upon each change.
@@ -1046,7 +1050,7 @@ state.displayRoot.children[<span class="hljs-number">1</span>].collapsed = <span
 state.filter = <span class="hljs-string">&quot;2&quot;</span>; <span class="hljs-comment">// search</span>
 state.filter = <span class="hljs-literal">null</span>; <span class="hljs-comment">// unsearch</span>
 </code></pre>
-
+</body></html>
                     
                     </section>
                 

@@ -25,6 +25,10 @@
         
     
         
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-anchors/plugin.css">
+        
+    
+        
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
@@ -44,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="2.3" data-basepath=".." data-revision="Mon Nov 20 2017 11:17:11 GMT+0100 (CET)">
+    <div class="book" data-level="2.3" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -882,7 +886,7 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/computed-decorator.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="-computed">(@)computed</h1>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/computed-decorator.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="-computed"><a name="-computed" class="plugin-anchor" href="#-computed"><span class="fa fa-link"></span></a>(@)computed</h1>
 <p><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/javascript-derive-computed-values-and-manage-side-effects-with-mobx-reactions" target="_blank">Egghead.io lesson 3: computed values</a></p>
 <p>Computed values are values that can be derived from the existing state or other computed values.
 Conceptually, they are very similar to formulas in spreadsheets.
@@ -901,7 +905,7 @@ In such cases it will be suspended.</p>
 It sometimes confuses people new to MobX, that if you create a computed property but don&apos;t use it anywhere in a reaction, it will not cache its value and recompute more often than seems necessary.
 However, in real life situations this is by far the best default, and you can always forcefully keep a computed value awake if you need to, by using either <a href="observe.html"><code>observe</code></a> or <a href="https://github.com/mobxjs/mobx-utils#keepalive" target="_blank"><code>keepAlive</code></a>.</p>
 <p>Note that <code>computed</code> properties are not enumerable. Nor can they be overwritten in an inheritance chain.</p>
-<h2 id="-computed"><code>@computed</code></h2>
+<h2 id="-computed"><a name="-computed" class="plugin-anchor" href="#-computed"><span class="fa fa-link"></span></a><code>@computed</code></h2>
 <p>If you have <a href="../best/decorators.html">decorators enabled</a> you can use the <code>@computed</code> decorator on any getter of a class property to declaratively created computed properties.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, computed} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
 
@@ -918,7 +922,7 @@ However, in real life situations this is by far the best default, and you can al
     }
 }
 </code></pre>
-<h2 id="-computed-modifier"><code>computed</code> modifier</h2>
+<h2 id="-computed-modifier"><a name="-computed-modifier" class="plugin-anchor" href="#-computed-modifier"><span class="fa fa-link"></span></a><code>computed</code> modifier</h2>
 <p>If your environment doesn&apos;t support decorators, use the <code>computed(expression)</code> modifier in combination with <code>extendObservable</code> / <code>observable</code> to introduce new computed properties.</p>
 <p><code>@computed get propertyName() { }</code> is basically sugar for <a href="extend-observable.html"><code>extendObservable(this, { propertyName: get func() { } })</code></a> in the constructor call.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {extendObservable, computed} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
@@ -940,7 +944,7 @@ However, in real life situations this is by far the best default, and you can al
     }
 }
 </code></pre>
-<h2 id="setters-for-computed-values">Setters for computed values</h2>
+<h2 id="setters-for-computed-values"><a name="setters-for-computed-values" class="plugin-anchor" href="#setters-for-computed-values"><span class="fa fa-link"></span></a>Setters for computed values</h2>
 <p>It is possible to define a setter for computed values as well. Note that these setters cannot be used to alter the value of the computed property directly,
 but they can be used as &apos;inverse&apos; of the derivation. For example:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> box = observable({
@@ -966,7 +970,7 @@ but they can be used as &apos;inverse&apos; of the derivation. For example:</p>
 </code></pre>
 <p><em>Note: always define the setter <em>after</em> the getter, some TypeScript versions are known to declare two properties with the same name otherwise.</em></p>
 <p><em>Note: setters require MobX 2.5.1 or higher</em></p>
-<h2 id="-computed-expression-as-function"><code>computed(expression)</code> as function</h2>
+<h2 id="-computed-expression-as-function"><a name="-computed-expression-as-function" class="plugin-anchor" href="#-computed-expression-as-function"><span class="fa fa-link"></span></a><code>computed(expression)</code> as function</h2>
 <p><code>computed</code> can also be invoked directly as function.
 Just like <code>observable.box(primitive value)</code> creates a stand-alone observable.
 Use <code>.get()</code> on the returned object to get the current value of the computation, or <code>.observe(callback)</code> to observe its changes.
@@ -984,7 +988,7 @@ This form of <code>computed</code> is not used very often, but in some cases whe
 name.set(<span class="hljs-string">&quot;Dave&quot;</span>);
 <span class="hljs-comment">// prints: &apos;DAVE&apos;</span>
 </code></pre>
-<h2 id="options-for-computed">Options for <code>computed</code></h2>
+<h2 id="options-for-computed"><a name="options-for-computed" class="plugin-anchor" href="#options-for-computed"><span class="fa fa-link"></span></a>Options for <code>computed</code></h2>
 <p>When using <code>computed</code> as modifier or as box, it accepts a second options argument with the following optional arguments:</p>
 <ul>
 <li><code>name</code>: String, the debug name used in spy and the MobX devtools</li>
@@ -993,18 +997,18 @@ name.set(<span class="hljs-string">&quot;Dave&quot;</span>);
 <li><code>compareStructural</code>: By default <code>false</code>. When true, the output of the expression is structurally compared with the previous value before any observer is notified about a change. This makes sure that observers of the computation don&apos;t re-evaluate if new structures are returned that are structurally equal to the original ones. This is very useful when working with point, vector or color structures for example. The same behaviour can be achieved by specifying the <code>equals</code> option with <code>comparer.structural</code>.</li>
 <li><code>equals</code>: By default <code>comparer.default</code>. This acts as a comparison function for comparing the previous value with the next value. If this function considers the previous and next values to be equal, then observers will not be re-evaluated. This is useful when working with structural data, and types from other libraries. For example, a computed <a href="https://momentjs.com/" target="_blank">moment</a> instance could use <code>(a, b) =&gt; a.isSame(b)</code>. If specified, this will override <code>compareStructural</code>.</li>
 </ul>
-<h2 id="-computed-struct-for-structural-comparison"><code>@computed.struct</code> for structural comparison</h2>
+<h2 id="-computed-struct-for-structural-comparison"><a name="-computed-struct-for-structural-comparison" class="plugin-anchor" href="#-computed-struct-for-structural-comparison"><span class="fa fa-link"></span></a><code>@computed.struct</code> for structural comparison</h2>
 <p>The <code>@computed</code> decorator does not take arguments. If you want to to create a computed property which does structural comparison, use <code>@computed.struct</code>.</p>
-<h2 id="-computed-equals-for-custom-comparison"><code>@computed.equals</code> for custom comparison</h2>
+<h2 id="-computed-equals-for-custom-comparison"><a name="-computed-equals-for-custom-comparison" class="plugin-anchor" href="#-computed-equals-for-custom-comparison"><span class="fa fa-link"></span></a><code>@computed.equals</code> for custom comparison</h2>
 <p>If you want to to create a computed property which does custom comparison, use <code>@computed.equals(comparer)</code>.</p>
-<h2 id="built-in-comparers">Built-in comparers</h2>
+<h2 id="built-in-comparers"><a name="built-in-comparers" class="plugin-anchor" href="#built-in-comparers"><span class="fa fa-link"></span></a>Built-in comparers</h2>
 <p>MobX provides three built-in <code>comparer</code>s which should cover most needs:</p>
 <ul>
 <li><code>comparer.identity</code>: Uses the identity (<code>===</code>) operator to determine if two values are the same.</li>
 <li><code>comparer.default</code>: The same as <code>comparer.identity</code>, but also considers <code>NaN</code> to be equal to <code>NaN</code>.</li>
 <li><code>comparer.structural</code>: Performs deep structural comparison to determine if two values are the same.</li>
 </ul>
-<h2 id="note-on-error-handling">Note on error handling</h2>
+<h2 id="note-on-error-handling"><a name="note-on-error-handling" class="plugin-anchor" href="#note-on-error-handling"><span class="fa fa-link"></span></a>Note on error handling</h2>
 <p>If a computed value throws an exception during its computation, this exception will be caught and rethrown any time its value is read.
 It is strongly recommended to always throw <code>Error</code>&apos;s, so that the original stack trace is preserved. E.g.: <code>throw new Error(&quot;Uhoh&quot;)</code> instead of <code>throw &quot;Uhoh&quot;</code>.
 Throwing exceptions doesn&apos;t break tracking, so it is possible for computed values to recover from exceptions.</p>
@@ -1026,7 +1030,7 @@ divided.get() <span class="hljs-comment">// Throws: Division by zero</span>
 y.set(<span class="hljs-number">2</span>)
 divided.get() <span class="hljs-comment">// Recovered; Returns 1.5</span>
 </code></pre>
-
+</body></html>
                     
                     </section>
                 

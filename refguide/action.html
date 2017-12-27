@@ -25,6 +25,10 @@
         
     
         
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-anchors/plugin.css">
+        
+    
+        
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
@@ -44,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="2.6" data-basepath=".." data-revision="Mon Nov 20 2017 11:17:11 GMT+0100 (CET)">
+    <div class="book" data-level="2.6" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -882,7 +886,7 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/action.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="action">action</h1>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/action.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="action"><a name="action" class="plugin-anchor" href="#action"><span class="fa fa-link"></span></a>action</h1>
 <p><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-use-mobx-actions-to-change-and-guard-state" target="_blank">Egghead.io lesson 5: actions</a></p>
 <p>Usage:</p>
 <ul>
@@ -927,20 +931,20 @@ This makes sure intermediate or incomplete values produced during an action are 
             }));
     }
 </code></pre>
-<h2 id="when-to-use-actions">When to use actions?</h2>
+<h2 id="when-to-use-actions"><a name="when-to-use-actions" class="plugin-anchor" href="#when-to-use-actions"><span class="fa fa-link"></span></a>When to use actions?</h2>
 <p>Actions should only, and always, be used on functions that <em>modify</em> state.
 Functions that just perform look-ups, filters etc should <em>not</em> be marked as actions; to allow MobX to track their invocations.</p>
 <p>Note in the above example that writing asynchronous actions is as straight forward as marking all the callbacks as <code>action</code> as well.
 Beyond that there is nothing special about asynchronous processes in MobX; an asynchronous update is just a synchronous action call in some future.</p>
 <p><a href="https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/api.md#usestrict" target="_blank"><em>Strict mode</em></a> enforces that all state modifications are done by an action. This is a useful best practice in larger, long term code bases. Simply call <code>mobx.useStrict(true)</code> when your application is initialized, and MobX will throw anytime you (accidentally) try to modify state without using an action.</p>
 <p>The <a href="https://mobx.js.org/best/actions.html" target="_blank">Writing async actions</a> section provides several syntactical recipes on how to organize asynchronous actions, in combination with promises, async / await, generators etc. Read it for inspiration!</p>
-<h2 id="bound-actions">Bound actions</h2>
+<h2 id="bound-actions"><a name="bound-actions" class="plugin-anchor" href="#bound-actions"><span class="fa fa-link"></span></a>Bound actions</h2>
 <p>The <code>action</code> decorator / function follows the normal rules for binding in javascript.
 However, Mobx 3 introduces <code>action.bound</code> to automatically bind actions to the targeted object.
 Note that unlike <code>action</code>, <code>(@)action.bound</code> does not take a name parameter, so the name will always be based on the property name to which the action is bound.</p>
 <p>Example:</p>
 <pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Ticker</span> </span>{
-    @observable <span class="hljs-keyword">this</span>.tick = <span class="hljs-number">0</span>
+    @observable tick = <span class="hljs-number">0</span>
 
     @action.bound
     increment() {
@@ -962,9 +966,9 @@ setInterval(ticker.increment, <span class="hljs-number">1000</span>)
 setInterval(ticker.increment, <span class="hljs-number">1000</span>)
 </code></pre>
 <p><em>Note: don&apos;t use <em>action.bound</em> with arrow functions; arrow functions are already bound and cannot be rebound.</em></p>
-<h2 id="-runinaction-name-thunk"><code>runInAction(name?, thunk)</code></h2>
+<h2 id="-runinaction-name-thunk"><a name="-runinaction-name-thunk" class="plugin-anchor" href="#-runinaction-name-thunk"><span class="fa fa-link"></span></a><code>runInAction(name?, thunk)</code></h2>
 <p><code>runInAction</code> is a simple utility that takes an code block and executes in an (anonymous) action. This is useful to create and execute actions on the fly, for example inside an asynchronous process. <code>runInAction(f)</code> is sugar for <code>action(f)()</code></p>
-
+</body></html>
                     
                     </section>
                 

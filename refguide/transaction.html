@@ -25,6 +25,10 @@
         
     
         
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-anchors/plugin.css">
+        
+    
+        
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
@@ -44,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="8.12" data-basepath=".." data-revision="Mon Nov 20 2017 11:17:11 GMT+0100 (CET)">
+    <div class="book" data-level="8.12" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -882,7 +886,7 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/transaction.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="transaction">Transaction</h1>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/transaction.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="transaction"><a name="transaction" class="plugin-anchor" href="#transaction"><span class="fa fa-link"></span></a>Transaction</h1>
 <p><em>Transaction is a low-level api, in most cases <em>action</em> or <em>runInAction</em> are a better alternative</em></p>
 <p><code>transaction(worker: () =&gt; void)</code> can be used to batch a bunch of updates without notifying any observers until the end of the transaction.
 <code>transaction</code> takes a single, parameterless <code>worker</code> function as argument and runs it.
@@ -906,7 +910,7 @@ transaction(() =&gt; {
 });
 <span class="hljs-comment">// Prints: &apos;3 numbers!&apos;</span>
 </code></pre>
-
+</body></html>
                     
                     </section>
                 

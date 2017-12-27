@@ -25,6 +25,10 @@
         
     
         
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-anchors/plugin.css">
+        
+    
+        
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
@@ -44,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="2" data-basepath=".." data-revision="Mon Nov 20 2017 11:17:11 GMT+0100 (CET)">
+    <div class="book" data-level="2" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -882,12 +886,12 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/api.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="mobx-api-reference">MobX Api Reference</h1>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/api.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="mobx-api-reference"><a name="mobx-api-reference" class="plugin-anchor" href="#mobx-api-reference"><span class="fa fa-link"></span></a>MobX Api Reference</h1>
 <p>Applies to MobX 3 and higher. For MobX 2, the old documentation is still available on <a href="https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md" target="_blank">github</a>.</p>
-<h1 id="core-api">Core API</h1>
+<h1 id="core-api"><a name="core-api" class="plugin-anchor" href="#core-api"><span class="fa fa-link"></span></a>Core API</h1>
 <p><em>The most important MobX api&apos;s. Understanding <code>observable</code>, <code>computed</code>, <code>reactions</code> and <code>actions</code> is enough to master MobX and use it in your applications!</em></p>
-<h2 id="creating-observables">Creating observables</h2>
-<h3 id="-observable-value"><code>observable(value)</code></h3>
+<h2 id="creating-observables"><a name="creating-observables" class="plugin-anchor" href="#creating-observables"><span class="fa fa-link"></span></a>Creating observables</h2>
+<h3 id="-observable-value"><a name="-observable-value" class="plugin-anchor" href="#-observable-value"><span class="fa fa-link"></span></a><code>observable(value)</code></h3>
 <p>Usage:</p>
 <ul>
 <li><code>observable(value)</code></li>
@@ -911,36 +915,36 @@ Some notes:</p>
 <li>By default making a data structure observable is <em>infective</em>; that means that <code>observable</code> is applied automatically to any value that is contained by the data structure, or will be contained by the data structure in the future. This behavior can be changed by using <em>modifiers</em> or <em>shallow</em>.</li>
 </ul>
 <p><a href="observable.html">&#xAB;<code>observable</code>&#xBB;</a>  &#x2014;  <a href="observable-decorator.html">&#xAB;<code>@observable</code>&#xBB;</a></p>
-<h3 id="-observable-property-value"><code>@observable property =  value</code></h3>
+<h3 id="-observable-property-value"><a name="-observable-property-value" class="plugin-anchor" href="#-observable-property-value"><span class="fa fa-link"></span></a><code>@observable property =  value</code></h3>
 <p><code>observable</code> can also be used as property decorator. It requires <a href="../best/decorators.html">decorators to be enabled</a> and is syntactic
 sugar for <code>extendObservable(this, { property: value })</code>.</p>
 <p><a href="observable-decorator.html">&#xAB;<code>details</code>&#xBB;</a></p>
-<h3 id="-observable-box-value-observable-shallowbox-value"><code>observable.box(value)</code> &amp; <code>observable.shallowBox(value)</code></h3>
+<h3 id="-observable-box-value-observable-shallowbox-value"><a name="-observable-box-value-observable-shallowbox-value" class="plugin-anchor" href="#-observable-box-value-observable-shallowbox-value"><span class="fa fa-link"></span></a><code>observable.box(value)</code> &amp; <code>observable.shallowBox(value)</code></h3>
 <p>Creates an observable <em>box</em> that stores an observable reference to a value. Use <code>get()</code> to get the current value of the box, and <code>set()</code> to update it.
 This is the foundation on which all other observables are built, but in practice you will use it rarely.
 Normal boxes will automatically try to turn any new value into an observable if it isn&apos;t already. Use <code>shallowBox</code> to disable this behavior.</p>
 <p><a href="boxed.html">&#xAB;<code>details</code>&#xBB;</a></p>
-<h3 id="-observable-object-value-observable-shallowobject-value"><code>observable.object(value)</code> &amp; <code>observable.shallowObject(value)</code></h3>
+<h3 id="-observable-object-value-observable-shallowobject-value"><a name="-observable-object-value-observable-shallowobject-value" class="plugin-anchor" href="#-observable-object-value-observable-shallowobject-value"><span class="fa fa-link"></span></a><code>observable.object(value)</code> &amp; <code>observable.shallowObject(value)</code></h3>
 <p>Creates a clone of the provided object and makes all its properties observable.
 By default any values in those properties will be made observable as well, but when using <code>shallowObject</code> only the properties will be made into observable
 references, but the values will be untouched. (This holds also for any values assigned in the future)</p>
 <p><a href="object.html">&#xAB;<code>details</code>&#xBB;</a></p>
-<h3 id="-observable-array-value-observable-shallowarray-value"><code>observable.array(value)</code> &amp; <code>observable.shallowArray(value)</code></h3>
+<h3 id="-observable-array-value-observable-shallowarray-value"><a name="-observable-array-value-observable-shallowarray-value" class="plugin-anchor" href="#-observable-array-value-observable-shallowarray-value"><span class="fa fa-link"></span></a><code>observable.array(value)</code> &amp; <code>observable.shallowArray(value)</code></h3>
 <p>Creates a new observable array based on the provided value. Use <code>shallowArray</code> if the values in the array should not be turned into observables.</p>
 <p><a href="array.html">&#xAB;<code>details</code>&#xBB;</a></p>
-<h3 id="-observable-map-value-observable-shallowmap-value"><code>observable.map(value)</code> &amp; <code>observable.shallowMap(value)</code></h3>
+<h3 id="-observable-map-value-observable-shallowmap-value"><a name="-observable-map-value-observable-shallowmap-value" class="plugin-anchor" href="#-observable-map-value-observable-shallowmap-value"><span class="fa fa-link"></span></a><code>observable.map(value)</code> &amp; <code>observable.shallowMap(value)</code></h3>
 <p>Creates a new observable map based on the provided value. Use <code>shallowMap</code> if the values in the map should not be turned into observables.
 Use <code>map</code> whenever you want to create a dynamically keyed collections and the addition / removal of keys needs to be observed.
 Note that only string keys are supported.</p>
 <p><a href="map.html">&#xAB;<code>details</code>&#xBB;</a></p>
-<h3 id="-extendobservable-extendshallowobservable"><code>extendObservable</code> &amp; <code>extendShallowObservable</code></h3>
+<h3 id="-extendobservable-extendshallowobservable"><a name="-extendobservable-extendshallowobservable" class="plugin-anchor" href="#-extendobservable-extendshallowobservable"><span class="fa fa-link"></span></a><code>extendObservable</code> &amp; <code>extendShallowObservable</code></h3>
 <p>Usage: <code>extendObservable(target, ...propertyMaps)</code>. For each key/value pair in each <code>propertyMap</code> a (new) observable property will be introduced on the target object.
 This can be used in constructor functions to introduce observable properties without using decorators.
 If a value of the <code>propertyMap</code> is a getter function, a <em>computed</em> property will be introduced.</p>
 <p>Use <code>extendShallowObservable</code> if the new properties should not be infective (that is; newly assigned values should not be turned into observables automatically).
 Note that <code>extendObservable</code> enhances existing objects, unlike <code>observable.object</code> which creates a new object.</p>
 <p><a href="extend-observable.html">&#xAB;details&#xBB;</a></p>
-<h3 id="modifiers">Modifiers</h3>
+<h3 id="modifiers"><a name="modifiers" class="plugin-anchor" href="#modifiers"><span class="fa fa-link"></span></a>Modifiers</h3>
 <p>Modifiers can be used as decorators or in combination with <code>extendObservable</code> and <code>observable.object</code> to change the autoconversion rules for specific properties.</p>
 <p>The following modifiers are available:</p>
 <ul>
@@ -962,7 +966,7 @@ Note that modifiers always &apos;stick&apos; to the property. So they will remai
 })
 </code></pre>
 <p><a href="modifiers.html">&#xAB;details&#xBB;</a></p>
-<h2 id="computed-values">Computed values</h2>
+<h2 id="computed-values"><a name="computed-values" class="plugin-anchor" href="#computed-values"><span class="fa fa-link"></span></a>Computed values</h2>
 <p>Usage:</p>
 <ul>
 <li><code>computed(() =&gt; expression)</code></li>
@@ -976,7 +980,7 @@ Note that modifiers always &apos;stick&apos; to the property. So they will remai
 The expression will automatically be re-evaluated if any observables it uses changes, but only if it is in use by some <em>reaction</em>.</p>
 <p>Comparison method can be used to override the default detection on when something is changed and should be of value <code>(value, value) =&gt; boolean</code>. Built-in comparers are: <code>comparer.identity</code>, <code>comparar.default</code>, <code>comparer.structural</code></p>
 <p><a href="computed-decorator.html">&#xAB;details&#xBB;</a></p>
-<h2 id="actions">Actions</h2>
+<h2 id="actions"><a name="actions" class="plugin-anchor" href="#actions"><span class="fa fa-link"></span></a>Actions</h2>
 <p>Any application has actions. Actions are anything that modify the state.</p>
 <p>With MobX you can make it explicit in your code where your actions live by marking them.
 Actions helps you to structure your code better.
@@ -994,12 +998,12 @@ Note: using <code>action</code> is mandatory when <em>strict mode</em> is enable
 <li><code>@action(name) boundClassMethod = (args) =&gt; { body }</code></li>
 </ul>
 <p>For one-time-actions <code>runInAction(name?, fn, scope?)</code> can be used, which is sugar for <code>action(name, fn, scope)()</code>.</p>
-<h2 id="reactions-derivations">Reactions &amp; Derivations</h2>
+<h2 id="reactions-derivations"><a name="reactions-derivations" class="plugin-anchor" href="#reactions-derivations"><span class="fa fa-link"></span></a>Reactions &amp; Derivations</h2>
 <p><em>Computed values</em> are <strong>values</strong> that react automatically to state changes.
 <em>Reactions</em> are <strong>side effects</strong> that react automatically to state changes.
 Reactions <em>can</em> be used to ensure that a certain side effect (mainly I/O) is automatically executed when relevant state changes, like logging, network requests etc.
 The most commonly used reaction is the <code>observer</code> decorator for React components (see below).</p>
-<h3 id="-observer"><code>observer</code></h3>
+<h3 id="-observer"><a name="-observer" class="plugin-anchor" href="#-observer"><span class="fa fa-link"></span></a><code>observer</code></h3>
 <p>Can be used as higher order component around a React component.
 The component will then automatically re-render if any of the observables used in the <code>render</code> function of the component has changed.
 Note that <code>observer</code> is provided by the <code>&quot;mobx-react&quot;</code> package and not by <code>&quot;mobx&quot;</code> itself.
@@ -1009,42 +1013,42 @@ Note that <code>observer</code> is provided by the <code>&quot;mobx-react&quot;<
 <li><code>observer(React.createClass({ ... }))</code></li>
 <li><code>observer((props, context) =&gt; ReactElement)</code></li>
 <li><code>observer(class MyComponent extends React.Component { ... })</code></li>
-<li><code>@observer class MyComponent extends React.Component { ... })</code></li>
+<li><code>@observer class MyComponent extends React.Component { ... }</code></li>
 </ul>
-<h3 id="-autorun"><code>autorun</code></h3>
+<h3 id="-autorun"><a name="-autorun" class="plugin-anchor" href="#-autorun"><span class="fa fa-link"></span></a><code>autorun</code></h3>
 <p>Usage: <code>autorun(debugname?, () =&gt; { sideEffect })</code>. Autorun runs the provided <code>sideEffect</code> and tracks which observable state is accessed while running the side effect.
 Whenever one of the used observables is changed in the future, the same sideEffect will be run again.
 Returns a disposer function to cancel the side effect. <a href="autorun.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-when"><code>when</code></h3>
+<h3 id="-when"><a name="-when" class="plugin-anchor" href="#-when"><span class="fa fa-link"></span></a><code>when</code></h3>
 <p>Usage: <code>when(debugname?, () =&gt; condition, () =&gt; { sideEffect })</code>.
 The condition expression will react automatically to any observables it uses.
 As soon as the expression returns true the sideEffect function will be invoked, but only once.
 <code>when</code> returns a disposer to prematurely cancel the whole thing. <a href="when.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-autorunasync"><code>autorunAsync</code></h3>
+<h3 id="-autorunasync"><a name="-autorunasync" class="plugin-anchor" href="#-autorunasync"><span class="fa fa-link"></span></a><code>autorunAsync</code></h3>
 <p>Usage: <code>autorunAsync(debugname?, () =&gt; { sideEffect }, delay)</code>. Similar to <code>autorun</code>, but the sideEffect will be delayed and debounced with the given <code>delay</code>.
 <a href="autorun-async.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-reaction"><code>reaction</code></h3>
+<h3 id="-reaction"><a name="-reaction" class="plugin-anchor" href="#-reaction"><span class="fa fa-link"></span></a><code>reaction</code></h3>
 <p>Usage: <code>reaction(debugname?, () =&gt; data, data =&gt; { sideEffect }, fireImmediately = false, delay = 0)</code>.
 A variation on <code>autorun</code> that gives more fine-grained control on which observables that will be tracked.
 It takes two function, the first one is tracked and returns data that is used as input for the second one, the side effect.
 Unlike <code>autorun</code> the side effect won&apos;t be run initially, and any observables that are accessed while executing the side effect will not be tracked.
 The side effect can be debounced, just like <code>autorunAsync</code>. <a href="reaction.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-expr"><code>expr</code></h3>
+<h3 id="-expr"><a name="-expr" class="plugin-anchor" href="#-expr"><span class="fa fa-link"></span></a><code>expr</code></h3>
 <p>Usage: <code>expr(() =&gt; someExpression)</code>. Just a shorthand for <code>computed(() =&gt; someExpression).get()</code>.
 <code>expr</code> is useful in some rare cases to optimize another computed function or reaction.
 In general it is simpler and better to just split the function in multiple smaller computed&apos;s to achieve the same effect.
 <a href="expr.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-onreactionerror"><code>onReactionError</code></h3>
+<h3 id="-onreactionerror"><a name="-onreactionerror" class="plugin-anchor" href="#-onreactionerror"><span class="fa fa-link"></span></a><code>onReactionError</code></h3>
 <p>Usage: <code>extras.onReactionError(handler: (error: any, derivation) =&gt; void)</code></p>
 <p>This method attaches a global error listener, which is invoked for every error that is thrown from a <em>reaction</em>.
 This can be used for monitoring or test purposes.</p>
 <hr>
-<h1 id="utilities">Utilities</h1>
+<h1 id="utilities"><a name="utilities" class="plugin-anchor" href="#utilities"><span class="fa fa-link"></span></a>Utilities</h1>
 <p><em>Here are some utilities that might make working with observable objects or computed values more convenient.
 More, less trivial utilities can be found in the * <a href="https://github.com/mobxjs/mobx-utils" target="_blank">mobx-utils</a> package.</em></p>
-<h3 id="-provider-mobx-react-package"><code>Provider</code> (<code>mobx-react</code> package)</h3>
+<h3 id="-provider-mobx-react-package"><a name="-provider-mobx-react-package" class="plugin-anchor" href="#-provider-mobx-react-package"><span class="fa fa-link"></span></a><code>Provider</code> (<code>mobx-react</code> package)</h3>
 <p>Can be used to pass stores to child components using React&apos;s context mechanism. See the <a href="https://github.com/mobxjs/mobx-react#provider-experimental" target="_blank"><code>mobx-react</code> docs</a>.</p>
-<h3 id="-inject-mobx-react-package"><code>inject</code> (<code>mobx-react</code> package)</h3>
+<h3 id="-inject-mobx-react-package"><a name="-inject-mobx-react-package" class="plugin-anchor" href="#-inject-mobx-react-package"><span class="fa fa-link"></span></a><code>inject</code> (<code>mobx-react</code> package)</h3>
 <p>Higher order component and counterpart of <code>Provider</code>. Can be used to pick stores from React&apos;s context and pass it as props to the target component. Usage:</p>
 <ul>
 <li><code>inject(&quot;store1&quot;, &quot;store2&quot;)(observer(MyComponent))</code></li>
@@ -1052,51 +1056,51 @@ More, less trivial utilities can be found in the * <a href="https://github.com/m
 <li><code>@inject((stores, props, context) =&gt; props) @observer MyComponent</code></li>
 <li><code>@observer([&quot;store1&quot;, &quot;store2&quot;]) MyComponent</code> is a shorthand for the the <code>@inject() @observer</code> combo.</li>
 </ul>
-<h3 id="-tojs"><code>toJS</code></h3>
+<h3 id="-tojs"><a name="-tojs" class="plugin-anchor" href="#-tojs"><span class="fa fa-link"></span></a><code>toJS</code></h3>
 <p>Usage: <code>toJS(observableDataStructure)</code>. Converts observable data structures back to plain javascript objects, ignoring computed values. <a href="tojson.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-isobservable"><code>isObservable</code></h3>
+<h3 id="-isobservable"><a name="-isobservable" class="plugin-anchor" href="#-isobservable"><span class="fa fa-link"></span></a><code>isObservable</code></h3>
 <p>Usage: <code>isObservable(thing, property?)</code>. Returns true if the given thing, or the <code>property</code> of the given thing is observable.
 Works for all observables, computed values and disposer functions of reactions. <a href="is-observable">&#xAB;details&#xBB;</a></p>
-<h3 id="-isobservableobject-array-map-and-isboxedobservable"><code>isObservableObject|Array|Map</code> and <code>isBoxedObservable</code></h3>
+<h3 id="-isobservableobject-array-map-and-isboxedobservable"><a name="-isobservableobject-array-map-and-isboxedobservable" class="plugin-anchor" href="#-isobservableobject-array-map-and-isboxedobservable"><span class="fa fa-link"></span></a><code>isObservableObject|Array|Map</code> and <code>isBoxedObservable</code></h3>
 <p>Usage: <code>isObservableObject(thing)</code>, <code>isObservableArray(thing)</code>, <code>isObservableMap(thing)</code>, <code>isBoxedObservable(thing)</code>. Returns <code>true</code> if.., well, do the math.</p>
-<h3 id="-isarraylike"><code>isArrayLike</code></h3>
+<h3 id="-isarraylike"><a name="-isarraylike" class="plugin-anchor" href="#-isarraylike"><span class="fa fa-link"></span></a><code>isArrayLike</code></h3>
 <p>Usage: <code>isArrayLike(thing)</code>. Returns <code>true</code> if the given thing is either a true JS-array or an observable (MobX-)array.
 This is intended as convenience/shorthand.
 Note that observable arrays can be <code>.slice()</code>d to turn them into true JS-arrays.</p>
-<h3 id="-isaction"><code>isAction</code></h3>
+<h3 id="-isaction"><a name="-isaction" class="plugin-anchor" href="#-isaction"><span class="fa fa-link"></span></a><code>isAction</code></h3>
 <p>Usage: <code>isAction(func)</code>. Returns true if the given function is wrapped / decorated with <code>action</code>.</p>
-<h3 id="-iscomputed"><code>isComputed</code></h3>
+<h3 id="-iscomputed"><a name="-iscomputed" class="plugin-anchor" href="#-iscomputed"><span class="fa fa-link"></span></a><code>isComputed</code></h3>
 <p>Usage: <code>isComputed(thing, property?)</code>. Returns true if the given thing is a boxed computed value, or if the designated property is a computed value.</p>
-<h3 id="-createtransformer"><code>createTransformer</code></h3>
+<h3 id="-createtransformer"><a name="-createtransformer" class="plugin-anchor" href="#-createtransformer"><span class="fa fa-link"></span></a><code>createTransformer</code></h3>
 <p>Usage: <code>createTransformer(transformation: A =&gt; B, onCleanup?): A = B</code>.
 Can be used to make functions that transforms one value into another value reactive and memoized.
 It behaves similar to computed and can be used for advanced patterns like very efficient array maps, map reduce or computed values that are not part of an object.
 <a href="create-transformer.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-intercept"><code>intercept</code></h3>
+<h3 id="-intercept"><a name="-intercept" class="plugin-anchor" href="#-intercept"><span class="fa fa-link"></span></a><code>intercept</code></h3>
 <p>Usage: <code>intercept(object, property?, interceptor)</code>.
 Api that can be used to intercept changes before they are applied to an observable api. Useful for validation, normalization or cancellation.
 <a href="observe.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-observe"><code>observe</code></h3>
+<h3 id="-observe"><a name="-observe" class="plugin-anchor" href="#-observe"><span class="fa fa-link"></span></a><code>observe</code></h3>
 <p>Usage: <code>observe(object, property?, listener, fireImmediately = false)</code>
 Low-level api that can be used to observe a single observable value.
 <a href="observe.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-usestrict"><code>useStrict</code></h3>
+<h3 id="-usestrict"><a name="-usestrict" class="plugin-anchor" href="#-usestrict"><span class="fa fa-link"></span></a><code>useStrict</code></h3>
 <p>Usage: <code>useStrict(boolean)</code>.
 Enables / disables strict mode <em>globally</em>.
 In strict mode, it is not allowed to change any state outside of an <a href="action.html"><code>action</code></a>.
 See also <code>extras.allowStateChanges</code>.</p>
-<h1 id="development-utilities">Development utilities</h1>
+<h1 id="development-utilities"><a name="development-utilities" class="plugin-anchor" href="#development-utilities"><span class="fa fa-link"></span></a>Development utilities</h1>
 <p><em>The following api&apos;s might come in handy if you want to build cool tools on top of MobX or if you want to inspect the internal state of MobX</em></p>
-<h3 id="-mobx-react-devtools-package"><code>&quot;mobx-react-devtools&quot;</code> package</h3>
+<h3 id="-mobx-react-devtools-package"><a name="-mobx-react-devtools-package" class="plugin-anchor" href="#-mobx-react-devtools-package"><span class="fa fa-link"></span></a><code>&quot;mobx-react-devtools&quot;</code> package</h3>
 <p>The mobx-react-devtools is a powerful package that helps you to investigate the performance and dependencies of your react components.
 Also has a powerful logger utility based on <code>spy</code>. <a href="../best/devtools.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-spy"><code>spy</code></h3>
+<h3 id="-spy"><a name="-spy" class="plugin-anchor" href="#-spy"><span class="fa fa-link"></span></a><code>spy</code></h3>
 <p>Usage: <code>spy(listener)</code>.
 Registers a global spy listener that listens to all events that happen in MobX.
 It is similar to attaching an <code>observe</code> listener to <em>all</em> observables at once, but also notifies about running (trans/re)actions and computations.
 Used for example by the <code>mobx-react-devtools</code>.
 <a href="spy.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-whyrun"><code>whyRun</code></h3>
+<h3 id="-whyrun"><a name="-whyrun" class="plugin-anchor" href="#-whyrun"><span class="fa fa-link"></span></a><code>whyRun</code></h3>
 <p>Usage:</p>
 <ul>
 <li><code>whyRun()</code></li>
@@ -1106,36 +1110,36 @@ Used for example by the <code>mobx-react-devtools</code>.
 <p><code>whyRun</code> is a small utility that can be used inside computed value or reaction (<code>autorun</code>, <code>reaction</code> or the <code>render</code> method of an <code>observer</code> React component)
 and prints why the derivation is currently running, and under which circumstances it will run again.
 This should help to get a deeper understanding when and why MobX runs stuff, and prevent some beginner mistakes.</p>
-<h3 id="-extras-getatom"><code>extras.getAtom</code></h3>
+<h3 id="-extras-getatom"><a name="-extras-getatom" class="plugin-anchor" href="#-extras-getatom"><span class="fa fa-link"></span></a><code>extras.getAtom</code></h3>
 <p>Usage: <code>getAtom(thing, property?)</code>.
 Returns the backing <em>Atom</em> of a given observable object, property, reaction etc.</p>
-<h3 id="-extras-getdebugname"><code>extras.getDebugName</code></h3>
+<h3 id="-extras-getdebugname"><a name="-extras-getdebugname" class="plugin-anchor" href="#-extras-getdebugname"><span class="fa fa-link"></span></a><code>extras.getDebugName</code></h3>
 <p>Usage: <code>getDebugName(thing, property?)</code>
 Returns a (generated) friendly debug name of an observable object, property, reaction etc. Used by for example the <code>mobx-react-devtools</code>.</p>
-<h3 id="-extras-getdependencytree"><code>extras.getDependencyTree</code></h3>
+<h3 id="-extras-getdependencytree"><a name="-extras-getdependencytree" class="plugin-anchor" href="#-extras-getdependencytree"><span class="fa fa-link"></span></a><code>extras.getDependencyTree</code></h3>
 <p>Usage: <code>getDependencyTree(thing, property?)</code>.
 Returns a tree structure with all observables the given reaction / computation currently depends upon.</p>
-<h3 id="-extras-getobservertree"><code>extras.getObserverTree</code></h3>
+<h3 id="-extras-getobservertree"><a name="-extras-getobservertree" class="plugin-anchor" href="#-extras-getobservertree"><span class="fa fa-link"></span></a><code>extras.getObserverTree</code></h3>
 <p>Usage: <code>getObserverTree(thing, property?)</code>.
 Returns a tree structure with all reactions / computations that are observing the given observable.</p>
-<h3 id="-extras-isspyenabled"><code>extras.isSpyEnabled</code></h3>
+<h3 id="-extras-isspyenabled"><a name="-extras-isspyenabled" class="plugin-anchor" href="#-extras-isspyenabled"><span class="fa fa-link"></span></a><code>extras.isSpyEnabled</code></h3>
 <p>Usage: <code>isSpyEnabled()</code>. Returns true if at least one spy is active</p>
-<h3 id="-extras-spyreport"><code>extras.spyReport</code></h3>
+<h3 id="-extras-spyreport"><a name="-extras-spyreport" class="plugin-anchor" href="#-extras-spyreport"><span class="fa fa-link"></span></a><code>extras.spyReport</code></h3>
 <p>Usage: <code>spyReport({ type: &quot;your type&quot;, &amp;laquo;details&amp;raquo; data})</code>. Emit your own custom spy event.</p>
-<h3 id="-extras-spyreportstart"><code>extras.spyReportStart</code></h3>
+<h3 id="-extras-spyreportstart"><a name="-extras-spyreportstart" class="plugin-anchor" href="#-extras-spyreportstart"><span class="fa fa-link"></span></a><code>extras.spyReportStart</code></h3>
 <p>Usage: <code>spyReportStart({ type: &quot;your type&quot;, &amp;laquo;details&amp;raquo; data})</code>. Emit your own custom spy event. Will start a new nested spy event group which should be closed using <code>spyReportEnd()</code></p>
-<h3 id="-extras-spyreportend"><code>extras.spyReportEnd</code></h3>
+<h3 id="-extras-spyreportend"><a name="-extras-spyreportend" class="plugin-anchor" href="#-extras-spyreportend"><span class="fa fa-link"></span></a><code>extras.spyReportEnd</code></h3>
 <p>Usage: <code>spyReportEnd()</code>. Ends the current spy group that was started with <code>extras.spyReportStart</code>.</p>
-<h3 id="-mobx-react-development-hooks"><code>&quot;mobx-react&quot;</code> development hooks</h3>
+<h3 id="-mobx-react-development-hooks"><a name="-mobx-react-development-hooks" class="plugin-anchor" href="#-mobx-react-development-hooks"><span class="fa fa-link"></span></a><code>&quot;mobx-react&quot;</code> development hooks</h3>
 <p>The <code>mobx-react</code> package exposes the following additional api&apos;s that are used by the <code>mobx-react-devtools</code>:</p>
 <ul>
 <li><code>trackComponents()</code>: enables the tracking of <code>observer</code> based React components</li>
 <li><code>renderReporter.on(callback)</code>: callback will be invoked on each rendering of an <code>observer</code> enabled React component, with timing information etc</li>
 <li><code>componentByNodeRegistery</code>: ES6 WeakMap that maps from DOMNode to a <code>observer</code> based React component instance</li>
 </ul>
-<h1 id="internal-functions">Internal functions</h1>
+<h1 id="internal-functions"><a name="internal-functions" class="plugin-anchor" href="#internal-functions"><span class="fa fa-link"></span></a>Internal functions</h1>
 <p><em>The following methods are all used internally by MobX, and might come in handy in rare cases. But usually MobX offers more declarative alternatives to tackle the same problem. They might come in handy though if you try to extend MobX</em></p>
-<h3 id="-transaction"><code>transaction</code></h3>
+<h3 id="-transaction"><a name="-transaction" class="plugin-anchor" href="#-transaction"><span class="fa fa-link"></span></a><code>transaction</code></h3>
 <p>Usage: <code>transaction(() =&gt; { block })</code>.
 Deprecated, use actions or <code>runInAction</code> instead.
 Low-level api that can be used to batch state changes.
@@ -1143,29 +1147,29 @@ State changes made inside the block won&apos;t cause any computations or reactio
 Nonetheless inspecting a computed value inside a transaction block will still return a consistent value.
 It is recommended to use <code>action</code> instead, which uses <code>transaction</code> internally.
 <a href="transaction.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-untracked"><code>untracked</code></h3>
+<h3 id="-untracked"><a name="-untracked" class="plugin-anchor" href="#-untracked"><span class="fa fa-link"></span></a><code>untracked</code></h3>
 <p>Usage: <code>untracked(() =&gt; { block })</code>.
 Low-level api that might be useful inside reactions and computations.
 Any observables accessed in the <code>block</code> won&apos;t cause the reaction / computations to be recomputed automatically.
 However it is recommended to use <code>action</code> instead, which uses <code>untracked</code> internally.
 <a href="untracked.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-atom"><code>Atom</code></h3>
+<h3 id="-atom"><a name="-atom" class="plugin-anchor" href="#-atom"><span class="fa fa-link"></span></a><code>Atom</code></h3>
 <p>Utility class that can be used to create your own observable data structures and hook them up to MobX.
 Used internally by all observable data types.
 <a href="extending.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-reaction"><code>Reaction</code></h3>
+<h3 id="-reaction"><a name="-reaction" class="plugin-anchor" href="#-reaction"><span class="fa fa-link"></span></a><code>Reaction</code></h3>
 <p>Utility class that can be used to create your own reactions and hook them up to MobX.
 Used internally by <code>autorun</code>, <code>reaction</code> (function) etc.
 <a href="extending.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-extras-allowstatechanges"><code>extras.allowStateChanges</code></h3>
+<h3 id="-extras-allowstatechanges"><a name="-extras-allowstatechanges" class="plugin-anchor" href="#-extras-allowstatechanges"><span class="fa fa-link"></span></a><code>extras.allowStateChanges</code></h3>
 <p>Usage: <code>allowStateChanges(allowStateChanges, () =&gt; { block })</code>.
 Can be used to (dis)allow state changes in a certain function.
 Used internally by <code>action</code> to allow changes, and by <code>computed</code> and <code>observer</code> to disallow state changes.</p>
-<h3 id="-extras-resetglobalstate"><code>extras.resetGlobalState</code></h3>
+<h3 id="-extras-resetglobalstate"><a name="-extras-resetglobalstate" class="plugin-anchor" href="#-extras-resetglobalstate"><span class="fa fa-link"></span></a><code>extras.resetGlobalState</code></h3>
 <p>Usage: <code>resetGlobalState()</code>.
 Resets MobX internal global state. MobX by defaults fails fast if an exception occurs inside a computation or reaction and refuses to run them again.
 This function resets MobX to the zero state. Existing <code>spy</code> listeners and the current value of strictMode will be preserved though.</p>
-
+</body></html>
                     
                     </section>
                 

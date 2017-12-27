@@ -25,6 +25,10 @@
         
     
         
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-anchors/plugin.css">
+        
+    
+        
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
@@ -44,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="8.2" data-basepath=".." data-revision="Mon Nov 20 2017 11:17:11 GMT+0100 (CET)">
+    <div class="book" data-level="8.2" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -882,8 +886,8 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/extending.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="creating-observable-data-structures-and-reactions">Creating observable data structures and reactions</h1>
-<h2 id="atoms">Atoms</h2>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/extending.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="creating-observable-data-structures-and-reactions"><a name="creating-observable-data-structures-and-reactions" class="plugin-anchor" href="#creating-observable-data-structures-and-reactions"><span class="fa fa-link"></span></a>Creating observable data structures and reactions</h1>
+<h2 id="atoms"><a name="atoms" class="plugin-anchor" href="#atoms"><span class="fa fa-link"></span></a>Atoms</h2>
 <p>At some point you might want to have more data structures or other things (like streams) that can be used in reactive computations.
 Achieving that is pretty simple by using the <code>Atom</code> class.
 Atoms can be used to signal MobX that some observable data source has been observed or changed.
@@ -959,7 +963,7 @@ disposer();
 
 <span class="hljs-comment">// printing stops. If nobody else uses the same `clock` the clock will stop ticking as well.</span>
 </code></pre>
-<h2 id="reactions">Reactions</h2>
+<h2 id="reactions"><a name="reactions" class="plugin-anchor" href="#reactions"><span class="fa fa-link"></span></a>Reactions</h2>
 <p><code>Reaction</code> allows you to create your own &apos;auto runner&apos;.
 Reactions track a function and signal when the function should be executed again because one or more dependencies have changed.</p>
 <p>This is how <code>autorun</code> is defined using <code>Reaction</code>:</p>
@@ -980,7 +984,7 @@ Reactions track a function and signal when the function should be executed again
     <span class="hljs-keyword">return</span> reaction.getDisposer();
 }
 </code></pre>
-
+</body></html>
                     
                     </section>
                 

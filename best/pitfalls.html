@@ -25,6 +25,10 @@
         
     
         
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-anchors/plugin.css">
+        
+    
+        
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
@@ -44,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="7.1" data-basepath=".." data-revision="Mon Nov 20 2017 11:17:11 GMT+0100 (CET)">
+    <div class="book" data-level="7.1" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -882,9 +886,9 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/pitfalls.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="common-pitfalls-best-practices">Common pitfalls &amp; best practices</h1>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/pitfalls.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="common-pitfalls-best-practices"><a name="common-pitfalls-best-practices" class="plugin-anchor" href="#common-pitfalls-best-practices"><span class="fa fa-link"></span></a>Common pitfalls &amp; best practices</h1>
 <p>Stuck with MobX? This section contains a list of common issues people new to MobX might run into.</p>
-<h4 id="importing-from-wrong-location">Importing from wrong location</h4>
+<h4 id="importing-from-wrong-location"><a name="importing-from-wrong-location" class="plugin-anchor" href="#importing-from-wrong-location"><span class="fa fa-link"></span></a>Importing from wrong location</h4>
 <p>Because MobX ships with typescript typings out of the box, some import autocompleting tools (at least in VSCode) have the habit of auto completing with a wrong import, like</p>
 <pre><code class="lang-javascript"><span class="hljs-comment">// wrong</span>
 <span class="hljs-keyword">import</span> { observable } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx/lib/mobx&quot;</span>
@@ -893,25 +897,25 @@
 <pre><code class="lang-javascript"><span class="hljs-comment">// correct</span>
 <span class="hljs-keyword">import</span> { observable } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>
 </code></pre>
-<h4 id="issues-with-decorators">Issues with decorators?</h4>
+<h4 id="issues-with-decorators"><a name="issues-with-decorators" class="plugin-anchor" href="#issues-with-decorators"><span class="fa fa-link"></span></a>Issues with decorators?</h4>
 <p>For setup tips and limitations on decorators, check the <a href="decorators.html">decorators</a> page</p>
-<h4 id="-array-isarray-observable-1-2-3-false"><code>Array.isArray(observable([1,2,3])) === false</code></h4>
+<h4 id="-array-isarray-observable-1-2-3-false"><a name="-array-isarray-observable-1-2-3-false" class="plugin-anchor" href="#-array-isarray-observable-1-2-3-false"><span class="fa fa-link"></span></a><code>Array.isArray(observable([1,2,3])) === false</code></h4>
 <p>In ES5 there is no way to reliably inherit from arrays, and hence observable arrays inherit from objects.
 This means that regularly libraries are not able to recognize observable arrays as normal arrays (like lodash, or built-in operations like <code>Array.concat</code>).
 This can simply be fixed by passing calling <code>observable.toJS()</code> or <code>observable.slice()</code> before passing the array to another library.
 As long as the external library has no intent to modify the array, this will further work completely as expected.
 You can use <code>isObservableArray(observable)</code> to check whether something is an observable array.</p>
-<h4 id="-object-somenewprop-value-is-not-picked-up"><code>object.someNewProp = value</code> is not picked up</h4>
+<h4 id="-object-somenewprop-value-is-not-picked-up"><a name="-object-somenewprop-value-is-not-picked-up" class="plugin-anchor" href="#-object-somenewprop-value-is-not-picked-up"><span class="fa fa-link"></span></a><code>object.someNewProp = value</code> is not picked up</h4>
 <p>MobX observable <em>objects</em> do not detect or react to property assignments that weren&apos;t declared observable before.
 So MobX observable objects act as records with predefined keys.
 You can use <code>extendObservable(target, props)</code> to introduce new observable properties to an object.
 However object iterators like <code>for .. in</code> or <code>Object.keys()</code> won&apos;t react to this automatically.
 If you need a dynamically keyed object, for example to store users by id, create observable _map_s using <a href="../refguide/map.html"><code>observable.map</code></a>.
 For more info see <a href="react.html">what will MobX react to?</a>.</p>
-<h3 id="use-observer-on-all-components-that-render-observable-s">Use <code>@observer</code> on all components that render <code>@observable</code>s.</h3>
+<h3 id="use-observer-on-all-components-that-render-observable-s"><a name="use-observer-on-all-components-that-render-observable-s" class="plugin-anchor" href="#use-observer-on-all-components-that-render-observable-s"><span class="fa fa-link"></span></a>Use <code>@observer</code> on all components that render <code>@observable</code>s.</h3>
 <p><code>@observer</code> only enhances the component you are decorating, not the components used inside it.
 So usually all your components should be decorated. Don&apos;t worry, this is not inefficient, in contrast, more <code>observer</code> components make rendering more efficient.</p>
-<h3 id="don-t-copy-observables-properties-and-store-them-locally">Don&apos;t copy observables properties and store them locally</h3>
+<h3 id="don-t-copy-observables-properties-and-store-them-locally"><a name="don-t-copy-observables-properties-and-store-them-locally" class="plugin-anchor" href="#don-t-copy-observables-properties-and-store-them-locally"><span class="fa fa-link"></span></a>Don&apos;t copy observables properties and store them locally</h3>
 <p>Observer components only track data that is accessed <em>during</em> the render method. A common mistake is that data plucked of from an observable property and stored will for that reason not be tracked:</p>
 <pre><code>class User {
   @observable name
@@ -946,10 +950,10 @@ class Profile extends React.Component {
     return &lt;div&gt;{this.name}&lt;/div&gt;
   }
 }
-</code></pre><h3 id="render-callbacks-are-not-part-of-the-render-method">Render callbacks are <em>not</em> part of the render method</h3>
+</code></pre><h3 id="render-callbacks-are-not-part-of-the-render-method"><a name="render-callbacks-are-not-part-of-the-render-method" class="plugin-anchor" href="#render-callbacks-are-not-part-of-the-render-method"><span class="fa fa-link"></span></a>Render callbacks are <em>not</em> part of the render method</h3>
 <p>Because <code>observer</code> only applies to exactly the <code>render</code> function of the current component; passing a render callback or component to a child component doesn&apos;t become reactive automatically.
 For more details, see the <a href="https://github.com/mobxjs/mobx/blob/gh-pages/docs/best/react.md#mobx-only-tracks-data-accessed-for-observer-components-if-they-are-directly-accessed-by-render" target="_blank">what will Mobx react to</a> guide.</p>
-<h3 id="dereference-values-as-late-as-possible">Dereference values as late as possible</h3>
+<h3 id="dereference-values-as-late-as-possible"><a name="dereference-values-as-late-as-possible" class="plugin-anchor" href="#dereference-values-as-late-as-possible"><span class="fa fa-link"></span></a>Dereference values as late as possible</h3>
 <p>MobX can do a lot, but it cannot make primitive values observable (although it can wrap them in an object see <a href="../refguide/boxed.html">boxed observables</a>).
 So it is not the <em>values</em> that are observable, but the <em>properties</em> of an object. This means that <code>@observer</code> actually reacts to the fact that you dereference a value.
 So in our above example, the <code>Timer</code> component would <strong>not</strong> react if it was initialized as follows:</p>
@@ -959,14 +963,14 @@ So in our above example, the <code>Timer</code> component would <strong>not</str
 That number won&apos;t change anymore in the future, so <code>Timer</code> will never update. It is the property <code>secondsPassed</code> that will change in the future,
 so we need to access it <em>in</em> the component. Or in other words: always try to pass the owning object of an observable property.
 For more info see <a href="react.html">what will MobX react to?</a>.</p>
-<h4 id="computed-values-run-more-often-than-expected">Computed values run more often than expected</h4>
+<h4 id="computed-values-run-more-often-than-expected"><a name="computed-values-run-more-often-than-expected" class="plugin-anchor" href="#computed-values-run-more-often-than-expected"><span class="fa fa-link"></span></a>Computed values run more often than expected</h4>
 <p>If a computed property is <em>not</em> in use by some reaction (<code>autorun</code>, <code>observer</code> etc), computed expressions will be evaluated lazily; each time their value is requested (so they just act as normal property).
 Computed values will only track their dependencies if they are observed.
 This allows MobX to automatically suspend computations that are not actively in use.
 See this <a href="https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254" target="_blank">blog</a> or <a href="https://github.com/mobxjs/mobx/issues/356" target="_blank">issue #356</a> for an explanation.
 So if you fiddle arounds, computed properties might not seem efficient. But when applied in a project that uses <code>observer</code>, <code>autorun</code> etc, they become very efficient.</p>
 <p>MobX computeds will automatically be kept alive during transactions as well, see PRs: <a href="https://github.com/mobxjs/mobx/pull/452" target="_blank">#452</a> and <a href="https://github.com/mobxjs/mobx/pull/489" target="_blank">#489</a></p>
-<h4 id="always-dispose-reactions">Always dispose reactions</h4>
+<h4 id="always-dispose-reactions"><a name="always-dispose-reactions" class="plugin-anchor" href="#always-dispose-reactions"><span class="fa fa-link"></span></a>Always dispose reactions</h4>
 <p>All forms of <code>autorun</code>, <code>observe</code> and <code>intercept</code> will only be garbage collected if all objects they observe are garbage collected themselves.
 So it is recommend to use the disposer function that is returned from these methods to stop them when you no longer need them.
 Usually for <code>observe</code> and <code>intercept</code> it is not strictly necessary to dispose them if when targed <code>this</code>.
@@ -996,10 +1000,10 @@ So make sure to always dispose your reactions when you no longer need them!</p>
     }
 }
 </code></pre>
-<h4 id="i-have-a-weird-exception-when-using-observable-in-a-react-component">I have a weird exception when using <code>@observable</code> in a React component.</h4>
+<h4 id="i-have-a-weird-exception-when-using-observable-in-a-react-component"><a name="i-have-a-weird-exception-when-using-observable-in-a-react-component" class="plugin-anchor" href="#i-have-a-weird-exception-when-using-observable-in-a-react-component"><span class="fa fa-link"></span></a>I have a weird exception when using <code>@observable</code> in a React component.</h4>
 <p>The following exception: <code>Uncaught TypeError: Cannot assign to read only property &apos;__mobxLazyInitializers&apos; of object</code> occurs when using a <code>react-hot-loader</code> that does not support decorators.
 Either use <code>extendObservable</code> in <code>componentWillMount</code> instead of <code>@observable</code>, or upgrade to <code>react-hot-loader</code> <code>&quot;^3.0.0-beta.2&quot;</code> or higher.</p>
-<h4 id="the-display-name-of-react-components-is-not-set">The display name of react components is not set</h4>
+<h4 id="the-display-name-of-react-components-is-not-set"><a name="the-display-name-of-react-components-is-not-set" class="plugin-anchor" href="#the-display-name-of-react-components-is-not-set"><span class="fa fa-link"></span></a>The display name of react components is not set</h4>
 <p>If you use <code>export const MyComponent = observer((props =&gt; &lt;div&gt;hi&lt;/div&gt;))</code>, no display name will be visible in the devtools.
 The following approaches can be used to fix this:</p>
 <pre><code class="lang-javascript"><span class="hljs-comment">// 1 (set displayName explicitly)</span>
@@ -1018,10 +1022,10 @@ const _MyComponent = observer((props =&gt; <span class="hljs-tag">&lt;<span clas
 <span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> observer(MyComponent)
 </code></pre>
 <p>See also: <a href="http://mobxjs.github.io/mobx/best/stateless-HMR.html" target="_blank">http://mobxjs.github.io/mobx/best/stateless-HMR.html</a> or <a href="https://github.com/mobxjs/mobx/issues/141#issuecomment-228457886" target="_blank">#141</a>.</p>
-<h4 id="the-proptype-of-an-observable-array-is-object">The propType of an observable array is object</h4>
+<h4 id="the-proptype-of-an-observable-array-is-object"><a name="the-proptype-of-an-observable-array-is-object" class="plugin-anchor" href="#the-proptype-of-an-observable-array-is-object"><span class="fa fa-link"></span></a>The propType of an observable array is object</h4>
 <p>Observable arrays are actually objects, so they comply to <code>propTypes.object</code> instead of <code>array</code>.
 <code>mobx-react</code> provides its explicit <code>PropTypes</code> for observable data structures.</p>
-<h4 id="rendering-listviews-in-react-native">Rendering ListViews in React Native</h4>
+<h4 id="rendering-listviews-in-react-native"><a name="rendering-listviews-in-react-native" class="plugin-anchor" href="#rendering-listviews-in-react-native"><span class="fa fa-link"></span></a>Rendering ListViews in React Native</h4>
 <p><code>ListView.DataSource</code> in React Native expects real arrays. Observable arrays are actually objects, make sure to <code>.slice()</code> them first before passing to list views. Furthermore, <code>ListView.DataSource</code> itself can be moved to the store and have it automatically updated with a <code>@computed</code>, this step can also be done on the component level.</p>
 <pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ListStore</span> </span>{
   @observable list = [
@@ -1052,9 +1056,9 @@ const _MyComponent = observer((props =&gt; <span class="hljs-tag">&lt;<span clas
 }
 </code></pre>
 <p>For more info see <a href="https://github.com/mobxjs/mobx/issues/476" target="_blank">#476</a></p>
-<h4 id="declaring-proptypes-might-cause-unnecessary-renders-in-dev-mode">Declaring propTypes might cause unnecessary renders in dev mode</h4>
+<h4 id="declaring-proptypes-might-cause-unnecessary-renders-in-dev-mode"><a name="declaring-proptypes-might-cause-unnecessary-renders-in-dev-mode" class="plugin-anchor" href="#declaring-proptypes-might-cause-unnecessary-renders-in-dev-mode"><span class="fa fa-link"></span></a>Declaring propTypes might cause unnecessary renders in dev mode</h4>
 <p>See: <a href="https://github.com/mobxjs/mobx-react/issues/56" target="_blank">https://github.com/mobxjs/mobx-react/issues/56</a></p>
-<h4 id="-observable-properties-initialize-lazily-when-using-babel"><code>@observable</code> properties initialize lazily when using Babel</h4>
+<h4 id="-observable-properties-initialize-lazily-when-using-babel"><a name="-observable-properties-initialize-lazily-when-using-babel" class="plugin-anchor" href="#-observable-properties-initialize-lazily-when-using-babel"><span class="fa fa-link"></span></a><code>@observable</code> properties initialize lazily when using Babel</h4>
 <p>This issue only occurs when transpiling with Babel and not with Typescript (in which decorator support is more mature).
 Observable properties will not be instantiated upon an instance until the first read / write to a property (at that point they all will be initialized).
 This results in the following subtle bug:</p>
@@ -1075,7 +1079,7 @@ todo.hasOwnProperty(<span class="hljs-string">&quot;done&quot;</span>) <span cla
 </code></pre>
 <p>In practice this is rarely an issue, only when using generic methods like <code>Object.assign(target, todo)</code> or <code>assert.deepEquals</code> <em>before</em> reading or writing any property of the object.
 If you want to make sure that this issue doesn&apos;t occur, just initialize the fields in the constructor instead of at the field declaration or use <code>extendObservable</code> to create the observable properties.</p>
-
+</body></html>
                     
                     </section>
                 

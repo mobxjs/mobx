@@ -25,6 +25,10 @@
         
     
         
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-anchors/plugin.css">
+        
+    
+        
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
@@ -44,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="8.5" data-basepath=".." data-revision="Mon Nov 20 2017 11:17:11 GMT+0100 (CET)">
+    <div class="book" data-level="8.5" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -882,7 +886,7 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/extend-observable.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="extendobservable">extendObservable</h1>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/extend-observable.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="extendobservable"><a name="extendobservable" class="plugin-anchor" href="#extendobservable"><span class="fa fa-link"></span></a>extendObservable</h1>
 <p>Quite similar to <code>Object.assign</code>, <code>extendObservable</code> takes two or more arguments, a <code>target</code> object and one or more <code>properties</code> maps.
 It adds all key-value pairs from the properties to the <code>target</code> as observable properties and returns the <code>target</code> object.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> Person = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">firstName, lastName</span>) </span>{
@@ -903,7 +907,7 @@ extendObservable(matthew, {
 <p>N.b:  <code>observable.object(object)</code> is actually an alias for <code>extendObservable({}, object)</code>.</p>
 <p>Note that the property maps are not always copied literally onto the target, but they are considered property descriptor.
 Most values are copied as-is, but values wrapped in a modifier as treated specially. And so are properties that have a getter.</p>
-<h2 id="modifiers">Modifiers</h2>
+<h2 id="modifiers"><a name="modifiers" class="plugin-anchor" href="#modifiers"><span class="fa fa-link"></span></a>Modifiers</h2>
 <p><a href="modifiers.html">Modifiers</a> can be used to define special behavior for certain properties.
 For example <code>observable.ref</code> creates an observable reference which doesn&apos;t automatically convert its values into observables, and <code>computed</code> introduces a derived property:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> Person = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">firstName, lastName</span>) </span>{
@@ -918,7 +922,7 @@ For example <code>observable.ref</code> creates an observable reference which do
 }
 </code></pre>
 <p>An overview of all available modifiers can be found in the <a href="modifiers.html">modifiers</a> section.</p>
-<h2 id="computed-properties">Computed properties</h2>
+<h2 id="computed-properties"><a name="computed-properties" class="plugin-anchor" href="#computed-properties"><span class="fa fa-link"></span></a>Computed properties</h2>
 <p>Computed properties can also be written by using a <em>getter</em> function. Optionally accompanied with a setter:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> Person = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">firstName, lastName</span>) </span>{
     <span class="hljs-comment">// initialize observable properties on a new instance</span>
@@ -937,11 +941,11 @@ For example <code>observable.ref</code> creates an observable reference which do
 }
 </code></pre>
 <p><em>Note: getter / setter is valid ES5 syntax and doesn&apos;t require a transpiler!</em></p>
-<h2 id="-extendshallowobservable"><code>extendShallowObservable</code></h2>
+<h2 id="-extendshallowobservable"><a name="-extendshallowobservable" class="plugin-anchor" href="#-extendshallowobservable"><span class="fa fa-link"></span></a><code>extendShallowObservable</code></h2>
 <p><code>extendShallowObservable</code> is like <code>extendObservable</code>, except that by default the properties will <em>not</em> automatically convert their values into observables.
 So it is similar to calling <code>extendObservable</code> with <code>observable.ref</code> modifier for each property.
 Note that <code>observable.deep</code> can be used to get the automatic conversion back for a specific property.</p>
-
+</body></html>
                     
                     </section>
                 

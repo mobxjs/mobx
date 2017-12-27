@@ -25,6 +25,10 @@
         
     
         
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-anchors/plugin.css">
+        
+    
+        
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
@@ -44,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="3.3" data-basepath=".." data-revision="Mon Nov 20 2017 11:17:11 GMT+0100 (CET)">
+    <div class="book" data-level="3.3" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -882,8 +886,8 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/map.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="observable-maps">Observable Maps</h1>
-<h2 id="-observable-map-values"><code>observable.map(values)</code></h2>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/map.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="observable-maps"><a name="observable-maps" class="plugin-anchor" href="#observable-maps"><span class="fa fa-link"></span></a>Observable Maps</h1>
+<h2 id="-observable-map-values"><a name="-observable-map-values" class="plugin-anchor" href="#-observable-map-values"><span class="fa fa-link"></span></a><code>observable.map(values)</code></h2>
 <p><code>observable.map(values?)</code> creates a dynamic keyed observable map.
 Observable maps are very useful if you don&apos;t want to react just to the change of a specific entry, but also to the addition or removal of entries.
 Optionally takes an object, entries array or string keyed <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" target="_blank">ES6 map</a> with initial values.
@@ -912,12 +916,12 @@ Unlike ES6 maps, only strings are accepted as keys.</p>
 <li><code>merge(values)</code>. Copies all entries from the provided object into this map. <code>values</code> can be a plain object, array of entries or string-keyed ES6 Map.</li>
 <li><code>replace(values)</code>. Replaces the entire contents of this map with the provided values. Short hand for <code>.clear().merge(values)</code></li>
 </ul>
-<h2 id="-observable-shallowmap-values"><code>observable.shallowMap(values)</code></h2>
+<h2 id="-observable-shallowmap-values"><a name="-observable-shallowmap-values" class="plugin-anchor" href="#-observable-shallowmap-values"><span class="fa fa-link"></span></a><code>observable.shallowMap(values)</code></h2>
 <p>Any values assigned to an observable map will be default passed through <a href="observable.html"><code>observable</code></a> to make them observable.
 Create a shallow map to disable this behavior and store are values as-is. See also <a href="modifiers.html">modifiers</a> for more details on this mechanism.</p>
-<h2 id="name-argument">Name argument</h2>
+<h2 id="name-argument"><a name="name-argument" class="plugin-anchor" href="#name-argument"><span class="fa fa-link"></span></a>Name argument</h2>
 <p>Both <code>observable.map</code> and <code>observable.shallowMap</code> take a second parameter which is used as debug name in for example <code>spy</code> or the MobX dev tools.</p>
-
+</body></html>
                     
                     </section>
                 

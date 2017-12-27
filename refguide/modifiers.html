@@ -25,6 +25,10 @@
         
     
         
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-anchors/plugin.css">
+        
+    
+        
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
@@ -44,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="8.7" data-basepath=".." data-revision="Mon Nov 20 2017 11:17:11 GMT+0100 (CET)">
+    <div class="book" data-level="8.7" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -882,7 +886,7 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/modifiers.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="modifiers-for-observable">Modifiers for observable</h1>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/modifiers.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="modifiers-for-observable"><a name="modifiers-for-observable" class="plugin-anchor" href="#modifiers-for-observable"><span class="fa fa-link"></span></a>Modifiers for observable</h1>
 <p>Modifiers can be used decorator or in combination with <code>extendObservable</code> and <code>observable.object</code> to change the autoconversion rules for specific properties.</p>
 <ul>
 <li><code>observable.deep</code>: This is the default modifier, used by any observable. It converts any assigned, non-primitive value into an observable value if it isn&apos;t one yet.</li>
@@ -891,13 +895,13 @@
 <li><code>computed</code>: Creates a derived property, see <a href="computed-decorator.html"><code>computed</code></a></li>
 <li><code>action</code>: Creates an action, see <a href="action.html"><code>action</code></a></li>
 </ul>
-<h2 id="deep-observability">Deep observability</h2>
+<h2 id="deep-observability"><a name="deep-observability" class="plugin-anchor" href="#deep-observability"><span class="fa fa-link"></span></a>Deep observability</h2>
 <p>When MobX creates an observable object, (using <code>observable</code>, <code>observable.object</code>, or <code>extendObservable</code>), it introduces observable properties which
 by default use the <code>deep</code> modifier. The deep modifier basically recursively calls <code>observable(newValue)</code> for any newly assigned value.
 Which in turns uses the <code>deep</code> modifier... you get the idea.</p>
 <p>This is a very convenient default. Without any additional effort all values assigned to an observable will themselves be made observable too (unless they already are), so no additional
 effort is required to make objects deep observable.</p>
-<h2 id="reference-observability">Reference observability</h2>
+<h2 id="reference-observability"><a name="reference-observability" class="plugin-anchor" href="#reference-observability"><span class="fa fa-link"></span></a>Reference observability</h2>
 <p>In some cases however, objects don&apos;t need to be converted into observables.
 Typical cases are immutable objects, or objects that are not managed by you but by an external library.
 Examples are JSX elements, DOM elements, native objects like History, window or etc.
@@ -920,7 +924,7 @@ For example:</p>
 }
 </code></pre>
 <p>Note that an observable, boxed reference can be created by using <code>const box = observable.shallowBox(value)</code></p>
-<h2 id="shallow-observability">Shallow observability</h2>
+<h2 id="shallow-observability"><a name="shallow-observability" class="plugin-anchor" href="#shallow-observability"><span class="fa fa-link"></span></a>Shallow observability</h2>
 <p>The <code>observable.shallow</code> modifier applies observability &apos;one-level-deep&apos;. You need those if you want to create a <em>collection</em> of observable references.
 If a new collection is assigned to a property with this modifier, it will be made observable, but its values will be left as is, so unlike <code>deep</code>, it won&apos;t recurse.
 Example:</p>
@@ -930,7 +934,7 @@ Example:</p>
 </code></pre>
 <p>In the above example an assignment of a plain array with authors to the <code>authors</code> will update the authors with an observable array, containing the original, non-observable authors.</p>
 <p>Note that the following methods can be used to create shallow collections manually: <code>observable.shallowObject</code>, <code>observable.shallowArray</code>, <code>observable.shallowMap</code> and <code>extendShallowObservable</code>.</p>
-<h2 id="action-computed">Action &amp; Computed</h2>
+<h2 id="action-computed"><a name="action-computed" class="plugin-anchor" href="#action-computed"><span class="fa fa-link"></span></a>Action &amp; Computed</h2>
 <p><code>action</code>, <code>action.bound</code>, <code>computed</code> and <code>computed.struct</code> can be used as modifiers as well.
 See <a href="computed-decorator.html"><code>computed</code></a> respectively <a href="action.html"><code>action</code></a>.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> taskStore = observable({
@@ -943,10 +947,10 @@ See <a href="computed-decorator.html"><code>computed</code></a> respectively <a 
     })
 })
 </code></pre>
-<h2 id="asstructure">asStructure</h2>
+<h2 id="asstructure"><a name="asstructure" class="plugin-anchor" href="#asstructure"><span class="fa fa-link"></span></a>asStructure</h2>
 <p>MobX 2 had the <code>asStructure</code> modifier, which in practice was rarely used, or only used in cases where it is used <code>reference</code> / <code>shallow</code> is often a better fit (when using immutable data for example).
 Structural comparision for computed properties and reactions is still possible.</p>
-<h2 id="effect-of-modifiers">Effect of modifiers</h2>
+<h2 id="effect-of-modifiers"><a name="effect-of-modifiers" class="plugin-anchor" href="#effect-of-modifiers"><span class="fa fa-link"></span></a>Effect of modifiers</h2>
 <pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
     @observable<span class="hljs-comment">/*.deep*/</span> collection1 = []
 
@@ -971,7 +975,7 @@ store.collection3 = todos;
 <li><code>collection3 === todos</code> is false; collection 3 is a new observable array</li>
 <li><code>collection3[0] === todos[0]</code> is true; the value of <code>collection3</code> was only shallowly turned into an observable, but the contents of the array is left as is.</li>
 </ol>
-
+</body></html>
                     
                     </section>
                 

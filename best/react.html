@@ -25,6 +25,10 @@
         
     
         
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-anchors/plugin.css">
+        
+    
+        
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
@@ -44,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="4" data-basepath=".." data-revision="Mon Nov 20 2017 11:17:11 GMT+0100 (CET)">
+    <div class="book" data-level="4" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -882,7 +886,7 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/react.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="what-does-mobx-react-to">What does MobX react to?</h1>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/react.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="what-does-mobx-react-to"><a name="what-does-mobx-react-to" class="plugin-anchor" href="#what-does-mobx-react-to"><span class="fa fa-link"></span></a>What does MobX react to?</h1>
 <p>MobX usually reacts to exactly the things you expect it to.
 Which means that in 90% of your use cases mobx &quot;just works&quot;.
 However, at some point you will encounter a case where it might not do what you expected.
@@ -900,7 +904,7 @@ At that point it is invaluable to understand how MobX determines what to react t
 <li>Values that are obtained from observables, but outside a tracked function</li>
 <li>Observables that are read in an asynchronously invoked code block</li>
 </ul>
-<h2 id="mobx-tracks-property-access-not-values">MobX tracks property access, not values</h2>
+<h2 id="mobx-tracks-property-access-not-values"><a name="mobx-tracks-property-access-not-values" class="plugin-anchor" href="#mobx-tracks-property-access-not-values"><span class="fa fa-link"></span></a>MobX tracks property access, not values</h2>
 <p>To elaborate on the above rules with an example, suppose that you have the following observable data structure (<code>observable</code> applies itself recursively by default, so all fields in this example are observable):</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">let</span> message = observable({
     title: <span class="hljs-string">&quot;Foo&quot;</span>,
@@ -915,9 +919,9 @@ At that point it is invaluable to understand how MobX determines what to react t
 <p>In memory that looks as follows. The green boxes indicate <em>observable</em> properties. Note that the <em>values</em> themselves are not observable!</p>
 <p><img src="../images/observed-refs.png" alt="MobX reacts to changing references"></p>
 <p>Now what MobX basically does is recording which <em>arrows</em> you use in your function. After that, it will re-run whenever one of this <em>arrows</em> changes; when they start to refer to something else.</p>
-<h2 id="examples">Examples</h2>
+<h2 id="examples"><a name="examples" class="plugin-anchor" href="#examples"><span class="fa fa-link"></span></a>Examples</h2>
 <p>Lets show that with a bunch of examples (based on the <code>message</code> variable defined above):</p>
-<h4 id="correct-dereference-inside-the-tracked-function">Correct: dereference inside the tracked function</h4>
+<h4 id="correct-dereference-inside-the-tracked-function"><a name="correct-dereference-inside-the-tracked-function" class="plugin-anchor" href="#correct-dereference-inside-the-tracked-function"><span class="fa fa-link"></span></a>Correct: dereference inside the tracked function</h4>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(message.title)
 })
@@ -936,7 +940,7 @@ WhyRun? reaction <span class="hljs-string">&apos;Autorun@1&apos;</span>:
  * This reaction will re-run <span class="hljs-keyword">if</span> any <span class="hljs-keyword">of</span> the following observables changes:
     ObservableObject@<span class="hljs-number">1.</span>title
 </code></pre>
-<h4 id="incorrect-changing-a-non-observable-reference">Incorrect: changing a non-observable reference</h4>
+<h4 id="incorrect-changing-a-non-observable-reference"><a name="incorrect-changing-a-non-observable-reference" class="plugin-anchor" href="#incorrect-changing-a-non-observable-reference"><span class="fa fa-link"></span></a>Incorrect: changing a non-observable reference</h4>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(message.title)
 })
@@ -944,7 +948,7 @@ message = observable({ title: <span class="hljs-string">&quot;Bar&quot;</span> }
 </code></pre>
 <p>This will <strong>not</strong> react. <code>message</code> was changed, but <code>message</code> is not an observable, just a variable which <em>refers to</em> an observable,
 but the variable (reference) itself is not observable.</p>
-<h4 id="incorrect-dereference-outside-a-tracked-function">Incorrect: dereference outside a tracked function</h4>
+<h4 id="incorrect-dereference-outside-a-tracked-function"><a name="incorrect-dereference-outside-a-tracked-function" class="plugin-anchor" href="#incorrect-dereference-outside-a-tracked-function"><span class="fa fa-link"></span></a>Incorrect: dereference outside a tracked function</h4>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> title = message.title;
 autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(title)
@@ -953,7 +957,7 @@ message.title = <span class="hljs-string">&quot;Bar&quot;</span>
 </code></pre>
 <p>This will <strong>not</strong> react. <code>message.title</code> was dereferenced outside the <code>autorun</code>, and just contains the value of <code>message.title</code> at the  moment of dereferencing (the string <code>&quot;Foo&quot;</code>).
 <code>title</code> is not an observable so <code>autorun</code> will never react.</p>
-<h4 id="correct-dereference-inside-the-tracked-function">Correct: dereference inside the tracked function</h4>
+<h4 id="correct-dereference-inside-the-tracked-function"><a name="correct-dereference-inside-the-tracked-function" class="plugin-anchor" href="#correct-dereference-inside-the-tracked-function"><span class="fa fa-link"></span></a>Correct: dereference inside the tracked function</h4>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(message.author.name)
 })
@@ -961,7 +965,7 @@ message.author.name = <span class="hljs-string">&quot;Sara&quot;</span>;
 message.author = { name: <span class="hljs-string">&quot;John&quot;</span> };
 </code></pre>
 <p>This will react to both changes. Both <code>author</code> and <code>author.name</code> are dotted into, allowing MobX to track these references.</p>
-<h4 id="incorrect-store-a-local-reference-to-an-observable-object-without-tracking">Incorrect: store a local reference to an observable object without tracking</h4>
+<h4 id="incorrect-store-a-local-reference-to-an-observable-object-without-tracking"><a name="incorrect-store-a-local-reference-to-an-observable-object-without-tracking" class="plugin-anchor" href="#incorrect-store-a-local-reference-to-an-observable-object-without-tracking"><span class="fa fa-link"></span></a>Incorrect: store a local reference to an observable object without tracking</h4>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> author = message.author;
 autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(author.name)
@@ -971,7 +975,7 @@ message.author = { name: <span class="hljs-string">&quot;John&quot;</span> };
 </code></pre>
 <p>The first change will be picked up, <code>message.author</code> and <code>author</code> are the same object, and the <code>.name</code> property is dereferenced in the autorun.
 However the second change will <strong>not</strong> be picked up, the <code>message.author</code> relation is not tracked by the <code>autorun</code>. Autorun is still using the &quot;old&quot; <code>author</code>.</p>
-<h4 id="common-pitfal-console-log">Common pitfal: console.log</h4>
+<h4 id="common-pitfal-console-log"><a name="common-pitfal-console-log" class="plugin-anchor" href="#common-pitfal-console-log"><span class="fa fa-link"></span></a>Common pitfal: console.log</h4>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> message = observable({ title: <span class="hljs-string">&quot;hello&quot;</span> })
 
 autorun(() =&gt; {
@@ -1001,7 +1005,7 @@ autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(message)) <span class="hljs-comment">// also reads the entire structure</span>
 })
 </code></pre>
-<h4 id="correct-access-array-properties-in-tracked-function">Correct: access array properties in tracked function</h4>
+<h4 id="correct-access-array-properties-in-tracked-function"><a name="correct-access-array-properties-in-tracked-function" class="plugin-anchor" href="#correct-access-array-properties-in-tracked-function"><span class="fa fa-link"></span></a>Correct: access array properties in tracked function</h4>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(message.likes.length);
 })
@@ -1010,7 +1014,7 @@ message.likes.push(<span class="hljs-string">&quot;Jennifer&quot;</span>);
 <p>This will react as expected. <code>.length</code> counts towards a property.
 Note that this will react to <em>any</em> change in the array.
 Arrays are not tracked per index / property (like observable objects and maps) but as a whole.</p>
-<h4 id="incorrect-access-out-of-bounds-indices-in-tracked-function">Incorrect: access out-of-bounds indices in tracked function</h4>
+<h4 id="incorrect-access-out-of-bounds-indices-in-tracked-function"><a name="incorrect-access-out-of-bounds-indices-in-tracked-function" class="plugin-anchor" href="#incorrect-access-out-of-bounds-indices-in-tracked-function"><span class="fa fa-link"></span></a>Incorrect: access out-of-bounds indices in tracked function</h4>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(message.likes[<span class="hljs-number">0</span>]);
 })
@@ -1019,7 +1023,7 @@ message.likes.push(<span class="hljs-string">&quot;Jennifer&quot;</span>);
 <p>This will react with the above sample data, array indexers count as property access. But <strong>only</strong> if the provided <code>index &lt; length</code>.
 MobX will not track not-yet-existing indices or object properties (except when using maps).
 So always guard your array index based access with a <code>.length</code> check.</p>
-<h4 id="correct-access-array-functions-in-tracked-function">Correct: access array functions in tracked function</h4>
+<h4 id="correct-access-array-functions-in-tracked-function"><a name="correct-access-array-functions-in-tracked-function" class="plugin-anchor" href="#correct-access-array-functions-in-tracked-function"><span class="fa fa-link"></span></a>Correct: access array functions in tracked function</h4>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(message.likes.join(<span class="hljs-string">&quot;, &quot;</span>));
 })
@@ -1033,7 +1037,7 @@ message.likes.push(<span class="hljs-string">&quot;Jennifer&quot;</span>);
 message.likes[<span class="hljs-number">2</span>] = <span class="hljs-string">&quot;Jennifer&quot;</span>;
 </code></pre>
 <p>This will react as expected. All array index assignments are detected, but only if <code>index &lt;= length</code>.</p>
-<h4 id="incorrect-use-an-observable-but-without-accessing-any-of-its-properties">Incorrect: &quot;use&quot; an observable but without accessing any of its properties</h4>
+<h4 id="incorrect-use-an-observable-but-without-accessing-any-of-its-properties"><a name="incorrect-use-an-observable-but-without-accessing-any-of-its-properties" class="plugin-anchor" href="#incorrect-use-an-observable-but-without-accessing-any-of-its-properties"><span class="fa fa-link"></span></a>Incorrect: &quot;use&quot; an observable but without accessing any of its properties</h4>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     message.likes;
 })
@@ -1041,14 +1045,14 @@ message.likes.push(<span class="hljs-string">&quot;Jennifer&quot;</span>);
 </code></pre>
 <p>This will <strong>not</strong> react. Simply because the <code>likes</code> array itself is not being used by the <code>autorun</code>, only the reference to the array.
 So in contrast, <code>messages.likes = [&quot;Jennifer&quot;]</code> would be picked up; that statement does not modify the array, but the <code>likes</code> property itself.</p>
-<h4 id="incorrect-using-non-observable-object-properties">Incorrect: using non-observable object properties</h4>
+<h4 id="incorrect-using-non-observable-object-properties"><a name="incorrect-using-non-observable-object-properties" class="plugin-anchor" href="#incorrect-using-non-observable-object-properties"><span class="fa fa-link"></span></a>Incorrect: using non-observable object properties</h4>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(message.postDate)
 })
 message.postDate = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>()
 </code></pre>
 <p>This will <strong>not</strong> react. MobX can only track observable properties.</p>
-<h4 id="incorrect-using-not-yet-existing-observable-object-properties">Incorrect: using not yet existing observable object properties</h4>
+<h4 id="incorrect-using-not-yet-existing-observable-object-properties"><a name="incorrect-using-not-yet-existing-observable-object-properties" class="plugin-anchor" href="#incorrect-using-not-yet-existing-observable-object-properties"><span class="fa fa-link"></span></a>Incorrect: using not yet existing observable object properties</h4>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(message.postDate)
 })
@@ -1058,7 +1062,7 @@ extendObservable(message, {
 </code></pre>
 <p>This will <strong>not</strong> react. MobX will not react to observable properties that did not exist when tracking started.
 If the two statements are swapped, or if any other observable causes the <code>autorun</code> to re-run, the <code>autorun</code> will start tracking the <code>postDate</code> as well.</p>
-<h4 id="correct-using-not-yet-existing-map-entries">Correct: using not yet existing map entries</h4>
+<h4 id="correct-using-not-yet-existing-map-entries"><a name="correct-using-not-yet-existing-map-entries" class="plugin-anchor" href="#correct-using-not-yet-existing-map-entries"><span class="fa fa-link"></span></a>Correct: using not yet existing map entries</h4>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> twitterUrls = observable.map({
     <span class="hljs-string">&quot;John&quot;</span>: <span class="hljs-string">&quot;twitter.com/johnny&quot;</span>
 })
@@ -1072,7 +1076,7 @@ twitterUrls.set(<span class="hljs-string">&quot;Sara&quot;</span>, <span class="
 Note that this will initially print <code>undefined</code>.
 You can check for the existence of an entry first by using <code>twitterUrls.has(&quot;Sara&quot;)</code>.
 So for dynamically keyed collections, always use observable maps.</p>
-<h2 id="mobx-only-tracks-synchronously-accessed-data">MobX only tracks synchronously accessed data</h2>
+<h2 id="mobx-only-tracks-synchronously-accessed-data"><a name="mobx-only-tracks-synchronously-accessed-data" class="plugin-anchor" href="#mobx-only-tracks-synchronously-accessed-data"><span class="fa fa-link"></span></a>MobX only tracks synchronously accessed data</h2>
 <pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">upperCaseAuthorName</span>(<span class="hljs-params">author</span>) </span>{
     <span class="hljs-keyword">const</span> baseName = author.name;
     <span class="hljs-keyword">return</span> baseName.toUpperCase();
@@ -1096,7 +1100,7 @@ message.likes.push(<span class="hljs-string">&quot;Jennifer&quot;</span>);
 </code></pre>
 <p>This will <strong>not</strong> react, during the execution of the <code>autorun</code> no observables where accessed, only during the <code>setTimeout</code>.
 In general this is quite obvious and rarely causes issues.</p>
-<h2 id="mobx-only-tracks-data-accessed-for-observer-components-if-they-are-directly-accessed-by-render">MobX only tracks data accessed for <code>observer</code> components if they are directly accessed by <code>render</code></h2>
+<h2 id="mobx-only-tracks-data-accessed-for-observer-components-if-they-are-directly-accessed-by-render"><a name="mobx-only-tracks-data-accessed-for-observer-components-if-they-are-directly-accessed-by-render" class="plugin-anchor" href="#mobx-only-tracks-data-accessed-for-observer-components-if-they-are-directly-accessed-by-render"><span class="fa fa-link"></span></a>MobX only tracks data accessed for <code>observer</code> components if they are directly accessed by <code>render</code></h2>
 <p>A common mistake made with <code>observer</code> is that it doesnt track data that syntactically seems parent of the <code>observer</code> component,
 but in practice is actually rendered out by a different component. This often happens when render callbacks of components are passed in first class to another component.</p>
 <p>Take for example the following contrived example:</p>
@@ -1135,7 +1139,7 @@ message.title = &quot;Bar&quot;
 
 message.title = &quot;Bar&quot;
 </span></code></pre>
-<h2 id="avoid-caching-observables-in-local-fields">Avoid caching observables in local fields</h2>
+<h2 id="avoid-caching-observables-in-local-fields"><a name="avoid-caching-observables-in-local-fields" class="plugin-anchor" href="#avoid-caching-observables-in-local-fields"><span class="fa fa-link"></span></a>Avoid caching observables in local fields</h2>
 <p>A common mistake is to store local variables that dereference observables, and then expect components to react. For example:</p>
 <pre><code class="lang-javascript">@observer <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyComponent</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">component</span> </span>{
     author;
@@ -1159,7 +1163,7 @@ This can simply be solved by doing the dereferencing inside <code>render()</code
     }
 <span class="hljs-comment">// ...</span>
 </code></pre>
-<h2 id="how-multiple-components-will-render">How multiple components will render</h2>
+<h2 id="how-multiple-components-will-render"><a name="how-multiple-components-will-render" class="plugin-anchor" href="#how-multiple-components-will-render"><span class="fa fa-link"></span></a>How multiple components will render</h2>
 <p>Suppose that the following components are used to render our above <code>message</code> object.</p>
 <pre><code class="lang-javascript">const Message = observer(({ message }) =&gt;
     &lt;div&gt;
@@ -1212,11 +1216,11 @@ const Likes = observer(({ likes }) =&gt;
 <li>* If the <code>Author</code> component was invoked like: <code>&lt;Author author={ message.author.name} /&gt;</code>. Then <code>Message</code> would be the dereferencing component and react to changes to <code>message.author.name</code>. Nonetheless <code>&lt;Author&gt;</code> would rerender as well, because it receives a new value. So performance wise it is best to dereference as late as possible.</li>
 <li>** If likes where objects instead of strings, and if they were rendered by their own <code>Like</code> component, the <code>Likes</code> component would not rerender for changes happening inside a specific like.</li>
 </ol>
-<h2 id="tl-dr">TL;DR</h2>
+<h2 id="tl-dr"><a name="tl-dr" class="plugin-anchor" href="#tl-dr"><span class="fa fa-link"></span></a>TL;DR</h2>
 <blockquote>
 <p>MobX reacts to any an <em>existing</em> <strong>observable</strong> <em>property</em> that is read during the execution of a tracked function.</p>
 </blockquote>
-
+</body></html>
                     
                     </section>
                 

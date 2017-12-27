@@ -25,6 +25,10 @@
         
     
         
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-anchors/plugin.css">
+        
+    
+        
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
@@ -44,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="5" data-basepath=".." data-revision="Mon Nov 20 2017 11:17:11 GMT+0100 (CET)">
+    <div class="book" data-level="5" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -882,7 +886,7 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/decorators.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="how-to-not-use-decorators">How to (not) use decorators</h1>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/decorators.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="how-to-not-use-decorators"><a name="how-to-not-use-decorators" class="plugin-anchor" href="#how-to-not-use-decorators"><span class="fa fa-link"></span></a>How to (not) use decorators</h1>
 <p>Using ES.next decorators in MobX is optional. This section explains how to use them, or how to avoid them.</p>
 <p>Advantages of using decorators:</p>
 <ul>
@@ -894,7 +898,7 @@
 <li>Stage-2 ES.next feature</li>
 <li>Requires a little setup and transpilation, only supported with Babel / Typescript transpilation so far</li>
 </ul>
-<h2 id="enabling-decorators">Enabling decorators</h2>
+<h2 id="enabling-decorators"><a name="enabling-decorators" class="plugin-anchor" href="#enabling-decorators"><span class="fa fa-link"></span></a>Enabling decorators</h2>
 <p>If you want to use decorators follow the following steps.</p>
 <p><strong>TypeScript</strong></p>
 <p>Enable the compiler option <code>experimentalDecorators</code> in <code>tsconfig.json</code> or pass it as flag <code>--experimentalDecorators</code> to the compiler. You must target <code>es5</code>+ (es5, es6, ...) with <code>target</code> option or by <code>--target</code> flag.</p>
@@ -913,14 +917,14 @@ Having issues with the babel setup? Check this <a href="https://github.com/mobxj
 <pre><code>{
   &quot;presets&quot;: [&quot;stage-2&quot;, &quot;react-native-stage-0/decorator-support&quot;]
 }
-</code></pre><h2 id="limitations-on-decorators">Limitations on decorators</h2>
+</code></pre><h2 id="limitations-on-decorators"><a name="limitations-on-decorators" class="plugin-anchor" href="#limitations-on-decorators"><span class="fa fa-link"></span></a>Limitations on decorators</h2>
 <ul>
 <li>typescript target must be es5 minimum</li>
 <li>reflect-metadata <a href="https://github.com/mobxjs/mobx/issues/534" target="_blank">https://github.com/mobxjs/mobx/issues/534</a></li>
 <li>decorators are not supported out of the box in <code>create-react-app</code>. To fix this, you can either eject, or use <a href="https://www.npmjs.com/package/custom-react-scripts" target="_blank">custom-react-scripts</a> for <code>create-react-app</code> (<a href="https://medium.com/@kitze/configure-create-react-app-without-ejecting-d8450e96196a#.n6xx12p5c" target="_blank">blog</a>)</li>
 <li><del>decorators are currently not yet support in Next.JS <a href="https://github.com/zeit/next.js/issues/26" target="_blank">issue</a></del> Decorators are now supported in Next.JS. Example: <a href="https://github.com/zeit/next.js/tree/master/examples/with-mobx" target="_blank">https://github.com/zeit/next.js/tree/master/examples/with-mobx</a></li>
 </ul>
-<h2 id="creating-observable-properties-without-decorators">Creating observable properties without decorators</h2>
+<h2 id="creating-observable-properties-without-decorators"><a name="creating-observable-properties-without-decorators" class="plugin-anchor" href="#creating-observable-properties-without-decorators"><span class="fa fa-link"></span></a>Creating observable properties without decorators</h2>
 <p>Without decorators <code>extendObservable</code> can be used to introduce observable properties on an object.
 Typically this is done inside a constructor function.
 The following example introduces observable properties, a computed property and an action in a constructor function / class:</p>
@@ -946,7 +950,7 @@ The following example introduces observable properties, a computed property and 
     }
 }
 </code></pre>
-<h2 id="creating-observable-properties-with-decorators">Creating observable properties with decorators</h2>
+<h2 id="creating-observable-properties-with-decorators"><a name="creating-observable-properties-with-decorators" class="plugin-anchor" href="#creating-observable-properties-with-decorators"><span class="fa fa-link"></span></a>Creating observable properties with decorators</h2>
 <p>Decorators combine very nicely with classes.
 When using decorators, observables, computed values and actions can be simply introduced by using the decorators:</p>
 <pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Timer</span> </span>{
@@ -962,7 +966,7 @@ When using decorators, observables, computed values and actions can be simply in
     }
 }
 </code></pre>
-<h2 id="creating-observer-components">Creating observer components</h2>
+<h2 id="creating-observer-components"><a name="creating-observer-components" class="plugin-anchor" href="#creating-observer-components"><span class="fa fa-link"></span></a>Creating observer components</h2>
 <p>The <code>observer</code> function / decorator from the mobx-package converts react components into observer components.
 The rule to remember here is that <code>@observer class ComponentName {}</code> is simply sugar for <code>const ComponentName = observer(class { })</code>.
 So all the following forms of creating observer components are valid:</p>
@@ -992,7 +996,7 @@ So all the following forms of creating observer components are valid:</p>
     <span class="hljs-comment">/* ... */</span>
 }
 </code></pre>
-
+</body></html>
                     
                     </section>
                 

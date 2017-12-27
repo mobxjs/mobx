@@ -25,6 +25,10 @@
         
     
         
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-anchors/plugin.css">
+        
+    
+        
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
@@ -44,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="7.2" data-basepath=".." data-revision="Mon Nov 20 2017 11:17:11 GMT+0100 (CET)">
+    <div class="book" data-level="7.2" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -882,17 +886,17 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/store.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="best-practices-for-building-large-scale-maintainable-projects">Best Practices for building large scale maintainable projects</h1>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/store.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="best-practices-for-building-large-scale-maintainable-projects"><a name="best-practices-for-building-large-scale-maintainable-projects" class="plugin-anchor" href="#best-practices-for-building-large-scale-maintainable-projects"><span class="fa fa-link"></span></a>Best Practices for building large scale maintainable projects</h1>
 <p>This section contains some best practices we discovered at Mendix while working with MobX.
 This section is opinionated and you are in no way forced to apply these practices.
 There are many ways of working with MobX and React, and this is just one of them.</p>
 <p>This section focuses on an unobtrusive way of working with MobX, which works well in existing code bases, or with classic MVC patterns. An alternative, more opinionated way of organizing stores is using <a href="https://github.com/mobxjs/mobx-state-tree" target="_blank">mobx-state-tree</a>, which ships with cool features as structurally shared snapshots, action middlewares, JSON patch support etc out of the box.</p>
-<h1 id="stores">Stores</h1>
+<h1 id="stores"><a name="stores" class="plugin-anchor" href="#stores"><span class="fa fa-link"></span></a>Stores</h1>
 <p>Let&apos;s start with <em>stores</em>.
 In the next sections we will discuss <em>actions</em> and React <em>components</em> as well.
 Stores can be found in any Flux architecture and can be compared a bit with controllers in the MVC pattern.
 The main responsibility of stores is to move <em>logic</em> and <em>state</em> out of your components into a standalone testable unit that can be used in both frontend and backend JavaScript.</p>
-<h2 id="stores-for-the-user-interface-state">Stores for the user interface state</h2>
+<h2 id="stores-for-the-user-interface-state"><a name="stores-for-the-user-interface-state" class="plugin-anchor" href="#stores-for-the-user-interface-state"><span class="fa fa-link"></span></a>Stores for the user interface state</h2>
 <p>Most applications benefit from having at least two stores.
 One for the <em>UI state</em> and one or more for the <em>domain state</em>.
 The advantage of separating those two is you can reuse and test <em>domain state</em> universally, and you might very well reuse it in other applications.
@@ -925,6 +929,7 @@ But after a while you discover that you need this information somewhere else in 
 Instead of pushing state in such a case upwards in the component tree, like you would do in plain React apps, you just move that state to the <em>ui-state-store</em>.</p>
 <p>For isomorphic applications you might also want to provide a stub implementation of this store with sane defaults so that all components render as expected.
 You might distribute the <em>ui-state-store</em> through your application by passing it as a property through your component tree or using <code>Provider</code> and <code>inject</code> from the <code>mobx-react</code> package.</p>
+<p>See <a href="https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/modifiers.md#asstructure" target="_blank">modifiers.asStructure for more</a></p>
 <p>Example of a store (using ES6 syntax):</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, computed, asStructure} <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;mobx&apos;</span>;
 <span class="hljs-keyword">import</span> jquery <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;jquery&apos;</span>;
@@ -933,7 +938,7 @@ You might distribute the <em>ui-state-store</em> through your application by pas
     @observable language = <span class="hljs-string">&quot;en_US&quot;</span>;
     @observable pendingRequestCount = <span class="hljs-number">0</span>;
 
-    <span class="hljs-comment">// asStructure makes sure observer won&apos;t be signaled only if the</span>
+    <span class="hljs-comment">// asStructure makes sure observer won&apos;t be signaled unless the</span>
     <span class="hljs-comment">// dimensions object changed in a deepEqual manner</span>
     @observable windowDimensions = asStructure({
         width: jquery(<span class="hljs-built_in">window</span>).width(),
@@ -951,7 +956,7 @@ You might distribute the <em>ui-state-store</em> through your application by pas
     }
 }
 </code></pre>
-<h2 id="domain-stores">Domain Stores</h2>
+<h2 id="domain-stores"><a name="domain-stores" class="plugin-anchor" href="#domain-stores"><span class="fa fa-link"></span></a>Domain Stores</h2>
 <p>Your application will contain one or multiple <em>domain</em> stores.
 These stores store the data your application is all about.
 Todo items, users, books, movies, orders, you name it.
@@ -974,7 +979,7 @@ This is fast, straightforward and convenient when debugging.</li>
 <li>To make sure your store is testable and can be run server-side, you probably will move doing actual websocket / http requests to a separate object so that you can abstract over your communication layer.</li>
 <li>There should be only one instance of a store.</li>
 </ul>
-<h3 id="domain-objects">Domain objects</h3>
+<h3 id="domain-objects"><a name="domain-objects" class="plugin-anchor" href="#domain-objects"><span class="fa fa-link"></span></a>Domain objects</h3>
 <p>Each domain object should be expressed using its own class (or constructor function).
 It is recommended to store your data in <em>denormalized</em> form.
 There is no need to treat your client-side application state as some kind of database.
@@ -995,7 +1000,7 @@ Especially in large applications this is important.</li>
 <li>Objects created using a constructor function can freely mix observable properties and functions, and non-observable properties and methods.</li>
 <li>They are easily recognizable and can strictly be type-checked.</li>
 </ul>
-<h3 id="example-domain-store">Example domain store</h3>
+<h3 id="example-domain-store"><a name="example-domain-store" class="plugin-anchor" href="#example-domain-store"><span class="fa fa-link"></span></a>Example domain store</h3>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, autorun} <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;mobx&apos;</span>;
 <span class="hljs-keyword">import</span> uuid <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;node-uuid&apos;</span>;
 
@@ -1139,7 +1144,7 @@ Especially in large applications this is important.</li>
     }
 }
 </code></pre>
-<h1 id="combining-multiple-stores">Combining multiple stores</h1>
+<h1 id="combining-multiple-stores"><a name="combining-multiple-stores" class="plugin-anchor" href="#combining-multiple-stores"><span class="fa fa-link"></span></a>Combining multiple stores</h1>
 <p>An often asked question is how to combine multiple stores without using singletons. How will they know about each other?</p>
 <p>An effective pattern is to create a <code>RootStore</code> that instantiates all stores, and share references. The advantage of this pattern is:</p>
 <ol>
@@ -1175,7 +1180,7 @@ Especially in large applications this is important.</li>
 }
 </code></pre>
 <p>When using React, this root store is typically inserted into the component tree by using <code>&lt;Provider rootStore={new RootStore()}&gt;&lt;App /&gt;&lt;/Provider&gt;</code></p>
-
+</body></html>
                     
                     </section>
                 

@@ -25,6 +25,10 @@
         
     
         
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-anchors/plugin.css">
+        
+    
+        
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
@@ -44,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="6.5" data-basepath=".." data-revision="Mon Nov 20 2017 11:17:11 GMT+0100 (CET)">
+    <div class="book" data-level="6.5" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -882,43 +886,43 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/faq/faq.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h2 id="faq">FAQ</h2>
-<h5 id="which-browsers-are-supported">Which browsers are supported?</h5>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/faq/faq.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h2 id="faq"><a name="faq" class="plugin-anchor" href="#faq"><span class="fa fa-link"></span></a>FAQ</h2>
+<h5 id="which-browsers-are-supported"><a name="which-browsers-are-supported" class="plugin-anchor" href="#which-browsers-are-supported"><span class="fa fa-link"></span></a>Which browsers are supported?</h5>
 <p>MobX runs on any ES5 environment. That means that Node.js, Rhino and all browsers except for IE8 are supported. See <a href="http://caniuse.com/#feat=es5" target="_blank">caniuse.com</a></p>
-<h5 id="can-mobx-be-combined-with-rxjs">Can MobX be combined with RxJS?</h5>
+<h5 id="can-mobx-be-combined-with-rxjs"><a name="can-mobx-be-combined-with-rxjs" class="plugin-anchor" href="#can-mobx-be-combined-with-rxjs"><span class="fa fa-link"></span></a>Can MobX be combined with RxJS?</h5>
 <p>Yes, you can use <a href="https://github.com/mobxjs/mobx-utils#tostream" target="_blank">toStream and fromStream from mobx-utils</a> to use RXJS and other TC 39 compatible observables with mobx.</p>
-<h5 id="when-to-use-rxjs-instead-of-mobx">When to use RxJS instead of MobX?</h5>
+<h5 id="when-to-use-rxjs-instead-of-mobx"><a name="when-to-use-rxjs-instead-of-mobx" class="plugin-anchor" href="#when-to-use-rxjs-instead-of-mobx"><span class="fa fa-link"></span></a>When to use RxJS instead of MobX?</h5>
 <p>For anything that involves explictly working with the concept of time,
 or when you need to reason about the historical values / events of an observable (and not just the latest), RxJs is recommended as it provides more low-level primitives.
 Whenever you want to react to <em>state</em> instead of <em>events</em>, MobX offers an easier and more high-level approach.
 In practice, combining RxJS and MobX might result in really powerful constructions.
 Use for example RxJS to process and throttle user events and as a result of that update the state.
 If the state has been made observable by MobX, it will then take care of updating the UI and other derivations accordingly.</p>
-<h5 id="is-react-native-supported">Is React Native supported?</h5>
+<h5 id="is-react-native-supported"><a name="is-react-native-supported" class="plugin-anchor" href="#is-react-native-supported"><span class="fa fa-link"></span></a>Is React Native supported?</h5>
 <p>Yes, <code>mobx</code> and <code>mobx-react</code> will work on React Native. The latter through importing <code>&quot;mobx-react/native&quot;</code>.
 The devtools don&apos;t support React Native. Note that if you indend to store state in a component that you want to be able to use with hot reloading, do not use decorators (annotations) in the component, use the functions instead (eg. <code>action(fn)</code> instead of <code>@action</code>).</p>
-<h5 id="how-does-mobx-compare-to-other-reactive-frameworks">How does MobX compare to other Reactive frameworks?</h5>
+<h5 id="how-does-mobx-compare-to-other-reactive-frameworks"><a name="how-does-mobx-compare-to-other-reactive-frameworks" class="plugin-anchor" href="#how-does-mobx-compare-to-other-reactive-frameworks"><span class="fa fa-link"></span></a>How does MobX compare to other Reactive frameworks?</h5>
 <p>See this <a href="https://github.com/mobxjs/mobx/issues/18" target="_blank">issue</a> for some considerations.</p>
-<h5 id="is-mobx-a-framework">Is MobX a framework?</h5>
+<h5 id="is-mobx-a-framework"><a name="is-mobx-a-framework" class="plugin-anchor" href="#is-mobx-a-framework"><span class="fa fa-link"></span></a>Is MobX a framework?</h5>
 <p>MobX is <em>not</em> a framework. It does not tell you how to structure your code, where to store state or how to process events. Yet it might free you from frameworks that poses all kinds of restrictions on your code in the name of performance.</p>
-<h5 id="can-i-combine-mobx-with-flux">Can I combine MobX with Flux?</h5>
+<h5 id="can-i-combine-mobx-with-flux"><a name="can-i-combine-mobx-with-flux" class="plugin-anchor" href="#can-i-combine-mobx-with-flux"><span class="fa fa-link"></span></a>Can I combine MobX with Flux?</h5>
 <p>Flux implementations that do not work on the assumption that the data in their stores is immutable should work well with MobX.
 However, the need for Flux is reduced when using MobX.
 MobX already optimizes rendering, and it works with most kinds of data, including cycles and classes.
 So other programming paradigms like classic MVC can now be easily applied in applications that combine ReactJS with MobX.</p>
-<h5 id="can-i-use-mobx-together-with-framework-x">Can I use MobX together with framework X?</h5>
+<h5 id="can-i-use-mobx-together-with-framework-x"><a name="can-i-use-mobx-together-with-framework-x" class="plugin-anchor" href="#can-i-use-mobx-together-with-framework-x"><span class="fa fa-link"></span></a>Can I use MobX together with framework X?</h5>
 <p>Probably.
 MobX is framework agnostic and can be applied in any modern JS environment.
 It just ships with a small function to transform ReactJS components into reactive view functions for convenience.
 MobX works just as well server side, and is already combined with jQuery (see this <a href="http://jsfiddle.net/mweststrate/vxn7qgdw" target="_blank">Fiddle</a>) and <a href="https://gist.github.com/mattmccray/d8740ea97013c7505a9b" target="_blank">Deku</a>.</p>
-<h5 id="can-i-record-states-and-re-hydrate-them">Can I record states and re-hydrate them?</h5>
+<h5 id="can-i-record-states-and-re-hydrate-them"><a name="can-i-record-states-and-re-hydrate-them" class="plugin-anchor" href="#can-i-record-states-and-re-hydrate-them"><span class="fa fa-link"></span></a>Can I record states and re-hydrate them?</h5>
 <p>Yes, see <a href="http://mobxjs.github.io/mobx/refguide/create-transformer.html" target="_blank">createTransformer</a> for some examples.</p>
-<h5 id="can-you-tell-me-how-it-works">Can you tell me how it works?</h5>
+<h5 id="can-you-tell-me-how-it-works"><a name="can-you-tell-me-how-it-works" class="plugin-anchor" href="#can-you-tell-me-how-it-works"><span class="fa fa-link"></span></a>Can you tell me how it works?</h5>
 <p>Sure, join the reactiflux channel or checkout the code. Or, submit an issue to motivate me to make some nice drawings :).
 And look at this <a href="https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254" target="_blank">Medium article</a>.</p>
-<h5 id="where-can-i-find-more-mobx-resources">Where can I find more MobX resources?</h5>
+<h5 id="where-can-i-find-more-mobx-resources"><a name="where-can-i-find-more-mobx-resources" class="plugin-anchor" href="#where-can-i-find-more-mobx-resources"><span class="fa fa-link"></span></a>Where can I find more MobX resources?</h5>
 <p>We&apos;ve compiled a large list of helpful resources of all types in the <a href="https://github.com/mobxjs/awesome-mobx#awesome-mobx" target="_blank">official awesome list</a>. If you feel it&apos;s missing something, please open an <a href="https://github.com/mobxjs/awesome-mobx/issues/new" target="_blank">issue</a> or <a href="https://github.com/mobxjs/awesome-mobx/compare" target="_blank">pull request</a> to describe what you&apos;re looking for or share your added links :).</p>
-
+</body></html>
                     
                     </section>
                 

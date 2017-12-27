@@ -25,6 +25,10 @@
         
     
         
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-anchors/plugin.css">
+        
+    
+        
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
@@ -44,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="3.4" data-basepath=".." data-revision="Mon Nov 20 2017 11:17:11 GMT+0100 (CET)">
+    <div class="book" data-level="3.4" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -882,13 +886,13 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/boxed.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h2 id="primitive-values-and-references">Primitive values and references</h2>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/boxed.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h2 id="primitive-values-and-references"><a name="primitive-values-and-references" class="plugin-anchor" href="#primitive-values-and-references"><span class="fa fa-link"></span></a>Primitive values and references</h2>
 <p>All primitive values in JavaScript are immutable and hence per definition not observable.
 Usually that is fine, as MobX usually can just make the <em>property</em> that contains the value observable.
 See also <a href="object.html">observable objects</a>.
 In rare cases it can be convenient to have an observable &quot;primitive&quot; that is not owned by an object.
 For these cases it is possible to create an observable box that manages such a primitive.</p>
-<h3 id="-observable-box-value"><code>observable.box(value)</code></h3>
+<h3 id="-observable-box-value"><a name="-observable-box-value" class="plugin-anchor" href="#-observable-box-value"><span class="fa fa-link"></span></a><code>observable.box(value)</code></h3>
 <p>So <code>observable.box(value)</code> accepts any value and stores it inside a box.
 The current value can be accessed through <code>.get()</code> and updated using <code>.set(newValue)</code>.</p>
 <p>Furthermore you can register a callback using its <code>.observe</code> method to listen to changes on the stored value.
@@ -900,11 +904,11 @@ But since MobX tracks changes to boxes automatically, in most cases it is better
 <li><code>intercept(interceptor)</code>. Can be used to intercept changes before they are applied. See <a href="observe.html">observe &amp; intercept</a></li>
 <li><code>.observe(callback: (change) =&gt; void, fireImmediately = false): disposerFunction</code>. Registers an observer function that will fire each time the stored value is replaced. Returns a function to cancel the observer. See <a href="observe.html">observe &amp; intercept</a>. The <code>change</code> parameter is an object containing both the <code>newValue</code> and <code>oldValue</code> of the observable.</li>
 </ul>
-<h3 id="-observable-shallowbox-value"><code>observable.shallowBox(value)</code></h3>
+<h3 id="-observable-shallowbox-value"><a name="-observable-shallowbox-value" class="plugin-anchor" href="#-observable-shallowbox-value"><span class="fa fa-link"></span></a><code>observable.shallowBox(value)</code></h3>
 <p><code>shallowBox</code> creates a box based on the <a href="modifiers.html"><code>ref</code></a> modifier. This means that any (future) value of box wouldn&apos;t be converted into an observable automatically.</p>
-<h3 id="-observable-primitivevalue"><code>observable(primitiveValue)</code></h3>
+<h3 id="-observable-primitivevalue"><a name="-observable-primitivevalue" class="plugin-anchor" href="#-observable-primitivevalue"><span class="fa fa-link"></span></a><code>observable(primitiveValue)</code></h3>
 <p>When using the generic <code>observable(value)</code> method, MobX will create an observable box for any value that could not be turned into an observable automatically..</p>
-<h3 id="example">Example</h3>
+<h3 id="example"><a name="example" class="plugin-anchor" href="#example"><span class="fa fa-link"></span></a>Example</h3>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
 
 <span class="hljs-keyword">const</span> cityName = observable(<span class="hljs-string">&quot;Vienna&quot;</span>);
@@ -950,9 +954,9 @@ cityName[<span class="hljs-number">1</span>] = <span class="hljs-string">&quot;C
 cityName.splice(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>);
 <span class="hljs-comment">// prints &apos;Amsterdam removed&apos;</span>
 </code></pre>
-<h2 id="name-argument">Name argument</h2>
+<h2 id="name-argument"><a name="name-argument" class="plugin-anchor" href="#name-argument"><span class="fa fa-link"></span></a>Name argument</h2>
 <p>Both <code>observable.box</code> and <code>observable.shallowBox</code> take a second parameter which is used as debug name in for example <code>spy</code> or the MobX dev tools.</p>
-
+</body></html>
                     
                     </section>
                 

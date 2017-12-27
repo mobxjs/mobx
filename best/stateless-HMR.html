@@ -25,6 +25,10 @@
         
     
         
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-anchors/plugin.css">
+        
+    
+        
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
@@ -44,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="7.7" data-basepath=".." data-revision="Mon Nov 20 2017 11:17:11 GMT+0100 (CET)">
+    <div class="book" data-level="7.7" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -882,13 +886,13 @@
                 
                     <section class="normal" id="section-">
                     
-                        <a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/stateless-HMR.md" class="btn fa fa-edit pull-left">&nbsp;&nbsp;Edit This Page</a><h1 id="hot-module-reloading-with-stateless-components">Hot Module Reloading with Stateless Components</h1>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/stateless-HMR.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="hot-module-reloading-with-stateless-components"><a name="hot-module-reloading-with-stateless-components" class="plugin-anchor" href="#hot-module-reloading-with-stateless-components"><span class="fa fa-link"></span></a>Hot Module Reloading with Stateless Components</h1>
 <p>One thing that can be a challenge when getting started with MobX (and React in general) is understanding why Hot Module Reloading (HMR) sometimes breaks. When you initially get it working, it seems like magic (and it kind of is), however there&apos;s at least one rough edge with regard to HMR and React: stateless components. Since stateless components don&apos;t explicitly identify themselves as React components, HMR doesn&apos;t quite know what to do with them, and so you&apos;ll often see warnings in your console like this:</p>
 <pre><code>[HMR] The following modules couldn&apos;t be hot updated: (Full reload needed)
 This is usually because the modules which have changed (and their parents) do not know how to hot reload themselves. See http://webpack.github.io/docs/hot-module-replacement-with-webpack.html for more details.
 [HMR]  - ./src/ToDoItem.jsx
 </code></pre><p>This is especially apparent when you start working with MobX since observables make it really easy to create a lot of stateless components. Here are some tips for how to build your stateless components and still get all the advantages of HMR:</p>
-<h2 id="use-function-declarations-instead-of-arrow-functions">Use function declarations instead of arrow functions</h2>
+<h2 id="use-function-declarations-instead-of-arrow-functions"><a name="use-function-declarations-instead-of-arrow-functions" class="plugin-anchor" href="#use-function-declarations-instead-of-arrow-functions"><span class="fa fa-link"></span></a>Use function declarations instead of arrow functions</h2>
 <p>Function declarations still do the exact same thing as arrow functions, but they have the key advantage of actually having names inside of the React DevTools.</p>
 <p>For instance, here&apos;s a stateless component built with an arrow function:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> ToDoItem = observer(props =&gt; <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>{props.item}<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>)</span>;
@@ -906,7 +910,7 @@ export default observer(ToDoItem);
 </span></code></pre>
 <p>And now the component shows up correctly in the DevTools:</p>
 <p><img src="../images/devtools-withDisplayName.png" alt="devtools-withname"></p>
-<h2 id="make-sure-your-top-level-component-is-a-stateful-observer">Make sure your top-level component is a stateful observer</h2>
+<h2 id="make-sure-your-top-level-component-is-a-stateful-observer"><a name="make-sure-your-top-level-component-is-a-stateful-observer" class="plugin-anchor" href="#make-sure-your-top-level-component-is-a-stateful-observer"><span class="fa fa-link"></span></a>Make sure your top-level component is a stateful observer</h2>
 <p>By &quot;stateful observer&quot;, all I really mean is a component created with <code>React.Component</code> or <code>React.createClass</code> and which uses the <code>@observer</code> decorator, like so:</p>
 <pre><code class="lang-javascript">import { observer } from &apos;mobx-react&apos;;
 
@@ -930,7 +934,7 @@ class App extends React.Component {
 }
 </code></pre>
 <p>In this case, <code>ToDoItem</code> is stateless, but will still work with HMR because the root-level of the UI tree is a stateful observer. As a result, whenever we change <strong>any</strong> stateless component, it will be hot-reloaded because the observers will trigger computations in the root-level component as well. And since the root-level component is a good old-fashioned React component, it&apos;ll trigger the HMR for all of its children and voila! All the magic of stateless components, observables, and hot module reloading working together beautifully.</p>
-
+</body></html>
                     
                     </section>
                 
