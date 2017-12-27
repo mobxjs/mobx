@@ -1,7 +1,6 @@
-var test = require("tape")
 var m = require("..")
 
-test("untracked 1", function(t) {
+test("untracked 1", function() {
     var cCalcs = 0,
         dCalcs = 0
     var a = m.observable(1)
@@ -22,19 +21,17 @@ test("untracked 1", function(t) {
         result = c.get()
     })
 
-    t.equal(result, 3)
-    t.equal(cCalcs, 1)
-    t.equal(dCalcs, 1)
+    expect(result).toBe(3)
+    expect(cCalcs).toBe(1)
+    expect(dCalcs).toBe(1)
 
     b.set(3)
-    t.equal(result, 3)
-    t.equal(cCalcs, 1)
-    t.equal(dCalcs, 1)
+    expect(result).toBe(3)
+    expect(cCalcs).toBe(1)
+    expect(dCalcs).toBe(1)
 
     a.set(2)
-    t.equal(result, 5)
-    t.equal(cCalcs, 2)
-    t.equal(dCalcs, 2)
-
-    t.end()
+    expect(result).toBe(5)
+    expect(cCalcs).toBe(2)
+    expect(dCalcs).toBe(2)
 })

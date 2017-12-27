@@ -1,25 +1,24 @@
 "use strict"
-const test = require("tape")
 const child_process = require("child_process")
 
 function testOutput(t, cmd, expected) {
-    test("Global state sharing: " + cmd, t => {
+    test("Global state sharing: " + cmd, done => {
         const output = child_process.exec(
             "node -e '" + cmd + "'",
             { cwd: __dirname },
             (e, stdout, stderr) => {
-                if (e) t.fail(e)
+                if (e) done.fail(e)
                 else {
-                    t.equal(stdout.toString(), "")
-                    t.equal(stderr.toString(), expected)
-                    t.end()
+                    expect(stdout.toString()).toBe("")
+                    expect(stderr.toString()).toBe(expected)
+                    done()
                 }
             }
         )
     })
 }
 
-test("it should handle multiple instances with the correct warnings", t => {
+test("it should handle multiple instances with the correct warnings", () => {
     testOutput(
         t,
         'require("..");require("../lib/mobx.umd.js")',
@@ -44,5 +43,4 @@ test("it should handle multiple instances with the correct warnings", t => {
     )
     testOutput(t, 'require("..");require("../lib/mobx.umd.js").extras.isolateGlobalState()', "")
     testOutput(t, 'require("..").extras.isolateGlobalState();require("../lib/mobx.umd.js")', "")
-    t.end()
 })

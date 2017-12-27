@@ -1,6 +1,5 @@
 const fs = require("fs")
 const child_process =  require("child_process")
-const test = require("tape")
 
 if (!fs.existsSync(__dirname + "/../../lib/mobx.umd.min.js")) {
 	// make sure the minified build exists
@@ -11,7 +10,7 @@ const mobx1 = require("../../")
 /* istanbul ignore next */
 const mobx2 = require("../../lib/mobx.umd.min.js")
 
-test("two versions should not work together if state is not shared", t => {
+test("two versions should not work together if state is not shared", () => {
     const a = mobx1.observable({
         x: 1
     })
@@ -33,15 +32,13 @@ test("two versions should not work together if state is not shared", t => {
     d1()
     d2()
 
-    t.deepEqual(values, [
+    expect(values).toEqual([
         3,
         1 // no re-runs
     ])
-
-    t.end()
 })
 
-test("two versions should work together if state is shared", t => {
+test("two versions should work together if state is shared", () => {
     mobx1.extras.shareGlobalState()
     mobx2.extras.shareGlobalState()
 
@@ -74,7 +71,7 @@ test("two versions should work together if state is shared", t => {
     a.x = 87
     a.x = 23
 
-    t.deepEqual(values, [
+    expect(values).toEqual([
         -4,
         4,
         5,
@@ -82,6 +79,4 @@ test("two versions should work together if state is shared", t => {
         6,
         -6
     ])
-
-    t.end()
 })

@@ -1,5 +1,4 @@
 "use strict"
-var test = require("tape")
 var mobx = require("..")
 var observable = mobx.observable
 var iterall = require("iterall")
@@ -15,19 +14,19 @@ function buffer() {
     return res
 }
 
-test("test1", function(t) {
+test("test1", function() {
     var a = observable([])
-    t.equal(a.length, 0)
-    t.deepEqual(Object.keys(a), [])
-    t.deepEqual(a.slice(), [])
+    expect(a.length).toBe(0)
+    expect(Object.keys(a)).toEqual([])
+    expect(a.slice()).toEqual([])
 
     a.push(1)
-    t.equal(a.length, 1)
-    t.deepEqual(a.slice(), [1])
+    expect(a.length).toBe(1)
+    expect(a.slice()).toEqual([1])
 
     a[1] = 2
-    t.equal(a.length, 2)
-    t.deepEqual(a.slice(), [1, 2])
+    expect(a.length).toBe(2)
+    expect(a.slice()).toEqual([1, 2])
 
     var sum = mobx.computed(function() {
         return (
@@ -38,92 +37,88 @@ test("test1", function(t) {
         )
     })
 
-    t.equal(sum.get(), 3)
+    expect(sum.get()).toBe(3)
 
     a[1] = 3
-    t.equal(a.length, 2)
-    t.deepEqual(a.slice(), [1, 3])
-    t.equal(sum.get(), 4)
+    expect(a.length).toBe(2)
+    expect(a.slice()).toEqual([1, 3])
+    expect(sum.get()).toBe(4)
 
     a.splice(1, 1, 4, 5)
-    t.equal(a.length, 3)
-    t.deepEqual(a.slice(), [1, 4, 5])
-    t.equal(sum.get(), 10)
+    expect(a.length).toBe(3)
+    expect(a.slice()).toEqual([1, 4, 5])
+    expect(sum.get()).toBe(10)
 
     a.replace([2, 4])
-    t.equal(sum.get(), 6)
+    expect(sum.get()).toBe(6)
 
     a.splice(1, 1)
-    t.equal(sum.get(), 2)
-    t.deepEqual(a.slice(), [2])
+    expect(sum.get()).toBe(2)
+    expect(a.slice()).toEqual([2])
 
     a.spliceWithArray(0, 0, [4, 3])
-    t.equal(sum.get(), 9)
-    t.deepEqual(a.slice(), [4, 3, 2])
+    expect(sum.get()).toBe(9)
+    expect(a.slice()).toEqual([4, 3, 2])
 
     a.clear()
-    t.equal(sum.get(), 0)
-    t.deepEqual(a.slice(), [])
+    expect(sum.get()).toBe(0)
+    expect(a.slice()).toEqual([])
 
     a.length = 4
-    t.equal(isNaN(sum.get()), true)
-    t.deepEqual(a.length, 4)
+    expect(isNaN(sum.get())).toBe(true)
+    expect(a.length).toEqual(4)
 
-    t.deepEqual(a.slice(), [undefined, undefined, undefined, undefined])
+    expect(a.slice()).toEqual([undefined, undefined, undefined, undefined])
 
     a.replace([1, 2, 2, 4])
-    t.equal(sum.get(), 9)
+    expect(sum.get()).toBe(9)
     a.length = 4
-    t.equal(sum.get(), 9)
+    expect(sum.get()).toBe(9)
 
     a.length = 2
-    t.equal(sum.get(), 3)
-    t.deepEqual(a.slice(), [1, 2])
+    expect(sum.get()).toBe(3)
+    expect(a.slice()).toEqual([1, 2])
 
-    t.deepEqual(a.reverse(), [2, 1])
-    t.deepEqual(a.slice(), [1, 2])
+    expect(a.reverse()).toEqual([2, 1])
+    expect(a.slice()).toEqual([1, 2])
 
     a.unshift(3)
-    t.deepEqual(a.sort(), [1, 2, 3])
-    t.deepEqual(a.slice(), [3, 1, 2])
+    expect(a.sort()).toEqual([1, 2, 3])
+    expect(a.slice()).toEqual([3, 1, 2])
 
-    t.equal(JSON.stringify(a), "[3,1,2]")
+    expect(JSON.stringify(a)).toBe("[3,1,2]")
 
-    t.equal(a.get(1), 1)
+    expect(a.get(1)).toBe(1)
     a.set(2, 4)
-    t.equal(a.get(2), 4)
+    expect(a.get(2)).toBe(4)
 
     //	t.deepEqual(Object.keys(a), ['0', '1', '2']); // ideally....
-    t.deepEqual(Object.keys(a), [])
-
-    t.end()
+    expect(Object.keys(a)).toEqual([])
 })
 
-test("array should support iterall / iterable ", t => {
+test("array should support iterall / iterable ", () => {
     var a = observable([1, 2, 3])
 
-    t.equal(iterall.isIterable(a), true)
-    t.equal(iterall.isArrayLike(a), true)
+    expect(iterall.isIterable(a)).toBe(true)
+    expect(iterall.isArrayLike(a)).toBe(true)
 
     var values = []
     iterall.forEach(a, v => values.push(v))
 
-    t.deepEqual(values, [1, 2, 3])
+    expect(values).toEqual([1, 2, 3])
 
     var iter = iterall.getIterator(a)
-    t.deepEqual(iter.next(), { value: 1, done: false })
-    t.deepEqual(iter.next(), { value: 2, done: false })
-    t.deepEqual(iter.next(), { value: 3, done: false })
-    t.deepEqual(iter.next(), { value: undefined, done: true })
+    expect(iter.next()).toEqual({ value: 1, done: false })
+    expect(iter.next()).toEqual({ value: 2, done: false })
+    expect(iter.next()).toEqual({ value: 3, done: false })
+    expect(iter.next()).toEqual({ value: undefined, done: true })
 
     a.replace([])
     iter = iterall.getIterator(a)
-    t.deepEqual(iter.next(), { value: undefined, done: true })
-
-    t.end()
+    expect(iter.next()).toEqual({ value: undefined, done: true })
 })
 
-test("find(findIndex) and remove", function(t) {
+test("find(findIndex) and remove", function() {
     var a = mobx.observable([10, 20, 20])
     var idx = -1
     function predicate(item, index) {
@@ -134,43 +129,40 @@ test("find(findIndex) and remove", function(t) {
         return false
     }
 
-    t.equal(a.find(predicate), 20)
-    t.equal(idx, 1)
-    t.equal(a.findIndex(predicate), 1)
-    t.equal(a.find(predicate, null, 1), 20)
-    t.equal(idx, 1)
-    t.equal(a.findIndex(predicate, null, 1), 1)
-    t.equal(a.find(predicate, null, 2), 20)
-    t.equal(idx, 2)
-    t.equal(a.findIndex(predicate, null, 2), 2)
+    expect(a.find(predicate)).toBe(20)
+    expect(idx).toBe(1)
+    expect(a.findIndex(predicate)).toBe(1)
+    expect(a.find(predicate, null, 1)).toBe(20)
+    expect(idx).toBe(1)
+    expect(a.findIndex(predicate, null, 1)).toBe(1)
+    expect(a.find(predicate, null, 2)).toBe(20)
+    expect(idx).toBe(2)
+    expect(a.findIndex(predicate, null, 2)).toBe(2)
     idx = -1
-    t.equal(a.find(predicate, null, 3), undefined)
-    t.equal(idx, -1)
-    t.equal(a.findIndex(predicate, null, 3), -1)
+    expect(a.find(predicate, null, 3)).toBe(undefined)
+    expect(idx).toBe(-1)
+    expect(a.findIndex(predicate, null, 3)).toBe(-1)
 
-    t.equal(a.remove(20), true)
-    t.equal(a.find(predicate), 20)
-    t.equal(idx, 1)
-    t.equal(a.findIndex(predicate), 1)
+    expect(a.remove(20)).toBe(true)
+    expect(a.find(predicate)).toBe(20)
+    expect(idx).toBe(1)
+    expect(a.findIndex(predicate)).toBe(1)
     idx = -1
-    t.equal(a.remove(20), true)
-    t.equal(a.find(predicate), undefined)
-    t.equal(idx, -1)
-    t.equal(a.findIndex(predicate), -1)
+    expect(a.remove(20)).toBe(true)
+    expect(a.find(predicate)).toBe(undefined)
+    expect(idx).toBe(-1)
+    expect(a.findIndex(predicate)).toBe(-1)
 
-    t.equal(a.remove(20), false)
-
-    t.end()
+    expect(a.remove(20)).toBe(false)
 })
 
-test("concat should automatically slice observable arrays, #260", t => {
+test("concat should automatically slice observable arrays, #260", () => {
     var a1 = mobx.observable([1, 2])
     var a2 = mobx.observable([3, 4])
-    t.deepEqual(a1.concat(a2), [1, 2, 3, 4])
-    t.end()
+    expect(a1.concat(a2)).toEqual([1, 2, 3, 4])
 })
 
-test("observe", function(t) {
+test("observe", function() {
     var ar = mobx.observable([1, 4])
     var buf = []
     var disposer = ar.observe(function(changes) {
@@ -182,7 +174,7 @@ test("observe", function(t) {
     ar.shift() // 3, 0
     ar.push(1, 2) // 3, 0, 1, 2
     ar.splice(1, 2, 3, 4) // 3, 3, 4, 2
-    t.deepEqual(ar.slice(), [3, 3, 4, 2])
+    expect(ar.slice()).toEqual([3, 3, 4, 2])
     ar.splice(6)
     ar.splice(6, 2)
     ar.replace(["a"])
@@ -191,7 +183,7 @@ test("observe", function(t) {
 
     // check the object param
     buf.forEach(function(change) {
-        t.equal(change.object, ar)
+        expect(change.object).toBe(ar)
         delete change.object
     })
 
@@ -220,39 +212,34 @@ test("observe", function(t) {
         { type: "splice", index: 0, addedCount: 0, removed: ["a"], added: [], removedCount: 1 }
     ]
 
-    t.deepEqual(buf, result)
+    expect(buf).toEqual(result)
 
     disposer()
     ar[0] = 5
-    t.deepEqual(buf, result)
-
-    t.end()
+    expect(buf).toEqual(result)
 })
 
-test("array modification1", function(t) {
+test("array modification1", function() {
     var a = mobx.observable([1, 2, 3])
     var r = a.splice(-10, 5, 4, 5, 6)
-    t.deepEqual(a.slice(), [4, 5, 6])
-    t.deepEqual(r, [1, 2, 3])
-    t.end()
+    expect(a.slice()).toEqual([4, 5, 6])
+    expect(r).toEqual([1, 2, 3])
 })
 
-test("serialize", function(t) {
+test("serialize", function() {
     var a = [1, 2, 3]
     var m = mobx.observable(a)
 
-    t.deepEqual(JSON.stringify(m), JSON.stringify(a))
-    t.deepEqual(a, m.peek())
+    expect(JSON.stringify(m)).toEqual(JSON.stringify(a))
+    expect(a).toEqual(m.peek())
 
     a = [4]
     m.replace(a)
-    t.deepEqual(JSON.stringify(m), JSON.stringify(a))
-    t.deepEqual(a, m.toJSON())
-
-    t.end()
+    expect(JSON.stringify(m)).toEqual(JSON.stringify(a))
+    expect(a).toEqual(m.toJSON())
 })
 
-test("array modification functions", function(t) {
+test("array modification functions", function() {
     var ars = [[], [1, 2, 3]]
     var funcs = ["push", "pop", "shift", "unshift"]
     funcs.forEach(function(f) {
@@ -261,14 +248,13 @@ test("array modification functions", function(t) {
             var b = mobx.observable(a)
             var res1 = a[f](4)
             var res2 = b[f](4)
-            t.deepEqual(res1, res2)
-            t.deepEqual(a, b.slice())
+            expect(res1).toEqual(res2)
+            expect(a).toEqual(b.slice())
         })
     })
-    t.end()
 })
 
-test("array modifications", function(t) {
+test("array modifications", function() {
     var a2 = mobx.observable([])
     var inputs = [undefined, -10, -4, -3, -1, 0, 1, 3, 4, 10]
     var arrays = [
@@ -298,37 +284,33 @@ test("array modifications", function(t) {
                     a2.replace(a1)
                     var res1 = a1.splice.apply(a1, [inputs[i], inputs[j]].concat(arrays[l]))
                     var res2 = a2.splice.apply(a2, [inputs[i], inputs[j]].concat(arrays[l]))
-                    t.deepEqual(a1.slice(), a2.slice(), "values wrong: " + msg)
-                    t.deepEqual(res1, res2, "results wrong: " + msg)
-                    t.equal(a1.length, a2.length, "length wrong: " + msg)
+                    expect(a1.slice()).toEqual(a2.slice())
+                    expect(res1).toEqual(res2)
+                    expect(a1.length).toBe(a2.length)
                 }
-
-    t.end()
 })
 
-test("is array", function(t) {
+test("is array", function() {
     var x = mobx.observable([])
-    t.equal(x instanceof Array, true)
+    expect(x instanceof Array).toBe(true)
 
     // would be cool if this would return true...
-    t.equal(Array.isArray(x), false)
-    t.end()
+    expect(Array.isArray(x)).toBe(false)
 })
 
-test("stringifies same as ecma array", function(t) {
+test("stringifies same as ecma array", function() {
     const x = mobx.observable([])
-    t.equal(x instanceof Array, true)
+    expect(x instanceof Array).toBe(true)
 
     // would be cool if these two would return true...
-    t.equal(x.toString(), "")
-    t.equal(x.toLocaleString(), "")
+    expect(x.toString()).toBe("")
+    expect(x.toLocaleString()).toBe("")
     x.push(1, 2)
-    t.equal(x.toString(), "1,2")
-    t.equal(x.toLocaleString(), "1,2")
-    t.end()
+    expect(x.toString()).toBe("1,2")
+    expect(x.toLocaleString()).toBe("1,2")
 })
 
-test("observes when stringified", function(t) {
+test("observes when stringified", function() {
     const x = mobx.observable([])
     let c = 0
     mobx.autorun(function() {
@@ -336,11 +318,10 @@ test("observes when stringified", function(t) {
         c++
     })
     x.push(1)
-    t.equal(c, 2)
-    t.end()
+    expect(c).toBe(2)
 })
 
-test("observes when stringified to locale", function(t) {
+test("observes when stringified to locale", function() {
     const x = mobx.observable([])
     let c = 0
     mobx.autorun(function() {
@@ -348,23 +329,21 @@ test("observes when stringified to locale", function(t) {
         c++
     })
     x.push(1)
-    t.equal(c, 2)
-    t.end()
+    expect(c).toBe(2)
 })
 
-test("peek", function(t) {
+test("peek", function() {
     var x = mobx.observable([1, 2, 3])
-    t.deepEqual(x.peek(), [1, 2, 3])
-    t.equal(x.$mobx.values, x.peek())
+    expect(x.peek()).toEqual([1, 2, 3])
+    expect(x.$mobx.values).toBe(x.peek())
 
     x.peek().push(4) //noooo!
-    t.throws(function() {
+    expect(function() {
         x.push(5) // detect alien change
-    }, "modification exception")
-    t.end()
+    }).toThrow()
 })
 
-test("react to sort changes", function(t) {
+test("react to sort changes", function() {
     var x = mobx.observable([4, 2, 3])
     var sortedX = mobx.computed(function() {
         return x.sort()
@@ -375,18 +354,17 @@ test("react to sort changes", function(t) {
         sorted = sortedX.get()
     })
 
-    t.deepEqual(x.slice(), [4, 2, 3])
-    t.deepEqual(sorted, [2, 3, 4])
+    expect(x.slice()).toEqual([4, 2, 3])
+    expect(sorted).toEqual([2, 3, 4])
     x.push(1)
-    t.deepEqual(x.slice(), [4, 2, 3, 1])
-    t.deepEqual(sorted, [1, 2, 3, 4])
+    expect(x.slice()).toEqual([4, 2, 3, 1])
+    expect(sorted).toEqual([1, 2, 3, 4])
     x.shift()
-    t.deepEqual(x.slice(), [2, 3, 1])
-    t.deepEqual(sorted, [1, 2, 3])
-    t.end()
+    expect(x.slice()).toEqual([2, 3, 1])
+    expect(sorted).toEqual([1, 2, 3])
 })
 
-test("autoextend buffer length", function(t) {
+test("autoextend buffer length", function() {
     var ar = observable(new Array(1000))
     var changesCount = 0
     ar.observe(changes => ++changesCount)
@@ -394,48 +372,41 @@ test("autoextend buffer length", function(t) {
     ar[ar.length] = 0
     ar.push(0)
 
-    t.equal(changesCount, 2)
-
-    t.end()
+    expect(changesCount).toBe(2)
 })
 
-test("array exposes correct keys", t => {
+test("array exposes correct keys", () => {
     var keys = []
     var ar = observable([1, 2])
     for (var key in ar) keys.push(key)
 
-    t.deepEqual(keys, [])
-    t.end()
+    expect(keys).toEqual([])
 })
 
-test("isArrayLike", t => {
+test("isArrayLike", () => {
     var arr = [0, 1, 2]
     var observableArr = observable(arr)
 
     var isArrayLike = mobx.isArrayLike
-    t.equal(typeof isArrayLike, "function")
+    expect(typeof isArrayLike).toBe("function")
 
-    t.equal(isArrayLike(observableArr), true)
-    t.equal(isArrayLike(arr), true)
-    t.equal(isArrayLike(42), false)
-    t.equal(isArrayLike({}), false)
-
-    t.end()
+    expect(isArrayLike(observableArr)).toBe(true)
+    expect(isArrayLike(arr)).toBe(true)
+    expect(isArrayLike(42)).toBe(false)
+    expect(isArrayLike({})).toBe(false)
 })
 
-test(".move throws on invalid indices", t => {
+test(".move throws on invalid indices", () => {
     const arr = [0, 1, 2]
     const observableArr = observable(arr)
 
-    t.throws(() => observableArr.move(-1, 0), /Index out of bounds: -1 is negative/)
-    t.throws(() => observableArr.move(3, 0), /Index out of bounds: 3 is not smaller than 3/)
-    t.throws(() => observableArr.move(0, -1), /Index out of bounds: -1 is negative/)
-    t.throws(() => observableArr.move(0, 3), /Index out of bounds: 3 is not smaller than 3/)
-
-    t.end()
+    expect(() => observableArr.move(-1, 0)).toThrowError(/Index out of bounds: -1 is negative/)
+    expect(() => observableArr.move(3, 0)).toThrowError(/Index out of bounds: 3 is not smaller than 3/)
+    expect(() => observableArr.move(0, -1)).toThrowError(/Index out of bounds: -1 is negative/)
+    expect(() => observableArr.move(0, 3)).toThrowError(/Index out of bounds: 3 is not smaller than 3/)
 })
 
-test(".move(i, i) does nothing", t => {
+test(".move(i, i) does nothing", () => {
     const arr = [0, 1, 2]
     const observableArr = observable(arr)
     var changesCount = 0
@@ -443,12 +414,10 @@ test(".move(i, i) does nothing", t => {
 
     observableArr.move(0, 0)
 
-    t.equal(0, changesCount)
-
-    t.end()
+    expect(0).toBe(changesCount)
 })
 
-test(".move works correctly", t => {
+test(".move works correctly", () => {
     const arr = [0, 1, 2, 3]
 
     function checkMove(fromIndex, toIndex, expected) {
@@ -456,8 +425,8 @@ test(".move works correctly", t => {
         var changesCount = 0
         oa.observe(changes => ++changesCount)
         oa.move(fromIndex, toIndex)
-        t.deepEqual(oa.slice(), expected, ".move(" + fromIndex + ", " + toIndex + ")")
-        t.equal(changesCount, 1)
+        expect(oa.slice()).toEqual(expected)
+        expect(changesCount).toBe(1)
     }
 
     checkMove(0, 1, [1, 0, 2, 3])
@@ -471,11 +440,9 @@ test(".move works correctly", t => {
     checkMove(2, 1, [0, 2, 1, 3])
     checkMove(3, 1, [0, 3, 1, 2])
     checkMove(3, 0, [3, 0, 1, 2])
-
-    t.end()
 })
 
-test("accessing out of bound values throws", t => {
+test("accessing out of bound values throws", () => {
     const a = mobx.observable([])
 
     var warns = 0
@@ -487,26 +454,23 @@ test("accessing out of bound values throws", t => {
     a[0] // out of bounds
     a[1] // out of bounds
 
-    t.equal(warns, 2)
+    expect(warns).toBe(2)
 
-    t.doesNotThrow(() => (a[0] = 3))
-    t.throws(() => (a[2] = 4))
+    expect(() => (a[0] = 3)).not.toThrow()
+    expect(() => (a[2] = 4)).toThrow()
 
     console.warn = baseWarn
-    t.end()
 })
 
-test("replace can handle large arrays", t => {
+test("replace can handle large arrays", () => {
     const a = mobx.observable([])
     const b = []
     b.length = 1000 * 1000
-    t.doesNotThrow(() => {
+    expect(() => {
         a.replace(b)
-    })
+    }).not.toThrow()
 
-    t.doesNotThrow(() => {
+    expect(() => {
         a.spliceWithArray(0, 0, b)
-    })
-
-    t.end()
+    }).not.toThrow()
 })

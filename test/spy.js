@@ -1,8 +1,7 @@
 "use strict"
-var test = require("tape")
 var mobx = require("..")
 
-test("spy output", t => {
+test("spy output", () => {
     var events = []
 
     var stop = mobx.spy(c => events.push(c))
@@ -19,25 +18,16 @@ test("spy output", t => {
         delete ev.time
     })
 
-    t.equal(events.length, doStuffEvents.length, "amount of events doesn't match")
+    expect(events.length).toBe(doStuffEvents.length)
     //t.deepEqual(events, doStuffEvents);
 
     events.forEach((ev, idx) => {
-        t.deepEqual(ev, doStuffEvents[idx], "expected event #" + (1 + idx) + " to be equal")
+        expect(ev).toEqual(doStuffEvents[idx])
     })
 
-    t.ok(
-        events.filter(ev => ev.spyReportStart === true).length > 0,
-        "spy report start count should be larger then zero"
-    )
+    expect(events.filter(ev => ev.spyReportStart === true).length > 0).toBeTruthy()
 
-    t.equal(
-        events.filter(ev => ev.spyReportStart === true).length,
-        events.filter(ev => ev.spyReportEnd === true).length,
-        "amount of start and end events differs"
-    )
-
-    t.end()
+    expect(events.filter(ev => ev.spyReportStart === true).length).toBe(events.filter(ev => ev.spyReportEnd === true).length)
 })
 
 function doStuff() {
@@ -158,7 +148,7 @@ const doStuffEvents = [
     { spyReportEnd: true }
 ]
 
-test("spy error", t => {
+test("spy error", () => {
     mobx.extras.getGlobalState().mobxGuid = 0
 
     const a = mobx.observable({
@@ -182,7 +172,7 @@ test("spy error", t => {
         delete x.time
     })
 
-    t.deepEqual(events, [
+    expect(events).toEqual([
         { spyReportStart: true, type: "reaction" },
         { type: "compute" },
         { spyReportEnd: true },
@@ -201,5 +191,4 @@ test("spy error", t => {
 
     d()
     stop()
-    t.end()
 })

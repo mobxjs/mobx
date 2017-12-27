@@ -1,28 +1,27 @@
-var test = require("tape")
 var mobx = require("..")
 var m = mobx
 
-test("treeD", function(t) {
+test("treeD", function() {
     m.extras.resetGlobalState()
     mobx.extras.getGlobalState().mobxGuid = 0
     var a = m.observable(3)
     var aName = "ObservableValue@1"
 
     var dtree = m.extras.getDependencyTree
-    t.deepEqual(dtree(a), {
+    expect(dtree(a)).toEqual({
         name: aName
     })
 
     var b = m.computed(() => a.get() * a.get())
     var bName = "ComputedValue@3"
-    t.deepEqual(dtree(b), {
+    expect(dtree(b)).toEqual({
         name: bName
         // no dependencies yet, since it isn't observed yet
     })
 
     var c = m.autorun(() => b.get())
     var cName = "Autorun@4"
-    t.deepEqual(dtree(c.$mobx), {
+    expect(dtree(c.$mobx)).toEqual({
         name: cName,
         dependencies: [
             {
@@ -36,10 +35,10 @@ test("treeD", function(t) {
         ]
     })
 
-    t.ok(aName !== bName)
-    t.ok(bName !== cName)
+    expect(aName !== bName).toBeTruthy()
+    expect(bName !== cName).toBeTruthy()
 
-    t.deepEqual(m.extras.getObserverTree(a), {
+    expect(m.extras.getObserverTree(a)).toEqual({
         name: aName,
         observers: [
             {
@@ -60,7 +59,7 @@ test("treeD", function(t) {
         x.has("absent")
     })
 
-    t.deepEqual(m.extras.getDependencyTree(d.$mobx), {
+    expect(m.extras.getDependencyTree(d.$mobx)).toEqual({
         name: "Autorun@7",
         dependencies: [
             {
@@ -77,11 +76,9 @@ test("treeD", function(t) {
             }
         ]
     })
-
-    t.end()
 })
 
-test("names", function(t) {
+test("names", function() {
     m.extras.resetGlobalState()
     mobx.extras.getGlobalState().mobxGuid = 0
 
@@ -102,23 +99,23 @@ test("names", function(t) {
     m.extendObservable(rstruct.y, { a: { b: 2 } })
     rstruct.ar.push({ b: 2 })
     rstruct.ar.push([])
-    t.equal(rstruct.$mobx.values.x.name, "ObservableObject@1.x")
-    t.equal(rstruct.$mobx.values.y.name, "ObservableObject@1.y")
-    t.equal(rstruct.y.$mobx.values.z.name, "ObservableObject@1.y.z")
-    t.equal(rstruct.$mobx.values.ar.name, "ObservableObject@1.ar")
-    t.equal(rstruct.ar.$mobx.atom.name, "ObservableObject@1.ar")
-    t.equal(rstruct.ar[1].$mobx.values.w.name, "ObservableObject@1.ar[..].w")
-    t.equal(rstruct.y.a.$mobx.values.b.name, "ObservableObject@1.y.a.b")
-    t.equal(rstruct.ar[2].$mobx.values.b.name, "ObservableObject@1.ar[..].b")
+    expect(rstruct.$mobx.values.x.name).toBe("ObservableObject@1.x")
+    expect(rstruct.$mobx.values.y.name).toBe("ObservableObject@1.y")
+    expect(rstruct.y.$mobx.values.z.name).toBe("ObservableObject@1.y.z")
+    expect(rstruct.$mobx.values.ar.name).toBe("ObservableObject@1.ar")
+    expect(rstruct.ar.$mobx.atom.name).toBe("ObservableObject@1.ar")
+    expect(rstruct.ar[1].$mobx.values.w.name).toBe("ObservableObject@1.ar[..].w")
+    expect(rstruct.y.a.$mobx.values.b.name).toBe("ObservableObject@1.y.a.b")
+    expect(rstruct.ar[2].$mobx.values.b.name).toBe("ObservableObject@1.ar[..].b")
 
     var d = m.autorun(function() {})
-    t.ok(d.$mobx.name)
+    expect(d.$mobx.name).toBeTruthy()
 
-    t.equal(m.autorun(function namedFunction() {}).$mobx.name, "namedFunction")
+    expect(m.autorun(function namedFunction() {}).$mobx.name).toBe("namedFunction")
 
-    t.ok(m.computed(function() {}))
+    expect(m.computed(function() {})).toBeTruthy()
 
-    t.equal(m.computed(function namedFunction() {}).name, "namedFunction")
+    expect(m.computed(function namedFunction() {}).name).toBe("namedFunction")
 
     function Task() {
         m.extendObservable(this, {
@@ -127,10 +124,8 @@ test("names", function(t) {
     }
 
     var task = new Task()
-    t.equal(task.$mobx.name, "Task@8")
-    t.equal(task.$mobx.values.title.name, "Task@8.title")
-
-    t.end()
+    expect(task.$mobx.name).toBe("Task@8")
+    expect(task.$mobx.values.title.name).toBe("Task@8.title")
 })
 
 function stripTrackerOutput(output) {
@@ -143,7 +138,7 @@ function stripTrackerOutput(output) {
     })
 }
 
-test("spy 1", function(t) {
+test("spy 1", function() {
     m.extras.resetGlobalState()
     var lines = []
 
@@ -161,18 +156,16 @@ test("spy 1", function(t) {
     a.set(4)
     stop()
     a.set(5)
-    t.deepEqual(stripTrackerOutput(lines), [
+    expect(stripTrackerOutput(lines)).toEqual([
         { newValue: 4, oldValue: 3, spyReportStart: true, type: "update" },
         { type: "compute" },
         { spyReportStart: true, type: "reaction" },
         { spyReportEnd: true },
         { spyReportEnd: true }
     ])
-
-    t.end()
 })
 
-test("get atom", function(t) {
+test("get atom", function() {
     mobx.extras.resetGlobalState()
     mobx.extras.getGlobalState().mobxGuid = 0 // hmm dangerous reset?
 
@@ -198,43 +191,32 @@ test("get atom", function(t) {
     var atomClassName = mobx.BaseAtom.name
     var reactionClassName = mobx.Reaction.name
 
-    t.equal(atom(a), ovClassName)
+    expect(atom(a)).toBe(ovClassName)
 
-    t.equal(atom(b, "a"), ovClassName)
-    t.throws(() => atom(b), /please specify a property/, "expected throw")
-    t.throws(
-        () => atom(b, "b"),
-        /no observable property 'b' found on the observable object 'ObservableObject@2'/,
-        "expected throw"
+    expect(atom(b, "a")).toBe(ovClassName)
+    expect(() => atom(b)).toThrowError(/please specify a property/)
+    expect(() => atom(b, "b")).toThrowError(
+        /no observable property 'b' found on the observable object 'ObservableObject@2'/
     )
 
-    t.equal(atom(c), atomClassName) // returns ke, "bla".constructor, === "Atomys
-    t.equal(atom(c, "a"), ovClassName) // returns ent, "bla".constructor, === "Atomry
-    t.equal(atom(c, "b"), ovClassName) // returns has entry (see autoru, "bla", "Atomn)
-    t.throws(
-        () => atom(c, "c"),
-        /the entry 'c' does not exist in the observable map 'ObservableMap@3'/,
-        "expected throw"
-    )
+    expect(atom(c)).toBe(atomClassName) // returns ke, "bla".constructor, === "Atomys
+    expect(atom(c, "a")).toBe(ovClassName) // returns ent, "bla".constructor, === "Atomry
+    expect(atom(c, "b")).toBe(ovClassName) // returns has entry (see autoru, "bla", "Atomn)
+    expect(() => atom(c, "c")).toThrowError(/the entry 'c' does not exist in the observable map 'ObservableMap@3'/)
 
-    t.equal(atom(d), atomClassName)
-    t.throws(
-        () => atom(d, 0),
-        /It is not possible to get index atoms from arrays/,
-        "expected throw"
-    )
+    expect(atom(d)).toBe(atomClassName)
+    expect(() => atom(d, 0)).toThrowError(/It is not possible to get index atoms from arrays/)
 
-    t.equal(atom(e), mobx.computed(() => {}).constructor.name)
-    t.equal(atom(f), mobx.Reaction.name)
+    expect(atom(e)).toBe(mobx.computed(() => {}).constructor.name)
+    expect(atom(f)).toBe(mobx.Reaction.name)
 
-    t.throws(() => atom(g), /please specify a property/)
-    t.equal(atom(g, "a"), ovClassName)
+    expect(() => atom(g)).toThrowError(/please specify a property/)
+    expect(atom(g, "a")).toBe(ovClassName)
 
     f()
-    t.end()
 })
 
-test("get debug name", function(t) {
+test("get debug name", function() {
     mobx.extras.resetGlobalState()
     mobx.extras.getGlobalState().mobxGuid = 0 // hmm dangerous reset?
 
@@ -257,45 +239,34 @@ test("get debug name", function(t) {
         return mobx.extras.getDebugName(thing, prop)
     }
 
-    t.equal(name(a), "ObservableValue@1")
+    expect(name(a)).toBe("ObservableValue@1")
 
-    t.equal(name(b, "a"), "ObservableObject@2.a")
-    t.throws(
-        () => name(b, "b"),
-        /no observable property 'b' found on the observable object 'ObservableObject@2'/,
-        "expected throw"
+    expect(name(b, "a")).toBe("ObservableObject@2.a")
+    expect(() => name(b, "b")).toThrowError(
+        /no observable property 'b' found on the observable object 'ObservableObject@2'/
     )
 
-    t.equal(name(c), "ObservableMap@3") // returns ke, "bla"ys
-    t.equal(name(c, "a"), "ObservableMap@3.a") // returns ent, "bla"ry
-    t.equal(name(c, "b"), "ObservableMap@3.b?") // returns has entry (see autoru, "bla"n)
-    t.throws(
-        () => name(c, "c"),
-        /the entry 'c' does not exist in the observable map 'ObservableMap@3'/,
-        "expected throw"
-    )
+    expect(name(c)).toBe("ObservableMap@3") // returns ke, "bla"ys
+    expect(name(c, "a")).toBe("ObservableMap@3.a") // returns ent, "bla"ry
+    expect(name(c, "b")).toBe("ObservableMap@3.b?") // returns has entry (see autoru, "bla"n)
+    expect(() => name(c, "c")).toThrowError(/the entry 'c' does not exist in the observable map 'ObservableMap@3'/)
 
-    t.equal(name(d), "ObservableArray@4")
-    t.throws(
-        () => name(d, 0),
-        /It is not possible to get index atoms from arrays/,
-        "expected throw"
-    )
+    expect(name(d)).toBe("ObservableArray@4")
+    expect(() => name(d, 0)).toThrowError(/It is not possible to get index atoms from arrays/)
 
-    t.equal(name(e), "ComputedValue@6")
-    t.equal(name(f), "Autorun@7")
+    expect(name(e)).toBe("ComputedValue@6")
+    expect(name(f)).toBe("Autorun@7")
 
-    t.equal(name(g), "Clazz@9")
-    t.equal(name(g, "a"), "Clazz@9.a")
+    expect(name(g)).toBe("Clazz@9")
+    expect(name(g, "a")).toBe("Clazz@9.a")
 
-    t.equal(name(h, "b"), "ObservableObject@12.b")
-    t.equal(name(h, "c"), "ObservableObject@12.c")
+    expect(name(h, "b")).toBe("ObservableObject@12.b")
+    expect(name(h, "c")).toBe("ObservableObject@12.c")
 
     f()
-    t.end()
 })
 
-test("get administration", function(t) {
+test("get administration", function() {
     mobx.extras.resetGlobalState()
     mobx.extras.getGlobalState().mobxGuid = 0 // hmm dangerous reset?
 
@@ -319,34 +290,27 @@ test("get administration", function(t) {
 
     var ovClassName = mobx.observable(3).constructor.name
 
-    t.equal(adm(a), ovClassName)
+    expect(adm(a)).toBe(ovClassName)
 
-    t.equal(adm(b, "a"), ovClassName)
-    t.equal(adm(b), b.$mobx.constructor.name)
-    t.throws(
-        () => adm(b, "b"),
-        /no observable property 'b' found on the observable object 'ObservableObject@2'/,
-        "expected throw"
+    expect(adm(b, "a")).toBe(ovClassName)
+    expect(adm(b)).toBe(b.$mobx.constructor.name)
+    expect(() => adm(b, "b")).toThrowError(
+        /no observable property 'b' found on the observable object 'ObservableObject@2'/
     )
 
-    t.equal(adm(c), mobx.ObservableMap.name)
-    t.equal(adm(c, "a"), ovClassName)
-    t.equal(adm(c, "b"), ovClassName)
-    t.throws(
-        () => adm(c, "c"),
-        /the entry 'c' does not exist in the observable map 'ObservableMap@3'/,
-        "expected throw"
-    )
+    expect(adm(c)).toBe(mobx.ObservableMap.name)
+    expect(adm(c, "a")).toBe(ovClassName)
+    expect(adm(c, "b")).toBe(ovClassName)
+    expect(() => adm(c, "c")).toThrowError(/the entry 'c' does not exist in the observable map 'ObservableMap@3'/)
 
-    t.equal(adm(d), d.$mobx.constructor.name)
-    t.throws(() => adm(d, 0), /It is not possible to get index atoms from arrays/, "expected throw")
+    expect(adm(d)).toBe(d.$mobx.constructor.name)
+    expect(() => adm(d, 0)).toThrowError(/It is not possible to get index atoms from arrays/)
 
-    t.equal(adm(e), mobx.computed(() => {}).constructor.name)
-    t.equal(adm(f), mobx.Reaction.name)
+    expect(adm(e)).toBe(mobx.computed(() => {}).constructor.name)
+    expect(adm(f)).toBe(mobx.Reaction.name)
 
-    t.equal(adm(g), b.$mobx.constructor.name)
-    t.equal(adm(g, "a"), ovClassName)
+    expect(adm(g)).toBe(b.$mobx.constructor.name)
+    expect(adm(g, "a")).toBe(ovClassName)
 
     f()
-    t.end()
 })

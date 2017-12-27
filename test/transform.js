@@ -1,8 +1,7 @@
 var m = require("../")
-var test = require("tape")
 var TransformUtils = require("./utils/transform")
 
-test("transform1", function(t) {
+test("transform1", function() {
     m.extras.resetGlobalState()
     var todoCalc = 0
     var stateCalc = 0
@@ -37,47 +36,45 @@ test("transform1", function(t) {
         mapped = transformState(state)
     })
 
-    t.equal(mapped, "michelCOFFEE")
-    t.equal(stateCalc, 1)
-    t.equal(todoCalc, 1)
+    expect(mapped).toBe("michelCOFFEE")
+    expect(stateCalc).toBe(1)
+    expect(todoCalc).toBe(1)
 
     state.name = "john"
-    t.equal(mapped, "johnCOFFEE")
-    t.equal(stateCalc, 2)
-    t.equal(todoCalc, 1)
+    expect(mapped).toBe("johnCOFFEE")
+    expect(stateCalc).toBe(2)
+    expect(todoCalc).toBe(1)
 
     state.todos[0].title = "TEA"
-    t.equal(mapped, "johnTEA")
-    t.equal(stateCalc, 3)
-    t.equal(todoCalc, 2)
+    expect(mapped).toBe("johnTEA")
+    expect(stateCalc).toBe(3)
+    expect(todoCalc).toBe(2)
 
     state.todos.push({ title: "BISCUIT" })
-    t.equal(mapped, "johnTEA,BISCUIT")
-    t.equal(stateCalc, 4)
-    t.equal(todoCalc, 3)
+    expect(mapped).toBe("johnTEA,BISCUIT")
+    expect(stateCalc).toBe(4)
+    expect(todoCalc).toBe(3)
 
     var tea = state.todos.shift()
-    t.equal(mapped, "johnBISCUIT")
-    t.equal(stateCalc, 5)
-    t.equal(todoCalc, 3)
+    expect(mapped).toBe("johnBISCUIT")
+    expect(stateCalc).toBe(5)
+    expect(todoCalc).toBe(3)
 
-    t.equal(unloaded.length, 1)
-    t.equal(unloaded[0][0], tea)
-    t.equal(unloaded[0][1], "TEA")
-    t.equal(tea.$mobx.values.title.observers.length, 0)
-    t.equal(state.todos[0].$mobx.values.title.observers.length, 1)
+    expect(unloaded.length).toBe(1)
+    expect(unloaded[0][0]).toBe(tea)
+    expect(unloaded[0][1]).toBe("TEA")
+    expect(tea.$mobx.values.title.observers.length).toBe(0)
+    expect(state.todos[0].$mobx.values.title.observers.length).toBe(1)
 
     tea.title = "mint"
-    t.equal(mapped, "johnBISCUIT")
-    t.equal(stateCalc, 5)
-    t.equal(todoCalc, 3)
+    expect(mapped).toBe("johnBISCUIT")
+    expect(stateCalc).toBe(5)
+    expect(todoCalc).toBe(3)
 
-    t.deepEqual(Object.keys(state.todos[0]), ["title"])
-
-    t.end()
+    expect(Object.keys(state.todos[0])).toEqual(["title"])
 })
 
-test("createTransformer as off-instance computed", t => {
+test("createTransformer as off-instance computed", () => {
     var runs = 0
 
     // observable in closure
@@ -110,49 +107,47 @@ test("createTransformer as off-instance computed", t => {
         displayNames = persons.map(p => displayName(p))
     })
 
-    t.equal(runs, 0)
-    t.deepEqual(displayNames, [])
+    expect(runs).toBe(0)
+    expect(displayNames).toEqual([])
 
     persons.push(person1)
-    t.equal(runs, 1)
-    t.deepEqual(displayNames, ["Mickey Mouse"])
+    expect(runs).toBe(1)
+    expect(displayNames).toEqual(["Mickey Mouse"])
 
-    t.equal(displayName(person1), "Mickey Mouse")
-    t.equal(runs, 1, "No new run needed; behaves like a normal computes")
+    expect(displayName(person1)).toBe("Mickey Mouse")
+    expect(runs).toBe(1)
 
     persons.push(person2)
-    t.equal(runs, 2, "person 2 calculated")
-    t.deepEqual(displayNames, ["Mickey Mouse", "Donald Duck"])
+    expect(runs).toBe(2)
+    expect(displayNames).toEqual(["Mickey Mouse", "Donald Duck"])
 
     persons.push(person1)
-    t.equal(runs, 2, "person 1 not recalculated")
-    t.deepEqual(displayNames, ["Mickey Mouse", "Donald Duck", "Mickey Mouse"])
+    expect(runs).toBe(2)
+    expect(displayNames).toEqual(["Mickey Mouse", "Donald Duck", "Mickey Mouse"])
 
     person1.firstName = "Minnie"
-    t.equal(runs, 3, "computed run only one other time")
-    t.deepEqual(displayNames, ["Minnie Mouse", "Donald Duck", "Minnie Mouse"])
+    expect(runs).toBe(3)
+    expect(displayNames).toEqual(["Minnie Mouse", "Donald Duck", "Minnie Mouse"])
 
     capitalize.set(true)
-    t.equal(runs, 5, "both computeds were invalidated")
-    t.deepEqual(displayNames, ["MINNIE MOUSE", "DONALD DUCK", "MINNIE MOUSE"])
+    expect(runs).toBe(5)
+    expect(displayNames).toEqual(["MINNIE MOUSE", "DONALD DUCK", "MINNIE MOUSE"])
 
     persons.splice(1, 1)
-    t.deepEqual(displayNames, ["MINNIE MOUSE", "MINNIE MOUSE"])
+    expect(displayNames).toEqual(["MINNIE MOUSE", "MINNIE MOUSE"])
 
     person2.firstName = "Dagobert"
-    t.equal(runs, 5, "No re-run for person2; not observed anymore")
+    expect(runs).toBe(5)
 
     disposer()
     person1.lastName = "Maxi"
-    t.equal(runs, 5, "No re-run for person1; not observed anymore")
+    expect(runs).toBe(5)
 
-    t.equal(displayName(person1), "MINNIE MAXI", "display name still consistent")
-    t.equal(runs, 6, "Re-run was needed because lazy mode")
-
-    t.end()
+    expect(displayName(person1)).toBe("MINNIE MAXI")
+    expect(runs).toBe(6)
 })
 
-test("163 - resetGlobalState should clear cache", function(t) {
+test("163 - resetGlobalState should clear cache", function() {
     var runs = 0
     function doubler(x) {
         runs++
@@ -169,28 +164,22 @@ test("163 - resetGlobalState should clear cache", function(t) {
         autorunTrigger.get()
         transformOutputs.push(doubleTransformer(a))
     })
-    t.equal(runs, 1)
+    expect(runs).toBe(1)
 
     autorunTrigger.set(2)
-    t.equal(runs, 1)
-    t.equal(transformOutputs.length, 2)
-    t.equal(transformOutputs[1], transformOutputs[0], "transformer should have returned from cache")
+    expect(runs).toBe(1)
+    expect(transformOutputs.length).toBe(2)
+    expect(transformOutputs[1]).toBe(transformOutputs[0])
 
     m.extras.resetGlobalState()
 
     autorunTrigger.set(3)
-    t.equal(runs, 2)
-    t.equal(transformOutputs.length, 3)
-    t.notEqual(
-        transformOutputs[2],
-        transformOutputs[1],
-        "transformer should NOT have returned from cache"
-    )
-
-    t.end()
+    expect(runs).toBe(2)
+    expect(transformOutputs.length).toBe(3)
+    expect(transformOutputs[2]).not.toBe(transformOutputs[1])
 })
 
-test("transform into reactive graph", function(t) {
+test("transform into reactive graph", function() {
     function Folder(name) {
         m.extendObservable(this, {
             name: name,
@@ -252,38 +241,36 @@ test("transform into reactive graph", function(t) {
         return a
     }
 
-    t.equal(state.derived.name, "/")
-    t.equal(state.derived.children.length, 0)
-    t.equal(transformCount(), 1)
-    t.equal(childrenRecalcs(), 1)
+    expect(state.derived.name).toBe("/")
+    expect(state.derived.children.length).toBe(0)
+    expect(transformCount()).toBe(1)
+    expect(childrenRecalcs()).toBe(1)
 
     state.root.children.push(new Folder("hoi"))
-    t.equal(state.derived.name, "/")
-    t.equal(state.derived.children.length, 1)
-    t.equal(state.derived.children[0].name, "hoi")
-    t.equal(transformCount(), 1)
-    t.equal(childrenRecalcs(), 1)
+    expect(state.derived.name).toBe("/")
+    expect(state.derived.children.length).toBe(1)
+    expect(state.derived.children[0].name).toBe("hoi")
+    expect(transformCount()).toBe(1)
+    expect(childrenRecalcs()).toBe(1)
 
     state.filter = "boe"
-    t.equal(state.derived.name, "/")
-    t.equal(state.derived.isVisible, false)
-    t.equal(state.derived.children.length, 0)
-    t.equal(transformCount(), 0)
-    t.equal(childrenRecalcs(), 2)
+    expect(state.derived.name).toBe("/")
+    expect(state.derived.isVisible).toBe(false)
+    expect(state.derived.children.length).toBe(0)
+    expect(transformCount()).toBe(0)
+    expect(childrenRecalcs()).toBe(2)
 
     state.filter = "oi"
-    t.equal(state.derived.name, "/")
-    t.equal(state.derived.isVisible, true)
-    t.equal(state.derived.children.length, 1)
-    t.equal(state.derived.children[0].name, "hoi")
-    t.equal(transformCount(), 0)
-    t.equal(childrenRecalcs(), 1)
-
-    t.end()
+    expect(state.derived.name).toBe("/")
+    expect(state.derived.isVisible).toBe(true)
+    expect(state.derived.children.length).toBe(1)
+    expect(state.derived.children[0].name).toBe("hoi")
+    expect(transformCount()).toBe(0)
+    expect(childrenRecalcs()).toBe(1)
 })
 
 // testing: https://github.com/mobxjs/mobx/issues/67
-test("transform tree (modifying tree incrementally)", function(t) {
+test("transform tree (modifying tree incrementally)", function() {
     var pluckFn = TransformUtils.pluckFn
     var identity = TransformUtils.identity
     var testSet = TransformUtils.testSet()
@@ -323,11 +310,11 @@ test("transform tree (modifying tree incrementally)", function(t) {
         renderNodeCount += state.renderedNodes.length
     })
 
-    t.equal(nodeCreateCount, 0)
-    t.equal(stats.refCount, 0)
-    t.equal(renderCount, 1)
-    t.equal(renderNodeCount, 0)
-    t.deepEqual(state.renderedNodes.length, 0)
+    expect(nodeCreateCount).toBe(0)
+    expect(stats.refCount).toBe(0)
+    expect(renderCount).toBe(1)
+    expect(renderNodeCount).toBe(0)
+    expect(state.renderedNodes.length).toEqual(0)
 
     ////////////////////////////////////
     // Incremental Tree
@@ -336,33 +323,33 @@ test("transform tree (modifying tree incrementally)", function(t) {
     // initialize root
     var node = new TreeNode("root")
     state.root = node
-    t.equal(nodeCreateCount, 1)
-    t.equal(stats.refCount, 1)
-    t.equal(renderCount, 2)
-    t.equal(renderNodeCount, 1)
-    t.deepEqual(state.renderedNodes.length, 1)
-    t.deepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), ["root"])
+    expect(nodeCreateCount).toBe(1)
+    expect(stats.refCount).toBe(1)
+    expect(renderCount).toBe(2)
+    expect(renderNodeCount).toBe(1)
+    expect(state.renderedNodes.length).toEqual(1)
+    expect(state.renderedNodes.map(pluckFn("node"))).toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual(["root"])
 
     // add first child
     state.root.addChild(new TreeNode("root-child-1"))
-    t.equal(nodeCreateCount, 1 + 1)
-    t.equal(stats.refCount, 1 + 1)
-    t.equal(renderCount, 2 + 1)
-    t.equal(renderNodeCount, 1 + 2)
-    t.deepEqual(state.renderedNodes.length, 2)
-    t.deepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), ["root", "root-child-1"])
+    expect(nodeCreateCount).toBe(1 + 1)
+    expect(stats.refCount).toBe(1 + 1)
+    expect(renderCount).toBe(2 + 1)
+    expect(renderNodeCount).toBe(1 + 2)
+    expect(state.renderedNodes.length).toEqual(2)
+    expect(state.renderedNodes.map(pluckFn("node"))).toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual(["root", "root-child-1"])
 
     // add second child
     state.root.addChild(new TreeNode("root-child-2"))
-    t.equal(nodeCreateCount, 1 + 1 + 1)
-    t.equal(stats.refCount, 1 + 1 + 1)
-    t.equal(renderCount, 2 + 1 + 1)
-    t.equal(renderNodeCount, 1 + 2 + 3)
-    t.deepEqual(state.renderedNodes.length, 3)
-    t.deepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(1 + 1 + 1)
+    expect(stats.refCount).toBe(1 + 1 + 1)
+    expect(renderCount).toBe(2 + 1 + 1)
+    expect(renderNodeCount).toBe(1 + 2 + 3)
+    expect(state.renderedNodes.length).toEqual(3)
+    expect(state.renderedNodes.map(pluckFn("node"))).toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root",
         "root-child-1",
         "root-child-2"
@@ -373,13 +360,13 @@ test("transform tree (modifying tree incrementally)", function(t) {
         return node.name === "root-child-2"
     })
     node.addChild(new TreeNode("root-child-2-child-1"))
-    t.equal(nodeCreateCount, 1 + 1 + 1 + 1)
-    t.equal(stats.refCount, 1 + 1 + 1 + 1)
-    t.equal(renderCount, 2 + 1 + 1 + 1)
-    t.equal(renderNodeCount, 1 + 2 + 3 + 4)
-    t.deepEqual(state.renderedNodes.length, 4)
-    t.deepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(1 + 1 + 1 + 1)
+    expect(stats.refCount).toBe(1 + 1 + 1 + 1)
+    expect(renderCount).toBe(2 + 1 + 1 + 1)
+    expect(renderNodeCount).toBe(1 + 2 + 3 + 4)
+    expect(state.renderedNodes.length).toEqual(4)
+    expect(state.renderedNodes.map(pluckFn("node"))).toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root",
         "root-child-1",
         "root-child-2",
@@ -391,13 +378,13 @@ test("transform tree (modifying tree incrementally)", function(t) {
         return node.name === "root-child-1"
     })
     node.addChild(new TreeNode("root-child-1-child-1"))
-    t.equal(nodeCreateCount, 1 + 1 + 1 + 1 + 1)
-    t.equal(stats.refCount, 1 + 1 + 1 + 1 + 1)
-    t.equal(renderCount, 2 + 1 + 1 + 1 + 1)
-    t.equal(renderNodeCount, 1 + 2 + 3 + 4 + 5)
-    t.deepEqual(state.renderedNodes.length, 5)
-    t.deepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(1 + 1 + 1 + 1 + 1)
+    expect(stats.refCount).toBe(1 + 1 + 1 + 1 + 1)
+    expect(renderCount).toBe(2 + 1 + 1 + 1 + 1)
+    expect(renderNodeCount).toBe(1 + 2 + 3 + 4 + 5)
+    expect(state.renderedNodes.length).toEqual(5)
+    expect(state.renderedNodes.map(pluckFn("node"))).toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root",
         "root-child-1",
         "root-child-1-child-1",
@@ -410,13 +397,13 @@ test("transform tree (modifying tree incrementally)", function(t) {
         return node.name === "root-child-1"
     })
     node.children.splice(0)
-    t.equal(nodeCreateCount, 1 + 1 + 1 + 1 + 1 + 0)
-    t.equal(stats.refCount, 1 + 1 + 1 + 1 + 1 - 1)
-    t.equal(renderCount, 2 + 1 + 1 + 1 + 1 + 1)
-    t.equal(renderNodeCount, 1 + 2 + 3 + 4 + 5 + 4)
-    t.deepEqual(state.renderedNodes.length, 4)
-    t.deepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(1 + 1 + 1 + 1 + 1 + 0)
+    expect(stats.refCount).toBe(1 + 1 + 1 + 1 + 1 - 1)
+    expect(renderCount).toBe(2 + 1 + 1 + 1 + 1 + 1)
+    expect(renderNodeCount).toBe(1 + 2 + 3 + 4 + 5 + 4)
+    expect(state.renderedNodes.length).toEqual(4)
+    expect(state.renderedNodes.map(pluckFn("node"))).toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root",
         "root-child-1",
         "root-child-2",
@@ -428,13 +415,13 @@ test("transform tree (modifying tree incrementally)", function(t) {
         return node.name === "root-child-1"
     })
     node.children.splice(0)
-    t.equal(nodeCreateCount, 1 + 1 + 1 + 1 + 1 + 0 + 0)
-    t.equal(stats.refCount, 1 + 1 + 1 + 1 + 1 - 1 + 0)
-    t.equal(renderCount, 2 + 1 + 1 + 1 + 1 + 1 + 0)
-    t.equal(renderNodeCount, 1 + 2 + 3 + 4 + 5 + 4 + 0)
-    t.deepEqual(state.renderedNodes.length, 4)
-    t.deepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(1 + 1 + 1 + 1 + 1 + 0 + 0)
+    expect(stats.refCount).toBe(1 + 1 + 1 + 1 + 1 - 1 + 0)
+    expect(renderCount).toBe(2 + 1 + 1 + 1 + 1 + 1 + 0)
+    expect(renderNodeCount).toBe(1 + 2 + 3 + 4 + 5 + 4 + 0)
+    expect(state.renderedNodes.length).toEqual(4)
+    expect(state.renderedNodes.map(pluckFn("node"))).toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root",
         "root-child-1",
         "root-child-2",
@@ -443,26 +430,24 @@ test("transform tree (modifying tree incrementally)", function(t) {
 
     // remove children from root
     state.root.children.splice(0)
-    t.equal(nodeCreateCount, 1 + 1 + 1 + 1 + 1 + 0 + 0 + 0)
-    t.equal(stats.refCount, 1 + 1 + 1 + 1 + 1 - 1 + 0 - 3)
-    t.equal(renderCount, 2 + 1 + 1 + 1 + 1 + 1 + 0 + 1)
-    t.equal(renderNodeCount, 1 + 2 + 3 + 4 + 5 + 4 + 0 + 1)
-    t.deepEqual(state.renderedNodes.length, 1)
-    t.deepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), ["root"])
+    expect(nodeCreateCount).toBe(1 + 1 + 1 + 1 + 1 + 0 + 0 + 0)
+    expect(stats.refCount).toBe(1 + 1 + 1 + 1 + 1 - 1 + 0 - 3)
+    expect(renderCount).toBe(2 + 1 + 1 + 1 + 1 + 1 + 0 + 1)
+    expect(renderNodeCount).toBe(1 + 2 + 3 + 4 + 5 + 4 + 0 + 1)
+    expect(state.renderedNodes.length).toEqual(1)
+    expect(state.renderedNodes.map(pluckFn("node"))).toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual(["root"])
 
     // teardown
     state.root = null
-    t.equal(nodeCreateCount, 1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 0)
-    t.equal(stats.refCount, 0)
-    t.equal(renderCount, 2 + 1 + 1 + 1 + 1 + 1 + 0 + 1 + 1)
-    t.equal(renderNodeCount, 1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 0)
-    t.deepEqual(state.renderedNodes.length, 0)
-
-    t.end()
+    expect(nodeCreateCount).toBe(1 + 1 + 1 + 1 + 1 + 0 + 0 + 0 + 0)
+    expect(stats.refCount).toBe(0)
+    expect(renderCount).toBe(2 + 1 + 1 + 1 + 1 + 1 + 0 + 1 + 1)
+    expect(renderNodeCount).toBe(1 + 2 + 3 + 4 + 5 + 4 + 0 + 1 + 0)
+    expect(state.renderedNodes.length).toEqual(0)
 })
 
-test("transform tree (modifying tree incrementally)", function(t) {
+test("transform tree (modifying tree incrementally)", function() {
     var pluckFn = TransformUtils.pluckFn
     var identity = TransformUtils.identity
     var testSet = TransformUtils.testSet()
@@ -500,13 +485,13 @@ test("transform tree (modifying tree incrementally)", function(t) {
     // setup
     var node = new TreeNode("root-1")
     state.root = node
-    t.equal(nodeCreateCount, 1)
-    t.equal(stats.refCount, 1)
-    t.equal(renderCount, 2)
-    t.equal(renderNodeCount, 1)
-    t.deepEqual(state.renderedNodes.length, 1)
-    t.deepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), ["root-1"])
+    expect(nodeCreateCount).toBe(1)
+    expect(stats.refCount).toBe(1)
+    expect(renderCount).toBe(2)
+    expect(renderNodeCount).toBe(1)
+    expect(state.renderedNodes.length).toEqual(1)
+    expect(state.renderedNodes.map(pluckFn("node"))).toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual(["root-1"])
 
     ////////////////////////////////////
     // Batch Tree (Partial)
@@ -519,13 +504,13 @@ test("transform tree (modifying tree incrementally)", function(t) {
     children.push(new TreeNode("root-1-child-2b"))
     children[1].addChild(new TreeNode("root-1-child-2b-child-1"))
     state.root.addChildren(children)
-    t.equal(nodeCreateCount, 1 + 4)
-    t.equal(stats.refCount, 1 + 4)
-    t.equal(renderCount, 2 + 1)
-    t.equal(renderNodeCount, 1 + 5)
-    t.deepEqual(state.renderedNodes.length, 5)
-    t.deepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(1 + 4)
+    expect(stats.refCount).toBe(1 + 4)
+    expect(renderCount).toBe(2 + 1)
+    expect(renderNodeCount).toBe(1 + 5)
+    expect(state.renderedNodes.length).toEqual(5)
+    expect(state.renderedNodes.map(pluckFn("node"))).toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root-1",
         "root-1-child-1b",
         "root-1-child-1b-child-1",
@@ -535,11 +520,11 @@ test("transform tree (modifying tree incrementally)", function(t) {
 
     // remove root-1
     state.root = null
-    t.equal(nodeCreateCount, 1 + 4 + 0)
-    t.equal(stats.refCount, 1 + 4 - 5)
-    t.equal(renderCount, 2 + 1 + 1)
-    t.equal(renderNodeCount, 1 + 5 + 0)
-    t.deepEqual(state.renderedNodes.length, 0)
+    expect(nodeCreateCount).toBe(1 + 4 + 0)
+    expect(stats.refCount).toBe(1 + 4 - 5)
+    expect(renderCount).toBe(2 + 1 + 1)
+    expect(renderNodeCount).toBe(1 + 5 + 0)
+    expect(state.renderedNodes.length).toEqual(0)
 
     ////////////////////////////////////
     // Batch Tree (Full)
@@ -552,13 +537,13 @@ test("transform tree (modifying tree incrementally)", function(t) {
     node.addChild(new TreeNode("root-2-child-2"))
     node.children[1].addChild(new TreeNode("root-2-child-2-child-1"))
     state.root = node
-    t.equal(nodeCreateCount, 1 + 4 + 0 + 5)
-    t.equal(stats.refCount, 1 + 4 - 5 + 5)
-    t.equal(renderCount, 2 + 1 + 1 + 1)
-    t.equal(renderNodeCount, 1 + 5 + 0 + 5)
-    t.deepEqual(state.renderedNodes.length, 5)
-    t.deepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(1 + 4 + 0 + 5)
+    expect(stats.refCount).toBe(1 + 4 - 5 + 5)
+    expect(renderCount).toBe(2 + 1 + 1 + 1)
+    expect(renderNodeCount).toBe(1 + 5 + 0 + 5)
+    expect(state.renderedNodes.length).toEqual(5)
+    expect(state.renderedNodes.map(pluckFn("node"))).toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root-2",
         "root-2-child-1",
         "root-2-child-1-child-1",
@@ -568,16 +553,14 @@ test("transform tree (modifying tree incrementally)", function(t) {
 
     // teardown
     state.root = null
-    t.equal(nodeCreateCount, 1 + 4 + 0 + 5 + 0)
-    t.equal(stats.refCount, 0)
-    t.equal(renderCount, 2 + 1 + 1 + 1 + 1)
-    t.equal(renderNodeCount, 1 + 5 + 0 + 5 + 0)
-    t.deepEqual(state.renderedNodes.length, 0)
-
-    t.end()
+    expect(nodeCreateCount).toBe(1 + 4 + 0 + 5 + 0)
+    expect(stats.refCount).toBe(0)
+    expect(renderCount).toBe(2 + 1 + 1 + 1 + 1)
+    expect(renderNodeCount).toBe(1 + 5 + 0 + 5 + 0)
+    expect(state.renderedNodes.length).toEqual(0)
 })
 
-test("transform tree (modifying expanded)", function(t) {
+test("transform tree (modifying expanded)", function() {
     var pluckFn = TransformUtils.pluckFn
     var identity = TransformUtils.identity
     var testSet = TransformUtils.testSet()
@@ -631,13 +614,13 @@ test("transform tree (modifying expanded)", function(t) {
     node.addChild(new TreeNode("root-child-2"))
     node.children[1].addChild(new TreeNode("root-child-2-child-1"))
     state.root = node
-    t.equal(nodeCreateCount, 5)
-    t.equal(stats.refCount, 5)
-    t.equal(renderCount, 2)
-    t.equal(renderNodeCount, 5)
-    t.deepEqual(state.renderedNodes.length, 5)
-    t.deepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(5)
+    expect(stats.refCount).toBe(5)
+    expect(renderCount).toBe(2)
+    expect(renderNodeCount).toBe(5)
+    expect(state.renderedNodes.length).toEqual(5)
+    expect(state.renderedNodes.map(pluckFn("node"))).toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root",
         "root-child-1",
         "root-child-1-child-1",
@@ -651,23 +634,23 @@ test("transform tree (modifying expanded)", function(t) {
 
     // toggle root to collapsed
     state.renderedNodes[0].toggleCollapsed()
-    t.equal(nodeCreateCount, 5 + 0)
-    t.equal(stats.refCount, 5 - 4)
-    t.equal(renderCount, 2 + 1)
-    t.equal(renderNodeCount, 5 + 1)
-    t.deepEqual(state.renderedNodes.length, 1)
-    t.notDeepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity)) // not a direct map of the tree nodes
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), ["root"])
+    expect(nodeCreateCount).toBe(5 + 0)
+    expect(stats.refCount).toBe(5 - 4)
+    expect(renderCount).toBe(2 + 1)
+    expect(renderNodeCount).toBe(5 + 1)
+    expect(state.renderedNodes.length).toEqual(1)
+    expect(state.renderedNodes.map(pluckFn("node"))).not.toEqual(state.root.map(identity)) // not a direct map of the tree nodes
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual(["root"])
 
     // toggle root to expanded
     state.renderedNodes[0].toggleCollapsed()
-    t.equal(nodeCreateCount, 5 + 0 + 4)
-    t.equal(stats.refCount, 5 - 4 + 4)
-    t.equal(renderCount, 2 + 1 + 1)
-    t.equal(renderNodeCount, 5 + 1 + 5)
-    t.deepEqual(state.renderedNodes.length, 5)
-    t.deepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(5 + 0 + 4)
+    expect(stats.refCount).toBe(5 - 4 + 4)
+    expect(renderCount).toBe(2 + 1 + 1)
+    expect(renderNodeCount).toBe(5 + 1 + 5)
+    expect(state.renderedNodes.length).toEqual(5)
+    expect(state.renderedNodes.map(pluckFn("node"))).toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root",
         "root-child-1",
         "root-child-1-child-1",
@@ -677,13 +660,13 @@ test("transform tree (modifying expanded)", function(t) {
 
     // toggle child-1 collapsed
     state.renderedNodes[1].toggleCollapsed()
-    t.equal(nodeCreateCount, 5 + 0 + 4 + 0)
-    t.equal(stats.refCount, 5 - 4 + 4 - 1)
-    t.equal(renderCount, 2 + 1 + 1 + 1)
-    t.equal(renderNodeCount, 5 + 1 + 5 + 4)
-    t.deepEqual(state.renderedNodes.length, 4)
-    t.notDeepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity)) // not a direct map of the tree nodes
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(5 + 0 + 4 + 0)
+    expect(stats.refCount).toBe(5 - 4 + 4 - 1)
+    expect(renderCount).toBe(2 + 1 + 1 + 1)
+    expect(renderNodeCount).toBe(5 + 1 + 5 + 4)
+    expect(state.renderedNodes.length).toEqual(4)
+    expect(state.renderedNodes.map(pluckFn("node"))).not.toEqual(state.root.map(identity)) // not a direct map of the tree nodes
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root",
         "root-child-1",
         "root-child-2",
@@ -692,13 +675,13 @@ test("transform tree (modifying expanded)", function(t) {
 
     // toggle child-2-child-1 collapsed should be a no-op
     state.renderedNodes[state.renderedNodes.length - 1].toggleCollapsed()
-    t.equal(nodeCreateCount, 5 + 0 + 4 + 0 + 0)
-    t.equal(stats.refCount, 5 - 4 + 4 - 1 + 0)
-    t.equal(renderCount, 2 + 1 + 1 + 1 + 0)
-    t.equal(renderNodeCount, 5 + 1 + 5 + 4 + 0)
-    t.deepEqual(state.renderedNodes.length, 4)
-    t.notDeepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity)) // not a direct map of the tree nodes
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(5 + 0 + 4 + 0 + 0)
+    expect(stats.refCount).toBe(5 - 4 + 4 - 1 + 0)
+    expect(renderCount).toBe(2 + 1 + 1 + 1 + 0)
+    expect(renderNodeCount).toBe(5 + 1 + 5 + 4 + 0)
+    expect(state.renderedNodes.length).toEqual(4)
+    expect(state.renderedNodes.map(pluckFn("node"))).not.toEqual(state.root.map(identity)) // not a direct map of the tree nodes
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root",
         "root-child-1",
         "root-child-2",
@@ -707,16 +690,14 @@ test("transform tree (modifying expanded)", function(t) {
 
     // teardown
     state.root = null
-    t.equal(nodeCreateCount, 5 + 0 + 4 + 0 + 0 + 0)
-    t.equal(stats.refCount, 0)
-    t.equal(renderCount, 2 + 1 + 1 + 1 + 0 + 1)
-    t.equal(renderNodeCount, 5 + 1 + 5 + 4 + 0 + 0)
-    t.deepEqual(state.renderedNodes.length, 0)
-
-    t.end()
+    expect(nodeCreateCount).toBe(5 + 0 + 4 + 0 + 0 + 0)
+    expect(stats.refCount).toBe(0)
+    expect(renderCount).toBe(2 + 1 + 1 + 1 + 0 + 1)
+    expect(renderNodeCount).toBe(5 + 1 + 5 + 4 + 0 + 0)
+    expect(state.renderedNodes.length).toEqual(0)
 })
 
-test("transform tree (modifying render observable)", function(t) {
+test("transform tree (modifying render observable)", function() {
     var pluckFn = TransformUtils.pluckFn
     var identity = TransformUtils.identity
     var testSet = TransformUtils.testSet()
@@ -771,13 +752,13 @@ test("transform tree (modifying render observable)", function(t) {
     node.addChild(new TreeNode("root-child-2"))
     node.children[1].addChild(new TreeNode("root-child-2-child-1"))
     state.root = node
-    t.equal(nodeCreateCount, 5)
-    t.equal(stats.refCount, 5)
-    t.equal(renderCount, 2)
-    t.equal(renderNodeCount, 5)
-    t.deepEqual(state.renderedNodes.length, 5)
-    t.deepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(5)
+    expect(stats.refCount).toBe(5)
+    expect(renderCount).toBe(2)
+    expect(renderNodeCount).toBe(5)
+    expect(state.renderedNodes.length).toEqual(5)
+    expect(state.renderedNodes.map(pluckFn("node"))).toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root",
         "root-child-1",
         "root-child-1-child-1",
@@ -791,13 +772,13 @@ test("transform tree (modifying render observable)", function(t) {
 
     // update root icon
     state.root.icon.set("file")
-    t.equal(nodeCreateCount, 5 + 0)
-    t.equal(stats.refCount, 5 + 0)
-    t.equal(renderCount, 2 + 1)
-    t.equal(renderNodeCount, 5 + 5)
-    t.deepEqual(state.renderedNodes.length, 5)
-    t.deepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(5 + 0)
+    expect(stats.refCount).toBe(5 + 0)
+    expect(renderCount).toBe(2 + 1)
+    expect(renderNodeCount).toBe(5 + 5)
+    expect(state.renderedNodes.length).toEqual(5)
+    expect(state.renderedNodes.map(pluckFn("node"))).toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root",
         "root-child-1",
         "root-child-1-child-1",
@@ -807,16 +788,14 @@ test("transform tree (modifying render observable)", function(t) {
 
     // teardown
     state.root = null
-    t.equal(nodeCreateCount, 5 + 0 + 0)
-    t.equal(stats.refCount, 0)
-    t.equal(renderCount, 2 + 1 + 1)
-    t.equal(renderNodeCount, 5 + 5 + 0)
-    t.deepEqual(state.renderedNodes.length, 0)
-
-    t.end()
+    expect(nodeCreateCount).toBe(5 + 0 + 0)
+    expect(stats.refCount).toBe(0)
+    expect(renderCount).toBe(2 + 1 + 1)
+    expect(renderNodeCount).toBe(5 + 5 + 0)
+    expect(state.renderedNodes.length).toEqual(0)
 })
 
-test("transform tree (modifying render-only observable)", function(t) {
+test("transform tree (modifying render-only observable)", function() {
     var pluckFn = TransformUtils.pluckFn
     var identity = TransformUtils.identity
     var testSet = TransformUtils.testSet()
@@ -866,14 +845,14 @@ test("transform tree (modifying render-only observable)", function(t) {
     node.addChild(new TreeNode("root-child-2"))
     node.children[1].addChild(new TreeNode("root-child-2-child-1"))
     state.root = node
-    t.equal(nodeCreateCount, 5)
-    t.equal(stats.refCount, 5)
-    t.equal(renderCount, 2)
-    t.equal(renderNodeCount, 5)
-    t.equal(renderIconCalc, 5)
-    t.deepEqual(state.renderedNodes.length, 5)
-    t.deepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(5)
+    expect(stats.refCount).toBe(5)
+    expect(renderCount).toBe(2)
+    expect(renderNodeCount).toBe(5)
+    expect(renderIconCalc).toBe(5)
+    expect(state.renderedNodes.length).toEqual(5)
+    expect(state.renderedNodes.map(pluckFn("node"))).toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root",
         "root-child-1",
         "root-child-1-child-1",
@@ -887,14 +866,14 @@ test("transform tree (modifying render-only observable)", function(t) {
 
     // update root icon
     state.root.icon.set("file")
-    t.equal(nodeCreateCount, 5 + 0)
-    t.equal(stats.refCount, 5 + 0)
-    t.equal(renderCount, 2 + 0)
-    t.equal(renderNodeCount, 5 + 0)
-    t.equal(renderIconCalc, 5 + 1)
-    t.deepEqual(state.renderedNodes.length, 5)
-    t.deepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(5 + 0)
+    expect(stats.refCount).toBe(5 + 0)
+    expect(renderCount).toBe(2 + 0)
+    expect(renderNodeCount).toBe(5 + 0)
+    expect(renderIconCalc).toBe(5 + 1)
+    expect(state.renderedNodes.length).toEqual(5)
+    expect(state.renderedNodes.map(pluckFn("node"))).toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root",
         "root-child-1",
         "root-child-1-child-1",
@@ -904,17 +883,15 @@ test("transform tree (modifying render-only observable)", function(t) {
 
     // teardown
     state.root = null
-    t.equal(nodeCreateCount, 5 + 0 + 0)
-    t.equal(stats.refCount, 0)
-    t.equal(renderCount, 2 + 0 + 1)
-    t.equal(renderNodeCount, 5 + 0 + 0)
-    t.equal(renderIconCalc, 5 + 1 + 0)
-    t.deepEqual(state.renderedNodes.length, 0)
-
-    t.end()
+    expect(nodeCreateCount).toBe(5 + 0 + 0)
+    expect(stats.refCount).toBe(0)
+    expect(renderCount).toBe(2 + 0 + 1)
+    expect(renderNodeCount).toBe(5 + 0 + 0)
+    expect(renderIconCalc).toBe(5 + 1 + 0)
+    expect(state.renderedNodes.length).toEqual(0)
 })
 
-test("transform tree (static tags / global filter only)", function(t) {
+test("transform tree (static tags / global filter only)", function() {
     var intersection = TransformUtils.intersection
     var pluckFn = TransformUtils.pluckFn
     var identity = TransformUtils.identity
@@ -971,13 +948,13 @@ test("transform tree (static tags / global filter only)", function(t) {
     node.addChild(new TreeNode("root-child-2", { tags: [2] }))
     node.children[1].addChild(new TreeNode("root-child-2-child-1", { tags: [3] }))
     state.root = node
-    t.equal(nodeCreateCount, 5)
-    t.equal(stats.refCount, 5)
-    t.equal(renderCount, 2)
-    t.equal(renderNodeCount, 5)
-    t.deepEqual(state.renderedNodes.length, 5)
-    t.deepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(5)
+    expect(stats.refCount).toBe(5)
+    expect(renderCount).toBe(2)
+    expect(renderNodeCount).toBe(5)
+    expect(state.renderedNodes.length).toEqual(5)
+    expect(state.renderedNodes.map(pluckFn("node"))).toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root",
         "root-child-1",
         "root-child-1-child-1",
@@ -991,23 +968,23 @@ test("transform tree (static tags / global filter only)", function(t) {
 
     // add search tag
     state.tags.push(2)
-    t.equal(nodeCreateCount, 5 + 0)
-    t.equal(stats.refCount, 5 - 3)
-    t.equal(renderCount, 2 + 1)
-    t.equal(renderNodeCount, 5 + 2)
-    t.deepEqual(state.renderedNodes.length, 2)
-    t.notDeepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), ["root-child-1", "root-child-2"])
+    expect(nodeCreateCount).toBe(5 + 0)
+    expect(stats.refCount).toBe(5 - 3)
+    expect(renderCount).toBe(2 + 1)
+    expect(renderNodeCount).toBe(5 + 2)
+    expect(state.renderedNodes.length).toEqual(2)
+    expect(state.renderedNodes.map(pluckFn("node"))).not.toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual(["root-child-1", "root-child-2"])
 
     // add search tag
     state.tags.push(3)
-    t.equal(nodeCreateCount, 5 + 0 + 2)
-    t.equal(stats.refCount, 5 - 3 + 2)
-    t.equal(renderCount, 2 + 1 + 1)
-    t.equal(renderNodeCount, 5 + 2 + 4)
-    t.deepEqual(state.renderedNodes.length, 4)
-    t.notDeepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(5 + 0 + 2)
+    expect(stats.refCount).toBe(5 - 3 + 2)
+    expect(renderCount).toBe(2 + 1 + 1)
+    expect(renderNodeCount).toBe(5 + 2 + 4)
+    expect(state.renderedNodes.length).toEqual(4)
+    expect(state.renderedNodes.map(pluckFn("node"))).not.toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root-child-1",
         "root-child-1-child-1",
         "root-child-2",
@@ -1016,13 +993,13 @@ test("transform tree (static tags / global filter only)", function(t) {
 
     // add search tag
     state.tags.push(1)
-    t.equal(nodeCreateCount, 5 + 0 + 2 + 1)
-    t.equal(stats.refCount, 5 - 3 + 2 + 1)
-    t.equal(renderCount, 2 + 1 + 1 + 1)
-    t.equal(renderNodeCount, 5 + 2 + 4 + 5)
-    t.deepEqual(state.renderedNodes.length, 5)
-    t.deepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(5 + 0 + 2 + 1)
+    expect(stats.refCount).toBe(5 - 3 + 2 + 1)
+    expect(renderCount).toBe(2 + 1 + 1 + 1)
+    expect(renderNodeCount).toBe(5 + 2 + 4 + 5)
+    expect(state.renderedNodes.length).toEqual(5)
+    expect(state.renderedNodes.map(pluckFn("node"))).toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root",
         "root-child-1",
         "root-child-1-child-1",
@@ -1032,26 +1009,24 @@ test("transform tree (static tags / global filter only)", function(t) {
 
     // remove search tags
     state.tags.splice(0, 2)
-    t.equal(nodeCreateCount, 5 + 0 + 2 + 1 + 0)
-    t.equal(stats.refCount, 5 - 3 + 2 + 1 - 4)
-    t.equal(renderCount, 2 + 1 + 1 + 1 + 1)
-    t.equal(renderNodeCount, 5 + 2 + 4 + 5 + 1)
-    t.deepEqual(state.renderedNodes.length, 1)
-    t.notDeepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), ["root"])
+    expect(nodeCreateCount).toBe(5 + 0 + 2 + 1 + 0)
+    expect(stats.refCount).toBe(5 - 3 + 2 + 1 - 4)
+    expect(renderCount).toBe(2 + 1 + 1 + 1 + 1)
+    expect(renderNodeCount).toBe(5 + 2 + 4 + 5 + 1)
+    expect(state.renderedNodes.length).toEqual(1)
+    expect(state.renderedNodes.map(pluckFn("node"))).not.toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual(["root"])
 
     // teardown
     state.root = null
-    t.equal(nodeCreateCount, 5 + 0 + 2 + 1 + 0 + 0)
-    t.equal(stats.refCount, 0)
-    t.equal(renderCount, 2 + 1 + 1 + 1 + 1 + 1)
-    t.equal(renderNodeCount, 5 + 2 + 4 + 5 + 1 + 0)
-    t.deepEqual(state.renderedNodes.length, 0)
-
-    t.end()
+    expect(nodeCreateCount).toBe(5 + 0 + 2 + 1 + 0 + 0)
+    expect(stats.refCount).toBe(0)
+    expect(renderCount).toBe(2 + 1 + 1 + 1 + 1 + 1)
+    expect(renderNodeCount).toBe(5 + 2 + 4 + 5 + 1 + 0)
+    expect(state.renderedNodes.length).toEqual(0)
 })
 
-test("transform tree (dynamic tags - peek / rebuild)", function(t) {
+test("transform tree (dynamic tags - peek / rebuild)", function() {
     var intersection = TransformUtils.intersection
     var pluckFn = TransformUtils.pluckFn
     var identity = TransformUtils.identity
@@ -1112,13 +1087,13 @@ test("transform tree (dynamic tags - peek / rebuild)", function(t) {
         new TreeNode("root-child-2-child-1", { tags: m.observable.array([3]) })
     )
     state.root = node
-    t.equal(nodeCreateCount, 5)
-    t.equal(stats.refCount, 5)
-    t.equal(renderCount, 2)
-    t.equal(renderNodeCount, 5)
-    t.deepEqual(state.renderedNodes.length, 5)
-    t.deepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(5)
+    expect(stats.refCount).toBe(5)
+    expect(renderCount).toBe(2)
+    expect(renderNodeCount).toBe(5)
+    expect(state.renderedNodes.length).toEqual(5)
+    expect(state.renderedNodes.map(pluckFn("node"))).toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root",
         "root-child-1",
         "root-child-1-child-1",
@@ -1132,23 +1107,23 @@ test("transform tree (dynamic tags - peek / rebuild)", function(t) {
 
     // add search tag
     state.tags.push(2)
-    t.equal(nodeCreateCount, 5 + 0)
-    t.equal(stats.refCount, 5 - 3)
-    t.equal(renderCount, 2 + 1)
-    t.equal(renderNodeCount, 5 + 2)
-    t.deepEqual(state.renderedNodes.length, 2)
-    t.notDeepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), ["root-child-1", "root-child-2"])
+    expect(nodeCreateCount).toBe(5 + 0)
+    expect(stats.refCount).toBe(5 - 3)
+    expect(renderCount).toBe(2 + 1)
+    expect(renderNodeCount).toBe(5 + 2)
+    expect(state.renderedNodes.length).toEqual(2)
+    expect(state.renderedNodes.map(pluckFn("node"))).not.toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual(["root-child-1", "root-child-2"])
 
     // modify search tag
     state.root.tags.push(2)
-    t.equal(nodeCreateCount, 5 + 0 + 1)
-    t.equal(stats.refCount, 5 - 3 + 1)
-    t.equal(renderCount, 2 + 1 + 1)
-    t.equal(renderNodeCount, 5 + 2 + 3)
-    t.deepEqual(state.renderedNodes.length, 3)
-    t.notDeepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(5 + 0 + 1)
+    expect(stats.refCount).toBe(5 - 3 + 1)
+    expect(renderCount).toBe(2 + 1 + 1)
+    expect(renderNodeCount).toBe(5 + 2 + 3)
+    expect(state.renderedNodes.length).toEqual(3)
+    expect(state.renderedNodes.map(pluckFn("node"))).not.toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root",
         "root-child-1",
         "root-child-2"
@@ -1173,13 +1148,13 @@ test("transform tree (dynamic tags - peek / rebuild)", function(t) {
             })
             .tags.push(2)
     })
-    t.equal(nodeCreateCount, 5 + 0 + 1 + 2)
-    t.equal(stats.refCount, 5 - 3 + 1 + 1)
-    t.equal(renderCount, 2 + 1 + 1 + 1)
-    t.equal(renderNodeCount, 5 + 2 + 3 + 4)
-    t.deepEqual(state.renderedNodes.length, 4)
-    t.notDeepEqual(state.renderedNodes.map(pluckFn("node")), state.root.map(identity))
-    t.deepEqual(state.renderedNodes.map(pluckFn("node.name")), [
+    expect(nodeCreateCount).toBe(5 + 0 + 1 + 2)
+    expect(stats.refCount).toBe(5 - 3 + 1 + 1)
+    expect(renderCount).toBe(2 + 1 + 1 + 1)
+    expect(renderNodeCount).toBe(5 + 2 + 3 + 4)
+    expect(state.renderedNodes.length).toEqual(4)
+    expect(state.renderedNodes.map(pluckFn("node"))).not.toEqual(state.root.map(identity))
+    expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root",
         "root-child-1-child-1",
         "root-child-2",
@@ -1188,17 +1163,15 @@ test("transform tree (dynamic tags - peek / rebuild)", function(t) {
 
     // teardown
     state.root = null
-    t.equal(nodeCreateCount, 5 + 0 + 1 + 2 + 0)
-    t.equal(stats.refCount, 0)
-    t.equal(renderCount, 2 + 1 + 1 + 1 + 1)
-    t.equal(renderNodeCount, 5 + 2 + 3 + 4 + 0)
-    t.deepEqual(state.renderedNodes.length, 0)
-
-    t.end()
+    expect(nodeCreateCount).toBe(5 + 0 + 1 + 2 + 0)
+    expect(stats.refCount).toBe(0)
+    expect(renderCount).toBe(2 + 1 + 1 + 1 + 1)
+    expect(renderNodeCount).toBe(5 + 2 + 3 + 4 + 0)
+    expect(state.renderedNodes.length).toEqual(0)
 })
 
 // https://github.com/mobxjs/mobx/issues/886
-test("transform with primitive key", function(t) {
+test("transform with primitive key", function() {
     m.extras.resetGlobalState()
 
     function Bob() {
@@ -1225,22 +1198,20 @@ test("transform with primitive key", function(t) {
 
     observableBobs.push("Bob1")
     observableBobs.push("Bob1")
-    t.equal(bobs[0].name, bobs[1].name)
+    expect(bobs[0].name).toBe(bobs[1].name)
 
     observableBobs.clear()
     observableBobs.push("Bob1")
     observableBobs.push("Bob2")
-    t.notEqual(bobs[0].name, bobs[1].name)
+    expect(bobs[0].name).not.toBe(bobs[1].name)
 
     observableBobs.clear()
     observableBobs.push(1)
     observableBobs.push(1)
-    t.equal(bobs[0].name, bobs[1].name)
+    expect(bobs[0].name).toBe(bobs[1].name)
 
     observableBobs.clear()
     observableBobs.push(1)
     observableBobs.push(2)
-    t.notEqual(bobs[0].name, bobs[1].name)
-
-    t.end()
+    expect(bobs[0].name).not.toBe(bobs[1].name)
 })

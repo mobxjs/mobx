@@ -1,16 +1,15 @@
-var test = require("tape")
 var m = require("..")
 
-test("autorun 1", function(t) {
+test("autorun 1", function(done) {
     var _fired = 0
     var _result = null
     var _cCalcs = 0
     var to = setTimeout
 
     function expect(fired, cCalcs, result) {
-        t.equal(_fired, fired, "autorun fired")
-        t.equal(_cCalcs, cCalcs, "'c' fired")
-        if (fired) t.equal(_result, result, "result")
+        expect(_fired).toBe(fired)
+        expect(_cCalcs).toBe(cCalcs)
+        if (fired) expect(_result).toBe(result)
         _fired = 0
         _cCalcs = 0
     }
@@ -68,7 +67,7 @@ test("autorun 1", function(t) {
                                 d.set(4)
                                 to(function() {
                                     expect(0, 0, 0)
-                                    t.end()
+                                    done()
                                 }, 30)
                             }, 30)
                         }, 30)
@@ -79,7 +78,7 @@ test("autorun 1", function(t) {
     }, 30)
 })
 
-test("autorun should not result in loop", function(t) {
+test("autorun should not result in loop", function(done) {
     var i = 0
     var a = m.observable({
         x: i
@@ -99,21 +98,21 @@ test("autorun should not result in loop", function(t) {
     )
 
     setTimeout(function() {
-        t.equal(autoRunsCalled, 1)
-        t.end()
+        expect(autoRunsCalled).toBe(1)
+        done()
 
-        t.equal(d.$mobx.name, "named async")
+        expect(d.$mobx.name).toBe("named async")
         d()
     }, 100)
 })
 
-test("autorunAsync passes Reaction as an argument to view function", function(t) {
+test("autorunAsync passes Reaction as an argument to view function", function(done) {
     var a = m.observable(1)
 
     var autoRunsCalled = 0
 
     m.autorunAsync(r => {
-        t.equal(typeof r.dispose, "function")
+        expect(typeof r.dispose).toBe("function")
         autoRunsCalled++
         if (a.get() === "pleaseDispose") r.dispose()
     }, 10)
@@ -124,14 +123,13 @@ test("autorunAsync passes Reaction as an argument to view function", function(t)
     setTimeout(() => a.set(4), 700)
 
     setTimeout(function() {
-        t.equal(autoRunsCalled, 3)
-        t.end()
+        expect(autoRunsCalled).toBe(3)
+        done()
     }, 1000)
 })
 
-test("autorunAsync warns when passed an action", function(t) {
+test("autorunAsync warns when passed an action", function() {
     var action = m.action(() => {})
-    t.plan(1)
-    t.throws(() => m.autorunAsync(action), /attempted to pass an action to autorunAsync/)
-    t.end()
+    expect.assertions(1)
+    expect(() => m.autorunAsync(action)).toThrowError(/attempted to pass an action to autorunAsync/)
 })

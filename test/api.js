@@ -1,93 +1,78 @@
 var mobx = require("../")
-var test = require("tape")
 
-test("correct api should be exposed", function(t) {
-    t.deepEquals(
-        Object.keys(mobx).sort(),
-        [
-            "Atom",
-            "BaseAtom", // TODO: remove somehow
-            "IDerivationState",
-            "ObservableMap",
-            "Reaction",
-            "action",
-            "asFlat",
-            "asMap",
-            "asReference",
-            "asStructure",
-            "autorun",
-            "autorunAsync",
-            "computed",
-            "comparer",
-            "createTransformer",
-            "default",
-            "expr",
-            "extendObservable",
-            "extendShallowObservable",
-            "extras",
-            "intercept",
-            "isAction",
-            "isArrayLike",
-            "isBoxedObservable",
-            "isComputed",
-            "isModifierDescriptor",
-            "isObservable",
-            "isObservableArray",
-            "isObservableMap",
-            "isObservableObject",
-            "isStrictModeEnabled",
-            "map",
-            "observable",
-            "observe",
-            "reaction",
-            "runInAction",
-            "spy",
-            "toJS",
-            "transaction",
-            "untracked",
-            "useStrict",
-            "when",
-            "whyRun"
-        ].sort()
-    )
-    t.equals(
-        Object.keys(mobx).filter(function(key) {
-            return mobx[key] == undefined
-        }).length,
-        0
-    )
+test("correct api should be exposed", function() {
+    expect(Object.keys(mobx).sort()).toEqual([
+        "Atom",
+        "BaseAtom", // TODO: remove somehow
+        "IDerivationState",
+        "ObservableMap",
+        "Reaction",
+        "action",
+        "asFlat",
+        "asMap",
+        "asReference",
+        "asStructure",
+        "autorun",
+        "autorunAsync",
+        "computed",
+        "comparer",
+        "createTransformer",
+        "default",
+        "expr",
+        "extendObservable",
+        "extendShallowObservable",
+        "extras",
+        "intercept",
+        "isAction",
+        "isArrayLike",
+        "isBoxedObservable",
+        "isComputed",
+        "isModifierDescriptor",
+        "isObservable",
+        "isObservableArray",
+        "isObservableMap",
+        "isObservableObject",
+        "isStrictModeEnabled",
+        "map",
+        "observable",
+        "observe",
+        "reaction",
+        "runInAction",
+        "spy",
+        "toJS",
+        "transaction",
+        "untracked",
+        "useStrict",
+        "when",
+        "whyRun"
+    ].sort())
+    expect(Object.keys(mobx).filter(function(key) {
+        return mobx[key] == undefined
+    }).length).toBe(0)
 
-    t.deepEquals(
-        Object.keys(mobx.extras).sort(),
-        [
-            "allowStateChanges",
-            "deepEqual",
-            "getAdministration",
-            "getAtom",
-            "getDebugName",
-            "getDependencyTree",
-            "getGlobalState",
-            "getObserverTree",
-            "interceptReads",
-            "isComputingDerivation",
-            "isSpyEnabled",
-            "isolateGlobalState",
-            "onReactionError",
-            "reserveArrayBuffer",
-            "resetGlobalState",
-            "setReactionScheduler",
-            "shareGlobalState",
-            "spyReport",
-            "spyReportEnd",
-            "spyReportStart"
-        ].sort()
-    )
-    t.equals(
-        Object.keys(mobx.extras).filter(function(key) {
-            return mobx.extras[key] == undefined
-        }).length,
-        0
-    )
-
-    t.end()
+    expect(Object.keys(mobx.extras).sort()).toEqual([
+        "allowStateChanges",
+        "deepEqual",
+        "getAdministration",
+        "getAtom",
+        "getDebugName",
+        "getDependencyTree",
+        "getGlobalState",
+        "getObserverTree",
+        "interceptReads",
+        "isComputingDerivation",
+        "isSpyEnabled",
+        "isolateGlobalState",
+        "onReactionError",
+        "reserveArrayBuffer",
+        "resetGlobalState",
+        "setReactionScheduler",
+        "shareGlobalState",
+        "spyReport",
+        "spyReportEnd",
+        "spyReportStart"
+    ].sort())
+    expect(Object.keys(mobx.extras).filter(function(key) {
+        return mobx.extras[key] == undefined
+    }).length).toBe(0)
 })

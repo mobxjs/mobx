@@ -1,8 +1,7 @@
-var test = require("tape")
 var m = require("..")
 var intercept = m.intercept
 
-test("intercept observable value", t => {
+test("intercept observable value", () => {
     var a = m.observable(1)
 
     var d = intercept(a, () => {
@@ -11,12 +10,12 @@ test("intercept observable value", t => {
 
     a.set(2)
 
-    t.equal(a.get(), 1, "should be unchanged")
+    expect(a.get()).toBe(1)
 
     d()
 
     a.set(3)
-    t.equal(a.get(), 3, "should be changed")
+    expect(a.get()).toBe(3)
 
     d = intercept(a, c => {
         if (c.newValue % 2 === 0) {
@@ -26,13 +25,13 @@ test("intercept observable value", t => {
         return c
     })
 
-    t.throws(() => {
+    expect(() => {
         a.set(4)
-    }, "value should be odd!")
+    }).toThrow()
 
-    t.equal(a.get(), 3, "unchanged")
+    expect(a.get()).toBe(3)
     a.set(5)
-    t.equal(a.get(), 5, "changed")
+    expect(a.get()).toBe(5)
 
     d()
     d = intercept(a, c => {
@@ -41,7 +40,7 @@ test("intercept observable value", t => {
     })
 
     a.set(6)
-    t.equal(a.get(), 12, "should be doubled")
+    expect(a.get()).toBe(12)
 
     var d2 = intercept(a, c => {
         c.newValue += 1
@@ -49,21 +48,19 @@ test("intercept observable value", t => {
     })
 
     a.set(7)
-    t.equal(a.get(), 15, "doubled and added")
+    expect(a.get()).toBe(15)
 
     d()
     a.set(8)
-    t.equal(a.get(), 9, "just added")
-
-    t.end()
+    expect(a.get()).toBe(9)
 })
 
-test("intercept array", t => {
+test("intercept array", () => {
     var a = m.observable([1, 2])
 
     var d = a.intercept(c => null)
     a.push(2)
-    t.deepEqual(a.slice(), [1, 2])
+    expect(a.slice()).toEqual([1, 2])
 
     d()
 
@@ -80,14 +77,12 @@ test("intercept array", t => {
 
     a.unshift(3, 4)
 
-    t.deepEqual(a.slice(), [3, 4, 6, 2], "splice has been modified")
+    expect(a.slice()).toEqual([3, 4, 6, 2])
     a[2] = 5
-    t.deepEqual(a.slice(), [3, 4, 15, 2], "update has tripled")
-
-    t.end()
+    expect(a.slice()).toEqual([3, 4, 15, 2])
 })
 
-test("intercept object", t => {
+test("intercept object", () => {
     var a = m.observable({
         b: 3
     })
@@ -101,7 +96,7 @@ test("intercept object", t => {
 
     a.b = 4
 
-    t.equal(a.b, 12, "intercept applied")
+    expect(a.b).toBe(12)
 
     var d2 = intercept(a, "b", c => {
         c.newValue += 1
@@ -109,20 +104,20 @@ test("intercept object", t => {
     })
 
     a.b = 5
-    t.equal(a.b, 16, "attribute selector applied last")
+    expect(a.b).toBe(16)
 
     var d3 = intercept(a, c => {
-        t.equal(c.name, "b"), t.equal(c.object, a)
-        t.equal(c.type, "update")
+        expect(c.name).toBe("b"), expect(c.object).toBe(a)
+        expect(c.type).toBe("update")
         return null
     })
 
     a.b = 7
-    t.equal(a.b, 16, "interceptor not applied")
+    expect(a.b).toBe(16)
 
     d3()
     a.b = 7
-    t.equal(a.b, 22, "interceptor applied again")
+    expect(a.b).toBe(22)
 
     var d4 = intercept(a, c => {
         if (c.type === "add") {
@@ -132,19 +127,17 @@ test("intercept object", t => {
     })
 
     m.extendObservable(a, { c: 1 })
-    t.equal(a.c, undefined, "extension intercepted")
-    t.equal(m.isObservable(a, "c"), false)
+    expect(a.c).toBe(undefined)
+    expect(m.isObservable(a, "c")).toBe(false)
 
     d4()
 
     m.extendObservable(a, { c: 2 })
-    t.equal(a.c, 6, "extension not intercepted")
-    t.equal(m.isObservable(a, "c"), true)
-
-    t.end()
+    expect(a.c).toBe(6)
+    expect(m.isObservable(a, "c")).toBe(true)
 })
 
-test("intercept map", t => {
+test("intercept map", () => {
     var a = m.map({
         b: 3
     })
@@ -156,7 +149,7 @@ test("intercept map", t => {
 
     a.set("b", 4)
 
-    t.equal(a.get("b"), 12, "intercept applied")
+    expect(a.get("b")).toBe(12)
 
     var d2 = intercept(a, "b", c => {
         c.newValue += 1
@@ -164,20 +157,20 @@ test("intercept map", t => {
     })
 
     a.set("b", 5)
-    t.equal(a.get("b"), 16, "attribute selector applied last")
+    expect(a.get("b")).toBe(16)
 
     var d3 = intercept(a, c => {
-        t.equal(c.name, "b"), t.equal(c.object, a)
-        t.equal(c.type, "update")
+        expect(c.name).toBe("b"), expect(c.object).toBe(a)
+        expect(c.type).toBe("update")
         return null
     })
 
     a.set("b", 7)
-    t.equal(a.get("b"), 16, "interceptor not applied")
+    expect(a.get("b")).toBe(16)
 
     d3()
     a.set("b", 7)
-    t.equal(a.get("b"), 22, "interceptor applied again")
+    expect(a.get("b")).toBe(22)
 
     var d4 = intercept(a, c => {
         if (c.type === "delete") return null
@@ -185,13 +178,11 @@ test("intercept map", t => {
     })
 
     a.delete("b")
-    t.equal(a.has("b"), true)
-    t.equal(a.get("b"), 22, "delete intercepted")
+    expect(a.has("b")).toBe(true)
+    expect(a.get("b")).toBe(22)
 
     d4()
     a.delete("b")
-    t.equal(a.has("b"), false)
-    t.equal(a.get("c"), undefined, "delete not intercepted")
-
-    t.end()
+    expect(a.has("b")).toBe(false)
+    expect(a.get("c")).toBe(undefined)
 })

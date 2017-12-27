@@ -14,8 +14,6 @@ import {
 } from "../"
 import * as mobx from "../"
 
-var test = require("tape")
-
 class Box {
     @observable uninitialized
     @observable height = 20
@@ -38,36 +36,34 @@ autorun(() => {
     ar.push(box.width)
 })
 
-test("babel", function(t) {
+test("babel", function() {
     var s = ar.slice()
-    t.deepEqual(s, [40])
+    expect(s).toEqual([40])
     box.height = 10
     s = ar.slice()
-    t.deepEqual(s, [40, 20])
+    expect(s).toEqual([40, 20])
     box.sizes.push(3, 4)
     s = ar.slice()
-    t.deepEqual(s, [40, 20, 60])
+    expect(s).toEqual([40, 20, 60])
     box.someFunc = () => 7
     s = ar.slice()
-    t.deepEqual(s, [40, 20, 60, 210])
+    expect(s).toEqual([40, 20, 60, 210])
     box.uninitialized = true
     s = ar.slice()
-    t.deepEqual(s, [40, 20, 60, 210, 420])
-    t.end()
+    expect(s).toEqual([40, 20, 60, 210, 420])
 })
 
-test("should not be possible to use @action with getters", t => {
-    t.throws(() => {
+test("should not be possible to use @action with getters", () => {
+    expect(() => {
         class A {
             @action get Test() { }
         }
-    }, new Error('[mobx] action is not expected to be used with getters'))
+    }).toThrowError(new Error('[mobx] action is not expected to be used with getters'))
 
     mobx.extras.resetGlobalState()
-    t.end()
 })
 
-test("babel: parameterized computed decorator", t => {
+test("babel: parameterized computed decorator", () => {
     class TestClass {
         @observable x = 3
         @observable y = 3
@@ -82,21 +78,19 @@ test("babel: parameterized computed decorator", t => {
     const d = autorun(() => changes.push(t1.boxedSum))
 
     t1.y = 4 // change
-    t.equal(changes.length, 2)
+    expect(changes.length).toBe(2)
     t1.y = 4.2 // no change
-    t.equal(changes.length, 2)
+    expect(changes.length).toBe(2)
     transaction(() => {
         t1.y = 3
         t1.x = 4
     }) // no change
-    t.equal(changes.length, 2)
+    expect(changes.length).toBe(2)
     t1.x = 6 // change
-    t.equal(changes.length, 3)
+    expect(changes.length).toBe(3)
     d()
 
-    t.deepEqual(changes, [{ sum: 6 }, { sum: 7 }, { sum: 9 }])
-
-    t.end()
+    expect(changes).toEqual([{ sum: 6 }, { sum: 7 }, { sum: 9 }])
 })
 
 class Order {
@@ -111,12 +105,12 @@ class Order {
     }
 }
 
-test("decorators", function(t) {
+test("decorators", function() {
     var o = new Order()
-    t.equal(isObservableObject(o), true)
-    t.equal(isObservable(o, "amount"), true)
-    t.equal(o.total, 6) // .... this is required to initialize the props which are made reactive lazily...
-    t.equal(isObservable(o, "total"), true)
+    expect(isObservableObject(o)).toBe(true)
+    expect(isObservable(o, "amount")).toBe(true)
+    expect(o.total).toBe(6) // .... this is required to initialize the props which are made reactive lazily...
+    expect(isObservable(o, "total")).toBe(true)
 
     var events = []
     var d1 = observe(o, ev => events.push(ev.name, ev.oldValue))
@@ -131,7 +125,7 @@ test("decorators", function(t) {
 
     o.price = 5
 
-    t.deepEqual(events, [
+    expect(events).toEqual([
         8, // new total
         6, // old total
         4, // new price
@@ -139,11 +133,9 @@ test("decorators", function(t) {
         "price", // event name
         3 // event oldValue
     ])
-
-    t.end()
 })
 
-test("issue 191 - shared initializers (babel)", function(t) {
+test("issue 191 - shared initializers (babel)", function() {
     class Test {
         @observable obj = { a: 1 }
         @observable array = [2]
@@ -157,18 +149,16 @@ test("issue 191 - shared initializers (babel)", function(t) {
     t2.obj.a = 3
     t2.array.push(4)
 
-    t.notEqual(t1.obj, t2.obj)
-    t.notEqual(t1.array, t2.array)
-    t.equal(t1.obj.a, 2)
-    t.equal(t2.obj.a, 3)
+    expect(t1.obj).not.toBe(t2.obj)
+    expect(t1.array).not.toBe(t2.array)
+    expect(t1.obj.a).toBe(2)
+    expect(t2.obj.a).toBe(3)
 
-    t.deepEqual(t1.array.slice(), [2, 3])
-    t.deepEqual(t2.array.slice(), [2, 4])
-
-    t.end()
+    expect(t1.array.slice()).toEqual([2, 3])
+    expect(t2.array.slice()).toEqual([2, 4])
 })
 
-test("705 - setter undoing caching (babel)", t => {
+test("705 - setter undoing caching (babel)", () => {
     let recomputes = 0
     let autoruns = 0
 
@@ -190,8 +180,8 @@ test("705 - setter undoing caching (babel)", t => {
     p1.name = "Tom Tank"
     p1.title = "Mr."
 
-    t.equal(recomputes, 0)
-    t.equal(autoruns, 0)
+    expect(recomputes).toBe(0)
+    expect(autoruns).toBe(0)
 
     const d1 = autorun(() => {
         autoruns++
@@ -203,16 +193,15 @@ test("705 - setter undoing caching (babel)", t => {
         p1.fullName
     })
 
-    t.equal(recomputes, 1)
-    t.equal(autoruns, 2)
+    expect(recomputes).toBe(1)
+    expect(autoruns).toBe(2)
 
     p1.title = "Master"
-    t.equal(recomputes, 2)
-    t.equal(autoruns, 4)
+    expect(recomputes).toBe(2)
+    expect(autoruns).toBe(4)
 
     d1()
     d2()
-    t.end()
 })
 
 function normalizeSpyEvents(events) {
@@ -223,7 +212,7 @@ function normalizeSpyEvents(events) {
     return events
 }
 
-test("action decorator (babel)", function(t) {
+test("action decorator (babel)", function() {
     class Store {
         constructor(multiplier) {
             this.multiplier = multiplier
@@ -239,11 +228,11 @@ test("action decorator (babel)", function(t) {
     const store2 = new Store(3)
     const events: any[] = []
     const d = spy(events.push.bind(events))
-    t.equal(store1.add(3, 4), 14)
-    t.equal(store2.add(3, 4), 21)
-    t.equal(store1.add(1, 1), 4)
+    expect(store1.add(3, 4)).toBe(14)
+    expect(store2.add(3, 4)).toBe(21)
+    expect(store1.add(1, 1)).toBe(4)
 
-    t.deepEqual(normalizeSpyEvents(events), [
+    expect(normalizeSpyEvents(events)).toEqual([
         { arguments: [3, 4], name: "add", spyReportStart: true, object: store1, type: "action" },
         { spyReportEnd: true },
         { arguments: [3, 4], name: "add", spyReportStart: true, object: store2, type: "action" },
@@ -253,10 +242,9 @@ test("action decorator (babel)", function(t) {
     ])
 
     d()
-    t.end()
 })
 
-test("custom action decorator (babel)", function(t) {
+test("custom action decorator (babel)", function() {
     class Store {
         constructor(multiplier) {
             this.multiplier = multiplier
@@ -272,11 +260,11 @@ test("custom action decorator (babel)", function(t) {
     const store2 = new Store(3)
     const events: any[] = []
     const d = spy(events.push.bind(events))
-    t.equal(store1.add(3, 4), 14)
-    t.equal(store2.add(3, 4), 21)
-    t.equal(store1.add(1, 1), 4)
+    expect(store1.add(3, 4)).toBe(14)
+    expect(store2.add(3, 4)).toBe(21)
+    expect(store1.add(1, 1)).toBe(4)
 
-    t.deepEqual(normalizeSpyEvents(events), [
+    expect(normalizeSpyEvents(events)).toEqual([
         {
             arguments: [3, 4],
             name: "zoem zoem",
@@ -304,10 +292,9 @@ test("custom action decorator (babel)", function(t) {
     ])
 
     d()
-    t.end()
 })
 
-test("action decorator on field (babel)", function(t) {
+test("action decorator on field (babel)", function() {
     class Store {
         constructor(multiplier) {
             this.multiplier = multiplier
@@ -324,11 +311,11 @@ test("action decorator on field (babel)", function(t) {
 
     const events: any[] = []
     const d = spy(events.push.bind(events))
-    t.equal(store1.add(3, 4), 14)
-    t.equal(store2.add(5, 4), 63)
-    t.equal(store1.add(2, 2), 8)
+    expect(store1.add(3, 4)).toBe(14)
+    expect(store2.add(5, 4)).toBe(63)
+    expect(store1.add(2, 2)).toBe(8)
 
-    t.deepEqual(normalizeSpyEvents(events), [
+    expect(normalizeSpyEvents(events)).toEqual([
         { arguments: [3, 4], name: "add", spyReportStart: true, object: store1, type: "action" },
         { spyReportEnd: true },
         { arguments: [5, 4], name: "add", spyReportStart: true, object: store2, type: "action" },
@@ -338,10 +325,9 @@ test("action decorator on field (babel)", function(t) {
     ])
 
     d()
-    t.end()
 })
 
-test("custom action decorator on field (babel)", function(t) {
+test("custom action decorator on field (babel)", function() {
     class Store {
         constructor(multiplier) {
             this.multiplier = multiplier
@@ -358,11 +344,11 @@ test("custom action decorator on field (babel)", function(t) {
 
     const events: any[] = []
     const d = spy(events.push.bind(events))
-    t.equal(store1.add(3, 4), 14)
-    t.equal(store2.add(5, 4), 63)
-    t.equal(store1.add(2, 2), 8)
+    expect(store1.add(3, 4)).toBe(14)
+    expect(store2.add(5, 4)).toBe(63)
+    expect(store1.add(2, 2)).toBe(8)
 
-    t.deepEqual(normalizeSpyEvents(events), [
+    expect(normalizeSpyEvents(events)).toEqual([
         {
             arguments: [3, 4],
             name: "zoem zoem",
@@ -390,10 +376,9 @@ test("custom action decorator on field (babel)", function(t) {
     ])
 
     d()
-    t.end()
 })
 
-test("267 (babel) should be possible to declare properties observable outside strict mode", t => {
+test("267 (babel) should be possible to declare properties observable outside strict mode", () => {
     useStrict(true)
 
     class Store {
@@ -401,10 +386,9 @@ test("267 (babel) should be possible to declare properties observable outside st
     }
 
     useStrict(false)
-    t.end()
 })
 
-test("288 atom not detected for object property", t => {
+test("288 atom not detected for object property", () => {
     class Store {
         @mobx.observable foo = ""
     }
@@ -419,11 +403,9 @@ test("288 atom not detected for object property", t => {
         },
         true
     )
-
-    t.end()
 })
 
-test("observable performance", t => {
+test("observable performance", () => {
     const AMOUNT = 100000
 
     class A {
@@ -454,11 +436,9 @@ test("observable performance", t => {
     }
 
     console.log("changed in ", Date.now() - start)
-
-    t.end()
 })
 
-test("unbound methods", t => {
+test("unbound methods", () => {
     class A {
         // shared across all instances
         @action
@@ -471,16 +451,15 @@ test("unbound methods", t => {
     const a1 = new A()
     const a2 = new A()
 
-    t.equal(a1.m1, a2.m1)
-    t.notEqual(a1.m2, a2.m2)
-    t.equal(a1.hasOwnProperty("m1"), false)
-    t.equal(a1.hasOwnProperty("m2"), true)
-    t.equal(a2.hasOwnProperty("m1"), false)
-    t.equal(a2.hasOwnProperty("m2"), true)
-    t.end()
+    expect(a1.m1).toBe(a2.m1)
+    expect(a1.m2).not.toBe(a2.m2)
+    expect(a1.hasOwnProperty("m1")).toBe(false)
+    expect(a1.hasOwnProperty("m2")).toBe(true)
+    expect(a2.hasOwnProperty("m1")).toBe(false)
+    expect(a2.hasOwnProperty("m2")).toBe(true)
 })
 
-test("inheritance", t => {
+test("inheritance", () => {
     class A {
         @observable a = 2
     }
@@ -503,12 +482,10 @@ test("inheritance", t => {
     b2.b = 5
     b2.a = 6
 
-    t.deepEqual(values, [10, 11, 12, 14, 18])
-
-    t.end()
+    expect(values).toEqual([10, 11, 12, 14, 18])
 })
 
-test("inheritance overrides observable", t => {
+test("inheritance overrides observable", () => {
     class A {
         @observable a = 2
     }
@@ -532,12 +509,10 @@ test("inheritance overrides observable", t => {
     b2.b = 5
     b2.a = 6
 
-    t.deepEqual(values, [16, 14, 15, 17, 18])
-
-    t.end()
+    expect(values).toEqual([16, 14, 15, 17, 18])
 })
 
-test("reusing initializers", t => {
+test("reusing initializers", () => {
     class A {
         @observable a = 3
         @observable b = this.a + 2
@@ -556,12 +531,10 @@ test("reusing initializers", t => {
     mobx.autorun(() => values.push(a.d))
 
     a.a = 4
-    t.deepEqual(values, [9, 10])
-
-    t.end()
+    expect(values).toEqual([9, 10])
 })
 
-test("enumerability", t => {
+test("enumerability", () => {
     class A {
         @observable a = 1 // enumerable, on proto
         @observable a2 = 2
@@ -581,23 +554,20 @@ test("enumerability", t => {
     let props = []
     for (var key in a) props.push(key)
 
-    t.deepEqual(
-        ownProps,
-        [
-            // should have a, not supported yet in babel...
-        ]
-    )
+    expect(ownProps).toEqual([
+        // should have a, not supported yet in babel...
+    ])
 
-    t.deepEqual(props, ["a", "a2"])
+    expect(props).toEqual(["a", "a2"])
 
-    t.equal("a" in a, true)
-    t.equal(a.hasOwnProperty("a"), false) // true would better..
-    t.equal(a.hasOwnProperty("b"), false)
-    t.equal(a.hasOwnProperty("m"), false)
-    t.equal(a.hasOwnProperty("m2"), false) // true would be ok as well
+    expect("a" in a).toBe(true)
+    expect(a.hasOwnProperty("a")).toBe(false) // true would better..
+    expect(a.hasOwnProperty("b")).toBe(false)
+    expect(a.hasOwnProperty("m")).toBe(false)
+    expect(a.hasOwnProperty("m2")).toBe(false) // true would be ok as well
 
-    t.equal(mobx.isAction(a.m), true)
-    t.equal(mobx.isAction(a.m2), true)
+    expect(mobx.isAction(a.m)).toBe(true)
+    expect(mobx.isAction(a.m2)).toBe(true)
 
     // after initialization
     a.a
@@ -609,24 +579,22 @@ test("enumerability", t => {
     props = []
     for (var key in a) props.push(key)
 
-    t.deepEqual(ownProps, [
+    expect(ownProps).toEqual([
         "a",
         "a2" // a2 is now initialized as well, altough never accessed!
     ])
 
-    t.deepEqual(props, ["a", "a2"])
+    expect(props).toEqual(["a", "a2"])
 
-    t.equal("a" in a, true)
-    t.equal(a.hasOwnProperty("a"), true)
-    t.equal(a.hasOwnProperty("a2"), true)
-    t.equal(a.hasOwnProperty("b"), false)
-    t.equal(a.hasOwnProperty("m"), false)
-    t.equal(a.hasOwnProperty("m2"), true)
-
-    t.end()
+    expect("a" in a).toBe(true)
+    expect(a.hasOwnProperty("a")).toBe(true)
+    expect(a.hasOwnProperty("a2")).toBe(true)
+    expect(a.hasOwnProperty("b")).toBe(false)
+    expect(a.hasOwnProperty("m")).toBe(false)
+    expect(a.hasOwnProperty("m2")).toBe(true)
 })
 
-test("enumerability - workaround", t => {
+test("enumerability - workaround", () => {
     class A {
         @observable a = 1 // enumerable, on proto
         @observable a2 = 2
@@ -650,24 +618,22 @@ test("enumerability - workaround", t => {
     const props = []
     for (var key in a) props.push(key)
 
-    t.deepEqual(ownProps, [
+    expect(ownProps).toEqual([
         "a",
         "a2" // a2 is now initialized as well, altough never accessed!
     ])
 
-    t.deepEqual(props, ["a", "a2"])
+    expect(props).toEqual(["a", "a2"])
 
-    t.equal("a" in a, true)
-    t.equal(a.hasOwnProperty("a"), true)
-    t.equal(a.hasOwnProperty("a2"), true)
-    t.equal(a.hasOwnProperty("b"), false)
-    t.equal(a.hasOwnProperty("m"), false)
-    t.equal(a.hasOwnProperty("m2"), true)
-
-    t.end()
+    expect("a" in a).toBe(true)
+    expect(a.hasOwnProperty("a")).toBe(true)
+    expect(a.hasOwnProperty("a2")).toBe(true)
+    expect(a.hasOwnProperty("b")).toBe(false)
+    expect(a.hasOwnProperty("m")).toBe(false)
+    expect(a.hasOwnProperty("m2")).toBe(true)
 })
 
-test("issue 285 (babel)", t => {
+test("issue 285 (babel)", () => {
     const { observable, toJS } = mobx
 
     class Todo {
@@ -682,17 +648,15 @@ test("issue 285 (babel)", t => {
 
     var todo = new Todo("Something to do")
 
-    t.deepEqual(toJS(todo), {
+    expect(toJS(todo)).toEqual({
         id: 1,
         title: "Something to do",
         finished: false,
         childThings: [1, 2, 3]
     })
-
-    t.end()
 })
 
-test("verify object assign (babel)", t => {
+test("verify object assign (babel)", () => {
     class Todo {
         @observable title = "test"
         @computed
@@ -702,23 +666,18 @@ test("verify object assign (babel)", t => {
     }
 
     const todo = new Todo()
-    t.deepEqual(
-        Object.assign({}, todo),
-        {
-            //		Should be:	title: "test"!
-        }
-    )
+    expect(Object.assign({}, todo)).toEqual({
+        //		Should be:	title: "test"!
+    })
 
     todo.title // lazy initialization :'(
 
-    t.deepEqual(Object.assign({}, todo), {
+    expect(Object.assign({}, todo)).toEqual({
         title: "test"
     })
-
-    t.end()
 })
 
-test("379, inheritable actions (babel)", t => {
+test("379, inheritable actions (babel)", () => {
     class A {
         @action
         method() {
@@ -741,21 +700,19 @@ test("379, inheritable actions (babel)", t => {
     }
 
     const b = new B()
-    t.equal(b.method(), 84)
-    t.equal(isAction(b.method), true)
+    expect(b.method()).toBe(84)
+    expect(isAction(b.method)).toBe(true)
 
     const a = new A()
-    t.equal(a.method(), 42)
-    t.equal(isAction(a.method), true)
+    expect(a.method()).toBe(42)
+    expect(isAction(a.method)).toBe(true)
 
     const c = new C()
-    t.equal(c.method(), 87)
-    t.equal(isAction(c.method), true)
-
-    t.end()
+    expect(c.method()).toBe(87)
+    expect(isAction(c.method)).toBe(true)
 })
 
-test("379, inheritable actions - 2 (babel)", t => {
+test("379, inheritable actions - 2 (babel)", () => {
     class A {
         @action("a method")
         method() {
@@ -778,21 +735,19 @@ test("379, inheritable actions - 2 (babel)", t => {
     }
 
     const b = new B()
-    t.equal(b.method(), 84)
-    t.equal(isAction(b.method), true)
+    expect(b.method()).toBe(84)
+    expect(isAction(b.method)).toBe(true)
 
     const a = new A()
-    t.equal(a.method(), 42)
-    t.equal(isAction(a.method), true)
+    expect(a.method()).toBe(42)
+    expect(isAction(a.method)).toBe(true)
 
     const c = new C()
-    t.equal(c.method(), 87)
-    t.equal(isAction(c.method), true)
-
-    t.end()
+    expect(c.method()).toBe(87)
+    expect(isAction(c.method)).toBe(true)
 })
 
-test("505, don't throw when accessing subclass fields in super constructor (babel)", t => {
+test("505, don't throw when accessing subclass fields in super constructor (babel)", () => {
     const values = {}
     class A {
         @observable a = 1
@@ -807,11 +762,10 @@ test("505, don't throw when accessing subclass fields in super constructor (babe
     }
 
     new B()
-    t.deepEqual(values, { a: 1, b: 2 }) // In the TS test b is undefined, which is actually the expected behavior?
-    t.end()
+    expect(values).toEqual({ a: 1, b: 2 }) // In the TS test b is undefined, which is actually the expected behavior?
 })
 
-test("computed setter should succeed (babel)", function(t) {
+test("computed setter should succeed (babel)", function() {
     class Bla {
         @observable a = 3
         @computed
@@ -824,14 +778,12 @@ test("computed setter should succeed (babel)", function(t) {
     }
 
     const b = new Bla()
-    t.equal(b.propX, 6)
+    expect(b.propX).toBe(6)
     b.propX = 4
-    t.equal(b.propX, 8)
-
-    t.end()
+    expect(b.propX).toBe(8)
 })
 
-test("computed getter / setter for plan objects should succeed (babel)", function(t) {
+test("computed getter / setter for plan objects should succeed (babel)", function() {
     const b = observable({
         a: 3,
         get propX() {
@@ -844,43 +796,37 @@ test("computed getter / setter for plan objects should succeed (babel)", functio
 
     const values = []
     mobx.autorun(() => values.push(b.propX))
-    t.equal(b.propX, 6)
+    expect(b.propX).toBe(6)
     b.propX = 4
-    t.equal(b.propX, 8)
+    expect(b.propX).toBe(8)
 
-    t.deepEqual(values, [6, 8])
-
-    t.end()
+    expect(values).toEqual([6, 8])
 })
 
-test("issue #701", t => {
+test("issue #701", () => {
     class Model {
         @observable a = 5
     }
 
     const model = new Model()
 
-    t.deepEqual(mobx.toJS(model), { a: 5 })
-    t.equal(mobx.isObservable(model), true)
-    t.equal(mobx.isObservableObject(model), true)
-
-    t.end()
+    expect(mobx.toJS(model)).toEqual({ a: 5 })
+    expect(mobx.isObservable(model)).toBe(true)
+    expect(mobx.isObservableObject(model)).toBe(true)
 })
 
-test("@observable.ref (Babel)", t => {
+test("@observable.ref (Babel)", () => {
     class A {
         @observable.ref ref = { a: 3 }
     }
 
     const a = new A()
-    t.equal(a.ref.a, 3)
-    t.equal(mobx.isObservable(a.ref), false)
-    t.equal(mobx.isObservable(a, "ref"), true)
-
-    t.end()
+    expect(a.ref.a).toBe(3)
+    expect(mobx.isObservable(a.ref)).toBe(false)
+    expect(mobx.isObservable(a, "ref")).toBe(true)
 })
 
-test("@observable.shallow (Babel)", t => {
+test("@observable.shallow (Babel)", () => {
     class A {
         @observable.shallow arr = [{ todo: 1 }]
     }
@@ -888,16 +834,14 @@ test("@observable.shallow (Babel)", t => {
     const a = new A()
     const todo2 = { todo: 2 }
     a.arr.push(todo2)
-    t.equal(mobx.isObservable(a.arr), true)
-    t.equal(mobx.isObservable(a, "arr"), true)
-    t.equal(mobx.isObservable(a.arr[0]), false)
-    t.equal(mobx.isObservable(a.arr[1]), false)
-    t.ok(a.arr[1] === todo2)
-
-    t.end()
+    expect(mobx.isObservable(a.arr)).toBe(true)
+    expect(mobx.isObservable(a, "arr")).toBe(true)
+    expect(mobx.isObservable(a.arr[0])).toBe(false)
+    expect(mobx.isObservable(a.arr[1])).toBe(false)
+    expect(a.arr[1] === todo2).toBeTruthy()
 })
 
-test("@observable.deep (Babel)", t => {
+test("@observable.deep (Babel)", () => {
     class A {
         @observable.deep arr = [{ todo: 1 }]
     }
@@ -906,17 +850,15 @@ test("@observable.deep (Babel)", t => {
     const todo2 = { todo: 2 }
     a.arr.push(todo2)
 
-    t.equal(mobx.isObservable(a.arr), true)
-    t.equal(mobx.isObservable(a, "arr"), true)
-    t.equal(mobx.isObservable(a.arr[0]), true)
-    t.equal(mobx.isObservable(a.arr[1]), true)
-    t.ok(a.arr[1] !== todo2)
-    t.equal(isObservable(todo2), false)
-
-    t.end()
+    expect(mobx.isObservable(a.arr)).toBe(true)
+    expect(mobx.isObservable(a, "arr")).toBe(true)
+    expect(mobx.isObservable(a.arr[0])).toBe(true)
+    expect(mobx.isObservable(a.arr[1])).toBe(true)
+    expect(a.arr[1] !== todo2).toBeTruthy()
+    expect(isObservable(todo2)).toBe(false)
 })
 
-test("action.bound binds (Babel)", t => {
+test("action.bound binds (Babel)", () => {
     class A {
         @observable x = 0
         @action.bound
@@ -929,12 +871,10 @@ test("action.bound binds (Babel)", t => {
     const runner = a.inc
     runner(2)
 
-    t.equal(a.x, 2)
-
-    t.end()
+    expect(a.x).toBe(2)
 })
 
-test("@computed.equals (Babel)", t => {
+test("@computed.equals (Babel)", () => {
     const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
     class Time {
         constructor(hour, minute) {
@@ -955,21 +895,19 @@ test("@computed.equals (Babel)", t => {
     const changes = []
     const disposeAutorun = autorun(() => changes.push(time.time))
 
-    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
     time.hour = 9
-    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
     time.minute = 0
-    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
     time.hour = 10
-    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
     time.minute = 30
-    t.deepEqual(changes, [
+    expect(changes).toEqual([
         { hour: 9, minute: 0 },
         { hour: 10, minute: 0 },
         { hour: 10, minute: 30 }
     ])
 
     disposeAutorun()
-
-    t.end()
 })

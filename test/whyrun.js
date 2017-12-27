@@ -1,10 +1,9 @@
 "use strict"
 
-const test = require("tape")
 const mobx = require("../")
 const noop = () => {}
 
-test("whyrun", t => {
+test("whyrun", () => {
     const baselog = console.log
     let lastButOneLine = ""
     let lastLine = ""
@@ -31,61 +30,59 @@ test("whyrun", t => {
     // TODO: enable this assertion
     // t.ok(lastLine.match(/suspended/), "just accessed fullname"); // no normal report, just a notification that nothing is being derived atm
 
-    t.ok(whyRun(x, "fullname").match(/\[idle\]/))
-    t.ok(whyRun(x, "fullname").match(/suspended/))
+    expect(whyRun(x, "fullname").match(/\[idle\]/)).toBeTruthy()
+    expect(whyRun(x, "fullname").match(/suspended/)).toBeTruthy()
 
     const d = mobx.autorun("loggerzz", () => {
         x.fullname
         whyRun()
     })
 
-    t.ok(lastButOneLine.match(/\[active\]/))
-    t.ok(lastButOneLine.match(/\.firstname/))
-    t.ok(lastButOneLine.match(/\.lastname/))
+    expect(lastButOneLine.match(/\[active\]/)).toBeTruthy()
+    expect(lastButOneLine.match(/\.firstname/)).toBeTruthy()
+    expect(lastButOneLine.match(/\.lastname/)).toBeTruthy()
 
-    t.ok(lastLine.match(/loggerzz/))
-    t.ok(lastLine.match(/\[running\]/))
-    t.ok(lastLine.match(/\.fullname/))
+    expect(lastLine.match(/loggerzz/)).toBeTruthy()
+    expect(lastLine.match(/\[running\]/)).toBeTruthy()
+    expect(lastLine.match(/\.fullname/)).toBeTruthy()
 
-    t.ok(whyRun(x, "fullname").match(/\[idle\]/))
-    t.ok(whyRun(x, "fullname").match(/\.firstname/))
-    t.ok(whyRun(x, "fullname").match(/\.lastname/))
-    t.ok(whyRun(x, "fullname").match(/loggerzz/))
+    expect(whyRun(x, "fullname").match(/\[idle\]/)).toBeTruthy()
+    expect(whyRun(x, "fullname").match(/\.firstname/)).toBeTruthy()
+    expect(whyRun(x, "fullname").match(/\.lastname/)).toBeTruthy()
+    expect(whyRun(x, "fullname").match(/loggerzz/)).toBeTruthy()
 
-    t.ok(whyRun(d).match(/\[idle\]/))
-    t.ok(whyRun(d).match(/\.fullname/))
+    expect(whyRun(d).match(/\[idle\]/)).toBeTruthy()
+    expect(whyRun(d).match(/\.fullname/)).toBeTruthy()
 
-    t.ok(whyRun(d).match(/loggerzz/))
+    expect(whyRun(d).match(/loggerzz/)).toBeTruthy()
 
     mobx.transaction(() => {
         x.firstname = "Veria"
-        t.ok(whyRun(x, "fullname").match(/\[idle\]/), "made change in transaction")
+        expect(whyRun(x, "fullname").match(/\[idle\]/)).toBeTruthy()
 
-        t.ok(whyRun(d).match(/\[scheduled\]/))
+        expect(whyRun(d).match(/\[scheduled\]/)).toBeTruthy()
     })
 
-    t.ok(lastButOneLine.match(/will re-run/))
-    t.ok(lastButOneLine.match(/\.firstname/))
-    t.ok(lastButOneLine.match(/\.lastname/))
-    t.ok(lastButOneLine.match(/\loggerzz/))
+    expect(lastButOneLine.match(/will re-run/)).toBeTruthy()
+    expect(lastButOneLine.match(/\.firstname/)).toBeTruthy()
+    expect(lastButOneLine.match(/\.lastname/)).toBeTruthy()
+    expect(lastButOneLine.match(/\loggerzz/)).toBeTruthy()
 
-    t.ok(lastLine.match(/\[running\]/))
-    t.ok(lastLine.match(/\.fullname/))
+    expect(lastLine.match(/\[running\]/)).toBeTruthy()
+    expect(lastLine.match(/\.fullname/)).toBeTruthy()
 
-    t.ok(whyRun(x, "fullname").match(/\[idle\]/))
-    t.ok(whyRun(x, "fullname").match(/\.firstname/))
-    t.ok(whyRun(x, "fullname").match(/\.lastname/))
-    t.ok(whyRun(x, "fullname").match(/loggerzz/))
+    expect(whyRun(x, "fullname").match(/\[idle\]/)).toBeTruthy()
+    expect(whyRun(x, "fullname").match(/\.firstname/)).toBeTruthy()
+    expect(whyRun(x, "fullname").match(/\.lastname/)).toBeTruthy()
+    expect(whyRun(x, "fullname").match(/loggerzz/)).toBeTruthy()
 
-    t.ok(whyRun(d).match(/\[idle\]/))
-    t.ok(whyRun(d).match(/\.fullname/))
-    t.ok(whyRun(d).match(/loggerzz/))
+    expect(whyRun(d).match(/\[idle\]/)).toBeTruthy()
+    expect(whyRun(d).match(/\.fullname/)).toBeTruthy()
+    expect(whyRun(d).match(/loggerzz/)).toBeTruthy()
 
     d()
 
-    t.ok(whyRun(d).match(/\[stopped\]/))
-    t.ok(whyRun(x, "fullname").match(/\[idle\]/))
-    t.ok(whyRun(x, "fullname").match(/suspended/))
-
-    t.end()
+    expect(whyRun(d).match(/\[stopped\]/)).toBeTruthy()
+    expect(whyRun(x, "fullname").match(/\[idle\]/)).toBeTruthy()
+    expect(whyRun(x, "fullname").match(/suspended/)).toBeTruthy()
 })

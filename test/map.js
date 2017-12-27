@@ -1,12 +1,11 @@
 "use strict"
 
-var test = require("tape")
 var mobx = require("..")
 var map = mobx.map
 var autorun = mobx.autorun
 var iterall = require("iterall")
 
-test("map crud", function(t) {
+test("map crud", function() {
     mobx.extras.getGlobalState().mobxGuid = 0 // hmm dangerous reset?
 
     var events = []
@@ -15,45 +14,45 @@ test("map crud", function(t) {
         events.push(changes)
     })
 
-    t.equal(m.has("a"), true)
-    t.equal(m.has("b"), false)
-    t.equal(m.get("a"), 1)
-    t.equal(m.get("b"), undefined)
-    t.equal(m.size, 1)
+    expect(m.has("a")).toBe(true)
+    expect(m.has("b")).toBe(false)
+    expect(m.get("a")).toBe(1)
+    expect(m.get("b")).toBe(undefined)
+    expect(m.size).toBe(1)
 
     m.set("a", 2)
-    t.equal(m.has("a"), true)
-    t.equal(m.get("a"), 2)
+    expect(m.has("a")).toBe(true)
+    expect(m.get("a")).toBe(2)
 
     m.set("b", 3)
-    t.equal(m.has("b"), true)
-    t.equal(m.get("b"), 3)
+    expect(m.has("b")).toBe(true)
+    expect(m.get("b")).toBe(3)
 
-    t.deepEqual(m.keys(), ["a", "b"])
-    t.deepEqual(m.values(), [2, 3])
-    t.deepEqual(m.entries(), [["a", 2], ["b", 3]])
-    t.deepEqual(m.toJS(), { a: 2, b: 3 })
-    t.deepEqual(JSON.stringify(m), '{"a":2,"b":3}')
-    t.deepEqual(m.toString(), "ObservableMap@1[{ a: 2, b: 3 }]")
-    t.equal(m.size, 2)
+    expect(m.keys()).toEqual(["a", "b"])
+    expect(m.values()).toEqual([2, 3])
+    expect(m.entries()).toEqual([["a", 2], ["b", 3]])
+    expect(m.toJS()).toEqual({ a: 2, b: 3 })
+    expect(JSON.stringify(m)).toEqual('{"a":2,"b":3}')
+    expect(m.toString()).toEqual("ObservableMap@1[{ a: 2, b: 3 }]")
+    expect(m.size).toBe(2)
 
     m.clear()
-    t.deepEqual(m.keys(), [])
-    t.deepEqual(m.values(), [])
-    t.deepEqual(m.toJS(), {})
-    t.deepEqual(m.toString(), "ObservableMap@1[{  }]")
-    t.equal(m.size, 0)
+    expect(m.keys()).toEqual([])
+    expect(m.values()).toEqual([])
+    expect(m.toJS()).toEqual({})
+    expect(m.toString()).toEqual("ObservableMap@1[{  }]")
+    expect(m.size).toBe(0)
 
-    t.equal(m.has("a"), false)
-    t.equal(m.has("b"), false)
-    t.equal(m.get("a"), undefined)
-    t.equal(m.get("b"), undefined)
+    expect(m.has("a")).toBe(false)
+    expect(m.has("b")).toBe(false)
+    expect(m.get("a")).toBe(undefined)
+    expect(m.get("b")).toBe(undefined)
 
     function removeObjectProp(item) {
         delete item.object
         return item
     }
-    t.deepEqual(events.map(removeObjectProp), [
+    expect(events.map(removeObjectProp)).toEqual([
         {
             type: "update",
             name: "a",
@@ -76,19 +75,16 @@ test("map crud", function(t) {
             oldValue: 3
         }
     ])
-    t.end()
 })
 
-test("map merge", function(t) {
+test("map merge", function() {
     var a = map({ a: 1, b: 2, c: 2 })
     var b = map({ c: 3, d: 4 })
     a.merge(b)
-    t.deepEqual(a.toJS(), { a: 1, b: 2, c: 3, d: 4 })
-
-    t.end()
+    expect(a.toJS()).toEqual({ a: 1, b: 2, c: 3, d: 4 })
 })
 
-test("observe value", function(t) {
+test("observe value", function() {
     var a = map()
     var hasX = false
     var valueX = undefined
@@ -106,45 +102,42 @@ test("observe value", function(t) {
         valueY = a.get("y")
     })
 
-    t.equal(hasX, false)
-    t.equal(valueX, undefined)
+    expect(hasX).toBe(false)
+    expect(valueX).toBe(undefined)
 
     a.set("x", 3)
-    t.equal(hasX, true)
-    t.equal(valueX, 3)
+    expect(hasX).toBe(true)
+    expect(valueX).toBe(3)
 
     a.set("x", 4)
-    t.equal(hasX, true)
-    t.equal(valueX, 4)
+    expect(hasX).toBe(true)
+    expect(valueX).toBe(4)
 
     a.delete("x")
-    t.equal(hasX, false)
-    t.equal(valueX, undefined)
+    expect(hasX).toBe(false)
+    expect(valueX).toBe(undefined)
 
     a.set("x", 5)
-    t.equal(hasX, true)
-    t.equal(valueX, 5)
+    expect(hasX).toBe(true)
+    expect(valueX).toBe(5)
 
-    t.equal(valueY, undefined)
+    expect(valueY).toBe(undefined)
     a.merge({ y: "hi" })
-    t.equal(valueY, "hi")
+    expect(valueY).toBe("hi")
     a.merge({ y: "hello" })
-    t.equal(valueY, "hello")
+    expect(valueY).toBe("hello")
 
     a.replace({ y: "stuff", z: "zoef" })
-    t.equal(valueY, "stuff")
-    t.deepEqual(a.keys(), ["y", "z"])
-
-    t.end()
+    expect(valueY).toBe("stuff")
+    expect(a.keys()).toEqual(["y", "z"])
 })
 
-test("initialize with entries", function(t) {
+test("initialize with entries", function() {
     var a = map([["a", 1], ["b", 2]])
-    t.deepEqual(a.toJS(), { a: 1, b: 2 })
-    t.end()
+    expect(a.toJS()).toEqual({ a: 1, b: 2 })
 })
 
-test("initialize with empty value", function(t) {
+test("initialize with empty value", function() {
     var a = map()
     var b = map({})
     var c = map([])
@@ -153,14 +146,12 @@ test("initialize with empty value", function(t) {
     b.set("0", 0)
     c.set("0", 0)
 
-    t.deepEqual(a.toJS(), { "0": 0 })
-    t.deepEqual(b.toJS(), { "0": 0 })
-    t.deepEqual(c.toJS(), { "0": 0 })
-
-    t.end()
+    expect(a.toJS()).toEqual({ "0": 0 })
+    expect(b.toJS()).toEqual({ "0": 0 })
+    expect(c.toJS()).toEqual({ "0": 0 })
 })
 
-test("observe collections", function(t) {
+test("observe collections", function() {
     var x = map()
     var keys, values, entries
 
@@ -175,39 +166,37 @@ test("observe collections", function(t) {
     })
 
     x.set("a", 1)
-    t.deepEqual(keys, ["a"])
-    t.deepEqual(values, [1])
-    t.deepEqual(entries, [["a", 1]])
+    expect(keys).toEqual(["a"])
+    expect(values).toEqual([1])
+    expect(entries).toEqual([["a", 1]])
 
     // should not retrigger:
     keys = null
     values = null
     entries = null
     x.set("a", 1)
-    t.deepEqual(keys, null)
-    t.deepEqual(values, null)
-    t.deepEqual(entries, null)
+    expect(keys).toEqual(null)
+    expect(values).toEqual(null)
+    expect(entries).toEqual(null)
 
     x.set("a", 2)
-    t.deepEqual(values, [2])
-    t.deepEqual(entries, [["a", 2]])
+    expect(values).toEqual([2])
+    expect(entries).toEqual([["a", 2]])
 
     x.set("b", 3)
-    t.deepEqual(keys, ["a", "b"])
-    t.deepEqual(values, [2, 3])
-    t.deepEqual(entries, [["a", 2], ["b", 3]])
+    expect(keys).toEqual(["a", "b"])
+    expect(values).toEqual([2, 3])
+    expect(entries).toEqual([["a", 2], ["b", 3]])
 
     x.has("c")
-    t.deepEqual(keys, ["a", "b"])
-    t.deepEqual(values, [2, 3])
-    t.deepEqual(entries, [["a", 2], ["b", 3]])
+    expect(keys).toEqual(["a", "b"])
+    expect(values).toEqual([2, 3])
+    expect(entries).toEqual([["a", 2], ["b", 3]])
 
     x.delete("a")
-    t.deepEqual(keys, ["b"])
-    t.deepEqual(values, [3])
-    t.deepEqual(entries, [["b", 3]])
-
-    t.end()
+    expect(keys).toEqual(["b"])
+    expect(values).toEqual([3])
+    expect(entries).toEqual([["b", 3]])
 })
 
 test.skip("asStructure", function(t) {
@@ -221,24 +210,24 @@ test.skip("asStructure", function(t) {
         value = x.get("a").b.c
     })
 
-    t.equal(triggerCount, 1)
-    t.equal(value, 1)
+    expect(triggerCount).toBe(1)
+    expect(value).toBe(1)
 
     x.get("a").b.c = 1
     x.get("a").b = { c: 1 }
     x.set("a", { b: { c: 1 } })
 
-    t.equal(triggerCount, 1)
-    t.equal(value, 1)
+    expect(triggerCount).toBe(1)
+    expect(value).toBe(1)
 
     x.get("a").b.c = 2
-    t.equal(triggerCount, 2)
-    t.equal(value, 2)
+    expect(triggerCount).toBe(2)
+    expect(value).toBe(2)
 
     t.end()
 })
 
-test("cleanup", function(t) {
+test("cleanup", function() {
     var x = map({ a: 1 })
 
     var aValue
@@ -248,50 +237,47 @@ test("cleanup", function(t) {
 
     var observable = x._data.a
 
-    t.equal(aValue, 1)
-    t.equal(observable.observers.length, 1)
-    t.equal(x._hasMap.a.observers.length, 1)
+    expect(aValue).toBe(1)
+    expect(observable.observers.length).toBe(1)
+    expect(x._hasMap.a.observers.length).toBe(1)
 
-    t.equal(x.delete("a"), true)
-    t.equal(x.delete("not-existing"), false)
+    expect(x.delete("a")).toBe(true)
+    expect(x.delete("not-existing")).toBe(false)
 
-    t.equal(aValue, undefined)
-    t.equal(observable.observers.length, 0)
-    t.equal(x._hasMap.a.observers.length, 1)
+    expect(aValue).toBe(undefined)
+    expect(observable.observers.length).toBe(0)
+    expect(x._hasMap.a.observers.length).toBe(1)
 
     x.set("a", 2)
     observable = x._data.a
 
-    t.equal(aValue, 2)
-    t.equal(observable.observers.length, 1)
-    t.equal(x._hasMap.a.observers.length, 1)
+    expect(aValue).toBe(2)
+    expect(observable.observers.length).toBe(1)
+    expect(x._hasMap.a.observers.length).toBe(1)
 
     disposer()
-    t.equal(aValue, 2)
-    t.equal(observable.observers.length, 0)
-    t.equal(x._hasMap.a.observers.length, 0)
-    t.end()
+    expect(aValue).toBe(2)
+    expect(observable.observers.length).toBe(0)
+    expect(x._hasMap.a.observers.length).toBe(0)
 })
 
-test("strict", function(t) {
+test("strict", function() {
     var x = map()
     autorun(function() {
         x.get("y") // should not throw
     })
-    t.end()
 })
 
-test("issue 100", function(t) {
+test("issue 100", function() {
     var that = {}
     mobx.extendObservable(that, {
         myMap: map()
     })
-    t.equal(mobx.isObservableMap(that.myMap), true)
-    t.equal(typeof that.myMap.observe, "function")
-    t.end()
+    expect(mobx.isObservableMap(that.myMap)).toBe(true)
+    expect(typeof that.myMap.observe).toBe("function")
 })
 
-test("issue 119 - unobserve before delete", function(t) {
+test("issue 119 - unobserve before delete", function() {
     var propValues = []
     var myObservable = mobx.observable({
         myMap: map()
@@ -313,69 +299,63 @@ test("issue 119 - unobserve before delete", function(t) {
     })
     myObservable.myMap.delete("myId")
 
-    t.deepEqual(propValues, ["myPropValue calculated"])
-    t.end()
+    expect(propValues).toEqual(["myPropValue calculated"])
 })
 
-test("issue 116 - has should not throw on invalid keys", function(t) {
+test("issue 116 - has should not throw on invalid keys", function() {
     var x = map()
-    t.equal(x.has(undefined), false)
-    t.equal(x.has({}), false)
-    t.equal(x.get({}), undefined)
-    t.equal(x.get(undefined), undefined)
-    t.throws(function() {
+    expect(x.has(undefined)).toBe(false)
+    expect(x.has({})).toBe(false)
+    expect(x.get({})).toBe(undefined)
+    expect(x.get(undefined)).toBe(undefined)
+    expect(function() {
         x.set({})
-    })
-    t.end()
+    }).toThrow()
 })
 
-test("map modifier", t => {
+test("map modifier", () => {
     var x = mobx.observable.map({ a: 1 })
-    t.equal(x instanceof mobx.ObservableMap, true)
-    t.equal(mobx.isObservableMap(x), true)
-    t.equal(x.get("a"), 1)
+    expect(x instanceof mobx.ObservableMap).toBe(true)
+    expect(mobx.isObservableMap(x)).toBe(true)
+    expect(x.get("a")).toBe(1)
     x.set("b", {})
-    t.equal(mobx.isObservableObject(x.get("b")), true)
+    expect(mobx.isObservableObject(x.get("b"))).toBe(true)
 
     x = mobx.observable.map([["a", 1]])
-    t.equal(x instanceof mobx.ObservableMap, true)
-    t.equal(x.get("a"), 1)
+    expect(x instanceof mobx.ObservableMap).toBe(true)
+    expect(x.get("a")).toBe(1)
 
     x = mobx.observable.map()
-    t.equal(x instanceof mobx.ObservableMap, true)
-    t.deepEqual(x.keys(), [])
+    expect(x instanceof mobx.ObservableMap).toBe(true)
+    expect(x.keys()).toEqual([])
 
     x = mobx.observable({ a: mobx.observable.map({ b: { c: 3 } }) })
-    t.equal(mobx.isObservableObject(x), true)
-    t.equal(mobx.isObservableObject(x.a), false)
-    t.equal(mobx.isObservableMap(x.a), true)
-    t.equal(mobx.isObservableObject(x.a.get("b")), true)
-
-    t.end()
+    expect(mobx.isObservableObject(x)).toBe(true)
+    expect(mobx.isObservableObject(x.a)).toBe(false)
+    expect(mobx.isObservableMap(x.a)).toBe(true)
+    expect(mobx.isObservableObject(x.a.get("b"))).toBe(true)
 })
 
-test("map modifier with modifier", t => {
+test("map modifier with modifier", () => {
     var x = mobx.observable.map({ a: { c: 3 } })
-    t.equal(mobx.isObservableObject(x.get("a")), true)
+    expect(mobx.isObservableObject(x.get("a"))).toBe(true)
     x.set("b", { d: 4 })
-    t.equal(mobx.isObservableObject(x.get("b")), true)
+    expect(mobx.isObservableObject(x.get("b"))).toBe(true)
 
     x = mobx.observable.shallowMap({ a: { c: 3 } })
-    t.equal(mobx.isObservableObject(x.get("a")), false)
+    expect(mobx.isObservableObject(x.get("a"))).toBe(false)
     x.set("b", { d: 4 })
-    t.equal(mobx.isObservableObject(x.get("b")), false)
+    expect(mobx.isObservableObject(x.get("b"))).toBe(false)
 
     x = mobx.observable({ a: mobx.observable.shallowMap({ b: {} }) })
-    t.equal(mobx.isObservableObject(x), true)
-    t.equal(mobx.isObservableMap(x.a), true)
-    t.equal(mobx.isObservableObject(x.a.get("b")), false)
+    expect(mobx.isObservableObject(x)).toBe(true)
+    expect(mobx.isObservableMap(x.a)).toBe(true)
+    expect(mobx.isObservableObject(x.a.get("b"))).toBe(false)
     x.a.set("e", {})
-    t.equal(mobx.isObservableObject(x.a.get("e")), false)
-
-    t.end()
+    expect(mobx.isObservableObject(x.a.get("e"))).toBe(false)
 })
 
-test("256, map.clear should not be tracked", t => {
+test("256, map.clear should not be tracked", () => {
     var x = new mobx.ObservableMap({ a: 3 })
     var c = 0
     var d = mobx.autorun(() => {
@@ -383,15 +363,14 @@ test("256, map.clear should not be tracked", t => {
         x.clear()
     })
 
-    t.equal(c, 1)
+    expect(c).toBe(1)
     x.set("b", 3)
-    t.equal(c, 1)
+    expect(c).toBe(1)
 
     d()
-    t.end()
 })
 
-test("256, map.merge should be not be tracked for target", t => {
+test("256, map.merge should be not be tracked for target", () => {
     var x = mobx.observable.map({ a: 3 })
     var y = mobx.observable.map({ b: 3 })
     var c = 0
@@ -401,44 +380,41 @@ test("256, map.merge should be not be tracked for target", t => {
         x.merge(y)
     })
 
-    t.equal(c, 1)
-    t.deepEqual(x.keys(), ["a", "b"])
+    expect(c).toBe(1)
+    expect(x.keys()).toEqual(["a", "b"])
 
     y.set("c", 4)
-    t.equal(c, 2)
-    t.deepEqual(x.keys(), ["a", "b", "c"])
+    expect(c).toBe(2)
+    expect(x.keys()).toEqual(["a", "b", "c"])
 
     x.set("d", 5)
-    t.equal(c, 2, "autorun should not have been triggered")
-    t.deepEqual(x.keys(), ["a", "b", "c", "d"])
+    expect(c).toBe(2)
+    expect(x.keys()).toEqual(["a", "b", "c", "d"])
 
     d()
-    t.end()
 })
 
-test("308, map keys should be coerced to strings correctly", t => {
+test("308, map keys should be coerced to strings correctly", () => {
     var m = mobx.map()
     m.set(1, true) // => "[mobx.map { 1: true }]"
     m.delete(1) // => "[mobx.map { }]"
-    t.deepEqual(m.keys(), [])
+    expect(m.keys()).toEqual([])
 
     m.set(1, true) // => "[mobx.map { 1: true }]"
     m.delete("1") // => "[mobx.map { 1: undefined }]"
-    t.deepEqual(m.keys(), [])
+    expect(m.keys()).toEqual([])
 
     m.set(1, true) // => "[mobx.map { 1: true, 1: true }]"
     m.delete("1") // => "[mobx.map { 1: undefined, 1: undefined }]"
-    t.deepEqual(m.keys(), [])
+    expect(m.keys()).toEqual([])
 
     m.set(true, true)
-    t.equal(m.get("true"), true)
+    expect(m.get("true")).toBe(true)
     m.delete(true)
-    t.deepEqual(m.keys(), [])
-
-    t.end()
+    expect(m.keys()).toEqual([])
 })
 
-test("map should support iterall / iterable ", t => {
+test("map should support iterall / iterable ", () => {
     var a = mobx.map({ a: 1, b: 2 })
 
     function leech(iter) {
@@ -450,45 +426,40 @@ test("map should support iterall / iterable ", t => {
         return values
     }
 
-    t.equal(iterall.isIterable(a), true)
+    expect(iterall.isIterable(a)).toBe(true)
 
-    t.deepEqual(leech(iterall.getIterator(a)), [["a", 1], ["b", 2]])
+    expect(leech(iterall.getIterator(a))).toEqual([["a", 1], ["b", 2]])
 
-    t.deepEqual(leech(a.entries()), [["a", 1], ["b", 2]])
+    expect(leech(a.entries())).toEqual([["a", 1], ["b", 2]])
 
-    t.deepEqual(leech(a.keys()), ["a", "b"])
-    t.deepEqual(leech(a.values()), [1, 2])
-
-    t.end()
+    expect(leech(a.keys())).toEqual(["a", "b"])
+    expect(leech(a.values())).toEqual([1, 2])
 })
 
-test("support for ES6 Map", t => {
+test("support for ES6 Map", () => {
     var x = new Map()
     x.set("x", 3)
     x.set("y", 2)
 
     var m = mobx.observable(x)
-    t.equal(mobx.isObservableMap(m), true)
-    t.deepEqual(m.entries(), [["x", 3], ["y", 2]])
+    expect(mobx.isObservableMap(m)).toBe(true)
+    expect(m.entries()).toEqual([["x", 3], ["y", 2]])
 
     var x2 = new Map()
     x2.set("y", 4)
     x2.set("z", 5)
     m.merge(x2)
-    t.deepEqual(m.get("z"), 5)
+    expect(m.get("z")).toEqual(5)
 
     var x3 = new Map()
     x3.set({ y: 2 }, { z: 4 })
 
-    t.throws(
-        () => mobx.observable.shallowMap(x3),
+    expect(() => mobx.observable.shallowMap(x3)).toThrowError(
         /only strings, numbers and booleans are accepted as key in observable maps/
     )
-
-    t.end()
 })
 
-test("deepEqual map", t => {
+test("deepEqual map", () => {
     var x = new Map()
     x.set("x", 3)
     x.set("y", { z: 2 })
@@ -497,21 +468,19 @@ test("deepEqual map", t => {
     x2.set("x", 3)
     x2.set("y", { z: 3 })
 
-    t.equals(mobx.extras.deepEqual(x, x2), false)
+    expect(mobx.extras.deepEqual(x, x2)).toBe(false)
     x2.get("y").z = 2
-    t.equals(mobx.extras.deepEqual(x, x2), true)
+    expect(mobx.extras.deepEqual(x, x2)).toBe(true)
 
     x2.set("z", 1)
-    t.equals(mobx.extras.deepEqual(x, x2), false)
+    expect(mobx.extras.deepEqual(x, x2)).toBe(false)
     x2.delete("z")
-    t.equals(mobx.extras.deepEqual(x, x2), true)
+    expect(mobx.extras.deepEqual(x, x2)).toBe(true)
     x2.delete("y")
-    t.equals(mobx.extras.deepEqual(x, x2), false)
-
-    t.end()
+    expect(mobx.extras.deepEqual(x, x2)).toBe(false)
 })
 
-test("798, cannot return observable map from computed prop", t => {
+test("798, cannot return observable map from computed prop", () => {
     // MWE: this is an anti pattern, yet should be possible in certain cases nonetheless..?
     // https://jsfiddle.net/7e6Ltscr/
 
@@ -548,34 +517,30 @@ test("798, cannot return observable map from computed prop", t => {
     }
     var cs = customerSearchStore()
 
-    t.doesNotThrow(() => {
+    expect(() => {
         console.log(cs.customerSearchType)
-    })
-
-    t.end()
+    }).not.toThrow()
 })
 
-test("869, deeply observable map should make added items observables as well", t => {
+test("869, deeply observable map should make added items observables as well", () => {
     var store = {
         map_deep1: mobx.observable(new Map()),
         map_deep2: mobx.observable.map()
     }
 
-    t.ok(mobx.isObservable(store.map_deep1), "should make map Observable")
-    t.ok(mobx.isObservableMap(store.map_deep1), "should make map ObservableMap")
-    t.ok(mobx.isObservable(store.map_deep2), "should make map Observable")
-    t.ok(mobx.isObservableMap(store.map_deep2), "should make map ObservableMap")
+    expect(mobx.isObservable(store.map_deep1)).toBeTruthy()
+    expect(mobx.isObservableMap(store.map_deep1)).toBeTruthy()
+    expect(mobx.isObservable(store.map_deep2)).toBeTruthy()
+    expect(mobx.isObservableMap(store.map_deep2)).toBeTruthy()
 
     store.map_deep2.set("a", [])
-    t.ok(mobx.isObservable(store.map_deep2.get("a")), "should make added items observables")
+    expect(mobx.isObservable(store.map_deep2.get("a"))).toBeTruthy()
 
     store.map_deep1.set("a", [])
-    t.ok(mobx.isObservable(store.map_deep1.get("a")), "should make added items observables")
-
-    t.end()
+    expect(mobx.isObservable(store.map_deep1.get("a"))).toBeTruthy()
 })
 
-test("using deep map", t => {
+test("using deep map", () => {
     var store = {
         map_deep: mobx.observable(new Map())
     }
@@ -589,51 +554,46 @@ test("using deep map", t => {
     })
 
     store.map_deep.set("shoes", [])
-    t.equal(observed, 1, "should observe new item added")
+    expect(observed).toBe(1)
 
     store.map_deep.get("shoes").push({ color: "black" })
-    t.equal(observed, 2, "should observe item mutated")
+    expect(observed).toBe(2)
 
     store.map_deep.get("shoes")[0].color = "red"
-    t.equal(observed, 3, "should observe nested item mutated")
-
-    t.end()
+    expect(observed).toBe(3)
 })
 
-test("issue 893", t => {
+test("issue 893", () => {
     const m = mobx.observable.map()
     const keys = ["constructor", "toString", "assertValidKey", "isValidKey", "toJSON", "toJS"]
     for (let key of keys) {
-        t.equal(m.get(key), undefined)
+        expect(m.get(key)).toBe(undefined)
     }
-    t.end()
 })
 
-test("work with 'toString' key", t => {
+test("work with 'toString' key", () => {
     const m = mobx.observable.map()
-    t.equal(m.get("toString"), undefined)
+    expect(m.get("toString")).toBe(undefined)
     m.set("toString", "test")
-    t.equal(m.get("toString"), "test")
-    t.end()
+    expect(m.get("toString")).toBe("test")
 })
 
-test("issue 940, should not be possible to change maps outside strict mode", t => {
-	mobx.useStrict(true)
+test("issue 940, should not be possible to change maps outside strict mode", () => {
+    mobx.useStrict(true)
 
-	const m = mobx.observable.map()
-	const d = mobx.autorun(() => m.values())
+    const m = mobx.observable.map()
+    const d = mobx.autorun(() => m.values())
 
-	t.throws(() => {
+    expect(() => {
 		m.set("x", 1)
-	}, /Since strict-mode is enabled/)
+	}).toThrowError(/Since strict-mode is enabled/)
 
-	d();
+    d();
 
-	mobx.useStrict(false)
-	t.end()
+    mobx.useStrict(false)
 })
 
-test("issue 1243, .replace should not trigger change on unchanged values", t => {
+test("issue 1243, .replace should not trigger change on unchanged values", () => {
     const m = mobx.observable.map({ a: 1, b: 2, c: 3 })
 
     let recomputeCount = 0
@@ -648,40 +608,37 @@ test("issue 1243, .replace should not trigger change on unchanged values", t => 
     })
 
     // recompute should happen once by now, due to the autorun
-    t.equal(recomputeCount, 1)
+    expect(recomputeCount).toBe(1)
 
     // a hasn't changed, recompute should not happen
     m.replace({ a: 1, d: 5 })
 
-    t.equal(recomputeCount, 1)
+    expect(recomputeCount).toBe(1)
 
     // this should cause a recompute
     m.replace({ a: 2 })
-    t.equal(recomputeCount, 2)
+    expect(recomputeCount).toBe(2)
 
     // this should remove key a and cause a recompute
     m.replace({ b: 2 })
-    t.equal(recomputeCount, 3)
+    expect(recomputeCount).toBe(3)
 
     m.replace([['a', 1]])
-    t.equal(recomputeCount, 4)
+    expect(recomputeCount).toBe(4)
 
     const nativeMap = new Map()
     nativeMap.set('a', 2)
     m.replace(nativeMap)
-    t.equal(recomputeCount, 5)
+    expect(recomputeCount).toBe(5)
 
-    t.throws(() => {
+    expect(() => {
         m.replace('not-an-object')
-    })
+    }).toThrow()
 
     d()
-    t.end()
 })
 
-test("#1258 cannot replace maps anymore", t => {
-	const items = mobx.observable.map()
-	items.replace(mobx.observable.map())
-
-	t.end()
+test("#1258 cannot replace maps anymore", () => {
+    const items = mobx.observable.map()
+    items.replace(mobx.observable.map())
 })
