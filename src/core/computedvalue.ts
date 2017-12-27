@@ -66,7 +66,8 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     observing = [] // nodes we are looking at. Our value depends on these nodes
     newObserving = null // during tracking it's an array with new observed observers
 
-    isPendingUnobservation: boolean = false
+	isPendingUnobservation = false
+	isBeingObserved = false;
     observers = []
     observersIndexes = {}
     diffValue = 0
@@ -108,8 +109,12 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         propagateMaybeChanged(this)
     }
 
+	onBecomeObserved() {
+		/* Noop */
+	}
+
     onBecomeUnobserved() {
-        clearObserving(this)
+		clearObserving(this)
         this.value = undefined;
     }
 

@@ -351,7 +351,7 @@ test("get administration", function(t) {
     t.end()
 })
 
-test("onBecome(Un)Observed simple", t => {
+test.skip("onBecome(Un)Observed simple", t => {
 	const x = mobx.observable.box(3)
 	const events = []
 
@@ -376,7 +376,7 @@ test("onBecome(Un)Observed simple", t => {
 	t.end()
 })
 
-test.only("onBecome(Un)Observed - less simple", t => {
+test.skip("onBecome(Un)Observed - less simple", t => {
 	const x = mobx.observable({
 		a: 3,
 		get b() {

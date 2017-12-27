@@ -30,3 +30,4 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Jorge Luis Acosta
 * Greg Zapp
 * Code Hat Programming Inc.
+* Nikolay Ivanov
