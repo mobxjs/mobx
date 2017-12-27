@@ -16,3 +16,4 @@ dist/
 *.iml
 *.ipr
 *.iws
+yarn-error.log

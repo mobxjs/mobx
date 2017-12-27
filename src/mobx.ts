@@ -111,6 +111,7 @@ import { isComputingDerivation } from "./core/derivation"
 import { setReactionScheduler, onReactionError } from "./core/reaction"
 import { reserveArrayBuffer, IObservableArray } from "./types/observablearray"
 import { interceptReads } from "./api/intercept-read"
+import { onBecomeObserved, onBecomeUnobserved } from "./api/become-observed"
 import { ObservableMap } from "./types/observablemap"
 import { IObservableValue } from "./types/observablevalue"
 import { registerGlobals } from "./core/globalstate"
@@ -139,7 +140,9 @@ export const extras = {
     spyReport,
     spyReportEnd,
     spyReportStart,
-    setReactionScheduler
+	setReactionScheduler,
+	onBecomeObserved,
+	onBecomeUnobserved
 }
 
 // Deprecated default export (will be removed in 4.0)

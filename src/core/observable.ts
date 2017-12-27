@@ -1,7 +1,8 @@
-import { IDerivation, IDerivationState } from "./derivation"
+import { IDerivation, IDerivationState, clearObserving } from "./derivation"
 import { globalState } from "./globalstate"
 import { invariant } from "../utils/utils"
 import { runReactions } from "./reaction"
+import { ComputedValue } from "./computedvalue"
 
 export interface IDepTreeNode {
     name: string
@@ -19,10 +20,12 @@ export interface IObservable extends IDepTreeNode {
 
     lowestObserverState: IDerivationState // Used to avoid redundant propagations
     isPendingUnobservation: boolean // Used to push itself to global.pendingUnobservations at most once per batch.
+	isBeingObserved: boolean
 
     observers: IDerivation[] // maintain _observers in raw array for for way faster iterating in propagation.
     observersIndexes: {} // map derivation.__mapid to _observers.indexOf(derivation) (see removeObserver)
 
+	onBecomeObserved()
     onBecomeUnobserved()
 }
 
@@ -128,9 +131,16 @@ export function endBatch() {
         for (let i = 0; i < list.length; i++) {
             const observable = list[i]
             observable.isPendingUnobservation = false
-            if (observable.observers.length === 0) {
-                observable.onBecomeUnobserved()
-                // NOTE: onBecomeUnobserved might push to `pendingUnobservations`
+			if (observable.observers.length === 0) {
+				// observable.isBeingObserved = false
+				// if (observable instanceof ComputedValue) {
+				// 	clearObserving(observable)
+				// 	this.value = undefined;
+				// }
+				// if (observable.isBeingObserved) {
+					observable.onBecomeUnobserved()
+					// NOTE: onBecomeUnobserved might push to `pendingUnobservations`
+				// }
             }
         }
         globalState.pendingUnobservations = []
@@ -149,7 +159,7 @@ export function reportObserved(observable: IObservable) {
             observable.lastAccessedBy = derivation.runId
             derivation.newObserving![derivation.unboundDepsCount++] = observable
         }
-    } else if (observable.observers.length === 0) {
+    } else if (observable.observers.length === 0 /* && globalState.inBatch > 0*/) {
         queueForUnobservation(observable)
     }
 }

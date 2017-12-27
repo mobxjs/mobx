@@ -117,8 +117,8 @@ export class ObservableValue<T> extends BaseAtom
     }
 
     public get(): T {
-        this.reportObserved()
-        return this.dehanceValue(this.value)
+		this.reportObserved()
+		return this.dehanceValue(this.value)
     }
 
     public intercept(handler: IInterceptor<IValueWillChange<T>>): Lambda {
