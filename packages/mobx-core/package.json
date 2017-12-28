@@ -28,8 +28,7 @@
   },
   "files": [
     "lib",
-    "LICENSE",
-    "bower.json"
+    "LICENSE"
   ],
   "homepage": "https://mobx.js.org/",
   "devDependencies": {},
