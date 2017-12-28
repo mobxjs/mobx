@@ -5,6 +5,7 @@
 * Break: dropped `autorunAsync`. Instead, pass { delay: number } to `autorun`
 * Name cannot be passed as second argument to autorun or when anymore, use options instead
 * Dropped bower support
+* Dropped `extras.shareGlobalState`
 
 # 3.4.1
 

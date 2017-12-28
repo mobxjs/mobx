@@ -16,26 +16,25 @@
  *
  */
 
-export { IObservable, IDepTreeNode } from "./core/observable"
-export { Reaction, IReactionPublic, IReactionDisposer } from "./core/reaction"
-export { IDerivation, untracked, IDerivationState } from "./core/derivation"
+// TODO: rename interfaces to types?
+export { IObservable, IDepTreeNode, runInAction,
+Reaction, IReactionPublic, IReactionDisposer, IAtom, Atom, BaseAtom, IComputedValue, IEqualsComparer, useStrict, isStrictModeEnabled, IAction
+ untracked, IInterceptable, IInterceptor, IListenable,
+ transaction,
+ IValueDidChange,
+ IValueWillChange,
+ IObservableValue,
+ isObservableValue as isBoxedObservable,
+ IObserverTree, IDependencyTree,
+ autorun, autorunAsync, when, reaction, IReactionOptions ,
+  action, isAction, IActionFactory
 
-// NOTE: For some reason, rollup's dependency tracker gets confused
-// if this line is above the previous 3, and will produce out of order
-// class definitions where BaseAtom is undefined, causing an error.
-// It's not ideal, but for now we can just make sure this line comes after
-// the ones above
-export { IAtom, Atom, BaseAtom } from "./core/atom"
+} from "../mobx-core/index"
 
-export { useStrict, isStrictModeEnabled, IAction } from "./core/action"
 export { spy } from "./core/spy"
-export { IComputedValue } from "./core/computedvalue"
 
-export { IEqualsComparer, comparer } from "./types/comparer"
-export { asReference, asFlat, asStructure, asMap } from "./types/modifiers-old"
+export {  comparer } from "./types/comparer"
 export { IModifierDescriptor, IEnhancer, isModifierDescriptor } from "./types/modifiers"
-export { IInterceptable, IInterceptor } from "./types/intercept-utils"
-export { IListenable } from "./types/listen-utils"
 export {
     IObjectWillChange,
     IObjectChange,
@@ -43,12 +42,6 @@ export {
     isObservableObject
 } from "./types/observableobject"
 
-export {
-    IValueDidChange,
-    IValueWillChange,
-    IObservableValue,
-    isObservableValue as isBoxedObservable
-} from "./types/observablevalue"
 export {
     IObservableArray,
     IArrayWillChange,
@@ -74,7 +67,6 @@ export {
     IMap
 } from "./types/observablemap"
 
-export { transaction } from "./api/transaction"
 export { observable, IObservableFactory, IObservableFactories } from "./api/observable"
 export { computed, IComputed, IComputedValueOptions } from "./api/computed"
 export { isObservable } from "./api/isobservable"
@@ -82,37 +74,36 @@ export { isComputed } from "./api/iscomputed"
 export { extendObservable, extendShallowObservable } from "./api/extendobservable"
 export { observe } from "./api/observe"
 export { intercept } from "./api/intercept"
-export { autorun, autorunAsync, when, reaction, IReactionOptions } from "./api/autorun"
-export { action, isAction, runInAction, IActionFactory } from "./api/action"
+
 
 export { expr } from "./api/expr"
 export { toJS } from "./api/tojs"
 export { ITransformer, createTransformer } from "./api/createtransformer"
 export { whyRun } from "./api/whyrun"
 
-export { Lambda, isArrayLike } from "./utils/utils"
+export { isArrayLike } from "./utils/utils"
 export { Iterator } from "./utils/iterable"
-export { IObserverTree, IDependencyTree } from "./api/extras"
 
 import {
     resetGlobalState,
-    shareGlobalState,
     getGlobalState,
     isolateGlobalState
-} from "./core/globalstate"
+} from "./globalstate"
 import { IDerivation } from "./core/derivation"
 import { IDepTreeNode } from "./core/observable"
 import { IObserverTree, IDependencyTree, getDependencyTree, getObserverTree } from "./api/extras"
-import { getDebugName, getAtom, getAdministration } from "./types/type-utils"
-import { allowStateChanges } from "./core/action"
-import { spyReport, spyReportEnd, spyReportStart, isSpyEnabled } from "./core/spy"
-import { Lambda, deepEqual } from "./utils/utils"
+import { allowStateChanges, Lambda,  } from "./core/action"
 import { isComputingDerivation } from "./core/derivation"
 import { setReactionScheduler, onReactionError } from "./core/reaction"
+import { IObservableValue } from "./types/observablevalue"
+
+import { getDebugName, getAtom, getAdministration } from "./types/type-utils"
+import { spyReport, spyReportEnd, spyReportStart, isSpyEnabled } from "./core/spy"
+import {  deepEqual } from "./utils/utils"
+
 import { reserveArrayBuffer, IObservableArray } from "./types/observablearray"
 import { interceptReads } from "./api/intercept-read"
 import { ObservableMap } from "./types/observablemap"
-import { IObservableValue } from "./types/observablevalue"
 import { registerGlobals } from "./core/globalstate"
 
 // This line should come after all the imports as well, for the same reason
@@ -135,14 +126,12 @@ export const extras = {
     reserveArrayBuffer, // See #734
     resetGlobalState,
     isolateGlobalState,
-    shareGlobalState,
     spyReport,
     spyReportEnd,
     spyReportStart,
     setReactionScheduler
 }
 
-// Deprecated default export (will be removed in 4.0)
 
 import { IObservable } from "./core/observable"
 import { Reaction, IReactionPublic, IReactionDisposer } from "./core/reaction"
@@ -189,7 +178,6 @@ import {
     IObservableMapInitialValues,
     IMap
 } from "./types/observablemap"
-import { transaction } from "./api/transaction"
 import { observable, IObservableFactory, IObservableFactories } from "./api/observable"
 import { computed, IComputed, IComputedValueOptions } from "./api/computed"
 import { isObservable } from "./api/isobservable"
@@ -198,79 +186,13 @@ import { extendObservable, extendShallowObservable } from "./api/extendobservabl
 import { observe } from "./api/observe"
 import { intercept } from "./api/intercept"
 import { autorun, autorunAsync, when, reaction, IReactionOptions } from "./api/autorun"
-import { action, isAction, runInAction, IActionFactory } from "./api/action"
+import { action, IActionFactory } from "./api/action"
 import { expr } from "./api/expr"
 import { toJS } from "./api/tojs"
 import { ITransformer, createTransformer } from "./api/createtransformer"
 import { whyRun } from "./api/whyrun"
 import { isArrayLike } from "./utils/utils"
 import { Iterator } from "./utils/iterable"
-
-const everything = {
-    Reaction,
-    untracked,
-    Atom,
-    BaseAtom,
-    useStrict,
-    isStrictModeEnabled,
-    spy,
-    comparer,
-    asReference,
-    asFlat,
-    asStructure,
-    asMap,
-    isModifierDescriptor,
-    isObservableObject,
-    isBoxedObservable,
-    isObservableArray,
-    ObservableMap,
-    isObservableMap,
-    map,
-    transaction,
-    observable,
-    computed,
-    isObservable,
-    isComputed,
-    extendObservable,
-    extendShallowObservable,
-    observe,
-    intercept,
-    autorun,
-    autorunAsync,
-    when,
-    reaction,
-    action,
-    isAction,
-    runInAction,
-    expr,
-    toJS,
-    createTransformer,
-    whyRun,
-    isArrayLike,
-    extras
-}
-
-let warnedAboutDefaultExport = false
-
-for (let p in everything) {
-    let val = everything[p]
-    Object.defineProperty(everything, p, {
-        get: () => {
-            if (!warnedAboutDefaultExport) {
-                warnedAboutDefaultExport = true
-                console.warn(
-                    "Using default export (`import mobx from 'mobx'`) is deprecated " +
-                        "and won’t work in mobx@4.0.0\n" +
-                        "Use `import * as mobx from 'mobx'` instead"
-                )
-            }
-            return val
-        }
-    })
-}
-
-// TODO: remove in 4.0, temporarily incompatibility fix for mobx-react@4.1.0 which accidentally uses default exports
-export default everything
 
 // Devtools support
 

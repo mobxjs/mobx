@@ -10,14 +10,15 @@
 
  // TODO: document all, and generate docs!
  // TODO: clean up things
- export {createAction, runInAction, useStrict} from "./core/action"
+ export {createAction, runInAction, isAction, useStrict, executeAction, IAction} from "./core/action"
  export {Atom, isAtom} from "./core/atom"
+ export {IObservable, IDepTreeNode} from "./core/observable"
 
  export {computed, isComputedValue} from "./core/computedvalue"
- export {untracked, isComputingDerivation} from "./core/derivation"
+ export {untracked, isComputingDerivation, IDerivation} from "./core/derivation"
  export {MobxState} from "./core/mobxstate"
  export {cell, isObservableValue} from "./core/observablevalue"
- export {Reaction, onReactionError} from "./core/reaction"
+ export {Reaction, onReactionError, IReactionDisposer, IReactionPublic} from "./core/reaction"
  export {autorun, reaction, when} from "./utils/autorun"
  export {defaultComparer, identityComparer} from "./utils/comparer"
  export {getDependencyTree, getObserverTree} from "./utils/extras"

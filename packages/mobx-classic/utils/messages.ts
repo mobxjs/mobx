@@ -1,4 +1,5 @@
 // TODO: clean up messages
+// TODO: make production build aware
 const messages = {
     m001: "It is not allowed to assign new values to @action fields",
     m002: "`runInAction` expects a function",

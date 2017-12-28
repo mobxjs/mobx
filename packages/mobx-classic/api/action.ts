@@ -1,6 +1,6 @@
 import { invariant, addHiddenProp } from "../utils/utils"
 import { createClassPropertyDecorator } from "../utils/decorators"
-import { createAction, executeAction, IAction } from "../core/action"
+import { createAction, executeAction, IAction } from "../../mobx-core/index"
 import { getMessage } from "../utils/messages"
 
 export interface IActionFactory {

@@ -1,30 +1,6 @@
-// TODO: clean up
-
-export const EMPTY_ARRAY = []
-Object.freeze(EMPTY_ARRAY)
-
 declare var global
 export function getGlobal() {
     return typeof window !== "undefined" ? window : global
-}
-
-export interface Lambda {
-    (): void
-    name?: string
-}
-
-export function getNextId() {
-    return ++globalState.mobxGuid
-}
-
-export function fail(message: string, thing?): never {
-    invariant(false, message, thing)
-    throw "X" // unreachable
-}
-
-export function invariant(check: boolean, message: string, thing?) {
-    if (!check)
-        throw new Error("[mobx] Invariant failed: " + message + (thing ? ` in '${thing}'` : ""))
 }
 
 /**
@@ -38,65 +14,6 @@ export function deprecated(msg: string): boolean {
     deprecatedMessages.push(msg)
     console.error("[mobx] Deprecated: " + msg)
     return true
-}
-
-/**
- * Makes sure that the provided function is invoked at most once.
- */
-export function once(func: Lambda): Lambda {
-    let invoked = false
-    return function() {
-        if (invoked) return
-        invoked = true
-        return (func as any).apply(this, arguments)
-    }
-}
-
-export const noop = () => {}
-
-export function unique<T>(list: T[]): T[] {
-    const res: T[] = []
-    list.forEach(item => {
-        if (res.indexOf(item) === -1) res.push(item)
-    })
-    return res
-}
-
-export function joinStrings(things: string[], limit: number = 100, separator = " - "): string {
-    if (!things) return ""
-    const sliced = things.slice(0, limit)
-    return `${sliced.join(separator)}${things.length > limit
-        ? " (... and " + (things.length - limit) + "more)"
-        : ""}`
-}
-
-export function isObject(value: any): boolean {
-    return value !== null && typeof value === "object"
-}
-
-export function isPlainObject(value) {
-    if (value === null || typeof value !== "object") return false
-    const proto = Object.getPrototypeOf(value)
-    return proto === Object.prototype || proto === null
-}
-
-export function objectAssign<T extends object>(target: { [key: string]: never }, clonedSource: T, ...sources: (Partial<T> & object)[]): T;
-export function objectAssign<T extends object>(target: T, ...sources: (Partial<T> & object)[]): T;
-export function objectAssign() {
-    const res = arguments[0]
-    for (let i = 1, l = arguments.length; i < l; i++) {
-        const source = arguments[i]
-        for (let key in source)
-            if (hasOwnProperty(source, key)) {
-                res[key] = source[key]
-            }
-    }
-    return res
-}
-
-const prototypeHasOwnProperty = Object.prototype.hasOwnProperty
-export function hasOwnProperty(object: Object, propName: string) {
-    return prototypeHasOwnProperty.call(object, propName)
 }
 
 export function makeNonEnumerable(object: any, propNames: string[]) {
@@ -184,21 +101,6 @@ export function deepEqual(a, b) {
     return false
 }
 
-export function createInstanceofPredicate<T>(
-    name: string,
-    clazz: new (...args: any[]) => T
-): (x: any) => x is T {
-    const propName = "isMobX" + name
-    clazz.prototype[propName] = true
-    return function(x) {
-        return isObject(x) && x[propName] === true
-    } as any
-}
-
-export function areBothNaN(a: any, b: any): boolean {
-    return (typeof a === "number" && typeof b === "number" && isNaN(a) && isNaN(b));
-}
-
 /**
  * Returns whether the argument is an array, disregarding observability.
  */
@@ -234,7 +136,8 @@ export function toPrimitive(value) {
     return value === null ? null : typeof value === "object" ? "" + value : value
 }
 
-import { globalState } from "../core/globalstate"
 import { IObservableArray, isObservableArray } from "../types/observablearray"
 import { isObservableMap, ObservableMap, IKeyValueMap } from "../types/observablemap"
 import { observable } from "../api/observable"
+import { invariant, isPlainObject, areBothNaN } from "../../mobx-core/index";
+
