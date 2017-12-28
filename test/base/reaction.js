@@ -79,22 +79,26 @@ test("effect debounce is honored", () => {
                 values.push(newValue)
             },
             {
-                delay: 100
+                delay: 200
             }
         )
 
         setTimeout(() => a.set(2), 30)
-        setTimeout(() => a.set(3), 150) // should not be visible, combined with the next
-        setTimeout(() => a.set(4), 160)
-        setTimeout(() => a.set(5), 300)
-        setTimeout(() => d(), 500)
-        setTimeout(() => a.set(6), 700)
+        setTimeout(() => a.set(3), 300) // should not be visible, combined with the next
+        setTimeout(() => a.set(4), 320)
+        setTimeout(() => a.set(5), 600)
+        setTimeout(() => d(), 1000)
+        setTimeout(() => a.set(6), 1400)
 
         setTimeout(() => {
-            expect(values).toEqual([2, 4, 5])
-            expect(exprCount).toBe(4)
-            resolve();
-        }, 900)
+            try {
+                expect(values).toEqual([2, 4, 5])
+                expect(exprCount).toBe(4)
+                resolve();
+            } catch (e) {
+                reject(e);
+            }
+        }, 1800)
     })
 })
 
@@ -123,10 +127,14 @@ test("effect debounce + fire immediately is honored", () => {
         setTimeout(() => a.set(4), 300)
 
         setTimeout(() => {
-            d()
-            expect(values).toEqual([1, 3, 4])
-            expect(exprCount).toBe(3)
-            resolve();
+            try {
+                d()
+                expect(values).toEqual([1, 3, 4])
+                expect(exprCount).toBe(3)
+                resolve();
+            } catch (e) {
+                reject(e);
+            }
         }, 500)
     });
 })

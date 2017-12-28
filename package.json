@@ -104,8 +104,14 @@
       "tsx",
       "js",
       "jsx",
-      "json",
-      "node"
+      "json"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/\\./"
+    ],
+    "watchPathIgnorePatterns": [
+      "<rootDir>/node_modules/"
     ]
   }
 }
