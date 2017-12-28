@@ -5,8 +5,5 @@
         "noImplicitAny": true,
         "sourceMap": false,
 		"experimentalDecorators": true
-    },
-    "files": [
-		"./typescript-tests.ts"
-	]
+    }
 }

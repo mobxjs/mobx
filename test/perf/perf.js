@@ -1,3 +1,4 @@
+var test = require("tape")
 var mobx = require("../..")
 var observable = mobx.observable
 var computed = mobx.computed
@@ -19,7 +20,7 @@ results of this test:
 186/113 after remove filter/length call to detect whether depencies are stable. 300 times faster. w00t.
 
 */
-test("one observes ten thousand that observe one", function() {
+test("one observes ten thousand that observe one", function(t) {
     gc()
     var a = observable(2)
 
@@ -47,11 +48,11 @@ test("one observes ten thousand that observe one", function() {
     var start = now()
 
     mobx.observe(b, voidObserver, true) // start observers
-    expect(99990000).toBe(b.get())
+    t.equal(99990000, b.get())
     var initial = now()
 
     a.set(3)
-    expect(149985000).toBe(b.get()) // yes, I verified ;-).
+    t.equal(149985000, b.get()) // yes, I verified ;-).
     //t.equal(2, bCalcs);
     var end = now()
 
@@ -62,9 +63,10 @@ test("one observes ten thousand that observe one", function() {
             (end - initial) +
             " ms."
     )
+    t.end()
 })
 
-test("five hundrend properties that observe their sibling", function() {
+test("five hundrend properties that observe their sibling", function(t) {
     gc()
     var observables = [observable(1)]
     for (var i = 0; i < 500; i++) {
@@ -81,11 +83,11 @@ test("five hundrend properties that observe their sibling", function() {
 
     var last = observables[observables.length - 1]
     mobx.observe(last, voidObserver)
-    expect(501).toBe(last.get())
+    t.equal(501, last.get())
     var initial = now()
 
     observables[0].set(2)
-    expect(502).toBe(last.get())
+    t.equal(502, last.get())
     var end = now()
 
     log(
@@ -95,9 +97,10 @@ test("five hundrend properties that observe their sibling", function() {
             (end - initial) +
             " ms."
     )
+    t.end()
 })
 
-test("late dependency change", function() {
+test("late dependency change", function(t) {
     gc()
     var values = []
     for (var i = 0; i < 100; i++) values.push(observable(0))
@@ -114,11 +117,12 @@ test("late dependency change", function() {
 
     for (var i = 0; i < 10000; i++) values[99].set(i)
 
-    expect(sum.get()).toBe(9999)
+    t.equal(sum.get(), 9999)
     log("Late dependency change - Updated in " + (new Date() - start) + "ms.")
+    t.end()
 })
 
-test("lots of unused computables", function() {
+test("lots of unused computables", function(t) {
     gc()
     var a = observable(1)
 
@@ -150,7 +154,7 @@ test("lots of unused computables", function() {
         true
     )
 
-    expect(sum).toBe(49995000)
+    t.equal(sum, 49995000)
 
     // unsubscribe, nobody should listen to a() now!
     subscription()
@@ -158,14 +162,15 @@ test("lots of unused computables", function() {
     var start = now()
 
     a.set(3)
-    expect(sum).toBe(49995000) // unchanged!
+    t.equal(sum, 49995000) // unchanged!
 
     var end = now()
 
     log("Unused computables -   Updated in " + (end - start) + " ms.")
+    t.end()
 })
 
-test("many unreferenced observables", function() {
+test("many unreferenced observables", function(t) {
     gc()
     var a = observable(3)
     var b = observable(6)
@@ -173,8 +178,8 @@ test("many unreferenced observables", function() {
     var d = computed(function() {
         return a.get() * b.get() * c.get()
     })
-    expect(d.get()).toBe(126)
-    expect(d.dependenciesState).toBe(-1)
+    t.equal(d.get(), 126)
+    t.equal(d.dependenciesState, -1)
     var start = now()
     for (var i = 0; i < 10000; i++) {
         c.set(i)
@@ -183,9 +188,11 @@ test("many unreferenced observables", function() {
     var end = now()
 
     log("Unused observables -  Updated in " + (end - start) + " ms.")
+
+    t.end()
 })
 
-test("array reduce", function() {
+test("array reduce", function(t) {
     gc()
     var aCalc = 0
     var ar = observable([])
@@ -203,8 +210,8 @@ test("array reduce", function() {
 
     for (var i = 0; i < 1000; i++) ar.push(i)
 
-    expect(499500).toBe(sum.get())
-    expect(1001).toBe(aCalc)
+    t.equal(499500, sum.get())
+    t.equal(1001, aCalc)
     aCalc = 0
 
     var initial = now()
@@ -212,15 +219,16 @@ test("array reduce", function() {
     for (var i = 0; i < 1000; i++) ar[i] = ar[i] * 2
     b.set(2)
 
-    expect(1998000).toBe(sum.get())
-    expect(1000).toBe(aCalc)
+    t.equal(1998000, sum.get())
+    t.equal(1000, aCalc)
 
     var end = now()
 
     log("Array reduce -  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.")
+    t.end()
 })
 
-test("array classic loop", function() {
+test("array classic loop", function(t) {
     gc()
     var ar = observable([])
     var aCalc = 0
@@ -235,11 +243,11 @@ test("array classic loop", function() {
 
     var start = now()
 
-    expect(1).toBe(aCalc)
+    t.equal(1, aCalc)
     for (var i = 0; i < 1000; i++) ar.push(i)
 
-    expect(499500).toBe(sum.get())
-    expect(1001).toBe(aCalc)
+    t.equal(499500, sum.get())
+    t.equal(1001, aCalc)
 
     var initial = now()
     aCalc = 0
@@ -247,17 +255,18 @@ test("array classic loop", function() {
     for (var i = 0; i < 1000; i++) ar[i] = ar[i] * 2
     b.set(2)
 
-    expect(1998000).toBe(sum.get())
-    expect(1000).toBe(aCalc)
+    t.equal(1998000, sum.get())
+    t.equal(1000, aCalc)
 
     var end = now()
 
     log("Array loop -  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.")
+    t.end()
 })
 
 function order_system_helper(t, usebatch, keepObserving) {
     gc()
-    expect(mobx.extras.isComputingDerivation()).toBe(false)
+    t.equal(mobx.extras.isComputingDerivation(), false)
     var orders = observable([])
     var vat = observable(2)
 
@@ -317,7 +326,7 @@ function order_system_helper(t, usebatch, keepObserving) {
     if (usebatch) mobx.transaction(setup)
     else setup()
 
-    expect(totalAmount.get()).toBe(375000)
+    t.equal(totalAmount.get(), 375000)
 
     var initial = now()
 
@@ -329,7 +338,7 @@ function order_system_helper(t, usebatch, keepObserving) {
     if (usebatch) mobx.transaction(update)
     else update()
 
-    expect(totalAmount.get()).toBe(500000)
+    t.equal(totalAmount.get(), 500000)
 
     if (keepObserving) disp()
 
@@ -349,41 +358,43 @@ function order_system_helper(t, usebatch, keepObserving) {
     t.end()
 }
 
-test("order system observed", function() {
+test("order system observed", function(t) {
     order_system_helper(t, false, true)
 })
 
-test("order system batched observed", function() {
+test("order system batched observed", function(t) {
     order_system_helper(t, true, true)
 })
 
-test("order system lazy", function() {
+test("order system lazy", function(t) {
     order_system_helper(t, false, false)
 })
 
-test("order system batched lazy", function() {
+test("order system batched lazy", function(t) {
     order_system_helper(t, true, false)
 })
 
-test("create array", function() {
+test("create array", function(t) {
     gc()
     var a = []
     for (var i = 0; i < 1000; i++) a.push(i)
     var start = now()
     for (var i = 0; i < 1000; i++) observable(a)
     log("\nCreate array -  Created in " + (now() - start) + "ms.")
+    t.end()
 })
 
-test("create array (fast)", function() {
+test("create array (fast)", function(t) {
     gc()
     var a = []
     for (var i = 0; i < 1000; i++) a.push(i)
     var start = now()
     for (var i = 0; i < 1000; i++) mobx.observable.shallowArray(a)
     log("\nCreate array (non-recursive)  Created in " + (now() - start) + "ms.")
+    t.end()
 })
 
-test("observe and dispose", () => {
+test("observe and dispose", t => {
     gc()
 
     var start = now()
@@ -401,9 +412,10 @@ test("observe and dispose", () => {
     }
 
     log("Observable with many observers  + dispose: " + (now() - start) + "ms")
+    t.end()
 })
 
-test("sort", () => {
+test("sort", t => {
     gc()
 
     function Item(a, b, c) {
@@ -461,7 +473,7 @@ test("sort", () => {
     log("expensive sort: disposed" + (now() - start))
 
     var plain = mobx.toJS(items, false)
-    expect(plain.length).toBe(MAX)
+    t.equal(plain.length, MAX)
 
     var start = now()
     for (var i = 0; i < 5; i++) {
@@ -473,9 +485,11 @@ test("sort", () => {
         plain.sort(sortFn)
     }
     log("native plain sort: updated " + (now() - start))
+
+    t.end()
 })
 
-test("computed temporary memoization", () => {
+test("computed temporary memoization", t => {
     "use strict"
     gc()
     var computeds = []
@@ -485,9 +499,10 @@ test("computed temporary memoization", () => {
         )
     }
     var start = now()
-    expect(computeds[27].get()).toBe(134217728)
+    t.equal(computeds[27].get(), 134217728)
 
     log("computed memoization " + (now() - start) + "ms")
+    t.end()
 })
 
 function now() {

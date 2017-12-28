@@ -1,8 +1,8 @@
 "use strict"
 const child_process = require("child_process")
 
-function testOutput(t, cmd, expected) {
-    test("Global state sharing: " + cmd, done => {
+function testOutput(cmd, expected) {
+    it("Global state sharing: " + cmd, done => {
         const output = child_process.exec(
             "node -e '" + cmd + "'",
             { cwd: __dirname },
@@ -18,29 +18,25 @@ function testOutput(t, cmd, expected) {
     })
 }
 
-test("it should handle multiple instances with the correct warnings", () => {
+describe("it should handle multiple instances with the correct warnings", () => {
     testOutput(
-        t,
-        'require("../../");require("../lib/mobx.umd.js")',
+        'require("../../");require("../../lib/mobx.umd.js")',
         "[mobx] Warning: there are multiple mobx instances active. This might lead to unexpected results. See https://github.com/mobxjs/mobx/issues/1082 for details.\n"
     )
     testOutput(
-        t,
-        'require("../../").extras.shareGlobalState();require("../lib/mobx.umd.js")',
+        'require("../../").extras.shareGlobalState();require("../../lib/mobx.umd.js")',
         "[mobx] Deprecated: Using `shareGlobalState` is not recommended, use peer dependencies instead. See https://github.com/mobxjs/mobx/issues/1082 for details." +
             "\n[mobx] Warning: there are multiple mobx instances active. This might lead to unexpected results. See https://github.com/mobxjs/mobx/issues/1082 for details.\n"
     )
     testOutput(
-        t,
-        'require("../../").extras.shareGlobalState();require("../lib/mobx.umd.js").extras.shareGlobalState()',
+        'require("../../").extras.shareGlobalState();require("../../lib/mobx.umd.js").extras.shareGlobalState()',
         "[mobx] Deprecated: Using `shareGlobalState` is not recommended, use peer dependencies instead. See https://github.com/mobxjs/mobx/issues/1082 for details." +
             "\n[mobx] Deprecated: Using `shareGlobalState` is not recommended, use peer dependencies instead. See https://github.com/mobxjs/mobx/issues/1082 for details.\n"
     )
     testOutput(
-        t,
-        'require("../../").extras.isolateGlobalState();require("../lib/mobx.umd.js").extras.isolateGlobalState()',
+        'require("../../").extras.isolateGlobalState();require("../../lib/mobx.umd.js").extras.isolateGlobalState()',
         ""
     )
-    testOutput(t, 'require("../../");require("../lib/mobx.umd.js").extras.isolateGlobalState()', "")
-    testOutput(t, 'require("../../").extras.isolateGlobalState();require("../lib/mobx.umd.js")', "")
+    testOutput('require("../../");require("../../lib/mobx.umd.js").extras.isolateGlobalState()', "")
+    testOutput('require("../../").extras.isolateGlobalState();require("../../lib/mobx.umd.js")', "")
 })

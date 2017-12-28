@@ -18,7 +18,7 @@ test("two versions should not work together if state is not shared", () => {
         x: 3
     })
 
-    values = []
+    const values = []
     const d1 = mobx1.autorun(() => {
         values.push(b.x)
     })

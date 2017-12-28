@@ -1,4 +1,5 @@
 var m = require("../../")
+var test = require("tape")
 var log = require("./index.js").logMeasurement
 
 function gc() {
@@ -27,7 +28,7 @@ function flatten() {
     return res
 }
 
-test("non-reactive folder tree", function() {
+test("non-reactive folder tree", function(t) {
     gc()
     function Folder(parent, name) {
         this.parent = parent
@@ -118,9 +119,9 @@ test("non-reactive folder tree", function() {
         measure("create text", () => {
             state.displayRoot.rebuildAll()
             state.text = state.displayRoot.asText.split("\n")
-            expect(state.text.length).toBe(1112)
-            expect(state.text[0]).toBe("root")
-            expect(state.text[state.text.length - 2]).toBe("root/9/9/9")
+            t.equal(state.text.length, 1112)
+            t.equal(state.text[0], "root")
+            t.equal(state.text[state.text.length - 2], "root/9/9/9")
         })
 
         measure("collapse folder", () => {
@@ -128,9 +129,9 @@ test("non-reactive folder tree", function() {
             state.displayRoot.children[9].rebuild()
             state.displayRoot.rebuild()
             state.text = state.displayRoot.asText.split("\n")
-            expect(state.text.length).toBe(1002)
-            expect(state.text[state.text.length - 3]).toBe("root/8/9/9")
-            expect(state.text[state.text.length - 2]).toBe("root/9")
+            t.equal(state.text.length, 1002)
+            t.equal(state.text[state.text.length - 3], "root/8/9/9")
+            t.equal(state.text[state.text.length - 2], "root/9")
         })
 
         measure("uncollapse folder", () => {
@@ -138,37 +139,39 @@ test("non-reactive folder tree", function() {
             state.displayRoot.children[9].rebuild()
             state.displayRoot.rebuild()
             state.text = state.displayRoot.asText.split("\n")
-            expect(state.text.length).toBe(1112)
-            expect(state.text[state.text.length - 2]).toBe("root/9/9/9")
+            t.equal(state.text.length, 1112)
+            t.equal(state.text[state.text.length - 2], "root/9/9/9")
         })
 
         measure("change name of folder", () => {
             state.root.name = "wow"
             state.displayRoot.rebuildAll()
             state.text = state.displayRoot.asText.split("\n")
-            expect(state.text.length).toBe(1112)
-            expect(state.text[state.text.length - 2]).toBe("wow/9/9/9")
+            t.equal(state.text.length, 1112)
+            t.equal(state.text[state.text.length - 2], "wow/9/9/9")
         })
 
         measure("search", () => {
             state.filter = "8"
             state.displayRoot.rebuildAll()
             state.text = state.displayRoot.asText.split("\n")
-            expect(state.text.slice(0, 4)).toEqual(["wow", "wow/0", "wow/0/0", "wow/0/0/8"])
-            expect(state.text.slice(-5)).toEqual(["wow/9/8", "wow/9/8/8", "wow/9/9", "wow/9/9/8", ""])
-            expect(state.text.length).toBe(212)
+            t.deepEqual(state.text.slice(0, 4), ["wow", "wow/0", "wow/0/0", "wow/0/0/8"])
+            t.deepEqual(state.text.slice(-5), ["wow/9/8", "wow/9/8/8", "wow/9/9", "wow/9/9/8", ""])
+            t.equal(state.text.length, 212)
         })
 
         measure("unsearch", () => {
             state.filter = null
             state.displayRoot.rebuildAll()
             state.text = state.displayRoot.asText.split("\n")
-            expect(state.text.length).toBe(1112)
+            t.equal(state.text.length, 1112)
         })
     })
+
+    t.end()
 })
 
-test("reactive folder tree", function() {
+test("reactive folder tree", function(t) {
     gc()
     function Folder(parent, name) {
         this.parent = parent
@@ -248,53 +251,55 @@ test("reactive folder tree", function() {
             m.autorun(function() {
                 state.text = stringTransformer(state.displayRoot).split("\n")
             })
-            expect(state.text.length).toBe(1112)
-            expect(state.text[0]).toBe("root")
-            expect(state.text[state.text.length - 2]).toBe("root/9/9/9")
+            t.equal(state.text.length, 1112)
+            t.equal(state.text[0], "root")
+            t.equal(state.text[state.text.length - 2], "root/9/9/9")
         })
 
         measure("collapse folder", () => {
             state.displayRoot.children[9].collapsed = true
-            expect(state.text.length).toBe(1002)
-            expect(state.text[state.text.length - 3]).toBe("root/8/9/9")
-            expect(state.text[state.text.length - 2]).toBe("root/9")
+            t.equal(state.text.length, 1002)
+            t.equal(state.text[state.text.length - 3], "root/8/9/9")
+            t.equal(state.text[state.text.length - 2], "root/9")
         })
 
         measure("uncollapse folder", () => {
             state.displayRoot.children[9].collapsed = false
-            expect(state.text.length).toBe(1112)
-            expect(state.text[state.text.length - 2]).toBe("root/9/9/9")
+            t.equal(state.text.length, 1112)
+            t.equal(state.text[state.text.length - 2], "root/9/9/9")
         })
 
         measure("change name of folder", () => {
             state.root.name = "wow"
-            expect(state.text.length).toBe(1112)
-            expect(state.text[state.text.length - 2]).toBe("wow/9/9/9")
+            t.equal(state.text.length, 1112)
+            t.equal(state.text[state.text.length - 2], "wow/9/9/9")
         })
 
         measure("search", () => {
             state.filter = "8"
-            expect(state.text.slice(0, 4)).toEqual(["wow", "wow/0", "wow/0/0", "wow/0/0/8"])
-            expect(state.text.slice(-5)).toEqual(["wow/9/8", "wow/9/8/8", "wow/9/9", "wow/9/9/8", ""])
-            expect(state.text.length).toBe(212)
+            t.deepEqual(state.text.slice(0, 4), ["wow", "wow/0", "wow/0/0", "wow/0/0/8"])
+            t.deepEqual(state.text.slice(-5), ["wow/9/8", "wow/9/8/8", "wow/9/9", "wow/9/9/8", ""])
+            t.equal(state.text.length, 212)
         })
 
         measure("unsearch", () => {
             state.filter = null
-            expect(state.text.length).toBe(1112)
+            t.equal(state.text.length, 1112)
         })
     })
+
+    t.end()
 })
 
 var BOX_COUNT = 10000
 var BOX_MUTATIONS = 100
 
-test("non-reactive state serialization", function() {
+test("non-reactive state serialization", function(t) {
     gc()
     serializationTester(t, x => x)
 })
 
-test("reactive state serialization", function() {
+test("reactive state serialization", function(t) {
     gc()
     serializationTester(t, m.createTransformer)
 })
@@ -333,9 +338,9 @@ function serializationTester(t, transformerFactory) {
                 boxes[boxes.length - 1 - BOX_MUTATIONS][i % 2 === 0 ? "x" : "y"] = i * 3
         })
 
-        expect(boxes.length).toBe(BOX_COUNT)
-        expect(states.length).toBe(BOX_MUTATIONS + 1)
-        expect(states[states.length - 1].length).toBe(BOX_COUNT)
+        t.equal(boxes.length, BOX_COUNT)
+        t.equal(states.length, BOX_MUTATIONS + 1)
+        t.equal(states[states.length - 1].length, BOX_COUNT)
     })
 
     t.end()

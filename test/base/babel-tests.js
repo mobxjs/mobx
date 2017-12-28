@@ -11,8 +11,8 @@ import {
     spy,
     isAction,
     useStrict
-} from "../"
-import * as mobx from "../"
+} from "../../"
+import * as mobx from "../../"
 
 class Box {
     @observable uninitialized
