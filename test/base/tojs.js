@@ -1,12 +1,11 @@
 "use strict"
 
-var test = require("tape")
-var mobx = require("..")
+var mobx = require("../../")
 var m = mobx
 var observable = mobx.observable
 var transaction = mobx.transaction
 
-test("json1", function(t) {
+test("json1", function() {
     mobx.extras.resetGlobalState()
 
     var todos = observable([
@@ -28,14 +27,12 @@ test("json1", function(t) {
     })
 
     todos[1].title = "improve coverage" // prints: write blog, improve coverage
-    t.equal(output, "write blog, improve coverage")
+    expect(output).toBe("write blog, improve coverage")
     todos.push({ title: "take a nap" }) // prints: write blog, improve coverage, take a nap
-    t.equal(output, "write blog, improve coverage, take a nap")
-
-    t.end()
+    expect(output).toBe("write blog, improve coverage, take a nap")
 })
 
-test("json2", function(t) {
+test("json2", function() {
     var source = {
         todos: [
             {
@@ -57,7 +54,7 @@ test("json2", function(t) {
 
     var o = mobx.observable(JSON.parse(JSON.stringify(source)))
 
-    t.deepEqual(mobx.toJS(o), source)
+    expect(mobx.toJS(o)).toEqual(source)
 
     var analyze = mobx.computed(function() {
         return [o.todos.length, o.todos[1].details.url]
@@ -94,7 +91,7 @@ test("json2", function(t) {
     o.todos[0].tags[0] = "reactjs"
     o.todos[1].tags.push("pff")
 
-    t.deepEqual(mobx.toJS(o), {
+    expect(mobx.toJS(o)).toEqual({
         todos: [
             {
                 title: "write blog",
@@ -112,8 +109,8 @@ test("json2", function(t) {
             }
         ]
     })
-    t.deepEqual(ab, [[2, "here"], [2, "ba"]])
-    t.deepEqual(tb, ["react,frp,mweh", "reactjs,frp,mweh", "reactjs,frp,mweh,pff"])
+    expect(ab).toEqual([[2, "here"], [2, "ba"]])
+    expect(tb).toEqual(["react,frp,mweh", "reactjs,frp,mweh", "reactjs,frp,mweh,pff"])
     ab = []
     tb = []
 
@@ -124,7 +121,7 @@ test("json2", function(t) {
         })
     )
 
-    t.deepEqual(mobx.toJS(o), {
+    expect(mobx.toJS(o)).toEqual({
         todos: [
             {
                 title: "write blog",
@@ -146,8 +143,8 @@ test("json2", function(t) {
             }
         ]
     })
-    t.deepEqual(ab, [[3, "ba"]])
-    t.deepEqual(tb, ["reactjs,frp,mweh,pff,x"])
+    expect(ab).toEqual([[3, "ba"]])
+    expect(tb).toEqual(["reactjs,frp,mweh,pff,x"])
     ab = []
     tb = []
 
@@ -158,7 +155,7 @@ test("json2", function(t) {
             url: "booking.com"
         }
     })
-    t.deepEqual(JSON.parse(JSON.stringify(o)), {
+    expect(JSON.parse(JSON.stringify(o))).toEqual({
         todos: [
             {
                 title: "write blog",
@@ -180,14 +177,14 @@ test("json2", function(t) {
             }
         ]
     })
-    t.deepEqual(ab, [[3, "booking.com"]])
-    t.deepEqual(tb, ["reactjs,frp,needs sabbatical,x"])
+    expect(ab).toEqual([[3, "booking.com"]])
+    expect(tb).toEqual(["reactjs,frp,needs sabbatical,x"])
     ab = []
     tb = []
 
     o.todos[1].details = mobx.observable({ url: "google" })
     o.todos[1].tags = ["foo", "bar"]
-    t.deepEqual(mobx.toJS(o, false), {
+    expect(mobx.toJS(o, false)).toEqual({
         todos: [
             {
                 title: "write blog",
@@ -209,25 +206,22 @@ test("json2", function(t) {
             }
         ]
     })
-    t.deepEqual(mobx.toJS(o, true), mobx.toJS(o, false))
-    t.deepEqual(ab, [[3, "google"]])
-    t.deepEqual(tb, ["reactjs,frp,foo,bar,x"])
-
-    t.end()
+    expect(mobx.toJS(o, true)).toEqual(mobx.toJS(o, false))
+    expect(ab).toEqual([[3, "google"]])
+    expect(tb).toEqual(["reactjs,frp,foo,bar,x"])
 })
 
-test("toJS handles dates", t => {
+test("toJS handles dates", () => {
     var a = observable({
         d: new Date()
     })
 
     var b = mobx.toJS(a)
-    t.equal(b.d instanceof Date, true)
-    t.equal(a.d === b.d, true)
-    t.end()
+    expect(b.d instanceof Date).toBe(true)
+    expect(a.d === b.d).toBe(true)
 })
 
-test("json cycles", function(t) {
+test("json cycles", function() {
     var a = observable({
         b: 1,
         c: [2],
@@ -245,19 +239,17 @@ test("json cycles", function(t) {
     var cloneC = cloneA.c
     var cloneD = cloneA.d
 
-    t.equal(cloneA.b, 1)
-    t.equal(cloneA.c[0], 2)
-    t.equal(cloneA.c[1], cloneA)
-    t.equal(cloneA.c[2], cloneD)
-    t.equal(cloneD.f, cloneA)
-    t.equal(cloneD.d, cloneD)
-    t.equal(cloneD.c, cloneC)
-    t.equal(cloneA.e, cloneA)
-
-    t.end()
+    expect(cloneA.b).toBe(1)
+    expect(cloneA.c[0]).toBe(2)
+    expect(cloneA.c[1]).toBe(cloneA)
+    expect(cloneA.c[2]).toBe(cloneD)
+    expect(cloneD.f).toBe(cloneA)
+    expect(cloneD.d).toBe(cloneD)
+    expect(cloneD.c).toBe(cloneC)
+    expect(cloneA.e).toBe(cloneA)
 })
 
-test("#285 class instances with toJS", t => {
+test("#285 class instances with toJS", () => {
     function Person() {
         this.firstName = "michel"
         mobx.extendObservable(this, {
@@ -271,23 +263,21 @@ test("#285 class instances with toJS", t => {
 
     const p1 = new Person()
     // check before lazy initialization
-    t.deepEqual(mobx.toJS(p1), {
+    expect(mobx.toJS(p1)).toEqual({
         firstName: "michel",
         lastName: "weststrate",
         tags: ["user", "mobx-member"]
     })
 
     // check after lazy initialization
-    t.deepEqual(mobx.toJS(p1), {
+    expect(mobx.toJS(p1)).toEqual({
         firstName: "michel",
         lastName: "weststrate",
         tags: ["user", "mobx-member"]
     })
-
-    t.end()
 })
 
-test("#285 non-mobx class instances with toJS", t => {
+test("#285 non-mobx class instances with toJS", () => {
     const nameObservable = mobx.observable("weststrate")
     function Person() {
         this.firstName = "michel"
@@ -296,34 +286,29 @@ test("#285 non-mobx class instances with toJS", t => {
 
     const p1 = new Person()
     // check before lazy initialization
-    t.deepEqual(mobx.toJS(p1), {
+    expect(mobx.toJS(p1)).toEqual({
         firstName: "michel",
         lastName: nameObservable // toJS doesn't recurse into non observable objects!
     })
-
-    t.end()
 })
 
-test("verify #566 solution", t => {
+test("verify #566 solution", () => {
     function MyClass() {}
     const a = new MyClass()
     const b = mobx.observable({ x: 3 })
     const c = mobx.observable({ a: a, b: b })
 
-    t.ok(mobx.toJS(c).a === a) // true
-    t.ok(mobx.toJS(c).b !== b) // false, cloned
-    t.ok(mobx.toJS(c).b.x === b.x) // true, both 3
-
-    t.end()
+    expect(mobx.toJS(c).a === a).toBeTruthy() // true
+    expect(mobx.toJS(c).b !== b).toBeTruthy() // false, cloned
+    expect(mobx.toJS(c).b.x === b.x).toBeTruthy() // true, both 3
 })
 
-test("verify already seen", t => {
+test("verify already seen", () => {
     const a = mobx.observable({ x: null, y: 3 })
     a.x = a
 
     const res = mobx.toJS(a)
-    t.equal(res.y, 3)
-    t.ok(res.x === res)
-    t.notOk(res.x === a)
-    t.end()
+    expect(res.y).toBe(3)
+    expect(res.x === res).toBeTruthy()
+    expect(res.x === a).toBeFalsy()
 })

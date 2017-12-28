@@ -1,6 +1,6 @@
 "use strict"
 
-exports.consoleError = function(t, block, regex) {
+exports.consoleError = function(block, regex) {
     let messages = ""
     const orig = console.error
     console.error = function() {
@@ -14,9 +14,8 @@ exports.consoleError = function(t, block, regex) {
     } finally {
         console.error = orig
     }
-    if (!messages) t.ok(false, "Expected error, but nothing was logged")
-    else if (regex.test(messages)) t.ok(true, "console.error")
-    else t.ok(false, "Expected " + regex + ", got: " + messages)
+    expect(messages.length).toBeGreaterThan(0)
+    expect(messages).toMatch(regex)
 }
 
 // TODO: move check globalState, cleanSpyEvents to here.

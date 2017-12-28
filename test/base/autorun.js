@@ -1,12 +1,11 @@
-var test = require("tape")
-var m = require("..")
+var m = require("../../")
 
-test("autorun passes Reaction as an argument to view function", function(t) {
+test("autorun passes Reaction as an argument to view function", function() {
     var a = m.observable(1)
     var values = []
 
     m.autorun(r => {
-        t.equal(typeof r.dispose, "function")
+        expect(typeof r.dispose).toBe("function")
         if (a.get() === "pleaseDispose") r.dispose()
         values.push(a.get())
     })
@@ -17,12 +16,10 @@ test("autorun passes Reaction as an argument to view function", function(t) {
     a.set(3)
     a.set(4)
 
-    t.deepEqual(values, [1, 2, "pleaseDispose"])
-
-    t.end()
+    expect(values).toEqual([1, 2, "pleaseDispose"])
 })
 
-test("autorun can be disposed on first run", function(t) {
+test("autorun can be disposed on first run", function() {
     var a = m.observable(1)
     var values = []
 
@@ -33,19 +30,16 @@ test("autorun can be disposed on first run", function(t) {
 
     a.set(2)
 
-    t.deepEqual(values, [1])
-
-    t.end()
+    expect(values).toEqual([1])
 })
 
-test("autorun warns when passed an action", function(t) {
+test("autorun warns when passed an action", function() {
     var action = m.action(() => {})
-    t.plan(1)
-    t.throws(() => m.autorun(action), /attempted to pass an action to autorun/)
-    t.end()
+    expect.assertions(1)
+    expect(() => m.autorun(action)).toThrowError(/attempted to pass an action to autorun/)
 })
 
-test("autorun batches automatically", function(t) {
+test("autorun batches automatically", function() {
     var runs = 0
     var a1runs = 0
     var a2runs = 0
@@ -71,22 +65,21 @@ test("autorun batches automatically", function(t) {
         x.c = x.a
     })
 
-    t.equal(a1runs, 1)
-    t.equal(a2runs, 1)
-    t.equal(runs, 1)
+    expect(a1runs).toBe(1)
+    expect(a2runs).toBe(1)
+    expect(runs).toBe(1)
 
     x.a = 17
 
-    t.equal(a1runs, 2)
-    t.equal(a2runs, 2)
-    t.equal(runs, 2)
+    expect(a1runs).toBe(2)
+    expect(a2runs).toBe(2)
+    expect(runs).toBe(2)
 
     d1()
     d2()
-    t.end()
 })
 
-test("autorun tracks invalidation of unbound dependencies", function(t) {
+test("autorun tracks invalidation of unbound dependencies", function() {
     var a = m.observable(0)
     var b = m.observable(0)
     var c = m.computed(() => a.get() + b.get())
@@ -98,6 +91,5 @@ test("autorun tracks invalidation of unbound dependencies", function(t) {
     })
 
     a.set(1)
-    t.deepEqual(values, [0, 100, 101])
-    t.end()
+    expect(values).toEqual([0, 100, 101])
 })

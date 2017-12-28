@@ -1,9 +1,8 @@
 "use strict"
 
-const test = require("tape")
-const mobx = require("../")
+const mobx = require("../../")
 
-test("nested computeds should not run unnecessary", t => {
+test("nested computeds should not run unnecessary", () => {
     function Item(name) {
         mobx.extendObservable(this, {
             name: name,
@@ -30,7 +29,5 @@ test("nested computeds should not run unnecessary", t => {
 
     store.items.replace([new Item("item2")])
 
-    t.deepEqual(values, ["0:item1", "0:item2"])
-
-    t.end()
+    expect(values).toEqual(["0:item1", "0:item2"])
 })

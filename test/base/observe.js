@@ -1,13 +1,12 @@
-var test = require("tape")
-var m = require("..")
+var m = require("../../")
 
-test("observe object and map properties", function(t) {
+test("observe object and map properties", function() {
     var map = m.map({ a: 1 })
     var events = []
 
-    t.throws(function() {
+    expect(function() {
         m.observe(map, "b", function() {})
-    })
+    }).toThrow()
 
     var d1 = m.observe(map, "a", function(e) {
         events.push([e.newValue, e.oldValue])
@@ -22,9 +21,9 @@ test("observe object and map properties", function(t) {
         a: 5
     })
 
-    t.throws(function() {
+    expect(function() {
         m.observe(o, "b", function() {})
-    })
+    }).toThrow()
     var d2 = m.observe(o, "a", function(e) {
         events.push([e.newValue, e.oldValue])
     })
@@ -34,12 +33,10 @@ test("observe object and map properties", function(t) {
     d2()
     o.a = 8
 
-    t.deepEqual(events, [[2, 1], [3, 2], [6, 5], [7, 6]])
-
-    t.end()
+    expect(events).toEqual([[2, 1], [3, 2], [6, 5], [7, 6]])
 })
 
-test("observe computed values", function(t) {
+test("observe computed values", function() {
     var events = []
 
     var v = m.observable(0)
@@ -57,7 +54,5 @@ test("observe computed values", function(t) {
     v.set(6)
     f.set(10)
 
-    t.deepEqual(events, [[6, 0]])
-
-    t.end()
+    expect(events).toEqual([[6, 0]])
 })

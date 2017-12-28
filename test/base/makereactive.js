@@ -1,5 +1,4 @@
-var test = require("tape")
-var mobx = require("..")
+var mobx = require("../../")
 var m = mobx
 var o = mobx.observable
 
@@ -17,7 +16,7 @@ function buffer() {
     return res
 }
 
-test("isObservable", function(t) {
+test("isObservable", function() {
     function Order(price) {}
 
     function ReactiveOrder(price) {
@@ -25,56 +24,53 @@ test("isObservable", function(t) {
             price: price
         })
     }
-    t.equal(m.isObservable(null), false)
-    t.equal(m.isObservable(null), false)
+    expect(m.isObservable(null)).toBe(false)
+    expect(m.isObservable(null)).toBe(false)
 
-    t.equal(m.isObservable(m.observable([])), true)
-    t.equal(m.isObservable(m.observable({})), true)
-    t.equal(m.isObservable(m.observable(function() {})), true)
-    t.equal(m.isObservable(m.computed(function() {})), true)
+    expect(m.isObservable(m.observable([]))).toBe(true)
+    expect(m.isObservable(m.observable({}))).toBe(true)
+    expect(m.isObservable(m.observable(function() {}))).toBe(true)
+    expect(m.isObservable(m.computed(function() {}))).toBe(true)
 
-    t.equal(m.isObservable([]), false)
-    t.equal(m.isObservable({}), false)
-    t.equal(m.isObservable(function() {}), false)
+    expect(m.isObservable([])).toBe(false)
+    expect(m.isObservable({})).toBe(false)
+    expect(m.isObservable(function() {})).toBe(false)
 
-    t.equal(m.isObservable(new Order()), false)
-    t.equal(m.isObservable(m.observable(new Order())), true)
+    expect(m.isObservable(new Order())).toBe(false)
+    expect(m.isObservable(m.observable(new Order()))).toBe(true)
 
-    t.equal(m.isObservable(new ReactiveOrder()), true)
-    t.equal(m.isObservable(m.observable(3)), true)
+    expect(m.isObservable(new ReactiveOrder())).toBe(true)
+    expect(m.isObservable(m.observable(3))).toBe(true)
 
     var obj = {}
-    t.equal(m.isObservable(obj), false)
+    expect(m.isObservable(obj)).toBe(false)
 
-    t.equal(m.isObservable(m.observable(function() {})), true)
-    t.equal(m.isObservable(m.autorun(function() {})), true)
+    expect(m.isObservable(m.observable(function() {}))).toBe(true)
+    expect(m.isObservable(m.autorun(function() {}))).toBe(true)
 
-    t.equal(m.isObservable(m.observable({ a: 1 }), "a"), true)
-    t.equal(m.isObservable(m.observable({ a: 1 }), "b"), false)
+    expect(m.isObservable(m.observable({ a: 1 }), "a")).toBe(true)
+    expect(m.isObservable(m.observable({ a: 1 }), "b")).toBe(false)
 
-    t.equal(m.isObservable(m.map()), true)
+    expect(m.isObservable(m.map())).toBe(true)
 
     const base = { a: 3 }
     const obs = m.observable(base)
-    t.equal(m.isObservable(base), false)
-    t.equal(m.isObservable(base, "a"), false)
-    t.equal(m.isObservable(obs), true)
-    t.equal(m.isObservable(obs, "a"), true)
-
-    t.end()
+    expect(m.isObservable(base)).toBe(false)
+    expect(m.isObservable(base, "a")).toBe(false)
+    expect(m.isObservable(obs)).toBe(true)
+    expect(m.isObservable(obs, "a")).toBe(true)
 })
 
-test("isBoxedObservable", function(t) {
-    t.equal(m.isBoxedObservable(m.observable({})), false)
-    t.equal(m.isBoxedObservable(m.computed(() => 3)), false)
-    t.equal(m.isBoxedObservable(m.observable(3)), true)
-    t.equal(m.isBoxedObservable(m.observable.box(3)), true)
-    t.equal(m.isBoxedObservable(m.observable.box({})), true)
-    t.equal(m.isBoxedObservable(m.observable.shallowBox({})), true)
-    t.end()
+test("isBoxedObservable", function() {
+    expect(m.isBoxedObservable(m.observable({}))).toBe(false)
+    expect(m.isBoxedObservable(m.computed(() => 3))).toBe(false)
+    expect(m.isBoxedObservable(m.observable(3))).toBe(true)
+    expect(m.isBoxedObservable(m.observable.box(3))).toBe(true)
+    expect(m.isBoxedObservable(m.observable.box({}))).toBe(true)
+    expect(m.isBoxedObservable(m.observable.shallowBox({}))).toBe(true)
 })
 
-test("observable1", function(t) {
+test("observable1", function() {
     m.extras.resetGlobalState()
 
     // recursive structure
@@ -91,10 +87,10 @@ test("observable1", function(t) {
     })
     x.a = { b: { c: 4 } }
     x.a.b.c = 5 // new structure was reactive as well
-    t.deepEqual(b.toArray(), [3, 4, 5])
+    expect(b.toArray()).toEqual([3, 4, 5])
 
     // recursive structure, but asReference passed in
-    t.equal(m.isObservable(x.a.b), true)
+    expect(m.isObservable(x.a.b)).toBe(true)
     var x2 = m.observable({
         a: m.observable.ref({
             b: {
@@ -103,9 +99,9 @@ test("observable1", function(t) {
         })
     })
 
-    t.equal(m.isObservable(x2), true)
-    t.equal(m.isObservable(x2.a), false)
-    t.equal(m.isObservable(x2.a.b), false)
+    expect(m.isObservable(x2)).toBe(true)
+    expect(m.isObservable(x2.a)).toBe(false)
+    expect(m.isObservable(x2.a.b)).toBe(false)
 
     var b2 = buffer()
     m.autorun(function() {
@@ -113,7 +109,7 @@ test("observable1", function(t) {
     })
     x2.a = { b: { c: 4 } }
     x2.a.b.c = 5 // not picked up, not reactive, since passed as reference
-    t.deepEqual(b2.toArray(), [3, 4])
+    expect(b2.toArray()).toEqual([3, 4])
 
     // non recursive structure
     var x3 = o.shallowObject({
@@ -129,12 +125,10 @@ test("observable1", function(t) {
     })
     x3.a = { b: { c: 4 } }
     x3.a.b.c = 5 // sub structure not reactive
-    t.deepEqual(b3.toArray(), [3, 4])
-
-    t.end()
+    expect(b3.toArray()).toEqual([3, 4])
 })
 
-test("observable3", function(t) {
+test("observable3", function() {
     function Order(price) {
         this.price = price
     }
@@ -148,18 +142,16 @@ test("observable3", function(t) {
         b(x.orders.length)
     })
 
-    t.equal(m.isObservable(x.orders), true)
-    t.equal(m.isObservable(x.orders[0]), false)
+    expect(m.isObservable(x.orders)).toBe(true)
+    expect(m.isObservable(x.orders[0])).toBe(false)
     x.orders[2] = new Order(3)
     x.orders = []
-    t.equal(m.isObservable(x.orders), true)
+    expect(m.isObservable(x.orders)).toBe(true)
     x.orders[0] = new Order(2)
-    t.deepEqual(b.toArray(), [2, 3, 0, 1])
-
-    t.end()
+    expect(b.toArray()).toEqual([2, 3, 0, 1])
 })
 
-test("observable4", function(t) {
+test("observable4", function() {
     var x = m.observable([{ x: 1 }, { x: 2 }])
 
     var b = buffer()
@@ -176,7 +168,7 @@ test("observable4", function(t) {
     x[0].x = 3
     x.shift()
     x.push({ x: 5 })
-    t.deepEqual(b.toArray(), [[1, 2], [3, 2], [2], [2, 5]])
+    expect(b.toArray()).toEqual([[1, 2], [3, 2], [2], [2, 5]])
 
     // non recursive
     var x2 = o.shallowArray([{ x: 1 }, { x: 2 }])
@@ -195,20 +187,18 @@ test("observable4", function(t) {
     x2[0].x = 3
     x2.shift()
     x2.push({ x: 5 })
-    t.deepEqual(b2.toArray(), [[1, 2], [2], [2, 5]])
-
-    t.end()
+    expect(b2.toArray()).toEqual([[1, 2], [2], [2, 5]])
 })
 
-test("observable5", function(t) {
+test("observable5", function() {
     var x = m.computed(function() {})
-    t.throws(function() {
+    expect(function() {
         x.set(7) // set not allowed
-    })
+    }).toThrow()
 
     var f = function() {}
     var x2 = m.observable(f)
-    t.equal(x2.get(), f)
+    expect(x2.get()).toBe(f)
     x2.set(null) // allowed
 
     f = function() {
@@ -231,12 +221,10 @@ test("observable5", function(t) {
         return 3
     }
     x.nonReactive = three
-    t.deepEqual(b.toArray(), [[17, f, 17], [18, f, 18], [18, three, 3]])
-
-    t.end()
+    expect(b.toArray()).toEqual([[17, f, 17], [18, f, 18], [18, three, 3]])
 })
 
-test("flat array", function(t) {
+test("flat array", function() {
     var x = m.observable({
         x: m.observable.shallow([
             {
@@ -252,29 +240,27 @@ test("flat array", function(t) {
         result = JSON.stringify(mobx.toJS(x))
     })
 
-    t.deepEqual(result, JSON.stringify({ x: [{ a: 1 }] }))
-    t.equal(updates, 1)
+    expect(result).toEqual(JSON.stringify({ x: [{ a: 1 }] }))
+    expect(updates).toBe(1)
 
     x.x[0].a = 2 // not picked up; object is not made reactive
-    t.deepEqual(result, JSON.stringify({ x: [{ a: 1 }] }))
-    t.equal(updates, 1)
+    expect(result).toEqual(JSON.stringify({ x: [{ a: 1 }] }))
+    expect(updates).toBe(1)
 
     x.x.push({ a: 3 }) // picked up, array is reactive
-    t.deepEqual(result, JSON.stringify({ x: [{ a: 2 }, { a: 3 }] }))
-    t.equal(updates, 2)
+    expect(result).toEqual(JSON.stringify({ x: [{ a: 2 }, { a: 3 }] }))
+    expect(updates).toBe(2)
 
     x.x[0] = { a: 4 } // picked up, array is reactive
-    t.deepEqual(result, JSON.stringify({ x: [{ a: 4 }, { a: 3 }] }))
-    t.equal(updates, 3)
+    expect(result).toEqual(JSON.stringify({ x: [{ a: 4 }, { a: 3 }] }))
+    expect(updates).toBe(3)
 
     x.x[1].a = 6 // not picked up
-    t.deepEqual(result, JSON.stringify({ x: [{ a: 4 }, { a: 3 }] }))
-    t.equal(updates, 3)
-
-    t.end()
+    expect(result).toEqual(JSON.stringify({ x: [{ a: 4 }, { a: 3 }] }))
+    expect(updates).toBe(3)
 })
 
-test("flat object", function(t) {
+test("flat object", function() {
     var y = m.observable.shallowObject({
         x: { z: 3 }
     })
@@ -286,25 +272,23 @@ test("flat object", function(t) {
         result = JSON.stringify(mobx.toJS(y))
     })
 
-    t.deepEqual(result, JSON.stringify({ x: { z: 3 } }))
-    t.equal(updates, 1)
+    expect(result).toEqual(JSON.stringify({ x: { z: 3 } }))
+    expect(updates).toBe(1)
 
     y.x.z = 4 // not picked up
-    t.deepEqual(result, JSON.stringify({ x: { z: 3 } }))
-    t.equal(updates, 1)
+    expect(result).toEqual(JSON.stringify({ x: { z: 3 } }))
+    expect(updates).toBe(1)
 
     y.x = { z: 5 }
-    t.deepEqual(result, JSON.stringify({ x: { z: 5 } }))
-    t.equal(updates, 2)
+    expect(result).toEqual(JSON.stringify({ x: { z: 5 } }))
+    expect(updates).toBe(2)
 
     y.x.z = 6 // not picked up
-    t.deepEqual(result, JSON.stringify({ x: { z: 5 } }))
-    t.equal(updates, 2)
-
-    t.end()
+    expect(result).toEqual(JSON.stringify({ x: { z: 5 } }))
+    expect(updates).toBe(2)
 })
 
-test("as structure", function(t) {
+test("as structure", function() {
     var x = m.observable({
         x: m.observable.struct(null)
     })
@@ -316,13 +300,13 @@ test("as structure", function(t) {
     })
 
     function c() {
-        t.equal(changed, 1, "expected a change")
+        expect(changed).toBe(1)
         if (changed !== 1) console.trace()
         changed = 0
     }
 
     function nc() {
-        t.equal(changed, 0, "expected no change")
+        expect(changed).toBe(0)
         if (changed !== 0) console.trace()
         changed = 0
     }
@@ -426,10 +410,9 @@ test("as structure", function(t) {
     nc()
 
     dis()
-    t.end()
 })
 
-test("as structure view", function(t) {
+test("as structure view", function() {
     var x = m.observable({
         a: 1,
         aa: 1,
@@ -451,26 +434,25 @@ test("as structure view", function(t) {
         x.b
         bc++
     })
-    t.equal(bc, 1)
+    expect(bc).toBe(1)
 
     var cc = 0
     var co = m.autorun(function() {
         x.c
         cc++
     })
-    t.equal(cc, 1)
+    expect(cc).toBe(1)
 
     x.a = 2
     x.a = 3
-    t.equal(bc, 3)
-    t.equal(cc, 1)
+    expect(bc).toBe(3)
+    expect(cc).toBe(1)
     x.aa = 3
-    t.equal(bc, 4)
-    t.equal(cc, 2)
-    t.end()
+    expect(bc).toBe(4)
+    expect(cc).toBe(2)
 })
 
-test("ES5 non reactive props", function(t) {
+test("ES5 non reactive props", function() {
     var te = {}
     Object.defineProperty(te, "nonConfigurable", {
         enumerable: true,
@@ -479,13 +461,13 @@ test("ES5 non reactive props", function(t) {
         value: "static"
     })
     // should throw if trying to reconfigure an existing non-configurable prop
-    t.throws(function() {
+    expect(function() {
         const a = m.extendObservable(te2, { notConfigurable: 1 })
-    })
+    }).toThrow()
     // should skip non-configurable / writable props when using `observable`
     te = m.extendObservable(te, te)
     const d1 = Object.getOwnPropertyDescriptor(te, "nonConfigurable")
-    t.equal(d1.value, "static")
+    expect(d1.value).toBe("static")
 
     var te2 = {}
     Object.defineProperty(te2, "notWritable", {
@@ -495,54 +477,49 @@ test("ES5 non reactive props", function(t) {
         value: "static"
     })
     // should throw if trying to reconfigure an existing non-writable prop
-    t.throws(function() {
+    expect(function() {
         const a = m.extendObservable(te2, { notWritable: 1 })
-    })
+    }).toThrow()
     const d2 = Object.getOwnPropertyDescriptor(te2, "notWritable")
-    t.equal(d2.value, "static")
+    expect(d2.value).toBe("static")
 
     // should not throw for other props
-    t.equal(m.extendObservable(te, { bla: 3 }).bla, 3)
-
-    t.end()
+    expect(m.extendObservable(te, { bla: 3 }).bla).toBe(3)
 })
 
-test("exceptions", function(t) {
-    t.throws(function() {
+test("exceptions", function() {
+    expect(function() {
         m.asReference(m.asFlat(3))
-    }, "nested")
+    }).toThrow()
 
     var x = m.observable({
         y: m.observable.ref(null),
         z: 2
     })
 
-    t.throws(function() {
+    expect(function() {
         x.z = m.asReference(3)
-    })
+    }).toThrow()
 
     var ar = m.observable([2])
 
-    t.throws(function() {
+    expect(function() {
         ar[0] = m.asReference(3)
-    })
+    }).toThrow()
 
-    t.throws(function() {
+    expect(function() {
         ar[1] = m.asReference(3)
-    })
+    }).toThrow()
 
-    t.throws(function() {
+    expect(function() {
         ar = m.observable([m.asStructure(3)])
-    })
+    }).toThrow()
 
-    return t.end()
+    return;
 })
 
-test("540 - extendobservable should not report cycles", function(t) {
-    t.throws(
-        () => m.extendObservable(Object.freeze({}), {}),
-        /Cannot make the designated object observable/
-    )
+test("540 - extendobservable should not report cycles", function() {
+    expect(() => m.extendObservable(Object.freeze({}), {})).toThrowError(/Cannot make the designated object observable/)
 
     var objWrapper = mobx.observable({
         value: null
@@ -553,52 +530,44 @@ test("540 - extendobservable should not report cycles", function(t) {
     }
 
     objWrapper.value = obj
-    t.throws(
-        () => mobx.extendObservable(objWrapper, objWrapper.value),
-        /extending an object with another observable \(object\) is not supported/
-    )
+    expect(() => mobx.extendObservable(objWrapper, objWrapper.value)).toThrowError(/extending an object with another observable \(object\) is not supported/)
 
     mobx.autorun(() => {
         console.log(objWrapper.name)
     })
-    t.end()
 })
 
-test("mobx 3", t => {
+test("mobx 3", () => {
     const x = mobx.observable({ a: 1 })
 
-    t.ok(x === mobx.observable(x))
+    expect(x === mobx.observable(x)).toBeTruthy()
 
     const y = mobx.observable.shallowBox(null)
     const obj = { a: 2 }
     y.set(obj)
-    t.ok(y.get() === obj)
-    t.equal(mobx.isObservable(y.get()), false)
-
-    t.end()
+    expect(y.get() === obj).toBeTruthy()
+    expect(mobx.isObservable(y.get())).toBe(false)
 })
 
-test("computed value", t => {
+test("computed value", () => {
     mobx.extras.getGlobalState().mobxGuid = 0
     var c = mobx.computed(() => 3)
 
-    t.equal(c.toJSON(), 3)
-    t.equal(mobx.isComputed(c), true)
-    t.equal(c.toString(), "ComputedValue@2[() => 3]")
-    t.end()
+    expect(c.toJSON()).toBe(3)
+    expect(mobx.isComputed(c)).toBe(true)
+    expect(c.toString()).toBe("ComputedValue@2[function () {return 3;}]")
 })
 
-test("boxed value json", t => {
+test("boxed value json", () => {
     var a = mobx.observable.box({ x: 1 })
-    t.deepEqual(a.get().x, 1)
+    expect(a.get().x).toEqual(1)
     a.set(3)
-    t.deepEqual(a.get(), 3)
-    t.equal("" + a, "3")
-    t.equal(a.toJSON(), 3)
-    t.end()
+    expect(a.get()).toEqual(3)
+    expect("" + a).toBe("3")
+    expect(a.toJSON()).toBe(3)
 })
 
-test("computed value scope", t => {
+test("computed value scope", () => {
     var a = mobx.observable({
         x: 1,
         y: mobx.computed(
@@ -611,29 +580,25 @@ test("computed value scope", t => {
         )
     })
 
-    t.equal(a.y, 2)
+    expect(a.y).toBe(2)
     a.x = 2
-    t.equal(a.y, 4)
+    expect(a.y).toBe(4)
     a.y = 3
-    t.equal(a.y, 6)
-
-    t.end()
+    expect(a.y).toBe(6)
 })
 
-test("shallow array", t => {
+test("shallow array", () => {
     var a = mobx.observable.shallowArray()
     a.push({ x: 1 }, [], 2, mobx.observable({ y: 3 }))
 
-    t.equal(mobx.isObservable(a), true)
-    t.equal(mobx.isObservable(a[0]), false)
-    t.equal(mobx.isObservable(a[1]), false)
-    t.equal(mobx.isObservable(a[2]), false)
-    t.equal(mobx.isObservable(a[3]), true)
-
-    t.end()
+    expect(mobx.isObservable(a)).toBe(true)
+    expect(mobx.isObservable(a[0])).toBe(false)
+    expect(mobx.isObservable(a[1])).toBe(false)
+    expect(mobx.isObservable(a[2])).toBe(false)
+    expect(mobx.isObservable(a[3])).toBe(true)
 })
 
-test("761 - deeply nested modifiers work", t => {
+test("761 - deeply nested modifiers work", () => {
     var a = {}
     mobx.extendObservable(a, {
         someKey: {
@@ -641,25 +606,23 @@ test("761 - deeply nested modifiers work", t => {
         }
     })
 
-    t.equal(mobx.isObservable(a), true)
-    t.equal(mobx.isObservable(a, "someKey"), true)
-    t.equal(mobx.isObservable(a.someKey), true)
-    t.equal(mobx.isObservable(a.someKey, "someNestedKey"), true)
-    t.equal(mobx.isObservable(a.someKey.someNestedKey), false)
-    t.equal(Array.isArray(a.someKey.someNestedKey), true)
+    expect(mobx.isObservable(a)).toBe(true)
+    expect(mobx.isObservable(a, "someKey")).toBe(true)
+    expect(mobx.isObservable(a.someKey)).toBe(true)
+    expect(mobx.isObservable(a.someKey, "someNestedKey")).toBe(true)
+    expect(mobx.isObservable(a.someKey.someNestedKey)).toBe(false)
+    expect(Array.isArray(a.someKey.someNestedKey)).toBe(true)
 
     Object.assign(a, { someKey: { someNestedKey: [1, 2, 3] } })
-    t.equal(mobx.isObservable(a), true)
-    t.equal(mobx.isObservable(a, "someKey"), true)
-    t.equal(mobx.isObservable(a.someKey), true)
-    t.equal(mobx.isObservable(a.someKey, "someNestedKey"), true)
-    t.equal(mobx.isObservable(a.someKey.someNestedKey), true) // Too bad: no deep merge with Object.assign! someKey object gets replaced in its entirity
-    t.equal(Array.isArray(a.someKey.someNestedKey), false)
-
-    t.end()
+    expect(mobx.isObservable(a)).toBe(true)
+    expect(mobx.isObservable(a, "someKey")).toBe(true)
+    expect(mobx.isObservable(a.someKey)).toBe(true)
+    expect(mobx.isObservable(a.someKey, "someNestedKey")).toBe(true)
+    expect(mobx.isObservable(a.someKey.someNestedKey)).toBe(true) // Too bad: no deep merge with Object.assign! someKey object gets replaced in its entirity
+    expect(Array.isArray(a.someKey.someNestedKey)).toBe(false)
 })
 
-test("compare structurally, deep", t => {
+test("compare structurally, deep", () => {
     var a = mobx.observable.object({
         x: mobx.observable.deep.struct()
     })
@@ -670,25 +633,24 @@ test("compare structurally, deep", t => {
         changed++
     })
 
-    t.equal(changed, 1)
+    expect(changed).toBe(1)
     a.x = { y: 2 }
-    t.equal(changed, 2)
+    expect(changed).toBe(2)
     a.x.y = 3
-    t.equal(changed, 3, "reacted to deep observability")
+    expect(changed).toBe(3)
 
     a.x = { y: 3 }
-    t.equal(changed, 3, "did not react; structurally the same")
+    expect(changed).toBe(3)
 
     a.x.y = { a: 1 }
-    t.equal(changed, 4, "did react")
+    expect(changed).toBe(4)
     a.x.y = { a: 1 }
-    t.equal(changed, 4, "did not react; structurally comparison was infective")
+    expect(changed).toBe(4)
 
     d()
-    t.end()
 })
 
-test("compare structurally, ref", t => {
+test("compare structurally, ref", () => {
     var a = mobx.observable.object({
         x: mobx.observable.ref.struct()
     })
@@ -699,19 +661,18 @@ test("compare structurally, ref", t => {
         changed++
     })
 
-    t.equal(changed, 1)
+    expect(changed).toBe(1)
     a.x = { y: 2 }
-    t.equal(changed, 2)
+    expect(changed).toBe(2)
     a.x.y = 3
-    t.equal(mobx.isObservable(a.x), false)
-    t.equal(changed, 2, "didn't react, not observed")
+    expect(mobx.isObservable(a.x)).toBe(false)
+    expect(changed).toBe(2)
 
     a.x = { y: 3 }
-    t.equal(changed, 2, "did not react; structurally the same")
+    expect(changed).toBe(2)
 
     a.x = { y: 4 }
-    t.equal(changed, 3, "did react; ref change")
+    expect(changed).toBe(3)
 
     d()
-    t.end()
 })
