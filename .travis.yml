@@ -1,7 +1,7 @@
 language: node_js
 install:
     - yarn install
-script: CI=true yarn test
+script: CI=true yarn tes:travis
 after_success:
   - cat ./coverage/lcov.info|./node_modules/coveralls/bin/coveralls.js
 node_js:

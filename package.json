@@ -9,10 +9,10 @@
   "react-native": "lib/mobx.module.js",
   "typings": "lib/mobx.d.ts",
   "scripts": {
-    "test": "yarn quick-build && jest",
+    "test": "yarn quick-build && yarn jest",
     "test:watch": "yarn test --watch",
     "test:mixed-versions": "jest --testRegex mixed-versions",
-    "test:all": "yarn small-build && yarn test && yarn test:flow && yarn test:mixed-versions && yarn test:webpack",
+    "test:all": "yarn small-build && yarn jest -i && yarn test:flow && yarn test:mixed-versions && yarn test:webpack",
     "test:webpack": "node scripts/webpack-regression-tests.js",
     "test:flow": "node_modules/.bin/flow check",
     "test:performance": "npm run small-build && PERSIST=true time node --expose-gc test/perf/index.js",
