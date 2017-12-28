@@ -1,6 +1,6 @@
-import { IDepTreeNode, getObservers, hasObservers } from "../core/observable"
+import { IDepTreeNode, getObservers, hasObservers, IObservable } from "../core/observable"
 import { unique } from "../utils/utils"
-import { getAtom } from "../types/type-utils"
+import { IDerivation } from "../core/derivation";
 
 export interface IDependencyTree {
     name: string
@@ -12,8 +12,8 @@ export interface IObserverTree {
     observers?: IObserverTree[]
 }
 
-export function getDependencyTree(thing: any, property?: string): IDependencyTree {
-    return nodeToDependencyTree(getAtom(thing, property))
+export function getDependencyTree(thing: IObservable): IDependencyTree {
+    return nodeToDependencyTree(thing)
 }
 
 function nodeToDependencyTree(node: IDepTreeNode): IDependencyTree {
@@ -25,8 +25,8 @@ function nodeToDependencyTree(node: IDepTreeNode): IDependencyTree {
     return result
 }
 
-export function getObserverTree(thing: any, property?: string): IObserverTree {
-    return nodeToObserverTree(getAtom(thing, property))
+export function getObserverTree(thing: IDerivation): IObserverTree {
+    return nodeToObserverTree(thing)
 }
 
 function nodeToObserverTree(node: IDepTreeNode): IObserverTree {

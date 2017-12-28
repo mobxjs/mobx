@@ -10,12 +10,10 @@ import { IObservable, startBatch, endBatch } from "./observable"
 import { MobxState } from "./mobxstate"
 import {
     createInstanceofPredicate,
-    getNextId,
     invariant,
     unique,
     joinStrings
 } from "../utils/utils"
-import { isSpyEnabled, spyReport, spyReportStart, spyReportEnd } from "./spy"
 import { getMessage } from "../utils/messages"
 
 /**
@@ -44,17 +42,18 @@ export interface IReactionPublic {
 export interface IReactionDisposer {
     (): void
     $mobx: Reaction
-    onError(handler: (error: any, derivation: IDerivation) => void)
+    onError(handler: (error: any, derivation: IDerivation) => void): void
 }
 
 export class Reaction implements IDerivation, IReactionPublic {
+    name: string
     observing: IObservable[] = [] // nodes we are looking at. Our value depends on these nodes
     newObserving: IObservable[] = []
     dependenciesState = IDerivationState.NOT_TRACKING
     diffValue = 0
     runId = 0
     unboundDepsCount = 0
-    __mapid = "#" + getNextId()
+    __mapid: string
     isDisposed = false
     _isScheduled = false
     _isTrackPending = false
@@ -63,9 +62,13 @@ export class Reaction implements IDerivation, IReactionPublic {
 
     constructor(
         readonly context: MobxState,
-        public name: string = "Reaction@" + getNextId(),
+        name: string | undefined,
         private onInvalidate: () => void
-    ) {}
+    ) {
+        const nextId = context.nextId();
+        this.name = name || "Reaction@" + nextId
+        this.__mapid = "#" + nextId
+    }
 
     onBecomeStale() {
         this.schedule()
@@ -88,32 +91,33 @@ export class Reaction implements IDerivation, IReactionPublic {
      */
     runReaction() {
         if (!this.isDisposed) {
-            startBatch(this.context)
+            const { context} = this
+            startBatch(context)
             this._isScheduled = false
             if (shouldCompute(this)) {
                 this._isTrackPending = true
 
                 this.onInvalidate()
-                if (this._isTrackPending && isSpyEnabled(this.context)) {
+                if (this._isTrackPending && context.isSpyEnabled()) {
                     // onInvalidate didn't trigger track right away..
-                    spyReport(this.context, {
+                    context.spyReport({
                         object: this,
                         type: "scheduled-reaction"
                     })
                 }
             }
-            endBatch(this.context)
+            endBatch(context)
         }
     }
 
     track(fn: () => void) {
         const { context } = this;
         startBatch(context)
-        const notify = isSpyEnabled(context)
+        const notify = context.isSpyEnabled()
         let startTime
         if (notify) {
             startTime = Date.now()
-            spyReportStart(context, {
+            context.spyReportStart({
                 object: this,
                 type: "reaction",
                 fn
@@ -129,8 +133,8 @@ export class Reaction implements IDerivation, IReactionPublic {
         }
         if (isCaughtException(result)) this.reportExceptionInDerivation(result.cause)
         if (notify) {
-            spyReportEnd(context, {
-                time: Date.now() - startTime
+            context.spyReportEnd({
+                time: Date.now() - (startTime as number)
             })
         }
         endBatch(context)
@@ -151,8 +155,8 @@ export class Reaction implements IDerivation, IReactionPublic {
         )
         /** If debugging brought you here, please, read the above message :-). Tnx! */
 
-        if (isSpyEnabled(this.context)) {
-            spyReport(this.context, {
+        if (this.context.isSpyEnabled()) {
+            this.context.spyReport({
                 type: "error",
                 message,
                 error,
@@ -191,6 +195,7 @@ export class Reaction implements IDerivation, IReactionPublic {
             dep => dep.name
         )
 
+        //TODO: strip in prod build
         return `
 WhyRun? reaction '${this.name}':
  * Status: [${this.isDisposed
@@ -206,7 +211,7 @@ WhyRun? reaction '${this.name}':
     }
 }
 
-function registerErrorHandler(handler) {
+function registerErrorHandler(this: IReactionDisposer, handler: (error: any, derivation: IDerivation) => void) {
     invariant(this && this.$mobx && isReaction(this.$mobx), "Invalid `this`")
     invariant(!this.$mobx.errorHandler, "Only one onErrorHandler can be registered")
     this.$mobx.errorHandler = handler

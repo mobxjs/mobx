@@ -87,6 +87,6 @@ export class Atom extends BaseAtom implements IAtom {
 import { MobxState } from "./mobxstate"
 import { IObservable, propagateChanged, reportObserved, startBatch, endBatch } from "./observable"
 import { IDerivationState } from "./derivation"
-import { noop, createInstanceofPredicate } from "./utils"
+import { noop, createInstanceofPredicate } from "../utils/utils"
 
 export const isAtom = createInstanceofPredicate("Atom", BaseAtom)

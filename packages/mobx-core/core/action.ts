@@ -2,7 +2,6 @@ import { IDerivation } from "./derivation"
 import { invariant } from "../utils/utils"
 import { untrackedStart, untrackedEnd } from "./derivation"
 import { startBatch, endBatch } from "./observable"
-import { isSpyEnabled, spyReportStart, spyReportEnd } from "./spy"
 import { MobxState } from "./mobxstate"
 import { getMessage } from "../utils/messages"
 
@@ -17,7 +16,7 @@ export function createAction(context: MobxState, actionName: string, fn: Functio
         typeof actionName === "string" && actionName.length > 0,
         `actions should have valid names, got: '${actionName}'`
     )
-    const res = function() {
+    const res = function(this: any) {
         return executeAction(context, actionName, fn, this, arguments)
     }
     ;(res as any).originalFn = fn
@@ -60,14 +59,14 @@ function startAction(
     scope: any,
     args?: IArguments
 ): IActionRunInfo {
-    const notifySpy = isSpyEnabled(context) && !!actionName
+    const notifySpy = context.isSpyEnabled() && !!actionName
     let startTime: number = 0
     if (notifySpy) {
         startTime = Date.now()
         const l = (args && args.length) || 0
         const flattendArgs = new Array(l)
         if (l > 0) for (let i = 0; i < l; i++) flattendArgs[i] = args![i]
-        spyReportStart(context, {
+        context.spyReportStart({
             type: "action",
             name: actionName,
             fn,
@@ -90,7 +89,7 @@ function endAction(context: MobxState, runInfo: IActionRunInfo) {
     allowStateChangesEnd(context, runInfo.prevAllowStateChanges)
     endBatch(context)
     untrackedEnd(context, runInfo.prevDerivation)
-    if (runInfo.notifySpy) spyReportEnd({ time: Date.now() - runInfo.startTime })
+    if (runInfo.notifySpy) context.spyReportEnd({ time: Date.now() - runInfo.startTime })
 }
 
 export function useStrict(context: MobxState, strict: boolean): void {

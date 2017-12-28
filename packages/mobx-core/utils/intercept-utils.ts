@@ -1,6 +1,6 @@
 import { Lambda, once, invariant } from "./utils"
-import { untrackedStart, untrackedEnd } from "./derivation"
-import { MobxState } from "./mobxstate";
+import { untrackedStart, untrackedEnd } from "../core/derivation"
+import { MobxState } from "../core/mobxstate";
 
 export type IInterceptor<T> = (change: T) => T | null
 

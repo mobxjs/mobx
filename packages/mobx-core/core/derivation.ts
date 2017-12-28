@@ -44,7 +44,7 @@ export interface IDerivation extends IDepTreeNode {
      */
     unboundDepsCount: number
     __mapid: string
-    onBecomeStale()
+    onBecomeStale(): void
 }
 
 export class CaughtException {
@@ -53,7 +53,7 @@ export class CaughtException {
     }
 }
 
-export function isCaughtException(e): e is CaughtException {
+export function isCaughtException(e: any): e is CaughtException {
     return e instanceof CaughtException
 }
 

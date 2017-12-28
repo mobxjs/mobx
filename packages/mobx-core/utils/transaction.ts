@@ -1,6 +1,6 @@
 import { startBatch, endBatch } from '../core/observable';
 import { executeAction } from "../core/action"
-import { MobxState } from "./mobxstate";
+import { MobxState } from "../core/mobxstate";
 
 /**
  * During a transaction no views are updated until the end of the transaction.

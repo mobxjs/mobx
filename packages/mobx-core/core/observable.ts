@@ -22,9 +22,9 @@ export interface IObservable extends IDepTreeNode {
     isPendingUnobservation: boolean // Used to push itself to global.pendingUnobservations at most once per batch.
 
     observers: IDerivation[] // maintain _observers in raw array for for way faster iterating in propagation.
-    observersIndexes: {} // map derivation.__mapid to _observers.indexOf(derivation) (see removeObserver)
+    observersIndexes: { [key:string]: number} // map derivation.__mapid to _observers.indexOf(derivation) (see removeObserver)
 
-    onBecomeUnobserved()
+    onBecomeUnobserved(): void
 }
 
 export function hasObservers(observable: IObservable): boolean {
@@ -123,7 +123,7 @@ export function startBatch(context: MobxState) {
 
 export function endBatch(context: MobxState) {
     if (--context.inBatch === 0) {
-        runReactions()
+        runReactions(context)
         // the batch is actually about to finish, all unobserving should happen here.
         const list = context.pendingUnobservations
         for (let i = 0; i < list.length; i++) {
@@ -155,7 +155,7 @@ export function reportObserved(observable: IObservable) {
     }
 }
 
-function invariantLOS(observable: IObservable, msg) {
+function invariantLOS(observable: IObservable, msg: string) {
     // it's expensive so better not run it in produciton. but temporarily helpful for testing
     const min = getObservers(observable).reduce((a, b) => Math.min(a, b.dependenciesState), 2)
     if (min >= observable.lowestObserverState) return // <- the only assumption about `lowestObserverState`

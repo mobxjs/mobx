@@ -22,7 +22,6 @@ import { MobxState } from "./mobxstate"
 import { createAction } from "./action"
 import {
     createInstanceofPredicate,
-    getNextId,
     invariant,
     Lambda,
     unique,
@@ -30,11 +29,10 @@ import {
     primitiveSymbol,
     toPrimitive
 } from "../utils/utils"
-import { isSpyEnabled, spyReport } from "./spy"
-import { autorun } from "./autorun"
-import { IEqualsComparer } from "./comparer"
-import { IValueDidChange } from "../types/observablevalue"
-import { getMessage } from "./messages"
+import { autorun } from "../utils/autorun"
+import { IEqualsComparer, defaultComparer } from "../utils/comparer"
+import { IValueDidChange } from "./observablevalue"
+import { getMessage } from "../utils/messages"
 
 export interface IComputedValue<T> {
     get(): T
@@ -61,7 +59,7 @@ export interface IComputedValue<T> {
  *
  * If at any point it's outside batch and it isn't observed: reset everything and go to 1.
  */
-export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDerivation {
+class ComputedValue<T> implements IObservable, IComputedValue<T>, IDerivation {
     dependenciesState = IDerivationState.NOT_TRACKING
     observing = [] // nodes we are looking at. Our value depends on these nodes
     newObserving = null // during tracking it's an array with new observed observers
@@ -74,7 +72,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     lastAccessedBy = 0
     lowestObserverState = IDerivationState.UP_TO_DATE
     unboundDepsCount = 0
-    __mapid = "#" + getNextId()
+    __mapid: string
     protected value: T | undefined | CaughtException = new CaughtException(null)
     name: string
     isComputing: boolean = false // to check for cycles
@@ -101,7 +99,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         name: string,
         setter?: (v: T) => void
     ) {
-        this.name = name || "ComputedValue@" + getNextId()
+        const nextId = context.nextId();
+        this.__mapid = "#" + nextId;
+        this.name = name || "ComputedValue@" + nextId
         if (setter) this.setter = createAction(context, name + "-setter", setter) as any
     }
 
@@ -165,8 +165,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     }
 
     private trackAndCompute(): boolean {
-        if (isSpyEnabled(this.context)) {
-            spyReport(this.context, {
+        const { context } = this;
+        if (context.isSpyEnabled()) {
+            context.spyReport({
                 object: this.thisArg,
                 type: "compute",
                 fn: this.derivation
@@ -204,7 +205,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {
         let firstTime = true
         let prevValue: T | undefined = undefined
-        return autorun(this.context, "observe_" + this.name, () => {
+        return autorun(this.context, () => {
             let newValue = this.get()
             if (!firstTime || fireImmediately) {
                 const prevU = untrackedStart(this.context)
@@ -218,7 +219,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             }
             firstTime = false
             prevValue = newValue
-        })
+        }, { name: "observe_" + this.name })
     }
 
     toJSON() {
@@ -230,7 +231,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     }
 
     valueOf(): T {
-        return toPrimitive(this.get())
+        return toPrimitive(this.get() as any) as any
     }
 
     whyRun() {
@@ -239,7 +240,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             (dep: any) => dep.name
         )
         const observers = unique(getObservers(this).map(dep => dep.name))
-        return (
+        return ( //TODO: strip in prod build
             `
 WhyRun? computation '${this.name}':
  * Running because: ${isTracking
@@ -264,6 +265,17 @@ WhyRun? computation '${this.name}':
     }
 }
 
-ComputedValue.prototype[primitiveSymbol()] = ComputedValue.prototype.valueOf
+;(ComputedValue as any).prototype[primitiveSymbol()] = ComputedValue.prototype.valueOf
 
-export const isComputedValue = createInstanceofPredicate("ComputedValue", ComputedValue)
+export const isComputedValue = createInstanceofPredicate<IComputedValue<any>>("ComputedValue", ComputedValue)
+
+export function computed<T>(
+    context: MobxState,
+    name: string,
+    derivation: () => T,
+    thisArg?: Object | undefined,
+    equals: IEqualsComparer<any> = defaultComparer,
+    setter?: (v: T) => void
+): IComputedValue<T> {
+    return new ComputedValue<T>(context, derivation, thisArg, equals, name, setter);
+}

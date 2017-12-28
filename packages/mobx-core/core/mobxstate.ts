@@ -1,4 +1,4 @@
-import { getGlobal, deprecated } from "../utils/utils"
+import { objectAssign, Lambda, once } from "../utils/utils"
 import { IDerivation } from "./derivation"
 import { Reaction } from "./reaction"
 import { IObservable } from "./observable"
@@ -7,6 +7,8 @@ import { IObservable } from "./observable"
  * These values will persist if global state is reset
  */
 const persistentKeys = ["mobxGuid", "resetId", "spyListeners", "strictMode", "runId"]
+
+const END_EVENT = { spyReportEnd: true }
 
 export class MobxState {
     /**
@@ -98,7 +100,37 @@ export class MobxState {
         this.resetId++
         const defaultGlobals = new MobxState()
         for (let key in defaultGlobals)
-            if (persistentKeys.indexOf(key) === -1) this[key] = defaultGlobals[key]
+            if (persistentKeys.indexOf(key) === -1) (this as any)[key] = (defaultGlobals as any)[key]
         this.allowStateChanges = !this.strictMode
     }
+
+    isSpyEnabled(): boolean {
+        return !!this.spyListeners.length
+    }
+
+    spyReport(event: any) {
+        if (!this.spyListeners.length) return
+        const listeners = this.spyListeners
+        for (let i = 0, l = listeners.length; i < l; i++) listeners[i](event)
+    }
+
+    spyReportStart(event: any) {
+        const change = objectAssign({}, event, { spyReportStart: true })
+        this.spyReport(change)
+    }
+
+
+    spyReportEnd(change?: any) {
+        if (change) this.spyReport(objectAssign({}, change, END_EVENT))
+        else this.spyReport(END_EVENT)
+    }
+
+    spy(listener: (change: any) => void): Lambda {
+        this.spyListeners.push(listener)
+        return once(() => {
+            const idx = this.spyListeners.indexOf(listener)
+            if (idx !== -1) this.spyListeners.splice(idx, 1)
+        })
+    }
+
 }

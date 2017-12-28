@@ -5,16 +5,15 @@ import {
     createInstanceofPredicate,
     primitiveSymbol,
     toPrimitive
-} from "./utils"
+} from "../utils/utils"
 import {
     hasInterceptors,
     IInterceptable,
     IInterceptor,
     registerInterceptor,
     interceptChange
-} from "./intercept-utils"
-import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
-import { isSpyEnabled, spyReportStart, spyReportEnd, spyReport } from "../core/spy"
+} from "../utils/intercept-utils"
+import { IListenable, registerListener, hasListeners, notifyListeners } from "../utils/listen-utils"
 import { MobxState } from "./mobxstate";
 
 export interface IValueWillChange<T> {
@@ -38,14 +37,13 @@ export interface IObservableValue<T> {
     observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
 }
 
-declare var Symbol
+declare var Symbol: any
 
-export class ObservableValue<T> extends BaseAtom
-    implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable {
+class ObservableValue<T> extends BaseAtom implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable {
     hasUnreportedChange = false
-    interceptors
-    changeListeners
-    protected value
+    interceptors: IInterceptor<IValueWillChange<T>>[] | null
+    changeListeners: Function[] | null
+    protected value: T
     dehancer: any = undefined
 
     constructor(
@@ -57,9 +55,9 @@ export class ObservableValue<T> extends BaseAtom
     ) {
         super(context, name)
         this.value = enhancer(value, undefined, name)
-        if (notifySpy && isSpyEnabled(context)) {
+        if (notifySpy && context.isSpyEnabled()) {
             // only notify spy if this is a stand-alone observable
-            spyReport(context, { type: "create", object: this, newValue: this.value })
+            context.spyReport({ type: "create", object: this, newValue: this.value })
         }
     }
 
@@ -72,9 +70,10 @@ export class ObservableValue<T> extends BaseAtom
         const oldValue = this.value
         newValue = this.prepareNewValue(newValue) as any
         if (newValue !== UNCHANGED) {
-            const notifySpy = isSpyEnabled(this.context)
+            const { context } = this;
+            const notifySpy = context.isSpyEnabled()
             if (notifySpy) {
-                spyReportStart(this.context, {
+                context.spyReportStart({
                     type: "update",
                     object: this,
                     newValue,
@@ -82,14 +81,14 @@ export class ObservableValue<T> extends BaseAtom
                 })
             }
             this.setNewValue(newValue)
-            if (notifySpy) spyReportEnd(this.context)
+            if (notifySpy) context.spyReportEnd()
         }
     }
 
-    private prepareNewValue(newValue): T | IUNCHANGED {
+    private prepareNewValue(newValue: T): T | IUNCHANGED {
         checkIfStateModificationsAreAllowed(this)
         if (hasInterceptors(this)) {
-            const change = interceptChange<IValueWillChange<T>>(this.context, this, {
+            const change = interceptChange<IValueWillChange<T>>(this.context, this as any, {
                 object: this,
                 type: "update",
                 newValue
@@ -148,12 +147,22 @@ export class ObservableValue<T> extends BaseAtom
     }
 
     valueOf(): T {
-        return toPrimitive(this.get())
+        return toPrimitive(this.get() as any) as any
     }
 }
 
-ObservableValue.prototype[primitiveSymbol()] = ObservableValue.prototype.valueOf
+;(ObservableValue as any).prototype[primitiveSymbol()] = ObservableValue.prototype.valueOf
 
 export var isObservableValue = createInstanceofPredicate("ObservableValue", ObservableValue) as (
     x: any
 ) => x is IObservableValue<any>
+
+export function cell<T>(
+    context: MobxState,
+    name = "ObservableValue@" + context.nextId(),
+    value: T,
+    enhancer: (newValue: T, oldValue: T | undefined, name: string) => T,
+    notifySpy = true
+): IObservableValue<T> {
+    return new ObservableValue(context, value, enhancer, name, notifySpy);
+}

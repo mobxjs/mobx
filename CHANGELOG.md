@@ -2,6 +2,8 @@
 
 * Breaking: `scope` has been dropped as optional argument for most public api's, like `autorun`, `when` etc..
 * Breaking, the options `context` , `compareStructural` and `struct` have been dropped from the `reaction` api. use the `equals` option instead.
+* Break: dropped `autorunAsync`. Instead, pass { delay: number } to `autorun`
+* Name cannot be passed as second argument to autorun anymore, use options instead
 
 # 3.4.1
 

@@ -1,6 +1,6 @@
 import { Lambda, once } from "./utils"
-import { untrackedStart, untrackedEnd } from "./derivation"
-import { MobxState } from "./mobxstate";
+import { untrackedStart, untrackedEnd } from "../core/derivation"
+import { MobxState } from "../core/mobxstate";
 
 export interface IListenable {
     changeListeners: Function[] | null
