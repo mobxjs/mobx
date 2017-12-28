@@ -16,7 +16,7 @@
     "test:webpack": "node scripts/webpack-regression-tests.js",
     "test:flow": "node_modules/.bin/flow check",
     "test:performance": "npm run small-build && PERSIST=true time node --expose-gc test/perf/index.js",
-    "test:travis": "yarn test:all && yarn size && yarn test:performance && yarn test --coverage",
+    "test:travis": "yarn test:all && yarn test:performance && yarn test --coverage && yarn size",
     "prettier": "prettier --write --print-width 100 --tab-width 4 --no-semi \"**/*.js\" \"**/*.jsx\" \"**/*.tsx\" \"**/*.ts\"",
     "_prepublish": "npm run small-build",
     "quick-build": "tsc --pretty",
