@@ -9,7 +9,7 @@
   "react-native": "lib/mobx-core.module.js",
   "typings": "lib/mobx-core.d.ts",
   "scripts": {
-    "test": "yarn quick-build && yarn jest",
+    "test": "cd ../../ && yarn jest --testRegex 'packages/mobx-core/test/.*'",
     "test:watch": "yarn test --watch",
     "_prepublish": "npm run small-build",
     "quick-build": "tsc --pretty",

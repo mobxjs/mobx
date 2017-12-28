@@ -15,6 +15,7 @@ import {
 } from "../utils/intercept-utils"
 import { IListenable, registerListener, hasListeners, notifyListeners } from "../utils/listen-utils"
 import { MobxState } from "./mobxstate";
+import { identity } from "../index";
 
 export interface IValueWillChange<T> {
     object: any
@@ -49,7 +50,7 @@ class ObservableValue<T> extends BaseAtom implements IObservableValue<T>, IInter
     constructor(
         context: MobxState,
         value: T,
-        protected enhancer: (newValue: T, oldValue: T | undefined, name: string) => T,
+        protected enhancer: (newValue: T, oldValue: T | undefined, name: string) => T = identity,
         name = "ObservableValue@" + context.nextId(),
         notifySpy = true
     ) {
@@ -159,8 +160,8 @@ export var isObservableValue = createInstanceofPredicate("ObservableValue", Obse
 
 export function cell<T>(
     context: MobxState,
-    name = "ObservableValue@" + context.nextId(),
     value: T,
+    name = "ObservableValue@" + context.nextId(),
     enhancer: (newValue: T, oldValue: T | undefined, name: string) => T,
     notifySpy = true
 ): IObservableValue<T> {

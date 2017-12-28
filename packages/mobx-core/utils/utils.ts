@@ -33,6 +33,8 @@ export function once(func: Lambda): Lambda {
 
 export const noop = () => {}
 
+export const identity:<T>(x: T) => T = x => x;
+
 export function unique<T>(list: T[]): T[] {
     const res: T[] = []
     list.forEach(item => {

@@ -97,7 +97,7 @@
       "^.+\\.tsx?$": "ts-jest",
       "^.+\\.jsx?$": "babel-jest"
     },
-    "testRegex": "test/base/.*\\.(t|j)sx?$",
+    "testRegex": "(test/base/|packages/mobx-core/test).*\\.(t|j)sx?$",
     "moduleFileExtensions": [
       "ts",
       "tsx",
