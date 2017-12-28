@@ -9,6 +9,7 @@
  */
 
  // TODO: document all, and generate docs!
+ // TODO: clean up things
  export {createAction, runInAction, useStrict} from "./core/action"
  export {Atom, isAtom} from "./core/atom"
 

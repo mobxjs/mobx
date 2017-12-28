@@ -61,20 +61,6 @@ export function isPlainObject(value: any) {
     return proto === Object.prototype || proto === null
 }
 
-export function objectAssign<T extends object>(target: { [key: string]: never }, clonedSource: T, ...sources: (Partial<T> & object)[]): T;
-export function objectAssign<T extends object>(target: T, ...sources: (Partial<T> & object)[]): T;
-export function objectAssign() {
-    const res = arguments[0]
-    for (let i = 1, l = arguments.length; i < l; i++) {
-        const source = arguments[i]
-        for (let key in source)
-            if (hasOwnProperty(source, key)) {
-                res[key] = source[key]
-            }
-    }
-    return res
-}
-
 const prototypeHasOwnProperty = Object.prototype.hasOwnProperty
 export function hasOwnProperty(object: Object, propName: string) {
     return prototypeHasOwnProperty.call(object, propName)
