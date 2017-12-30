@@ -1,11 +1,17 @@
 # Next
 
+* A lot of API's have been unexposed, as, as far as we know, they are never used by others in practice. Please file an issue if we missed your use case and they should be re-exposed!
+
 * Breaking: `scope` has been dropped as optional argument for most public api's, like `autorun`, `when` etc..
 * Breaking, the options `context` , `compareStructural` and `struct` have been dropped from the `reaction` api. use the `equals` option instead.
 * Break: dropped `autorunAsync`. Instead, pass { delay: number } to `autorun`
 * Name cannot be passed as second argument to autorun or when anymore, use options instead
 * Dropped bower support
 * Dropped `extras.shareGlobalState`
+* The `Reaction` is no longer exposed
+* The `Atom` class is no longer exposed. Use `createAtom` instead
+* Removed `isStrictModeEnabled` from api
+* All api's in the `extras` namespace have been moved to toplevel api's. This allows for better tree shaking.
 
 # 3.4.1
 

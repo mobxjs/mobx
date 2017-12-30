@@ -321,3 +321,7 @@ const isObservableArrayAdministration = createInstanceofPredicate(
 export function isObservableArray(thing): thing is IObservableArray<any> {
 	return isObject(thing) && isObservableArrayAdministration(thing.$mobx)
 }
+
+export function reserveArrayBuffer(size: number) {
+	ObservableArray.prototype.reserveArrayBuffer(size)
+}

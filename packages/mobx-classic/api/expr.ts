@@ -1,6 +1,7 @@
 import { computed } from "./computed"
-import { isComputingDerivation } from "../core/derivation"
+import { isComputingDerivation } from "../../mobx-core"
 import { getMessage } from "../utils/messages"
+import { mobxState } from "../globalstate"
 
 /**
  * expr can be used to create temporarily views inside views.
@@ -17,7 +18,7 @@ import { getMessage } from "../utils/messages"
  *
  */
 export function expr<T>(expr: () => T, scope?): T {
-    if (!isComputingDerivation()) console.warn(getMessage("m013"))
-    // optimization: would be more efficient if the expr itself wouldn't be evaluated first on the next change, but just a 'changed' signal would be fired
-    return computed(expr, { context: scope }).get()
+	if (!isComputingDerivation(mobxState)) console.warn(getMessage("m013"))
+	// optimization: would be more efficient if the expr itself wouldn't be evaluated first on the next change, but just a 'changed' signal would be fired
+	return computed(expr, { context: scope }).get()
 }

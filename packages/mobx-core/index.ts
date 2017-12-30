@@ -8,19 +8,19 @@
  *
  */
 
- // TODO: document all, and generate docs!
- // TODO: clean up things
- export {createAction, runInAction, isAction, useStrict, executeAction, IAction} from "./core/action"
- export {Atom, isAtom} from "./core/atom"
- export {IObservable, IDepTreeNode} from "./core/observable"
+// TODO: document all, and generate docs!
+// TODO: clean up things
+export { createAction, runInAction, isAction, executeAction, IAction } from "./core/action"
+export { Atom, isAtom, IAtom } from "./core/atom"
+export { IObservable, IDepTreeNode } from "./core/observable"
 
- export {computed, isComputedValue} from "./core/computedvalue"
- export {untracked, isComputingDerivation, IDerivation} from "./core/derivation"
- export {MobxState} from "./core/mobxstate"
- export {cell, isObservableValue} from "./core/observablevalue"
- export {Reaction, onReactionError, IReactionDisposer, IReactionPublic} from "./core/reaction"
- export {autorun, reaction, when} from "./utils/autorun"
- export {defaultComparer, identityComparer} from "./utils/comparer"
- export {getDependencyTree, getObserverTree} from "./utils/extras"
- export {transaction} from "./utils/transaction"
- export * from "./utils/utils";
+export { computed, ComputedValue, isComputedValue, IComputedValue } from "./core/computedvalue"
+export { untracked, isComputingDerivation, IDerivation } from "./core/derivation"
+export { MobxState } from "./core/mobxstate"
+export { box, isObservableValue, IObservableValue } from "./core/observablevalue"
+export { Reaction, onReactionError, IReactionDisposer, IReactionPublic } from "./core/reaction"
+export { autorun, reaction, when } from "./utils/autorun"
+export { defaultComparer, identityComparer, IEqualsComparer } from "./utils/comparer"
+export { getDependencyTree, getObserverTree } from "./utils/extras"
+export { transaction } from "./utils/transaction"
+export * from "./utils/utils"
