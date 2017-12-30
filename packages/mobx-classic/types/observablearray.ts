@@ -1,32 +1,34 @@
 import {
 	isObject,
 	createInstanceofPredicate,
-	getNextId,
-	makeNonEnumerable,
 	Lambda,
 	EMPTY_ARRAY,
-	addHiddenFinalProp,
-	addHiddenProp,
 	invariant
-} from "../utils/utils"
-import { BaseAtom } from "../core/atom"
-import { checkIfStateModificationsAreAllowed } from "../core/derivation"
+} from "../../mobx-core"
 import {
 	IInterceptable,
 	IInterceptor,
 	hasInterceptors,
 	registerInterceptor,
 	interceptChange
-} from "./intercept-utils"
-import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
-import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
+} from "../../mobx-core/utils/intercept-utils"
 import { arrayAsIterator, declareIterator } from "../utils/iterable"
 import { IEnhancer } from "./modifiers"
 
 import {
 	createInterceptableArrayClass,
 	IInterceptableArray
-} from "../../interceptable-collections/types/observablearray" // TODO: rename
+} from "../../interceptable-collections/types/interceptable-array" // TODO: rename
+import {
+	IListenable,
+	registerListener,
+	hasListeners,
+	notifyListeners
+} from "../../mobx-core/utils/listen-utils"
+import { BaseAtom } from "../../mobx-core/core/atom"
+import { mobxState } from "../globalstate"
+import { checkIfStateModificationsAreAllowed } from "../../mobx-core/core/derivation"
+import { addHiddenFinalProp, objectAssign } from "../utils/utils"
 
 export interface IObservableArray<T> extends IInterceptableArray<T> {
 	observe(
@@ -91,7 +93,7 @@ class ObservableArrayAdministration
 		public array: IObservableArray<any>,
 		public owned: boolean
 	) {
-		this.atom = new BaseAtom(name || "ObservableArray@" + getNextId())
+		this.atom = new BaseAtom(name || "ObservableArray@" + mobxState.nextId())
 		this.enhancer = (newV, oldV) => enhancer(newV, oldV, name + "[..]")
 	}
 
@@ -136,7 +138,7 @@ class ObservableArrayAdministration
 		checkIfStateModificationsAreAllowed(this.atom)
 
 		if (hasInterceptors(this)) {
-			const change = interceptChange<IArrayWillSplice<any>>(this as any, {
+			const change = interceptChange<IArrayWillSplice<any>>(mobxState, this as any, {
 				object: this.array,
 				type: "splice",
 				index,
@@ -170,7 +172,7 @@ class ObservableArrayAdministration
 	}
 
 	notifyArrayChildUpdate<T>(index: number, newValue: T, oldValue: T) {
-		const notifySpy = !this.owned && isSpyEnabled()
+		const notifySpy = !this.owned && mobxState.isSpyEnabled()
 		const notify = hasListeners(this)
 		const change =
 			notify || notifySpy
@@ -183,14 +185,14 @@ class ObservableArrayAdministration
 					}
 				: null
 
-		if (notifySpy) spyReportStart(change)
+		if (notifySpy) mobxState.spyReportStart(change)
 		this.atom.reportChanged()
-		if (notify) notifyListeners(this, change)
-		if (notifySpy) spyReportEnd()
+		if (notify) notifyListeners(mobxState, this, change)
+		if (notifySpy) mobxState.spyReportEnd()
 	}
 
 	notifyArraySplice<T>(index: number, added: any[], removed: any[]) {
-		const notifySpy = !this.owned && isSpyEnabled()
+		const notifySpy = !this.owned && mobxState.isSpyEnabled()
 		const notify = hasListeners(this)
 		const change =
 			notify || notifySpy
@@ -205,11 +207,11 @@ class ObservableArrayAdministration
 					}
 				: null
 
-		if (notifySpy) spyReportStart(change)
+		if (notifySpy) mobxState.spyReportStart(change)
 		this.atom.reportChanged()
 		// conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-		if (notify) notifyListeners(this, change)
-		if (notifySpy) spyReportEnd()
+		if (notify) notifyListeners(mobxState, this, change)
+		if (notifySpy) mobxState.spyReportEnd()
 	}
 }
 
@@ -222,7 +224,7 @@ export const ObservableArray: new <T>(
 	afterCreate(
 		initialValues: any[] | undefined,
 		enhancer: IEnhancer<any>,
-		name = "ObservableArray@" + getNextId(),
+		name = "ObservableArray@" + mobxState.nextId(),
 		owned = false
 	) {
 		const adm = new ObservableArrayAdministration(name, enhancer, this as any, owned)
@@ -248,7 +250,7 @@ export const ObservableArray: new <T>(
 			checkIfStateModificationsAreAllowed(adm.atom)
 			const oldValue = values[index]
 			if (hasInterceptors(adm)) {
-				const change = interceptChange<IArrayWillChange<any>>(adm as any, {
+				const change = interceptChange<IArrayWillChange<any>>(mobxState, adm as any, {
 					type: "update",
 					object: this as any,
 					index,
@@ -291,7 +293,7 @@ export const ObservableArray: new <T>(
 	}
 }) as any
 
-Object.assign(ObservableArray.prototype, {
+objectAssign(ObservableArray.prototype, {
 	intercept(handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>): Lambda {
 		return this.$mobx.intercept(handler)
 	},

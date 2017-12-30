@@ -35,7 +35,7 @@ export interface IObservableValue<T> {
 
 declare var Symbol: any
 
-class ObservableValue<T> extends BaseAtom
+export class ObservableValue<T> extends BaseAtom
 	implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable {
 	hasUnreportedChange = false
 	interceptors: IInterceptor<IValueWillChange<T>>[] | null

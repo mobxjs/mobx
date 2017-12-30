@@ -38,6 +38,7 @@ export interface IComputedValue<T> {
 	get(): T
 	set(value: T): void
 	observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
+	whyRun()
 }
 
 /**
@@ -273,7 +274,7 @@ WhyRun? computation '${this.name}':
 
 ;(ComputedValue as any).prototype[primitiveSymbol()] = ComputedValue.prototype.valueOf
 
-export const isComputedValue = createInstanceofPredicate<IComputedValue<any>>(
+export const isComputedValue = createInstanceofPredicate<ComputedValue<any>>(
 	"ComputedValue",
 	ComputedValue
 )
