@@ -1,6 +1,6 @@
 # Reaction
 
-Usage: `reaction(() => data, data => { sideEffect }, options?)`.
+Usage: `reaction(() => data, (data, reaction) => { sideEffect }, options?)`.
 
 A variation on `autorun` that gives more fine grained control on which observables will be tracked.
 It takes two functions, the first one (the *data* function) is tracked and returns data that is used as input for the second one, the *effect* function.
@@ -55,6 +55,15 @@ const reaction1 = reaction(
 const reaction2 = reaction(
     () => todos.map(todo => todo.title),
     titles => console.log("reaction 2:", titles.join(", "))
+);
+
+// invoke once of reaction: reacts to length changes
+const reactionOnce = reaction(
+    () => todos.length,
+    (length, reaction) => {
+        console.log("invoked once"));
+        reaction.dispose();
+    }
 );
 
 // autorun reacts to just everything that is used in its function
