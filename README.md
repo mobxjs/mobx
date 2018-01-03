@@ -300,7 +300,13 @@ And finally kudos for all the people that believed in, tried, validated and even
 * Use `npm test` to run the basic test suite, `npm run coverage` for the test suite with coverage and `npm run perf` for the performance tests.
 
 ## Flow support
-MobX ships with flow typings. Flow will automatically include them. Though you cannot ignore `node_modules` in your `.flowconfig` and a you **cannot** import it explicitly in the `[libs]` section.
+MobX ships with [flow typings](flow-typed/mobx.js). Flow will automatically include them when you import mobx modules. Although you **do not** need to import the types explicitly, you can still do it like this: `import type { ... } from 'mobx'`. 
+
+To use the [flow typings](flow-typed/mobx.js) shipped with MobX:
+
+* In `.flowconfig`, you **cannot** ignore `node_modules`.
+* In `.flowconfig`, you **cannot** import it explicitly in the `[libs]` section.
+* You **do not** need to install library definition using [flow-typed](https://github.com/flowtype/flow-typed).
 
 ## Bower support
 
