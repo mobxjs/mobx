@@ -120,21 +120,28 @@ export function autorunAsync(
     delay?: number,
     scope?: any
 ): IReactionDisposer
+export function autorunAsync(
+    func: (r: IReactionPublic) => any,
+    scheduler: (func: () => any) => any,
+    scope?: any
+): IReactionDisposer
 export function autorunAsync(arg1: any, arg2: any, arg3?: any, arg4?: any) {
-    let name: string, func: (r: IReactionPublic) => any, delay: number, scope: any
+    let name: string, func: (r: IReactionPublic) => any, scheduler: (func: () => any) => any, scope: any
     if (typeof arg1 === "string") {
         name = arg1
-        func = arg2
-        delay = arg3
-        scope = arg4
+        arg1 = arg2
+        arg2 = arg3
+        arg3 = arg4
     } else {
         name = arg1.name || "AutorunAsync@" + getNextId()
-        func = arg1
-        delay = arg2
-        scope = arg3
     }
+    func = arg1
+    scheduler = arg2 === void 0 ? (f: () => any) => setTimeout(f, 1)
+              : typeof arg2 === "number" ? (f: () => any) => setTimeout(f, arg2)
+              : arg2
+    scope = arg3
+
     invariant(isAction(func) === false, getMessage("m006"))
-    if (delay === void 0) delay = 1
 
     if (scope) func = func.bind(scope)
 
@@ -143,10 +150,10 @@ export function autorunAsync(arg1: any, arg2: any, arg3?: any, arg4?: any) {
     const r = new Reaction(name, () => {
         if (!isScheduled) {
             isScheduled = true
-            setTimeout(() => {
+            scheduler(() => {
                 isScheduled = false
                 if (!r.isDisposed) r.track(reactionRunner)
-            }, delay)
+            })
         }
     })
 
