@@ -54,6 +54,7 @@
     "coveralls": "^2.11.4",
     "flow-bin": "^0.59.0",
     "fs-extra": "^3.0.1",
+    "husky": "^0.14.3",
     "iterall": "^1.0.2",
     "jest": "^22.0.4",
     "lint-staged": "^3.6.1",
