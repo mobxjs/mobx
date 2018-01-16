@@ -1,0 +1,25 @@
+{
+    "version": "2.0.10",
+    "compilerOptions": {
+        "target": "es5",
+        "outDir": "lib",
+        "sourceMap": false,
+        "declaration": true,
+        "module": "commonjs",
+        "removeComments": false,
+        "strict": true,
+        "lib": [
+            "es5",
+            "dom"
+        ]
+    },
+    "exclude": [
+        "node_modules",
+        "test",
+        "lib",
+        ".build"
+    ],
+    "files": [
+        "./index.ts"
+    ]
+}

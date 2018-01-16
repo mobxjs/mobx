@@ -1,0 +1,79 @@
+{
+  "name": "mobx-core",
+  "version": "3.4.1",
+  "description": "Core data flow library powering mobx",
+  "main": "lib/mobx-core.js",
+  "umd:main": "lib/mobx-core.umd.js",
+  "module": "lib/mobx-core.module.js",
+  "jsnext:main": "lib/mobx-core.module.js",
+  "react-native": "lib/mobx-core.module.js",
+  "typings": "lib/mobx-core.d.ts",
+  "scripts": {
+    "test": "cd ../../ && yarn jest --testRegex 'packages/mobx-core/test/.*'",
+    "test:watch": "yarn test --watch",
+    "_prepublish": "npm run small-build",
+    "quick-build": "tsc --pretty",
+    "small-build": "node scripts/build.js",
+    "size": "size-limit 20KB lib/mobx-core.js",
+    "precommit": "lint-staged"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mobxjs/mobx.git"
+  },
+  "author": "Michel Weststrate",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mobxjs/mobx/issues"
+  },
+  "files": [
+    "lib",
+    "LICENSE"
+  ],
+  "homepage": "https://mobx.js.org/",
+  "devDependencies": {},
+  "dependencies": {
+    "typescript": "^2.6.2"
+  },
+  "keywords": [
+    "mobx",
+    "mobservable",
+    "observable",
+    "react-component",
+    "react",
+    "reactjs",
+    "reactive",
+    "model",
+    "frp",
+    "functional-reactive-programming",
+    "state management",
+    "data flow"
+  ],
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "prettier --write --print-width 100 --tab-width 4 --no-semi",
+      "git add"
+    ]
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest",
+      "^.+\\.jsx?$": "babel-jest"
+    },
+    "testRegex": "test/.*\\.(t|j)sx?$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/\\./"
+    ],
+    "watchPathIgnorePatterns": [
+      "<rootDir>/node_modules/"
+    ]
+  }
+}
