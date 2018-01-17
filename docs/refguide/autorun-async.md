@@ -11,6 +11,23 @@ This might be useful for stuff that is expensive and doesn't need to happen sync
 
 If a scope is given, the action will be bound to this scope object.
 
+`autorunAsync(action: () => void, scheduler: (callback: () => void) => any, scope?)`
+
+If a function is passed in as the delay it will be treated as a scheduling function.
+This scheduling function must take a single callback function as an argument.
+Rather than waiting until the number of milliseconds has passed, it will wait until the callback has been executed before invoking `action`.
+
+A common use case for this is rendering to a canvas.
+Using `autorun` will cause the canvas to re-render for every change in the data it is observing.
+If the rendering function is expensive this will impact the smoothness of animations.
+If `requestAnimationFrame` is passed as the `scheduler`, mobx will only invoke the `action` after the callback to `requestAnimationFrame` executes.
+
+```javascript
+autorunAsync(() => {
+    renderToCanvas()
+}, requestAnimationFrame)
+```
+
 `autorunAsync(debugName: string, action: () => void, minimumDelay?: number, scope?)`
 
 If a string is passed as first argument to `autorunAsync`, it will be used as debug name.

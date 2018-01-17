@@ -164,7 +164,7 @@ Usage:
 * `observer(React.createClass({ ... }))`
 * `observer((props, context) => ReactElement)`
 * `observer(class MyComponent extends React.Component { ... })`
-* `@observer class MyComponent extends React.Component { ... })`
+* `@observer class MyComponent extends React.Component { ... }`
 
 
 ### `autorun`
@@ -179,7 +179,12 @@ As soon as the expression returns true the sideEffect function will be invoked, 
 `when` returns a disposer to prematurely cancel the whole thing. [&laquo;details&raquo;](when.md)
 
 ### `autorunAsync`
-Usage: `autorunAsync(debugname?, () => { sideEffect }, delay)`. Similar to `autorun`, but the sideEffect will be delayed and debounced with the given `delay`.
+Usage:
+ * `autorunAsync(debugname?, () => { sideEffect }, delay, context?)`
+ * `autorunAsync(debugname?, () => { sideEffect }, scheduler, context?)`
+Similar to `autorun`, but the sideEffect will be delayed and debounced.
+If a number is given as `delay` it will debounce side effects with that number of ms.
+If a `scheduler` is given it will use it to determine when it is next appropriate to run by passing it a callback.
 [&laquo;details&raquo;](autorun-async.md)
 
 ### `reaction`
