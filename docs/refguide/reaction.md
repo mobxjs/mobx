@@ -57,15 +57,6 @@ const reaction2 = reaction(
     titles => console.log("reaction 2:", titles.join(", "))
 );
 
-// invoke once of reaction: reacts to length changes
-const reactionOnce = reaction(
-    () => todos.length,
-    (length, reaction) => {
-        console.log("invoked once"));
-        reaction.dispose();
-    }
-);
-
 // autorun reacts to just everything that is used in its function
 const autorun1 = autorun(
     () => console.log("autorun 1:", todos.map(todo => todo.title).join(", "))
@@ -81,6 +72,35 @@ todos[0].title = "Make tea"
 // prints:
 // reaction 2: Make tea, find biscuit, explain reactions
 // autorun 1: Make tea, find biscuit, explain reactions
+```
+
+In the following example `reaction3`, will react to the change in the `counter` count.
+When invoked `reaction`, second argument can use as disposer.
+The following example shows a `reaction` that is invoked only once.
+
+```javascript
+const counter = observable({ count: 0 });
+
+// invoke once of and dispose reaction: reacts to obserbable value.
+const reaction3 = reaction(
+    () => counter.count,
+    (count, reaction) => {
+        console.log("reaction 3: invoked. counter.count = " + count);
+        reaction.dispose();
+    }
+);
+
+counter.count = 1;
+// prints:
+// reaction 3: invoked. counter.count = 1
+
+counter.count = 2;
+// prints:
+// (There are no logging, because of reaction disposed. But, counter continue reaction)
+
+console.log(counter.count);
+// prints:
+// 2
 ```
 
 Reaction is roughly speaking sugar for: `computed(expression).observe(action(sideEffect))` or `autorun(() => action(sideEffect)(expression)`
