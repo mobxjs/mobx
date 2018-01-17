@@ -128,6 +128,37 @@ test("autorunAsync passes Reaction as an argument to view function", function(do
     }, 1000)
 })
 
+test("autorunAsync accepts a scheduling function", function(done) {
+
+    var a = m.observable({
+        x: 0,
+        y: 1,
+    })
+
+    var autoRunsCalled = 0
+    var schedulingsCalled = 0
+
+    m.autorunAsync(function(r) {
+        autoRunsCalled++
+        expect(a.y).toBe(a.x + 1)
+
+        if (a.x < 10) {
+            // Queue the two actions separately, if this was autorun it would fail
+            setTimeout(function() { a.x = a.x + 1 }, 0)
+            setTimeout(function() { a.y = a.y + 1 }, 0)
+        }
+    }, function (fn) {
+        schedulingsCalled++
+        setTimeout(fn, 0)
+    })
+
+    setTimeout(function() {
+        expect(autoRunsCalled).toBe(11)
+        expect(schedulingsCalled).toBe(11)
+        done()
+    }, 100)
+})
+
 test("autorunAsync warns when passed an action", function() {
     var action = m.action(() => {})
     expect.assertions(1)
