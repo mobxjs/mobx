@@ -33,24 +33,24 @@ For an extensive introduction to `action` see also the [MobX 2.2 release notes](
 Two example actions from the `contact-list` project:
 
 ```javascript
-	@action	createRandomContact() {
-		this.pendingRequestCount++;
-		superagent
-			.get('https://randomuser.me/api/')
-			.set('Accept', 'application/json')
-			.end(action("createRandomContact-callback", (error, results) => {
-				// ^ Note: asynchronous callbacks are separate actions!
-				if (error)
-					console.error(error);
-				else {
-					const data = JSON.parse(results.text).results[0];
-					const contact = new Contact(this, data.dob, data.name, data.login.username, data.picture)
-					contact.addTag('random-user');
-					this.contacts.push(contact);
-					this.pendingRequestCount--;
-				}
-			}));
-	}
+@action  createRandomContact() {
+    this.pendingRequestCount++;
+    superagent
+        .get('https://randomuser.me/api/')
+        .set('Accept', 'application/json')
+        .end(action("createRandomContact-callback", (error, results) => {
+            // ^ Note: asynchronous callbacks are separate actions!
+            if (error)
+                console.error(error);
+            else {
+                const data = JSON.parse(results.text).results[0];
+                const contact = new Contact(this, data.dob, data.name, data.login.username, data.picture)
+                contact.addTag('random-user');
+                this.contacts.push(contact);
+                this.pendingRequestCount--;
+            }
+        }));
+}
 ```
 
 
