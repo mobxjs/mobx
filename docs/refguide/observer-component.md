@@ -23,7 +23,7 @@ setInterval(() => {
 	}
 };
 
-React.render(<Timer timerData={timerData} />, document.body);
+ReactDOM.render(<Timer timerData={timerData} />, document.body);
 ```
 
 Tip: when `observer` needs to be combined with other decorators or higher-order-components, make sure that `observer` is the innermost (first applied) decorator;
@@ -84,9 +84,9 @@ import {observable} from "mobx"
 	render() {
 		return (<span>Seconds passed: { this.secondsPassed } </span> )
 	}
-})
+}
 
-React.render(<Timer />, document.body)
+ReactDOM.render(<Timer />, document.body)
 ```
 
 For more advantages of using observable local component state, see [3 reasons why I stopped using `setState`](https://medium.com/@mweststrate/3-reasons-why-i-stopped-using-react-setstate-ab73fc67a42e).
