@@ -156,7 +156,7 @@ test("autorunAsync accepts a scheduling function", function(done) {
         expect(autoRunsCalled).toBe(11)
         expect(schedulingsCalled).toBe(11)
         done()
-    }, 100)
+    }, 1000)
 })
 
 test("autorunAsync warns when passed an action", function() {
