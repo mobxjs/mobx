@@ -122,11 +122,11 @@ export function autorunAsync(
 ): IReactionDisposer
 export function autorunAsync(
     func: (r: IReactionPublic) => any,
-    scheduler: (func: () => any) => any,
+    scheduler: (callback: () => void) => any,
     scope?: any
 ): IReactionDisposer
 export function autorunAsync(arg1: any, arg2: any, arg3?: any, arg4?: any) {
-    let name: string, func: (r: IReactionPublic) => any, scheduler: (func: () => any) => any, scope: any
+    let name: string, func: (r: IReactionPublic) => any, scheduler: (callback: () => void) => any, scope: any
     if (typeof arg1 === "string") {
         name = arg1
         arg1 = arg2
@@ -136,8 +136,8 @@ export function autorunAsync(arg1: any, arg2: any, arg3?: any, arg4?: any) {
         name = arg1.name || "AutorunAsync@" + getNextId()
     }
     func = arg1
-    scheduler = arg2 === void 0 ? (f: () => any) => setTimeout(f, 1)
-              : typeof arg2 === "number" ? (f: () => any) => setTimeout(f, arg2)
+    scheduler = arg2 === void 0 ? (f: () => void) => setTimeout(f, 1)
+              : typeof arg2 === "number" ? (f: () => void) => setTimeout(f, arg2)
               : arg2
     scope = arg3
 
