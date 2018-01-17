@@ -9,7 +9,7 @@ Any observables that are accessed while executing the side effect will not be tr
 
 The side effect can be debounced, just like `autorunAsync`.
 `reaction` returns a disposer function.
-The functions passed to `reaction` will receive one argument when invoked, the current reaction, which can be used to dispose the when during execution.
+The functions passed to `reaction` will receive two argument when invoked, the current reaction, which can be used to dispose the when during execution.
 
 It is important to notice that the side effect will *only* react to data that was *accessed* in the data expression, which might be less then the data that is actually used in the effect.
 Also, the side effect will only be triggered when the data returned by the expression has changed.
