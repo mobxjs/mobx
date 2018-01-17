@@ -1,3 +1,7 @@
+# 3.5.0
+
+* `autorunAsync` now accepts a scheduler function to allow improved performance for tasks such as rendering to canvas
+
 # 3.4.1
 
 * Republished 3.4.0, because the package update doesn't seem to distibute consistently through yarn / npm
