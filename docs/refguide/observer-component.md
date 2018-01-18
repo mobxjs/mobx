@@ -128,7 +128,7 @@ colors.foreground = 'blue';
 // all buttons updated
 ```
 
-See for more information the [`mobx-react` docs](https://github.com/mobxjs/mobx-react#provider-experimental).
+See for more information the [`mobx-react` docs](https://github.com/mobxjs/mobx-react#provider-and-inject).
 
 
 ## When to apply `observer`?
