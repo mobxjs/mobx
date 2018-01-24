@@ -135,134 +135,16 @@ export const extras = {
     setReactionScheduler
 }
 
-// Deprecated default export (will be removed in 4.0)
-
-import { IObservable } from "./core/observable"
-import { Reaction, IReactionPublic, IReactionDisposer } from "./core/reaction"
-import { untracked, IDerivationState } from "./core/derivation"
-import { IAtom, Atom, BaseAtom } from "./core/atom"
-import { useStrict, isStrictModeEnabled, IAction } from "./core/action"
-import { spy } from "./core/spy"
-import { IComputedValue } from "./core/computedvalue"
-import { IEqualsComparer, comparer } from "./types/comparer"
-import { IModifierDescriptor, IEnhancer, isModifierDescriptor } from "./types/modifiers"
-import { IInterceptable, IInterceptor } from "./types/intercept-utils"
-import { IListenable } from "./types/listen-utils"
-import {
-    IObjectWillChange,
-    IObjectChange,
-    IObservableObject,
-    isObservableObject
-} from "./types/observableobject"
-import {
-    IValueDidChange,
-    IValueWillChange,
-    isObservableValue as isBoxedObservable
-} from "./types/observablevalue"
-import {
-    IArrayWillChange,
-    IArrayWillSplice,
-    IArrayChange,
-    IArraySplice,
-    isObservableArray
-} from "./types/observablearray"
-import {
-    IKeyValueMap,
-    IMapEntries,
-    IMapEntry,
-    IMapWillChange,
-    IMapChange,
-    IMapChangeUpdate,
-    IMapChangeAdd,
-    IMapChangeBase,
-    IMapChangeDelete,
-    isObservableMap,
-    map,
-    IObservableMapInitialValues,
-    IMap
-} from "./types/observablemap"
-import { transaction } from "./api/transaction"
-import { observable, IObservableFactory, IObservableFactories } from "./api/observable"
-import { computed, IComputed, IComputedValueOptions } from "./api/computed"
-import { isObservable } from "./api/isobservable"
-import { isComputed } from "./api/iscomputed"
-import { extendObservable, extendShallowObservable } from "./api/extendobservable"
-import { observe } from "./api/observe"
-import { intercept } from "./api/intercept"
-import { autorun, autorunAsync, when, reaction, IReactionOptions } from "./api/autorun"
-import { action, isAction, runInAction, IActionFactory } from "./api/action"
-import { expr } from "./api/expr"
-import { toJS } from "./api/tojs"
-import { ITransformer, createTransformer } from "./api/createtransformer"
-import { whyRun } from "./api/whyrun"
-import { isArrayLike } from "./utils/utils"
-import { Iterator } from "./utils/iterable"
-
-const everything = {
-    Reaction,
-    untracked,
-    Atom,
-    BaseAtom,
-    useStrict,
-    isStrictModeEnabled,
-    spy,
-    comparer,
-    isModifierDescriptor,
-    isObservableObject,
-    isBoxedObservable,
-    isObservableArray,
-    ObservableMap,
-    isObservableMap,
-    map,
-    transaction,
-    observable,
-    computed,
-    isObservable,
-    isComputed,
-    extendObservable,
-    extendShallowObservable,
-    observe,
-    intercept,
-    autorun,
-    autorunAsync,
-    when,
-    reaction,
-    action,
-    isAction,
-    runInAction,
-    expr,
-    toJS,
-    createTransformer,
-    whyRun,
-    isArrayLike,
-    extras
-}
-
-let warnedAboutDefaultExport = false
-
-for (let p in everything) {
-    let val = everything[p]
-    Object.defineProperty(everything, p, {
-        get: () => {
-            if (!warnedAboutDefaultExport) {
-                warnedAboutDefaultExport = true
-                console.warn(
-                    "Using default export (`import mobx from 'mobx'`) is deprecated " +
-                        "and won’t work in mobx@4.0.0\n" +
-                        "Use `import * as mobx from 'mobx'` instead"
-                )
-            }
-            return val
-        }
-    })
-}
-
-// TODO: remove in 4.0, temporarily incompatibility fix for mobx-react@4.1.0 which accidentally uses default exports
-export default everything
-
 // Devtools support
+import { spy } from "./core/spy"
 
 declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: ((any) => void) }
 if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
-    __MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx({ spy, extras })
+    // See: https://github.com/andykog/mobx-devtools/
+    __MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx({
+        spy,
+        extras: {
+            getDebugName
+        }
+    })
 }

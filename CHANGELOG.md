@@ -1,5 +1,6 @@
 # 4.0.0
 
+
 ## Breaking changes
 
 * Killed the already deprecated modifiers `asFlat` etc. If you war still using this, see the MobX 2 -> 3 migration notes.
@@ -8,6 +9,8 @@
 * If there are multiple mobx instances active in a single project, an exception will be thrown. Previously only a warning was printed. Fixes #1098. For details, see [#1082](https://github.com/mobxjs/mobx/issues/1082).
 
 ## Non breaking changes
+
+* Dropped the broken `default` export that made it impossible to tree-shake mobx. Make sure you always use `import { x } from "mobx"` and not `import x from "mobx"`
 
 # 3.4.1
 
