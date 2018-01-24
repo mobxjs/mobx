@@ -1,3 +1,7 @@
+# 4.0.0
+
+* [breaking] Killed the already deprecated modifiers `asFlat` etc. If you war still using this, see the MobX 2 -> 3 migration notes.
+
 # 3.4.1
 
 * Republished 3.4.0, because the package update doesn't seem to distibute consistently through yarn / npm
