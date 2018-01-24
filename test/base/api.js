@@ -1,7 +1,7 @@
 var mobx = require("../../src/mobx.ts")
 
 test("correct api should be exposed", function() {
-    expect(Object.keys(mobx).sort()).toEqual(
+    expect(Object.keys(mobx).filter(key => mobx[key] !== undefined).sort()).toEqual(
         [
             "action",
             "_allowStateChanges",
@@ -29,7 +29,7 @@ test("correct api should be exposed", function() {
             "isArrayLike",
             "isBoxedObservable",
             "isComputed",
-            "isComputingDerivation",
+            "_isComputingDerivation",
             "isModifierDescriptor",
             "isObservable",
             "isObservableArray",
@@ -46,7 +46,6 @@ test("correct api should be exposed", function() {
             "_resetGlobalState",
             "runInAction",
             "_setReactionScheduler",
-            "shareGlobalState",
             "spy",
             "toJS",
             "transaction",

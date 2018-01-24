@@ -23,7 +23,7 @@ module.exports.testSet = function() {
     var state = (testSet.state = m.observable({
         root: null,
         renderedNodes: m.observable.array(),
-        collapsed: new m.map() // KM: ideally, I would like to use a set
+        collapsed: m.observable.map() // KM: ideally, I would like to use a set
     }))
 
     var stats = (testSet.stats = {

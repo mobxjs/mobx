@@ -76,7 +76,7 @@ test("exception when starting autorun can be recovered from", () => {
     a.x = 3
     expect(b).toBe(6)
     checkGlobalState()
-    expect(mobx.extras.getAtom(a, "y").observers.length).toBe(1)
+    expect(mobx.getAtom(a, "y").observers.length).toBe(1)
 })
 
 test("exception in autorun can be recovered from", () => {
@@ -94,7 +94,7 @@ test("exception in autorun can be recovered from", () => {
     })
     expect(a.y).toBe(2)
     expect(b).toBe(2)
-    expect(mobx.extras.getAtom(a, "y").observers.length).toBe(1)
+    expect(mobx.getAtom(a, "y").observers.length).toBe(1)
 
     utils.consoleError(() => {
         a.x = 2
@@ -104,7 +104,7 @@ test("exception in autorun can be recovered from", () => {
     expect(() => {
         expect(a.y).toBe(2) // old cached value!
     }).toThrowError(/Uhoh/)
-    expect(mobx.extras.getAtom(a, "y").observers.length).toBe(1)
+    expect(mobx.getAtom(a, "y").observers.length).toBe(1)
 
     expect(b).toBe(2)
     checkGlobalState()
@@ -113,9 +113,9 @@ test("exception in autorun can be recovered from", () => {
     expect(a.y).toBe(6)
     expect(b).toBe(6)
     checkGlobalState()
-    expect(mobx.extras.getAtom(a, "y").observers.length).toBe(1)
+    expect(mobx.getAtom(a, "y").observers.length).toBe(1)
     d()
-    expect(mobx.extras.getAtom(a, "y").observers.length).toBe(0)
+    expect(mobx.getAtom(a, "y").observers.length).toBe(0)
 })
 
 test("multiple autoruns with exceptions are handled correctly", () => {
@@ -673,7 +673,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
     test("it should be possible to handle global errors in reactions", () => {
         const a = mobx.observable(1)
         const errors = []
-        const d2 = mobx.extras.onReactionError(e => errors.push(e))
+        const d2 = mobx.onReactionError(e => errors.push(e))
 
         const d = mobx.autorun(function() {
             throw a.get()

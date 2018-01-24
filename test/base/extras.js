@@ -7,7 +7,7 @@ test("treeD", function() {
     var a = m.observable(3)
     var aName = "ObservableValue@1"
 
-    var dtree = m.extras.getDependencyTree
+    var dtree = m.getDependencyTree
     expect(dtree(a)).toEqual({
         name: aName
     })
@@ -38,7 +38,7 @@ test("treeD", function() {
     expect(aName !== bName).toBeTruthy()
     expect(bName !== cName).toBeTruthy()
 
-    expect(m.extras.getObserverTree(a)).toEqual({
+    expect(m.getObserverTree(a)).toEqual({
         name: aName,
         observers: [
             {
@@ -52,14 +52,14 @@ test("treeD", function() {
         ]
     })
 
-    var x = mobx.map({ temperature: 0 })
+    var x = mobx.observable.map({ temperature: 0 })
     var d = mobx.autorun(function() {
         x.keys()
         if (x.has("temperature")) x.get("temperature")
         x.has("absent")
     })
 
-    expect(m.extras.getDependencyTree(d.$mobx)).toEqual({
+    expect(m.getDependencyTree(d.$mobx)).toEqual({
         name: "Autorun@7",
         dependencies: [
             {
@@ -177,14 +177,14 @@ test("get atom", function() {
 
     var a = mobx.observable(3)
     var b = mobx.observable({ a: 3 })
-    var c = mobx.map({ a: 3 })
+    var c = mobx.observable.map({ a: 3 })
     var d = mobx.observable([1, 2])
     var e = mobx.computed(() => 3)
     var f = mobx.autorun(() => c.has("b"))
     var g = new Clazz()
 
     function atom(thing, prop) {
-        return mobx.extras.getAtom(thing, prop).constructor.name
+        return mobx.getAtom(thing, prop).constructor.name
     }
 
     var ovClassName = mobx.observable(3).constructor.name
@@ -230,7 +230,7 @@ test("get debug name", function() {
 
     var a = mobx.observable(3)
     var b = mobx.observable({ a: 3 })
-    var c = mobx.map({ a: 3 })
+    var c = mobx.observable.map({ a: 3 })
     var d = mobx.observable([1, 2])
     var e = mobx.computed(() => 3)
     var f = mobx.autorun(() => c.has("b"))
@@ -238,7 +238,7 @@ test("get debug name", function() {
     var h = mobx.observable({ b: function() {}, c: mobx.computed(function() {}) })
 
     function name(thing, prop) {
-        return mobx.extras.getDebugName(thing, prop)
+        return mobx.getDebugName(thing, prop)
     }
 
     expect(name(a)).toBe("ObservableValue@1")
@@ -282,14 +282,14 @@ test("get administration", function() {
 
     var a = mobx.observable(3)
     var b = mobx.observable({ a: 3 })
-    var c = mobx.map({ a: 3 })
+    var c = mobx.observable.map({ a: 3 })
     var d = mobx.observable([1, 2])
     var e = mobx.computed(() => 3)
     var f = mobx.autorun(() => c.has("b"))
     var g = new Clazz()
 
     function adm(thing, prop) {
-        return mobx.extras.getAdministration(thing, prop).constructor.name
+        return mobx._getAdministration(thing, prop).constructor.name
     }
 
     var ovClassName = mobx.observable(3).constructor.name

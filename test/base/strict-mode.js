@@ -4,9 +4,7 @@ var strictError = /Since strict-mode is enabled, changing observed observable va
 
 test("strict mode should not allow changes outside action", () => {
     var a = mobx.observable(2)
-    expect(mobx.isStrictModeEnabled()).toBe(false)
     mobx.useStrict(true)
-    expect(mobx.isStrictModeEnabled()).toBe(true)
 
     // allowed, a is not observed
     a.set(3)
@@ -17,7 +15,6 @@ test("strict mode should not allow changes outside action", () => {
     d()
 
     mobx.useStrict(false)
-    expect(mobx.isStrictModeEnabled()).toBe(false)
     a.set(4)
     expect(a.get()).toBe(4)
 })
@@ -113,14 +110,14 @@ test("action inside reaction in strict mode can modify state", () => {
 test("cannot create or modify objects in strict mode without action", () => {
     var obj = mobx.observable({ a: 2 })
     var ar = mobx.observable([1])
-    var map = mobx.map({ a: 2 })
+    var map = mobx.observable.map({ a: 2 })
 
     mobx.useStrict(true)
 
     // introducing new observables is ok!
     // mobx.observable({ a: 2, b: function() { return this.a }});
     // mobx.observable({ b: function() { return this.a } });
-    // mobx.map({ a: 2});
+    // mobx.observable.map({ a: 2});
     // mobx.observable([1, 2, 3]);
     // mobx.extendObservable(obj, { b: 4});
 
@@ -140,7 +137,7 @@ test("cannot create or modify objects in strict mode without action", () => {
 test("can create objects in strict mode with action", () => {
     var obj = mobx.observable({ a: 2 })
     var ar = mobx.observable([1])
-    var map = mobx.map({ a: 2 })
+    var map = mobx.observable.map({ a: 2 })
 
     mobx.useStrict(true)
 
@@ -151,7 +148,7 @@ test("can create objects in strict mode with action", () => {
                 return this.a
             }
         })
-        mobx.map({ a: 2 })
+        mobx.observable.map({ a: 2 })
         mobx.observable([1, 2, 3])
 
         obj.a = 3
@@ -170,16 +167,16 @@ test("strict mode checks", function() {
     var x = mobx.observable(3)
     var d = mobx.autorun(() => x.get())
 
-    mobx.extras.allowStateChanges(false, function() {
+    mobx._allowStateChanges(false, function() {
         x.get()
     })
 
-    mobx.extras.allowStateChanges(true, function() {
+    mobx._allowStateChanges(true, function() {
         x.set(7)
     })
 
     expect(function() {
-        mobx.extras.allowStateChanges(false, function() {
+        mobx._allowStateChanges(false, function() {
             x.set(4)
         })
     }).toThrowError(/Side effects like changing state are not allowed at this point/)

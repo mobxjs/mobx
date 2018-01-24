@@ -225,7 +225,7 @@ test("json cycles", function() {
     var a = observable({
         b: 1,
         c: [2],
-        d: mobx.map(),
+        d: mobx.observable.map(),
         e: a
     })
 

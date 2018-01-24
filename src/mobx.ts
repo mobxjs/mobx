@@ -27,7 +27,7 @@ export { IDerivation, untracked, IDerivationState } from "./core/derivation"
 // the ones above
 export { IAtom, Atom, BaseAtom } from "./core/atom"
 
-export { useStrict, isStrictModeEnabled, IAction } from "./core/action"
+export { useStrict, IAction } from "./core/action"
 export { spy } from "./core/spy"
 export { IComputedValue } from "./core/computedvalue"
 
@@ -68,7 +68,6 @@ export {
     IMapChangeBase,
     IMapChangeDelete,
     isObservableMap,
-    map,
     IObservableMapInitialValues,
     IMap
 } from "./types/observablemap"
@@ -100,7 +99,7 @@ export {
 export { getDebugName, getAtom, getAdministration as _getAdministration } from "./types/type-utils"
 export { allowStateChanges as _allowStateChanges } from "./core/action"
 export { Lambda, deepEqual, isArrayLike } from "./utils/utils"
-export { isComputingDerivation } from "./core/derivation"
+export { isComputingDerivation as _isComputingDerivation } from "./core/derivation"
 export { setReactionScheduler as _setReactionScheduler, onReactionError } from "./core/reaction"
 export { reserveArrayBuffer as _reserveArrayBuffer /* See #734 */ } from "./types/observablearray"
 export { interceptReads as _interceptReads } from "./api/intercept-read"

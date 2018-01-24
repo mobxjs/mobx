@@ -1,7 +1,7 @@
 var m = require("../../src/mobx.ts")
 
 test("observe object and map properties", function() {
-    var map = m.map({ a: 1 })
+    var map = m.observable.map({ a: 1 })
     var events = []
 
     expect(function() {

@@ -1,7 +1,7 @@
 "use strict"
 
 var mobx = require("../../src/mobx.ts")
-var map = mobx.map
+var map = mobx.observable.map
 var autorun = mobx.autorun
 var iterall = require("iterall")
 
@@ -395,17 +395,17 @@ test("256, map.merge should be not be tracked for target", () => {
 })
 
 test("308, map keys should be coerced to strings correctly", () => {
-    var m = mobx.map()
-    m.set(1, true) // => "[mobx.map { 1: true }]"
-    m.delete(1) // => "[mobx.map { }]"
+    var m = mobx.observable.map()
+    m.set(1, true) // => "[mobx.observable.map { 1: true }]"
+    m.delete(1) // => "[mobx.observable.map { }]"
     expect(m.keys()).toEqual([])
 
-    m.set(1, true) // => "[mobx.map { 1: true }]"
-    m.delete("1") // => "[mobx.map { 1: undefined }]"
+    m.set(1, true) // => "[mobx.observable.map { 1: true }]"
+    m.delete("1") // => "[mobx.observable.map { 1: undefined }]"
     expect(m.keys()).toEqual([])
 
-    m.set(1, true) // => "[mobx.map { 1: true, 1: true }]"
-    m.delete("1") // => "[mobx.map { 1: undefined, 1: undefined }]"
+    m.set(1, true) // => "[mobx.observable.map { 1: true, 1: true }]"
+    m.delete("1") // => "[mobx.observable.map { 1: undefined, 1: undefined }]"
     expect(m.keys()).toEqual([])
 
     m.set(true, true)
@@ -415,7 +415,7 @@ test("308, map keys should be coerced to strings correctly", () => {
 })
 
 test("map should support iterall / iterable ", () => {
-    var a = mobx.map({ a: 1, b: 2 })
+    var a = mobx.observable.map({ a: 1, b: 2 })
 
     function leech(iter) {
         var values = []
@@ -468,16 +468,16 @@ test("deepEqual map", () => {
     x2.set("x", 3)
     x2.set("y", { z: 3 })
 
-    expect(mobx.extras.deepEqual(x, x2)).toBe(false)
+    expect(mobx.deepEqual(x, x2)).toBe(false)
     x2.get("y").z = 2
-    expect(mobx.extras.deepEqual(x, x2)).toBe(true)
+    expect(mobx.deepEqual(x, x2)).toBe(true)
 
     x2.set("z", 1)
-    expect(mobx.extras.deepEqual(x, x2)).toBe(false)
+    expect(mobx.deepEqual(x, x2)).toBe(false)
     x2.delete("z")
-    expect(mobx.extras.deepEqual(x, x2)).toBe(true)
+    expect(mobx.deepEqual(x, x2)).toBe(true)
     x2.delete("y")
-    expect(mobx.extras.deepEqual(x, x2)).toBe(false)
+    expect(mobx.deepEqual(x, x2)).toBe(false)
 })
 
 test("798, cannot return observable map from computed prop", () => {

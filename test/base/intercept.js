@@ -138,7 +138,7 @@ test("intercept object", () => {
 })
 
 test("intercept map", () => {
-    var a = m.map({
+    var a = m.observable.map({
         b: 3
     })
 

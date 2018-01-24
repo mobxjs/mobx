@@ -51,7 +51,7 @@ test("isObservable", function() {
     expect(m.isObservable(m.observable({ a: 1 }), "a")).toBe(true)
     expect(m.isObservable(m.observable({ a: 1 }), "b")).toBe(false)
 
-    expect(m.isObservable(m.map())).toBe(true)
+    expect(m.isObservable(m.observable.map())).toBe(true)
 
     const base = { a: 3 }
     const obs = m.observable(base)

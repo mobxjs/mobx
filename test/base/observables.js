@@ -511,7 +511,7 @@ test("mobx.observe", function() {
     var events = []
     var o = observable({ b: 2 })
     var ar = observable([3])
-    var map = mobx.map({})
+    var map = mobx.observable.map({})
 
     var push = function(event) {
         events.push(event)

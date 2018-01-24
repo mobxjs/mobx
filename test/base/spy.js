@@ -48,7 +48,7 @@ function doStuff() {
     e.shift()
     e[2] = 5
 
-    var f = mobx.map({ g: 1 })
+    var f = mobx.observable.map({ g: 1 })
     f.delete("h")
     f.delete("g")
     f.set("i", 5)
