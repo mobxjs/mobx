@@ -89,54 +89,29 @@ export { toJS } from "./api/tojs"
 export { ITransformer, createTransformer } from "./api/createtransformer"
 export { whyRun } from "./api/whyrun"
 
-export { Lambda, isArrayLike } from "./utils/utils"
 export { Iterator } from "./utils/iterable"
-export { IObserverTree, IDependencyTree } from "./api/extras"
+export { IObserverTree, IDependencyTree, getDependencyTree, getObserverTree } from "./api/extras"
 
-import { resetGlobalState, getGlobalState, isolateGlobalState } from "./core/globalstate"
-import { IDerivation } from "./core/derivation"
-import { IDepTreeNode } from "./core/observable"
-import { IObserverTree, IDependencyTree, getDependencyTree, getObserverTree } from "./api/extras"
-import { getDebugName, getAtom, getAdministration } from "./types/type-utils"
-import { allowStateChanges } from "./core/action"
-import { spyReport, spyReportEnd, spyReportStart, isSpyEnabled } from "./core/spy"
-import { Lambda, deepEqual } from "./utils/utils"
-import { isComputingDerivation } from "./core/derivation"
-import { setReactionScheduler, onReactionError } from "./core/reaction"
-import { reserveArrayBuffer, IObservableArray } from "./types/observablearray"
-import { interceptReads } from "./api/intercept-read"
-import { ObservableMap } from "./types/observablemap"
-import { IObservableValue } from "./types/observablevalue"
-import { registerGlobals } from "./core/globalstate"
+export {
+    resetGlobalState as _resetGlobalState,
+    getGlobalState as _getGlobalState,
+    isolateGlobalState
+} from "./core/globalstate"
+export { getDebugName, getAtom, getAdministration as _getAdministration } from "./types/type-utils"
+export { allowStateChanges as _allowStateChanges } from "./core/action"
+export { Lambda, deepEqual, isArrayLike } from "./utils/utils"
+export { isComputingDerivation } from "./core/derivation"
+export { setReactionScheduler as _setReactionScheduler, onReactionError } from "./core/reaction"
+export { reserveArrayBuffer as _reserveArrayBuffer /* See #734 */ } from "./types/observablearray"
+export { interceptReads as _interceptReads } from "./api/intercept-read"
 
 // This line should come after all the imports as well, for the same reason
 // as noted above. I will file a bug with rollupjs - @rossipedia
-registerGlobals()
-
-export const extras = {
-    allowStateChanges,
-    deepEqual,
-    getAtom,
-    getDebugName,
-    getDependencyTree,
-    getAdministration,
-    getGlobalState,
-    getObserverTree,
-    interceptReads,
-    isComputingDerivation,
-    isSpyEnabled,
-    onReactionError,
-    reserveArrayBuffer, // See #734
-    resetGlobalState,
-    isolateGlobalState,
-    spyReport,
-    spyReportEnd,
-    spyReportStart,
-    setReactionScheduler
-}
+import "./core/globalstate"
 
 // Devtools support
 import { spy } from "./core/spy"
+import { getDebugName } from "./types/type-utils"
 
 declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: ((any) => void) }
 if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {

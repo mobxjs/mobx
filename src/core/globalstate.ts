@@ -115,10 +115,6 @@ export function getGlobalState(): any {
     return globalState
 }
 
-export function registerGlobals() {
-    // no-op to make explicit why this file is loaded
-}
-
 /**
  * For testing purposes only; this will break the internal state of existing observables,
  * but can be used to get back at a stable state after throwing errors

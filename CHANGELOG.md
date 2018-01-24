@@ -1,12 +1,13 @@
 # 4.0.0
 
-
 ## Breaking changes
 
 * Killed the already deprecated modifiers `asFlat` etc. If you war still using this, see the MobX 2 -> 3 migration notes.
 * Dropped bower support. Fixes #1263
 * Dropped the `shareGlobalState` feature. Instead, projects should be setup properly and it is up to the hosting package to make sure that there is only one MobX instance
 * If there are multiple mobx instances active in a single project, an exception will be thrown. Previously only a warning was printed. Fixes #1098. For details, see [#1082](https://github.com/mobxjs/mobx/issues/1082).
+* The `extras.` namespace has been dropped to enable tree-shaking non-used MobX features. All methods that where there originally are now exported at top level. If they are part of the official public API (you are encouraged to use them) they are exported as is. If they are experimental or somehow internal (you are discouraged to use them), they are prefixed with `_`.
+* The `spyReportStart`, `spyReportEnd`, `spyReport` and `isSpyEnabled` are no longer public. It is no longer possible to emit custom spy events as to avoid confusing in listeners what the possible set of events is.
 
 ## Non breaking changes
 
