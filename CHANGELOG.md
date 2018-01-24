@@ -1,6 +1,7 @@
 # 4.0.0
 
 * [breaking] Killed the already deprecated modifiers `asFlat` etc. If you war still using this, see the MobX 2 -> 3 migration notes.
+* [breaking] Dropped bower support. Fixes #1263
 
 # 3.4.1
 
