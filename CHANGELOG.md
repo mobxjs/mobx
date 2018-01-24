@@ -1,7 +1,13 @@
 # 4.0.0
 
-* [breaking] Killed the already deprecated modifiers `asFlat` etc. If you war still using this, see the MobX 2 -> 3 migration notes.
-* [breaking] Dropped bower support. Fixes #1263
+## Breaking changes
+
+* Killed the already deprecated modifiers `asFlat` etc. If you war still using this, see the MobX 2 -> 3 migration notes.
+* Dropped bower support. Fixes #1263
+* Dropped the `shareGlobalState` feature. Instead, projects should be setup properly and it is up to the hosting package to make sure that there is only one MobX instance
+* If there are multiple mobx instances active in a single project, an exception will be thrown. Previously only a warning was printed. Fixes #1098. For details, see [#1082](https://github.com/mobxjs/mobx/issues/1082).
+
+## Non breaking changes
 
 # 3.4.1
 

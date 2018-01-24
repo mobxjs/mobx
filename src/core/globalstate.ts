@@ -88,9 +88,7 @@ export class MobXGlobals {
 
 export let globalState: MobXGlobals = new MobXGlobals()
 
-let shareGlobalStateCalled = false
 let runInIsolationCalled = false
-let warnedAboutMultipleInstances = false
 
 {
     const global = getGlobal()
@@ -99,10 +97,9 @@ let warnedAboutMultipleInstances = false
     } else {
         global.__mobxInstanceCount++
         setTimeout(() => {
-            if (!shareGlobalStateCalled && !runInIsolationCalled && !warnedAboutMultipleInstances) {
-                warnedAboutMultipleInstances = true
-                console.warn(
-                    "[mobx] Warning: there are multiple mobx instances active. This might lead to unexpected results. See https://github.com/mobxjs/mobx/issues/1082 for details."
+            if (!runInIsolationCalled) {
+                fail(
+                    "There are multiple mobx instances active. This might lead to unexpected results. See https://github.com/mobxjs/mobx/issues/1082 for details."
                 )
             }
         })
@@ -112,26 +109,6 @@ let warnedAboutMultipleInstances = false
 export function isolateGlobalState() {
     runInIsolationCalled = true
     getGlobal().__mobxInstanceCount--
-}
-
-export function shareGlobalState() {
-    // TODO: remove in 4.0; just use peer dependencies instead.
-    deprecated(
-        "Using `shareGlobalState` is not recommended, use peer dependencies instead. See https://github.com/mobxjs/mobx/issues/1082 for details."
-    )
-    shareGlobalStateCalled = true
-    const global = getGlobal()
-    const ownState = globalState
-
-    /**
-     * Backward compatibility check
-     */
-    if (global.__mobservableTrackingStack || global.__mobservableViewStack)
-        throw new Error("[mobx] An incompatible version of mobservable is already loaded.")
-    if (global.__mobxGlobal && global.__mobxGlobal.version !== ownState.version)
-        throw new Error("[mobx] An incompatible version of mobx is already loaded.")
-    if (global.__mobxGlobal) globalState = global.__mobxGlobal
-    else global.__mobxGlobal = ownState
 }
 
 export function getGlobalState(): any {

@@ -93,12 +93,7 @@ export { Lambda, isArrayLike } from "./utils/utils"
 export { Iterator } from "./utils/iterable"
 export { IObserverTree, IDependencyTree } from "./api/extras"
 
-import {
-    resetGlobalState,
-    shareGlobalState,
-    getGlobalState,
-    isolateGlobalState
-} from "./core/globalstate"
+import { resetGlobalState, getGlobalState, isolateGlobalState } from "./core/globalstate"
 import { IDerivation } from "./core/derivation"
 import { IDepTreeNode } from "./core/observable"
 import { IObserverTree, IDependencyTree, getDependencyTree, getObserverTree } from "./api/extras"
@@ -134,7 +129,6 @@ export const extras = {
     reserveArrayBuffer, // See #734
     resetGlobalState,
     isolateGlobalState,
-    shareGlobalState,
     spyReport,
     spyReportEnd,
     spyReportStart,
@@ -151,7 +145,6 @@ import { useStrict, isStrictModeEnabled, IAction } from "./core/action"
 import { spy } from "./core/spy"
 import { IComputedValue } from "./core/computedvalue"
 import { IEqualsComparer, comparer } from "./types/comparer"
-import { asReference, asFlat, asStructure, asMap } from "./types/modifiers-old"
 import { IModifierDescriptor, IEnhancer, isModifierDescriptor } from "./types/modifiers"
 import { IInterceptable, IInterceptor } from "./types/intercept-utils"
 import { IListenable } from "./types/listen-utils"
@@ -214,10 +207,6 @@ const everything = {
     isStrictModeEnabled,
     spy,
     comparer,
-    asReference,
-    asFlat,
-    asStructure,
-    asMap,
     isModifierDescriptor,
     isObservableObject,
     isBoxedObservable,
