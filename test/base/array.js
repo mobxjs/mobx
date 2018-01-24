@@ -1,5 +1,5 @@
 "use strict"
-var mobx = require("../../")
+var mobx = require("../../src/mobx.ts")
 var observable = mobx.observable
 var iterall = require("iterall")
 
@@ -15,7 +15,7 @@ function buffer() {
 }
 
 test("test1", function() {
-    debugger;
+    debugger
     var a = observable([])
     expect(a.length).toBe(0)
     expect(Object.keys(a)).toEqual([])
@@ -402,9 +402,13 @@ test(".move throws on invalid indices", () => {
     const observableArr = observable(arr)
 
     expect(() => observableArr.move(-1, 0)).toThrowError(/Index out of bounds: -1 is negative/)
-    expect(() => observableArr.move(3, 0)).toThrowError(/Index out of bounds: 3 is not smaller than 3/)
+    expect(() => observableArr.move(3, 0)).toThrowError(
+        /Index out of bounds: 3 is not smaller than 3/
+    )
     expect(() => observableArr.move(0, -1)).toThrowError(/Index out of bounds: -1 is negative/)
-    expect(() => observableArr.move(0, 3)).toThrowError(/Index out of bounds: 3 is not smaller than 3/)
+    expect(() => observableArr.move(0, 3)).toThrowError(
+        /Index out of bounds: 3 is not smaller than 3/
+    )
 })
 
 test(".move(i, i) does nothing", () => {

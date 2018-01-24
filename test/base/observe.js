@@ -1,4 +1,4 @@
-var m = require("../../")
+var m = require("../../src/mobx.ts")
 
 test("observe object and map properties", function() {
     var map = m.map({ a: 1 })

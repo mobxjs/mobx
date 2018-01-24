@@ -1,6 +1,6 @@
 "use strict"
 
-var mobx = require("../../")
+var mobx = require("../../src/mobx.ts")
 var m = mobx
 var observable = mobx.observable
 var computed = mobx.computed
@@ -35,7 +35,7 @@ test("basic", function() {
     x.set(5)
     expect(5).toBe(x.get())
     expect([5]).toEqual(b.toArray())
-    expect(mobx.extras.isComputingDerivation()).toBe(false)
+    expect(mobx._isComputingDerivation()).toBe(false)
 })
 
 test("basic2", function() {
@@ -56,7 +56,7 @@ test("basic2", function() {
     expect(z.get()).toBe(10)
     expect(y.get()).toBe(15)
 
-    expect(mobx.extras.isComputingDerivation()).toBe(false)
+    expect(mobx._isComputingDerivation()).toBe(false)
 })
 
 test("computed with asStructure modifier", function(done) {
@@ -86,7 +86,7 @@ test("computed with asStructure modifier", function(done) {
         })
 
         expect(b.toArray()).toEqual([{ sum: 8 }, { sum: 9 }])
-        expect(mobx.extras.isComputingDerivation()).toBe(false)
+        expect(mobx._isComputingDerivation()).toBe(false)
 
         done()
     } catch (e) {
@@ -109,7 +109,7 @@ test("dynamic", function(done) {
         expect(5).toBe(y.get())
 
         expect(b.toArray()).toEqual([3, 5])
-        expect(mobx.extras.isComputingDerivation()).toBe(false)
+        expect(mobx._isComputingDerivation()).toBe(false)
 
         done()
     } catch (e) {
@@ -133,7 +133,7 @@ test("dynamic2", function(done) {
 
         //no intermediate value 15!
         expect([25]).toEqual(b.toArray())
-        expect(mobx.extras.isComputingDerivation()).toBe(false)
+        expect(mobx._isComputingDerivation()).toBe(false)
 
         done()
     } catch (e) {
@@ -160,7 +160,7 @@ test("readme1", function(done) {
         expect([24]).toEqual(b.toArray())
         order.price.set(10)
         expect([24, 12]).toEqual(b.toArray())
-        expect(mobx.extras.isComputingDerivation()).toBe(false)
+        expect(mobx._isComputingDerivation()).toBe(false)
 
         done()
     } catch (e) {
@@ -272,7 +272,7 @@ test("scope", function() {
     order.price.set(10)
     order.amount.set(3)
     expect(36).toBe(order.total.get())
-    expect(mobx.extras.isComputingDerivation()).toBe(false)
+    expect(mobx._isComputingDerivation()).toBe(false)
 })
 
 test("props1", function() {
@@ -302,7 +302,7 @@ test("props1", function() {
     order.amount = 5
     expect(totals).toEqual([36, 48])
 
-    expect(mobx.extras.isComputingDerivation()).toBe(false)
+    expect(mobx._isComputingDerivation()).toBe(false)
 })
 
 test("props2", function() {
@@ -584,7 +584,7 @@ test("change count optimization", function() {
     expect(bCalcs).toBe(2)
     expect(cCalcs).toBe(1)
 
-    expect(mobx.extras.isComputingDerivation()).toBe(false)
+    expect(mobx._isComputingDerivation()).toBe(false)
 })
 
 test("observables removed", function() {
@@ -613,7 +613,7 @@ test("observables removed", function() {
     expect(c.get()).toBe(9)
     expect(calcs).toBe(3)
 
-    expect(mobx.extras.isComputingDerivation()).toBe(false)
+    expect(mobx._isComputingDerivation()).toBe(false)
 })
 
 test("lazy evaluation", function() {
@@ -691,7 +691,7 @@ test("lazy evaluation", function() {
 
     expect(observerChanges).toBe(1)
 
-    expect(mobx.extras.isComputingDerivation()).toBe(false)
+    expect(mobx._isComputingDerivation()).toBe(false)
 })
 
 test("multiple view dependencies", function() {
@@ -927,8 +927,8 @@ function stripSpyOutput(events) {
 }
 
 test("issue 50", function(done) {
-    m.extras.resetGlobalState()
-    mobx.extras.getGlobalState().mobxGuid = 0
+    m._resetGlobalState()
+    mobx._getGlobalState().mobxGuid = 0
     var x = observable({
         a: true,
         b: false,
@@ -984,8 +984,8 @@ test("issue 50", function(done) {
 })
 
 test("verify transaction events", function() {
-    m.extras.resetGlobalState()
-    mobx.extras.getGlobalState().mobxGuid = 0
+    m._resetGlobalState()
+    mobx._getGlobalState().mobxGuid = 0
 
     var x = observable({
         b: 1,
@@ -1054,8 +1054,8 @@ test("verify array in transaction", function() {
 })
 
 test("delay autorun until end of transaction", function() {
-    m.extras.resetGlobalState()
-    mobx.extras.getGlobalState().mobxGuid = 0
+    m._resetGlobalState()
+    mobx._getGlobalState().mobxGuid = 0
     var events = []
     var x = observable({
         a: 2,
@@ -1177,14 +1177,17 @@ test("computed values believe NaN === NaN", function() {
 
 test("computed values believe deep NaN === deep NaN when using compareStructural", function() {
     var a = observable({ b: { a: 1 } })
-    var c = computed(function() {
-        return a.b
-    }, {compareStructural: true})
+    var c = computed(
+        function() {
+            return a.b
+        },
+        { compareStructural: true }
+    )
 
     var buf = new buffer()
-    c.observe((newValue) => {
+    c.observe(newValue => {
         buf(newValue)
-    });
+    })
 
     a.b = { a: NaN }
     a.b = { a: NaN }
@@ -1615,7 +1618,9 @@ test("support computed property getters / setters", () => {
     a.size = 3
     expect(a.volume).toBe(9)
 
-    expect(() => (a.volume = 9)).toThrowError(/It is not possible to assign a new value to a computed value/)
+    expect(() => (a.volume = 9)).toThrowError(
+        /It is not possible to assign a new value to a computed value/
+    )
 
     a = {}
     mobx.extendObservable(a, {
@@ -1692,11 +1697,13 @@ test("#558 boxed observables stay boxed observables", function() {
 
 test("iscomputed", function() {
     expect(mobx.isComputed(observable(3))).toBe(false)
-    expect(mobx.isComputed(
-        mobx.computed(function() {
-            return 3
-        })
-    )).toBe(true)
+    expect(
+        mobx.isComputed(
+            mobx.computed(function() {
+                return 3
+            })
+        )
+    ).toBe(true)
 
     var x = observable({
         a: 3,
@@ -1725,7 +1732,7 @@ test("603 - transaction should not kill reactions", () => {
 
     expect(a.observers.length).toBe(1)
     expect(d.$mobx.observing.length).toBe(1)
-    const g = m.extras.getGlobalState()
+    const g = m._getGlobalState()
     expect(g.inBatch).toEqual(0)
     expect(g.pendingReactions.length).toEqual(0)
     expect(g.pendingUnobservations.length).toEqual(0)
@@ -1895,7 +1902,9 @@ test("Issue 1121 - It should be possible to redefine a computed property", () =>
 
     const a = observable({
         width: 10,
-        get surface() { return this.width }
+        get surface() {
+            return this.width
+        }
     })
 
     let observeCalls = 0
@@ -1906,7 +1915,9 @@ test("Issue 1121 - It should be possible to redefine a computed property", () =>
 
     expect(() => {
         mobx.extendObservable(a, {
-            get surface() { return this.width * 2 }
+            get surface() {
+                return this.width * 2
+            }
         })
     }).not.toThrow()
 

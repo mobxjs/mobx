@@ -1,5 +1,5 @@
 "use strict"
-var mobx = require("../../")
+var mobx = require("../../src/mobx.ts")
 
 test("spy output", () => {
     var events = []
@@ -27,7 +27,9 @@ test("spy output", () => {
 
     expect(events.filter(ev => ev.spyReportStart === true).length > 0).toBeTruthy()
 
-    expect(events.filter(ev => ev.spyReportStart === true).length).toBe(events.filter(ev => ev.spyReportEnd === true).length)
+    expect(events.filter(ev => ev.spyReportStart === true).length).toBe(
+        events.filter(ev => ev.spyReportEnd === true).length
+    )
 })
 
 function doStuff() {
@@ -149,7 +151,7 @@ const doStuffEvents = [
 ]
 
 test("spy error", () => {
-    mobx.extras.getGlobalState().mobxGuid = 0
+    mobx._getGlobalState().mobxGuid = 0
 
     const a = mobx.observable({
         x: 2,

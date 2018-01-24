@@ -1,4 +1,4 @@
-var m = require("../../")
+var m = require("../../src/mobx.ts")
 
 module.exports.intersection = require("lodash.intersection")
 

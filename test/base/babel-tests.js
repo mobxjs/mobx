@@ -11,8 +11,8 @@ import {
     spy,
     isAction,
     useStrict
-} from "../../"
-import * as mobx from "../../"
+} from "../../src/mobx.ts"
+import * as mobx from "../../src/mobx.ts"
 
 class Box {
     @observable uninitialized
@@ -56,11 +56,12 @@ test("babel", function() {
 test("should not be possible to use @action with getters", () => {
     expect(() => {
         class A {
-            @action get Test() { }
+            @action
+            get Test() {}
         }
-    }).toThrowError(new Error('[mobx] action is not expected to be used with getters'))
+    }).toThrowError(new Error("[mobx] action is not expected to be used with getters"))
 
-    mobx.extras.resetGlobalState()
+    mobx._resetGlobalState()
 })
 
 test("babel: parameterized computed decorator", () => {
@@ -554,9 +555,11 @@ test("enumerability", () => {
     let props = []
     for (var key in a) props.push(key)
 
-    expect(ownProps).toEqual([
-        // should have a, not supported yet in babel...
-    ])
+    expect(ownProps).toEqual(
+        [
+            // should have a, not supported yet in babel...
+        ]
+    )
 
     expect(props).toEqual(["a", "a2"])
 
@@ -666,9 +669,11 @@ test("verify object assign (babel)", () => {
     }
 
     const todo = new Todo()
-    expect(Object.assign({}, todo)).toEqual({
-        //		Should be:	title: "test"!
-    })
+    expect(Object.assign({}, todo)).toEqual(
+        {
+            //		Should be:	title: "test"!
+        }
+    )
 
     todo.title // lazy initialization :'(
 

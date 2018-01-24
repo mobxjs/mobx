@@ -1,4 +1,4 @@
-var mobx = require("../../")
+var mobx = require("../../src/mobx.ts")
 
 var strictError = /Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: /
 
@@ -52,7 +52,7 @@ test("reactions cannot modify state in strict mode", () => {
     var a = mobx.observable(3)
     var b = mobx.observable(4)
     mobx.useStrict(true)
-    mobx.extras.resetGlobalState() // should preserve strict mode
+    mobx._resetGlobalState() // should preserve strict mode
 
     var bd = mobx.autorun(() => {
         b.get() // make sure it is observed
@@ -184,6 +184,6 @@ test("strict mode checks", function() {
         })
     }).toThrowError(/Side effects like changing state are not allowed at this point/)
 
-    mobx.extras.resetGlobalState()
+    mobx._resetGlobalState()
     d()
 })

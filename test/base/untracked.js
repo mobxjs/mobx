@@ -1,4 +1,4 @@
-var m = require("../../")
+var m = require("../../src/mobx.ts")
 
 test("untracked 1", function() {
     var cCalcs = 0,

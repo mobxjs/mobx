@@ -1,6 +1,6 @@
 "use strict"
 
-var mobx = require("../../")
+var mobx = require("../../src/mobx.ts")
 var utils = require("../utils/test-utils")
 
 test("action should wrap in transaction", () => {
@@ -170,7 +170,7 @@ test("should be possible to change unobserved state in an action called from com
         }).not.toThrow()
     })
 
-    mobx.extras.resetGlobalState()
+    mobx._resetGlobalState()
 })
 
 test("should not be possible to change observed state in an action called from computed", () => {
@@ -194,7 +194,7 @@ test("should not be possible to change observed state in an action called from c
         /Computed values are not allowed to cause side effects by changing observables that are already being observed/
     )
 
-    mobx.extras.resetGlobalState()
+    mobx._resetGlobalState()
     d()
 })
 

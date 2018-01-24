@@ -1,8 +1,8 @@
-var m = require("../../")
+var m = require("../../src/mobx.ts")
 var TransformUtils = require("../utils/transform")
 
 test("transform1", function() {
-    m.extras.resetGlobalState()
+    m._resetGlobalState()
     var todoCalc = 0
     var stateCalc = 0
     var state = m.observable({
@@ -171,7 +171,7 @@ test("163 - resetGlobalState should clear cache", function() {
     expect(transformOutputs.length).toBe(2)
     expect(transformOutputs[1]).toBe(transformOutputs[0])
 
-    m.extras.resetGlobalState()
+    m._resetGlobalState()
 
     autorunTrigger.set(3)
     expect(runs).toBe(2)
@@ -1172,7 +1172,7 @@ test("transform tree (dynamic tags - peek / rebuild)", function() {
 
 // https://github.com/mobxjs/mobx/issues/886
 test("transform with primitive key", function() {
-    m.extras.resetGlobalState()
+    m._resetGlobalState()
 
     function Bob() {
         this.num = Math.floor(Math.random() * 1000)

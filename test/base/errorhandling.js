@@ -1,4 +1,4 @@
-var mobx = require("../../")
+var mobx = require("../../src/mobx.ts")
 var m = mobx
 var utils = require("../utils/test-utils")
 
@@ -19,7 +19,7 @@ function buffer() {
 }
 
 function checkGlobalState() {
-    const gs = mobx.extras.getGlobalState()
+    const gs = mobx._getGlobalState()
     expect(gs.isRunningReactions).toBe(false)
     expect(gs.trackingDerivation).toBe(null)
     expect(gs.inBatch).toBe(0)
@@ -66,14 +66,11 @@ test("exception when starting autorun can be recovered from", () => {
         }
     })
 
-    utils.consoleError(
-        () => {
-            mobx.autorun(() => {
-                b = a.y
-            })
-        },
-        /Uhoh/
-    )
+    utils.consoleError(() => {
+        mobx.autorun(() => {
+            b = a.y
+        })
+    }, /Uhoh/)
     expect(b).toBe(undefined)
     checkGlobalState()
     a.x = 3
@@ -99,12 +96,9 @@ test("exception in autorun can be recovered from", () => {
     expect(b).toBe(2)
     expect(mobx.extras.getAtom(a, "y").observers.length).toBe(1)
 
-    utils.consoleError(
-        () => {
-            a.x = 2
-        },
-        /Uhoh/
-    )
+    utils.consoleError(() => {
+        a.x = 2
+    }, /Uhoh/)
 
     // exception is also rethrown to each consumer
     expect(() => {
@@ -183,7 +177,7 @@ test("allow state changes in autorun", function() {
     expect(x.get()).toBe(5)
     expect(z.get()).toBe(5)
 
-    expect(mobx.extras.isComputingDerivation()).toBe(false)
+    expect(mobx._isComputingDerivation()).toBe(false)
     checkGlobalState()
 })
 
@@ -197,11 +191,11 @@ test("deny array change in view", function(done) {
         })
 
         expect(function() {
-            y();
+            y()
         }).toThrow()
 
         expect(z.slice()).toEqual([])
-        expect(mobx.extras.isComputingDerivation()).toBe(false)
+        expect(mobx._isComputingDerivation()).toBe(false)
 
         checkGlobalState()
         done()
@@ -223,7 +217,7 @@ test("allow array change in autorun", function() {
     x.set(2)
     expect(z.slice()).toEqual([5, 6])
 
-    expect(mobx.extras.isComputingDerivation()).toBe(false)
+    expect(mobx._isComputingDerivation()).toBe(false)
     checkGlobalState()
 })
 
@@ -232,12 +226,9 @@ test("throw error if modification loop", function() {
     var dis = m.autorun(function() {
         x.set(x.get() + 1) // is allowed to throw, but doesn't as the observables aren't bound yet during first execution
     })
-    utils.consoleError(
-        () => {
-            x.set(5)
-        },
-        /Reaction doesn't converge to a stable state/
-    )
+    utils.consoleError(() => {
+        x.set(5)
+    }, /Reaction doesn't converge to a stable state/)
     checkGlobalState()
 })
 
@@ -245,12 +236,9 @@ test("cycle1", function() {
     var p = computed(function() {
         return p.get() * 2
     }) // thats a cycle!
-    utils.consoleError(
-        () => {
-            p.observe(voidObserver, true)
-        },
-        /Cycle detected/
-    )
+    utils.consoleError(() => {
+        p.observe(voidObserver, true)
+    }, /Cycle detected/)
     checkGlobalState()
 })
 
@@ -289,12 +277,9 @@ test("cycle4", function() {
     m.observe(b, voidObserver)
     expect(1).toBe(a.get())
 
-    utils.consoleError(
-        () => {
-            z.set(false) // introduces a cycle!
-        },
-        /Cycle detected/
-    )
+    utils.consoleError(() => {
+        z.set(false) // introduces a cycle!
+    }, /Cycle detected/)
     checkGlobalState()
 })
 
@@ -312,7 +297,7 @@ test("throws when the max iterations over reactions are done", () => {
         () => foo.a++,
         /Reaction doesn't converge to a stable state after 100 iterations/
     )
-    mobx.extras.resetGlobalState()
+    mobx._resetGlobalState()
 })
 
 test("issue 86, converging cycles", function() {
@@ -559,12 +544,9 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
 
     test("it should not break internal consistency when exception occurred", () => {
         // Trigger exception
-        utils.consoleError(
-            () => {
-                a.set(2)
-            },
-            /chocolademelk/
-        )
+        utils.consoleError(() => {
+            a.set(2)
+        }, /chocolademelk/)
         expect(r).toBe(2)
 
         expect(a.isPendingUnobservation).toBe(true) // true is a default for optimization

@@ -123,26 +123,26 @@ inherit(StubArray, Array.prototype)
 // Make them writeable and configurable in prototype chain
 // https://github.com/alibaba/weex/pull/1529
 if (Object.isFrozen(Array)) {
-	;[
-		"constructor",
-		"push",
-		"shift",
-		"concat",
-		"pop",
-		"unshift",
-		"replace",
-		"find",
-		"findIndex",
-		"splice",
-		"reverse",
-		"sort"
-	].forEach(function (key) {
-		Object.defineProperty(StubArray.prototype, key, {
-			configurable: true,
-			writable: true,
-			value: Array.prototype[key]
-		})
-	})
+    ;[
+        "constructor",
+        "push",
+        "shift",
+        "concat",
+        "pop",
+        "unshift",
+        "replace",
+        "find",
+        "findIndex",
+        "splice",
+        "reverse",
+        "sort"
+    ].forEach(function(key) {
+        Object.defineProperty(StubArray.prototype, key, {
+            configurable: true,
+            writable: true,
+            value: Array.prototype[key]
+        })
+    })
 }
 
 class ObservableArrayAdministration<T>

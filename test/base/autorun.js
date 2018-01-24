@@ -1,4 +1,4 @@
-var m = require("../../")
+var m = require("../../src/mobx.ts")
 
 test("autorun passes Reaction as an argument to view function", function() {
     var a = m.observable(1)

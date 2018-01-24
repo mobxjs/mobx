@@ -1,4 +1,4 @@
-var mobx = require("../../")
+var mobx = require("../../src/mobx.ts")
 var reaction = mobx.reaction
 
 test("basic", () => {
@@ -94,9 +94,9 @@ test("effect debounce is honored", () => {
             try {
                 expect(values).toEqual([2, 4, 5])
                 expect(exprCount).toBe(4)
-                resolve();
+                resolve()
             } catch (e) {
-                reject(e);
+                reject(e)
             }
         }, 1800)
     })
@@ -131,12 +131,12 @@ test("effect debounce + fire immediately is honored", () => {
                 d()
                 expect(values).toEqual([1, 3, 4])
                 expect(exprCount).toBe(3)
-                resolve();
+                resolve()
             } catch (e) {
-                reject(e);
+                reject(e)
             }
         }, 500)
-    });
+    })
 })
 
 test("passes Reaction as an argument to expression function", () => {

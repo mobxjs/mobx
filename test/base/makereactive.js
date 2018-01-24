@@ -1,4 +1,4 @@
-var mobx = require("../../")
+var mobx = require("../../src/mobx.ts")
 var m = mobx
 var o = mobx.observable
 
@@ -71,7 +71,7 @@ test("isBoxedObservable", function() {
 })
 
 test("observable1", function() {
-    m.extras.resetGlobalState()
+    m._resetGlobalState()
 
     // recursive structure
     var x = m.observable({
@@ -515,11 +515,13 @@ test("exceptions", function() {
         ar = m.observable([m.asStructure(3)])
     }).toThrow()
 
-    return;
+    return
 })
 
 test("540 - extendobservable should not report cycles", function() {
-    expect(() => m.extendObservable(Object.freeze({}), {})).toThrowError(/Cannot make the designated object observable/)
+    expect(() => m.extendObservable(Object.freeze({}), {})).toThrowError(
+        /Cannot make the designated object observable/
+    )
 
     var objWrapper = mobx.observable({
         value: null
@@ -530,7 +532,9 @@ test("540 - extendobservable should not report cycles", function() {
     }
 
     objWrapper.value = obj
-    expect(() => mobx.extendObservable(objWrapper, objWrapper.value)).toThrowError(/extending an object with another observable \(object\) is not supported/)
+    expect(() => mobx.extendObservable(objWrapper, objWrapper.value)).toThrowError(
+        /extending an object with another observable \(object\) is not supported/
+    )
 
     mobx.autorun(() => {
         console.log(objWrapper.name)
@@ -550,7 +554,7 @@ test("mobx 3", () => {
 })
 
 test("computed value", () => {
-    mobx.extras.getGlobalState().mobxGuid = 0
+    mobx._getGlobalState().mobxGuid = 0
     var c = mobx.computed(() => 3)
 
     expect(c.toJSON()).toBe(3)

@@ -380,11 +380,6 @@ declareIterator(ObservableMap.prototype, function() {
     return this.entries()
 })
 
-export function map<V>(initialValues?: IObservableMapInitialValues<V>): ObservableMap<V> {
-    deprecated("`mobx.map` is deprecated, use `new ObservableMap` or `mobx.observable.map` instead")
-    return observable.map<V>(initialValues)
-}
-
 /* 'var' fixes small-build issue */
 export var isObservableMap = createInstanceofPredicate("ObservableMap", ObservableMap) as (
     thing: any
