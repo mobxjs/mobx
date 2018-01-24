@@ -39,8 +39,8 @@ test("observe object and map properties", function() {
 test("observe computed values", function() {
     var events = []
 
-    var v = m.observable(0)
-    var f = m.observable(0)
+    var v = m.observable.box(0)
+    var f = m.observable.box(0)
     var c = m.computed(function() {
         return v.get()
     })

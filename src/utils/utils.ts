@@ -78,8 +78,16 @@ export function isPlainObject(value) {
     return proto === Object.prototype || proto === null
 }
 
-export function objectAssign<T extends object>(target: { [key: string]: never }, clonedSource: T, ...sources: (Partial<T> & object)[]): T;
-export function objectAssign<T extends object>(target: T, ...sources: (Partial<T> & object)[]): T;
+export function canBeMadeObservable(value) {
+    return isObject(value) || Array.isArray(value) || isES6Map(value)
+}
+
+export function objectAssign<T extends object>(
+    target: { [key: string]: never },
+    clonedSource: T,
+    ...sources: (Partial<T> & object)[]
+): T
+export function objectAssign<T extends object>(target: T, ...sources: (Partial<T> & object)[]): T
 export function objectAssign() {
     const res = arguments[0]
     for (let i = 1, l = arguments.length; i < l; i++) {
@@ -194,7 +202,7 @@ export function createInstanceofPredicate<T>(
 }
 
 export function areBothNaN(a: any, b: any): boolean {
-    return (typeof a === "number" && typeof b === "number" && isNaN(a) && isNaN(b));
+    return typeof a === "number" && typeof b === "number" && isNaN(a) && isNaN(b)
 }
 
 /**
@@ -214,12 +222,12 @@ export function isES6Map(thing): boolean {
 }
 
 export function getMapLikeKeys<V>(map: ObservableMap<V> | IKeyValueMap<V> | any): string[] {
-	let keys;
-	if (isPlainObject(map)) keys = Object.keys(map)
-	else if (Array.isArray(map)) keys = map.map(([key]) => key)
-	else if (isMapLike(map)) keys = (Array as any).from(map.keys())
-	else fail("Cannot get keys from " + map)
-	return keys;
+    let keys
+    if (isPlainObject(map)) keys = Object.keys(map)
+    else if (Array.isArray(map)) keys = map.map(([key]) => key)
+    else if (isMapLike(map)) keys = (Array as any).from(map.keys())
+    else fail("Cannot get keys from " + map)
+    return keys
 }
 
 declare var Symbol

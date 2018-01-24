@@ -14,13 +14,13 @@ test("autorun 1", function(done) {
         _cCalcs = 0
     }
 
-    var a = m.observable(2)
-    var b = m.observable(3)
+    var a = m.observable.box(2)
+    var b = m.observable.box(3)
     var c = m.computed(function() {
         _cCalcs++
         return a.get() * b.get()
     })
-    var d = m.observable(1)
+    var d = m.observable.box(1)
     var autorun = function() {
         _fired++
         _result = d.get() > 0 ? a.get() * c.get() : d.get()
@@ -107,7 +107,7 @@ test("autorun should not result in loop", function(done) {
 })
 
 test("autorunAsync passes Reaction as an argument to view function", function(done) {
-    var a = m.observable(1)
+    var a = m.observable.box(1)
 
     var autoRunsCalled = 0
 

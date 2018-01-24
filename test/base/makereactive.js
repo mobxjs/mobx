@@ -29,7 +29,7 @@ test("isObservable", function() {
 
     expect(m.isObservable(m.observable([]))).toBe(true)
     expect(m.isObservable(m.observable({}))).toBe(true)
-    expect(m.isObservable(m.observable(function() {}))).toBe(true)
+    expect(m.isObservable(m.observable.box(function() {}))).toBe(true)
     expect(m.isObservable(m.computed(function() {}))).toBe(true)
 
     expect(m.isObservable([])).toBe(false)
@@ -37,15 +37,15 @@ test("isObservable", function() {
     expect(m.isObservable(function() {})).toBe(false)
 
     expect(m.isObservable(new Order())).toBe(false)
-    expect(m.isObservable(m.observable(new Order()))).toBe(true)
+    expect(m.isObservable(m.observable.box(new Order()))).toBe(true)
 
     expect(m.isObservable(new ReactiveOrder())).toBe(true)
-    expect(m.isObservable(m.observable(3))).toBe(true)
+    expect(m.isObservable(m.observable.box(3))).toBe(true)
 
     var obj = {}
     expect(m.isObservable(obj)).toBe(false)
 
-    expect(m.isObservable(m.observable(function() {}))).toBe(true)
+    expect(m.isObservable(m.observable.box(function() {}))).toBe(true)
     expect(m.isObservable(m.autorun(function() {}))).toBe(true)
 
     expect(m.isObservable(m.observable({ a: 1 }), "a")).toBe(true)
@@ -64,7 +64,7 @@ test("isObservable", function() {
 test("isBoxedObservable", function() {
     expect(m.isBoxedObservable(m.observable({}))).toBe(false)
     expect(m.isBoxedObservable(m.computed(() => 3))).toBe(false)
-    expect(m.isBoxedObservable(m.observable(3))).toBe(true)
+    expect(m.isBoxedObservable(m.observable.box(3))).toBe(true)
     expect(m.isBoxedObservable(m.observable.box(3))).toBe(true)
     expect(m.isBoxedObservable(m.observable.box({}))).toBe(true)
     expect(m.isBoxedObservable(m.observable.shallowBox({}))).toBe(true)
@@ -197,7 +197,7 @@ test("observable5", function() {
     }).toThrow()
 
     var f = function() {}
-    var x2 = m.observable(f)
+    var x2 = m.observable.box(f)
     expect(x2.get()).toBe(f)
     x2.set(null) // allowed
 

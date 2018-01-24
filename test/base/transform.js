@@ -78,7 +78,7 @@ test("createTransformer as off-instance computed", () => {
     var runs = 0
 
     // observable in closure
-    var capitalize = m.observable(false)
+    var capitalize = m.observable.box(false)
 
     var _computeDisplayName = person => {
         runs++ // count the runs
@@ -157,7 +157,7 @@ test("163 - resetGlobalState should clear cache", function() {
     var doubleTransformer = m.createTransformer(doubler)
     var a = { value: 2 }
 
-    var autorunTrigger = m.observable(1)
+    var autorunTrigger = m.observable.box(1)
     var transformOutputs = []
 
     m.autorun(function() {

@@ -278,7 +278,7 @@ test("#285 class instances with toJS", () => {
 })
 
 test("#285 non-mobx class instances with toJS", () => {
-    const nameObservable = mobx.observable("weststrate")
+    const nameObservable = mobx.observable.box("weststrate")
     function Person() {
         this.firstName = "michel"
         this.lastName = nameObservable

@@ -2,7 +2,7 @@ var mobx = require("../../src/mobx.ts")
 var reaction = mobx.reaction
 
 test("basic", () => {
-    var a = mobx.observable(1)
+    var a = mobx.observable.box(1)
     var values = []
 
     var d = reaction(
@@ -21,7 +21,7 @@ test("basic", () => {
 })
 
 test("effect fireImmediately is honored", () => {
-    var a = mobx.observable(1)
+    var a = mobx.observable.box(1)
     var values = []
 
     var d = reaction(
@@ -41,8 +41,8 @@ test("effect fireImmediately is honored", () => {
 })
 
 test("effect is untracked", () => {
-    var a = mobx.observable(1)
-    var b = mobx.observable(2)
+    var a = mobx.observable.box(1)
+    var b = mobx.observable.box(2)
     var values = []
 
     var d = reaction(
@@ -66,7 +66,7 @@ test("effect debounce is honored", () => {
     expect.assertions(2)
 
     return new Promise((resolve, reject) => {
-        var a = mobx.observable(1)
+        var a = mobx.observable.box(1)
         var values = []
         var exprCount = 0
 
@@ -105,7 +105,7 @@ test("effect debounce is honored", () => {
 test("effect debounce + fire immediately is honored", () => {
     expect.assertions(2)
     return new Promise((resolve, reject) => {
-        var a = mobx.observable(1)
+        var a = mobx.observable.box(1)
         var values = []
         var exprCount = 0
 
@@ -140,7 +140,7 @@ test("effect debounce + fire immediately is honored", () => {
 })
 
 test("passes Reaction as an argument to expression function", () => {
-    var a = mobx.observable(1)
+    var a = mobx.observable.box(1)
     var values = []
 
     reaction(
@@ -164,7 +164,7 @@ test("passes Reaction as an argument to expression function", () => {
 })
 
 test("passes Reaction as an argument to effect function", () => {
-    var a = mobx.observable(1)
+    var a = mobx.observable.box(1)
     var values = []
 
     reaction(
@@ -186,7 +186,7 @@ test("passes Reaction as an argument to effect function", () => {
 })
 
 test("can dispose reaction on first run", () => {
-    var a = mobx.observable(1)
+    var a = mobx.observable.box(1)
 
     var valuesExpr1st = []
     reaction(
@@ -240,7 +240,7 @@ test("can dispose reaction on first run", () => {
 })
 
 test("#278 do not rerun if expr output doesn't change", () => {
-    var a = mobx.observable(1)
+    var a = mobx.observable.box(1)
     var values = []
 
     var d = reaction(
@@ -305,7 +305,7 @@ test("#278 do not rerun if expr output doesn't change structurally", () => {
 })
 
 test("do not rerun if prev & next expr output is NaN", () => {
-    var v = mobx.observable("a")
+    var v = mobx.observable.box("a")
     var values = []
     var valuesS = []
 
@@ -337,7 +337,7 @@ test("do not rerun if prev & next expr output is NaN", () => {
 })
 
 test("reaction uses equals", () => {
-    const o = mobx.observable("a")
+    const o = mobx.observable.box("a")
     const values = []
     const disposeReaction = mobx.reaction(
         () => o.get(),
@@ -362,8 +362,8 @@ test("reaction equals function only invoked when necessary", () => {
         return from === to
     }
 
-    const left = mobx.observable("A")
-    const right = mobx.observable("B")
+    const left = mobx.observable.box("A")
+    const right = mobx.observable.box("B")
 
     const values = []
     const disposeReaction = mobx.reaction(

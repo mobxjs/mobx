@@ -32,7 +32,7 @@ module.exports.testSet = function() {
 
     var TreeNode = (testSet.TreeNode = function(name, extensions) {
         this.children = m.observable.array()
-        this.icon = m.observable("folder")
+        this.icon = m.observable.box("folder")
 
         this.parent = null // not observed
         this.name = name // not observed

@@ -33,7 +33,7 @@ test("spy output", () => {
 })
 
 function doStuff() {
-    var a = mobx.observable(2)
+    var a = mobx.observable.box(2)
     a.set(3)
 
     var b = mobx.observable({

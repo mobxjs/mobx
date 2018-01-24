@@ -2,7 +2,7 @@ var m = require("../../src/mobx.ts")
 var intercept = m.intercept
 
 test("intercept observable value", () => {
-    var a = m.observable(1)
+    var a = m.observable.box(1)
 
     var d = intercept(a, () => {
         return null

@@ -3,8 +3,8 @@ var m = require("../../src/mobx.ts")
 test("untracked 1", function() {
     var cCalcs = 0,
         dCalcs = 0
-    var a = m.observable(1)
-    var b = m.observable(2)
+    var a = m.observable.box(1)
+    var b = m.observable.box(2)
     var c = m.computed(function() {
         cCalcs++
         return (

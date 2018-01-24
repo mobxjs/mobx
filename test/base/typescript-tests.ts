@@ -24,7 +24,7 @@ import {
 } from "../../src/mobx"
 import * as mobx from "../../src/mobx"
 
-var v = observable(3)
+var v = observable.box(3)
 observe(v, () => {})
 
 var a = observable([1, 2, 3])
@@ -95,7 +95,7 @@ test("decorators", () => {
 })
 
 test("observable", () => {
-    var a = observable(3)
+    var a = observable.box(3)
     var b = computed(() => a.get() * 2)
     t.equal(b.get(), 6)
 })
@@ -185,7 +185,7 @@ test("typing", () => {
         // console.log(d.type)
     })
 
-    var x: IObservableValue<number> = observable(3)
+    var x: IObservableValue<number> = observable.box(3)
 
     var d2 = autorunAsync(function() {})
 })

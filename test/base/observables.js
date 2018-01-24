@@ -20,14 +20,14 @@ function buffer() {
 }
 
 test("argumentless observable", () => {
-    var a = observable()
+    var a = observable.box()
 
     expect(m.isObservable(a)).toBe(true)
     expect(a.get()).toBe(undefined)
 })
 
 test("basic", function() {
-    var x = observable(3)
+    var x = observable.box(3)
     var b = buffer()
     m.observe(x, b)
     expect(3).toBe(x.get())
@@ -39,7 +39,7 @@ test("basic", function() {
 })
 
 test("basic2", function() {
-    var x = observable(3)
+    var x = observable.box(3)
     var z = computed(function() {
         return x.get() * 2
     })
@@ -61,8 +61,8 @@ test("basic2", function() {
 
 test("computed with asStructure modifier", function(done) {
     try {
-        var x1 = observable(3)
-        var x2 = observable(5)
+        var x1 = observable.box(3)
+        var x2 = observable.box(5)
         var y = m.computed(
             function() {
                 return {
@@ -96,7 +96,7 @@ test("computed with asStructure modifier", function(done) {
 
 test("dynamic", function(done) {
     try {
-        var x = observable(3)
+        var x = observable.box(3)
         var y = m.computed(function() {
             return x.get()
         })
@@ -119,7 +119,7 @@ test("dynamic", function(done) {
 
 test("dynamic2", function(done) {
     try {
-        var x = observable(3)
+        var x = observable.box(3)
         var y = computed(function() {
             return x.get() * x.get()
         })
@@ -145,9 +145,9 @@ test("readme1", function(done) {
     try {
         var b = buffer()
 
-        var vat = observable(0.2)
+        var vat = observable.box(0.2)
         var order = {}
-        order.price = observable(10)
+        order.price = observable.box(10)
         // Prints: New price: 24
         //in TS, just: value(() => this.price() * (1+vat()))
         order.priceWithVat = computed(function() {
@@ -170,8 +170,8 @@ test("readme1", function(done) {
 })
 
 test("batch", function() {
-    var a = observable(2)
-    var b = observable(3)
+    var a = observable.box(2)
+    var b = observable.box(3)
     var c = computed(function() {
         return a.get() * b.get()
     })
@@ -200,7 +200,7 @@ test("batch", function() {
 })
 
 test("transaction with inspection", function() {
-    var a = observable(2)
+    var a = observable.box(2)
     var calcs = 0
     var b = computed(function() {
         calcs++
@@ -227,7 +227,7 @@ test("transaction with inspection", function() {
 })
 
 test("transaction with inspection 2", function() {
-    var a = observable(2)
+    var a = observable.box(2)
     var calcs = 0
     var b
     mobx.autorun(function() {
@@ -255,10 +255,10 @@ test("transaction with inspection 2", function() {
 })
 
 test("scope", function() {
-    var vat = observable(0.2)
+    var vat = observable.box(0.2)
     var Order = function() {
-        this.price = observable(20)
-        this.amount = observable(2)
+        this.price = observable.box(20)
+        this.amount = observable.box(2)
         this.total = computed(
             function() {
                 return (1 + vat.get()) * this.price.get() * this.amount.get()
@@ -276,7 +276,7 @@ test("scope", function() {
 })
 
 test("props1", function() {
-    var vat = observable(0.2)
+    var vat = observable.box(0.2)
     var Order = function() {
         mobx.extendObservable(this, {
             price: 20,
@@ -306,7 +306,7 @@ test("props1", function() {
 })
 
 test("props2", function() {
-    var vat = observable(0.2)
+    var vat = observable.box(0.2)
     var Order = function() {
         mobx.extendObservable(this, {
             price: 20,
@@ -325,7 +325,7 @@ test("props2", function() {
 })
 
 test("props3", function() {
-    var vat = observable(0.2)
+    var vat = observable.box(0.2)
     var Order = function() {
         this.price = 20
         this.amount = 2
@@ -560,7 +560,7 @@ test("mobx.observe", function() {
 test("change count optimization", function() {
     var bCalcs = 0
     var cCalcs = 0
-    var a = observable(3)
+    var a = observable.box(3)
     var b = computed(function() {
         bCalcs += 1
         return 4 + a.get() - a.get()
@@ -589,8 +589,8 @@ test("change count optimization", function() {
 
 test("observables removed", function() {
     var calcs = 0
-    var a = observable(1)
-    var b = observable(2)
+    var a = observable.box(1)
+    var b = observable.box(2)
     var c = computed(function() {
         calcs++
         if (a.get() === 1) return b.get() * a.get() * b.get()
@@ -622,7 +622,7 @@ test("lazy evaluation", function() {
     var dCalcs = 0
     var observerChanges = 0
 
-    var a = observable(1)
+    var a = observable.box(1)
     var b = computed(function() {
         bCalcs += 1
         return a.get() + 1
@@ -697,12 +697,12 @@ test("lazy evaluation", function() {
 test("multiple view dependencies", function() {
     var bCalcs = 0
     var dCalcs = 0
-    var a = observable(1)
+    var a = observable.box(1)
     var b = computed(function() {
         bCalcs++
         return 2 * a.get()
     })
-    var c = observable(2)
+    var c = observable.box(2)
     var d = computed(function() {
         dCalcs++
         return 3 * c.get()
@@ -739,8 +739,8 @@ test("multiple view dependencies", function() {
 })
 
 test("nested observable2", function() {
-    var factor = observable(0)
-    var price = observable(100)
+    var factor = observable.box(0)
+    var price = observable.box(100)
     var totalCalcs = 0
     var innerCalcs = 0
 
@@ -777,8 +777,8 @@ test("nested observable2", function() {
 })
 
 test("expr", function() {
-    var factor = observable(0)
-    var price = observable(100)
+    var factor = observable.box(0)
+    var price = observable.box(100)
     var totalCalcs = 0
     var innerCalcs = 0
 
@@ -815,7 +815,7 @@ test("expr", function() {
 })
 
 test("observe", function() {
-    var x = observable(3)
+    var x = observable.box(3)
     var x2 = computed(function() {
         return x.get() * 2
     })
@@ -834,7 +834,7 @@ test("observe", function() {
 })
 
 test("when", function() {
-    var x = observable(3)
+    var x = observable.box(3)
 
     var called = 0
     mobx.when(
@@ -857,7 +857,7 @@ test("when", function() {
 })
 
 test("when 2", function() {
-    var x = observable(3)
+    var x = observable.box(3)
 
     var called = 0
     var d = mobx.when(
@@ -880,8 +880,8 @@ test("when 2", function() {
 })
 
 test("expr2", function() {
-    var factor = observable(0)
-    var price = observable(100)
+    var factor = observable.box(0)
+    var price = observable.box(100)
     var totalCalcs = 0
     var innerCalcs = 0
 
@@ -1130,7 +1130,7 @@ test("delay autorun until end of transaction", function() {
 })
 
 test("prematurely end autorun", function() {
-    var x = observable(2)
+    var x = observable.box(2)
     var dis1, dis2
     mobx.transaction(function() {
         dis1 = mobx.autorun(function() {
@@ -1158,8 +1158,8 @@ test("prematurely end autorun", function() {
 })
 
 test("computed values believe NaN === NaN", function() {
-    var a = observable(2)
-    var b = observable(3)
+    var a = observable.box(2)
+    var b = observable.box(3)
     var c = computed(function() {
         return String(a.get() * b.get())
     })
@@ -1314,7 +1314,7 @@ test("eval in transaction", function() {
 })
 
 test("forcefully tracked reaction should still yield valid results", function() {
-    var x = observable(3)
+    var x = observable.box(3)
     var z
     var runCount = 0
     var identity = function() {
@@ -1358,7 +1358,7 @@ test("forcefully tracked reaction should still yield valid results", function() 
 })
 
 test("autoruns created in autoruns should kick off", function() {
-    var x = observable(3)
+    var x = observable.box(3)
     var x2 = []
     var d
 
@@ -1387,7 +1387,7 @@ test("#502 extendObservable throws on objects created with Object.create(null)",
 })
 
 test("#328 atom throwing exception if observing stuff in onObserved", () => {
-    var b = mobx.observable(1)
+    var b = mobx.observable.box(1)
     var a = new mobx.Atom("test atom", () => {
         b.get()
     })
@@ -1398,9 +1398,9 @@ test("#328 atom throwing exception if observing stuff in onObserved", () => {
 })
 
 test("prematurely ended autoruns are cleaned up properly", () => {
-    var a = mobx.observable(1)
-    var b = mobx.observable(2)
-    var c = mobx.observable(3)
+    var a = mobx.observable.box(1)
+    var b = mobx.observable.box(2)
+    var c = mobx.observable.box(3)
     var called = 0
 
     var d = mobx.autorun(() => {
@@ -1430,8 +1430,8 @@ test("prematurely ended autoruns are cleaned up properly", () => {
 })
 
 test("unoptimizable subscriptions are diffed correctly", () => {
-    var a = mobx.observable(1)
-    var b = mobx.observable(1)
+    var a = mobx.observable.box(1)
+    var b = mobx.observable.box(1)
     var c = mobx.computed(() => {
         a.get()
         return 3
@@ -1529,7 +1529,7 @@ test("atom events #427", () => {
 
 test("verify calculation count", () => {
     var calcs = []
-    var a = observable(1)
+    var a = observable.box(1)
     var b = mobx.computed(() => {
         calcs.push("b")
         return a.get()
@@ -1688,7 +1688,7 @@ test("helpful error for self referencing setter", function() {
 
 test("#558 boxed observables stay boxed observables", function() {
     var a = observable({
-        x: observable(3)
+        x: observable.box(3)
     })
 
     expect(typeof a.x).toBe("object")
@@ -1696,7 +1696,7 @@ test("#558 boxed observables stay boxed observables", function() {
 })
 
 test("iscomputed", function() {
-    expect(mobx.isComputed(observable(3))).toBe(false)
+    expect(mobx.isComputed(observable.box(3))).toBe(false)
     expect(
         mobx.isComputed(
             mobx.computed(function() {
@@ -1717,7 +1717,7 @@ test("iscomputed", function() {
 })
 
 test("603 - transaction should not kill reactions", () => {
-    var a = observable(1)
+    var a = observable.box(1)
     var b = 1
     var d = mobx.autorun(() => {
         b = a.get()
@@ -1745,7 +1745,7 @@ test("603 - transaction should not kill reactions", () => {
 
 test("#561 test toPrimitive() of observable objects", function() {
     if (typeof Symbol !== "undefined" && Symbol.toPrimitive) {
-        var x = observable(3)
+        var x = observable.box(3)
 
         expect(x.valueOf()).toBe(3)
         expect(x[Symbol.toPrimitive]()).toBe(3)
@@ -1753,14 +1753,14 @@ test("#561 test toPrimitive() of observable objects", function() {
         expect(+x).toBe(3)
         expect(++x).toBe(4)
 
-        var y = observable(3)
+        var y = observable.box(3)
 
         expect(y + 7).toBe(10)
 
         var z = computed(() => ({ a: 3 }))
         expect(3 + z).toBe("3[object Object]")
     } else {
-        var x = observable(3)
+        var x = observable.box(3)
 
         expect(x.valueOf()).toBe(3)
         expect(x["@@toPrimitive"]()).toBe(3)
@@ -1768,7 +1768,7 @@ test("#561 test toPrimitive() of observable objects", function() {
         expect(+x).toBe(3)
         expect(++x).toBe(4)
 
-        var y = observable(3)
+        var y = observable.box(3)
 
         expect(y + 7).toBe(10)
 
@@ -1795,8 +1795,8 @@ test("computed equals function only invoked when necessary", () => {
         return from === to
     }
 
-    const left = mobx.observable("A")
-    const right = mobx.observable("B")
+    const left = mobx.observable.box("A")
+    const right = mobx.observable.box("B")
     const combinedToLowerCase = mobx.computed(
         () => left.get().toLowerCase() + right.get().toLowerCase(),
         { equals: loggingComparer }

@@ -4,7 +4,7 @@ var m = mobx
 test("treeD", function() {
     m._resetGlobalState()
     mobx._getGlobalState().mobxGuid = 0
-    var a = m.observable(3)
+    var a = m.observable.box(3)
     var aName = "ObservableValue@1"
 
     var dtree = m.getDependencyTree
@@ -142,7 +142,7 @@ test("spy 1", function() {
     m._resetGlobalState()
     var lines = []
 
-    var a = m.observable(3)
+    var a = m.observable.box(3)
     var b = m.computed(function() {
         return a.get() * 2
     })
@@ -175,7 +175,7 @@ test("get atom", function() {
         })
     }
 
-    var a = mobx.observable(3)
+    var a = mobx.observable.box(3)
     var b = mobx.observable({ a: 3 })
     var c = mobx.observable.map({ a: 3 })
     var d = mobx.observable([1, 2])
@@ -187,7 +187,7 @@ test("get atom", function() {
         return mobx.getAtom(thing, prop).constructor.name
     }
 
-    var ovClassName = mobx.observable(3).constructor.name
+    var ovClassName = mobx.observable.box(3).constructor.name
     var atomClassName = mobx.BaseAtom.name
     var reactionClassName = mobx.Reaction.name
 
@@ -228,7 +228,7 @@ test("get debug name", function() {
         })
     }
 
-    var a = mobx.observable(3)
+    var a = mobx.observable.box(3)
     var b = mobx.observable({ a: 3 })
     var c = mobx.observable.map({ a: 3 })
     var d = mobx.observable([1, 2])
@@ -280,7 +280,7 @@ test("get administration", function() {
         })
     }
 
-    var a = mobx.observable(3)
+    var a = mobx.observable.box(3)
     var b = mobx.observable({ a: 3 })
     var c = mobx.observable.map({ a: 3 })
     var d = mobx.observable([1, 2])
@@ -292,7 +292,7 @@ test("get administration", function() {
         return mobx._getAdministration(thing, prop).constructor.name
     }
 
-    var ovClassName = mobx.observable(3).constructor.name
+    var ovClassName = mobx.observable.box(3).constructor.name
 
     expect(adm(a)).toBe(ovClassName)
 

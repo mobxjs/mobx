@@ -119,7 +119,7 @@ test("exception in autorun can be recovered from", () => {
 })
 
 test("multiple autoruns with exceptions are handled correctly", () => {
-    var a = mobx.observable(1)
+    var a = mobx.observable.box(1)
     var values = []
     var d1 = mobx.autorun(() => values.push("a" + a.get()))
     var d2 = mobx.autorun(() => {
@@ -147,8 +147,8 @@ test("multiple autoruns with exceptions are handled correctly", () => {
 })
 
 test("deny state changes in views", function() {
-    var x = observable(3)
-    var z = observable(5)
+    var x = observable.box(3)
+    var z = observable.box(5)
     var y = computed(function() {
         z(6)
         return x() * x()
@@ -162,8 +162,8 @@ test("deny state changes in views", function() {
 })
 
 test("allow state changes in autorun", function() {
-    var x = observable(3)
-    var z = observable(3)
+    var x = observable.box(3)
+    var z = observable.box(3)
 
     m.autorun(function() {
         if (x.get() !== 3) z.set(x.get())
@@ -183,7 +183,7 @@ test("allow state changes in autorun", function() {
 
 test("deny array change in view", function(done) {
     try {
-        var x = observable(3)
+        var x = observable.box(3)
         var z = observable([])
         var y = computed(function() {
             z.push(3)
@@ -205,7 +205,7 @@ test("deny array change in view", function(done) {
 })
 
 test("allow array change in autorun", function() {
-    var x = observable(3)
+    var x = observable.box(3)
     var z = observable([])
     var y = m.autorun(function() {
         if (x.get() > 4) z.push(x.get())
@@ -222,7 +222,7 @@ test("allow array change in autorun", function() {
 })
 
 test("throw error if modification loop", function() {
-    var x = observable(3)
+    var x = observable.box(3)
     var dis = m.autorun(function() {
         x.set(x.get() + 1) // is allowed to throw, but doesn't as the observables aren't bound yet during first execution
     })
@@ -266,7 +266,7 @@ test("cycle3", function() {
 })
 
 test("cycle4", function() {
-    var z = observable(true)
+    var z = observable.box(true)
     var a = computed(function() {
         return z.get() ? 1 : b.get() * 2
     })
@@ -306,7 +306,7 @@ test("issue 86, converging cycles", function() {
         return -1
     }
 
-    const deleteThisId = mobx.observable(1)
+    const deleteThisId = mobx.observable.box(1)
     const state = mobx.observable({ someArray: [] })
     var calcs = 0
 
@@ -331,7 +331,7 @@ test("issue 86, converging cycles", function() {
 })
 
 test("slow converging cycle", function() {
-    var x = mobx.observable(1)
+    var x = mobx.observable.box(1)
     var res = -1
     mobx.autorun(() => {
         if (x.get() === 100) res = x.get()
@@ -370,7 +370,7 @@ test("error handling assistence ", function(done) {
         warns.push(msg)
     }
 
-    var a = observable(3)
+    var a = observable.box(3)
     var b = computed(function() {
         if (a.get() === 42) throw "should not be 42"
         return a.get() * 2
@@ -464,7 +464,7 @@ test("236 - cycles", () => {
 })
 
 test("peeking inside erroring computed value doesn't bork (global) state", () => {
-    const a = mobx.observable(1)
+    const a = mobx.observable.box(1)
     const b = mobx.computed(() => {
         a.get()
         throw "chocolademelk"
@@ -499,7 +499,7 @@ test("peeking inside erroring computed value doesn't bork (global) state", () =>
 
 describe("peeking inside autorun doesn't bork (global) state", () => {
     var r = -1
-    const a = mobx.observable(1)
+    const a = mobx.observable.box(1)
     const b = mobx.computed(() => {
         const res = (r = a.get())
         if (res === 2) throw "chocolademelk"
@@ -653,7 +653,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
     })
 
     test("it should be possible to handle exceptions in reaction", () => {
-        const a = mobx.observable(1)
+        const a = mobx.observable.box(1)
         const d = mobx.autorun(function() {
             throw a.get()
         })
@@ -671,7 +671,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
     })
 
     test("it should be possible to handle global errors in reactions", () => {
-        const a = mobx.observable(1)
+        const a = mobx.observable.box(1)
         const errors = []
         const d2 = mobx.onReactionError(e => errors.push(e))
 

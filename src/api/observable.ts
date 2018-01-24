@@ -45,27 +45,18 @@ function createObservable(v: any = undefined) {
     if (res !== v) return res
 
     // otherwise, just box it
-    return observable.box(v)
+    fail(
+        `The provided value could not be converted into an observable. If you want just create an observable reference to the object use 'observable.box(value)'`
+    )
 }
 
 export interface IObservableFactory {
     // observable overloads
-    <T>(): IObservableValue<T>
     <T>(wrapped: IModifierDescriptor<T>): T
     (target: Object, key: string, baseDescriptor?: PropertyDescriptor): any
     <T>(value: T[]): IObservableArray<T>
-    (value: string): IObservableValue<string>
-    (value: boolean): IObservableValue<boolean>
-    (value: number): IObservableValue<number>
-    (value: Date): IObservableValue<Date>
-    (value: RegExp): IObservableValue<RegExp>
-    (value: Function): IObservableValue<Function>
-    <T>(value: null | undefined): IObservableValue<T>
-    (value: null | undefined): IObservableValue<any>
-    (): IObservableValue<any>
     <T>(value: IMap<string | number | boolean, T>): ObservableMap<T>
     <T extends Object>(value: T): T & IObservableObject
-    <T>(value: T): IObservableValue<T>
 }
 
 export interface IObservableFactories {
@@ -82,7 +73,7 @@ export interface IObservableFactories {
      * Decorator that creates an observable that only observes the references, but doesn't try to turn the assigned value into an observable.ts.
      */
     ref(target: Object, property: string, descriptor?: PropertyDescriptor): any
-    ref<T>(initialValue: T): T;
+    ref<T>(initialValue: T): T
 
     /**
      * Decorator that creates an observable converts its value (objects, maps or arrays) into a shallow observable structure

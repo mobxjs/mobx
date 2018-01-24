@@ -3,7 +3,7 @@ var mobx = require("../../src/mobx.ts")
 var strictError = /Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: /
 
 test("strict mode should not allow changes outside action", () => {
-    var a = mobx.observable(2)
+    var a = mobx.observable.box(2)
     mobx.useStrict(true)
 
     // allowed, a is not observed
@@ -20,13 +20,13 @@ test("strict mode should not allow changes outside action", () => {
 })
 
 test("actions can modify observed state in strict mode", () => {
-    var a = mobx.observable(2)
+    var a = mobx.observable.box(2)
     var d = mobx.autorun(() => a.get())
 
     mobx.useStrict(true)
     mobx.action(() => {
         a.set(3)
-        var b = mobx.observable(4)
+        var b = mobx.observable.box(4)
     })()
 
     mobx.useStrict(false)
@@ -34,20 +34,20 @@ test("actions can modify observed state in strict mode", () => {
 })
 
 test("actions can modify non-observed state in strict mode", () => {
-    var a = mobx.observable(2)
+    var a = mobx.observable.box(2)
 
     mobx.useStrict(true)
     mobx.action(() => {
         a.set(3)
-        var b = mobx.observable(4)
+        var b = mobx.observable.box(4)
     })()
 
     mobx.useStrict(false)
 })
 
 test("reactions cannot modify state in strict mode", () => {
-    var a = mobx.observable(3)
-    var b = mobx.observable(4)
+    var a = mobx.observable.box(3)
+    var b = mobx.observable.box(4)
     mobx.useStrict(true)
     mobx._resetGlobalState() // should preserve strict mode
 
@@ -76,8 +76,8 @@ test("reactions cannot modify state in strict mode", () => {
 })
 
 test("action inside reaction in strict mode can modify state", () => {
-    var a = mobx.observable(1)
-    var b = mobx.observable(2)
+    var a = mobx.observable.box(1)
+    var b = mobx.observable.box(2)
 
     var bd = mobx.autorun(() => {
         b.get() // make sure it is observed
@@ -164,7 +164,7 @@ test("can create objects in strict mode with action", () => {
 })
 
 test("strict mode checks", function() {
-    var x = mobx.observable(3)
+    var x = mobx.observable.box(3)
     var d = mobx.autorun(() => x.get())
 
     mobx._allowStateChanges(false, function() {
