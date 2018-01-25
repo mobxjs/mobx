@@ -88,7 +88,7 @@ export { action, isAction, runInAction, IActionFactory } from "./api/action"
 export { expr } from "./api/expr"
 export { toJS } from "./api/tojs"
 export { ITransformer, createTransformer } from "./api/createtransformer"
-export { whyRun } from "./api/whyrun"
+export { whyRun, trace } from "./api/whyrun"
 
 export { Lambda, isArrayLike } from "./utils/utils"
 export { Iterator } from "./utils/iterable"

@@ -16,7 +16,8 @@ import {
     untrackedEnd,
     shouldCompute,
     CaughtException,
-    isCaughtException
+    isCaughtException,
+    TraceMode
 } from "./derivation"
 import { globalState } from "./globalstate"
 import { createAction } from "./action"
@@ -63,7 +64,7 @@ export interface IComputedValue<T> {
  */
 export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDerivation {
     dependenciesState = IDerivationState.NOT_TRACKING
-    observing = [] // nodes we are looking at. Our value depends on these nodes
+    observing: IObservable[] = [] // nodes we are looking at. Our value depends on these nodes
     newObserving = null // during tracking it's an array with new observed observers
 
     isPendingUnobservation: boolean = false
@@ -80,6 +81,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     isComputing: boolean = false // to check for cycles
     isRunningSetter: boolean = false
     setter: (value: T) => void
+    isTracing: TraceMode = TraceMode.NONE
 
     /**
      * Create a new computed value based on a function expression.
@@ -110,7 +112,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
     onBecomeUnobserved() {
         clearObserving(this)
-        this.value = undefined;
+        this.value = undefined
     }
 
     /**
@@ -172,7 +174,8 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             })
         }
         const oldValue = this.value
-        const wasSuspended = /* see #1208 */ this.dependenciesState === IDerivationState.NOT_TRACKING;
+        const wasSuspended =
+            /* see #1208 */ this.dependenciesState === IDerivationState.NOT_TRACKING
         const newValue = (this.value = this.computeValue(true))
         return (
             wasSuspended ||

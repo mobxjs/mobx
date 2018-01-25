@@ -4,7 +4,8 @@ import {
     trackDerivedFunction,
     clearObserving,
     shouldCompute,
-    isCaughtException
+    isCaughtException,
+    TraceMode
 } from "./derivation"
 import { IObservable, startBatch, endBatch } from "./observable"
 import { globalState } from "./globalstate"
@@ -59,6 +60,7 @@ export class Reaction implements IDerivation, IReactionPublic {
     _isScheduled = false
     _isTrackPending = false
     _isRunning = false
+    isTracing: TraceMode = TraceMode.NONE
     errorHandler: (error: any, derivation: IDerivation) => void
 
     constructor(
