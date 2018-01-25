@@ -1,4 +1,4 @@
-import { getGlobal, deprecated } from "../utils/utils"
+import { getGlobal, deprecated, fail } from "../utils/utils"
 import { IDerivation } from "./derivation"
 import { Reaction } from "./reaction"
 import { IObservable } from "./observable"
