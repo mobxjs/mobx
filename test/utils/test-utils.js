@@ -18,4 +18,15 @@ exports.consoleError = function(block, regex) {
     expect(messages).toMatch(regex)
 }
 
-// TODO: move check globalState, cleanSpyEvents to here.
+exports.supressConsole = function(block) {
+    const { warn, error } = console
+    Object.assign(console, {
+        warn() {},
+        error() {}
+    })
+    try {
+        block()
+    } finally {
+        Object.assign(console, { warn, error })
+    }
+}

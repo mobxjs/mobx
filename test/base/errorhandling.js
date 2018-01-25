@@ -362,11 +362,9 @@ test("error handling assistence ", function(done) {
     var thrown = [] // list of actually thrown exceptons
 
     console.error = function(msg) {
-        baseError.apply(console, arguments)
         errors.push(msg)
     }
     console.warn = function(msg) {
-        baseWarn.apply(console, arguments)
         warns.push(msg)
     }
 
@@ -653,41 +651,45 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
     })
 
     test("it should be possible to handle exceptions in reaction", () => {
-        const a = mobx.observable.box(1)
-        const d = mobx.autorun(function() {
-            throw a.get()
+        utils.supressConsole(() => {
+            const a = mobx.observable.box(1)
+            const d = mobx.autorun(function() {
+                throw a.get()
+            })
+
+            const errors = []
+            d.onError(e => errors.push(e))
+
+            a.set(2)
+            a.set(3)
+
+            expect(errors).toEqual([2, 3])
+            d()
+
+            checkGlobalState()
         })
-
-        const errors = []
-        d.onError(e => errors.push(e))
-
-        a.set(2)
-        a.set(3)
-
-        expect(errors).toEqual([2, 3])
-        d()
-
-        checkGlobalState()
     })
 
     test("it should be possible to handle global errors in reactions", () => {
-        const a = mobx.observable.box(1)
-        const errors = []
-        const d2 = mobx.onReactionError(e => errors.push(e))
+        utils.supressConsole(() => {
+            const a = mobx.observable.box(1)
+            const errors = []
+            const d2 = mobx.onReactionError(e => errors.push(e))
 
-        const d = mobx.autorun(function() {
-            throw a.get()
+            const d = mobx.autorun(function() {
+                throw a.get()
+            })
+
+            a.set(2)
+            a.set(3)
+
+            d2()
+            a.set(4)
+
+            expect(errors).toEqual([1, 2, 3])
+            d()
+
+            checkGlobalState()
         })
-
-        a.set(2)
-        a.set(3)
-
-        d2()
-        a.set(4)
-
-        expect(errors).toEqual([1, 2, 3])
-        d()
-
-        checkGlobalState()
     })
 })
