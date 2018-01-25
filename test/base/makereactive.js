@@ -349,7 +349,6 @@ test("as structure", function() {
     }
     c()
     x.x.y.y = 3
-    console.log("test")
     nc()
     x.x.y = { y: 3 }
     nc()
@@ -535,10 +534,6 @@ test("540 - extendobservable should not report cycles", function() {
     expect(() => mobx.extendObservable(objWrapper, objWrapper.value)).toThrowError(
         /extending an object with another observable \(object\) is not supported/
     )
-
-    mobx.autorun(() => {
-        console.log(objWrapper.name)
-    })
 })
 
 test("mobx 3", () => {

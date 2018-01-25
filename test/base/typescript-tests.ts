@@ -664,7 +664,7 @@ test("observable performance", () => {
 
     for (var i = 0; i < AMOUNT; i++) objs.push(new A())
 
-    console.log("created in ", Date.now() - start)
+    // console.log("created in ", Date.now() - start)
 
     for (var j = 0; j < 4; j++) {
         for (var i = 0; i < AMOUNT; i++) {
@@ -676,7 +676,7 @@ test("observable performance", () => {
         }
     }
 
-    console.log("changed in ", Date.now() - start)
+    // console.log("changed in ", Date.now() - start)
 })
 
 test("unbound methods", () => {

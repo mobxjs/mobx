@@ -218,7 +218,7 @@ test("transform into reactive graph", function() {
     var _transformCount = 0
     var transformFolder = m.createTransformer(function(folder) {
         _transformCount++
-        console.log("Transform", folder.name)
+        // console.log("Transform", folder.name)
         return new DerivedFolder(state, folder)
     })
 

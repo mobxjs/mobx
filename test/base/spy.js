@@ -1,5 +1,6 @@
 "use strict"
 var mobx = require("../../src/mobx.ts")
+const utils = require("../utils/test-utils")
 
 test("spy output", () => {
     var events = []
@@ -151,46 +152,48 @@ const doStuffEvents = [
 ]
 
 test("spy error", () => {
-    mobx._getGlobalState().mobxGuid = 0
+    utils.supressConsole(() => {
+        mobx._getGlobalState().mobxGuid = 0
 
-    const a = mobx.observable({
-        x: 2,
-        get y() {
-            if (this.x === 3) throw "Oops"
-            return this.x * 2
-        }
+        const a = mobx.observable({
+            x: 2,
+            get y() {
+                if (this.x === 3) throw "Oops"
+                return this.x * 2
+            }
+        })
+
+        var events = []
+        var stop = mobx.spy(c => events.push(c))
+
+        var d = mobx.autorun("autorun", () => a.y)
+
+        a.x = 3
+
+        events.forEach(x => {
+            delete x.fn
+            delete x.object
+            delete x.time
+        })
+
+        expect(events).toEqual([
+            { spyReportStart: true, type: "reaction" },
+            { type: "compute" },
+            { spyReportEnd: true },
+            { name: "x", newValue: 3, oldValue: 2, spyReportStart: true, type: "update" },
+            { type: "compute" },
+            { spyReportStart: true, type: "reaction" },
+            {
+                error: "Oops",
+                message:
+                    "[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: 'Reaction[autorun]",
+                type: "error"
+            },
+            { spyReportEnd: true },
+            { spyReportEnd: true }
+        ])
+
+        d()
+        stop()
     })
-
-    var events = []
-    var stop = mobx.spy(c => events.push(c))
-
-    var d = mobx.autorun("autorun", () => a.y)
-
-    a.x = 3
-
-    events.forEach(x => {
-        delete x.fn
-        delete x.object
-        delete x.time
-    })
-
-    expect(events).toEqual([
-        { spyReportStart: true, type: "reaction" },
-        { type: "compute" },
-        { spyReportEnd: true },
-        { name: "x", newValue: 3, oldValue: 2, spyReportStart: true, type: "update" },
-        { type: "compute" },
-        { spyReportStart: true, type: "reaction" },
-        {
-            error: "Oops",
-            message:
-                "[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: 'Reaction[autorun]",
-            type: "error"
-        },
-        { spyReportEnd: true },
-        { spyReportEnd: true }
-    ])
-
-    d()
-    stop()
 })

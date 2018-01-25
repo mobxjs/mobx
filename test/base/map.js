@@ -293,7 +293,6 @@ test("issue 119 - unobserve before delete", function() {
     // the error only happens if the value is observed
     mobx.autorun(function() {
         myObservable.myMap.values().forEach(function(value) {
-            console.log("x")
             propValues.push(value.myCalculatedProp)
         })
     })
@@ -487,18 +486,14 @@ test("798, cannot return observable map from computed prop", () => {
     const form = function(settings) {
         var form = mobx.observable({
             reactPropsMap: mobx.observable.map({
-                onSubmit: function() {
-                    console.log("onSubmit init!")
-                }
+                onSubmit: function() {}
             }),
             model: {
                 value: "TEST"
             }
         })
 
-        form.reactPropsMap.set("onSubmit", function() {
-            console.log("onSubmit overwritten!")
-        })
+        form.reactPropsMap.set("onSubmit", function() {})
 
         return form
     }
@@ -518,7 +513,8 @@ test("798, cannot return observable map from computed prop", () => {
     var cs = customerSearchStore()
 
     expect(() => {
-        console.log(cs.customerSearchType)
+        const x = Object.assign({}, cs.customerSearchType)
+        // console.log(x)
     }).not.toThrow()
 })
 
