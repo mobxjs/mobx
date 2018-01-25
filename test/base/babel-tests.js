@@ -8,6 +8,8 @@ import {
     isObservableObject,
     observe,
     isObservable,
+    isObservableProp,
+    isComputedProp,
     spy,
     isAction,
     useStrict
@@ -109,9 +111,9 @@ class Order {
 test("decorators", function() {
     var o = new Order()
     expect(isObservableObject(o)).toBe(true)
-    expect(isObservable(o, "amount")).toBe(true)
+    expect(isObservableProp(o, "amount")).toBe(true)
     expect(o.total).toBe(6) // .... this is required to initialize the props which are made reactive lazily...
-    expect(isObservable(o, "total")).toBe(true)
+    expect(isObservableProp(o, "total")).toBe(true)
 
     var events = []
     var d1 = observe(o, ev => events.push(ev.name, ev.oldValue))
@@ -828,7 +830,7 @@ test("@observable.ref (Babel)", () => {
     const a = new A()
     expect(a.ref.a).toBe(3)
     expect(mobx.isObservable(a.ref)).toBe(false)
-    expect(mobx.isObservable(a, "ref")).toBe(true)
+    expect(mobx.isObservableProp(a, "ref")).toBe(true)
 })
 
 test("@observable.shallow (Babel)", () => {
@@ -840,7 +842,7 @@ test("@observable.shallow (Babel)", () => {
     const todo2 = { todo: 2 }
     a.arr.push(todo2)
     expect(mobx.isObservable(a.arr)).toBe(true)
-    expect(mobx.isObservable(a, "arr")).toBe(true)
+    expect(mobx.isObservableProp(a, "arr")).toBe(true)
     expect(mobx.isObservable(a.arr[0])).toBe(false)
     expect(mobx.isObservable(a.arr[1])).toBe(false)
     expect(a.arr[1] === todo2).toBeTruthy()
@@ -856,7 +858,7 @@ test("@observable.deep (Babel)", () => {
     a.arr.push(todo2)
 
     expect(mobx.isObservable(a.arr)).toBe(true)
-    expect(mobx.isObservable(a, "arr")).toBe(true)
+    expect(mobx.isObservableProp(a, "arr")).toBe(true)
     expect(mobx.isObservable(a.arr[0])).toBe(true)
     expect(mobx.isObservable(a.arr[1])).toBe(true)
     expect(a.arr[1] !== todo2).toBeTruthy()

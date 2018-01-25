@@ -128,13 +128,13 @@ test("intercept object", () => {
 
     m.extendObservable(a, { c: 1 })
     expect(a.c).toBe(undefined)
-    expect(m.isObservable(a, "c")).toBe(false)
+    expect(m.isObservableProp(a, "c")).toBe(false)
 
     d4()
 
     m.extendObservable(a, { c: 2 })
     expect(a.c).toBe(6)
-    expect(m.isObservable(a, "c")).toBe(true)
+    expect(m.isObservableProp(a, "c")).toBe(true)
 })
 
 test("intercept map", () => {

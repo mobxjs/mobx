@@ -9,6 +9,7 @@
 * The `spyReportStart`, `spyReportEnd`, `spyReport` and `isSpyEnabled` are no longer public. It is no longer possible to emit custom spy events as to avoid confusing in listeners what the possible set of events is.
 * Dropped `isStrictModeEnabled`
 * `observable(value)` will only succeed if it can turn the value into an observable data structure (a Map, Array or observable object). But it will no longer create an observable box for other values to avoid confusion. Call `observable.box(value)`  explictly in such cases.
+* `isComputed` and `isObservable` no longer accept a property as second argument. Instead use `isComputedProp` and `isObservableProp`.
 
 ## Non breaking changes
 

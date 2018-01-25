@@ -14,6 +14,7 @@ import {
     IArrayWillSplice,
     IObservableValue,
     isObservable,
+    isObservableProp,
     isObservableObject,
     Atom,
     transaction,
@@ -68,8 +69,8 @@ class Order {
 test("decorators", () => {
     var o = new Order()
     t.equal(isObservableObject(o), true)
-    t.equal(isObservable(o, "amount"), true)
-    t.equal(isObservable(o, "total"), true)
+    t.equal(isObservableProp(o, "amount"), true)
+    t.equal(isObservableProp(o, "total"), true)
 
     var events: any[] = []
     var d1 = observe(o, (ev: IObjectChange) => events.push(ev.name, ev.oldValue))
@@ -946,9 +947,9 @@ test("373 - fix isObservable for unused computed", () => {
             return 3
         }
         constructor() {
-            t.equal(isObservable(this, "computedVal"), true)
+            t.equal(isObservableProp(this, "computedVal"), true)
             this.computedVal
-            t.equal(isObservable(this, "computedVal"), true)
+            t.equal(isObservableProp(this, "computedVal"), true)
         }
     }
 
@@ -1084,7 +1085,7 @@ test("@observable.ref (TS)", () => {
     const a = new A()
     t.equal(a.ref.a, 3)
     t.equal(mobx.isObservable(a.ref), false)
-    t.equal(mobx.isObservable(a, "ref"), true)
+    t.equal(mobx.isObservableProp(a, "ref"), true)
 })
 
 test("@observable.shallow (TS)", () => {
@@ -1096,7 +1097,7 @@ test("@observable.shallow (TS)", () => {
     const todo2 = { todo: 2 }
     a.arr.push(todo2)
     t.equal(mobx.isObservable(a.arr), true)
-    t.equal(mobx.isObservable(a, "arr"), true)
+    t.equal(mobx.isObservableProp(a, "arr"), true)
     t.equal(mobx.isObservable(a.arr[0]), false)
     t.equal(mobx.isObservable(a.arr[1]), false)
     t.equal(a.arr[1] === todo2, true)
@@ -1112,7 +1113,7 @@ test("@observable.deep (TS)", () => {
     a.arr.push(todo2)
 
     t.equal(mobx.isObservable(a.arr), true)
-    t.equal(mobx.isObservable(a, "arr"), true)
+    t.equal(mobx.isObservableProp(a, "arr"), true)
     t.equal(mobx.isObservable(a.arr[0]), true)
     t.equal(mobx.isObservable(a.arr[1]), true)
     t.equal(a.arr[1] !== todo2, true)

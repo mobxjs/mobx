@@ -1383,7 +1383,7 @@ test("autoruns created in autoruns should kick off", function() {
 test("#502 extendObservable throws on objects created with Object.create(null)", () => {
     var a = Object.create(null)
     mobx.extendObservable(a, { b: 3 })
-    expect(mobx.isObservable(a, "b")).toBe(true)
+    expect(mobx.isObservableProp(a, "b")).toBe(true)
 })
 
 test("#328 atom throwing exception if observing stuff in onObserved", () => {
@@ -1712,8 +1712,8 @@ test("iscomputed", function() {
         }
     })
 
-    expect(mobx.isComputed(x, "a")).toBe(false)
-    expect(mobx.isComputed(x, "b")).toBe(true)
+    expect(mobx.isComputedProp(x, "a")).toBe(false)
+    expect(mobx.isComputedProp(x, "b")).toBe(true)
 })
 
 test("603 - transaction should not kill reactions", () => {
@@ -1893,8 +1893,8 @@ test("Issue 1092 - We should be able to define observable on all siblings", () =
 })
 
 test("Issue 1120 - isComputed should return false for a non existing property", () => {
-    expect(mobx.isComputed({}, "x")).toBe(false)
-    expect(mobx.isComputed(observable({}), "x")).toBe(false)
+    expect(mobx.isComputedProp({}, "x")).toBe(false)
+    expect(mobx.isComputedProp(observable({}), "x")).toBe(false)
 })
 
 test("Issue 1121 - It should be possible to redefine a computed property", () => {

@@ -48,17 +48,17 @@ test("isObservable", function() {
     expect(m.isObservable(m.observable.box(function() {}))).toBe(true)
     expect(m.isObservable(m.autorun(function() {}))).toBe(true)
 
-    expect(m.isObservable(m.observable({ a: 1 }), "a")).toBe(true)
-    expect(m.isObservable(m.observable({ a: 1 }), "b")).toBe(false)
+    expect(m.isObservableProp(m.observable({ a: 1 }), "a")).toBe(true)
+    expect(m.isObservableProp(m.observable({ a: 1 }), "b")).toBe(false)
 
     expect(m.isObservable(m.observable.map())).toBe(true)
 
     const base = { a: 3 }
     const obs = m.observable(base)
     expect(m.isObservable(base)).toBe(false)
-    expect(m.isObservable(base, "a")).toBe(false)
+    expect(m.isObservableProp(base, "a")).toBe(false)
     expect(m.isObservable(obs)).toBe(true)
-    expect(m.isObservable(obs, "a")).toBe(true)
+    expect(m.isObservableProp(obs, "a")).toBe(true)
 })
 
 test("isBoxedObservable", function() {
@@ -611,17 +611,17 @@ test("761 - deeply nested modifiers work", () => {
     })
 
     expect(mobx.isObservable(a)).toBe(true)
-    expect(mobx.isObservable(a, "someKey")).toBe(true)
+    expect(mobx.isObservableProp(a, "someKey")).toBe(true)
     expect(mobx.isObservable(a.someKey)).toBe(true)
-    expect(mobx.isObservable(a.someKey, "someNestedKey")).toBe(true)
+    expect(mobx.isObservableProp(a.someKey, "someNestedKey")).toBe(true)
     expect(mobx.isObservable(a.someKey.someNestedKey)).toBe(false)
     expect(Array.isArray(a.someKey.someNestedKey)).toBe(true)
 
     Object.assign(a, { someKey: { someNestedKey: [1, 2, 3] } })
     expect(mobx.isObservable(a)).toBe(true)
-    expect(mobx.isObservable(a, "someKey")).toBe(true)
+    expect(mobx.isObservableProp(a, "someKey")).toBe(true)
     expect(mobx.isObservable(a.someKey)).toBe(true)
-    expect(mobx.isObservable(a.someKey, "someNestedKey")).toBe(true)
+    expect(mobx.isObservableProp(a.someKey, "someNestedKey")).toBe(true)
     expect(mobx.isObservable(a.someKey.someNestedKey)).toBe(true) // Too bad: no deep merge with Object.assign! someKey object gets replaced in its entirity
     expect(Array.isArray(a.someKey.someNestedKey)).toBe(false)
 })
