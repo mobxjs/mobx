@@ -23,7 +23,7 @@ export interface IObservable extends IDepTreeNode {
     observers: IDerivation[] // maintain _observers in raw array for for way faster iterating in propagation.
     observersIndexes: {} // map derivation.__mapid to _observers.indexOf(derivation) (see removeObserver)
 
-    onBecomeUnobserved()
+    onBecomeUnobserved(): void
 }
 
 export function hasObservers(observable: IObservable): boolean {
@@ -154,7 +154,7 @@ export function reportObserved(observable: IObservable) {
     }
 }
 
-function invariantLOS(observable: IObservable, msg) {
+function invariantLOS(observable: IObservable, msg: string) {
     // it's expensive so better not run it in produciton. but temporarily helpful for testing
     const min = getObservers(observable).reduce((a, b) => Math.min(a, b.dependenciesState), 2)
     if (min >= observable.lowestObserverState) return // <- the only assumption about `lowestObserverState`
@@ -188,6 +188,7 @@ export function propagateChanged(observable: IObservable) {
         const d = observers[i]
         if (d.dependenciesState === IDerivationState.UP_TO_DATE) d.onBecomeStale()
         d.dependenciesState = IDerivationState.STALE
+        d.triggeredBy = observable.name
     }
     // invariantLOS(observable, "changed end");
 }
@@ -208,6 +209,7 @@ export function propagateChangeConfirmed(observable: IObservable) {
             d.dependenciesState === IDerivationState.UP_TO_DATE // this happens during computing of `d`, just keep lowestObserverState up to date.
         )
             observable.lowestObserverState = IDerivationState.UP_TO_DATE
+        d.triggeredBy = observable.name
     }
     // invariantLOS(observable, "confirmed end");
 }

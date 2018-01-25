@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`whyrun 1`] = `
-"WhyRun? computation 'ObservableObject@1.fullname':
+"WhyRun? computation 'ObservableObject@1.fullname': 
  * Running because: [idle] not running at the moment
 * This computation is suspended (not in use by any reaction) and won't run automatically.
 	Didn't expect this computation to be suspended at this point?
@@ -10,7 +10,7 @@ exports[`whyrun 1`] = `
 `;
 
 exports[`whyrun 2`] = `
-"WhyRun? computation 'ObservableObject@1.fullname':
+"WhyRun? computation 'ObservableObject@1.fullname': 
  * Running because: [active] the value of this computation is needed by a reaction
  * This computation will re-run if any of the following observables changes:
     ObservableObject@1.firstname - ObservableObject@1.lastname
@@ -36,7 +36,7 @@ exports[`whyrun 3`] = `
 `;
 
 exports[`whyrun 4`] = `
-"WhyRun? computation 'ObservableObject@1.fullname':
+"WhyRun? computation 'ObservableObject@1.fullname': 
  * Running because: [idle] not running at the moment
  * This computation will re-run if any of the following observables changes:
     ObservableObject@1.firstname - ObservableObject@1.lastname
@@ -62,7 +62,8 @@ exports[`whyrun 5`] = `
 `;
 
 exports[`whyrun 6`] = `
-"WhyRun? computation 'ObservableObject@1.fullname':
+"WhyRun? computation 'ObservableObject@1.fullname': 
+ * Scheduled by a change to 'ObservableObject@1.firstname'
  * Running because: [active] the value of this computation is needed by a reaction
  * This computation will re-run if any of the following observables changes:
     ObservableObject@1.firstname - ObservableObject@1.lastname
@@ -78,6 +79,7 @@ exports[`whyrun 6`] = `
 exports[`whyrun 7`] = `
 "WhyRun? reaction 'loggerzz':
  * Status: [running]
+ * Scheduled by a change to 'ObservableObject@1.fullname'
  * This reaction will re-run if any of the following observables changes:
     ObservableObject@1.fullname
      (... or any observable accessed during the remainder of the current run)
@@ -88,7 +90,7 @@ exports[`whyrun 7`] = `
 `;
 
 exports[`whyrun 8`] = `
-"WhyRun? computation 'ObservableObject@1.fullname':
+"WhyRun? computation 'ObservableObject@1.fullname': 
  * Running because: [idle] not running at the moment
  * This computation will re-run if any of the following observables changes:
     ObservableObject@1.firstname - ObservableObject@1.lastname
@@ -126,7 +128,7 @@ exports[`whyrun 10`] = `
 `;
 
 exports[`whyrun 11`] = `
-"WhyRun? computation 'ObservableObject@1.fullname':
+"WhyRun? computation 'ObservableObject@1.fullname': 
  * Running because: [idle] not running at the moment
 * This computation is suspended (not in use by any reaction) and won't run automatically.
 	Didn't expect this computation to be suspended at this point?

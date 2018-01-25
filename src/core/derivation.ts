@@ -43,7 +43,8 @@ export interface IDerivation extends IDepTreeNode {
      */
     unboundDepsCount: number
     __mapid: string
-    onBecomeStale()
+    onBecomeStale(): void
+    triggeredBy: string
 }
 
 export class CaughtException {
@@ -52,7 +53,7 @@ export class CaughtException {
     }
 }
 
-export function isCaughtException(e): e is CaughtException {
+export function isCaughtException(e: any): e is CaughtException {
     return e instanceof CaughtException
 }
 
@@ -121,7 +122,7 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
  * The tracking information is stored on the `derivation` object and the derivation is registered
  * as observer of any of the accessed observables.
  */
-export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, context) {
+export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, context: any) {
     // pre allocate array allocation + room for variation in deps
     // array will be trimmed by bindDependencies
     changeDependenciesStateTo0(derivation)
@@ -148,34 +149,33 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, con
  */
 function bindDependencies(derivation: IDerivation) {
     // invariant(derivation.dependenciesState !== IDerivationState.NOT_TRACKING, "INTERNAL ERROR bindDependencies expects derivation.dependenciesState !== -1");
-
+    derivation.triggeredBy = ""
     const prevObserving = derivation.observing
     const observing = (derivation.observing = derivation.newObserving!)
     let lowestNewObservingDerivationState = IDerivationState.UP_TO_DATE
-
 
     // Go through all new observables and check diffValue: (this list can contain duplicates):
     //   0: first occurrence, change to 1 and keep it
     //   1: extra occurrence, drop it
     let i0 = 0,
-	l = derivation.unboundDepsCount
+        l = derivation.unboundDepsCount
     for (let i = 0; i < l; i++) {
-		const dep = observing[i]
+        const dep = observing[i]
         if (dep.diffValue === 0) {
-			dep.diffValue = 1
+            dep.diffValue = 1
             if (i0 !== i) observing[i0] = dep
-				i0++
+            i0++
         }
 
         // Upcast is 'safe' here, because if dep is IObservable, `dependenciesState` will be undefined,
         // not hitting the condition
         if (((dep as any) as IDerivation).dependenciesState > lowestNewObservingDerivationState) {
-			lowestNewObservingDerivationState = ((dep as any) as IDerivation).dependenciesState
+            lowestNewObservingDerivationState = ((dep as any) as IDerivation).dependenciesState
         }
     }
     observing.length = i0
 
-	derivation.newObserving = null // newObserving shouldn't be needed outside tracking (statement moved down to work around FF bug, see #614)
+    derivation.newObserving = null // newObserving shouldn't be needed outside tracking (statement moved down to work around FF bug, see #614)
 
     // Go through all old observables and check diffValue: (it is unique after last bindDependencies)
     //   0: it's not in new observables, unobserve it

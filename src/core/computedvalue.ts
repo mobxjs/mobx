@@ -77,6 +77,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     __mapid = "#" + getNextId()
     protected value: T | undefined | CaughtException = new CaughtException(null)
     name: string
+    triggeredBy: string
     isComputing: boolean = false // to check for cycles
     isRunningSetter: boolean = false
     setter: (value: T) => void
@@ -241,12 +242,14 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         const observers = unique(getObservers(this).map(dep => dep.name))
         // prettier-ignore
         return (
-`WhyRun? computation '${this.name}':
+`WhyRun? computation '${this.name}': ${this.triggeredBy
+	? `\n * Scheduled by a change to '${this.triggeredBy}'`
+	: ""}
  * Running because: ${isTracking
-     ? "[active] the value of this computation is needed by a reaction"
-     : this.isComputing
-       ? "[get] The value of this computed was requested outside a reaction"
-       : "[idle] not running at the moment"}
+		? "[active] the value of this computation is needed by a reaction"
+		: this.isComputing
+			? "[get] The value of this computed was requested outside a reaction"
+			: "[idle] not running at the moment"}
 ` +
             (this.dependenciesState === IDerivationState.NOT_TRACKING
                 ? getMessage("m032")
@@ -254,8 +257,8 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 ` * This computation will re-run if any of the following observables changes:
     ${joinStrings(observing)}
     ${this.isComputing && isTracking
-        ? " (... or any observable accessed during the remainder of the current run)"
-        : ""}
+		? " (... or any observable accessed during the remainder of the current run)"
+		: ""}
     ${getMessage("m038")}
   * If the outcome of this computation changes, the following observers will be re-run:
     ${joinStrings(observers)}`)

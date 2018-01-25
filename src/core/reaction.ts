@@ -59,6 +59,7 @@ export class Reaction implements IDerivation, IReactionPublic {
     _isScheduled = false
     _isTrackPending = false
     _isRunning = false
+    triggeredBy = ""
     errorHandler: (error: any, derivation: IDerivation) => void
 
     constructor(
@@ -192,8 +193,10 @@ export class Reaction implements IDerivation, IReactionPublic {
         // prettier-ignore
         return `WhyRun? reaction '${this.name}':
  * Status: [${this.isDisposed
-     ? "stopped"
-     : this._isRunning ? "running" : this.isScheduled() ? "scheduled" : "idle"}]
+		? "stopped"
+		: this._isRunning ? "running" : this.isScheduled() ? "scheduled" : "idle"}]${this.triggeredBy
+			? `\n * Scheduled by a change to '${this.triggeredBy}'`
+			: ""}
  * This reaction will re-run if any of the following observables changes:
     ${joinStrings(observing)}
     ${this._isRunning
