@@ -4,6 +4,7 @@ const mobx = require("../../src/mobx.ts")
 const noop = () => {}
 
 test("whyrun", () => {
+    mobx._resetGlobalState()
     const baselog = console.log
     let lastButOneLine = ""
     let lastLine = ""
@@ -30,31 +31,20 @@ test("whyrun", () => {
     // TODO: enable this assertion
     // t.ok(lastLine.match(/suspended/), "just accessed fullname"); // no normal report, just a notification that nothing is being derived atm
 
-    expect(whyRun(x, "fullname").match(/\[idle\]/)).toBeTruthy()
-    expect(whyRun(x, "fullname").match(/suspended/)).toBeTruthy()
+    expect(whyRun(x, "fullname")).toMatchSnapshot()
 
     const d = mobx.autorun("loggerzz", () => {
         x.fullname
         whyRun()
     })
 
-    expect(lastButOneLine.match(/\[active\]/)).toBeTruthy()
-    expect(lastButOneLine.match(/\.firstname/)).toBeTruthy()
-    expect(lastButOneLine.match(/\.lastname/)).toBeTruthy()
+    expect(lastButOneLine).toMatchSnapshot()
 
-    expect(lastLine.match(/loggerzz/)).toBeTruthy()
-    expect(lastLine.match(/\[running\]/)).toBeTruthy()
-    expect(lastLine.match(/\.fullname/)).toBeTruthy()
+    expect(lastLine).toMatchSnapshot()
 
-    expect(whyRun(x, "fullname").match(/\[idle\]/)).toBeTruthy()
-    expect(whyRun(x, "fullname").match(/\.firstname/)).toBeTruthy()
-    expect(whyRun(x, "fullname").match(/\.lastname/)).toBeTruthy()
-    expect(whyRun(x, "fullname").match(/loggerzz/)).toBeTruthy()
+    expect(whyRun(x, "fullname")).toMatchSnapshot()
 
-    expect(whyRun(d).match(/\[idle\]/)).toBeTruthy()
-    expect(whyRun(d).match(/\.fullname/)).toBeTruthy()
-
-    expect(whyRun(d).match(/loggerzz/)).toBeTruthy()
+    expect(whyRun(d)).toMatchSnapshot()
 
     mobx.transaction(() => {
         x.firstname = "Veria"
@@ -63,26 +53,16 @@ test("whyrun", () => {
         expect(whyRun(d).match(/\[scheduled\]/)).toBeTruthy()
     })
 
-    expect(lastButOneLine.match(/will re-run/)).toBeTruthy()
-    expect(lastButOneLine.match(/\.firstname/)).toBeTruthy()
-    expect(lastButOneLine.match(/\.lastname/)).toBeTruthy()
-    expect(lastButOneLine.match(/\loggerzz/)).toBeTruthy()
+    expect(lastButOneLine).toMatchSnapshot()
 
-    expect(lastLine.match(/\[running\]/)).toBeTruthy()
-    expect(lastLine.match(/\.fullname/)).toBeTruthy()
+    expect(lastLine).toMatchSnapshot()
 
-    expect(whyRun(x, "fullname").match(/\[idle\]/)).toBeTruthy()
-    expect(whyRun(x, "fullname").match(/\.firstname/)).toBeTruthy()
-    expect(whyRun(x, "fullname").match(/\.lastname/)).toBeTruthy()
-    expect(whyRun(x, "fullname").match(/loggerzz/)).toBeTruthy()
+    expect(whyRun(x, "fullname")).toMatchSnapshot()
 
-    expect(whyRun(d).match(/\[idle\]/)).toBeTruthy()
-    expect(whyRun(d).match(/\.fullname/)).toBeTruthy()
-    expect(whyRun(d).match(/loggerzz/)).toBeTruthy()
+    expect(whyRun(d)).toMatchSnapshot()
 
     d()
 
-    expect(whyRun(d).match(/\[stopped\]/)).toBeTruthy()
-    expect(whyRun(x, "fullname").match(/\[idle\]/)).toBeTruthy()
-    expect(whyRun(x, "fullname").match(/suspended/)).toBeTruthy()
+    expect(whyRun(d)).toMatchSnapshot()
+    expect(whyRun(x, "fullname")).toMatchSnapshot()
 })
