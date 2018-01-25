@@ -110,7 +110,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
     onBecomeUnobserved() {
         clearObserving(this)
-        this.value = undefined;
+        this.value = undefined
     }
 
     /**
@@ -172,7 +172,8 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             })
         }
         const oldValue = this.value
-        const wasSuspended = /* see #1208 */ this.dependenciesState === IDerivationState.NOT_TRACKING;
+        const wasSuspended =
+            /* see #1208 */ this.dependenciesState === IDerivationState.NOT_TRACKING
         const newValue = (this.value = this.computeValue(true))
         return (
             wasSuspended ||
@@ -238,9 +239,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             (dep: any) => dep.name
         )
         const observers = unique(getObservers(this).map(dep => dep.name))
+        // prettier-ignore
         return (
-            `
-WhyRun? computation '${this.name}':
+`WhyRun? computation '${this.name}':
  * Running because: ${isTracking
      ? "[active] the value of this computation is needed by a reaction"
      : this.isComputing
@@ -249,16 +250,15 @@ WhyRun? computation '${this.name}':
 ` +
             (this.dependenciesState === IDerivationState.NOT_TRACKING
                 ? getMessage("m032")
-                : ` * This computation will re-run if any of the following observables changes:
+				:
+` * This computation will re-run if any of the following observables changes:
     ${joinStrings(observing)}
     ${this.isComputing && isTracking
         ? " (... or any observable accessed during the remainder of the current run)"
         : ""}
     ${getMessage("m038")}
-
   * If the outcome of this computation changes, the following observers will be re-run:
-    ${joinStrings(observers)}
-`)
+    ${joinStrings(observers)}`)
         )
     }
 }

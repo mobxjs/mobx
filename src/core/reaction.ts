@@ -189,8 +189,8 @@ export class Reaction implements IDerivation, IReactionPublic {
             dep => dep.name
         )
 
-        return `
-WhyRun? reaction '${this.name}':
+        // prettier-ignore
+        return `WhyRun? reaction '${this.name}':
  * Status: [${this.isDisposed
      ? "stopped"
      : this._isRunning ? "running" : this.isScheduled() ? "scheduled" : "idle"}]
@@ -199,8 +199,7 @@ WhyRun? reaction '${this.name}':
     ${this._isRunning
         ? " (... or any observable accessed during the remainder of the current run)"
         : ""}
-	${getMessage("m038")}
-`
+	${getMessage("m038")}`
     }
 }
 
