@@ -1,6 +1,6 @@
 # Reaction
 
-Usage: `reaction(() => data, data => { sideEffect }, options?)`.
+Usage: `reaction(() => data, (data, reaction) => { sideEffect }, options?)`.
 
 A variation on `autorun` that gives more fine grained control on which observables will be tracked.
 It takes two functions, the first one (the *data* function) is tracked and returns data that is used as input for the second one, the *effect* function.
@@ -9,7 +9,7 @@ Any observables that are accessed while executing the side effect will not be tr
 
 The side effect can be debounced, just like `autorunAsync`.
 `reaction` returns a disposer function.
-The functions passed to `reaction` will receive one argument when invoked, the current reaction, which can be used to dispose the when during execution.
+The functions passed to `reaction` will receive two argument when invoked, the current reaction, which can be used to dispose the when during execution.
 
 It is important to notice that the side effect will *only* react to data that was *accessed* in the data expression, which might be less then the data that is actually used in the effect.
 Also, the side effect will only be triggered when the data returned by the expression has changed.
@@ -72,6 +72,35 @@ todos[0].title = "Make tea"
 // prints:
 // reaction 2: Make tea, find biscuit, explain reactions
 // autorun 1: Make tea, find biscuit, explain reactions
+```
+
+In the following example `reaction3`, will react to the change in the `counter` count.
+When invoked `reaction`, second argument can use as disposer.
+The following example shows a `reaction` that is invoked only once.
+
+```javascript
+const counter = observable({ count: 0 });
+
+// invoke once of and dispose reaction: reacts to obserbable value.
+const reaction3 = reaction(
+    () => counter.count,
+    (count, reaction) => {
+        console.log("reaction 3: invoked. counter.count = " + count);
+        reaction.dispose();
+    }
+);
+
+counter.count = 1;
+// prints:
+// reaction 3: invoked. counter.count = 1
+
+counter.count = 2;
+// prints:
+// (There are no logging, because of reaction disposed. But, counter continue reaction)
+
+console.log(counter.count);
+// prints:
+// 2
 ```
 
 Reaction is roughly speaking sugar for: `computed(expression).observe(action(sideEffect))` or `autorun(() => action(sideEffect)(expression)`
