@@ -27,7 +27,7 @@ So the signature of object returned by `observable.box(scalar)` is:
 
 ### `observable(primitiveValue)`
 
-When using the generic `observable(value)` method, MobX will create an observable box for any value that could not be turned into an observable automatically..
+When using the generic `observable(value)` method, MobX will create an observable box for any value that could not be turned into an observable automatically.
 
 ### Example
 
