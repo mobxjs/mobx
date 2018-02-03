@@ -73,12 +73,44 @@ Slower:
 
 `<DisplayName name={person.name} />`.
 
-There is nothing wrong to the latter.
-But a change in the `name` property will, in the first case, trigger the `DisplayName` to re-render, while in the latter, the owner of the component has to re-render.
-However, it is more important for your components to have a comprehensible API than applying this optimization.
-To have the best of both worlds, consider making smaller components:
+There is nothing wrong to the latter, but a change in the `name` property will, in the first case, trigger only the `DisplayName` to re-render, while in the latter, the owner of the component has to re-render. If rendering the owning component is fast enough, that approach will work well.
 
-`const PersonNameDisplayer = observer(({ props }) => <DisplayName name={props.person.name} />)`
+You may notice that in order to gain the best possible performance, you'd have to create lots of small observer components where each would be customized to render some different part of data, for example:
+
+`const PersonNameDisplayer = observer((props) => <DisplayName name={props.person.name} />)`
+
+`const CarNameDisplayer = observer((props) => <DisplayName name={props.car.model} />)`
+
+`const ManufacturerNameDisplayer = observer((props) => <DisplayName name={props.car.manufacturer.name} />)`
+
+This is a valid option, but may become tedious if you have lots of data of different shape. An alternative is using a function that returns the data that you want your `*Displayer` to render:
+
+`const GenericNameDisplayer = observer((props) => <DisplayName name={props.getNameTracked()} />)`
+
+Then, you may use the component like this:
+
+```
+render() {
+  const { person, car } = this.props;
+  return (
+    <>
+      <GenericNameDisplayer getNameTracked={() => person.name} />
+      <GenericNameDisplayer getNameTracked={car.getModelTracked} />
+      <GenericNameDisplayer getNameTracked={this.getManufacturerNameTracked} />
+    </>
+  );
+}
+
+getManufacturerNameTracked = () => this.props.car.manufacturer.name;
+
+...
+class Car {
+  @observable model
+  getModelTracked = () => this.model
+}
+```
+
+This approach will allow `GenericNameDisplayer` to be reused throughout your application to render any name. Now, what remains to be solved is the placement of those functions: the sample shows three possibilities - you may create the function directly in the render method (which is not considered a good practice), you may place the function in the component (as with `getManufacturerNameTracked`), or you may place the function directly on the object that contains the data (as with `getModelTracked`).
 
 ## Bind functions early
 
