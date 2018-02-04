@@ -184,7 +184,8 @@ Usage:
  * `autorunAsync(debugname?, () => { sideEffect }, scheduler, context?)`
 Similar to `autorun`, but the sideEffect will be delayed and debounced.
 If a number is given as `delay` it will debounce side effects with that number of ms.
-If a `scheduler` is given it will use it to determine when it is next appropriate to run by passing it a callback.
+If a `scheduler` function is given `autorunAsync` will use this function to debounce execution.
+The `scheduler` function should accept a callback that will execute when the underlying system is ready.
 [&laquo;details&raquo;](autorun-async.md)
 
 ### `reaction`
