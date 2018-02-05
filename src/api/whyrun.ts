@@ -2,7 +2,7 @@ import { globalState } from "../core/globalstate"
 import { isComputedValue } from "../core/computedvalue"
 import { isReaction } from "../core/reaction"
 import { getAtom } from "../types/type-utils"
-import { fail } from "../utils/utils"
+import { fail, deprecated } from "../utils/utils"
 import { getMessage } from "../utils/messages"
 import { TraceMode } from "../core/derivation"
 
@@ -12,6 +12,7 @@ function log(msg: string): string {
 }
 
 export function whyRun(thing?: any, prop?: string) {
+    deprecated("`whyRun` is deprecated in favor of `trace`")
     thing = getAtomFromArgs(arguments)
     if (!thing) return log(getMessage("m024"))
     if (isComputedValue(thing) || isReaction(thing)) return log(thing.whyRun())
