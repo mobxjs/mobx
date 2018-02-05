@@ -30,6 +30,7 @@
   * [Writing async actions](best/actions.md)
   * [Optimizing React components](best/react-performance.md)
   * [DevTools](best/devtools.md)
+  * [Using trace for debugging](best/trace.md)
   * [ES5 / ES6 / TypeScript syntax](best/syntax.md)
   * [Stateless Components and Hot Module Reloading](best/stateless-HMR.md)
 * Utility functions

@@ -279,6 +279,19 @@ _The following api's might come in handy if you want to build cool tools on top 
 The mobx-react-devtools is a powerful package that helps you to investigate the performance and dependencies of your react components.
 Also has a powerful logger utility based on `spy`. [&laquo;details&raquo;](../best/devtools.md)
 
+### `trace`
+Usage:
+* `trace(enterDebugger?)`
+* `trace(Reaction object / ComputedValue object / disposer function, enterDebugger?)`
+* `trace(object, computedValuePropertyName, enterDebugger?)`
+
+`trace` is a small utility that you can use inside a computed value or reaction.
+If it is enabled, it will start logging when the value is being invalidated, and why.
+If `enterDebugger` is set to true, and developer tools are enabled, the javascript engine
+will break on the point where it is triggered.
+
+[&laquo;trace&raquo;](../best/trace.md)
+
 ### `spy`
 Usage: `spy(listener)`.
 Registers a global spy listener that listens to all events that happen in MobX.
@@ -291,6 +304,8 @@ Usage:
 * `whyRun()`
 * `whyRun(Reaction object / ComputedValue object / disposer function)`
 * `whyRun(object, "computed property name")`
+
+_whyRun is deprecated in favor of [trace](#trace)_
 
 `whyRun` is a small utility that can be used inside computed value or reaction (`autorun`, `reaction` or the `render` method of an `observer` React component)
 and prints why the derivation is currently running, and under which circumstances it will run again.
