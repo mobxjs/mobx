@@ -1,4 +1,4 @@
-# 3.5.0
+# 3.5.0/1
 
 * Introduced `trace` for easier debugging of reactions / computed values. See the [docs](https://mobx.js.org/best/trace.html) for details.
 * Improved typings of `observableArray.find`, see [#1324](https://github.com/mobxjs/mobx/pull/1324) for details.
