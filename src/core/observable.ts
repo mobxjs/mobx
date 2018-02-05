@@ -3,6 +3,8 @@ import { globalState } from "./globalstate"
 import { invariant } from "../utils/utils"
 import { runReactions, Reaction } from "./reaction"
 import { ComputedValue } from "./computedvalue"
+import { getDependencyTree } from "../api/extras"
+import { IDependencyTree } from "../mobx"
 
 export interface IDepTreeNode {
     name: string
@@ -240,18 +242,38 @@ export function propagateMaybeChanged(observable: IObservable) {
 }
 
 function logTraceInfo(derivation: IDerivation, observable: IObservable) {
-    console.log(`[mobx.trace] '${observable.name}' -> '${derivation.name}'`)
-    if (derivation.isTracing === TraceMode.BREAK)
-        new Function(`
-		debugger;
-        /*
-            Tracing '${derivation.name}'
+    console.log(
+        `[mobx.trace] '${derivation.name}' is invalidated due to a change in: '${observable.name}'`
+    )
+    if (derivation.isTracing === TraceMode.BREAK) {
+        const lines = []
+        printDepTree(getDependencyTree(derivation), lines, 1)
 
-			You are entering this break point because derivation '${derivation.name}' is being traced and '${observable.name}' is now forcing it to update.
-            Just follow the stacktrace you should now see in the devtools to see precisely what piece of your code is causing this update
-            The stackframe you are looking for is at least ~6-8 stack-frames up.
+        // prettier-ignore
+        new Function(
+`debugger;
+/*
+Tracing '${derivation.name}'
 
-            ${derivation instanceof ComputedValue ? derivation.derivation.toString() : "<unknown>"}
-		*/
-	`)()
+You are entering this break point because derivation '${derivation.name}' is being traced and '${observable.name}' is now forcing it to update.
+Just follow the stacktrace you should now see in the devtools to see precisely what piece of your code is causing this update
+The stackframe you are looking for is at least ~6-8 stack-frames up.
+
+${derivation instanceof ComputedValue ? derivation.derivation.toString() : ""}
+
+The dependencies for this derivation are:
+
+${lines.join("\n")}
+*/
+    `)()
+    }
+}
+
+function printDepTree(tree: IDependencyTree, lines: string[], depth: number) {
+    if (lines.length >= 1000) {
+        lines.push("(and many more)")
+        return
+    }
+    lines.push(`${new Array(depth).join("\t")}${tree.name}`) // MWE: not the fastest, but the easiest way :)
+    if (tree.dependencies) tree.dependencies.forEach(child => printDepTree(child, lines, depth + 1))
 }

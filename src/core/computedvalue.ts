@@ -126,7 +126,15 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             // The computedValue is accessed outside of any mobx stuff. Batch observing should be enough and don't need
             // tracking as it will never be called again inside this batch.
             startBatch()
-            if (shouldCompute(this)) this.value = this.computeValue(false)
+            if (shouldCompute(this)) {
+                if (this.isTracing !== TraceMode.NONE) {
+                    console.log(
+                        `[mobx.trace] '${this
+                            .name}' is being read outside a reactive context and doing a full recompute`
+                    )
+                }
+                this.value = this.computeValue(false)
+            }
             endBatch()
         } else {
             reportObserved(this)

@@ -12,27 +12,37 @@ function log(msg: string): string {
 }
 
 export function whyRun(thing?: any, prop?: string) {
-    switch (arguments.length) {
-        case 0:
-            thing = globalState.trackingDerivation
-            if (!thing) return log(getMessage("m024"))
-            break
-        case 2:
-            thing = getAtom(thing, prop)
-            break
-    }
-    thing = getAtom(thing)
-    if (isComputedValue(thing)) return log(thing.whyRun())
-    else if (isReaction(thing)) return log(thing.whyRun())
+    thing = getAtomFromArgs(arguments)
+    if (!thing) return log(getMessage("m024"))
+    if (isComputedValue(thing) || isReaction(thing)) return log(thing.whyRun())
     return fail(getMessage("m025"))
 }
 
-// TODO: overload for IReactionPublic
-// TODO: clear error message
-export function trace(enterBreakPoint: boolean = false): void {
-    const derivation = globalState.trackingDerivation
+export function trace(thing?: any, prop?: string, enterBreakPoint?: boolean): void
+export function trace(thing?: any, enterBreakPoint?: boolean): void
+export function trace(enterBreakPoint?: boolean): void
+export function trace(...args: any[]): void {
+    let enterBreakPoint = false
+    if (typeof args[args.length - 1] === "boolean") enterBreakPoint = args.pop()
+    const derivation = getAtomFromArgs(args)
     if (!derivation) {
-        return fail(`'trace(break?)' can only be used inside a computed value or a Reaction.`)
+        return fail(
+            `'trace(break?)' can only be used inside a tracked computed value or a Reaction. Consider passing in the computed value or reaction explicitly`
+        )
+    }
+    if (derivation.isTracing === TraceMode.NONE) {
+        console.log(`[mobx.trace] '${derivation.name}' tracing enabled`)
     }
     derivation.isTracing = enterBreakPoint ? TraceMode.BREAK : TraceMode.LOG
+}
+
+function getAtomFromArgs(args): any {
+    switch (args.length) {
+        case 0:
+            return globalState.trackingDerivation
+        case 1:
+            return getAtom(args[0])
+        case 2:
+            return getAtom(args[0], args[1])
+    }
 }
