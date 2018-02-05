@@ -14,6 +14,15 @@ In debugger mode, the debug information will also reveal the full derivation tre
 
 ![trace](../images/trace.gif)
 
+## Live examples
+
+Simple codesandbox trace example: https://codesandbox.io/s/nr58ylyn4m
+
+Here's a deployed example for exploring the stack: https://csb-nr58ylyn4m-hontnuliaa.now.sh/
+Be sure to play with chrome debugger's blackbox feature!
+
+## Usage examples
+
 There are different ways of calling `trace()`, some examples:
 
 ```javascript
