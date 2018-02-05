@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>toJS | MobX</title>
+        <title>Using trace for debugging | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.4.3">
@@ -37,10 +37,10 @@
         
     
     
-    <link rel="next" href="../refguide/transaction.html" />
+    <link rel="next" href="../best/syntax.html" />
     
     
-    <link rel="prev" href="../refguide/spy.html" />
+    <link rel="prev" href="../best/devtools.html" />
     
 
         
@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="8.11" data-basepath=".." data-revision="Mon Feb 05 2018 19:21:11 GMT+0100 (CET)">
+    <div class="book" data-level="7.6" data-basepath=".." data-revision="Mon Feb 05 2018 19:21:11 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -507,7 +507,7 @@
             
         </li>
     
-        <li class="chapter " data-level="7.6" data-path="best/trace.html">
+        <li class="chapter active" data-level="7.6" data-path="best/trace.html">
             
                 
                     <a href="../best/trace.html">
@@ -715,7 +715,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="8.11" data-path="refguide/tojson.html">
+        <li class="chapter " data-level="8.11" data-path="refguide/tojson.html">
             
                 
                     <a href="../refguide/tojson.html">
@@ -901,23 +901,36 @@
                 
                     <section class="normal" id="section-">
                     
-                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/tojson.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="tojs"><a name="tojs" class="plugin-anchor" href="#tojs"><span class="fa fa-link"></span></a>toJS</h1>
-<p><code>toJS(value, supportCycles = true)</code></p>
-<p>Recursively converts an (observable) object to a javascript <em>structure</em>.
-Supports observable arrays, objects, maps and primitives.
-Computed values and other non-enumerable properties won&apos;t be part of the result.
-Cycles are detected and properly supported by default, but this can be disabled to improve performance.</p>
-<p>For more complex (de)serialization scenario&apos;s, one can use <a href="https://github.com/mobxjs/serializr" target="_blank">serializr</a></p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> obj = mobx.observable({
-    x: <span class="hljs-number">1</span>
-});
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/trace.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="using-trace-for-debugging"><a name="using-trace-for-debugging" class="plugin-anchor" href="#using-trace-for-debugging"><span class="fa fa-link"></span></a>Using <code>trace</code> for debugging</h1>
+<p>Trace is a small utility that helps to find out why your computed values, reactions or components are re-evaluating.</p>
+<p>It can be used by simply importing <code>import { trace } from &quot;mobx&quot;</code>, and then put it inside a reaction or computed value.
+It will print why it is re-evaluating the current derivation.</p>
+<p>Optionally it is possible to automatically enter the debugger by passing <code>true</code> as last argument.
+This way the exact mutation that causes the reaction to re-run is still in stack, usually ~8 stack frames up. See the image below.</p>
+<p>In debugger mode, the debug information will also reveal the full derivation tree that is affecting the current computation / reaction.</p>
+<p><img src="../images/trace-tips2.png" alt="trace"></p>
+<p><img src="../images/trace.gif" alt="trace"></p>
+<p>There are different ways of calling <code>trace()</code>, some examples:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> { observer } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>
+<span class="hljs-keyword">import</span> { trace } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>
 
-<span class="hljs-keyword">var</span> clone = mobx.toJS(obj);
-
-<span class="hljs-built_in">console</span>.log(mobx.isObservableObject(obj)); <span class="hljs-comment">// true</span>
-<span class="hljs-built_in">console</span>.log(mobx.isObservableObject(clone)); <span class="hljs-comment">// false</span>
+@observer
+class MyComponent extends React.Component {
+    render() {
+        trace(true) // enter the debugger whenever an observable value causes this comonent to re-run
+        return &lt;div&gt;{this.props.user.name}&lt;/name&gt;
+    }
+}
 </code></pre>
-<p>Note: this method was named <code>toJSON</code> before MobX 2.2</p>
+<p>Enable trace by using the <code>reaction</code> argument of an reaction / autorun:</p>
+<pre><code class="lang-javascript">mobx.autorun(<span class="hljs-string">&quot;loggerzz&quot;</span>, r =&gt; {
+    r.trace()
+    <span class="hljs-built_in">console</span>.log(user.fullname)
+})
+</code></pre>
+<p>Pass in the property name of a computed property:</p>
+<pre><code class="lang-javascript">trace(user, <span class="hljs-string">&quot;fullname&quot;</span>)
+</code></pre>
 </body></html>
                     
                     </section>
@@ -928,10 +941,10 @@ Cycles are detected and properly supported by default, but this can be disabled 
         </div>
 
         
-        <a href="../refguide/spy.html" class="navigation navigation-prev " aria-label="Previous page: spy"><i class="fa fa-angle-left"></i></a>
+        <a href="../best/devtools.html" class="navigation navigation-prev " aria-label="Previous page: DevTools"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../refguide/transaction.html" class="navigation navigation-next " aria-label="Next page: transaction"><i class="fa fa-angle-right"></i></a>
+        <a href="../best/syntax.html" class="navigation navigation-next " aria-label="Next page: ES5 / ES6 / TypeScript syntax"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

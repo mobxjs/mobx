@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="7.4" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
+    <div class="book" data-level="7.4" data-basepath=".." data-revision="Mon Feb 05 2018 19:21:11 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -507,14 +507,29 @@
             
         </li>
     
-        <li class="chapter " data-level="7.6" data-path="best/syntax.html">
+        <li class="chapter " data-level="7.6" data-path="best/trace.html">
+            
+                
+                    <a href="../best/trace.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.6.</b>
+                        
+                        Using trace for debugging
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="7.7" data-path="best/syntax.html">
             
                 
                     <a href="../best/syntax.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>7.6.</b>
+                            <b>7.7.</b>
                         
                         ES5 / ES6 / TypeScript syntax
                     </a>
@@ -522,14 +537,14 @@
             
         </li>
     
-        <li class="chapter " data-level="7.7" data-path="best/stateless-HMR.html">
+        <li class="chapter " data-level="7.8" data-path="best/stateless-HMR.html">
             
                 
                     <a href="../best/stateless-HMR.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>7.7.</b>
+                            <b>7.8.</b>
                         
                         Stateless Components and Hot Module Reloading
                     </a>
@@ -940,11 +955,33 @@ If this happens deeper in your component tree, less components have to re-render
 <p><code>&lt;DisplayName person={person} /&gt;</code></p>
 <p>Slower:</p>
 <p><code>&lt;DisplayName name={person.name} /&gt;</code>.</p>
-<p>There is nothing wrong to the latter.
-But a change in the <code>name</code> property will, in the first case, trigger the <code>DisplayName</code> to re-render, while in the latter, the owner of the component has to re-render.
-However, it is more important for your components to have a comprehensible API than applying this optimization.
-To have the best of both worlds, consider making smaller components:</p>
-<p><code>const PersonNameDisplayer = observer(({ props }) =&gt; &lt;DisplayName name={props.person.name} /&gt;)</code></p>
+<p>There is nothing wrong to the latter, but a change in the <code>name</code> property will, in the first case, trigger only the <code>DisplayName</code> to re-render, while in the latter, the owner of the component has to re-render. If rendering the owning component is fast enough, that approach will work well.</p>
+<p>You may notice that in order to gain the best possible performance, you&apos;d have to create lots of small observer components where each would be customized to render some different part of data, for example:</p>
+<p><code>const PersonNameDisplayer = observer((props) =&gt; &lt;DisplayName name={props.person.name} /&gt;)</code></p>
+<p><code>const CarNameDisplayer = observer((props) =&gt; &lt;DisplayName name={props.car.model} /&gt;)</code></p>
+<p><code>const ManufacturerNameDisplayer = observer((props) =&gt; &lt;DisplayName name={props.car.manufacturer.name} /&gt;)</code></p>
+<p>This is a valid option, but may become tedious if you have lots of data of different shape. An alternative is using a function that returns the data that you want your <code>*Displayer</code> to render:</p>
+<p><code>const GenericNameDisplayer = observer((props) =&gt; &lt;DisplayName name={props.getNameTracked()} /&gt;)</code></p>
+<p>Then, you may use the component like this:</p>
+<pre><code>render() {
+  const { person, car } = this.props;
+  return (
+    &lt;&gt;
+      &lt;GenericNameDisplayer getNameTracked={() =&gt; person.name} /&gt;
+      &lt;GenericNameDisplayer getNameTracked={car.getModelTracked} /&gt;
+      &lt;GenericNameDisplayer getNameTracked={this.getManufacturerNameTracked} /&gt;
+    &lt;/&gt;
+  );
+}
+
+getManufacturerNameTracked = () =&gt; this.props.car.manufacturer.name;
+
+...
+class Car {
+  @observable model
+  getModelTracked = () =&gt; this.model
+}
+</code></pre><p>This approach will allow <code>GenericNameDisplayer</code> to be reused throughout your application to render any name. Now, what remains to be solved is the placement of those functions: the sample shows three possibilities - you may create the function directly in the render method (which is not considered a good practice), you may place the function in the component (as with <code>getManufacturerNameTracked</code>), or you may place the function directly on the object that contains the data (as with <code>getModelTracked</code>).</p>
 <h2 id="bind-functions-early"><a name="bind-functions-early" class="plugin-anchor" href="#bind-functions-early"><span class="fa fa-link"></span></a>Bind functions early</h2>
 <p>This tip applies to React in general and libraries using <code>PureRenderMixin</code> especially, try to avoid creating new closures in render methods.</p>
 <p>See also these resources:</p>

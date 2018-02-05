@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="8.9" data-basepath=".." data-revision="Wed Dec 27 2017 10:43:12 GMT+0100 (CET)">
+    <div class="book" data-level="8.9" data-basepath=".." data-revision="Mon Feb 05 2018 19:21:11 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -507,14 +507,29 @@
             
         </li>
     
-        <li class="chapter " data-level="7.6" data-path="best/syntax.html">
+        <li class="chapter " data-level="7.6" data-path="best/trace.html">
+            
+                
+                    <a href="../best/trace.html">
+                
+                        <i class="fa fa-check"></i>
+                        
+                            <b>7.6.</b>
+                        
+                        Using trace for debugging
+                    </a>
+            
+            
+        </li>
+    
+        <li class="chapter " data-level="7.7" data-path="best/syntax.html">
             
                 
                     <a href="../best/syntax.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>7.6.</b>
+                            <b>7.7.</b>
                         
                         ES5 / ES6 / TypeScript syntax
                     </a>
@@ -522,14 +537,14 @@
             
         </li>
     
-        <li class="chapter " data-level="7.7" data-path="best/stateless-HMR.html">
+        <li class="chapter " data-level="7.8" data-path="best/stateless-HMR.html">
             
                 
                     <a href="../best/stateless-HMR.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>7.7.</b>
+                            <b>7.8.</b>
                         
                         Stateless Components and Hot Module Reloading
                     </a>
@@ -887,14 +902,14 @@
                     <section class="normal" id="section-">
                     
                         <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/reaction.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="reaction"><a name="reaction" class="plugin-anchor" href="#reaction"><span class="fa fa-link"></span></a>Reaction</h1>
-<p>Usage: <code>reaction(() =&gt; data, data =&gt; { sideEffect }, options?)</code>.</p>
+<p>Usage: <code>reaction(() =&gt; data, (data, reaction) =&gt; { sideEffect }, options?)</code>.</p>
 <p>A variation on <code>autorun</code> that gives more fine grained control on which observables will be tracked.
 It takes two functions, the first one (the <em>data</em> function) is tracked and returns data that is used as input for the second one, the <em>effect</em> function.
 Unlike <code>autorun</code> the side effect won&apos;t be run directly when created, but only after the data expression returns a new value for the first time.
 Any observables that are accessed while executing the side effect will not be tracked.</p>
 <p>The side effect can be debounced, just like <code>autorunAsync</code>.
 <code>reaction</code> returns a disposer function.
-The functions passed to <code>reaction</code> will receive one argument when invoked, the current reaction, which can be used to dispose the when during execution.</p>
+The functions passed to <code>reaction</code> will receive two argument when invoked, the current reaction, which can be used to dispose the when during execution.</p>
 <p>It is important to notice that the side effect will <em>only</em> react to data that was <em>accessed</em> in the data expression, which might be less then the data that is actually used in the effect.
 Also, the side effect will only be triggered when the data returned by the expression has changed.
 In other words: reaction requires you to produce the things you need in your side effect.</p>
@@ -951,6 +966,32 @@ todos[<span class="hljs-number">0</span>].title = <span class="hljs-string">&quo
 <span class="hljs-comment">// prints:</span>
 <span class="hljs-comment">// reaction 2: Make tea, find biscuit, explain reactions</span>
 <span class="hljs-comment">// autorun 1: Make tea, find biscuit, explain reactions</span>
+</code></pre>
+<p>In the following example <code>reaction3</code>, will react to the change in the <code>counter</code> count.
+When invoked <code>reaction</code>, second argument can use as disposer.
+The following example shows a <code>reaction</code> that is invoked only once.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> counter = observable({ count: <span class="hljs-number">0</span> });
+
+<span class="hljs-comment">// invoke once of and dispose reaction: reacts to obserbable value.</span>
+<span class="hljs-keyword">const</span> reaction3 = reaction(
+    () =&gt; counter.count,
+    (count, reaction) =&gt; {
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;reaction 3: invoked. counter.count = &quot;</span> + count);
+        reaction.dispose();
+    }
+);
+
+counter.count = <span class="hljs-number">1</span>;
+<span class="hljs-comment">// prints:</span>
+<span class="hljs-comment">// reaction 3: invoked. counter.count = 1</span>
+
+counter.count = <span class="hljs-number">2</span>;
+<span class="hljs-comment">// prints:</span>
+<span class="hljs-comment">// (There are no logging, because of reaction disposed. But, counter continue reaction)</span>
+
+<span class="hljs-built_in">console</span>.log(counter.count);
+<span class="hljs-comment">// prints:</span>
+<span class="hljs-comment">// 2</span>
 </code></pre>
 <p>Reaction is roughly speaking sugar for: <code>computed(expression).observe(action(sideEffect))</code> or <code>autorun(() =&gt; action(sideEffect)(expression)</code></p>
 </body></html>
