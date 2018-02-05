@@ -17,10 +17,7 @@
             "dom"
         ]
     },
-    "exclude": [
-        "node_modules",
-        "test",
-        "lib",
-        ".build"
+    "include": [
+        "src/**/*.ts"
     ]
 }

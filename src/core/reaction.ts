@@ -4,7 +4,8 @@ import {
     trackDerivedFunction,
     clearObserving,
     shouldCompute,
-    isCaughtException
+    isCaughtException,
+    TraceMode
 } from "./derivation"
 import { IObservable, startBatch, endBatch } from "./observable"
 import { globalState } from "./globalstate"
@@ -17,6 +18,7 @@ import {
 } from "../utils/utils"
 import { isSpyEnabled, spyReport, spyReportStart, spyReportEnd } from "./spy"
 import { getMessage } from "../utils/messages"
+import { trace } from "../api/whyrun"
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations
@@ -39,6 +41,7 @@ import { getMessage } from "../utils/messages"
 
 export interface IReactionPublic {
     dispose(): void
+    trace(enterBreakPoint?: boolean): void
 }
 
 export interface IReactionDisposer {
@@ -59,6 +62,7 @@ export class Reaction implements IDerivation, IReactionPublic {
     _isScheduled = false
     _isTrackPending = false
     _isRunning = false
+    isTracing: TraceMode = TraceMode.NONE
     errorHandler: (error: any, derivation: IDerivation) => void
 
     constructor(
@@ -201,6 +205,10 @@ WhyRun? reaction '${this.name}':
         : ""}
 	${getMessage("m038")}
 `
+    }
+
+    trace(enterBreakPoint: boolean = false) {
+        trace(this, enterBreakPoint)
     }
 }
 
