@@ -18,7 +18,7 @@ If you want to use decorators follow the following steps.
 
 Enable the compiler option `experimentalDecorators` in `tsconfig.json` or pass it as flag `--experimentalDecorators` to the compiler. You must target `es5`+ (es5, es6, ...) with `target` option or by `--target` flag.
 
-**Babel:**
+**Babel: enabling decorators**
 
 Install support for decorators: `npm i --save-dev babel-plugin-transform-decorators-legacy`. And enable it in your `.babelrc` file:
 
@@ -41,6 +41,22 @@ When using react native, the following preset can be used instead of `transform-
   "presets": ["stage-2", "react-native-stage-0/decorator-support"]
 }
 ```
+
+**Babel: using `babel-preset-mobx`**
+
+A more convenient way to setup Babel for usage with mobx is to use the [`mobx`](https://github.com/zwhitchcox/babel-preset-mobx) preset, that incorporates decorators and several other plugins typically used with mobx:
+
+```
+npm install --save-dev babel-preset-mobx
+```
+
+.babelrc:
+```
+{
+  "presets": ["mobx"]
+}
+```
+
 
 ## Limitations on decorators
 
