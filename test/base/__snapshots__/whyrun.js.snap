@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`whyrun 1`] = `
-"WhyRun? computation 'ObservableObject@1.fullname': 
+"WhyRun? computation 'ObservableObject@1.fullname':
  * Running because: [idle] not running at the moment
 * This computation is suspended (not in use by any reaction) and won't run automatically.
 	Didn't expect this computation to be suspended at this point?
@@ -10,7 +10,7 @@ exports[`whyrun 1`] = `
 `;
 
 exports[`whyrun 2`] = `
-"WhyRun? computation 'ObservableObject@1.fullname': 
+"WhyRun? computation 'ObservableObject@1.fullname':
  * Running because: [active] the value of this computation is needed by a reaction
  * This computation will re-run if any of the following observables changes:
     ObservableObject@1.firstname - ObservableObject@1.lastname
@@ -36,11 +36,11 @@ exports[`whyrun 3`] = `
 `;
 
 exports[`whyrun 4`] = `
-"WhyRun? computation 'ObservableObject@1.fullname': 
+"WhyRun? computation 'ObservableObject@1.fullname':
  * Running because: [idle] not running at the moment
  * This computation will re-run if any of the following observables changes:
     ObservableObject@1.firstname - ObservableObject@1.lastname
-    
+
     Missing items in this list?
     1. Check whether all used values are properly marked as observable (use isObservable to verify)
     2. Make sure you didn't dereference values too early. MobX observes props, not primitives. E.g: use 'person.name' instead of 'name' in your computation.
@@ -54,7 +54,7 @@ exports[`whyrun 5`] = `
  * Status: [idle]
  * This reaction will re-run if any of the following observables changes:
     ObservableObject@1.fullname
-    
+
 	Missing items in this list?
     1. Check whether all used values are properly marked as observable (use isObservable to verify)
     2. Make sure you didn't dereference values too early. MobX observes props, not primitives. E.g: use 'person.name' instead of 'name' in your computation.
@@ -62,7 +62,7 @@ exports[`whyrun 5`] = `
 `;
 
 exports[`whyrun 6`] = `
-"WhyRun? computation 'ObservableObject@1.fullname': 
+"WhyRun? computation 'ObservableObject@1.fullname':
  * Scheduled by a change to 'ObservableObject@1.firstname'
  * Running because: [active] the value of this computation is needed by a reaction
  * This computation will re-run if any of the following observables changes:
@@ -90,11 +90,11 @@ exports[`whyrun 7`] = `
 `;
 
 exports[`whyrun 8`] = `
-"WhyRun? computation 'ObservableObject@1.fullname': 
+"WhyRun? computation 'ObservableObject@1.fullname':
  * Running because: [idle] not running at the moment
  * This computation will re-run if any of the following observables changes:
     ObservableObject@1.firstname - ObservableObject@1.lastname
-    
+
     Missing items in this list?
     1. Check whether all used values are properly marked as observable (use isObservable to verify)
     2. Make sure you didn't dereference values too early. MobX observes props, not primitives. E.g: use 'person.name' instead of 'name' in your computation.
@@ -108,7 +108,7 @@ exports[`whyrun 9`] = `
  * Status: [idle]
  * This reaction will re-run if any of the following observables changes:
     ObservableObject@1.fullname
-    
+
 	Missing items in this list?
     1. Check whether all used values are properly marked as observable (use isObservable to verify)
     2. Make sure you didn't dereference values too early. MobX observes props, not primitives. E.g: use 'person.name' instead of 'name' in your computation.
@@ -119,8 +119,8 @@ exports[`whyrun 10`] = `
 "WhyRun? reaction 'loggerzz':
  * Status: [stopped]
  * This reaction will re-run if any of the following observables changes:
-    
-    
+
+
 	Missing items in this list?
     1. Check whether all used values are properly marked as observable (use isObservable to verify)
     2. Make sure you didn't dereference values too early. MobX observes props, not primitives. E.g: use 'person.name' instead of 'name' in your computation.
@@ -128,10 +128,33 @@ exports[`whyrun 10`] = `
 `;
 
 exports[`whyrun 11`] = `
-"WhyRun? computation 'ObservableObject@1.fullname': 
+"WhyRun? computation 'ObservableObject@1.fullname':
  * Running because: [idle] not running at the moment
 * This computation is suspended (not in use by any reaction) and won't run automatically.
 	Didn't expect this computation to be suspended at this point?
 	  1. Make sure this computation is used by a reaction (reaction, autorun, observer).
 	  2. Check whether you are using this computation synchronously (in the same stack as they reaction that needs it)."
+exports[`trace 1`] = `
+Array [
+  "- INIT -",
+  Arguments [
+    "[mobx.trace] 'ObservableObject@4.fullname' tracing enabled",
+  ],
+  "- SECOND READ -",
+  Arguments [
+    "[mobx.trace] 'ObservableObject@4.fullname' is being read outside a reactive context and doing a full recompute",
+  ],
+  "- REACTION -",
+  Arguments [
+    "[mobx.trace] 'loggerzz' tracing enabled",
+  ],
+  "- CHANGE -",
+  Arguments [
+    "[mobx.trace] 'ObservableObject@4.fullname' is invalidated due to a change in: 'ObservableObject@4.firstname'",
+  ],
+  Arguments [
+    "[mobx.trace] 'loggerzz' is invalidated due to a change in: 'ObservableObject@4.fullname'",
+  ],
+  "- DISPOSE -",
+]
 `;

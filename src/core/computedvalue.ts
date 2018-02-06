@@ -16,7 +16,8 @@ import {
     untrackedEnd,
     shouldCompute,
     CaughtException,
-    isCaughtException
+    isCaughtException,
+    TraceMode
 } from "./derivation"
 import { globalState } from "./globalstate"
 import { createAction } from "./action"
@@ -26,7 +27,6 @@ import {
     invariant,
     Lambda,
     unique,
-    joinStrings,
     primitiveSymbol,
     toPrimitive
 } from "../utils/utils"
@@ -63,7 +63,7 @@ export interface IComputedValue<T> {
  */
 export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDerivation {
     dependenciesState = IDerivationState.NOT_TRACKING
-    observing = [] // nodes we are looking at. Our value depends on these nodes
+    observing: IObservable[] = [] // nodes we are looking at. Our value depends on these nodes
     newObserving = null // during tracking it's an array with new observed observers
 
     isPendingUnobservation: boolean = false
@@ -81,6 +81,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     isComputing: boolean = false // to check for cycles
     isRunningSetter: boolean = false
     setter: (value: T) => void
+    isTracing: TraceMode = TraceMode.NONE
 
     /**
      * Create a new computed value based on a function expression.
@@ -125,7 +126,15 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             // The computedValue is accessed outside of any mobx stuff. Batch observing should be enough and don't need
             // tracking as it will never be called again inside this batch.
             startBatch()
-            if (shouldCompute(this)) this.value = this.computeValue(false)
+            if (shouldCompute(this)) {
+                if (this.isTracing !== TraceMode.NONE) {
+                    console.log(
+                        `[mobx.trace] '${this
+                            .name}' is being read outside a reactive context and doing a full recompute`
+                    )
+                }
+                this.value = this.computeValue(false)
+            }
             endBatch()
         } else {
             reportObserved(this)
@@ -232,37 +241,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
     valueOf(): T {
         return toPrimitive(this.get())
-    }
-
-    whyRun() {
-        const isTracking = Boolean(globalState.trackingDerivation)
-        const observing = unique(this.isComputing ? this.newObserving! : this.observing).map(
-            (dep: any) => dep.name
-        )
-        const observers = unique(getObservers(this).map(dep => dep.name))
-        // prettier-ignore
-        return (
-`WhyRun? computation '${this.name}': ${this.triggeredBy
-	? `\n * Scheduled by a change to '${this.triggeredBy}'`
-	: ""}
- * Running because: ${isTracking
-		? "[active] the value of this computation is needed by a reaction"
-		: this.isComputing
-			? "[get] The value of this computed was requested outside a reaction"
-			: "[idle] not running at the moment"}
-` +
-            (this.dependenciesState === IDerivationState.NOT_TRACKING
-                ? getMessage("m032")
-				:
-` * This computation will re-run if any of the following observables changes:
-    ${joinStrings(observing)}
-    ${this.isComputing && isTracking
-		? " (... or any observable accessed during the remainder of the current run)"
-		: ""}
-    ${getMessage("m038")}
-  * If the outcome of this computation changes, the following observers will be re-run:
-    ${joinStrings(observers)}`)
-        )
     }
 }
 

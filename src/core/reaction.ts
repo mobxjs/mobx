@@ -4,19 +4,15 @@ import {
     trackDerivedFunction,
     clearObserving,
     shouldCompute,
-    isCaughtException
+    isCaughtException,
+    TraceMode
 } from "./derivation"
 import { IObservable, startBatch, endBatch } from "./observable"
 import { globalState } from "./globalstate"
-import {
-    createInstanceofPredicate,
-    getNextId,
-    invariant,
-    unique,
-    joinStrings
-} from "../utils/utils"
+import { createInstanceofPredicate, getNextId, invariant, unique } from "../utils/utils"
 import { isSpyEnabled, spyReport, spyReportStart, spyReportEnd } from "./spy"
 import { getMessage } from "../utils/messages"
+import { trace } from "../api/whyrun"
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations
@@ -39,6 +35,7 @@ import { getMessage } from "../utils/messages"
 
 export interface IReactionPublic {
     dispose(): void
+    trace(enterBreakPoint?: boolean): void
 }
 
 export interface IReactionDisposer {
@@ -59,7 +56,7 @@ export class Reaction implements IDerivation, IReactionPublic {
     _isScheduled = false
     _isTrackPending = false
     _isRunning = false
-    triggeredBy = ""
+    isTracing: TraceMode = TraceMode.NONE
     errorHandler: (error: any, derivation: IDerivation) => void
 
     constructor(
@@ -185,24 +182,8 @@ export class Reaction implements IDerivation, IReactionPublic {
         return `Reaction[${this.name}]`
     }
 
-    whyRun() {
-        const observing = unique(this._isRunning ? this.newObserving : this.observing).map(
-            dep => dep.name
-        )
-
-        // prettier-ignore
-        return `WhyRun? reaction '${this.name}':
- * Status: [${this.isDisposed
-		? "stopped"
-		: this._isRunning ? "running" : this.isScheduled() ? "scheduled" : "idle"}]${this.triggeredBy
-			? `\n * Scheduled by a change to '${this.triggeredBy}'`
-			: ""}
- * This reaction will re-run if any of the following observables changes:
-    ${joinStrings(observing)}
-    ${this._isRunning
-        ? " (... or any observable accessed during the remainder of the current run)"
-        : ""}
-	${getMessage("m038")}`
+    trace(enterBreakPoint: boolean = false) {
+        trace(this, enterBreakPoint)
     }
 }
 

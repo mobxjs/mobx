@@ -25,6 +25,12 @@ export enum IDerivationState {
     STALE = 2
 }
 
+export enum TraceMode {
+    NONE,
+    LOG,
+    BREAK
+}
+
 /**
  * A derivation is everything that can be derived from the state (all the atoms) in a pure manner.
  * See https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.xvbh6qd74
@@ -44,7 +50,7 @@ export interface IDerivation extends IDepTreeNode {
     unboundDepsCount: number
     __mapid: string
     onBecomeStale(): void
-    triggeredBy: string
+    isTracing: TraceMode
 }
 
 export class CaughtException {

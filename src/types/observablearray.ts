@@ -54,7 +54,7 @@ export interface IObservableArray<T> extends Array<T> {
         predicate: (item: T, index: number, array: IObservableArray<T>) => boolean,
         thisArg?: any,
         fromIndex?: number
-    ): T
+    ): T | undefined
     findIndex(
         predicate: (item: T, index: number, array: IObservableArray<T>) => boolean,
         thisArg?: any,

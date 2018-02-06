@@ -3,7 +3,7 @@ root = true
 [*]
 end_of_line = lf
 charset = utf-8
-indent_style = tab
+indent_style = space
 tab_width = 4
 
 [{package.json,.travis.yml}]

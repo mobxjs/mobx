@@ -16,6 +16,10 @@
 * Dropped already deprecated and broken `default` export that made it impossible to tree-shake mobx. Make sure you always use `import { x } from "mobx"` and not `import x from "mobx"`
 * Dropped already deprecated toplevel `map` function
 * Killed the already deprecated modifiers `asFlat` etc. If you war still using this, see the MobX 2 -> 3 migration notes.
+# 3.5.0/1
+
+* Introduced `trace` for easier debugging of reactions / computed values. See the [docs](https://mobx.js.org/best/trace.html) for details.
+* Improved typings of `observableArray.find`, see [#1324](https://github.com/mobxjs/mobx/pull/1324) for details.
 
 # 3.4.1
 
