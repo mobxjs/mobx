@@ -10,12 +10,14 @@
 * Dropped `isStrictModeEnabled`
 * `observable(value)` will only succeed if it can turn the value into an observable data structure (a Map, Array or observable object). But it will no longer create an observable box for other values to avoid confusion. Call `observable.box(value)`  explictly in such cases.
 * `isComputed` and `isObservable` no longer accept a property as second argument. Instead use `isComputedProp` and `isObservableProp`.
+* Removed `whyRun`, use `trace` instead
 
 ## Non breaking changes
 
 * Dropped already deprecated and broken `default` export that made it impossible to tree-shake mobx. Make sure you always use `import { x } from "mobx"` and not `import x from "mobx"`
 * Dropped already deprecated toplevel `map` function
 * Killed the already deprecated modifiers `asFlat` etc. If you war still using this, see the MobX 2 -> 3 migration notes.
+
 # 3.5.0/1
 
 * Introduced `trace` for easier debugging of reactions / computed values. See the [docs](https://mobx.js.org/best/trace.html) for details.

@@ -50,11 +50,11 @@ test("correct api should be exposed", function() {
             "_setReactionScheduler",
             "spy",
             "toJS",
+            "trace",
             "transaction",
             "untracked",
             "useStrict",
-            "when",
-            "whyRun"
+            "when"
         ].sort()
     )
 })

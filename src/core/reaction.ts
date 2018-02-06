@@ -12,7 +12,7 @@ import { globalState } from "./globalstate"
 import { createInstanceofPredicate, getNextId, invariant, unique } from "../utils/utils"
 import { isSpyEnabled, spyReport, spyReportStart, spyReportEnd } from "./spy"
 import { getMessage } from "../utils/messages"
-import { trace } from "../api/whyrun"
+import { trace } from "../api/trace"
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations

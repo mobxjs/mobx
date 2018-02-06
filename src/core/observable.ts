@@ -196,7 +196,6 @@ export function propagateChanged(observable: IObservable) {
             d.onBecomeStale()
         }
         d.dependenciesState = IDerivationState.STALE
-        d.triggeredBy = observable.name
     }
     // invariantLOS(observable, "changed end");
 }
@@ -217,7 +216,6 @@ export function propagateChangeConfirmed(observable: IObservable) {
             d.dependenciesState === IDerivationState.UP_TO_DATE // this happens during computing of `d`, just keep lowestObserverState up to date.
         )
             observable.lowestObserverState = IDerivationState.UP_TO_DATE
-        d.triggeredBy = observable.name
     }
     // invariantLOS(observable, "confirmed end");
 }
