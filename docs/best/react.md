@@ -411,8 +411,8 @@ const Likes = observer(({ likes }) =>
 
 Notes:
 1. \* If the `Author` component was invoked like: `<Author author={ message.author.name} />`. Then `Message` would be the dereferencing component and react to changes to `message.author.name`. Nonetheless `<Author>` would rerender as well, because it receives a new value. So performance wise it is best to dereference as late as possible.
-2. \** If likes where objects instead of strings, and if they were rendered by their own `Like` component, the `Likes` component would not rerender for changes happening inside a specific like.
+2. \** If likes were objects instead of strings, and if they were rendered by their own `Like` component, the `Likes` component would not rerender for changes happening inside a specific like.
 
 ## TL;DR
 
-> MobX reacts to any an _existing_ **observable** _property_ that is read during the execution of a tracked function.
+> MobX reacts to any _existing_ **observable** _property_ that is read during the execution of a tracked function.
