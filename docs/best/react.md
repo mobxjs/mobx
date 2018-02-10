@@ -119,7 +119,7 @@ message.author = { name: "John" };
 The first change will be picked up, `message.author` and `author` are the same object, and the `.name` property is dereferenced in the autorun.
 However the second change will **not** be picked up, the `message.author` relation is not tracked by the `autorun`. Autorun is still using the "old" `author`.
 
-#### Common pitfal: console.log
+#### Common pitfall: console.log
 
 ```javascript
 const message = observable({ title: "hello" })
