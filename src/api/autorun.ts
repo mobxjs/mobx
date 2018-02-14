@@ -82,7 +82,7 @@ export function when(
  * @param scope (optional)
  * @returns disposer function to prematurely end the observer.
  */
-export function when(predicate: () => boolean, effect: Lambda, scope?: any): Lambda
+export function when(predicate: () => boolean, effect: Lambda, scope?: any): IReactionDisposer
 
 export function when(arg1: any, arg2: any, arg3?: any, arg4?: any) {
     let name: string, predicate: () => boolean, effect: Lambda, scope: any
