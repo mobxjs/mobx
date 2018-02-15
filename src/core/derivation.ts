@@ -163,7 +163,6 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, con
  */
 function bindDependencies(derivation: IDerivation) {
     // invariant(derivation.dependenciesState !== IDerivationState.NOT_TRACKING, "INTERNAL ERROR bindDependencies expects derivation.dependenciesState !== -1");
-    derivation.triggeredBy = ""
     const prevObserving = derivation.observing
     const observing = (derivation.observing = derivation.newObserving!)
     let lowestNewObservingDerivationState = IDerivationState.UP_TO_DATE

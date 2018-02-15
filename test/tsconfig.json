@@ -4,6 +4,7 @@
         "target": "es5",
         "noImplicitAny": true,
         "sourceMap": false,
-		"experimentalDecorators": true
+        "experimentalDecorators": true,
+        "strict":true
     }
 }
