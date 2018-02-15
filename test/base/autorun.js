@@ -36,7 +36,7 @@ test("autorun can be disposed on first run", function() {
 test("autorun warns when passed an action", function() {
     var action = m.action(() => {})
     expect.assertions(1)
-    expect(() => m.autorun(action)).toThrowError(/attempted to pass an action to autorun/)
+    expect(() => m.autorun(action)).toThrowError(/Autorun does not accept actions/)
 })
 
 test("autorun batches automatically", function() {

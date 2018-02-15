@@ -61,7 +61,7 @@ test("should not be possible to use @action with getters", () => {
             @action
             get Test() {}
         }
-    }).toThrowError(new Error("[mobx] action is not expected to be used with getters"))
+    }).toThrowError(new Error("[mobx] @action cannot be used with getters"))
 
     mobx._resetGlobalState()
 })

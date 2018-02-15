@@ -7,12 +7,11 @@ import { isReaction } from "../core/reaction"
 import { isObservableArray } from "./observablearray"
 import { isObservableMap } from "./observablemap"
 import { isObservableObject } from "./observableobject"
-import { getMessage } from "../utils/messages"
 
 export function getAtom(thing: any, property?: string): IDepTreeNode {
     if (typeof thing === "object" && thing !== null) {
         if (isObservableArray(thing)) {
-            invariant(property === undefined, getMessage("m036"))
+            invariant(property === undefined, "It is not possible to get index atoms from arrays")
             return (thing as any).$mobx.atom
         }
         if (isObservableMap(thing)) {

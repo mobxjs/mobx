@@ -22,7 +22,6 @@ import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
 import { IEqualsComparer, comparer } from "./comparer"
 import { IEnhancer, isModifierDescriptor, IModifierDescriptor } from "./modifiers"
 import { isAction, defineBoundAction } from "../api/action"
-import { getMessage } from "../utils/messages"
 
 export interface IObservableObject {
     "observable-object": IObservableObject
@@ -77,7 +76,10 @@ export interface IIsObservableObject {
 export function asObservableObject(target, name?: string): ObservableObjectAdministration {
     if (isObservableObject(target) && target.hasOwnProperty("$mobx")) return (target as any).$mobx
 
-    invariant(Object.isExtensible(target), getMessage("m035"))
+    invariant(
+        Object.isExtensible(target),
+        "Cannot make the designated object observable; it is not extensible"
+    )
     if (!isPlainObject(target))
         name = (target.constructor.name || "ObservableObject") + "@" + getNextId()
     if (!name) name = "ObservableObject@" + getNextId()

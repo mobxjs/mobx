@@ -4,14 +4,16 @@ import { isObservableObject, ObservableObjectAdministration } from "../types/obs
 import { isAtom } from "../core/atom"
 import { isComputedValue } from "../core/computedvalue"
 import { isReaction } from "../core/reaction"
-import { getMessage } from "../utils/messages"
-import { fail } from "../utils/utils"
+import { fail, invariant } from "../utils/utils"
 
 function _isObservable(value, property?: string): boolean {
     if (value === null || value === undefined) return false
     if (property !== undefined) {
-        if (isObservableArray(value) || isObservableMap(value)) throw new Error(getMessage("m019"))
-        else if (isObservableObject(value)) {
+        if (isObservableArray(value) || isObservableMap(value))
+            return fail(
+                "isObservable(object, propertyName) is not supported for arrays and maps. Use map.has or array.length instead."
+            )
+        if (isObservableObject(value)) {
             const o = <ObservableObjectAdministration>(value as any).$mobx
             return o.values && !!o.values[property]
         }
@@ -28,10 +30,10 @@ function _isObservable(value, property?: string): boolean {
 }
 
 export function isObservable(value: any): boolean {
-    if (arguments.length > 1)
-        return fail(
-            `isObservable expects only 1 argument. Use isObsevableProp to inspect the observability of a property`
-        )
+    invariant(
+        arguments.length === 1,
+        `isObservable expects only 1 argument. Use isObsevableProp to inspect the observability of a property`
+    )
     return _isObservable(value)
 }
 

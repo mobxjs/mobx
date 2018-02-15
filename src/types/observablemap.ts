@@ -26,7 +26,6 @@ import { arrayAsIterator, declareIterator, Iterator } from "../utils/iterable"
 import { observable } from "../api/observable"
 import { transaction } from "../api/transaction"
 import { referenceEnhancer } from "./modifiers"
-import { getMessage } from "../utils/messages"
 
 /**
  * Map as defined by Typescript's lib.es2015.collection.d.ts
@@ -367,7 +366,10 @@ export class ObservableMap<V>
      * for callback details
      */
     observe(listener: (changes: IMapChange<V>) => void, fireImmediately?: boolean): Lambda {
-        invariant(fireImmediately !== true, getMessage("m033"))
+        invariant(
+            fireImmediately !== true,
+            "`observe` doesn't support fireImmediately=true in combination with maps."
+        )
         return registerListener(this, listener)
     }
 

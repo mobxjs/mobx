@@ -16,7 +16,6 @@ import { isObservable } from "./isobservable"
 import { IObservableObject, asObservableObject } from "../types/observableobject"
 import { extendObservable, extendShallowObservable } from "./extendobservable"
 import { IObservableMapInitialValues, ObservableMap, IMap } from "../types/observablemap"
-import { getMessage } from "../utils/messages"
 
 const deepDecorator = createDecoratorForEnhancer(deepEnhancer)
 const shallowDecorator = createDecoratorForEnhancer(shallowEnhancer)
@@ -32,8 +31,12 @@ function createObservable(v: any = undefined) {
     // @observable someProp;
     if (typeof arguments[1] === "string") return deepDecorator.apply(null, arguments)
 
-    invariant(arguments.length <= 1, getMessage("m021"))
-    invariant(!isModifierDescriptor(v), getMessage("m020"))
+    invariant(arguments.length <= 1, "observable expects zero or one arguments")
+    // TODO: kill this check?
+    invariant(
+        !isModifierDescriptor(v),
+        "modifiers can only be used for individual object properties"
+    )
 
     // it is an observable already, done
     if (isObservable(v)) return v

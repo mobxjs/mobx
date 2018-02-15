@@ -6,14 +6,16 @@ import {
 import { invariant, assertPropertyConfigurable } from "../utils/utils"
 import { createClassPropertyDecorator } from "../utils/decorators"
 import { IEnhancer } from "../types/modifiers"
-import { getMessage } from "../utils/messages"
 
 export function createDecoratorForEnhancer(enhancer: IEnhancer<any>) {
     invariant(!!enhancer, ":(")
     return createClassPropertyDecorator(
         (target, name, baseValue, _, baseDescriptor) => {
             assertPropertyConfigurable(target, name)
-            invariant(!baseDescriptor || !baseDescriptor.get, getMessage("m022"))
+            invariant(
+                !baseDescriptor || !baseDescriptor.get,
+                "@observable can not be used on getters, use @computed instead"
+            )
 
             const adm = asObservableObject(target, undefined)
             defineObservableProperty(adm, name, baseValue, enhancer)

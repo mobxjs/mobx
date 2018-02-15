@@ -21,8 +21,7 @@ export function fail(message: string, thing?): never {
 }
 
 export function invariant(check: boolean, message: string, thing?) {
-    if (!check)
-        throw new Error("[mobx] Invariant failed: " + message + (thing ? ` in '${thing}'` : ""))
+    if (!check) throw new Error("[mobx] " + message + (thing ? ` in '${thing}'` : ""))
 }
 
 /**

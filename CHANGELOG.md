@@ -1,18 +1,5 @@
 # 4.0.0
 
-## TODO:
-
-Upgrade to latest TS
-Error messages cleanup
-Reaction api cleanup
-Remove most invariants in prod
-Support Babel 7
-Process TODOs
-Fix strict type errors
-make observable api more stricter
-Remove some mutating spy events?
-double check cleaned up api
-
 ## Breaking changes
 
 * The `extras.` namespace has been dropped to enable tree-shaking non-used MobX features. All methods that where there originally are now exported at top level. If they are part of the official public API (you are encouraged to use them) they are exported as is. If they are experimental or somehow internal (you are discouraged to use them), they are prefixed with `_`.

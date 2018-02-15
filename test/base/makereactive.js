@@ -532,7 +532,7 @@ test("540 - extendobservable should not report cycles", function() {
 
     objWrapper.value = obj
     expect(() => mobx.extendObservable(objWrapper, objWrapper.value)).toThrowError(
-        /extending an object with another observable \(object\) is not supported/
+        /Extending an object with another observable \(object\) is not supported/
     )
 })
 

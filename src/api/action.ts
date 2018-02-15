@@ -1,7 +1,6 @@
 import { invariant, addHiddenProp } from "../utils/utils"
 import { createClassPropertyDecorator } from "../utils/decorators"
 import { createAction, executeAction, IAction } from "../core/action"
-import { getMessage } from "../utils/messages"
 
 export interface IActionFactory {
     // nameless actions
@@ -69,9 +68,7 @@ const actionFieldDecorator = createClassPropertyDecorator(
     function(key) {
         return this[key]
     },
-    function() {
-        invariant(false, getMessage("m001"))
-    },
+    dontReassignFields,
     false,
     true
 )
@@ -83,12 +80,14 @@ const boundActionDecorator = createClassPropertyDecorator(
     function(key) {
         return this[key]
     },
-    function() {
-        invariant(false, getMessage("m001"))
-    },
+    dontReassignFields,
     false,
     false
 )
+
+function dontReassignFields() {
+    invariant(false, "@action fields are not reassignable")
+}
 
 export var action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): any {
     if (arguments.length === 1 && typeof arg1 === "function")
@@ -121,7 +120,7 @@ function namedActionDecorator(name: string) {
             return descriptor
         }
         if (descriptor !== undefined && descriptor.get !== undefined) {
-            throw new Error("[mobx] action is not expected to be used with getters");
+            return invariant(false, "@action cannot be used with getters")
         }
         // bound instance methods
         return actionFieldDecorator(name).apply(this, arguments)
@@ -135,8 +134,10 @@ export function runInAction<T>(arg1, arg2?, arg3?) {
     const fn = typeof arg1 === "function" ? arg1 : arg2
     const scope = typeof arg1 === "function" ? arg2 : arg3
 
-    invariant(typeof fn === "function", getMessage("m002"))
-    invariant(fn.length === 0, getMessage("m003"))
+    invariant(
+        typeof fn === "function" && fn.length === 0,
+        "`runInAction` expects a function without arguments"
+    )
     invariant(
         typeof actionName === "string" && actionName.length > 0,
         `actions should have valid names, got: '${actionName}'`

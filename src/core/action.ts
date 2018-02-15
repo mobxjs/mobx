@@ -4,7 +4,6 @@ import { untrackedStart, untrackedEnd } from "./derivation"
 import { startBatch, endBatch } from "./observable"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "./spy"
 import { globalState } from "./globalstate"
-import { getMessage } from "../utils/messages"
 
 export interface IAction {
     originalFn: Function
@@ -12,7 +11,7 @@ export interface IAction {
 }
 
 export function createAction(actionName: string, fn: Function): Function & IAction {
-    invariant(typeof fn === "function", getMessage("m026"))
+    invariant(typeof fn === "function", "`action` can only be invoked on functions")
     invariant(
         typeof actionName === "string" && actionName.length > 0,
         `actions should have valid names, got: '${actionName}'`
@@ -81,7 +80,6 @@ function endAction(runInfo: IActionRunInfo) {
 }
 
 export function useStrict(strict: boolean): void {
-    invariant(globalState.trackingDerivation === null, getMessage("m028"))
     globalState.strictMode = strict
     globalState.allowStateChanges = !strict
 }

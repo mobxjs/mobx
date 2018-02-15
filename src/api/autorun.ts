@@ -4,7 +4,6 @@ import { Reaction, IReactionPublic, IReactionDisposer } from "../core/reaction"
 import { untrackedStart, untrackedEnd } from "../core/derivation"
 import { action, isAction, runInAction } from "./action"
 import { IEqualsComparer, comparer } from "../types/comparer"
-import { getMessage } from "../utils/messages"
 
 /**
  * Creates a reactive view and keeps it alive, so that the view is always
@@ -41,8 +40,11 @@ export function autorun(arg1: any, arg2: any, arg3?: any) {
         scope = arg2
     }
 
-    invariant(typeof view === "function", getMessage("m004"))
-    invariant(isAction(view) === false, getMessage("m005"))
+    invariant(typeof view === "function", "Autorun expects a function")
+    invariant(
+        isAction(view) === false,
+        "Autorun does not accept actions since actions are untrackable"
+    )
     if (scope) view = view.bind(scope)
 
     const reaction = new Reaction(name, function() {
@@ -133,7 +135,10 @@ export function autorunAsync(arg1: any, arg2: any, arg3?: any, arg4?: any) {
         delay = arg2
         scope = arg3
     }
-    invariant(isAction(func) === false, getMessage("m006"))
+    invariant(
+        isAction(func) === false,
+        "Autorun does not accept actions since actions are untrackable"
+    )
     if (delay === void 0) delay = 1
 
     if (scope) func = func.bind(scope)
@@ -190,13 +195,6 @@ export function reaction<T>(
     effect: (arg: T, r: IReactionPublic) => void,
     arg3: any
 ) {
-    if (arguments.length > 3) {
-        fail(getMessage("m007"))
-    }
-    if (isModifierDescriptor(expression)) {
-        fail(getMessage("m008"))
-    }
-
     let opts: IReactionOptions
     if (typeof arg3 === "object") {
         opts = arg3

@@ -11,7 +11,6 @@ import { IObservable, startBatch, endBatch } from "./observable"
 import { globalState } from "./globalstate"
 import { createInstanceofPredicate, getNextId, invariant, unique } from "../utils/utils"
 import { isSpyEnabled, spyReport, spyReportStart, spyReportEnd } from "./spy"
-import { getMessage } from "../utils/messages"
 import { trace } from "../api/trace"
 
 /**
@@ -139,12 +138,7 @@ export class Reaction implements IDerivation, IReactionPublic {
         }
 
         const message = `[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: '${this}`
-        const messageToUser = getMessage("m037")
-
-        console.error(
-            message || messageToUser /* latter will not be true, make sure uglify doesn't remove */,
-            error
-        )
+        console.error(message, error)
         /** If debugging brought you here, please, read the above message :-). Tnx! */
 
         if (isSpyEnabled()) {

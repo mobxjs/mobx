@@ -131,5 +131,5 @@ test("autorunAsync passes Reaction as an argument to view function", function(do
 test("autorunAsync warns when passed an action", function() {
     var action = m.action(() => {})
     expect.assertions(1)
-    expect(() => m.autorunAsync(action)).toThrowError(/attempted to pass an action to autorunAsync/)
+    expect(() => m.autorunAsync(action)).toThrowError(/Autorun does not accept actions/)
 })

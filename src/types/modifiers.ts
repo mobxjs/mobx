@@ -2,16 +2,19 @@ export interface IEnhancer<T> {
     (newValue: T, oldValue: T | undefined, name: string): T
 }
 
+// TODO: can be removed?
 export interface IModifierDescriptor<T> {
     isMobxModifierDescriptor: boolean
     initialValue: T | undefined
     enhancer: IEnhancer<T>
 }
 
+// TODO: can be removed?
 export function isModifierDescriptor(thing): thing is IModifierDescriptor<any> {
     return typeof thing === "object" && thing !== null && thing.isMobxModifierDescriptor === true
 }
 
+// TODO: can be removed?
 export function createModifierDescriptor<T>(
     enhancer: IEnhancer<T>,
     initialValue: T

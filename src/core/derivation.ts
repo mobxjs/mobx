@@ -3,7 +3,6 @@ import { IAtom } from "./atom"
 import { globalState } from "./globalstate"
 import { fail } from "../utils/utils"
 import { isComputedValue } from "./computedvalue"
-import { getMessage } from "../utils/messages"
 
 export enum IDerivationState {
     // before being run or (outside batch and not being observed)
@@ -117,10 +116,19 @@ export function isComputingDerivation() {
 export function checkIfStateModificationsAreAllowed(atom: IAtom) {
     const hasObservers = atom.observers.length > 0
     // Should never be possible to change an observed observable from inside computed, see #798
-    if (globalState.computationDepth > 0 && hasObservers) fail(getMessage("m031") + atom.name)
+    if (globalState.computationDepth > 0 && hasObservers)
+        fail(
+            "Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ",
+            +atom.name
+        )
     // Should not be possible to change observed state outside strict mode, except during initialization, see #563
     if (!globalState.allowStateChanges && hasObservers)
-        fail(getMessage(globalState.strictMode ? "m030a" : "m030b") + atom.name)
+        fail(
+            (globalState.strictMode
+                ? "Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: "
+                : "Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, the render function of a React component? Tried to modify: ") +
+                atom.name
+        )
 }
 
 /**

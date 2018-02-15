@@ -34,7 +34,6 @@ import { isSpyEnabled, spyReport } from "./spy"
 import { autorun } from "../api/autorun"
 import { IEqualsComparer } from "../types/comparer"
 import { IValueDidChange } from "../types/observablevalue"
-import { getMessage } from "../utils/messages"
 
 export interface IComputedValue<T> {
     get(): T
