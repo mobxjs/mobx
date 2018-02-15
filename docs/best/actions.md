@@ -31,7 +31,7 @@ class Store {
 }
 ```
 
-The above example would throw exceptions, as the callbacks passed to the `fethGithubProjectsSomehow` promise are not part of the `fetchProjects` action, as actions only apply to the current stack.
+The above example would throw exceptions, as the callbacks passed to the `fetchGithubProjectsSomehow` promise are not part of the `fetchProjects` action, as actions only apply to the current stack.
 
 A first simple fix is to extract the callbacks to actions. (Note that binding is important here to get a correct `this`!):
 
