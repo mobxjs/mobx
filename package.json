@@ -72,7 +72,6 @@
     "uglify-js": "^2.6.1"
   },
   "dependencies": {
-    "babel-plugin-transform-decorators": "^6.24.1"
   },
   "keywords": [
     "mobx",
