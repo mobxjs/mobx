@@ -4,5 +4,8 @@
     "es2015",
     "stage-1"
   ],
-  "plugins": ["transform-decorators-legacy"]
+  "plugins":[
+      "transform-decorators",
+      ["transform-class-properties", { "loose": true}]
+  ]
 }

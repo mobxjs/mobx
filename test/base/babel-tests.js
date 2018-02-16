@@ -77,7 +77,7 @@ test("babel: parameterized computed decorator", () => {
     }
 
     const t1 = new TestClass()
-    const changes: { sum: number }[] = []
+    const changes = []
     const d = autorun(() => changes.push(t1.boxedSum))
 
     t1.y = 4 // change
@@ -166,8 +166,8 @@ test("705 - setter undoing caching (babel)", () => {
     let autoruns = 0
 
     class Person {
-        @observable name: string
-        @observable title: string
+        @observable name
+        @observable title
         set fullName(val) {
             // Noop
         }
@@ -229,7 +229,7 @@ test("action decorator (babel)", function() {
 
     const store1 = new Store(2)
     const store2 = new Store(3)
-    const events: any[] = []
+    const events = []
     const d = spy(events.push.bind(events))
     expect(store1.add(3, 4)).toBe(14)
     expect(store2.add(3, 4)).toBe(21)
@@ -261,7 +261,7 @@ test("custom action decorator (babel)", function() {
 
     const store1 = new Store(2)
     const store2 = new Store(3)
-    const events: any[] = []
+    const events = []
     const d = spy(events.push.bind(events))
     expect(store1.add(3, 4)).toBe(14)
     expect(store2.add(3, 4)).toBe(21)
@@ -312,7 +312,7 @@ test("action decorator on field (babel)", function() {
     const store1 = new Store(2)
     const store2 = new Store(7)
 
-    const events: any[] = []
+    const events = []
     const d = spy(events.push.bind(events))
     expect(store1.add(3, 4)).toBe(14)
     expect(store2.add(5, 4)).toBe(63)
@@ -345,7 +345,7 @@ test("custom action decorator on field (babel)", function() {
     const store1 = new Store(2)
     const store2 = new Store(7)
 
-    const events: any[] = []
+    const events = []
     const d = spy(events.push.bind(events))
     expect(store1.add(3, 4)).toBe(14)
     expect(store2.add(5, 4)).toBe(63)
@@ -871,7 +871,7 @@ test("action.bound binds (Babel)", () => {
     class A {
         @observable x = 0
         @action.bound
-        inc(value: number) {
+        inc(value) {
             this.x += value
         }
     }
@@ -891,8 +891,8 @@ test("@computed.equals (Babel)", () => {
             this.minute = minute
         }
 
-        @observable hour: number
-        @observable minute: number
+        @observable hour
+        @observable minute
 
         @computed.equals(sameTime)
         get time() {
