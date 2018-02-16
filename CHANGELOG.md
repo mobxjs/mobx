@@ -20,6 +20,7 @@
 * Dropped already deprecated and broken `default` export that made it impossible to tree-shake mobx. Make sure you always use `import { x } from "mobx"` and not `import x from "mobx"`
 * Dropped already deprecated toplevel `map` function
 * Killed the already deprecated modifiers `asFlat` etc. If you war still using this, see the MobX 2 -> 3 migration notes.
+* `autorun` now accepts a scheduler function to allow improved performance for tasks such as rendering to canvas
 
 # 3.5.0/1
 

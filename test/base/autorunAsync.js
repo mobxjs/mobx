@@ -130,6 +130,94 @@ test("autorunAsync passes Reaction as an argument to view function", function(do
     }, 1000)
 })
 
+test("autorunAsync accepts a scheduling function", function(done) {
+    var a = m.observable({
+        x: 0,
+        y: 1
+    })
+
+    var autoRunsCalled = 0
+    var schedulingsCalled = 0
+
+    debugger
+    m.autorun(
+        function(r) {
+            autoRunsCalled++
+            expect(a.y).toBe(a.x + 1)
+
+            if (a.x < 10) {
+                // Queue the two actions separately, if this was autorun it would fail
+                setTimeout(function() {
+                    a.x = a.x + 1
+                }, 0)
+                setTimeout(function() {
+                    a.y = a.y + 1
+                }, 0)
+            }
+        },
+        {
+            scheduler: function(fn) {
+                schedulingsCalled++
+                setTimeout(fn, 0)
+            }
+        }
+    )
+
+    setTimeout(function() {
+        expect(autoRunsCalled).toBe(11)
+        expect(schedulingsCalled).toBe(11)
+        done()
+    }, 1000)
+})
+
+test("reaction accepts a scheduling function", function(done) {
+    var a = m.observable({
+        x: 0,
+        y: 1
+    })
+
+    var autoRunsCalled = 0
+    var schedulingsCalled = 0
+    var exprCalled = 0
+
+    var values = []
+
+    m.reaction(
+        () => {
+            exprCalled++
+            return a.x
+        },
+        () => {
+            autoRunsCalled++
+            values.push(a.x)
+        },
+        {
+            fireImmediately: true,
+            scheduler: function(fn) {
+                schedulingsCalled++
+                setTimeout(fn, 2)
+            }
+        }
+    )
+
+    a.x++
+    a.x++
+    a.x++
+    setTimeout(() => {
+        a.x++
+        a.x++
+        a.x++
+    }, 20)
+
+    setTimeout(function() {
+        expect(exprCalled).toBe(3) // start, 2 batches
+        expect(autoRunsCalled).toBe(3) // start, 2 batches
+        expect(schedulingsCalled).toBe(2) // skipped first time due to fireImmediately
+        expect(values).toEqual([0, 3, 6])
+        done()
+    }, 100)
+})
+
 test("autorunAsync warns when passed an action", function() {
     var action = m.action(() => {})
     expect.assertions(1)

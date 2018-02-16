@@ -8,6 +8,7 @@ import { IEqualsComparer, comparer } from "../types/comparer"
 export interface IAutorunOptions {
     delay?: number
     name?: string
+    scheduler?: (callback: () => void) => any
 }
 
 /**
@@ -18,7 +19,7 @@ export interface IAutorunOptions {
  */
 export function autorun(
     view: (r: IReactionPublic) => any,
-    opts?: IAutorunOptions
+    opts: IAutorunOptions = EMPTY_OBJECT
 ): IReactionDisposer {
     invariant(typeof view === "function", "Autorun expects a function as first argument")
     invariant(
@@ -27,25 +28,26 @@ export function autorun(
     )
 
     const name: string = (opts && opts.name) || (view as any).name || "Autorun@" + getNextId()
-    const delay = (opts && opts.delay) || 0
+    const runSync = !opts.scheduler && !opts.delay
     let reaction: Reaction
 
-    if (delay === 0) {
+    if (runSync) {
         // normal autorun
         reaction = new Reaction(name, function(this: Reaction) {
             this.track(reactionRunner)
         })
     } else {
+        const scheduler = createSchedulerFromOptions(opts)
         // debounced autorun
         let isScheduled = false
 
         reaction = new Reaction(name, () => {
             if (!isScheduled) {
                 isScheduled = true
-                setTimeout(() => {
+                scheduler(() => {
                     isScheduled = false
                     if (!reaction.isDisposed) reaction.track(reactionRunner)
-                }, delay)
+                })
             }
         })
     }
@@ -79,6 +81,14 @@ export type IReactionOptions = IAutorunOptions & {
     equals?: IEqualsComparer<any>
 }
 
+const run = (f: Lambda) => f()
+
+function createSchedulerFromOptions(opts: IReactionOptions) {
+    return opts.scheduler
+        ? opts.scheduler
+        : opts.delay ? (f: Lambda) => setTimeout(f, opts.delay) : run
+}
+
 export function reaction<T>(
     expression: (r: IReactionPublic) => T,
     effect: (arg: T, r: IReactionPublic) => void,
@@ -94,9 +104,10 @@ export function reaction<T>(
     invariant(typeof opts === "object", "Third argument of reactions should be an object")
     const name = opts.name || "Reaction@" + getNextId()
     const fireImmediately = opts.fireImmediately === true
-    const delay = opts.delay || 0
     // TODO: creates ugly spy events, use `effect = (r) => runInAction(opts.name, () => effect(r))` instead?
     const effectAction = action(name, effect)
+    const runSync = !opts.scheduler && !opts.delay
+    const scheduler = createSchedulerFromOptions(opts)
 
     let firstTime = true
     let isScheduled = false
@@ -105,18 +116,16 @@ export function reaction<T>(
     const equals = opts.compareStructural ? comparer.structural : opts.equals || comparer.default
 
     const r = new Reaction(name, () => {
-        if (firstTime || delay < 1) {
+        if (firstTime || runSync) {
             reactionRunner()
         } else if (!isScheduled) {
             isScheduled = true
-            setTimeout(() => {
-                isScheduled = false
-                reactionRunner()
-            }, delay)
+            scheduler!(reactionRunner)
         }
     })
 
     function reactionRunner() {
+        isScheduled = false // Q: move into reaction runner?
         if (r.isDisposed) return
         let changed = false
         r.track(() => {
