@@ -3,7 +3,6 @@ import {
     computed,
     observable,
     autorun,
-    autorunAsync,
     extendObservable,
     action,
     IObservableObject,
@@ -187,8 +186,6 @@ test("typing", () => {
     })
 
     var x: IObservableValue<number> = observable.box(3)
-
-    var d2 = autorunAsync(function() {})
 })
 
 const state: any = observable({
@@ -198,7 +195,7 @@ const state: any = observable({
 test("issue8", () => {
     t.throws(() => {
         class LoginStoreTest {
-            loggedIn2: boolean
+            loggedIn2: boolean = false
             constructor() {
                 extendObservable(this, {
                     loggedIn2: () => !!state.authToken
@@ -272,8 +269,8 @@ test("atom clock example", () => {
 
     class Clock {
         atom: Atom
-        intervalHandler: number = null
-        currentDateTime: string
+        intervalHandler: number | null = null
+        currentDateTime: string | undefined = undefined
 
         constructor() {
             // console.log("create")
@@ -314,7 +311,7 @@ test("atom clock example", () => {
 
         stopTicking() {
             // console.log("stop ticking")
-            clearInterval(this.intervalHandler)
+            clearInterval(this.intervalHandler!)
             this.intervalHandler = null
         }
     }
@@ -325,7 +322,7 @@ test("atom clock example", () => {
 
     // ... prints the time each second
     const disposer = autorun(() => {
-        values.push(clock.getTime())
+        values.push(clock.getTime()!)
         // console.log(clock.getTime())
     })
 
@@ -396,15 +393,15 @@ test("issue 165", () => {
     }
 
     class Game {
-        @observable firstCardSelected: Card = null
-        @observable secondCardSelected: Card = null
+        @observable firstCardSelected: Card | null = null
+        @observable secondCardSelected: Card | null = null
 
         @computed
         get isMatchWrong() {
             return report(
                 "Computing isMatchWrong",
                 this.secondCardSelected !== null &&
-                    this.firstCardSelected.id !== this.secondCardSelected.id
+                    this.firstCardSelected!.id !== this.secondCardSelected.id
             )
         }
     }
@@ -623,7 +620,7 @@ test("267 (typescript) should be possible to declare properties observable outsi
     useStrict(true)
 
     class Store {
-        @observable timer: number
+        @observable timer: number | null = null
     }
 
     useStrict(false)
@@ -1016,7 +1013,7 @@ test("484 - isObservableObject type guard includes type T", () => {
 })
 
 test("484 - isObservableObject type guard includes type IObservableObject", () => {
-    const requires_observable_object = (o: IObservableObject): void => null
+    const requires_observable_object = (o: IObservableObject): void => {}
     const o = observable({ stuff: "things" })
 
     if (isObservableObject(o)) {
@@ -1031,8 +1028,8 @@ test("705 - setter undoing caching (typescript)", () => {
     let autoruns = 0
 
     class Person {
-        @observable name: string
-        @observable title: string
+        @observable name: string = ""
+        @observable title: string = ""
 
         // Typescript bug: if fullName is before the getter, the property is defined twice / incorrectly, see #705
         // set fullName(val) {

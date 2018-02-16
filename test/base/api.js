@@ -7,7 +7,6 @@ test("correct api should be exposed", function() {
             "_allowStateChanges",
             "Atom",
             "autorun",
-            "autorunAsync",
             "BaseAtom", // TODO: remove somehow
             "comparer",
             "computed",

@@ -29,10 +29,13 @@ test("trace", () => {
 
         lines.push("- REACTION -")
 
-        const d = mobx.autorun("loggerzz", d => {
-            x.fullname
-            d.trace()
-        })
+        const d = mobx.autorun(
+            d => {
+                x.fullname
+                d.trace()
+            },
+            { name: "loggerzz" }
+        )
 
         lines.push("- CHANGE -")
 

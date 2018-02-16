@@ -862,13 +862,13 @@ test("when 2", function() {
 
     var called = 0
     var d = mobx.when(
-        "when x is 3",
         function() {
             return x.get() === 3
         },
         function() {
             called += 1
-        }
+        },
+        { name: "when x is 3" }
     )
 
     expect(called).toBe(1)
@@ -1244,13 +1244,12 @@ test("issue 71, transacting running transformation", function() {
         })
 
         mobx.when(
-            function() {
+            () => {
                 return this.isVisible
             },
-            function() {
+            () => {
                 if (this.pos < 4) state.things.push(new Thing(value + 1))
-            },
-            this
+            }
         )
     }
 

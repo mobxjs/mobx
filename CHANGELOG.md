@@ -2,6 +2,9 @@
 
 ## Breaking changes
 
+* Passing `context` explicitly to `autorun`, `reaction` etc is no longer supported. Use arrow functions or function.bind instead.
+* Removed `autorunAsync`.
+* `autorun`, `when`, `reaction` don't support name as first argument anymore, instead pass options.
 * The `extras.` namespace has been dropped to enable tree-shaking non-used MobX features. All methods that where there originally are now exported at top level. If they are part of the official public API (you are encouraged to use them) they are exported as is. If they are experimental or somehow internal (you are discouraged to use them), they are prefixed with `_`.
 * If there are multiple mobx instances active in a single project, an exception will be thrown. Previously only a warning was printed. Fixes #1098. For details, see [#1082](https://github.com/mobxjs/mobx/issues/1082).
 * Dropped the `shareGlobalState` feature. Instead, projects should be setup properly and it is up to the hosting package to make sure that there is only one MobX instance

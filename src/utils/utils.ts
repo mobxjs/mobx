@@ -1,6 +1,9 @@
 export const EMPTY_ARRAY = []
 Object.freeze(EMPTY_ARRAY)
 
+export const EMPTY_OBJECT = {}
+Object.freeze(EMPTY_OBJECT)
+
 declare var global
 export function getGlobal() {
     return typeof window !== "undefined" ? window : global

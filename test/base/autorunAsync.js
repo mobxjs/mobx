@@ -25,13 +25,13 @@ test("autorun 1", function(done) {
         _fired++
         _result = d.get() > 0 ? a.get() * c.get() : d.get()
     }
-    var disp = m.autorunAsync(autorun, 20)
+    var disp = m.autorun(autorun, { delay: 20 })
 
     check(0, 0, null)
     disp()
     to(function() {
         check(0, 0, null)
-        disp = m.autorunAsync(autorun, 20)
+        disp = m.autorun(autorun, { delay: 20 })
 
         to(function() {
             check(1, 1, 12)
@@ -85,8 +85,7 @@ test("autorun should not result in loop", function(done) {
     })
 
     var autoRunsCalled = 0
-    var d = m.autorunAsync(
-        "named async",
+    var d = m.autorun(
         function() {
             autoRunsCalled++
             a.x = ++i
@@ -94,7 +93,7 @@ test("autorun should not result in loop", function(done) {
                 a.x = ++i
             }, 10)
         },
-        10
+        { delay: 10, name: "named async" }
     )
 
     setTimeout(function() {
@@ -111,11 +110,14 @@ test("autorunAsync passes Reaction as an argument to view function", function(do
 
     var autoRunsCalled = 0
 
-    m.autorunAsync(r => {
-        expect(typeof r.dispose).toBe("function")
-        autoRunsCalled++
-        if (a.get() === "pleaseDispose") r.dispose()
-    }, 10)
+    m.autorun(
+        r => {
+            expect(typeof r.dispose).toBe("function")
+            autoRunsCalled++
+            if (a.get() === "pleaseDispose") r.dispose()
+        },
+        { delay: 10 }
+    )
 
     setTimeout(() => a.set(2), 250)
     setTimeout(() => a.set("pleaseDispose"), 400)
@@ -131,5 +133,5 @@ test("autorunAsync passes Reaction as an argument to view function", function(do
 test("autorunAsync warns when passed an action", function() {
     var action = m.action(() => {})
     expect.assertions(1)
-    expect(() => m.autorunAsync(action)).toThrowError(/Autorun does not accept actions/)
+    expect(() => m.autorun(action)).toThrowError(/Autorun does not accept actions/)
 })

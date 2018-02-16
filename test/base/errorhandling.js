@@ -288,10 +288,13 @@ test("throws when the max iterations over reactions are done", () => {
         a: 1
     })
 
-    mobx.autorun("bar", () => {
-        var x = foo.a
-        foo.a = Math.random()
-    })
+    mobx.autorun(
+        () => {
+            var x = foo.a
+            foo.a = Math.random()
+        },
+        { name: "bar" }
+    )
 
     utils.consoleError(
         () => foo.a++,

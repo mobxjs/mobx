@@ -30,7 +30,7 @@ test("effect fireImmediately is honored", () => {
         newValue => {
             values.push(newValue)
         },
-        true
+        { fireImmediately: true }
     )
 
     a.set(2)

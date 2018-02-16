@@ -166,7 +166,7 @@ test("spy error", () => {
         var events = []
         var stop = mobx.spy(c => events.push(c))
 
-        var d = mobx.autorun("autorun", () => a.y)
+        var d = mobx.autorun(() => a.y, { name: "autorun" })
 
         a.x = 3
 
