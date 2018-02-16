@@ -1,3 +1,7 @@
+# Next
+
+* `autorunAsync` now accepts a scheduler function to allow improved performance for tasks such as rendering to canvas
+
 # 3.5.0/1
 
 * Introduced `trace` for easier debugging of reactions / computed values. See the [docs](https://mobx.js.org/best/trace.html) for details.
