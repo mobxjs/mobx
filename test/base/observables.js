@@ -1929,3 +1929,25 @@ test("Issue 1121 - It should be possible to redefine a computed property", () =>
     expect(reactionCalls).toBe(1)
     expect(a.surface).toBe(22)
 })
+
+test("extendObservable should be able to set an a computed property", () => {
+    let setterCalled = false
+    const x = observable({
+        a: computed(
+            function() {
+                return this.b * 2
+            },
+            function(val) {
+                setterCalled = true
+                this.b += val
+            }
+        ),
+        b: 2
+    })
+    expect(x.a).toBe(4)
+    debugger
+    mobx.extendObservable(x, { b: 4, a: 7 })
+    expect(setterCalled).toBe(true)
+    expect(x.b).toBe(11)
+    expect(x.a).toBe(22)
+})

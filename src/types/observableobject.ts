@@ -114,19 +114,24 @@ export function defineObservablePropertyFromDescriptor(
     descriptor: PropertyDescriptor,
     defaultEnhancer: IEnhancer<any>
 ) {
-    if (adm.values[propName] && !isComputedValue(adm.values[propName])) {
-        // already observable property
-        invariant(
-            "value" in descriptor,
-            `The property ${propName} in ${adm.name} is already observable, cannot redefine it as computed property`
-        )
-        adm.target[propName] = descriptor.value // the property setter will make 'value' reactive if needed.
-        return
+    const hasGetter = "get" in descriptor
+    const existingObservable = adm.values[propName]
+    if (existingObservable) {
+        if (isComputedValue(existingObservable) && hasGetter) {
+            // nothing, will just redefine below
+        } else if (hasGetter) {
+            return fail(
+                `The property ${propName} in ${adm.name} is already observable, cannot redefine it as computed property`
+            )
+        } else {
+            // already observable property
+            adm.target[propName] = descriptor.value // the property setter will make 'value' reactive if needed.
+            return
+        }
     }
 
     // not yet observable property
-
-    if ("value" in descriptor) {
+    if (!hasGetter) {
         // not a computed value
         if (isModifierDescriptor(descriptor.value)) {
             // x : ref(someValue)
