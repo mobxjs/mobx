@@ -3,6 +3,7 @@ import { isObservableObject } from "../types/observableobject"
 import { isObservableMap } from "../types/observablemap"
 import { isObservableValue } from "../types/observablevalue"
 import { isObservable } from "./isobservable"
+import { keys } from "./object-api"
 
 /**
  * Basically, a deep clone, so that no reactive property will exist anymore.
@@ -33,7 +34,9 @@ export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, 
         }
         if (isObservableObject(source)) {
             const res = cache({})
-            for (let key in source) res[key] = toJS(source[key], detectCycles, __alreadySeen)
+            keys(source).forEach(key => {
+                res[key] = toJS(source[key], detectCycles, __alreadySeen)
+            })
             return res
         }
         if (isObservableMap(source)) {

@@ -37,6 +37,7 @@ test("correct api should be exposed", function() {
             "isObservableObject",
             "isObservableProp",
             "isolateGlobalState",
+            "keys",
             "observable",
             "ObservableMap",
             "observe",

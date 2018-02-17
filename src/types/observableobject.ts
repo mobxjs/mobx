@@ -20,8 +20,14 @@ import {
 import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
 import { IEqualsComparer, comparer } from "./comparer"
-import { IEnhancer, isModifierDescriptor, IModifierDescriptor } from "./modifiers"
+import {
+    IEnhancer,
+    isModifierDescriptor,
+    IModifierDescriptor,
+    referenceEnhancer
+} from "./modifiers"
 import { isAction, defineBoundAction } from "../api/action"
+import { ObservableArray, IObservableArray } from "./observablearray"
 
 export interface IObservableObject {
     "observable-object": IObservableObject
@@ -46,6 +52,7 @@ export interface IObjectWillChange {
 export class ObservableObjectAdministration
     implements IInterceptable<IObjectWillChange>, IListenable {
     values: { [key: string]: ObservableValue<any> | ComputedValue<any> } = {}
+    keys: undefined | IObservableArray<string>
     changeListeners = null
     interceptors = null
 
@@ -66,6 +73,18 @@ export class ObservableObjectAdministration
 
     intercept(handler): Lambda {
         return registerInterceptor(this, handler)
+    }
+
+    getKeys(): string[] {
+        if (this.keys === undefined) {
+            this.keys = <any>new ObservableArray(
+                Object.keys(this.values),
+                referenceEnhancer,
+                `keys(${this.name})`,
+                true
+            )
+        }
+        return this.keys!.slice()
     }
 }
 
@@ -167,6 +186,7 @@ export function defineObservableProperty(
     newValue = (observable as any).value // observableValue might have changed it
 
     Object.defineProperty(adm.target, propName, generateObservablePropConfig(propName))
+    if (adm.keys) adm.keys.push(propName)
     notifyPropertyAddition(adm, adm.target, propName, newValue)
 }
 

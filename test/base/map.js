@@ -156,7 +156,7 @@ test("observe collections", function() {
     var keys, values, entries
 
     autorun(function() {
-        keys = x.keys()
+        keys = mobx.keys(x)
     })
     autorun(function() {
         values = x.values()

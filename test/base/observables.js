@@ -1,6 +1,6 @@
 "use strict"
 
-var mobx = require("../../src/mobx.ts")
+var mobx = require("../../src/mobx")
 var m = mobx
 var observable = mobx.observable
 var computed = mobx.computed

@@ -82,6 +82,7 @@ export { observe } from "./api/observe"
 export { intercept } from "./api/intercept"
 export { autorun, when, reaction, IReactionOptions } from "./api/autorun"
 export { action, isAction, runInAction, IActionFactory } from "./api/action"
+export { keys } from "./api/object-api"
 
 export { expr } from "./api/expr"
 export { toJS } from "./api/tojs"
