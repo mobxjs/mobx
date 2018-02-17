@@ -1,5 +1,5 @@
 import { isObservableArray } from "../types/observablearray"
-import { isObservableObject } from "../types/observableobject"
+import { isObservableObject, ObservableObjectAdministration } from "../types/observableobject"
 import { isObservableMap } from "../types/observablemap"
 import { isObservableValue } from "../types/observablevalue"
 import { isObservable } from "./isobservable"
@@ -34,9 +34,10 @@ export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, 
         }
         if (isObservableObject(source)) {
             const res = cache({})
-            keys(source).forEach(key => {
+            keys(source) // make sure we track the keys of the object
+            for (let key in source) {
                 res[key] = toJS(source[key], detectCycles, __alreadySeen)
-            })
+            }
             return res
         }
         if (isObservableMap(source)) {
