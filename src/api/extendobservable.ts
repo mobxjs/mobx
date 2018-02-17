@@ -6,6 +6,7 @@ import {
 import { isObservable } from "./isobservable"
 import { invariant, isPropertyConfigurable, hasOwnProperty } from "../utils/utils"
 import { deepEnhancer, referenceEnhancer, IEnhancer } from "../types/modifiers"
+import { startBatch, endBatch } from "../core/observable"
 
 export function extendObservable<A extends Object, B extends Object>(
     target: A,
@@ -46,16 +47,21 @@ export function extendObservableHelper(
 
     const adm = asObservableObject(target)
     const definedProps = {}
-    // Note could be optimised if properties.length === 1
-    for (let i = properties.length - 1; i >= 0; i--) {
-        const propSet = properties[i]
-        for (let key in propSet)
-            if (definedProps[key] !== true && hasOwnProperty(propSet, key)) {
-                definedProps[key] = true
-                if ((target as any) === propSet && !isPropertyConfigurable(target, key)) continue // see #111, skip non-configurable or non-writable props for `observable(object)`.
-                const descriptor = Object.getOwnPropertyDescriptor(propSet, key)
-                defineObservablePropertyFromDescriptor(adm, key, descriptor!, defaultEnhancer)
-            }
+    startBatch()
+    try {
+        for (let i = properties.length - 1; i >= 0; i--) {
+            const propSet = properties[i]
+            for (let key in propSet)
+                if (definedProps[key] !== true && hasOwnProperty(propSet, key)) {
+                    definedProps[key] = true
+                    if ((target as any) === propSet && !isPropertyConfigurable(target, key))
+                        continue // see #111, skip non-configurable or non-writable props for `observable(object)`.
+                    const descriptor = Object.getOwnPropertyDescriptor(propSet, key)
+                    defineObservablePropertyFromDescriptor(adm, key, descriptor!, defaultEnhancer)
+                }
+        }
+    } finally {
+        endBatch()
     }
     return target
 }
