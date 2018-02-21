@@ -7,11 +7,12 @@ import {
     defineObservableProperty
 } from "../types/observableobject"
 import { isObservableArray, IObservableArray } from "../types/observablearray"
-import { fail } from "../utils/utils"
+import { fail, invariant } from "../utils/utils"
 import { extendObservable } from "./extendobservable"
 import { isComputedValue } from "../core/computedvalue"
 import { isModifierDescriptor } from "../mobx"
 import { deepEnhancer } from "../types/modifiers"
+import { startBatch, endBatch } from "../core/observable"
 
 export function keys(obj: IObservableObject): string[]
 export function keys(map: ObservableMap<any>): string[]
@@ -58,8 +59,12 @@ export function set(obj: any, key: any, value: any): void {
     } else if (isObservableMap(obj)) {
         obj.set(key, value)
     } else if (isObservableArray(obj)) {
+        if (typeof key !== "number") key = parseInt(key, 10)
+        invariant(key >= 0, `Not a valid index: '${key}'`)
+        startBatch()
         if (key >= obj.length) obj.length = key + 1
         obj[key] = value
+        endBatch()
     } else {
         return fail("'set()' can only be used on observable objects, arrays and maps")
     }
@@ -81,6 +86,8 @@ export function remove(obj: any, key: any): void {
     } else if (isObservableMap(obj)) {
         obj.delete(key)
     } else if (isObservableArray(obj)) {
+        if (typeof key !== "number") key = parseInt(key, 10)
+        invariant(key >= 0, `Not a valid index: '${key}'`)
         obj.splice(key, 1)
     } else {
         return fail("'remove()' can only be used on observable objects, arrays and maps")

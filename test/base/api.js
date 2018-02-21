@@ -44,16 +44,19 @@ test("correct api should be exposed", function() {
             "onReactionError",
             "Reaction",
             "reaction",
+            "remove",
             "_reserveArrayBuffer",
             "_resetGlobalState",
             "runInAction",
             "_setReactionScheduler",
+            "set",
             "spy",
             "toJS",
             "trace",
             "transaction",
             "untracked",
             "useStrict",
+            "values",
             "when"
         ].sort()
     )
