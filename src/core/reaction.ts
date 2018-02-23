@@ -93,7 +93,7 @@ export class Reaction implements IDerivation, IReactionPublic {
                 if (this._isTrackPending && isSpyEnabled()) {
                     // onInvalidate didn't trigger track right away..
                     spyReport({
-                        object: this,
+                        name: this.name,
                         type: "scheduled-reaction"
                     })
                 }
@@ -109,9 +109,8 @@ export class Reaction implements IDerivation, IReactionPublic {
         if (notify) {
             startTime = Date.now()
             spyReportStart({
-                object: this,
-                type: "reaction",
-                fn
+                name: this.name,
+                type: "reaction"
             })
         }
         this._isRunning = true
@@ -144,9 +143,9 @@ export class Reaction implements IDerivation, IReactionPublic {
         if (isSpyEnabled()) {
             spyReport({
                 type: "error",
+                name: this.name,
                 message,
-                error,
-                object: this
+                error: "" + error
             })
         }
 

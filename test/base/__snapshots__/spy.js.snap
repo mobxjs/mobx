@@ -3,32 +3,38 @@
 exports[`spy error 1`] = `
 Array [
   Object {
+    "name": "autorun",
     "spyReportStart": true,
     "type": "reaction",
   },
   Object {
+    "name": "ObservableObject@1.y",
     "type": "compute",
   },
   Object {
     "spyReportEnd": true,
   },
   Object {
-    "name": "x",
+    "key": "x",
+    "name": "ObservableObject@1",
     "newValue": 3,
     "oldValue": 2,
     "spyReportStart": true,
     "type": "update",
   },
   Object {
+    "name": "ObservableObject@1.y",
     "type": "compute",
   },
   Object {
+    "name": "autorun",
     "spyReportStart": true,
     "type": "reaction",
   },
   Object {
     "error": "Oops",
     "message": "[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: 'Reaction[autorun]",
+    "name": "autorun",
     "type": "error",
   },
   Object {
@@ -43,10 +49,12 @@ Array [
 exports[`spy output 1`] = `
 Array [
   Object {
-    "newValue": 2,
+    "name": "ObservableValue@1",
+    "newValue": "2",
     "type": "create",
   },
   Object {
+    "name": "ObservableValue@1",
     "newValue": 3,
     "oldValue": 2,
     "spyReportStart": true,
@@ -56,7 +64,8 @@ Array [
     "spyReportEnd": true,
   },
   Object {
-    "name": "c",
+    "key": "c",
+    "name": "ObservableObject@2",
     "newValue": 4,
     "spyReportStart": true,
     "type": "add",
@@ -65,7 +74,8 @@ Array [
     "spyReportEnd": true,
   },
   Object {
-    "name": "c",
+    "key": "c",
+    "name": "ObservableObject@2",
     "newValue": 5,
     "oldValue": 4,
     "spyReportStart": true,
@@ -75,7 +85,8 @@ Array [
     "spyReportEnd": true,
   },
   Object {
-    "name": "d",
+    "key": "d",
+    "name": "ObservableObject@2",
     "newValue": 6,
     "spyReportStart": true,
     "type": "add",
@@ -84,7 +95,8 @@ Array [
     "spyReportEnd": true,
   },
   Object {
-    "name": "d",
+    "key": "d",
+    "name": "ObservableObject@2",
     "newValue": 7,
     "oldValue": 6,
     "spyReportStart": true,
@@ -100,6 +112,7 @@ Array [
     ],
     "addedCount": 2,
     "index": 0,
+    "name": "ObservableArray@3",
     "removed": Array [],
     "removedCount": 0,
     "spyReportStart": true,
@@ -115,6 +128,7 @@ Array [
     ],
     "addedCount": 2,
     "index": 2,
+    "name": "ObservableArray@3",
     "removed": Array [],
     "removedCount": 0,
     "spyReportStart": true,
@@ -127,6 +141,7 @@ Array [
     "added": Array [],
     "addedCount": 0,
     "index": 0,
+    "name": "ObservableArray@3",
     "removed": Array [
       1,
     ],
@@ -139,6 +154,7 @@ Array [
   },
   Object {
     "index": 2,
+    "name": "ObservableArray@3",
     "newValue": 5,
     "oldValue": 4,
     "spyReportStart": true,
@@ -148,7 +164,8 @@ Array [
     "spyReportEnd": true,
   },
   Object {
-    "name": "g",
+    "key": "g",
+    "name": "ObservableMap@4",
     "newValue": 1,
     "spyReportStart": true,
     "type": "add",
@@ -157,7 +174,8 @@ Array [
     "spyReportEnd": true,
   },
   Object {
-    "name": "g",
+    "key": "g",
+    "name": "ObservableMap@4",
     "oldValue": 1,
     "spyReportStart": true,
     "type": "delete",
@@ -166,7 +184,8 @@ Array [
     "spyReportEnd": true,
   },
   Object {
-    "name": "i",
+    "key": "i",
+    "name": "ObservableMap@4",
     "newValue": 5,
     "spyReportStart": true,
     "type": "add",
@@ -175,7 +194,8 @@ Array [
     "spyReportEnd": true,
   },
   Object {
-    "name": "i",
+    "key": "i",
+    "name": "ObservableMap@4",
     "newValue": 6,
     "oldValue": 5,
     "spyReportStart": true,
@@ -185,25 +205,30 @@ Array [
     "spyReportEnd": true,
   },
   Object {
+    "name": "Autorun@7",
     "spyReportStart": true,
     "type": "reaction",
   },
   Object {
+    "name": "ComputedValue@6",
     "type": "compute",
   },
   Object {
     "spyReportEnd": true,
   },
   Object {
+    "name": "ObservableValue@1",
     "newValue": 4,
     "oldValue": 3,
     "spyReportStart": true,
     "type": "update",
   },
   Object {
+    "name": "ComputedValue@6",
     "type": "compute",
   },
   Object {
+    "name": "Autorun@7",
     "spyReportStart": true,
     "type": "reaction",
   },
@@ -214,6 +239,7 @@ Array [
     "spyReportEnd": true,
   },
   Object {
+    "name": "ObservableValue@1",
     "newValue": 5,
     "oldValue": 4,
     "spyReportStart": true,
@@ -223,6 +249,7 @@ Array [
     "spyReportEnd": true,
   },
   Object {
+    "name": "ObservableValue@1",
     "newValue": 6,
     "oldValue": 5,
     "spyReportStart": true,
@@ -232,9 +259,11 @@ Array [
     "spyReportEnd": true,
   },
   Object {
+    "name": "ComputedValue@6",
     "type": "compute",
   },
   Object {
+    "name": "Autorun@7",
     "spyReportStart": true,
     "type": "reaction",
   },
@@ -250,6 +279,7 @@ Array [
     "type": "action",
   },
   Object {
+    "name": "ObservableValue@1",
     "newValue": 7,
     "oldValue": 6,
     "spyReportStart": true,
@@ -259,9 +289,11 @@ Array [
     "spyReportEnd": true,
   },
   Object {
+    "name": "ComputedValue@6",
     "type": "compute",
   },
   Object {
+    "name": "Autorun@7",
     "spyReportStart": true,
     "type": "reaction",
   },

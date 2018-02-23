@@ -165,7 +165,7 @@ export class ObservableMap<V>
                       }
                     : null
 
-            if (notifySpy) spyReportStart(change)
+            if (notifySpy) spyReportStart({ ...change, name: this.name, key })
             transaction(() => {
                 this._keys.remove(key)
                 this._updateHasMapEntry(key, false)
@@ -196,8 +196,8 @@ export class ObservableMap<V>
         return entry
     }
 
-    private _updateValue(name: string, newValue: V | undefined) {
-        const observable = this._data[name]!
+    private _updateValue(key: string, newValue: V | undefined) {
+        const observable = this._data[key]!
         newValue = (observable as any).prepareNewValue(newValue) as V
         if (newValue !== UNCHANGED) {
             const notifySpy = isSpyEnabled()
@@ -208,29 +208,29 @@ export class ObservableMap<V>
                           type: "update",
                           object: this,
                           oldValue: (observable as any).value,
-                          name,
+                          name: key,
                           newValue
                       }
                     : null
 
-            if (notifySpy) spyReportStart(change)
+            if (notifySpy) spyReportStart({ ...change, name: this.name, key })
             observable.setNewValue(newValue as V)
             if (notify) notifyListeners(this, change)
             if (notifySpy) spyReportEnd()
         }
     }
 
-    private _addValue(name: string, newValue: V | undefined) {
+    private _addValue(key: string, newValue: V | undefined) {
         transaction(() => {
-            const observable = (this._data[name] = new ObservableValue(
+            const observable = (this._data[key] = new ObservableValue(
                 newValue,
                 this.enhancer,
-                `${this.name}.${name}`,
+                `${this.name}.${key}`,
                 false
             ))
             newValue = (observable as any).value // value might have been changed
-            this._updateHasMapEntry(name, true)
-            this._keys.push(name)
+            this._updateHasMapEntry(key, true)
+            this._keys.push(key)
         })
 
         const notifySpy = isSpyEnabled()
@@ -240,12 +240,12 @@ export class ObservableMap<V>
                 ? <IMapChange<V>>{
                       type: "add",
                       object: this,
-                      name,
+                      name: key,
                       newValue
                   }
                 : null
 
-        if (notifySpy) spyReportStart(change)
+        if (notifySpy) spyReportStart({ ...change, name: this.name, key })
         if (notify) notifyListeners(this, change)
         if (notifySpy) spyReportEnd()
     }

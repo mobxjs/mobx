@@ -19,6 +19,8 @@
 * `observable(value)` will only succeed if it can turn the value into an observable data structure (a Map, Array or observable object). But it will no longer create an observable box for other values to avoid confusion. Call `observable.box(value)`  explictly in such cases.
 * `isComputed` and `isObservable` no longer accept a property as second argument. Instead use `isComputedProp` and `isObservableProp`.
 * Removed `whyRun`, use `trace` instead
+* spy event signature has changed
+* spy event no longer public
 
 ## Non breaking changes
 

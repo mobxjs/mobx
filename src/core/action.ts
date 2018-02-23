@@ -56,7 +56,6 @@ function startAction(
         spyReportStart({
             type: "action",
             name: actionName,
-            fn,
             object: scope,
             arguments: flattendArgs
         })

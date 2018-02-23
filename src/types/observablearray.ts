@@ -289,7 +289,7 @@ class ObservableArrayAdministration<T>
                   }
                 : null
 
-        if (notifySpy) spyReportStart(change)
+        if (notifySpy) spyReportStart({ ...change, name: this.atom.name })
         this.atom.reportChanged()
         if (notify) notifyListeners(this, change)
         if (notifySpy) spyReportEnd()
@@ -311,7 +311,7 @@ class ObservableArrayAdministration<T>
                   }
                 : null
 
-        if (notifySpy) spyReportStart(change)
+        if (notifySpy) spyReportStart({ ...change, name: this.atom.name })
         this.atom.reportChanged()
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
         if (notify) notifyListeners(this, change)

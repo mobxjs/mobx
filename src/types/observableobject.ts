@@ -265,22 +265,24 @@ export function generateComputedPropConfig(propName) {
     )
 }
 
-export function setPropertyValue(instance, name: string, newValue) {
-    const adm = instance.$mobx
-    const observable = adm.values[name]
+export function setPropertyValue(instance, key: string, newValue) {
+    const adm = instance.$mobx as ObservableObjectAdministration
+    const observable = adm.values[key]
+    if (observable instanceof ComputedValue)
+        return fail(`setPropertyValue cannot be used on computed values`)
 
     // intercept
     if (hasInterceptors(adm)) {
         const change = interceptChange<IObjectWillChange>(adm, {
             type: "update",
             object: instance,
-            name,
+            name: key,
             newValue
         })
         if (!change) return
         newValue = change.newValue
     }
-    newValue = observable.prepareNewValue(newValue)
+    newValue = (observable as any).prepareNewValue(newValue)
 
     // notify spy & observers
     if (newValue !== UNCHANGED) {
@@ -292,19 +294,24 @@ export function setPropertyValue(instance, name: string, newValue) {
                       type: "update",
                       object: instance,
                       oldValue: (observable as any).value,
-                      name,
+                      name: key,
                       newValue
                   }
                 : null
 
-        if (notifySpy) spyReportStart(change)
+        if (notifySpy) spyReportStart({ ...change, name: adm.name, key })
         observable.setNewValue(newValue)
         if (notify) notifyListeners(adm, change)
         if (notifySpy) spyReportEnd()
     }
 }
 
-function notifyPropertyAddition(adm, object, name: string, newValue) {
+function notifyPropertyAddition(
+    adm: ObservableObjectAdministration,
+    object,
+    key: string,
+    newValue
+) {
     const notify = hasListeners(adm)
     const notifySpy = isSpyEnabled()
     const change =
@@ -312,12 +319,12 @@ function notifyPropertyAddition(adm, object, name: string, newValue) {
             ? {
                   type: "add",
                   object,
-                  name,
+                  name: key,
                   newValue
               }
             : null
 
-    if (notifySpy) spyReportStart(change)
+    if (notifySpy) spyReportStart({ ...change, name: adm.name, key })
     if (notify) notifyListeners(adm, change)
     if (notifySpy) spyReportEnd()
 }

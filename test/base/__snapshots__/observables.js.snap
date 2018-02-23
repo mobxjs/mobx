@@ -3,7 +3,8 @@
 exports[`delay autorun until end of transaction 1`] = `
 Array [
   Object {
-    "name": "a",
+    "key": "a",
+    "name": "ObservableObject@1",
     "newValue": 3,
     "oldValue": 2,
     "spyReportStart": true,
@@ -13,7 +14,8 @@ Array [
     "spyReportEnd": true,
   },
   Object {
-    "name": "a",
+    "key": "a",
+    "name": "ObservableObject@1",
     "newValue": 4,
     "oldValue": 3,
     "spyReportStart": true,
@@ -24,7 +26,8 @@ Array [
   },
   "end1",
   Object {
-    "name": "a",
+    "key": "a",
+    "name": "ObservableObject@1",
     "newValue": 5,
     "oldValue": 4,
     "spyReportStart": true,
@@ -35,11 +38,13 @@ Array [
   },
   "end2",
   Object {
+    "name": "test",
     "spyReportStart": true,
     "type": "reaction",
   },
   "auto",
   Object {
+    "name": "ObservableObject@1.b",
     "type": "compute",
   },
   "calc y",
@@ -48,17 +53,20 @@ Array [
   },
   "post trans1",
   Object {
-    "name": "a",
+    "key": "a",
+    "name": "ObservableObject@1",
     "newValue": 6,
     "oldValue": 5,
     "spyReportStart": true,
     "type": "update",
   },
   Object {
+    "name": "ObservableObject@1.b",
     "type": "compute",
   },
   "calc y",
   Object {
+    "name": "test",
     "spyReportStart": true,
     "type": "reaction",
   },
@@ -71,7 +79,8 @@ Array [
   },
   "post trans2",
   Object {
-    "name": "a",
+    "key": "a",
+    "name": "ObservableObject@1",
     "newValue": 3,
     "oldValue": 6,
     "spyReportStart": true,
@@ -90,7 +99,8 @@ Array [
   "calc c",
   "transstart",
   Object {
-    "name": "a",
+    "key": "a",
+    "name": "ObservableObject@1",
     "newValue": false,
     "oldValue": true,
     "spyReportStart": true,
@@ -100,7 +110,8 @@ Array [
     "spyReportEnd": true,
   },
   Object {
-    "name": "b",
+    "key": "b",
+    "name": "ObservableObject@1",
     "newValue": true,
     "oldValue": false,
     "spyReportStart": true,
@@ -111,11 +122,13 @@ Array [
   },
   "transpreend",
   Object {
+    "name": "ar",
     "spyReportStart": true,
     "type": "reaction",
   },
   "auto",
   Object {
+    "name": "ObservableObject@1.c",
     "type": "compute",
   },
   "calc c",
@@ -132,7 +145,8 @@ Array [
   "calc c",
   "transstart",
   Object {
-    "name": "b",
+    "key": "b",
+    "name": "ObservableObject@1",
     "newValue": 2,
     "oldValue": 1,
     "spyReportStart": true,
@@ -143,10 +157,12 @@ Array [
   },
   "transpreend",
   Object {
+    "name": "ObservableObject@1.c",
     "type": "compute",
   },
   "calc c",
   Object {
+    "name": "ar",
     "spyReportStart": true,
     "type": "reaction",
   },

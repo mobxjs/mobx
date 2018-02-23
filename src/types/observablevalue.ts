@@ -59,7 +59,7 @@ export class ObservableValue<T> extends BaseAtom
         this.value = enhancer(value, undefined, name)
         if (notifySpy && isSpyEnabled()) {
             // only notify spy if this is a stand-alone observable
-            spyReport({ type: "create", object: this, newValue: this.value })
+            spyReport({ type: "create", name: this.name, newValue: "" + this.value })
         }
     }
 
@@ -76,7 +76,7 @@ export class ObservableValue<T> extends BaseAtom
             if (notifySpy) {
                 spyReportStart({
                     type: "update",
-                    object: this,
+                    name: this.name,
                     newValue,
                     oldValue
                 })

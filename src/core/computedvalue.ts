@@ -177,7 +177,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             spyReport({
                 object: this.scope,
                 type: "compute",
-                fn: this.derivation
+                name: this.name
             })
         }
         const oldValue = this.value
