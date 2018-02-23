@@ -20,7 +20,8 @@ import {
     IObjectChange,
     spy,
     useStrict,
-    isAction
+    isAction,
+    decorate
 } from "../../src/mobx"
 import * as mobx from "../../src/mobx"
 
@@ -1250,4 +1251,18 @@ test("1072 - @observable without initial value and observe before first access",
 
     const user = new User()
     observe(user, "loginCount", () => {})
+})
+
+test("decorate works", () => {
+    class Box {
+        height: number = 2
+    }
+
+    decorate(Box, {
+        height: observable
+        // size: observable // MWE: enabling this should give type error!
+    })
+    const b = new Box()
+    expect(b.height).toBe(2)
+    expect(mobx.isObservableProp(b, "height")).toBe(true)
 })
