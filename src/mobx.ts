@@ -84,6 +84,7 @@ export { autorun, when, reaction, IReactionOptions } from "./api/autorun"
 export { action, isAction, runInAction, IActionFactory } from "./api/action"
 export { keys, values, set, remove } from "./api/object-api"
 export { decorate } from "./api/decorate"
+export { onBecomeObserved, onBecomeUnobserved } from "./api/become-observed"
 
 export { expr } from "./api/expr"
 export { toJS } from "./api/tojs"

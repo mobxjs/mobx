@@ -43,6 +43,8 @@ test("correct api should be exposed", function() {
             "ObservableMap",
             "observe",
             "onReactionError",
+            "onBecomeObserved",
+            "onBecomeUnobserved",
             "Reaction",
             "reaction",
             "remove",

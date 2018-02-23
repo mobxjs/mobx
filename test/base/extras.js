@@ -314,3 +314,83 @@ test("get administration", function() {
 
     f()
 })
+
+test.skip("onBecome(Un)Observed simple", t => {
+    const x = mobx.observable.box(3)
+    const events = []
+
+    const d1 = mobx.onBecomeObserved(x, () => {
+        events.push("x observed")
+    })
+    const d2 = mobx.onBecomeUnobserved(x, () => {
+        events.push("x unobserved")
+    })
+
+    t.equals(events.length, 0) // nothing happened yet
+
+    const d5 = mobx.reaction(() => x.get(), () => {})
+    t.equals(events.length, 1)
+    t.deepEquals(events, ["x observed"])
+
+    debugger
+    d5()
+    t.equals(events.length, 2)
+    t.deepEquals(events, ["x observed", "x unobserved"])
+
+    t.end()
+})
+
+test.skip("onBecome(Un)Observed - less simple", t => {
+    const x = mobx.observable({
+        a: 3,
+        get b() {
+            return this.a * 2
+        }
+    })
+    const events = []
+
+    const d1 = mobx.onBecomeObserved(x, "a", () => {
+        events.push("a observed")
+    })
+    const d2 = mobx.onBecomeUnobserved(x, "a", () => {
+        debugger
+        events.push("a unobserved")
+    })
+    const d3 = mobx.onBecomeObserved(x, "b", () => {
+        events.push("b observed")
+    })
+    const d4 = mobx.onBecomeUnobserved(x, "b", () => {
+        events.push("b unobserved")
+    })
+
+    debugger
+    x.b
+    x.a = 4
+
+    debugger
+    t.equals(events.length, 0) // nothing happened yet
+
+    const d5 = mobx.reaction(() => x.b, () => {})
+    t.equals(events.length, 2)
+    t.deepEquals(events, ["a observed", "b observed"])
+
+    const d6 = mobx.reaction(() => x.b, () => {})
+    t.equals(events.length, 2)
+
+    d5()
+    t.equals(events.length, 2)
+    debugger
+    d6()
+    t.equals(events.length, 4)
+    t.deepEquals(events, ["a observed", "b observed"])
+
+    d1()
+    d2()
+    d3()
+    d4()
+    const d7 = mobx.reaction(() => x.b, () => {})
+    d7()
+    t.equals(events.length, 4)
+
+    t.end()
+})
