@@ -1,0 +1,159 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`delay autorun until end of transaction 1`] = `
+Array [
+  Object {
+    "name": "a",
+    "newValue": 3,
+    "oldValue": 2,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "name": "a",
+    "newValue": 4,
+    "oldValue": 3,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  "end1",
+  Object {
+    "name": "a",
+    "newValue": 5,
+    "oldValue": 4,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  "end2",
+  Object {
+    "spyReportStart": true,
+    "type": "reaction",
+  },
+  "auto",
+  Object {
+    "type": "compute",
+  },
+  "calc y",
+  Object {
+    "spyReportEnd": true,
+  },
+  "post trans1",
+  Object {
+    "name": "a",
+    "newValue": 6,
+    "oldValue": 5,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "type": "compute",
+  },
+  "calc y",
+  Object {
+    "spyReportStart": true,
+    "type": "reaction",
+  },
+  "auto",
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  "post trans2",
+  Object {
+    "name": "a",
+    "newValue": 3,
+    "oldValue": 6,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  "post trans3",
+]
+`;
+
+exports[`issue 50 1`] = `
+Array [
+  "auto",
+  "calc c",
+  "transstart",
+  Object {
+    "name": "a",
+    "newValue": false,
+    "oldValue": true,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "name": "b",
+    "newValue": true,
+    "oldValue": false,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  "transpreend",
+  Object {
+    "spyReportStart": true,
+    "type": "reaction",
+  },
+  "auto",
+  Object {
+    "type": "compute",
+  },
+  "calc c",
+  Object {
+    "spyReportEnd": true,
+  },
+  "transpostend",
+]
+`;
+
+exports[`verify transaction events 1`] = `
+Array [
+  "auto",
+  "calc c",
+  "transstart",
+  Object {
+    "name": "b",
+    "newValue": 2,
+    "oldValue": 1,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  "transpreend",
+  Object {
+    "type": "compute",
+  },
+  "calc c",
+  Object {
+    "spyReportStart": true,
+    "type": "reaction",
+  },
+  "auto",
+  Object {
+    "spyReportEnd": true,
+  },
+  "transpostend",
+]
+`;

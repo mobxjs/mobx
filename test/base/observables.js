@@ -961,22 +961,7 @@ test("issue 50", function(done) {
         expect(result).toBe("false,true,true")
         expect(x.c).toBe(x.b)
 
-        expect(stripSpyOutput(events)).toEqual([
-            "auto",
-            "calc c",
-            "transstart",
-            { name: "a", newValue: false, oldValue: true, spyReportStart: true, type: "update" },
-            { spyReportEnd: true },
-            { name: "b", newValue: true, oldValue: false, spyReportStart: true, type: "update" },
-            { spyReportEnd: true },
-            "transpreend",
-            { spyReportStart: true, type: "reaction" },
-            "auto",
-            { type: "compute" },
-            "calc c",
-            { spyReportEnd: true },
-            "transpostend"
-        ])
+        expect(stripSpyOutput(events)).toMatchSnapshot()
 
         disposer1()
         disposer2()
@@ -1014,20 +999,7 @@ test("verify transaction events", function() {
     })
     events.push("transpostend")
 
-    expect(stripSpyOutput(events)).toEqual([
-        "auto",
-        "calc c",
-        "transstart",
-        { name: "b", newValue: 2, oldValue: 1, spyReportStart: true, type: "update" },
-        { spyReportEnd: true },
-        "transpreend",
-        { type: "compute" },
-        "calc c",
-        { spyReportStart: true, type: "reaction" },
-        "auto",
-        { spyReportEnd: true },
-        "transpostend"
-    ])
+    expect(stripSpyOutput(events)).toMatchSnapshot()
 
     disposer1()
     disposer2()
@@ -1099,33 +1071,7 @@ test("delay autorun until end of transaction", function() {
     x.a = 3
     events.push("post trans3")
 
-    expect(stripSpyOutput(events)).toEqual([
-        { name: "a", newValue: 3, oldValue: 2, spyReportStart: true, type: "update" },
-        { spyReportEnd: true },
-        { name: "a", newValue: 4, oldValue: 3, spyReportStart: true, type: "update" },
-        { spyReportEnd: true },
-        "end1",
-        { name: "a", newValue: 5, oldValue: 4, spyReportStart: true, type: "update" },
-        { spyReportEnd: true },
-        "end2",
-        { spyReportStart: true, type: "reaction" },
-        "auto",
-        { type: "compute" },
-        "calc y",
-        { spyReportEnd: true },
-        "post trans1",
-        { name: "a", newValue: 6, oldValue: 5, spyReportStart: true, type: "update" },
-        { type: "compute" },
-        "calc y",
-        { spyReportStart: true, type: "reaction" },
-        "auto",
-        { spyReportEnd: true },
-        { spyReportEnd: true },
-        "post trans2",
-        { name: "a", newValue: 3, oldValue: 6, spyReportStart: true, type: "update" },
-        { spyReportEnd: true },
-        "post trans3"
-    ])
+    expect(stripSpyOutput(events)).toMatchSnapshot()
 
     disposer2()
 })

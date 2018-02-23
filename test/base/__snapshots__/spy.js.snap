@@ -1,0 +1,275 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`spy error 1`] = `
+Array [
+  Object {
+    "spyReportStart": true,
+    "type": "reaction",
+  },
+  Object {
+    "type": "compute",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "name": "x",
+    "newValue": 3,
+    "oldValue": 2,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "type": "compute",
+  },
+  Object {
+    "spyReportStart": true,
+    "type": "reaction",
+  },
+  Object {
+    "error": "Oops",
+    "message": "[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: 'Reaction[autorun]",
+    "type": "error",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+]
+`;
+
+exports[`spy output 1`] = `
+Array [
+  Object {
+    "newValue": 2,
+    "type": "create",
+  },
+  Object {
+    "newValue": 3,
+    "oldValue": 2,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "name": "c",
+    "newValue": 4,
+    "spyReportStart": true,
+    "type": "add",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "name": "c",
+    "newValue": 5,
+    "oldValue": 4,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "name": "d",
+    "newValue": 6,
+    "spyReportStart": true,
+    "type": "add",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "name": "d",
+    "newValue": 7,
+    "oldValue": 6,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "added": Array [
+      1,
+      2,
+    ],
+    "addedCount": 2,
+    "index": 0,
+    "removed": Array [],
+    "removedCount": 0,
+    "spyReportStart": true,
+    "type": "splice",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "added": Array [
+      3,
+      4,
+    ],
+    "addedCount": 2,
+    "index": 2,
+    "removed": Array [],
+    "removedCount": 0,
+    "spyReportStart": true,
+    "type": "splice",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "added": Array [],
+    "addedCount": 0,
+    "index": 0,
+    "removed": Array [
+      1,
+    ],
+    "removedCount": 1,
+    "spyReportStart": true,
+    "type": "splice",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "index": 2,
+    "newValue": 5,
+    "oldValue": 4,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "name": "g",
+    "newValue": 1,
+    "spyReportStart": true,
+    "type": "add",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "name": "g",
+    "oldValue": 1,
+    "spyReportStart": true,
+    "type": "delete",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "name": "i",
+    "newValue": 5,
+    "spyReportStart": true,
+    "type": "add",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "name": "i",
+    "newValue": 6,
+    "oldValue": 5,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "spyReportStart": true,
+    "type": "reaction",
+  },
+  Object {
+    "type": "compute",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "newValue": 4,
+    "oldValue": 3,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "type": "compute",
+  },
+  Object {
+    "spyReportStart": true,
+    "type": "reaction",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "newValue": 5,
+    "oldValue": 4,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "newValue": 6,
+    "oldValue": 5,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "type": "compute",
+  },
+  Object {
+    "spyReportStart": true,
+    "type": "reaction",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "arguments": Array [
+      7,
+    ],
+    "name": "myTestAction",
+    "spyReportStart": true,
+    "type": "action",
+  },
+  Object {
+    "newValue": 7,
+    "oldValue": 6,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "type": "compute",
+  },
+  Object {
+    "spyReportStart": true,
+    "type": "reaction",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+]
+`;

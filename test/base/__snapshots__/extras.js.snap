@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`spy 1 1`] = `
+Array [
+  Object {
+    "newValue": 4,
+    "oldValue": 3,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "type": "compute",
+  },
+  Object {
+    "spyReportStart": true,
+    "type": "reaction",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+]
+`;

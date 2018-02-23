@@ -156,13 +156,7 @@ test("spy 1", function() {
     a.set(4)
     stop()
     a.set(5)
-    expect(stripTrackerOutput(lines)).toEqual([
-        { newValue: 4, oldValue: 3, spyReportStart: true, type: "update" },
-        { type: "compute" },
-        { spyReportStart: true, type: "reaction" },
-        { spyReportEnd: true },
-        { spyReportEnd: true }
-    ])
+    expect(stripTrackerOutput(lines)).toMatchSnapshot()
 })
 
 test("get atom", function() {
