@@ -1,7 +1,9 @@
-import { ComputedValue } from "../core/computedvalue"
+import { ComputedValue, IComputedValue } from "../core/computedvalue"
+import { computed } from "./computed"
 import { globalState } from "../core/globalstate"
 import { comparer } from "../types/comparer"
 import { invariant, getNextId, addHiddenProp } from "../utils/utils"
+import { onBecomeUnobserved } from "./become-observed"
 
 export type ITransformer<A, B> = (object: A) => B
 
@@ -15,43 +17,42 @@ export function createTransformer<A, B>(
     )
 
     // Memoizes: object id -> reactive view that applies transformer to the object
-    let objectCache: { [id: number]: ComputedValue<B> } = {}
-
+    let views: { [id: number]: () => B } = {}
     // If the resetId changes, we will clear the object cache, see #163
     // This construction is used to avoid leaking refs to the objectCache directly
     let resetId = globalState.resetId
 
-    // Local transformer class specifically for this transformer
-    class Transformer extends ComputedValue<B> {
-        constructor(private sourceIdentifier: string, private sourceObject: A) {
-            super(
-                () => transformer(sourceObject),
-                undefined,
-                comparer.default,
-                `Transformer-${(<any>transformer).name}-${sourceIdentifier}`,
-                undefined
-            )
-        }
-        onBecomeUnobserved() {
-            const lastValue = this.value
-            super.onBecomeUnobserved()
-            delete objectCache[this.sourceIdentifier]
-            if (onCleanup) onCleanup(lastValue as any, this.sourceObject)
-        }
+    function createView(sourceIdentifier: string, sourceObject: A) {
+        let latestValue: B
+        const expr = computed(
+            () => {
+                return (latestValue = transformer(sourceObject))
+            },
+            {
+                name: `Transformer-${(<any>transformer).name}-${sourceIdentifier}`
+            }
+        )
+        const disposer = onBecomeUnobserved(expr, () => {
+            delete views[sourceIdentifier]
+            disposer()
+            if (onCleanup) onCleanup(latestValue, sourceObject)
+        })
+
+        return () => expr.get()
     }
 
     return (object: A) => {
         if (resetId !== globalState.resetId) {
-            objectCache = {}
+            views = {}
             resetId = globalState.resetId
         }
 
         const identifier = getMemoizationId(object)
-        let reactiveTransformer = objectCache[identifier]
-        if (reactiveTransformer) return reactiveTransformer.get()
+        let reactiveView = views[identifier]
+        if (reactiveView) return reactiveView()
         // Not in cache; create a reactive view
-        reactiveTransformer = objectCache[identifier] = new Transformer(identifier, object)
-        return reactiveTransformer.get()
+        reactiveView = views[identifier] = createView(identifier, object)
+        return reactiveView()
     }
 }
 

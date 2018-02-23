@@ -133,15 +133,15 @@ export function endBatch() {
             const observable = list[i]
             observable.isPendingUnobservation = false
             if (observable.observers.length === 0) {
-                if (observable instanceof ComputedValue) {
-                    // computed values are automatically teared down when the last observer leaves
-                    // this process happens recursively, this computed might be the last observabe of another, etc..
-                    observable.suspend()
-                }
                 if (observable.isBeingObserved) {
                     // if this observable had reactive observers, trigger the hooks
                     observable.isBeingObserved = false
                     observable.onBecomeUnobserved()
+                }
+                if (observable instanceof ComputedValue) {
+                    // computed values are automatically teared down when the last observer leaves
+                    // this process happens recursively, this computed might be the last observabe of another, etc..
+                    observable.suspend()
                 }
             }
         }
