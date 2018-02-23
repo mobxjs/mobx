@@ -211,21 +211,26 @@ test("issue8", () => {
     }, /@computed/)
 })
 
-class Box {
-    @observable uninitialized: any
-    @observable height = 20
-    @observable sizes = [2]
-    @observable
-    someFunc = function() {
-        return 2
-    }
-    @computed
-    get width() {
-        return this.height * this.sizes.length * this.someFunc() * (this.uninitialized ? 2 : 1)
-    }
-}
-
 test("box", () => {
+    class Box {
+        @observable uninitialized: any
+        @observable height = 20
+        @observable sizes = [2]
+        @observable
+        someFunc = function() {
+            return 2
+        }
+        @computed
+        get width() {
+            return this.height * this.sizes.length * this.someFunc() * (this.uninitialized ? 2 : 1)
+        }
+        @action
+        addSize() {
+            this.sizes.push(3)
+            this.sizes.push(4)
+        }
+    }
+
     var box = new Box()
 
     var ar: number[] = []
@@ -243,6 +248,8 @@ test("box", () => {
     t.deepEqual(ar.slice(), [40, 20, 60, 210])
     box.uninitialized = true
     t.deepEqual(ar.slice(), [40, 20, 60, 210, 420])
+    box.addSize()
+    expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700])
 })
 
 test("computed setter should succeed", () => {

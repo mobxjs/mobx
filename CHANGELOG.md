@@ -1,5 +1,10 @@
 # 4.0.0
 
+## New Features!
+
+* Decorate. To decorate without decorator syntax.
+* `values`, `keys`, `set`, `remove` to use objects as observable collections
+
 ## Breaking changes
 
 * Passing `context` explicitly to `autorun`, `reaction` etc is no longer supported. Use arrow functions or function.bind instead.

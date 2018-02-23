@@ -16,29 +16,32 @@ import {
 } from "../../src/mobx.ts"
 import * as mobx from "../../src/mobx.ts"
 
-class Box {
-    @observable uninitialized
-    @observable height = 20
-    @observable sizes = [2]
-    @observable
-    someFunc = function() {
-        return 2
-    }
-    @computed
-    get width() {
-        return this.height * this.sizes.length * this.someFunc() * (this.uninitialized ? 2 : 1)
-    }
-}
-
-var box = new Box()
-
-var ar = []
-
-autorun(() => {
-    ar.push(box.width)
-})
-
 test("babel", function() {
+    class Box {
+        @observable uninitialized
+        @observable height = 20
+        @observable sizes = [2]
+        @observable
+        someFunc = function() {
+            return 2
+        }
+        @computed
+        get width() {
+            return this.height * this.sizes.length * this.someFunc() * (this.uninitialized ? 2 : 1)
+        }
+        @action
+        addSize() {
+            this.sizes.push(3)
+            this.sizes.push(4)
+        }
+    }
+
+    var box = new Box()
+    var ar = []
+    autorun(() => {
+        ar.push(box.width)
+    })
+
     var s = ar.slice()
     expect(s).toEqual([40])
     box.height = 10
@@ -53,6 +56,9 @@ test("babel", function() {
     box.uninitialized = true
     s = ar.slice()
     expect(s).toEqual([40, 20, 60, 210, 420])
+    box.addSize()
+    s = ar.slice()
+    expect(s).toEqual([40, 20, 60, 210, 420, 700])
 })
 
 test("should not be possible to use @action with getters", () => {

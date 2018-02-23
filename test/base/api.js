@@ -11,6 +11,7 @@ test("correct api should be exposed", function() {
             "comparer",
             "computed",
             "createTransformer",
+            "decorate",
             "deepEqual",
             "expr",
             "extendObservable",
