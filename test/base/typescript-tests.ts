@@ -1253,7 +1253,7 @@ test("1072 - @observable without initial value and observe before first access",
     observe(user, "loginCount", () => {})
 })
 
-test("decorate works", () => {
+test("typescript - decorate works with classes", () => {
     class Box {
         height: number = 2
     }
@@ -1263,6 +1263,35 @@ test("decorate works", () => {
         // size: observable // MWE: enabling this should give type error!
     })
     const b = new Box()
+    expect(b.height).toBe(2)
+    expect(mobx.isObservableProp(b, "height")).toBe(true)
+})
+
+test("typescript - decorate works with objects", () => {
+    const b = decorate(
+        {
+            height: 2
+        },
+        {
+            height: observable
+            // size: observable // MWE: enabling this should give type error!
+        }
+    )
+    expect(b.height).toBe(2)
+    expect(mobx.isObservableProp(b, "height")).toBe(true)
+})
+
+test("typescript - decorate works with Object.create", () => {
+    const Box = {
+        height: 2
+    }
+
+    decorate(Box, {
+        height: observable
+        // size: observable // MWE: enabling this should give type error!
+    })
+
+    const b = Object.create(Box)
     expect(b.height).toBe(2)
     expect(mobx.isObservableProp(b, "height")).toBe(true)
 })
