@@ -481,14 +481,14 @@ test("peeking inside erroring computed value doesn't bork (global) state", () =>
         b.get()
     }).toThrowError(/chocolademelk/)
 
-    expect(a.isPendingUnobservation).toBe(true) // true is a default for optimization
+    expect(a.isPendingUnobservation).toBe(false)
     expect(a.observers.length).toBe(0)
     expect(a.diffValue).toBe(0)
     expect(a.lowestObserverState).toBe(-1)
     expect(a.hasUnreportedChange).toBe(false)
     expect(a.value).toBe(1)
 
-    // t.equal(b.dependenciesState, 0) // TODO: re-enable
+    expect(b.dependenciesState).toBe(-1) // NOT_TRACKING
     expect(b.observing.length).toBe(0)
     expect(b.newObserving).toBe(null)
     expect(b.isPendingUnobservation).toBe(false)
@@ -519,7 +519,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
     expect(r).toBe(1)
 
     test("it should update correctly initially", () => {
-        expect(a.isPendingUnobservation).toBe(true) // true is a default for optimization
+        expect(a.isPendingUnobservation).toBe(false)
         expect(a.observers.length).toBe(1)
         expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState).toBe(-1)
@@ -556,7 +556,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         }, /chocolademelk/)
         expect(r).toBe(2)
 
-        expect(a.isPendingUnobservation).toBe(true) // true is a default for optimization
+        expect(a.isPendingUnobservation).toBe(false)
         expect(a.observers.length).toBe(1)
         expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState).toBe(0)
@@ -592,7 +592,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         a.set(3)
         expect(r).toBe(3)
 
-        expect(a.isPendingUnobservation).toBe(true) // true is a default for optimization
+        expect(a.isPendingUnobservation).toBe(false)
         expect(a.observers.length).toBe(1)
         expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState).toBe(0)
@@ -626,7 +626,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
     test("it should clean up correctly", () => {
         d()
 
-        expect(a.isPendingUnobservation).toBe(true) // true is a default for optimization
+        expect(a.isPendingUnobservation).toBe(false)
         expect(a.observers.length).toBe(0)
         expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState).toBe(0)

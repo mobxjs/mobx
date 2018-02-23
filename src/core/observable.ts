@@ -1,4 +1,4 @@
-import { IDerivation, IDerivationState, TraceMode } from "./derivation"
+import { IDerivation, IDerivationState, TraceMode, clearObserving } from "./derivation"
 import { globalState } from "./globalstate"
 import { invariant } from "../utils/utils"
 import { runReactions, Reaction } from "./reaction"
@@ -19,6 +19,7 @@ export interface IObservable extends IDepTreeNode {
      * the dependency is already established
      */
     lastAccessedBy: number
+    isBeingObserved: boolean
 
     lowestObserverState: IDerivationState // Used to avoid redundant propagations
     isPendingUnobservation: boolean // Used to push itself to global.pendingUnobservations at most once per batch.
@@ -27,6 +28,7 @@ export interface IObservable extends IDepTreeNode {
     observersIndexes: {} // map derivation.__mapid to _observers.indexOf(derivation) (see removeObserver)
 
     onBecomeUnobserved(): void
+    onBecomeObserved(): void
 }
 
 export function hasObservers(observable: IObservable): boolean {
@@ -106,8 +108,7 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 }
 
 export function queueForUnobservation(observable: IObservable) {
-    if (!observable.isPendingUnobservation) {
-        // invariant(globalState.inBatch > 0, "INTERNAL ERROR, remove should be called only inside batch");
+    if (observable.isPendingUnobservation === false) {
         // invariant(observable._observers.length === 0, "INTERNAL ERROR, should only queue for unobservation unobserved observables");
         observable.isPendingUnobservation = true
         globalState.pendingUnobservations.push(observable)
@@ -132,8 +133,17 @@ export function endBatch() {
             const observable = list[i]
             observable.isPendingUnobservation = false
             if (observable.observers.length === 0) {
-                observable.onBecomeUnobserved()
-                // NOTE: onBecomeUnobserved might push to `pendingUnobservations`
+                if (observable instanceof ComputedValue) {
+                    // computed values are automatically teared down when the last observer leaves
+                    // this process happens recursively, this computed might be the last observabe of another, etc..
+                    clearObserving(observable)
+                    ;(observable as any).value = undefined // don't hold on to computed value!
+                }
+                if (observable.isBeingObserved) {
+                    // if this observable had reactive observers, trigger the hooks
+                    observable.isBeingObserved = false
+                    observable.onBecomeUnobserved()
+                }
             }
         }
         globalState.pendingUnobservations = []
@@ -151,8 +161,12 @@ export function reportObserved(observable: IObservable) {
         if (derivation.runId !== observable.lastAccessedBy) {
             observable.lastAccessedBy = derivation.runId
             derivation.newObserving![derivation.unboundDepsCount++] = observable
+            if (!observable.isBeingObserved) {
+                observable.isBeingObserved = true
+                observable.onBecomeObserved()
+            }
         }
-    } else if (observable.observers.length === 0) {
+    } else if (observable.observers.length === 0 && globalState.inBatch > 0) {
         queueForUnobservation(observable)
     }
 }
