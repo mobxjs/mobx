@@ -139,7 +139,6 @@ test("autorunAsync accepts a scheduling function", function(done) {
     var autoRunsCalled = 0
     var schedulingsCalled = 0
 
-    debugger
     m.autorun(
         function(r) {
             autoRunsCalled++
