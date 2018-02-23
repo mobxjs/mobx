@@ -9,7 +9,7 @@ import { IObservable } from "../core/observable"
 import { fail } from "../utils/utils"
 
 export function onBecomeObserved(
-    value: IObservableValue<any> | IComputedValue<any> | IObservableArray<any> | ObservableMap<any>,
+    value: IObservable | IComputedValue<any> | IObservableArray<any> | ObservableMap<any>,
     listener: Lambda
 ): Lambda
 export function onBecomeObserved(
@@ -22,7 +22,7 @@ export function onBecomeObserved(thing, arg2, arg3?): Lambda {
 }
 
 export function onBecomeUnobserved(
-    value: IObservableValue<any> | IComputedValue<any> | IObservableArray<any> | ObservableMap<any>,
+    value: IObservable | IComputedValue<any> | IObservableArray<any> | ObservableMap<any>,
     listener: Lambda
 ): Lambda
 export function onBecomeUnobserved(

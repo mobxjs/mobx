@@ -25,7 +25,7 @@ export { IDerivation, untracked, IDerivationState } from "./core/derivation"
 // class definitions where BaseAtom is undefined, causing an error.
 // It's not ideal, but for now we can just make sure this line comes after
 // the ones above
-export { IAtom, Atom, BaseAtom } from "./core/atom"
+export { IAtom, createAtom } from "./core/atom"
 
 export { useStrict, IAction } from "./core/action"
 export { spy } from "./core/spy"

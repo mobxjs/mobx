@@ -271,9 +271,9 @@ test("computed setter should succeed", () => {
     t.equal(b.propX, 8)
 })
 
-test("atom clock example", () => {
+test("atom clock example", done => {
     let ticks = 0
-    const time_factor = 500 // speed up / slow down tests
+    const time_factor = 50 // speed up / slow down tests
 
     class Clock {
         atom: Atom
@@ -283,7 +283,7 @@ test("atom clock example", () => {
         constructor() {
             // console.log("create")
             // creates an atom to interact with the mobx core algorithm
-            this.atom = new Atom(
+            this.atom = mobx.createAtom(
                 // first param a name for this atom, for debugging purposes
                 "Clock",
                 // second (optional) parameter: callback for when this atom transitions from unobserved to observed.
@@ -338,9 +338,10 @@ test("atom clock example", () => {
     setTimeout(disposer, 4.5 * time_factor)
 
     setTimeout(() => {
-        t.equal(ticks, 5)
-        t.equal(values.length, 5)
-        t.equal(values.filter(x => x.length > 0).length, 5)
+        expect(ticks).toEqual(5)
+        expect(values.length).toEqual(5)
+        expect(values.filter(x => x.length > 0).length).toBe(5)
+        done()
     }, 10 * time_factor)
 })
 

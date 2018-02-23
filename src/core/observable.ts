@@ -136,8 +136,7 @@ export function endBatch() {
                 if (observable instanceof ComputedValue) {
                     // computed values are automatically teared down when the last observer leaves
                     // this process happens recursively, this computed might be the last observabe of another, etc..
-                    clearObserving(observable)
-                    ;(observable as any).value = undefined // don't hold on to computed value!
+                    observable.suspend()
                 }
                 if (observable.isBeingObserved) {
                     // if this observable had reactive observers, trigger the hooks
@@ -150,7 +149,7 @@ export function endBatch() {
     }
 }
 
-export function reportObserved(observable: IObservable) {
+export function reportObserved(observable: IObservable): boolean {
     const derivation = globalState.trackingDerivation
     if (derivation !== null) {
         /**
@@ -166,9 +165,11 @@ export function reportObserved(observable: IObservable) {
                 observable.onBecomeObserved()
             }
         }
+        return true
     } else if (observable.observers.length === 0 && globalState.inBatch > 0) {
         queueForUnobservation(observable)
     }
+    return false
 }
 
 function invariantLOS(observable: IObservable, msg: string) {

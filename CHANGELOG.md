@@ -21,6 +21,7 @@
 * Removed `whyRun`, use `trace` instead
 * spy event signature has changed
 * spy event no longer public
+* new Atom => createAtom
 
 ## Non breaking changes
 

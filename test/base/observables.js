@@ -1334,7 +1334,7 @@ test("#502 extendObservable throws on objects created with Object.create(null)",
 
 test("#328 atom throwing exception if observing stuff in onObserved", () => {
     var b = mobx.observable.box(1)
-    var a = new mobx.Atom("test atom", () => {
+    var a = mobx.createAtom("test atom", () => {
         b.get()
     })
     var d = mobx.autorun(() => {
@@ -1427,50 +1427,55 @@ test("unoptimizable subscriptions are diffed correctly", () => {
 test("atom events #427", () => {
     var start = 0
     var stop = 0
+    var runs = 0
 
-    var a = new mobx.Atom("test", () => start++, () => stop++)
-    a.reportObserved()
-    a.reportObserved()
+    var a = mobx.createAtom("test", () => start++, () => stop++)
+    // TODO: fix: Atom should throw on this! (or have a handler to react to untracked reads)
+    expect(a.reportObserved()).toEqual(false)
 
-    expect(start).toBe(2)
-    expect(stop).toBe(2)
+    expect(start).toBe(0)
+    expect(stop).toBe(0)
 
     var d = mobx.autorun(() => {
-        a.reportObserved()
-        expect(start).toBe(3)
-        a.reportObserved()
-        expect(start).toBe(3)
+        runs++
+        expect(a.reportObserved()).toBe(true)
+        expect(start).toBe(1)
+        expect(a.reportObserved()).toBe(true)
+        expect(start).toBe(1)
     })
 
-    expect(start).toBe(3)
-    expect(stop).toBe(2)
+    expect(runs).toBe(1)
+    expect(start).toBe(1)
+    expect(stop).toBe(0)
     a.reportChanged()
-    expect(start).toBe(3)
-    expect(stop).toBe(2)
+    expect(runs).toBe(2)
+    expect(start).toBe(1)
+    expect(stop).toBe(0)
 
     d()
-    expect(start).toBe(3)
-    expect(stop).toBe(3)
+    expect(runs).toBe(2)
+    expect(start).toBe(1)
+    expect(stop).toBe(1)
 
     expect(a.reportObserved()).toBe(false)
-    expect(start).toBe(4)
-    expect(stop).toBe(4)
+    expect(start).toBe(1)
+    expect(stop).toBe(1)
 
     d = mobx.autorun(() => {
         expect(a.reportObserved()).toBe(true)
-        expect(start).toBe(5)
+        expect(start).toBe(2)
         a.reportObserved()
-        expect(start).toBe(5)
+        expect(start).toBe(2)
     })
 
-    expect(start).toBe(5)
-    expect(stop).toBe(4)
+    expect(start).toBe(2)
+    expect(stop).toBe(1)
     a.reportChanged()
-    expect(start).toBe(5)
-    expect(stop).toBe(4)
+    expect(start).toBe(2)
+    expect(stop).toBe(1)
 
     d()
-    expect(stop).toBe(5)
+    expect(stop).toBe(2)
 })
 
 test("verify calculation count", () => {
@@ -1891,7 +1896,6 @@ test("extendObservable should be able to set an a computed property", () => {
         b: 2
     })
     expect(x.a).toBe(4)
-    debugger
     mobx.extendObservable(x, { b: 4, a: 7 })
     expect(setterCalled).toBe(true)
     expect(x.b).toBe(11)

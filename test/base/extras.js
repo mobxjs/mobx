@@ -182,7 +182,7 @@ test("get atom", function() {
     }
 
     var ovClassName = mobx.observable.box(3).constructor.name
-    var atomClassName = mobx.BaseAtom.name
+    var atomClassName = mobx.createAtom("test").constructor.name
     var reactionClassName = mobx.Reaction.name
 
     expect(atom(a)).toBe(ovClassName)
@@ -315,7 +315,7 @@ test("get administration", function() {
     f()
 })
 
-test.skip("onBecome(Un)Observed simple", t => {
+test("onBecome(Un)Observed simple", () => {
     const x = mobx.observable.box(3)
     const events = []
 
@@ -326,21 +326,22 @@ test.skip("onBecome(Un)Observed simple", t => {
         events.push("x unobserved")
     })
 
-    t.equals(events.length, 0) // nothing happened yet
+    expect(events.length).toBe(0) // nothing happened yet
+    x.get()
+    expect(events.length).toBe(0) // nothing happened yet
+    x.set(4)
+    expect(events.length).toBe(0) // nothing happened yet
 
     const d5 = mobx.reaction(() => x.get(), () => {})
-    t.equals(events.length, 1)
-    t.deepEquals(events, ["x observed"])
+    expect(events.length).toBe(1)
+    expect(events).toEqual(["x observed"])
 
-    debugger
     d5()
-    t.equals(events.length, 2)
-    t.deepEquals(events, ["x observed", "x unobserved"])
-
-    t.end()
+    expect(events.length).toBe(2)
+    expect(events).toEqual(["x observed", "x unobserved"])
 })
 
-test.skip("onBecome(Un)Observed - less simple", t => {
+test("onBecome(Un)Observed - less simple", () => {
     const x = mobx.observable({
         a: 3,
         get b() {
@@ -353,7 +354,6 @@ test.skip("onBecome(Un)Observed - less simple", t => {
         events.push("a observed")
     })
     const d2 = mobx.onBecomeUnobserved(x, "a", () => {
-        debugger
         events.push("a unobserved")
     })
     const d3 = mobx.onBecomeObserved(x, "b", () => {
@@ -363,34 +363,30 @@ test.skip("onBecome(Un)Observed - less simple", t => {
         events.push("b unobserved")
     })
 
-    debugger
     x.b
     x.a = 4
 
-    debugger
-    t.equals(events.length, 0) // nothing happened yet
+    expect(events.length).toBe(0) // nothing happened yet
 
     const d5 = mobx.reaction(() => x.b, () => {})
-    t.equals(events.length, 2)
-    t.deepEquals(events, ["a observed", "b observed"])
+    expect(events.length).toBe(2)
+    expect(events).toEqual(["b observed", "a observed"])
 
     const d6 = mobx.reaction(() => x.b, () => {})
-    t.equals(events.length, 2)
+    expect(events.length).toBe(2)
 
     d5()
-    t.equals(events.length, 2)
-    debugger
+    expect(events.length).toBe(2)
     d6()
-    t.equals(events.length, 4)
-    t.deepEquals(events, ["a observed", "b observed"])
+    expect(events.length).toBe(4)
+    expect(events).toEqual(["b observed", "a observed", "b unobserved", "a unobserved"])
 
     d1()
     d2()
     d3()
     d4()
+    events.splice(0)
     const d7 = mobx.reaction(() => x.b, () => {})
     d7()
-    t.equals(events.length, 4)
-
-    t.end()
+    expect(events.length).toBe(4)
 })

@@ -31,9 +31,10 @@ export class BaseAtom implements IAtom {
 
     /**
      * Invoke this method to notify mobx that your atom has been used somehow.
+     * Returns true if there is currently a reactive context.
      */
-    public reportObserved() {
-        reportObserved(this)
+    public reportObserved(): boolean {
+        return reportObserved(this)
     }
 
     /**
@@ -50,48 +51,21 @@ export class BaseAtom implements IAtom {
     }
 }
 
-// TODO: unify classes
-export class Atom extends BaseAtom implements IAtom {
-    isPendingUnobservation = false // for effective unobserving.
-    public isBeingTracked = false
-
-    /**
-     * Create a new atom. For debugging purposes it is recommended to give it a name.
-     * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
-     */
-    constructor(
-        public name = "Atom@" + getNextId(),
-        public onBecomeObservedHandler: () => void = noop,
-        public onBecomeUnobservedHandler: () => void = noop
-    ) {
-        super(name)
-    }
-
-    public reportObserved(): boolean {
-        startBatch()
-
-        super.reportObserved()
-
-        if (!this.isBeingTracked) {
-            this.isBeingTracked = true
-            this.onBecomeObservedHandler()
-        }
-
-        endBatch()
-        return !!globalState.trackingDerivation
-        // return doesn't really give useful info, because it can be as well calling computed which calls atom (no reactions)
-        // also it could not trigger when calculating reaction dependent on Atom because Atom's value was cached by computed called by given reaction.
-    }
-
-    public onBecomeUnobserved() {
-        this.isBeingTracked = false
-        this.onBecomeUnobservedHandler()
-    }
+export function createAtom(
+    name: string,
+    onBecomeObservedHandler: () => void = noop,
+    onBecomeUnobservedHandler: () => void = noop
+): IAtom {
+    const atom = new BaseAtom(name)
+    onBecomeObserved(atom, onBecomeObservedHandler)
+    onBecomeUnobserved(atom, onBecomeUnobservedHandler)
+    return atom
 }
 
 import { globalState } from "./globalstate"
 import { IObservable, propagateChanged, reportObserved, startBatch, endBatch } from "./observable"
 import { IDerivationState } from "./derivation"
 import { createInstanceofPredicate, noop, getNextId } from "../utils/utils"
+import { onBecomeObserved, onBecomeUnobserved } from "../api/become-observed"
 
 export const isAtom = createInstanceofPredicate("Atom", BaseAtom)

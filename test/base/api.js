@@ -5,11 +5,10 @@ test("correct api should be exposed", function() {
         [
             "action",
             "_allowStateChanges",
-            "Atom",
             "autorun",
-            "BaseAtom", // TODO: remove somehow
             "comparer",
             "computed",
+            "createAtom",
             "createTransformer",
             "decorate",
             "deepEqual",

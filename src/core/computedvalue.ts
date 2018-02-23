@@ -209,6 +209,11 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         return res
     }
 
+    suspend() {
+        clearObserving(this)
+        this.value = undefined // don't hold on to computed value!
+    }
+
     observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {
         let firstTime = true
         let prevValue: T | undefined = undefined

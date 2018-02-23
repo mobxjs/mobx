@@ -199,34 +199,6 @@ test("observe collections", function() {
     expect(entries).toEqual([["b", 3]])
 })
 
-test.skip("asStructure", function(t) {
-    var x = mobx.observable.structureMap({})
-    var triggerCount = 0
-    var value = null
-
-    x.set("a", { b: { c: 1 } })
-    autorun(function() {
-        triggerCount += 1
-        value = x.get("a").b.c
-    })
-
-    expect(triggerCount).toBe(1)
-    expect(value).toBe(1)
-
-    x.get("a").b.c = 1
-    x.get("a").b = { c: 1 }
-    x.set("a", { b: { c: 1 } })
-
-    expect(triggerCount).toBe(1)
-    expect(value).toBe(1)
-
-    x.get("a").b.c = 2
-    expect(triggerCount).toBe(2)
-    expect(value).toBe(2)
-
-    t.end()
-})
-
 test("cleanup", function() {
     var x = map({ a: 1 })
 
