@@ -32,7 +32,6 @@ function createObservable(v: any = undefined) {
     if (typeof arguments[1] === "string") return deepDecorator.apply(null, arguments)
 
     invariant(arguments.length <= 1, "observable expects zero or one arguments")
-    // TODO: kill this check?
     invariant(
         !isModifierDescriptor(v),
         "modifiers can only be used for individual object properties"
