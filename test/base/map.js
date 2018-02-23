@@ -309,7 +309,7 @@ test("issue 116 - has should not throw on invalid keys", function() {
     expect(x.get(undefined)).toBe(undefined)
     expect(function() {
         x.set({})
-    }).toThrow()
+    }).toThrow(/Invalid key/)
 })
 
 test("map modifier", () => {
@@ -629,7 +629,7 @@ test("issue 1243, .replace should not trigger change on unchanged values", () =>
 
     expect(() => {
         m.replace("not-an-object")
-    }).toThrow()
+    }).toThrow(/Cannot get keys from 'not-an-object'/)
 
     d()
 })

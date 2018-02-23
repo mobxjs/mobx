@@ -19,7 +19,6 @@ test("intercept observable value", () => {
 
     d = intercept(a, c => {
         if (c.newValue % 2 === 0) {
-            debugger
             throw "value should be odd!"
         }
         return c
@@ -27,7 +26,7 @@ test("intercept observable value", () => {
 
     expect(() => {
         a.set(4)
-    }).toThrow()
+    }).toThrow(/value should be odd/)
 
     expect(a.get()).toBe(3)
     a.set(5)

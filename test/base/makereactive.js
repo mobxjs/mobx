@@ -194,7 +194,7 @@ test("observable5", function() {
     var x = m.computed(function() {})
     expect(function() {
         x.set(7) // set not allowed
-    }).toThrow()
+    }).toThrow(/It is not possible to assign a new value to a computed value/)
 
     var f = function() {}
     var x2 = m.observable.box(f)
@@ -462,7 +462,7 @@ test("ES5 non reactive props", function() {
     // should throw if trying to reconfigure an existing non-configurable prop
     expect(function() {
         const a = m.extendObservable(te2, { notConfigurable: 1 })
-    }).toThrow()
+    }).toThrow(/'extendObservable' expects an object as first argument/)
     // should skip non-configurable / writable props when using `observable`
     te = m.extendObservable(te, te)
     const d1 = Object.getOwnPropertyDescriptor(te, "nonConfigurable")
@@ -478,7 +478,7 @@ test("ES5 non reactive props", function() {
     // should throw if trying to reconfigure an existing non-writable prop
     expect(function() {
         const a = m.extendObservable(te2, { notWritable: 1 })
-    }).toThrow()
+    }).toThrow(/Cannot make property 'notWritable' observable/)
     const d2 = Object.getOwnPropertyDescriptor(te2, "notWritable")
     expect(d2.value).toBe("static")
 
@@ -488,8 +488,8 @@ test("ES5 non reactive props", function() {
 
 test("exceptions", function() {
     expect(function() {
-        m.asReference(m.asFlat(3))
-    }).toThrow()
+        m.observable.ref(m.observable.shallow(3))
+    }).toThrow(/Modifiers cannot be nested/)
 
     var x = m.observable({
         y: m.observable.ref(null),
@@ -497,22 +497,22 @@ test("exceptions", function() {
     })
 
     expect(function() {
-        x.z = m.asReference(3)
-    }).toThrow()
+        x.z = m.observable.ref(3)
+    }).toThrow(/You tried to assign a modifier wrapped value to a collection/)
 
     var ar = m.observable([2])
 
     expect(function() {
-        ar[0] = m.asReference(3)
-    }).toThrow()
+        ar[0] = m.observable.ref(3)
+    }).toThrow(/You tried to assign a modifier wrapped value to a collection/)
 
     expect(function() {
-        ar[1] = m.asReference(3)
-    }).toThrow()
+        ar[1] = m.observable.deep(3)
+    }).toThrow(/You tried to assign a modifier wrapped value to a collection/)
 
     expect(function() {
-        ar = m.observable([m.asStructure(3)])
-    }).toThrow()
+        ar = m.observable([m.observable.shallow(3)])
+    }).toThrow(/You tried to assign a modifier wrapped value to a collection/)
 
     return
 })

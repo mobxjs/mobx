@@ -341,7 +341,7 @@ test("peek", function() {
     x.peek().push(4) //noooo!
     expect(function() {
         x.push(5) // detect alien change
-    }).toThrow()
+    }).toThrow(/the internal structure of an observable array was changed/)
 })
 
 test("react to sort changes", function() {
@@ -462,7 +462,7 @@ test("accessing out of bound values throws", () => {
     expect(warns).toBe(2)
 
     expect(() => (a[0] = 3)).not.toThrow()
-    expect(() => (a[2] = 4)).toThrow()
+    expect(() => (a[2] = 4)).toThrow(/Index out of bounds, 2 is larger than 1/)
 
     console.warn = baseWarn
 })

@@ -167,7 +167,7 @@ test("should be possible to change unobserved state in an action called from com
     mobx.autorun(() => {
         expect(() => {
             c.get()
-        }).not.toThrow()
+        }).not.toThrow(/bla/)
     })
 
     mobx._resetGlobalState()

@@ -6,7 +6,7 @@ test("observe object and map properties", function() {
 
     expect(function() {
         m.observe(map, "b", function() {})
-    }).toThrow()
+    }).toThrow(/the entry 'b' does not exist in the observable map/)
 
     var d1 = m.observe(map, "a", function(e) {
         events.push([e.newValue, e.oldValue])
@@ -23,7 +23,7 @@ test("observe object and map properties", function() {
 
     expect(function() {
         m.observe(o, "b", function() {})
-    }).toThrow()
+    }).toThrow(/no observable property 'b' found on the observable object/)
     var d2 = m.observe(o, "a", function(e) {
         events.push([e.newValue, e.oldValue])
     })

@@ -220,7 +220,7 @@ export function getMapLikeKeys<V>(map: ObservableMap<V> | IKeyValueMap<V> | any)
     if (isPlainObject(map)) keys = Object.keys(map)
     else if (Array.isArray(map)) keys = map.map(([key]) => key)
     else if (isMapLike(map)) keys = (Array as any).from(map.keys())
-    else fail("Cannot get keys from " + map)
+    else fail(`Cannot get keys from '${map}'`)
     return keys
 }
 

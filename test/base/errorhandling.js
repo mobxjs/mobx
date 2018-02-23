@@ -31,7 +31,7 @@ test("exception1", function() {
     var a = computed(function() {
         throw "hoi"
     })
-    expect(() => a()).toThrow()
+    expect(() => a.get()).toThrow(/hoi/)
     checkGlobalState()
 })
 
@@ -150,13 +150,18 @@ test("deny state changes in views", function() {
     var x = observable.box(3)
     var z = observable.box(5)
     var y = computed(function() {
-        z(6)
-        return x() * x()
+        z.set(6)
+        return x.get() * x.get()
     })
 
     expect(() => {
-        y()
-    }).toThrow()
+        y.get() // modifying unobserved values in computeds is allowed, so that new observables can be created and returned
+    }).not.toThrow()
+
+    m.reaction(() => z.get(), () => {})
+    expect(() => {
+        y.get()
+    }).toThrow(/Computed values are not allowed to cause side effects/)
 
     checkGlobalState()
 })
@@ -182,26 +187,27 @@ test("allow state changes in autorun", function() {
 })
 
 test("deny array change in view", function(done) {
-    try {
-        var x = observable.box(3)
-        var z = observable([])
-        var y = computed(function() {
-            z.push(3)
-            return x() * x()
-        })
+    var x = observable.box(3)
+    var z = observable([])
+    var y = computed(function() {
+        z.push(3)
+        return x.get() * x.get()
+    })
 
-        expect(function() {
-            y()
-        }).toThrow()
+    expect(function() {
+        y.get() // modifying z is allowed if nobody is observing
+    }).not.toThrow()
+    m.reaction(() => z.length, () => {})
 
-        expect(z.slice()).toEqual([])
-        expect(mobx._isComputingDerivation()).toBe(false)
+    expect(function() {
+        y.get()
+    }).toThrow(/Computed values are not allowed to cause side effects by changing observables/)
 
-        checkGlobalState()
-        done()
-    } catch (e) {
-        console.log(e.stack)
-    }
+    expect(z.slice()).toEqual([3])
+    expect(mobx._isComputingDerivation()).toBe(false)
+
+    checkGlobalState()
+    done()
 })
 
 test("allow array change in autorun", function() {
@@ -251,7 +257,7 @@ test("cycle2", function() {
     })
     expect(() => {
         b.get()
-    }).toThrow()
+    }).toThrow(/Cycle detected/)
     checkGlobalState()
 })
 
@@ -261,7 +267,7 @@ test("cycle3", function() {
     })
     expect(() => {
         p.get()
-    }).toThrow()
+    }).toThrow(/Cycle detected/)
     checkGlobalState()
 })
 
