@@ -47,6 +47,6 @@ function interceptHook(hook: "onBecomeObserved" | "onBecomeUnobserved", thing, a
         cb.call(this)
     }
     return function() {
-        this[hook] = orig
+        atom[hook] = orig
     }
 }
