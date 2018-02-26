@@ -1,4 +1,4 @@
-var m = require("../../")
+var m = require("../../lib/mobx.min.js")
 var test = require("tape")
 var log = require("./index.js").logMeasurement
 
