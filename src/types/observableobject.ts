@@ -53,8 +53,8 @@ export class ObservableObjectAdministration
     implements IInterceptable<IObjectWillChange>, IListenable {
     values: { [key: string]: ObservableValue<any> | ComputedValue<any> } = {}
     keys: undefined | IObservableArray<string>
-    changeListeners = null
-    interceptors = null
+    changeListeners
+    interceptors
 
     constructor(public target: any, public name: string) {}
 

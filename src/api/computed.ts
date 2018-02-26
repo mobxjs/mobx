@@ -5,8 +5,7 @@ import { createClassPropertyDecorator } from "../utils/decorators"
 import { ComputedValue, IComputedValue } from "../core/computedvalue"
 
 export interface IComputedValueOptions<T> {
-    compareStructural?: boolean // TODO: remove in 4.0 in favor of equals
-    struct?: boolean // TODO: remove in 4.0 in favor of equals
+    compareStructural?: boolean
     equals?: IEqualsComparer<T>
     name?: string
     setter?: (value: T) => void
@@ -74,7 +73,7 @@ export var computed: IComputed = function computed(arg1, arg2, arg3) {
 
     const equals = opts.equals
         ? opts.equals
-        : opts.compareStructural || opts.struct ? comparer.structural : comparer.default
+        : opts.compareStructural || (opts as any).struct ? comparer.structural : comparer.default
 
     return new ComputedValue(arg1, opts.context, equals, opts.name || arg1.name || "", opts.setter)
 } as any

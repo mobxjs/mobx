@@ -150,8 +150,8 @@ class ObservableArrayAdministration<T>
     atom: IAtom
     values: T[] = []
     lastKnownLength: number = 0
-    interceptors = null
-    changeListeners = null
+    interceptors
+    changeListeners
     enhancer: (newV: T, oldV: T | undefined) => T
     dehancer: any
 

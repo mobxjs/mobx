@@ -25,9 +25,9 @@ export function declareAtom() {
         lastAccessedBy = 0
         lowestObserverState = IDerivationState.NOT_TRACKING
         /**
-     * Create a new atom. For debugging purposes it is recommended to give it a name.
-     * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
-     */
+         * Create a new atom. For debugging purposes it is recommended to give it a name.
+         * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
+         */
         constructor(public name = "Atom@" + getNextId()) {}
 
         public onBecomeUnobserved() {

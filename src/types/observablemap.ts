@@ -95,9 +95,9 @@ export class ObservableMap<V>
         `${this.name}.keys()`,
         true
     )
-    interceptors = null
-    changeListeners = null
-    dehancer: any = undefined
+    interceptors
+    changeListeners
+    dehancer: any
 
     constructor(
         initialData?: IObservableMapInitialValues<V>,

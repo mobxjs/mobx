@@ -49,7 +49,7 @@ export class ObservableValue<T> extends Atom
     interceptors
     changeListeners
     protected value
-    dehancer: any = undefined
+    dehancer: any
 
     constructor(
         value: T,
