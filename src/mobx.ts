@@ -15,16 +15,9 @@
  * - utils/   Utility stuff.
  *
  */
-
 export { IObservable, IDepTreeNode } from "./core/observable"
 export { Reaction, IReactionPublic, IReactionDisposer } from "./core/reaction"
 export { IDerivation, untracked, IDerivationState } from "./core/derivation"
-
-// NOTE: For some reason, rollup's dependency tracker gets confused
-// if this line is above the previous 3, and will produce out of order
-// class definitions where BaseAtom is undefined, causing an error.
-// It's not ideal, but for now we can just make sure this line comes after
-// the ones above
 export { IAtom, createAtom } from "./core/atom"
 
 export { useStrict, IAction } from "./core/action"
@@ -35,13 +28,13 @@ export { IEqualsComparer, comparer } from "./types/comparer"
 export { IModifierDescriptor, IEnhancer, isModifierDescriptor } from "./types/modifiers"
 export { IInterceptable, IInterceptor } from "./types/intercept-utils"
 export { IListenable } from "./types/listen-utils"
+
 export {
     IObjectWillChange,
     IObjectChange,
     IObservableObject,
     isObservableObject
 } from "./types/observableobject"
-
 export {
     IValueDidChange,
     IValueWillChange,

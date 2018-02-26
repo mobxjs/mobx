@@ -9,7 +9,7 @@ import {
     addHiddenProp,
     invariant
 } from "../utils/utils"
-import { BaseAtom } from "../core/atom"
+import { Atom, IAtom } from "../core/atom"
 import { checkIfStateModificationsAreAllowed } from "../core/derivation"
 import {
     IInterceptable,
@@ -147,7 +147,7 @@ if (Object.isFrozen(Array)) {
 
 class ObservableArrayAdministration<T>
     implements IInterceptable<IArrayWillChange<T> | IArrayWillSplice<T>>, IListenable {
-    atom: BaseAtom
+    atom: IAtom
     values: T[] = []
     lastKnownLength: number = 0
     interceptors = null
@@ -161,7 +161,7 @@ class ObservableArrayAdministration<T>
         public array: IObservableArray<T>,
         public owned: boolean
     ) {
-        this.atom = new BaseAtom(name || "ObservableArray@" + getNextId())
+        this.atom = new Atom(name || "ObservableArray@" + getNextId())
         this.enhancer = (newV, oldV) => enhancer(newV, oldV, name + "[..]")
     }
 

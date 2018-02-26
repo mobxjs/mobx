@@ -1,4 +1,4 @@
-import { BaseAtom } from "../core/atom"
+import { Atom, declareAtom } from "../core/atom"
 import { checkIfStateModificationsAreAllowed } from "../core/derivation"
 import {
     Lambda,
@@ -41,7 +41,9 @@ export interface IObservableValue<T> {
 
 declare var Symbol
 
-export class ObservableValue<T> extends BaseAtom
+declareAtom()
+
+export class ObservableValue<T> extends Atom
     implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable {
     hasUnreportedChange = false
     interceptors
