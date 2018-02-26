@@ -1,4 +1,4 @@
-import { fail, Lambda, OBFUSCATED_ERROR } from "../utils/utils"
+import { fail, Lambda } from "../utils/utils"
 import { IObservableArray, isObservableArray } from "../types/observablearray"
 import { isObservableMap, ObservableMap } from "../types/observablemap"
 import { isObservableObject } from "../types/observableobject"

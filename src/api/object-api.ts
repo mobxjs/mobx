@@ -2,14 +2,11 @@ import { isObservableMap, ObservableMap } from "../types/observablemap"
 import {
     isObservableObject,
     IObservableObject,
-    ObservableObjectAdministration,
     IIsObservableObject,
     defineObservableProperty
 } from "../types/observableobject"
 import { isObservableArray, IObservableArray } from "../types/observablearray"
-import { fail, invariant, OBFUSCATED_ERROR } from "../utils/utils"
-import { extendObservable } from "./extendobservable"
-import { isComputedValue } from "../core/computedvalue"
+import { fail, invariant } from "../utils/utils"
 import { isModifierDescriptor } from "../mobx"
 import { deepEnhancer } from "../types/modifiers"
 import { startBatch, endBatch } from "../core/observable"

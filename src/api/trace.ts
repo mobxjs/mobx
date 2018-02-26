@@ -1,6 +1,6 @@
 import { globalState } from "../core/globalstate"
 import { getAtom } from "../types/type-utils"
-import { fail, OBFUSCATED_ERROR } from "../utils/utils"
+import { fail } from "../utils/utils"
 import { TraceMode } from "../core/derivation"
 
 export function trace(thing?: any, prop?: string, enterBreakPoint?: boolean): void

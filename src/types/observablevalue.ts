@@ -39,8 +39,6 @@ export interface IObservableValue<T> {
     observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
 }
 
-declare var Symbol
-
 declareAtom()
 
 export class ObservableValue<T> extends Atom

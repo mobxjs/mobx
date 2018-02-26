@@ -8,7 +8,7 @@ export function decorate<T>(
     object: T,
     decorators: { [P in keyof T]: MethodDecorator | PropertyDecorator }
 ): T
-export function decorate<T>(thing: any, decorators: any) {
+export function decorate(thing: any, decorators: any) {
     process.env.NODE_ENV !== "production" &&
         invariant(isPlainObject(decorators), "Decorators should be a key value map")
     const target = typeof thing === "function" ? thing.prototype : thing

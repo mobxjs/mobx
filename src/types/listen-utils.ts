@@ -10,7 +10,7 @@ export function hasListeners(listenable: IListenable) {
     return listenable.changeListeners !== undefined && listenable.changeListeners.length > 0
 }
 
-export function registerListener<T>(listenable: IListenable, handler: Function): Lambda {
+export function registerListener(listenable: IListenable, handler: Function): Lambda {
     const listeners = listenable.changeListeners || (listenable.changeListeners = [])
     listeners.push(handler)
     return once(() => {

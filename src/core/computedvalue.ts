@@ -4,8 +4,7 @@ import {
     propagateMaybeChanged,
     propagateChangeConfirmed,
     startBatch,
-    endBatch,
-    getObservers
+    endBatch
 } from "./observable"
 import {
     IDerivation,
@@ -27,7 +26,6 @@ import {
     getNextId,
     invariant,
     Lambda,
-    unique,
     primitiveSymbol,
     toPrimitive
 } from "../utils/utils"

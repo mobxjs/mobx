@@ -1,5 +1,5 @@
 import { isObservableArray } from "../types/observablearray"
-import { isObservableObject, ObservableObjectAdministration } from "../types/observableobject"
+import { isObservableObject } from "../types/observableobject"
 import { isObservableMap } from "../types/observablemap"
 import { isObservableValue } from "../types/observablevalue"
 import { isObservable } from "./isobservable"

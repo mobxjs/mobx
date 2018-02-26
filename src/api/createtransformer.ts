@@ -1,7 +1,5 @@
-import { ComputedValue, IComputedValue } from "../core/computedvalue"
 import { computed } from "./computed"
 import { globalState } from "../core/globalstate"
-import { comparer } from "../types/comparer"
 import { invariant, getNextId, addHiddenProp } from "../utils/utils"
 import { onBecomeUnobserved } from "./become-observed"
 

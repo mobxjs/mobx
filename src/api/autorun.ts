@@ -1,8 +1,7 @@
-import { Lambda, getNextId, invariant, fail, EMPTY_OBJECT, deprecated } from "../utils/utils"
-import { isModifierDescriptor } from "../types/modifiers"
+import { Lambda, getNextId, invariant, EMPTY_OBJECT, deprecated } from "../utils/utils"
 import { Reaction, IReactionPublic, IReactionDisposer } from "../core/reaction"
 import { untrackedStart, untrackedEnd } from "../core/derivation"
-import { action, isAction, runInAction } from "./action"
+import { action, isAction } from "./action"
 import { IEqualsComparer, comparer } from "../types/comparer"
 
 export interface IAutorunOptions {
@@ -110,7 +109,6 @@ export function reaction<T>(
         invariant(typeof opts === "object", "Third argument of reactions should be an object")
     }
     const name = opts.name || "Reaction@" + getNextId()
-    const fireImmediately = opts.fireImmediately === true
     // TODO: creates ugly spy events, use `effect = (r) => runInAction(opts.name, () => effect(r))` instead?
     const effectAction = action(name, effect)
     const runSync = !opts.scheduler && !opts.delay
@@ -140,8 +138,8 @@ export function reaction<T>(
             changed = firstTime || !equals(value, nextValue)
             value = nextValue
         })
-        if (firstTime && opts.fireImmediately!) effect(value, r)
-        if (!firstTime && (changed as boolean) === true) effect(value, r)
+        if (firstTime && opts.fireImmediately!) effectAction(value, r)
+        if (!firstTime && (changed as boolean) === true) effectAction(value, r)
         if (firstTime) firstTime = false
     }
 

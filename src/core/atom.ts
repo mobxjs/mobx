@@ -74,7 +74,6 @@ export function createAtom(
     return atom
 }
 
-import { globalState } from "./globalstate"
 import { IObservable, propagateChanged, reportObserved, startBatch, endBatch } from "./observable"
 import { IDerivationState } from "./derivation"
 import { createInstanceofPredicate, noop, getNextId } from "../utils/utils"

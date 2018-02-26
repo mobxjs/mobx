@@ -1,7 +1,6 @@
-import { IDerivation, IDerivationState, TraceMode, clearObserving } from "./derivation"
+import { IDerivation, IDerivationState, TraceMode } from "./derivation"
 import { globalState } from "./globalstate"
-import { invariant } from "../utils/utils"
-import { runReactions, Reaction } from "./reaction"
+import { runReactions } from "./reaction"
 import { ComputedValue } from "./computedvalue"
 import { getDependencyTree } from "../api/extras"
 import { IDependencyTree } from "../mobx"
@@ -39,23 +38,23 @@ export function getObservers(observable: IObservable): IDerivation[] {
     return observable.observers
 }
 
-function invariantObservers(observable: IObservable) {
-    const list = observable.observers
-    const map = observable.observersIndexes
-    const l = list.length
-    for (let i = 0; i < l; i++) {
-        const id = list[i].__mapid
-        if (i) {
-            invariant(map[id] === i, "INTERNAL ERROR maps derivation.__mapid to index in list") // for performance
-        } else {
-            invariant(!(id in map), "INTERNAL ERROR observer on index 0 shouldn't be held in map.") // for performance
-        }
-    }
-    invariant(
-        list.length === 0 || Object.keys(map).length === list.length - 1,
-        "INTERNAL ERROR there is no junk in map"
-    )
-}
+// function invariantObservers(observable: IObservable) {
+//     const list = observable.observers
+//     const map = observable.observersIndexes
+//     const l = list.length
+//     for (let i = 0; i < l; i++) {
+//         const id = list[i].__mapid
+//         if (i) {
+//             invariant(map[id] === i, "INTERNAL ERROR maps derivation.__mapid to index in list") // for performance
+//         } else {
+//             invariant(!(id in map), "INTERNAL ERROR observer on index 0 shouldn't be held in map.") // for performance
+//         }
+//     }
+//     invariant(
+//         list.length === 0 || Object.keys(map).length === list.length - 1,
+//         "INTERNAL ERROR there is no junk in map"
+//     )
+// }
 export function addObserver(observable: IObservable, node: IDerivation) {
     // invariant(node.dependenciesState !== -1, "INTERNAL ERROR, can add only dependenciesState !== -1");
     // invariant(observable._observers.indexOf(node) === -1, "INTERNAL ERROR add already added node");
@@ -172,19 +171,19 @@ export function reportObserved(observable: IObservable): boolean {
     return false
 }
 
-function invariantLOS(observable: IObservable, msg: string) {
-    // it's expensive so better not run it in produciton. but temporarily helpful for testing
-    const min = getObservers(observable).reduce((a, b) => Math.min(a, b.dependenciesState), 2)
-    if (min >= observable.lowestObserverState) return // <- the only assumption about `lowestObserverState`
-    throw new Error(
-        "lowestObserverState is wrong for " +
-            msg +
-            " because " +
-            min +
-            " < " +
-            observable.lowestObserverState
-    )
-}
+// function invariantLOS(observable: IObservable, msg: string) {
+//     // it's expensive so better not run it in produciton. but temporarily helpful for testing
+//     const min = getObservers(observable).reduce((a, b) => Math.min(a, b.dependenciesState), 2)
+//     if (min >= observable.lowestObserverState) return // <- the only assumption about `lowestObserverState`
+//     throw new Error(
+//         "lowestObserverState is wrong for " +
+//             msg +
+//             " because " +
+//             min +
+//             " < " +
+//             observable.lowestObserverState
+//     )
+// }
 
 /**
  * NOTE: current propagation mechanism will in case of self reruning autoruns behave unexpectedly

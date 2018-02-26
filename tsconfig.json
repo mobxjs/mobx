@@ -10,6 +10,7 @@
         "strictNullChecks": true,
         "noImplicitReturns": true,
         "noImplicitUseStrict": true,
+        "noUnusedLocals": true,
         "noImplicitAny": false,
         "moduleResolution": "node",
         "lib": [

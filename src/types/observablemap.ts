@@ -8,7 +8,6 @@ import {
     getNextId,
     Lambda,
     invariant,
-    deprecated,
     isES6Map,
     getMapLikeKeys,
     fail
@@ -23,7 +22,6 @@ import {
 import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
 import { declareIterator, Iterator, iteratorSymbol } from "../utils/iterable"
-import { observable } from "../api/observable"
 import { transaction } from "../api/transaction"
 import { referenceEnhancer } from "./modifiers"
 

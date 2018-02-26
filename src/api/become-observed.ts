@@ -1,10 +1,8 @@
-import { IObservableArray, IArrayChange, IArraySplice } from "../types/observablearray"
-import { ObservableMap, IMapChange } from "../types/observablemap"
-import { IObjectChange } from "../types/observableobject"
+import { IObservableArray } from "../types/observablearray"
+import { ObservableMap } from "../types/observablemap"
 import { IComputedValue } from "../core/computedvalue"
-import { IObservableValue, IValueDidChange } from "../types/observablevalue"
 import { Lambda } from "../utils/utils"
-import { getAdministration, getAtom } from "../types/type-utils"
+import { getAtom } from "../types/type-utils"
 import { IObservable } from "../core/observable"
 import { fail } from "../utils/utils"
 

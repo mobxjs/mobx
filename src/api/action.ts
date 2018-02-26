@@ -1,4 +1,4 @@
-import { invariant, addHiddenProp, OBFUSCATED_ERROR, fail } from "../utils/utils"
+import { invariant, addHiddenProp, fail } from "../utils/utils"
 import { createClassPropertyDecorator } from "../utils/decorators"
 import { createAction, executeAction, IAction } from "../core/action"
 
@@ -133,7 +133,7 @@ function namedActionDecorator(name: string) {
 
 export function runInAction<T>(block: () => T, scope?: any): T
 export function runInAction<T>(name: string, block: () => T, scope?: any): T
-export function runInAction<T>(arg1, arg2?, arg3?) {
+export function runInAction(arg1, arg2?, arg3?) {
     const actionName = typeof arg1 === "string" ? arg1 : arg1.name || "<unnamed action>"
     const fn = typeof arg1 === "function" ? arg1 : arg2
     const scope = typeof arg1 === "function" ? arg2 : arg3
