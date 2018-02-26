@@ -5,6 +5,7 @@
 * Decorate. To decorate without decorator syntax.
 * `values`, `keys`, `set`, `remove` to use objects as observable collections
 * Introduced `onBecomeObserved` and `onBecomeUnobserved`
+* MobX now supports development only checks and exceptions, resulting in smaller and faster production builds. The setup requirements are identical to react
 
 ## Breaking changes
 

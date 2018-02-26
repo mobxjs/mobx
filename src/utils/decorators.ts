@@ -41,10 +41,11 @@ export function createClassPropertyDecorator(
         customArgs?: IArguments,
         argLen: number = 0
     ) {
-        invariant(
-            allowCustomArguments || quacksLikeADecorator(arguments),
-            "This function is a decorator, but it wasn't invoked like a decorator"
-        )
+        process.env.NODE_ENV !== "production" &&
+            invariant(
+                allowCustomArguments || quacksLikeADecorator(arguments),
+                "This function is a decorator, but it wasn't invoked like a decorator"
+            )
         if (!descriptor) {
             // typescript (except for getter / setters)
             const newDescriptor = {

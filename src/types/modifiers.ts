@@ -2,24 +2,21 @@ export interface IEnhancer<T> {
     (newValue: T, oldValue: T | undefined, name: string): T
 }
 
-// TODO: can be removed?
 export interface IModifierDescriptor<T> {
     isMobxModifierDescriptor: boolean
     initialValue: T | undefined
     enhancer: IEnhancer<T>
 }
 
-// TODO: can be removed?
 export function isModifierDescriptor(thing): thing is IModifierDescriptor<any> {
     return typeof thing === "object" && thing !== null && thing.isMobxModifierDescriptor === true
 }
 
-// TODO: can be removed?
 export function createModifierDescriptor<T>(
     enhancer: IEnhancer<T>,
     initialValue: T
 ): IModifierDescriptor<T> {
-    invariant(!isModifierDescriptor(initialValue), "Modifiers cannot be nested")
+    if (isModifierDescriptor(initialValue)) fail("Modifiers cannot be nested")
     return {
         isMobxModifierDescriptor: true,
         initialValue,
@@ -30,7 +27,8 @@ export function createModifierDescriptor<T>(
 export function deepEnhancer(v, _, name) {
     if (isModifierDescriptor(v))
         fail(
-            "You tried to assign a modifier wrapped value to a collection, please define modifiers when creating the collection, not when modifying it"
+            process.env.NODE_ENV !== "production" &&
+                "You tried to assign a modifier wrapped value to a collection, please define modifiers when creating the collection, not when modifying it"
         )
 
     // it is an observable already, done
@@ -47,7 +45,8 @@ export function deepEnhancer(v, _, name) {
 export function shallowEnhancer(v, _, name): any {
     if (isModifierDescriptor(v))
         fail(
-            "You tried to assign a modifier wrapped value to a collection, please define modifiers when creating the collection, not when modifying it"
+            process.env.NODE_ENV !== "production" &&
+                "You tried to assign a modifier wrapped value to a collection, please define modifiers when creating the collection, not when modifying it"
         )
 
     if (v === undefined || v === null) return v
@@ -57,7 +56,8 @@ export function shallowEnhancer(v, _, name): any {
     if (isES6Map(v)) return observable.shallowMap(v, name)
 
     return fail(
-        "The shallow modifier / decorator can only used in combination with arrays, objects and maps"
+        process.env.NODE_ENV !== "production" &&
+            "The shallow modifier / decorator can only used in combination with arrays, objects and maps"
     )
 }
 

@@ -1,4 +1,4 @@
-import { invariant, addHiddenProp } from "../utils/utils"
+import { invariant, addHiddenProp, OBFUSCATED_ERROR, fail } from "../utils/utils"
 import { createClassPropertyDecorator } from "../utils/decorators"
 import { createAction, executeAction, IAction } from "../core/action"
 
@@ -86,7 +86,7 @@ const boundActionDecorator = createClassPropertyDecorator(
 )
 
 function dontReassignFields() {
-    invariant(false, "@action fields are not reassignable")
+    invariant(false, process.env.NODE_ENV !== "production" && "@action fields are not reassignable")
 }
 
 export var action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): any {
@@ -119,8 +119,12 @@ function namedActionDecorator(name: string) {
             descriptor.configurable = true
             return descriptor
         }
-        if (descriptor !== undefined && descriptor.get !== undefined) {
-            return invariant(false, "@action cannot be used with getters")
+        if (
+            process.env.NODE_ENV !== "production" &&
+            descriptor !== undefined &&
+            descriptor.get !== undefined
+        ) {
+            return fail("@action cannot be used with getters")
         }
         // bound instance methods
         return actionFieldDecorator(name).apply(this, arguments)
@@ -134,14 +138,14 @@ export function runInAction<T>(arg1, arg2?, arg3?) {
     const fn = typeof arg1 === "function" ? arg1 : arg2
     const scope = typeof arg1 === "function" ? arg2 : arg3
 
-    invariant(
-        typeof fn === "function" && fn.length === 0,
-        "`runInAction` expects a function without arguments"
-    )
-    invariant(
-        typeof actionName === "string" && actionName.length > 0,
-        `actions should have valid names, got: '${actionName}'`
-    )
+    if (process.env.NODE_ENV !== "production") {
+        invariant(
+            typeof fn === "function" && fn.length === 0,
+            "`runInAction` expects a function without arguments"
+        )
+        if (typeof actionName !== "string" || !actionName)
+            fail(`actions should have valid names, got: '${actionName}'`)
+    }
 
     return executeAction(actionName, fn, scope, undefined)
 }

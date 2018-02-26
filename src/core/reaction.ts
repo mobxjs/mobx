@@ -181,8 +181,10 @@ export class Reaction implements IDerivation, IReactionPublic {
 }
 
 function registerErrorHandler(handler) {
-    invariant(this && this.$mobx && isReaction(this.$mobx), "Invalid `this`")
-    invariant(!this.$mobx.errorHandler, "Only one onErrorHandler can be registered")
+    if (process.env.NODE_ENV !== "production") {
+        invariant(this && this.$mobx && isReaction(this.$mobx), "Invalid `this`")
+        invariant(!this.$mobx.errorHandler, "Only one onErrorHandler can be registered")
+    }
     this.$mobx.errorHandler = handler
 }
 

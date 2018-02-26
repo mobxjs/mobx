@@ -386,10 +386,11 @@ export class ObservableMap<V>
      * for callback details
      */
     observe(listener: (changes: IMapChange<V>) => void, fireImmediately?: boolean): Lambda {
-        invariant(
-            fireImmediately !== true,
-            "`observe` doesn't support fireImmediately=true in combination with maps."
-        )
+        process.env.NODE_ENV !== "production" &&
+            invariant(
+                fireImmediately !== true,
+                "`observe` doesn't support fireImmediately=true in combination with maps."
+            )
         return registerListener(this, listener)
     }
 

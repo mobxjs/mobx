@@ -1,4 +1,4 @@
-import { getGlobal, deprecated, fail } from "../utils/utils"
+import { getGlobal, deprecated, fail, OBFUSCATED_ERROR } from "../utils/utils"
 import { IDerivation } from "./derivation"
 import { Reaction } from "./reaction"
 import { IObservable } from "./observable"
@@ -99,7 +99,8 @@ let runInIsolationCalled = false
         setTimeout(() => {
             if (!runInIsolationCalled) {
                 fail(
-                    "There are multiple mobx instances active. This might lead to unexpected results. See https://github.com/mobxjs/mobx/issues/1082 for details."
+                    process.env.NODE_ENV !== "production" &&
+                        "There are multiple mobx instances active. This might lead to unexpected results. See https://github.com/mobxjs/mobx/issues/1082 for details."
                 )
             }
         })

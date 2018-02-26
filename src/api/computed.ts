@@ -23,11 +23,12 @@ export interface IComputed {
 function createComputedDecorator(equals: IEqualsComparer<any>) {
     return createClassPropertyDecorator(
         (target, name, _, __, originalDescriptor) => {
-            invariant(
-                typeof originalDescriptor !== "undefined" &&
-                    typeof originalDescriptor.get === "function",
-                "@computed can only be used on getter functions like: '@computed get myProps() { return ...; }'."
-            )
+            process.env.NODE_ENV !== "production" &&
+                invariant(
+                    typeof originalDescriptor !== "undefined" &&
+                        typeof originalDescriptor.get === "function",
+                    "@computed can only be used on getter functions like: '@computed get myProps() { return ...; }'."
+                )
 
             const adm = asObservableObject(target, "")
             defineComputedProperty(
@@ -66,8 +67,13 @@ export var computed: IComputed = function computed(arg1, arg2, arg3) {
     if (typeof arg2 === "string") {
         return computedDecorator.apply(null, arguments)
     }
-    invariant(typeof arg1 === "function", "First argument to `computed` should be an expression.")
-    invariant(arguments.length < 3, "Computed takes one or two arguments if used as function")
+    if (process.env.NODE_ENV !== "production") {
+        invariant(
+            typeof arg1 === "function",
+            "First argument to `computed` should be an expression."
+        )
+        invariant(arguments.length < 3, "Computed takes one or two arguments if used as function")
+    }
     const opts: IComputedValueOptions<any> = typeof arg2 === "object" ? arg2 : {}
     opts.setter = typeof arg2 === "function" ? arg2 : opts.setter
 

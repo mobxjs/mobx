@@ -40,7 +40,8 @@ function interceptHook(hook: "onBecomeObserved" | "onBecomeUnobserved", thing, a
     const cb = typeof arg2 === "string" ? arg3 : arg2
     const orig = atom[hook]
 
-    if (typeof orig !== "function") return fail("Not an atom that can be (un)observed")
+    if (typeof orig !== "function")
+        return fail(process.env.NODE_ENV !== "production" && "Not an atom that can be (un)observed")
 
     atom[hook] = function() {
         orig.call(this)

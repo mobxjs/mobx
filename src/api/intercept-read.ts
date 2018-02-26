@@ -1,4 +1,4 @@
-import { fail, Lambda } from "../utils/utils"
+import { fail, Lambda, OBFUSCATED_ERROR } from "../utils/utils"
 import { IObservableArray, isObservableArray } from "../types/observablearray"
 import { isObservableMap, ObservableMap } from "../types/observablemap"
 import { isObservableObject } from "../types/observableobject"
@@ -29,13 +29,20 @@ export function interceptReads(thing, propOrHandler?, handler?): Lambda {
     } else if (isObservableObject(thing)) {
         if (typeof propOrHandler !== "string")
             return fail(
-                `InterceptReads can only be used with a specific property, not with an object in general`
+                process.env.NODE_ENV !== "production" &&
+                    `InterceptReads can only be used with a specific property, not with an object in general`
             )
         target = getAdministration(thing, propOrHandler)
     } else {
-        return fail(`Expected observable map, object or array as first array`)
+        return fail(
+            process.env.NODE_ENV !== "production" &&
+                `Expected observable map, object or array as first array`
+        )
     }
-    if (target.dehancer !== undefined) return fail(`An intercept reader was already established`)
+    if (target.dehancer !== undefined)
+        return fail(
+            process.env.NODE_ENV !== "production" && `An intercept reader was already established`
+        )
     target.dehancer = typeof propOrHandler === "function" ? propOrHandler : handler
     return () => {
         target.dehancer = undefined

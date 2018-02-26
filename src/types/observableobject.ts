@@ -64,10 +64,11 @@ export class ObservableObjectAdministration
      * for callback details
      */
     observe(callback: (changes: IObjectChange) => void, fireImmediately?: boolean): Lambda {
-        invariant(
-            fireImmediately !== true,
-            "`observe` doesn't support the fire immediately property for observable objects."
-        )
+        process.env.NODE_ENV !== "production" &&
+            invariant(
+                fireImmediately !== true,
+                "`observe` doesn't support the fire immediately property for observable objects."
+            )
         return registerListener(this, callback)
     }
 
@@ -95,10 +96,11 @@ export interface IIsObservableObject {
 export function asObservableObject(target, name?: string): ObservableObjectAdministration {
     if (isObservableObject(target) && target.hasOwnProperty("$mobx")) return (target as any).$mobx
 
-    invariant(
-        Object.isExtensible(target),
-        "Cannot make the designated object observable; it is not extensible"
-    )
+    process.env.NODE_ENV !== "production" &&
+        invariant(
+            Object.isExtensible(target),
+            "Cannot make the designated object observable; it is not extensible"
+        )
     if (!isPlainObject(target))
         name = (target.constructor.name || "ObservableObject") + "@" + getNextId()
     if (!name) name = "ObservableObject@" + getNextId()
@@ -121,7 +123,8 @@ export function defineObservablePropertyFromDescriptor(
             // nothing, will just redefine below
         } else if (hasGetter) {
             return fail(
-                `The property ${propName} in ${adm.name} is already observable, cannot redefine it as computed property`
+                process.env.NODE_ENV !== "production" &&
+                    `The property ${propName} in ${adm.name} is already observable, cannot redefine it as computed property`
             )
         } else {
             // already observable property
@@ -269,7 +272,10 @@ export function setPropertyValue(instance, key: string, newValue) {
     const adm = instance.$mobx as ObservableObjectAdministration
     const observable = adm.values[key]
     if (observable instanceof ComputedValue)
-        return fail(`setPropertyValue cannot be used on computed values`)
+        return fail(
+            process.env.NODE_ENV !== "production" &&
+                `setPropertyValue cannot be used on computed values`
+        )
 
     // intercept
     if (hasInterceptors(adm)) {

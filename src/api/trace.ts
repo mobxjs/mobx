@@ -1,6 +1,6 @@
 import { globalState } from "../core/globalstate"
 import { getAtom } from "../types/type-utils"
-import { fail } from "../utils/utils"
+import { fail, OBFUSCATED_ERROR } from "../utils/utils"
 import { TraceMode } from "../core/derivation"
 
 export function trace(thing?: any, prop?: string, enterBreakPoint?: boolean): void
@@ -12,7 +12,8 @@ export function trace(...args: any[]): void {
     const derivation = getAtomFromArgs(args)
     if (!derivation) {
         return fail(
-            `'trace(break?)' can only be used inside a tracked computed value or a Reaction. Consider passing in the computed value or reaction explicitly`
+            process.env.NODE_ENV !== "production" &&
+                `'trace(break?)' can only be used inside a tracked computed value or a Reaction. Consider passing in the computed value or reaction explicitly`
         )
     }
     if (derivation.isTracing === TraceMode.NONE) {

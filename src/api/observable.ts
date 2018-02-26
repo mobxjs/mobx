@@ -31,11 +31,13 @@ function createObservable(v: any = undefined) {
     // @observable someProp;
     if (typeof arguments[1] === "string") return deepDecorator.apply(null, arguments)
 
-    invariant(arguments.length <= 1, "observable expects zero or one arguments")
-    invariant(
-        !isModifierDescriptor(v),
-        "modifiers can only be used for individual object properties"
-    )
+    if (process.env.NODE_ENV !== "production") {
+        invariant(arguments.length <= 1, "observable expects zero or one arguments")
+        invariant(
+            !isModifierDescriptor(v),
+            "modifiers can only be used for individual object properties"
+        )
+    }
 
     // it is an observable already, done
     if (isObservable(v)) return v
@@ -48,7 +50,8 @@ function createObservable(v: any = undefined) {
 
     // otherwise, just box it
     fail(
-        `The provided value could not be converted into an observable. If you want just create an observable reference to the object use 'observable.box(value)'`
+        process.env.NODE_ENV !== "production" &&
+            `The provided value could not be converted into an observable. If you want just create an observable reference to the object use 'observable.box(value)'`
     )
 }
 
@@ -199,6 +202,7 @@ observable.ref.struct = function() {
 
 function incorrectlyUsedAsDecorator(methodName) {
     fail(
+        // process.env.NODE_ENV !== "production" &&
         `Expected one or two arguments to observable.${methodName}. Did you accidentally try to use observable.${methodName} as decorator?`
     )
 }

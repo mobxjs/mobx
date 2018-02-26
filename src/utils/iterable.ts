@@ -1,4 +1,4 @@
-import { invariant, addHiddenFinalProp } from "./utils"
+import { addHiddenFinalProp } from "./utils"
 
 // inspired by https://github.com/leebyron/iterall/
 

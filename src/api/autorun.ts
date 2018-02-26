@@ -21,11 +21,13 @@ export function autorun(
     view: (r: IReactionPublic) => any,
     opts: IAutorunOptions = EMPTY_OBJECT
 ): IReactionDisposer {
-    invariant(typeof view === "function", "Autorun expects a function as first argument")
-    invariant(
-        isAction(view) === false,
-        "Autorun does not accept actions since actions are untrackable"
-    )
+    if (process.env.NODE_ENV !== "production") {
+        invariant(typeof view === "function", "Autorun expects a function as first argument")
+        invariant(
+            isAction(view) === false,
+            "Autorun does not accept actions since actions are untrackable"
+        )
+    }
 
     const name: string = (opts && opts.name) || (view as any).name || "Autorun@" + getNextId()
     const runSync = !opts.scheduler && !opts.delay
@@ -94,14 +96,19 @@ export function reaction<T>(
     effect: (arg: T, r: IReactionPublic) => void,
     opts: IReactionOptions = EMPTY_OBJECT
 ): IReactionDisposer {
-    invariant(typeof expression === "function", "First argument to reaction should be a function")
     if (typeof opts === "boolean") {
         opts = { fireImmediately: opts }
         deprecated(
             `Using fireImmediately as argument is deprecated. Use '{ fireImmediately: true }' instead`
         )
     }
-    invariant(typeof opts === "object", "Third argument of reactions should be an object")
+    if (process.env.NODE_ENV !== "production") {
+        invariant(
+            typeof expression === "function",
+            "First argument to reaction should be a function"
+        )
+        invariant(typeof opts === "object", "Third argument of reactions should be an object")
+    }
     const name = opts.name || "Reaction@" + getNextId()
     const fireImmediately = opts.fireImmediately === true
     // TODO: creates ugly spy events, use `effect = (r) => runInAction(opts.name, () => effect(r))` instead?

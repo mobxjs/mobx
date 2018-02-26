@@ -23,6 +23,7 @@ import { globalState } from "./globalstate"
 import { createAction } from "./action"
 import {
     createInstanceofPredicate,
+    fail,
     getNextId,
     invariant,
     Lambda,
@@ -118,7 +119,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * Will evaluate its computation first if needed.
      */
     public get(): T {
-        invariant(!this.isComputing, `Cycle detected in computation ${this.name}`, this.derivation)
+        if (this.isComputing) fail(`Cycle detected in computation ${this.name}: ${this.derivation}`)
         if (globalState.inBatch === 0) {
             // This is an minor optimization which could be omitted to simplify the code
             // The computedValue is accessed outside of any mobx stuff. Batch observing should be enough and don't need
@@ -166,8 +167,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         } else
             invariant(
                 false,
-                `[ComputedValue '${this
-                    .name}'] It is not possible to assign a new value to a computed value.`
+                process.env.NODE_ENV !== "production" &&
+                    `[ComputedValue '${this
+                        .name}'] It is not possible to assign a new value to a computed value.`
             )
     }
 

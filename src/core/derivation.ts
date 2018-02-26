@@ -118,16 +118,17 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
     // Should never be possible to change an observed observable from inside computed, see #798
     if (globalState.computationDepth > 0 && hasObservers)
         fail(
-            "Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ",
-            +atom.name
+            process.env.NODE_ENV !== "production" &&
+                `Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ${atom.name}`
         )
     // Should not be possible to change observed state outside strict mode, except during initialization, see #563
     if (!globalState.allowStateChanges && hasObservers)
         fail(
-            (globalState.strictMode
-                ? "Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: "
-                : "Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, the render function of a React component? Tried to modify: ") +
-                atom.name
+            process.env.NODE_ENV !== "production" &&
+                (globalState.strictMode
+                    ? "Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: "
+                    : "Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, the render function of a React component? Tried to modify: ") +
+                    atom.name
         )
 }
 

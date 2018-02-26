@@ -1,3 +1,6 @@
+export const OBFUSCATED_ERROR =
+    "An invariant failed, however the error is obfuscated because this is an production build."
+
 export const EMPTY_ARRAY = []
 Object.freeze(EMPTY_ARRAY)
 
@@ -18,13 +21,16 @@ export function getNextId() {
     return ++globalState.mobxGuid
 }
 
-export function fail(message: string, thing?): never {
-    invariant(false, message, thing)
+export function fail(message: string | boolean): never {
+    invariant(false, message)
     throw "X" // unreachable
 }
 
-export function invariant(check: boolean, message: string, thing?) {
-    if (!check) throw new Error("[mobx] " + message + (thing ? ` in '${thing}'` : ""))
+export function invariant(check: false, message: string | boolean): never
+export function invariant(check: true, message: string | boolean): void
+export function invariant(check: any, message: string | boolean): void
+export function invariant(check: boolean, message: string | boolean) {
+    if (!check) throw new Error("[mobx] " + (message || OBFUSCATED_ERROR))
 }
 
 /**
@@ -131,6 +137,7 @@ export function isPropertyConfigurable(object: any, prop: string): boolean {
 export function assertPropertyConfigurable(object: any, prop: string) {
     invariant(
         isPropertyConfigurable(object, prop),
+        // TODO: process.env.NODE_ENV !== "production" &&
         `Cannot make property '${prop}' observable, it is not configurable and writable in the target object`
     )
 }

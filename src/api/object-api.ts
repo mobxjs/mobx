@@ -7,7 +7,7 @@ import {
     defineObservableProperty
 } from "../types/observableobject"
 import { isObservableArray, IObservableArray } from "../types/observablearray"
-import { fail, invariant } from "../utils/utils"
+import { fail, invariant, OBFUSCATED_ERROR } from "../utils/utils"
 import { extendObservable } from "./extendobservable"
 import { isComputedValue } from "../core/computedvalue"
 import { isModifierDescriptor } from "../mobx"
@@ -23,7 +23,10 @@ export function keys(obj: any): string[] {
     if (isObservableMap(obj)) {
         return (obj as any)._keys.slice()
     }
-    return fail("'keys()' can only be used on observable objects and maps")
+    return fail(
+        process.env.NODE_ENV !== "production" &&
+            "'keys()' can only be used on observable objects and maps"
+    )
 }
 
 export function values<T = any>(obj: IObservableObject): T[]
@@ -39,7 +42,10 @@ export function values(obj: any): string[] {
     if (isObservableArray(obj)) {
         return obj.slice()
     }
-    return fail("'values()' can only be used on observable objects, arrays and maps")
+    return fail(
+        process.env.NODE_ENV !== "production" &&
+            "'values()' can only be used on observable objects, arrays and maps"
+    )
 }
 
 export function set(obj: IObservableObject, key: string, value: any)
@@ -66,7 +72,10 @@ export function set(obj: any, key: any, value: any): void {
         obj[key] = value
         endBatch()
     } else {
-        return fail("'set()' can only be used on observable objects, arrays and maps")
+        return fail(
+            process.env.NODE_ENV !== "production" &&
+                "'set()' can only be used on observable objects, arrays and maps"
+        )
     }
 }
 
@@ -90,6 +99,9 @@ export function remove(obj: any, key: any): void {
         invariant(key >= 0, `Not a valid index: '${key}'`)
         obj.splice(key, 1)
     } else {
-        return fail("'remove()' can only be used on observable objects, arrays and maps")
+        return fail(
+            process.env.NODE_ENV !== "production" &&
+                "'remove()' can only be used on observable objects, arrays and maps"
+        )
     }
 }
