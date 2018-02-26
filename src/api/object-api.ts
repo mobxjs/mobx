@@ -21,7 +21,7 @@ export function keys(obj: any): string[] {
         return ((obj as any) as IIsObservableObject).$mobx.getKeys()
     }
     if (isObservableMap(obj)) {
-        return obj.keys()
+        return (obj as any)._keys.slice()
     }
     return fail("'keys()' can only be used on observable objects and maps")
 }
@@ -34,7 +34,7 @@ export function values(obj: any): string[] {
         return keys(obj).map(key => obj[key])
     }
     if (isObservableMap(obj)) {
-        return obj.values()
+        return keys(obj).map(key => obj.get(key))
     }
     if (isObservableArray(obj)) {
         return obj.slice()

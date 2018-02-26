@@ -478,3 +478,14 @@ test("replace can handle large arrays", () => {
         a.spliceWithArray(0, 0, b)
     }).not.toThrow()
 })
+
+test("can iterate arrays", () => {
+    const x = mobx.observable([])
+    const y = []
+    const d = mobx.reaction(() => Array.from(x), items => y.push(items), { fireImmediately: true })
+
+    x.push("a")
+    x.push("b")
+    expect(y).toEqual([[], ["a"], ["a", "b"]])
+    d()
+})

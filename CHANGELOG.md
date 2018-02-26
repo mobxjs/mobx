@@ -4,6 +4,7 @@
 
 * Decorate. To decorate without decorator syntax.
 * `values`, `keys`, `set`, `remove` to use objects as observable collections
+* Introduced `onBecomeObserved` and `onBecomeUnobserved`
 
 ## Breaking changes
 
@@ -22,6 +23,8 @@
 * spy event signature has changed
 * spy event no longer public
 * new Atom => createAtom
+* custom atoms: `reportObserved` outside tracking context won't trigger changes
+* map `.entries()`, `.values()` and `.keys()` now properly return iterators. use `values(m)` or `keys(m)` or `Array.from(m)` to get the old behavior
 
 ## Non breaking changes
 

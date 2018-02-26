@@ -28,17 +28,17 @@ test("map crud", function() {
     expect(m.has("b")).toBe(true)
     expect(m.get("b")).toBe(3)
 
-    expect(m.keys()).toEqual(["a", "b"])
-    expect(m.values()).toEqual([2, 3])
-    expect(m.entries()).toEqual([["a", 2], ["b", 3]])
+    expect(mobx.keys(m)).toEqual(["a", "b"])
+    expect(mobx.values(m)).toEqual([2, 3])
+    expect(iteratorToArray(m.entries())).toEqual([["a", 2], ["b", 3]])
     expect(m.toJS()).toEqual({ a: 2, b: 3 })
     expect(JSON.stringify(m)).toEqual('{"a":2,"b":3}')
     expect(m.toString()).toEqual("ObservableMap@1[{ a: 2, b: 3 }]")
     expect(m.size).toBe(2)
 
     m.clear()
-    expect(m.keys()).toEqual([])
-    expect(m.values()).toEqual([])
+    expect(mobx.keys(m)).toEqual([])
+    expect(mobx.values(m)).toEqual([])
     expect(m.toJS()).toEqual({})
     expect(m.toString()).toEqual("ObservableMap@1[{  }]")
     expect(m.size).toBe(0)
@@ -129,7 +129,7 @@ test("observe value", function() {
 
     a.replace({ y: "stuff", z: "zoef" })
     expect(valueY).toBe("stuff")
-    expect(a.keys()).toEqual(["y", "z"])
+    expect(mobx.keys(a)).toEqual(["y", "z"])
 })
 
 test("initialize with entries", function() {
@@ -159,10 +159,10 @@ test("observe collections", function() {
         keys = mobx.keys(x)
     })
     autorun(function() {
-        values = x.values()
+        values = iteratorToArray(x.values())
     })
     autorun(function() {
-        entries = x.entries()
+        entries = iteratorToArray(x.entries())
     })
 
     x.set("a", 1)
@@ -264,7 +264,7 @@ test("issue 119 - unobserve before delete", function() {
     })
     // the error only happens if the value is observed
     mobx.autorun(function() {
-        myObservable.myMap.values().forEach(function(value) {
+        mobx.values(myObservable.myMap).forEach(function(value) {
             propValues.push(value.myCalculatedProp)
         })
     })
@@ -298,7 +298,7 @@ test("map modifier", () => {
 
     x = mobx.observable.map()
     expect(x instanceof mobx.ObservableMap).toBe(true)
-    expect(x.keys()).toEqual([])
+    expect(mobx.keys(x)).toEqual([])
 
     x = mobx.observable({ a: mobx.observable.map({ b: { c: 3 } }) })
     expect(mobx.isObservableObject(x)).toBe(true)
@@ -352,15 +352,15 @@ test("256, map.merge should be not be tracked for target", () => {
     })
 
     expect(c).toBe(1)
-    expect(x.keys()).toEqual(["a", "b"])
+    expect(mobx.keys(x)).toEqual(["a", "b"])
 
     y.set("c", 4)
     expect(c).toBe(2)
-    expect(x.keys()).toEqual(["a", "b", "c"])
+    expect(mobx.keys(x)).toEqual(["a", "b", "c"])
 
     x.set("d", 5)
     expect(c).toBe(2)
-    expect(x.keys()).toEqual(["a", "b", "c", "d"])
+    expect(mobx.keys(x)).toEqual(["a", "b", "c", "d"])
 
     d()
 })
@@ -369,20 +369,20 @@ test("308, map keys should be coerced to strings correctly", () => {
     var m = mobx.observable.map()
     m.set(1, true) // => "[mobx.observable.map { 1: true }]"
     m.delete(1) // => "[mobx.observable.map { }]"
-    expect(m.keys()).toEqual([])
+    expect(mobx.keys(m)).toEqual([])
 
     m.set(1, true) // => "[mobx.observable.map { 1: true }]"
     m.delete("1") // => "[mobx.observable.map { 1: undefined }]"
-    expect(m.keys()).toEqual([])
+    expect(mobx.keys(m)).toEqual([])
 
     m.set(1, true) // => "[mobx.observable.map { 1: true, 1: true }]"
     m.delete("1") // => "[mobx.observable.map { 1: undefined, 1: undefined }]"
-    expect(m.keys()).toEqual([])
+    expect(mobx.keys(m)).toEqual([])
 
     m.set(true, true)
     expect(m.get("true")).toBe(true)
     m.delete(true)
-    expect(m.keys()).toEqual([])
+    expect(mobx.keys(m)).toEqual([])
 })
 
 test("map should support iterall / iterable ", () => {
@@ -414,7 +414,7 @@ test("support for ES6 Map", () => {
 
     var m = mobx.observable(x)
     expect(mobx.isObservableMap(m)).toBe(true)
-    expect(m.entries()).toEqual([["x", 3], ["y", 2]])
+    expect(Array.from(m)).toEqual([["x", 3], ["y", 2]])
 
     var x2 = new Map()
     x2.set("y", 4)
@@ -549,16 +549,18 @@ test("work with 'toString' key", () => {
 test("issue 940, should not be possible to change maps outside strict mode", () => {
     mobx.useStrict(true)
 
-    const m = mobx.observable.map()
-    const d = mobx.autorun(() => m.values())
+    try {
+        const m = mobx.observable.map()
+        const d = mobx.autorun(() => mobx.values(m))
 
-    expect(() => {
-        m.set("x", 1)
-    }).toThrowError(/Since strict-mode is enabled/)
+        expect(() => {
+            m.set("x", 1)
+        }).toThrowError(/Since strict-mode is enabled/)
 
-    d()
-
-    mobx.useStrict(false)
+        d()
+    } finally {
+        mobx.useStrict(false)
+    }
 })
 
 test("issue 1243, .replace should not trigger change on unchanged values", () => {
@@ -609,4 +611,67 @@ test("issue 1243, .replace should not trigger change on unchanged values", () =>
 test("#1258 cannot replace maps anymore", () => {
     const items = mobx.observable.map()
     items.replace(mobx.observable.map())
+})
+
+test("can iterate maps", () => {
+    const x = mobx.observable.map()
+    const y = []
+    const d = mobx.reaction(() => Array.from(x), items => y.push(items), { fireImmediately: true })
+
+    x.set("a", "A")
+    x.set("b", "B")
+    expect(y).toEqual([[], [["a", "A"]], [["a", "A"], ["b", "B"]]])
+    d()
+})
+
+function iteratorToArray(it) {
+    const res = []
+    while (true) {
+        const r = it.next()
+        if (!r.done) {
+            res.push(r.value)
+        } else {
+            break
+        }
+    }
+    return res
+}
+
+test("can iterate map - entries", () => {
+    const x = mobx.observable.map()
+    const y = []
+    const d = mobx.reaction(() => iteratorToArray(x.entries()), items => y.push(items), {
+        fireImmediately: true
+    })
+
+    x.set("a", "A")
+    x.set("b", "B")
+    expect(y).toEqual([[], [["a", "A"]], [["a", "A"], ["b", "B"]]])
+    d()
+})
+
+test("can iterate map - keys", () => {
+    const x = mobx.observable.map()
+    const y = []
+    const d = mobx.reaction(() => iteratorToArray(x.keys()), items => y.push(items), {
+        fireImmediately: true
+    })
+
+    x.set("a", "A")
+    x.set("b", "B")
+    expect(y).toEqual([[], ["a"], ["a", "b"]])
+    d()
+})
+
+test("can iterate map - values", () => {
+    const x = mobx.observable.map()
+    const y = []
+    const d = mobx.reaction(() => iteratorToArray(x.values()), items => y.push(items), {
+        fireImmediately: true
+    })
+
+    x.set("a", "A")
+    x.set("b", "B")
+    expect(y).toEqual([[], ["A"], ["A", "B"]])
+    d()
 })

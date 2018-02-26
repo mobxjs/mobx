@@ -20,7 +20,7 @@ import {
 } from "./intercept-utils"
 import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
-import { arrayAsIterator, declareIterator } from "../utils/iterable"
+import { declareIterator } from "../utils/iterable"
 import { IEnhancer } from "./modifiers"
 
 const MAX_SPLICE_SIZE = 10000 // See e.g. https://github.com/mobxjs/mobx/issues/859
@@ -171,7 +171,8 @@ class ObservableArrayAdministration<T>
     }
 
     dehanceValues(values: T[]): T[] {
-        if (this.dehancer !== undefined) return values.map(this.dehancer) as any
+        if (this.dehancer !== undefined && this.values.length > 0)
+            return values.map(this.dehancer) as any
         return values
     }
 
@@ -239,7 +240,7 @@ class ObservableArrayAdministration<T>
         else if (deleteCount === undefined || deleteCount === null) deleteCount = 0
         else deleteCount = Math.max(0, Math.min(deleteCount, length - index))
 
-        if (newItems === undefined) newItems = []
+        if (newItems === undefined) newItems = EMPTY_ARRAY
 
         if (hasInterceptors(this)) {
             const change = interceptChange<IArrayWillSplice<T>>(this as any, {
@@ -254,7 +255,8 @@ class ObservableArrayAdministration<T>
             newItems = change.added
         }
 
-        newItems = <T[]>newItems.map(v => this.enhancer(v, undefined))
+        newItems =
+            newItems.length === 0 ? newItems : <T[]>newItems.map(v => this.enhancer(v, undefined))
         const lengthDelta = newItems.length - deleteCount
         this.updateArrayLength(length, lengthDelta) // create or remove new entries
         const res = this.spliceItemsIntoValues(index, deleteCount, newItems)
@@ -569,7 +571,16 @@ export class ObservableArray<T> extends StubArray {
 }
 
 declareIterator(ObservableArray.prototype, function() {
-    return arrayAsIterator(this.slice())
+    ;(this.$mobx as ObservableArrayAdministration<any>).atom.reportObserved()
+    const self = this
+    let nextIndex = 0
+    return {
+        next: function() {
+            return nextIndex < self.length
+                ? { value: self[nextIndex++], done: false }
+                : { done: true }
+        }
+    }
 })
 
 Object.defineProperty(ObservableArray.prototype, "length", {

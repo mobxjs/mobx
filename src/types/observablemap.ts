@@ -22,7 +22,7 @@ import {
 } from "./intercept-utils"
 import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
-import { arrayAsIterator, declareIterator, Iterator } from "../utils/iterable"
+import { declareIterator, Iterator, iteratorSymbol } from "../utils/iterable"
 import { observable } from "../api/observable"
 import { transaction } from "../api/transaction"
 import { referenceEnhancer } from "./modifiers"
@@ -263,20 +263,40 @@ export class ObservableMap<V>
         return value
     }
 
-    keys(): string[] & Iterator<string> {
-        return arrayAsIterator(this._keys.slice())
+    keys(): Iterator<string> {
+        return (this._keys[iteratorSymbol()] as any)()
     }
 
-    values(): V[] & Iterator<V> {
-        return (arrayAsIterator as any)(this._keys.map(this.get, this))
+    values(): Iterator<V> {
+        const self = this
+        let nextIndex = 0
+        return {
+            next: function() {
+                return nextIndex < self._keys.length
+                    ? { value: self.get(self._keys[nextIndex++]), done: false }
+                    : { done: true }
+            }
+        }
     }
 
-    entries(): IMapEntries<V> & Iterator<IMapEntry<V>> {
-        return arrayAsIterator(this._keys.map(key => <[string, V]>[key, this.get(key)]))
+    entries(): Iterator<IMapEntry<V>> {
+        const self = this
+        let nextIndex = 0
+        return {
+            next: function() {
+                const key = self._keys[nextIndex++]
+                return nextIndex <= self._keys.length
+                    ? {
+                          value: [key, self.get(key)!],
+                          done: false
+                      }
+                    : { done: true }
+            }
+        }
     }
 
     forEach(callback: (value: V, key: string, object: IMap<string, V>) => void, thisArg?) {
-        this.keys().forEach(key => callback.call(thisArg, this.get(key), key, this))
+        this._keys.forEach(key => callback.call(thisArg, this.get(key), key, this))
     }
 
     /** Merge another object into this object, returns this. */
@@ -297,7 +317,7 @@ export class ObservableMap<V>
     clear() {
         transaction(() => {
             untracked(() => {
-                this.keys().forEach(this.delete, this)
+                this._keys.slice().forEach(key => this.delete(key))
             })
         })
     }
@@ -308,7 +328,7 @@ export class ObservableMap<V>
             // and delete them from the map, then merge the new map
             // this will cause reactions only on changed values
             const newKeys = getMapLikeKeys(values)
-            const oldKeys = this.keys()
+            const oldKeys = this._keys
             const missingKeys = oldKeys.filter(k => newKeys.indexOf(k) === -1)
 
             missingKeys.forEach(k => this.delete(k))
@@ -328,7 +348,7 @@ export class ObservableMap<V>
      */
     toJS(): IKeyValueMap<V> {
         const res: IKeyValueMap<V> = {}
-        this.keys().forEach(key => (res[key] = this.get(key)!))
+        this._keys.forEach(key => (res[key] = this.get(key)!))
         return res
     }
 
@@ -355,7 +375,7 @@ export class ObservableMap<V>
         return (
             this.name +
             "[{ " +
-            this.keys().map(key => `${key}: ${"" + this.get(key)}`).join(", ") +
+            this._keys.map(key => `${key}: ${"" + this.get(key)}`).join(", ") +
             " }]"
         )
     }
