@@ -3,38 +3,37 @@ MobX Sponsors
 
 Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 
-* Mendix
-* Rainer Wittmann
-* Nikolay Ivanov
-* Mattia Manzati
-* Matt Ruby
-* Jeff Hansen
-* Steven Pérez
-* Anri Asaturov
 * Anders Sjöberg
-* Andy Kogut
-* Michael Mazurczak
-* Mihail Diordiev
-* Benjamin Gruenbaum
-* James McElwain
-* Dardo Kukovec
-* Surafel D
-* Vojtech Novak
-* Rafal Filipek
-* Graham Kaemmer
 * Andrei Zvonimir Crnković
-* Rob Searle
-* Thibault Maekelbergh
-* Matthieu Dumont
-* Wilson Lee
-* Jorge Luis Acosta
-* Greg Zapp
+* Andy Kogut
+* Anri Asaturov
+* Benjamin Gruenbaum
 * Code Hat Programming Inc.
 * Dane Hitchcox
-* Konrad Mazanowski
-* Wilfried Reiter
-* Yousuf Nejati
-* Pavel Ravits
-* Raj Sekaran
 * Daniel Nakov
+* Dardo Kukovec
+* Graham Kaemmer
+* Greg Zapp
+* James McElwain
+* Jeff Hansen
 * Joinbox
+* Jorge Luis Acosta
+* Konrad Mazanowski
+* Matt Ruby
+* Matthieu Dumont
+* Mattia Manzati
+* Michael Mazurczak
+* Mihail Diordiev
+* Nikolay Ivanov
+* Pavel Ravits
+* Rafal Filipek
+* Rainer Wittmann
+* Raj Sekaran
+* Rob Searle
+* Steven Pérez
+* Surafel D
+* Thibault Maekelbergh
+* Vojtech Novak
+* Wilfried Reiter
+* Wilson Lee
+* Yousuf Nejati
