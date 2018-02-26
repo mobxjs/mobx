@@ -388,5 +388,5 @@ test("onBecome(Un)Observed - less simple", () => {
     events.splice(0)
     const d7 = mobx.reaction(() => x.b, () => {})
     d7()
-    expect(events.length).toBe(4)
+    expect(events.length).toBe(0)
 })
