@@ -1,4 +1,5 @@
 var mobx = require("../../src/mobx.ts")
+var utils = require("../utils/test-utils")
 
 var strictError = /Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: /
 
@@ -183,4 +184,21 @@ test("strict mode checks", function() {
 
     mobx._resetGlobalState()
     d()
+})
+
+test("warn on unsafe reads", function() {
+    try {
+        mobx.configure({ warnOnUnsafeComputationReads: true })
+        const x = mobx.observable({
+            y: 3,
+            get yy() {
+                return this.y * 2
+            }
+        })
+        utils.consoleWarn(() => {
+            x.yy
+        }, /is read outside a reactive context and not actively observed/)
+    } finally {
+        mobx.configure({ warnOnUnsafeComputationReads: false })
+    }
 })

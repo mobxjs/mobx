@@ -6,9 +6,11 @@
 * `values`, `keys`, `set`, `remove` to use objects as observable collections
 * Introduced `onBecomeObserved` and `onBecomeUnobserved`
 * MobX now supports development only checks and exceptions, resulting in smaller and faster production builds. The setup requirements are identical to react
+* Introduced `mobx.configure({ warnOnUnsafeComputationReads: true })`
 
 ## Breaking changes
 
+* `useStrict(boolean)` was dropped, use `configure({enforceActions: boolean})` instead
 * `expr` is moved to mobx-utils. Remember, `expr(fn)` is just sugar for `computed(fn).get()`
 * `createTransformer` is moved to mobx-utils
 * Passing `context` explicitly to `autorun`, `reaction` etc is no longer supported. Use arrow functions or function.bind instead.

@@ -130,6 +130,12 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                             .name}' is being read outside a reactive context and doing a full recompute`
                     )
                 }
+                if (globalState.warnOnUnsafeComputationReads) {
+                    console.warn(
+                        `[mobx] Computed value ${this
+                            .name} is read outside a reactive context and not actively observed. Doing a full recompute`
+                    )
+                }
                 this.value = this.computeValue(false)
             }
             endBatch()

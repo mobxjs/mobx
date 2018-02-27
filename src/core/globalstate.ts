@@ -6,7 +6,13 @@ import { IObservable } from "./observable"
 /**
  * These values will persist if global state is reset
  */
-const persistentKeys = ["mobxGuid", "spyListeners", "enforceActions", "runId"]
+const persistentKeys = [
+    "mobxGuid",
+    "spyListeners",
+    "enforceActions",
+    "warnOnUnsafeComputationReads",
+    "runId"
+]
 
 export class MobXGlobals {
     /**
@@ -79,6 +85,11 @@ export class MobXGlobals {
      * Globally attached error handlers that react specifically to errors in reactions
      */
     globalReactionErrorHandlers: ((error: any, derivation: IDerivation) => void)[] = []
+
+    /**
+     * Warn if computed values are accessed outside a reactive context
+     */
+    warnOnUnsafeComputationReads = false
 }
 
 export let globalState: MobXGlobals = new MobXGlobals()
