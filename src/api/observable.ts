@@ -128,7 +128,7 @@ const observableFactories: IObservableFactories = {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("object")
         const res = {}
         // convert to observable object
-        asObservableObject(res, name)
+        asObservableObject(res, name) // TODO: line can be removed?
         // add properties
         extendObservable(res, props)
         return res as any

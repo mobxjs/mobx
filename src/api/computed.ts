@@ -1,16 +1,9 @@
-import { IEqualsComparer, comparer } from "../types/comparer"
+import { IEqualsComparer, comparer } from "../utils/comparer"
+import { IComputedValueOptions } from "../core/computedvalue"
 import { asObservableObject, defineComputedProperty } from "../types/observableobject"
 import { invariant } from "../utils/utils"
 import { createClassPropertyDecorator } from "../utils/decorators"
 import { ComputedValue, IComputedValue } from "../core/computedvalue"
-
-export interface IComputedValueOptions<T> {
-    compareStructural?: boolean
-    equals?: IEqualsComparer<T>
-    name?: string
-    setter?: (value: T) => void
-    context?: any
-}
 
 export interface IComputed {
     <T>(func: () => T, setter?: (value: T) => void): IComputedValue<T>
@@ -35,8 +28,7 @@ function createComputedDecorator(equals: IEqualsComparer<any>) {
                 adm,
                 name,
                 originalDescriptor.get,
-                originalDescriptor.set,
-                equals,
+                { setter: originalDescriptor.set, equals },
                 false
             )
         },
@@ -76,12 +68,9 @@ export var computed: IComputed = function computed(arg1, arg2, arg3) {
     }
     const opts: IComputedValueOptions<any> = typeof arg2 === "object" ? arg2 : {}
     opts.setter = typeof arg2 === "function" ? arg2 : opts.setter
+    opts.name = opts.name || arg1.name || "" /* for generated name */
 
-    const equals = opts.equals
-        ? opts.equals
-        : opts.compareStructural || (opts as any).struct ? comparer.structural : comparer.default
-
-    return new ComputedValue(arg1, opts.context, equals, opts.name || arg1.name || "", opts.setter)
+    return new ComputedValue(arg1, opts)
 } as any
 
 computed.struct = computedStructDecorator

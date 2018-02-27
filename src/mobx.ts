@@ -24,7 +24,7 @@ export { IAction } from "./core/action"
 export { spy } from "./core/spy"
 export { IComputedValue } from "./core/computedvalue"
 
-export { IEqualsComparer, comparer } from "./types/comparer"
+export { IEqualsComparer, comparer } from "./utils/comparer"
 export { IModifierDescriptor, IEnhancer } from "./types/modifiers"
 export { IInterceptable, IInterceptor } from "./types/intercept-utils"
 export { IListenable } from "./types/listen-utils"
@@ -67,7 +67,7 @@ export {
 
 export { transaction } from "./api/transaction"
 export { observable, IObservableFactory, IObservableFactories } from "./api/observable"
-export { computed, IComputed, IComputedValueOptions } from "./api/computed"
+export { computed, IComputed } from "./api/computed"
 export { isObservable, isObservableProp } from "./api/isobservable"
 export { isComputed, isComputedProp } from "./api/iscomputed"
 export { extendObservable, extendShallowObservable } from "./api/extendobservable"
@@ -97,6 +97,7 @@ export { isComputingDerivation as _isComputingDerivation } from "./core/derivati
 export { setReactionScheduler as _setReactionScheduler, onReactionError } from "./core/reaction"
 export { reserveArrayBuffer as _reserveArrayBuffer /* See #734 */ } from "./types/observablearray"
 export { interceptReads as _interceptReads } from "./api/intercept-read"
+export { IComputedValueOptions } from "./core/computedvalue"
 
 // This line should come after all the imports as well, for the same reason
 // as noted above. I will file a bug with rollupjs - @rossipedia

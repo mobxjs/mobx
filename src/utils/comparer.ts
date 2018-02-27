@@ -13,7 +13,7 @@ function structuralComparer(a: any, b: any): boolean {
 }
 
 function defaultComparer(a: any, b: any): boolean {
-    return areBothNaN(a,b) || identityComparer(a, b)
+    return areBothNaN(a, b) || identityComparer(a, b)
 }
 
 export const comparer = {

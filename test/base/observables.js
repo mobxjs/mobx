@@ -60,39 +60,33 @@ test("basic2", function() {
     expect(mobx._isComputingDerivation()).toBe(false)
 })
 
-test("computed with asStructure modifier", function(done) {
-    try {
-        var x1 = observable.box(3)
-        var x2 = observable.box(5)
-        var y = m.computed(
-            function() {
-                return {
-                    sum: x1.get() + x2.get()
-                }
-            },
-            { struct: true }
-        )
-        var b = buffer()
-        m.observe(y, b, true)
+test("computed with asStructure modifier", function() {
+    var x1 = observable.box(3)
+    var x2 = observable.box(5)
+    var y = m.computed(
+        function() {
+            return {
+                sum: x1.get() + x2.get()
+            }
+        },
+        { compareStructural: true }
+    )
+    var b = buffer()
+    m.observe(y, b, true)
 
-        expect(8).toBe(y.get().sum)
+    expect(8).toBe(y.get().sum)
 
-        x1.set(4)
-        expect(9).toBe(y.get().sum)
+    x1.set(4)
+    expect(9).toBe(y.get().sum)
 
-        m.transaction(function() {
-            // swap values, computation results is structuraly unchanged
-            x1.set(5)
-            x2.set(4)
-        })
+    m.transaction(function() {
+        // swap values, computation results is structuraly unchanged
+        x1.set(5)
+        x2.set(4)
+    })
 
-        expect(b.toArray()).toEqual([{ sum: 8 }, { sum: 9 }])
-        expect(mobx._isComputingDerivation()).toBe(false)
-
-        done()
-    } catch (e) {
-        console.log(e.stack)
-    }
+    expect(b.toArray()).toEqual([{ sum: 8 }, { sum: 9 }])
+    expect(mobx._isComputingDerivation()).toBe(false)
 })
 
 test("dynamic", function(done) {

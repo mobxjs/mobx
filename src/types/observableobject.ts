@@ -1,5 +1,5 @@
 import { ObservableValue, UNCHANGED } from "./observablevalue"
-import { isComputedValue, ComputedValue } from "../core/computedvalue"
+import { isComputedValue, ComputedValue, IComputedValueOptions } from "../core/computedvalue"
 import {
     createInstanceofPredicate,
     isObject,
@@ -19,7 +19,6 @@ import {
 } from "./intercept-utils"
 import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
-import { IEqualsComparer, comparer } from "./comparer"
 import {
     IEnhancer,
     isModifierDescriptor,
@@ -156,14 +155,7 @@ export function defineObservablePropertyFromDescriptor(
         }
     } else {
         // get x() { return 3 } set x(v) { }
-        defineComputedProperty(
-            adm,
-            propName,
-            descriptor.get,
-            descriptor.set,
-            comparer.default,
-            true
-        )
+        defineComputedProperty(adm, propName, descriptor.get!, { setter: descriptor.set }, true)
     }
 }
 
@@ -201,20 +193,14 @@ export function defineObservableProperty(
 export function defineComputedProperty(
     adm: ObservableObjectAdministration,
     propName: string,
-    getter,
-    setter,
-    equals: IEqualsComparer<any>,
+    getter: () => any,
+    options: IComputedValueOptions<any>,
     asInstanceProperty: boolean
 ) {
     if (asInstanceProperty) assertPropertyConfigurable(adm.target, propName)
-
-    adm.values[propName] = new ComputedValue(
-        getter,
-        adm.target,
-        equals,
-        `${adm.name}.${propName}`,
-        setter
-    )
+    options.name = options.name || `${adm.name}.${propName}`
+    options.context = adm.target
+    adm.values[propName] = new ComputedValue(getter, options)
     if (asInstanceProperty) {
         Object.defineProperty(adm.target, propName, generateComputedPropConfig(propName))
     }

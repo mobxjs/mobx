@@ -31,13 +31,21 @@ import {
 } from "../utils/utils"
 import { isSpyEnabled, spyReport } from "./spy"
 import { autorun } from "../api/autorun"
-import { IEqualsComparer } from "../types/comparer"
+import { IEqualsComparer, comparer } from "../utils/comparer"
 import { IValueDidChange } from "../types/observablevalue"
 
 export interface IComputedValue<T> {
     get(): T
     set(value: T): void
     observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
+}
+
+export interface IComputedValueOptions<T> {
+    compareStructural?: boolean
+    equals?: IEqualsComparer<T>
+    name?: string
+    setter?: (value: T) => void
+    context?: any
 }
 
 /**
@@ -80,6 +88,8 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     isRunningSetter: boolean = false
     setter: (value: T) => void
     isTracing: TraceMode = TraceMode.NONE
+    public scope: Object | undefined
+    private equals: IEqualsComparer<any>
 
     /**
      * Create a new computed value based on a function expression.
@@ -93,15 +103,12 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * don't want to notify observers if it is structurally the same.
      * This is useful for working with vectors, mouse coordinates etc.
      */
-    constructor(
-        public derivation: () => T,
-        public scope: Object | undefined,
-        private equals: IEqualsComparer<any>,
-        name: string,
-        setter?: (v: T) => void
-    ) {
-        this.name = name || "ComputedValue@" + getNextId()
-        if (setter) this.setter = createAction(name + "-setter", setter) as any
+    constructor(public derivation: () => T, options: IComputedValueOptions<T>) {
+        this.name = options.name || "ComputedValue@" + getNextId()
+        if (options.setter) this.setter = createAction(name + "-setter", options.setter) as any
+        this.equals =
+            options.equals || (options.compareStructural ? comparer.structural : comparer.default)
+        this.scope = options.context
     }
 
     onBecomeStale() {

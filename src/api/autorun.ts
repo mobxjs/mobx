@@ -2,7 +2,7 @@ import { Lambda, getNextId, invariant, EMPTY_OBJECT, deprecated } from "../utils
 import { Reaction, IReactionPublic, IReactionDisposer } from "../core/reaction"
 import { untrackedStart, untrackedEnd } from "../core/derivation"
 import { action, isAction } from "./action"
-import { IEqualsComparer, comparer } from "../types/comparer"
+import { IEqualsComparer, comparer } from "../utils/comparer"
 
 export interface IAutorunOptions {
     delay?: number
