@@ -1,3 +1,7 @@
+# 3.6.0
+
+* Fixed [#1118](https://github.com/mobxjs/mobx/issues/1118), the deepEquals operator build into mobx gave wrong results for non-primitive objects. This affected for example `computed.struct`, or the `compareStructural` of `reaction`
+
 # 3.5.0/1
 
 * Introduced `trace` for easier debugging of reactions / computed values. See the [docs](https://mobx.js.org/best/trace.html) for details.

@@ -165,22 +165,19 @@ export function isArrayLike(x: any): x is Array<any> | IObservableArray<any> {
     return Array.isArray(x) || isObservableArray(x)
 }
 
-export function isMapLike(x: any): boolean {
-    return isES6Map(x) || isObservableMap(x)
-}
-
 export function isES6Map(thing): boolean {
     if (getGlobal().Map !== undefined && thing instanceof getGlobal().Map) return true
     return false
 }
 
-export function getMapLikeKeys<V>(map: ObservableMap<V> | IKeyValueMap<V> | any): string[] {
-    let keys
-    if (isPlainObject(map)) keys = Object.keys(map)
-    else if (Array.isArray(map)) keys = map.map(([key]) => key)
-    else if (isMapLike(map)) keys = (Array as any).from(map.keys())
-    else fail("Cannot get keys from " + map)
-    return keys
+export function iteratorToArray<T>(it: Iterator<T>): ReadonlyArray<T> {
+    const res: T[] = []
+    while (true) {
+        const r: any = it.next()
+        if (r.done) break
+        res.push(r.value)
+    }
+    return res
 }
 
 declare var Symbol
