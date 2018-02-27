@@ -204,10 +204,14 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         if (track) {
             res = trackDerivedFunction(this, this.derivation, this.scope)
         } else {
-            try {
+            if (globalState.disableErrorBoundaries === true) {
                 res = this.derivation.call(this.scope)
-            } catch (e) {
-                res = new CaughtException(e)
+            } else {
+                try {
+                    res = this.derivation.call(this.scope)
+                } catch (e) {
+                    res = new CaughtException(e)
+                }
             }
         }
         globalState.computationDepth--

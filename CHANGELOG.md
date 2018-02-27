@@ -7,6 +7,7 @@
 * Introduced `onBecomeObserved` and `onBecomeUnobserved`
 * MobX now supports development only checks and exceptions, resulting in smaller and faster production builds. The setup requirements are identical to react
 * Introduced `mobx.configure({ warnOnUnsafeComputationReads: true })`
+* Introduced `mobx.configure({ disableErrorBoundaries })`, for easier debugging of exceptoins. By [NaridaL](https://github.com/NaridaL) through [#1262](https://github.com/mobxjs/mobx/pull/1262)
 
 ## Breaking changes
 

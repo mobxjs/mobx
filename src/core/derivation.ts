@@ -87,12 +87,16 @@ export function shouldCompute(derivation: IDerivation): boolean {
             for (let i = 0; i < l; i++) {
                 const obj = obs[i]
                 if (isComputedValue(obj)) {
-                    try {
+                    if (globalState.disableErrorBoundaries) {
                         obj.get()
-                    } catch (e) {
-                        // we are not interested in the value *or* exception at this moment, but if there is one, notify all
-                        untrackedEnd(prevUntracked)
-                        return true
+                    } else {
+                        try {
+                            obj.get()
+                        } catch (e) {
+                            // we are not interested in the value *or* exception at this moment, but if there is one, notify all
+                            untrackedEnd(prevUntracked)
+                            return true
+                        }
                     }
                     // if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
                     // and `derivation` is an observer of `obj`
@@ -147,10 +151,14 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, con
     const prevTracking = globalState.trackingDerivation
     globalState.trackingDerivation = derivation
     let result
-    try {
+    if (globalState.disableErrorBoundaries === true) {
         result = f.call(context)
-    } catch (e) {
-        result = new CaughtException(e)
+    } else {
+        try {
+            result = f.call(context)
+        } catch (e) {
+            result = new CaughtException(e)
+        }
     }
     globalState.trackingDerivation = prevTracking
     bindDependencies(derivation)
