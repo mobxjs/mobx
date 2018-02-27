@@ -701,4 +701,42 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
             checkGlobalState()
         })
     })
+
+    test("global error handling will be skipped when using disableErrorBoundaries - 1", () => {
+        mobx.configure({ disableErrorBoundaries: true })
+        try {
+            const a = mobx.observable.box(1)
+
+            expect(() => {
+                const d = mobx.autorun(function() {
+                    throw "OOPS"
+                })
+            }).toThrowError(/OOPS/)
+        } finally {
+            mobx.configure({ disableErrorBoundaries: false })
+            mobx._resetGlobalState()
+        }
+    })
+
+    test("global error handling will be skipped when using disableErrorBoundaries - 2", () => {
+        mobx.configure({ disableErrorBoundaries: true })
+        try {
+            const a = mobx.observable.box(1)
+
+            const d = mobx.reaction(
+                () => a.get(),
+                () => {
+                    throw "OOPS"
+                }
+            )
+            expect(() => {
+                a.set(2)
+            }).toThrowError(/OOPS/)
+
+            d()
+        } finally {
+            mobx.configure({ disableErrorBoundaries: false })
+            mobx._resetGlobalState()
+        }
+    })
 })
