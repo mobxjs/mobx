@@ -390,3 +390,39 @@ test("onBecome(Un)Observed - less simple", () => {
     d7()
     expect(events.length).toBe(0)
 })
+
+test("deepEquals should yield correct results for complex objects #1118 - 1", () => {
+    const d2016jan1 = new Date("2016-01-01")
+    const d2016jan1_2 = new Date("2016-01-01")
+    const d2017jan1 = new Date("2017-01-01")
+
+    expect(d2016jan1).toEqual(d2016jan1_2)
+    expect(d2016jan1).not.toEqual(d2017jan1)
+    expect(mobx.extras.deepEqual(d2016jan1, d2016jan1)).toBe(true)
+    expect(mobx.extras.deepEqual(d2016jan1, d2017jan1)).toBe(false)
+    expect(mobx.extras.deepEqual(d2016jan1, d2016jan1_2)).toBe(true)
+})
+
+test("deepEquals should yield correct results for complex objects #1118 - 2", () => {
+    class A {
+        x = 3
+        y = 4
+
+        constructor(x) {
+            this.x = x
+        }
+    }
+
+    const a1 = new A(2)
+    const a2 = new A(2)
+    const a3 = new A(3)
+    const a4 = new A(2)
+    a4.z = 2
+
+    expect(a1).toEqual(a2)
+    expect(a1).not.toEqual(a3)
+    expect(mobx.extras.deepEqual(a1, a1)).toBe(true)
+    expect(mobx.extras.deepEqual(a1, a3)).toBe(false)
+    expect(mobx.extras.deepEqual(a1, a2)).toBe(true)
+    expect(mobx.extras.deepEqual(a1, a4)).toBe(false)
+})

@@ -1,4 +1,5 @@
-import { deepEqual, areBothNaN } from "../utils/utils"
+import { areBothNaN } from "../utils/utils"
+import { deepEqual } from "../utils/eq"
 
 export interface IEqualsComparer<T> {
     (a: T, b: T): boolean
