@@ -408,3 +408,18 @@ test("reaction equals function only invoked when necessary", () => {
         disposeReaction()
     })
 })
+
+test("issue #1148", () => {
+    const a = mobx.observable.box(1)
+    let called = 0
+    const dispose = reaction(
+        () => this.a,
+        () => {
+            called++
+        },
+        { delay: 1 }
+    )
+    a.set(2)
+    dispose()
+    expect(called).toBe(0)
+})
