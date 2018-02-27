@@ -1,6 +1,6 @@
 # Autorun
 
-<a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-write-custom-mobx-reactions-with-when-and-autorun">Egghead.io lesson 9: custom reactions</a>
+<a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-write-custom-mobx-reactions-with-when-and-autorun">egghead.io lesson 9: custom reactions</a>
 
 `mobx.autorun` can be used in those cases where you want to create a reactive function that will never have observers itself.
 This is usually the case when you need to bridge from reactive to imperative code, for example for logging, persistence, or UI-updating code.

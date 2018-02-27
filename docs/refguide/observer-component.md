@@ -1,6 +1,6 @@
 # @observer
 
-<a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx">Egghead.io lesson 1: observable & observer</a>
+<a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx">egghead.io lesson 1: observable & observer</a>
 
 The `observer` function / decorator can be used to turn ReactJS components into reactive components.
 It wraps the component's render function in `mobx.autorun` to make sure that any data that is used during the rendering of a component forces a re-rendering upon change.
@@ -93,7 +93,7 @@ For more advantages of using observable local component state, see [3 reasons wh
 
 ## Connect components to provided stores using `inject`
 
-<a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-connect-mobx-observer-components-to-the-store-with-the-react-provider">Egghead.io lesson 8: inject stores with Provider</a>
+<a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-connect-mobx-observer-components-to-the-store-with-the-react-provider">egghead.io lesson 8: inject stores with Provider</a>
 
 The `mobx-react` package also provides the `Provider` component that can be used to pass down stores using React's context mechanism.
 To connect to those stores, pass a list of store names to `inject`, which will make the stores available as props.
