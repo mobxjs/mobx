@@ -1,4 +1,4 @@
-import { areBothNaN, isArrayLike, getEnumerableKeys, isES6Map, iteratorToArray } from "./utils"
+import { areBothNaN, isArrayLike, isES6Map, iteratorToArray } from "./utils"
 import { observable } from "../api/observable"
 import { isObservableArray, isObservableMap } from "../mobx"
 

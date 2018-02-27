@@ -137,12 +137,6 @@ export function assertPropertyConfigurable(object: any, prop: string) {
     )
 }
 
-export function getEnumerableKeys(obj) {
-    const res: string[] = []
-    for (let key in obj) res.push(key)
-    return res
-}
-
 export function createInstanceofPredicate<T>(
     name: string,
     clazz: new (...args: any[]) => T
@@ -168,6 +162,14 @@ export function isArrayLike(x: any): x is Array<any> | IObservableArray<any> {
 export function isES6Map(thing): boolean {
     if (getGlobal().Map !== undefined && thing instanceof getGlobal().Map) return true
     return false
+}
+
+export function getMapLikeKeys<V>(map: ObservableMap<V> | IKeyValueMap<V> | any): string[] {
+    if (isPlainObject(map)) return Object.keys(map)
+    if (Array.isArray(map)) return map.map(([key]) => key)
+    if (isES6Map(map)) return (Array as any).from(map.keys())
+    if (isObservableMap(map)) return map.keys()
+    return fail("Cannot get keys from " + map)
 }
 
 export function iteratorToArray<T>(it: Iterator<T>): ReadonlyArray<T> {
