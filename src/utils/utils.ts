@@ -78,8 +78,12 @@ export function isPlainObject(value) {
     return proto === Object.prototype || proto === null
 }
 
-export function objectAssign<T extends object>(target: { [key: string]: never }, clonedSource: T, ...sources: (Partial<T> & object)[]): T;
-export function objectAssign<T extends object>(target: T, ...sources: (Partial<T> & object)[]): T;
+export function objectAssign<T extends object>(
+    target: { [key: string]: never },
+    clonedSource: T,
+    ...sources: (Partial<T> & object)[]
+): T
+export function objectAssign<T extends object>(target: T, ...sources: (Partial<T> & object)[]): T
 export function objectAssign() {
     const res = arguments[0]
     for (let i = 1, l = arguments.length; i < l; i++) {
@@ -139,49 +143,6 @@ export function getEnumerableKeys(obj) {
     return res
 }
 
-/**
- * Naive deepEqual. Doesn't check for prototype, non-enumerable or out-of-range properties on arrays.
- * If you have such a case, you probably should use this function but something fancier :).
- */
-export function deepEqual(a, b) {
-    if (a === null && b === null) return true
-    if (a === undefined && b === undefined) return true
-    if (areBothNaN(a, b)) return true
-    if (typeof a !== "object") return a === b
-    const aIsArray = isArrayLike(a)
-    const aIsMap = isMapLike(a)
-    if (aIsArray !== isArrayLike(b)) {
-        return false
-    } else if (aIsMap !== isMapLike(b)) {
-        return false
-    } else if (aIsArray) {
-        if (a.length !== b.length) return false
-        for (let i = a.length - 1; i >= 0; i--) if (!deepEqual(a[i], b[i])) return false
-        return true
-    } else if (aIsMap) {
-        if (a.size !== b.size) return false
-        let equals = true
-        a.forEach((value, key) => {
-            equals = equals && deepEqual(b.get(key), value)
-        })
-        return equals
-    } else if (typeof a === "object" && typeof b === "object") {
-        if (a === null || b === null) return false
-        if (isMapLike(a) && isMapLike(b)) {
-            if (a.size !== b.size) return false
-            // Freaking inefficient.... Create PR if you run into this :) Much appreciated!
-            return deepEqual(observable.shallowMap(a).entries(), observable.shallowMap(b).entries())
-        }
-        if (getEnumerableKeys(a).length !== getEnumerableKeys(b).length) return false
-        for (let prop in a) {
-            if (!(prop in b)) return false
-            if (!deepEqual(a[prop], b[prop])) return false
-        }
-        return true
-    }
-    return false
-}
-
 export function createInstanceofPredicate<T>(
     name: string,
     clazz: new (...args: any[]) => T
@@ -194,7 +155,7 @@ export function createInstanceofPredicate<T>(
 }
 
 export function areBothNaN(a: any, b: any): boolean {
-    return (typeof a === "number" && typeof b === "number" && isNaN(a) && isNaN(b));
+    return typeof a === "number" && typeof b === "number" && isNaN(a) && isNaN(b)
 }
 
 /**
@@ -214,12 +175,12 @@ export function isES6Map(thing): boolean {
 }
 
 export function getMapLikeKeys<V>(map: ObservableMap<V> | IKeyValueMap<V> | any): string[] {
-	let keys;
-	if (isPlainObject(map)) keys = Object.keys(map)
-	else if (Array.isArray(map)) keys = map.map(([key]) => key)
-	else if (isMapLike(map)) keys = (Array as any).from(map.keys())
-	else fail("Cannot get keys from " + map)
-	return keys;
+    let keys
+    if (isPlainObject(map)) keys = Object.keys(map)
+    else if (Array.isArray(map)) keys = map.map(([key]) => key)
+    else if (isMapLike(map)) keys = (Array as any).from(map.keys())
+    else fail("Cannot get keys from " + map)
+    return keys
 }
 
 declare var Symbol
