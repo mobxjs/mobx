@@ -1227,7 +1227,7 @@ test("computed comparer works with extendObservable (TS)", () => {
     const time = new Time(9, 0)
 
     const changes: Array<{ hour: number; minute: number }> = []
-    const disposeAutorun = autorun(() => changes.push(time.time))
+    const disposeAutorun = autorun(() => changes.push((time as any).time))
 
     t.deepEqual(changes, [{ hour: 9, minute: 0 }])
     time.hour = 9
@@ -1248,7 +1248,7 @@ test("computed comparer works with extendObservable (TS)", () => {
 
 test("1072 - @observable without initial value and observe before first access", () => {
     class User {
-        @observable loginCount: number
+        @observable loginCount?: number
     }
 
     const user = new User()
