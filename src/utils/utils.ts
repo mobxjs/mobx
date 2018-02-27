@@ -135,11 +135,10 @@ export function isPropertyConfigurable(object: any, prop: string): boolean {
 }
 
 export function assertPropertyConfigurable(object: any, prop: string) {
-    invariant(
-        isPropertyConfigurable(object, prop),
-        // TODO: process.env.NODE_ENV !== "production" &&
-        `Cannot make property '${prop}' observable, it is not configurable and writable in the target object`
-    )
+    if (process.env.NODE_ENV !== "production" && !isPropertyConfigurable(object, prop))
+        fail(
+            `Cannot make property '${prop}' observable, it is not configurable and writable in the target object`
+        )
 }
 
 export function getEnumerableKeys(obj) {

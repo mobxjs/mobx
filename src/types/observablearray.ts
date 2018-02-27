@@ -45,8 +45,6 @@ export interface IObservableArray<T> extends Array<T> {
         fireImmediately?: boolean
     ): Lambda
     intercept(handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>): Lambda
-    intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda // TODO: remove in 4.0
-    intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda // TODO: remove in 4.0
     clear(): T[]
     peek(): T[]
     replace(newItems: T[]): T[]
@@ -661,7 +659,6 @@ function createArrayEntryDescriptor(index: number) {
         enumerable: false,
         configurable: false,
         get: function() {
-            // TODO: Check `this`?, see #752?
             return this.get(index)
         },
         set: function(value) {

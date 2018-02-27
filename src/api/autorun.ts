@@ -109,7 +109,6 @@ export function reaction<T>(
         invariant(typeof opts === "object", "Third argument of reactions should be an object")
     }
     const name = opts.name || "Reaction@" + getNextId()
-    // TODO: creates ugly spy events, use `effect = (r) => runInAction(opts.name, () => effect(r))` instead?
     const effectAction = action(name, effect)
     const runSync = !opts.scheduler && !opts.delay
     const scheduler = createSchedulerFromOptions(opts)
