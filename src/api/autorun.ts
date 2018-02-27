@@ -72,8 +72,11 @@ export function when(
         if (predicate()) {
             r.dispose()
             const prevUntracked = untrackedStart()
-            effect()
-            untrackedEnd(prevUntracked)
+            try {
+                effect()
+            } finally {
+                untrackedEnd(prevUntracked)
+            }
         }
     }, opts)
 }

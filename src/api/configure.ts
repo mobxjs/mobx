@@ -1,4 +1,4 @@
-import { globalState, isolateGlobalState, disableErrorBoundaries } from "../core/globalstate"
+import { globalState, isolateGlobalState } from "../core/globalstate"
 
 export function configure(options: {
     enforceActions?: boolean
@@ -17,6 +17,10 @@ export function configure(options: {
         isolateGlobalState()
     }
     if (options.disableErrorBoundaries !== undefined) {
-        globalState.disableErrorBoundaries = !!disableErrorBoundaries
+        if (options.disableErrorBoundaries === true)
+            console.warn(
+                "WARNING: Debug feature only. MobX will NOT recover from errors if this is on."
+            )
+        globalState.disableErrorBoundaries = !!options.disableErrorBoundaries
     }
 }

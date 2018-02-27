@@ -139,19 +139,3 @@ export function resetGlobalState() {
         if (persistentKeys.indexOf(key) === -1) globalState[key] = defaultGlobals[key]
     globalState.allowStateChanges = !globalState.enforceActions
 }
-
-/**
- * Don't catch and rethrow exceptions. This is useful for inspecting the state of
- * the stack when an exception occurs while debugging.
- */
-export function disableErrorBoundaries() {
-    console.warn("WARNING: Debug feature only. MobX will NOT recover from errors if this is on.")
-    globalState.disableErrorBoundaries = true
-}
-
-/**
- * Opposite of disableErrorBoundaries
- */
-export function enableErrorBoundaries() {
-    globalState.disableErrorBoundaries = false
-}

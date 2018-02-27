@@ -1303,10 +1303,10 @@ test("issue #1122", done => {
         _atom = createAtom(
             "Testing atom",
             () => {
-                console.log("Value getting observed.")
+                // console.log("Value getting observed.")
             },
             () => {
-                console.log("Value getting unobserved.")
+                // console.log("Value getting unobserved.")
                 runInAction(() => {}) // <-- INFINITE RECURSION
             }
         )
@@ -1318,7 +1318,7 @@ test("issue #1122", done => {
 
     const a = new ClassA()
     const unobserve = autorun(() => {
-        console.log(a.value)
+        // console.log(a.value)
     })
 
     setTimeout(() => {
