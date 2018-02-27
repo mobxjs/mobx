@@ -80,7 +80,6 @@ export { decorate } from "./api/decorate"
 export { onBecomeObserved, onBecomeUnobserved } from "./api/become-observed"
 
 export { toJS } from "./api/tojs"
-export { ITransformer, createTransformer } from "./api/createtransformer"
 export { trace } from "./api/trace"
 
 export { Iterator } from "./utils/iterable"

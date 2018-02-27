@@ -9,6 +9,8 @@
 
 ## Breaking changes
 
+* `expr` is moved to mobx-utils. Remember, `expr(fn)` is just sugar for `computed(fn).get()`
+* `createTransformer` is moved to mobx-utils
 * Passing `context` explicitly to `autorun`, `reaction` etc is no longer supported. Use arrow functions or function.bind instead.
 * Removed `autorunAsync`.
 * `autorun`, `when`, `reaction` don't support name as first argument anymore, instead pass options.

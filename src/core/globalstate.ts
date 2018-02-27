@@ -6,7 +6,7 @@ import { IObservable } from "./observable"
 /**
  * These values will persist if global state is reset
  */
-const persistentKeys = ["mobxGuid", "resetId", "spyListeners", "strictMode", "runId"]
+const persistentKeys = ["mobxGuid", "spyListeners", "strictMode", "runId"]
 
 export class MobXGlobals {
     /**
@@ -71,11 +71,6 @@ export class MobXGlobals {
     strictMode = false
 
     /**
-     * Used by createTransformer to detect that the global state has been reset.
-     */
-    resetId = 0
-
-    /**
      * Spy callbacks
      */
     spyListeners: { (change: any): void }[] = []
@@ -121,7 +116,6 @@ export function getGlobalState(): any {
  * but can be used to get back at a stable state after throwing errors
  */
 export function resetGlobalState() {
-    globalState.resetId++
     const defaultGlobals = new MobXGlobals()
     for (let key in defaultGlobals)
         if (persistentKeys.indexOf(key) === -1) globalState[key] = defaultGlobals[key]

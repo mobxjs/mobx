@@ -17,7 +17,6 @@ if (process.env.PERSIST) {
 }
 
 require("./perf.js")
-require("./transform-perf.js")
 
 // This test runs last..
 require("tape")(t => {
