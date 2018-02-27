@@ -22,8 +22,8 @@ import {
     spy,
     useStrict,
     isAction
-} from "../../lib/mobx"
-import * as mobx from "../../lib/mobx"
+} from "../../src/mobx"
+import * as mobx from "../../src/mobx"
 
 var v = observable(3)
 observe(v, () => {})
@@ -36,19 +36,18 @@ var testFunction = function(a: any) {}
 
 const t = {
     equal(a: any, b: any) {
-        expect(a).toBe(b);
+        expect(a).toBe(b)
     },
     deepEqual(a: any, b: any) {
-        expect(a).toEqual(b);
+        expect(a).toEqual(b)
     },
     notEqual(a: any, b: any) {
-        expect(a).not.toEqual(b);
+        expect(a).not.toEqual(b)
     },
 
     throws(a: any, b: any) {
         expect(a).toThrow(b)
-    },
-
+    }
 }
 
 class Order {
@@ -94,7 +93,6 @@ test("decorators", () => {
         "price", // event name
         3 // event oldValue
     ])
-
 })
 
 test("observable", () => {
@@ -135,7 +133,6 @@ test("annotations", () => {
     }
     order1.aFunction = x
     t.equal(order1.aFunction, x)
-
 })
 
 test("scope", () => {
@@ -168,7 +165,6 @@ test("scope", () => {
     t.equal(x3.z, 6)
     x3.y = 4
     t.equal(x3.z, 8)
-
 })
 
 test("typing", () => {
@@ -193,7 +189,6 @@ test("typing", () => {
     var x: IObservableValue<number> = observable(3)
 
     var d2 = autorunAsync(function() {})
-
 })
 
 const state: any = observable({
@@ -251,7 +246,6 @@ test("box", () => {
     t.deepEqual(ar.slice(), [40, 20, 60, 210])
     box.uninitialized = true
     t.deepEqual(ar.slice(), [40, 20, 60, 210, 420])
-
 })
 
 test("computed setter should succeed", () => {
@@ -270,7 +264,6 @@ test("computed setter should succeed", () => {
     t.equal(b.propX, 6)
     b.propX = 4
     t.equal(b.propX, 8)
-
 })
 
 test("atom clock example", () => {
@@ -343,7 +336,6 @@ test("atom clock example", () => {
         t.equal(ticks, 5)
         t.equal(values.length, 5)
         t.equal(values.filter(x => x.length > 0).length, 5)
-
     }, 10 * time_factor)
 })
 
@@ -375,7 +367,6 @@ test("typescript: parameterized computed decorator", () => {
     d()
 
     t.deepEqual(changes, [{ sum: 6 }, { sum: 7 }, { sum: 9 }])
-
 })
 
 test("issue 165", () => {
@@ -423,8 +414,8 @@ test("issue 165", () => {
         card2 = new Card(game, 2)
 
     autorun(() => {
-        card1.isWrong;
-        card2.isWrong;
+        card1.isWrong
+        card2.isWrong
         // console.log("card1.isWrong =", card1.isWrong)
         // console.log("card2.isWrong =", card2.isWrong)
         // console.log("------------------------------")
@@ -437,7 +428,6 @@ test("issue 165", () => {
 
     t.equal(card1.isWrong, true)
     t.equal(card2.isWrong, true)
-
 })
 
 test("issue 191 - shared initializers (ts)", () => {
@@ -461,7 +451,6 @@ test("issue 191 - shared initializers (ts)", () => {
 
     t.deepEqual(t1.array.slice(), [2, 3])
     t.deepEqual(t2.array.slice(), [2, 4])
-
 })
 
 function normalizeSpyEvents(events: any[]) {
@@ -655,7 +644,6 @@ test("288 atom not detected for object property", () => {
         },
         true
     )
-
 })
 
 test("observable performance", () => {
@@ -689,7 +677,6 @@ test("observable performance", () => {
     }
 
     console.log("changed in ", Date.now() - start)
-
 })
 
 test("unbound methods", () => {
@@ -737,7 +724,6 @@ test("inheritance", () => {
     b2.a = 6
 
     t.deepEqual(values, [10, 11, 12, 14, 18])
-
 })
 
 test("inheritance overrides observable", () => {
@@ -765,7 +751,6 @@ test("inheritance overrides observable", () => {
     b2.a = 6
 
     t.deepEqual(values, [16, 14, 15, 17, 18])
-
 })
 
 test("reusing initializers", () => {
@@ -788,7 +773,6 @@ test("reusing initializers", () => {
 
     a.a = 4
     t.deepEqual(values, [9, 10])
-
 })
 
 test("enumerability", () => {
@@ -847,7 +831,6 @@ test("enumerability", () => {
     t.equal(a.hasOwnProperty("b"), false)
     t.equal(a.hasOwnProperty("m"), false)
     t.equal(a.hasOwnProperty("m2"), true)
-
 })
 
 test("issue 285 (babel)", () => {
@@ -871,7 +854,6 @@ test("issue 285 (babel)", () => {
         finished: false,
         childThings: [1, 2, 3]
     })
-
 })
 
 test("verify object assign (typescript)", () => {
@@ -921,7 +903,6 @@ test("379, inheritable actions (typescript)", () => {
     const c = new C()
     t.equal(c.method(), 87)
     t.equal(isAction(c.method), true)
-
 })
 
 test("379, inheritable actions - 2 (typescript)", () => {
@@ -957,7 +938,6 @@ test("379, inheritable actions - 2 (typescript)", () => {
     const c = new C()
     t.equal(c.method(), 87)
     t.equal(isAction(c.method), true)
-
 })
 
 test("373 - fix isObservable for unused computed", () => {
@@ -1031,7 +1011,7 @@ test("484 - isObservableObject type guard includes type T", () => {
     if (isObservableObject(o)) {
         o.stuff = "new things"
     } else {
-        throw "failure";
+        throw "failure"
     }
 })
 
@@ -1042,7 +1022,7 @@ test("484 - isObservableObject type guard includes type IObservableObject", () =
     if (isObservableObject(o)) {
         requires_observable_object(o)
     } else {
-        throw ("object should have been IObservableObject")
+        throw "object should have been IObservableObject"
     }
 })
 
@@ -1106,7 +1086,6 @@ test("@observable.ref (TS)", () => {
     t.equal(a.ref.a, 3)
     t.equal(mobx.isObservable(a.ref), false)
     t.equal(mobx.isObservable(a, "ref"), true)
-
 })
 
 test("@observable.shallow (TS)", () => {
@@ -1122,7 +1101,6 @@ test("@observable.shallow (TS)", () => {
     t.equal(mobx.isObservable(a.arr[0]), false)
     t.equal(mobx.isObservable(a.arr[1]), false)
     t.equal(a.arr[1] === todo2, true)
-
 })
 
 test("@observable.deep (TS)", () => {
@@ -1140,7 +1118,6 @@ test("@observable.deep (TS)", () => {
     t.equal(mobx.isObservable(a.arr[1]), true)
     t.equal(a.arr[1] !== todo2, true)
     t.equal(isObservable(todo2), false)
-
 })
 
 test("action.bound binds (TS)", () => {
@@ -1157,7 +1134,6 @@ test("action.bound binds (TS)", () => {
     runner(2)
 
     t.equal(a.x, 2)
-
 })
 
 test("803 - action.bound and action preserve type info", () => {
@@ -1217,7 +1193,6 @@ test("@computed.equals (TS)", () => {
     ])
 
     disposeAutorun()
-
 })
 
 test("computed comparer works with extendObservable (TS)", () => {
@@ -1262,7 +1237,6 @@ test("computed comparer works with extendObservable (TS)", () => {
     ])
 
     disposeAutorun()
-
 })
 
 test("1072 - @observable without initial value and observe before first access", () => {

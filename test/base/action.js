@@ -1,6 +1,6 @@
 "use strict"
 
-var mobx = require("../../")
+var mobx = require("../../src/mobx.ts")
 var utils = require("../utils/test-utils")
 
 test("action should wrap in transaction", () => {

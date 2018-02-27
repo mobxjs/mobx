@@ -1,4 +1,4 @@
-var mobx = require("../../")
+var mobx = require("../../src/mobx.ts")
 var m = mobx
 
 test("treeD", function() {
@@ -202,7 +202,9 @@ test("get atom", function() {
     expect(atom(c)).toBe(atomClassName) // returns ke, "bla".constructor, === "Atomys
     expect(atom(c, "a")).toBe(ovClassName) // returns ent, "bla".constructor, === "Atomry
     expect(atom(c, "b")).toBe(ovClassName) // returns has entry (see autoru, "bla", "Atomn)
-    expect(() => atom(c, "c")).toThrowError(/the entry 'c' does not exist in the observable map 'ObservableMap@3'/)
+    expect(() => atom(c, "c")).toThrowError(
+        /the entry 'c' does not exist in the observable map 'ObservableMap@3'/
+    )
 
     expect(atom(d)).toBe(atomClassName)
     expect(() => atom(d, 0)).toThrowError(/It is not possible to get index atoms from arrays/)
@@ -249,7 +251,9 @@ test("get debug name", function() {
     expect(name(c)).toBe("ObservableMap@3") // returns ke, "bla"ys
     expect(name(c, "a")).toBe("ObservableMap@3.a") // returns ent, "bla"ry
     expect(name(c, "b")).toBe("ObservableMap@3.b?") // returns has entry (see autoru, "bla"n)
-    expect(() => name(c, "c")).toThrowError(/the entry 'c' does not exist in the observable map 'ObservableMap@3'/)
+    expect(() => name(c, "c")).toThrowError(
+        /the entry 'c' does not exist in the observable map 'ObservableMap@3'/
+    )
 
     expect(name(d)).toBe("ObservableArray@4")
     expect(() => name(d, 0)).toThrowError(/It is not possible to get index atoms from arrays/)
@@ -301,7 +305,9 @@ test("get administration", function() {
     expect(adm(c)).toBe(mobx.ObservableMap.name)
     expect(adm(c, "a")).toBe(ovClassName)
     expect(adm(c, "b")).toBe(ovClassName)
-    expect(() => adm(c, "c")).toThrowError(/the entry 'c' does not exist in the observable map 'ObservableMap@3'/)
+    expect(() => adm(c, "c")).toThrowError(
+        /the entry 'c' does not exist in the observable map 'ObservableMap@3'/
+    )
 
     expect(adm(d)).toBe(d.$mobx.constructor.name)
     expect(() => adm(d, 0)).toThrowError(/It is not possible to get index atoms from arrays/)

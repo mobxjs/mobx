@@ -1,4 +1,4 @@
-var m = require("../../")
+var m = require("../../src/mobx.ts")
 var TransformUtils = require("../utils/transform")
 
 test("transform1", function() {

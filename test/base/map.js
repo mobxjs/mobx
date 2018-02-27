@@ -1,6 +1,6 @@
 "use strict"
 
-var mobx = require("../../")
+var mobx = require("../../src/mobx.ts")
 var map = mobx.map
 var autorun = mobx.autorun
 var iterall = require("iterall")
@@ -585,10 +585,10 @@ test("issue 940, should not be possible to change maps outside strict mode", () 
     const d = mobx.autorun(() => m.values())
 
     expect(() => {
-		m.set("x", 1)
-	}).toThrowError(/Since strict-mode is enabled/)
+        m.set("x", 1)
+    }).toThrowError(/Since strict-mode is enabled/)
 
-    d();
+    d()
 
     mobx.useStrict(false)
 })
@@ -600,7 +600,7 @@ test("issue 1243, .replace should not trigger change on unchanged values", () =>
     let visitedComputed = false
     const computedValue = mobx.computed(() => {
         recomputeCount++
-        return m.get('a')
+        return m.get("a")
     })
 
     const d = mobx.autorun(() => {
@@ -623,16 +623,16 @@ test("issue 1243, .replace should not trigger change on unchanged values", () =>
     m.replace({ b: 2 })
     expect(recomputeCount).toBe(3)
 
-    m.replace([['a', 1]])
+    m.replace([["a", 1]])
     expect(recomputeCount).toBe(4)
 
     const nativeMap = new Map()
-    nativeMap.set('a', 2)
+    nativeMap.set("a", 2)
     m.replace(nativeMap)
     expect(recomputeCount).toBe(5)
 
     expect(() => {
-        m.replace('not-an-object')
+        m.replace("not-an-object")
     }).toThrow()
 
     d()

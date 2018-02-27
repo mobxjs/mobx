@@ -1,4 +1,4 @@
-var mobx = require("../../")
+var mobx = require("../../src/mobx.ts")
 var m = mobx
 var o = mobx.observable
 
@@ -515,11 +515,13 @@ test("exceptions", function() {
         ar = m.observable([m.asStructure(3)])
     }).toThrow()
 
-    return;
+    return
 })
 
 test("540 - extendobservable should not report cycles", function() {
-    expect(() => m.extendObservable(Object.freeze({}), {})).toThrowError(/Cannot make the designated object observable/)
+    expect(() => m.extendObservable(Object.freeze({}), {})).toThrowError(
+        /Cannot make the designated object observable/
+    )
 
     var objWrapper = mobx.observable({
         value: null
@@ -530,7 +532,9 @@ test("540 - extendobservable should not report cycles", function() {
     }
 
     objWrapper.value = obj
-    expect(() => mobx.extendObservable(objWrapper, objWrapper.value)).toThrowError(/extending an object with another observable \(object\) is not supported/)
+    expect(() => mobx.extendObservable(objWrapper, objWrapper.value)).toThrowError(
+        /extending an object with another observable \(object\) is not supported/
+    )
 
     mobx.autorun(() => {
         console.log(objWrapper.name)

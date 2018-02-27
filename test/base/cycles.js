@@ -1,4 +1,4 @@
-var m = require("../../")
+var m = require("../../src/mobx.ts")
 
 test("cascading active state (form 1)", function() {
     var Store = function() {
@@ -161,27 +161,35 @@ test("efficient selection", function() {
     var store = new Store()
 
     expect(store.selection).toBe(null)
-    expect(store.items.filter(function(i) {
-        return i.selected
-    }).length).toBe(0)
+    expect(
+        store.items.filter(function(i) {
+            return i.selected
+        }).length
+    ).toBe(0)
 
     store.selection = store.items[1]
-    expect(store.items.filter(function(i) {
-        return i.selected
-    }).length).toBe(1)
+    expect(
+        store.items.filter(function(i) {
+            return i.selected
+        }).length
+    ).toBe(1)
     expect(store.selection).toBe(store.items[1])
     expect(store.items[1].selected).toBe(true)
 
     store.selection = store.items[2]
-    expect(store.items.filter(function(i) {
-        return i.selected
-    }).length).toBe(1)
+    expect(
+        store.items.filter(function(i) {
+            return i.selected
+        }).length
+    ).toBe(1)
     expect(store.selection).toBe(store.items[2])
     expect(store.items[2].selected).toBe(true)
 
     store.selection = null
-    expect(store.items.filter(function(i) {
-        return i.selected
-    }).length).toBe(0)
+    expect(
+        store.items.filter(function(i) {
+            return i.selected
+        }).length
+    ).toBe(0)
     expect(store.selection).toBe(null)
 })

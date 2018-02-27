@@ -1,6 +1,6 @@
 "use strict"
 
-const mobx = require("../../")
+const mobx = require("../../src/mobx.ts")
 
 test("nested computeds should not run unnecessary", () => {
     function Item(name) {

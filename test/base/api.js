@@ -1,4 +1,5 @@
 var mobx = require("../../")
+mobx.extras.isolateGlobalState()
 
 test("correct api should be exposed", function() {
     expect(Object.keys(mobx).sort()).toEqual(
