@@ -21,7 +21,9 @@ import {
     configure,
     isAction,
     decorate,
-    IAtom
+    IAtom,
+    createAtom,
+    runInAction
 } from "../../src/mobx"
 import * as mobx from "../../src/mobx"
 
@@ -1294,4 +1296,33 @@ test("typescript - decorate works with Object.create", () => {
     const b = Object.create(Box)
     expect(b.height).toBe(2)
     expect(mobx.isObservableProp(b, "height")).toBe(true)
+})
+
+test("issue #1122", done => {
+    class ClassA {
+        _atom = createAtom(
+            "Testing atom",
+            () => {
+                console.log("Value getting observed.")
+            },
+            () => {
+                console.log("Value getting unobserved.")
+                runInAction(() => {}) // <-- INFINITE RECURSION
+            }
+        )
+        get value() {
+            this._atom.reportObserved()
+            return true
+        }
+    }
+
+    const a = new ClassA()
+    const unobserve = autorun(() => {
+        console.log(a.value)
+    })
+
+    setTimeout(() => {
+        unobserve()
+        done()
+    }, 100)
 })
