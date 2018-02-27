@@ -1,8 +1,9 @@
-import { globalState } from "../core/globalstate"
+import { globalState, isolateGlobalState } from "../core/globalstate"
 
 export function configure(options: {
     enforceActions?: boolean
     warnOnUnsafeComputationReads?: boolean
+    isolateGlobalState?: boolean
 }): void {
     if (options.enforceActions !== undefined) {
         globalState.enforceActions = !!options.enforceActions
@@ -10,5 +11,8 @@ export function configure(options: {
     }
     if (options.warnOnUnsafeComputationReads) {
         globalState.warnOnUnsafeComputationReads = !!options.warnOnUnsafeComputationReads
+    }
+    if (options.isolateGlobalState === true) {
+        isolateGlobalState()
     }
 }

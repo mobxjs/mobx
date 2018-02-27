@@ -88,8 +88,7 @@ export { IObserverTree, IDependencyTree, getDependencyTree, getObserverTree } fr
 
 export {
     resetGlobalState as _resetGlobalState,
-    getGlobalState as _getGlobalState,
-    isolateGlobalState
+    getGlobalState as _getGlobalState
 } from "./core/globalstate"
 export { getDebugName, getAtom, getAdministration as _getAdministration } from "./types/type-utils"
 export { allowStateChanges as _allowStateChanges } from "./core/action"

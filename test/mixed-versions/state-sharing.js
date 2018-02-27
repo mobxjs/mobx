@@ -29,9 +29,15 @@ describe("it should handle multiple instances with the correct warnings", () => 
         "There are multiple mobx instances active."
     )
     testOutput(
-        'require("../../").isolateGlobalState();require("../../lib/mobx.umd.js").isolateGlobalState()',
+        'require("../../").configure({isolateGlobalState: true});require("../../lib/mobx.umd.js").configure({isolateGlobalState: true})',
         ""
     )
-    testOutput('require("../../");require("../../lib/mobx.umd.js").isolateGlobalState()', "")
-    testOutput('require("../../").isolateGlobalState();require("../../lib/mobx.umd.js")', "")
+    testOutput(
+        'require("../../");require("../../lib/mobx.umd.js").configure({isolateGlobalState: true})',
+        ""
+    )
+    testOutput(
+        'require("../../").configure({isolateGlobalState: true});require("../../lib/mobx.umd.js")',
+        ""
+    )
 })
