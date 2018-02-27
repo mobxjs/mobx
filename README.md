@@ -8,12 +8,15 @@ _Simple, scalable state management_
 [![Coverage Status](https://coveralls.io/repos/mobxjs/mobx/badge.svg?branch=master&service=github)](https://coveralls.io/github/mobxjs/mobx?branch=master)
 [![Join the chat at https://gitter.im/mobxjs/mobx](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mobxjs/mobx?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Discuss MobX on Hashnode](https://hashnode.github.io/badges/mobx.svg)](https://hashnode.com/n/mobx)
-[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://mobxjs.github.io/mobx/donate.html)
 [![OpenCollective](https://opencollective.com/mobx/backers/badge.svg)](#backers)
 [![OpenCollective](https://opencollective.com/mobx/sponsors/badge.svg)](#sponsors)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
-![npm install mobx](https://nodei.co/npm/mobx.png?downloadRank=true&downloads=true)
+MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source and many [individual sponsors](#backers)
+
+<img src="docs/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix" /> <img src="docs/coinbase.jpeg" align="center" width="100" title="Coinbase" alt="Coinbase" /> <img src="docs/fbos.jpeg" align="center" width="100" title="Facebook Open Source" alt="Facebook Open Source" />
+
+# Installation
 
 * Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`. To enable ESNext decorators (optional), see below.
 * CDN:
@@ -256,13 +259,6 @@ The result of this is that you often need to learn less new concepts when using 
 ---
 
 
-
-<center>
-<img src="https://www.mendix.com/styleguide/img/logo-mendix.png" align="center" width="200"/>
-
-__MobX is proudly used in mission critical systems at [Mendix](https://www.mendix.com)__
-</center>
-
 ## Credits
 
 MobX is inspired by reactive programming principles as found in spreadsheets. It is inspired by MVVM frameworks like in MeteorJS tracker, knockout and Vue.js. But MobX brings Transparent Functional Reactive Programming to the next level and provides a stand alone implementation. It implements TFRP in a glitch-free, synchronous, predictable and efficient manner.
@@ -308,15 +304,10 @@ To use the [flow typings](flow-typed/mobx.js) shipped with MobX:
 * In `.flowconfig`, you **cannot** import it explicitly in the `[libs]` section.
 * You **do not** need to install library definition using [flow-typed](https://github.com/flowtype/flow-typed).
 
-## MobX was formerly known as Mobservable.
-
-See the [changelog](https://github.com/mobxjs/mobx/blob/master/CHANGELOG.md#200) for all the details about `mobservable` to `mobx`.
-
 ## Donating
 
-Was MobX key in making your project a success? Share the victory by using the [donate button](https://mobxjs.github.io/mobx/donate.html)!
-MobX is developed largely in free time, so any ROI is appreciated :-).
-If you leave a name you will be added to the [sponsors](https://github.com/mobxjs/mobx/blob/master/sponsors.md) list :).
+Was MobX key in making your project a success?
+Join our [open collective](https://opencollective.com/mobx#) or use the [donate button](https://mobxjs.github.io/mobx/donate.html)!
 
 ### Backers
 Support us with a monthly donation and help us continue our activities. [[Become a backer](https://opencollective.com/mobx#backer)]
@@ -351,6 +342,40 @@ Support us with a monthly donation and help us continue our activities. [[Become
 <a href="https://opencollective.com/mobx/backer/27/website" target="_blank"><img src="https://opencollective.com/mobx/backer/27/avatar.svg"></a>
 <a href="https://opencollective.com/mobx/backer/28/website" target="_blank"><img src="https://opencollective.com/mobx/backer/28/avatar.svg"></a>
 <a href="https://opencollective.com/mobx/backer/29/website" target="_blank"><img src="https://opencollective.com/mobx/backer/29/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/30/website" target="_blank"><img src="https://opencollective.com/mobx/backer/30/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/31/website" target="_blank"><img src="https://opencollective.com/mobx/backer/31/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/32/website" target="_blank"><img src="https://opencollective.com/mobx/backer/32/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/33/website" target="_blank"><img src="https://opencollective.com/mobx/backer/33/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/34/website" target="_blank"><img src="https://opencollective.com/mobx/backer/34/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/35/website" target="_blank"><img src="https://opencollective.com/mobx/backer/35/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/36/website" target="_blank"><img src="https://opencollective.com/mobx/backer/36/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/37/website" target="_blank"><img src="https://opencollective.com/mobx/backer/37/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/38/website" target="_blank"><img src="https://opencollective.com/mobx/backer/38/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/39/website" target="_blank"><img src="https://opencollective.com/mobx/backer/39/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/40/website" target="_blank"><img src="https://opencollective.com/mobx/backer/40/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/41/website" target="_blank"><img src="https://opencollective.com/mobx/backer/41/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/42/website" target="_blank"><img src="https://opencollective.com/mobx/backer/42/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/43/website" target="_blank"><img src="https://opencollective.com/mobx/backer/43/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/44/website" target="_blank"><img src="https://opencollective.com/mobx/backer/44/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/45/website" target="_blank"><img src="https://opencollective.com/mobx/backer/45/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/46/website" target="_blank"><img src="https://opencollective.com/mobx/backer/46/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/47/website" target="_blank"><img src="https://opencollective.com/mobx/backer/47/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/48/website" target="_blank"><img src="https://opencollective.com/mobx/backer/48/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/49/website" target="_blank"><img src="https://opencollective.com/mobx/backer/49/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/50/website" target="_blank"><img src="https://opencollective.com/mobx/backer/50/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/51/website" target="_blank"><img src="https://opencollective.com/mobx/backer/51/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/52/website" target="_blank"><img src="https://opencollective.com/mobx/backer/52/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/53/website" target="_blank"><img src="https://opencollective.com/mobx/backer/53/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/54/website" target="_blank"><img src="https://opencollective.com/mobx/backer/54/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/55/website" target="_blank"><img src="https://opencollective.com/mobx/backer/55/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/56/website" target="_blank"><img src="https://opencollective.com/mobx/backer/56/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/57/website" target="_blank"><img src="https://opencollective.com/mobx/backer/57/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/58/website" target="_blank"><img src="https://opencollective.com/mobx/backer/58/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/backer/59/website" target="_blank"><img src="https://opencollective.com/mobx/backer/59/avatar.svg"></a>
+
+One time donations through paypal are welcome as well and are recorded in the [sponsors](sponsors.md) list.
+
+[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://mobxjs.github.io/mobx/donate.html)
 
 ### Sponsors
 
@@ -386,3 +411,33 @@ Become a sponsor and get your logo on our README on Github with a link to your s
 <a href="https://opencollective.com/mobx/sponsor/27/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/27/avatar.svg"></a>
 <a href="https://opencollective.com/mobx/sponsor/28/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/28/avatar.svg"></a>
 <a href="https://opencollective.com/mobx/sponsor/29/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/29/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/30/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/30/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/31/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/31/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/32/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/32/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/33/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/33/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/34/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/34/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/35/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/35/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/36/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/36/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/37/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/37/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/38/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/38/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/39/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/39/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/40/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/40/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/41/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/41/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/42/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/42/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/43/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/43/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/44/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/44/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/45/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/45/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/46/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/46/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/47/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/47/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/48/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/48/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/49/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/49/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/50/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/50/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/51/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/51/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/52/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/52/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/53/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/53/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/54/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/54/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/55/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/55/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/56/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/56/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/57/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/57/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/58/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/58/avatar.svg"></a>
+<a href="https://opencollective.com/mobx/sponsor/59/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/59/avatar.svg"></a>
