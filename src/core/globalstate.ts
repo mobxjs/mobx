@@ -10,7 +10,7 @@ const persistentKeys = [
     "mobxGuid",
     "spyListeners",
     "enforceActions",
-    "warnOnUnsafeComputationReads",
+    "computedRequiresReaction",
     "disableErrorBoundaries",
     "runId"
 ]
@@ -90,7 +90,7 @@ export class MobXGlobals {
     /**
      * Warn if computed values are accessed outside a reactive context
      */
-    warnOnUnsafeComputationReads = false
+    computedRequiresReaction = false
 
     /*
      * Don't catch and rethrow exceptions. This is useful for inspecting the state of

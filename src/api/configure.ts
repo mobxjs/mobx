@@ -2,7 +2,7 @@ import { globalState, isolateGlobalState, disableErrorBoundaries } from "../core
 
 export function configure(options: {
     enforceActions?: boolean
-    warnOnUnsafeComputationReads?: boolean
+    computedRequiresReaction?: boolean
     isolateGlobalState?: boolean
     disableErrorBoundaries?: boolean
 }): void {
@@ -10,8 +10,8 @@ export function configure(options: {
         globalState.enforceActions = !!options.enforceActions
         globalState.allowStateChanges = !options.enforceActions
     }
-    if (options.warnOnUnsafeComputationReads !== undefined) {
-        globalState.warnOnUnsafeComputationReads = !!options.warnOnUnsafeComputationReads
+    if (options.computedRequiresReaction !== undefined) {
+        globalState.computedRequiresReaction = !!options.computedRequiresReaction
     }
     if (options.isolateGlobalState === true) {
         isolateGlobalState()

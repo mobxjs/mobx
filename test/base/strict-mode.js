@@ -188,7 +188,7 @@ test("strict mode checks", function() {
 
 test("warn on unsafe reads", function() {
     try {
-        mobx.configure({ warnOnUnsafeComputationReads: true })
+        mobx.configure({ computedRequiresReaction: true })
         const x = mobx.observable({
             y: 3,
             get yy() {
@@ -199,6 +199,6 @@ test("warn on unsafe reads", function() {
             x.yy
         }, /is read outside a reactive context and not actively observed/)
     } finally {
-        mobx.configure({ warnOnUnsafeComputationReads: false })
+        mobx.configure({ computedRequiresReaction: false })
     }
 })
