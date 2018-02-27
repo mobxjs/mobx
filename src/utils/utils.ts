@@ -197,4 +197,3 @@ export function toPrimitive(value) {
 import { globalState } from "../core/globalstate"
 import { IObservableArray, isObservableArray } from "../types/observablearray"
 import { isObservableMap, ObservableMap, IKeyValueMap } from "../types/observablemap"
-import { observable } from "../api/observable"

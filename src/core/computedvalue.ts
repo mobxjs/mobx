@@ -2,9 +2,7 @@ import {
     IObservable,
     reportObserved,
     propagateMaybeChanged,
-    propagateChangeConfirmed,
-    startBatch,
-    endBatch
+    propagateChangeConfirmed
 } from "./observable"
 import {
     IDerivation,

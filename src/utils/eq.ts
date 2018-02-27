@@ -1,15 +1,14 @@
-import { areBothNaN, isArrayLike, isES6Map, iteratorToArray } from "./utils"
-import { observable } from "../api/observable"
+import { isES6Map, iteratorToArray } from "./utils"
 import { isObservableArray, isObservableMap } from "../mobx"
 
 // Copied from https://github.com/jashkenas/underscore/blob/5c237a7c682fb68fd5378203f0bf22dce1624854/underscore.js#L1186-L1289
 
-export function deepEqual(a, b): boolean {
+export function deepEqual(a: any, b: any): boolean {
     return eq(a, b)
 }
 
 // Internal recursive comparison function for `isEqual`.
-function eq(a, b, aStack?, bStack?) {
+function eq(a: any, b: any, aStack?: any[], bStack?: any[]) {
     // Identical objects are equal. `0 === -0`, but they aren't identical.
     // See the [Harmony `egal` proposal](http://wiki.ecmascript.org/doku.php?id=harmony:egal).
     if (a === b) return a !== 0 || 1 / a === 1 / b
@@ -24,7 +23,7 @@ function eq(a, b, aStack?, bStack?) {
 }
 
 // Internal recursive comparison function for `isEqual`.
-function deepEq(a, b, aStack?, bStack?) {
+function deepEq(a: any, b: any, aStack?: any[], bStack?: any[]) {
     // Unwrap any wrapped objects.
     a = unwrap(a)
     b = unwrap(b)
@@ -124,13 +123,13 @@ function deepEq(a, b, aStack?, bStack?) {
     return true
 }
 
-function unwrap(a) {
+function unwrap(a: any) {
     if (isObservableArray(a)) return a.peek()
     if (isObservableMap(a)) return a.entries()
     if (isES6Map(a)) return iteratorToArray(a.entries())
     return a
 }
 
-function has(a, key) {
+function has(a: any, key: string) {
     return Object.prototype.hasOwnProperty.call(a, key)
 }
