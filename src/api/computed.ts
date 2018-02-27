@@ -7,7 +7,6 @@ import { ComputedValue, IComputedValue } from "../core/computedvalue"
 
 export interface IComputed {
     <T>(options: IComputedValueOptions<T>): any // decorator
-    <T>(func: () => T, setter?: (value: T) => void): IComputedValue<T> // TODO: remove
     <T>(func: () => T, options?: IComputedValueOptions<T>): IComputedValue<T> // normal usage
     (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator
     struct(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator

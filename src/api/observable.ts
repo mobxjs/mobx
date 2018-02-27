@@ -127,18 +127,15 @@ const observableFactories: IObservableFactories = {
     object<T>(props: T, name?: string): T & IObservableObject {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("object")
         const res = {}
-        // convert to observable object
-        asObservableObject(res, name) // TODO: line can be removed?
+        asObservableObject(res, name) // TODO: remove ones extendObservable takes arguments
         // add properties
-        extendObservable(res, props)
-        return res as any
+        return extendObservable(res, props) as any
     },
     shallowObject<T>(props: T, name?: string): T & IObservableObject {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowObject")
         const res = {}
         asObservableObject(res, name)
-        extendShallowObservable(res, props)
-        return res as any
+        return extendShallowObservable(res, props) as any
     },
     ref() {
         if (arguments.length < 2) {
