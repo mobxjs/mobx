@@ -282,13 +282,14 @@ export class ObservableMap<V>
         let nextIndex = 0
         return {
             next: function() {
-                const key = self._keys[nextIndex++]
-                return nextIndex <= self._keys.length
-                    ? {
-                          value: [key, self.get(key)!],
-                          done: false
-                      }
-                    : { done: true }
+                if (nextIndex < self._keys.length) {
+                    const key = self._keys[nextIndex++]
+                    return {
+                        value: [key, self.get(key)!],
+                        done: false
+                    }
+                }
+                return { done: true }
             }
         }
     }
