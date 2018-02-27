@@ -1151,8 +1151,8 @@ test("803 - action.bound and action preserve type info", () => {
 
     thingThatAcceptsCallback(
         action((elem: any) => {
-            // TODO: ideally, type of action would be inferred!
-            // console.log(elem.x) // x is boolean
+            // ideally, type of action would be inferred!
+            console.log(elem.x) // x is boolean
         })
     )
 

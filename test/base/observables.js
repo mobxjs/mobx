@@ -1354,7 +1354,6 @@ test("atom events #427", () => {
     var runs = 0
 
     var a = mobx.createAtom("test", () => start++, () => stop++)
-    // TODO: fix: Atom should throw on this! (or have a handler to react to untracked reads)
     expect(a.reportObserved()).toEqual(false)
 
     expect(start).toBe(0)

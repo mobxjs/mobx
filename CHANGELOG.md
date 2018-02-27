@@ -29,6 +29,7 @@
 * custom atoms: `reportObserved` outside tracking context won't trigger changes
 * map `.entries()`, `.values()` and `.keys()` now properly return iterators. use `values(m)` or `keys(m)` or `Array.from(m)` to get the old behavior
 * the option `struct` for computed values is deprecated, use `compareStructural` indeed
+* `isModifierDescriptor` is no longer exposed
 
 ## Non breaking changes
 

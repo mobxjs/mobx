@@ -83,10 +83,6 @@ export function useStrict(strict: boolean): void {
     globalState.allowStateChanges = !strict
 }
 
-export function isStrictModeEnabled(): boolean {
-    return globalState.strictMode
-}
-
 export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T): T {
     const prev = allowStateChangesStart(allowStateChanges)
     let res: T

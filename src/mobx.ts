@@ -25,7 +25,7 @@ export { spy } from "./core/spy"
 export { IComputedValue } from "./core/computedvalue"
 
 export { IEqualsComparer, comparer } from "./types/comparer"
-export { IModifierDescriptor, IEnhancer, isModifierDescriptor } from "./types/modifiers"
+export { IModifierDescriptor, IEnhancer } from "./types/modifiers"
 export { IInterceptable, IInterceptor } from "./types/intercept-utils"
 export { IListenable } from "./types/listen-utils"
 

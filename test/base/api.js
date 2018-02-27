@@ -28,7 +28,6 @@ test("correct api should be exposed", function() {
             "isComputed",
             "isComputedProp",
             "_isComputingDerivation",
-            "isModifierDescriptor", // TODO: drop
             "isObservable",
             "isObservableArray",
             "isObservableMap",

@@ -7,8 +7,7 @@ import {
 } from "../types/observableobject"
 import { isObservableArray, IObservableArray } from "../types/observablearray"
 import { fail, invariant } from "../utils/utils"
-import { isModifierDescriptor } from "../mobx"
-import { deepEnhancer } from "../types/modifiers"
+import { deepEnhancer, isModifierDescriptor } from "../types/modifiers"
 import { startBatch, endBatch } from "../core/observable"
 
 export function keys(obj: IObservableObject): string[]
