@@ -79,7 +79,6 @@ export { keys, values, set, remove } from "./api/object-api"
 export { decorate } from "./api/decorate"
 export { onBecomeObserved, onBecomeUnobserved } from "./api/become-observed"
 
-export { expr } from "./api/expr"
 export { toJS } from "./api/tojs"
 export { ITransformer, createTransformer } from "./api/createtransformer"
 export { trace } from "./api/trace"

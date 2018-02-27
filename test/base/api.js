@@ -12,7 +12,6 @@ test("correct api should be exposed", function() {
             "createTransformer",
             "decorate",
             "deepEqual",
-            "expr",
             "extendObservable",
             "extendShallowObservable",
             "_getAdministration",
@@ -30,7 +29,7 @@ test("correct api should be exposed", function() {
             "isComputed",
             "isComputedProp",
             "_isComputingDerivation",
-            "isModifierDescriptor",
+            "isModifierDescriptor", // TODO: drop
             "isObservable",
             "isObservableArray",
             "isObservableMap",

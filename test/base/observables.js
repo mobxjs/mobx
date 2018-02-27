@@ -777,44 +777,6 @@ test("nested observable2", function() {
     expect(totalCalcs).toBe(5)
 })
 
-test("expr", function() {
-    var factor = observable.box(0)
-    var price = observable.box(100)
-    var totalCalcs = 0
-    var innerCalcs = 0
-
-    var total = computed(function() {
-        totalCalcs += 1 // outer observable shouldn't recalc if inner observable didn't publish a real change
-        return (
-            price.get() *
-            mobx.expr(function() {
-                innerCalcs += 1
-                return factor.get() % 2 === 0 ? 1 : 3
-            })
-        )
-    })
-
-    var b = []
-    var sub = m.observe(
-        total,
-        function(x) {
-            b.push(x.newValue)
-        },
-        true
-    )
-
-    price.set(150)
-    factor.set(7) // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
-    factor.set(5) // doesn't trigger outer calc
-    factor.set(3) // doesn't trigger outer calc
-    factor.set(4) // triggers innerCalc twice
-    price.set(20)
-
-    expect(b).toEqual([100, 150, 450, 150, 20])
-    expect(innerCalcs).toBe(9)
-    expect(totalCalcs).toBe(5)
-})
-
 test("observe", function() {
     var x = observable.box(3)
     var x2 = computed(function() {
@@ -878,44 +840,6 @@ test("when 2", function() {
     expect(called).toBe(1)
 
     expect(d.$mobx.name).toBe("when x is 3")
-})
-
-test("expr2", function() {
-    var factor = observable.box(0)
-    var price = observable.box(100)
-    var totalCalcs = 0
-    var innerCalcs = 0
-
-    var total = computed(function() {
-        totalCalcs += 1 // outer observable shouldn't recalc if inner observable didn't publish a real change
-        return (
-            price.get() *
-            mobx.expr(function() {
-                innerCalcs += 1
-                return factor.get() % 2 === 0 ? 1 : 3
-            })
-        )
-    })
-
-    var b = []
-    var sub = m.observe(
-        total,
-        function(x) {
-            b.push(x.newValue)
-        },
-        true
-    )
-
-    price.set(150)
-    factor.set(7) // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
-    factor.set(5) // doesn't trigger outer calc
-    factor.set(3) // doesn't trigger outer calc
-    factor.set(4) // triggers innerCalc twice
-    price.set(20)
-
-    expect(b).toEqual([100, 150, 450, 150, 20])
-    expect(innerCalcs).toBe(9)
-    expect(totalCalcs).toBe(5)
 })
 
 function stripSpyOutput(events) {
