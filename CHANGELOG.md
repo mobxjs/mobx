@@ -10,6 +10,7 @@
 * Introduced `mobx.configure({ computedRequiresReaction: true })`
 * Introduced `mobx.configure({ disableErrorBoundaries })`, for easier debugging of exceptoins. By [NaridaL](https://github.com/NaridaL) through [#1262](https://github.com/mobxjs/mobx/pull/1262)
 * Introduced `@computed(options)`
+* `autorun`, `reaction` and `when` now can take an `onError` property as parameter
 
 ## Breaking changes
 

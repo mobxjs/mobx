@@ -423,3 +423,126 @@ test("issue #1148", () => {
     dispose()
     expect(called).toBe(0)
 })
+
+test("Introduce custom onError for - autorun", () => {
+    let error = ""
+    let globalHandlerCalled = false
+    const d = mobx.onReactionError(() => {
+        globalHandlerCalled = true
+    })
+    expect(() => {
+        mobx.autorun(
+            () => {
+                throw "OOPS"
+            },
+            {
+                onError(e) {
+                    error = e
+                }
+            }
+        )
+    }).not.toThrow()
+    expect(error).toBe("OOPS")
+    expect(globalHandlerCalled).toBe(false)
+    d()
+})
+
+test("Introduce custom onError for - reaction - 1", () => {
+    let error = ""
+    let globalHandlerCalled = false
+    const d = mobx.onReactionError(() => {
+        globalHandlerCalled = true
+    })
+    expect(() => {
+        mobx.reaction(
+            () => {
+                throw "OOPS"
+            },
+            () => {},
+            {
+                onError(e) {
+                    error = e
+                }
+            }
+        )
+    }).not.toThrow()
+    expect(error).toBe("OOPS")
+    expect(globalHandlerCalled).toBe(false)
+    d()
+})
+
+test("Introduce custom onError for - reaction - 2", () => {
+    let error = ""
+    let globalHandlerCalled = false
+    let box = mobx.observable.box(1)
+    const d = mobx.onReactionError(() => {
+        globalHandlerCalled = true
+    })
+    mobx.reaction(
+        () => box.get(),
+        () => {
+            throw "OOPS"
+        },
+        {
+            onError(e) {
+                error = e
+            }
+        }
+    )
+    expect(() => {
+        box.set(2)
+    }).not.toThrow()
+    expect(error).toBe("OOPS")
+    expect(globalHandlerCalled).toBe(false)
+    d()
+})
+
+test("Introduce custom onError for - when - 1", () => {
+    let error = ""
+    let globalHandlerCalled = false
+    const d = mobx.onReactionError(() => {
+        globalHandlerCalled = true
+    })
+    expect(() => {
+        mobx.when(
+            () => {
+                throw "OOPS"
+            },
+            () => {},
+            {
+                onError(e) {
+                    error = e
+                }
+            }
+        )
+    }).not.toThrow()
+    expect(error).toBe("OOPS")
+    expect(globalHandlerCalled).toBe(false)
+    d()
+})
+
+test("Introduce custom onError for - when - 2", () => {
+    let error = ""
+    let globalHandlerCalled = false
+    let box = mobx.observable.box(1)
+    const d = mobx.onReactionError(() => {
+        globalHandlerCalled = true
+    })
+    mobx.when(
+        () => box.get() === 2,
+        () => {
+            throw "OOPS"
+        },
+        {
+            onError(e) {
+                error = e
+            }
+        }
+    )
+    expect(() => {
+        box.set(2)
+    }).not.toThrow()
+    expect(error).toBe("OOPS")
+    expect(globalHandlerCalled).toBe(false)
+    d()
+})

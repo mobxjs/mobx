@@ -171,6 +171,13 @@ export class Reaction implements IDerivation, IReactionPublic {
         return r
     }
 
+    onError(handler) {
+        if (process.env.NODE_ENV !== "production") {
+            invariant(!this.errorHandler, "Only one onErrorHandler can be registered")
+        }
+        this.errorHandler = handler
+    }
+
     toString() {
         return `Reaction[${this.name}]`
     }

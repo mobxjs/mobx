@@ -8,6 +8,7 @@ export interface IAutorunOptions {
     delay?: number
     name?: string
     scheduler?: (callback: () => void) => any
+    onError?: (error: any) => void
 }
 
 /**
@@ -57,6 +58,7 @@ export function autorun(
         view(reaction)
     }
 
+    if (opts.onError) reaction.onError(opts.onError)
     reaction.schedule()
     return reaction.getDisposer()
 }
@@ -64,7 +66,7 @@ export function autorun(
 export function when(
     predicate: () => boolean,
     effect: Lambda,
-    opts?: { name?: string }
+    opts?: { name?: string; onError?: (error: any) => void }
 ): IReactionDisposer {
     return autorun(r => {
         if (predicate()) {
@@ -109,7 +111,10 @@ export function reaction<T>(
         invariant(typeof opts === "object", "Third argument of reactions should be an object")
     }
     const name = opts.name || "Reaction@" + getNextId()
-    const effectAction = action(name, effect)
+    const effectAction = action(
+        name,
+        opts.onError ? wrapErrorHandler(opts.onError, effect) : effect
+    )
     const runSync = !opts.scheduler && !opts.delay
     const scheduler = createSchedulerFromOptions(opts)
 
@@ -142,6 +147,17 @@ export function reaction<T>(
         if (firstTime) firstTime = false
     }
 
+    if (opts.onError) r.onError(opts.onError)
     r.schedule()
     return r.getDisposer()
+}
+
+function wrapErrorHandler(errorHandler, baseFn) {
+    return function() {
+        try {
+            return baseFn.apply(this, arguments)
+        } catch (e) {
+            errorHandler.call(this, e)
+        }
+    }
 }
