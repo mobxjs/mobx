@@ -20,7 +20,7 @@ export { Reaction, IReactionPublic, IReactionDisposer } from "./core/reaction"
 export { IDerivation, untracked, IDerivationState } from "./core/derivation"
 export { IAtom, createAtom } from "./core/atom"
 
-export { useStrict, IAction } from "./core/action"
+export { IAction } from "./core/action"
 export { spy } from "./core/spy"
 export { IComputedValue } from "./core/computedvalue"
 
@@ -77,6 +77,7 @@ export { autorun, when, reaction, IReactionOptions } from "./api/autorun"
 export { action, isAction, runInAction, IActionFactory } from "./api/action"
 export { keys, values, set, remove } from "./api/object-api"
 export { decorate } from "./api/decorate"
+export { configure } from "./api/configure"
 export { onBecomeObserved, onBecomeUnobserved } from "./api/become-observed"
 
 export { toJS } from "./api/tojs"

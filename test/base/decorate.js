@@ -12,7 +12,6 @@ import {
     isComputedProp,
     spy,
     isAction,
-    useStrict,
     decorate
 } from "../../src/mobx"
 

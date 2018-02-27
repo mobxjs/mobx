@@ -15,13 +15,13 @@ import {
     isObservable,
     isObservableProp,
     isObservableObject,
-    Atom,
     transaction,
     IObjectChange,
     spy,
-    useStrict,
+    configure,
     isAction,
-    decorate
+    decorate,
+    IAtom
 } from "../../src/mobx"
 import * as mobx from "../../src/mobx"
 
@@ -153,7 +153,7 @@ test("scope", () => {
         y: number
     }
 
-    const Thing = function() {
+    const Thing = function(this: any) {
         extendObservable(this, {
             y: 3,
             // this will work here
@@ -276,7 +276,7 @@ test("atom clock example", done => {
     const time_factor = 50 // speed up / slow down tests
 
     class Clock {
-        atom: Atom
+        atom: IAtom
         intervalHandler: number | null = null
         currentDateTime: string | undefined = undefined
 
@@ -626,13 +626,13 @@ test("custom action decorator on field (typescript)", () => {
 })
 
 test("267 (typescript) should be possible to declare properties observable outside strict mode", () => {
-    useStrict(true)
+    configure({ enforceActions: true })
 
     class Store {
         @observable timer: number | null = null
     }
 
-    useStrict(false)
+    configure({ enforceActions: false })
 })
 
 test("288 atom not detected for object property", () => {
@@ -1221,7 +1221,6 @@ test("computed comparer works with extendObservable (TS)", () => {
 
         public hour: number
         public minute: number
-        public time: { hour: number; minute: number }
     }
     const time = new Time(9, 0)
 

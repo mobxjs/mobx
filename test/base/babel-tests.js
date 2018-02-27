@@ -12,7 +12,7 @@ import {
     isComputedProp,
     spy,
     isAction,
-    useStrict
+    configure
 } from "../../src/mobx.ts"
 import * as mobx from "../../src/mobx.ts"
 
@@ -388,13 +388,13 @@ test("custom action decorator on field (babel)", function() {
 })
 
 test("267 (babel) should be possible to declare properties observable outside strict mode", () => {
-    useStrict(true)
+    configure({ enforceActions: true })
 
     class Store {
         @observable timer
     }
 
-    useStrict(false)
+    configure({ enforceActions: false })
 })
 
 test("288 atom not detected for object property", () => {

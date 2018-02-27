@@ -78,11 +78,6 @@ function endAction(runInfo: IActionRunInfo) {
     if (runInfo.notifySpy) spyReportEnd({ time: Date.now() - runInfo.startTime })
 }
 
-export function useStrict(strict: boolean): void {
-    globalState.strictMode = strict
-    globalState.allowStateChanges = !strict
-}
-
 export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T): T {
     const prev = allowStateChangesStart(allowStateChanges)
     let res: T

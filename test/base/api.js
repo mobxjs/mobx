@@ -8,6 +8,7 @@ test("correct api should be exposed", function() {
             "autorun",
             "comparer",
             "computed",
+            "configure",
             "createAtom",
             "decorate",
             "deepEqual",
@@ -54,7 +55,6 @@ test("correct api should be exposed", function() {
             "trace",
             "transaction",
             "untracked",
-            "useStrict",
             "values",
             "when"
         ].sort()

@@ -125,7 +125,7 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
     if (!globalState.allowStateChanges && hasObservers)
         fail(
             process.env.NODE_ENV !== "production" &&
-                (globalState.strictMode
+                (globalState.enforceActions
                     ? "Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: "
                     : "Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, the render function of a React component? Tried to modify: ") +
                     atom.name

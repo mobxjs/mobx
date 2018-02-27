@@ -6,7 +6,7 @@ import { IObservable } from "./observable"
 /**
  * These values will persist if global state is reset
  */
-const persistentKeys = ["mobxGuid", "spyListeners", "strictMode", "runId"]
+const persistentKeys = ["mobxGuid", "spyListeners", "enforceActions", "runId"]
 
 export class MobXGlobals {
     /**
@@ -68,7 +68,7 @@ export class MobXGlobals {
     /**
      * If strict mode is enabled, state changes are by default not allowed
      */
-    strictMode = false
+    enforceActions = false
 
     /**
      * Spy callbacks
@@ -119,5 +119,5 @@ export function resetGlobalState() {
     const defaultGlobals = new MobXGlobals()
     for (let key in defaultGlobals)
         if (persistentKeys.indexOf(key) === -1) globalState[key] = defaultGlobals[key]
-    globalState.allowStateChanges = !globalState.strictMode
+    globalState.allowStateChanges = !globalState.enforceActions
 }
