@@ -46,6 +46,7 @@ export interface IComputedValueOptions<T> {
     name?: string
     setter?: (value: T) => void
     context?: any
+    requiresReaction?: boolean
 }
 
 /**
@@ -90,6 +91,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     isTracing: TraceMode = TraceMode.NONE
     public scope: Object | undefined
     private equals: IEqualsComparer<any>
+    private requiresReaction
 
     /**
      * Create a new computed value based on a function expression.
@@ -109,6 +111,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         this.equals =
             options.equals || (options.compareStructural ? comparer.structural : comparer.default)
         this.scope = options.context
+        this.requiresReaction = !!options.requiresReaction
     }
 
     onBecomeStale() {
@@ -126,26 +129,10 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     public get(): T {
         if (this.isComputing) fail(`Cycle detected in computation ${this.name}: ${this.derivation}`)
         if (globalState.inBatch === 0) {
-            // This is an minor optimization which could be omitted to simplify the code
-            // The computedValue is accessed outside of any mobx stuff. Batch observing should be enough and don't need
-            // tracking as it will never be called again inside this batch.
-            startBatch()
             if (shouldCompute(this)) {
-                if (this.isTracing !== TraceMode.NONE) {
-                    console.log(
-                        `[mobx.trace] '${this
-                            .name}' is being read outside a reactive context and doing a full recompute`
-                    )
-                }
-                if (globalState.computedRequiresReaction) {
-                    console.warn(
-                        `[mobx] Computed value ${this
-                            .name} is read outside a reactive context and not actively observed. Doing a full recompute`
-                    )
-                }
+                this.warnAboutUntrackedRead()
                 this.value = this.computeValue(false)
             }
-            endBatch()
         } else {
             reportObserved(this)
             if (shouldCompute(this)) if (this.trackAndCompute()) propagateChangeConfirmed(this)
@@ -249,6 +236,25 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             firstTime = false
             prevValue = newValue
         })
+    }
+
+    warnAboutUntrackedRead() {
+        if (process.env.NODE_ENV === "production") return
+        if (this.requiresReaction === true) {
+            fail(`[mobx] Computed value ${this.name} is read outside a reactive context`)
+        }
+        if (this.isTracing !== TraceMode.NONE) {
+            console.log(
+                `[mobx.trace] '${this
+                    .name}' is being read outside a reactive context. Doing a full recompute`
+            )
+        }
+        if (globalState.computedRequiresReaction) {
+            console.warn(
+                `[mobx] Computed value ${this
+                    .name} is being read outside a reactive context. Doing a full recompute`
+            )
+        }
     }
 
     toJSON() {

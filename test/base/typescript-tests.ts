@@ -1176,7 +1176,7 @@ test("@computed.equals (TS)", () => {
         @observable public hour: number
         @observable public minute: number
 
-        @computed.equals(sameTime)
+        @computed({ equals: sameTime })
         public get time() {
             return { hour: this.hour, minute: this.minute }
         }
@@ -1325,4 +1325,30 @@ test("issue #1122", done => {
         unobserve()
         done()
     }, 100)
+})
+
+test("unread computed reads should trow with requiresReaction enabled", () => {
+    class A {
+        @observable x = 0
+
+        @computed({ requiresReaction: true })
+        get y() {
+            return this.x * 2
+        }
+    }
+
+    const a = new A()
+    expect(() => {
+        a.y
+    }).toThrow(/is read outside a reactive context/)
+
+    const d = mobx.reaction(() => a.y, () => {})
+    expect(() => {
+        a.y
+    }).not.toThrow()
+
+    d()
+    expect(() => {
+        a.y
+    }).toThrow(/is read outside a reactive context/)
 })

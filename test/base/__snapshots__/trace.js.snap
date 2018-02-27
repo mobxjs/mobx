@@ -8,7 +8,7 @@ Array [
   ],
   "- SECOND READ -",
   Arguments [
-    "[mobx.trace] 'ObservableObject@1.fullname' is being read outside a reactive context and doing a full recompute",
+    "[mobx.trace] 'ObservableObject@1.fullname' is being read outside a reactive context. Doing a full recompute",
   ],
   "- REACTION -",
   Arguments [

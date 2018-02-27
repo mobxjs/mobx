@@ -197,7 +197,7 @@ test("warn on unsafe reads", function() {
         })
         utils.consoleWarn(() => {
             x.yy
-        }, /is read outside a reactive context and not actively observed/)
+        }, /being read outside a reactive context/)
     } finally {
         mobx.configure({ computedRequiresReaction: false })
     }

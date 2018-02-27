@@ -1,4 +1,4 @@
-import { IEqualsComparer, comparer } from "../utils/comparer"
+import { comparer } from "../utils/comparer"
 import { IComputedValueOptions } from "../core/computedvalue"
 import { asObservableObject, defineComputedProperty } from "../types/observableobject"
 import { invariant } from "../utils/utils"
@@ -6,14 +6,14 @@ import { createClassPropertyDecorator } from "../utils/decorators"
 import { ComputedValue, IComputedValue } from "../core/computedvalue"
 
 export interface IComputed {
-    <T>(func: () => T, setter?: (value: T) => void): IComputedValue<T>
-    <T>(func: () => T, options: IComputedValueOptions<T>): IComputedValue<T>
-    (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void
-    struct(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void
-    equals(equals: IEqualsComparer<any>): PropertyDecorator
+    <T>(options: IComputedValueOptions<T>): any // decorator
+    <T>(func: () => T, setter?: (value: T) => void): IComputedValue<T> // TODO: remove
+    <T>(func: () => T, options?: IComputedValueOptions<T>): IComputedValue<T> // normal usage
+    (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator
+    struct(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator
 }
 
-function createComputedDecorator(equals: IEqualsComparer<any>) {
+function createComputedDecorator(options: IComputedValueOptions<any>) {
     return createClassPropertyDecorator(
         (target, name, _, __, originalDescriptor) => {
             process.env.NODE_ENV !== "production" &&
@@ -28,7 +28,7 @@ function createComputedDecorator(equals: IEqualsComparer<any>) {
                 adm,
                 name,
                 originalDescriptor.get,
-                { setter: originalDescriptor.set, equals },
+                { ...options, setter: originalDescriptor.set },
                 false
             )
         },
@@ -48,8 +48,8 @@ function createComputedDecorator(equals: IEqualsComparer<any>) {
     )
 }
 
-const computedDecorator = createComputedDecorator(comparer.default)
-const computedStructDecorator = createComputedDecorator(comparer.structural)
+const computedDecorator = createComputedDecorator({})
+const computedStructDecorator = createComputedDecorator({ equals: comparer.structural })
 
 /**
  * Decorator for class properties: @computed get value() { return expr; }.
@@ -59,6 +59,10 @@ export var computed: IComputed = function computed(arg1, arg2, arg3) {
     if (typeof arg2 === "string") {
         return computedDecorator.apply(null, arguments)
     }
+    if (arg1 !== null && typeof arg1 === "object" && arguments.length === 1) {
+        return createComputedDecorator(arg1)
+    }
+
     if (process.env.NODE_ENV !== "production") {
         invariant(
             typeof arg1 === "function",
@@ -74,4 +78,3 @@ export var computed: IComputed = function computed(arg1, arg2, arg3) {
 } as any
 
 computed.struct = computedStructDecorator
-computed.equals = createComputedDecorator

@@ -900,7 +900,7 @@ test("@computed.equals (Babel)", () => {
         @observable hour
         @observable minute
 
-        @computed.equals(sameTime)
+        @computed({ equals: sameTime })
         get time() {
             return { hour: this.hour, minute: this.minute }
         }
