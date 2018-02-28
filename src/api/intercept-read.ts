@@ -13,9 +13,9 @@ export function interceptReads<T>(
     observableArray: IObservableArray<T>,
     handler: ReadInterceptor<T>
 ): Lambda
-export function interceptReads<T>(
-    observableMap: ObservableMap<T>,
-    handler: ReadInterceptor<T>
+export function interceptReads<K, V>(
+    observableMap: ObservableMap<K, V>,
+    handler: ReadInterceptor<V>
 ): Lambda
 export function interceptReads(
     object: Object,

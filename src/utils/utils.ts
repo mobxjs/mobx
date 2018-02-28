@@ -164,9 +164,9 @@ export function isES6Map(thing): boolean {
     return false
 }
 
-export function getMapLikeKeys<V>(
-    map: ObservableMap<V> | IKeyValueMap<V> | any
-): ReadonlyArray<string> {
+export function getMapLikeKeys<K, V>(map: ObservableMap<K, V>): ReadonlyArray<K>
+export function getMapLikeKeys<V>(map: IKeyValueMap<V> | any): ReadonlyArray<string>
+export function getMapLikeKeys(map: any): any {
     if (isPlainObject(map)) return Object.keys(map)
     if (Array.isArray(map)) return map.map(([key]) => key)
     if (isES6Map(map) || isObservableMap(map)) return iteratorToArray(map.keys())

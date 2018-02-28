@@ -14,14 +14,14 @@ export function intercept<T>(
     observableArray: IObservableArray<T>,
     handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>
 ): Lambda
-export function intercept<T>(
-    observableMap: ObservableMap<T>,
-    handler: IInterceptor<IMapWillChange<T>>
+export function intercept<K, V>(
+    observableMap: ObservableMap<K, V>,
+    handler: IInterceptor<IMapWillChange<K, V>>
 ): Lambda
-export function intercept<T>(
-    observableMap: ObservableMap<T>,
-    property: string,
-    handler: IInterceptor<IValueWillChange<T>>
+export function intercept<K, V>(
+    observableMap: ObservableMap<K, V>,
+    property: K,
+    handler: IInterceptor<IValueWillChange<V>>
 ): Lambda
 export function intercept(object: Object, handler: IInterceptor<IObjectWillChange>): Lambda
 export function intercept<T extends Object, K extends keyof T>(
