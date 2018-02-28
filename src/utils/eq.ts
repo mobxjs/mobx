@@ -22,6 +22,8 @@ function eq(a: any, b: any, aStack?: any[], bStack?: any[]) {
     return deepEq(a, b, aStack, bStack)
 }
 
+const toString = Object.prototype.toString
+
 // Internal recursive comparison function for `isEqual`.
 function deepEq(a: any, b: any, aStack?: any[], bStack?: any[]) {
     // Unwrap any wrapped objects.

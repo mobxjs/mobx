@@ -46,6 +46,10 @@
 * Killed the already deprecated modifiers `asFlat` etc. If you war still using this, see the MobX 2 -> 3 migration notes.
 * `autorun` now accepts a scheduler function to allow improved performance for tasks such as rendering to canvas
 
+# 3.6.1
+
+* Fixed [#1358](https://github.com/mobxjs/mobx/pull/1359): Deep comparison failing on IE11. By [le0nik](https://github.com/le0nik) through [#1359](https://github.com/mobxjs/mobx/pull/1359)
+
 # 3.6.0
 
 * Fixed [#1118](https://github.com/mobxjs/mobx/issues/1118), the deepEquals operator build into mobx gave wrong results for non-primitive objects. This affected for example `computed.struct`, or the `compareStructural` of `reaction`
