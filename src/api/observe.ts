@@ -33,10 +33,10 @@ export function observe(
     listener: (change: IObjectChange) => void,
     fireImmediately?: boolean
 ): Lambda
-export function observe(
-    object: Object,
-    property: string,
-    listener: (change: IValueDidChange<any>) => void,
+export function observe<T, K extends keyof T>(
+    object: T,
+    property: K,
+    listener: (change: IValueDidChange<T[K]>) => void,
     fireImmediately?: boolean
 ): Lambda
 export function observe(thing, propOrCb?, cbOrFire?, fireImmediately?): Lambda {
