@@ -2,7 +2,9 @@ import {
     IObservable,
     reportObserved,
     propagateMaybeChanged,
-    propagateChangeConfirmed
+    propagateChangeConfirmed,
+    startBatch,
+    endBatch
 } from "./observable"
 import {
     IDerivation,
@@ -129,7 +131,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         if (globalState.inBatch === 0) {
             if (shouldCompute(this)) {
                 this.warnAboutUntrackedRead()
+                startBatch() // See perf test 'computed memoization'
                 this.value = this.computeValue(false)
+                endBatch()
             }
         } else {
             reportObserved(this)
