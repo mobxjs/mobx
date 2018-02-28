@@ -16,7 +16,7 @@ import { createDecoratorForEnhancer } from "./observabledecorator"
 import { isObservable } from "./isobservable"
 import { IObservableObject, asObservableObject } from "../types/observableobject"
 import { extendObservable, extendShallowObservable } from "./extendobservable"
-import { IObservableMapInitialValues, ObservableMap, IMap } from "../types/observablemap"
+import { IObservableMapInitialValues, ObservableMap } from "../types/observablemap"
 
 export type CreateObservableOptions = {
     name?: string
@@ -95,7 +95,7 @@ export interface IObservableFactory {
     <T>(wrapped: IModifierDescriptor<T>): T
     (target: Object, key: string, baseDescriptor?: PropertyDescriptor): any
     <T>(value: T[]): IObservableArray<T>
-    <K, V>(value: IMap<K, V>): ObservableMap<K, V>
+    <K, V>(value: Map<K, V>): ObservableMap<K, V>
     <T extends Object>(value: T): T & IObservableObject
 }
 
@@ -123,17 +123,17 @@ export interface IObservableFactories {
      */
     shallow(target: Object, property: string, descriptor?: PropertyDescriptor): any
     shallow<T>(initialValues: T[]): IObservableArray<T>
-    shallow<K, V>(initialValues: IMap<K, V>): ObservableMap<K, V>
+    shallow<K, V>(initialValues: Map<K, V>): ObservableMap<K, V>
     shallow<T extends Object>(value: T): T
 
     deep(target: Object, property: string, descriptor?: PropertyDescriptor): any
     deep<T>(initialValues: T[]): IObservableArray<T>
-    deep<K, V>(initialValues: IMap<K, V>): ObservableMap<K, V>
+    deep<K, V>(initialValues: Map<K, V>): ObservableMap<K, V>
     deep<T>(initialValue: T): T
 
     struct(target: Object, property: string, descriptor?: PropertyDescriptor): any
     struct<T>(initialValues: T[]): IObservableArray<T>
-    struct<K, V>(initialValues: IMap<K, V>): ObservableMap<K, V>
+    struct<K, V>(initialValues: Map<K, V>): ObservableMap<K, V>
     struct<T>(initialValue: T): T
 }
 

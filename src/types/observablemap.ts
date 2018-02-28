@@ -25,30 +25,6 @@ import { declareIterator, Iterator, iteratorSymbol } from "../utils/iterable"
 import { transaction } from "../api/transaction"
 import { referenceEnhancer } from "./modifiers"
 
-/**
- * Map as defined by Typescript's lib.es2015.collection.d.ts
- *
- * Imported here to not require consumers to have these libs enabled in their tsconfig if not actually using maps
- */
-// TODO: kill this interface
-export interface IMap<K, V> {
-    clear(): void
-    delete(key: K): boolean
-    forEach(callbackfn: (value: V, index: K, map: IMap<K, V>) => void, thisArg?: any): void
-    get(key: K): V | undefined
-    has(key: K): boolean
-    set(key: K, value?: V): this
-    readonly size: number
-}
-
-interface IMapConstructor {
-    new <K = any, V = any>(): IMap<K, V>
-    new <K, V>(entries?: [K, V][]): IMap<K, V>
-    readonly prototype: IMap<any, any>
-}
-
-declare var Map: IMapConstructor
-
 export interface IKeyValueMap<V> {
     [key: string]: V
 }
@@ -89,13 +65,13 @@ export interface IMapWillChange<K, V> {
 
 const ObservableMapMarker = {}
 
-export type IObservableMapInitialValues<K, V> = IMapEntries<K, V> | IKeyValueMap<V> | IMap<K, V>
+export type IObservableMapInitialValues<K, V> = IMapEntries<K, V> | IKeyValueMap<V> | Map<K, V>
 
 export class ObservableMap<K, V>
-    implements IInterceptable<IMapWillChange<K, V>>, IListenable, IMap<K, V> {
+    implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable {
     $mobx = ObservableMapMarker
-    private _data: IMap<K, ObservableValue<V>>
-    private _hasMap: IMap<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
+    private _data: Map<K, ObservableValue<V>>
+    private _hasMap: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
     private _keys: IObservableArray<K> = <any>new ObservableArray(
         undefined,
         referenceEnhancer,
@@ -296,7 +272,7 @@ export class ObservableMap<K, V>
         }
     }
 
-    forEach(callback: (value: V, key: K, object: IMap<K, V>) => void, thisArg?) {
+    forEach(callback: (value: V, key: K, object: Map<K, V>) => void, thisArg?) {
         this._keys.forEach(key => callback.call(thisArg, this.get(key), key, this))
     }
 
@@ -357,9 +333,9 @@ export class ObservableMap<K, V>
 	 * Returns a shallow non observable object clone of this map.
 	 * Note that the values migth still be observable. For a deep clone use mobx.toJS.
 	 */
-    toJS(): IMap<K, V> {
-        const res: IMap<K, V> = new Map()
-        this._keys.forEach(key => res.set(key, this.get(key)))
+    toJS(): Map<K, V> {
+        const res: Map<K, V> = new Map()
+        this._keys.forEach(key => res.set(key, this.get(key)!))
         return res
     }
 
