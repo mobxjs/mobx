@@ -16,7 +16,7 @@ import { createDecoratorForEnhancer } from "./observabledecorator"
 import { isObservable } from "./isobservable"
 import { IObservableObject, asObservableObject } from "../types/observableobject"
 import { extendObservable, extendShallowObservable } from "./extendobservable"
-import { IObservableMapInitialValues, ObservableMap, IMap } from "../types/observablemap"
+import { IObservableMapInitialValues, ObservableMap } from "../types/observablemap"
 
 export type CreateObservableOptions = {
     name?: string
@@ -95,7 +95,7 @@ export interface IObservableFactory {
     <T>(wrapped: IModifierDescriptor<T>): T
     (target: Object, key: string, baseDescriptor?: PropertyDescriptor): any
     <T>(value: T[]): IObservableArray<T>
-    <T>(value: IMap<string | number | boolean, T>): ObservableMap<T>
+    <K, V>(value: Map<K, V>): ObservableMap<K, V>
     <T extends Object>(value: T): T & IObservableObject
 }
 
@@ -104,8 +104,11 @@ export interface IObservableFactories {
     shallowBox<T>(value?: T, name?: string): IObservableValue<T>
     array<T>(initialValues?: T[], name?: string): IObservableArray<T>
     shallowArray<T>(initialValues?: T[], name?: string): IObservableArray<T>
-    map<T>(initialValues?: IObservableMapInitialValues<T>, name?: string): ObservableMap<T>
-    shallowMap<T>(initialValues?: IObservableMapInitialValues<T>, name?: string): ObservableMap<T>
+    map<K, V>(initialValues?: IObservableMapInitialValues<K, V>, name?: string): ObservableMap<K, V>
+    shallowMap<K, V>(
+        initialValues?: IObservableMapInitialValues<K, V>,
+        name?: string
+    ): ObservableMap<K, V>
     object<T>(props: T, name?: string): T & IObservableObject
     shallowObject<T>(props: T, name?: string): T & IObservableObject
 
@@ -120,17 +123,17 @@ export interface IObservableFactories {
      */
     shallow(target: Object, property: string, descriptor?: PropertyDescriptor): any
     shallow<T>(initialValues: T[]): IObservableArray<T>
-    shallow<T>(initialValues: IMap<string | number | boolean, T>): ObservableMap<T>
+    shallow<K, V>(initialValues: Map<K, V>): ObservableMap<K, V>
     shallow<T extends Object>(value: T): T
 
     deep(target: Object, property: string, descriptor?: PropertyDescriptor): any
     deep<T>(initialValues: T[]): IObservableArray<T>
-    deep<T>(initialValues: IMap<string | number | boolean, T>): ObservableMap<T>
+    deep<K, V>(initialValues: Map<K, V>): ObservableMap<K, V>
     deep<T>(initialValue: T): T
 
     struct(target: Object, property: string, descriptor?: PropertyDescriptor): any
     struct<T>(initialValues: T[]): IObservableArray<T>
-    struct<T>(initialValues: IMap<string | number | boolean, T>): ObservableMap<T>
+    struct<K, V>(initialValues: Map<K, V>): ObservableMap<K, V>
     struct<T>(initialValue: T): T
 }
 
@@ -151,13 +154,19 @@ const observableFactories: IObservableFactories = {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowArray")
         return new ObservableArray(initialValues, referenceEnhancer, name) as any
     },
-    map<T>(initialValues?: IObservableMapInitialValues<T>, name?: string): ObservableMap<T> {
+    map<K, V>(
+        initialValues?: IObservableMapInitialValues<K, V>,
+        name?: string
+    ): ObservableMap<K, V> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("map")
-        return new ObservableMap(initialValues, deepEnhancer, name)
+        return new ObservableMap<K, V>(initialValues, deepEnhancer, name)
     },
-    shallowMap<T>(initialValues?: IObservableMapInitialValues<T>, name?: string): ObservableMap<T> {
+    shallowMap<K, V>(
+        initialValues?: IObservableMapInitialValues<K, V>,
+        name?: string
+    ): ObservableMap<K, V> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowMap")
-        return new ObservableMap(initialValues, referenceEnhancer, name)
+        return new ObservableMap<K, V>(initialValues, referenceEnhancer, name)
     },
     object<T>(props: T, name?: string): T & IObservableObject {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("object")

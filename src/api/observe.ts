@@ -17,15 +17,15 @@ export function observe<T>(
     listener: (change: IArrayChange<T> | IArraySplice<T>) => void,
     fireImmediately?: boolean
 ): Lambda
-export function observe<T>(
-    observableMap: ObservableMap<T>,
-    listener: (change: IMapChange<T>) => void,
+export function observe<K, V>(
+    observableMap: ObservableMap<K, V>,
+    listener: (change: IMapChange<K, V>) => void,
     fireImmediately?: boolean
 ): Lambda
-export function observe<T>(
-    observableMap: ObservableMap<T>,
-    property: string,
-    listener: (change: IValueDidChange<T>) => void,
+export function observe<K, V>(
+    observableMap: ObservableMap<K, V>,
+    property: K,
+    listener: (change: IValueDidChange<V>) => void,
     fireImmediately?: boolean
 ): Lambda
 export function observe(

@@ -21,7 +21,7 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
         if (isObservableMap(thing)) {
             const anyThing = thing as any
             if (property === undefined) return getAtom(anyThing._keys)
-            const observable = anyThing._data[property] || anyThing._hasMap[property]
+            const observable = anyThing._data.get(property) || anyThing._hasMap.get(property)
             if (!observable)
                 fail(
                     process.env.NODE_ENV !== "production" &&

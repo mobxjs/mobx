@@ -61,8 +61,7 @@ export {
     IMapChangeBase,
     IMapChangeDelete,
     isObservableMap,
-    IObservableMapInitialValues,
-    IMap
+    IObservableMapInitialValues
 } from "./types/observablemap"
 
 export { transaction } from "./api/transaction"

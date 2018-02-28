@@ -2,6 +2,7 @@
 
 ## New Features!
 
+* Observable maps are now backed by real maps
 * Decorate. To decorate without decorator syntax.
 * `values`, `keys`, `set`, `remove` to use objects as observable collections
 * Introduced `onBecomeObserved` and `onBecomeUnobserved`
@@ -11,9 +12,12 @@
 * Introduced `mobx.configure({ disableErrorBoundaries })`, for easier debugging of exceptoins. By [NaridaL](https://github.com/NaridaL) through [#1262](https://github.com/mobxjs/mobx/pull/1262)
 * Introduced `@computed(options)`
 * `autorun`, `reaction` and `when` now can take an `onError` property as parameter
+* `toJS` now accepts options: `{    detectCycles?: boolean    exportMapsAsObjects?: boolean }`, both `true` by default
 
 ## Breaking changes
 
+* below IE 11, Map polyfill is needed when using observable maps
+* `toJS` on an observable map now returns a Map object, not a plain object
 * dropped `@computed.equals`, instead, you can now use `@computed({ equals: ... })`
 * `useStrict(boolean)` was dropped, use `configure({enforceActions: boolean})` instead
 * `isolateGlobalState` was dropped, use `configure({ isolateGlobalState: true})` instead
