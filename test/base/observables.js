@@ -362,28 +362,22 @@ test("props4", function() {
 
 test("extend observable multiple prop maps", function() {
     var x = { a: 1 }
-    mobx.extendObservable(
-        x,
-        {
-            b: 2,
-            c: 2
-        },
-        {
-            c: 3,
-            d: 4
-        },
-        {
-            a: 5
-        }
-    )
-
-    var sum = 0
-    var disposer = mobx.autorun(function() {
-        sum = x.a + x.b + x.c + x.d
-    })
-    expect(sum).toBe(14)
-    x.a = 1
-    expect(sum).toBe(10)
+    expect(() => {
+        mobx.extendObservable(
+            x,
+            {
+                b: 2,
+                c: 2
+            },
+            {
+                c: 3,
+                d: 4
+            },
+            {
+                a: 5
+            }
+        )
+    }).toThrow(/extendObservable accepts only one object defining props/)
 })
 
 test("object enumerable props", function() {

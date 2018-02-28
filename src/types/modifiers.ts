@@ -80,7 +80,7 @@ export function deepStructEnhancer(v, oldValue, name): any {
     if (isPlainObject(v)) {
         const res = {}
         asObservableObject(res, name)
-        extendObservableHelper(res, deepStructEnhancer, [v])
+        extendObservableHelper(res, deepStructEnhancer, v)
         return res
     }
 
