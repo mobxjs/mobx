@@ -4,35 +4,35 @@ import {
     defineObservablePropertyFromDescriptor
 } from "../types/observableobject"
 import { isObservable } from "./isobservable"
-import { invariant, isPropertyConfigurable, hasOwnProperty, fail } from "../utils/utils"
-import { deepEnhancer, referenceEnhancer, IEnhancer } from "../types/modifiers"
+import { invariant, isPropertyConfigurable, hasOwnProperty, deprecated } from "../utils/utils"
+import { deepEnhancer, referenceEnhancer } from "../types/modifiers"
 import { startBatch, endBatch } from "../core/observable"
-
-export function extendObservable<A extends Object, B extends Object>(
-    target: A,
-    properties: B
-): A & B {
-    if (process.env.NODE_ENV !== "production" && arguments.length > 2)
-        return fail(`extendObservable accepts only one object defining props`)
-    return extendObservableHelper(target, deepEnhancer, properties) as any
-}
+import {
+    CreateObservableOptions,
+    asCreateObservableOptions,
+    shallowCreateObservableOptions
+} from "./observable"
 
 export function extendShallowObservable<A extends Object, B extends Object>(
     target: A,
     properties: B
 ): A & B {
-    if (process.env.NODE_ENV !== "production" && arguments.length > 2)
-        return fail(`extendObservable accepts only one object defining props`)
-    return extendObservableHelper(target, referenceEnhancer, properties) as any
+    deprecated(
+        "'extendShallowObservable' is deprecated, use 'extendObservable(target, props, { deep: false })' instead"
+    )
+    return extendObservable(target, properties, shallowCreateObservableOptions)
 }
 
-export function extendObservableHelper(
-    target: Object,
-    defaultEnhancer: IEnhancer<any>,
-    properties: Object
-): Object {
+export function extendObservable<A extends Object, B extends Object>(
+    target: A,
+    properties: B,
+    options?: CreateObservableOptions
+): A & B {
     if (process.env.NODE_ENV !== "production") {
-        invariant(arguments.length >= 2, "'extendObservable' expected 2 or more arguments")
+        invariant(
+            arguments.length === 2 || arguments.length === 3,
+            "'extendObservable' expected 2 or 3 arguments"
+        )
         invariant(
             typeof target === "object",
             "'extendObservable' expects an object as first argument"
@@ -51,6 +51,9 @@ export function extendObservableHelper(
         )
     }
 
+    options = asCreateObservableOptions(options)
+    const defaultEnhancer =
+        options.enhancer || (options.deep === true ? deepEnhancer : referenceEnhancer)
     const adm = asObservableObject(target)
     startBatch()
     try {
@@ -63,5 +66,5 @@ export function extendObservableHelper(
     } finally {
         endBatch()
     }
-    return target
+    return target as any
 }

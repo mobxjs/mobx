@@ -372,12 +372,9 @@ test("extend observable multiple prop maps", function() {
             {
                 c: 3,
                 d: 4
-            },
-            {
-                a: 5
             }
         )
-    }).toThrow(/extendObservable accepts only one object defining props/)
+    }).toThrow(/invalid option for \(extend\)observable: c/)
 })
 
 test("object enumerable props", function() {

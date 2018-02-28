@@ -7,7 +7,8 @@ import {
     shallowEnhancer,
     deepStructEnhancer,
     refStructEnhancer,
-    createModifierDescriptor
+    createModifierDescriptor,
+    IEnhancer
 } from "../types/modifiers"
 import { IObservableValue, ObservableValue } from "../types/observablevalue"
 import { IObservableArray, ObservableArray } from "../types/observablearray"
@@ -16,6 +17,40 @@ import { isObservable } from "./isobservable"
 import { IObservableObject, asObservableObject } from "../types/observableobject"
 import { extendObservable, extendShallowObservable } from "./extendobservable"
 import { IObservableMapInitialValues, ObservableMap, IMap } from "../types/observablemap"
+
+export type CreateObservableOptions = {
+    name?: string
+    deep?: boolean
+    enhancer?: IEnhancer<any>
+}
+
+// Predefined bags of create observable options, to avoid allocating temporarily option objects
+// in the majority of cases
+export const defaultCreateObservableOptions: CreateObservableOptions = {
+    deep: true, // TODO MWE: or false?
+    name: undefined, // TODO: not used yet
+    enhancer: undefined
+}
+export const shallowCreateObservableOptions = {
+    deep: false,
+    name: undefined,
+    enhancer: undefined
+}
+Object.freeze(defaultCreateObservableOptions)
+Object.freeze(shallowCreateObservableOptions)
+
+function assertValidOption(key: string) {
+    if (!/^(deep|name|enhancer)$/.test(key)) fail(`invalid option for (extend)observable: ${key}`)
+}
+
+export function asCreateObservableOptions(thing: any): CreateObservableOptions {
+    if (thing === null || thing === undefined) return defaultCreateObservableOptions
+    if (process.env.NODE_ENV !== "production") {
+        if (typeof thing !== "object") return fail("expected options object")
+        Object.keys(thing).forEach(assertValidOption)
+    }
+    return thing as CreateObservableOptions
+}
 
 const deepDecorator = createDecoratorForEnhancer(deepEnhancer)
 const shallowDecorator = createDecoratorForEnhancer(shallowEnhancer)
