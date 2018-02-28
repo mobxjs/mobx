@@ -513,7 +513,7 @@ test("Map: initializing", function(t) {
 
     var start = Date.now()
     for (i = 0; i < iterationsCount; i++) {
-        map = mobx.map()
+        map = mobx.observable.map()
     }
     var end = Date.now()
     log("Initilizing " + iterationsCount + " maps: " + (end - start) + " ms.")
@@ -524,7 +524,7 @@ test("Map: looking up properties", function(t) {
     gc()
     var iterationsCount = 1000
     var propertiesCount = 100
-    var map = mobx.map()
+    var map = mobx.observable.map()
     var i
     var p
 
@@ -556,7 +556,7 @@ test("Map: setting and deleting properties", function(t) {
     gc()
     var iterationsCount = 1000
     var propertiesCount = 100
-    var map = mobx.map()
+    var map = mobx.observable.map()
     var i
     var p
 
