@@ -8,6 +8,7 @@ import { keys } from "./object-api"
 /**
  * Basically, a deep clone, so that no reactive property will exist anymore.
  */
+// TODO: replace options with `detectCycles`, `convertMapsToObjects`
 export function toJS<T>(source: T, detectCycles?: boolean): T
 export function toJS(source: any, detectCycles?: boolean): any
 export function toJS(source, detectCycles: boolean, __alreadySeen: [any, any][]) // internal overload

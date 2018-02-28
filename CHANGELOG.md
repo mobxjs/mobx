@@ -2,6 +2,7 @@
 
 ## New Features!
 
+* Observable maps are now backed by real maps
 * Decorate. To decorate without decorator syntax.
 * `values`, `keys`, `set`, `remove` to use objects as observable collections
 * Introduced `onBecomeObserved` and `onBecomeUnobserved`
@@ -14,6 +15,8 @@
 
 ## Breaking changes
 
+* below IE 11, Map polyfill is needed when using observable maps
+* `toJS` on an observable map now returns a Map object, not a plain object
 * dropped `@computed.equals`, instead, you can now use `@computed({ equals: ... })`
 * `useStrict(boolean)` was dropped, use `configure({enforceActions: boolean})` instead
 * `isolateGlobalState` was dropped, use `configure({ isolateGlobalState: true})` instead
