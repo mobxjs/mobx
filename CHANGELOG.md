@@ -38,6 +38,7 @@
 * map `.entries()`, `.values()` and `.keys()` now properly return iterators. use `values(m)` or `keys(m)` or `Array.from(m)` to get the old behavior
 * the option `struct` for computed values is deprecated, use `compareStructural` indeed
 * `isModifierDescriptor` is no longer exposed
+* `deepEqual` is no longer exposed, use `comparer.structural` instead
 
 ## Non breaking changes
 

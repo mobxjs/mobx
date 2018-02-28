@@ -93,7 +93,6 @@ export {
 export { getDebugName, getAtom, getAdministration as _getAdministration } from "./types/type-utils"
 export { allowStateChanges as _allowStateChanges } from "./core/action"
 export { Lambda, isArrayLike } from "./utils/utils"
-export { deepEqual } from "./utils/eq"
 export { isComputingDerivation as _isComputingDerivation } from "./core/derivation"
 export { setReactionScheduler as _setReactionScheduler, onReactionError } from "./core/reaction"
 export { reserveArrayBuffer as _reserveArrayBuffer /* See #734 */ } from "./types/observablearray"

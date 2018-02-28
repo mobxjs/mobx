@@ -11,7 +11,6 @@ test("correct api should be exposed", function() {
             "configure",
             "createAtom",
             "decorate",
-            "deepEqual",
             "extendObservable",
             "extendShallowObservable",
             "_getAdministration",
