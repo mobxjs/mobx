@@ -661,3 +661,13 @@ test("can iterate map - values", () => {
     expect(y).toEqual([[], ["A"], ["A", "B"]])
     d()
 })
+
+test("NaN as map key", function() {
+    var a = map(new Map([[NaN, 0]]))
+    expect(a.has(NaN)).toBe(true)
+    expect(a.get(NaN)).toBe(0)
+    a.set(NaN, 1)
+    a.merge(map(new Map([[NaN, 2]])))
+    expect(a.get(NaN)).toBe(2)
+    expect(a.size).toBe(1)
+})
