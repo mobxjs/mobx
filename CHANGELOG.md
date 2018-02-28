@@ -1,3 +1,8 @@
+
+# 3.6.1
+
+* Fixed [#1358](https://github.com/mobxjs/mobx/pull/1359): Deep comparison failing on IE11. By [le0nik](https://github.com/le0nik) through [#1359](https://github.com/mobxjs/mobx/pull/1359)
+
 # 3.6.0
 
 * Fixed [#1118](https://github.com/mobxjs/mobx/issues/1118), the deepEquals operator build into mobx gave wrong results for non-primitive objects. This affected for example `computed.struct`, or the `compareStructural` of `reaction`
