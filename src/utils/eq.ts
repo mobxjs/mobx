@@ -23,6 +23,8 @@ function eq(a, b, aStack?, bStack?) {
     return deepEq(a, b, aStack, bStack)
 }
 
+var toString = Object.prototype.toString
+
 // Internal recursive comparison function for `isEqual`.
 function deepEq(a, b, aStack?, bStack?) {
     // Unwrap any wrapped objects.
