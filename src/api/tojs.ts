@@ -5,14 +5,28 @@ import { isObservableValue } from "../types/observablevalue"
 import { isObservable } from "./isobservable"
 import { keys } from "./object-api"
 
+export type ToJSOptions = {
+    detectCycles?: boolean
+    exportMapsAsObjects?: boolean
+}
+
+const defaultOptions: ToJSOptions = {
+    detectCycles: true,
+    exportMapsAsObjects: true
+}
+
 /**
  * Basically, a deep clone, so that no reactive property will exist anymore.
  */
-// TODO: replace options with `detectCycles`, `convertMapsToObjects`
-export function toJS<T>(source: T, detectCycles?: boolean): T
-export function toJS(source: any, detectCycles?: boolean): any
-export function toJS(source, detectCycles: boolean, __alreadySeen: [any, any][]) // internal overload
-export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, any][] = []) {
+export function toJS<T>(source: T, options?: ToJSOptions): T
+export function toJS(source: any, options?: ToJSOptions): any
+export function toJS(source, options: ToJSOptions, __alreadySeen: [any, any][]) // internal overload
+export function toJS(source, options?: ToJSOptions, __alreadySeen: [any, any][] = []) {
+    // backward compatibility
+    if (typeof options === "boolean") options = { detectCycles: options }
+
+    if (!options) options = defaultOptions
+    const detectCycles = options.detectCycles === true
     // optimization: using ES6 map would be more efficient!
     // optimization: lift this function outside toJS, this makes recursion expensive
     function cache(value) {
@@ -28,7 +42,7 @@ export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, 
 
         if (isObservableArray(source)) {
             const res = cache([])
-            const toAdd = source.map(value => toJS(value, detectCycles, __alreadySeen))
+            const toAdd = source.map(value => toJS(value, options!, __alreadySeen))
             res.length = toAdd.length
             for (let i = 0, l = toAdd.length; i < l; i++) res[i] = toAdd[i]
             return res
@@ -37,16 +51,26 @@ export function toJS(source, detectCycles: boolean = true, __alreadySeen: [any, 
             const res = cache({})
             keys(source) // make sure we track the keys of the object
             for (let key in source) {
-                res[key] = toJS(source[key], detectCycles, __alreadySeen)
+                res[key] = toJS(source[key], options!, __alreadySeen)
             }
             return res
         }
         if (isObservableMap(source)) {
-            const res = cache({})
-            source.forEach((value, key) => (res[key] = toJS(value, detectCycles, __alreadySeen)))
-            return res
+            if (options.exportMapsAsObjects === false) {
+                const res = cache(new Map())
+                source.forEach((value, key) => {
+                    res.set(key, toJS(value, options!, __alreadySeen))
+                })
+                return res
+            } else {
+                const res = cache({})
+                source.forEach((value, key) => {
+                    res[key] = toJS(value, options!, __alreadySeen)
+                })
+                return res
+            }
         }
-        if (isObservableValue(source)) return toJS(source.get(), detectCycles, __alreadySeen)
+        if (isObservableValue(source)) return toJS(source.get(), options!, __alreadySeen)
     }
     return source
 }

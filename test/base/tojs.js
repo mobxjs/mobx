@@ -312,3 +312,32 @@ test("verify already seen", () => {
     expect(res.x === res).toBeTruthy()
     expect(res.x === a).toBeFalsy()
 })
+
+test("json cycles when exporting maps as maps", function() {
+    var a = observable({
+        b: 1,
+        c: [2],
+        d: mobx.observable.map(),
+        e: a
+    })
+
+    a.e = a
+    a.c.push(a, a.d)
+    a.d.set("f", a)
+    a.d.set("d", a.d)
+    a.d.set("c", a.c)
+
+    var cloneA = mobx.toJS(a, { exportMapsAsObjects: false, detectCycles: true })
+    var cloneC = cloneA.c
+    var cloneD = cloneA.d
+
+    expect(cloneA.b).toBe(1)
+    expect(cloneA.c[0]).toBe(2)
+    expect(cloneA.c[1]).toBe(cloneA)
+    expect(cloneA.c[2]).toBe(cloneD)
+    expect(cloneD).toBeInstanceOf(Map)
+    expect(cloneD.get("f")).toBe(cloneA)
+    expect(cloneD.get("d")).toBe(cloneD)
+    expect(cloneD.get("c")).toBe(cloneC)
+    expect(cloneA.e).toBe(cloneA)
+})
