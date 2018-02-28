@@ -99,7 +99,7 @@ export function refStructEnhancer(v, oldValue, name): any {
 }
 
 import { isObservable } from "../api/isobservable"
-import { observable, defaultCreateObservableOptions } from "../api/observable"
+import { observable } from "../api/observable"
 import { extendObservable } from "../api/extendobservable"
 import { fail, isPlainObject, isES6Map } from "../utils/utils"
 import { isObservableObject, asObservableObject } from "./observableobject"
