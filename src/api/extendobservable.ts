@@ -10,8 +10,12 @@ import { startBatch, endBatch } from "../core/observable"
 import {
     CreateObservableOptions,
     asCreateObservableOptions,
-    shallowCreateObservableOptions
+    shallowCreateObservableOptions,
+    observable
 } from "./observable"
+import { computed } from "./computed"
+import { decorate } from "./decorate"
+import { isComputed } from "./iscomputed"
 
 export function extendShallowObservable<A extends Object, B extends Object>(
     target: A,
@@ -51,18 +55,29 @@ export function extendObservable<A extends Object, B extends Object>(
         )
     }
 
+    // TODO: eliminate options, preserve name
     options = asCreateObservableOptions(options)
-    const defaultEnhancer =
-        options.enhancer || (options.deep === true ? deepEnhancer : referenceEnhancer)
+    // TODO:
+    // const defaultEnhancer =
+    //     options.enhancer || (options.deep === true ? deepEnhancer : referenceEnhancer)
     const adm = asObservableObject(target)
     startBatch()
     try {
-        for (let key in properties)
-            if (hasOwnProperty(properties, key)) {
-                if ((target as any) === properties && !isPropertyConfigurable(target, key)) continue // see #111, skip non-configurable or non-writable props for `observable(object)`.
-                const descriptor = Object.getOwnPropertyDescriptor(properties, key)
-                defineObservablePropertyFromDescriptor(adm, key, descriptor!, defaultEnhancer)
+        const decorators: any = {}
+        for (let key in properties) {
+            // TODO: using decorators is a bit inefficient, short circuit those
+            if ((target as any) === properties && !isPropertyConfigurable(target, key)) continue // see #111, skip non-configurable or non-writable props for `observable(object)`.
+            const descriptor = Object.getOwnPropertyDescriptor(properties, key)!
+            if (typeof descriptor.get === "function") {
+                decorators[key] = computed
+            } else if (typeof descriptor.value === "function" || isComputed(descriptor.value)) {
+                continue
+            } else {
+                decorators[key] = options!.deep === true ? observable.deep : observable.ref
             }
+            Object.defineProperty(target, key, descriptor)
+        }
+        decorate(target, decorators)
     } finally {
         endBatch()
     }

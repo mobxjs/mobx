@@ -273,6 +273,7 @@ test("scope", function() {
 test("props1", function() {
     var vat = observable.box(0.2)
     var Order = function() {
+        debugger
         mobx.extendObservable(this, {
             price: 20,
             amount: 2,
