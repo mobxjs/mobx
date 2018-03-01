@@ -203,17 +203,14 @@ test("issue8", () => {
             loggedIn2: boolean = false
             constructor() {
                 extendObservable(this, {
-                    loggedIn2: () => !!state.authToken
+                    get loggedIn2() {
+                        return true
+                    }
                 })
-            }
-
-            @observable
-            get loggedIn() {
-                return !!state.authToken
             }
         }
         const store = new LoginStoreTest()
-    }, /@computed/)
+    }, /'extendObservable' can only be used to introduce new properties/)
 })
 
 test("box", () => {

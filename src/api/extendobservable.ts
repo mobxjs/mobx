@@ -55,7 +55,7 @@ export function extendObservable<A extends Object, B extends Object>(
     // TODO:
     const defaultDecorator =
         options.defaultDecorator || (options.deep === true ? observable.deep : observable.ref)
-    const adm = asObservableObject(target)
+    asObservableObject(target) // make sure it can be observable
     startBatch()
     try {
         decorators = decorators || ({} as any)
