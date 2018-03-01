@@ -297,7 +297,7 @@ test("flat object", function() {
     expect(updates).toBe(2)
 })
 
-test("as structure", function() {
+test.skip("as structure", function() {
     var x = m.observable.object(
         {
             x: null
@@ -633,7 +633,7 @@ test("761 - deeply nested modifiers work", () => {
     expect(Array.isArray(a.someKey.someNestedKey)).toBe(false)
 })
 
-test("compare structurally, deep", () => {
+test.skip("compare structurally, deep", () => {
     var a = mobx.observable.object(
         {
             x: undefined

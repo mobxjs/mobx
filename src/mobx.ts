@@ -17,6 +17,7 @@
  */
 
 // TODO: define process.env if needed
+// TODO: detect minification and see if process.env is production
 
 export { IObservable, IDepTreeNode } from "./core/observable"
 export { Reaction, IReactionPublic, IReactionDisposer } from "./core/reaction"

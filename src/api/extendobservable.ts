@@ -1,5 +1,5 @@
 import { isObservableMap } from "../types/observablemap"
-import { asObservableObject } from "../types/observableobject"
+import { asObservableObject, defineObservableProperty } from "../types/observableobject"
 import { isObservable } from "./isobservable"
 import { invariant, deprecated, fail } from "../utils/utils"
 import { startBatch, endBatch } from "../core/observable"
@@ -12,6 +12,7 @@ import {
 import { computed } from "./computed"
 import { decorate } from "./decorate"
 import { isComputed } from "./iscomputed"
+import { referenceEnhancer, deepEnhancer } from "../types/modifiers"
 
 export function extendShallowObservable<A extends Object, B extends Object>(
     target: A,
@@ -55,7 +56,7 @@ export function extendObservable<A extends Object, B extends Object>(
     // TODO:
     const defaultDecorator =
         options.defaultDecorator || (options.deep === false ? observable.ref : observable.deep)
-    asObservableObject(target) // make sure it can be observable
+    const adm = asObservableObject(target) // make sure it can be observable
     startBatch()
     try {
         const additionalDecorators = {} as any // don't want to modify passed in object
@@ -78,8 +79,18 @@ export function extendObservable<A extends Object, B extends Object>(
                 Object.defineProperty(target, key, descriptor)
                 if (!decorators || !decorators[key]) additionalDecorators[key] = computed
             } else {
-                unassigned.push(key)
-                if (!decorators || !decorators[key]) additionalDecorators[key] = defaultDecorator
+                if (decorators && decorators[key]) unassigned.push(key)
+                else {
+                    // TODO: theother enhancers
+                    defineObservableProperty(
+                        adm,
+                        key,
+                        value,
+                        options.deep === false ? referenceEnhancer : deepEnhancer
+                    )
+                    // additionalDecorators[key] = defaultDecorator
+                    // unassigned.push(key)
+                }
             }
         }
         if (decorators) decorate(target, decorators as any)
