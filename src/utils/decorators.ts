@@ -148,6 +148,7 @@ export function runLazyInitializers(instance) {
     if (instance.__mobxDidRunLazyInitializers === true) return
     if (instance.__mobxLazyInitializers) {
         addHiddenProp(instance, "__mobxDidRunLazyInitializers", true)
+        // TODO: optmize forEach
         instance.__mobxDidRunLazyInitializers &&
             instance.__mobxLazyInitializers.forEach(initializer => initializer(instance))
     }
