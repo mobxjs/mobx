@@ -11,7 +11,8 @@ import {
     deprecated,
     isES6Map,
     getMapLikeKeys,
-    fail
+    fail,
+    declareStringTag
 } from "../utils/utils"
 import {
     IInterceptable,
@@ -40,7 +41,16 @@ export interface IMap<K, V> {
     get(key: K): V | undefined
     has(key: K): boolean
     set(key: K, value?: V): this
+    [Symbol.toStringTag]: "Map"
+    [Symbol.iterator](): IterableIterator<[K, V]>
+    entries(): IterableIterator<[K, V]>
+    keys(): IterableIterator<K>
+    values(): IterableIterator<V>
     readonly size: number
+}
+
+export interface IterableIterator<T> extends Iterator<T> {
+    [Symbol.iterator](): IterableIterator<T>
 }
 
 export interface IKeyValueMap<V> {
@@ -376,9 +386,19 @@ export class ObservableMap<V>
     }
 }
 
+/**
+ * Include the interface to cover the implementations added to the prototype directly.
+ */
+export interface ObservableMap<V> {
+    [Symbol.toStringTag]: "Map"
+    [Symbol.iterator](): IterableIterator<[string, V]>
+}
+
 declareIterator(ObservableMap.prototype, function() {
     return this.entries()
 })
+
+declareStringTag(ObservableMap.prototype, "Map")
 
 export function map<V>(initialValues?: IObservableMapInitialValues<V>): ObservableMap<V> {
     deprecated("`mobx.map` is deprecated, use `new ObservableMap` or `mobx.observable.map` instead")

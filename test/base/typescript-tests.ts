@@ -1247,3 +1247,8 @@ test("1072 - @observable without initial value and observe before first access",
     const user = new User()
     observe(user, "loginCount", () => {})
 })
+
+test("map should structurally match ES6 Map", () => {
+    // Including this line strictly for type checking.
+    const m: Map<string, number> = mobx.observable.map({ a: 1, b: 2 })
+})

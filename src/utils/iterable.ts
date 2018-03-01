@@ -10,11 +10,15 @@ function iteratorSymbol() {
 
 export const IS_ITERATING_MARKER = "__$$iterating"
 
+export interface IteratorResult<T> {
+    done: boolean
+    value: T
+}
+
 export interface Iterator<T> {
-    next(): {
-        done: boolean
-        value?: T
-    }
+    next(value?: any): IteratorResult<T>
+    return?(value?: any): IteratorResult<T>
+    throw?(e?: any): IteratorResult<T>
 }
 
 export function arrayAsIterator<T>(array: T[]): T[] & Iterator<T> {

@@ -642,3 +642,9 @@ test("#1258 cannot replace maps anymore", () => {
     const items = mobx.observable.map()
     items.replace(mobx.observable.map())
 })
+
+test("map should implement toStringTag", () => {
+    const m = mobx.observable.map({ a: 1 })
+    const name = Object.prototype.toString.call(m)
+    expect(name).toBe("[object Map]")
+})
