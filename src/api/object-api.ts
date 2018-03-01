@@ -53,8 +53,11 @@ export function set(obj: any, key: any, value?: any): void {
     if (arguments.length === 2) {
         startBatch()
         const values = key
-        for (let key in values) set(obj, key, values[key])
-        endBatch()
+        try {
+            for (let key in values) set(obj, key, values[key])
+        } finally {
+            endBatch()
+        }
         return
     }
     if (isObservableObject(obj)) {

@@ -57,8 +57,8 @@ export function extendObservable<A extends Object, B extends Object>(
     // TODO: eliminate options, preserve name
     options = asCreateObservableOptions(options)
     // TODO:
-    // const defaultEnhancer =
-    //     options.enhancer || (options.deep === true ? deepEnhancer : referenceEnhancer)
+    const defaultDecorator =
+        options.defaultDecorator || (options.deep === true ? observable.deep : observable.ref)
     const adm = asObservableObject(target)
     startBatch()
     try {
@@ -81,12 +81,9 @@ export function extendObservable<A extends Object, B extends Object>(
             if (typeof get === "function") {
                 Object.defineProperty(target, key, descriptor)
                 decorators![key] = decorators![key] || computed
-            } else if (typeof descriptor.value === "function") {
-                unassigned.push(key)
             } else {
                 unassigned.push(key)
-                decorators![key] =
-                    decorators![key] || options!.deep === true ? observable.deep : observable.ref
+                decorators![key] = decorators![key] || defaultDecorator
             }
         }
         decorate(target, decorators as any)

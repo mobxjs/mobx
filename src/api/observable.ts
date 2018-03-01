@@ -21,7 +21,7 @@ import { IObservableMapInitialValues, ObservableMap } from "../types/observablem
 export type CreateObservableOptions = {
     name?: string
     deep?: boolean
-    enhancer?: IEnhancer<any>
+    defaultDecorator?: Function
 }
 
 // Predefined bags of create observable options, to avoid allocating temporarily option objects
@@ -29,18 +29,19 @@ export type CreateObservableOptions = {
 export const defaultCreateObservableOptions: CreateObservableOptions = {
     deep: true, // TODO MWE: or false?
     name: undefined, // TODO: not used yet
-    enhancer: undefined
+    defaultDecorator: undefined
 }
 export const shallowCreateObservableOptions = {
     deep: false,
     name: undefined,
-    enhancer: undefined
+    defaultDecorator: undefined
 }
 Object.freeze(defaultCreateObservableOptions)
 Object.freeze(shallowCreateObservableOptions)
 
 function assertValidOption(key: string) {
-    if (!/^(deep|name|enhancer)$/.test(key)) fail(`invalid option for (extend)observable: ${key}`)
+    if (!/^(deep|name|defaultDecorator)$/.test(key))
+        fail(`invalid option for (extend)observable: ${key}`)
 }
 
 export function asCreateObservableOptions(thing: any): CreateObservableOptions {
@@ -200,6 +201,7 @@ const observableFactories: IObservableFactories = {
         return extendShallowObservable(res, props, decorators) as any
     },
     ref() {
+        // TODO: kill all of those
         if (arguments.length < 2) {
             // although ref creates actually a modifier descriptor, the type of the resultig properties
             // of the object is `T` in the end, when the descriptors are interpreted
