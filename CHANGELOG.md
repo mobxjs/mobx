@@ -1,5 +1,106 @@
 # 4.0.0
 
+Most noteable changes:
+
+* `observable.shallowArray(values)` has been removed, instead use `observable.array(values, { deep: false })`
+* `observable.shallowMap(values)` has been removed, instead use `observable.map(values, { deep: false })`
+* `observable.shallowObject(values)` has been removed, instead use `observable.object(values, {}, { deep: false })`
+* `extendShallowObservable(target, props)`, instead use `extendObservable(target, props, {}, { deep: false })`
+
+The decorators `observable.ref`, `observable.shallow`, `observable.deep`, `observable.struct` can no longer be used as functions,
+instead, we made the api more consistent by always using these decorators really as decorators.
+For example, `observable.object` and `extendObservable` now support a `decorators` parameter.
+
+The advantage is that the usage between `@decorator` and `decorator` is now consistend, and they can always be called in the same way and with the same arguments. For example, the following examples work now all the same, and use the decorators with the same signature:
+
+```javascript
+class Todo {
+    @observable title = "test"
+    @observable.ref promise = somePromise
+
+    @computed get difficulty() {
+        return this.title.length
+    }
+    @computed({ compareStructurally: true })
+    get difficultyAsArray() {
+        return [this.title.length]
+    }
+
+    @action setTitle(t) {
+        this.title = t
+    }
+    @action.bound setTitle2(t) {
+        this.title = t
+    }
+}
+
+// observable.object takes a second 'decorators' param, specifying which decorators need to be applied.
+// defaulting to `observable` for omitted fields (or `computed` for getters)
+const todo = observable.object({
+    title: "test",
+    promise: somePromise,
+    get difficulty() {
+        return this.title.length
+    },
+    get difficultyAsArray() {
+        return [this.title.length]
+    },
+    setTitle(t) {
+        this.title = t
+    },
+    setTitle2(t) {
+        this.title = t
+    }
+}, {
+    ref: observable.ref,
+    difficultyAsArray: computed({ compareStructurally: true }),
+    setTitle: action,
+    setTitle2: action.bound
+})
+
+// Maybe you have classes, but no decorator syntax enabled. Don't worry, with MobX 4 you don't have to fall back to
+// `extendObservable` in the constructor! Instead, just declare the fields and use `mobx.decorate` to ehance the prototype:
+class Todo {
+    title = "test"
+    promise = somePromise
+
+    get difficulty() {
+        return this.title.length
+    }
+    get difficultyAsArray() {
+        return [this.title.length]
+    }
+
+    setTitle(t) {
+        this.title = t
+    }
+    setTitle2(t) {
+        this.title = t
+    }
+}
+decorate(Todo, {
+    ref: observable.ref,
+    difficultyAsArray: computed({ compareStructurally: true }),
+    setTitle: action,
+    setTitle2: action.bound
+})
+```
+
+`extendObservable(target, props, decorators?, options?)` follows consequently the same mechanism.
+
+`options` is a last optional parameter to `extendObservable`, `observable.object`, `observable.map`, `observable.array` which can override the default decorator that is used (`deep: false` will result in `observable.ref` to be used as default decorator), and it can specify a debug `name` property.
+
+`extendObservable` can no longer be used to update properties, it can *only* introduce new properties. Use the new `set` method to set or add new properties
+
+# Most noteable new features
+
+* observable maps are now backed by new maps
+* use observable objects as collections by leveraging `set`, `values`, `keys`, `remove`. When using those methods for writing and iterating, MobX can detect key additions and removals
+* Iterating maps now follows the spec, that is, `map.values` etc no longer return an array, but an iterator. Use `mobx.values(map)` or `Array.from(map)` to get the values as array again
+
+
+All the random notes that should make up a nice changelog:
+
 ## New Features!
 
 * Observable maps are now backed by real maps
@@ -44,12 +145,6 @@
 * `isModifierDescriptor` is no longer exposed
 * `deepEqual` is no longer exposed, use `comparer.structural` instead
 
-### extendObservable
-
-* killed using decorators as functions on values
-* `extendObservable` can no longer be used to redefine or update existing properties! To declare existing properties to be observable use 'decorate'
-* `extendObservable(x, { y: computed(...)})` => `extendObservable(x, { get y() {}})` or `extendObservable(x, { get y() {}}, { y: computed(opts)})`
-* `action.bound` => use decorator
 
 #### observable
 
