@@ -1,11 +1,12 @@
-import { invariant, fail } from "../utils/utils"
+import { invariant, fail, deprecated } from "../utils/utils"
 import {
     IModifierDescriptor,
     deepEnhancer,
     referenceEnhancer,
     shallowEnhancer,
     deepStructEnhancer,
-    refStructEnhancer
+    refStructEnhancer,
+    IEnhancer
 } from "../types/modifiers"
 import { IObservableValue, ObservableValue } from "../types/observablevalue"
 import { IObservableArray, ObservableArray } from "../types/observablearray"
@@ -23,6 +24,7 @@ export type CreateObservableOptions = {
 
 // Predefined bags of create observable options, to avoid allocating temporarily option objects
 // in the majority of cases
+// TODO: support default decorator / enhancer everywhere!, create interface for IDecorator that can also grab enhancer
 export const defaultCreateObservableOptions: CreateObservableOptions = {
     deep: true, // TODO MWE: or false?
     name: undefined, // TODO: not used yet
@@ -43,11 +45,17 @@ function assertValidOption(key: string) {
 
 export function asCreateObservableOptions(thing: any): CreateObservableOptions {
     if (thing === null || thing === undefined) return defaultCreateObservableOptions
+    if (typeof thing === "string") return { name: thing, deep: true }
     if (process.env.NODE_ENV !== "production") {
         if (typeof thing !== "object") return fail("expected options object")
         Object.keys(thing).forEach(assertValidOption)
     }
     return thing as CreateObservableOptions
+}
+
+function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any> {
+    // TODO: make it possible to get enhancer from decorator
+    return options.deep === false ? referenceEnhancer : deepEnhancer
 }
 
 const deepDecorator = createDecoratorForEnhancer(deepEnhancer)
@@ -94,104 +102,91 @@ export interface IObservableFactory {
 }
 
 export interface IObservableFactories {
-    // TODO: replace name with CreateObservableOptions
-    box<T>(value?: T, name?: string): IObservableValue<T>
-    shallowBox<T>(value?: T, name?: string): IObservableValue<T>
-    array<T>(initialValues?: T[], name?: string): IObservableArray<T>
-    shallowArray<T>(initialValues?: T[], name?: string): IObservableArray<T>
-    map<K, V>(initialValues?: IObservableMapInitialValues<K, V>, name?: string): ObservableMap<K, V>
+    box<T>(value?: T, options?: CreateObservableOptions): IObservableValue<T>
+    shallowBox<T>(value?: T, options?: CreateObservableOptions): IObservableValue<T>
+    array<T>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T>
+    shallowArray<T>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T>
+    map<K, V>(
+        initialValues?: IObservableMapInitialValues<K, V>,
+        options?: CreateObservableOptions
+    ): ObservableMap<K, V>
     shallowMap<K, V>(
         initialValues?: IObservableMapInitialValues<K, V>,
-        name?: string
+        options?: CreateObservableOptions
     ): ObservableMap<K, V>
-
     object<T>(
         props: T,
         decorators?: { [K in keyof T]?: Function },
-        name?: string
+        options?: CreateObservableOptions
     ): T & IObservableObject
     shallowObject<T>(
         props: T,
         decorators?: { [K in keyof T]?: Function },
-        name?: string
+        options?: CreateObservableOptions
     ): T & IObservableObject
 
     /**
      * Decorator that creates an observable that only observes the references, but doesn't try to turn the assigned value into an observable.ts.
      */
     ref(target: Object, property: string, descriptor?: PropertyDescriptor): any
-    ref<T>(initialValue: T): T
-
     /**
      * Decorator that creates an observable converts its value (objects, maps or arrays) into a shallow observable structure
      */
     shallow(target: Object, property: string, descriptor?: PropertyDescriptor): any
-    shallow<T>(initialValues: T[]): IObservableArray<T>
-    shallow<K, V>(initialValues: Map<K, V>): ObservableMap<K, V>
-    shallow<T extends Object>(value: T): T
-
     deep(target: Object, property: string, descriptor?: PropertyDescriptor): any
-    deep<T>(initialValues: T[]): IObservableArray<T>
-    deep<K, V>(initialValues: Map<K, V>): ObservableMap<K, V>
-    deep<T>(initialValue: T): T
-
     struct(target: Object, property: string, descriptor?: PropertyDescriptor): any
-    struct<T>(initialValues: T[]): IObservableArray<T>
-    struct<K, V>(initialValues: Map<K, V>): ObservableMap<K, V>
-    struct<T>(initialValue: T): T
 }
 
 const observableFactories: IObservableFactories = {
-    box<T>(value?: T, name?: string): IObservableValue<T> {
+    box<T>(value?: T, options?: CreateObservableOptions): IObservableValue<T> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("box")
-        return new ObservableValue(value, deepEnhancer, name)
+        const o = asCreateObservableOptions(options)
+        return new ObservableValue(value, getEnhancerFromOptions(o), o.name)
     },
     shallowBox<T>(value?: T, name?: string): IObservableValue<T> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowBox")
-        return new ObservableValue(value, referenceEnhancer, name)
+        deprecated(`observable.shallowBox`, `observable.box(value, { deep: false })`)
+        return observable.box(value, { name, deep: false })
     },
-    array<T>(initialValues?: T[], name?: string): IObservableArray<T> {
+    array<T>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("array")
-        return new ObservableArray(initialValues, deepEnhancer, name) as any
+        const o = asCreateObservableOptions(options)
+        return new ObservableArray(initialValues, getEnhancerFromOptions(o), o.name) as any
     },
     shallowArray<T>(initialValues?: T[], name?: string): IObservableArray<T> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowArray")
-        return new ObservableArray(initialValues, referenceEnhancer, name) as any
+        deprecated(`observable.shallowArray`, `observable.array(values, { deep: false })`)
+        return observable.array(initialValues, { name, deep: false })
     },
     map<K, V>(
         initialValues?: IObservableMapInitialValues<K, V>,
-        name?: string
+        options?: CreateObservableOptions
     ): ObservableMap<K, V> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("map")
-        return new ObservableMap<K, V>(initialValues, deepEnhancer, name)
+        const o = asCreateObservableOptions(options)
+        return new ObservableMap<K, V>(initialValues, getEnhancerFromOptions(o), o.name)
     },
     shallowMap<K, V>(
         initialValues?: IObservableMapInitialValues<K, V>,
-        name?: string
+        options?: CreateObservableOptions
     ): ObservableMap<K, V> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowMap")
-        return new ObservableMap<K, V>(initialValues, referenceEnhancer, name)
+        deprecated(`observable.shallowMap`, `observable.map(values, { deep: false })`)
+        return observable.map(initialValues, { name, deep: false })
     },
     object<T>(
         props: T,
         decorators?: { [K in keyof T]: Function },
-        name?: string
+        options?: CreateObservableOptions
     ): T & IObservableObject {
         if (typeof arguments[1] === "string") incorrectlyUsedAsDecorator("object")
-        const res = {}
-        asObservableObject(res, name) // TODO: remove ones extendObservable takes arguments
-        // add properties
-        return extendObservable(res, props, decorators) as any
+        const o = asCreateObservableOptions(options)
+        return extendObservable({}, props, decorators, o) as any
     },
-    shallowObject<T>(
-        props: T,
-        decorators?: { [K in keyof T]: Function },
-        name?: string
-    ): T & IObservableObject {
+    shallowObject<T>(props: T, name?: string): T & IObservableObject {
         if (typeof arguments[1] === "string") incorrectlyUsedAsDecorator("shallowObject")
-        const res = {}
-        asObservableObject(res, name)
-        return extendShallowObservable(res, props, decorators) as any
+        deprecated(`observable.shallowObject`, `observable.object(values, {}, { deep: false })`)
+        return observable.object(props, {}, { name, deep: false })
     },
     ref: refDecorator,
     shallow: shallowDecorator,

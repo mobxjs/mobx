@@ -13,9 +13,10 @@ export function deepEnhancer(v, _, name) {
     if (isObservable(v)) return v
 
     // something that can be converted and mutated?
-    if (Array.isArray(v)) return observable.array(v, name)
-    if (isPlainObject(v)) return observable.object(v, undefined, name)
-    if (isES6Map(v)) return observable.map(v, name)
+    // TODO: optimize by not going through observable api's
+    if (Array.isArray(v)) return observable.array(v, { name })
+    if (isPlainObject(v)) return observable.object(v, undefined, { name })
+    if (isES6Map(v)) return observable.map(v, { name })
 
     return v
 }
@@ -23,9 +24,9 @@ export function deepEnhancer(v, _, name) {
 export function shallowEnhancer(v, _, name): any {
     if (v === undefined || v === null) return v
     if (isObservableObject(v) || isObservableArray(v) || isObservableMap(v)) return v
-    if (Array.isArray(v)) return observable.shallowArray(v, name)
-    if (isPlainObject(v)) return observable.shallowObject(v, undefined, name)
-    if (isES6Map(v)) return observable.shallowMap(v, name)
+    if (Array.isArray(v)) return observable.array(v, { name, deep: false })
+    if (isPlainObject(v)) return observable.object(v, undefined, { name, deep: false })
+    if (isES6Map(v)) return observable.map(v, { name, deep: false })
 
     return fail(
         process.env.NODE_ENV !== "production" &&
@@ -52,7 +53,11 @@ export function deepStructEnhancer(v, oldValue, name): any {
     if (isPlainObject(v)) {
         const res = {}
         asObservableObject(res, name)
-        extendObservable(res, v, undefined, deepStructOptions)
+        extendObservable(res, v, undefined, {
+            deep: false,
+            name,
+            defaultDecorator: observable.struct
+        })
         return res
     }
 
@@ -65,13 +70,6 @@ export function refStructEnhancer(v, oldValue, name): any {
 }
 
 import { observable } from "../api/observable"
-
-const deepStructOptions = {
-    deep: false,
-    name: undefined,
-    defaultDecorator: observable.struct
-}
-
 import { isObservable } from "../api/isobservable"
 import { extendObservable } from "../api/extendobservable"
 import { fail, isPlainObject, isES6Map } from "../utils/utils"

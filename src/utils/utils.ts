@@ -39,7 +39,12 @@ export function invariant(check: boolean, message: string | boolean) {
  */
 const deprecatedMessages: string[] = []
 
-export function deprecated(msg: string): boolean {
+export function deprecated(msg: string): boolean
+export function deprecated(thing: string, replacement: string): boolean
+export function deprecated(msg: string, thing?: string): boolean {
+    if (thing) {
+        return deprecated(`'${msg}', use '${thing}' instead.`)
+    }
     if (deprecatedMessages.indexOf(msg) !== -1) return false
     deprecatedMessages.push(msg)
     console.error("[mobx] Deprecated: " + msg)

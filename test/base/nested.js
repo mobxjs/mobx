@@ -14,6 +14,7 @@ test("nested computeds should not run unnecessary", () => {
         })
     }
 
+    debugger
     const store = mobx.observable({
         items: [],
         get asString() {

@@ -54,11 +54,11 @@ export function extendObservable<A extends Object, B extends Object>(
     options = asCreateObservableOptions(options)
     // TODO:
     const defaultDecorator =
-        options.defaultDecorator || (options.deep === true ? observable.deep : observable.ref)
+        options.defaultDecorator || (options.deep === false ? observable.ref : observable.deep)
     asObservableObject(target) // make sure it can be observable
     startBatch()
     try {
-        decorators = decorators || ({} as any)
+        const additionalDecorators = {} as any // don't want to modify passed in object
         const unassigned: string[] = []
         for (let key in properties) {
             const descriptor = Object.getOwnPropertyDescriptor(properties, key)!
@@ -76,13 +76,15 @@ export function extendObservable<A extends Object, B extends Object>(
             }
             if (typeof get === "function") {
                 Object.defineProperty(target, key, descriptor)
-                decorators![key] = decorators![key] || computed
+                if (!decorators || !decorators[key]) additionalDecorators[key] = computed
             } else {
                 unassigned.push(key)
-                decorators![key] = decorators![key] || defaultDecorator
+                if (!decorators || !decorators[key]) additionalDecorators[key] = defaultDecorator
             }
         }
-        decorate(target, decorators as any)
+        if (decorators) decorate(target, decorators as any)
+        // TODO: can optimize decorators away if decorators are callable
+        decorate(target, additionalDecorators)
         unassigned.forEach(key => (target[key] = properties[key])) // TODO: optimize
     } finally {
         endBatch()

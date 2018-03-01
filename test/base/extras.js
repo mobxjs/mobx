@@ -78,7 +78,7 @@ test("treeD", function() {
     })
 })
 
-test("names", function() {
+test.skip("names", function() {
     m._resetGlobalState()
     mobx._getGlobalState().mobxGuid = 0
 
