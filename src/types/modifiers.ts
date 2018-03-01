@@ -8,29 +8,7 @@ export interface IModifierDescriptor<T> {
     enhancer: IEnhancer<T>
 }
 
-export function isModifierDescriptor(thing): thing is IModifierDescriptor<any> {
-    return typeof thing === "object" && thing !== null && thing.isMobxModifierDescriptor === true
-}
-
-export function createModifierDescriptor<T>(
-    enhancer: IEnhancer<T>,
-    initialValue: T
-): IModifierDescriptor<T> {
-    if (isModifierDescriptor(initialValue)) fail("Modifiers cannot be nested")
-    return {
-        isMobxModifierDescriptor: true,
-        initialValue,
-        enhancer
-    }
-}
-
 export function deepEnhancer(v, _, name) {
-    if (isModifierDescriptor(v))
-        fail(
-            process.env.NODE_ENV !== "production" &&
-                "You tried to assign a modifier wrapped value to a collection, please define modifiers when creating the collection, not when modifying it"
-        )
-
     // it is an observable already, done
     if (isObservable(v)) return v
 
@@ -43,12 +21,6 @@ export function deepEnhancer(v, _, name) {
 }
 
 export function shallowEnhancer(v, _, name): any {
-    if (isModifierDescriptor(v))
-        fail(
-            process.env.NODE_ENV !== "production" &&
-                "You tried to assign a modifier wrapped value to a collection, please define modifiers when creating the collection, not when modifying it"
-        )
-
     if (v === undefined || v === null) return v
     if (isObservableObject(v) || isObservableArray(v) || isObservableMap(v)) return v
     if (Array.isArray(v)) return observable.shallowArray(v, name)

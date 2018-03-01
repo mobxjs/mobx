@@ -19,12 +19,7 @@ import {
 } from "./intercept-utils"
 import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
-import {
-    IEnhancer,
-    isModifierDescriptor,
-    IModifierDescriptor,
-    referenceEnhancer
-} from "./modifiers"
+import { IEnhancer, referenceEnhancer } from "./modifiers"
 import { isAction, defineBoundAction } from "../api/action"
 import { ObservableArray, IObservableArray } from "./observablearray"
 
@@ -136,16 +131,8 @@ export function defineObservablePropertyFromDescriptor(
     // not yet observable property
     if (!hasGetter) {
         // not a computed value
-        if (isModifierDescriptor(descriptor.value)) {
-            // x : ref(someValue)
-            const modifierDescriptor = descriptor.value as IModifierDescriptor<any>
-            defineObservableProperty(
-                adm,
-                propName,
-                modifierDescriptor.initialValue,
-                modifierDescriptor.enhancer
-            )
-        } else if (isAction(descriptor.value) && descriptor.value.autoBind === true) {
+        // TODO: is this first branch still used?
+        if (isAction(descriptor.value) && descriptor.value.autoBind === true) {
             defineBoundAction(adm.target, propName, descriptor.value.originalFn)
         } else if (isComputedValue(descriptor.value)) {
             // x: computed(someExpr)

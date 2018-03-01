@@ -1,11 +1,7 @@
 import { isObservableMap } from "../types/observablemap"
-import {
-    asObservableObject,
-    defineObservablePropertyFromDescriptor
-} from "../types/observableobject"
+import { asObservableObject } from "../types/observableobject"
 import { isObservable } from "./isobservable"
-import { invariant, isPropertyConfigurable, hasOwnProperty, deprecated, fail } from "../utils/utils"
-import { deepEnhancer, referenceEnhancer } from "../types/modifiers"
+import { invariant, deprecated, fail } from "../utils/utils"
 import { startBatch, endBatch } from "../core/observable"
 import {
     CreateObservableOptions,

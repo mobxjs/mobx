@@ -1,14 +1,11 @@
 import { invariant, fail } from "../utils/utils"
 import {
-    isModifierDescriptor,
     IModifierDescriptor,
     deepEnhancer,
     referenceEnhancer,
     shallowEnhancer,
     deepStructEnhancer,
-    refStructEnhancer,
-    createModifierDescriptor,
-    IEnhancer
+    refStructEnhancer
 } from "../types/modifiers"
 import { IObservableValue, ObservableValue } from "../types/observablevalue"
 import { IObservableArray, ObservableArray } from "../types/observablearray"
@@ -69,10 +66,6 @@ function createObservable(v: any) {
 
     if (process.env.NODE_ENV !== "production") {
         invariant(arguments.length === 1, "observable expects one arguments")
-        invariant(
-            !isModifierDescriptor(v),
-            "modifiers can only be used for individual object properties"
-        )
     }
 
     // it is an observable already, done
@@ -200,43 +193,10 @@ const observableFactories: IObservableFactories = {
         asObservableObject(res, name)
         return extendShallowObservable(res, props, decorators) as any
     },
-    ref() {
-        // TODO: kill all of those
-        if (arguments.length < 2) {
-            // although ref creates actually a modifier descriptor, the type of the resultig properties
-            // of the object is `T` in the end, when the descriptors are interpreted
-            return createModifierDescriptor(referenceEnhancer, arguments[0]) as any
-        } else {
-            return refDecorator.apply(null, arguments)
-        }
-    },
-    shallow() {
-        if (arguments.length < 2) {
-            // although ref creates actually a modifier descriptor, the type of the resultig properties
-            // of the object is `T` in the end, when the descriptors are interpreted
-            return createModifierDescriptor(shallowEnhancer, arguments[0]) as any
-        } else {
-            return shallowDecorator.apply(null, arguments)
-        }
-    },
-    deep() {
-        if (arguments.length < 2) {
-            // although ref creates actually a modifier descriptor, the type of the resultig properties
-            // of the object is `T` in the end, when the descriptors are interpreted
-            return createModifierDescriptor(deepEnhancer, arguments[0]) as any
-        } else {
-            return deepDecorator.apply(null, arguments)
-        }
-    },
-    struct() {
-        if (arguments.length < 2) {
-            // although ref creates actually a modifier descriptor, the type of the resultig properties
-            // of the object is `T` in the end, when the descriptors are interpreted
-            return createModifierDescriptor(deepStructEnhancer, arguments[0]) as any
-        } else {
-            return deepStructDecorator.apply(null, arguments)
-        }
-    }
+    ref: refDecorator,
+    shallow: shallowDecorator,
+    deep: deepDecorator,
+    struct: deepStructDecorator
 } as any
 
 export const observable: IObservableFactory &
@@ -252,14 +212,9 @@ export const observable: IObservableFactory &
 // weird trick to keep our typings nicely with our funcs, and still extend the observable function
 Object.keys(observableFactories).forEach(name => (observable[name] = observableFactories[name]))
 
+// TODO: MWE: really? just kill those two?
 observable.deep.struct = observable.struct
-observable.ref.struct = function() {
-    if (arguments.length < 2) {
-        return createModifierDescriptor(refStructEnhancer, arguments[0]) as any
-    } else {
-        return refStructDecorator.apply(null, arguments)
-    }
-}
+observable.ref.struct = refStructDecorator
 
 function incorrectlyUsedAsDecorator(methodName) {
     fail(

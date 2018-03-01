@@ -7,7 +7,7 @@ import {
 } from "../types/observableobject"
 import { isObservableArray, IObservableArray } from "../types/observablearray"
 import { fail, invariant } from "../utils/utils"
-import { deepEnhancer, isModifierDescriptor } from "../types/modifiers"
+import { deepEnhancer } from "../types/modifiers"
 import { startBatch, endBatch } from "../core/observable"
 
 export function keys(obj: IObservableObject): ReadonlyArray<string>
@@ -65,9 +65,8 @@ export function set(obj: any, key: any, value?: any): void {
         const existingObservable = adm.values[key]
         if (existingObservable) {
             existingObservable.set(value)
-        } else if (isModifierDescriptor(value)) {
-            defineObservableProperty(adm, key, value.initialValue, value.enhancer)
         } else {
+            // TODO: should use enhancer of the object! add tests for that
             defineObservableProperty(adm, key, value, deepEnhancer)
         }
     } else if (isObservableMap(obj)) {
