@@ -155,7 +155,8 @@ export function defineObservablePropertyFromDescriptor(
         }
     } else {
         // get x() { return 3 } set x(v) { }
-        defineComputedProperty(adm, propName, descriptor.get!, { setter: descriptor.set }, true)
+        const { set, get } = descriptor
+        defineComputedProperty(adm, propName, { get, set }, true)
     }
 }
 
@@ -193,14 +194,13 @@ export function defineObservableProperty(
 export function defineComputedProperty(
     adm: ObservableObjectAdministration,
     propName: string,
-    getter: () => any,
     options: IComputedValueOptions<any>,
     asInstanceProperty: boolean
 ) {
     if (asInstanceProperty) assertPropertyConfigurable(adm.target, propName)
     options.name = options.name || `${adm.name}.${propName}`
     options.context = adm.target
-    adm.values[propName] = new ComputedValue(getter, options)
+    adm.values[propName] = new ComputedValue(options)
     if (asInstanceProperty) {
         Object.defineProperty(adm.target, propName, generateComputedPropConfig(propName))
     }

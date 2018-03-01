@@ -24,13 +24,8 @@ function createComputedDecorator(options: IComputedValueOptions<any>) {
                 )
 
             const adm = asObservableObject(target, "")
-            defineComputedProperty(
-                adm,
-                name,
-                originalDescriptor.get,
-                { ...options, setter: originalDescriptor.set },
-                false
-            )
+            const { get, set } = originalDescriptor
+            defineComputedProperty(adm, name, { ...options, get, set }, false)
         },
         function(name) {
             const observable = this.$mobx.values[name]
@@ -71,10 +66,11 @@ export var computed: IComputed = function computed(arg1, arg2, arg3) {
         invariant(arguments.length < 3, "Computed takes one or two arguments if used as function")
     }
     const opts: IComputedValueOptions<any> = typeof arg2 === "object" ? arg2 : {}
-    opts.setter = typeof arg2 === "function" ? arg2 : opts.setter
+    opts.get = arg1
+    opts.set = typeof arg2 === "function" ? arg2 : opts.set
     opts.name = opts.name || arg1.name || "" /* for generated name */
 
-    return new ComputedValue(arg1, opts)
+    return new ComputedValue(opts)
 } as any
 
 computed.struct = computedStructDecorator

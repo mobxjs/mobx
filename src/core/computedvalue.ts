@@ -41,10 +41,11 @@ export interface IComputedValue<T> {
 }
 
 export interface IComputedValueOptions<T> {
+    get?: () => T
+    set?: (value: T) => void
+    name?: string
     compareStructural?: boolean
     equals?: IEqualsComparer<T>
-    name?: string
-    setter?: (value: T) => void
     context?: any
     requiresReaction?: boolean
 }
@@ -87,6 +88,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     triggeredBy: string
     isComputing: boolean = false // to check for cycles
     isRunningSetter: boolean = false
+    derivation: () => T
     setter: (value: T) => void
     isTracing: TraceMode = TraceMode.NONE
     public scope: Object | undefined
@@ -105,9 +107,12 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * don't want to notify observers if it is structurally the same.
      * This is useful for working with vectors, mouse coordinates etc.
      */
-    constructor(public derivation: () => T, options: IComputedValueOptions<T>) {
+    constructor(options: IComputedValueOptions<T>) {
+        if (!options.get && process.env.NODE_ENV === "production")
+            return fail("missing option for computed: get")
+        this.derivation = options.get!
         this.name = options.name || "ComputedValue@" + getNextId()
-        if (options.setter) this.setter = createAction(name + "-setter", options.setter) as any
+        if (options.set) this.setter = createAction(name + "-setter", options.set) as any
         this.equals =
             options.equals || (options.compareStructural ? comparer.structural : comparer.default)
         this.scope = options.context

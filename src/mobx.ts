@@ -15,6 +15,9 @@
  * - utils/   Utility stuff.
  *
  */
+
+// TODO: define process.env if needed
+
 export { IObservable, IDepTreeNode } from "./core/observable"
 export { Reaction, IReactionPublic, IReactionDisposer } from "./core/reaction"
 export { IDerivation, untracked, IDerivationState } from "./core/derivation"
