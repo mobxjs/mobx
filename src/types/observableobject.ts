@@ -93,7 +93,8 @@ export interface IIsObservableObject {
 }
 
 export function asObservableObject(target, name?: string): ObservableObjectAdministration {
-    if (isObservableObject(target) && target.hasOwnProperty("$mobx")) return (target as any).$mobx
+    if (isObservableObject(target) && Object.prototype.hasOwnProperty.call(target, "$mobx"))
+        return (target as any).$mobx
 
     process.env.NODE_ENV !== "production" &&
         invariant(

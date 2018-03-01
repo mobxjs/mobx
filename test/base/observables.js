@@ -1469,9 +1469,9 @@ test("verify calculation count", () => {
 test("support computed property getters / setters", () => {
     let a = observable({
         size: 1,
-        volume: mobx.computed(function() {
+        get volume() {
             return this.size * this.size
-        })
+        }
     })
 
     expect(a.volume).toBe(1)
@@ -1485,14 +1485,12 @@ test("support computed property getters / setters", () => {
     a = {}
     mobx.extendObservable(a, {
         size: 2,
-        volume: mobx.computed(
-            function() {
-                return this.size * this.size
-            },
-            function(v) {
-                this.size = Math.sqrt(v)
-            }
-        )
+        get volume() {
+            return this.size * this.size
+        },
+        set volume(v) {
+            this.size = Math.sqrt(v)
+        }
     })
 
     const values = []
@@ -1759,9 +1757,7 @@ test("Issue 1120 - isComputed should return false for a non existing property", 
     expect(mobx.isComputedProp(observable({}), "x")).toBe(false)
 })
 
-test("Issue 1121 - It should be possible to redefine a computed property", () => {
-    expect.assertions(4)
-
+test("It should not be possible to redefine a computed property", () => {
     const a = observable({
         width: 10,
         get surface() {
@@ -1769,44 +1765,27 @@ test("Issue 1121 - It should be possible to redefine a computed property", () =>
         }
     })
 
-    let observeCalls = 0
-    let reactionCalls = 0
-
-    mobx.observe(a, "surface", v => observeCalls++)
-    mobx.reaction(() => a.surface, v => reactionCalls++)
-
     expect(() => {
         mobx.extendObservable(a, {
             get surface() {
                 return this.width * 2
             }
         })
-    }).not.toThrow()
-
-    a.width = 11
-
-    expect(observeCalls).toBe(1)
-    expect(reactionCalls).toBe(1)
-    expect(a.surface).toBe(22)
+    }).toThrow(/'extendObservable' can only be used to introduce new properties/)
 })
 
-test("extendObservable should be able to set an a computed property", () => {
-    let setterCalled = false
-    const x = observable({
-        a: computed(
-            function() {
-                return this.b * 2
-            },
-            function(val) {
-                setterCalled = true
-                this.b += val
-            }
-        ),
-        b: 2
-    })
-    expect(x.a).toBe(4)
-    mobx.extendObservable(x, { b: 4, a: 7 })
-    expect(setterCalled).toBe(true)
-    expect(x.b).toBe(11)
-    expect(x.a).toBe(22)
+test("extendObservable should not be able to set a computed property", () => {
+    expect(() => {
+        const x = observable({
+            a: computed(
+                function() {
+                    return this.b * 2
+                },
+                function(val) {
+                    this.b += val
+                }
+            ),
+            b: 2
+        })
+    }).toThrow(/Passing a 'computed' as initial property value is no longer supported/)
 })

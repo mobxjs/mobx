@@ -4,7 +4,7 @@ import {
     defineObservablePropertyFromDescriptor
 } from "../types/observableobject"
 import { isObservable } from "./isobservable"
-import { invariant, isPropertyConfigurable, hasOwnProperty, deprecated } from "../utils/utils"
+import { invariant, isPropertyConfigurable, hasOwnProperty, deprecated, fail } from "../utils/utils"
 import { deepEnhancer, referenceEnhancer } from "../types/modifiers"
 import { startBatch, endBatch } from "../core/observable"
 import {
@@ -65,10 +65,19 @@ export function extendObservable<A extends Object, B extends Object>(
     try {
         const decorators: any = {}
         for (let key in properties) {
-            // TODO: using decorators is a bit inefficient, short circuit those
-            if ((target as any) === properties && !isPropertyConfigurable(target, key)) continue // see #111, skip non-configurable or non-writable props for `observable(object)`.
             const descriptor = Object.getOwnPropertyDescriptor(properties, key)!
-            if (typeof descriptor.get === "function") {
+            const { value, get } = descriptor
+            if (process.env.NODE_ENV !== "production") {
+                if (Object.getOwnPropertyDescriptor(target, key))
+                    fail(
+                        `'extendObservable' can only be used to introduce new properties. Use 'decorate' to update existing properties. The property '${key}' already exists on '${target}'`
+                    )
+                if (isComputed(value))
+                    fail(
+                        `Passing a 'computed' as initial property value is no longer supported by extendObservable. Use a getter or decorator instead`
+                    )
+            }
+            if (typeof get === "function") {
                 decorators[key] = computed
             } else if (typeof descriptor.value === "function" || isComputed(descriptor.value)) {
                 continue
