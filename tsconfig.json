@@ -13,7 +13,7 @@
         "noImplicitAny": false,
         "moduleResolution": "node",
         "lib": [
-            "es5",
+            "es2015",
             "dom"
         ]
     },
