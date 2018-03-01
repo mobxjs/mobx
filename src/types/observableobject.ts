@@ -20,7 +20,6 @@ import {
 import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
 import { IEnhancer, referenceEnhancer } from "./modifiers"
-import { isAction, defineBoundAction } from "../api/action"
 import { ObservableArray, IObservableArray } from "./observablearray"
 
 export interface IObservableObject {
@@ -105,49 +104,6 @@ export function asObservableObject(target, name?: string): ObservableObjectAdmin
     return adm
 }
 
-export function defineObservablePropertyFromDescriptor(
-    adm: ObservableObjectAdministration,
-    propName: string,
-    descriptor: PropertyDescriptor,
-    defaultEnhancer: IEnhancer<any>
-) {
-    const hasGetter = "get" in descriptor
-    const existingObservable = adm.values[propName]
-    if (existingObservable) {
-        if (isComputedValue(existingObservable) && hasGetter) {
-            // nothing, will just redefine below
-        } else if (hasGetter) {
-            return fail(
-                process.env.NODE_ENV !== "production" &&
-                    `The property ${propName} in ${adm.name} is already observable, cannot redefine it as computed property`
-            )
-        } else {
-            // already observable property
-            adm.target[propName] = descriptor.value // the property setter will make 'value' reactive if needed.
-            return
-        }
-    }
-
-    // not yet observable property
-    if (!hasGetter) {
-        // not a computed value
-        // TODO: is this first branch still used?
-        if (isAction(descriptor.value) && descriptor.value.autoBind === true) {
-            defineBoundAction(adm.target, propName, descriptor.value.originalFn)
-        } else if (isComputedValue(descriptor.value)) {
-            // x: computed(someExpr)
-            defineComputedPropertyFromComputedValue(adm, propName, descriptor.value)
-        } else {
-            // x: someValue
-            defineObservableProperty(adm, propName, descriptor.value, defaultEnhancer)
-        }
-    } else {
-        // get x() { return 3 } set x(v) { }
-        const { set, get } = descriptor
-        defineComputedProperty(adm, propName, { get, set }, true)
-    }
-}
-
 export function defineObservableProperty(
     adm: ObservableObjectAdministration,
     propName: string,
@@ -194,19 +150,6 @@ export function defineComputedProperty(
     }
 }
 
-export function defineComputedPropertyFromComputedValue(
-    adm: ObservableObjectAdministration,
-    propName: string,
-    computedValue: ComputedValue<any>
-) {
-    let name = `${adm.name}.${propName}`
-    computedValue.name = name
-    if (!computedValue.scope) computedValue.scope = adm.target
-
-    adm.values[propName] = computedValue
-    Object.defineProperty(adm.target, propName, generateComputedPropConfig(propName))
-}
-
 const observablePropertyConfigs = {}
 const computedPropertyConfigs = {}
 
@@ -245,11 +188,6 @@ export function generateComputedPropConfig(propName) {
 export function setPropertyValue(instance, key: string, newValue) {
     const adm = instance.$mobx as ObservableObjectAdministration
     const observable = adm.values[key]
-    if (observable instanceof ComputedValue)
-        return fail(
-            process.env.NODE_ENV !== "production" &&
-                `setPropertyValue cannot be used on computed values`
-        )
 
     // intercept
     if (hasInterceptors(adm)) {
