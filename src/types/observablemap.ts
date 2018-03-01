@@ -41,7 +41,8 @@ export interface IMap<K, V> {
     get(key: K): V | undefined
     has(key: K): boolean
     set(key: K, value?: V): this
-    [Symbol.toStringTag]: "Map"
+    // prettier-ignore
+    [Symbol.toStringTag]: "Map"; // necessary semicolon
     [Symbol.iterator](): IterableIterator<[K, V]>
     entries(): IterableIterator<[K, V]>
     keys(): IterableIterator<K>
@@ -390,7 +391,8 @@ export class ObservableMap<V>
  * Include the interface to cover the implementations added to the prototype directly.
  */
 export interface ObservableMap<V> {
-    [Symbol.toStringTag]: "Map"
+    // prettier-ignore
+    [Symbol.toStringTag]: "Map"; // necessary semicolon
     [Symbol.iterator](): IterableIterator<[string, V]>
 }
 
