@@ -192,10 +192,12 @@ export function toPrimitive(value) {
     return value === null ? null : typeof value === "object" ? "" + value : value
 }
 
-const stringTagSymbol = (typeof Symbol === "function" && Symbol.toStringTag) || "@@toStringTag"
+export function stringTagSymbol() {
+    return (typeof Symbol === "function" && Symbol.toStringTag) || "@@toStringTag"
+}
 
 export function declareStringTag<T>(prototType, tag: string) {
-    addHiddenFinalProp(prototType, stringTagSymbol, tag)
+    addHiddenFinalProp(prototType, stringTagSymbol(), tag)
 }
 
 import { globalState } from "../core/globalstate"
