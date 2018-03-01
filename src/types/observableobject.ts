@@ -27,7 +27,7 @@ export interface IObservableObject {
     "observable-object": IObservableObject
 }
 
-// In 3.0, change to IObjectDidChange
+// TODO: In 3.0, change to IObjectDidChange
 export interface IObjectChange {
     name: string
     object: any
