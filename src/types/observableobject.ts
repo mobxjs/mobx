@@ -51,6 +51,49 @@ export class ObservableObjectAdministration
 
     constructor(public target: any, public name: string) {}
 
+    read(propName: string) {
+        return this.values[propName].get()
+    }
+
+    write(key: string, newValue) {
+        const instance = this.target
+        const observable = this.values[key]
+
+        // intercept
+        if (hasInterceptors(this)) {
+            const change = interceptChange<IObjectWillChange>(this, {
+                type: "update",
+                object: instance,
+                name: key,
+                newValue
+            })
+            if (!change) return
+            newValue = change.newValue
+        }
+        newValue = (observable as any).prepareNewValue(newValue)
+
+        // notify spy & observers
+        if (newValue !== UNCHANGED) {
+            const notify = hasListeners(this)
+            const notifySpy = isSpyEnabled()
+            const change =
+                notify || notifySpy
+                    ? {
+                          type: "update",
+                          object: instance,
+                          oldValue: (observable as any).value,
+                          name: key,
+                          newValue
+                      }
+                    : null
+
+            if (notifySpy) spyReportStart({ ...change, name: this.name, key })
+            ;(observable as ObservableValue<any>).setNewValue(newValue)
+            if (notify) notifyListeners(this, change)
+            if (notifySpy) spyReportEnd()
+        }
+    }
+
     /**
      * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
      * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
@@ -163,7 +206,7 @@ export function generateObservablePropConfig(propName) {
                 return this.$mobx.values[propName].get()
             },
             set: function(v) {
-                setPropertyValue(this, propName, v)
+                this.$mobx.write(propName, v)
             }
         })
     )
@@ -176,52 +219,13 @@ export function generateComputedPropConfig(propName) {
             configurable: true,
             enumerable: false,
             get: function() {
-                return this.$mobx.values[propName].get()
+                return this.$mobx.read(propName)
             },
             set: function(v) {
                 return this.$mobx.values[propName].set(v)
             }
         })
     )
-}
-
-export function setPropertyValue(instance, key: string, newValue) {
-    const adm = instance.$mobx as ObservableObjectAdministration
-    const observable = adm.values[key]
-
-    // intercept
-    if (hasInterceptors(adm)) {
-        const change = interceptChange<IObjectWillChange>(adm, {
-            type: "update",
-            object: instance,
-            name: key,
-            newValue
-        })
-        if (!change) return
-        newValue = change.newValue
-    }
-    newValue = (observable as any).prepareNewValue(newValue)
-
-    // notify spy & observers
-    if (newValue !== UNCHANGED) {
-        const notify = hasListeners(adm)
-        const notifySpy = isSpyEnabled()
-        const change =
-            notify || notifySpy
-                ? {
-                      type: "update",
-                      object: instance,
-                      oldValue: (observable as any).value,
-                      name: key,
-                      newValue
-                  }
-                : null
-
-        if (notifySpy) spyReportStart({ ...change, name: adm.name, key })
-        observable.setNewValue(newValue)
-        if (notify) notifyListeners(adm, change)
-        if (notifySpy) spyReportEnd()
-    }
 }
 
 function notifyPropertyAddition(
