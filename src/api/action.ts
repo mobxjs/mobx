@@ -100,10 +100,8 @@ export var action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): 
 } as any
 
 action.bound = function boundAction(arg1, arg2?, arg3?) {
-    if (typeof arg1 === "function") {
-        const action = createAction("<not yet bound action>", arg1)
-        ;(action as any).autoBind = true
-        return action
+    if (process.env.NODE_ENV !== "production" && typeof arg1 === "function") {
+        return fail(`'action.bound' cannot be used function anymore, use decorators instead`)
     }
 
     return boundActionDecorator.apply(null, arguments)

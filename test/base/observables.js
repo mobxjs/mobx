@@ -2,9 +2,7 @@
 
 var mobx = require("../../src/mobx")
 var m = mobx
-var observable = mobx.observable
-var computed = mobx.computed
-var transaction = mobx.transaction
+const { observable, computed, transaction, action, autorun, extendObservable, decorate } = mobx
 const utils = require("../utils/test-utils")
 
 var voidObserver = function() {}
@@ -1761,4 +1759,119 @@ test("extendObservable should not be able to set a computed property", () => {
             b: 2
         })
     }).toThrow(/Passing a 'computed' as initial property value is no longer supported/)
+})
+
+test("computed comparer works with decorate (plain)", () => {
+    const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
+    function Time(hour, minute) {
+        this.hour = hour
+        this.minute = minute
+    }
+
+    Object.defineProperty(Time.prototype, "time", {
+        configurable: true,
+        enumerable: true,
+        get() {
+            return { hour: this.hour, minute: this.minute }
+        }
+    })
+    decorate(Time, {
+        hour: observable,
+        minute: observable,
+        time: computed({ equals: sameTime })
+    })
+    const time = new Time(9, 0)
+
+    const changes = []
+    const disposeAutorun = autorun(() => changes.push(time.time))
+
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 9
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.minute = 0
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 10
+    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    expect(changes).toEqual([
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test("computed comparer works with decorate (plain) - 2", () => {
+    const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
+    function Time(hour, minute) {
+        extendObservable(
+            this,
+            {
+                hour,
+                minute,
+                get time() {
+                    return { hour: this.hour, minute: this.minute }
+                }
+            },
+            {
+                time: computed({ equals: sameTime })
+            }
+        )
+    }
+    const time = new Time(9, 0)
+
+    const changes = []
+    const disposeAutorun = autorun(() => changes.push(time.time))
+
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 9
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.minute = 0
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 10
+    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    expect(changes).toEqual([
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test("computed comparer works with decorate (plain) - 3", () => {
+    const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
+    const time = observable(
+        {
+            hour: 9,
+            minute: 0,
+            get time() {
+                return { hour: this.hour, minute: this.minute }
+            }
+        },
+        {
+            time: computed({ equals: sameTime })
+        }
+    )
+
+    const changes = []
+    const disposeAutorun = autorun(() => changes.push(time.time))
+
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 9
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.minute = 0
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 10
+    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    expect(changes).toEqual([
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
 })

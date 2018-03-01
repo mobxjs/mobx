@@ -48,6 +48,7 @@
 
 * `extendObservable` can no longer be used to redefine or update existing properties! To declare existing properties to be observable use 'decorate'
 * `extendObservable(x, { y: computed(...)})` => `extendObservable(x, { get y() {}})` or `extendObservable(x, { get y() {}}, { y: computed(opts)})`
+* `action.bound` => use decorator
 
 ## Non breaking changes
 

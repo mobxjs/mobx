@@ -19,17 +19,20 @@ import { isComputed } from "./iscomputed"
 
 export function extendShallowObservable<A extends Object, B extends Object>(
     target: A,
-    properties: B
+    properties: B,
+    decorators?: { [K in keyof B]: Function }
 ): A & B {
+    // TODO: or restore?
     deprecated(
         "'extendShallowObservable' is deprecated, use 'extendObservable(target, props, { deep: false })' instead"
     )
-    return extendObservable(target, properties, shallowCreateObservableOptions)
+    return extendObservable(target, properties, decorators, shallowCreateObservableOptions)
 }
 
 export function extendObservable<A extends Object, B extends Object>(
     target: A,
     properties: B,
+    decorators?: { [K in keyof B]: Function },
     options?: CreateObservableOptions
 ): A & B {
     if (process.env.NODE_ENV !== "production") {
@@ -63,7 +66,7 @@ export function extendObservable<A extends Object, B extends Object>(
     const adm = asObservableObject(target)
     startBatch()
     try {
-        const decorators: any = {}
+        decorators = decorators || ({} as any)
         const unassigned: string[] = []
         for (let key in properties) {
             const descriptor = Object.getOwnPropertyDescriptor(properties, key)!
@@ -81,15 +84,16 @@ export function extendObservable<A extends Object, B extends Object>(
             }
             if (typeof get === "function") {
                 Object.defineProperty(target, key, descriptor)
-                decorators[key] = computed
+                decorators![key] = decorators![key] || computed
             } else if (typeof descriptor.value === "function") {
                 unassigned.push(key)
             } else {
                 unassigned.push(key)
-                decorators[key] = options!.deep === true ? observable.deep : observable.ref
+                decorators![key] =
+                    decorators![key] || options!.deep === true ? observable.deep : observable.ref
             }
         }
-        decorate(target, decorators)
+        decorate(target, decorators as any)
         unassigned.forEach(key => (target[key] = properties[key])) // TODO: optimize
     } finally {
         endBatch()

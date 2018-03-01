@@ -159,7 +159,7 @@ test("scope", () => {
         extendObservable(this, {
             y: 3,
             // this will work here
-            z() {
+            get z() {
                 return 2 * this.y
             }
         })
@@ -1205,28 +1205,137 @@ test("@computed.equals (TS)", () => {
     disposeAutorun()
 })
 
-test("computed comparer works with extendObservable (TS)", () => {
+test("computed comparer works with decorate (TS)", () => {
     const sameTime = (from: Time, to: Time) => from.hour === to.hour && from.minute === to.minute
     class Time {
-        constructor(hour: number, minute: number) {
-            this.hour = hour
-            this.minute = minute
-            extendObservable(this, {
-                hour,
-                minute,
-                time: computed(
-                    () => {
-                        return { hour: this.hour, minute: this.minute }
-                    },
-                    { equals: sameTime }
-                )
-            })
-        }
+        constructor(public hour: number, public minute: number) {}
 
-        public hour: number
-        public minute: number
+        get time() {
+            return { hour: this.hour, minute: this.minute }
+        }
+    }
+    decorate(Time, {
+        hour: observable,
+        minute: observable,
+        time: computed({ equals: sameTime })
+    })
+    const time = new Time(9, 0)
+
+    const changes: Array<{ hour: number; minute: number }> = []
+    const disposeAutorun = autorun(() => changes.push((time as any).time))
+
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 9
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.minute = 0
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 10
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    t.deepEqual(changes, [
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test("computed comparer works with decorate (TS)", () => {
+    const sameTime = (from: Time, to: Time) => from.hour === to.hour && from.minute === to.minute
+    class Time {
+        constructor(public hour: number, public minute: number) {}
+
+        get time() {
+            return { hour: this.hour, minute: this.minute }
+        }
+    }
+    decorate(Time, {
+        hour: observable,
+        minute: observable,
+        time: computed({ equals: sameTime })
+    })
+    const time = new Time(9, 0)
+
+    const changes: Array<{ hour: number; minute: number }> = []
+    const disposeAutorun = autorun(() => changes.push((time as any).time))
+
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 9
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.minute = 0
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 10
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    t.deepEqual(changes, [
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test("computed comparer works with decorate (TS) - 2", () => {
+    const sameTime = (from: Time, to: Time) => from.hour === to.hour && from.minute === to.minute
+    class Time {
+        hour: number
+        minute: number
+        readonly time: number
+
+        constructor(hour: number, minute: number) {
+            extendObservable(
+                this,
+                {
+                    hour,
+                    minute,
+                    get time() {
+                        return { hour: this.hour, minute: this.minute }
+                    }
+                },
+                {
+                    time: computed({ equals: sameTime })
+                }
+            )
+        }
     }
     const time = new Time(9, 0)
+
+    const changes: Array<{ hour: number; minute: number }> = []
+    const disposeAutorun = autorun(() => changes.push((time as any).time))
+
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 9
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.minute = 0
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 10
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    t.deepEqual(changes, [
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test("computed comparer works with decorate (TS) - 3", () => {
+    const sameTime = (from: any, to: any) => from.hour === to.hour && from.minute === to.minute
+    const time = observable(
+        {
+            hour: 9,
+            minute: 0,
+            get time() {
+                return { hour: this.hour, minute: this.minute }
+            }
+        },
+        {
+            time: computed({ equals: sameTime })
+        }
+    )
 
     const changes: Array<{ hour: number; minute: number }> = []
     const disposeAutorun = autorun(() => changes.push((time as any).time))

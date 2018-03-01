@@ -926,3 +926,122 @@ test("@computed.equals (Babel)", () => {
 
     disposeAutorun()
 })
+
+test("computed comparer works with decorate (babel)", () => {
+    const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
+    class Time {
+        constructor(hour, minute) {
+            this.hour = hour
+            this.minute = minute
+        }
+
+        get time() {
+            return { hour: this.hour, minute: this.minute }
+        }
+    }
+    decorate(Time, {
+        hour: observable,
+        minute: observable,
+        time: computed({ equals: sameTime })
+    })
+    const time = new Time(9, 0)
+
+    const changes = []
+    const disposeAutorun = autorun(() => changes.push(time.time))
+
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 9
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.minute = 0
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 10
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    t.deepEqual(changes, [
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test("computed comparer works with decorate (babel) - 2", () => {
+    const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
+    class Time {
+        hour
+        minute
+        time
+
+        constructor(hour, minute) {
+            extendObservable(
+                this,
+                {
+                    hour,
+                    minute,
+                    get time() {
+                        return { hour: this.hour, minute: this.minute }
+                    }
+                },
+                {
+                    time: computed({ equals: sameTime })
+                }
+            )
+        }
+    }
+    const time = new Time(9, 0)
+
+    const changes = []
+    const disposeAutorun = autorun(() => changes.push(time.time))
+
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 9
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.minute = 0
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 10
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    t.deepEqual(changes, [
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test("computed comparer works with decorate (babel) - 3", () => {
+    const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
+    const time = observable(
+        {
+            hour: 9,
+            minute: 0,
+            get time() {
+                return { hour: this.hour, minute: this.minute }
+            }
+        },
+        {
+            time: computed({ equals: sameTime })
+        }
+    )
+
+    const changes = []
+    const disposeAutorun = autorun(() => changes.push(time.time))
+
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 9
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.minute = 0
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 10
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    t.deepEqual(changes, [
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
