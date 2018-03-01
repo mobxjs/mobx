@@ -131,3 +131,5 @@ test("array - set, remove, values are reactive", () => {
         [3, 4]
     ])
 })
+
+// TODO: test: observe and intercept property additions

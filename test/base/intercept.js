@@ -86,20 +86,18 @@ test("intercept object", () => {
         b: 3
     })
 
-    // bit magical, but intercept makes a observable, to be consistent with observe.
-    // deprecated immediately :)
-    var d = intercept(a, c => {
-        c.newValue *= 3
-        return c
+    var d = intercept(a, change => {
+        change.newValue *= 3
+        return change
     })
 
     a.b = 4
 
     expect(a.b).toBe(12)
 
-    var d2 = intercept(a, "b", c => {
-        c.newValue += 1
-        return c
+    var d2 = intercept(a, "b", change => {
+        change.newValue += 1
+        return change
     })
 
     a.b = 5
@@ -117,22 +115,27 @@ test("intercept object", () => {
     d3()
     a.b = 7
     expect(a.b).toBe(22)
+})
 
-    var d4 = intercept(a, c => {
-        if (c.type === "add") {
+test.skip("intercept property additions", () => {
+    // TODO: in mobx3 it was possible to intercept object extension through extendObservable,
+    // in the new decorator approach that is not possible anymore, should it?
+    var a = m.observable({})
+    var d4 = intercept(a, change => {
+        if (change.type === "add") {
             return null
         }
-        return c
+        return change
     })
 
-    m.extendObservable(a, { c: 1 })
+    m.extendObservable(a, { c: 1 }) // not added!
     expect(a.c).toBe(undefined)
     expect(m.isObservableProp(a, "c")).toBe(false)
 
     d4()
 
     m.extendObservable(a, { c: 2 })
-    expect(a.c).toBe(6)
+    expect(a.c).toBe(2)
     expect(m.isObservableProp(a, "c")).toBe(true)
 })
 

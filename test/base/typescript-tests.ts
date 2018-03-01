@@ -159,7 +159,9 @@ test("scope", () => {
         extendObservable(this, {
             y: 3,
             // this will work here
-            z: computed(() => 2 * this.y)
+            z() {
+                return 2 * this.y
+            }
         })
     }
 

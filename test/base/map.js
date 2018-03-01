@@ -242,11 +242,11 @@ test("issue 119 - unobserve before delete", function() {
     })
     myObservable.myMap.set("myId", {
         myProp: "myPropValue",
-        myCalculatedProp: mobx.computed(function() {
+        get myCalculatedProp() {
             if (myObservable.myMap.has("myId"))
                 return myObservable.myMap.get("myId").myProp + " calculated"
             return undefined
-        })
+        }
     })
     // the error only happens if the value is observed
     mobx.autorun(function() {
@@ -459,12 +459,12 @@ test("798, cannot return observable map from computed prop", () => {
     const customerSearchStore = function() {
         var customerSearchStore = mobx.observable({
             customerType: "RUBY",
-            searchTypeFormStore: mobx.computed(function() {
+            searchTypeFormStore() {
                 return form(customerSearchStore.customerType)
-            }),
-            customerSearchType: mobx.computed(function() {
+            },
+            customerSearchType() {
                 return form(customerSearchStore.searchTypeFormStore.model.value)
-            })
+            }
         })
         return customerSearchStore
     }
