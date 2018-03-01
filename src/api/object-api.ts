@@ -44,10 +44,19 @@ export function values(obj: any): string[] {
     )
 }
 
-export function set(obj: IObservableObject, key: string, value: any)
-export function set<K, V>(obj: ObservableMap<K, V>, key: K, value: V)
+export function set<V>(obj: ObservableMap<string, V>, values: { [key: string]: V })
+export function set(obj: IObservableObject, values: { [key: string]: any })
 export function set<T>(obj: IObservableArray<T>, index: number, value: T)
-export function set(obj: any, key: any, value: any): void {
+export function set<K, V>(obj: ObservableMap<K, V>, key: K, value: V)
+export function set(obj: IObservableObject, key: string, value: any)
+export function set(obj: any, key: any, value?: any): void {
+    if (arguments.length === 2) {
+        startBatch()
+        const values = key
+        for (let key in values) set(obj, key, values[key])
+        endBatch()
+        return
+    }
     if (isObservableObject(obj)) {
         const adm = ((obj as any) as IIsObservableObject).$mobx
         const existingObservable = adm.values[key]

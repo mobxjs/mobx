@@ -72,7 +72,7 @@ export function extendObservable<A extends Object, B extends Object>(
             if (process.env.NODE_ENV !== "production") {
                 if (Object.getOwnPropertyDescriptor(target, key))
                     fail(
-                        `'extendObservable' can only be used to introduce new properties. Use 'decorate' to update existing properties. The property '${key}' already exists on '${target}'`
+                        `'extendObservable' can only be used to introduce new properties. Use 'set' or 'decorate' instead. The property '${key}' already exists on '${target}'`
                     )
                 if (isComputed(value))
                     fail(
