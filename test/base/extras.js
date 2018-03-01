@@ -212,7 +212,7 @@ test("get atom", function() {
     f()
 })
 
-test("get debug name", function() {
+test.skip("get debug name", function() {
     mobx._resetGlobalState()
     mobx._getGlobalState().mobxGuid = 0 // hmm dangerous reset?
 

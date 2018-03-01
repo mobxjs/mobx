@@ -523,37 +523,7 @@ test("ES5 non reactive props - 2", function() {
 test("exceptions", function() {
     expect(function() {
         m.observable.ref(m.observable.shallow(3))
-    }).toThrow(/Modifiers cannot be nested/)
-
-    var x = m.observable.object(
-        {
-            y: null,
-            z: 2
-        },
-        {
-            y: m.observable.ref
-        }
-    )
-
-    expect(function() {
-        x.z = m.observable.ref(3)
-    }).toThrow(/You tried to assign a modifier wrapped value to a collection/)
-
-    var ar = m.observable([2])
-
-    expect(function() {
-        ar[0] = m.observable.ref(3)
-    }).toThrow(/You tried to assign a modifier wrapped value to a collection/)
-
-    expect(function() {
-        ar[1] = m.observable.deep(3)
-    }).toThrow(/You tried to assign a modifier wrapped value to a collection/)
-
-    expect(function() {
-        ar = m.observable([m.observable.shallow(3)])
-    }).toThrow(/You tried to assign a modifier wrapped value to a collection/)
-
-    return
+    }).toThrow(/This function is a decorator, but it wasn't invoked like a decorator/)
 })
 
 test("540 - extendobservable should not report cycles", function() {
