@@ -37,8 +37,8 @@ export function extendObservable<A extends Object, B extends Object>(
 ): A & B {
     if (process.env.NODE_ENV !== "production") {
         invariant(
-            arguments.length === 2 || arguments.length === 3,
-            "'extendObservable' expected 2 or 3 arguments"
+            arguments.length >= 2 && arguments.length <= 4,
+            "'extendObservable' expected 2-4 arguments"
         )
         invariant(
             typeof target === "object",
@@ -47,10 +47,6 @@ export function extendObservable<A extends Object, B extends Object>(
         invariant(
             !isObservableMap(target),
             "'extendObservable' should not be used on maps, use map.merge instead"
-        )
-        invariant(
-            typeof properties === "object",
-            "All arguments of 'extendObservable' should be objects"
         )
         invariant(
             !isObservable(properties),

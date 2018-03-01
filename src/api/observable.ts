@@ -62,7 +62,7 @@ const refStructDecorator = createDecoratorForEnhancer(refStructEnhancer)
  * Turns an object, array or function into a reactive structure.
  * @param v the value which should become observable.
  */
-function createObservable(v: any = undefined) {
+function createObservable(v: any) {
     // @observable someProp;
     if (typeof arguments[1] === "string") return deepDecorator.apply(null, arguments)
 
@@ -100,6 +100,7 @@ export interface IObservableFactory {
 }
 
 export interface IObservableFactories {
+    // TODO: replace name with CreateObservableOptions
     box<T>(value?: T, name?: string): IObservableValue<T>
     shallowBox<T>(value?: T, name?: string): IObservableValue<T>
     array<T>(initialValues?: T[], name?: string): IObservableArray<T>
@@ -109,8 +110,17 @@ export interface IObservableFactories {
         initialValues?: IObservableMapInitialValues<K, V>,
         name?: string
     ): ObservableMap<K, V>
-    object<T>(props: T, name?: string): T & IObservableObject
-    shallowObject<T>(props: T, name?: string): T & IObservableObject
+
+    object<T>(
+        props: T,
+        decorators?: { [K in keyof T]: Function },
+        name?: string
+    ): T & IObservableObject
+    shallowObject<T>(
+        props: T,
+        decorators?: { [K in keyof T]: Function },
+        name?: string
+    ): T & IObservableObject
 
     /**
      * Decorator that creates an observable that only observes the references, but doesn't try to turn the assigned value into an observable.ts.
@@ -168,18 +178,26 @@ const observableFactories: IObservableFactories = {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowMap")
         return new ObservableMap<K, V>(initialValues, referenceEnhancer, name)
     },
-    object<T>(props: T, name?: string): T & IObservableObject {
-        if (arguments.length > 2) incorrectlyUsedAsDecorator("object")
+    object<T>(
+        props: T,
+        decorators?: { [K in keyof T]: Function },
+        name?: string
+    ): T & IObservableObject {
+        if (typeof arguments[1] === "string") incorrectlyUsedAsDecorator("object")
         const res = {}
         asObservableObject(res, name) // TODO: remove ones extendObservable takes arguments
         // add properties
-        return extendObservable(res, props) as any
+        return extendObservable(res, props, decorators) as any
     },
-    shallowObject<T>(props: T, name?: string): T & IObservableObject {
-        if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowObject")
+    shallowObject<T>(
+        props: T,
+        decorators?: { [K in keyof T]: Function },
+        name?: string
+    ): T & IObservableObject {
+        if (typeof arguments[1] === "string") incorrectlyUsedAsDecorator("shallowObject")
         const res = {}
         asObservableObject(res, name)
-        return extendShallowObservable(res, props) as any
+        return extendShallowObservable(res, props, decorators) as any
     },
     ref() {
         if (arguments.length < 2) {

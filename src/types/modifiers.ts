@@ -36,7 +36,7 @@ export function deepEnhancer(v, _, name) {
 
     // something that can be converted and mutated?
     if (Array.isArray(v)) return observable.array(v, name)
-    if (isPlainObject(v)) return observable.object(v, name)
+    if (isPlainObject(v)) return observable.object(v, undefined, name)
     if (isES6Map(v)) return observable.map(v, name)
 
     return v
@@ -52,7 +52,7 @@ export function shallowEnhancer(v, _, name): any {
     if (v === undefined || v === null) return v
     if (isObservableObject(v) || isObservableArray(v) || isObservableMap(v)) return v
     if (Array.isArray(v)) return observable.shallowArray(v, name)
-    if (isPlainObject(v)) return observable.shallowObject(v, name)
+    if (isPlainObject(v)) return observable.shallowObject(v, undefined, name)
     if (isES6Map(v)) return observable.shallowMap(v, name)
 
     return fail(
@@ -86,7 +86,7 @@ export function deepStructEnhancer(v, oldValue, name): any {
     if (isPlainObject(v)) {
         const res = {}
         asObservableObject(res, name)
-        extendObservable(res, v, deepStructOptions)
+        extendObservable(res, v, undefined, deepStructOptions)
         return res
     }
 

@@ -345,6 +345,7 @@ test("extend observable multiple prop maps", function() {
     expect(() => {
         mobx.extendObservable(
             x,
+            {},
             {
                 b: 2,
                 c: 2
@@ -1843,7 +1844,7 @@ test("computed comparer works with decorate (plain) - 2", () => {
 
 test("computed comparer works with decorate (plain) - 3", () => {
     const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
-    const time = observable(
+    const time = observable.object(
         {
             hour: 9,
             minute: 0,
