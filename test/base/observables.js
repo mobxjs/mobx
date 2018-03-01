@@ -320,24 +320,6 @@ test("props2", function() {
     expect(36).toBe(order.total)
 })
 
-test("props3", function() {
-    var vat = observable.box(0.2)
-    var Order = function() {
-        this.price = 20
-        this.amount = 2
-        this.total = mobx.computed(function() {
-            return (1 + vat.get()) * this.price * this.amount // price and amount are now properties!
-        })
-        mobx.extendObservable(this, this)
-    }
-
-    var order = new Order()
-    expect(48).toBe(order.total)
-    order.price = 10
-    order.amount = 3
-    expect(36).toBe(order.total)
-})
-
 test("props4", function() {
     function Bzz() {
         mobx.extendObservable(this, {
@@ -381,14 +363,14 @@ test("extend observable multiple prop maps", function() {
 test("object enumerable props", function() {
     var x = mobx.observable({
         a: 3,
-        b: mobx.computed(function() {
+        get b() {
             return 2 * this.a
-        })
+        }
     })
     mobx.extendObservable(x, { c: 4 })
     var ar = []
     for (var key in x) ar.push(key)
-    expect(ar).toEqual(["a", "c"]) // or should 'b' be in here as well?
+    expect(ar).toEqual(["a", "c"])
 })
 
 test("observe property", function() {
@@ -446,7 +428,6 @@ test("observe object", function() {
 
     a.a = 2
     mobx.extendObservable(a, {
-        a: 3,
         b: 3
     })
     a.a = 4
@@ -460,13 +441,6 @@ test("observe object", function() {
             oldValue: 1
         },
         {
-            type: "update",
-            object: a,
-            name: "a",
-            newValue: 3,
-            oldValue: 2
-        },
-        {
             type: "add",
             object: a,
             newValue: 3,
@@ -477,7 +451,7 @@ test("observe object", function() {
             object: a,
             name: "a",
             newValue: 4,
-            oldValue: 3
+            oldValue: 2
         },
         {
             type: "update",

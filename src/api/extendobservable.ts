@@ -64,9 +64,11 @@ export function extendObservable<A extends Object, B extends Object>(
     startBatch()
     try {
         const decorators: any = {}
+        const unassigned: string[] = []
         for (let key in properties) {
             const descriptor = Object.getOwnPropertyDescriptor(properties, key)!
             const { value, get } = descriptor
+            // TODO: introduce and check decorators arg
             if (process.env.NODE_ENV !== "production") {
                 if (Object.getOwnPropertyDescriptor(target, key))
                     fail(
@@ -78,15 +80,17 @@ export function extendObservable<A extends Object, B extends Object>(
                     )
             }
             if (typeof get === "function") {
+                Object.defineProperty(target, key, descriptor)
                 decorators[key] = computed
-            } else if (typeof descriptor.value === "function" || isComputed(descriptor.value)) {
-                continue
+            } else if (typeof descriptor.value === "function") {
+                unassigned.push(key)
             } else {
+                unassigned.push(key)
                 decorators[key] = options!.deep === true ? observable.deep : observable.ref
             }
-            Object.defineProperty(target, key, descriptor)
         }
         decorate(target, decorators)
+        unassigned.forEach(key => (target[key] = properties[key])) // TODO: optimize
     } finally {
         endBatch()
     }
