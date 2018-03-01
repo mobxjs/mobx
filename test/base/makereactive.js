@@ -697,3 +697,19 @@ test("compare structurally, ref", () => {
 
     d()
 })
+
+test.skip("double declare property", () => {
+    const o = {}
+    mobx.extendObservable(o, {
+        a: 5
+    })
+    expect(() => {
+        mobx.extendObservable(
+            o,
+            {},
+            {
+                a: mobx.observable.ref // a is getter at this point
+            }
+        )
+    }).toThrow(/something better than this/)
+})
