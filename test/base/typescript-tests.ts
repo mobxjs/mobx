@@ -1160,11 +1160,11 @@ test("803 - action.bound and action preserve type info", () => {
         })
     )
 
-    const bound = action.bound(() => {
+    const bound = action(() => {
         return { x: "3" } as Object
     }) as () => void
 
-    const bound2 = action.bound(function() {}) as (() => void)
+    const bound2 = action(function() {}) as (() => void)
 })
 
 test("@computed.equals (TS)", () => {
@@ -1324,7 +1324,7 @@ test("computed comparer works with decorate (TS) - 2", () => {
 
 test("computed comparer works with decorate (TS) - 3", () => {
     const sameTime = (from: any, to: any) => from.hour === to.hour && from.minute === to.minute
-    const time = observable(
+    const time = observable.object(
         {
             hour: 9,
             minute: 0,

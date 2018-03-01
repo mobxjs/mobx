@@ -67,7 +67,7 @@ function createObservable(v: any) {
     if (typeof arguments[1] === "string") return deepDecorator.apply(null, arguments)
 
     if (process.env.NODE_ENV !== "production") {
-        invariant(arguments.length <= 1, "observable expects zero or one arguments")
+        invariant(arguments.length === 1, "observable expects one arguments")
         invariant(
             !isModifierDescriptor(v),
             "modifiers can only be used for individual object properties"
@@ -113,12 +113,12 @@ export interface IObservableFactories {
 
     object<T>(
         props: T,
-        decorators?: { [K in keyof T]: Function },
+        decorators?: { [K in keyof T]?: Function },
         name?: string
     ): T & IObservableObject
     shallowObject<T>(
         props: T,
-        decorators?: { [K in keyof T]: Function },
+        decorators?: { [K in keyof T]?: Function },
         name?: string
     ): T & IObservableObject
 

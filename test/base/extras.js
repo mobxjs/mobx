@@ -229,7 +229,7 @@ test("get debug name", function() {
     var e = mobx.computed(() => 3)
     var f = mobx.autorun(() => c.has("b"))
     var g = new Clazz()
-    var h = mobx.observable({ b: function() {}, c: mobx.computed(function() {}) })
+    var h = mobx.observable({ b: function() {}, c() {} })
 
     function name(thing, prop) {
         return mobx.getDebugName(thing, prop)

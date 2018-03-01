@@ -20,7 +20,7 @@ import { isComputed } from "./iscomputed"
 export function extendShallowObservable<A extends Object, B extends Object>(
     target: A,
     properties: B,
-    decorators?: { [K in keyof B]: Function }
+    decorators?: { [K in keyof B]?: Function }
 ): A & B {
     // TODO: or restore?
     deprecated(
@@ -32,7 +32,7 @@ export function extendShallowObservable<A extends Object, B extends Object>(
 export function extendObservable<A extends Object, B extends Object>(
     target: A,
     properties: B,
-    decorators?: { [K in keyof B]: Function },
+    decorators?: { [K in keyof B]?: Function },
     options?: CreateObservableOptions
 ): A & B {
     if (process.env.NODE_ENV !== "production") {
