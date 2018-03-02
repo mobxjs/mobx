@@ -8,6 +8,7 @@ import {
     invariant,
     assertPropertyConfigurable,
     isPlainObject,
+    fail,
     addHiddenFinalProp
 } from "../utils/utils"
 import { runLazyInitializers } from "../utils/decorators"

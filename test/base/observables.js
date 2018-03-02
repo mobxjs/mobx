@@ -1675,8 +1675,6 @@ test("computed equals function only invoked when necessary", () => {
 // document that extendObservable is not inheritance compatible,
 // and make sure this does work with decorate
 test("Issue 1092 - Should not access attributes of siblings in the prot. chain", () => {
-    expect.assertions(2)
-
     // The parent is an observable
     // and has an attribute
     const parent = {}
@@ -1700,13 +1698,16 @@ test("Issue 1092 - Should not access attributes of siblings in the prot. chain",
     expect(typeof child2.attribute).toBe("undefined")
 
     // We still should be able to read the value from the parent
-    expect(child2.staticObservable).toBe(11)
+    expect(() => {
+        child2.staticObservable
+    }).toThrow(/accessed through the prototype chain/)
+    expect(() => {
+        child2.staticObservable = 3
+    }).toThrow(/accessed through the prototype chain/)
 
-    // but, when writing, the value should be on the new instance!
-    child2.staticObservable = 13
-    expect(child2.staticObservable).toBe(13)
     expect(parent.staticObservable).toBe(11)
-    expect(child1.staticObservable).toBe(11)
+    parent.staticObservable = 12
+    expect(parent.staticObservable).toBe(12)
 })
 
 test("Issue 1092 - We should be able to define observable on all siblings", () => {

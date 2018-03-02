@@ -48,7 +48,7 @@ export function initializeInstance(target: DecoratorTarget) {
     if (decorators)
         for (let key in decorators) {
             const d = decorators[key]
-            d.propertyCreator(target, d.prop, d.initializer && d.initializer())
+            d.propertyCreator(target, d.prop, d.initializer && d.initializer.call(target))
         }
 }
 
