@@ -55,7 +55,14 @@ export function createPropDecorator(propertyCreator: PropertyCreator) {
         prop: string,
         descriptor: BabelDescriptor | undefined
     ) {
-        if (!target.__mobxDecorators) addHiddenProp(target, "__mobxDecorators", [])
+        if (!Object.prototype.hasOwnProperty.call(target, "__mobxDecorators")) {
+            const inheritedDecorators = target.__mobxDecorators
+            addHiddenProp(
+                target,
+                "__mobxDecorators",
+                inheritedDecorators ? inheritedDecorators.slice() : []
+            )
+        }
         target.__mobxDecorators!.push({
             prop,
             propertyCreator,

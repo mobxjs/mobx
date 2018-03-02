@@ -666,7 +666,7 @@ test("288 atom not detected for object property", () => {
     )
 })
 
-test("observable performance", () => {
+test.skip("observable performance", () => {
     const AMOUNT = 100000
 
     class A {
@@ -1472,4 +1472,17 @@ test("unread computed reads should trow with requiresReaction enabled", () => {
     expect(() => {
         a.y
     }).toThrow(/is read outside a reactive context/)
+})
+
+test("multiple inheritance should work", () => {
+    debugger
+    class A {
+        @observable x = 1
+    }
+
+    class B extends A {
+        @observable y = 1
+    }
+
+    expect(mobx.keys(new B())).toEqual(["x", "y"])
 })
