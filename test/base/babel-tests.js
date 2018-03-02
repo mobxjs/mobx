@@ -1043,3 +1043,14 @@ test("computed comparer works with decorate (babel) - 3", () => {
 
     disposeAutorun()
 })
+
+test.skip("actions are not reassignable", () => {
+    class A {
+        @action m2 = () => {} // non-enumerable, on self
+    }
+
+    const a = new A()
+    expect(isAction(a.m2)).toBe(true)
+    a.m2 = () => {}
+    expect(isAction(a.m2)).toBe(true)
+})

@@ -1,3 +1,5 @@
+"use strict"
+
 import {
     observe,
     computed,
@@ -1574,4 +1576,15 @@ test("multiple inheritance should work", () => {
     }
 
     expect(mobx.keys(new B())).toEqual(["x", "y"])
+})
+
+test.skip("actions are reassignable", () => {
+    class A {
+        @action m2 = () => {} // non-enumerable, on self
+    }
+
+    const a = new A()
+    expect(isAction(a.m2)).toBe(true)
+    a.m2 = () => {}
+    expect(isAction(a.m2)).toBe(true)
 })

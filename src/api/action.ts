@@ -102,6 +102,35 @@ function actionFieldDecorator(name: string) {
     }
 }
 
+const boundActionDecorator = createPropDecorator(
+    false,
+    (
+        instance: any,
+        propertyName: string,
+        descriptor: any,
+        decoratorTarget: any,
+        decoratorArgs: any[]
+    ) => {
+        if (descriptor)
+            defineBoundAction(
+                instance,
+                propertyName,
+                descriptor.value || descriptor.initializer.call(instance)
+            )
+        else
+            Object.defineProperty(instance, propertyName, {
+                enumerable: false,
+                configurable: true,
+                set(v) {
+                    defineBoundAction(this, propertyName, v)
+                },
+                get() {
+                    return undefined
+                }
+            })
+    }
+)
+
 const actionFieldDecoratorOld = createClassPropertyDecorator(
     function(target, key, value, args, originalDescriptor) {
         const actionName =
@@ -117,7 +146,7 @@ const actionFieldDecoratorOld = createClassPropertyDecorator(
     true
 )
 
-const boundActionDecorator = createClassPropertyDecorator(
+const boundActionDecorator2 = createClassPropertyDecorator(
     function(target, key, value) {
         defineBoundAction(target, key, value)
     },
@@ -154,12 +183,12 @@ action.bound = function boundAction(arg1, arg2?, arg3?) {
 
 function namedActionDecorator(name: string) {
     return function(target, prop, descriptor: BabelDescriptor) {
-        // babel / typescript
-        // @action method() { }
         if (descriptor) {
             if (process.env.NODE_ENV !== "production" && descriptor.get !== undefined) {
                 return fail("@action cannot be used with getters")
             }
+            // babel / typescript
+            // @action method() { }
             if (descriptor.value) {
                 // typescript
                 return {
@@ -169,14 +198,15 @@ function namedActionDecorator(name: string) {
                     writable: true // for typescript, this must be writable, otherwise it cannot inherit :/ (see inheritable actions test)
                 }
             }
-            // babel
+            // babel only: @action method = () => {}
+            const { initializer } = descriptor
             return {
                 enumerable: false,
                 configurable: false,
                 writable: false,
                 initializer() {
                     // N.B: we can't immediately invoke initializer; this would be wrong
-                    return createAction(name, descriptor.initializer!.call(this))
+                    return createAction(name, initializer!.call(this))
                 }
             }
         }
