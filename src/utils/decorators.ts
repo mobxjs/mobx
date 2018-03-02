@@ -1,4 +1,5 @@
 import { invariant, addHiddenProp, hasOwnProperty } from "./utils"
+import { initializeInstance } from "./decorators2"
 
 /**
  * Constructs a decorator, that normalizes the differences between
@@ -152,6 +153,7 @@ export function runLazyInitializers(instance) {
         instance.__mobxDidRunLazyInitializers &&
             instance.__mobxLazyInitializers.forEach(initializer => initializer(instance))
     }
+    initializeInstance(instance)
 }
 
 function quacksLikeADecorator(args: IArguments): boolean {

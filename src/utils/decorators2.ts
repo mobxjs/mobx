@@ -1,7 +1,8 @@
 import { addHiddenProp } from "./utils"
 
 type DecoratorTarget = {
-    __mobxDecorators?: DecoratorInvocationDescription[]
+    __mobxDidRunLazyInitializers2?: boolean // TODO: rename
+    __mobxDecorators?: { [prop: string]: DecoratorInvocationDescription }
 }
 
 type BabelDescriptor = PropertyDescriptor & { initializer?: () => any }
@@ -40,12 +41,15 @@ function decorateObservable(target: any, prop: string, descriptor: any) {
     return createEnumerableInitDescriptor(prop)
 }
 
-function initializeInstance(target: DecoratorTarget) {
-    const decorators = target.__mobxDecorators!
-    for (let i = 0; i < decorators.length; i++) {
-        const d = decorators[i]
-        d.propertyCreator(target, d.prop, d.initializer && d.initializer())
-    }
+export function initializeInstance(target: DecoratorTarget) {
+    if (target.__mobxDidRunLazyInitializers2 === true) return
+    addHiddenProp(target, "__mobxDidRunLazyInitializers2", true)
+    const decorators = target.__mobxDecorators
+    if (decorators)
+        for (let key in decorators) {
+            const d = decorators[key]
+            d.propertyCreator(target, d.prop, d.initializer && d.initializer())
+        }
 }
 
 // TODO: add param, declare enumerable
@@ -57,17 +61,13 @@ export function createPropDecorator(propertyCreator: PropertyCreator) {
     ) {
         if (!Object.prototype.hasOwnProperty.call(target, "__mobxDecorators")) {
             const inheritedDecorators = target.__mobxDecorators
-            addHiddenProp(
-                target,
-                "__mobxDecorators",
-                inheritedDecorators ? inheritedDecorators.slice() : []
-            )
+            addHiddenProp(target, "__mobxDecorators", { ...inheritedDecorators })
         }
-        target.__mobxDecorators!.push({
+        target.__mobxDecorators[prop] = {
             prop,
             propertyCreator,
-            initializer: descriptor && descriptor.initializer
-        })
+            initializer: descriptor && (descriptor.initializer || (() => descriptor.value))
+        }
         return createEnumerableInitDescriptor(prop)
     }
     // TODO: story property creator on return thing directly

@@ -53,7 +53,6 @@ const t = {
 }
 
 test("decorators", () => {
-    debugger
     class Order {
         @observable price: number = 3
         @observable amount: number = 2
@@ -1400,8 +1399,8 @@ test("typescript - decorate works with objects", () => {
             // size: observable // MWE: enabling this should give type error!
         }
     )
-    expect(b.height).toBe(2)
     expect(mobx.isObservableProp(b, "height")).toBe(true)
+    expect(b.height).toBe(2)
 })
 
 test("typescript - decorate works with Object.create", () => {
@@ -1415,8 +1414,8 @@ test("typescript - decorate works with Object.create", () => {
     })
 
     const b = Object.create(Box)
-    expect(b.height).toBe(2)
     expect(mobx.isObservableProp(b, "height")).toBe(true)
+    expect(b.height).toBe(2)
 })
 
 test("issue #1122", done => {
@@ -1475,7 +1474,6 @@ test("unread computed reads should trow with requiresReaction enabled", () => {
 })
 
 test("multiple inheritance should work", () => {
-    debugger
     class A {
         @observable x = 1
     }
