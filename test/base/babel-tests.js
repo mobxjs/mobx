@@ -607,7 +607,7 @@ test("enumerability", () => {
     expect(a.hasOwnProperty("m2")).toBe(true)
 })
 
-test("enumerability - workaround", () => {
+test.skip("enumerability - workaround", () => {
     class A {
         @observable a = 1 // enumerable, on proto
         @observable a2 = 2

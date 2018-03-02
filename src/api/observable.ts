@@ -69,41 +69,6 @@ const refDecorator = createDecoratorForEnhancer(referenceEnhancer)
 const deepStructDecorator = createDecoratorForEnhancer(deepStructEnhancer)
 const refStructDecorator = createDecoratorForEnhancer(refStructEnhancer)
 
-const deepDecorator2 = createPropDecorator(
-    (target: any, propertyName: string, initialValue: string) => {
-        defineObservableProperty(target, propertyName, initialValue, deepEnhancer)
-    }
-)
-
-function createObservableDescriptor(prop: string) {
-    // TODO: cache
-    return {
-        configurable: true, // TODO: false?
-        enumerable: true,
-        get() {
-            initializeObservableObject(this)
-            return this[prop]
-        },
-        set(value) {
-            initializeObservableObject(this)
-            this[prop] = value
-        }
-    }
-}
-
-function initializeObservableObject(target) {
-    const decorators = target.__mobxDecorators
-    decorators.forEach(({ prop, initializer }) => {
-        defineObservableProperty(target, prop, initializer && initializer(), deepEnhancer)
-    })
-}
-
-function decorateObservable(target: any, prop: string, descriptor: any) {
-    if (!target.__mobxDecorators) addHiddenProp(target, "__mobxDecorators", [])
-    target.__mobxDecorators.push({ prop, initializer: descriptor && descriptor.initializer })
-    return createObservableDescriptor(prop)
-}
-
 /**
  * Turns an object, array or function into a reactive structure.
  * @param v the value which should become observable.
@@ -111,7 +76,7 @@ function decorateObservable(target: any, prop: string, descriptor: any) {
 function createObservable(v: any) {
     // @observable someProp;
     if (typeof arguments[1] === "string") {
-        return deepDecorator2.apply(null, arguments)
+        return deepDecorator.apply(null, arguments)
     }
 
     if (process.env.NODE_ENV !== "production") {

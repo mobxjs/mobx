@@ -1,4 +1,4 @@
-import { addHiddenProp } from "./utils"
+import { addHiddenProp, fail } from "./utils"
 
 type DecoratorTarget = {
     __mobxDidRunLazyInitializers2?: boolean // TODO: rename
@@ -59,6 +59,8 @@ export function createPropDecorator(propertyCreator: PropertyCreator) {
         prop: string,
         descriptor: BabelDescriptor | undefined
     ) {
+        if (process.env.NODE_ENV !== "production" && !quacksLikeADecorator(arguments))
+            fail("This function is a decorator, but it wasn't invoked like a decorator")
         if (!Object.prototype.hasOwnProperty.call(target, "__mobxDecorators")) {
             const inheritedDecorators = target.__mobxDecorators
             addHiddenProp(target, "__mobxDecorators", { ...inheritedDecorators })
@@ -72,4 +74,8 @@ export function createPropDecorator(propertyCreator: PropertyCreator) {
     }
     // TODO: story property creator on return thing directly
     // TODO: surround with factory
+}
+
+export function quacksLikeADecorator(args: IArguments): boolean {
+    return (args.length === 2 || args.length === 3) && typeof args[1] === "string"
 }
