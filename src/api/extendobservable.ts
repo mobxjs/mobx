@@ -1,5 +1,9 @@
 import { isObservableMap } from "../types/observablemap"
-import { asObservableObject, defineObservableProperty } from "../types/observableobject"
+import {
+    asObservableObject,
+    defineObservableProperty,
+    defineComputedProperty
+} from "../types/observableobject"
 import { isObservable } from "./isobservable"
 import { invariant, deprecated, fail } from "../utils/utils"
 import { startBatch, endBatch } from "../core/observable"
@@ -56,7 +60,7 @@ export function extendObservable<A extends Object, B extends Object>(
     // TODO:
     const defaultDecorator =
         options.defaultDecorator || (options.deep === false ? observable.ref : observable.deep)
-    const adm = asObservableObject(target) // make sure it can be observable
+    asObservableObject(target) // make sure object is observable, even without initial props
     startBatch()
     try {
         const additionalDecorators = {} as any // don't want to modify passed in object
@@ -76,11 +80,18 @@ export function extendObservable<A extends Object, B extends Object>(
                     )
             }
             if (typeof get === "function") {
-                Object.defineProperty(target, key, descriptor)
-                if (!decorators || !decorators[key]) additionalDecorators[key] = computed
+                // todo: push getter
+                if (decorators && decorators[key]) {
+                    // just copy the description, the decorator will pick it up during decorate
+                    Object.defineProperty(target, key, descriptor)
+                } else {
+                    // optimized shortcut; don't use the decorator but declare prop right away
+                    defineComputedProperty(target, key, { get, set: descriptor.set })
+                }
             } else {
                 if (decorators && decorators[key]) unassigned.push(key)
                 else {
+                    // optimized shortcut; don't use the decorator but declare prop right away
                     // TODO: theother enhancers
                     defineObservableProperty(
                         target,
@@ -88,13 +99,11 @@ export function extendObservable<A extends Object, B extends Object>(
                         value,
                         options.deep === false ? referenceEnhancer : deepEnhancer
                     )
-                    // additionalDecorators[key] = defaultDecorator
-                    // unassigned.push(key)
                 }
             }
         }
         if (decorators) decorate(target, decorators as any)
-        // TODO: can optimize decorators away if decorators are callable
+        // TODO: can optimize decorators away if decorators are callable?
         decorate(target, additionalDecorators)
         unassigned.forEach(key => (target[key] = properties[key])) // TODO: optimize
     } finally {

@@ -13,6 +13,23 @@ export interface IComputed {
     struct(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator
 }
 
+// export function createDecoratorForEnhancer(enhancer: IEnhancer<any>) {
+//     const decorator = createPropDecorator(
+//         (target: any, propertyName: string, initialValue: string, decoratorArgs: any[]) => {
+//             defineObservableProperty(target, propertyName, initialValue, enhancer)
+//         }
+//     )
+//     return function observableDecorator() {
+//         // This wrapper function is just to detect illegal decorator invocations, deprecate in a next version
+//         // and simply return the created prop decorator
+//         if (process.env.NODE_ENV !== "production" && arguments.length < 2)
+//             return fail(
+//                 "Incorrect decorator invocation. @observable decorator doesn't expect any arguments"
+//             )
+//         return decorator.apply(null, arguments)
+//     }
+// }
+
 function createComputedDecorator(options: IComputedValueOptions<any>) {
     return createClassPropertyDecorator(
         (target, name, _, __, originalDescriptor) => {
@@ -23,9 +40,8 @@ function createComputedDecorator(options: IComputedValueOptions<any>) {
                     "@computed can only be used on getter functions like: '@computed get myProps() { return ...; }'."
                 )
 
-            const adm = asObservableObject(target, "")
             const { get, set } = originalDescriptor
-            defineComputedProperty(adm, name, { ...options, get, set }, false)
+            defineComputedProperty(target, name, { ...options, get, set })
         },
         function(name) {
             const observable = this.$mobx.values[name]

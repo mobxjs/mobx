@@ -62,9 +62,14 @@ export class ObservableObjectAdministration
     write(owner: any, key: string, newValue) {
         const instance = this.target
         if (instance !== owner) {
-            return this.illegalAccess(owner, key)
+            this.illegalAccess(owner, key)
+            return
         }
         const observable = this.values[key]
+        if (observable instanceof ComputedValue) {
+            observable.set(newValue)
+            return
+        }
 
         // intercept
         if (hasInterceptors(this)) {
@@ -214,18 +219,16 @@ export function defineObservableProperty(
 }
 
 export function defineComputedProperty(
-    adm: ObservableObjectAdministration,
+    target: any,
     propName: string,
-    options: IComputedValueOptions<any>,
-    asInstanceProperty: boolean
+    options: IComputedValueOptions<any>
 ) {
-    if (asInstanceProperty) assertPropertyConfigurable(adm.target, propName)
+    const adm = asObservableObject(target, "")
+    // assertPropertyConfigurable(target, propName)
     options.name = options.name || `${adm.name}.${propName}`
-    options.context = adm.target
+    options.context = target
     adm.values[propName] = new ComputedValue(options)
-    if (asInstanceProperty) {
-        Object.defineProperty(adm.target, propName, generateComputedPropConfig(propName))
-    }
+    Object.defineProperty(target, propName, generateComputedPropConfig(propName))
 }
 
 const observablePropertyConfigs = {}
@@ -254,10 +257,10 @@ export function generateComputedPropConfig(propName) {
             configurable: true,
             enumerable: false,
             get: function() {
-                return this.$mobx.read(propName)
+                return this.$mobx.read(this, propName)
             },
             set: function(v) {
-                return this.$mobx.values[propName].set(v)
+                this.$mobx.write(this, propName, v)
             }
         })
     )

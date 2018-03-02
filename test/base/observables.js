@@ -280,6 +280,7 @@ test("props1", function() {
         })
     }
 
+    debugger
     var order = new Order()
     expect(48).toBe(order.total)
     order.price = 10
