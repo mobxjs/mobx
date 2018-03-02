@@ -1232,7 +1232,8 @@ test("@observable.deep (TS)", () => {
     t.equal(isObservable(todo2), false)
 })
 
-test("action.bound binds (TS)", () => {
+test.only("action.bound binds (TS)", () => {
+    debugger
     class A {
         @observable x = 0
         @action.bound
