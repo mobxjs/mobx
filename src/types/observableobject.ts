@@ -51,21 +51,17 @@ export class ObservableObjectAdministration
 
     constructor(public target: any, public name: string) {}
 
-    read(owner: any, propName: string) {
+    read(owner: any, key: string) {
         if (owner !== this.target) {
-            return fail("illegal state!")
-            // this.cloneInto(owner)
-            // return owner[propName]
+            return this.illegalAccess(owner, key)
         }
-        return this.values[propName].get()
+        return this.values[key].get()
     }
 
     write(owner: any, key: string, newValue) {
         const instance = this.target
         if (instance !== owner) {
-            return fail("illegal state!")
-            // this.cloneInto(owner)
-            // return (owner[key] = newValue)
+            return this.illegalAccess(owner, key)
         }
         const observable = this.values[key]
 
@@ -104,35 +100,30 @@ export class ObservableObjectAdministration
         }
     }
 
-    // TODO: remove this func again
-    // cloneInto(instance) {
-    //     // if there instance we read / write from is not the target of this administration,
-    //     // it means that twe are currently reading through the prototype chain
-    //     // for enumerability etc we want all properties on the actual instance, so let's move them!
-
-    //     // TODO FIX: potential bug, what if we used keys / intercept / observe, before reading any value?
-    //     const adm = asObservableObject(instance)
-    //     for (let key in this.values) {
-    //         const observable = this.values[key]
-    //         if (observable instanceof ObservableValue) {
-    //             const initializer = this.initializers && this.initializers[key]
-    //             defineObservableProperty(
-    //                 adm,
-    //                 key,
-    //                 initializer ? initializer() : observable.value,
-    //                 observable.enhancer
-    //             )
-    //         } else {
-    //             // TODO: copy all options
-    //             defineComputedProperty(
-    //                 adm,
-    //                 key,
-    //                 { get: observable.derivation },
-    //                 true /* TODO or..? */
-    //             )
-    //         }
-    //     }
-    // }
+    illegalAccess(owner, propName) {
+        /**
+         * This happens if a property is accessed through the prototype chain, but the property was
+         * declared directly as own property on the prototype.
+         *
+         * E.g.:
+         * class A {
+         * }
+         * extendObservable(A.prototype, { x: 1 })
+         *
+         * classB extens A {
+         * }
+         * console.log(new B().x)
+         *
+         * It is unclear whether the property should be considered 'static' or inherited.
+         * Either use `console.log(A.x)`
+         * or: decorate(A, { x: observable })
+         *
+         * When using decorate, the property will always be redeclared as own property on the actual instance
+         */
+        return fail(
+            `Property '${propName}' of '${owner}' was accessed through the prototype chain. Use 'decorate' instead to declare the prop or access it statically through it's owner`
+        )
+    }
 
     /**
      * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
