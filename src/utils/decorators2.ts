@@ -11,14 +11,16 @@ type PropertyCreator = (
     instance: any,
     propertyName: string,
     descriptor: BabelDescriptor,
+    decoratorTarget: any,
     decoratorArgs: any[]
 ) => void
 
 type DecoratorInvocationDescription = {
     prop: string
     propertyCreator: PropertyCreator
-    decoratorArguments: any[]
     descriptor: BabelDescriptor
+    decoratorTarget: any
+    decoratorArguments: any[]
 }
 
 const enumerableDescriptorCache: { [prop: string]: PropertyDescriptor } = {}
@@ -53,7 +55,7 @@ export function initializeInstance(target: DecoratorTarget) {
     if (decorators)
         for (let key in decorators) {
             const d = decorators[key]
-            d.propertyCreator(target, d.prop, d.descriptor, d.decoratorArguments)
+            d.propertyCreator(target, d.prop, d.descriptor, d.decoratorTarget, d.decoratorArguments)
         }
 }
 
@@ -80,6 +82,7 @@ export function createPropDecorator(
                 prop,
                 propertyCreator,
                 descriptor,
+                decoratorTarget: target,
                 decoratorArguments
             }
             return createPropertyInitializerDescriptor(prop, propertyInitiallyEnumerable)
@@ -92,9 +95,9 @@ export function createPropDecorator(
         } else {
             // @decorator(args)
             decoratorArguments = Array.prototype.slice.call(arguments)
-            decorator
+            return decorator
         }
-    }
+    } as Function
 }
 
 export function quacksLikeADecorator(args: IArguments): boolean {

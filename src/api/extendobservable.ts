@@ -86,7 +86,7 @@ export function extendObservable<A extends Object, B extends Object>(
                     Object.defineProperty(target, key, descriptor)
                 } else {
                     // optimized shortcut; don't use the decorator but declare prop right away
-                    defineComputedProperty(target, key, { get, set: descriptor.set })
+                    defineComputedProperty(target, target, key, { get, set: descriptor.set })
                 }
             } else {
                 if (decorators && decorators[key]) unassigned.push(key)

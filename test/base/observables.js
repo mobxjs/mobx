@@ -280,7 +280,6 @@ test("props1", function() {
         })
     }
 
-    debugger
     var order = new Order()
     expect(48).toBe(order.total)
     order.price = 10
@@ -1787,6 +1786,7 @@ test("computed comparer works with decorate (plain)", () => {
             return { hour: this.hour, minute: this.minute }
         }
     })
+    debugger
     decorate(Time, {
         hour: observable,
         minute: observable,

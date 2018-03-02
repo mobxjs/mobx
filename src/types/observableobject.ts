@@ -9,7 +9,8 @@ import {
     assertPropertyConfigurable,
     isPlainObject,
     fail,
-    addHiddenFinalProp
+    addHiddenFinalProp,
+    isPropertyConfigurable
 } from "../utils/utils"
 import { runLazyInitializers } from "../utils/decorators"
 import {
@@ -22,6 +23,7 @@ import { IListenable, registerListener, hasListeners, notifyListeners } from "./
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
 import { IEnhancer, referenceEnhancer } from "./modifiers"
 import { ObservableArray, IObservableArray } from "./observablearray"
+import { initializeInstance } from "../utils/decorators2"
 
 export interface IObservableObject {
     "observable-object": IObservableObject
@@ -53,8 +55,9 @@ export class ObservableObjectAdministration
     constructor(public target: any, public name: string) {}
 
     read(owner: any, key: string) {
-        if (owner !== this.target) {
-            return this.illegalAccess(owner, key)
+        if (this.target !== owner) {
+            this.illegalAccess(owner, key)
+            return
         }
         return this.values[key].get()
     }
@@ -219,16 +222,18 @@ export function defineObservableProperty(
 }
 
 export function defineComputedProperty(
-    target: any,
+    valueOwner: any, // which objects holds the observable and provides `this` context?
+    propertyOwner: any, // where is the property declared?
     propName: string,
     options: IComputedValueOptions<any>
 ) {
-    const adm = asObservableObject(target, "")
-    // assertPropertyConfigurable(target, propName)
+    const adm = asObservableObject(valueOwner, "")
     options.name = options.name || `${adm.name}.${propName}`
-    options.context = target
+    options.context = valueOwner
     adm.values[propName] = new ComputedValue(options)
-    Object.defineProperty(target, propName, generateComputedPropConfig(propName))
+    // TODO: isPropertyConfigurable needed / best check?
+    if (propertyOwner === valueOwner || isPropertyConfigurable(propertyOwner, propName))
+        Object.defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
 }
 
 const observablePropertyConfigs = {}
@@ -240,14 +245,25 @@ export function generateObservablePropConfig(propName) {
         (observablePropertyConfigs[propName] = {
             configurable: true,
             enumerable: true,
-            get: function() {
+            get() {
                 return this.$mobx.read(this, propName)
             },
-            set: function(v) {
+            set(v) {
                 this.$mobx.write(this, propName, v)
             }
         })
     )
+}
+
+function getAdministrationForComputedPropOwner(owner: any): ObservableObjectAdministration {
+    const adm = owner.$mobx
+    if (!adm) {
+        // because computed props are declared on proty,
+        // the current instance might not have been initialized yet
+        initializeInstance(owner)
+        return owner.$mobx
+    }
+    return adm
 }
 
 export function generateComputedPropConfig(propName) {
@@ -256,11 +272,11 @@ export function generateComputedPropConfig(propName) {
         (computedPropertyConfigs[propName] = {
             configurable: true,
             enumerable: false,
-            get: function() {
-                return this.$mobx.read(this, propName)
+            get() {
+                return getAdministrationForComputedPropOwner(this).read(this, propName)
             },
-            set: function(v) {
-                this.$mobx.write(this, propName, v)
+            set(v) {
+                getAdministrationForComputedPropOwner(this).write(this, propName, v)
             }
         })
     )

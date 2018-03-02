@@ -14,63 +14,23 @@ export interface IComputed {
     struct(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator
 }
 
-// export function createDecoratorForEnhancer(enhancer: IEnhancer<any>) {
-//     const decorator = createPropDecorator(
-//         (target: any, propertyName: string, initialValue: string, decoratorArgs: any[]) => {
-//             defineObservableProperty(target, propertyName, initialValue, enhancer)
-//         }
-//     )
-//     return function observableDecorator() {
-//         // This wrapper function is just to detect illegal decorator invocations, deprecate in a next version
-//         // and simply return the created prop decorator
-//         if (process.env.NODE_ENV !== "production" && arguments.length < 2)
-//             return fail(
-//                 "Incorrect decorator invocation. @observable decorator doesn't expect any arguments"
-//             )
-//         return decorator.apply(null, arguments)
-//     }
-// }
+const computedDecorator = createPropDecorator(
+    false,
+    (
+        instance: any,
+        propertyName: string,
+        descriptor: any,
+        decoratorTarget: any,
+        decoratorArgs: any[]
+    ) => {
+        const { get, set } = descriptor // initialValue is the descriptor for get / set props
+        // Optimization: faster on decorator target or instance? Assuming target
+        const options = decoratorArgs[0] || {}
+        defineComputedProperty(instance, decoratorTarget, propertyName, { ...options, get, set })
+    }
+)
 
-function createComputedDecorator(options: IComputedValueOptions<any>) {
-    return createPropDecorator(
-        false,
-        (target: any, propertyName: string, descriptor: any, decoratorArgs: any[]) => {
-            const { get, set } = descriptor // initialValue is the descriptor for get / set props
-            // TODO: assert a getter
-            defineComputedProperty(target, propertyName, { ...options, get, set })
-        }
-    )
-
-    return createClassPropertyDecorator(
-        (target, name, _, __, originalDescriptor) => {
-            process.env.NODE_ENV !== "production" &&
-                invariant(
-                    typeof originalDescriptor !== "undefined" &&
-                        typeof originalDescriptor.get === "function",
-                    "@computed can only be used on getter functions like: '@computed get myProps() { return ...; }'."
-                )
-
-            const { get, set } = originalDescriptor
-            defineComputedProperty(target, name, { ...options, get, set })
-        },
-        function(name) {
-            const observable = this.$mobx.values[name]
-            if (
-                observable === undefined // See #505
-            )
-                return undefined
-            return observable.get()
-        },
-        function(name, value) {
-            this.$mobx.values[name].set(value)
-        },
-        false,
-        false
-    )
-}
-
-const computedDecorator = createComputedDecorator({})
-const computedStructDecorator = createComputedDecorator({ equals: comparer.structural })
+const computedStructDecorator = computedDecorator({ equals: comparer.structural })
 
 /**
  * Decorator for class properties: @computed get value() { return expr; }.
@@ -78,12 +38,15 @@ const computedStructDecorator = createComputedDecorator({ equals: comparer.struc
  */
 export var computed: IComputed = function computed(arg1, arg2, arg3) {
     if (typeof arg2 === "string") {
+        // @computed
         return computedDecorator.apply(null, arguments)
     }
     if (arg1 !== null && typeof arg1 === "object" && arguments.length === 1) {
-        return createComputedDecorator(arg1)
+        // @computed({ options })
+        return computedDecorator.apply(null, arguments)
     }
 
+    // computed(expr, options?)
     if (process.env.NODE_ENV !== "production") {
         invariant(
             typeof arg1 === "function",
