@@ -4,6 +4,7 @@ import { asObservableObject, defineComputedProperty } from "../types/observableo
 import { invariant } from "../utils/utils"
 import { createClassPropertyDecorator } from "../utils/decorators"
 import { ComputedValue, IComputedValue } from "../core/computedvalue"
+import { createPropDecorator } from "../utils/decorators2"
 
 export interface IComputed {
     <T>(options: IComputedValueOptions<T>): any // decorator
@@ -31,6 +32,13 @@ export interface IComputed {
 // }
 
 function createComputedDecorator(options: IComputedValueOptions<any>) {
+    return createPropDecorator(
+        (target: any, propertyName: string, initialValue: any, decoratorArgs: any[]) => {
+            const { get, set } = initialValue // initialValue is the descriptor for get / set props
+            defineComputedProperty(target, propertyName, { ...options, get, set })
+        }
+    )
+
     return createClassPropertyDecorator(
         (target, name, _, __, originalDescriptor) => {
             process.env.NODE_ENV !== "production" &&

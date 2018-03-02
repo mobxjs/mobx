@@ -5,7 +5,7 @@ import { createPropDecorator } from "../utils/decorators2"
 
 export function createDecoratorForEnhancer(enhancer: IEnhancer<any>) {
     const decorator = createPropDecorator(
-        (target: any, propertyName: string, initialValue: string, decoratorArgs: any[]) => {
+        (target: any, propertyName: string, initialValue: any, decoratorArgs: any[]) => {
             defineObservableProperty(target, propertyName, initialValue, enhancer)
         }
     )

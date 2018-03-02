@@ -82,7 +82,11 @@ export function createPropDecorator(propertyCreator: PropertyCreator) {
             target.__mobxDecorators[prop] = {
                 prop,
                 propertyCreator,
-                initializer: descriptor && (descriptor.initializer || (() => descriptor.value)),
+                initializer: descriptor
+                    ? descriptor.get
+                      ? () => descriptor
+                      : descriptor.initializer ? descriptor.initializer : () => descriptor.value
+                    : undefined,
                 decoratorArguments
             }
             return createEnumerableInitDescriptor(prop)
