@@ -1,6 +1,7 @@
 import { invariant, addHiddenProp, fail } from "../utils/utils"
 import { createClassPropertyDecorator } from "../utils/decorators"
 import { createAction, executeAction, IAction } from "../core/action"
+import { createPropDecorator } from "../utils/decorators2"
 
 export interface IActionFactory {
     // nameless actions
@@ -58,7 +59,34 @@ export interface IActionFactory {
     bound(target: Object, propertyKey: string, descriptor?: PropertyDescriptor): void
 }
 
-const actionFieldDecorator = createClassPropertyDecorator(
+const actionFieldDescriptorCache: { [key: string]: PropertyDescriptor } = {}
+
+const actionFieldDecorator = createPropDecorator(
+    false,
+    (
+        instance: any,
+        propertyName: string,
+        descriptor: any,
+        decoratorTarget: any,
+        decoratorArgs: any[]
+    ) => {
+        const name = decoratorArgs[0] || propertyName
+        // Optimization: could cache descriptor (but need to cach on name/propertyName combo!)
+        Object.defineProperty(instance, propertyName, {
+            enumerable: false,
+            configurable: true,
+            set(v) {
+                const wrappedAction = action(name, v)
+                addHiddenProp(this, propertyName, wrappedAction)
+            },
+            get() {
+                return undefined
+            }
+        })
+    }
+)
+
+const actionFieldDecoratorOld = createClassPropertyDecorator(
     function(target, key, value, args, originalDescriptor) {
         const actionName =
             args && args.length === 1 ? args[0] : value.name || key || "<unnamed action>"
@@ -90,6 +118,7 @@ function dontReassignFields() {
 }
 
 export var action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): any {
+    debugger
     if (arguments.length === 1 && typeof arg1 === "function")
         return createAction(arg1.name || "<unnamed action>", arg1)
     if (arguments.length === 2 && typeof arg2 === "function") return createAction(arg1, arg2)
@@ -109,20 +138,18 @@ action.bound = function boundAction(arg1, arg2?, arg3?) {
 
 function namedActionDecorator(name: string) {
     return function(target, prop, descriptor) {
-        if (descriptor && typeof descriptor.value === "function") {
-            // TypeScript @action method() { }. Defined on proto before being decorated
-            // Don't use the field decorator if we are just decorating a method
-            descriptor.value = createAction(name, descriptor.value)
-            descriptor.enumerable = false
-            descriptor.configurable = true
-            return descriptor
-        }
-        if (
-            process.env.NODE_ENV !== "production" &&
-            descriptor !== undefined &&
-            descriptor.get !== undefined
-        ) {
-            return fail("@action cannot be used with getters")
+        // babel / typescript
+        // @action method() { }
+        if (descriptor) {
+            if (process.env.NODE_ENV !== "production" && descriptor.get !== undefined) {
+                return fail("@action cannot be used with getters")
+            }
+            return {
+                value: createAction(name, descriptor.value),
+                enumerable: false,
+                configurable: false,
+                writable: true // for typescript, this must be writable, otherwise it cannot inherit :/ (see inheritable actions test)
+            }
         }
         // bound instance methods
         return actionFieldDecorator(name).apply(this, arguments)

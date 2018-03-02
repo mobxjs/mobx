@@ -63,6 +63,7 @@ test("babel", function() {
 
 test("should not be possible to use @action with getters", () => {
     expect(() => {
+        debugger
         class A {
             @action
             get Test() {}
