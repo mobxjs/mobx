@@ -1,4 +1,4 @@
-import { addHiddenProp, fail } from "./utils"
+import { addHiddenProp, fail, EMPTY_ARRAY } from "./utils"
 
 type DecoratorTarget = {
     __mobxDidRunLazyInitializers2?: boolean // TODO: rename
@@ -7,11 +7,17 @@ type DecoratorTarget = {
 
 type BabelDescriptor = PropertyDescriptor & { initializer?: () => any }
 
-type PropertyCreator = (instance: any, propertyName: string, initialValue: string) => void
+type PropertyCreator = (
+    instance: any,
+    propertyName: string,
+    initialValue: string,
+    decoratorArgs: any[]
+) => void
 
 type DecoratorInvocationDescription = {
     prop: string
     propertyCreator: PropertyCreator
+    decoratorArguments: any[]
     initializer: () => any
 }
 
@@ -48,32 +54,50 @@ export function initializeInstance(target: DecoratorTarget) {
     if (decorators)
         for (let key in decorators) {
             const d = decorators[key]
-            d.propertyCreator(target, d.prop, d.initializer && d.initializer.call(target))
+            d.propertyCreator(
+                target,
+                d.prop,
+                d.initializer && d.initializer.call(target),
+                d.decoratorArguments
+            )
         }
 }
 
 // TODO: add param, declare enumerable
 export function createPropDecorator(propertyCreator: PropertyCreator) {
-    return function decorate(
-        target: DecoratorTarget,
-        prop: string,
-        descriptor: BabelDescriptor | undefined
-    ) {
-        if (process.env.NODE_ENV !== "production" && !quacksLikeADecorator(arguments))
-            fail("This function is a decorator, but it wasn't invoked like a decorator")
-        if (!Object.prototype.hasOwnProperty.call(target, "__mobxDecorators")) {
-            const inheritedDecorators = target.__mobxDecorators
-            addHiddenProp(target, "__mobxDecorators", { ...inheritedDecorators })
+    return function decoratorFactory() {
+        let decoratorArguments: any[]
+
+        const decorator = function decorate(
+            target: DecoratorTarget,
+            prop: string,
+            descriptor: BabelDescriptor | undefined
+        ) {
+            if (process.env.NODE_ENV !== "production" && !quacksLikeADecorator(arguments))
+                fail("This function is a decorator, but it wasn't invoked like a decorator")
+            if (!Object.prototype.hasOwnProperty.call(target, "__mobxDecorators")) {
+                const inheritedDecorators = target.__mobxDecorators
+                addHiddenProp(target, "__mobxDecorators", { ...inheritedDecorators })
+            }
+            target.__mobxDecorators[prop] = {
+                prop,
+                propertyCreator,
+                initializer: descriptor && (descriptor.initializer || (() => descriptor.value)),
+                decoratorArguments
+            }
+            return createEnumerableInitDescriptor(prop)
         }
-        target.__mobxDecorators[prop] = {
-            prop,
-            propertyCreator,
-            initializer: descriptor && (descriptor.initializer || (() => descriptor.value))
+
+        if (quacksLikeADecorator(arguments)) {
+            // @decorator
+            decoratorArguments = EMPTY_ARRAY
+            return decorator.apply(null, arguments)
+        } else {
+            // @decorator(args)
+            decoratorArguments = Array.prototype.slice.call(arguments)
+            decorator
         }
-        return createEnumerableInitDescriptor(prop)
     }
-    // TODO: story property creator on return thing directly
-    // TODO: surround with factory
 }
 
 export function quacksLikeADecorator(args: IArguments): boolean {
