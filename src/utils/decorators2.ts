@@ -22,13 +22,18 @@ type DecoratorInvocationDescription = {
 }
 
 const enumerableDescriptorCache: { [prop: string]: PropertyDescriptor } = {}
+const nonEnumerableDescriptorCache: { [prop: string]: PropertyDescriptor } = {}
 
-function createEnumerableInitDescriptor(prop: string): PropertyDescriptor {
+function createPropertyInitializerDescriptor(
+    prop: string,
+    enumerable: boolean
+): PropertyDescriptor {
+    const cache = enumerable ? enumerableDescriptorCache : nonEnumerableDescriptorCache
     return (
-        enumerableDescriptorCache[prop] ||
-        (enumerableDescriptorCache[prop] = {
+        cache[prop] ||
+        (cache[prop] = {
             configurable: true,
-            enumerable: true,
+            enumerable: enumerable,
             get() {
                 initializeInstance(this)
                 return this[prop]
@@ -39,12 +44,6 @@ function createEnumerableInitDescriptor(prop: string): PropertyDescriptor {
             }
         })
     )
-}
-
-function decorateObservable(target: any, prop: string, descriptor: any) {
-    if (!target.__mobxDecorators) addHiddenProp(target, "__mobxDecorators", [])
-    target.__mobxDecorators.push({ prop, initializer: descriptor && descriptor.initializer })
-    return createEnumerableInitDescriptor(prop)
 }
 
 export function initializeInstance(target: DecoratorTarget) {
@@ -59,7 +58,10 @@ export function initializeInstance(target: DecoratorTarget) {
 }
 
 // TODO: add param, declare enumerable
-export function createPropDecorator(propertyCreator: PropertyCreator) {
+export function createPropDecorator(
+    propertyInitiallyEnumerable: boolean,
+    propertyCreator: PropertyCreator
+) {
     return function decoratorFactory() {
         let decoratorArguments: any[]
 
@@ -80,7 +82,7 @@ export function createPropDecorator(propertyCreator: PropertyCreator) {
                 descriptor,
                 decoratorArguments
             }
-            return createEnumerableInitDescriptor(prop)
+            return createPropertyInitializerDescriptor(prop, propertyInitiallyEnumerable)
         }
 
         if (quacksLikeADecorator(arguments)) {

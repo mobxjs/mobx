@@ -5,6 +5,7 @@ import { createPropDecorator, BabelDescriptor } from "../utils/decorators2"
 
 export function createDecoratorForEnhancer(enhancer: IEnhancer<any>) {
     const decorator = createPropDecorator(
+        true,
         (target: any, propertyName: string, descriptor: BabelDescriptor, decoratorArgs: any[]) => {
             const initialValue = descriptor
                 ? descriptor.initializer ? descriptor.initializer.call(target) : descriptor.value

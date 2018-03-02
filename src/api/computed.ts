@@ -33,6 +33,7 @@ export interface IComputed {
 
 function createComputedDecorator(options: IComputedValueOptions<any>) {
     return createPropDecorator(
+        false,
         (target: any, propertyName: string, descriptor: any, decoratorArgs: any[]) => {
             const { get, set } = descriptor // initialValue is the descriptor for get / set props
             // TODO: assert a getter
