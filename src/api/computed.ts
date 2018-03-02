@@ -1,8 +1,7 @@
 import { comparer } from "../utils/comparer"
 import { IComputedValueOptions } from "../core/computedvalue"
-import { asObservableObject, defineComputedProperty } from "../types/observableobject"
+import { defineComputedProperty } from "../types/observableobject"
 import { invariant } from "../utils/utils"
-import { createClassPropertyDecorator } from "../utils/decorators"
 import { ComputedValue, IComputedValue } from "../core/computedvalue"
 import { createPropDecorator } from "../utils/decorators2"
 

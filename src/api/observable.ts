@@ -1,4 +1,4 @@
-import { invariant, fail, deprecated, addHiddenProp } from "../utils/utils"
+import { invariant, fail, deprecated } from "../utils/utils"
 import {
     IModifierDescriptor,
     deepEnhancer,
@@ -12,14 +12,9 @@ import { IObservableValue, ObservableValue } from "../types/observablevalue"
 import { IObservableArray, ObservableArray } from "../types/observablearray"
 import { createDecoratorForEnhancer } from "./observabledecorator"
 import { isObservable } from "./isobservable"
-import {
-    IObservableObject,
-    asObservableObject,
-    defineObservableProperty
-} from "../types/observableobject"
-import { extendObservable, extendShallowObservable } from "./extendobservable"
+import { IObservableObject } from "../types/observableobject"
+import { extendObservable } from "./extendobservable"
 import { IObservableMapInitialValues, ObservableMap } from "../types/observablemap"
-import { createPropDecorator } from "../utils/decorators2"
 
 export type CreateObservableOptions = {
     name?: string
@@ -215,7 +210,7 @@ export const observable: IObservableFactory &
 Object.keys(observableFactories).forEach(name => (observable[name] = observableFactories[name]))
 
 // TODO: MWE: really? just kill those two?
-observable.deep.struct = observable.struct
+observable.deep.struct = observable.struct as any
 observable.ref.struct = refStructDecorator
 
 function incorrectlyUsedAsDecorator(methodName) {

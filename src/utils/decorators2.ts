@@ -7,10 +7,10 @@ type DecoratorTarget = {
 
 export type BabelDescriptor = PropertyDescriptor & { initializer?: () => any }
 
-type PropertyCreator = (
+export type PropertyCreator = (
     instance: any,
     propertyName: string,
-    descriptor: BabelDescriptor,
+    descriptor: BabelDescriptor | undefined,
     decoratorTarget: any,
     decoratorArgs: any[]
 ) => void
@@ -18,7 +18,7 @@ type PropertyCreator = (
 type DecoratorInvocationDescription = {
     prop: string
     propertyCreator: PropertyCreator
-    descriptor: BabelDescriptor
+    descriptor: BabelDescriptor | undefined
     decoratorTarget: any
     decoratorArguments: any[]
 }
@@ -48,6 +48,7 @@ function createPropertyInitializerDescriptor(
     )
 }
 
+export function initializeInstance(target: any)
 export function initializeInstance(target: DecoratorTarget) {
     if (target.__mobxDidRunLazyInitializers2 === true) return
     addHiddenProp(target, "__mobxDidRunLazyInitializers2", true)
@@ -78,7 +79,7 @@ export function createPropDecorator(
                 const inheritedDecorators = target.__mobxDecorators
                 addHiddenProp(target, "__mobxDecorators", { ...inheritedDecorators })
             }
-            target.__mobxDecorators[prop] = {
+            target.__mobxDecorators![prop] = {
                 prop,
                 propertyCreator,
                 descriptor,

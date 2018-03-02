@@ -10,10 +10,8 @@ import { startBatch, endBatch } from "../core/observable"
 import {
     CreateObservableOptions,
     asCreateObservableOptions,
-    shallowCreateObservableOptions,
-    observable
+    shallowCreateObservableOptions
 } from "./observable"
-import { computed } from "./computed"
 import { decorate } from "./decorate"
 import { isComputed } from "./iscomputed"
 import { referenceEnhancer, deepEnhancer } from "../types/modifiers"
@@ -58,8 +56,8 @@ export function extendObservable<A extends Object, B extends Object>(
     // TODO: eliminate options, preserve name
     options = asCreateObservableOptions(options)
     // TODO:
-    const defaultDecorator =
-        options.defaultDecorator || (options.deep === false ? observable.ref : observable.deep)
+    // const defaultDecorator =
+    //     options.defaultDecorator || (options.deep === false ? observable.ref : observable.deep)
     asObservableObject(target) // make sure object is observable, even without initial props
     startBatch()
     try {

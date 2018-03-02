@@ -1,6 +1,6 @@
 import { invariant, addHiddenProp, fail, addHiddenFinalProp } from "../utils/utils"
 import { createAction, executeAction, IAction } from "../core/action"
-import { createPropDecorator, BabelDescriptor } from "../utils/decorators2"
+import { BabelDescriptor } from "../utils/decorators2"
 
 export interface IActionFactory {
     // nameless actions
