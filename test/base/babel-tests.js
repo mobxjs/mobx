@@ -416,7 +416,7 @@ test("288 atom not detected for object property", () => {
     expect(changed).toBe(true)
 })
 
-test.skip("observable performance", () => {
+test("observable performance", () => {
     const AMOUNT = 100000
 
     class A {
@@ -434,7 +434,7 @@ test.skip("observable performance", () => {
 
     for (var i = 0; i < AMOUNT; i++) objs.push(new A())
 
-    // console.log("created in ", Date.now() - start)
+    console.log("created in ", Date.now() - start)
 
     for (var j = 0; j < 4; j++) {
         for (var i = 0; i < AMOUNT; i++) {
@@ -446,7 +446,7 @@ test.skip("observable performance", () => {
         }
     }
 
-    // console.log("changed in ", Date.now() - start)
+    console.log("changed in ", Date.now() - start)
 })
 
 test("unbound methods", () => {

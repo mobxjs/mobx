@@ -1,5 +1,5 @@
 import { ObservableValue, UNCHANGED } from "./observablevalue"
-import { isComputedValue, ComputedValue, IComputedValueOptions } from "../core/computedvalue"
+import { ComputedValue, IComputedValueOptions } from "../core/computedvalue"
 import {
     createInstanceofPredicate,
     isObject,
@@ -51,12 +51,22 @@ export class ObservableObjectAdministration
 
     constructor(public target: any, public name: string) {}
 
-    read(propName: string) {
+    read(owner: any, propName: string) {
+        if (owner !== this.target) {
+            return fail("illegal state!")
+            // this.cloneInto(owner)
+            // return owner[propName]
+        }
         return this.values[propName].get()
     }
 
-    write(key: string, newValue) {
+    write(owner: any, key: string, newValue) {
         const instance = this.target
+        if (instance !== owner) {
+            return fail("illegal state!")
+            // this.cloneInto(owner)
+            // return (owner[key] = newValue)
+        }
         const observable = this.values[key]
 
         // intercept
@@ -94,6 +104,36 @@ export class ObservableObjectAdministration
         }
     }
 
+    // TODO: remove this func again
+    // cloneInto(instance) {
+    //     // if there instance we read / write from is not the target of this administration,
+    //     // it means that twe are currently reading through the prototype chain
+    //     // for enumerability etc we want all properties on the actual instance, so let's move them!
+
+    //     // TODO FIX: potential bug, what if we used keys / intercept / observe, before reading any value?
+    //     const adm = asObservableObject(instance)
+    //     for (let key in this.values) {
+    //         const observable = this.values[key]
+    //         if (observable instanceof ObservableValue) {
+    //             const initializer = this.initializers && this.initializers[key]
+    //             defineObservableProperty(
+    //                 adm,
+    //                 key,
+    //                 initializer ? initializer() : observable.value,
+    //                 observable.enhancer
+    //             )
+    //         } else {
+    //             // TODO: copy all options
+    //             defineComputedProperty(
+    //                 adm,
+    //                 key,
+    //                 { get: observable.derivation },
+    //                 true /* TODO or..? */
+    //             )
+    //         }
+    //     }
+    // }
+
     /**
      * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
      * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
@@ -130,7 +170,9 @@ export interface IIsObservableObject {
 }
 
 export function asObservableObject(target, name?: string): ObservableObjectAdministration {
-    if (isObservableObject(target) && Object.prototype.hasOwnProperty.call(target, "$mobx"))
+    if (
+        Object.prototype.hasOwnProperty.call(target, "$mobx") // TODO: needs own property check?
+    )
         return (target as any).$mobx
 
     process.env.NODE_ENV !== "production" &&
@@ -148,16 +190,17 @@ export function asObservableObject(target, name?: string): ObservableObjectAdmin
 }
 
 export function defineObservableProperty(
-    adm: ObservableObjectAdministration,
+    target: any,
     propName: string,
     newValue,
     enhancer: IEnhancer<any>
 ) {
-    assertPropertyConfigurable(adm.target, propName)
+    const adm = asObservableObject(target)
+    assertPropertyConfigurable(target, propName)
 
     if (hasInterceptors(adm)) {
         const change = interceptChange<IObjectWillChange>(adm, {
-            object: adm.target,
+            object: target,
             name: propName,
             type: "add",
             newValue
@@ -173,9 +216,9 @@ export function defineObservableProperty(
     ))
     newValue = (observable as any).value // observableValue might have changed it
 
-    Object.defineProperty(adm.target, propName, generateObservablePropConfig(propName))
+    Object.defineProperty(target, propName, generateObservablePropConfig(propName))
     if (adm.keys) adm.keys.push(propName)
-    notifyPropertyAddition(adm, adm.target, propName, newValue)
+    notifyPropertyAddition(adm, target, propName, newValue)
 }
 
 export function defineComputedProperty(
@@ -203,10 +246,10 @@ export function generateObservablePropConfig(propName) {
             configurable: true,
             enumerable: true,
             get: function() {
-                return this.$mobx.values[propName].get()
+                return this.$mobx.read(this, propName)
             },
             set: function(v) {
-                this.$mobx.write(propName, v)
+                this.$mobx.write(this, propName, v)
             }
         })
     )

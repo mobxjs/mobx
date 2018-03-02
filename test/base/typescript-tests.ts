@@ -52,23 +52,24 @@ const t = {
     }
 }
 
-class Order {
-    @observable price: number = 3
-    @observable amount: number = 2
-    @observable orders: string[] = []
-    @observable aFunction = testFunction
+test("decorators", () => {
+    debugger
+    class Order {
+        @observable price: number = 3
+        @observable amount: number = 2
+        @observable orders: string[] = []
+        @observable aFunction = testFunction
 
-    @computed
-    get total() {
-        return this.amount * this.price * (1 + this.orders.length)
+        @computed
+        get total() {
+            return this.amount * this.price * (1 + this.orders.length)
+        }
+
+        // Typescript classes cannot be defined inside functions,
+        // but if the next line is enabled it should throw...
+        // @observable hoepie() { return 3; }
     }
 
-    // Typescript classes cannot be defined inside functions,
-    // but if the next line is enabled it should throw...
-    // @observable hoepie() { return 3; }
-}
-
-test("decorators", () => {
     var o = new Order()
     t.equal(isObservableObject(o), true)
     t.equal(isObservableProp(o, "amount"), true)
@@ -104,6 +105,18 @@ test("observable", () => {
 })
 
 test("annotations", () => {
+    class Order {
+        @observable price: number = 3
+        @observable amount: number = 2
+        @observable orders: string[] = []
+        @observable aFunction = testFunction
+
+        @computed
+        get total() {
+            return this.amount * this.price * (1 + this.orders.length)
+        }
+    }
+
     var order1totals: number[] = []
     var order1 = new Order()
     var order2 = new Order()
@@ -653,7 +666,7 @@ test("288 atom not detected for object property", () => {
     )
 })
 
-test.skip("observable performance", () => {
+test("observable performance", () => {
     const AMOUNT = 100000
 
     class A {
@@ -671,7 +684,7 @@ test.skip("observable performance", () => {
 
     for (var i = 0; i < AMOUNT; i++) objs.push(new A())
 
-    // console.log("created in ", Date.now() - start)
+    console.log("created in ", Date.now() - start)
 
     for (var j = 0; j < 4; j++) {
         for (var i = 0; i < AMOUNT; i++) {
@@ -683,7 +696,7 @@ test.skip("observable performance", () => {
         }
     }
 
-    // console.log("changed in ", Date.now() - start)
+    console.log("changed in ", Date.now() - start)
 })
 
 test("unbound methods", () => {
@@ -719,7 +732,7 @@ test("inheritance", () => {
             return this.a + this.b
         }
     }
-
+    debugger
     const b1 = new B()
     const b2 = new B()
     const values: any[] = []

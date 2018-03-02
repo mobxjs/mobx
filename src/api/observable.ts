@@ -1,4 +1,4 @@
-import { invariant, fail, deprecated } from "../utils/utils"
+import { invariant, fail, deprecated, addHiddenProp } from "../utils/utils"
 import {
     IModifierDescriptor,
     deepEnhancer,
@@ -12,9 +12,14 @@ import { IObservableValue, ObservableValue } from "../types/observablevalue"
 import { IObservableArray, ObservableArray } from "../types/observablearray"
 import { createDecoratorForEnhancer } from "./observabledecorator"
 import { isObservable } from "./isobservable"
-import { IObservableObject, asObservableObject } from "../types/observableobject"
+import {
+    IObservableObject,
+    asObservableObject,
+    defineObservableProperty
+} from "../types/observableobject"
 import { extendObservable, extendShallowObservable } from "./extendobservable"
 import { IObservableMapInitialValues, ObservableMap } from "../types/observablemap"
+import { createPropDecorator } from "../utils/decorators2"
 
 export type CreateObservableOptions = {
     name?: string
@@ -64,13 +69,50 @@ const refDecorator = createDecoratorForEnhancer(referenceEnhancer)
 const deepStructDecorator = createDecoratorForEnhancer(deepStructEnhancer)
 const refStructDecorator = createDecoratorForEnhancer(refStructEnhancer)
 
+const deepDecorator2 = createPropDecorator(
+    (target: any, propertyName: string, initialValue: string) => {
+        defineObservableProperty(target, propertyName, initialValue, deepEnhancer)
+    }
+)
+
+function createObservableDescriptor(prop: string) {
+    // TODO: cache
+    return {
+        configurable: true, // TODO: false?
+        enumerable: true,
+        get() {
+            initializeObservableObject(this)
+            return this[prop]
+        },
+        set(value) {
+            initializeObservableObject(this)
+            this[prop] = value
+        }
+    }
+}
+
+function initializeObservableObject(target) {
+    const decorators = target.__mobxDecorators
+    decorators.forEach(({ prop, initializer }) => {
+        defineObservableProperty(target, prop, initializer && initializer(), deepEnhancer)
+    })
+}
+
+function decorateObservable(target: any, prop: string, descriptor: any) {
+    if (!target.__mobxDecorators) addHiddenProp(target, "__mobxDecorators", [])
+    target.__mobxDecorators.push({ prop, initializer: descriptor && descriptor.initializer })
+    return createObservableDescriptor(prop)
+}
+
 /**
  * Turns an object, array or function into a reactive structure.
  * @param v the value which should become observable.
  */
 function createObservable(v: any) {
     // @observable someProp;
-    if (typeof arguments[1] === "string") return deepDecorator.apply(null, arguments)
+    if (typeof arguments[1] === "string") {
+        return deepDecorator2.apply(null, arguments)
+    }
 
     if (process.env.NODE_ENV !== "production") {
         invariant(arguments.length === 1, "observable expects one arguments")

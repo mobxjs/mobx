@@ -83,7 +83,7 @@ export function extendObservable<A extends Object, B extends Object>(
                 else {
                     // TODO: theother enhancers
                     defineObservableProperty(
-                        adm,
+                        target,
                         key,
                         value,
                         options.deep === false ? referenceEnhancer : deepEnhancer

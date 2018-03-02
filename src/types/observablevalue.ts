@@ -46,12 +46,12 @@ export class ObservableValue<T> extends Atom
     hasUnreportedChange = false
     interceptors
     changeListeners
-    protected value
+    value
     dehancer: any
 
     constructor(
         value: T,
-        protected enhancer: IEnhancer<T>,
+        public enhancer: IEnhancer<T>,
         name = "ObservableValue@" + getNextId(),
         notifySpy = true
     ) {

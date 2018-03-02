@@ -14,14 +14,13 @@ export function createDecoratorForEnhancer(enhancer: IEnhancer<any>) {
                 )
             }
 
-            const adm = asObservableObject(target, undefined)
-            defineObservableProperty(adm, name, baseValue, enhancer)
+            defineObservableProperty(target, name, baseValue, enhancer)
         },
         function(name) {
-            return this.$mobx.read(name)
+            return this.$mobx.read(this, name)
         },
         function(name, value) {
-            this.$mobx.write(name, value)
+            this.$mobx.write(this, name, value)
         },
         true,
         false
