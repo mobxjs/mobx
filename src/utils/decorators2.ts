@@ -5,12 +5,12 @@ type DecoratorTarget = {
     __mobxDecorators?: { [prop: string]: DecoratorInvocationDescription }
 }
 
-type BabelDescriptor = PropertyDescriptor & { initializer?: () => any }
+export type BabelDescriptor = PropertyDescriptor & { initializer?: () => any }
 
 type PropertyCreator = (
     instance: any,
     propertyName: string,
-    initialValue: string,
+    descriptor: BabelDescriptor,
     decoratorArgs: any[]
 ) => void
 
@@ -18,7 +18,7 @@ type DecoratorInvocationDescription = {
     prop: string
     propertyCreator: PropertyCreator
     decoratorArguments: any[]
-    initializer: () => any
+    descriptor: BabelDescriptor
 }
 
 const enumerableDescriptorCache: { [prop: string]: PropertyDescriptor } = {}
@@ -54,12 +54,7 @@ export function initializeInstance(target: DecoratorTarget) {
     if (decorators)
         for (let key in decorators) {
             const d = decorators[key]
-            d.propertyCreator(
-                target,
-                d.prop,
-                d.initializer && d.initializer.call(target),
-                d.decoratorArguments
-            )
+            d.propertyCreator(target, d.prop, d.descriptor, d.decoratorArguments)
         }
 }
 
@@ -82,11 +77,7 @@ export function createPropDecorator(propertyCreator: PropertyCreator) {
             target.__mobxDecorators[prop] = {
                 prop,
                 propertyCreator,
-                initializer: descriptor
-                    ? descriptor.get
-                      ? () => descriptor
-                      : descriptor.initializer ? descriptor.initializer : () => descriptor.value
-                    : undefined,
+                descriptor,
                 decoratorArguments
             }
             return createEnumerableInitDescriptor(prop)
