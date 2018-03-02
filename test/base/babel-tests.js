@@ -305,6 +305,7 @@ test("custom action decorator (babel)", function() {
 })
 
 test("action decorator on field (babel)", function() {
+    debugger
     class Store {
         constructor(multiplier) {
             this.multiplier = multiplier
@@ -578,7 +579,7 @@ test("enumerability", () => {
     expect(a.hasOwnProperty("a")).toBe(false) // true would better..
     expect(a.hasOwnProperty("b")).toBe(false)
     expect(a.hasOwnProperty("m")).toBe(false)
-    expect(a.hasOwnProperty("m2")).toBe(false) // true would be ok as well
+    expect(a.hasOwnProperty("m2")).toBe(true)
 
     expect(mobx.isAction(a.m)).toBe(true)
     expect(mobx.isAction(a.m2)).toBe(true)

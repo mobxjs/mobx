@@ -1,7 +1,7 @@
 import { invariant, addHiddenProp, fail } from "../utils/utils"
 import { createClassPropertyDecorator } from "../utils/decorators"
 import { createAction, executeAction, IAction } from "../core/action"
-import { createPropDecorator } from "../utils/decorators2"
+import { createPropDecorator, BabelDescriptor } from "../utils/decorators2"
 
 export interface IActionFactory {
     // nameless actions
@@ -61,30 +61,46 @@ export interface IActionFactory {
 
 const actionFieldDescriptorCache: { [key: string]: PropertyDescriptor } = {}
 
-const actionFieldDecorator = createPropDecorator(
-    false,
-    (
-        instance: any,
-        propertyName: string,
-        descriptor: any,
-        decoratorTarget: any,
-        decoratorArgs: any[]
-    ) => {
-        const name = decoratorArgs[0] || propertyName
-        // Optimization: could cache descriptor (but need to cach on name/propertyName combo!)
-        Object.defineProperty(instance, propertyName, {
-            enumerable: false,
+// const actionFieldDecorator = createPropDecorator(
+//     false,
+//     (
+//         instance: any,
+//         propertyName: string,
+//         descriptor: any,
+//         decoratorTarget: any,
+//         decoratorArgs: any[]
+//     ) => {
+//         const name = decoratorArgs[0] || propertyName
+//         // Optimization: could cache descriptor (but need to cach on name/propertyName combo!)
+//         Object.defineProperty(instance, propertyName, {
+//             enumerable: false,
+//             configurable: true,
+//             set(v) {
+//                 const wrappedAction = action(name, v)
+//                 addHiddenProp(this, propertyName, wrappedAction)
+//             },
+//             get() {
+//                 return undefined
+//             }
+//         })
+//     }
+// )
+
+function actionFieldDecorator(name: string) {
+    // Simple property that writes on first invocation to the current instance
+    return function(target, prop, descriptor) {
+        Object.defineProperty(target, prop, {
             configurable: true,
-            set(v) {
-                const wrappedAction = action(name, v)
-                addHiddenProp(this, propertyName, wrappedAction)
-            },
+            enumerable: false,
             get() {
                 return undefined
+            },
+            set(value) {
+                addHiddenProp(this, prop, action(name, value))
             }
         })
     }
-)
+}
 
 const actionFieldDecoratorOld = createClassPropertyDecorator(
     function(target, key, value, args, originalDescriptor) {
@@ -137,18 +153,31 @@ action.bound = function boundAction(arg1, arg2?, arg3?) {
 }
 
 function namedActionDecorator(name: string) {
-    return function(target, prop, descriptor) {
+    return function(target, prop, descriptor: BabelDescriptor) {
         // babel / typescript
         // @action method() { }
         if (descriptor) {
             if (process.env.NODE_ENV !== "production" && descriptor.get !== undefined) {
                 return fail("@action cannot be used with getters")
             }
+            if (descriptor.value) {
+                // typescript
+                return {
+                    value: createAction(name, descriptor.value),
+                    enumerable: false,
+                    configurable: false,
+                    writable: true // for typescript, this must be writable, otherwise it cannot inherit :/ (see inheritable actions test)
+                }
+            }
+            // babel
             return {
-                value: createAction(name, descriptor.value),
                 enumerable: false,
                 configurable: false,
-                writable: true // for typescript, this must be writable, otherwise it cannot inherit :/ (see inheritable actions test)
+                writable: false,
+                initializer() {
+                    // N.B: we can't immediately invoke initializer; this would be wrong
+                    return createAction(name, descriptor.initializer!.call(this))
+                }
             }
         }
         // bound instance methods
