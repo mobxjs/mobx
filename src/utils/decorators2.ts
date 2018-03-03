@@ -60,7 +60,11 @@ export function initializeInstance(target: DecoratorTarget) {
         }
 }
 
-// TODO: add param, declare enumerable
+// This is a special token to signal the direct application of a decorator, allow extendObservable to skip the entire type decoration part,
+// as the instance to apply the deorator to equals the target
+// TODO: just make this a boolean
+export const applyToInstance = {}
+
 export function createPropDecorator(
     propertyInitiallyEnumerable: boolean,
     propertyCreator: PropertyCreator
@@ -71,8 +75,13 @@ export function createPropDecorator(
         const decorator = function decorate(
             target: DecoratorTarget,
             prop: string,
-            descriptor: BabelDescriptor | undefined
+            descriptor: BabelDescriptor | undefined,
+            applyImmediately?: any
         ) {
+            if (applyImmediately === applyToInstance) {
+                propertyCreator(target, prop, descriptor, target, decoratorArguments)
+                return null
+            }
             if (process.env.NODE_ENV !== "production" && !quacksLikeADecorator(arguments))
                 fail("This function is a decorator, but it wasn't invoked like a decorator")
             if (!Object.prototype.hasOwnProperty.call(target, "__mobxDecorators")) {
@@ -102,5 +111,8 @@ export function createPropDecorator(
 }
 
 export function quacksLikeADecorator(args: IArguments): boolean {
-    return (args.length === 2 || args.length === 3) && typeof args[1] === "string"
+    return (
+        ((args.length === 2 || args.length === 3) && typeof args[1] === "string") ||
+        (args.length === 4 && args[3] === applyToInstance)
+    )
 }

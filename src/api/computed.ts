@@ -13,7 +13,7 @@ export interface IComputed {
     struct(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator
 }
 
-const computedDecorator = createPropDecorator(
+export const computedDecorator = createPropDecorator(
     false,
     (
         instance: any,

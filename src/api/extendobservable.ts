@@ -10,11 +10,17 @@ import { startBatch, endBatch } from "../core/observable"
 import {
     CreateObservableOptions,
     asCreateObservableOptions,
-    shallowCreateObservableOptions
+    shallowCreateObservableOptions,
+    observable,
+    deepDecorator,
+    shallowDecorator,
+    refDecorator
 } from "./observable"
 import { decorate } from "./decorate"
 import { isComputed } from "./iscomputed"
 import { referenceEnhancer, deepEnhancer } from "../types/modifiers"
+import { computed, computedDecorator } from "./computed"
+import { applyToInstance } from "../utils/decorators2"
 
 export function extendShallowObservable<A extends Object, B extends Object>(
     target: A,
@@ -55,9 +61,10 @@ export function extendObservable<A extends Object, B extends Object>(
 
     // TODO: eliminate options, preserve name
     options = asCreateObservableOptions(options)
-    // TODO:
-    // const defaultDecorator =
-    //     options.defaultDecorator || (options.deep === false ? observable.ref : observable.deep)
+    // TODO: the default decorator should be piced from observable object
+    const defaultDecorator =
+        options.defaultDecorator || (options.deep === false ? refDecorator : deepDecorator)
+    // TODO: pass in the default decorator
     asObservableObject(target) // make sure object is observable, even without initial props
     startBatch()
     try {
@@ -65,45 +72,58 @@ export function extendObservable<A extends Object, B extends Object>(
         const unassigned: string[] = []
         for (let key in properties) {
             const descriptor = Object.getOwnPropertyDescriptor(properties, key)!
-            const { value, get } = descriptor
+            // const { value, get } = descriptor
             // TODO: introduce and check decorators arg
             if (process.env.NODE_ENV !== "production") {
                 if (Object.getOwnPropertyDescriptor(target, key))
                     fail(
                         `'extendObservable' can only be used to introduce new properties. Use 'set' or 'decorate' instead. The property '${key}' already exists on '${target}'`
                     )
-                if (isComputed(value))
+                if (isComputed(descriptor.value))
                     fail(
                         `Passing a 'computed' as initial property value is no longer supported by extendObservable. Use a getter or decorator instead`
                     )
+                // TODO: check for superfluos decorators
             }
-            if (typeof get === "function") {
-                // todo: push getter
-                if (decorators && decorators[key]) {
-                    // just copy the description, the decorator will pick it up during decorate
-                    Object.defineProperty(target, key, descriptor)
-                } else {
-                    // optimized shortcut; don't use the decorator but declare prop right away
-                    defineComputedProperty(target, target, key, { get, set: descriptor.set })
-                }
-            } else {
-                if (decorators && decorators[key]) unassigned.push(key)
-                else {
-                    // optimized shortcut; don't use the decorator but declare prop right away
-                    // TODO: theother enhancers
-                    defineObservableProperty(
-                        target,
-                        key,
-                        value,
-                        options.deep === false ? referenceEnhancer : deepEnhancer
-                    )
-                }
-            }
+            const decorator =
+                decorators && key in decorators
+                    ? decorators[key]
+                    : descriptor.get ? computedDecorator : defaultDecorator
+            if (process.env.NODE_ENV !== "production" && typeof decorator !== "function")
+                return fail(`Not a valid decorator for '${key}', got: ${decorator}`)
+
+            const resultDescriptor = decorator!(target, key, descriptor, applyToInstance)
+            if (
+                resultDescriptor // otherwise, assume already applied, due to `applyToInstance`
+            )
+                Object.defineProperty(target, key, resultDescriptor)
+            // if (typeof get === "function") {
+            //     // todo: push getter
+            //     if (decorators && decorators[key]) {
+            //         // just copy the description, the decorator will pick it up during decorate
+            //         Object.defineProperty(target, key, descriptor)
+            //     } else {
+            //         // optimized shortcut; don't use the decorator but declare prop right away
+            //         defineComputedProperty(target, target, key, { get, set: descriptor.set })
+            //     }
+            // } else {
+            //     if (decorators && decorators[key]) unassigned.push(key)
+            //     else {
+            //         // optimized shortcut; don't use the decorator but declare prop right away
+            //         // TODO: theother enhancers
+            //         defineObservableProperty(
+            //             target,
+            //             key,
+            //             value,
+            //             options.deep === false ? referenceEnhancer : deepEnhancer
+            //         )
+            //     }
+            // }
         }
-        if (decorators) decorate(target, decorators as any)
-        // TODO: can optimize decorators away if decorators are callable?
-        decorate(target, additionalDecorators)
-        unassigned.forEach(key => (target[key] = properties[key])) // TODO: optimize
+        // if (decorators) decorate(target, decorators as any)
+        // // TODO: can optimize decorators away if decorators are callable?
+        // decorate(target, additionalDecorators)
+        // unassigned.forEach(key => (target[key] = properties[key])) // TODO: optimize
     } finally {
         endBatch()
     }
