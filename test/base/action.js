@@ -372,6 +372,55 @@ test("computed values and actions", () => {
     expect(calls).toBe(3)
 })
 
+test("extendObservable respects action decorators", () => {
+    debugger
+    const x = mobx.observable.object(
+        // TODO remove .object
+        {
+            a1() {
+                return this
+            },
+            a2() {
+                return this
+            },
+            a3() {
+                return this
+            }
+        },
+        {
+            a1: mobx.action,
+            a2: mobx.action.bound
+        }
+    )
+    expect(mobx.isAction(x.a1)).toBe(true)
+    expect(mobx.isAction(x.a2)).toBe(true)
+    expect(mobx.isAction(x.a3)).toBe(false)
+
+    const global = (function() {
+        return this
+    })()
+
+    const { a1, a2, a3 } = x
+    expect(a1.call(x)).toBe(x)
+    // expect(a1()).toBe(global)
+    expect(a2.call(x)).toBe(x)
+    expect(a2()).toBe(x)
+    expect(a3.call(x)).toBe(x)
+    // expect(a3()).toBe(global)
+})
+
+test("expect warning for invalid decorator", () => {
+    expect(() => {
+        mobx.observable({ x: 1 }, { x: undefined })
+    }).toThrow(/Not a valid decorator for 'x', got: undefined/)
+})
+
+test.skip("expect warning superfluos decorator", () => {
+    expect(() => {
+        mobx.observable({ x() {} }, { y: mobx.action })
+    }).toThrow(/Not a valid decorator for 'x', got: undefined/)
+})
+
 // TODO re-enable
 test.skip("bound actions bind", () => {
     var called = 0

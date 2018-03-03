@@ -97,6 +97,7 @@ export { getDebugName, getAtom, getAdministration as _getAdministration } from "
 export { allowStateChanges as _allowStateChanges } from "./core/action"
 export { Lambda, isArrayLike } from "./utils/utils"
 export { isComputingDerivation as _isComputingDerivation } from "./core/derivation"
+// TOOD: move next thee to confgiure
 export { setReactionScheduler as _setReactionScheduler, onReactionError } from "./core/reaction"
 export { reserveArrayBuffer as _reserveArrayBuffer /* See #734 */ } from "./types/observablearray"
 export { interceptReads as _interceptReads } from "./api/intercept-read"
@@ -120,3 +121,5 @@ if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
         }
     })
 }
+
+// TODO: generate getters for legacy api's

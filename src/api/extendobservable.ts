@@ -1,5 +1,5 @@
 import { isObservableMap } from "../types/observablemap"
-import { asObservableObject, defineObservableProperty } from "../types/observableobject"
+import { asObservableObject } from "../types/observableobject"
 import { isObservable } from "./isobservable"
 import { invariant, deprecated, fail } from "../utils/utils"
 import { startBatch, endBatch } from "../core/observable"
@@ -7,12 +7,12 @@ import {
     CreateObservableOptions,
     asCreateObservableOptions,
     shallowCreateObservableOptions,
-    observable
+    deepDecorator,
+    refDecorator
 } from "./observable"
-import { computed } from "./computed"
-import { decorate } from "./decorate"
 import { isComputed } from "./iscomputed"
-import { referenceEnhancer, deepEnhancer } from "../types/modifiers"
+import { computedDecorator } from "./computed"
+import { applyToInstance } from "../utils/decorators2"
 
 export function extendShallowObservable<A extends Object, B extends Object>(
     target: A,
@@ -53,50 +53,41 @@ export function extendObservable<A extends Object, B extends Object>(
 
     // TODO: eliminate options, preserve name
     options = asCreateObservableOptions(options)
-    // TODO:
+    // TODO: the default decorator should be piced from observable object
     const defaultDecorator =
-        options.defaultDecorator || (options.deep === false ? observable.ref : observable.deep)
-    const adm = asObservableObject(target) // make sure it can be observable
+        options.defaultDecorator || (options.deep === false ? refDecorator : deepDecorator)
+    // TODO: pass in the default decorator
+    asObservableObject(target) // make sure object is observable, even without initial props
     startBatch()
     try {
-        const additionalDecorators = {} as any // don't want to modify passed in object
-        const unassigned: string[] = []
         for (let key in properties) {
             const descriptor = Object.getOwnPropertyDescriptor(properties, key)!
-            const { value, get } = descriptor
+            // const { value, get } = descriptor
             // TODO: introduce and check decorators arg
             if (process.env.NODE_ENV !== "production") {
                 if (Object.getOwnPropertyDescriptor(target, key))
                     fail(
                         `'extendObservable' can only be used to introduce new properties. Use 'set' or 'decorate' instead. The property '${key}' already exists on '${target}'`
                     )
-                if (isComputed(value))
+                if (isComputed(descriptor.value))
                     fail(
                         `Passing a 'computed' as initial property value is no longer supported by extendObservable. Use a getter or decorator instead`
                     )
+                // TODO: check for superfluos decorators
             }
-            if (typeof get === "function") {
-                Object.defineProperty(target, key, descriptor)
-                if (!decorators || !decorators[key]) additionalDecorators[key] = computed
-            } else {
-                if (decorators && decorators[key]) unassigned.push(key)
-                else {
-                    // TODO: theother enhancers
-                    defineObservableProperty(
-                        adm,
-                        key,
-                        value,
-                        options.deep === false ? referenceEnhancer : deepEnhancer
-                    )
-                    // additionalDecorators[key] = defaultDecorator
-                    // unassigned.push(key)
-                }
-            }
+            const decorator =
+                decorators && key in decorators
+                    ? decorators[key]
+                    : descriptor.get ? computedDecorator : defaultDecorator
+            if (process.env.NODE_ENV !== "production" && typeof decorator !== "function")
+                return fail(`Not a valid decorator for '${key}', got: ${decorator}`)
+
+            const resultDescriptor = decorator!(target, key, descriptor, applyToInstance)
+            if (
+                resultDescriptor // otherwise, assume already applied, due to `applyToInstance`
+            )
+                Object.defineProperty(target, key, resultDescriptor)
         }
-        if (decorators) decorate(target, decorators as any)
-        // TODO: can optimize decorators away if decorators are callable
-        decorate(target, additionalDecorators)
-        unassigned.forEach(key => (target[key] = properties[key])) // TODO: optimize
     } finally {
         endBatch()
     }

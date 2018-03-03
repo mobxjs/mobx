@@ -1,9 +1,9 @@
 import { comparer } from "../utils/comparer"
 import { IComputedValueOptions } from "../core/computedvalue"
-import { asObservableObject, defineComputedProperty } from "../types/observableobject"
+import { defineComputedProperty } from "../types/observableobject"
 import { invariant } from "../utils/utils"
-import { createClassPropertyDecorator } from "../utils/decorators"
 import { ComputedValue, IComputedValue } from "../core/computedvalue"
+import { createPropDecorator } from "../utils/decorators2"
 
 export interface IComputed {
     <T>(options: IComputedValueOptions<T>): any // decorator
@@ -13,38 +13,24 @@ export interface IComputed {
     struct(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator
 }
 
-function createComputedDecorator(options: IComputedValueOptions<any>) {
-    return createClassPropertyDecorator(
-        (target, name, _, __, originalDescriptor) => {
-            process.env.NODE_ENV !== "production" &&
-                invariant(
-                    typeof originalDescriptor !== "undefined" &&
-                        typeof originalDescriptor.get === "function",
-                    "@computed can only be used on getter functions like: '@computed get myProps() { return ...; }'."
-                )
+export const computedDecorator = createPropDecorator(
+    false,
+    (
+        instance: any,
+        propertyName: string,
+        descriptor: any,
+        decoratorTarget: any,
+        decoratorArgs: any[]
+    ) => {
+        const { get, set } = descriptor // initialValue is the descriptor for get / set props
+        // Optimization: faster on decorator target or instance? Assuming target
+        // TODO: find out if declaring on instance isn't just faster. (also makes the property descriptor simpler)
+        const options = decoratorArgs[0] || {}
+        defineComputedProperty(instance, decoratorTarget, propertyName, { ...options, get, set })
+    }
+)
 
-            const adm = asObservableObject(target, "")
-            const { get, set } = originalDescriptor
-            defineComputedProperty(adm, name, { ...options, get, set }, false)
-        },
-        function(name) {
-            const observable = this.$mobx.values[name]
-            if (
-                observable === undefined // See #505
-            )
-                return undefined
-            return observable.get()
-        },
-        function(name, value) {
-            this.$mobx.values[name].set(value)
-        },
-        false,
-        false
-    )
-}
-
-const computedDecorator = createComputedDecorator({})
-const computedStructDecorator = createComputedDecorator({ equals: comparer.structural })
+const computedStructDecorator = computedDecorator({ equals: comparer.structural })
 
 /**
  * Decorator for class properties: @computed get value() { return expr; }.
@@ -52,12 +38,15 @@ const computedStructDecorator = createComputedDecorator({ equals: comparer.struc
  */
 export var computed: IComputed = function computed(arg1, arg2, arg3) {
     if (typeof arg2 === "string") {
+        // @computed
         return computedDecorator.apply(null, arguments)
     }
     if (arg1 !== null && typeof arg1 === "object" && arguments.length === 1) {
-        return createComputedDecorator(arg1)
+        // @computed({ options })
+        return computedDecorator.apply(null, arguments)
     }
 
+    // computed(expr, options?)
     if (process.env.NODE_ENV !== "production") {
         invariant(
             typeof arg1 === "function",

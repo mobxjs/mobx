@@ -298,3 +298,22 @@ test.skip("decorate should work with constructor function", function() {
     box2.undeclared = 1
     expect(box2.width).toBe(40) // no shared state!
 })
+
+test("decorate should work with inheritance through Object.create", () => {
+    const P = {
+        x: 3
+    }
+    decorate(P, {
+        x: observable
+    })
+
+    const child1 = Object.create(P)
+    expect(child1.x).toBe(3) // now an own property
+    child1.x = 4
+    expect(child1.x).toBe(4)
+    const child2 = Object.create(P)
+    expect(child2.x).toBe(3)
+    child2.x = 5
+    expect(child2.x).toBe(5)
+    expect(child1.x).toBe(4)
+})

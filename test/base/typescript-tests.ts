@@ -1,3 +1,5 @@
+"use strict"
+
 import {
     observe,
     computed,
@@ -52,23 +54,23 @@ const t = {
     }
 }
 
-class Order {
-    @observable price: number = 3
-    @observable amount: number = 2
-    @observable orders: string[] = []
-    @observable aFunction = testFunction
+test("decorators", () => {
+    class Order {
+        @observable price: number = 3
+        @observable amount: number = 2
+        @observable orders: string[] = []
+        @observable aFunction = testFunction
 
-    @computed
-    get total() {
-        return this.amount * this.price * (1 + this.orders.length)
+        @computed
+        get total() {
+            return this.amount * this.price * (1 + this.orders.length)
+        }
+
+        // Typescript classes cannot be defined inside functions,
+        // but if the next line is enabled it should throw...
+        // @observable hoepie() { return 3; }
     }
 
-    // Typescript classes cannot be defined inside functions,
-    // but if the next line is enabled it should throw...
-    // @observable hoepie() { return 3; }
-}
-
-test("decorators", () => {
     var o = new Order()
     t.equal(isObservableObject(o), true)
     t.equal(isObservableProp(o, "amount"), true)
@@ -104,6 +106,18 @@ test("observable", () => {
 })
 
 test("annotations", () => {
+    class Order {
+        @observable price: number = 3
+        @observable amount: number = 2
+        @observable orders: string[] = []
+        @observable aFunction = testFunction
+
+        @computed
+        get total() {
+            return this.amount * this.price * (1 + this.orders.length)
+        }
+    }
+
     var order1totals: number[] = []
     var order1 = new Order()
     var order2 = new Order()
@@ -671,7 +685,7 @@ test.skip("observable performance", () => {
 
     for (var i = 0; i < AMOUNT; i++) objs.push(new A())
 
-    // console.log("created in ", Date.now() - start)
+    console.log("created in ", Date.now() - start)
 
     for (var j = 0; j < 4; j++) {
         for (var i = 0; i < AMOUNT; i++) {
@@ -683,7 +697,7 @@ test.skip("observable performance", () => {
         }
     }
 
-    // console.log("changed in ", Date.now() - start)
+    console.log("changed in ", Date.now() - start)
 })
 
 test("unbound methods", () => {
@@ -719,7 +733,7 @@ test("inheritance", () => {
             return this.a + this.b
         }
     }
-
+    debugger
     const b1 = new B()
     const b2 = new B()
     const values: any[] = []
@@ -878,6 +892,7 @@ test("verify object assign (typescript)", () => {
 })
 
 test("379, inheritable actions (typescript)", () => {
+    debugger
     class A {
         @action
         method() {
@@ -1128,6 +1143,7 @@ test("@observable.deep (TS)", () => {
 })
 
 test("action.bound binds (TS)", () => {
+    debugger
     class A {
         @observable x = 0
         @action.bound
@@ -1387,8 +1403,8 @@ test("typescript - decorate works with objects", () => {
             // size: observable // MWE: enabling this should give type error!
         }
     )
-    expect(b.height).toBe(2)
     expect(mobx.isObservableProp(b, "height")).toBe(true)
+    expect(b.height).toBe(2)
 })
 
 test("typescript - decorate works with Object.create", () => {
@@ -1402,8 +1418,8 @@ test("typescript - decorate works with Object.create", () => {
     })
 
     const b = Object.create(Box)
-    expect(b.height).toBe(2)
     expect(mobx.isObservableProp(b, "height")).toBe(true)
+    expect(b.height).toBe(2)
 })
 
 test("issue #1122", done => {
@@ -1459,4 +1475,27 @@ test("unread computed reads should trow with requiresReaction enabled", () => {
     expect(() => {
         a.y
     }).toThrow(/is read outside a reactive context/)
+})
+
+test("multiple inheritance should work", () => {
+    class A {
+        @observable x = 1
+    }
+
+    class B extends A {
+        @observable y = 1
+    }
+
+    expect(mobx.keys(new B())).toEqual(["x", "y"])
+})
+
+test.skip("actions are reassignable", () => {
+    class A {
+        @action m2 = () => {} // non-enumerable, on self
+    }
+
+    const a = new A()
+    expect(isAction(a.m2)).toBe(true)
+    a.m2 = () => {}
+    expect(isAction(a.m2)).toBe(true)
 })

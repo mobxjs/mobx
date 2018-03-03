@@ -1,5 +1,5 @@
 import { ObservableValue, UNCHANGED } from "./observablevalue"
-import { isComputedValue, ComputedValue, IComputedValueOptions } from "../core/computedvalue"
+import { ComputedValue, IComputedValueOptions } from "../core/computedvalue"
 import {
     createInstanceofPredicate,
     isObject,
@@ -8,7 +8,9 @@ import {
     invariant,
     assertPropertyConfigurable,
     isPlainObject,
-    addHiddenFinalProp
+    fail,
+    addHiddenFinalProp,
+    isPropertyConfigurable
 } from "../utils/utils"
 import { runLazyInitializers } from "../utils/decorators"
 import {
@@ -21,6 +23,7 @@ import { IListenable, registerListener, hasListeners, notifyListeners } from "./
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
 import { IEnhancer, referenceEnhancer } from "./modifiers"
 import { ObservableArray, IObservableArray } from "./observablearray"
+import { initializeInstance } from "../utils/decorators2"
 
 export interface IObservableObject {
     "observable-object": IObservableObject
@@ -51,13 +54,25 @@ export class ObservableObjectAdministration
 
     constructor(public target: any, public name: string) {}
 
-    read(propName: string) {
-        return this.values[propName].get()
+    read(owner: any, key: string) {
+        if (this.target !== owner) {
+            this.illegalAccess(owner, key)
+            return
+        }
+        return this.values[key].get()
     }
 
-    write(key: string, newValue) {
+    write(owner: any, key: string, newValue) {
         const instance = this.target
+        if (instance !== owner) {
+            this.illegalAccess(owner, key)
+            return
+        }
         const observable = this.values[key]
+        if (observable instanceof ComputedValue) {
+            observable.set(newValue)
+            return
+        }
 
         // intercept
         if (hasInterceptors(this)) {
@@ -92,6 +107,31 @@ export class ObservableObjectAdministration
             if (notify) notifyListeners(this, change)
             if (notifySpy) spyReportEnd()
         }
+    }
+
+    illegalAccess(owner, propName) {
+        /**
+         * This happens if a property is accessed through the prototype chain, but the property was
+         * declared directly as own property on the prototype.
+         *
+         * E.g.:
+         * class A {
+         * }
+         * extendObservable(A.prototype, { x: 1 })
+         *
+         * classB extens A {
+         * }
+         * console.log(new B().x)
+         *
+         * It is unclear whether the property should be considered 'static' or inherited.
+         * Either use `console.log(A.x)`
+         * or: decorate(A, { x: observable })
+         *
+         * When using decorate, the property will always be redeclared as own property on the actual instance
+         */
+        return fail(
+            `Property '${propName}' of '${owner}' was accessed through the prototype chain. Use 'decorate' instead to declare the prop or access it statically through it's owner`
+        )
     }
 
     /**
@@ -130,7 +170,9 @@ export interface IIsObservableObject {
 }
 
 export function asObservableObject(target, name?: string): ObservableObjectAdministration {
-    if (isObservableObject(target) && Object.prototype.hasOwnProperty.call(target, "$mobx"))
+    if (
+        Object.prototype.hasOwnProperty.call(target, "$mobx") // TODO: needs own property check?
+    )
         return (target as any).$mobx
 
     process.env.NODE_ENV !== "production" &&
@@ -148,16 +190,17 @@ export function asObservableObject(target, name?: string): ObservableObjectAdmin
 }
 
 export function defineObservableProperty(
-    adm: ObservableObjectAdministration,
+    target: any,
     propName: string,
     newValue,
     enhancer: IEnhancer<any>
 ) {
-    assertPropertyConfigurable(adm.target, propName)
+    const adm = asObservableObject(target)
+    assertPropertyConfigurable(target, propName)
 
     if (hasInterceptors(adm)) {
         const change = interceptChange<IObjectWillChange>(adm, {
-            object: adm.target,
+            object: target,
             name: propName,
             type: "add",
             newValue
@@ -173,24 +216,24 @@ export function defineObservableProperty(
     ))
     newValue = (observable as any).value // observableValue might have changed it
 
-    Object.defineProperty(adm.target, propName, generateObservablePropConfig(propName))
+    Object.defineProperty(target, propName, generateObservablePropConfig(propName))
     if (adm.keys) adm.keys.push(propName)
-    notifyPropertyAddition(adm, adm.target, propName, newValue)
+    notifyPropertyAddition(adm, target, propName, newValue)
 }
 
 export function defineComputedProperty(
-    adm: ObservableObjectAdministration,
+    valueOwner: any, // which objects holds the observable and provides `this` context?
+    propertyOwner: any, // where is the property declared?
     propName: string,
-    options: IComputedValueOptions<any>,
-    asInstanceProperty: boolean
+    options: IComputedValueOptions<any>
 ) {
-    if (asInstanceProperty) assertPropertyConfigurable(adm.target, propName)
+    const adm = asObservableObject(valueOwner, "")
     options.name = options.name || `${adm.name}.${propName}`
-    options.context = adm.target
+    options.context = valueOwner
     adm.values[propName] = new ComputedValue(options)
-    if (asInstanceProperty) {
-        Object.defineProperty(adm.target, propName, generateComputedPropConfig(propName))
-    }
+    // TODO: isPropertyConfigurable needed / best check?
+    if (propertyOwner === valueOwner || isPropertyConfigurable(propertyOwner, propName))
+        Object.defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
 }
 
 const observablePropertyConfigs = {}
@@ -202,14 +245,25 @@ export function generateObservablePropConfig(propName) {
         (observablePropertyConfigs[propName] = {
             configurable: true,
             enumerable: true,
-            get: function() {
-                return this.$mobx.values[propName].get()
+            get() {
+                return this.$mobx.read(this, propName)
             },
-            set: function(v) {
-                this.$mobx.write(propName, v)
+            set(v) {
+                this.$mobx.write(this, propName, v)
             }
         })
     )
+}
+
+function getAdministrationForComputedPropOwner(owner: any): ObservableObjectAdministration {
+    const adm = owner.$mobx
+    if (!adm) {
+        // because computed props are declared on proty,
+        // the current instance might not have been initialized yet
+        initializeInstance(owner)
+        return owner.$mobx
+    }
+    return adm
 }
 
 export function generateComputedPropConfig(propName) {
@@ -218,11 +272,11 @@ export function generateComputedPropConfig(propName) {
         (computedPropertyConfigs[propName] = {
             configurable: true,
             enumerable: false,
-            get: function() {
-                return this.$mobx.read(propName)
+            get() {
+                return getAdministrationForComputedPropOwner(this).read(this, propName)
             },
-            set: function(v) {
-                return this.$mobx.values[propName].set(v)
+            set(v) {
+                getAdministrationForComputedPropOwner(this).write(this, propName, v)
             }
         })
     )

@@ -523,7 +523,7 @@ test("ES5 non reactive props - 2", function() {
 test("exceptions", function() {
     expect(function() {
         m.observable.ref(m.observable.shallow(3))
-    }).toThrow(/This function is a decorator, but it wasn't invoked like a decorator/)
+    }).toThrow(/@observable decorator doesn't expect any arguments/)
 })
 
 test("540 - extendobservable should not report cycles", function() {
