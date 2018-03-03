@@ -415,7 +415,7 @@ test("expect warning for invalid decorator", () => {
     }).toThrow(/Not a valid decorator for 'x', got: undefined/)
 })
 
-test("expect warning superfluos decorator", () => {
+test.skip("expect warning superfluos decorator", () => {
     expect(() => {
         mobx.observable({ x() {} }, { y: mobx.action })
     }).toThrow(/Not a valid decorator for 'x', got: undefined/)
