@@ -133,3 +133,5 @@ test("array - set, remove, values are reactive", () => {
 })
 
 // TODO: test: observe and intercept property additions
+
+// TODO: test, dynamically adding properties should preserve the original modifiers of an object

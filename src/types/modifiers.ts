@@ -2,6 +2,7 @@ export interface IEnhancer<T> {
     (newValue: T, oldValue: T | undefined, name: string): T
 }
 
+// TODO: kill?
 export interface IModifierDescriptor<T> {
     isMobxModifierDescriptor: boolean
     initialValue: T | undefined

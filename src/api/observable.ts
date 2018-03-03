@@ -1,4 +1,4 @@
-import { invariant, fail, deprecated } from "../utils/utils"
+import { invariant, fail, deprecated, isES6Map, isPlainObject } from "../utils/utils"
 import {
     IModifierDescriptor,
     deepEnhancer,
@@ -58,9 +58,9 @@ function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any
     return options.deep === false ? referenceEnhancer : deepEnhancer
 }
 
-const deepDecorator = createDecoratorForEnhancer(deepEnhancer)
+export const deepDecorator = createDecoratorForEnhancer(deepEnhancer)
 const shallowDecorator = createDecoratorForEnhancer(shallowEnhancer)
-const refDecorator = createDecoratorForEnhancer(referenceEnhancer)
+export const refDecorator = createDecoratorForEnhancer(referenceEnhancer)
 const deepStructDecorator = createDecoratorForEnhancer(deepStructEnhancer)
 const refStructDecorator = createDecoratorForEnhancer(refStructEnhancer)
 
@@ -68,21 +68,22 @@ const refStructDecorator = createDecoratorForEnhancer(refStructEnhancer)
  * Turns an object, array or function into a reactive structure.
  * @param v the value which should become observable.
  */
-function createObservable(v: any) {
+function createObservable(v: any, arg2?: any, arg3?: any) {
     // @observable someProp;
     if (typeof arguments[1] === "string") {
         return deepDecorator.apply(null, arguments)
-    }
-
-    if (process.env.NODE_ENV !== "production") {
-        invariant(arguments.length === 1, "observable expects one arguments")
     }
 
     // it is an observable already, done
     if (isObservable(v)) return v
 
     // something that can be converted and mutated?
-    const res = deepEnhancer(v, undefined, undefined)
+    // TODO: add tests for all these extra args
+    const res = Array.isArray(v)
+        ? observable.array(v, arg2)
+        : isES6Map(v)
+          ? observable.map(v, arg2)
+          : isPlainObject(v) ? observable.object(v, arg2, arg3) : v
 
     // this value could be converted to a new observable data structure, return it
     if (res !== v) return res
@@ -96,11 +97,15 @@ function createObservable(v: any) {
 
 export interface IObservableFactory {
     // observable overloads
-    <T>(wrapped: IModifierDescriptor<T>): T
-    (target: Object, key: string, baseDescriptor?: PropertyDescriptor): any
-    <T>(value: T[]): IObservableArray<T>
-    <K, V>(value: Map<K, V>): ObservableMap<K, V>
-    <T extends Object>(value: T): T & IObservableObject
+    <T>(wrapped: IModifierDescriptor<T>): T // TODO: kill this overload?
+    (target: Object, key: string, baseDescriptor?: PropertyDescriptor): any // decorator
+    <T>(value: T[], options?: CreateObservableOptions): IObservableArray<T>
+    <K, V>(value: Map<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>
+    <T extends Object>(
+        value: T,
+        decorators?: { [K in keyof T]?: Function },
+        options?: CreateObservableOptions
+    ): T & IObservableObject
 }
 
 export interface IObservableFactories {
