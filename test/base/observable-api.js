@@ -10,14 +10,14 @@ test("keys should be observable when extending", () => {
         titles => todoTitles.push(titles.join(","))
     )
 
-    mobx.extendObservable(todos, {
+    mobx.set(todos, {
         lewis: "Read Lewis",
         chesterton: "Be mind blown by Chesterton"
     })
     expect(todoTitles).toEqual(["lewis: Read Lewis,chesterton: Be mind blown by Chesterton"])
 
-    mobx.extendObservable(todos, { lewis: "Read Lewis twice" })
-    mobx.extendObservable(todos, { coffee: "Grab coffee" })
+    mobx.set(todos, { lewis: "Read Lewis twice" })
+    mobx.set(todos, { coffee: "Grab coffee" })
     expect(todoTitles).toEqual([
         "lewis: Read Lewis,chesterton: Be mind blown by Chesterton",
         "lewis: Read Lewis twice,chesterton: Be mind blown by Chesterton",
@@ -33,12 +33,12 @@ test("toJS respects key changes", () => {
         serialized.push(JSON.stringify(mobx.toJS(todos)))
     })
 
-    mobx.extendObservable(todos, {
+    mobx.set(todos, {
         lewis: "Read Lewis",
         chesterton: "Be mind blown by Chesterton"
     })
-    mobx.extendObservable(todos, { lewis: "Read Lewis twice" })
-    mobx.extendObservable(todos, { coffee: "Grab coffee" })
+    mobx.set(todos, { lewis: "Read Lewis twice" })
+    mobx.set(todos, { coffee: "Grab coffee" })
     expect(serialized).toEqual([
         "{}",
         '{"lewis":"Read Lewis","chesterton":"Be mind blown by Chesterton"}',
@@ -131,3 +131,7 @@ test("array - set, remove, values are reactive", () => {
         [3, 4]
     ])
 })
+
+// TODO: test: observe and intercept property additions
+
+// TODO: test, dynamically adding properties should preserve the original modifiers of an object

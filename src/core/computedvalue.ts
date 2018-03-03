@@ -44,7 +44,7 @@ export interface IComputedValueOptions<T> {
     get?: () => T
     set?: (value: T) => void
     name?: string
-    compareStructural?: boolean
+    compareStructural?: boolean // TODO: remove (there is computed.struct already)
     equals?: IEqualsComparer<T>
     context?: any
     requiresReaction?: boolean

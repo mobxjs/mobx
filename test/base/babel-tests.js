@@ -63,6 +63,7 @@ test("babel", function() {
 
 test("should not be possible to use @action with getters", () => {
     expect(() => {
+        debugger
         class A {
             @action
             get Test() {}
@@ -304,6 +305,7 @@ test("custom action decorator (babel)", function() {
 })
 
 test("action decorator on field (babel)", function() {
+    debugger
     class Store {
         constructor(multiplier) {
             this.multiplier = multiplier
@@ -434,7 +436,7 @@ test.skip("observable performance", () => {
 
     for (var i = 0; i < AMOUNT; i++) objs.push(new A())
 
-    // console.log("created in ", Date.now() - start)
+    console.log("created in ", Date.now() - start)
 
     for (var j = 0; j < 4; j++) {
         for (var i = 0; i < AMOUNT; i++) {
@@ -446,7 +448,7 @@ test.skip("observable performance", () => {
         }
     }
 
-    // console.log("changed in ", Date.now() - start)
+    console.log("changed in ", Date.now() - start)
 })
 
 test("unbound methods", () => {
@@ -577,7 +579,7 @@ test("enumerability", () => {
     expect(a.hasOwnProperty("a")).toBe(false) // true would better..
     expect(a.hasOwnProperty("b")).toBe(false)
     expect(a.hasOwnProperty("m")).toBe(false)
-    expect(a.hasOwnProperty("m2")).toBe(false) // true would be ok as well
+    expect(a.hasOwnProperty("m2")).toBe(true)
 
     expect(mobx.isAction(a.m)).toBe(true)
     expect(mobx.isAction(a.m2)).toBe(true)
@@ -607,7 +609,7 @@ test("enumerability", () => {
     expect(a.hasOwnProperty("m2")).toBe(true)
 })
 
-test("enumerability - workaround", () => {
+test.skip("enumerability - workaround", () => {
     class A {
         @observable a = 1 // enumerable, on proto
         @observable a2 = 2
@@ -925,4 +927,130 @@ test("@computed.equals (Babel)", () => {
     ])
 
     disposeAutorun()
+})
+
+test("computed comparer works with decorate (babel)", () => {
+    const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
+    class Time {
+        constructor(hour, minute) {
+            this.hour = hour
+            this.minute = minute
+        }
+
+        get time() {
+            return { hour: this.hour, minute: this.minute }
+        }
+    }
+    mobx.decorate(Time, {
+        hour: observable,
+        minute: observable,
+        time: computed({ equals: sameTime })
+    })
+    const time = new Time(9, 0)
+
+    const changes = []
+    const disposeAutorun = autorun(() => changes.push(time.time))
+
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 9
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.minute = 0
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 10
+    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    expect(changes).toEqual([
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test("computed comparer works with decorate (babel) - 2", () => {
+    const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
+    class Time {
+        constructor(hour, minute) {
+            extendObservable(
+                this,
+                {
+                    hour,
+                    minute,
+                    get time() {
+                        return { hour: this.hour, minute: this.minute }
+                    }
+                },
+                {
+                    time: computed({ equals: sameTime })
+                }
+            )
+        }
+    }
+    const time = new Time(9, 0)
+
+    const changes = []
+    const disposeAutorun = autorun(() => changes.push(time.time))
+
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 9
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.minute = 0
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 10
+    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    expect(changes).toEqual([
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test("computed comparer works with decorate (babel) - 3", () => {
+    const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
+    const time = observable.object(
+        {
+            hour: 9,
+            minute: 0,
+            get time() {
+                return { hour: this.hour, minute: this.minute }
+            }
+        },
+        {
+            time: computed({ equals: sameTime })
+        }
+    )
+
+    const changes = []
+    const disposeAutorun = autorun(() => changes.push(time.time))
+
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 9
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.minute = 0
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 10
+    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    expect(changes).toEqual([
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test.skip("actions are not reassignable", () => {
+    class A {
+        @action m2 = () => {} // non-enumerable, on self
+    }
+
+    const a = new A()
+    expect(isAction(a.m2)).toBe(true)
+    a.m2 = () => {}
+    expect(isAction(a.m2)).toBe(true)
 })

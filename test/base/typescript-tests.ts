@@ -1,3 +1,5 @@
+"use strict"
+
 import {
     observe,
     computed,
@@ -52,23 +54,23 @@ const t = {
     }
 }
 
-class Order {
-    @observable price: number = 3
-    @observable amount: number = 2
-    @observable orders: string[] = []
-    @observable aFunction = testFunction
+test("decorators", () => {
+    class Order {
+        @observable price: number = 3
+        @observable amount: number = 2
+        @observable orders: string[] = []
+        @observable aFunction = testFunction
 
-    @computed
-    get total() {
-        return this.amount * this.price * (1 + this.orders.length)
+        @computed
+        get total() {
+            return this.amount * this.price * (1 + this.orders.length)
+        }
+
+        // Typescript classes cannot be defined inside functions,
+        // but if the next line is enabled it should throw...
+        // @observable hoepie() { return 3; }
     }
 
-    // Typescript classes cannot be defined inside functions,
-    // but if the next line is enabled it should throw...
-    // @observable hoepie() { return 3; }
-}
-
-test("decorators", () => {
     var o = new Order()
     t.equal(isObservableObject(o), true)
     t.equal(isObservableProp(o, "amount"), true)
@@ -104,6 +106,18 @@ test("observable", () => {
 })
 
 test("annotations", () => {
+    class Order {
+        @observable price: number = 3
+        @observable amount: number = 2
+        @observable orders: string[] = []
+        @observable aFunction = testFunction
+
+        @computed
+        get total() {
+            return this.amount * this.price * (1 + this.orders.length)
+        }
+    }
+
     var order1totals: number[] = []
     var order1 = new Order()
     var order2 = new Order()
@@ -159,7 +173,9 @@ test("scope", () => {
         extendObservable(this, {
             y: 3,
             // this will work here
-            z: computed(() => 2 * this.y)
+            get z() {
+                return 2 * this.y
+            }
         })
     }
 
@@ -201,17 +217,14 @@ test("issue8", () => {
             loggedIn2: boolean = false
             constructor() {
                 extendObservable(this, {
-                    loggedIn2: () => !!state.authToken
+                    get loggedIn2() {
+                        return true
+                    }
                 })
-            }
-
-            @observable
-            get loggedIn() {
-                return !!state.authToken
             }
         }
         const store = new LoginStoreTest()
-    }, /@computed/)
+    }, /'extendObservable' can only be used to introduce new properties/)
 })
 
 test("box", () => {
@@ -672,7 +685,7 @@ test.skip("observable performance", () => {
 
     for (var i = 0; i < AMOUNT; i++) objs.push(new A())
 
-    // console.log("created in ", Date.now() - start)
+    console.log("created in ", Date.now() - start)
 
     for (var j = 0; j < 4; j++) {
         for (var i = 0; i < AMOUNT; i++) {
@@ -684,7 +697,7 @@ test.skip("observable performance", () => {
         }
     }
 
-    // console.log("changed in ", Date.now() - start)
+    console.log("changed in ", Date.now() - start)
 })
 
 test("unbound methods", () => {
@@ -720,7 +733,7 @@ test("inheritance", () => {
             return this.a + this.b
         }
     }
-
+    debugger
     const b1 = new B()
     const b2 = new B()
     const values: any[] = []
@@ -879,6 +892,7 @@ test("verify object assign (typescript)", () => {
 })
 
 test("379, inheritable actions (typescript)", () => {
+    debugger
     class A {
         @action
         method() {
@@ -1129,6 +1143,7 @@ test("@observable.deep (TS)", () => {
 })
 
 test("action.bound binds (TS)", () => {
+    debugger
     class A {
         @observable x = 0
         @action.bound
@@ -1158,11 +1173,11 @@ test("803 - action.bound and action preserve type info", () => {
         })
     )
 
-    const bound = action.bound(() => {
+    const bound = action(() => {
         return { x: "3" } as Object
     }) as () => void
 
-    const bound2 = action.bound(function() {}) as (() => void)
+    const bound2 = action(function() {}) as (() => void)
 })
 
 test("@computed.equals (TS)", () => {
@@ -1203,28 +1218,137 @@ test("@computed.equals (TS)", () => {
     disposeAutorun()
 })
 
-test("computed comparer works with extendObservable (TS)", () => {
+test("computed comparer works with decorate (TS)", () => {
     const sameTime = (from: Time, to: Time) => from.hour === to.hour && from.minute === to.minute
     class Time {
-        constructor(hour: number, minute: number) {
-            this.hour = hour
-            this.minute = minute
-            extendObservable(this, {
-                hour,
-                minute,
-                time: computed(
-                    () => {
-                        return { hour: this.hour, minute: this.minute }
-                    },
-                    { equals: sameTime }
-                )
-            })
-        }
+        constructor(public hour: number, public minute: number) {}
 
-        public hour: number
-        public minute: number
+        get time() {
+            return { hour: this.hour, minute: this.minute }
+        }
+    }
+    decorate(Time, {
+        hour: observable,
+        minute: observable,
+        time: computed({ equals: sameTime })
+    })
+    const time = new Time(9, 0)
+
+    const changes: Array<{ hour: number; minute: number }> = []
+    const disposeAutorun = autorun(() => changes.push((time as any).time))
+
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 9
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.minute = 0
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 10
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    t.deepEqual(changes, [
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test("computed comparer works with decorate (TS)", () => {
+    const sameTime = (from: Time, to: Time) => from.hour === to.hour && from.minute === to.minute
+    class Time {
+        constructor(public hour: number, public minute: number) {}
+
+        get time() {
+            return { hour: this.hour, minute: this.minute }
+        }
+    }
+    decorate(Time, {
+        hour: observable,
+        minute: observable,
+        time: computed({ equals: sameTime })
+    })
+    const time = new Time(9, 0)
+
+    const changes: Array<{ hour: number; minute: number }> = []
+    const disposeAutorun = autorun(() => changes.push((time as any).time))
+
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 9
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.minute = 0
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 10
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    t.deepEqual(changes, [
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test("computed comparer works with decorate (TS) - 2", () => {
+    const sameTime = (from: Time, to: Time) => from.hour === to.hour && from.minute === to.minute
+    class Time {
+        hour: number
+        minute: number
+        readonly time: number
+
+        constructor(hour: number, minute: number) {
+            extendObservable(
+                this,
+                {
+                    hour,
+                    minute,
+                    get time() {
+                        return { hour: this.hour, minute: this.minute }
+                    }
+                },
+                {
+                    time: computed({ equals: sameTime })
+                }
+            )
+        }
     }
     const time = new Time(9, 0)
+
+    const changes: Array<{ hour: number; minute: number }> = []
+    const disposeAutorun = autorun(() => changes.push((time as any).time))
+
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 9
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.minute = 0
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 10
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    t.deepEqual(changes, [
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test("computed comparer works with decorate (TS) - 3", () => {
+    const sameTime = (from: any, to: any) => from.hour === to.hour && from.minute === to.minute
+    const time = observable.object(
+        {
+            hour: 9,
+            minute: 0,
+            get time() {
+                return { hour: this.hour, minute: this.minute }
+            }
+        },
+        {
+            time: computed({ equals: sameTime })
+        }
+    )
 
     const changes: Array<{ hour: number; minute: number }> = []
     const disposeAutorun = autorun(() => changes.push((time as any).time))
@@ -1279,8 +1403,8 @@ test("typescript - decorate works with objects", () => {
             // size: observable // MWE: enabling this should give type error!
         }
     )
-    expect(b.height).toBe(2)
     expect(mobx.isObservableProp(b, "height")).toBe(true)
+    expect(b.height).toBe(2)
 })
 
 test("typescript - decorate works with Object.create", () => {
@@ -1294,8 +1418,8 @@ test("typescript - decorate works with Object.create", () => {
     })
 
     const b = Object.create(Box)
-    expect(b.height).toBe(2)
     expect(mobx.isObservableProp(b, "height")).toBe(true)
+    expect(b.height).toBe(2)
 })
 
 test("issue #1122", done => {
@@ -1351,4 +1475,27 @@ test("unread computed reads should trow with requiresReaction enabled", () => {
     expect(() => {
         a.y
     }).toThrow(/is read outside a reactive context/)
+})
+
+test("multiple inheritance should work", () => {
+    class A {
+        @observable x = 1
+    }
+
+    class B extends A {
+        @observable y = 1
+    }
+
+    expect(mobx.keys(new B())).toEqual(["x", "y"])
+})
+
+test.skip("actions are reassignable", () => {
+    class A {
+        @action m2 = () => {} // non-enumerable, on self
+    }
+
+    const a = new A()
+    expect(isAction(a.m2)).toBe(true)
+    a.m2 = () => {}
+    expect(isAction(a.m2)).toBe(true)
 })

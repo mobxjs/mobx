@@ -1,6 +1,6 @@
-import { invariant, addHiddenProp, fail } from "../utils/utils"
-import { createClassPropertyDecorator } from "../utils/decorators"
+import { invariant, addHiddenProp, fail, addHiddenFinalProp } from "../utils/utils"
 import { createAction, executeAction, IAction } from "../core/action"
+import { BabelDescriptor } from "../utils/decorators2"
 
 export interface IActionFactory {
     // nameless actions
@@ -38,18 +38,6 @@ export interface IActionFactory {
     // unnamed decorator
     (target: Object, propertyKey: string, descriptor?: PropertyDescriptor): void
 
-    // .bound
-    bound<A1, R, T extends (a1: A1) => R>(fn: T): T & IAction
-    bound<A1, A2, R, T extends (a1: A1, a2: A2) => R>(fn: T): T & IAction
-    bound<A1, A2, A3, R, T extends (a1: A1, a2: A2, a3: A3) => R>(fn: T): T & IAction
-    bound<A1, A2, A3, A4, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4) => R>(fn: T): T & IAction
-    bound<A1, A2, A3, A4, A5, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => R>(
-        fn: T
-    ): T & IAction
-    bound<A1, A2, A3, A4, A5, A6, R, T extends (a1: A1, a2: A2, a3: A3, a4: A4, a6: A6) => R>(
-        fn: T
-    ): T & IAction
-
     // generic forms
     bound<T extends Function>(fn: T): T & IAction
     bound<T extends Function>(name: string, fn: T): T & IAction
@@ -58,35 +46,64 @@ export interface IActionFactory {
     bound(target: Object, propertyKey: string, descriptor?: PropertyDescriptor): void
 }
 
-const actionFieldDecorator = createClassPropertyDecorator(
-    function(target, key, value, args, originalDescriptor) {
-        const actionName =
-            args && args.length === 1 ? args[0] : value.name || key || "<unnamed action>"
-        const wrappedAction = action(actionName, value)
-        addHiddenProp(target, key, wrappedAction)
-    },
-    function(key) {
-        return this[key]
-    },
-    dontReassignFields,
-    false,
-    true
-)
-
-const boundActionDecorator = createClassPropertyDecorator(
-    function(target, key, value) {
-        defineBoundAction(target, key, value)
-    },
-    function(key) {
-        return this[key]
-    },
-    dontReassignFields,
-    false,
-    false
-)
+function actionFieldDecorator(name: string) {
+    // Simple property that writes on first invocation to the current instance
+    return function(target, prop, descriptor) {
+        Object.defineProperty(target, prop, {
+            configurable: true,
+            enumerable: false,
+            get() {
+                return undefined
+            },
+            set(value) {
+                addHiddenProp(this, prop, action(name, value))
+            }
+        })
+    }
+}
 
 function dontReassignFields() {
     invariant(false, process.env.NODE_ENV !== "production" && "@action fields are not reassignable")
+}
+
+const boundActionDecorator = function(target, propertyName, descriptor, applyToInstance?: boolean) {
+    if (applyToInstance === true) {
+        defineBoundAction(this, propertyName, descriptor.value)
+        return null
+    }
+    if (descriptor) {
+        if (descriptor.value)
+            // Typescript / Babel: @action.bound method() { }
+            return {
+                configurable: true,
+                enumerable: false,
+                get() {
+                    defineBoundAction(this, propertyName, descriptor.value)
+                    return this[propertyName]
+                },
+                set: dontReassignFields
+            }
+        // babel
+        return {
+            configurable: true,
+            enumerable: false,
+            writeable: false,
+            initializer() {
+                defineBoundAction(this, propertyName, descriptor.initializer.call(this))
+            }
+        }
+    }
+    // field decorator
+    return {
+        enumerable: false,
+        configurable: true,
+        set(v) {
+            defineBoundAction(this, propertyName, v)
+        },
+        get() {
+            return undefined
+        }
+    }
 }
 
 export var action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): any {
@@ -96,35 +113,49 @@ export var action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): 
 
     if (arguments.length === 1 && typeof arg1 === "string") return namedActionDecorator(arg1)
 
-    return namedActionDecorator(arg2).apply(null, arguments)
+    if (arg4 === true) {
+        // apply to instance immediately
+        return {
+            value: createAction(name, arg3.value),
+            enumerable: false,
+            configurable: false,
+            writable: false
+        }
+    } else {
+        return namedActionDecorator(arg2).apply(null, arguments)
+    }
 } as any
 
-action.bound = function boundAction(arg1, arg2?, arg3?) {
-    if (typeof arg1 === "function") {
-        const action = createAction("<not yet bound action>", arg1)
-        ;(action as any).autoBind = true
-        return action
-    }
-
-    return boundActionDecorator.apply(null, arguments)
-}
+action.bound = boundActionDecorator as any
 
 function namedActionDecorator(name: string) {
-    return function(target, prop, descriptor) {
-        if (descriptor && typeof descriptor.value === "function") {
-            // TypeScript @action method() { }. Defined on proto before being decorated
-            // Don't use the field decorator if we are just decorating a method
-            descriptor.value = createAction(name, descriptor.value)
-            descriptor.enumerable = false
-            descriptor.configurable = true
-            return descriptor
-        }
-        if (
-            process.env.NODE_ENV !== "production" &&
-            descriptor !== undefined &&
-            descriptor.get !== undefined
-        ) {
-            return fail("@action cannot be used with getters")
+    return function(target, prop, descriptor: BabelDescriptor) {
+        if (descriptor) {
+            if (process.env.NODE_ENV !== "production" && descriptor.get !== undefined) {
+                return fail("@action cannot be used with getters")
+            }
+            // babel / typescript
+            // @action method() { }
+            if (descriptor.value) {
+                // typescript
+                return {
+                    value: createAction(name, descriptor.value),
+                    enumerable: false,
+                    configurable: false,
+                    writable: true // for typescript, this must be writable, otherwise it cannot inherit :/ (see inheritable actions test)
+                }
+            }
+            // babel only: @action method = () => {}
+            const { initializer } = descriptor
+            return {
+                enumerable: false,
+                configurable: false,
+                writable: false,
+                initializer() {
+                    // N.B: we can't immediately invoke initializer; this would be wrong
+                    return createAction(name, initializer!.call(this))
+                }
+            }
         }
         // bound instance methods
         return actionFieldDecorator(name).apply(this, arguments)
@@ -155,9 +186,5 @@ export function isAction(thing: any) {
 }
 
 export function defineBoundAction(target: any, propertyName: string, fn: Function) {
-    const res = function() {
-        return executeAction(propertyName, fn, target, arguments)
-    }
-    ;(res as any).isMobxAction = true
-    addHiddenProp(target, propertyName, res)
+    addHiddenFinalProp(target, propertyName, createAction(propertyName, fn.bind(target)))
 }

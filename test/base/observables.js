@@ -2,9 +2,7 @@
 
 var mobx = require("../../src/mobx")
 var m = mobx
-var observable = mobx.observable
-var computed = mobx.computed
-var transaction = mobx.transaction
+const { observable, computed, transaction, action, autorun, extendObservable, decorate } = mobx
 const utils = require("../utils/test-utils")
 
 var voidObserver = function() {}
@@ -319,24 +317,6 @@ test("props2", function() {
     expect(36).toBe(order.total)
 })
 
-test("props3", function() {
-    var vat = observable.box(0.2)
-    var Order = function() {
-        this.price = 20
-        this.amount = 2
-        this.total = mobx.computed(function() {
-            return (1 + vat.get()) * this.price * this.amount // price and amount are now properties!
-        })
-        mobx.extendObservable(this, this)
-    }
-
-    var order = new Order()
-    expect(48).toBe(order.total)
-    order.price = 10
-    order.amount = 3
-    expect(36).toBe(order.total)
-})
-
 test("props4", function() {
     function Bzz() {
         mobx.extendObservable(this, {
@@ -365,6 +345,7 @@ test("extend observable multiple prop maps", function() {
     expect(() => {
         mobx.extendObservable(
             x,
+            {},
             {
                 b: 2,
                 c: 2
@@ -380,14 +361,14 @@ test("extend observable multiple prop maps", function() {
 test("object enumerable props", function() {
     var x = mobx.observable({
         a: 3,
-        b: mobx.computed(function() {
+        get b() {
             return 2 * this.a
-        })
+        }
     })
     mobx.extendObservable(x, { c: 4 })
     var ar = []
     for (var key in x) ar.push(key)
-    expect(ar).toEqual(["a", "c"]) // or should 'b' be in here as well?
+    expect(ar).toEqual(["a", "c"])
 })
 
 test("observe property", function() {
@@ -445,7 +426,6 @@ test("observe object", function() {
 
     a.a = 2
     mobx.extendObservable(a, {
-        a: 3,
         b: 3
     })
     a.a = 4
@@ -459,13 +439,6 @@ test("observe object", function() {
             oldValue: 1
         },
         {
-            type: "update",
-            object: a,
-            name: "a",
-            newValue: 3,
-            oldValue: 2
-        },
-        {
             type: "add",
             object: a,
             newValue: 3,
@@ -476,7 +449,7 @@ test("observe object", function() {
             object: a,
             name: "a",
             newValue: 4,
-            oldValue: 3
+            oldValue: 2
         },
         {
             type: "update",
@@ -1468,9 +1441,9 @@ test("verify calculation count", () => {
 test("support computed property getters / setters", () => {
     let a = observable({
         size: 1,
-        volume: mobx.computed(function() {
+        get volume() {
             return this.size * this.size
-        })
+        }
     })
 
     expect(a.volume).toBe(1)
@@ -1484,14 +1457,12 @@ test("support computed property getters / setters", () => {
     a = {}
     mobx.extendObservable(a, {
         size: 2,
-        volume: mobx.computed(
-            function() {
-                return this.size * this.size
-            },
-            function(v) {
-                this.size = Math.sqrt(v)
-            }
-        )
+        get volume() {
+            return this.size * this.size
+        },
+        set volume(v) {
+            this.size = Math.sqrt(v)
+        }
     })
 
     const values = []
@@ -1700,9 +1671,10 @@ test("computed equals function only invoked when necessary", () => {
     })
 })
 
+// TODO:
+// document that extendObservable is not inheritance compatible,
+// and make sure this does work with decorate
 test("Issue 1092 - Should not access attributes of siblings in the prot. chain", () => {
-    expect.assertions(2)
-
     // The parent is an observable
     // and has an attribute
     const parent = {}
@@ -1726,7 +1698,16 @@ test("Issue 1092 - Should not access attributes of siblings in the prot. chain",
     expect(typeof child2.attribute).toBe("undefined")
 
     // We still should be able to read the value from the parent
-    expect(child2.staticObservable).toBe(11)
+    expect(() => {
+        child2.staticObservable
+    }).toThrow(/accessed through the prototype chain/)
+    expect(() => {
+        child2.staticObservable = 3
+    }).toThrow(/accessed through the prototype chain/)
+
+    expect(parent.staticObservable).toBe(11)
+    parent.staticObservable = 12
+    expect(parent.staticObservable).toBe(12)
 })
 
 test("Issue 1092 - We should be able to define observable on all siblings", () => {
@@ -1758,9 +1739,7 @@ test("Issue 1120 - isComputed should return false for a non existing property", 
     expect(mobx.isComputedProp(observable({}), "x")).toBe(false)
 })
 
-test("Issue 1121 - It should be possible to redefine a computed property", () => {
-    expect.assertions(4)
-
+test("It should not be possible to redefine a computed property", () => {
     const a = observable({
         width: 10,
         get surface() {
@@ -1768,44 +1747,143 @@ test("Issue 1121 - It should be possible to redefine a computed property", () =>
         }
     })
 
-    let observeCalls = 0
-    let reactionCalls = 0
-
-    mobx.observe(a, "surface", v => observeCalls++)
-    mobx.reaction(() => a.surface, v => reactionCalls++)
-
     expect(() => {
         mobx.extendObservable(a, {
             get surface() {
                 return this.width * 2
             }
         })
-    }).not.toThrow()
-
-    a.width = 11
-
-    expect(observeCalls).toBe(1)
-    expect(reactionCalls).toBe(1)
-    expect(a.surface).toBe(22)
+    }).toThrow(/'extendObservable' can only be used to introduce new properties/)
 })
 
-test("extendObservable should be able to set an a computed property", () => {
-    let setterCalled = false
-    const x = observable({
-        a: computed(
-            function() {
-                return this.b * 2
-            },
-            function(val) {
-                setterCalled = true
-                this.b += val
-            }
-        ),
-        b: 2
+test("extendObservable should not be able to set a computed property", () => {
+    expect(() => {
+        const x = observable({
+            a: computed(
+                function() {
+                    return this.b * 2
+                },
+                function(val) {
+                    this.b += val
+                }
+            ),
+            b: 2
+        })
+    }).toThrow(/Passing a 'computed' as initial property value is no longer supported/)
+})
+
+test("computed comparer works with decorate (plain)", () => {
+    const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
+    function Time(hour, minute) {
+        this.hour = hour
+        this.minute = minute
+    }
+
+    Object.defineProperty(Time.prototype, "time", {
+        configurable: true,
+        enumerable: true,
+        get() {
+            return { hour: this.hour, minute: this.minute }
+        }
     })
-    expect(x.a).toBe(4)
-    mobx.extendObservable(x, { b: 4, a: 7 })
-    expect(setterCalled).toBe(true)
-    expect(x.b).toBe(11)
-    expect(x.a).toBe(22)
+    debugger
+    decorate(Time, {
+        hour: observable,
+        minute: observable,
+        time: computed({ equals: sameTime })
+    })
+    const time = new Time(9, 0)
+
+    const changes = []
+    const disposeAutorun = autorun(() => changes.push(time.time))
+
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 9
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.minute = 0
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 10
+    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    expect(changes).toEqual([
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test("computed comparer works with decorate (plain) - 2", () => {
+    const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
+    function Time(hour, minute) {
+        extendObservable(
+            this,
+            {
+                hour,
+                minute,
+                get time() {
+                    return { hour: this.hour, minute: this.minute }
+                }
+            },
+            {
+                time: computed({ equals: sameTime })
+            }
+        )
+    }
+    const time = new Time(9, 0)
+
+    const changes = []
+    const disposeAutorun = autorun(() => changes.push(time.time))
+
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 9
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.minute = 0
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 10
+    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    expect(changes).toEqual([
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test("computed comparer works with decorate (plain) - 3", () => {
+    const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
+    const time = observable.object(
+        {
+            hour: 9,
+            minute: 0,
+            get time() {
+                return { hour: this.hour, minute: this.minute }
+            }
+        },
+        {
+            time: computed({ equals: sameTime })
+        }
+    )
+
+    const changes = []
+    const disposeAutorun = autorun(() => changes.push(time.time))
+
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 9
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.minute = 0
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 10
+    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    expect(changes).toEqual([
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
 })
