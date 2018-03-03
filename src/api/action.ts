@@ -66,8 +66,11 @@ function dontReassignFields() {
     invariant(false, process.env.NODE_ENV !== "production" && "@action fields are not reassignable")
 }
 
-const boundActionDecorator = function(target, propertyName, descriptor) {
-    debugger
+const boundActionDecorator = function(target, propertyName, descriptor, applyToInstance?: boolean) {
+    if (applyToInstance === true) {
+        defineBoundAction(this, propertyName, descriptor.value)
+        return null
+    }
     if (descriptor) {
         if (descriptor.value)
             // Typescript / Babel: @action.bound method() { }
@@ -104,14 +107,23 @@ const boundActionDecorator = function(target, propertyName, descriptor) {
 }
 
 export var action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): any {
-    debugger
     if (arguments.length === 1 && typeof arg1 === "function")
         return createAction(arg1.name || "<unnamed action>", arg1)
     if (arguments.length === 2 && typeof arg2 === "function") return createAction(arg1, arg2)
 
     if (arguments.length === 1 && typeof arg1 === "string") return namedActionDecorator(arg1)
 
-    return namedActionDecorator(arg2).apply(null, arguments)
+    if (arg4 === true) {
+        // apply to instance immediately
+        return {
+            value: createAction(name, arg3.value),
+            enumerable: false,
+            configurable: false,
+            writable: false
+        }
+    } else {
+        return namedActionDecorator(arg2).apply(null, arguments)
+    }
 } as any
 
 action.bound = boundActionDecorator as any
