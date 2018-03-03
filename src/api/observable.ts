@@ -1,4 +1,4 @@
-import { invariant, fail, deprecated, isES6Map, isPlainObject } from "../utils/utils"
+import { fail, deprecated, isES6Map, isPlainObject } from "../utils/utils"
 import {
     IModifierDescriptor,
     deepEnhancer,
@@ -19,7 +19,7 @@ import { IObservableMapInitialValues, ObservableMap } from "../types/observablem
 export type CreateObservableOptions = {
     name?: string
     deep?: boolean
-    defaultDecorator?: Function
+    defaultDecorator?: Function // TODO: do we need this one
 }
 
 // Predefined bags of create observable options, to avoid allocating temporarily option objects

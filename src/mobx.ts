@@ -121,3 +121,5 @@ if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
         }
     })
 }
+
+// TODO: generate getters for legacy api's

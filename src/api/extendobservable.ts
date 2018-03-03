@@ -1,9 +1,5 @@
 import { isObservableMap } from "../types/observablemap"
-import {
-    asObservableObject,
-    defineObservableProperty,
-    defineComputedProperty
-} from "../types/observableobject"
+import { asObservableObject } from "../types/observableobject"
 import { isObservable } from "./isobservable"
 import { invariant, deprecated, fail } from "../utils/utils"
 import { startBatch, endBatch } from "../core/observable"
@@ -11,15 +7,11 @@ import {
     CreateObservableOptions,
     asCreateObservableOptions,
     shallowCreateObservableOptions,
-    observable,
     deepDecorator,
-    shallowDecorator,
     refDecorator
 } from "./observable"
-import { decorate } from "./decorate"
 import { isComputed } from "./iscomputed"
-import { referenceEnhancer, deepEnhancer } from "../types/modifiers"
-import { computed, computedDecorator } from "./computed"
+import { computedDecorator } from "./computed"
 import { applyToInstance } from "../utils/decorators2"
 
 export function extendShallowObservable<A extends Object, B extends Object>(
@@ -68,8 +60,6 @@ export function extendObservable<A extends Object, B extends Object>(
     asObservableObject(target) // make sure object is observable, even without initial props
     startBatch()
     try {
-        const additionalDecorators = {} as any // don't want to modify passed in object
-        const unassigned: string[] = []
         for (let key in properties) {
             const descriptor = Object.getOwnPropertyDescriptor(properties, key)!
             // const { value, get } = descriptor
@@ -97,33 +87,7 @@ export function extendObservable<A extends Object, B extends Object>(
                 resultDescriptor // otherwise, assume already applied, due to `applyToInstance`
             )
                 Object.defineProperty(target, key, resultDescriptor)
-            // if (typeof get === "function") {
-            //     // todo: push getter
-            //     if (decorators && decorators[key]) {
-            //         // just copy the description, the decorator will pick it up during decorate
-            //         Object.defineProperty(target, key, descriptor)
-            //     } else {
-            //         // optimized shortcut; don't use the decorator but declare prop right away
-            //         defineComputedProperty(target, target, key, { get, set: descriptor.set })
-            //     }
-            // } else {
-            //     if (decorators && decorators[key]) unassigned.push(key)
-            //     else {
-            //         // optimized shortcut; don't use the decorator but declare prop right away
-            //         // TODO: theother enhancers
-            //         defineObservableProperty(
-            //             target,
-            //             key,
-            //             value,
-            //             options.deep === false ? referenceEnhancer : deepEnhancer
-            //         )
-            //     }
-            // }
         }
-        // if (decorators) decorate(target, decorators as any)
-        // // TODO: can optimize decorators away if decorators are callable?
-        // decorate(target, additionalDecorators)
-        // unassigned.forEach(key => (target[key] = properties[key])) // TODO: optimize
     } finally {
         endBatch()
     }
