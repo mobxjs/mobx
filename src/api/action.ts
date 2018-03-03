@@ -46,6 +46,7 @@ export interface IActionFactory {
     bound(target: Object, propertyKey: string, descriptor?: PropertyDescriptor): void
 }
 
+// TODO: move decoators to own file
 function actionFieldDecorator(name: string) {
     // Simple property that writes on first invocation to the current instance
     return function(target, prop, descriptor) {
@@ -68,7 +69,7 @@ function dontReassignFields() {
 
 const boundActionDecorator = function(target, propertyName, descriptor, applyToInstance?: boolean) {
     if (applyToInstance === true) {
-        defineBoundAction(this, propertyName, descriptor.value)
+        defineBoundAction(target, propertyName, descriptor.value)
         return null
     }
     if (descriptor) {
@@ -115,12 +116,7 @@ export var action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): 
 
     if (arg4 === true) {
         // apply to instance immediately
-        return {
-            value: createAction(name, arg3.value),
-            enumerable: false,
-            configurable: false,
-            writable: false
-        }
+        arg1[arg2] = createAction(name, arg3.value)
     } else {
         return namedActionDecorator(arg2).apply(null, arguments)
     }

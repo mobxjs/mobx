@@ -12,7 +12,6 @@ import {
 } from "./observable"
 import { isComputed } from "./iscomputed"
 import { computedDecorator } from "./computed"
-import { applyToInstance } from "../utils/decorators2"
 
 export function extendShallowObservable<A extends Object, B extends Object>(
     target: A,
@@ -82,7 +81,7 @@ export function extendObservable<A extends Object, B extends Object>(
             if (process.env.NODE_ENV !== "production" && typeof decorator !== "function")
                 return fail(`Not a valid decorator for '${key}', got: ${decorator}`)
 
-            const resultDescriptor = decorator!(target, key, descriptor, applyToInstance)
+            const resultDescriptor = decorator!(target, key, descriptor, true)
             if (
                 resultDescriptor // otherwise, assume already applied, due to `applyToInstance`
             )

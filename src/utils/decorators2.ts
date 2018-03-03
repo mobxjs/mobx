@@ -60,11 +60,6 @@ export function initializeInstance(target: DecoratorTarget) {
         }
 }
 
-// This is a special token to signal the direct application of a decorator, allow extendObservable to skip the entire type decoration part,
-// as the instance to apply the deorator to equals the target
-// TODO: just make this a boolean
-export const applyToInstance = {}
-
 export function createPropDecorator(
     propertyInitiallyEnumerable: boolean,
     propertyCreator: PropertyCreator
@@ -77,8 +72,10 @@ export function createPropDecorator(
             prop: string,
             descriptor: BabelDescriptor | undefined,
             applyImmediately?: any
+            // This is a special parameter to signal the direct application of a decorator, allow extendObservable to skip the entire type decoration part,
+            // as the instance to apply the deorator to equals the target
         ) {
-            if (applyImmediately === applyToInstance) {
+            if (applyImmediately === true) {
                 propertyCreator(target, prop, descriptor, target, decoratorArguments)
                 return null
             }
@@ -113,6 +110,6 @@ export function createPropDecorator(
 export function quacksLikeADecorator(args: IArguments): boolean {
     return (
         ((args.length === 2 || args.length === 3) && typeof args[1] === "string") ||
-        (args.length === 4 && args[3] === applyToInstance)
+        (args.length === 4 && args[3] === true)
     )
 }
