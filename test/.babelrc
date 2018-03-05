@@ -6,6 +6,7 @@
   ],
   "plugins":[
       "transform-decorators",
-      ["transform-class-properties", { "loose": true}]
+      ["transform-class-properties", { "loose": true}],
+      ["transform-regenerator", { "asyncGenerators": false }]
   ]
 }

@@ -7,7 +7,6 @@ export interface IWhenOptions {
     name?: string
     timeout?: number
     onError?: (error: any) => void
-    promise?: boolean
 }
 
 export function when(predicate: () => boolean, opts?: IWhenOptions): Promise<void> & { cancel() }

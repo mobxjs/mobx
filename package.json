@@ -10,7 +10,7 @@
   "typings": "lib/mobx.d.ts",
   "scripts": {
     "test": "yarn quick-build && yarn jest",
-    "test:watch": "yarn test --watch",
+    "watch": "yarn test --watch",
     "test:mixed-versions": "jest --testRegex mixed-versions",
     "test:all": "yarn small-build && yarn jest -i && yarn test:flow && yarn test:mixed-versions",
     "test:webpack": "node scripts/webpack-regression-tests.js",
@@ -47,6 +47,7 @@
     "babel-preset-es2015": "7.0.0-beta.3",
     "babel-preset-react": "7.0.0-beta.3",
     "babel-preset-stage-1": "7.0.0-beta.3",
+    "babel-plugin-transform-regenerator": "^6.26.0",
     "browserify": "^12.0.1",
     "chalk": "^1.1.3",
     "coveralls": "^2.11.4",
@@ -72,7 +73,8 @@
     "typescript": "^2.1.4",
     "uglify-js": "^2.6.1"
   },
-  "dependencies": {},
+  "dependencies": {
+  },
   "keywords": [
     "mobx",
     "mobservable",

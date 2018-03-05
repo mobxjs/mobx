@@ -116,6 +116,7 @@ All the random notes that should make up a nice changelog:
 * `toJS` now accepts options: `{    detectCycles?: boolean    exportMapsAsObjects?: boolean }`, both `true` by default
 * `when` now supports an `timeout` option, so `mobxUtils.whenWithTimeout` is no longer needed
 * when `when` is invoked withoout effect, it will automatically return a promise, so that you can await conditions. These promises are canceallable by calling `.cancel`
+* moved `asyncActions` from the mobx-utils package to mobx-core, and called it `flow`
 
 ## Breaking changes
 

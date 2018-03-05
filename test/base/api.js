@@ -14,6 +14,7 @@ test("correct api should be exposed", function() {
             "decorate",
             "extendObservable",
             "extendShallowObservable", // deprecated but still public
+            "flow",
             "_getAdministration",
             "getAtom",
             "getDebugName",

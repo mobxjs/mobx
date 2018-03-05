@@ -1557,3 +1557,25 @@ test("promised when can be cancelled", async () => {
         expect("" + e).toMatch(/WHEN_CANCELLED/)
     }
 })
+
+test("it should support asyncAction as decorator (babel)", async () => {
+    const values = []
+
+    mobx.configure({ enforceActions: true })
+
+    class X {
+        @observable a = 1;
+
+        @mobx.flow
+        *f(initial: number): any {
+            this.a = initial // this runs in action
+            this.a += yield Promise.resolve(5)
+            this.a = this.a * 2
+            return this.a
+        }
+    }
+
+    const x = new X()
+
+    expect(await x.f(3)).toBe(16)
+})

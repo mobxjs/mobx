@@ -95,6 +95,7 @@ export { keys, values, set, remove } from "./api/object-api"
 export { decorate } from "./api/decorate"
 export { configure } from "./api/configure"
 export { onBecomeObserved, onBecomeUnobserved } from "./api/become-observed"
+export { flow } from "./api/flow"
 
 export { toJS } from "./api/tojs"
 export { trace } from "./api/trace"
