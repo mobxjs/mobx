@@ -1,6 +1,5 @@
 import { fail, deprecated, isES6Map, isPlainObject } from "../utils/utils"
 import {
-    IModifierDescriptor,
     deepEnhancer,
     referenceEnhancer,
     shallowEnhancer,

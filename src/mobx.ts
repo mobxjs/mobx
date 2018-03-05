@@ -29,7 +29,7 @@ export { spy } from "./core/spy"
 export { IComputedValue } from "./core/computedvalue"
 
 export { IEqualsComparer, comparer } from "./utils/comparer"
-export { IModifierDescriptor, IEnhancer } from "./types/modifiers"
+export { IEnhancer } from "./types/modifiers"
 export { IInterceptable, IInterceptor } from "./types/intercept-utils"
 export { IListenable } from "./types/listen-utils"
 
@@ -59,11 +59,7 @@ export {
     IMapEntries,
     IMapEntry,
     IMapWillChange,
-    IMapChange,
-    IMapChangeUpdate,
-    IMapChangeAdd,
-    IMapChangeBase,
-    IMapChangeDelete,
+    IMapDidChange,
     isObservableMap,
     IObservableMapInitialValues
 } from "./types/observablemap"

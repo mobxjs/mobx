@@ -20,7 +20,7 @@ import {
 } from "./intercept-utils"
 import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
-import { declareIterator } from "../utils/iterable"
+import { declareIterator, makeIterable } from "../utils/iterable"
 import { IEnhancer } from "./modifiers"
 
 const MAX_SPLICE_SIZE = 10000 // See e.g. https://github.com/mobxjs/mobx/issues/859
@@ -572,13 +572,13 @@ declareIterator(ObservableArray.prototype, function() {
     ;(this.$mobx as ObservableArrayAdministration<any>).atom.reportObserved()
     const self = this
     let nextIndex = 0
-    return {
+    return makeIterable({
         next: function() {
             return nextIndex < self.length
                 ? { value: self[nextIndex++], done: false }
                 : { done: true }
         }
-    }
+    })
 })
 
 Object.defineProperty(ObservableArray.prototype, "length", {

@@ -1,5 +1,5 @@
 import { IObservableArray, IArrayChange, IArraySplice } from "../types/observablearray"
-import { ObservableMap, IMapChange } from "../types/observablemap"
+import { ObservableMap, IMapDidChange } from "../types/observablemap"
 import { IObjectDidChange } from "../types/observableobject"
 import { IComputedValue } from "../core/computedvalue"
 
@@ -19,7 +19,7 @@ export function observe<T>(
 ): Lambda
 export function observe<K, V>(
     observableMap: ObservableMap<K, V>,
-    listener: (change: IMapChange<K, V>) => void,
+    listener: (change: IMapDidChange<K, V>) => void,
     fireImmediately?: boolean
 ): Lambda
 export function observe<K, V>(

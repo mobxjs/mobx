@@ -20,3 +20,12 @@ export interface Iterator<T> {
 export function declareIterator<T>(prototType, iteratorFactory: () => Iterator<T>) {
     addHiddenFinalProp(prototType, iteratorSymbol(), iteratorFactory)
 }
+
+export function makeIterable<T>(iterator: Iterator<T>): IterableIterator<T> {
+    iterator[iteratorSymbol()] = self
+    return iterator as any
+}
+
+function self() {
+    return this
+}

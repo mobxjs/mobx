@@ -21,7 +21,7 @@ import {
 } from "./intercept-utils"
 import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
-import { declareIterator, Iterator, iteratorSymbol } from "../utils/iterable"
+import { declareIterator, Iterator, iteratorSymbol, makeIterable } from "../utils/iterable"
 import { transaction } from "../api/transaction"
 import { referenceEnhancer } from "./modifiers"
 
@@ -32,29 +32,26 @@ export interface IKeyValueMap<V> {
 export type IMapEntry<K, V> = [K, V]
 export type IMapEntries<K, V> = IMapEntry<K, V>[]
 
-// TODO: rename In 3.0, change to IObjectMapChange
-export type IMapChange<K, V> = IMapChangeUpdate<K, V> | IMapChangeAdd<K, V> | IMapChangeDelete<K, V>
-
-export interface IMapChangeBase<K, V> {
-    object: ObservableMap<K, V>
-    name: K // actual the key or index, but this is based on the ancient .observe proposal for consistency
-}
-
-export interface IMapChangeUpdate<K, V> extends IMapChangeBase<K, V> {
-    type: "update"
-    newValue: V
-    oldValue: V
-}
-
-export interface IMapChangeAdd<K, V> extends IMapChangeBase<K, V> {
-    type: "add"
-    newValue: V
-}
-
-export interface IMapChangeDelete<K, V> extends IMapChangeBase<K, V> {
-    type: "delete"
-    oldValue: V
-}
+export type IMapDidChange<K, V> =
+    | {
+          object: ObservableMap<K, V>
+          name: K // actual the key or index, but this is based on the ancient .observe proposal for consistency
+          type: "update"
+          newValue: V
+          oldValue: V
+      }
+    | {
+          object: ObservableMap<K, V>
+          name: K
+          type: "add"
+          newValue: V
+      }
+    | {
+          object: ObservableMap<K, V>
+          name: K
+          type: "delete"
+          oldValue: V
+      }
 
 export interface IMapWillChange<K, V> {
     object: ObservableMap<K, V>
@@ -80,7 +77,8 @@ export class ObservableMap<K, V>
     )
     interceptors
     changeListeners
-    dehancer: any
+    dehancer: any;
+    [Symbol.iterator]
 
     constructor(
         initialData?: IObservableMapInitialValues<K, V>,
@@ -140,7 +138,7 @@ export class ObservableMap<K, V>
             const notify = hasListeners(this)
             const change =
                 notify || notifySpy
-                    ? <IMapChange<K, V>>{
+                    ? <IMapDidChange<K, V>>{
                           type: "delete",
                           object: this,
                           oldValue: (<any>this._data.get(key)).value,
@@ -183,7 +181,7 @@ export class ObservableMap<K, V>
             const notify = hasListeners(this)
             const change =
                 notify || notifySpy
-                    ? <IMapChange<K, V>>{
+                    ? <IMapDidChange<K, V>>{
                           type: "update",
                           object: this,
                           oldValue: (observable as any).value,
@@ -215,7 +213,7 @@ export class ObservableMap<K, V>
         const notify = hasListeners(this)
         const change =
             notify || notifySpy
-                ? <IMapChange<K, V>>{
+                ? <IMapDidChange<K, V>>{
                       type: "add",
                       object: this,
                       name: key,
@@ -239,37 +237,37 @@ export class ObservableMap<K, V>
         return value
     }
 
-    keys(): Iterator<K> {
+    keys(): IterableIterator<K> {
         return (this._keys[iteratorSymbol()] as any)()
     }
 
-    values(): Iterator<V> {
+    values(): IterableIterator<V> {
         const self = this
         let nextIndex = 0
-        return {
+        return makeIterable({
             next: function() {
                 return nextIndex < self._keys.length
                     ? { value: self.get(self._keys[nextIndex++]), done: false }
                     : { done: true }
             }
-        }
+        })
     }
 
-    entries(): Iterator<IMapEntry<K, V>> {
+    entries(): IterableIterator<IMapEntry<K, V>> {
         const self = this
         let nextIndex = 0
-        return {
+        return makeIterable({
             next: function() {
                 if (nextIndex < self._keys.length) {
                     const key = self._keys[nextIndex++]
                     return {
-                        value: [key, self.get(key)!],
+                        value: [key, self.get(key)!] as [K, V],
                         done: false
                     }
                 }
                 return { done: true }
             }
-        }
+        })
     }
 
     forEach(callback: (value: V, key: K, object: Map<K, V>) => void, thisArg?) {
@@ -358,7 +356,7 @@ export class ObservableMap<K, V>
 	 * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
 	 * for callback details
 	 */
-    observe(listener: (changes: IMapChange<K, V>) => void, fireImmediately?: boolean): Lambda {
+    observe(listener: (changes: IMapDidChange<K, V>) => void, fireImmediately?: boolean): Lambda {
         process.env.NODE_ENV !== "production" &&
             invariant(
                 fireImmediately !== true,

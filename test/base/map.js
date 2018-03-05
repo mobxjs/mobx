@@ -671,3 +671,10 @@ test("NaN as map key", function() {
     expect(a.get(NaN)).toBe(2)
     expect(a.size).toBe(1)
 })
+
+test("maps.values, keys and maps.entries are iterables", () => {
+    const x = mobx.observable.map({ x: 1, y: 2 })
+    expect(Array.from(x.entries())).toEqual([["x", 1], ["y", 2]])
+    expect(Array.from(x.values())).toEqual([1, 2])
+    expect(Array.from(x.keys())).toEqual(["x", "y"])
+})
