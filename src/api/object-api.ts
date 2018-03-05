@@ -89,14 +89,7 @@ export function remove<T>(obj: IObservableArray<T>, index: number)
 export function remove<T extends Object>(obj: T, key: string)
 export function remove(obj: any, key: any): void {
     if (isObservableObject(obj)) {
-        const adm = ((obj as any) as IIsObservableObject).$mobx
-        if (!adm.values[key]) return
-        if (adm.keys) {
-            const keyIndex = adm.keys.indexOf(key)
-            if (keyIndex !== -1) adm.keys.splice(keyIndex, 1)
-        }
-        delete adm.values[key]
-        delete adm.target[key]
+        ;((obj as any) as IIsObservableObject).$mobx.remove(key)
     } else if (isObservableMap(obj)) {
         obj.delete(key)
     } else if (isObservableArray(obj)) {

@@ -23,26 +23,45 @@ import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
 import { IEnhancer, referenceEnhancer, deepEnhancer } from "./modifiers"
 import { ObservableArray, IObservableArray } from "./observablearray"
 import { initializeInstance } from "../utils/decorators2"
+import { startBatch, endBatch } from "../core/observable"
 
 export interface IObservableObject {
     "observable-object": IObservableObject
 }
 
-// TODO: In 3.0, change to IObjectDidChange
-export interface IObjectChange {
-    name: string
-    object: any
-    type: "update" | "add"
-    oldValue?: any
-    newValue: any
-}
+export type IObjectDidChange =
+    | {
+          name: string
+          object: any
+          type: "add"
+          newValue: any
+      }
+    | {
+          name: string
+          object: any
+          type: "update"
+          oldValue: any
+          newValue: any
+      }
+    | {
+          name: string
+          object: any
+          type: "remove"
+          oldValue: any
+      }
 
-export interface IObjectWillChange {
-    object: any
-    type: "update" | "add"
-    name: string
-    newValue: any
-}
+export type IObjectWillChange =
+    | {
+          object: any
+          type: "update" | "add"
+          name: string
+          newValue: any
+      }
+    | {
+          object: any
+          type: "remove"
+          name: string
+      }
 
 export class ObservableObjectAdministration
     implements IInterceptable<IObjectWillChange>, IListenable {
@@ -82,7 +101,7 @@ export class ObservableObjectAdministration
                 newValue
             })
             if (!change) return
-            newValue = change.newValue
+            newValue = (change as any).newValue
         }
         newValue = (observable as any).prepareNewValue(newValue)
 
@@ -105,6 +124,42 @@ export class ObservableObjectAdministration
             ;(observable as ObservableValue<any>).setNewValue(newValue)
             if (notify) notifyListeners(this, change)
             if (notifySpy) spyReportEnd()
+        }
+    }
+
+    remove(key: string) {
+        if (!this.values[key]) return
+        const { target } = this
+        if (hasInterceptors(this)) {
+            const change = interceptChange<IObjectWillChange>(this, {
+                object: target,
+                name: key,
+                type: "remove"
+            })
+            if (!change) return
+        }
+        try {
+            startBatch()
+            const notify = hasListeners(this)
+            const notifySpy = isSpyEnabled()
+            const oldValue = this.values[key].get()
+            if (this.keys) this.keys.remove(key)
+            delete this.values[key]
+            delete this.target[key]
+            const change =
+                notify || notifySpy
+                    ? {
+                          type: "remove",
+                          object: target,
+                          oldValue: oldValue,
+                          name: key
+                      }
+                    : null
+            if (notifySpy) spyReportStart({ ...change, name: this.name, key })
+            if (notify) notifyListeners(this, change)
+            if (notifySpy) spyReportEnd()
+        } finally {
+            endBatch()
         }
     }
 
@@ -138,7 +193,7 @@ export class ObservableObjectAdministration
      * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
      * for callback details
      */
-    observe(callback: (changes: IObjectChange) => void, fireImmediately?: boolean): Lambda {
+    observe(callback: (changes: IObjectDidChange) => void, fireImmediately?: boolean): Lambda {
         process.env.NODE_ENV !== "production" &&
             invariant(
                 fireImmediately !== true,
@@ -207,7 +262,7 @@ export function defineObservableProperty(
             newValue
         })
         if (!change) return
-        newValue = change.newValue
+        newValue = (change as any).newValue
     }
     const observable = (adm.values[propName] = new ObservableValue(
         newValue,

@@ -18,7 +18,7 @@ import {
     isObservableProp,
     isObservableObject,
     transaction,
-    IObjectChange,
+    IObjectDidChange,
     spy,
     configure,
     isAction,
@@ -77,7 +77,7 @@ test("decorators", () => {
     t.equal(isObservableProp(o, "total"), true)
 
     var events: any[] = []
-    var d1 = observe(o, (ev: IObjectChange) => events.push(ev.name, ev.oldValue))
+    var d1 = observe(o, (ev: IObjectDidChange) => events.push(ev.name, ev.oldValue))
     var d2 = observe(o, "price", ev => events.push(ev.newValue, ev.oldValue))
     var d3 = observe(o, "total", ev => events.push(ev.newValue, ev.oldValue))
 

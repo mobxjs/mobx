@@ -1,6 +1,6 @@
 import { IObservableArray, IArrayChange, IArraySplice } from "../types/observablearray"
 import { ObservableMap, IMapChange } from "../types/observablemap"
-import { IObjectChange } from "../types/observableobject"
+import { IObjectDidChange } from "../types/observableobject"
 import { IComputedValue } from "../core/computedvalue"
 
 import { IObservableValue, IValueDidChange } from "../types/observablevalue"
@@ -30,7 +30,7 @@ export function observe<K, V>(
 ): Lambda
 export function observe(
     object: Object,
-    listener: (change: IObjectChange) => void,
+    listener: (change: IObjectDidChange) => void,
     fireImmediately?: boolean
 ): Lambda
 export function observe<T, K extends keyof T>(

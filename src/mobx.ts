@@ -35,7 +35,7 @@ export { IListenable } from "./types/listen-utils"
 
 export {
     IObjectWillChange,
-    IObjectChange,
+    IObjectDidChange,
     IObservableObject,
     isObservableObject
 } from "./types/observableobject"

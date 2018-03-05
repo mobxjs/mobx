@@ -132,7 +132,37 @@ test("array - set, remove, values are reactive", () => {
     ])
 })
 
-// TODO: test: observe and intercept property additions
+test("observe & intercept", () => {
+    let events = []
+    const todos = observable(
+        {
+            a: { title: "get coffee" }
+        },
+        {},
+        { deep: false }
+    )
+    mobx.observe(todos, c => events.push({ observe: c }))
+    const d = mobx.intercept(todos, c => {
+        events.push({ intercept: c })
+        return null // no addition!
+    })
+
+    set(todos, { b: { title: "get tea" } })
+    remove(todos, "a")
+    expect(events).toMatchSnapshot()
+    expect(mobx.toJS(todos)).toEqual({
+        a: { title: "get coffee" }
+    })
+
+    events.splice(0)
+    d()
+    set(todos, { b: { title: "get tea" } })
+    remove(todos, "a")
+    expect(events).toMatchSnapshot()
+    expect(mobx.toJS(todos)).toEqual({
+        b: { title: "get tea" }
+    })
+})
 
 test("dynamically adding properties should preserve the original modifiers of an object", () => {
     const todos = observable(
