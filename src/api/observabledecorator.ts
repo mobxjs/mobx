@@ -3,8 +3,13 @@ import { fail } from "../utils/utils"
 import { IEnhancer } from "../types/modifiers"
 import { createPropDecorator, BabelDescriptor } from "../utils/decorators2"
 
+export type IObservableDecorator = {
+    (target: Object, property: string, descriptor?: PropertyDescriptor): void
+    enhancer: IEnhancer<any>
+}
+
 // TODO: make private and move other ones here
-export function createDecoratorForEnhancer(enhancer: IEnhancer<any>): any {
+export function createDecoratorForEnhancer(enhancer: IEnhancer<any>): IObservableDecorator {
     const decorator = createPropDecorator(
         true,
         (
@@ -20,16 +25,18 @@ export function createDecoratorForEnhancer(enhancer: IEnhancer<any>): any {
             defineObservableProperty(target, propertyName, initialValue, enhancer)
         }
     )
-    if (process.env.NODE_ENV !== "production") {
-        return function observableDecorator() {
-            // This wrapper function is just to detect illegal decorator invocations, deprecate in a next version
-            // and simply return the created prop decorator
-            if (arguments.length < 2)
-                return fail(
-                    "Incorrect decorator invocation. @observable decorator doesn't expect any arguments"
-                )
-            return decorator.apply(null, arguments)
-        }
-    }
-    return decorator
+    const res: any =
+        process.env.NODE_ENV !== "production"
+            ? function observableDecorator() {
+                  // This wrapper function is just to detect illegal decorator invocations, deprecate in a next version
+                  // and simply return the created prop decorator
+                  if (arguments.length < 2)
+                      return fail(
+                          "Incorrect decorator invocation. @observable decorator doesn't expect any arguments"
+                      )
+                  return decorator.apply(null, arguments)
+              }
+            : decorator
+    res.enhancer = enhancer
+    return res
 }

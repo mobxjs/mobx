@@ -10,7 +10,7 @@ import {
 } from "../types/modifiers"
 import { IObservableValue, ObservableValue } from "../types/observablevalue"
 import { IObservableArray, ObservableArray } from "../types/observablearray"
-import { createDecoratorForEnhancer } from "./observabledecorator"
+import { createDecoratorForEnhancer, IObservableDecorator } from "./observabledecorator"
 import { isObservable } from "./isobservable"
 import { IObservableObject } from "../types/observableobject"
 import { extendObservable } from "./extendobservable"
@@ -19,15 +19,14 @@ import { IObservableMapInitialValues, ObservableMap } from "../types/observablem
 export type CreateObservableOptions = {
     name?: string
     deep?: boolean
-    defaultDecorator?: Function // TODO: do we need this one
+    defaultDecorator?: IObservableDecorator
 }
 
 // Predefined bags of create observable options, to avoid allocating temporarily option objects
 // in the majority of cases
-// TODO: support default decorator / enhancer everywhere!, create interface for IDecorator that can also grab enhancer
 export const defaultCreateObservableOptions: CreateObservableOptions = {
-    deep: true, // TODO MWE: or false?
-    name: undefined, // TODO: not used yet
+    deep: true,
+    name: undefined,
     defaultDecorator: undefined
 }
 export const shallowCreateObservableOptions = {
@@ -54,8 +53,9 @@ export function asCreateObservableOptions(thing: any): CreateObservableOptions {
 }
 
 function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any> {
-    // TODO: make it possible to get enhancer from decorator
-    return options.deep === false ? referenceEnhancer : deepEnhancer
+    return options.defaultDecorator
+        ? options.defaultDecorator.enhancer
+        : options.deep === false ? referenceEnhancer : deepEnhancer
 }
 
 export const deepDecorator = createDecoratorForEnhancer(deepEnhancer)
@@ -97,7 +97,6 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
 
 export interface IObservableFactory {
     // observable overloads
-    <T>(wrapped: IModifierDescriptor<T>): T // TODO: kill this overload?
     (target: Object, key: string, baseDescriptor?: PropertyDescriptor): any // decorator
     <T>(value: T[], options?: CreateObservableOptions): IObservableArray<T>
     <K, V>(value: Map<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>
@@ -135,13 +134,13 @@ export interface IObservableFactories {
     /**
      * Decorator that creates an observable that only observes the references, but doesn't try to turn the assigned value into an observable.ts.
      */
-    ref(target: Object, property: string, descriptor?: PropertyDescriptor): any
+    ref: IObservableDecorator
     /**
      * Decorator that creates an observable converts its value (objects, maps or arrays) into a shallow observable structure
      */
-    shallow(target: Object, property: string, descriptor?: PropertyDescriptor): any
-    deep(target: Object, property: string, descriptor?: PropertyDescriptor): any
-    struct(target: Object, property: string, descriptor?: PropertyDescriptor): any
+    shallow: IObservableDecorator
+    deep: IObservableDecorator
+    struct: IObservableDecorator
 }
 
 const observableFactories: IObservableFactories = {
@@ -201,13 +200,14 @@ const observableFactories: IObservableFactories = {
     struct: deepStructDecorator
 } as any
 
-export const observable: IObservableFactory &
-    IObservableFactories & {
+export const observable: IObservableFactory & {
+    enhancer: IEnhancer<any>
+} & IObservableFactories & {
         deep: {
-            struct(target: Object, property: string, descriptor?: PropertyDescriptor): any
+            struct: IObservableDecorator
         }
         ref: {
-            struct(target: Object, property: string, descriptor?: PropertyDescriptor): any
+            struct: IObservableDecorator
         }
     } = createObservable as any
 
