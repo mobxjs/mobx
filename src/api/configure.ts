@@ -8,7 +8,7 @@ export function configure(options: {
     isolateGlobalState?: boolean
     disableErrorBoundaries?: boolean
     arrayBuffer?: number
-    reactionScheduler: (f: () => void) => void
+    reactionScheduler?: (f: () => void) => void
 }): void {
     if (options.enforceActions !== undefined) {
         globalState.enforceActions = !!options.enforceActions
