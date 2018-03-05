@@ -204,17 +204,16 @@ const observableFactories: IObservableFactories = {
 export const observable: IObservableFactory &
     IObservableFactories & {
         deep: {
-            struct<T>(initialValue?: T): T
+            struct(target: Object, property: string, descriptor?: PropertyDescriptor): any
         }
         ref: {
-            struct<T>(initialValue?: T): T
+            struct(target: Object, property: string, descriptor?: PropertyDescriptor): any
         }
     } = createObservable as any
 
 // weird trick to keep our typings nicely with our funcs, and still extend the observable function
 Object.keys(observableFactories).forEach(name => (observable[name] = observableFactories[name]))
 
-// TODO: MWE: really? just kill those two?
 observable.deep.struct = observable.struct as any
 observable.ref.struct = refStructDecorator
 
