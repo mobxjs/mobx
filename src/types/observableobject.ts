@@ -20,7 +20,7 @@ import {
 } from "./intercept-utils"
 import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
-import { IEnhancer, referenceEnhancer } from "./modifiers"
+import { IEnhancer, referenceEnhancer, deepEnhancer } from "./modifiers"
 import { ObservableArray, IObservableArray } from "./observablearray"
 import { initializeInstance } from "../utils/decorators2"
 
@@ -51,7 +51,7 @@ export class ObservableObjectAdministration
     changeListeners
     interceptors
 
-    constructor(public target: any, public name: string) {}
+    constructor(public target: any, public name: string, public defaultEnhancer: IEnhancer<any>) {}
 
     read(owner: any, key: string) {
         if (this.target !== owner) {
@@ -168,11 +168,13 @@ export interface IIsObservableObject {
     $mobx: ObservableObjectAdministration
 }
 
-export function asObservableObject(target, name?: string): ObservableObjectAdministration {
-    if (
-        Object.prototype.hasOwnProperty.call(target, "$mobx") // TODO: needs own property check?
-    )
-        return (target as any).$mobx
+export function asObservableObject(
+    target,
+    name: string = "",
+    defaultEnhancer: IEnhancer<any> = deepEnhancer
+): ObservableObjectAdministration {
+    let adm = (target as any).$mobx
+    if (adm) return adm
 
     process.env.NODE_ENV !== "production" &&
         invariant(
@@ -183,7 +185,7 @@ export function asObservableObject(target, name?: string): ObservableObjectAdmin
         name = (target.constructor.name || "ObservableObject") + "@" + getNextId()
     if (!name) name = "ObservableObject@" + getNextId()
 
-    const adm = new ObservableObjectAdministration(target, name)
+    adm = new ObservableObjectAdministration(target, name, defaultEnhancer)
     addHiddenFinalProp(target, "$mobx", adm)
     return adm
 }
@@ -226,7 +228,7 @@ export function defineComputedProperty(
     propName: string,
     options: IComputedValueOptions<any>
 ) {
-    const adm = asObservableObject(valueOwner, "")
+    const adm = asObservableObject(valueOwner)
     options.name = options.name || `${adm.name}.${propName}`
     options.context = valueOwner
     adm.values[propName] = new ComputedValue(options)

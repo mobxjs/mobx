@@ -53,9 +53,7 @@ export function deepStructEnhancer(v, oldValue, name): any {
     if (isES6Map(v)) return new ObservableMap(v, deepStructEnhancer, name)
     if (isPlainObject(v)) {
         const res = {}
-        asObservableObject(res, name)
         extendObservable(res, v, undefined, {
-            deep: false,
             name,
             defaultDecorator: observable.struct
         })

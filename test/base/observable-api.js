@@ -134,4 +134,15 @@ test("array - set, remove, values are reactive", () => {
 
 // TODO: test: observe and intercept property additions
 
-// TODO: test, dynamically adding properties should preserve the original modifiers of an object
+test("dynamically adding properties should preserve the original modifiers of an object", () => {
+    const todos = observable(
+        {
+            a: { title: "get coffee" }
+        },
+        {},
+        { deep: false }
+    )
+    expect(mobx.isObservable(todos.a)).toBe(false)
+    set(todos, { b: { title: "get tea" } })
+    expect(mobx.isObservable(todos.b)).toBe(false)
+})

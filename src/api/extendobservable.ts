@@ -50,11 +50,10 @@ export function extendObservable<A extends Object, B extends Object>(
     }
 
     options = asCreateObservableOptions(options)
-    // TODO: the default decorator should be piced from observable object
     const defaultDecorator =
         options.defaultDecorator || (options.deep === false ? refDecorator : deepDecorator)
     // TODO: pass in the default decorator
-    asObservableObject(target) // make sure object is observable, even without initial props
+    asObservableObject(target, options.name, defaultDecorator.enhancer) // make sure object is observable, even without initial props
     startBatch()
     try {
         for (let key in properties) {

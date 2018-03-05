@@ -65,8 +65,7 @@ export function set(obj: any, key: any, value?: any): void {
         if (existingObservable) {
             existingObservable.set(value)
         } else {
-            // TODO: should use enhancer of the object! add tests for that
-            defineObservableProperty(obj, key, value, deepEnhancer)
+            defineObservableProperty(obj, key, value, adm.defaultEnhancer)
         }
     } else if (isObservableMap(obj)) {
         obj.set(key, value)
