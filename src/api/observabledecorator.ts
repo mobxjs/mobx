@@ -8,7 +8,6 @@ export type IObservableDecorator = {
     enhancer: IEnhancer<any>
 }
 
-// TODO: make private and move other ones here
 export function createDecoratorForEnhancer(enhancer: IEnhancer<any>): IObservableDecorator {
     const decorator = createPropDecorator(
         true,

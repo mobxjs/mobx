@@ -44,7 +44,6 @@ export interface IComputedValueOptions<T> {
     get?: () => T
     set?: (value: T) => void
     name?: string
-    compareStructural?: boolean // TODO: remove (there is computed.struct already)
     equals?: IEqualsComparer<T>
     context?: any
     requiresReaction?: boolean
@@ -114,7 +113,10 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         this.name = options.name || "ComputedValue@" + getNextId()
         if (options.set) this.setter = createAction(name + "-setter", options.set) as any
         this.equals =
-            options.equals || (options.compareStructural ? comparer.structural : comparer.default)
+            options.equals ||
+            ((options as any).compareStructural || (options as any).struct
+                ? comparer.structural
+                : comparer.default)
         this.scope = options.context
         this.requiresReaction = !!options.requiresReaction
     }

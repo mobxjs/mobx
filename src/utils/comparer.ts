@@ -19,7 +19,6 @@ function defaultComparer(a: any, b: any): boolean {
 
 export const comparer = {
     identity: identityComparer,
-    // TODO: rename to deep
     structural: structuralComparer,
     default: defaultComparer
 }

@@ -52,14 +52,11 @@ export function extendObservable<A extends Object, B extends Object>(
     options = asCreateObservableOptions(options)
     const defaultDecorator =
         options.defaultDecorator || (options.deep === false ? refDecorator : deepDecorator)
-    // TODO: pass in the default decorator
     asObservableObject(target, options.name, defaultDecorator.enhancer) // make sure object is observable, even without initial props
     startBatch()
     try {
         for (let key in properties) {
             const descriptor = Object.getOwnPropertyDescriptor(properties, key)!
-            // const { value, get } = descriptor
-            // TODO: introduce and check decorators arg
             if (process.env.NODE_ENV !== "production") {
                 if (Object.getOwnPropertyDescriptor(target, key))
                     fail(
@@ -69,7 +66,10 @@ export function extendObservable<A extends Object, B extends Object>(
                     fail(
                         `Passing a 'computed' as initial property value is no longer supported by extendObservable. Use a getter or decorator instead`
                     )
-                // TODO: check for superfluos decorators
+                if (decorators)
+                    for (let key in decorators)
+                        if (!(key in properties))
+                            fail(`Trying to declare a decorator for unspecified property '${key}'`)
             }
             const decorator =
                 decorators && key in decorators

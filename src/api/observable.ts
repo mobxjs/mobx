@@ -78,7 +78,6 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
     if (isObservable(v)) return v
 
     // something that can be converted and mutated?
-    // TODO: add tests for all these extra args
     const res = Array.isArray(v)
         ? observable.array(v, arg2)
         : isES6Map(v)

@@ -21,9 +21,9 @@ class Todo {
     @computed get difficulty() {
         return this.title.length
     }
-    @computed({ compareStructurally: true })
-    get difficultyAsArray() {
-        return [this.title.length]
+    @computed({ requiresReaction: true })
+    get expensive() {
+        return somethingExpensive()
     }
 
     @action setTitle(t) {
@@ -42,8 +42,8 @@ const todo = observable.object({
     get difficulty() {
         return this.title.length
     },
-    get difficultyAsArray() {
-        return [this.title.length]
+    get expensive() {
+        return somethingExpensive()
     },
     setTitle(t) {
         this.title = t
@@ -53,7 +53,7 @@ const todo = observable.object({
     }
 }, {
     ref: observable.ref,
-    difficultyAsArray: computed({ compareStructurally: true }),
+    expensive: computed({ requiresReaction: true }),
     setTitle: action,
     setTitle2: action.bound
 })
@@ -67,8 +67,8 @@ class Todo {
     get difficulty() {
         return this.title.length
     }
-    get difficultyAsArray() {
-        return [this.title.length]
+    get expensive() {
+        return somethingExpensive()
     }
 
     setTitle(t) {
@@ -80,7 +80,7 @@ class Todo {
 }
 decorate(Todo, {
     ref: observable.ref,
-    difficultyAsArray: computed({ compareStructurally: true }),
+    expensive: computed({ requiresReaction: true }),
     setTitle: action,
     setTitle2: action.bound
 })
@@ -141,7 +141,7 @@ All the random notes that should make up a nice changelog:
 * new Atom => createAtom
 * custom atoms: `reportObserved` outside tracking context won't trigger changes
 * map `.entries()`, `.values()` and `.keys()` now properly return iterators. use `values(m)` or `keys(m)` or `Array.from(m)` to get the old behavior
-* the option `struct` for computed values is deprecated, use `compareStructural` indeed
+* the option `struct` and `compareStructural` for computed values is deprecated, use `@computed.struct` or `computed({ equals: comparer.structural})` indeed
 * `isModifierDescriptor` is no longer exposed
 * `deepEqual` is no longer exposed, use `comparer.structural` instead
 

@@ -24,7 +24,7 @@ export const computedDecorator = createPropDecorator(
     ) => {
         const { get, set } = descriptor // initialValue is the descriptor for get / set props
         // Optimization: faster on decorator target or instance? Assuming target
-        // TODO: find out if declaring on instance isn't just faster. (also makes the property descriptor simpler)
+        // Optimiziation: find out if declaring on instance isn't just faster. (also makes the property descriptor simpler). But, more memory usage..
         const options = decoratorArgs[0] || {}
         defineComputedProperty(instance, decoratorTarget, propertyName, { ...options, get, set })
     }
