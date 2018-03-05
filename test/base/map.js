@@ -678,3 +678,9 @@ test("maps.values, keys and maps.entries are iterables", () => {
     expect(Array.from(x.values())).toEqual([1, 2])
     expect(Array.from(x.keys())).toEqual(["x", "y"])
 })
+
+test("toStringTag", () => {
+    const x = mobx.observable.map({ x: 1, y: 2 })
+    expect(x[Symbol.toStringTag]).toBe("Map")
+    expect(Object.prototype.toString.call(x)).toBe("[object Map]")
+})

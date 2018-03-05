@@ -10,7 +10,8 @@ import {
     invariant,
     isES6Map,
     getMapLikeKeys,
-    fail
+    fail,
+    addHiddenFinalProp
 } from "../utils/utils"
 import {
     IInterceptable,
@@ -78,7 +79,8 @@ export class ObservableMap<K, V>
     interceptors
     changeListeners
     dehancer: any;
-    [Symbol.iterator]
+    [Symbol.iterator];
+    [Symbol.toStringTag]
 
     constructor(
         initialData?: IObservableMapInitialValues<K, V>,
@@ -373,6 +375,12 @@ export class ObservableMap<K, V>
 declareIterator(ObservableMap.prototype, function() {
     return this.entries()
 })
+
+addHiddenFinalProp(
+    ObservableMap.prototype,
+    typeof Symbol !== "undefined" ? Symbol.toStringTag : "@@toStringTag" as any,
+    "Map"
+)
 
 /* 'var' fixes small-build issue */
 export var isObservableMap = createInstanceofPredicate("ObservableMap", ObservableMap) as (

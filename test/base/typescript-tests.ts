@@ -1499,3 +1499,9 @@ test.skip("actions are reassignable", () => {
     a.m2 = () => {}
     expect(isAction(a.m2)).toBe(true)
 })
+
+test("map should structurally match ES6 Map", () => {
+    // Including this line strictly for type checking.
+    const m: Map<string, number> = mobx.observable.map({ a: 1, b: 2 })
+    expect(true).toBe(true)
+})
