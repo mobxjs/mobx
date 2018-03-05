@@ -6,7 +6,6 @@ import {
 } from "../types/observableobject"
 import { isObservableArray, IObservableArray } from "../types/observablearray"
 import { fail, invariant } from "../utils/utils"
-import { deepEnhancer } from "../types/modifiers"
 import { startBatch, endBatch } from "../core/observable"
 
 export function keys<K>(map: ObservableMap<K, any>): ReadonlyArray<K>

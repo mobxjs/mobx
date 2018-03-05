@@ -14,9 +14,8 @@
         "noImplicitAny": false,
         "moduleResolution": "node",
         "lib": [
-            "es5",
-            "dom",
-            "es2015.collection"
+            "es6",
+            "dom"
         ]
     },
     "include": [

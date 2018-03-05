@@ -17,7 +17,7 @@ export interface Iterator<T> {
     }
 }
 
-export function declareIterator<T>(prototType, iteratorFactory: () => Iterator<T>) {
+export function declareIterator<T>(prototType, iteratorFactory: () => IterableIterator<T>) {
     addHiddenFinalProp(prototType, iteratorSymbol(), iteratorFactory)
 }
 

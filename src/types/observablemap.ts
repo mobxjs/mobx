@@ -22,7 +22,7 @@ import {
 } from "./intercept-utils"
 import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
-import { declareIterator, Iterator, iteratorSymbol, makeIterable } from "../utils/iterable"
+import { declareIterator, iteratorSymbol, makeIterable } from "../utils/iterable"
 import { transaction } from "../api/transaction"
 import { referenceEnhancer } from "./modifiers"
 
@@ -258,18 +258,20 @@ export class ObservableMap<K, V>
     entries(): IterableIterator<IMapEntry<K, V>> {
         const self = this
         let nextIndex = 0
-        return makeIterable({
-            next: function() {
-                if (nextIndex < self._keys.length) {
-                    const key = self._keys[nextIndex++]
-                    return {
-                        value: [key, self.get(key)!] as [K, V],
-                        done: false
+        return makeIterable(
+            {
+                next: function() {
+                    if (nextIndex < self._keys.length) {
+                        const key = self._keys[nextIndex++]
+                        return {
+                            value: [key, self.get(key)!] as [K, V],
+                            done: false
+                        }
                     }
+                    return { done: true }
                 }
-                return { done: true }
-            }
-        })
+            } as any
+        )
     }
 
     forEach(callback: (value: V, key: K, object: Map<K, V>) => void, thisArg?) {
