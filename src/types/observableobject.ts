@@ -287,7 +287,6 @@ export function defineComputedProperty(
     options.name = options.name || `${adm.name}.${propName}`
     options.context = valueOwner
     adm.values[propName] = new ComputedValue(options)
-    // TODO: isPropertyConfigurable needed / best check?
     if (propertyOwner === valueOwner || isPropertyConfigurable(propertyOwner, propName))
         Object.defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
 }

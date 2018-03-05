@@ -1,7 +1,7 @@
 import { addHiddenProp, fail, EMPTY_ARRAY } from "./utils"
 
 type DecoratorTarget = {
-    __mobxDidRunLazyInitializers2?: boolean // TODO: rename
+    __mobxDidRunLazyInitializers?: boolean
     __mobxDecorators?: { [prop: string]: DecoratorInvocationDescription }
 }
 
@@ -50,8 +50,8 @@ function createPropertyInitializerDescriptor(
 
 export function initializeInstance(target: any)
 export function initializeInstance(target: DecoratorTarget) {
-    if (target.__mobxDidRunLazyInitializers2 === true) return
-    addHiddenProp(target, "__mobxDidRunLazyInitializers2", true)
+    if (target.__mobxDidRunLazyInitializers === true) return
+    addHiddenProp(target, "__mobxDidRunLazyInitializers", true)
     const decorators = target.__mobxDecorators
     if (decorators)
         for (let key in decorators) {

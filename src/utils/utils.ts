@@ -178,7 +178,7 @@ export function getMapLikeKeys(map: any): any {
     return fail(`Cannot get keys from '${map}'`)
 }
 
-// TODO: use Array.from in Mobx 5
+// use Array.from in Mobx 5
 export function iteratorToArray<T>(it: Iterator<T>): ReadonlyArray<T> {
     const res: T[] = []
     while (true) {

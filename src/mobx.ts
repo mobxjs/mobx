@@ -15,9 +15,24 @@
  * - utils/   Utility stuff.
  *
  */
+if (typeof process === "undefined") {
+    // define process.env if needed
+    ;(function() {
+        return this
+    })().process = { env: {} }
+}
 
-// TODO: define process.env if needed
-// TODO: detect minification and see if process.env is production
+;(() => {
+    function testCodeMinification() {}
+    if (
+        testCodeMinification.name !== "testCodeMinification" &&
+        process.env.NODE_ENV !== "production"
+    ) {
+        console.warn(
+            "[mobx] you are running a minified build, but 'process.env.NODE_ENV' was not set to 'production' in your bundler. This results in an unnecessarily large and slow bundle"
+        )
+    }
+})()
 
 export { IObservable, IDepTreeNode } from "./core/observable"
 export { Reaction, IReactionPublic, IReactionDisposer } from "./core/reaction"
