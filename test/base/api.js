@@ -1,3 +1,4 @@
+import * as fs from "fs"
 var mobx = require("../../src/mobx.ts")
 
 test("correct api should be exposed", function() {
@@ -57,4 +58,9 @@ test("correct api should be exposed", function() {
             "when"
         ].sort()
     )
+})
+
+test("mobx has no dependencies", () => {
+    const pkg = JSON.parse(fs.readFileSync(__dirname + "/../../package.json", "utf8"))
+    expect(pkg.dependencies).toEqual({})
 })
