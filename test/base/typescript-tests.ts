@@ -1524,3 +1524,36 @@ test("map should structurally match ES6 Map", () => {
     const m: Map<string, number> = mobx.observable.map({ a: 1, b: 2 })
     expect(true).toBe(true)
 })
+
+test("single arg when returns a promise", async () => {
+    const x = mobx.observable.box(1)
+
+    setTimeout(() => x.set(3), 200)
+    await mobx.when(() => x.get() === 3)
+})
+
+test("single arg when returns a can timeout", async () => {
+    const x = mobx.observable.box(1)
+
+    setTimeout(() => x.set(3), 200)
+    try {
+        await mobx.when(() => x.get() === 3, { timeout: 100 })
+        fail("should timeout")
+    } catch (e) {
+        expect("" + e).toMatch(/WHEN_TIMEOUT/)
+    }
+})
+
+test("promised when can be cancelled", async () => {
+    const x = mobx.observable.box(1)
+
+    try {
+        debugger
+        const p = mobx.when(() => x.get() === 3)
+        setTimeout(() => p.cancel(), 100)
+        await p
+        fail("should cancel")
+    } catch (e) {
+        expect("" + e).toMatch(/WHEN_CANCELLED/)
+    }
+})
