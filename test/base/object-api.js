@@ -1,5 +1,5 @@
 const mobx = require("../../src/mobx")
-const { keys, set, remove, values, reaction, observable, extendObservable } = mobx
+const { keys, when, set, remove, values, reaction, observable, extendObservable, has, get } = mobx
 
 test("keys should be observable when extending", () => {
     const todos = observable({})
@@ -53,7 +53,11 @@ test("object - set, remove, values are reactive", () => {
 
     reaction(() => values(todos), values => snapshots.push(values))
 
+    expect(has(todos, "x")).toBe(false)
+    expect(get(todos, "x")).toBe(undefined)
     set(todos, "x", 3)
+    expect(has(todos, "x")).toBe(true)
+    expect(get(todos, "x")).toBe(3)
     remove(todos, "y")
     set(todos, "z", 4)
     set(todos, "x", 5)
@@ -84,7 +88,11 @@ test("map - set, remove, values are reactive", () => {
 
     reaction(() => values(todos), values => snapshots.push(values))
 
+    expect(has(todos, "x")).toBe(false)
+    expect(get(todos, "x")).toBe(undefined)
     set(todos, "x", 3)
+    expect(has(todos, "x")).toBe(true)
+    expect(get(todos, "x")).toBe(3)
     remove(todos, "y")
     set(todos, "z", 4)
     set(todos, "x", 5)
@@ -115,7 +123,12 @@ test("array - set, remove, values are reactive", () => {
 
     reaction(() => values(todos), values => snapshots.push(values))
 
+    expect(has(todos, 0)).toBe(false)
+    expect(get(todos, 0)).toBe(undefined)
     set(todos, 0, 2)
+    expect(has(todos, 0)).toBe(true)
+    expect(get(todos, 0)).toBe(2)
+
     set(todos, "1", 4)
     set(todos, 3, 4)
     set(todos, 1, 3)
@@ -175,4 +188,18 @@ test("dynamically adding properties should preserve the original modifiers of an
     expect(mobx.isObservable(todos.a)).toBe(false)
     set(todos, { b: { title: "get tea" } })
     expect(mobx.isObservable(todos.b)).toBe(false)
+})
+
+test("has and get are reactive", async () => {
+    const todos = observable({})
+
+    const p1 = when(() => has(todos, "x"))
+    const p2 = when(() => get(todos, "y") === 3)
+
+    setTimeout(() => {
+        set(todos, { x: false, y: 3 })
+    }, 100)
+
+    await p1
+    await p2
 })

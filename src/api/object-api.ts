@@ -102,3 +102,40 @@ export function remove(obj: any, key: any): void {
         )
     }
 }
+
+export function has<K>(obj: ObservableMap<K, any>, key: K): boolean
+export function has<T>(obj: IObservableArray<T>, index: number): boolean
+export function has<T extends Object>(obj: T, key: string): boolean
+export function has(obj: any, key: any): boolean {
+    if (isObservableObject(obj)) {
+        return keys(obj).indexOf(key) >= 0
+    } else if (isObservableMap(obj)) {
+        return obj.has(key)
+    } else if (isObservableArray(obj)) {
+        return key >= 0 && key < obj.length
+    } else {
+        return fail(
+            process.env.NODE_ENV !== "production" &&
+                "'has()' can only be used on observable objects, arrays and maps"
+        )
+    }
+}
+
+export function get<K, V>(obj: ObservableMap<K, V>, key: K): V | undefined
+export function get<T>(obj: IObservableArray<T>, index: number): T | undefined
+export function get<T extends Object>(obj: T, key: string): any
+export function get(obj: any, key: any): any {
+    if (!has(obj, key)) return undefined
+    if (isObservableObject(obj)) {
+        return obj[key]
+    } else if (isObservableMap(obj)) {
+        return obj.get(key)
+    } else if (isObservableArray(obj)) {
+        return obj[key]
+    } else {
+        return fail(
+            process.env.NODE_ENV !== "production" &&
+                "'get()' can only be used on observable objects, arrays and maps"
+        )
+    }
+}

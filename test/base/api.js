@@ -15,10 +15,12 @@ test("correct api should be exposed", function() {
             "extendObservable",
             "extendShallowObservable", // deprecated but still public
             "flow",
+            "get",
             "_getAdministration",
             "getAtom",
             "getDebugName",
             "getDependencyTree",
+            "has",
             "_getGlobalState",
             "getObserverTree",
             "IDerivationState",

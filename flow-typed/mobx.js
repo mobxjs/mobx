@@ -444,6 +444,14 @@ declare export function remove<K, V>(obj: ObservableMap<K, V>, key: K): void
 declare export function remove<T>(obj: IObservableArray<T>, index: number): void
 declare export function remove(obj: any, key: string): void
 
+declare export function has<K>(obj: ObservableMap<K, any>, key: K): boolean
+declare export function has<T>(obj: IObservableArray<T>, index: number): boolean
+declare export function has(obj: any, key: string): boolean
+
+declare export function get<K, V>(obj: ObservableMap<K, V>, key: K): V | void
+declare export function get<T>(obj: IObservableArray<T>, index: number): T | void
+declare export function get(obj: any, key: string): any
+
 declare export function onReactionError(
     handler: (error: any, derivation: IDerivation) => void
 ): () => void
