@@ -144,7 +144,8 @@ All the random notes that should make up a nice changelog:
 * the option `struct` and `compareStructural` for computed values is deprecated, use `@computed.struct` or `computed({ equals: comparer.structural})` indeed
 * `isModifierDescriptor` is no longer exposed
 * `deepEqual` is no longer exposed, use `comparer.structural` instead
-
+* `setReactionScheduler` -> `configure({ reactionScheduler: fn })`
+* `reserveArrayBuffer` -> `configure({ reactionErrorHandler: fn })`
 
 #### observable
 
