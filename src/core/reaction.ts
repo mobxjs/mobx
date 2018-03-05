@@ -9,7 +9,7 @@ import {
 } from "./derivation"
 import { IObservable, startBatch, endBatch } from "./observable"
 import { globalState } from "./globalstate"
-import { createInstanceofPredicate, getNextId, invariant } from "../utils/utils"
+import { createInstanceofPredicate, getNextId, invariant, Lambda } from "../utils/utils"
 import { isSpyEnabled, spyReport, spyReportStart, spyReportEnd } from "./spy"
 import { trace } from "../api/trace"
 
@@ -195,9 +195,7 @@ function registerErrorHandler(handler) {
     this.$mobx.errorHandler = handler
 }
 
-export function onReactionError(
-    handler: (error: any, derivation: IDerivation) => void
-): () => void {
+export function onReactionError(handler: (error: any, derivation: IDerivation) => void): Lambda {
     globalState.globalReactionErrorHandlers.push(handler)
     return () => {
         const idx = globalState.globalReactionErrorHandlers.indexOf(handler)

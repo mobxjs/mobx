@@ -63,12 +63,10 @@ export var action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): 
 
 action.bound = boundActionDecorator as any
 
-export function runInAction<T>(block: () => T, scope?: any): T
-export function runInAction<T>(name: string, block: () => T, scope?: any): T
-export function runInAction(arg1, arg2?, arg3?) {
+export function runInAction<T>(name: string, block: () => T): T
+export function runInAction(arg1, arg2?) {
     const actionName = typeof arg1 === "string" ? arg1 : arg1.name || "<unnamed action>"
     const fn = typeof arg1 === "function" ? arg1 : arg2
-    const scope = typeof arg1 === "function" ? arg2 : arg3
 
     if (process.env.NODE_ENV !== "production") {
         invariant(
@@ -79,7 +77,7 @@ export function runInAction(arg1, arg2?, arg3?) {
             fail(`actions should have valid names, got: '${actionName}'`)
     }
 
-    return executeAction(actionName, fn, scope, undefined)
+    return executeAction(actionName, fn, this, undefined)
 }
 
 export function isAction(thing: any) {

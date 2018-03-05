@@ -64,7 +64,6 @@ export function autorun(
 
 export type IReactionOptions = IAutorunOptions & {
     fireImmediately?: boolean
-    compareStructural?: boolean
     equals?: IEqualsComparer<any>
 }
 
@@ -106,7 +105,9 @@ export function reaction<T>(
     let isScheduled = false
     let value: T
 
-    const equals = opts.compareStructural ? comparer.structural : opts.equals || comparer.default
+    const equals = (opts as any).compareStructural
+        ? comparer.structural
+        : opts.equals || comparer.default
 
     const r = new Reaction(name, () => {
         if (firstTime || runSync) {

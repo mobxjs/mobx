@@ -151,6 +151,7 @@ All the random notes that should make up a nice changelog:
 * `reserveArrayBuffer` -> `configure({ reactionErrorHandler: fn })`
 * `ObservableMap` is no longer exposed as constructor, use `observable.map` or `isObservableMap` instead
 * `map` -> `observable.map`
+* `runInAction` no longer accepts a custom scope
 
 #### observable
 
