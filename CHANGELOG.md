@@ -146,6 +146,7 @@ All the random notes that should make up a nice changelog:
 * `deepEqual` is no longer exposed, use `comparer.structural` instead
 * `setReactionScheduler` -> `configure({ reactionScheduler: fn })`
 * `reserveArrayBuffer` -> `configure({ reactionErrorHandler: fn })`
+* `ObservableMap` is no longer exposed as constructor, use `observable.map` or `isObservableMap` instead
 
 #### observable
 

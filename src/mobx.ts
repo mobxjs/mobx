@@ -119,6 +119,7 @@ import "./core/globalstate"
 // Devtools support
 import { spy } from "./core/spy"
 import { getDebugName } from "./types/type-utils"
+import { addHiddenProp, fail } from "./utils/utils"
 
 declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: ((any) => void) }
 if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
@@ -131,4 +132,34 @@ if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
     })
 }
 
-// TODO: generate getters for legacy api's
+if (process.env.NODE_ENV !== "production" && typeof module !== "undefined") {
+    ;[
+        "extras",
+        "default",
+        "Atom",
+        "BaseAtom",
+        "ObservableMap",
+        "asFlat",
+        "asMap",
+        "asReference",
+        "asStructure",
+        "autorunAsync",
+        "createTranformer",
+        "expr",
+        "isModifierDescriptor",
+        "isStrictModeEnabled",
+        "map",
+        "useStrict",
+        "whyRun"
+    ].forEach(prop => {
+        Object.defineProperty(module.exports, prop, {
+            enumerable: false,
+            get() {
+                fail(
+                    `'${prop}' is no longer part of the public MobX api. Please consult the changelog to find out where this functionality went`
+                )
+            },
+            set() {}
+        })
+    })
+}
