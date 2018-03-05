@@ -87,7 +87,9 @@ export { isComputed, isComputedProp } from "./api/iscomputed"
 export { extendObservable, extendShallowObservable } from "./api/extendobservable"
 export { observe } from "./api/observe"
 export { intercept } from "./api/intercept"
-export { autorun, when, reaction, IReactionOptions } from "./api/autorun"
+export { autorun, reaction, IReactionOptions } from "./api/autorun"
+export { when, IWhenOptions } from "./api/when"
+
 export { action, isAction, runInAction, IActionFactory } from "./api/action"
 export { keys, values, set, remove } from "./api/object-api"
 export { decorate } from "./api/decorate"
@@ -132,6 +134,7 @@ if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
     })
 }
 
+// TODO: remove in some future build
 if (process.env.NODE_ENV !== "production" && typeof module !== "undefined") {
     ;[
         "extras",

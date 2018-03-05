@@ -114,6 +114,7 @@ All the random notes that should make up a nice changelog:
 * Introduced `@computed(options)`
 * `autorun`, `reaction` and `when` now can take an `onError` property as parameter
 * `toJS` now accepts options: `{    detectCycles?: boolean    exportMapsAsObjects?: boolean }`, both `true` by default
+* `when` now supports an `timeout` option, so `mobxUtils.whenWithTimeout` is no longer needed
 
 ## Breaking changes
 

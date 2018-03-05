@@ -222,3 +222,53 @@ test("autorunAsync warns when passed an action", function() {
     expect.assertions(1)
     expect(() => m.autorun(action)).toThrowError(/Autorun does not accept actions/)
 })
+
+test("whenWithTimeout should operate normally", done => {
+    var a = m.observable.box(1)
+
+    m.when(() => a.get() === 2, () => done(), {
+        timeout: 500,
+        onError: () => done.fail("error triggered")
+    })
+
+    setTimeout(m.action(() => a.set(2)), 200)
+})
+
+test("whenWithTimeout should timeout", done => {
+    const a = m.observable.box(1)
+
+    m.when(() => a.get() === 2, () => done.fail("should have timed out"), {
+        timeout: 500,
+        onError: e => {
+            expect("" + e).toMatch(/WHEN_TIMEOUT/)
+            done()
+        }
+    })
+
+    setTimeout(m.action(() => a.set(2)), 1000)
+})
+
+test("whenWithTimeout should dispose", done => {
+    const a = m.observable.box(1)
+
+    const d1 = m.when(() => a.get() === 2, () => done.fail("1 should not finsih"), {
+        timeout: 100,
+        onError: () => done.fail("1 should not timeout")
+    })
+
+    const d2 = m.when(() => a.get() === 2, () => t.fail("2 should not finsih"), {
+        timeout: 200,
+        onError: () => done.fail("2 should not timeout")
+    })
+
+    d1()
+    d2()
+
+    setTimeout(
+        m.action(() => {
+            a.set(2)
+            done()
+        }),
+        150
+    )
+})

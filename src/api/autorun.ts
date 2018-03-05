@@ -1,6 +1,5 @@
 import { Lambda, getNextId, invariant, EMPTY_OBJECT, deprecated } from "../utils/utils"
 import { Reaction, IReactionPublic, IReactionDisposer } from "../core/reaction"
-import { untrackedStart, untrackedEnd } from "../core/derivation"
 import { action, isAction } from "./action"
 import { IEqualsComparer, comparer } from "../utils/comparer"
 
@@ -61,24 +60,6 @@ export function autorun(
     if (opts.onError) reaction.onError(opts.onError)
     reaction.schedule()
     return reaction.getDisposer()
-}
-
-export function when(
-    predicate: () => boolean,
-    effect: Lambda,
-    opts?: { name?: string; onError?: (error: any) => void }
-): IReactionDisposer {
-    return autorun(r => {
-        if (predicate()) {
-            r.dispose()
-            const prevUntracked = untrackedStart()
-            try {
-                effect()
-            } finally {
-                untrackedEnd(prevUntracked)
-            }
-        }
-    }, opts)
 }
 
 export type IReactionOptions = IAutorunOptions & {
