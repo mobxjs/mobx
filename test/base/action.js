@@ -374,8 +374,7 @@ test("computed values and actions", () => {
 
 test("extendObservable respects action decorators", () => {
     debugger
-    const x = mobx.observable.object(
-        // TODO remove .object
+    const x = mobx.observable(
         {
             a1() {
                 return this
@@ -415,14 +414,13 @@ test("expect warning for invalid decorator", () => {
     }).toThrow(/Not a valid decorator for 'x', got: undefined/)
 })
 
-test.skip("expect warning superfluos decorator", () => {
+test("expect warning superfluos decorator", () => {
     expect(() => {
         mobx.observable({ x() {} }, { y: mobx.action })
-    }).toThrow(/Not a valid decorator for 'x', got: undefined/)
+    }).toThrow(/Trying to declare a decorator for unspecified property 'y'/)
 })
 
-// TODO re-enable
-test.skip("bound actions bind", () => {
+test("bound actions bind", () => {
     var called = 0
     var x = mobx.observable(
         {

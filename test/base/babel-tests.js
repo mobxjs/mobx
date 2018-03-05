@@ -609,7 +609,7 @@ test("enumerability", () => {
     expect(a.hasOwnProperty("m2")).toBe(true)
 })
 
-test.skip("enumerability - workaround", () => {
+test("enumerability - workaround", () => {
     class A {
         @observable a = 1 // enumerable, on proto
         @observable a2 = 2
@@ -1044,13 +1044,34 @@ test("computed comparer works with decorate (babel) - 3", () => {
     disposeAutorun()
 })
 
-test.skip("actions are not reassignable", () => {
+test("actions are not reassignable", () => {
     class A {
-        @action m2 = () => {} // non-enumerable, on self
+        @action
+        m1() {}
+        @action m2 = () => {}
+        @action.bound
+        m3() {}
+        @action.bound m4 = () => {}
     }
 
     const a = new A()
+    expect(isAction(a.m1)).toBe(true)
     expect(isAction(a.m2)).toBe(true)
-    a.m2 = () => {}
-    expect(isAction(a.m2)).toBe(true)
+    expect(isAction(a.m3)).toBe(true)
+    expect(isAction(a.m4)).toBe(true)
+    // expect(() => {
+    //     a.m1 = () => {}
+    // }).toThrow(/Cannot assign to read only property 'm1'/)
+    a.m1 = () => {}
+    // we cannot prevent actions to be reassignable in TS, as it will kill overriding the action in subtypes :'(
+    expect(isAction(a.m1)).toBe(false)
+    expect(() => {
+        a.m2 = () => {}
+    }).toThrow(/Cannot assign to read only property 'm2'/)
+    expect(() => {
+        a.m3 = () => {}
+    }).toThrow(/Cannot assign to read only property 'm3'/)
+    expect(() => {
+        a.m4 = () => {}
+    }).toThrow(/Cannot assign to read only property 'm4'/)
 })

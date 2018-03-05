@@ -571,7 +571,9 @@ test("action decorator on field (typescript)", () => {
     }
 
     const store1 = new Store(2)
+    debugger
     const store2 = new Store(7)
+    expect(store1.add).not.toEqual(store2.add)
 
     const events: any[] = []
     const d = spy(events.push.bind(events))
@@ -1489,15 +1491,36 @@ test("multiple inheritance should work", () => {
     expect(mobx.keys(new B())).toEqual(["x", "y"])
 })
 
-test.skip("actions are reassignable", () => {
+test("actions are not reassignable", () => {
     class A {
-        @action m2 = () => {} // non-enumerable, on self
+        @action
+        m1() {}
+        @action m2 = () => {}
+        @action.bound
+        m3() {}
+        @action.bound m4 = () => {}
     }
 
     const a = new A()
+    expect(isAction(a.m1)).toBe(true)
     expect(isAction(a.m2)).toBe(true)
-    a.m2 = () => {}
-    expect(isAction(a.m2)).toBe(true)
+    expect(isAction(a.m3)).toBe(true)
+    expect(isAction(a.m4)).toBe(true)
+    // expect(() => {
+    //     a.m1 = () => {}
+    // }).toThrow(/Cannot assign to read only property 'm1'/)
+    a.m1 = () => {}
+    // we cannot prevent actions to be reassignable in TS, as it will kill overriding the action in subtypes :'(
+    expect(isAction(a.m1)).toBe(false)
+    expect(() => {
+        a.m2 = () => {}
+    }).toThrow(/Cannot assign to read only property 'm2'/)
+    expect(() => {
+        a.m3 = () => {}
+    }).toThrow(/Cannot assign to read only property 'm3'/)
+    expect(() => {
+        a.m4 = () => {}
+    }).toThrow(/Cannot assign to read only property 'm4'/)
 })
 
 test("map should structurally match ES6 Map", () => {

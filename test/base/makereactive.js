@@ -297,7 +297,7 @@ test("flat object", function() {
     expect(updates).toBe(2)
 })
 
-test.skip("as structure", function() {
+test("as structure", function() {
     var x = m.observable.object(
         {
             x: null
@@ -633,7 +633,7 @@ test("761 - deeply nested modifiers work", () => {
     expect(Array.isArray(a.someKey.someNestedKey)).toBe(false)
 })
 
-test.skip("compare structurally, deep", () => {
+test("compare structurally, deep", () => {
     var a = mobx.observable.object(
         {
             x: undefined
@@ -698,18 +698,23 @@ test("compare structurally, ref", () => {
     d()
 })
 
-test.skip("double declare property", () => {
+test("double declare property", () => {
     const o = {}
     mobx.extendObservable(o, {
         a: 5
     })
     expect(() => {
+        mobx.extendObservable(o, {
+            a: 3
+        })
+    }).toThrow(/can only be used to introduce new properties/)
+    expect(() => {
         mobx.extendObservable(
             o,
             {},
             {
-                a: mobx.observable.ref // a is getter at this point
+                a: mobx.observable.ref
             }
         )
-    }).toThrow(/something better than this/)
+    }).toThrow(/Trying to declare a decorator for unspecified property/)
 })

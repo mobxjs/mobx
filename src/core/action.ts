@@ -19,7 +19,7 @@ export function createAction(actionName: string, fn: Function): Function & IActi
     const res = function() {
         return executeAction(actionName, fn, this, arguments)
     }
-    ;(res as any).originalFn = fn
+    ;(res as any).originalFn = fn // TODO: remove
     ;(res as any).isMobxAction = true
     return res as any
 }

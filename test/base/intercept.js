@@ -117,9 +117,7 @@ test("intercept object", () => {
     expect(a.b).toBe(22)
 })
 
-test.skip("intercept property additions", () => {
-    // TODO: in mobx3 it was possible to intercept object extension through extendObservable,
-    // in the new decorator approach that is not possible anymore, should it?
+test("intercept property additions", () => {
     var a = m.observable({})
     var d4 = intercept(a, change => {
         if (change.type === "add") {

@@ -225,13 +225,14 @@ test("decorate should work with Object.create", function() {
     expect(box2.width).toBe(40) // no shared state!
 })
 
-// TODO: re-enable
-test.skip("decorate should work with constructor function", function() {
+test("decorate should work with constructor function", function() {
     function Box() {
         this.uninitialized = undefined
-        extendObservable(this, {
-            height: 20,
-            get width() {
+        this.height = 20
+        Object.defineProperty(this, "width", {
+            configurable: true,
+            enumerable: false,
+            get() {
                 return (
                     this.undeclared *
                     this.height *
@@ -241,10 +242,14 @@ test.skip("decorate should work with constructor function", function() {
                 )
             }
         })
-        ;(this.sizes = [2]), (this.someFunc = function() {
+        this.sizes = [2]
+        this.someFunc = function() {
             return 2
-        })
-        debugger
+        }
+        this.addSize = function() {
+            this.sizes.push([3])
+            this.sizes.push([4])
+        }
         decorate(this, {
             uninitialized: observable,
             undeclared: observable,
@@ -254,10 +259,6 @@ test.skip("decorate should work with constructor function", function() {
             width: computed,
             addSize: action
         })
-    }
-    Box.prototype.addSize = function() {
-        this.sizes.push([3])
-        this.sizes.push([4])
     }
 
     const box = new Box()
@@ -294,7 +295,7 @@ test.skip("decorate should work with constructor function", function() {
     box.undeclared = 2
     expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700, 1400])
 
-    const box2 = Object.create(Box)
+    const box2 = new Box()
     box2.undeclared = 1
     expect(box2.width).toBe(40) // no shared state!
 })

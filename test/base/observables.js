@@ -346,10 +346,7 @@ test("extend observable multiple prop maps", function() {
         mobx.extendObservable(
             x,
             {},
-            {
-                b: 2,
-                c: 2
-            },
+            {},
             {
                 c: 3,
                 d: 4
@@ -1031,30 +1028,6 @@ test("computed values believe deep NaN === deep NaN when using compareStructural
     expect(bufArray.length).toBe(3)
 })
 
-test.skip("issue 65; transaction causing transaction", function(t) {
-    // MWE: disabled, bad test; depends on transaction being tracked, transaction should not be used in computed!
-    var x = mobx.observable({
-        a: 3,
-        get b() {
-            return mobx.transaction(function() {
-                return this.a * 2
-            }, this)
-        }
-    })
-
-    var res
-    mobx.autorun(function() {
-        res = x.a + x.b
-    })
-
-    mobx.transaction(function() {
-        x.a = 2
-        x.a = 5
-    })
-    expect(res).toBe(15)
-    t.end()
-})
-
 test("issue 71, transacting running transformation", function() {
     var state = mobx.observable({
         things: []
@@ -1671,7 +1644,6 @@ test("computed equals function only invoked when necessary", () => {
     })
 })
 
-// TODO:
 // document that extendObservable is not inheritance compatible,
 // and make sure this does work with decorate
 test("Issue 1092 - Should not access attributes of siblings in the prot. chain", () => {

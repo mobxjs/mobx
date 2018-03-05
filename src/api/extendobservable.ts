@@ -47,6 +47,10 @@ export function extendObservable<A extends Object, B extends Object>(
             !isObservable(properties),
             "Extending an object with another observable (object) is not supported. Please construct an explicit propertymap, using `toJS` if need. See issue #540"
         )
+        if (decorators)
+            for (let key in decorators)
+                if (!(key in properties))
+                    fail(`Trying to declare a decorator for unspecified property '${key}'`)
     }
 
     options = asCreateObservableOptions(options)
@@ -66,10 +70,6 @@ export function extendObservable<A extends Object, B extends Object>(
                     fail(
                         `Passing a 'computed' as initial property value is no longer supported by extendObservable. Use a getter or decorator instead`
                     )
-                if (decorators)
-                    for (let key in decorators)
-                        if (!(key in properties))
-                            fail(`Trying to declare a decorator for unspecified property '${key}'`)
             }
             const decorator =
                 decorators && key in decorators

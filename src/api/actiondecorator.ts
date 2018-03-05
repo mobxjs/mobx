@@ -1,4 +1,4 @@
-import { addHiddenProp, fail } from "../utils/utils"
+import { fail, addHiddenFinalProp } from "../utils/utils"
 import { createAction } from "../core/action"
 import { BabelDescriptor } from "../utils/decorators2"
 import { action, defineBoundAction } from "./action"
@@ -51,7 +51,7 @@ export function actionFieldDecorator(name: string) {
                 return undefined
             },
             set(value) {
-                addHiddenProp(this, prop, action(name, value))
+                addHiddenFinalProp(this, prop, action(name, value))
             }
         })
     }
@@ -63,25 +63,21 @@ export function boundActionDecorator(target, propertyName, descriptor, applyToIn
         return null
     }
     if (descriptor) {
-        if (descriptor.value)
-            // Typescript / Babel: @action.bound method() { }
-            return {
-                configurable: true,
-                enumerable: false,
-                get() {
-                    defineBoundAction(this, propertyName, descriptor.value)
-                    return this[propertyName]
-                },
-                set: dontReassignFields
-            }
-        // babel @action.bound method = () => {}
+        // if (descriptor.value)
+        // Typescript / Babel: @action.bound method() { }
+        // also: babel @action.bound method = () => {}
         return {
             configurable: true,
             enumerable: false,
-            writeable: false,
-            initializer() {
-                defineBoundAction(this, propertyName, descriptor.initializer.call(this))
-            }
+            get() {
+                defineBoundAction(
+                    this,
+                    propertyName,
+                    descriptor.value || descriptor.initializer.call(this)
+                )
+                return this[propertyName]
+            },
+            set: dontReassignFields
         }
     }
     // field decorator Typescript @action.bound method = () => {}
