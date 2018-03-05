@@ -1887,3 +1887,16 @@ test("computed comparer works with decorate (plain) - 3", () => {
 
     disposeAutorun()
 })
+
+test("can create computed with setter", () => {
+    let y = 1
+    let x = mobx.computed(
+        () => y,
+        v => {
+            y = v * 2
+        }
+    )
+    expect(x.get()).toBe(1)
+    x.set(3)
+    expect(x.get()).toBe(6)
+})

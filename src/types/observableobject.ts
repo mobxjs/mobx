@@ -12,7 +12,6 @@ import {
     addHiddenFinalProp,
     isPropertyConfigurable
 } from "../utils/utils"
-import { runLazyInitializers } from "../utils/decorators"
 import {
     hasInterceptors,
     IInterceptable,
@@ -313,7 +312,7 @@ const isObservableObjectAdministration = createInstanceofPredicate(
 export function isObservableObject(thing: any): thing is IObservableObject {
     if (isObject(thing)) {
         // Initializers run lazily when transpiling to babel, so make sure they are run...
-        runLazyInitializers(thing)
+        initializeInstance(thing)
         return isObservableObjectAdministration((thing as any).$mobx)
     }
     return false

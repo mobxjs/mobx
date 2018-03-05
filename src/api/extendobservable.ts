@@ -18,7 +18,6 @@ export function extendShallowObservable<A extends Object, B extends Object>(
     properties: B,
     decorators?: { [K in keyof B]?: Function }
 ): A & B {
-    // TODO: or restore?
     deprecated(
         "'extendShallowObservable' is deprecated, use 'extendObservable(target, props, { deep: false })' instead"
     )
@@ -50,7 +49,6 @@ export function extendObservable<A extends Object, B extends Object>(
         )
     }
 
-    // TODO: eliminate options, preserve name
     options = asCreateObservableOptions(options)
     // TODO: the default decorator should be piced from observable object
     const defaultDecorator =

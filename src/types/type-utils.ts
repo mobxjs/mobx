@@ -1,6 +1,6 @@
 import { IDepTreeNode } from "../core/observable"
 import { fail } from "../utils/utils"
-import { runLazyInitializers } from "../utils/decorators"
+import { initializeInstance } from "../utils/decorators2"
 import { isAtom } from "../core/atom"
 import { isComputedValue } from "../core/computedvalue"
 import { isReaction } from "../core/reaction"
@@ -32,7 +32,7 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
             return observable
         }
         // Initializers run lazily when transpiling to babel, so make sure they are run...
-        runLazyInitializers(thing)
+        initializeInstance(thing)
         if (property && !thing.$mobx) thing[property] // See #1072
         if (isObservableObject(thing)) {
             if (!property)
@@ -65,7 +65,7 @@ export function getAdministration(thing: any, property?: string) {
     if (isAtom(thing) || isComputedValue(thing) || isReaction(thing)) return thing
     if (isObservableMap(thing)) return thing
     // Initializers run lazily when transpiling to babel, so make sure they are run...
-    runLazyInitializers(thing)
+    initializeInstance(thing)
     if (thing.$mobx) return thing.$mobx
     fail(process.env.NODE_ENV !== "production" && "Cannot obtain administration from " + thing)
 }

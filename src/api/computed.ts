@@ -7,8 +7,8 @@ import { createPropDecorator } from "../utils/decorators2"
 
 export interface IComputed {
     <T>(options: IComputedValueOptions<T>): any // decorator
+    <T>(func: () => T, setter: (v: T) => void): IComputedValue<T> // normal usage
     <T>(func: () => T, options?: IComputedValueOptions<T>): IComputedValue<T> // normal usage
-    // TODO: restore setter as separate second arg and add unit test for it
     (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator
     struct(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator
 }

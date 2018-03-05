@@ -21,10 +21,7 @@ export function decorate(thing: any, decorators: any) {
             )
         const descriptor = Object.getOwnPropertyDescriptor(target, prop)
         const newDescriptor = decorator(target, prop, descriptor)
-        if (
-            newDescriptor // TODO: does make sense?
-        )
-            Object.defineProperty(target, prop, newDescriptor)
+        Object.defineProperty(target, prop, newDescriptor)
     }
     return thing
 }
