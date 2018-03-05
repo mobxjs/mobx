@@ -287,6 +287,7 @@ test("get administration", function() {
     }
 
     var ovClassName = mobx.observable.box(3).constructor.name
+    var mapClassName = mobx.observable.map().constructor.name
 
     expect(adm(a)).toBe(ovClassName)
 
@@ -296,7 +297,7 @@ test("get administration", function() {
         /no observable property 'b' found on the observable object 'ObservableObject@2'/
     )
 
-    expect(adm(c)).toBe(mobx.ObservableMap.name)
+    expect(adm(c)).toBe(mapClassName)
     expect(adm(c, "a")).toBe(ovClassName)
     expect(adm(c, "b")).toBe(ovClassName)
     expect(() => adm(c, "c")).toThrowError(

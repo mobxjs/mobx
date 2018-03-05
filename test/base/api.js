@@ -13,7 +13,7 @@ test("correct api should be exposed", function() {
             "createAtom",
             "decorate",
             "extendObservable",
-            "extendShallowObservable",
+            "extendShallowObservable", // deprecated but still public
             "_getAdministration",
             "getAtom",
             "getDebugName",
@@ -36,7 +36,6 @@ test("correct api should be exposed", function() {
             "isObservableProp",
             "keys",
             "observable",
-            "ObservableMap",
             "observe",
             "onReactionError",
             "onBecomeObserved",

@@ -269,18 +269,15 @@ test("issue 116 - has should not throw on invalid keys", function() {
 
 test("map modifier", () => {
     var x = mobx.observable.map({ a: 1 })
-    expect(x instanceof mobx.ObservableMap).toBe(true)
     expect(mobx.isObservableMap(x)).toBe(true)
     expect(x.get("a")).toBe(1)
     x.set("b", {})
     expect(mobx.isObservableObject(x.get("b"))).toBe(true)
 
     x = mobx.observable.map([["a", 1]])
-    expect(x instanceof mobx.ObservableMap).toBe(true)
     expect(x.get("a")).toBe(1)
 
     x = mobx.observable.map()
-    expect(x instanceof mobx.ObservableMap).toBe(true)
     expect(mobx.keys(x)).toEqual([])
 
     x = mobx.observable({ a: mobx.observable.map({ b: { c: 3 } }) })
@@ -310,7 +307,7 @@ test("map modifier with modifier", () => {
 })
 
 test("256, map.clear should not be tracked", () => {
-    var x = new mobx.ObservableMap({ a: 3 })
+    var x = new mobx.observable.map({ a: 3 })
     var c = 0
     var d = mobx.autorun(() => {
         c++
