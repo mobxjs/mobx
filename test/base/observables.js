@@ -1758,7 +1758,6 @@ test("computed comparer works with decorate (plain)", () => {
             return { hour: this.hour, minute: this.minute }
         }
     })
-    debugger
     decorate(Time, {
         hour: observable,
         minute: observable,

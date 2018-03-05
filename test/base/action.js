@@ -373,7 +373,6 @@ test("computed values and actions", () => {
 })
 
 test("extendObservable respects action decorators", () => {
-    debugger
     const x = mobx.observable(
         {
             a1() {

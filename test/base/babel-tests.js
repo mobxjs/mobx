@@ -63,7 +63,6 @@ test("babel", function() {
 
 test("should not be possible to use @action with getters", () => {
     expect(() => {
-        debugger
         class A {
             @action
             get Test() {}
@@ -180,7 +179,6 @@ test("705 - setter undoing caching (babel)", () => {
         }
         @computed
         get fullName() {
-            debugger
             recomputes++
             return this.title + " " + this.name
         }
@@ -305,7 +303,6 @@ test("custom action decorator (babel)", function() {
 })
 
 test("action decorator on field (babel)", function() {
-    debugger
     class Store {
         constructor(multiplier) {
             this.multiplier = multiplier

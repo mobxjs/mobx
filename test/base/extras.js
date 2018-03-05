@@ -78,7 +78,7 @@ test("treeD", function() {
     })
 })
 
-test.skip("names", function() {
+test("names", function() {
     m._resetGlobalState()
     mobx._getGlobalState().mobxGuid = 0
 
@@ -212,7 +212,7 @@ test("get atom", function() {
     f()
 })
 
-test.skip("get debug name", function() {
+test("get debug name", function() {
     mobx._resetGlobalState()
     mobx._getGlobalState().mobxGuid = 0 // hmm dangerous reset?
 
@@ -258,8 +258,8 @@ test.skip("get debug name", function() {
     expect(name(g)).toBe("Clazz@9")
     expect(name(g, "a")).toBe("Clazz@9.a")
 
-    expect(name(h, "b")).toBe("ObservableObject@12.b")
-    expect(name(h, "c")).toBe("ObservableObject@12.c")
+    expect(name(h, "b")).toBe("ObservableObject@10.b")
+    expect(name(h, "c")).toBe("ObservableObject@10.c")
 
     f()
 })

@@ -571,7 +571,6 @@ test("action decorator on field (typescript)", () => {
     }
 
     const store1 = new Store(2)
-    debugger
     const store2 = new Store(7)
     expect(store1.add).not.toEqual(store2.add)
 
@@ -735,7 +734,6 @@ test("inheritance", () => {
             return this.a + this.b
         }
     }
-    debugger
     const b1 = new B()
     const b2 = new B()
     const values: any[] = []
@@ -894,7 +892,6 @@ test("verify object assign (typescript)", () => {
 })
 
 test("379, inheritable actions (typescript)", () => {
-    debugger
     class A {
         @action
         method() {
@@ -1145,7 +1142,6 @@ test("@observable.deep (TS)", () => {
 })
 
 test("action.bound binds (TS)", () => {
-    debugger
     class A {
         @observable x = 0
         @action.bound
