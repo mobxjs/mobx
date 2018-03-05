@@ -1,5 +1,5 @@
 import { Lambda, fail } from "../utils/utils"
-import { IReactionDisposer, IReactionPublic } from "../core/reaction"
+import { IReactionDisposer } from "../core/reaction"
 import { untrackedStart, untrackedEnd } from "../core/derivation"
 import { autorun } from "./autorun"
 
@@ -52,7 +52,6 @@ function _when(predicate: () => boolean, effect: Lambda, opts?: IWhenOptions): I
 function whenPromise(predicate: () => boolean, opts?: IWhenOptions): Promise<void> & { cancel() } {
     if (process.env.NODE_ENV !== "production" && opts && opts.onError)
         return fail(`the options 'onError' and 'promise' cannot be combined`)
-    let disposer
     let cancel
     const res = new Promise((resolve, reject) => {
         let disposer = _when(predicate, resolve, { ...opts, onError: reject })
