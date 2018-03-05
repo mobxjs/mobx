@@ -1,5 +1,10 @@
 # 4.0.0
 
+* For the highlights of this release, read the [blog](https://medium.com/p/c1fbc08008da/):
+* For migration notes: see the [wiki page](https://github.com/mobxjs/mobx/wiki/Migrating-from-mobx-3-to-mobx-4)
+
+This is the extensive list of all changes.
+
 Most noteable changes:
 
 * `observable.shallowArray(values)` has been removed, instead use `observable.array(values, { deep: false })`
@@ -11,7 +16,7 @@ The decorators `observable.ref`, `observable.shallow`, `observable.deep`, `obser
 instead, we made the api more consistent by always using these decorators really as decorators.
 For example, `observable.object` and `extendObservable` now support a `decorators` parameter.
 
-The advantage is that the usage between `@decorator` and `decorator` is now consistend, and they can always be called in the same way and with the same arguments. For example, the following examples work now all the same, and use the decorators with the same signature:
+The advantage is that the usage between `@decorator` and `decorator` is now consistent, and they can always be called in the same way and with the same arguments. For example, the following examples work now all the same, and use the decorators with the same signature:
 
 ```javascript
 class Todo {
@@ -164,6 +169,7 @@ All the random notes that should make up a nice changelog:
 * Killed the already deprecated modifiers `asFlat` etc. If you war still using this, see the MobX 2 -> 3 migration notes.
 * `autorun` now accepts a scheduler function to allow improved performance for tasks such as rendering to canvas
 * Observable maps now fully implement the map interface. See [#1361](https://github.com/mobxjs/mobx/pull/1361) by [Marc Fallows](https://github.com/marcfallows)
+* Computed usedByReaction
 
 # 3.6.1
 
