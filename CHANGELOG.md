@@ -5,171 +5,121 @@
 
 This is the extensive list of all changes.
 
-Most noteable changes:
+### New features
 
+The changes mentioned here are discussed in detail in the [release highlights](https://medium.com/p/c1fbc08008da/), or were simply updated in the docs.
+
+* MobX 4 introduces separation between the production and non production build. The production build strips most typechecks, resulting in a faster and smaller build. Make sure to substitute process.env.NODE_ENV = "production" in your build process! If you are using MobX in a react project, you most probably already have set this up. Otherwise, they idea is explained [here](https://reactjs.org/docs/add-react-to-an-existing-app.html).
+* Observable maps are now backed by real ES6 Maps. This means that any value can be used as key now, not just strings and numbers.
+* Introduced `decorate(thing, decorators)` to decorate classes or object without needing decorator syntax.
+* Introduced `onBecomeObserved` and `onBecomeUnobserved`. These API's enable hooking into the observability system and get notified about when an observable starts / stops becoming used. This is great to automaticaly fetch data from external resources, or stop doing so.
+* `computed` / `@computed` now accepts a `requiresReaction` option. If it set, the computed value will throw an exception if it is being read while not being tracked by some reaction.
+* To make `requiresReaction` the default, use `mobx.configure({ computedRequiresReaction: true })`
+* Introduced `mobx.configure({ disableErrorBoundaries })`, for easier debugging of exceptoins. By [NaridaL](https://github.com/NaridaL) through [#1262](https://github.com/mobxjs/mobx/pull/1262)
+* `toJS` now accepts the options: `{ detectCycles?: boolean, exportMapsAsObjects?: boolean }`, both `true` by default
+* Introduced `flow` to create a chain of async actions. This is the same function as [`asyncActions`](https://github.com/mobxjs/mobx-utils#asyncaction) of the mobx-utils package
+* The flow typings have been updated. Since this is a manual effort, there can be mistakes, so feel free to PR!
+
+* `computed(fn, options?)` / `@computed(options) get fn()` now accept the following options:
+  * `set: (value) => void` to set a custom setter on the computed property
+  * `name: "debug name"`
+  * `equals: fn` the equality value to use for the computed to determine whether it's output has changed. The default is `comparer.default`. Alternatives are `comparer.structural`, `comparer.identity` or just your own comparison function.
+  * `requiresReaction: boolean` see above.
+
+* `autorun(fn, options?)` now accepts the following options:
+  * `delay: number` debounce the autorun with the given amount of milliseconds. This replaces the MobX 3 api `autorunAsync`
+  * `name: "debug name"
+  * `scheduler: function` a custom scheduler to run the autorun. For example to connect running the autorun to `requestAnimationFrame`. See the docs for more details
+  * `onError`. A custom error handler to be notified when an autorun throws an exception.
+
+* `reaction(expr, effect, options?)` now accepts the following options:
+  * `delay: number` debounce the autorun with the given amount of milliseconds. This replaces the MobX 3 api `autorunAsync`
+  * `fireImmediately`. Immediately fire the effect function after the first evaluation of `expr`
+  * `equals`. Custom equality function to determine whether the `expr` function differed from it's previous result, and hence should fire `effect`. Accepts the same options as the `equals` option of computed.
+  * All the options `autorun` accepts
+
+* `when(predicate, effect?, options?)` now accepts the following options:
+  * `name: "debug name"`
+  * `onError`. A custom error handler to be notified when an autorun throws an exception.
+  * `timeout: number` a timeout in milliseconds, after which the `onError` handler will be triggered to signal the condition not being met within a certain time
+* The `effect` parameter of `when` has become optional. If it is omitted, `when` will return a promise. This makes it easy to `await` a condition, for example: `await when(() => user.profile.loaded)`. The returned promise can be cancelled using `promise.cancel()`
+
+* There is now an utility API that enables manipulating observable maps, objects and arrays with the same api. These api's are fully reactive, which means that even new property declarations can be detected by mobx if `set` is used to add them, and `values` or `keys` to iterate them.
+  * `values(thing)` returns all values in the collection as array
+  * `keys(thing)` returns all keys in the collection as array
+  * `set(thing, key, value)` or `set(thing, { key: value })` Updates the given collection with the provided key / value pair(s).
+  * `remove(thing, key)` removes the specified child from the collection. For arrays splicing is used.
+  * `has(thing, key)` returns true if the collection has the specified _observable_ property.
+  * `get(thing, key)` returns the chlid under the specified key.
+
+* `observable`, `observable.array`, `observable.object`, `observable.map` and `extendObservable` now accept an additional options object, which can specify the following attributes:
+  * `name: "debug name"`
+  * `deep: boolean`. `true` by default, indicates whether the children of this collection are automatically converted into observables as well.
+  * `defaultDecorator: <decorator>` specifies the default decorator used for new children / properties, by default: `observable.deep`, but could be changed to `observable.ref`, `observable.struct` etc. (The `deep` property is just a short-hand for switching between `observable.deep` or `observable.ref` as default decorator for new properties)
+
+
+### Breaking changes
+
+The changes mentioned here are discussed in detail in the [migration notes](https://github.com/mobxjs/mobx/wiki/Migrating-from-mobx-3-to-mobx-4)
+
+* MobX 4 requires `Map` to be globally available. Polyfill it if targeting IE < 11 or other older browsers.
+* For typescript users, MobX now requires `Map` to exist for it's typings. So make sure that the `lib` configuration of your project is set to `"es6"`, or that `"es2015.collection"` is part of the `lib` section.
 * `observable.shallowArray(values)` has been removed, instead use `observable.array(values, { deep: false })`
 * `observable.shallowMap(values)` has been removed, instead use `observable.map(values, { deep: false })`
 * `observable.shallowObject(values)` has been removed, instead use `observable.object(values, {}, { deep: false })`
 * `extendShallowObservable(target, props)`, instead use `extendObservable(target, props, {}, { deep: false })`
-
-The decorators `observable.ref`, `observable.shallow`, `observable.deep`, `observable.struct` can no longer be used as functions,
-instead, we made the api more consistent by always using these decorators really as decorators.
-For example, `observable.object` and `extendObservable` now support a `decorators` parameter.
-
-The advantage is that the usage between `@decorator` and `decorator` is now consistent, and they can always be called in the same way and with the same arguments. For example, the following examples work now all the same, and use the decorators with the same signature:
-
-```javascript
-class Todo {
-    @observable title = "test"
-    @observable.ref promise = somePromise
-
-    @computed get difficulty() {
-        return this.title.length
-    }
-    @computed({ requiresReaction: true })
-    get expensive() {
-        return somethingExpensive()
-    }
-
-    @action setTitle(t) {
-        this.title = t
-    }
-    @action.bound setTitle2(t) {
-        this.title = t
-    }
-}
-
-// observable.object takes a second 'decorators' param, specifying which decorators need to be applied.
-// defaulting to `observable` for omitted fields (or `computed` for getters)
-const todo = observable.object({
-    title: "test",
-    promise: somePromise,
-    get difficulty() {
-        return this.title.length
-    },
-    get expensive() {
-        return somethingExpensive()
-    },
-    setTitle(t) {
-        this.title = t
-    },
-    setTitle2(t) {
-        this.title = t
-    }
-}, {
-    ref: observable.ref,
-    expensive: computed({ requiresReaction: true }),
-    setTitle: action,
-    setTitle2: action.bound
-})
-
-// Maybe you have classes, but no decorator syntax enabled. Don't worry, with MobX 4 you don't have to fall back to
-// `extendObservable` in the constructor! Instead, just declare the fields and use `mobx.decorate` to ehance the prototype:
-class Todo {
-    title = "test"
-    promise = somePromise
-
-    get difficulty() {
-        return this.title.length
-    }
-    get expensive() {
-        return somethingExpensive()
-    }
-
-    setTitle(t) {
-        this.title = t
-    }
-    setTitle2(t) {
-        this.title = t
-    }
-}
-decorate(Todo, {
-    ref: observable.ref,
-    expensive: computed({ requiresReaction: true }),
-    setTitle: action,
-    setTitle2: action.bound
-})
-```
-
-`extendObservable(target, props, decorators?, options?)` follows consequently the same mechanism.
-
-`options` is a last optional parameter to `extendObservable`, `observable.object`, `observable.map`, `observable.array` which can override the default decorator that is used (`deep: false` will result in `observable.ref` to be used as default decorator), and it can specify a debug `name` property.
-
-`extendObservable` can no longer be used to update properties, it can *only* introduce new properties. Use the new `set` method to set or add new properties
-
-# Most noteable new features
-
-* observable maps are now backed by new maps
-* use observable objects as collections by leveraging `set`, `values`, `keys`, `remove`. When using those methods for writing and iterating, MobX can detect key additions and removals
-* Iterating maps now follows the spec, that is, `map.values` etc no longer return an array, but an iterator. Use `mobx.values(map)` or `Array.from(map)` to get the values as array again
-
-
-All the random notes that should make up a nice changelog:
-
-## New Features!
-
-* Observable maps are now backed by real maps
-* Decorate. To decorate without decorator syntax.
-* `values`, `keys`, `set`, `remove` to use objects as observable collections
-* Introduced `onBecomeObserved` and `onBecomeUnobserved`
-* MobX now supports development only checks and exceptions, resulting in smaller and faster production builds. The setup requirements are identical to react
-* added `requiresReaction` option to computed
-* Introduced `mobx.configure({ computedRequiresReaction: true })`
-* Introduced `mobx.configure({ disableErrorBoundaries })`, for easier debugging of exceptoins. By [NaridaL](https://github.com/NaridaL) through [#1262](https://github.com/mobxjs/mobx/pull/1262)
-* Introduced `@computed(options)`
-* `autorun`, `reaction` and `when` now can take an `onError` property as parameter
-* `toJS` now accepts options: `{    detectCycles?: boolean    exportMapsAsObjects?: boolean }`, both `true` by default
-* `when` now supports an `timeout` option, so `mobxUtils.whenWithTimeout` is no longer needed
-* when `when` is invoked withoout effect, it will automatically return a promise, so that you can await conditions. These promises are canceallable by calling `.cancel`
-* moved `asyncActions` from the mobx-utils package to mobx-core, and called it `flow`
-
-## Breaking changes
-
-* below IE 11, Map polyfill is needed when using observable maps
-* `toJS` on an observable map now returns a Map object, not a plain object
+* The decorators `observable.ref`, `observable.shallow`, `observable.deep`, `observable.struct` can no longer be used as functions. Instead, they should be passed as part of the `decorators` param to resp. `observable.object` and `extendObservable`
+* The new signature of `extendObservable` is `extendObservable(target, props, decorators?, options?)`. This also means it is no longer possible to pass multiple bags of properties to `extendObservable`. `extendObservable` can no longer be used to re-declare properties. Use `set` instead to update existing properties (or introduce new ones).
+* Iterating maps now follows the spec, that is, `map.values()`, `map.entries()`, `map.keys()`, `map[@@iterator]()` and `array[@@iterator]()` no longer return an array, but an iterator. Use `mobx.values(map)` or `Array.from(map)` to convert the iterators to arrays.
 * dropped `@computed.equals`, instead, you can now use `@computed({ equals: ... })`
-* `useStrict(boolean)` was dropped, use `configure({enforceActions: boolean})` instead
+* `useStrict(boolean)` was dropped, use `configure({ enforceActions: boolean })` instead
 * `isolateGlobalState` was dropped, use `configure({ isolateGlobalState: true})` instead
-* `expr` is moved to mobx-utils. Remember, `expr(fn)` is just sugar for `computed(fn).get()`
-* `createTransformer` is moved to mobx-utils
-* Passing `context` explicitly to `autorun`, `reaction` etc is no longer supported. Use arrow functions or function.bind instead.
-* Removed `autorunAsync`.
-* `autorun`, `when`, `reaction` don't support name as first argument anymore, instead pass options.
-* The `extras.` namespace has been dropped to enable tree-shaking non-used MobX features. All methods that where there originally are now exported at top level. If they are part of the official public API (you are encouraged to use them) they are exported as is. If they are experimental or somehow internal (you are discouraged to use them), they are prefixed with `_`.
 * If there are multiple mobx instances active in a single project, an exception will be thrown. Previously only a warning was printed. Fixes #1098. For details, see [#1082](https://github.com/mobxjs/mobx/issues/1082).
 * Dropped the `shareGlobalState` feature. Instead, projects should be setup properly and it is up to the hosting package to make sure that there is only one MobX instance
+* `expr` has been moved to mobx-utils. Remember, `expr(fn)` is just `computed(fn).get()`
+* `createTransformer` has been moved to mobx-utils
+* Passing `context` explicitly to `autorun`, `reaction` etc is no longer supported. Use arrow functions or function.bind instead.
+* Removed `autorunAsync`. Use the `delay` option of `autorun` instead.
+* `autorun`, `when`, `reaction` don't support name as first argument anymore, instead pass the `name` option.
+* The `extras.` namespace has been dropped to enable tree-shaking non-used MobX features. All methods that where there originally are now exported at top level. If they are part of the official public API (you are encouraged to use them) they are exported as is. If they are experimental or somehow internal (you are discouraged to use them), they are prefixed with `_`.
 * Dropped bower support. Fixes #1263
 * The `spyReportStart`, `spyReportEnd`, `spyReport` and `isSpyEnabled` are no longer public. It is no longer possible to emit custom spy events as to avoid confusing in listeners what the possible set of events is.
 * Dropped `isStrictModeEnabled`
 * `observable(value)` will only succeed if it can turn the value into an observable data structure (a Map, Array or observable object). But it will no longer create an observable box for other values to avoid confusion. Call `observable.box(value)`  explictly in such cases.
 * `isComputed` and `isObservable` no longer accept a property as second argument. Instead use `isComputedProp` and `isObservableProp`.
 * Removed `whyRun`, use `trace` instead
-* spy event signature has changed
-* spy event no longer public
-* new Atom => createAtom
-* custom atoms: `reportObserved` outside tracking context won't trigger changes
-* map `.entries()`, `.values()` and `.keys()` now properly return iterators. use `values(m)` or `keys(m)` or `Array.from(m)` to get the old behavior
-* the option `struct` and `compareStructural` for computed values is deprecated, use `@computed.struct` or `computed({ equals: comparer.structural})` indeed
-* `isModifierDescriptor` is no longer exposed
-* `deepEqual` is no longer exposed, use `comparer.structural` instead
+* The spy event signature has slightly changed
+* The `Atom` class is no longer exposed. Use `createAtom` instead (same signature).
+* Calling reportObserved() on a self made atom will no longer trigger the hooks if reportObserved is triggered outside a reactive context.
+* The options `struct` and `compareStructural` for computed values are deprecated, use `@computed.struct` or `computed({ equals: comparer.structural})` instead.
+* `isModifierDescriptor` is no longer exposed.
+* `deepEqual` is no longer exposed, use `comparer.structural` instead.
 * `setReactionScheduler` -> `configure({ reactionScheduler: fn })`
 * `reserveArrayBuffer` -> `configure({ reactionErrorHandler: fn })`
 * `ObservableMap` is no longer exposed as constructor, use `observable.map` or `isObservableMap` instead
 * `map` -> `observable.map`
 * `runInAction` no longer accepts a custom scope
-
-#### observable
-
-* `observable.shallowX` is deprecated, use `observable.X(value, { deep: false })` instead
-
-## Non breaking changes
-
-* Dropped already deprecated and broken `default` export that made it impossible to tree-shake mobx. Make sure you always use `import { x } from "mobx"` and not `import x from "mobx"`
-* Dropped already deprecated toplevel `map` function
+* Dropped the already deprecated and broken `default` export that made it harder to tree-shake mobx. Make sure to always use `import { x } from "mobx"` and not `import mobx from "mobx"`.
 * Killed the already deprecated modifiers `asFlat` etc. If you war still using this, see the MobX 2 -> 3 migration notes.
-* `autorun` now accepts a scheduler function to allow improved performance for tasks such as rendering to canvas
 * Observable maps now fully implement the map interface. See [#1361](https://github.com/mobxjs/mobx/pull/1361) by [Marc Fallows](https://github.com/marcfallows)
-* Computed usedByReaction
+
+### Issues fixed in this release:
+
+The issues are incoprorated in the above notes.
+
+* [#1316](https://github.com/mobxjs/mobx/issues/1316) - Improve `observable` api
+* [#992](https://github.com/mobxjs/mobx/issues/992) - `onBecomeObserved` & `onBecomeUnobserved`
+* [#1301](https://github.com/mobxjs/mobx/issues/1301) - Set `onError` handler when creating reactions
+* [#817](https://github.com/mobxjs/mobx/issues/817) - Improve typings of `observe`
+* [#800](https://github.com/mobxjs/mobx/issues/800) - Use `Map` as backend implementation of observable maps
+* [#1361](https://github.com/mobxjs/mobx/issues/1361) - Make observableMaps structurally correct maps
+* [#813](https://github.com/mobxjs/mobx/issues/813) - Create separate dev and production builds
+* [#961](https://github.com/mobxjs/mobx/issues/961), [#1197](https://github.com/mobxjs/mobx/issues/1197) - Make it possible to forbid reading an untracked computed value
+* [#1098](https://github.com/mobxjs/mobx/issues/1098) - Throw instead of warn if multiple MobX instances are active
+* [#1122](https://github.com/mobxjs/mobx/issues/1122) - Atom hooks fired to often for observable maps
+* [#1148](https://github.com/mobxjs/mobx/issues/1148) - Disposer of reactions should also cancel all scheduled effects
+* [#1241](https://github.com/mobxjs/mobx/issues/1241) - Make it possible to disable error boundaries, to make it easier to find exceptions
+* [#1263](https://github.com/mobxjs/mobx/issues/1263) - Remove bower.json
 
 # 3.6.1
 

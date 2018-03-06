@@ -2,11 +2,14 @@ import { isObservableMap, ObservableMap } from "../types/observablemap"
 import {
     isObservableObject,
     IIsObservableObject,
-    defineObservableProperty
+    defineObservableProperty,
+    ObservableObjectAdministration
 } from "../types/observableobject"
 import { isObservableArray, IObservableArray } from "../types/observablearray"
 import { fail, invariant } from "../utils/utils"
 import { startBatch, endBatch } from "../core/observable"
+import { getAdministration } from "../types/type-utils"
+import { ObservableValue } from "../types/observablevalue"
 
 export function keys<K>(map: ObservableMap<K, any>): ReadonlyArray<K>
 export function keys<T extends Object>(obj: T): ReadonlyArray<string>
@@ -108,7 +111,10 @@ export function has<T>(obj: IObservableArray<T>, index: number): boolean
 export function has<T extends Object>(obj: T, key: string): boolean
 export function has(obj: any, key: any): boolean {
     if (isObservableObject(obj)) {
-        return keys(obj).indexOf(key) >= 0
+        // return keys(obj).indexOf(key) >= 0
+        const adm = getAdministration(obj) as ObservableObjectAdministration
+        adm.getKeys() // make sure we get notified of key changes, but for performance, use the values map to look up existence
+        return adm.values[key] instanceof ObservableValue
     } else if (isObservableMap(obj)) {
         return obj.has(key)
     } else if (isObservableArray(obj)) {
