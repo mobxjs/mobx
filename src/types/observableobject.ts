@@ -209,7 +209,7 @@ export class ObservableObjectAdministration
     getKeys(): string[] {
         if (this.keys === undefined) {
             this.keys = <any>new ObservableArray(
-                Object.keys(this.values),
+                Object.keys(this.values).filter(key => this.values[key] instanceof ObservableValue),
                 referenceEnhancer,
                 `keys(${this.name})`,
                 true

@@ -203,3 +203,17 @@ test("has and get are reactive", async () => {
     await p1
     await p2
 })
+
+test("computed props are not considered part of collections", () => {
+    const x = observable({
+        get y() {
+            return 3
+        }
+    })
+    expect(mobx.isComputedProp(x, "y")).toBe(true)
+    expect(x.y).toBe(3)
+    expect(has(x, "y")).toBe(false)
+    expect(get(x, "y")).toBe(undefined) // disputable?
+    expect(keys(x)).toEqual([])
+    expect(values(x)).toEqual([])
+})
