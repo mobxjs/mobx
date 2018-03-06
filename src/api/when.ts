@@ -49,7 +49,10 @@ function _when(predicate: () => boolean, effect: Lambda, opts?: IWhenOptions): I
     return disposer
 }
 
-function whenPromise(predicate: () => boolean, opts?: IWhenOptions): Promise<void> & { cancel() } {
+function whenPromise(
+    predicate: () => boolean,
+    opts?: IWhenOptions
+): Promise<void> & { cancel(): void } {
     if (process.env.NODE_ENV !== "production" && opts && opts.onError)
         return fail(`the options 'onError' and 'promise' cannot be combined`)
     let cancel
