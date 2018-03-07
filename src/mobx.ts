@@ -15,11 +15,16 @@
  * - utils/   Utility stuff.
  *
  */
-if (typeof process === "undefined") {
+
+try {
     // define process.env if needed
-    ;(function() {
-        return this
-    })().process = { env: {} }
+    // if this is not a production build in the first place
+    // (in which case the expression below would be substituted with 'production')
+    process.env.NODE_ENV
+} catch (e) {
+    if (typeof process === "undefined")
+        ((typeof window !== "undefined" ? window : global) as any).process = {}
+    process.env = {}
 }
 
 ;(() => {

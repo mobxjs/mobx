@@ -25,7 +25,8 @@ export function createDecoratorForEnhancer(enhancer: IEnhancer<any>): IObservabl
         }
     )
     const res: any =
-        process.env.NODE_ENV !== "production"
+        // Extra process checks, as this happens during module initialization
+        typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production"
             ? function observableDecorator() {
                   // This wrapper function is just to detect illegal decorator invocations, deprecate in a next version
                   // and simply return the created prop decorator
