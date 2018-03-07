@@ -1,6 +1,6 @@
 # MobX Api Reference
 
-Applies to MobX 3 and higher. For MobX 2, the old documentation is still available on [github](https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md).
+Applies to MobX 4 and higher. For MobX 2, the old documentation is still available on [github](https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md).
 
 # Core API
 
@@ -23,7 +23,7 @@ The following conversion rules are applied, but can be fine-tuned by using *modi
 1. If *value* is an instance of an [ES6 Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map): a new [Observable Map](map.md) will be returned. Observable maps are very useful if you don't want to react just to the change of a specific entry, but also to the addition or removal of entries.
 1. If *value* is an array, a new [Observable Array](array.md) will be returned.
 1. If *value* is an object *without* prototype or its prototype is `Object.prototype`, the object will be cloned and all its current properties will be made observable. See [Observable Object](object.md)
-1. If *value* is an object *with* a prototype, a JavaScript primitive or function, a [Boxed Observable](boxed.md) will be returned. MobX will not make objects with a prototype automatically observable; as that is the responsibility of its constructor function. Use `extendObservable` in the constructor, or `@observable` in its class definition instead.
+1. If *value* is an object *with* a prototype, a JavaScript primitive or function, there will be no change made to the value. If you do need a [Boxed Observable](boxed.md), call `observable.box(*value*)` explicitly. MobX will not make objects with a prototype automatically observable; as that is the responsibility of its constructor function. Use `extendObservable` in the constructor, or `@observable` in its class definition instead.
 
 These rules might seem complicated at first sight, but you will notice that in practice they are very intuitive to work with.
 Some notes:
