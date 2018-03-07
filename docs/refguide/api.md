@@ -4,7 +4,10 @@ Applies to MobX 4 and higher. For MobX 2, the old documentation is still availab
 
 # Core API
 
-_The most important MobX api's. Understanding `observable`, `computed`, `reactions` and `actions` is enough to master MobX and use it in your applications!_
+_These are the most important MobX API's._ 
+
+> Understanding `observable`, `computed`, `reaction` and `action` is enough
+ to master MobX and use it in your applications!
 
 ## Creating observables
 
@@ -15,7 +18,10 @@ Usage:
 * `@observable classProperty = value`
 
 Observable values can be JS primitives, references, plain objects, class instances, arrays and maps.
-`observable(value)` is a convenience overload, that always tries to create the best matching observable types.
+
+**Note:** `observable(value)` is a convenience API that will succeed only if it can be made into
+ an observable data structure (_Array_, _Map_, or _observable-object_). For all other values, no conversion will be performed. 
+
 You can also directly create the desired observable type, see below.
 
 The following conversion rules are applied, but can be fine-tuned by using *modifiers*. See below.
@@ -26,8 +32,10 @@ The following conversion rules are applied, but can be fine-tuned by using *modi
 1. If *value* is an object *with* a prototype, a JavaScript primitive or function, there will be no change made to the value. If you do need a [Boxed Observable](boxed.md), call `observable.box(*value*)` explicitly. MobX will not make objects with a prototype automatically observable; as that is the responsibility of its constructor function. Use `extendObservable` in the constructor, or `@observable` in its class definition instead.
 
 These rules might seem complicated at first sight, but you will notice that in practice they are very intuitive to work with.
-Some notes:
-* To create dynamically keyed objects always use maps! Only initially existing properties on an object will be made observable, although new ones can be added using `extendObservable`.
+
+**Some notes:**
+
+* To create dynamically keyed objects, always use maps! Only initially existing properties on an object will be made observable, although new ones can be added using `extendObservable`.
 * To use the `@observable` decorator, make sure that [decorators are enabled](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) in your transpiler (babel or typescript).
 * By default making a data structure observable is *infective*; that means that `observable` is applied automatically to any value that is contained by the data structure, or will be contained by the data structure in the future. This behavior can be changed by using *modifiers* or *shallow*.
 
@@ -262,11 +270,15 @@ Usage: `observe(object, property?, listener, fireImmediately = false)`
 Low-level api that can be used to observe a single observable value.
 [&laquo;details&raquo;](observe.md)
 
-### `useStrict`
-Usage: `useStrict(boolean)`.
-Enables / disables strict mode *globally*.
+### `configure`
+Usage: `configure({ enforceActions: boolean, isolateGlobalState: boolean })`.
+
+- `enforceActions`: Enables / disables strict mode *globally*.
 In strict mode, it is not allowed to change any state outside of an [`action`](action.md).
-See also `extras.allowStateChanges`.
+See also `allowStateChanges`.
+- `isolateGlobalState`: Isolates the global state of MobX, when there are multiple instances of MobX in the same 
+environment
+
 
 
 
@@ -299,46 +311,21 @@ It is similar to attaching an `observe` listener to *all* observables at once, b
 Used for example by the `mobx-react-devtools`.
 [&laquo;details&raquo;](spy.md)
 
-### `whyRun`
-Usage:
-* `whyRun()`
-* `whyRun(Reaction object / ComputedValue object / disposer function)`
-* `whyRun(object, "computed property name")`
-
-_whyRun is deprecated in favor of [trace](#trace)_
-
-`whyRun` is a small utility that can be used inside computed value or reaction (`autorun`, `reaction` or the `render` method of an `observer` React component)
-and prints why the derivation is currently running, and under which circumstances it will run again.
-This should help to get a deeper understanding when and why MobX runs stuff, and prevent some beginner mistakes.
-
-
-### `extras.getAtom`
+### `getAtom`
 Usage: `getAtom(thing, property?)`.
 Returns the backing *Atom* of a given observable object, property, reaction etc.
 
-### `extras.getDebugName`
+### `getDebugName`
 Usage: `getDebugName(thing, property?)`
 Returns a (generated) friendly debug name of an observable object, property, reaction etc. Used by for example the `mobx-react-devtools`.
 
-### `extras.getDependencyTree`
+### `getDependencyTree`
 Usage: `getDependencyTree(thing, property?)`.
 Returns a tree structure with all observables the given reaction / computation currently depends upon.
 
-### `extras.getObserverTree`
+### `getObserverTree`
 Usage: `getObserverTree(thing, property?)`.
 Returns a tree structure with all reactions / computations that are observing the given observable.
-
-### `extras.isSpyEnabled`
-Usage: `isSpyEnabled()`. Returns true if at least one spy is active
-
-### `extras.spyReport`
-Usage: `spyReport({ type: "your type", &laquo;details&raquo; data})`. Emit your own custom spy event.
-
-### `extras.spyReportStart`
-Usage: `spyReportStart({ type: "your type", &laquo;details&raquo; data})`. Emit your own custom spy event. Will start a new nested spy event group which should be closed using `spyReportEnd()`
-
-### `extras.spyReportEnd`
-Usage: `spyReportEnd()`. Ends the current spy group that was started with `extras.spyReportStart`.
 
 ### `"mobx-react"` development hooks
 The `mobx-react` package exposes the following additional api's that are used by the `mobx-react-devtools`:
@@ -366,8 +353,8 @@ Any observables accessed in the `block` won't cause the reaction / computations 
 However it is recommended to use `action` instead, which uses `untracked` internally.
 [&laquo;details&raquo;](untracked.md)
 
-### `Atom`
-Utility class that can be used to create your own observable data structures and hook them up to MobX.
+### `createAtom`
+Utility function that can be used to create your own observable data structures and hook them up to MobX.
 Used internally by all observable data types.
 [&laquo;details&raquo;](extending.md)
 
@@ -376,12 +363,12 @@ Utility class that can be used to create your own reactions and hook them up to 
 Used internally by `autorun`, `reaction` (function) etc.
 [&laquo;details&raquo;](extending.md)
 
-### `extras.allowStateChanges`
+### `allowStateChanges`
 Usage: `allowStateChanges(allowStateChanges, () => { block })`.
 Can be used to (dis)allow state changes in a certain function.
 Used internally by `action` to allow changes, and by `computed` and `observer` to disallow state changes.
 
-### `extras.resetGlobalState`
+### `resetGlobalState`
 Usage: `resetGlobalState()`.
 Resets MobX internal global state. MobX by defaults fails fast if an exception occurs inside a computation or reaction and refuses to run them again.
 This function resets MobX to the zero state. Existing `spy` listeners and the current value of strictMode will be preserved though.
