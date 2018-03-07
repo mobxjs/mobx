@@ -12,8 +12,10 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Dane Hitchcox
 * Daniel Nakov
 * Dardo Kukovec
+* Dominik Nowik
 * Graham Kaemmer
 * Greg Zapp
+* James Athanassakis
 * James McElwain
 * Jeff Hansen
 * Joinbox
@@ -26,6 +28,7 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Mihail Diordiev
 * Nikolay Ivanov
 * Pavel Ravits
+* Peng Zhenqing
 * Rafal Filipek
 * Rainer Wittmann
 * Raj Sekaran
@@ -33,7 +36,18 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Steven Pérez
 * Surafel D
 * Thibault Maekelbergh
+* Timothy Durant
 * Vojtech Novak
 * Wilfried Reiter
 * Wilson Lee
 * Yousuf Nejati
+
+Or... Become my personal Patreon! https://www.patreon.com/mweststrate
+
+Patrons:
+
+* Micheal Tiller
+* Micheal Hicke
+* @guidojo
+* Ronal Chanou
+* Kim Joar Bekkelund
