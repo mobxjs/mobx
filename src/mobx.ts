@@ -136,7 +136,11 @@ if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
 }
 
 // TODO: remove in some future build
-if (process.env.NODE_ENV !== "production" && typeof module !== "undefined") {
+if (
+    process.env.NODE_ENV !== "production" &&
+    typeof module !== "undefined" &&
+    typeof module.exports !== "undefined"
+) {
     ;[
         "extras",
         "default",
