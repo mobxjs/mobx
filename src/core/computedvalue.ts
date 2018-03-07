@@ -27,7 +27,8 @@ import {
     invariant,
     Lambda,
     primitiveSymbol,
-    toPrimitive
+    toPrimitive,
+    isThennable
 } from "../utils/utils"
 import { isSpyEnabled, spyReport } from "./spy"
 import { autorun } from "../api/autorun"
@@ -47,7 +48,10 @@ export interface IComputedValueOptions<T> {
     equals?: IEqualsComparer<T>
     context?: any
     requiresReaction?: boolean
+    defaultValue?: T
 }
+
+let notInitialized
 
 /**
  * A node in the state dependency root that observes other nodes, and can be observed itself.
@@ -82,7 +86,8 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     lowestObserverState = IDerivationState.UP_TO_DATE
     unboundDepsCount = 0
     __mapid = "#" + getNextId()
-    protected value: T | undefined | CaughtException = new CaughtException(null)
+    protected value: T | undefined | CaughtException = notInitialized ||
+        (notInitialized = new CaughtException("COMPUTED_NOT_INITIALIZED"))
     name: string
     triggeredBy: string
     isComputing: boolean = false // to check for cycles
@@ -93,6 +98,8 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     public scope: Object | undefined
     private equals: IEqualsComparer<any>
     private requiresReaction
+    defaultValue: T // used by suspended computed values
+    pendingPromise?: PromiseLike<any>
 
     /**
      * Create a new computed value based on a function expression.
@@ -119,6 +126,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 : comparer.default)
         this.scope = options.context
         this.requiresReaction = !!options.requiresReaction
+        if ("defaultValue" in options) this.defaultValue = options.defaultValue!
     }
 
     onBecomeStale() {
@@ -148,7 +156,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         }
         const result = this.value!
 
-        if (isCaughtException(result)) throw result.cause
+        if (isCaughtException(result)) {
+            throw result.cause
+        }
         return result
     }
 
@@ -192,6 +202,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         const wasSuspended =
             /* see #1208 */ this.dependenciesState === IDerivationState.NOT_TRACKING
         const newValue = (this.value = this.computeValue(true))
+        if (this.pendingPromise) return false
         return (
             wasSuspended ||
             isCaughtException(oldValue) ||
@@ -206,6 +217,10 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         let res: T | CaughtException
         if (track) {
             res = trackDerivedFunction(this, this.derivation, this.scope)
+            if (isCaughtException(res) && isThennable(res.cause)) {
+                this.awaitPromise(res.cause)
+                res = this.value === notInitialized ? this.defaultValue : this.value!
+            }
         } else {
             if (globalState.disableErrorBoundaries === true) {
                 res = this.derivation.call(this.scope)
@@ -213,7 +228,15 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 try {
                     res = this.derivation.call(this.scope)
                 } catch (e) {
-                    res = new CaughtException(e)
+                    if (isThennable(e)) {
+                        res = new CaughtException(
+                            new Error(
+                                "[mobx] Untracked computed values cannot suspend; nobody will await their value"
+                            )
+                        )
+                    } else {
+                        res = new CaughtException(e)
+                    }
                 }
             }
         }
@@ -225,6 +248,35 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     suspend() {
         clearObserving(this)
         this.value = undefined // don't hold on to computed value!
+    }
+
+    awaitPromise(promise: PromiseLike<T>) {
+        if (promise === this.pendingPromise) return
+        this.pendingPromise = promise
+        promise.then(
+            newValue => {
+                debugger
+                if (promise !== this.pendingPromise) return
+                this.pendingPromise = undefined
+                const oldValue = this.value
+                if (isCaughtException(oldValue) || !this.equals(oldValue, newValue)) {
+                    startBatch()
+                    propagateMaybeChanged(this)
+                    this.value = newValue
+                    propagateChangeConfirmed(this)
+                    endBatch()
+                }
+            },
+            error => {
+                if (promise !== this.pendingPromise) return
+                this.pendingPromise = undefined
+                startBatch()
+                propagateMaybeChanged(this)
+                this.value = new CaughtException(error)
+                propagateChangeConfirmed(this)
+                endBatch()
+            }
+        )
     }
 
     observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {
