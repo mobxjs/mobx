@@ -197,6 +197,7 @@ const observableFactories: IObservableFactories = {
     shallow: shallowDecorator,
     deep: deepDecorator,
     struct: deepStructDecorator
+    // TODO: promise
 } as any
 
 export const observable: IObservableFactory & {

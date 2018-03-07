@@ -217,9 +217,8 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         let res: T | CaughtException
         if (track) {
             res = trackDerivedFunction(this, this.derivation, this.scope)
-            if (isCaughtException(res) && isThennable(res.cause)) {
-                this.awaitPromise(res.cause)
-                res = this.value === notInitialized ? this.defaultValue : this.value!
+            if (isThennable(res)) {
+                res = this.awaitPromise(res)
             }
         } else {
             if (globalState.disableErrorBoundaries === true) {
@@ -228,15 +227,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 try {
                     res = this.derivation.call(this.scope)
                 } catch (e) {
-                    if (isThennable(e)) {
-                        res = new CaughtException(
-                            new Error(
-                                "[mobx] Untracked computed values cannot suspend; nobody will await their value"
-                            )
-                        )
-                    } else {
-                        res = new CaughtException(e)
-                    }
+                    res = new CaughtException(e)
                 }
             }
         }
@@ -262,7 +253,10 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 if (isCaughtException(oldValue) || !this.equals(oldValue, newValue)) {
                     startBatch()
                     propagateMaybeChanged(this)
-                    this.value = newValue
+                    this.value = {
+                        state: "fulfilled",
+                        value: newValue
+                    }
                     propagateChangeConfirmed(this)
                     endBatch()
                 }
@@ -272,11 +266,30 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 this.pendingPromise = undefined
                 startBatch()
                 propagateMaybeChanged(this)
-                this.value = new CaughtException(error)
+                this.value = {
+                    state: "errored",
+                    value: error,
+                    previousValue: this.getPreviousValueFromCurrent(this.value)
+                }
                 propagateChangeConfirmed(this)
                 endBatch()
             }
         )
+        if (this.value === notInitialized || this.value.state !== "pending") {
+            this.value = {
+                state: "pending",
+                value: this.defaultValue,
+                previousValue: this.getPreviousValueFromCurrent(this.value)
+            }
+        }
+        return this.value
+    }
+
+    // move method
+    getPreviousValueFromCurrent(value) {
+        if (value === notInitialized) return undefined
+        if (value.state === "fullfilled") return value.value
+        return value.previousValue
     }
 
     observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {

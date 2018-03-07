@@ -5,6 +5,7 @@ import { invariant } from "../utils/utils"
 import { ComputedValue, IComputedValue } from "../core/computedvalue"
 import { createPropDecorator } from "../utils/decorators2"
 
+// TODO: promise overloads
 export interface IComputed {
     <T>(options: IComputedValueOptions<T>): any // decorator
     <T>(func: () => T, setter: (v: T) => void): IComputedValue<T> // normal usage
