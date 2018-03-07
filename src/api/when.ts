@@ -9,7 +9,10 @@ export interface IWhenOptions {
     onError?: (error: any) => void
 }
 
-export function when(predicate: () => boolean, opts?: IWhenOptions): Promise<void> & { cancel() }
+export function when(
+    predicate: () => boolean,
+    opts?: IWhenOptions
+): Promise<void> & { cancel(): void }
 export function when(
     predicate: () => boolean,
     effect: Lambda,
