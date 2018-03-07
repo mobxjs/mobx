@@ -63,7 +63,7 @@ The changes mentioned here are discussed in detail in the [release highlights](h
 The changes mentioned here are discussed in detail in the [migration notes](https://github.com/mobxjs/mobx/wiki/Migrating-from-mobx-3-to-mobx-4)
 
 * MobX 4 requires `Map` to be globally available. Polyfill it if targeting IE < 11 or other older browsers.
-* For typescript users, MobX now requires `Map` to exist for it's typings. So make sure that the `lib` configuration of your project is set to `"es6"`, or that `"es2015.collection"` is part of the `lib` section.
+* For typescript users, MobX now requires `Map` and several `Symbol`s to exist for it's typings. So make sure that the `lib` configuration of your project is set to `"es6"`. (The compilation target can still be `"es5"`)
 * `observable.shallowArray(values)` has been removed, instead use `observable.array(values, { deep: false })`
 * `observable.shallowMap(values)` has been removed, instead use `observable.map(values, { deep: false })`
 * `observable.shallowObject(values)` has been removed, instead use `observable.object(values, {}, { deep: false })`
