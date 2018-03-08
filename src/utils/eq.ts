@@ -1,4 +1,4 @@
-import { isES6Map, iteratorToArray } from "./utils"
+import { isES6Map } from "./utils"
 import { isObservableArray, isObservableMap } from "../mobx"
 
 // Copied from https://github.com/jashkenas/underscore/blob/5c237a7c682fb68fd5378203f0bf22dce1624854/underscore.js#L1186-L1289
@@ -127,7 +127,7 @@ function deepEq(a: any, b: any, aStack?: any[], bStack?: any[]) {
 
 function unwrap(a: any) {
     if (isObservableArray(a)) return a.peek()
-    if (isES6Map(a) || isObservableMap(a)) return iteratorToArray(a.entries())
+    if (isES6Map(a) || isObservableMap(a)) return Array.from(a.entries())
     return a
 }
 

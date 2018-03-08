@@ -1,12 +1,6 @@
 import { Atom, declareAtom } from "../core/atom"
 import { checkIfStateModificationsAreAllowed } from "../core/derivation"
-import {
-    Lambda,
-    getNextId,
-    createInstanceofPredicate,
-    primitiveSymbol,
-    toPrimitive
-} from "../utils/utils"
+import { Lambda, getNextId, createInstanceofPredicate, toPrimitive } from "../utils/utils"
 import {
     hasInterceptors,
     IInterceptable,
@@ -150,9 +144,11 @@ export class ObservableValue<T> extends Atom
     valueOf(): T {
         return toPrimitive(this.get())
     }
-}
 
-ObservableValue.prototype[primitiveSymbol()] = ObservableValue.prototype.valueOf
+    [Symbol.toPrimitive]() {
+        return this.valueOf()
+    }
+}
 
 export var isObservableValue = createInstanceofPredicate("ObservableValue", ObservableValue) as (
     x: any

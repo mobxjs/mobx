@@ -148,6 +148,7 @@ export function isArrayLike(x: any): x is Array<any> | IObservableArray<any> {
 }
 
 export function isES6Map(thing): boolean {
+    // return thing instanceof Map // TODO: somehow this makes jest crash
     if (getGlobal().Map !== undefined && thing instanceof getGlobal().Map) return true
     return false
 }
@@ -157,25 +158,8 @@ export function getMapLikeKeys<V>(map: IKeyValueMap<V> | any): ReadonlyArray<str
 export function getMapLikeKeys(map: any): any {
     if (isPlainObject(map)) return Object.keys(map)
     if (Array.isArray(map)) return map.map(([key]) => key)
-    if (isES6Map(map) || isObservableMap(map)) return iteratorToArray(map.keys())
+    if (isES6Map(map) || isObservableMap(map)) return Array.from(map.keys())
     return fail(`Cannot get keys from '${map}'`)
-}
-
-// use Array.from in Mobx 5
-export function iteratorToArray<T>(it: Iterator<T>): ReadonlyArray<T> {
-    const res: T[] = []
-    while (true) {
-        const r: any = it.next()
-        if (r.done) break
-        res.push(r.value)
-    }
-    return res
-}
-
-declare var Symbol
-
-export function primitiveSymbol() {
-    return (typeof Symbol === "function" && Symbol.toPrimitive) || "@@toPrimitive"
 }
 
 export function toPrimitive(value) {

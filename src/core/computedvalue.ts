@@ -26,7 +26,6 @@ import {
     getNextId,
     invariant,
     Lambda,
-    primitiveSymbol,
     toPrimitive
 } from "../utils/utils"
 import { isSpyEnabled, spyReport } from "./spy"
@@ -111,7 +110,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             return fail("missing option for computed: get")
         this.derivation = options.get!
         this.name = options.name || "ComputedValue@" + getNextId()
-        if (options.set) this.setter = createAction(name + "-setter", options.set) as any
+        if (options.set) this.setter = createAction(this.name + "-setter", options.set) as any
         this.equals =
             options.equals ||
             ((options as any).compareStructural || (options as any).struct
@@ -277,8 +276,10 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     valueOf(): T {
         return toPrimitive(this.get())
     }
-}
 
-ComputedValue.prototype[primitiveSymbol()] = ComputedValue.prototype.valueOf
+    [Symbol.toPrimitive]() {
+        return this.valueOf()
+    }
+}
 
 export const isComputedValue = createInstanceofPredicate("ComputedValue", ComputedValue)
