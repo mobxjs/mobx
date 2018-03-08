@@ -1,6 +1,9 @@
 # MobX Api Reference
 
-Applies to MobX 4 and higher. For MobX 2, the old documentation is still available on [github](https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md).
+**Applies to MobX 4 and higher**
+
+- Using Mobx 3? Use this [migration guide](https://github.com/mobxjs/mobx/wiki/Migrating-from-mobx-3-to-mobx-4) to switch gears.
+- For MobX 2, the old documentation is still available on [github](https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md).
 
 # Core API
 
@@ -24,7 +27,7 @@ Observable values can be JS primitives, references, plain objects, class instanc
 
 You can also directly create the desired observable type, see below.
 
-The following conversion rules are applied, but can be fine-tuned by using *modifiers*. See below.
+The following conversion rules are applied, but can be fine-tuned by using *decorators*. See below.
 
 1. If *value* is an instance of an [ES6 Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map): a new [Observable Map](map.md) will be returned. Observable maps are very useful if you don't want to react just to the change of a specific entry, but also to the addition or removal of entries.
 1. If *value* is an array, a new [Observable Array](array.md) will be returned.
@@ -37,7 +40,7 @@ These rules might seem complicated at first sight, but you will notice that in p
 
 * To create dynamically keyed objects, always use maps! Only initially existing properties on an object will be made observable, although new ones can be added using `extendObservable`.
 * To use the `@observable` decorator, make sure that [decorators are enabled](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) in your transpiler (babel or typescript).
-* By default making a data structure observable is *infective*; that means that `observable` is applied automatically to any value that is contained by the data structure, or will be contained by the data structure in the future. This behavior can be changed by using *modifiers* or *shallow*.
+* By default making a data structure observable is *infective*; that means that `observable` is applied automatically to any value that is contained by the data structure, or will be contained by the data structure in the future. This behavior can be changed by using *decorators*.
 
 [&laquo;`observable`&raquo;](observable.md)  &mdash;  [&laquo;`@observable`&raquo;](observable-decorator.md)
 
@@ -48,33 +51,33 @@ sugar for `extendObservable(this, { property: value })`.
 
 [&laquo;`details`&raquo;](observable-decorator.md)
 
-### `observable.box(value)` & `observable.shallowBox(value)`
-
+### `observable.box(value)` & `observable.box(value, {deep: false})`
 Creates an observable _box_ that stores an observable reference to a value. Use `get()` to get the current value of the box, and `set()` to update it.
 This is the foundation on which all other observables are built, but in practice you will use it rarely.
-Normal boxes will automatically try to turn any new value into an observable if it isn't already. Use `shallowBox` to disable this behavior.
+Normal boxes will automatically try to turn any new value into an observable if it isn't already. Use `{deep: false}` option to disable this behavior.
 
 [&laquo;`details`&raquo;](boxed.md)
 
-### `observable.object(value)` & `observable.shallowObject(value)`
+### `observable.object(value)` & `observable.object(value, {deep: false})`
 
 Creates a clone of the provided object and makes all its properties observable.
-By default any values in those properties will be made observable as well, but when using `shallowObject` only the properties will be made into observable
+By default any values in those properties will be made observable as well, but when using `{deep: false}` only the properties will be made into observable
 references, but the values will be untouched. (This holds also for any values assigned in the future)
 
 [&laquo;`details`&raquo;](object.md)
 
-### `observable.array(value)` & `observable.shallowArray(value)`
+### `observable.array(value)` & `observable.array(value, {deep: false})`
 
-Creates a new observable array based on the provided value. Use `shallowArray` if the values in the array should not be turned into observables.
+Creates a new observable array based on the provided value. Use `{deep: false}` option if the values in the array should not be turned into observables.
 
 [&laquo;`details`&raquo;](array.md)
 
-### `observable.map(value)` & `observable.shallowMap(value)`
+### `observable.map(value)` & `observable.map(value, {deep: false})`
 
 Creates a new observable map based on the provided value. Use `shallowMap` if the values in the map should not be turned into observables.
 Use `map` whenever you want to create a dynamically keyed collections and the addition / removal of keys needs to be observed.
-Note that only string keys are supported.
+Since this uses the full-blown _ES6 Map_ internally, you are free to use any type for the key and _not limited_ to 
+string keys.
 
 [&laquo;`details`&raquo;](map.md)
 
@@ -253,12 +256,6 @@ Usage: `isAction(func)`. Returns true if the given function is wrapped / decorat
 
 ### `isComputed`
 Usage: `isComputed(thing, property?)`. Returns true if the given thing is a boxed computed value, or if the designated property is a computed value.
-
-### `createTransformer`
-Usage: `createTransformer(transformation: A => B, onCleanup?): A = B`.
-Can be used to make functions that transforms one value into another value reactive and memoized.
-It behaves similar to computed and can be used for advanced patterns like very efficient array maps, map reduce or computed values that are not part of an object.
-[&laquo;details&raquo;](create-transformer.md)
 
 ### `intercept`
 Usage: `intercept(object, property?, interceptor)`.

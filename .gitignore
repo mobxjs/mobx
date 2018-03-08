@@ -6,4 +6,5 @@ refguide/*.md
 *.ipr
 *.iws
 /.idea
+.vscode
 gitbook/plugins
