@@ -40,7 +40,7 @@ These rules might seem complicated at first sight, but you will notice that in p
 
 * To create dynamically keyed objects, always use maps! Only initially existing properties on an object will be made observable, although new ones can be added using `extendObservable`.
 * To use the `@observable` decorator, make sure that [decorators are enabled](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) in your transpiler (babel or typescript).
-* By default making a data structure observable is *infective*; that means that `observable` is applied automatically to any value that is contained by the data structure, or will be contained by the data structure in the future. This behavior can be changed by using *decorators*.
+* By default making a data structure observable is *infective*; that means that `observable` is applied automatically to any value that is contained by the data structure, or will be contained by the data structure in the future. This behavior can be changed by using [*decorators*](#decorators).
 
 [&laquo;`observable`&raquo;](observable.md)  &mdash;  [&laquo;`@observable`&raquo;](observable-decorator.md)
 
@@ -54,48 +54,55 @@ sugar for `extendObservable(this, { property: value })`.
 ### `observable.box(value)` & `observable.box(value, {deep: false})`
 Creates an observable _box_ that stores an observable reference to a value. Use `get()` to get the current value of the box, and `set()` to update it.
 This is the foundation on which all other observables are built, but in practice you will use it rarely.
+
 Normal boxes will automatically try to turn any new value into an observable if it isn't already. Use `{deep: false}` option to disable this behavior.
 
 [&laquo;`details`&raquo;](boxed.md)
 
-### `observable.object(value)` & `observable.object(value, {deep: false})`
+### `observable.object(value)` & `observable.object(value, decorators, {deep: false})`
 
 Creates a clone of the provided object and makes all its properties observable.
 By default any values in those properties will be made observable as well, but when using `{deep: false}` only the properties will be made into observable
-references, but the values will be untouched. (This holds also for any values assigned in the future)
+references, but the values will be untouched. (This holds also for any values assigned in the future).
 
-[&laquo;`details`&raquo;](object.md)
+The second argument in `observable.object()` can be used to fine tune the observability with `decorators`.
+
+[&laquo;`details`&raquo;](object.md)the
 
 ### `observable.array(value)` & `observable.array(value, {deep: false})`
 
-Creates a new observable array based on the provided value. Use `{deep: false}` option if the values in the array should not be turned into observables.
+Creates a new observable array based on the provided value. 
+
+Use the `{deep: false}` option if the values in the array should not be turned into observables.
 
 [&laquo;`details`&raquo;](array.md)
 
 ### `observable.map(value)` & `observable.map(value, {deep: false})`
 
-Creates a new observable map based on the provided value. Use `shallowMap` if the values in the map should not be turned into observables.
+Creates a new observable map based on the provided value. Use `{deep: false}` if the values in the map should not be turned into observables.
+
 Use `map` whenever you want to create a dynamically keyed collections and the addition / removal of keys needs to be observed.
-Since this uses the full-blown _ES6 Map_ internally, you are free to use any type for the key and _not limited_ to 
-string keys.
+Since this uses the full-blown _ES6 Map_ internally, you are free to use any type for the key and _not limited_ to string keys.
 
 [&laquo;`details`&raquo;](map.md)
 
-### `extendObservable` & `extendShallowObservable`
-Usage: `extendObservable(target, ...propertyMaps)`. For each key/value pair in each `propertyMap` a (new) observable property will be introduced on the target object.
+### `extendObservable` & `extendObservable(target, props, decorators?, options?)`
+Usage: `extendObservable(target, ...propertyMaps)`. 
+
+For each key/value pair in each `propertyMap` a (new) observable property will be introduced on the target object.
 This can be used in constructor functions to introduce observable properties without using decorators.
 If a value of the `propertyMap` is a getter function, a *computed* property will be introduced.
 
-Use `extendShallowObservable` if the new properties should not be infective (that is; newly assigned values should not be turned into observables automatically).
+Use `extendObservable(target, props, decorators?, {deep: false})` if the new properties should not be infective (that is; newly assigned values should not be turned into observables automatically).
 Note that `extendObservable` enhances existing objects, unlike `observable.object` which creates a new object.
 
 [&laquo;details&raquo;](extend-observable.md)
 
-### Modifiers
+### Decorators
 
-Modifiers can be used as decorators or in combination with `extendObservable` and `observable.object` to change the autoconversion rules for specific properties.
+Use decorators to fine tune the observability of properties defined via `observable`, `extendObservable` and `observable.object`. They can also control the autoconversion rules for specific properties.
 
-The following modifiers are available:
+The following decorators are available:
 
 * `observable.deep`: This is the default modifier, used by any observable. It converts any assigned, non-primitive value into an observable if it isn't one yet.
 * `observable.ref`: Disables automatic observable conversion, just creates an observable reference instead.
