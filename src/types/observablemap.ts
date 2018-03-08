@@ -10,8 +10,7 @@ import {
     invariant,
     isES6Map,
     getMapLikeKeys,
-    fail,
-    addHiddenFinalProp
+    fail
 } from "../utils/utils"
 import {
     IInterceptable,
@@ -22,7 +21,7 @@ import {
 } from "./intercept-utils"
 import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
-import { declareIterator, iteratorSymbol, makeIterable } from "../utils/iterable"
+import { makeIterable } from "../utils/iterable"
 import { transaction } from "../api/transaction"
 import { referenceEnhancer } from "./modifiers"
 
@@ -78,9 +77,7 @@ export class ObservableMap<K, V>
     )
     interceptors
     changeListeners
-    dehancer: any;
-    [Symbol.iterator];
-    [Symbol.toStringTag]
+    dehancer: any
 
     constructor(
         initialData?: IObservableMapInitialValues<K, V>,
@@ -240,19 +237,21 @@ export class ObservableMap<K, V>
     }
 
     keys(): IterableIterator<K> {
-        return (this._keys[iteratorSymbol()] as any)()
+        return this._keys[Symbol.iterator]()
     }
 
     values(): IterableIterator<V> {
         const self = this
         let nextIndex = 0
-        return makeIterable({
-            next: function() {
-                return nextIndex < self._keys.length
-                    ? { value: self.get(self._keys[nextIndex++]), done: false }
-                    : { done: true }
-            }
-        })
+        return makeIterable<V>(
+            {
+                next() {
+                    return nextIndex < self._keys.length
+                        ? { value: self.get(self._keys[nextIndex++]), done: false }
+                        : { done: true }
+                }
+            } as any
+        )
     }
 
     entries(): IterableIterator<IMapEntry<K, V>> {
@@ -272,6 +271,10 @@ export class ObservableMap<K, V>
                 }
             } as any
         )
+    }
+
+    [Symbol.iterator]() {
+        return this.entries()
     }
 
     forEach(callback: (value: V, key: K, object: Map<K, V>) => void, thisArg?) {
@@ -355,6 +358,8 @@ export class ObservableMap<K, V>
         )
     }
 
+    [Symbol.toStringTag]: "Map" = "Map"
+
     /**
 	 * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
 	 * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
@@ -373,16 +378,6 @@ export class ObservableMap<K, V>
         return registerInterceptor(this, handler)
     }
 }
-
-declareIterator(ObservableMap.prototype, function() {
-    return this.entries()
-})
-
-addHiddenFinalProp(
-    ObservableMap.prototype,
-    typeof Symbol !== "undefined" ? Symbol.toStringTag : "@@toStringTag" as any,
-    "Map"
-)
 
 /* 'var' fixes small-build issue */
 export var isObservableMap = createInstanceofPredicate("ObservableMap", ObservableMap) as (
