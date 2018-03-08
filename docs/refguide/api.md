@@ -104,7 +104,7 @@ Use decorators to fine tune the observability of properties defined via `observa
 
 The following decorators are available:
 
-* **`observable.deep`**: This is the default modifier, used by any observable. It converts any assigned, non-primitive value into an observable if it isn't one yet.
+* **`observable.deep`**: This is the default decorator, used by any observable. It converts any assigned, non-primitive value into an observable if it isn't one yet.
 * **`observable.ref`**: Disables automatic observable conversion, just creates an observable reference instead.
 * **`observable.shallow`**: Can only be used in combination with collections. Turns any assigned collection into an collection, which is shallowly observable (instead of deep). In other words; the values inside the collection won't become observables automatically.
 * **`computed`**: Creates a derived property, see [`computed`](computed-decorator.md)
@@ -284,8 +284,30 @@ Low-level api that can be used to observe a single observable value.
 [&laquo;details&raquo;](observe.md)
 
 ### `decorate`
-Usage: TODO
-TODO
+Usage: `decorate(object, decorators)`
+This is a convenience method to apply observability [decorators](#decorators) to the properties of a plain object or class instance. The second argument is an object with properties set to certain decorators. 
+
+Use this if you cannot use the _@decorator_ syntax or need more control over setting observability.
+
+```js
+class TodoList {
+    todos = {}
+    get unfinishedTodoCount() {
+        return values(this.todos).filter(todo => !todo.finished).length
+    }
+    addTodo() {
+        const t = new Todo()
+        t.title = 'Test_' + Math.random()
+        set(this.todos, t.id, t)
+    }
+}
+
+decorate(TodoList, {
+    todos: observable,
+    unfinishedTodoCount: computed,
+    addTodo: action.bound
+})
+```
 
 ### `onBecomeObserved` and `onBecomeUnobserved`
 Usage: TODO
