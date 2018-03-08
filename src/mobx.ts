@@ -16,15 +16,16 @@
  *
  */
 
+declare var window: any
 try {
     // define process.env if needed
     // if this is not a production build in the first place
     // (in which case the expression below would be substituted with 'production')
     process.env.NODE_ENV
 } catch (e) {
-    if (typeof process === "undefined")
-        ((typeof window !== "undefined" ? window : global) as any).process = {}
-    process.env = {}
+    var g = typeof window !== "undefined" ? window : global
+    if (typeof process === "undefined") g.process = {}
+    g.process.env = {}
 }
 
 ;(() => {
