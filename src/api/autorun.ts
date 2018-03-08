@@ -72,7 +72,7 @@ const run = (f: Lambda) => f()
 function createSchedulerFromOptions(opts: IReactionOptions) {
     return opts.scheduler
         ? opts.scheduler
-        : opts.delay ? (f: Lambda) => setTimeout(f, opts.delay) : run
+        : opts.delay ? (f: Lambda) => setTimeout(f, opts.delay!) : run
 }
 
 export function reaction<T>(

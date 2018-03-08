@@ -111,7 +111,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             return fail("missing option for computed: get")
         this.derivation = options.get!
         this.name = options.name || "ComputedValue@" + getNextId()
-        if (options.set) this.setter = createAction(name + "-setter", options.set) as any
+        if (options.set) this.setter = createAction(this.name + "-setter", options.set) as any
         this.equals =
             options.equals ||
             ((options as any).compareStructural || (options as any).struct
