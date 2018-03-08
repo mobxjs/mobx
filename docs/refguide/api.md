@@ -100,7 +100,7 @@ Note that `extendObservable` enhances existing objects, unlike `observable.objec
 
 ### Decorators
 
-Use decorators to fine tune the observability of properties defined via `observable`, `extendObservable` and `observable.object`. They can also control the autoconversion rules for specific properties.
+Use decorators to fine tune the observability of properties defined via `observable`, `extendObservable` and `observable.object`. They can also control the auto-conversion rules for specific properties.
 
 The following decorators are available:
 
@@ -113,6 +113,8 @@ The following decorators are available:
 You can apply these decorators using the _@decorator_ syntax:
 
 ```javascript
+import {observable, action} from 'mobx';
+
 class TaskStore {
     @observable.shallow tasks = []
     @action addTask(task) { /* ... */ }
@@ -123,6 +125,8 @@ Or by passing in property decorators via `observable.object` / `observable.exten
 Note that decorators always 'stick' to the property. So they will remain in effect even if a new value is assigned.
 
 ```javascript
+import {observable, action} from 'mobx';
+
 const taskStore = observable({
     tasks: [],
     addTask(task) { /* ... */ }
@@ -149,7 +153,7 @@ Usage:
 Creates a computed property. The `expression` should not have side effects but return a value.
 The expression will automatically be re-evaluated if any observables it uses changes, but only if it is in use by some *reaction*.
 
-Comparison method can be used to override the default detection on when something is changed and should be of value `(value, value) => boolean`. Built-in comparers are: `comparer.identity`, `comparar.default`, `comparer.structural`
+Comparison method can be used to override the default detection on when something is changed and should be of value `(value, value) => boolean`. Built-in comparers are: `comparer.identity`, `comparer.default`, `comparer.structural`
 
 [&laquo;details&raquo;](computed-decorator.md)
 
@@ -290,11 +294,10 @@ TODO
 ### `configure`
 Usage: `configure({ enforceActions: boolean, isolateGlobalState: boolean })`.
 
-- `enforceActions`: Enables / disables strict mode *globally*.
+- **`enforceActions`**: Enables / disables strict mode *globally*.
 In strict mode, it is not allowed to change any state outside of an [`action`](action.md).
 See also `allowStateChanges`.
-- `isolateGlobalState`: Isolates the global state of MobX, when there are multiple instances of MobX in the same 
-environment
+- **`isolateGlobalState`**: Isolates the global state of MobX, when there are multiple instances of MobX in the same environment. This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX. The reactivty inside the library will remain self-contained when you call `configure({isolateGlobalState: true})` inside the library. Additionally, MobX won't throw an error that there are multiple instances in the global scope. 
 
 
 
