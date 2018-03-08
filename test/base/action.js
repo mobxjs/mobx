@@ -455,3 +455,16 @@ test("bound actions bind", () => {
     d()
     d2()
 })
+
+test("Fix #1367", () => {
+    const x = mobx.extendObservable(
+        {},
+        {
+            method() {}
+        },
+        {
+            method: mobx.action
+        }
+    )
+    expect(mobx.isAction(x.method)).toBe(true)
+})
