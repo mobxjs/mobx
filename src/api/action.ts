@@ -59,7 +59,6 @@ export var action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): 
     } else {
         return namedActionDecorator(arg2).apply(null, arguments)
     }
-    toString
 } as any
 
 action.bound = boundActionDecorator as any

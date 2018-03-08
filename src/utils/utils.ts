@@ -7,7 +7,8 @@ Object.freeze(EMPTY_ARRAY)
 export const EMPTY_OBJECT = {}
 Object.freeze(EMPTY_OBJECT)
 
-declare var global
+declare var window: any
+
 export function getGlobal() {
     return typeof window !== "undefined" ? window : global
 }

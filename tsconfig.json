@@ -14,8 +14,7 @@
         "noImplicitAny": false,
         "moduleResolution": "node",
         "lib": [
-            "es6",
-            "dom"
+            "es6"
         ]
     },
     "include": [

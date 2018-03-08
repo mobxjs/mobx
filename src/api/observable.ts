@@ -173,7 +173,7 @@ const observableFactories: IObservableFactories = {
     },
     shallowMap<K, V>(
         initialValues?: IObservableMapInitialValues<K, V>,
-        options?: CreateObservableOptions
+        name?: string
     ): ObservableMap<K, V> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowMap")
         deprecated(`observable.shallowMap`, `observable.map(values, { deep: false })`)
