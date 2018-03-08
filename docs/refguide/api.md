@@ -27,12 +27,12 @@ Observable values can be JS primitives, references, plain objects, class instanc
 
 You can also directly create the desired observable type, see below.
 
-The following conversion rules are applied, but can be fine-tuned by using *decorators*. See below.
+The following conversion rules are applied, but can be fine-tuned by using [*decorators*](#decorators). See below.
 
 1. If *value* is an instance of an [ES6 Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map): a new [Observable Map](map.md) will be returned. Observable maps are very useful if you don't want to react just to the change of a specific entry, but also to the addition or removal of entries.
 1. If *value* is an array, a new [Observable Array](array.md) will be returned.
 1. If *value* is an object *without* prototype or its prototype is `Object.prototype`, the object will be cloned and all its current properties will be made observable. See [Observable Object](object.md)
-1. If *value* is an object *with* a prototype, a JavaScript primitive or function, there will be no change made to the value. If you do need a [Boxed Observable](boxed.md), call `observable.box(*value*)` explicitly. MobX will not make objects with a prototype automatically observable; as that is the responsibility of its constructor function. Use `extendObservable` in the constructor, or `@observable` in its class definition instead.
+1. If *value* is an object *with* a prototype, a JavaScript primitive or function, there will be no change made to the value. If you do need a [Boxed Observable](boxed.md), call `observable.box(value)` explicitly. MobX will not make objects with a prototype automatically observable; as that is the responsibility of its constructor function. Use `extendObservable` in the constructor, or `@observable` in its class definition instead.
 
 These rules might seem complicated at first sight, but you will notice that in practice they are very intuitive to work with.
 
@@ -63,9 +63,9 @@ Normal boxes will automatically try to turn any new value into an observable if 
 
 Creates a clone of the provided object and makes all its properties observable.
 By default any values in those properties will be made observable as well, but when using `{deep: false}` only the properties will be made into observable
-references, but the values will be untouched. (This holds also for any values assigned in the future).
+references, leaving the values untouched. (This holds also for any values assigned in the future).
 
-The second argument in `observable.object()` can be used to fine tune the observability with `decorators`.
+The second argument in `observable.object()` can be used to fine tune the observability with [`decorators`](#decorators).
 
 [&laquo;`details`&raquo;](object.md)the
 
@@ -104,26 +104,31 @@ Use decorators to fine tune the observability of properties defined via `observa
 
 The following decorators are available:
 
-* `observable.deep`: This is the default modifier, used by any observable. It converts any assigned, non-primitive value into an observable if it isn't one yet.
-* `observable.ref`: Disables automatic observable conversion, just creates an observable reference instead.
-* `observable.shallow`: Can only be used in combination with collections. Turns any assigned collection into an collection, which is shallowly observable (instead of deep). In other words; the values inside the collection won't become observables automatically.
-* `computed`: Creates a derived property, see [`computed`](computed-decorator.md)
-* `action`: Creates an action, see [`action`](action.md)
+* **`observable.deep`**: This is the default modifier, used by any observable. It converts any assigned, non-primitive value into an observable if it isn't one yet.
+* **`observable.ref`**: Disables automatic observable conversion, just creates an observable reference instead.
+* **`observable.shallow`**: Can only be used in combination with collections. Turns any assigned collection into an collection, which is shallowly observable (instead of deep). In other words; the values inside the collection won't become observables automatically.
+* **`computed`**: Creates a derived property, see [`computed`](computed-decorator.md)
+* **`action`**: Creates an action, see [`action`](action.md)
 
-Modifiers can be used as decorators:
+You can apply these decorators using the _@decorator_ syntax:
 
 ```javascript
 class TaskStore {
     @observable.shallow tasks = []
+    @action addTask(task) { /* ... */ }
 }
 ```
 
-Or as property modifiers in combination with `observable.object` / `observable.extendObservable`.
-Note that modifiers always 'stick' to the property. So they will remain in effect even if a new value is assigned.
+Or by passing in property decorators via `observable.object` / `observable.extendObservable`.
+Note that decorators always 'stick' to the property. So they will remain in effect even if a new value is assigned.
 
 ```javascript
 const taskStore = observable({
-    tasks: observable.shallow([])
+    tasks: [],
+    addTask(task) { /* ... */ }
+}, {
+    tasks: observable.shallow,
+    addTask: action
 })
 ```
 
@@ -219,7 +224,7 @@ In general it is simpler and better to just split the function in multiple small
 
 ### `onReactionError`
 
-Usage: `extras.onReactionError(handler: (error: any, derivation) => void)`
+Usage: `onReactionError(handler: (error: any, derivation) => void)`
 
 This method attaches a global error listener, which is invoked for every error that is thrown from a _reaction_.
 This can be used for monitoring or test purposes.
@@ -273,6 +278,14 @@ Api that can be used to intercept changes before they are applied to an observab
 Usage: `observe(object, property?, listener, fireImmediately = false)`
 Low-level api that can be used to observe a single observable value.
 [&laquo;details&raquo;](observe.md)
+
+### `decorate`
+Usage: TODO
+TODO
+
+### `onBecomeObserved` and `onBecomeUnobserved`
+Usage: TODO
+TODO
 
 ### `configure`
 Usage: `configure({ enforceActions: boolean, isolateGlobalState: boolean })`.
