@@ -397,7 +397,7 @@ export class ObservableArray<T> extends StubArray {
         fromIndex = 0
     ): T | undefined {
         const idx = this.findIndex.apply(this, arguments)
-        return idx === -1 ? undefined : this.get(idx)
+        return idx === -1 ? undefined : this[idx]
     }
 
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex
@@ -493,46 +493,6 @@ export class ObservableArray<T> extends StubArray {
         )
     }
 
-    // TODO: remove
-    move(fromIndex: number, toIndex: number): void {
-        function checkIndex(index: number) {
-            if (index < 0) {
-                throw new Error(`[mobx.array] Index out of bounds: ${index} is negative`)
-            }
-            const length = this.$mobx.values.length
-            if (index >= length) {
-                throw new Error(
-                    `[mobx.array] Index out of bounds: ${index} is not smaller than ${length}`
-                )
-            }
-        }
-        checkIndex.call(this, fromIndex)
-        checkIndex.call(this, toIndex)
-        if (fromIndex === toIndex) {
-            return
-        }
-        const oldItems = this.$mobx.values
-        let newItems: T[]
-        if (fromIndex < toIndex) {
-            newItems = [
-                ...oldItems.slice(0, fromIndex),
-                ...oldItems.slice(fromIndex + 1, toIndex + 1),
-                oldItems[fromIndex],
-                ...oldItems.slice(toIndex + 1)
-            ]
-        } else {
-            // toIndex < fromIndex
-            newItems = [
-                ...oldItems.slice(0, toIndex),
-                oldItems[fromIndex],
-                ...oldItems.slice(toIndex, fromIndex),
-                ...oldItems.slice(fromIndex + 1)
-            ]
-        }
-        this.replace(newItems)
-    }
-
-    // See #734, in case property accessors are unreliable...
     get(index: number): T | undefined {
         const impl = <ObservableArrayAdministration<any>>this.$mobx
         if (impl) {
@@ -549,7 +509,6 @@ export class ObservableArray<T> extends StubArray {
         return undefined
     }
 
-    // See #734, in case property accessors are unreliable...
     set(index: number, newValue: T) {
         const adm = <ObservableArrayAdministration<T>>this.$mobx
         const values = adm.values

@@ -396,56 +396,6 @@ test("isArrayLike", () => {
     expect(isArrayLike({})).toBe(false)
 })
 
-test(".move throws on invalid indices", () => {
-    const arr = [0, 1, 2]
-    const observableArr = observable(arr)
-
-    expect(() => observableArr.move(-1, 0)).toThrowError(/Index out of bounds: -1 is negative/)
-    expect(() => observableArr.move(3, 0)).toThrowError(
-        /Index out of bounds: 3 is not smaller than 3/
-    )
-    expect(() => observableArr.move(0, -1)).toThrowError(/Index out of bounds: -1 is negative/)
-    expect(() => observableArr.move(0, 3)).toThrowError(
-        /Index out of bounds: 3 is not smaller than 3/
-    )
-})
-
-test(".move(i, i) does nothing", () => {
-    const arr = [0, 1, 2]
-    const observableArr = observable(arr)
-    var changesCount = 0
-    observableArr.observe(changes => ++changesCount)
-
-    observableArr.move(0, 0)
-
-    expect(0).toBe(changesCount)
-})
-
-test(".move works correctly", () => {
-    const arr = [0, 1, 2, 3]
-
-    function checkMove(fromIndex, toIndex, expected) {
-        const oa = observable(arr)
-        var changesCount = 0
-        oa.observe(changes => ++changesCount)
-        oa.move(fromIndex, toIndex)
-        expect(oa.slice()).toEqual(expected)
-        expect(changesCount).toBe(1)
-    }
-
-    checkMove(0, 1, [1, 0, 2, 3])
-    checkMove(0, 2, [1, 2, 0, 3])
-    checkMove(1, 2, [0, 2, 1, 3])
-    checkMove(2, 3, [0, 1, 3, 2])
-    checkMove(0, 3, [1, 2, 3, 0])
-
-    checkMove(1, 0, [1, 0, 2, 3])
-    checkMove(2, 0, [2, 0, 1, 3])
-    checkMove(2, 1, [0, 2, 1, 3])
-    checkMove(3, 1, [0, 3, 1, 2])
-    checkMove(3, 0, [3, 0, 1, 2])
-})
-
 test("accessing out of bound values throws", () => {
     const a = mobx.observable([])
 
