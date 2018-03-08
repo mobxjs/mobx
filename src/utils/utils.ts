@@ -7,12 +7,6 @@ Object.freeze(EMPTY_ARRAY)
 export const EMPTY_OBJECT = {}
 Object.freeze(EMPTY_OBJECT)
 
-declare var window: any
-
-export function getGlobal() {
-    return typeof window !== "undefined" ? window : global
-}
-
 export interface Lambda {
     (): void
     name?: string
@@ -149,8 +143,7 @@ export function isArrayLike(x: any): x is Array<any> | IObservableArray<any> {
 
 export function isES6Map(thing): boolean {
     // return thing instanceof Map // TODO: somehow this makes jest crash
-    if (getGlobal().Map !== undefined && thing instanceof getGlobal().Map) return true
-    return false
+    return thing instanceof Map
 }
 
 export function getMapLikeKeys<K, V>(map: ObservableMap<K, V>): ReadonlyArray<K>

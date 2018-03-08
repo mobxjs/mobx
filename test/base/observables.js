@@ -1580,17 +1580,6 @@ test("#561 test toPrimitive() of observable objects", function() {
     }
 })
 
-test("observables should not fail when ES6 Map is missing", () => {
-    const globalMapFunction = global.Map
-    global.Map = undefined
-    expect(global.Map).toBe(undefined)
-    var a = observable([1, 2, 3]) //trigger isES6Map in utils
-
-    expect(m.isObservable(a)).toBe(true)
-
-    global.Map = globalMapFunction
-})
-
 test("computed equals function only invoked when necessary", () => {
     utils.supressConsole(() => {
         const comparisons = []

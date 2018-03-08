@@ -1,4 +1,4 @@
-import { getGlobal, fail } from "../utils/utils"
+import { fail } from "../utils/utils"
 import { IDerivation } from "./derivation"
 import { Reaction } from "./reaction"
 import { IObservable } from "./observable"
@@ -138,4 +138,10 @@ export function resetGlobalState() {
     for (let key in defaultGlobals)
         if (persistentKeys.indexOf(key) === -1) globalState[key] = defaultGlobals[key]
     globalState.allowStateChanges = !globalState.enforceActions
+}
+
+declare var window: any
+
+export function getGlobal() {
+    return typeof window !== "undefined" ? window : global
 }
