@@ -41,7 +41,7 @@ export function deepStructEnhancer(v, oldValue, name): any {
     if (isObservable(v)) return v
 
     // something that can be converted and mutated?
-    if (Array.isArray(v)) return new ObservableArray(v, deepStructEnhancer, name)
+    if (Array.isArray(v)) return createObservableArray(v, deepStructEnhancer, name)
     if (isES6Map(v)) return new ObservableMap(v, deepStructEnhancer, name)
     if (isPlainObject(v)) {
         const res = {}
@@ -65,6 +65,6 @@ import { isObservable } from "../api/isobservable"
 import { extendObservable } from "../api/extendobservable"
 import { fail, isPlainObject, isES6Map } from "../utils/utils"
 import { isObservableObject } from "./observableobject"
-import { isObservableArray, ObservableArray } from "./observablearray"
+import { isObservableArray, createObservableArray } from "./observablearray"
 import { isObservableMap, ObservableMap } from "./observablemap"
 import { deepEqual } from "../utils/eq"

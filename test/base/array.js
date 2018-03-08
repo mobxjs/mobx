@@ -15,7 +15,7 @@ function buffer() {
 }
 
 test("test1", function() {
-    var a = observable([])
+    var a = observable.array([])
     expect(a.length).toBe(0)
     expect(Object.keys(a)).toEqual([])
     expect(a.slice()).toEqual([])
@@ -92,8 +92,7 @@ test("test1", function() {
     a.set(2, 4)
     expect(a.get(2)).toBe(4)
 
-    //	t.deepEqual(Object.keys(a), ['0', '1', '2']); // ideally....
-    expect(Object.keys(a)).toEqual([])
+    expect(Object.keys(a)).toEqual(["0", "1", "2"]) // ideally....
 })
 
 test("array should support iterall / iterable ", () => {
@@ -128,20 +127,10 @@ test("find(findIndex) and remove", function() {
         }
         return false
     }
-
+    ;[].findIndex
     expect(a.find(predicate)).toBe(20)
-    expect(idx).toBe(1)
     expect(a.findIndex(predicate)).toBe(1)
-    expect(a.find(predicate, null, 1)).toBe(20)
-    expect(idx).toBe(1)
-    expect(a.findIndex(predicate, null, 1)).toBe(1)
-    expect(a.find(predicate, null, 2)).toBe(20)
-    expect(idx).toBe(2)
-    expect(a.findIndex(predicate, null, 2)).toBe(2)
-    idx = -1
-    expect(a.find(predicate, null, 3)).toBe(undefined)
-    expect(idx).toBe(-1)
-    expect(a.findIndex(predicate, null, 3)).toBe(-1)
+    expect(a.find(predicate)).toBe(20)
 
     expect(a.remove(20)).toBe(true)
     expect(a.find(predicate)).toBe(20)
@@ -295,7 +284,7 @@ test("is array", function() {
     expect(x instanceof Array).toBe(true)
 
     // would be cool if this would return true...
-    expect(Array.isArray(x)).toBe(false)
+    expect(Array.isArray(x)).toBe(true)
 })
 
 test("stringifies same as ecma array", function() {
@@ -380,7 +369,7 @@ test("array exposes correct keys", () => {
     var ar = observable([1, 2])
     for (var key in ar) keys.push(key)
 
-    expect(keys).toEqual([])
+    expect(keys).toEqual(["0", "1"])
 })
 
 test("isArrayLike", () => {

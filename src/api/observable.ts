@@ -8,7 +8,7 @@ import {
     IEnhancer
 } from "../types/modifiers"
 import { IObservableValue, ObservableValue } from "../types/observablevalue"
-import { IObservableArray, ObservableArray } from "../types/observablearray"
+import { IObservableArray, createObservableArray } from "../types/observablearray"
 import { createDecoratorForEnhancer, IObservableDecorator } from "./observabledecorator"
 import { isObservable } from "./isobservable"
 import { IObservableObject } from "../types/observableobject"
@@ -156,7 +156,7 @@ const observableFactories: IObservableFactories = {
     array<T>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("array")
         const o = asCreateObservableOptions(options)
-        return new ObservableArray(initialValues, getEnhancerFromOptions(o), o.name) as any
+        return createObservableArray(initialValues, getEnhancerFromOptions(o), o.name) as any
     },
     shallowArray<T>(initialValues?: T[], name?: string): IObservableArray<T> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowArray")

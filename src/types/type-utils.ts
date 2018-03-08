@@ -66,7 +66,7 @@ export function getAdministration(thing: any, property?: string) {
     if (isObservableMap(thing)) return thing
     // Initializers run lazily when transpiling to babel, so make sure they are run...
     initializeInstance(thing)
-    if (thing.$mobx) return thing.$mobx
+    if (thing.$mobx) return thing.$mobx // TODO: use a Symbol
     fail(process.env.NODE_ENV !== "production" && "Cannot obtain administration from " + thing)
 }
 

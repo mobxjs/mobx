@@ -1,6 +1,6 @@
 import { IEnhancer, deepEnhancer } from "./modifiers"
 import { untracked } from "../core/derivation"
-import { IObservableArray, ObservableArray } from "./observablearray"
+import { IObservableArray, createObservableArray } from "./observablearray"
 import { ObservableValue, UNCHANGED } from "./observablevalue"
 import {
     createInstanceofPredicate,
@@ -69,7 +69,7 @@ export class ObservableMap<K, V>
     $mobx = ObservableMapMarker
     private _data: Map<K, ObservableValue<V>>
     private _hasMap: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
-    private _keys: IObservableArray<K> = <any>new ObservableArray(
+    private _keys: IObservableArray<K> = <any>createObservableArray(
         undefined,
         referenceEnhancer,
         `${this.name}.keys()`,

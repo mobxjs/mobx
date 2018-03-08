@@ -1,3 +1,8 @@
+# 5.0.0
+
+* dropped `array.move`
+* dropped third arg to `array.find` and `array.findIndex` (not in standard)
+
 # 4.0.0
 
 * For the highlights of this release, read the [blog](https://medium.com/p/c1fbc08008da/):

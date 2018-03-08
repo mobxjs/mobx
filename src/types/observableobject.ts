@@ -21,7 +21,7 @@ import {
 import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
 import { IEnhancer, referenceEnhancer, deepEnhancer } from "./modifiers"
-import { ObservableArray, IObservableArray } from "./observablearray"
+import { IObservableArray, createObservableArray } from "./observablearray"
 import { initializeInstance } from "../utils/decorators2"
 import { startBatch, endBatch } from "../core/observable"
 
@@ -208,7 +208,7 @@ export class ObservableObjectAdministration
 
     getKeys(): string[] {
         if (this.keys === undefined) {
-            this.keys = <any>new ObservableArray(
+            this.keys = <any>createObservableArray(
                 Object.keys(this.values).filter(key => this.values[key] instanceof ObservableValue),
                 referenceEnhancer,
                 `keys(${this.name})`,
