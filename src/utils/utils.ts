@@ -181,10 +181,6 @@ export function toPrimitive(value) {
     return value === null ? null : typeof value === "object" ? "" + value : value
 }
 
-export function isThennable(thing: any): thing is PromiseLike<any> {
-    return thing !== null && typeof thing === "object" && typeof thing.then === "function"
-}
-
 import { globalState } from "../core/globalstate"
 import { IObservableArray, isObservableArray } from "../types/observablearray"
 import { isObservableMap, ObservableMap, IKeyValueMap } from "../types/observablemap"
