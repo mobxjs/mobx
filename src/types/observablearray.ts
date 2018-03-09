@@ -7,7 +7,8 @@ import {
     EMPTY_ARRAY,
     addHiddenFinalProp,
     addHiddenProp,
-    invariant
+    invariant,
+    negate
 } from "../utils/utils"
 import { BaseAtom } from "../core/atom"
 import { checkIfStateModificationsAreAllowed } from "../core/derivation"
@@ -50,6 +51,10 @@ export interface IObservableArray<T> extends Array<T> {
     clear(): T[]
     peek(): T[]
     replace(newItems: T[]): T[]
+    removeAll(
+        predicate: (item: T, index: number, array: IObservableArray<T>) => any,
+        thisArg?: any
+    ): T[]
     find(
         predicate: (item: T, index: number, array: IObservableArray<T>) => boolean,
         thisArg?: any,
@@ -123,26 +128,27 @@ inherit(StubArray, Array.prototype)
 // Make them writeable and configurable in prototype chain
 // https://github.com/alibaba/weex/pull/1529
 if (Object.isFrozen(Array)) {
-	;[
-		"constructor",
-		"push",
-		"shift",
-		"concat",
-		"pop",
-		"unshift",
-		"replace",
-		"find",
-		"findIndex",
-		"splice",
-		"reverse",
-		"sort"
-	].forEach(function (key) {
-		Object.defineProperty(StubArray.prototype, key, {
-			configurable: true,
-			writable: true,
-			value: Array.prototype[key]
-		})
-	})
+    ;[
+        "constructor",
+        "push",
+        "shift",
+        "concat",
+        "pop",
+        "unshift",
+        "replace",
+        "removeAll",
+        "find",
+        "findIndex",
+        "splice",
+        "reverse",
+        "sort"
+    ].forEach(function(key) {
+        Object.defineProperty(StubArray.prototype, key, {
+            configurable: true,
+            writable: true,
+            value: Array.prototype[key]
+        })
+    })
 }
 
 class ObservableArrayAdministration<T>
@@ -369,6 +375,13 @@ export class ObservableArray<T> extends StubArray {
 
     replace(newItems: T[]) {
         return this.$mobx.spliceWithArray(0, this.$mobx.values.length, newItems)
+    }
+
+    removeAll(
+        predicate: (item: T, index: number, array: IObservableArray<T>) => any,
+        thisArg?: any
+    ): T[] {
+        return this.replace(this.$mobx.values.filter(negate(predicate), thisArg))
     }
 
     /**
@@ -622,6 +635,7 @@ makeNonEnumerable(ObservableArray.prototype, [
     "concat",
     "get",
     "replace",
+    "removeAll",
     "toJS",
     "toJSON",
     "peek",
