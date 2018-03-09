@@ -1,4 +1,5 @@
-var mobx = require("../../src/mobx.ts")
+import * as mobx from "../../src/mobx.ts"
+const { flow } = mobx
 
 function delay(time, value, shouldThrow = false) {
     return new Promise((resolve, reject) => {
@@ -158,3 +159,101 @@ function stripEvents(events) {
         return e
     })
 }
+
+test("flows can be cancelled - 1 - uncatched cancellation", done => {
+    let steps = 0
+    const start = flow(function*() {
+        steps = 1
+        yield Promise.resolve()
+        steps = 2
+    })
+
+    const promise = start()
+    promise.then(
+        () => fail(),
+        err => {
+            expect(steps).toBe(1)
+            expect("" + err).toBe("Error: FLOW_CANCELLED")
+            done()
+        }
+    )
+    promise.cancel()
+})
+
+test("flows can be cancelled - 2 - catch cancellation in generator", done => {
+    let steps = 0
+    const start = flow(function*() {
+        steps = 1
+        try {
+            yield Promise.resolve()
+            steps = 2
+        } catch (e) {
+            expect(steps).toBe(1)
+            expect(e.toString()).toBe("Error: FLOW_CANCELLED")
+            return 4
+        }
+    })
+    const promise = start()
+    promise.then(
+        res => {
+            expect(res).toBe(4)
+            done()
+        },
+        err => {
+            fail()
+        }
+    )
+    promise.cancel()
+})
+
+test("flows can be cancelled - 3 - rethrow cancellation", done => {
+    let steps = 0
+    const start = flow(function*() {
+        steps = 1
+        try {
+            yield Promise.resolve()
+            steps = 2
+        } catch (e) {
+            expect(steps).toBe(1)
+            expect(e.toString()).toBe("Error: FLOW_CANCELLED")
+            throw e // rethrow
+        }
+    })
+
+    const promise = start()
+    promise.then(
+        () => fail(),
+        err => {
+            expect(steps).toBe(1)
+            expect("" + err).toBe("Error: FLOW_CANCELLED")
+            done()
+        }
+    )
+    promise.cancel()
+})
+
+test("flows can be cancelled - 3 - pending Promise will be ignored", done => {
+    let steps = 0
+    const start = flow(function*() {
+        steps = 1
+        try {
+            yield Promise.reject("This won't be catched anywhere!") // cancel will resolve this flow before this one is throw, so this promise goes uncatched
+            steps = 2
+        } catch (e) {
+            expect(steps).toBe(1)
+            expect(e.toString()).toBe("Error: FLOW_CANCELLED")
+            throw e
+        }
+    })
+
+    const promise = start()
+    promise.then(
+        () => fail(),
+        err => {
+            expect(steps).toBe(1)
+            expect("" + err).toBe("Error: FLOW_CANCELLED")
+            done()
+        }
+    )
+    promise.cancel()
+})
