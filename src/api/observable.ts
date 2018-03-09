@@ -184,6 +184,8 @@ const observableFactories: IObservableFactories = {
         decorators?: { [K in keyof T]: Function },
         options?: CreateObservableOptions
     ): T & IObservableObject {
+        // TODO: should create dynamic observable object
+        // TODO: should forbid deleting decorated members (so that behavior remains sticky)
         if (typeof arguments[1] === "string") incorrectlyUsedAsDecorator("object")
         const o = asCreateObservableOptions(options)
         return extendObservable({}, props, decorators, o) as any

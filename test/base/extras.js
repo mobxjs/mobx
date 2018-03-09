@@ -54,7 +54,7 @@ test("treeD", function() {
 
     var x = mobx.observable.map({ temperature: 0 })
     var d = mobx.autorun(function() {
-        x.keys()
+        Array.from(x.keys())
         if (x.has("temperature")) x.get("temperature")
         x.has("absent")
     })

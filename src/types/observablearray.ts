@@ -123,6 +123,7 @@ class ObservableArrayAdministration
     enhancer: (newV: any, oldV: any | undefined) => any
     dehancer: any
     proxy: any[] = undefined as any
+    lastKnownLength = 0
 
     constructor(name, enhancer: IEnhancer<any>, public owned: boolean) {
         this.atom = new Atom(name || "ObservableArray@" + getNextId())
@@ -181,6 +182,14 @@ class ObservableArrayAdministration
         } else this.spliceWithArray(newLength, currentLength - newLength)
     }
 
+    updateArrayLength(oldLength: number, delta: number) {
+        if (oldLength !== this.lastKnownLength)
+            throw new Error(
+                "[mobx] Modification exception: the internal structure of an observable array was changed. Did you use peek() to change it?"
+            )
+        this.lastKnownLength += delta
+    }
+
     spliceWithArray(index: number, deleteCount?: number, newItems?: any[]): any[] {
         checkIfStateModificationsAreAllowed(this.atom)
         const length = this.values.length
@@ -209,6 +218,10 @@ class ObservableArrayAdministration
         }
 
         newItems = newItems.length === 0 ? newItems : newItems.map(v => this.enhancer(v, undefined))
+        if (process.env.NODE_ENV !== "production") {
+            const lengthDelta = newItems.length - deleteCount
+            this.updateArrayLength(length, lengthDelta) // checks if internal array wasn't modified
+        }
         const res = this.spliceItemsIntoValues(index, deleteCount, newItems)
 
         if (deleteCount !== 0 || newItems.length !== 0) this.notifyArraySplice(index, newItems, res)
@@ -271,7 +284,7 @@ class ObservableArrayAdministration
     }
 }
 
-// Optimizatin: the following methods coudl be made faster by applying them to values immediately (to avoid triggerering traps a 100 times on arrays)
+// TODO: Optimizatin: the following methods coudl be made faster by applying them to values immediately (to avoid triggerering traps a 100 times on arrays)
 const interceptReads = {
     concat: true,
     find: true,
@@ -291,11 +304,10 @@ const interceptReads = {
     toLocaleString: true
 }
 
+// TODO: optimization, is it faster if we don't intercept all these
+// calls and trap set / get instead?
 const arrayExtensions = {
-    intercept(
-        adm: ObservableArrayAdministration,
-        handler: IInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>
-    ): Lambda {
+    intercept(handler: IInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>): Lambda {
         return this.$mobx.intercept(handler)
     },
 
@@ -309,6 +321,12 @@ const arrayExtensions = {
 
     clear(): any[] {
         return this.splice(0)
+    },
+
+    concat(): any[] {
+        const adm: ObservableArrayAdministration = this.$mobx
+        adm.atom.reportObserved()
+        return Array.prototype.concat.apply(adm.values, arguments)
     },
 
     replace(newItems: any[]) {
@@ -343,6 +361,8 @@ const arrayExtensions = {
      * and for that reason the do not call dependencyState.notifyObserved
      */
     splice(index: number, deleteCount?: number, ...newItems: any[]): any[] {
+        // TODO: splice could just use the prototype definiton of splice on `changed`
+        // ... but, intercept handlers?
         const adm: ObservableArrayAdministration = this.$mobx
         switch (arguments.length) {
             case 0:
@@ -365,6 +385,14 @@ const arrayExtensions = {
         const adm: ObservableArrayAdministration = this.$mobx
         adm.spliceWithArray(adm.values.length, 0, items)
         return adm.values.length
+    },
+
+    pop() {
+        return this.splice(Math.max(this.$mobx.values.length - 1, 0), 1)[0]
+    },
+
+    shift() {
+        return this.splice(0, 1)[0]
     },
 
     unshift(...items: any[]): number {

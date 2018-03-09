@@ -630,7 +630,7 @@ test("761 - deeply nested modifiers work", () => {
     expect(mobx.isObservable(a.someKey)).toBe(true)
     expect(mobx.isObservableProp(a.someKey, "someNestedKey")).toBe(true)
     expect(mobx.isObservable(a.someKey.someNestedKey)).toBe(true) // Too bad: no deep merge with Object.assign! someKey object gets replaced in its entirity
-    expect(Array.isArray(a.someKey.someNestedKey)).toBe(false)
+    expect(Array.isArray(a.someKey.someNestedKey)).toBe(true)
 })
 
 test("compare structurally, deep", () => {
