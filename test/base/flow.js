@@ -232,7 +232,7 @@ test("flows can be cancelled - 3 - rethrow cancellation", done => {
     promise.cancel()
 })
 
-test("flows can be cancelled - 3 - pending Promise will be ignored", done => {
+test("flows can be cancelled - 4 - pending Promise will be ignored", done => {
     let steps = 0
     const start = flow(function*() {
         steps = 1
@@ -256,4 +256,23 @@ test("flows can be cancelled - 3 - pending Promise will be ignored", done => {
         }
     )
     promise.cancel()
+})
+
+test("flows can be cancelled - 5 - return before cancel", done => {
+    let steps = 0
+    const start = flow(function*() {
+        steps = 1
+        return Promise.resolve(2) // cancel will be to late..
+    })
+
+    const promise = start()
+    promise.then(
+        value => {
+            expect(value).toBe(2), done()
+        },
+        err => {
+            fail()
+        }
+    )
+    promise.cancel() // no-op
 })
