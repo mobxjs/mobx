@@ -146,14 +146,19 @@ Usage:
 * `computed(() => expression, (newValue) => void)`
 * `computed(() => expression, options)`
 * `@computed get classProperty() { return expression; }`
-* `@computed.struct get classProperty() { return expression; }`
-* `@computed.equals(comparisonMethod) get classProperty() { return expression; }`
+* `@computed({equals: compareFn}) get classProperty() { return expression; }`
 
 
 Creates a computed property. The `expression` should not have side effects but return a value.
 The expression will automatically be re-evaluated if any observables it uses changes, but only if it is in use by some *reaction*.
 
-Comparison method can be used to override the default detection on when something is changed and should be of value `(value, value) => boolean`. Built-in comparers are: `comparer.identity`, `comparer.default`, `comparer.structural`
+There are various `options` that can be used to control the behavior of `computed`. These include:
+
+* **`equals: (value, value) => boolean`** Comparison method can be used to override the default detection on when something is changed. Built-in comparers are: `comparer.identity`, `comparer.default`, `comparer.structural`.
+* **`name: string`** Provide a debug name to this computed property
+* **`requiresReaction: boolean`** Wait for a change in value of the tracked observables, before recomputing the derived property
+* **`get: () => value)`** Override the getter for the computed property.
+* **`set: (value) => void`** Override the setter for the computed property
 
 [&laquo;details&raquo;](computed-decorator.md)
 
@@ -165,7 +170,7 @@ With MobX you can make it explicit in your code where your actions live by marki
 Actions helps you to structure your code better.
 It is advised to use them on any function that modifies observables or has side effects.
 `action` also provides useful debugging information in combination with the devtools.
-Note: using `action` is mandatory when *strict mode* is enabled, see `useStrict`.
+Note: using `action` is mandatory when *strict mode* is enabled, see `enforceActions`.
 [&laquo;details&raquo;](action.md)
 
 Usage:
@@ -176,7 +181,7 @@ Usage:
 * `@action boundClassMethod = (args) => { body }`
 * `@action(name) boundClassMethod = (args) => { body }`
 
-For one-time-actions `runInAction(name?, fn, scope?)` can be used, which is sugar for `action(name, fn, scope)()`.
+For one-time-actions `runInAction(name?, fn)` can be used, which is sugar for `action(name, fn)()`.
 
 ## Reactions & Derivations
 
@@ -220,12 +225,6 @@ It takes two function, the first one is tracked and returns data that is used as
 Unlike `autorun` the side effect won't be run initially, and any observables that are accessed while executing the side effect will not be tracked.
 The side effect can be debounced, just like `autorunAsync`. [&laquo;details&raquo;](reaction.md)
 
-### `expr`
-Usage: `expr(() => someExpression)`. Just a shorthand for `computed(() => someExpression).get()`.
-`expr` is useful in some rare cases to optimize another computed function or reaction.
-In general it is simpler and better to just split the function in multiple smaller computed's to achieve the same effect.
-[&laquo;details&raquo;](expr.md)
-
 ### `onReactionError`
 
 Usage: `onReactionError(handler: (error: any, derivation) => void)`
@@ -255,8 +254,8 @@ Higher order component and counterpart of `Provider`. Can be used to pick stores
 ### `toJS`
 Usage: `toJS(observableDataStructure)`. Converts observable data structures back to plain javascript objects, ignoring computed values. [&laquo;details&raquo;](tojson.md)
 
-### `isObservable`
-Usage: `isObservable(thing, property?)`. Returns true if the given thing, or the `property` of the given thing is observable.
+### `isObservableProp`
+Usage: `isObservableProp(thing, property?)`. Returns true if the given thing, or the `property` of the given thing is observable.
 Works for all observables, computed values and disposer functions of reactions. [&laquo;details&raquo;](is-observable)
 
 ### `isObservableObject|Array|Map` and `isBoxedObservable`
@@ -270,8 +269,8 @@ Note that observable arrays can be `.slice()`d to turn them into true JS-arrays.
 ### `isAction`
 Usage: `isAction(func)`. Returns true if the given function is wrapped / decorated with `action`.
 
-### `isComputed`
-Usage: `isComputed(thing, property?)`. Returns true if the given thing is a boxed computed value, or if the designated property is a computed value.
+### `isComputedProp`
+Usage: `isComputedProp(thing, property?)`. Returns true if the given thing is a boxed computed value, or if the designated property is a computed value.
 
 ### `intercept`
 Usage: `intercept(object, property?, interceptor)`.
@@ -310,16 +309,21 @@ decorate(TodoList, {
 ```
 
 ### `onBecomeObserved` and `onBecomeUnobserved`
-Usage: TODO
-TODO
+Usage: `onBecomeObserved(observable, listener: () => void): (() => void)` and
+`onBecomeUnobserved(observable, listener: () => void): (() => void)`
+
+These functions are hooks into the observability system of MobX and get notified when observables _start_ / _stop_ becoming observed. It can be used to execute some lazy operations or perform network fetches. 
+
+The return value is a _diposer-function_ that will detach the _listener_.
 
 ### `configure`
-Usage: `configure({ enforceActions: boolean, isolateGlobalState: boolean })`.
+Usage: `configure(options)`.
 
-- **`enforceActions`**: Enables / disables strict mode *globally*.
+- **`enforceActions: boolean`**: Enables / disables strict mode *globally*.
 In strict mode, it is not allowed to change any state outside of an [`action`](action.md).
 See also `allowStateChanges`.
-- **`isolateGlobalState`**: Isolates the global state of MobX, when there are multiple instances of MobX in the same environment. This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX. The reactivty inside the library will remain self-contained when you call `configure({isolateGlobalState: true})` inside the library. Additionally, MobX won't throw an error that there are multiple instances in the global scope. 
+- **`isolateGlobalState: boolean`**: Isolates the global state of MobX, when there are multiple instances of MobX in the same environment. This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX. The reactivty inside the library will remain self-contained when you call `configure({isolateGlobalState: true})` inside the library. Additionally, MobX won't throw an error that there are multiple instances in the global scope. 
+- **`disableErrorBoundaries: boolean`**: Use this to simplify debugging exceptions and prevent MobX from catching and rethrowing exceptions happening in your code.
 
 
 
@@ -405,12 +409,3 @@ Utility class that can be used to create your own reactions and hook them up to 
 Used internally by `autorun`, `reaction` (function) etc.
 [&laquo;details&raquo;](extending.md)
 
-### `allowStateChanges`
-Usage: `allowStateChanges(allowStateChanges, () => { block })`.
-Can be used to (dis)allow state changes in a certain function.
-Used internally by `action` to allow changes, and by `computed` and `observer` to disallow state changes.
-
-### `resetGlobalState`
-Usage: `resetGlobalState()`.
-Resets MobX internal global state. MobX by defaults fails fast if an exception occurs inside a computation or reaction and refuses to run them again.
-This function resets MobX to the zero state. Existing `spy` listeners and the current value of strictMode will be preserved though.
