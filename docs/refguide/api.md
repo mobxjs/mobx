@@ -204,26 +204,34 @@ Usage:
 
 
 ### `autorun`
-Usage: `autorun(debugname?, () => { sideEffect })`. Autorun runs the provided `sideEffect` and tracks which observable state is accessed while running the side effect.
+Usage: `autorun(() => { sideEffect }, options)`. Autorun runs the provided `sideEffect` and tracks which observable state is accessed while running the side effect.
 Whenever one of the used observables is changed in the future, the same sideEffect will be run again.
 Returns a disposer function to cancel the side effect. [&laquo;details&raquo;](autorun.md)
 
+**options**
+- **`debugname?: string`**: A name for easier identification and debugging
+- **`delay?: number`**: the sideEffect will be delayed and debounced with the given `delay`. Defaults to `0`.
+
 ### `when`
-Usage: `when(debugname?, () => condition, () => { sideEffect })`.
+Usage: `when(() => condition, () => { sideEffect }, options)`.
 The condition expression will react automatically to any observables it uses.
 As soon as the expression returns true the sideEffect function will be invoked, but only once.
 `when` returns a disposer to prematurely cancel the whole thing. [&laquo;details&raquo;](when.md)
 
-### `autorunAsync`
-Usage: `autorunAsync(debugname?, () => { sideEffect }, delay)`. Similar to `autorun`, but the sideEffect will be delayed and debounced with the given `delay`.
-[&laquo;details&raquo;](autorun-async.md)
+**options**
+- **`debugname?: string`**: A name for easier identification and debugging
 
 ### `reaction`
-Usage: `reaction(debugname?, () => data, data => { sideEffect }, fireImmediately = false, delay = 0)`.
+Usage: `reaction(() => data, data => { sideEffect }, options)`.
 A variation on `autorun` that gives more fine-grained control on which observables that will be tracked.
 It takes two function, the first one is tracked and returns data that is used as input for the second one, the side effect.
 Unlike `autorun` the side effect won't be run initially, and any observables that are accessed while executing the side effect will not be tracked.
 The side effect can be debounced, just like `autorunAsync`. [&laquo;details&raquo;](reaction.md)
+
+options
+**options**
+- **`fireImmediately?: boolean`**: Wait for a change before firing the _effect function_. Defaults to `false`.
+- **`delay?: number`**: the sideEffect will be delayed and debounced with the given `delay`. Defaults to `0`.
 
 ### `onReactionError`
 
