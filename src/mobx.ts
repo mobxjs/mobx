@@ -16,6 +16,12 @@
  *
  */
 
+if (typeof Proxy === "undefined") {
+    throw new Error(
+        "[mobx] MobX 15+ requires Proxy objects. If your environment doesn't support Proxy objects, please downgrade to MobX 4."
+    )
+}
+
 declare var window: any
 try {
     // define process.env if needed
