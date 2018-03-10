@@ -1,5 +1,7 @@
 # createTransformer
 
+Provided by the `mobx-utils` package.
+
 `createTransformer<A, B>(transformation: (value: A) => B, onCleanup?: (result: B, value?: A) => void): (value: A) => B`
 
 `createTransformer` turns a function (that should transform value `A` into another value `B`) into a reactive and memoizing function.
@@ -104,7 +106,7 @@ Some examples:
 
 ```javascript
 var m = require('mobx')
-	
+
 function Folder(parent, name) {
 	this.parent = parent;
 	m.extendObservable(this, {

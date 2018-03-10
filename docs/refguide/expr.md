@@ -1,5 +1,7 @@
 # Expr
 
+Provided by the `mobx-utils` package.
+
 `expr` can be used to create temporarily computed values inside computed values.
 Nesting computed values is useful to create cheap computations to prevent expensive computations to run.
 
