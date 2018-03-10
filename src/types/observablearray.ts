@@ -7,7 +7,8 @@ import {
     EMPTY_ARRAY,
     addHiddenFinalProp,
     addHiddenProp,
-    invariant
+    invariant,
+    deprecated
 } from "../utils/utils"
 import { Atom, IAtom } from "../core/atom"
 import { checkIfStateModificationsAreAllowed } from "../core/derivation"
@@ -395,6 +396,10 @@ export class ObservableArray<T> extends StubArray {
         thisArg?,
         fromIndex = 0
     ): T | undefined {
+        if (arguments.length === 3)
+            deprecated(
+                "The array.find fromIndex argument to find will not be supported anymore in the next major"
+            )
         const idx = this.findIndex.apply(this, arguments)
         return idx === -1 ? undefined : this.get(idx)
     }
@@ -405,6 +410,10 @@ export class ObservableArray<T> extends StubArray {
         thisArg?,
         fromIndex = 0
     ): number {
+        if (arguments.length === 3)
+            deprecated(
+                "The array.findIndex fromIndex argument to find will not be supported anymore in the next major"
+            )
         const items = this.peek(),
             l = items.length
         for (let i = fromIndex; i < l; i++) if (predicate.call(thisArg, items[i], i, this)) return i
@@ -478,6 +487,7 @@ export class ObservableArray<T> extends StubArray {
     }
 
     move(fromIndex: number, toIndex: number): void {
+        deprecated("observableArray.move is deprecated, use .slice() & .replace() instead")
         function checkIndex(index: number) {
             if (index < 0) {
                 throw new Error(`[mobx.array] Index out of bounds: ${index} is negative`)

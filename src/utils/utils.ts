@@ -43,6 +43,7 @@ const deprecatedMessages: string[] = []
 export function deprecated(msg: string): boolean
 export function deprecated(thing: string, replacement: string): boolean
 export function deprecated(msg: string, thing?: string): boolean {
+    if (process.env.NODE_ENV === "production") return false
     if (thing) {
         return deprecated(`'${msg}', use '${thing}' instead.`)
     }

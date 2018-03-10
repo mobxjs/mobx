@@ -102,6 +102,7 @@ The changes mentioned here are discussed in detail in the [migration notes](http
 * Dropped the already deprecated and broken `default` export that made it harder to tree-shake mobx. Make sure to always use `import { x } from "mobx"` and not `import mobx from "mobx"`.
 * Killed the already deprecated modifiers `asFlat` etc. If you war still using this, see the MobX 2 -> 3 migration notes.
 * Observable maps now fully implement the map interface. See [#1361](https://github.com/mobxjs/mobx/pull/1361) by [Marc Fallows](https://github.com/marcfallows)
+* Observable arrays will no longer expose the `.move` method
 
 ### Issues fixed in this release:
 
