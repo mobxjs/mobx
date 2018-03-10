@@ -64,6 +64,7 @@ const ObservableMapMarker = {}
 
 export type IObservableMapInitialValues<K, V> = IMapEntries<K, V> | IKeyValueMap<V> | Map<K, V>
 
+// TODO: just extend Map? See also https://gist.github.com/nestharus/13b4d74f2ef4a2f4357dbd3fc23c1e54
 export class ObservableMap<K, V>
     implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable {
     $mobx = ObservableMapMarker

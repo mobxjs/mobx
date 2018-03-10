@@ -1,3 +1,5 @@
+// TODO: use Object.values / Object.entries where relevant
+
 export const OBFUSCATED_ERROR =
     "An invariant failed, however the error is obfuscated because this is an production build."
 
