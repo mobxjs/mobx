@@ -10,16 +10,99 @@ Disadvantages of using decorators:
 * Stage-2 ES.next feature
 * Requires a little setup and transpilation, only supported with Babel / Typescript transpilation so far
 
-## Enabling decorators
+You can approach using decorators in two ways in MobX
+
+1. Enable the currently experimental decorator syntax in your compiler (read on)
+2. Don't enable decorator syntax, but leverage the MobX built-in utility `decorate` to apply decorators to your classes / objects.
+
+Using decorator syntax:
+
+```javascript
+import { observable, computed, action } from "mobx"
+
+class Timer {
+	@observable start = Date.now();
+	@observable current = Date.now();
+
+	@computed get elapsedTime() {
+		return (this.current - this.start) + "milliseconds"
+	}
+
+	@action tick() {
+		this.current = Date.now()
+	}
+}
+```
+
+Using the `decorate` utility:
+
+```javascript
+import { observable, computed, action } from "mobx"
+
+class Timer {
+	start = Date.now();
+	current = Date.now();
+
+	get elapsedTime() {
+		return (this.current - this.start) + "milliseconds"
+	}
+
+	tick() {
+		this.current = Date.now()
+	}
+}
+decorate(Timer, {
+	start: observable,
+	current: observable,
+	elapsedTime: computed,
+	tick: action
+})
+```
+
+Note that the `observer` function from `mobx-react` is both a decorator and a function, that means that both all these syntax variants will work:
+
+```javascript
+@observer
+class Timer extends React.Component {
+	/* ... */
+}
+
+const Timer = observer(class Timer extends React.Component {
+	/* ... */
+})
+
+const Timer = observer((props) => (
+	/* rendering */
+))
+```
+
+## Enabling decorator syntax
 
 If you want to use decorators follow the following steps.
 
 **TypeScript**
 
-Enable the compiler option `experimentalDecorators` in `tsconfig.json` or pass it as flag `--experimentalDecorators` to the compiler. You must target `es5`+ (es5, es6, ...) with `target` option or by `--target` flag.
+Enable the compiler option `"experimentalDecorators": true` in your `tsconfig.json`.
 
-**Babel: enabling decorators**
 
+**Babel: using `babel-preset-mobx`**
+
+A more convenient way to setup Babel for usage with mobx is to use the [`mobx`](https://github.com/zwhitchcox/babel-preset-mobx) preset, that incorporates decorators and several other plugins typically used with mobx:
+
+```
+npm install --save-dev babel-preset-mobx
+```
+
+.babelrc:
+```
+{
+  "presets": ["mobx"]
+}
+```
+
+**Babel: manually enabling decorators**
+
+To enable support for decorators without using the mobx preset, follow the following steps.
 Install support for decorators: `npm i --save-dev babel-plugin-transform-decorators-legacy`. And enable it in your `.babelrc` file:
 
 ```
@@ -42,125 +125,10 @@ When using react native, the following preset can be used instead of `transform-
 }
 ```
 
-**Babel: using `babel-preset-mobx`**
-
-A more convenient way to setup Babel for usage with mobx is to use the [`mobx`](https://github.com/zwhitchcox/babel-preset-mobx) preset, that incorporates decorators and several other plugins typically used with mobx:
-
-```
-npm install --save-dev babel-preset-mobx
-```
-
-.babelrc:
-```
-{
-  "presets": ["mobx"]
-}
-```
+For babel 7, see [issue 1352](https://github.com/mobxjs/mobx/issues/1352) for an example setup.
 
 
-## Limitations on decorators
 
-* typescript target must be es5 minimum
-* reflect-metadata https://github.com/mobxjs/mobx/issues/534
-* decorators are not supported out of the box in `create-react-app`. To fix this, you can either eject, or use [custom-react-scripts](https://www.npmjs.com/package/custom-react-scripts) for `create-react-app` ([blog](https://medium.com/@kitze/configure-create-react-app-without-ejecting-d8450e96196a#.n6xx12p5c))
-* ~~decorators are currently not yet support in Next.JS [issue](https://github.com/zeit/next.js/issues/26)~~ Decorators are now supported in Next.JS. Example: https://github.com/zeit/next.js/tree/master/examples/with-mobx
+## Decorator syntax and Create React App
 
-## Creating observable properties without decorators
-
-Without decorators `extendObservable` can be used to introduce observable properties on an object.
-Typically this is done inside a constructor function.
-The following example introduces observable properties, a computed property and an action in a constructor function / class:
-
-```javascript
-function Timer() {
-	extendObservable(this, {
-		start: Date.now(),
-		current: Date.now(),
-		get elapsedTime() {
-			return (this.current - this.start) + "milliseconds"
-		},
-        tick: action(function() {
-          	this.current = Date.now()
-        })
-	})
-}
-```
-
-Or, when using classes:
-
-```javascript
-class Timer {
-	constructor() {
-		extendObservable(this, {
-			/* See previous listing */
-		})
-	}
-}
-```
-
-## Creating observable properties with decorators
-
-Decorators combine very nicely with classes.
-When using decorators, observables, computed values and actions can be simply introduced by using the decorators:
-
-```javascript
-class Timer {
-	@observable start = Date.now();
-	@observable current = Date.now();
-
-	@computed get elapsedTime() {
-		return (this.current - this.start) + "milliseconds"
-	}
-
-	@action tick() {
-		this.current = Date.now()
-	}
-}
-```
-
-## Creating observer components
-
-The `observer` function / decorator from the mobx-package converts react components into observer components.
-The rule to remember here is that `@observer class ComponentName {}` is simply sugar for `const ComponentName = observer(class { })`.
-So all the following forms of creating observer components are valid:
-
-Stateless function component, ES5:
-
-```javascript
-const Timer = observer(function(props) {
-	return React.createElement("div", {}, props.timer.elapsedTime)
-})
-```
-
-Stateless function component, ES6:
-
-```javascript
-const Timer = observer(({ timer }) =>
-	<div>{ timer.elapsedTime }</div>
-)
-```
-
-React component, ES5:
-
-```javascript
-const Timer = observer(React.createClass({
-	/* ... */
-}))
-```
-
-React component class, ES6:
-
-```javascript
-const Timer = observer(class Timer extends React.Component {
-	/* ... */
-})
-```
-
-React component class with decorator, ES.next:
-
-```javascript
-@observer
-class Timer extends React.Component {
-	/* ... */
-}
-```
+* decorators are not supported out of the box in `create-react-app`. To fix this, you can either eject, or use [react-app-rewired](https://github.com/timarney/react-app-rewired/tree/master/packages/react-app-rewire-mobx).

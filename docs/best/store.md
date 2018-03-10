@@ -45,8 +45,6 @@ Instead of pushing state in such a case upwards in the component tree, like you 
 For isomorphic applications you might also want to provide a stub implementation of this store with sane defaults so that all components render as expected.
 You might distribute the _ui-state-store_ through your application by passing it as a property through your component tree or using `Provider` and `inject` from the `mobx-react` package.
 
-See [modifiers.asStructure for more](https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/modifiers.md#asstructure)
-
 Example of a store (using ES6 syntax):
 
 ```javascript
@@ -57,12 +55,12 @@ export class UiState {
     @observable language = "en_US";
     @observable pendingRequestCount = 0;
 
-    // asStructure makes sure observer won't be signaled unless the
+    // .struct makes sure observer won't be signaled unless the
     // dimensions object changed in a deepEqual manner
-    @observable windowDimensions = asStructure({
+    @observable.struct windowDimensions = {
         width: jquery(window).width(),
         height: jquery(window).height()
-    });
+    };
 
 	constructor() {
         jquery.resize(() => {
@@ -304,7 +302,7 @@ class UserStore {
 
 class TodoStore {
   @observable todos = []
-  
+
   constructor(rootStore) {
     this.rootStore = rootStore
   }

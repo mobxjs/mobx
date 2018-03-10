@@ -227,29 +227,3 @@ For more info see [#476](https://github.com/mobxjs/mobx/issues/476)
 #### Declaring propTypes might cause unnecessary renders in dev mode
 
 See: https://github.com/mobxjs/mobx-react/issues/56
-
-#### `@observable` properties initialize lazily when using Babel
-
-This issue only occurs when transpiling with Babel and not with Typescript (in which decorator support is more mature).
-Observable properties will not be instantiated upon an instance until the first read / write to a property (at that point they all will be initialized).
-This results in the following subtle bug:
-
-```javascript
-class Todo {
-    @observable done = true
-    @observable title = "test"
-}
-const todo = new Todo()
-
-"done" in todo // true
-todo.hasOwnProperty("done") // false
-Object.keys(todo) // []
-
-console.log(todo.title)
-"done" in todo // true
-todo.hasOwnProperty("done") // true
-Object.keys(todo) // ["done", "title"]
-```
-
-In practice this is rarely an issue, only when using generic methods like `Object.assign(target, todo)` or `assert.deepEquals` *before* reading or writing any property of the object.
-If you want to make sure that this issue doesn't occur, just initialize the fields in the constructor instead of at the field declaration or use `extendObservable` to create the observable properties.
