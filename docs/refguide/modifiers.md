@@ -1,12 +1,67 @@
-# Modifiers for observable
+# Decorators
 
-Modifiers can be used decorator or in combination with `extendObservable` and `observable.object` to change the autoconversion rules for specific properties.
+In MobX there is a set of decorators that defines how observable properties will behave.
 
-* `observable.deep`: This is the default modifier, used by any observable. It converts any assigned, non-primitive value into an observable value if it isn't one yet.
+* `observable`: An alias for `observable.deep`.
+* `observable.deep`: This is the default modifier, used by any observable. It clones and converts any (not yet observable) array, Map or plain object into it's observable counterpart upon assignment to the given property
 * `observable.ref`: Disables automatic observable conversion, just creates an observable reference instead.
-* `observable.shallow`: Can only used in combination with collections. Turns any assigned collection into an collection, which is shallowly observable (instead of deep)
+* `observable.shallow`: Can only used in combination with collections. Turns any assigned collection into an observable, but the values of that collection will be treated as-is.
+* `observable.struct`: Like `ref`, but will ignore new values that are structurally equal to the current value
 * `computed`: Creates a derived property, see [`computed`](computed-decorator.md)
+* `computed(options)`: Idem, sets additional options.
+* `computed.struct`: Same as `computed`, but will only notify any of it's observers when the value produced by the view is _structurally_ different from the previous value
 * `action`: Creates an action, see [`action`](action.md)
+* `action(name)`: Creates an action, overrides the name
+* `action.bound`: Creates an action, and binds `this` to the instance
+
+Decorators can be used with the api's `decorate`, `observable.object`, `extendObservable` and `observable` (when creating objects) to specify how object members should behave.
+If no decorators are passed in, the default behavior is to use `observable.deep` for any key / value pair, and `computed` for geters.
+
+```javascript
+import {observable, autorun, action} from "mobx";
+
+var person = observable({
+	name: "John",
+	age: 42,
+	showAge: false,
+
+	get labelText() {
+		return this.showAge ? `${this.name} (age: ${this.age})` : this.name;
+	},
+
+    // action:
+    setAge(age) {
+        this.age = age;
+    }
+}, {
+    setAge: action
+    // the other properties will default to observables  / computed
+});
+```
+
+```javascript
+class Person {
+	name = "John"
+	age = 42
+	showAge = false
+
+	get labelText() {
+		return this.showAge ? `${this.name} (age: ${this.age})` : this.name;
+	},
+
+    setAge(age) {
+        this.age = age;
+    }
+}
+// when using decorate, all fields should be specified (a class might have many more non-observable internal fields after all)
+decorate(Person, {
+    name: observable,
+    age: observable,
+    showAge: observable,
+    labelText: computed,
+    setAge: action
+})
+```
 
 ## Deep observability
 
@@ -42,7 +97,9 @@ Or with just ES5 syntax:
 function Message() {
     extendObservable({
         message: "Hello world",
-        author: observable.ref(null)
+        author: null
+    }, {
+        author: observable.ref
     })
 }
 ```
@@ -62,54 +119,4 @@ class AuthorStore {
 ```
 In the above example an assignment of a plain array with authors to the `authors` will update the authors with an observable array, containing the original, non-observable authors.
 
-Note that the following methods can be used to create shallow collections manually: `observable.shallowObject`, `observable.shallowArray`, `observable.shallowMap` and `extendShallowObservable`.
-
-## Action & Computed
-
-`action`, `action.bound`, `computed` and `computed.struct` can be used as modifiers as well.
-See [`computed`](computed-decorator.md) respectively [`action`](action.md).
-
-```javascript
-const taskStore = observable({
-    tasks: observable.shallow([]),
-    taskCount: computed(function() {
-        return this.tasks.length
-    }),
-    clearTasks: action.bound(function() {
-        this.tasks.clear()
-    })
-})
-```
-
-## asStructure
-
-MobX 2 had the `asStructure` modifier, which in practice was rarely used, or only used in cases where it is used `reference` / `shallow` is often a better fit (when using immutable data for example).
-Structural comparision for computed properties and reactions is still possible.
-
-## Effect of modifiers
-
-```javascript
-class Store {
-    @observable/*.deep*/ collection1 = []
-
-    @observable.ref collection2 = []
-
-    @observable.shallow collection3 = []
-}
-
-const todos = [{ test: "value" }]
-const store = new Store()
-
-store.collection1 = todos;
-store.collection2 = todos;
-store.collection3 = todos;
-```
-
-After these assignments:
-
-1. `collection1 === todos` is false; the contents of todos will be cloned into a new observable array
-2. `collection1[0] === todos[0]` is false; the first todo was a plain object and hence it was cloned into an observable object which is stored in the array
-3. `collection2 === todos` is true; the `todos` are kept as is, and are non-observable. Only the `collection2` property itself is observable.
-4. `collection2[0] === todos[0]` is true; because of 3.
-5. `collection3 === todos` is false; collection 3 is a new observable array
-6. `collection3[0] === todos[0]` is true; the value of `collection3` was only shallowly turned into an observable, but the contents of the array is left as is.
+Note that `{ deep: false }` can be passed as option to `observable`, `observable.object`, `observable.array`, `observable.map` and `extendObservable` to create shallow collections.

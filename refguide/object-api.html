@@ -5,7 +5,7 @@
         
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>The Gist of MobX | MobX</title>
+        <title>Object api | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="generator" content="GitBook 2.4.3">
@@ -37,10 +37,10 @@
         
     
     
-    <link rel="next" href="../intro/concepts.html" />
+    <link rel="next" href="../refguide/tojson.html" />
     
     
-    <link rel="prev" href="../index.html" />
+    <link rel="prev" href="../best/actions.html" />
     
 
         
@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="1.1" data-basepath=".." data-revision="Sat Mar 10 2018 21:53:24 GMT+0100 (CET)">
+    <div class="book" data-level="5.3" data-basepath=".." data-revision="Sat Mar 10 2018 21:53:24 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -87,7 +87,7 @@
             <ul class="articles">
                 
     
-        <li class="chapter active" data-level="1.1" data-path="intro/overview.html">
+        <li class="chapter " data-level="1.1" data-path="intro/overview.html">
             
                 
                     <a href="../intro/overview.html">
@@ -396,7 +396,7 @@
             
         </li>
     
-        <li class="chapter " data-level="5.3" data-path="refguide/object-api.html">
+        <li class="chapter active" data-level="5.3" data-path="refguide/object-api.html">
             
                 
                     <a href="../refguide/object-api.html">
@@ -878,66 +878,32 @@
                 
                     <section class="normal" id="section-">
                     
-                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/intro/overview.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="the-gist-of-mobx"><a name="the-gist-of-mobx" class="plugin-anchor" href="#the-gist-of-mobx"><span class="fa fa-link"></span></a>The gist of MobX</h1>
-<p><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx" target="_blank">egghead.io lesson 1: observable &amp; observer</a></p>
-<p>So far it all might sound a bit fancy, but making an app reactive using MobX boils down to just these three steps:</p>
-<h2 id="1-define-your-state-and-make-it-observable"><a name="1-define-your-state-and-make-it-observable" class="plugin-anchor" href="#1-define-your-state-and-make-it-observable"><span class="fa fa-link"></span></a>1. Define your state and make it observable</h2>
-<p>Store state in any data structure you like; objects, array, classes.
-Cyclic data structures, references, it doesn&apos;t matter.
-Just make sure that all properties that you want to change over time are marked by <code>mobx</code> to make them observable.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable} <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;mobx&apos;</span>;
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/object-api.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h2 id="direct-observable-manipulation"><a name="direct-observable-manipulation" class="plugin-anchor" href="#direct-observable-manipulation"><span class="fa fa-link"></span></a>Direct Observable manipulation</h2>
+<p>There is now an utility API that enables manipulating observable maps, objects and arrays with the same API. These api&apos;s are fully reactive, which means that even new property declarations can be detected by mobx if <code>set</code> is used to add them, and <code>values</code> or <code>keys</code> to iterate them.</p>
+<ul>
+<li><strong><code>values(thing)</code></strong> returns all values in the collection as array</li>
+<li><strong><code>keys(thing)</code></strong> returns all keys in the collection as array</li>
+<li><strong><code>set(thing, key, value)</code></strong> or <strong><code>set(thing, { key: value })</code></strong> Updates the given collection with the provided key / value pair(s).</li>
+<li><strong><code>remove(thing, key)</code></strong> removes the specified child from the collection. For arrays splicing is used.</li>
+<li><strong><code>has(thing, key)</code></strong> returns true if the collection has the specified <em>observable</em> property.</li>
+<li><strong><code>get(thing, key)</code></strong> returns the chlid under the specified key.</li>
+</ul>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> { get, set, observable, values } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>
 
-<span class="hljs-keyword">var</span> appState = observable({
-    timer: <span class="hljs-number">0</span>
-});
+const twitterUrls = observable.object({
+    <span class="hljs-string">&quot;John&quot;</span>: <span class="hljs-string">&quot;twitter.com/johnny&quot;</span>
+})
+
+autorun(() =&gt; {
+    console.log(get(twitterUrls, <span class="hljs-string">&quot;Sara&quot;</span>)) // get can track not yet existing properties
+})
+
+autorun(() =&gt; {
+    console.log(<span class="hljs-string">&quot;All urls: &quot;</span> + values(twitterUrls).join(<span class="hljs-string">&quot;, &quot;</span>))
+})
+
+set(twitterUrls, { <span class="hljs-string">&quot;Sara&quot;</span> : <span class="hljs-string">&quot;twitter.com/horsejs&quot;</span>})
 </code></pre>
-<h2 id="2-create-a-view-that-responds-to-changes-in-the-state"><a name="2-create-a-view-that-responds-to-changes-in-the-state" class="plugin-anchor" href="#2-create-a-view-that-responds-to-changes-in-the-state"><span class="fa fa-link"></span></a>2. Create a view that responds to changes in the State</h2>
-<p>We didn&apos;t make our <code>appState</code> observable for nothing;
-you can now create views that automatically update whenever relevant data in the <code>appState</code> changes.
-MobX will find the minimal way to update your views.
-This single fact saves you tons of boilerplate and is <a href="https://mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/" target="_blank">wickedly efficient</a>.</p>
-<p>Generally speaking any function can become a reactive view that observes its data, and MobX can be applied in any ES5 conformant JavaScript environment.
-But here is an (ES6) example of a view in the form of a React component.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;mobx-react&apos;</span>;
-
-@observer
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TimerView</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
-    render() {
-        <span class="hljs-keyword">return</span> (<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{this.onReset.bind(this)}</span>&gt;</span>
-                Seconds passed: {this.props.appState.timer}
-            <span class="hljs-tag">&lt;/<span class="hljs-title">button</span>&gt;</span>)</span>;
-    }
-
-    onReset () {
-        <span class="hljs-keyword">this</span>.props.appState.resetTimer();
-    }
-};
-
-ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">TimerView</span> <span class="hljs-attribute">appState</span>=<span class="hljs-value">{appState}</span> /&gt;</span>, document.body);
-</span></code></pre>
-<p>(For the implementation of <code>resetTimer</code> function see the next section)</p>
-<h2 id="3-modify-the-state"><a name="3-modify-the-state" class="plugin-anchor" href="#3-modify-the-state"><span class="fa fa-link"></span></a>3. Modify the State</h2>
-<p>The third thing to do is to modify the state.
-That is what your app is all about after all.
-Unlike many other frameworks, MobX doesn&apos;t dictate how you do this.
-There are best practices, but the key thing to remember is:
-<strong><em>MobX helps you do things in a simple straightforward way</em></strong>.</p>
-<p>The following code will alter your data every second, and the UI will update automatically when needed.
-No explicit relations are defined in either the controller functions that <em>change</em> the state or in the views that should <em>update</em>.
-Decorating your <em>state</em> and <em>views</em> with <code>observable</code> is enough for MobX to detect all relationships.
-Here are two examples of changing the state:</p>
-<pre><code class="lang-javascript">appState.resetTimer = action(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">reset</span>(<span class="hljs-params"></span>) </span>{
-    appState.timer = <span class="hljs-number">0</span>;
-});
-
-setInterval(action(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">tick</span>(<span class="hljs-params"></span>) </span>{
-    appState.timer += <span class="hljs-number">1</span>;
-}), <span class="hljs-number">1000</span>);
-</code></pre>
-<p>The <code>action</code> wrapper is only needed when using MobX in strict mode (by default off).
-It is recommended to use action though as it will help you to better structure applications and expresses the intention of a function to modify state.
-Also it automatically applies transactions for optimal performance.</p>
-<p>Feel free to try this example on <a href="http://jsfiddle.net/mweststrate/wgbe4guu/" target="_blank">JSFiddle</a> or by cloning the <a href="https://github.com/mobxjs/mobx-react-boilerplate" target="_blank">MobX boilerplate project</a></p>
 </body></html>
                     
                     </section>
@@ -948,10 +914,10 @@ Also it automatically applies transactions for optimal performance.</p>
         </div>
 
         
-        <a href="../index.html" class="navigation navigation-prev " aria-label="Previous page: Introduction"><i class="fa fa-angle-left"></i></a>
+        <a href="../best/actions.html" class="navigation navigation-prev " aria-label="Previous page: async actions &amp; flows"><i class="fa fa-angle-left"></i></a>
         
         
-        <a href="../intro/concepts.html" class="navigation navigation-next " aria-label="Next page: Concepts &amp; Principles"><i class="fa fa-angle-right"></i></a>
+        <a href="../refguide/tojson.html" class="navigation navigation-next " aria-label="Next page: toJS"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>

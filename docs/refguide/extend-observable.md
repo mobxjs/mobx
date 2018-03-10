@@ -1,53 +1,14 @@
 # extendObservable
 
-Quite similar to `Object.assign`, `extendObservable` takes two or more arguments, a `target` object and one or more `properties` maps.
-It adds all key-value pairs from the properties to the `target` as observable properties and returns the `target` object.
+`extendObservable(target, properties, decorators?, options?)`
 
-```javascript
-var Person = function(firstName, lastName) {
-	// initialize observable properties on a new instance
-	extendObservable(this, {
-		firstName: firstName,
-		lastName: lastName
-	});
-}
+ExtendObservable can be used to add observable properties to the existing target objects.
+All key / value pairs in the properties map will result in new observable properties on the target initialized to the given value.
+Any getters in the properties map will be turned into computed properties.
 
-var matthew = new Person("Matthew", "Henry");
+The `decorators` param can be used to override the decorator that will be used for a specific property, similar to `decorate` and `observable.object`.
 
-// add a observable property to an already observable object
-extendObservable(matthew, {
-	age: 353
-});
-```
-
-N.b:  `observable.object(object)` is actually an alias for `extendObservable({}, object)`.
-
-Note that the property maps are not always copied literally onto the target, but they are considered property descriptor.
-Most values are copied as-is, but values wrapped in a modifier as treated specially. And so are properties that have a getter.
-
-## Modifiers
-
-[Modifiers](modifiers.md) can be used to define special behavior for certain properties.
-For example `observable.ref` creates an observable reference which doesn't automatically convert its values into observables, and `computed` introduces a derived property:
-
-```javascript
-var Person = function(firstName, lastName) {
-	// initialize observable properties on a new instance
-	extendObservable(this, {
-		firstName: observable.ref(firstName),
-		lastName: observable.ref(lastName),
-		fullName: computed(function() {
-			return this.firstName + " " + this.lastName
-		})
-	});
-}
-```
-
-An overview of all available modifiers can be found in the [modifiers](modifiers.md) section.
-
-## Computed properties
-
-Computed properties can also be written by using a *getter* function. Optionally accompanied with a setter:
+Use the `deep: false` option to make the new properties _shallow_. That is, prevent auto conversion of their _values_ to observables.
 
 ```javascript
 var Person = function(firstName, lastName) {
@@ -56,21 +17,24 @@ var Person = function(firstName, lastName) {
 		firstName: firstName,
 		lastName: lastName,
 		get fullName() {
-			return this.firstName + " " + this.lastName
+			return this.firstName + "  " + this.lastName
 		},
-		set fullName(newValue) {
-			var parts = newValue.split(" ")
-			this.firstName = parts[0]
-			this.lastName = parts[1]
+		setFirstName(firstName) {
+			this.firstName = firstName
 		}
+	}, {
+		setFirstName: action
 	});
 }
+
+var matthew = new Person("Matthew", "Henry");
+
+// add an observable property to an already observable object
+extendObservable(matthew, {
+	age: 353
+});
 ```
 
-_Note: getter / setter is valid ES5 syntax and doesn't require a transpiler!_
+Note:  `observable.object(object)` is actually an alias for `extendObservable({}, object)`.
 
-## `extendShallowObservable`
-
-`extendShallowObservable` is like `extendObservable`, except that by default the properties will *not* automatically convert their values into observables.
-So it is similar to calling `extendObservable` with `observable.ref` modifier for each property.
-Note that `observable.deep` can be used to get the automatic conversion back for a specific property.
+Note: `decorate` could be used to introduce observable properties to an object, similar to `extendObservable`. The difference is that `extendObservable` is designed to introduce properties directly on the target instance, where `decorate` introduces them on prototypes; you can either pass it a constructor function (class) directly, or an object that will act as prototype for others.

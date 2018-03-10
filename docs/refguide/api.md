@@ -8,7 +8,7 @@
 
 # Core API
 
-_These are the most important MobX API's._ 
+_These are the most important MobX API's._
 
 > Understanding `observable`, `computed`, `reaction` and `action` is enough
  to master MobX and use it in your applications!
@@ -24,7 +24,7 @@ Usage:
 Observable values can be JS primitives, references, plain objects, class instances, arrays and maps.
 
 **Note:** `observable(value)` is a convenience API that will succeed only if it can be made into
- an observable data structure (_Array_, _Map_, or _observable-object_). For all other values, no conversion will be performed. 
+ an observable data structure (_Array_, _Map_, or _observable-object_). For all other values, no conversion will be performed.
 
 You can also directly create the desired observable type, see below.
 
@@ -58,7 +58,7 @@ sugar for `extendObservable(this, { property: value })`.
 
 [&laquo;`details`&raquo;](observable-decorator.md)
 
-### `observable.box(value)` & `observable.box(value, options?)`
+### `observable.box(value, options?)`
 Creates an observable _box_ that stores an observable reference to a value. Use `get()` to get the current value of the box, and `set()` to update it.
 This is the foundation on which all other observables are built, but in practice you will use it rarely.
 
@@ -66,7 +66,7 @@ Normal boxes will automatically try to turn any new value into an observable if 
 
 [&laquo;`details`&raquo;](boxed.md)
 
-### `observable.object(value)` & `observable.object(value, decorators, options?)`
+### `observable.object(value, decorators?, options?)`
 
 Creates a clone of the provided object and makes all its properties observable.
 By default any values in those properties will be made observable as well, but when using the `{deep: false}` options, only the properties will be made into observable
@@ -76,15 +76,15 @@ The second argument in `observable.object()` can be used to fine tune the observ
 
 [&laquo;`details`&raquo;](object.md)the
 
-### `observable.array(value)` & `observable.array(value, options?)`
+### `observable.array(value, options?)`
 
-Creates a new observable array based on the provided value. 
+Creates a new observable array based on the provided value.
 
 Use the `{deep: false}` option if the values in the array should not be turned into observables.
 
 [&laquo;`details`&raquo;](array.md)
 
-### `observable.map(value)` & `observable.map(value, options?)`
+### `observable.map(value, options?)`
 
 Creates a new observable map based on the provided value. Use the `{deep: false}` option if the values in the map should not be turned into observables.
 
@@ -93,8 +93,9 @@ Since this uses the full-blown _ES6 Map_ internally, you are free to use any typ
 
 [&laquo;`details`&raquo;](map.md)
 
-### `extendObservable` & `extendObservable(target, props, decorators?, options?)`
-Usage: `extendObservable(target, ...propertyMaps)`. 
+### `extendObservable`
+
+Usage: `extendObservable(target, properties, decorators?, options?)`.
 
 For each key/value pair in each `propertyMap` a (new) observable property will be introduced on the target object.
 This can be used in constructor functions to introduce observable properties without using decorators.
@@ -116,6 +117,7 @@ The following decorators are available:
 * **`observable.shallow`**: Can only be used in combination with collections. Turns any assigned collection into an collection, which is shallowly observable (instead of deep). In other words; the values inside the collection won't become observables automatically.
 * **`computed`**: Creates a derived property, see [`computed`](computed-decorator.md)
 * **`action`**: Creates an action, see [`action`](action.md)
+* **`action.bound`**: Creates a bound action, see [`action`](action.md)
 
 You can apply these decorators using the _@decorator_ syntax:
 
@@ -147,7 +149,7 @@ const taskStore = observable({
 
 ### `decorate`
 Usage: `decorate(object, decorators)`
-This is a convenience method to apply observability [decorators](#decorators) to the properties of a plain object or class instance. The second argument is an object with properties set to certain decorators. 
+This is a convenience method to apply observability [decorators](#decorators) to the properties of a plain object or class instance. The second argument is an object with properties set to certain decorators.
 
 Use this if you cannot use the _@decorator_ syntax or need more control over setting observability.
 
@@ -221,7 +223,7 @@ For one-time-actions `runInAction(name?, fn)` can be used, which is sugar for `a
 Usage: `flow(function* (args) { })` or `@flow *classMethod`.
 `flow()` takes a generator function as its only input
 
-When dealing with _async actions_, the code that executes in the callback is not wrapped by `action`. This means the observable state that you are mutating, will fail the [`enforceActions`](#configure) check. An easy way to retain the action semantics is by wrapping the async function with flow. This will ensure to wrap all your callbacks in `action()`. 
+When dealing with _async actions_, the code that executes in the callback is not wrapped by `action`. This means the observable state that you are mutating, will fail the [`enforceActions`](#configure) check. An easy way to retain the action semantics is by wrapping the async function with flow. This will ensure to wrap all your callbacks in `action()`.
 
 Note that the async function must be a _generator_ and you must only _yield_ to promises inside. `flow` gives you back a promise that you can `cancel()` if you want.
 
@@ -243,7 +245,7 @@ class Store {
         try {
             const projects = yield fetchGithubProjectsSomehow(); // yield instead of await
             const filteredProjects = somePreprocessing(projects);
-            
+
             // the asynchronous blocks will automatically be wrapped actions
             this.state = "done";
             this.githubProjects = filteredProjects;
@@ -279,7 +281,7 @@ Usage:
 ### `autorun`
 Usage: `autorun(() => { sideEffect }, options)`. Autorun runs the provided `sideEffect` and tracks which observable state is accessed while running the side effect.
 Whenever one of the used observables is changed in the future, the same sideEffect will be run again.
-Returns a disposer function to cancel the side effect. 
+Returns a disposer function to cancel the side effect.
 
 [&laquo;details&raquo;](autorun.md)
 
@@ -289,7 +291,7 @@ Returns a disposer function to cancel the side effect.
 - **`onError?: (error) => void`**: error handler that will be triggered if the autorun function throws an exception
 - **`scheduler?: (callback) => void`**: Set a custom scheduler to determine how re-running the autorun function should be scheduled
 
- 
+
 ### `when`
 Usage: `when(() => condition, () => { sideEffect }, options)`.
 The condition expression will react automatically to any observables it uses.
@@ -297,9 +299,9 @@ As soon as the expression returns true the sideEffect function will be invoked, 
 
 **Note:** the _effect-function_ (second argument) is actually optional. If no effect-function is provided, it will return a cancelable promise (i.e. having a `cancel()` method on the promise)
 
-`when` returns a disposer to prematurely cancel the whole thing. 
+`when` returns a disposer to prematurely cancel the whole thing.
 
-[&laquo;details&raquo;](when.md). 
+[&laquo;details&raquo;](when.md).
 
 **options**
 - **`name?: string`**: A name for easier identification and debugging
@@ -311,7 +313,7 @@ Usage: `reaction(() => data, data => { sideEffect }, options)`.
 A variation on `autorun` that gives more fine-grained control on which observables that will be tracked.
 It takes two function, the first one is tracked and returns data that is used as input for the second one, the side effect.
 Unlike `autorun` the side effect won't be run initially, and any observables that are accessed while executing the side effect will not be tracked.
-The side effect can be debounced, just like `autorunAsync`. 
+The side effect can be debounced, just like `autorunAsync`.
 
 [&laquo;details&raquo;](reaction.md)
 
@@ -348,18 +350,18 @@ Higher order component and counterpart of `Provider`. Can be used to pick stores
 * `@observer(["store1", "store2"]) MyComponent` is a shorthand for the the `@inject() @observer` combo.
 
 ### `toJS`
-Usage: `toJS(observableDataStructure, options?)`. Converts observable data structures back to plain javascript objects, ignoring computed values. 
+Usage: `toJS(observableDataStructure, options?)`. Converts observable data structures back to plain javascript objects, ignoring computed values.
 
 The `options` include:
- 
+
 - **`detectCycles: boolean`**: Checks for cyclical references in the observable data-structure. Defaults to `true`.
 - **`exportMapsAsObjects: boolean`**: Treats ES6 Maps as regular objects for export. Defaults to `true`
 
-[&laquo;details&raquo;](tojson.md). 
+[&laquo;details&raquo;](tojson.md).
 
 ### `isObservable` and `isObservableProp`
 Usage: `isObservable(thing)` or `isObservableProp(thing, property?)`. Returns true if the given thing, or the `property` of the given thing is observable.
-Works for all observables, computed values and disposer functions of reactions. 
+Works for all observables, computed values and disposer functions of reactions.
 
 [&laquo;details&raquo;](is-observable)
 
@@ -390,12 +392,43 @@ Low-level api that can be used to observe a single observable value.
 [&laquo;details&raquo;](observe.md)
 
 ### `onBecomeObserved` and `onBecomeUnobserved`
-Usage: `onBecomeObserved(observable, listener: () => void): (() => void)` and
-`onBecomeUnobserved(observable, listener: () => void): (() => void)`
+Usage: `onBecomeObserved(observable, property?, listener: () => void): (() => void)` and
+`onBecomeUnobserved(observable, property?, listener: () => void): (() => void)`
 
-These functions are hooks into the observability system of MobX and get notified when observables _start_ / _stop_ becoming observed. It can be used to execute some lazy operations or perform network fetches. 
+These functions are hooks into the observability system of MobX and get notified when observables _start_ / _stop_ becoming observed. It can be used to execute some lazy operations or perform network fetches.
 
 The return value is a _diposer-function_ that will detach the _listener_.
+
+```javascript
+
+export class City {
+    @observable location
+    @observable temperature
+    interval
+
+    constructor(location) {
+        this.location = location
+        // only start data fetching if temperature is actually used!
+        onBecomeObserved(this, 'temperature', this.resume)
+        onBecomeUnobserved(this, 'temperature', this.suspend)
+    }
+
+    resume = () => {
+        log(`Resuming ${this.location}`)
+        this.interval = setInterval(() => this.fetchTemperature(), 5000)
+    }
+
+    suspend = () => {
+        log(`Suspending ${this.location}`)
+        this.temperature = undefined
+        clearInterval(this.interval)
+    }
+
+    @flow fetchTemperature = function*() {
+        // dat afetching logic
+    }
+}
+```
 
 ### `configure`
 Usage: `configure(options)`.
@@ -403,10 +436,11 @@ Usage: `configure(options)`.
 - **`enforceActions: boolean`**: Enables / disables strict mode *globally*.
 In strict mode, it is not allowed to change any state outside of an [`action`](action.md).
 See also `allowStateChanges`.
-- **`isolateGlobalState: boolean`**: Isolates the global state of MobX, when there are multiple instances of MobX in the same environment. This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX. The reactivty inside the library will remain self-contained when you call `configure({isolateGlobalState: true})` inside the library. Additionally, MobX won't throw an error that there are multiple instances in the global scope. 
+- **`isolateGlobalState: boolean`**: Isolates the global state of MobX, when there are multiple instances of MobX in the same environment. This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX. The reactivty inside the library will remain self-contained when you call `configure({isolateGlobalState: true})` inside the library. Additionally, MobX won't throw an error that there are multiple instances in the global scope.
 - **`disableErrorBoundaries: boolean`**: Use this to simplify debugging exceptions and prevent MobX from catching and rethrowing exceptions happening in your code.
+- **`computedRequiresReaction: boolean`**: Forbids the access of any unobserved computed value. Use this if you want to check whether you are using computed properties without a reactive context
 
-## Direct Observable manipulation 
+## Direct Observable manipulation
 There is now an utility API that enables manipulating observable maps, objects and arrays with the same API. These api's are fully reactive, which means that even new property declarations can be detected by mobx if `set` is used to add them, and `values` or `keys` to iterate them.
   * **`values(thing)`** returns all values in the collection as array
   * **`keys(thing)`** returns all keys in the collection as array
@@ -423,7 +457,7 @@ _The following api's might come in handy if you want to build cool tools on top 
 
 ### `"mobx-react-devtools"` package
 The mobx-react-devtools is a powerful package that helps you to investigate the performance and dependencies of your react components.
-Also has a powerful logger utility based on `spy`. 
+Also has a powerful logger utility based on `spy`.
 
 [&laquo;details&raquo;](../best/devtools.md)
 
@@ -475,32 +509,68 @@ The `mobx-react` package exposes the following additional api's that are used by
 _The following methods are all used internally by MobX, and might come in handy in rare cases. But usually MobX offers more declarative alternatives to tackle the same problem. They might come in handy though if you try to extend MobX_
 
 ### `transaction`
-Usage: `transaction(() => { block })`.
-Deprecated, use actions or `runInAction` instead.
-Low-level api that can be used to batch state changes.
-State changes made inside the block won't cause any computations or reactions to run until the end of the block is reached.
-Nonetheless inspecting a computed value inside a transaction block will still return a consistent value.
-It is recommended to use `action` instead, which uses `transaction` internally.
 
-[&laquo;details&raquo;](transaction.md)
+_Transaction is a low-level api, it is recommended to use actions instead_
+
+`transaction(worker: () => void)` can be used to batch a bunch of updates without notifying any observers until the end of the transaction.
+`transaction` takes a single, parameterless `worker` function as argument and runs it.
+No observers are notified until this function has completed.
+`transaction` returns any value that was returned by the `worker` function.
+Note that `transaction` runs completely synchronously.
+Transactions can be nested. Only after completing the outermost `transaction` pending reactions will be run.
+
+```javascript
+import {observable, transaction, autorun} from "mobx";
+
+const numbers = observable([]);
+
+autorun(() => console.log(numbers.length, "numbers!"));
+// Prints: '0 numbers!'
+
+transaction(() => {
+	transaction(() => {
+		numbers.push(1);
+		numbers.push(2);
+	});
+	numbers.push(3);
+});
+// Prints: '3 numbers!'
+```
+
 
 ### `untracked`
-Usage: `untracked(() => { block })`.
-Low-level api that might be useful inside reactions and computations.
-Any observables accessed in the `block` won't cause the reaction / computations to be recomputed automatically.
-However it is recommended to use `action` instead, which uses `untracked` internally.
 
-[&laquo;details&raquo;](untracked.md)
+Untracked allows you to run a piece of code without establishing observers.
+Like `transaction`, `untracked` is automatically applied by `(@)action`, so usually it makes more sense to use actions than to use `untracked` directly.
+Example:
+
+```javascript
+
+const person = observable({
+	firstName: "Michel",
+	lastName: "Weststrate"
+});
+
+autorun(() => {
+	console.log(
+		person.lastName,
+		",",
+		// this untracked block will return the person's firstName without establishing a dependency
+		untracked(() => person.firstName)
+	);
+});
+// prints: Weststrate, Michel
+
+person.firstName = "G.K.";
+// doesn't print!
+
+person.lastName = "Chesterton";
+// prints: Chesterton, G.K.
+```
 
 ### `createAtom`
 Utility function that can be used to create your own observable data structures and hook them up to MobX.
 Used internally by all observable data types.
-
-[&laquo;details&raquo;](extending.md)
-
-### `Reaction`
-Utility class that can be used to create your own reactions and hook them up to MobX.
-Used internally by `autorun`, `reaction` (function) etc.
 
 [&laquo;details&raquo;](extending.md)
 
