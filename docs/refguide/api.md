@@ -3,6 +3,7 @@
 **Applies to MobX 4 and higher**
 
 - Using Mobx 3? Use this [migration guide](https://github.com/mobxjs/mobx/wiki/Migrating-from-mobx-3-to-mobx-4) to switch gears.
+- [MobX 3 documentation](https://github.com/mobxjs/mobx/blob/54557dc319b04e92e31cb87427bef194ec1c549c/docs/refguide/api.md)
 - For MobX 2, the old documentation is still available on [github](https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md).
 
 # Core API
@@ -32,7 +33,13 @@ The following conversion rules are applied, but can be fine-tuned by using [*dec
 1. If *value* is an instance of an [ES6 Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map): a new [Observable Map](map.md) will be returned. Observable maps are very useful if you don't want to react just to the change of a specific entry, but also to the addition or removal of entries.
 1. If *value* is an array, a new [Observable Array](array.md) will be returned.
 1. If *value* is an object *without* prototype or its prototype is `Object.prototype`, the object will be cloned and all its current properties will be made observable. See [Observable Object](object.md)
-1. If *value* is an object *with* a prototype, a JavaScript primitive or function, there will be no change made to the value. If you do need a [Boxed Observable](boxed.md), call `observable.box(value)` explicitly. MobX will not make objects with a prototype automatically observable; as that is the responsibility of its constructor function. Use `extendObservable` in the constructor, or `@observable` in its class definition instead.
+1. If *value* is an object *with* a prototype, a JavaScript primitive or function, there will be no change made to the value. If you do need a [Boxed Observable](boxed.md), you can do one of the following:
+    - Call `observable.box(value)` explicitly
+    - Use `@observable` in the class definition
+    - Call [`decorate()`](#decorate)
+    - Use `extendObservable()` to introduce properties on a class definition
+
+MobX will not make objects with a prototype automatically observable; as that is the responsibility of its constructor function. Use `extendObservable` in the constructor, or `@observable` in its class definition instead.
 
 These rules might seem complicated at first sight, but you will notice that in practice they are very intuitive to work with.
 
@@ -51,25 +58,25 @@ sugar for `extendObservable(this, { property: value })`.
 
 [&laquo;`details`&raquo;](observable-decorator.md)
 
-### `observable.box(value)` & `observable.box(value, {deep: false})`
+### `observable.box(value)` & `observable.box(value, options?)`
 Creates an observable _box_ that stores an observable reference to a value. Use `get()` to get the current value of the box, and `set()` to update it.
 This is the foundation on which all other observables are built, but in practice you will use it rarely.
 
-Normal boxes will automatically try to turn any new value into an observable if it isn't already. Use `{deep: false}` option to disable this behavior.
+Normal boxes will automatically try to turn any new value into an observable if it isn't already. Use the `{deep: false}` option to disable this behavior.
 
 [&laquo;`details`&raquo;](boxed.md)
 
-### `observable.object(value)` & `observable.object(value, decorators, {deep: false})`
+### `observable.object(value)` & `observable.object(value, decorators, options?)`
 
 Creates a clone of the provided object and makes all its properties observable.
-By default any values in those properties will be made observable as well, but when using `{deep: false}` only the properties will be made into observable
+By default any values in those properties will be made observable as well, but when using the `{deep: false}` options, only the properties will be made into observable
 references, leaving the values untouched. (This holds also for any values assigned in the future).
 
 The second argument in `observable.object()` can be used to fine tune the observability with [`decorators`](#decorators).
 
 [&laquo;`details`&raquo;](object.md)the
 
-### `observable.array(value)` & `observable.array(value, {deep: false})`
+### `observable.array(value)` & `observable.array(value, options?)`
 
 Creates a new observable array based on the provided value. 
 
@@ -77,9 +84,9 @@ Use the `{deep: false}` option if the values in the array should not be turned i
 
 [&laquo;`details`&raquo;](array.md)
 
-### `observable.map(value)` & `observable.map(value, {deep: false})`
+### `observable.map(value)` & `observable.map(value, options?)`
 
-Creates a new observable map based on the provided value. Use `{deep: false}` if the values in the map should not be turned into observables.
+Creates a new observable map based on the provided value. Use the `{deep: false}` option if the values in the map should not be turned into observables.
 
 Use `map` whenever you want to create a dynamically keyed collections and the addition / removal of keys needs to be observed.
 Since this uses the full-blown _ES6 Map_ internally, you are free to use any type for the key and _not limited_ to string keys.
@@ -121,7 +128,7 @@ class TaskStore {
 }
 ```
 
-Or by passing in property decorators via `observable.object` / `observable.extendObservable`.
+Or by passing in property decorators via `observable.object` / `observable.extendObservable` or [`decorate()`](#decorate).
 Note that decorators always 'stick' to the property. So they will remain in effect even if a new value is assigned.
 
 ```javascript
@@ -138,6 +145,32 @@ const taskStore = observable({
 
 [&laquo;details&raquo;](modifiers.md)
 
+### `decorate`
+Usage: `decorate(object, decorators)`
+This is a convenience method to apply observability [decorators](#decorators) to the properties of a plain object or class instance. The second argument is an object with properties set to certain decorators. 
+
+Use this if you cannot use the _@decorator_ syntax or need more control over setting observability.
+
+```js
+class TodoList {
+    todos = {}
+    get unfinishedTodoCount() {
+        return values(this.todos).filter(todo => !todo.finished).length
+    }
+    addTodo() {
+        const t = new Todo()
+        t.title = 'Test_' + Math.random()
+        set(this.todos, t.id, t)
+    }
+}
+
+decorate(TodoList, {
+    todos: observable,
+    unfinishedTodoCount: computed,
+    addTodo: action.bound
+})
+```
+
 
 ## Computed values
 
@@ -147,7 +180,7 @@ Usage:
 * `computed(() => expression, options)`
 * `@computed get classProperty() { return expression; }`
 * `@computed({equals: compareFn}) get classProperty() { return expression; }`
-
+* `@computed.struct get classProperty() { return expression; }`
 
 Creates a computed property. The `expression` should not have side effects but return a value.
 The expression will automatically be re-evaluated if any observables it uses changes, but only if it is in use by some *reaction*.
@@ -178,8 +211,8 @@ Usage:
 * `action(name, fn)`
 * `@action classMethod`
 * `@action(name) classMethod`
-* `@action.bound boundClassMethod = (args) => { body }`
-* `@action.bound(name) boundClassMethod = (args) => { body }`
+* `@action boundClassMethod = (args) => { body }`
+* `@action.bound boundClassMethod(args) { body }`
 
 For one-time-actions `runInAction(name?, fn)` can be used, which is sugar for `action(name, fn)()`.
 
@@ -194,6 +227,7 @@ The most commonly used reaction is the `observer` decorator for React components
 Can be used as higher order component around a React component.
 The component will then automatically re-render if any of the observables used in the `render` function of the component has changed.
 Note that `observer` is provided by the `"mobx-react"` package and not by `"mobx"` itself.
+
 [&laquo;details&raquo;](observer-component.md)
 
 Usage:
@@ -206,32 +240,47 @@ Usage:
 ### `autorun`
 Usage: `autorun(() => { sideEffect }, options)`. Autorun runs the provided `sideEffect` and tracks which observable state is accessed while running the side effect.
 Whenever one of the used observables is changed in the future, the same sideEffect will be run again.
-Returns a disposer function to cancel the side effect. [&laquo;details&raquo;](autorun.md)
+Returns a disposer function to cancel the side effect. 
+
+[&laquo;details&raquo;](autorun.md)
 
 **options**
-- **`debugname?: string`**: A name for easier identification and debugging
+- **`name?: string`**: A name for easier identification and debugging
 - **`delay?: number`**: the sideEffect will be delayed and debounced with the given `delay`. Defaults to `0`.
+- **`onError?: (error) => void`**: error handler that will be triggered if the autorun function throws an exception
+- **`scheduler?: (callback) => void`**: Set a custom scheduler to determine how re-running the autorun function should be scheduled
 
+ 
 ### `when`
 Usage: `when(() => condition, () => { sideEffect }, options)`.
 The condition expression will react automatically to any observables it uses.
 As soon as the expression returns true the sideEffect function will be invoked, but only once.
-`when` returns a disposer to prematurely cancel the whole thing. [&laquo;details&raquo;](when.md)
+
+**Note:** the _effect-function_ (second argument) is actually optional. If no effect-function is provided, it will return a cancelable promise (i.e. having a `cancel()` method on the promise)
+
+`when` returns a disposer to prematurely cancel the whole thing. 
+
+[&laquo;details&raquo;](when.md). 
 
 **options**
-- **`debugname?: string`**: A name for easier identification and debugging
+- **`name?: string`**: A name for easier identification and debugging
+- **`onError?: (error) => void`**: error handler that will be triggered if the _predicate-function_ or the _effect-function_ throws an exception
+- **`timeout: number`** a timeout in milliseconds, after which the `onError` handler will be triggered to signal the condition not being met within a certain time
 
 ### `reaction`
 Usage: `reaction(() => data, data => { sideEffect }, options)`.
 A variation on `autorun` that gives more fine-grained control on which observables that will be tracked.
 It takes two function, the first one is tracked and returns data that is used as input for the second one, the side effect.
 Unlike `autorun` the side effect won't be run initially, and any observables that are accessed while executing the side effect will not be tracked.
-The side effect can be debounced, just like `autorunAsync`. [&laquo;details&raquo;](reaction.md)
+The side effect can be debounced, just like `autorunAsync`. 
 
-options
+[&laquo;details&raquo;](reaction.md)
+
 **options**
 - **`fireImmediately?: boolean`**: Wait for a change before firing the _effect function_. Defaults to `false`.
 - **`delay?: number`**: the sideEffect will be delayed and debounced with the given `delay`. Defaults to `0`.
+- **`equals`**. Custom equality function to determine whether the expr function differed from it's previous result, and hence should fire effect. Accepts the same options as the equals option of `computed`.
+- Also accepts all of the options from [`autorun`](#autorun)
 
 ### `onReactionError`
 
@@ -260,11 +309,20 @@ Higher order component and counterpart of `Provider`. Can be used to pick stores
 * `@observer(["store1", "store2"]) MyComponent` is a shorthand for the the `@inject() @observer` combo.
 
 ### `toJS`
-Usage: `toJS(observableDataStructure)`. Converts observable data structures back to plain javascript objects, ignoring computed values. [&laquo;details&raquo;](tojson.md)
+Usage: `toJS(observableDataStructure, options?)`. Converts observable data structures back to plain javascript objects, ignoring computed values. 
 
-### `isObservableProp`
-Usage: `isObservableProp(thing, property?)`. Returns true if the given thing, or the `property` of the given thing is observable.
-Works for all observables, computed values and disposer functions of reactions. [&laquo;details&raquo;](is-observable)
+The `options` include:
+ 
+- **`detectCycles: boolean`**: Checks for cyclical references in the observable data-structure. Defaults to `true`.
+- **`exportMapsAsObjects: boolean`**: Treats ES6 Maps as regular objects for export. Defaults to `true`
+
+[&laquo;details&raquo;](tojson.md). 
+
+### `isObservable` and `isObservableProp`
+Usage: `isObservable(thing)` or `isObservableProp(thing, property?)`. Returns true if the given thing, or the `property` of the given thing is observable.
+Works for all observables, computed values and disposer functions of reactions. 
+
+[&laquo;details&raquo;](is-observable)
 
 ### `isObservableObject|Array|Map` and `isBoxedObservable`
 Usage: `isObservableObject(thing)`, `isObservableArray(thing)`, `isObservableMap(thing)`, `isBoxedObservable(thing)`. Returns `true` if.., well, do the math.
@@ -277,44 +335,20 @@ Note that observable arrays can be `.slice()`d to turn them into true JS-arrays.
 ### `isAction`
 Usage: `isAction(func)`. Returns true if the given function is wrapped / decorated with `action`.
 
-### `isComputedProp`
-Usage: `isComputedProp(thing, property?)`. Returns true if the given thing is a boxed computed value, or if the designated property is a computed value.
+### `isComputed` and `isComputedProp`
+Usage: `isComputed(thing)` or `isComputedProp(thing, property?)`. Returns true if the given thing is a boxed computed value, or if the designated property is a computed value.
 
 ### `intercept`
 Usage: `intercept(object, property?, interceptor)`.
 Api that can be used to intercept changes before they are applied to an observable api. Useful for validation, normalization or cancellation.
+
 [&laquo;details&raquo;](observe.md)
 
 ### `observe`
 Usage: `observe(object, property?, listener, fireImmediately = false)`
 Low-level api that can be used to observe a single observable value.
+
 [&laquo;details&raquo;](observe.md)
-
-### `decorate`
-Usage: `decorate(object, decorators)`
-This is a convenience method to apply observability [decorators](#decorators) to the properties of a plain object or class instance. The second argument is an object with properties set to certain decorators. 
-
-Use this if you cannot use the _@decorator_ syntax or need more control over setting observability.
-
-```js
-class TodoList {
-    todos = {}
-    get unfinishedTodoCount() {
-        return values(this.todos).filter(todo => !todo.finished).length
-    }
-    addTodo() {
-        const t = new Todo()
-        t.title = 'Test_' + Math.random()
-        set(this.todos, t.id, t)
-    }
-}
-
-decorate(TodoList, {
-    todos: observable,
-    unfinishedTodoCount: computed,
-    addTodo: action.bound
-})
-```
 
 ### `onBecomeObserved` and `onBecomeUnobserved`
 Usage: `onBecomeObserved(observable, listener: () => void): (() => void)` and
@@ -350,7 +384,9 @@ _The following api's might come in handy if you want to build cool tools on top 
 
 ### `"mobx-react-devtools"` package
 The mobx-react-devtools is a powerful package that helps you to investigate the performance and dependencies of your react components.
-Also has a powerful logger utility based on `spy`. [&laquo;details&raquo;](../best/devtools.md)
+Also has a powerful logger utility based on `spy`. 
+
+[&laquo;details&raquo;](../best/devtools.md)
 
 ### `trace`
 Usage:
@@ -370,6 +406,7 @@ Usage: `spy(listener)`.
 Registers a global spy listener that listens to all events that happen in MobX.
 It is similar to attaching an `observe` listener to *all* observables at once, but also notifies about running (trans/re)actions and computations.
 Used for example by the `mobx-react-devtools`.
+
 [&laquo;details&raquo;](spy.md)
 
 ### `getAtom`
@@ -405,6 +442,7 @@ Low-level api that can be used to batch state changes.
 State changes made inside the block won't cause any computations or reactions to run until the end of the block is reached.
 Nonetheless inspecting a computed value inside a transaction block will still return a consistent value.
 It is recommended to use `action` instead, which uses `transaction` internally.
+
 [&laquo;details&raquo;](transaction.md)
 
 ### `untracked`
@@ -412,15 +450,18 @@ Usage: `untracked(() => { block })`.
 Low-level api that might be useful inside reactions and computations.
 Any observables accessed in the `block` won't cause the reaction / computations to be recomputed automatically.
 However it is recommended to use `action` instead, which uses `untracked` internally.
+
 [&laquo;details&raquo;](untracked.md)
 
 ### `createAtom`
 Utility function that can be used to create your own observable data structures and hook them up to MobX.
 Used internally by all observable data types.
+
 [&laquo;details&raquo;](extending.md)
 
 ### `Reaction`
 Utility class that can be used to create your own reactions and hook them up to MobX.
 Used internally by `autorun`, `reaction` (function) etc.
+
 [&laquo;details&raquo;](extending.md)
 
