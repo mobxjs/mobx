@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="4" data-basepath=".." data-revision="Mon Feb 05 2018 19:21:11 GMT+0100 (CET)">
+    <div class="book" data-level="4" data-basepath=".." data-revision="Sat Mar 10 2018 10:48:07 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -990,7 +990,7 @@ message.author = { name: <span class="hljs-string">&quot;John&quot;</span> };
 </code></pre>
 <p>The first change will be picked up, <code>message.author</code> and <code>author</code> are the same object, and the <code>.name</code> property is dereferenced in the autorun.
 However the second change will <strong>not</strong> be picked up, the <code>message.author</code> relation is not tracked by the <code>autorun</code>. Autorun is still using the &quot;old&quot; <code>author</code>.</p>
-<h4 id="common-pitfal-console-log"><a name="common-pitfal-console-log" class="plugin-anchor" href="#common-pitfal-console-log"><span class="fa fa-link"></span></a>Common pitfal: console.log</h4>
+<h4 id="common-pitfall-console-log"><a name="common-pitfall-console-log" class="plugin-anchor" href="#common-pitfall-console-log"><span class="fa fa-link"></span></a>Common pitfall: console.log</h4>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> message = observable({ title: <span class="hljs-string">&quot;hello&quot;</span> })
 
 autorun(() =&gt; {
@@ -1002,7 +1002,7 @@ message.title = <span class="hljs-string">&quot;Hello world&quot;</span>
 </code></pre>
 <p>In the above example, the updated message title won&apos;t be printed, because it is not used inside the autorun.
 The autorun only depends on <code>message</code>, which is not an observable, but a constant. In other words, as far as MobX is concerned, <code>title</code> is not used in- and hence not relevant for the <code>autorun</code></p>
-<p>The fact that <code>console.log</code> will print the message title is misleading here; <code>console.log</code> is an asynchronous api that only will format it&apos;s parameters later in time, for which reason the autorun won&apos;t be tracking what data the console.log is accessing. For that reason make sure to always pass immutable data or defensive copies to <code>console.log</code>.</p>
+<p>The fact that <code>console.log</code> will print the message title is misleading here; <code>console.log</code> is an asynchronous api that only will format its parameters later in time, for which reason the autorun won&apos;t be tracking what data the console.log is accessing. For that reason make sure to always pass immutable data or defensive copies to <code>console.log</code>.</p>
 <p>The following solutions however, will all react to <code>message.title</code>:</p>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(message.title) <span class="hljs-comment">// clearly, the `.title` observable is used</span>
@@ -1229,11 +1229,11 @@ const Likes = observer(({ likes }) =&gt;
 <p>Notes:</p>
 <ol>
 <li>* If the <code>Author</code> component was invoked like: <code>&lt;Author author={ message.author.name} /&gt;</code>. Then <code>Message</code> would be the dereferencing component and react to changes to <code>message.author.name</code>. Nonetheless <code>&lt;Author&gt;</code> would rerender as well, because it receives a new value. So performance wise it is best to dereference as late as possible.</li>
-<li>** If likes where objects instead of strings, and if they were rendered by their own <code>Like</code> component, the <code>Likes</code> component would not rerender for changes happening inside a specific like.</li>
+<li>** If likes were objects instead of strings, and if they were rendered by their own <code>Like</code> component, the <code>Likes</code> component would not rerender for changes happening inside a specific like.</li>
 </ol>
 <h2 id="tl-dr"><a name="tl-dr" class="plugin-anchor" href="#tl-dr"><span class="fa fa-link"></span></a>TL;DR</h2>
 <blockquote>
-<p>MobX reacts to any an <em>existing</em> <strong>observable</strong> <em>property</em> that is read during the execution of a tracked function.</p>
+<p>MobX reacts to any <em>existing</em> <strong>observable</strong> <em>property</em> that is read during the execution of a tracked function.</p>
 </blockquote>
 </body></html>
                     

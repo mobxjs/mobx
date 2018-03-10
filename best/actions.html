@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="7.3" data-basepath=".." data-revision="Mon Feb 05 2018 19:21:11 GMT+0100 (CET)">
+    <div class="book" data-level="7.3" data-basepath=".." data-revision="Sat Mar 10 2018 10:48:07 GMT+0100 (CET)">
     
 
 <div class="book-summary">
@@ -929,7 +929,7 @@ Let&apos;s start with a basic example:</p>
     }
 }
 </code></pre>
-<p>The above example would throw exceptions, as the callbacks passed to the <code>fethGithubProjectsSomehow</code> promise are not part of the <code>fetchProjects</code> action, as actions only apply to the current stack.</p>
+<p>The above example would throw exceptions, as the callbacks passed to the <code>fetchGithubProjectsSomehow</code> promise are not part of the <code>fetchProjects</code> action, as actions only apply to the current stack.</p>
 <p>A first simple fix is to extract the callbacks to actions. (Note that binding is important here to get a correct <code>this</code>!):</p>
 <pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
     @observable githubProjects = []
