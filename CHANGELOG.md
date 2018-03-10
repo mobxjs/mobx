@@ -1,4 +1,8 @@
 
+# 3.6.2
+
+* Fixed [#1248](https://github.com/mobxjs/mobx/issues/1248): removeAll support for observable arrays. By [benbraou](https://github.com/benbraou) through [#1384](https://github.com/mobxjs/mobx/pull/1384)
+
 # 3.6.1
 
 * Fixed [#1358](https://github.com/mobxjs/mobx/pull/1359): Deep comparison failing on IE11. By [le0nik](https://github.com/le0nik) through [#1359](https://github.com/mobxjs/mobx/pull/1359)

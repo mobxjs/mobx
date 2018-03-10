@@ -192,6 +192,12 @@ export function toPrimitive(value) {
     return value === null ? null : typeof value === "object" ? "" + value : value
 }
 
+export function negate(predicate: (...args: any[]) => boolean) {
+    return function(...args) {
+        return !predicate.apply(this, args)
+    }
+}
+
 import { globalState } from "../core/globalstate"
 import { IObservableArray, isObservableArray } from "../types/observablearray"
 import { isObservableMap, ObservableMap, IKeyValueMap } from "../types/observablemap"

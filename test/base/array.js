@@ -97,6 +97,38 @@ test("test1", function() {
     expect(Object.keys(a)).toEqual([])
 })
 
+test("removeAll", function() {
+    let a = observable([])
+    const isEven = n => n % 2 === 0
+
+    // checking that removeAll works well with empty array
+    a.removeAll(isEven)
+    expect(a.slice()).toEqual([])
+
+    // checking that removeAll works well with non empty array
+    a = observable([1, 2, 3, 4, 5, 6, 7])
+    a.removeAll(isEven)
+    expect(a.slice()).toEqual([1, 3, 5, 7])
+
+    // checking that removeAll does nothing when predicate finds no match
+    a = observable([1, 2, 3, 4, 5, 6, 7])
+    a.removeAll(n => n > 8)
+    expect(a.slice()).toEqual([1, 2, 3, 4, 5, 6, 7])
+
+    // checking that removeAll handles predicates returning falsy/truthy values
+    a = observable([1, 2, 3, 4, 5, 6, 7])
+    a.removeAll(n => (n > 4 ? 1 : 0))
+    expect(a.slice()).toEqual([1, 2, 3, 4])
+
+    // checking that removeAll handles large arrays
+    const b = Array(1000 * 1000).fill().map((_, i) => (i === 42 ? -1 : 0))
+    b.length = 1000 * 1000
+    a = observable(b)
+    expect(a.length).toEqual(1000 * 1000)
+    a.removeAll(n => n >= 0)
+    expect(a.length).toEqual(1)
+})
+
 test("array should support iterall / iterable ", () => {
     var a = observable([1, 2, 3])
 

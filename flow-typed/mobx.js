@@ -58,7 +58,7 @@ export interface IMap<K, V> {
     size: number
 }
 
-declare export function isObservableMap (x: any): boolean
+declare export function isObservableMap(x: any): boolean
 
 declare type ISimpleEventListener = {
     (): void
@@ -147,6 +147,7 @@ export interface IObservableArray<T> extends Array<T> {
     clear(): T[],
     peek(): T[],
     replace(newItems: T[]): T[],
+    removeAll(predicate: (item: T, index: number, array: Array<T>) => any, thisArg?: any): T[],
     find(
         predicate: (item: T, index: number, array: Array<T>) => boolean,
         thisArg?: any,
@@ -247,13 +248,13 @@ export interface IObservableValue<T> {
 }
 
 export interface IEnhancer<T> {
-    (newValue: T, oldValue: T | void, name: string): T,
+    (newValue: T, oldValue: T | void, name: string): T
 }
 
 export interface IModifierDescriptor<T> {
     isMobxModifierDescriptor: boolean,
     initialValue: T | void,
-    enhancer: IEnhancer<T>,
+    enhancer: IEnhancer<T>
 }
 
 export interface IObservableFactory {
@@ -273,7 +274,7 @@ export interface IObservableFactory {
     <T>(value: IModifierDescriptor<T>): T,
     <T: Object>(value: T): T,
     <T>(value: T): IObservableValue<T>,
-    <T>(): IObservableValue<T>,
+    <T>(): IObservableValue<T>
 }
 
 declare export class IObservableFactories {
@@ -282,10 +283,7 @@ declare export class IObservableFactories {
     array<T>(initialValues?: T[], name?: string): IObservableArray<T>,
     shallowArray<T>(initialValues?: T[], name?: string): IObservableArray<T>,
     map<T>(initialValues?: IObservableMapInitialValues<T>, name?: string): ObservableMap<T>,
-    shallowMap<T>(
-        initialValues?: IObservableMapInitialValues<T>,
-        name?: string
-    ): ObservableMap<T>,
+    shallowMap<T>(initialValues?: IObservableMapInitialValues<T>, name?: string): ObservableMap<T>,
     object<T>(props: T, name?: string): T & IObservableObject,
     shallowObject<T>(props: T, name?: string): T & IObservableObject,
     ref(target: Object, property?: string, descriptor?: PropertyDescriptor): any,
@@ -323,10 +321,7 @@ declare export class ObservableMap<V> {
     keys(): string[] & Iterator<string>,
     values(): V[] & Iterator<V>,
     entries(): IMapEntries<V> & Iterator<IMapEntry<V>>,
-    forEach(
-        callback: (value: V, key: string, object: KeyValueMap<V>) => void,
-        thisArg?: any
-    ): void,
+    forEach(callback: (value: V, key: string, object: KeyValueMap<V>) => void, thisArg?: any): void,
     merge(other: ObservableMap<V> | KeyValueMap<V>): ObservableMap<V>,
     clear(): void,
     replace(other: ObservableMap<V> | KeyValueMap<V>): ObservableMap<V>,
@@ -383,14 +378,17 @@ declare export function createTransformer<A, B>(
 declare export function expr<T>(expr: () => T, scope?: any): T
 declare export function extendObservable<A, B>(target: A, ...properties: B[]): A & B
 
-declare export function intercept(object: Object, property: string, handler: IInterceptor<any>): Lambda
+declare export function intercept(
+    object: Object,
+    property: string,
+    handler: IInterceptor<any>
+): Lambda
 
 declare export function isComputed(value: any, property?: string): boolean
 
 declare export function isObservable(value: any, property?: string): boolean
 
-declare export var observable:
-    IObservableFactory &
+declare export var observable: IObservableFactory &
     IObservableFactories & {
         deep: {
             struct<T>(initialValue?: T): T
@@ -398,7 +396,7 @@ declare export var observable:
         ref: {
             struct<T>(initialValue?: T): T
         }
-}
+    }
 
 declare export function observe<T>(
     value: IObservableValue<T> | IComputedValue<T>,
@@ -433,7 +431,11 @@ declare export function observe(
     fireImmediately?: boolean
 ): Lambda
 
-declare export function toJS(source: any, detectCycles?: boolean, ___alreadySeen?: [any, any][]): any
+declare export function toJS(
+    source: any,
+    detectCycles?: boolean,
+    ___alreadySeen?: [any, any][]
+): any
 declare export function toJSlegacy(
     source: any,
     detectCycles?: boolean,
