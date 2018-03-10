@@ -178,8 +178,8 @@ Usage:
 * `action(name, fn)`
 * `@action classMethod`
 * `@action(name) classMethod`
-* `@action boundClassMethod = (args) => { body }`
-* `@action(name) boundClassMethod = (args) => { body }`
+* `@action.bound boundClassMethod = (args) => { body }`
+* `@action.bound(name) boundClassMethod = (args) => { body }`
 
 For one-time-actions `runInAction(name?, fn)` can be used, which is sugar for `action(name, fn)()`.
 
@@ -333,7 +333,14 @@ See also `allowStateChanges`.
 - **`isolateGlobalState: boolean`**: Isolates the global state of MobX, when there are multiple instances of MobX in the same environment. This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX. The reactivty inside the library will remain self-contained when you call `configure({isolateGlobalState: true})` inside the library. Additionally, MobX won't throw an error that there are multiple instances in the global scope. 
 - **`disableErrorBoundaries: boolean`**: Use this to simplify debugging exceptions and prevent MobX from catching and rethrowing exceptions happening in your code.
 
-
+## Direct Observable manipulation 
+There is now an utility API that enables manipulating observable maps, objects and arrays with the same API. These api's are fully reactive, which means that even new property declarations can be detected by mobx if `set` is used to add them, and `values` or `keys` to iterate them.
+  * **`values(thing)`** returns all values in the collection as array
+  * **`keys(thing)`** returns all keys in the collection as array
+  * **`set(thing, key, value)`** or **`set(thing, { key: value })`** Updates the given collection with the provided key / value pair(s).
+  * **`remove(thing, key)`** removes the specified child from the collection. For arrays splicing is used.
+  * **`has(thing, key)`** returns true if the collection has the specified _observable_ property.
+  * **`get(thing, key)`** returns the chlid under the specified key.
 
 
 
