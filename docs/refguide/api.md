@@ -216,6 +216,45 @@ Usage:
 
 For one-time-actions `runInAction(name?, fn)` can be used, which is sugar for `action(name, fn)()`.
 
+### Flow
+
+Usage: `flow(function* (args) { })` or `@flow *classMethod`.
+`flow()` takes a generator function as its only input
+
+When dealing with _async actions_, the code that executes in the callback is not wrapped by `action`. This means the observable state that you are mutating, will fail the [`enforceActions`](#configure) check. An easy way to retain the action semantics is by wrapping the async function with flow. This will ensure to wrap all your callbacks in `action()`. 
+
+Note that the async function must be a _generator_ and you must only _yield_ to promises inside. `flow` gives you back a promise that you can `cancel()` if you want.
+
+```js
+import { configure } from 'mobx';
+
+// don't allow state modifications outside actions
+configure({enforceActions: true});
+
+class Store {
+    @observable githubProjects = [];
+    @observable state = "pending"; // "pending" / "done" / "error"
+
+
+    @flow
+    *fetchProjects() { // <- note the star, this a generator function!
+        this.githubProjects = [];
+        this.state = "pending";
+        try {
+            const projects = yield fetchGithubProjectsSomehow(); // yield instead of await
+            const filteredProjects = somePreprocessing(projects);
+            
+            // the asynchronous blocks will automatically be wrapped actions
+            this.state = "done";
+            this.githubProjects = filteredProjects;
+        } catch (error) {
+            this.state = "error";
+        }
+    }
+}
+
+```
+
 ## Reactions & Derivations
 
 *Computed values* are **values** that react automatically to state changes.
