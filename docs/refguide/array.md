@@ -45,6 +45,7 @@ Besides all built-in functions, the following goodies are available as well on o
 * `observe(listener, fireImmediately? = false)` Listen to changes in this array. The callback will receive arguments that express an array splice or array change, conforming to [ES7 proposal](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe). It returns a disposer function to stop the listener.
 * `clear()` Remove all current entries from the array.
 * `replace(newItems)` Replaces all existing entries in the array with new ones.
+* `removeAll(predicate: (item, index, array) => any, thisArg?)` Removes all items for which the predicate returns a truthy value.
 * `find(predicate: (item, index, array) => boolean, thisArg?, fromIndex?)` Basically the same as the ES7 `Array.find` proposal, except for the additional `fromIndex` parameter.
 * `findIndex(predicate: (item, index, array) => boolean, thisArg?, fromIndex?)` Basically the same as the ES7 `Array.findIndex` proposal, except for the additional `fromIndex` parameter.
 * `remove(value)` Remove a single item by value from the array. Returns `true` if the item was found and removed.
