@@ -1,5 +1,4 @@
 docs/_book
-docs/node_modules
 refguide/*.md
 .DS_Store
 *.iml
@@ -7,4 +6,4 @@ refguide/*.md
 *.iws
 /.idea
 .vscode
-gitbook/plugins
+node_modules
