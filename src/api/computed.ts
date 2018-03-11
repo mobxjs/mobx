@@ -1,6 +1,6 @@
 import { comparer } from "../utils/comparer"
 import { IComputedValueOptions } from "../core/computedvalue"
-import { defineComputedProperty } from "../types/observableobject"
+import { asObservableObject } from "../types/observableobject"
 import { invariant } from "../utils/utils"
 import { ComputedValue, IComputedValue } from "../core/computedvalue"
 import { createPropDecorator } from "../utils/decorators2"
@@ -26,7 +26,11 @@ export const computedDecorator = createPropDecorator(
         // Optimization: faster on decorator target or instance? Assuming target
         // Optimiziation: find out if declaring on instance isn't just faster. (also makes the property descriptor simpler). But, more memory usage..
         const options = decoratorArgs[0] || {}
-        defineComputedProperty(instance, decoratorTarget, propertyName, { ...options, get, set })
+        asObservableObject(instance).addComputedProp(decoratorTarget, propertyName, {
+            ...options,
+            get,
+            set
+        })
     }
 )
 

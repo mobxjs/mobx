@@ -24,6 +24,7 @@ import { IEnhancer, referenceEnhancer, deepEnhancer } from "./modifiers"
 import { IObservableArray, createObservableArray } from "./observablearray"
 import { initializeInstance } from "../utils/decorators2"
 import { startBatch, endBatch } from "../core/observable"
+import { IIsObservableObject } from "./observableobject"
 
 export interface IObservableObject {
     "observable-object": IObservableObject
@@ -65,19 +66,26 @@ export type IObjectWillChange =
 
 export class ObservableObjectAdministration
     implements IInterceptable<IObjectWillChange>, IListenable {
-    values: { [key: string]: ObservableValue<any> | ComputedValue<any> } = {}
-    keys: undefined | IObservableArray<string>
+    keys: IObservableArray<string>
     changeListeners
     interceptors
 
-    constructor(public target: any, public name: string, public defaultEnhancer: IEnhancer<any>) {}
+    constructor(
+        public values: { [key: string]: ObservableValue<any> | ComputedValue<any> },
+        public target,
+        public name: string,
+        public defaultEnhancer: IEnhancer<any>
+    ) {
+        this.keys = <any>createObservableArray([], referenceEnhancer, `keys(${this.name})`, true)
+    }
 
     read(owner: any, key: string) {
         if (this.target !== owner) {
             this.illegalAccess(owner, key)
             return
         }
-        return this.values[key].get()
+        const observable = this.values[key]
+        return observable ? observable.get() : undefined
     }
 
     write(owner: any, key: string, newValue) {
@@ -87,6 +95,7 @@ export class ObservableObjectAdministration
             return
         }
         const observable = this.values[key]
+        if (!observable) return this.addProp(key, newValue)
         if (observable instanceof ComputedValue) {
             observable.set(newValue)
             return
@@ -127,10 +136,8 @@ export class ObservableObjectAdministration
         }
     }
 
-    addObservableProp(propName: string, newValue, enhancer: IEnhancer<any> = this.defaultEnhancer) {
-        const { target } = this
-        assertPropertyConfigurable(target, propName)
-
+    addProp(propName: string, newValue: any) {
+        const { target, values } = this
         if (hasInterceptors(this)) {
             const change = interceptChange<IObjectWillChange>(this, {
                 object: target,
@@ -141,30 +148,16 @@ export class ObservableObjectAdministration
             if (!change) return
             newValue = (change as any).newValue
         }
-        const observable = (this.values[propName] = new ObservableValue(
+        const observable = (values[propName] = new ObservableValue(
             newValue,
-            enhancer,
+            this.defaultEnhancer,
             `${this.name}.${propName}`,
             false
         ))
         newValue = (observable as any).value // observableValue might have changed it
 
-        Object.defineProperty(target, propName, generateObservablePropConfig(propName))
-        if (this.keys) this.keys.push(propName)
-        this.notifyPropertyAddition(propName, newValue)
-    }
-
-    addComputedProp(
-        propertyOwner: any, // where is the property declared?
-        propName: string,
-        options: IComputedValueOptions<any>
-    ) {
-        const { target } = this
-        options.name = options.name || `${this.name}.${propName}`
-        options.context = target
-        this.values[propName] = new ComputedValue(options)
-        if (propertyOwner === target || isPropertyConfigurable(propertyOwner, propName))
-            Object.defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
+        this.keys.push(propName)
+        notifyPropertyAddition(this, target, propName, newValue)
     }
 
     remove(key: string) {
@@ -246,60 +239,57 @@ export class ObservableObjectAdministration
         return registerInterceptor(this, handler)
     }
 
-    notifyPropertyAddition(key: string, newValue) {
-        const notify = hasListeners(this)
-        const notifySpy = isSpyEnabled()
-        const change =
-            notify || notifySpy
-                ? {
-                      type: "add",
-                      object: this.target,
-                      name: key,
-                      newValue
-                  }
-                : null
-
-        if (notifySpy) spyReportStart({ ...change, name: this.name, key })
-        if (notify) notifyListeners(this, change)
-        if (notifySpy) spyReportEnd()
-    }
-
     getKeys(): string[] {
-        if (this.keys === undefined) {
-            this.keys = <any>createObservableArray(
-                Object.keys(this.values).filter(key => this.values[key] instanceof ObservableValue),
-                referenceEnhancer,
-                `keys(${this.name})`,
-                true
-            )
-        }
         return this.keys!.slice() // TODO, optimize, don't slice here!
     }
 }
 
-export interface IIsObservableObject {
-    $mobx: ObservableObjectAdministration
+const objectProxyTraps: ProxyHandler<any> = {
+    get(target: IIsObservableObject, name: string) {
+        const adm = target.$mobx
+        if (name === "$mobx") return adm
+        return adm.read(this, name)
+    },
+    set(target: IIsObservableObject, name: string, value: any) {
+        const adm = target.$mobx
+        if (name === "$mobx") return fail(`Cannot reassign $mobx`)
+        adm.write(this, name, value)
+        return true
+    },
+    deleteProperty(target: IIsObservableObject, name: string) {
+        const adm = target.$mobx
+        if (name === "$mobx") return fail(`Cannot reassign $mobx`)
+        adm.remove(name)
+        return true
+    }
 }
 
-export function asObservableObject(
-    target: any,
-    name: string = "",
+export function createDynamicObservableObject(
+    source,
+    name,
     defaultEnhancer: IEnhancer<any> = deepEnhancer
-): ObservableObjectAdministration {
-    if (Object.prototype.hasOwnProperty.call(target, "$mobx")) return target.$mobx
-
-    process.env.NODE_ENV !== "production" &&
-        invariant(
-            Object.isExtensible(target),
-            "Cannot make the designated object observable; it is not extensible"
-        )
-    if (!isPlainObject(target))
-        name = (target.constructor.name || "ObservableObject") + "@" + getNextId()
-    if (!name) name = "ObservableObject@" + getNextId()
-
+) {
+    // TODO: check not observable already
+    const target = {}
+    const proxy = new Proxy(target, objectProxyTraps)
     const adm = new ObservableObjectAdministration(target, name, defaultEnhancer)
     addHiddenFinalProp(target, "$mobx", adm)
-    return adm
+    // TODO, copy props, including getters
+    return proxy
+}
+
+export function defineComputedProperty(
+    valueOwner: any, // which objects holds the observable and provides `this` context?
+    propertyOwner: any, // where is the property declared?
+    propName: string,
+    options: IComputedValueOptions<any>
+) {
+    const adm = asObservableObject(valueOwner)
+    options.name = options.name || `${adm.name}.${propName}`
+    options.context = valueOwner
+    adm.values[propName] = new ComputedValue(options)
+    if (propertyOwner === valueOwner || isPropertyConfigurable(propertyOwner, propName))
+        Object.defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
 }
 
 const observablePropertyConfigs = {}
@@ -346,6 +336,29 @@ export function generateComputedPropConfig(propName) {
             }
         })
     )
+}
+
+function notifyPropertyAddition(
+    adm: ObservableObjectAdministration,
+    object,
+    key: string,
+    newValue
+) {
+    const notify = hasListeners(adm)
+    const notifySpy = isSpyEnabled()
+    const change =
+        notify || notifySpy
+            ? {
+                  type: "add",
+                  object,
+                  name: key,
+                  newValue
+              }
+            : null
+
+    if (notifySpy) spyReportStart({ ...change, name: adm.name, key })
+    if (notify) notifyListeners(adm, change)
+    if (notifySpy) spyReportEnd()
 }
 
 const isObservableObjectAdministration = createInstanceofPredicate(

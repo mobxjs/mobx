@@ -148,6 +148,7 @@ const observableFactories: IObservableFactories = {
         const o = asCreateObservableOptions(options)
         return new ObservableValue(value, getEnhancerFromOptions(o), o.name)
     },
+    // TODO: kill these shallow and other deprecated stuff
     shallowBox<T>(value?: T, name?: string): IObservableValue<T> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowBox")
         deprecated(`observable.shallowBox`, `observable.box(value, { deep: false })`)
@@ -179,6 +180,7 @@ const observableFactories: IObservableFactories = {
         deprecated(`observable.shallowMap`, `observable.map(values, { deep: false })`)
         return observable.map(initialValues, { name, deep: false })
     },
+    // TODO: record?
     object<T>(
         props: T,
         decorators?: { [K in keyof T]: Function },

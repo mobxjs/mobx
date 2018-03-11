@@ -2,7 +2,7 @@ import { isObservableMap, ObservableMap } from "../types/observablemap"
 import {
     isObservableObject,
     IIsObservableObject,
-    defineObservableProperty,
+    asObservableObject,
     ObservableObjectAdministration
 } from "../types/observableobject"
 import { isObservableArray, IObservableArray } from "../types/observablearray"
@@ -67,7 +67,7 @@ export function set(obj: any, key: any, value?: any): void {
         if (existingObservable) {
             existingObservable.set(value)
         } else {
-            defineObservableProperty(obj, key, value, adm.defaultEnhancer)
+            adm.addObservableProp(key, value, adm.defaultEnhancer)
         }
     } else if (isObservableMap(obj)) {
         obj.set(key, value)

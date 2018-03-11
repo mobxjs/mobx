@@ -1,4 +1,4 @@
-import { defineObservableProperty } from "../types/observableobject"
+import { asObservableObject } from "../types/observableobject"
 import { fail } from "../utils/utils"
 import { IEnhancer } from "../types/modifiers"
 import { createPropDecorator, BabelDescriptor } from "../utils/decorators2"
@@ -21,7 +21,7 @@ export function createDecoratorForEnhancer(enhancer: IEnhancer<any>): IObservabl
             const initialValue = descriptor
                 ? descriptor.initializer ? descriptor.initializer.call(target) : descriptor.value
                 : undefined
-            defineObservableProperty(target, propertyName, initialValue, enhancer)
+            asObservableObject(target).addObservableProp(propertyName, initialValue, enhancer)
         }
     )
     const res: any =
