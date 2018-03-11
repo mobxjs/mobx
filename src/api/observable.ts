@@ -11,7 +11,11 @@ import { IObservableValue, ObservableValue } from "../types/observablevalue"
 import { IObservableArray, createObservableArray } from "../types/observablearray"
 import { createDecoratorForEnhancer, IObservableDecorator } from "./observabledecorator"
 import { isObservable } from "./isobservable"
-import { IObservableObject } from "../types/observableobject"
+import {
+    IObservableObject,
+    asObservableObject,
+    createDynamicObservableObject
+} from "../types/observableobject"
 import { extendObservable } from "./extendobservable"
 import { IObservableMapInitialValues, ObservableMap } from "../types/observablemap"
 
@@ -189,8 +193,12 @@ const observableFactories: IObservableFactories = {
         // TODO: should create dynamic observable object
         // TODO: should forbid deleting decorated members (so that behavior remains sticky)
         if (typeof arguments[1] === "string") incorrectlyUsedAsDecorator("object")
-        const o = asCreateObservableOptions(options)
-        return extendObservable({}, props, decorators, o) as any
+        options = asCreateObservableOptions(options)
+        // TODO: duplicated with extendObservable, create function
+        const defaultDecorator =
+            options.defaultDecorator || (options.deep === false ? refDecorator : deepDecorator)
+        const res = createDynamicObservableObject(options.name, defaultDecorator.enhancer)
+        return extendObservable(res, props, decorators, options) as any
     },
     shallowObject<T>(props: T, name?: string): T & IObservableObject {
         if (typeof arguments[1] === "string") incorrectlyUsedAsDecorator("shallowObject")

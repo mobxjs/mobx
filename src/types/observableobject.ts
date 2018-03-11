@@ -65,24 +65,42 @@ export type IObjectWillChange =
 
 export class ObservableObjectAdministration
     implements IInterceptable<IObjectWillChange>, IListenable {
-    values: { [key: string]: ObservableValue<any> | ComputedValue<any> } = {}
     keys: undefined | IObservableArray<string>
     changeListeners
     interceptors
 
-    constructor(public target: any, public name: string, public defaultEnhancer: IEnhancer<any>) {}
+    constructor(
+        public target: any,
+        public values: { [key: string]: ObservableValue<any> | ComputedValue<any> },
+        public name: string,
+        public defaultEnhancer: IEnhancer<any>,
+        public isProxied: boolean
+    ) {}
 
     read(owner: any, key: string) {
-        if (this.target !== owner) {
+        if (!this.isProxied && this.target !== owner) {
+            // TODO: remove isProxied check?
             this.illegalAccess(owner, key)
             return
         }
-        return this.values[key].get()
+        const observable = this.values[key]
+        if (observable) {
+            // todo, remove this check
+            if (typeof observable.get !== "function") fail("not an observable " + key)
+            return observable.get()
+        } else {
+            // might be added in the future
+            if (this.isProxied) {
+                this.getKeys().length // notitify observabed
+                return undefined
+            } else fail(`Not an observable property ${key}`)
+        }
     }
 
     write(owner: any, key: string, newValue) {
         const instance = this.target
-        if (instance !== owner) {
+        if (!this.isProxied && instance !== owner) {
+            // TODO: remove isProxied check?
             this.illegalAccess(owner, key)
             return
         }
@@ -149,7 +167,8 @@ export class ObservableObjectAdministration
         ))
         newValue = (observable as any).value // observableValue might have changed it
 
-        Object.defineProperty(target, propName, generateObservablePropConfig(propName))
+        if (!this.isProxied)
+            Object.defineProperty(target, propName, generateObservablePropConfig(propName))
         if (this.keys) this.keys.push(propName)
         this.notifyPropertyAddition(propName, newValue)
     }
@@ -163,7 +182,10 @@ export class ObservableObjectAdministration
         options.name = options.name || `${this.name}.${propName}`
         options.context = target
         this.values[propName] = new ComputedValue(options)
-        if (propertyOwner === target || isPropertyConfigurable(propertyOwner, propName))
+        if (
+            !this.isProxied &&
+            (propertyOwner === target || isPropertyConfigurable(propertyOwner, propName))
+        )
             Object.defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
     }
 
@@ -182,10 +204,11 @@ export class ObservableObjectAdministration
             startBatch()
             const notify = hasListeners(this)
             const notifySpy = isSpyEnabled()
-            const oldValue = this.values[key].get()
+            const oldValue = this.values[key].get() // TODO: might not exist on dynamic objects
+            this.values[key].set(undefined)
             if (this.keys) this.keys.remove(key)
             delete this.values[key]
-            delete this.target[key]
+            if (!this.isProxied) delete this.target[key]
             const change =
                 notify || notifySpy
                     ? {
@@ -295,9 +318,9 @@ export function asObservableObject(
         )
     if (!isPlainObject(target))
         name = (target.constructor.name || "ObservableObject") + "@" + getNextId()
-    if (!name) name = "ObservableObject@" + getNextId()
+    if (!name) name = "ObservableObject@" + getNextId() // TODO: change name to record
 
-    const adm = new ObservableObjectAdministration(target, name, defaultEnhancer)
+    const adm = new ObservableObjectAdministration(target, {}, name, defaultEnhancer, false)
     addHiddenFinalProp(target, "$mobx", adm)
     return adm
 }
@@ -360,4 +383,50 @@ export function isObservableObject(thing: any): thing is IObservableObject {
         return isObservableObjectAdministration((thing as any).$mobx)
     }
     return false
+}
+
+const objectProxyTraps: ProxyHandler<any> = {
+    get(target: IIsObservableObject, name: string) {
+        const adm = target.$mobx
+        if (name === "$mobx") return adm
+        // TODO: use symbol for  "__mobxDidRunLazyInitializers" and "$mobx", and remove these checks
+        if (
+            typeof name === "string" &&
+            name !== "constructor" &&
+            name !== "__mobxDidRunLazyInitializers"
+        )
+            return adm.read(target, name)
+        return target[name]
+    },
+    set(target: IIsObservableObject, name: string, value: any) {
+        const adm = target.$mobx
+        if (typeof name === "string" && name !== "constructor" && name !== "$mobx") {
+            adm.write(target, name, value)
+            return true
+        }
+        return fail(`Cannot reassign ${name}`)
+    },
+    deleteProperty(target: IIsObservableObject, name: string) {
+        const adm = target.$mobx
+        if (name === "$mobx") return fail(`Cannot reassign $mobx`)
+        adm.remove(name)
+        return true
+    }
+}
+
+export function createDynamicObservableObject(
+    name,
+    defaultEnhancer: IEnhancer<any> = deepEnhancer
+) {
+    const values = {}
+    const proxy = new Proxy(values, objectProxyTraps)
+    const adm = new ObservableObjectAdministration(
+        proxy,
+        values,
+        name || "ObservableObject@" + getNextId(),
+        defaultEnhancer,
+        true
+    )
+    addHiddenFinalProp(values, "$mobx", adm)
+    return proxy
 }
