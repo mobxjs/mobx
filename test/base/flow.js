@@ -280,3 +280,40 @@ test("flows can be cancelled - 5 - return before cancel", done => {
     )
     promise.cancel() // no-op
 })
+
+test("flows can be cancelled - 5 - flows cancel recursively", done => {
+    let flow1cancelled = false
+    let flow2cancelled = false
+    let stepsReached = 0
+
+    const flow1 = flow(function*() {
+        try {
+            yield Promise.resolve()
+            stepsReached++
+        } finally {
+            flow1cancelled = true
+        }
+    })
+
+    const flow2 = flow(function*() {
+        try {
+            yield flow1()
+            stepsReached++
+        } finally {
+            flow2cancelled = true
+        }
+    })
+
+    const p = flow2()
+    p.then(
+        () => fail(),
+        err => {
+            expect("" + err).toBe("Error: FLOW_CANCELLED")
+            expect(stepsReached).toBe(0)
+            expect(flow2cancelled).toBeTruthy()
+            expect(flow1cancelled).toBeTruthy()
+            done()
+        }
+    )
+    p.cancel()
+})

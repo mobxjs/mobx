@@ -118,12 +118,14 @@ export function createFlowGenerator(name: string, generator: Function) {
         const runId = ++generatorId
         const gen = action(`${name} - runid: ${runId} - init`, generator).apply(ctx, args)
         let rejector: (error: any) => void
+        let pendingPromise: CancellablePromise<any> | undefined = undefined
 
         const res = new Promise(function(resolve, reject) {
             let stepId = 0
             rejector = reject
 
             function onFulfilled(res: any) {
+                pendingPromise = undefined
                 let ret
                 try {
                     ret = action(`${name} - runid: ${runId} - yield ${stepId++}`, gen.next).call(
@@ -138,6 +140,7 @@ export function createFlowGenerator(name: string, generator: Function) {
             }
 
             function onRejected(err: any) {
+                pendingPromise = undefined
                 let ret
                 try {
                     ret = action(`${name} - runid: ${runId} - yield ${stepId++}`, gen.throw).call(
@@ -155,7 +158,8 @@ export function createFlowGenerator(name: string, generator: Function) {
                 // TODO: support more type of values? See https://github.com/tj/co/blob/249bbdc72da24ae44076afd716349d2089b31c4c/index.js#L100
                 if (!ret.value || typeof ret.value.then !== "function")
                     return fail("Only promises can be yielded to asyncAction, got: " + ret)
-                return ret.value.then(onFulfilled, onRejected)
+                pendingPromise = ret.value
+                return pendingPromise!.then(onFulfilled, onRejected)
             }
 
             onFulfilled(undefined) // kick off the process
@@ -163,6 +167,8 @@ export function createFlowGenerator(name: string, generator: Function) {
 
         res.cancel = action(`${name} - runid: ${runId} - cancel`, function() {
             try {
+                if (pendingPromise && typeof pendingPromise.cancel === "function")
+                    pendingPromise.cancel()
                 gen.return()
                 rejector(new Error("FLOW_CANCELLED"))
             } catch (e) {
