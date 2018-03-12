@@ -1,35 +1,42 @@
-import {
-    asObservableObject,
-    defineObservableProperty,
-    setPropertyValue
-} from "../types/observableobject"
-import { invariant, assertPropertyConfigurable } from "../utils/utils"
-import { createClassPropertyDecorator } from "../utils/decorators"
+import { defineObservableProperty } from "../types/observableobject"
+import { fail } from "../utils/utils"
 import { IEnhancer } from "../types/modifiers"
-import { getMessage } from "../utils/messages"
+import { createPropDecorator, BabelDescriptor } from "../utils/decorators2"
 
-export function createDecoratorForEnhancer(enhancer: IEnhancer<any>) {
-    invariant(!!enhancer, ":(")
-    return createClassPropertyDecorator(
-        (target, name, baseValue, _, baseDescriptor) => {
-            assertPropertyConfigurable(target, name)
-            invariant(!baseDescriptor || !baseDescriptor.get, getMessage("m022"))
+export type IObservableDecorator = {
+    (target: Object, property: string, descriptor?: PropertyDescriptor): void
+    enhancer: IEnhancer<any>
+}
 
-            const adm = asObservableObject(target, undefined)
-            defineObservableProperty(adm, name, baseValue, enhancer)
-        },
-        function(name) {
-            const observable = this.$mobx.values[name]
-            if (
-                observable === undefined // See #505
-            )
-                return undefined
-            return observable.get()
-        },
-        function(name, value) {
-            setPropertyValue(this, name, value)
-        },
+export function createDecoratorForEnhancer(enhancer: IEnhancer<any>): IObservableDecorator {
+    const decorator = createPropDecorator(
         true,
-        false
+        (
+            target: any,
+            propertyName: string,
+            descriptor: BabelDescriptor,
+            _decoratorTarget,
+            decoratorArgs: any[]
+        ) => {
+            const initialValue = descriptor
+                ? descriptor.initializer ? descriptor.initializer.call(target) : descriptor.value
+                : undefined
+            defineObservableProperty(target, propertyName, initialValue, enhancer)
+        }
     )
+    const res: any =
+        // Extra process checks, as this happens during module initialization
+        typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production"
+            ? function observableDecorator() {
+                  // This wrapper function is just to detect illegal decorator invocations, deprecate in a next version
+                  // and simply return the created prop decorator
+                  if (arguments.length < 2)
+                      return fail(
+                          "Incorrect decorator invocation. @observable decorator doesn't expect any arguments"
+                      )
+                  return decorator.apply(null, arguments)
+              }
+            : decorator
+    res.enhancer = enhancer
+    return res
 }

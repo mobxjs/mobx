@@ -31,7 +31,7 @@ MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source and many [in
 
 * <i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx">Egghead.io course</a></i>
 * [Ten minute, interactive MobX + React tutorial](https://mobxjs.github.io/mobx/getting-started.html)
-* [Official MobX 3 documentation and API overview](https://mobxjs.github.io/mobx/refguide/api.html) ([MobX 2](https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md))
+* [Official MobX 4 documentation and API overview](https://mobxjs.github.io/mobx/refguide/api.html) ([MobX 3](https://github.com/mobxjs/mobx/blob/54557dc319b04e92e31cb87427bef194ec1c549c/docs/refguide/api.md), [MobX 2](https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md))
 * Videos:
   * [ReactNext 2016: Real World MobX](https://www.youtube.com/watch?v=Aws40KOx90U) - 40m [slides](https://docs.google.com/presentation/d/1DrI6Hc2xIPTLBkfNH8YczOcPXQTOaCIcDESdyVfG_bE/edit?usp=sharing)
   * [Practical React with MobX](https://www.youtube.com/watch?v=XGwuM_u7UeQ). In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth (ES5 only) - 42m.
@@ -69,6 +69,8 @@ MobX adds observable capabilities to existing data structures like objects, arra
 This can simply be done by annotating your class properties with the [@observable](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) decorator (ES.Next).
 
 ```javascript
+import { observable } from "mobx"
+
 class Todo {
     id = Math.random();
     @observable title = "";
@@ -78,25 +80,24 @@ class Todo {
 
 Using `observable` is like turning a property of an object into a spreadsheet cell.
 But unlike spreadsheets, these values can be not only primitive values, but also references, objects and arrays.
-You can even [define your own](http://mobxjs.github.io/mobx/refguide/extending.html) observable data sources.
 
-### Intermezzo: Using MobX in ES5, ES6 and ES.next environments
-
-If these `@` thingies look alien to you, these are ES.next decorators.
-Using them is entirely optional in MobX. See the [documentation](http://mobxjs.github.io/mobx/best/decorators.html) for details how to either use or avoid them.
-MobX runs on any ES5 environment, but leveraging ES.next features like decorators are the cherry on the pie when using MobX.
-The remainder of this readme uses decorators, but remember, _they are optional_.
-
-For example, in good ol' ES5 the above snippet would look like:
+If your environment doesn't support decorator syntax, don't worry.
+You can read [here](http://mobxjs.github.io/mobx/best/decorators.html) about how to set them up.
+Or you can skip them altoghether, as MobX can be used fine without decorator _syntax_, by leveraging the _decorate_ utility.
+Many MobX users do prefer the decorator syntax though, as it is slightly more concise.
 
 ```javascript
-function Todo() {
-    this.id = Math.random()
-    extendObservable(this, {
-        title: "",
-        finished: false
-    })
+import { decorate, observable } from "mobx"
+
+class Todo {
+    id = Math.random();
+    title = "";
+    finished = false;
 }
+decorate(Todo, {
+    title: observable,
+    finished: observable
+})
 ```
 
 ### Computed values
@@ -104,7 +105,7 @@ function Todo() {
 <i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/javascript-derive-computed-values-and-manage-side-effects-with-mobx-reactions">Egghead.io lesson 3: computed values</a></i>
 
 With MobX you can define values that will be derived automatically when relevant data is modified.
-By using the [`@computed`](http://mobxjs.github.io/mobx/refguide/computed-decorator.html) decorator or by using getter / setter functions when using `(extend)Observable`.
+By using the [`@computed`](http://mobxjs.github.io/mobx/refguide/computed-decorator.html) decorator or by using getter / setter functions when using `(extend)Observable` (Of course, you can use `decorate` here again as alternative to the `@` syntax).
 
 ```javascript
 class TodoList {
@@ -214,6 +215,7 @@ store.todos[0].finished = true;
 ```
 
 Nonetheless, MobX has an optional built-in concept of [`actions`](https://mobxjs.github.io/mobx/refguide/action.html).
+Read this section as well if you want to now more about writing asynchronous actions. It's easy!
 Use them to your advantage; they will help you to structure your code better and make wise decisions about when and where state should be modified.
 
 ## MobX: Simple and scalable
@@ -303,13 +305,6 @@ To use the [flow typings](flow-typed/mobx.js) shipped with MobX:
 * In `.flowconfig`, you **cannot** ignore `node_modules`.
 * In `.flowconfig`, you **cannot** import it explicitly in the `[libs]` section.
 * You **do not** need to install library definition using [flow-typed](https://github.com/flowtype/flow-typed).
-
-## Bower support
-
-Bower support is available through the infamous unpkg.com:
-`bower install https://unpkg.com/mobx/bower.zip`
-
-Then use `lib/mobx.umd.js` or `lib/mobx.umd.min.js`
 
 ## Donating
 

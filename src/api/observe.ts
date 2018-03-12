@@ -1,6 +1,6 @@
 import { IObservableArray, IArrayChange, IArraySplice } from "../types/observablearray"
-import { ObservableMap, IMapChange } from "../types/observablemap"
-import { IObjectChange } from "../types/observableobject"
+import { ObservableMap, IMapDidChange } from "../types/observablemap"
+import { IObjectDidChange } from "../types/observableobject"
 import { IComputedValue } from "../core/computedvalue"
 
 import { IObservableValue, IValueDidChange } from "../types/observablevalue"
@@ -17,26 +17,26 @@ export function observe<T>(
     listener: (change: IArrayChange<T> | IArraySplice<T>) => void,
     fireImmediately?: boolean
 ): Lambda
-export function observe<T>(
-    observableMap: ObservableMap<T>,
-    listener: (change: IMapChange<T>) => void,
+export function observe<K, V>(
+    observableMap: ObservableMap<K, V>,
+    listener: (change: IMapDidChange<K, V>) => void,
     fireImmediately?: boolean
 ): Lambda
-export function observe<T>(
-    observableMap: ObservableMap<T>,
-    property: string,
-    listener: (change: IValueDidChange<T>) => void,
-    fireImmediately?: boolean
-): Lambda
-export function observe(
-    object: Object,
-    listener: (change: IObjectChange) => void,
+export function observe<K, V>(
+    observableMap: ObservableMap<K, V>,
+    property: K,
+    listener: (change: IValueDidChange<V>) => void,
     fireImmediately?: boolean
 ): Lambda
 export function observe(
     object: Object,
-    property: string,
-    listener: (change: IValueDidChange<any>) => void,
+    listener: (change: IObjectDidChange) => void,
+    fireImmediately?: boolean
+): Lambda
+export function observe<T, K extends keyof T>(
+    object: T,
+    property: K,
+    listener: (change: IValueDidChange<T[K]>) => void,
     fireImmediately?: boolean
 ): Lambda
 export function observe(thing, propOrCb?, cbOrFire?, fireImmediately?): Lambda {

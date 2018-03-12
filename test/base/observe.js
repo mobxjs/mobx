@@ -1,12 +1,12 @@
 var m = require("../../src/mobx.ts")
 
 test("observe object and map properties", function() {
-    var map = m.map({ a: 1 })
+    var map = m.observable.map({ a: 1 })
     var events = []
 
     expect(function() {
         m.observe(map, "b", function() {})
-    }).toThrow()
+    }).toThrow(/the entry 'b' does not exist in the observable map/)
 
     var d1 = m.observe(map, "a", function(e) {
         events.push([e.newValue, e.oldValue])
@@ -23,7 +23,7 @@ test("observe object and map properties", function() {
 
     expect(function() {
         m.observe(o, "b", function() {})
-    }).toThrow()
+    }).toThrow(/no observable property 'b' found on the observable object/)
     var d2 = m.observe(o, "a", function(e) {
         events.push([e.newValue, e.oldValue])
     })
@@ -39,8 +39,8 @@ test("observe object and map properties", function() {
 test("observe computed values", function() {
     var events = []
 
-    var v = m.observable(0)
-    var f = m.observable(0)
+    var v = m.observable.box(0)
+    var f = m.observable.box(0)
     var c = m.computed(function() {
         return v.get()
     })

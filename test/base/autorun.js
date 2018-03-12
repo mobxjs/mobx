@@ -1,7 +1,7 @@
 var m = require("../../src/mobx.ts")
 
 test("autorun passes Reaction as an argument to view function", function() {
-    var a = m.observable(1)
+    var a = m.observable.box(1)
     var values = []
 
     m.autorun(r => {
@@ -20,7 +20,7 @@ test("autorun passes Reaction as an argument to view function", function() {
 })
 
 test("autorun can be disposed on first run", function() {
-    var a = m.observable(1)
+    var a = m.observable.box(1)
     var values = []
 
     m.autorun(r => {
@@ -36,7 +36,7 @@ test("autorun can be disposed on first run", function() {
 test("autorun warns when passed an action", function() {
     var action = m.action(() => {})
     expect.assertions(1)
-    expect(() => m.autorun(action)).toThrowError(/attempted to pass an action to autorun/)
+    expect(() => m.autorun(action)).toThrowError(/Autorun does not accept actions/)
 })
 
 test("autorun batches automatically", function() {
@@ -80,8 +80,8 @@ test("autorun batches automatically", function() {
 })
 
 test("autorun tracks invalidation of unbound dependencies", function() {
-    var a = m.observable(0)
-    var b = m.observable(0)
+    var a = m.observable.box(0)
+    var b = m.observable.box(0)
     var c = m.computed(() => a.get() + b.get())
     var values = []
 

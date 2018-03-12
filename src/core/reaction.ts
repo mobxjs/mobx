@@ -9,16 +9,9 @@ import {
 } from "./derivation"
 import { IObservable, startBatch, endBatch } from "./observable"
 import { globalState } from "./globalstate"
-import {
-    createInstanceofPredicate,
-    getNextId,
-    invariant,
-    unique,
-    joinStrings
-} from "../utils/utils"
+import { createInstanceofPredicate, getNextId, Lambda } from "../utils/utils"
 import { isSpyEnabled, spyReport, spyReportStart, spyReportEnd } from "./spy"
-import { getMessage } from "../utils/messages"
-import { trace } from "../api/whyrun"
+import { trace } from "../api/trace"
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations
@@ -47,7 +40,6 @@ export interface IReactionPublic {
 export interface IReactionDisposer {
     (): void
     $mobx: Reaction
-    onError(handler: (error: any, derivation: IDerivation) => void)
 }
 
 export class Reaction implements IDerivation, IReactionPublic {
@@ -63,11 +55,11 @@ export class Reaction implements IDerivation, IReactionPublic {
     _isTrackPending = false
     _isRunning = false
     isTracing: TraceMode = TraceMode.NONE
-    errorHandler: (error: any, derivation: IDerivation) => void
 
     constructor(
         public name: string = "Reaction@" + getNextId(),
-        private onInvalidate: () => void
+        private onInvalidate: () => void,
+        private errorHandler?: (error: any, derivation: IDerivation) => void
     ) {}
 
     onBecomeStale() {
@@ -100,7 +92,7 @@ export class Reaction implements IDerivation, IReactionPublic {
                 if (this._isTrackPending && isSpyEnabled()) {
                     // onInvalidate didn't trigger track right away..
                     spyReport({
-                        object: this,
+                        name: this.name,
                         type: "scheduled-reaction"
                     })
                 }
@@ -116,9 +108,8 @@ export class Reaction implements IDerivation, IReactionPublic {
         if (notify) {
             startTime = Date.now()
             spyReportStart({
-                object: this,
-                type: "reaction",
-                fn
+                name: this.name,
+                type: "reaction"
             })
         }
         this._isRunning = true
@@ -145,20 +136,15 @@ export class Reaction implements IDerivation, IReactionPublic {
         }
 
         const message = `[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: '${this}`
-        const messageToUser = getMessage("m037")
-
-        console.error(
-            message || messageToUser /* latter will not be true, make sure uglify doesn't remove */,
-            error
-        )
+        console.error(message, error)
         /** If debugging brought you here, please, read the above message :-). Tnx! */
 
         if (isSpyEnabled()) {
             spyReport({
                 type: "error",
+                name: this.name,
                 message,
-                error,
-                object: this
+                error: "" + error
             })
         }
 
@@ -180,7 +166,6 @@ export class Reaction implements IDerivation, IReactionPublic {
     getDisposer(): IReactionDisposer {
         const r = this.dispose.bind(this)
         r.$mobx = this
-        r.onError = registerErrorHandler
         return r
     }
 
@@ -188,39 +173,12 @@ export class Reaction implements IDerivation, IReactionPublic {
         return `Reaction[${this.name}]`
     }
 
-    whyRun() {
-        const observing = unique(this._isRunning ? this.newObserving : this.observing).map(
-            dep => dep.name
-        )
-
-        return `
-WhyRun? reaction '${this.name}':
- * Status: [${this.isDisposed
-     ? "stopped"
-     : this._isRunning ? "running" : this.isScheduled() ? "scheduled" : "idle"}]
- * This reaction will re-run if any of the following observables changes:
-    ${joinStrings(observing)}
-    ${this._isRunning
-        ? " (... or any observable accessed during the remainder of the current run)"
-        : ""}
-	${getMessage("m038")}
-`
-    }
-
     trace(enterBreakPoint: boolean = false) {
         trace(this, enterBreakPoint)
     }
 }
 
-function registerErrorHandler(handler) {
-    invariant(this && this.$mobx && isReaction(this.$mobx), "Invalid `this`")
-    invariant(!this.$mobx.errorHandler, "Only one onErrorHandler can be registered")
-    this.$mobx.errorHandler = handler
-}
-
-export function onReactionError(
-    handler: (error: any, derivation: IDerivation) => void
-): () => void {
+export function onReactionError(handler: (error: any, derivation: IDerivation) => void): Lambda {
     globalState.globalReactionErrorHandlers.push(handler)
     return () => {
         const idx = globalState.globalReactionErrorHandlers.indexOf(handler)

@@ -6,7 +6,7 @@ var utils = require("../utils/test-utils")
 test("action should wrap in transaction", () => {
     var values = []
 
-    var observable = mobx.observable(0)
+    var observable = mobx.observable.box(0)
     var d = mobx.autorun(() => values.push(observable.get()))
 
     var increment = mobx.action("increment", amount => {
@@ -23,7 +23,7 @@ test("action should wrap in transaction", () => {
 })
 
 test("action modifications should be picked up 1", () => {
-    var a = mobx.observable(1)
+    var a = mobx.observable.box(1)
     var i = 3
     var b = 0
 
@@ -45,7 +45,7 @@ test("action modifications should be picked up 1", () => {
 })
 
 test("action modifications should be picked up 1", () => {
-    var a = mobx.observable(1)
+    var a = mobx.observable.box(1)
     var b = 0
 
     mobx.autorun(() => {
@@ -66,7 +66,7 @@ test("action modifications should be picked up 1", () => {
 })
 
 test("action modifications should be picked up 3", () => {
-    var a = mobx.observable(1)
+    var a = mobx.observable.box(1)
     var b = 0
 
     var doubler = mobx.computed(() => a.get() * 2)
@@ -89,8 +89,8 @@ test("action modifications should be picked up 3", () => {
 })
 
 test("test action should be untracked", () => {
-    var a = mobx.observable(3)
-    var b = mobx.observable(4)
+    var a = mobx.observable.box(3)
+    var b = mobx.observable.box(4)
     var latest = 0
     var runs = 0
 
@@ -131,7 +131,7 @@ test("test action should be untracked", () => {
 })
 
 test("should be possible to create autorun in ation", () => {
-    var a = mobx.observable(1)
+    var a = mobx.observable.box(1)
     var values = []
 
     var adder = mobx.action(inc => {
@@ -153,7 +153,7 @@ test("should be possible to create autorun in ation", () => {
 })
 
 test("should be possible to change unobserved state in an action called from computed", () => {
-    var a = mobx.observable(2)
+    var a = mobx.observable.box(2)
 
     var testAction = mobx.action(() => {
         a.set(3)
@@ -167,14 +167,14 @@ test("should be possible to change unobserved state in an action called from com
     mobx.autorun(() => {
         expect(() => {
             c.get()
-        }).not.toThrow()
+        }).not.toThrow(/bla/)
     })
 
-    mobx.extras.resetGlobalState()
+    mobx._resetGlobalState()
 })
 
 test("should not be possible to change observed state in an action called from computed", () => {
-    var a = mobx.observable(2)
+    var a = mobx.observable.box(2)
     var d = mobx.autorun(() => {
         a.get()
     })
@@ -194,13 +194,13 @@ test("should not be possible to change observed state in an action called from c
         /Computed values are not allowed to cause side effects by changing observables that are already being observed/
     )
 
-    mobx.extras.resetGlobalState()
+    mobx._resetGlobalState()
     d()
 })
 
 test("action in autorun should be untracked", () => {
-    var a = mobx.observable(2)
-    var b = mobx.observable(3)
+    var a = mobx.observable.box(2)
+    var b = mobx.observable.box(3)
 
     var data = []
     var multiplier = mobx.action(val => val * b.get())
@@ -273,7 +273,7 @@ test("#286 exceptions in actions should not affect global state", () => {
 })
 
 test("runInAction", () => {
-    mobx.useStrict(true)
+    mobx.configure({ enforceActions: true })
     var values = []
     var events = []
     var spyDisposer = mobx.spy(ev => {
@@ -284,7 +284,7 @@ test("runInAction", () => {
             })
     })
 
-    var observable = mobx.observable(0)
+    var observable = mobx.observable.box(0)
     var d = mobx.autorun(() => values.push(observable.get()))
 
     var res = mobx.runInAction("increment", () => {
@@ -309,7 +309,7 @@ test("runInAction", () => {
         { arguments: [], name: "<unnamed action>" }
     ])
 
-    mobx.useStrict(false)
+    mobx.configure({ enforceActions: false })
     spyDisposer()
 
     d()
@@ -348,7 +348,7 @@ test("action in autorun does not keep / make computed values alive", () => {
 test("computed values and actions", () => {
     let calls = 0
 
-    const number = mobx.observable(1)
+    const number = mobx.observable.box(1)
     const squared = mobx.computed(() => {
         calls++
         return number.get() * number.get()
@@ -372,20 +372,71 @@ test("computed values and actions", () => {
     expect(calls).toBe(3)
 })
 
+test("extendObservable respects action decorators", () => {
+    const x = mobx.observable(
+        {
+            a1() {
+                return this
+            },
+            a2() {
+                return this
+            },
+            a3() {
+                return this
+            }
+        },
+        {
+            a1: mobx.action,
+            a2: mobx.action.bound
+        }
+    )
+    expect(mobx.isAction(x.a1)).toBe(true)
+    expect(mobx.isAction(x.a2)).toBe(true)
+    expect(mobx.isAction(x.a3)).toBe(false)
+
+    const global = (function() {
+        return this
+    })()
+
+    const { a1, a2, a3 } = x
+    expect(a1.call(x)).toBe(x)
+    // expect(a1()).toBe(global)
+    expect(a2.call(x)).toBe(x)
+    expect(a2()).toBe(x)
+    expect(a3.call(x)).toBe(x)
+    // expect(a3()).toBe(global)
+})
+
+test("expect warning for invalid decorator", () => {
+    expect(() => {
+        mobx.observable({ x: 1 }, { x: undefined })
+    }).toThrow(/Not a valid decorator for 'x', got: undefined/)
+})
+
+test("expect warning superfluos decorator", () => {
+    expect(() => {
+        mobx.observable({ x() {} }, { y: mobx.action })
+    }).toThrow(/Trying to declare a decorator for unspecified property 'y'/)
+})
+
 test("bound actions bind", () => {
     var called = 0
-    var x = mobx.observable({
-        y: 0,
-        z: mobx.action.bound(function(v) {
-            this.y += v
-            this.y += v
-        }),
-
-        get yValue() {
-            called++
-            return this.y
+    var x = mobx.observable(
+        {
+            y: 0,
+            z: function(v) {
+                this.y += v
+                this.y += v
+            },
+            get yValue() {
+                called++
+                return this.y
+            }
+        },
+        {
+            z: mobx.action.bound
         }
-    })
+    )
 
     var d = mobx.autorun(() => {
         x.yValue
@@ -403,4 +454,17 @@ test("bound actions bind", () => {
 
     d()
     d2()
+})
+
+test("Fix #1367", () => {
+    const x = mobx.extendObservable(
+        {},
+        {
+            method() {}
+        },
+        {
+            method: mobx.action
+        }
+    )
+    expect(mobx.isAction(x.method)).toBe(true)
 })

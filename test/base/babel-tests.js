@@ -8,35 +8,40 @@ import {
     isObservableObject,
     observe,
     isObservable,
+    isObservableProp,
+    isComputedProp,
     spy,
     isAction,
-    useStrict
-} from "../../src/mobx"
-import * as mobx from "../../src/mobx"
-
-class Box {
-    @observable uninitialized
-    @observable height = 20
-    @observable sizes = [2]
-    @observable
-    someFunc = function() {
-        return 2
-    }
-    @computed
-    get width() {
-        return this.height * this.sizes.length * this.someFunc() * (this.uninitialized ? 2 : 1)
-    }
-}
-
-var box = new Box()
-
-var ar = []
-
-autorun(() => {
-    ar.push(box.width)
-})
+    configure
+} from "../../src/mobx.ts"
+import * as mobx from "../../src/mobx.ts"
 
 test("babel", function() {
+    class Box {
+        @observable uninitialized
+        @observable height = 20
+        @observable sizes = [2]
+        @observable
+        someFunc = function() {
+            return 2
+        }
+        @computed
+        get width() {
+            return this.height * this.sizes.length * this.someFunc() * (this.uninitialized ? 2 : 1)
+        }
+        @action
+        addSize() {
+            this.sizes.push(3)
+            this.sizes.push(4)
+        }
+    }
+
+    var box = new Box()
+    var ar = []
+    autorun(() => {
+        ar.push(box.width)
+    })
+
     var s = ar.slice()
     expect(s).toEqual([40])
     box.height = 10
@@ -51,6 +56,9 @@ test("babel", function() {
     box.uninitialized = true
     s = ar.slice()
     expect(s).toEqual([40, 20, 60, 210, 420])
+    box.addSize()
+    s = ar.slice()
+    expect(s).toEqual([40, 20, 60, 210, 420, 700])
 })
 
 test("should not be possible to use @action with getters", () => {
@@ -59,9 +67,9 @@ test("should not be possible to use @action with getters", () => {
             @action
             get Test() {}
         }
-    }).toThrowError(new Error("[mobx] action is not expected to be used with getters"))
+    }).toThrowError(/@action cannot be used with getters/)
 
-    mobx.extras.resetGlobalState()
+    mobx._resetGlobalState()
 })
 
 test("babel: parameterized computed decorator", () => {
@@ -75,7 +83,7 @@ test("babel: parameterized computed decorator", () => {
     }
 
     const t1 = new TestClass()
-    const changes: { sum: number }[] = []
+    const changes = []
     const d = autorun(() => changes.push(t1.boxedSum))
 
     t1.y = 4 // change
@@ -109,9 +117,9 @@ class Order {
 test("decorators", function() {
     var o = new Order()
     expect(isObservableObject(o)).toBe(true)
-    expect(isObservable(o, "amount")).toBe(true)
+    expect(isObservableProp(o, "amount")).toBe(true)
     expect(o.total).toBe(6) // .... this is required to initialize the props which are made reactive lazily...
-    expect(isObservable(o, "total")).toBe(true)
+    expect(isObservableProp(o, "total")).toBe(true)
 
     var events = []
     var d1 = observe(o, ev => events.push(ev.name, ev.oldValue))
@@ -164,14 +172,13 @@ test("705 - setter undoing caching (babel)", () => {
     let autoruns = 0
 
     class Person {
-        @observable name: string
-        @observable title: string
+        @observable name
+        @observable title
         set fullName(val) {
             // Noop
         }
         @computed
         get fullName() {
-            debugger
             recomputes++
             return this.title + " " + this.name
         }
@@ -227,7 +234,7 @@ test("action decorator (babel)", function() {
 
     const store1 = new Store(2)
     const store2 = new Store(3)
-    const events: any[] = []
+    const events = []
     const d = spy(events.push.bind(events))
     expect(store1.add(3, 4)).toBe(14)
     expect(store2.add(3, 4)).toBe(21)
@@ -259,7 +266,7 @@ test("custom action decorator (babel)", function() {
 
     const store1 = new Store(2)
     const store2 = new Store(3)
-    const events: any[] = []
+    const events = []
     const d = spy(events.push.bind(events))
     expect(store1.add(3, 4)).toBe(14)
     expect(store2.add(3, 4)).toBe(21)
@@ -310,7 +317,7 @@ test("action decorator on field (babel)", function() {
     const store1 = new Store(2)
     const store2 = new Store(7)
 
-    const events: any[] = []
+    const events = []
     const d = spy(events.push.bind(events))
     expect(store1.add(3, 4)).toBe(14)
     expect(store2.add(5, 4)).toBe(63)
@@ -343,7 +350,7 @@ test("custom action decorator on field (babel)", function() {
     const store1 = new Store(2)
     const store2 = new Store(7)
 
-    const events: any[] = []
+    const events = []
     const d = spy(events.push.bind(events))
     expect(store1.add(3, 4)).toBe(14)
     expect(store2.add(5, 4)).toBe(63)
@@ -380,13 +387,13 @@ test("custom action decorator on field (babel)", function() {
 })
 
 test("267 (babel) should be possible to declare properties observable outside strict mode", () => {
-    useStrict(true)
+    configure({ enforceActions: true })
 
     class Store {
         @observable timer
     }
 
-    useStrict(false)
+    configure({ enforceActions: false })
 })
 
 test("288 atom not detected for object property", () => {
@@ -395,18 +402,20 @@ test("288 atom not detected for object property", () => {
     }
 
     const store = new Store()
+    let changed = false
 
     mobx.observe(
         store,
         "foo",
         () => {
-            console.log("Change observed")
+            changed = true
         },
         true
     )
+    expect(changed).toBe(true)
 })
 
-test("observable performance", () => {
+test.skip("observable performance", () => {
     const AMOUNT = 100000
 
     class A {
@@ -567,7 +576,7 @@ test("enumerability", () => {
     expect(a.hasOwnProperty("a")).toBe(false) // true would better..
     expect(a.hasOwnProperty("b")).toBe(false)
     expect(a.hasOwnProperty("m")).toBe(false)
-    expect(a.hasOwnProperty("m2")).toBe(false) // true would be ok as well
+    expect(a.hasOwnProperty("m2")).toBe(true)
 
     expect(mobx.isAction(a.m)).toBe(true)
     expect(mobx.isAction(a.m2)).toBe(true)
@@ -828,7 +837,7 @@ test("@observable.ref (Babel)", () => {
     const a = new A()
     expect(a.ref.a).toBe(3)
     expect(mobx.isObservable(a.ref)).toBe(false)
-    expect(mobx.isObservable(a, "ref")).toBe(true)
+    expect(mobx.isObservableProp(a, "ref")).toBe(true)
 })
 
 test("@observable.shallow (Babel)", () => {
@@ -840,7 +849,7 @@ test("@observable.shallow (Babel)", () => {
     const todo2 = { todo: 2 }
     a.arr.push(todo2)
     expect(mobx.isObservable(a.arr)).toBe(true)
-    expect(mobx.isObservable(a, "arr")).toBe(true)
+    expect(mobx.isObservableProp(a, "arr")).toBe(true)
     expect(mobx.isObservable(a.arr[0])).toBe(false)
     expect(mobx.isObservable(a.arr[1])).toBe(false)
     expect(a.arr[1] === todo2).toBeTruthy()
@@ -856,7 +865,7 @@ test("@observable.deep (Babel)", () => {
     a.arr.push(todo2)
 
     expect(mobx.isObservable(a.arr)).toBe(true)
-    expect(mobx.isObservable(a, "arr")).toBe(true)
+    expect(mobx.isObservableProp(a, "arr")).toBe(true)
     expect(mobx.isObservable(a.arr[0])).toBe(true)
     expect(mobx.isObservable(a.arr[1])).toBe(true)
     expect(a.arr[1] !== todo2).toBeTruthy()
@@ -867,7 +876,7 @@ test("action.bound binds (Babel)", () => {
     class A {
         @observable x = 0
         @action.bound
-        inc(value: number) {
+        inc(value) {
             this.x += value
         }
     }
@@ -887,10 +896,10 @@ test("@computed.equals (Babel)", () => {
             this.minute = minute
         }
 
-        @observable hour: number
-        @observable minute: number
+        @observable hour
+        @observable minute
 
-        @computed.equals(sameTime)
+        @computed({ equals: sameTime })
         get time() {
             return { hour: this.hour, minute: this.minute }
         }
@@ -915,4 +924,172 @@ test("@computed.equals (Babel)", () => {
     ])
 
     disposeAutorun()
+})
+
+test("computed comparer works with decorate (babel)", () => {
+    const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
+    class Time {
+        constructor(hour, minute) {
+            this.hour = hour
+            this.minute = minute
+        }
+
+        get time() {
+            return { hour: this.hour, minute: this.minute }
+        }
+    }
+    mobx.decorate(Time, {
+        hour: observable,
+        minute: observable,
+        time: computed({ equals: sameTime })
+    })
+    const time = new Time(9, 0)
+
+    const changes = []
+    const disposeAutorun = autorun(() => changes.push(time.time))
+
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 9
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.minute = 0
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 10
+    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    expect(changes).toEqual([
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test("computed comparer works with decorate (babel) - 2", () => {
+    const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
+    class Time {
+        constructor(hour, minute) {
+            extendObservable(
+                this,
+                {
+                    hour,
+                    minute,
+                    get time() {
+                        return { hour: this.hour, minute: this.minute }
+                    }
+                },
+                {
+                    time: computed({ equals: sameTime })
+                }
+            )
+        }
+    }
+    const time = new Time(9, 0)
+
+    const changes = []
+    const disposeAutorun = autorun(() => changes.push(time.time))
+
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 9
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.minute = 0
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 10
+    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    expect(changes).toEqual([
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test("computed comparer works with decorate (babel) - 3", () => {
+    const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
+    const time = observable.object(
+        {
+            hour: 9,
+            minute: 0,
+            get time() {
+                return { hour: this.hour, minute: this.minute }
+            }
+        },
+        {
+            time: computed({ equals: sameTime })
+        }
+    )
+
+    const changes = []
+    const disposeAutorun = autorun(() => changes.push(time.time))
+
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 9
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.minute = 0
+    expect(changes).toEqual([{ hour: 9, minute: 0 }])
+    time.hour = 10
+    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    expect(changes).toEqual([
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test("actions are not reassignable", () => {
+    class A {
+        @action
+        m1() {}
+        @action m2 = () => {}
+        @action.bound
+        m3() {}
+        @action.bound m4 = () => {}
+    }
+
+    const a = new A()
+    expect(isAction(a.m1)).toBe(true)
+    expect(isAction(a.m2)).toBe(true)
+    expect(isAction(a.m3)).toBe(true)
+    expect(isAction(a.m4)).toBe(true)
+    // expect(() => {
+    //     a.m1 = () => {}
+    // }).toThrow(/Cannot assign to read only property 'm1'/)
+    a.m1 = () => {}
+    // we cannot prevent actions to be reassignable in TS, as it will kill overriding the action in subtypes :'(
+    expect(isAction(a.m1)).toBe(false)
+    expect(() => {
+        a.m2 = () => {}
+    }).toThrow(/Cannot assign to read only property 'm2'/)
+    expect(() => {
+        a.m3 = () => {}
+    }).toThrow(/Cannot assign to read only property 'm3'/)
+    expect(() => {
+        a.m4 = () => {}
+    }).toThrow(/Cannot assign to read only property 'm4'/)
+})
+
+test("it should support asyncAction (babel)", async () => {
+    const values = []
+
+    mobx.configure({ enforceActions: true })
+
+    class X {
+        @observable a = 1
+
+        f = mobx.flow(function* f(initial) {
+            this.a = initial // this runs in action
+            this.a += yield Promise.resolve(5)
+            this.a = this.a * 2
+            return this.a
+        })
+    }
+
+    const x = new X()
+
+    expect(await x.f(3)).toBe(16)
 })

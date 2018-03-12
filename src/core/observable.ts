@@ -1,7 +1,6 @@
 import { IDerivation, IDerivationState, TraceMode } from "./derivation"
 import { globalState } from "./globalstate"
-import { invariant } from "../utils/utils"
-import { runReactions, Reaction } from "./reaction"
+import { runReactions } from "./reaction"
 import { ComputedValue } from "./computedvalue"
 import { getDependencyTree } from "../api/extras"
 import { IDependencyTree } from "../mobx"
@@ -19,6 +18,7 @@ export interface IObservable extends IDepTreeNode {
      * the dependency is already established
      */
     lastAccessedBy: number
+    isBeingObserved: boolean
 
     lowestObserverState: IDerivationState // Used to avoid redundant propagations
     isPendingUnobservation: boolean // Used to push itself to global.pendingUnobservations at most once per batch.
@@ -26,7 +26,8 @@ export interface IObservable extends IDepTreeNode {
     observers: IDerivation[] // maintain _observers in raw array for for way faster iterating in propagation.
     observersIndexes: {} // map derivation.__mapid to _observers.indexOf(derivation) (see removeObserver)
 
-    onBecomeUnobserved()
+    onBecomeUnobserved(): void
+    onBecomeObserved(): void
 }
 
 export function hasObservers(observable: IObservable): boolean {
@@ -37,23 +38,23 @@ export function getObservers(observable: IObservable): IDerivation[] {
     return observable.observers
 }
 
-function invariantObservers(observable: IObservable) {
-    const list = observable.observers
-    const map = observable.observersIndexes
-    const l = list.length
-    for (let i = 0; i < l; i++) {
-        const id = list[i].__mapid
-        if (i) {
-            invariant(map[id] === i, "INTERNAL ERROR maps derivation.__mapid to index in list") // for performance
-        } else {
-            invariant(!(id in map), "INTERNAL ERROR observer on index 0 shouldn't be held in map.") // for performance
-        }
-    }
-    invariant(
-        list.length === 0 || Object.keys(map).length === list.length - 1,
-        "INTERNAL ERROR there is no junk in map"
-    )
-}
+// function invariantObservers(observable: IObservable) {
+//     const list = observable.observers
+//     const map = observable.observersIndexes
+//     const l = list.length
+//     for (let i = 0; i < l; i++) {
+//         const id = list[i].__mapid
+//         if (i) {
+//             invariant(map[id] === i, "INTERNAL ERROR maps derivation.__mapid to index in list") // for performance
+//         } else {
+//             invariant(!(id in map), "INTERNAL ERROR observer on index 0 shouldn't be held in map.") // for performance
+//         }
+//     }
+//     invariant(
+//         list.length === 0 || Object.keys(map).length === list.length - 1,
+//         "INTERNAL ERROR there is no junk in map"
+//     )
+// }
 export function addObserver(observable: IObservable, node: IDerivation) {
     // invariant(node.dependenciesState !== -1, "INTERNAL ERROR, can add only dependenciesState !== -1");
     // invariant(observable._observers.indexOf(node) === -1, "INTERNAL ERROR add already added node");
@@ -106,8 +107,7 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 }
 
 export function queueForUnobservation(observable: IObservable) {
-    if (!observable.isPendingUnobservation) {
-        // invariant(globalState.inBatch > 0, "INTERNAL ERROR, remove should be called only inside batch");
+    if (observable.isPendingUnobservation === false) {
         // invariant(observable._observers.length === 0, "INTERNAL ERROR, should only queue for unobservation unobserved observables");
         observable.isPendingUnobservation = true
         globalState.pendingUnobservations.push(observable)
@@ -132,15 +132,23 @@ export function endBatch() {
             const observable = list[i]
             observable.isPendingUnobservation = false
             if (observable.observers.length === 0) {
-                observable.onBecomeUnobserved()
-                // NOTE: onBecomeUnobserved might push to `pendingUnobservations`
+                if (observable.isBeingObserved) {
+                    // if this observable had reactive observers, trigger the hooks
+                    observable.isBeingObserved = false
+                    observable.onBecomeUnobserved()
+                }
+                if (observable instanceof ComputedValue) {
+                    // computed values are automatically teared down when the last observer leaves
+                    // this process happens recursively, this computed might be the last observabe of another, etc..
+                    observable.suspend()
+                }
             }
         }
         globalState.pendingUnobservations = []
     }
 }
 
-export function reportObserved(observable: IObservable) {
+export function reportObserved(observable: IObservable): boolean {
     const derivation = globalState.trackingDerivation
     if (derivation !== null) {
         /**
@@ -151,25 +159,31 @@ export function reportObserved(observable: IObservable) {
         if (derivation.runId !== observable.lastAccessedBy) {
             observable.lastAccessedBy = derivation.runId
             derivation.newObserving![derivation.unboundDepsCount++] = observable
+            if (!observable.isBeingObserved) {
+                observable.isBeingObserved = true
+                observable.onBecomeObserved()
+            }
         }
-    } else if (observable.observers.length === 0) {
+        return true
+    } else if (observable.observers.length === 0 && globalState.inBatch > 0) {
         queueForUnobservation(observable)
     }
+    return false
 }
 
-function invariantLOS(observable: IObservable, msg) {
-    // it's expensive so better not run it in produciton. but temporarily helpful for testing
-    const min = getObservers(observable).reduce((a, b) => Math.min(a, b.dependenciesState), 2)
-    if (min >= observable.lowestObserverState) return // <- the only assumption about `lowestObserverState`
-    throw new Error(
-        "lowestObserverState is wrong for " +
-            msg +
-            " because " +
-            min +
-            " < " +
-            observable.lowestObserverState
-    )
-}
+// function invariantLOS(observable: IObservable, msg: string) {
+//     // it's expensive so better not run it in produciton. but temporarily helpful for testing
+//     const min = getObservers(observable).reduce((a, b) => Math.min(a, b.dependenciesState), 2)
+//     if (min >= observable.lowestObserverState) return // <- the only assumption about `lowestObserverState`
+//     throw new Error(
+//         "lowestObserverState is wrong for " +
+//             msg +
+//             " because " +
+//             min +
+//             " < " +
+//             observable.lowestObserverState
+//     )
+// }
 
 /**
  * NOTE: current propagation mechanism will in case of self reruning autoruns behave unexpectedly

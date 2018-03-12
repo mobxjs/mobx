@@ -1,5 +1,5 @@
 import { globalState } from "./globalstate"
-import { objectAssign, once, Lambda } from "../utils/utils"
+import { once, Lambda } from "../utils/utils"
 
 export function isSpyEnabled() {
     return !!globalState.spyListeners.length
@@ -12,14 +12,14 @@ export function spyReport(event) {
 }
 
 export function spyReportStart(event) {
-    const change = objectAssign({}, event, { spyReportStart: true })
+    const change = { ...event, spyReportStart: true }
     spyReport(change)
 }
 
 const END_EVENT = { spyReportEnd: true }
 
 export function spyReportEnd(change?) {
-    if (change) spyReport(objectAssign({}, change, END_EVENT))
+    if (change) spyReport({ ...change, spyReportEnd: true })
     else spyReport(END_EVENT)
 }
 

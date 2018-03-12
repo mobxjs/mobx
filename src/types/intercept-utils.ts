@@ -4,12 +4,12 @@ import { untrackedStart, untrackedEnd } from "../core/derivation"
 export type IInterceptor<T> = (change: T) => T | null
 
 export interface IInterceptable<T> {
-    interceptors: IInterceptor<T>[] | null
+    interceptors: IInterceptor<T>[] | undefined
     intercept(handler: IInterceptor<T>): Lambda
 }
 
 export function hasInterceptors(interceptable: IInterceptable<any>) {
-    return interceptable.interceptors && interceptable.interceptors.length > 0
+    return interceptable.interceptors !== undefined && interceptable.interceptors.length > 0
 }
 
 export function registerInterceptor<T>(

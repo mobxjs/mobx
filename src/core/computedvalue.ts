@@ -4,8 +4,7 @@ import {
     propagateMaybeChanged,
     propagateChangeConfirmed,
     startBatch,
-    endBatch,
-    getObservers
+    endBatch
 } from "./observable"
 import {
     IDerivation,
@@ -23,24 +22,31 @@ import { globalState } from "./globalstate"
 import { createAction } from "./action"
 import {
     createInstanceofPredicate,
+    fail,
     getNextId,
     invariant,
     Lambda,
-    unique,
-    joinStrings,
     primitiveSymbol,
     toPrimitive
 } from "../utils/utils"
 import { isSpyEnabled, spyReport } from "./spy"
 import { autorun } from "../api/autorun"
-import { IEqualsComparer } from "../types/comparer"
+import { IEqualsComparer, comparer } from "../utils/comparer"
 import { IValueDidChange } from "../types/observablevalue"
-import { getMessage } from "../utils/messages"
 
 export interface IComputedValue<T> {
     get(): T
     set(value: T): void
     observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
+}
+
+export interface IComputedValueOptions<T> {
+    get?: () => T
+    set?: (value: T) => void
+    name?: string
+    equals?: IEqualsComparer<T>
+    context?: any
+    requiresReaction?: boolean
 }
 
 /**
@@ -66,7 +72,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     dependenciesState = IDerivationState.NOT_TRACKING
     observing: IObservable[] = [] // nodes we are looking at. Our value depends on these nodes
     newObserving = null // during tracking it's an array with new observed observers
-
+    isBeingObserved = false
     isPendingUnobservation: boolean = false
     observers = []
     observersIndexes = {}
@@ -78,10 +84,15 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     __mapid = "#" + getNextId()
     protected value: T | undefined | CaughtException = new CaughtException(null)
     name: string
+    triggeredBy: string
     isComputing: boolean = false // to check for cycles
     isRunningSetter: boolean = false
+    derivation: () => T
     setter: (value: T) => void
     isTracing: TraceMode = TraceMode.NONE
+    public scope: Object | undefined
+    private equals: IEqualsComparer<any>
+    private requiresReaction
 
     /**
      * Create a new computed value based on a function expression.
@@ -95,47 +106,42 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * don't want to notify observers if it is structurally the same.
      * This is useful for working with vectors, mouse coordinates etc.
      */
-    constructor(
-        public derivation: () => T,
-        public scope: Object | undefined,
-        private equals: IEqualsComparer<any>,
-        name: string,
-        setter?: (v: T) => void
-    ) {
-        this.name = name || "ComputedValue@" + getNextId()
-        if (setter) this.setter = createAction(name + "-setter", setter) as any
+    constructor(options: IComputedValueOptions<T>) {
+        if (process.env.NODE_ENV === "production" && !options.get)
+            return fail("missing option for computed: get")
+        this.derivation = options.get!
+        this.name = options.name || "ComputedValue@" + getNextId()
+        if (options.set) this.setter = createAction(this.name + "-setter", options.set) as any
+        this.equals =
+            options.equals ||
+            ((options as any).compareStructural || (options as any).struct
+                ? comparer.structural
+                : comparer.default)
+        this.scope = options.context
+        this.requiresReaction = !!options.requiresReaction
     }
 
     onBecomeStale() {
         propagateMaybeChanged(this)
     }
 
-    onBecomeUnobserved() {
-        clearObserving(this)
-        this.value = undefined
-    }
+    onBecomeUnobserved() {}
+
+    onBecomeObserved() {}
 
     /**
      * Returns the current value of this computed value.
      * Will evaluate its computation first if needed.
      */
     public get(): T {
-        invariant(!this.isComputing, `Cycle detected in computation ${this.name}`, this.derivation)
+        if (this.isComputing) fail(`Cycle detected in computation ${this.name}: ${this.derivation}`)
         if (globalState.inBatch === 0) {
-            // This is an minor optimization which could be omitted to simplify the code
-            // The computedValue is accessed outside of any mobx stuff. Batch observing should be enough and don't need
-            // tracking as it will never be called again inside this batch.
-            startBatch()
             if (shouldCompute(this)) {
-                if (this.isTracing !== TraceMode.NONE) {
-                    console.log(
-                        `[mobx.trace] '${this
-                            .name}' is being read outside a reactive context and doing a full recompute`
-                    )
-                }
+                this.warnAboutUntrackedRead()
+                startBatch() // See perf test 'computed memoization'
                 this.value = this.computeValue(false)
+                endBatch()
             }
-            endBatch()
         } else {
             reportObserved(this)
             if (shouldCompute(this)) if (this.trackAndCompute()) propagateChangeConfirmed(this)
@@ -168,8 +174,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         } else
             invariant(
                 false,
-                `[ComputedValue '${this
-                    .name}'] It is not possible to assign a new value to a computed value.`
+                process.env.NODE_ENV !== "production" &&
+                    `[ComputedValue '${this
+                        .name}'] It is not possible to assign a new value to a computed value.`
             )
     }
 
@@ -178,7 +185,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             spyReport({
                 object: this.scope,
                 type: "compute",
-                fn: this.derivation
+                name: this.name
             })
         }
         const oldValue = this.value
@@ -200,15 +207,24 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         if (track) {
             res = trackDerivedFunction(this, this.derivation, this.scope)
         } else {
-            try {
+            if (globalState.disableErrorBoundaries === true) {
                 res = this.derivation.call(this.scope)
-            } catch (e) {
-                res = new CaughtException(e)
+            } else {
+                try {
+                    res = this.derivation.call(this.scope)
+                } catch (e) {
+                    res = new CaughtException(e)
+                }
             }
         }
         globalState.computationDepth--
         this.isComputing = false
         return res
+    }
+
+    suspend() {
+        clearObserving(this)
+        this.value = undefined // don't hold on to computed value!
     }
 
     observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {
@@ -231,6 +247,25 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         })
     }
 
+    warnAboutUntrackedRead() {
+        if (process.env.NODE_ENV === "production") return
+        if (this.requiresReaction === true) {
+            fail(`[mobx] Computed value ${this.name} is read outside a reactive context`)
+        }
+        if (this.isTracing !== TraceMode.NONE) {
+            console.log(
+                `[mobx.trace] '${this
+                    .name}' is being read outside a reactive context. Doing a full recompute`
+            )
+        }
+        if (globalState.computedRequiresReaction) {
+            console.warn(
+                `[mobx] Computed value ${this
+                    .name} is being read outside a reactive context. Doing a full recompute`
+            )
+        }
+    }
+
     toJSON() {
         return this.get()
     }
@@ -241,36 +276,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
     valueOf(): T {
         return toPrimitive(this.get())
-    }
-
-    whyRun() {
-        const isTracking = Boolean(globalState.trackingDerivation)
-        const observing = unique(this.isComputing ? this.newObserving! : this.observing).map(
-            (dep: any) => dep.name
-        )
-        const observers = unique(getObservers(this).map(dep => dep.name))
-        return (
-            `
-WhyRun? computation '${this.name}':
- * Running because: ${isTracking
-     ? "[active] the value of this computation is needed by a reaction"
-     : this.isComputing
-       ? "[get] The value of this computed was requested outside a reaction"
-       : "[idle] not running at the moment"}
-` +
-            (this.dependenciesState === IDerivationState.NOT_TRACKING
-                ? getMessage("m032")
-                : ` * This computation will re-run if any of the following observables changes:
-    ${joinStrings(observing)}
-    ${this.isComputing && isTracking
-        ? " (... or any observable accessed during the remainder of the current run)"
-        : ""}
-    ${getMessage("m038")}
-
-  * If the outcome of this computation changes, the following observers will be re-run:
-    ${joinStrings(observers)}
-`)
-        )
     }
 }
 

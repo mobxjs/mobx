@@ -1,9 +1,10 @@
+"use strict"
+
 import {
     observe,
     computed,
     observable,
     autorun,
-    autorunAsync,
     extendObservable,
     action,
     IObservableObject,
@@ -14,18 +15,21 @@ import {
     IArrayWillSplice,
     IObservableValue,
     isObservable,
+    isObservableProp,
     isObservableObject,
-    extras,
-    Atom,
     transaction,
-    IObjectChange,
+    IObjectDidChange,
     spy,
-    useStrict,
-    isAction
+    configure,
+    isAction,
+    decorate,
+    IAtom,
+    createAtom,
+    runInAction
 } from "../../src/mobx"
 import * as mobx from "../../src/mobx"
 
-var v = observable(3)
+var v = observable.box(3)
 observe(v, () => {})
 
 var a = observable([1, 2, 3])
@@ -50,30 +54,30 @@ const t = {
     }
 }
 
-class Order {
-    @observable price: number = 3
-    @observable amount: number = 2
-    @observable orders: string[] = []
-    @observable aFunction = testFunction
+test("decorators", () => {
+    class Order {
+        @observable price: number = 3
+        @observable amount: number = 2
+        @observable orders: string[] = []
+        @observable aFunction = testFunction
 
-    @computed
-    get total() {
-        return this.amount * this.price * (1 + this.orders.length)
+        @computed
+        get total() {
+            return this.amount * this.price * (1 + this.orders.length)
+        }
+
+        // Typescript classes cannot be defined inside functions,
+        // but if the next line is enabled it should throw...
+        // @observable hoepie() { return 3; }
     }
 
-    // Typescript classes cannot be defined inside functions,
-    // but if the next line is enabled it should throw...
-    // @observable hoepie() { return 3; }
-}
-
-test("decorators", () => {
     var o = new Order()
     t.equal(isObservableObject(o), true)
-    t.equal(isObservable(o, "amount"), true)
-    t.equal(isObservable(o, "total"), true)
+    t.equal(isObservableProp(o, "amount"), true)
+    t.equal(isObservableProp(o, "total"), true)
 
     var events: any[] = []
-    var d1 = observe(o, (ev: IObjectChange) => events.push(ev.name, ev.oldValue))
+    var d1 = observe(o, (ev: IObjectDidChange) => events.push(ev.name, (ev as any).oldValue))
     var d2 = observe(o, "price", ev => events.push(ev.newValue, ev.oldValue))
     var d3 = observe(o, "total", ev => events.push(ev.newValue, ev.oldValue))
 
@@ -96,12 +100,24 @@ test("decorators", () => {
 })
 
 test("observable", () => {
-    var a = observable(3)
+    var a = observable.box(3)
     var b = computed(() => a.get() * 2)
     t.equal(b.get(), 6)
 })
 
 test("annotations", () => {
+    class Order {
+        @observable price: number = 3
+        @observable amount: number = 2
+        @observable orders: string[] = []
+        @observable aFunction = testFunction
+
+        @computed
+        get total() {
+            return this.amount * this.price * (1 + this.orders.length)
+        }
+    }
+
     var order1totals: number[] = []
     var order1 = new Order()
     var order2 = new Order()
@@ -153,11 +169,13 @@ test("scope", () => {
         y: number
     }
 
-    const Thing = function() {
+    const Thing = function(this: any) {
         extendObservable(this, {
             y: 3,
             // this will work here
-            z: computed(() => 2 * this.y)
+            get z() {
+                return 2 * this.y
+            }
         })
     }
 
@@ -186,9 +204,7 @@ test("typing", () => {
         // console.log(d.type)
     })
 
-    var x: IObservableValue<number> = observable(3)
-
-    var d2 = autorunAsync(function() {})
+    var x: IObservableValue<number> = observable.box(3)
 })
 
 const state: any = observable({
@@ -198,37 +214,39 @@ const state: any = observable({
 test("issue8", () => {
     t.throws(() => {
         class LoginStoreTest {
-            loggedIn2: boolean
+            loggedIn2: boolean = false
             constructor() {
                 extendObservable(this, {
-                    loggedIn2: () => !!state.authToken
+                    get loggedIn2() {
+                        return true
+                    }
                 })
-            }
-
-            @observable
-            get loggedIn() {
-                return !!state.authToken
             }
         }
         const store = new LoginStoreTest()
-    }, /@computed/)
+    }, /'extendObservable' can only be used to introduce new properties/)
 })
 
-class Box {
-    @observable uninitialized: any
-    @observable height = 20
-    @observable sizes = [2]
-    @observable
-    someFunc = function() {
-        return 2
-    }
-    @computed
-    get width() {
-        return this.height * this.sizes.length * this.someFunc() * (this.uninitialized ? 2 : 1)
-    }
-}
-
 test("box", () => {
+    class Box {
+        @observable uninitialized: any
+        @observable height = 20
+        @observable sizes = [2]
+        @observable
+        someFunc = function() {
+            return 2
+        }
+        @computed
+        get width() {
+            return this.height * this.sizes.length * this.someFunc() * (this.uninitialized ? 2 : 1)
+        }
+        @action
+        addSize() {
+            this.sizes.push(3)
+            this.sizes.push(4)
+        }
+    }
+
     var box = new Box()
 
     var ar: number[] = []
@@ -246,6 +264,8 @@ test("box", () => {
     t.deepEqual(ar.slice(), [40, 20, 60, 210])
     box.uninitialized = true
     t.deepEqual(ar.slice(), [40, 20, 60, 210, 420])
+    box.addSize()
+    expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700])
 })
 
 test("computed setter should succeed", () => {
@@ -266,19 +286,19 @@ test("computed setter should succeed", () => {
     t.equal(b.propX, 8)
 })
 
-test("atom clock example", () => {
+test("atom clock example", done => {
     let ticks = 0
-    const time_factor = 500 // speed up / slow down tests
+    const time_factor = 50 // speed up / slow down tests
 
     class Clock {
-        atom: Atom
-        intervalHandler: number = null
-        currentDateTime: string
+        atom: IAtom
+        intervalHandler: number | null = null
+        currentDateTime: string | undefined = undefined
 
         constructor() {
             // console.log("create")
             // creates an atom to interact with the mobx core algorithm
-            this.atom = new Atom(
+            this.atom = mobx.createAtom(
                 // first param a name for this atom, for debugging purposes
                 "Clock",
                 // second (optional) parameter: callback for when this atom transitions from unobserved to observed.
@@ -314,7 +334,7 @@ test("atom clock example", () => {
 
         stopTicking() {
             // console.log("stop ticking")
-            clearInterval(this.intervalHandler)
+            clearInterval(this.intervalHandler!)
             this.intervalHandler = null
         }
     }
@@ -325,7 +345,7 @@ test("atom clock example", () => {
 
     // ... prints the time each second
     const disposer = autorun(() => {
-        values.push(clock.getTime())
+        values.push(clock.getTime()!)
         // console.log(clock.getTime())
     })
 
@@ -333,9 +353,10 @@ test("atom clock example", () => {
     setTimeout(disposer, 4.5 * time_factor)
 
     setTimeout(() => {
-        t.equal(ticks, 5)
-        t.equal(values.length, 5)
-        t.equal(values.filter(x => x.length > 0).length, 5)
+        expect(ticks).toEqual(5)
+        expect(values.length).toEqual(5)
+        expect(values.filter(x => x.length > 0).length).toBe(5)
+        done()
     }, 10 * time_factor)
 })
 
@@ -396,15 +417,15 @@ test("issue 165", () => {
     }
 
     class Game {
-        @observable firstCardSelected: Card = null
-        @observable secondCardSelected: Card = null
+        @observable firstCardSelected: Card | null = null
+        @observable secondCardSelected: Card | null = null
 
         @computed
         get isMatchWrong() {
             return report(
                 "Computing isMatchWrong",
                 this.secondCardSelected !== null &&
-                    this.firstCardSelected.id !== this.secondCardSelected.id
+                    this.firstCardSelected!.id !== this.secondCardSelected.id
             )
         }
     }
@@ -551,6 +572,7 @@ test("action decorator on field (typescript)", () => {
 
     const store1 = new Store(2)
     const store2 = new Store(7)
+    expect(store1.add).not.toEqual(store2.add)
 
     const events: any[] = []
     const d = spy(events.push.bind(events))
@@ -620,13 +642,13 @@ test("custom action decorator on field (typescript)", () => {
 })
 
 test("267 (typescript) should be possible to declare properties observable outside strict mode", () => {
-    useStrict(true)
+    configure({ enforceActions: true })
 
     class Store {
-        @observable timer: number
+        @observable timer: number | null = null
     }
 
-    useStrict(false)
+    configure({ enforceActions: false })
 })
 
 test("288 atom not detected for object property", () => {
@@ -646,7 +668,7 @@ test("288 atom not detected for object property", () => {
     )
 })
 
-test("observable performance", () => {
+test.skip("observable performance", () => {
     const AMOUNT = 100000
 
     class A {
@@ -712,7 +734,6 @@ test("inheritance", () => {
             return this.a + this.b
         }
     }
-
     const b1 = new B()
     const b2 = new B()
     const values: any[] = []
@@ -947,9 +968,9 @@ test("373 - fix isObservable for unused computed", () => {
             return 3
         }
         constructor() {
-            t.equal(isObservable(this, "computedVal"), true)
+            t.equal(isObservableProp(this, "computedVal"), true)
             this.computedVal
-            t.equal(isObservable(this, "computedVal"), true)
+            t.equal(isObservableProp(this, "computedVal"), true)
         }
     }
 
@@ -1016,7 +1037,7 @@ test("484 - isObservableObject type guard includes type T", () => {
 })
 
 test("484 - isObservableObject type guard includes type IObservableObject", () => {
-    const requires_observable_object = (o: IObservableObject): void => null
+    const requires_observable_object = (o: IObservableObject): void => {}
     const o = observable({ stuff: "things" })
 
     if (isObservableObject(o)) {
@@ -1031,8 +1052,8 @@ test("705 - setter undoing caching (typescript)", () => {
     let autoruns = 0
 
     class Person {
-        @observable name: string
-        @observable title: string
+        @observable name: string = ""
+        @observable title: string = ""
 
         // Typescript bug: if fullName is before the getter, the property is defined twice / incorrectly, see #705
         // set fullName(val) {
@@ -1085,7 +1106,7 @@ test("@observable.ref (TS)", () => {
     const a = new A()
     t.equal(a.ref.a, 3)
     t.equal(mobx.isObservable(a.ref), false)
-    t.equal(mobx.isObservable(a, "ref"), true)
+    t.equal(mobx.isObservableProp(a, "ref"), true)
 })
 
 test("@observable.shallow (TS)", () => {
@@ -1097,7 +1118,7 @@ test("@observable.shallow (TS)", () => {
     const todo2 = { todo: 2 }
     a.arr.push(todo2)
     t.equal(mobx.isObservable(a.arr), true)
-    t.equal(mobx.isObservable(a, "arr"), true)
+    t.equal(mobx.isObservableProp(a, "arr"), true)
     t.equal(mobx.isObservable(a.arr[0]), false)
     t.equal(mobx.isObservable(a.arr[1]), false)
     t.equal(a.arr[1] === todo2, true)
@@ -1113,7 +1134,7 @@ test("@observable.deep (TS)", () => {
     a.arr.push(todo2)
 
     t.equal(mobx.isObservable(a.arr), true)
-    t.equal(mobx.isObservable(a, "arr"), true)
+    t.equal(mobx.isObservableProp(a, "arr"), true)
     t.equal(mobx.isObservable(a.arr[0]), true)
     t.equal(mobx.isObservable(a.arr[1]), true)
     t.equal(a.arr[1] !== todo2, true)
@@ -1145,16 +1166,16 @@ test("803 - action.bound and action preserve type info", () => {
 
     thingThatAcceptsCallback(
         action((elem: any) => {
-            // TODO: ideally, type of action would be inferred!
-            // console.log(elem.x) // x is boolean
+            // ideally, type of action would be inferred!
+            console.log(elem.x) // x is boolean
         })
     )
 
-    const bound = action.bound(() => {
+    const bound = action(() => {
         return { x: "3" } as Object
     }) as () => void
 
-    const bound2 = action.bound(function() {}) as (() => void)
+    const bound2 = action(function() {}) as (() => void)
 })
 
 test("@computed.equals (TS)", () => {
@@ -1168,7 +1189,7 @@ test("@computed.equals (TS)", () => {
         @observable public hour: number
         @observable public minute: number
 
-        @computed.equals(sameTime)
+        @computed({ equals: sameTime })
         public get time() {
             return { hour: this.hour, minute: this.minute }
         }
@@ -1195,32 +1216,140 @@ test("@computed.equals (TS)", () => {
     disposeAutorun()
 })
 
-test("computed comparer works with extendObservable (TS)", () => {
+test("computed comparer works with decorate (TS)", () => {
     const sameTime = (from: Time, to: Time) => from.hour === to.hour && from.minute === to.minute
     class Time {
-        constructor(hour: number, minute: number) {
-            this.hour = hour
-            this.minute = minute
-            extendObservable(this, {
-                hour,
-                minute,
-                time: computed(
-                    () => {
-                        return { hour: this.hour, minute: this.minute }
-                    },
-                    { equals: sameTime }
-                )
-            })
-        }
+        constructor(public hour: number, public minute: number) {}
 
-        public hour: number
-        public minute: number
-        public time: { hour: number; minute: number }
+        get time() {
+            return { hour: this.hour, minute: this.minute }
+        }
+    }
+    decorate(Time, {
+        hour: observable,
+        minute: observable,
+        time: computed({ equals: sameTime })
+    })
+    const time = new Time(9, 0)
+
+    const changes: Array<{ hour: number; minute: number }> = []
+    const disposeAutorun = autorun(() => changes.push((time as any).time))
+
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 9
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.minute = 0
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 10
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    t.deepEqual(changes, [
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test("computed comparer works with decorate (TS)", () => {
+    const sameTime = (from: Time, to: Time) => from.hour === to.hour && from.minute === to.minute
+    class Time {
+        constructor(public hour: number, public minute: number) {}
+
+        get time() {
+            return { hour: this.hour, minute: this.minute }
+        }
+    }
+    decorate(Time, {
+        hour: observable,
+        minute: observable,
+        time: computed({ equals: sameTime })
+    })
+    const time = new Time(9, 0)
+
+    const changes: Array<{ hour: number; minute: number }> = []
+    const disposeAutorun = autorun(() => changes.push((time as any).time))
+
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 9
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.minute = 0
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 10
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    t.deepEqual(changes, [
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test("computed comparer works with decorate (TS) - 2", () => {
+    const sameTime = (from: Time, to: Time) => from.hour === to.hour && from.minute === to.minute
+    class Time {
+        hour: number
+        minute: number
+        readonly time: number
+
+        constructor(hour: number, minute: number) {
+            extendObservable(
+                this,
+                {
+                    hour,
+                    minute,
+                    get time() {
+                        return { hour: this.hour, minute: this.minute }
+                    }
+                },
+                {
+                    time: computed({ equals: sameTime })
+                }
+            )
+        }
     }
     const time = new Time(9, 0)
 
     const changes: Array<{ hour: number; minute: number }> = []
-    const disposeAutorun = autorun(() => changes.push(time.time))
+    const disposeAutorun = autorun(() => changes.push((time as any).time))
+
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 9
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.minute = 0
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }])
+    time.hour = 10
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    time.minute = 30
+    t.deepEqual(changes, [
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 },
+        { hour: 10, minute: 30 }
+    ])
+
+    disposeAutorun()
+})
+
+test("computed comparer works with decorate (TS) - 3", () => {
+    const sameTime = (from: any, to: any) => from.hour === to.hour && from.minute === to.minute
+    const time = observable.object(
+        {
+            hour: 9,
+            minute: 0,
+            get time() {
+                return { hour: this.hour, minute: this.minute }
+            }
+        },
+        {
+            time: computed({ equals: sameTime })
+        }
+    )
+
+    const changes: Array<{ hour: number; minute: number }> = []
+    const disposeAutorun = autorun(() => changes.push((time as any).time))
 
     t.deepEqual(changes, [{ hour: 9, minute: 0 }])
     time.hour = 9
@@ -1241,9 +1370,267 @@ test("computed comparer works with extendObservable (TS)", () => {
 
 test("1072 - @observable without initial value and observe before first access", () => {
     class User {
-        @observable loginCount: number
+        @observable loginCount?: number
     }
 
     const user = new User()
     observe(user, "loginCount", () => {})
+})
+
+test("typescript - decorate works with classes", () => {
+    class Box {
+        height: number = 2
+    }
+
+    decorate(Box, {
+        height: observable
+        // size: observable // MWE: enabling this should give type error!
+    })
+    const b = new Box()
+    expect(b.height).toBe(2)
+    expect(mobx.isObservableProp(b, "height")).toBe(true)
+})
+
+test("typescript - decorate works with objects", () => {
+    const b = decorate(
+        {
+            height: 2
+        },
+        {
+            height: observable
+            // size: observable // MWE: enabling this should give type error!
+        }
+    )
+    expect(mobx.isObservableProp(b, "height")).toBe(true)
+    expect(b.height).toBe(2)
+})
+
+test("typescript - decorate works with Object.create", () => {
+    const Box = {
+        height: 2
+    }
+
+    decorate(Box, {
+        height: observable
+        // size: observable // MWE: enabling this should give type error!
+    })
+
+    const b = Object.create(Box)
+    expect(mobx.isObservableProp(b, "height")).toBe(true)
+    expect(b.height).toBe(2)
+})
+
+test("issue #1122", done => {
+    class ClassA {
+        _atom = createAtom(
+            "Testing atom",
+            () => {
+                // console.log("Value getting observed.")
+            },
+            () => {
+                // console.log("Value getting unobserved.")
+                runInAction(() => {}) // <-- INFINITE RECURSION
+            }
+        )
+        get value() {
+            this._atom.reportObserved()
+            return true
+        }
+    }
+
+    const a = new ClassA()
+    const unobserve = autorun(() => {
+        // console.log(a.value)
+    })
+
+    setTimeout(() => {
+        unobserve()
+        done()
+    }, 100)
+})
+
+test("unread computed reads should trow with requiresReaction enabled", () => {
+    class A {
+        @observable x = 0
+
+        @computed({ requiresReaction: true })
+        get y() {
+            return this.x * 2
+        }
+    }
+
+    const a = new A()
+    expect(() => {
+        a.y
+    }).toThrow(/is read outside a reactive context/)
+
+    const d = mobx.reaction(() => a.y, () => {})
+    expect(() => {
+        a.y
+    }).not.toThrow()
+
+    d()
+    expect(() => {
+        a.y
+    }).toThrow(/is read outside a reactive context/)
+})
+
+test("multiple inheritance should work", () => {
+    class A {
+        @observable x = 1
+    }
+
+    class B extends A {
+        @observable y = 1
+    }
+
+    expect(mobx.keys(new B())).toEqual(["x", "y"])
+})
+
+test("actions are not reassignable", () => {
+    class A {
+        @action
+        m1() {}
+        @action m2 = () => {}
+        @action.bound
+        m3() {}
+        @action.bound m4 = () => {}
+    }
+
+    const a = new A()
+    expect(isAction(a.m1)).toBe(true)
+    expect(isAction(a.m2)).toBe(true)
+    expect(isAction(a.m3)).toBe(true)
+    expect(isAction(a.m4)).toBe(true)
+    // expect(() => {
+    //     a.m1 = () => {}
+    // }).toThrow(/Cannot assign to read only property 'm1'/)
+    a.m1 = () => {}
+    // we cannot prevent actions to be reassignable in TS, as it will kill overriding the action in subtypes :'(
+    expect(isAction(a.m1)).toBe(false)
+    expect(() => {
+        a.m2 = () => {}
+    }).toThrow(/Cannot assign to read only property 'm2'/)
+    expect(() => {
+        a.m3 = () => {}
+    }).toThrow(/Cannot assign to read only property 'm3'/)
+    expect(() => {
+        a.m4 = () => {}
+    }).toThrow(/Cannot assign to read only property 'm4'/)
+})
+
+test("map should structurally match ES6 Map", () => {
+    // Including this line strictly for type checking.
+    const m: Map<string, number> = mobx.observable.map({ a: 1, b: 2 })
+    expect(true).toBe(true)
+})
+
+test("single arg when returns a promise", async () => {
+    const x = mobx.observable.box(1)
+
+    setTimeout(() => x.set(3), 200)
+    await mobx.when(() => x.get() === 3)
+})
+
+test("single arg when returns a can timeout", async () => {
+    const x = mobx.observable.box(1)
+
+    setTimeout(() => x.set(3), 200)
+    try {
+        await mobx.when(() => x.get() === 3, { timeout: 100 })
+        fail("should timeout")
+    } catch (e) {
+        expect("" + e).toMatch(/WHEN_TIMEOUT/)
+    }
+})
+
+test("promised when can be cancelled", async () => {
+    const x = mobx.observable.box(1)
+
+    try {
+        debugger
+        const p = mobx.when(() => x.get() === 3)
+        setTimeout(() => p.cancel(), 100)
+        await p
+        fail("should cancel")
+    } catch (e) {
+        expect("" + e).toMatch(/WHEN_CANCELLED/)
+    }
+})
+
+test("it should support asyncAction as decorator (ts)", async () => {
+    const values = []
+
+    mobx.configure({ enforceActions: true })
+
+    class X {
+        @observable a = 1
+
+        f = mobx.flow(function* f(initial: number): any {
+            this.a = initial // this runs in action
+            this.a += yield Promise.resolve(5)
+            this.a = this.a * 2
+            return this.a
+        })
+    }
+
+    const x = new X()
+
+    expect(await x.f(3)).toBe(16)
+})
+
+test("flow support async generators", async () => {
+    ;(Symbol as any).asyncIterator =
+        (Symbol as any).asyncIterator || Symbol.for("Symbol.asyncIterator")
+
+    async function* someNumbers() {
+        await Promise.resolve()
+        yield 1
+        await Promise.resolve()
+        yield 2
+        await Promise.resolve()
+        yield 3
+    }
+
+    let steps = 0
+    const start = mobx.flow(async function*() {
+        let total = 0
+        for await (const number of someNumbers()) {
+            total += number
+        }
+        return total
+    })
+
+    const p = start()
+    const res = await p
+    expect(res).toBe(6)
+})
+
+test.only("flow support throwing async generators", async () => {
+    ;(Symbol as any).asyncIterator =
+        (Symbol as any).asyncIterator || Symbol.for("Symbol.asyncIterator")
+
+    async function* someNumbers() {
+        await Promise.resolve()
+        yield 1
+        await Promise.resolve()
+        throw "OOPS"
+    }
+
+    let steps = 0
+    const start = mobx.flow(async function*() {
+        let total = 0
+        for await (const number of someNumbers()) {
+            total += number
+        }
+        return total
+    })
+
+    const p = start()
+    try {
+        await p
+        fail()
+    } catch (e) {
+        expect("" + e).toBe("OOPS")
+    }
 })

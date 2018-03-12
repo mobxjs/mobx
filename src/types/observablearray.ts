@@ -7,9 +7,10 @@ import {
     EMPTY_ARRAY,
     addHiddenFinalProp,
     addHiddenProp,
-    invariant
+    invariant,
+    deprecated
 } from "../utils/utils"
-import { BaseAtom } from "../core/atom"
+import { Atom, IAtom } from "../core/atom"
 import { checkIfStateModificationsAreAllowed } from "../core/derivation"
 import {
     IInterceptable,
@@ -20,7 +21,7 @@ import {
 } from "./intercept-utils"
 import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
-import { arrayAsIterator, declareIterator } from "../utils/iterable"
+import { declareIterator, makeIterable } from "../utils/iterable"
 import { IEnhancer } from "./modifiers"
 
 const MAX_SPLICE_SIZE = 10000 // See e.g. https://github.com/mobxjs/mobx/issues/859
@@ -45,8 +46,6 @@ export interface IObservableArray<T> extends Array<T> {
         fireImmediately?: boolean
     ): Lambda
     intercept(handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>): Lambda
-    intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda // TODO: remove in 4.0
-    intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda // TODO: remove in 4.0
     clear(): T[]
     peek(): T[]
     replace(newItems: T[]): T[]
@@ -123,35 +122,35 @@ inherit(StubArray, Array.prototype)
 // Make them writeable and configurable in prototype chain
 // https://github.com/alibaba/weex/pull/1529
 if (Object.isFrozen(Array)) {
-	;[
-		"constructor",
-		"push",
-		"shift",
-		"concat",
-		"pop",
-		"unshift",
-		"replace",
-		"find",
-		"findIndex",
-		"splice",
-		"reverse",
-		"sort"
-	].forEach(function (key) {
-		Object.defineProperty(StubArray.prototype, key, {
-			configurable: true,
-			writable: true,
-			value: Array.prototype[key]
-		})
-	})
+    ;[
+        "constructor",
+        "push",
+        "shift",
+        "concat",
+        "pop",
+        "unshift",
+        "replace",
+        "find",
+        "findIndex",
+        "splice",
+        "reverse",
+        "sort"
+    ].forEach(function(key) {
+        Object.defineProperty(StubArray.prototype, key, {
+            configurable: true,
+            writable: true,
+            value: Array.prototype[key]
+        })
+    })
 }
 
 class ObservableArrayAdministration<T>
     implements IInterceptable<IArrayWillChange<T> | IArrayWillSplice<T>>, IListenable {
-    atom: BaseAtom
+    atom: IAtom
     values: T[] = []
     lastKnownLength: number = 0
-    interceptors = null
-    changeListeners = null
+    interceptors
+    changeListeners
     enhancer: (newV: T, oldV: T | undefined) => T
     dehancer: any
 
@@ -161,7 +160,7 @@ class ObservableArrayAdministration<T>
         public array: IObservableArray<T>,
         public owned: boolean
     ) {
-        this.atom = new BaseAtom(name || "ObservableArray@" + getNextId())
+        this.atom = new Atom(name || "ObservableArray@" + getNextId())
         this.enhancer = (newV, oldV) => enhancer(newV, oldV, name + "[..]")
     }
 
@@ -171,7 +170,8 @@ class ObservableArrayAdministration<T>
     }
 
     dehanceValues(values: T[]): T[] {
-        if (this.dehancer !== undefined) return values.map(this.dehancer) as any
+        if (this.dehancer !== undefined && this.values.length > 0)
+            return values.map(this.dehancer) as any
         return values
     }
 
@@ -239,7 +239,7 @@ class ObservableArrayAdministration<T>
         else if (deleteCount === undefined || deleteCount === null) deleteCount = 0
         else deleteCount = Math.max(0, Math.min(deleteCount, length - index))
 
-        if (newItems === undefined) newItems = []
+        if (newItems === undefined) newItems = EMPTY_ARRAY
 
         if (hasInterceptors(this)) {
             const change = interceptChange<IArrayWillSplice<T>>(this as any, {
@@ -254,7 +254,8 @@ class ObservableArrayAdministration<T>
             newItems = change.added
         }
 
-        newItems = <T[]>newItems.map(v => this.enhancer(v, undefined))
+        newItems =
+            newItems.length === 0 ? newItems : <T[]>newItems.map(v => this.enhancer(v, undefined))
         const lengthDelta = newItems.length - deleteCount
         this.updateArrayLength(length, lengthDelta) // create or remove new entries
         const res = this.spliceItemsIntoValues(index, deleteCount, newItems)
@@ -289,7 +290,7 @@ class ObservableArrayAdministration<T>
                   }
                 : null
 
-        if (notifySpy) spyReportStart(change)
+        if (notifySpy) spyReportStart({ ...change, name: this.atom.name })
         this.atom.reportChanged()
         if (notify) notifyListeners(this, change)
         if (notifySpy) spyReportEnd()
@@ -311,7 +312,7 @@ class ObservableArrayAdministration<T>
                   }
                 : null
 
-        if (notifySpy) spyReportStart(change)
+        if (notifySpy) spyReportStart({ ...change, name: this.atom.name })
         this.atom.reportChanged()
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
         if (notify) notifyListeners(this, change)
@@ -395,6 +396,10 @@ export class ObservableArray<T> extends StubArray {
         thisArg?,
         fromIndex = 0
     ): T | undefined {
+        if (arguments.length === 3)
+            deprecated(
+                "The array.find fromIndex argument to find will not be supported anymore in the next major"
+            )
         const idx = this.findIndex.apply(this, arguments)
         return idx === -1 ? undefined : this.get(idx)
     }
@@ -405,6 +410,10 @@ export class ObservableArray<T> extends StubArray {
         thisArg?,
         fromIndex = 0
     ): number {
+        if (arguments.length === 3)
+            deprecated(
+                "The array.findIndex fromIndex argument to find will not be supported anymore in the next major"
+            )
         const items = this.peek(),
             l = items.length
         for (let i = fromIndex; i < l; i++) if (predicate.call(thisArg, items[i], i, this)) return i
@@ -478,6 +487,7 @@ export class ObservableArray<T> extends StubArray {
     }
 
     move(fromIndex: number, toIndex: number): void {
+        deprecated("observableArray.move is deprecated, use .slice() & .replace() instead")
         function checkIndex(index: number) {
             if (index < 0) {
                 throw new Error(`[mobx.array] Index out of bounds: ${index} is negative`)
@@ -569,7 +579,16 @@ export class ObservableArray<T> extends StubArray {
 }
 
 declareIterator(ObservableArray.prototype, function() {
-    return arrayAsIterator(this.slice())
+    ;(this.$mobx as ObservableArrayAdministration<any>).atom.reportObserved()
+    const self = this
+    let nextIndex = 0
+    return makeIterable({
+        next() {
+            return nextIndex < self.length
+                ? { value: self[nextIndex++], done: false }
+                : { done: true, value: undefined }
+        }
+    })
 })
 
 Object.defineProperty(ObservableArray.prototype, "length", {
@@ -650,7 +669,6 @@ function createArrayEntryDescriptor(index: number) {
         enumerable: false,
         configurable: false,
         get: function() {
-            // TODO: Check `this`?, see #752?
             return this.get(index)
         },
         set: function(value) {

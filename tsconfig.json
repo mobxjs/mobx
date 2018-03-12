@@ -10,10 +10,12 @@
         "strictNullChecks": true,
         "noImplicitReturns": true,
         "noImplicitUseStrict": true,
+        "noUnusedLocals": true,
         "noImplicitAny": false,
         "moduleResolution": "node",
+        "downlevelIteration": true,
         "lib": [
-            "es5"
+            "es6"
         ]
     },
     "include": [

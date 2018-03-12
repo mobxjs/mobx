@@ -3,7 +3,6 @@ import { IAtom } from "./atom"
 import { globalState } from "./globalstate"
 import { fail } from "../utils/utils"
 import { isComputedValue } from "./computedvalue"
-import { getMessage } from "../utils/messages"
 
 export enum IDerivationState {
     // before being run or (outside batch and not being observed)
@@ -49,7 +48,7 @@ export interface IDerivation extends IDepTreeNode {
      */
     unboundDepsCount: number
     __mapid: string
-    onBecomeStale()
+    onBecomeStale(): void
     isTracing: TraceMode
 }
 
@@ -59,7 +58,7 @@ export class CaughtException {
     }
 }
 
-export function isCaughtException(e): e is CaughtException {
+export function isCaughtException(e: any): e is CaughtException {
     return e instanceof CaughtException
 }
 
@@ -88,12 +87,16 @@ export function shouldCompute(derivation: IDerivation): boolean {
             for (let i = 0; i < l; i++) {
                 const obj = obs[i]
                 if (isComputedValue(obj)) {
-                    try {
+                    if (globalState.disableErrorBoundaries) {
                         obj.get()
-                    } catch (e) {
-                        // we are not interested in the value *or* exception at this moment, but if there is one, notify all
-                        untrackedEnd(prevUntracked)
-                        return true
+                    } else {
+                        try {
+                            obj.get()
+                        } catch (e) {
+                            // we are not interested in the value *or* exception at this moment, but if there is one, notify all
+                            untrackedEnd(prevUntracked)
+                            return true
+                        }
                     }
                     // if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
                     // and `derivation` is an observer of `obj`
@@ -117,10 +120,20 @@ export function isComputingDerivation() {
 export function checkIfStateModificationsAreAllowed(atom: IAtom) {
     const hasObservers = atom.observers.length > 0
     // Should never be possible to change an observed observable from inside computed, see #798
-    if (globalState.computationDepth > 0 && hasObservers) fail(getMessage("m031") + atom.name)
+    if (globalState.computationDepth > 0 && hasObservers)
+        fail(
+            process.env.NODE_ENV !== "production" &&
+                `Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ${atom.name}`
+        )
     // Should not be possible to change observed state outside strict mode, except during initialization, see #563
     if (!globalState.allowStateChanges && hasObservers)
-        fail(getMessage(globalState.strictMode ? "m030a" : "m030b") + atom.name)
+        fail(
+            process.env.NODE_ENV !== "production" &&
+                (globalState.enforceActions
+                    ? "Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: "
+                    : "Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, the render function of a React component? Tried to modify: ") +
+                    atom.name
+        )
 }
 
 /**
@@ -128,7 +141,7 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
  * The tracking information is stored on the `derivation` object and the derivation is registered
  * as observer of any of the accessed observables.
  */
-export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, context) {
+export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, context: any) {
     // pre allocate array allocation + room for variation in deps
     // array will be trimmed by bindDependencies
     changeDependenciesStateTo0(derivation)
@@ -138,10 +151,14 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, con
     const prevTracking = globalState.trackingDerivation
     globalState.trackingDerivation = derivation
     let result
-    try {
+    if (globalState.disableErrorBoundaries === true) {
         result = f.call(context)
-    } catch (e) {
-        result = new CaughtException(e)
+    } else {
+        try {
+            result = f.call(context)
+        } catch (e) {
+            result = new CaughtException(e)
+        }
     }
     globalState.trackingDerivation = prevTracking
     bindDependencies(derivation)
@@ -155,7 +172,6 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, con
  */
 function bindDependencies(derivation: IDerivation) {
     // invariant(derivation.dependenciesState !== IDerivationState.NOT_TRACKING, "INTERNAL ERROR bindDependencies expects derivation.dependenciesState !== -1");
-
     const prevObserving = derivation.observing
     const observing = (derivation.observing = derivation.newObserving!)
     let lowestNewObservingDerivationState = IDerivationState.UP_TO_DATE

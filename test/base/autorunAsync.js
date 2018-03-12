@@ -14,24 +14,24 @@ test("autorun 1", function(done) {
         _cCalcs = 0
     }
 
-    var a = m.observable(2)
-    var b = m.observable(3)
+    var a = m.observable.box(2)
+    var b = m.observable.box(3)
     var c = m.computed(function() {
         _cCalcs++
         return a.get() * b.get()
     })
-    var d = m.observable(1)
+    var d = m.observable.box(1)
     var autorun = function() {
         _fired++
         _result = d.get() > 0 ? a.get() * c.get() : d.get()
     }
-    var disp = m.autorunAsync(autorun, 20)
+    var disp = m.autorun(autorun, { delay: 20 })
 
     check(0, 0, null)
     disp()
     to(function() {
         check(0, 0, null)
-        disp = m.autorunAsync(autorun, 20)
+        disp = m.autorun(autorun, { delay: 20 })
 
         to(function() {
             check(1, 1, 12)
@@ -85,8 +85,7 @@ test("autorun should not result in loop", function(done) {
     })
 
     var autoRunsCalled = 0
-    var d = m.autorunAsync(
-        "named async",
+    var d = m.autorun(
         function() {
             autoRunsCalled++
             a.x = ++i
@@ -94,7 +93,7 @@ test("autorun should not result in loop", function(done) {
                 a.x = ++i
             }, 10)
         },
-        10
+        { delay: 10, name: "named async" }
     )
 
     setTimeout(function() {
@@ -107,15 +106,18 @@ test("autorun should not result in loop", function(done) {
 })
 
 test("autorunAsync passes Reaction as an argument to view function", function(done) {
-    var a = m.observable(1)
+    var a = m.observable.box(1)
 
     var autoRunsCalled = 0
 
-    m.autorunAsync(r => {
-        expect(typeof r.dispose).toBe("function")
-        autoRunsCalled++
-        if (a.get() === "pleaseDispose") r.dispose()
-    }, 10)
+    m.autorun(
+        r => {
+            expect(typeof r.dispose).toBe("function")
+            autoRunsCalled++
+            if (a.get() === "pleaseDispose") r.dispose()
+        },
+        { delay: 10 }
+    )
 
     setTimeout(() => a.set(2), 250)
     setTimeout(() => a.set("pleaseDispose"), 400)
@@ -128,8 +130,145 @@ test("autorunAsync passes Reaction as an argument to view function", function(do
     }, 1000)
 })
 
+test("autorunAsync accepts a scheduling function", function(done) {
+    var a = m.observable({
+        x: 0,
+        y: 1
+    })
+
+    var autoRunsCalled = 0
+    var schedulingsCalled = 0
+
+    m.autorun(
+        function(r) {
+            autoRunsCalled++
+            expect(a.y).toBe(a.x + 1)
+
+            if (a.x < 10) {
+                // Queue the two actions separately, if this was autorun it would fail
+                setTimeout(function() {
+                    a.x = a.x + 1
+                }, 0)
+                setTimeout(function() {
+                    a.y = a.y + 1
+                }, 0)
+            }
+        },
+        {
+            scheduler: function(fn) {
+                schedulingsCalled++
+                setTimeout(fn, 0)
+            }
+        }
+    )
+
+    setTimeout(function() {
+        expect(autoRunsCalled).toBe(11)
+        expect(schedulingsCalled).toBe(11)
+        done()
+    }, 1000)
+})
+
+test("reaction accepts a scheduling function", function(done) {
+    var a = m.observable({
+        x: 0,
+        y: 1
+    })
+
+    var autoRunsCalled = 0
+    var schedulingsCalled = 0
+    var exprCalled = 0
+
+    var values = []
+
+    m.reaction(
+        () => {
+            exprCalled++
+            return a.x
+        },
+        () => {
+            autoRunsCalled++
+            values.push(a.x)
+        },
+        {
+            fireImmediately: true,
+            scheduler: function(fn) {
+                schedulingsCalled++
+                setTimeout(fn, 2)
+            }
+        }
+    )
+
+    a.x++
+    a.x++
+    a.x++
+    setTimeout(() => {
+        a.x++
+        a.x++
+        a.x++
+    }, 20)
+
+    setTimeout(function() {
+        expect(exprCalled).toBe(3) // start, 2 batches
+        expect(autoRunsCalled).toBe(3) // start, 2 batches
+        expect(schedulingsCalled).toBe(2) // skipped first time due to fireImmediately
+        expect(values).toEqual([0, 3, 6])
+        done()
+    }, 100)
+})
+
 test("autorunAsync warns when passed an action", function() {
     var action = m.action(() => {})
     expect.assertions(1)
-    expect(() => m.autorunAsync(action)).toThrowError(/attempted to pass an action to autorunAsync/)
+    expect(() => m.autorun(action)).toThrowError(/Autorun does not accept actions/)
+})
+
+test("whenWithTimeout should operate normally", done => {
+    var a = m.observable.box(1)
+
+    m.when(() => a.get() === 2, () => done(), {
+        timeout: 500,
+        onError: () => done.fail("error triggered")
+    })
+
+    setTimeout(m.action(() => a.set(2)), 200)
+})
+
+test("whenWithTimeout should timeout", done => {
+    const a = m.observable.box(1)
+
+    m.when(() => a.get() === 2, () => done.fail("should have timed out"), {
+        timeout: 500,
+        onError: e => {
+            expect("" + e).toMatch(/WHEN_TIMEOUT/)
+            done()
+        }
+    })
+
+    setTimeout(m.action(() => a.set(2)), 1000)
+})
+
+test("whenWithTimeout should dispose", done => {
+    const a = m.observable.box(1)
+
+    const d1 = m.when(() => a.get() === 2, () => done.fail("1 should not finsih"), {
+        timeout: 100,
+        onError: () => done.fail("1 should not timeout")
+    })
+
+    const d2 = m.when(() => a.get() === 2, () => t.fail("2 should not finsih"), {
+        timeout: 200,
+        onError: () => done.fail("2 should not timeout")
+    })
+
+    d1()
+    d2()
+
+    setTimeout(
+        m.action(() => {
+            a.set(2)
+            done()
+        }),
+        150
+    )
 })

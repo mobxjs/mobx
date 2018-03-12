@@ -1,4 +1,4 @@
-import { getGlobal, deprecated } from "../utils/utils"
+import { getGlobal, fail } from "../utils/utils"
 import { IDerivation } from "./derivation"
 import { Reaction } from "./reaction"
 import { IObservable } from "./observable"
@@ -6,7 +6,14 @@ import { IObservable } from "./observable"
 /**
  * These values will persist if global state is reset
  */
-const persistentKeys = ["mobxGuid", "resetId", "spyListeners", "strictMode", "runId"]
+const persistentKeys = [
+    "mobxGuid",
+    "spyListeners",
+    "enforceActions",
+    "computedRequiresReaction",
+    "disableErrorBoundaries",
+    "runId"
+]
 
 export class MobXGlobals {
     /**
@@ -68,12 +75,7 @@ export class MobXGlobals {
     /**
      * If strict mode is enabled, state changes are by default not allowed
      */
-    strictMode = false
-
-    /**
-     * Used by createTransformer to detect that the global state has been reset.
-     */
-    resetId = 0
+    enforceActions = false
 
     /**
      * Spy callbacks
@@ -84,13 +86,22 @@ export class MobXGlobals {
      * Globally attached error handlers that react specifically to errors in reactions
      */
     globalReactionErrorHandlers: ((error: any, derivation: IDerivation) => void)[] = []
+
+    /**
+     * Warn if computed values are accessed outside a reactive context
+     */
+    computedRequiresReaction = false
+
+    /*
+     * Don't catch and rethrow exceptions. This is useful for inspecting the state of
+     * the stack when an exception occurs while debugging.
+     */
+    disableErrorBoundaries = false
 }
 
 export let globalState: MobXGlobals = new MobXGlobals()
 
-let shareGlobalStateCalled = false
 let runInIsolationCalled = false
-let warnedAboutMultipleInstances = false
 
 {
     const global = getGlobal()
@@ -99,10 +110,10 @@ let warnedAboutMultipleInstances = false
     } else {
         global.__mobxInstanceCount++
         setTimeout(() => {
-            if (!shareGlobalStateCalled && !runInIsolationCalled && !warnedAboutMultipleInstances) {
-                warnedAboutMultipleInstances = true
-                console.warn(
-                    "[mobx] Warning: there are multiple mobx instances active. This might lead to unexpected results. See https://github.com/mobxjs/mobx/issues/1082 for details."
+            if (!runInIsolationCalled) {
+                fail(
+                    process.env.NODE_ENV !== "production" &&
+                        "There are multiple mobx instances active. This might lead to unexpected results. See https://github.com/mobxjs/mobx/issues/1082 for details."
                 )
             }
         }, 1)
@@ -114,32 +125,8 @@ export function isolateGlobalState() {
     getGlobal().__mobxInstanceCount--
 }
 
-export function shareGlobalState() {
-    // TODO: remove in 4.0; just use peer dependencies instead.
-    deprecated(
-        "Using `shareGlobalState` is not recommended, use peer dependencies instead. See https://github.com/mobxjs/mobx/issues/1082 for details."
-    )
-    shareGlobalStateCalled = true
-    const global = getGlobal()
-    const ownState = globalState
-
-    /**
-     * Backward compatibility check
-     */
-    if (global.__mobservableTrackingStack || global.__mobservableViewStack)
-        throw new Error("[mobx] An incompatible version of mobservable is already loaded.")
-    if (global.__mobxGlobal && global.__mobxGlobal.version !== ownState.version)
-        throw new Error("[mobx] An incompatible version of mobx is already loaded.")
-    if (global.__mobxGlobal) globalState = global.__mobxGlobal
-    else global.__mobxGlobal = ownState
-}
-
 export function getGlobalState(): any {
     return globalState
-}
-
-export function registerGlobals() {
-    // no-op to make explicit why this file is loaded
 }
 
 /**
@@ -147,9 +134,8 @@ export function registerGlobals() {
  * but can be used to get back at a stable state after throwing errors
  */
 export function resetGlobalState() {
-    globalState.resetId++
     const defaultGlobals = new MobXGlobals()
     for (let key in defaultGlobals)
         if (persistentKeys.indexOf(key) === -1) globalState[key] = defaultGlobals[key]
-    globalState.allowStateChanges = !globalState.strictMode
+    globalState.allowStateChanges = !globalState.enforceActions
 }

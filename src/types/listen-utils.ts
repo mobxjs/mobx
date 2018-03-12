@@ -2,15 +2,15 @@ import { Lambda, once } from "../utils/utils"
 import { untrackedStart, untrackedEnd } from "../core/derivation"
 
 export interface IListenable {
-    changeListeners: Function[] | null
+    changeListeners: Function[] | undefined
     observe(handler: (change: any, oldValue?: any) => void, fireImmediately?: boolean): Lambda
 }
 
 export function hasListeners(listenable: IListenable) {
-    return listenable.changeListeners && listenable.changeListeners.length > 0
+    return listenable.changeListeners !== undefined && listenable.changeListeners.length > 0
 }
 
-export function registerListener<T>(listenable: IListenable, handler: Function): Lambda {
+export function registerListener(listenable: IListenable, handler: Function): Lambda {
     const listeners = listenable.changeListeners || (listenable.changeListeners = [])
     listeners.push(handler)
     return once(() => {

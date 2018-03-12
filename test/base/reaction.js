@@ -1,8 +1,9 @@
 var mobx = require("../../src/mobx.ts")
 var reaction = mobx.reaction
+const utils = require("../utils/test-utils")
 
 test("basic", () => {
-    var a = mobx.observable(1)
+    var a = mobx.observable.box(1)
     var values = []
 
     var d = reaction(
@@ -21,7 +22,7 @@ test("basic", () => {
 })
 
 test("effect fireImmediately is honored", () => {
-    var a = mobx.observable(1)
+    var a = mobx.observable.box(1)
     var values = []
 
     var d = reaction(
@@ -29,7 +30,7 @@ test("effect fireImmediately is honored", () => {
         newValue => {
             values.push(newValue)
         },
-        true
+        { fireImmediately: true }
     )
 
     a.set(2)
@@ -41,8 +42,8 @@ test("effect fireImmediately is honored", () => {
 })
 
 test("effect is untracked", () => {
-    var a = mobx.observable(1)
-    var b = mobx.observable(2)
+    var a = mobx.observable.box(1)
+    var b = mobx.observable.box(2)
     var values = []
 
     var d = reaction(
@@ -66,7 +67,7 @@ test("effect debounce is honored", () => {
     expect.assertions(2)
 
     return new Promise((resolve, reject) => {
-        var a = mobx.observable(1)
+        var a = mobx.observable.box(1)
         var values = []
         var exprCount = 0
 
@@ -105,7 +106,7 @@ test("effect debounce is honored", () => {
 test("effect debounce + fire immediately is honored", () => {
     expect.assertions(2)
     return new Promise((resolve, reject) => {
-        var a = mobx.observable(1)
+        var a = mobx.observable.box(1)
         var values = []
         var exprCount = 0
 
@@ -140,7 +141,7 @@ test("effect debounce + fire immediately is honored", () => {
 })
 
 test("passes Reaction as an argument to expression function", () => {
-    var a = mobx.observable(1)
+    var a = mobx.observable.box(1)
     var values = []
 
     reaction(
@@ -164,7 +165,7 @@ test("passes Reaction as an argument to expression function", () => {
 })
 
 test("passes Reaction as an argument to effect function", () => {
-    var a = mobx.observable(1)
+    var a = mobx.observable.box(1)
     var values = []
 
     reaction(
@@ -186,7 +187,7 @@ test("passes Reaction as an argument to effect function", () => {
 })
 
 test("can dispose reaction on first run", () => {
-    var a = mobx.observable(1)
+    var a = mobx.observable.box(1)
 
     var valuesExpr1st = []
     reaction(
@@ -240,7 +241,7 @@ test("can dispose reaction on first run", () => {
 })
 
 test("#278 do not rerun if expr output doesn't change", () => {
-    var a = mobx.observable(1)
+    var a = mobx.observable.box(1)
     var values = []
 
     var d = reaction(
@@ -305,7 +306,7 @@ test("#278 do not rerun if expr output doesn't change structurally", () => {
 })
 
 test("do not rerun if prev & next expr output is NaN", () => {
-    var v = mobx.observable("a")
+    var v = mobx.observable.box("a")
     var values = []
     var valuesS = []
 
@@ -337,7 +338,7 @@ test("do not rerun if prev & next expr output is NaN", () => {
 })
 
 test("reaction uses equals", () => {
-    const o = mobx.observable("a")
+    const o = mobx.observable.box("a")
     const values = []
     const disposeReaction = mobx.reaction(
         () => o.get(),
@@ -356,52 +357,246 @@ test("reaction uses equals", () => {
 })
 
 test("reaction equals function only invoked when necessary", () => {
-    const comparisons = []
-    const loggingComparer = (from, to) => {
-        comparisons.push({ from, to })
-        return from === to
-    }
+    utils.supressConsole(() => {
+        const comparisons = []
+        const loggingComparer = (from, to) => {
+            comparisons.push({ from, to })
+            return from === to
+        }
 
-    const left = mobx.observable("A")
-    const right = mobx.observable("B")
+        const left = mobx.observable.box("A")
+        const right = mobx.observable.box("B")
 
-    const values = []
-    const disposeReaction = mobx.reaction(
-        // Note: exceptions thrown here are intentional!
-        () => left.get().toLowerCase() + right.get().toLowerCase(),
-        value => values.push(value),
-        { equals: loggingComparer, fireImmediately: true }
+        const values = []
+        const disposeReaction = mobx.reaction(
+            // Note: exceptions thrown here are intentional!
+            () => left.get().toLowerCase() + right.get().toLowerCase(),
+            value => values.push(value),
+            { equals: loggingComparer, fireImmediately: true }
+        )
+
+        // No comparison should be made on the first value
+        expect(comparisons).toEqual([])
+
+        // First change will cause a comparison
+        left.set("C")
+        expect(comparisons).toEqual([{ from: "ab", to: "cb" }])
+
+        // Exception in the reaction expression won't cause a comparison
+        left.set(null)
+        expect(comparisons).toEqual([{ from: "ab", to: "cb" }])
+
+        // Another exception in the reaction expression won't cause a comparison
+        right.set(null)
+        expect(comparisons).toEqual([{ from: "ab", to: "cb" }])
+
+        // Transition from exception in the expression will cause a comparison with the last valid value
+        left.set("D")
+        right.set("E")
+        expect(comparisons).toEqual([{ from: "ab", to: "cb" }, { from: "cb", to: "de" }])
+
+        // Another value change will cause a comparison
+        right.set("F")
+        expect(comparisons).toEqual([
+            { from: "ab", to: "cb" },
+            { from: "cb", to: "de" },
+            { from: "de", to: "df" }
+        ])
+
+        expect(values).toEqual(["ab", "cb", "de", "df"])
+
+        disposeReaction()
+    })
+})
+
+test("issue #1148", () => {
+    const a = mobx.observable.box(1)
+    let called = 0
+    const dispose = reaction(
+        () => this.a,
+        () => {
+            called++
+        },
+        { delay: 1 }
     )
+    a.set(2)
+    dispose()
+    expect(called).toBe(0)
+})
 
-    // No comparison should be made on the first value
-    expect(comparisons).toEqual([])
+test("Introduce custom onError for - autorun - 1", () => {
+    let error = ""
+    let globalHandlerCalled = false
+    const d = mobx.onReactionError(() => {
+        globalHandlerCalled = true
+    })
+    expect(() => {
+        mobx.autorun(
+            () => {
+                throw "OOPS"
+            },
+            {
+                onError(e) {
+                    error = e
+                }
+            }
+        )
+    }).not.toThrow()
+    expect(error).toBe("OOPS")
+    expect(globalHandlerCalled).toBe(false)
+    d()
+})
 
-    // First change will cause a comparison
-    left.set("C")
-    expect(comparisons).toEqual([{ from: "ab", to: "cb" }])
+test("Introduce custom onError for - autorun - 2", done => {
+    let error = ""
+    let globalHandlerCalled = false
+    const d = mobx.onReactionError(() => {
+        globalHandlerCalled = true
+    })
+    expect(() => {
+        mobx.autorun(
+            () => {
+                throw "OOPS"
+            },
+            {
+                delay: 5,
+                onError(error) {
+                    setImmediate(() => {
+                        expect(error).toBe("OOPS")
+                        expect(globalHandlerCalled).toBe(false)
+                        d()
+                        done()
+                    })
+                }
+            }
+        )
+    }).not.toThrow()
+})
 
-    // Exception in the reaction expression won't cause a comparison
-    left.set(null)
-    expect(comparisons).toEqual([{ from: "ab", to: "cb" }])
+test("Introduce custom onError for - reaction - 1", () => {
+    let error = ""
+    let globalHandlerCalled = false
+    const d = mobx.onReactionError(() => {
+        globalHandlerCalled = true
+    })
+    expect(() => {
+        mobx.reaction(
+            () => {
+                throw "OOPS"
+            },
+            () => {},
+            {
+                onError(e) {
+                    error = e
+                }
+            }
+        )
+    }).not.toThrow()
+    expect(error).toBe("OOPS")
+    expect(globalHandlerCalled).toBe(false)
+    d()
+})
 
-    // Another exception in the reaction expression won't cause a comparison
-    right.set(null)
-    expect(comparisons).toEqual([{ from: "ab", to: "cb" }])
+test("Introduce custom onError for - reaction - 2", () => {
+    let error = ""
+    let globalHandlerCalled = false
+    let box = mobx.observable.box(1)
+    const d = mobx.onReactionError(() => {
+        globalHandlerCalled = true
+    })
+    mobx.reaction(
+        () => box.get(),
+        () => {
+            throw "OOPS"
+        },
+        {
+            onError(e) {
+                error = e
+            }
+        }
+    )
+    expect(() => {
+        box.set(2)
+    }).not.toThrow()
+    expect(error).toBe("OOPS")
+    expect(globalHandlerCalled).toBe(false)
+    d()
+})
 
-    // Transition from exception in the expression will cause a comparison with the last valid value
-    left.set("D")
-    right.set("E")
-    expect(comparisons).toEqual([{ from: "ab", to: "cb" }, { from: "cb", to: "de" }])
+test("Introduce custom onError for - reaction - 3", done => {
+    let globalHandlerCalled = false
+    let box = mobx.observable.box(1)
+    const d = mobx.onReactionError(() => {
+        globalHandlerCalled = true
+    })
+    mobx.reaction(
+        () => box.get(),
+        () => {
+            throw "OOPS"
+        },
+        {
+            delay: 5,
+            onError(e) {
+                expect(e).toBe("OOPS")
+                setImmediate(() => {
+                    expect(globalHandlerCalled).toBe(false)
+                    d()
+                    done()
+                })
+            }
+        }
+    )
+    expect(() => {
+        box.set(2)
+    }).not.toThrow()
+})
 
-    // Another value change will cause a comparison
-    right.set("F")
-    expect(comparisons).toEqual([
-        { from: "ab", to: "cb" },
-        { from: "cb", to: "de" },
-        { from: "de", to: "df" }
-    ])
+test("Introduce custom onError for - when - 1", () => {
+    let error = ""
+    let globalHandlerCalled = false
+    const d = mobx.onReactionError(() => {
+        globalHandlerCalled = true
+    })
+    expect(() => {
+        mobx.when(
+            () => {
+                throw "OOPS"
+            },
+            () => {},
+            {
+                onError(e) {
+                    error = e
+                }
+            }
+        )
+    }).not.toThrow()
+    expect(error).toBe("OOPS")
+    expect(globalHandlerCalled).toBe(false)
+    d()
+})
 
-    expect(values).toEqual(["ab", "cb", "de", "df"])
-
-    disposeReaction()
+test("Introduce custom onError for - when - 2", () => {
+    let error = ""
+    let globalHandlerCalled = false
+    let box = mobx.observable.box(1)
+    const d = mobx.onReactionError(() => {
+        globalHandlerCalled = true
+    })
+    mobx.when(
+        () => box.get() === 2,
+        () => {
+            throw "OOPS"
+        },
+        {
+            onError(e) {
+                error = e
+            }
+        }
+    )
+    expect(() => {
+        box.set(2)
+    }).not.toThrow()
+    expect(error).toBe("OOPS")
+    expect(globalHandlerCalled).toBe(false)
+    d()
 })

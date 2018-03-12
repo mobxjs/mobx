@@ -8,10 +8,10 @@ import {
     getNextId,
     Lambda,
     invariant,
-    deprecated,
     isES6Map,
     getMapLikeKeys,
-    fail
+    fail,
+    addHiddenFinalProp
 } from "../utils/utils"
 import {
     IInterceptable,
@@ -22,116 +22,101 @@ import {
 } from "./intercept-utils"
 import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
-import { arrayAsIterator, declareIterator, Iterator } from "../utils/iterable"
-import { observable } from "../api/observable"
+import { declareIterator, iteratorSymbol, makeIterable } from "../utils/iterable"
 import { transaction } from "../api/transaction"
 import { referenceEnhancer } from "./modifiers"
-import { getMessage } from "../utils/messages"
-
-/**
- * Map as defined by Typescript's lib.es2015.collection.d.ts
- *
- * Imported here to not require consumers to have these libs enabled in their tsconfig if not actually using maps
- */
-export interface IMap<K, V> {
-    clear(): void
-    delete(key: K): boolean
-    forEach(callbackfn: (value: V, index: K, map: IMap<K, V>) => void, thisArg?: any): void
-    get(key: K): V | undefined
-    has(key: K): boolean
-    set(key: K, value?: V): this
-    readonly size: number
-}
 
 export interface IKeyValueMap<V> {
     [key: string]: V
 }
 
-export type IMapEntry<V> = [string, V]
-export type IMapEntries<V> = IMapEntry<V>[]
+export type IMapEntry<K, V> = [K, V]
+export type IMapEntries<K, V> = IMapEntry<K, V>[]
 
-// In 3.0, change to IObjectMapChange
-export type IMapChange<T> = IMapChangeUpdate<T> | IMapChangeAdd<T> | IMapChangeDelete<T>
+export type IMapDidChange<K, V> =
+    | {
+          object: ObservableMap<K, V>
+          name: K // actual the key or index, but this is based on the ancient .observe proposal for consistency
+          type: "update"
+          newValue: V
+          oldValue: V
+      }
+    | {
+          object: ObservableMap<K, V>
+          name: K
+          type: "add"
+          newValue: V
+      }
+    | {
+          object: ObservableMap<K, V>
+          name: K
+          type: "delete"
+          oldValue: V
+      }
 
-export interface IMapChangeBase<T> {
-    object: ObservableMap<T>
-    name: string
-}
-
-export interface IMapChangeUpdate<T> extends IMapChangeBase<T> {
-    type: "update"
-    newValue: T
-    oldValue: T
-}
-
-export interface IMapChangeAdd<T> extends IMapChangeBase<T> {
-    type: "add"
-    newValue: T
-}
-
-export interface IMapChangeDelete<T> extends IMapChangeBase<T> {
-    type: "delete"
-    oldValue: T
-}
-
-export interface IMapWillChange<T> {
-    object: ObservableMap<T>
+export interface IMapWillChange<K, V> {
+    object: ObservableMap<K, V>
     type: "update" | "add" | "delete"
-    name: string
-    newValue?: T
+    name: K
+    newValue?: V
 }
 
 const ObservableMapMarker = {}
 
-export type IObservableMapInitialValues<V> = IMapEntries<V> | IKeyValueMap<V> | IMap<string, V>
+export type IObservableMapInitialValues<K, V> = IMapEntries<K, V> | IKeyValueMap<V> | Map<K, V>
 
-export class ObservableMap<V>
-    implements IInterceptable<IMapWillChange<V>>, IListenable, IMap<string, V> {
+export class ObservableMap<K, V>
+    implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable {
     $mobx = ObservableMapMarker
-    private _data: { [key: string]: ObservableValue<V | undefined> } = Object.create(null)
-    private _hasMap: { [key: string]: ObservableValue<boolean> } = Object.create(null) // hasMap, not hashMap >-).
-    private _keys: IObservableArray<string> = <any>new ObservableArray(
+    private _data: Map<K, ObservableValue<V>>
+    private _hasMap: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
+    private _keys: IObservableArray<K> = <any>new ObservableArray(
         undefined,
         referenceEnhancer,
         `${this.name}.keys()`,
         true
     )
-    interceptors = null
-    changeListeners = null
-    dehancer: any = undefined
+    interceptors
+    changeListeners
+    dehancer: any;
+    [Symbol.iterator];
+    [Symbol.toStringTag]
 
     constructor(
-        initialData?: IObservableMapInitialValues<V>,
+        initialData?: IObservableMapInitialValues<K, V>,
         public enhancer: IEnhancer<V> = deepEnhancer,
         public name = "ObservableMap@" + getNextId()
     ) {
+        if (typeof Map !== "function") {
+            throw new Error(
+                "mobx.map requires Map polyfill for the current browser. Check babel-polyfill or core-js/es6/map.js"
+            )
+        }
+        this._data = new Map()
+        this._hasMap = new Map()
         this.merge(initialData)
     }
 
-    private _has(key: string): boolean {
-        return typeof this._data[key] !== "undefined"
+    private _has(key: K): boolean {
+        return this._data.has(key)
     }
 
-    has(key: string): boolean {
-        if (!this.isValidKey(key)) return false
-        key = "" + key
-        if (this._hasMap[key]) return this._hasMap[key].get()
+    has(key: K): boolean {
+        if (this._hasMap.has(key)) return this._hasMap.get(key)!.get()
         return this._updateHasMapEntry(key, false).get()
     }
 
-    set(key: string, value?: V | undefined) {
-        this.assertValidKey(key)
-        key = "" + key
+    set(key: K, value: V) {
         const hasKey = this._has(key)
         if (hasInterceptors(this)) {
-            const change = interceptChange<IMapWillChange<V>>(this, {
+            const change = interceptChange<IMapWillChange<K, V>>(this, {
                 type: hasKey ? "update" : "add",
                 object: this,
                 newValue: value,
                 name: key
             })
             if (!change) return this
-            value = change.newValue
+            value = change.newValue!
         }
         if (hasKey) {
             this._updateValue(key, value)
@@ -141,38 +126,35 @@ export class ObservableMap<V>
         return this
     }
 
-    delete(key: string): boolean {
-        this.assertValidKey(key)
-        key = "" + key
+    delete(key: K): boolean {
         if (hasInterceptors(this)) {
-            const change = interceptChange<IMapWillChange<V>>(this, {
+            const change = interceptChange<IMapWillChange<K, V>>(this, {
                 type: "delete",
                 object: this,
                 name: key
             })
             if (!change) return false
         }
-
         if (this._has(key)) {
             const notifySpy = isSpyEnabled()
             const notify = hasListeners(this)
             const change =
                 notify || notifySpy
-                    ? <IMapChange<V>>{
+                    ? <IMapDidChange<K, V>>{
                           type: "delete",
                           object: this,
-                          oldValue: (<any>this._data[key]).value,
+                          oldValue: (<any>this._data.get(key)).value,
                           name: key
                       }
                     : null
 
-            if (notifySpy) spyReportStart(change)
+            if (notifySpy) spyReportStart({ ...change, name: this.name, key })
             transaction(() => {
                 this._keys.remove(key)
                 this._updateHasMapEntry(key, false)
-                const observable = this._data[key]!
+                const observable = this._data.get(key)!
                 observable.setNewValue(undefined as any)
-                this._data[key] = undefined as any
+                this._data.delete(key)
             })
             if (notify) notifyListeners(this, change)
             if (notifySpy) spyReportEnd()
@@ -181,79 +163,72 @@ export class ObservableMap<V>
         return false
     }
 
-    private _updateHasMapEntry(key: string, value: boolean): ObservableValue<boolean> {
+    private _updateHasMapEntry(key: K, value: boolean): ObservableValue<boolean> {
         // optimization; don't fill the hasMap if we are not observing, or remove entry if there are no observers anymore
-        let entry = this._hasMap[key]
+        let entry = this._hasMap.get(key)
         if (entry) {
             entry.setNewValue(value)
         } else {
-            entry = this._hasMap[key] = new ObservableValue(
-                value,
-                referenceEnhancer,
-                `${this.name}.${key}?`,
-                false
-            )
+            entry = new ObservableValue(value, referenceEnhancer, `${this.name}.${key}?`, false)
+            this._hasMap.set(key, entry)
         }
         return entry
     }
 
-    private _updateValue(name: string, newValue: V | undefined) {
-        const observable = this._data[name]!
+    private _updateValue(key: K, newValue: V | undefined) {
+        const observable = this._data.get(key)!
         newValue = (observable as any).prepareNewValue(newValue) as V
         if (newValue !== UNCHANGED) {
             const notifySpy = isSpyEnabled()
             const notify = hasListeners(this)
             const change =
                 notify || notifySpy
-                    ? <IMapChange<V>>{
+                    ? <IMapDidChange<K, V>>{
                           type: "update",
                           object: this,
                           oldValue: (observable as any).value,
-                          name,
+                          name: key,
                           newValue
                       }
                     : null
-
-            if (notifySpy) spyReportStart(change)
+            if (notifySpy) spyReportStart({ ...change, name: this.name, key })
             observable.setNewValue(newValue as V)
             if (notify) notifyListeners(this, change)
             if (notifySpy) spyReportEnd()
         }
     }
 
-    private _addValue(name: string, newValue: V | undefined) {
+    private _addValue(key: K, newValue: V) {
         transaction(() => {
-            const observable = (this._data[name] = new ObservableValue(
+            const observable = new ObservableValue(
                 newValue,
                 this.enhancer,
-                `${this.name}.${name}`,
+                `${this.name}.${key}`,
                 false
-            ))
+            )
+            this._data.set(key, observable)
             newValue = (observable as any).value // value might have been changed
-            this._updateHasMapEntry(name, true)
-            this._keys.push(name)
+            this._updateHasMapEntry(key, true)
+            this._keys.push(key)
         })
-
         const notifySpy = isSpyEnabled()
         const notify = hasListeners(this)
         const change =
             notify || notifySpy
-                ? <IMapChange<V>>{
+                ? <IMapDidChange<K, V>>{
                       type: "add",
                       object: this,
-                      name,
+                      name: key,
                       newValue
                   }
                 : null
-
-        if (notifySpy) spyReportStart(change)
+        if (notifySpy) spyReportStart({ ...change, name: this.name, key })
         if (notify) notifyListeners(this, change)
         if (notifySpy) spyReportEnd()
     }
 
-    get(key: string): V | undefined {
-        key = "" + key
-        if (this.has(key)) return this.dehanceValue(this._data[key]!.get())
+    get(key: K): V | undefined {
+        if (this.has(key)) return this.dehanceValue(this._data.get(key)!.get())
         return this.dehanceValue(undefined)
     }
 
@@ -264,29 +239,53 @@ export class ObservableMap<V>
         return value
     }
 
-    keys(): string[] & Iterator<string> {
-        return arrayAsIterator(this._keys.slice())
+    keys(): IterableIterator<K> {
+        return (this._keys[iteratorSymbol()] as any)()
     }
 
-    values(): V[] & Iterator<V> {
-        return (arrayAsIterator as any)(this._keys.map(this.get, this))
+    values(): IterableIterator<V> {
+        const self = this
+        let nextIndex = 0
+        return makeIterable({
+            next() {
+                return nextIndex < self._keys.length
+                    ? { value: self.get(self._keys[nextIndex++]), done: false }
+                    : { value: undefined as any, done: true }
+            }
+        })
     }
 
-    entries(): IMapEntries<V> & Iterator<IMapEntry<V>> {
-        return arrayAsIterator(this._keys.map(key => <[string, V]>[key, this.get(key)]))
+    entries(): IterableIterator<IMapEntry<K, V>> {
+        const self = this
+        let nextIndex = 0
+        return makeIterable(
+            {
+                next: function() {
+                    if (nextIndex < self._keys.length) {
+                        const key = self._keys[nextIndex++]
+                        return {
+                            value: [key, self.get(key)!] as [K, V],
+                            done: false
+                        }
+                    }
+                    return { done: true }
+                }
+            } as any
+        )
     }
 
-    forEach(callback: (value: V, key: string, object: IMap<string, V>) => void, thisArg?) {
-        this.keys().forEach(key => callback.call(thisArg, this.get(key), key, this))
+    forEach(callback: (value: V, key: K, object: Map<K, V>) => void, thisArg?) {
+        this._keys.forEach(key => callback.call(thisArg, this.get(key), key, this))
     }
 
     /** Merge another object into this object, returns this. */
-    merge(other: ObservableMap<V> | IKeyValueMap<V> | any): ObservableMap<V> {
+    merge(other: ObservableMap<K, V> | IKeyValueMap<V> | any): ObservableMap<K, V> {
         if (isObservableMap(other)) {
             other = other.toJS()
         }
         transaction(() => {
-            if (isPlainObject(other)) Object.keys(other).forEach(key => this.set(key, other[key]))
+            if (isPlainObject(other))
+                Object.keys(other).forEach(key => this.set((key as any) as K, other[key]))
             else if (Array.isArray(other)) other.forEach(([key, value]) => this.set(key, value))
             else if (isES6Map(other)) other.forEach((value, key) => this.set(key, value))
             else if (other !== null && other !== undefined)
@@ -298,22 +297,20 @@ export class ObservableMap<V>
     clear() {
         transaction(() => {
             untracked(() => {
-                this.keys().forEach(this.delete, this)
+                this._keys.slice().forEach(key => this.delete(key))
             })
         })
     }
 
-    replace(values: ObservableMap<V> | IKeyValueMap<V> | any): ObservableMap<V> {
+    replace(values: ObservableMap<K, V> | IKeyValueMap<V> | any): ObservableMap<K, V> {
         transaction(() => {
             // grab all the keys that are present in the new map but not present in the current map
             // and delete them from the map, then merge the new map
             // this will cause reactions only on changed values
-            const newKeys = getMapLikeKeys(values)
-            const oldKeys = this.keys()
+            const newKeys = (getMapLikeKeys(values) as any) as K[]
+            const oldKeys = this._keys
             const missingKeys = oldKeys.filter(k => newKeys.indexOf(k) === -1)
-
             missingKeys.forEach(k => this.delete(k))
-
             this.merge(values)
         })
         return this
@@ -324,54 +321,55 @@ export class ObservableMap<V>
     }
 
     /**
-     * Returns a shallow non observable object clone of this map.
-     * Note that the values might still be observable. For a deep clone use mobx.toJS.
-     */
-    toJS(): IKeyValueMap<V> {
+	 * Returns a plain object that represents this map.
+	 * Note that all the keys being stringified.
+	 * If there are duplicating keys after converting them to strings, behaviour is undetermined.
+	 */
+    toPOJO(): IKeyValueMap<V> {
         const res: IKeyValueMap<V> = {}
-        this.keys().forEach(key => (res[key] = this.get(key)!))
+        this._keys.forEach(key => (res["" + key] = this.get(key)!))
+        return res
+    }
+
+    /**
+	 * Returns a shallow non observable object clone of this map.
+	 * Note that the values migth still be observable. For a deep clone use mobx.toJS.
+	 */
+    toJS(): Map<K, V> {
+        const res: Map<K, V> = new Map()
+        this._keys.forEach(key => res.set(key, this.get(key)!))
         return res
     }
 
     toJSON(): IKeyValueMap<V> {
         // Used by JSON.stringify
-        return this.toJS()
-    }
-
-    private isValidKey(key: string) {
-        if (key === null || key === undefined) return false
-        if (typeof key === "string" || typeof key === "number" || typeof key === "boolean")
-            return true
-        return false
-    }
-
-    private assertValidKey(key: string) {
-        if (!this.isValidKey(key))
-            throw new Error(
-                `[mobx.map] Invalid key: '${key}', only strings, numbers and booleans are accepted as key in observable maps.`
-            )
+        return this.toPOJO()
     }
 
     toString(): string {
         return (
             this.name +
             "[{ " +
-            this.keys().map(key => `${key}: ${"" + this.get(key)}`).join(", ") +
+            this._keys.map(key => `${key}: ${"" + this.get(key)}`).join(", ") +
             " }]"
         )
     }
 
     /**
-     * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
-     * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
-     * for callback details
-     */
-    observe(listener: (changes: IMapChange<V>) => void, fireImmediately?: boolean): Lambda {
-        invariant(fireImmediately !== true, getMessage("m033"))
+	 * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
+	 * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
+	 * for callback details
+	 */
+    observe(listener: (changes: IMapDidChange<K, V>) => void, fireImmediately?: boolean): Lambda {
+        process.env.NODE_ENV !== "production" &&
+            invariant(
+                fireImmediately !== true,
+                "`observe` doesn't support fireImmediately=true in combination with maps."
+            )
         return registerListener(this, listener)
     }
 
-    intercept(handler: IInterceptor<IMapWillChange<V>>): Lambda {
+    intercept(handler: IInterceptor<IMapWillChange<K, V>>): Lambda {
         return registerInterceptor(this, handler)
     }
 }
@@ -380,12 +378,13 @@ declareIterator(ObservableMap.prototype, function() {
     return this.entries()
 })
 
-export function map<V>(initialValues?: IObservableMapInitialValues<V>): ObservableMap<V> {
-    deprecated("`mobx.map` is deprecated, use `new ObservableMap` or `mobx.observable.map` instead")
-    return observable.map<V>(initialValues)
-}
+addHiddenFinalProp(
+    ObservableMap.prototype,
+    typeof Symbol !== "undefined" ? Symbol.toStringTag : "@@toStringTag" as any,
+    "Map"
+)
 
 /* 'var' fixes small-build issue */
 export var isObservableMap = createInstanceofPredicate("ObservableMap", ObservableMap) as (
     thing: any
-) => thing is ObservableMap<any>
+) => thing is ObservableMap<any, any>

@@ -1,7 +1,13 @@
+export const OBFUSCATED_ERROR =
+    "An invariant failed, however the error is obfuscated because this is an production build."
+
 export const EMPTY_ARRAY = []
 Object.freeze(EMPTY_ARRAY)
 
-declare var window, global, Symbol
+export const EMPTY_OBJECT = {}
+Object.freeze(EMPTY_OBJECT)
+
+declare var window: any
 
 export function getGlobal() {
     return typeof window !== "undefined" ? window : global
@@ -16,14 +22,16 @@ export function getNextId() {
     return ++globalState.mobxGuid
 }
 
-export function fail(message: string, thing?): never {
-    invariant(false, message, thing)
+export function fail(message: string | boolean): never {
+    invariant(false, message)
     throw "X" // unreachable
 }
 
-export function invariant(check: boolean, message: string, thing?) {
-    if (!check)
-        throw new Error("[mobx] Invariant failed: " + message + (thing ? ` in '${thing}'` : ""))
+export function invariant(check: false, message: string | boolean): never
+export function invariant(check: true, message: string | boolean): void
+export function invariant(check: any, message: string | boolean): void
+export function invariant(check: boolean, message: string | boolean) {
+    if (!check) throw new Error("[mobx] " + (message || OBFUSCATED_ERROR))
 }
 
 /**
@@ -32,7 +40,13 @@ export function invariant(check: boolean, message: string, thing?) {
  */
 const deprecatedMessages: string[] = []
 
-export function deprecated(msg: string): boolean {
+export function deprecated(msg: string): boolean
+export function deprecated(thing: string, replacement: string): boolean
+export function deprecated(msg: string, thing?: string): boolean {
+    if (process.env.NODE_ENV === "production") return false
+    if (thing) {
+        return deprecated(`'${msg}', use '${thing}' instead.`)
+    }
     if (deprecatedMessages.indexOf(msg) !== -1) return false
     deprecatedMessages.push(msg)
     console.error("[mobx] Deprecated: " + msg)
@@ -61,14 +75,6 @@ export function unique<T>(list: T[]): T[] {
     return res
 }
 
-export function joinStrings(things: string[], limit: number = 100, separator = " - "): string {
-    if (!things) return ""
-    const sliced = things.slice(0, limit)
-    return `${sliced.join(separator)}${things.length > limit
-        ? " (... and " + (things.length - limit) + "more)"
-        : ""}`
-}
-
 export function isObject(value: any): boolean {
     return value !== null && typeof value === "object"
 }
@@ -77,24 +83,6 @@ export function isPlainObject(value) {
     if (value === null || typeof value !== "object") return false
     const proto = Object.getPrototypeOf(value)
     return proto === Object.prototype || proto === null
-}
-
-export function objectAssign<T extends object>(
-    target: { [key: string]: never },
-    clonedSource: T,
-    ...sources: (Partial<T> & object)[]
-): T
-export function objectAssign<T extends object>(target: T, ...sources: (Partial<T> & object)[]): T
-export function objectAssign() {
-    const res = arguments[0]
-    for (let i = 1, l = arguments.length; i < l; i++) {
-        const source = arguments[i]
-        for (let key in source)
-            if (hasOwnProperty(source, key)) {
-                res[key] = source[key]
-            }
-    }
-    return res
 }
 
 const prototypeHasOwnProperty = Object.prototype.hasOwnProperty
@@ -132,10 +120,10 @@ export function isPropertyConfigurable(object: any, prop: string): boolean {
 }
 
 export function assertPropertyConfigurable(object: any, prop: string) {
-    invariant(
-        isPropertyConfigurable(object, prop),
-        `Cannot make property '${prop}' observable, it is not configurable and writable in the target object`
-    )
+    if (process.env.NODE_ENV !== "production" && !isPropertyConfigurable(object, prop))
+        fail(
+            `Cannot make property '${prop}' observable, it is not configurable and writable in the target object`
+        )
 }
 
 export function createInstanceofPredicate<T>(
@@ -165,14 +153,16 @@ export function isES6Map(thing): boolean {
     return false
 }
 
-export function getMapLikeKeys<V>(map: ObservableMap<V> | IKeyValueMap<V> | any): string[] {
+export function getMapLikeKeys<K, V>(map: ObservableMap<K, V>): ReadonlyArray<K>
+export function getMapLikeKeys<V>(map: IKeyValueMap<V> | any): ReadonlyArray<string>
+export function getMapLikeKeys(map: any): any {
     if (isPlainObject(map)) return Object.keys(map)
     if (Array.isArray(map)) return map.map(([key]) => key)
-    if (isES6Map(map)) return (Array as any).from(map.keys())
-    if (isObservableMap(map)) return map.keys()
-    return fail("Cannot get keys from " + map)
+    if (isES6Map(map) || isObservableMap(map)) return iteratorToArray(map.keys())
+    return fail(`Cannot get keys from '${map}'`)
 }
 
+// use Array.from in Mobx 5
 export function iteratorToArray<T>(it: Iterator<T>): ReadonlyArray<T> {
     const res: T[] = []
     while (true) {
@@ -194,5 +184,3 @@ export function toPrimitive(value) {
 import { globalState } from "../core/globalstate"
 import { IObservableArray, isObservableArray } from "../types/observablearray"
 import { isObservableMap, ObservableMap, IKeyValueMap } from "../types/observablemap"
-import { observable } from "../api/observable"
-import { Iterator } from "./iterable"

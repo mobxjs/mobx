@@ -4,23 +4,20 @@ import { untrackedStart, untrackedEnd } from "./derivation"
 import { startBatch, endBatch } from "./observable"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "./spy"
 import { globalState } from "./globalstate"
-import { getMessage } from "../utils/messages"
 
 export interface IAction {
-    originalFn: Function
     isMobxAction: boolean
 }
 
 export function createAction(actionName: string, fn: Function): Function & IAction {
-    invariant(typeof fn === "function", getMessage("m026"))
-    invariant(
-        typeof actionName === "string" && actionName.length > 0,
-        `actions should have valid names, got: '${actionName}'`
-    )
+    if (process.env.NODE_ENV !== "production") {
+        invariant(typeof fn === "function", "`action` can only be invoked on functions")
+        if (typeof actionName !== "string" || !actionName)
+            fail(`actions should have valid names, got: '${actionName}'`)
+    }
     const res = function() {
         return executeAction(actionName, fn, this, arguments)
     }
-    ;(res as any).originalFn = fn
     ;(res as any).isMobxAction = true
     return res as any
 }
@@ -57,7 +54,6 @@ function startAction(
         spyReportStart({
             type: "action",
             name: actionName,
-            fn,
             object: scope,
             arguments: flattendArgs
         })
@@ -80,24 +76,9 @@ function endAction(runInfo: IActionRunInfo) {
     if (runInfo.notifySpy) spyReportEnd({ time: Date.now() - runInfo.startTime })
 }
 
-export function useStrict(strict: boolean): void {
-    invariant(globalState.trackingDerivation === null, getMessage("m028"))
-    globalState.strictMode = strict
-    globalState.allowStateChanges = !strict
-}
-
-export function isStrictModeEnabled(): boolean {
-    return globalState.strictMode
-}
-
 export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T): T {
-    // TODO: deprecate / refactor this function in next major
-    // Currently only used by `@observer`
-    // Proposed change: remove first param, rename to `forbidStateChanges`,
-    // require error callback instead of the hardcoded error message now used
-    // Use `inAction` instead of allowStateChanges in derivation.ts to check strictMode
     const prev = allowStateChangesStart(allowStateChanges)
-    let res
+    let res: T
     try {
         res = func()
     } finally {

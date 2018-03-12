@@ -19,7 +19,7 @@ function buffer() {
 }
 
 function checkGlobalState() {
-    const gs = mobx.extras.getGlobalState()
+    const gs = mobx._getGlobalState()
     expect(gs.isRunningReactions).toBe(false)
     expect(gs.trackingDerivation).toBe(null)
     expect(gs.inBatch).toBe(0)
@@ -31,7 +31,7 @@ test("exception1", function() {
     var a = computed(function() {
         throw "hoi"
     })
-    expect(() => a()).toThrow()
+    expect(() => a.get()).toThrow(/hoi/)
     checkGlobalState()
 })
 
@@ -76,7 +76,7 @@ test("exception when starting autorun can be recovered from", () => {
     a.x = 3
     expect(b).toBe(6)
     checkGlobalState()
-    expect(mobx.extras.getAtom(a, "y").observers.length).toBe(1)
+    expect(mobx.getAtom(a, "y").observers.length).toBe(1)
 })
 
 test("exception in autorun can be recovered from", () => {
@@ -94,7 +94,7 @@ test("exception in autorun can be recovered from", () => {
     })
     expect(a.y).toBe(2)
     expect(b).toBe(2)
-    expect(mobx.extras.getAtom(a, "y").observers.length).toBe(1)
+    expect(mobx.getAtom(a, "y").observers.length).toBe(1)
 
     utils.consoleError(() => {
         a.x = 2
@@ -104,7 +104,7 @@ test("exception in autorun can be recovered from", () => {
     expect(() => {
         expect(a.y).toBe(2) // old cached value!
     }).toThrowError(/Uhoh/)
-    expect(mobx.extras.getAtom(a, "y").observers.length).toBe(1)
+    expect(mobx.getAtom(a, "y").observers.length).toBe(1)
 
     expect(b).toBe(2)
     checkGlobalState()
@@ -113,13 +113,13 @@ test("exception in autorun can be recovered from", () => {
     expect(a.y).toBe(6)
     expect(b).toBe(6)
     checkGlobalState()
-    expect(mobx.extras.getAtom(a, "y").observers.length).toBe(1)
+    expect(mobx.getAtom(a, "y").observers.length).toBe(1)
     d()
-    expect(mobx.extras.getAtom(a, "y").observers.length).toBe(0)
+    expect(mobx.getAtom(a, "y").observers.length).toBe(0)
 })
 
 test("multiple autoruns with exceptions are handled correctly", () => {
-    var a = mobx.observable(1)
+    var a = mobx.observable.box(1)
     var values = []
     var d1 = mobx.autorun(() => values.push("a" + a.get()))
     var d2 = mobx.autorun(() => {
@@ -147,23 +147,28 @@ test("multiple autoruns with exceptions are handled correctly", () => {
 })
 
 test("deny state changes in views", function() {
-    var x = observable(3)
-    var z = observable(5)
+    var x = observable.box(3)
+    var z = observable.box(5)
     var y = computed(function() {
-        z(6)
-        return x() * x()
+        z.set(6)
+        return x.get() * x.get()
     })
 
     expect(() => {
-        y()
-    }).toThrow()
+        y.get() // modifying unobserved values in computeds is allowed, so that new observables can be created and returned
+    }).not.toThrow()
+
+    m.reaction(() => z.get(), () => {})
+    expect(() => {
+        y.get()
+    }).toThrow(/Computed values are not allowed to cause side effects/)
 
     checkGlobalState()
 })
 
 test("allow state changes in autorun", function() {
-    var x = observable(3)
-    var z = observable(3)
+    var x = observable.box(3)
+    var z = observable.box(3)
 
     m.autorun(function() {
         if (x.get() !== 3) z.set(x.get())
@@ -177,35 +182,36 @@ test("allow state changes in autorun", function() {
     expect(x.get()).toBe(5)
     expect(z.get()).toBe(5)
 
-    expect(mobx.extras.isComputingDerivation()).toBe(false)
+    expect(mobx._isComputingDerivation()).toBe(false)
     checkGlobalState()
 })
 
 test("deny array change in view", function(done) {
-    try {
-        var x = observable(3)
-        var z = observable([])
-        var y = computed(function() {
-            z.push(3)
-            return x() * x()
-        })
+    var x = observable.box(3)
+    var z = observable([])
+    var y = computed(function() {
+        z.push(3)
+        return x.get() * x.get()
+    })
 
-        expect(function() {
-            y()
-        }).toThrow()
+    expect(function() {
+        y.get() // modifying z is allowed if nobody is observing
+    }).not.toThrow()
+    m.reaction(() => z.length, () => {})
 
-        expect(z.slice()).toEqual([])
-        expect(mobx.extras.isComputingDerivation()).toBe(false)
+    expect(function() {
+        y.get()
+    }).toThrow(/Computed values are not allowed to cause side effects by changing observables/)
 
-        checkGlobalState()
-        done()
-    } catch (e) {
-        console.log(e.stack)
-    }
+    expect(z.slice()).toEqual([3])
+    expect(mobx._isComputingDerivation()).toBe(false)
+
+    checkGlobalState()
+    done()
 })
 
 test("allow array change in autorun", function() {
-    var x = observable(3)
+    var x = observable.box(3)
     var z = observable([])
     var y = m.autorun(function() {
         if (x.get() > 4) z.push(x.get())
@@ -217,12 +223,12 @@ test("allow array change in autorun", function() {
     x.set(2)
     expect(z.slice()).toEqual([5, 6])
 
-    expect(mobx.extras.isComputingDerivation()).toBe(false)
+    expect(mobx._isComputingDerivation()).toBe(false)
     checkGlobalState()
 })
 
 test("throw error if modification loop", function() {
-    var x = observable(3)
+    var x = observable.box(3)
     var dis = m.autorun(function() {
         x.set(x.get() + 1) // is allowed to throw, but doesn't as the observables aren't bound yet during first execution
     })
@@ -251,7 +257,7 @@ test("cycle2", function() {
     })
     expect(() => {
         b.get()
-    }).toThrow()
+    }).toThrow(/Cycle detected/)
     checkGlobalState()
 })
 
@@ -261,12 +267,12 @@ test("cycle3", function() {
     })
     expect(() => {
         p.get()
-    }).toThrow()
+    }).toThrow(/Cycle detected/)
     checkGlobalState()
 })
 
 test("cycle4", function() {
-    var z = observable(true)
+    var z = observable.box(true)
     var a = computed(function() {
         return z.get() ? 1 : b.get() * 2
     })
@@ -288,16 +294,19 @@ test("throws when the max iterations over reactions are done", () => {
         a: 1
     })
 
-    mobx.autorun("bar", () => {
-        var x = foo.a
-        foo.a = Math.random()
-    })
+    mobx.autorun(
+        () => {
+            var x = foo.a
+            foo.a = Math.random()
+        },
+        { name: "bar" }
+    )
 
     utils.consoleError(
         () => foo.a++,
         /Reaction doesn't converge to a stable state after 100 iterations/
     )
-    mobx.extras.resetGlobalState()
+    mobx._resetGlobalState()
 })
 
 test("issue 86, converging cycles", function() {
@@ -306,7 +315,7 @@ test("issue 86, converging cycles", function() {
         return -1
     }
 
-    const deleteThisId = mobx.observable(1)
+    const deleteThisId = mobx.observable.box(1)
     const state = mobx.observable({ someArray: [] })
     var calcs = 0
 
@@ -331,7 +340,7 @@ test("issue 86, converging cycles", function() {
 })
 
 test("slow converging cycle", function() {
-    var x = mobx.observable(1)
+    var x = mobx.observable.box(1)
     var res = -1
     mobx.autorun(() => {
         if (x.get() === 100) res = x.get()
@@ -362,15 +371,13 @@ test("error handling assistence ", function(done) {
     var thrown = [] // list of actually thrown exceptons
 
     console.error = function(msg) {
-        baseError.apply(console, arguments)
         errors.push(msg)
     }
     console.warn = function(msg) {
-        baseWarn.apply(console, arguments)
         warns.push(msg)
     }
 
-    var a = observable(3)
+    var a = observable.box(3)
     var b = computed(function() {
         if (a.get() === 42) throw "should not be 42"
         return a.get() * 2
@@ -464,7 +471,7 @@ test("236 - cycles", () => {
 })
 
 test("peeking inside erroring computed value doesn't bork (global) state", () => {
-    const a = mobx.observable(1)
+    const a = mobx.observable.box(1)
     const b = mobx.computed(() => {
         a.get()
         throw "chocolademelk"
@@ -474,14 +481,14 @@ test("peeking inside erroring computed value doesn't bork (global) state", () =>
         b.get()
     }).toThrowError(/chocolademelk/)
 
-    expect(a.isPendingUnobservation).toBe(true) // true is a default for optimization
+    expect(a.isPendingUnobservation).toBe(false)
     expect(a.observers.length).toBe(0)
     expect(a.diffValue).toBe(0)
     expect(a.lowestObserverState).toBe(-1)
     expect(a.hasUnreportedChange).toBe(false)
     expect(a.value).toBe(1)
 
-    // t.equal(b.dependenciesState, 0) // TODO: re-enable
+    expect(b.dependenciesState).toBe(-1) // NOT_TRACKING
     expect(b.observing.length).toBe(0)
     expect(b.newObserving).toBe(null)
     expect(b.isPendingUnobservation).toBe(false)
@@ -499,7 +506,7 @@ test("peeking inside erroring computed value doesn't bork (global) state", () =>
 
 describe("peeking inside autorun doesn't bork (global) state", () => {
     var r = -1
-    const a = mobx.observable(1)
+    const a = mobx.observable.box(1)
     const b = mobx.computed(() => {
         const res = (r = a.get())
         if (res === 2) throw "chocolademelk"
@@ -512,7 +519,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
     expect(r).toBe(1)
 
     test("it should update correctly initially", () => {
-        expect(a.isPendingUnobservation).toBe(true) // true is a default for optimization
+        expect(a.isPendingUnobservation).toBe(false)
         expect(a.observers.length).toBe(1)
         expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState).toBe(-1)
@@ -549,7 +556,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         }, /chocolademelk/)
         expect(r).toBe(2)
 
-        expect(a.isPendingUnobservation).toBe(true) // true is a default for optimization
+        expect(a.isPendingUnobservation).toBe(false)
         expect(a.observers.length).toBe(1)
         expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState).toBe(0)
@@ -585,7 +592,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         a.set(3)
         expect(r).toBe(3)
 
-        expect(a.isPendingUnobservation).toBe(true) // true is a default for optimization
+        expect(a.isPendingUnobservation).toBe(false)
         expect(a.observers.length).toBe(1)
         expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState).toBe(0)
@@ -619,7 +626,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
     test("it should clean up correctly", () => {
         d()
 
-        expect(a.isPendingUnobservation).toBe(true) // true is a default for optimization
+        expect(a.isPendingUnobservation).toBe(false)
         expect(a.observers.length).toBe(0)
         expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState).toBe(0)
@@ -651,29 +658,38 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
 
         checkGlobalState()
     })
+})
 
-    test("it should be possible to handle exceptions in reaction", () => {
-        const a = mobx.observable(1)
-        const d = mobx.autorun(function() {
-            throw a.get()
-        })
-
+test("it should be possible to handle exceptions in reaction", () => {
+    utils.supressConsole(() => {
         const errors = []
-        d.onError(e => errors.push(e))
+        const a = mobx.observable.box(1)
+        const d = mobx.autorun(
+            function() {
+                throw a.get()
+            },
+            {
+                onError(e) {
+                    errors.push(e)
+                }
+            }
+        )
 
         a.set(2)
         a.set(3)
 
-        expect(errors).toEqual([2, 3])
+        expect(errors).toEqual([1, 2, 3])
         d()
 
         checkGlobalState()
     })
+})
 
-    test("it should be possible to handle global errors in reactions", () => {
-        const a = mobx.observable(1)
+test("it should be possible to handle global errors in reactions", () => {
+    utils.supressConsole(() => {
+        const a = mobx.observable.box(1)
         const errors = []
-        const d2 = mobx.extras.onReactionError(e => errors.push(e))
+        const d2 = mobx.onReactionError(e => errors.push(e))
 
         const d = mobx.autorun(function() {
             throw a.get()
@@ -690,4 +706,57 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
 
         checkGlobalState()
     })
+})
+
+test("global error handling will be skipped when using disableErrorBoundaries - 1", () => {
+    mobx.configure({ disableErrorBoundaries: true })
+    try {
+        const a = mobx.observable.box(1)
+
+        expect(() => {
+            const d = mobx.autorun(function() {
+                throw "OOPS"
+            })
+        }).toThrowError(/OOPS/)
+    } finally {
+        mobx.configure({ disableErrorBoundaries: false })
+        mobx._resetGlobalState()
+    }
+})
+
+test("global error handling will be skipped when using disableErrorBoundaries - 2", () => {
+    mobx.configure({ disableErrorBoundaries: true })
+    try {
+        const a = mobx.observable.box(1)
+
+        const d = mobx.reaction(
+            () => a.get(),
+            () => {
+                throw "OOPS"
+            }
+        )
+        expect(() => {
+            a.set(2)
+        }).toThrowError(/OOPS/)
+
+        d()
+    } finally {
+        mobx.configure({ disableErrorBoundaries: false })
+        mobx._resetGlobalState()
+    }
+})
+
+test("error in effect of when is properly cleaned up", () => {
+    checkGlobalState()
+
+    const b = mobx.observable.box(1)
+    const d = mobx.when(
+        () => b.get() === 2,
+        () => {
+            throw "OOPS"
+        }
+    )
+
+    b.set(2)
+    checkGlobalState()
 })

@@ -1,5 +1,6 @@
 "use strict"
 var mobx = require("../../src/mobx.ts")
+const utils = require("../utils/test-utils")
 
 test("spy output", () => {
     var events = []
@@ -18,22 +19,11 @@ test("spy output", () => {
         delete ev.time
     })
 
-    expect(events.length).toBe(doStuffEvents.length)
-    //t.deepEqual(events, doStuffEvents);
-
-    events.forEach((ev, idx) => {
-        expect(ev).toEqual(doStuffEvents[idx])
-    })
-
-    expect(events.filter(ev => ev.spyReportStart === true).length > 0).toBeTruthy()
-
-    expect(events.filter(ev => ev.spyReportStart === true).length).toBe(
-        events.filter(ev => ev.spyReportEnd === true).length
-    )
+    expect(events).toMatchSnapshot()
 })
 
 function doStuff() {
-    var a = mobx.observable(2)
+    var a = mobx.observable.box(2)
     a.set(3)
 
     var b = mobx.observable({
@@ -48,7 +38,7 @@ function doStuff() {
     e.shift()
     e[2] = 5
 
-    var f = mobx.map({ g: 1 })
+    var f = mobx.observable.map({ g: 1 })
     f.delete("h")
     f.delete("g")
     f.set("i", 5)
@@ -74,123 +64,34 @@ function doStuff() {
         .call({}, 7)
 }
 
-const doStuffEvents = [
-    { newValue: 2, type: "create" },
-    { newValue: 3, oldValue: 2, type: "update", spyReportStart: true },
-    { spyReportEnd: true },
-    { name: "c", newValue: 4, spyReportStart: true, type: "add" },
-    { spyReportEnd: true },
-    { name: "c", newValue: 5, oldValue: 4, spyReportStart: true, type: "update" },
-    { spyReportEnd: true },
-    { name: "d", newValue: 6, spyReportStart: true, type: "add" },
-    { spyReportEnd: true },
-    { name: "d", newValue: 7, oldValue: 6, spyReportStart: true, type: "update" },
-    { spyReportEnd: true },
-    {
-        added: [1, 2],
-        addedCount: 2,
-        index: 0,
-        removed: [],
-        removedCount: 0,
-        spyReportStart: true,
-        type: "splice"
-    },
-    { spyReportEnd: true },
-    {
-        added: [3, 4],
-        addedCount: 2,
-        index: 2,
-        removed: [],
-        removedCount: 0,
-        spyReportStart: true,
-        type: "splice"
-    },
-    { spyReportEnd: true },
-    {
-        added: [],
-        addedCount: 0,
-        index: 0,
-        removed: [1],
-        removedCount: 1,
-        spyReportStart: true,
-        type: "splice"
-    },
-    { spyReportEnd: true },
-    { index: 2, newValue: 5, oldValue: 4, spyReportStart: true, type: "update" },
-    { spyReportEnd: true },
-    { name: "g", newValue: 1, spyReportStart: true, type: "add" },
-    { spyReportEnd: true },
-    { name: "g", oldValue: 1, spyReportStart: true, type: "delete" },
-    { spyReportEnd: true },
-    { name: "i", newValue: 5, spyReportStart: true, type: "add" },
-    { spyReportEnd: true },
-    { name: "i", newValue: 6, oldValue: 5, spyReportStart: true, type: "update" },
-    { spyReportEnd: true },
-    { spyReportStart: true, type: "reaction" },
-    { type: "compute" },
-    { spyReportEnd: true },
-    { newValue: 4, oldValue: 3, spyReportStart: true, type: "update" },
-    { type: "compute" },
-    { spyReportStart: true, type: "reaction" },
-    { spyReportEnd: true },
-    { spyReportEnd: true },
-    { newValue: 5, oldValue: 4, spyReportStart: true, type: "update" },
-    { spyReportEnd: true },
-    { newValue: 6, oldValue: 5, spyReportStart: true, type: "update" },
-    { spyReportEnd: true },
-    { type: "compute" },
-    { spyReportStart: true, type: "reaction" },
-    { spyReportEnd: true },
-    { name: "myTestAction", spyReportStart: true, arguments: [7], type: "action" },
-    { newValue: 7, oldValue: 6, spyReportStart: true, type: "update" },
-    { spyReportEnd: true },
-    { type: "compute" },
-    { spyReportStart: true, type: "reaction" },
-    { spyReportEnd: true },
-    { spyReportEnd: true }
-]
-
 test("spy error", () => {
-    mobx.extras.getGlobalState().mobxGuid = 0
+    utils.supressConsole(() => {
+        mobx._getGlobalState().mobxGuid = 0
 
-    const a = mobx.observable({
-        x: 2,
-        get y() {
-            if (this.x === 3) throw "Oops"
-            return this.x * 2
-        }
+        const a = mobx.observable({
+            x: 2,
+            get y() {
+                if (this.x === 3) throw "Oops"
+                return this.x * 2
+            }
+        })
+
+        var events = []
+        var stop = mobx.spy(c => events.push(c))
+
+        var d = mobx.autorun(() => a.y, { name: "autorun" })
+
+        a.x = 3
+
+        events.forEach(x => {
+            delete x.fn
+            delete x.object
+            delete x.time
+        })
+
+        expect(events).toMatchSnapshot()
+
+        d()
+        stop()
     })
-
-    var events = []
-    var stop = mobx.spy(c => events.push(c))
-
-    var d = mobx.autorun("autorun", () => a.y)
-
-    a.x = 3
-
-    events.forEach(x => {
-        delete x.fn
-        delete x.object
-        delete x.time
-    })
-
-    expect(events).toEqual([
-        { spyReportStart: true, type: "reaction" },
-        { type: "compute" },
-        { spyReportEnd: true },
-        { name: "x", newValue: 3, oldValue: 2, spyReportStart: true, type: "update" },
-        { type: "compute" },
-        { spyReportStart: true, type: "reaction" },
-        {
-            error: "Oops",
-            message:
-                "[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: 'Reaction[autorun]",
-            type: "error"
-        },
-        { spyReportEnd: true },
-        { spyReportEnd: true }
-    ])
-
-    d()
-    stop()
 })

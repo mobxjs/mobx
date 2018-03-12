@@ -1,4 +1,4 @@
-import { BaseAtom } from "../core/atom"
+import { Atom, declareAtom } from "../core/atom"
 import { checkIfStateModificationsAreAllowed } from "../core/derivation"
 import {
     Lambda,
@@ -39,19 +39,19 @@ export interface IObservableValue<T> {
     observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
 }
 
-declare var Symbol
+declareAtom()
 
-export class ObservableValue<T> extends BaseAtom
+export class ObservableValue<T> extends Atom
     implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable {
     hasUnreportedChange = false
     interceptors
     changeListeners
-    protected value
-    dehancer: any = undefined
+    value
+    dehancer: any
 
     constructor(
         value: T,
-        protected enhancer: IEnhancer<T>,
+        public enhancer: IEnhancer<T>,
         name = "ObservableValue@" + getNextId(),
         notifySpy = true
     ) {
@@ -59,7 +59,7 @@ export class ObservableValue<T> extends BaseAtom
         this.value = enhancer(value, undefined, name)
         if (notifySpy && isSpyEnabled()) {
             // only notify spy if this is a stand-alone observable
-            spyReport({ type: "create", object: this, newValue: this.value })
+            spyReport({ type: "create", name: this.name, newValue: "" + this.value })
         }
     }
 
@@ -76,7 +76,7 @@ export class ObservableValue<T> extends BaseAtom
             if (notifySpy) {
                 spyReportStart({
                     type: "update",
-                    object: this,
+                    name: this.name,
                     newValue,
                     oldValue
                 })

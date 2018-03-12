@@ -4,18 +4,19 @@ import { isObservableObject, ObservableObjectAdministration } from "../types/obs
 import { isAtom } from "../core/atom"
 import { isComputedValue } from "../core/computedvalue"
 import { isReaction } from "../core/reaction"
-import { getMessage } from "../utils/messages"
+import { fail } from "../utils/utils"
 
-/**
- * Returns true if the provided value is reactive.
- * @param value object, function or array
- * @param property if property is specified, checks whether value.property is reactive.
- */
-export function isObservable(value, property?: string): boolean {
+function _isObservable(value, property?: string): boolean {
     if (value === null || value === undefined) return false
     if (property !== undefined) {
-        if (isObservableArray(value) || isObservableMap(value)) throw new Error(getMessage("m019"))
-        else if (isObservableObject(value)) {
+        if (
+            process.env.NODE_ENV !== "production" &&
+            (isObservableMap(value) || isObservableArray(value))
+        )
+            return fail(
+                "isObservable(object, propertyName) is not supported for arrays and maps. Use map.has or array.length instead."
+            )
+        if (isObservableObject(value)) {
             const o = <ObservableObjectAdministration>(value as any).$mobx
             return o.values && !!o.values[property]
         }
@@ -29,4 +30,21 @@ export function isObservable(value, property?: string): boolean {
         isReaction(value) ||
         isComputedValue(value)
     )
+}
+
+export function isObservable(value: any): boolean {
+    if (arguments.length !== 1)
+        fail(
+            process.env.NODE_ENV !== "production" &&
+                `isObservable expects only 1 argument. Use isObsevableProp to inspect the observability of a property`
+        )
+    return _isObservable(value)
+}
+
+export function isObservableProp(value: any, propName: string): boolean {
+    if (typeof propName !== "string")
+        return fail(
+            process.env.NODE_ENV !== "production" && `expected a property name as second argument`
+        )
+    return _isObservable(value, propName)
 }

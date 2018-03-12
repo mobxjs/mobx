@@ -1,88 +1,66 @@
-var mobx = require("../../")
-mobx.extras.isolateGlobalState()
+import * as fs from "fs"
+var mobx = require("../../src/mobx.ts")
 
 test("correct api should be exposed", function() {
-    expect(Object.keys(mobx).sort()).toEqual(
+    expect(Object.keys(mobx).filter(key => mobx[key] !== undefined).sort()).toEqual(
         [
-            "Atom",
-            "BaseAtom", // TODO: remove somehow
-            "IDerivationState",
-            "ObservableMap",
-            "Reaction",
             "action",
-            "asFlat",
-            "asMap",
-            "asReference",
-            "asStructure",
+            "_allowStateChanges",
             "autorun",
-            "autorunAsync",
-            "computed",
             "comparer",
-            "createTransformer",
-            "default",
-            "expr",
+            "computed",
+            "configure",
+            "createAtom",
+            "decorate",
             "extendObservable",
-            "extendShallowObservable",
-            "extras",
+            "extendShallowObservable", // deprecated but still public
+            "flow",
+            "get",
+            "_getAdministration",
+            "getAtom",
+            "getDebugName",
+            "getDependencyTree",
+            "has",
+            "_getGlobalState",
+            "getObserverTree",
+            "IDerivationState",
             "intercept",
+            "_interceptReads",
             "isAction",
             "isArrayLike",
             "isBoxedObservable",
             "isComputed",
-            "isModifierDescriptor",
+            "isComputedProp",
+            "_isComputingDerivation",
             "isObservable",
             "isObservableArray",
             "isObservableMap",
             "isObservableObject",
-            "isStrictModeEnabled",
-            "map",
+            "isObservableProp",
+            "keys",
             "observable",
             "observe",
+            "onReactionError",
+            "onBecomeObserved",
+            "onBecomeUnobserved",
+            "Reaction",
             "reaction",
+            "remove",
+            "_resetGlobalState",
             "runInAction",
+            "set",
             "spy",
             "toJS",
             "trace",
             "transaction",
             "untracked",
-            "useStrict",
-            "when",
-            "whyRun"
+            "values",
+            "when"
         ].sort()
     )
-    expect(
-        Object.keys(mobx).filter(function(key) {
-            return mobx[key] == undefined
-        }).length
-    ).toBe(0)
+})
 
-    expect(Object.keys(mobx.extras).sort()).toEqual(
-        [
-            "allowStateChanges",
-            "deepEqual",
-            "getAdministration",
-            "getAtom",
-            "getDebugName",
-            "getDependencyTree",
-            "getGlobalState",
-            "getObserverTree",
-            "interceptReads",
-            "isComputingDerivation",
-            "isSpyEnabled",
-            "isolateGlobalState",
-            "onReactionError",
-            "reserveArrayBuffer",
-            "resetGlobalState",
-            "setReactionScheduler",
-            "shareGlobalState",
-            "spyReport",
-            "spyReportEnd",
-            "spyReportStart"
-        ].sort()
-    )
-    expect(
-        Object.keys(mobx.extras).filter(function(key) {
-            return mobx.extras[key] == undefined
-        }).length
-    ).toBe(0)
+test("mobx has no dependencies", () => {
+    const pkg = JSON.parse(fs.readFileSync(__dirname + "/../../package.json", "utf8"))
+    expect(pkg.dependencies).toEqual({})
 })

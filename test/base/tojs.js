@@ -6,7 +6,7 @@ var observable = mobx.observable
 var transaction = mobx.transaction
 
 test("json1", function() {
-    mobx.extras.resetGlobalState()
+    mobx._resetGlobalState()
 
     var todos = observable([
         {
@@ -225,7 +225,7 @@ test("json cycles", function() {
     var a = observable({
         b: 1,
         c: [2],
-        d: mobx.map(),
+        d: mobx.observable.map(),
         e: a
     })
 
@@ -278,7 +278,7 @@ test("#285 class instances with toJS", () => {
 })
 
 test("#285 non-mobx class instances with toJS", () => {
-    const nameObservable = mobx.observable("weststrate")
+    const nameObservable = mobx.observable.box("weststrate")
     function Person() {
         this.firstName = "michel"
         this.lastName = nameObservable
@@ -311,4 +311,33 @@ test("verify already seen", () => {
     expect(res.y).toBe(3)
     expect(res.x === res).toBeTruthy()
     expect(res.x === a).toBeFalsy()
+})
+
+test("json cycles when exporting maps as maps", function() {
+    var a = observable({
+        b: 1,
+        c: [2],
+        d: mobx.observable.map(),
+        e: a
+    })
+
+    a.e = a
+    a.c.push(a, a.d)
+    a.d.set("f", a)
+    a.d.set("d", a.d)
+    a.d.set("c", a.c)
+
+    var cloneA = mobx.toJS(a, { exportMapsAsObjects: false, detectCycles: true })
+    var cloneC = cloneA.c
+    var cloneD = cloneA.d
+
+    expect(cloneA.b).toBe(1)
+    expect(cloneA.c[0]).toBe(2)
+    expect(cloneA.c[1]).toBe(cloneA)
+    expect(cloneA.c[2]).toBe(cloneD)
+    expect(cloneD).toBeInstanceOf(Map)
+    expect(cloneD.get("f")).toBe(cloneA)
+    expect(cloneD.get("d")).toBe(cloneD)
+    expect(cloneD.get("c")).toBe(cloneC)
+    expect(cloneA.e).toBe(cloneA)
 })

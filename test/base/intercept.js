@@ -2,7 +2,7 @@ var m = require("../../src/mobx.ts")
 var intercept = m.intercept
 
 test("intercept observable value", () => {
-    var a = m.observable(1)
+    var a = m.observable.box(1)
 
     var d = intercept(a, () => {
         return null
@@ -19,7 +19,6 @@ test("intercept observable value", () => {
 
     d = intercept(a, c => {
         if (c.newValue % 2 === 0) {
-            debugger
             throw "value should be odd!"
         }
         return c
@@ -27,7 +26,7 @@ test("intercept observable value", () => {
 
     expect(() => {
         a.set(4)
-    }).toThrow()
+    }).toThrow(/value should be odd/)
 
     expect(a.get()).toBe(3)
     a.set(5)
@@ -87,20 +86,18 @@ test("intercept object", () => {
         b: 3
     })
 
-    // bit magical, but intercept makes a observable, to be consistent with observe.
-    // deprecated immediately :)
-    var d = intercept(a, c => {
-        c.newValue *= 3
-        return c
+    var d = intercept(a, change => {
+        change.newValue *= 3
+        return change
     })
 
     a.b = 4
 
     expect(a.b).toBe(12)
 
-    var d2 = intercept(a, "b", c => {
-        c.newValue += 1
-        return c
+    var d2 = intercept(a, "b", change => {
+        change.newValue += 1
+        return change
     })
 
     a.b = 5
@@ -118,27 +115,30 @@ test("intercept object", () => {
     d3()
     a.b = 7
     expect(a.b).toBe(22)
+})
 
-    var d4 = intercept(a, c => {
-        if (c.type === "add") {
+test("intercept property additions", () => {
+    var a = m.observable({})
+    var d4 = intercept(a, change => {
+        if (change.type === "add") {
             return null
         }
-        return c
+        return change
     })
 
-    m.extendObservable(a, { c: 1 })
+    m.extendObservable(a, { c: 1 }) // not added!
     expect(a.c).toBe(undefined)
-    expect(m.isObservable(a, "c")).toBe(false)
+    expect(m.isObservableProp(a, "c")).toBe(false)
 
     d4()
 
     m.extendObservable(a, { c: 2 })
-    expect(a.c).toBe(6)
-    expect(m.isObservable(a, "c")).toBe(true)
+    expect(a.c).toBe(2)
+    expect(m.isObservableProp(a, "c")).toBe(true)
 })
 
 test("intercept map", () => {
-    var a = m.map({
+    var a = m.observable.map({
         b: 3
     })
 

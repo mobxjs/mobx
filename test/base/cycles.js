@@ -150,12 +150,12 @@ test("efficient selection", function() {
             selection: null,
             items: [new Item(1), new Item(2), new Item(3)]
         })
-        m.autorun(function() {
+        m.autorun(() => {
             if (this.previousSelection === this.selection) return true // converging condition
             if (this.previousSelection) this.previousSelection.selected = false
             if (this.selection) this.selection.selected = true
             this.previousSelection = this.selection
-        }, this)
+        })
     }
 
     var store = new Store()
