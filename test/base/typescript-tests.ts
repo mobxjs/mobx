@@ -1579,3 +1579,59 @@ test("it should support asyncAction as decorator (babel)", async () => {
 
     expect(await x.f(3)).toBe(16)
 })
+
+test("flow support async generators", async () => {
+    ;(Symbol as any).asyncIterator =
+        (Symbol as any).asyncIterator || Symbol.for("Symbol.asyncIterator")
+
+    async function* someNumbers() {
+        await Promise.resolve()
+        yield 1
+        await Promise.resolve()
+        yield 2
+        await Promise.resolve()
+        yield 3
+    }
+
+    let steps = 0
+    const start = mobx.flow(async function*() {
+        let total = 0
+        for await (const number of someNumbers()) {
+            total += number
+        }
+        return total
+    })
+
+    const p = start()
+    const res = await p
+    expect(res).toBe(6)
+})
+
+test.only("flow support throwing async generators", async () => {
+    ;(Symbol as any).asyncIterator =
+        (Symbol as any).asyncIterator || Symbol.for("Symbol.asyncIterator")
+
+    async function* someNumbers() {
+        await Promise.resolve()
+        yield 1
+        await Promise.resolve()
+        throw "OOPS"
+    }
+
+    let steps = 0
+    const start = mobx.flow(async function*() {
+        let total = 0
+        for await (const number of someNumbers()) {
+            total += number
+        }
+        return total
+    })
+
+    const p = start()
+    try {
+        await p
+        fail()
+    } catch (e) {
+        expect("" + e).toBe("OOPS")
+    }
+})

@@ -19,6 +19,7 @@ The changes mentioned here are discussed in detail in the [release highlights](h
 * `toJS` now accepts the options: `{ detectCycles?: boolean, exportMapsAsObjects?: boolean }`, both `true` by default
 * Introduced `flow` to create a chain of async actions. This is the same function as [`asyncActions`](https://github.com/mobxjs/mobx-utils#asyncaction) of the mobx-utils package
 * These `flow`'s are now cancellable, by calling `.cancel()` on the returned promise, which will throw a cancellation exception into the generator function.
+* `flow` also has experimental support for async iterators (`async * function`)
 * The flow typings have been updated. Since this is a manual effort, there can be mistakes, so feel free to PR!
 
 * `computed(fn, options?)` / `@computed(options) get fn()` now accept the following options:

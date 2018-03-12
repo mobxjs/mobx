@@ -154,6 +154,11 @@ export function createFlowGenerator(name: string, generator: Function) {
             }
 
             function next(ret: any) {
+                if (ret && typeof ret.then === "function") {
+                    // an async iterator
+                    ret.then(next, reject)
+                    return
+                }
                 if (ret.done) return resolve(ret.value)
                 pendingPromise = Promise.resolve(ret.value) as any
                 return pendingPromise!.then(onFulfilled, onRejected)
