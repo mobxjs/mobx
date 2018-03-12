@@ -10,7 +10,8 @@ import {
     isPlainObject,
     fail,
     addHiddenFinalProp,
-    isPropertyConfigurable
+    isPropertyConfigurable,
+    addHiddenProp
 } from "../utils/utils"
 import {
     hasInterceptors,
@@ -65,7 +66,8 @@ export type IObjectWillChange =
 
 export class ObservableObjectAdministration
     implements IInterceptable<IObjectWillChange>, IListenable {
-    keys: undefined | IObservableArray<string>
+    keys: undefined | IObservableArray<string> // TODO: change int o just an atom
+    // TODO: kep a hasMap like with observable Maps (probably, reuse same mechanism?)
     changeListeners
     interceptors
 
@@ -83,10 +85,9 @@ export class ObservableObjectAdministration
             this.illegalAccess(owner, key)
             return
         }
+        if (typeof key !== "string" || !this.values.hasOwnProperty(key)) return this.values[key] // might be on prototype
         const observable = this.values[key]
         if (observable) {
-            // todo, remove this check
-            if (typeof observable.get !== "function") fail("not an observable " + key)
             return observable.get()
         } else {
             // might be added in the future
@@ -181,7 +182,7 @@ export class ObservableObjectAdministration
         const { target } = this
         options.name = options.name || `${this.name}.${propName}`
         options.context = target
-        this.values[propName] = new ComputedValue(options)
+        addHiddenProp(this.values, propName, new ComputedValue(options)) // non enumerable
         if (
             !this.isProxied &&
             (propertyOwner === target || isPropertyConfigurable(propertyOwner, propName))
@@ -387,15 +388,14 @@ export function isObservableObject(thing: any): thing is IObservableObject {
 
 const objectProxyTraps: ProxyHandler<any> = {
     get(target: IIsObservableObject, name: string) {
-        const adm = target.$mobx
-        if (name === "$mobx") return adm
+        if (name === "$mobx") return target.$mobx
         // TODO: use symbol for  "__mobxDidRunLazyInitializers" and "$mobx", and remove these checks
         if (
             typeof name === "string" &&
             name !== "constructor" &&
             name !== "__mobxDidRunLazyInitializers"
         )
-            return adm.read(target, name)
+            return target.$mobx.read(target, name)
         return target[name]
     },
     set(target: IIsObservableObject, name: string, value: any) {

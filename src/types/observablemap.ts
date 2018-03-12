@@ -71,6 +71,7 @@ export class ObservableMap<K, V>
     private _data: Map<K, ObservableValue<V>>
     private _hasMap: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
     private _keys: IObservableArray<K> = <any>createObservableArray(
+        // TODO: can be just an atom!
         undefined,
         referenceEnhancer,
         `${this.name}.keys()`,
