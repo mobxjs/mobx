@@ -662,18 +662,23 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
 
 test("it should be possible to handle exceptions in reaction", () => {
     utils.supressConsole(() => {
-        const a = mobx.observable.box(1)
-        const d = mobx.autorun(function() {
-            throw a.get()
-        })
-
         const errors = []
-        d.onError(e => errors.push(e))
+        const a = mobx.observable.box(1)
+        const d = mobx.autorun(
+            function() {
+                throw a.get()
+            },
+            {
+                onError(e) {
+                    errors.push(e)
+                }
+            }
+        )
 
         a.set(2)
         a.set(3)
 
-        expect(errors).toEqual([2, 3])
+        expect(errors).toEqual([1, 2, 3])
         d()
 
         checkGlobalState()

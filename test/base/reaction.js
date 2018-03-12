@@ -424,7 +424,7 @@ test("issue #1148", () => {
     expect(called).toBe(0)
 })
 
-test("Introduce custom onError for - autorun", () => {
+test("Introduce custom onError for - autorun - 1", () => {
     let error = ""
     let globalHandlerCalled = false
     const d = mobx.onReactionError(() => {
@@ -445,6 +445,32 @@ test("Introduce custom onError for - autorun", () => {
     expect(error).toBe("OOPS")
     expect(globalHandlerCalled).toBe(false)
     d()
+})
+
+test("Introduce custom onError for - autorun - 2", done => {
+    let error = ""
+    let globalHandlerCalled = false
+    const d = mobx.onReactionError(() => {
+        globalHandlerCalled = true
+    })
+    expect(() => {
+        mobx.autorun(
+            () => {
+                throw "OOPS"
+            },
+            {
+                delay: 5,
+                onError(error) {
+                    setImmediate(() => {
+                        expect(error).toBe("OOPS")
+                        expect(globalHandlerCalled).toBe(false)
+                        d()
+                        done()
+                    })
+                }
+            }
+        )
+    }).not.toThrow()
 })
 
 test("Introduce custom onError for - reaction - 1", () => {
@@ -495,6 +521,34 @@ test("Introduce custom onError for - reaction - 2", () => {
     expect(error).toBe("OOPS")
     expect(globalHandlerCalled).toBe(false)
     d()
+})
+
+test("Introduce custom onError for - reaction - 3", done => {
+    let globalHandlerCalled = false
+    let box = mobx.observable.box(1)
+    const d = mobx.onReactionError(() => {
+        globalHandlerCalled = true
+    })
+    mobx.reaction(
+        () => box.get(),
+        () => {
+            throw "OOPS"
+        },
+        {
+            delay: 5,
+            onError(e) {
+                expect(e).toBe("OOPS")
+                setImmediate(() => {
+                    expect(globalHandlerCalled).toBe(false)
+                    d()
+                    done()
+                })
+            }
+        }
+    )
+    expect(() => {
+        box.set(2)
+    }).not.toThrow()
 })
 
 test("Introduce custom onError for - when - 1", () => {

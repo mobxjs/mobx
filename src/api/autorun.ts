@@ -34,30 +34,37 @@ export function autorun(
 
     if (runSync) {
         // normal autorun
-        reaction = new Reaction(name, function(this: Reaction) {
-            this.track(reactionRunner)
-        })
+        reaction = new Reaction(
+            name,
+            function(this: Reaction) {
+                this.track(reactionRunner)
+            },
+            opts.onError
+        )
     } else {
         const scheduler = createSchedulerFromOptions(opts)
         // debounced autorun
         let isScheduled = false
 
-        reaction = new Reaction(name, () => {
-            if (!isScheduled) {
-                isScheduled = true
-                scheduler(() => {
-                    isScheduled = false
-                    if (!reaction.isDisposed) reaction.track(reactionRunner)
-                })
-            }
-        })
+        reaction = new Reaction(
+            name,
+            () => {
+                if (!isScheduled) {
+                    isScheduled = true
+                    scheduler(() => {
+                        isScheduled = false
+                        if (!reaction.isDisposed) reaction.track(reactionRunner)
+                    })
+                }
+            },
+            opts.onError
+        )
     }
 
     function reactionRunner() {
         view(reaction)
     }
 
-    if (opts.onError) reaction.onError(opts.onError)
     reaction.schedule()
     return reaction.getDisposer()
 }
@@ -109,14 +116,18 @@ export function reaction<T>(
         ? comparer.structural
         : opts.equals || comparer.default
 
-    const r = new Reaction(name, () => {
-        if (firstTime || runSync) {
-            reactionRunner()
-        } else if (!isScheduled) {
-            isScheduled = true
-            scheduler!(reactionRunner)
-        }
-    })
+    const r = new Reaction(
+        name,
+        () => {
+            if (firstTime || runSync) {
+                reactionRunner()
+            } else if (!isScheduled) {
+                isScheduled = true
+                scheduler!(reactionRunner)
+            }
+        },
+        opts.onError
+    )
 
     function reactionRunner() {
         isScheduled = false // Q: move into reaction runner?
@@ -132,7 +143,6 @@ export function reaction<T>(
         if (firstTime) firstTime = false
     }
 
-    if (opts.onError) r.onError(opts.onError)
     r.schedule()
     return r.getDisposer()
 }
