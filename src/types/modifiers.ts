@@ -32,29 +32,6 @@ export function referenceEnhancer(newValue?) {
     return newValue
 }
 
-export function deepStructEnhancer(v, oldValue, name): any {
-    // don't confuse structurally compare enhancer with ref enhancer! The latter is probably
-    // more suited for immutable objects
-    if (deepEqual(v, oldValue)) return oldValue
-
-    // it is an observable already, done
-    if (isObservable(v)) return v
-
-    // something that can be converted and mutated?
-    if (Array.isArray(v)) return new ObservableArray(v, deepStructEnhancer, name)
-    if (isES6Map(v)) return new ObservableMap(v, deepStructEnhancer, name)
-    if (isPlainObject(v)) {
-        const res = {}
-        extendObservable(res, v, undefined, {
-            name,
-            defaultDecorator: observable.struct
-        })
-        return res
-    }
-
-    return v
-}
-
 export function refStructEnhancer(v, oldValue, name): any {
     if (process.env.NODE_ENV !== "production" && isObservable(v))
         throw `observable.struct should not be used with observable values`
@@ -64,9 +41,8 @@ export function refStructEnhancer(v, oldValue, name): any {
 
 import { observable } from "../api/observable"
 import { isObservable } from "../api/isobservable"
-import { extendObservable } from "../api/extendobservable"
 import { fail, isPlainObject, isES6Map } from "../utils/utils"
 import { isObservableObject } from "./observableobject"
-import { isObservableArray, ObservableArray } from "./observablearray"
-import { isObservableMap, ObservableMap } from "./observablemap"
+import { isObservableArray } from "./observablearray"
+import { isObservableMap } from "./observablemap"
 import { deepEqual } from "../utils/eq"

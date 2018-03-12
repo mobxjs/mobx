@@ -3,7 +3,6 @@ import {
     deepEnhancer,
     referenceEnhancer,
     shallowEnhancer,
-    deepStructEnhancer,
     refStructEnhancer,
     IEnhancer
 } from "../types/modifiers"
