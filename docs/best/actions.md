@@ -183,8 +183,7 @@ class Store {
 	@observable githubProjects = []
 	@observable state = "pending"
 
-	@flow
-	*fetchProjects() { // <- note the star, this a generator function!
+	fetchProjects = flow(function * () { // <- note the star, this a generator function!
 		this.githubProjects = []
 		this.state = "pending"
 		try {
@@ -196,6 +195,6 @@ class Store {
 		} catch (error) {
 			this.state = "error"
 		}
-	}
+	})
 }
 ```

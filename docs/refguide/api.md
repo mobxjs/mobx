@@ -220,7 +220,8 @@ For one-time-actions `runInAction(name?, fn)` can be used, which is sugar for `a
 
 ### Flow
 
-Usage: `flow(function* (args) { })` or `@flow *classMethod`.
+Usage: `flow(function* (args) { })`
+
 `flow()` takes a generator function as its only input
 
 When dealing with _async actions_, the code that executes in the callback is not wrapped by `action`. This means the observable state that you are mutating, will fail the [`enforceActions`](#configure) check. An easy way to retain the action semantics is by wrapping the async function with flow. This will ensure to wrap all your callbacks in `action()`.
@@ -238,8 +239,7 @@ class Store {
     @observable state = "pending"; // "pending" / "done" / "error"
 
 
-    @flow
-    *fetchProjects() { // <- note the star, this a generator function!
+    fetchProjects = flow(function* fetchProjects() { // <- note the star, this a generator function!
         this.githubProjects = [];
         this.state = "pending";
         try {
@@ -252,9 +252,37 @@ class Store {
         } catch (error) {
             this.state = "error";
         }
-    }
+    })
+}
+```
+
+_Tip: it is recommended to give the generator function a name, this is the name that will show up in dev tools and such_
+
+**Flows can be cancelled**
+
+Flows are canceallable, that means that you can call `cancel()` on the returned promise. This will stop the generator immediately, but any `finally` clause will still be processed.
+The returned promise itself will reject with `FLOW_CANCELLED`
+
+**Flows support sync iterators**
+
+Flows support async iterators, that means you can use async generators:
+
+```javscript
+async function* someNumbers() {
+    yield Promise.resolve(1)
+    yield Promise.resolve(2)
+    yield Promise.resolve(3)
 }
 
+const count = mobx.flow(async function*() {
+    // use for await to loop async iterators
+    for await (const number of someNumbers()) {
+        total += number
+    }
+    return total
+})
+
+const res = await count() // 6
 ```
 
 ## Reactions & Derivations
