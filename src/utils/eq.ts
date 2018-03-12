@@ -2,12 +2,14 @@ import { areBothNaN, isArrayLike, isES6Map, iteratorToArray } from "./utils"
 import { observable } from "../api/observable"
 import { isObservableArray, isObservableMap } from "../mobx"
 
-// Copied from https://github.com/jashkenas/underscore/blob/5c237a7c682fb68fd5378203f0bf22dce1624854/underscore.js#L1186-L1289
+declare var Symbol
+const toString = Object.prototype.toString
 
 export function deepEqual(a, b): boolean {
     return eq(a, b)
 }
 
+// Copied from https://github.com/jashkenas/underscore/blob/5c237a7c682fb68fd5378203f0bf22dce1624854/underscore.js#L1186-L1289
 // Internal recursive comparison function for `isEqual`.
 function eq(a, b, aStack?, bStack?) {
     // Identical objects are equal. `0 === -0`, but they aren't identical.
@@ -22,8 +24,6 @@ function eq(a, b, aStack?, bStack?) {
     if (type !== "function" && type !== "object" && typeof b != "object") return false
     return deepEq(a, b, aStack, bStack)
 }
-
-const toString = Object.prototype.toString
 
 // Internal recursive comparison function for `isEqual`.
 function deepEq(a, b, aStack?, bStack?) {

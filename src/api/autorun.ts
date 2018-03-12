@@ -231,7 +231,7 @@ export function reaction<T>(
             setTimeout(() => {
                 isScheduled = false
                 reactionRunner()
-            }, opts.delay)
+            }, opts.delay!)
         }
     })
 

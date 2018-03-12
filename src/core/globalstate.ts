@@ -105,7 +105,7 @@ let warnedAboutMultipleInstances = false
                     "[mobx] Warning: there are multiple mobx instances active. This might lead to unexpected results. See https://github.com/mobxjs/mobx/issues/1082 for details."
                 )
             }
-        })
+        }, 1)
     }
 }
 

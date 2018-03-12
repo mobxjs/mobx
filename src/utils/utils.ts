@@ -1,7 +1,8 @@
 export const EMPTY_ARRAY = []
 Object.freeze(EMPTY_ARRAY)
 
-declare var global
+declare var window, global, Symbol
+
 export function getGlobal() {
     return typeof window !== "undefined" ? window : global
 }
@@ -182,8 +183,6 @@ export function iteratorToArray<T>(it: Iterator<T>): ReadonlyArray<T> {
     return res
 }
 
-declare var Symbol
-
 export function primitiveSymbol() {
     return (typeof Symbol === "function" && Symbol.toPrimitive) || "@@toPrimitive"
 }
@@ -196,3 +195,4 @@ import { globalState } from "../core/globalstate"
 import { IObservableArray, isObservableArray } from "../types/observablearray"
 import { isObservableMap, ObservableMap, IKeyValueMap } from "../types/observablemap"
 import { observable } from "../api/observable"
+import { Iterator } from "./iterable"
