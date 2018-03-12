@@ -117,53 +117,58 @@ export function createFlowGenerator(name: string, generator: Function) {
         const args = arguments
         const runId = ++generatorId
         const gen = action(`${name} - runid: ${runId} - init`, generator).apply(ctx, args)
-        let stepId = 0
-        let resolver: (value: any) => void
         let rejector: (error: any) => void
 
-        function onFulfilled(res: any) {
-            let ret
-            try {
-                ret = action(`${name} - runid: ${runId} - yield ${stepId++}`, gen.next).call(
-                    gen,
-                    res
-                )
-            } catch (e) {
-                return rejector(e)
-            }
-            next(ret)
-            return null
-        }
-
-        function onRejected(err: any) {
-            let ret
-            try {
-                ret = action(`${name} - runid: ${runId} - yield ${stepId++}`, gen.throw).call(
-                    gen,
-                    err
-                )
-            } catch (e) {
-                return rejector(e)
-            }
-            next(ret)
-        }
-
-        function next(ret: any) {
-            if (ret.done) return resolver(ret.value)
-            // TODO: support more type of values? See https://github.com/tj/co/blob/249bbdc72da24ae44076afd716349d2089b31c4c/index.js#L100
-            if (!ret.value || typeof ret.value.then !== "function")
-                return fail("Only promises can be yielded to asyncAction, got: " + ret)
-            return ret.value.then(onFulfilled, onRejected)
-        }
-
         const res = new Promise(function(resolve, reject) {
-            resolver = resolve
+            let stepId = 0
             rejector = reject
+
+            function onFulfilled(res: any) {
+                let ret
+                try {
+                    ret = action(`${name} - runid: ${runId} - yield ${stepId++}`, gen.next).call(
+                        gen,
+                        res
+                    )
+                } catch (e) {
+                    return reject(e)
+                }
+                next(ret)
+                return null
+            }
+
+            function onRejected(err: any) {
+                let ret
+                try {
+                    ret = action(`${name} - runid: ${runId} - yield ${stepId++}`, gen.throw).call(
+                        gen,
+                        err
+                    )
+                } catch (e) {
+                    return reject(e)
+                }
+                next(ret)
+            }
+
+            function next(ret: any) {
+                if (ret.done) return resolve(ret.value)
+                // TODO: support more type of values? See https://github.com/tj/co/blob/249bbdc72da24ae44076afd716349d2089b31c4c/index.js#L100
+                if (!ret.value || typeof ret.value.then !== "function")
+                    return fail("Only promises can be yielded to asyncAction, got: " + ret)
+                return ret.value.then(onFulfilled, onRejected)
+            }
+
             onFulfilled(undefined) // kick off the process
         }) as any
-        res.cancel = function() {
-            onRejected(new Error("FLOW_CANCELLED"))
-        }
+
+        res.cancel = action(`${name} - runid: ${runId} - cancel`, function() {
+            try {
+                gen.return()
+                rejector(new Error("FLOW_CANCELLED"))
+            } catch (e) {
+                rejector(e) // there could be a throwing finally block
+            }
+        })
         return res
     }
 }

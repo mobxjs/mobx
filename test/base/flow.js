@@ -170,62 +170,72 @@ test("flows can be cancelled - 1 - uncatched cancellation", done => {
 
     const promise = start()
     promise.then(
-        () => fail(),
+        () => {
+            debugger
+            fail()
+        },
         err => {
+            debugger
             expect(steps).toBe(1)
             expect("" + err).toBe("Error: FLOW_CANCELLED")
             done()
         }
     )
+    debugger
     promise.cancel()
 })
 
-test("flows can be cancelled - 2 - catch cancellation in generator", done => {
+test("flows can be cancelled - 2 - finally clauses are run", done => {
     let steps = 0
+    let finallyHandled = false
     const start = flow(function*() {
         steps = 1
         try {
             yield Promise.resolve()
             steps = 2
-        } catch (e) {
+        } finally {
             expect(steps).toBe(1)
-            expect(e.toString()).toBe("Error: FLOW_CANCELLED")
-            return 4
+            finallyHandled = true
         }
     })
     const promise = start()
     promise.then(
         res => {
-            expect(res).toBe(4)
-            done()
+            fail()
         },
         err => {
-            fail()
+            expect("" + err).toBe("Error: FLOW_CANCELLED")
+            expect(finallyHandled).toBeTruthy()
+            done()
         }
     )
     promise.cancel()
 })
 
-test("flows can be cancelled - 3 - rethrow cancellation", done => {
-    let steps = 0
+test("flows can be cancelled - 3 - throw in finally should be catched", done => {
+    const counter = mobx.observable({ counter: 0 })
+    const d = mobx.reaction(() => counter.counter, () => {})
+    mobx.configure({ enforceActions: true })
+
     const start = flow(function*() {
-        steps = 1
+        counter.counter = 1
         try {
             yield Promise.resolve()
-            steps = 2
-        } catch (e) {
-            expect(steps).toBe(1)
-            expect(e.toString()).toBe("Error: FLOW_CANCELLED")
-            throw e // rethrow
+            counter.counter = 15
+        } finally {
+            counter.counter = 4
+            throw "OOPS"
         }
     })
 
     const promise = start()
     promise.then(
-        () => fail(),
+        () => fail("flow should not have failed"),
         err => {
-            expect(steps).toBe(1)
-            expect("" + err).toBe("Error: FLOW_CANCELLED")
+            expect("" + err).toBe("OOPS")
+            expect(counter.counter).toBe(4)
+            mobx.configure({ enforceActions: false })
+            d()
             done()
         }
     )
@@ -236,14 +246,8 @@ test("flows can be cancelled - 4 - pending Promise will be ignored", done => {
     let steps = 0
     const start = flow(function*() {
         steps = 1
-        try {
-            yield Promise.reject("This won't be catched anywhere!") // cancel will resolve this flow before this one is throw, so this promise goes uncatched
-            steps = 2
-        } catch (e) {
-            expect(steps).toBe(1)
-            expect(e.toString()).toBe("Error: FLOW_CANCELLED")
-            throw e
-        }
+        yield Promise.reject("This won't be catched anywhere!") // cancel will resolve this flow before this one is throw, so this promise goes uncatched
+        steps = 2
     })
 
     const promise = start()
