@@ -1,6 +1,7 @@
 import { globalState } from "./globalstate"
 import { once, Lambda } from "../utils/utils"
 
+// TODO: remove spy events in prod build?
 export function isSpyEnabled() {
     return !!globalState.spyListeners.length
 }
