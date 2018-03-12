@@ -11,7 +11,9 @@ This is the extensive list of all changes.
 The changes mentioned here are discussed in detail in the [release highlights](https://medium.com/p/c1fbc08008da/), or were simply updated in the docs.
 
 * MobX 4 introduces separation between the production and non production build. The production build strips most typechecks, resulting in a faster and smaller build. Make sure to substitute process.env.NODE_ENV = "production" in your build process! If you are using MobX in a react project, you most probably already have set this up. Otherwise, they idea is explained [here](https://reactjs.org/docs/add-react-to-an-existing-app.html).
-* Introduced `flow` to create a chain of async actions. This is the same function as [`asyncActions`](https://github.com/mobxjs/mobx-utils#asyncaction) of the mobx-utils package. (Note, unlike `asyncAction` and unlike in the beta, it can _not_ be used as decorator)
+* Introduced `flow` to create a chain of async actions. This is the same function as [`asyncActions`](https://github.com/mobxjs/mobx-utils#asyncaction) of the mobx-utils package
+* These `flow`'s are now cancellable, by calling `.cancel()` on the returned promise, which will throw a cancellation exception into the generator function.
+* `flow` also has experimental support for async iterators (`async * function`)
 * Introduced `decorate(thing, decorators)` to decorate classes or object without needing decorator syntax.
 * Introduced `onBecomeObserved` and `onBecomeUnobserved`. These API's enable hooking into the observability system and get notified about when an observable starts / stops becoming used. This is great to automaticaly fetch data from external resources, or stop doing so.
 * `computed` / `@computed` now accepts a `requiresReaction` option. If it set, the computed value will throw an exception if it is being read while not being tracked by some reaction.
