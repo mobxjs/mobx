@@ -1,9 +1,9 @@
 docs/_book
-docs/node_modules
 refguide/*.md
 .DS_Store
 *.iml
 *.ipr
 *.iws
 /.idea
-gitbook/plugins
+.vscode
+node_modules

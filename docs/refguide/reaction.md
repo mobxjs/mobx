@@ -7,7 +7,6 @@ It takes two functions, the first one (the *data* function) is tracked and retur
 Unlike `autorun` the side effect won't be run directly when created, but only after the data expression returns a new value for the first time.
 Any observables that are accessed while executing the side effect will not be tracked.
 
-The side effect can be debounced, just like `autorunAsync`.
 `reaction` returns a disposer function.
 The functions passed to `reaction` will receive two argument when invoked, the current reaction, which can be used to dispose the when during execution.
 
@@ -19,12 +18,12 @@ In other words: reaction requires you to produce the things you need in your sid
 
 Reaction accepts as third argument an options object with the following optional options:
 
-* `context`: The `this` to be used in the functions passed to `reaction`. By default undefined (use arrow functions instead!)
 * `fireImmediately`: Boolean that indicates that the effect function should immediately be triggered after the first run of the data function. `false` by default. If a boolean is passed as third argument to `reaction`, it will be interpreted as the `fireImmediately` option.
 * `delay`: Number in milliseconds that can be used to debounce the effect function. If zero (the default), no debouncing will happen.
-* `compareStructural`: `false` by default. If `true`, the return value of the *data* function is structurally compared to its previous return value, and the *effect* function will only be invoked if there is a structural change in the output. This can also be specified by setting `equals` to `comparer.structural`.
 * `equals`: `comparer.default` by default. If specified, this comparer function will be used to compare the previous and next values produced by the *data* function. The *effect* function will only be invoked if this function returns true. If specified, this will override `compareStructural`.
 * `name`: String that is used as name for this reaction in for example [`spy`](spy.md) events.
+* `onError`: function that will handle the errors of this reaction, rather then propagating them.
+* `scheduler`: Set a custom scheduler to determine how re-running the autorun function should be scheduled
 
 ## Example
 

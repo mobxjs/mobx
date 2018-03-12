@@ -52,19 +52,27 @@ message.title = "Bar"
 
 This will react as expected, the `.title` property was dereferenced by the autorun, and changed afterwards, so this change is detected.
 
-You can verify what MobX will track by calling `whyRun()` inside the tracked function. In the case of the above function it will output the following:
+You can verify what MobX will track by calling [`trace()`](../reguide/trace) inside the tracked function. In the case of the above function it will output the following:
 
 ```javascript
-autorun(() => {
+const disposer = autorun(() => {
     console.log(message.title)
-    whyRun()
+    trace()
 })
 
 // Outputs:
-WhyRun? reaction 'Autorun@1':
- * Status: [running]
- * This reaction will re-run if any of the following observables changes:
-    ObservableObject@1.title
+// [mobx.trace] 'Autorun@2' tracing enabled
+
+message.title = "Hello"
+// [mobx.trace] 'Autorun@2' is invalidated due to a change in: 'ObservableObject@1.title'
+```
+
+It is also possible to get the internal dependency (or observer) tree by using the designated utilities for that:
+
+```javascript
+getDependencyTree(disposer) // prints the dependency tree of the reaction coupled to the disposer
+// { name: 'Autorun@4',
+//  dependencies: [ { name: 'ObservableObject@1.title' } ] }
 ```
 
 #### Incorrect: changing a non-observable reference
@@ -244,6 +252,7 @@ extendObservable(message, {
 This will **not** react. MobX will not react to observable properties that did not exist when tracking started.
 If the two statements are swapped, or if any other observable causes the `autorun` to re-run, the `autorun` will start tracking the `postDate` as well.
 
+
 #### Correct: using not yet existing map entries
 
 ```javascript
@@ -262,6 +271,25 @@ Note that this will initially print `undefined`.
 You can check for the existence of an entry first by using `twitterUrls.has("Sara")`.
 So for dynamically keyed collections, always use observable maps.
 
+#### Correct: using MobX utilities to read / write to objects
+
+Since MobX 4 it is also possible to use observable objects as dynamic collection, if they are read / updated by using the mobx apis, so that mobx can keep track of the property changes. The following will react as well:
+
+
+```javascript
+import { get, set, observable } from "mobx"
+
+const twitterUrls = observable.object({
+    "John": "twitter.com/johnny"
+})
+
+autorun(() => {
+    console.log(get(twitterUrls, "Sara")) // get can track not yet existing properties
+})
+set(twitterUrls, { "Sara" : "twitter.com/horsejs"})
+```
+
+See the [object manipulation api](https://mobx.js.org/refguide/api.html#direct-observable-manipulation) for more details
 
 ## MobX only tracks synchronously accessed data
 

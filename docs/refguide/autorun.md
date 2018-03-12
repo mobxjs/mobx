@@ -29,33 +29,50 @@ numbers.push(5);
 // won't print anything, nor is `sum` re-evaluated
 ```
 
-## Error handling
+## Options
+
+Reaction accepts as third argument an options object with the following optional options:
+
+* `fireImmediately`: Boolean that indicates that the effect function should immediately be triggered after the first run of the data function. `false` by default. If a boolean is passed as third argument to `reaction`, it will be interpreted as the `fireImmediately` option.
+* `delay`: Number in milliseconds that can be used to debounce the effect function. If zero (the default), no debouncing will happen.
+* `equals`: `comparer.default` by default. If specified, this comparer function will be used to compare the previous and next values produced by the *data* function. The *effect* function will only be invoked if this function returns true. If specified, this will override `compareStructural`.
+* `name`: String that is used as name for this reaction in for example [`spy`](spy.md) events.
+* `onError`: function that will handle the errors of this reaction, rather then propagating them.
+* `scheduler`: Set a custom scheduler to determine how re-running the autorun function should be scheduled
+
+## The `delay` option
+
+```javascript
+autorun(() => {
+	// Assuming that profile.asJson returns an observable Json representation of profile,
+	// send it to the server each time it is changed, but await at least 300 milliseconds before sending it.
+	// When sent, the latest value of profile.asJson will be used.
+	sendProfileToServer(profile.asJson);
+}, { delay: 300 });
+```
+
+## The `onError` option
 
 Exceptions thrown in autorun and all other types reactions are caught and logged to the console, but not propagated back to the original causing code.
 This is to make sure that a reaction in one exception does not prevent the scheduled execution of other, possibly unrelated, reactions.
 This also allows reactions to recover from exceptions; throwing an exception does not break the tracking done by MobX,
 so as subsequent run of a reaction might complete normally again if the cause for the exception is removed.
 
-It is possible to override the default logging behavior of Reactions by calling the `onError` handler on the disposer of the reaction.
+It is possible to override the default logging behavior of Reactions by providing the `onError` option
 Example:
 
 ```javascript
-const age = observable(10)
+const age = observable.box(10)
+
 const dispose = autorun(() => {
     if (age.get() < 0)
         throw new Error("Age should not be negative")
     console.log("Age", age.get())
+}, {
+    onError(e) {
+        window.alert("Please enter a valid age")
+    }
 })
-
-age.set(18)  // Logs: Age 18
-age.set(-10) // Logs "Error in reaction .... Age should not be negative
-age.set(5)   // Recovered, logs Age 5
-
-dispose.onError(e => {
-    window.alert("Please enter a valid age")
-})
-
-age.set(-5)  // Shows alert box
 ```
 
-A global onError handler can be set as well through `extras.onReactionError(handler)`. This can be useful in tests or for monitoring.
+A global onError handler can be set as well, use `onReactionError(handler)`. This can be useful in tests or for client side error monitoring.

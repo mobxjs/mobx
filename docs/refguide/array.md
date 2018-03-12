@@ -45,19 +45,19 @@ Besides all built-in functions, the following goodies are available as well on o
 * `observe(listener, fireImmediately? = false)` Listen to changes in this array. The callback will receive arguments that express an array splice or array change, conforming to [ES7 proposal](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe). It returns a disposer function to stop the listener.
 * `clear()` Remove all current entries from the array.
 * `replace(newItems)` Replaces all existing entries in the array with new ones.
-* `find(predicate: (item, index, array) => boolean, thisArg?, fromIndex?)` Basically the same as the ES7 `Array.find` proposal, except for the additional `fromIndex` parameter.
-* `findIndex(predicate: (item, index, array) => boolean, thisArg?, fromIndex?)` Basically the same as the ES7 `Array.findIndex` proposal, except for the additional `fromIndex` parameter.
+* `find(predicate: (item, index, array) => boolean, thisArg?)` Basically the same as the ES7 `Array.find` proposal.
+* `findIndex(predicate: (item, index, array) => boolean, thisArg?)` Basically the same as the ES7 `Array.findIndex` proposal.
 * `remove(value)` Remove a single item by value from the array. Returns `true` if the item was found and removed.
 * `peek()` Returns an array with all the values which can safely be passed to other libraries, similar to `slice()`.
 
 In contrast to `slice`, `peek` doesn't create a defensive copy. Use this in performance critical applications if you know for sure that you use the array in a read-only manner.
 In performance critical sections it is recommended to use a flat observable array as well.
 
-## `observable.shallowArray(values)`
+## `observable.array(values, { deep: false })`
 
 Any values assigned to an observable array will be default passed through [`observable`](observable.md) to make them observable.
 Create a shallow array to disable this behavior and store a values as-is. See also [modifiers](modifiers.md) for more details on this mechanism.
 
-## Name argument
+## `observable.array(values, { name: "my array" })`
 
-Both `observable.array` and `observable.shallowArray` take a second parameter which is used as debug name in for example `spy` or the MobX dev tools.
+The `name` option can be used to give the array a friendly debug name, to be used in for example `spy` or the MobX dev tools.

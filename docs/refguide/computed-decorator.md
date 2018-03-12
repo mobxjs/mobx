@@ -45,32 +45,42 @@ class OrderLine {
 }
 ```
 
-## `computed` modifier
-
-If your environment doesn't support decorators, use the `computed(expression)` modifier in combination with `extendObservable` / `observable` to introduce new computed properties.
-
-`@computed get propertyName() { }` is basically sugar for [`extendObservable(this, { propertyName: get func() { } })`](extend-observable.md) in the constructor call.
+Otherwise, use `decorate` to introduce them:
 
 ```javascript
-import {extendObservable, computed} from "mobx";
+import {decorate, observable, computed} from "mobx";
 
 class OrderLine {
+    price = 0;
+    amount = 1;
+
     constructor(price) {
-        extendObservable(this, {
-            price: price,
-            amount: 1,
-            // valid:
-            get total() {
-                return this.price * this.amount
-            },
-            // also valid:
-            total: computed(function() {
-                return this.price * this.amount
-            })
-        })
+        this.price = price;
+    }
+
+    get total() {
+        return this.price * this.amount;
     }
 }
+decorate(OrderLine, {
+    price: observable,
+    amount: observable,
+    total: computed
+})
 ```
+
+Both `observable.object` and `extendObservable` will automatically infer getter properties to be computed properties, so the followin suffices:
+
+```javascript
+const orderLine = observable.object({
+    price: 0,
+    amount: 1,
+    get total() {
+        return this.price * this.amount
+    }
+})
+```
+
 
 ## Setters for computed values
 
@@ -78,15 +88,16 @@ It is possible to define a setter for computed values as well. Note that these s
 but they can be used as 'inverse' of the derivation. For example:
 
 ```javascript
-const box = observable({
-    length: 2,
-    get squared() {
-        return this.length * this.length;
+const orderLine = observable.object({
+    price: 0,
+    amount: 1,
+    get total() {
+        return this.price * this.amount
     },
-    set squared(value) {
-        this.length = Math.sqrt(value);
+    set total(total) {
+        this.price = total / this.amount // infer price from total
     }
-});
+})
 ```
 
 And similarly
@@ -104,8 +115,6 @@ class Foo {
 ```
 
 _Note: always define the setter *after* the getter, some TypeScript versions are known to declare two properties with the same name otherwise._
-
-_Note: setters require MobX 2.5.1 or higher_
 
 ## `computed(expression)` as function
 
@@ -136,17 +145,13 @@ When using `computed` as modifier or as box, it accepts a second options argumen
 
 * `name`: String, the debug name used in spy and the MobX devtools
 * `context`: The `this` that should be used in the provided expression
-* `setter`: The setter function to be used. Without setter it is not possible to assign new values to a computed value. If the second argument passed to `computed` is a function, this is assumed to be a setter.
-* `compareStructural`: By default `false`. When true, the output of the expression is structurally compared with the previous value before any observer is notified about a change. This makes sure that observers of the computation don't re-evaluate if new structures are returned that are structurally equal to the original ones. This is very useful when working with point, vector or color structures for example. The same behaviour can be achieved by specifying the `equals` option with `comparer.structural`.
-* `equals`: By default `comparer.default`. This acts as a comparison function for comparing the previous value with the next value. If this function considers the previous and next values to be equal, then observers will not be re-evaluated. This is useful when working with structural data, and types from other libraries. For example, a computed [moment](https://momentjs.com/) instance could use `(a, b) => a.isSame(b)`. If specified, this will override `compareStructural`.
+* `set`: The setter function to be used. Without setter it is not possible to assign new values to a computed value. If the second argument passed to `computed` is a function, this is assumed to be a setter.
+* `equals`: By default `comparer.default`. This acts as a comparison function for comparing the previous value with the next value. If this function considers the previous and next values to be equal, then observers will not be re-evaluated. This is useful when working with structural data, and types from other libraries. For example, a computed [moment](https://momentjs.com/) instance could use `(a, b) => a.isSame(b)`. `comparer.deep` comes in handy if you want to use structural comparison to determine whether the new value is different from the previous value (and as a result notify observers).
+* `requiresReaction`: It is recommended to set this one to `true` on very expensive computed values. If you try to read it's value, but the value is not being tracked by some observer (in which case MobX won't cache the value), it will cause the computed to throw, instead of doing an expensive re-evalution.
 
 ## `@computed.struct` for structural comparison
 
 The `@computed` decorator does not take arguments. If you want to to create a computed property which does structural comparison, use `@computed.struct`.
-
-## `@computed.equals` for custom comparison
-
-If you want to to create a computed property which does custom comparison, use `@computed.equals(comparer)`.
 
 ## Built-in comparers
 

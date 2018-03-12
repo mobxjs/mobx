@@ -7,7 +7,7 @@ Let's start with a basic example:
 ### Promises
 
 ```javascript
-mobx.useStrict(true) // don't allow state modifications outside actions
+mobx.configure({ enforceActions: true }) // don't allow state modifications outside actions
 
 class Store {
 	@observable githubProjects = []
@@ -33,9 +33,11 @@ class Store {
 
 The above example would throw exceptions, as the callbacks passed to the `fetchGithubProjectsSomehow` promise are not part of the `fetchProjects` action, as actions only apply to the current stack.
 
-A first simple fix is to extract the callbacks to actions. (Note that binding is important here to get a correct `this`!):
+A first simple fix is to extract the callbacks to actions. (Note that binding using `action.bound` is important here to get a correct `this`!):
 
 ```javascript
+mobx.configure({ enforceActions: true })
+
 class Store {
 	@observable githubProjects = []
 	@observable state = "pending" // "pending" / "done" / "error"
@@ -47,14 +49,14 @@ class Store {
 		fetchGithubProjectsSomehow().then(this.fetchProjectsSuccess, this.fetchProjectsError)
 	}
 
-	@action.bound // callback action
+	@action.bound
 	fetchProjectsSuccess(projects) {
 		const filteredProjects = somePreprocessing(projects)
 		this.githubProjects = filteredProjects
 		this.state = "done"
 	}
 
-	@action.bound // callback action
+	@action.bound
 	fetchProjectsError(error) {
 		this.state = "error"
 	}
@@ -64,7 +66,7 @@ class Store {
 Although this is clean and explicit, it might get a bit verbose with complex async flows. Alternative, you can wrap the promise callbacks with the `action` keyword. It is recommended, but not mandatory, to give them a name as well:
 
 ```javascript
-mobx.useStrict(true) // don't allow state modifications outside actions
+mobx.configure({ enforceActions: true })
 
 class Store {
 	@observable githubProjects = []
@@ -97,7 +99,7 @@ Instead of creating an action for the entire callback, you can also run only the
 The advantage of this pattern is that it encourages you to not litter the place with `action`, but rather put all the state modifications as much as possible at the end of the whole process:
 
 ```javascript
-mobx.useStrict(true) // don't allow state modifications outside actions
+mobx.configure({ enforceActions: true })
 
 class Store {
 	@observable githubProjects = []
@@ -139,7 +141,7 @@ And after each `await` a new asynchronous function is started, so after each `aw
 This is where `runInAction` comes in handy again:
 
 ```javascript
-mobx.useStrict(true) // don't allow state modifications outside actions
+mobx.configure({ enforceActions: true })
 
 class Store {
 	@observable githubProjects = []
@@ -166,41 +168,33 @@ class Store {
 }
 ```
 
-### babel-plugin-mobx-deep-action
+### flows
 
-If you use babel, there is a plugin that scans for `@action` methods and automatically wraps all callbacks and await statements properly in actions during transpilation: [mobx-deep-action](https://github.com/mobxjs/babel-plugin-mobx-deep-action).
+However, a nicer approach is to use the built-in concept of `flow`s. They use generators. Which might look scary in the beginning, but it works the same as `async` / `await`. Just use `function *` instead of `async` and `yield` instead of `await`.
+The advantage of `flow` is that it is syntactically very close to async / await (with different keywords), and no manually action wrapping is needed for async parts, resulting in very clean code.
 
-### Generators & asyncAction
-
-Finally there is the `asyncAction` utility in the [`mobx-utils` package](https://github.com/mobxjs/mobx-utils) that uses generators behind the scenes to automatically wrap yielded promises in actions. The advantage of this is that it is syntactically very close to async / await (with different keywords), and no manually action wrapping is needed for async parts, resulting in very clean code.
-Just make sure every `yield` returns a promise.
-
-`asyncAction` can be used as decorator and as function (just like `@action`).
-`asyncAction` integrates neatly with MobX development tools, so that it is easy to trace the process of the async function.
-For more details see the docs of [asyncAction](https://github.com/mobxjs/mobx-utils#asyncaction).
+`flow` can be used as decorator and as function (just like `@action`).
+`flow` integrates neatly with MobX development tools, so that it is easy to trace the process of the async function.
 
 ```javascript
-import {asyncAction} from "mobx-utils"
-
-mobx.useStrict(true) // don't allow state modifications outside actions
+mobx.configure({ enforceActions: true })
 
 class Store {
 	@observable githubProjects = []
-	@observable state = "pending" // "pending" / "done" / "error"
+	@observable state = "pending"
 
-	@asyncAction
-	*fetchProjects() { // <- note the star, this a generator function!
+	fetchProjects = flow(function * () { // <- note the star, this a generator function!
 		this.githubProjects = []
 		this.state = "pending"
 		try {
 			const projects = yield fetchGithubProjectsSomehow() // yield instead of await
 			const filteredProjects = somePreprocessing(projects)
-			// the asynchronous blocks will automatically be wrapped actions
+			// the asynchronous blocks will automatically be wrapped actions and can modify state
 			this.state = "done"
 			this.githubProjects = filteredProjects
 		} catch (error) {
 			this.state = "error"
 		}
-	}
+	})
 }
 ```

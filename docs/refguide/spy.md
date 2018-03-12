@@ -18,11 +18,10 @@ Spy listeners always receive one object, which usually has at least a `type` fie
 
 | event | fields | nested |
 | --- | --- |--- |
-| action | name, target (scope), arguments, fn (source function of the action | yes |
-| transaction | name, target (scope) | yes |
-| scheduled-reaction | object (Reaction instance) | no |
-| reaction | object (Reaction instance), fn (source of the reaction) | yes
-| compute | object (ComputedValue instance), target (scope), fn (source) | no
+| action | name, object (scope), arguments | yes |
+| scheduled-reaction | name | no |
+| reaction | name | yes
+| compute | name | no
 | error | message | no |
 | update (array) | object (the array), index, newValue, oldValue | yes
 | update (map) | object (observable map instance), name, newValue, oldValue | yes
