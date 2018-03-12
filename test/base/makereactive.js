@@ -388,39 +388,7 @@ test("as structure", function() {
     x.x[1] = 2
     nc()
     x.x[0] = 0
-    c()
-    x.x[1] = {
-        a: [1, 2]
-    }
-    c()
-    x.x[1].a = [1, 2]
-    nc()
-    x.x[1].a[1] = 3
-    c()
-    x.x[1].a[2] = 3
-    c()
-    x.x = {
-        a: [
-            {
-                b: 3
-            }
-        ]
-    }
-    c()
-    x.x = {
-        a: [
-            {
-                b: 3
-            }
-        ]
-    }
-    nc()
-    x.x.a = [{ b: 3 }]
-    nc()
-    x.x.a[0] = { b: 3 }
-    nc()
-    x.x.a[0].b = 3
-    nc()
+    nc() // not detected
 
     dis()
 })
@@ -633,46 +601,13 @@ test("761 - deeply nested modifiers work", () => {
     expect(Array.isArray(a.someKey.someNestedKey)).toBe(false)
 })
 
-test("compare structurally, deep", () => {
-    var a = mobx.observable.object(
-        {
-            x: undefined
-        },
-        {
-            x: mobx.observable.deep.struct
-        }
-    )
-
-    var changed = 0
-    var d = mobx.autorun(() => {
-        mobx.toJS(a)
-        changed++
-    })
-
-    expect(changed).toBe(1)
-    a.x = { y: 2 }
-    expect(changed).toBe(2)
-    a.x.y = 3
-    expect(changed).toBe(3)
-
-    a.x = { y: 3 }
-    expect(changed).toBe(3)
-
-    a.x.y = { a: 1 }
-    expect(changed).toBe(4)
-    a.x.y = { a: 1 }
-    expect(changed).toBe(4)
-
-    d()
-})
-
 test("compare structurally, ref", () => {
     var a = mobx.observable.object(
         {
             x: undefined
         },
         {
-            x: mobx.observable.ref.struct
+            x: mobx.observable.struct
         }
     )
 
@@ -692,6 +627,8 @@ test("compare structurally, ref", () => {
     a.x = { y: 3 }
     expect(changed).toBe(2)
 
+    a.x = { y: 4 }
+    expect(changed).toBe(3)
     a.x = { y: 4 }
     expect(changed).toBe(3)
 
@@ -717,4 +654,23 @@ test("double declare property", () => {
             }
         )
     }).toThrow(/Trying to declare a decorator for unspecified property/)
+})
+
+test("structural collections", () => {
+    const o = mobx.observable(
+        {
+            x: [1, 2, 3]
+        },
+        {
+            x: mobx.observable.struct
+        }
+    )
+
+    expect(mobx.isObservable(o.x)).toBeFalsy()
+    const x = o.x
+    o.x = [1, 2, 3]
+    expect(o.x).toBe(x)
+    expect(() => {
+        o.x = mobx.observable([1, 2, 3])
+    }).toThrow("observable.struct should not be used with observable values")
 })

@@ -60,7 +60,6 @@ function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any
 export const deepDecorator = createDecoratorForEnhancer(deepEnhancer)
 const shallowDecorator = createDecoratorForEnhancer(shallowEnhancer)
 export const refDecorator = createDecoratorForEnhancer(referenceEnhancer)
-const deepStructDecorator = createDecoratorForEnhancer(deepStructEnhancer)
 const refStructDecorator = createDecoratorForEnhancer(refStructEnhancer)
 
 /**
@@ -196,25 +195,16 @@ const observableFactories: IObservableFactories = {
     ref: refDecorator,
     shallow: shallowDecorator,
     deep: deepDecorator,
-    struct: deepStructDecorator
+    struct: refStructDecorator
 } as any
 
-export const observable: IObservableFactory & {
-    enhancer: IEnhancer<any>
-} & IObservableFactories & {
-        deep: {
-            struct: IObservableDecorator
-        }
-        ref: {
-            struct: IObservableDecorator
-        }
+export const observable: IObservableFactory &
+    IObservableFactories & {
+        enhancer: IEnhancer<any>
     } = createObservable as any
 
 // weird trick to keep our typings nicely with our funcs, and still extend the observable function
 Object.keys(observableFactories).forEach(name => (observable[name] = observableFactories[name]))
-
-observable.deep.struct = observable.struct as any
-observable.ref.struct = refStructDecorator
 
 function incorrectlyUsedAsDecorator(methodName) {
     fail(

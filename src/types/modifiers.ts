@@ -56,6 +56,8 @@ export function deepStructEnhancer(v, oldValue, name): any {
 }
 
 export function refStructEnhancer(v, oldValue, name): any {
+    if (process.env.NODE_ENV !== "production" && isObservable(v))
+        throw `observable.struct should not be used with observable values`
     if (deepEqual(v, oldValue)) return oldValue
     return v
 }

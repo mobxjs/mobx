@@ -2,6 +2,7 @@
 
 * For the highlights of this release, read the [blog](https://medium.com/p/c1fbc08008da/):
 * For migration notes: see the [wiki page](https://github.com/mobxjs/mobx/wiki/Migrating-from-mobx-3-to-mobx-4)
+* Note; many things that were removed were removed to make the api surface smaller. If you thing some feature shouldn't have been removed, feel free to open an issue!
 
 This is the extensive list of all changes.
 
@@ -103,6 +104,10 @@ The changes mentioned here are discussed in detail in the [migration notes](http
 * Killed the already deprecated modifiers `asFlat` etc. If you war still using this, see the MobX 2 -> 3 migration notes.
 * Observable maps now fully implement the map interface. See [#1361](https://github.com/mobxjs/mobx/pull/1361) by [Marc Fallows](https://github.com/marcfallows)
 * Observable arrays will no longer expose the `.move` method
+* Dropped the `observable.deep.struct` modifier
+* Dropped the `observable.ref.struct` modifier
+* `observable.struct` now behaves like `observable.ref.struct` (this used to be `observable.deep.struct`). That is; values in an `observable.struct` field will be stored as is, but structural comparison will be used when assigning a new value
+* IReactionDisposer.onError has been removed, use the `onError` option of reactions instead
 
 ### Issues fixed in this release:
 
