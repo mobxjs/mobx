@@ -106,7 +106,6 @@ export { flow } from "./api/flow"
 export { toJS } from "./api/tojs"
 export { trace } from "./api/trace"
 
-export { Iterator } from "./utils/iterable"
 export { IObserverTree, IDependencyTree, getDependencyTree, getObserverTree } from "./api/extras"
 
 export {

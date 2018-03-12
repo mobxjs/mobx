@@ -247,10 +247,10 @@ export class ObservableMap<K, V>
         const self = this
         let nextIndex = 0
         return makeIterable({
-            next: function() {
+            next() {
                 return nextIndex < self._keys.length
                     ? { value: self.get(self._keys[nextIndex++]), done: false }
-                    : { done: true }
+                    : { value: undefined as any, done: true }
             }
         })
     }

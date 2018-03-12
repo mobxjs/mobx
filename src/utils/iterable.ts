@@ -10,13 +10,6 @@ export function iteratorSymbol() {
 
 export const IS_ITERATING_MARKER = "__$$iterating"
 
-export interface Iterator<T> {
-    next(): {
-        done: boolean
-        value?: T
-    }
-}
-
 export function declareIterator<T>(prototType, iteratorFactory: () => IterableIterator<T>) {
     addHiddenFinalProp(prototType, iteratorSymbol(), iteratorFactory)
 }

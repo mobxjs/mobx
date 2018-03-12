@@ -583,10 +583,10 @@ declareIterator(ObservableArray.prototype, function() {
     const self = this
     let nextIndex = 0
     return makeIterable({
-        next: function() {
+        next() {
             return nextIndex < self.length
                 ? { value: self[nextIndex++], done: false }
-                : { done: true }
+                : { done: true, value: undefined }
         }
     })
 })
