@@ -317,3 +317,14 @@ test("flows can be cancelled - 5 - flows cancel recursively", done => {
     )
     p.cancel()
 })
+
+test("flows yield anything", async () => {
+    let steps = 0
+    const start = flow(function*() {
+        const x = yield 2
+        return x
+    })
+
+    const res = await start()
+    expect(res).toBe(2)
+})

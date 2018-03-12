@@ -135,8 +135,8 @@ export function createFlowGenerator(name: string, generator: Function) {
                 } catch (e) {
                     return reject(e)
                 }
+
                 next(ret)
-                return null
             }
 
             function onRejected(err: any) {
@@ -155,10 +155,7 @@ export function createFlowGenerator(name: string, generator: Function) {
 
             function next(ret: any) {
                 if (ret.done) return resolve(ret.value)
-                // TODO: support more type of values? See https://github.com/tj/co/blob/249bbdc72da24ae44076afd716349d2089b31c4c/index.js#L100
-                if (!ret.value || typeof ret.value.then !== "function")
-                    return fail("Only promises can be yielded to asyncAction, got: " + ret)
-                pendingPromise = ret.value
+                pendingPromise = Promise.resolve(ret.value) as any
                 return pendingPromise!.then(onFulfilled, onRejected)
             }
 
