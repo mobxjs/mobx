@@ -173,8 +173,6 @@ export function iteratorToArray<T>(it: Iterator<T>): ReadonlyArray<T> {
     return res
 }
 
-declare var Symbol
-
 export function primitiveSymbol() {
     return (typeof Symbol === "function" && Symbol.toPrimitive) || "@@toPrimitive"
 }
@@ -186,3 +184,4 @@ export function toPrimitive(value) {
 import { globalState } from "../core/globalstate"
 import { IObservableArray, isObservableArray } from "../types/observablearray"
 import { isObservableMap, ObservableMap, IKeyValueMap } from "../types/observablemap"
+import { Iterator } from "./iterable"

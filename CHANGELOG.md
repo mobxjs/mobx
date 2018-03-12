@@ -127,6 +127,10 @@ The issues are incoprorated in the above notes.
 * [#1241](https://github.com/mobxjs/mobx/issues/1241) - Make it possible to disable error boundaries, to make it easier to find exceptions
 * [#1263](https://github.com/mobxjs/mobx/issues/1263) - Remove bower.json
 
+# 3.6.2
+
+* Fixed accidental dependency on the `node` typings. Fixes [#1387](https://github.com/mobxjs/mobx/issues/1387) / [#1362](https://github.com/mobxjs/mobx/issues/1387)
+
 # 3.6.1
 
 * Fixed [#1358](https://github.com/mobxjs/mobx/pull/1359): Deep comparison failing on IE11. By [le0nik](https://github.com/le0nik) through [#1359](https://github.com/mobxjs/mobx/pull/1359)
