@@ -89,15 +89,15 @@ test("it should support throw from yielded promise generator", done => {
     )
 })
 
-test("it should support asyncAction as decorator", done => {
+test("it should support asyncAction in classes", done => {
     const values = []
 
     mobx.configure({ enforceActions: true })
 
     class X {
-        a = 1;
+        a = 1
 
-        *f(initial) {
+        f = mobx.flow(function*(initial) {
             this.a = initial // this runs in action
             try {
                 this.a = yield delay(100, 5, true) // and this as well!
@@ -107,11 +107,10 @@ test("it should support asyncAction as decorator", done => {
                 this.a = e
             }
             return this.a
-        }
+        })
     }
     mobx.decorate(X, {
-        a: mobx.observable,
-        f: mobx.flow
+        a: mobx.observable
     })
 
     const x = new X()
@@ -132,7 +131,7 @@ test("it should support logging", done => {
     const events = []
     const x = mobx.observable({ a: 1 })
 
-    const f = mobx.flow("myaction", function*(initial) {
+    const f = mobx.flow(function* myaction(initial) {
         x.a = initial
         x.a = yield delay(100, 5)
         x.a = 4

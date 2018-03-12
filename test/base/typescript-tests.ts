@@ -1558,21 +1558,20 @@ test("promised when can be cancelled", async () => {
     }
 })
 
-test("it should support asyncAction as decorator (babel)", async () => {
+test("it should support asyncAction as decorator (ts)", async () => {
     const values = []
 
     mobx.configure({ enforceActions: true })
 
     class X {
-        @observable a = 1;
+        @observable a = 1
 
-        @mobx.flow
-        *f(initial: number): any {
+        f = mobx.flow(function* f(initial: number): any {
             this.a = initial // this runs in action
             this.a += yield Promise.resolve(5)
             this.a = this.a * 2
             return this.a
-        }
+        })
     }
 
     const x = new X()

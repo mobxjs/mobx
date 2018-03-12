@@ -1073,7 +1073,7 @@ test("actions are not reassignable", () => {
     }).toThrow(/Cannot assign to read only property 'm4'/)
 })
 
-test("it should support asyncAction as decorator (babel)", async () => {
+test("it should support asyncAction (babel)", async () => {
     const values = []
 
     mobx.configure({ enforceActions: true })
@@ -1081,13 +1081,12 @@ test("it should support asyncAction as decorator (babel)", async () => {
     class X {
         @observable a = 1
 
-        @mobx.flow
-        f = function*(initial) {
+        f = mobx.flow(function* f(initial) {
             this.a = initial // this runs in action
             this.a += yield Promise.resolve(5)
             this.a = this.a * 2
-            return Promise.resolve(this.a)
-        }
+            return this.a
+        })
     }
 
     const x = new X()
