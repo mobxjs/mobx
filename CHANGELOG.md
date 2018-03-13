@@ -14,7 +14,7 @@ This is the extensive list of all changes.
 
 The changes mentioned here are discussed in detail in the [release highlights](https://medium.com/p/c1fbc08008da/), or were simply updated in the docs.
 
-* MobX 4 introduces separation between the production and non production build. The production build strips most typechecks, resulting in a faster and smaller build. Make sure to substitute process.env.NODE_ENV = "production" in your build process! If you are using MobX in a react project, you most probably already have set this up. Otherwise, they idea is explained [here](https://reactjs.org/docs/add-react-to-an-existing-app.html).
+* MobX 4 introduces separation between the production and non production build. The production build strips most typechecks, resulting in a faster and smaller build. Make sure to substitute process.env.NODE_ENV = "production" in your build process! If you are using MobX in a react project, you most probably already have set this up. Otherwise, the idea is explained [here](https://reactjs.org/docs/add-react-to-an-existing-app.html).
 * Introduced `flow` to create a chain of async actions. This is the same function as [`asyncActions`](https://github.com/mobxjs/mobx-utils#asyncaction) of the mobx-utils package
 * These `flow`'s are now cancellable, by calling `.cancel()` on the returned promise, which will throw a cancellation exception into the generator function.
 * `flow` also has experimental support for async iterators (`async * function`)
@@ -30,19 +30,19 @@ The changes mentioned here are discussed in detail in the [release highlights](h
 * `computed(fn, options?)` / `@computed(options) get fn()` now accept the following options:
   * `set: (value) => void` to set a custom setter on the computed property
   * `name: "debug name"`
-  * `equals: fn` the equality value to use for the computed to determine whether it's output has changed. The default is `comparer.default`. Alternatives are `comparer.structural`, `comparer.identity` or just your own comparison function.
+  * `equals: fn` the equality value to use for the computed to determine whether its output has changed. The default is `comparer.default`. Alternatives are `comparer.structural`, `comparer.identity` or just your own comparison function.
   * `requiresReaction: boolean` see above.
 
 * `autorun(fn, options?)` now accepts the following options:
   * `delay: number` debounce the autorun with the given amount of milliseconds. This replaces the MobX 3 api `autorunAsync`
-  * `name: "debug name"
+  * `name: "debug name"`
   * `scheduler: function` a custom scheduler to run the autorun. For example to connect running the autorun to `requestAnimationFrame`. See the docs for more details
   * `onError`. A custom error handler to be notified when an autorun throws an exception.
 
 * `reaction(expr, effect, options?)` now accepts the following options:
   * `delay: number` debounce the autorun with the given amount of milliseconds. This replaces the MobX 3 api `autorunAsync`
   * `fireImmediately`. Immediately fire the effect function after the first evaluation of `expr`
-  * `equals`. Custom equality function to determine whether the `expr` function differed from it's previous result, and hence should fire `effect`. Accepts the same options as the `equals` option of computed.
+  * `equals`. Custom equality function to determine whether the `expr` function differed from its previous result, and hence should fire `effect`. Accepts the same options as the `equals` option of computed.
   * All the options `autorun` accepts
 
 * `when(predicate, effect?, options?)` now accepts the following options:
@@ -70,7 +70,7 @@ The changes mentioned here are discussed in detail in the [release highlights](h
 The changes mentioned here are discussed in detail in the [migration notes](https://github.com/mobxjs/mobx/wiki/Migrating-from-mobx-3-to-mobx-4)
 
 * MobX 4 requires `Map` to be globally available. Polyfill it if targeting IE < 11 or other older browsers.
-* For typescript users, MobX now requires `Map` and several `Symbol`s to exist for it's typings. So make sure that the `lib` configuration of your project is set to `"es6"`. (The compilation target can still be `"es5"`)
+* For typescript users, MobX now requires `Map` and several `Symbol`s to exist for its typings. So make sure that the `lib` configuration of your project is set to `"es6"`. (The compilation target can still be `"es5"`)
 * `observable.shallowArray(values)` has been removed, instead use `observable.array(values, { deep: false })`
 * `observable.shallowMap(values)` has been removed, instead use `observable.map(values, { deep: false })`
 * `observable.shallowObject(values)` has been removed, instead use `observable.object(values, {}, { deep: false })`
