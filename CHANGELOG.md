@@ -613,6 +613,18 @@ observable({
 })
 ```
 
+By the way, if you have code such as:
+
+```
+observable({
+    @computed get someProp() { ... }
+});
+```
+
+That code will no longer work. Rather, reactions will fail silently. Remove `@computed`.
+Note, this only applies when using observable in this way; it doesn't apply when using
+`@observable` on a property within a class declaration.
+
 ### Misc
 
 * Fixed #701: `toJS` sometimes failing to convert objects decorated with `@observable` (cause: `isObservable` sometimes returned false on these object)
