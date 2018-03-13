@@ -1,3 +1,7 @@
+# 4.0.1
+
+* Updated flow typings, see [#1393](https://github.com/mobxjs/mobx/pull/1393) by [andrew--r](https://github.com/andrew--r)
+
 # 4.0.0
 
 * For the highlights of this release, read the [blog](https://medium.com/p/c1fbc08008da/):
