@@ -602,6 +602,19 @@ Object.defineProperty(ObservableArray.prototype, "length", {
     }
 })
 
+// Internet Explorer on desktop doesn't support this.....
+// So, let's don't do this to avoid different semantics
+// See #1395
+// addHiddenProp(
+//     ObservableArray.prototype,
+//     typeof Symbol !== "undefined" ? Symbol.isConcatSpreadable as any : "@@isConcatSpreadable",
+//     {
+//         enumerable: false,
+//         configurable: true,
+//         value: true
+//     }
+// )
+
 /**
  * Wrap function from prototype
  */
