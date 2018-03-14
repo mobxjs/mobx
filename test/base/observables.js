@@ -1871,3 +1871,12 @@ test("can create computed with setter", () => {
     x.set(3)
     expect(x.get()).toBe(6)
 })
+
+test("can make non-extenible objects observable", () => {
+    const base = { x: 3 }
+    Object.freeze(base)
+    const o = mobx.observable(base)
+    o.x = 4
+    expect(o.x).toBe(4)
+    expect(mobx.isObservableProp(o, "x")).toBeTruthy()
+})

@@ -51,13 +51,14 @@ function createPropertyInitializerDescriptor(
 export function initializeInstance(target: any)
 export function initializeInstance(target: DecoratorTarget) {
     if (target.__mobxDidRunLazyInitializers === true) return
-    addHiddenProp(target, "__mobxDidRunLazyInitializers", true)
     const decorators = target.__mobxDecorators
-    if (decorators)
+    if (decorators) {
+        addHiddenProp(target, "__mobxDidRunLazyInitializers", true)
         for (let key in decorators) {
             const d = decorators[key]
             d.propertyCreator(target, d.prop, d.descriptor, d.decoratorTarget, d.decoratorArguments)
         }
+    }
 }
 
 export function createPropDecorator(
