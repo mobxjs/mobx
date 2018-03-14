@@ -1,4 +1,4 @@
-import { invariant, fail, addHiddenFinalProp } from "../utils/utils"
+import { invariant, fail, addHiddenProp } from "../utils/utils"
 import { createAction, executeAction, IAction } from "../core/action"
 import { namedActionDecorator, boundActionDecorator } from "./actiondecorator"
 
@@ -87,5 +87,5 @@ export function isAction(thing: any) {
 }
 
 export function defineBoundAction(target: any, propertyName: string, fn: Function) {
-    addHiddenFinalProp(target, propertyName, createAction(propertyName, fn.bind(target)))
+    addHiddenProp(target, propertyName, createAction(propertyName, fn.bind(target)))
 }

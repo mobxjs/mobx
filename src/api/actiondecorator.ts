@@ -29,7 +29,7 @@ export function namedActionDecorator(name: string) {
             return {
                 enumerable: false,
                 configurable: false,
-                writable: false,
+                writable: process.env.NODE_ENV !== "production", // See #1398
                 initializer() {
                     // N.B: we can't immediately invoke initializer; this would be wrong
                     return createAction(name, initializer!.call(this))

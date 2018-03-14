@@ -1041,7 +1041,8 @@ test("computed comparer works with decorate (babel) - 3", () => {
     disposeAutorun()
 })
 
-test("actions are not reassignable", () => {
+test("actions are reassignable", () => {
+    // See #1398, make actions reassignable to support stubbing
     class A {
         @action
         m1() {}
@@ -1056,21 +1057,14 @@ test("actions are not reassignable", () => {
     expect(isAction(a.m2)).toBe(true)
     expect(isAction(a.m3)).toBe(true)
     expect(isAction(a.m4)).toBe(true)
-    // expect(() => {
-    //     a.m1 = () => {}
-    // }).toThrow(/Cannot assign to read only property 'm1'/)
     a.m1 = () => {}
-    // we cannot prevent actions to be reassignable in TS, as it will kill overriding the action in subtypes :'(
     expect(isAction(a.m1)).toBe(false)
-    expect(() => {
-        a.m2 = () => {}
-    }).toThrow(/Cannot assign to read only property 'm2'/)
-    expect(() => {
-        a.m3 = () => {}
-    }).toThrow(/Cannot assign to read only property 'm3'/)
-    expect(() => {
-        a.m4 = () => {}
-    }).toThrow(/Cannot assign to read only property 'm4'/)
+    a.m2 = () => {}
+    expect(isAction(a.m2)).toBe(false)
+    a.m3 = () => {}
+    expect(isAction(a.m3)).toBe(false)
+    a.m4 = () => {}
+    expect(isAction(a.m4)).toBe(false)
 })
 
 test("it should support asyncAction (babel)", async () => {
