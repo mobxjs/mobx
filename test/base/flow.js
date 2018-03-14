@@ -170,17 +170,14 @@ test("flows can be cancelled - 1 - uncatched cancellation", done => {
     const promise = start()
     promise.then(
         () => {
-            debugger
             fail()
         },
         err => {
-            debugger
             expect(steps).toBe(1)
             expect("" + err).toBe("Error: FLOW_CANCELLED")
             done()
         }
     )
-    debugger
     promise.cancel()
 })
 

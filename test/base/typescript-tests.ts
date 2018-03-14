@@ -1548,7 +1548,6 @@ test("promised when can be cancelled", async () => {
     const x = mobx.observable.box(1)
 
     try {
-        debugger
         const p = mobx.when(() => x.get() === 3)
         setTimeout(() => p.cancel(), 100)
         await p
