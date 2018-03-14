@@ -37,8 +37,8 @@ export function flow<A1, A2, A3>(
 ): (a1: A1, a2: A2, a3: A3) => CancellablePromise<any>
 export function flow<A1, A2>(
     generator: (a1: A1, a2: A2) => IterableIterator<any>
-): (a1: A1, a2: A2) => Promise<any>
-export function flow<A1>(generator: (a1: A1) => IterableIterator<any>): (a1: A1) => Promise<any>
+): (a1: A1, a2: A2) => CancellablePromise<any>
+export function flow<A1>(generator: (a1: A1) => IterableIterator<any>): (a1: A1) => CancellablePromise<any>
 export function flow(generator: Function) {
     if (arguments.length !== 1)
         fail(process.env.NODE_ENV && `Flow expects one 1 argument and cannot be used as decorator`)
