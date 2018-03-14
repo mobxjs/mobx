@@ -1,6 +1,7 @@
 # 4.0.2
 
-* Fixed issue where exceptions like `TypeError: Cannot define property:__mobxDidRunLazyInitializers, object is not extensible.` were thrown.
+* Fixed issue where exceptions like `TypeError: Cannot define property:__mobxDidRunLazyInitializers, object is not extensible.` were thrown. Fixes [#1404](https://github.com/mobxjs/mobx/issues/1404)
+* Improved flow typings for `flow`, [#1399](https://github.com/mobxjs/mobx/pull/1399) by @ismailhabib
 
 # 4.0.1
 
