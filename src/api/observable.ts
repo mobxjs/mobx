@@ -75,11 +75,9 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
     if (isObservable(v)) return v
 
     // something that can be converted and mutated?
-    const res = Array.isArray(v)
-        ? observable.array(v, arg2)
-        : isES6Map(v)
-          ? observable.map(v, arg2)
-          : isPlainObject(v) ? observable.object(v, arg2, arg3) : v
+    const res = isPlainObject(v)
+        ? observable.object(v, arg2, arg3)
+        : Array.isArray(v) ? observable.array(v, arg2) : isES6Map(v) ? observable.map(v, arg2) : v
 
     // this value could be converted to a new observable data structure, return it
     if (res !== v) return res
