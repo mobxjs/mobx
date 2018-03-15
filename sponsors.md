@@ -28,6 +28,7 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Mihail Diordiev
 * Nikolay Ivanov
 * Pavel Ravits
+* Pascal Van Hecke
 * Peng Zhenqing
 * Rafal Filipek
 * Rainer Wittmann
@@ -51,3 +52,4 @@ Patrons:
 * @guidojo
 * Ronal Chanou
 * Kim Joar Bekkelund
+* Tőrös Egon Richárd
