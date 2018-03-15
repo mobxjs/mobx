@@ -26,7 +26,7 @@ export const computedDecorator = createPropDecorator(
         // Optimization: faster on decorator target or instance? Assuming target
         // Optimiziation: find out if declaring on instance isn't just faster. (also makes the property descriptor simpler). But, more memory usage..
         const options = decoratorArgs[0] || {}
-        defineComputedProperty(instance, decoratorTarget, propertyName, { ...options, get, set })
+        defineComputedProperty(instance, propertyName, { ...options, get, set })
     }
 )
 

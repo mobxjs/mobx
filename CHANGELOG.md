@@ -1,3 +1,8 @@
+
+# 4.0.3
+
+* `@computed` properties are now declared on their owner rather then the protoptype. Fixes an issue where `@computed` fields didn't work in React Native on proxied objects. See [#1398](https://github.com/mobxjs/mobx/issues/1398)
+
 # 4.0.2
 
 * Fixed issue where exceptions like `TypeError: Cannot define property:__mobxDidRunLazyInitializers, object is not extensible.` were thrown. Fixes [#1404](https://github.com/mobxjs/mobx/issues/1404)
