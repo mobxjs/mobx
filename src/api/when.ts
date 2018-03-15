@@ -43,7 +43,6 @@ function _when(predicate: () => boolean, effect: Lambda, opts: IWhenOptions): IR
         if (predicate()) {
             r.dispose()
             if (timeoutHandle) clearTimeout(timeoutHandle)
-            debugger
             effectAction()
         }
     }, opts)

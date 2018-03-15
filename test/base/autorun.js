@@ -94,7 +94,7 @@ test("autorun tracks invalidation of unbound dependencies", function() {
     expect(values).toEqual([0, 100, 101])
 })
 
-test.only("when effect is an action", function(done) {
+test("when effect is an action", function(done) {
     var a = m.observable.box(0)
 
     m.configure({ enforceActions: true })

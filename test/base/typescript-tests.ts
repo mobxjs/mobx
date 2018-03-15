@@ -826,7 +826,7 @@ test("enumerability", () => {
 
     t.equal("a" in a, true)
     t.equal(a.hasOwnProperty("a"), true)
-    t.equal(a.hasOwnProperty("b"), false)
+    t.equal(a.hasOwnProperty("b"), true) // better, false, but, see: #1398
     t.equal(a.hasOwnProperty("m"), false)
     t.equal(a.hasOwnProperty("m2"), true)
 
@@ -849,12 +849,12 @@ test("enumerability", () => {
 
     t.equal("a" in a, true)
     t.equal(a.hasOwnProperty("a"), true)
-    t.equal(a.hasOwnProperty("b"), false)
+    t.equal(a.hasOwnProperty("b"), true) // better, false, but, see: #1398
     t.equal(a.hasOwnProperty("m"), false)
     t.equal(a.hasOwnProperty("m2"), true)
 })
 
-test("issue 285 (babel)", () => {
+test("issue 285 (typescript)", () => {
     const { observable, toJS } = mobx
 
     class Todo {
