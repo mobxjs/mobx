@@ -1,6 +1,9 @@
 # 4.0.3
 
+* Introduced `keepAlive` as option to `computed`
 * All observable api's now default to `any` for their generic arguments
+* Improved `flow` cancellation
+* The effect of `when` is now automatically an action.
 
 # 4.0.2
 
