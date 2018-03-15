@@ -1,3 +1,7 @@
+# 4.0.3
+
+* All observable api's now default to `any` for their generic arguments
+
 # 4.0.2
 
 * Fixed issue where exceptions like `TypeError: Cannot define property:__mobxDidRunLazyInitializers, object is not extensible.` were thrown. Fixes [#1404](https://github.com/mobxjs/mobx/issues/1404)
