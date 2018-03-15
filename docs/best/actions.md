@@ -173,7 +173,7 @@ class Store {
 However, a nicer approach is to use the built-in concept of `flow`s. They use generators. Which might look scary in the beginning, but it works the same as `async` / `await`. Just use `function *` instead of `async` and `yield` instead of `await`.
 The advantage of `flow` is that it is syntactically very close to async / await (with different keywords), and no manually action wrapping is needed for async parts, resulting in very clean code.
 
-`flow` can be used as decorator and as function (just like `@action`).
+`flow` can be used only as function and not as decorator.
 `flow` integrates neatly with MobX development tools, so that it is easy to trace the process of the async function.
 
 ```javascript
