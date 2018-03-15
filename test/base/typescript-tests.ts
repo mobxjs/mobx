@@ -1628,3 +1628,17 @@ test("flow support throwing async generators", async () => {
         expect("" + e).toBe("OOPS")
     }
 })
+
+test("toJS bug #1413 (TS)", () => {
+    class X {
+        @observable
+        test = {
+            test1: 1
+        }
+    }
+
+    const x = new X()
+    const res = mobx.toJS(x.test) as any
+    expect(res).toEqual({ test1: 1 })
+    expect(res.__mobxDidRunLazyInitializers).toBe(undefined)
+})

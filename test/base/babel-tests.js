@@ -1087,3 +1087,17 @@ test("it should support asyncAction (babel)", async () => {
 
     expect(await x.f(3)).toBe(16)
 })
+
+test("toJS bug #1413 (babel)", () => {
+    class X {
+        @observable
+        test = {
+            test1: 1
+        }
+    }
+
+    const x = new X()
+    const res = mobx.toJS(x.test)
+    expect(res).toEqual({ test1: 1 })
+    expect(res.__mobxDidRunLazyInitializers).toBe(undefined)
+})

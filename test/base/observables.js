@@ -1880,3 +1880,47 @@ test("can make non-extenible objects observable", () => {
     expect(o.x).toBe(4)
     expect(mobx.isObservableProp(o, "x")).toBeTruthy()
 })
+
+test("keeping computed properties alive works", () => {
+    let calcs = 0
+    const x = observable(
+        {
+            x: 1,
+            get y() {
+                calcs++
+                return this.x * 2
+            }
+        },
+        {
+            y: mobx.computed({ keepAlive: true })
+        }
+    )
+
+    expect(x.y).toBe(2)
+    expect(calcs).toBe(1)
+    expect(x.y).toBe(2)
+    expect(calcs).toBe(1) // kept alive!
+
+    x.x = 3
+    expect(calcs).toBe(2) // reactively updated
+    expect(x.y).toBe(6)
+})
+
+test("tuples", () => {
+    // See #1391
+    function tuple() {
+        const res = new Array(arguments.length)
+        for (let i = 0; i < arguments.length; i++) mobx.extendObservable(res, { [i]: arguments[i] })
+        return res
+    }
+
+    const myStuff = tuple(1, 3)
+    const events = []
+
+    mobx.reaction(() => myStuff[0], val => events.push(val))
+    myStuff[1] = 17 // should not react
+    myStuff[0] = 2 // should react
+    expect(events).toEqual([2])
+
+    expect(myStuff.map(x => x * 2)).toEqual([4, 34])
+})

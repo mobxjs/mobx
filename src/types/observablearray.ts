@@ -39,7 +39,7 @@ const safariPrototypeSetterInheritanceBug = (() => {
     return v === false
 })()
 
-export interface IObservableArray<T> extends Array<T> {
+export interface IObservableArray<T = any> extends Array<T> {
     spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[]
     observe(
         listener: (changeData: IArrayChange<T> | IArraySplice<T>) => void,
@@ -64,7 +64,7 @@ export interface IObservableArray<T> extends Array<T> {
 }
 
 // In 3.0, change to IArrayDidChange
-export interface IArrayChange<T> {
+export interface IArrayChange<T = any> {
     type: "update"
     object: IObservableArray<T>
     index: number
@@ -73,7 +73,7 @@ export interface IArrayChange<T> {
 }
 
 // In 3.0, change to IArrayDidSplice
-export interface IArraySplice<T> {
+export interface IArraySplice<T = any> {
     type: "splice"
     object: IObservableArray<T>
     index: number
@@ -83,14 +83,14 @@ export interface IArraySplice<T> {
     removedCount: number
 }
 
-export interface IArrayWillChange<T> {
+export interface IArrayWillChange<T = any> {
     type: "update"
     object: IObservableArray<T>
     index: number
     newValue: T
 }
 
-export interface IArrayWillSplice<T> {
+export interface IArrayWillSplice<T = any> {
     type: "splice"
     object: IObservableArray<T>
     index: number

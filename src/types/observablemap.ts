@@ -26,14 +26,14 @@ import { declareIterator, iteratorSymbol, makeIterable } from "../utils/iterable
 import { transaction } from "../api/transaction"
 import { referenceEnhancer } from "./modifiers"
 
-export interface IKeyValueMap<V> {
+export interface IKeyValueMap<V = any> {
     [key: string]: V
 }
 
-export type IMapEntry<K, V> = [K, V]
-export type IMapEntries<K, V> = IMapEntry<K, V>[]
+export type IMapEntry<K = any, V = any> = [K, V]
+export type IMapEntries<K = any, V = any> = IMapEntry<K, V>[]
 
-export type IMapDidChange<K, V> =
+export type IMapDidChange<K = any, V = any> =
     | {
           object: ObservableMap<K, V>
           name: K // actual the key or index, but this is based on the ancient .observe proposal for consistency
@@ -54,7 +54,7 @@ export type IMapDidChange<K, V> =
           oldValue: V
       }
 
-export interface IMapWillChange<K, V> {
+export interface IMapWillChange<K = any, V = any> {
     object: ObservableMap<K, V>
     type: "update" | "add" | "delete"
     name: K
@@ -63,9 +63,12 @@ export interface IMapWillChange<K, V> {
 
 const ObservableMapMarker = {}
 
-export type IObservableMapInitialValues<K, V> = IMapEntries<K, V> | IKeyValueMap<V> | Map<K, V>
+export type IObservableMapInitialValues<K = any, V = any> =
+    | IMapEntries<K, V>
+    | IKeyValueMap<V>
+    | Map<K, V>
 
-export class ObservableMap<K, V>
+export class ObservableMap<K = any, V = any>
     implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable {
     $mobx = ObservableMapMarker
     private _data: Map<K, ObservableValue<V>>
