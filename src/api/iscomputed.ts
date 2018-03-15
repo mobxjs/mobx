@@ -18,7 +18,7 @@ export function isComputed(value: any): boolean {
     if (arguments.length > 1)
         return fail(
             process.env.NODE_ENV !== "production" &&
-                `isComputed expects only 1 argument. Use isObsevableProp to inspect the observability of a property`
+                `isComputed expects only 1 argument. Use isObsevable to inspect the observability of a property`
         )
     return _isComputed(value)
 }
