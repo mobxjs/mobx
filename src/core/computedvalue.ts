@@ -47,6 +47,7 @@ export interface IComputedValueOptions<T> {
     equals?: IEqualsComparer<T>
     context?: any
     requiresReaction?: boolean
+    keepAlive?: boolean
 }
 
 /**
@@ -119,6 +120,11 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 : comparer.default)
         this.scope = options.context
         this.requiresReaction = !!options.requiresReaction
+        if (options.keepAlive === true) {
+            // dangerous: never exposed, so this cmputed value should not depend on observables
+            // that live globally, or it will never get disposed! (nor anything attached to it)
+            autorun(() => this.get())
+        }
     }
 
     onBecomeStale() {

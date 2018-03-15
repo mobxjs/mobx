@@ -1880,3 +1880,28 @@ test("can make non-extenible objects observable", () => {
     expect(o.x).toBe(4)
     expect(mobx.isObservableProp(o, "x")).toBeTruthy()
 })
+
+test("keeping computed properties alive works", () => {
+    let calcs = 0
+    const x = observable(
+        {
+            x: 1,
+            get y() {
+                calcs++
+                return this.x * 2
+            }
+        },
+        {
+            y: mobx.computed({ keepAlive: true })
+        }
+    )
+
+    expect(x.y).toBe(2)
+    expect(calcs).toBe(1)
+    expect(x.y).toBe(2)
+    expect(calcs).toBe(1) // kept alive!
+
+    x.x = 3
+    expect(calcs).toBe(2) // reactively updated
+    expect(x.y).toBe(6)
+})
