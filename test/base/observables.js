@@ -1905,3 +1905,22 @@ test("keeping computed properties alive works", () => {
     expect(calcs).toBe(2) // reactively updated
     expect(x.y).toBe(6)
 })
+
+test("tuples", () => {
+    // See #1391
+    function tuple() {
+        const res = new Array(arguments.length)
+        for (let i = 0; i < arguments.length; i++) mobx.extendObservable(res, { [i]: arguments[i] })
+        return res
+    }
+
+    const myStuff = tuple(1, 3)
+    const events = []
+
+    mobx.reaction(() => myStuff[0], val => events.push(val))
+    myStuff[1] = 17 // should not react
+    myStuff[0] = 2 // should react
+    expect(events).toEqual([2])
+
+    expect(myStuff.map(x => x * 2)).toEqual([4, 34])
+})
