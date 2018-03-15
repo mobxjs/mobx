@@ -34,7 +34,6 @@
   * [mobxUtils.toStream](https://github.com/mobxjs/mobx-utils#tostream)
   * [mobxUtils.fromStream](https://github.com/mobxjs/mobx-utils#fromstream)
   * [mobxUtils.now](https://github.com/mobxjs/mobx-utils#now)
-  * [mobxUtils.keepAlive](https://github.com/mobxjs/mobx-utils#keepalive)
   * [mobxUtils.createTransformer](refguide/create-transformer.md)
   * [mobxUtils.expr](refguide/expr.md)
   * [complete api overview](refguide/api.md)

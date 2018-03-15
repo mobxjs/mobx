@@ -47,7 +47,7 @@ class Person {
 
 	get labelText() {
 		return this.showAge ? `${this.name} (age: ${this.age})` : this.name;
-	},
+	}
 
     setAge(age) {
         this.age = age;
