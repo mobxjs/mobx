@@ -1,4 +1,4 @@
-# 4.0.3
+# 4.1.0
 
 * Introduced `keepAlive` as option to `computed`
 * All observable api's now default to `any` for their generic arguments
