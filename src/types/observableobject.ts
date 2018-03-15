@@ -9,8 +9,7 @@ import {
     assertPropertyConfigurable,
     isPlainObject,
     fail,
-    addHiddenFinalProp,
-    isPropertyConfigurable
+    addHiddenFinalProp
 } from "../utils/utils"
 import {
     hasInterceptors,
@@ -278,17 +277,15 @@ export function defineObservableProperty(
 }
 
 export function defineComputedProperty(
-    valueOwner: any, // which objects holds the observable and provides `this` context?
-    propertyOwner: any, // where is the property declared?
+    target: any, // which objects holds the observable and provides `this` context?
     propName: string,
     options: IComputedValueOptions<any>
 ) {
-    const adm = asObservableObject(valueOwner)
-    options.name = options.name || `${adm.name}.${propName}`
-    options.context = valueOwner
+    const adm = asObservableObject(target)
+    options.name = `${adm.name}.${propName}`
+    options.context = target
     adm.values[propName] = new ComputedValue(options)
-    if (propertyOwner === valueOwner || isPropertyConfigurable(propertyOwner, propName))
-        Object.defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
+    Object.defineProperty(target, propName, generateComputedPropConfig(propName))
 }
 
 const observablePropertyConfigs = {}

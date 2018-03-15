@@ -4,6 +4,8 @@
 * All observable api's now default to `any` for their generic arguments
 * Improved `flow` cancellation
 * The effect of `when` is now automatically an action.
+* `@computed` properties are now declared on their owner rather then the protoptype. Fixes an issue where `@computed` fields didn't work in React Native on proxied objects. See [#1396](https://github.com/mobxjs/mobx/issues/1396)
+* `action` and `action.bound` decorated fields are now reassignable, so that they can be stubbed
 
 # 4.0.2
 
