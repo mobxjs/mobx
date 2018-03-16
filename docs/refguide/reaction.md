@@ -8,7 +8,7 @@ Unlike `autorun` the side effect won't be run directly when created, but only af
 Any observables that are accessed while executing the side effect will not be tracked.
 
 `reaction` returns a disposer function.
-The functions passed to `reaction` will receive two argument when invoked, the current reaction, which can be used to dispose the when during execution.
+The functions passed to `reaction` will receive two argument when invoked, the current reaction, which can be used to dispose the `reaction` when during execution.
 
 It is important to notice that the side effect will *only* react to data that was *accessed* in the data expression, which might be less then the data that is actually used in the effect.
 Also, the side effect will only be triggered when the data returned by the expression has changed.
@@ -16,7 +16,7 @@ In other words: reaction requires you to produce the things you need in your sid
 
 ## Options
 
-Reaction accepts as third argument an options object with the following optional options:
+Reaction accepts a third argument as an options object with the following optional options:
 
 * `fireImmediately`: Boolean that indicates that the effect function should immediately be triggered after the first run of the data function. `false` by default. If a boolean is passed as third argument to `reaction`, it will be interpreted as the `fireImmediately` option.
 * `delay`: Number in milliseconds that can be used to debounce the effect function. If zero (the default), no debouncing will happen.
