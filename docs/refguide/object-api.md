@@ -7,7 +7,7 @@ There is now an utility API that enables manipulating observable maps, objects a
   * **`set(thing, key, value)`** or **`set(thing, { key: value })`** Updates the given collection with the provided key / value pair(s).
   * **`remove(thing, key)`** removes the specified child from the collection. For arrays splicing is used.
   * **`has(thing, key)`** returns true if the collection has the specified _observable_ property.
-  * **`get(thing, key)`** returns the chlid under the specified key.
+  * **`get(thing, key)`** returns the child under the specified key.
 
 
 ```javascript
