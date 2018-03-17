@@ -20,7 +20,7 @@
 
 * For the highlights of this release, read the [blog](https://medium.com/p/c1fbc08008da/):
 * For migration notes: see the [wiki page](https://github.com/mobxjs/mobx/wiki/Migrating-from-mobx-3-to-mobx-4)
-* Note; many things that were removed were removed to make the api surface smaller. If you think some feature shouldn't have been removed, feel free to open an issue!
+* Note; many things that were removed to make the api surface smaller. If you think some feature shouldn't have been removed, feel free to open an issue!
 
 This is the extensive list of all changes.
 
