@@ -22,4 +22,4 @@ class OrderLine {
 ```
 
 If your environment doesn't support decorators or field initializers,
-use `decorate` instead (see [decorators](../modifiers.md) for details).
+use `decorate` instead (see [decorators](./modifiers.md) for details).
