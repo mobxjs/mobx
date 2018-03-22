@@ -48,4 +48,4 @@ Either use the [`@observable`](observable.md) annotation or the [`extendObservab
 * `observable` is applied recursively to a whole object graph automatically. Both on instantiation and to any new values that will be assigned to observable properties in the future. Observable will not recurse into non-plain objects.
 * These defaults are fine in 95% of the cases, but for more fine-grained on how and which properties should be made observable, see the [decorators](modifiers.md) section.
 * Pass `{ deep: false }` as 3th argument to disable the auto conversion of property values
-* Pase `{ name: "my object" }` to assign a friendly debug name to this object
+* Pass `{ name: "my object" }` to assign a friendly debug name to this object
