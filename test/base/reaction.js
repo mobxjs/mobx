@@ -63,7 +63,7 @@ test("effect is untracked", () => {
     expect(values).toEqual([2, 4, 21])
 })
 
-const TIME_AMPLIFIER = 1
+let TIME_AMPLIFIER = 1
 if (process.env.CI === "true") {
     console.log("Amplifying time")
     TIME_AMPLIFIER = 10
