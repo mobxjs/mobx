@@ -66,6 +66,7 @@ test("effect is untracked", () => {
 let TIME_AMPLIFIER = 1
 if (process.env.CI === "true") {
     console.log("Amplifying time")
+    jest.setTimeout(50 * 1000)
     TIME_AMPLIFIER = 10
 }
 
