@@ -80,16 +80,19 @@ test("effect debounce is honored", () => {
                 values.push(newValue)
             },
             {
-                delay: 200
+                delay: 150,
+                fireImmediately: false
             }
         )
 
-        setTimeout(() => a.set(2), 30)
+        setTimeout(() => a.set(2), 40)
         setTimeout(() => a.set(3), 300) // should not be visible, combined with the next
-        setTimeout(() => a.set(4), 320)
+        setTimeout(() => a.set(4), 301)
         setTimeout(() => a.set(5), 600)
-        setTimeout(() => d(), 1000)
-        setTimeout(() => a.set(6), 1400)
+        setTimeout(() => {
+            d()
+            a.set(6)
+        }, 1000)
 
         setTimeout(() => {
             try {
@@ -99,7 +102,7 @@ test("effect debounce is honored", () => {
             } catch (e) {
                 reject(e)
             }
-        }, 1800)
+        }, 1200)
     })
 })
 
