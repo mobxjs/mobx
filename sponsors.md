@@ -7,6 +7,7 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Andrei Zvonimir Crnković
 * Andy Kogut
 * Anri Asaturov
+* Bayu Fitri Andrianto
 * Benjamin Gruenbaum
 * Code Hat Programming Inc.
 * Dane Hitchcox
@@ -20,6 +21,7 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Jeff Hansen
 * Joinbox
 * Jorge Luis Acosta
+* Karolis Astrauka
 * Konrad Mazanowski
 * Matt Ruby
 * Matthieu Dumont
