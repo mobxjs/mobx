@@ -26,6 +26,7 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Matt Ruby
 * Matthieu Dumont
 * Mattia Manzati
+* Michael Fisher
 * Michael Mazurczak
 * Mihail Diordiev
 * Nikolay Ivanov
@@ -44,6 +45,7 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Wilfried Reiter
 * Wilson Lee
 * Yousuf Nejati
+* Zheng Renzhe
 
 Or... Become my personal Patreon! https://www.patreon.com/mweststrate
 
