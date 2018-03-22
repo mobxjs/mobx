@@ -63,6 +63,12 @@ test("effect is untracked", () => {
     expect(values).toEqual([2, 4, 21])
 })
 
+const TIME_AMPLIFIER = 1
+if (process.env.CI === "true") {
+    console.log("Amplifying time")
+    TIME_AMPLIFIER = 10
+}
+
 test("effect debounce is honored", () => {
     expect.assertions(2)
 
@@ -80,19 +86,23 @@ test("effect debounce is honored", () => {
                 values.push(newValue)
             },
             {
-                delay: 150,
+                delay: 150 * TIME_AMPLIFIER,
                 fireImmediately: false
             }
         )
 
-        setTimeout(() => a.set(2), 40)
-        setTimeout(() => a.set(3), 300) // should not be visible, combined with the next
-        setTimeout(() => a.set(4), 301)
-        setTimeout(() => a.set(5), 600)
+        setTimeout(() => a.set(2), 40 * TIME_AMPLIFIER)
+        setTimeout(() => {
+            a.set(3) // should not be visible, combined with the next
+            setImmediate(() => {
+                a.set(4)
+            })
+        }, 300 * TIME_AMPLIFIER)
+        setTimeout(() => a.set(5), 600 * TIME_AMPLIFIER)
         setTimeout(() => {
             d()
             a.set(6)
-        }, 1000)
+        }, 1000 * TIME_AMPLIFIER)
 
         setTimeout(() => {
             try {
@@ -102,7 +112,7 @@ test("effect debounce is honored", () => {
             } catch (e) {
                 reject(e)
             }
-        }, 1200)
+        }, 1200 * TIME_AMPLIFIER)
     })
 })
 
@@ -123,12 +133,12 @@ test("effect debounce + fire immediately is honored", () => {
             },
             {
                 fireImmediately: true,
-                delay: 100
+                delay: 100 * TIME_AMPLIFIER
             }
         )
 
-        setTimeout(() => a.set(3), 150)
-        setTimeout(() => a.set(4), 300)
+        setTimeout(() => a.set(3), 150 * TIME_AMPLIFIER)
+        setTimeout(() => a.set(4), 300 * TIME_AMPLIFIER)
 
         setTimeout(() => {
             try {
@@ -139,7 +149,7 @@ test("effect debounce + fire immediately is honored", () => {
             } catch (e) {
                 reject(e)
             }
-        }, 500)
+        }, 500 * TIME_AMPLIFIER)
     })
 })
 
