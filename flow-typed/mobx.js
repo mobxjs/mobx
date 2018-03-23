@@ -290,6 +290,7 @@ declare export function action(
 declare export function action<T>(name: string, func: T): T
 declare export function action<T>(func: T): T
 
+declare export function runInAction<T>(name: string, block: () => T): T
 declare export function runInAction<T>(block: () => T): T
 declare export function isAction(thing: any): boolean
 declare export function autorun(
