@@ -509,7 +509,7 @@ configure({ enforceActions: true });
 #### `isolateGlobalState: boolean`
 Isolates the global state of MobX, when there are multiple instances of MobX in the same environment.
 This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX.
-The reactivty inside the library will remain self-contained when you call `configure({isolateGlobalState: true})` inside the library.
+The reactivity inside the library will remain self-contained when you call `configure({isolateGlobalState: true})` inside the library.
 Additionally, MobX won't throw an error that there are multiple instances in the global scope.
 
 ```javascript
