@@ -1,3 +1,5 @@
+// @ts-check
+
 import {
     observable,
     computed,
@@ -17,6 +19,7 @@ import {
 
 test("decorate should work", function() {
     class Box {
+        // @ts-ignore
         uninitialized
         height = 20
         sizes = [2]
@@ -33,7 +36,9 @@ test("decorate should work", function() {
             )
         }
         addSize() {
+            // @ts-ignore
             this.sizes.push([3])
+            // @ts-ignore
             this.sizes.push([4])
         }
         constructor() {
@@ -105,7 +110,9 @@ test("decorate should work with plain object", function() {
             )
         },
         addSize() {
+            // @ts-ignore
             this.sizes.push([3])
+            // @ts-ignore
             this.sizes.push([4])
         }
     }
@@ -171,7 +178,9 @@ test("decorate should work with Object.create", function() {
             )
         },
         addSize() {
+            // @ts-ignore
             this.sizes.push([3])
+            // @ts-ignore
             this.sizes.push([4])
         }
     }
@@ -233,12 +242,16 @@ test("decorate should work with constructor function", function() {
             configurable: true,
             enumerable: false,
             get() {
+                /** @type {Box} */
+                var t /** @type {any} */ = this
+
                 return (
-                    this.undeclared *
-                    this.height *
-                    this.sizes.length *
-                    this.someFunc() *
-                    (this.uninitialized ? 2 : 1)
+                    // @ts-ignore
+                    t.undeclared *
+                    t.height *
+                    t.sizes.length *
+                    t.someFunc() *
+                    (t.uninitialized ? 2 : 1)
                 )
             }
         })
@@ -262,6 +275,7 @@ test("decorate should work with constructor function", function() {
     }
 
     const box = new Box()
+    // @ts-ignore
     box.undeclared = 1
 
     expect(isObservableObject(box)).toBe(true)
@@ -278,6 +292,7 @@ test("decorate should work with constructor function", function() {
     var ar = []
 
     autorun(() => {
+        // @ts-ignore
         ar.push(box.width)
     })
 
@@ -292,11 +307,14 @@ test("decorate should work with constructor function", function() {
     expect(ar.slice()).toEqual([40, 20, 60, 210, 420])
     box.addSize()
     expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700])
+    // @ts-ignore
     box.undeclared = 2
     expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700, 1400])
 
     const box2 = new Box()
+    // @ts-ignore
     box2.undeclared = 1
+    // @ts-ignore
     expect(box2.width).toBe(40) // no shared state!
 })
 
@@ -317,4 +335,19 @@ test("decorate should work with inheritance through Object.create", () => {
     child2.x = 5
     expect(child2.x).toBe(5)
     expect(child1.x).toBe(4)
+})
+
+test("decorate should work with ES6 constructor", () => {
+    class Todo {
+        constructor() {
+            this.finished = false
+            this.id = Math.random()
+            this.title = ""
+        }
+    }
+
+    decorate(Todo, {
+        finished: observable,
+        title: observable
+    })
 })

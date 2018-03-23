@@ -92,7 +92,7 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
 export interface IObservableFactory {
     // observable overloads
     (value: number | string | null | undefined | boolean): never // Nope, not supported, use box
-    (target: Object, key: string, baseDescriptor?: PropertyDescriptor): any // decorator
+    (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): any // decorator
     <T = any>(value: T[], options?: CreateObservableOptions): IObservableArray<T>
     <K = any, V = any>(value: Map<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>
     <T extends Object>(
