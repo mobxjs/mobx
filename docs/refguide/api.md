@@ -460,13 +460,75 @@ export class City {
 
 ### `configure`
 Usage: `configure(options)`.
+Sets global behavior settings on the active MobX instance.
+Use this to change how MobX behaves as a whole.
 
-- **`enforceActions: boolean`**: Enables / disables strict mode *globally*.
+```javascript
+import { configure } from "mobx";
+
+configure({
+    // ...
+});
+```
+
+#### `arrayBuffer: number`
+Increases the default created size of observable arrays to `arrayBuffer`, if the maximum size isn't yet there.
+
+Observable arrays lazily create getters on members of `ObservableArray.prototype` starting at `0`.
+This will create the members from `0` to `arrayBuffer` if they don't yet exist.
+Use `arrayBuffer` if you know you'll have a common minimum array size and don't want to risk first creating those getters in hot code paths.
+See also `observable`.
+
+#### `computedRequiresReaction: boolean`
+Forbids the access of any unobserved computed value.
+Use this if you want to check whether you are using computed properties without a reactive context.
+
+```javascript
+configure({ computedRequiresReaction: true });
+```
+
+#### `disableErrorBoundaries: boolean`
+Use this to simplify debugging exceptions and prevent MobX from catching and rethrowing exceptions happening in your code.
+
+```javascript
+configure({ disableErrorBoundaries: true });
+```
+
+#### `enforceActions: boolean`
+Also known as "strict mode".
 In strict mode, it is not allowed to change any state outside of an [`action`](action.md).
+This is recommended when working in larger applications with complex layers of state computations.
 See also `allowStateChanges`.
-- **`isolateGlobalState: boolean`**: Isolates the global state of MobX, when there are multiple instances of MobX in the same environment. This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX. The reactivty inside the library will remain self-contained when you call `configure({isolateGlobalState: true})` inside the library. Additionally, MobX won't throw an error that there are multiple instances in the global scope.
-- **`disableErrorBoundaries: boolean`**: Use this to simplify debugging exceptions and prevent MobX from catching and rethrowing exceptions happening in your code.
-- **`computedRequiresReaction: boolean`**: Forbids the access of any unobserved computed value. Use this if you want to check whether you are using computed properties without a reactive context
+
+> Prior to MobX 4, this behavior was enabled by `useStrict(): void`.
+
+```javascript
+configure({ enforceActions: true });
+```
+
+#### `isolateGlobalState: boolean`
+Isolates the global state of MobX, when there are multiple instances of MobX in the same environment.
+This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX.
+The reactivty inside the library will remain self-contained when you call `configure({isolateGlobalState: true})` inside the library.
+Additionally, MobX won't throw an error that there are multiple instances in the global scope.
+
+```javascript
+configure({ isolatedGlobalState: true });
+```
+
+#### `reactionScheduler: (f: () => void) => void`
+Sets a new function that executes all MobX reactions.
+By default `reactionScheduler` just runs the `f` reaction without any other behavior.
+This can be useful for basic debugging, or slowing down reactions to visualize application updates.
+
+```javascript
+configure({
+    reactionScheduler: (f): void => {
+        console.log("Running an event after a delay:", f);
+        setTimeout(f, 100);
+    }
+});
+```
 
 ## Direct Observable manipulation
 There is now an utility API that enables manipulating observable maps, objects and arrays with the same API. These api's are fully reactive, which means that even new property declarations can be detected by mobx if `set` is used to add them, and `values` or `keys` to iterate them.
