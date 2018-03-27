@@ -95,3 +95,9 @@ test("spy error", () => {
         stop()
     })
 })
+
+test("spy stop listen from handler, #1459", () => {
+    const stop = mobx.spy(() => stop())
+    mobx.spy(() => {})
+    doStuff()
+})
