@@ -1,4 +1,5 @@
 import { ObservableValue, UNCHANGED } from "./observablevalue"
+import { IAtom, Atom } from "../core/atom"
 import { ComputedValue, IComputedValueOptions } from "../core/computedvalue"
 import {
     createInstanceofPredicate,
@@ -22,7 +23,7 @@ import {
 import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
 import { IEnhancer, referenceEnhancer, deepEnhancer } from "./modifiers"
-import { IObservableArray, createObservableArray } from "./observablearray"
+import { createObservableArray } from "./observablearray"
 import { initializeInstance } from "../utils/decorators2"
 import { startBatch, endBatch } from "../core/observable"
 
@@ -66,18 +67,21 @@ export type IObjectWillChange =
 
 export class ObservableObjectAdministration
     implements IInterceptable<IObjectWillChange>, IListenable {
-    keys: undefined | IObservableArray<string> // TODO: change int o just an atom
+    keysAtom: IAtom
     // TODO: kep a hasMap like with observable Maps (probably, reuse same mechanism?)
     changeListeners
     interceptors
 
     constructor(
         public target: any,
+        // TODO: split into two; enumerable and non-enumerable members
         public values: { [key: string]: ObservableValue<any> | ComputedValue<any> },
         public name: string,
         public defaultEnhancer: IEnhancer<any>,
         public isProxied: boolean
-    ) {}
+    ) {
+        this.keysAtom = new Atom(name + ".keys")
+    }
 
     read(owner: any, key: string) {
         if (!this.isProxied && this.target !== owner) {
@@ -90,10 +94,11 @@ export class ObservableObjectAdministration
         if (observable) {
             return observable.get()
         } else {
-            // might be added in the future
             if (this.isProxied) {
-                this.getKeys().length // notitify observabed
-                return undefined
+                // lazily create the property if it a dynamic object
+                console.log("adding" + key)
+                this.addObservableProp(key, undefined)
+                return this.values[key].get()
             } else fail(`Not an observable property ${key}`)
         }
     }
@@ -106,6 +111,10 @@ export class ObservableObjectAdministration
             return
         }
         const observable = this.values[key]
+        if (!observable && this.isProxied) {
+            this.addObservableProp(key, newValue)
+            return
+        }
         if (observable instanceof ComputedValue) {
             observable.set(newValue)
             return
@@ -170,7 +179,6 @@ export class ObservableObjectAdministration
 
         if (!this.isProxied)
             Object.defineProperty(target, propName, generateObservablePropConfig(propName))
-        if (this.keys) this.keys.push(propName)
         this.notifyPropertyAddition(propName, newValue)
     }
 
@@ -207,7 +215,7 @@ export class ObservableObjectAdministration
             const notifySpy = isSpyEnabled()
             const oldValue = this.values[key].get() // TODO: might not exist on dynamic objects
             this.values[key].set(undefined)
-            if (this.keys) this.keys.remove(key)
+            this.keysAtom.reportChanged()
             delete this.values[key]
             if (!this.isProxied) delete this.target[key]
             const change =
@@ -286,18 +294,12 @@ export class ObservableObjectAdministration
         if (notifySpy) spyReportStart({ ...change, name: this.name, key })
         if (notify) notifyListeners(this, change)
         if (notifySpy) spyReportEnd()
+        this.keysAtom.reportChanged()
     }
 
     getKeys(): string[] {
-        if (this.keys === undefined) {
-            this.keys = <any>createObservableArray(
-                Object.keys(this.values).filter(key => this.values[key] instanceof ObservableValue),
-                referenceEnhancer,
-                `keys(${this.name})`,
-                true
-            )
-        }
-        return this.keys!.slice() // TODO, optimize, don't slice here!
+        this.keysAtom.reportObserved()
+        return Object.keys(this.values).filter(key => this.values[key] instanceof ObservableValue)
     }
 }
 
@@ -411,6 +413,10 @@ const objectProxyTraps: ProxyHandler<any> = {
         if (name === "$mobx") return fail(`Cannot reassign $mobx`)
         adm.remove(name)
         return true
+    },
+    ownKeys(target: IIsObservableObject) {
+        const adm = target.$mobx
+        return adm.getKeys()
     }
 }
 
