@@ -7,10 +7,13 @@ test("should react to key removal (unless reconfiguraing to empty) - 1", () => {
         z: 1
     })
 
-    reaction(() => Object.keys(x), keys => events.push(keys.join(",")))
-
+    reaction(() => Object.keys(x), keys => events.push(keys.join(",")), { fireImmediately: true })
+    expect(events).toEqual(["y,z"])
     delete x.y
-    expect(events).toEqual(["z"])
+    expect(events).toEqual(["y,z", "z"])
+    // should not trigger another time..
+    delete x.y
+    expect(events).toEqual(["y,z", "z"])
 })
 
 test("should react to key removal (unless reconfiguraing to empty) - 2", () => {
