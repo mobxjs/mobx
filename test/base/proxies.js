@@ -1,4 +1,4 @@
-import { observable, reaction, extendObservable } from "../../src/mobx.ts"
+import { observable, reaction, extendObservable, keys } from "../../src/mobx.ts"
 
 test("should react to key removal (unless reconfiguraing to empty) - 1", () => {
     const events = []
@@ -76,4 +76,83 @@ test("should throw clear warning if trying to add computed to already reserved k
             }
         })
     }).toThrow(/bla/)
+})
+
+test("correct keys are reported", () => {
+    const x = observable.object({
+        x: 1,
+        get y() {
+            return 2
+        }
+    })
+    x.z = 3
+    extendObservable(x, {
+        a: 4,
+        get b() {
+            return 5
+        }
+    })
+
+    expect(Object.keys(x)).toEqual(["x", "z", "a"])
+    expect(Object.values(x)).toEqual([1, 3, 4])
+    expect(Object.entries(x)).toEqual([["x", 1], ["z", 3], ["a", 4]])
+
+    expect(Object.getOwnPropertyNames(x)).toEqual(["x", "y", "z", "a", "b"])
+    expect(keys(x)).toEqual(["x", "z", "a"])
+
+    delete x.x
+    expect(Object.keys(x)).toEqual(["z", "a"])
+    expect(Object.getOwnPropertyNames(x)).toEqual(["y", "z", "a", "b"])
+    expect(keys(x)).toEqual(["z", "a"])
+})
+
+test("in operator", () => {
+    const x = observable.object({
+        x: 1,
+        get y() {
+            return 2
+        }
+    })
+    x.z = 3
+    extendObservable(x, {
+        a: 4,
+        get b() {
+            return 5
+        }
+    })
+    expect("a" in x).toBeTruthy()
+    expect("b" in x).toBeTruthy()
+    expect("x" in x).toBeTruthy()
+    expect("y" in x).toBeTruthy()
+    expect("z" in x).toBeTruthy()
+    expect("c" in x).toBeFalsy()
+    expect("c" in x).toBeFalsy() // not accidentally create
+    delete x.x
+    expect("x" in x).toBeFalsy()
+})
+
+test("for-in operator", () => {
+    const x = observable.object({
+        x: 1,
+        get y() {
+            return 2
+        }
+    })
+    x.z = 3
+    extendObservable(x, {
+        a: 4,
+        get b() {
+            return 5
+        }
+    })
+
+    function computeKeys() {
+        const res = []
+        for (let key in x) res.push(key)
+        return res
+    }
+
+    expect(computeKeys(x)).toEqual(["x", "z", "a"])
+    delete x.x
+    expect(computeKeys(x)).toEqual(["z", "a"])
 })
