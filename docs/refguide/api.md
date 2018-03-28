@@ -488,11 +488,31 @@ configure({ computedRequiresReaction: true });
 ```
 
 #### `disableErrorBoundaries: boolean`
-Use this to simplify debugging exceptions and prevent MobX from catching and rethrowing exceptions happening in your code.
+By default, MobX will catch and rethrow exceptions happening in your code to make sure that a reaction in one exception does not prevent the scheduled execution of other, possibly unrelated, reactions. This means exceptions are not propagated back to the original causing code and therefore you won't be able to catch them using try/catch.
+
+There may be times when you want to catch those errors, for example when unit testing your reactions. You can disable this behaviour using `disableErrorBoundaries`.
 
 ```javascript
 configure({ disableErrorBoundaries: true });
 ```
+
+Please note that MobX won't recover from errors when using this configuration. For that reason, you may need to use `_resetGlobalState` after each exception. Example:
+
+```js
+configure({ disableErrorBoundaries: true })
+
+test('Throw if age is negative', () => {
+  expect(() => {
+    const age = observable.box(10)
+    autorun(() => { if (age.get() < 0) throw new Error('Age should not be negative') })
+    age.set(-1)
+  }).toThrow()
+  _resetGlobalState() // Needed after each exception
+})
+```
+
+> Prior to MobX 4, `_resetGlobalState` was `extras.resetGlobalState`.
+
 
 #### `enforceActions: boolean`
 Also known as "strict mode".
