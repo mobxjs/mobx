@@ -1,3 +1,7 @@
+# 4.1.1
+
+* Import `default` from MobX will no longer throw, but only warn instead. This fixes some issues with tools that reflect on the `default` export of a module.
+
 # 4.1.0
 
 * Introduced `keepAlive` as option to `computed`

@@ -146,9 +146,21 @@ if (
     typeof module !== "undefined" &&
     typeof module.exports !== "undefined"
 ) {
+    let warnedAboutDefaultExport = false
+    Object.defineProperty(module.exports, "default", {
+        enumerable: false,
+        get() {
+            if (!warnedAboutDefaultExport) {
+                warnedAboutDefaultExport = true
+                console.warn(
+                    `The MobX package does not have a default export. Use 'import { thing } from "mobx"' (recommended) or 'import * as mobx from "mobx"' instead."`
+                )
+            }
+            return undefined
+        }
+    })
     ;[
         "extras",
-        "default",
         "Atom",
         "BaseAtom",
         "ObservableMap",
