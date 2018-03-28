@@ -1,6 +1,9 @@
 # 4.1.1
 
 * Import `default` from MobX will no longer throw, but only warn instead. This fixes some issues with tools that reflect on the `default` export of a module.
+* Disposing a spy listener inside a spy handler no longer causes an exception. Fixes [#1459](https://github.com/mobxjs/mobx/issues/1459) through [#1460](https://github.com/mobxjs/mobx/pull/1460) by [farwayer](https://github.com/farwayer)
+* Added a missing `runInAction` overload in the flow typings. [#1451](https://github.com/mobxjs/mobx/pull/1451) by [AMilassin](https://github.com/mobxjs/mobx/issues?q=is%3Apr+author%3AAMilassin)
+* Improved the typings of `decorate`. See [#1450](https://github.com/mobxjs/mobx/pull/1450) by [makepost](https://github.com/mobxjs/mobx/issues?q=is%3Apr+author%3Amakepost)
 
 # 4.1.0
 
