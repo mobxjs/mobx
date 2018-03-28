@@ -100,7 +100,7 @@ So it is not the _values_ that are observable, but the _properties_ of an object
 So in our above example, the `Timer` component would **not** react if it was initialized as follows:
 
 ```javascript
-React.render(<Timer timerData={timerData.secondsPassed} />, document.body)
+ReactDOM.render(<Timer timerData={timerData.secondsPassed} />, document.body)
 ```
 
 In this snippet just the current value of `secondsPassed` is passed to the `Timer`, which is the immutable value `0` (all primitives are immutable in JS).
