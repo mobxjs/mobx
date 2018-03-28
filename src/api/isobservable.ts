@@ -36,7 +36,7 @@ export function isObservable(value: any): boolean {
     if (arguments.length !== 1)
         fail(
             process.env.NODE_ENV !== "production" &&
-                `isObservable expects only 1 argument. Use isObsevableProp to inspect the observability of a property`
+                `isObservable expects only 1 argument. Use isObservableProp to inspect the observability of a property`
         )
     return _isObservable(value)
 }
