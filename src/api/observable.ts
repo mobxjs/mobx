@@ -11,13 +11,10 @@ import { IObservableValue, ObservableValue } from "../types/observablevalue"
 import { IObservableArray, createObservableArray } from "../types/observablearray"
 import { createDecoratorForEnhancer, IObservableDecorator } from "./observabledecorator"
 import { isObservable } from "./isobservable"
-import {
-    IObservableObject,
-    asObservableObject,
-    createDynamicObservableObject
-} from "../types/observableobject"
+import { IObservableObject, asObservableObject } from "../types/observableobject"
 import { extendObservable } from "./extendobservable"
 import { IObservableMapInitialValues, ObservableMap } from "../types/observablemap"
+import { createDynamicObservableObject } from "../types/dynamicobject"
 
 export type CreateObservableOptions = {
     name?: string

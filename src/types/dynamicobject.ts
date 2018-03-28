@@ -26,7 +26,9 @@ import { IEnhancer, referenceEnhancer, deepEnhancer } from "./modifiers"
 import { createObservableArray } from "./observablearray"
 import { initializeInstance } from "../utils/decorators2"
 import { startBatch, endBatch } from "../core/observable"
-import { DynamicObservableObjectAdministration } from "./dynamicobject"
+import { IIsObservableObject } from "./observableobject"
+
+// TODO: dedupe
 
 export interface IObservableObject {
     "observable-object": IObservableObject
@@ -66,14 +68,16 @@ export type IObjectWillChange =
           name: string
       }
 
-export class ObservableObjectAdministration
+export class DynamicObservableObjectAdministration
     implements IInterceptable<IObjectWillChange>, IListenable {
     keysAtom: IAtom
+    // TODO: kep a hasMap like with observable Maps (probably, reuse same mechanism?)
     changeListeners
     interceptors
 
     constructor(
         public target: any,
+        // TODO: split into two; enumerable and non-enumerable members
         public values: { [key: string]: ObservableValue<any> | ComputedValue<any> },
         public name: string,
         public defaultEnhancer: IEnhancer<any>
@@ -82,25 +86,25 @@ export class ObservableObjectAdministration
     }
 
     read(owner: any, key: string) {
-        if (this.target !== owner) {
-            this.illegalAccess(owner, key)
-            return
-        }
         if (typeof key !== "string" || !this.values.hasOwnProperty(key)) return this.values[key] // might be on prototype
         const observable = this.values[key]
         if (observable) {
             return observable.get()
+        } else {
+            // lazily create the property if it a dynamic object
+            console.log("adding" + key)
+            this.addObservableProp(key, undefined)
+            return this.values[key].get()
         }
-        fail(`Not an observable property ${key}`)
     }
 
     write(owner: any, key: string, newValue) {
         const instance = this.target
-        if (instance !== owner) {
-            this.illegalAccess(owner, key)
+        const observable = this.values[key]
+        if (!observable) {
+            this.addObservableProp(key, newValue)
             return
         }
-        const observable = this.values[key]
         if (observable instanceof ComputedValue) {
             observable.set(newValue)
             return
@@ -163,7 +167,6 @@ export class ObservableObjectAdministration
         ))
         newValue = (observable as any).value // observableValue might have changed it
 
-        Object.defineProperty(target, propName, generateObservablePropConfig(propName))
         this.notifyPropertyAddition(propName, newValue)
     }
 
@@ -175,9 +178,8 @@ export class ObservableObjectAdministration
         const { target } = this
         options.name = options.name || `${this.name}.${propName}`
         options.context = target
+        // TODO: fix
         addHiddenProp(this.values, propName, new ComputedValue(options)) // non enumerable
-        if (propertyOwner === target || isPropertyConfigurable(propertyOwner, propName))
-            Object.defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
     }
 
     remove(key: string) {
@@ -199,7 +201,6 @@ export class ObservableObjectAdministration
             this.values[key].set(undefined)
             this.keysAtom.reportChanged()
             delete this.values[key]
-            delete this.target[key]
             const change =
                 notify || notifySpy
                     ? {
@@ -285,93 +286,50 @@ export class ObservableObjectAdministration
     }
 }
 
-export interface IIsObservableObject {
-    $mobx: ObservableObjectAdministration | DynamicObservableObjectAdministration
-}
-
-export function asObservableObject(
-    target: any,
-    name: string = "",
-    defaultEnhancer: IEnhancer<any> = deepEnhancer
-): ObservableObjectAdministration {
-    if (Object.prototype.hasOwnProperty.call(target, "$mobx")) return target.$mobx
-
-    process.env.NODE_ENV !== "production" &&
-        invariant(
-            Object.isExtensible(target),
-            "Cannot make the designated object observable; it is not extensible"
+const objectProxyTraps: ProxyHandler<any> = {
+    get(target: IIsObservableObject, name: string) {
+        if (name === "$mobx") return target.$mobx
+        // TODO: use symbol for  "__mobxDidRunLazyInitializers" and "$mobx", and remove these checks
+        if (
+            typeof name === "string" &&
+            name !== "constructor" &&
+            name !== "__mobxDidRunLazyInitializers"
         )
-    if (!isPlainObject(target))
-        name = (target.constructor.name || "ObservableObject") + "@" + getNextId()
-    if (!name) name = "ObservableObject@" + getNextId() // TODO: change name to record
-
-    const adm = new ObservableObjectAdministration(target, {}, name, defaultEnhancer)
-    addHiddenFinalProp(target, "$mobx", adm)
-    return adm
-}
-
-const observablePropertyConfigs = {}
-const computedPropertyConfigs = {}
-
-export function generateObservablePropConfig(propName) {
-    return (
-        observablePropertyConfigs[propName] ||
-        (observablePropertyConfigs[propName] = {
-            configurable: true,
-            enumerable: true,
-            get() {
-                return this.$mobx.read(this, propName)
-            },
-            set(v) {
-                this.$mobx.write(this, propName, v)
-            }
-        })
-    )
-}
-
-function getAdministrationForComputedPropOwner(owner: any): ObservableObjectAdministration {
-    const adm = owner.$mobx
-    if (!adm) {
-        // because computed props are declared on proty,
-        // the current instance might not have been initialized yet
-        initializeInstance(owner)
-        return owner.$mobx
+            return target.$mobx.read(target, name)
+        return target[name]
+    },
+    set(target: IIsObservableObject, name: string, value: any) {
+        const adm = target.$mobx
+        if (typeof name === "string" && name !== "constructor" && name !== "$mobx") {
+            adm.write(target, name, value)
+            return true
+        }
+        return fail(`Cannot reassign ${name}`)
+    },
+    deleteProperty(target: IIsObservableObject, name: string) {
+        const adm = target.$mobx
+        if (name === "$mobx") return fail(`Cannot reassign $mobx`)
+        adm.remove(name)
+        return true
+    },
+    ownKeys(target: IIsObservableObject) {
+        const adm = target.$mobx
+        return adm.getKeys()
     }
-    return adm
 }
 
-export function generateComputedPropConfig(propName) {
-    return (
-        computedPropertyConfigs[propName] ||
-        (computedPropertyConfigs[propName] = {
-            configurable: true,
-            enumerable: false,
-            get() {
-                return getAdministrationForComputedPropOwner(this).read(this, propName)
-            },
-            set(v) {
-                getAdministrationForComputedPropOwner(this).write(this, propName, v)
-            }
-        })
+export function createDynamicObservableObject(
+    name,
+    defaultEnhancer: IEnhancer<any> = deepEnhancer
+) {
+    const values = {}
+    const proxy = new Proxy(values, objectProxyTraps)
+    const adm = new DynamicObservableObjectAdministration(
+        proxy,
+        values,
+        name || "ObservableObject@" + getNextId(),
+        defaultEnhancer
     )
-}
-
-const isObservableObjectAdministration = createInstanceofPredicate(
-    "ObservableObjectAdministration",
-    ObservableObjectAdministration
-)
-
-const isDynamicObservableObjectAdministration = createInstanceofPredicate(
-    "DynamicObservableObjectAdministration",
-    DynamicObservableObjectAdministration
-)
-
-export function isObservableObject(thing: any): thing is IObservableObject {
-    if (isObject(thing)) {
-        if (isDynamicObservableObjectAdministration((thing as any).$mobx)) return true
-        // Initializers run lazily when transpiling to babel, so make sure they are run...
-        initializeInstance(thing)
-        return isObservableObjectAdministration((thing as any).$mobx)
-    }
-    return false
+    addHiddenFinalProp(values, "$mobx", adm)
+    return proxy
 }

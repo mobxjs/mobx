@@ -281,6 +281,8 @@ test("get administration", function() {
     var e = mobx.computed(() => 3)
     var f = mobx.autorun(() => c.has("b"))
     var g = new Clazz()
+    const h = {}
+    mobx.extendObservable(h, { a: 3 })
 
     function adm(thing, prop) {
         return mobx._getAdministration(thing, prop).constructor.name
@@ -296,6 +298,11 @@ test("get administration", function() {
     expect(() => adm(b, "b")).toThrowError(
         /no observable property 'b' found on the observable object 'ObservableObject@2'/
     )
+    expect(adm(h, "a")).toBe(ovClassName)
+    expect(adm(h)).toBe(h.$mobx.constructor.name)
+    expect(() => adm(h, "b")).toThrowError(
+        /no observable property 'b' found on the observable object 'ObservableObject@10'/
+    )
 
     expect(adm(c)).toBe(mapClassName)
     expect(adm(c, "a")).toBe(ovClassName)
@@ -310,10 +317,8 @@ test("get administration", function() {
     expect(adm(e)).toBe(mobx.computed(() => {}).constructor.name)
     expect(adm(f)).toBe(mobx.Reaction.name)
 
-    expect(adm(g)).toBe(b.$mobx.constructor.name)
+    expect(adm(g)).toBe(h.$mobx.constructor.name)
     expect(adm(g, "a")).toBe(ovClassName)
-
-    f()
 })
 
 test("onBecome(Un)Observed simple", () => {
