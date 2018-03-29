@@ -15,7 +15,7 @@ In MobX there is a set of decorators that defines how observable properties will
 * `action.bound`: Creates an action, and binds `this` to the instance
 
 Decorators can be used with the api's `decorate`, `observable.object`, `extendObservable` and `observable` (when creating objects) to specify how object members should behave.
-If no decorators are passed in, the default behavior is to use `observable.deep` for any key / value pair, and `computed` for geters.
+If no decorators are passed in, the default behavior is to use `observable.deep` for any key / value pair, and `computed` for getters.
 
 ```javascript
 import {observable, autorun, action} from "mobx";
