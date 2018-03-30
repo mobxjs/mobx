@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="6.11" data-basepath=".." data-revision="Thu Mar 15 2018 17:56:00 GMT+0100 (CET)">
+    <div class="book" data-level="6.11" data-basepath=".." data-revision="Fri Mar 30 2018 10:00:23 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -865,16 +865,20 @@
                     
                         <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/expr.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="expr"><a name="expr" class="plugin-anchor" href="#expr"><span class="fa fa-link"></span></a>Expr</h1>
 <p>Provided by the <code>mobx-utils</code> package.</p>
-<p><code>expr</code> can be used to create temporarily computed values inside computed values.
-Nesting computed values is useful to create cheap computations to prevent expensive computations to run.</p>
-<p>In the following example the expression prevents that the <code>TodoView</code> component is re-rendered if the selection changes elsewhere.
-Instead the component will only re-render when the relevant todo is (de)selected.</p>
+<p><code>expr</code> can be used to create temporary computed values inside computed values. 
+Nesting computed values is useful to create cheap computations in order to prevent expensive computations from needing to run.</p>
+<p>In the following example, the expression prevents the <code>TodoView</code> component from being re-rendered if the selection changes elsewhere.
+Instead, the component will only re-render when the relevant todo is (de)selected, which happens much less frequently.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> TodoView = observer(({todo, editorState}) =&gt; {
     <span class="hljs-keyword">const</span> isSelected = mobx.expr(() =&gt; editorState.selection === todo);
     <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">className</span>=<span class="hljs-value">{isSelected</span> ? &quot;<span class="hljs-attribute">todo</span> <span class="hljs-attribute">todo-selected</span>&quot; <span class="hljs-attribute">:</span> &quot;<span class="hljs-attribute">todo</span>&quot;}&gt;</span>{todo.title}<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>;</span>
 });
 </code></pre>
 <p><code>expr(func)</code> is an alias for <code>computed(func).get()</code>.</p>
+<p>Please note that the function given to <code>expr</code> will be evaluated <em>twice</em> in the scenario that the overall expression value changes.
+It will be evaluated the first time when any observables it depends on change.
+It will be evaluated a second time when a change in its value triggers the outer computed or reaction to evaluate, which will
+recreate and reevaluate the expression.</p>
 </body></html>
                     
                     </section>

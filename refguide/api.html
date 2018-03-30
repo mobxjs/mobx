@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="2" data-basepath=".." data-revision="Thu Mar 15 2018 17:56:00 GMT+0100 (CET)">
+    <div class="book" data-level="2" data-basepath=".." data-revision="Fri Mar 30 2018 10:00:23 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -1226,15 +1226,74 @@ Low-level api that can be used to observe a single observable value.</p>
 }
 </code></pre>
 <h3 id="-configure"><a name="-configure" class="plugin-anchor" href="#-configure"><span class="fa fa-link"></span></a><code>configure</code></h3>
-<p>Usage: <code>configure(options)</code>.</p>
-<ul>
-<li><strong><code>enforceActions: boolean</code></strong>: Enables / disables strict mode <em>globally</em>.
+<p>Usage: <code>configure(options)</code>.
+Sets global behavior settings on the active MobX instance.
+Use this to change how MobX behaves as a whole.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> { configure } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
+
+configure({
+    <span class="hljs-comment">// ...</span>
+});
+</code></pre>
+<h4 id="-arraybuffer-number"><a name="-arraybuffer-number" class="plugin-anchor" href="#-arraybuffer-number"><span class="fa fa-link"></span></a><code>arrayBuffer: number</code></h4>
+<p>Increases the default created size of observable arrays to <code>arrayBuffer</code>, if the maximum size isn&apos;t yet there.</p>
+<p>Observable arrays lazily create getters on members of <code>ObservableArray.prototype</code> starting at <code>0</code>.
+This will create the members from <code>0</code> to <code>arrayBuffer</code> if they don&apos;t yet exist.
+Use <code>arrayBuffer</code> if you know you&apos;ll have a common minimum array size and don&apos;t want to risk first creating those getters in hot code paths.
+See also <code>observable</code>.</p>
+<h4 id="-computedrequiresreaction-boolean"><a name="-computedrequiresreaction-boolean" class="plugin-anchor" href="#-computedrequiresreaction-boolean"><span class="fa fa-link"></span></a><code>computedRequiresReaction: boolean</code></h4>
+<p>Forbids the access of any unobserved computed value.
+Use this if you want to check whether you are using computed properties without a reactive context.</p>
+<pre><code class="lang-javascript">configure({ computedRequiresReaction: <span class="hljs-literal">true</span> });
+</code></pre>
+<h4 id="-disableerrorboundaries-boolean"><a name="-disableerrorboundaries-boolean" class="plugin-anchor" href="#-disableerrorboundaries-boolean"><span class="fa fa-link"></span></a><code>disableErrorBoundaries: boolean</code></h4>
+<p>By default, MobX will catch and rethrow exceptions happening in your code to make sure that a reaction in one exception does not prevent the scheduled execution of other, possibly unrelated, reactions. This means exceptions are not propagated back to the original causing code and therefore you won&apos;t be able to catch them using try/catch.</p>
+<p>There may be times when you want to catch those errors, for example when unit testing your reactions. You can disable this behaviour using <code>disableErrorBoundaries</code>.</p>
+<pre><code class="lang-javascript">configure({ disableErrorBoundaries: <span class="hljs-literal">true</span> });
+</code></pre>
+<p>Please note that MobX won&apos;t recover from errors when using this configuration. For that reason, you may need to use <code>_resetGlobalState</code> after each exception. Example:</p>
+<pre><code class="lang-js">configure({ disableErrorBoundaries: <span class="hljs-literal">true</span> })
+
+test(<span class="hljs-string">&apos;Throw if age is negative&apos;</span>, () =&gt; {
+  expect(() =&gt; {
+    <span class="hljs-keyword">const</span> age = observable.box(<span class="hljs-number">10</span>)
+    autorun(() =&gt; { <span class="hljs-keyword">if</span> (age.get() &lt; <span class="hljs-number">0</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">&apos;Age should not be negative&apos;</span>) })
+    age.set(-<span class="hljs-number">1</span>)
+  }).toThrow()
+  _resetGlobalState() <span class="hljs-comment">// Needed after each exception</span>
+})
+</code></pre>
+<blockquote>
+<p>Prior to MobX 4, <code>_resetGlobalState</code> was <code>extras.resetGlobalState</code>.</p>
+</blockquote>
+<h4 id="-enforceactions-boolean"><a name="-enforceactions-boolean" class="plugin-anchor" href="#-enforceactions-boolean"><span class="fa fa-link"></span></a><code>enforceActions: boolean</code></h4>
+<p>Also known as &quot;strict mode&quot;.
 In strict mode, it is not allowed to change any state outside of an <a href="action.html"><code>action</code></a>.
-See also <code>allowStateChanges</code>.</li>
-<li><strong><code>isolateGlobalState: boolean</code></strong>: Isolates the global state of MobX, when there are multiple instances of MobX in the same environment. This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX. The reactivty inside the library will remain self-contained when you call <code>configure({isolateGlobalState: true})</code> inside the library. Additionally, MobX won&apos;t throw an error that there are multiple instances in the global scope.</li>
-<li><strong><code>disableErrorBoundaries: boolean</code></strong>: Use this to simplify debugging exceptions and prevent MobX from catching and rethrowing exceptions happening in your code.</li>
-<li><strong><code>computedRequiresReaction: boolean</code></strong>: Forbids the access of any unobserved computed value. Use this if you want to check whether you are using computed properties without a reactive context</li>
-</ul>
+This is recommended when working in larger applications with complex layers of state computations.
+See also <code>allowStateChanges</code>.</p>
+<blockquote>
+<p>Prior to MobX 4, this behavior was enabled by <code>useStrict(): void</code>.</p>
+</blockquote>
+<pre><code class="lang-javascript">configure({ enforceActions: <span class="hljs-literal">true</span> });
+</code></pre>
+<h4 id="-isolateglobalstate-boolean"><a name="-isolateglobalstate-boolean" class="plugin-anchor" href="#-isolateglobalstate-boolean"><span class="fa fa-link"></span></a><code>isolateGlobalState: boolean</code></h4>
+<p>Isolates the global state of MobX, when there are multiple instances of MobX in the same environment.
+This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX.
+The reactivity inside the library will remain self-contained when you call <code>configure({isolateGlobalState: true})</code> inside the library.
+Additionally, MobX won&apos;t throw an error that there are multiple instances in the global scope.</p>
+<pre><code class="lang-javascript">configure({ isolatedGlobalState: <span class="hljs-literal">true</span> });
+</code></pre>
+<h4 id="-reactionscheduler-f-void-void"><a name="-reactionscheduler-f-void-void" class="plugin-anchor" href="#-reactionscheduler-f-void-void"><span class="fa fa-link"></span></a><code>reactionScheduler: (f: () =&gt; void) =&gt; void</code></h4>
+<p>Sets a new function that executes all MobX reactions.
+By default <code>reactionScheduler</code> just runs the <code>f</code> reaction without any other behavior.
+This can be useful for basic debugging, or slowing down reactions to visualize application updates.</p>
+<pre><code class="lang-javascript">configure({
+    reactionScheduler: (f): <span class="hljs-keyword">void</span> =&gt; {
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Running an event after a delay:&quot;</span>, f);
+        setTimeout(f, <span class="hljs-number">100</span>);
+    }
+});
+</code></pre>
 <h2 id="direct-observable-manipulation"><a name="direct-observable-manipulation" class="plugin-anchor" href="#direct-observable-manipulation"><span class="fa fa-link"></span></a>Direct Observable manipulation</h2>
 <p>There is now an utility API that enables manipulating observable maps, objects and arrays with the same API. These api&apos;s are fully reactive, which means that even new property declarations can be detected by mobx if <code>set</code> is used to add them, and <code>values</code> or <code>keys</code> to iterate them.</p>
 <ul>

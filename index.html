@@ -46,7 +46,7 @@
     <body>
         
         
-    <div class="book" data-level="0" data-basepath="." data-revision="Thu Mar 15 2018 17:56:00 GMT+0100 (CET)">
+    <div class="book" data-level="0" data-basepath="." data-revision="Fri Mar 30 2018 10:00:23 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -875,10 +875,12 @@
 <p><img src="docs/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix"> <img src="docs/coinbase.jpeg" align="center" width="100" title="Coinbase" alt="Coinbase"> <img src="docs/fbos.jpeg" align="center" width="100" title="Facebook Open Source" alt="Facebook Open Source"></p>
 <h1 id="installation"><a name="installation" class="plugin-anchor" href="#installation"><span class="fa fa-link"></span></a>Installation</h1>
 <ul>
-<li>Installation: <code>npm install mobx --save</code>. React bindings: <code>npm install mobx-react --save</code>. To enable ESNext decorators (optional), see below.</li>
-<li>CDN:</li>
+<li>Installation:<br><code>npm install mobx --save</code>. React bindings: <code>npm install mobx-react --save</code>. To enable ESNext decorators (optional), pelse checkout decoration section below.</li>
+<li>CDN:<ul>
 <li><a href="https://unpkg.com/mobx/lib/mobx.umd.js" target="_blank">https://unpkg.com/mobx/lib/mobx.umd.js</a></li>
 <li><a href="https://cdnjs.com/libraries/mobx" target="_blank">https://cdnjs.com/libraries/mobx</a></li>
+</ul>
+</li>
 </ul>
 <h2 id="translations"><a name="translations" class="plugin-anchor" href="#translations"><span class="fa fa-link"></span></a>Translations</h2>
 <ul>
@@ -1075,8 +1077,8 @@ Use them to your advantage; they will help you to structure your code better and
 <li>Use <code>npm test</code> to run the basic test suite, <code>npm run coverage</code> for the test suite with coverage and <code>npm run perf</code> for the performance tests.</li>
 </ul>
 <h2 id="flow-support"><a name="flow-support" class="plugin-anchor" href="#flow-support"><span class="fa fa-link"></span></a>Flow support</h2>
-<p>MobX ships with <a href="flow-typed/mobx.js">flow typings</a>. Flow will automatically include them when you import mobx modules. Although you <strong>do not</strong> need to import the types explicitly, you can still do it like this: <code>import type { ... } from &apos;mobx&apos;</code>.</p>
-<p>To use the <a href="flow-typed/mobx.js">flow typings</a> shipped with MobX:</p>
+<p>MobX ships with <a href="https://github.com/mobxjs/mobx/blob/master/flow-typed/mobx.js" target="_blank">flow typings</a>. Flow will automatically include them when you import mobx modules. Although you <strong>do not</strong> need to import the types explicitly, you can still do it like this: <code>import type { ... } from &apos;mobx&apos;</code>.</p>
+<p>To use the <a href="https://github.com/mobxjs/mobx/blob/master/flow-typed/mobx.js" target="_blank">flow typings</a> shipped with MobX:</p>
 <ul>
 <li>In <code>.flowconfig</code>, you <strong>cannot</strong> ignore <code>node_modules</code>.</li>
 <li>In <code>.flowconfig</code>, you <strong>cannot</strong> import it explicitly in the <code>[libs]</code> section.</li>

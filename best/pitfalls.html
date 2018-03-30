@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="8.2" data-basepath=".." data-revision="Thu Mar 15 2018 17:56:00 GMT+0100 (CET)">
+    <div class="book" data-level="8.2" data-basepath=".." data-revision="Fri Mar 30 2018 10:00:23 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -934,7 +934,7 @@ For more details, see the <a href="https://github.com/mobxjs/mobx/blob/gh-pages/
 <p>MobX can do a lot, but it cannot make primitive values observable (although it can wrap them in an object see <a href="../refguide/boxed.html">boxed observables</a>).
 So it is not the <em>values</em> that are observable, but the <em>properties</em> of an object. This means that <code>@observer</code> actually reacts to the fact that you dereference a value.
 So in our above example, the <code>Timer</code> component would <strong>not</strong> react if it was initialized as follows:</p>
-<pre><code class="lang-javascript">React.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">Timer</span> <span class="hljs-attribute">timerData</span>=<span class="hljs-value">{timerData.secondsPassed}</span> /&gt;</span>, document.body)
+<pre><code class="lang-javascript">ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">Timer</span> <span class="hljs-attribute">timerData</span>=<span class="hljs-value">{timerData.secondsPassed}</span> /&gt;</span>, document.body)
 </span></code></pre>
 <p>In this snippet just the current value of <code>secondsPassed</code> is passed to the <code>Timer</code>, which is the immutable value <code>0</code> (all primitives are immutable in JS).
 That number won&apos;t change anymore in the future, so <code>Timer</code> will never update. It is the property <code>secondsPassed</code> that will change in the future,
