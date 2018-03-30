@@ -215,7 +215,7 @@ store.todos[0].finished = true;
 ```
 
 Nonetheless, MobX has an optional built-in concept of [`actions`](https://mobxjs.github.io/mobx/refguide/action.html).
-Read this section as well if you want to now more about writing asynchronous actions. It's easy!
+Read this section as well if you want to know more about writing asynchronous actions. It's easy!
 Use them to your advantage; they will help you to structure your code better and make wise decisions about when and where state should be modified.
 
 ## MobX: Simple and scalable
