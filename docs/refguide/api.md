@@ -74,7 +74,7 @@ references, leaving the values untouched. (This holds also for any values assign
 
 The second argument in `observable.object()` can be used to fine tune the observability with [`decorators`](#decorators).
 
-[&laquo;`details`&raquo;](object.md)the
+[&laquo;`details`&raquo;](object.md)
 
 ### `observable.array(value, options?)`
 
@@ -263,7 +263,7 @@ _Tip: it is recommended to give the generator function a name, this is the name 
 Flows are canceallable, that means that you can call `cancel()` on the returned promise. This will stop the generator immediately, but any `finally` clause will still be processed.
 The returned promise itself will reject with `FLOW_CANCELLED`
 
-**Flows support sync iterators**
+**Flows support async iterators**
 
 Flows support async iterators, that means you can use async generators:
 
@@ -348,7 +348,7 @@ The side effect can be debounced, just like `autorunAsync`.
 **options**
 - **`fireImmediately?: boolean`**: Wait for a change before firing the _effect function_. Defaults to `false`.
 - **`delay?: number`**: the sideEffect will be delayed and debounced with the given `delay`. Defaults to `0`.
-- **`equals`**. Custom equality function to determine whether the expr function differed from it's previous result, and hence should fire effect. Accepts the same options as the equals option of `computed`.
+- **`equals`**: Custom equality function to determine whether the expr function differed from it's previous result, and hence should fire effect. Accepts the same options as the equals option of `computed`.
 - Also accepts all of the options from [`autorun`](#autorun)
 
 ### `onReactionError`
@@ -453,7 +453,7 @@ export class City {
     }
 
     @flow fetchTemperature = function*() {
-        // dat afetching logic
+        // data fetching logic
     }
 }
 ```
