@@ -1,5 +1,5 @@
 import { action } from "./action"
-import { noop } from "../utils/utils"
+import { fail, noop } from "../utils/utils"
 
 let generatorId = 0
 
