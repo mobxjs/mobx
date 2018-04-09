@@ -159,3 +159,9 @@ test("for-in operator", () => {
     delete x.x
     expect(computeKeys(x)).toEqual(["z", "a"])
 })
+
+// TODO: No extendobservable on dynamic
+// TODO:, verify set, etc
+// Verfiy computes and actions
+// Verify non deletability of static members
+// Verify non enumerability of these members
