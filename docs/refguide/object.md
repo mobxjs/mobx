@@ -22,7 +22,7 @@ var person = observable({
 
     setAge(age) {
         this.age = age;
-    })
+    }
 }, {
     setAge: action
 });
