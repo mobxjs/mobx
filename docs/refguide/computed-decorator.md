@@ -69,7 +69,7 @@ decorate(OrderLine, {
 })
 ```
 
-Both `observable.object` and `extendObservable` will automatically infer getter properties to be computed properties, so the followin suffices:
+Both `observable.object` and `extendObservable` will automatically infer getter properties to be computed properties, so the following suffices:
 
 ```javascript
 const orderLine = observable.object({
