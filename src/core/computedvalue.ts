@@ -197,13 +197,19 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         const oldValue = this.value
         const wasSuspended =
             /* see #1208 */ this.dependenciesState === IDerivationState.NOT_TRACKING
-        const newValue = (this.value = this.computeValue(true))
-        return (
+        const newValue = this.computeValue(true)
+
+        const changed =
             wasSuspended ||
             isCaughtException(oldValue) ||
             isCaughtException(newValue) ||
             !this.equals(oldValue, newValue)
-        )
+
+        if (changed) {
+            this.value = newValue
+        }
+
+        return changed
     }
 
     computeValue(track: boolean) {

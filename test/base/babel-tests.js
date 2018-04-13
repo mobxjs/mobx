@@ -102,6 +102,29 @@ test("babel: parameterized computed decorator", () => {
     expect(changes).toEqual([{ sum: 6 }, { sum: 7 }, { sum: 9 }])
 })
 
+test("computed value should be the same around comparer judged equivalent reassign", () => {
+    class TestClass {
+        @observable c = null
+        defaultCollection = []
+        @computed.struct
+        get collection() {
+            return this.c || this.defaultCollection
+        }
+    }
+
+    const t1 = new TestClass()
+
+    const d = autorun(() => t1.collection)
+
+    const oldCollection = t1.collection
+    t1.c = []
+    const newCollection = t1.collection
+
+    expect(oldCollection).toBe(newCollection)
+
+    d()
+})
+
 class Order {
     @observable price = 3
     @observable amount = 2
