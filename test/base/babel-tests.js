@@ -102,7 +102,7 @@ test("babel: parameterized computed decorator", () => {
     expect(changes).toEqual([{ sum: 6 }, { sum: 7 }, { sum: 9 }])
 })
 
-test("computed value should be the same around comparer judged equivalent reassign", () => {
+test("computed value should be the same around changing which was considered equivalent", () => {
     class TestClass {
         @observable c = null
         defaultCollection = []
