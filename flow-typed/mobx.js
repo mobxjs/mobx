@@ -1,5 +1,11 @@
 // @flow
 
+export type CreateObservableOptions = {
+    name?: string,
+    deep?: boolean,
+    defaultDecorator?: any
+}
+
 export type IObservableMapInitialValues<K, V> = IMapEntries<K, V> | KeyValueMap<V> | IMap<K, V>
 
 export interface IMobxConfigurationOptions {
@@ -234,13 +240,13 @@ export interface IObservableFactory {
 }
 
 declare export class IObservableFactories {
-    box<T>(value?: T, name?: string): IObservableValue<T>,
-    array<T>(initialValues?: T[], name?: string): IObservableArray<T>,
+    box<T>(value?: T, options?: CreateObservableOptions): IObservableValue<T>,
+    array<T>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T>,
     map<K, V>(
         initialValues?: IObservableMapInitialValues<K, V>,
-        name?: string
+        options?: CreateObservableOptions
     ): ObservableMap<K, V>,
-    object<T>(props: T, name?: string): T & IObservableObject,
+    object<T>(props: T, options?: CreateObservableOptions): T & IObservableObject,
     ref(target: Object, property?: string, descriptor?: PropertyDescriptor): any,
     shallow(target: Object, property?: string, descriptor?: PropertyDescriptor): any,
     deep(target: Object, property?: string, descriptor?: PropertyDescriptor): any
