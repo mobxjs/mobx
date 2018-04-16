@@ -20,7 +20,7 @@ export function namedActionDecorator(name: string) {
                 return {
                     value: createAction(name, descriptor.value),
                     enumerable: false,
-                    configurable: false,
+                    configurable: true, // See #1477
                     writable: true // for typescript, this must be writable, otherwise it cannot inherit :/ (see inheritable actions test)
                 }
             }
@@ -28,8 +28,8 @@ export function namedActionDecorator(name: string) {
             const { initializer } = descriptor
             return {
                 enumerable: false,
-                configurable: false,
-                writable: process.env.NODE_ENV !== "production", // See #1398
+                configurable: true, // See #1477
+                writable: true, // See #1398
                 initializer() {
                     // N.B: we can't immediately invoke initializer; this would be wrong
                     return createAction(name, initializer!.call(this))
