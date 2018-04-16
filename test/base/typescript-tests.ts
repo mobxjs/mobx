@@ -288,7 +288,7 @@ test("computed setter should succeed", () => {
 
 test("atom clock example", done => {
     let ticks = 0
-    const time_factor = process.env.CI === "true" ? 300 : 50 // speed up / slow down tests
+    const time_factor = process.env.CI === "true" ? 300 : 100 // speed up / slow down tests
 
     class Clock {
         atom: IAtom
