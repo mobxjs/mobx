@@ -708,6 +708,32 @@ test("it should be possible to handle global errors in reactions", () => {
     })
 })
 
+test("it should be possible to handle global errors in reactions - 2 - #1480", () => {
+    utils.supressConsole(() => {
+        const a = mobx.observable.box(1)
+        const errors = []
+        const d2 = mobx.onReactionError(e => errors.push(e))
+
+        const d = mobx.reaction(
+            () => a.get(),
+            a => {
+                if (a >= 2) throw a
+            }
+        )
+
+        a.set(2)
+        a.set(3)
+
+        d2()
+        a.set(4)
+
+        expect(errors).toEqual([2, 3])
+        d()
+
+        checkGlobalState()
+    })
+})
+
 test("global error handling will be skipped when using disableErrorBoundaries - 1", () => {
     mobx.configure({ disableErrorBoundaries: true })
     try {

@@ -88,13 +88,17 @@ export class Reaction implements IDerivation, IReactionPublic {
             if (shouldCompute(this)) {
                 this._isTrackPending = true
 
-                this.onInvalidate()
-                if (this._isTrackPending && isSpyEnabled()) {
-                    // onInvalidate didn't trigger track right away..
-                    spyReport({
-                        name: this.name,
-                        type: "scheduled-reaction"
-                    })
+                try {
+                    this.onInvalidate()
+                    if (this._isTrackPending && isSpyEnabled()) {
+                        // onInvalidate didn't trigger track right away..
+                        spyReport({
+                            name: this.name,
+                            type: "scheduled-reaction"
+                        })
+                    }
+                } catch (e) {
+                    this.reportExceptionInDerivation(e)
                 }
             }
             endBatch()
@@ -134,6 +138,8 @@ export class Reaction implements IDerivation, IReactionPublic {
             this.errorHandler(error, this)
             return
         }
+
+        if (globalState.disableErrorBoundaries) throw error
 
         const message = `[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: '${this}`
         console.error(message, error)
