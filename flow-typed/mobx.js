@@ -170,18 +170,18 @@ export type KeyValueMap<V> = {
     [key: string]: V
 }
 
-export interface IMapChange<T> {
-    object: ObservableMap<T>,
+export interface IMapChange<K, T> {
+    object: ObservableMap<K, T>,
     type: "update" | "add" | "delete",
-    name: string,
+    name: K,
     newValue?: any,
     oldValue?: any
 }
 
-export interface IMapWillChange<T> {
-    object: ObservableMap<T>,
+export interface IMapWillChange<K, T> {
+    object: ObservableMap<K, T>,
     type: "update" | "add" | "delete",
-    name: string,
+    name: K,
     newValue?: any
 }
 
