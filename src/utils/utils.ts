@@ -96,7 +96,7 @@ export function makeNonEnumerable(object: any, propNames: string[]) {
     }
 }
 
-export function addHiddenProp(object: any, propName: string, value: any) {
+export function addHiddenProp(object: any, propName: PropertyKey, value: any) {
     Object.defineProperty(object, propName, {
         enumerable: false,
         writable: true,

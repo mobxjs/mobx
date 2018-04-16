@@ -602,6 +602,14 @@ Object.defineProperty(ObservableArray.prototype, "length", {
     }
 })
 
+if (typeof Symbol !== "undefined" && Symbol.toStringTag) {
+    addHiddenProp(
+        ObservableArray.prototype,
+        typeof Symbol !== "undefined" ? Symbol.toStringTag : "@@toStringTag" as any,
+        "Array"
+    )
+}
+
 // Internet Explorer on desktop doesn't support this.....
 // So, let's don't do this to avoid different semantics
 // See #1395

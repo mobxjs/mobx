@@ -504,3 +504,10 @@ test("array is spreadable, #1395", () => {
     const y = mobx.observable([])
     expect([5, ...y]).toEqual([5])
 })
+
+test("array supports toStringTag, #1490", () => {
+    // N.B. on old environments this requires polyfils for these symbols *and* Object.prototype.toString.
+    // core-js provides both
+    const a = mobx.observable([])
+    expect(Object.prototype.toString.call(a)).toBe("[object Array]")
+})
