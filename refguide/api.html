@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="2" data-basepath=".." data-revision="Fri Mar 30 2018 10:00:23 GMT+0200 (CEST)">
+    <div class="book" data-level="2" data-basepath=".." data-revision="Mon Apr 16 2018 21:04:48 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -923,7 +923,7 @@ This is the foundation on which all other observables are built, but in practice
 By default any values in those properties will be made observable as well, but when using the <code>{deep: false}</code> options, only the properties will be made into observable
 references, leaving the values untouched. (This holds also for any values assigned in the future).</p>
 <p>The second argument in <code>observable.object()</code> can be used to fine tune the observability with <a href="#decorators"><code>decorators</code></a>.</p>
-<p><a href="object.html">&#xAB;<code>details</code>&#xBB;</a>the</p>
+<p><a href="object.html">&#xAB;<code>details</code>&#xBB;</a></p>
 <h3 id="-observable-array-value-options"><a name="-observable-array-value-options" class="plugin-anchor" href="#-observable-array-value-options"><span class="fa fa-link"></span></a><code>observable.array(value, options?)</code></h3>
 <p>Creates a new observable array based on the provided value.</p>
 <p>Use the <code>{deep: false}</code> option if the values in the array should not be turned into observables.</p>
@@ -1069,7 +1069,7 @@ configure({enforceActions: <span class="hljs-literal">true</span>});
 <p><strong>Flows can be cancelled</strong></p>
 <p>Flows are canceallable, that means that you can call <code>cancel()</code> on the returned promise. This will stop the generator immediately, but any <code>finally</code> clause will still be processed.
 The returned promise itself will reject with <code>FLOW_CANCELLED</code></p>
-<p><strong>Flows support sync iterators</strong></p>
+<p><strong>Flows support async iterators</strong></p>
 <p>Flows support async iterators, that means you can use async generators:</p>
 <pre><code class="lang-javscript">async function* someNumbers() {
     yield Promise.resolve(1)
@@ -1140,7 +1140,7 @@ The side effect can be debounced, just like <code>autorunAsync</code>.</p>
 <ul>
 <li><strong><code>fireImmediately?: boolean</code></strong>: Wait for a change before firing the <em>effect function</em>. Defaults to <code>false</code>.</li>
 <li><strong><code>delay?: number</code></strong>: the sideEffect will be delayed and debounced with the given <code>delay</code>. Defaults to <code>0</code>.</li>
-<li><strong><code>equals</code></strong>. Custom equality function to determine whether the expr function differed from it&apos;s previous result, and hence should fire effect. Accepts the same options as the equals option of <code>computed</code>.</li>
+<li><strong><code>equals</code></strong>: Custom equality function to determine whether the expr function differed from it&apos;s previous result, and hence should fire effect. Accepts the same options as the equals option of <code>computed</code>.</li>
 <li>Also accepts all of the options from <a href="#autorun"><code>autorun</code></a></li>
 </ul>
 <h3 id="-onreactionerror"><a name="-onreactionerror" class="plugin-anchor" href="#-onreactionerror"><span class="fa fa-link"></span></a><code>onReactionError</code></h3>
@@ -1221,7 +1221,7 @@ Low-level api that can be used to observe a single observable value.</p>
     }
 
     @flow fetchTemperature = <span class="hljs-function"><span class="hljs-keyword">function</span>*(<span class="hljs-params"></span>) </span>{
-        <span class="hljs-comment">// dat afetching logic</span>
+        <span class="hljs-comment">// data fetching logic</span>
     }
 }
 </code></pre>
@@ -1276,6 +1276,10 @@ See also <code>allowStateChanges</code>.</p>
 </blockquote>
 <pre><code class="lang-javascript">configure({ enforceActions: <span class="hljs-literal">true</span> });
 </code></pre>
+<p>Since MobX 4.2, it is also possible to specify </p>
+<pre><code class="lang-javascript">configure({ enforceActions: <span class="hljs-string">&quot;strict&quot;</span> });
+</code></pre>
+<p>In sloppy (<code>true</code>) mode, MobX will only throw if an observed observable is modified, in <code>&quot;strict&quot;</code> mode it will even throw for non-observed observables</p>
 <h4 id="-isolateglobalstate-boolean"><a name="-isolateglobalstate-boolean" class="plugin-anchor" href="#-isolateglobalstate-boolean"><span class="fa fa-link"></span></a><code>isolateGlobalState: boolean</code></h4>
 <p>Isolates the global state of MobX, when there are multiple instances of MobX in the same environment.
 This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX.

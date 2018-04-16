@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="3.1" data-basepath=".." data-revision="Fri Mar 30 2018 10:00:23 GMT+0200 (CEST)">
+    <div class="book" data-level="3.1" data-basepath=".." data-revision="Mon Apr 16 2018 21:04:48 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -877,7 +877,7 @@ The following conversion rules are applied, but can be fine-tuned by using <em>m
 <li>If <em>value</em> is an ES6 <code>Map</code>: a new <a href="map.html">Observable Map</a> will be returned. Observable maps are very useful if you don&apos;t want to react just to the change of a specific entry, but also to the addition or removal of entries.</li>
 <li>If <em>value</em> is an array, a new <a href="array.html">Observable Array</a> will be returned.</li>
 <li>If <em>value</em> is an object <em>without</em> prototype, all its current properties will be made observable. See <a href="object.html">Observable Object</a></li>
-<li>If <em>value</em> is an object <em>with</em> a prototype, a JavaScript primitive or function, a <a href="boxed.html">Boxed Observable</a> will be returned. MobX will not make objects with a prototype automatically observable; as that is the responsibility of its constructor function. Use <code>extendObservable</code> in the constructor, or <code>@observable</code> in its class definition instead.</li>
+<li>If <em>value</em> is an object <em>with</em> a prototype, a JavaScript primitive or function, <code>observable</code> will throw. Use <a href="boxed.html">Boxed Observable</a> observables instead if you want to create a stand-alone observable reference to such a value. MobX will not make objects with a prototype automatically observable; as that is considered the responsibility of its constructor function. Use <code>extendObservable</code> in the constructor, or <code>@observable</code> / <code>decorate</code> in its class definition instead.</li>
 </ol>
 <p>These rules might seem complicated at first sight, but you will notice that in practice they are very intuitive to work with.
 Some notes:</p>
@@ -899,7 +899,7 @@ list[<span class="hljs-number">2</span>] = <span class="hljs-number">3</span>;
 });
 person.firstName = <span class="hljs-string">&quot;C.S.&quot;</span>;
 
-<span class="hljs-keyword">const</span> temperature = observable(<span class="hljs-number">20</span>);
+<span class="hljs-keyword">const</span> temperature = observable.box(<span class="hljs-number">20</span>);
 temperature.set(<span class="hljs-number">25</span>);
 </code></pre>
 </body></html>
