@@ -9,6 +9,7 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Anri Asaturov
 * Bayu Fitri Andrianto
 * Benjamin Gruenbaum
+* Chance Snow
 * Code Hat Programming Inc.
 * Dane Hitchcox
 * Daniel Nakov
