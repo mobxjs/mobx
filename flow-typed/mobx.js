@@ -233,14 +233,32 @@ export interface IObservableFactory {
     <T: Object>(value: T): T
 }
 
+export type IObservableDecorator = {
+    (target: Object, property: string, descriptor?: PropertyDescriptor): void,
+    enhancer: IEnhancer<any>
+}
+
+export type CreateObservableOptions = {
+    name?: string,
+    deep?: boolean,
+    defaultDecorator?: IObservableDecorator
+}
+
 declare export class IObservableFactories {
-    box<T>(value?: T, name?: string): IObservableValue<T>,
-    array<T>(initialValues?: T[], name?: string): IObservableArray<T>,
-    map<T>(initialValues?: IObservableMapInitialValues<T>, name?: string): ObservableMap<T>,
-    object<T>(props: T, name?: string): T & IObservableObject,
-    ref(target: Object, property?: string, descriptor?: PropertyDescriptor): any,
-    shallow(target: Object, property?: string, descriptor?: PropertyDescriptor): any,
-    deep(target: Object, property?: string, descriptor?: PropertyDescriptor): any
+    box<T>(value?: T, options?: CreateObservableOptions): IObservableValue<T>,
+    array<T>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T>,
+    map<K, V>(
+        initialValues?: IObservableMapInitialValues<K, V>,
+        options?: CreateObservableOptions
+    ): ObservableMap<K, V>,
+    object<T>(props: T, options?: CreateObservableOptions): T & IObservableObject,
+    ref(target: Object, property?: string, descriptor?: PropertyDescriptor): IObservableDecorator,
+    shallow(
+        target: Object,
+        property?: string,
+        descriptor?: PropertyDescriptor
+    ): IObservableDecorator,
+    deep(target: Object, property?: string, descriptor?: PropertyDescriptor): IObservableDecorator
 }
 
 export interface Iterator<T> {
