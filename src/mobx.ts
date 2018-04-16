@@ -163,7 +163,6 @@ if (
         "extras",
         "Atom",
         "BaseAtom",
-        "ObservableMap",
         "asFlat",
         "asMap",
         "asReference",
