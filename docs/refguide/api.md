@@ -526,6 +526,15 @@ See also `allowStateChanges`.
 configure({ enforceActions: true });
 ```
 
+Since MobX 4.2, it is also possible to specify 
+
+```javascript
+configure({ enforceActions: "strict" });
+```
+
+In sloppy (`true`) mode, MobX will only throw if an observed observable is modified, in `"strict"` mode it will even throw for non-observed observables
+
+
 #### `isolateGlobalState: boolean`
 Isolates the global state of MobX, when there are multiple instances of MobX in the same environment.
 This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX.
