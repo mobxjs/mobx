@@ -1,3 +1,14 @@
+# 4.2.0
+
+* Introduced `configure({ enforceActions: "strict" })`, which is more strict then `enforceActions: true`, as it will also throw on non-observed changes to observables. See also [#1473](https://github.com/mobxjs/mobx/issues/1473)
+* Fixed [#1480](https://github.com/mobxjs/mobx/issues/1480): Exceptions in the effect handler of `reaction` where not properly picked up by the global reaction system
+* Fixed a bug where computed values updated their cached value, even when the comparer considered the new value equal to the previous one. Thanks @kuitos for finding this and fixing it! [#1499](https://github.com/mobxjs/mobx/pull/1499)
+* Undeprecated `ObservableMap`, fixes [#1496](https://github.com/mobxjs/mobx/issues/1496)
+* Observable arrays now support `Symbol.toStringTag` (if available / polyfilled). This allows libraries like Ramda to detect automatically that observable arrays are arrays. Fixes [#1490](https://github.com/mobxjs/mobx/issues/1490). Note that `Array.isArray` will keep returning false for the entire MobX 4 range.
+* Actions are now always `configurable` and `writable`, like in MobX 3. Fixes [#1477](https://github.com/mobxjs/mobx/issues/1477)
+* Merged several improvements to the flow typings. [#1501](https://github.com/mobxjs/mobx/pull/1501) by @quanganhtran
+* Fixed several accidental usages of the global `fail`, by @mtaran-google through [#1483](https://github.com/mobxjs/mobx/pull/1483) and [#1482](https://github.com/mobxjs/mobx/pull/1482)
+
 # 4.1.1
 
 * Import `default` from MobX will no longer throw, but only warn instead. This fixes some issues with tools that reflect on the `default` export of a module.
