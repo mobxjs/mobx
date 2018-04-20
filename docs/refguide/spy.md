@@ -6,7 +6,7 @@ It is similar to attaching an `observe` listener to *all* observables at once, b
 Used for example by the `mobx-react-devtools`.
 
 Example usage of spying all actions:
-```
+```javascript
 spy((event) => {
     if (event.type === 'action') {
         console.log(`${event.name} with args: ${event.arguments}`)

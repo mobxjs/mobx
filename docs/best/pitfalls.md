@@ -48,7 +48,7 @@ So usually all your components should be decorated. Don't worry, this is not ine
 
 Observer components only track data that is accessed _during_ the render method. A common mistake is that data plucked of from an observable property and stored will for that reason not be tracked:
 
-```
+```javascript
 class User {
   @observable name
 }
@@ -71,7 +71,7 @@ class Profile extends React.Component {
 
 The correct approach is either by not storing the values of observables locally (obviously, the above example is simple but contrived), or by defining them as computed property:
 
-```
+```javascript
 class User {
   @observable name
 }
