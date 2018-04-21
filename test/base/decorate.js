@@ -351,3 +351,20 @@ test("decorate should work with ES6 constructor", () => {
         title: observable
     })
 })
+
+test("decorate should not allow @observable on getter", function() {
+    const obj = {
+        x: 0,
+        get y() {
+            return 0
+        }
+    }
+
+    decorate(obj, {
+        x: observable,
+        y: observable
+    })
+
+    expect(() => obj.x).toThrow(/"y"/)
+    expect(() => obj.y).toThrow()
+})
