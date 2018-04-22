@@ -65,7 +65,7 @@ export function set(obj: any, key: any, value?: any): void {
         const adm = ((obj as any) as IIsObservableObject).$mobx
         const existingObservable = adm.values[key]
         if (existingObservable) {
-            existingObservable.set(value)
+            adm.write(obj, key, value)
         } else {
             defineObservableProperty(obj, key, value, adm.defaultEnhancer)
         }

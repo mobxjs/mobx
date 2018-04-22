@@ -177,6 +177,25 @@ test("observe & intercept", () => {
     })
 })
 
+test("observe & intercept set called multiple times", () => {
+    const a = mobx.observable({})
+    const interceptLogs = []
+    const observeLogs = []
+
+    mobx.intercept(a, change => {
+        interceptLogs.push(`${change.name}: ${change.newValue}`)
+        return change
+    })
+    mobx.observe(a, change => observeLogs.push(`${change.name}: ${change.newValue}`))
+
+    mobx.set(a, "x", 0)
+    a.x = 1
+    mobx.set(a, "x", 2)
+
+    expect(interceptLogs).toEqual(["x: 0", "x: 1", "x: 2"])
+    expect(observeLogs).toEqual(["x: 0", "x: 1", "x: 2"])
+})
+
 test("dynamically adding properties should preserve the original modifiers of an object", () => {
     const todos = observable(
         {
