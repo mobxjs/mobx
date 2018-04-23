@@ -8,6 +8,7 @@ import { keys } from "./object-api"
 export type ToJSOptions = {
     detectCycles?: boolean
     exportMapsAsObjects?: boolean
+    objectKeysFn?: (object) => string[]
 }
 
 const defaultOptions: ToJSOptions = {
@@ -50,7 +51,12 @@ export function toJS(source, options?: ToJSOptions, __alreadySeen: [any, any][] 
         if (isObservableObject(source)) {
             const res = cache({})
             keys(source) // make sure we track the keys of the object
-            for (let key in source) {
+
+            const objectKeysFn =
+                typeof options.objectKeysFn === "function" ? options.objectKeysFn : Object.keys
+            const sourceKeys = objectKeysFn(source)
+            for (let i = 0, len = sourceKeys.length, key; i < len; ++i) {
+                key = sourceKeys[i]
                 res[key] = toJS(source[key], options!, __alreadySeen)
             }
             return res
