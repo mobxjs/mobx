@@ -31,11 +31,9 @@ numbers.push(5);
 
 ## Options
 
-Reaction accepts as third argument an options object with the following optional options:
+Autorun accepts as the second argument an options object with the following optional options:
 
-* `fireImmediately`: Boolean that indicates that the effect function should immediately be triggered after the first run of the data function. `false` by default. If a boolean is passed as third argument to `reaction`, it will be interpreted as the `fireImmediately` option.
 * `delay`: Number in milliseconds that can be used to debounce the effect function. If zero (the default), no debouncing will happen.
-* `equals`: `comparer.default` by default. If specified, this comparer function will be used to compare the previous and next values produced by the *data* function. The *effect* function will only be invoked if this function returns true. If specified, this will override `compareStructural`.
 * `name`: String that is used as name for this reaction in for example [`spy`](spy.md) events.
 * `onError`: function that will handle the errors of this reaction, rather then propagating them.
 * `scheduler`: Set a custom scheduler to determine how re-running the autorun function should be scheduled
