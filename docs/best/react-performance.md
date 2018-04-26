@@ -89,7 +89,7 @@ This is a valid option, but may become tedious if you have lots of data of diffe
 
 Then, you may use the component like this:
 
-```
+```javascript
 render() {
   const { person, car } = this.props;
   return (

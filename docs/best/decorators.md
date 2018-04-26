@@ -94,7 +94,7 @@ npm install --save-dev babel-preset-mobx
 ```
 
 .babelrc:
-```
+```json
 {
   "presets": ["mobx"]
 }
@@ -105,7 +105,7 @@ npm install --save-dev babel-preset-mobx
 To enable support for decorators without using the mobx preset, follow the following steps.
 Install support for decorators: `npm i --save-dev babel-plugin-transform-decorators-legacy`. And enable it in your `.babelrc` file:
 
-```
+```json
 {
   "presets": [
     "es2015",

@@ -267,7 +267,7 @@ The returned promise itself will reject with `FLOW_CANCELLED`
 
 Flows support async iterators, that means you can use async generators:
 
-```javscript
+```javascript
 async function* someNumbers() {
     yield Promise.resolve(1)
     yield Promise.resolve(2)
