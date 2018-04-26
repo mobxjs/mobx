@@ -25,7 +25,7 @@ It is advised to use `(@)action` on any function that modifies observables or ha
 
 Using the `@action` decorator with setters (i.e. `@action set propertyName`) is not supported; however, setters of [computed properties are automatically actions](https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/computed-decorator.md#setters-for-computed-values).
 
-Note: using `action` is mandatory when MobX is configured to require actions to make state changes, see [`useStrict`](https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/api.md#configure).
+Note: using `action` is mandatory when MobX is configured to require actions to make state changes, see [`enforceActions`](https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/api.md#configure).
 
 ## When to use actions?
 
