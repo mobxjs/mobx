@@ -221,6 +221,38 @@ test("toJS handles dates", () => {
     expect(a.d === b.d).toBe(true)
 })
 
+test("toJS objectKeysFn", () => {
+    var a = observable({
+        a: 1,
+        get b() {
+            return this.a + 1
+        },
+        c() {}
+    })
+
+    var b = mobx.toJS(a)
+    expect(b.a).toEqual(1)
+    expect(b.b).toBe(undefined)
+    expect(b.c).toBe(a.c)
+
+    var c = mobx.toJS(a, {
+        objectKeysFn(obj) {
+            return Object.getOwnPropertyNames(obj).filter(key => {
+                if (typeof obj[key] === "function") {
+                    return false
+                }
+
+                const descriptor = Object.getOwnPropertyDescriptor(obj, key)
+
+                return descriptor.enumerable || mobx.isComputedProp(obj, key)
+            })
+        }
+    })
+    expect(c.a).toEqual(1)
+    expect(c.b).toBe(2)
+    expect(c.c).toBe(undefined)
+})
+
 test("json cycles", function() {
     var a = observable({
         b: 1,
