@@ -511,6 +511,7 @@ test("using deep map", () => {
     expect(observed).toBe(2)
 
     store.map_deep.get("shoes")[0].color = "red"
+
     expect(observed).toBe(3)
 })
 
@@ -680,4 +681,54 @@ test("toStringTag", () => {
     const x = mobx.observable.map({ x: 1, y: 2 })
     expect(x[Symbol.toStringTag]).toBe("Map")
     expect(Object.prototype.toString.call(x)).toBe("[object Map]")
+})
+
+describe("extending", function() {
+    // this method of adding computed properties works fine
+    const fromFactory = map({ x: 3, y: 2 })
+    fromFactory.callCount = 0
+    Object.defineProperty(fromFactory, "mult", {
+        get() {
+            this.callCount += 1
+            return (this.get("x") || 0) * (this.get("y") || 0)
+        }
+    })
+    mobx.decorate(fromFactory, {
+        multiplied: mobx.computed
+    })
+
+    // but inheriting does not
+    class MyMap extends mobx.ObservableMap {
+        callCount = 0
+        @mobx.computed
+        get mult() {
+            this.callCount += 1
+            return (this.get("x") || 0) * (this.get("y") || 0)
+        }
+    }
+    const fromClass = new MyMap({ x: 3, y: 2 })
+
+    const tests = { fromFactory, fromClass }
+
+    Object.keys(tests).forEach(test => {
+        it(`map ${test}`, function() {
+            const map = tests[test]
+
+            expect(map.mult).toEqual(6)
+
+            const results = []
+            mobx.autorun(() => {
+                results.push(map.mult)
+            })
+            expect(results).toEqual([6])
+
+            expect(map.callCount).toEqual(2)
+            map.set("y", 3)
+            expect(results).toEqual([6, 9])
+            expect(map.callCount).toEqual(3)
+            map.set("unrelated", 3)
+            expect(results).toEqual([6, 9])
+            expect(map.callCount).toEqual(3)
+        })
+    })
 })

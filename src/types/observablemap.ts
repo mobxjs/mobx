@@ -1,5 +1,6 @@
 import { IEnhancer, deepEnhancer } from "./modifiers"
 import { untracked } from "../core/derivation"
+import { asObservableObject } from "./observableobject"
 import { IObservableArray, ObservableArray } from "./observablearray"
 import { ObservableValue, UNCHANGED } from "./observablevalue"
 import {
@@ -70,6 +71,8 @@ export type IObservableMapInitialValues<K = any, V = any> =
 
 export class ObservableMap<K = any, V = any>
     implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable {
+    // removing this "fixes" the inheritance,
+    // however it breaks the deep observable spec
     $mobx = ObservableMapMarker
     private _data: Map<K, ObservableValue<V>>
     private _hasMap: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
@@ -97,7 +100,11 @@ export class ObservableMap<K = any, V = any>
         }
         this._data = new Map()
         this._hasMap = new Map()
+
         this.merge(initialData)
+        // i also attempted to make map observable as objects are
+        // this brok quite a few specs
+        // asObservableObject(this, name, enhancer)
     }
 
     private _has(key: K): boolean {

@@ -241,6 +241,7 @@ export function asObservableObject(
 
     adm = new ObservableObjectAdministration(target, name, defaultEnhancer)
     addHiddenFinalProp(target, "$mobx", adm)
+    //console.log(target.$mobx)
     return adm
 }
 
