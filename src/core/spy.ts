@@ -26,7 +26,6 @@ export function spyReportEnd(change?) {
 export function spy(listener: (change: any) => void): Lambda {
     globalState.spyListeners.push(listener)
     return once(() => {
-        globalState.spyListeners = globalState.spyListeners
-          .filter(l => l !== listener)
+        globalState.spyListeners = globalState.spyListeners.filter(l => l !== listener)
     })
 }
