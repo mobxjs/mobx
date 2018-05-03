@@ -1642,3 +1642,11 @@ test("toJS bug #1413 (TS)", () => {
     expect(res).toEqual({ test1: 1 })
     expect(res.__mobxDidRunLazyInitializers).toBe(undefined)
 })
+
+test("verify #1528", () => {
+    const appState = mobx.observable({
+        timer: 0
+    })
+
+    expect(appState.timer).toBe(0)
+})
