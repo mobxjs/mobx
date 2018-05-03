@@ -74,7 +74,7 @@ export function createPropDecorator(
             descriptor: BabelDescriptor | undefined,
             applyImmediately?: any
             // This is a special parameter to signal the direct application of a decorator, allow extendObservable to skip the entire type decoration part,
-            // as the instance to apply the deorator to equals the target
+            // as the instance to apply the decorator to equals the target
         ) {
             if (applyImmediately === true) {
                 propertyCreator(target, prop, descriptor, target, decoratorArguments)
