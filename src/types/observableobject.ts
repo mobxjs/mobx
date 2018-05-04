@@ -182,7 +182,7 @@ export class ObservableObjectAdministration
          *
          * When using decorate, the property will always be redeclared as own property on the actual instance
          */
-        return fail(
+        console.warn(
             `Property '${propName}' of '${owner}' was accessed through the prototype chain. Use 'decorate' instead to declare the prop or access it statically through it's owner`
         )
     }
