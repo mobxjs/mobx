@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="4.2" data-basepath=".." data-revision="Mon Apr 16 2018 21:04:48 GMT+0200 (CEST)">
+    <div class="book" data-level="4.2" data-basepath=".." data-revision="Fri May 04 2018 14:11:05 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -888,11 +888,9 @@ numbers.push(<span class="hljs-number">5</span>);
 <span class="hljs-comment">// won&apos;t print anything, nor is `sum` re-evaluated</span>
 </code></pre>
 <h2 id="options"><a name="options" class="plugin-anchor" href="#options"><span class="fa fa-link"></span></a>Options</h2>
-<p>Reaction accepts as third argument an options object with the following optional options:</p>
+<p>Autorun accepts as the second argument an options object with the following optional options:</p>
 <ul>
-<li><code>fireImmediately</code>: Boolean that indicates that the effect function should immediately be triggered after the first run of the data function. <code>false</code> by default. If a boolean is passed as third argument to <code>reaction</code>, it will be interpreted as the <code>fireImmediately</code> option.</li>
 <li><code>delay</code>: Number in milliseconds that can be used to debounce the effect function. If zero (the default), no debouncing will happen.</li>
-<li><code>equals</code>: <code>comparer.default</code> by default. If specified, this comparer function will be used to compare the previous and next values produced by the <em>data</em> function. The <em>effect</em> function will only be invoked if this function returns true. If specified, this will override <code>compareStructural</code>.</li>
 <li><code>name</code>: String that is used as name for this reaction in for example <a href="spy.html"><code>spy</code></a> events.</li>
 <li><code>onError</code>: function that will handle the errors of this reaction, rather then propagating them.</li>
 <li><code>scheduler</code>: Set a custom scheduler to determine how re-running the autorun function should be scheduled</li>

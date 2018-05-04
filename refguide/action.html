@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="5.1" data-basepath=".." data-revision="Mon Apr 16 2018 21:04:48 GMT+0200 (CEST)">
+    <div class="book" data-level="5.1" data-basepath=".." data-revision="Fri May 04 2018 14:11:05 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -885,7 +885,7 @@ This makes sure intermediate or incomplete values produced during an action are 
 <p>It is advised to use <code>(@)action</code> on any function that modifies observables or has side effects.
 <code>action</code> also provides useful debugging information in combination with the devtools.</p>
 <p>Using the <code>@action</code> decorator with setters (i.e. <code>@action set propertyName</code>) is not supported; however, setters of <a href="https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/computed-decorator.md#setters-for-computed-values" target="_blank">computed properties are automatically actions</a>.</p>
-<p>Note: using <code>action</code> is mandatory when MobX is configured to require actions to make state changes, see <a href="https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/api.md#configure" target="_blank"><code>useStrict</code></a>.</p>
+<p>Note: using <code>action</code> is mandatory when MobX is configured to require actions to make state changes, see <a href="https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/api.md#configure" target="_blank"><code>enforceActions</code></a>.</p>
 <h2 id="when-to-use-actions"><a name="when-to-use-actions" class="plugin-anchor" href="#when-to-use-actions"><span class="fa fa-link"></span></a>When to use actions?</h2>
 <p>Actions should only, and always, be used on functions that <em>modify</em> state.
 Functions that just perform look-ups, filters etc should <em>not</em> be marked as actions; to allow MobX to track their invocations.</p>

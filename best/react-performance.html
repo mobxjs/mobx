@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="8.6" data-basepath=".." data-revision="Mon Apr 16 2018 21:04:48 GMT+0200 (CEST)">
+    <div class="book" data-level="8.6" data-basepath=".." data-revision="Fri May 04 2018 14:11:05 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -925,25 +925,26 @@ If this happens deeper in your component tree, less components have to re-render
 <p>This is a valid option, but may become tedious if you have lots of data of different shape. An alternative is using a function that returns the data that you want your <code>*Displayer</code> to render:</p>
 <p><code>const GenericNameDisplayer = observer((props) =&gt; &lt;DisplayName name={props.getNameTracked()} /&gt;)</code></p>
 <p>Then, you may use the component like this:</p>
-<pre><code>render() {
-  const { person, car } = this.props;
-  return (
-    &lt;&gt;
-      &lt;GenericNameDisplayer getNameTracked={() =&gt; person.name} /&gt;
-      &lt;GenericNameDisplayer getNameTracked={car.getModelTracked} /&gt;
-      &lt;GenericNameDisplayer getNameTracked={this.getManufacturerNameTracked} /&gt;
-    &lt;/&gt;
-  );
+<pre><code class="lang-javascript">render() {
+  <span class="hljs-keyword">const</span> { person, car } = <span class="hljs-keyword">this</span>.props;
+  <span class="hljs-keyword">return</span> (
+    <span class="xml"><span class="hljs-tag">&lt;&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-title">GenericNameDisplayer</span> <span class="hljs-attribute">getNameTracked</span>=<span class="hljs-value">{()</span> =&gt;</span> person.name} /&gt;
+      <span class="hljs-tag">&lt;<span class="hljs-title">GenericNameDisplayer</span> <span class="hljs-attribute">getNameTracked</span>=<span class="hljs-value">{car.getModelTracked}</span> /&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-title">GenericNameDisplayer</span> <span class="hljs-attribute">getNameTracked</span>=<span class="hljs-value">{this.getManufacturerNameTracked}</span> /&gt;</span>
+    <span class="hljs-tag">&lt;/&gt;</span>
+  )</span>;
 }
 
-getManufacturerNameTracked = () =&gt; this.props.car.manufacturer.name;
+getManufacturerNameTracked = () =&gt; <span class="hljs-keyword">this</span>.props.car.manufacturer.name;
 
 ...
-class Car {
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Car</span> </span>{
   @observable model
-  getModelTracked = () =&gt; this.model
+  getModelTracked = () =&gt; <span class="hljs-keyword">this</span>.model
 }
-</code></pre><p>This approach will allow <code>GenericNameDisplayer</code> to be reused throughout your application to render any name. Now, what remains to be solved is the placement of those functions: the sample shows three possibilities - you may create the function directly in the render method (which is not considered a good practice), you may place the function in the component (as with <code>getManufacturerNameTracked</code>), or you may place the function directly on the object that contains the data (as with <code>getModelTracked</code>).</p>
+</code></pre>
+<p>This approach will allow <code>GenericNameDisplayer</code> to be reused throughout your application to render any name. Now, what remains to be solved is the placement of those functions: the sample shows three possibilities - you may create the function directly in the render method (which is not considered a good practice), you may place the function in the component (as with <code>getManufacturerNameTracked</code>), or you may place the function directly on the object that contains the data (as with <code>getModelTracked</code>).</p>
 <h2 id="bind-functions-early"><a name="bind-functions-early" class="plugin-anchor" href="#bind-functions-early"><span class="fa fa-link"></span></a>Bind functions early</h2>
 <p>This tip applies to React in general and libraries using <code>PureRenderMixin</code> especially, try to avoid creating new closures in render methods.</p>
 <p>See also these resources:</p>

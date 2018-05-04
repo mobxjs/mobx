@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="8.3" data-basepath=".." data-revision="Mon Apr 16 2018 21:04:48 GMT+0200 (CEST)">
+    <div class="book" data-level="8.3" data-basepath=".." data-revision="Fri May 04 2018 14:11:05 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -865,12 +865,12 @@
                     
                         <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/decorators.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="how-to-not-use-decorators"><a name="how-to-not-use-decorators" class="plugin-anchor" href="#how-to-not-use-decorators"><span class="fa fa-link"></span></a>How to (not) use decorators</h1>
 <p>Using ES.next decorators in MobX is optional. This section explains how to use them, or how to avoid them.</p>
-<p>Advantages of using decorators:</p>
+<p>Advantages of using decorator syntax:</p>
 <ul>
 <li>Minimizes boilerplate, declarative.</li>
 <li>Easy to use and read. A majority of the MobX users use them.</li>
 </ul>
-<p>Disadvantages of using decorators:</p>
+<p>Disadvantages of using decorator syntax:</p>
 <ul>
 <li>Stage-2 ES.next feature</li>
 <li>Requires a little setup and transpilation, only supported with Babel / Typescript transpilation so far</li>
@@ -881,42 +881,44 @@
 <li>Don&apos;t enable decorator syntax, but leverage the MobX built-in utility <code>decorate</code> to apply decorators to your classes / objects.</li>
 </ol>
 <p>Using decorator syntax:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> { observable, computed, action } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> { observable, computed, action } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
 
-class Timer {
-    @observable start = Date.now();
-    @observable current = <span class="hljs-built_in">Date</span>.now();
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Timer</span> </span>{
+  @observable start = <span class="hljs-built_in">Date</span>.now();
+  @observable current = <span class="hljs-built_in">Date</span>.now();
 
-    @computed get elapsedTime() {
-        <span class="hljs-keyword">return</span> (<span class="hljs-keyword">this</span>.current - <span class="hljs-keyword">this</span>.start) + <span class="hljs-string">&quot;milliseconds&quot;</span>
-    }
+  @computed
+  get elapsedTime() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.current - <span class="hljs-keyword">this</span>.start + <span class="hljs-string">&quot;milliseconds&quot;</span>;
+  }
 
-    @action tick() {
-        <span class="hljs-keyword">this</span>.current = <span class="hljs-built_in">Date</span>.now()
-    }
+  @action
+  tick() {
+    <span class="hljs-keyword">this</span>.current = <span class="hljs-built_in">Date</span>.now();
+  }
 }
 </code></pre>
 <p>Using the <code>decorate</code> utility:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> { observable, computed, action } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> { observable, computed, action } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
 
-class Timer {
-    start = Date.now();
-    current = <span class="hljs-built_in">Date</span>.now();
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Timer</span> </span>{
+  start = <span class="hljs-built_in">Date</span>.now();
+  current = <span class="hljs-built_in">Date</span>.now();
 
-    get elapsedTime() {
-        <span class="hljs-keyword">return</span> (<span class="hljs-keyword">this</span>.current - <span class="hljs-keyword">this</span>.start) + <span class="hljs-string">&quot;milliseconds&quot;</span>
-    }
+  get elapsedTime() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.current - <span class="hljs-keyword">this</span>.start + <span class="hljs-string">&quot;milliseconds&quot;</span>;
+  }
 
-    tick() {
-        <span class="hljs-keyword">this</span>.current = <span class="hljs-built_in">Date</span>.now()
-    }
+  tick() {
+    <span class="hljs-keyword">this</span>.current = <span class="hljs-built_in">Date</span>.now();
+  }
 }
 decorate(Timer, {
-    start: observable,
-    current: observable,
-    elapsedTime: computed,
-    tick: action
-})
+  start: observable,
+  current: observable,
+  elapsedTime: computed,
+  tick: action
+});
 </code></pre>
 <p>Note that the <code>observer</code> function from <code>mobx-react</code> is both a decorator and a function, that means that both all these syntax variants will work:</p>
 <pre><code class="lang-javascript">@observer
@@ -940,26 +942,40 @@ decorate(Timer, {
 <p>A more convenient way to setup Babel for usage with mobx is to use the <a href="https://github.com/zwhitchcox/babel-preset-mobx" target="_blank"><code>mobx</code></a> preset, that incorporates decorators and several other plugins typically used with mobx:</p>
 <pre><code>npm install --save-dev babel-preset-mobx
 </code></pre><p>.babelrc:</p>
-<pre><code>{
-  &quot;presets&quot;: [&quot;mobx&quot;]
+<pre><code class="lang-json">{
+  <span class="hljs-string">&quot;presets&quot;</span>: [<span class="hljs-string">&quot;mobx&quot;</span>]
 }
-</code></pre><p><strong>Babel: manually enabling decorators</strong></p>
+</code></pre>
+<p><strong>Babel: manually enabling decorators</strong></p>
 <p>To enable support for decorators without using the mobx preset, follow the following steps.
 Install support for decorators: <code>npm i --save-dev babel-plugin-transform-decorators-legacy</code>. And enable it in your <code>.babelrc</code> file:</p>
-<pre><code>{
-  &quot;presets&quot;: [
-    &quot;es2015&quot;,
-    &quot;stage-1&quot;
-  ],
-  &quot;plugins&quot;: [&quot;transform-decorators-legacy&quot;]
+<pre><code class="lang-json">{
+  <span class="hljs-string">&quot;presets&quot;</span>: [<span class="hljs-string">&quot;es2015&quot;</span>, <span class="hljs-string">&quot;stage-1&quot;</span>],
+  <span class="hljs-string">&quot;plugins&quot;</span>: [<span class="hljs-string">&quot;transform-decorators-legacy&quot;</span>]
 }
-</code></pre><p>Note that the order of plugins is important: <code>transform-decorators-legacy</code> should be listed <em>first</em>.
+</code></pre>
+<p>Note that the order of plugins is important: <code>transform-decorators-legacy</code> should be listed <em>first</em>.
 Having issues with the babel setup? Check this <a href="https://github.com/mobxjs/mobx/issues/105" target="_blank">issue</a> first.</p>
 <p>For babel 7, see <a href="https://github.com/mobxjs/mobx/issues/1352" target="_blank">issue 1352</a> for an example setup.</p>
 <h2 id="decorator-syntax-and-create-react-app"><a name="decorator-syntax-and-create-react-app" class="plugin-anchor" href="#decorator-syntax-and-create-react-app"><span class="fa fa-link"></span></a>Decorator syntax and Create React App</h2>
 <ul>
 <li>decorators are not supported out of the box in <code>create-react-app</code>. To fix this, you can either eject, or use <a href="https://github.com/timarney/react-app-rewired/tree/master/packages/react-app-rewire-mobx" target="_blank">react-app-rewired</a>.</li>
 </ul>
+<hr>
+<h2 id="disclamer-limitations-of-decorator-syntax"><a name="disclamer-limitations-of-decorator-syntax" class="plugin-anchor" href="#disclamer-limitations-of-decorator-syntax"><span class="fa fa-link"></span></a>Disclamer: Limitations of decorator syntax:</h2>
+<p><em>The current transpiler implementations of decorator syntax are quite limited and don&apos;t behave exactly the same.
+Also, many compositional patterns are currently not possible with decorators, until the stage-2 proposal has been implemented by all transpilers.
+For this reason the scope of decorator syntax support in MobX is currently scoped to make sure that the supported features
+behave consistently accross all environments</em></p>
+<p>The following patterns are not officially supported by the MobX community:</p>
+<ul>
+<li>Redefining decorated class members in inheritance trees</li>
+<li>Decorating static class members</li>
+<li>Combining decorators provided by MobX with other decorators</li>
+<li>Hot module reloading (HMR) / React-hot-loader might not work as expected</li>
+</ul>
+<p>Decorated properties might not be visible yet on class instances as <em>own</em> property until the first read / write to that property occurred.</p>
+<p>(N.B.: not supported doesn&apos;t mean it doesn&apos;t work, it means that if it doesn&apos;t work, reported issues will not be processed until the official spec has been moved forward)</p>
 </body></html>
                     
                     </section>

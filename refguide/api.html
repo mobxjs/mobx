@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="2" data-basepath=".." data-revision="Mon Apr 16 2018 21:04:48 GMT+0200 (CEST)">
+    <div class="book" data-level="2" data-basepath=".." data-revision="Fri May 04 2018 14:11:05 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -1071,21 +1071,21 @@ configure({enforceActions: <span class="hljs-literal">true</span>});
 The returned promise itself will reject with <code>FLOW_CANCELLED</code></p>
 <p><strong>Flows support async iterators</strong></p>
 <p>Flows support async iterators, that means you can use async generators:</p>
-<pre><code class="lang-javscript">async function* someNumbers() {
-    yield Promise.resolve(1)
-    yield Promise.resolve(2)
-    yield Promise.resolve(3)
+<pre><code class="lang-javascript"><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>* <span class="hljs-title">someNumbers</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">yield</span> <span class="hljs-built_in">Promise</span>.resolve(<span class="hljs-number">1</span>)
+    <span class="hljs-keyword">yield</span> <span class="hljs-built_in">Promise</span>.resolve(<span class="hljs-number">2</span>)
+    <span class="hljs-keyword">yield</span> <span class="hljs-built_in">Promise</span>.resolve(<span class="hljs-number">3</span>)
 }
 
-const count = mobx.flow(async function*() {
-    // use for await to loop async iterators
-    for await (const number of someNumbers()) {
+<span class="hljs-keyword">const</span> count = mobx.flow(<span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>*(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-comment">// use for await to loop async iterators</span>
+    <span class="hljs-keyword">for</span> <span class="hljs-keyword">await</span> (<span class="hljs-keyword">const</span> number <span class="hljs-keyword">of</span> someNumbers()) {
         total += number
     }
-    return total
+    <span class="hljs-keyword">return</span> total
 })
 
-const res = await count() // 6
+<span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> count() <span class="hljs-comment">// 6</span>
 </code></pre>
 <h2 id="reactions-derivations"><a name="reactions-derivations" class="plugin-anchor" href="#reactions-derivations"><span class="fa fa-link"></span></a>Reactions &amp; Derivations</h2>
 <p><em>Computed values</em> are <strong>values</strong> that react automatically to state changes.

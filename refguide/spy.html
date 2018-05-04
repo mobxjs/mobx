@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="8.8" data-basepath=".." data-revision="Mon Apr 16 2018 21:04:48 GMT+0200 (CEST)">
+    <div class="book" data-level="8.8" data-basepath=".." data-revision="Fri May 04 2018 14:11:05 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -869,12 +869,13 @@ Registers a global spy listener that listens to all events that happen in MobX.
 It is similar to attaching an <code>observe</code> listener to <em>all</em> observables at once, but also notifies about running (trans/re)actions and computations.
 Used for example by the <code>mobx-react-devtools</code>.</p>
 <p>Example usage of spying all actions:</p>
-<pre><code>spy((event) =&gt; {
-    if (event.type === &apos;action&apos;) {
-        console.log(`${event.name} with args: ${event.arguments}`)
+<pre><code class="lang-javascript">spy((event) =&gt; {
+    <span class="hljs-keyword">if</span> (event.type === <span class="hljs-string">&apos;action&apos;</span>) {
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`<span class="hljs-subst">${event.name}</span> with args: <span class="hljs-subst">${event.arguments}</span>`</span>)
     }
 })
-</code></pre><p>Spy listeners always receive one object, which usually has at least a <code>type</code> field. The following events are emitted by default by spy.</p>
+</code></pre>
+<p>Spy listeners always receive one object, which usually has at least a <code>type</code> field. The following events are emitted by default by spy.</p>
 <table>
 <thead>
 <tr>
