@@ -1,3 +1,12 @@
+# 4.2.1
+
+* Fixed flow typings for `mobx.configure` [#1521](https://github.com/mobxjs/mobx/pull/1521) by @andrew--r
+* Improved typings for `mobx.flow`, fixes [#1527](https://github.com/mobxjs/mobx/issues/1527)
+* Throw error when using `@observable` in combination with a getter. [#1511](https://github.com/mobxjs/mobx/pull/1511) by @quanganhtran
+* `toJS` now uses Map internally, for faster detection of cycles. [#1517](https://github.com/mobxjs/mobx/pull/1517) by @loatheb
+* Fixed [#1512](https://github.com/mobxjs/mobx/issues/1512): `observe` hooks not being triggered when using `mobx.set`, Fixed in [#1514](https://github.com/mobxjs/mobx/pull/1514) by @quanganhtran
+* Several minor improvements, additional tests and doc improvements.
+
 # 4.2.0
 
 * Introduced `configure({ enforceActions: "strict" })`, which is more strict then `enforceActions: true`, as it will also throw on non-observed changes to observables. See also [#1473](https://github.com/mobxjs/mobx/issues/1473)
