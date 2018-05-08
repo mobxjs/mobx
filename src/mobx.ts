@@ -97,7 +97,7 @@ export { autorun, reaction, IReactionOptions } from "./api/autorun"
 export { when, IWhenOptions } from "./api/when"
 
 export { action, isAction, runInAction, IActionFactory } from "./api/action"
-export { keys, values, set, remove, has, get } from "./api/object-api"
+export { keys, values, entries, set, remove, has, get } from "./api/object-api"
 export { decorate } from "./api/decorate"
 export { configure } from "./api/configure"
 export { onBecomeObserved, onBecomeUnobserved } from "./api/become-observed"
