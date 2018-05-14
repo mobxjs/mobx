@@ -26,7 +26,8 @@ import { IEnhancer, referenceEnhancer, deepEnhancer } from "./modifiers"
 import { createObservableArray } from "./observablearray"
 import { initializeInstance } from "../utils/decorators2"
 import { startBatch, endBatch } from "../core/observable"
-import { IIsObservableObject } from "./observableobject"
+import { IIsObservableObject, asObservableObject } from "./observableobject"
+import { get, set, remove, keys, has } from "../api/object-api"
 
 // TODO: dedupe
 
@@ -288,48 +289,43 @@ export class DynamicObservableObjectAdministration
 
 const objectProxyTraps: ProxyHandler<any> = {
     get(target: IIsObservableObject, name: string) {
-        if (name === "$mobx") return target.$mobx
         // TODO: use symbol for  "__mobxDidRunLazyInitializers" and "$mobx", and remove these checks
-        if (
-            typeof name === "string" &&
-            name !== "constructor" &&
-            name !== "__mobxDidRunLazyInitializers"
-        )
-            return target.$mobx.read(target, name)
-        return target[name]
+        if (name === "$mobx" || name === "constructor" || name === "__mobxDidRunLazyInitializers")
+            return target[name]
+        if (!has(target, name)) return undefined
+        return get(target, name)
+        // if (
+        //     typeof name === "string" &&
+        //     name !== "constructor" &&
+        //     name !== "__mobxDidRunLazyInitializers"
+        // )
+        //     return target.$mobx.read(target, name)
+        // return target[name]
     },
     set(target: IIsObservableObject, name: string, value: any) {
-        const adm = target.$mobx
-        if (typeof name === "string" && name !== "constructor" && name !== "$mobx") {
-            adm.write(target, name, value)
-            return true
-        }
-        return fail(`Cannot reassign ${name}`)
+        set(target, name, value)
+        return true
+        // const adm = target.$mobx
+        // if (typeof name === "string" && name !== "constructor" && name !== "$mobx") {
+        //     adm.write(target, name, value)
+        //     return true
+        // }
+        // return fail(`Cannot reassign ${name}`)
     },
     deleteProperty(target: IIsObservableObject, name: string) {
-        const adm = target.$mobx
-        if (name === "$mobx") return fail(`Cannot reassign $mobx`)
-        adm.remove(name)
+        remove(target, name)
+        // const adm = target.$mobx
+        // if (name === "$mobx") return fail(`Cannot reassign $mobx`)
+        // adm.remove(name)
         return true
     },
     ownKeys(target: IIsObservableObject) {
-        const adm = target.$mobx
-        return adm.getKeys()
+        return keys(target)
+        // const adm = target.$mobx
+        // return adm.getKeys()
     }
 }
 
-export function createDynamicObservableObject(
-    name,
-    defaultEnhancer: IEnhancer<any> = deepEnhancer
-) {
-    const values = {}
-    const proxy = new Proxy(values, objectProxyTraps)
-    const adm = new DynamicObservableObjectAdministration(
-        proxy,
-        values,
-        name || "ObservableObject@" + getNextId(),
-        defaultEnhancer
-    )
-    addHiddenFinalProp(values, "$mobx", adm)
-    return proxy
+export function createDynamicObservableObject(base) {
+    return new Proxy(base, objectProxyTraps)
 }

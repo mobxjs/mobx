@@ -194,12 +194,14 @@ const observableFactories: IObservableFactories = {
         // TODO: should create dynamic observable object
         // TODO: should forbid deleting decorated members (so that behavior remains sticky)
         if (typeof arguments[1] === "string") incorrectlyUsedAsDecorator("object")
-        options = asCreateObservableOptions(options)
-        // TODO: duplicated with extendObservable, create function
-        const defaultDecorator =
-            options.defaultDecorator || (options.deep === false ? refDecorator : deepDecorator)
-        const res = createDynamicObservableObject(options.name, defaultDecorator.enhancer)
-        return extendObservable(res, props, decorators, options) as any
+        const o = asCreateObservableOptions(options)
+        const base = extendObservable({}, props, decorators, o) as any
+        // // TODO: duplicated with extendObservable, create function
+        // const defaultDecorator =
+        //     options.defaultDecorator || (options.deep === false ? refDecorator : deepDecorator)
+        // const res = createDynamicObservableObject(props, options.name, defaultDecorator.enhancer)
+        // return extendObservable(res, props, decorators, options) as any
+        return createDynamicObservableObject(base)
     },
     shallowObject<T>(props: T, name?: string): T & IObservableObject {
         if (typeof arguments[1] === "string") incorrectlyUsedAsDecorator("shallowObject")

@@ -409,7 +409,7 @@ test("observe property", function() {
     expect(mb).toEqual([undefined, 15])
 })
 
-test("observe object", function() {
+test.only("observe object", function() {
     var events = []
     var a = observable({
         a: 1,
