@@ -9,6 +9,7 @@
   "react-native": "lib/mobx.module.js",
   "typings": "lib/mobx.d.ts",
   "scripts": {
+    "test": "yarn jest",
     "watch": "yarn jest --watch",
     "test:mixed-versions": "jest --testRegex mixed-versions",
     "test:all": "yarn small-build && yarn jest -i && yarn test:flow && yarn test:mixed-versions",
@@ -72,8 +73,7 @@
     "typescript": "^2.1.4",
     "uglify-js": "^2.6.1"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "keywords": [
     "mobx",
     "mobservable",

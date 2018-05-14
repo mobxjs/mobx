@@ -288,7 +288,7 @@ test("computed setter should succeed", () => {
 
 test("atom clock example", done => {
     let ticks = 0
-    const time_factor = 50 // speed up / slow down tests
+    const time_factor = process.env.CI === "true" ? 300 : 100 // speed up / slow down tests
 
     class Clock {
         atom: IAtom
@@ -826,7 +826,7 @@ test("enumerability", () => {
 
     t.equal("a" in a, true)
     t.equal(a.hasOwnProperty("a"), true)
-    t.equal(a.hasOwnProperty("b"), false)
+    t.equal(a.hasOwnProperty("b"), true) // better, false, but, see: #1398
     t.equal(a.hasOwnProperty("m"), false)
     t.equal(a.hasOwnProperty("m2"), true)
 
@@ -849,12 +849,12 @@ test("enumerability", () => {
 
     t.equal("a" in a, true)
     t.equal(a.hasOwnProperty("a"), true)
-    t.equal(a.hasOwnProperty("b"), false)
+    t.equal(a.hasOwnProperty("b"), true) // better, false, but, see: #1398
     t.equal(a.hasOwnProperty("m"), false)
     t.equal(a.hasOwnProperty("m2"), true)
 })
 
-test("issue 285 (babel)", () => {
+test("issue 285 (typescript)", () => {
     const { observable, toJS } = mobx
 
     class Todo {
@@ -1487,7 +1487,8 @@ test("multiple inheritance should work", () => {
     expect(mobx.keys(new B())).toEqual(["x", "y"])
 })
 
-test("actions are not reassignable", () => {
+test("actions are reassignable", () => {
+    // See #1398, make actions reassignable to support stubbing
     class A {
         @action
         m1() {}
@@ -1502,21 +1503,15 @@ test("actions are not reassignable", () => {
     expect(isAction(a.m2)).toBe(true)
     expect(isAction(a.m3)).toBe(true)
     expect(isAction(a.m4)).toBe(true)
-    // expect(() => {
-    //     a.m1 = () => {}
-    // }).toThrow(/Cannot assign to read only property 'm1'/)
     a.m1 = () => {}
-    // we cannot prevent actions to be reassignable in TS, as it will kill overriding the action in subtypes :'(
     expect(isAction(a.m1)).toBe(false)
     expect(() => {
-        a.m2 = () => {}
+        a.m2 = () => {} // cause it is a getter prop
     }).toThrow(/Cannot assign to read only property 'm2'/)
-    expect(() => {
-        a.m3 = () => {}
-    }).toThrow(/Cannot assign to read only property 'm3'/)
-    expect(() => {
-        a.m4 = () => {}
-    }).toThrow(/Cannot assign to read only property 'm4'/)
+    a.m3 = () => {}
+    expect(isAction(a.m3)).toBe(false)
+    a.m4 = () => {}
+    expect(isAction(a.m4)).toBe(false)
 })
 
 test("map should structurally match ES6 Map", () => {
@@ -1548,7 +1543,6 @@ test("promised when can be cancelled", async () => {
     const x = mobx.observable.box(1)
 
     try {
-        debugger
         const p = mobx.when(() => x.get() === 3)
         setTimeout(() => p.cancel(), 100)
         await p
@@ -1558,24 +1552,101 @@ test("promised when can be cancelled", async () => {
     }
 })
 
-test("it should support asyncAction as decorator (babel)", async () => {
+test("it should support asyncAction as decorator (ts)", async () => {
     const values = []
 
     mobx.configure({ enforceActions: true })
 
     class X {
-        @observable a = 1;
+        @observable a = 1
 
-        @mobx.flow
-        *f(initial: number): any {
+        f = mobx.flow(function* f(initial: number): any {
             this.a = initial // this runs in action
             this.a += yield Promise.resolve(5)
             this.a = this.a * 2
             return this.a
-        }
+        })
     }
 
     const x = new X()
 
     expect(await x.f(3)).toBe(16)
+})
+
+test("flow support async generators", async () => {
+    ;(Symbol as any).asyncIterator =
+        (Symbol as any).asyncIterator || Symbol.for("Symbol.asyncIterator")
+
+    async function* someNumbers() {
+        await Promise.resolve()
+        yield 1
+        await Promise.resolve()
+        yield 2
+        await Promise.resolve()
+        yield 3
+    }
+
+    let steps = 0
+    const start = mobx.flow(async function*() {
+        let total = 0
+        for await (const number of someNumbers()) {
+            total += number
+        }
+        return total
+    })
+
+    const p = start()
+    const res = await p
+    expect(res).toBe(6)
+})
+
+test("flow support throwing async generators", async () => {
+    ;(Symbol as any).asyncIterator =
+        (Symbol as any).asyncIterator || Symbol.for("Symbol.asyncIterator")
+
+    async function* someNumbers() {
+        await Promise.resolve()
+        yield 1
+        await Promise.resolve()
+        throw "OOPS"
+    }
+
+    let steps = 0
+    const start = mobx.flow(async function*() {
+        let total = 0
+        for await (const number of someNumbers()) {
+            total += number
+        }
+        return total
+    })
+
+    const p = start()
+    try {
+        await p
+        fail()
+    } catch (e) {
+        expect("" + e).toBe("OOPS")
+    }
+})
+
+test("toJS bug #1413 (TS)", () => {
+    class X {
+        @observable
+        test = {
+            test1: 1
+        }
+    }
+
+    const x = new X()
+    const res = mobx.toJS(x.test) as any
+    expect(res).toEqual({ test1: 1 })
+    expect(res.__mobxDidRunLazyInitializers).toBe(undefined)
+})
+
+test("verify #1528", () => {
+    const appState = mobx.observable({
+        timer: 0
+    })
+
+    expect(appState.timer).toBe(0)
 })

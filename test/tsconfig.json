@@ -2,9 +2,11 @@
     "compilerOptions": {
         "module": "commonjs",
         "target": "es5",
+        "lib": ["esnext"],
         "noImplicitAny": true,
         "sourceMap": false,
         "experimentalDecorators": true,
-        "strict":true
+        "strict":true,
+        "downlevelIteration": true
     }
 }

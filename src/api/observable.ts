@@ -3,7 +3,6 @@ import {
     deepEnhancer,
     referenceEnhancer,
     shallowEnhancer,
-    deepStructEnhancer,
     refStructEnhancer,
     IEnhancer
 } from "../types/modifiers"
@@ -61,7 +60,6 @@ function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any
 export const deepDecorator = createDecoratorForEnhancer(deepEnhancer)
 const shallowDecorator = createDecoratorForEnhancer(shallowEnhancer)
 export const refDecorator = createDecoratorForEnhancer(referenceEnhancer)
-const deepStructDecorator = createDecoratorForEnhancer(deepStructEnhancer)
 const refStructDecorator = createDecoratorForEnhancer(refStructEnhancer)
 
 /**
@@ -78,11 +76,9 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
     if (isObservable(v)) return v
 
     // something that can be converted and mutated?
-    const res = Array.isArray(v)
-        ? observable.array(v, arg2)
-        : isES6Map(v)
-          ? observable.map(v, arg2)
-          : isPlainObject(v) ? observable.object(v, arg2, arg3) : v
+    const res = isPlainObject(v)
+        ? observable.object(v, arg2, arg3)
+        : Array.isArray(v) ? observable.array(v, arg2) : isES6Map(v) ? observable.map(v, arg2) : v
 
     // this value could be converted to a new observable data structure, return it
     if (res !== v) return res
@@ -97,9 +93,9 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
 export interface IObservableFactory {
     // observable overloads
     (value: number | string | null | undefined | boolean): never // Nope, not supported, use box
-    (target: Object, key: string, baseDescriptor?: PropertyDescriptor): any // decorator
-    <T>(value: T[], options?: CreateObservableOptions): IObservableArray<T>
-    <K, V>(value: Map<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>
+    (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): any // decorator
+    <T = any>(value: T[], options?: CreateObservableOptions): IObservableArray<T>
+    <K = any, V = any>(value: Map<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>
     <T extends Object>(
         value: T,
         decorators?: { [K in keyof T]?: Function },
@@ -108,24 +104,27 @@ export interface IObservableFactory {
 }
 
 export interface IObservableFactories {
-    box<T>(value?: T, options?: CreateObservableOptions): IObservableValue<T>
-    shallowBox<T>(value?: T, options?: CreateObservableOptions): IObservableValue<T>
-    array<T>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T>
-    shallowArray<T>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T>
-    map<K, V>(
+    box<T = any>(value?: T, options?: CreateObservableOptions): IObservableValue<T>
+    shallowBox<T = any>(value?: T, options?: CreateObservableOptions): IObservableValue<T>
+    array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T>
+    shallowArray<T = any>(
+        initialValues?: T[],
+        options?: CreateObservableOptions
+    ): IObservableArray<T>
+    map<K = any, V = any>(
         initialValues?: IObservableMapInitialValues<K, V>,
         options?: CreateObservableOptions
     ): ObservableMap<K, V>
-    shallowMap<K, V>(
+    shallowMap<K = any, V = any>(
         initialValues?: IObservableMapInitialValues<K, V>,
         options?: CreateObservableOptions
     ): ObservableMap<K, V>
-    object<T>(
+    object<T = any>(
         props: T,
         decorators?: { [K in keyof T]?: Function },
         options?: CreateObservableOptions
     ): T & IObservableObject
-    shallowObject<T>(
+    shallowObject<T = any>(
         props: T,
         decorators?: { [K in keyof T]?: Function },
         options?: CreateObservableOptions
@@ -144,29 +143,29 @@ export interface IObservableFactories {
 }
 
 const observableFactories: IObservableFactories = {
-    box<T>(value?: T, options?: CreateObservableOptions): IObservableValue<T> {
+    box<T = any>(value?: T, options?: CreateObservableOptions): IObservableValue<T> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("box")
         const o = asCreateObservableOptions(options)
         return new ObservableValue(value, getEnhancerFromOptions(o), o.name)
     },
     // TODO: kill these shallow and other deprecated stuff
-    shallowBox<T>(value?: T, name?: string): IObservableValue<T> {
+    shallowBox<T = any>(value?: T, name?: string): IObservableValue<T> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowBox")
         deprecated(`observable.shallowBox`, `observable.box(value, { deep: false })`)
         return observable.box(value, { name, deep: false })
     },
-    array<T>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T> {
+    array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T> {
         // TODO: invariant, not already observable (also for the other apis)
         if (arguments.length > 2) incorrectlyUsedAsDecorator("array")
         const o = asCreateObservableOptions(options)
         return createObservableArray(initialValues, getEnhancerFromOptions(o), o.name) as any
     },
-    shallowArray<T>(initialValues?: T[], name?: string): IObservableArray<T> {
+    shallowArray<T = any>(initialValues?: T[], name?: string): IObservableArray<T> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowArray")
         deprecated(`observable.shallowArray`, `observable.array(values, { deep: false })`)
         return observable.array(initialValues, { name, deep: false })
     },
-    map<K, V>(
+    map<K = any, V = any>(
         initialValues?: IObservableMapInitialValues<K, V>,
         options?: CreateObservableOptions
     ): ObservableMap<K, V> {
@@ -174,7 +173,7 @@ const observableFactories: IObservableFactories = {
         const o = asCreateObservableOptions(options)
         return new ObservableMap<K, V>(initialValues, getEnhancerFromOptions(o), o.name)
     },
-    shallowMap<K, V>(
+    shallowMap<K = any, V = any>(
         initialValues?: IObservableMapInitialValues<K, V>,
         name?: string
     ): ObservableMap<K, V> {
@@ -186,7 +185,7 @@ const observableFactories: IObservableFactories = {
     // TODO: separate between object and record
     // TODO: record should be frozen
     // only record supports computed props
-    object<T>(
+    object<T = any>(
         props: T,
         decorators?: { [K in keyof T]: Function },
         options?: CreateObservableOptions
@@ -203,7 +202,7 @@ const observableFactories: IObservableFactories = {
         // return extendObservable(res, props, decorators, options) as any
         return createDynamicObservableObject(base)
     },
-    shallowObject<T>(props: T, name?: string): T & IObservableObject {
+    shallowObject<T = any>(props: T, name?: string): T & IObservableObject {
         if (typeof arguments[1] === "string") incorrectlyUsedAsDecorator("shallowObject")
         deprecated(`observable.shallowObject`, `observable.object(values, {}, { deep: false })`)
         return observable.object(props, {}, { name, deep: false })
@@ -211,25 +210,16 @@ const observableFactories: IObservableFactories = {
     ref: refDecorator,
     shallow: shallowDecorator,
     deep: deepDecorator,
-    struct: deepStructDecorator
+    struct: refStructDecorator
 } as any
 
-export const observable: IObservableFactory & {
-    enhancer: IEnhancer<any>
-} & IObservableFactories & {
-        deep: {
-            struct: IObservableDecorator
-        }
-        ref: {
-            struct: IObservableDecorator
-        }
+export const observable: IObservableFactory &
+    IObservableFactories & {
+        enhancer: IEnhancer<any>
     } = createObservable as any
 
 // weird trick to keep our typings nicely with our funcs, and still extend the observable function
 Object.keys(observableFactories).forEach(name => (observable[name] = observableFactories[name]))
-
-observable.deep.struct = observable.struct as any
-observable.ref.struct = refStructDecorator
 
 function incorrectlyUsedAsDecorator(methodName) {
     fail(

@@ -428,3 +428,25 @@ test("can iterate arrays", () => {
     expect(y).toEqual([[], ["a"], ["a", "b"]])
     d()
 })
+
+test("array is concat spreadable, #1395", () => {
+    const x = mobx.observable([1, 2, 3, 4])
+    const y = [5].concat(x)
+    expect(y.length).toBe(2) // Should become 5 in MobX 5
+    expect(y).toEqual([5, x]) // should become [5, 1,2,3,4] in MobX 5
+})
+
+test("array is spreadable, #1395", () => {
+    const x = mobx.observable([1, 2, 3, 4])
+    expect([5, ...x]).toEqual([5, 1, 2, 3, 4])
+
+    const y = mobx.observable([])
+    expect([5, ...y]).toEqual([5])
+})
+
+test("array supports toStringTag, #1490", () => {
+    // N.B. on old environments this requires polyfils for these symbols *and* Object.prototype.toString.
+    // core-js provides both
+    const a = mobx.observable([])
+    expect(Object.prototype.toString.call(a)).toBe("[object Array]")
+})

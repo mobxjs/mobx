@@ -39,6 +39,7 @@ const deprecatedMessages: string[] = []
 export function deprecated(msg: string): boolean
 export function deprecated(thing: string, replacement: string): boolean
 export function deprecated(msg: string, thing?: string): boolean {
+    if (process.env.NODE_ENV === "production") return false
     if (thing) {
         return deprecated(`'${msg}', use '${thing}' instead.`)
     }
@@ -91,7 +92,7 @@ export function makeNonEnumerable(object: any, propNames: string[]) {
     }
 }
 
-export function addHiddenProp(object: any, propName: string, value: any) {
+export function addHiddenProp(object: any, propName: PropertyKey, value: any) {
     Object.defineProperty(object, propName, {
         enumerable: false,
         writable: true,

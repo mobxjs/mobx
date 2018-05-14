@@ -1,5 +1,5 @@
 import { IDerivation } from "./derivation"
-import { invariant } from "../utils/utils"
+import { invariant, fail } from "../utils/utils"
 import { untrackedStart, untrackedEnd } from "./derivation"
 import { startBatch, endBatch } from "./observable"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "./spy"

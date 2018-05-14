@@ -1,14 +1,9 @@
 // @flow
 
-declare export function getAtom(thing: any, property?: string): IDepTreeNode
-declare export function getDebugName(thing: any, property?: string): string
-declare export function getDependencyTree(thing: any, property?: string): IDependencyTree
-declare export function getObserverTree(thing: any, property?: string): IObserverTree
-
 export type IObservableMapInitialValues<K, V> = IMapEntries<K, V> | KeyValueMap<V> | IMap<K, V>
 
 export interface IMobxConfigurationOptions {
-    enforceActions?: boolean,
+    +enforceActions?: boolean | "strict",
     computedRequiresReaction?: boolean,
     isolateGlobalState?: boolean,
     disableErrorBoundaries?: boolean,
@@ -175,18 +170,18 @@ export type KeyValueMap<V> = {
     [key: string]: V
 }
 
-export interface IMapChange<T> {
-    object: ObservableMap<T>,
+export interface IMapChange<K, T> {
+    object: ObservableMap<K, T>,
     type: "update" | "add" | "delete",
-    name: string,
+    name: K,
     newValue?: any,
     oldValue?: any
 }
 
-export interface IMapWillChange<T> {
-    object: ObservableMap<T>,
+export interface IMapWillChange<K, T> {
+    object: ObservableMap<K, T>,
     type: "update" | "add" | "delete",
-    name: string,
+    name: K,
     newValue?: any
 }
 
@@ -238,14 +233,32 @@ export interface IObservableFactory {
     <T: Object>(value: T): T
 }
 
+export type IObservableDecorator = {
+    (target: Object, property: string, descriptor?: PropertyDescriptor): void,
+    enhancer: IEnhancer<any>
+}
+
+export type CreateObservableOptions = {
+    name?: string,
+    deep?: boolean,
+    defaultDecorator?: IObservableDecorator
+}
+
 declare export class IObservableFactories {
-    box<T>(value?: T, name?: string): IObservableValue<T>,
-    array<T>(initialValues?: T[], name?: string): IObservableArray<T>,
-    map<T>(initialValues?: IObservableMapInitialValues<T>, name?: string): ObservableMap<T>,
-    object<T>(props: T, name?: string): T & IObservableObject,
-    ref(target: Object, property?: string, descriptor?: PropertyDescriptor): any,
-    shallow(target: Object, property?: string, descriptor?: PropertyDescriptor): any,
-    deep(target: Object, property?: string, descriptor?: PropertyDescriptor): any
+    box<T>(value?: T, options?: CreateObservableOptions): IObservableValue<T>,
+    array<T>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T>,
+    map<K, V>(
+        initialValues?: IObservableMapInitialValues<K, V>,
+        options?: CreateObservableOptions
+    ): ObservableMap<K, V>,
+    object<T>(props: T, options?: CreateObservableOptions): T & IObservableObject,
+    ref(target: Object, property?: string, descriptor?: PropertyDescriptor): IObservableDecorator,
+    shallow(
+        target: Object,
+        property?: string,
+        descriptor?: PropertyDescriptor
+    ): IObservableDecorator,
+    deep(target: Object, property?: string, descriptor?: PropertyDescriptor): IObservableDecorator
 }
 
 export interface Iterator<T> {
@@ -295,11 +308,17 @@ declare export function action(
 declare export function action<T>(name: string, func: T): T
 declare export function action<T>(func: T): T
 
+declare export function runInAction<T>(name: string, block: () => T): T
 declare export function runInAction<T>(block: () => T): T
 declare export function isAction(thing: any): boolean
 declare export function autorun(
     nameOrFunction: string | ((r: IReactionPublic) => any),
     options?: IAutorunOptions
+): any
+declare export function reaction<T>(
+    expression: (r: IReactionPublic) => T,
+    effect: (arg: T, r: IReactionPublic) => void,
+    opts?: IReactionOptions
 ): any
 
 export interface IWhenOptions {
@@ -475,3 +494,8 @@ declare export function onBecomeUnobserved<K>(
     property: K,
     listener: Lambda
 ): Lambda
+
+declare export function getAtom(thing: any, property?: string): IDepTreeNode
+declare export function getDebugName(thing: any, property?: string): string
+declare export function getDependencyTree(thing: any, property?: string): IDependencyTree
+declare export function getObserverTree(thing: any, property?: string): IObserverTree

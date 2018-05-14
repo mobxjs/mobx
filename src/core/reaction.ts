@@ -9,7 +9,7 @@ import {
 } from "./derivation"
 import { IObservable, startBatch, endBatch } from "./observable"
 import { globalState } from "./globalstate"
-import { createInstanceofPredicate, getNextId, invariant, Lambda } from "../utils/utils"
+import { createInstanceofPredicate, getNextId, Lambda } from "../utils/utils"
 import { isSpyEnabled, spyReport, spyReportStart, spyReportEnd } from "./spy"
 import { trace } from "../api/trace"
 
@@ -40,7 +40,6 @@ export interface IReactionPublic {
 export interface IReactionDisposer {
     (): void
     $mobx: Reaction
-    onError(handler: (error: any, derivation: IDerivation) => void)
 }
 
 export class Reaction implements IDerivation, IReactionPublic {
@@ -56,11 +55,11 @@ export class Reaction implements IDerivation, IReactionPublic {
     _isTrackPending = false
     _isRunning = false
     isTracing: TraceMode = TraceMode.NONE
-    errorHandler: (error: any, derivation: IDerivation) => void
 
     constructor(
         public name: string = "Reaction@" + getNextId(),
-        private onInvalidate: () => void
+        private onInvalidate: () => void,
+        private errorHandler?: (error: any, derivation: IDerivation) => void
     ) {}
 
     onBecomeStale() {
@@ -89,13 +88,17 @@ export class Reaction implements IDerivation, IReactionPublic {
             if (shouldCompute(this)) {
                 this._isTrackPending = true
 
-                this.onInvalidate()
-                if (this._isTrackPending && isSpyEnabled()) {
-                    // onInvalidate didn't trigger track right away..
-                    spyReport({
-                        name: this.name,
-                        type: "scheduled-reaction"
-                    })
+                try {
+                    this.onInvalidate()
+                    if (this._isTrackPending && isSpyEnabled()) {
+                        // onInvalidate didn't trigger track right away..
+                        spyReport({
+                            name: this.name,
+                            type: "scheduled-reaction"
+                        })
+                    }
+                } catch (e) {
+                    this.reportExceptionInDerivation(e)
                 }
             }
             endBatch()
@@ -136,6 +139,8 @@ export class Reaction implements IDerivation, IReactionPublic {
             return
         }
 
+        if (globalState.disableErrorBoundaries) throw error
+
         const message = `[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: '${this}`
         console.error(message, error)
         /** If debugging brought you here, please, read the above message :-). Tnx! */
@@ -167,15 +172,7 @@ export class Reaction implements IDerivation, IReactionPublic {
     getDisposer(): IReactionDisposer {
         const r = this.dispose.bind(this)
         r.$mobx = this
-        r.onError = registerErrorHandler
         return r
-    }
-
-    onError(handler) {
-        if (process.env.NODE_ENV !== "production") {
-            invariant(!this.errorHandler, "Only one onErrorHandler can be registered")
-        }
-        this.errorHandler = handler
     }
 
     toString() {
@@ -185,14 +182,6 @@ export class Reaction implements IDerivation, IReactionPublic {
     trace(enterBreakPoint: boolean = false) {
         trace(this, enterBreakPoint)
     }
-}
-
-function registerErrorHandler(handler) {
-    if (process.env.NODE_ENV !== "production") {
-        invariant(this && this.$mobx && isReaction(this.$mobx), "Invalid `this`")
-        invariant(!this.$mobx.errorHandler, "Only one onErrorHandler can be registered")
-    }
-    this.$mobx.errorHandler = handler
 }
 
 export function onReactionError(handler: (error: any, derivation: IDerivation) => void): Lambda {

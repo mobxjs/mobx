@@ -681,3 +681,12 @@ test("toStringTag", () => {
     expect(x[Symbol.toStringTag]).toBe("Map")
     expect(Object.prototype.toString.call(x)).toBe("[object Map]")
 })
+
+test("verify #1524", () => {
+    class Store {
+        @mobx.observable articles = new Map()
+    }
+
+    const store = new Store()
+    expect(typeof store.articles.observe === "function").toBe(true)
+})

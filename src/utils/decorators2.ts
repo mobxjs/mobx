@@ -51,13 +51,14 @@ function createPropertyInitializerDescriptor(
 export function initializeInstance(target: any)
 export function initializeInstance(target: DecoratorTarget) {
     if (target.__mobxDidRunLazyInitializers === true) return
-    addHiddenProp(target, "__mobxDidRunLazyInitializers", true)
     const decorators = target.__mobxDecorators
-    if (decorators)
+    if (decorators) {
+        addHiddenProp(target, "__mobxDidRunLazyInitializers", true)
         for (let key in decorators) {
             const d = decorators[key]
             d.propertyCreator(target, d.prop, d.descriptor, d.decoratorTarget, d.decoratorArguments)
         }
+    }
 }
 
 export function createPropDecorator(
@@ -73,7 +74,7 @@ export function createPropDecorator(
             descriptor: BabelDescriptor | undefined,
             applyImmediately?: any
             // This is a special parameter to signal the direct application of a decorator, allow extendObservable to skip the entire type decoration part,
-            // as the instance to apply the deorator to equals the target
+            // as the instance to apply the decorator to equals the target
         ) {
             if (applyImmediately === true) {
                 propertyCreator(target, prop, descriptor, target, decoratorArguments)

@@ -1,4 +1,4 @@
-import { invariant, fail, addHiddenFinalProp } from "../utils/utils"
+import { invariant, fail, addHiddenProp } from "../utils/utils"
 import { createAction, executeAction, IAction } from "../core/action"
 import { namedActionDecorator, boundActionDecorator } from "./actiondecorator"
 
@@ -66,6 +66,7 @@ action.bound = boundActionDecorator as any
 export function runInAction<T>(block: () => T): T
 export function runInAction<T>(name: string, block: () => T): T
 export function runInAction(arg1, arg2?) {
+    // TODO: deprecate?
     const actionName = typeof arg1 === "string" ? arg1 : arg1.name || "<unnamed action>"
     const fn = typeof arg1 === "function" ? arg1 : arg2
 
@@ -86,5 +87,5 @@ export function isAction(thing: any) {
 }
 
 export function defineBoundAction(target: any, propertyName: string, fn: Function) {
-    addHiddenFinalProp(target, propertyName, createAction(propertyName, fn.bind(target)))
+    addHiddenProp(target, propertyName, createAction(propertyName, fn.bind(target)))
 }

@@ -46,6 +46,7 @@ export interface IComputedValueOptions<T> {
     equals?: IEqualsComparer<T>
     context?: any
     requiresReaction?: boolean
+    keepAlive?: boolean
 }
 
 /**
@@ -106,7 +107,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * This is useful for working with vectors, mouse coordinates etc.
      */
     constructor(options: IComputedValueOptions<T>) {
-        if (process.env.NODE_ENV === "production" && !options.get)
+        if (process.env.NODE_ENV !== "production" && !options.get)
             return fail("missing option for computed: get")
         this.derivation = options.get!
         this.name = options.name || "ComputedValue@" + getNextId()
@@ -118,6 +119,11 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 : comparer.default)
         this.scope = options.context
         this.requiresReaction = !!options.requiresReaction
+        if (options.keepAlive === true) {
+            // dangerous: never exposed, so this cmputed value should not depend on observables
+            // that live globally, or it will never get disposed! (nor anything attached to it)
+            autorun(() => this.get())
+        }
     }
 
     onBecomeStale() {
@@ -190,13 +196,19 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         const oldValue = this.value
         const wasSuspended =
             /* see #1208 */ this.dependenciesState === IDerivationState.NOT_TRACKING
-        const newValue = (this.value = this.computeValue(true))
-        return (
+        const newValue = this.computeValue(true)
+
+        const changed =
             wasSuspended ||
             isCaughtException(oldValue) ||
             isCaughtException(newValue) ||
             !this.equals(oldValue, newValue)
-        )
+
+        if (changed) {
+            this.value = newValue
+        }
+
+        return changed
     }
 
     computeValue(track: boolean) {

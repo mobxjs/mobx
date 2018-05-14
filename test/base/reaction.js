@@ -63,6 +63,13 @@ test("effect is untracked", () => {
     expect(values).toEqual([2, 4, 21])
 })
 
+let TIME_AMPLIFIER = 1
+if (process.env.CI === "true") {
+    console.log("Amplifying time")
+    jest.setTimeout(50 * 1000)
+    TIME_AMPLIFIER = 10
+}
+
 test("effect debounce is honored", () => {
     expect.assertions(2)
 
@@ -80,16 +87,23 @@ test("effect debounce is honored", () => {
                 values.push(newValue)
             },
             {
-                delay: 200
+                delay: 150 * TIME_AMPLIFIER,
+                fireImmediately: false
             }
         )
 
-        setTimeout(() => a.set(2), 30)
-        setTimeout(() => a.set(3), 300) // should not be visible, combined with the next
-        setTimeout(() => a.set(4), 320)
-        setTimeout(() => a.set(5), 600)
-        setTimeout(() => d(), 1000)
-        setTimeout(() => a.set(6), 1400)
+        setTimeout(() => a.set(2), 40 * TIME_AMPLIFIER)
+        setTimeout(() => {
+            a.set(3) // should not be visible, combined with the next
+            setImmediate(() => {
+                a.set(4)
+            })
+        }, 300 * TIME_AMPLIFIER)
+        setTimeout(() => a.set(5), 600 * TIME_AMPLIFIER)
+        setTimeout(() => {
+            d()
+            a.set(6)
+        }, 1000 * TIME_AMPLIFIER)
 
         setTimeout(() => {
             try {
@@ -99,7 +113,7 @@ test("effect debounce is honored", () => {
             } catch (e) {
                 reject(e)
             }
-        }, 1800)
+        }, 1200 * TIME_AMPLIFIER)
     })
 })
 
@@ -120,12 +134,12 @@ test("effect debounce + fire immediately is honored", () => {
             },
             {
                 fireImmediately: true,
-                delay: 100
+                delay: 100 * TIME_AMPLIFIER
             }
         )
 
-        setTimeout(() => a.set(3), 150)
-        setTimeout(() => a.set(4), 300)
+        setTimeout(() => a.set(3), 150 * TIME_AMPLIFIER)
+        setTimeout(() => a.set(4), 300 * TIME_AMPLIFIER)
 
         setTimeout(() => {
             try {
@@ -136,7 +150,7 @@ test("effect debounce + fire immediately is honored", () => {
             } catch (e) {
                 reject(e)
             }
-        }, 500)
+        }, 500 * TIME_AMPLIFIER)
     })
 })
 
@@ -424,7 +438,7 @@ test("issue #1148", () => {
     expect(called).toBe(0)
 })
 
-test("Introduce custom onError for - autorun", () => {
+test("Introduce custom onError for - autorun - 1", () => {
     let error = ""
     let globalHandlerCalled = false
     const d = mobx.onReactionError(() => {
@@ -445,6 +459,32 @@ test("Introduce custom onError for - autorun", () => {
     expect(error).toBe("OOPS")
     expect(globalHandlerCalled).toBe(false)
     d()
+})
+
+test("Introduce custom onError for - autorun - 2", done => {
+    let error = ""
+    let globalHandlerCalled = false
+    const d = mobx.onReactionError(() => {
+        globalHandlerCalled = true
+    })
+    expect(() => {
+        mobx.autorun(
+            () => {
+                throw "OOPS"
+            },
+            {
+                delay: 5,
+                onError(error) {
+                    setImmediate(() => {
+                        expect(error).toBe("OOPS")
+                        expect(globalHandlerCalled).toBe(false)
+                        d()
+                        done()
+                    })
+                }
+            }
+        )
+    }).not.toThrow()
 })
 
 test("Introduce custom onError for - reaction - 1", () => {
@@ -495,6 +535,34 @@ test("Introduce custom onError for - reaction - 2", () => {
     expect(error).toBe("OOPS")
     expect(globalHandlerCalled).toBe(false)
     d()
+})
+
+test("Introduce custom onError for - reaction - 3", done => {
+    let globalHandlerCalled = false
+    let box = mobx.observable.box(1)
+    const d = mobx.onReactionError(() => {
+        globalHandlerCalled = true
+    })
+    mobx.reaction(
+        () => box.get(),
+        () => {
+            throw "OOPS"
+        },
+        {
+            delay: 5,
+            onError(e) {
+                expect(e).toBe("OOPS")
+                setImmediate(() => {
+                    expect(globalHandlerCalled).toBe(false)
+                    d()
+                    done()
+                })
+            }
+        }
+    )
+    expect(() => {
+        box.set(2)
+    }).not.toThrow()
 })
 
 test("Introduce custom onError for - when - 1", () => {

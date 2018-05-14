@@ -38,6 +38,7 @@ test("correct api should be exposed", function() {
             "isObservableObject",
             "isObservableProp",
             "keys",
+            "ObservableMap",
             "observable",
             "observe",
             "onReactionError",

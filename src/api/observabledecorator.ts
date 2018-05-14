@@ -1,5 +1,5 @@
 import { asObservableObject } from "../types/observableobject"
-import { fail } from "../utils/utils"
+import { fail, invariant } from "../utils/utils"
 import { IEnhancer } from "../types/modifiers"
 import { createPropDecorator, BabelDescriptor } from "../utils/decorators2"
 
@@ -18,6 +18,12 @@ export function createDecoratorForEnhancer(enhancer: IEnhancer<any>): IObservabl
             _decoratorTarget,
             decoratorArgs: any[]
         ) => {
+            if (process.env.NODE_ENV !== "production") {
+                invariant(
+                    !descriptor || !descriptor.get,
+                    `@observable cannot be used on getter (property "${propertyName}"), use @computed instead.`
+                )
+            }
             const initialValue = descriptor
                 ? descriptor.initializer ? descriptor.initializer.call(target) : descriptor.value
                 : undefined

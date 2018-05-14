@@ -75,7 +75,7 @@ export class MobXGlobals {
     /**
      * If strict mode is enabled, state changes are by default not allowed
      */
-    enforceActions = false
+    enforceActions: boolean | "strict" = false
 
     /**
      * Spy callbacks

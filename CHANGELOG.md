@@ -3,10 +3,56 @@
 * dropped `array.move`
 * dropped third arg to `array.find` and `array.findIndex` (not in standard)
 
+# 4.2.1
+
+* Fixed flow typings for `mobx.configure` [#1521](https://github.com/mobxjs/mobx/pull/1521) by @andrew--r
+* Improved typings for `mobx.flow`, fixes [#1527](https://github.com/mobxjs/mobx/issues/1527)
+* Throw error when using `@observable` in combination with a getter. [#1511](https://github.com/mobxjs/mobx/pull/1511) by @quanganhtran
+* `toJS` now uses Map internally, for faster detection of cycles. [#1517](https://github.com/mobxjs/mobx/pull/1517) by @loatheb
+* Fixed [#1512](https://github.com/mobxjs/mobx/issues/1512): `observe` hooks not being triggered when using `mobx.set`, Fixed in [#1514](https://github.com/mobxjs/mobx/pull/1514) by @quanganhtran
+* Several minor improvements, additional tests and doc improvements.
+
+# 4.2.0
+
+* Introduced `configure({ enforceActions: "strict" })`, which is more strict then `enforceActions: true`, as it will also throw on non-observed changes to observables. See also [#1473](https://github.com/mobxjs/mobx/issues/1473)
+* Fixed [#1480](https://github.com/mobxjs/mobx/issues/1480): Exceptions in the effect handler of `reaction` where not properly picked up by the global reaction system
+* Fixed a bug where computed values updated their cached value, even when the comparer considered the new value equal to the previous one. Thanks @kuitos for finding this and fixing it! [#1499](https://github.com/mobxjs/mobx/pull/1499)
+* Undeprecated `ObservableMap`, fixes [#1496](https://github.com/mobxjs/mobx/issues/1496)
+* Observable arrays now support `Symbol.toStringTag` (if available / polyfilled). This allows libraries like Ramda to detect automatically that observable arrays are arrays. Fixes [#1490](https://github.com/mobxjs/mobx/issues/1490). Note that `Array.isArray` will keep returning false for the entire MobX 4 range.
+* Actions are now always `configurable` and `writable`, like in MobX 3. Fixes [#1477](https://github.com/mobxjs/mobx/issues/1477)
+* Merged several improvements to the flow typings. [#1501](https://github.com/mobxjs/mobx/pull/1501) by @quanganhtran
+* Fixed several accidental usages of the global `fail`, by @mtaran-google through [#1483](https://github.com/mobxjs/mobx/pull/1483) and [#1482](https://github.com/mobxjs/mobx/pull/1482)
+
+# 4.1.1
+
+* Import `default` from MobX will no longer throw, but only warn instead. This fixes some issues with tools that reflect on the `default` export of a module.
+* Disposing a spy listener inside a spy handler no longer causes an exception. Fixes [#1459](https://github.com/mobxjs/mobx/issues/1459) through [#1460](https://github.com/mobxjs/mobx/pull/1460) by [farwayer](https://github.com/farwayer)
+* Added a missing `runInAction` overload in the flow typings. [#1451](https://github.com/mobxjs/mobx/pull/1451) by [AMilassin](https://github.com/mobxjs/mobx/issues?q=is%3Apr+author%3AAMilassin)
+* Improved the typings of `decorate`. See [#1450](https://github.com/mobxjs/mobx/pull/1450) by [makepost](https://github.com/mobxjs/mobx/issues?q=is%3Apr+author%3Amakepost)
+
+# 4.1.0
+
+* Introduced `keepAlive` as option to `computed`
+* All observable api's now default to `any` for their generic arguments
+* Improved `flow` cancellation
+* The effect of `when` is now automatically an action.
+* `@computed` properties are now declared on their owner rather then the protoptype. Fixes an issue where `@computed` fields didn't work in React Native on proxied objects. See [#1396](https://github.com/mobxjs/mobx/issues/1396)
+* `action` and `action.bound` decorated fields are now reassignable, so that they can be stubbed
+
+# 4.0.2
+
+* Fixed issue where exceptions like `TypeError: Cannot define property:__mobxDidRunLazyInitializers, object is not extensible.` were thrown. Fixes [#1404](https://github.com/mobxjs/mobx/issues/1404)
+* Improved flow typings for `flow`, [#1399](https://github.com/mobxjs/mobx/pull/1399) by @ismailhabib
+
+# 4.0.1
+
+* Updated flow typings, see [#1393](https://github.com/mobxjs/mobx/pull/1393) by [andrew--r](https://github.com/andrew--r)
+
 # 4.0.0
 
 * For the highlights of this release, read the [blog](https://medium.com/p/c1fbc08008da/):
 * For migration notes: see the [wiki page](https://github.com/mobxjs/mobx/wiki/Migrating-from-mobx-3-to-mobx-4)
+* Note; many things that were removed to make the api surface smaller. If you think some feature shouldn't have been removed, feel free to open an issue!
 
 This is the extensive list of all changes.
 
@@ -14,33 +60,35 @@ This is the extensive list of all changes.
 
 The changes mentioned here are discussed in detail in the [release highlights](https://medium.com/p/c1fbc08008da/), or were simply updated in the docs.
 
-* MobX 4 introduces separation between the production and non production build. The production build strips most typechecks, resulting in a faster and smaller build. Make sure to substitute process.env.NODE_ENV = "production" in your build process! If you are using MobX in a react project, you most probably already have set this up. Otherwise, they idea is explained [here](https://reactjs.org/docs/add-react-to-an-existing-app.html).
-* Observable maps are now backed by real ES6 Maps. This means that any value can be used as key now, not just strings and numbers.
+* MobX 4 introduces separation between the production and non production build. The production build strips most typechecks, resulting in a faster and smaller build. Make sure to substitute process.env.NODE_ENV = "production" in your build process! If you are using MobX in a react project, you most probably already have set this up. Otherwise, the idea is explained [here](https://reactjs.org/docs/add-react-to-an-existing-app.html).
+* Introduced `flow` to create a chain of async actions. This is the same function as [`asyncActions`](https://github.com/mobxjs/mobx-utils#asyncaction) of the mobx-utils package
+* These `flow`'s are now cancellable, by calling `.cancel()` on the returned promise, which will throw a cancellation exception into the generator function.
+* `flow` also has experimental support for async iterators (`async * function`)
 * Introduced `decorate(thing, decorators)` to decorate classes or object without needing decorator syntax.
 * Introduced `onBecomeObserved` and `onBecomeUnobserved`. These API's enable hooking into the observability system and get notified about when an observable starts / stops becoming used. This is great to automaticaly fetch data from external resources, or stop doing so.
 * `computed` / `@computed` now accepts a `requiresReaction` option. If it set, the computed value will throw an exception if it is being read while not being tracked by some reaction.
 * To make `requiresReaction` the default, use `mobx.configure({ computedRequiresReaction: true })`
 * Introduced `mobx.configure({ disableErrorBoundaries })`, for easier debugging of exceptoins. By [NaridaL](https://github.com/NaridaL) through [#1262](https://github.com/mobxjs/mobx/pull/1262)
 * `toJS` now accepts the options: `{ detectCycles?: boolean, exportMapsAsObjects?: boolean }`, both `true` by default
-* Introduced `flow` to create a chain of async actions. This is the same function as [`asyncActions`](https://github.com/mobxjs/mobx-utils#asyncaction) of the mobx-utils package
+* Observable maps are now backed by real ES6 Maps. This means that any value can be used as key now, not just strings and numbers.
 * The flow typings have been updated. Since this is a manual effort, there can be mistakes, so feel free to PR!
 
 * `computed(fn, options?)` / `@computed(options) get fn()` now accept the following options:
   * `set: (value) => void` to set a custom setter on the computed property
   * `name: "debug name"`
-  * `equals: fn` the equality value to use for the computed to determine whether it's output has changed. The default is `comparer.default`. Alternatives are `comparer.structural`, `comparer.identity` or just your own comparison function.
+  * `equals: fn` the equality value to use for the computed to determine whether its output has changed. The default is `comparer.default`. Alternatives are `comparer.structural`, `comparer.identity` or just your own comparison function.
   * `requiresReaction: boolean` see above.
 
 * `autorun(fn, options?)` now accepts the following options:
   * `delay: number` debounce the autorun with the given amount of milliseconds. This replaces the MobX 3 api `autorunAsync`
-  * `name: "debug name"
+  * `name: "debug name"`
   * `scheduler: function` a custom scheduler to run the autorun. For example to connect running the autorun to `requestAnimationFrame`. See the docs for more details
   * `onError`. A custom error handler to be notified when an autorun throws an exception.
 
 * `reaction(expr, effect, options?)` now accepts the following options:
   * `delay: number` debounce the autorun with the given amount of milliseconds. This replaces the MobX 3 api `autorunAsync`
   * `fireImmediately`. Immediately fire the effect function after the first evaluation of `expr`
-  * `equals`. Custom equality function to determine whether the `expr` function differed from it's previous result, and hence should fire `effect`. Accepts the same options as the `equals` option of computed.
+  * `equals`. Custom equality function to determine whether the `expr` function differed from its previous result, and hence should fire `effect`. Accepts the same options as the `equals` option of computed.
   * All the options `autorun` accepts
 
 * `when(predicate, effect?, options?)` now accepts the following options:
@@ -68,7 +116,7 @@ The changes mentioned here are discussed in detail in the [release highlights](h
 The changes mentioned here are discussed in detail in the [migration notes](https://github.com/mobxjs/mobx/wiki/Migrating-from-mobx-3-to-mobx-4)
 
 * MobX 4 requires `Map` to be globally available. Polyfill it if targeting IE < 11 or other older browsers.
-* For typescript users, MobX now requires `Map` and several `Symbol`s to exist for it's typings. So make sure that the `lib` configuration of your project is set to `"es6"`. (The compilation target can still be `"es5"`)
+* For typescript users, MobX now requires `Map` and several `Symbol`s to exist for its typings. So make sure that the `lib` configuration of your project is set to `"es6"`. (The compilation target can still be `"es5"`)
 * `observable.shallowArray(values)` has been removed, instead use `observable.array(values, { deep: false })`
 * `observable.shallowMap(values)` has been removed, instead use `observable.map(values, { deep: false })`
 * `observable.shallowObject(values)` has been removed, instead use `observable.object(values, {}, { deep: false })`
@@ -107,6 +155,11 @@ The changes mentioned here are discussed in detail in the [migration notes](http
 * Dropped the already deprecated and broken `default` export that made it harder to tree-shake mobx. Make sure to always use `import { x } from "mobx"` and not `import mobx from "mobx"`.
 * Killed the already deprecated modifiers `asFlat` etc. If you war still using this, see the MobX 2 -> 3 migration notes.
 * Observable maps now fully implement the map interface. See [#1361](https://github.com/mobxjs/mobx/pull/1361) by [Marc Fallows](https://github.com/marcfallows)
+* Observable arrays will no longer expose the `.move` method
+* Dropped the `observable.deep.struct` modifier
+* Dropped the `observable.ref.struct` modifier
+* `observable.struct` now behaves like `observable.ref.struct` (this used to be `observable.deep.struct`). That is; values in an `observable.struct` field will be stored as is, but structural comparison will be used when assigning a new value
+* IReactionDisposer.onError has been removed, use the `onError` option of reactions instead
 
 ### Issues fixed in this release:
 
@@ -125,6 +178,10 @@ The issues are incoprorated in the above notes.
 * [#1148](https://github.com/mobxjs/mobx/issues/1148) - Disposer of reactions should also cancel all scheduled effects
 * [#1241](https://github.com/mobxjs/mobx/issues/1241) - Make it possible to disable error boundaries, to make it easier to find exceptions
 * [#1263](https://github.com/mobxjs/mobx/issues/1263) - Remove bower.json
+
+# 3.6.2
+
+* Fixed accidental dependency on the `node` typings. Fixes [#1387](https://github.com/mobxjs/mobx/issues/1387) / [#1362](https://github.com/mobxjs/mobx/issues/1387)
 
 # 3.6.1
 
@@ -605,6 +662,18 @@ observable({
 	})
 })
 ```
+
+By the way, if you have code such as:
+
+```
+observable({
+    @computed get someProp() { ... }
+});
+```
+
+That code will no longer work. Rather, reactions will fail silently. Remove `@computed`.
+Note, this only applies when using observable in this way; it doesn't apply when using
+`@observable` on a property within a class declaration.
 
 ### Misc
 

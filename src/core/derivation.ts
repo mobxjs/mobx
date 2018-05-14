@@ -126,7 +126,7 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
                 `Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ${atom.name}`
         )
     // Should not be possible to change observed state outside strict mode, except during initialization, see #563
-    if (!globalState.allowStateChanges && hasObservers)
+    if (!globalState.allowStateChanges && (hasObservers || globalState.enforceActions === "strict"))
         fail(
             process.env.NODE_ENV !== "production" &&
                 (globalState.enforceActions

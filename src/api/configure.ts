@@ -2,30 +2,39 @@ import { globalState, isolateGlobalState } from "../core/globalstate"
 import { setReactionScheduler } from "../core/reaction"
 
 export function configure(options: {
-    enforceActions?: boolean
+    enforceActions?: boolean | "strict"
     computedRequiresReaction?: boolean
     isolateGlobalState?: boolean
     disableErrorBoundaries?: boolean
     reactionScheduler?: (f: () => void) => void
 }): void {
-    if (options.enforceActions !== undefined) {
-        globalState.enforceActions = !!options.enforceActions
-        globalState.allowStateChanges = !options.enforceActions
+    const {
+        enforceActions,
+        computedRequiresReaction,
+        disableErrorBoundaries,
+        reactionScheduler
+    } = options
+    if (enforceActions !== undefined) {
+        if (typeof enforceActions !== "boolean" && enforceActions !== "strict")
+            return fail(`Invalid configuration for 'enforceActions': ${enforceActions}`)
+        globalState.enforceActions = enforceActions
+        globalState.allowStateChanges =
+            enforceActions === true || enforceActions === "strict" ? false : true
     }
-    if (options.computedRequiresReaction !== undefined) {
-        globalState.computedRequiresReaction = !!options.computedRequiresReaction
+    if (computedRequiresReaction !== undefined) {
+        globalState.computedRequiresReaction = !!computedRequiresReaction
     }
     if (options.isolateGlobalState === true) {
         isolateGlobalState()
     }
-    if (options.disableErrorBoundaries !== undefined) {
-        if (options.disableErrorBoundaries === true)
+    if (disableErrorBoundaries !== undefined) {
+        if (disableErrorBoundaries === true)
             console.warn(
                 "WARNING: Debug feature only. MobX will NOT recover from errors if this is on."
             )
-        globalState.disableErrorBoundaries = !!options.disableErrorBoundaries
+        globalState.disableErrorBoundaries = !!disableErrorBoundaries
     }
-    if (options.reactionScheduler) {
-        setReactionScheduler(options.reactionScheduler)
+    if (reactionScheduler) {
+        setReactionScheduler(reactionScheduler)
     }
 }
