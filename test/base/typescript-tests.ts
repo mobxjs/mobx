@@ -1488,7 +1488,7 @@ test("multiple inheritance should work", () => {
 })
 
 test("actions are reassignable", () => {
-    // See #1398, make actions reassignable to support stubbing
+    // See #1398 and #1545, make actions reassignable to support stubbing
     class A {
         @action
         m1() {}
@@ -1505,9 +1505,8 @@ test("actions are reassignable", () => {
     expect(isAction(a.m4)).toBe(true)
     a.m1 = () => {}
     expect(isAction(a.m1)).toBe(false)
-    expect(() => {
-        a.m2 = () => {} // cause it is a getter prop
-    }).toThrow(/Cannot assign to read only property 'm2'/)
+    a.m2 = () => {}
+    expect(isAction(a.m2)).toBe(false)
     a.m3 = () => {}
     expect(isAction(a.m3)).toBe(false)
     a.m4 = () => {}
