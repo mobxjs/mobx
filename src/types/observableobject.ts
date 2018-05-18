@@ -71,6 +71,7 @@ export class ObservableObjectAdministration
     keysAtom: IAtom
     changeListeners
     interceptors
+    private proxy: any
 
     constructor(
         public target: any,
@@ -82,10 +83,12 @@ export class ObservableObjectAdministration
     }
 
     read(owner: any, key: string) {
-        if (this.target !== owner) {
+        // TODO: why was this relevant again?
+        if (owner !== this.target && owner !== this.proxy) {
             this.illegalAccess(owner, key)
             return
         }
+        // TODO: why was this relevant again?
         if (typeof key !== "string" || !this.values.hasOwnProperty(key)) return this.values[key] // might be on prototype
         const observable = this.values[key]
         if (observable) {
@@ -96,7 +99,7 @@ export class ObservableObjectAdministration
 
     write(owner: any, key: string, newValue) {
         const instance = this.target
-        if (instance !== owner) {
+        if (instance !== owner && owner !== this.proxy) {
             this.illegalAccess(owner, key)
             return
         }
@@ -110,7 +113,7 @@ export class ObservableObjectAdministration
         if (hasInterceptors(this)) {
             const change = interceptChange<IObjectWillChange>(this, {
                 type: "update",
-                object: instance,
+                object: this.proxy || instance,
                 name: key,
                 newValue
             })
@@ -127,7 +130,7 @@ export class ObservableObjectAdministration
                 notify || notifySpy
                     ? {
                           type: "update",
-                          object: instance,
+                          object: this.proxy || instance,
                           oldValue: (observable as any).value,
                           name: key,
                           newValue
@@ -147,7 +150,7 @@ export class ObservableObjectAdministration
 
         if (hasInterceptors(this)) {
             const change = interceptChange<IObjectWillChange>(this, {
-                object: target,
+                object: this.proxy || target,
                 name: propName,
                 type: "add",
                 newValue
@@ -185,7 +188,7 @@ export class ObservableObjectAdministration
         const { target } = this
         if (hasInterceptors(this)) {
             const change = interceptChange<IObjectWillChange>(this, {
-                object: target,
+                object: this.proxy || target,
                 name: key,
                 type: "remove"
             })
@@ -204,7 +207,7 @@ export class ObservableObjectAdministration
                 notify || notifySpy
                     ? {
                           type: "remove",
-                          object: target,
+                          object: this.proxy || target,
                           oldValue: oldValue,
                           name: key
                       }
@@ -267,7 +270,7 @@ export class ObservableObjectAdministration
             notify || notifySpy
                 ? {
                       type: "add",
-                      object: this.target,
+                      object: this.proxy || this.target,
                       name: key,
                       newValue
                   }

@@ -432,8 +432,8 @@ test("can iterate arrays", () => {
 test("array is concat spreadable, #1395", () => {
     const x = mobx.observable([1, 2, 3, 4])
     const y = [5].concat(x)
-    expect(y.length).toBe(2) // Should become 5 in MobX 5
-    expect(y).toEqual([5, x]) // should become [5, 1,2,3,4] in MobX 5
+    expect(y.length).toBe(5)
+    expect(y).toEqual([5, 1, 2, 3, 4])
 })
 
 test("array is spreadable, #1395", () => {

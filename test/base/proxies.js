@@ -1,4 +1,4 @@
-import { observable, reaction, extendObservable, keys } from "../../src/mobx.ts"
+import { observable, action, reaction, extendObservable, keys } from "../../src/mobx.ts"
 
 test("should react to key removal (unless reconfiguraing to empty) - 1", () => {
     const events = []
@@ -166,6 +166,36 @@ test("for-in operator", () => {
     expect(computeKeys(x)).toEqual(["x", "z", "a"])
     delete x.x
     expect(computeKeys(x)).toEqual(["z", "a"])
+})
+
+test("bound actions", () => {
+    const x = observable(
+        {
+            a1() {
+                return this
+            }
+        },
+        {
+            a1: action.bound
+        }
+    )
+
+    extendObservable(x, {
+        a2() {
+            return this
+        }
+    })
+
+    // x is the proxy, so it cannot be this if this was bound during creation...
+    expect(x.a1()).not.toBe(x)
+    // x was bound later, so it's will work fine
+    expect(x.a2()).toBe(x)
+})
+
+test("type coercion doesn't break", () => {
+    const x = observable({})
+    expect("" + x).toBe("[object Object]")
+    expect(42 * x).toBeNaN()
 })
 
 // TODO: No extendobservable on dynamic

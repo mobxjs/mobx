@@ -401,8 +401,8 @@ test("extendObservable respects action decorators", () => {
     const { a1, a2, a3 } = x
     expect(a1.call(x)).toBe(x)
     // expect(a1()).toBe(global)
-    expect(a2.call(x)).toBe(x)
-    expect(a2()).toBe(x)
+    expect(a2.call(x)).toBeTruthy() // it is not this! proxies :) see test in proxies.js
+    expect(a2()).toBeTruthy()
     expect(a3.call(x)).toBe(x)
     // expect(a3()).toBe(global)
 })

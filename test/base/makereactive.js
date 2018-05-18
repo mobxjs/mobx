@@ -435,7 +435,12 @@ test("as structure view", function() {
     expect(cc).toBe(2)
 })
 
-test("ES5 non reactive props", function() {
+// This test doesn't make much sense anymore with proxies;
+// creating non configurable props on dynamic observable object
+// will break the invariants of proxies (when trying to determine keys)
+// which is not unfixiable in itself,
+// but definitely a pattern we don't want to encourage
+test.skip("ES5 non reactive props", function() {
     var te = m.observable({})
     Object.defineProperty(te, "nonConfigurable", {
         enumerable: true,

@@ -3,6 +3,10 @@
 * dropped `array.move`
 * dropped third arg to `array.find` and `array.findIndex` (not in standard)
 
+Proxies
+- caveats: prebound methods this ain't the proxy!
+- arrays are now spreadable and such
+
 # 4.2.1
 
 * Fixed flow typings for `mobx.configure` [#1521](https://github.com/mobxjs/mobx/pull/1521) by @andrew--r

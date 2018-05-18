@@ -292,8 +292,14 @@ const objectProxyTraps: ProxyHandler<any> = {
         // TODO: use symbol for  "__mobxDidRunLazyInitializers" and "$mobx", and remove these checks
         if (name === "$mobx" || name === "constructor" || name === "__mobxDidRunLazyInitializers")
             return target[name]
-        if (!has(target, name)) return undefined
-        return get(target, name)
+        const observable = target.$mobx.values[name]
+        if (observable instanceof Atom) return observable.get()
+        // make sure we start listening to future keys
+        // TODO: optimization: has here is inefficient and will react to any key change,
+        // better: keep a set of observables expressing the existince of a key, like in
+        // observable maps
+        has(target, name)
+        return target[name]
         // if (
         //     typeof name === "string" &&
         //     name !== "constructor" &&
@@ -327,5 +333,7 @@ const objectProxyTraps: ProxyHandler<any> = {
 }
 
 export function createDynamicObservableObject(base) {
-    return new Proxy(base, objectProxyTraps)
+    const proxy = new Proxy(base, objectProxyTraps)
+    base.$mobx.proxy = proxy
+    return proxy
 }

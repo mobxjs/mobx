@@ -826,7 +826,7 @@ test("enumerability", () => {
 
     t.equal("a" in a, true)
     t.equal(a.hasOwnProperty("a"), true)
-    t.equal(a.hasOwnProperty("b"), true) // better, false, but, see: #1398
+    t.equal(a.hasOwnProperty("b"), false) // ok also ok-ish
     t.equal(a.hasOwnProperty("m"), false)
     t.equal(a.hasOwnProperty("m2"), true)
 
@@ -849,7 +849,7 @@ test("enumerability", () => {
 
     t.equal("a" in a, true)
     t.equal(a.hasOwnProperty("a"), true)
-    t.equal(a.hasOwnProperty("b"), true) // better, false, but, see: #1398
+    t.equal(a.hasOwnProperty("b"), false) // true would also be ok-ish, see: #1398
     t.equal(a.hasOwnProperty("m"), false)
     t.equal(a.hasOwnProperty("m2"), true)
 })
