@@ -41,6 +41,7 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Steven Pérez
 * Surafel D
 * Thibault Maekelbergh
+* Timor Zhiyentayev
 * Timothy Durant
 * Vojtech Novak
 * Wilfried Reiter
@@ -58,3 +59,5 @@ Patrons:
 * Ronal Chanou
 * Kim Joar Bekkelund
 * Tőrös Egon Richárd
+* Lucas Nascimento
+* Jason Hendriksen
