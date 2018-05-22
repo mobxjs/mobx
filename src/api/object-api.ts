@@ -45,10 +45,10 @@ export function values(obj: any): string[] {
     )
 }
 
-export function entries<K, T>(map: ObservableMap<K, T>): ReadonlyArray<T>
-export function entries<T>(ar: IObservableArray<T>): ReadonlyArray<T>
-export function entries<T = any>(obj: T): ReadonlyArray<any>
-export function entries(obj: any): string[][] {
+export function entries<K, T>(map: ObservableMap<K, T>): ReadonlyArray<[K, T]>
+export function entries<T>(ar: IObservableArray<T>): ReadonlyArray<[number, T]>
+export function entries<T = any>(obj: T): ReadonlyArray<[string, any]>
+export function entries(obj: any): any {
     if (isObservableObject(obj)) {
         return keys(obj).map(key => [key, obj[key]])
     }
@@ -56,7 +56,7 @@ export function entries(obj: any): string[][] {
         return keys(obj).map(key => [key, obj.get(key)])
     }
     if (isObservableArray(obj)) {
-        return obj.map((key, index) => [index.toString(), key])
+        return obj.map((key, index) => [index, key])
     }
     return fail(
         process.env.NODE_ENV !== "production" &&
