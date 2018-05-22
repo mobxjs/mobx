@@ -8,7 +8,6 @@ import {
     invariant,
     assertPropertyConfigurable,
     isPlainObject,
-    fail,
     addHiddenFinalProp
 } from "../utils/utils"
 import {
