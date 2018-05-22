@@ -38,3 +38,5 @@ extendObservable(matthew, {
 Note:  `observable.object(object)` is actually an alias for `extendObservable({}, object)`.
 
 Note: `decorate` could be used to introduce observable properties to an object, similar to `extendObservable`. The difference is that `extendObservable` is designed to introduce properties directly on the target instance, where `decorate` introduces them on prototypes; you can either pass it a constructor function (class) directly, or an object that will act as prototype for others.
+
+Note: `extendObservable` can not be used to introduce new properties on observable arrays or objects
