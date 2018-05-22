@@ -141,7 +141,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      */
     public get(): T {
         if (this.isComputing) fail(`Cycle detected in computation ${this.name}: ${this.derivation}`)
-        if (globalState.inBatch === 0) {
+        if (globalState.inBatch === 0 && this.observers.length === 0) {
             if (shouldCompute(this)) {
                 this.warnAboutUntrackedRead()
                 startBatch() // See perf test 'computed memoization'
