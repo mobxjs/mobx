@@ -71,18 +71,17 @@ export class ObservableObjectAdministration
     constructor(public target: any, public name: string, public defaultEnhancer: IEnhancer<any>) {}
 
     read(owner: any, key: string) {
-        if (this.target !== owner) {
+        if (process.env.NODE_ENV === "production" && this.target !== owner) {
             this.illegalAccess(owner, key)
-            return
+            if (!this.values[key]) return undefined
         }
         return this.values[key].get()
     }
 
     write(owner: any, key: string, newValue) {
         const instance = this.target
-        if (instance !== owner) {
+        if (process.env.NODE_ENV === "production" && instance !== owner) {
             this.illegalAccess(owner, key)
-            return
         }
         const observable = this.values[key]
         if (observable instanceof ComputedValue) {
