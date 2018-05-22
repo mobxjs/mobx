@@ -240,9 +240,9 @@ As demonstrated above, modifying state when using MobX is very straightforward. 
 
 MobX builds a graph of all the derivations in your application to find the least number of re-computations that is needed to prevent staleness. "Derive everything" might sound expensive, MobX builds a virtual derivation graph to minimize the number of recomputations needed to keep derivations in sync with the state.
 
-In fact, when testing MobX at Mendix we found out that using this library to track the relations in our code is often a lot more efficient then pushing changes through our application by using handwritten events or "smart" selector based container components.
+In fact, when testing MobX at Mendix we found out that using this library to track the relations in our code is often a lot more efficient than pushing changes through our application by using handwritten events or "smart" selector based container components.
 
-The simple reason is that MobX will establish far more fine grained 'listeners' on your data then you would do as a programmer.
+The simple reason is that MobX will establish far more fine grained 'listeners' on your data than you would do as a programmer.
 
 Secondly MobX sees the causality between derivations so it can order them in such a way that no derivation has to run twice or introduces a glitch.
 

@@ -7,6 +7,15 @@ Proxies
 - caveats: prebound methods this ain't the proxy!
 - arrays are now spreadable and such
 
+# 4.3.0
+
+* Introduced the `entries(observable)` API, by @samjacobclift through [#1536](https://github.com/mobxjs/mobx/pull/1536)
+* Fixed [#1535](https://github.com/mobxjs/mobx/issues/1535): Change in nested computed value was not propagated if read outside action context when there is a pending reaction. For more details see the exact test case.
+* Illegal property access through prototypes is now a warning instead of an error. Fixes [#1506](https://github.com/mobxjs/mobx/issues/1506). By @AmazingTurtle through [#1529](https://github.com/mobxjs/mobx/pull/1529)
+* Fixed issue where providing a custom setter to `@computed({ set: ... })` wasn't picked up
+* Fixed #1545: Actions properties where not re-assignable when using TypeScript
+* Illegal Access checks are now a warning instead of an error. Fix
+
 # 4.2.1
 
 * Fixed flow typings for `mobx.configure` [#1521](https://github.com/mobxjs/mobx/pull/1521) by @andrew--r

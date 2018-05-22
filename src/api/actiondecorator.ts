@@ -1,4 +1,4 @@
-import { fail, addHiddenFinalProp } from "../utils/utils"
+import { fail, addHiddenProp } from "../utils/utils"
 import { createAction } from "../core/action"
 import { BabelDescriptor } from "../utils/decorators2"
 import { action, defineBoundAction } from "./action"
@@ -51,7 +51,7 @@ export function actionFieldDecorator(name: string) {
                 return undefined
             },
             set(value) {
-                addHiddenFinalProp(this, prop, action(name, value))
+                addHiddenProp(this, prop, action(name, value))
             }
         })
     }

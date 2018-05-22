@@ -1124,3 +1124,76 @@ test("toJS bug #1413 (babel)", () => {
     expect(res).toEqual({ test1: 1 })
     expect(res.__mobxDidRunLazyInitializers).toBe(undefined)
 })
+
+test("computed setter problem", () => {
+    class Contact {
+        @observable firstName = ""
+        @observable lastName = ""
+
+        @computed({
+            set(value) {
+                const [firstName, lastName] = value.split(" ")
+
+                this.firstName = firstName
+                this.lastName = lastName
+            }
+        })
+        get fullName() {
+            return `${this.firstName} ${this.lastName}`
+        }
+
+        set fullName(value) {
+            const [firstName, lastName] = value.split(" ")
+
+            this.firstName = firstName
+            this.lastName = lastName
+        }
+    }
+
+    const c = new Contact()
+
+    c.firstName = "Pavan"
+    c.lastName = "Podila"
+
+    expect(c.fullName).toBe("Pavan Podila")
+
+    c.fullName = "Michel Weststrate"
+    expect(c.firstName).toBe("Michel")
+    expect(c.lastName).toBe("Weststrate")
+})
+
+test.only("computed setter problem - 2", () => {
+    class Contact {
+        @observable firstName = ""
+        @observable lastName = ""
+
+        get fullName() {
+            return `${this.firstName} ${this.lastName}`
+        }
+    }
+
+    debugger
+    mobx.decorate(Contact, {
+        fullName: computed({
+            // This doesn't work
+            set: function(value) {
+                const [firstName, lastName] = value.split(" ")
+
+                this.firstName = firstName
+                this.lastName = lastName
+            },
+            equals: mobx.comparer.identity
+        })
+    })
+
+    const c = new Contact()
+
+    c.firstName = "Pavan"
+    c.lastName = "Podila"
+
+    expect(c.fullName).toBe("Pavan Podila")
+
+    c.fullName = "Michel Weststrate"
+    expect(c.firstName).toBe("Michel")
+    expect(c.lastName).toBe("Weststrate")
+})

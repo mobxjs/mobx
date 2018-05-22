@@ -56,6 +56,7 @@ test("correct api should be exposed", function() {
             "transaction",
             "untracked",
             "values",
+            "entries",
             "when"
         ].sort()
     )

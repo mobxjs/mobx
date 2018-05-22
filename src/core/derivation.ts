@@ -100,7 +100,8 @@ export function shouldCompute(derivation: IDerivation): boolean {
                     }
                     // if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
                     // and `derivation` is an observer of `obj`
-                    if ((derivation as any).dependenciesState === IDerivationState.STALE) {
+                    // invariantShouldCompute(derivation)
+                    if ((derivation.dependenciesState as any) === IDerivationState.STALE) {
                         untrackedEnd(prevUntracked)
                         return true
                     }
@@ -112,6 +113,17 @@ export function shouldCompute(derivation: IDerivation): boolean {
         }
     }
 }
+
+// function invariantShouldCompute(derivation: IDerivation) {
+//     const newDepState = (derivation as any).dependenciesState
+
+//     if (
+//         process.env.NODE_ENV === "production" &&
+//         (newDepState === IDerivationState.POSSIBLY_STALE ||
+//             newDepState === IDerivationState.NOT_TRACKING)
+//     )
+//         fail("Illegal dependency state")
+// }
 
 export function isComputingDerivation() {
     return globalState.trackingDerivation !== null // filter out actions inside computations

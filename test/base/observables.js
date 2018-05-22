@@ -1658,14 +1658,6 @@ test("Issue 1092 - Should not access attributes of siblings in the prot. chain",
     // sibling child1
     expect(typeof child2.attribute).toBe("undefined")
 
-    // We still should be able to read the value from the parent
-    expect(() => {
-        child2.staticObservable
-    }).toThrow(/accessed through the prototype chain/)
-    expect(() => {
-        child2.staticObservable = 3
-    }).toThrow(/accessed through the prototype chain/)
-
     expect(parent.staticObservable).toBe(11)
     parent.staticObservable = 12
     expect(parent.staticObservable).toBe(12)
