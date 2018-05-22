@@ -45,6 +45,25 @@ export function values(obj: any): string[] {
     )
 }
 
+export function entries<K, T>(map: ObservableMap<K, T>): ReadonlyArray<T>
+export function entries<T>(ar: IObservableArray<T>): ReadonlyArray<T>
+export function entries<T = any>(obj: T): ReadonlyArray<any>
+export function entries(obj: any): string[][] {
+    if (isObservableObject(obj)) {
+        return keys(obj).map(key => [key, obj[key]])
+    }
+    if (isObservableMap(obj)) {
+        return keys(obj).map(key => [key, obj.get(key)])
+    }
+    if (isObservableArray(obj)) {
+        return obj.map((key, index) => [index.toString(), key])
+    }
+    return fail(
+        process.env.NODE_ENV !== "production" &&
+            "'entries()' can only be used on observable objects, arrays and maps"
+    )
+}
+
 export function set<V>(obj: ObservableMap<string, V>, values: { [key: string]: V })
 export function set<K, V>(obj: ObservableMap<K, V>, key: K, value: V)
 export function set<T>(obj: IObservableArray<T>, index: number, value: T)
