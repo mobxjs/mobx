@@ -1,4 +1,4 @@
-import { fail, deprecated, isES6Map, isPlainObject } from "../utils/utils"
+import { fail, isES6Map, isPlainObject } from "../utils/utils"
 import {
     deepEnhancer,
     referenceEnhancer,
@@ -30,14 +30,7 @@ export const defaultCreateObservableOptions: CreateObservableOptions = {
     defaultDecorator: undefined,
     proxy: true
 }
-export const shallowCreateObservableOptions = {
-    deep: false,
-    name: undefined,
-    defaultDecorator: undefined,
-    proxy: true
-}
 Object.freeze(defaultCreateObservableOptions)
-Object.freeze(shallowCreateObservableOptions)
 
 function assertValidOption(key: string) {
     if (!/^(deep|name|defaultDecorator|proxy)$/.test(key))
@@ -108,26 +101,12 @@ export interface IObservableFactory {
 
 export interface IObservableFactories {
     box<T = any>(value?: T, options?: CreateObservableOptions): IObservableValue<T>
-    shallowBox<T = any>(value?: T, options?: CreateObservableOptions): IObservableValue<T>
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T>
-    shallowArray<T = any>(
-        initialValues?: T[],
-        options?: CreateObservableOptions
-    ): IObservableArray<T>
     map<K = any, V = any>(
         initialValues?: IObservableMapInitialValues<K, V>,
         options?: CreateObservableOptions
     ): ObservableMap<K, V>
-    shallowMap<K = any, V = any>(
-        initialValues?: IObservableMapInitialValues<K, V>,
-        options?: CreateObservableOptions
-    ): ObservableMap<K, V>
     object<T = any>(
-        props: T,
-        decorators?: { [K in keyof T]?: Function },
-        options?: CreateObservableOptions
-    ): T & IObservableObject
-    shallowObject<T = any>(
         props: T,
         decorators?: { [K in keyof T]?: Function },
         options?: CreateObservableOptions
@@ -151,22 +130,11 @@ const observableFactories: IObservableFactories = {
         const o = asCreateObservableOptions(options)
         return new ObservableValue(value, getEnhancerFromOptions(o), o.name)
     },
-    // TODO: kill these shallow and other deprecated stuff
-    shallowBox<T = any>(value?: T, name?: string): IObservableValue<T> {
-        if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowBox")
-        deprecated(`observable.shallowBox`, `observable.box(value, { deep: false })`)
-        return observable.box(value, { name, deep: false })
-    },
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T> {
         // TODO: invariant, not already observable (also for the other apis)
         if (arguments.length > 2) incorrectlyUsedAsDecorator("array")
         const o = asCreateObservableOptions(options)
         return createObservableArray(initialValues, getEnhancerFromOptions(o), o.name) as any
-    },
-    shallowArray<T = any>(initialValues?: T[], name?: string): IObservableArray<T> {
-        if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowArray")
-        deprecated(`observable.shallowArray`, `observable.array(values, { deep: false })`)
-        return observable.array(initialValues, { name, deep: false })
     },
     map<K = any, V = any>(
         initialValues?: IObservableMapInitialValues<K, V>,
@@ -176,42 +144,18 @@ const observableFactories: IObservableFactories = {
         const o = asCreateObservableOptions(options)
         return new ObservableMap<K, V>(initialValues, getEnhancerFromOptions(o), o.name)
     },
-    shallowMap<K = any, V = any>(
-        initialValues?: IObservableMapInitialValues<K, V>,
-        name?: string
-    ): ObservableMap<K, V> {
-        if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowMap")
-        deprecated(`observable.shallowMap`, `observable.map(values, { deep: false })`)
-        return observable.map(initialValues, { name, deep: false })
-    },
-    // TODO: record?
-    // TODO: separate between object and record
-    // TODO: record should be frozen
-    // only record supports computed props
     object<T = any>(
         props: T,
         decorators?: { [K in keyof T]: Function },
         options?: CreateObservableOptions
     ): T & IObservableObject {
-        // TODO: should create dynamic observable object
-        // TODO: should forbid deleting decorated members (so that behavior remains sticky)
         if (typeof arguments[1] === "string") incorrectlyUsedAsDecorator("object")
         const o = asCreateObservableOptions(options)
         const base = extendObservable({}, props, decorators, o) as any
-        // // TODO: duplicated with extendObservable, create function
-        // const defaultDecorator =
-        //     options.defaultDecorator || (options.deep === false ? refDecorator : deepDecorator)
-        // const res = createDynamicObservableObject(props, options.name, defaultDecorator.enhancer)
-        // return extendObservable(res, props, decorators, options) as any
         if (o.proxy === false) {
             return base
         }
         return createDynamicObservableObject(base)
-    },
-    shallowObject<T = any>(props: T, name?: string): T & IObservableObject {
-        if (typeof arguments[1] === "string") incorrectlyUsedAsDecorator("shallowObject")
-        deprecated(`observable.shallowObject`, `observable.object(values, {}, { deep: false })`)
-        return observable.object(props, {}, { name, deep: false })
     },
     ref: refDecorator,
     shallow: shallowDecorator,

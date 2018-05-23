@@ -293,12 +293,12 @@ test("map modifier with modifier", () => {
     x.set("b", { d: 4 })
     expect(mobx.isObservableObject(x.get("b"))).toBe(true)
 
-    x = mobx.observable.shallowMap({ a: { c: 3 } })
+    x = mobx.observable.map({ a: { c: 3 } }, { deep: false })
     expect(mobx.isObservableObject(x.get("a"))).toBe(false)
     x.set("b", { d: 4 })
     expect(mobx.isObservableObject(x.get("b"))).toBe(false)
 
-    x = mobx.observable({ a: mobx.observable.shallowMap({ b: {} }) })
+    x = mobx.observable({ a: mobx.observable.map({ b: {} }, { deep: false }) })
     expect(mobx.isObservableObject(x)).toBe(true)
     expect(mobx.isObservableMap(x.a)).toBe(true)
     expect(mobx.isObservableObject(x.a.get("b"))).toBe(false)

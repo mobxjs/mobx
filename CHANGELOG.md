@@ -1,7 +1,10 @@
 # 5.0.0
 
+* all deprecated api's are dropped. Make sure to not have any deprecation warnings before upgrading
+* uses proxies. otherwise use mobx 4
 * dropped `array.move`
 * dropped third arg to `array.find` and `array.findIndex` (not in standard)
+* `proxy` argument to `observable.object`
 
 Proxies
 - caveats: prebound methods this ain't the proxy!

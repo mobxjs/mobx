@@ -67,7 +67,7 @@ test("isBoxedObservable", function() {
     expect(m.isBoxedObservable(m.observable.box(3))).toBe(true)
     expect(m.isBoxedObservable(m.observable.box(3))).toBe(true)
     expect(m.isBoxedObservable(m.observable.box({}))).toBe(true)
-    expect(m.isBoxedObservable(m.observable.shallowBox({}))).toBe(true)
+    expect(m.isBoxedObservable(m.observable.box({}, { deep: false }))).toBe(true)
 })
 
 test("observable1", function() {
@@ -117,13 +117,17 @@ test("observable1", function() {
     expect(b2.toArray()).toEqual([3, 4])
 
     // non recursive structure
-    var x3 = o.shallowObject({
-        a: {
-            b: {
-                c: 3
+    var x3 = o.object(
+        {
+            a: {
+                b: {
+                    c: 3
+                }
             }
-        }
-    })
+        },
+        {},
+        { deep: false }
+    )
     var b3 = buffer()
     m.autorun(function() {
         b3(x3.a.b.c)
@@ -176,7 +180,7 @@ test("observable4", function() {
     expect(b.toArray()).toEqual([[1, 2], [3, 2], [2], [2, 5]])
 
     // non recursive
-    var x2 = o.shallowArray([{ x: 1 }, { x: 2 }])
+    var x2 = o.array([{ x: 1 }, { x: 2 }], { deep: false })
 
     var b2 = buffer()
     m.observe(
@@ -270,9 +274,13 @@ test("flat array", function() {
 })
 
 test("flat object", function() {
-    var y = m.observable.shallowObject({
-        x: { z: 3 }
-    })
+    var y = m.observable.object(
+        {
+            x: { z: 3 }
+        },
+        {},
+        { deep: false }
+    )
 
     var result
     var updates = 0
@@ -523,7 +531,7 @@ test("mobx 3", () => {
 
     expect(x === mobx.observable(x)).toBeTruthy()
 
-    const y = mobx.observable.shallowBox(null)
+    const y = mobx.observable.box(null, { deep: false })
     const obj = { a: 2 }
     y.set(obj)
     expect(y.get() === obj).toBeTruthy()
@@ -567,7 +575,7 @@ test("computed value scope", () => {
 })
 
 test("shallow array", () => {
-    var a = mobx.observable.shallowArray()
+    var a = mobx.observable.array([], { deep: false })
     a.push({ x: 1 }, [], 2, mobx.observable({ y: 3 }))
 
     expect(mobx.isObservable(a)).toBe(true)

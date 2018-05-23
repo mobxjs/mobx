@@ -389,7 +389,7 @@ test("create array (fast)", function(t) {
     var a = []
     for (var i = 0; i < 1000; i++) a.push(i)
     var start = now()
-    for (var i = 0; i < 1000; i++) mobx.observable.shallowArray(a)
+    for (var i = 0; i < 1000; i++) mobx.observable.array(a, { deep: false })
     log("\nCreate array (non-recursive)  Created in " + (now() - start) + "ms.")
     t.end()
 })

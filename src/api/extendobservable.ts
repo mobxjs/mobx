@@ -1,28 +1,16 @@
 import { isObservableMap } from "../types/observablemap"
 import { asObservableObject } from "../types/observableobject"
 import { isObservable } from "./isobservable"
-import { invariant, deprecated, fail } from "../utils/utils"
+import { invariant, fail } from "../utils/utils"
 import { startBatch, endBatch } from "../core/observable"
 import {
     CreateObservableOptions,
     asCreateObservableOptions,
-    shallowCreateObservableOptions,
     deepDecorator,
     refDecorator
 } from "./observable"
 import { isComputed } from "./iscomputed"
 import { computedDecorator } from "./computed"
-
-export function extendShallowObservable<A extends Object, B extends Object>(
-    target: A,
-    properties: B,
-    decorators?: { [K in keyof B]?: Function }
-): A & B {
-    deprecated(
-        "'extendShallowObservable' is deprecated, use 'extendObservable(target, props, { deep: false })' instead"
-    )
-    return extendObservable(target, properties, decorators, shallowCreateObservableOptions)
-}
 
 export function extendObservable<A extends Object, B extends Object>(
     target: A,
