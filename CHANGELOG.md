@@ -6,6 +6,7 @@
 Proxies
 - caveats: prebound methods this ain't the proxy!
 - arrays are now spreadable and such
+- observable.object option record: true
 
 # 4.3.0
 

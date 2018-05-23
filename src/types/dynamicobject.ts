@@ -299,14 +299,7 @@ const objectProxyTraps: ProxyHandler<any> = {
         // better: keep a set of observables expressing the existince of a key, like in
         // observable maps
         has(target, name)
-        return target[name]
-        // if (
-        //     typeof name === "string" &&
-        //     name !== "constructor" &&
-        //     name !== "__mobxDidRunLazyInitializers"
-        // )
-        //     return target.$mobx.read(target, name)
-        // return target[name]
+        return undefined
     },
     set(target: IIsObservableObject, name: string, value: any) {
         set(target, name, value)

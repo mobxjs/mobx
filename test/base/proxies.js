@@ -1,4 +1,12 @@
-import { observable, action, reaction, extendObservable, keys } from "../../src/mobx.ts"
+import {
+    isObservableProp,
+    autorun,
+    observable,
+    action,
+    reaction,
+    extendObservable,
+    keys
+} from "../../src/mobx.ts"
 
 test("should react to key removal (unless reconfiguraing to empty) - 1", () => {
     const events = []
@@ -198,8 +206,28 @@ test("type coercion doesn't break", () => {
     expect(42 * x).toBeNaN()
 })
 
-// TODO: No extendobservable on dynamic
-// TODO:, verify set, etc
-// Verfiy computes and actions
-// Verify non deletability of static members
-// Verify non enumerability of these members
+test("adding a different key doesn't trigger a pending key", () => {
+    const x = observable({})
+    let counter = 0
+
+    const d = autorun(() => {
+        x.x
+        counter++
+    })
+    expect(counter).toBe(0)
+
+    x.y = 3
+    expect(counter).toBe(0)
+
+    x.x = 3
+    expect(counter).toBe(1)
+
+    d()
+})
+
+test("proxy false reverts to original behavior", () => {
+    const x = observable({ x: 3 }, {}, { proxy: false })
+    x.y = 3
+    expect(isObservableProp(x, "x")).toBe(true)
+    expect(isObservableProp(x, "y")).toBe(false)
+})

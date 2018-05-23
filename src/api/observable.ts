@@ -10,7 +10,7 @@ import { IObservableValue, ObservableValue } from "../types/observablevalue"
 import { IObservableArray, createObservableArray } from "../types/observablearray"
 import { createDecoratorForEnhancer, IObservableDecorator } from "./observabledecorator"
 import { isObservable } from "./isobservable"
-import { IObservableObject, asObservableObject } from "../types/observableobject"
+import { IObservableObject } from "../types/observableobject"
 import { extendObservable } from "./extendobservable"
 import { IObservableMapInitialValues, ObservableMap } from "../types/observablemap"
 import { createDynamicObservableObject } from "../types/dynamicobject"
@@ -19,6 +19,7 @@ export type CreateObservableOptions = {
     name?: string
     deep?: boolean
     defaultDecorator?: IObservableDecorator
+    proxy?: boolean
 }
 
 // Predefined bags of create observable options, to avoid allocating temporarily option objects
@@ -26,24 +27,26 @@ export type CreateObservableOptions = {
 export const defaultCreateObservableOptions: CreateObservableOptions = {
     deep: true,
     name: undefined,
-    defaultDecorator: undefined
+    defaultDecorator: undefined,
+    proxy: true
 }
 export const shallowCreateObservableOptions = {
     deep: false,
     name: undefined,
-    defaultDecorator: undefined
+    defaultDecorator: undefined,
+    proxy: true
 }
 Object.freeze(defaultCreateObservableOptions)
 Object.freeze(shallowCreateObservableOptions)
 
 function assertValidOption(key: string) {
-    if (!/^(deep|name|defaultDecorator)$/.test(key))
+    if (!/^(deep|name|defaultDecorator|proxy)$/.test(key))
         fail(`invalid option for (extend)observable: ${key}`)
 }
 
 export function asCreateObservableOptions(thing: any): CreateObservableOptions {
     if (thing === null || thing === undefined) return defaultCreateObservableOptions
-    if (typeof thing === "string") return { name: thing, deep: true }
+    if (typeof thing === "string") return { name: thing, deep: true, proxy: true }
     if (process.env.NODE_ENV !== "production") {
         if (typeof thing !== "object") return fail("expected options object")
         Object.keys(thing).forEach(assertValidOption)
@@ -200,6 +203,9 @@ const observableFactories: IObservableFactories = {
         //     options.defaultDecorator || (options.deep === false ? refDecorator : deepDecorator)
         // const res = createDynamicObservableObject(props, options.name, defaultDecorator.enhancer)
         // return extendObservable(res, props, decorators, options) as any
+        if (o.proxy === false) {
+            return base
+        }
         return createDynamicObservableObject(base)
     },
     shallowObject<T = any>(props: T, name?: string): T & IObservableObject {
