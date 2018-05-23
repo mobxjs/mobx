@@ -299,7 +299,7 @@ const objectProxyTraps: ProxyHandler<any> = {
         // better: keep a set of observables expressing the existince of a key, like in
         // observable maps
         has(target, name)
-        return undefined
+        return target[name]
     },
     set(target: IIsObservableObject, name: string, value: any) {
         set(target, name, value)

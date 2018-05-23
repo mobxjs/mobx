@@ -72,6 +72,7 @@ export class ObservableObjectAdministration
     changeListeners
     interceptors
     private proxy: any
+    private pendingKeys: undefined | Map<string, ObservableValue<boolean>>
 
     constructor(
         public target: any,
@@ -145,6 +146,21 @@ export class ObservableObjectAdministration
             if (notify) notifyListeners(this, change)
             if (notifySpy) spyReportEnd()
         }
+    }
+
+    waitForKey(name: string) {
+        const map = this.pendingKeys || (this.pendingKeys = new Map())
+        let entry = map.get(name)
+        if (!entry) {
+            entry = new ObservableValue(
+                false,
+                referenceEnhancer,
+                `${this.name}.${name.toString()}?`,
+                false
+            )
+            map.set(name, entry)
+        }
+        entry.get() // read to subscribe
     }
 
     addObservableProp(propName: string, newValue, enhancer: IEnhancer<any> = this.defaultEnhancer) {
@@ -282,6 +298,10 @@ export class ObservableObjectAdministration
         if (notifySpy) spyReportStart({ ...change, name: this.name, key })
         if (notify) notifyListeners(this, change)
         if (notifySpy) spyReportEnd()
+        if (this.pendingKeys) {
+            const entry = this.pendingKeys.get(key)
+            if (entry) entry.set(true)
+        }
         this.keysAtom.reportChanged()
     }
 

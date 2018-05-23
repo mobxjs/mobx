@@ -211,16 +211,17 @@ test("adding a different key doesn't trigger a pending key", () => {
     let counter = 0
 
     const d = autorun(() => {
+        debugger
         x.x
         counter++
     })
-    expect(counter).toBe(0)
+    expect(counter).toBe(1)
 
     x.y = 3
-    expect(counter).toBe(0)
+    expect(counter).toBe(1)
 
     x.x = 3
-    expect(counter).toBe(1)
+    expect(counter).toBe(2)
 
     d()
 })
