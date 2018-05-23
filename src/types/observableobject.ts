@@ -23,10 +23,8 @@ import {
 import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
 import { IEnhancer, referenceEnhancer, deepEnhancer } from "./modifiers"
-import { createObservableArray } from "./observablearray"
 import { initializeInstance } from "../utils/decorators2"
 import { startBatch, endBatch } from "../core/observable"
-import { DynamicObservableObjectAdministration } from "./dynamicobject"
 
 export interface IObservableObject {
     "observable-object": IObservableObject
@@ -148,17 +146,25 @@ export class ObservableObjectAdministration
         }
     }
 
-    waitForKey(name: string) {
+    has(key: string) {
+        if (this.values[key]) return this.values[key] instanceof ObservableValue
+        else {
+            this.waitForKey(key)
+            return false
+        }
+    }
+
+    private waitForKey(key: string) {
         const map = this.pendingKeys || (this.pendingKeys = new Map())
-        let entry = map.get(name)
+        let entry = map.get(key)
         if (!entry) {
             entry = new ObservableValue(
                 false,
                 referenceEnhancer,
-                `${this.name}.${name.toString()}?`,
+                `${this.name}.${key.toString()}?`,
                 false
             )
-            map.set(name, entry)
+            map.set(key, entry)
         }
         entry.get() // read to subscribe
     }
@@ -217,7 +223,7 @@ export class ObservableObjectAdministration
             startBatch()
             const notify = hasListeners(this)
             const notifySpy = isSpyEnabled()
-            const oldValue = this.values[key].get() // TODO: might not exist on dynamic objects
+            const oldValue = this.values[key] && this.values[key].get()
             this.values[key].set(undefined)
             this.keysAtom.reportChanged()
             delete this.values[key]
@@ -312,7 +318,7 @@ export class ObservableObjectAdministration
 }
 
 export interface IIsObservableObject {
-    $mobx: ObservableObjectAdministration | DynamicObservableObjectAdministration
+    $mobx: ObservableObjectAdministration
 }
 
 export function asObservableObject(
@@ -387,14 +393,8 @@ const isObservableObjectAdministration = createInstanceofPredicate(
     ObservableObjectAdministration
 )
 
-const isDynamicObservableObjectAdministration = createInstanceofPredicate(
-    "DynamicObservableObjectAdministration",
-    DynamicObservableObjectAdministration
-)
-
 export function isObservableObject(thing: any): thing is IObservableObject {
     if (isObject(thing)) {
-        if (isDynamicObservableObjectAdministration((thing as any).$mobx)) return true
         // Initializers run lazily when transpiling to babel, so make sure they are run...
         initializeInstance(thing)
         return isObservableObjectAdministration((thing as any).$mobx)
