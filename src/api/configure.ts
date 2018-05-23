@@ -30,7 +30,7 @@ export function configure(options: {
     if (disableErrorBoundaries !== undefined) {
         if (disableErrorBoundaries === true)
             console.warn(
-                "WARNING: Debug feature only. MobX will NOT recover from errors if this is on."
+                "WARNING: Debug feature only. MobX will NOT recover from errors when `disableErrorBoundaries` is enabled."
             )
         globalState.disableErrorBoundaries = !!disableErrorBoundaries
     }

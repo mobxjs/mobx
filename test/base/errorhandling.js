@@ -735,54 +735,60 @@ test("it should be possible to handle global errors in reactions - 2 - #1480", (
 })
 
 test("global error handling will be skipped when using disableErrorBoundaries - 1", () => {
-    mobx.configure({ disableErrorBoundaries: true })
-    try {
-        const a = mobx.observable.box(1)
+    utils.supressConsole(() => {
+        mobx.configure({ disableErrorBoundaries: true })
+        try {
+            const a = mobx.observable.box(1)
 
-        expect(() => {
-            const d = mobx.autorun(function() {
-                throw "OOPS"
-            })
-        }).toThrowError(/OOPS/)
-    } finally {
-        mobx.configure({ disableErrorBoundaries: false })
-        mobx._resetGlobalState()
-    }
+            expect(() => {
+                const d = mobx.autorun(function() {
+                    throw "OOPS"
+                })
+            }).toThrowError(/OOPS/)
+        } finally {
+            mobx.configure({ disableErrorBoundaries: false })
+            mobx._resetGlobalState()
+        }
+    })
 })
 
 test("global error handling will be skipped when using disableErrorBoundaries - 2", () => {
-    mobx.configure({ disableErrorBoundaries: true })
-    try {
-        const a = mobx.observable.box(1)
+    utils.supressConsole(() => {
+        mobx.configure({ disableErrorBoundaries: true })
+        try {
+            const a = mobx.observable.box(1)
 
-        const d = mobx.reaction(
-            () => a.get(),
-            () => {
-                throw "OOPS"
-            }
-        )
-        expect(() => {
-            a.set(2)
-        }).toThrowError(/OOPS/)
+            const d = mobx.reaction(
+                () => a.get(),
+                () => {
+                    throw "OOPS"
+                }
+            )
+            expect(() => {
+                a.set(2)
+            }).toThrowError(/OOPS/)
 
-        d()
-    } finally {
-        mobx.configure({ disableErrorBoundaries: false })
-        mobx._resetGlobalState()
-    }
+            d()
+        } finally {
+            mobx.configure({ disableErrorBoundaries: false })
+            mobx._resetGlobalState()
+        }
+    })
 })
 
 test("error in effect of when is properly cleaned up", () => {
     checkGlobalState()
 
     const b = mobx.observable.box(1)
-    const d = mobx.when(
-        () => b.get() === 2,
-        () => {
-            throw "OOPS"
-        }
-    )
+    utils.supressConsole(() => {
+        const d = mobx.when(
+            () => b.get() === 2,
+            () => {
+                throw "OOPS"
+            }
+        )
+        b.set(2)
+    })
 
-    b.set(2)
     checkGlobalState()
 })
