@@ -1,5 +1,5 @@
 import { globalState } from "./globalstate"
-import { once, Lambda } from "../utils/utils"
+import { once, Lambda, fail } from "../utils/utils"
 
 export function isSpyEnabled() {
     return process.env.NODE_ENV !== "production" && !!globalState.spyListeners.length
@@ -28,7 +28,7 @@ export function spyReportEnd(change?) {
 
 export function spy(listener: (change: any) => void): Lambda {
     if (process.env.NODE_ENV === "production") {
-        fail(`[mobx.spy] can not be used in production builds`)
+        return fail(`[mobx.spy] can not be used in production builds`)
     } else {
         globalState.spyListeners.push(listener)
         return once(() => {

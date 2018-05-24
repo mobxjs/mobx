@@ -11,7 +11,6 @@ import {
     isPlainObject,
     addHiddenFinalProp,
     isPropertyConfigurable,
-    addHiddenProp,
     $mobx
 } from "../utils/utils"
 import {
@@ -82,7 +81,7 @@ export class ObservableObjectAdministration
     }
 
     read(key: string) {
-        return this.values.get(key).get()
+        return this.values.get(key)!.get()
     }
 
     write(key: string, newValue) {
@@ -209,7 +208,7 @@ export class ObservableObjectAdministration
             const notifySpy = isSpyEnabled()
             const oldObservable = this.values.get(key)
             const oldValue = oldObservable && oldObservable.get()
-            oldObservable.set(undefined)
+            oldObservable && oldObservable.set(undefined)
             this.keysAtom.reportChanged()
             this.values.delete(key)
             delete this.target[key]
