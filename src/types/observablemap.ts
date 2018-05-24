@@ -146,7 +146,8 @@ export class ObservableMap<K = any, V = any>
                       }
                     : null
 
-            if (notifySpy) spyReportStart({ ...change, name: this.name, key })
+            if (notifySpy && process.env.NODE_ENV !== "production")
+                spyReportStart({ ...change, name: this.name, key })
             transaction(() => {
                 this._keysAtom.reportChanged()
                 this._updateHasMapEntry(key, false)
@@ -155,7 +156,7 @@ export class ObservableMap<K = any, V = any>
                 this._data.delete(key)
             })
             if (notify) notifyListeners(this, change)
-            if (notifySpy) spyReportEnd()
+            if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
             return true
         }
         return false
@@ -189,10 +190,11 @@ export class ObservableMap<K = any, V = any>
                           newValue
                       }
                     : null
-            if (notifySpy) spyReportStart({ ...change, name: this.name, key })
+            if (notifySpy && process.env.NODE_ENV !== "production")
+                spyReportStart({ ...change, name: this.name, key })
             observable.setNewValue(newValue as V)
             if (notify) notifyListeners(this, change)
-            if (notifySpy) spyReportEnd()
+            if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
         }
     }
 
@@ -221,9 +223,10 @@ export class ObservableMap<K = any, V = any>
                       newValue
                   }
                 : null
-        if (notifySpy) spyReportStart({ ...change, name: this.name, key })
+        if (notifySpy && process.env.NODE_ENV !== "production")
+            spyReportStart({ ...change, name: this.name, key })
         if (notify) notifyListeners(this, change)
-        if (notifySpy) spyReportEnd()
+        if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
     }
 
     get(key: K): V | undefined {

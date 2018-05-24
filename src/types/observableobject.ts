@@ -121,10 +121,11 @@ export class ObservableObjectAdministration
                       }
                     : null
 
-            if (notifySpy) spyReportStart({ ...change, name: this.name, key })
+            if (notifySpy && process.env.NODE_ENV !== "production")
+                spyReportStart({ ...change, name: this.name, key })
             ;(observable as ObservableValue<any>).setNewValue(newValue)
             if (notify) notifyListeners(this, change)
-            if (notifySpy) spyReportEnd()
+            if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
         }
     }
 
@@ -221,9 +222,10 @@ export class ObservableObjectAdministration
                           name: key
                       }
                     : null
-            if (notifySpy) spyReportStart({ ...change, name: this.name, key })
+            if (notifySpy && process.env.NODE_ENV !== "production")
+                spyReportStart({ ...change, name: this.name, key })
             if (notify) notifyListeners(this, change)
-            if (notifySpy) spyReportEnd()
+            if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
         } finally {
             endBatch()
         }
@@ -285,9 +287,10 @@ export class ObservableObjectAdministration
                   }
                 : null
 
-        if (notifySpy) spyReportStart({ ...change, name: this.name, key })
+        if (notifySpy && process.env.NODE_ENV !== "production")
+            spyReportStart({ ...change, name: this.name, key })
         if (notify) notifyListeners(this, change)
-        if (notifySpy) spyReportEnd()
+        if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
         if (this.pendingKeys) {
             const entry = this.pendingKeys.get(key)
             if (entry) entry.set(true)

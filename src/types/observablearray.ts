@@ -256,10 +256,13 @@ class ObservableArrayAdministration
                   }
                 : null
 
-        if (notifySpy) spyReportStart({ ...change, name: this.atom.name })
+        // The reason why this is on right hand side here (and not above), is this way the uglifier will drop it, but it won't
+        // cause any runtime overhead in development mode without NODE_ENV set, unless spying is enabled
+        if (notifySpy && process.env.NODE_ENV !== "production")
+            spyReportStart({ ...change, name: this.atom.name })
         this.atom.reportChanged()
         if (notify) notifyListeners(this, change)
-        if (notifySpy) spyReportEnd()
+        if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
     }
 
     notifyArraySplice(index: number, added: any[], removed: any[]) {
@@ -278,11 +281,12 @@ class ObservableArrayAdministration
                   }
                 : null
 
-        if (notifySpy) spyReportStart({ ...change, name: this.atom.name })
+        if (notifySpy && process.env.NODE_ENV !== "production")
+            spyReportStart({ ...change, name: this.atom.name })
         this.atom.reportChanged()
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
         if (notify) notifyListeners(this, change)
-        if (notifySpy) spyReportEnd()
+        if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
     }
 }
 

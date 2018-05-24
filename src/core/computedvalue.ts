@@ -185,7 +185,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     }
 
     private trackAndCompute(): boolean {
-        if (isSpyEnabled()) {
+        if (isSpyEnabled() && process.env.NODE_ENV !== "production") {
             spyReport({
                 object: this.scope,
                 type: "compute",

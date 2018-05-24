@@ -1,5 +1,6 @@
 # 5.0.0
 
+* `spy` is no longer available in production builds
 * all deprecated api's are dropped. Make sure to not have any deprecation warnings before upgrading
 * uses proxies. otherwise use mobx 4
 * dropped `array.move`
