@@ -289,8 +289,6 @@ class ObservableArrayAdministration
     }
 }
 
-// TODO: optimization, is it faster if we don't intercept all these
-// calls and trap set / get instead?
 const arrayExtensions = {
     intercept(handler: IInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>): Lambda {
         return this[$mobx].intercept(handler)
@@ -306,12 +304,6 @@ const arrayExtensions = {
 
     clear(): any[] {
         return this.splice(0)
-    },
-
-    concat(): any[] {
-        const adm: ObservableArrayAdministration = this[$mobx]
-        adm.atom.reportObserved()
-        return Array.prototype.concat.apply(adm.values, arguments)
     },
 
     replace(newItems: any[]) {
@@ -345,8 +337,6 @@ const arrayExtensions = {
      * and for that reason the do not call dependencyState.notifyObserved
      */
     splice(index: number, deleteCount?: number, ...newItems: any[]): any[] {
-        // TODO: splice could just use the prototype definiton of splice on `changed`
-        // ... but, intercept handlers?
         const adm: ObservableArrayAdministration = this[$mobx]
         switch (arguments.length) {
             case 0:
@@ -364,7 +354,6 @@ const arrayExtensions = {
         return adm.spliceWithArray(index, deleteCount, newItems)
     },
 
-    // TODO: do we need to intercept those or can we rely on the setters?
     push(...items: any[]): number {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.spliceWithArray(adm.values.length, 0, items)
@@ -385,7 +374,6 @@ const arrayExtensions = {
         return adm.values.length
     },
 
-    // TODO: what about this one
     reverse(): any[] {
         // reverse by default mutates in place before returning the result
         // which makes it both a 'derivation' and a 'mutation'.
@@ -394,7 +382,6 @@ const arrayExtensions = {
         return clone.reverse.apply(clone, arguments)
     },
 
-    // TODO: what about this one
     sort(compareFn?: (a: any, b: any) => number): any[] {
         // sort by default mutates in place before returning the result
         // which goes against all good practices. Let's not change the array in place!
