@@ -80,7 +80,7 @@ export function set(obj: any, key: any, value?: any): void {
     }
     if (isObservableObject(obj)) {
         const adm = ((obj as any) as IIsObservableObject)[$mobx]
-        const existingObservable = adm.values[key]
+        const existingObservable = adm.values.get(key)
         if (existingObservable) {
             adm.write(key, value)
         } else {

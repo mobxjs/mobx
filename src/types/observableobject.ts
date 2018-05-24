@@ -74,7 +74,7 @@ export class ObservableObjectAdministration
 
     constructor(
         public target: any,
-        public values: { [key: string]: ObservableValue<any> | ComputedValue<any> }, // TODO: make object?
+        public values = new Map<string, ObservableValue<any> | ComputedValue<any>>(),
         public name: string,
         public defaultEnhancer: IEnhancer<any>
     ) {
@@ -82,12 +82,12 @@ export class ObservableObjectAdministration
     }
 
     read(key: string) {
-        return this.values[key].get()
+        return this.values.get(key).get()
     }
 
     write(key: string, newValue) {
         const instance = this.target
-        const observable = this.values[key]
+        const observable = this.values.get(key)
         if (observable instanceof ComputedValue) {
             observable.set(newValue)
             return
@@ -129,7 +129,7 @@ export class ObservableObjectAdministration
     }
 
     has(key: string) {
-        if (this.values[key]) return this.values[key] instanceof ObservableValue
+        if (this.values.get(key) instanceof ObservableValue) return true
         else {
             this.waitForKey(key)
             return false
@@ -165,12 +165,13 @@ export class ObservableObjectAdministration
             if (!change) return
             newValue = (change as any).newValue
         }
-        const observable = (this.values[propName] = new ObservableValue(
+        const observable = new ObservableValue(
             newValue,
             enhancer,
             `${this.name}.${propName}`,
             false
-        ))
+        )
+        this.values.set(propName, observable)
         newValue = (observable as any).value // observableValue might have changed it
 
         Object.defineProperty(target, propName, generateObservablePropConfig(propName))
@@ -185,13 +186,13 @@ export class ObservableObjectAdministration
         const { target } = this
         options.name = options.name || `${this.name}.${propName}`
         options.context = target
-        addHiddenProp(this.values, propName, new ComputedValue(options)) // non enumerable
+        this.values.set(propName, new ComputedValue(options))
         if (propertyOwner === target || isPropertyConfigurable(propertyOwner, propName))
             Object.defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
     }
 
     remove(key: string) {
-        if (!this.values[key]) return
+        if (!this.values.has(key)) return
         const { target } = this
         if (hasInterceptors(this)) {
             const change = interceptChange<IObjectWillChange>(this, {
@@ -205,10 +206,11 @@ export class ObservableObjectAdministration
             startBatch()
             const notify = hasListeners(this)
             const notifySpy = isSpyEnabled()
-            const oldValue = this.values[key] && this.values[key].get()
-            this.values[key].set(undefined)
+            const oldObservable = this.values.get(key)
+            const oldValue = oldObservable && oldObservable.get()
+            oldObservable.set(undefined)
             this.keysAtom.reportChanged()
-            delete this.values[key]
+            this.values.delete(key)
             delete this.target[key]
             const change =
                 notify || notifySpy
@@ -295,7 +297,9 @@ export class ObservableObjectAdministration
 
     getKeys(): string[] {
         this.keysAtom.reportObserved()
-        return Object.keys(this.values).filter(key => this.values[key] instanceof ObservableValue)
+        const res: string[] = []
+        for (const [key, value] of this.values) if (value instanceof ObservableValue) res.push(key)
+        return res
     }
 }
 
@@ -319,7 +323,7 @@ export function asObservableObject(
         name = (target.constructor.name || "ObservableObject") + "@" + getNextId()
     if (!name) name = "ObservableObject@" + getNextId()
 
-    const adm = new ObservableObjectAdministration(target, {}, name, defaultEnhancer)
+    const adm = new ObservableObjectAdministration(target, new Map(), name, defaultEnhancer)
     addHiddenFinalProp(target, $mobx, adm)
     return adm
 }

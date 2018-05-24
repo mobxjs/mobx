@@ -101,14 +101,14 @@ test("names", function() {
     m.extendObservable(rstruct.y, { a: { b: 2 } })
     rstruct.ar.push({ b: 2 })
     rstruct.ar.push([])
-    expect(rstruct[$mobx].values.x.name).toBe("ObservableObject@1.x")
-    expect(rstruct[$mobx].values.y.name).toBe("ObservableObject@1.y")
-    expect(rstruct.y[$mobx].values.z.name).toBe("ObservableObject@1.y.z")
-    expect(rstruct[$mobx].values.ar.name).toBe("ObservableObject@1.ar")
+    expect(rstruct[$mobx].values.get("x").name).toBe("ObservableObject@1.x")
+    expect(rstruct[$mobx].values.get("y").name).toBe("ObservableObject@1.y")
+    expect(rstruct.y[$mobx].values.get("z").name).toBe("ObservableObject@1.y.z")
+    expect(rstruct[$mobx].values.get("ar").name).toBe("ObservableObject@1.ar")
     expect(rstruct.ar[$mobx].atom.name).toBe("ObservableObject@1.ar")
-    expect(rstruct.ar[1][$mobx].values.w.name).toBe("ObservableObject@1.ar[..].w")
-    expect(rstruct.y.a[$mobx].values.b.name).toBe("ObservableObject@1.y.a.b")
-    expect(rstruct.ar[2][$mobx].values.b.name).toBe("ObservableObject@1.ar[..].b")
+    expect(rstruct.ar[1][$mobx].values.get("w").name).toBe("ObservableObject@1.ar[..].w")
+    expect(rstruct.y.a[$mobx].values.get("b").name).toBe("ObservableObject@1.y.a.b")
+    expect(rstruct.ar[2][$mobx].values.get("b").name).toBe("ObservableObject@1.ar[..].b")
 
     var d = m.autorun(function() {})
     expect(d[$mobx].name).toBeTruthy()
@@ -127,7 +127,7 @@ test("names", function() {
 
     var task = new Task()
     expect(task[$mobx].name).toBe("Task@8")
-    expect(task[$mobx].values.title.name).toBe("Task@8.title")
+    expect(task[$mobx].values.get("title").name).toBe("Task@8.title")
 })
 
 function stripTrackerOutput(output) {

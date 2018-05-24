@@ -37,7 +37,7 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
         if (isObservableObject(thing)) {
             if (!property)
                 return fail(process.env.NODE_ENV !== "production" && `please specify a property`)
-            const observable = (thing as any)[$mobx].values[property]
+            const observable = (thing as any)[$mobx].values.get(property)
             if (!observable)
                 fail(
                     process.env.NODE_ENV !== "production" &&

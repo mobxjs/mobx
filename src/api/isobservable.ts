@@ -17,8 +17,7 @@ function _isObservable(value, property?: string): boolean {
                 "isObservable(object, propertyName) is not supported for arrays and maps. Use map.has or array.length instead."
             )
         if (isObservableObject(value)) {
-            const o = <ObservableObjectAdministration>(value as any)[$mobx]
-            return o.values && !!o.values[property]
+            return (<ObservableObjectAdministration>(value as any)[$mobx]).values.has(property)
         }
         return false
     }

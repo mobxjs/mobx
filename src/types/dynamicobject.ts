@@ -13,7 +13,7 @@ const objectProxyTraps: ProxyHandler<any> = {
         if (name === $mobx || name === "constructor" || name === mobxDidRunLazyInitializersSymbol)
             return target[name]
         const adm = getAdm(target)
-        const observable = adm.values[name]
+        const observable = adm.values.get(name as string)
         if (observable instanceof Atom) return (observable as any).get()
         // make sure we start listening to future keys
         // note that we only do this here for optimization
