@@ -130,7 +130,7 @@ export function isComputingDerivation() {
 }
 
 export function checkIfStateModificationsAreAllowed(atom: IAtom) {
-    const hasObservers = atom.observers.length > 0
+    const hasObservers = atom.observers.size > 0
     // Should never be possible to change an observed observable from inside computed, see #798
     if (globalState.computationDepth > 0 && hasObservers)
         fail(

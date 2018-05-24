@@ -196,27 +196,27 @@ test("cleanup", function() {
     var observable = x._data.get("a")
 
     expect(aValue).toBe(1)
-    expect(observable.observers.length).toBe(1)
-    expect(x._hasMap.get("a").observers.length).toBe(1)
+    expect(observable.observers.size).toBe(1)
+    expect(x._hasMap.get("a").observers.size).toBe(1)
 
     expect(x.delete("a")).toBe(true)
     expect(x.delete("not-existing")).toBe(false)
 
     expect(aValue).toBe(undefined)
-    expect(observable.observers.length).toBe(0)
-    expect(x._hasMap.get("a").observers.length).toBe(1)
+    expect(observable.observers.size).toBe(0)
+    expect(x._hasMap.get("a").observers.size).toBe(1)
 
     x.set("a", 2)
     observable = x._data.get("a")
 
     expect(aValue).toBe(2)
-    expect(observable.observers.length).toBe(1)
-    expect(x._hasMap.get("a").observers.length).toBe(1)
+    expect(observable.observers.size).toBe(1)
+    expect(x._hasMap.get("a").observers.size).toBe(1)
 
     disposer()
     expect(aValue).toBe(2)
-    expect(observable.observers.length).toBe(0)
-    expect(x._hasMap.get("a").observers.length).toBe(0)
+    expect(observable.observers.size).toBe(0)
+    expect(x._hasMap.get("a").observers.size).toBe(0)
 })
 
 test("strict", function() {

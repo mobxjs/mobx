@@ -798,7 +798,7 @@ test("when 2", function() {
     )
 
     expect(called).toBe(1)
-    expect(x.observers.length).toBe(0)
+    expect(x.observers.size).toBe(0)
     x.set(5)
     x.set(3)
     expect(called).toBe(1)
@@ -975,19 +975,19 @@ test("prematurely end autorun", function() {
             x.get()
         })
 
-        expect(x.observers.length).toBe(0)
+        expect(x.observers.size).toBe(0)
         expect(dis1[$mobx].observing.length).toBe(0)
         expect(dis2[$mobx].observing.length).toBe(0)
 
         dis1()
     })
-    expect(x.observers.length).toBe(1)
+    expect(x.observers.size).toBe(1)
     expect(dis1[$mobx].observing.length).toBe(0)
     expect(dis2[$mobx].observing.length).toBe(1)
 
     dis2()
 
-    expect(x.observers.length).toBe(0)
+    expect(x.observers.size).toBe(0)
     expect(dis1[$mobx].observing.length).toBe(0)
     expect(dis2[$mobx].observing.length).toBe(0)
 })
@@ -1225,17 +1225,17 @@ test("prematurely ended autoruns are cleaned up properly", () => {
     })
 
     expect(called).toBe(1)
-    expect(a.observers.length).toBe(1)
-    expect(b.observers.length).toBe(0)
-    expect(c.observers.length).toBe(1)
+    expect(a.observers.size).toBe(1)
+    expect(b.observers.size).toBe(0)
+    expect(c.observers.size).toBe(1)
     expect(d[$mobx].observing.length).toBe(2)
 
     a.set(2)
 
     expect(called).toBe(2)
-    expect(a.observers.length).toBe(0)
-    expect(b.observers.length).toBe(0)
-    expect(c.observers.length).toBe(0)
+    expect(a.observers.size).toBe(0)
+    expect(b.observers.size).toBe(0)
+    expect(c.observers.size).toBe(0)
     expect(d[$mobx].observing.length).toBe(0)
 })
 
@@ -1262,27 +1262,27 @@ test("unoptimizable subscriptions are diffed correctly", () => {
 
     expect(called).toBe(1)
     expect(val).toBe(1)
-    expect(a.observers.length).toBe(2)
-    expect(b.observers.length).toBe(1)
-    expect(c.observers.length).toBe(1)
+    expect(a.observers.size).toBe(2)
+    expect(b.observers.size).toBe(1)
+    expect(c.observers.size).toBe(1)
     expect(d[$mobx].observing.length).toBe(3) // 3 would be better!
 
     b.set(2)
 
     expect(called).toBe(2)
     expect(val).toBe(1)
-    expect(a.observers.length).toBe(2)
-    expect(b.observers.length).toBe(1)
-    expect(c.observers.length).toBe(1)
+    expect(a.observers.size).toBe(2)
+    expect(b.observers.size).toBe(1)
+    expect(c.observers.size).toBe(1)
     expect(d[$mobx].observing.length).toBe(3) // c was cached so accessing a was optimizable
 
     a.set(2)
 
     expect(called).toBe(3)
     expect(val).toBe(2)
-    expect(a.observers.length).toBe(2)
-    expect(b.observers.length).toBe(1)
-    expect(c.observers.length).toBe(1)
+    expect(a.observers.size).toBe(2)
+    expect(b.observers.size).toBe(1)
+    expect(c.observers.size).toBe(1)
     expect(d[$mobx].observing.length).toBe(3) // c was cached so accessing a was optimizable
 
     d()
@@ -1399,9 +1399,9 @@ test("verify calculation count", () => {
         "f",
         "change",
         "b",
+        "d",
         "c",
         "e",
-        "d",
         "f", // would have expected b c e d f, but alas
         "transaction",
         "f",
@@ -1412,8 +1412,8 @@ test("verify calculation count", () => {
         "try f",
         "f",
         "end transaction",
-        "e",
-        "d" // would have expected e d
+        "d", // would have expected e d
+        "e"
     ])
 
     d()
@@ -1542,7 +1542,7 @@ test("603 - transaction should not kill reactions", () => {
         })
     } catch (e) {}
 
-    expect(a.observers.length).toBe(1)
+    expect(a.observers.size).toBe(1)
     expect(d[$mobx].observing.length).toBe(1)
     const g = m._getGlobalState()
     expect(g.inBatch).toEqual(0)

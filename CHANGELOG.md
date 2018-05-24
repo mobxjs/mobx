@@ -6,6 +6,7 @@
 * dropped third arg to `array.find` and `array.findIndex` (not in standard)
 * `proxy` argument to `observable.object`
 * `.$mobx` property has been dropped from all observables and replaced by a Symbol. Instead of e.g. `x.$mobx.name`, use `import { $mobx } from "mobx"; x[$mobx].name`
+* in some cases, the order in which autoruns are fired could have changed due to some internal optimizations (note that MobX never had a guarantee about the order in which autoruns fired!)
 
 Proxies
 - caveats: prebound methods this ain't the proxy!

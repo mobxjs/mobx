@@ -34,6 +34,6 @@ function nodeToObserverTree(node: IDepTreeNode): IObserverTree {
         name: node.name
     }
     if (hasObservers(node as any))
-        result.observers = <any>getObservers(node as any).map(<any>nodeToObserverTree)
+        result.observers = Array.from(<any>getObservers(node as any)).map(<any>nodeToObserverTree)
     return result
 }

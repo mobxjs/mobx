@@ -130,7 +130,7 @@ test("test action should be untracked", () => {
     d()
 })
 
-test("should be possible to create autorun in ation", () => {
+test("should be possible to create autorun in action", () => {
     var a = mobx.observable.box(1)
     var values = []
 
@@ -149,7 +149,7 @@ test("should be possible to create autorun in ation", () => {
     d2()
     a.set(100)
 
-    expect(values).toEqual([3, 5, 20, 41, 26, 28])
+    expect(values).toEqual([3, 5, 20, 26, 41, 28]) // n.b. order could swap as autorun creation order doesn't guarantee stuff
 })
 
 test("should be possible to change unobserved state in an action called from computed", () => {

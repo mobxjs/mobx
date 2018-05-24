@@ -75,7 +75,7 @@ test("exception when starting autorun can be recovered from", () => {
     a.x = 3
     expect(b).toBe(6)
     checkGlobalState()
-    expect(mobx.getAtom(a, "y").observers.length).toBe(1)
+    expect(mobx.getAtom(a, "y").observers.size).toBe(1)
 })
 
 test("exception in autorun can be recovered from", () => {
@@ -93,7 +93,7 @@ test("exception in autorun can be recovered from", () => {
     })
     expect(a.y).toBe(2)
     expect(b).toBe(2)
-    expect(mobx.getAtom(a, "y").observers.length).toBe(1)
+    expect(mobx.getAtom(a, "y").observers.size).toBe(1)
 
     utils.consoleError(() => {
         a.x = 2
@@ -103,7 +103,7 @@ test("exception in autorun can be recovered from", () => {
     expect(() => {
         expect(a.y).toBe(2) // old cached value!
     }).toThrowError(/Uhoh/)
-    expect(mobx.getAtom(a, "y").observers.length).toBe(1)
+    expect(mobx.getAtom(a, "y").observers.size).toBe(1)
 
     expect(b).toBe(2)
     checkGlobalState()
@@ -112,9 +112,9 @@ test("exception in autorun can be recovered from", () => {
     expect(a.y).toBe(6)
     expect(b).toBe(6)
     checkGlobalState()
-    expect(mobx.getAtom(a, "y").observers.length).toBe(1)
+    expect(mobx.getAtom(a, "y").observers.size).toBe(1)
     d()
-    expect(mobx.getAtom(a, "y").observers.length).toBe(0)
+    expect(mobx.getAtom(a, "y").observers.size).toBe(0)
 })
 
 test("multiple autoruns with exceptions are handled correctly", () => {
@@ -481,7 +481,7 @@ test("peeking inside erroring computed value doesn't bork (global) state", () =>
     }).toThrowError(/chocolademelk/)
 
     expect(a.isPendingUnobservation).toBe(false)
-    expect(a.observers.length).toBe(0)
+    expect(a.observers.size).toBe(0)
     expect(a.diffValue).toBe(0)
     expect(a.lowestObserverState).toBe(-1)
     expect(a.hasUnreportedChange).toBe(false)
@@ -491,7 +491,7 @@ test("peeking inside erroring computed value doesn't bork (global) state", () =>
     expect(b.observing.length).toBe(0)
     expect(b.newObserving).toBe(null)
     expect(b.isPendingUnobservation).toBe(false)
-    expect(b.observers.length).toBe(0)
+    expect(b.observers.size).toBe(0)
     expect(b.diffValue).toBe(0)
     expect(b.lowestObserverState).toBe(0)
     expect(b.unboundDepsCount).toBe(0)
@@ -519,7 +519,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
 
     test("it should update correctly initially", () => {
         expect(a.isPendingUnobservation).toBe(false)
-        expect(a.observers.length).toBe(1)
+        expect(a.observers.size).toBe(1)
         expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState).toBe(-1)
         expect(a.hasUnreportedChange).toBe(false)
@@ -529,7 +529,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(b.observing.length).toBe(1)
         expect(b.newObserving).toBe(null)
         expect(b.isPendingUnobservation).toBe(false)
-        expect(b.observers.length).toBe(1)
+        expect(b.observers.size).toBe(1)
         expect(b.diffValue).toBe(0)
         expect(b.lowestObserverState).toBe(0)
         expect(b.unboundDepsCount).toBe(1) // value is always the last bound amount of observers
@@ -556,7 +556,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(r).toBe(2)
 
         expect(a.isPendingUnobservation).toBe(false)
-        expect(a.observers.length).toBe(1)
+        expect(a.observers.size).toBe(1)
         expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState).toBe(0)
         expect(a.hasUnreportedChange).toBe(false)
@@ -566,7 +566,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(b.observing.length).toBe(1)
         expect(b.newObserving).toBe(null)
         expect(b.isPendingUnobservation).toBe(false)
-        expect(b.observers.length).toBe(1)
+        expect(b.observers.size).toBe(1)
         expect(b.diffValue).toBe(0)
         expect(b.lowestObserverState).toBe(0)
         expect(b.unboundDepsCount).toBe(1)
@@ -592,7 +592,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(r).toBe(3)
 
         expect(a.isPendingUnobservation).toBe(false)
-        expect(a.observers.length).toBe(1)
+        expect(a.observers.size).toBe(1)
         expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState).toBe(0)
         expect(a.hasUnreportedChange).toBe(false)
@@ -602,7 +602,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(b.observing.length).toBe(1)
         expect(b.newObserving).toBe(null)
         expect(b.isPendingUnobservation).toBe(false)
-        expect(b.observers.length).toBe(1)
+        expect(b.observers.size).toBe(1)
         expect(b.diffValue).toBe(0)
         expect(b.lowestObserverState).toBe(0)
         expect(b.unboundDepsCount).toBe(1)
@@ -626,7 +626,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         d()
 
         expect(a.isPendingUnobservation).toBe(false)
-        expect(a.observers.length).toBe(0)
+        expect(a.observers.size).toBe(0)
         expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState).toBe(0)
         expect(a.hasUnreportedChange).toBe(false)
@@ -636,7 +636,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(b.observing.length).toBe(0)
         expect(b.newObserving).toBe(null)
         expect(b.isPendingUnobservation).toBe(false)
-        expect(b.observers.length).toBe(0)
+        expect(b.observers.size).toBe(0)
         expect(b.diffValue).toBe(0)
         expect(b.lowestObserverState).toBe(0)
         expect(b.unboundDepsCount).toBe(1)

@@ -18,8 +18,7 @@ export function declareAtom() {
     Atom = class AtomImpl implements IAtom {
         isPendingUnobservation = false // for effective unobserving. BaseAtom has true, for extra optimization, so its onBecomeUnobserved never gets called, because it's not needed
         isBeingObserved = false
-        observers = []
-        observersIndexes = {}
+        observers = new Set()
 
         diffValue = 0
         lastAccessedBy = 0

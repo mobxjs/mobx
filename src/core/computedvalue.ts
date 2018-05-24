@@ -74,8 +74,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     newObserving = null // during tracking it's an array with new observed observers
     isBeingObserved = false
     isPendingUnobservation: boolean = false
-    observers = []
-    observersIndexes = {}
+    observers = new Set()
     diffValue = 0
     runId = 0
     lastAccessedBy = 0
@@ -140,7 +139,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      */
     public get(): T {
         if (this.isComputing) fail(`Cycle detected in computation ${this.name}: ${this.derivation}`)
-        if (globalState.inBatch === 0 && this.observers.length === 0) {
+        if (globalState.inBatch === 0 && this.observers.size === 0) {
             if (shouldCompute(this)) {
                 this.warnAboutUntrackedRead()
                 startBatch() // See perf test 'computed memoization'
