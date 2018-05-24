@@ -335,7 +335,7 @@ export function asObservableObject(
         )
     if (!isPlainObject(target))
         name = (target.constructor.name || "ObservableObject") + "@" + getNextId()
-    if (!name) name = "ObservableObject@" + getNextId() // TODO: change name to record
+    if (!name) name = "ObservableObject@" + getNextId()
 
     const adm = new ObservableObjectAdministration(target, {}, name, defaultEnhancer)
     addHiddenFinalProp(target, "$mobx", adm)

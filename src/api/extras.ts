@@ -12,8 +12,6 @@ export interface IObserverTree {
     observers?: IObserverTree[]
 }
 
-// TODO: remove these utilities in prod builds?
-
 export function getDependencyTree(thing: any, property?: string): IDependencyTree {
     return nodeToDependencyTree(getAtom(thing, property))
 }

@@ -18,7 +18,6 @@ export function extendObservable<A extends Object, B extends Object>(
     decorators?: { [K in keyof B]?: Function },
     options?: CreateObservableOptions
 ): A & B {
-    // TODO: deprecate, use decorator instead
     if (process.env.NODE_ENV !== "production") {
         invariant(
             arguments.length >= 2 && arguments.length <= 4,

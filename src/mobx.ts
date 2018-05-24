@@ -96,7 +96,7 @@ export { observable, IObservableFactory, IObservableFactories } from "./api/obse
 export { computed, IComputed } from "./api/computed"
 export { isObservable, isObservableProp } from "./api/isobservable"
 export { isComputed, isComputedProp } from "./api/iscomputed"
-export { extendObservable, extendShallowObservable } from "./api/extendobservable"
+export { extendObservable } from "./api/extendobservable"
 export { observe } from "./api/observe"
 export { intercept } from "./api/intercept"
 export { autorun, reaction, IReactionOptions } from "./api/autorun"
@@ -143,53 +143,5 @@ if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
         extras: {
             getDebugName
         }
-    })
-}
-
-// TODO: remove in some future build
-if (
-    process.env.NODE_ENV !== "production" &&
-    typeof module !== "undefined" &&
-    typeof module.exports !== "undefined"
-) {
-    let warnedAboutDefaultExport = false
-    Object.defineProperty(module.exports, "default", {
-        enumerable: false,
-        get() {
-            if (!warnedAboutDefaultExport) {
-                warnedAboutDefaultExport = true
-                console.warn(
-                    `The MobX package does not have a default export. Use 'import { thing } from "mobx"' (recommended) or 'import * as mobx from "mobx"' instead."`
-                )
-            }
-            return undefined
-        }
-    })
-    ;[
-        "extras",
-        "Atom",
-        "BaseAtom",
-        "asFlat",
-        "asMap",
-        "asReference",
-        "asStructure",
-        "autorunAsync",
-        "createTranformer",
-        "expr",
-        "isModifierDescriptor",
-        "isStrictModeEnabled",
-        "map",
-        "useStrict",
-        "whyRun"
-    ].forEach(prop => {
-        Object.defineProperty(module.exports, prop, {
-            enumerable: false,
-            get() {
-                fail(
-                    `'${prop}' is no longer part of the public MobX api. Please consult the changelog to find out where this functionality went`
-                )
-            },
-            set() {}
-        })
     })
 }

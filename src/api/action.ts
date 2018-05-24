@@ -66,7 +66,6 @@ action.bound = boundActionDecorator as any
 export function runInAction<T>(block: () => T): T
 export function runInAction<T>(name: string, block: () => T): T
 export function runInAction(arg1, arg2?) {
-    // TODO: deprecate?
     const actionName = typeof arg1 === "string" ? arg1 : arg1.name || "<unnamed action>"
     const fn = typeof arg1 === "function" ? arg1 : arg2
 

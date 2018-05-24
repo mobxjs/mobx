@@ -115,8 +115,8 @@ export interface IObservableArray<T> extends Array<T> {
         fireImmediately?: boolean
     ): Lambda,
     intercept(handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>): Lambda,
-    intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda, // TODO: remove in 4.0
-    intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda, // TODO: remove in 4.0
+    intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda,
+    intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda,
     clear(): T[],
     peek(): T[],
     replace(newItems: T[]): T[],

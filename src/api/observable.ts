@@ -131,7 +131,6 @@ const observableFactories: IObservableFactories = {
         return new ObservableValue(value, getEnhancerFromOptions(o), o.name)
     },
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T> {
-        // TODO: invariant, not already observable (also for the other apis)
         if (arguments.length > 2) incorrectlyUsedAsDecorator("array")
         const o = asCreateObservableOptions(options)
         return createObservableArray(initialValues, getEnhancerFromOptions(o), o.name) as any

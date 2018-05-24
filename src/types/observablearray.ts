@@ -117,7 +117,7 @@ export function createObservableArray<T>(
 class ObservableArrayAdministration
     implements IInterceptable<IArrayWillChange<any> | IArrayWillSplice<any>>, IListenable {
     atom: IAtom
-    values: any[] = [] // TODO: unify this with the proxy target
+    values: any[] = []
     interceptors
     changeListeners
     enhancer: (newV: any, oldV: any | undefined) => any
@@ -347,7 +347,6 @@ const arrayExtensions = {
         return this.toJS()
     },
 
-    // TODO remove peek?
     peek(): any[] {
         const adm: ObservableArrayAdministration = this.$mobx
         adm.atom.reportObserved()

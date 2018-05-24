@@ -1,5 +1,3 @@
-// TODO: use Object.values / Object.entries where relevant
-
 export const OBFUSCATED_ERROR =
     "An invariant failed, however the error is obfuscated because this is an production build."
 
@@ -134,7 +132,7 @@ export function createInstanceofPredicate<T>(
 }
 
 export function areBothNaN(a: any, b: any): boolean {
-    return typeof a === "number" && typeof b === "number" && isNaN(a) && isNaN(b)
+    return typeof a === "number" && typeof b === "number" && isNaN(a) && isNaN(b) // TODO: use Object.is instead
 }
 
 /**
@@ -145,7 +143,6 @@ export function isArrayLike(x: any): x is Array<any> | IObservableArray<any> {
 }
 
 export function isES6Map(thing): boolean {
-    // return thing instanceof Map // TODO: somehow this makes jest crash
     return thing instanceof Map
 }
 

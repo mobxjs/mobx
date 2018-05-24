@@ -84,7 +84,6 @@ function runWebpackBuild({ webpackVersion, moduleFormat }) {
         console.log(
             chalk.yellow(`Installing webpack@${webpackVersion}, using ${moduleFormat} modules`)
         )
-        // TODO: npm? v5 was giving me issues
         return exec(`yarn add --dev webpack@${webpackVersion}`)
     }
 
