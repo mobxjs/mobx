@@ -1,5 +1,5 @@
 import { IEnhancer, deepEnhancer } from "./modifiers"
-import { untracked } from "../core/derivation"
+import { untracked, checkIfStateModificationsAreAllowed } from "../core/derivation"
 import { IObservableArray, createObservableArray } from "./observablearray"
 import { ObservableValue, UNCHANGED } from "./observablevalue"
 import {
@@ -25,6 +25,7 @@ import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
 import { makeIterable } from "../utils/iterable"
 import { transaction } from "../api/transaction"
 import { referenceEnhancer } from "./modifiers"
+import { createAtom } from "../core/atom"
 
 export interface IKeyValueMap<V = any> {
     [key: string]: V
@@ -75,13 +76,7 @@ export class ObservableMap<K = any, V = any>
     [$mobx] = ObservableMapMarker
     private _data: Map<K, ObservableValue<V>>
     private _hasMap: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
-    private _keys: IObservableArray<K> = <any>createObservableArray(
-        // TODO: can be just an atom!
-        undefined,
-        referenceEnhancer,
-        `${this.name}.keys()`,
-        true
-    )
+    private _keysAtom = createAtom(`${this.name}.keys()`)
     interceptors
     changeListeners
     dehancer: any
@@ -154,7 +149,7 @@ export class ObservableMap<K = any, V = any>
 
             if (notifySpy) spyReportStart({ ...change, name: this.name, key })
             transaction(() => {
-                this._keys.remove(key)
+                this._keysAtom.reportChanged()
                 this._updateHasMapEntry(key, false)
                 const observable = this._data.get(key)!
                 observable.setNewValue(undefined as any)
@@ -203,6 +198,7 @@ export class ObservableMap<K = any, V = any>
     }
 
     private _addValue(key: K, newValue: V) {
+        checkIfStateModificationsAreAllowed(this._keysAtom)
         transaction(() => {
             const observable = new ObservableValue(
                 newValue,
@@ -213,7 +209,7 @@ export class ObservableMap<K = any, V = any>
             this._data.set(key, observable)
             newValue = (observable as any).value // value might have been changed
             this._updateHasMapEntry(key, true)
-            this._keys.push(key)
+            this._keysAtom.reportChanged()
         })
         const notifySpy = isSpyEnabled()
         const notify = hasListeners(this)
@@ -244,17 +240,19 @@ export class ObservableMap<K = any, V = any>
     }
 
     keys(): IterableIterator<K> {
-        return this._keys[Symbol.iterator]()
+        this._keysAtom.reportObserved()
+        return this._data.keys()
     }
 
     values(): IterableIterator<V> {
         const self = this
         let nextIndex = 0
+        const keys = Array.from(this.keys())
         return makeIterable<V>(
             {
                 next() {
-                    return nextIndex < self._keys.length
-                        ? { value: self.get(self._keys[nextIndex++]), done: false }
+                    return nextIndex < keys.length
+                        ? { value: self.get(keys[nextIndex++]), done: false }
                         : { done: true }
                 }
             } as any
@@ -264,11 +262,12 @@ export class ObservableMap<K = any, V = any>
     entries(): IterableIterator<IMapEntry<K, V>> {
         const self = this
         let nextIndex = 0
+        const keys = Array.from(this.keys())
         return makeIterable(
             {
                 next: function() {
-                    if (nextIndex < self._keys.length) {
-                        const key = self._keys[nextIndex++]
+                    if (nextIndex < keys.length) {
+                        const key = keys[nextIndex++]
                         return {
                             value: [key, self.get(key)!] as [K, V],
                             done: false
@@ -285,7 +284,7 @@ export class ObservableMap<K = any, V = any>
     }
 
     forEach(callback: (value: V, key: K, object: Map<K, V>) => void, thisArg?) {
-        this._keys.forEach(key => callback.call(thisArg, this.get(key), key, this))
+        for (const [key, value] of this) callback.call(thisArg, value, key, this)
     }
 
     /** Merge another object into this object, returns this. */
@@ -307,7 +306,7 @@ export class ObservableMap<K = any, V = any>
     clear() {
         transaction(() => {
             untracked(() => {
-                this._keys.slice().forEach(key => this.delete(key))
+                for (const key of this.keys()) this.delete(key)
             })
         })
     }
@@ -318,7 +317,7 @@ export class ObservableMap<K = any, V = any>
             // and delete them from the map, then merge the new map
             // this will cause reactions only on changed values
             const newKeys = (getMapLikeKeys(values) as any) as K[]
-            const oldKeys = this._keys
+            const oldKeys = Array.from(this.keys())
             const missingKeys = oldKeys.filter(k => newKeys.indexOf(k) === -1)
             missingKeys.forEach(k => this.delete(k))
             this.merge(values)
@@ -327,7 +326,7 @@ export class ObservableMap<K = any, V = any>
     }
 
     get size(): number {
-        return this._keys.length
+        return this._data.size
     }
 
     /**
@@ -337,7 +336,9 @@ export class ObservableMap<K = any, V = any>
 	 */
     toPOJO(): IKeyValueMap<V> {
         const res: IKeyValueMap<V> = {}
-        this._keys.forEach(key => (res["" + key] = this.get(key)!))
+        for (const [key, value] of this) {
+            res["" + key] = value
+        }
         return res
     }
 
@@ -346,9 +347,7 @@ export class ObservableMap<K = any, V = any>
 	 * Note that the values migth still be observable. For a deep clone use mobx.toJS.
 	 */
     toJS(): Map<K, V> {
-        const res: Map<K, V> = new Map()
-        this._keys.forEach(key => res.set(key, this.get(key)!))
-        return res
+        return new Map(this)
     }
 
     toJSON(): IKeyValueMap<V> {
@@ -360,7 +359,7 @@ export class ObservableMap<K = any, V = any>
         return (
             this.name +
             "[{ " +
-            this._keys.map(key => `${key}: ${"" + this.get(key)}`).join(", ") +
+            Array.from(this.keys()).map(key => `${key}: ${"" + this.get(key)}`).join(", ") +
             " }]"
         )
     }

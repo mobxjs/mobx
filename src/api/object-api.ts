@@ -16,7 +16,7 @@ export function keys(obj: any): any {
         return ((obj as any) as IIsObservableObject)[$mobx].getKeys()
     }
     if (isObservableMap(obj)) {
-        return (obj as any)._keys.slice()
+        return Array.from(obj.keys())
     }
     return fail(
         process.env.NODE_ENV !== "production" &&

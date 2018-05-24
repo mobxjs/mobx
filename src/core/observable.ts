@@ -132,7 +132,7 @@ export function reportObserved(observable: IObservable): boolean {
          */
         if (derivation.runId !== observable.lastAccessedBy) {
             observable.lastAccessedBy = derivation.runId
-            // TODO: use Set for newObserving to make it faster?
+            // Tried storing newObserving, or observing, or both as Set, but performance didn't come close...
             derivation.newObserving![derivation.unboundDepsCount++] = observable
             if (!observable.isBeingObserved) {
                 observable.isBeingObserved = true
