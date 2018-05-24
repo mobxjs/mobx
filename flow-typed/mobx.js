@@ -118,7 +118,6 @@ export interface IObservableArray<T> extends Array<T> {
     intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda,
     intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda,
     clear(): T[],
-    peek(): T[],
     replace(newItems: T[]): T[],
     find(
         predicate: (item: T, index: number, array: Array<T>) => boolean,

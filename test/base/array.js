@@ -221,7 +221,7 @@ test("serialize", function() {
 
     expect(JSON.stringify(m)).toEqual(JSON.stringify(a))
 
-    expect(a).toEqual([...m.peek()]) // MWE: spread is needed because jest crashes on the $mobx symbol present in the peeked array
+    expect(a).toEqual(m.slice())
 
     a = [4]
     m.replace(a)
@@ -320,17 +320,6 @@ test("observes when stringified to locale", function() {
     })
     x.push(1)
     expect(c).toBe(2)
-})
-
-test("peek", function() {
-    var x = mobx.observable([1, 2, 3])
-    expect([...x.peek()]).toEqual([1, 2, 3]) // MWE: spread is needed because jest crashes on the $mobx symbol present in the peeked array
-    expect(x[$mobx].values).toBe(x.peek())
-
-    x.peek().push(4) //noooo!
-    expect(function() {
-        x.push(5) // detect alien change
-    }).toThrow(/the internal structure of an observable array was changed/)
 })
 
 test("react to sort changes", function() {

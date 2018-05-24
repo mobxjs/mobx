@@ -31,7 +31,6 @@ export interface IObservableArray<T = any> extends Array<T> {
     intercept(handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>): Lambda
     clear(): T[]
     replace(newItems: T[]): T[]
-    peek(): T[] // TODO: remove?
     remove(value: T): boolean
 }
 
@@ -137,10 +136,10 @@ class ObservableArrayAdministration
         return value
     }
 
-    dehanceValues(values: any[]): any[] {
+    dehanceValues(values: any[], forceClone: boolean): any[] {
         if (this.dehancer !== undefined && this.values.length > 0)
             return values.map(this.dehancer) as any
-        return values
+        return forceClone ? values.slice() : values
     }
 
     intercept(handler: IInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>): Lambda {
@@ -187,7 +186,7 @@ class ObservableArrayAdministration
     updateArrayLength(oldLength: number, delta: number) {
         if (oldLength !== this.lastKnownLength)
             throw new Error(
-                "[mobx] Modification exception: the internal structure of an observable array was changed. Did you use peek() to change it?"
+                "[mobx] Modification exception: the internal structure of an observable array was changed."
             )
         this.lastKnownLength += delta
     }
@@ -227,7 +226,7 @@ class ObservableArrayAdministration
         const res = this.spliceItemsIntoValues(index, deleteCount, newItems)
 
         if (deleteCount !== 0 || newItems.length !== 0) this.notifyArraySplice(index, newItems, res)
-        return this.dehanceValues(res)
+        return this.dehanceValues(res, false)
     }
 
     spliceItemsIntoValues(index, deleteCount, newItems: any[]): any[] {
@@ -333,10 +332,10 @@ const arrayExtensions = {
         return this.toJS()
     },
 
-    peek(): any[] {
+    slice(): any[] {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom.reportObserved()
-        return adm.dehanceValues(adm.values)
+        return adm.dehanceValues(adm.values, true)
     },
 
     /*
@@ -405,7 +404,7 @@ const arrayExtensions = {
 
     remove(value: any): boolean {
         const adm: ObservableArrayAdministration = this[$mobx]
-        const idx = adm.dehanceValues(adm.values).indexOf(value)
+        const idx = adm.dehanceValues(adm.values, false).indexOf(value)
         if (idx > -1) {
             this.splice(idx, 1)
             return true

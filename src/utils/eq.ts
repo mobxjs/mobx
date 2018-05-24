@@ -126,7 +126,7 @@ function deepEq(a: any, b: any, aStack?: any[], bStack?: any[]) {
 }
 
 function unwrap(a: any) {
-    if (isObservableArray(a)) return a.peek()
+    if (isObservableArray(a)) return a.slice()
     if (isES6Map(a) || isObservableMap(a)) return Array.from(a.entries())
     return a
 }
