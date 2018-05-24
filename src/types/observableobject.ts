@@ -9,7 +9,6 @@ import {
     invariant,
     assertPropertyConfigurable,
     isPlainObject,
-    fail,
     addHiddenFinalProp,
     isPropertyConfigurable,
     addHiddenProp,
@@ -82,30 +81,12 @@ export class ObservableObjectAdministration
         this.keysAtom = new Atom(name + ".keys")
     }
 
-    read(owner: any, key: string) {
-        // TODO: why was this relevant again?
-        if (
-            process.env.NODE_ENV === "production" &&
-            owner !== this.target &&
-            owner !== this.proxy
-        ) {
-            this.illegalAccess(owner, key)
-            if (!this.values[key]) return undefined
-        }
-        // TODO: why was this relevant again?
-        if (typeof key !== "string" || !this.values.hasOwnProperty(key)) return this.values[key] // might be on prototype
-        const observable = this.values[key]
-        if (observable) {
-            return observable.get()
-        }
-        fail(`Not an observable property ${key}`)
+    read(key: string) {
+        return this.values[key].get()
     }
 
-    write(owner: any, key: string, newValue) {
+    write(key: string, newValue) {
         const instance = this.target
-        if (process.env.NODE_ENV === "production" && instance !== owner && owner !== this.proxy) {
-            this.illegalAccess(owner, key)
-        }
         const observable = this.values[key]
         if (observable instanceof ComputedValue) {
             observable.set(newValue)
@@ -353,10 +334,10 @@ export function generateObservablePropConfig(propName) {
             configurable: true,
             enumerable: true,
             get() {
-                return this[$mobx].read(this, propName)
+                return this[$mobx].read(propName)
             },
             set(v) {
-                this[$mobx].write(this, propName, v)
+                this[$mobx].write(propName, v)
             }
         })
     )
@@ -380,10 +361,10 @@ export function generateComputedPropConfig(propName) {
             configurable: true,
             enumerable: false,
             get() {
-                return getAdministrationForComputedPropOwner(this).read(this, propName)
+                return getAdministrationForComputedPropOwner(this).read(propName)
             },
             set(v) {
-                getAdministrationForComputedPropOwner(this).write(this, propName, v)
+                getAdministrationForComputedPropOwner(this).write(propName, v)
             }
         })
     )

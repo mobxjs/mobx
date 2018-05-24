@@ -1,6 +1,5 @@
 import { IEnhancer, deepEnhancer } from "./modifiers"
 import { untracked, checkIfStateModificationsAreAllowed } from "../core/derivation"
-import { IObservableArray, createObservableArray } from "./observablearray"
 import { ObservableValue, UNCHANGED } from "./observablevalue"
 import {
     createInstanceofPredicate,
