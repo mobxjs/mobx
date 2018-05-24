@@ -7,6 +7,8 @@ Object.freeze(EMPTY_ARRAY)
 export const EMPTY_OBJECT = {}
 Object.freeze(EMPTY_OBJECT)
 
+export const $mobx = Symbol("mobx administration")
+
 export interface Lambda {
     (): void
     name?: string
@@ -80,11 +82,11 @@ export function isPlainObject(value) {
 }
 
 const prototypeHasOwnProperty = Object.prototype.hasOwnProperty
-export function hasOwnProperty(object: Object, propName: string) {
+export function hasOwnProperty(object: Object, propName: PropertyKey) {
     return prototypeHasOwnProperty.call(object, propName)
 }
 
-export function makeNonEnumerable(object: any, propNames: string[]) {
+export function makeNonEnumerable(object: any, propNames: PropertyKey[]) {
     for (let i = 0; i < propNames.length; i++) {
         addHiddenProp(object, propNames[i], object[propNames[i]])
     }
@@ -99,7 +101,7 @@ export function addHiddenProp(object: any, propName: PropertyKey, value: any) {
     })
 }
 
-export function addHiddenFinalProp(object: any, propName: string, value: any) {
+export function addHiddenFinalProp(object: any, propName: PropertyKey, value: any) {
     Object.defineProperty(object, propName, {
         enumerable: false,
         writable: false,
@@ -108,12 +110,12 @@ export function addHiddenFinalProp(object: any, propName: string, value: any) {
     })
 }
 
-export function isPropertyConfigurable(object: any, prop: string): boolean {
+export function isPropertyConfigurable(object: any, prop: PropertyKey): boolean {
     const descriptor = Object.getOwnPropertyDescriptor(object, prop)
     return !descriptor || (descriptor.configurable !== false && descriptor.writable !== false)
 }
 
-export function assertPropertyConfigurable(object: any, prop: string) {
+export function assertPropertyConfigurable(object: any, prop: PropertyKey) {
     if (process.env.NODE_ENV !== "production" && !isPropertyConfigurable(object, prop))
         fail(
             `Cannot make property '${prop}' observable, it is not configurable and writable in the target object`

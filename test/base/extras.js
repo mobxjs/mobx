@@ -1,5 +1,7 @@
-var mobx = require("../../src/mobx.ts")
-var m = mobx
+const mobx = require("../../src/mobx.ts")
+const m = mobx
+
+const { $mobx } = mobx
 
 test("treeD", function() {
     m._resetGlobalState()
@@ -21,7 +23,7 @@ test("treeD", function() {
 
     var c = m.autorun(() => b.get())
     var cName = "Autorun@4"
-    expect(dtree(c.$mobx)).toEqual({
+    expect(dtree(c[$mobx])).toEqual({
         name: cName,
         dependencies: [
             {
@@ -59,7 +61,7 @@ test("treeD", function() {
         x.has("absent")
     })
 
-    expect(m.getDependencyTree(d.$mobx)).toEqual({
+    expect(m.getDependencyTree(d[$mobx])).toEqual({
         name: "Autorun@7",
         dependencies: [
             {
@@ -99,19 +101,19 @@ test("names", function() {
     m.extendObservable(rstruct.y, { a: { b: 2 } })
     rstruct.ar.push({ b: 2 })
     rstruct.ar.push([])
-    expect(rstruct.$mobx.values.x.name).toBe("ObservableObject@1.x")
-    expect(rstruct.$mobx.values.y.name).toBe("ObservableObject@1.y")
-    expect(rstruct.y.$mobx.values.z.name).toBe("ObservableObject@1.y.z")
-    expect(rstruct.$mobx.values.ar.name).toBe("ObservableObject@1.ar")
-    expect(rstruct.ar.$mobx.atom.name).toBe("ObservableObject@1.ar")
-    expect(rstruct.ar[1].$mobx.values.w.name).toBe("ObservableObject@1.ar[..].w")
-    expect(rstruct.y.a.$mobx.values.b.name).toBe("ObservableObject@1.y.a.b")
-    expect(rstruct.ar[2].$mobx.values.b.name).toBe("ObservableObject@1.ar[..].b")
+    expect(rstruct[$mobx].values.x.name).toBe("ObservableObject@1.x")
+    expect(rstruct[$mobx].values.y.name).toBe("ObservableObject@1.y")
+    expect(rstruct.y[$mobx].values.z.name).toBe("ObservableObject@1.y.z")
+    expect(rstruct[$mobx].values.ar.name).toBe("ObservableObject@1.ar")
+    expect(rstruct.ar[$mobx].atom.name).toBe("ObservableObject@1.ar")
+    expect(rstruct.ar[1][$mobx].values.w.name).toBe("ObservableObject@1.ar[..].w")
+    expect(rstruct.y.a[$mobx].values.b.name).toBe("ObservableObject@1.y.a.b")
+    expect(rstruct.ar[2][$mobx].values.b.name).toBe("ObservableObject@1.ar[..].b")
 
     var d = m.autorun(function() {})
-    expect(d.$mobx.name).toBeTruthy()
+    expect(d[$mobx].name).toBeTruthy()
 
-    expect(m.autorun(function namedFunction() {}).$mobx.name).toBe("namedFunction")
+    expect(m.autorun(function namedFunction() {})[$mobx].name).toBe("namedFunction")
 
     expect(m.computed(function() {})).toBeTruthy()
 
@@ -124,8 +126,8 @@ test("names", function() {
     }
 
     var task = new Task()
-    expect(task.$mobx.name).toBe("Task@8")
-    expect(task.$mobx.values.title.name).toBe("Task@8.title")
+    expect(task[$mobx].name).toBe("Task@8")
+    expect(task[$mobx].values.title.name).toBe("Task@8.title")
 })
 
 function stripTrackerOutput(output) {
@@ -294,12 +296,12 @@ test("get administration", function() {
     expect(adm(a)).toBe(ovClassName)
 
     expect(adm(b, "a")).toBe(ovClassName)
-    expect(adm(b)).toBe(b.$mobx.constructor.name)
+    expect(adm(b)).toBe(b[$mobx].constructor.name)
     expect(() => adm(b, "b")).toThrowError(
         /no observable property 'b' found on the observable object 'ObservableObject@2'/
     )
     expect(adm(h, "a")).toBe(ovClassName)
-    expect(adm(h)).toBe(h.$mobx.constructor.name)
+    expect(adm(h)).toBe(h[$mobx].constructor.name)
     expect(() => adm(h, "b")).toThrowError(
         /no observable property 'b' found on the observable object 'ObservableObject@10'/
     )
@@ -311,13 +313,13 @@ test("get administration", function() {
         /the entry 'c' does not exist in the observable map 'ObservableMap@3'/
     )
 
-    expect(adm(d)).toBe(d.$mobx.constructor.name)
+    expect(adm(d)).toBe(d[$mobx].constructor.name)
     expect(() => adm(d, 0)).toThrowError(/It is not possible to get index atoms from arrays/)
 
     expect(adm(e)).toBe(mobx.computed(() => {}).constructor.name)
     expect(adm(f)).toBe(mobx.Reaction.name)
 
-    expect(adm(g)).toBe(h.$mobx.constructor.name)
+    expect(adm(g)).toBe(h[$mobx].constructor.name)
     expect(adm(g, "a")).toBe(ovClassName)
 })
 

@@ -4,6 +4,7 @@ var mobx = require("../../src/mobx.ts")
 test("correct api should be exposed", function() {
     expect(Object.keys(mobx).filter(key => mobx[key] !== undefined).sort()).toEqual(
         [
+            "$mobx", // adminstration symbol
             "action",
             "_allowStateChanges",
             "autorun",

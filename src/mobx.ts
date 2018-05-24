@@ -120,7 +120,7 @@ export {
 } from "./core/globalstate"
 export { getDebugName, getAtom, getAdministration as _getAdministration } from "./types/type-utils"
 export { allowStateChanges as _allowStateChanges } from "./core/action"
-export { Lambda, isArrayLike } from "./utils/utils"
+export { Lambda, isArrayLike, $mobx } from "./utils/utils"
 export { isComputingDerivation as _isComputingDerivation } from "./core/derivation"
 export { onReactionError } from "./core/reaction"
 export { interceptReads as _interceptReads } from "./api/intercept-read"

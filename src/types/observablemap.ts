@@ -10,7 +10,8 @@ import {
     invariant,
     isES6Map,
     getMapLikeKeys,
-    fail
+    fail,
+    $mobx
 } from "../utils/utils"
 import {
     IInterceptable,
@@ -70,7 +71,7 @@ export type IObservableMapInitialValues<K = any, V = any> =
 // TODO: just extend Map? See also https://gist.github.com/nestharus/13b4d74f2ef4a2f4357dbd3fc23c1e54
 export class ObservableMap<K = any, V = any>
     implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable {
-    $mobx = ObservableMapMarker
+    [$mobx] = ObservableMapMarker
     private _data: Map<K, ObservableValue<V>>
     private _hasMap: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
     private _keys: IObservableArray<K> = <any>createObservableArray(

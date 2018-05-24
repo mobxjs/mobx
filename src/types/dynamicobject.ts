@@ -1,15 +1,16 @@
 import { Atom } from "../core/atom"
 import { IIsObservableObject, ObservableObjectAdministration } from "./observableobject"
 import { set } from "../api/object-api"
+import { $mobx } from "../utils/utils"
 
 function getAdm(target): ObservableObjectAdministration {
-    return target.$mobx
+    return target[$mobx]
 }
 
 const objectProxyTraps: ProxyHandler<any> = {
     get(target: IIsObservableObject, name: string) {
-        // TODO: use symbol for  "__mobxDidRunLazyInitializers" and "$mobx", and remove these checks
-        if (name === "$mobx" || name === "constructor" || name === "__mobxDidRunLazyInitializers")
+        // TODO: use symbol for  "__mobxDidRunLazyInitializers" and $mobx, and remove these checks
+        if (name === $mobx || name === "constructor" || name === "__mobxDidRunLazyInitializers")
             return target[name]
         const adm = getAdm(target)
         const observable = adm.values[name]
@@ -36,6 +37,6 @@ const objectProxyTraps: ProxyHandler<any> = {
 
 export function createDynamicObservableObject(base) {
     const proxy = new Proxy(base, objectProxyTraps)
-    base.$mobx.proxy = proxy
+    base[$mobx].proxy = proxy
     return proxy
 }

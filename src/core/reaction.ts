@@ -9,7 +9,7 @@ import {
 } from "./derivation"
 import { IObservable, startBatch, endBatch } from "./observable"
 import { globalState } from "./globalstate"
-import { createInstanceofPredicate, getNextId, Lambda } from "../utils/utils"
+import { createInstanceofPredicate, getNextId, Lambda, $mobx } from "../utils/utils"
 import { isSpyEnabled, spyReport, spyReportStart, spyReportEnd } from "./spy"
 import { trace } from "../api/trace"
 
@@ -171,7 +171,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 
     getDisposer(): IReactionDisposer {
         const r = this.dispose.bind(this)
-        r.$mobx = this
+        r[$mobx] = this
         return r
     }
 

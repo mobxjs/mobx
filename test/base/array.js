@@ -1,6 +1,6 @@
 "use strict"
 var mobx = require("../../src/mobx.ts")
-var observable = mobx.observable
+const { observable, $mobx } = mobx
 var iterall = require("iterall")
 
 function buffer() {
@@ -220,7 +220,8 @@ test("serialize", function() {
     var m = mobx.observable(a)
 
     expect(JSON.stringify(m)).toEqual(JSON.stringify(a))
-    expect(a).toEqual(m.peek())
+
+    expect(a).toEqual([...m.peek()]) // MWE: spread is needed because jest crashes on the $mobx symbol present in the peeked array
 
     a = [4]
     m.replace(a)
@@ -323,8 +324,8 @@ test("observes when stringified to locale", function() {
 
 test("peek", function() {
     var x = mobx.observable([1, 2, 3])
-    expect(x.peek()).toEqual([1, 2, 3])
-    expect(x.$mobx.values).toBe(x.peek())
+    expect([...x.peek()]).toEqual([1, 2, 3]) // MWE: spread is needed because jest crashes on the $mobx symbol present in the peeked array
+    expect(x[$mobx].values).toBe(x.peek())
 
     x.peek().push(4) //noooo!
     expect(function() {

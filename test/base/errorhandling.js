@@ -2,8 +2,7 @@ var mobx = require("../../src/mobx.ts")
 var m = mobx
 var utils = require("../utils/test-utils")
 
-var observable = mobx.observable
-var computed = mobx.computed
+const { observable, computed, $mobx } = mobx
 
 var voidObserver = function() {}
 
@@ -513,7 +512,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         return res
     })
     const d = mobx.autorun(() => b.get())
-    const c = d.$mobx
+    const c = d[$mobx]
 
     expect(b.get()).toBe(1)
     expect(r).toBe(1)

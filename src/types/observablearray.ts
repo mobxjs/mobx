@@ -4,7 +4,8 @@ import {
     getNextId,
     Lambda,
     EMPTY_ARRAY,
-    addHiddenFinalProp
+    addHiddenFinalProp,
+    $mobx
 } from "../utils/utils"
 import { Atom, IAtom } from "../core/atom"
 import { checkIfStateModificationsAreAllowed } from "../core/derivation"
@@ -70,8 +71,8 @@ export interface IArrayWillSplice<T = any> {
 
 const arrayTraps = {
     get(target, name) {
-        if (name === "$mobx") return target.$mobx
-        if (name === "length") return target.$mobx.getArrayLength()
+        if (name === $mobx) return target[$mobx]
+        if (name === "length") return target[$mobx].getArrayLength()
         if (typeof name === "number") {
             return arrayExtensions.get.call(target, name)
         }
@@ -85,7 +86,7 @@ const arrayTraps = {
     },
     set(target, name, value): boolean {
         if (name === "length") {
-            target.$mobx.setArrayLength(value)
+            target[$mobx].setArrayLength(value)
             return true
         }
         if (typeof name === "number") {
@@ -107,7 +108,7 @@ export function createObservableArray<T>(
     owned = false
 ): IObservableArray<T> {
     const adm = new ObservableArrayAdministration(name, enhancer, owned)
-    addHiddenFinalProp(adm.values, "$mobx", adm)
+    addHiddenFinalProp(adm.values, $mobx, adm)
     const proxy = new Proxy(adm.values, arrayTraps) as any
     adm.proxy = proxy
     if (initialValues && initialValues.length) adm.spliceWithArray(0, 0, initialValues)
@@ -308,14 +309,14 @@ const interceptReads = {
 // calls and trap set / get instead?
 const arrayExtensions = {
     intercept(handler: IInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>): Lambda {
-        return this.$mobx.intercept(handler)
+        return this[$mobx].intercept(handler)
     },
 
     observe(
         listener: (changeData: IArrayChange<any> | IArraySplice<any>) => void,
         fireImmediately = false
     ): Lambda {
-        const adm: ObservableArrayAdministration = this.$mobx
+        const adm: ObservableArrayAdministration = this[$mobx]
         return adm.observe(listener, fireImmediately)
     },
 
@@ -324,13 +325,13 @@ const arrayExtensions = {
     },
 
     concat(): any[] {
-        const adm: ObservableArrayAdministration = this.$mobx
+        const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom.reportObserved()
         return Array.prototype.concat.apply(adm.values, arguments)
     },
 
     replace(newItems: any[]) {
-        const adm: ObservableArrayAdministration = this.$mobx
+        const adm: ObservableArrayAdministration = this[$mobx]
         return adm.spliceWithArray(0, adm.values.length, newItems)
     },
 
@@ -348,7 +349,7 @@ const arrayExtensions = {
     },
 
     peek(): any[] {
-        const adm: ObservableArrayAdministration = this.$mobx
+        const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom.reportObserved()
         return adm.dehanceValues(adm.values)
     },
@@ -362,7 +363,7 @@ const arrayExtensions = {
     splice(index: number, deleteCount?: number, ...newItems: any[]): any[] {
         // TODO: splice could just use the prototype definiton of splice on `changed`
         // ... but, intercept handlers?
-        const adm: ObservableArrayAdministration = this.$mobx
+        const adm: ObservableArrayAdministration = this[$mobx]
         switch (arguments.length) {
             case 0:
                 return []
@@ -375,19 +376,19 @@ const arrayExtensions = {
     },
 
     spliceWithArray(index: number, deleteCount?: number, newItems?: any[]): any[] {
-        const adm: ObservableArrayAdministration = this.$mobx
+        const adm: ObservableArrayAdministration = this[$mobx]
         return adm.spliceWithArray(index, deleteCount, newItems)
     },
 
     // TODO: do we need to intercept those or can we rely on the setters?
     push(...items: any[]): number {
-        const adm: ObservableArrayAdministration = this.$mobx
+        const adm: ObservableArrayAdministration = this[$mobx]
         adm.spliceWithArray(adm.values.length, 0, items)
         return adm.values.length
     },
 
     pop() {
-        return this.splice(Math.max(this.$mobx.values.length - 1, 0), 1)[0]
+        return this.splice(Math.max(this[$mobx].values.length - 1, 0), 1)[0]
     },
 
     shift() {
@@ -395,7 +396,7 @@ const arrayExtensions = {
     },
 
     unshift(...items: any[]): number {
-        const adm = this.$mobx
+        const adm = this[$mobx]
         adm.spliceWithArray(0, 0, items)
         return adm.values.length
     },
@@ -418,7 +419,7 @@ const arrayExtensions = {
     },
 
     remove(value: any): boolean {
-        const adm: ObservableArrayAdministration = this.$mobx
+        const adm: ObservableArrayAdministration = this[$mobx]
         const idx = adm.dehanceValues(adm.values).indexOf(value)
         if (idx > -1) {
             this.splice(idx, 1)
@@ -428,7 +429,7 @@ const arrayExtensions = {
     },
 
     get(index: number): any | undefined {
-        const adm: ObservableArrayAdministration = this.$mobx
+        const adm: ObservableArrayAdministration = this[$mobx]
         if (adm) {
             if (index < adm.values.length) {
                 adm.atom.reportObserved()
@@ -444,7 +445,7 @@ const arrayExtensions = {
     },
 
     set(index: number, newValue: any) {
-        const adm: ObservableArrayAdministration = this.$mobx
+        const adm: ObservableArrayAdministration = this[$mobx]
         const values = adm.values
         if (index < values.length) {
             // update at index in range
@@ -484,5 +485,5 @@ const isObservableArrayAdministration = createInstanceofPredicate(
 )
 
 export function isObservableArray(thing): thing is IObservableArray<any> {
-    return isObject(thing) && isObservableArrayAdministration(thing.$mobx)
+    return isObject(thing) && isObservableArrayAdministration(thing[$mobx])
 }

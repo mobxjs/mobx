@@ -6,7 +6,7 @@ import {
     ObservableObjectAdministration
 } from "../types/observableobject"
 import { isObservableArray, IObservableArray } from "../types/observablearray"
-import { fail, invariant } from "../utils/utils"
+import { fail, invariant, $mobx } from "../utils/utils"
 import { startBatch, endBatch } from "../core/observable"
 import { getAdministration } from "../types/type-utils"
 import { ObservableValue } from "../types/observablevalue"
@@ -15,7 +15,7 @@ export function keys<K>(map: ObservableMap<K, any>): ReadonlyArray<K>
 export function keys<T extends Object>(obj: T): ReadonlyArray<string>
 export function keys(obj: any): any {
     if (isObservableObject(obj)) {
-        return ((obj as any) as IIsObservableObject).$mobx.getKeys()
+        return ((obj as any) as IIsObservableObject)[$mobx].getKeys()
     }
     if (isObservableMap(obj)) {
         return (obj as any)._keys.slice()
@@ -81,7 +81,7 @@ export function set(obj: any, key: any, value?: any): void {
         return
     }
     if (isObservableObject(obj)) {
-        const adm = ((obj as any) as IIsObservableObject).$mobx
+        const adm = ((obj as any) as IIsObservableObject)[$mobx]
         const existingObservable = adm.values[key]
         if (existingObservable) {
             adm.write(obj, key, value)
@@ -110,7 +110,7 @@ export function remove<T>(obj: IObservableArray<T>, index: number)
 export function remove<T extends Object>(obj: T, key: string)
 export function remove(obj: any, key: any): void {
     if (isObservableObject(obj)) {
-        ;((obj as any) as IIsObservableObject).$mobx.remove(key)
+        ;((obj as any) as IIsObservableObject)[$mobx].remove(key)
     } else if (isObservableMap(obj)) {
         obj.delete(key)
     } else if (isObservableArray(obj)) {

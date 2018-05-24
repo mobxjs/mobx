@@ -12,7 +12,8 @@ import {
     fail,
     addHiddenFinalProp,
     isPropertyConfigurable,
-    addHiddenProp
+    addHiddenProp,
+    $mobx
 } from "../utils/utils"
 import {
     hasInterceptors,
@@ -326,7 +327,7 @@ export function asObservableObject(
     name: string = "",
     defaultEnhancer: IEnhancer<any> = deepEnhancer
 ): ObservableObjectAdministration {
-    if (Object.prototype.hasOwnProperty.call(target, "$mobx")) return target.$mobx
+    if (Object.prototype.hasOwnProperty.call(target, $mobx)) return target[$mobx]
 
     process.env.NODE_ENV !== "production" &&
         invariant(
@@ -338,7 +339,7 @@ export function asObservableObject(
     if (!name) name = "ObservableObject@" + getNextId()
 
     const adm = new ObservableObjectAdministration(target, {}, name, defaultEnhancer)
-    addHiddenFinalProp(target, "$mobx", adm)
+    addHiddenFinalProp(target, $mobx, adm)
     return adm
 }
 
@@ -352,22 +353,22 @@ export function generateObservablePropConfig(propName) {
             configurable: true,
             enumerable: true,
             get() {
-                return this.$mobx.read(this, propName)
+                return this[$mobx].read(this, propName)
             },
             set(v) {
-                this.$mobx.write(this, propName, v)
+                this[$mobx].write(this, propName, v)
             }
         })
     )
 }
 
 function getAdministrationForComputedPropOwner(owner: any): ObservableObjectAdministration {
-    const adm = owner.$mobx
+    const adm = owner[$mobx]
     if (!adm) {
         // because computed props are declared on proty,
         // the current instance might not have been initialized yet
         initializeInstance(owner)
-        return owner.$mobx
+        return owner[$mobx]
     }
     return adm
 }
@@ -397,7 +398,7 @@ export function isObservableObject(thing: any): thing is IObservableObject {
     if (isObject(thing)) {
         // Initializers run lazily when transpiling to babel, so make sure they are run...
         initializeInstance(thing)
-        return isObservableObjectAdministration((thing as any).$mobx)
+        return isObservableObjectAdministration((thing as any)[$mobx])
     }
     return false
 }

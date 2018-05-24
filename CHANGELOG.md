@@ -5,6 +5,7 @@
 * dropped `array.move`
 * dropped third arg to `array.find` and `array.findIndex` (not in standard)
 * `proxy` argument to `observable.object`
+* `.$mobx` property has been dropped from all observables and replaced by a Symbol. Instead of e.g. `x.$mobx.name`, use `import { $mobx } from "mobx"; x[$mobx].name`
 
 Proxies
 - caveats: prebound methods this ain't the proxy!

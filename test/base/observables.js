@@ -2,7 +2,16 @@
 
 var mobx = require("../../src/mobx")
 var m = mobx
-const { observable, computed, transaction, action, autorun, extendObservable, decorate } = mobx
+const {
+    $mobx,
+    observable,
+    computed,
+    transaction,
+    action,
+    autorun,
+    extendObservable,
+    decorate
+} = mobx
 const utils = require("../utils/test-utils")
 
 var voidObserver = function() {}
@@ -794,7 +803,7 @@ test("when 2", function() {
     x.set(3)
     expect(called).toBe(1)
 
-    expect(d.$mobx.name).toBe("when x is 3")
+    expect(d[$mobx].name).toBe("when x is 3")
 })
 
 function stripSpyOutput(events) {
@@ -967,20 +976,20 @@ test("prematurely end autorun", function() {
         })
 
         expect(x.observers.length).toBe(0)
-        expect(dis1.$mobx.observing.length).toBe(0)
-        expect(dis2.$mobx.observing.length).toBe(0)
+        expect(dis1[$mobx].observing.length).toBe(0)
+        expect(dis2[$mobx].observing.length).toBe(0)
 
         dis1()
     })
     expect(x.observers.length).toBe(1)
-    expect(dis1.$mobx.observing.length).toBe(0)
-    expect(dis2.$mobx.observing.length).toBe(1)
+    expect(dis1[$mobx].observing.length).toBe(0)
+    expect(dis2[$mobx].observing.length).toBe(1)
 
     dis2()
 
     expect(x.observers.length).toBe(0)
-    expect(dis1.$mobx.observing.length).toBe(0)
-    expect(dis2.$mobx.observing.length).toBe(0)
+    expect(dis1[$mobx].observing.length).toBe(0)
+    expect(dis2[$mobx].observing.length).toBe(0)
 })
 
 test("computed values believe NaN === NaN", function() {
@@ -1174,8 +1183,8 @@ test("autoruns created in autoruns should kick off", function() {
     })
 
     // a should be observed by the inner autorun, not the outer
-    expect(a.$mobx.observing.length).toBe(0)
-    expect(d.$mobx.observing.length).toBe(1)
+    expect(a[$mobx].observing.length).toBe(0)
+    expect(d[$mobx].observing.length).toBe(1)
 
     x.set(4)
     expect(x2).toEqual([6, 8])
@@ -1219,7 +1228,7 @@ test("prematurely ended autoruns are cleaned up properly", () => {
     expect(a.observers.length).toBe(1)
     expect(b.observers.length).toBe(0)
     expect(c.observers.length).toBe(1)
-    expect(d.$mobx.observing.length).toBe(2)
+    expect(d[$mobx].observing.length).toBe(2)
 
     a.set(2)
 
@@ -1227,7 +1236,7 @@ test("prematurely ended autoruns are cleaned up properly", () => {
     expect(a.observers.length).toBe(0)
     expect(b.observers.length).toBe(0)
     expect(c.observers.length).toBe(0)
-    expect(d.$mobx.observing.length).toBe(0)
+    expect(d[$mobx].observing.length).toBe(0)
 })
 
 test("unoptimizable subscriptions are diffed correctly", () => {
@@ -1256,7 +1265,7 @@ test("unoptimizable subscriptions are diffed correctly", () => {
     expect(a.observers.length).toBe(2)
     expect(b.observers.length).toBe(1)
     expect(c.observers.length).toBe(1)
-    expect(d.$mobx.observing.length).toBe(3) // 3 would be better!
+    expect(d[$mobx].observing.length).toBe(3) // 3 would be better!
 
     b.set(2)
 
@@ -1265,7 +1274,7 @@ test("unoptimizable subscriptions are diffed correctly", () => {
     expect(a.observers.length).toBe(2)
     expect(b.observers.length).toBe(1)
     expect(c.observers.length).toBe(1)
-    expect(d.$mobx.observing.length).toBe(3) // c was cached so accessing a was optimizable
+    expect(d[$mobx].observing.length).toBe(3) // c was cached so accessing a was optimizable
 
     a.set(2)
 
@@ -1274,7 +1283,7 @@ test("unoptimizable subscriptions are diffed correctly", () => {
     expect(a.observers.length).toBe(2)
     expect(b.observers.length).toBe(1)
     expect(c.observers.length).toBe(1)
-    expect(d.$mobx.observing.length).toBe(3) // c was cached so accessing a was optimizable
+    expect(d[$mobx].observing.length).toBe(3) // c was cached so accessing a was optimizable
 
     d()
 })
@@ -1534,7 +1543,7 @@ test("603 - transaction should not kill reactions", () => {
     } catch (e) {}
 
     expect(a.observers.length).toBe(1)
-    expect(d.$mobx.observing.length).toBe(1)
+    expect(d[$mobx].observing.length).toBe(1)
     const g = m._getGlobalState()
     expect(g.inBatch).toEqual(0)
     expect(g.pendingReactions.length).toEqual(0)
