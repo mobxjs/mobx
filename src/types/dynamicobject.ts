@@ -8,7 +8,7 @@ function getAdm(target): ObservableObjectAdministration {
 }
 
 const objectProxyTraps: ProxyHandler<any> = {
-    get(target: IIsObservableObject, name: string) {
+    get(target: IIsObservableObject, name: PropertyKey) {
         // TODO: use symbol for  "__mobxDidRunLazyInitializers" and $mobx, and remove these checks
         if (name === $mobx || name === "constructor" || name === "__mobxDidRunLazyInitializers")
             return target[name]
@@ -17,14 +17,16 @@ const objectProxyTraps: ProxyHandler<any> = {
         if (observable instanceof Atom) return (observable as any).get()
         // make sure we start listening to future keys
         // note that we only do this here for optimization
-        adm.has(name)
+        if (typeof name === "string") adm.has(name)
         return target[name]
     },
-    set(target: IIsObservableObject, name: string, value: any) {
+    set(target: IIsObservableObject, name: PropertyKey, value: any) {
+        if (typeof name !== "string") return false
         set(target, name, value)
         return true
     },
-    deleteProperty(target: IIsObservableObject, name: string) {
+    deleteProperty(target: IIsObservableObject, name: PropertyKey) {
+        if (typeof name !== "string") return false
         const adm = getAdm(target)
         adm.remove(name)
         return true
