@@ -9,9 +9,9 @@ import {
     invariant,
     assertPropertyConfigurable,
     isPlainObject,
-    addHiddenFinalProp,
     isPropertyConfigurable,
-    $mobx
+    $mobx,
+    addHiddenProp
 } from "../utils/utils"
 import {
     hasInterceptors,
@@ -326,7 +326,7 @@ export function asObservableObject(
     if (!name) name = "ObservableObject@" + getNextId()
 
     const adm = new ObservableObjectAdministration(target, new Map(), name, defaultEnhancer)
-    addHiddenFinalProp(target, $mobx, adm)
+    addHiddenProp(target, $mobx, adm)
     return adm
 }
 
