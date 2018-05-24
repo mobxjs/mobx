@@ -2,14 +2,12 @@ import { isObservableMap, ObservableMap } from "../types/observablemap"
 import {
     isObservableObject,
     IIsObservableObject,
-    asObservableObject,
     ObservableObjectAdministration
 } from "../types/observableobject"
 import { isObservableArray, IObservableArray } from "../types/observablearray"
 import { fail, invariant, $mobx } from "../utils/utils"
 import { startBatch, endBatch } from "../core/observable"
 import { getAdministration } from "../types/type-utils"
-import { ObservableValue } from "../types/observablevalue"
 
 export function keys<K>(map: ObservableMap<K, any>): ReadonlyArray<K>
 export function keys<T extends Object>(obj: T): ReadonlyArray<string>

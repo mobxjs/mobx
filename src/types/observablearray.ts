@@ -31,6 +31,7 @@ export interface IObservableArray<T = any> extends Array<T> {
     intercept(handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>): Lambda
     clear(): T[]
     replace(newItems: T[]): T[]
+    peek(): T[] // TODO: remove?
     remove(value: T): boolean
 }
 
@@ -283,26 +284,6 @@ class ObservableArrayAdministration
         if (notify) notifyListeners(this, change)
         if (notifySpy) spyReportEnd()
     }
-}
-
-// TODO: Optimizatin: the following methods coudl be made faster by applying them to values immediately (to avoid triggerering traps a 100 times on arrays)
-const interceptReads = {
-    concat: true,
-    find: true,
-    findIndex: true,
-    every: true,
-    filter: true,
-    forEach: true,
-    indexOf: true,
-    join: true,
-    lastIndexOf: true,
-    map: true,
-    reduce: true,
-    reduceRight: true,
-    slice: true,
-    some: true,
-    toString: true,
-    toLocaleString: true
 }
 
 // TODO: optimization, is it faster if we don't intercept all these

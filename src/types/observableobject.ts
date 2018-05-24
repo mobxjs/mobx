@@ -75,7 +75,7 @@ export class ObservableObjectAdministration
 
     constructor(
         public target: any,
-        public values: { [key: string]: ObservableValue<any> | ComputedValue<any> },
+        public values: { [key: string]: ObservableValue<any> | ComputedValue<any> }, // TODO: make object?
         public name: string,
         public defaultEnhancer: IEnhancer<any>
     ) {

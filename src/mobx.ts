@@ -133,7 +133,6 @@ import "./core/globalstate"
 // Devtools support
 import { spy } from "./core/spy"
 import { getDebugName } from "./types/type-utils"
-import { fail } from "./utils/utils"
 
 declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: ((any) => void) }
 if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
