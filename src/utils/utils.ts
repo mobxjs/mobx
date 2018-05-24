@@ -133,10 +133,6 @@ export function createInstanceofPredicate<T>(
     } as any
 }
 
-export function areBothNaN(a: any, b: any): boolean {
-    return typeof a === "number" && typeof b === "number" && isNaN(a) && isNaN(b) // TODO: use Object.is instead
-}
-
 /**
  * Returns whether the argument is an array, disregarding observability.
  */

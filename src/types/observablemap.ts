@@ -68,7 +68,8 @@ export type IObservableMapInitialValues<K = any, V = any> =
     | IKeyValueMap<V>
     | Map<K, V>
 
-// TODO: just extend Map? See also https://gist.github.com/nestharus/13b4d74f2ef4a2f4357dbd3fc23c1e54
+// just extend Map? See also https://gist.github.com/nestharus/13b4d74f2ef4a2f4357dbd3fc23c1e54
+// But: https://github.com/mobxjs/mobx/issues/1556
 export class ObservableMap<K = any, V = any>
     implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable {
     [$mobx] = ObservableMapMarker
