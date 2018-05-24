@@ -2,6 +2,7 @@ import { Atom } from "../core/atom"
 import { IIsObservableObject, ObservableObjectAdministration } from "./observableobject"
 import { set } from "../api/object-api"
 import { $mobx } from "../utils/utils"
+import { mobxDidRunLazyInitializersSymbol } from "../utils/decorators2"
 
 function getAdm(target): ObservableObjectAdministration {
     return target[$mobx]
@@ -9,8 +10,7 @@ function getAdm(target): ObservableObjectAdministration {
 
 const objectProxyTraps: ProxyHandler<any> = {
     get(target: IIsObservableObject, name: PropertyKey) {
-        // TODO: use symbol for  "__mobxDidRunLazyInitializers" and $mobx, and remove these checks
-        if (name === $mobx || name === "constructor" || name === "__mobxDidRunLazyInitializers")
+        if (name === $mobx || name === "constructor" || name === mobxDidRunLazyInitializersSymbol)
             return target[name]
         const adm = getAdm(target)
         const observable = adm.values[name]
