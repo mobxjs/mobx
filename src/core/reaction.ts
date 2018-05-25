@@ -9,7 +9,7 @@ import {
 } from "./derivation"
 import { IObservable, startBatch, endBatch } from "./observable"
 import { globalState } from "./globalstate"
-import { createInstanceofPredicate, getNextId, Lambda, $mobx } from "../utils/utils"
+import { createInstanceofPredicate, getNextId, Lambda, $mobx } from "../internal"
 import { isSpyEnabled, spyReport, spyReportStart, spyReportEnd } from "./spy"
 import { trace } from "../api/trace"
 

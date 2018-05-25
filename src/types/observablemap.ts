@@ -11,7 +11,7 @@ import {
     getMapLikeKeys,
     fail,
     $mobx
-} from "../utils/utils"
+} from "../internal"
 import {
     IInterceptable,
     IInterceptor,
@@ -250,35 +250,31 @@ export class ObservableMap<K = any, V = any>
         const self = this
         let nextIndex = 0
         const keys = Array.from(this.keys())
-        return makeIterable<V>(
-            {
-                next() {
-                    return nextIndex < keys.length
-                        ? { value: self.get(keys[nextIndex++]), done: false }
-                        : { done: true }
-                }
-            } as any
-        )
+        return makeIterable<V>({
+            next() {
+                return nextIndex < keys.length
+                    ? { value: self.get(keys[nextIndex++]), done: false }
+                    : { done: true }
+            }
+        } as any)
     }
 
     entries(): IterableIterator<IMapEntry<K, V>> {
         const self = this
         let nextIndex = 0
         const keys = Array.from(this.keys())
-        return makeIterable(
-            {
-                next: function() {
-                    if (nextIndex < keys.length) {
-                        const key = keys[nextIndex++]
-                        return {
-                            value: [key, self.get(key)!] as [K, V],
-                            done: false
-                        }
+        return makeIterable({
+            next: function() {
+                if (nextIndex < keys.length) {
+                    const key = keys[nextIndex++]
+                    return {
+                        value: [key, self.get(key)!] as [K, V],
+                        done: false
                     }
-                    return { done: true }
                 }
-            } as any
-        )
+                return { done: true }
+            }
+        } as any)
     }
 
     [Symbol.iterator]() {
@@ -332,10 +328,10 @@ export class ObservableMap<K = any, V = any>
     }
 
     /**
-	 * Returns a plain object that represents this map.
-	 * Note that all the keys being stringified.
-	 * If there are duplicating keys after converting them to strings, behaviour is undetermined.
-	 */
+     * Returns a plain object that represents this map.
+     * Note that all the keys being stringified.
+     * If there are duplicating keys after converting them to strings, behaviour is undetermined.
+     */
     toPOJO(): IKeyValueMap<V> {
         const res: IKeyValueMap<V> = {}
         for (const [key, value] of this) {
@@ -345,9 +341,9 @@ export class ObservableMap<K = any, V = any>
     }
 
     /**
-	 * Returns a shallow non observable object clone of this map.
-	 * Note that the values migth still be observable. For a deep clone use mobx.toJS.
-	 */
+     * Returns a shallow non observable object clone of this map.
+     * Note that the values migth still be observable. For a deep clone use mobx.toJS.
+     */
     toJS(): Map<K, V> {
         return new Map(this)
     }
@@ -361,7 +357,9 @@ export class ObservableMap<K = any, V = any>
         return (
             this.name +
             "[{ " +
-            Array.from(this.keys()).map(key => `${key}: ${"" + this.get(key)}`).join(", ") +
+            Array.from(this.keys())
+                .map(key => `${key}: ${"" + this.get(key)}`)
+                .join(", ") +
             " }]"
         )
     }
@@ -369,10 +367,10 @@ export class ObservableMap<K = any, V = any>
     [Symbol.toStringTag]: "Map" = "Map"
 
     /**
-	 * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
-	 * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
-	 * for callback details
-	 */
+     * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
+     * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
+     * for callback details
+     */
     observe(listener: (changes: IMapDidChange<K, V>) => void, fireImmediately?: boolean): Lambda {
         process.env.NODE_ENV !== "production" &&
             invariant(

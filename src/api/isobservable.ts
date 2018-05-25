@@ -4,7 +4,7 @@ import { isObservableObject, ObservableObjectAdministration } from "../types/obs
 import { isAtom } from "../core/atom"
 import { isComputedValue } from "../core/computedvalue"
 import { isReaction } from "../core/reaction"
-import { fail, $mobx } from "../utils/utils"
+import { fail, $mobx } from "../internal"
 
 function _isObservable(value, property?: string): boolean {
     if (value === null || value === undefined) return false

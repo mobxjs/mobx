@@ -1,7 +1,7 @@
 import { isObservableObject } from "../types/observableobject"
 import { getAtom } from "../types/type-utils"
 import { isComputedValue } from "../core/computedvalue"
-import { fail, $mobx } from "../utils/utils"
+import { fail, $mobx } from "../internal"
 
 export function _isComputed(value, property?: string): boolean {
     if (value === null || value === undefined) return false

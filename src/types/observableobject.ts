@@ -1,29 +1,29 @@
-import { ObservableValue, UNCHANGED } from "./observablevalue"
-import { IAtom, Atom } from "../core/atom"
+import { Atom, IAtom } from "../core/atom"
 import { ComputedValue, IComputedValueOptions } from "../core/computedvalue"
+import { endBatch, startBatch } from "../core/observable"
+import { isSpyEnabled, spyReportEnd, spyReportStart } from "../core/spy"
 import {
-    createInstanceofPredicate,
-    isObject,
+    $mobx,
     Lambda,
+    addHiddenProp,
+    assertPropertyConfigurable,
+    createInstanceofPredicate,
     getNextId,
     invariant,
-    assertPropertyConfigurable,
+    isObject,
     isPlainObject,
-    isPropertyConfigurable,
-    $mobx,
-    addHiddenProp
-} from "../utils/utils"
-import {
-    hasInterceptors,
-    IInterceptable,
-    registerInterceptor,
-    interceptChange
-} from "./intercept-utils"
-import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
-import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
-import { IEnhancer, referenceEnhancer, deepEnhancer } from "./modifiers"
+    isPropertyConfigurable
+} from "../internal"
 import { initializeInstance } from "../utils/decorators2"
-import { startBatch, endBatch } from "../core/observable"
+import {
+    IInterceptable,
+    hasInterceptors,
+    interceptChange,
+    registerInterceptor
+} from "./intercept-utils"
+import { IListenable, hasListeners, notifyListeners, registerListener } from "./listen-utils"
+import { IEnhancer, deepEnhancer, referenceEnhancer } from "./modifiers"
+import { ObservableValue, UNCHANGED } from "./observablevalue"
 
 export interface IObservableObject {
     "observable-object": IObservableObject

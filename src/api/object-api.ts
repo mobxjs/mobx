@@ -5,7 +5,7 @@ import {
     ObservableObjectAdministration
 } from "../types/observableobject"
 import { isObservableArray, IObservableArray } from "../types/observablearray"
-import { fail, invariant, $mobx } from "../utils/utils"
+import { fail, invariant, $mobx } from "../internal"
 import { startBatch, endBatch } from "../core/observable"
 import { getAdministration } from "../types/type-utils"
 

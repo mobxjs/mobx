@@ -1,4 +1,4 @@
-import { Lambda, fail, getNextId, $mobx } from "../utils/utils"
+import { Lambda, fail, getNextId, $mobx } from "../internal"
 import { IReactionDisposer } from "../core/reaction"
 import { autorun } from "./autorun"
 import { createAction } from "../core/action"

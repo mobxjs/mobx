@@ -1,7 +1,7 @@
 import { Atom } from "../core/atom"
 import { IIsObservableObject, ObservableObjectAdministration } from "./observableobject"
 import { set } from "../api/object-api"
-import { $mobx, fail } from "../utils/utils"
+import { $mobx, fail } from "../internal"
 import { mobxDidRunLazyInitializersSymbol } from "../utils/decorators2"
 
 function getAdm(target): ObservableObjectAdministration {

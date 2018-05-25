@@ -7,8 +7,6 @@ Object.freeze(EMPTY_ARRAY)
 export const EMPTY_OBJECT = {}
 Object.freeze(EMPTY_OBJECT)
 
-export const $mobx = Symbol("mobx administration")
-
 export interface Lambda {
     (): void
     name?: string

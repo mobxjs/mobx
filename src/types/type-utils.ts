@@ -1,5 +1,5 @@
 import { IDepTreeNode } from "../core/observable"
-import { fail, $mobx } from "../utils/utils"
+import { $mobx, fail } from "../internal"
 import { initializeInstance } from "../utils/decorators2"
 import { isAtom } from "../core/atom"
 import { isComputedValue } from "../core/computedvalue"

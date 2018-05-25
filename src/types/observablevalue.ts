@@ -1,4 +1,4 @@
-import { Atom, declareAtom } from "../core/atom"
+import { Atom } from "../core/atom"
 import { checkIfStateModificationsAreAllowed } from "../core/derivation"
 import { Lambda, getNextId, createInstanceofPredicate, toPrimitive } from "../utils/utils"
 import {
@@ -32,8 +32,6 @@ export interface IObservableValue<T> {
     intercept(handler: IInterceptor<IValueWillChange<T>>): Lambda
     observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
 }
-
-declareAtom()
 
 export class ObservableValue<T> extends Atom
     implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable {
