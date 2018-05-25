@@ -13,6 +13,7 @@ export type IObservableDecorator = {
 }
 
 export function createDecoratorForEnhancer(enhancer: IEnhancer<any>): IObservableDecorator {
+    invariant(enhancer)
     const decorator = createPropDecorator(
         true,
         (

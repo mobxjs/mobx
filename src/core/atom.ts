@@ -12,6 +12,8 @@ import {
     startBatch
 } from "../internal"
 
+export const $mobx = Symbol("mobx administration")
+
 export interface IAtom extends IObservable {
     reportObserved()
     reportChanged()

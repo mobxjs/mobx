@@ -53,6 +53,11 @@ export function asCreateObservableOptions(thing: any): CreateObservableOptions {
     return thing as CreateObservableOptions
 }
 
+export const deepDecorator = createDecoratorForEnhancer(deepEnhancer)
+const shallowDecorator = createDecoratorForEnhancer(shallowEnhancer)
+export const refDecorator = createDecoratorForEnhancer(referenceEnhancer)
+const refStructDecorator = createDecoratorForEnhancer(refStructEnhancer)
+
 function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any> {
     return options.defaultDecorator
         ? options.defaultDecorator.enhancer
@@ -60,11 +65,6 @@ function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any
             ? referenceEnhancer
             : deepEnhancer
 }
-
-export const deepDecorator = createDecoratorForEnhancer(deepEnhancer)
-const shallowDecorator = createDecoratorForEnhancer(shallowEnhancer)
-export const refDecorator = createDecoratorForEnhancer(referenceEnhancer)
-const refStructDecorator = createDecoratorForEnhancer(refStructEnhancer)
 
 /**
  * Turns an object, array or function into a reactive structure.
