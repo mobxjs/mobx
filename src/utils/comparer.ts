@@ -1,4 +1,4 @@
-import { deepEqual } from "../utils/eq"
+import { deepEqual } from "../internal"
 
 export interface IEqualsComparer<T> {
     (a: T, b: T): boolean

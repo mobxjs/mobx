@@ -1,30 +1,36 @@
-import { IEnhancer, deepEnhancer } from "./modifiers"
-import { untracked, checkIfStateModificationsAreAllowed } from "../core/derivation"
-import { ObservableValue, UNCHANGED } from "./observablevalue"
 import {
-    createInstanceofPredicate,
-    isPlainObject,
-    getNextId,
-    Lambda,
-    invariant,
-    isES6Map,
-    getMapLikeKeys,
-    fail,
-    $mobx
-} from "../internal"
-import {
+    $mobx,
+    IEnhancer,
     IInterceptable,
     IInterceptor,
+    IListenable,
+    Lambda,
+    ObservableValue,
+    UNCHANGED,
+    checkIfStateModificationsAreAllowed,
+    createAtom,
+    createInstanceofPredicate,
+    deepEnhancer,
+    fail,
+    getMapLikeKeys,
+    getNextId,
     hasInterceptors,
+    hasListeners,
+    interceptChange,
+    invariant,
+    isES6Map,
+    isPlainObject,
+    isSpyEnabled,
+    makeIterable,
+    notifyListeners,
+    referenceEnhancer,
     registerInterceptor,
-    interceptChange
-} from "./intercept-utils"
-import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
-import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
-import { makeIterable } from "../utils/iterable"
-import { transaction } from "../api/transaction"
-import { referenceEnhancer } from "./modifiers"
-import { createAtom } from "../core/atom"
+    registerListener,
+    spyReportEnd,
+    spyReportStart,
+    transaction,
+    untracked
+} from "../internal"
 
 export interface IKeyValueMap<V = any> {
     [key: string]: V

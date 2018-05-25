@@ -1,10 +1,12 @@
-import { IObservableArray } from "../types/observablearray"
-import { ObservableMap } from "../types/observablemap"
-import { IComputedValue } from "../core/computedvalue"
-import { Lambda } from "../utils/utils"
-import { getAtom } from "../types/type-utils"
-import { IObservable } from "../core/observable"
-import { fail } from "../utils/utils"
+import {
+    IComputedValue,
+    IObservable,
+    IObservableArray,
+    Lambda,
+    ObservableMap,
+    fail,
+    getAtom
+} from "../internal"
 
 export function onBecomeObserved(
     value: IObservable | IComputedValue<any> | IObservableArray<any> | ObservableMap<any, any>,
@@ -34,7 +36,7 @@ export function onBecomeUnobserved(thing, arg2, arg3?): Lambda {
 
 function interceptHook(hook: "onBecomeObserved" | "onBecomeUnobserved", thing, arg2, arg3) {
     const atom: IObservable =
-        typeof arg2 === "string" ? getAtom(thing, arg2) : getAtom(thing) as any
+        typeof arg2 === "string" ? getAtom(thing, arg2) : (getAtom(thing) as any)
     const cb = typeof arg2 === "string" ? arg3 : arg2
     const orig = atom[hook]
 

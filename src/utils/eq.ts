@@ -1,5 +1,4 @@
-import { isES6Map } from "./utils"
-import { isObservableArray, isObservableMap } from "../mobx"
+import { isES6Map, isObservableArray, isObservableMap } from "../internal"
 
 declare var Symbol
 const toString = Object.prototype.toString

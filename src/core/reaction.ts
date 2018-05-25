@@ -1,17 +1,25 @@
 import {
+    $mobx,
     IDerivation,
     IDerivationState,
-    trackDerivedFunction,
+    IObservable,
+    Lambda,
+    TraceMode,
     clearObserving,
-    shouldCompute,
+    createInstanceofPredicate,
+    endBatch,
+    getNextId,
+    globalState,
     isCaughtException,
-    TraceMode
-} from "./derivation"
-import { IObservable, startBatch, endBatch } from "./observable"
-import { globalState } from "./globalstate"
-import { createInstanceofPredicate, getNextId, Lambda, $mobx } from "../internal"
-import { isSpyEnabled, spyReport, spyReportStart, spyReportEnd } from "./spy"
-import { trace } from "../api/trace"
+    isSpyEnabled,
+    shouldCompute,
+    spyReport,
+    spyReportEnd,
+    spyReportStart,
+    startBatch,
+    trace,
+    trackDerivedFunction
+} from "../internal"
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations

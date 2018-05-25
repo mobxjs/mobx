@@ -1,5 +1,4 @@
-import { action } from "./action"
-import { fail, noop } from "../utils/utils"
+import { action, fail, noop } from "../internal"
 
 let generatorId = 0
 

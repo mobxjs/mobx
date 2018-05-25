@@ -1,6 +1,13 @@
-import { invariant, fail, addHiddenProp } from "../utils/utils"
-import { createAction, executeAction, IAction } from "../core/action"
-import { namedActionDecorator, boundActionDecorator } from "./actiondecorator"
+import {
+    IAction,
+    addHiddenProp,
+    boundActionDecorator,
+    createAction,
+    executeAction,
+    fail,
+    invariant,
+    namedActionDecorator
+} from "../internal"
 
 export interface IActionFactory {
     // nameless actions

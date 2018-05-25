@@ -1,6 +1,4 @@
-import { IDepTreeNode, getObservers, hasObservers } from "../core/observable"
-import { unique } from "../utils/utils"
-import { getAtom } from "../types/type-utils"
+import { IDepTreeNode, getAtom, getObservers, hasObservers, unique } from "../internal"
 
 export interface IDependencyTree {
     name: string

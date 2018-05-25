@@ -1,16 +1,18 @@
-import { isObservableMap } from "../types/observablemap"
-import { asObservableObject } from "../types/observableobject"
-import { isObservable } from "./isobservable"
-import { invariant, fail } from "../utils/utils"
-import { startBatch, endBatch } from "../core/observable"
 import {
     CreateObservableOptions,
     asCreateObservableOptions,
+    asObservableObject,
+    computedDecorator,
     deepDecorator,
-    refDecorator
-} from "./observable"
-import { isComputed } from "./iscomputed"
-import { computedDecorator } from "./computed"
+    endBatch,
+    fail,
+    invariant,
+    isComputed,
+    isObservable,
+    isObservableMap,
+    refDecorator,
+    startBatch
+} from "../internal"
 
 export function extendObservable<A extends Object, B extends Object>(
     target: A,
@@ -62,7 +64,9 @@ export function extendObservable<A extends Object, B extends Object>(
             const decorator =
                 decorators && key in decorators
                     ? decorators[key]
-                    : descriptor.get ? computedDecorator : defaultDecorator
+                    : descriptor.get
+                        ? computedDecorator
+                        : defaultDecorator
             if (process.env.NODE_ENV !== "production" && typeof decorator !== "function")
                 return fail(`Not a valid decorator for '${key}', got: ${decorator}`)
 

@@ -1,12 +1,15 @@
-import { IDepTreeNode } from "../core/observable"
-import { $mobx, fail } from "../internal"
-import { initializeInstance } from "../utils/decorators2"
-import { isAtom } from "../core/atom"
-import { isComputedValue } from "../core/computedvalue"
-import { isReaction } from "../core/reaction"
-import { isObservableArray } from "./observablearray"
-import { isObservableMap } from "./observablemap"
-import { isObservableObject } from "./observableobject"
+import {
+    $mobx,
+    IDepTreeNode,
+    fail,
+    initializeInstance,
+    isAtom,
+    isComputedValue,
+    isObservableArray,
+    isObservableMap,
+    isObservableObject,
+    isReaction
+} from "../internal"
 
 export function getAtom(thing: any, property?: string): IDepTreeNode {
     if (typeof thing === "object" && thing !== null) {

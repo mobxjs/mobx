@@ -1,29 +1,38 @@
-import { Atom, IAtom } from "../core/atom"
-import { ComputedValue, IComputedValueOptions } from "../core/computedvalue"
-import { endBatch, startBatch } from "../core/observable"
-import { isSpyEnabled, spyReportEnd, spyReportStart } from "../core/spy"
 import {
     $mobx,
+    Atom,
+    ComputedValue,
+    IAtom,
+    IComputedValueOptions,
+    IEnhancer,
+    IInterceptable,
+    IListenable,
     Lambda,
+    ObservableValue,
+    UNCHANGED,
     addHiddenProp,
     assertPropertyConfigurable,
     createInstanceofPredicate,
+    deepEnhancer,
+    endBatch,
     getNextId,
+    hasInterceptors,
+    hasListeners,
+    initializeInstance,
+    interceptChange,
     invariant,
     isObject,
     isPlainObject,
-    isPropertyConfigurable
+    isPropertyConfigurable,
+    isSpyEnabled,
+    notifyListeners,
+    referenceEnhancer,
+    registerInterceptor,
+    registerListener,
+    spyReportEnd,
+    spyReportStart,
+    startBatch
 } from "../internal"
-import { initializeInstance } from "../utils/decorators2"
-import {
-    IInterceptable,
-    hasInterceptors,
-    interceptChange,
-    registerInterceptor
-} from "./intercept-utils"
-import { IListenable, hasListeners, notifyListeners, registerListener } from "./listen-utils"
-import { IEnhancer, deepEnhancer, referenceEnhancer } from "./modifiers"
-import { ObservableValue, UNCHANGED } from "./observablevalue"
 
 export interface IObservableObject {
     "observable-object": IObservableObject

@@ -1,9 +1,13 @@
-import { IDerivation, IDerivationState, TraceMode } from "./derivation"
-import { globalState } from "./globalstate"
-import { runReactions } from "./reaction"
-import { ComputedValue } from "./computedvalue"
-import { getDependencyTree } from "../api/extras"
-import { IDependencyTree } from "../mobx"
+import {
+    ComputedValue,
+    IDependencyTree,
+    IDerivation,
+    IDerivationState,
+    TraceMode,
+    getDependencyTree,
+    globalState,
+    runReactions
+} from "../internal"
 
 export interface IDepTreeNode {
     name: string

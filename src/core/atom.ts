@@ -1,3 +1,17 @@
+import {
+    IDerivationState,
+    IObservable,
+    createInstanceofPredicate,
+    endBatch,
+    getNextId,
+    noop,
+    onBecomeObserved,
+    onBecomeUnobserved,
+    propagateChanged,
+    reportObserved,
+    startBatch
+} from "../internal"
+
 export interface IAtom extends IObservable {
     reportObserved()
     reportChanged()
@@ -59,8 +73,3 @@ export function createAtom(
     onBecomeUnobserved(atom, onBecomeUnobservedHandler)
     return atom
 }
-
-import { IObservable, propagateChanged, reportObserved, startBatch, endBatch } from "./observable"
-import { IDerivationState } from "./derivation"
-import { createInstanceofPredicate, noop, getNextId } from "../utils/utils"
-import { onBecomeObserved, onBecomeUnobserved } from "../api/become-observed"

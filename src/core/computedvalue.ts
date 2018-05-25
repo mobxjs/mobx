@@ -1,37 +1,35 @@
 import {
-    IObservable,
-    reportObserved,
-    propagateMaybeChanged,
-    propagateChangeConfirmed,
-    startBatch,
-    endBatch
-} from "./observable"
-import {
+    CaughtException,
     IDerivation,
     IDerivationState,
-    trackDerivedFunction,
+    IEqualsComparer,
+    IObservable,
+    IValueDidChange,
+    Lambda,
+    TraceMode,
+    autorun,
     clearObserving,
-    untrackedStart,
-    untrackedEnd,
-    shouldCompute,
-    CaughtException,
-    isCaughtException,
-    TraceMode
-} from "./derivation"
-import { globalState } from "./globalstate"
-import { createAction } from "./action"
-import {
+    comparer,
+    createAction,
     createInstanceofPredicate,
+    endBatch,
     fail,
     getNextId,
+    globalState,
     invariant,
-    Lambda,
-    toPrimitive
-} from "../utils/utils"
-import { isSpyEnabled, spyReport } from "./spy"
-import { autorun } from "../api/autorun"
-import { IEqualsComparer, comparer } from "../utils/comparer"
-import { IValueDidChange } from "../types/observablevalue"
+    isCaughtException,
+    isSpyEnabled,
+    propagateChangeConfirmed,
+    propagateMaybeChanged,
+    reportObserved,
+    shouldCompute,
+    spyReport,
+    startBatch,
+    toPrimitive,
+    trackDerivedFunction,
+    untrackedEnd,
+    untrackedStart
+} from "../internal"
 
 export interface IComputedValue<T> {
     get(): T
@@ -166,8 +164,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         if (this.setter) {
             invariant(
                 !this.isRunningSetter,
-                `The setter of computed value '${this
-                    .name}' is trying to update itself. Did you intend to update an _observable_ value, instead of the computed property?`
+                `The setter of computed value '${
+                    this.name
+                }' is trying to update itself. Did you intend to update an _observable_ value, instead of the computed property?`
             )
             this.isRunningSetter = true
             try {
@@ -179,8 +178,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             invariant(
                 false,
                 process.env.NODE_ENV !== "production" &&
-                    `[ComputedValue '${this
-                        .name}'] It is not possible to assign a new value to a computed value.`
+                    `[ComputedValue '${
+                        this.name
+                    }'] It is not possible to assign a new value to a computed value.`
             )
     }
 
@@ -264,14 +264,16 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         }
         if (this.isTracing !== TraceMode.NONE) {
             console.log(
-                `[mobx.trace] '${this
-                    .name}' is being read outside a reactive context. Doing a full recompute`
+                `[mobx.trace] '${
+                    this.name
+                }' is being read outside a reactive context. Doing a full recompute`
             )
         }
         if (globalState.computedRequiresReaction) {
             console.warn(
-                `[mobx] Computed value ${this
-                    .name} is being read outside a reactive context. Doing a full recompute`
+                `[mobx] Computed value ${
+                    this.name
+                } is being read outside a reactive context. Doing a full recompute`
             )
         }
     }

@@ -1,25 +1,29 @@
 import {
-    isObject,
-    createInstanceofPredicate,
-    getNextId,
-    Lambda,
+    $mobx,
+    Atom,
     EMPTY_ARRAY,
-    fail,
-    addHiddenFinalProp,
-    $mobx
-} from "../internal"
-import { Atom, IAtom } from "../core/atom"
-import { checkIfStateModificationsAreAllowed } from "../core/derivation"
-import {
+    IAtom,
+    IEnhancer,
     IInterceptable,
     IInterceptor,
+    IListenable,
+    Lambda,
+    addHiddenFinalProp,
+    checkIfStateModificationsAreAllowed,
+    createInstanceofPredicate,
+    fail,
+    getNextId,
     hasInterceptors,
+    hasListeners,
+    interceptChange,
+    isObject,
+    isSpyEnabled,
+    notifyListeners,
     registerInterceptor,
-    interceptChange
-} from "./intercept-utils"
-import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
-import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
-import { IEnhancer } from "./modifiers"
+    registerListener,
+    spyReportEnd,
+    spyReportStart
+} from "../internal"
 
 const MAX_SPLICE_SIZE = 10000 // See e.g. https://github.com/mobxjs/mobx/issues/859
 

@@ -1,5 +1,4 @@
-import { globalState } from "./globalstate"
-import { once, Lambda } from "../utils/utils"
+import { Lambda, globalState, once } from "../internal"
 
 export function isSpyEnabled() {
     return process.env.NODE_ENV !== "production" && !!globalState.spyListeners.length

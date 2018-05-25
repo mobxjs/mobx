@@ -1,19 +1,25 @@
-import { fail, isES6Map, isPlainObject } from "../utils/utils"
 import {
+    IEnhancer,
+    IObservableArray,
+    IObservableDecorator,
+    IObservableMapInitialValues,
+    IObservableObject,
+    IObservableValue,
+    ObservableMap,
+    ObservableValue,
+    createDecoratorForEnhancer,
+    createDynamicObservableObject,
+    createObservableArray,
     deepEnhancer,
-    referenceEnhancer,
-    shallowEnhancer,
+    extendObservable,
+    fail,
+    isES6Map,
+    isObservable,
+    isPlainObject,
     refStructEnhancer,
-    IEnhancer
-} from "../types/modifiers"
-import { IObservableValue, ObservableValue } from "../types/observablevalue"
-import { IObservableArray, createObservableArray } from "../types/observablearray"
-import { createDecoratorForEnhancer, IObservableDecorator } from "./observabledecorator"
-import { isObservable } from "./isobservable"
-import { IObservableObject } from "../types/observableobject"
-import { extendObservable } from "./extendobservable"
-import { IObservableMapInitialValues, ObservableMap } from "../types/observablemap"
-import { createDynamicObservableObject } from "../types/dynamicobject"
+    referenceEnhancer,
+    shallowEnhancer
+} from "../internal"
 
 export type CreateObservableOptions = {
     name?: string
@@ -50,7 +56,9 @@ export function asCreateObservableOptions(thing: any): CreateObservableOptions {
 function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any> {
     return options.defaultDecorator
         ? options.defaultDecorator.enhancer
-        : options.deep === false ? referenceEnhancer : deepEnhancer
+        : options.deep === false
+            ? referenceEnhancer
+            : deepEnhancer
 }
 
 export const deepDecorator = createDecoratorForEnhancer(deepEnhancer)
@@ -74,7 +82,11 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
     // something that can be converted and mutated?
     const res = isPlainObject(v)
         ? observable.object(v, arg2, arg3)
-        : Array.isArray(v) ? observable.array(v, arg2) : isES6Map(v) ? observable.map(v, arg2) : v
+        : Array.isArray(v)
+            ? observable.array(v, arg2)
+            : isES6Map(v)
+                ? observable.map(v, arg2)
+                : v
 
     // this value could be converted to a new observable data structure, return it
     if (res !== v) return res

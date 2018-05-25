@@ -1,3 +1,12 @@
+import {
+    IKeyValueMap,
+    IObservableArray,
+    ObservableMap,
+    globalState,
+    isObservableArray,
+    isObservableMap
+} from "../internal"
+
 export const OBFUSCATED_ERROR =
     "An invariant failed, however the error is obfuscated because this is an production build."
 
@@ -154,7 +163,3 @@ export function getMapLikeKeys(map: any): any {
 export function toPrimitive(value) {
     return value === null ? null : typeof value === "object" ? "" + value : value
 }
-
-import { globalState } from "../core/globalstate"
-import { IObservableArray, isObservableArray } from "../types/observablearray"
-import { isObservableMap, ObservableMap, IKeyValueMap } from "../types/observablemap"
