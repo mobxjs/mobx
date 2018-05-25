@@ -1,6 +1,6 @@
 {
   "name": "mobx",
-  "version": "5.0.0-beta.3",
+  "version": "5.0.0-beta.4",
   "description": "Simple, scalable state management.",
   "main": "lib/mobx.js",
   "umd:main": "lib/mobx.umd.js",
@@ -44,10 +44,10 @@
     "@types/node": "^7.0.22",
     "babel-core": "7.0.0-beta.3",
     "babel-jest": "^22.0.4",
+    "babel-plugin-transform-regenerator": "^6.26.0",
     "babel-preset-es2015": "7.0.0-beta.3",
     "babel-preset-react": "7.0.0-beta.3",
     "babel-preset-stage-1": "7.0.0-beta.3",
-    "babel-plugin-transform-regenerator": "^6.26.0",
     "browserify": "^12.0.1",
     "chalk": "^1.1.3",
     "coveralls": "^2.11.4",
@@ -71,7 +71,7 @@
     "ts-jest": "^22.0.0",
     "tslib": "^1.7.1",
     "typescript": "^2.1.4",
-    "uglify-js": "^2.6.1"
+    "uglify-es": "^3.3.9"
   },
   "dependencies": {},
   "keywords": [

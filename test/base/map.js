@@ -307,7 +307,7 @@ test("map modifier with modifier", () => {
 })
 
 test("256, map.clear should not be tracked", () => {
-    var x = new mobx.observable.map({ a: 3 })
+    var x = mobx.observable.map({ a: 3 })
     var c = 0
     var d = mobx.autorun(() => {
         c++

@@ -38,9 +38,9 @@ function runTypeScriptBuild(outDir, target, declarations) {
         const message = result.diagnostics
             .map(
                 d =>
-                    `${ts.DiagnosticCategory[
-                        d.category
-                    ]} ${d.code} (${d.file}:${d.start}): ${d.messageText}`
+                    `${ts.DiagnosticCategory[d.category]} ${d.code} (${d.file}:${d.start}): ${
+                        d.messageText
+                    }`
             )
             .join("\n")
 
@@ -77,11 +77,11 @@ function generateMinified() {
     console.log("Generating mobx.min.js and mobx.umd.min.js")
     exec(`NODE_ENV=production ${binFolder}/envify lib/mobx.js > lib/mobx.prod.js`)
     exec(
-        `${binFolder}/uglifyjs -m sort,toplevel -c warnings=false --screw-ie8 --preamble "/** MobX - (c) Michel Weststrate 2015, 2016 - MIT Licensed */" --source-map lib/mobx.min.js.map -o lib/mobx.min.js lib/mobx.prod.js`
+        `${binFolder}/uglifyjs --toplevel -m -c warnings=false --preamble "/** MobX - (c) Michel Weststrate 2015, 2016 - MIT Licensed */" --source-map -o lib/mobx.min.js lib/mobx.prod.js`
     )
     exec(`NODE_ENV=production ${binFolder}/envify lib/mobx.umd.js > lib/mobx.prod.umd.js`)
     exec(
-        `${binFolder}/uglifyjs -m sort,toplevel -c warnings=false --screw-ie8 --preamble "/** MobX - (c) Michel Weststrate 2015, 2016 - MIT Licensed */" --source-map lib/mobx.umd.min.js.map -o lib/mobx.umd.min.js lib/mobx.prod.umd.js`
+        `${binFolder}/uglifyjs --toplevel -m -c warnings=false --preamble "/** MobX - (c) Michel Weststrate 2015, 2016 - MIT Licensed */" --source-map -o lib/mobx.umd.min.js lib/mobx.prod.umd.js`
     )
     exec(`rm lib/mobx.prod.js lib/mobx.prod.umd.js`)
 }
@@ -92,8 +92,8 @@ function copyFlowDefinitions() {
 }
 
 function build() {
-    runTypeScriptBuild(".build.cjs", ts.ScriptTarget.ES5, true)
-    runTypeScriptBuild(".build.es", ts.ScriptTarget.ES5, false)
+    runTypeScriptBuild(".build.cjs", ts.ScriptTarget.ES2015, true)
+    runTypeScriptBuild(".build.es", ts.ScriptTarget.ES2015, false)
     return Promise.all([
         generateBundledModule(
             path.resolve(".build.cjs", "mobx.js"),
