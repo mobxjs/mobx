@@ -6,7 +6,8 @@ import {
     EMPTY_ARRAY,
     fail,
     addHiddenFinalProp,
-    $mobx
+    $mobx,
+    invariant
 } from "../utils/utils"
 import { Atom, IAtom } from "../core/atom"
 import { checkIfStateModificationsAreAllowed } from "../core/derivation"
@@ -335,13 +336,6 @@ const arrayExtensions = {
         return this.toJS()
     },
 
-    slice(): any[] {
-        const adm: ObservableArrayAdministration = this[$mobx]
-        adm.atom.reportObserved()
-        const res = adm.dehanceValues(adm.values)
-        return res.slice.apply(res, arguments)
-    },
-
     /*
      * functions that do alter the internal structure of the array, (based on lib.es6.d.ts)
      * since these functions alter the inner structure of the array, the have side effects.
@@ -461,6 +455,35 @@ const arrayExtensions = {
         }
     }
 }
+
+/**
+ * Wrap function from prototype
+ * Without this, everything works as well, but this works
+ * faster as everything works on unproxied values
+ */
+;[
+    "every",
+    "filter",
+    "forEach",
+    "indexOf",
+    "join",
+    "lastIndexOf",
+    "map",
+    "reduce",
+    "reduceRight",
+    "slice",
+    "some",
+    "toString",
+    "toLocaleString"
+].forEach(funcName => {
+    const baseFunc = Array.prototype[funcName]
+    arrayExtensions[funcName] = function() {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        adm.atom.reportObserved()
+        const res = adm.dehanceValues(adm.values)
+        return baseFunc.apply(res, arguments)
+    }
+})
 
 const isObservableArrayAdministration = createInstanceofPredicate(
     "ObservableArrayAdministration",

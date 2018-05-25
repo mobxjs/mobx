@@ -1,6 +1,6 @@
 "use strict"
 var mobx = require("../../src/mobx.ts")
-const { observable, $mobx } = mobx
+const { observable, $mobx, when } = mobx
 var iterall = require("iterall")
 
 function buffer() {
@@ -444,4 +444,18 @@ test("array supports toStringTag, #1490", () => {
 test("slice works", () => {
     const a = mobx.observable([1, 2, 3])
     expect(a.slice(0, 2)).toEqual([1, 2])
+})
+
+test("slice is reactive", () => {
+    const a = mobx.observable([1, 2, 3])
+    let ok = false
+    when(() => a.slice().length === 4, () => (ok = true))
+    expect(ok).toBe(false)
+    a.push(1)
+    expect(ok).toBe(true)
+})
+
+test("toString", () => {
+    expect(mobx.observable([1, 2]).toString()).toEqual([1, 2].toString())
+    expect(mobx.observable([1, 2]).toLocaleString()).toEqual([1, 2].toLocaleString())
 })
