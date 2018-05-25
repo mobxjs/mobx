@@ -147,10 +147,10 @@ class ObservableArrayAdministration
         return value
     }
 
-    dehanceValues(values: any[], forceClone: boolean): any[] {
+    dehanceValues(values: any[]): any[] {
         if (this.dehancer !== undefined && this.values.length > 0)
             return values.map(this.dehancer) as any
-        return forceClone ? values.slice() : values
+        return values
     }
 
     intercept(handler: IInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>): Lambda {
@@ -237,7 +237,7 @@ class ObservableArrayAdministration
         const res = this.spliceItemsIntoValues(index, deleteCount, newItems)
 
         if (deleteCount !== 0 || newItems.length !== 0) this.notifyArraySplice(index, newItems, res)
-        return this.dehanceValues(res, false)
+        return this.dehanceValues(res)
     }
 
     spliceItemsIntoValues(index, deleteCount, newItems: any[]): any[] {
@@ -338,7 +338,8 @@ const arrayExtensions = {
     slice(): any[] {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom.reportObserved()
-        return adm.dehanceValues(adm.values, true)
+        const res = adm.dehanceValues(adm.values)
+        return res.slice.apply(res, arguments)
     },
 
     /*
@@ -402,7 +403,7 @@ const arrayExtensions = {
 
     remove(value: any): boolean {
         const adm: ObservableArrayAdministration = this[$mobx]
-        const idx = adm.dehanceValues(adm.values, false).indexOf(value)
+        const idx = adm.dehanceValues(adm.values).indexOf(value)
         if (idx > -1) {
             this.splice(idx, 1)
             return true

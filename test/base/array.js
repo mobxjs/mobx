@@ -440,3 +440,8 @@ test("array supports toStringTag, #1490", () => {
     const a = mobx.observable([])
     expect(Object.prototype.toString.call(a)).toBe("[object Array]")
 })
+
+test("slice works", () => {
+    const a = mobx.observable([1, 2, 3])
+    expect(a.slice(0, 2)).toEqual([1, 2])
+})
