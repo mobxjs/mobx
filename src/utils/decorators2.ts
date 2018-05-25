@@ -1,4 +1,4 @@
-import { addHiddenProp, fail, EMPTY_ARRAY } from "./utils"
+import { EMPTY_ARRAY, addHiddenProp, fail } from "../internal"
 
 export const mobxDidRunLazyInitializersSymbol = Symbol("mobx did run lazy initializers")
 export const mobxPendingDecorators = Symbol("mobx pending decorators")

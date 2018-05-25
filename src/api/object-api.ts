@@ -1,13 +1,18 @@
-import { isObservableMap, ObservableMap } from "../types/observablemap"
 import {
-    isObservableObject,
+    $mobx,
     IIsObservableObject,
-    ObservableObjectAdministration
-} from "../types/observableobject"
-import { isObservableArray, IObservableArray } from "../types/observablearray"
-import { fail, invariant, $mobx } from "../utils/utils"
-import { startBatch, endBatch } from "../core/observable"
-import { getAdministration } from "../types/type-utils"
+    IObservableArray,
+    ObservableMap,
+    ObservableObjectAdministration,
+    endBatch,
+    fail,
+    getAdministration,
+    invariant,
+    isObservableArray,
+    isObservableMap,
+    isObservableObject,
+    startBatch
+} from "../internal"
 
 export function keys<K>(map: ObservableMap<K, any>): ReadonlyArray<K>
 export function keys<T extends Object>(obj: T): ReadonlyArray<string>

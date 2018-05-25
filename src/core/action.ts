@@ -1,9 +1,16 @@
-import { IDerivation } from "./derivation"
-import { invariant, fail } from "../utils/utils"
-import { untrackedStart, untrackedEnd } from "./derivation"
-import { startBatch, endBatch } from "./observable"
-import { isSpyEnabled, spyReportStart, spyReportEnd } from "./spy"
-import { globalState } from "./globalstate"
+import {
+    IDerivation,
+    endBatch,
+    fail,
+    globalState,
+    invariant,
+    isSpyEnabled,
+    spyReportEnd,
+    spyReportStart,
+    startBatch,
+    untrackedEnd,
+    untrackedStart
+} from "../internal"
 
 export interface IAction {
     isMobxAction: boolean

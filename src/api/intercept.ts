@@ -1,10 +1,16 @@
-import { IInterceptor } from "../types/intercept-utils"
-import { IObservableArray, IArrayWillChange, IArrayWillSplice } from "../types/observablearray"
-import { ObservableMap, IMapWillChange } from "../types/observablemap"
-import { IObjectWillChange } from "../types/observableobject"
-import { IValueWillChange, IObservableValue } from "../types/observablevalue"
-import { Lambda } from "../utils/utils"
-import { getAdministration } from "../types/type-utils"
+import {
+    IArrayWillChange,
+    IArrayWillSplice,
+    IInterceptor,
+    IMapWillChange,
+    IObjectWillChange,
+    IObservableArray,
+    IObservableValue,
+    IValueWillChange,
+    Lambda,
+    ObservableMap,
+    getAdministration
+} from "../internal"
 
 export function intercept<T>(
     value: IObservableValue<T>,

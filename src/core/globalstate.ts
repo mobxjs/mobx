@@ -1,7 +1,4 @@
-import { fail } from "../utils/utils"
-import { IDerivation } from "./derivation"
-import { Reaction } from "./reaction"
-import { IObservable } from "./observable"
+import { IDerivation, IObservable, Reaction, fail } from "../internal"
 
 /**
  * These values will persist if global state is reset

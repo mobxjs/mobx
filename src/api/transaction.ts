@@ -1,4 +1,4 @@
-import { startBatch, endBatch } from "../core/observable"
+import { endBatch, startBatch } from "../internal"
 
 /**
  * During a transaction no views are updated until the end of the transaction.

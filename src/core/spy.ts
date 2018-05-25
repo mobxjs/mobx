@@ -1,5 +1,4 @@
-import { globalState } from "./globalstate"
-import { once, Lambda, fail } from "../utils/utils"
+import { Lambda, globalState, once } from "../internal"
 
 export function isSpyEnabled() {
     return process.env.NODE_ENV !== "production" && !!globalState.spyListeners.length
@@ -29,6 +28,7 @@ export function spyReportEnd(change?) {
 export function spy(listener: (change: any) => void): Lambda {
     if (process.env.NODE_ENV === "production") {
         console.warn(`[mobx.spy] Is a no-op in production builds`)
+        return function() {}
     } else {
         globalState.spyListeners.push(listener)
         return once(() => {

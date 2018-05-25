@@ -280,7 +280,7 @@ test("observe & intercept set called multiple times", () => {
 })
 
 test("dynamically adding properties should preserve the original modifiers of an object", () => {
-    const todos = observable(
+    const todos = observable.object(
         {
             a: { title: "get coffee" }
         },

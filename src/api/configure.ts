@@ -1,5 +1,4 @@
-import { globalState, isolateGlobalState } from "../core/globalstate"
-import { setReactionScheduler } from "../core/reaction"
+import { globalState, isolateGlobalState, setReactionScheduler } from "../internal"
 
 export function configure(options: {
     enforceActions?: boolean | "strict"

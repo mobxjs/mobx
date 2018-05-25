@@ -1,7 +1,11 @@
-import { fail, addHiddenProp } from "../utils/utils"
-import { createAction } from "../core/action"
-import { BabelDescriptor } from "../utils/decorators2"
-import { action, defineBoundAction } from "./action"
+import {
+    BabelDescriptor,
+    action,
+    addHiddenProp,
+    createAction,
+    defineBoundAction,
+    fail
+} from "../internal"
 
 function dontReassignFields() {
     fail(process.env.NODE_ENV !== "production" && "@action fields are not reassignable")

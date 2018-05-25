@@ -1,5 +1,5 @@
 var test = require("tape")
-var mobx = require("../../lib/mobx.min.js")
+var mobx = require("../../lib/mobx.js")
 var observable = mobx.observable
 var computed = mobx.computed
 var log = require("./index.js").logMeasurement
