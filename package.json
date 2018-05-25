@@ -1,6 +1,6 @@
 {
   "name": "mobx",
-  "version": "5.0.0-beta.4",
+  "version": "5.0.0-beta.5",
   "description": "Simple, scalable state management.",
   "main": "lib/mobx.js",
   "umd:main": "lib/mobx.umd.js",
@@ -22,7 +22,7 @@
     "quick-build": "tsc --pretty",
     "small-build": "node scripts/build.js",
     "lint": "tslint -c tslint.json src/*.ts src/types/*.ts src/api/*.ts src/core/*.ts src/utils/*.ts",
-    "size": "size-limit 20KB lib/mobx.js",
+    "size": "size-limit --babili 20KB lib/mobx.js",
     "precommit": "lint-staged"
   },
   "repository": {
