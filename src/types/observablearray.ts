@@ -4,6 +4,7 @@ import {
     getNextId,
     Lambda,
     EMPTY_ARRAY,
+    fail,
     addHiddenFinalProp,
     $mobx
 } from "../utils/utils"
@@ -97,6 +98,16 @@ const arrayTraps = {
             arrayExtensions.set.call(target, parseInt(name), value)
             return true
         }
+        return false
+    },
+    defineProperty(target, key, descriptor) {
+        fail(
+            `Defining properties on observable arrays is not supported, directly assign them instead`
+        )
+        return false
+    },
+    preventExtensions(target) {
+        fail(`Observable arrays cannot be frozen`)
         return false
     }
 }

@@ -448,7 +448,7 @@ test("as structure view", function() {
 // will break the invariants of proxies (when trying to determine keys)
 // which is not unfixiable in itself,
 // but definitely a pattern we don't want to encourage
-test.skip("ES5 non reactive props", function() {
+test("ES5 non reactive props", function() {
     var te = m.observable({})
     Object.defineProperty(te, "nonConfigurable", {
         enumerable: true,

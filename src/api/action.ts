@@ -55,7 +55,7 @@ export var action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): 
     // @action fn() {}
     if (arg4 === true) {
         // apply to instance immediately
-        arg1[arg2] = createAction(arg1.name || arg2, arg3.value)
+        addHiddenProp(arg1, arg2, createAction(arg1.name || arg2, arg3.value))
     } else {
         return namedActionDecorator(arg2).apply(null, arguments)
     }

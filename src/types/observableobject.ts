@@ -299,6 +299,7 @@ export class ObservableObjectAdministration
 
     getKeys(): string[] {
         this.keysAtom.reportObserved()
+        // return Reflect.ownKeys(this.values) as any
         const res: string[] = []
         for (const [key, value] of this.values) if (value instanceof ObservableValue) res.push(key)
         return res

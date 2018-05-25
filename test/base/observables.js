@@ -19,7 +19,13 @@ var voidObserver = function() {}
 function buffer() {
     var b = []
     var res = function(x) {
-        b.push(x.newValue)
+        if (typeof x.newValue === "object") {
+            const copy = { ...x.newValue }
+            delete copy[$mobx]
+            b.push(copy)
+        } else {
+            b.push(x.newValue)
+        }
     }
     res.toArray = function() {
         return b

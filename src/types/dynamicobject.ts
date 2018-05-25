@@ -1,13 +1,15 @@
 import { Atom } from "../core/atom"
 import { IIsObservableObject, ObservableObjectAdministration } from "./observableobject"
 import { set } from "../api/object-api"
-import { $mobx } from "../utils/utils"
+import { $mobx, fail } from "../utils/utils"
 import { mobxDidRunLazyInitializersSymbol } from "../utils/decorators2"
 
 function getAdm(target): ObservableObjectAdministration {
     return target[$mobx]
 }
 
+// Optimization: we don't need the intermediate objects and could have a completely custom administration for DynamicObjects,
+// and skip either the internal values map, or the base object with its property descriptors!
 const objectProxyTraps: ProxyHandler<any> = {
     get(target: IIsObservableObject, name: PropertyKey) {
         if (name === $mobx || name === "constructor" || name === mobxDidRunLazyInitializersSymbol)
@@ -33,7 +35,12 @@ const objectProxyTraps: ProxyHandler<any> = {
     },
     ownKeys(target: IIsObservableObject) {
         const adm = getAdm(target)
-        return adm.getKeys() as PropertyKey[]
+        adm.keysAtom.reportObserved()
+        return Reflect.ownKeys(target)
+    },
+    preventExtensions(target) {
+        fail(`Dynamic observable objects cannot be frozen`)
+        return false
     }
 }
 

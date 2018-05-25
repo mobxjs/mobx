@@ -1162,7 +1162,7 @@ test("computed setter problem", () => {
     expect(c.lastName).toBe("Weststrate")
 })
 
-test.only("computed setter problem - 2", () => {
+test("computed setter problem - 2", () => {
     class Contact {
         @observable firstName = ""
         @observable lastName = ""

@@ -1,12 +1,18 @@
 import {
+    decorate,
+    isComputedProp,
+    isAction,
     isObservableProp,
     autorun,
     observable,
     action,
     reaction,
     extendObservable,
-    keys
+    keys,
+    $mobx
 } from "../../src/mobx.ts"
+
+import { stripAdminFromDescriptors } from "../utils/test-utils"
 
 test("should react to key removal (unless reconfiguraing to empty) - 1", () => {
     const events = []
@@ -83,7 +89,7 @@ test("should react to future key additions - 2", () => {
     expect(events).toEqual([4])
 })
 
-test.skip("should throw clear warning if trying to add computed to already reserved key", () => {
+test("should throw clear warning if trying to add computed to already reserved key", () => {
     const x = observable.object({ z: 3 })
 
     expect(() => {
@@ -92,7 +98,7 @@ test.skip("should throw clear warning if trying to add computed to already reser
                 return 3
             }
         })
-    }).toThrow(/bla/)
+    }).toThrow(/can only be used to introduce new properties/)
 })
 
 test("correct keys are reported", () => {
@@ -116,12 +122,12 @@ test("correct keys are reported", () => {
     expect(Object.values(x)).toEqual([1, 3, 4])
     expect(Object.entries(x)).toEqual([["x", 1], ["z", 3], ["a", 4]])
 
-    expect(Object.getOwnPropertyNames(x)).toEqual(["x", /* "y",*/ "z", "a" /*, "b"*/])
+    expect(Object.getOwnPropertyNames(x)).toEqual(["x", "y", "z", "a", "b"])
     expect(keys(x)).toEqual(["x", "z", "a"])
 
     delete x.x
     expect(Object.keys(x)).toEqual(["z", "a"])
-    expect(Object.getOwnPropertyNames(x)).toEqual([/*"y",*/ "z", "a" /*, "b"*/])
+    expect(Object.getOwnPropertyNames(x)).toEqual(["y", "z", "a", "b"])
     expect(keys(x)).toEqual(["z", "a"])
 })
 
@@ -211,7 +217,6 @@ test("adding a different key doesn't trigger a pending key", () => {
     let counter = 0
 
     const d = autorun(() => {
-        debugger
         x.x
         counter++
     })
@@ -231,4 +236,102 @@ test("proxy false reverts to original behavior", () => {
     x.y = 3
     expect(isObservableProp(x, "x")).toBe(true)
     expect(isObservableProp(x, "y")).toBe(false)
+})
+
+test("ownKeys invariant not broken - 1", () => {
+    const a = observable({ x: 3, get y() {} })
+    expect(() => {
+        Object.freeze(a)
+    }).toThrow("cannot be frozen")
+})
+
+test("ownKeys invariant not broken - 2", () => {
+    const a = observable([2])
+    expect(() => {
+        Object.freeze(a)
+    }).toThrow("cannot be frozen")
+})
+
+test("non-proxied object", () => {
+    const a = observable({ x: 3 }, {}, { proxy: false })
+    a.b = 4
+    debugger
+    extendObservable(
+        a,
+        {
+            double() {
+                this.x = this.x * 2
+            },
+            get y() {
+                return this.x * 2
+            }
+        },
+        {
+            double: action
+        }
+    )
+
+    expect(a.y).toBe(6)
+    debugger
+    a.double()
+    expect(a.y).toBe(12)
+    expect(isComputedProp(a, "y")).toBe(true)
+    expect(isAction(a.double)).toBe(true)
+    expect(stripAdminFromDescriptors(Object.getOwnPropertyDescriptors(a))).toMatchSnapshot()
+    expect(Object.keys(a)).toEqual(["x", "b"])
+})
+
+test("extend proxies", () => {
+    const a = observable({ x: 3 })
+    a.b = 4
+    extendObservable(
+        a,
+        {
+            double() {
+                this.x = this.x * 2
+            },
+            get y() {
+                return this.x * 2
+            }
+        },
+        {
+            double: action
+        }
+    )
+
+    expect(a.y).toBe(6)
+    debugger
+    a.double()
+    expect(a.y).toBe(12)
+    expect(isComputedProp(a, "y")).toBe(true)
+    expect(isAction(a.double)).toBe(true)
+    expect(stripAdminFromDescriptors(Object.getOwnPropertyDescriptors(a))).toMatchSnapshot()
+    expect(Object.keys(a)).toEqual(["x", "b"])
+})
+
+test("decorate proxies", () => {
+    const a = observable({ x: 3 })
+    a.b = 4
+    extendObservable(
+        a,
+        {
+            double() {
+                this.x = this.x * 2
+            },
+            get y() {
+                return this.x * 2
+            }
+        },
+        {
+            double: action
+        }
+    )
+
+    expect(a.y).toBe(6)
+    a.double()
+    expect(a.y).toBe(12)
+    expect(isComputedProp(a, "y")).toBe(true)
+    expect(isAction(a.double)).toBe(true)
+    expect(stripAdminFromDescriptors(Object.getOwnPropertyDescriptors(a))).toMatchSnapshot()
+    expect(Object.keys(a)).toEqual(["x", "b"])
 })
