@@ -261,9 +261,11 @@ export function clearObserving(derivation: IDerivation) {
 
 export function untracked<T>(action: () => T): T {
     const prev = untrackedStart()
-    const res = action()
-    untrackedEnd(prev)
-    return res
+    try {
+        return action()
+    } finally {
+        untrackedEnd(prev)
+    }
 }
 
 export function untrackedStart(): IDerivation | null {
