@@ -14,8 +14,6 @@ const {
     $mobx
 } = mobx
 
-// TODO: duplicate test suite for not using utilities
-
 test("keys should be observable when extending", () => {
     const todos = observable({})
 

@@ -1,20 +1,24 @@
 # 5.0.0
 
+# Improvements
+
+* uses & requires proxies. otherwise use mobx 4
+* observable objects created with `observable({...})` support dynamically adding keys
+- arrays are now spreadable and such
+
+# Breaking
+
 * The minimum runtime target is now ES2015, not ES5
-* `spy` is no longer available in production builds
+* `spy` is a no-op in production builds
 * all deprecated api's are dropped. Make sure to not have any deprecation warnings before upgrading
-* uses proxies. otherwise use mobx 4
-* dropped `array.move`
+* dropped `array.move` and `array.peek`
 * dropped third arg to `array.find` and `array.findIndex` (not in standard)
-* `proxy` argument to `observable.object`
+* `proxy: false` argument to `observable.object` to disable proxying (faster, but no dynamic key support)
 * `.$mobx` property has been dropped from all observables and replaced by a Symbol. Instead of e.g. `x.$mobx.name`, use `import { $mobx } from "mobx"; x[$mobx].name`
 * in some cases, the order in which autoruns are fired could have changed due to some internal optimizations (note that MobX never had a guarantee about the order in which autoruns fired!)
-* dropped `observableArray.peek()`, there is no need for it anymore
 
 Proxies
-- caveats: prebound methods this ain't the proxy!
-- arrays are now spreadable and such
-- observable.object option record: true
+- caveats: prebound methods `this` ain't the proxy!
 
 # 4.3.0
 

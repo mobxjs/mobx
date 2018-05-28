@@ -15,6 +15,14 @@ function getAdm(target): ObservableObjectAdministration {
 // Optimization: we don't need the intermediate objects and could have a completely custom administration for DynamicObjects,
 // and skip either the internal values map, or the base object with its property descriptors!
 const objectProxyTraps: ProxyHandler<any> = {
+    has(target: IIsObservableObject, name: PropertyKey) {
+        if (name === $mobx || name === "constructor" || name === mobxDidRunLazyInitializersSymbol)
+            return true
+        const adm = getAdm(target)
+        if (adm.values.get(name as string)) return true
+        if (typeof name === "string") return adm.has(name)
+        return (name as any) in target
+    },
     get(target: IIsObservableObject, name: PropertyKey) {
         if (name === $mobx || name === "constructor" || name === mobxDidRunLazyInitializersSymbol)
             return target[name]
