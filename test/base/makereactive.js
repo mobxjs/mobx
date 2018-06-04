@@ -687,3 +687,51 @@ test("structural collections", () => {
         o.x = mobx.observable([1, 2, 3])
     }).toThrow("observable.struct should not be used with observable values")
 })
+
+test.skip("jest is behaving correctly", () => {
+    // this failing test is fixed here:
+    // https://github.com/facebook/jest/pull/6391
+    const symbol = Symbol("test")
+    const a = []
+    const b = []
+    const c = []
+    a[symbol] = 1
+    b[symbol] = 1
+    c[symbol] = 2
+    expect(a).toEqual(b)
+    expect(a).not.toEqual(c)
+})
+
+test("jest object equals issue - reference", () => {
+    class Store {
+        constructor() {
+            mobx.extendObservable(this, { x: 3 })
+        }
+    }
+
+    const store = new Store()
+    expect(store).toEqual(new Store())
+})
+
+test("jest object equals issue", () => {
+    class Store {
+        @mobx.observable x = 2
+
+        constructor() {
+            this.x = 3
+        }
+    }
+
+    const store = new Store()
+    expect(store).toEqual(new Store())
+})
+
+test("jest array equals issue", () => {
+    debugger
+    class Store {
+        @mobx.observable things = []
+    }
+
+    const store = new Store()
+    expect(store.things).toEqual([])
+})
