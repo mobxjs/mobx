@@ -187,3 +187,6 @@ if (
         })
     })
 }
+
+// forward compatibility with mobx, so that packages can easily support mobx 4 & 5
+export const $mobx = "$mobx"
