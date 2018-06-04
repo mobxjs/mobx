@@ -20,6 +20,8 @@
 Proxies
 - caveats: prebound methods `this` ain't the proxy!
 
+Caveat: Jest `toEqual` matcher might no longer play nicely with your class instances, due to a bug with the processing of symbols: https://github.com/facebook/jest/issues/6392. For now you might want to use a custom matcher if you are directly equalling observable objects.
+
 # 4.3.0
 
 * Introduced the `entries(observable)` API, by @samjacobclift through [#1536](https://github.com/mobxjs/mobx/pull/1536)

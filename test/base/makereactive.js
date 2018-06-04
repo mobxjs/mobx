@@ -702,7 +702,31 @@ test.skip("jest is behaving correctly", () => {
     expect(a).not.toEqual(c)
 })
 
-test("jest object equals issue - reference", () => {
+test.only("All non-enumerables should be treated equally!", () => {
+    // Bug filed here: https://github.com/facebook/jest/issues/6392
+    const actual1 = {
+        x: 3
+    }
+    Object.defineProperty(actual1, "test", {
+        enumerable: false,
+        value: 5
+    })
+
+    const actual2 = {
+        x: 3
+    }
+    const mySymbol = Symbol("test")
+    Object.defineProperty(actual2, mySymbol, {
+        enumerable: false,
+        value: 5
+    })
+
+    expect(actual1).toEqual({ x: 3 })
+    expect(actual2).toEqual({ x: 3 })
+})
+
+test.skip("jest object equals issue - reference", () => {
+    // Skip until https://github.com/facebook/jest/issues/6392 is resolved
     class Store {
         constructor() {
             mobx.extendObservable(this, { x: 3 })
@@ -710,10 +734,12 @@ test("jest object equals issue - reference", () => {
     }
 
     const store = new Store()
+    debugger
     expect(store).toEqual(new Store())
 })
 
-test("jest object equals issue", () => {
+test.skip("jest object equals issue", () => {
+    // Skip until https://github.com/facebook/jest/issues/6392 is resolved
     class Store {
         @mobx.observable x = 2
 
@@ -726,8 +752,8 @@ test("jest object equals issue", () => {
     expect(store).toEqual(new Store())
 })
 
-test("jest array equals issue", () => {
-    debugger
+test.skip("jest array equals issue", () => {
+    // Skip until https://github.com/facebook/jest/issues/6392 is resolved
     class Store {
         @mobx.observable things = []
     }
