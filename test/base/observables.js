@@ -1888,6 +1888,30 @@ test("keeping computed properties alive works", () => {
         }
     )
 
+    expect(calcs).toBe(0)
+    expect(x.y).toBe(2)
+    expect(calcs).toBe(1)
+    expect(x.y).toBe(2)
+    expect(calcs).toBe(1) // kept alive!
+
+    x.x = 3
+    expect(calcs).toBe(2) // reactively updated
+    expect(x.y).toBe(6)
+})
+
+test("keeping computed properties alive works for objects", () => {
+    let calcs = 0
+    class Foo {
+        @observable x = 1
+        @computed({ keepAlive: true })
+        get y() {
+            calcs++
+            return this.x * 2
+        }
+    }
+    const x = new Foo()
+
+    expect(calcs).toBe(0)
     expect(x.y).toBe(2)
     expect(calcs).toBe(1)
     expect(x.y).toBe(2)
