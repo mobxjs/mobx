@@ -258,8 +258,12 @@ For the same reason you can use it out of the box both server and client side, i
 
 The result of this is that you often need to learn less new concepts when using MobX in comparison to other state management solutions.
 
----
+### Browser support
 
+MobX >=5 runs on any browser with [ES6 proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy). On older environments such as IE11 or Node.js 4 it throws an error on startup.
+MobX <=4 runs in any ES5 compatible environment-so IE9 an up.
+
+---
 
 ## Credits
 
