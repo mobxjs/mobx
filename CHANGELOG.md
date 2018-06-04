@@ -1,3 +1,7 @@
+# 4.3.1
+
+* Added the `$mobx` export symbol for MobX 5 forward compatibity
+
 # 4.3.0
 
 * Introduced the `entries(observable)` API, by @samjacobclift through [#1536](https://github.com/mobxjs/mobx/pull/1536)
