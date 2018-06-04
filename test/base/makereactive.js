@@ -674,3 +674,36 @@ test("structural collections", () => {
         o.x = mobx.observable([1, 2, 3])
     }).toThrow("observable.struct should not be used with observable values")
 })
+
+test("yest object equals issue - reference", () => {
+    class Store {
+        constructor() {
+            mobx.extendObservable(this, { x: 3 })
+        }
+    }
+
+    const store = new Store()
+    expect(store).toEqual(new Store())
+})
+
+test("yest object equals issue", () => {
+    class Store {
+        @mobx.observable x = 2
+
+        constructor() {
+            this.x = 3
+        }
+    }
+
+    const store = new Store()
+    expect(store).toEqual(new Store())
+})
+
+test("yest array equals issue", () => {
+    class Store {
+        @mobx.observable things = []
+    }
+
+    const store = new Store()
+    expect(store.things).toEqual([])
+})

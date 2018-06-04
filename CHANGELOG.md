@@ -1,5 +1,10 @@
-# 4.3.1
+# 4.4.0
+
 * Fixed [#1534](Fixes https://github.com/mobxjs/mobx/issues/1534):  @computed({keepAlive: true}) no long calculates before being accessed.
+
+# 4.3.1
+
+* Added the `$mobx` export symbol for MobX 5 forward compatibity
 
 # 4.3.0
 
