@@ -444,7 +444,7 @@ test("sort", t => {
     }
 
     var sorted = mobx.computed(() => {
-        items.sort(sortFn)
+        items.slice().sort(sortFn)
     })
 
     var start = now()
