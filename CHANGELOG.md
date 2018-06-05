@@ -1,30 +1,45 @@
 # 5.0.0
 
-# Improvements
+### Proxy support!
 
-* uses & requires proxies. otherwise use mobx 4
-* observable objects created with `observable({...})` support dynamically adding keys
-- arrays are now spreadable and such
+MobX 5 is the first MobX version fully leveraging Proxies. This has two big advantages
 
-# Breaking
+1. MobX can now detect the addition of properties on plain observable objects, so it is now possible to use plain observable objects as dynamic collections.
+2. Observable arrays are now recognized as arrays by all third party libraries, which will avoid the need to slice them.
 
+### The system requirements to run MobX has been upped
+
+* MobX 5 can only be used on environments that support `Proxies`. In practice this means, no Internet Explorer (Edge is fine). No nodejs < 4. React Native on Android only when JavaScript core is upgraded. All modern browsers are supported.
+* Since MobX no longer runs on older browser, the compilation target has been upgraded to ES2015 syntax supporting browsers. This means that MobX is not loadable on older browsers without down compilation to ES5.
+* If for whatever reason your project cannot meet this requirements, please stick to MobX 4. It will be actively maintained. All current features of MobX 5 are expressable in MobX 4 as well, but it means that for example to use dynamic objects some [additional APIs](https://mobx.js.org/refguide/object-api.html) are needed.
+* The performance footprint of MobX 5 should be pretty similar to MobX 4. In our performance tests we saw some minor improvements in memory footprint, but overall it should be pretty comparable.
+
+### Breaking changes
+
+* The required runtime needs to support the non-polyfillable `Proxy` API.
 * The minimum runtime target is now ES2015, not ES5
-* `spy` is a no-op in production builds
-* all deprecated api's are dropped. Make sure to not have any deprecation warnings before upgrading
-* dropped `array.move` and `array.peek`
-* dropped third arg to `array.find` and `array.findIndex` (not in standard)
-* `proxy: false` argument to `observable.object` to disable proxying (faster, but no dynamic key support)
-* `.$mobx` property has been dropped from all observables and replaced by a Symbol. Instead of e.g. `x.$mobx.name`, use `import { $mobx } from "mobx"; x[$mobx].name`
-* in some cases, the order in which autoruns are fired could have changed due to some internal optimizations (note that MobX never had a guarantee about the order in which autoruns fired!)
+* `spy` has become a no-op in production builds
+* All earlier deprecated APIs are dropped. Make sure to not have any deprecation warnings before upgrading.
+* `array.move` and `array.peek` are removed from the API
+* Dropped the third argument to `array.find` and `array.findIndex` since they were not standardized in ES.
+* `.$mobx` property has been dropped from all observables and replaced by a Symbol. Instead of using `x.$mobx.name`, use `import { $mobx } from "mobx"; x[$mobx].name` etc.
+* In some cases, the order in which autoruns are fired could have changed due to some internal optimizations (note that MobX never had a guarantee about the order in which autoruns fired!)
 
-Proxies
-- caveats: prebound methods `this` ain't the proxy!
+### New features
 
-Caveats
+* It is possible to pass the `proxy: false` argument to `observable.object` to disable proxying (theoretically slightly faster, but removes no dynamic key addition)
 
-Jest `toEqual` might throw an error `allKeys[x].match is not a function` when trying to equal observable arrays. This is a bug in Jest [report](https://github.com/facebook/jest/issues/6391). The simple work around for now is to slice (or `toJS` if the problem is recursive) the array first.
+### Known Issues
 
-Jest `toEqual` matcher might no longer corretly equal your class instances, complaining about differences in the MobX adminstration. This is due to a bug with the processing of symbols: [report](https://github.com/facebook/jest/issues/6392). For now you might want to use a custom matcher if you are directly equalling observable objects. As a work around `toJS(object)` could be used before diffing.
+* Jest `toEqual` might throw an error `allKeys[x].match is not a function` when trying to equal observable arrays. This is a bug in Jest [report](https://github.com/facebook/jest/issues/6391). The simple work around for now is to slice (or `toJS` if the problem is recursive) the array first.
+* Jest `toEqual` matcher might no longer corretly equal your class instances, complaining about differences in the MobX adminstration. This is due to a bug with the processing of symbols: [report](https://github.com/facebook/jest/issues/6392). For now you might want to use a custom matcher if you are directly equalling observable objects. As a work around `toJS(object)` could be used before diffing.
+
+### Migration guide
+
+* Make sure to not use any API that produces deprecation warnings in MobX 4. Beyond that MobX 5 should pretty well as drop-in replacement of MobX 4.
+* You _could_ perform the following clean ups:
+  * Don't `slice()` arrays when passing them to external libraries. (Note you still shouldn't pass observable data structures to non-`observer` React components, which is an orthogonal concept)
+  * You could replace observable maps with observable objects if you are only using string-based keys.
 
 # 4.3.0
 
