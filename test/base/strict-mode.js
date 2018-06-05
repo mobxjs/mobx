@@ -210,6 +210,20 @@ test("enforceActions 'strict' does not allow changing unobserved observables", (
     }
 })
 
+test("enforceActions 'strict' should not throw exception while observable array initialization", () => {
+    try {
+        mobx.configure({ enforceActions: "strict" })
+
+        expect(() => {
+            const x = mobx.observable({
+                a: [1, 2]
+            })
+        }).not.toThrow(/Since strict-mode is enabled/)
+    } finally {
+        mobx.configure({ enforceActions: false })
+    }
+})
+
 test("warn on unsafe reads", function() {
     try {
         mobx.configure({ computedRequiresReaction: true })

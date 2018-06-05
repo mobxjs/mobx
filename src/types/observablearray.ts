@@ -23,6 +23,7 @@ import { IListenable, registerListener, hasListeners, notifyListeners } from "./
 import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
 import { declareIterator, makeIterable } from "../utils/iterable"
 import { IEnhancer } from "./modifiers"
+import { allowStateChangesEnd, allowStateChangesStart } from "../core/action"
 
 const MAX_SPLICE_SIZE = 10000 // See e.g. https://github.com/mobxjs/mobx/issues/859
 
@@ -335,7 +336,9 @@ export class ObservableArray<T> extends StubArray {
         addHiddenFinalProp(this, "$mobx", adm)
 
         if (initialValues && initialValues.length) {
+            const prev = allowStateChangesStart(true)
             this.spliceWithArray(0, 0, initialValues)
+            allowStateChangesEnd(prev)
         }
 
         if (safariPrototypeSetterInheritanceBug) {
