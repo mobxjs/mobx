@@ -2,18 +2,19 @@
     "version": "2.0.10",
     "compilerOptions": {
         "target": "es6",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "alwaysStrict": true,
         "outDir": "lib",
         "sourceMap": false,
         "declaration": true,
-        "module": "commonjs",
         "removeComments": false,
-        "strictNullChecks": true,
+        "strict": true,
         "noImplicitReturns": true,
-        "noImplicitUseStrict": true,
         "noUnusedLocals": true,
+        "noUnusedParameters": false,
         "noImplicitAny": false,
-        "moduleResolution": "node",
-        "downlevelIteration": true,
+        "noImplicitThis": false,
         "lib": [
             "es6"
         ]

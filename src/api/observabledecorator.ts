@@ -19,7 +19,7 @@ export function createDecoratorForEnhancer(enhancer: IEnhancer<any>): IObservabl
         (
             target: any,
             propertyName: string,
-            descriptor: BabelDescriptor,
+            descriptor: BabelDescriptor | undefined,
             _decoratorTarget,
             decoratorArgs: any[]
         ) => {

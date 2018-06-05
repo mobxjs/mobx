@@ -70,7 +70,7 @@
     "tape": "^4.2.2",
     "ts-jest": "^22.0.0",
     "tslib": "^1.7.1",
-    "typescript": "^2.1.4",
+    "typescript": "^2.9.0",
     "uglify-es": "^3.3.9"
   },
   "dependencies": {},

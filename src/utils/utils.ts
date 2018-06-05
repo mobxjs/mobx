@@ -125,7 +125,7 @@ export function isPropertyConfigurable(object: any, prop: PropertyKey): boolean 
 export function assertPropertyConfigurable(object: any, prop: PropertyKey) {
     if (process.env.NODE_ENV !== "production" && !isPropertyConfigurable(object, prop))
         fail(
-            `Cannot make property '${prop}' observable, it is not configurable and writable in the target object`
+            `Cannot make property '${prop.toString()}' observable, it is not configurable and writable in the target object`
         )
 }
 

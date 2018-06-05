@@ -80,7 +80,7 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
 export function toJS<T>(source: T, options?: ToJSOptions): T
 export function toJS(source: any, options?: ToJSOptions): any
 export function toJS(source, options: ToJSOptions) // internal overload
-export function toJS(source, options: ToJSOptions) {
+export function toJS(source, options?: ToJSOptions) {
     if (!isObservable(source)) return source
 
     // backward compatibility
