@@ -4,8 +4,10 @@ import {
     addHiddenProp,
     createAction,
     defineBoundAction,
-    fail
+    fail,
+    $mobx
 } from "../internal"
+import { isObservableObject } from "../types/observableobject"
 
 function dontReassignFields() {
     fail(process.env.NODE_ENV !== "production" && "@action fields are not reassignable")
@@ -62,10 +64,6 @@ export function actionFieldDecorator(name: string) {
 }
 
 export function boundActionDecorator(target, propertyName, descriptor, applyToInstance?: boolean) {
-    if (applyToInstance === true) {
-        defineBoundAction(target, propertyName, descriptor.value)
-        return null
-    }
     if (descriptor) {
         // if (descriptor.value)
         // Typescript / Babel: @action.bound method() { }
@@ -74,10 +72,11 @@ export function boundActionDecorator(target, propertyName, descriptor, applyToIn
             configurable: true,
             enumerable: false,
             get() {
+                const self = isObservableObject(this) ? this[$mobx].proxy || this : this
                 defineBoundAction(
-                    this,
+                    self,
                     propertyName,
-                    descriptor.value || descriptor.initializer.call(this)
+                    descriptor.value || descriptor.initializer.call(self)
                 )
                 return this[propertyName]
             },

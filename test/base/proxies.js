@@ -1,4 +1,5 @@
 import {
+    computed,
     decorate,
     isComputedProp,
     isAction,
@@ -182,30 +183,6 @@ test("for-in operator", () => {
     expect(computeKeys(x)).toEqual(["z", "a"])
 })
 
-test("bound actions", () => {
-    const x = observable(
-        {
-            a1() {
-                return this
-            }
-        },
-        {
-            a1: action.bound
-        }
-    )
-
-    extendObservable(x, {
-        a2() {
-            return this
-        }
-    })
-
-    // x is the proxy, so it cannot be this if this was bound during creation...
-    expect(x.a1()).not.toBe(x)
-    // x was bound later, so it's will work fine
-    expect(x.a2()).toBe(x)
-})
-
 test("type coercion doesn't break", () => {
     const x = observable({})
     expect("" + x).toBe("[object Object]")
@@ -334,4 +311,63 @@ test("decorate proxies", () => {
     expect(isAction(a.double)).toBe(true)
     expect(stripAdminFromDescriptors(Object.getOwnPropertyDescriptors(a))).toMatchSnapshot()
     expect(Object.keys(a)).toEqual(["x", "b"])
+})
+
+test("predictable 'this' - 1", () => {
+    debugger
+    const a = observable.object(
+        {
+            a0() {
+                return this
+            },
+            a1() {
+                return this
+            },
+            a2() {
+                return this
+            },
+            get computed() {
+                return this
+            }
+        },
+        {
+            a1: action,
+            a2: action.bound
+        }
+    )
+
+    expect(a.a0()).toBe(a)
+    expect(a.a1()).toBe(a)
+    expect(a.a2()).toBe(a) // pre-bound!
+    // expect(a.computed).toBe(a)
+})
+
+test("predictable 'this' - 2", () => {
+    class A {
+        a0() {
+            return this
+        }
+
+        @action
+        a1() {
+            return this
+        }
+
+        @action.bound
+        a2() {
+            return this
+        }
+
+        @computed
+        get computed() {
+            return this
+        }
+    }
+
+    const a = new A()
+
+    expect(a.a0()).toBe(a)
+    expect(a.a1()).toBe(a)
+    expect(a.a2()).toBe(a)
+    expect(a.computed).toBe(a)
 })
