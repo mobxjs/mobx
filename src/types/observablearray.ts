@@ -22,7 +22,9 @@ import {
     registerInterceptor,
     registerListener,
     spyReportEnd,
-    spyReportStart
+    spyReportStart,
+    allowStateChangesStart,
+    allowStateChangesEnd
 } from "../internal"
 
 const MAX_SPLICE_SIZE = 10000 // See e.g. https://github.com/mobxjs/mobx/issues/859
@@ -126,7 +128,11 @@ export function createObservableArray<T>(
     addHiddenFinalProp(adm.values, $mobx, adm)
     const proxy = new Proxy(adm.values, arrayTraps) as any
     adm.proxy = proxy
-    if (initialValues && initialValues.length) adm.spliceWithArray(0, 0, initialValues)
+    if (initialValues && initialValues.length) {
+        const prev = allowStateChangesStart(true)
+        adm.spliceWithArray(0, 0, initialValues)
+        allowStateChangesEnd(prev)
+    }
     return proxy
 }
 

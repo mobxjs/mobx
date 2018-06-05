@@ -88,11 +88,6 @@ export function isPlainObject(value) {
     return proto === Object.prototype || proto === null
 }
 
-const prototypeHasOwnProperty = Object.prototype.hasOwnProperty
-export function hasOwnProperty(object: Object, propName: PropertyKey) {
-    return prototypeHasOwnProperty.call(object, propName)
-}
-
 export function makeNonEnumerable(object: any, propNames: PropertyKey[]) {
     for (let i = 0; i < propNames.length; i++) {
         addHiddenProp(object, propNames[i], object[propNames[i]])

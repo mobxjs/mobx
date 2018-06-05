@@ -41,6 +41,11 @@ MobX 5 is the first MobX version fully leveraging Proxies. This has two big adva
   * Don't `slice()` arrays when passing them to external libraries. (Note you still shouldn't pass observable data structures to non-`observer` React components, which is an orthogonal concept)
   * You could replace observable maps with observable objects if you are only using string-based keys.
 
+# 4.3.1
+
+* Fixed [#1534](Fixes https://github.com/mobxjs/mobx/issues/1534):  @computed({keepAlive: true}) no long calculates before being accessed.
+* Added the `$mobx` export symbol for MobX 5 forward compatibity
+
 # 4.3.0
 
 * Introduced the `entries(observable)` API, by @samjacobclift through [#1536](https://github.com/mobxjs/mobx/pull/1536)

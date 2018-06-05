@@ -89,7 +89,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     isTracing: TraceMode = TraceMode.NONE
     public scope: Object | undefined
     private equals: IEqualsComparer<any>
-    private requiresReaction
+    private requiresReaction: boolean
+    private keepAlive: boolean
+    private firstGet: boolean = true
 
     /**
      * Create a new computed value based on a function expression.
@@ -99,7 +101,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * The `equals` property specifies the comparer function to use to determine if a newly produced
      * value differs from the previous value. Two comparers are provided in the library; `defaultComparer`
      * compares based on identity comparison (===), and `structualComparer` deeply compares the structure.
-     * Structural comparison can be convenient if you always produce an new aggregated object and
+     * Structural comparison can be convenient if you always produce a new aggregated object and
      * don't want to notify observers if it is structurally the same.
      * This is useful for working with vectors, mouse coordinates etc.
      */
@@ -116,11 +118,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 : comparer.default)
         this.scope = options.context
         this.requiresReaction = !!options.requiresReaction
-        if (options.keepAlive === true) {
-            // dangerous: never exposed, so this cmputed value should not depend on observables
-            // that live globally, or it will never get disposed! (nor anything attached to it)
-            autorun(() => this.get())
-        }
+        this.keepAlive = !!options.keepAlive
     }
 
     onBecomeStale() {
@@ -136,6 +134,10 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * Will evaluate its computation first if needed.
      */
     public get(): T {
+        if (this.keepAlive && this.firstGet) {
+            this.firstGet = false
+            autorun(() => this.get())
+        }
         if (this.isComputing) fail(`Cycle detected in computation ${this.name}: ${this.derivation}`)
         if (globalState.inBatch === 0 && this.observers.size === 0) {
             if (shouldCompute(this)) {
