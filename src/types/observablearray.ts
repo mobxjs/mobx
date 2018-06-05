@@ -385,6 +385,9 @@ const arrayExtensions = {
         // reverse by default mutates in place before returning the result
         // which makes it both a 'derivation' and a 'mutation'.
         // so we deviate from the default and just make it an dervitation
+        console.warn(
+            "[mobx] `observableArray.reverse()` will not update the array in place. Use `observableArray.slice().reverse()` to supress this warning, or `observableArray.replace(observableArray.slice().reverse())` to reverse & update in place"
+        )
         const clone = (<any>this).slice()
         return clone.reverse.apply(clone, arguments)
     },
@@ -392,6 +395,9 @@ const arrayExtensions = {
     sort(compareFn?: (a: any, b: any) => number): any[] {
         // sort by default mutates in place before returning the result
         // which goes against all good practices. Let's not change the array in place!
+        console.warn(
+            "[mobx] `observableArray.sort()` will not update the array in place. Use `observableArray.slice().sort()` to supress this warning, or `observableArray.replace(observableArray.slice().sort())` to sort & update in place"
+        )
         const clone = (<any>this).slice()
         return clone.sort.apply(clone, arguments)
     },

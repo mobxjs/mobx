@@ -79,11 +79,11 @@ test("test1", function() {
     expect(sum.get()).toBe(3)
     expect(a.slice()).toEqual([1, 2])
 
-    expect(a.reverse()).toEqual([2, 1])
+    expect(a.slice().reverse()).toEqual([2, 1])
     expect(a.slice()).toEqual([1, 2])
 
     a.unshift(3)
-    expect(a.sort()).toEqual([1, 2, 3])
+    expect(a.slice().sort()).toEqual([1, 2, 3])
     expect(a.slice()).toEqual([3, 1, 2])
 
     expect(JSON.stringify(a)).toBe("[3,1,2]")
@@ -325,7 +325,7 @@ test("observes when stringified to locale", function() {
 test("react to sort changes", function() {
     var x = mobx.observable([4, 2, 3])
     var sortedX = mobx.computed(function() {
-        return x.sort()
+        return x.slice().sort()
     })
     var sorted
 
