@@ -702,7 +702,7 @@ test.skip("jest is behaving correctly", () => {
     expect(a).not.toEqual(c)
 })
 
-test.only("All non-enumerables should be treated equally!", () => {
+test.skip("All non-enumerables should be treated equally!", () => {
     // Bug filed here: https://github.com/facebook/jest/issues/6392
     const actual1 = {
         x: 3
