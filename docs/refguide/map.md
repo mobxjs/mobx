@@ -14,9 +14,9 @@ The following methods are exposed according to the [ES6 Map spec](https://develo
 * `set(key, value)`. Sets the given `key` to `value`. The provided key will be added to the map if it didn't exist yet.
 * `delete(key)`. Deletes the given key and its value from the map.
 * `get(key)`. Returns the value at the given key (or `undefined`).
-* `keys()`. Returns all keys present in this map. Insertion order is preserved.
-* `values()`. Returns all values present in this map. Insertion order is preserved.
-* `entries()`. Returns an (insertion ordered) array that for each key/value pair in the map contains an array `[key, value]`.
+* `keys()`. Returns an iterator over all keys present in this map. Insertion order is preserved.
+* `values()`. Returns an iterator all values present in this map. Insertion order is preserved.
+* `entries()`. Returns an iterator (insertion ordered) over array that for each key/value pair in the map contains an array `[key, value]`.
 * `forEach(callback:(value, key, map) => void, thisArg?)`. Invokes the given callback for each key / value pair in the map.
 * `clear()`. Removes all entries from this map.
 * `size`. Returns the amount of entries in this map.
