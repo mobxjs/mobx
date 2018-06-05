@@ -39,4 +39,4 @@ This event might report the total execution time as well.
 
 The spy events for observable values are identical to the events passed to `observe`. See [intercept & observe](observe.md) for an extensive overview.
 
-It is possible to emit your own spy events as well. See `extras.spyReport`, `extras.spyReportStart` and `extras.spyReportEnd`
+In production builds, the `spy` API is a no-op as it will be minimized away.

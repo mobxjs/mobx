@@ -45,9 +45,9 @@ These rules might seem complicated at first sight, but you will notice that in p
 
 **Some notes:**
 
-* To create dynamically keyed objects, always use maps! Only initially existing properties on an object will be made observable, although new ones can be added using `extendObservable`.
 * To use the `@observable` decorator, make sure that [decorators are enabled](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) in your transpiler (babel or typescript).
 * By default making a data structure observable is *infective*; that means that `observable` is applied automatically to any value that is contained by the data structure, or will be contained by the data structure in the future. This behavior can be changed by using [*decorators*](#decorators).
+* _[MobX 4 and below]_ To create dynamically keyed objects, always use maps! Only initially existing properties on an object will be made observable, although new ones can be added using `extendObservable`.
 
 [&laquo;`observable`&raquo;](observable.md)  &mdash;  [&laquo;`@observable`&raquo;](observable-decorator.md)
 
@@ -194,6 +194,7 @@ There are various `options` that can be used to control the behavior of `compute
 * **`requiresReaction: boolean`** Wait for a change in value of the tracked observables, before recomputing the derived property
 * **`get: () => value)`** Override the getter for the computed property.
 * **`set: (value) => void`** Override the setter for the computed property
+* **`keepAlive: boolean`** Set to true to automatically keep computed values alive, rather then suspending then when there are no observers.
 
 [&laquo;details&raquo;](computed-decorator.md)
 
@@ -328,6 +329,8 @@ As soon as the expression returns true the sideEffect function will be invoked, 
 **Note:** the _effect-function_ (second argument) is actually optional. If no effect-function is provided, it will return a cancelable promise (i.e. having a `cancel()` method on the promise)
 
 `when` returns a disposer to prematurely cancel the whole thing.
+
+If no effect function is passed to `when`, it will return a promise that can be awaited until the condition settles.
 
 [&laquo;details&raquo;](when.md).
 
@@ -526,7 +529,7 @@ See also `allowStateChanges`.
 configure({ enforceActions: true });
 ```
 
-Since MobX 4.2, it is also possible to specify 
+Since MobX 4.2, it is also possible to specify
 
 ```javascript
 configure({ enforceActions: "strict" });
@@ -563,6 +566,7 @@ configure({
 There is now an utility API that enables manipulating observable maps, objects and arrays with the same API. These api's are fully reactive, which means that even new property declarations can be detected by mobx if `set` is used to add them, and `values` or `keys` to iterate them.
   * **`values(thing)`** returns all values in the collection as array
   * **`keys(thing)`** returns all keys in the collection as array
+  * **`entries(thing)`** returns a [key, value] pair for all entries in the collection as array
   * **`set(thing, key, value)`** or **`set(thing, { key: value })`** Updates the given collection with the provided key / value pair(s).
   * **`remove(thing, key)`** removes the specified child from the collection. For arrays splicing is used.
   * **`has(thing, key)`** returns true if the collection has the specified _observable_ property.

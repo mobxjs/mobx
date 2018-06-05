@@ -226,7 +226,7 @@ message.likes.push("Jennifer");
 This will **not** react. Simply because the `likes` array itself is not being used by the `autorun`, only the reference to the array.
 So in contrast, `messages.likes = ["Jennifer"]` would be picked up; that statement does not modify the array, but the `likes` property itself.
 
-#### Incorrect: using non-observable object properties
+#### Using non-observable object properties
 
 
 ```javascript
@@ -236,9 +236,25 @@ autorun(() => {
 message.postDate = new Date()
 ```
 
-This will **not** react. MobX can only track observable properties.
+_MobX 4_
 
-#### Incorrect: using not yet existing observable object properties
+This will **not** react. MobX can only track observable properties, and 'postDate' has not been defined as observable property above.
+However, it is possible to use the `get` and `set` methods as exposed by MobX to work around this:
+
+```javascript
+autorun(() => {
+    console.log(get(message, "postDate"))
+})
+set(message, "postDate",  new Date())
+```
+
+_MobX 5_
+
+In MobX 5 this **will** react, as MobX 5 can track not-yet existing properties.
+Note that this is only done for objects created with `observable` or `observable.object`.
+New properties on class instances will not be made observable automatically.
+
+#### [MobX 4 and lower] Incorrect: using not yet existing observable object properties
 
 ```javascript
 autorun(() => {
