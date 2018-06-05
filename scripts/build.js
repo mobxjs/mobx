@@ -62,7 +62,7 @@ function generateBundledModule(inputFile, outputFile, format) {
             bundle.write({
                 dest: outputFile,
                 format,
-                banner: "/** MobX - (c) Michel Weststrate 2015, 2016 - MIT Licensed */",
+                banner: "/** MobX - (c) Michel Weststrate 2015 - 2018 - MIT Licensed */",
                 exports: "named"
             })
         )
@@ -77,11 +77,11 @@ function generateMinified() {
     console.log("Generating mobx.min.js and mobx.umd.min.js")
     exec(`NODE_ENV=production ${binFolder}/envify lib/mobx.js > lib/mobx.prod.js`)
     exec(
-        `${binFolder}/uglifyjs --toplevel -m -c warnings=false --preamble "/** MobX - (c) Michel Weststrate 2015, 2016 - MIT Licensed */" --source-map -o lib/mobx.min.js lib/mobx.prod.js`
+        `${binFolder}/uglifyjs --toplevel -m -c warnings=false --preamble "/** MobX - (c) Michel Weststrate 2015 - 2018 - MIT Licensed */" --source-map -o lib/mobx.min.js lib/mobx.prod.js`
     )
     exec(`NODE_ENV=production ${binFolder}/envify lib/mobx.umd.js > lib/mobx.prod.umd.js`)
     exec(
-        `${binFolder}/uglifyjs --toplevel -m -c warnings=false --preamble "/** MobX - (c) Michel Weststrate 2015, 2016 - MIT Licensed */" --source-map -o lib/mobx.umd.min.js lib/mobx.prod.umd.js`
+        `${binFolder}/uglifyjs --toplevel -m -c warnings=false --preamble "/** MobX - (c) Michel Weststrate 2015 - 2018 - MIT Licensed */" --source-map -o lib/mobx.umd.min.js lib/mobx.prod.umd.js`
     )
     exec(`rm lib/mobx.prod.js lib/mobx.prod.umd.js`)
 }
