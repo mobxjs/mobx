@@ -13,10 +13,11 @@ import {
     refDecorator,
     startBatch
 } from "../internal"
+import { IObservableDecorator } from "./observabledecorator"
 
 export function extendObservable<A extends Object, B extends Object>(
     target: A,
-    properties: B,
+    properties?: B,
     decorators?: { [K in keyof B]?: Function },
     options?: CreateObservableOptions
 ): A & B {
@@ -33,20 +34,38 @@ export function extendObservable<A extends Object, B extends Object>(
             !isObservableMap(target),
             "'extendObservable' should not be used on maps, use map.merge instead"
         )
+    }
+
+    options = asCreateObservableOptions(options)
+    const defaultDecorator = getDefaultDecoratorFromObjectOptions(options)
+    asObservableObject(target, options.name, defaultDecorator.enhancer) // make sure object is observable, even without initial props
+    if (properties)
+        extendObservableObjectWithProperties(target, properties, decorators, defaultDecorator)
+    return target as any
+}
+
+export function getDefaultDecoratorFromObjectOptions(
+    options: CreateObservableOptions
+): IObservableDecorator {
+    return options.defaultDecorator || (options.deep === false ? refDecorator : deepDecorator)
+}
+
+export function extendObservableObjectWithProperties(
+    target,
+    properties,
+    decorators,
+    defaultDecorator
+) {
+    if (process.env.NODE_ENV !== "production") {
         invariant(
             !isObservable(properties),
             "Extending an object with another observable (object) is not supported. Please construct an explicit propertymap, using `toJS` if need. See issue #540"
         )
         if (decorators)
             for (let key in decorators)
-                if (!(key in properties))
+                if (!(key in properties!))
                     fail(`Trying to declare a decorator for unspecified property '${key}'`)
     }
-
-    options = asCreateObservableOptions(options)
-    const defaultDecorator =
-        options.defaultDecorator || (options.deep === false ? refDecorator : deepDecorator)
-    asObservableObject(target, options.name, defaultDecorator.enhancer) // make sure object is observable, even without initial props
     startBatch()
     try {
         for (let key in properties) {
@@ -68,7 +87,7 @@ export function extendObservable<A extends Object, B extends Object>(
                         ? computedDecorator
                         : defaultDecorator
             if (process.env.NODE_ENV !== "production" && typeof decorator !== "function")
-                return fail(`Not a valid decorator for '${key}', got: ${decorator}`)
+                fail(`Not a valid decorator for '${key}', got: ${decorator}`)
 
             const resultDescriptor = decorator!(target, key, descriptor, true)
             if (
@@ -79,5 +98,4 @@ export function extendObservable<A extends Object, B extends Object>(
     } finally {
         endBatch()
     }
-    return target as any
 }

@@ -18,9 +18,10 @@ import {
     isPlainObject,
     refStructEnhancer,
     referenceEnhancer,
-    shallowEnhancer
+    shallowEnhancer,
+    getDefaultDecoratorFromObjectOptions,
+    extendObservableObjectWithProperties
 } from "../internal"
-import { EMPTY_OBJECT } from "../utils/utils"
 
 export type CreateObservableOptions = {
     name?: string
@@ -166,9 +167,11 @@ const observableFactories: IObservableFactories = {
         if (o.proxy === false) {
             return extendObservable({}, props, decorators, o) as any
         } else {
-            const base = extendObservable({}, EMPTY_OBJECT, EMPTY_OBJECT, o) as any
+            const defaultDecorator = getDefaultDecoratorFromObjectOptions(o)
+            const base = extendObservable({}, undefined, undefined, o) as any
             const proxy = createDynamicObservableObject(base)
-            return extendObservable(proxy, props, decorators, o)
+            extendObservableObjectWithProperties(proxy, props, decorators, defaultDecorator)
+            return proxy
         }
     },
     ref: refDecorator,
