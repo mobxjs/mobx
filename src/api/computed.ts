@@ -32,6 +32,7 @@ export const computedDecorator = createPropDecorator(
         asObservableObject(instance).addComputedProp(decoratorTarget, propertyName, {
             get,
             set,
+            context: instance,
             ...options
         })
     }

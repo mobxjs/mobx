@@ -20,6 +20,7 @@ import {
     referenceEnhancer,
     shallowEnhancer
 } from "../internal"
+import { EMPTY_OBJECT } from "../utils/utils"
 
 export type CreateObservableOptions = {
     name?: string
@@ -162,11 +163,13 @@ const observableFactories: IObservableFactories = {
     ): T & IObservableObject {
         if (typeof arguments[1] === "string") incorrectlyUsedAsDecorator("object")
         const o = asCreateObservableOptions(options)
-        const base = extendObservable({}, props, decorators, o) as any
         if (o.proxy === false) {
-            return base
+            return extendObservable({}, props, decorators, o) as any
+        } else {
+            const base = extendObservable({}, EMPTY_OBJECT, EMPTY_OBJECT, o) as any
+            const proxy = createDynamicObservableObject(base)
+            return extendObservable(proxy, props, decorators, o)
         }
-        return createDynamicObservableObject(base)
     },
     ref: refDecorator,
     shallow: shallowDecorator,

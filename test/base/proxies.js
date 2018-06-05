@@ -339,7 +339,7 @@ test("predictable 'this' - 1", () => {
     expect(a.a0()).toBe(a)
     expect(a.a1()).toBe(a)
     expect(a.a2()).toBe(a) // pre-bound!
-    // expect(a.computed).toBe(a)
+    expect(a.computed).toBe(a)
 })
 
 test("predictable 'this' - 2", () => {

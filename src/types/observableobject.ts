@@ -194,7 +194,6 @@ export class ObservableObjectAdministration
     ) {
         const { target } = this
         options.name = options.name || `${this.name}.${propName}`
-        options.context = target
         this.values.set(propName, new ComputedValue(options))
         if (propertyOwner === target || isPropertyConfigurable(propertyOwner, propName))
             Object.defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
