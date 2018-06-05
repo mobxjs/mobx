@@ -22,7 +22,7 @@ Proxies
 
 Caveats
 
-Jest `toEqual` might throw an error `allKeys[x].match is not a function` when trying to equal observable arrays. This is a bug in Jest [report](https://github.com/facebook/jest/issues/6390). The simple work around for now is to slice (or `toJS` if the problem is recursive) the array first.
+Jest `toEqual` might throw an error `allKeys[x].match is not a function` when trying to equal observable arrays. This is a bug in Jest [report](https://github.com/facebook/jest/issues/6391). The simple work around for now is to slice (or `toJS` if the problem is recursive) the array first.
 
 Jest `toEqual` matcher might no longer corretly equal your class instances, complaining about differences in the MobX adminstration. This is due to a bug with the processing of symbols: [report](https://github.com/facebook/jest/issues/6392). For now you might want to use a custom matcher if you are directly equalling observable objects. As a work around `toJS(object)` could be used before diffing.
 
