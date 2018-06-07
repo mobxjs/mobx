@@ -11,7 +11,7 @@ MobX 5 is the first MobX version fully leveraging Proxies. This has two big adva
 
 ### The system requirements to run MobX has been upped
 
-* MobX 5 can only be used on environments that support `Proxies`. In practice this means, no Internet Explorer (Edge is fine). No nodejs < 4. React Native on Android only when JavaScript core is upgraded. All modern browsers are supported.
+* MobX 5 can only be used on environments that support `Proxies`. In practice this means, no Internet Explorer (Edge is fine). No nodejs < 6. React Native on Android only when JavaScript core is upgraded. All modern browsers are supported.
 * Since MobX no longer runs on older browser, the compilation target has been upgraded to ES2015 syntax supporting browsers. This means that MobX is not loadable on older browsers without down compilation to ES5.
 * If for whatever reason your project cannot meet this requirements, please stick to MobX 4. It will be actively maintained. All current features of MobX 5 are expressable in MobX 4 as well, but it means that for example to use dynamic objects some [additional APIs](https://mobx.js.org/refguide/object-api.html) are needed.
 * The performance footprint of MobX 5 should be pretty similar to MobX 4. In our performance tests we saw some minor improvements in memory footprint, but overall it should be pretty comparable.
@@ -33,6 +33,7 @@ MobX 5 is the first MobX version fully leveraging Proxies. This has two big adva
 
 ### Known Issues
 
+* If you are using `mobx` with `mobx-react`, and you are upgrading `mobx-react` to the MobX 5 compatible version (`mobx-react@5.2.0`) you will notice that `this.props` or `this.state` are not yet observable in the `constructor` or `componentWillMount`. This is for forward compatibility with React 16.3 where `componentWillMount` has been deprecated. In most cases using `componentDidMount` instead will suffice, especially when the goal is to setup reactions. For more info see  [#478](https://github.com/mobxjs/mobx-react/issues/478), [#477](https://github.com/mobxjs/mobx-react/issues/477) and [#425](https://github.com/mobxjs/mobx-react/issues/425).
 * Jest `toEqual` might throw an error `allKeys[x].match is not a function` when trying to equal observable arrays. This is a bug in Jest [report](https://github.com/facebook/jest/issues/6398). The simple work around for now is to slice (or `toJS` if the problem is recursive) the array first.
 * Jest `toEqual` matcher might no longer corretly equal your class instances, complaining about differences in the MobX adminstration. This is due to a bug with the processing of symbols: [report](https://github.com/facebook/jest/issues/6392). For now you might want to use a custom matcher if you are directly equalling observable objects. As a work around `toJS(object)` could be used before diffing.
 
