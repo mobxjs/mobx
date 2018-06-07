@@ -1,5 +1,7 @@
 # 5.0.0
 
+[Release blogpost](https://medium.com/p/4852bce05572/)
+
 ### Proxy support!
 
 MobX 5 is the first MobX version fully leveraging Proxies. This has two big advantages
@@ -31,8 +33,10 @@ MobX 5 is the first MobX version fully leveraging Proxies. This has two big adva
 
 ### Known Issues
 
-* Jest `toEqual` might throw an error `allKeys[x].match is not a function` when trying to equal observable arrays. This is a bug in Jest [report](https://github.com/facebook/jest/issues/6391). The simple work around for now is to slice (or `toJS` if the problem is recursive) the array first.
+* Jest `toEqual` might throw an error `allKeys[x].match is not a function` when trying to equal observable arrays. This is a bug in Jest [report](https://github.com/facebook/jest/issues/6398). The simple work around for now is to slice (or `toJS` if the problem is recursive) the array first.
 * Jest `toEqual` matcher might no longer corretly equal your class instances, complaining about differences in the MobX adminstration. This is due to a bug with the processing of symbols: [report](https://github.com/facebook/jest/issues/6392). For now you might want to use a custom matcher if you are directly equalling observable objects. As a work around `toJS(object)` could be used before diffing.
+
+_Note June 7th, 2018:_ Both issues are already in Jest master and should be released soon.
 
 ### Migration guide
 
@@ -40,6 +44,14 @@ MobX 5 is the first MobX version fully leveraging Proxies. This has two big adva
 * You _could_ perform the following clean ups:
   * Don't `slice()` arrays when passing them to external libraries. (Note you still shouldn't pass observable data structures to non-`observer` React components, which is an orthogonal concept)
   * You could replace observable maps with observable objects if you are only using string-based keys.
+* Don't call the `reverse` or `sort` operations directly on observableArray's anymore, as it's behavior slightly differed from the built-in implementations of those methods. Instead use `observableArray.slice().sort()` to perform the sort on a copy. This gives no additional performance overhead compared to MobX 4. (The reason behind this is that built-in `sort` updates the array in place, but the observable array implementation always performed the sort on a defensive copy, and this change makes that explicit).
+
+
+### API's that have been dropped
+
+* The `arrayBuffer` setting is no longer supported by `configure` (it has become irrelevant)
+* `observable.shallowBox`, `observable.shallowArray`, `observable.shallowMap`, `observable.shallowObject`, `extendShallowObservable` api's have been removed. Instead, pass `{ deep: false }` to their non-shallow counter parts.
+* `observableArray.peek`, `observableArray.move`
 
 # 4.3.1
 
