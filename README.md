@@ -25,7 +25,7 @@ MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source and many [in
 
 # Browser support
 
-* MobX >=5 runs on any browser with [ES6 proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy). It will throw an error on startup on older environments such as IE11, Node.js 4 or React Native Android on old JavaScriptCore.
+* MobX >=5 runs on any browser with [ES6 proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy). It will throw an error on startup on older environments such as IE11, Node.js <6 or React Native Android on old JavaScriptCore.
 * MobX 4 runs on any ES5 browser and will be actively maintained. The MobX 4 and 5 api's are the same and semantically can achieve the same, but MobX 4 has some [limitations](#mobx-4-vs-mobx-5).
 
 ## Translations
