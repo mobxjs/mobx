@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="5.3" data-basepath=".." data-revision="Fri May 04 2018 14:11:05 GMT+0200 (CEST)">
+    <div class="book" data-level="5.3" data-basepath=".." data-revision="Thu Jun 07 2018 14:13:00 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -868,6 +868,10 @@
 <ul>
 <li><strong><code>values(thing)</code></strong> returns all values in the collection as array</li>
 <li><strong><code>keys(thing)</code></strong> returns all keys in the collection as array</li>
+<li><strong><code>entries(thing)</code></strong> returns a [key, value] pair for all entries in the collection as array</li>
+</ul>
+<p>The following methods are not really when using MobX 5, but can be used to achieve MobX-5-like behavior in MobX</p>
+<ul>
 <li><strong><code>set(thing, key, value)</code></strong> or <strong><code>set(thing, { key: value })</code></strong> Updates the given collection with the provided key / value pair(s).</li>
 <li><strong><code>remove(thing, key)</code></strong> removes the specified child from the collection. For arrays splicing is used.</li>
 <li><strong><code>has(thing, key)</code></strong> returns true if the collection has the specified <em>observable</em> property.</li>

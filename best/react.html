@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="4.6" data-basepath=".." data-revision="Fri May 04 2018 14:11:05 GMT+0200 (CEST)">
+    <div class="book" data-level="4.6" data-basepath=".." data-revision="Thu Jun 07 2018 14:13:00 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -1027,14 +1027,25 @@ message.likes.push(<span class="hljs-string">&quot;Jennifer&quot;</span>);
 </code></pre>
 <p>This will <strong>not</strong> react. Simply because the <code>likes</code> array itself is not being used by the <code>autorun</code>, only the reference to the array.
 So in contrast, <code>messages.likes = [&quot;Jennifer&quot;]</code> would be picked up; that statement does not modify the array, but the <code>likes</code> property itself.</p>
-<h4 id="incorrect-using-non-observable-object-properties"><a name="incorrect-using-non-observable-object-properties" class="plugin-anchor" href="#incorrect-using-non-observable-object-properties"><span class="fa fa-link"></span></a>Incorrect: using non-observable object properties</h4>
+<h4 id="using-non-observable-object-properties"><a name="using-non-observable-object-properties" class="plugin-anchor" href="#using-non-observable-object-properties"><span class="fa fa-link"></span></a>Using non-observable object properties</h4>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(message.postDate)
 })
 message.postDate = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>()
 </code></pre>
-<p>This will <strong>not</strong> react. MobX can only track observable properties.</p>
-<h4 id="incorrect-using-not-yet-existing-observable-object-properties"><a name="incorrect-using-not-yet-existing-observable-object-properties" class="plugin-anchor" href="#incorrect-using-not-yet-existing-observable-object-properties"><span class="fa fa-link"></span></a>Incorrect: using not yet existing observable object properties</h4>
+<p><em>MobX 4</em></p>
+<p>This will <strong>not</strong> react. MobX can only track observable properties, and &apos;postDate&apos; has not been defined as observable property above.
+However, it is possible to use the <code>get</code> and <code>set</code> methods as exposed by MobX to work around this:</p>
+<pre><code class="lang-javascript">autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(get(message, <span class="hljs-string">&quot;postDate&quot;</span>))
+})
+set(message, <span class="hljs-string">&quot;postDate&quot;</span>,  <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>())
+</code></pre>
+<p><em>MobX 5</em></p>
+<p>In MobX 5 this <strong>will</strong> react, as MobX 5 can track not-yet existing properties.
+Note that this is only done for objects created with <code>observable</code> or <code>observable.object</code>.
+New properties on class instances will not be made observable automatically.</p>
+<h4 id="-mobx-4-and-lower-incorrect-using-not-yet-existing-observable-object-properties"><a name="-mobx-4-and-lower-incorrect-using-not-yet-existing-observable-object-properties" class="plugin-anchor" href="#-mobx-4-and-lower-incorrect-using-not-yet-existing-observable-object-properties"><span class="fa fa-link"></span></a>[MobX 4 and lower] Incorrect: using not yet existing observable object properties</h4>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(message.postDate)
 })

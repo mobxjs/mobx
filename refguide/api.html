@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="2" data-basepath=".." data-revision="Fri May 04 2018 14:11:05 GMT+0200 (CEST)">
+    <div class="book" data-level="2" data-basepath=".." data-revision="Thu Jun 07 2018 14:13:00 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -904,9 +904,9 @@
 <p>These rules might seem complicated at first sight, but you will notice that in practice they are very intuitive to work with.</p>
 <p><strong>Some notes:</strong></p>
 <ul>
-<li>To create dynamically keyed objects, always use maps! Only initially existing properties on an object will be made observable, although new ones can be added using <code>extendObservable</code>.</li>
 <li>To use the <code>@observable</code> decorator, make sure that <a href="http://mobxjs.github.io/mobx/refguide/observable-decorator.html" target="_blank">decorators are enabled</a> in your transpiler (babel or typescript).</li>
 <li>By default making a data structure observable is <em>infective</em>; that means that <code>observable</code> is applied automatically to any value that is contained by the data structure, or will be contained by the data structure in the future. This behavior can be changed by using <a href="#decorators"><em>decorators</em></a>.</li>
+<li><em>[MobX 4 and below]</em> To create dynamically keyed objects, always use maps! Only initially existing properties on an object will be made observable, although new ones can be added using <code>extendObservable</code>.</li>
 </ul>
 <p><a href="observable.html">&#xAB;<code>observable</code>&#xBB;</a>  &#x2014;  <a href="observable-decorator.html">&#xAB;<code>@observable</code>&#xBB;</a></p>
 <h3 id="-observable-property-value"><a name="-observable-property-value" class="plugin-anchor" href="#-observable-property-value"><span class="fa fa-link"></span></a><code>@observable property =  value</code></h3>
@@ -1014,6 +1014,7 @@ The expression will automatically be re-evaluated if any observables it uses cha
 <li><strong><code>requiresReaction: boolean</code></strong> Wait for a change in value of the tracked observables, before recomputing the derived property</li>
 <li><strong><code>get: () =&gt; value)</code></strong> Override the getter for the computed property.</li>
 <li><strong><code>set: (value) =&gt; void</code></strong> Override the setter for the computed property</li>
+<li><strong><code>keepAlive: boolean</code></strong> Set to true to automatically keep computed values alive, rather then suspending then when there are no observers.</li>
 </ul>
 <p><a href="computed-decorator.html">&#xAB;details&#xBB;</a></p>
 <h2 id="actions"><a name="actions" class="plugin-anchor" href="#actions"><span class="fa fa-link"></span></a>Actions</h2>
@@ -1122,6 +1123,7 @@ The condition expression will react automatically to any observables it uses.
 As soon as the expression returns true the sideEffect function will be invoked, but only once.</p>
 <p><strong>Note:</strong> the <em>effect-function</em> (second argument) is actually optional. If no effect-function is provided, it will return a cancelable promise (i.e. having a <code>cancel()</code> method on the promise)</p>
 <p><code>when</code> returns a disposer to prematurely cancel the whole thing.</p>
+<p>If no effect function is passed to <code>when</code>, it will return a promise that can be awaited until the condition settles.</p>
 <p><a href="when.html">&#xAB;details&#xBB;</a>.</p>
 <p><strong>options</strong></p>
 <ul>
@@ -1276,7 +1278,7 @@ See also <code>allowStateChanges</code>.</p>
 </blockquote>
 <pre><code class="lang-javascript">configure({ enforceActions: <span class="hljs-literal">true</span> });
 </code></pre>
-<p>Since MobX 4.2, it is also possible to specify </p>
+<p>Since MobX 4.2, it is also possible to specify</p>
 <pre><code class="lang-javascript">configure({ enforceActions: <span class="hljs-string">&quot;strict&quot;</span> });
 </code></pre>
 <p>In sloppy (<code>true</code>) mode, MobX will only throw if an observed observable is modified, in <code>&quot;strict&quot;</code> mode it will even throw for non-observed observables</p>
@@ -1303,6 +1305,7 @@ This can be useful for basic debugging, or slowing down reactions to visualize a
 <ul>
 <li><strong><code>values(thing)</code></strong> returns all values in the collection as array</li>
 <li><strong><code>keys(thing)</code></strong> returns all keys in the collection as array</li>
+<li><strong><code>entries(thing)</code></strong> returns a [key, value] pair for all entries in the collection as array</li>
 <li><strong><code>set(thing, key, value)</code></strong> or <strong><code>set(thing, { key: value })</code></strong> Updates the given collection with the provided key / value pair(s).</li>
 <li><strong><code>remove(thing, key)</code></strong> removes the specified child from the collection. For arrays splicing is used.</li>
 <li><strong><code>has(thing, key)</code></strong> returns true if the collection has the specified <em>observable</em> property.</li>

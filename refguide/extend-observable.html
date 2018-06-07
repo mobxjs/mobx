@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="6.2" data-basepath=".." data-revision="Fri May 04 2018 14:11:05 GMT+0200 (CEST)">
+    <div class="book" data-level="6.2" data-basepath=".." data-revision="Thu Jun 07 2018 14:13:00 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -895,6 +895,7 @@ extendObservable(matthew, {
 </code></pre>
 <p>Note:  <code>observable.object(object)</code> is actually an alias for <code>extendObservable({}, object)</code>.</p>
 <p>Note: <code>decorate</code> could be used to introduce observable properties to an object, similar to <code>extendObservable</code>. The difference is that <code>extendObservable</code> is designed to introduce properties directly on the target instance, where <code>decorate</code> introduces them on prototypes; you can either pass it a constructor function (class) directly, or an object that will act as prototype for others.</p>
+<p>Note: <code>extendObservable</code> can not be used to introduce new properties on observable arrays or objects</p>
 </body></html>
                     
                     </section>

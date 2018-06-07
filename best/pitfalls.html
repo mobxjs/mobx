@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="8.2" data-basepath=".." data-revision="Fri May 04 2018 14:11:05 GMT+0200 (CEST)">
+    <div class="book" data-level="8.2" data-basepath=".." data-revision="Thu Jun 07 2018 14:13:00 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -877,17 +877,20 @@
 <h4 id="issues-with-decorators"><a name="issues-with-decorators" class="plugin-anchor" href="#issues-with-decorators"><span class="fa fa-link"></span></a>Issues with decorators?</h4>
 <p>For setup tips and limitations on decorators, check the <a href="decorators.html">decorators</a> page</p>
 <h4 id="-array-isarray-observable-1-2-3-false"><a name="-array-isarray-observable-1-2-3-false" class="plugin-anchor" href="#-array-isarray-observable-1-2-3-false"><span class="fa fa-link"></span></a><code>Array.isArray(observable([1,2,3])) === false</code></h4>
+<p><em>This limitation applies to MobX 4 and lower only</em></p>
 <p>In ES5 there is no way to reliably inherit from arrays, and hence observable arrays inherit from objects.
 This means that regularly libraries are not able to recognize observable arrays as normal arrays (like lodash, or built-in operations like <code>Array.concat</code>).
 This can simply be fixed by passing calling <code>observable.toJS()</code> or <code>observable.slice()</code> before passing the array to another library.
 As long as the external library has no intent to modify the array, this will further work completely as expected.
 You can use <code>isObservableArray(observable)</code> to check whether something is an observable array.</p>
 <h4 id="-object-somenewprop-value-is-not-picked-up"><a name="-object-somenewprop-value-is-not-picked-up" class="plugin-anchor" href="#-object-somenewprop-value-is-not-picked-up"><span class="fa fa-link"></span></a><code>object.someNewProp = value</code> is not picked up</h4>
+<p><em>This limitation applies to MobX 4 and lower</em></p>
+<p><em>In MobX 5 this limitation applies to class instances and other objects that were _not</em> created using <code>observable()</code> / <code>observable.object()</code>.</p>
 <p>MobX observable <em>objects</em> do not detect or react to property assignments that weren&apos;t declared observable before.
 So MobX observable objects act as records with predefined keys.
 You can use <code>extendObservable(target, props)</code> to introduce new observable properties to an object.
 However object iterators like <code>for .. in</code> or <code>Object.keys()</code> won&apos;t react to this automatically.
-If you need a dynamically keyed object, for example to store users by id, create observable _map_s using <a href="../refguide/map.html"><code>observable.map</code></a>.
+If you need a dynamically keyed object in MobX 4 and lower, for example to store users by id, create observable _map_s using <a href="../refguide/map.html"><code>observable.map</code></a> or use the utility methods as exposed by the <a href="../refguide/object-api.html">Object API</a>.
 For more info see <a href="react.html">what will MobX react to?</a>.</p>
 <h3 id="use-observer-on-all-components-that-render-observable-s"><a name="use-observer-on-all-components-that-render-observable-s" class="plugin-anchor" href="#use-observer-on-all-components-that-render-observable-s"><span class="fa fa-link"></span></a>Use <code>@observer</code> on all components that render <code>@observable</code>s.</h3>
 <p><code>@observer</code> only enhances the component you are decorating, not the components used inside it.
@@ -949,6 +952,7 @@ This allows MobX to automatically suspend computations that are not actively in 
 See this <a href="https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254" target="_blank">blog</a> or <a href="https://github.com/mobxjs/mobx/issues/356" target="_blank">issue #356</a> for an explanation.
 So if you fiddle arounds, computed properties might not seem efficient. But when applied in a project that uses <code>observer</code>, <code>autorun</code> etc, they become very efficient.</p>
 <p>MobX computeds will automatically be kept alive during transactions as well, see PRs: <a href="https://github.com/mobxjs/mobx/pull/452" target="_blank">#452</a> and <a href="https://github.com/mobxjs/mobx/pull/489" target="_blank">#489</a></p>
+<p>To force computed values to stay alive one can use the <code>keepAlive: true</code> option, but not that this can potentially create memory leaks.</p>
 <h4 id="always-dispose-reactions"><a name="always-dispose-reactions" class="plugin-anchor" href="#always-dispose-reactions"><span class="fa fa-link"></span></a>Always dispose reactions</h4>
 <p>All forms of <code>autorun</code>, <code>observe</code> and <code>intercept</code> will only be garbage collected if all objects they observe are garbage collected themselves.
 So it is recommend to use the disposer function that is returned from these methods to stop them when you no longer need them.

@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="3.1" data-basepath=".." data-revision="Fri May 04 2018 14:11:05 GMT+0200 (CEST)">
+    <div class="book" data-level="3.1" data-basepath=".." data-revision="Thu Jun 07 2018 14:13:00 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -882,9 +882,9 @@ The following conversion rules are applied, but can be fine-tuned by using <em>m
 <p>These rules might seem complicated at first sight, but you will notice that in practice they are very intuitive to work with.
 Some notes:</p>
 <ul>
-<li>To create <strong>dynamically keyed objects</strong> use an <a href="map.html">Observable Map</a>! Only initially existing properties on an object will be made observable, although new ones can be added using <code>extendObservable</code>.</li>
 <li>To use the <code>@observable</code> decorator, make sure that <a href="observable-decorator.html">decorators are enabled</a> in your transpiler (babel or typescript).</li>
 <li>By default, making a data structure observable is <em>infective</em>; that means that <code>observable</code> is applied automatically to any value that is contained by the data structure, or will be contained by the data structure in the future. This behavior can be changed by using <em>modifiers</em>.</li>
+<li><em>[MobX 4 and lower]</em> To create <strong>dynamically keyed objects</strong> use an <a href="map.html">Observable Map</a>! Only initially existing properties on an object will be made observable, although new ones can be added using <code>extendObservable</code>.</li>
 </ul>
 <p>Some examples:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> map = observable.map({ key: <span class="hljs-string">&quot;value&quot;</span>});
