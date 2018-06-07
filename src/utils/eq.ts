@@ -1,5 +1,4 @@
-import { isES6Map, iteratorToArray } from "./utils"
-import { isObservableArray, isObservableMap } from "../mobx"
+import { isES6Map, isObservableArray, isObservableMap } from "../internal"
 
 declare var Symbol
 const toString = Object.prototype.toString
@@ -126,8 +125,8 @@ function deepEq(a: any, b: any, aStack?: any[], bStack?: any[]) {
 }
 
 function unwrap(a: any) {
-    if (isObservableArray(a)) return a.peek()
-    if (isES6Map(a) || isObservableMap(a)) return iteratorToArray(a.entries())
+    if (isObservableArray(a)) return a.slice()
+    if (isES6Map(a) || isObservableMap(a)) return Array.from(a.entries())
     return a
 }
 

@@ -102,6 +102,29 @@ test("babel: parameterized computed decorator", () => {
     expect(changes).toEqual([{ sum: 6 }, { sum: 7 }, { sum: 9 }])
 })
 
+test("computed value should be the same around changing which was considered equivalent", () => {
+    class TestClass {
+        @observable c = null
+        defaultCollection = []
+        @computed.struct
+        get collection() {
+            return this.c || this.defaultCollection
+        }
+    }
+
+    const t1 = new TestClass()
+
+    const d = autorun(() => t1.collection)
+
+    const oldCollection = t1.collection
+    t1.c = []
+    const newCollection = t1.collection
+
+    expect(oldCollection).toBe(newCollection)
+
+    d()
+})
+
 class Order {
     @observable price = 3
     @observable amount = 2
@@ -601,7 +624,7 @@ test("enumerability", () => {
     expect("a" in a).toBe(true)
     expect(a.hasOwnProperty("a")).toBe(true)
     expect(a.hasOwnProperty("a2")).toBe(true)
-    expect(a.hasOwnProperty("b")).toBe(false)
+    expect(a.hasOwnProperty("b")).toBe(false) // true would also be ok-ish. see: #1398
     expect(a.hasOwnProperty("m")).toBe(false)
     expect(a.hasOwnProperty("m2")).toBe(true)
 })
@@ -640,7 +663,7 @@ test("enumerability - workaround", () => {
     expect("a" in a).toBe(true)
     expect(a.hasOwnProperty("a")).toBe(true)
     expect(a.hasOwnProperty("a2")).toBe(true)
-    expect(a.hasOwnProperty("b")).toBe(false)
+    expect(a.hasOwnProperty("b")).toBe(false) // true would also be ok-ish. see: #1398
     expect(a.hasOwnProperty("m")).toBe(false)
     expect(a.hasOwnProperty("m2")).toBe(true)
 })
@@ -1041,7 +1064,8 @@ test("computed comparer works with decorate (babel) - 3", () => {
     disposeAutorun()
 })
 
-test("actions are not reassignable", () => {
+test("actions are reassignable", () => {
+    // See #1398, make actions reassignable to support stubbing
     class A {
         @action
         m1() {}
@@ -1056,21 +1080,14 @@ test("actions are not reassignable", () => {
     expect(isAction(a.m2)).toBe(true)
     expect(isAction(a.m3)).toBe(true)
     expect(isAction(a.m4)).toBe(true)
-    // expect(() => {
-    //     a.m1 = () => {}
-    // }).toThrow(/Cannot assign to read only property 'm1'/)
     a.m1 = () => {}
-    // we cannot prevent actions to be reassignable in TS, as it will kill overriding the action in subtypes :'(
     expect(isAction(a.m1)).toBe(false)
-    expect(() => {
-        a.m2 = () => {}
-    }).toThrow(/Cannot assign to read only property 'm2'/)
-    expect(() => {
-        a.m3 = () => {}
-    }).toThrow(/Cannot assign to read only property 'm3'/)
-    expect(() => {
-        a.m4 = () => {}
-    }).toThrow(/Cannot assign to read only property 'm4'/)
+    a.m2 = () => {}
+    expect(isAction(a.m2)).toBe(false)
+    a.m3 = () => {}
+    expect(isAction(a.m3)).toBe(false)
+    a.m4 = () => {}
+    expect(isAction(a.m4)).toBe(false)
 })
 
 test("it should support asyncAction (babel)", async () => {
@@ -1092,4 +1109,91 @@ test("it should support asyncAction (babel)", async () => {
     const x = new X()
 
     expect(await x.f(3)).toBe(16)
+})
+
+test("toJS bug #1413 (babel)", () => {
+    class X {
+        @observable
+        test = {
+            test1: 1
+        }
+    }
+
+    const x = new X()
+    const res = mobx.toJS(x.test)
+    expect(res).toEqual({ test1: 1 })
+    expect(res.__mobxDidRunLazyInitializers).toBe(undefined)
+})
+
+test("computed setter problem", () => {
+    class Contact {
+        @observable firstName = ""
+        @observable lastName = ""
+
+        @computed({
+            set(value) {
+                const [firstName, lastName] = value.split(" ")
+
+                this.firstName = firstName
+                this.lastName = lastName
+            }
+        })
+        get fullName() {
+            return `${this.firstName} ${this.lastName}`
+        }
+
+        set fullName(value) {
+            const [firstName, lastName] = value.split(" ")
+
+            this.firstName = firstName
+            this.lastName = lastName
+        }
+    }
+
+    const c = new Contact()
+
+    c.firstName = "Pavan"
+    c.lastName = "Podila"
+
+    expect(c.fullName).toBe("Pavan Podila")
+
+    c.fullName = "Michel Weststrate"
+    expect(c.firstName).toBe("Michel")
+    expect(c.lastName).toBe("Weststrate")
+})
+
+test("computed setter problem - 2", () => {
+    class Contact {
+        @observable firstName = ""
+        @observable lastName = ""
+
+        get fullName() {
+            return `${this.firstName} ${this.lastName}`
+        }
+    }
+
+    debugger
+    mobx.decorate(Contact, {
+        fullName: computed({
+            // This doesn't work
+            set: function(value) {
+                const [firstName, lastName] = value.split(" ")
+
+                this.firstName = firstName
+                this.lastName = lastName
+            },
+            equals: mobx.comparer.identity
+        })
+    })
+
+    const c = new Contact()
+
+    c.firstName = "Pavan"
+    c.lastName = "Podila"
+
+    expect(c.fullName).toBe("Pavan Podila")
+
+    c.fullName = "Michel Weststrate"
+    expect(c.firstName).toBe("Michel")
+    expect(c.lastName).toBe("Weststrate")
 })

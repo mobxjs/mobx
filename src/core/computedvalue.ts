@@ -1,38 +1,35 @@
 import {
-    IObservable,
-    reportObserved,
-    propagateMaybeChanged,
-    propagateChangeConfirmed,
-    startBatch,
-    endBatch
-} from "./observable"
-import {
+    CaughtException,
     IDerivation,
     IDerivationState,
-    trackDerivedFunction,
+    IEqualsComparer,
+    IObservable,
+    IValueDidChange,
+    Lambda,
+    TraceMode,
+    autorun,
     clearObserving,
-    untrackedStart,
-    untrackedEnd,
-    shouldCompute,
-    CaughtException,
-    isCaughtException,
-    TraceMode
-} from "./derivation"
-import { globalState } from "./globalstate"
-import { createAction } from "./action"
-import {
+    comparer,
+    createAction,
     createInstanceofPredicate,
+    endBatch,
     fail,
     getNextId,
+    globalState,
     invariant,
-    Lambda,
-    primitiveSymbol,
-    toPrimitive
-} from "../utils/utils"
-import { isSpyEnabled, spyReport } from "./spy"
-import { autorun } from "../api/autorun"
-import { IEqualsComparer, comparer } from "../utils/comparer"
-import { IValueDidChange } from "../types/observablevalue"
+    isCaughtException,
+    isSpyEnabled,
+    propagateChangeConfirmed,
+    propagateMaybeChanged,
+    reportObserved,
+    shouldCompute,
+    spyReport,
+    startBatch,
+    toPrimitive,
+    trackDerivedFunction,
+    untrackedEnd,
+    untrackedStart
+} from "../internal"
 
 export interface IComputedValue<T> {
     get(): T
@@ -47,6 +44,7 @@ export interface IComputedValueOptions<T> {
     equals?: IEqualsComparer<T>
     context?: any
     requiresReaction?: boolean
+    keepAlive?: boolean
 }
 
 /**
@@ -74,8 +72,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     newObserving = null // during tracking it's an array with new observed observers
     isBeingObserved = false
     isPendingUnobservation: boolean = false
-    observers = []
-    observersIndexes = {}
+    observers = new Set()
     diffValue = 0
     runId = 0
     lastAccessedBy = 0
@@ -84,15 +81,17 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     __mapid = "#" + getNextId()
     protected value: T | undefined | CaughtException = new CaughtException(null)
     name: string
-    triggeredBy: string
+    triggeredBy?: string
     isComputing: boolean = false // to check for cycles
     isRunningSetter: boolean = false
     derivation: () => T
-    setter: (value: T) => void
+    setter?: (value: T) => void
     isTracing: TraceMode = TraceMode.NONE
     public scope: Object | undefined
     private equals: IEqualsComparer<any>
-    private requiresReaction
+    private requiresReaction: boolean
+    private keepAlive: boolean
+    private firstGet: boolean = true
 
     /**
      * Create a new computed value based on a function expression.
@@ -102,13 +101,13 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * The `equals` property specifies the comparer function to use to determine if a newly produced
      * value differs from the previous value. Two comparers are provided in the library; `defaultComparer`
      * compares based on identity comparison (===), and `structualComparer` deeply compares the structure.
-     * Structural comparison can be convenient if you always produce an new aggregated object and
+     * Structural comparison can be convenient if you always produce a new aggregated object and
      * don't want to notify observers if it is structurally the same.
      * This is useful for working with vectors, mouse coordinates etc.
      */
     constructor(options: IComputedValueOptions<T>) {
-        if (process.env.NODE_ENV === "production" && !options.get)
-            return fail("missing option for computed: get")
+        if (process.env.NODE_ENV !== "production" && !options.get)
+            throw "[mobx] missing option for computed: get"
         this.derivation = options.get!
         this.name = options.name || "ComputedValue@" + getNextId()
         if (options.set) this.setter = createAction(this.name + "-setter", options.set) as any
@@ -119,6 +118,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 : comparer.default)
         this.scope = options.context
         this.requiresReaction = !!options.requiresReaction
+        this.keepAlive = !!options.keepAlive
     }
 
     onBecomeStale() {
@@ -134,8 +134,12 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * Will evaluate its computation first if needed.
      */
     public get(): T {
+        if (this.keepAlive && this.firstGet) {
+            this.firstGet = false
+            autorun(() => this.get())
+        }
         if (this.isComputing) fail(`Cycle detected in computation ${this.name}: ${this.derivation}`)
-        if (globalState.inBatch === 0) {
+        if (globalState.inBatch === 0 && this.observers.size === 0) {
             if (shouldCompute(this)) {
                 this.warnAboutUntrackedRead()
                 startBatch() // See perf test 'computed memoization'
@@ -162,8 +166,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         if (this.setter) {
             invariant(
                 !this.isRunningSetter,
-                `The setter of computed value '${this
-                    .name}' is trying to update itself. Did you intend to update an _observable_ value, instead of the computed property?`
+                `The setter of computed value '${
+                    this.name
+                }' is trying to update itself. Did you intend to update an _observable_ value, instead of the computed property?`
             )
             this.isRunningSetter = true
             try {
@@ -175,13 +180,14 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             invariant(
                 false,
                 process.env.NODE_ENV !== "production" &&
-                    `[ComputedValue '${this
-                        .name}'] It is not possible to assign a new value to a computed value.`
+                    `[ComputedValue '${
+                        this.name
+                    }'] It is not possible to assign a new value to a computed value.`
             )
     }
 
     private trackAndCompute(): boolean {
-        if (isSpyEnabled()) {
+        if (isSpyEnabled() && process.env.NODE_ENV !== "production") {
             spyReport({
                 object: this.scope,
                 type: "compute",
@@ -191,13 +197,19 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         const oldValue = this.value
         const wasSuspended =
             /* see #1208 */ this.dependenciesState === IDerivationState.NOT_TRACKING
-        const newValue = (this.value = this.computeValue(true))
-        return (
+        const newValue = this.computeValue(true)
+
+        const changed =
             wasSuspended ||
             isCaughtException(oldValue) ||
             isCaughtException(newValue) ||
             !this.equals(oldValue, newValue)
-        )
+
+        if (changed) {
+            this.value = newValue
+        }
+
+        return changed
     }
 
     computeValue(track: boolean) {
@@ -254,14 +266,16 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         }
         if (this.isTracing !== TraceMode.NONE) {
             console.log(
-                `[mobx.trace] '${this
-                    .name}' is being read outside a reactive context. Doing a full recompute`
+                `[mobx.trace] '${
+                    this.name
+                }' is being read outside a reactive context. Doing a full recompute`
             )
         }
         if (globalState.computedRequiresReaction) {
             console.warn(
-                `[mobx] Computed value ${this
-                    .name} is being read outside a reactive context. Doing a full recompute`
+                `[mobx] Computed value ${
+                    this.name
+                } is being read outside a reactive context. Doing a full recompute`
             )
         }
     }
@@ -277,8 +291,10 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     valueOf(): T {
         return toPrimitive(this.get())
     }
-}
 
-ComputedValue.prototype[primitiveSymbol()] = ComputedValue.prototype.valueOf
+    [Symbol.toPrimitive]() {
+        return this.valueOf()
+    }
+}
 
 export const isComputedValue = createInstanceofPredicate("ComputedValue", ComputedValue)

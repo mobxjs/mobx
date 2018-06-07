@@ -196,27 +196,27 @@ test("cleanup", function() {
     var observable = x._data.get("a")
 
     expect(aValue).toBe(1)
-    expect(observable.observers.length).toBe(1)
-    expect(x._hasMap.get("a").observers.length).toBe(1)
+    expect(observable.observers.size).toBe(1)
+    expect(x._hasMap.get("a").observers.size).toBe(1)
 
     expect(x.delete("a")).toBe(true)
     expect(x.delete("not-existing")).toBe(false)
 
     expect(aValue).toBe(undefined)
-    expect(observable.observers.length).toBe(0)
-    expect(x._hasMap.get("a").observers.length).toBe(1)
+    expect(observable.observers.size).toBe(0)
+    expect(x._hasMap.get("a").observers.size).toBe(1)
 
     x.set("a", 2)
     observable = x._data.get("a")
 
     expect(aValue).toBe(2)
-    expect(observable.observers.length).toBe(1)
-    expect(x._hasMap.get("a").observers.length).toBe(1)
+    expect(observable.observers.size).toBe(1)
+    expect(x._hasMap.get("a").observers.size).toBe(1)
 
     disposer()
     expect(aValue).toBe(2)
-    expect(observable.observers.length).toBe(0)
-    expect(x._hasMap.get("a").observers.length).toBe(0)
+    expect(observable.observers.size).toBe(0)
+    expect(x._hasMap.get("a").observers.size).toBe(0)
 })
 
 test("strict", function() {
@@ -293,12 +293,12 @@ test("map modifier with modifier", () => {
     x.set("b", { d: 4 })
     expect(mobx.isObservableObject(x.get("b"))).toBe(true)
 
-    x = mobx.observable.shallowMap({ a: { c: 3 } })
+    x = mobx.observable.map({ a: { c: 3 } }, { deep: false })
     expect(mobx.isObservableObject(x.get("a"))).toBe(false)
     x.set("b", { d: 4 })
     expect(mobx.isObservableObject(x.get("b"))).toBe(false)
 
-    x = mobx.observable({ a: mobx.observable.shallowMap({ b: {} }) })
+    x = mobx.observable({ a: mobx.observable.map({ b: {} }, { deep: false }) })
     expect(mobx.isObservableObject(x)).toBe(true)
     expect(mobx.isObservableMap(x.a)).toBe(true)
     expect(mobx.isObservableObject(x.a.get("b"))).toBe(false)
@@ -307,7 +307,7 @@ test("map modifier with modifier", () => {
 })
 
 test("256, map.clear should not be tracked", () => {
-    var x = new mobx.observable.map({ a: 3 })
+    var x = mobx.observable.map({ a: 3 })
     var c = 0
     var d = mobx.autorun(() => {
         c++
@@ -680,4 +680,13 @@ test("toStringTag", () => {
     const x = mobx.observable.map({ x: 1, y: 2 })
     expect(x[Symbol.toStringTag]).toBe("Map")
     expect(Object.prototype.toString.call(x)).toBe("[object Map]")
+})
+
+test("verify #1524", () => {
+    class Store {
+        @mobx.observable articles = new Map()
+    }
+
+    const store = new Store()
+    expect(typeof store.articles.observe === "function").toBe(true)
 })

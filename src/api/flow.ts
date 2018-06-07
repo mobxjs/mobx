@@ -1,4 +1,4 @@
-import { action } from "./action"
+import { action, fail, noop } from "../internal"
 
 let generatorId = 0
 
@@ -8,6 +8,24 @@ export function flow<R>(generator: () => IterableIterator<any>): () => Cancellab
 export function flow<A1>(
     generator: (a1: A1) => IterableIterator<any>
 ): (a1: A1) => CancellablePromise<any> // Ideally we want to have R instead of Any, but cannot specify R without specifying A1 etc... 'any' as result is better then not specifying request args
+export function flow<A1, A2>(
+    generator: (a1: A1, a2: A2) => IterableIterator<any>
+): (a1: A1, a2: A2) => CancellablePromise<any>
+export function flow<A1, A2, A3>(
+    generator: (a1: A1, a2: A2, a3: A3) => IterableIterator<any>
+): (a1: A1, a2: A2, a3: A3) => CancellablePromise<any>
+export function flow<A1, A2, A3, A4>(
+    generator: (a1: A1, a2: A2, a3: A3, a4: A4) => IterableIterator<any>
+): (a1: A1, a2: A2, a3: A3, a4: A4) => CancellablePromise<any>
+export function flow<A1, A2, A3, A4, A5>(
+    generator: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => IterableIterator<any>
+): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => CancellablePromise<any>
+export function flow<A1, A2, A3, A4, A5, A6>(
+    generator: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6) => IterableIterator<any>
+): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6) => CancellablePromise<any>
+export function flow<A1, A2, A3, A4, A5, A6, A7>(
+    generator: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7) => IterableIterator<any>
+): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7) => CancellablePromise<any>
 export function flow<A1, A2, A3, A4, A5, A6, A7, A8>(
     generator: (
         a1: A1,
@@ -20,25 +38,6 @@ export function flow<A1, A2, A3, A4, A5, A6, A7, A8>(
         a8: A8
     ) => IterableIterator<any>
 ): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7, a8: A8) => CancellablePromise<any>
-export function flow<A1, A2, A3, A4, A5, A6, A7>(
-    generator: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7) => IterableIterator<any>
-): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7) => CancellablePromise<any>
-export function flow<A1, A2, A3, A4, A5, A6>(
-    generator: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6) => IterableIterator<any>
-): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6) => CancellablePromise<any>
-export function flow<A1, A2, A3, A4, A5>(
-    generator: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => IterableIterator<any>
-): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => CancellablePromise<any>
-export function flow<A1, A2, A3, A4>(
-    generator: (a1: A1, a2: A2, a3: A3, a4: A4) => IterableIterator<any>
-): (a1: A1, a2: A2, a3: A3, a4: A4) => CancellablePromise<any>
-export function flow<A1, A2, A3>(
-    generator: (a1: A1, a2: A2, a3: A3) => IterableIterator<any>
-): (a1: A1, a2: A2, a3: A3) => CancellablePromise<any>
-export function flow<A1, A2>(
-    generator: (a1: A1, a2: A2) => IterableIterator<any>
-): (a1: A1, a2: A2) => Promise<any>
-export function flow<A1>(generator: (a1: A1) => IterableIterator<any>): (a1: A1) => Promise<any>
 export function flow(generator: Function) {
     if (arguments.length !== 1)
         fail(process.env.NODE_ENV && `Flow expects one 1 argument and cannot be used as decorator`)
@@ -102,9 +101,14 @@ export function flow(generator: Function) {
 
         res.cancel = action(`${name} - runid: ${runId} - cancel`, function() {
             try {
-                if (pendingPromise && typeof pendingPromise.cancel === "function")
-                    pendingPromise.cancel()
-                gen.return()
+                if (pendingPromise) cancelPromise(pendingPromise)
+                // Finally block can return (or yield) stuff..
+                const res = gen.return()
+                // eat anything that promise would do, it's cancelled!
+                const yieldedPromise = Promise.resolve(res.value)
+                yieldedPromise.then(noop, noop)
+                cancelPromise(yieldedPromise) // maybe it can be cancelled :)
+                // reject our original promise
                 rejector(new Error("FLOW_CANCELLED"))
             } catch (e) {
                 rejector(e) // there could be a throwing finally block
@@ -112,4 +116,8 @@ export function flow(generator: Function) {
         })
         return res
     }
+}
+
+function cancelPromise(promise) {
+    if (typeof promise.cancel === "function") promise.cancel()
 }

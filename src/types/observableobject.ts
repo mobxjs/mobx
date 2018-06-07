@@ -1,29 +1,38 @@
-import { ObservableValue, UNCHANGED } from "./observablevalue"
-import { ComputedValue, IComputedValueOptions } from "../core/computedvalue"
 import {
-    createInstanceofPredicate,
-    isObject,
-    Lambda,
-    getNextId,
-    invariant,
-    assertPropertyConfigurable,
-    isPlainObject,
-    fail,
-    addHiddenFinalProp,
-    isPropertyConfigurable
-} from "../utils/utils"
-import {
-    hasInterceptors,
+    $mobx,
+    Atom,
+    ComputedValue,
+    IAtom,
+    IComputedValueOptions,
+    IEnhancer,
     IInterceptable,
+    IListenable,
+    Lambda,
+    ObservableValue,
+    UNCHANGED,
+    addHiddenProp,
+    assertPropertyConfigurable,
+    createInstanceofPredicate,
+    deepEnhancer,
+    endBatch,
+    getNextId,
+    hasInterceptors,
+    hasListeners,
+    initializeInstance,
+    interceptChange,
+    invariant,
+    isObject,
+    isPlainObject,
+    isPropertyConfigurable,
+    isSpyEnabled,
+    notifyListeners,
+    referenceEnhancer,
     registerInterceptor,
-    interceptChange
-} from "./intercept-utils"
-import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
-import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
-import { IEnhancer, referenceEnhancer, deepEnhancer } from "./modifiers"
-import { ObservableArray, IObservableArray } from "./observablearray"
-import { initializeInstance } from "../utils/decorators2"
-import { startBatch, endBatch } from "../core/observable"
+    registerListener,
+    spyReportEnd,
+    spyReportStart,
+    startBatch
+} from "../internal"
 
 export interface IObservableObject {
     "observable-object": IObservableObject
@@ -65,28 +74,28 @@ export type IObjectWillChange =
 
 export class ObservableObjectAdministration
     implements IInterceptable<IObjectWillChange>, IListenable {
-    values: { [key: string]: ObservableValue<any> | ComputedValue<any> } = {}
-    keys: undefined | IObservableArray<string>
+    keysAtom: IAtom
     changeListeners
     interceptors
+    private proxy: any
+    private pendingKeys: undefined | Map<string, ObservableValue<boolean>>
 
-    constructor(public target: any, public name: string, public defaultEnhancer: IEnhancer<any>) {}
-
-    read(owner: any, key: string) {
-        if (this.target !== owner) {
-            this.illegalAccess(owner, key)
-            return
-        }
-        return this.values[key].get()
+    constructor(
+        public target: any,
+        public values = new Map<string, ObservableValue<any> | ComputedValue<any>>(),
+        public name: string,
+        public defaultEnhancer: IEnhancer<any>
+    ) {
+        this.keysAtom = new Atom(name + ".keys")
     }
 
-    write(owner: any, key: string, newValue) {
+    read(key: string) {
+        return this.values.get(key)!.get()
+    }
+
+    write(key: string, newValue) {
         const instance = this.target
-        if (instance !== owner) {
-            this.illegalAccess(owner, key)
-            return
-        }
-        const observable = this.values[key]
+        const observable = this.values.get(key)
         if (observable instanceof ComputedValue) {
             observable.set(newValue)
             return
@@ -96,7 +105,7 @@ export class ObservableObjectAdministration
         if (hasInterceptors(this)) {
             const change = interceptChange<IObjectWillChange>(this, {
                 type: "update",
-                object: instance,
+                object: this.proxy || instance,
                 name: key,
                 newValue
             })
@@ -113,26 +122,89 @@ export class ObservableObjectAdministration
                 notify || notifySpy
                     ? {
                           type: "update",
-                          object: instance,
+                          object: this.proxy || instance,
                           oldValue: (observable as any).value,
                           name: key,
                           newValue
                       }
                     : null
 
-            if (notifySpy) spyReportStart({ ...change, name: this.name, key })
+            if (notifySpy && process.env.NODE_ENV !== "production")
+                spyReportStart({ ...change, name: this.name, key })
             ;(observable as ObservableValue<any>).setNewValue(newValue)
             if (notify) notifyListeners(this, change)
-            if (notifySpy) spyReportEnd()
+            if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
         }
     }
 
+    has(key: string) {
+        if (this.values.get(key) instanceof ObservableValue) return true
+        else {
+            this.waitForKey(key)
+            return false
+        }
+    }
+
+    private waitForKey(key: string) {
+        const map = this.pendingKeys || (this.pendingKeys = new Map())
+        let entry = map.get(key)
+        if (!entry) {
+            entry = new ObservableValue(
+                false,
+                referenceEnhancer,
+                `${this.name}.${key.toString()}?`,
+                false
+            )
+            map.set(key, entry)
+        }
+        entry.get() // read to subscribe
+    }
+
+    addObservableProp(propName: string, newValue, enhancer: IEnhancer<any> = this.defaultEnhancer) {
+        const { target } = this
+        assertPropertyConfigurable(target, propName)
+
+        if (hasInterceptors(this)) {
+            const change = interceptChange<IObjectWillChange>(this, {
+                object: this.proxy || target,
+                name: propName,
+                type: "add",
+                newValue
+            })
+            if (!change) return
+            newValue = (change as any).newValue
+        }
+        const observable = new ObservableValue(
+            newValue,
+            enhancer,
+            `${this.name}.${propName}`,
+            false
+        )
+        this.values.set(propName, observable)
+        newValue = (observable as any).value // observableValue might have changed it
+
+        Object.defineProperty(target, propName, generateObservablePropConfig(propName))
+        this.notifyPropertyAddition(propName, newValue)
+    }
+
+    addComputedProp(
+        propertyOwner: any, // where is the property declared?
+        propName: string,
+        options: IComputedValueOptions<any>
+    ) {
+        const { target } = this
+        options.name = options.name || `${this.name}.${propName}`
+        this.values.set(propName, new ComputedValue(options))
+        if (propertyOwner === target || isPropertyConfigurable(propertyOwner, propName))
+            Object.defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
+    }
+
     remove(key: string) {
-        if (!this.values[key]) return
+        if (!this.values.has(key)) return
         const { target } = this
         if (hasInterceptors(this)) {
             const change = interceptChange<IObjectWillChange>(this, {
-                object: target,
+                object: this.proxy || target,
                 name: key,
                 type: "remove"
             })
@@ -142,22 +214,25 @@ export class ObservableObjectAdministration
             startBatch()
             const notify = hasListeners(this)
             const notifySpy = isSpyEnabled()
-            const oldValue = this.values[key].get()
-            if (this.keys) this.keys.remove(key)
-            delete this.values[key]
+            const oldObservable = this.values.get(key)
+            const oldValue = oldObservable && oldObservable.get()
+            oldObservable && oldObservable.set(undefined)
+            this.keysAtom.reportChanged()
+            this.values.delete(key)
             delete this.target[key]
             const change =
                 notify || notifySpy
                     ? {
                           type: "remove",
-                          object: target,
+                          object: this.proxy || target,
                           oldValue: oldValue,
                           name: key
                       }
                     : null
-            if (notifySpy) spyReportStart({ ...change, name: this.name, key })
+            if (notifySpy && process.env.NODE_ENV !== "production")
+                spyReportStart({ ...change, name: this.name, key })
             if (notify) notifyListeners(this, change)
-            if (notifySpy) spyReportEnd()
+            if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
         } finally {
             endBatch()
         }
@@ -183,7 +258,7 @@ export class ObservableObjectAdministration
          *
          * When using decorate, the property will always be redeclared as own property on the actual instance
          */
-        return fail(
+        console.warn(
             `Property '${propName}' of '${owner}' was accessed through the prototype chain. Use 'decorate' instead to declare the prop or access it statically through it's owner`
         )
     }
@@ -206,16 +281,36 @@ export class ObservableObjectAdministration
         return registerInterceptor(this, handler)
     }
 
-    getKeys(): string[] {
-        if (this.keys === undefined) {
-            this.keys = <any>new ObservableArray(
-                Object.keys(this.values).filter(key => this.values[key] instanceof ObservableValue),
-                referenceEnhancer,
-                `keys(${this.name})`,
-                true
-            )
+    notifyPropertyAddition(key: string, newValue) {
+        const notify = hasListeners(this)
+        const notifySpy = isSpyEnabled()
+        const change =
+            notify || notifySpy
+                ? {
+                      type: "add",
+                      object: this.proxy || this.target,
+                      name: key,
+                      newValue
+                  }
+                : null
+
+        if (notifySpy && process.env.NODE_ENV !== "production")
+            spyReportStart({ ...change, name: this.name, key })
+        if (notify) notifyListeners(this, change)
+        if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
+        if (this.pendingKeys) {
+            const entry = this.pendingKeys.get(key)
+            if (entry) entry.set(true)
         }
-        return this.keys!.slice()
+        this.keysAtom.reportChanged()
+    }
+
+    getKeys(): string[] {
+        this.keysAtom.reportObserved()
+        // return Reflect.ownKeys(this.values) as any
+        const res: string[] = []
+        for (const [key, value] of this.values) if (value instanceof ObservableValue) res.push(key)
+        return res
     }
 }
 
@@ -224,12 +319,11 @@ export interface IIsObservableObject {
 }
 
 export function asObservableObject(
-    target,
+    target: any,
     name: string = "",
     defaultEnhancer: IEnhancer<any> = deepEnhancer
 ): ObservableObjectAdministration {
-    let adm = (target as any).$mobx
-    if (adm) return adm
+    if (Object.prototype.hasOwnProperty.call(target, $mobx)) return target[$mobx]
 
     process.env.NODE_ENV !== "production" &&
         invariant(
@@ -240,55 +334,9 @@ export function asObservableObject(
         name = (target.constructor.name || "ObservableObject") + "@" + getNextId()
     if (!name) name = "ObservableObject@" + getNextId()
 
-    adm = new ObservableObjectAdministration(target, name, defaultEnhancer)
-    addHiddenFinalProp(target, "$mobx", adm)
+    const adm = new ObservableObjectAdministration(target, new Map(), name, defaultEnhancer)
+    addHiddenProp(target, $mobx, adm)
     return adm
-}
-
-export function defineObservableProperty(
-    target: any,
-    propName: string,
-    newValue,
-    enhancer: IEnhancer<any>
-) {
-    const adm = asObservableObject(target)
-    assertPropertyConfigurable(target, propName)
-
-    if (hasInterceptors(adm)) {
-        const change = interceptChange<IObjectWillChange>(adm, {
-            object: target,
-            name: propName,
-            type: "add",
-            newValue
-        })
-        if (!change) return
-        newValue = (change as any).newValue
-    }
-    const observable = (adm.values[propName] = new ObservableValue(
-        newValue,
-        enhancer,
-        `${adm.name}.${propName}`,
-        false
-    ))
-    newValue = (observable as any).value // observableValue might have changed it
-
-    Object.defineProperty(target, propName, generateObservablePropConfig(propName))
-    if (adm.keys) adm.keys.push(propName)
-    notifyPropertyAddition(adm, target, propName, newValue)
-}
-
-export function defineComputedProperty(
-    valueOwner: any, // which objects holds the observable and provides `this` context?
-    propertyOwner: any, // where is the property declared?
-    propName: string,
-    options: IComputedValueOptions<any>
-) {
-    const adm = asObservableObject(valueOwner)
-    options.name = options.name || `${adm.name}.${propName}`
-    options.context = valueOwner
-    adm.values[propName] = new ComputedValue(options)
-    if (propertyOwner === valueOwner || isPropertyConfigurable(propertyOwner, propName))
-        Object.defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
 }
 
 const observablePropertyConfigs = {}
@@ -301,22 +349,22 @@ export function generateObservablePropConfig(propName) {
             configurable: true,
             enumerable: true,
             get() {
-                return this.$mobx.read(this, propName)
+                return this[$mobx].read(propName)
             },
             set(v) {
-                this.$mobx.write(this, propName, v)
+                this[$mobx].write(propName, v)
             }
         })
     )
 }
 
 function getAdministrationForComputedPropOwner(owner: any): ObservableObjectAdministration {
-    const adm = owner.$mobx
+    const adm = owner[$mobx]
     if (!adm) {
         // because computed props are declared on proty,
         // the current instance might not have been initialized yet
         initializeInstance(owner)
-        return owner.$mobx
+        return owner[$mobx]
     }
     return adm
 }
@@ -328,36 +376,13 @@ export function generateComputedPropConfig(propName) {
             configurable: true,
             enumerable: false,
             get() {
-                return getAdministrationForComputedPropOwner(this).read(this, propName)
+                return getAdministrationForComputedPropOwner(this).read(propName)
             },
             set(v) {
-                getAdministrationForComputedPropOwner(this).write(this, propName, v)
+                getAdministrationForComputedPropOwner(this).write(propName, v)
             }
         })
     )
-}
-
-function notifyPropertyAddition(
-    adm: ObservableObjectAdministration,
-    object,
-    key: string,
-    newValue
-) {
-    const notify = hasListeners(adm)
-    const notifySpy = isSpyEnabled()
-    const change =
-        notify || notifySpy
-            ? {
-                  type: "add",
-                  object,
-                  name: key,
-                  newValue
-              }
-            : null
-
-    if (notifySpy) spyReportStart({ ...change, name: adm.name, key })
-    if (notify) notifyListeners(adm, change)
-    if (notifySpy) spyReportEnd()
 }
 
 const isObservableObjectAdministration = createInstanceofPredicate(
@@ -369,7 +394,7 @@ export function isObservableObject(thing: any): thing is IObservableObject {
     if (isObject(thing)) {
         // Initializers run lazily when transpiling to babel, so make sure they are run...
         initializeInstance(thing)
-        return isObservableObjectAdministration((thing as any).$mobx)
+        return isObservableObjectAdministration((thing as any)[$mobx])
     }
     return false
 }

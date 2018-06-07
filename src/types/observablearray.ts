@@ -1,45 +1,35 @@
 import {
-    isObject,
-    createInstanceofPredicate,
-    getNextId,
-    makeNonEnumerable,
-    Lambda,
+    $mobx,
+    Atom,
     EMPTY_ARRAY,
-    addHiddenFinalProp,
-    addHiddenProp,
-    invariant,
-    deprecated
-} from "../utils/utils"
-import { Atom, IAtom } from "../core/atom"
-import { checkIfStateModificationsAreAllowed } from "../core/derivation"
-import {
+    IAtom,
+    IEnhancer,
     IInterceptable,
     IInterceptor,
+    IListenable,
+    Lambda,
+    addHiddenFinalProp,
+    checkIfStateModificationsAreAllowed,
+    createInstanceofPredicate,
+    fail,
+    getNextId,
     hasInterceptors,
+    hasListeners,
+    interceptChange,
+    isObject,
+    isSpyEnabled,
+    notifyListeners,
     registerInterceptor,
-    interceptChange
-} from "./intercept-utils"
-import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
-import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
-import { declareIterator, makeIterable } from "../utils/iterable"
-import { IEnhancer } from "./modifiers"
+    registerListener,
+    spyReportEnd,
+    spyReportStart,
+    allowStateChangesStart,
+    allowStateChangesEnd
+} from "../internal"
 
 const MAX_SPLICE_SIZE = 10000 // See e.g. https://github.com/mobxjs/mobx/issues/859
 
-// Detects bug in safari 9.1.1 (or iOS 9 safari mobile). See #364
-const safariPrototypeSetterInheritanceBug = (() => {
-    let v = false
-    const p = {}
-    Object.defineProperty(p, "0", {
-        set: () => {
-            v = true
-        }
-    })
-    Object.create(p)["0"] = 1
-    return v === false
-})()
-
-export interface IObservableArray<T> extends Array<T> {
+export interface IObservableArray<T = any> extends Array<T> {
     spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[]
     observe(
         listener: (changeData: IArrayChange<T> | IArraySplice<T>) => void,
@@ -47,24 +37,12 @@ export interface IObservableArray<T> extends Array<T> {
     ): Lambda
     intercept(handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>): Lambda
     clear(): T[]
-    peek(): T[]
     replace(newItems: T[]): T[]
-    find(
-        predicate: (item: T, index: number, array: IObservableArray<T>) => boolean,
-        thisArg?: any,
-        fromIndex?: number
-    ): T | undefined
-    findIndex(
-        predicate: (item: T, index: number, array: IObservableArray<T>) => boolean,
-        thisArg?: any,
-        fromIndex?: number
-    ): number
     remove(value: T): boolean
-    move(fromIndex: number, toIndex: number): void
 }
 
 // In 3.0, change to IArrayDidChange
-export interface IArrayChange<T> {
+export interface IArrayChange<T = any> {
     type: "update"
     object: IObservableArray<T>
     index: number
@@ -73,7 +51,7 @@ export interface IArrayChange<T> {
 }
 
 // In 3.0, change to IArrayDidSplice
-export interface IArraySplice<T> {
+export interface IArraySplice<T = any> {
     type: "splice"
     object: IObservableArray<T>
     index: number
@@ -83,14 +61,14 @@ export interface IArraySplice<T> {
     removedCount: number
 }
 
-export interface IArrayWillChange<T> {
+export interface IArrayWillChange<T = any> {
     type: "update"
     object: IObservableArray<T>
     index: number
     newValue: T
 }
 
-export interface IArrayWillSplice<T> {
+export interface IArrayWillSplice<T = any> {
     type: "splice"
     object: IObservableArray<T>
     index: number
@@ -98,103 +76,111 @@ export interface IArrayWillSplice<T> {
     removedCount: number
 }
 
-/**
- * This array buffer contains two lists of properties, so that all arrays
- * can recycle their property definitions, which significantly improves performance of creating
- * properties on the fly.
- */
-let OBSERVABLE_ARRAY_BUFFER_SIZE = 0
-
-// Typescript workaround to make sure ObservableArray extends Array
-export class StubArray {}
-function inherit(ctor, proto) {
-    if (typeof Object["setPrototypeOf"] !== "undefined") {
-        Object["setPrototypeOf"](ctor.prototype, proto)
-    } else if (typeof ctor.prototype.__proto__ !== "undefined") {
-        ctor.prototype.__proto__ = proto
-    } else {
-        ctor["prototype"] = proto
+const arrayTraps = {
+    get(target, name) {
+        if (name === $mobx) return target[$mobx]
+        if (name === "length") return target[$mobx].getArrayLength()
+        if (typeof name === "number") {
+            return arrayExtensions.get.call(target, name)
+        }
+        if (typeof name === "string" && !isNaN(name as any)) {
+            return arrayExtensions.get.call(target, parseInt(name))
+        }
+        if (arrayExtensions.hasOwnProperty(name)) {
+            return arrayExtensions[name]
+        }
+        return target[name]
+    },
+    set(target, name, value): boolean {
+        if (name === "length") {
+            target[$mobx].setArrayLength(value)
+            return true
+        }
+        if (typeof name === "number") {
+            arrayExtensions.set.call(target, name, value)
+            return true
+        }
+        if (!isNaN(name)) {
+            arrayExtensions.set.call(target, parseInt(name), value)
+            return true
+        }
+        return false
+    },
+    defineProperty(target, key, descriptor) {
+        fail(
+            `Defining properties on observable arrays is not supported, directly assign them instead`
+        )
+        return false
+    },
+    preventExtensions(target) {
+        fail(`Observable arrays cannot be frozen`)
+        return false
     }
 }
-inherit(StubArray, Array.prototype)
 
-// Weex freeze Array.prototype
-// Make them writeable and configurable in prototype chain
-// https://github.com/alibaba/weex/pull/1529
-if (Object.isFrozen(Array)) {
-    ;[
-        "constructor",
-        "push",
-        "shift",
-        "concat",
-        "pop",
-        "unshift",
-        "replace",
-        "find",
-        "findIndex",
-        "splice",
-        "reverse",
-        "sort"
-    ].forEach(function(key) {
-        Object.defineProperty(StubArray.prototype, key, {
-            configurable: true,
-            writable: true,
-            value: Array.prototype[key]
-        })
-    })
+export function createObservableArray<T>(
+    initialValues: any[] | undefined,
+    enhancer: IEnhancer<T>,
+    name = "ObservableArray@" + getNextId(),
+    owned = false
+): IObservableArray<T> {
+    const adm = new ObservableArrayAdministration(name, enhancer, owned)
+    addHiddenFinalProp(adm.values, $mobx, adm)
+    const proxy = new Proxy(adm.values, arrayTraps) as any
+    adm.proxy = proxy
+    if (initialValues && initialValues.length) {
+        const prev = allowStateChangesStart(true)
+        adm.spliceWithArray(0, 0, initialValues)
+        allowStateChangesEnd(prev)
+    }
+    return proxy
 }
 
-class ObservableArrayAdministration<T>
-    implements IInterceptable<IArrayWillChange<T> | IArrayWillSplice<T>>, IListenable {
+class ObservableArrayAdministration
+    implements IInterceptable<IArrayWillChange<any> | IArrayWillSplice<any>>, IListenable {
     atom: IAtom
-    values: T[] = []
-    lastKnownLength: number = 0
+    values: any[] = []
     interceptors
     changeListeners
-    enhancer: (newV: T, oldV: T | undefined) => T
+    enhancer: (newV: any, oldV: any | undefined) => any
     dehancer: any
+    proxy: any[] = undefined as any
+    lastKnownLength = 0
 
-    constructor(
-        name,
-        enhancer: IEnhancer<T>,
-        public array: IObservableArray<T>,
-        public owned: boolean
-    ) {
+    constructor(name, enhancer: IEnhancer<any>, public owned: boolean) {
         this.atom = new Atom(name || "ObservableArray@" + getNextId())
         this.enhancer = (newV, oldV) => enhancer(newV, oldV, name + "[..]")
     }
 
-    dehanceValue(value: T): T {
+    dehanceValue(value: any): any {
         if (this.dehancer !== undefined) return this.dehancer(value)
         return value
     }
 
-    dehanceValues(values: T[]): T[] {
+    dehanceValues(values: any[]): any[] {
         if (this.dehancer !== undefined && this.values.length > 0)
             return values.map(this.dehancer) as any
         return values
     }
 
-    intercept(handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>): Lambda {
-        return registerInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>(this, handler)
+    intercept(handler: IInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>): Lambda {
+        return registerInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>(this, handler)
     }
 
     observe(
-        listener: (changeData: IArrayChange<T> | IArraySplice<T>) => void,
+        listener: (changeData: IArrayChange<any> | IArraySplice<any>) => void,
         fireImmediately = false
     ): Lambda {
         if (fireImmediately) {
-            listener(
-                <IArraySplice<T>>{
-                    object: this.array,
-                    type: "splice",
-                    index: 0,
-                    added: this.values.slice(),
-                    addedCount: this.values.length,
-                    removed: [],
-                    removedCount: 0
-                }
-            )
+            listener(<IArraySplice<any>>{
+                object: this.proxy as any,
+                type: "splice",
+                index: 0,
+                added: this.values.slice(),
+                addedCount: this.values.length,
+                removed: [],
+                removedCount: 0
+            })
         }
         return registerListener(this, listener)
     }
@@ -216,18 +202,15 @@ class ObservableArrayAdministration<T>
         } else this.spliceWithArray(newLength, currentLength - newLength)
     }
 
-    // adds / removes the necessary numeric properties to this object
     updateArrayLength(oldLength: number, delta: number) {
         if (oldLength !== this.lastKnownLength)
             throw new Error(
-                "[mobx] Modification exception: the internal structure of an observable array was changed. Did you use peek() to change it?"
+                "[mobx] Modification exception: the internal structure of an observable array was changed."
             )
         this.lastKnownLength += delta
-        if (delta > 0 && oldLength + delta + 1 > OBSERVABLE_ARRAY_BUFFER_SIZE)
-            reserveArrayBuffer(oldLength + delta + 1)
     }
 
-    spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[] {
+    spliceWithArray(index: number, deleteCount?: number, newItems?: any[]): any[] {
         checkIfStateModificationsAreAllowed(this.atom)
         const length = this.values.length
 
@@ -242,8 +225,8 @@ class ObservableArrayAdministration<T>
         if (newItems === undefined) newItems = EMPTY_ARRAY
 
         if (hasInterceptors(this)) {
-            const change = interceptChange<IArrayWillSplice<T>>(this as any, {
-                object: this.array,
+            const change = interceptChange<IArrayWillSplice<any>>(this as any, {
+                object: this.proxy as any,
                 type: "splice",
                 index,
                 removedCount: deleteCount,
@@ -254,17 +237,18 @@ class ObservableArrayAdministration<T>
             newItems = change.added
         }
 
-        newItems =
-            newItems.length === 0 ? newItems : <T[]>newItems.map(v => this.enhancer(v, undefined))
-        const lengthDelta = newItems.length - deleteCount
-        this.updateArrayLength(length, lengthDelta) // create or remove new entries
+        newItems = newItems.length === 0 ? newItems : newItems.map(v => this.enhancer(v, undefined))
+        if (process.env.NODE_ENV !== "production") {
+            const lengthDelta = newItems.length - deleteCount
+            this.updateArrayLength(length, lengthDelta) // checks if internal array wasn't modified
+        }
         const res = this.spliceItemsIntoValues(index, deleteCount, newItems)
 
         if (deleteCount !== 0 || newItems.length !== 0) this.notifyArraySplice(index, newItems, res)
         return this.dehanceValues(res)
     }
 
-    spliceItemsIntoValues(index, deleteCount, newItems: T[]): T[] {
+    spliceItemsIntoValues(index, deleteCount, newItems: any[]): any[] {
         if (newItems.length < MAX_SPLICE_SIZE) {
             return this.values.splice(index, deleteCount, ...newItems)
         } else {
@@ -276,13 +260,13 @@ class ObservableArrayAdministration<T>
         }
     }
 
-    notifyArrayChildUpdate<T>(index: number, newValue: T, oldValue: T) {
+    notifyArrayChildUpdate(index: number, newValue: any, oldValue: any) {
         const notifySpy = !this.owned && isSpyEnabled()
         const notify = hasListeners(this)
         const change =
             notify || notifySpy
                 ? {
-                      object: this.array,
+                      object: this.proxy,
                       type: "update",
                       index,
                       newValue,
@@ -290,19 +274,22 @@ class ObservableArrayAdministration<T>
                   }
                 : null
 
-        if (notifySpy) spyReportStart({ ...change, name: this.atom.name })
+        // The reason why this is on right hand side here (and not above), is this way the uglifier will drop it, but it won't
+        // cause any runtime overhead in development mode without NODE_ENV set, unless spying is enabled
+        if (notifySpy && process.env.NODE_ENV !== "production")
+            spyReportStart({ ...change, name: this.atom.name })
         this.atom.reportChanged()
         if (notify) notifyListeners(this, change)
-        if (notifySpy) spyReportEnd()
+        if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
     }
 
-    notifyArraySplice<T>(index: number, added: T[], removed: T[]) {
+    notifyArraySplice(index: number, added: any[], removed: any[]) {
         const notifySpy = !this.owned && isSpyEnabled()
         const notify = hasListeners(this)
         const change =
             notify || notifySpy
                 ? {
-                      object: this.array,
+                      object: this.proxy,
                       type: "splice",
                       index,
                       removed,
@@ -312,113 +299,49 @@ class ObservableArrayAdministration<T>
                   }
                 : null
 
-        if (notifySpy) spyReportStart({ ...change, name: this.atom.name })
+        if (notifySpy && process.env.NODE_ENV !== "production")
+            spyReportStart({ ...change, name: this.atom.name })
         this.atom.reportChanged()
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
         if (notify) notifyListeners(this, change)
-        if (notifySpy) spyReportEnd()
+        if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
     }
 }
 
-export class ObservableArray<T> extends StubArray {
-    private $mobx: ObservableArrayAdministration<T>
-
-    constructor(
-        initialValues: T[] | undefined,
-        enhancer: IEnhancer<T>,
-        name = "ObservableArray@" + getNextId(),
-        owned = false
-    ) {
-        super()
-
-        const adm = new ObservableArrayAdministration<T>(name, enhancer, this as any, owned)
-        addHiddenFinalProp(this, "$mobx", adm)
-
-        if (initialValues && initialValues.length) {
-            this.spliceWithArray(0, 0, initialValues)
-        }
-
-        if (safariPrototypeSetterInheritanceBug) {
-            // Seems that Safari won't use numeric prototype setter untill any * numeric property is
-            // defined on the instance. After that it works fine, even if this property is deleted.
-            Object.defineProperty(adm.array, "0", ENTRY_0)
-        }
-    }
-
-    intercept(handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>): Lambda {
-        return this.$mobx.intercept(handler)
-    }
+const arrayExtensions = {
+    intercept(handler: IInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>): Lambda {
+        return this[$mobx].intercept(handler)
+    },
 
     observe(
-        listener: (changeData: IArrayChange<T> | IArraySplice<T>) => void,
+        listener: (changeData: IArrayChange<any> | IArraySplice<any>) => void,
         fireImmediately = false
     ): Lambda {
-        return this.$mobx.observe(listener, fireImmediately)
-    }
+        const adm: ObservableArrayAdministration = this[$mobx]
+        return adm.observe(listener, fireImmediately)
+    },
 
-    clear(): T[] {
+    clear(): any[] {
         return this.splice(0)
-    }
+    },
 
-    concat(...arrays: T[][]): T[] {
-        this.$mobx.atom.reportObserved()
-        return Array.prototype.concat.apply(
-            (this as any).peek(),
-            arrays.map(a => (isObservableArray(a) ? a.peek() : a))
-        )
-    }
-
-    replace(newItems: T[]) {
-        return this.$mobx.spliceWithArray(0, this.$mobx.values.length, newItems)
-    }
+    replace(newItems: any[]) {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        return adm.spliceWithArray(0, adm.values.length, newItems)
+    },
 
     /**
      * Converts this array back to a (shallow) javascript structure.
      * For a deep clone use mobx.toJS
      */
-    toJS(): T[] {
+    toJS(): any[] {
         return (this as any).slice()
-    }
+    },
 
-    toJSON(): T[] {
+    toJSON(): any[] {
         // Used by JSON.stringify
         return this.toJS()
-    }
-
-    peek(): T[] {
-        this.$mobx.atom.reportObserved()
-        return this.$mobx.dehanceValues(this.$mobx.values)
-    }
-
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
-    find(
-        predicate: (item: T, index: number, array: ObservableArray<T>) => boolean,
-        thisArg?,
-        fromIndex = 0
-    ): T | undefined {
-        if (arguments.length === 3)
-            deprecated(
-                "The array.find fromIndex argument to find will not be supported anymore in the next major"
-            )
-        const idx = this.findIndex.apply(this, arguments)
-        return idx === -1 ? undefined : this.get(idx)
-    }
-
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex
-    findIndex(
-        predicate: (item: T, index: number, array: ObservableArray<T>) => boolean,
-        thisArg?,
-        fromIndex = 0
-    ): number {
-        if (arguments.length === 3)
-            deprecated(
-                "The array.findIndex fromIndex argument to find will not be supported anymore in the next major"
-            )
-        const items = this.peek(),
-            l = items.length
-        for (let i = fromIndex; i < l; i++) if (predicate.call(thisArg, items[i], i, this)) return i
-        return -1
-    }
+    },
 
     /*
      * functions that do alter the internal structure of the array, (based on lib.es6.d.ts)
@@ -426,132 +349,104 @@ export class ObservableArray<T> extends StubArray {
      * Because the have side effects, they should not be used in computed function,
      * and for that reason the do not call dependencyState.notifyObserved
      */
-    splice(index: number, deleteCount?: number, ...newItems: T[]): T[] {
+    splice(index: number, deleteCount?: number, ...newItems: any[]): any[] {
+        const adm: ObservableArrayAdministration = this[$mobx]
         switch (arguments.length) {
             case 0:
                 return []
             case 1:
-                return this.$mobx.spliceWithArray(index)
+                return adm.spliceWithArray(index)
             case 2:
-                return this.$mobx.spliceWithArray(index, deleteCount)
+                return adm.spliceWithArray(index, deleteCount)
         }
-        return this.$mobx.spliceWithArray(index, deleteCount, newItems)
-    }
+        return adm.spliceWithArray(index, deleteCount, newItems)
+    },
 
-    spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[] {
-        return this.$mobx.spliceWithArray(index, deleteCount, newItems)
-    }
+    spliceWithArray(index: number, deleteCount?: number, newItems?: any[]): any[] {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        return adm.spliceWithArray(index, deleteCount, newItems)
+    },
 
-    push(...items: T[]): number {
-        const adm = this.$mobx
+    push(...items: any[]): number {
+        const adm: ObservableArrayAdministration = this[$mobx]
         adm.spliceWithArray(adm.values.length, 0, items)
         return adm.values.length
-    }
+    },
 
-    pop(): T | undefined {
-        return this.splice(Math.max(this.$mobx.values.length - 1, 0), 1)[0]
-    }
+    pop() {
+        return this.splice(Math.max(this[$mobx].values.length - 1, 0), 1)[0]
+    },
 
-    shift(): T | undefined {
+    shift() {
         return this.splice(0, 1)[0]
-    }
+    },
 
-    unshift(...items: T[]): number {
-        const adm = this.$mobx
+    unshift(...items: any[]): number {
+        const adm = this[$mobx]
         adm.spliceWithArray(0, 0, items)
         return adm.values.length
-    }
+    },
 
-    reverse(): T[] {
+    reverse(): any[] {
         // reverse by default mutates in place before returning the result
         // which makes it both a 'derivation' and a 'mutation'.
         // so we deviate from the default and just make it an dervitation
+        if (process.env.NODE_ENV !== "production") {
+            console.warn(
+                "[mobx] `observableArray.reverse()` will not update the array in place. Use `observableArray.slice().reverse()` to supress this warning and perform the operation on a copy, or `observableArray.replace(observableArray.slice().reverse())` to reverse & update in place"
+            )
+        }
         const clone = (<any>this).slice()
         return clone.reverse.apply(clone, arguments)
-    }
+    },
 
-    sort(compareFn?: (a: T, b: T) => number): T[] {
+    sort(compareFn?: (a: any, b: any) => number): any[] {
         // sort by default mutates in place before returning the result
         // which goes against all good practices. Let's not change the array in place!
+        if (process.env.NODE_ENV !== "production") {
+            console.warn(
+                "[mobx] `observableArray.sort()` will not update the array in place. Use `observableArray.slice().sort()` to supress this warning and perform the operation on a copy, or `observableArray.replace(observableArray.slice().sort())` to sort & update in place"
+            )
+        }
         const clone = (<any>this).slice()
         return clone.sort.apply(clone, arguments)
-    }
+    },
 
-    remove(value: T): boolean {
-        const idx = this.$mobx.dehanceValues(this.$mobx.values).indexOf(value)
+    remove(value: any): boolean {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        const idx = adm.dehanceValues(adm.values).indexOf(value)
         if (idx > -1) {
             this.splice(idx, 1)
             return true
         }
         return false
-    }
+    },
 
-    move(fromIndex: number, toIndex: number): void {
-        deprecated("observableArray.move is deprecated, use .slice() & .replace() instead")
-        function checkIndex(index: number) {
-            if (index < 0) {
-                throw new Error(`[mobx.array] Index out of bounds: ${index} is negative`)
-            }
-            const length = this.$mobx.values.length
-            if (index >= length) {
-                throw new Error(
-                    `[mobx.array] Index out of bounds: ${index} is not smaller than ${length}`
-                )
-            }
-        }
-        checkIndex.call(this, fromIndex)
-        checkIndex.call(this, toIndex)
-        if (fromIndex === toIndex) {
-            return
-        }
-        const oldItems = this.$mobx.values
-        let newItems: T[]
-        if (fromIndex < toIndex) {
-            newItems = [
-                ...oldItems.slice(0, fromIndex),
-                ...oldItems.slice(fromIndex + 1, toIndex + 1),
-                oldItems[fromIndex],
-                ...oldItems.slice(toIndex + 1)
-            ]
-        } else {
-            // toIndex < fromIndex
-            newItems = [
-                ...oldItems.slice(0, toIndex),
-                oldItems[fromIndex],
-                ...oldItems.slice(toIndex, fromIndex),
-                ...oldItems.slice(fromIndex + 1)
-            ]
-        }
-        this.replace(newItems)
-    }
-
-    // See #734, in case property accessors are unreliable...
-    get(index: number): T | undefined {
-        const impl = <ObservableArrayAdministration<any>>this.$mobx
-        if (impl) {
-            if (index < impl.values.length) {
-                impl.atom.reportObserved()
-                return impl.dehanceValue(impl.values[index])
+    get(index: number): any | undefined {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        if (adm) {
+            if (index < adm.values.length) {
+                adm.atom.reportObserved()
+                return adm.dehanceValue(adm.values[index])
             }
             console.warn(
-                `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${impl
-                    .values
-                    .length}). Please check length first. Out of bound indices will not be tracked by MobX`
+                `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${
+                    adm.values.length
+                }). Please check length first. Out of bound indices will not be tracked by MobX`
             )
         }
         return undefined
-    }
+    },
 
-    // See #734, in case property accessors are unreliable...
-    set(index: number, newValue: T) {
-        const adm = <ObservableArrayAdministration<T>>this.$mobx
+    set(index: number, newValue: any) {
+        const adm: ObservableArrayAdministration = this[$mobx]
         const values = adm.values
         if (index < values.length) {
             // update at index in range
             checkIfStateModificationsAreAllowed(adm.atom)
             const oldValue = values[index]
             if (hasInterceptors(adm)) {
-                const change = interceptChange<IArrayWillChange<T>>(adm as any, {
+                const change = interceptChange<IArrayWillChange<any>>(adm as any, {
                     type: "update",
                     object: this as any,
                     index,
@@ -578,32 +473,10 @@ export class ObservableArray<T> extends StubArray {
     }
 }
 
-declareIterator(ObservableArray.prototype, function() {
-    ;(this.$mobx as ObservableArrayAdministration<any>).atom.reportObserved()
-    const self = this
-    let nextIndex = 0
-    return makeIterable({
-        next() {
-            return nextIndex < self.length
-                ? { value: self[nextIndex++], done: false }
-                : { done: true, value: undefined }
-        }
-    })
-})
-
-Object.defineProperty(ObservableArray.prototype, "length", {
-    enumerable: false,
-    configurable: true,
-    get: function(): number {
-        return this.$mobx.getArrayLength()
-    },
-    set: function(newLength: number) {
-        this.$mobx.setArrayLength(newLength)
-    }
-})
-
 /**
  * Wrap function from prototype
+ * Without this, everything works as well, but this works
+ * faster as everything works on unproxied values
  */
 ;[
     "every",
@@ -621,73 +494,13 @@ Object.defineProperty(ObservableArray.prototype, "length", {
     "toLocaleString"
 ].forEach(funcName => {
     const baseFunc = Array.prototype[funcName]
-    invariant(
-        typeof baseFunc === "function",
-        `Base function not defined on Array prototype: '${funcName}'`
-    )
-    addHiddenProp(ObservableArray.prototype, funcName, function() {
-        return baseFunc.apply(this.peek(), arguments)
-    })
-})
-
-/**
- * We don't want those to show up in `for (const key in ar)` ...
- */
-makeNonEnumerable(ObservableArray.prototype, [
-    "constructor",
-    "intercept",
-    "observe",
-    "clear",
-    "concat",
-    "get",
-    "replace",
-    "toJS",
-    "toJSON",
-    "peek",
-    "find",
-    "findIndex",
-    "splice",
-    "spliceWithArray",
-    "push",
-    "pop",
-    "set",
-    "shift",
-    "unshift",
-    "reverse",
-    "sort",
-    "remove",
-    "move",
-    "toString",
-    "toLocaleString"
-])
-
-// See #364
-const ENTRY_0 = createArrayEntryDescriptor(0)
-
-function createArrayEntryDescriptor(index: number) {
-    return {
-        enumerable: false,
-        configurable: false,
-        get: function() {
-            return this.get(index)
-        },
-        set: function(value) {
-            this.set(index, value)
-        }
+    arrayExtensions[funcName] = function() {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        adm.atom.reportObserved()
+        const res = adm.dehanceValues(adm.values)
+        return baseFunc.apply(res, arguments)
     }
-}
-
-function createArrayBufferItem(index: number) {
-    Object.defineProperty(ObservableArray.prototype, "" + index, createArrayEntryDescriptor(index))
-}
-
-export function reserveArrayBuffer(max: number) {
-    for (let index = OBSERVABLE_ARRAY_BUFFER_SIZE; index < max; index++)
-        createArrayBufferItem(index)
-    OBSERVABLE_ARRAY_BUFFER_SIZE = max
-}
-
-reserveArrayBuffer(1000)
+})
 
 const isObservableArrayAdministration = createInstanceofPredicate(
     "ObservableArrayAdministration",
@@ -695,5 +508,5 @@ const isObservableArrayAdministration = createInstanceofPredicate(
 )
 
 export function isObservableArray(thing): thing is IObservableArray<any> {
-    return isObject(thing) && isObservableArrayAdministration(thing.$mobx)
+    return isObject(thing) && isObservableArrayAdministration(thing[$mobx])
 }

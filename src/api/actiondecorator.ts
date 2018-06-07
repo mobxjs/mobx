@@ -1,7 +1,11 @@
-import { fail, addHiddenFinalProp } from "../utils/utils"
-import { createAction } from "../core/action"
-import { BabelDescriptor } from "../utils/decorators2"
-import { action, defineBoundAction } from "./action"
+import {
+    BabelDescriptor,
+    action,
+    addHiddenProp,
+    createAction,
+    defineBoundAction,
+    fail
+} from "../internal"
 
 function dontReassignFields() {
     fail(process.env.NODE_ENV !== "production" && "@action fields are not reassignable")
@@ -20,7 +24,7 @@ export function namedActionDecorator(name: string) {
                 return {
                     value: createAction(name, descriptor.value),
                     enumerable: false,
-                    configurable: false,
+                    configurable: true, // See #1477
                     writable: true // for typescript, this must be writable, otherwise it cannot inherit :/ (see inheritable actions test)
                 }
             }
@@ -28,8 +32,8 @@ export function namedActionDecorator(name: string) {
             const { initializer } = descriptor
             return {
                 enumerable: false,
-                configurable: false,
-                writable: false,
+                configurable: true, // See #1477
+                writable: true, // See #1398
                 initializer() {
                     // N.B: we can't immediately invoke initializer; this would be wrong
                     return createAction(name, initializer!.call(this))
@@ -51,7 +55,7 @@ export function actionFieldDecorator(name: string) {
                 return undefined
             },
             set(value) {
-                addHiddenFinalProp(this, prop, action(name, value))
+                addHiddenProp(this, prop, action(name, value))
             }
         })
     }

@@ -8,22 +8,14 @@ Array [
       "newValue": Object {
         "title": "get tea",
       },
-      "object": Object {
-        "a": Object {
-          "title": "get coffee",
-        },
-      },
+      "object": "skip",
       "type": "add",
     },
   },
   Object {
     "intercept": Object {
       "name": "a",
-      "object": Object {
-        "a": Object {
-          "title": "get coffee",
-        },
-      },
+      "object": "skip",
       "type": "remove",
     },
   },
@@ -38,22 +30,14 @@ Array [
       "newValue": Object {
         "title": "get tea",
       },
-      "object": Object {
-        "b": Object {
-          "title": "get tea",
-        },
-      },
+      "object": "skip",
       "type": "add",
     },
   },
   Object {
     "observe": Object {
       "name": "a",
-      "object": Object {
-        "b": Object {
-          "title": "get tea",
-        },
-      },
+      "object": "skip",
       "oldValue": Object {
         "title": "get coffee",
       },

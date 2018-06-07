@@ -1,12 +1,15 @@
-import { IDepTreeNode } from "../core/observable"
-import { fail } from "../utils/utils"
-import { initializeInstance } from "../utils/decorators2"
-import { isAtom } from "../core/atom"
-import { isComputedValue } from "../core/computedvalue"
-import { isReaction } from "../core/reaction"
-import { isObservableArray } from "./observablearray"
-import { isObservableMap } from "./observablemap"
-import { isObservableObject } from "./observableobject"
+import {
+    $mobx,
+    IDepTreeNode,
+    fail,
+    initializeInstance,
+    isAtom,
+    isComputedValue,
+    isObservableArray,
+    isObservableMap,
+    isObservableObject,
+    isReaction
+} from "../internal"
 
 export function getAtom(thing: any, property?: string): IDepTreeNode {
     if (typeof thing === "object" && thing !== null) {
@@ -16,11 +19,11 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
                     process.env.NODE_ENV !== "production" &&
                         "It is not possible to get index atoms from arrays"
                 )
-            return (thing as any).$mobx.atom
+            return (thing as any)[$mobx].atom
         }
         if (isObservableMap(thing)) {
             const anyThing = thing as any
-            if (property === undefined) return getAtom(anyThing._keys)
+            if (property === undefined) return anyThing._keysAtom
             const observable = anyThing._data.get(property) || anyThing._hasMap.get(property)
             if (!observable)
                 fail(
@@ -33,11 +36,11 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
         }
         // Initializers run lazily when transpiling to babel, so make sure they are run...
         initializeInstance(thing)
-        if (property && !thing.$mobx) thing[property] // See #1072
+        if (property && !thing[$mobx]) thing[property] // See #1072
         if (isObservableObject(thing)) {
             if (!property)
                 return fail(process.env.NODE_ENV !== "production" && `please specify a property`)
-            const observable = (thing as any).$mobx.values[property]
+            const observable = (thing as any)[$mobx].values.get(property)
             if (!observable)
                 fail(
                     process.env.NODE_ENV !== "production" &&
@@ -51,9 +54,9 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
             return thing
         }
     } else if (typeof thing === "function") {
-        if (isReaction(thing.$mobx)) {
+        if (isReaction(thing[$mobx])) {
             // disposer function
-            return thing.$mobx
+            return thing[$mobx]
         }
     }
     return fail(process.env.NODE_ENV !== "production" && "Cannot obtain atom from " + thing)
@@ -66,7 +69,7 @@ export function getAdministration(thing: any, property?: string) {
     if (isObservableMap(thing)) return thing
     // Initializers run lazily when transpiling to babel, so make sure they are run...
     initializeInstance(thing)
-    if (thing.$mobx) return thing.$mobx
+    if (thing[$mobx]) return thing[$mobx]
     fail(process.env.NODE_ENV !== "production" && "Cannot obtain administration from " + thing)
 }
 

@@ -1,9 +1,12 @@
-import { comparer } from "../utils/comparer"
-import { IComputedValueOptions } from "../core/computedvalue"
-import { defineComputedProperty } from "../types/observableobject"
-import { invariant } from "../utils/utils"
-import { ComputedValue, IComputedValue } from "../core/computedvalue"
-import { createPropDecorator } from "../utils/decorators2"
+import {
+    ComputedValue,
+    IComputedValue,
+    IComputedValueOptions,
+    asObservableObject,
+    comparer,
+    createPropDecorator,
+    invariant
+} from "../internal"
 
 export interface IComputed {
     <T>(options: IComputedValueOptions<T>): any // decorator
@@ -24,9 +27,14 @@ export const computedDecorator = createPropDecorator(
     ) => {
         const { get, set } = descriptor // initialValue is the descriptor for get / set props
         // Optimization: faster on decorator target or instance? Assuming target
-        // Optimiziation: find out if declaring on instance isn't just faster. (also makes the property descriptor simpler). But, more memory usage..
+        // Optimization: find out if declaring on instance isn't just faster. (also makes the property descriptor simpler). But, more memory usage..
         const options = decoratorArgs[0] || {}
-        defineComputedProperty(instance, decoratorTarget, propertyName, { ...options, get, set })
+        asObservableObject(instance).addComputedProp(decoratorTarget, propertyName, {
+            get,
+            set,
+            context: instance,
+            ...options
+        })
     }
 )
 

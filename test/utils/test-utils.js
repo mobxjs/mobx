@@ -1,6 +1,6 @@
-"use strict"
+import { $mobx } from "../../src/mobx.ts"
 
-exports.consoleError = function(block, regex) {
+export function consoleError(block, regex) {
     let messages = ""
     const orig = console.error
     console.error = function() {
@@ -18,7 +18,7 @@ exports.consoleError = function(block, regex) {
     expect(messages).toMatch(regex)
 }
 
-exports.consoleWarn = function(block, regex) {
+export function consoleWarn(block, regex) {
     let messages = ""
     const orig = console.warn
     console.warn = function() {
@@ -36,7 +36,7 @@ exports.consoleWarn = function(block, regex) {
     expect(messages).toMatch(regex)
 }
 
-exports.supressConsole = function(block) {
+export function supressConsole(block) {
     const { warn, error } = console
     Object.assign(console, {
         warn() {},
@@ -47,4 +47,10 @@ exports.supressConsole = function(block) {
     } finally {
         Object.assign(console, { warn, error })
     }
+}
+
+export function stripAdminFromDescriptors(snapshot) {
+    const mobxProperty = snapshot[$mobx]
+    expect(mobxProperty).toBeTruthy()
+    return { ...snapshot, [$mobx]: { ...mobxProperty, value: "(omitted)" } }
 }

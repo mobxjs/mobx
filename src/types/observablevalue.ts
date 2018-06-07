@@ -1,22 +1,25 @@
-import { Atom, declareAtom } from "../core/atom"
-import { checkIfStateModificationsAreAllowed } from "../core/derivation"
 import {
-    Lambda,
-    getNextId,
-    createInstanceofPredicate,
-    primitiveSymbol,
-    toPrimitive
-} from "../utils/utils"
-import {
-    hasInterceptors,
+    Atom,
+    IEnhancer,
     IInterceptable,
     IInterceptor,
+    IListenable,
+    Lambda,
+    checkIfStateModificationsAreAllowed,
+    createInstanceofPredicate,
+    getNextId,
+    hasInterceptors,
+    hasListeners,
+    interceptChange,
+    isSpyEnabled,
+    notifyListeners,
     registerInterceptor,
-    interceptChange
-} from "./intercept-utils"
-import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
-import { isSpyEnabled, spyReportStart, spyReportEnd, spyReport } from "../core/spy"
-import { IEnhancer } from "./modifiers"
+    registerListener,
+    spyReport,
+    spyReportEnd,
+    spyReportStart,
+    toPrimitive
+} from "../internal"
 
 export interface IValueWillChange<T> {
     object: any
@@ -39,8 +42,6 @@ export interface IObservableValue<T> {
     observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
 }
 
-declareAtom()
-
 export class ObservableValue<T> extends Atom
     implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable {
     hasUnreportedChange = false
@@ -57,7 +58,7 @@ export class ObservableValue<T> extends Atom
     ) {
         super(name)
         this.value = enhancer(value, undefined, name)
-        if (notifySpy && isSpyEnabled()) {
+        if (notifySpy && isSpyEnabled() && process.env.NODE_ENV !== "production") {
             // only notify spy if this is a stand-alone observable
             spyReport({ type: "create", name: this.name, newValue: "" + this.value })
         }
@@ -73,7 +74,7 @@ export class ObservableValue<T> extends Atom
         newValue = this.prepareNewValue(newValue) as any
         if (newValue !== UNCHANGED) {
             const notifySpy = isSpyEnabled()
-            if (notifySpy) {
+            if (notifySpy && process.env.NODE_ENV !== "production") {
                 spyReportStart({
                     type: "update",
                     name: this.name,
@@ -82,7 +83,7 @@ export class ObservableValue<T> extends Atom
                 })
             }
             this.setNewValue(newValue)
-            if (notifySpy) spyReportEnd()
+            if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
         }
     }
 
@@ -150,9 +151,11 @@ export class ObservableValue<T> extends Atom
     valueOf(): T {
         return toPrimitive(this.get())
     }
-}
 
-ObservableValue.prototype[primitiveSymbol()] = ObservableValue.prototype.valueOf
+    [Symbol.toPrimitive]() {
+        return this.valueOf()
+    }
+}
 
 export var isObservableValue = createInstanceofPredicate("ObservableValue", ObservableValue) as (
     x: any

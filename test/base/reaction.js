@@ -51,7 +51,7 @@ test("effect is untracked", () => {
         newValue => {
             values.push(newValue * b.get())
         },
-        true
+        { fireImmediately: true }
     )
 
     a.set(2)
@@ -62,6 +62,13 @@ test("effect is untracked", () => {
 
     expect(values).toEqual([2, 4, 21])
 })
+
+let TIME_AMPLIFIER = 1
+if (process.env.CI === "true") {
+    console.log("Amplifying time")
+    jest.setTimeout(50 * 1000)
+    TIME_AMPLIFIER = 10
+}
 
 test("effect debounce is honored", () => {
     expect.assertions(2)
@@ -80,16 +87,23 @@ test("effect debounce is honored", () => {
                 values.push(newValue)
             },
             {
-                delay: 200
+                delay: 150 * TIME_AMPLIFIER,
+                fireImmediately: false
             }
         )
 
-        setTimeout(() => a.set(2), 30)
-        setTimeout(() => a.set(3), 300) // should not be visible, combined with the next
-        setTimeout(() => a.set(4), 320)
-        setTimeout(() => a.set(5), 600)
-        setTimeout(() => d(), 1000)
-        setTimeout(() => a.set(6), 1400)
+        setTimeout(() => a.set(2), 40 * TIME_AMPLIFIER)
+        setTimeout(() => {
+            a.set(3) // should not be visible, combined with the next
+            setImmediate(() => {
+                a.set(4)
+            })
+        }, 300 * TIME_AMPLIFIER)
+        setTimeout(() => a.set(5), 600 * TIME_AMPLIFIER)
+        setTimeout(() => {
+            d()
+            a.set(6)
+        }, 1000 * TIME_AMPLIFIER)
 
         setTimeout(() => {
             try {
@@ -99,7 +113,7 @@ test("effect debounce is honored", () => {
             } catch (e) {
                 reject(e)
             }
-        }, 1800)
+        }, 1200 * TIME_AMPLIFIER)
     })
 })
 
@@ -120,12 +134,12 @@ test("effect debounce + fire immediately is honored", () => {
             },
             {
                 fireImmediately: true,
-                delay: 100
+                delay: 100 * TIME_AMPLIFIER
             }
         )
 
-        setTimeout(() => a.set(3), 150)
-        setTimeout(() => a.set(4), 300)
+        setTimeout(() => a.set(3), 150 * TIME_AMPLIFIER)
+        setTimeout(() => a.set(4), 300 * TIME_AMPLIFIER)
 
         setTimeout(() => {
             try {
@@ -136,7 +150,7 @@ test("effect debounce + fire immediately is honored", () => {
             } catch (e) {
                 reject(e)
             }
-        }, 500)
+        }, 500 * TIME_AMPLIFIER)
     })
 })
 
@@ -152,7 +166,7 @@ test("passes Reaction as an argument to expression function", () => {
         newValue => {
             values.push(newValue)
         },
-        true
+        { fireImmediately: true }
     )
 
     a.set(2)
@@ -174,7 +188,7 @@ test("passes Reaction as an argument to effect function", () => {
             if (a.get() === "pleaseDispose") r.dispose()
             values.push(newValue)
         },
-        true
+        { fireImmediately: true }
     )
 
     a.set(2)
@@ -196,7 +210,7 @@ test("can dispose reaction on first run", () => {
             r.dispose()
             valuesExpr1st.push(newValue)
         },
-        true
+        { fireImmediately: true }
     )
 
     var valuesEffect1st = []
@@ -208,7 +222,7 @@ test("can dispose reaction on first run", () => {
         newValue => {
             valuesEffect1st.push(newValue)
         },
-        true
+        { fireImmediately: true }
     )
 
     var valuesExpr = []

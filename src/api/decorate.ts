@@ -1,12 +1,12 @@
-import { invariant, isPlainObject } from "../utils/utils"
+import { invariant, isPlainObject } from "../internal"
 
 export function decorate<T>(
     clazz: new (...args: any[]) => T,
-    decorators: { [P in keyof T]: MethodDecorator | PropertyDecorator }
+    decorators: { [P in keyof T]?: MethodDecorator | PropertyDecorator }
 ): void
 export function decorate<T>(
     object: T,
-    decorators: { [P in keyof T]: MethodDecorator | PropertyDecorator }
+    decorators: { [P in keyof T]?: MethodDecorator | PropertyDecorator }
 ): T
 export function decorate(thing: any, decorators: any) {
     process.env.NODE_ENV !== "production" &&

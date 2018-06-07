@@ -1,5 +1,5 @@
 var test = require("tape")
-var mobx = require("../../lib/mobx.min.js")
+var mobx = require("../../lib/mobx.js")
 var observable = mobx.observable
 var computed = mobx.computed
 var log = require("./index.js").logMeasurement
@@ -389,7 +389,7 @@ test("create array (fast)", function(t) {
     var a = []
     for (var i = 0; i < 1000; i++) a.push(i)
     var start = now()
-    for (var i = 0; i < 1000; i++) mobx.observable.shallowArray(a)
+    for (var i = 0; i < 1000; i++) mobx.observable.array(a, { deep: false })
     log("\nCreate array (non-recursive)  Created in " + (now() - start) + "ms.")
     t.end()
 })
@@ -444,7 +444,7 @@ test("sort", t => {
     }
 
     var sorted = mobx.computed(() => {
-        items.sort(sortFn)
+        items.slice().sort(sortFn)
     })
 
     var start = now()

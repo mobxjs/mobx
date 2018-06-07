@@ -1,3 +1,12 @@
+import {
+    IKeyValueMap,
+    IObservableArray,
+    ObservableMap,
+    globalState,
+    isObservableArray,
+    isObservableMap
+} from "../internal"
+
 export const OBFUSCATED_ERROR =
     "An invariant failed, however the error is obfuscated because this is an production build."
 
@@ -6,12 +15,6 @@ Object.freeze(EMPTY_ARRAY)
 
 export const EMPTY_OBJECT = {}
 Object.freeze(EMPTY_OBJECT)
-
-declare var window: any
-
-export function getGlobal() {
-    return typeof window !== "undefined" ? window : global
-}
 
 export interface Lambda {
     (): void
@@ -27,10 +30,10 @@ export function fail(message: string | boolean): never {
     throw "X" // unreachable
 }
 
-export function invariant(check: false, message: string | boolean): never
-export function invariant(check: true, message: string | boolean): void
-export function invariant(check: any, message: string | boolean): void
-export function invariant(check: boolean, message: string | boolean) {
+export function invariant(check: false, message?: string | boolean): never
+export function invariant(check: true, message?: string | boolean): void
+export function invariant(check: any, message?: string | boolean): void
+export function invariant(check: boolean, message?: string | boolean) {
     if (!check) throw new Error("[mobx] " + (message || OBFUSCATED_ERROR))
 }
 
@@ -85,18 +88,13 @@ export function isPlainObject(value) {
     return proto === Object.prototype || proto === null
 }
 
-const prototypeHasOwnProperty = Object.prototype.hasOwnProperty
-export function hasOwnProperty(object: Object, propName: string) {
-    return prototypeHasOwnProperty.call(object, propName)
-}
-
-export function makeNonEnumerable(object: any, propNames: string[]) {
+export function makeNonEnumerable(object: any, propNames: PropertyKey[]) {
     for (let i = 0; i < propNames.length; i++) {
         addHiddenProp(object, propNames[i], object[propNames[i]])
     }
 }
 
-export function addHiddenProp(object: any, propName: string, value: any) {
+export function addHiddenProp(object: any, propName: PropertyKey, value: any) {
     Object.defineProperty(object, propName, {
         enumerable: false,
         writable: true,
@@ -105,7 +103,7 @@ export function addHiddenProp(object: any, propName: string, value: any) {
     })
 }
 
-export function addHiddenFinalProp(object: any, propName: string, value: any) {
+export function addHiddenFinalProp(object: any, propName: PropertyKey, value: any) {
     Object.defineProperty(object, propName, {
         enumerable: false,
         writable: false,
@@ -114,15 +112,15 @@ export function addHiddenFinalProp(object: any, propName: string, value: any) {
     })
 }
 
-export function isPropertyConfigurable(object: any, prop: string): boolean {
+export function isPropertyConfigurable(object: any, prop: PropertyKey): boolean {
     const descriptor = Object.getOwnPropertyDescriptor(object, prop)
     return !descriptor || (descriptor.configurable !== false && descriptor.writable !== false)
 }
 
-export function assertPropertyConfigurable(object: any, prop: string) {
+export function assertPropertyConfigurable(object: any, prop: PropertyKey) {
     if (process.env.NODE_ENV !== "production" && !isPropertyConfigurable(object, prop))
         fail(
-            `Cannot make property '${prop}' observable, it is not configurable and writable in the target object`
+            `Cannot make property '${prop.toString()}' observable, it is not configurable and writable in the target object`
         )
 }
 
@@ -137,10 +135,6 @@ export function createInstanceofPredicate<T>(
     } as any
 }
 
-export function areBothNaN(a: any, b: any): boolean {
-    return typeof a === "number" && typeof b === "number" && isNaN(a) && isNaN(b)
-}
-
 /**
  * Returns whether the argument is an array, disregarding observability.
  */
@@ -149,8 +143,7 @@ export function isArrayLike(x: any): x is Array<any> | IObservableArray<any> {
 }
 
 export function isES6Map(thing): boolean {
-    if (getGlobal().Map !== undefined && thing instanceof getGlobal().Map) return true
-    return false
+    return thing instanceof Map
 }
 
 export function getMapLikeKeys<K, V>(map: ObservableMap<K, V>): ReadonlyArray<K>
@@ -158,29 +151,10 @@ export function getMapLikeKeys<V>(map: IKeyValueMap<V> | any): ReadonlyArray<str
 export function getMapLikeKeys(map: any): any {
     if (isPlainObject(map)) return Object.keys(map)
     if (Array.isArray(map)) return map.map(([key]) => key)
-    if (isES6Map(map) || isObservableMap(map)) return iteratorToArray(map.keys())
+    if (isES6Map(map) || isObservableMap(map)) return Array.from(map.keys())
     return fail(`Cannot get keys from '${map}'`)
-}
-
-// use Array.from in Mobx 5
-export function iteratorToArray<T>(it: Iterator<T>): ReadonlyArray<T> {
-    const res: T[] = []
-    while (true) {
-        const r: any = it.next()
-        if (r.done) break
-        res.push(r.value)
-    }
-    return res
-}
-
-export function primitiveSymbol() {
-    return (typeof Symbol === "function" && Symbol.toPrimitive) || "@@toPrimitive"
 }
 
 export function toPrimitive(value) {
     return value === null ? null : typeof value === "object" ? "" + value : value
 }
-
-import { globalState } from "../core/globalstate"
-import { IObservableArray, isObservableArray } from "../types/observablearray"
-import { isObservableMap, ObservableMap, IKeyValueMap } from "../types/observablemap"

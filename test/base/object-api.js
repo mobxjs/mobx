@@ -1,5 +1,18 @@
 const mobx = require("../../src/mobx")
-const { keys, when, set, remove, values, reaction, observable, extendObservable, has, get } = mobx
+const {
+    keys,
+    when,
+    set,
+    remove,
+    values,
+    entries,
+    reaction,
+    observable,
+    extendObservable,
+    has,
+    get,
+    $mobx
+} = mobx
 
 test("keys should be observable when extending", () => {
     const todos = observable({})
@@ -66,6 +79,25 @@ test("object - set, remove, values are reactive", () => {
     expect(snapshots).toEqual([[3], [3, 4], [5, 4], [5]])
 })
 
+test("object - set, remove, entries are reactive", () => {
+    const todos = observable({})
+    const snapshots = []
+
+    reaction(() => entries(todos), entries => snapshots.push(entries))
+
+    expect(has(todos, "x")).toBe(false)
+    expect(get(todos, "x")).toBe(undefined)
+    set(todos, "x", 3)
+    expect(has(todos, "x")).toBe(true)
+    expect(get(todos, "x")).toBe(3)
+    remove(todos, "y")
+    set(todos, "z", 4)
+    set(todos, "x", 5)
+    remove(todos, "z")
+
+    expect(snapshots).toEqual([[["x", 3]], [["x", 3], ["z", 4]], [["x", 5], ["z", 4]], [["x", 5]]])
+})
+
 test("object - set, remove, keys are reactive", () => {
     const todos = observable({ a: 3 })
     const snapshots = []
@@ -99,6 +131,25 @@ test("map - set, remove, values are reactive", () => {
     remove(todos, "z")
 
     expect(snapshots).toEqual([[3], [3, 4], [5, 4], [5]])
+})
+
+test("map - set, remove, entries are reactive", () => {
+    const todos = observable.map({})
+    const snapshots = []
+
+    reaction(() => entries(todos), entries => snapshots.push(entries))
+
+    expect(has(todos, "x")).toBe(false)
+    expect(get(todos, "x")).toBe(undefined)
+    set(todos, "x", 3)
+    expect(has(todos, "x")).toBe(true)
+    expect(get(todos, "x")).toBe(3)
+    remove(todos, "y")
+    set(todos, "z", 4)
+    set(todos, "x", 5)
+    remove(todos, "z")
+
+    expect(snapshots).toEqual([[["x", 3]], [["x", 3], ["z", 4]], [["x", 5], ["z", 4]], [["x", 5]]])
 })
 
 test("map - set, remove, keys are reactive", () => {
@@ -145,6 +196,34 @@ test("array - set, remove, values are reactive", () => {
     ])
 })
 
+test("array - set, remove, entries are reactive", () => {
+    const todos = observable.array()
+    const snapshots = []
+
+    reaction(() => entries(todos), entries => snapshots.push(entries))
+
+    expect(has(todos, 0)).toBe(false)
+    expect(get(todos, 0)).toBe(undefined)
+    set(todos, 0, 2)
+    expect(has(todos, 0)).toBe(true)
+    expect(get(todos, 0)).toBe(2)
+
+    set(todos, "1", 4)
+    set(todos, 3, 4)
+    set(todos, 1, 3)
+    remove(todos, 2)
+    remove(todos, "0")
+
+    expect(snapshots).toEqual([
+        [[0, 2]],
+        [[0, 2], [1, 4]],
+        [[0, 2], [1, 4], [2, undefined], [3, 4]],
+        [[0, 2], [1, 3], [2, undefined], [3, 4]],
+        [[0, 2], [1, 3], [2, 4]],
+        [[0, 3], [1, 4]]
+    ])
+})
+
 test("observe & intercept", () => {
     let events = []
     const todos = observable(
@@ -154,9 +233,11 @@ test("observe & intercept", () => {
         {},
         { deep: false }
     )
-    mobx.observe(todos, c => events.push({ observe: c }))
+    mobx.observe(todos, c => {
+        events.push({ observe: { ...c, object: "skip" } })
+    })
     const d = mobx.intercept(todos, c => {
-        events.push({ intercept: c })
+        events.push({ intercept: { ...c, object: "skip" } })
         return null // no addition!
     })
 
@@ -177,8 +258,27 @@ test("observe & intercept", () => {
     })
 })
 
+test("observe & intercept set called multiple times", () => {
+    const a = mobx.observable({})
+    const interceptLogs = []
+    const observeLogs = []
+
+    mobx.intercept(a, change => {
+        interceptLogs.push(`${change.name}: ${change.newValue}`)
+        return change
+    })
+    mobx.observe(a, change => observeLogs.push(`${change.name}: ${change.newValue}`))
+
+    mobx.set(a, "x", 0)
+    a.x = 1
+    mobx.set(a, "x", 2)
+
+    expect(interceptLogs).toEqual(["x: 0", "x: 1", "x: 2"])
+    expect(observeLogs).toEqual(["x: 0", "x: 1", "x: 2"])
+})
+
 test("dynamically adding properties should preserve the original modifiers of an object", () => {
-    const todos = observable(
+    const todos = observable.object(
         {
             a: { title: "get coffee" }
         },
@@ -216,4 +316,5 @@ test("computed props are not considered part of collections", () => {
     expect(get(x, "y")).toBe(undefined) // disputable?
     expect(keys(x)).toEqual([])
     expect(values(x)).toEqual([])
+    expect(entries(x)).toEqual([])
 })

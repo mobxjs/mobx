@@ -1,9 +1,13 @@
-import { IDerivation, IDerivationState, TraceMode } from "./derivation"
-import { globalState } from "./globalstate"
-import { runReactions } from "./reaction"
-import { ComputedValue } from "./computedvalue"
-import { getDependencyTree } from "../api/extras"
-import { IDependencyTree } from "../mobx"
+import {
+    ComputedValue,
+    IDependencyTree,
+    IDerivation,
+    IDerivationState,
+    TraceMode,
+    getDependencyTree,
+    globalState,
+    runReactions
+} from "../internal"
 
 export interface IDepTreeNode {
     name: string
@@ -23,18 +27,17 @@ export interface IObservable extends IDepTreeNode {
     lowestObserverState: IDerivationState // Used to avoid redundant propagations
     isPendingUnobservation: boolean // Used to push itself to global.pendingUnobservations at most once per batch.
 
-    observers: IDerivation[] // maintain _observers in raw array for for way faster iterating in propagation.
-    observersIndexes: {} // map derivation.__mapid to _observers.indexOf(derivation) (see removeObserver)
+    observers: Set<IDerivation>
 
     onBecomeUnobserved(): void
     onBecomeObserved(): void
 }
 
 export function hasObservers(observable: IObservable): boolean {
-    return observable.observers && observable.observers.length > 0
+    return observable.observers && observable.observers.size > 0
 }
 
-export function getObservers(observable: IObservable): IDerivation[] {
+export function getObservers(observable: IObservable): Set<IDerivation> {
     return observable.observers
 }
 
@@ -60,13 +63,7 @@ export function addObserver(observable: IObservable, node: IDerivation) {
     // invariant(observable._observers.indexOf(node) === -1, "INTERNAL ERROR add already added node");
     // invariantObservers(observable);
 
-    const l = observable.observers.length
-    if (l) {
-        // because object assignment is relatively expensive, let's not store data about index 0.
-        observable.observersIndexes[node.__mapid] = l
-    }
-    observable.observers[l] = node
-
+    observable.observers.add(node)
     if (observable.lowestObserverState > node.dependenciesState)
         observable.lowestObserverState = node.dependenciesState
 
@@ -78,29 +75,10 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
     // invariant(globalState.inBatch > 0, "INTERNAL ERROR, remove should be called only inside batch");
     // invariant(observable._observers.indexOf(node) !== -1, "INTERNAL ERROR remove already removed node");
     // invariantObservers(observable);
-
-    if (observable.observers.length === 1) {
+    observable.observers.delete(node)
+    if (observable.observers.size === 0) {
         // deleting last observer
-        observable.observers.length = 0
-
         queueForUnobservation(observable)
-    } else {
-        // deleting from _observersIndexes is straight forward, to delete from _observers, let's swap `node` with last element
-        const list = observable.observers
-        const map = observable.observersIndexes
-        const filler = list.pop()! // get last element, which should fill the place of `node`, so the array doesn't have holes
-        if (filler !== node) {
-            // otherwise node was the last element, which already got removed from array
-            const index = map[node.__mapid] || 0 // getting index of `node`. this is the only place we actually use map.
-            if (index) {
-                // map store all indexes but 0, see comment in `addObserver`
-                map[filler.__mapid] = index
-            } else {
-                delete map[filler.__mapid]
-            }
-            list[index] = filler
-        }
-        delete map[node.__mapid]
     }
     // invariantObservers(observable);
     // invariant(observable._observers.indexOf(node) === -1, "INTERNAL ERROR remove already removed node2");
@@ -131,7 +109,7 @@ export function endBatch() {
         for (let i = 0; i < list.length; i++) {
             const observable = list[i]
             observable.isPendingUnobservation = false
-            if (observable.observers.length === 0) {
+            if (observable.observers.size === 0) {
                 if (observable.isBeingObserved) {
                     // if this observable had reactive observers, trigger the hooks
                     observable.isBeingObserved = false
@@ -158,6 +136,7 @@ export function reportObserved(observable: IObservable): boolean {
          */
         if (derivation.runId !== observable.lastAccessedBy) {
             observable.lastAccessedBy = derivation.runId
+            // Tried storing newObserving, or observing, or both as Set, but performance didn't come close...
             derivation.newObserving![derivation.unboundDepsCount++] = observable
             if (!observable.isBeingObserved) {
                 observable.isBeingObserved = true
@@ -165,7 +144,7 @@ export function reportObserved(observable: IObservable): boolean {
             }
         }
         return true
-    } else if (observable.observers.length === 0 && globalState.inBatch > 0) {
+    } else if (observable.observers.size === 0 && globalState.inBatch > 0) {
         queueForUnobservation(observable)
     }
     return false
@@ -199,10 +178,7 @@ export function propagateChanged(observable: IObservable) {
     if (observable.lowestObserverState === IDerivationState.STALE) return
     observable.lowestObserverState = IDerivationState.STALE
 
-    const observers = observable.observers
-    let i = observers.length
-    while (i--) {
-        const d = observers[i]
+    for (const d of observable.observers) {
         if (d.dependenciesState === IDerivationState.UP_TO_DATE) {
             if (d.isTracing !== TraceMode.NONE) {
                 logTraceInfo(d, observable)
@@ -220,10 +196,7 @@ export function propagateChangeConfirmed(observable: IObservable) {
     if (observable.lowestObserverState === IDerivationState.STALE) return
     observable.lowestObserverState = IDerivationState.STALE
 
-    const observers = observable.observers
-    let i = observers.length
-    while (i--) {
-        const d = observers[i]
+    for (const d of observable.observers) {
         if (d.dependenciesState === IDerivationState.POSSIBLY_STALE)
             d.dependenciesState = IDerivationState.STALE
         else if (
@@ -240,10 +213,7 @@ export function propagateMaybeChanged(observable: IObservable) {
     if (observable.lowestObserverState !== IDerivationState.UP_TO_DATE) return
     observable.lowestObserverState = IDerivationState.POSSIBLY_STALE
 
-    const observers = observable.observers
-    let i = observers.length
-    while (i--) {
-        const d = observers[i]
+    for (const d of observable.observers) {
         if (d.dependenciesState === IDerivationState.UP_TO_DATE) {
             d.dependenciesState = IDerivationState.POSSIBLY_STALE
             if (d.isTracing !== TraceMode.NONE) {

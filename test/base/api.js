@@ -2,8 +2,13 @@ import * as fs from "fs"
 var mobx = require("../../src/mobx.ts")
 
 test("correct api should be exposed", function() {
-    expect(Object.keys(mobx).filter(key => mobx[key] !== undefined).sort()).toEqual(
+    expect(
+        Object.keys(mobx)
+            .filter(key => mobx[key] !== undefined)
+            .sort()
+    ).toEqual(
         [
+            "$mobx", // adminstration symbol
             "action",
             "_allowStateChanges",
             "autorun",
@@ -13,7 +18,6 @@ test("correct api should be exposed", function() {
             "createAtom",
             "decorate",
             "extendObservable",
-            "extendShallowObservable", // deprecated but still public
             "flow",
             "get",
             "_getAdministration",
@@ -38,6 +42,7 @@ test("correct api should be exposed", function() {
             "isObservableObject",
             "isObservableProp",
             "keys",
+            "ObservableMap",
             "observable",
             "observe",
             "onReactionError",
@@ -55,6 +60,7 @@ test("correct api should be exposed", function() {
             "transaction",
             "untracked",
             "values",
+            "entries",
             "when"
         ].sort()
     )

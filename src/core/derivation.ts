@@ -1,8 +1,13 @@
-import { IObservable, IDepTreeNode, addObserver, removeObserver } from "./observable"
-import { IAtom } from "./atom"
-import { globalState } from "./globalstate"
-import { fail } from "../utils/utils"
-import { isComputedValue } from "./computedvalue"
+import {
+    IAtom,
+    IDepTreeNode,
+    IObservable,
+    addObserver,
+    fail,
+    globalState,
+    isComputedValue,
+    removeObserver
+} from "../internal"
 
 export enum IDerivationState {
     // before being run or (outside batch and not being observed)
@@ -100,7 +105,8 @@ export function shouldCompute(derivation: IDerivation): boolean {
                     }
                     // if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
                     // and `derivation` is an observer of `obj`
-                    if ((derivation as any).dependenciesState === IDerivationState.STALE) {
+                    // invariantShouldCompute(derivation)
+                    if ((derivation.dependenciesState as any) === IDerivationState.STALE) {
                         untrackedEnd(prevUntracked)
                         return true
                     }
@@ -113,20 +119,33 @@ export function shouldCompute(derivation: IDerivation): boolean {
     }
 }
 
+// function invariantShouldCompute(derivation: IDerivation) {
+//     const newDepState = (derivation as any).dependenciesState
+
+//     if (
+//         process.env.NODE_ENV === "production" &&
+//         (newDepState === IDerivationState.POSSIBLY_STALE ||
+//             newDepState === IDerivationState.NOT_TRACKING)
+//     )
+//         fail("Illegal dependency state")
+// }
+
 export function isComputingDerivation() {
     return globalState.trackingDerivation !== null // filter out actions inside computations
 }
 
 export function checkIfStateModificationsAreAllowed(atom: IAtom) {
-    const hasObservers = atom.observers.length > 0
+    const hasObservers = atom.observers.size > 0
     // Should never be possible to change an observed observable from inside computed, see #798
     if (globalState.computationDepth > 0 && hasObservers)
         fail(
             process.env.NODE_ENV !== "production" &&
-                `Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ${atom.name}`
+                `Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ${
+                    atom.name
+                }`
         )
     // Should not be possible to change observed state outside strict mode, except during initialization, see #563
-    if (!globalState.allowStateChanges && hasObservers)
+    if (!globalState.allowStateChanges && (hasObservers || globalState.enforceActions === "strict"))
         fail(
             process.env.NODE_ENV !== "production" &&
                 (globalState.enforceActions
@@ -242,9 +261,11 @@ export function clearObserving(derivation: IDerivation) {
 
 export function untracked<T>(action: () => T): T {
     const prev = untrackedStart()
-    const res = action()
-    untrackedEnd(prev)
-    return res
+    try {
+        return action()
+    } finally {
+        untrackedEnd(prev)
+    }
 }
 
 export function untrackedStart(): IDerivation | null {

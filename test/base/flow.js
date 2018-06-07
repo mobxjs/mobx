@@ -170,17 +170,14 @@ test("flows can be cancelled - 1 - uncatched cancellation", done => {
     const promise = start()
     promise.then(
         () => {
-            debugger
             fail()
         },
         err => {
-            debugger
             expect(steps).toBe(1)
             expect("" + err).toBe("Error: FLOW_CANCELLED")
             done()
         }
     )
-    debugger
     promise.cancel()
 })
 
@@ -326,4 +323,25 @@ test("flows yield anything", async () => {
 
     const res = await start()
     expect(res).toBe(2)
+})
+
+test("cancelled flow should not result in runaway reject", async () => {
+    const start = flow(function*() {
+        try {
+            const x = yield 2
+            return x
+        } finally {
+            yield Promise.reject("Oh noes")
+            return 4
+        }
+    })
+
+    const p = start()
+    p.cancel()
+    try {
+        await p
+        fail()
+    } catch (e) {
+        expect("" + e).toBe("Error: FLOW_CANCELLED")
+    }
 })

@@ -1,7 +1,5 @@
 Welcome to MobX. Please provide as much relevant information as possible!
 
-If at all possible, provide a **minimal** sample reproduction. **Create a minimal reproduction based on this [jsfiddle](https://jsfiddle.net/mweststrate/f0dptdau/2/)**
-
 I have a:
 
 1. [ ] Question: Feel free to just state your question. For a quick answer, there are usually people online at our [Gitter](https://gitter.im/mobxjs/mobx) channel

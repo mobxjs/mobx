@@ -67,7 +67,7 @@ test("isBoxedObservable", function() {
     expect(m.isBoxedObservable(m.observable.box(3))).toBe(true)
     expect(m.isBoxedObservable(m.observable.box(3))).toBe(true)
     expect(m.isBoxedObservable(m.observable.box({}))).toBe(true)
-    expect(m.isBoxedObservable(m.observable.shallowBox({}))).toBe(true)
+    expect(m.isBoxedObservable(m.observable.box({}, { deep: false }))).toBe(true)
 })
 
 test("observable1", function() {
@@ -117,13 +117,17 @@ test("observable1", function() {
     expect(b2.toArray()).toEqual([3, 4])
 
     // non recursive structure
-    var x3 = o.shallowObject({
-        a: {
-            b: {
-                c: 3
+    var x3 = o.object(
+        {
+            a: {
+                b: {
+                    c: 3
+                }
             }
-        }
-    })
+        },
+        {},
+        { deep: false }
+    )
     var b3 = buffer()
     m.autorun(function() {
         b3(x3.a.b.c)
@@ -176,7 +180,7 @@ test("observable4", function() {
     expect(b.toArray()).toEqual([[1, 2], [3, 2], [2], [2, 5]])
 
     // non recursive
-    var x2 = o.shallowArray([{ x: 1 }, { x: 2 }])
+    var x2 = o.array([{ x: 1 }, { x: 2 }], { deep: false })
 
     var b2 = buffer()
     m.observe(
@@ -270,9 +274,13 @@ test("flat array", function() {
 })
 
 test("flat object", function() {
-    var y = m.observable.shallowObject({
-        x: { z: 3 }
-    })
+    var y = m.observable.object(
+        {
+            x: { z: 3 }
+        },
+        {},
+        { deep: false }
+    )
 
     var result
     var updates = 0
@@ -435,6 +443,11 @@ test("as structure view", function() {
     expect(cc).toBe(2)
 })
 
+// This test doesn't make much sense anymore with proxies;
+// creating non configurable props on dynamic observable object
+// will break the invariants of proxies (when trying to determine keys)
+// which is not unfixiable in itself,
+// but definitely a pattern we don't want to encourage
 test("ES5 non reactive props", function() {
     var te = m.observable({})
     Object.defineProperty(te, "nonConfigurable", {
@@ -518,7 +531,7 @@ test("mobx 3", () => {
 
     expect(x === mobx.observable(x)).toBeTruthy()
 
-    const y = mobx.observable.shallowBox(null)
+    const y = mobx.observable.box(null, { deep: false })
     const obj = { a: 2 }
     y.set(obj)
     expect(y.get() === obj).toBeTruthy()
@@ -531,7 +544,7 @@ test("computed value", () => {
 
     expect(c.toJSON()).toBe(3)
     expect(mobx.isComputed(c)).toBe(true)
-    expect(c.toString()).toBe("ComputedValue@2[function () {return 3;}]")
+    expect(c.toString()).toMatchSnapshot()
 })
 
 test("boxed value json", () => {
@@ -562,7 +575,7 @@ test("computed value scope", () => {
 })
 
 test("shallow array", () => {
-    var a = mobx.observable.shallowArray()
+    var a = mobx.observable.array([], { deep: false })
     a.push({ x: 1 }, [], 2, mobx.observable({ y: 3 }))
 
     expect(mobx.isObservable(a)).toBe(true)
@@ -598,7 +611,7 @@ test("761 - deeply nested modifiers work", () => {
     expect(mobx.isObservable(a.someKey)).toBe(true)
     expect(mobx.isObservableProp(a.someKey, "someNestedKey")).toBe(true)
     expect(mobx.isObservable(a.someKey.someNestedKey)).toBe(true) // Too bad: no deep merge with Object.assign! someKey object gets replaced in its entirity
-    expect(Array.isArray(a.someKey.someNestedKey)).toBe(false)
+    expect(Array.isArray(a.someKey.someNestedKey)).toBe(true)
 })
 
 test("compare structurally, ref", () => {
@@ -673,4 +686,78 @@ test("structural collections", () => {
     expect(() => {
         o.x = mobx.observable([1, 2, 3])
     }).toThrow("observable.struct should not be used with observable values")
+})
+
+test.skip("jest is behaving correctly", () => {
+    // this failing test is fixed here:
+    // https://github.com/facebook/jest/pull/6391
+    const symbol = Symbol("test")
+    const a = []
+    const b = []
+    const c = []
+    a[symbol] = 1
+    b[symbol] = 1
+    c[symbol] = 2
+    expect(a).toEqual(b)
+    expect(a).not.toEqual(c)
+})
+
+test.skip("All non-enumerables should be treated equally!", () => {
+    // Bug filed here: https://github.com/facebook/jest/issues/6392
+    const actual1 = {
+        x: 3
+    }
+    Object.defineProperty(actual1, "test", {
+        enumerable: false,
+        value: 5
+    })
+
+    const actual2 = {
+        x: 3
+    }
+    const mySymbol = Symbol("test")
+    Object.defineProperty(actual2, mySymbol, {
+        enumerable: false,
+        value: 5
+    })
+
+    expect(actual1).toEqual({ x: 3 })
+    expect(actual2).toEqual({ x: 3 })
+})
+
+test.skip("jest object equals issue - reference", () => {
+    // Skip until https://github.com/facebook/jest/issues/6392 is resolved
+    class Store {
+        constructor() {
+            mobx.extendObservable(this, { x: 3 })
+        }
+    }
+
+    const store = new Store()
+    debugger
+    expect(store).toEqual(new Store())
+})
+
+test.skip("jest object equals issue", () => {
+    // Skip until https://github.com/facebook/jest/issues/6392 is resolved
+    class Store {
+        @mobx.observable x = 2
+
+        constructor() {
+            this.x = 3
+        }
+    }
+
+    const store = new Store()
+    expect(store).toEqual(new Store())
+})
+
+test.skip("jest array equals issue", () => {
+    // Skip until https://github.com/facebook/jest/issues/6392 is resolved
+    class Store {
+        @mobx.observable things = []
+    }
+
+    const store = new Store()
+    expect(store.things).toEqual([])
 })

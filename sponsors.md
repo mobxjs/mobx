@@ -7,7 +7,9 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Andrei Zvonimir Crnković
 * Andy Kogut
 * Anri Asaturov
+* Bayu Fitri Andrianto
 * Benjamin Gruenbaum
+* Chance Snow
 * Code Hat Programming Inc.
 * Dane Hitchcox
 * Daniel Nakov
@@ -20,14 +22,17 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Jeff Hansen
 * Joinbox
 * Jorge Luis Acosta
+* Karolis Astrauka
 * Konrad Mazanowski
 * Matt Ruby
 * Matthieu Dumont
 * Mattia Manzati
+* Michael Fisher
 * Michael Mazurczak
 * Mihail Diordiev
 * Nikolay Ivanov
 * Pavel Ravits
+* Pascal Van Hecke
 * Peng Zhenqing
 * Rafal Filipek
 * Rainer Wittmann
@@ -36,11 +41,13 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Steven Pérez
 * Surafel D
 * Thibault Maekelbergh
+* Timor Zhiyentayev
 * Timothy Durant
 * Vojtech Novak
 * Wilfried Reiter
 * Wilson Lee
 * Yousuf Nejati
+* Zheng Renzhe
 
 Or... Become my personal Patreon! https://www.patreon.com/mweststrate
 
@@ -51,3 +58,6 @@ Patrons:
 * @guidojo
 * Ronal Chanou
 * Kim Joar Bekkelund
+* Tőrös Egon Richárd
+* Lucas Nascimento
+* Jason Hendriksen

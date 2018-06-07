@@ -23,6 +23,11 @@ MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source and many [in
 - https://unpkg.com/mobx/lib/mobx.umd.js
 - https://cdnjs.com/libraries/mobx
 
+# Browser support
+
+* MobX >=5 runs on any browser with [ES6 proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy). On older environments such as IE11, Node.js 4 or React Native Android on old JavaScriptCore it will an error on startup.
+* MobX 4 runs on any ES5 browser and will be actively maintained. The MobX 4 and 5 api's are the same and semantically can achieve the same, but MobX 4 has same [limitations](#mobx-4-vs-mobx-5).
+
 ## Translations
 
 * [中文](http://cn.mobx.js.org)
@@ -55,7 +60,7 @@ which includes the UI, data serialization, server communication, etc.
 
 React and MobX together are a powerful combination. React renders the application state by providing mechanisms to translate it into a tree of renderable components. MobX provides the mechanism to store and update the application state that React then uses.
 
-Both React and MobX provide very optimal and unique solutions to common problems in application development. React provides mechanisms to optimally render UI by using a virtual DOM that reduces the number of costly DOM mutations. MobX provides mechanisms to optimally synchronize application state with your React components by using a reactive virtual dependency state graph that is only updated when strictly needed and is never stale.
+Both React and MobX provide optimal and unique solutions to common problems in application development. React provides mechanisms to optimally render UI by using a virtual DOM that reduces the number of costly DOM mutations. MobX provides mechanisms to optimally synchronize application state with your React components by using a reactive virtual dependency state graph that is only updated when strictly needed and is never stale.
 
 ## Core concepts
 
@@ -215,7 +220,7 @@ store.todos[0].finished = true;
 ```
 
 Nonetheless, MobX has an optional built-in concept of [`actions`](https://mobxjs.github.io/mobx/refguide/action.html).
-Read this section as well if you want to now more about writing asynchronous actions. It's easy!
+Read this section as well if you want to know more about writing asynchronous actions. It's easy!
 Use them to your advantage; they will help you to structure your code better and make wise decisions about when and where state should be modified.
 
 ## MobX: Simple and scalable
@@ -240,9 +245,9 @@ As demonstrated above, modifying state when using MobX is very straightforward. 
 
 MobX builds a graph of all the derivations in your application to find the least number of re-computations that is needed to prevent staleness. "Derive everything" might sound expensive, MobX builds a virtual derivation graph to minimize the number of recomputations needed to keep derivations in sync with the state.
 
-In fact, when testing MobX at Mendix we found out that using this library to track the relations in our code is often a lot more efficient then pushing changes through our application by using handwritten events or "smart" selector based container components.
+In fact, when testing MobX at Mendix we found out that using this library to track the relations in our code is often a lot more efficient than pushing changes through our application by using handwritten events or "smart" selector based container components.
 
-The simple reason is that MobX will establish far more fine grained 'listeners' on your data then you would do as a programmer.
+The simple reason is that MobX will establish far more fine grained 'listeners' on your data than you would do as a programmer.
 
 Secondly MobX sees the causality between derivations so it can order them in such a way that no derivation has to run twice or introduces a glitch.
 
@@ -259,7 +264,6 @@ For the same reason you can use it out of the box both server and client side, i
 The result of this is that you often need to learn less new concepts when using MobX in comparison to other state management solutions.
 
 ---
-
 
 ## Credits
 
@@ -296,6 +300,17 @@ And finally kudos for all the people that believed in, tried, validated and even
 
 * Feel free to send small pull requests. Please discuss new features or big changes in a GitHub issue first.
 * Use `npm test` to run the basic test suite, `npm run coverage` for the test suite with coverage and `npm run perf` for the performance tests.
+* Please note that if you want to backport a feature / fix to MobX 4 a second PR needs to be opened to the mobx4-master branch.
+
+# MobX 4 vs MobX 5
+
+The difference between MobX 4 and MobX 5 is that the later uses Proxies to do property tracking. As a consequence MobX 5 only runs on Proxy supporting browsers, in contrast to MobX 4 that runs on any ES 5 environment.
+
+The most noteable limitations of MobX 4:
+  * Observable arrays are not real arrays, so they won't pass the `Array.isArray()` check. The practical consequence is that you often need to `.slice()` the array first (to get a real array shallow copy) before passing to third party libraries.
+  * Adding properties to existing observable objects after creation is automatically picked up. Either use observable maps instead, or use the the build in [utility functions](https://mobx.js.org/refguide/object-api.html) to read / write / iterate objects that you want to dynamically add properties to.
+
+For more details see the [caveats page](https://mobx.js.org/best/pitfalls.html).
 
 ## Flow support
 MobX ships with [flow typings](flow-typed/mobx.js). Flow will automatically include them when you import mobx modules. Although you **do not** need to import the types explicitly, you can still do it like this: `import type { ... } from 'mobx'`.
