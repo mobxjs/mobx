@@ -2,8 +2,7 @@ var mobx = require("../../src/mobx.ts")
 var m = mobx
 var utils = require("../utils/test-utils")
 
-var observable = mobx.observable
-var computed = mobx.computed
+const { observable, computed, $mobx } = mobx
 
 var voidObserver = function() {}
 
@@ -76,7 +75,7 @@ test("exception when starting autorun can be recovered from", () => {
     a.x = 3
     expect(b).toBe(6)
     checkGlobalState()
-    expect(mobx.getAtom(a, "y").observers.length).toBe(1)
+    expect(mobx.getAtom(a, "y").observers.size).toBe(1)
 })
 
 test("exception in autorun can be recovered from", () => {
@@ -94,7 +93,7 @@ test("exception in autorun can be recovered from", () => {
     })
     expect(a.y).toBe(2)
     expect(b).toBe(2)
-    expect(mobx.getAtom(a, "y").observers.length).toBe(1)
+    expect(mobx.getAtom(a, "y").observers.size).toBe(1)
 
     utils.consoleError(() => {
         a.x = 2
@@ -104,7 +103,7 @@ test("exception in autorun can be recovered from", () => {
     expect(() => {
         expect(a.y).toBe(2) // old cached value!
     }).toThrowError(/Uhoh/)
-    expect(mobx.getAtom(a, "y").observers.length).toBe(1)
+    expect(mobx.getAtom(a, "y").observers.size).toBe(1)
 
     expect(b).toBe(2)
     checkGlobalState()
@@ -113,9 +112,9 @@ test("exception in autorun can be recovered from", () => {
     expect(a.y).toBe(6)
     expect(b).toBe(6)
     checkGlobalState()
-    expect(mobx.getAtom(a, "y").observers.length).toBe(1)
+    expect(mobx.getAtom(a, "y").observers.size).toBe(1)
     d()
-    expect(mobx.getAtom(a, "y").observers.length).toBe(0)
+    expect(mobx.getAtom(a, "y").observers.size).toBe(0)
 })
 
 test("multiple autoruns with exceptions are handled correctly", () => {
@@ -482,7 +481,7 @@ test("peeking inside erroring computed value doesn't bork (global) state", () =>
     }).toThrowError(/chocolademelk/)
 
     expect(a.isPendingUnobservation).toBe(false)
-    expect(a.observers.length).toBe(0)
+    expect(a.observers.size).toBe(0)
     expect(a.diffValue).toBe(0)
     expect(a.lowestObserverState).toBe(-1)
     expect(a.hasUnreportedChange).toBe(false)
@@ -492,7 +491,7 @@ test("peeking inside erroring computed value doesn't bork (global) state", () =>
     expect(b.observing.length).toBe(0)
     expect(b.newObserving).toBe(null)
     expect(b.isPendingUnobservation).toBe(false)
-    expect(b.observers.length).toBe(0)
+    expect(b.observers.size).toBe(0)
     expect(b.diffValue).toBe(0)
     expect(b.lowestObserverState).toBe(0)
     expect(b.unboundDepsCount).toBe(0)
@@ -513,14 +512,14 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         return res
     })
     const d = mobx.autorun(() => b.get())
-    const c = d.$mobx
+    const c = d[$mobx]
 
     expect(b.get()).toBe(1)
     expect(r).toBe(1)
 
     test("it should update correctly initially", () => {
         expect(a.isPendingUnobservation).toBe(false)
-        expect(a.observers.length).toBe(1)
+        expect(a.observers.size).toBe(1)
         expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState).toBe(-1)
         expect(a.hasUnreportedChange).toBe(false)
@@ -530,7 +529,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(b.observing.length).toBe(1)
         expect(b.newObserving).toBe(null)
         expect(b.isPendingUnobservation).toBe(false)
-        expect(b.observers.length).toBe(1)
+        expect(b.observers.size).toBe(1)
         expect(b.diffValue).toBe(0)
         expect(b.lowestObserverState).toBe(0)
         expect(b.unboundDepsCount).toBe(1) // value is always the last bound amount of observers
@@ -557,7 +556,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(r).toBe(2)
 
         expect(a.isPendingUnobservation).toBe(false)
-        expect(a.observers.length).toBe(1)
+        expect(a.observers.size).toBe(1)
         expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState).toBe(0)
         expect(a.hasUnreportedChange).toBe(false)
@@ -567,7 +566,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(b.observing.length).toBe(1)
         expect(b.newObserving).toBe(null)
         expect(b.isPendingUnobservation).toBe(false)
-        expect(b.observers.length).toBe(1)
+        expect(b.observers.size).toBe(1)
         expect(b.diffValue).toBe(0)
         expect(b.lowestObserverState).toBe(0)
         expect(b.unboundDepsCount).toBe(1)
@@ -593,7 +592,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(r).toBe(3)
 
         expect(a.isPendingUnobservation).toBe(false)
-        expect(a.observers.length).toBe(1)
+        expect(a.observers.size).toBe(1)
         expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState).toBe(0)
         expect(a.hasUnreportedChange).toBe(false)
@@ -603,7 +602,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(b.observing.length).toBe(1)
         expect(b.newObserving).toBe(null)
         expect(b.isPendingUnobservation).toBe(false)
-        expect(b.observers.length).toBe(1)
+        expect(b.observers.size).toBe(1)
         expect(b.diffValue).toBe(0)
         expect(b.lowestObserverState).toBe(0)
         expect(b.unboundDepsCount).toBe(1)
@@ -627,7 +626,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         d()
 
         expect(a.isPendingUnobservation).toBe(false)
-        expect(a.observers.length).toBe(0)
+        expect(a.observers.size).toBe(0)
         expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState).toBe(0)
         expect(a.hasUnreportedChange).toBe(false)
@@ -637,7 +636,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(b.observing.length).toBe(0)
         expect(b.newObserving).toBe(null)
         expect(b.isPendingUnobservation).toBe(false)
-        expect(b.observers.length).toBe(0)
+        expect(b.observers.size).toBe(0)
         expect(b.diffValue).toBe(0)
         expect(b.lowestObserverState).toBe(0)
         expect(b.unboundDepsCount).toBe(1)
@@ -735,54 +734,60 @@ test("it should be possible to handle global errors in reactions - 2 - #1480", (
 })
 
 test("global error handling will be skipped when using disableErrorBoundaries - 1", () => {
-    mobx.configure({ disableErrorBoundaries: true })
-    try {
-        const a = mobx.observable.box(1)
+    utils.supressConsole(() => {
+        mobx.configure({ disableErrorBoundaries: true })
+        try {
+            const a = mobx.observable.box(1)
 
-        expect(() => {
-            const d = mobx.autorun(function() {
-                throw "OOPS"
-            })
-        }).toThrowError(/OOPS/)
-    } finally {
-        mobx.configure({ disableErrorBoundaries: false })
-        mobx._resetGlobalState()
-    }
+            expect(() => {
+                const d = mobx.autorun(function() {
+                    throw "OOPS"
+                })
+            }).toThrowError(/OOPS/)
+        } finally {
+            mobx.configure({ disableErrorBoundaries: false })
+            mobx._resetGlobalState()
+        }
+    })
 })
 
 test("global error handling will be skipped when using disableErrorBoundaries - 2", () => {
-    mobx.configure({ disableErrorBoundaries: true })
-    try {
-        const a = mobx.observable.box(1)
+    utils.supressConsole(() => {
+        mobx.configure({ disableErrorBoundaries: true })
+        try {
+            const a = mobx.observable.box(1)
 
-        const d = mobx.reaction(
-            () => a.get(),
-            () => {
-                throw "OOPS"
-            }
-        )
-        expect(() => {
-            a.set(2)
-        }).toThrowError(/OOPS/)
+            const d = mobx.reaction(
+                () => a.get(),
+                () => {
+                    throw "OOPS"
+                }
+            )
+            expect(() => {
+                a.set(2)
+            }).toThrowError(/OOPS/)
 
-        d()
-    } finally {
-        mobx.configure({ disableErrorBoundaries: false })
-        mobx._resetGlobalState()
-    }
+            d()
+        } finally {
+            mobx.configure({ disableErrorBoundaries: false })
+            mobx._resetGlobalState()
+        }
+    })
 })
 
 test("error in effect of when is properly cleaned up", () => {
     checkGlobalState()
 
     const b = mobx.observable.box(1)
-    const d = mobx.when(
-        () => b.get() === 2,
-        () => {
-            throw "OOPS"
-        }
-    )
+    utils.supressConsole(() => {
+        const d = mobx.when(
+            () => b.get() === 2,
+            () => {
+                throw "OOPS"
+            }
+        )
+        b.set(2)
+    })
 
-    b.set(2)
     checkGlobalState()
 })

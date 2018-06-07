@@ -1,9 +1,16 @@
-import { IDerivation } from "./derivation"
-import { invariant, fail } from "../utils/utils"
-import { untrackedStart, untrackedEnd } from "./derivation"
-import { startBatch, endBatch } from "./observable"
-import { isSpyEnabled, spyReportStart, spyReportEnd } from "./spy"
-import { globalState } from "./globalstate"
+import {
+    IDerivation,
+    endBatch,
+    fail,
+    globalState,
+    invariant,
+    isSpyEnabled,
+    spyReportEnd,
+    spyReportStart,
+    startBatch,
+    untrackedEnd,
+    untrackedStart
+} from "../internal"
 
 export interface IAction {
     isMobxAction: boolean
@@ -46,7 +53,7 @@ function startAction(
 ): IActionRunInfo {
     const notifySpy = isSpyEnabled() && !!actionName
     let startTime: number = 0
-    if (notifySpy) {
+    if (notifySpy && process.env.NODE_ENV !== "production") {
         startTime = Date.now()
         const l = (args && args.length) || 0
         const flattendArgs = new Array(l)
@@ -73,7 +80,8 @@ function endAction(runInfo: IActionRunInfo) {
     allowStateChangesEnd(runInfo.prevAllowStateChanges)
     endBatch()
     untrackedEnd(runInfo.prevDerivation)
-    if (runInfo.notifySpy) spyReportEnd({ time: Date.now() - runInfo.startTime })
+    if (runInfo.notifySpy && process.env.NODE_ENV !== "production")
+        spyReportEnd({ time: Date.now() - runInfo.startTime })
 }
 
 export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T): T {

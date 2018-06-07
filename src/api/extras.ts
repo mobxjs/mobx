@@ -1,6 +1,4 @@
-import { IDepTreeNode, getObservers, hasObservers } from "../core/observable"
-import { unique } from "../utils/utils"
-import { getAtom } from "../types/type-utils"
+import { IDepTreeNode, getAtom, getObservers, hasObservers, unique } from "../internal"
 
 export interface IDependencyTree {
     name: string
@@ -34,6 +32,6 @@ function nodeToObserverTree(node: IDepTreeNode): IObserverTree {
         name: node.name
     }
     if (hasObservers(node as any))
-        result.observers = <any>getObservers(node as any).map(<any>nodeToObserverTree)
+        result.observers = Array.from(<any>getObservers(node as any)).map(<any>nodeToObserverTree)
     return result
 }

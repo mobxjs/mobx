@@ -1,17 +1,25 @@
 import {
+    $mobx,
     IDerivation,
     IDerivationState,
-    trackDerivedFunction,
+    IObservable,
+    Lambda,
+    TraceMode,
     clearObserving,
-    shouldCompute,
+    createInstanceofPredicate,
+    endBatch,
+    getNextId,
+    globalState,
     isCaughtException,
-    TraceMode
-} from "./derivation"
-import { IObservable, startBatch, endBatch } from "./observable"
-import { globalState } from "./globalstate"
-import { createInstanceofPredicate, getNextId, Lambda } from "../utils/utils"
-import { isSpyEnabled, spyReport, spyReportStart, spyReportEnd } from "./spy"
-import { trace } from "../api/trace"
+    isSpyEnabled,
+    shouldCompute,
+    spyReport,
+    spyReportEnd,
+    spyReportStart,
+    startBatch,
+    trace,
+    trackDerivedFunction
+} from "../internal"
 
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations
@@ -90,7 +98,11 @@ export class Reaction implements IDerivation, IReactionPublic {
 
                 try {
                     this.onInvalidate()
-                    if (this._isTrackPending && isSpyEnabled()) {
+                    if (
+                        this._isTrackPending &&
+                        isSpyEnabled() &&
+                        process.env.NODE_ENV !== "production"
+                    ) {
                         // onInvalidate didn't trigger track right away..
                         spyReport({
                             name: this.name,
@@ -109,7 +121,7 @@ export class Reaction implements IDerivation, IReactionPublic {
         startBatch()
         const notify = isSpyEnabled()
         let startTime
-        if (notify) {
+        if (notify && process.env.NODE_ENV !== "production") {
             startTime = Date.now()
             spyReportStart({
                 name: this.name,
@@ -125,7 +137,7 @@ export class Reaction implements IDerivation, IReactionPublic {
             clearObserving(this)
         }
         if (isCaughtException(result)) this.reportExceptionInDerivation(result.cause)
-        if (notify) {
+        if (notify && process.env.NODE_ENV !== "production") {
             spyReportEnd({
                 time: Date.now() - startTime
             })
@@ -171,7 +183,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 
     getDisposer(): IReactionDisposer {
         const r = this.dispose.bind(this)
-        r.$mobx = this
+        r[$mobx] = this
         return r
     }
 

@@ -10,7 +10,8 @@ const {
     observable,
     extendObservable,
     has,
-    get
+    get,
+    $mobx
 } = mobx
 
 test("keys should be observable when extending", () => {
@@ -232,9 +233,11 @@ test("observe & intercept", () => {
         {},
         { deep: false }
     )
-    mobx.observe(todos, c => events.push({ observe: c }))
+    mobx.observe(todos, c => {
+        events.push({ observe: { ...c, object: "skip" } })
+    })
     const d = mobx.intercept(todos, c => {
-        events.push({ intercept: c })
+        events.push({ intercept: { ...c, object: "skip" } })
         return null // no addition!
     })
 
@@ -275,7 +278,7 @@ test("observe & intercept set called multiple times", () => {
 })
 
 test("dynamically adding properties should preserve the original modifiers of an object", () => {
-    const todos = observable(
+    const todos = observable.object(
         {
             a: { title: "get coffee" }
         },

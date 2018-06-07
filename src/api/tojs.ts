@@ -1,9 +1,11 @@
-import { isObservableArray } from "../types/observablearray"
-import { isObservableObject } from "../types/observableobject"
-import { isObservableMap } from "../types/observablemap"
-import { isObservableValue } from "../types/observablevalue"
-import { isObservable } from "./isobservable"
-import { keys } from "./object-api"
+import {
+    isObservable,
+    isObservableArray,
+    isObservableMap,
+    isObservableObject,
+    isObservableValue,
+    keys
+} from "../internal"
 
 export type ToJSOptions = {
     detectCycles?: boolean
@@ -78,7 +80,7 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
 export function toJS<T>(source: T, options?: ToJSOptions): T
 export function toJS(source: any, options?: ToJSOptions): any
 export function toJS(source, options: ToJSOptions) // internal overload
-export function toJS(source, options: ToJSOptions) {
+export function toJS(source, options?: ToJSOptions) {
     if (!isObservable(source)) return source
 
     // backward compatibility

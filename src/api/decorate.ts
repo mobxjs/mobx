@@ -1,4 +1,4 @@
-import { invariant, isPlainObject } from "../utils/utils"
+import { invariant, isPlainObject } from "../internal"
 
 export function decorate<T>(
     clazz: new (...args: any[]) => T,

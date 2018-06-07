@@ -1,6 +1,6 @@
 {
   "name": "mobx",
-  "version": "4.3.1",
+  "version": "5.0.0-beta.7",
   "description": "Simple, scalable state management.",
   "main": "lib/mobx.js",
   "umd:main": "lib/mobx.umd.js",
@@ -9,7 +9,7 @@
   "react-native": "lib/mobx.module.js",
   "typings": "lib/mobx.d.ts",
   "scripts": {
-    "test": "yarn quick-build && yarn jest",
+    "test": "yarn jest",
     "watch": "yarn jest --watch",
     "test:mixed-versions": "jest --testRegex mixed-versions",
     "test:all": "yarn small-build && yarn jest -i && yarn test:flow && yarn test:mixed-versions",
@@ -22,7 +22,7 @@
     "quick-build": "tsc --pretty",
     "small-build": "node scripts/build.js",
     "lint": "tslint -c tslint.json src/*.ts src/types/*.ts src/api/*.ts src/core/*.ts src/utils/*.ts",
-    "size": "size-limit 20KB lib/mobx.js",
+    "size": "size-limit --babili 20KB lib/mobx.js",
     "precommit": "lint-staged"
   },
   "repository": {
@@ -44,10 +44,10 @@
     "@types/node": "^7.0.22",
     "babel-core": "7.0.0-beta.3",
     "babel-jest": "^22.0.4",
+    "babel-plugin-transform-regenerator": "^6.26.0",
     "babel-preset-es2015": "7.0.0-beta.3",
     "babel-preset-react": "7.0.0-beta.3",
     "babel-preset-stage-1": "7.0.0-beta.3",
-    "babel-plugin-transform-regenerator": "^6.26.0",
     "browserify": "^12.0.1",
     "chalk": "^1.1.3",
     "coveralls": "^2.11.4",
@@ -70,8 +70,8 @@
     "tape": "^4.2.2",
     "ts-jest": "^22.0.0",
     "tslib": "^1.7.1",
-    "typescript": "^2.1.4",
-    "uglify-js": "^2.6.1"
+    "typescript": "^2.9.0",
+    "uglify-es": "^3.3.9"
   },
   "dependencies": {},
   "keywords": [

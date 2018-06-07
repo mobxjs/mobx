@@ -23,6 +23,11 @@ MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source and many [in
 - https://unpkg.com/mobx/lib/mobx.umd.js
 - https://cdnjs.com/libraries/mobx
 
+# Browser support
+
+* MobX >=5 runs on any browser with [ES6 proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy). On older environments such as IE11, Node.js 4 or React Native Android on old JavaScriptCore it will an error on startup.
+* MobX 4 runs on any ES5 browser and will be actively maintained. The MobX 4 and 5 api's are the same and semantically can achieve the same, but MobX 4 has same [limitations](#mobx-4-vs-mobx-5).
+
 ## Translations
 
 * [中文](http://cn.mobx.js.org)
@@ -260,7 +265,6 @@ The result of this is that you often need to learn less new concepts when using 
 
 ---
 
-
 ## Credits
 
 MobX is inspired by reactive programming principles as found in spreadsheets. It is inspired by MVVM frameworks like in MeteorJS tracker, knockout and Vue.js. But MobX brings Transparent Functional Reactive Programming to the next level and provides a stand alone implementation. It implements TFRP in a glitch-free, synchronous, predictable and efficient manner.
@@ -296,6 +300,17 @@ And finally kudos for all the people that believed in, tried, validated and even
 
 * Feel free to send small pull requests. Please discuss new features or big changes in a GitHub issue first.
 * Use `npm test` to run the basic test suite, `npm run coverage` for the test suite with coverage and `npm run perf` for the performance tests.
+* Please note that if you want to backport a feature / fix to MobX 4 a second PR needs to be opened to the mobx4-master branch.
+
+# MobX 4 vs MobX 5
+
+The difference between MobX 4 and MobX 5 is that the later uses Proxies to do property tracking. As a consequence MobX 5 only runs on Proxy supporting browsers, in contrast to MobX 4 that runs on any ES 5 environment.
+
+The most noteable limitations of MobX 4:
+  * Observable arrays are not real arrays, so they won't pass the `Array.isArray()` check. The practical consequence is that you often need to `.slice()` the array first (to get a real array shallow copy) before passing to third party libraries.
+  * Adding properties to existing observable objects after creation is automatically picked up. Either use observable maps instead, or use the the build in [utility functions](https://mobx.js.org/refguide/object-api.html) to read / write / iterate objects that you want to dynamically add properties to.
+
+For more details see the [caveats page](https://mobx.js.org/best/pitfalls.html).
 
 ## Flow support
 MobX ships with [flow typings](flow-typed/mobx.js). Flow will automatically include them when you import mobx modules. Although you **do not** need to import the types explicitly, you can still do it like this: `import type { ... } from 'mobx'`.

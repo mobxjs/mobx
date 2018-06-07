@@ -8,6 +8,7 @@ test("correct api should be exposed", function() {
             .sort()
     ).toEqual(
         [
+            "$mobx", // adminstration symbol
             "action",
             "_allowStateChanges",
             "autorun",
@@ -17,7 +18,6 @@ test("correct api should be exposed", function() {
             "createAtom",
             "decorate",
             "extendObservable",
-            "extendShallowObservable", // deprecated but still public
             "flow",
             "get",
             "_getAdministration",
@@ -61,8 +61,7 @@ test("correct api should be exposed", function() {
             "untracked",
             "values",
             "entries",
-            "when",
-            "$mobx"
+            "when"
         ].sort()
     )
 })

@@ -1,9 +1,61 @@
-# 4.4.0
+# 5.0.0
 
-* Fixed [#1534](Fixes https://github.com/mobxjs/mobx/issues/1534):  @computed({keepAlive: true}) no long calculates before being accessed.
+[Release blogpost](https://medium.com/p/4852bce05572/)
+
+### Proxy support!
+
+MobX 5 is the first MobX version fully leveraging Proxies. This has two big advantages
+
+1. MobX can now detect the addition of properties on plain observable objects, so it is now possible to use plain observable objects as dynamic collections.
+2. Observable arrays are now recognized as arrays by all third party libraries, which will avoid the need to slice them.
+
+### The system requirements to run MobX has been upped
+
+* MobX 5 can only be used on environments that support `Proxies`. In practice this means, no Internet Explorer (Edge is fine). No nodejs < 4. React Native on Android only when JavaScript core is upgraded. All modern browsers are supported.
+* Since MobX no longer runs on older browser, the compilation target has been upgraded to ES2015 syntax supporting browsers. This means that MobX is not loadable on older browsers without down compilation to ES5.
+* If for whatever reason your project cannot meet this requirements, please stick to MobX 4. It will be actively maintained. All current features of MobX 5 are expressable in MobX 4 as well, but it means that for example to use dynamic objects some [additional APIs](https://mobx.js.org/refguide/object-api.html) are needed.
+* The performance footprint of MobX 5 should be pretty similar to MobX 4. In our performance tests we saw some minor improvements in memory footprint, but overall it should be pretty comparable.
+
+### Breaking changes
+
+* The required runtime needs to support the non-polyfillable `Proxy` API.
+* The minimum runtime target is now ES2015, not ES5
+* `spy` has become a no-op in production builds
+* All earlier deprecated APIs are dropped. Make sure to not have any deprecation warnings before upgrading.
+* `array.move` and `array.peek` are removed from the API
+* Dropped the third argument to `array.find` and `array.findIndex` since they were not standardized in ES.
+* `.$mobx` property has been dropped from all observables and replaced by a Symbol. Instead of using `x.$mobx.name`, use `import { $mobx } from "mobx"; x[$mobx].name` etc.
+* In some cases, the order in which autoruns are fired could have changed due to some internal optimizations (note that MobX never had a guarantee about the order in which autoruns fired!)
+
+### New features
+
+* It is possible to pass the `proxy: false` argument to `observable.object` to disable proxying (theoretically slightly faster, but removes no dynamic key addition)
+
+### Known Issues
+
+* Jest `toEqual` might throw an error `allKeys[x].match is not a function` when trying to equal observable arrays. This is a bug in Jest [report](https://github.com/facebook/jest/issues/6398). The simple work around for now is to slice (or `toJS` if the problem is recursive) the array first.
+* Jest `toEqual` matcher might no longer corretly equal your class instances, complaining about differences in the MobX adminstration. This is due to a bug with the processing of symbols: [report](https://github.com/facebook/jest/issues/6392). For now you might want to use a custom matcher if you are directly equalling observable objects. As a work around `toJS(object)` could be used before diffing.
+
+_Note June 7th, 2018:_ Both issues are already in Jest master and should be released soon.
+
+### Migration guide
+
+* Make sure to not use any API that produces deprecation warnings in MobX 4. Beyond that MobX 5 should pretty well as drop-in replacement of MobX 4.
+* You _could_ perform the following clean ups:
+  * Don't `slice()` arrays when passing them to external libraries. (Note you still shouldn't pass observable data structures to non-`observer` React components, which is an orthogonal concept)
+  * You could replace observable maps with observable objects if you are only using string-based keys.
+* Don't call the `reverse` or `sort` operations directly on observableArray's anymore, as it's behavior slightly differed from the built-in implementations of those methods. Instead use `observableArray.slice().sort()` to perform the sort on a copy. This gives no additional performance overhead compared to MobX 4. (The reason behind this is that built-in `sort` updates the array in place, but the observable array implementation always performed the sort on a defensive copy, and this change makes that explicit).
+
+
+### API's that have been dropped
+
+* The `arrayBuffer` setting is no longer supported by `configure` (it has become irrelevant)
+* `observable.shallowBox`, `observable.shallowArray`, `observable.shallowMap`, `observable.shallowObject`, `extendShallowObservable` api's have been removed. Instead, pass `{ deep: false }` to their non-shallow counter parts.
+* `observableArray.peek`, `observableArray.move`
 
 # 4.3.1
 
+* Fixed [#1534](Fixes https://github.com/mobxjs/mobx/issues/1534):  @computed({keepAlive: true}) no long calculates before being accessed.
 * Added the `$mobx` export symbol for MobX 5 forward compatibity
 
 # 4.3.0
@@ -37,7 +89,7 @@
 
 # 4.1.1
 
-* Import `default` from MobX will no longer throw, but only warn instead. This fixes some issues with tools that reflect on the `default` export of a module.
+* Import `default` from MobX will no longer throw, but only warn instead. This fixes some issues with tools that reflect on the `default` export of a module
 * Disposing a spy listener inside a spy handler no longer causes an exception. Fixes [#1459](https://github.com/mobxjs/mobx/issues/1459) through [#1460](https://github.com/mobxjs/mobx/pull/1460) by [farwayer](https://github.com/farwayer)
 * Added a missing `runInAction` overload in the flow typings. [#1451](https://github.com/mobxjs/mobx/pull/1451) by [AMilassin](https://github.com/mobxjs/mobx/issues?q=is%3Apr+author%3AAMilassin)
 * Improved the typings of `decorate`. See [#1450](https://github.com/mobxjs/mobx/pull/1450) by [makepost](https://github.com/mobxjs/mobx/issues?q=is%3Apr+author%3Amakepost)

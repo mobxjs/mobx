@@ -2,7 +2,16 @@
 
 var mobx = require("../../src/mobx")
 var m = mobx
-const { observable, computed, transaction, action, autorun, extendObservable, decorate } = mobx
+const {
+    $mobx,
+    observable,
+    computed,
+    transaction,
+    action,
+    autorun,
+    extendObservable,
+    decorate
+} = mobx
 const utils = require("../utils/test-utils")
 
 var voidObserver = function() {}
@@ -10,7 +19,13 @@ var voidObserver = function() {}
 function buffer() {
     var b = []
     var res = function(x) {
-        b.push(x.newValue)
+        if (typeof x.newValue === "object") {
+            const copy = { ...x.newValue }
+            delete copy[$mobx]
+            b.push(copy)
+        } else {
+            b.push(x.newValue)
+        }
     }
     res.toArray = function() {
         return b
@@ -789,12 +804,12 @@ test("when 2", function() {
     )
 
     expect(called).toBe(1)
-    expect(x.observers.length).toBe(0)
+    expect(x.observers.size).toBe(0)
     x.set(5)
     x.set(3)
     expect(called).toBe(1)
 
-    expect(d.$mobx.name).toBe("when x is 3")
+    expect(d[$mobx].name).toBe("when x is 3")
 })
 
 function stripSpyOutput(events) {
@@ -966,21 +981,21 @@ test("prematurely end autorun", function() {
             x.get()
         })
 
-        expect(x.observers.length).toBe(0)
-        expect(dis1.$mobx.observing.length).toBe(0)
-        expect(dis2.$mobx.observing.length).toBe(0)
+        expect(x.observers.size).toBe(0)
+        expect(dis1[$mobx].observing.length).toBe(0)
+        expect(dis2[$mobx].observing.length).toBe(0)
 
         dis1()
     })
-    expect(x.observers.length).toBe(1)
-    expect(dis1.$mobx.observing.length).toBe(0)
-    expect(dis2.$mobx.observing.length).toBe(1)
+    expect(x.observers.size).toBe(1)
+    expect(dis1[$mobx].observing.length).toBe(0)
+    expect(dis2[$mobx].observing.length).toBe(1)
 
     dis2()
 
-    expect(x.observers.length).toBe(0)
-    expect(dis1.$mobx.observing.length).toBe(0)
-    expect(dis2.$mobx.observing.length).toBe(0)
+    expect(x.observers.size).toBe(0)
+    expect(dis1[$mobx].observing.length).toBe(0)
+    expect(dis2[$mobx].observing.length).toBe(0)
 })
 
 test("computed values believe NaN === NaN", function() {
@@ -1174,8 +1189,8 @@ test("autoruns created in autoruns should kick off", function() {
     })
 
     // a should be observed by the inner autorun, not the outer
-    expect(a.$mobx.observing.length).toBe(0)
-    expect(d.$mobx.observing.length).toBe(1)
+    expect(a[$mobx].observing.length).toBe(0)
+    expect(d[$mobx].observing.length).toBe(1)
 
     x.set(4)
     expect(x2).toEqual([6, 8])
@@ -1216,18 +1231,18 @@ test("prematurely ended autoruns are cleaned up properly", () => {
     })
 
     expect(called).toBe(1)
-    expect(a.observers.length).toBe(1)
-    expect(b.observers.length).toBe(0)
-    expect(c.observers.length).toBe(1)
-    expect(d.$mobx.observing.length).toBe(2)
+    expect(a.observers.size).toBe(1)
+    expect(b.observers.size).toBe(0)
+    expect(c.observers.size).toBe(1)
+    expect(d[$mobx].observing.length).toBe(2)
 
     a.set(2)
 
     expect(called).toBe(2)
-    expect(a.observers.length).toBe(0)
-    expect(b.observers.length).toBe(0)
-    expect(c.observers.length).toBe(0)
-    expect(d.$mobx.observing.length).toBe(0)
+    expect(a.observers.size).toBe(0)
+    expect(b.observers.size).toBe(0)
+    expect(c.observers.size).toBe(0)
+    expect(d[$mobx].observing.length).toBe(0)
 })
 
 test("unoptimizable subscriptions are diffed correctly", () => {
@@ -1253,28 +1268,28 @@ test("unoptimizable subscriptions are diffed correctly", () => {
 
     expect(called).toBe(1)
     expect(val).toBe(1)
-    expect(a.observers.length).toBe(2)
-    expect(b.observers.length).toBe(1)
-    expect(c.observers.length).toBe(1)
-    expect(d.$mobx.observing.length).toBe(3) // 3 would be better!
+    expect(a.observers.size).toBe(2)
+    expect(b.observers.size).toBe(1)
+    expect(c.observers.size).toBe(1)
+    expect(d[$mobx].observing.length).toBe(3) // 3 would be better!
 
     b.set(2)
 
     expect(called).toBe(2)
     expect(val).toBe(1)
-    expect(a.observers.length).toBe(2)
-    expect(b.observers.length).toBe(1)
-    expect(c.observers.length).toBe(1)
-    expect(d.$mobx.observing.length).toBe(3) // c was cached so accessing a was optimizable
+    expect(a.observers.size).toBe(2)
+    expect(b.observers.size).toBe(1)
+    expect(c.observers.size).toBe(1)
+    expect(d[$mobx].observing.length).toBe(3) // c was cached so accessing a was optimizable
 
     a.set(2)
 
     expect(called).toBe(3)
     expect(val).toBe(2)
-    expect(a.observers.length).toBe(2)
-    expect(b.observers.length).toBe(1)
-    expect(c.observers.length).toBe(1)
-    expect(d.$mobx.observing.length).toBe(3) // c was cached so accessing a was optimizable
+    expect(a.observers.size).toBe(2)
+    expect(b.observers.size).toBe(1)
+    expect(c.observers.size).toBe(1)
+    expect(d[$mobx].observing.length).toBe(3) // c was cached so accessing a was optimizable
 
     d()
 })
@@ -1390,9 +1405,9 @@ test("verify calculation count", () => {
         "f",
         "change",
         "b",
+        "d",
         "c",
         "e",
-        "d",
         "f", // would have expected b c e d f, but alas
         "transaction",
         "f",
@@ -1403,8 +1418,8 @@ test("verify calculation count", () => {
         "try f",
         "f",
         "end transaction",
-        "e",
-        "d" // would have expected e d
+        "d", // would have expected e d
+        "e"
     ])
 
     d()
@@ -1533,8 +1548,8 @@ test("603 - transaction should not kill reactions", () => {
         })
     } catch (e) {}
 
-    expect(a.observers.length).toBe(1)
-    expect(d.$mobx.observing.length).toBe(1)
+    expect(a.observers.size).toBe(1)
+    expect(d[$mobx].observing.length).toBe(1)
     const g = m._getGlobalState()
     expect(g.inBatch).toEqual(0)
     expect(g.pendingReactions.length).toEqual(0)
@@ -1578,17 +1593,6 @@ test("#561 test toPrimitive() of observable objects", function() {
         var z = computed(() => ({ a: 3 }))
         expect("3" + z["@@toPrimitive"]()).toBe("3[object Object]")
     }
-})
-
-test("observables should not fail when ES6 Map is missing", () => {
-    const globalMapFunction = global.Map
-    global.Map = undefined
-    expect(global.Map).toBe(undefined)
-    var a = observable([1, 2, 3]) //trigger isES6Map in utils
-
-    expect(m.isObservable(a)).toBe(true)
-
-    global.Map = globalMapFunction
 })
 
 test("computed equals function only invoked when necessary", () => {

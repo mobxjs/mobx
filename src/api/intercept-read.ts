@@ -1,9 +1,15 @@
-import { fail, Lambda } from "../utils/utils"
-import { IObservableArray, isObservableArray } from "../types/observablearray"
-import { isObservableMap, ObservableMap } from "../types/observablemap"
-import { isObservableObject } from "../types/observableobject"
-import { IObservableValue, isObservableValue } from "../types/observablevalue"
-import { getAdministration } from "../types/type-utils"
+import {
+    IObservableArray,
+    IObservableValue,
+    Lambda,
+    ObservableMap,
+    fail,
+    getAdministration,
+    isObservableArray,
+    isObservableMap,
+    isObservableObject,
+    isObservableValue
+} from "../internal"
 
 export type ReadInterceptor<T> = (value: any) => T
 

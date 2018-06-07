@@ -624,7 +624,7 @@ test("enumerability", () => {
     expect("a" in a).toBe(true)
     expect(a.hasOwnProperty("a")).toBe(true)
     expect(a.hasOwnProperty("a2")).toBe(true)
-    expect(a.hasOwnProperty("b")).toBe(true) // better, false, but, see: #1398
+    expect(a.hasOwnProperty("b")).toBe(false) // true would also be ok-ish. see: #1398
     expect(a.hasOwnProperty("m")).toBe(false)
     expect(a.hasOwnProperty("m2")).toBe(true)
 })
@@ -663,7 +663,7 @@ test("enumerability - workaround", () => {
     expect("a" in a).toBe(true)
     expect(a.hasOwnProperty("a")).toBe(true)
     expect(a.hasOwnProperty("a2")).toBe(true)
-    expect(a.hasOwnProperty("b")).toBe(true) // better, false, but, see: #1398
+    expect(a.hasOwnProperty("b")).toBe(false) // true would also be ok-ish. see: #1398
     expect(a.hasOwnProperty("m")).toBe(false)
     expect(a.hasOwnProperty("m2")).toBe(true)
 })
@@ -1162,7 +1162,7 @@ test("computed setter problem", () => {
     expect(c.lastName).toBe("Weststrate")
 })
 
-test.only("computed setter problem - 2", () => {
+test("computed setter problem - 2", () => {
     class Contact {
         @observable firstName = ""
         @observable lastName = ""

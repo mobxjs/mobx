@@ -1,5 +1,7 @@
 var m = require("../../src/mobx.ts")
 
+const { $mobx } = m
+
 test("autorun 1", function(done) {
     var _fired = 0
     var _result = null
@@ -100,7 +102,7 @@ test("autorun should not result in loop", function(done) {
         expect(autoRunsCalled).toBe(1)
         done()
 
-        expect(d.$mobx.name).toBe("named async")
+        expect(d[$mobx].name).toBe("named async")
         d()
     }, 100)
 })

@@ -1,5 +1,4 @@
-import { Lambda, once, invariant } from "../utils/utils"
-import { untrackedStart, untrackedEnd } from "../core/derivation"
+import { Lambda, invariant, once, untrackedEnd, untrackedStart } from "../internal"
 
 export type IInterceptor<T> = (change: T) => T | null
 

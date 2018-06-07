@@ -1,24 +1,27 @@
-import { isObservableMap, ObservableMap } from "../types/observablemap"
 import {
-    isObservableObject,
+    $mobx,
     IIsObservableObject,
-    defineObservableProperty,
-    ObservableObjectAdministration
-} from "../types/observableobject"
-import { isObservableArray, IObservableArray } from "../types/observablearray"
-import { fail, invariant } from "../utils/utils"
-import { startBatch, endBatch } from "../core/observable"
-import { getAdministration } from "../types/type-utils"
-import { ObservableValue } from "../types/observablevalue"
+    IObservableArray,
+    ObservableMap,
+    ObservableObjectAdministration,
+    endBatch,
+    fail,
+    getAdministration,
+    invariant,
+    isObservableArray,
+    isObservableMap,
+    isObservableObject,
+    startBatch
+} from "../internal"
 
 export function keys<K>(map: ObservableMap<K, any>): ReadonlyArray<K>
 export function keys<T extends Object>(obj: T): ReadonlyArray<string>
 export function keys(obj: any): any {
     if (isObservableObject(obj)) {
-        return ((obj as any) as IIsObservableObject).$mobx.getKeys()
+        return ((obj as any) as IIsObservableObject)[$mobx].getKeys()
     }
     if (isObservableMap(obj)) {
-        return (obj as any)._keys.slice()
+        return Array.from(obj.keys())
     }
     return fail(
         process.env.NODE_ENV !== "production" &&
@@ -81,12 +84,12 @@ export function set(obj: any, key: any, value?: any): void {
         return
     }
     if (isObservableObject(obj)) {
-        const adm = ((obj as any) as IIsObservableObject).$mobx
-        const existingObservable = adm.values[key]
+        const adm = ((obj as any) as IIsObservableObject)[$mobx]
+        const existingObservable = adm.values.get(key)
         if (existingObservable) {
-            adm.write(obj, key, value)
+            adm.write(key, value)
         } else {
-            defineObservableProperty(obj, key, value, adm.defaultEnhancer)
+            adm.addObservableProp(key, value, adm.defaultEnhancer)
         }
     } else if (isObservableMap(obj)) {
         obj.set(key, value)
@@ -110,7 +113,7 @@ export function remove<T>(obj: IObservableArray<T>, index: number)
 export function remove<T extends Object>(obj: T, key: string)
 export function remove(obj: any, key: any): void {
     if (isObservableObject(obj)) {
-        ;((obj as any) as IIsObservableObject).$mobx.remove(key)
+        ;((obj as any) as IIsObservableObject)[$mobx].remove(key)
     } else if (isObservableMap(obj)) {
         obj.delete(key)
     } else if (isObservableArray(obj)) {
@@ -132,8 +135,7 @@ export function has(obj: any, key: any): boolean {
     if (isObservableObject(obj)) {
         // return keys(obj).indexOf(key) >= 0
         const adm = getAdministration(obj) as ObservableObjectAdministration
-        adm.getKeys() // make sure we get notified of key changes, but for performance, use the values map to look up existence
-        return adm.values[key] instanceof ObservableValue
+        return adm.has(key)
     } else if (isObservableMap(obj)) {
         return obj.has(key)
     } else if (isObservableArray(obj)) {

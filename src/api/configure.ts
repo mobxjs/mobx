@@ -1,20 +1,16 @@
-import { globalState, isolateGlobalState } from "../core/globalstate"
-import { reserveArrayBuffer } from "../types/observablearray"
-import { setReactionScheduler } from "../core/reaction"
+import { globalState, isolateGlobalState, setReactionScheduler } from "../internal"
 
 export function configure(options: {
     enforceActions?: boolean | "strict"
     computedRequiresReaction?: boolean
     isolateGlobalState?: boolean
     disableErrorBoundaries?: boolean
-    arrayBuffer?: number
     reactionScheduler?: (f: () => void) => void
 }): void {
     const {
         enforceActions,
         computedRequiresReaction,
         disableErrorBoundaries,
-        arrayBuffer,
         reactionScheduler
     } = options
     if (enforceActions !== undefined) {
@@ -33,12 +29,9 @@ export function configure(options: {
     if (disableErrorBoundaries !== undefined) {
         if (disableErrorBoundaries === true)
             console.warn(
-                "WARNING: Debug feature only. MobX will NOT recover from errors if this is on."
+                "WARNING: Debug feature only. MobX will NOT recover from errors when `disableErrorBoundaries` is enabled."
             )
         globalState.disableErrorBoundaries = !!disableErrorBoundaries
-    }
-    if (typeof arrayBuffer === "number") {
-        reserveArrayBuffer(arrayBuffer)
     }
     if (reactionScheduler) {
         setReactionScheduler(reactionScheduler)

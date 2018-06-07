@@ -104,7 +104,8 @@ test("intercept object", () => {
     expect(a.b).toBe(16)
 
     var d3 = intercept(a, c => {
-        expect(c.name).toBe("b"), expect(c.object).toBe(a)
+        expect(c.name).toBe("b")
+        expect(c.object).toBe(a)
         expect(c.type).toBe("update")
         return null
     })

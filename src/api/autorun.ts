@@ -1,7 +1,16 @@
-import { Lambda, getNextId, invariant, EMPTY_OBJECT, deprecated } from "../utils/utils"
-import { Reaction, IReactionPublic, IReactionDisposer } from "../core/reaction"
-import { action, isAction } from "./action"
-import { IEqualsComparer, comparer } from "../utils/comparer"
+import {
+    EMPTY_OBJECT,
+    IEqualsComparer,
+    IReactionDisposer,
+    IReactionPublic,
+    Lambda,
+    Reaction,
+    action,
+    comparer,
+    getNextId,
+    invariant,
+    isAction
+} from "../internal"
 
 export interface IAutorunOptions {
     delay?: number
@@ -79,7 +88,9 @@ const run = (f: Lambda) => f()
 function createSchedulerFromOptions(opts: IReactionOptions) {
     return opts.scheduler
         ? opts.scheduler
-        : opts.delay ? (f: Lambda) => setTimeout(f, opts.delay!) : run
+        : opts.delay
+            ? (f: Lambda) => setTimeout(f, opts.delay!)
+            : run
 }
 
 export function reaction<T>(
@@ -87,12 +98,6 @@ export function reaction<T>(
     effect: (arg: T, r: IReactionPublic) => void,
     opts: IReactionOptions = EMPTY_OBJECT
 ): IReactionDisposer {
-    if (typeof opts === "boolean") {
-        opts = { fireImmediately: opts }
-        deprecated(
-            `Using fireImmediately as argument is deprecated. Use '{ fireImmediately: true }' instead`
-        )
-    }
     if (process.env.NODE_ENV !== "production") {
         invariant(
             typeof expression === "function",

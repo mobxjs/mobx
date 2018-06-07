@@ -1,6 +1,6 @@
 "use strict"
 var mobx = require("../../src/mobx.ts")
-var observable = mobx.observable
+const { observable, $mobx, when } = mobx
 var iterall = require("iterall")
 
 function buffer() {
@@ -15,7 +15,7 @@ function buffer() {
 }
 
 test("test1", function() {
-    var a = observable([])
+    var a = observable.array([])
     expect(a.length).toBe(0)
     expect(Object.keys(a)).toEqual([])
     expect(a.slice()).toEqual([])
@@ -79,11 +79,11 @@ test("test1", function() {
     expect(sum.get()).toBe(3)
     expect(a.slice()).toEqual([1, 2])
 
-    expect(a.reverse()).toEqual([2, 1])
+    expect(a.slice().reverse()).toEqual([2, 1])
     expect(a.slice()).toEqual([1, 2])
 
     a.unshift(3)
-    expect(a.sort()).toEqual([1, 2, 3])
+    expect(a.slice().sort()).toEqual([1, 2, 3])
     expect(a.slice()).toEqual([3, 1, 2])
 
     expect(JSON.stringify(a)).toBe("[3,1,2]")
@@ -92,8 +92,7 @@ test("test1", function() {
     a.set(2, 4)
     expect(a.get(2)).toBe(4)
 
-    //	t.deepEqual(Object.keys(a), ['0', '1', '2']); // ideally....
-    expect(Object.keys(a)).toEqual([])
+    expect(Object.keys(a)).toEqual(["0", "1", "2"]) // ideally....
 })
 
 test("array should support iterall / iterable ", () => {
@@ -128,20 +127,10 @@ test("find(findIndex) and remove", function() {
         }
         return false
     }
-
+    ;[].findIndex
     expect(a.find(predicate)).toBe(20)
-    expect(idx).toBe(1)
     expect(a.findIndex(predicate)).toBe(1)
-    expect(a.find(predicate, null, 1)).toBe(20)
-    expect(idx).toBe(1)
-    expect(a.findIndex(predicate, null, 1)).toBe(1)
-    expect(a.find(predicate, null, 2)).toBe(20)
-    expect(idx).toBe(2)
-    expect(a.findIndex(predicate, null, 2)).toBe(2)
-    idx = -1
-    expect(a.find(predicate, null, 3)).toBe(undefined)
-    expect(idx).toBe(-1)
-    expect(a.findIndex(predicate, null, 3)).toBe(-1)
+    expect(a.find(predicate)).toBe(20)
 
     expect(a.remove(20)).toBe(true)
     expect(a.find(predicate)).toBe(20)
@@ -231,7 +220,8 @@ test("serialize", function() {
     var m = mobx.observable(a)
 
     expect(JSON.stringify(m)).toEqual(JSON.stringify(a))
-    expect(a).toEqual(m.peek())
+
+    expect(a).toEqual(m.slice())
 
     a = [4]
     m.replace(a)
@@ -295,7 +285,7 @@ test("is array", function() {
     expect(x instanceof Array).toBe(true)
 
     // would be cool if this would return true...
-    expect(Array.isArray(x)).toBe(false)
+    expect(Array.isArray(x)).toBe(true)
 })
 
 test("stringifies same as ecma array", function() {
@@ -332,21 +322,10 @@ test("observes when stringified to locale", function() {
     expect(c).toBe(2)
 })
 
-test("peek", function() {
-    var x = mobx.observable([1, 2, 3])
-    expect(x.peek()).toEqual([1, 2, 3])
-    expect(x.$mobx.values).toBe(x.peek())
-
-    x.peek().push(4) //noooo!
-    expect(function() {
-        x.push(5) // detect alien change
-    }).toThrow(/the internal structure of an observable array was changed/)
-})
-
 test("react to sort changes", function() {
     var x = mobx.observable([4, 2, 3])
     var sortedX = mobx.computed(function() {
-        return x.sort()
+        return x.slice().sort()
     })
     var sorted
 
@@ -380,7 +359,7 @@ test("array exposes correct keys", () => {
     var ar = observable([1, 2])
     for (var key in ar) keys.push(key)
 
-    expect(keys).toEqual([])
+    expect(keys).toEqual(["0", "1"])
 })
 
 test("isArrayLike", () => {
@@ -394,56 +373,6 @@ test("isArrayLike", () => {
     expect(isArrayLike(arr)).toBe(true)
     expect(isArrayLike(42)).toBe(false)
     expect(isArrayLike({})).toBe(false)
-})
-
-test(".move throws on invalid indices", () => {
-    const arr = [0, 1, 2]
-    const observableArr = observable(arr)
-
-    expect(() => observableArr.move(-1, 0)).toThrowError(/Index out of bounds: -1 is negative/)
-    expect(() => observableArr.move(3, 0)).toThrowError(
-        /Index out of bounds: 3 is not smaller than 3/
-    )
-    expect(() => observableArr.move(0, -1)).toThrowError(/Index out of bounds: -1 is negative/)
-    expect(() => observableArr.move(0, 3)).toThrowError(
-        /Index out of bounds: 3 is not smaller than 3/
-    )
-})
-
-test(".move(i, i) does nothing", () => {
-    const arr = [0, 1, 2]
-    const observableArr = observable(arr)
-    var changesCount = 0
-    observableArr.observe(changes => ++changesCount)
-
-    observableArr.move(0, 0)
-
-    expect(0).toBe(changesCount)
-})
-
-test(".move works correctly", () => {
-    const arr = [0, 1, 2, 3]
-
-    function checkMove(fromIndex, toIndex, expected) {
-        const oa = observable(arr)
-        var changesCount = 0
-        oa.observe(changes => ++changesCount)
-        oa.move(fromIndex, toIndex)
-        expect(oa.slice()).toEqual(expected)
-        expect(changesCount).toBe(1)
-    }
-
-    checkMove(0, 1, [1, 0, 2, 3])
-    checkMove(0, 2, [1, 2, 0, 3])
-    checkMove(1, 2, [0, 2, 1, 3])
-    checkMove(2, 3, [0, 1, 3, 2])
-    checkMove(0, 3, [1, 2, 3, 0])
-
-    checkMove(1, 0, [1, 0, 2, 3])
-    checkMove(2, 0, [2, 0, 1, 3])
-    checkMove(2, 1, [0, 2, 1, 3])
-    checkMove(3, 1, [0, 3, 1, 2])
-    checkMove(3, 0, [3, 0, 1, 2])
 })
 
 test("accessing out of bound values throws", () => {
@@ -493,8 +422,8 @@ test("can iterate arrays", () => {
 test("array is concat spreadable, #1395", () => {
     const x = mobx.observable([1, 2, 3, 4])
     const y = [5].concat(x)
-    expect(y.length).toBe(2) // Should become 5 in MobX 5
-    expect(y).toEqual([5, x]) // should become [5, 1,2,3,4] in MobX 5
+    expect(y.length).toBe(5)
+    expect(y).toEqual([5, 1, 2, 3, 4])
 })
 
 test("array is spreadable, #1395", () => {
@@ -510,4 +439,23 @@ test("array supports toStringTag, #1490", () => {
     // core-js provides both
     const a = mobx.observable([])
     expect(Object.prototype.toString.call(a)).toBe("[object Array]")
+})
+
+test("slice works", () => {
+    const a = mobx.observable([1, 2, 3])
+    expect(a.slice(0, 2)).toEqual([1, 2])
+})
+
+test("slice is reactive", () => {
+    const a = mobx.observable([1, 2, 3])
+    let ok = false
+    when(() => a.slice().length === 4, () => (ok = true))
+    expect(ok).toBe(false)
+    a.push(1)
+    expect(ok).toBe(true)
+})
+
+test("toString", () => {
+    expect(mobx.observable([1, 2]).toString()).toEqual([1, 2].toString())
+    expect(mobx.observable([1, 2]).toLocaleString()).toEqual([1, 2].toLocaleString())
 })

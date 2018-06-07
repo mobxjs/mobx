@@ -51,7 +51,7 @@ test("effect is untracked", () => {
         newValue => {
             values.push(newValue * b.get())
         },
-        true
+        { fireImmediately: true }
     )
 
     a.set(2)
@@ -166,7 +166,7 @@ test("passes Reaction as an argument to expression function", () => {
         newValue => {
             values.push(newValue)
         },
-        true
+        { fireImmediately: true }
     )
 
     a.set(2)
@@ -188,7 +188,7 @@ test("passes Reaction as an argument to effect function", () => {
             if (a.get() === "pleaseDispose") r.dispose()
             values.push(newValue)
         },
-        true
+        { fireImmediately: true }
     )
 
     a.set(2)
@@ -210,7 +210,7 @@ test("can dispose reaction on first run", () => {
             r.dispose()
             valuesExpr1st.push(newValue)
         },
-        true
+        { fireImmediately: true }
     )
 
     var valuesEffect1st = []
@@ -222,7 +222,7 @@ test("can dispose reaction on first run", () => {
         newValue => {
             valuesEffect1st.push(newValue)
         },
-        true
+        { fireImmediately: true }
     )
 
     var valuesExpr = []

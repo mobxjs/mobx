@@ -1,5 +1,5 @@
 /**
- * (c) Michel Weststrate 2015 - 2016
+ * (c) Michel Weststrate 2015 - 2018
  * MIT Licensed
  *
  * Welcome to the mobx sources! To get an global overview of how MobX internally works,
@@ -15,6 +15,12 @@
  * - utils/   Utility stuff.
  *
  */
+
+if (typeof Proxy === "undefined") {
+    throw new Error(
+        "[mobx] MobX 5+ requires Proxy objects. If your environment doesn't support Proxy objects, please downgrade to MobX 4."
+    )
+}
 
 declare var window: any
 try {
@@ -40,41 +46,40 @@ try {
     }
 })()
 
-export { IObservable, IDepTreeNode } from "./core/observable"
-export { Reaction, IReactionPublic, IReactionDisposer } from "./core/reaction"
-export { IDerivation, untracked, IDerivationState } from "./core/derivation"
-export { IAtom, createAtom } from "./core/atom"
-
-export { IAction } from "./core/action"
-export { spy } from "./core/spy"
-export { IComputedValue } from "./core/computedvalue"
-
-export { IEqualsComparer, comparer } from "./utils/comparer"
-export { IEnhancer } from "./types/modifiers"
-export { IInterceptable, IInterceptor } from "./types/intercept-utils"
-export { IListenable } from "./types/listen-utils"
-
 export {
+    IObservable,
+    IDepTreeNode,
+    Reaction,
+    IReactionPublic,
+    IReactionDisposer,
+    IDerivation,
+    untracked,
+    IDerivationState,
+    IAtom,
+    createAtom,
+    IAction,
+    spy,
+    IComputedValue,
+    IEqualsComparer,
+    comparer,
+    IEnhancer,
+    IInterceptable,
+    IInterceptor,
+    IListenable,
     IObjectWillChange,
     IObjectDidChange,
     IObservableObject,
-    isObservableObject
-} from "./types/observableobject"
-export {
+    isObservableObject,
     IValueDidChange,
     IValueWillChange,
     IObservableValue,
-    isObservableValue as isBoxedObservable
-} from "./types/observablevalue"
-export {
+    isObservableValue as isBoxedObservable,
     IObservableArray,
     IArrayWillChange,
     IArrayWillSplice,
     IArrayChange,
     IArraySplice,
-    isObservableArray
-} from "./types/observablearray"
-export {
+    isObservableArray,
     IKeyValueMap,
     ObservableMap,
     IMapEntries,
@@ -82,52 +87,65 @@ export {
     IMapWillChange,
     IMapDidChange,
     isObservableMap,
-    IObservableMapInitialValues
-} from "./types/observablemap"
-
-export { transaction } from "./api/transaction"
-export { observable, IObservableFactory, IObservableFactories } from "./api/observable"
-export { computed, IComputed } from "./api/computed"
-export { isObservable, isObservableProp } from "./api/isobservable"
-export { isComputed, isComputedProp } from "./api/iscomputed"
-export { extendObservable, extendShallowObservable } from "./api/extendobservable"
-export { observe } from "./api/observe"
-export { intercept } from "./api/intercept"
-export { autorun, reaction, IReactionOptions } from "./api/autorun"
-export { when, IWhenOptions } from "./api/when"
-
-export { action, isAction, runInAction, IActionFactory } from "./api/action"
-export { keys, values, entries, set, remove, has, get } from "./api/object-api"
-export { decorate } from "./api/decorate"
-export { configure } from "./api/configure"
-export { onBecomeObserved, onBecomeUnobserved } from "./api/become-observed"
-export { flow } from "./api/flow"
-
-export { toJS } from "./api/tojs"
-export { trace } from "./api/trace"
-
-export { IObserverTree, IDependencyTree, getDependencyTree, getObserverTree } from "./api/extras"
-
-export {
+    IObservableMapInitialValues,
+    transaction,
+    observable,
+    IObservableFactory,
+    IObservableFactories,
+    computed,
+    IComputed,
+    isObservable,
+    isObservableProp,
+    isComputed,
+    isComputedProp,
+    extendObservable,
+    observe,
+    intercept,
+    autorun,
+    reaction,
+    IReactionOptions,
+    when,
+    IWhenOptions,
+    action,
+    isAction,
+    runInAction,
+    IActionFactory,
+    keys,
+    values,
+    entries,
+    set,
+    remove,
+    has,
+    get,
+    decorate,
+    configure,
+    onBecomeObserved,
+    onBecomeUnobserved,
+    flow,
+    toJS,
+    trace,
+    IObserverTree,
+    IDependencyTree,
+    getDependencyTree,
+    getObserverTree,
     resetGlobalState as _resetGlobalState,
-    getGlobalState as _getGlobalState
-} from "./core/globalstate"
-export { getDebugName, getAtom, getAdministration as _getAdministration } from "./types/type-utils"
-export { allowStateChanges as _allowStateChanges } from "./core/action"
-export { Lambda, isArrayLike } from "./utils/utils"
-export { isComputingDerivation as _isComputingDerivation } from "./core/derivation"
-export { onReactionError } from "./core/reaction"
-export { interceptReads as _interceptReads } from "./api/intercept-read"
-export { IComputedValueOptions } from "./core/computedvalue"
-
-// This line should come after all the imports as well, for the same reason
-// as noted above. I will file a bug with rollupjs - @rossipedia
-import "./core/globalstate"
+    getGlobalState as _getGlobalState,
+    getDebugName,
+    getAtom,
+    getAdministration as _getAdministration,
+    allowStateChanges as _allowStateChanges,
+    Lambda,
+    isArrayLike,
+    $mobx,
+    isComputingDerivation as _isComputingDerivation,
+    onReactionError,
+    interceptReads as _interceptReads,
+    IComputedValueOptions
+} from "./internal"
 
 // Devtools support
-import { spy } from "./core/spy"
-import { getDebugName } from "./types/type-utils"
-import { fail } from "./utils/utils"
+import { spy } from "./internal"
+import { getDebugName } from "./internal"
 
 declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: ((any) => void) }
 if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
@@ -139,54 +157,3 @@ if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
         }
     })
 }
-
-// TODO: remove in some future build
-if (
-    process.env.NODE_ENV !== "production" &&
-    typeof module !== "undefined" &&
-    typeof module.exports !== "undefined"
-) {
-    let warnedAboutDefaultExport = false
-    Object.defineProperty(module.exports, "default", {
-        enumerable: false,
-        get() {
-            if (!warnedAboutDefaultExport) {
-                warnedAboutDefaultExport = true
-                console.warn(
-                    `The MobX package does not have a default export. Use 'import { thing } from "mobx"' (recommended) or 'import * as mobx from "mobx"' instead."`
-                )
-            }
-            return undefined
-        }
-    })
-    ;[
-        "extras",
-        "Atom",
-        "BaseAtom",
-        "asFlat",
-        "asMap",
-        "asReference",
-        "asStructure",
-        "autorunAsync",
-        "createTranformer",
-        "expr",
-        "isModifierDescriptor",
-        "isStrictModeEnabled",
-        "map",
-        "useStrict",
-        "whyRun"
-    ].forEach(prop => {
-        Object.defineProperty(module.exports, prop, {
-            enumerable: false,
-            get() {
-                fail(
-                    `'${prop}' is no longer part of the public MobX api. Please consult the changelog to find out where this functionality went`
-                )
-            },
-            set() {}
-        })
-    })
-}
-
-// forward compatibility with mobx, so that packages can easily support mobx 4 & 5
-export const $mobx = "$mobx"

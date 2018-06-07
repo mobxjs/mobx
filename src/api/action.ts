@@ -1,6 +1,13 @@
-import { invariant, fail, addHiddenProp } from "../utils/utils"
-import { createAction, executeAction, IAction } from "../core/action"
-import { namedActionDecorator, boundActionDecorator } from "./actiondecorator"
+import {
+    IAction,
+    addHiddenProp,
+    boundActionDecorator,
+    createAction,
+    executeAction,
+    fail,
+    invariant,
+    namedActionDecorator
+} from "../internal"
 
 export interface IActionFactory {
     // nameless actions
@@ -55,7 +62,7 @@ export var action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): 
     // @action fn() {}
     if (arg4 === true) {
         // apply to instance immediately
-        arg1[arg2] = createAction(arg1.name || arg2, arg3.value)
+        addHiddenProp(arg1, arg2, createAction(arg1.name || arg2, arg3.value))
     } else {
         return namedActionDecorator(arg2).apply(null, arguments)
     }
@@ -66,7 +73,6 @@ action.bound = boundActionDecorator as any
 export function runInAction<T>(block: () => T): T
 export function runInAction<T>(name: string, block: () => T): T
 export function runInAction(arg1, arg2?) {
-    // TODO: deprecate?
     const actionName = typeof arg1 === "string" ? arg1 : arg1.name || "<unnamed action>"
     const fn = typeof arg1 === "function" ? arg1 : arg2
 
