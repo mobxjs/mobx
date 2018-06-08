@@ -146,6 +146,10 @@ export function isES6Map(thing): boolean {
     return thing instanceof Map
 }
 
+export function isES6Set(thing): thing is Set<any> {
+    return thing instanceof Set
+}
+
 export function getMapLikeKeys<K, V>(map: ObservableMap<K, V>): ReadonlyArray<K>
 export function getMapLikeKeys<V>(map: IKeyValueMap<V> | any): ReadonlyArray<string>
 export function getMapLikeKeys(map: any): any {

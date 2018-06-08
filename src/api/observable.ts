@@ -3,9 +3,11 @@ import {
     IObservableArray,
     IObservableDecorator,
     IObservableMapInitialValues,
+    IObservableSetInitialValues,
     IObservableObject,
     IObservableValue,
     ObservableMap,
+    ObservableSet,
     ObservableValue,
     createDecoratorForEnhancer,
     createDynamicObservableObject,
@@ -14,6 +16,7 @@ import {
     extendObservable,
     fail,
     isES6Map,
+    isES6Set,
     isObservable,
     isPlainObject,
     refStructEnhancer,
@@ -88,7 +91,9 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
             ? observable.array(v, arg2)
             : isES6Map(v)
                 ? observable.map(v, arg2)
-                : v
+                : isES6Set(v)
+                    ? observable.set(v, arg2)
+                    : v
 
     // this value could be converted to a new observable data structure, return it
     if (res !== v) return res
@@ -116,6 +121,10 @@ export interface IObservableFactory {
 export interface IObservableFactories {
     box<T = any>(value?: T, options?: CreateObservableOptions): IObservableValue<T>
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T>
+    set<T = any>(
+        initialValues?: IObservableSetInitialValues<T>,
+        options?: CreateObservableOptions
+    ): ObservableSet<T>
     map<K = any, V = any>(
         initialValues?: IObservableMapInitialValues<K, V>,
         options?: CreateObservableOptions
@@ -156,6 +165,14 @@ const observableFactories: IObservableFactories = {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("map")
         const o = asCreateObservableOptions(options)
         return new ObservableMap<K, V>(initialValues, getEnhancerFromOptions(o), o.name)
+    },
+    set<T = any>(
+        initialValues?: IObservableSetInitialValues<T>,
+        options?: CreateObservableOptions
+    ): ObservableSet<T> {
+        if (arguments.length > 2) incorrectlyUsedAsDecorator("set")
+        const o = asCreateObservableOptions(options)
+        return new ObservableSet<T>(initialValues, getEnhancerFromOptions(o), o.name)
     },
     object<T = any>(
         props: T,
