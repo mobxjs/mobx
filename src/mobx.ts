@@ -144,8 +144,7 @@ export {
 } from "./internal"
 
 // Devtools support
-import { spy } from "./internal"
-import { getDebugName } from "./internal"
+import { spy, getDebugName, $mobx } from "./internal"
 
 declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: ((any) => void) }
 if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
@@ -154,6 +153,7 @@ if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
         spy,
         extras: {
             getDebugName
-        }
+        },
+        $mobx
     })
 }
