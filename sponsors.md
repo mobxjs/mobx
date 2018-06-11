@@ -31,6 +31,7 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Michael Mazurczak
 * Mihail Diordiev
 * Nikolay Ivanov
+* Uncomon
 * Pavel Ravits
 * Pascal Van Hecke
 * Peng Zhenqing
