@@ -1,4 +1,8 @@
-# 5.0.1
+# 5.0.2
+
+* Fixed issue where iterators where not compiled to ES5, breaking the ES5 based builds.
+
+# 5.0.1 (Unpublished)
 
 * Fixed regression bug: `ObservableMap.size` was no longer observable. Fixes [#1583](https://github.com/mobxjs/mobx/issues/1583)
 * Downgraded lib export from ES6 to ES5. To many build tools still trip over ES6. Fixes [#1584](https://github.com/mobxjs/mobx/issues/1584). A modern build is available through `import ... from "mobx/lib/mobx.es6"` (or setup an alias in your build system)

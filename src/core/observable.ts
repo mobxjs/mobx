@@ -178,7 +178,8 @@ export function propagateChanged(observable: IObservable) {
     if (observable.lowestObserverState === IDerivationState.STALE) return
     observable.lowestObserverState = IDerivationState.STALE
 
-    for (const d of observable.observers) {
+    // Ideally we use for..of here, but the downcompiled version is really slow...
+    observable.observers.forEach(d => {
         if (d.dependenciesState === IDerivationState.UP_TO_DATE) {
             if (d.isTracing !== TraceMode.NONE) {
                 logTraceInfo(d, observable)
@@ -186,7 +187,7 @@ export function propagateChanged(observable: IObservable) {
             d.onBecomeStale()
         }
         d.dependenciesState = IDerivationState.STALE
-    }
+    })
     // invariantLOS(observable, "changed end");
 }
 
@@ -196,14 +197,14 @@ export function propagateChangeConfirmed(observable: IObservable) {
     if (observable.lowestObserverState === IDerivationState.STALE) return
     observable.lowestObserverState = IDerivationState.STALE
 
-    for (const d of observable.observers) {
+    observable.observers.forEach(d => {
         if (d.dependenciesState === IDerivationState.POSSIBLY_STALE)
             d.dependenciesState = IDerivationState.STALE
         else if (
             d.dependenciesState === IDerivationState.UP_TO_DATE // this happens during computing of `d`, just keep lowestObserverState up to date.
         )
             observable.lowestObserverState = IDerivationState.UP_TO_DATE
-    }
+    })
     // invariantLOS(observable, "confirmed end");
 }
 
@@ -213,7 +214,7 @@ export function propagateMaybeChanged(observable: IObservable) {
     if (observable.lowestObserverState !== IDerivationState.UP_TO_DATE) return
     observable.lowestObserverState = IDerivationState.POSSIBLY_STALE
 
-    for (const d of observable.observers) {
+    observable.observers.forEach(d => {
         if (d.dependenciesState === IDerivationState.UP_TO_DATE) {
             d.dependenciesState = IDerivationState.POSSIBLY_STALE
             if (d.isTracing !== TraceMode.NONE) {
@@ -221,7 +222,7 @@ export function propagateMaybeChanged(observable: IObservable) {
             }
             d.onBecomeStale()
         }
-    }
+    })
     // invariantLOS(observable, "maybe end");
 }
 
