@@ -330,6 +330,7 @@ export class ObservableMap<K = any, V = any>
     }
 
     get size(): number {
+        this._keysAtom.reportObserved()
         return this._data.size
     }
 

@@ -1,3 +1,8 @@
+# 5.0.1
+
+* Fixed regression bug: `ObservableMap.size` was no longer observable. Fixes [#1583](https://github.com/mobxjs/mobx/issues/1583)
+* Added support for mobx-react-devtools
+
 # 5.0.0
 
 [Release blogpost](https://medium.com/p/4852bce05572/)
@@ -11,7 +16,7 @@ MobX 5 is the first MobX version fully leveraging Proxies. This has two big adva
 
 ### The system requirements to run MobX has been upped
 
-* MobX 5 can only be used on environments that support `Proxies`. In practice this means, no Internet Explorer (Edge is fine). No nodejs < 6. React Native on Android only when JavaScript core is upgraded. All modern browsers are supported.
+* MobX 5 can only be used on environments that support `Proxies`. In practice this means, no Internet Explorer (Edge is fine). No nodejs < 6. React Native on Android only when JavaScript core is [upgraded](https://github.com/react-community/jsc-android-buildscripts#how-to-use-it-with-my-react-native-app). All modern browsers are supported.
 * Since MobX no longer runs on older browser, the compilation target has been upgraded to ES2015 syntax supporting browsers. This means that MobX is not loadable on older browsers without down compilation to ES5.
 * If for whatever reason your project cannot meet this requirements, please stick to MobX 4. It will be actively maintained. All current features of MobX 5 are expressable in MobX 4 as well, but it means that for example to use dynamic objects some [additional APIs](https://mobx.js.org/refguide/object-api.html) are needed.
 * The performance footprint of MobX 5 should be pretty similar to MobX 4. In our performance tests we saw some minor improvements in memory footprint, but overall it should be pretty comparable.
