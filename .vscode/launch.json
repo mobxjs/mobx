@@ -12,6 +12,13 @@
             "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
             "args": ["-i", "${file}"],
             // "preLaunchTask": "tsc: build - tsconfig.json"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "debug perf test",
+            "program": "${file}",
+            // "preLaunchTask": "tsc: build - tsconfig.json"
         }
     ]
 }

@@ -4,6 +4,7 @@
         "target": "es6",
         "module": "commonjs",
         "moduleResolution": "node",
+        "downlevelIteration": true,
         "alwaysStrict": true,
         "outDir": "lib",
         "sourceMap": false,
