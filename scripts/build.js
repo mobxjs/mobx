@@ -92,18 +92,24 @@ function copyFlowDefinitions() {
 }
 
 function build() {
-    runTypeScriptBuild(".build.cjs", ts.ScriptTarget.ES2015, true)
-    runTypeScriptBuild(".build.es", ts.ScriptTarget.ES2015, false)
+    runTypeScriptBuild(".build.es5", ts.ScriptTarget.ES5, true)
+    runTypeScriptBuild(".build.es6", ts.ScriptTarget.ES2015, false)
     return Promise.all([
         generateBundledModule(
-            path.resolve(".build.cjs", "mobx.js"),
+            path.resolve(".build.es5", "mobx.js"),
             path.resolve("lib", "mobx.js"),
             "cjs"
         ),
 
         generateBundledModule(
-            path.resolve(".build.es", "mobx.js"),
+            path.resolve(".build.es5", "mobx.js"),
             path.resolve("lib", "mobx.module.js"),
+            "es"
+        ),
+
+        generateBundledModule(
+            path.resolve(".build.es6", "mobx.js"),
+            path.resolve("lib", "mobx.es6.js"),
             "es"
         )
     ]).then(() => {

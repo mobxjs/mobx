@@ -1,6 +1,7 @@
 # 5.0.1
 
 * Fixed regression bug: `ObservableMap.size` was no longer observable. Fixes [#1583](https://github.com/mobxjs/mobx/issues/1583)
+* Downgraded lib export from ES6 to ES5. To many build tools still trip over ES6. Fixes [#1584](https://github.com/mobxjs/mobx/issues/1584). A modern build is available through `import ... from "mobx/lib/mobx.es6"` (or setup an alias in your build system)
 * Added support for mobx-react-devtools
 
 # 5.0.0
