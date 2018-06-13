@@ -106,12 +106,6 @@ const arrayTraps = {
         }
         return false
     },
-    defineProperty(target, key, descriptor) {
-        fail(
-            `Defining properties on observable arrays is not supported, directly assign them instead`
-        )
-        return false
-    },
     preventExtensions(target) {
         fail(`Observable arrays cannot be frozen`)
         return false
