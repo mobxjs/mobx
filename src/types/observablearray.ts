@@ -23,8 +23,7 @@ import {
     registerListener,
     spyReportEnd,
     spyReportStart,
-    allowStateChangesStart,
-    allowStateChangesEnd
+    allowStateChanges
 } from "../internal"
 
 const MAX_SPLICE_SIZE = 10000 // See e.g. https://github.com/mobxjs/mobx/issues/859
@@ -129,9 +128,7 @@ export function createObservableArray<T>(
     const proxy = new Proxy(adm.values, arrayTraps) as any
     adm.proxy = proxy
     if (initialValues && initialValues.length) {
-        const prev = allowStateChangesStart(true)
-        adm.spliceWithArray(0, 0, initialValues)
-        allowStateChangesEnd(prev)
+        allowStateChanges(true, () => adm.spliceWithArray(0, 0, initialValues))
     }
     return proxy
 }
