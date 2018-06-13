@@ -1,3 +1,7 @@
+# Unreleased
+
+* Remove ObservableArray `defineProperty` trap so that $mobx and $treenode can be properly defined in mobx-state-tree
+
 # 5.0.2
 
 * Fixed issue where iterators where not compiled to ES5, breaking the ES5 based builds.
