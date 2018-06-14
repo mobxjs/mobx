@@ -1573,8 +1573,9 @@ test("it should support asyncAction as decorator (ts)", async () => {
 })
 
 test("flow support async generators", async () => {
-    ;(Symbol as any).asyncIterator =
-        (Symbol as any).asyncIterator || Symbol.for("Symbol.asyncIterator")
+    if (!(Symbol as any).asyncIterator) {
+        (Symbol as any).asyncIterator = Symbol.for("Symbol.asyncIterator")
+    }
 
     async function* someNumbers() {
         await Promise.resolve()
@@ -1600,8 +1601,9 @@ test("flow support async generators", async () => {
 })
 
 test("flow support throwing async generators", async () => {
-    ;(Symbol as any).asyncIterator =
-        (Symbol as any).asyncIterator || Symbol.for("Symbol.asyncIterator")
+    if (!(Symbol as any).asyncIterator) {
+        (Symbol as any).asyncIterator = Symbol.for("Symbol.asyncIterator")
+    }
 
     async function* someNumbers() {
         await Promise.resolve()
