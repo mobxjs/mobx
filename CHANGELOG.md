@@ -1,3 +1,7 @@
+# 5.0.3
+
+* Fixed issue where it was no longer possible to define custom properties on observable arrays
+
 # 5.0.2
 
 * Fixed issue where iterators where not compiled to ES5, breaking the ES5 based builds.

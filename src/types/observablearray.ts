@@ -106,12 +106,6 @@ const arrayTraps = {
         }
         return false
     },
-    defineProperty(target, key, descriptor) {
-        fail(
-            `Defining properties on observable arrays is not supported, directly assign them instead`
-        )
-        return false
-    },
     preventExtensions(target) {
         fail(`Observable arrays cannot be frozen`)
         return false
@@ -493,12 +487,11 @@ const arrayExtensions = {
     "toString",
     "toLocaleString"
 ].forEach(funcName => {
-    const baseFunc = Array.prototype[funcName]
     arrayExtensions[funcName] = function() {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom.reportObserved()
         const res = adm.dehanceValues(adm.values)
-        return baseFunc.apply(res, arguments)
+        return res[funcName].apply(res, arguments)
     }
 })
 

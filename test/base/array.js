@@ -459,3 +459,17 @@ test("toString", () => {
     expect(mobx.observable([1, 2]).toString()).toEqual([1, 2].toString())
     expect(mobx.observable([1, 2]).toLocaleString()).toEqual([1, 2].toLocaleString())
 })
+
+test("can define properties on arrays", () => {
+    const ar = observable.array([1, 2])
+    Object.defineProperty(ar, "toString", {
+        enumerable: false,
+        configurable: true,
+        value: function() {
+            return "hoi"
+        }
+    })
+
+    expect(ar.toString()).toBe("hoi")
+    expect("" + ar).toBe("hoi")
+})
