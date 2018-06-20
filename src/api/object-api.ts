@@ -15,6 +15,7 @@ import {
 } from "../internal"
 
 export function keys<K>(map: ObservableMap<K, any>): ReadonlyArray<K>
+export function keys<T>(ar: IObservableArray<T>): ReadonlyArray<number>
 export function keys<T extends Object>(obj: T): ReadonlyArray<string>
 export function keys(obj: any): any {
     if (isObservableObject(obj)) {
@@ -23,9 +24,12 @@ export function keys(obj: any): any {
     if (isObservableMap(obj)) {
         return Array.from(obj.keys())
     }
+    if (isObservableArray(obj)) {
+        return obj.map((_, index) => index)
+    }
     return fail(
         process.env.NODE_ENV !== "production" &&
-            "'keys()' can only be used on observable objects and maps"
+            "'keys()' can only be used on observable objects, arrays and maps"
     )
 }
 
