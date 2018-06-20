@@ -223,6 +223,22 @@ test("array - set, remove, entries are reactive", () => {
     ])
 })
 
+test("array - set, remove, keys are reactive", () => {
+    const todos = observable.array()
+    const snapshots = []
+
+    reaction(() => keys(todos), keys => snapshots.push(keys))
+
+    set(todos, 0, 2)
+    set(todos, "1", 4)
+    set(todos, 3, 4)
+    set(todos, 1, 3)
+    remove(todos, 2)
+    remove(todos, "0")
+
+    expect(snapshots).toEqual([[0], [0, 1], [0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2], [0, 1]])
+})
+
 test("observe & intercept", () => {
     let events = []
     const todos = observable(
