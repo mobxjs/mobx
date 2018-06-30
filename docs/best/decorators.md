@@ -41,7 +41,7 @@ class Timer {
 Using the `decorate` utility:
 
 ```javascript
-import { observable, computed, action } from "mobx";
+import { observable, computed, action, decorate } from "mobx";
 
 class Timer {
   start = Date.now();
