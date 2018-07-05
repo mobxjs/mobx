@@ -23,6 +23,7 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Joinbox
 * Jorge Luis Acosta
 * Karolis Astrauka
+* Kevin Samuel
 * Konrad Mazanowski
 * Matt Ruby
 * Matthieu Dumont
@@ -55,6 +56,7 @@ Or... Become my personal Patreon! https://www.patreon.com/mweststrate
 Patrons:
 
 * Micheal Tiller
+* Goran Mandić
 * Micheal Hicke
 * @guidojo
 * Ronal Chanou
