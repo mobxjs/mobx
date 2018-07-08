@@ -84,7 +84,7 @@ But unlike spreadsheets, these values can be not only primitive values, but also
 
 If your environment doesn't support decorator syntax, don't worry.
 You can read [here](http://mobxjs.github.io/mobx/best/decorators.html) about how to set them up.
-Or you can skip them altoghether, as MobX can be used fine without decorator _syntax_, by leveraging the _decorate_ utility.
+Or you can skip them altogether, as MobX can be used fine without decorator _syntax_, by leveraging the _decorate_ utility.
 Many MobX users do prefer the decorator syntax though, as it is slightly more concise.
 
 ```javascript
