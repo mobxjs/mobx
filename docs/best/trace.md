@@ -32,7 +32,7 @@ import { trace } from "mobx"
 @observer
 class MyComponent extends React.Component {
     render() {
-        trace(true) // enter the debugger whenever an observable value causes this comonent to re-run
+        trace(true) // enter the debugger whenever an observable value causes this component to re-run
         return <div>{this.props.user.name}</name>
     }
 }
