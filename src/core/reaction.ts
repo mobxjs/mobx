@@ -154,8 +154,11 @@ export class Reaction implements IDerivation, IReactionPublic {
         if (globalState.disableErrorBoundaries) throw error
 
         const message = `[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: '${this}`
-        console.error(message, error)
-        /** If debugging brought you here, please, read the above message :-). Tnx! */
+        
+        if (typeof error.then !== 'function') {
+            console.error(message, error)
+	        /** If debugging brought you here, please, read the above message :-). Tnx! */
+        }
 
         if (isSpyEnabled()) {
             spyReport({
