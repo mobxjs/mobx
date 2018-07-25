@@ -14,8 +14,11 @@ import {
     isComputedProp,
     spy,
     isAction,
-    decorate
+    decorate,
+    reaction
 } from "../../src/mobx"
+
+import { serializable, primitive, serialize, deserialize } from "serializr"
 
 test("decorate should work", function() {
     class Box {
@@ -367,4 +370,80 @@ test("decorate should not allow @observable on getter", function() {
 
     expect(() => obj.x).toThrow(/"y"/)
     expect(() => obj.y).toThrow()
+})
+
+test("decorate a function property with two decorators", function() {
+    let callsCount = 0
+    let spyCount = 0
+    const spyDisposer = spy(ev => {
+        if (ev.type === "action" && ev.name === "fn") spyCount++
+    })
+
+    const countFunctionCallsDecorator = (target, key, descriptor) => {
+        const func = descriptor.value
+        descriptor.value = function wrapper(...args) {
+            const result = func.call(this, ...args)
+            callsCount++
+            return result
+        }
+        for (const key in func) {
+            descriptor.value[key] = func[key]
+        }
+        return descriptor
+    }
+
+    class Obj {
+        fn() {}
+    }
+
+    decorate(Obj, {
+        fn: [action("fn"), countFunctionCallsDecorator]
+    })
+
+    const obj = new Obj()
+
+    expect(isAction(obj.fn)).toBe(true)
+
+    obj.fn()
+
+    expect(callsCount).toEqual(1)
+    expect(spyCount).toEqual(1)
+
+    obj.fn()
+
+    expect(callsCount).toEqual(2)
+    expect(spyCount).toEqual(2)
+
+    spyDisposer()
+})
+
+test("decorate a property with two decorators", function() {
+    let updatedByAutorun
+
+    class Obj {
+        x = null
+    }
+
+    decorate(Obj, {
+        x: [serializable(primitive()), observable]
+    })
+
+    const obj = deserialize(Obj, {
+        x: 0
+    })
+
+    const d = autorun(() => {
+        updatedByAutorun = obj.x
+    })
+
+    expect(isObservableProp(obj, "x")).toBe(true)
+    expect(updatedByAutorun).toEqual(0)
+
+    obj.x++
+
+    expect(obj.x).toEqual(1)
+    expect(updatedByAutorun).toEqual(1)
+    expect(serialize(obj).x).toEqual(1)
+
+    d()
 })

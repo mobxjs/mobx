@@ -107,6 +107,24 @@ decorate(Todo, {
 })
 ```
 
+For applying multiple decorators on a single property, you can pass an array of decorators.
+```javascript
+import { decorate, observable } from "mobx"
+import { serializable, primitive } from "serializr"
+import persist from 'mobx-persist';
+
+class Todo {
+    id = Math.random();
+    title = "";
+    finished = false;
+}
+decorate(Todo, {
+    title: [serializable(primitive), persist('object'), observable],
+    finished: [serializable(primitive), observable]
+})
+```
+Note: Composing decorators can sometimes lead to strange things when one decorator modifies the [property descriptor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty) in a way that is unexpected for the other decorators.
+
 ### Computed values
 
 <i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/javascript-derive-computed-values-and-manage-side-effects-with-mobx-reactions">Egghead.io lesson 3: computed values</a></i>
