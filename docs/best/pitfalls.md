@@ -235,3 +235,51 @@ For more info see [#476](https://github.com/mobxjs/mobx/issues/476)
 #### Declaring propTypes might cause unnecessary renders in dev mode
 
 See: https://github.com/mobxjs/mobx-react/issues/56
+
+#### Don't decorate (some) React lifecycle methods as `action.bound` on `Observer` React components
+
+As mentioned above, all React components which used observable data should be marked as `@observer` Additionally, if you are going to be modifying any observable data in a function in your React component, that function should be marked as `@action`. Additionally, if you want `this` to refer to the instance of your component class, you should use `@action.bound`. Consider the following class:
+
+```js
+class ExampleComponent extends React.Component {
+  @observable disposer // <--- this value is disposed in addActed
+  
+  @action.bound
+  addActed() {
+    this.dispose()
+  }
+  
+  @action.bound
+  componentDidMount() {
+    this.disposer = this.observe(....) //<-- details don't matter
+  }
+}
+```
+
+If you call `addActed()` on a mounted `ExampleComponent`, the disposer is called.
+
+On the other hand, consider the following:
+
+```js
+class ExampleComponent extends React.Component {
+  @observable disposer // <--- this value is disposed in addActed
+  
+  @action.bound
+  componentWillUnmount() {
+    this.dispose()
+  }
+  
+  @action.bound
+  componentDidMount() {
+    this.disposer = this.observe(....) //<-- details don't matter
+  }
+}
+```
+
+In this case, your `disposer` will never be called! The reason is that the mixin for making the `ExampleComponent` an `observer`, the modifies the `componentWillUnmount` function which changes `this` to an unexpected `React.Component` instance (don't know which one). To work around this, declare`componentWillUnmount()` as follows:
+
+```js
+componentWillUnmount() {
+  runInAction(() => this.dispose())
+}
+```
