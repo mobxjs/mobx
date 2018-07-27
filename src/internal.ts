@@ -8,7 +8,7 @@ but at least in this file we can magically reorder the imports with trial and er
 export * from "./utils/utils"
 export * from "./core/atom"
 export * from "./utils/comparer"
-export * from "./utils/decorators2"
+export * from "./utils/decorators"
 export * from "./types/modifiers"
 export * from "./api/observabledecorator"
 export * from "./api/observable"
