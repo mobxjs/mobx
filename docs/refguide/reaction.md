@@ -8,7 +8,10 @@ Unlike `autorun` the side effect won't be run directly when created, but only af
 Any observables that are accessed while executing the side effect will not be tracked.
 
 `reaction` returns a disposer function.
-The functions passed to `reaction` will receive two argument when invoked, the current reaction, which can be used to dispose the `reaction` when during execution.
+
+The second function (the *effect* function) passed to `reaction` will receive two arguments when invoked.
+The first argument is the value returned by the *data* function. The second argument is the current reaction,
+which can be used to dispose the `reaction` during execution.
 
 It is important to notice that the side effect will *only* react to data that was *accessed* in the data expression, which might be less then the data that is actually used in the effect.
 Also, the side effect will only be triggered when the data returned by the expression has changed.
