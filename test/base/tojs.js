@@ -288,7 +288,7 @@ test("#285 non-mobx class instances with toJS", () => {
     // check before lazy initialization
     expect(mobx.toJS(p1)).toEqual({
         firstName: "michel",
-        lastName: nameObservable // toJS doesn't recurse into non observable objects!
+        lastName: "weststrate" // toJS will recurse into any object that may contain observable value
     })
 })
 
