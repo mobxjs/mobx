@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="8.3" data-basepath=".." data-revision="Thu Jun 07 2018 14:13:00 GMT+0200 (CEST)">
+    <div class="book" data-level="8.3" data-basepath=".." data-revision="Thu Aug 09 2018 20:46:42 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -899,7 +899,7 @@
 }
 </code></pre>
 <p>Using the <code>decorate</code> utility:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> { observable, computed, action } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> { observable, computed, action, decorate } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Timer</span> </span>{
   start = <span class="hljs-built_in">Date</span>.now();
@@ -920,7 +920,7 @@ decorate(Timer, {
   tick: action
 });
 </code></pre>
-<p>Note that the <code>observer</code> function from <code>mobx-react</code> is both a decorator and a function, that means that both all these syntax variants will work:</p>
+<p>Note that the <code>observer</code> function from <code>mobx-react</code> is both a decorator and a function, that means that all these syntax variants will work:</p>
 <pre><code class="lang-javascript">@observer
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Timer</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
     <span class="hljs-comment">/* ... */</span>

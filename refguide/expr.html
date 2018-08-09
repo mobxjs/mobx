@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="6.11" data-basepath=".." data-revision="Thu Jun 07 2018 14:13:00 GMT+0200 (CEST)">
+    <div class="book" data-level="6.11" data-basepath=".." data-revision="Thu Aug 09 2018 20:46:42 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -870,7 +870,7 @@ Nesting computed values is useful to create cheap computations in order to preve
 <p>In the following example, the expression prevents the <code>TodoView</code> component from being re-rendered if the selection changes elsewhere.
 Instead, the component will only re-render when the relevant todo is (de)selected, which happens much less frequently.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> TodoView = observer(({todo, editorState}) =&gt; {
-    <span class="hljs-keyword">const</span> isSelected = mobx.expr(() =&gt; editorState.selection === todo);
+    <span class="hljs-keyword">const</span> isSelected = mobxUtils.expr(() =&gt; editorState.selection === todo);
     <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">className</span>=<span class="hljs-value">{isSelected</span> ? &quot;<span class="hljs-attribute">todo</span> <span class="hljs-attribute">todo-selected</span>&quot; <span class="hljs-attribute">:</span> &quot;<span class="hljs-attribute">todo</span>&quot;}&gt;</span>{todo.title}<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>;</span>
 });
 </code></pre>
