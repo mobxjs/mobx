@@ -42,6 +42,7 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Rob Searle
 * Steven Pérez
 * Surafel D
+* Taylor Goolsby
 * Thibault Maekelbergh
 * Timor Zhiyentayev
 * Timothy Durant
