@@ -155,7 +155,7 @@ test("json2", function() {
             url: "booking.com"
         }
     })
-    expect(JSON.parse(JSON.stringify(o))).toEqual({
+    expect(mobx.toJS(o)).toEqual({
         todos: [
             {
                 title: "write blog",
@@ -217,8 +217,8 @@ test("toJS handles dates", () => {
     })
 
     var b = mobx.toJS(a)
-    expect(b.d instanceof Date).toBe(true)
-    expect(a.d === b.d).toBe(true)
+    expect(b.d).toBeInstanceOf(Date)
+    expect(a.d).toEqual(b.d)
 })
 
 test("json cycles", function() {
@@ -298,9 +298,11 @@ test("verify #566 solution", () => {
     const b = mobx.observable({ x: 3 })
     const c = mobx.observable({ a: a, b: b })
 
-    expect(mobx.toJS(c).a === a).toBeTruthy() // true
-    expect(mobx.toJS(c).b !== b).toBeTruthy() // false, cloned
-    expect(mobx.toJS(c).b.x === b.x).toBeTruthy() // true, both 3
+    expect(mobx.toJS(c).a).toEqual(a)
+    expect(mobx.toJS(c).a).toBeInstanceOf(MyClass)
+    expect(mobx.isObservableObject(c.b)).toBeTruthy()
+    expect(mobx.isObservableObject(mobx.toJS(c).b)).toBeFalsy()
+    expect(mobx.toJS(c).b).toEqual(mobx.toJS(c.b))
 })
 
 test("verify already seen", () => {
