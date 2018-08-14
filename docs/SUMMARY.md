@@ -30,7 +30,7 @@
   * [createAtom](refguide/extending.md)
   * [intercept & observe](refguide/observe.md)
   * [mobxUtils.fromPromise](https://github.com/mobxjs/mobx-utils#frompromise)
-  * [mobxUtis.fromResource](https://github.com/mobxjs/mobx-utils#fromresource)
+  * [mobxUtils.fromResource](https://github.com/mobxjs/mobx-utils#fromresource)
   * [mobxUtils.toStream](https://github.com/mobxjs/mobx-utils#tostream)
   * [mobxUtils.fromStream](https://github.com/mobxjs/mobx-utils#fromstream)
   * [mobxUtils.now](https://github.com/mobxjs/mobx-utils#now)
