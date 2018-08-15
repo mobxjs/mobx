@@ -424,8 +424,7 @@ This is intended as convenience/shorthand.
 Note that observable arrays can be `.slice()`d to turn them into true JS-arrays.
 
 ### `isAction`
-Usage: `isAction(func)`. Returns true if the given function is wrapped / 
-d with `action`.
+Usage: `isAction(func)`. Returns true if the given function is wrapped / decorated with `action`.
 
 ### `isComputed` and `isComputedProp`
 Usage: `isComputed(thing)` or `isComputedProp(thing, property?)`. Returns true if the given thing is a boxed computed value, or if the designated property is a computed value.
