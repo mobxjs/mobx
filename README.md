@@ -111,7 +111,7 @@ For applying multiple decorators on a single property, you can pass an array of 
 ```javascript
 import { decorate, observable } from "mobx"
 import { serializable, primitive } from "serializr"
-import persist from 'mobx-persist';
+import persist from "mobx-persist";
 
 class Todo {
     id = Math.random();
@@ -119,7 +119,7 @@ class Todo {
     finished = false;
 }
 decorate(Todo, {
-    title: [serializable(primitive), persist('object'), observable],
+    title: [serializable(primitive), persist("object"), observable],
     finished: [serializable(primitive), observable]
 })
 ```
