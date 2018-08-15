@@ -175,13 +175,13 @@ decorate(TodoList, {
 
 For applying multiple decorators on a single property, you can pass an array of decorators. The decorators application order is from right to left.
 ```javascript
-import { decorate, observable } from "mobx"
-import { serializable, primitive } from "serializr"
+import { decorate, observable } from 'mobx'
+import { serializable, primitive } from 'serializr'
 import persist from 'mobx-persist'
 
 class Todo {
     id = Math.random();
-    title = "";
+    title = '';
     finished = false;
 }
 
@@ -424,7 +424,8 @@ This is intended as convenience/shorthand.
 Note that observable arrays can be `.slice()`d to turn them into true JS-arrays.
 
 ### `isAction`
-Usage: `isAction(func)`. Returns true if the given function is wrapped / decorated with `action`.
+Usage: `isAction(func)`. Returns true if the given function is wrapped / 
+d with `action`.
 
 ### `isComputed` and `isComputedProp`
 Usage: `isComputed(thing)` or `isComputedProp(thing, property?)`. Returns true if the given thing is a boxed computed value, or if the designated property is a computed value.
