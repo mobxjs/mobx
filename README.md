@@ -107,7 +107,7 @@ decorate(Todo, {
 })
 ```
 
-For applying multiple decorators on a single property, you can pass an array of decorators.
+For applying multiple decorators on a single property, you can pass an array of decorators. The decorators application order is from right to left.
 ```javascript
 import { decorate, observable } from "mobx"
 import { serializable, primitive } from "serializr"
@@ -123,7 +123,7 @@ decorate(Todo, {
     finished: [serializable(primitive), observable]
 })
 ```
-Note: Composing decorators can sometimes lead to strange things when one decorator modifies the [property descriptor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty) in a way that is unexpected for the other decorators.
+Note: Not all decorators can be composed together, and this functionality is just best-effort. Some decorators affect the instance directly and can 'hide' the effect of other decorators that only change the prototype.
 
 ### Computed values
 
