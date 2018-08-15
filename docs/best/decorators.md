@@ -63,7 +63,7 @@ decorate(Timer, {
 });
 ```
 
-Note that the `observer` function from `mobx-react` is both a decorator and a function, that means that both all these syntax variants will work:
+Note that the `observer` function from `mobx-react` is both a decorator and a function, that means that all these syntax variants will work:
 
 ```javascript
 @observer

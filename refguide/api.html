@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="2" data-basepath=".." data-revision="Thu Jun 07 2018 14:13:00 GMT+0200 (CEST)">
+    <div class="book" data-level="2" data-basepath=".." data-revision="Tue Aug 14 2018 15:53:18 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -508,7 +508,7 @@
                         
                             <b>6.6.</b>
                         
-                        mobxUtis.fromResource
+                        mobxUtils.fromResource
                     </a>
             
             
@@ -1287,7 +1287,7 @@ See also <code>allowStateChanges</code>.</p>
 This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX.
 The reactivity inside the library will remain self-contained when you call <code>configure({isolateGlobalState: true})</code> inside the library.
 Additionally, MobX won&apos;t throw an error that there are multiple instances in the global scope.</p>
-<pre><code class="lang-javascript">configure({ isolatedGlobalState: <span class="hljs-literal">true</span> });
+<pre><code class="lang-javascript">configure({ isolateGlobalState: <span class="hljs-literal">true</span> });
 </code></pre>
 <h4 id="-reactionscheduler-f-void-void"><a name="-reactionscheduler-f-void-void" class="plugin-anchor" href="#-reactionscheduler-f-void-void"><span class="fa fa-link"></span></a><code>reactionScheduler: (f: () =&gt; void) =&gt; void</code></h4>
 <p>Sets a new function that executes all MobX reactions.

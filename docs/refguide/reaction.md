@@ -8,7 +8,10 @@ Unlike `autorun` the side effect won't be run directly when created, but only af
 Any observables that are accessed while executing the side effect will not be tracked.
 
 `reaction` returns a disposer function.
-The functions passed to `reaction` will receive two argument when invoked, the current reaction, which can be used to dispose the `reaction` when during execution.
+
+The second function (the *effect* function) passed to `reaction` will receive two arguments when invoked.
+The first argument is the value returned by the *data* function. The second argument is the current reaction,
+which can be used to dispose the `reaction` during execution.
 
 It is important to notice that the side effect will *only* react to data that was *accessed* in the data expression, which might be less then the data that is actually used in the effect.
 Also, the side effect will only be triggered when the data returned by the expression has changed.
@@ -18,7 +21,7 @@ In other words: reaction requires you to produce the things you need in your sid
 
 Reaction accepts a third argument as an options object with the following optional options:
 
-* `fireImmediately`: Boolean that indicates that the effect function should immediately be triggered after the first run of the data function. `false` by default. If a boolean is passed as third argument to `reaction`, it will be interpreted as the `fireImmediately` option.
+* `fireImmediately`: Boolean that indicates that the effect function should immediately be triggered after the first run of the data function. `false` by default.
 * `delay`: Number in milliseconds that can be used to debounce the effect function. If zero (the default), no debouncing will happen.
 * `equals`: `comparer.default` by default. If specified, this comparer function will be used to compare the previous and next values produced by the *data* function. The *effect* function will only be invoked if this function returns true. If specified, this will override `compareStructural`.
 * `name`: String that is used as name for this reaction in for example [`spy`](spy.md) events.

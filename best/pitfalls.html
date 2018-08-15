@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="8.2" data-basepath=".." data-revision="Thu Jun 07 2018 14:13:00 GMT+0200 (CEST)">
+    <div class="book" data-level="8.2" data-basepath=".." data-revision="Tue Aug 14 2018 15:53:18 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -508,7 +508,7 @@
                         
                             <b>6.6.</b>
                         
-                        mobxUtis.fromResource
+                        mobxUtils.fromResource
                     </a>
             
             
@@ -1041,6 +1041,43 @@ const _MyComponent = observer((props =&gt; <span class="hljs-tag">&lt;<span clas
 <p>For more info see <a href="https://github.com/mobxjs/mobx/issues/476" target="_blank">#476</a></p>
 <h4 id="declaring-proptypes-might-cause-unnecessary-renders-in-dev-mode"><a name="declaring-proptypes-might-cause-unnecessary-renders-in-dev-mode" class="plugin-anchor" href="#declaring-proptypes-might-cause-unnecessary-renders-in-dev-mode"><span class="fa fa-link"></span></a>Declaring propTypes might cause unnecessary renders in dev mode</h4>
 <p>See: <a href="https://github.com/mobxjs/mobx-react/issues/56" target="_blank">https://github.com/mobxjs/mobx-react/issues/56</a></p>
+<h4 id="don-t-decorate-some-react-lifecycle-methods-as-action-bound-on-observer-react-components"><a name="don-t-decorate-some-react-lifecycle-methods-as-action-bound-on-observer-react-components" class="plugin-anchor" href="#don-t-decorate-some-react-lifecycle-methods-as-action-bound-on-observer-react-components"><span class="fa fa-link"></span></a>Don&apos;t decorate (some) React lifecycle methods as <code>action.bound</code> on <code>Observer</code> React components</h4>
+<p>As mentioned above, all React components which used observable data should be marked as <code>@observer</code> Additionally, if you are going to be modifying any observable data in a function in your React component, that function should be marked as <code>@action</code>. Additionally, if you want <code>this</code> to refer to the instance of your component class, you should use <code>@action.bound</code>. Consider the following class:</p>
+<pre><code class="lang-js"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ExampleComponent</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
+  @observable disposer <span class="hljs-comment">// &lt;--- this value is disposed in addActed</span>
+
+  @action.bound
+  addActed() {
+    <span class="hljs-keyword">this</span>.dispose()
+  }
+
+  @action.bound
+  componentDidMount() {
+    <span class="hljs-keyword">this</span>.disposer = <span class="hljs-keyword">this</span>.observe(....) <span class="hljs-comment">//&lt;-- details don&apos;t matter</span>
+  }
+}
+</code></pre>
+<p>If you call <code>addActed()</code> on a mounted <code>ExampleComponent</code>, the disposer is called.</p>
+<p>On the other hand, consider the following:</p>
+<pre><code class="lang-js"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ExampleComponent</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
+  @observable disposer <span class="hljs-comment">// &lt;--- this value is disposed in addActed</span>
+
+  @action.bound
+  componentWillUnmount() {
+    <span class="hljs-keyword">this</span>.dispose()
+  }
+
+  @action.bound
+  componentDidMount() {
+    <span class="hljs-keyword">this</span>.disposer = <span class="hljs-keyword">this</span>.observe(....) <span class="hljs-comment">//&lt;-- details don&apos;t matter</span>
+  }
+}
+</code></pre>
+<p>In this case, your <code>disposer</code> will never be called! The reason is that the mixin for making the <code>ExampleComponent</code> an <code>observer</code>, the modifies the <code>componentWillUnmount</code> function which changes <code>this</code> to an unexpected <code>React.Component</code> instance (don&apos;t know which one). To work around this, declare<code>componentWillUnmount()</code> as follows:</p>
+<pre><code class="lang-js">componentWillUnmount() {
+  runInAction(() =&gt; <span class="hljs-keyword">this</span>.dispose())
+}
+</code></pre>
 </body></html>
                     
                     </section>

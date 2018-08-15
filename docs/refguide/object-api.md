@@ -6,7 +6,7 @@ There is now an utility API that enables manipulating observable maps, objects a
   * **`keys(thing)`** returns all keys in the collection as array
   * **`entries(thing)`** returns a [key, value] pair for all entries in the collection as array
 
-The following methods are not really when using MobX 5, but can be used to achieve MobX-5-like behavior in MobX
+The following methods are not really necessary when using MobX 5, but can be used to achieve MobX-5-like behavior in MobX 4.
 
   * **`set(thing, key, value)`** or **`set(thing, { key: value })`** Updates the given collection with the provided key / value pair(s).
   * **`remove(thing, key)`** removes the specified child from the collection. For arrays splicing is used.

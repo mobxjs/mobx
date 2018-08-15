@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="4.4" data-basepath=".." data-revision="Thu Jun 07 2018 14:13:00 GMT+0200 (CEST)">
+    <div class="book" data-level="4.4" data-basepath=".." data-revision="Tue Aug 14 2018 15:53:18 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -508,7 +508,7 @@
                         
                             <b>6.6.</b>
                         
-                        mobxUtis.fromResource
+                        mobxUtils.fromResource
                     </a>
             
             
@@ -869,15 +869,17 @@
 It takes two functions, the first one (the <em>data</em> function) is tracked and returns data that is used as input for the second one, the <em>effect</em> function.
 Unlike <code>autorun</code> the side effect won&apos;t be run directly when created, but only after the data expression returns a new value for the first time.
 Any observables that are accessed while executing the side effect will not be tracked.</p>
-<p><code>reaction</code> returns a disposer function.
-The functions passed to <code>reaction</code> will receive two argument when invoked, the current reaction, which can be used to dispose the <code>reaction</code> when during execution.</p>
+<p><code>reaction</code> returns a disposer function.</p>
+<p>The second function (the <em>effect</em> function) passed to <code>reaction</code> will receive two arguments when invoked.
+The first argument is the value returned by the <em>data</em> function. The second argument is the current reaction,
+which can be used to dispose the <code>reaction</code> during execution.</p>
 <p>It is important to notice that the side effect will <em>only</em> react to data that was <em>accessed</em> in the data expression, which might be less then the data that is actually used in the effect.
 Also, the side effect will only be triggered when the data returned by the expression has changed.
 In other words: reaction requires you to produce the things you need in your side effect.</p>
 <h2 id="options"><a name="options" class="plugin-anchor" href="#options"><span class="fa fa-link"></span></a>Options</h2>
 <p>Reaction accepts a third argument as an options object with the following optional options:</p>
 <ul>
-<li><code>fireImmediately</code>: Boolean that indicates that the effect function should immediately be triggered after the first run of the data function. <code>false</code> by default. If a boolean is passed as third argument to <code>reaction</code>, it will be interpreted as the <code>fireImmediately</code> option.</li>
+<li><code>fireImmediately</code>: Boolean that indicates that the effect function should immediately be triggered after the first run of the data function. <code>false</code> by default.</li>
 <li><code>delay</code>: Number in milliseconds that can be used to debounce the effect function. If zero (the default), no debouncing will happen.</li>
 <li><code>equals</code>: <code>comparer.default</code> by default. If specified, this comparer function will be used to compare the previous and next values produced by the <em>data</em> function. The <em>effect</em> function will only be invoked if this function returns true. If specified, this will override <code>compareStructural</code>.</li>
 <li><code>name</code>: String that is used as name for this reaction in for example <a href="spy.html"><code>spy</code></a> events.</li>

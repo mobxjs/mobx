@@ -545,7 +545,7 @@ The reactivity inside the library will remain self-contained when you call `conf
 Additionally, MobX won't throw an error that there are multiple instances in the global scope.
 
 ```javascript
-configure({ isolatedGlobalState: true });
+configure({ isolateGlobalState: true });
 ```
 
 #### `reactionScheduler: (f: () => void) => void`
