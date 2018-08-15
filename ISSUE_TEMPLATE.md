@@ -3,6 +3,7 @@ Welcome to MobX. Please provide as much relevant information as possible!
 I have a:
 
 1. [ ] Question: Feel free to just state your question. For a quick answer, there are usually people online at our [Gitter](https://gitter.im/mobxjs/mobx) channel
+2. [ ] Documentation improvement. Please don't open an issue but create a PR instead!
 2. [ ] Issue:
   * [ ] **Provide error messages including stacktrace**
   * [ ] Provide a **minimal** sample reproduction. **Create a reproduction based on this [sandbox](https://codesandbox.io/s/v3v0my2370)**
