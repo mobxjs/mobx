@@ -24,12 +24,20 @@ MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source and many [in
 - https://unpkg.com/mobx/lib/mobx.umd.js
 - https://cdnjs.com/libraries/mobx
 
+
+_Tip: Consider using the faster and smaller ES6 build if targetting a modern environment: `lib/mobx.es6.js`. For example by setting up a webpack alias: `resolve: { alias: { mobx: __dirname + "/node_modules/mobx/lib/mobx.es6.js" }}`_
+
 # Browser support
+
+| MobX version | Actively supported  | Supported browsers | GitHub branch |
+| ----- | ----- | --- | --- |
+| 5.* | Yes | Any browser that supports [ES6 Proxies](https://kangax.github.io/compat-table/es6/#test-Proxy) (non polyfillable). _NOT:_ IE 11 and lower, Node 5 and lower | `master` |
+| 4.* | Yes (LTS) | Any ES5 compliant browser | `mobx4-master` |
+| 1-3.* | No |  Any ES5 compliant browser | No active branch |
 
 * MobX >=5 runs on any browser with [ES6 proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy). It will throw an error on startup on older environments such as IE11, Node.js <6 or React Native Android on old JavaScriptCore [how-to-upgrade](https://github.com/react-community/jsc-android-buildscripts#how-to-use-it-with-my-react-native-app).
 * MobX 4 runs on any ES5 browser and will be actively maintained. The MobX 4 and 5 api's are the same and semantically can achieve the same, but MobX 4 has some [limitations](#mobx-4-vs-mobx-5).
 
-_Tip: the main entry point of the MobX 5 package ships with ES5 code for backward compatibility with all build tools. But since MobX 5 runs only on modern browsers anyway, consider using the faster and smaller ES6 build: `lib/mobx.es6.js`. For example by setting up a webpack alias: `resolve: { alias: { mobx: __dirname + "/node_modules/mobx/lib/mobx.es6.js" }}`_
 
 ## Translations
 
