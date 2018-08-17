@@ -4982,6 +4982,10 @@ send@0.15.3:
     range-parser "~1.2.0"
     statuses "~1.3.1"
 
+serializr@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/serializr/-/serializr-1.3.0.tgz#6c7f977461d54a24bb1f17a03ed0ce61d239b010"
+
 serve-static@1.12.3:
   version "1.12.3"
   resolved "https://registry.yarnpkg.com/serve-static/-/serve-static-1.12.3.tgz#9f4ba19e2f3030c547f8af99107838ec38d5b1e2"

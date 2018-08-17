@@ -100,6 +100,24 @@ decorate(Todo, {
 })
 ```
 
+For applying multiple decorators on a single property, you can pass an array of decorators. The decorators application order is from right to left.
+```javascript
+import { decorate, observable } from "mobx"
+import { serializable, primitive } from "serializr"
+import persist from "mobx-persist";
+
+class Todo {
+    id = Math.random();
+    title = "";
+    finished = false;
+}
+decorate(Todo, {
+    title: [serializable(primitive), persist("object"), observable],
+    finished: [serializable(primitive), observable]
+})
+```
+Note: Not all decorators can be composed together, and this functionality is just best-effort. Some decorators affect the instance directly and can 'hide' the effect of other decorators that only change the prototype.
+
 ### Computed values
 
 <i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/javascript-derive-computed-values-and-manage-side-effects-with-mobx-reactions">Egghead.io lesson 3: computed values</a></i>
