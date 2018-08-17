@@ -113,3 +113,17 @@ test("when effect is an action", function(done) {
         a.set(1)
     })
 })
+
+test("Don't log promises as errors", function (done) {
+    var a = m.observable.box(false)
+    var p = Promise.resolve()
+    
+    m.autorun(() => {
+        if (!a.get()) throw p
+        done()
+    })
+
+    m.runInAction(() => {
+        a.set(true)
+    })
+})
