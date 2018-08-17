@@ -63,7 +63,28 @@ decorate(Timer, {
 });
 ```
 
-Note that the `observer` function from `mobx-react` is both a decorator and a function, that means that all these syntax variants will work:
+For applying multiple decorators on a single property, you can pass an array of decorators. The decorators application order is from right to left.
+
+```javascript
+import { decorate, observable } from "mobx"
+import { serializable, primitive } from "serializr"
+import persist from "mobx-persist";
+
+class Todo {
+    id = Math.random();
+    title = "";
+    finished = false;
+}
+decorate(Todo, {
+    title: [serializable(primitive), persist("object"), observable],
+    finished: [serializable(primitive), observable]
+})
+```
+Note: Not all decorators can be composed together, and this functionality is just best-effort. Some decorators affect the instance directly and can 'hide' the effect of other decorators that only change the prototype.
+
+---
+
+The `observer` function from `mobx-react` is both a decorator and a function, that means that all these syntax variants will work:
 
 ```javascript
 @observer
