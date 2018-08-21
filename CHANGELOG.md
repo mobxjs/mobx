@@ -3,7 +3,7 @@
 * Fixed [#1685](https://github.com/mobxjs/mobx/issues/1685): expose `IAutorunOptions`
 * `decorate` now can apply multiple decorators, by accepting an array and applying them right to left: `decorate(Todo, { title: [serializable(primitive), persist('object'), observable] })`. By [@ramybenaroya](https://github.com/ramybenaroya) through [#1691](https://github.com/mobxjs/mobx/pull/1691) and [#1686](https://github.com/mobxjs/mobx/pull/1686)
 * Improved typings of `flow` so that it accepts async generators. By [@dannsam](https://github.com/dannsam) through [#1656](https://github.com/mobxjs/mobx/pull/1656) and [#1655](https://github.com/mobxjs/mobx/pull/1655)
-* `keys()` now also supports arrays. Fixes [#1600]() through [#1601](https://github.com/mobxjs/mobx/pull/1601) by [@nunocastromartins](https://github.com/nunocastromartins)
+* `keys()` now also supports arrays. Fixes [#1600](https://github.com/mobxjs/mobx/pull/1600) through [#1601](https://github.com/mobxjs/mobx/pull/1601) by [@nunocastromartins](https://github.com/nunocastromartins)
 
 # 5.0.3
 
