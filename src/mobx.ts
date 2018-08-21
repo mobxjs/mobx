@@ -93,7 +93,7 @@ export { isComputed, isComputedProp } from "./api/iscomputed"
 export { extendObservable, extendShallowObservable } from "./api/extendobservable"
 export { observe } from "./api/observe"
 export { intercept } from "./api/intercept"
-export { autorun, reaction, IReactionOptions } from "./api/autorun"
+export { autorun, reaction, IReactionOptions, IAutorunOptions } from "./api/autorun"
 export { when, IWhenOptions } from "./api/when"
 
 export { action, isAction, runInAction, IActionFactory } from "./api/action"
