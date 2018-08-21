@@ -30,7 +30,7 @@ module.exports = function(shell, npm, git) {
         shell.write("package.json", JSON.stringify(pkg, null, 2))
 
         // Finally, commit and publish!
-        npm("publish")
+        npm("publish", "--tag", "mobx4")
         git("commit", "-am", "Published version " + version)
         git("tag", version)
 
