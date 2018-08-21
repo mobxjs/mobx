@@ -1,9 +1,12 @@
-# 4.4.0
+# For latest changes, see CHANGELOG on master
 
-* Fixed [#1534](Fixes https://github.com/mobxjs/mobx/issues/1534):  @computed({keepAlive: true}) no long calculates before being accessed.
+Changelog continues [here](https://github.com/mobxjs/mobx/blob/master/CHANGELOG.md)
+
+---
 
 # 4.3.1
 
+* Fixed [#1534](Fixes https://github.com/mobxjs/mobx/issues/1534):  @computed({keepAlive: true}) no long calculates before being accessed.
 * Added the `$mobx` export symbol for MobX 5 forward compatibity
 
 # 4.3.0
