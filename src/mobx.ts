@@ -102,6 +102,7 @@ export {
     observe,
     intercept,
     autorun,
+    IAutorunOptions,
     reaction,
     IReactionOptions,
     when,
