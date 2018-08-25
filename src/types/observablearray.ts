@@ -473,6 +473,7 @@ const arrayExtensions = {
  * faster as everything works on unproxied values
  */
 ;[
+    "concat",
     "every",
     "filter",
     "forEach",

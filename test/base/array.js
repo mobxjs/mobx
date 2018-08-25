@@ -473,3 +473,22 @@ test("can define properties on arrays", () => {
     expect(ar.toString()).toBe("hoi")
     expect("" + ar).toBe("hoi")
 })
+
+test("concats correctly #1667", () => {
+    const x = observable({ data: [] })
+
+    function generate(count) {
+        const d = []
+        for (let i = 0; i < count; i++) d.push({})
+        return d
+    }
+
+    x.data = generate(10000)
+    const first = x.data[0]
+    expect(Array.isArray(x.data)).toBe(true)
+
+    x.data = x.data.concat(generate(1000))
+    expect(Array.isArray(x.data)).toBe(true)
+    expect(x.data[0]).toBe(first)
+    expect(x.data.length).toBe(11000)
+})

@@ -1,3 +1,7 @@
+# 5.0.5
+
+* Fixed [#1667](https://github.com/mobxjs/mobx/issues/1667): creating a large array could result in undefined items (MobX 4.* was not affected)
+
 # 4.3.2 / 5.0.4
 
 * Fixed [#1685](https://github.com/mobxjs/mobx/issues/1685): expose `IAutorunOptions`
