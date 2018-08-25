@@ -511,3 +511,20 @@ test("array supports toStringTag, #1490", () => {
     const a = mobx.observable([])
     expect(Object.prototype.toString.call(a)).toBe("[object Array]")
 })
+
+test("concats correctly #1667", () => {
+    const x = observable({ data: [] })
+
+    function generate(count) {
+        const d = []
+        for (let i = 0; i < count; i++) d.push({})
+        return d
+    }
+
+    x.data = generate(10000)
+    const first = x.data[0]
+
+    x.data = x.data.concat(generate(1000))
+    expect(x.data[0]).toBe(first)
+    expect(x.data.length).toBe(11000)
+})
