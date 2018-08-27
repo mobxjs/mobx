@@ -1,3 +1,7 @@
+# 5.1.0
+
+* Improved handling of multiple MobX instances. MobX will no longer complain about being loaded multiple times (one should still prevent it though, to prevent blowing up bundle size!), but merge internal state by default. If multiple MobX versions need to be loaded, call `configure({ isolateGlobalState: true })`. Note that this means that observables from the different MobX instances won't cooperate. Fixes [#1681](https://github.com/mobxjs/mobx/issues/1681), [#1082](https://github.com/mobxjs/mobx/issues/1082)
+
 # 5.0.5
 
 * Fixed [#1667](https://github.com/mobxjs/mobx/issues/1667): creating a large array could result in undefined items (MobX 4.* was not affected)
