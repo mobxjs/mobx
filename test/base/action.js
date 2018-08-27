@@ -273,7 +273,7 @@ test("#286 exceptions in actions should not affect global state", () => {
 })
 
 test("runInAction", () => {
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
     var values = []
     var events = []
     var spyDisposer = mobx.spy(ev => {
@@ -309,7 +309,7 @@ test("runInAction", () => {
         { arguments: [], name: "<unnamed action>" }
     ])
 
-    mobx.configure({ enforceActions: false })
+    mobx.configure({ enforceActions: "never" })
     spyDisposer()
 
     d()

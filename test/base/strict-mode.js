@@ -188,7 +188,7 @@ test("strict mode checks", function() {
 
 test("enforceActions 'strict' does not allow changing unobserved observables", () => {
     try {
-        mobx.configure({ enforceActions: "strict" })
+        mobx.configure({ enforceActions: "always" })
         const x = mobx.observable({
             a: 1,
             b: 2
