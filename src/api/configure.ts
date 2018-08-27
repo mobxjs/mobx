@@ -1,9 +1,10 @@
 import { globalState, isolateGlobalState } from "../core/globalstate"
 import { reserveArrayBuffer } from "../types/observablearray"
 import { setReactionScheduler } from "../core/reaction"
+import { deprecated } from "../utils/utils"
 
 export function configure(options: {
-    enforceActions?: boolean | "strict"
+    enforceActions?: boolean | "strict" | "never" | "always" | "observed"
     computedRequiresReaction?: boolean
     isolateGlobalState?: boolean
     disableErrorBoundaries?: boolean
@@ -18,11 +19,31 @@ export function configure(options: {
         reactionScheduler
     } = options
     if (enforceActions !== undefined) {
-        if (typeof enforceActions !== "boolean" && enforceActions !== "strict")
-            return fail(`Invalid configuration for 'enforceActions': ${enforceActions}`)
-        globalState.enforceActions = enforceActions
-        globalState.allowStateChanges =
-            enforceActions === true || enforceActions === "strict" ? false : true
+        if (typeof enforceActions === "boolean" || enforceActions === "strict")
+            deprecated(
+                `Deprecated value for 'enforceActions', use 'false' => '"never"', 'true' => '"observed"', '"strict"' => "'always'" instead`
+            )
+        let ea
+        switch (enforceActions) {
+            case true:
+            case "observed":
+                ea = true
+                break
+            case false:
+            case "never":
+                ea = false
+                break
+            case "strict":
+            case "always":
+                ea = "strict"
+                break
+            default:
+                fail(
+                    `Invalid value for 'enforceActions': '${enforceActions}', expected 'never', 'always' or 'observed'`
+                )
+        }
+        globalState.enforceActions = ea
+        globalState.allowStateChanges = ea === true || ea === "strict" ? false : true
     }
     if (computedRequiresReaction !== undefined) {
         globalState.computedRequiresReaction = !!computedRequiresReaction
