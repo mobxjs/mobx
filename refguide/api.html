@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="2" data-basepath=".." data-revision="Fri Aug 17 2018 16:03:19 GMT+0200 (CEST)">
+    <div class="book" data-level="2" data-basepath=".." data-revision="Mon Aug 27 2018 11:22:20 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -995,6 +995,23 @@ decorate(TodoList, {
     addTodo: action.bound
 })
 </code></pre>
+<p>For applying multiple decorators on a single property, you can pass an array of decorators. The decorators application order is from right to left.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> { decorate, observable } <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;mobx&apos;</span>
+<span class="hljs-keyword">import</span> { serializable, primitive } <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;serializr&apos;</span>
+<span class="hljs-keyword">import</span> persist <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;mobx-persist&apos;</span>
+
+class Todo {
+    id = Math.random();
+    title = <span class="hljs-string">&apos;&apos;</span>;
+    finished = <span class="hljs-literal">false</span>;
+}
+
+decorate(Todo, {
+    title: [serializable(primitive), persist(<span class="hljs-string">&apos;object&apos;</span>), observable],
+    finished: [serializable(primitive), observable]
+})
+</code></pre>
+<p>Note: Not all decorators can be composed together, and this functionality is just best-effort. Some decorators affect the instance directly and can &apos;hide&apos; the effect of other decorators that only change the prototype.</p>
 <h2 id="computed-values"><a name="computed-values" class="plugin-anchor" href="#computed-values"><span class="fa fa-link"></span></a>Computed values</h2>
 <p>Usage:</p>
 <ul>
@@ -1268,25 +1285,20 @@ test(<span class="hljs-string">&apos;Throw if age is negative&apos;</span>, () =
 <blockquote>
 <p>Prior to MobX 4, <code>_resetGlobalState</code> was <code>extras.resetGlobalState</code>.</p>
 </blockquote>
-<h4 id="-enforceactions-boolean"><a name="-enforceactions-boolean" class="plugin-anchor" href="#-enforceactions-boolean"><span class="fa fa-link"></span></a><code>enforceActions: boolean</code></h4>
+<h4 id="-enforceactions"><a name="-enforceactions" class="plugin-anchor" href="#-enforceactions"><span class="fa fa-link"></span></a><code>enforceActions</code></h4>
 <p>Also known as &quot;strict mode&quot;.
 In strict mode, it is not allowed to change any state outside of an <a href="action.html"><code>action</code></a>.
-This is recommended when working in larger applications with complex layers of state computations.
-See also <code>allowStateChanges</code>.</p>
-<blockquote>
-<p>Prior to MobX 4, this behavior was enabled by <code>useStrict(): void</code>.</p>
-</blockquote>
-<pre><code class="lang-javascript">configure({ enforceActions: <span class="hljs-literal">true</span> });
-</code></pre>
-<p>Since MobX 4.2, it is also possible to specify</p>
-<pre><code class="lang-javascript">configure({ enforceActions: <span class="hljs-string">&quot;strict&quot;</span> });
-</code></pre>
-<p>In sloppy (<code>true</code>) mode, MobX will only throw if an observed observable is modified, in <code>&quot;strict&quot;</code> mode it will even throw for non-observed observables</p>
+Accepted values:</p>
+<ul>
+<li><code>&quot;never&quot;</code> (default): State can be modified from anywhere</li>
+<li><code>&quot;observed&quot;</code>: All state that is observed <em>somewhere</em> needs to be changed through actions. This is the recommended strictness mode in non-trivial applications.</li>
+<li><code>&quot;always&quot;</code>: State always needs be updated (which in practice also includes creation) in actions.</li>
+</ul>
 <h4 id="-isolateglobalstate-boolean"><a name="-isolateglobalstate-boolean" class="plugin-anchor" href="#-isolateglobalstate-boolean"><span class="fa fa-link"></span></a><code>isolateGlobalState: boolean</code></h4>
 <p>Isolates the global state of MobX, when there are multiple instances of MobX in the same environment.
 This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX.
-The reactivity inside the library will remain self-contained when you call <code>configure({isolateGlobalState: true})</code> inside the library.
-Additionally, MobX won&apos;t throw an error that there are multiple instances in the global scope.</p>
+The reactivity inside the library will remain self-contained when you call <code>configure({isolateGlobalState: true})</code> inside the library.</p>
+<p>Without this options, if multiple MobX instances are active, the internal state will be shared. The benefit is that observables from both instances work together, the downside is that the MobX versions have to match.</p>
 <pre><code class="lang-javascript">configure({ isolateGlobalState: <span class="hljs-literal">true</span> });
 </code></pre>
 <h4 id="-reactionscheduler-f-void-void"><a name="-reactionscheduler-f-void-void" class="plugin-anchor" href="#-reactionscheduler-f-void-void"><span class="fa fa-link"></span></a><code>reactionScheduler: (f: () =&gt; void) =&gt; void</code></h4>
