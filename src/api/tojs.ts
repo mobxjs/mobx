@@ -1,15 +1,13 @@
-import {
-    isObservable,
-    isObservableArray,
-    isObservableMap,
-    isObservableObject,
-    isObservableValue,
-    keys
-} from "../internal"
+import { keys } from "./object-api"
+import { isObservable } from "./isobservable"
+import { isObservableArray } from "../types/observablearray"
+import { isObservableValue } from "../types/observablevalue"
+import { isObservableMap } from "../types/observablemap"
 
 export type ToJSOptions = {
     detectCycles?: boolean
     exportMapsAsObjects?: boolean
+    recurseEverything?: boolean
 }
 
 const defaultOptions: ToJSOptions = {
@@ -23,8 +21,18 @@ function cache<K, V>(map: Map<any, any>, key: K, value: V, options: ToJSOptions)
 }
 
 function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) {
-    if (typeof source !== "object") {
-        return source
+    if (!options.recurseEverything && !isObservable(source)) return source
+
+    if (typeof source !== "object") return source
+
+    // Directly return the Date object itself if contained in the observable
+    if (source instanceof Date) return source
+
+    if (isObservableValue(source)) return toJSHelper(source.get(), options!, __alreadySeen)
+
+    // make sure we track the keys of the object
+    if (isObservable(source)) {
+        keys(source)
     }
 
     const detectCycles = options.detectCycles === true
@@ -33,7 +41,7 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
         return __alreadySeen.get(source)
     }
 
-    if (isObservableArray(source) || Object.getPrototypeOf(source) === Array.prototype) {
+    if (isObservableArray(source) || Array.isArray(source)) {
         const res = cache(__alreadySeen, source, [] as any, options)
         const toAdd = source.map(value => toJSHelper(value, options!, __alreadySeen))
         res.length = toAdd.length
@@ -57,20 +65,13 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
         }
     }
 
-    if (isObservableValue(source)) return toJSHelper(source.get(), options!, __alreadySeen)
-
-    // Directly return the Date object itself if contained in the observable
-    if (source instanceof Date) return source
-
-    // Fallback to situation if source is an ObservableObject or a plain object
+    // Fallback to the situation that source is an ObservableObject or a plain object
     const res = cache(__alreadySeen, source, {}, options)
-    Object.setPrototypeOf(res, Object.getPrototypeOf(source))
     for (let key in source) {
         res[key] = toJSHelper(source[key], options!, __alreadySeen)
     }
-    return res
 
-    return source
+    return res
 }
 
 /**
