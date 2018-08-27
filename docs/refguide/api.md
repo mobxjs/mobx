@@ -536,32 +536,23 @@ test('Throw if age is negative', () => {
 > Prior to MobX 4, `_resetGlobalState` was `extras.resetGlobalState`.
 
 
-#### `enforceActions: boolean`
+#### `enforceActions`
+
 Also known as "strict mode".
 In strict mode, it is not allowed to change any state outside of an [`action`](action.md).
-This is recommended when working in larger applications with complex layers of state computations.
-See also `allowStateChanges`.
+Accepted values:
 
-> Prior to MobX 4, this behavior was enabled by `useStrict(): void`.
-
-```javascript
-configure({ enforceActions: true });
-```
-
-Since MobX 4.2, it is also possible to specify
-
-```javascript
-configure({ enforceActions: "strict" });
-```
-
-In sloppy (`true`) mode, MobX will only throw if an observed observable is modified, in `"strict"` mode it will even throw for non-observed observables
-
+* `"never"` (default): State can be modified from anywhere
+* `"observed"`: All state that is observed _somewhere_ needs to be changed through actions. This is the recommended strictness mode in non-trivial applications.
+* `"always"`: State always needs be updated (which in practice also includes creation) in actions.
 
 #### `isolateGlobalState: boolean`
+
 Isolates the global state of MobX, when there are multiple instances of MobX in the same environment.
 This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX.
 The reactivity inside the library will remain self-contained when you call `configure({isolateGlobalState: true})` inside the library.
-Additionally, MobX won't throw an error that there are multiple instances in the global scope.
+
+Without this options, if multiple MobX instances are active, the internal state will be shared. The benefit is that observables from both instances work together, the downside is that the MobX versions have to match.
 
 ```javascript
 configure({ isolateGlobalState: true });

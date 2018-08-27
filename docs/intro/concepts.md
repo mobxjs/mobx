@@ -34,7 +34,7 @@ An _action_ is any piece of code that changes the _state_. User events, backend 
 An action is like a user that enters a new value in a spreadsheet cell.
 
 Actions can be defined explicitly in MobX to help you to structure code more clearly.
-If MobX is used in *strict mode*, MobX will enforce that no state can be modified outside actions.
+If MobX is used in [*strict mode*](../refguide/api##-enforceactions-), MobX will enforce that no state can be modified outside actions.
 
 ## Principles
 
