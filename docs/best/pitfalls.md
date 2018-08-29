@@ -36,13 +36,13 @@ You can use `isObservableArray(observable)` to check whether something is an obs
 
 _This limitation applies to MobX 4 and lower_
 
-_In MobX 5 this limitation applies to class instances and other objects that were _not_ created using `observable()` / `observable.object()`.
+_In MobX 5 this limitation applies to class instances and other objects that were **not** created using `observable()` / `observable.object()`._
 
 MobX observable _objects_ do not detect or react to property assignments that weren't declared observable before.
 So MobX observable objects act as records with predefined keys.
 You can use `extendObservable(target, props)` to introduce new observable properties to an object.
 However object iterators like `for .. in` or `Object.keys()` won't react to this automatically.
-If you need a dynamically keyed object in MobX 4 and lower, for example to store users by id, create observable _map_s using [`observable.map`](../refguide/map.md) or use the utility methods as exposed by the [Object API](../refguide/object-api.md).
+If you need a dynamically keyed object in MobX 4 and lower, for example to store users by id, create observable _maps_ using [`observable.map`](../refguide/map.md) or use the utility methods as exposed by the [Object API](../refguide/object-api.md).
 For more info see [what will MobX react to?](react.md).
 
 ### Use `@observer` on all components that render `@observable`s.
