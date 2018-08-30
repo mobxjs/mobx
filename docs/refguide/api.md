@@ -114,7 +114,7 @@ The following decorators are available:
 
 * **`observable.deep`**: This is the default decorator, used by any observable. It converts any assigned, non-primitive value into an observable if it isn't one yet.
 * **`observable.ref`**: Disables automatic observable conversion, just creates an observable reference instead.
-* **`observable.shallow`**: Can only be used in combination with collections. Turns any assigned collection into an collection, which is shallowly observable (instead of deep). In other words; the values inside the collection won't become observables automatically.
+* **`observable.shallow`**: Can only be used in combination with collections. Turns any assigned collection into a collection, which is shallowly observable (instead of deep). In other words; the values inside the collection won't become observables automatically.
 * **`computed`**: Creates a derived property, see [`computed`](computed-decorator.md)
 * **`action`**: Creates an action, see [`action`](action.md)
 * **`action.bound`**: Creates a bound action, see [`action`](action.md)
