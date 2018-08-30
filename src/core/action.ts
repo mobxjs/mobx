@@ -104,3 +104,27 @@ export function allowStateChangesStart(allowStateChanges: boolean) {
 export function allowStateChangesEnd(prev: boolean) {
     globalState.allowStateChanges = prev
 }
+
+export function allowStateChangesInsideComputed<T>(
+    allowStateChangesInsideComputed: boolean,
+    func: () => T
+): T {
+    const prev = allowStateChangesInsideComputedStart(allowStateChangesInsideComputed)
+    let res: T
+    try {
+        res = func()
+    } finally {
+        allowStateChangesInsideComputedEnd(prev)
+    }
+    return res
+}
+
+export function allowStateChangesInsideComputedStart(allowStateChangesInsideComputed: boolean) {
+    const prev = globalState.allowStateChangesInsideComputed
+    globalState.allowStateChangesInsideComputed = allowStateChangesInsideComputed
+    return prev
+}
+
+export function allowStateChangesInsideComputedEnd(prev: boolean) {
+    globalState.allowStateChangesInsideComputed = prev
+}

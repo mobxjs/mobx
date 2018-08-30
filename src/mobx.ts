@@ -135,6 +135,7 @@ export {
     getAtom,
     getAdministration as _getAdministration,
     allowStateChanges as _allowStateChanges,
+    allowStateChangesInsideComputed as _allowStateChangesInsideComputed,
     Lambda,
     isArrayLike,
     $mobx,

@@ -72,6 +72,13 @@ export class MobXGlobals {
      * To ensure that those functions stay pure.
      */
     allowStateChanges = true
+
+    /**
+     * Is it allowed to change observables when inside a computed context?
+     * No 99% of the time.
+     */
+    allowStateChangesInsideComputed = false
+
     /**
      * If strict mode is enabled, state changes are by default not allowed
      */
@@ -154,6 +161,7 @@ export function resetGlobalState() {
     for (let key in defaultGlobals)
         if (persistentKeys.indexOf(key) === -1) globalState[key] = defaultGlobals[key]
     globalState.allowStateChanges = !globalState.enforceActions
+    globalState.allowStateChangesInsideComputed = false
 }
 
 declare var window: any
