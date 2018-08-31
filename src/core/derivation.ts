@@ -137,11 +137,7 @@ export function isComputingDerivation() {
 export function checkIfStateModificationsAreAllowed(atom: IAtom) {
     const hasObservers = atom.observers.size > 0
     // Should never be possible to change an observed observable from inside computed, see #798
-    if (
-        !globalState.allowStateChangesInsideComputed &&
-        globalState.computationDepth > 0 &&
-        hasObservers
-    )
+    if (globalState.computationDepth > 0 && hasObservers)
         fail(
             process.env.NODE_ENV !== "production" &&
                 `Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ${
