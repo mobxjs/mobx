@@ -205,7 +205,7 @@ test("should be possible to change observed state in an action called from compu
     })
 
     var testAction = mobx.action(() => {
-        mobx._allowStateChangesInsideComputed(() => {
+        mobx._allowStateChangesInsideComputed(true, () => {
             a.set(3)
         })
     })
