@@ -198,6 +198,29 @@ test("should not be possible to change observed state in an action called from c
     d()
 })
 
+test("should be possible to change observed state in an action called from computed if run inside _allowStateChangesInsideComputed", () => {
+    var a = mobx.observable.box(2)
+    var d = mobx.autorun(() => {
+        a.get()
+    })
+
+    var testAction = mobx.action(() => {
+        mobx._allowStateChangesInsideComputed(() => {
+            a.set(3)
+        })
+    })
+
+    var c = mobx.computed(() => {
+        testAction()
+        return a.get()
+    })
+
+    c.get()
+
+    mobx._resetGlobalState()
+    d()
+})
+
 test("action in autorun should be untracked", () => {
     var a = mobx.observable.box(2)
     var b = mobx.observable.box(3)
