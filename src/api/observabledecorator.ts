@@ -4,7 +4,7 @@ import { IEnhancer } from "../types/modifiers"
 import { createPropDecorator, BabelDescriptor } from "../utils/decorators2"
 
 export type IObservableDecorator = {
-    (target: Object, property: string, descriptor?: PropertyDescriptor): void
+    (target: Object, property: string | symbol, descriptor?: PropertyDescriptor): void
     enhancer: IEnhancer<any>
 }
 
