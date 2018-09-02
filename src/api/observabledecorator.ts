@@ -8,7 +8,7 @@ import {
 } from "../internal"
 
 export type IObservableDecorator = {
-    (target: Object, property: string, descriptor?: PropertyDescriptor): void
+    (target: Object, property: string | symbol, descriptor?: PropertyDescriptor): void
     enhancer: IEnhancer<any>
 }
 

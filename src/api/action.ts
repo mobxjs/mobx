@@ -40,13 +40,13 @@ export interface IActionFactory {
     <T extends Function>(name: string, fn: T): T & IAction
 
     // named decorator
-    (customName: string): (target: Object, key: string, baseDescriptor?: PropertyDescriptor) => void
+    (customName: string): (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor) => void
 
     // unnamed decorator
-    (target: Object, propertyKey: string, descriptor?: PropertyDescriptor): void
+    (target: Object, propertyKey: string | symbol, descriptor?: PropertyDescriptor): void
 
     // @action.bound decorator
-    bound(target: Object, propertyKey: string, descriptor?: PropertyDescriptor): void
+    bound(target: Object, propertyKey: string | symbol, descriptor?: PropertyDescriptor): void
 }
 
 export var action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): any {
