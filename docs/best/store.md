@@ -8,8 +8,6 @@ This section focuses on an unobtrusive way of working with MobX, which works wel
 
 # Stores
 
-Let's start with _stores_.
-In the next sections we will discuss _actions_ and React _components_ as well.
 Stores can be found in any Flux architecture and can be compared a bit with controllers in the MVC pattern.
 The main responsibility of stores is to move _logic_ and _state_ out of your components into a standalone testable unit that can be used in both frontend and backend JavaScript.
 
