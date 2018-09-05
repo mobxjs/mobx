@@ -1,4 +1,4 @@
-import { deepEqual } from "../internal"
+import { deepEqual, shallowEqual } from "../internal"
 
 export interface IEqualsComparer<T> {
     (a: T, b: T): boolean
@@ -12,6 +12,10 @@ function structuralComparer(a: any, b: any): boolean {
     return deepEqual(a, b)
 }
 
+function shallowComparer(a: any, b: any): boolean {
+    return shallowEqual(a, b)
+}
+
 function defaultComparer(a: any, b: any): boolean {
     return Object.is(a, b)
 }
@@ -19,5 +23,6 @@ function defaultComparer(a: any, b: any): boolean {
 export const comparer = {
     identity: identityComparer,
     structural: structuralComparer,
+    shallow: shallowComparer,
     default: defaultComparer
 }

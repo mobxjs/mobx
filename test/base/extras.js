@@ -434,3 +434,17 @@ test("deepEquals should yield correct results for complex objects #1118 - 2", ()
     expect(mobx.comparer.structural(a1, a2)).toBe(true)
     expect(mobx.comparer.structural(a1, a4)).toBe(false)
 })
+
+test("shallow comparer and deep comparer", () => {
+    expect(mobx.comparer.shallow(1, 1)).toBe(true)
+    expect(mobx.comparer.shallow({ a: 1 }, { a: 1 })).toBe(true)
+    expect(mobx.comparer.shallow({ a: {} }, { a: {} })).toBe(false)
+    expect(mobx.comparer.shallow([1, 2], [1, 2])).toBe(true)
+    expect(mobx.comparer.shallow([{}, {}], [{}, {}])).toBe(false)
+
+    expect(mobx.comparer.structural(1, 1)).toBe(true)
+    expect(mobx.comparer.structural({ a: 1 }, { a: 1 })).toBe(true)
+    expect(mobx.comparer.structural({ a: {} }, { a: {} })).toBe(true)
+    expect(mobx.comparer.structural([1, 2], [1, 2])).toBe(true)
+    expect(mobx.comparer.structural([{}, {}], [{}, {}])).toBe(true)
+})
