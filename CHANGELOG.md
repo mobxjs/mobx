@@ -676,6 +676,12 @@ Since this behavior is probably not used outside Mendix, it has been deprecated 
 
 See [#621](https://github.com/mobxjs/mobx/issues/621)
 
+### Using the @action decorator inside individual objects
+
+Don't use the `@action` decorator on an individual object that you pass to `observable()` or `extendObservable()`. If you have code that looks like `observable({ @action f: () => {})`, you should change it to `observable({ f: action(() => {})`.
+
+Whether or not this was ever a good idea is debatable, but it stopped working in this version. If you're using classes, it's a non-issue.
+
 ### Other changes
 
 * **Breaking change:** The arguments to `observe` listeners for computed and boxed observables have changed and are now consistent with the other apis. Instead of invoking the callback with `(newValue: T, oldValue: T)` they are now invoked with a single change object: `(change: {newValue: T, oldValue: T, object, type: "update"})`
