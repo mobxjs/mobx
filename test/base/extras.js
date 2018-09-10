@@ -434,3 +434,75 @@ test("deepEquals should yield correct results for complex objects #1118 - 2", ()
     expect(mobx.comparer.structural(a1, a2)).toBe(true)
     expect(mobx.comparer.structural(a1, a4)).toBe(false)
 })
+
+test("comparer.shallow and comparer.structural", () => {
+    expect(mobx.comparer.shallow(1, 1)).toBe(true)
+    expect(mobx.comparer.shallow({ a: 1 }, { a: 1 })).toBe(true)
+    expect(mobx.comparer.shallow({ a: {} }, { a: {} })).toBe(false)
+    expect(mobx.comparer.shallow([1, 2], [1, 2])).toBe(true)
+    expect(mobx.comparer.shallow([{}, {}], [{}, {}])).toBe(false)
+
+    expect(mobx.comparer.structural(1, 1)).toBe(true)
+    expect(mobx.comparer.structural({ a: 1 }, { a: 1 })).toBe(true)
+    expect(mobx.comparer.structural({ a: {} }, { a: {} })).toBe(true)
+    expect(mobx.comparer.structural([1, 2], [1, 2])).toBe(true)
+    expect(mobx.comparer.structural([{}, {}], [{}, {}])).toBe(true)
+})
+
+test("computed.shallow and computed.struct", () => {
+    class TestClass {
+        @mobx.observable.ref value = { a: 1 }
+        @mobx.computed.shallow
+        get shallow() {
+            return this.value
+        }
+        @mobx.computed.shallow
+        get boxedShallow() {
+            return { value: this.value }
+        }
+        @mobx.computed.struct
+        get struct() {
+            return this.value
+        }
+        @mobx.computed.struct
+        get boxedStruct() {
+            return { value: this.value }
+        }
+    }
+
+    const t = new TestClass()
+
+    const shallowChanges = []
+    const shallowDisposer = mobx.autorun(() => {
+        shallowChanges.push(t.shallow)
+    })
+    const boxedShallowChanges = []
+    const boxedShallowDisposer = mobx.autorun(() => {
+        boxedShallowChanges.push(t.boxedShallow)
+    })
+    const structChanges = []
+    const structDisposer = mobx.autorun(() => {
+        structChanges.push(t.struct)
+    })
+    const boxedStructChanges = []
+    const boxedStructDisposer = mobx.autorun(() => {
+        boxedStructChanges.push(t.boxedStruct)
+    })
+
+    t.value = { a: 1 }
+    t.value = { a: 2 }
+
+    shallowDisposer()
+    boxedShallowDisposer()
+    structDisposer()
+    boxedStructDisposer()
+
+    expect(shallowChanges).toEqual([{ a: 1 }, { a: 2 }])
+    expect(boxedShallowChanges).toEqual([
+        { value: { a: 1 } },
+        { value: { a: 1 } },
+        { value: { a: 2 } }
+    ])
+    expect(structChanges).toEqual([{ a: 1 }, { a: 2 }])
+    expect(boxedStructChanges).toEqual([{ value: { a: 1 } }, { value: { a: 2 } }])
+})
