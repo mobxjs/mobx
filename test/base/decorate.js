@@ -50,7 +50,7 @@ test("decorate should work", function() {
     }
 
     decorate(Box, {
-        uninitialized: observable,
+        uninitialized: observable.ref,
         undeclared: observable,
         height: observable,
         sizes: observable,
@@ -97,6 +97,7 @@ test("decorate should work", function() {
 
 test("decorate should work with plain object", function() {
     const box = {
+        /** @type {boolean | undefined} */
         uninitialized: undefined,
         height: 20,
         sizes: [2],
