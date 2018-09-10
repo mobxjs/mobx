@@ -202,6 +202,30 @@ test("should be possible to change observed state in an action called from compu
     d()
 })
 
+test("should be possible to change observed state in an action called from computed if run inside _allowStateChangesInsideComputed - 2", () => {
+    const a = mobx.observable.box(2)
+    const d = mobx.autorun(() => {
+        a.get()
+    })
+
+    const testAction = mobx.action(() => {
+        a.set(3)
+    })
+
+    const c = mobx.computed(() => {
+        mobx._allowStateChanges(true, () => {
+            testAction()
+        })
+        return a.get()
+    })
+
+    c.get()
+
+    mobx._resetGlobalState()
+    d()
+})
+
+
 test("should not be possible to change observed state in an action called from computed", () => {
     var a = mobx.observable.box(2)
     var d = mobx.autorun(() => {
