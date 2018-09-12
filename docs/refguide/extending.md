@@ -46,7 +46,7 @@ class Clock {
 		if (this.atom.reportObserved()) {
             return this.currentDateTime;
         } else {
-            // apparantly getTime was called but not while a reaction is running.
+            // apparently getTime was called but not while a reaction is running.
             // So, nobody depends on this value, hence the onBecomeObserved handler (startTicking) won't be fired
             // Depending on the nature of your atom
             // it might behave differently in such circumstances
