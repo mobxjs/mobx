@@ -41,12 +41,14 @@ import {observer} from 'mobx-react';
 @observer
 class TimerView extends React.Component {
     render() {
-        return (<button onClick={this.onReset.bind(this)}>
+        return (
+            <button onClick={this.onReset.bind(this)}>
                 Seconds passed: {this.props.appState.timer}
-            </button>);
+            </button>
+        );
     }
 
-    onReset () {
+    onReset() {
         this.props.appState.resetTimer();
     }
 };
