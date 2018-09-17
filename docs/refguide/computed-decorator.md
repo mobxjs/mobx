@@ -33,7 +33,7 @@ Note that `computed` properties are not enumerable. Nor can they be overwritten 
 
 ## `@computed`
 
-If you have [decorators enabled](../best/decorators.md) you can use the `@computed` decorator on any getter of a class property to declaratively created computed properties.
+If you have [decorators enabled](../best/decorators.md) you can use the `@computed` decorator on any getter of a class property to declaratively create computed properties.
 
 ```javascript
 import {observable, computed} from "mobx";
