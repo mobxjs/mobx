@@ -1,3 +1,7 @@
+# 5.1.2 / 4.4.2
+
+* Fixed [#1650](https://github.com/mobxjs/mobx/issues/1650), decorating fields with the name `toString` does not behave correctly.
+
 # 5.1.1 / 4.4.1
 
 * Improved typings of `decorate`, see [#1711](https://github.com/mobxjs/mobx/pull/1711) by [makepost](https://github.com/makepost)
