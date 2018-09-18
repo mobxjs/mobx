@@ -286,8 +286,8 @@ export function defineComputedProperty(
     Object.defineProperty(target, propName, generateComputedPropConfig(propName))
 }
 
-const observablePropertyConfigs = {}
-const computedPropertyConfigs = {}
+const observablePropertyConfigs = Object.create(null)
+const computedPropertyConfigs = Object.create(null)
 
 export function generateObservablePropConfig(propName) {
     return (
