@@ -1,9 +1,9 @@
 # Installation
 
-## Pick your version: MobX 4 or MobX 15
+## Pick your version: MobX 4 or MobX 5
 
 * MobX 4 runs on any ES5 compatible environment, which is basically any javascript engine except IE 8. Due to this wide support of JavaScript engines there are some [caveats](caveats.md)
-* MobX 15 uses `Proxy`. This avoids all of the above caveats, however it means that Microsoft Internet Explorer is not supported (Microsoft Edge is), and React Native for Android only after [upgrading JavaScriptCore](https://github.com/SoftwareMansion/jsc-android-buildscripts)
+* MobX 5 uses `Proxy`. This avoids all of the above caveats, however it means that Microsoft Internet Explorer is not supported (Microsoft Edge is), and React Native for Android only after [upgrading JavaScriptCore](https://github.com/SoftwareMansion/jsc-android-buildscripts)
 
 Please pick the version that matches your project requirements. Downgrading is possible in general, but might require some additional work.
 
