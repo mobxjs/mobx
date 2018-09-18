@@ -707,3 +707,9 @@ test("yest array equals issue", () => {
     const store = new Store()
     expect(store.things).toEqual([])
 })
+
+test("#1650, toString is not treated correctly", () => {
+    const o = { a: "a", toString: "toString" }
+    const oo = mobx.observable(o)
+    expect(oo.toString).toBe("toString")
+})
