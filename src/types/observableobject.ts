@@ -339,8 +339,8 @@ export function asObservableObject(
     return adm
 }
 
-const observablePropertyConfigs = {}
-const computedPropertyConfigs = {}
+const observablePropertyConfigs = Object.create(null);
+const computedPropertyConfigs = Object.create(null);
 
 export function generateObservablePropConfig(propName) {
     return (

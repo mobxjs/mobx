@@ -688,9 +688,7 @@ test("structural collections", () => {
     }).toThrow("observable.struct should not be used with observable values")
 })
 
-test.skip("jest is behaving correctly", () => {
-    // this failing test is fixed here:
-    // https://github.com/facebook/jest/pull/6391
+test("jest is behaving correctly", () => {
     const symbol = Symbol("test")
     const a = []
     const b = []
@@ -702,8 +700,7 @@ test.skip("jest is behaving correctly", () => {
     expect(a).not.toEqual(c)
 })
 
-test.skip("All non-enumerables should be treated equally!", () => {
-    // Bug filed here: https://github.com/facebook/jest/issues/6392
+test("All non-enumerables should be treated equally!", () => {
     const actual1 = {
         x: 3
     }
@@ -725,8 +722,7 @@ test.skip("All non-enumerables should be treated equally!", () => {
     expect(actual2).toEqual({ x: 3 })
 })
 
-test.skip("jest object equals issue - reference", () => {
-    // Skip until https://github.com/facebook/jest/issues/6392 is resolved
+test("jest object equals issue - reference", () => {
     class Store {
         constructor() {
             mobx.extendObservable(this, { x: 3 })
@@ -738,8 +734,7 @@ test.skip("jest object equals issue - reference", () => {
     expect(store).toEqual(new Store())
 })
 
-test.skip("jest object equals issue", () => {
-    // Skip until https://github.com/facebook/jest/issues/6392 is resolved
+test("jest object equals issue", () => {
     class Store {
         @mobx.observable x = 2
 
@@ -752,12 +747,17 @@ test.skip("jest object equals issue", () => {
     expect(store).toEqual(new Store())
 })
 
-test.skip("jest array equals issue", () => {
-    // Skip until https://github.com/facebook/jest/issues/6392 is resolved
+test("jest array equals issue", () => {
     class Store {
         @mobx.observable things = []
     }
 
     const store = new Store()
     expect(store.things).toEqual([])
+})
+
+test("#1650, toString is not treated correctly", () => {
+    const o = { a: "a", toString: "toString" }
+    const oo = mobx.observable(o)
+    expect(oo.toString).toBe("toString")
 })

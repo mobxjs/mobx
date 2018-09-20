@@ -1,4 +1,12 @@
-# 5.1.0
+# 5.1.2 / 4.4.2
+
+* Fixed [#1650](https://github.com/mobxjs/mobx/issues/1650), decorating fields with the name `toString` does not behave correctly.
+
+# 5.1.1 / 4.4.1
+
+* Improved typings of `decorate`, see [#1711](https://github.com/mobxjs/mobx/pull/1711) by [makepost](https://github.com/makepost)
+
+# 5.1.0 / 4.4.0
 
 * Improved handling of multiple MobX instances. MobX will no longer complain about being loaded multiple times (one should still prevent it though, to prevent blowing up bundle size!), but merge internal state by default. If multiple MobX versions need to be loaded, call `configure({ isolateGlobalState: true })`. Note that this means that observables from the different MobX instances won't cooperate. Fixes [#1681](https://github.com/mobxjs/mobx/issues/1681), [#1082](https://github.com/mobxjs/mobx/issues/1082)
 * `enforceActions` options now supports the values: `"never"`, `"observed"` and `"always"` to make the behavior more clear. Fixes [#1680](https://github.com/mobxjs/mobx/issues/1680), [#1473](https://github.com/mobxjs/mobx/issues/1473)
@@ -675,6 +683,12 @@ If you still want to use the old behavior, this can be achieved by running `mobx
 Since this behavior is probably not used outside Mendix, it has been deprecated immediately, so if you rely on this feature, please report in #621, so that it can be undeprecated if there is no more elegant solution.
 
 See [#621](https://github.com/mobxjs/mobx/issues/621)
+
+### Using the @action decorator inside individual objects
+
+Don't use the `@action` decorator on an individual object that you pass to `observable()` or `extendObservable()`. If you have code that looks like `observable({ @action f: () => {})`, you should change it to `observable({ f: action(() => {})`.
+
+Whether or not this was ever a good idea is debatable, but it stopped working in this version. If you're using classes, it's a non-issue.
 
 ### Other changes
 
