@@ -40,14 +40,13 @@
   ],
   "homepage": "https://mobx.js.org/",
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/plugin-proposal-decorators": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
     "@types/jest": "^21.1.9",
     "@types/node": "^7.0.22",
-    "babel-core": "7.0.0-beta.3",
-    "babel-jest": "^22.0.4",
-    "babel-preset-es2015": "7.0.0-beta.3",
-    "babel-preset-react": "7.0.0-beta.3",
-    "babel-preset-stage-1": "7.0.0-beta.3",
-    "babel-plugin-transform-regenerator": "^6.26.0",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^23.6.0",
     "browserify": "^12.0.1",
     "chalk": "^1.1.3",
     "coveralls": "^2.11.4",
@@ -74,7 +73,8 @@
     "typescript": "^2.1.4",
     "uglify-js": "^2.6.1"
   },
-  "dependencies": {},
+  "dependencies": {
+  },
   "keywords": [
     "mobx",
     "mobservable",
