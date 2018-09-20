@@ -41,6 +41,7 @@
   ],
   "homepage": "https://mobx.js.org/",
   "devDependencies": {
+    "@babel/core": "^7.1.0",
     "@babel/plugin-proposal-class-properties": "^7.1.0",
     "@babel/plugin-proposal-decorators": "^7.1.0",
     "@babel/preset-env": "^7.1.0",
@@ -74,8 +75,7 @@
     "typescript": "^2.9.0",
     "uglify-es": "^3.3.9"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "keywords": [
     "mobx",
     "mobservable",
