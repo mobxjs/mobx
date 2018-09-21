@@ -29,7 +29,8 @@
         "lint":
             "tslint -c tslint.json src/*.ts src/types/*.ts src/api/*.ts src/core/*.ts src/utils/*.ts",
         "size": "size-limit --babili 20KB lib/mobx.js",
-        "precommit": "lint-staged"
+        "precommit": "lint-staged",
+        "publish-script": "node scripts/publish.js"
     },
     "repository": {
         "type": "git",
