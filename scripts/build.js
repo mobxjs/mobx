@@ -2,12 +2,23 @@ const rollup = require("rollup")
 const fs = require("fs-extra")
 const path = require("path")
 const ts = require("typescript")
-const exec = require("child_process").execSync
+const shell = require("shelljs")
+const exec = shell.exec
+
+// exit upon first error
+shell.set("-e")
+
+const binFolder = path.resolve("node_modules/.bin/")
+
+function getCmd(cmd) {
+    if (process.platform === "win32") {
+        return path.join(binFolder, cmd + ".cmd")
+    }
+    return cmd
+}
 
 // make sure we're in the right folder
 process.chdir(path.resolve(__dirname, ".."))
-
-const binFolder = path.resolve("node_modules/.bin/")
 
 fs.removeSync("lib")
 fs.removeSync(".build.cjs")
@@ -74,21 +85,32 @@ function generateUmd() {
 }
 
 function generateMinified() {
+    const prodEnv = {
+        ...process.env,
+        NODE_ENV: "production"
+    }
+
     console.log("Generating mobx.min.js and mobx.umd.min.js")
-    exec(`NODE_ENV=production ${binFolder}/envify lib/mobx.js > lib/mobx.prod.js`)
+    exec(`${getCmd(`envify`)} lib/mobx.js > lib/mobx.prod.js`, { env: prodEnv })
     exec(
-        `node_modules/uglify-es/bin/uglifyjs --toplevel -m -c warnings=false --preamble "/** MobX - (c) Michel Weststrate 2015 - 2018 - MIT Licensed */" --source-map -o lib/mobx.min.js lib/mobx.prod.js`
+        `${getCmd(
+            "uglifyjs"
+        )} --toplevel -m -c warnings=false --preamble "/** MobX - (c) Michel Weststrate 2015 - 2018 - MIT Licensed */" --source-map -o lib/mobx.min.js lib/mobx.prod.js`
     )
-    exec(`NODE_ENV=production ${binFolder}/envify lib/mobx.umd.js > lib/mobx.prod.umd.js`)
+    exec(`${getCmd(`envify`)} lib/mobx.umd.js > lib/mobx.prod.umd.js`, {
+        env: prodEnv
+    })
     exec(
-        `node_modules/uglify-es/bin/uglifyjs --toplevel -m -c warnings=false --preamble "/** MobX - (c) Michel Weststrate 2015 - 2018 - MIT Licensed */" --source-map -o lib/mobx.umd.min.js lib/mobx.prod.umd.js`
+        `${getCmd(
+            `uglifyjs`
+        )} --toplevel -m -c warnings=false --preamble "/** MobX - (c) Michel Weststrate 2015 - 2018 - MIT Licensed */" --source-map -o lib/mobx.umd.min.js lib/mobx.prod.umd.js`
     )
-    exec(`rm lib/mobx.prod.js lib/mobx.prod.umd.js`)
+    shell.rm("lib/mobx.prod.js", "lib/mobx.prod.umd.js")
 }
 
 function copyFlowDefinitions() {
     console.log("Copying flowtype definitions")
-    exec(`${binFolder}/ncp flow-typed/mobx.js lib/mobx.js.flow`)
+    exec(`${getCmd(`ncp`)} flow-typed/mobx.js lib/mobx.js.flow`)
 }
 
 function build() {
