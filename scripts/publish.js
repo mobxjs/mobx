@@ -75,6 +75,7 @@ async function main() {
         run("git push")
         run("git push --tags")
         console.log("Published!")
+        exit(0)
     } else {
         exit(1, pkg.name + " is not an existing npm package")
     }
