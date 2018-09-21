@@ -217,8 +217,8 @@ test("toJS handles dates", () => {
     })
 
     var b = mobx.toJS(a)
-    expect(b.d instanceof Date).toBe(true)
-    expect(a.d === b.d).toBe(true)
+    expect(b.d).toBeInstanceOf(Date)
+    expect(a.d).toEqual(b.d)
 })
 
 test("json cycles", function() {
@@ -298,9 +298,9 @@ test("verify #566 solution", () => {
     const b = mobx.observable({ x: 3 })
     const c = mobx.observable({ a: a, b: b })
 
-    expect(mobx.toJS(c).a === a).toBeTruthy() // true
-    expect(mobx.toJS(c).b !== b).toBeTruthy() // false, cloned
-    expect(mobx.toJS(c).b.x === b.x).toBeTruthy() // true, both 3
+    expect(mobx.toJS(c).a).toBe(a)
+    expect(mobx.toJS(c).b).toEqual(mobx.toJS(c.b))
+    expect(mobx.toJS(c).b.x).toEqual(b.x)
 })
 
 test("verify already seen", () => {
@@ -340,4 +340,44 @@ test("json cycles when exporting maps as maps", function() {
     expect(cloneD.get("d")).toBe(cloneD)
     expect(cloneD.get("c")).toBe(cloneC)
     expect(cloneA.e).toBe(cloneA)
+})
+
+describe("recurseEverything set to true", function() {
+    test("prototype chain will be removed even if the object is not observable", function() {
+        function Person() {
+            this.firstname = "michel"
+            this.lastname = "weststrate"
+        }
+        const p = new Person()
+
+        expect(mobx.toJS(p)).toBeInstanceOf(Person)
+        expect(mobx.toJS(p, { recurseEverything: true })).not.toBeInstanceOf(Person)
+        expect(mobx.toJS(p)).toEqual({ firstname: "michel", lastname: "weststrate" })
+        expect(mobx.toJS(p)).toEqual(mobx.toJS(p, { recurseEverything: true }))
+    })
+
+    test("properties on prototype should be flattened to plain object", function() {
+        const observableValue = mobx.observable.box("b")
+        const Base = function() {
+            this.a = "a"
+        }
+        const derived = Object.create(new Base(), {
+            b: { value: observableValue, enumerable: true }
+        })
+
+        const simpleCopy = mobx.toJS(derived)
+        const deepCopy = mobx.toJS(derived, { recurseEverything: true })
+        expect(simpleCopy).toBeInstanceOf(Base)
+        expect(simpleCopy).toEqual({ b: observableValue })
+        expect(simpleCopy.hasOwnProperty("a")).toBeFalsy()
+
+        expect(deepCopy).not.toBeInstanceOf(Base)
+        expect(deepCopy).toEqual({ a: "a", b: "b" })
+        expect(deepCopy.hasOwnProperty("a")).toBeTruthy()
+    })
+
+    test("Date type should not be converted", function() {
+        const date = new Date()
+        expect(mobx.toJS(mobx.observable.box(date), { recurseEverything: true })).toBe(date)
+    })
 })
