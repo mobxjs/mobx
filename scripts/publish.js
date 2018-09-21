@@ -26,7 +26,10 @@ function exit(code, msg) {
 
 async function prompt(question, defaultValue) {
     return new Promise(resolve => {
-        rl.question(`${question} [${defaultValue}]: `, resolve)
+        rl.question(`${question} [${defaultValue}]: `, answer => {
+            answer = answer && answer.trim()
+            resolve(answer ? answer : defaultValue)
+        })
     })
 }
 
