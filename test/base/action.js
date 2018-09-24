@@ -182,6 +182,10 @@ test("should be possible to change observed state in an action called from compu
     const testAction = mobx.action(() => {
         mobx._allowStateChangesInsideComputed(() => {
             a.set(3)
+            // a second level computed should throw
+            expect(() => c2.get()).toThrowError(
+                /Computed values are not allowed to cause side effects by changing observables that are already being observed/
+            )
         })
         expect(a.get()).toBe(3)
         expect(() => {
@@ -193,6 +197,11 @@ test("should be possible to change observed state in an action called from compu
 
     const c = mobx.computed(() => {
         testAction()
+        return a.get()
+    })
+
+    const c2 = mobx.computed(() => {
+        a.set(6)
         return a.get()
     })
 
