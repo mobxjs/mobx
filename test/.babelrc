@@ -2,6 +2,6 @@
     "presets": ["@babel/preset-env"],
     "plugins": [
         ["@babel/plugin-proposal-decorators", { "legacy": false, "decoratorsBeforeExport": true }],
-        ["@babel/plugin-proposal-class-properties", { "loose": false }]
+        ["@babel/plugin-proposal-class-properties", { "loose": true }]
     ]
 }
