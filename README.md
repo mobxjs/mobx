@@ -100,7 +100,7 @@ But, unlike spreadsheets, these values can be not only primitive values, but als
 If your environment doesn't support decorator syntax, don't worry.
 You can read [here](http://mobxjs.github.io/mobx/best/decorators.html) about how to set them up.
 Or you can skip them altoghether, as MobX can be used fine without decorator _syntax_, by leveraging the _decorate_ utility.
-Many MobX users prefer the slightly more concise decorator syntax, though.
+Many MobX users prefer the slightly more concise decorator syntax.
 
 ```javascript
 import { decorate, observable } from "mobx"
@@ -236,7 +236,7 @@ Use them to your advantage; they will help you to structure your code better and
 
 ## MobX: Simple and scalable
 
-MobX is a simple, very scaleable and obtrusive state management library.
+MobX is a simple, very scaleable and unobtrusive state management library.
 
 ### Using classes and real references
 
@@ -246,7 +246,7 @@ With MobX you don't need to normalize your data. This makes the library very sui
 
 Since data doesn't need to be normalized and MobX automatically tracks the relations between state and derivations, you get referential integrity for free.
 
-Rendering something that is accessed through three levels of indirection? No problem. MobX will track them and re-render whenever one of the references changes. As a result, staleness bugs are avoided. As a programmer, you might forget that changing some data might influence a seemingly unrelated component, but MobX won't forget.
+Rendering something that is accessed through three levels of indirection? No problem. MobX will track them and re-render whenever one of the references changes. As a result, staleness bugs are eliminated. As a programmer, you might forget that changing some data might influence a seemingly unrelated component, but MobX won't forget.
 
 ### Simpler actions are easier to maintain
 
