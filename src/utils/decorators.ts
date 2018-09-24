@@ -26,15 +26,6 @@ type DecoratorInvocationDescription = {
     decoratorArguments: any[]
 }
 
-export type Stage2Decorator = {
-    kind: "field" | "method" | "class"
-    key: string
-    placement: "static" | "prototype" | "own"
-    descriptor: PropertyDescriptor
-    initializer?: () => any
-    finisher?: (klass) => void
-}
-
 const enumerableDescriptorCache: { [prop: string]: PropertyDescriptor } = {}
 const nonEnumerableDescriptorCache: { [prop: string]: PropertyDescriptor } = {}
 
@@ -88,40 +79,6 @@ export function createPropDecorator(
             // This is a special parameter to signal the direct application of a decorator, allow extendObservable to skip the entire type decoration part,
             // as the instance to apply the decorator to equals the target
         ) {
-            if (quacksLikeAStage2Decorator(arguments)) {
-                const stage2decorator = target as Stage2Decorator
-                const { key, descriptor, initializer } = stage2decorator
-                return {
-                    kind: "method",
-                    placement: propertyInitiallyEnumerable ? "own" : "prototype",
-                    key,
-                    descriptor: {
-                        enumerable: propertyInitiallyEnumerable,
-                        configurable: true,
-                        get() {
-                            propertyCreator(
-                                this,
-                                key,
-                                { ...descriptor, initializer },
-                                this,
-                                decoratorArguments
-                            )
-                            return this[key]
-                        },
-                        set(v) {
-                            propertyCreator(
-                                this,
-                                key,
-                                { ...descriptor, initializer },
-                                this,
-                                decoratorArguments
-                            )
-                            this[key] = v
-                        }
-                    }
-                }
-            }
-
             if (applyImmediately === true) {
                 propertyCreator(target, prop, descriptor, target, decoratorArguments)
                 return null
@@ -142,7 +99,7 @@ export function createPropDecorator(
             return createPropertyInitializerDescriptor(prop, propertyInitiallyEnumerable)
         }
 
-        if (quacksLikeADecorator(arguments) || quacksLikeAStage2Decorator(arguments)) {
+        if (quacksLikeADecorator(arguments)) {
             // @decorator
             decoratorArguments = EMPTY_ARRAY
             return decorator.apply(null, arguments)
@@ -159,8 +116,4 @@ export function quacksLikeADecorator(args: IArguments): boolean {
         ((args.length === 2 || args.length === 3) && typeof args[1] === "string") ||
         (args.length === 4 && args[3] === true)
     )
-}
-
-export function quacksLikeAStage2Decorator(args: IArguments): boolean {
-    return args.length === 1 && args[0] && (args[0].kind === "field" || args[0].kind === "method")
 }
