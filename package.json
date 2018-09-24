@@ -13,21 +13,16 @@
         "test": "jest",
         "watch": "jest --watch",
         "test:mixed-versions": "jest --testRegex mixed-versions",
-        "test:all":
-            "yarn small-build && yarn jest -i && yarn test:flow && yarn test:mixed-versions",
+        "test:all": "yarn small-build && yarn jest -i && yarn test:flow && yarn test:mixed-versions",
         "test:webpack": "node scripts/webpack-regression-tests.js",
         "test:flow": "node_modules/.bin/flow check",
-        "test:performance":
-            "npm run small-build && PERSIST=true time node --expose-gc test/perf/index.js",
-        "test:travis":
-            "yarn test:all && yarn test:performance && yarn test -i --coverage && yarn test:webpack && yarn size",
-        "prettier":
-            "prettier --write --print-width 100 --tab-width 4 --no-semi \"**/*.js\" \"**/*.jsx\" \"**/*.tsx\" \"**/*.ts\"",
+        "test:performance": "npm run small-build && PERSIST=true time node --expose-gc test/perf/index.js",
+        "test:travis": "yarn test:all && yarn test:performance && yarn test -i --coverage && yarn test:webpack && yarn size",
+        "prettier": "prettier --write --print-width 100 --tab-width 4 --no-semi \"**/*.js\" \"**/*.jsx\" \"**/*.tsx\" \"**/*.ts\"",
         "_prepublish": "npm run small-build",
         "quick-build": "tsc --pretty",
         "small-build": "node scripts/build.js",
-        "lint":
-            "tslint -c tslint.json src/*.ts src/types/*.ts src/api/*.ts src/core/*.ts src/utils/*.ts",
+        "lint": "tslint -c tslint.json src/*.ts src/types/*.ts src/api/*.ts src/core/*.ts src/utils/*.ts",
         "size": "size-limit --babili 20KB lib/mobx.js",
         "precommit": "lint-staged",
         "publish-script": "node scripts/publish.js"
@@ -41,7 +36,10 @@
     "bugs": {
         "url": "https://github.com/mobxjs/mobx/issues"
     },
-    "files": ["lib", "LICENSE"],
+    "files": [
+        "lib",
+        "LICENSE"
+    ],
     "homepage": "https://mobx.js.org/",
     "devDependencies": {
         "@types/jest": "^21.1.9",
@@ -105,8 +103,19 @@
             "^.+\\.jsx?$": "babel-jest"
         },
         "testRegex": "test/base/.*\\.(t|j)sx?$",
-        "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json"],
-        "testPathIgnorePatterns": ["/node_modules/", "/\\./"],
-        "watchPathIgnorePatterns": ["<rootDir>/node_modules/"]
+        "moduleFileExtensions": [
+            "ts",
+            "tsx",
+            "js",
+            "jsx",
+            "json"
+        ],
+        "testPathIgnorePatterns": [
+            "/node_modules/",
+            "/\\./"
+        ],
+        "watchPathIgnorePatterns": [
+            "<rootDir>/node_modules/"
+        ]
     }
 }
