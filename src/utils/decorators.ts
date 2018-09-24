@@ -93,7 +93,7 @@ export function createPropDecorator(
                 const { key, descriptor, initializer } = stage2decorator
                 return {
                     kind: "method",
-                    placement: propertyInitiallyEnumerable ? "own" : "prototype", // Ideally, we want to use prototype here, but that get's to hairy...
+                    placement: propertyInitiallyEnumerable ? "own" : "prototype",
                     key,
                     descriptor: {
                         enumerable: propertyInitiallyEnumerable,

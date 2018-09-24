@@ -18,12 +18,9 @@ import * as mobx from "../../src/mobx.ts"
 
 test("babel", function() {
     class Box {
-        @observable
-        uninitialized
-        @observable
-        height = 20
-        @observable
-        sizes = [2]
+        @observable uninitialized
+        @observable height = 20
+        @observable sizes = [2]
         @observable
         someFunc = function() {
             return 2
@@ -77,10 +74,8 @@ test("should not be possible to use @action with getters", () => {
 
 test("babel: parameterized computed decorator", () => {
     class TestClass {
-        @observable
-        x = 3
-        @observable
-        y = 3
+        @observable x = 3
+        @observable y = 3
         @computed.struct
         get boxedSum() {
             return { sum: Math.round(this.x) + Math.round(this.y) }
@@ -109,8 +104,7 @@ test("babel: parameterized computed decorator", () => {
 
 test("computed value should be the same around changing which was considered equivalent", () => {
     class TestClass {
-        @observable
-        c = null
+        @observable c = null
         defaultCollection = []
         @computed.struct
         get collection() {
@@ -132,14 +126,10 @@ test("computed value should be the same around changing which was considered equ
 })
 
 class Order {
-    @observable
-    price = 3
-    @observable
-    amount = 2
-    @observable
-    orders = []
-    @observable
-    aFunction = function(a) {}
+    @observable price = 3
+    @observable amount = 2
+    @observable orders = []
+    @observable aFunction = function(a) {}
 
     @computed
     get total() {
@@ -183,10 +173,8 @@ test("decorators", function() {
 
 test("issue 191 - shared initializers (babel)", function() {
     class Test {
-        @observable
-        obj = { a: 1 }
-        @observable
-        array = [2]
+        @observable obj = { a: 1 }
+        @observable array = [2]
     }
 
     var t1 = new Test()
@@ -211,10 +199,8 @@ test("705 - setter undoing caching (babel)", () => {
     let autoruns = 0
 
     class Person {
-        @observable
-        name
-        @observable
-        title
+        @observable name
+        @observable title
         set fullName(val) {
             // Noop
         }
@@ -431,8 +417,7 @@ test("267 (babel) should be possible to declare properties observable outside st
     configure({ enforceActions: true })
 
     class Store {
-        @observable
-        timer
+        @observable timer
     }
 
     configure({ enforceActions: false })
@@ -440,8 +425,7 @@ test("267 (babel) should be possible to declare properties observable outside st
 
 test("288 atom not detected for object property", () => {
     class Store {
-        @mobx.observable
-        foo = ""
+        @mobx.observable foo = ""
     }
 
     const store = new Store()
@@ -462,12 +446,9 @@ test.skip("observable performance", () => {
     const AMOUNT = 100000
 
     class A {
-        @observable
-        a = 1
-        @observable
-        b = 2
-        @observable
-        c = 3
+        @observable a = 1
+        @observable b = 2
+        @observable c = 3
         @computed
         get d() {
             return this.a + this.b + this.c
@@ -501,8 +482,7 @@ test("unbound methods", () => {
         m1() {}
 
         // per instance
-        @action
-        m2 = () => {}
+        @action m2 = () => {}
     }
 
     const a1 = new A()
@@ -518,13 +498,11 @@ test("unbound methods", () => {
 
 test("inheritance", () => {
     class A {
-        @observable
-        a = 2
+        @observable a = 2
     }
 
     class B extends A {
-        @observable
-        b = 3
+        @observable b = 3
         @computed
         get c() {
             return this.a + this.b
@@ -546,15 +524,12 @@ test("inheritance", () => {
 
 test("inheritance overrides observable", () => {
     class A {
-        @observable
-        a = 2
+        @observable a = 2
     }
 
     class B {
-        @observable
-        a = 5
-        @observable
-        b = 3
+        @observable a = 5
+        @observable b = 3
         @computed
         get c() {
             return this.a + this.b
@@ -576,10 +551,8 @@ test("inheritance overrides observable", () => {
 
 test("reusing initializers", () => {
     class A {
-        @observable
-        a = 3
-        @observable
-        b = this.a + 2
+        @observable a = 3
+        @observable b = this.a + 2
         @computed
         get c() {
             return this.a + this.b
@@ -600,18 +573,15 @@ test("reusing initializers", () => {
 
 test("enumerability", () => {
     class A {
-        @observable
-        a = 1 // enumerable, on proto
-        @observable
-        a2 = 2
+        @observable a = 1 // enumerable, on proto
+        @observable a2 = 2
         @computed
         get b() {
             return this.a
         } // non-enumerable, on proto
         @action
         m() {} // non-enumerable, on proto
-        @action
-        m2 = () => {} // non-enumerable, on self
+        @action m2 = () => {} // non-enumerable, on self
     }
 
     const a = new A()
@@ -658,18 +628,15 @@ test("enumerability", () => {
 
 test("enumerability - workaround", () => {
     class A {
-        @observable
-        a = 1 // enumerable, on proto
-        @observable
-        a2 = 2
+        @observable a = 1 // enumerable, on proto
+        @observable a2 = 2
         @computed
         get b() {
             return this.a
         } // non-enumerable, on proto
         @action
         m() {} // non-enumerable, on proto
-        @action
-        m2 = () => {} // non-enumerable, on self
+        @action m2 = () => {} // non-enumerable, on self
 
         constructor() {
             this.a = 1
@@ -709,8 +676,7 @@ test.skip("Babel bug", () => {
     }
     class Todo2 {
         id = 1
-        @dec
-        x
+        @dec x
     }
 
     const t1 = new Todo1()
@@ -725,12 +691,9 @@ test("issue 285 (babel)", () => {
 
     class Todo {
         id = 1
-        @observable
-        title
-        @observable
-        finished = false
-        @observable
-        childThings = [1, 2, 3]
+        @observable title
+        @observable finished = false
+        @observable childThings = [1, 2, 3]
         constructor(title) {
             this.title = title
         }
@@ -751,8 +714,7 @@ test("issue 285 (babel)", () => {
 
 test("verify object assign (babel)", () => {
     class Todo {
-        @observable
-        title = "test"
+        @observable title = "test"
         @computed
         get upperCase() {
             return this.title.toUpperCase()
@@ -844,8 +806,7 @@ test("379, inheritable actions - 2 (babel)", () => {
 test("505, don't throw when accessing subclass fields in super constructor (babel)", () => {
     const values = {}
     class A {
-        @observable
-        a = 1
+        @observable a = 1
         constructor() {
             values.b = this.b
             values.a = this.a
@@ -853,8 +814,7 @@ test("505, don't throw when accessing subclass fields in super constructor (babe
     }
 
     class B extends A {
-        @observable
-        b = 2
+        @observable b = 2
     }
 
     new B()
@@ -863,8 +823,7 @@ test("505, don't throw when accessing subclass fields in super constructor (babe
 
 test("computed setter should succeed (babel)", function() {
     class Bla {
-        @observable
-        a = 3
+        @observable a = 3
         @computed
         get propX() {
             return this.a * 2
@@ -902,8 +861,7 @@ test("computed getter / setter for plan objects should succeed (babel)", functio
 
 test("issue #701", () => {
     class Model {
-        @observable
-        a = 5
+        @observable a = 5
     }
 
     const model = new Model()
@@ -915,8 +873,7 @@ test("issue #701", () => {
 
 test("@observable.ref (Babel)", () => {
     class A {
-        @observable.ref
-        ref = { a: 3 }
+        @observable.ref ref = { a: 3 }
     }
 
     const a = new A()
@@ -927,8 +884,7 @@ test("@observable.ref (Babel)", () => {
 
 test("@observable.shallow (Babel)", () => {
     class A {
-        @observable.shallow
-        arr = [{ todo: 1 }]
+        @observable.shallow arr = [{ todo: 1 }]
     }
 
     const a = new A()
@@ -943,8 +899,7 @@ test("@observable.shallow (Babel)", () => {
 
 test("@observable.deep (Babel)", () => {
     class A {
-        @observable.deep
-        arr = [{ todo: 1 }]
+        @observable.deep arr = [{ todo: 1 }]
     }
 
     const a = new A()
@@ -961,8 +916,7 @@ test("@observable.deep (Babel)", () => {
 
 test("action.bound binds (Babel)", () => {
     class A {
-        @observable
-        x = 0
+        @observable x = 0
         @action.bound
         inc(value) {
             this.x += value
@@ -984,10 +938,8 @@ test("@computed.equals (Babel)", () => {
             this.minute = minute
         }
 
-        @observable
-        hour
-        @observable
-        minute
+        @observable hour
+        @observable minute
 
         @computed({ equals: sameTime })
         get time() {
@@ -1136,12 +1088,10 @@ test("actions are reassignable", () => {
     class A {
         @action
         m1() {}
-        @action
-        m2 = () => {}
+        @action m2 = () => {}
         @action.bound
         m3() {}
-        @action.bound
-        m4 = () => {}
+        @action.bound m4 = () => {}
     }
 
     const a = new A()
@@ -1165,8 +1115,7 @@ test("it should support asyncAction (babel)", async () => {
     mobx.configure({ enforceActions: true })
 
     class X {
-        @observable
-        a = 1
+        @observable a = 1
 
         f = mobx.flow(function* f(initial) {
             this.a = initial // this runs in action
@@ -1197,10 +1146,8 @@ test("toJS bug #1413 (babel)", () => {
 
 test("computed setter problem", () => {
     class Contact {
-        @observable
-        firstName = ""
-        @observable
-        lastName = ""
+        @observable firstName = ""
+        @observable lastName = ""
 
         @computed({
             set(value) {
@@ -1236,10 +1183,8 @@ test("computed setter problem", () => {
 
 test("computed setter problem - 2", () => {
     class Contact {
-        @observable
-        firstName = ""
-        @observable
-        lastName = ""
+        @observable firstName = ""
+        @observable lastName = ""
 
         get fullName() {
             return `${this.firstName} ${this.lastName}`
