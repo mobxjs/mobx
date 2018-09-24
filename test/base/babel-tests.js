@@ -598,7 +598,7 @@ test("reusing initializers", () => {
     expect(values).toEqual([9, 10])
 })
 
-test.skip("enumerability", () => {
+test("enumerability", () => {
     class A {
         @observable
         a = 1 // enumerable, on proto
@@ -644,22 +644,19 @@ test.skip("enumerability", () => {
     props = []
     for (var key in a) props.push(key)
 
-    expect(ownProps).toEqual([
-        "a"
-        // "a2" ideally should include a2 as well
-    ])
+    expect(ownProps).toEqual(["a", "a2"])
 
     expect(props).toEqual(["a", "a2"])
 
     expect("a" in a).toBe(true)
     expect(a.hasOwnProperty("a")).toBe(true)
-    expect(a.hasOwnProperty("a2")).toBe(false) // ideally, true, but never accessed...
+    expect(a.hasOwnProperty("a2")).toBe(true)
     expect(a.hasOwnProperty("b")).toBe(true) // ideally, false. see: #1398
     expect(a.hasOwnProperty("m")).toBe(false)
     expect(a.hasOwnProperty("m2")).toBe(true)
 })
 
-test.skip("enumerability - workaround", () => {
+test("enumerability - workaround", () => {
     class A {
         @observable
         a = 1 // enumerable, on proto
@@ -696,7 +693,7 @@ test.skip("enumerability - workaround", () => {
     expect("a" in a).toBe(true)
     expect(a.hasOwnProperty("a")).toBe(true)
     expect(a.hasOwnProperty("a2")).toBe(true)
-    expect(a.hasOwnProperty("b")).toBe(false) // true would also be ok-ish. see: #1398
+    expect(a.hasOwnProperty("b")).toBe(true) // ideally false would also be ok-ish. see: #1398
     expect(a.hasOwnProperty("m")).toBe(false)
     expect(a.hasOwnProperty("m2")).toBe(true)
 })
