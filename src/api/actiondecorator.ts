@@ -4,7 +4,9 @@ import {
     addHiddenProp,
     createAction,
     defineBoundAction,
-    fail
+    fail,
+    quacksLikeAStage2Decorator,
+    Stage2Decorator
 } from "../internal"
 
 function dontReassignFields() {
@@ -13,6 +15,32 @@ function dontReassignFields() {
 
 export function namedActionDecorator(name: string) {
     return function(target, prop, descriptor: BabelDescriptor) {
+        if (quacksLikeAStage2Decorator(arguments)) {
+            const decorator = target as Stage2Decorator
+            // @action.bound method() {}
+            if (decorator.kind === "method") {
+                const { descriptor } = decorator
+                if (process.env.NODE_ENV !== "production" && descriptor.get !== undefined) {
+                    return fail("@action cannot be used with getters")
+                }
+                return {
+                    ...decorator,
+                    descriptor: {
+                        ...descriptor,
+                        value: createAction(name, descriptor.value)
+                    }
+                }
+            } else {
+                // @action.bound method = () => {}
+                // kind = field
+                return {
+                    ...decorator,
+                    initializer() {
+                        return createAction(name, decorator.initializer.call(this))
+                    }
+                }
+            }
+        }
         if (descriptor) {
             if (process.env.NODE_ENV !== "production" && descriptor.get !== undefined) {
                 return fail("@action cannot be used with getters")
@@ -65,6 +93,26 @@ export function boundActionDecorator(target, propertyName, descriptor, applyToIn
     if (applyToInstance === true) {
         defineBoundAction(target, propertyName, descriptor.value)
         return null
+    }
+    if (quacksLikeAStage2Decorator(arguments)) {
+        // @action.bound method() and // @action.bound method = () => {}
+        const decorator = target as Stage2Decorator
+        return {
+            kind: "field",
+            placement: "own",
+            key: decorator.key,
+            descriptor: {
+                configurable: true,
+                enumerable: false,
+                writable: true
+            },
+            initializer() {
+                const fn = decorator.initializer
+                    ? decorator.initializer.call(this)
+                    : decorator.descriptor.value
+                return createAction(decorator.key, fn.bind(this))
+            }
+        }
     }
     if (descriptor) {
         // if (descriptor.value)

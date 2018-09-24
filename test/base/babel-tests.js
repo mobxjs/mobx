@@ -587,11 +587,7 @@ test("enumerability", () => {
     let props = []
     for (var key in a) props.push(key)
 
-    expect(ownProps).toEqual(
-        [
-            // should have a, not supported yet in babel...
-        ]
-    )
+    expect(ownProps).toEqual(["a", "a2"])
 
     expect(props).toEqual(["a", "a2"])
 
@@ -701,11 +697,9 @@ test("verify object assign (babel)", () => {
     }
 
     const todo = new Todo()
-    expect(Object.assign({}, todo)).toEqual(
-        {
-            //		Should be:	title: "test"!
-        }
-    )
+    expect(Object.assign({}, todo)).toEqual({
+        title: "test"
+    })
 
     todo.title // lazy initialization :'(
 
@@ -799,7 +793,7 @@ test("505, don't throw when accessing subclass fields in super constructor (babe
     }
 
     new B()
-    expect(values).toEqual({ a: 1, b: 2 }) // In the TS test b is undefined, which is actually the expected behavior?
+    expect(values).toEqual({ a: 1, b: undefined })
 })
 
 test("computed setter should succeed (babel)", function() {

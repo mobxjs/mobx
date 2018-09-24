@@ -4,7 +4,8 @@ import {
     asObservableObject,
     createPropDecorator,
     fail,
-    invariant
+    invariant,
+    quacksLikeAStage2Decorator
 } from "../internal"
 
 export type IObservableDecorator = {
@@ -43,7 +44,7 @@ export function createDecoratorForEnhancer(enhancer: IEnhancer<any>): IObservabl
             ? function observableDecorator() {
                   // This wrapper function is just to detect illegal decorator invocations, deprecate in a next version
                   // and simply return the created prop decorator
-                  if (arguments.length < 2)
+                  if (arguments.length < 2 && !quacksLikeAStage2Decorator(arguments))
                       return fail(
                           "Incorrect decorator invocation. @observable decorator doesn't expect any arguments"
                       )

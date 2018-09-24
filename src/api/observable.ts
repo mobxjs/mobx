@@ -20,7 +20,8 @@ import {
     referenceEnhancer,
     shallowEnhancer,
     getDefaultDecoratorFromObjectOptions,
-    extendObservableObjectWithProperties
+    extendObservableObjectWithProperties,
+    quacksLikeAStage2Decorator
 } from "../internal"
 
 export type CreateObservableOptions = {
@@ -74,7 +75,7 @@ function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any
  */
 function createObservable(v: any, arg2?: any, arg3?: any) {
     // @observable someProp;
-    if (typeof arguments[1] === "string") {
+    if (typeof arguments[1] === "string" || quacksLikeAStage2Decorator(arguments)) {
         return deepDecorator.apply(null, arguments)
     }
 

@@ -5,7 +5,8 @@ import {
     asObservableObject,
     comparer,
     createPropDecorator,
-    invariant
+    invariant,
+    quacksLikeAStage2Decorator
 } from "../internal"
 
 export interface IComputed {
@@ -45,7 +46,7 @@ const computedStructDecorator = computedDecorator({ equals: comparer.structural 
  * For legacy purposes also invokable as ES5 observable created: `computed(() => expr)`;
  */
 export var computed: IComputed = function computed(arg1, arg2, arg3) {
-    if (typeof arg2 === "string") {
+    if (typeof arg2 === "string" || quacksLikeAStage2Decorator(arguments)) {
         // @computed
         return computedDecorator.apply(null, arguments)
     }
