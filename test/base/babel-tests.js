@@ -627,7 +627,7 @@ test("enumerability", () => {
 
     expect("a" in a).toBe(true)
     expect(a.hasOwnProperty("a")).toBe(true)
-    expect(a.hasOwnProperty("b")).toBe(true) // ideally false
+    expect(a.hasOwnProperty("b")).toBe(false) // ideally false
     expect(a.hasOwnProperty("m")).toBe(false)
     expect(a.hasOwnProperty("m2")).toBe(true)
 
@@ -693,7 +693,7 @@ test("enumerability - workaround", () => {
     expect("a" in a).toBe(true)
     expect(a.hasOwnProperty("a")).toBe(true)
     expect(a.hasOwnProperty("a2")).toBe(true)
-    expect(a.hasOwnProperty("b")).toBe(true) // ideally false would also be ok-ish. see: #1398
+    expect(a.hasOwnProperty("b")).toBe(false) // ideally false, true would also be ok-ish. see: #1398
     expect(a.hasOwnProperty("m")).toBe(false)
     expect(a.hasOwnProperty("m2")).toBe(true)
 })

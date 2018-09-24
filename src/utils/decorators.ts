@@ -90,33 +90,29 @@ export function createPropDecorator(
         ) {
             if (quacksLikeAStage2Decorator(arguments)) {
                 const stage2decorator = target as Stage2Decorator
-                const key = stage2decorator.key
+                const { key, descriptor, initializer } = stage2decorator
                 return {
                     kind: "method",
-                    placement: "own",
+                    placement: propertyInitiallyEnumerable ? "own" : "prototype", // Ideally, we want to use prototype here, but that get's to hairy...
                     key,
                     descriptor: {
                         enumerable: propertyInitiallyEnumerable,
                         configurable: true,
                         get() {
-                            // TODO: initializeInstance(this)
                             propertyCreator(
                                 this,
                                 key,
-                                stage2decorator.descriptor,
+                                { ...descriptor, initializer },
                                 this,
                                 decoratorArguments
                             )
-                            if (stage2decorator.initializer)
-                                this[key] = stage2decorator.initializer.call(this)
                             return this[key]
                         },
                         set(v) {
-                            // TODO: initializeInstance(this)
                             propertyCreator(
                                 this,
                                 key,
-                                stage2decorator.descriptor,
+                                { ...descriptor, initializer },
                                 this,
                                 decoratorArguments
                             )
