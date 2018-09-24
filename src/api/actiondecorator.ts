@@ -25,6 +25,7 @@ export function namedActionDecorator(name: string) {
                 }
                 return {
                     ...decorator,
+                    placement: "prototype",
                     descriptor: {
                         ...descriptor,
                         value: createAction(name, descriptor.value)
