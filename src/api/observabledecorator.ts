@@ -5,9 +5,9 @@ import {
     createPropDecorator,
     fail,
     invariant,
-    quacksLikeAStage2Decorator
+    quacksLikeAStage2Decorator,
+    Stage2Decorator
 } from "../internal"
-import { Stage2Decorator } from "../utils/decorators"
 
 export type IObservableDecorator = {
     (target: Object, property: string | symbol, descriptor?: PropertyDescriptor): void
@@ -43,12 +43,7 @@ export function createDecoratorForEnhancer(enhancer: IEnhancer<any>): IObservabl
         if (quacksLikeAStage2Decorator(arguments)) {
             return stage2ObservableDecorator(enhancer, arguments[0])
         }
-        // Extra process checks, as this happens during module initialization
-        if (
-            process.env.NODE_ENV !== "production" &&
-            arguments.length < 2 &&
-            !quacksLikeAStage2Decorator(arguments)
-        )
+        if (process.env.NODE_ENV !== "production" && arguments.length < 2)
             return fail(
                 "Incorrect decorator invocation. @observable decorator doesn't expect any arguments"
             )
@@ -66,7 +61,9 @@ function stage2ObservableDecorator(
     return {
         key,
         kind: "method",
-        placement: "own", // makes sure they are immediately enumerable!
+        // makes sure they are immediately enumerable!
+        // ideally we would put it in the prototype, but then the props are not immediately visible on the instance (through Object.keys and such)
+        placement: "own",
         descriptor: {
             enumerable: true,
             configurable: true,
