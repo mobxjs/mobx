@@ -19,7 +19,7 @@ export interface IComputed {
     struct(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator
 }
 
-const classicComputedDecorator = createPropDecorator(
+const legacyComputedDecorator = createPropDecorator(
     false,
     (
         instance: any,
@@ -42,14 +42,14 @@ const classicComputedDecorator = createPropDecorator(
 )
 
 export const computedDecorator = function computedDecorator(arg1) {
-    if (arguments.length > 1) return classicComputedDecorator.apply(null, arguments)
+    if (arguments.length > 1) return legacyComputedDecorator.apply(null, arguments)
     if (quacksLikeAStage2Decorator(arguments)) {
         return stage2ComputedDecorator(EMPTY_OBJECT, arg1)
     }
     return function() {
         if (quacksLikeAStage2Decorator(arguments))
             return stage2ComputedDecorator(arg1, arguments[0])
-        else return classicComputedDecorator(arg1).apply(null, arguments)
+        else return legacyComputedDecorator(arg1).apply(null, arguments)
     }
 }
 
@@ -63,7 +63,7 @@ export var computed: IComputed = function computed(arg1, arg2, arg3) {
     debugger
     if (typeof arg2 === "string") {
         // @computed
-        return classicComputedDecorator.apply(null, arguments)
+        return legacyComputedDecorator.apply(null, arguments)
     }
     if (arg1 !== null && typeof arg1 === "object" && arguments.length === 1) {
         // @computed({ options })
@@ -95,8 +95,8 @@ function stage2ComputedDecorator(
     const { get, set } = descriptor
     return {
         key,
-        placement: "prototype",
         kind: "method",
+        placement: "prototype",
         descriptor: {
             enumerable: false,
             configurable: true,

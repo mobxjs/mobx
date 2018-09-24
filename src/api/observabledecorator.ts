@@ -7,6 +7,7 @@ import {
     invariant,
     quacksLikeAStage2Decorator
 } from "../internal"
+import { Stage2Decorator } from "../utils/decorators"
 
 export type IObservableDecorator = {
     (target: Object, property: string | symbol, descriptor?: PropertyDescriptor): void
@@ -15,7 +16,7 @@ export type IObservableDecorator = {
 
 export function createDecoratorForEnhancer(enhancer: IEnhancer<any>): IObservableDecorator {
     invariant(enhancer)
-    const decorator = createPropDecorator(
+    const legacyDecorator = createPropDecorator(
         true,
         (
             target: any,
@@ -38,19 +39,53 @@ export function createDecoratorForEnhancer(enhancer: IEnhancer<any>): IObservabl
             asObservableObject(target).addObservableProp(propertyName, initialValue, enhancer)
         }
     )
-    const res: any =
+    const res: any = function observableDecorator() {
+        if (quacksLikeAStage2Decorator(arguments)) {
+            return stage2ObservableDecorator(enhancer, arguments[0])
+        }
         // Extra process checks, as this happens during module initialization
-        typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production"
-            ? function observableDecorator() {
-                  // This wrapper function is just to detect illegal decorator invocations, deprecate in a next version
-                  // and simply return the created prop decorator
-                  if (arguments.length < 2 && !quacksLikeAStage2Decorator(arguments))
-                      return fail(
-                          "Incorrect decorator invocation. @observable decorator doesn't expect any arguments"
-                      )
-                  return decorator.apply(null, arguments)
-              }
-            : decorator
+        if (
+            process.env.NODE_ENV !== "production" &&
+            arguments.length < 2 &&
+            !quacksLikeAStage2Decorator(arguments)
+        )
+            return fail(
+                "Incorrect decorator invocation. @observable decorator doesn't expect any arguments"
+            )
+        return legacyDecorator.apply(null, arguments)
+    }
     res.enhancer = enhancer
     return res
+}
+
+function stage2ObservableDecorator(
+    enhancer: IEnhancer<any>,
+    elementDescriptor: Stage2Decorator
+): Stage2Decorator {
+    const { key, initializer } = elementDescriptor
+    return {
+        key,
+        kind: "method",
+        placement: "own", // makes sure they are immediately enumerable!
+        descriptor: {
+            enumerable: true,
+            configurable: true,
+            get() {
+                asObservableObject(this).addObservableProp(
+                    key,
+                    initializer && initializer.call(this),
+                    enhancer
+                )
+                return this[key]
+            },
+            set(v) {
+                asObservableObject(this).addObservableProp(
+                    key,
+                    initializer && initializer.call(this),
+                    enhancer
+                )
+                this[key] = v
+            }
+        }
+    }
 }
