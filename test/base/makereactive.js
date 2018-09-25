@@ -531,7 +531,7 @@ test("computed value", () => {
 
     expect(c.toJSON()).toBe(3)
     expect(mobx.isComputed(c)).toBe(true)
-    expect(c.toString()).toBe("ComputedValue@2[function () {return 3;}]")
+    expect(c.toString()).toMatchSnapshot()
 })
 
 test("boxed value json", () => {
