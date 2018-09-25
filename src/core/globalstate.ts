@@ -72,6 +72,7 @@ export class MobXGlobals {
      * To ensure that those functions stay pure.
      */
     allowStateChanges = true
+
     /**
      * If strict mode is enabled, state changes are by default not allowed
      */

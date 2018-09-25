@@ -11,6 +11,7 @@ test("correct api should be exposed", function() {
             "$mobx", // adminstration symbol
             "action",
             "_allowStateChanges",
+            "_allowStateChangesInsideComputed",
             "autorun",
             "comparer",
             "computed",
