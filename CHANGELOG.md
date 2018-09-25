@@ -1,3 +1,37 @@
+# 5.5.0 / 4.5.0
+
+(Jumped minor version of 5 to have the numbers more closely aligned)
+
+MobX now supports 4 different implementations of the decorators proposal:
+* TypeScript with the `--experimentalDecorators` compiler flag enabled
+* Babel 6, trough the `babel-plugin-transform-decorators-legacy` plugin
+* Babel 7, with `@babel/plugin-proposal-decorators` in legacy mode. (Setting: `legacy: true`)
+* **🎉NEW🎉** Babel 7, with `@babel/plugin-proposal-decorators` in stage 2 spec mode. (Setting: `legacy: false`)
+
+Because these implementations offer different features and semantics, there are subtle differences in all implementations.
+They won't affect 99% of your work, but sometimes there are subtle differences.
+
+These are the changes introduced by the Babel 7 implementation *if* `legacy` is set to `false`:
+
+* The legacy decorators issue where fields were not initialized until the first read are solved.
+* The exception is computed properties, running `isComputedProp` on an `@computed` decorated field that was never accessed will incorrectly yield `false`. ([background](https://github.com/tc39/proposal-decorators/issues/153))
+* There is a [babel issue](https://github.com/babel/babel/issues/8760), which has been fixed but not released yet, which causes non-decorated fields to be no longer enumerable. This currently breaks utilities like `toJS`, however this is not a MobX issue and should resolve itself with the next Babel release.
+* Computed properties become now live on the instance, rather than the prototype, so they become part of the _ownProperties_ of an object. However, they are still not enumerable, so this should make no difference in practice.
+* MobX generates non-enumerable utility properties that are all of the form `__mobx-initializer-${propName}`. Those always have the value `undefined` and you can even delete them if they annoy you, but those were introduced to work around some limitations of the current stage2 proposal ([background](https://github.com/tc39/proposal-decorators/issues/153))
+* By supporting the stage2 implementation, it is now possible to use `@babel/plugin-proposal-class-properties` in spec mode (that is, with option: `{ "loose": false }`). However, the `spec` mode breaks using the `decorate` utility on class instances, so for now it is recommended to keep using `{ "loose": true }` in your babel configuration
+* The value of te `decoratorsBeforeExport` setting of `plugin-proposal-decorators` is technically indifferent to MobX, but it is recommended to set it to `true`, this is in line with the legacy syntax and all current MobX documentation. With `true`, one can write: `@observer export class MyComponent extends React.Component {...`, with `false`, this needs to be rewritten as: `export @ observer class MyComponent extends React.Component {...`. ([background](https://github.com/tc39/proposal-decorators/issues/69))
+
+In summary: this is the babel config that uses the stage2 decorators implementation:
+
+```json
+{
+    "plugins": [
+        ["@babel/plugin-proposal-decorators", { "legacy": false, "decoratorsBeforeExport": true }],
+        ["@babel/plugin-proposal-class-properties", { "loose": true }]
+    ]
+}
+```
+
 # 5.1.2 / 4.4.2
 
 * Fixed [#1650](https://github.com/mobxjs/mobx/issues/1650), decorating fields with the name `toString` does not behave correctly.
