@@ -89,6 +89,7 @@ export function extendObservableObjectWithProperties(
             if (process.env.NODE_ENV !== "production" && typeof decorator !== "function")
                 fail(`Not a valid decorator for '${key}', got: ${decorator}`)
 
+            // TODO: in future, use the stage2 definitions / implementations instead
             const resultDescriptor = decorator!(target, key, descriptor, true)
             if (
                 resultDescriptor // otherwise, assume already applied, due to `applyToInstance`

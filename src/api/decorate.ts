@@ -39,6 +39,7 @@ export function decorate(thing: any, decorators: any) {
             (accDescriptor, decorator) => decorator(target, prop, accDescriptor),
             descriptor
         )
+        // TODO: in future, use the stage2 definitions / implementations instead
         if (newDescriptor) Object.defineProperty(target, prop, newDescriptor)
     }
     return thing
