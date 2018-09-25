@@ -442,7 +442,7 @@ test("288 atom not detected for object property", () => {
     expect(changed).toBe(true)
 })
 
-test.skip("observable performance", () => {
+test("observable performance", () => {
     const AMOUNT = 100000
 
     class A {
@@ -624,6 +624,15 @@ test("enumerability", () => {
     expect(a.hasOwnProperty("b")).toBe(true) // ideally, false. see: #1398
     expect(a.hasOwnProperty("m")).toBe(false)
     expect(a.hasOwnProperty("m2")).toBe(true)
+
+    expect(Object.getOwnPropertyNames(a)).toEqual([
+        "a",
+        "a2",
+        "__mobx-initializer-a", // Yikes! https://github.com/tc39/proposal-decorators/issues/153
+        "__mobx-initializer-a2",
+        "m2",
+        "b"
+    ])
 })
 
 test("enumerability - workaround", () => {

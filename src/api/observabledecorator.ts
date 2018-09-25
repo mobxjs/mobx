@@ -6,7 +6,8 @@ import {
     fail,
     invariant,
     quacksLikeAStage2Decorator,
-    Stage2Decorator
+    Stage2Decorator,
+    generateObservablePropConfig
 } from "../internal"
 
 export type IObservableDecorator = {
@@ -58,25 +59,37 @@ function stage2ObservableDecorator(
     elementDescriptor: Stage2Decorator
 ): Stage2Decorator {
     const { key, initializer } = elementDescriptor
-    // This property is basically an ugly hack
-    // To run some code upon initialization,
-    // see: https://github.com/tc39/proposal-decorators/issues/153
     return {
-        key: key + "_initializer",
-        kind: "field",
+        key,
+        kind: "method",
         placement: "own",
-        descriptor: {
-            enumerable: false,
-            configurable: true,
-            writable: true
-        },
-        initializer() {
-            asObservableObject(this).addObservableProp(
-                key,
-                initializer && initializer.call(this),
-                enhancer
-            )
-            return undefined
-        }
+        initializer: undefined,
+        descriptor: generateObservablePropConfig(key),
+        extras: [
+            // introduce an additional property that is always undefined,
+            // just to be able to rn initialization code upon instance creation
+            // This property is basically an ugly hack
+            // To run some code upon initialization,
+            // see: https://github.com/tc39/proposal-decorators/issues/153
+            {
+                key: "__mobx-initializer-" + key,
+                kind: "field",
+                placement: "own",
+                descriptor: {
+                    enumerable: false,
+                    configurable: true,
+                    writable: true
+                },
+                initializer() {
+                    asObservableObject(this).initializeObservableProp(
+                        key,
+                        initializer && initializer.call(this),
+                        enhancer
+                    )
+                    // rather, we would want to delete this property...
+                    return undefined
+                }
+            }
+        ]
     }
 }

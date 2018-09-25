@@ -5,6 +5,7 @@ export type Stage2Decorator = {
     descriptor: PropertyDescriptor
     initializer?: () => any
     finisher?: (klass) => void
+    extras?: Stage2Decorator[]
 }
 
 export function quacksLikeAStage2Decorator(args: IArguments): boolean {

@@ -174,6 +174,13 @@ export class ObservableObjectAdministration
             if (!change) return
             newValue = (change as any).newValue
         }
+
+        Object.defineProperty(target, propName, generateObservablePropConfig(propName))
+        newValue = this.initializeObservableProp(propName, newValue, enhancer)
+        this.notifyPropertyAddition(propName, newValue)
+    }
+
+    initializeObservableProp(propName: string, newValue, enhancer: IEnhancer<any>) {
         const observable = new ObservableValue(
             newValue,
             enhancer,
@@ -181,10 +188,7 @@ export class ObservableObjectAdministration
             false
         )
         this.values.set(propName, observable)
-        newValue = (observable as any).value // observableValue might have changed it
-
-        Object.defineProperty(target, propName, generateObservablePropConfig(propName))
-        this.notifyPropertyAddition(propName, newValue)
+        return (observable as any).value // observableValue might have changed it
     }
 
     addComputedProp(
@@ -339,8 +343,8 @@ export function asObservableObject(
     return adm
 }
 
-const observablePropertyConfigs = Object.create(null);
-const computedPropertyConfigs = Object.create(null);
+const observablePropertyConfigs = Object.create(null)
+const computedPropertyConfigs = Object.create(null)
 
 export function generateObservablePropConfig(propName) {
     return (
