@@ -112,7 +112,10 @@ export {
     getGlobalState as _getGlobalState
 } from "./core/globalstate"
 export { getDebugName, getAtom, getAdministration as _getAdministration } from "./types/type-utils"
-export { allowStateChanges as _allowStateChanges } from "./core/action"
+export {
+    allowStateChanges as _allowStateChanges,
+    allowStateChangesInsideComputed as _allowStateChangesInsideComputed
+} from "./core/action"
 export { Lambda, isArrayLike } from "./utils/utils"
 export { isComputingDerivation as _isComputingDerivation } from "./core/derivation"
 export { onReactionError } from "./core/reaction"
