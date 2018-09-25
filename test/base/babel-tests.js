@@ -140,8 +140,8 @@ class Order {
 test("decorators", function() {
     var o = new Order()
     // Broken, see: https://github.com/tc39/proposal-decorators/issues/153
-    // expect(isObservableObject(o)).toBe(true)
-    // expect(isObservableProp(o, "amount")).toBe(true)
+    expect(isObservableObject(o)).toBe(true)
+    expect(isObservableProp(o, "amount")).toBe(true)
     expect(o.total).toBe(6) // .... this is required to initialize the props which are made reactive lazily...
     expect(isObservableProp(o, "total")).toBe(true)
 

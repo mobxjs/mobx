@@ -58,31 +58,25 @@ function stage2ObservableDecorator(
     elementDescriptor: Stage2Decorator
 ): Stage2Decorator {
     const { key, initializer } = elementDescriptor
+    // This property is basically an ugly hack
+    // To run some code upon initialization,
+    // see: https://github.com/tc39/proposal-decorators/issues/153
     return {
-        key,
-        kind: "method",
-        // makes sure they are immediately enumerable!
-        // ideally we would put it in the prototype, but then the props are not immediately visible on the instance (through Object.keys and such)
+        key: key + "_initializer",
+        kind: "field",
         placement: "own",
         descriptor: {
-            enumerable: true,
+            enumerable: false,
             configurable: true,
-            get() {
-                asObservableObject(this).addObservableProp(
-                    key,
-                    initializer && initializer.call(this),
-                    enhancer
-                )
-                return this[key]
-            },
-            set(v) {
-                asObservableObject(this).addObservableProp(
-                    key,
-                    initializer && initializer.call(this),
-                    enhancer
-                )
-                this[key] = v
-            }
+            writable: true
+        },
+        initializer() {
+            asObservableObject(this).addObservableProp(
+                key,
+                initializer && initializer.call(this),
+                enhancer
+            )
+            return undefined
         }
     }
 }
