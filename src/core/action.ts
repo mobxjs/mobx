@@ -112,7 +112,7 @@ export function allowStateChangesInsideComputed<T>(func: () => T): T {
     try {
         res = func()
     } finally {
-        globalState.computationDepth += prev
+        globalState.computationDepth = prev
     }
     return res
 }
