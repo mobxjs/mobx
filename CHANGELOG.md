@@ -1,3 +1,11 @@
+# 5.5.0 / 4.5.0
+
+(Minor version of `5` was bumped significantly to make the number better correlate together :-))
+
+* `has` now returns true for computed fields
+* `get` now returns a value for computed fields
+* `has` now picks up `removed` / `delete`-ed fields (#1739)
+
 # 5.1.2 / 4.4.2
 
 * Fixed [#1650](https://github.com/mobxjs/mobx/issues/1650), decorating fields with the name `toString` does not behave correctly.

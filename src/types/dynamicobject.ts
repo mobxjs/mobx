@@ -19,7 +19,9 @@ const objectProxyTraps: ProxyHandler<any> = {
         if (name === $mobx || name === "constructor" || name === mobxDidRunLazyInitializersSymbol)
             return true
         const adm = getAdm(target)
-        if (adm.values.get(name as string)) return true
+        // MWE: should `in` operator be reactive? If not, below code path will be faster / more memory efficient
+        // TODO: check performance stats!
+        // if (adm.values.get(name as string)) return true
         if (typeof name === "string") return adm.has(name)
         return (name as any) in target
     },

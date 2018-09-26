@@ -146,10 +146,10 @@ test("in operator", () => {
             return 5
         }
     })
-    expect("a" in x).toBeTruthy()
-    expect("b" in x).toBeTruthy()
     expect("x" in x).toBeTruthy()
     expect("y" in x).toBeTruthy()
+    expect("a" in x).toBeTruthy()
+    expect("b" in x).toBeTruthy()
     expect("z" in x).toBeTruthy()
     expect("c" in x).toBeFalsy()
     expect("c" in x).toBeFalsy() // not accidentally create
