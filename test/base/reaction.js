@@ -427,7 +427,7 @@ test("issue #1148", () => {
     const a = mobx.observable.box(1)
     let called = 0
     const dispose = reaction(
-        () => this.a,
+        () => a.get(),
         () => {
             called++
         },

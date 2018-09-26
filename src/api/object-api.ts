@@ -137,7 +137,7 @@ export function has(obj: any, key: any): boolean {
         // return keys(obj).indexOf(key) >= 0
         const adm = getAdministration(obj) as ObservableObjectAdministration
         adm.getKeys() // make sure we get notified of key changes, but for performance, use the values map to look up existence
-        return adm.values[key] instanceof ObservableValue
+        return !!adm.values[key]
     } else if (isObservableMap(obj)) {
         return obj.has(key)
     } else if (isObservableArray(obj)) {

@@ -1,5 +1,6 @@
 const mobx = require("../../src/mobx")
 const {
+    autorun,
     keys,
     when,
     set,
@@ -317,7 +318,7 @@ test("has and get are reactive", async () => {
     await p2
 })
 
-test("computed props are not considered part of collections", () => {
+test("computed props are considered part of collections", () => {
     const x = observable({
         get y() {
             return 3
@@ -325,9 +326,26 @@ test("computed props are not considered part of collections", () => {
     })
     expect(mobx.isComputedProp(x, "y")).toBe(true)
     expect(x.y).toBe(3)
-    expect(has(x, "y")).toBe(false)
-    expect(get(x, "y")).toBe(undefined) // disputable?
+    expect(has(x, "y")).toBe(true)
+    expect(get(x, "y")).toBe(3)
     expect(keys(x)).toEqual([])
     expect(values(x)).toEqual([])
     expect(entries(x)).toEqual([])
+})
+
+test("#1739 - delete and undelete should work", () => {
+    const x = observable({})
+
+    const events = []
+    autorun(() => {
+        events.push(has(x, "a"))
+    })
+
+    set(x, "a", 1)
+    set(x, "a", 2)
+    remove(x, "a")
+    set(x, "a", 2)
+    remove(x, "a")
+    set(x, "a", 3)
+    expect(events).toEqual([false, true, false, true, false, true])
 })
