@@ -9,7 +9,6 @@ import { isObservableArray, IObservableArray } from "../types/observablearray"
 import { fail, invariant } from "../utils/utils"
 import { startBatch, endBatch } from "../core/observable"
 import { getAdministration } from "../types/type-utils"
-import { ObservableValue } from "../types/observablevalue"
 
 export function keys<K>(map: ObservableMap<K, any>): ReadonlyArray<K>
 export function keys<T>(ar: IObservableArray<T>): ReadonlyArray<number>
