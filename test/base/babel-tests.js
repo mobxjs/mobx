@@ -1197,3 +1197,26 @@ test.only("computed setter problem - 2", () => {
     expect(c.firstName).toBe("Michel")
     expect(c.lastName).toBe("Weststrate")
 })
+
+test("#1740, combining extendObservable & decorators", () => {
+    class AppState {
+        constructor(id) {
+            console.log("Creating Store", id)
+
+            extendObservable(this, {
+                selectedChild: null
+            })
+
+            // This will fail on the second store
+            console.log(this.foo)
+        }
+
+        @computed
+        get foo() {
+            return "foo"
+        }
+    }
+
+    let app = new AppState(1)
+    app = new AppState(2)
+})

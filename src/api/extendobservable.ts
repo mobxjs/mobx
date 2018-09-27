@@ -12,6 +12,7 @@ import {
 } from "./observable"
 import { isComputed } from "./iscomputed"
 import { computedDecorator } from "./computed"
+import { initializeInstance } from "../utils/decorators2"
 
 export function extendShallowObservable<A extends Object, B extends Object>(
     target: A,
@@ -56,6 +57,7 @@ export function extendObservable<A extends Object, B extends Object>(
     options = asCreateObservableOptions(options)
     const defaultDecorator =
         options.defaultDecorator || (options.deep === false ? refDecorator : deepDecorator)
+    initializeInstance(target)
     asObservableObject(target, options.name, defaultDecorator.enhancer) // make sure object is observable, even without initial props
     startBatch()
     try {
