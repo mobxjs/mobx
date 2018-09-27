@@ -11,7 +11,7 @@ function delay(time, value, shouldThrow = false) {
 }
 
 test("it should support async generator actions", done => {
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
     const values = []
     const x = mobx.observable({ a: 1 })
     mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
@@ -35,7 +35,7 @@ test("it should support async generator actions", done => {
 })
 
 test("it should support try catch in async generator", done => {
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
     const values = []
     const x = mobx.observable({ a: 1 })
     mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
@@ -63,37 +63,41 @@ test("it should support try catch in async generator", done => {
 })
 
 test("it should support throw from async generator", done => {
-    mobx.flow(function*() {
-        throw 7
-    })().then(
-        () => {
-            done.fail("should fail")
-        },
-        e => {
-            expect(e).toBe(7)
-            done()
-        }
-    )
+    mobx
+        .flow(function*() {
+            throw 7
+        })()
+        .then(
+            () => {
+                done.fail("should fail")
+            },
+            e => {
+                expect(e).toBe(7)
+                done()
+            }
+        )
 })
 
 test("it should support throw from yielded promise generator", done => {
-    mobx.flow(function*() {
-        return yield delay(10, 7, true)
-    })().then(
-        () => {
-            done.fail("should fail")
-        },
-        e => {
-            expect(e).toBe(7)
-            done()
-        }
-    )
+    mobx
+        .flow(function*() {
+            return yield delay(10, 7, true)
+        })()
+        .then(
+            () => {
+                done.fail("should fail")
+            },
+            e => {
+                expect(e).toBe(7)
+                done()
+            }
+        )
 })
 
 test("it should support asyncAction in classes", done => {
     const values = []
 
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
 
     class X {
         a = 1
@@ -128,7 +132,7 @@ test("it should support asyncAction in classes", done => {
 })
 
 test("it should support logging", done => {
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
     const events = []
     const x = mobx.observable({ a: 1 })
 
@@ -211,7 +215,7 @@ test("flows can be cancelled - 2 - finally clauses are run", done => {
 test("flows can be cancelled - 3 - throw in finally should be catched", done => {
     const counter = mobx.observable({ counter: 0 })
     const d = mobx.reaction(() => counter.counter, () => {})
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
 
     const start = flow(function*() {
         counter.counter = 1
@@ -230,7 +234,7 @@ test("flows can be cancelled - 3 - throw in finally should be catched", done => 
         err => {
             expect("" + err).toBe("OOPS")
             expect(counter.counter).toBe(4)
-            mobx.configure({ enforceActions: false })
+            mobx.configure({ enforceActions: "never" })
             d()
             done()
         }
