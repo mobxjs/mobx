@@ -2,9 +2,14 @@
 
 (Minor version of `5` was bumped significantly to make the number better correlate together :-))
 
-* `has` now returns true for computed fields
-* `get` now returns a value for computed fields
-* `has` now picks up `removed` / `delete`-ed fields (#1739)
+* Fixed [#1740](https://github.com/mobxjs/mobx/issues/1740): combining decorators and `extendObservable` in a class constructor caused errors to be thrown
+* Fixed [#1739](https://github.com/mobxjs/mobx/issues/1740):
+   * Proxies: `delete`-ing a property was not always picked up by the reactivity system
+   * Non-proxies: `remove()`-ing a property was not always picked up by the `has()` and `get()` utilities
+   * `has` now returns `true` for computed fields
+   * `get` now returns a value for computed fields
+* Introduced `_allowStateChangeInsideComputed`. Don't use it :-).
+* MobX is now transpiled using babel 7
 
 # 5.1.2 / 4.4.2
 
