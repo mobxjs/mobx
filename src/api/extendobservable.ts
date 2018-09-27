@@ -11,7 +11,8 @@ import {
     isObservable,
     isObservableMap,
     refDecorator,
-    startBatch
+    startBatch,
+    initializeInstance
 } from "../internal"
 import { IObservableDecorator } from "./observabledecorator"
 
@@ -38,6 +39,7 @@ export function extendObservable<A extends Object, B extends Object>(
 
     options = asCreateObservableOptions(options)
     const defaultDecorator = getDefaultDecoratorFromObjectOptions(options)
+    initializeInstance(target) // Fixes #1740
     asObservableObject(target, options.name, defaultDecorator.enhancer) // make sure object is observable, even without initial props
     if (properties)
         extendObservableObjectWithProperties(target, properties, decorators, defaultDecorator)

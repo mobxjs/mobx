@@ -587,11 +587,9 @@ test("enumerability", () => {
     let props = []
     for (var key in a) props.push(key)
 
-    expect(ownProps).toEqual(
-        [
-            // should have a, not supported yet in babel...
-        ]
-    )
+    expect(ownProps).toEqual([
+        // should have a, not supported yet in babel...
+    ])
 
     expect(props).toEqual(["a", "a2"])
 
@@ -701,11 +699,9 @@ test("verify object assign (babel)", () => {
     }
 
     const todo = new Todo()
-    expect(Object.assign({}, todo)).toEqual(
-        {
-            //		Should be:	title: "test"!
-        }
-    )
+    expect(Object.assign({}, todo)).toEqual({
+        //		Should be:	title: "test"!
+    })
 
     todo.title // lazy initialization :'(
 
@@ -1196,4 +1192,27 @@ test("computed setter problem - 2", () => {
     c.fullName = "Michel Weststrate"
     expect(c.firstName).toBe("Michel")
     expect(c.lastName).toBe("Weststrate")
+})
+
+test("#1740, combining extendObservable & decorators", () => {
+    class AppState {
+        constructor(id) {
+            console.log("Creating Store", id)
+
+            extendObservable(this, {
+                selectedChild: null
+            })
+
+            // This will fail on the second store
+            console.log(this.foo)
+        }
+
+        @computed
+        get foo() {
+            return "foo"
+        }
+    }
+
+    let app = new AppState(1)
+    app = new AppState(2)
 })

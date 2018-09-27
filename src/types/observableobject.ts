@@ -143,6 +143,8 @@ export class ObservableObjectAdministration
         if (entry) return entry.get()
         else {
             const exists = !!this.values.get(key)
+            // Possible optimization: Don't have a separate map for non existing keys,
+            // but store them in the values map instead, using a special symbol to denote "not existing"
             entry = new ObservableValue(
                 exists,
                 referenceEnhancer,
