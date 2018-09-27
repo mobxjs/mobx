@@ -642,13 +642,13 @@ test("custom action decorator on field (typescript)", () => {
 })
 
 test("267 (typescript) should be possible to declare properties observable outside strict mode", () => {
-    configure({ enforceActions: true })
+    configure({ enforceActions: "observed" })
 
     class Store {
         @observable timer: number | null = null
     }
 
-    configure({ enforceActions: false })
+    configure({ enforceActions: "never" })
 })
 
 test("288 atom not detected for object property", () => {
@@ -1554,7 +1554,7 @@ test("promised when can be cancelled", async () => {
 test("it should support asyncAction as decorator (ts)", async () => {
     const values = []
 
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
 
     class X {
         @observable a = 1
