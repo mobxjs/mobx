@@ -189,7 +189,7 @@ class Store {
 		try {
 			const projects = yield fetchGithubProjectsSomehow() // yield instead of await
 			const filteredProjects = somePreprocessing(projects)
-			// the asynchronous blocks will automatically be wrapped actions and can modify state
+			// the asynchronous blocks will automatically be wrapped in actions and can modify state
 			this.state = "done"
 			this.githubProjects = filteredProjects
 		} catch (error) {
@@ -198,3 +198,7 @@ class Store {
 	})
 }
 ```
+
+#### Flows can be cancelled
+
+Flows are canceallable, that means that you can call `cancel()` on the returned promise. This will stop the generator immediately, but any finally clause will still be processed. The returned promise itself will reject with `FLOW_CANCELLED`.
