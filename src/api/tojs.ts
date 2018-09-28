@@ -12,7 +12,8 @@ export type ToJSOptions = {
 
 const defaultOptions: ToJSOptions = {
     detectCycles: true,
-    exportMapsAsObjects: true
+    exportMapsAsObjects: true,
+    recurseEverything: false
 }
 
 function cache<K, V>(map: Map<any, any>, key: K, value: V, options: ToJSOptions): V {
@@ -21,13 +22,9 @@ function cache<K, V>(map: Map<any, any>, key: K, value: V, options: ToJSOptions)
 }
 
 function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) {
-    if (!options.recurseEverything && !isObservable(source)) {
-        return source
-    }
+    if (!options.recurseEverything && !isObservable(source)) return source
 
-    if (typeof source !== "object") {
-        return source
-    }
+    if (typeof source !== "object") return source
 
     // Directly return the Date object itself if contained in the observable
     if (source instanceof Date) return source
@@ -88,10 +85,13 @@ export function toJS(source, options?: ToJSOptions) {
     // backward compatibility
     if (typeof options === "boolean") options = { detectCycles: options }
     if (!options) options = defaultOptions
-    const detectCycles = options.detectCycles === true
+    options.detectCycles =
+        options.detectCycles === undefined
+            ? options.recurseEverything === true
+            : options.detectCycles === true
 
     let __alreadySeen
-    if (detectCycles) __alreadySeen = new Map()
+    if (options.detectCycles) __alreadySeen = new Map()
 
     return toJSHelper(source, options, __alreadySeen)
 }
