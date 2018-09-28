@@ -1,20 +1,21 @@
 import {
+    keys,
     isObservable,
     isObservableArray,
-    isObservableMap,
-    isObservableObject,
     isObservableValue,
-    keys
+    isObservableMap
 } from "../internal"
 
 export type ToJSOptions = {
     detectCycles?: boolean
     exportMapsAsObjects?: boolean
+    recurseEverything?: boolean
 }
 
 const defaultOptions: ToJSOptions = {
     detectCycles: true,
-    exportMapsAsObjects: true
+    exportMapsAsObjects: true,
+    recurseEverything: false
 }
 
 function cache<K, V>(map: Map<any, any>, key: K, value: V, options: ToJSOptions): V {
@@ -23,20 +24,27 @@ function cache<K, V>(map: Map<any, any>, key: K, value: V, options: ToJSOptions)
 }
 
 function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) {
-    if (!isObservable(source)) return source
+    if (!options.recurseEverything && !isObservable(source)) return source
+
+    if (typeof source !== "object") return source
+
+    // Directly return the Date object itself if contained in the observable
+    if (source instanceof Date) return source
+
+    if (isObservableValue(source)) return toJSHelper(source.get(), options!, __alreadySeen)
+
+    // make sure we track the keys of the object
+    if (isObservable(source)) {
+        keys(source)
+    }
 
     const detectCycles = options.detectCycles === true
 
-    if (
-        detectCycles &&
-        source !== null &&
-        typeof source === "object" &&
-        __alreadySeen.has(source)
-    ) {
+    if (detectCycles && source !== null && __alreadySeen.has(source)) {
         return __alreadySeen.get(source)
     }
 
-    if (isObservableArray(source)) {
+    if (isObservableArray(source) || Array.isArray(source)) {
         const res = cache(__alreadySeen, source, [] as any, options)
         const toAdd = source.map(value => toJSHelper(value, options!, __alreadySeen))
         res.length = toAdd.length
@@ -44,16 +52,7 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
         return res
     }
 
-    if (isObservableObject(source)) {
-        const res = cache(__alreadySeen, source, {}, options)
-        keys(source) // make sure we track the keys of the object
-        for (let key in source) {
-            res[key] = toJSHelper(source[key], options!, __alreadySeen)
-        }
-        return res
-    }
-
-    if (isObservableMap(source)) {
+    if (isObservableMap(source) || Object.getPrototypeOf(source) === Map.prototype) {
         if (options.exportMapsAsObjects === false) {
             const res = cache(__alreadySeen, source, new Map(), options)
             source.forEach((value, key) => {
@@ -69,9 +68,13 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
         }
     }
 
-    if (isObservableValue(source)) return toJSHelper(source.get(), options!, __alreadySeen)
+    // Fallback to the situation that source is an ObservableObject or a plain object
+    const res = cache(__alreadySeen, source, {}, options)
+    for (let key in source) {
+        res[key] = toJSHelper(source[key], options!, __alreadySeen)
+    }
 
-    return source
+    return res
 }
 
 /**
@@ -81,15 +84,16 @@ export function toJS<T>(source: T, options?: ToJSOptions): T
 export function toJS(source: any, options?: ToJSOptions): any
 export function toJS(source, options: ToJSOptions) // internal overload
 export function toJS(source, options?: ToJSOptions) {
-    if (!isObservable(source)) return source
-
     // backward compatibility
     if (typeof options === "boolean") options = { detectCycles: options }
     if (!options) options = defaultOptions
-    const detectCycles = options.detectCycles === true
+    options.detectCycles =
+        options.detectCycles === undefined
+            ? options.recurseEverything === true
+            : options.detectCycles === true
 
     let __alreadySeen
-    if (detectCycles) __alreadySeen = new Map()
+    if (options.detectCycles) __alreadySeen = new Map()
 
     return toJSHelper(source, options, __alreadySeen)
 }
