@@ -1,8 +1,10 @@
-import { keys } from "./object-api"
-import { isObservable } from "./isobservable"
-import { isObservableArray } from "../types/observablearray"
-import { isObservableValue } from "../types/observablevalue"
-import { isObservableMap } from "../types/observablemap"
+import {
+    keys,
+    isObservable,
+    isObservableArray,
+    isObservableValue,
+    isObservableMap
+} from "../internal"
 
 export type ToJSOptions = {
     detectCycles?: boolean
@@ -12,7 +14,8 @@ export type ToJSOptions = {
 
 const defaultOptions: ToJSOptions = {
     detectCycles: true,
-    exportMapsAsObjects: true
+    exportMapsAsObjects: true,
+    recurseEverything: false
 }
 
 function cache<K, V>(map: Map<any, any>, key: K, value: V, options: ToJSOptions): V {
@@ -84,10 +87,13 @@ export function toJS(source, options?: ToJSOptions) {
     // backward compatibility
     if (typeof options === "boolean") options = { detectCycles: options }
     if (!options) options = defaultOptions
-    const detectCycles = options.detectCycles === true
+    options.detectCycles =
+        options.detectCycles === undefined
+            ? options.recurseEverything === true
+            : options.detectCycles === true
 
     let __alreadySeen
-    if (detectCycles) __alreadySeen = new Map()
+    if (options.detectCycles) __alreadySeen = new Map()
 
     return toJSHelper(source, options, __alreadySeen)
 }
