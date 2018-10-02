@@ -170,7 +170,8 @@ class Store {
 
 ### flows
 
-However, a nicer approach is to use the built-in concept of `flow`s. They use generators. Which might look scary in the beginning, but it works the same as `async` / `await`. Just use `function *` instead of `async` and `yield` instead of `await`.
+However, a nicer approach is to use the built-in concept of `flow`s. They use generators. Which might look scary in the beginning, but it works the same as `async` / `await`. Just use `function *` instead of `async` and `yield` instead of `await`. You may use `Promise.resolve()` and `Promise.reject()` / `throw` from within the generator function to return information about the success or failure to the callsite.
+
 The advantage of `flow` is that it is syntactically very close to async / await (with different keywords), and no manually action wrapping is needed for async parts, resulting in very clean code.
 
 `flow` can be used only as function and not as decorator.
@@ -192,8 +193,10 @@ class Store {
 			// the asynchronous blocks will automatically be wrapped in actions and can modify state
 			this.state = "done"
 			this.githubProjects = filteredProjects
+			return "SUCCESS!"
 		} catch (error) {
 			this.state = "error"
+			return Promise.reject(new Error("FAILED!")) // you can also use throw new Error(...)
 		}
 	})
 }
