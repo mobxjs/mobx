@@ -78,7 +78,23 @@ test("it should support throw from async generator", done => {
         )
 })
 
-test("it should support throw from yielded promise generator", done => {
+test("it should support returning Promise.reject() from async generator", done => {
+    mobx
+        .flow(function*() {
+            return Promise.reject(7)
+        })()
+        .then(
+            () => {
+                done.fail("should fail")
+            },
+            e => {
+                expect(e).toBe(7)
+                done()
+            }
+        )
+})
+
+test("it should support promise rejection from yielded promise generator", done => {
     mobx
         .flow(function*() {
             return yield delay(10, 7, true)
