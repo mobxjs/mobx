@@ -140,7 +140,7 @@ export class TodoStore {
     }
 
     /**
-     * Fetches all todo's from the server
+     * Fetches all todos from the server
      */
     loadTodos() {
         this.isLoading = true;
@@ -153,7 +153,7 @@ export class TodoStore {
     /**
      * Update a todo with information from the server. Guarantees a todo
      * only exists once. Might either construct a new todo, update an existing one,
-     * or remove an todo if it has been deleted on the server.
+     * or remove a todo if it has been deleted on the server.
      */
     updateTodoFromServer(json) {
         var todo = this.todos.find(todo => todo.id === json.id);
@@ -252,7 +252,7 @@ export class Todo {
      * Update this todo with information from the server
      */
     updateFromJson(json) {
-        // make sure our changes aren't send back to the server
+        // make sure our changes aren't sent back to the server
         this.autoSave = false;
         this.completed = json.completed;
         this.task = json.task;
