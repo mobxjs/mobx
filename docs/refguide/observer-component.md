@@ -127,7 +127,7 @@ const Button = inject("colors")(observer(({ colors, label, onClick }) =>
       backgroundColor: colors.background
     }}
     onClick={onClick}
-  >{label}<button>
+  >{label}</button>
 ));
 
 // later..
