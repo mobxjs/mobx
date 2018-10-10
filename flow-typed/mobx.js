@@ -354,6 +354,12 @@ declare export function isComputedProp(value: any, property: string): boolean
 declare export function isObservable(value: any): boolean
 declare export function isObservableProp(value: any, property: string): boolean
 
+declare export var comparer: {
+    identity: IEqualsComparer<any>,
+    structural: IEqualsComparer<any>,
+    default: IEqualsComparer<any>,
+}
+
 declare export var observable: IObservableFactory &
     IObservableFactories & {
         deep: {
