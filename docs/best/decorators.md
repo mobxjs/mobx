@@ -109,7 +109,7 @@ If you want to use decorators follow the following steps.
 
 Enable the compiler option `"experimentalDecorators": true` in your `tsconfig.json`.
 
-**Babel: using `babel-preset-mobx`**
+**Babel 6: using `babel-preset-mobx`**
 
 A more convenient way to setup Babel for usage with mobx is to use the [`mobx`](https://github.com/zwhitchcox/babel-preset-mobx) preset, that incorporates decorators and several other plugins typically used with mobx:
 
@@ -125,7 +125,7 @@ npm install --save-dev babel-preset-mobx
 }
 ```
 
-**Babel: manually enabling decorators**
+**Babel 6: manually enabling decorators**
 
 To enable support for decorators without using the mobx preset, follow the following steps.
 Install support for decorators: `npm i --save-dev babel-plugin-transform-decorators-legacy`. And enable it in your `.babelrc` file:
@@ -140,11 +140,28 @@ Install support for decorators: `npm i --save-dev babel-plugin-transform-decorat
 Note that the order of plugins is important: `transform-decorators-legacy` should be listed _first_.
 Having issues with the babel setup? Check this [issue](https://github.com/mobxjs/mobx/issues/105) first.
 
-For babel 7, see [issue 1352](https://github.com/mobxjs/mobx/issues/1352) for an example setup.
+**Babel 7**
 
-## Decorator syntax and Create React App
+Install support for decorators: `npm i --save-dev @babel/plugin-proposal-class-properties @babel/plugin-proposal-decorators`. And enable it in your `.babelrc` file:
 
-* decorators are not supported out of the box in `create-react-app`. To fix this, you can either eject, or use [react-app-rewired](https://github.com/timarney/react-app-rewired/tree/master/packages/react-app-rewire-mobx).
+```json
+{
+    "plugins": [
+        ["@babel/plugin-proposal-decorators", { "legacy": true}],
+        ["@babel/plugin-proposal-class-properties", { "loose": true}]
+    ]
+}
+```
+
+Note that the `legacy` mode is important (as is putting the decorators proposal first). Non-legacy mode is [WIP](https://github.com/mobxjs/mobx/pull/1732).
+
+## Decorator syntax and Create React App (v1)
+
+* Decorators are not supported out of the box in `create-react-app@1.*`. To fix this, you can either use the `decorate` utility, eject, or use the [react-app-rewired](https://github.com/timarney/react-app-rewired/tree/master/packages/react-app-rewire-mobx) package.
+
+## Decorator syntax and Create React App (v2)
+
+* decorators are not supported out of the box in `create-react-app@2.*`. To fix this, you can either use the `decorate` utility, eject, or use the [customize-cra](https://github.com/timarney/react-app-rewired/tree/master/packages/react-app-rewire-mobx) package.
 
 ---
 
