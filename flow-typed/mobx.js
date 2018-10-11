@@ -3,7 +3,7 @@
 export type IObservableMapInitialValues<K, V> = IMapEntries<K, V> | KeyValueMap<V> | IMap<K, V>
 
 export interface IMobxConfigurationOptions {
-    +enforceActions?: boolean | "strict",
+    +enforceActions?: boolean | "strict" | "never" | "always" | "observed",
     computedRequiresReaction?: boolean,
     isolateGlobalState?: boolean,
     disableErrorBoundaries?: boolean,
