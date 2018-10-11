@@ -27,6 +27,18 @@ export class Atom implements IAtom {
     diffValue = 0
     lastAccessedBy = 0
     lowestObserverState = IDerivationState.NOT_TRACKING
+
+    private observedListeners?: Set<Function>
+    private unobservedListeners?: Set<Function>
+
+    get onBecomeObservedListeners(): Set<Function> {
+        if (this.observedListeners === undefined) this.observedListeners = new Set()
+        return this.observedListeners
+    }
+    get onBecomeUnobservedListeners(): Set<Function> {
+        if (this.unobservedListeners === undefined) this.unobservedListeners = new Set()
+        return this.unobservedListeners
+    }
     /**
      * Create a new atom. For debugging purposes it is recommended to give it a name.
      * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
@@ -34,11 +46,11 @@ export class Atom implements IAtom {
     constructor(public name = "Atom@" + getNextId()) {}
 
     public onBecomeUnobserved() {
-        // noop
+        this.onBecomeUnobservedListeners.forEach(listener => listener())
     }
 
     public onBecomeObserved() {
-        /* noop */
+        this.onBecomeObservedListeners.forEach(listener => listener())
     }
 
     /**

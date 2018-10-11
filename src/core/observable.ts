@@ -31,6 +31,9 @@ export interface IObservable extends IDepTreeNode {
 
     onBecomeUnobserved(): void
     onBecomeObserved(): void
+
+    onBecomeUnobservedListeners: Set<Function>
+    onBecomeObservedListeners: Set<Function>
 }
 
 export function hasObservers(observable: IObservable): boolean {

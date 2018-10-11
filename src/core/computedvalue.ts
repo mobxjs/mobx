@@ -93,6 +93,18 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     private keepAlive: boolean
     private firstGet: boolean = true
 
+    private observedListeners?: Set<Function>
+    private unobservedListeners?: Set<Function>
+
+    get onBecomeObservedListeners(): Set<Function> {
+        if (this.observedListeners === undefined) this.observedListeners = new Set()
+        return this.observedListeners
+    }
+    get onBecomeUnobservedListeners(): Set<Function> {
+        if (this.unobservedListeners === undefined) this.unobservedListeners = new Set()
+        return this.unobservedListeners
+    }
+
     /**
      * Create a new computed value based on a function expression.
      *
@@ -125,9 +137,13 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         propagateMaybeChanged(this)
     }
 
-    onBecomeUnobserved() {}
+    public onBecomeUnobserved() {
+        this.onBecomeUnobservedListeners.forEach(listener => listener())
+    }
 
-    onBecomeObserved() {}
+    public onBecomeObserved() {
+        this.onBecomeObservedListeners.forEach(listener => listener())
+    }
 
     /**
      * Returns the current value of this computed value.

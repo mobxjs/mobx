@@ -375,7 +375,6 @@ test("onBecome(Un)Observed - less simple", () => {
     x.a = 4
 
     expect(events.length).toBe(0) // nothing happened yet
-
     const d5 = mobx.reaction(() => x.b, () => {})
     expect(events.length).toBe(2)
     expect(events).toEqual(["b observed", "a observed"])
@@ -397,6 +396,45 @@ test("onBecome(Un)Observed - less simple", () => {
     const d7 = mobx.reaction(() => x.b, () => {})
     d7()
     expect(events.length).toBe(0)
+})
+
+test("onBecomeObserved correctly disposes second listener", () => {
+    const x = mobx.observable.box(3)
+    const events = []
+
+    const d1 = mobx.onBecomeObserved(x, () => {
+        events.push("x observed")
+    })
+    mobx.onBecomeObserved(x, () => {
+        events.push("x observed 2")
+    })
+
+    d1()
+    mobx.reaction(() => x.get(), () => {})
+
+    expect(events.length).toBe(1)
+    expect(events).toEqual(["x observed 2"])
+})
+
+test("onBecomeUnobserved correctly disposes second listener", () => {
+    const x = mobx.observable.box(3)
+    const events = []
+
+    const d1 = mobx.onBecomeUnobserved(x, () => {
+        events.push("x unobserved")
+    })
+    mobx.onBecomeUnobserved(x, () => {
+        events.push("x unobserved 2")
+    })
+
+    d1()
+
+    const d3 = mobx.reaction(() => x.get(), () => {})
+
+    d3()
+
+    expect(events.length).toBe(1)
+    expect(events).toEqual(["x unobserved 2"])
 })
 
 test("deepEquals should yield correct results for complex objects #1118 - 1", () => {
